@@ -125,7 +125,9 @@ final class SchedulingMethodImpl implements SchedulingMethod {
      * 	<li>Manage exception while deploying tasks on nodes
      * </ul>
      */
-    public void schedule() {
+    public int schedule() {
+
+        int numberOfTaskStarted = 0;
         //Number of time to retry an active object creation before leaving scheduling loop
         activeObjectCreationRetryTimeNumber = ACTIVEOBJECT_CREATION_RETRY_TIME_NUMBER;
 
@@ -138,10 +140,11 @@ final class SchedulingMethodImpl implements SchedulingMethod {
 
         //if there is no task to scheduled, return
         if (taskRetrivedFromPolicy == null || taskRetrivedFromPolicy.size() == 0) {
-            return;
+            return numberOfTaskStarted;
         }
 
         logger_dev.info("Number of tasks ready to be scheduled : " + taskRetrivedFromPolicy.size());
+        System.out.println("Number of tasks ready to be scheduled : " + taskRetrivedFromPolicy.size());
 
         while (!taskRetrivedFromPolicy.isEmpty()) {
             //get rmState and update it in scheduling policy
@@ -179,6 +182,7 @@ final class SchedulingMethodImpl implements SchedulingMethod {
 
                     //create launcher and try to start the task
                     node = nodeSet.get(0);
+                    numberOfTaskStarted++;
                     createExecution(nodeSet, node, currentJob, internalTask, taskDescriptor);
 
                     //if every task that should be launched have been removed
@@ -201,7 +205,7 @@ final class SchedulingMethodImpl implements SchedulingMethod {
                     logger_dev.info("Unable to get back the nodeSet to the RM", e2);
                 }
                 if (--activeObjectCreationRetryTimeNumber == 0) {
-                    return;
+                    return numberOfTaskStarted;
                 }
             } catch (Exception e1) {
                 //if we are here, it is that something append while launching the current task.
@@ -214,6 +218,7 @@ final class SchedulingMethodImpl implements SchedulingMethod {
                 }
             }
         }
+        return numberOfTaskStarted;
     }
 
     /**

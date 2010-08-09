@@ -47,6 +47,6 @@ interface SchedulingMethod {
     /**
      * Scheduling process.
      */
-    void schedule();
+    int schedule();
 
 }

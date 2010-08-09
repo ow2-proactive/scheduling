@@ -70,6 +70,9 @@ public enum PASchedulerProperties {
     /** Scheduler main loop time out */
     SCHEDULER_TIME_OUT("pa.scheduler.core.timeout", PropertyType.INTEGER),
 
+    /** Scheduler main loop time out */
+    SCHEDULER_START_TERMINATE_RATIO("pa.scheduler.core.stratio", PropertyType.INTEGER),
+
     /** Scheduler node ping frequency in s. */
     SCHEDULER_NODE_PING_FREQUENCY("pa.scheduler.core.nodepingfrequency", PropertyType.INTEGER),
 

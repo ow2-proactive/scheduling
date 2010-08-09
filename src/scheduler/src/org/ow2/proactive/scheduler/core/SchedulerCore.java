@@ -39,6 +39,7 @@ package org.ow2.proactive.scheduler.core;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -149,6 +150,13 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
 
     /** Scheduler main loop time out */
     private static final int SCHEDULER_TIME_OUT = PASchedulerProperties.SCHEDULER_TIME_OUT.getValueAsInt();
+
+    /** Ratio between number of task start and task termination in a single scheduling loop */
+    private static final int SCHEDULER_START_TERM_RATIO = PASchedulerProperties.SCHEDULER_START_TERMINATE_RATIO
+            .getValueAsInt();
+
+    /** Max number of terminate request that can be served consecutively */
+    private static final int MAX_TERM_SERVICE = 21;
 
     /** Scheduler node ping frequency in second. */
     private static final long SCHEDULER_NODE_PING_FREQUENCY = PASchedulerProperties.SCHEDULER_NODE_PING_FREQUENCY
@@ -482,11 +490,22 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
 
             Service service = new Service(body);
             // immediate services are set with @ImmediateService annotation
-            logger_dev.debug("Core immediate services : isSubmitPossible, getJobResult, getJobState");
 
-            //set the filter for serveAll method (user action are privileged)
-            RequestFilter filter = new MainLoopRequestFilter("submit", "terminate", "listenJobLogs",
-                "getState");
+            if (logger_dev.isDebugEnabled()) {
+                String tmp = "Core immediate services :";
+                for (Method m : SchedulerCore.class.getDeclaredMethods()) {
+                    if (m.isAnnotationPresent(ImmediateService.class)) {
+                        tmp += " " + m.getName();
+                    }
+                }
+                logger_dev.info(tmp);
+            }
+
+			//set the filter for serveAll method (user action are privileged)
+            RequestFilter terminateFilter = new MainLoopRequestFilter("terminate");
+            RequestFilter incomingRequestsFilter = new MainLoopRequestFilter("submit", "listenJobLogs",
+                    "getState");
+
             createPingThread();
 
             //create scheduling method
@@ -496,16 +515,48 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
             start();
 
             do {
-
+                // number of task started by the previous scheduling loop
+                int numberOfTaskStarted = 1;
                 while ((status == SchedulerStatus.STARTED) || (status == SchedulerStatus.PAUSED) ||
                     (status == SchedulerStatus.STOPPED)) {
                     try {
-                        //block the loop until a method is invoked and serve it
-                        service.blockingServeOldest(SCHEDULER_TIME_OUT);
-                        //serve all important methods
-                        service.serveAll(filter);
+                        // block the loop until a method is invoked and serve it
+                        // while some task are started loop as faster as possible
+                        service.blockingServeOldest(numberOfTaskStarted != 0 ? 1 : SCHEDULER_TIME_OUT);
+                        if (logger_dev.isTraceEnabled()) {
+                            logger_dev.trace("[PROF] Timout is = " +
+                                (numberOfTaskStarted != 0 ? 1 : SCHEDULER_TIME_OUT));
+                        }
+                        //serve all incoming methods
+                        service.serveAll(incomingRequestsFilter);
+
                         //schedule
-                        schedulingMethod.schedule();
+                        long startSch = System.currentTimeMillis();
+                        numberOfTaskStarted = schedulingMethod.schedule();
+                        if (logger_dev.isTraceEnabled()) {
+                            logger_dev.trace("[PROF] Scheduling time = " +
+                                (System.currentTimeMillis() - startSch) + " for " + numberOfTaskStarted);
+                        }
+                        // serve internal request
+                        long startTerm = System.currentTimeMillis();
+                        int maxTermServices = 0;
+                        if (numberOfTaskStarted != 0) {
+                            final int stratio = numberOfTaskStarted / SCHEDULER_START_TERM_RATIO;
+                            maxTermServices = stratio < 1 ? 1 : stratio;
+                        } else {
+                            maxTermServices = MAX_TERM_SERVICE;
+                        }
+                        int termServicesCounter = 0;
+                        while (service.hasRequestToServe(terminateFilter) &&
+                            (termServicesCounter < maxTermServices)) {
+                            service.serveOldest(terminateFilter);
+                            termServicesCounter++;
+                        }
+                        if (logger_dev.isTraceEnabled()) {
+                            logger_dev.trace("[PROF] Terminate served = " + termServicesCounter + " in " +
+                                (System.currentTimeMillis() - startTerm));
+                        }
+
                     } catch (Throwable e) {
                         //this point is reached in case of big problem, sometimes unknown
                         logger
@@ -560,13 +611,26 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
                 //terminating jobs...
                 logger.info("Terminating jobs...");
             }
-
+            int numberOfTaskStarted = 1;
             while ((runningJobs.size() + pendingJobs.size()) > 0) {
                 try {
-                    //block the loop until a method is invoked and serve it
-                    service.blockingServeOldest(SCHEDULER_TIME_OUT);
-                    service.serveAll(filter);
-                    schedulingMethod.schedule();
+                    // same loop as main loop
+                    service.blockingServeOldest(numberOfTaskStarted != 0 ? 1 : SCHEDULER_TIME_OUT);
+                    service.serveAll(incomingRequestsFilter);
+                    numberOfTaskStarted = schedulingMethod.schedule();
+                    int maxTermServices = 0;
+                    if (numberOfTaskStarted != 0) {
+                        final int stratio = numberOfTaskStarted / SCHEDULER_START_TERM_RATIO;
+                        maxTermServices = stratio < 1 ? 1 : stratio;
+                    } else {
+                        maxTermServices = MAX_TERM_SERVICE;
+                    }
+                    int termServicesCounter = 0;
+                    while (service.hasRequestToServe(terminateFilter) &&
+                        (termServicesCounter < maxTermServices)) {
+                        service.serveOldest(terminateFilter);
+                        termServicesCounter++;
+                    }
                 } catch (Exception e) {
                     logger_dev.error("", e);
                 }
