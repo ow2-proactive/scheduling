@@ -63,10 +63,10 @@ public final class SchedulerStateImpl implements SchedulerState {
     private Vector<JobState> finishedJobs = new Vector<JobState>();
 
     /** Scheduler status */
-    private SchedulerStatus status = SchedulerStatus.STOPPED;
+    private SchedulerStatus status = SchedulerStatus.STARTED;
 
     /** List of connected user. */
-    private SchedulerUsers sUsers;
+    private SchedulerUsers sUsers = new SchedulerUsers();
 
     /**
      * ProActive Empty constructor.

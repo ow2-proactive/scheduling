@@ -83,7 +83,6 @@ import org.ow2.proactive.db.DatabaseManagerException;
 import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.SchedulerCoreMethods;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
-import org.ow2.proactive.scheduler.common.SchedulerState;
 import org.ow2.proactive.scheduler.common.SchedulerStatus;
 import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
 import org.ow2.proactive.scheduler.common.exception.ClassServerException;
@@ -1223,27 +1222,6 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
      * {@inheritDoc}
      */
     @RunActivityFiltered(id = "external")
-    public SchedulerState getState() {
-        SchedulerStateImpl sState = new SchedulerStateImpl();
-        sState.setPendingJobs(convert(pendingJobs));
-        sState.setRunningJobs(convert(runningJobs));
-        sState.setFinishedJobs(convert(finishedJobs));
-        sState.setState(status);
-        return sState;
-    }
-
-    private Vector<JobState> convert(Vector<InternalJob> jobs) {
-        Vector<JobState> jobs2 = new Vector<JobState>();
-        for (InternalJob j : jobs) {
-            jobs2.add(j);
-        }
-        return jobs2;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @RunActivityFiltered(id = "external")
     public void listenJobLogs(JobId jobId, AppenderProvider appenderProvider) throws UnknownJobException {
         logger_dev.info("listen logs of job '" + jobId + "'");
         Logger l = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX + jobId);
@@ -1795,14 +1773,6 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
     /**
      * {@inheritDoc}
      */
-    public JobState getJobState(JobId jobId) {
-        logger_dev.info("Request sent to get the State of job '" + jobId + "'");
-        return jobs.get(jobId);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public boolean changePolicy(Class<? extends Policy> newPolicyFile) {
         try {
             policy = newPolicyFile.newInstance();
@@ -1873,7 +1843,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
 
         if (recovering.size() == 0) {
             logger_dev.info("No Job to recover.");
-            frontend.recover(null);
+            frontend.recover(new SchedulerStateImpl());
             return;
         }
 
@@ -2094,8 +2064,21 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
         //------------------------------------------------------------------------
         logger.debug("Recover the scheduler front-end");
 
-        frontend.recover(jobs);
+        SchedulerStateImpl sState = new SchedulerStateImpl();
+        sState.setPendingJobs(convert(pendingJobs));
+        sState.setRunningJobs(convert(runningJobs));
+        sState.setFinishedJobs(convert(finishedJobs));
+        //status is started by default
+        frontend.recover(sState);
 
+    }
+
+    private Vector<JobState> convert(Vector<InternalJob> jobs) {
+        Vector<JobState> jobs2 = new Vector<JobState>();
+        for (InternalJob j : jobs) {
+            jobs2.add(j);
+        }
+        return jobs2;
     }
 
     /**

@@ -46,7 +46,6 @@ import javax.persistence.Table;
 
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.account.AbstractAccountsManager;
-import org.ow2.proactive.scheduler.common.SchedulerUsers;
 import org.ow2.proactive.scheduler.core.db.DatabaseManager;
 import org.ow2.proactive.scheduler.core.db.SchedulerDatabaseManager;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
@@ -75,15 +74,12 @@ public final class SchedulerAccountsManager extends AbstractAccountsManager<Sche
     /**
      * Create a new instance of this class.
      */
-    public SchedulerAccountsManager(final SchedulerUsers connectedUsers) {
+    public SchedulerAccountsManager() {
         super(new HashMap<String, SchedulerAccount>(), "Scheduler Accounts Manager Refresher",
                 ProActiveLogger.getLogger(SchedulerDevLoggers.DATABASE));
 
         // Get the database manager
         this.dbmanager = DatabaseManager.getInstance();
-
-        // Connected users will be used later
-        //this.connectedUsers = connectedUsers;
     }
 
     /**
@@ -245,8 +241,7 @@ public final class SchedulerAccountsManager extends AbstractAccountsManager<Sche
     }
 
     public static void main(String[] args) {
-        SchedulerUsers ss = new SchedulerUsers();
-        SchedulerAccountsManager m = new SchedulerAccountsManager(ss);
+        SchedulerAccountsManager m = new SchedulerAccountsManager();
         m.startAccountsRefresher();
         while (true) {
             try {

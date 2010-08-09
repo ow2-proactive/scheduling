@@ -37,11 +37,14 @@
 package org.ow2.proactive.scheduler.util.console;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.ObjectOutputStream;
 import java.io.RandomAccessFile;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -488,11 +491,47 @@ public class SchedulerModel extends ConsoleModel {
         }
     }
 
+    private int getSize(Object o) {
+        try {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ObjectOutputStream oos = new ObjectOutputStream(baos);
+            oos.writeObject(o);
+            oos.flush();
+            oos.close();
+            baos.close();
+            return baos.size();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    private void printAllSize(Object o, Class<?> start) {
+        try {
+            if (start == null) {
+                start = o.getClass();
+            }
+            System.out.println(start.getName() + "=" + getSize(o));
+            for (Class<?> klass = start; !klass.equals(Object.class); klass = klass.getSuperclass()) {
+                Field[] fields = klass.getDeclaredFields();
+                for (Field f : fields) {
+                    f.setAccessible(true);
+                    System.out.println(f.getName() + "=" + f.get(o) + "  size=" + getSize(f.get(o)));
+                }
+                System.out.println("------------------------------");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     public JobState jobState_(String jobId) {
         List<String> list;
         try {
             JobState js = scheduler.getJobState(jobId);
+
             JobInfo ji = js.getJobInfo();
+
             String state = "\n   Job '" + ji.getJobId() + "'    name:" + ji.getJobId().getReadableName() +
                 "    owner:" + js.getOwner() + "    status:" + ji.getStatus() + "    #tasks:" +
                 ji.getTotalNumberOfTasks() + newline;
@@ -552,6 +591,9 @@ public class SchedulerModel extends ConsoleModel {
         List<String> list;
         try {
             SchedulerState state = scheduler.getState();
+
+            System.out.println(getSize(state));
+
             if (state.getPendingJobs().size() + state.getRunningJobs().size() +
                 state.getFinishedJobs().size() == 0) {
                 print("\n\tThere is no jobs handled by the Scheduler");
