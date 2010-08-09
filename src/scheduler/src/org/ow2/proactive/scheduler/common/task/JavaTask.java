@@ -62,9 +62,9 @@ import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 public class JavaTask extends Task {
 
     /**  */
-	private static final long serialVersionUID = 21L;
+    private static final long serialVersionUID = 21L;
 
-	/** Classname of the executable */
+    /** Classname of the executable */
     protected String executableClassName = null;
 
     /** Arguments of the task as a map */

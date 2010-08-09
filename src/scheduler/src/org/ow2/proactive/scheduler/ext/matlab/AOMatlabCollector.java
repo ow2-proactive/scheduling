@@ -49,9 +49,9 @@ import ptolemy.data.Token;
 public class AOMatlabCollector extends AOMatlabWorker {
 
     /**  */
-	private static final long serialVersionUID = 21L;
+    private static final long serialVersionUID = 21L;
 
-	/**
+    /**
      *
      */
     public AOMatlabCollector() {

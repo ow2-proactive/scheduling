@@ -62,8 +62,8 @@ import org.ow2.proactive.utils.FileToBytesConverter;
 public class PluginDescriptor implements Serializable {
 
     /**  */
-	private static final long serialVersionUID = 21L;
-	private String pluginName;
+    private static final long serialVersionUID = 21L;
+    private String pluginName;
     private String pluginDescription;
 
     private Collection<ConfigurableField> configurableFields = new LinkedList<ConfigurableField>();

@@ -48,6 +48,6 @@ import org.ow2.proactive.policy.ClientsPolicy;
  */
 public class AllPermission extends ClientPermission {
 
-	/**  */
-	private static final long serialVersionUID = 21L;
+    /**  */
+    private static final long serialVersionUID = 21L;
 }

@@ -68,9 +68,9 @@ import org.ow2.proactive.scheduler.job.JobIdImpl;
 @Proxy(lazy = false)
 public final class TaskIdImpl implements TaskId {
     /**  */
-	private static final long serialVersionUID = 21L;
+    private static final long serialVersionUID = 21L;
 
-	@Id
+    @Id
     @GeneratedValue
     @SuppressWarnings("unused")
     private long hId;

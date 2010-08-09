@@ -54,9 +54,9 @@ import org.ow2.proactive.utils.NodeSet;
 public class ExecuterInformations implements Serializable {
 
     /**  */
-	private static final long serialVersionUID = 21L;
+    private static final long serialVersionUID = 21L;
 
-	/** Reference to the launcher of this task. */
+    /** Reference to the launcher of this task. */
     private TaskLauncher launcher;
 
     /** Reference to the node */

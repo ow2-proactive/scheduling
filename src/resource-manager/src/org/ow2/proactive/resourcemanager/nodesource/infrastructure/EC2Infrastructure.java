@@ -80,8 +80,8 @@ import com.xerox.amazonws.ec2.ReservationDescription.Instance;
 public class EC2Infrastructure extends InfrastructureManager {
 
     /**  */
-	private static final long serialVersionUID = 21L;
-	@Configurable(fileBrowser = true)
+    private static final long serialVersionUID = 21L;
+    @Configurable(fileBrowser = true)
     protected File configurationFile;
     @Configurable
     protected String rmUrl;

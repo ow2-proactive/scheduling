@@ -49,9 +49,9 @@ import org.objectweb.proactive.annotation.PublicAPI;
 public class JobCreationException extends SchedulerException {
 
     /**  */
-	private static final long serialVersionUID = 21L;
+    private static final long serialVersionUID = 21L;
 
-	/**
+    /**
      * Create a new instance of JobCreationException with the given message and cause
      *
      * @param msg the message to attach.

@@ -68,8 +68,8 @@ import org.ow2.proactive.utils.FileToBytesConverter;
 public class MyAO implements Serializable {
 
     /**  */
-	private static final long serialVersionUID = 21L;
-	protected String rmUsername = "demo";
+    private static final long serialVersionUID = 21L;
+    protected String rmUsername = "demo";
     protected String rmPassword = "demo";
 
     protected static String schedulerDefaultURL = "//Localhost/";

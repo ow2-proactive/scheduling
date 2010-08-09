@@ -87,9 +87,9 @@ import org.ow2.proactive.utils.SchedulerLoggers;
 @Proxy(lazy = false)
 public class SelectionScript extends Script<Boolean> {
     /**  */
-	private static final long serialVersionUID = 21L;
+    private static final long serialVersionUID = 21L;
 
-	/** Loggers */
+    /** Loggers */
     public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerLoggers.SCRIPT);
 
     @Id

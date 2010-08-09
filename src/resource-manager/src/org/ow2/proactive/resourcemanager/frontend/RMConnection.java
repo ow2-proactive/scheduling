@@ -58,8 +58,8 @@ import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 public class RMConnection extends Connection<RMAuthentication> {
 
     /**  */
-	private static final long serialVersionUID = 21L;
-	private static RMConnection instance;
+    private static final long serialVersionUID = 21L;
+    private static RMConnection instance;
 
     private RMConnection() {
         super(RMAuthentication.class);

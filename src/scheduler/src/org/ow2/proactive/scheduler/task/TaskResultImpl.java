@@ -101,9 +101,9 @@ import org.ow2.proactive.scheduler.util.classloading.TaskClassLoader;
 @Proxy(lazy = false)
 public class TaskResultImpl implements TaskResult {
     /**  */
-	private static final long serialVersionUID = 21L;
+    private static final long serialVersionUID = 21L;
 
-	public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.CORE);
+    public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.CORE);
 
     @Id
     @GeneratedValue

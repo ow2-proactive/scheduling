@@ -63,8 +63,8 @@ import org.objectweb.proactive.annotation.PublicAPI;
 public class RMEvent implements Serializable {
 
     /**  */
-	private static final long serialVersionUID = 21L;
-	@Id
+    private static final long serialVersionUID = 21L;
+    @Id
     @GeneratedValue
     @SuppressWarnings("unused")
     protected long id;

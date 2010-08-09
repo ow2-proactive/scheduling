@@ -50,8 +50,8 @@ import java.io.Serializable;
 public class ResultsAndLogs implements Serializable {
 
     /**  */
-	private static final long serialVersionUID = 21L;
-	private SciData result;
+    private static final long serialVersionUID = 21L;
+    private SciData result;
     private String logs;
     private Throwable exception;
     private boolean scilabError;

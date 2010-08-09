@@ -132,9 +132,9 @@ public class SSHInfrastructure extends InfrastructureManager {
     protected static org.apache.log4j.Logger logger = ProActiveLogger.getLogger(RMLoggers.NODESOURCE);
 
     /**  */
-	private static final long serialVersionUID = 21L;
+    private static final long serialVersionUID = 21L;
 
-	@Configurable(fileBrowser = true)
+    @Configurable(fileBrowser = true)
     protected File hostsList;
 
     /**

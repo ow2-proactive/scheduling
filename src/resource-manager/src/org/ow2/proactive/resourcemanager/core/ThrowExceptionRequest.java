@@ -46,8 +46,8 @@ import org.objectweb.proactive.core.body.request.ServeException;
 public class ThrowExceptionRequest extends RequestImpl {
 
     /**  */
-	private static final long serialVersionUID = 21L;
-	private RuntimeException exception;
+    private static final long serialVersionUID = 21L;
+    private RuntimeException exception;
 
     public ThrowExceptionRequest(Request request, RuntimeException exception) {
         super(request.getMethodCall(), request.getSender(), request.isOneWay(), request.getSequenceNumber());

@@ -54,8 +54,8 @@ import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 public class RMState implements Serializable {
 
     /**  */
-	private static final long serialVersionUID = 21L;
-	private int freeNodesNumber;
+    private static final long serialVersionUID = 21L;
+    private int freeNodesNumber;
     private int totalAliveNodesNumber;
     private int totalNodesNumber;
 

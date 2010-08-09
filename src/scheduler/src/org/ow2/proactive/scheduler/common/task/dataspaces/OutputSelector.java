@@ -67,9 +67,9 @@ import org.objectweb.proactive.annotation.PublicAPI;
 public class OutputSelector implements Serializable {
 
     /**  */
-	private static final long serialVersionUID = 21L;
+    private static final long serialVersionUID = 21L;
 
-	@Id
+    @Id
     @GeneratedValue
     protected long hId;
 

@@ -56,8 +56,8 @@ import org.ow2.proactive.scripting.Script;
 public class TaskLauncherInitializer implements Serializable {
 
     /**  */
-	private static final long serialVersionUID = 21L;
-	/** The task identification */
+    private static final long serialVersionUID = 21L;
+    /** The task identification */
     private TaskId taskId;
     /** The script executed before the task */
     private Script<?> pre;

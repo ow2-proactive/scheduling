@@ -80,9 +80,9 @@ import org.ow2.proactive.utils.Tools;
 public class SchedulerAuthentication extends AuthenticationImpl implements SchedulerAuthenticationInterface {
 
     /**  */
-	private static final long serialVersionUID = 21L;
+    private static final long serialVersionUID = 21L;
 
-	/** Scheduler logger */
+    /** Scheduler logger */
     public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.CONNECTION);
 
     /** The scheduler front-end connected to this authentication interface */

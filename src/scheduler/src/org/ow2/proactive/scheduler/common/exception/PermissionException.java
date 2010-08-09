@@ -47,9 +47,9 @@ package org.ow2.proactive.scheduler.common.exception;
 public class PermissionException extends SchedulerException {
 
     /**  */
-	private static final long serialVersionUID = 21L;
+    private static final long serialVersionUID = 21L;
 
-	/**
+    /**
      * Create a new instance of PermissionException
      *
      * @param msg the message to attach.

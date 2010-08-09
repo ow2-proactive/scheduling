@@ -57,9 +57,9 @@ import org.objectweb.proactive.core.node.Node;
 public class NodeSet extends ArrayList<Node> {
 
     /**  */
-	private static final long serialVersionUID = 21L;
+    private static final long serialVersionUID = 21L;
 
-	/**
+    /**
      * constructor.
      */
     public NodeSet() {

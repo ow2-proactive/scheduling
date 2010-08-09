@@ -500,7 +500,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
                 logger_dev.info(tmp);
             }
 
-			//set the filter for serveAll method (user action are privileged)
+            //set the filter for serveAll method (user action are privileged)
             RequestFilter terminateFilter = new MainLoopRequestFilter("terminate");
             RequestFilter incomingRequestsFilter = new MainLoopRequestFilter("submit", "listenJobLogs");
 

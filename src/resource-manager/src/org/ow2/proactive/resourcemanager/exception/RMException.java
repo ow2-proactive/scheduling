@@ -53,9 +53,9 @@ import org.ow2.proactive.resourcemanager.frontend.RMConnection;
 public class RMException extends Exception {
 
     /**  */
-	private static final long serialVersionUID = 21L;
+    private static final long serialVersionUID = 21L;
 
-	/**
+    /**
      * Attaches a message to the Exception
      * @param message message attached
      */

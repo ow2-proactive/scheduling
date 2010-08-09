@@ -53,9 +53,9 @@ import org.ow2.proactive.scheduler.common.policy.Policy;
 public class SchedulerAdminAdapter extends SchedulerUserAdapter implements AdminSchedulerInterface {
 
     /**  */
-	private static final long serialVersionUID = 21L;
+    private static final long serialVersionUID = 21L;
 
-	public SchedulerAdminAdapter(Scheduler frontend) {
+    public SchedulerAdminAdapter(Scheduler frontend) {
         super(frontend);
     }
 

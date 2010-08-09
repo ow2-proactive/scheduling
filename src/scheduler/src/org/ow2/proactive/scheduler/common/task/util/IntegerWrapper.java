@@ -63,9 +63,9 @@ import org.objectweb.proactive.annotation.PublicAPI;
 @Proxy(lazy = false)
 public class IntegerWrapper implements Serializable {
     /**  */
-	private static final long serialVersionUID = 21L;
+    private static final long serialVersionUID = 21L;
 
-	@Id
+    @Id
     @GeneratedValue
     @Column(name = "ID")
     @SuppressWarnings("unused")

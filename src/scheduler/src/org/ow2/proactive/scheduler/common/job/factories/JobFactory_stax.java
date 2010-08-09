@@ -326,9 +326,9 @@ public class JobFactory_stax extends JobFactory {
         Job jtmp = new Job() {
 
             /**  */
-			private static final long serialVersionUID = 21L;
+            private static final long serialVersionUID = 21L;
 
-			@Override
+            @Override
             public JobId getId() {
                 throw new RuntimeException("Not Available !");
             }
@@ -608,8 +608,8 @@ public class JobFactory_stax extends JobFactory {
             Task toReturn = null;
             Task tmpTask = (taskToFill != null) ? taskToFill : new Task() {
 
-				/**  */
-				private static final long serialVersionUID = 21L;
+                /**  */
+                private static final long serialVersionUID = 21L;
             };
             //parse job attributes and fill the temporary one
             int attrLen = cursorTask.getAttributeCount();

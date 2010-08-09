@@ -46,8 +46,8 @@ import java.io.Serializable;
  */
 public class ConfigurableField implements Serializable {
     /**  */
-	private static final long serialVersionUID = 21L;
-	private String name;
+    private static final long serialVersionUID = 21L;
+    private String name;
     private String value;
     private Configurable meta;
 

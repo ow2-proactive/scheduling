@@ -50,9 +50,9 @@ import org.objectweb.proactive.annotation.PublicAPI;
 public class InternalSchedulerException extends SchedulerException {
 
     /**  */
-	private static final long serialVersionUID = 21L;
+    private static final long serialVersionUID = 21L;
 
-	/**
+    /**
      * Create a new instance of InternalSchedulerException with the given message.
      *
      * @param msg the message to attach.

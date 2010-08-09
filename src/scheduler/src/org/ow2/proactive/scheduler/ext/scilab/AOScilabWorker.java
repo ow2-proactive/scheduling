@@ -57,9 +57,9 @@ import java.util.Map;
 public class AOScilabWorker implements Serializable {
 
     /**  */
-	private static final long serialVersionUID = 21L;
+    private static final long serialVersionUID = 21L;
 
-	static String nl = System.getProperty("line.separator");
+    static String nl = System.getProperty("line.separator");
 
     /**
      * script executed to initialize the task (input parameter)

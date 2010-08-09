@@ -51,9 +51,9 @@ import java.io.Serializable;
  */
 public class MatlabJobInfo implements Serializable {
     /**  */
-	private static final long serialVersionUID = 21L;
+    private static final long serialVersionUID = 21L;
 
-	private JobStatus status;
+    private JobStatus status;
 
     private ArrayList<Token> results;
 

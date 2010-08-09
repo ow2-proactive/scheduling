@@ -85,9 +85,9 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 public class AOSchedulerWorker extends AOWorker implements SchedulerEventListener {
 
     /**  */
-	private static final long serialVersionUID = 21L;
+    private static final long serialVersionUID = 21L;
 
-	/**
+    /**
      * interface to scheduler
      */
     private Scheduler scheduler;

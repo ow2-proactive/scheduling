@@ -72,8 +72,8 @@ import org.ow2.proactive.authentication.principals.IdentityPrincipal;
 public class PrincipalPermission extends ClientPermission {
 
     /**  */
-	private static final long serialVersionUID = 21L;
-	private List<IdentityPrincipal> principals = new LinkedList<IdentityPrincipal>();
+    private static final long serialVersionUID = 21L;
+    private List<IdentityPrincipal> principals = new LinkedList<IdentityPrincipal>();
 
     public PrincipalPermission(IdentityPrincipal principal) {
         super(principal.getName());
@@ -112,8 +112,8 @@ public class PrincipalPermission extends ClientPermission {
 final class PrincipalPermissionCollection extends PermissionCollection implements Serializable {
 
     /**  */
-	private static final long serialVersionUID = 21L;
-	private transient List<Permission> permissions;
+    private static final long serialVersionUID = 21L;
+    private transient List<Permission> permissions;
 
     public PrincipalPermissionCollection() {
         permissions = new LinkedList<Permission>();

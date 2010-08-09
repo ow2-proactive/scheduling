@@ -1058,9 +1058,9 @@ public class MatlabTask extends JavaExecutable {
     public static class DummyJVMProcess extends JVMProcessImpl implements Serializable {
 
         /**  */
-		private static final long serialVersionUID = 21L;
+        private static final long serialVersionUID = 21L;
 
-		public DummyJVMProcess() {
+        public DummyJVMProcess() {
             super();
         }
 

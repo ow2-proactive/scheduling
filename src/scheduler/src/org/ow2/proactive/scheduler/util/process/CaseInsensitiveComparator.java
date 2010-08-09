@@ -47,8 +47,8 @@ import java.util.Comparator;
  */
 public final class CaseInsensitiveComparator implements Comparator<String>, Serializable {
     /**  */
-	private static final long serialVersionUID = 21L;
-	/**  */
+    private static final long serialVersionUID = 21L;
+    /**  */
     public static final Comparator<String> INSTANCE = new CaseInsensitiveComparator();
 
     private CaseInsensitiveComparator() {
