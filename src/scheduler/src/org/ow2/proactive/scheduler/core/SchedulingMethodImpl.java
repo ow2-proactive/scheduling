@@ -144,7 +144,6 @@ final class SchedulingMethodImpl implements SchedulingMethod {
         }
 
         logger_dev.info("Number of tasks ready to be scheduled : " + taskRetrivedFromPolicy.size());
-        System.out.println("Number of tasks ready to be scheduled : " + taskRetrivedFromPolicy.size());
 
         while (!taskRetrivedFromPolicy.isEmpty()) {
             //get rmState and update it in scheduling policy
