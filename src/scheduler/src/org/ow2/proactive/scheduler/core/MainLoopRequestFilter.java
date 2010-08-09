@@ -39,9 +39,12 @@ package org.ow2.proactive.scheduler.core;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.body.request.RequestFilter;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.scheduler.core.annotation.RunActivityFiltered;
+import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 
 
 /**
@@ -53,15 +56,21 @@ import org.ow2.proactive.scheduler.core.annotation.RunActivityFiltered;
  * @since ProActive Scheduling 0.9
  */
 public class MainLoopRequestFilter implements RequestFilter {
+    public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.CORE);
     private ArrayList<String> methodNames = new ArrayList<String>();
 
     /**
      * When acceptRequest will be invoked,
      * the SchedulerCore methods annoted with {@link RunActivityFiltered} will be served first.
      */
-    public MainLoopRequestFilter() {
+    public MainLoopRequestFilter(String id) {
+        if (id == null) {
+            throw new NullPointerException("Request Filter ID cannot be null");
+        }
         for (Method m : SchedulerCore.class.getDeclaredMethods()) {
-            if (m.isAnnotationPresent(RunActivityFiltered.class)) {
+            if (m.isAnnotationPresent(RunActivityFiltered.class) &&
+                id.equals(m.getAnnotation(RunActivityFiltered.class).id())) {
+                logger_dev.info(m.getName() + " is filtered with id = " + id);
                 methodNames.add(m.getName());
             }
         }

@@ -69,6 +69,7 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAException;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.body.request.RequestFilter;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectAdapter;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectExposer;
@@ -151,6 +152,13 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
 
     /** Scheduler main loop time out */
     private static final int SCHEDULER_TIME_OUT = PASchedulerProperties.SCHEDULER_TIME_OUT.getValueAsInt();
+
+    /** Ratio between number of task start and task termination in a single scheduling loop */
+    private static final int SCHEDULER_START_TERM_RATIO = PASchedulerProperties.SCHEDULER_START_TERMINATE_RATIO
+            .getValueAsInt();
+
+    /** Max number of terminate request that can be served consecutively */
+    private static final int MAX_TERM_SERVICE = 21;
 
     /** Scheduler node ping frequency in second. */
     private static final long SCHEDULER_NODE_PING_FREQUENCY = PASchedulerProperties.SCHEDULER_NODE_PING_FREQUENCY
@@ -491,12 +499,13 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
                         tmp += " " + m.getName();
                     }
                 }
-                logger_dev.debug(tmp);
+                logger_dev.info(tmp);
             }
 
             //set the filter for serveAll method (user action are privileged)
             //Filtered methods must be annoted with @RunActivityFiltered
-            RequestFilter filter = new MainLoopRequestFilter();
+            RequestFilter terminateFilter = new MainLoopRequestFilter("internal");
+            RequestFilter incomingRequestsFilter = new MainLoopRequestFilter("external");
 
             createPingThread();
 
@@ -507,16 +516,48 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
             start();
 
             do {
-
+                // number of task started by the previous scheduling loop
+                int numberOfTaskStarted = 1;
                 while ((status == SchedulerStatus.STARTED) || (status == SchedulerStatus.PAUSED) ||
                     (status == SchedulerStatus.STOPPED)) {
                     try {
-                        //block the loop until a method is invoked and serve it
-                        service.blockingServeOldest(SCHEDULER_TIME_OUT);
-                        //serve all important methods
-                        service.serveAll(filter);
+                        // block the loop until a method is invoked and serve it
+                        // while some task are started loop as faster as possible
+                        service.blockingServeOldest(numberOfTaskStarted != 0 ? 1 : SCHEDULER_TIME_OUT);
+                        if (logger_dev.isTraceEnabled()) {
+                            logger_dev.trace("[PROF] Timout is = " +
+                                (numberOfTaskStarted != 0 ? 1 : SCHEDULER_TIME_OUT));
+                        }
+                        //serve all incoming methods
+                        service.serveAll(incomingRequestsFilter);
+
                         //schedule
-                        schedulingMethod.schedule();
+                        long startSch = System.currentTimeMillis();
+                        numberOfTaskStarted = schedulingMethod.schedule();
+                        if (logger_dev.isTraceEnabled()) {
+                            logger_dev.trace("[PROF] Scheduling time = " +
+                                (System.currentTimeMillis() - startSch) + " for " + numberOfTaskStarted);
+                        }
+                        // serve internal request
+                        long startTerm = System.currentTimeMillis();
+                        int maxTermServices = 0;
+                        if (numberOfTaskStarted != 0) {
+                            final int stratio = numberOfTaskStarted / SCHEDULER_START_TERM_RATIO;
+                            maxTermServices = stratio < 1 ? 1 : stratio;
+                        } else {
+                            maxTermServices = MAX_TERM_SERVICE;
+                        }
+                        int termServicesCounter = 0;
+                        while (service.hasRequestToServe(terminateFilter) &&
+                            (termServicesCounter < maxTermServices)) {
+                            service.serveOldest(terminateFilter);
+                            termServicesCounter++;
+                        }
+                        if (logger_dev.isTraceEnabled()) {
+                            logger_dev.trace("[PROF] Terminate served = " + termServicesCounter + " in " +
+                                (System.currentTimeMillis() - startTerm));
+                        }
+
                     } catch (Throwable e) {
                         //this point is reached in case of big problem, sometimes unknown
                         logger
@@ -571,13 +612,26 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
                 //terminating jobs...
                 logger.info("Terminating jobs...");
             }
-
+            int numberOfTaskStarted = 1;
             while ((runningJobs.size() + pendingJobs.size()) > 0) {
                 try {
-                    //block the loop until a method is invoked and serve it
-                    service.blockingServeOldest(SCHEDULER_TIME_OUT);
-                    service.serveAll(filter);
-                    schedulingMethod.schedule();
+                    // same loop as main loop
+                    service.blockingServeOldest(numberOfTaskStarted != 0 ? 1 : SCHEDULER_TIME_OUT);
+                    service.serveAll(incomingRequestsFilter);
+                    numberOfTaskStarted = schedulingMethod.schedule();
+                    int maxTermServices = 0;
+                    if (numberOfTaskStarted != 0) {
+                        final int stratio = numberOfTaskStarted / SCHEDULER_START_TERM_RATIO;
+                        maxTermServices = stratio < 1 ? 1 : stratio;
+                    } else {
+                        maxTermServices = MAX_TERM_SERVICE;
+                    }
+                    int termServicesCounter = 0;
+                    while (service.hasRequestToServe(terminateFilter) &&
+                        (termServicesCounter < maxTermServices)) {
+                        service.serveOldest(terminateFilter);
+                        termServicesCounter++;
+                    }
                 } catch (Exception e) {
                     logger_dev.error("", e);
                 }
@@ -681,7 +735,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
      * It is not possible to submit the job if the Scheduler is stopped
      * This method must be synchronous !
      */
-    @RunActivityFiltered
+    @RunActivityFiltered(id = "external")
     public boolean submit() {
         InternalJob job = currentJobToSubmit.getJob();
         logger_dev.info("Trying to submit new Job '" + job.getId() + "'");
@@ -859,7 +913,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
      *
      * @param taskId the identification of the executed task.
      */
-    @RunActivityFiltered
+    @RunActivityFiltered(id = "internal")
     public void terminate(final TaskId taskId) {
         boolean hasBeenReleased = false;
         int nativeIntegerResult = 0;
@@ -1168,7 +1222,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
     /**
      * {@inheritDoc}
      */
-    @RunActivityFiltered
+    @RunActivityFiltered(id = "external")
     public SchedulerState getState() {
         SchedulerStateImpl sState = new SchedulerStateImpl();
         sState.setPendingJobs(convert(pendingJobs));
@@ -1189,7 +1243,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
     /**
      * {@inheritDoc}
      */
-    @RunActivityFiltered
+    @RunActivityFiltered(id = "external")
     public void listenJobLogs(JobId jobId, AppenderProvider appenderProvider) throws UnknownJobException {
         logger_dev.info("listen logs of job '" + jobId + "'");
         Logger l = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX + jobId);
