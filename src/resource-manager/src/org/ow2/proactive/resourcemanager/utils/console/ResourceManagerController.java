@@ -36,14 +36,15 @@
  */
 package org.ow2.proactive.resourcemanager.utils.console;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.URI;
 import java.security.KeyException;
 import java.security.PublicKey;
 
 import javax.security.auth.login.LoginException;
+
+import jline.ConsoleReader;
 
 import org.apache.commons.cli.AlreadySelectedException;
 import org.apache.commons.cli.CommandLine;
@@ -60,7 +61,6 @@ import org.apache.commons.cli.UnrecognizedOptionException;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.core.util.passwordhandler.PasswordField;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.exception.RMException;
@@ -198,26 +198,20 @@ public class ResourceManagerController {
                         throw e;
                     }
                 } else {
+                    ConsoleReader console = new ConsoleReader(System.in, new PrintWriter(System.out));
                     if (cmd.hasOption("l")) {
                         pwdMsg = user + "'s password: ";
                     } else {
-                        System.out.print("login: ");
-                        BufferedReader buf = new BufferedReader(new InputStreamReader(System.in));
-                        user = buf.readLine();
+                        user = console.readLine("login: ");
                         pwdMsg = "password: ";
                     }
 
                     //ask password to User
-                    char password[] = null;
                     try {
-                        password = PasswordField.getPassword(System.in, pwdMsg);
-                        if (password == null) {
-                            pwd = "";
-                        } else {
-                            pwd = String.valueOf(password);
-                        }
+                        console.setDefaultPrompt(pwdMsg);
+                        pwd = console.readLine('*');
                     } catch (IOException ioe) {
-                        logger.error("", ioe);
+                        logger.error("" + ioe);
                     }
 
                     PublicKey pubKey = null;

@@ -3,6 +3,12 @@ importClass(org.ow2.proactive.resourcemanager.utils.console.ResourceManagerModel
 var rm_ = ResourceManagerModel.getModel(false);
 var rm = rm_.getResourceManager();
 
+function addcandidate(str){
+	if (str == undefined || str == ""){
+		str = null;
+	}
+	rm_.addCandidate_(str);
+}
 
 function exmode(displayStack, displayOnDemand){
 	if (displayStack == undefined){

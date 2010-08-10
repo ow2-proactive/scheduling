@@ -36,13 +36,14 @@
  */
 package org.ow2.proactive.scheduler.util.console;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.security.KeyException;
 import java.security.PublicKey;
 
 import javax.security.auth.login.LoginException;
+
+import jline.ConsoleReader;
 
 import org.apache.commons.cli.AlreadySelectedException;
 import org.apache.commons.cli.CommandLine;
@@ -58,7 +59,6 @@ import org.apache.commons.cli.Parser;
 import org.apache.commons.cli.UnrecognizedOptionException;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.core.util.passwordhandler.PasswordField;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.common.SchedulerConnection;
@@ -107,7 +107,7 @@ public class SchedulerController {
      *
      * @param args the arguments to be passed
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Throwable {
         args = JVMPropertiesPreloader.overrideJVMProperties(args);
         shell = new SchedulerController(null);
         shell.load(args);
@@ -197,24 +197,18 @@ public class SchedulerController {
                         throw e;
                     }
                 } else {
+                    ConsoleReader console = new ConsoleReader(System.in, new PrintWriter(System.out));
                     if (cmd.hasOption("login")) {
                         pwdMsg = user + "'s password: ";
                     } else {
-                        System.out.print("login: ");
-                        BufferedReader buf = new BufferedReader(new InputStreamReader(System.in));
-                        user = buf.readLine();
+                        user = console.readLine("login: ");
                         pwdMsg = "password: ";
                     }
 
                     //ask password to User
-                    char password[] = null;
                     try {
-                        password = PasswordField.getPassword(System.in, pwdMsg);
-                        if (password == null) {
-                            pwd = "";
-                        } else {
-                            pwd = String.valueOf(password);
-                        }
+                        console.setDefaultPrompt(pwdMsg);
+                        pwd = console.readLine('*');
                     } catch (IOException ioe) {
                         logger.error("" + ioe);
                     }

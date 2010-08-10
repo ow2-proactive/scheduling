@@ -41,7 +41,12 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.Reader;
 
+import jline.ArgumentCompletor;
+import jline.ClassNameCompletor;
+import jline.Completor;
 import jline.ConsoleReader;
+import jline.FileNameCompletor;
+import jline.MultiCompletor;
 import jline.SimpleCompletor;
 
 
@@ -85,6 +90,20 @@ public class JlineConsole implements Console {
     public Console start(String prompt) {
         try {
             console = new ConsoleReader(System.in, new PrintWriter(System.out, true));
+            completor = new SimpleCompletor(new String[] {});
+            ArgumentCompletor comp = new ArgumentCompletor(new MultiCompletor(new Completor[] {
+                    new ClassNameCompletor(), completor, new FileNameCompletor() }),
+                new ArgumentCompletor.WhitespaceArgumentDelimiter() {
+                    @Override
+                    public boolean isDelimiterChar(String buffer, int pos) {
+                        return super.isDelimiterChar(buffer, pos) || buffer.charAt(pos) == '\'' ||
+                            buffer.charAt(pos) == '"' || buffer.charAt(pos) == '{' ||
+                            buffer.charAt(pos) == '}' || buffer.charAt(pos) == ',' ||
+                            buffer.charAt(pos) == ';';
+                    }
+                });
+            comp.setStrict(false);
+            console.addCompletor(comp);
         } catch (IOException e) {
             e.printStackTrace();
         }
