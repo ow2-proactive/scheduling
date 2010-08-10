@@ -61,6 +61,9 @@ package org.ow2.proactive.resourcemanager.nodesource.infrastructure;
  */
 public class PBSInfrastructure extends BatchJobInfrastructure {
 
+    /**  */
+    private static final long serialVersionUID = 21L;
+
     public PBSInfrastructure() {
         this.submitJobOpt = "-l \"nodes=1:ppn=1\"";
     }

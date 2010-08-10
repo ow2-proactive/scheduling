@@ -74,6 +74,10 @@ import org.ow2.proactive.resourcemanager.utils.RMLoggers;
  * </ul>
  */
 public abstract class BatchJobInfrastructure extends InfrastructureManager {
+
+    /**  */
+    private static final long serialVersionUID = 21L;
+
     /**
      * Path to the Java executable on the remote hosts
      */
