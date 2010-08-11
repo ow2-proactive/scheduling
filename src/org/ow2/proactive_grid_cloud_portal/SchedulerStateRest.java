@@ -27,46 +27,76 @@ import org.ow2.proactive.scheduler.common.task.TaskState;
 public class SchedulerStateRest {
     
     
-    @GET
-    @Path("/jobs")
-    @Produces("application/json")
-    public  List<String> jobs(@HeaderParam("sessionid") String sessionId) {
-        Scheduler s = SchedulerSessionMapper.getInstance().getSessionsMap().get(sessionId);
-        System.out.println("sessionid " + sessionId);
-        try {
-            List<JobState> jobs = new ArrayList<JobState>();
-            
-            jobs.addAll(s.getState().getPendingJobs());
-            jobs.addAll(s.getState().getRunningJobs());
-            jobs.addAll(s.getState().getFinishedJobs());
-
-            List<String> names = new ArrayList<String>();
-            for (JobState j : jobs) {
-                names.add(j.getId().toString());
-            }
-            
-            return names;
-        } catch (NotConnectedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (PermissionException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        return null;
-        /*
-        try {
-            return s.getState().toString();
-        } catch (NotConnectedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (PermissionException e) {
-            e.printStackTrace();
-        }
-        return "";
-        */
-    }
+//    @GET
+//    @Path("/jobs")
+//    @Produces("application/json")
+//    public  List<String> jobs(@HeaderParam("sessionid") String sessionId) {
+//        Scheduler s = SchedulerSessionMapper.getInstance().getSessionsMap().get(sessionId);
+//        System.out.println("sessionid " + sessionId);
+//        try {
+//            List<JobState> jobs = new ArrayList<JobState>();
+//            
+//            jobs.addAll(s.getState().getPendingJobs());
+//            jobs.addAll(s.getState().getRunningJobs());
+//            jobs.addAll(s.getState().getFinishedJobs());
+//
+//            List<String> names = new ArrayList<String>();
+//            for (JobState j : jobs) {
+//                names.add(j.getId().toString());
+//            }
+//            
+//            return names;
+//        } catch (NotConnectedException e) {
+//            // TODO Auto-generated catch block
+//            e.printStackTrace();
+//        } catch (PermissionException e) {
+//            // TODO Auto-generated catch block
+//            e.printStackTrace();
+//        }
+//        return null;
+//        /*
+//        try {
+//            return s.getState().toString();
+//        } catch (NotConnectedException e) {
+//            // TODO Auto-generated catch block
+//            e.printStackTrace();
+//        } catch (PermissionException e) {
+//            e.printStackTrace();
+//        }
+//        return "";
+//        */
+//    }
     
+	   @GET
+	    @Path("/jobs")
+	    @Produces("application/json")
+	    public  List<UserJobInfo> jobs(@HeaderParam("sessionid") String sessionId) {
+	        Scheduler s = SchedulerSessionMapper.getInstance().getSessionsMap().get(sessionId);
+	        System.out.println("sessionid " + sessionId);
+	        try {
+	            List<JobState> jobs = new ArrayList<JobState>();
+	            
+	            jobs.addAll(s.getState().getPendingJobs());
+	            jobs.addAll(s.getState().getRunningJobs());
+	            jobs.addAll(s.getState().getFinishedJobs());
+	
+	            List<UserJobInfo> jobInfoList = new ArrayList<UserJobInfo>();
+	            for (JobState j : jobs) {
+	            	jobInfoList.add(new UserJobInfo(j.getId().value(), j.getOwner(), j.getJobInfo()));
+	            }
+	            return jobInfoList;
+	        } catch (NotConnectedException e) {
+	            // TODO Auto-generated catch block
+	            e.printStackTrace();
+	        } catch (PermissionException e) {
+	            // TODO Auto-generated catch block
+	            e.printStackTrace();
+	        }
+	        return null;
+	        
+	    }
+	
+	
     @GET
     @Path("/jobs/{jobid}")
     public JobState job(@HeaderParam("sessionid") String sessionId,
@@ -92,7 +122,7 @@ public class SchedulerStateRest {
     
     
     @GET
-    @Path("/jobs/{jobid}")
+    @Path("/jobs/{jobid}/result")
     public JobResult jobResult(@HeaderParam("sessionid") String sessionId,
             @PathParam("jobid") String jobId) {
     Scheduler s = SchedulerSessionMapper.getInstance().getSessionsMap().get(sessionId);
@@ -140,7 +170,7 @@ public class SchedulerStateRest {
             @PathParam("jobid") String jobId) {
     Scheduler s = SchedulerSessionMapper.getInstance().getSessionsMap().get(sessionId);
     try {
-        s.removeJob(jobId);
+        s.killJob(jobId);
     } catch (NotConnectedException e) {
         // TODO Auto-generated catch block
         e.printStackTrace();
