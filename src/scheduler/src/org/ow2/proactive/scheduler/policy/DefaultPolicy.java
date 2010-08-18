@@ -65,7 +65,7 @@ import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
  * </ul>
  *
  * @author The ProActive Team
- * @since ProActive Scheduling 0.9
+ * @since ProActive Scheduling 2.1
  */
 public class DefaultPolicy extends Policy {
 
@@ -74,7 +74,7 @@ public class DefaultPolicy extends Policy {
     private String CONFIG_FILE_NAME = PASchedulerProperties
             .getAbsolutePath("config/scheduler/DefaultPolicy.conf");
     /** Number of loop to wait until the next read of configuration file */
-    private int READ_ARGUMENT_LOOP_FREQUENCY = 21;
+    private int READ_ARGUMENT_LOOP_FREQUENCY = 0;
     /** Maximum number of tasks returned by the policy in each loop */
     private int NB_TASKS_PER_LOOP = Integer.MAX_VALUE;
 
@@ -82,6 +82,7 @@ public class DefaultPolicy extends Policy {
     private int globalNbCalls = 0;
     private Set<TaskId> ids = new HashSet<TaskId>();
     private int nbCalls = 0;
+    private long lastModifConfFile = 0;
 
     /**
      * This method return the tasks using FIFO policy according to the jobs priorities.
@@ -91,7 +92,9 @@ public class DefaultPolicy extends Policy {
     @Override
     public Vector<EligibleTaskDescriptor> getOrderedTasks(List<JobDescriptor> jobs) {
         //read configuration file
-        if (++globalNbCalls % READ_ARGUMENT_LOOP_FREQUENCY == 0) {
+        //if this.lastModifConfFile==0, it is the first read 
+        if (this.lastModifConfFile == 0 ||
+            (READ_ARGUMENT_LOOP_FREQUENCY != 0 && ++globalNbCalls % READ_ARGUMENT_LOOP_FREQUENCY == 0)) {
             readConfigFile();
         }
 
@@ -138,12 +141,18 @@ public class DefaultPolicy extends Policy {
             ids.clear();
             nbCalls = 0;
         }
+
         return toReturn;
     }
 
     private void readConfigFile() {
         File confFile = new File(CONFIG_FILE_NAME);
-        if (!confFile.exists()) {
+        long lastModified = confFile.lastModified();
+        if (lastModified == 0) {
+            logger_dev.warn("Error while accessing the lastModified field of " + CONFIG_FILE_NAME);
+            return;
+        }
+        if (!confFile.exists() || this.lastModifConfFile == lastModified) {
             return;
         }
         try {
@@ -166,6 +175,7 @@ public class DefaultPolicy extends Policy {
                     NB_TASKS_PER_LOOP = Integer.MAX_VALUE;
                 }
             }
+            this.lastModifConfFile = lastModified;
         } catch (Exception e) {
             //file not read due to exception while reading conf file
             logger_dev.warn("Exception while reading Policy configuration file", e);
