@@ -3,6 +3,13 @@ importClass(org.ow2.proactive.scheduler.util.console.SchedulerModel);
 var s_ = SchedulerModel.getModel(false);
 var scheduler = s_.getScheduler();
 
+function addcandidate(str){
+	if (str == undefined || str == ""){
+		str = null;
+	}
+	s_.addCandidate_(str);
+}
+
 function exmode(displayStack, displayOnDemand){
 	if (displayStack == undefined){
 		displayStack = true;

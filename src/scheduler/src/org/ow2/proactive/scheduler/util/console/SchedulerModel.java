@@ -142,6 +142,9 @@ public class SchedulerModel extends ConsoleModel {
     protected SchedulerModel(boolean allowExitCommand) {
         this.allowExitCommand = allowExitCommand;
         commands = new ArrayList<Command>();
+        commands.add(new Command("addcandidate(str)",
+            "Add a completion candidate to the current completion list "
+                + "(str is a string representing the candidate to add)"));
         commands
                 .add(new Command(
                     "exmode(display,onDemand)",
@@ -222,7 +225,11 @@ public class SchedulerModel extends ConsoleModel {
         String[] ret = new String[commands.size()];
         for (int i = 0; i < commands.size(); i++) {
             String name = commands.get(i).getName();
-            ret[i] = name.substring(0, name.indexOf('(')) + "();";
+            int lb = name.indexOf('(');
+            ret[i] = name.substring(0, lb + 1);
+            if (name.indexOf(')') - lb == 1) {
+                ret[i] += ");";
+            }
         }
         return ret;
     }
@@ -331,6 +338,14 @@ public class SchedulerModel extends ConsoleModel {
 
     //***************** COMMAND LISTENER *******************
     //note : method marked with a "_" are called from JS evaluation
+
+    public void addCandidate_(String candidate) {
+        if (candidate == null) {
+            error("Candidate string cannot be null or empty");
+        } else {
+            console.addCompletion(candidate);
+        }
+    }
 
     public String submit_(String xmlDescriptor) {
         try {
@@ -985,10 +1000,12 @@ public class SchedulerModel extends ConsoleModel {
     protected String helpScreen() {
         StringBuilder out = new StringBuilder("Scheduler controller commands are :" + newline + newline);
 
+        out.append(String.format(" %1$-" + cmdHelpMaxCharLength + "s %2$s" + newline, commands.get(0)
+                .getName(), commands.get(0).getDescription()));
         out.append(String.format(" %1$-" + cmdHelpMaxCharLength + "s %2$s" + newline + newline, commands.get(
-                0).getName(), commands.get(0).getDescription()));
+                1).getName(), commands.get(1).getDescription()));
 
-        for (int i = 1; i < commands.size(); i++) {
+        for (int i = 2; i < commands.size(); i++) {
             out.append(String.format(" %1$-" + cmdHelpMaxCharLength + "s %2$s" + newline, commands.get(i)
                     .getName(), commands.get(i).getDescription()));
         }
