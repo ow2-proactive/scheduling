@@ -580,7 +580,7 @@ public class SchedulerModel extends ConsoleModel {
         }
     }
 
-    public void schedulerState_() {
+    public SchedulerState schedulerState_() {
         List<String> list;
         try {
             SchedulerState state = scheduler.getState();
@@ -588,7 +588,7 @@ public class SchedulerModel extends ConsoleModel {
             if (state.getPendingJobs().size() + state.getRunningJobs().size() +
                 state.getFinishedJobs().size() == 0) {
                 print("\n\tThere is no jobs handled by the Scheduler");
-                return;
+                return state;
             }
             //create formatter
             ObjectArrayFormatter oaf = new ObjectArrayFormatter();
@@ -630,10 +630,11 @@ public class SchedulerModel extends ConsoleModel {
             }
             //print formatter
             print(Tools.getStringAsArray(oaf));
+            return state;
         } catch (Exception e) {
             handleExceptionDisplay("Error while getting list of jobs", e);
+            return null;
         }
-
     }
 
     private List<String> makeList(JobState js) {
