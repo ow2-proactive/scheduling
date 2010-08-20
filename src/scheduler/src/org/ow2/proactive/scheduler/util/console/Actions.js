@@ -73,7 +73,7 @@ function exec(commandFilePath){
 }
 
 function listjobs(){
-	s_.schedulerState_();
+	return s_.schedulerState_();
 }
 
 function stats(){

@@ -296,7 +296,7 @@ public class ResourceManagerModel extends ConsoleModel {
         }
     }
 
-    public void listns_() {
+    public List<RMNodeSourceEvent> listns_() {
         try {
             List<String> list;
             List<RMNodeSourceEvent> listns = rm.getMonitoring().getState().getNodeSource();
@@ -320,12 +320,14 @@ public class ResourceManagerModel extends ConsoleModel {
                 oaf.addLine(list);
             }
             print(Tools.getStringAsArray(oaf));
+            return listns;
         } catch (Exception e) {
             handleExceptionDisplay("Error while retreiving nodeSources informations", e);
+            return null;
         }
     }
 
-    public void listnodes_() {
+    public List<RMNodeEvent> listnodes_() {
         try {
             List<RMNodeEvent> listne = rm.getMonitoring().getState().getNodesEvents();
             if (listne.size() == 0) {
@@ -361,8 +363,10 @@ public class ResourceManagerModel extends ConsoleModel {
                 }
                 print(Tools.getStringAsArray(oaf));
             }
+            return listne;
         } catch (Exception e) {
             handleExceptionDisplay("Error while retreiving nodes informations", e);
+            return null;
         }
     }
 
@@ -443,27 +447,31 @@ public class ResourceManagerModel extends ConsoleModel {
         }
     }
 
-    public void listInfrastructures_() {
+    public Collection<PluginDescriptor> listInfrastructures_() {
         try {
             Collection<PluginDescriptor> plugins = rm.getSupportedNodeSourceInfrastructures();
             print("Available node source infrastructures:");
             for (PluginDescriptor plugin : plugins) {
                 print(plugin.toString());
             }
+            return plugins;
         } catch (Exception e) {
             handleExceptionDisplay("Error while retreiving infrastructure informations", e);
+            return null;
         }
     }
 
-    public void listPolicies_() {
+    public Collection<PluginDescriptor> listPolicies_() {
         try {
             Collection<PluginDescriptor> plugins = rm.getSupportedNodeSourcePolicies();
             print("Available node source policies:");
             for (PluginDescriptor plugin : plugins) {
                 print(plugin.toString());
             }
+            return plugins;
         } catch (Exception e) {
             handleExceptionDisplay("Error while retreiving policies informations", e);
+            return null;
         }
     }
 
