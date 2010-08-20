@@ -3,6 +3,23 @@ importClass(org.ow2.proactive.scheduler.util.console.SchedulerModel);
 var s_ = SchedulerModel.getModel(false);
 var scheduler = s_.getScheduler();
 
+function filterspush(regexp){
+	s_.filtersPush_(regexp);
+}
+function filterspop(){
+	return s_.filtersPop_();
+}
+function filtersclear(){
+	s_.filtersClear_();
+}
+function setpagination(state){
+	if (state){
+		s_.setPagination_(true);
+	} else {
+		s_.setPagination_(false);
+	}
+}
+
 function addcandidate(str){
 	if (str == undefined || str == ""){
 		str = null;
@@ -18,6 +35,10 @@ function exmode(displayStack, displayOnDemand){
 		displayOnDemand = true;
 	}
 	s_.setExceptionMode_(displayStack, displayOnDemand);
+}
+
+function cnslhelp(){
+	s_.cnslhelp_();
 }
 
 function help(){

@@ -494,9 +494,41 @@ public class VisualConsole extends JFrame implements Console, KeyListener {
     }
 
     /**
-     * NOT USED IN THIS CONSOLE
+     * NOT IMPLEMENTED IN THIS CONSOLE
      */
     public void addCompletion(String... candidates) {
+    }
+
+    /**
+     * NOT IMPLEMENTED IN THIS CONSOLE
+     */
+    public void filtersPush(String regexp) {
+    }
+
+    /**
+     * NOT IMPLEMENTED IN THIS CONSOLE
+     */
+    public String filtersPop() {
+        return null;
+    }
+
+    /**
+     * NOT IMPLEMENTED IN THIS CONSOLE
+     */
+    public void filtersClear() {
+    }
+
+    /**
+     * NOT IMPLEMENTED IN THIS CONSOLE
+     */
+    public boolean isPaginationActivated() {
+        return false;
+    }
+
+    /**
+     * NOT IMPLEMENTED IN THIS CONSOLE
+     */
+    public void setPaginationActivated(boolean paginationActivated) {
     }
 
 }

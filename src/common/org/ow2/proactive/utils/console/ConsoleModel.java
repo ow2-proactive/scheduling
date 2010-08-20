@@ -39,6 +39,7 @@ package org.ow2.proactive.utils.console;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
@@ -54,6 +55,7 @@ import javax.script.ScriptException;
 public abstract class ConsoleModel {
 
     protected static String newline = System.getProperty("line.separator");
+    protected static int cmdHelpMaxCharLength = 24;
 
     protected boolean initialized = false;
     protected boolean terminated = false;
@@ -67,6 +69,52 @@ public abstract class ConsoleModel {
 
     protected static ConsoleModel model;
     protected boolean allowExitCommand;
+
+    protected String initEnvFileName = null;
+
+    protected ArrayList<Command> commands;
+
+    protected ConsoleModel() {
+        commands = new ArrayList<Command>();
+        commands.add(new Command("filterspush(regexp)", "Add a new regexp to the list of filters"));
+        commands.add(new Command("filterspop()", "Remove the last inserted regexp from the list of filters"));
+        commands.add(new Command("filtersclear()", "Clear the list of filters"));
+        commands.add(new Command("setpagination(state)", "Enable or disable the pagination of the console "
+            + "(state is a boolean, true to enable pagination, false to disable it)"));
+        commands.add(new Command("addcandidate(str)",
+            "Add a completion candidate to the current completion list "
+                + "(str is a string representing the candidate to add)"));
+        commands
+                .add(new Command(
+                    "exmode(display,onDemand)",
+                    "Change the way exceptions are displayed (if display is true, stacks are displayed - if onDemand is true, prompt before displaying stacks)"));
+    }
+
+    /**
+     * Retrieve a completion list from the list of commands
+     *
+     * @return a completion list as a string array
+     */
+    protected String[] getCompletionList() {
+        String[] ret = new String[commands.size()];
+        for (int i = 0; i < commands.size(); i++) {
+            String name = commands.get(i).getName();
+            int lb = name.indexOf('(');
+            if (lb > 0) {
+                ret[i] = name.substring(0, lb + 1);
+                if (name.indexOf(')') - lb == 1) {
+                    ret[i] += ");";
+                }
+            } else {
+                ret[i] = name;
+            }
+        }
+        return ret;
+    }
+
+    public void setInitEnv(String fileName) {
+        this.initEnvFileName = fileName;
+    }
 
     /**
      * Start this model
@@ -127,6 +175,38 @@ public abstract class ConsoleModel {
         }
     }
 
+    //***************** COMMAND LISTENER *******************
+    //note : method marked with a "_" are called from JS evaluation
+
+    public void filtersPush_(String regexp) {
+        console.filtersPush(regexp);
+    }
+
+    public String filtersPop_() {
+        return console.filtersPop();
+    }
+
+    public void filtersClear_() {
+        console.filtersClear();
+    }
+
+    public void setPagination_(boolean state) {
+        console.setPaginationActivated(state);
+    }
+
+    /**
+     * Add a candidate for completion
+     *
+     * @param candidate
+     */
+    public void addCandidate_(String candidate) {
+        if (candidate == null) {
+            error("Candidate string cannot be null or empty");
+        } else {
+            console.addCompletion(candidate);
+        }
+    }
+
     /**
      * Set the exception mode
      *
@@ -151,6 +231,10 @@ public abstract class ConsoleModel {
 
     public void help_() {
         print(newline + helpScreen());
+    }
+
+    public void cnslhelp_() {
+        print(newline + helpScreenCnsl());
     }
 
     //***************** OTHER *******************
@@ -242,6 +326,17 @@ public abstract class ConsoleModel {
     //*****************  HELP SCREEN  *******************
 
     protected abstract String helpScreen();
+
+    protected String helpScreenCnsl() {
+        StringBuilder out = new StringBuilder("Console options commands are :" + newline + newline);
+
+        for (int i = 0; i < 6; i++) {
+            out.append(String.format(" %1$-" + cmdHelpMaxCharLength + "s %2$s" + newline, commands.get(i)
+                    .getName(), commands.get(i).getDescription()));
+        }
+
+        return out.toString();
+    }
 
     //***************** GETTER SETTER *******************
 

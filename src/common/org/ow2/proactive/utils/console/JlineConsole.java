@@ -40,6 +40,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.Reader;
+import java.util.Stack;
 
 import jline.ArgumentCompletor;
 import jline.ClassNameCompletor;
@@ -62,10 +63,16 @@ import jline.SimpleCompletor;
  */
 public class JlineConsole implements Console {
 
+    private static String newLineChar = System.getProperty("line.separator");
+    private static char ABORT = 'q';
+    private static char ALL = 'a';
+
     private boolean started = false;
     private String prompt = "";
     private ConsoleReader console;
     private SimpleCompletor completor;
+    private boolean paginationActivated = true;
+    private Stack<String> filters = new Stack<String>();
 
     /**
      * Create a new instance of SimpleConsole.
@@ -140,9 +147,31 @@ public class JlineConsole implements Console {
     public Console print(String msg) {
         if (this.started) {
             try {
-                console.printString(msg);
-                console.printNewline();
-                //flush();
+                StringBuffer sb = filter(new StringBuffer(msg));
+                if (!paginationActivated) {
+                    console.printString(sb.toString());
+                    console.printNewline();
+                } else {
+                    while (sb.length() > 0) {
+                        console.printString(nFirstLine(sb, console.getTermheight() - 5) + newLineChar);
+                        if (sb.length() > 0) {
+                            console.printString("- more - (" + ABORT + " : abort | " + ALL +
+                                " : display all | any : next page)" + newLineChar);
+                            console.flushConsole();
+                            int c = console.readVirtualKey();
+                            if (c == ABORT) {
+                                break;
+                            } else if (c == ALL) {
+                                console.printString(sb.toString());
+                                console.flushConsole();
+                                break;
+                            }
+                        } else {
+                            break;
+                        }
+                    }
+                    console.printNewline();
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -150,6 +179,78 @@ public class JlineConsole implements Console {
             throw new RuntimeException("Console is not started !");
         }
         return this;
+    }
+
+    /**
+     * Filter the given message according to the list of filters of this class.<br />
+     * Line by line, return a StringBuffer which contains the same lines except the one that
+     * don't match the filters.
+     * Lines are delimited by independent platform newLine char.
+     *
+     * @param msg the original message
+     * @return a StringBuffered containing only the line that matches the filters
+     */
+    private StringBuffer filter(StringBuffer msg) {
+        StringBuffer lines = new StringBuffer();
+        while (msg.length() > 0) {
+            int io = msg.indexOf(newLineChar);
+            if (io == -1) {
+                io = msg.length();
+            }
+            String toAppend = msg.substring(0, io);
+            msg.delete(0, io + newLineChar.length());
+            if (isfiltered(toAppend)) {
+                lines.append(toAppend);
+                if (msg.length() > 0) {
+                    lines.append(newLineChar);
+                }
+            }
+        }
+        return lines;
+    }
+
+    /**
+     * Return n first lines of the given string buffer and remove those lines from the buffer.
+     * If there are less than n lines, everything is returned
+     *
+     * @param msg the message to be evaluate
+     * @param n the number of line to extract
+     * @return the n first lines of the string buffer
+     */
+    private String nFirstLine(StringBuffer msg, int n) {
+        StringBuffer nLines = new StringBuffer();
+        while (n > 0 && msg.length() > 0) {
+            int io = msg.indexOf(newLineChar);
+            if (io == -1) {
+                io = msg.length();
+            }
+            String toAppend = msg.substring(0, io);
+            nLines.append(toAppend);
+            msg.delete(0, io + newLineChar.length());
+            n--;
+            if (n > 0 && msg.length() > 0) {
+                nLines.append(newLineChar);
+            }
+        }
+        return nLines.toString();
+    }
+
+    /**
+     * Filter the given string according to the list of filters defined in this class
+     *
+     * @param line the line to be filtered
+     * @return true if the line matches the current filters array, false otherwise.
+     */
+    private boolean isfiltered(String line) {
+        if (filters == null) {
+            return true;
+        }
+        for (String f : filters) {
+            if (!line.matches(f)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
@@ -228,6 +329,41 @@ public class JlineConsole implements Console {
                 throw new IllegalArgumentException("Candidates argument cannot contains null or empty values");
             }
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void filtersPush(String regexp) {
+        filters.push(regexp);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String filtersPop() {
+        return filters.pop();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void filtersClear() {
+        filters.clear();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean isPaginationActivated() {
+        return paginationActivated;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setPaginationActivated(boolean paginationActivated) {
+        this.paginationActivated = paginationActivated;
     }
 
 }
