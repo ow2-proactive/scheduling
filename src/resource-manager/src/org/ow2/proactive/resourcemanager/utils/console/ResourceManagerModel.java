@@ -79,13 +79,12 @@ public class ResourceManagerModel extends ConsoleModel {
     private static final String DEFAULT_INIT_JS = System.getProperty("user.home") + File.separator +
         ".proactive" + File.separator + "rm-client.js";
     private static final String JS_INIT_FILE = "ResourceManagerActions.js";
-    protected static final int cmdHelpMaxCharLength = 28;
+    protected static int cmdHelpMaxCharLength = 28;
     private static final String YES = "yes";
     private static final String NO = "no";
     private static final String YES_NO = "(" + YES + "/" + NO + ")";
 
     protected ResourceManager rm;
-    private ArrayList<Command> commands;
 
     private static int logsNbLines = 20;
     private static String logsDirectory = System.getProperty("pa.rm.home") + File.separator + ".logs";
@@ -93,8 +92,6 @@ public class ResourceManagerModel extends ConsoleModel {
     private static final String rmLogFile = "RM.log";
 
     protected MBeanInfoViewer jmxInfoViewer = null;
-
-    private String initEnvFileName = null;
 
     /**
      * Get this model. Also specify if the exit command should do something or not
@@ -115,14 +112,6 @@ public class ResourceManagerModel extends ConsoleModel {
 
     protected ResourceManagerModel(boolean allowExitCommand) {
         this.allowExitCommand = allowExitCommand;
-        commands = new ArrayList<Command>();
-        commands.add(new Command("addcandidate(str)",
-            "Add a completion candidate to the current completion list "
-                + "(str is a string representing the candidate to add)"));
-        commands
-                .add(new Command(
-                    "exmode(display,onDemand)",
-                    "Change the way exceptions are displayed (if display is true, stacks are displayed - if onDemand is true, prompt before displaying stacks)"));
         commands.add(new Command("addnode(nodeURL, nsName)",
             "Add node to the given node source (parameters is a string representing the node URL to add &"
                 + " an optional string representing the node source in which to add the node)"));
@@ -154,28 +143,11 @@ public class ResourceManagerModel extends ConsoleModel {
             "Set the directory where the log are located, (default is RM_HOME/.logs"));
         commands.add(new Command("viewlogs(nbLines)",
             "View the last nbLines lines of the logs file, (default nbLines is 20)"));
+        commands.add(new Command("cnslhelp() or ?c", "Displays help about the console functions itself"));
         if (allowExitCommand) {
             commands.add(new Command("exit()", "Exits RM controller"));
         }
 
-    }
-
-    /**
-     * Retrieve a completion list from the list of commands
-     *
-     * @return a completion list as a string array
-     */
-    private String[] getCompletionList() {
-        String[] ret = new String[commands.size()];
-        for (int i = 0; i < commands.size(); i++) {
-            String name = commands.get(i).getName();
-            int lb = name.indexOf('(');
-            ret[i] = name.substring(0, lb + 1);
-            if (name.indexOf(')') - lb == 1) {
-                ret[i] += ");";
-            }
-        }
-        return ret;
     }
 
     /**
@@ -211,10 +183,6 @@ public class ResourceManagerModel extends ConsoleModel {
         }
     }
 
-    void setInitEnv(String fileName) {
-        this.initEnvFileName = fileName;
-    }
-
     /**
      * @see org.ow2.proactive.utils.console.ConsoleModel#startModel()
      */
@@ -229,7 +197,9 @@ public class ResourceManagerModel extends ConsoleModel {
         while (!terminated) {
             stmt = console.readStatement();
             if ("?".equals(stmt)) {
-                console.print("\n" + helpScreen());
+                console.print(newline + helpScreen());
+            } else if ("?c".equals(stmt)) {
+                console.print(newline + helpScreenCnsl());
             } else {
                 eval(stmt);
                 console.print("");
@@ -254,14 +224,6 @@ public class ResourceManagerModel extends ConsoleModel {
 
     //***************** COMMAND LISTENER *******************
     //note : method marked with a "_" are called from JS evaluation
-
-    public void addCandidate_(String candidate) {
-        if (candidate == null) {
-            error("Candidate string cannot be null or empty");
-        } else {
-            console.addCompletion(candidate);
-        }
-    }
 
     public void shutdown_(boolean preempt) {
         try {
@@ -628,12 +590,7 @@ public class ResourceManagerModel extends ConsoleModel {
         StringBuilder out = new StringBuilder("Resource Manager controller commands are :" + newline +
             newline);
 
-        out.append(String.format(" %1$-" + cmdHelpMaxCharLength + "s\t %2$s" + newline, commands.get(0)
-                .getName(), commands.get(0).getDescription()));
-        out.append(String.format(" %1$-" + cmdHelpMaxCharLength + "s\t %2$s" + newline + newline, commands
-                .get(1).getName(), commands.get(1).getDescription()));
-
-        for (int i = 2; i < commands.size(); i++) {
+        for (int i = 6; i < commands.size(); i++) {
             out.append(String.format(" %1$-" + cmdHelpMaxCharLength + "s\t %2$s" + newline, commands.get(i)
                     .getName(), commands.get(i).getDescription()));
         }

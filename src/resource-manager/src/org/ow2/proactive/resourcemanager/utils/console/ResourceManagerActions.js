@@ -3,6 +3,23 @@ importClass(org.ow2.proactive.resourcemanager.utils.console.ResourceManagerModel
 var rm_ = ResourceManagerModel.getModel(false);
 var rm = rm_.getResourceManager();
 
+function filterspush(regexp){
+	rm_.filtersPush_(regexp);
+}
+function filterspop(){
+	return rm_.filtersPop_();
+}
+function filtersclear(){
+	rm_.filtersClear_();
+}
+function setpagination(state){
+	if (state){
+		rm_.setPagination_(true);
+	} else {
+		rm_.setPagination_(false);
+	}
+}
+
 function addcandidate(str){
 	if (str == undefined || str == ""){
 		str = null;
@@ -120,6 +137,10 @@ function viewlogs(nbLines){
 
 function exit(){
 	return rm_.exit_();
+}
+
+function cnslhelp(){
+	rm_.cnslhelp_();
 }
 
 function help(){

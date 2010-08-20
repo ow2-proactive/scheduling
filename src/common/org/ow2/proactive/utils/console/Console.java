@@ -141,4 +141,37 @@ public interface Console {
      */
     public void addCompletion(String... candidates);
 
+    /**
+     * Push a new regexp in the filters list.
+     * Each line printed through this console will NOT be printed if the line does not match this new filter
+     * and every other filters already set.
+     *
+     * @param regexp the new filter to be added
+     */
+    public void filtersPush(String regexp);
+
+    /**
+     * Remove the regexp at the top of the filters list.
+     */
+    public String filtersPop();
+
+    /**
+     * Clear the filters list by removing every regexp.
+     */
+    public void filtersClear();
+
+    /**
+     * Get the state of pagination
+     *
+     * @return the state of pagination
+     */
+    public boolean isPaginationActivated();
+
+    /**
+     * Set the state of the pagination the given paginationActivated value
+     *
+     * @param paginationActivated the new state of the pagination
+     */
+    public void setPaginationActivated(boolean paginationActivated);
+
 }

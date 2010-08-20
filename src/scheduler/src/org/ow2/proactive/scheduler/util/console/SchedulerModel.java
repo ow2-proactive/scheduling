@@ -93,7 +93,6 @@ public class SchedulerModel extends ConsoleModel {
     private static final String YES = "yes";
     private static final String NO = "no";
     private static final String YES_NO = "(" + YES + "/" + NO + ")";
-    protected static final int cmdHelpMaxCharLength = 24;
 
     private static int logsNbLines = 20;
     private static String logsDirectory = System.getProperty("pa.scheduler.home") + File.separator + ".logs";
@@ -101,11 +100,8 @@ public class SchedulerModel extends ConsoleModel {
     private static final String schedulerLogFile = "Scheduler.log";
     private static final String schedulerDevLogFile = "SchedulerDev.log";
 
-    private ArrayList<Command> commands;
     protected Scheduler scheduler;
     protected MBeanInfoViewer jmxInfoViewer = null;
-
-    private String initEnvFileName = null;
 
     static {
         TaskState.setSortingBy(TaskState.SORT_BY_ID);
@@ -140,15 +136,8 @@ public class SchedulerModel extends ConsoleModel {
     }
 
     protected SchedulerModel(boolean allowExitCommand) {
+        super();
         this.allowExitCommand = allowExitCommand;
-        commands = new ArrayList<Command>();
-        commands.add(new Command("addcandidate(str)",
-            "Add a completion candidate to the current completion list "
-                + "(str is a string representing the candidate to add)"));
-        commands
-                .add(new Command(
-                    "exmode(display,onDemand)",
-                    "Change the way exceptions are displayed (if display is true, stacks are displayed - if onDemand is true, prompt before displaying stacks)"));
         commands.add(new Command("submit(XMLdescriptor)",
             "Submit a new job (parameter is a string representing the job XML descriptor URL)"));
         commands
@@ -211,27 +200,10 @@ public class SchedulerModel extends ConsoleModel {
             "View the last nbLines lines of the admin logs file, (default nbLines is 20)"));
         commands.add(new Command("viewdevlogs(nbLines)",
             "View the last nbLines lines of the dev logs file, (default nbLines is 20)"));
+        commands.add(new Command("cnslhelp() or ?c", "Displays help about the console functions itself"));
         if (allowExitCommand) {
             commands.add(new Command("exit()", "Exit Scheduler controller"));
         }
-    }
-
-    /**
-     * Retrieve a completion list from the list of commands
-     *
-     * @return a completion list as a string array
-     */
-    private String[] getCompletionList() {
-        String[] ret = new String[commands.size()];
-        for (int i = 0; i < commands.size(); i++) {
-            String name = commands.get(i).getName();
-            int lb = name.indexOf('(');
-            ret[i] = name.substring(0, lb + 1);
-            if (name.indexOf(')') - lb == 1) {
-                ret[i] += ");";
-            }
-        }
-        return ret;
     }
 
     /**
@@ -267,10 +239,6 @@ public class SchedulerModel extends ConsoleModel {
         }
     }
 
-    void setInitEnv(String fileName) {
-        this.initEnvFileName = fileName;
-    }
-
     /**
      * @see org.ow2.proactive.utils.console.ConsoleModel#startModel()
      */
@@ -300,6 +268,8 @@ public class SchedulerModel extends ConsoleModel {
             String stmt = console.readStatement(prompt + "> ");
             if ("?".equals(stmt)) {
                 console.print(newline + helpScreen());
+            } else if ("?c".equals(stmt)) {
+                console.print(newline + helpScreenCnsl());
             } else {
                 eval(stmt);
                 console.print("");
@@ -338,14 +308,6 @@ public class SchedulerModel extends ConsoleModel {
 
     //***************** COMMAND LISTENER *******************
     //note : method marked with a "_" are called from JS evaluation
-
-    public void addCandidate_(String candidate) {
-        if (candidate == null) {
-            error("Candidate string cannot be null or empty");
-        } else {
-            console.addCompletion(candidate);
-        }
-    }
 
     public String submit_(String xmlDescriptor) {
         try {
@@ -1001,12 +963,7 @@ public class SchedulerModel extends ConsoleModel {
     protected String helpScreen() {
         StringBuilder out = new StringBuilder("Scheduler controller commands are :" + newline + newline);
 
-        out.append(String.format(" %1$-" + cmdHelpMaxCharLength + "s %2$s" + newline, commands.get(0)
-                .getName(), commands.get(0).getDescription()));
-        out.append(String.format(" %1$-" + cmdHelpMaxCharLength + "s %2$s" + newline + newline, commands.get(
-                1).getName(), commands.get(1).getDescription()));
-
-        for (int i = 2; i < commands.size(); i++) {
+        for (int i = 6; i < commands.size(); i++) {
             out.append(String.format(" %1$-" + cmdHelpMaxCharLength + "s %2$s" + newline, commands.get(i)
                     .getName(), commands.get(i).getDescription()));
         }
