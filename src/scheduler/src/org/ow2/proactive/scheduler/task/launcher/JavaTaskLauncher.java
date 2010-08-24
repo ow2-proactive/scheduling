@@ -37,6 +37,8 @@
 package org.ow2.proactive.scheduler.task.launcher;
 
 import java.io.Serializable;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAActiveObject;
@@ -44,7 +46,9 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.dataspaces.core.BaseScratchSpaceConfiguration;
 import org.objectweb.proactive.extensions.dataspaces.core.DataSpacesNodes;
 import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
+import org.ow2.proactive.scheduler.common.task.ExecutableInitializer;
 import org.ow2.proactive.scheduler.common.task.JavaExecutableInitializer;
+import org.ow2.proactive.scheduler.common.task.TaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import org.ow2.proactive.scheduler.task.ExecutableContainer;
@@ -94,6 +98,7 @@ public class JavaTaskLauncher extends TaskLauncher {
         try {
             //init dataspace
             initDataSpaces();
+            replaceDSIterationTag();
 
             //copy datas from OUTPUT or INPUT to local scratch
             copyInputDataToScratch();
@@ -112,9 +117,9 @@ public class JavaTaskLauncher extends TaskLauncher {
             currentExecutable = executableContainer.getExecutable();
 
             //init task
-            callInternalInit(JavaExecutable.class, JavaExecutableInitializer.class, executableContainer
-                    .createExecutableInitializer());
-
+            ExecutableInitializer initializer = executableContainer.createExecutableInitializer();
+            replaceIterationTags(initializer);
+            callInternalInit(JavaExecutable.class, JavaExecutableInitializer.class, initializer);
             Throwable exception = null;
             Serializable userResult = null;
             sample = System.currentTimeMillis();
@@ -141,9 +146,17 @@ public class JavaTaskLauncher extends TaskLauncher {
                 throw exception;
             }
 
+            TaskResultImpl res = new TaskResultImpl(taskId, userResult, null, duration, null, null);
+
+            if (flow != null) {
+                this.executeFlowScript(PAActiveObject.getNode(), res);
+            }
+
             //return result
-            return new TaskResultImpl(taskId, userResult, this.getLogs(), duration,
-                retreivePropagatedProperties());
+            res.setPropagatedProperties(retreivePropagatedProperties());
+            TaskLogs tl = this.getLogs();
+            res.setLogs(tl);
+            return res;
         } catch (Throwable ex) {
             logger_dev.info("", ex);
             // exceptions are always handled at scheduler core level
@@ -159,6 +172,29 @@ public class JavaTaskLauncher extends TaskLauncher {
                  */
                 this.finalizeLoggers();
             }
+        }
+    }
+
+    /**
+     * Replaces iteration and duplication index syntactic macros
+     * in various string locations across the task descriptor
+     *
+     * @param init the executable initializer containing the Java arguments
+     */
+    protected void replaceIterationTags(ExecutableInitializer init) {
+        JavaExecutableInitializer jinit = (JavaExecutableInitializer) init;
+        try {
+            Map<String, Serializable> args = jinit.getArguments(Thread.currentThread()
+                    .getContextClassLoader());
+            for (Entry<String, Serializable> arg : args.entrySet()) {
+                if (arg.getValue() instanceof String) {
+                    String str = ((String) arg.getValue()).replaceAll(ITERATION_INDEX_TAG, "" +
+                        this.iterationIndex);
+                    str = str.replaceAll(DUPLICATION_INDEX_TAG, "" + this.duplicationIndex);
+                    jinit.setArgument(arg.getKey(), str);
+                }
+            }
+        } catch (Exception e) {
         }
     }
 
@@ -206,5 +242,4 @@ public class JavaTaskLauncher extends TaskLauncher {
         }
         return true;
     }
-
 }

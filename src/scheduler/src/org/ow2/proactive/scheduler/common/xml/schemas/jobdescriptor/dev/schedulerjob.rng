@@ -242,6 +242,9 @@
       </optional>
       <ref name="executable"/>
       <optional>
+        <ref name="flow"/>
+      </optional>
+      <optional>
         <ref name="post"/>
       </optional>
       <optional>
@@ -347,6 +350,27 @@
         <ref name="selectionScript"/>
       </oneOrMore>
     </element>
+  </define>
+  <define name="flow">
+    <element name="flowControl">
+      <doc:documentation>Flow control : block declaration, flow action</doc:documentation>
+      <optional>
+        <ref name="block"/>
+      </optional>
+      <optional>
+        <choice>
+          <ref name="actionIf"/>
+          <ref name="actionDuplicate"/>
+          <ref name="actionLoop"/>
+        </choice>
+      </optional>
+    </element>
+  </define>
+  <define name="block">
+    <attribute name="block">
+      <doc:documentation>block declaration</doc:documentation>
+      <ref name="blockAttr"/>
+    </attribute>
   </define>
   <define name="pre">
     <element name="pre">
@@ -668,6 +692,47 @@
       <ref name="inexcludePattern"/>
     </attribute>
   </define>
+  <!-- +++++++++++++ Control flow -->
+  <define name="actionIf">
+    <element name="if">
+      <doc:documentation>branching Control flow action</doc:documentation>
+      <ref name="target"/>
+      <ref name="targetElse"/>
+      <ref name="targetJoin"/>
+      <ref name="script"/>
+    </element>
+  </define>
+  <define name="target">
+    <attribute name="target">
+      <doc:documentation>branching if target</doc:documentation>
+      <data type="string"/>
+    </attribute>
+  </define>
+  <define name="targetElse">
+    <attribute name="else">
+      <doc:documentation>branching else target</doc:documentation>
+      <data type="string"/>
+    </attribute>
+  </define>
+  <define name="targetJoin">
+    <attribute name="join">
+      <doc:documentation>branching else target</doc:documentation>
+      <data type="string"/>
+    </attribute>
+  </define>
+  <define name="actionLoop">
+    <element name="loop">
+      <doc:documentation>looping control flow action</doc:documentation>
+      <ref name="target"/>
+      <ref name="script"/>
+    </element>
+  </define>
+  <define name="actionDuplicate">
+    <element name="duplicate">
+      <doc:documentation>duplicate control flow action</doc:documentation>
+      <ref name="script"/>
+    </element>
+  </define>
   <!-- +++++++++++++ User define types -->
   <define name="jobPriority">
     <choice>
@@ -720,5 +785,19 @@
     <data type="string">
       <param name="pattern">.+(,.+)*</param>
     </data>
+  </define>
+  <define name="controlFlowAction">
+    <choice>
+      <value>goto</value>
+      <value>duplicate</value>
+      <value>continue</value>
+    </choice>
+  </define>
+  <define name="blockAttr">
+    <choice>
+      <value>start</value>
+      <value>end</value>
+      <value>none</value>
+    </choice>
   </define>
 </grammar>

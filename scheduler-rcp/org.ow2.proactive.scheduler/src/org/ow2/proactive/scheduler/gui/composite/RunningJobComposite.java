@@ -293,6 +293,84 @@ public class RunningJobComposite extends AbstractJobComposite implements Running
         }
     }
 
+    /**
+     * @see org.ow2.proactive.scheduler.gui.listeners.RunningJobsListener#taskDuplicated(JobId)
+     */
+    public void taskDuplicated(JobId jobId) {
+        super.stateUpdate(jobId);
+
+        if (!this.isDisposed()) {
+            final JobId jobi = jobId;
+
+            getDisplay().syncExec(new Runnable() {
+
+                public void run() {
+                    Table table = getTable();
+                    TableItem[] items = table.getItems();
+                    TableItem item = null;
+                    for (TableItem it : items) {
+                        if (((JobId) (it.getData())).equals(jobi)) {
+                            item = it;
+                            break;
+                        }
+                    }
+
+                    JobState job = JobsController.getLocalView().getJobById(jobi);
+                    ((ProgressBar) item.getData("bar")).setMaximum(job.getTotalNumberOfTasks() * 100);
+                    ((DotTask) item.getData("dotTask")).tasksDuplicated();
+
+                    TableColumn[] cols = table.getColumns();
+                    for (int i = 0; i < cols.length; i++) {
+                        String title = cols[i].getText();
+                        if (COLUMN_PROGRESS_TEXT_TITLE.equals(title)) {
+                            item.setText(i, job.getNumberOfFinishedTasks() + "/" +
+                                job.getTotalNumberOfTasks());
+                        }
+                    }
+                }
+            });
+        }
+    }
+
+    /**
+     * @see org.ow2.proactive.scheduler.gui.listeners.RunningJobsListener#taskSkipped(JobId)
+     */
+    public void taskSkipped(JobId jobId) {
+        super.stateUpdate(jobId);
+
+        if (!this.isDisposed()) {
+            final JobId jobi = jobId;
+
+            getDisplay().syncExec(new Runnable() {
+
+                public void run() {
+                    Table table = getTable();
+                    TableItem[] items = table.getItems();
+                    TableItem item = null;
+                    for (TableItem it : items) {
+                        if (((JobId) (it.getData())).equals(jobi)) {
+                            item = it;
+                            break;
+                        }
+                    }
+
+                    JobState job = JobsController.getLocalView().getJobById(jobi);
+                    ((ProgressBar) item.getData("bar")).setMaximum(job.getTotalNumberOfTasks() * 100);
+                    ((DotTask) item.getData("dotTask")).finishedTask();
+
+                    TableColumn[] cols = table.getColumns();
+                    for (int i = 0; i < cols.length; i++) {
+                        String title = cols[i].getText();
+                        if (COLUMN_PROGRESS_TEXT_TITLE.equals(title)) {
+                            item.setText(i, job.getNumberOfFinishedTasks() + "/" +
+                                job.getTotalNumberOfTasks());
+                        }
+                    }
+                }
+            });
+        }
+    }
+
     // -------------------------------------------------------------------- //
     // ----------------- implements FinishedTasksListener ----------------- //
     // -------------------------------------------------------------------- //
@@ -546,6 +624,23 @@ class DotTask extends TimerTask {
         }
     }
 
+    /**
+     * An unknown number of tasks was duplicated
+     */
+    public void tasksDuplicated() {
+        int n = Math.max(this.job.getTotalNumberOfTasks(), this.tasks.length);
+        double[] tasks_new = new double[n];
+        for (int i = 0; i < n; i++) {
+            if (i < tasks.length) {
+                tasks_new[i] = tasks[i];
+            } else {
+                tasks_new[i] = 0;
+            }
+        }
+        this.tasks = tasks_new;
+        run();
+    }
+
     private static int findX() {
         double sum;
         int step;
@@ -599,6 +694,15 @@ class DotTask extends TimerTask {
      */
     public JobState getJob() {
         return job;
+    }
+
+    /**
+     * Update the encapsulated job
+     * 
+     * @param j the new job
+     */
+    public void setJob(JobState j) {
+        this.job = j;
     }
 
 }

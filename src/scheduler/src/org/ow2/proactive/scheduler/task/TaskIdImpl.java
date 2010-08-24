@@ -127,6 +127,22 @@ public final class TaskIdImpl implements TaskId {
     }
 
     /**
+     * To reinitialize the initial id value
+     * 
+     * @param init the initial value to set
+     */
+    public static void initialize(int init) {
+        currentId = Math.max(0, init);
+    }
+
+    /**
+     * @return the current value of the id
+     */
+    public static int getCurrentValue() {
+        return currentId;
+    }
+
+    /**
      * Get the next id.
      *
      * @param jobId the id of the enclosing job. Permit a generation of a task id based on the jobId.
@@ -207,5 +223,44 @@ public final class TaskIdImpl implements TaskId {
      */
     public String value() {
         return "" + this.id;
+    }
+
+    /**
+     * Set readable name of this TaskId
+     * 
+     * @param new name
+     */
+    public void setReadableName(String string) {
+        this.readableName = string;
+    }
+
+    /**
+     * @see TaskId#getIterationIndex()
+     */
+    public int getIterationIndex() {
+        // implementation note :
+        // this has to match what is done in InternalTask#setName(String)
+        int it = 0;
+        int pos = -1;
+        if ((pos = this.readableName.indexOf(TaskId.iterationSeparator)) != -1) {
+            int read = Integer.parseInt("" + this.readableName.charAt(pos + 1));
+            it = Math.max(0, read);
+        }
+        return it;
+    }
+
+    /**
+     * @see TaskId#getDuplicationIndex()
+     */
+    public int getDuplicationIndex() {
+        // implementation note :
+        // this has to match what is done in InternalTask#setName(String)
+        int dup = 0;
+        int pos = -1;
+        if ((pos = this.readableName.indexOf(TaskId.duplicationSeparator)) != -1) {
+            int read = Integer.parseInt("" + this.readableName.charAt(pos + 1));
+            dup = Math.max(0, read);
+        }
+        return dup;
     }
 }

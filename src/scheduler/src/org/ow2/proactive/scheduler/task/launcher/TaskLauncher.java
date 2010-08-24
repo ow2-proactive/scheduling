@@ -82,8 +82,11 @@ import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
 import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingException;
 import org.ow2.proactive.scheduler.common.util.logforwarder.appenders.AsyncAppenderWithStorage;
 import org.ow2.proactive.scheduler.common.util.logforwarder.util.LoggingOutputStream;
+import org.ow2.proactive.scheduler.flow.FlowAction;
+import org.ow2.proactive.scheduler.flow.FlowScript;
 import org.ow2.proactive.scheduler.task.ExecutableContainer;
 import org.ow2.proactive.scheduler.task.KillTask;
+import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 import org.ow2.proactive.scripting.PropertyUtils;
 import org.ow2.proactive.scripting.Script;
@@ -133,7 +136,11 @@ public abstract class TaskLauncher implements InitActive {
         /**  */
         JAVAENV_TASK_ID_VARNAME("pas.task.id"),
         /**  */
-        JAVAENV_TASK_NAME_VARNAME("pas.task.name");
+        JAVAENV_TASK_NAME_VARNAME("pas.task.name"),
+        /**  */
+        JAVAENV_TASK_ITERATION("pas.task.iteration"),
+        /**  */
+        JAVAENV_TASK_DUPLICATION("pas.task.duplication");
 
         String varName;
 
@@ -153,6 +160,12 @@ public abstract class TaskLauncher implements InitActive {
     protected TaskId taskId;
     protected Script<?> pre;
     protected Script<?> post;
+    protected FlowScript flow;
+
+    /** duplication index: task was duplicated in parallel */
+    protected int duplicationIndex = 0;
+    /** iteration index: task was duplicated sequentially */
+    protected int iterationIndex = 0;
 
     // handle streams
     protected transient PrintStream redirectedStdout;
@@ -177,6 +190,12 @@ public abstract class TaskLauncher implements InitActive {
     /** The timer that will terminate the launcher if the task doesn't finish before the walltime */
     protected KillTask killTaskTimer = null;
 
+    /** Will be replaced in file paths by the task's iteration index */
+    protected static final String ITERATION_INDEX_TAG = "\\$IT";
+
+    /** Will be replaced in file paths by the task's duplication index */
+    protected static final String DUPLICATION_INDEX_TAG = "\\$DUP";
+
     /**
      * ProActive empty constructor.
      */
@@ -193,6 +212,7 @@ public abstract class TaskLauncher implements InitActive {
         this.taskId = initializer.getTaskId();
         this.pre = initializer.getPreScript();
         this.post = initializer.getPostScript();
+        this.flow = initializer.getControlFlowScript();
         if (initializer.getWalltime() > 0) {
             this.wallTime = initializer.getWalltime();
         }
@@ -200,6 +220,8 @@ public abstract class TaskLauncher implements InitActive {
         this.inputFiles = initializer.getTaskInputFiles();
         this.outputFiles = initializer.getTaskOutputFiles();
         this.namingServiceUrl = initializer.getNamingServiceUrl();
+        this.duplicationIndex = initializer.getDuplicationIndex();
+        this.iterationIndex = initializer.getIterationIndex();
     }
 
     /**
@@ -332,6 +354,9 @@ public abstract class TaskLauncher implements InitActive {
                 .getReadableName());
         System.setProperty(SchedulerVars.JAVAENV_TASK_ID_VARNAME.toString(), this.taskId.value());
         System.setProperty(SchedulerVars.JAVAENV_TASK_NAME_VARNAME.toString(), this.taskId.getReadableName());
+        System.setProperty(SchedulerVars.JAVAENV_TASK_ITERATION.toString(), "" + this.iterationIndex);
+        System.setProperty(SchedulerVars.JAVAENV_TASK_DUPLICATION.toString(), "" + this.duplicationIndex);
+
         // previously exported and propagated vars must be deleted
         System.clearProperty(PropertyUtils.EXPORTED_PROPERTIES_VAR_NAME);
         System.clearProperty(PropertyUtils.PROPAGATED_PROPERTIES_VAR_NAME);
@@ -345,6 +370,8 @@ public abstract class TaskLauncher implements InitActive {
         System.clearProperty(SchedulerVars.JAVAENV_JOB_NAME_VARNAME.toString());
         System.clearProperty(SchedulerVars.JAVAENV_TASK_ID_VARNAME.toString());
         System.clearProperty(SchedulerVars.JAVAENV_TASK_NAME_VARNAME.toString());
+        System.clearProperty(SchedulerVars.JAVAENV_TASK_ITERATION.toString());
+        System.clearProperty(SchedulerVars.JAVAENV_TASK_DUPLICATION.toString());
     }
 
     /**
@@ -496,6 +523,7 @@ public abstract class TaskLauncher implements InitActive {
     @SuppressWarnings("unchecked")
     protected void executePreScript(Node n) throws ActiveObjectCreationException, NodeException,
             UserException {
+        replaceIterationTag(pre);
         logger_dev.info("Executing pre-script");
         ScriptHandler handler = ScriptLoader.createHandler(n);
         ScriptResult<String> res = handler.handle(pre);
@@ -521,6 +549,7 @@ public abstract class TaskLauncher implements InitActive {
     @SuppressWarnings("unchecked")
     protected void executePostScript(Node n, boolean executionSucceed) throws ActiveObjectCreationException,
             NodeException, UserException {
+        replaceIterationTag(post);
         logger_dev.info("Executing post-script");
         ScriptHandler handler = ScriptLoader.createHandler(n);
         handler.addBinding(EXECUTION_SUCCEED_BINDING_NAME, executionSucceed);
@@ -533,6 +562,35 @@ public abstract class TaskLauncher implements InitActive {
         }
         // flush postscript output
         this.flushStreams();
+    }
+
+    /**
+     * Execute the control flow script on the node n or on the default node if n is null
+     * 
+     * @param n the node on which the script is to be executed
+     * @param res TaskResult of this launcher's task, input of the script
+     * @throws Throwable
+     */
+    @SuppressWarnings("unchecked")
+    protected void executeFlowScript(Node n, TaskResult res) throws Throwable {
+        replaceIterationTag(flow);
+        logger_dev.info("Executing flow-script");
+        ScriptHandler handler = ScriptLoader.createHandler(n);
+        handler.addBinding(FlowScript.resultVariable, res.value());
+        ScriptResult<FlowAction> sRes = handler.handle(flow);
+
+        if (sRes.errorOccured()) {
+            Throwable ee = sRes.getException();
+            if (ee != null) {
+                ee.printStackTrace();
+                logger_dev.error("Error on flow-script occured : ", ee);
+                throw new UserException("Flow-script has failed on the current node", ee);
+            }
+        }
+
+        this.flushStreams();
+        FlowAction action = sRes.getResult();
+        ((TaskResultImpl) res).setAction(action);
     }
 
     /**
@@ -800,4 +858,79 @@ public abstract class TaskLauncher implements InitActive {
         return true;
     }
 
+    /**
+     * Replace iteration and duplication helper tags in the dataspace's input and output descriptions
+     */
+    protected void replaceDSIterationTag() {
+        if (isDataspaceAware()) {
+            if (inputFiles != null) {
+                for (InputSelector is : inputFiles) {
+                    String[] inc = is.getInputFiles().getIncludes();
+                    String[] exc = is.getInputFiles().getExcludes();
+
+                    if (inc != null) {
+                        for (int i = 0; i < inc.length; i++) {
+                            inc[i] = inc[i].replaceAll(ITERATION_INDEX_TAG, "" + this.iterationIndex);
+                            inc[i] = inc[i].replaceAll(DUPLICATION_INDEX_TAG, "" + this.duplicationIndex);
+                        }
+                    }
+                    if (exc != null) {
+                        for (int i = 0; i < exc.length; i++) {
+                            exc[i] = exc[i].replaceAll(ITERATION_INDEX_TAG, "" + this.iterationIndex);
+                            exc[i] = exc[i].replaceAll(DUPLICATION_INDEX_TAG, "" + this.duplicationIndex);
+                        }
+                    }
+
+                    is.getInputFiles().setIncludes(inc);
+                    is.getInputFiles().setExcludes(exc);
+                }
+            }
+            if (outputFiles != null) {
+                for (OutputSelector os : outputFiles) {
+                    String[] inc = os.getOutputFiles().getIncludes();
+                    String[] exc = os.getOutputFiles().getExcludes();
+
+                    if (inc != null) {
+                        for (int i = 0; i < inc.length; i++) {
+                            inc[i] = inc[i].replaceAll(ITERATION_INDEX_TAG, "" + this.iterationIndex);
+                            inc[i] = inc[i].replaceAll(DUPLICATION_INDEX_TAG, "" + this.duplicationIndex);
+                        }
+                    }
+                    if (exc != null) {
+                        for (int i = 0; i < exc.length; i++) {
+                            exc[i] = exc[i].replaceAll(ITERATION_INDEX_TAG, "" + this.iterationIndex);
+                            exc[i] = exc[i].replaceAll(DUPLICATION_INDEX_TAG, "" + this.duplicationIndex);
+                        }
+                    }
+
+                    os.getOutputFiles().setIncludes(inc);
+                    os.getOutputFiles().setExcludes(exc);
+                }
+            }
+        }
+    }
+
+    /**
+     * Replace iteration and duplication helper tags in the scripts' contents and parameters
+     * 
+     * @param script the script where tags should be replaced
+     */
+    protected void replaceIterationTag(Script<?> script) {
+        if (script == null) {
+            return;
+        }
+        String code = script.getScript();
+        String[] args = script.getParameters();
+
+        code = code.replaceAll(ITERATION_INDEX_TAG, "" + this.iterationIndex);
+        code = code.replaceAll(DUPLICATION_INDEX_TAG, "" + this.duplicationIndex);
+        if (args != null) {
+            for (int i = 0; i < args.length; i++) {
+                args[i] = args[i].replaceAll(ITERATION_INDEX_TAG, "" + this.iterationIndex);
+                args[i] = args[i].replaceAll(DUPLICATION_INDEX_TAG, "" + this.duplicationIndex);
+            }
+        }
+
+        script.setScript(code);
+    }
 }

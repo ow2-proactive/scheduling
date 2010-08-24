@@ -42,6 +42,7 @@ import java.util.Map;
 import javax.swing.JPanel;
 
 import org.objectweb.proactive.annotation.PublicAPI;
+import org.ow2.proactive.scheduler.flow.FlowAction;
 
 
 /**
@@ -77,6 +78,15 @@ public interface TaskResult extends Serializable {
      * @throws Throwable If the value has generate an exception.
      */
     public Serializable value() throws Throwable;
+
+    /**
+     * If a FlowScript was executed on this task, its result
+     * is stored it so that the action can be performed later when
+     * processed by the core.
+     * 
+     * @return the Control Flow action embedded in this TaskResult
+     */
+    public FlowAction getAction();
 
     /**
      * Retrieve the exception threw by the task.

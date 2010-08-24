@@ -99,7 +99,11 @@ public enum SchedulerEvent {
     /** The scheduling policy has been changed. */
     POLICY_CHANGED("Policy changed"),
     /** A job has been terminated from pending queue. All tasks are finished. */
-    JOB_PENDING_TO_FINISHED("Job pending to finished");
+    JOB_PENDING_TO_FINISHED("Job pending to finished"),
+    /** A Control Flow Action led to the duplication of a task */
+    TASK_DUPLICATED("Task duplicated"),
+    /** A Control Flow Action (branching) led to a task being skipped */
+    TASK_SKIPPED("Task skipped");
 
     /** Name of the method */
     private String methodName;

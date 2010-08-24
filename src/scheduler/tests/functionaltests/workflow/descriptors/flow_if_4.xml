@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job xmlns="urn:proactive:jobdescriptor:dev" 
+     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     xsi:schemaLocation="urn:proactive:jobdescriptor:dev ../../src/scheduler/src/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/dev/schedulerjob.xsd"
+     name="Job" priority="low" projectName="myProject" cancelJobOnError="true">
+  <taskFlow>
+    <task name="T6" maxNumberOfExecution="4">
+      <description> // <![CDATA[
+      x=298,y=419
+      // ]]> </description>
+      <depends>
+        <task ref ="T5" />
+      </depends>
+      <javaExecutable class="org.ow2.proactive.scheduler.examples.IncrementJob">
+      </javaExecutable>
+      <flowControl block="end" />
+    </task>
+    <task name="T7" maxNumberOfExecution="4">
+      <description> // <![CDATA[
+      x=437,y=364
+      // ]]> </description>
+      <javaExecutable class="org.ow2.proactive.scheduler.examples.IncrementJob">
+      </javaExecutable>
+    </task>
+    <task name="T" maxNumberOfExecution="4">
+      <description> // <![CDATA[
+      x=244,y=96
+      // ]]> </description>
+      <javaExecutable class="org.ow2.proactive.scheduler.examples.IncrementJob">
+      </javaExecutable>
+      <flowControl block="none" >
+        <if target="T1" else="T3" join="T9">
+          <script>
+            <code language="javascript">
+// <![CDATA[
+branch = "else";
+// ]]>
+            </code>
+          </script>
+        </if>
+      </flowControl>
+    </task>
+    <task name="T4" maxNumberOfExecution="4">
+      <description> // <![CDATA[
+      x=376,y=255
+      // ]]> </description>
+      <depends>
+        <task ref ="T3" />
+      </depends>
+      <javaExecutable class="org.ow2.proactive.scheduler.examples.IncrementJob">
+      </javaExecutable>
+      <flowControl block="none" >
+        <if target="T5" else="T7" join="T8">
+          <script>
+            <code language="javascript">
+// <![CDATA[
+branch = "if";
+// ]]>
+            </code>
+          </script>
+        </if>
+      </flowControl>
+    </task>
+    <task name="T5" maxNumberOfExecution="4">
+      <description> // <![CDATA[
+      x=296,y=332
+      // ]]> </description>
+      <javaExecutable class="org.ow2.proactive.scheduler.examples.IncrementJob">
+      </javaExecutable>
+      <flowControl block="start" />
+    </task>
+    <task name="T8" maxNumberOfExecution="4">
+      <description> // <![CDATA[
+      x=375,y=487
+      // ]]> </description>
+      <javaExecutable class="org.ow2.proactive.scheduler.examples.IncrementJob">
+      </javaExecutable>
+      <flowControl block="end" />
+    </task>
+    <task name="T9" maxNumberOfExecution="4">
+      <description> // <![CDATA[
+      x=251,y=574
+      // ]]> </description>
+      <javaExecutable class="org.ow2.proactive.scheduler.examples.IncrementJob">
+      </javaExecutable>
+    </task>
+    <task name="T1" maxNumberOfExecution="4">
+      <description> // <![CDATA[
+      x=109,y=189
+      // ]]> </description>
+      <javaExecutable class="org.ow2.proactive.scheduler.examples.IncrementJob">
+      </javaExecutable>
+      <flowControl block="start" />
+    </task>
+    <task name="T3" maxNumberOfExecution="4">
+      <description> // <![CDATA[
+      x=374,y=172
+      // ]]> </description>
+      <javaExecutable class="org.ow2.proactive.scheduler.examples.IncrementJob">
+      </javaExecutable>
+      <flowControl block="start" />
+    </task>
+    <task name="T2" maxNumberOfExecution="4">
+      <description> // <![CDATA[
+      x=113,y=483
+      // ]]> </description>
+      <depends>
+        <task ref ="T1" />
+      </depends>
+      <javaExecutable class="org.ow2.proactive.scheduler.examples.IncrementJob">
+      </javaExecutable>
+      <flowControl block="end" />
+    </task>
+  </taskFlow>
+</job>

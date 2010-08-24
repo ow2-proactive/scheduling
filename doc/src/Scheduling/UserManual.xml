@@ -1352,6 +1352,601 @@ public class DSTest extends JavaExecutable {
 				</section>
 			</section>
 		</section>
+		<section xml:id="scheduler_workflow"><info><title>Enabling Workflows in a Task Flow job</title></info>
+		  <para>
+			Workflows in Scheduling is a set of Control Flow operations and syntactical constructs that
+			allow any valid Task Flow job to gain expressiveness and dynamic properties.
+		  </para>
+		  <section xml:id="scheduler_workflow_use_case"><info><title>Use-cases</title></info>
+			<para>
+			  <xref linkend="scheduler_workflow_uc_img" /> demonstrates the simplest use-case in which Workflows are needed in Scheduling.
+			  Without workflows, 6 (split, join, plus one per split image) tasks have to be written statically in the descriptor to achieve this behaviour.
+			  <figure xml:id="scheduler_workflow_uc_img"><info><title>Simple Workflow use-case</title></info>
+				<mediaobject>
+				  <imageobject>
+					<imagedata width="100%" align="center" fileref="images/png/user_manual/workflow_uc.png" format="PNG"/>
+				  </imageobject>
+				</mediaobject>
+			  </figure>
+			  With Workflows, this job should be composed of only three tasks, and the number of actual split task should be dynamic, and dependant on the size of the input, here an image.
+			  The goal of Workflows is, in the end, to provide tools to program logic inside a job for parts that are obviously factorisable.
+			</para>
+		  </section>
+		  <section xml:id="scheduler_workflow_spec"><info><title>Specification</title></info>
+			<para>
+			  Workflows provide three main features: the ability to duplicate tasks, the ability to loop on a set of tasks, and the ability to choose between two paths in the flow.
+			  These features are defined and restricted by syntactic and semantic rules, in order to ensure the correctness of the job prior to submission.
+			</para>
+			<section xml:id="scheduler_workflow_spec_common"><info><title>Common rules</title></info>
+			  <para>
+				<itemizedlist>
+				  <listitem>
+					<para>
+					  A <emphasis>dependency</emphasis> between tasks refers exclusively to an explicit &lt;depends&gt; tag in the descriptor.
+					  Other types of links introduced by workflows will use proper vocabulary.
+					</para>
+				  </listitem>
+				  <listitem>
+					<para>
+					  If a task <emphasis>t</emphasis> is started, every task having <emphasis>t</emphasis> as dependency should eventually be started.
+					</para>
+				  </listitem>
+				  <listitem>
+					<para>
+					  A control flow operation is always activated on the compute node, just after the actual task is executed.
+					</para>
+				  </listitem>
+				  <listitem>
+					<para>
+					  The control flow operation's activation is controlled by a dynamic script using the task's result as input.
+					</para>
+				  </listitem>
+				  <listitem>
+					<para>
+					  The task on which the action is embedded is called the <emphasis>initiator</emphasis>, if a task is used as parameter for
+					  an action, it is called a <emphasis>target</emphasis>.
+					</para>
+				  </listitem>
+				  <listitem>
+					<para>
+					  A <emphasis>task block</emphasis> is a set of tasks delimited by two tasks tagged <emphasis>start block</emphasis> and <emphasis>end block</emphasis>,
+					  forming a semantic scope.
+					</para>
+				  </listitem>
+				  <listitem>
+					<para>
+					  <emphasis>Task blocks</emphasis> can be nested: each <emphasis>end block</emphasis> task matches the last defined <emphasis>start block</emphasis>
+					  task up in the dependency chain.
+					</para>
+				  </listitem>
+				  <listitem>
+					<para>
+					  A <emphasis>Task blocks</emphasis> can consist of one single task, provided it is neither tagged as <emphasis>start block</emphasis> of <emphasis>end block</emphasis>.
+					</para>
+				  </listitem>
+				  <listitem>
+					<para>
+					  Walking up the dependency chain of an <emphasis>end block</emphasis> task must always lead to the same <emphasis>start block</emphasis>
+					  task. Walking down the dependency chain of a <emphasis>start block</emphasis> task must always lead to the same <emphasis>end block</emphasis>
+					  task.
+					</para>
+				  </listitem>
+				  <listitem>
+					<para>
+					  Three distinct operations are defined: <emphasis>duplicate</emphasis> (parallelization),
+					  <emphasis>if</emphasis> (branching) and <emphasis>loop</emphasis> (looping).
+					</para>
+				  </listitem>
+				</itemizedlist>
+			  </para>
+			</section>
+			<section xml:id="scheduler_workflow_spec_duplicate"><info><title>Parallelization</title></info>
+			  <para>
+				The &lt;duplicate&gt; action allows the execution of multiple tasks in parallel when only one task is written in the descriptor,
+				and the number of parallel runs is not statically known.
+				<figure xml:id="scheduler_workflow_spec_duplicate_img"><info><title><emphasis>Duplicate</emphasis> control flow action</title></info>
+				  <mediaobject>
+					<imageobject>
+					  <imagedata width="100%" align="center" fileref="images/png/user_manual/flow_spec_duplicate.png" format="PNG"/>
+					</imageobject>
+				  </mediaobject>
+				</figure>
+				<itemizedlist>
+				  <listitem>
+					<para>
+					  The target is the direct child of the task initiator.
+					</para>
+				  </listitem>
+				  <listitem>
+					<para>
+					  The initiator can have multiple children; each child is duplicated.
+					</para>
+				  </listitem>
+				  <listitem>
+					<para>
+					  If the target is a <emphasis>start block</emphasis>, the whole block is duplicated.
+					</para>
+				  </listitem>
+				  <listitem>
+					<para>
+					  The target must have the initiator as only dependency: the action is performed when the initiator task terminates. 
+					  If the target has an other pending task as dependency, the behaviour cannot be specified.
+					</para>
+				  </listitem>
+				  <listitem>
+					<para>
+					  There should always be a merge task after the target of a duplicate: if the target is not a start block,
+					  it should have at least one child, if the target is a start block, the corresponding end block should have at least one child.
+					</para>
+				  </listitem>
+				  <listitem>
+					<para>
+					  The last task of a duplicated task block (or the duplicated task if there is no block) cannot perform
+					  a <emphasis>branching</emphasis> or  <emphasis>duplicate</emphasis> action.
+					</para>
+				  </listitem>
+				  <listitem>
+					<para>
+					  The target of a <emphasis>duplicate</emphasis> action can not be tagged as <emphasis>end block</emphasis>.
+					</para>
+				  </listitem>
+				</itemizedlist>
+			  </para>
+			</section>
+			<section xml:id="scheduler_workflow_spec_if"><info><title>Branching</title></info>
+			  <para>
+				The <emphasis>If</emphasis> action provides the ability to choose between two alternative task flows, with the possibility to merge back to a common flow.
+				<figure xml:id="scheduler_workflow_spec_if_img"><info><title><emphasis>If</emphasis> control flow action</title></info>
+				  <mediaobject>
+					<imageobject>
+					  <imagedata width="100%" align="center" fileref="images/png/user_manual/flow_spec_if.png" format="PNG"/>
+					</imageobject>
+				  </mediaobject>
+				</figure>
+				<itemizedlist>
+				  <listitem>
+					<para>
+					  There is no explicit dependency between the initiator and the <emphasis>if/else</emphasis> targets.
+					  These are <emphasis>optional links</emphasis> (ie. A -> B or E -> F in Figure <xref linkend="scheduler_workflow_spec_if_img"/>) defined in the <emphasis>if</emphasis> task.
+					</para>
+				  </listitem>
+				  <listitem>
+					<para>
+					  The <emphasis>if</emphasis> and <emphasis>else</emphasis> flows can be merged by a <emphasis>join</emphasis> task referenced in the <emphasis>if</emphasis> task,
+					  playing the role of an <emphasis>endif</emphasis> construct.
+					</para>
+				  </listitem>
+				  <listitem>
+					<para>
+					  <emphasis>If</emphasis> and <emphasis>else</emphasis> targets are executed <emphasis>exclusively</emphasis>. The initiator however can be
+					  the dependency of other tasks, which will be executed normally along the <emphasis>if</emphasis> or the <emphasis>else</emphasis> target.
+					</para>
+				  </listitem>
+				  <listitem>
+					<para>
+					  A <emphasis>task block</emphasis> can be defined across <emphasis>if</emphasis>, <emphasis>else</emphasis> and <emphasis>join</emphasis> links,
+					  and not just plain dependencies
+					  (i.e. with <emphasis>A</emphasis> as <emphasis>start</emphasis> and <emphasis>F</emphasis> as <emphasis>end</emphasis> in <xref linkend="scheduler_workflow_spec_if_img" />).
+					</para>
+				  </listitem>
+				  <listitem>
+					<para>
+					  If using no join task, the if and else targets, along with their children, must be strictly distinct.
+					</para>
+				  </listitem>
+				  <listitem>
+					<para>
+					  If using a join task, the if and else targets must be strictly distinct and valid task blocks.
+					</para>
+				  </listitem>
+				  <listitem>
+					<para>
+					  <emphasis>if</emphasis>, <emphasis>else</emphasis> and <emphasis>join</emphasis> tasks (B, D and F in <xref linkend="scheduler_workflow_spec_if_img" />)
+					  cannot have an explicit dependency.
+					</para>
+				  </listitem>
+				  <listitem>
+					<para>
+					  <emphasis>if</emphasis>, <emphasis>else</emphasis> and <emphasis>join</emphasis> tasks
+					  cannot be entry points for the job, they must be triggered by the <emphasis>if</emphasis> control flow action.
+					</para>
+				  </listitem>
+				  <listitem>
+					<para>
+					  A task can be target of only one <emphasis>if</emphasis> or <emphasis>else</emphasis> action.
+					  A <emphasis>join</emphasis> task can not merge two different <emphasis>if</emphasis> actions.
+					</para>
+				  </listitem>
+				</itemizedlist>
+			  </para>
+			</section>
+			<section xml:id="scheduler_workflow_spec_loop"><info><title>Looping</title></info>
+			  <para>
+				<figure xml:id="scheduler_workflow_spec_loop_img"><info><title><emphasis>Loop</emphasis> control flow action</title></info>
+				  <mediaobject>
+					<imageobject>
+					  <imagedata width="100%" align="center" fileref="images/png/user_manual/flow_spec_loop.png" format="PNG"/>
+					</imageobject>
+				  </mediaobject>
+				</figure>
+				<itemizedlist>
+				  <listitem>
+					<para>
+					  The target of a <emphasis>loop</emphasis> action must be a parent of the initiator following the dependency chain;
+					  this action goes back to a previously executed task.
+					</para>
+				  </listitem>
+				  <listitem>
+					<para>
+					  Every task is executed at least once; <emphasis>loop</emphasis> operates in a <emphasis>do...while</emphasis> fashion.
+					</para>
+				  </listitem>
+				  <listitem>
+					<para>
+					  The target of a <emphasis>loop</emphasis> should have only one explicit dependency.
+					  It will have different parameters (dependencies) depending if
+					  it is executed for the first time or not. The cardinality should stay the same.
+					</para>
+				  </listitem>
+				  <listitem>
+					<para>
+					  The <emphasis>loop</emphasis> scope should be a <emphasis>task block</emphasis>: the target is a <emphasis>start block</emphasis> task,
+					  and the initiator its related <emphasis>end block task</emphasis>.
+					</para>
+				  </listitem>
+				</itemizedlist>
+			  </para>
+			</section>
+		  </section>
+		  <section xml:id="scheduler_workflow_create"><info><title>Create a Workflow enabled job</title></info>
+			<para>
+			  The following section demonstrates the combined use of task duplication, branching and looping.
+			  <figure xml:id="scheduler_workflow_create_img"><info><title>A job combining all control flow actions</title></info>
+				<mediaobject>
+				  <imageobject>
+					<imagedata width="100%" align="center" fileref="images/png/user_manual/workflow_example.png" format="PNG"/>
+				  </imageobject>
+				</mediaobject>
+			  </figure>
+			  This job can express the following algorithm:
+				<programlisting language="java">
+for i in parallel:
+   var result
+   do:
+      if condition:
+         result := f1 (result, i)
+      else
+         result := f2 (result, i)
+      endif
+   while result > epsilon
+done</programlisting>
+			  In <xref linkend="scheduler_workflow_create_img" />), it can be noted that:
+			  <itemizedlist>
+				<listitem>
+				  <para>
+					Task A performs a <emphasis>duplicate</emphasis> control flow action.
+					This means all tasks that depend on task A will be duplicated.
+				  </para>
+				</listitem>
+				<listitem>
+				  <para>
+					Task B will be duplicated, as it depends on task A, but so will
+					tasks C, D and E as they are included in the same <emphasis>task block</emphasis>.
+					Tasks B and E are resepectively the start and end block tasks.
+				  </para>
+				</listitem>
+				<listitem>
+				  <para>
+					Task B performs an <emphasis>if</emphasis> action. The <emphasis>if</emphasis> and <emphasis>else</emphasis> targets are tasks C and D,
+					and a <emphasis>join</emphasis> is performed on task E. An if with join operates on task blocks targets, which tasks C and D are,
+					being single tasks.
+				  </para>
+				</listitem>
+				<listitem>
+				  <para>
+					Task E performs a <emphasis>loop</emphasis> action with task B as target. This action is valid as tasks B (the target)
+					and E (the initiator) form a task block.
+				  </para>
+				</listitem>
+			  </itemizedlist>
+			</para>
+			<section xml:id="scheduler_workflow_blocks"><info><title>Task blocks</title></info>
+			  <para>
+				One important notion that can be extracted from the specification detailed in <xref linkend="scheduler_workflow_spec" />
+				is the existence of <emphasis>Task Blocks</emphasis>.
+			  </para>
+			  <para>
+				Task blocks are defined by pairs of <emphasis>start</emphasis> and <emphasis>end</emphasis> tags.
+				<itemizedlist>
+				  <listitem>
+					<para>
+					  Each task of the flow can be tagged either <emphasis>start</emphasis> or <emphasis>end</emphasis>
+					</para>
+				  </listitem>
+				  <listitem>
+					<para>
+					  Tags can be nested
+					</para>
+				  </listitem>
+				  <listitem>
+					<para>
+					  Each <emphasis>start</emphasis> tag needs to match a distinct <emphasis>end</emphasis> tag
+					</para>
+				  </listitem>
+				</itemizedlist>
+				Task blocks are very similar to the parenthesis of most programming languages: anonymous and nested start/end tags. The
+				only difference is that a parenthesis is a syntactical information, whereas task blocks are semantic.
+				All combinations of task blocks are syntactically valid, but only those allowed by <xref linkend="scheduler_workflow_spec" />
+				are semantically valid and can be submitted to the scheduler.
+			  </para>
+			  <para>
+				The role of Task Blocks is to restrain the expressiveness of the system so that a workflow can be statically
+				checked and validated. A treatment that can be looped or iterated will be isolated in a well-defined task block.
+				<itemizedlist>
+				  <listitem>
+					<para>
+					  A <emphasis>loop</emphasis> flow action only applies on a Task block: the initiator of the loop must be the end of the block, and the target must be the beginning.
+					</para>
+				  </listitem>
+				  <listitem>
+					<para>
+					  When using a <emphasis>join</emphasis> task in an <emphasis>if</emphasis> flow action, the <emphasis>if</emphasis> and <emphasis>else</emphasis> branches must be task blocks.
+					</para>
+				  </listitem>
+				  <listitem>
+					<para>
+					  If the child of a <emphasis>duplicate</emphasis> task is a task block, the whole block will be duplicated and not only the child of the initiator.
+					</para>
+				  </listitem>
+				</itemizedlist>
+			  </para>
+			</section>
+			<section xml:id="scheduler_workflow_script"><info><title>Control Flow Scripts</title></info>
+			  <para>
+				To perform a control flow action such as if, duplicate or loop, a <emphasis>Control Flow Script</emphasis> is executed on the execution node.
+				This script takes the result of the task as input; meaning a Java object if it was a Java task, or nothing if it was a native task.
+			  </para>
+			  <para>
+				The script is executed on the compute node, just after the task's executable. If the executable is a JavaExecutable and returns a result,
+				the variable <emphasis>result</emphasis> will be set in the script's environment so that dynamic decisions can be taken with the task's result
+				as input. Native Java objects can be used in a Javascript script using the following syntax:
+				<programlisting language="java"><![CDATA[
+importPackage(java.io);
+// the result variable is the TaskResult.value() if it exists
+var resFile = new File("/path/to/data/" + new java.lang.String(result));
+if (! resFile.exists()) {
+   loop = false;
+} else {
+   loop = true;
+   var input = new BufferedReader(new FileReader(f));
+   // this variable will determine the number of parallel runs
+   runs = java.lang.Integer.parseInt(input.readLine());
+   input.close()
+} ]]></programlisting>
+				Similarly to how parameters are passed through the <emphasis>result</emphasis> variable to the script,
+				the script needs to define variables specific to each action to determine what action the script will lead to.
+			  </para>
+			  <para>
+				<itemizedlist>
+				  <listitem>
+					<para>
+					  A <emphasis>duplicate</emphasis> control flow action needs to define how many parallel runs will be executed,
+					  by defining the variable <emphasis>runs</emphasis>:
+				<programlisting language="java"><![CDATA[
+// assuming result is a java.lang.Integer
+runs = result % 4 + 1;
+]]></programlisting>
+				The assigned value needs be a strictly positive integer.
+					</para>
+				  </listitem>
+				  <listitem>
+					<para>
+					  An <emphasis>if</emphasis> control flow action needs to determine whether the if or the else branch is selected,
+					  it does this by defining the boolean variable <emphasis>branch</emphasis>:
+				<programlisting language="java"><![CDATA[
+// assuming result is a java.lang.Integer
+if (result % 2) {
+  branch = "if";
+} else {
+  branch = "else";
+} ]]></programlisting>
+				The assigned value needs to be the string value "if" or "else".
+					</para>
+				  </listitem>
+				  <listitem>
+					<para>
+					  The <emphasis>loop</emphasis> control flow action requires setting the <emphasis>loop</emphasis>,
+					  which will determine wheter looping to the statically defined target is performed,
+					  or if the normal flow is executed as would a continue instruction do in a programming language:
+				<programlisting language="java"><![CDATA[
+loop = new java.lang.Boolean(result);
+]]></programlisting>
+				The assigned valuee needs to be a boolean.
+					</para>
+				  </listitem>
+				</itemizedlist>
+				Failure to set the required variables or the provide a write a valid control flow script
+				will not be treated gracefully and will result in the failure of the task.
+			  </para>
+			</section>
+			<section xml:id="scheduler_workflow_create_xml"><info><title>Using an XML descriptor</title></info>
+			  <para>
+				The following job is an XML implementation of the job described in <xref linkend="scheduler_workflow_create_img" />).
+				<programlisting language="xml"><textobject><textdata fileref="code_snippets/job_descriptors/workflow_1.xml" /></textobject></programlisting>
+			  </para>
+			</section>
+			<section xml:id="scheduler_workflow_create_api"><info><title>Using the Java API</title></info>
+			  <para>
+				This section takes the same example as in <xref linkend="scheduler_workflow_create_img" /> but focuses on using exclusively the Java API. The code is as follows:
+				<programlisting language="java">
+TaskFlowJob job = new TaskFlowJob();
+
+JavaTask split = new JavaTask();
+split.setName("split");
+split.setExecutableClassName("net.example.Split");
+FlowScript dup = FlowScript.createDuplicateFlowScript(dupScriptContent);
+split.setFlowScript(dup);
+
+JavaTask processing_1 = new JavaTask();
+processing_1.setName("processing_1");
+processing_1.addDependence(split);
+processing_1.setExecutableClassName("net.example.Processing_1");
+processing_1.setFlowBlock(FlowBlock.START);
+FlowScript ifScript = FlowScript.createIfFlowScript(ifScriptContent,
+  processing_2_a.getName(), processing_2_b.getName(), processing_3.getName());
+processing_1.setFlowScript(ifScript);
+
+JavaTask processing_2_a = new JavaTask();
+processing_2_a.setName("processing_2_a");
+processing_2_a.setExecutableClassName("net.example.Processing_2_a");
+
+JavaTask processing_2_b = new JavaTask();
+processing_2_b.setName("processing_2_b");
+processing_2_b.setExecutableClassName("net.example.Processing_2_b");
+
+JavaTask processing_3 = new JavaTask();
+processing_3.setName("processing_2");
+processing_3.addDependence(processing_1);
+processing_3.setExecutableClassName("net.example.Processing_2");
+processing_3.setFlowBlock(FlowBlock.END);
+FlowScript loop = FlowScript.createLoopFlowScript(loopScriptContent, processing_1.getName());
+processing_3.setFlowScript(loop);
+
+JavaTask join = new JavaTask();
+join.setName("join");
+join.addDependence(processing_3);
+join.setExecutableClassName("net.example.Join");</programlisting>
+				The most relevant method calls are the one used to tag tasks as <emphasis>start</emphasis> or <emphasis>end block</emphasis>, 
+				as well as the ones used to set the Control Flow Script on tasks.
+			  </para>
+			  <para>
+				To see how the Control Flow operations can be used and composed within a job, refer to <xref linkend="scheduler_workflow_spec" />
+			  </para>
+			</section>
+		  </section>
+		  <section xml:id="scheduler_workflow_awareness"><info><title>Iteration and duplication awareness</title></info>
+			<para>
+			  When Control Flow actions such as <emphasis>duplicate</emphasis> or <emphasis>loop</emphasis> are performed, some tasks are duplicated.
+			  To be able to identify duplicated tasks uniquely, each duplicated task has an <emphasis>iteration index</emphasis> and <emphasis>duplication index</emphasis>.
+			</para>
+			<section xml:id="scheduler_workflow_awareness_names"><info><title>Task names</title></info>
+			  <para>
+				First, those indexes are reflected inside the names of the tasks themselves. Indeed, task names must be unique inside a job.
+				The indexes are added to the original task name as a suffix, separated by a special character.
+				<itemizedlist>
+				  <listitem>
+					<para>
+					  If a task named "T" is duplicated after a <emphasis>loop</emphasis> action, the newly created tasks will be named "T#1", "T#2", etc.
+					  The number following the  <emphasis>#</emphasis> separator character represents the <emphasis>iteration index</emphasis>.
+					</para>
+				  </listitem>
+				  <listitem>
+					<para>
+					  The same scheme is used upon <emphasis>duplicate</emphasis> actions: newly created tasks are named "T*1", "T*2", and so on.
+					  The separator character  <emphasis>*</emphasis>, and the following number is the <emphasis>duplication index</emphasis>.
+					</para>
+				  </listitem>
+				  <listitem>
+					<para>
+					  When combining both of the above, the resulting task names are of the form: "T#1*1", "T#2*4", etc., in that precise order.
+					</para>
+				  </listitem>
+				</itemizedlist>
+				Note that these indexes can be safely extracted using the API :
+				<programlisting language="java"><![CDATA[
+JobResult jobResult = scheduler.getJobResult(jobId);
+for (Entry<String, TaskResult> result : res.getAllResults().entrySet()) {
+   int it = result.getValue().getTaskId().getIterationIndex();
+   int dup = result.getValue().getTaskid().getDuplicationIndex();
+   ...
+}			  ]]></programlisting>
+			  </para>
+			</section>
+			<section xml:id="scheduler_workflow_awareness_descriptor"><info><title>Iteration and duplication indexes in task description</title></info>
+			  <para>
+				Those indexes are also available when creating a task. They can be obtained using a special string that will be substituted
+				with the actual iteration or duplication index at runtime: <emphasis>$IT</emphasis> for the iteration index, and <emphasis>$DUP</emphasis>
+				for the duplication index. Those macro can be used in the following locations:
+				<itemizedlist>
+				  <listitem>
+					<para>
+					  <emphasis>Java Executable parameters:</emphasis>
+					  <programlisting language="xml"><![CDATA[
+<javaExecutable class="net.example.Executable">
+  <parameters>
+    <parameter name="images" value="/some/path/images/pic_$IT_$DUP.jpg" />  ]]></programlisting>
+					  <programlisting language="java"><![CDATA[
+JavaTask t = new JavaTask();
+t.setExecutableClassName("net.example.Executable");
+t.addArgument("images","/some/path/images/pic_$IT_$DUP.jpg");  ]]></programlisting>
+					</para>
+				  </listitem>
+				  <listitem>
+					<para>
+					  <emphasis>Native Executable arguments:</emphasis>
+					  <programlisting language="xml"><![CDATA[
+<staticCommand value="/path/to/bin.sh">
+  <arguments>
+    <argument value="/some/path/$IT/$DUP.dat" />  ]]></programlisting>
+					  <programlisting language="java"><![CDATA[
+NativeTask nt = new NativeTask();
+nt.setCommandLine(new String[] { "/path/to/bin.sh", "/path/to/$ID/$DUP.dat" });  ]]></programlisting>
+					</para>
+				  </listitem>
+				  <listitem>
+					<para>
+					  <emphasis>Dataspace input and output:</emphasis>
+					  <programlisting language="xml"><![CDATA[
+<task name="t1" retries="2">
+  <inputFiles>
+    <files includes="foo_$IT_$DUP.dat" accessMode="transferFromInputSpace"/>
+  </inputFiles><outputFiles>
+    <files includes="bar_$IT_$DUP.res" accessMode="transferToOutputSpace"/>  ]]></programlisting>
+					  <programlisting language="java"><![CDATA[
+task.addInputFiles("foo_$IT_$DUP.dat",OutputAccessMode.TransferToOutputSpace);
+task.addOutputFiles("bar_$IT_$DUP.res",OutputAccessMode.none);  ]]></programlisting>
+					</para>
+				  </listitem>
+				  <listitem>
+					<para>
+					  <emphasis>Script :</emphasis>
+					  <programlisting language="xml"><![CDATA[
+<task>
+  <pre><script><code language="javascript">
+		var f = new java.io.File(".lock_$IT_$DUP");
+		f.createNewFile();
+  </code></script></pre>  ]]></programlisting>
+					  <programlisting language="java"><![CDATA[
+task.setPreScript(new SimpleScript("var f = new java.io.File(\".lock_$ID_$DUP\"); f.createNewFile();", "javascript"));  ]]></programlisting>
+					  Scripts affected by the macro substitution are: Pre, Post, Command generation and Control Flow.
+					  <emphasis>No substitution will occur in selection scripts.</emphasis>
+					</para>
+				  </listitem>
+				</itemizedlist>
+			  </para>
+			</section>
+			<section xml:id="scheduler_workflow_awareness_exec"><info><title>Iteration and duplication indexes in executables</title></info>
+			  <para>
+				The iteration and duplication indexes are available inside the executables launched by tasks.
+			  </para>
+			  <para>
+				In Java tasks, the indexes are exported through the following Java properties: <emphasis>pas.task.iteration</emphasis> and <emphasis>pas.task.duplication</emphasis>.
+				<programlisting language="java"><![CDATA[
+public Serializable execute(TaskResult... results) throws Throwable {
+  int it  = System.getProperty("pas.task.iteration");
+  int dup = System.getProperty("pas.task.duplication");
+} ]]></programlisting>
+			  </para>
+			  <para>
+				In a similar fashion, environment variables are set when launching a native executable: <emphasis>PAS_TASK_ITERATION</emphasis> and <emphasis>PAS_TASK_DUPLICATION</emphasis>:
+				<programlisting language="sh"><![CDATA[
+#!/bin/sh
+/path/to/bin.sh /path/to/file/${PAS_TASK_ITERATION}/${PAS_TASK_DUPLICATION}.dat
+ ]]></programlisting>
+			  </para>
+			</section>
+		  </section>
+		</section>
 		<section xml:id="Submit_a_job"><info><title>Submit a job to the Scheduler</title></info>
 			<para>
 				The submission will perform some verifications to ensure that a job is correctly formed.
@@ -1370,7 +1965,7 @@ public class DSTest extends JavaExecutable {
 			</section>
 			<section xml:id="Submit_a_job_sh"><info><title>Submit a job using the shell command</title></info>
 				<para>
-					Use the provided shell script <emphasis>scheduler-client[.bat]</emphasis> to submit a job using command line.
+				  Use the provided shell script <emphasis>scheduler-client[.bat]</emphasis> to submit a job using command line.
 					This script (bin/[os]/scheduler-client[.bat] used to submit a job) has 1 mandatory option and 2 optional :
 					<itemizedlist>
 						<listitem>

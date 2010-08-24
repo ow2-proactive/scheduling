@@ -162,6 +162,33 @@ public class FileSelector implements Serializable {
     }
 
     /**
+     * Copy constructor
+     * 
+     * @param or original instance
+     */
+    public FileSelector(FileSelector or) {
+        if (or.getIncludes() != null) {
+            int inlen = or.getIncludes().length;
+            if (inlen > 0) {
+                this.includes = new String[inlen];
+                for (int i = 0; i < inlen; i++) {
+                    this.includes[i] = new String(or.getIncludes()[i]);
+                }
+            }
+        }
+        if (or.getExcludes() != null) {
+            int exlen = or.getExcludes().length;
+            if (exlen > 0) {
+                this.excludes = new String[exlen];
+                for (int i = 0; i < exlen; i++) {
+                    this.excludes[i] = new String(or.getExcludes()[i]);
+                }
+            }
+        }
+        this.caseSensitive = or.isCaseSensitive();
+    }
+
+    /**
      * Create a new instance of FileSelector using exclude and include files pattern
      *
      * @param includes

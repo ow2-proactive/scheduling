@@ -82,6 +82,7 @@ import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.util.ResultPreviewTool.SimpleTextPanel;
+import org.ow2.proactive.scheduler.flow.FlowAction;
 import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 import org.ow2.proactive.scheduler.util.classloading.TaskClassLoader;
 
@@ -157,6 +158,11 @@ public class TaskResultImpl implements TaskResult {
     @Type(type = "org.ow2.proactive.scheduler.core.db.schedulerType.CharacterLargeOBject")
     private String[] jobClasspath;
 
+    /** result of the FlowScript if there was one, or null */
+    @Cascade(CascadeType.ALL)
+    @OneToOne(fetch = FetchType.EAGER, targetEntity = FlowAction.class)
+    private FlowAction flowAction = null;
+
     //Managed by taskInfo, this field is here only to bring taskDuration to core AO
     @Transient
     private long taskDuration = -1;
@@ -177,6 +183,10 @@ public class TaskResultImpl implements TaskResult {
         this.output = output;
     }
 
+    public TaskResultImpl(TaskId id, Serializable value, TaskLogs output, long execDuration) {
+        this(id, value, output, execDuration, null, null);
+    }
+
     /**
      * Return a new instance of task result represented by a task id, its result and its output.
      *
@@ -188,10 +198,11 @@ public class TaskResultImpl implements TaskResult {
      * @throws IOException
      */
     public TaskResultImpl(TaskId id, Serializable value, TaskLogs output, long execDuration,
-            Map<String, BigString> propagatedProperties) {
+            Map<String, BigString> propagatedProperties, FlowAction action) {
         this(id, output);
         this.taskDuration = execDuration;
         this.value = value;
+        this.flowAction = action;
         this.propagatedProperties = propagatedProperties;
         try {
             //try to serialize user result
@@ -249,6 +260,42 @@ public class TaskResultImpl implements TaskResult {
                 logger_dev.error("", ioe3);
             }
         }
+    }
+
+    /**
+     * If a FlowScript was executed on this task, its result
+     * is stored so that the action can be performed later when
+     * processed by the core.
+     * 
+     * return the Action to perform for this task
+     */
+    public FlowAction getAction() {
+        return this.flowAction;
+    }
+
+    /**
+     * If a FlowScript was executed on this task, its result
+     * is stored so that the action can be performed later when
+     * processed by the core.
+     * 
+     * @param act an Control Flow action to embed in this TaskResult
+     */
+    public void setAction(FlowAction act) {
+        this.flowAction = act;
+    }
+
+    /**
+     * @param the output of the task
+     */
+    public void setLogs(TaskLogs l) {
+        this.output = l;
+    }
+
+    /**
+     * @param propagatedProperties the map of all properties that has been propagated through Exporter.propagateProperty
+     */
+    public void setPropagatedProperties(Map<String, BigString> props) {
+        this.propagatedProperties = props;
     }
 
     /**

@@ -104,6 +104,7 @@ public class NativeTaskLauncher extends TaskLauncher {
         try {
             //init dataspace
             initDataSpaces();
+            replaceDSIterationTag();
 
             //copy datas from OUTPUT or INPUT to local scratch
             copyInputDataToScratch();
@@ -128,7 +129,9 @@ public class NativeTaskLauncher extends TaskLauncher {
             //init task
             ExecutableInitializer execInit = executableContainer.createExecutableInitializer();
             replaceWorkingDirDSTags(execInit);
+            replaceIterationTag(((NativeExecutableInitializer) execInit).getGenerationScript());
             callInternalInit(NativeExecutable.class, NativeExecutableInitializer.class, execInit);
+            replaceIterationTags(execInit);
 
             //replace dataspace tags in command (if needed) by local scratch directory
             replaceCommandDSTags();
@@ -161,9 +164,17 @@ public class NativeTaskLauncher extends TaskLauncher {
                 throw exception;
             }
 
+            TaskResultImpl res = new TaskResultImpl(taskId, userResult, null, duration, null, null);
+
+            if (flow != null) {
+                this.executeFlowScript(PAActiveObject.getNode(), res);
+            }
+
+            res.setPropagatedProperties(retreivePropagatedProperties());
+            res.setLogs(this.getLogs());
+
             //return result
-            return new TaskResultImpl(taskId, userResult, this.getLogs(), duration,
-                retreivePropagatedProperties());
+            return res;
         } catch (Throwable ex) {
             logger_dev.info("", ex);
             // exceptions are always handled at scheduler core level
@@ -192,6 +203,23 @@ public class NativeTaskLauncher extends TaskLauncher {
             String fullScratchPath = SCRATCH.getRealURI().replace("file://", "");
             for (int i = 0; i < args.length; i++) {
                 args[i] = args[i].replaceAll(DATASPACE_TAG, fullScratchPath);
+            }
+        }
+    }
+
+    /**
+     * Replaces iteration and duplication index syntactic macros
+     * in various string locations across the task descriptor
+     * 
+     * @param init the executable initializer containing the native command
+     */
+    protected void replaceIterationTags(ExecutableInitializer init) {
+        NativeExecutable ne = (NativeExecutable) currentExecutable;
+        String[] cmd = ne.getCommand();
+        if (cmd != null) {
+            for (int i = 0; i < cmd.length; i++) {
+                cmd[i] = cmd[i].replaceAll(ITERATION_INDEX_TAG, "" + this.iterationIndex);
+                cmd[i] = cmd[i].replaceAll(DUPLICATION_INDEX_TAG, "" + this.duplicationIndex);
             }
         }
     }

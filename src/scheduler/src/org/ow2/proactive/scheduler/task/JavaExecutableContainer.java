@@ -125,6 +125,19 @@ public class JavaExecutableContainer extends ExecutableContainer {
     }
 
     /**
+     * Copy constructor
+     * 
+     * @param cont original object to copy
+     */
+    public JavaExecutableContainer(JavaExecutableContainer cont) {
+        this.userExecutableClassName = cont.userExecutableClassName;
+        for (Entry<String, ByteArrayWrapper> e : cont.serializedArguments.entrySet()) {
+            this.serializedArguments.put(new String(e.getKey()), new ByteArrayWrapper(e.getValue()
+                    .byteArrayValue()));
+        }
+    }
+
+    /**
      * @see org.ow2.proactive.scheduler.task.ExecutableContainer#getExecutable()
      */
     @Override

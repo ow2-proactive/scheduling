@@ -98,6 +98,15 @@ public class ForkedJavaExecutableContainer extends JavaExecutableContainer {
     }
 
     /**
+     * Copy constructor
+     * 
+     * @param original object to copy
+     */
+    public ForkedJavaExecutableContainer(ForkedJavaExecutableContainer original) {
+        super(original);
+    }
+
+    /**
      * @see org.ow2.proactive.scheduler.task.ExecutableContainer#getExecutable()
      */
     @Override

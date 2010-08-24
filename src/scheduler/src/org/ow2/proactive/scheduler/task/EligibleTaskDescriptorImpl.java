@@ -244,4 +244,17 @@ public class EligibleTaskDescriptorImpl implements EligibleTaskDescriptor {
     public String toString() {
         return "TaskDescriptor(" + getId() + ")";
     }
+
+    /** 
+     * Removes all children dependences
+     */
+    public void clearChildren() {
+        if (children == null) {
+            children = new Vector<TaskDescriptor>();
+        }
+
+        children.clear();
+        childrenCount = 0;
+    }
+
 }

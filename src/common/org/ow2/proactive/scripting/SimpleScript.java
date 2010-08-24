@@ -104,6 +104,16 @@ public class SimpleScript extends Script {
     }
 
     /**
+     * Copy constructor
+     * 
+     * @param original script to copy
+     * @throws InvalidScriptException 
+     */
+    public SimpleScript(Script<?> original) throws InvalidScriptException {
+        super(original);
+    }
+
+    /**
      * @see org.ow2.proactive.scripting.Script#getId()
      */
     @Override

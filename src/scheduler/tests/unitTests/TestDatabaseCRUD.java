@@ -66,6 +66,7 @@ import org.ow2.proactive.scheduler.common.task.util.ByteArrayWrapper;
 import org.ow2.proactive.scheduler.common.task.util.IntegerWrapper;
 import org.ow2.proactive.scheduler.core.db.DatabaseManager;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
+import org.ow2.proactive.scheduler.flow.FlowAction;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.job.InternalJobFactory;
 import org.ow2.proactive.scheduler.job.InternalTaskFlowJob;
@@ -126,7 +127,7 @@ public class TestDatabaseCRUD {
         //add a taskResult
         itfJob.setJobResult(new JobResultImpl(itfJob.getId()));
         ((JobResultImpl) itfJob.getJobResult()).addTaskResult("task2", new TaskResultImpl(TaskIdImpl
-                .nextId(itfJob.getJobInfo().getJobId()), "salut", null, 1, null), true);
+                .nextId(itfJob.getJobInfo().getJobId()), "salut", null, 1, null, new FlowAction()), true);
         //register the job
         DatabaseManager.getInstance().register(itfJob);
         //list of internal job to recover

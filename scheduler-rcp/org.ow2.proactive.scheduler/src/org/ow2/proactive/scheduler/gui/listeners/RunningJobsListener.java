@@ -60,4 +60,19 @@ public interface RunningJobsListener {
      * @param jobId the jobid
      */
     public void removeRunningJob(JobId jobId);
+
+    /**
+     * One or more tasks have been duplicated inside this job,
+     * some updates may be necessary
+     * 
+     * @param jobId the jobid
+     */
+    public void taskDuplicated(JobId jobId);
+
+    /**
+     * Tasks were skipped due to branching flow action
+     * 
+     * @param info
+     */
+    public void taskSkipped(JobId info);
 }

@@ -1,5 +1,5 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:jd="urn:proactive:jobdescriptor:dev" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" elementFormDefault="qualified" targetNamespace="urn:proactive:jobdescriptor:dev">
+<?xml version="1.0" encoding="UTF-8"?><xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:jd="urn:proactive:jobdescriptor:dev" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" elementFormDefault="qualified" targetNamespace="urn:proactive:jobdescriptor:dev">
+  
   <xs:element name="job">
     <xs:annotation>
       <xs:documentation>Definition of a job for the scheduler </xs:documentation>
@@ -251,6 +251,7 @@
             <xs:element minOccurs="0" ref="jd:selection"/>
             <xs:element minOccurs="0" ref="jd:pre"/>
             <xs:element ref="jd:executable"/>
+            <xs:element minOccurs="0" ref="jd:flowControl"/>
             <xs:element minOccurs="0" ref="jd:post"/>
             <xs:element minOccurs="0" ref="jd:cleaning"/>
             <xs:element minOccurs="0" ref="jd:outputFiles"/>
@@ -424,6 +425,30 @@
       <xs:group maxOccurs="unbounded" ref="jd:selectionScript"/>
     </xs:complexType>
   </xs:element>
+  <xs:element name="flowControl">
+    <xs:annotation>
+      <xs:documentation>Flow control : block declaration, flow action</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:choice minOccurs="0">
+        <xs:element ref="jd:if"/>
+        <xs:element ref="jd:duplicate"/>
+        <xs:element ref="jd:loop"/>
+      </xs:choice>
+      <xs:attribute name="block" type="jd:blockAttr">
+        <xs:annotation>
+          <xs:documentation>block declaration</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="block">
+    <xs:attribute name="block" use="required" type="jd:blockAttr">
+      <xs:annotation>
+        <xs:documentation>block declaration</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
   <xs:element name="pre" type="jd:script">
     <xs:annotation>
       <xs:documentation>A script launched before the task execution in the task node</xs:documentation>
@@ -840,6 +865,59 @@
       </xs:annotation>
     </xs:attribute>
   </xs:attributeGroup>
+  <!-- +++++++++++++ Control flow -->
+  <xs:element name="if">
+    <xs:annotation>
+      <xs:documentation>branching Control flow action</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="jd:script">
+          <xs:attributeGroup ref="jd:target"/>
+          <xs:attributeGroup ref="jd:targetElse"/>
+          <xs:attributeGroup ref="jd:targetJoin"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="target">
+    <xs:attribute name="target" use="required" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>branching if target</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="targetElse">
+    <xs:attribute name="else" use="required" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>branching else target</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="targetJoin">
+    <xs:attribute name="join" use="required" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>branching else target</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:element name="loop">
+    <xs:annotation>
+      <xs:documentation>looping control flow action</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="jd:script">
+          <xs:attributeGroup ref="jd:target"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="duplicate" type="jd:script">
+    <xs:annotation>
+      <xs:documentation>duplicate control flow action</xs:documentation>
+    </xs:annotation>
+  </xs:element>
   <!-- +++++++++++++ User define types -->
   <xs:simpleType name="jobPriority">
     <xs:union memberTypes="jd:variableRefType">
@@ -935,6 +1013,20 @@
   <xs:simpleType name="inexcludePattern">
     <xs:restriction base="xs:string">
       <xs:pattern value=".+(,.+)*"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="controlFlowAction">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="goto"/>
+      <xs:enumeration value="duplicate"/>
+      <xs:enumeration value="continue"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="blockAttr">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="start"/>
+      <xs:enumeration value="end"/>
+      <xs:enumeration value="none"/>
     </xs:restriction>
   </xs:simpleType>
 </xs:schema>

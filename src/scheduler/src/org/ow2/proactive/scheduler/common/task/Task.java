@@ -48,6 +48,7 @@ import javax.persistence.MappedSuperclass;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import org.hibernate.annotations.AccessType;
 import org.hibernate.annotations.AnyMetaDef;
@@ -65,6 +66,9 @@ import org.ow2.proactive.scheduler.common.task.dataspaces.InputAccessMode;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputSelector;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
+import org.ow2.proactive.scheduler.flow.FlowAction;
+import org.ow2.proactive.scheduler.flow.FlowBlock;
+import org.ow2.proactive.scheduler.flow.FlowScript;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.scripting.SimpleScript;
@@ -101,6 +105,15 @@ public abstract class Task extends CommonAttribute {
     /** Name of the task. */
     @Column(name = "NAME")
     protected String name = SchedulerConstants.TASK_DEFAULT_NAME;
+
+    /** Entry point: spontaneously startable */
+    @Column(name = "ENTRY_POINT")
+    protected boolean entryPoint = false;
+
+    /** block declaration : syntactic scopes used for workflows
+     * string representation of a FlowBlock enum */
+    @Column(name = "FLOW_BLOCK")
+    protected String flowBlock = FlowBlock.NONE.toString();
 
     /** Description of the task. */
     @Column(name = "DESCRIPTION", length = Integer.MAX_VALUE)
@@ -158,18 +171,20 @@ public abstract class Task extends CommonAttribute {
     @OneToOne(fetch = FetchType.EAGER, targetEntity = SimpleScript.class)
     protected Script<?> cScript;
 
+    /**
+     * FlowScript: Control Flow Action Script executed after the task,
+     * returns a {@link FlowAction} which will perform flow actions on the job
+     */
+    @Cascade(CascadeType.ALL)
+    @OneToOne(fetch = FetchType.EAGER, targetEntity = FlowScript.class)
+    protected FlowScript flowScript;
+
     /** Tell whether this task has a precious result or not. */
     @Column(name = "PRECIOUS_RESULT")
     protected boolean preciousResult;
 
     /** List of dependences if necessary. */
-    @ManyToAny(metaColumn = @Column(name = "TASK_TYPE", length = 5))
-    @AnyMetaDef(idType = "long", metaType = "string", metaValues = {
-            @MetaValue(targetEntity = JavaTask.class, value = "IJT"),
-            @MetaValue(targetEntity = NativeTask.class, value = "INT") })
-    @JoinTable(joinColumns = @JoinColumn(name = "TASK_ID"), inverseJoinColumns = @JoinColumn(name = "DEPEND_ID"))
-    @LazyCollection(value = LazyCollectionOption.FALSE)
-    @Cascade(CascadeType.ALL)
+    @Transient
     private List<Task> dependences = null;
 
     /** maximum execution time of the task (in milliseconds), the variable is only valid if isWallTime is true */
@@ -280,11 +295,68 @@ public abstract class Task extends CommonAttribute {
      *            the name to set.
      */
     public void setName(String name) {
-        if (name != null && name.length() > 255) {
+        if (name == null) {
+            return;
+        }
+        if (name.length() > 255) {
             throw new IllegalArgumentException("The name is too long, it must have 255 chars length max : " +
                 name);
         }
         this.name = name;
+    }
+
+    /**
+     * @return true if this task is an entry point for the job
+     */
+    public boolean isEntryPoint() {
+        return this.entryPoint;
+    }
+
+    /**
+     * @param e true if the task should be an entry point for the job, or false
+     */
+    public void setEntryPoint(boolean e) {
+        this.entryPoint = e;
+    }
+
+    /**
+     * Defining Control Flow Blocks with pairs of {@link FlowBlock#START} and {@link FlowBlock#END}
+     * is a semantic requirement to be able to create specific control flow constructs.
+     * <p>
+     * Refer to the documentation for detailed instructions.
+     * 
+     * @return the FlowBlock attribute of this task indicating if it is the beginning or the ending
+     *  of a new block scope
+     */
+    public FlowBlock getFlowBlock() {
+        return FlowBlock.parse(this.flowBlock);
+    }
+
+    /**
+     * Defining Control Flow Blocks with pairs of {@link FlowBlock#START} and {@link FlowBlock#END}
+     * is a semantic requirement to be able to create specific control flow constructs.
+     * <p>
+     * Refer to the documentation for detailed instructions.
+     
+     * @param flowBlock the FlowBlock attribute of this task indicating if it is the beginning 
+     *  or the ending of a new block scope
+     * @see FlowBlock#parse(String)
+     */
+    public void setFlowBlock(String flowBlock) {
+        this.flowBlock = flowBlock;
+    }
+
+    /**
+     * Defining Control Flow Blocks using {@link FlowBlock#START} and {@link FlowBlock#END}
+     * is a semantic requirement to be able to create specific control flow constructs.
+     * <p>
+     * Refer to the documentation for detailed instructions.
+     * 
+     * @param fb the FlowBlock attribute of this task indicating if it is the beginning 
+     *  or the ending of a new block scope
+     */
+    public void setFlowBlock(FlowBlock fb) {
+        this.flowBlock = fb.toString();
     }
 
     /**
@@ -313,6 +385,38 @@ public abstract class Task extends CommonAttribute {
      */
     public Script<?> getPostScript() {
         return postScript;
+    }
+
+    /**
+     * To perform complex Control Flow Actions in a TaskFlowJob,
+     * a FlowScript needs to be attached to specific tasks.
+     * <p>
+     * Some Control Flow constructs need to be used within the bounds of
+     * a {@link FlowBlock}, which is defined a the level of the Task using
+     * {@link Task#setFlowBlock(FlowBlock)}.
+     * <p>
+     * Refer to the user documentation for further instructions.
+     * 
+     * @return the Control Flow Script used for workflow actions
+     */
+    public FlowScript getFlowScript() {
+        return flowScript;
+    }
+
+    /**
+     * To perform complex Control Flow Actions in a TaskFlowJob,
+     * a FlowScript needs to be attached to specific tasks.
+     * <p>
+     * Some Control Flow constructs need to be used within the bounds of
+     * a {@link FlowBlock}, which is defined a the level of the Task using
+     * {@link Task#setFlowBlock(FlowBlock)}.
+     * <p>
+     * Refer to the user documentation for further instructions.
+     * 
+     * @param s the Control Flow Script used for workflow actions
+     */
+    public void setFlowScript(FlowScript s) {
+        this.flowScript = s;
     }
 
     /**

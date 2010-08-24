@@ -152,6 +152,18 @@ public class JobsController implements SchedulerEventListener {
             listener.removeRunningJob(jobId);
     }
 
+    /** call "taskSkipped" method on listeners */
+    private void taskSkippedEventInternal(JobId jobId) {
+        for (RunningJobsListener listener : runningJobsListeners)
+            listener.taskSkipped(jobId);
+    }
+
+    /** call "taskDuplicated" method on listeners */
+    private void taskDuplicatedEventInternal(JobId jobId) {
+        for (RunningJobsListener listener : runningJobsListeners)
+            listener.taskDuplicated(jobId);
+    }
+
     /** call "addFinishedJob" method on listeners */
     private void addFinishedJobEventInternal(JobId jobId) {
         for (FinishedJobsListener listener : finishedJobsListeners)
@@ -337,6 +349,12 @@ public class JobsController implements SchedulerEventListener {
                 break;
             case JOB_CHANGE_PRIORITY:
                 jobChangePriorityEvent(notification.getData());
+                break;
+            case TASK_DUPLICATED:
+                taskDuplicated(notification.getData());
+                break;
+            case TASK_SKIPPED:
+                taskSkipped(notification.getData());
                 break;
         }
     }
@@ -836,6 +854,79 @@ public class JobsController implements SchedulerEventListener {
                     TaskView taskView = TaskView.getInstance();
                     if (taskView != null) {
                         taskView.lineUpdate(getTaskStateById(job, taskInfo.getTaskId()));
+                    }
+                }
+            });
+        }
+    }
+
+    private void taskSkipped(JobInfo info) {
+        JobId jobId = info.getJobId();
+        final JobState job = getJobById(jobId);
+        job.update(info);
+
+        // if this job is selected in a table
+        if (TableManager.getInstance().isJobSelected(info.getJobId())) {
+            Display.getDefault().asyncExec(new Runnable() {
+                public void run() {
+                    List<JobId> jobsId = TableManager.getInstance().getJobsIdOfSelectedItems();
+                    List<JobState> jobs = getJobsByIds(jobsId);
+
+                    // update info
+                    org.ow2.proactive.scheduler.gui.views.JobInfo jobInfo = org.ow2.proactive.scheduler.gui.views.JobInfo
+                            .getInstance();
+                    if (jobInfo != null) {
+                        if (jobsId.size() == 1)
+                            jobInfo.updateInfos(job);
+                        else
+                            jobInfo.updateInfos(jobs);
+                    }
+
+                    TaskView taskView = TaskView.getInstance();
+                    if (taskView != null) {
+                        if (jobsId.size() == 1)
+                            taskView.fullUpdate(job);
+                        else
+                            taskView.fullUpdate(jobs);
+                    }
+                }
+            });
+        }
+        // call method on listeners
+        taskSkippedEventInternal(info.getJobId());
+
+    }
+
+    private void taskDuplicated(JobInfo info) {
+        JobId jobId = info.getJobId();
+        JobState job = getJobById(jobId);
+        job.update(info);
+
+        taskDuplicatedEventInternal(info.getJobId());
+
+        // if this job is selected in the Running table
+        if (TableManager.getInstance().isJobSelected(jobId)) {
+            final JobState job1 = job;
+            Display.getDefault().asyncExec(new Runnable() {
+                public void run() {
+                    List<JobId> jobsId = TableManager.getInstance().getJobsIdOfSelectedItems();
+
+                    // update info
+                    org.ow2.proactive.scheduler.gui.views.JobInfo jobInfo = org.ow2.proactive.scheduler.gui.views.JobInfo
+                            .getInstance();
+                    if (jobInfo != null) {
+                        if (jobsId.size() == 1)
+                            jobInfo.updateInfos(job1);
+                        else
+                            jobInfo.updateInfos(getJobsByIds(jobsId));
+                    }
+
+                    TaskView taskView = TaskView.getInstance();
+                    if (taskView != null) {
+                        if (jobsId.size() == 1)
+                            taskView.fullUpdate(job1);
+                        else
+                            taskView.fullUpdate(getJobsByIds(jobsId));
                     }
                 }
             });

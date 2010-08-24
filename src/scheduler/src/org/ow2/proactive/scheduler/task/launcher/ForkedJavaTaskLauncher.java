@@ -37,6 +37,7 @@
 package org.ow2.proactive.scheduler.task.launcher;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
 import org.ow2.proactive.scheduler.common.task.TaskLogs;
@@ -101,6 +102,7 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher {
             //init task
             ForkedJavaExecutableInitializer fjei = (ForkedJavaExecutableInitializer) executableContainer
                     .createExecutableInitializer();
+            replaceIterationTags(fjei);
             fjei.setJavaTaskLauncherInitializer(initializer);
             //create initializer
             ExecutableContainerInitializer eci = new ExecutableContainerInitializer();
@@ -123,7 +125,6 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher {
             duration = System.currentTimeMillis() - duration;
 
             return userResult;
-
         } catch (Throwable ex) {
             logger_dev.info("", ex);
             return new TaskResultImpl(taskId, ex, this.getLogs(), duration, null);

@@ -40,6 +40,7 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -1209,6 +1210,8 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
             case JOB_PAUSED:
             case JOB_RESUMED:
             case JOB_CHANGE_PRIORITY:
+            case TASK_DUPLICATED:
+            case TASK_SKIPPED:
                 dispatchJobStateUpdated(owner, notification);
                 this.jmxHelper.getSchedulerRuntimeMBean().jobStateUpdatedEvent(notification);
                 break;

@@ -1,0 +1,630 @@
+/*
+ * ################################################################
+ *
+ * ProActive Parallel Suite(TM): The Java(TM) library for
+ *    Parallel, Distributed, Multi-Core Computing for
+ *    Enterprise Grids & Clouds
+ *
+ * Copyright (C) 1997-2010 INRIA/University of 
+ *              Nice-Sophia Antipolis/ActiveEon
+ * Contact: proactive@ow2.org or contact@activeeon.com
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; version 3 of
+ * the License.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ * If needed, contact us to obtain a release under GPL Version 2 
+ * or a different license than the GPL.
+ *
+ *  Initial developer(s):               The ActiveEon Team
+ *                        http://www.activeeon.com/
+ *  Contributor(s):
+ *
+ * ################################################################
+ * $$ACTIVEEON_INITIAL_DEV$$
+ */
+package org.ow2.proactive.scheduler.flow;
+
+import java.io.Reader;
+import java.io.StringReader;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.script.Bindings;
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+
+import org.hibernate.annotations.AccessType;
+import org.hibernate.annotations.Proxy;
+import org.objectweb.proactive.annotation.PublicAPI;
+import org.ow2.proactive.scheduler.common.task.Task;
+import org.ow2.proactive.scripting.InvalidScriptException;
+import org.ow2.proactive.scripting.Script;
+import org.ow2.proactive.scripting.ScriptResult;
+import org.ow2.proactive.scripting.SimpleScript;
+
+
+/**
+ * Dynamic evaluation of this script determines at runtime if a specific 
+ * Control Flow operation should be performed in a TaskFlow.
+ * <p>
+ * This class wraps information around a {@link  org.ow2.proactive.scripting.Script}
+ * to determine which {@link FlowAction} is attached to this script
+ * <p>
+ * Available after the execution of the script with {@link FlowScript#execute()}, 
+ * the method {@link FlowScript#getResult(Bindings)} returns the {@link FlowAction} which is enabled
+ * or disabled depending the value of the {@link FlowScript#enabledVariable} variable set in the script.
+ * <p>
+ * When using the action type {@link FlowActionType#DUPLICATE}, the value of the 
+ * {@link FlowScript#duplicateRunsVariable} determines the number of parallel runs.
+ * 
+ * 
+ * @author The ProActive Team
+ * @since ProActive Scheduling 2.1
+ * @see FlowAction
+ * 
+ */
+@PublicAPI
+@Entity
+@Table(name = "FLOW_SCRIPT")
+@AccessType("field")
+@Proxy(lazy = false)
+public class FlowScript extends Script<FlowAction> {
+
+    @Id
+    @GeneratedValue
+    @SuppressWarnings("unused")
+    private long hId;
+
+    /** String representation of a FlowActionType
+     * see {@link FlowActionType#parse(String)} */
+    @Column(name = "ACTIONTYPE")
+    private String actionType = null;
+
+    // implementation note:
+    // target / targetElse / targetJoin
+    // would be much better represented with an InternalTask or a TaskId, but :
+    // - InternalTask cannot be used because of project setup :
+    //   it is not exported on the worker on which this script executes;
+    //   it cannot be used on user side, and this class is PublicAPI
+    // - TaskId cannot be used by the user prior to submission
+    // A complete solution would involve exposing one class to the user,
+    // copying the info onto another more complete InternalFlowScript,
+    // and holding a TaskId, which would present some of the problems
+    // of the current string-based implementation
+    //
+    // In the end, using strings is less safe, but faster and simpler ;
+    // also, this is only internals never exposed to the user
+
+    /** Name of the target task of this action if it requires one */
+    @Column(name = "TARGET")
+    private String target = null;
+
+    /** Name of the 'Else' target task if this action is an 'If' */
+    @Column(name = "TARGET_ELSE")
+    private String targetElse = null;
+
+    /** Name of the 'Join' target task if this action is an 'If' */
+    @Column(name = "TARGET_JOIN")
+    private String targetJoin = null;
+
+    /** Name of the variable that will be set in the script's environment
+     * to contain the result of the Task executed along this script */
+    public static final String resultVariable = "result";
+
+    /** Name of the boolean variable to set in the script to determine 
+     * if a LOOP action is enabled or if the execution should continue */
+    public static final String loopVariable = "loop";
+
+    /** Name of the Integer variable to set in the script to determine
+     * the number of parallel runs of a DUPLICATE action */
+    public static final String duplicateRunsVariable = "runs";
+
+    /** Name of the variable to set in the script to determine
+     * which one of the IF or ELSE branch is selected in an IF
+     * control flow action */
+    public static final String branchSelectionVariable = "branch";
+
+    /** Value to set {@link #branchSelectionVariable} to
+     * signify the IF branch should be selected */
+    public static final String ifBranchSelectedVariable = "if";
+
+    /** Value to set {@link #branchSelectionVariable} to
+     * signify the ELSE branch should be selected */
+    public static final String elseBranchSelectedVariable = "else";
+
+    /**
+     * Hibernate default constructor,
+     * use {@link #createContinueFlowScript()},
+     * {@link #createLoopFlowScript(Script, String)} or
+     * {@link #createDuplicateFlowScript(Script)} to
+     * create a FlowScript
+     */
+    public FlowScript() {
+    }
+
+    /**
+     * Copy constructor 
+     * 
+     * @param scr Source script
+     * @throws InvalidScriptException
+     */
+    public FlowScript(FlowScript fl) throws InvalidScriptException {
+        super(fl);
+        if (fl.getActionType() != null) {
+            this.actionType = new String(fl.getActionType());
+        }
+        if (fl.getActionTarget() != null) {
+            this.target = new String(fl.getActionTarget());
+        }
+        if (fl.getActionTargetElse() != null) {
+            this.targetElse = new String(fl.getActionTargetElse());
+        }
+        if (fl.getActionJoin() != null) {
+            this.targetJoin = new String(fl.getActionJoin());
+        }
+    }
+
+    private FlowScript(Script<?> scr) throws InvalidScriptException {
+        super(scr);
+    }
+
+    public static FlowScript createContinueFlowScript() throws InvalidScriptException {
+        FlowScript fs = new FlowScript(new SimpleScript("", "javascript"));
+        fs.setActionType(FlowActionType.CONTINUE);
+        return fs;
+    }
+
+    /**
+     * Creates a Control Flow Script configured to perform a LOOP control flow action
+     * the code will be run using a javascript engine
+     * 
+     * @param script code of the Javascript script 
+     * @param target target of the LOOP action
+     * @return a newly allocated and configured Control Flow Script
+     * @throws InvalidScriptException
+     */
+    public static FlowScript createLoopFlowScript(String script, String target) throws InvalidScriptException {
+        return createLoopFlowScript(script, "javascript", target);
+    }
+
+    /**
+     * Creates a Control Flow Script configured to perform a LOOP control flow action
+     * 
+     * @param script code of the script
+     * @param engine engine running the script
+     * @param target target of the LOOP action
+     * @return a newly allocated and configured Control Flow Script
+     * @throws InvalidScriptException
+     */
+    public static FlowScript createLoopFlowScript(String script, String engine, String target)
+            throws InvalidScriptException {
+        Script<?> scr = new SimpleScript(script, engine);
+        return createLoopFlowScript(scr, target);
+    }
+
+    /**
+     * Creates a Control Flow Script configured to perform a LOOP control flow action
+     * 
+     * @param script the script to execute
+     * @param target target of the LOOP action
+     * @return a newly allocated and configured Control Flow Script
+     * @throws InvalidScriptException
+     */
+    public static FlowScript createLoopFlowScript(Script<?> script, String target)
+            throws InvalidScriptException {
+        FlowScript flow = new FlowScript(script);
+        flow.setActionType(FlowActionType.LOOP);
+        flow.setActionTarget(target);
+        return flow;
+    }
+
+    /**
+     * Creates a Control Flow Script configured to perform an IF control flow action
+     * the code will be run using a javascript engine
+     * 
+     * @param script code of the Javascript script 
+     * @param targetIf IF branch
+     * @param targetElse ELSE branch
+     * @param targetJoin JOIN branch, can be null
+     * @return a newly allocated and configured Control Flow Script
+     * @throws InvalidScriptException
+     */
+    public static FlowScript createIfFlowScript(String script, String targetIf, String targetElse,
+            String targetJoin) throws InvalidScriptException {
+        return createIfFlowScript(script, "javascript", targetIf, targetElse, targetJoin);
+    }
+
+    /**
+     * Creates a Control Flow Script configured to perform an IF control flow action
+     * 
+     * @param script code of the script
+     * @param engine engine running the script
+     * @param targetIf IF branch
+     * @param targetElse ELSE branch
+     * @param targetJoin JOIN branch, can be null
+     * @return a newly allocated and configured Control Flow Script
+     * @throws InvalidScriptException
+     */
+    public static FlowScript createIfFlowScript(String script, String engine, String targetIf,
+            String targetElse, String targetJoin) throws InvalidScriptException {
+        Script<?> scr = new SimpleScript(script, engine);
+        return createIfFlowScript(scr, targetIf, targetElse, targetJoin);
+    }
+
+    /**
+     * Creates a Control Flow Script configured to perform an IF control flow action
+     * 
+     * @param script the script to execute
+     * @param targetIf IF branch
+     * @param targetElse ELSE branch
+     * @param targetJoin JOIN branch, can be null
+     * @return a newly allocated and configured Control Flow Script
+     * @throws InvalidScriptException
+     */
+    public static FlowScript createIfFlowScript(Script<?> script, String targetIf, String targetElse,
+            String targetJoin) throws InvalidScriptException {
+        FlowScript flow = new FlowScript(script);
+        flow.setActionType(FlowActionType.IF);
+        flow.setActionTarget(targetIf);
+        flow.setActionTargetElse(targetElse);
+        flow.setActionJoin(targetJoin);
+        return flow;
+    }
+
+    /**
+     * Creates a Control Flow Script configured to perform a DUPLICATE control flow action
+     * the code will be run using a javascript engine
+     * 
+     * @param script code of the Javascript script 
+     * @return a newly allocated and configured Control Flow Script
+     * @throws InvalidScriptException
+     */
+    public static FlowScript createDuplicateFlowScript(String script) throws InvalidScriptException {
+        return createDuplicateFlowScript(script, "javascript");
+    }
+
+    /**
+     * Creates a Control Flow Script configured to perform a Duplicate control flow action
+     * 
+     * @param script code of the script
+     * @param engine engine running the script
+     * @return a newly allocated and configured Control Flow Script
+     * @throws InvalidScriptException
+     */
+    public static FlowScript createDuplicateFlowScript(String script, String engine)
+            throws InvalidScriptException {
+        Script<?> scr = new SimpleScript(script, engine);
+        return createDuplicateFlowScript(scr);
+    }
+
+    /**
+     * Creates a Control Flow Script configured to perform a DUPLICATE control flow action
+     * 
+     * @param script the script to execute
+     * @return a newly allocated and configured Control Flow Script
+     * @throws InvalidScriptException
+     */
+    public static FlowScript createDuplicateFlowScript(Script<?> script) throws InvalidScriptException {
+        FlowScript flow = new FlowScript(script);
+        flow.setActionType(FlowActionType.DUPLICATE);
+        return flow;
+    }
+
+    /**
+     * The Action Type does not have any effect on the execution of the script,
+     * but will be used after the execution to determine what Control Flow Action
+     * should be performed on the TaskFlow.
+     * 
+     * @param actionType the String representation of the new ActionType of this script,
+     * @see {@link FlowActionType#parse(String)}
+     */
+    public void setActionType(String actionType) {
+        this.actionType = actionType;
+    }
+
+    /**
+     * The Action Type does not have any effect on the execution of the script,
+     * but will be used after the execution to determine what Control Flow Action
+     * should be performed on the TaskFlow.
+     * 
+     * @param actionType the ActionType of this script,
+     */
+    public void setActionType(FlowActionType type) {
+        this.actionType = type.toString();
+    }
+
+    /**
+     * The Action Type does not have any effect on the execution of the script,
+     * but will be used after the execution to determine what Control Flow Action
+     * should be performed on the TaskFlow.
+     * 
+     * @return the String representation of the ActionType of this script,
+     * @see {@link FlowActionType#parse(String)}
+     */
+    public String getActionType() {
+        return this.actionType;
+    }
+
+    /**
+     * If the Action type (see {@link #getActionType()}) of this FlowScript 
+     * is {@link FlowActionType#LOOP}, the target is the entry point of the next loop iteration.
+     * If the Action type is {@link FlowActionType#IF}, the target is the branch executed when 
+     * the If condition succeeds.
+     * <p>
+     * This value has no effect on the execution of the script
+     * 
+     * @param target the main target of the action of this script.
+     */
+    public void setActionTarget(String target) {
+        this.target = target;
+    }
+
+    /**
+     * If the Action type (see {@link #getActionType()}) of this FlowScript 
+     * is {@link FlowActionType#LOOP}, the target is the entry point of the next loop iteration.
+     * If the Action type is {@link FlowActionType#IF}, the target is the branch executed when 
+     * the If condition succeeds.
+     * <p>
+     * This value has no effect on the execution of the script
+     * 
+     * @param target the main target of the action of this script.
+     */
+    public void setActionTarget(Task target) {
+        this.target = target.getName();
+    }
+
+    /**
+     * If the Action type (see {@link #getActionType()}) of this FlowScript 
+     * is {@link FlowActionType#LOOP}, the target is the entry point of the next loop iteration.
+     * If the Action type is {@link FlowActionType#IF}, the target is the branch executed when 
+     * the If condition succeeds.
+     * <p>
+     * This value has no effect on the execution of the script
+     * 
+     * @return the main target of the action of this script
+     */
+    public String getActionTarget() {
+        return this.target;
+    }
+
+    /**
+     * If the Action type (see {@link #getActionType()}) of this FlowScript 
+     * is {@link FlowActionType#IF}, the targetElse is the branch executed when 
+     * the If condition fails.
+     * <p>
+     * This value has no effect on the execution of the script
+     * 
+     * @param target the Else target of the action of this script
+     */
+    public void setActionTargetElse(String target) {
+        this.targetElse = target;
+    }
+
+    /**
+     * If the Action type (see {@link #getActionType()}) of this FlowScript 
+     * is {@link FlowActionType#IF}, the targetElse is the branch executed when 
+     * the If condition fails.
+     * <p>
+     * This value has no effect on the execution of the script
+     * 
+     * @param target the Else target of the action of this script
+     */
+    public void setActionTargetElse(Task target) {
+        this.targetElse = target.getName();
+    }
+
+    /**
+     * If the Action type (see {@link #getActionType()}) of this FlowScript 
+     * is {@link FlowActionType#IF}, the targetElse is the branch executed when 
+     * the If condition fails.
+     * <p>
+     * This value has no effect on the execution of the script
+     * 
+     * @return the Else target of the action of this script
+     */
+    public String getActionTargetElse() {
+        return this.targetElse;
+    }
+
+    /**
+     * If the Action type (see {@link #getActionType()}) of this FlowScript 
+     * is {@link FlowActionType#IF}, the targetJoin is the Task on which both
+     * if and else branches will join after either one has been executed.
+     * <p>
+     * This value has no effect on the execution of the script
+     * 
+     * @param target the Join target of the action of this script
+     */
+    public void setActionJoin(String target) {
+        this.targetJoin = target;
+    }
+
+    /**
+     * If the Action type (see {@link #getActionType()}) of this FlowScript 
+     * is {@link FlowActionType#IF}, the targetJoin is the Task on which both
+     * if and else branches will join after either one has been executed.
+     * <p>
+     * This value has no effect on the execution of the script
+     * 
+     * @param target the Join target of the action of this script
+     */
+    public void setActionJoin(Task target) {
+        this.targetJoin = target.getName();
+    }
+
+    /**
+     * If the Action type (see {@link #getActionType()}) of this FlowScript 
+     * is {@link FlowActionType#IF}, the targetJoin is the Task on which both
+     * if and else branches will join after either one has been executed.
+     * <p>
+     * This value has no effect on the execution of the script
+     * 
+     * @return the Join target of the action of this script
+     */
+    public String getActionJoin() {
+        return this.targetJoin;
+    }
+
+    @Override
+    protected ScriptEngine getEngine() {
+        return new ScriptEngineManager().getEngineByName(scriptEngine);
+    }
+
+    @Override
+    public String getId() {
+        return this.id.toString();
+    }
+
+    @Override
+    protected Reader getReader() {
+        return new StringReader(script);
+    }
+
+    @Override
+    protected ScriptResult<FlowAction> getResult(Bindings bindings) {
+        try {
+            FlowAction act = new FlowAction();
+
+            /*
+             * no action defined
+             */
+            if (this.actionType == null || this.actionType.equals(FlowActionType.CONTINUE.toString())) {
+                act.setType(FlowActionType.CONTINUE);
+            }
+
+            /*
+             * loop
+             */
+            else if (this.actionType.equals(FlowActionType.LOOP.toString())) {
+                if (this.target == null) {
+                    String msg = "LOOP control flow action requires a target";
+                    logger_dev.error(msg);
+                    return new ScriptResult<FlowAction>(new Exception(msg));
+                } else {
+                    if (bindings.containsKey(loopVariable)) {
+                        Boolean enabled = new Boolean(bindings.get(loopVariable).toString());
+
+                        if (enabled) {
+                            act.setType(FlowActionType.LOOP);
+                            act.setTarget(this.target);
+                        } else {
+                            act.setType(FlowActionType.CONTINUE);
+                        }
+                    } else {
+                        String msg = "Script environment for LOOP action needs to define variable " +
+                            loopVariable;
+                        logger_dev.error(msg);
+                        return new ScriptResult<FlowAction>(new Exception(msg));
+                    }
+                }
+            }
+            /*
+             * duplicate
+             */
+            else if (this.actionType.equals(FlowActionType.DUPLICATE.toString())) {
+                if (bindings.containsKey(duplicateRunsVariable)) {
+                    act.setType(FlowActionType.DUPLICATE);
+                    int args = 1;
+                    Object o = bindings.get(duplicateRunsVariable);
+                    try {
+                        args = Integer.parseInt("" + o);
+                    } catch (NumberFormatException e) {
+                        try {
+                            args = (int) Math.floor(Double.parseDouble("" + o));
+                        } catch (Exception e2) {
+                            String msg = "DUPLICATE action: could not parse value for variable " +
+                                duplicateRunsVariable;
+                            logger_dev.error(msg);
+                            return new ScriptResult<FlowAction>(new Exception(msg, e2));
+                        }
+                    }
+                    if (args < 1) {
+                        String msg = "DUPLICATE action: value of variable " + duplicateRunsVariable +
+                            " cannot be negative";
+                        logger_dev.error(msg);
+                        return new ScriptResult<FlowAction>(new Exception(msg));
+                    }
+                    act.setDupNumber(args);
+                } else {
+                    String msg = "Script environment for DUPLICATE action needs to define variable " +
+                        duplicateRunsVariable;
+                    logger_dev.error(msg);
+                    return new ScriptResult<FlowAction>(new Exception(msg));
+                }
+            }
+            /*
+             * if
+             */
+            else if (this.actionType.equals(FlowActionType.IF.toString())) {
+                if (this.target == null) {
+                    String msg = "IF action requires a target ";
+                    logger_dev.error(msg);
+                    return new ScriptResult<FlowAction>(new Exception(msg));
+                } else if (this.targetElse == null) {
+                    String msg = "IF action requires an ELSE target ";
+                    logger_dev.error(msg);
+                    return new ScriptResult<FlowAction>(new Exception(msg));
+                } else {
+                    act.setType(FlowActionType.IF);
+
+                    if (bindings.containsKey(branchSelectionVariable)) {
+                        String val = new String((String) bindings.get(branchSelectionVariable));
+                        if (val.equals(ifBranchSelectedVariable)) {
+                            act.setTarget(this.target);
+                            act.setTargetElse(this.targetElse);
+                        } else if (val.equals(elseBranchSelectedVariable)) {
+                            act.setTarget(this.targetElse);
+                            act.setTargetElse(this.target);
+                        } else {
+                            String msg = "IF action: value for " + branchSelectionVariable +
+                                " needs to be one of " + ifBranchSelectedVariable + " or " +
+                                elseBranchSelectedVariable;
+                            logger_dev.error(msg);
+                            return new ScriptResult<FlowAction>(new Exception(msg));
+                        }
+                    } else {
+                        String msg = "Environment for IF action needs to define variable " +
+                            branchSelectionVariable;
+                        logger_dev.error(msg);
+                        return new ScriptResult<FlowAction>(new Exception(msg));
+                    }
+
+                    if (this.targetJoin != null) {
+                        act.setTargetJoin(this.targetJoin);
+                    }
+                }
+            }
+            /*
+             * unknown action
+             */
+            else {
+                String msg = actionType + " action type unknown";
+                logger_dev.error(msg);
+                return new ScriptResult<FlowAction>(new Exception(msg));
+            }
+
+            return new ScriptResult<FlowAction>(act);
+        } catch (Throwable th) {
+            return new ScriptResult<FlowAction>(th);
+        }
+    }
+
+    @Override
+    protected void prepareSpecialBindings(Bindings bindings) {
+    }
+}

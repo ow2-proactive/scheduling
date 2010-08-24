@@ -462,6 +462,10 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
         currentJob.setTaskStatusModify(null);
         // used when a job has failed
         currentJob.setTaskFinishedTimeModify(null);
+        // also duplicated tasks
+        currentJob.setDuplicatedTasksModify(null);
+        currentJob.setLoopedTasksModify(null);
+        currentJob.setSkippedTasksModify(null);
         // and to database
         DatabaseManager.getInstance().synchronize(currentJob.getJobInfo());
         for (TaskState task : currentJob.getTasks()) {
@@ -1049,6 +1053,10 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
             } else {
                 logger_dev.debug("Terminated task '" + taskId + "' is a java task");
                 errorOccurred = res.hadException();
+                if (errorOccurred) {
+                    res.getException().printStackTrace();
+                    logger_dev.info(" ", res.getException());
+                }
             }
 
             logger_dev
@@ -1117,7 +1125,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
                 descriptor.getName() + "'");
             //to be done before terminating the task, once terminated it is not running anymore..
             TaskDescriptor currentTD = job.getRunningTaskDescriptor(taskId);
-            descriptor = job.terminateTask(errorOccurred, taskId);
+            descriptor = job.terminateTask(errorOccurred, taskId, frontend, res.getAction());
 
             //and update database
             try {
@@ -2057,7 +2065,6 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
         Collections.sort(pendingJobs, jobComparator);
         Collections.sort(runningJobs, jobComparator);
         Collections.sort(finishedJobs, jobComparator);
-
         //------------------------------------------------------------------------
         //-----------------    Recover the scheduler front-end   -----------------
         //------------------------------------------------------------------------
@@ -2100,6 +2107,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
                     case FAILED:
                     case FINISHED:
                     case FAULTY:
+                    case SKIPPED:
                         tasksList.add(task);
                 }
             } else {

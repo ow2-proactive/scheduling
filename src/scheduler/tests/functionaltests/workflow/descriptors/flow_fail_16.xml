@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job xmlns="urn:proactive:jobdescriptor:dev" 
+     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     xsi:schemaLocation="urn:proactive:jobdescriptor:dev ../../src/scheduler/src/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/dev/schedulerjob.xsd"
+     name="Job" priority="low" projectName="myProject" cancelJobOnError="true">
+  <taskFlow>
+    <task name="T" maxNumberOfExecution="4">
+      <description> // <![CDATA[
+      x=150,y=95
+      // ]]> </description>
+      <javaExecutable class="org.ow2.proactive.scheduler.examples.IncrementJob">
+      </javaExecutable>
+      <flowControl block="none" >
+        <duplicate>
+          <script>
+            <code language="javascript">
+            </code>
+          </script>
+        </duplicate>
+      </flowControl>
+    </task>
+    <task name="T1" maxNumberOfExecution="4">
+      <description> // <![CDATA[
+      x=151,y=182
+      // ]]> </description>
+      <depends>
+        <task ref ="T" />
+      </depends>
+      <javaExecutable class="org.ow2.proactive.scheduler.examples.IncrementJob">
+      </javaExecutable>
+    </task>
+  </taskFlow>
+</job>

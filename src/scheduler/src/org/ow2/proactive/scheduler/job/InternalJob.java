@@ -44,8 +44,10 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.TreeMap;
 
 import javax.persistence.Column;
 import javax.persistence.FetchType;
@@ -70,6 +72,8 @@ import org.hibernate.annotations.Proxy;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.dataspaces.core.naming.NamingService;
 import org.ow2.proactive.db.annotation.Alterable;
+import org.ow2.proactive.scheduler.common.NotificationData;
+import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.job.JobDescriptor;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
@@ -82,8 +86,14 @@ import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
+import org.ow2.proactive.scheduler.core.SchedulerFrontend;
 import org.ow2.proactive.scheduler.core.annotation.TransientInSerialization;
+import org.ow2.proactive.scheduler.core.db.DatabaseManager;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
+import org.ow2.proactive.scheduler.flow.FlowAction;
+import org.ow2.proactive.scheduler.flow.FlowActionType;
+import org.ow2.proactive.scheduler.flow.FlowBlock;
+import org.ow2.proactive.scheduler.job.JobInfoImpl.DuplicatedTask;
 import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalForkedJavaTask;
@@ -230,6 +240,184 @@ public abstract class InternalJob extends JobState {
                 }
             }
         }
+        // update skipped tasks
+        if (this.jobInfo.getTasksSkipped() != null) {
+            for (TaskId id : tasks.keySet()) {
+                if (this.jobInfo.getTasksSkipped().contains(id)) {
+                    InternalTask it = tasks.get(id);
+                    it.setStatus(TaskStatus.SKIPPED);
+                }
+            }
+        }
+        // duplicated tasks have been added through FlowAction#DUPLICATE
+        if (this.jobInfo.getTasksDuplicated() != null) {
+            updateTasksDuplicated();
+        }
+        // duplicated tasks have been added through FlowAction#LOOP
+        if (this.jobInfo.getTasksLooped() != null) {
+            updateTasksLooped();
+        }
+    }
+
+    /**
+     * Updates this job when tasks were duplicated due to a {@link FlowActionType#DUPLICATE} action
+     * <p>
+     * The internal state of the job will change: new tasks will be added,
+     * existing tasks will be modified.
+     */
+    private void updateTasksDuplicated() {
+        // key: duplicated task / value : id of the original task
+        // originalId not used as key because tasks can be duplicated multiple times
+        Map<InternalTask, TaskId> newTasks = new TreeMap<InternalTask, TaskId>();
+
+        // create the new tasks
+        for (DuplicatedTask it : this.jobInfo.getTasksDuplicated()) {
+            InternalTask original = this.tasks.get(it.originalId);
+            InternalTask duplicated = null;
+            try {
+                duplicated = (InternalTask) original.duplicate();
+            } catch (Exception e) {
+            }
+            duplicated.setId(it.duplicatedId);
+            // for some reason the indices are embedded in the Readable name and not where they belong
+            int dupId = InternalTask.getDuplicationIndexFromName(it.duplicatedId.getReadableName());
+            int itId = InternalTask.getIterationIndexFromName(it.duplicatedId.getReadableName());
+            duplicated.setDuplicationIndex(dupId);
+            duplicated.setIterationIndex(itId);
+
+            this.tasks.put(it.duplicatedId, duplicated);
+            newTasks.put(duplicated, it.originalId);
+
+            // when nesting DUPLICATE, the original duplicated task can have its Duplication Index changed:
+            // the new Duplication Id of the original task is the lowest id among duplicated tasks minus one
+            int minDup = Integer.MAX_VALUE;
+            for (DuplicatedTask it2 : this.jobInfo.getTasksDuplicated()) {
+                String iDup = InternalTask.getInitialName(it2.duplicatedId.getReadableName());
+                String iOr = InternalTask.getInitialName(it.originalId.getReadableName());
+                if (iDup.equals(iOr)) {
+                    int iDupId = InternalTask.getDuplicationIndexFromName(it2.duplicatedId.getReadableName());
+                    minDup = Math.min(iDupId, minDup);
+                }
+            }
+            original.setDuplicationIndex(minDup - 1);
+        }
+
+        // recreate deps contained in the data struct
+        for (DuplicatedTask it : this.jobInfo.getTasksDuplicated()) {
+            InternalTask newtask = this.tasks.get(it.duplicatedId);
+            for (TaskId depId : it.deps) {
+                InternalTask dep = this.tasks.get(depId);
+                newtask.addDependence(dep);
+            }
+        }
+
+        // plug mergers
+        List<InternalTask> toAdd = new ArrayList<InternalTask>();
+        for (InternalTask old : this.tasks.values()) {
+            // task is not a duplicated one, has dependencies
+            if (!newTasks.containsValue(old.getId()) && old.hasDependences()) {
+                for (InternalTask oldDep : old.getIDependences()) {
+                    // one of its dependencies is a duplicated task
+                    if (newTasks.containsValue(oldDep.getId())) {
+                        // connect those duplicated tasks to the merger
+                        for (Entry<InternalTask, TaskId> newTask : newTasks.entrySet()) {
+                            if (newTask.getValue().equals(oldDep.getId())) {
+                                toAdd.add(newTask.getKey());
+                            }
+                        }
+                    }
+                }
+                // avoids concurrent modification
+                for (InternalTask newDep : toAdd) {
+                    old.addDependence(newDep);
+                }
+                toAdd.clear();
+            }
+        }
+
+    }
+
+    /**
+     * Updates this job when tasks were duplicated due to a {@link FlowActionType#LOOP} action
+     * <p>
+     * The internal state of the job will change: new tasks will be added,
+     * existing tasks will be modified.
+     */
+    private void updateTasksLooped() {
+        Map<TaskId, InternalTask> newTasks = new TreeMap<TaskId, InternalTask>();
+
+        // create the new tasks
+        for (DuplicatedTask it : this.jobInfo.getTasksLooped()) {
+            InternalTask original = this.tasks.get(it.originalId);
+            InternalTask duplicated = null;
+            try {
+                duplicated = (InternalTask) original.duplicate();
+            } catch (Exception e) {
+            }
+            duplicated.setId(it.duplicatedId);
+            // for some reason the indices are embedded in the Readable name and not where they belong
+            int dupId = InternalTask.getDuplicationIndexFromName(it.duplicatedId.getReadableName());
+            int itId = InternalTask.getIterationIndexFromName(it.duplicatedId.getReadableName());
+            duplicated.setDuplicationIndex(dupId);
+            duplicated.setIterationIndex(itId);
+
+            this.tasks.put(it.duplicatedId, duplicated);
+            newTasks.put(it.originalId, duplicated);
+        }
+
+        InternalTask oldInit = null;
+        // recreate deps contained in the data struct
+        for (DuplicatedTask it : this.jobInfo.getTasksLooped()) {
+            InternalTask newtask = this.tasks.get(it.duplicatedId);
+            for (TaskId depId : it.deps) {
+                InternalTask dep = this.tasks.get(depId);
+                if (!newTasks.containsValue(dep)) {
+                    oldInit = dep;
+                }
+                newtask.addDependence(dep);
+            }
+        }
+
+        // find mergers
+        InternalTask newInit = null;
+        InternalTask merger = null;
+        for (InternalTask old : this.tasks.values()) {
+            // the merger is not a duplicated task, nor has been duplicated
+            if (!newTasks.containsKey(old.getId()) && !newTasks.containsValue(old) && old.hasDependences()) {
+                for (InternalTask oldDep : old.getIDependences()) {
+                    // merger's deps contains the initiator of the LOOP
+                    if (oldDep.equals(oldInit)) {
+                        merger = old;
+                        break;
+                    }
+                }
+                if (merger != null) {
+                    break;
+                }
+            }
+        }
+
+        // merger can be null
+        if (merger != null) {
+            // find new initiator
+            Map<TaskId, InternalTask> newTasks2 = new HashMap<TaskId, InternalTask>();
+            for (InternalTask it : newTasks.values()) {
+                newTasks2.put(it.getId(), it);
+            }
+            for (InternalTask it : newTasks.values()) {
+                if (it.hasDependences()) {
+                    for (InternalTask dep : it.getIDependences()) {
+                        newTasks2.remove(dep.getId());
+                    }
+                }
+            }
+            for (InternalTask it : newTasks2.values()) {
+                newInit = it;
+                break;
+            }
+            merger.getIDependences().remove(oldInit);
+            merger.addDependence(newInit);
+        }
     }
 
     /**
@@ -250,6 +438,9 @@ public abstract class InternalJob extends JobState {
     public boolean addTask(InternalTask task) {
         task.setJobId(getId());
 
+        if (TaskIdImpl.getCurrentValue() < this.tasks.size()) {
+            TaskIdImpl.initialize(tasks.size());
+        }
         task.setId(TaskIdImpl.nextId(getId(), task.getName()));
 
         boolean result = (tasks.put(task.getId(), task) == null);
@@ -328,11 +519,18 @@ public abstract class InternalJob extends JobState {
     /**
      * Terminate a task, change status, managing dependences
      *
+     * Also, apply a Control Flow Action if provided.
+     * This may alter the number of tasks in the job,
+     * events have to be sent accordingly.
+     * 
      * @param errorOccurred has an error occurred for this termination
      * @param taskId the task to terminate.
+     * @param frontend Used to notify all listeners of the duplication of tasks, triggered by the FlowAction
+     * @param action a Control Flow Action that will potentially create new tasks inside the job
      * @return the taskDescriptor that has just been terminated.
      */
-    public InternalTask terminateTask(boolean errorOccurred, TaskId taskId) {
+    public InternalTask terminateTask(boolean errorOccurred, TaskId taskId, SchedulerFrontend frontend,
+            FlowAction action) {
         logger_dev.debug(" ");
         InternalTask descriptor = tasks.get(taskId);
         descriptor.setFinishedTime(System.currentTimeMillis());
@@ -346,8 +544,475 @@ public abstract class InternalJob extends JobState {
             setStatus(JobStatus.STALLED);
         }
 
+        boolean didAction = false;
+        if (action != null) {
+            InternalTask initiator = tasks.get(taskId);
+
+            switch (action.getType()) {
+                /*
+                 * LOOP action
+                 * 
+                 */
+                case LOOP: {
+
+                    {
+                        // find the target of the loop
+                        InternalTask target = null;
+                        if (action.getTarget().equals(initiator.getName())) {
+                            target = initiator;
+                        } else {
+                            target = findTaskUp(action.getTarget(), initiator);
+                        }
+                        TaskId targetId = target.getTaskInfo().getTaskId();
+
+                        logger_dev.info("Control Flow Action LOOP (init:" + initiator.getId() + ";target:" +
+                            target.getId() + ")");
+
+                        // accumulates the tasks between the initiator and the target
+                        Map<TaskId, InternalTask> dup = new HashMap<TaskId, InternalTask>();
+
+                        // duplicate the tasks between the initiator and the target
+                        try {
+                            initiator.duplicateTree(dup, targetId, true, initiator.getDuplicationIndex(),
+                                    initiator.getIterationIndex());
+                        } catch (Exception e) {
+                            logger_dev.error("", e);
+                            break;
+                        }
+
+                        ((JobInfoImpl) this.getJobInfo()).setNumberOfPendingTasks(this.getJobInfo()
+                                .getNumberOfPendingTasks() +
+                            dup.size());
+
+                        // ensure naming unicity
+                        // time-consuming but safe
+                        for (InternalTask nt : dup.values()) {
+                            boolean ok;
+                            do {
+                                ok = true;
+                                for (InternalTask task : tasks.values()) {
+                                    if (nt.getName().equals(task.getName())) {
+                                        nt.setIterationIndex(nt.getIterationIndex() + 1);
+                                        ok = false;
+                                    }
+                                }
+                            } while (!ok);
+                        }
+
+                        // configure the new tasks
+                        InternalTask newTarget = null;
+                        InternalTask newInit = null;
+                        for (Entry<TaskId, InternalTask> it : dup.entrySet()) {
+                            InternalTask nt = it.getValue();
+                            if (target.getId().equals(it.getKey())) {
+                                newTarget = nt;
+                            }
+                            if (initiator.getId().equals(it.getKey())) {
+                                newInit = nt;
+                            }
+                            nt.setJobInfo(getJobInfo());
+                            this.addTask(nt);
+                        }
+
+                        // connect duplicated tree
+                        newTarget.addDependence(initiator);
+
+                        // connect mergers
+                        List<InternalTask> mergers = new ArrayList<InternalTask>();
+                        for (InternalTask t : this.tasks.values()) {
+                            if (t.getIDependences() != null) {
+
+                                for (InternalTask p : t.getIDependences()) {
+                                    if (p.getId().equals(initiator.getId())) {
+                                        if (!t.equals(newTarget)) {
+                                            mergers.add(t);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        for (InternalTask t : mergers) {
+                            t.getIDependences().remove(initiator);
+                            t.addDependence(newInit);
+                        }
+
+                        // propagate the changes in the job descriptor
+                        getJobDescriptor().doLoop(taskId, dup, newTarget, newInit);
+
+                        List<DuplicatedTask> tev = new ArrayList<DuplicatedTask>();
+                        for (Entry<TaskId, InternalTask> it : dup.entrySet()) {
+                            DuplicatedTask tid = new DuplicatedTask(it.getKey(), it.getValue().getId());
+                            if (it.getValue().hasDependences()) {
+                                for (InternalTask dep : it.getValue().getIDependences()) {
+                                    tid.deps.add(dep.getId());
+                                }
+                            }
+                            tev.add(tid);
+                        }
+
+                        this.jobInfo.setTasksLooped(tev);
+                        // notify listeners that tasks were added to the job
+                        frontend.jobStateUpdated(this.getOwner(), new NotificationData<JobInfo>(
+                            SchedulerEvent.TASK_DUPLICATED, this.getJobInfo()));
+                        this.jobInfo.setTasksLooped(null);
+
+                        didAction = true;
+                        break;
+                    }
+                }
+
+                    /*
+                     * IF action
+                     * 
+                     */
+                case IF:
+
+                {
+                    // the targetIf from action.getTarget() is the selected branch;
+                    // the IF condition has already been evaluated prior to being put in a FlowAction
+                    // the targetElse from action.getTargetElse() is the branch that was NOT selected
+                    InternalTask targetIf = null;
+                    InternalTask targetElse = null;
+                    InternalTask targetJoin = null;
+
+                    // search for the targets as perfect matches of the unique name
+                    for (InternalTask it : tasks.values()) {
+
+                        // target is finished : probably looped
+                        if (it.getStatus().equals(TaskStatus.FINISHED) ||
+                            it.getStatus().equals(TaskStatus.SKIPPED)) {
+                            continue;
+                        }
+                        if (action.getTarget().equals(it.getName())) {
+                            if (it.getIfBranch().equals(initiator)) {
+                                targetIf = it;
+                            }
+                        } else if (action.getTargetElse().equals(it.getName())) {
+                            if (it.getIfBranch().equals(initiator)) {
+                                targetElse = it;
+                            }
+                        } else if (action.getTargetJoin().equals(it.getName())) {
+                            if (findTaskUp(initiator.getName(), it).equals(initiator)) {
+                                targetJoin = it;
+                            }
+                        }
+
+                    }
+
+                    boolean searchIf = (targetIf == null);
+                    boolean searchElse = (targetElse == null);
+                    boolean searchJoin = (targetJoin == null);
+
+                    // search of a runnable perfect match for the targets failed;
+                    // the natural target was iterated, need to find the next iteration
+                    // which is the the one with the same dup index and base name,
+                    // but the highest iteration index
+                    for (InternalTask it : tasks.values()) {
+
+                        // does not share the same dup index : cannot be the same scope
+                        if (it.getDuplicationIndex() != initiator.getDuplicationIndex()) {
+                            continue;
+                        }
+
+                        if (it.getStatus().equals(TaskStatus.FINISHED) ||
+                            it.getStatus().equals(TaskStatus.SKIPPED)) {
+                            continue;
+                        }
+
+                        String name = InternalTask.getInitialName(it.getName());
+
+                        if (searchIf && InternalTask.getInitialName(action.getTarget()).equals(name)) {
+                            if (targetIf == null || targetIf.getIterationIndex() < it.getIterationIndex()) {
+                                targetIf = it;
+                            }
+                        } else if (searchElse &&
+                            InternalTask.getInitialName(action.getTargetElse()).equals(name)) {
+                            if (targetElse == null || targetElse.getIterationIndex() < it.getIterationIndex()) {
+                                targetElse = it;
+                            }
+                        } else if (searchJoin &&
+                            InternalTask.getInitialName(action.getTargetJoin()).equals(name)) {
+                            if (targetJoin == null || targetJoin.getIterationIndex() < it.getIterationIndex()) {
+                                targetJoin = it;
+                            }
+                        }
+                    }
+
+                    logger_dev.info("Control Flow Action IF: " + targetIf.getId() + " join: " +
+                        ((targetJoin == null) ? "null" : targetJoin.getId()));
+
+                    // these 2 tasks delimit the Task Block formed by the IF branch
+                    InternalTask branchStart = targetIf;
+                    InternalTask branchEnd = null;
+
+                    String match = targetIf.getMatchingBlock();
+                    if (match != null) {
+                        for (InternalTask t : tasks.values()) {
+                            if (match.equals(t.getName()) &&
+                                !(t.getStatus().equals(TaskStatus.FINISHED) || t.getStatus().equals(
+                                        TaskStatus.SKIPPED))) {
+                                branchEnd = t;
+                            }
+                        }
+                    }
+                    // no matching block: there is no block, the branch is a single task
+                    if (branchEnd == null) {
+                        branchEnd = targetIf;
+                    }
+
+                    // plug the branch
+                    branchStart.addDependence(initiator);
+                    if (targetJoin != null) {
+                        targetJoin.addDependence(branchEnd);
+                    }
+
+                    // the other branch will not be executed
+                    // first, find the concerned tasks
+                    List<InternalTask> elseTasks = new ArrayList<InternalTask>();
+                    //  elseTasks.add(targetElse);
+                    for (InternalTask t : this.tasks.values()) {
+                        if (t.dependsOn(targetElse)) {
+                            elseTasks.add(t);
+                        }
+                    }
+
+                    List<TaskId> tev = new ArrayList<TaskId>(elseTasks.size());
+                    for (InternalTask it : elseTasks) {
+                        it.setFinishedTime(System.currentTimeMillis());
+                        it.setStatus(TaskStatus.SKIPPED);
+                        it.setExecutionDuration(0);
+                        setNumberOfPendingTasks(getNumberOfPendingTasks() - 1);
+                        setNumberOfFinishedTasks(getNumberOfFinishedTasks() + 1);
+                        tev.add(it.getId());
+                        DatabaseManager.getInstance().unload(it);
+                        logger_dev.info("Task " + it.getId() + " will not be executed");
+                    }
+
+                    // plug the branch in the descriptor
+                    TaskId joinId = null;
+                    if (targetJoin != null) {
+                        joinId = targetJoin.getId();
+                    }
+                    getJobDescriptor().doIf(initiator.getId(), branchStart.getId(), branchEnd.getId(),
+                            joinId, targetElse.getId(), elseTasks);
+
+                    this.jobInfo.setTasksSkipped(tev);
+                    // notify listeners that tasks were skipped
+                    frontend.jobStateUpdated(this.getOwner(), new NotificationData<JobInfo>(
+                        SchedulerEvent.TASK_SKIPPED, this.getJobInfo()));
+                    this.jobInfo.setTasksSkipped(null);
+
+                    // no jump is performed ; now that the tasks have been plugged
+                    // the flow can continue its normal operation
+                    getJobDescriptor().terminate(taskId);
+
+                    didAction = true;
+
+                    break;
+                }
+
+                    /*
+                     * DUPLICATE action
+                     * 
+                     */
+                case DUPLICATE:
+
+                {
+                    int runs = action.getDupNumber();
+                    if (runs < 1) {
+                        runs = 1;
+                    }
+
+                    logger_dev.info("Control Flow Action DUPLICATE (runs:" + runs + ")");
+                    List<InternalTask> toDuplicate = new ArrayList<InternalTask>();
+
+                    // find the tasks that need to be duplicated
+                    for (InternalTask ti : tasks.values()) {
+                        List<InternalTask> tl = ti.getIDependences();
+                        if (tl != null) {
+                            for (InternalTask ts : tl) {
+                                if (ts.getId().equals(initiator.getId()) && !toDuplicate.contains(ti)) {
+                                    // ti needs to be duplicated
+                                    toDuplicate.add(ti);
+                                }
+                            }
+                        }
+                    }
+
+                    List<DuplicatedTask> tasksEvent = new ArrayList<DuplicatedTask>();
+
+                    // for each initial task to duplicate
+                    for (InternalTask todup : toDuplicate) {
+
+                        // determine the target of the duplication whether it is a block or a single task
+                        InternalTask target = null;
+
+                        // target is a task block start : duplication of the block
+                        if (todup.getFlowBlock().equals(FlowBlock.START)) {
+                            String tg = todup.getMatchingBlock();
+                            for (InternalTask t : tasks.values()) {
+                                if (tg.equals(t.getName()) &&
+                                    !(t.getStatus().equals(TaskStatus.FINISHED) || t.getStatus().equals(
+                                            TaskStatus.SKIPPED)) && t.dependsOn(todup)) {
+                                    target = t;
+                                    break;
+                                }
+                            }
+                            if (target == null) {
+                                logger_dev.error("DUPLICATE: could not find matching block '" + tg + "'");
+                                continue;
+                            }
+                        }
+                        // target is not a block : duplication of the task
+                        else {
+                            target = todup;
+                        }
+
+                        // for each number of parallel run
+                        for (int i = 1; i < runs; i++) {
+
+                            // accumulates the tasks between the initiator and the target
+                            Map<TaskId, InternalTask> dup = new HashMap<TaskId, InternalTask>();
+                            // duplicate the tasks between the initiator and the target
+                            try {
+                                target.duplicateTree(dup, todup.getId(), false, initiator
+                                        .getDuplicationIndex() *
+                                    runs, 0);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                                break;
+                            }
+
+                            ((JobInfoImpl) this.getJobInfo()).setNumberOfPendingTasks(this.getJobInfo()
+                                    .getNumberOfPendingTasks() +
+                                dup.size());
+
+                            // pointers to the new duplicated tasks corresponding the begin and 
+                            // the end of the block ; can be the same
+                            InternalTask newTarget = null;
+                            InternalTask newEnd = null;
+
+                            // configure the new tasks
+                            for (Entry<TaskId, InternalTask> it : dup.entrySet()) {
+                                InternalTask nt = it.getValue();
+                                nt.setJobInfo(getJobInfo());
+                                this.addTask(nt);
+                                int dupIndex = initiator.getDuplicationIndex() * runs + i;
+                                nt.setDuplicationIndex(dupIndex);
+                            }
+
+                            // find the beginning and the ending of the duplicated block
+                            for (Entry<TaskId, InternalTask> it : dup.entrySet()) {
+                                InternalTask nt = it.getValue();
+
+                                // connect the first task of the duplicated block to the initiator
+                                if (todup.getId().equals(it.getKey())) {
+                                    newTarget = nt;
+                                    newTarget.addDependence(initiator);
+                                }
+                                // connect the last task of the block with the merge task(s)
+                                if (target.getId().equals(it.getKey())) {
+                                    newEnd = nt;
+
+                                    List<InternalTask> toAdd = new ArrayList<InternalTask>();
+                                    // find the merge tasks ; can be multiple
+                                    for (InternalTask t : tasks.values()) {
+                                        List<InternalTask> pdeps = t.getIDependences();
+                                        if (pdeps != null) {
+                                            for (InternalTask parent : pdeps) {
+                                                if (parent.getId().equals(target.getId())) {
+                                                    toAdd.add(t);
+                                                }
+                                            }
+                                        }
+                                    }
+                                    // connect the merge tasks
+                                    for (InternalTask t : toAdd) {
+                                        t.addDependence(newEnd);
+                                    }
+                                }
+                            }
+
+                            // propagate the changes on the JobDescriptor
+                            getJobDescriptor().doDuplicate(taskId, dup, newTarget, target.getId(),
+                                    newEnd.getId());
+
+                            // used by the event dispatcher
+                            for (Entry<TaskId, InternalTask> it : dup.entrySet()) {
+                                DuplicatedTask tid = new DuplicatedTask(it.getKey(), it.getValue().getId());
+                                if (it.getValue().hasDependences()) {
+                                    for (InternalTask dep : it.getValue().getIDependences()) {
+                                        tid.deps.add(dep.getId());
+                                    }
+                                }
+                                tasksEvent.add(tid);
+                            }
+                        }
+                    }
+                    // notify listeners that tasks were added to the job
+                    this.jobInfo.setTasksDuplicated(tasksEvent);
+                    frontend.jobStateUpdated(this.getOwner(), new NotificationData<JobInfo>(
+                        SchedulerEvent.TASK_DUPLICATED, this.getJobInfo()));
+                    this.jobInfo.setTasksDuplicated(null);
+
+                    // no jump is performed ; now that the tasks have been duplicated and
+                    // configured, the flow can continue its normal operation
+                    getJobDescriptor().terminate(taskId);
+                    didAction = true;
+                    break;
+
+                }
+
+                    /*
+                     * CONTINUE action :
+                     * - continue taskflow as if no action was provided
+                     */
+                case CONTINUE:
+
+                    logger_dev.debug("Task flow Action CONTINUE on task " +
+                        initiator.getId().getReadableName());
+                    break;
+            }
+
+            /**
+            System.out.println("******** task dump ** " + this.getJobInfo().getJobId() + " " +
+                initiator.getName() + " does " + action.getType() + " " +
+                ((action.getTarget() == null) ? "." : action.getTarget()) + " " +
+                ((action.getTargetElse() == null) ? "." : action.getTargetElse()) + " " +
+                ((action.getTargetJoin() == null) ? "." : action.getTargetJoin()));
+            for (InternalTask it : this.tasks.values()) {
+                System.out.print(it.getName() + " ");
+                if (it.getIDependences() != null) {
+                    System.out.print("deps ");
+                    for (InternalTask parent : it.getIDependences()) {
+                        System.out.print(parent.getName() + " ");
+                    }
+                }
+                if (it.getIfBranch() != null) {
+                    System.out.print("if " + it.getIfBranch().getName() + " ");
+                }
+                if (it.getJoinedBranches() != null && it.getJoinedBranches().size() == 2) {
+                    System.out.print("join " + it.getJoinedBranches().get(0).getName() + " " +
+                        it.getJoinedBranches().get(1).getName());
+                }
+                System.out.println();
+            }
+            System.out.println("******** task dump ** " + this.getJobInfo().getJobId());
+            System.out.println();
+            **/
+
+        }
+
         //terminate this task
-        getJobDescriptor().terminate(taskId);
+        if (!didAction) {
+            getJobDescriptor().terminate(taskId);
+        } else {
+            DatabaseManager.getInstance().startTransaction();
+            DatabaseManager.getInstance().synchronize(this.getJobInfo());
+            DatabaseManager.getInstance().synchronize(descriptor.getTaskInfo());
+            DatabaseManager.getInstance().update(this);
+            DatabaseManager.getInstance().commitTransaction();
+        }
 
         //creating list of status for the jobDescriptor
         HashMap<TaskId, TaskStatus> hts = new HashMap<TaskId, TaskStatus>();
@@ -360,6 +1025,39 @@ public abstract class InternalJob extends JobState {
         getJobDescriptor().update(hts);
 
         return descriptor;
+    }
+
+    /**
+     * Walk up <code>down</code>'s dependences until
+     * a task <code>name</code> is met
+     * 
+     * also walks weak references created by {@link FlowActionType#IF}
+     * 
+     * @return the task names <code>name</code>, or null
+     */
+    private InternalTask findTaskUp(String name, InternalTask down) {
+        InternalTask ret = null;
+        List<InternalTask> ideps = new ArrayList<InternalTask>();
+        if (down.getIDependences() != null) {
+            ideps.addAll(down.getIDependences());
+        }
+        if (down.getJoinedBranches() != null) {
+            ideps.addAll(down.getJoinedBranches());
+        }
+        if (down.getIfBranch() != null) {
+            ideps.add(down.getIfBranch());
+        }
+        for (InternalTask up : ideps) {
+            if (up.getName().equals(name)) {
+                ret = up;
+            } else {
+                InternalTask r = findTaskUp(name, up);
+                if (r != null) {
+                    ret = r;
+                }
+            }
+        }
+        return ret;
     }
 
     /**
@@ -411,7 +1109,7 @@ public abstract class InternalJob extends JobState {
                     td.getStatus() == TaskStatus.WAITING_ON_FAILURE) {
                     td.setStatus(TaskStatus.NOT_RESTARTED);
                 } else if (td.getStatus() != TaskStatus.FINISHED && td.getStatus() != TaskStatus.FAILED &&
-                    td.getStatus() != TaskStatus.FAULTY) {
+                    td.getStatus() != TaskStatus.FAULTY && td.getStatus() != TaskStatus.SKIPPED) {
                     td.setStatus(TaskStatus.NOT_STARTED);
                 }
             }
@@ -522,7 +1220,8 @@ public abstract class InternalJob extends JobState {
         HashMap<TaskId, TaskStatus> hts = new HashMap<TaskId, TaskStatus>();
 
         for (InternalTask td : tasks.values()) {
-            if ((td.getStatus() != TaskStatus.FINISHED) && (td.getStatus() != TaskStatus.RUNNING)) {
+            if ((td.getStatus() != TaskStatus.FINISHED) && (td.getStatus() != TaskStatus.RUNNING) &&
+                (td.getStatus() != TaskStatus.SKIPPED)) {
                 td.setStatus(TaskStatus.PAUSED);
             }
 
@@ -563,7 +1262,8 @@ public abstract class InternalJob extends JobState {
                 td.setStatus(TaskStatus.SUBMITTED);
             } else if ((jobInfo.getStatus() == JobStatus.RUNNING) ||
                 (jobInfo.getStatus() == JobStatus.STALLED)) {
-                if ((td.getStatus() != TaskStatus.FINISHED) && (td.getStatus() != TaskStatus.RUNNING)) {
+                if ((td.getStatus() != TaskStatus.FINISHED) && (td.getStatus() != TaskStatus.RUNNING) &&
+                    (td.getStatus() != TaskStatus.SKIPPED)) {
                     td.setStatus(TaskStatus.PENDING);
                 }
             }
@@ -642,6 +1342,33 @@ public abstract class InternalJob extends JobState {
      */
     public void setTaskFinishedTimeModify(Map<TaskId, Long> taskFinishedTimeModify) {
         jobInfo.setTaskFinishedTimeModify(taskFinishedTimeModify);
+    }
+
+    /**
+     * To set the tasksDuplicated
+     *
+     * @param d tasksDuplicated
+     */
+    public void setDuplicatedTasksModify(List<DuplicatedTask> d) {
+        jobInfo.setTasksDuplicated(d);
+    }
+
+    /**
+     * To set the tasksLooped
+     *
+     * @param d tasksLooped
+     */
+    public void setLoopedTasksModify(List<DuplicatedTask> d) {
+        jobInfo.setTasksLooped(d);
+    }
+
+    /**
+     * To set the tasksSkipped
+     *
+     * @param d tasksSkipped
+     */
+    public void setSkippedTasksModify(List<TaskId> d) {
+        jobInfo.setTasksSkipped(d);
     }
 
     /**

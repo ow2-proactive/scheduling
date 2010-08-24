@@ -61,6 +61,7 @@ import org.ow2.proactive.scheduler.common.exception.ExecutableCreationException;
 import org.ow2.proactive.scheduler.common.task.executable.Executable;
 import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 import org.ow2.proactive.scripting.GenerationScript;
+import org.ow2.proactive.scripting.InvalidScriptException;
 
 
 /**
@@ -115,6 +116,32 @@ public class NativeExecutableContainer extends ExecutableContainer {
     @Override
     public Executable getExecutable() throws ExecutableCreationException {
         return new NativeExecutable();
+    }
+
+    /**
+     * Copy constructor
+     * 
+     * @param cont original object to copy
+     */
+    public NativeExecutableContainer(NativeExecutableContainer cont) {
+        this.command = new String[cont.command.length];
+        for (int i = 0; i < cont.command.length; i++) {
+            this.command[i] = new String(cont.command[i]);
+        }
+        if (cont.generated == null) {
+            this.generated = null;
+        } else {
+            try {
+                this.generated = new GenerationScript(cont.generated);
+            } catch (InvalidScriptException e) {
+                e.printStackTrace();
+            }
+        }
+        if (cont.workingDir == null) {
+            this.workingDir = null;
+        } else {
+            this.workingDir = new String(cont.workingDir);
+        }
     }
 
     /**

@@ -52,7 +52,6 @@ import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.ow2.proactive.db.types.BigString;
 import org.ow2.proactive.scheduler.common.exception.UserException;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.Executable;
@@ -62,8 +61,8 @@ import org.ow2.proactive.scheduler.task.launcher.TaskLauncher.SchedulerVars;
 import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 import org.ow2.proactive.scheduler.util.process.ProcessTreeKiller;
 import org.ow2.proactive.scheduler.util.process.ThreadReader;
-import org.ow2.proactive.scripting.PropertyUtils;
 import org.ow2.proactive.scripting.GenerationScript;
+import org.ow2.proactive.scripting.PropertyUtils;
 import org.ow2.proactive.scripting.ScriptHandler;
 import org.ow2.proactive.scripting.ScriptLoader;
 import org.ow2.proactive.scripting.ScriptResult;
@@ -221,6 +220,10 @@ public class NativeExecutable extends Executable {
                 .getProperty(SchedulerVars.JAVAENV_TASK_ID_VARNAME.toString()));
         taskEnvVariables.put(SchedulerVars.JAVAENV_TASK_NAME_VARNAME.toString(), System
                 .getProperty(SchedulerVars.JAVAENV_TASK_NAME_VARNAME.toString()));
+        taskEnvVariables.put(SchedulerVars.JAVAENV_TASK_ITERATION.toString(), System
+                .getProperty(SchedulerVars.JAVAENV_TASK_ITERATION.toString()));
+        taskEnvVariables.put(SchedulerVars.JAVAENV_TASK_DUPLICATION.toString(), System
+                .getProperty(SchedulerVars.JAVAENV_TASK_DUPLICATION.toString()));
 
         // exported properties
         String allVars = System.getProperty(PropertyUtils.EXPORTED_PROPERTIES_VAR_NAME);

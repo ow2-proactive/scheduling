@@ -40,6 +40,7 @@ import java.io.Serializable;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.scheduler.flow.FlowActionType;
 
 
 /**
@@ -75,4 +76,31 @@ public interface TaskId extends Comparable<TaskId>, Serializable {
      */
     public String value();
 
+    /**
+     * When Control Flow actions are performed on Tasks, some tasks are duplicated. 
+     * A task duplicated by a {@link FlowActionType#IF} action
+     * is differentiated from the original by an incremented Iteration Index.
+     * This index is reflected in the readable name of the Task's id ({@link #getReadableName()}),
+     * this methods safely extracts it and returns it as an int.
+     * 
+     * @return the iteration number of this task if it was duplicated by a IF flow operation (>= 0)
+     */
+    public int getIterationIndex();
+
+    /**
+     * When Control Flow actions are performed on Tasks, some tasks are duplicated. 
+     * A task duplicated by a {@link FlowActionType#DUPLICATE} action
+     * is differentiated from the original by an incremented Duplication Index.
+     * This index is reflected in the readable name of the Task's id ({@link #getReadableName()}),
+     * this methods safely extracts it and returns it as an int.
+     * 
+     * @return the iteration number of this task if it was duplicated by a IF flow operation (>= 0)
+     */
+    public int getDuplicationIndex();
+
+    /** string separator in the task name for indicating the duplication index */
+    public final static String duplicationSeparator = "*";
+
+    /** string separator in the task name for indicating the iteration index */
+    public final static String iterationSeparator = "#";
 }

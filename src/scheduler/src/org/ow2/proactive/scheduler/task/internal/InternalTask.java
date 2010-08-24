@@ -46,6 +46,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.persistence.Column;
 import javax.persistence.FetchType;
@@ -72,20 +74,33 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.ow2.proactive.db.annotation.Unloadable;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
+import org.ow2.proactive.scheduler.common.task.Task;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
+import org.ow2.proactive.scheduler.common.task.dataspaces.FileSelector;
+import org.ow2.proactive.scheduler.common.task.dataspaces.InputSelector;
+import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
 import org.ow2.proactive.scheduler.core.annotation.TransientInSerialization;
+import org.ow2.proactive.scheduler.core.db.DatabaseManager;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
+import org.ow2.proactive.scheduler.flow.FlowAction;
+import org.ow2.proactive.scheduler.flow.FlowActionType;
+import org.ow2.proactive.scheduler.flow.FlowBlock;
+import org.ow2.proactive.scheduler.flow.FlowScript;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.task.ExecutableContainer;
 import org.ow2.proactive.scheduler.task.ForkedJavaExecutableContainer;
 import org.ow2.proactive.scheduler.task.JavaExecutableContainer;
 import org.ow2.proactive.scheduler.task.NativeExecutableContainer;
+import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.proactive.scheduler.task.TaskInfoImpl;
 import org.ow2.proactive.scheduler.task.launcher.TaskLauncher;
 import org.ow2.proactive.scheduler.task.launcher.TaskLauncherInitializer;
+import org.ow2.proactive.scripting.InvalidScriptException;
+import org.ow2.proactive.scripting.SelectionScript;
+import org.ow2.proactive.scripting.SimpleScript;
 import org.ow2.proactive.utils.NodeSet;
 
 
@@ -113,7 +128,6 @@ public abstract class InternalTask extends TaskState {
     @JoinTable(joinColumns = @JoinColumn(name = "ITASK_ID"), inverseJoinColumns = @JoinColumn(name = "DEPEND_ID"))
     @LazyCollection(value = LazyCollectionOption.FALSE)
     @Cascade(CascadeType.ALL)
-    @TransientInSerialization
     private List<InternalTask> ideps = null;
 
     /** Informations about the launcher and node */
@@ -148,6 +162,417 @@ public abstract class InternalTask extends TaskState {
     @Column(name = "MAX_EXEC_ON_FAILURE")
     private int maxNumberOfExecutionOnFailure = PASchedulerProperties.NUMBER_OF_EXECUTION_ON_FAILURE
             .getValueAsInt();
+
+    /** iteration number if the task was duplicated by a IF control flow action */
+    @Column(name = "ITERATION")
+    private int iteration = 0;
+
+    /** duplication number if the task was duplicated by a DUPLICATE control flow action */
+    @Column(name = "DUPLICATION")
+    private int duplication = 0;
+
+    /** If this{@link #getFlowBlock()} != {@link FlowBlock#NONE}, 
+     * each start block has a matching end block and vice versa */
+    @Column(name = "MATCH_BLOCK")
+    private String matchingBlock = null;
+
+    /** if this task is the JOIN task of a {@link FlowActionType#IF} action,
+     * this list contains the 2 end-points (tagged {@link FlowBlock#END}) of the
+     * IF and ELSE branches */
+    @ManyToAny(metaColumn = @Column(name = "ITASK_TYPE", length = 5))
+    @AnyMetaDef(idType = "long", metaType = "string", metaValues = {
+            @MetaValue(targetEntity = InternalJavaTask.class, value = "IJT"),
+            @MetaValue(targetEntity = InternalNativeTask.class, value = "INT"),
+            @MetaValue(targetEntity = InternalForkedJavaTask.class, value = "IFJT") })
+    @JoinTable(joinColumns = @JoinColumn(name = "ITASK_ID"), inverseJoinColumns = @JoinColumn(name = "DEPEND_ID"))
+    @LazyCollection(value = LazyCollectionOption.FALSE)
+    @Cascade(CascadeType.ALL)
+    @TransientInSerialization
+    @Column(name = "JOIN_BRANCH")
+    private List<InternalTask> joinedBranches = null;
+
+    /** if this task is the IF or ELSE task of a {@link FlowActionType#IF} action,
+     * this fields points to the task performing the corresponding IF action */
+    @Any(fetch = FetchType.LAZY, metaColumn = @Column(name = "ITASK_TYPE", updatable = false, length = 5))
+    @AnyMetaDef(idType = "long", metaType = "string", metaValues = {
+            @MetaValue(targetEntity = InternalJavaTask.class, value = "IJT"),
+            @MetaValue(targetEntity = InternalNativeTask.class, value = "INT"),
+            @MetaValue(targetEntity = InternalForkedJavaTask.class, value = "IFJT") })
+    @JoinColumn(name = "ITASK_ID", updatable = false)
+    @Cascade(CascadeType.ALL)
+    @TransientInSerialization
+    private InternalTask ifBranch = null;
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public TaskState duplicate() throws Exception {
+        InternalTask nt = (InternalTask) this.getClass().newInstance();
+
+        try {
+            DatabaseManager.getInstance().load(this);
+        } catch (NoClassDefFoundError e) {
+            // some clients use this but not hibernate
+        }
+
+        if (this.executerInformations != null) {
+            nt.setExecuterInformations(this.executerInformations);
+        }
+        if (this.nodeExclusion != null) {
+            nt.setNodeExclusion(this.nodeExclusion);
+        }
+        if (this.executableContainer != null) {
+            nt.setExecutableContainer(copyContainer(this.executableContainer));
+        }
+        int mx = Math.max(1, this.getMaxNumberOfExecution());
+        nt.setMaxNumberOfExecution(mx);
+        nt.setName(new String(this.getName()));
+        if (this.description != null) {
+            nt.setDescription(new String(this.getDescription()));
+        }
+        nt.setPreciousResult(preciousResult);
+        if (this.getPreScript() != null) {
+            try {
+                nt.setPreScript(new SimpleScript(this.getPreScript()));
+            } catch (InvalidScriptException e) {
+                throw new Exception("Could not copy PreScript", e);
+            }
+        }
+        if (this.getPostScript() != null) {
+            try {
+                nt.setPostScript(new SimpleScript(this.getPostScript()));
+            } catch (InvalidScriptException e) {
+                throw new Exception("Could not copy PostScript", e);
+            }
+        }
+        if (this.getSelectionScripts() != null) {
+            List<SelectionScript> sel = new ArrayList<SelectionScript>();
+            for (SelectionScript script : this.getSelectionScripts()) {
+                sel.add(new SelectionScript(script, script.isDynamic()));
+            }
+            nt.setSelectionScripts(sel);
+        }
+        if (this.getFlowScript() != null) {
+            try {
+                nt.setFlowScript(new FlowScript(this.getFlowScript()));
+            } catch (InvalidScriptException e) {
+                throw new Exception("Could not copy FlowScript", e);
+            }
+        }
+        if (this.getCleaningScript() != null) {
+            try {
+                nt.setCleaningScript(new SimpleScript(this.getCleaningScript()));
+            } catch (InvalidScriptException e) {
+                throw new Exception("Could not copy CleaningScript", e);
+            }
+        }
+
+        nt.setIterationIndex(this.getIterationIndex());
+        nt.setDuplicationIndex(this.getDuplicationIndex());
+        nt.setFlowBlock(this.getFlowBlock());
+        if (this.getMatchingBlock() != null) {
+            nt.setMatchingBlock(new String(this.getMatchingBlock()));
+        }
+
+        if (this.getInputFilesList() != null) {
+            for (InputSelector inputSel : this.getInputFilesList()) {
+                nt.addInputFiles(new FileSelector(inputSel.getInputFiles()), inputSel.getMode());
+            }
+        }
+
+        if (this.getOutputFilesList() != null) {
+            for (OutputSelector outputSel : this.getOutputFilesList()) {
+                nt.addOutputFiles(new FileSelector(outputSel.getOutputFiles()), outputSel.getMode());
+            }
+        }
+
+        try {
+            DatabaseManager.getInstance().register(nt);
+        } catch (NoClassDefFoundError e) {
+            // some clients use this but not hibernate
+        }
+        return nt;
+    }
+
+    /**
+     * Return a copy of the provided executable container
+     * 
+     * @param the original container to copy
+     * @return the new container to return
+     */
+    private static ExecutableContainer copyContainer(ExecutableContainer original) {
+        ExecutableContainer copy = null;
+        if (original instanceof ForkedJavaExecutableContainer) {
+            copy = new ForkedJavaExecutableContainer((ForkedJavaExecutableContainer) original);
+        } else if (original instanceof JavaExecutableContainer) {
+            copy = new JavaExecutableContainer((JavaExecutableContainer) original);
+        } else {
+            copy = new NativeExecutableContainer((NativeExecutableContainer) original);
+        }
+        return copy;
+    }
+
+    /**
+     * Accumulates in <code>acc</code>  duplications of all the tasks that recursively 
+     * depend on <code>this</code> until <code>target</code> is met
+     * 
+     * @param acc tasks accumulator
+     * @param target stopping condition
+     * @param loopAction true if the action performed is a LOOP, false is it is a duplicate
+     * @param dupIndex duplication index threshold if <code>ifAction == true</code>
+     *                 duplication index to set to the old tasks if <code>ifAction == false</code>
+     * @param itIndex iteration index threshold it <code>ifAction == true</code>
+     *        
+     * @throws Exception
+     */
+    public void duplicateTree(Map<TaskId, InternalTask> acc, TaskId target, boolean loopAction, int dupIndex,
+            int itIndex) throws Exception {
+
+        Map<TaskId, InternalTask> tmp = new HashMap<TaskId, InternalTask>();
+
+        // duplicate the tasks
+        internalDuplicateTree(tmp, target, loopAction, dupIndex, itIndex);
+
+        // remove duplicates from nested LOOP action
+        Map<String, Entry<TaskId, InternalTask>> map = new HashMap<String, Entry<TaskId, InternalTask>>();
+        for (Entry<TaskId, InternalTask> it : tmp.entrySet()) {
+            String name = it.getValue().getAmbiguousName();
+            if (map.containsKey(name)) {
+                Entry<TaskId, InternalTask> cur = map.get(name);
+                if (it.getValue().getIterationIndex() < cur.getValue().getIterationIndex()) {
+                    map.put(name, it);
+                }
+            } else {
+                map.put(name, it);
+            }
+        }
+
+        for (Entry<TaskId, InternalTask> it : map.values()) {
+            acc.put(it.getKey(), it.getValue());
+        }
+
+        // reconstruct the dependencies
+        internalReconstructTree(acc, target, loopAction, dupIndex, itIndex);
+    }
+
+    /**
+     * Internal recursive delegate of {@link #duplicateTree(Map, TaskId)} for task duplication
+     * 
+     * @param acc accumulator
+     * @param target end condition
+     * @param loopAction true if the action performed is a LOOP, false is it is a duplicate
+     * @param initDupIndex duplication index threshold if <code>ifAction == true</code>
+     *                 duplication index to set to the old tasks if <code>ifAction == false</code>
+     * @param itIndex iteration index threshold it <code>ifAction == true</code>
+     *
+     * @throws Exception instantiation error
+     */
+    private void internalDuplicateTree(Map<TaskId, InternalTask> acc, TaskId target, boolean loopAction,
+            int dupIndex, int itIndex) throws Exception {
+
+        InternalTask nt = null;
+        if (!acc.containsKey(this.getId())) {
+            nt = (InternalTask) this.duplicate();
+
+            // when nesting DUPLICATE actions, the duplication index of the original tasks will change
+            if (!loopAction) {
+                this.setDuplicationIndex(dupIndex);
+            } else {
+                nt.setIterationIndex(this.getIterationIndex() + 1);
+            }
+
+            acc.put(this.getTaskInfo().getTaskId(), nt);
+
+            // recursive call
+            if (!this.getTaskInfo().getTaskId().equals(target)) {
+                if (this.getIDependences() != null) {
+                    Map<String, InternalTask> deps = new HashMap<String, InternalTask>();
+                    for (InternalTask parent : this.getIDependences()) {
+                        // filter out duplicated tasks
+                        if (deps.containsKey(parent.getAmbiguousName())) {
+                            InternalTask dep = deps.get(parent.getAmbiguousName());
+                            if (dep.getDuplicationIndex() > parent.getDuplicationIndex()) {
+                                deps.put(parent.getAmbiguousName(), parent);
+                            }
+                        } else {
+                            deps.put(parent.getAmbiguousName(), parent);
+                        }
+                    }
+                    for (InternalTask parent : deps.values()) {
+                        parent.internalDuplicateTree(acc, target, loopAction, dupIndex, itIndex);
+                    }
+                }
+                if (this.getJoinedBranches() != null) {
+                    for (InternalTask parent : this.getJoinedBranches()) {
+                        parent.internalDuplicateTree(acc, target, loopAction, dupIndex, itIndex);
+                    }
+                }
+                if (this.getIfBranch() != null) {
+                    this.getIfBranch().internalDuplicateTree(acc, target, loopAction, dupIndex, itIndex);
+                }
+            }
+        }
+    }
+
+    /**
+     * Internal recursive delegate of {@link #duplicateTree(Map, TaskId)} for dependence duplication
+     * 
+     * @param acc accumulator
+     * @param target end condition
+     * @param loopAction true if the action performed is an if, false is it is a duplicate
+     * @param initDupIndex duplication index threshold if <code>ifAction == true</code>
+     *                 duplication index to set to the old tasks if <code>ifAction == false</code>
+     * @param itIndex iteration index threshold it <code>ifAction == true</code>
+     *
+     * @throws Exception instantiation error
+     */
+    private void internalReconstructTree(Map<TaskId, InternalTask> acc, TaskId target, boolean loopAction,
+            int dupIndex, int itIndex) {
+        if (target.equals(this.getId())) {
+            return;
+        }
+
+        InternalTask nt = acc.get(this.getId());
+
+        Map<String, InternalTask> ideps = new HashMap<String, InternalTask>();
+        int deptype = 0;
+        if (this.getIfBranch() != null) {
+            deptype = 1;
+            ideps.put(this.getIfBranch().getAmbiguousName(), this.getIfBranch());
+        } else if (this.getJoinedBranches() != null && this.getJoinedBranches().size() == 2) {
+            deptype = 2;
+            ideps.put(this.getJoinedBranches().get(0).getAmbiguousName(), this.getJoinedBranches().get(0));
+            ideps.put(this.getJoinedBranches().get(1).getAmbiguousName(), this.getJoinedBranches().get(1));
+        } else if (this.hasDependences()) {
+            // hard dependency check has to be exclusive and AFTER if branch checks :
+            // if an FlowAction#IF was executed, we should have both weak and hard dependencies,
+            // although only the weak one should be copied on the duplicated task
+            // ideps.addAll(this.getIDependences());
+            for (InternalTask parent : this.getIDependences()) {
+                // filter out duplicated tasks
+                if (ideps.containsKey(parent.getAmbiguousName())) {
+                    InternalTask dep = ideps.get(parent.getAmbiguousName());
+                    if (dep.getDuplicationIndex() > parent.getDuplicationIndex()) {
+                        ideps.put(parent.getAmbiguousName(), parent);
+                    }
+                } else {
+                    ideps.put(parent.getAmbiguousName(), parent);
+                }
+            }
+
+        }
+        if (ideps.size() == 0) {
+            return;
+        }
+
+        for (InternalTask parent : ideps.values()) {
+            if (acc.get(parent.getId()) == null && nt != null) {
+                // tasks are skipped to prevent nested LOOP
+                while (acc.get(parent.getId()) == null) {
+                    InternalTask np = parent.getIDependences().get(0);
+                    if (np == null) {
+                        if (parent.getIfBranch() != null) {
+                            np = parent.getIfBranch();
+                        } else if (parent.getJoinedBranches() != null) {
+                            np = parent.getJoinedBranches().get(0);
+                        }
+                    }
+                    parent = np;
+                }
+
+                InternalTask tg = acc.get(parent.getId());
+                nt.addDependence(tg);
+            } else if (nt != null) {
+                InternalTask tg = acc.get(parent.getId());
+                boolean hasit = false;
+                switch (deptype) {
+                    case 0:
+                        if (nt.hasDependences()) {
+                            for (InternalTask it : nt.getIDependences()) {
+                                // do NOT use contains(): relies on getId() which is null
+                                if (it.getName().equals(tg.getName())) {
+                                    hasit = true;
+                                }
+                            }
+                        }
+                        if (!hasit) {
+                            nt.addDependence(tg);
+                        }
+                        break;
+                    case 1:
+                        nt.setIfBranch(tg);
+                        break;
+                    case 2:
+                        if (nt.getJoinedBranches() == null) {
+                            List<InternalTask> jb = new ArrayList<InternalTask>();
+                            nt.setJoinedBranches(jb);
+                        }
+                        for (InternalTask it : nt.getJoinedBranches()) {
+                            if (it.getName().equals(tg.getName())) {
+                                hasit = true;
+                            }
+                        }
+                        if (!hasit) {
+                            nt.getJoinedBranches().add(tg);
+                        }
+                        break;
+                }
+
+            }
+
+            if (!parent.getTaskInfo().getTaskId().equals(target)) {
+                parent.internalReconstructTree(acc, target, loopAction, dupIndex, itIndex);
+            }
+        }
+    }
+
+    /**
+     * Recursively checks if this is a dependence,
+     * direct or indirect, of <code>parent</code>
+     * <p>
+     * Direct dependence means through {@link Task#getDependencesList()},
+     * indirect dependence means through weak dependences induced by 
+     * {@link FlowActionType#IF}, materialized by
+     * {@link InternalTask#getIfBranch()} and {@link InternalTask#getJoinedBranches()}.
+     * 
+     * @param parent the dependence to find
+     * @return true if this depends on <code>parent</code>
+     */
+    public boolean dependsOn(InternalTask parent) {
+        return internalDependsOn(parent, 0);
+    }
+
+    private boolean internalDependsOn(InternalTask parent, int depth) {
+        if (this.getId().equals(parent.getId())) {
+            return (depth >= 0);
+        }
+        if (this.getIDependences() == null && this.getJoinedBranches() == null && this.getIfBranch() == null) {
+            return false;
+        }
+        if (this.joinedBranches != null) {
+            for (InternalTask it : this.getJoinedBranches()) {
+                if (!it.internalDependsOn(parent, depth - 1)) {
+                    return false;
+                }
+            }
+        } else if (this.getIfBranch() != null) {
+            if (!this.getIfBranch().internalDependsOn(parent, depth + 1)) {
+                return false;
+            }
+        } else if (this.getIDependences() != null) {
+            for (InternalTask it : this.getIDependences()) {
+                if (!it.internalDependsOn(parent, depth)) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    public void setExecutableContainer(ExecutableContainer e) {
+        this.executableContainer = e;
+    }
 
     /** Hibernate default constructor */
     public InternalTask() {
@@ -189,8 +614,14 @@ public abstract class InternalTask extends TaskState {
         if (ideps == null) {
             ideps = new ArrayList<InternalTask>();
         }
-
         ideps.add(task);
+    }
+
+    public boolean removeDependence(InternalTask task) {
+        if (ideps != null) {
+            return ideps.remove(task);
+        }
+        return false;
     }
 
     /**
@@ -312,11 +743,9 @@ public abstract class InternalTask extends TaskState {
     }
 
     /**
-     * To get the dependences of this task.
-     * Return null if this task has no dependence.
-     *
-     * @return the dependences of this task
+     * {@inheritDoc}
      */
+    @Override
     public List<TaskState> getDependences() {
         //set to null if needed
         if (ideps == null || ideps.size() == 0) {
@@ -398,6 +827,278 @@ public abstract class InternalTask extends TaskState {
     }
 
     /**
+     * To set the name of this task.
+     * <p>
+     * The provided String will be appended the iteration and duplication index
+     * if > 0, so that: <br>
+     * <code>name = name [iterationSeparator iteration] [duplicationSeparator duplication]</code>
+     *
+     * @param newName
+     *            the name to set.
+     */
+    public void setName(String newName) {
+        if (newName == null) {
+            return;
+        }
+        int i = -1;
+        if ((i = newName.indexOf(TaskId.iterationSeparator)) != -1) {
+            newName = newName.substring(0, i);
+        } else if ((i = newName.indexOf(TaskId.duplicationSeparator)) != -1) {
+            newName = newName.substring(0, i);
+        }
+
+        String n = this.getTaskNameSuffix();
+        if (newName.length() + n.length() > 255) {
+            throw new IllegalArgumentException("The name is too long, it must have 255 chars length max : " +
+                newName + n);
+        }
+
+        super.setName(newName + n);
+        if (this.getId() != null) {
+            ((TaskIdImpl) this.getId()).setReadableName(newName + n);
+        }
+
+        // update matching block name if it exists
+        // start/end block tasks should always have the same iteration & duplication
+        if (this.matchingBlock != null && this.matchingBlock.length() > 0) {
+            String m = getInitialName(this.matchingBlock);
+            this.setMatchingBlock(m + getTaskNameSuffix());
+        }
+        // update target name if this task performs a LOOP action
+        // same as the matching block name : indexes should match as LOOP initiator and
+        // target share the same block scope
+        if (this.getFlowScript() != null &&
+            this.getFlowScript().getActionType().equals(FlowActionType.LOOP.toString())) {
+            String t = getInitialName(this.getFlowScript().getActionTarget());
+            this.getFlowScript().setActionTarget(t + getTaskNameSuffix());
+        }
+
+        // same stuff with IF
+        if (this.getFlowScript() != null &&
+            this.getFlowScript().getActionType().equals(FlowActionType.IF.toString())) {
+            String ifBranch = getInitialName(this.getFlowScript().getActionTarget());
+            String elseBranch = getInitialName(this.getFlowScript().getActionTargetElse());
+            this.getFlowScript().setActionTarget(ifBranch + getTaskNameSuffix());
+            this.getFlowScript().setActionTargetElse(elseBranch + getTaskNameSuffix());
+
+            if (this.getFlowScript().getActionJoin() != null) {
+                String join = getInitialName(this.getFlowScript().getActionJoin());
+                this.getFlowScript().setActionJoin(join + getTaskNameSuffix());
+            }
+        }
+    }
+
+    /**
+     * Constructs the suffix to append to a task name so that is 
+     * can be unique among duplicated tasks in complex taskflows with loops/duplications
+     * 
+     * @return the String suffix to append to a duplicated task so that
+     * it can be distinguished from the original
+     */
+    private String getTaskNameSuffix() {
+        String n = "";
+        if (this.iteration > 0) {
+            n += TaskId.iterationSeparator + this.iteration;
+        }
+        if (this.duplication > 0) {
+            n += TaskId.duplicationSeparator + this.duplication;
+        }
+        return n;
+    }
+
+    /**
+     * Extracts the original task name if it was added a suffix to
+     * make it unique among duplicated tasks
+     * <p>
+     * <b>This methods returns an ambiguous name: several tasks can share this name;
+     * it cannot be used as an identifier.
+     * </b>
+     * @return the original task name, without the added suffixes for iteration and duplication
+     */
+    private String getAmbiguousName() {
+        return getInitialName(this.getName());
+    }
+
+    /**
+     * Extracts the original task name if it was added a suffix to
+     * make it unique among duplicated tasks
+     * <p>
+     * <b>This methods returns an ambiguous name: several tasks can share this name;
+     * it cannot be used as an identifier.
+     * </b>
+     * @param fullTaskName name with the iteration and duplication suffixes
+     * @return the original task name, without the added suffixes for iteration and duplication
+     */
+    public static String getInitialName(String fullTaskname) {
+        String taskName = null;
+
+        String[] str = new String[] { "^(.*)[" + TaskId.iterationSeparator + "].*$",
+                "^(.*)[" + TaskId.duplicationSeparator + "].*$", "^(.*)$" };
+
+        Matcher matcher = null;
+        for (String regex : str) {
+            Pattern pat = Pattern.compile(regex);
+            matcher = pat.matcher(fullTaskname);
+            if (matcher.find()) {
+                taskName = matcher.group(1);
+                return taskName;
+            }
+        }
+        throw new RuntimeException("Could not extract task name: " + fullTaskname);
+    }
+
+    /**
+     * Extracts the duplication index from a non ambiguous name:
+     * <p>ie: getDuplicationIndexFromName("task1*3") returns 3.
+     * 
+     * @param name non ambiguous task name
+     * @return the duplication index contained in the name
+     */
+    public static int getDuplicationIndexFromName(String name) {
+        if (name.indexOf(TaskId.duplicationSeparator) == -1) {
+            return 0;
+        } else {
+            return Integer.parseInt(name.split("[" + TaskId.duplicationSeparator + "]")[1]);
+        }
+    }
+
+    /**
+     * Extracts the iteration index from a non ambiguous name:
+     * <p>ie: getIterationIndexFromName("task1#3") returns 3.
+     * 
+     * @param name non ambiguous task name
+     * @return the duplication index contained in the name
+     */
+    public static int getIterationIndexFromName(String name) {
+        if (name.indexOf(TaskId.iterationSeparator) == -1) {
+            return 0;
+        } else {
+            String suffix = name.split("[" + TaskId.iterationSeparator + "]")[1];
+            return Integer.parseInt(suffix.split("[" + TaskId.duplicationSeparator + "]")[0]);
+        }
+    }
+
+    /**
+     * Set the iteration number of this task if it was duplicated by a IF flow operations
+     * <p>
+     * Updates the Task's name consequently, see {@link Task#setName(String)}
+     * 
+     * @param it iteration number, must be >= 0
+     */
+    public void setIterationIndex(int it) {
+        if (it < 0) {
+            throw new IllegalArgumentException("Cannot set negative iteration index: " + it);
+        }
+        String taskName = getInitialName(this.getName());
+        this.iteration = it;
+        this.setName(taskName);
+    }
+
+    /**
+     * @return the iteration number of this task if it was duplicated by a LOOP flow operations (>= 0)
+     */
+    @Override
+    public int getIterationIndex() {
+        return this.iteration;
+    }
+
+    /**
+     * Set the duplication number of this task if it was duplicated by a DUPLICATE flow operations
+     * 
+     * @param it iteration number, must be >= 0
+     */
+    public void setDuplicationIndex(int it) {
+        if (it < 0) {
+            throw new IllegalArgumentException("Cannot set negative duplication index: " + it);
+        }
+        String taskName = getInitialName(this.getName());
+        this.duplication = it;
+        this.setName(taskName);
+    }
+
+    /**
+     * @return the duplication number of this task if it was duplicated by a DUPLICATE flow operations (>= 0)
+     */
+    @Override
+    public int getDuplicationIndex() {
+        return this.duplication;
+    }
+
+    /**
+     * Control Flow Blocks are formed with pairs of {@link FlowBlock#START} and {@link FlowBlock#END}
+     * on tasks. The Matching Block of a Task represents the corresponding
+     * {@link FlowBlock#START} of a Task tagged {@link FlowBlock#END}, and vice-versa.
+     * 
+     * @return the name of the Task matching the block started or ended in this task, or null
+     */
+    public String getMatchingBlock() {
+        return this.matchingBlock;
+    }
+
+    /**            
+     * Control Flow Blocks are formed with pairs of {@link FlowBlock#START} and {@link FlowBlock#END}
+     * on tasks. The Matching Block of a Task represents the corresponding
+     * {@link FlowBlock#START} of a Task tagged {@link FlowBlock#END}, and vice-versa.
+     * 
+     * @param s the name of the Task matching the block started or ended in this task
+     */
+    public void setMatchingBlock(String s) {
+        this.matchingBlock = s;
+    }
+
+    /**
+     * If a {@link FlowActionType#IF} {@link FlowAction} is performed in a TaskFlow,
+     * there exist no hard dependency between the initiator of the action and the IF or ELSE
+     * branch. Similarly, there exist no dependency between the IF or ELSE branches
+     * and the JOIN task.
+     * This method provides an easy way to check if this task joins an IF/ELSE action
+     * 
+     * @return a List of String containing the end-points of the IF and ELSE branches
+     *         joined by this task, or null if it does not merge anything.
+     */
+    public List<InternalTask> getJoinedBranches() {
+        return this.joinedBranches;
+    }
+
+    /**
+     * If a {@link FlowActionType#IF} {@link FlowAction} is performed in a TaskFlow,
+     * there exist no hard dependency between the initiator of the action and the IF or ELSE
+     * branch. Similarly, there exist no dependency between the IF or ELSE branches
+     * and the JOIN task.
+     * 
+     * @param branches sets the List of String containing the end-points 
+     *        of the IF and ELSE branches joined by this task
+     */
+    public void setJoinedBranches(List<InternalTask> branches) {
+        this.joinedBranches = branches;
+    }
+
+    /**
+     * If a {@link FlowActionType#IF} {@link FlowAction} is performed in a TaskFlow,
+     * there exist no hard dependency between the initiator of the action and the IF or ELSE
+     * branch. Similarly, there exist no dependency between the IF or ELSE branches
+     * and the JOIN task.
+     * This method provides an easy way to check if this task is an IF/ELSE branch.
+     * 
+     * @return the name of the initiator of the IF action that this task is a branch of
+     */
+    public InternalTask getIfBranch() {
+        return this.ifBranch;
+    }
+
+    /**
+     * If a {@link FlowActionType#IF} {@link FlowAction} is performed in a TaskFlow,
+     * there exist no hard dependency between the initiator of the action and the IF or ELSE
+     * branch. Similarly, there exist no dependency between the IF or ELSE branches
+     * and the JOIN task.
+     * 
+     * @return the name of the initiator of the IF action that this task is a branch of
+     */
+    public void setIfBranch(InternalTask branch) {
+        this.ifBranch = branch;
+    }
+
+    /**
      * Prepare and return the default task launcher initializer (ie the one that works for every launcher)<br>
      * Concrete launcher may have to add values to the created initializer to bring more information to the launcher.
      * 
@@ -408,9 +1109,12 @@ public abstract class InternalTask extends TaskState {
         tli.setTaskId(getId());
         tli.setPreScript(getPreScript());
         tli.setPostScript(getPostScript());
+        tli.setControlFlowScript(getFlowScript());
         tli.setTaskInputFiles(getInputFilesList());
         tli.setTaskOutputFiles(getOutputFilesList());
         tli.setNamingServiceUrl(job.getJobDataSpaceApplication().getNamingServiceURL());
+        tli.setIterationIndex(getIterationIndex());
+        tli.setDuplicationIndex(getDuplicationIndex());
         if (isWallTime()) {
             tli.setWalltime(wallTime);
         }

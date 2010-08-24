@@ -43,6 +43,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.objectweb.proactive.core.util.converter.ByteToObjectConverter;
+import org.objectweb.proactive.core.util.converter.ObjectToByteConverter;
 import org.ow2.proactive.utils.NodeSet;
 
 
@@ -102,6 +103,27 @@ public class JavaExecutableInitializer implements ExecutableInitializer {
      */
     public Map<String, byte[]> getSerializedArguments() {
         return serializedArguments;
+    }
+
+    /**
+     * Set an argument
+     * 
+     * @param key key of the argument to set
+     * @param arg de-serialized version of the argument
+     */
+    public void setArgument(String key, Serializable arg) {
+        if (key != null && key.length() > 255) {
+            throw new IllegalArgumentException("Key is too long, it must have 255 chars length max : " + key);
+        } else {
+            byte[] serialized = null;
+            try {
+                serialized = ObjectToByteConverter.ObjectStream.convert(arg);
+                this.serializedArguments.put(key, serialized);
+            } catch (IOException e) {
+                throw new IllegalArgumentException("Cannot add argument " + key, e);
+            }
+            this.serializedArguments.put(key, serialized);
+        }
     }
 
     /**

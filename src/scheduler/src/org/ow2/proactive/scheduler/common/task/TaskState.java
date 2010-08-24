@@ -36,9 +36,12 @@
  */
 package org.ow2.proactive.scheduler.common.task;
 
+import java.util.List;
+
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.scheduler.flow.FlowActionType;
 
 
 /**
@@ -77,6 +80,65 @@ public abstract class TaskState extends Task implements Comparable<TaskState> {
      * @param taskInfo the taskInfo to set
      */
     public abstract void update(TaskInfo taskInfo);
+
+    /**
+     * To get the dependences of this task.
+     * Return null if this task has no dependence.
+     *
+     * @return the dependences of this task
+     */
+    public abstract List<TaskState> getDependences();
+
+    /**
+     * If the Task was submitted, a call to this method will throw a
+     * RuntimeException. The Dependence list should then
+     * be accessed through {@link #getDependences()}
+     *
+     * @return the the list of dependences of the task, or null if this task
+     *      has been submitted
+     * @throws IllegalStateException if this task was already submitted to the scheduler
+     */
+    @Override
+    public List<Task> getDependencesList() {
+        throw new IllegalStateException("This method cannot be used on a submitted task;" + "use " +
+            this.getClass().getCanonicalName() + "#getDependences()");
+    }
+
+    /**
+     * If the Task was submitted, a call to this method will throw a
+     * RuntimeException. Dependences cannot be added to a task at runtime.
+     *
+     * @param task the parent task to add to this task.
+     * @throws IllegalStateException if this task was already submitted to the scheduler
+     */
+    @Override
+    public void addDependence(Task task) {
+        throw new IllegalStateException("This method cannot be used on a submitted task");
+    }
+
+    /**
+     * If the Task was submitted, a call to this method will throw a
+     * RuntimeException. Dependences cannot be added to a task at runtime.
+     *
+     * @param task the parent tasks to add to this task.
+     * @throws IllegalStateException if this task was already submitted to the scheduler
+     */
+    @Override
+    public void addDependences(List<Task> tasks) {
+        throw new IllegalStateException("This method cannot be used on a submitted task");
+    }
+
+    /**
+     * If the Task was submitted, a call to this method will throw a
+     * RuntimeException.
+     * 
+     * @param e true if the task should be an entry point for the job, or false
+     * @throws IllegalStateException if this task was already submitted to the scheduler
+     */
+    @Override
+    public void setEntryPoint(boolean e) {
+        throw new IllegalStateException("This method cannot be used on a submitted task");
+    }
 
     /**
      * Set the field to sort on.
@@ -292,5 +354,35 @@ public abstract class TaskState extends Task implements Comparable<TaskState> {
 
         return false;
     }
+
+    /**
+     * Duplicates a task
+     * <p>
+     * Deep copies all fields, does not share any reference
+     * 
+     * @return the newly created task, cast as a TaskState
+     * @throws Exception
+     */
+    public abstract TaskState duplicate() throws Exception;
+
+    /**
+     * When Control Flow actions are performed (see {@link #getFlowScript()}),
+     * some tasks are duplicated. 
+     * A task duplicated by a {@link FlowActionType#LOOP} action
+     * is differentiated from the original by an incremented Iteration Index.
+     * 
+     * @return the iteration number of this task if it was duplicated by a LOOP flow operation (>= 0)
+     */
+    public abstract int getIterationIndex();
+
+    /**
+     * When Control Flow actions are performed (see {@link #getFlowScript()}),
+     * some tasks are duplicated. 
+     * A task duplicated by a {@link FlowActionType#DUPLICATE} action
+     * is differentiated from the original by an incremented Duplication Index.
+     
+     * @return the duplication number of this task if it was duplicated by a DUPLICATE flow operations (>= 0)
+     */
+    public abstract int getDuplicationIndex();
 
 }

@@ -36,6 +36,9 @@
  */
 package org.ow2.proactive.scheduler.job;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import javax.persistence.Column;
@@ -52,8 +55,9 @@ import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 import org.hibernate.annotations.Proxy;
 import org.ow2.proactive.db.annotation.Alterable;
-import org.ow2.proactive.scheduler.common.job.JobInfo;
+import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.task.TaskId;
@@ -152,6 +156,34 @@ public class JobInfoImpl implements JobInfo {
     //not Hibernate informations
     @Transient
     private Map<TaskId, Long> taskFinishedTimeModify = null;
+
+    /**
+     * contains the ids of the original and the duplicated task,
+     * as well as ids of the dependencies of the duplicated task
+     */
+    public static class DuplicatedTask implements Serializable {
+        public TaskId originalId = null;
+        public TaskId duplicatedId = null;
+        public List<TaskId> deps = null;
+
+        public DuplicatedTask(TaskId original, TaskId duplicated) {
+            this.originalId = original;
+            this.duplicatedId = duplicated;
+            this.deps = new ArrayList<TaskId>();
+        }
+    }
+
+    /** Tasks duplicated by a Control Flow Action */
+    @Transient
+    private List<DuplicatedTask> tasksDuplicated = null;
+
+    /** Tasks loop by a Control Flow Action */
+    @Transient
+    private List<DuplicatedTask> tasksLooped = null;
+
+    /** Tasks skipped by a Control Flow Action */
+    @Transient
+    private List<TaskId> tasksSkipped = null;
 
     /** Hibernate default constructor */
     public JobInfoImpl() {
@@ -278,6 +310,66 @@ public class JobInfoImpl implements JobInfo {
      */
     public Map<TaskId, Long> getTaskFinishedTimeModify() {
         return taskFinishedTimeModify;
+    }
+
+    /**
+     * Used as an argument for {@link SchedulerEvent#TASK_DUPLICATED} to
+     * specify which tasks were duplicated
+     * 
+     * @param m list of the duplicated tasks
+     */
+    public void setTasksDuplicated(List<DuplicatedTask> m) {
+        this.tasksDuplicated = m;
+    }
+
+    /**
+     * Used as an argument for {@link SchedulerEvent#TASK_DUPLICATED} to
+     * specify which tasks were duplicated
+     * 
+     * @return a list of the duplicated tasks
+     */
+    public List<DuplicatedTask> getTasksDuplicated() {
+        return this.tasksDuplicated;
+    }
+
+    /**
+     * Used as an argument for {@link SchedulerEvent#TASK_DUPLICATED} to
+     * specify which tasks were duplicated
+     * 
+     * @param m list of the duplicated tasks
+     */
+    public void setTasksLooped(List<DuplicatedTask> m) {
+        this.tasksLooped = m;
+    }
+
+    /**
+     * Used as an argument for {@link SchedulerEvent#TASK_DUPLICATED} to
+     * specify which tasks were duplicated
+     * 
+     * @return a list of the duplicated tasks
+     */
+    public List<DuplicatedTask> getTasksLooped() {
+        return this.tasksLooped;
+    }
+
+    /**
+     * Used as an argument for {@link SchedulerEvent#TASK_SKIPPED} to
+     * specify which tasks were skipped
+     * 
+     * @param m list of the skipped tasks
+     */
+    public void setTasksSkipped(List<TaskId> m) {
+        this.tasksSkipped = m;
+    }
+
+    /**
+     * Used as an argument for {@link SchedulerEvent#TASK_SKIPPED} to
+     * specify which tasks were skipped
+     * 
+     * @return a list of the skipped tasks
+     */
+    public List<TaskId> getTasksSkipped() {
+        return this.tasksSkipped;
     }
 
     /**

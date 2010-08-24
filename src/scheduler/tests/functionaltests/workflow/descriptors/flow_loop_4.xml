@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job xmlns="urn:proactive:jobdescriptor:dev" 
+     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     xsi:schemaLocation="urn:proactive:jobdescriptor:dev ../../src/scheduler/src/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/dev/schedulerjob.xsd"
+     name="Job" priority="low" projectName="myProject" cancelJobOnError="true">
+  <taskFlow>
+    <task name="T" maxNumberOfExecution="4">
+      <description> // <![CDATA[
+      x=162,y=67
+      // ]]> </description>
+      <javaExecutable class="org.ow2.proactive.scheduler.examples.IncrementJob">
+      </javaExecutable>
+      <flowControl block="start" />
+    </task>
+    <task name="T1" maxNumberOfExecution="4">
+      <description> // <![CDATA[
+      x=161,y=160,a=163,b=149
+      // ]]> </description>
+      <depends>
+        <task ref ="T" />
+      </depends>
+      <javaExecutable class="org.ow2.proactive.scheduler.examples.IncrementJob">
+      </javaExecutable>
+      <flowControl block="none" >
+        <loop target="T1">
+          <script>
+            <code language="javascript">
+// <![CDATA[
+importPackage(java.io);
+var ID   = 1;
+var RUNS = 3;
+var f = new File(".test_flow_lock_" + ID);
+var it = 0;
+if (f.exists()) {
+var input = new BufferedReader(new FileReader(f));
+it = java.lang.Integer.parseInt(input.readLine());
+input.close();
+f["delete"]();
+}
+it++;
+if (it < RUNS) {
+loop = true;
+f.createNewFile();
+var output = new BufferedWriter(new FileWriter(f));
+output.write("" + it);
+output.close();
+} else {
+loop = false;
+}
+// ]]>
+            </code>
+          </script>
+        </loop>
+      </flowControl>
+    </task>
+    <task name="T2" maxNumberOfExecution="4">
+      <description> // <![CDATA[
+      x=161,y=264,a=315,b=148
+      // ]]> </description>
+      <depends>
+        <task ref ="T1" />
+      </depends>
+      <javaExecutable class="org.ow2.proactive.scheduler.examples.IncrementJob">
+      </javaExecutable>
+      <flowControl block="end" >
+        <loop target="T">
+          <script>
+            <code language="javascript">
+// <![CDATA[
+importPackage(java.io);
+var ID   = 2;
+var RUNS = 3;
+var f = new File(".test_flow_lock_" + ID);
+var it = 0;
+if (f.exists()) {
+var input = new BufferedReader(new FileReader(f));
+it = java.lang.Integer.parseInt(input.readLine());
+input.close();
+f["delete"]();
+}
+it++;
+if (it < RUNS) {
+loop = true;
+f.createNewFile();
+var output = new BufferedWriter(new FileWriter(f));
+output.write("" + it);
+output.close();
+} else {
+loop = false;
+}
+// ]]>
+            </code>
+          </script>
+        </loop>
+      </flowControl>
+    </task>
+  </taskFlow>
+</job>

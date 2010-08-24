@@ -38,9 +38,9 @@ package org.ow2.proactive.scheduler.job;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -54,6 +54,10 @@ import org.ow2.proactive.scheduler.common.task.CommonAttribute;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.NativeTask;
 import org.ow2.proactive.scheduler.common.task.Task;
+import org.ow2.proactive.scheduler.flow.FlowActionType;
+import org.ow2.proactive.scheduler.flow.FlowChecker;
+import org.ow2.proactive.scheduler.flow.FlowError;
+import org.ow2.proactive.scheduler.flow.FlowScript;
 import org.ow2.proactive.scheduler.task.ForkedJavaExecutableContainer;
 import org.ow2.proactive.scheduler.task.JavaExecutableContainer;
 import org.ow2.proactive.scheduler.task.NativeExecutableContainer;
@@ -112,39 +116,6 @@ public class InternalJobFactory {
     }
 
     /**
-     * Check whether or not every tasks of the given tasks flow can be reached.
-     * 
-     * @return true if every tasks can be accessed, false if not.
-     */
-    private static boolean isConsistent(TaskFlowJob userJob) {
-        logger_dev.info("Check if job '" + userJob.getName() +
-            "' is consistent : ie Every task can be accessed");
-        HashSet<Task> tasks = new HashSet<Task>();
-        HashSet<Task> reached = new HashSet<Task>();
-        for (Task t : userJob.getTasks()) {
-            if (t.getDependencesList() == null) {
-                reached.add(t);
-            } else {
-                tasks.add(t);
-            }
-        }
-        boolean change;
-        do {
-            change = false;
-            Iterator<Task> it = tasks.iterator();
-            while (it.hasNext()) {
-                Task t = it.next();
-                if (reached.containsAll(t.getDependencesList())) {
-                    it.remove();
-                    reached.add(t);
-                    change = true;
-                }
-            }
-        } while (change);
-        return reached.size() == userJob.getTasks().size();
-    }
-
-    /**
      * Create an internalTaskFlow job with the given task flow job (user)
      *
      * @param job the user job that will be used to create the internal job.
@@ -157,11 +128,30 @@ public class InternalJobFactory {
             throw new JobCreationException("This job must contains tasks !");
         }
 
-        //check tasks flow
-        if (!isConsistent(userJob)) {
-            String msg = "One or more tasks in this job cannot be reached !";
-            logger_dev.info(msg);
-            throw new JobCreationException(msg);
+        createEntryPoints(userJob);
+
+        // validate taskflow
+        List<FlowChecker.Block> blocks = new ArrayList<FlowChecker.Block>();
+        FlowError err = FlowChecker.validate(userJob, blocks);
+        if (err != null) {
+            String e = "";
+
+            e += "Invalid taskflow: " + err.getMessage();
+            if (err.getTasks().size() > 0) {
+                e += " (Context task" + ((err.getTasks().size() > 1) ? "s" : "") + ": ";
+                List<String> tt = err.getTasks();
+                for (int i = 0; i < tt.size(); i++) {
+                    e += tt.get(i);
+                    if (i != tt.size() - 1) {
+                        e += " ";
+                    }
+                }
+                e += ")";
+            }
+            e += ".";
+
+            logger_dev.error(e);
+            throw new JobCreationException(e, err);
         }
 
         InternalJob job = new InternalTaskFlowJob();
@@ -189,6 +179,80 @@ public class InternalJobFactory {
             job.addTask(entry.getValue());
         }
 
+        // tag matching blocks in InternalTasks
+        for (InternalTask it : tasksList.values()) {
+            for (FlowChecker.Block block : blocks) {
+                if (it.getName().equals(block.start.element.getName())) {
+                    it.setMatchingBlock(block.end.element.getName());
+                }
+                if (it.getName().equals(block.end.element.getName())) {
+                    it.setMatchingBlock(block.start.element.getName());
+                }
+            }
+        }
+
+        // create if/else/join weak dependencies
+        for (InternalTask it : tasksList.values()) {
+
+            // it performs an IF action
+            if (it.getFlowScript() != null &&
+                it.getFlowScript().getActionType().equals(FlowActionType.IF.toString())) {
+                String ifBranch = it.getFlowScript().getActionTarget();
+                String elseBranch = it.getFlowScript().getActionTargetElse();
+                String join = it.getFlowScript().getActionJoin();
+                List<InternalTask> joinedBranches = new ArrayList<InternalTask>();
+
+                // find the ifBranch task
+                for (InternalTask it2 : tasksList.values()) {
+                    if (it2.getName().equals(ifBranch)) {
+                        it2.setIfBranch(it);
+                        String match = it2.getMatchingBlock();
+                        // find its matching block task
+                        if (match == null) {
+                            // no match: single task
+                            joinedBranches.add(it2);
+                        } else {
+                            for (InternalTask it3 : tasksList.values()) {
+                                if (it3.getName().equals(match)) {
+                                    joinedBranches.add(it3);
+                                    break;
+                                }
+                            }
+                        }
+                        break;
+                    }
+                }
+
+                // find the elseBranch task
+                for (InternalTask it2 : tasksList.values()) {
+                    if (it2.getName().equals(elseBranch)) {
+                        it2.setIfBranch(it);
+
+                        String match = it2.getMatchingBlock();
+                        // find its matching block task
+                        if (match == null) {
+                            // no match: single task
+                            joinedBranches.add(it2);
+                        } else {
+                            for (InternalTask it3 : tasksList.values()) {
+                                if (it3.getName().equals(match)) {
+                                    joinedBranches.add(it3);
+                                    break;
+                                }
+                            }
+                        }
+                        break;
+                    }
+                }
+
+                // find the joinBranch task
+                for (InternalTask it2 : tasksList.values()) {
+                    if (it2.getName().equals(join)) {
+                        it2.setJoinedBranches(joinedBranches);
+                    }
+                }
+            }
+        }
         return job;
     }
 
@@ -348,4 +412,54 @@ public class InternalJobFactory {
         }
     }
 
+    /**
+     * Tags all startable tasks as entry point
+     * a startable task : has no dependency, and is not target of an if control flow action
+     * 
+     * @param job
+     */
+    private static void createEntryPoints(TaskFlowJob job) {
+        for (Task t1 : job.getTasks()) {
+            List<Task> deps = t1.getDependencesList();
+            boolean candidate = false;
+
+            // a startable task has no dependency
+            if (deps == null || deps.size() == 0) {
+                candidate = true;
+            } else {
+                continue;
+            }
+
+            // a startable task is not target of an if
+            for (Task t2 : job.getTasks()) {
+                if (t1.equals(t2)) {
+                    continue;
+                }
+                FlowScript sc = t2.getFlowScript();
+                if (sc != null) {
+                    String actionType = sc.getActionType();
+                    if (FlowActionType.parse(actionType).equals(FlowActionType.IF)) {
+                        String tIf = sc.getActionTarget();
+                        String tElse = sc.getActionTargetElse();
+                        String tJoin = sc.getActionJoin();
+                        if (tIf != null && tIf.equals(t1.getName())) {
+                            candidate = false;
+                            break;
+                        }
+                        if (tElse != null && tElse.equals(t1.getName())) {
+                            candidate = false;
+                            break;
+                        }
+                        if (tJoin != null && tJoin.equals(t1.getName())) {
+                            candidate = false;
+                            break;
+                        }
+                    }
+                }
+            }
+            if (candidate) {
+                t1.setEntryPoint(true);
+            }
+        }
+    }
 }

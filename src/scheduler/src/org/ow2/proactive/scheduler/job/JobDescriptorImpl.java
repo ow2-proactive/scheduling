@@ -36,13 +36,16 @@
  */
 package org.ow2.proactive.scheduler.job;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.Vector;
-import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
@@ -96,6 +99,9 @@ public class JobDescriptorImpl implements JobDescriptor {
     /** Job tasks to be able to be schedule */
     private Map<TaskId, EligibleTaskDescriptor> eligibleTasks = new ConcurrentHashMap<TaskId, EligibleTaskDescriptor>();
 
+    /** Those are not directly eligible, and will be triggered by an IF control flow action */
+    private Map<TaskId, EligibleTaskDescriptor> branchTasks = new ConcurrentHashMap<TaskId, EligibleTaskDescriptor>();
+
     /** Job running tasks */
     private Map<TaskId, TaskDescriptor> runningTasks = new ConcurrentHashMap<TaskId, TaskDescriptor>();
 
@@ -146,8 +152,12 @@ public class JobDescriptorImpl implements JobDescriptor {
             //if this task is a first task, put it in eligible tasks list
             EligibleTaskDescriptor lt = new EligibleTaskDescriptorImpl(td);
 
-            if (!td.hasDependences()) {
+            if (td.isEntryPoint()) {
                 eligibleTasks.put(td.getId(), lt);
+            }
+
+            if (td.getJoinedBranches() != null || td.getIfBranch() != null) {
+                branchTasks.put(td.getId(), lt);
             }
 
             mem.put(td, lt);
@@ -198,6 +208,282 @@ public class JobDescriptorImpl implements JobDescriptor {
      */
     public void reStart(TaskId taskId) {
         eligibleTasks.put(taskId, (EligibleTaskDescriptor) runningTasks.remove(taskId));
+    }
+
+    /**
+     * Complete LOOP action on JobDescriptor side
+     * 
+     * @param initiator Task initiating the LOOP action
+     * @param tree InternalTask tree of duplicated tasks
+     * @param target Target task of the LOOP action
+     */
+    public void doLoop(TaskId initiator, Map<TaskId, InternalTask> tree, InternalTask target,
+            InternalTask newInit) {
+        Map<TaskId, EligibleTaskDescriptorImpl> acc = new HashMap<TaskId, EligibleTaskDescriptorImpl>();
+
+        // create new EligibleTasks and accumulate it
+        for (Entry<TaskId, InternalTask> it : tree.entrySet()) {
+            TaskId itId = it.getValue().getId();
+            EligibleTaskDescriptorImpl td = new EligibleTaskDescriptorImpl(it.getValue());
+            acc.put(itId, td);
+            this.numberOfTasks++;
+        }
+
+        EligibleTaskDescriptorImpl oldEnd = (EligibleTaskDescriptorImpl) runningTasks.get(initiator);
+        EligibleTaskDescriptorImpl newStart = (EligibleTaskDescriptorImpl) acc.get(target.getId());
+        EligibleTaskDescriptorImpl newEnd = (EligibleTaskDescriptorImpl) acc.get(newInit.getId());
+
+        // plug the end of the old tree (initiator) to the beginning of the new (target)
+        for (TaskDescriptor ot : oldEnd.getChildren()) {
+            newEnd.addChild(ot);
+            ot.getParents().remove(oldEnd);
+            ot.getParents().add(newEnd);
+        }
+        oldEnd.clearChildren();
+
+        // recreate the dependencies
+        for (Entry<TaskId, InternalTask> it : tree.entrySet()) {
+            TaskId itId = it.getValue().getTaskInfo().getTaskId();
+            EligibleTaskDescriptorImpl down = acc.get(itId);
+
+            List<InternalTask> ideps = new ArrayList<InternalTask>();
+            int deptype = 0;
+            if (it.getValue().hasDependences()) {
+                ideps.addAll(it.getValue().getIDependences());
+            }
+            if (it.getValue().getIfBranch() != null) {
+                deptype = 1;
+                ideps.add(it.getValue().getIfBranch());
+            }
+            if (it.getValue().getJoinedBranches() != null) {
+                deptype = 2;
+                ideps.addAll(it.getValue().getJoinedBranches());
+            }
+
+            if (ideps.size() > 0 && !target.equals(itId)) {
+                for (InternalTask parent : ideps) {
+                    if (parent == null) {
+                        continue;
+                    }
+                    EligibleTaskDescriptorImpl up = acc.get(parent.getTaskInfo().getTaskId());
+                    switch (deptype) {
+                        case 0:
+                            if (parent.getId().equals(initiator)) {
+                                up = (EligibleTaskDescriptorImpl) runningTasks.get(initiator);
+                            }
+                            up.addChild(down);
+                            down.addParent(up);
+                            break;
+                        case 1:
+                        case 2:
+                            // 'weak' dependencies from FlowAction#IF are not
+                            // represented in TaskDescriptor
+                            branchTasks.put(down.getId(), down);
+                            break;
+                    }
+
+                }
+            }
+        }
+
+        //    EligibleTaskDescriptorImpl newTask = (EligibleTaskDescriptorImpl) acc.get(target.getId());
+
+        eligibleTasks.put(target.getId(), newStart);
+
+        runningTasks.remove(initiator);
+    }
+
+    /**
+     * Complete IF action on JobDescriptor side
+     * 
+     * @param initiator Task initiating the IF action
+     * @param branchStart START task of the IF branch
+     * @param branchEnd END task of the IF branch
+     * @param join JOIN task of the IF action, or null
+     * @param elseTarget the START task of the ELSE branch that will not be executed
+     * @param elseTasks list of tasks contained in the not executed ELSE branch
+     */
+    public void doIf(TaskId initiator, TaskId branchStart, TaskId branchEnd, TaskId ifJoin,
+            TaskId elseTarget, List<InternalTask> elseTasks) {
+        EligibleTaskDescriptorImpl init = (EligibleTaskDescriptorImpl) runningTasks.get(initiator);
+        EligibleTaskDescriptorImpl start = (EligibleTaskDescriptorImpl) branchTasks.get(branchStart);
+        EligibleTaskDescriptorImpl end = null;
+        EligibleTaskDescriptorImpl join = null;
+        if (ifJoin != null) {
+            join = (EligibleTaskDescriptorImpl) branchTasks.get(ifJoin);
+        }
+
+        // plug the initiator with the beginning of the IF block
+        init.addChild(start);
+        start.addParent(init);
+
+        // the join task is optional
+        if (join != null) {
+            for (EligibleTaskDescriptor td : branchTasks.values()) {
+                LinkedList<EligibleTaskDescriptorImpl> q = new LinkedList<EligibleTaskDescriptorImpl>();
+                q.offer((EligibleTaskDescriptorImpl) td);
+
+                // find the matching end block task 
+                do {
+                    EligibleTaskDescriptorImpl ptr = q.poll();
+                    if (ptr.getChildren() == null || ptr.getChildren().size() == 0) {
+                        if (ptr.getId().equals(branchEnd)) {
+                            // no child : if the block is valid this is the end
+                            end = ptr;
+                        }
+                        break;
+                    } else {
+                        for (TaskDescriptor desc : ptr.getChildren()) {
+                            if (!q.contains(desc)) {
+                                q.offer((EligibleTaskDescriptorImpl) desc);
+                            }
+                        }
+                    }
+                } while (q.size() > 0);
+                if (end != null) {
+                    break;
+                }
+            }
+            // plug the join task with the end of the if block
+            join.addParent(end);
+            end.addChild(join);
+        }
+        branchTasks.remove(start);
+        if (join != null) {
+            branchTasks.remove(join);
+        }
+
+        for (InternalTask it : elseTasks) {
+            EligibleTaskDescriptorImpl td = (EligibleTaskDescriptorImpl) branchTasks.remove(it.getId());
+            LinkedList<EligibleTaskDescriptorImpl> q = new LinkedList<EligibleTaskDescriptorImpl>();
+            if (td != null) {
+                q.clear();
+                q.offer(td);
+                while (q.size() > 0) {
+                    EligibleTaskDescriptorImpl ptr = q.poll();
+                    ptr.setChildrenCount(0);
+                    ptr.setCount(0);
+                    if (ptr.getChildren() != null) {
+                        for (TaskDescriptor child : ptr.getChildren()) {
+                            q.offer((EligibleTaskDescriptorImpl) child);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Complete DUPLICATE action on JobDescriptor side
+     * 
+     * @param initiator Task initiating the DUPLICATE action
+     * @param tree InternalTask tree of duplicated tasks
+     * @param target Target task of the DUPLICATE action: first task of the block
+     * @param oldEnd End task of the duplicated block ; original version
+     * @param newEnd End task of the duplicated block ; dup version
+     */
+    public void doDuplicate(TaskId initiator, Map<TaskId, InternalTask> tree, InternalTask target,
+            TaskId oldEnd, TaskId newEnd) {
+        Map<TaskId, EligibleTaskDescriptorImpl> acc = new HashMap<TaskId, EligibleTaskDescriptorImpl>();
+
+        // create new EligibleTasks and accumulate it
+        for (Entry<TaskId, InternalTask> it : tree.entrySet()) {
+            TaskId itId = it.getValue().getTaskInfo().getTaskId();
+            EligibleTaskDescriptorImpl td = new EligibleTaskDescriptorImpl(it.getValue());
+            acc.put(itId, td);
+
+            this.numberOfTasks++;
+        }
+
+        // recreate the dependencies
+        for (Entry<TaskId, InternalTask> it : tree.entrySet()) {
+            TaskId itId = it.getValue().getTaskInfo().getTaskId();
+            EligibleTaskDescriptorImpl down = acc.get(itId);
+
+            List<InternalTask> ideps = new ArrayList<InternalTask>();
+            int deptype = 0;
+            if (it.getValue().hasDependences()) {
+                ideps.addAll(it.getValue().getIDependences());
+            } else if (it.getValue().getIfBranch() != null) {
+                deptype = 1;
+                ideps.add(it.getValue().getIfBranch());
+            } else if (it.getValue().getJoinedBranches() != null) {
+                deptype = 2;
+                ideps.addAll(it.getValue().getJoinedBranches());
+            }
+            if (ideps != null && !target.equals(itId)) {
+                for (InternalTask parent : ideps) {
+                    if (parent == null) {
+                        continue;
+                    }
+                    EligibleTaskDescriptorImpl up = acc.get(parent.getId());
+                    if (up == null) {
+                        continue;
+                    }
+                    switch (deptype) {
+                        case 0:
+                            up.addChild(down);
+                            down.addParent(up);
+                            break;
+                        case 1:
+                        case 2:
+                            branchTasks.put(down.getId(), down);
+                            break;
+                    }
+                }
+            }
+        }
+
+        EligibleTaskDescriptorImpl oldTask = (EligibleTaskDescriptorImpl) runningTasks.get(initiator);
+        EligibleTaskDescriptorImpl newTask = (EligibleTaskDescriptorImpl) acc.get(target.getId());
+        if (oldTask == null) {
+            oldTask = (EligibleTaskDescriptorImpl) eligibleTasks.get(initiator);
+        }
+        EligibleTaskDescriptorImpl endTask = (EligibleTaskDescriptorImpl) findTask(oldTask, oldEnd);
+        if (endTask == null) {
+            // findTask cannot walk weak dependencies (IF/ELSE) down, lets walk these branches ourselves
+            for (TaskDescriptor branch : branchTasks.values()) {
+                endTask = (EligibleTaskDescriptorImpl) findTask(branch, oldEnd);
+                if (endTask != null) {
+                    break;
+                }
+            }
+        }
+        EligibleTaskDescriptorImpl end = (EligibleTaskDescriptorImpl) acc.get(newEnd);
+
+        for (TaskDescriptor t : endTask.getChildren()) {
+            end.addChild(t);
+            ((EligibleTaskDescriptorImpl) t).addParent(end);
+        }
+
+        newTask.addParent(oldTask);
+        oldTask.addChild(newTask);
+
+        eligibleTasks.put(target.getId(), newTask);
+    }
+
+    /**
+     * Find a task given a parent task
+     * 
+     * @param haystack task from which the child subtree will be walked
+     * @param needle task to find in <code>haystack's</code> subtree 
+     * @return the TaskDescriptor corresponding <code>needle</code> if it is 
+     *  a child of <code>haystack's</code>, or null
+     */
+    private TaskDescriptor findTask(TaskDescriptor haystack, TaskId needle) {
+        if (needle.equals(haystack.getId())) {
+            return haystack;
+        }
+        for (TaskDescriptor td : haystack.getChildren()) {
+            if (needle.equals(td.getId())) {
+                return td;
+            }
+            TaskDescriptor ttd = findTask(td, needle);
+            if (ttd != null) {
+                return ttd;
+            }
+        }
+        return null;
     }
 
     /**

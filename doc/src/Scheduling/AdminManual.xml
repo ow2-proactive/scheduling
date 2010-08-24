@@ -661,8 +661,8 @@ SchedulerFactory.createScheduler(
 				<orderedlist>
 					<listitem>
 						<para>
-							First, the user submits a Job using his <emphasis role="bold">Scheduler</emphasis>
-							retrieved by the <emphasis role="bold">login</emphasis> method. Let's remind it (see
+							First, the user submits a Job using his <emphasis role="bold">UserSchedulerInterface</emphasis>
+							retrieved by the <emphasis role="bold">logAsUser</emphasis> method. Let's remind it (see
 							<xref linkend="Submit_a_job_java"/> for how to use Credentials):
 							<programlisting language="java">
 // connecting to the scheduler
@@ -799,7 +799,7 @@ Scheduler scheduler = auth.login(Credentials.getCredentials());
 					shown below:
 				</para>
 				<programlisting language="java">
-//scheduler is the Scheduler interface returned in the previous sections
+//scheduler is the AdminSchedulerInterface returned in the previous sections
 scheduler.changePolicy(org.ow2.proactive.scheduler.policy.PriorityPolicy.class);
 				</programlisting>
 			</section>

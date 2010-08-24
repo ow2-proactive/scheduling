@@ -102,7 +102,11 @@ public enum TaskStatus implements java.io.Serializable {
     /**
      * The task has finished execution.
      */
-    FINISHED("Finished");
+    FINISHED("Finished"),
+    /**
+     * The task was not executed: it was the non-selected branch of an IF/ELSE control flow action
+     */
+    SKIPPED("Skipped");
 
     /** The name of the current status. */
     private String name;

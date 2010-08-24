@@ -500,6 +500,8 @@ public class SchedulerModel extends ConsoleModel {
             list = new ArrayList<String>();
             list.add("ID");
             list.add("NAME");
+            list.add("ID");
+            list.add("DUP");
             list.add("STATUS");
             list.add("HOSTNAME");
             list.add("EXEC DURATION");
@@ -516,6 +518,8 @@ public class SchedulerModel extends ConsoleModel {
                 list = new ArrayList<String>();
                 list.add(ts.getId().toString());
                 list.add(ts.getName());
+                list.add((ts.getIterationIndex() > 0) ? "" + ts.getIterationIndex() : "");
+                list.add((ts.getDuplicationIndex() > 0) ? "" + ts.getDuplicationIndex() : "");
                 list.add(ts.getStatus().toString());
                 list.add((ts.getExecutionHostName() == null) ? "unknown" : ts.getExecutionHostName());
                 list.add(Tools.getFormattedDuration(0, ts.getExecutionDuration()));

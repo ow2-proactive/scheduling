@@ -271,5 +271,4 @@ public abstract class JavaExecutable extends Executable {
     public final DataSpacesFileObject getLocalFile(String path) throws FileSystemException {
         return getLocalSpace().resolveFile(path);
     }
-
 }

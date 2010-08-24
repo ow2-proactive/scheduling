@@ -42,6 +42,7 @@ import java.util.List;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputSelector;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
+import org.ow2.proactive.scheduler.flow.FlowScript;
 import org.ow2.proactive.scripting.Script;
 
 
@@ -61,10 +62,17 @@ public class TaskLauncherInitializer implements Serializable {
     private Script<?> pre;
     /** The script executed after the task */
     private Script<?> post;
+    /** The script executed after the task */
+    private FlowScript flowScript;
     /** The walltime defined for the task (it is considered as defined if it is > 0) */
     private long walltime;
     /** policy content to be prepared before being sent to node */
     private String policyContent;
+
+    /** duplication index: task was duplicated in parallel */
+    private int duplicationIndex = 0;
+    /** iteration index: task was duplicated sequentially */
+    private int iterationIndex = 0;
 
     /** DataSpaces needed parameter */
     private List<InputSelector> taskInputFiles = null;
@@ -114,6 +122,24 @@ public class TaskLauncherInitializer implements Serializable {
      */
     public Script<?> getPostScript() {
         return post;
+    }
+
+    /**
+     * Set the control flow script value to the given flow value
+     * 
+     * @param flow the control flow script to set
+     */
+    public void setControlFlowScript(FlowScript flow) {
+        flowScript = flow;
+    }
+
+    /**
+     * Get the control flow script
+     *
+     * @return the post-script
+     */
+    public FlowScript getControlFlowScript() {
+        return flowScript;
     }
 
     /**
@@ -215,4 +241,31 @@ public class TaskLauncherInitializer implements Serializable {
         this.taskOutputFiles = taskOutputFiles;
     }
 
+    /**
+     * @param id the duplication index: task was duplicated in parallel 
+     */
+    public void setIterationIndex(int id) {
+        this.iterationIndex = id;
+    }
+
+    /**
+     * @return the duplication index: task was duplicated in parallel 
+     */
+    public int getIterationIndex() {
+        return this.iterationIndex;
+    }
+
+    /**
+     * @param id the iteration index: task was duplicated sequentially 
+     */
+    public void setDuplicationIndex(int id) {
+        this.duplicationIndex = id;
+    }
+
+    /**
+     * @return the iteration index: task was duplicated sequentially 
+     */
+    public int getDuplicationIndex() {
+        return this.duplicationIndex;
+    }
 }

@@ -1,0 +1,317 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job xmlns="urn:proactive:jobdescriptor:dev" 
+     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     xsi:schemaLocation="urn:proactive:jobdescriptor:dev ../../src/scheduler/src/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/dev/schedulerjob.xsd"
+     name="Job" priority="low" projectName="myProject" cancelJobOnError="true">
+  <taskFlow>
+    <task name="T1" maxNumberOfExecution="4">
+      <description> // <![CDATA[
+      x=284,y=53
+      // ]]> </description>
+      <javaExecutable class="org.ow2.proactive.scheduler.examples.IncrementJob">
+      </javaExecutable>
+    </task>
+    <task name="T3" maxNumberOfExecution="4">
+      <description> // <![CDATA[
+      x=181,y=180
+      // ]]> </description>
+      <depends>
+        <task ref ="T2" />
+      </depends>
+      <javaExecutable class="org.ow2.proactive.scheduler.examples.IncrementJob">
+      </javaExecutable>
+    </task>
+    <task name="T2" maxNumberOfExecution="4">
+      <description> // <![CDATA[
+      x=285,y=121
+      // ]]> </description>
+      <depends>
+        <task ref ="T1" />
+      </depends>
+      <javaExecutable class="org.ow2.proactive.scheduler.examples.IncrementJob">
+      </javaExecutable>
+      <flowControl block="start" />
+    </task>
+    <task name="T6" maxNumberOfExecution="4">
+      <description> // <![CDATA[
+      x=450,y=241
+      // ]]> </description>
+      <depends>
+        <task ref ="T4" />
+      </depends>
+      <javaExecutable class="org.ow2.proactive.scheduler.examples.IncrementJob">
+      </javaExecutable>
+    </task>
+    <task name="T7" maxNumberOfExecution="4">
+      <description> // <![CDATA[
+      x=451,y=329,a=451,b=324
+      // ]]> </description>
+      <depends>
+        <task ref ="T6" />
+      </depends>
+      <javaExecutable class="org.ow2.proactive.scheduler.examples.IncrementJob">
+      </javaExecutable>
+      <flowControl block="none" >
+        <loop target="T7">
+          <script>
+            <code language="javascript">
+// <![CDATA[
+importPackage(java.io);
+var ID   = 4;
+var RUNS = 3;
+var f = new File(".test_flow_lock_" + ID);
+var it = 0;
+if (f.exists()) {
+var input = new BufferedReader(new FileReader(f));
+it = java.lang.Integer.parseInt(input.readLine());
+input.close();
+f["delete"]();
+}
+it++;
+if (it < RUNS) {
+loop = true;
+f.createNewFile();
+var output = new BufferedWriter(new FileWriter(f));
+output.write("" + it);
+output.close();
+} else {
+loop = false;
+}
+// ]]>
+            </code>
+          </script>
+        </loop>
+      </flowControl>
+    </task>
+    <task name="T4" maxNumberOfExecution="4">
+      <description> // <![CDATA[
+      x=380,y=183
+      // ]]> </description>
+      <depends>
+        <task ref ="T2" />
+      </depends>
+      <javaExecutable class="org.ow2.proactive.scheduler.examples.IncrementJob">
+      </javaExecutable>
+      <flowControl block="start" />
+    </task>
+    <task name="T5" maxNumberOfExecution="4">
+      <description> // <![CDATA[
+      x=316,y=245
+      // ]]> </description>
+      <depends>
+        <task ref ="T4" />
+      </depends>
+      <javaExecutable class="org.ow2.proactive.scheduler.examples.IncrementJob">
+      </javaExecutable>
+      <flowControl block="start" />
+    </task>
+    <task name="T10" maxNumberOfExecution="4">
+      <description> // <![CDATA[
+      x=180,y=393
+      // ]]> </description>
+      <depends>
+        <task ref ="T3" />
+        <task ref ="T12" />
+      </depends>
+      <javaExecutable class="org.ow2.proactive.scheduler.examples.IncrementJob">
+      </javaExecutable>
+    </task>
+    <task name="T11" maxNumberOfExecution="4">
+      <description> // <![CDATA[
+      x=107,y=222
+      // ]]> </description>
+      <depends>
+        <task ref ="T3" />
+      </depends>
+      <javaExecutable class="org.ow2.proactive.scheduler.examples.IncrementJob">
+      </javaExecutable>
+      <flowControl block="start" />
+    </task>
+    <task name="T12" maxNumberOfExecution="4">
+      <description> // <![CDATA[
+      x=106,y=354,a=167,b=309
+      // ]]> </description>
+      <depends>
+        <task ref ="T11" />
+      </depends>
+      <javaExecutable class="org.ow2.proactive.scheduler.examples.IncrementJob">
+      </javaExecutable>
+      <flowControl block="end" >
+        <loop target="T11">
+          <script>
+            <code language="javascript">
+// <![CDATA[
+importPackage(java.io);
+var ID   = 2;
+var RUNS = 3;
+var f = new File(".test_flow_lock_" + ID);
+var it = 0;
+if (f.exists()) {
+var input = new BufferedReader(new FileReader(f));
+it = java.lang.Integer.parseInt(input.readLine());
+input.close();
+f["delete"]();
+}
+it++;
+if (it < RUNS) {
+loop = true;
+f.createNewFile();
+var output = new BufferedWriter(new FileWriter(f));
+output.write("" + it);
+output.close();
+} else {
+loop = false;
+}
+// ]]>
+            </code>
+          </script>
+        </loop>
+      </flowControl>
+    </task>
+    <task name="T13" maxNumberOfExecution="4">
+      <description> // <![CDATA[
+      x=287,y=456,a=225,b=310
+      // ]]> </description>
+      <depends>
+        <task ref ="T10" />
+        <task ref ="T9" />
+      </depends>
+      <javaExecutable class="org.ow2.proactive.scheduler.examples.IncrementJob">
+      </javaExecutable>
+      <flowControl block="end" >
+        <loop target="T2">
+          <script>
+            <code language="javascript">
+// <![CDATA[
+importPackage(java.io);
+var ID   = 1;
+var RUNS = 3;
+var f = new File(".test_flow_lock_" + ID);
+var it = 0;
+if (f.exists()) {
+var input = new BufferedReader(new FileReader(f));
+it = java.lang.Integer.parseInt(input.readLine());
+input.close();
+f["delete"]();
+}
+it++;
+if (it < RUNS) {
+loop = true;
+f.createNewFile();
+var output = new BufferedWriter(new FileWriter(f));
+output.write("" + it);
+output.close();
+} else {
+loop = false;
+}
+// ]]>
+            </code>
+          </script>
+        </loop>
+      </flowControl>
+    </task>
+    <task name="T8" maxNumberOfExecution="4">
+      <description> // <![CDATA[
+      x=317,y=329,a=353,b=286
+      // ]]> </description>
+      <depends>
+        <task ref ="T5" />
+      </depends>
+      <javaExecutable class="org.ow2.proactive.scheduler.examples.IncrementJob">
+      </javaExecutable>
+      <flowControl block="end" >
+        <loop target="T5">
+          <script>
+            <code language="javascript">
+// <![CDATA[
+importPackage(java.io);
+var ID   = 5;
+var RUNS = 3;
+var f = new File(".test_flow_lock_" + ID);
+var it = 0;
+if (f.exists()) {
+var input = new BufferedReader(new FileReader(f));
+it = java.lang.Integer.parseInt(input.readLine());
+input.close();
+f["delete"]();
+}
+it++;
+if (it < RUNS) {
+loop = true;
+f.createNewFile();
+var output = new BufferedWriter(new FileWriter(f));
+output.write("" + it);
+output.close();
+} else {
+loop = false;
+}
+// ]]>
+            </code>
+          </script>
+        </loop>
+      </flowControl>
+    </task>
+    <task name="T14" maxNumberOfExecution="4">
+      <description> // <![CDATA[
+      x=191,y=522
+      // ]]> </description>
+      <depends>
+        <task ref ="T13" />
+      </depends>
+      <javaExecutable class="org.ow2.proactive.scheduler.examples.IncrementJob">
+      </javaExecutable>
+    </task>
+    <task name="T9" maxNumberOfExecution="4">
+      <description> // <![CDATA[
+      x=386,y=384,a=388,b=291
+      // ]]> </description>
+      <depends>
+        <task ref ="T7" />
+        <task ref ="T8" />
+      </depends>
+      <javaExecutable class="org.ow2.proactive.scheduler.examples.IncrementJob">
+      </javaExecutable>
+      <flowControl block="end" >
+        <loop target="T4">
+          <script>
+            <code language="javascript">
+// <![CDATA[
+importPackage(java.io);
+var ID   = 3;
+var RUNS = 3;
+var f = new File(".test_flow_lock_" + ID);
+var it = 0;
+if (f.exists()) {
+var input = new BufferedReader(new FileReader(f));
+it = java.lang.Integer.parseInt(input.readLine());
+input.close();
+f["delete"]();
+}
+it++;
+if (it < RUNS) {
+loop = true;
+f.createNewFile();
+var output = new BufferedWriter(new FileWriter(f));
+output.write("" + it);
+output.close();
+} else {
+loop = false;
+}
+// ]]>
+            </code>
+          </script>
+        </loop>
+      </flowControl>
+    </task>
+    <task name="T15" maxNumberOfExecution="4">
+      <description> // <![CDATA[
+      x=372,y=521
+      // ]]> </description>
+      <depends>
+        <task ref ="T13" />
+      </depends>
+      <javaExecutable class="org.ow2.proactive.scheduler.examples.IncrementJob">
+      </javaExecutable>
+    </task>
+  </taskFlow>
+</job>

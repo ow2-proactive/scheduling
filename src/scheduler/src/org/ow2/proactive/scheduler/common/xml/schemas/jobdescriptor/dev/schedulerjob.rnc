@@ -52,7 +52,7 @@ taskFlow = ## A job composed of a flow of tasks with or without dependencies
 
 # +++++++++++++ task
 task = ## A task is the smallest computation unit for the scheduler 
-    element task { taskName, nodesNumber_t?, cancelJobOnError_t?, restartTaskOnError_t?, numberOfExecution_t?, walltime?, preciousResult?, resultPreviewClass?, taskDescription?, genericInformation?, depends?, inputFiles?, selection?, pre?, executable, post?, cleaning?, outputFiles?}
+    element task { taskName, nodesNumber_t?, cancelJobOnError_t?, restartTaskOnError_t?, numberOfExecution_t?, walltime?, preciousResult?, resultPreviewClass?, taskDescription?, genericInformation?, depends?, inputFiles?, selection?, pre?, executable, flow?, post?, cleaning?, outputFiles?}
 taskName = ## Identification of this task (identifier) 
     attribute name { xsd:ID }
 nodesNumber_t = ## number of cores needed for the task (identifier)
@@ -77,13 +77,16 @@ dependsTask = ## A task from which this task depends
     element task { attribute ref { xsd:IDREF} }
 selection = ## A script used to select resources that can handle the task 
     element selection { selectionScript+ }
+flow = ## Flow control : block declaration, flow action
+    element flowControl { block?, (actionIf | actionDuplicate | actionLoop)? }
+block = ## block declaration
+    attribute block { blockAttr }
 pre = ## A script launched before the task execution in the task node
     element pre { script }
 post = ## A script launched after the task execution in the task node
     element post { script }
 cleaning = ## A script launched by the Resource Manager after the task or post script
     element cleaning { script }
-
 
 # +++++++++++++ scripts
 script = ## Definition of a standard script 
@@ -165,6 +168,20 @@ excludes_ = ## Pattern of the files to exclude among the included one, relative 
 	attribute excludes { inexcludePattern }
 
 
+# +++++++++++++ Control flow
+actionIf = ## branching Control flow action
+	 element if { target, targetElse, targetJoin, script }
+target = ## branching if target
+    attribute target { xsd:string }
+targetElse = ## branching else target
+    attribute else { xsd:string }
+targetJoin = ## branching else target
+    attribute join { xsd:string }
+actionLoop = ## looping control flow action
+	 element loop { target, script }
+actionDuplicate = ## duplicate control flow action
+	 element duplicate { script }
+
 # +++++++++++++ User define types
 jobPriority = 'highest' | 'high' | 'normal' | 'low' | 'lowest' | variableRefType
 restartTaskType = 'anywhere' | 'elsewhere' | variableRefType
@@ -174,3 +191,5 @@ classPattern = xsd:string { pattern="([A-Za-z_$][A-Za-z_0-9$]*\.)*[A-Za-z_$][A-Z
 walltimePattern = xsd:string { pattern="[0-9]*[1-9][0-9]*(:[0-5][0-9]){0,2}" }
 variableRefType = xsd:string { pattern="$\{[A-Za-z0-9._]+\}" }
 inexcludePattern = xsd:string { pattern=".+(,.+)*" }
+controlFlowAction = 'goto' | 'duplicate' | 'continue'
+blockAttr = 'start' | 'end' | 'none'

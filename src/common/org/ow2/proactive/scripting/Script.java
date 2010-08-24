@@ -210,6 +210,15 @@ public abstract class Script<E> implements Serializable {
     }
 
     /**
+     * Set the script content, ie the executed code
+     * 
+     * @param script the new script content
+     */
+    public void setScript(String script) {
+        this.script = script;
+    }
+
+    /**
      * Get the parameters.
      *
      * @return the parameters.

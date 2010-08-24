@@ -51,6 +51,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.events.XMLEvent;
 
@@ -77,6 +78,8 @@ import org.ow2.proactive.scheduler.common.task.dataspaces.InputAccessMode;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
 import org.ow2.proactive.scheduler.common.util.RegexpMatcher;
 import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
+import org.ow2.proactive.scheduler.flow.FlowActionType;
+import org.ow2.proactive.scheduler.flow.FlowScript;
 import org.ow2.proactive.scripting.GenerationScript;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.SelectionScript;
@@ -165,6 +168,16 @@ public class JobFactory_stax extends JobFactory {
     private static final String ELEMENT_FORK_ENVIRONMENT = "forkEnvironment";
     private static final String ATTRIBUTE_FORK_JAVAHOME = "javaHome";
     private static final String ATTRIBUTE_FORK_JVMPARAMETERS = "jvmParameters";
+
+    // FLOW CONTROL
+    private static final String ELEMENT_FLOW = "flowControl";
+    private static final String ATTRIBUTE_FLOW_BLOCK = "block";
+    private static final String ELEMENT_FLOW_IF = "if";
+    private static final String ELEMENT_FLOW_DUPLICATE = "duplicate";
+    private static final String ELEMENT_FLOW_LOOP = "loop";
+    private static final String ATTRIBUTE_FLOW_TARGET = "target";
+    private static final String ATTRIBUTE_FLOW_ELSE = "else";
+    private static final String ATTRIBUTE_FLOW_JOIN = "join";
 
     //DATASPACES
     private static final String ELEMENT_DS_INPUTSPACE = "inputSpace";
@@ -520,6 +533,7 @@ public class JobFactory_stax extends JobFactory {
             //go to the description END_ELEMENT
             while (cursorVariables.next() != XMLEvent.END_ELEMENT)
                 ;
+
             return description;
         } catch (Exception e) {
             throw new JobCreationException(e.getMessage(), e);
@@ -639,6 +653,7 @@ public class JobFactory_stax extends JobFactory {
                 switch (eventType) {
                     case XMLEvent.START_ELEMENT:
                         String current = cursorTask.getLocalName();
+
                         if (current.equals(JobFactory_stax.ELEMENT_COMMON_GENERIC_INFORMATION)) {
                             tmpTask.setGenericInformations(getGenericInformations(cursorTask));
                         } else if (current.equals(JobFactory_stax.ELEMENT_COMMON_DESCRIPTION)) {
@@ -655,6 +670,8 @@ public class JobFactory_stax extends JobFactory {
                             tmpTask.setPostScript(createScript(cursorTask));
                         } else if (current.equals(JobFactory_stax.ELEMENT_SCRIPT_CLEANING)) {
                             tmpTask.setCleaningScript(createScript(cursorTask));
+                        } else if (current.equals(JobFactory_stax.ELEMENT_FLOW)) {
+                            tmpTask.setFlowScript(createControlFlowScript(cursorTask, tmpTask));
                         } else if (current.equals(JobFactory_stax.ELEMENT_TASK_DEPENDENCES)) {
                             createdependences(cursorTask, tmpTask);
                         } else if (current.equals(JobFactory_stax.ELEMENT_JAVA_EXECUTABLE)) {
@@ -787,6 +804,7 @@ public class JobFactory_stax extends JobFactory {
                             dependences.put(t.getName(), depends);
                             return;
                         }
+
                         break;
                 }
             }
@@ -795,23 +813,124 @@ public class JobFactory_stax extends JobFactory {
         }
     }
 
+    private FlowScript createControlFlowScript(XMLStreamReader cursorTask, Task tmpTask)
+            throws JobCreationException {
+        String type = null;
+        String target = null;
+        String targetElse = null;
+        String targetJoin = null;
+        int event = -1;
+
+        for (int i = 0; i < cursorTask.getAttributeCount(); i++) {
+            String attrName = cursorTask.getAttributeLocalName(i);
+            if (attrName.equals(JobFactory_stax.ATTRIBUTE_FLOW_BLOCK)) {
+                tmpTask.setFlowBlock(replace(cursorTask.getAttributeValue(i)));
+            }
+        }
+
+        try {
+            // <control>  =>  <if> | <loop> | <duplicate>
+            while (cursorTask.hasNext()) {
+                event = cursorTask.next();
+                if (event == XMLEvent.START_ELEMENT) {
+                    break;
+                } else if (event == XMLEvent.END_ELEMENT &&
+                    cursorTask.getLocalName().equals(JobFactory_stax.ELEMENT_FLOW)) {
+                    return null;
+                }
+            }
+            if (event != XMLEvent.START_ELEMENT) {
+                throw new JobCreationException("Expected start element IF, DUPLICATE or LOOP at line " +
+                    cursorTask.getLocation().getLineNumber());
+            }
+
+            // DUPLICATE : no attribute
+            if (cursorTask.getLocalName().equals(JobFactory_stax.ELEMENT_FLOW_DUPLICATE)) {
+                type = FlowActionType.DUPLICATE.toString();
+            }
+            // IF : attributes TARGET_IF and TARGET_ELSE and TARGET_JOIN
+            else if (cursorTask.getLocalName().equals(JobFactory_stax.ELEMENT_FLOW_IF)) {
+                type = FlowActionType.IF.toString();
+                for (int i = 0; i < cursorTask.getAttributeCount(); i++) {
+                    String attrName = cursorTask.getAttributeLocalName(i);
+                    if (attrName.equals(JobFactory_stax.ATTRIBUTE_FLOW_TARGET)) {
+                        target = cursorTask.getAttributeValue(i);
+                    } else if (attrName.equals(JobFactory_stax.ATTRIBUTE_FLOW_ELSE)) {
+                        targetElse = cursorTask.getAttributeValue(i);
+                    } else if (attrName.equals(JobFactory_stax.ATTRIBUTE_FLOW_JOIN)) {
+                        targetJoin = cursorTask.getAttributeValue(i);
+                    }
+                }
+            }
+            // LOOP : attribute TARGET
+            else if (cursorTask.getLocalName().equals(JobFactory_stax.ELEMENT_FLOW_LOOP)) {
+                type = FlowActionType.LOOP.toString();
+                for (int i = 0; i < cursorTask.getAttributeCount(); i++) {
+                    String attrName = cursorTask.getAttributeLocalName(i);
+                    if (attrName.equals(JobFactory_stax.ATTRIBUTE_FLOW_TARGET)) {
+                        target = cursorTask.getAttributeValue(i);
+                    }
+                }
+            } else {
+                throw new XMLStreamException("Awaited element " + JobFactory_stax.ELEMENT_FLOW_DUPLICATE +
+                    "," + JobFactory_stax.ELEMENT_FLOW_IF + " or " + JobFactory_stax.ELEMENT_FLOW_LOOP +
+                    ", got " + cursorTask.getLocalName());
+            }
+            FlowScript sc = null;
+            Script<?> internalScript = null;
+            try {
+                internalScript = createScript(cursorTask, 2);
+                switch (FlowActionType.parse(type)) {
+                    case IF:
+                        sc = FlowScript.createIfFlowScript(internalScript, target, targetElse, targetJoin);
+                        break;
+                    case DUPLICATE:
+                        sc = FlowScript.createDuplicateFlowScript(internalScript);
+                        break;
+                    case LOOP:
+                        sc = FlowScript.createLoopFlowScript(internalScript, target);
+                        break;
+                }
+            } catch (Exception e) {
+                throw new XMLStreamException("Could not create Control Flow Script", e);
+            }
+
+            // </script>  -->  </if> | </duplicate> | </loop>
+            while (cursorTask.hasNext()) {
+                event = cursorTask.next();
+                if (event == XMLEvent.END_ELEMENT) {
+                    break;
+                }
+            }
+            if (event != XMLEvent.END_ELEMENT) {
+                throw new JobCreationException("Expected end element IF, DUPLICATE or LOOP at line " +
+                    cursorTask.getLocation().getLineNumber());
+            }
+
+            return sc;
+        } catch (XMLStreamException e) {
+            throw new JobCreationException("", e);
+        }
+    }
+
     /**
      * Get the script defined at the specified cursor.
      * Leave the method with cursor at the end of the corresponding script.
      *
      * @param cursorScript the streamReader with the cursor on the corresponding script tag (pre, post, cleaning, selection, generation).
-     * @param selection tell if the script is a selection script or not.
+     * @param selection nature of the script : 1 : selection
+     *                                         2 : flow
+     *                                         3 : else
      * @return the script defined at the specified cursor.
      */
-    private Script<?> createScript(XMLStreamReader cursorScript, boolean selection)
-            throws JobCreationException {
+    private Script<?> createScript(XMLStreamReader cursorScript, int type) throws JobCreationException {
         String currentScriptTag = cursorScript.getLocalName();
         try {
             boolean isDynamic = true;
             Script<?> toReturn = null;
             int eventType = -1;
             while (cursorScript.hasNext()) {
-                if (selection && eventType == -1) {
+                if (type == 1 && eventType == -1) {
                     eventType = cursorScript.getEventType();
                 } else {
                     eventType = cursorScript.next();
@@ -863,7 +982,7 @@ public class JobFactory_stax extends JobFactory {
                         break;
                     case XMLEvent.END_ELEMENT:
                         if (cursorScript.getLocalName().equals(currentScriptTag)) {
-                            if (selection) {
+                            if (type == 1) {
                                 return new SelectionScript(toReturn, isDynamic);
                             } else {
                                 return toReturn;
@@ -898,7 +1017,7 @@ public class JobFactory_stax extends JobFactory {
                     case XMLEvent.START_ELEMENT:
                         String current = cursorScript.getLocalName();
                         if (current.equals(JobFactory_stax.ELEMENT_SCRIPT_SCRIPT)) {
-                            newOne = (SelectionScript) createScript(cursorScript, true);
+                            newOne = (SelectionScript) createScript(cursorScript, 1);
                             scripts.add(newOne);
                         }
                         break;
@@ -927,7 +1046,7 @@ public class JobFactory_stax extends JobFactory {
      * @return the script defined at the specified cursor.
      */
     private Script<?> createScript(XMLStreamReader cursorScript) throws JobCreationException {
-        return createScript(cursorScript, false);
+        return createScript(cursorScript, 0);
     }
 
     /**
@@ -1319,5 +1438,4 @@ public class JobFactory_stax extends JobFactory {
             }
         }
     }
-
 }

@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job xmlns="urn:proactive:jobdescriptor:dev" 
+     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     xsi:schemaLocation="urn:proactive:jobdescriptor:dev ../../src/scheduler/src/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/dev/schedulerjob.xsd"
+     name="Job" priority="low" projectName="myProject" cancelJobOnError="true">
+
+  <variables>
+    <variable name="bin" value="${pa.scheduler.home}/classes/schedulerTests/functionaltests/workflow/" />
+  </variables>
+
+  <taskFlow>
+    <task name="T" maxNumberOfExecution="4">
+      <description> // <![CDATA[
+      x=308,y=91
+      // ]]> </description>
+      <javaExecutable class="org.ow2.proactive.scheduler.examples.EmptyTask">
+      </javaExecutable>
+      <flowControl block="start" >
+        <duplicate>
+          <script>
+            <code language="javascript">
+// <![CDATA[
+runs=2;
+// ]]>
+            </code>
+          </script>
+        </duplicate>
+      </flowControl>
+    </task>
+    <task name="T1" maxNumberOfExecution="4">
+      <description> // <![CDATA[
+      x=307,y=166
+      // ]]> </description>
+      <depends>
+        <task ref ="T" />
+      </depends>
+	  <pre>
+		<script>
+		  <code language="javascript">
+// <![CDATA[
+importPackage(java.io);
+var f = new File("${pa.scheduler.home}/PRE_$IT_$DUP");
+f.createNewFile();
+// ]]>
+		  </code>
+		</script>
+	  </pre>
+	  <nativeExecutable>
+        <staticCommand value="${bin}/it.sh">
+		  <arguments>
+			<argument value="${pa.scheduler.home}/" />
+			<argument value="$IT" />
+			<argument value="$DUP" />
+		  </arguments>
+		</staticCommand>
+	  </nativeExecutable>
+	  <post>
+		<script>
+		  <code language="javascript">
+// <![CDATA[
+importPackage(java.io);
+var f = new File("${pa.scheduler.home}/POST_$IT_$DUP");
+f.createNewFile();
+// ]]>
+		  </code>
+		</script>
+	  </post>
+    </task>
+    <task name="T2" maxNumberOfExecution="4">
+      <description> // <![CDATA[
+      x=307,y=244,a=399,b=175
+      // ]]> </description>
+      <depends>
+        <task ref ="T1" />
+      </depends>
+      <javaExecutable class="org.ow2.proactive.scheduler.examples.EmptyTask">
+      </javaExecutable>
+      <flowControl block="end" >
+        <loop target="T">
+          <script>
+            <code language="javascript">
+// <![CDATA[
+importPackage(java.io);
+var ID   = 3;
+var RUNS = 2;
+var f = new File(".test_flow_lock_" + ID);
+var it = 0;
+if (f.exists()) {
+var input = new BufferedReader(new FileReader(f));
+it = java.lang.Integer.parseInt(input.readLine());
+input.close();
+f["delete"]();
+}
+it++;
+if (it < RUNS) {
+loop = true;
+f.createNewFile();
+var output = new BufferedWriter(new FileWriter(f));
+output.write("" + it);
+output.close();
+} else {
+loop = false;
+}
+// ]]>
+            </code>
+          </script>
+        </loop>
+      </flowControl>
+    </task>
+  </taskFlow>
+</job>
