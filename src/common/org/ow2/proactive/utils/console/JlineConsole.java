@@ -147,13 +147,18 @@ public class JlineConsole implements Console {
     public Console print(String msg) {
         if (this.started) {
             try {
-                StringBuffer sb = filter(new StringBuffer(msg));
+                FilterResult fr = filter(new StringBuffer(msg));
+                StringBuffer sb = fr.content;
+                if (msg.length() == 0) {
+                    console.printNewline();
+                    return this;
+                }
                 if (!paginationActivated) {
                     console.printString(sb.toString());
                     console.printNewline();
                 } else {
                     while (sb.length() > 0) {
-                        console.printString(nFirstLine(sb, console.getTermheight() - 5) + newLineChar);
+                        console.printString(nFirstLine(sb, console.getTermheight() - 3) + newLineChar);
                         if (sb.length() > 0) {
                             console.printString("- more - (" + ABORT + " : abort | " + ALL +
                                 " : display all | any : next page)" + newLineChar);
@@ -163,15 +168,20 @@ public class JlineConsole implements Console {
                                 break;
                             } else if (c == ALL) {
                                 console.printString(sb.toString());
-                                console.flushConsole();
+                                console.printNewline();
                                 break;
                             }
                         } else {
                             break;
                         }
                     }
-                    console.printNewline();
                 }
+                if (filters.size() > 0) {
+                    console.printString("- Output filtered - (" + fr.nbFiltered + "/" + fr.nbLines +
+                        " lines by " + filters.size() + " filter" + (filters.size() == 1 ? "" : "s") + ") " +
+                        filters + newLineChar);
+                }
+                console.flushConsole();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -188,25 +198,37 @@ public class JlineConsole implements Console {
      * Lines are delimited by independent platform newLine char.
      *
      * @param msg the original message
-     * @return a StringBuffered containing only the line that matches the filters
+     * @return a FilterResult containing the total number of lines, the number of filtered lines,
+     * 			and every lines that matche the filters
      */
-    private StringBuffer filter(StringBuffer msg) {
+    private FilterResult filter(StringBuffer msg) {
+        int nbFiltered = 0;
+        int nbLine = 0;
         StringBuffer lines = new StringBuffer();
-        while (msg.length() > 0) {
-            int io = msg.indexOf(newLineChar);
-            if (io == -1) {
-                io = msg.length();
-            }
-            String toAppend = msg.substring(0, io);
-            msg.delete(0, io + newLineChar.length());
-            if (isfiltered(toAppend)) {
-                lines.append(toAppend);
-                if (msg.length() > 0) {
-                    lines.append(newLineChar);
+        try {
+            while (msg.length() > 0) {
+                int io = msg.indexOf(newLineChar);
+                if (io == -1) {
+                    io = msg.length();
+                }
+                String toAppend = msg.substring(0, io);
+                msg.delete(0, io + newLineChar.length());
+                nbLine++;
+                if (isfiltered(toAppend)) {
+                    nbFiltered++;
+                    lines.append(toAppend);
+                    if (msg.length() > 0) {
+                        lines.append(newLineChar);
+                    }
                 }
             }
+        } catch (Throwable t) {
+            try {
+                console.printString("ERROR : " + t.getMessage() + newLineChar);
+            } catch (IOException e) {
+            }
         }
-        return lines;
+        return new FilterResult(nbLine, nbFiltered, lines);
     }
 
     /**
@@ -364,6 +386,18 @@ public class JlineConsole implements Console {
      */
     public void setPaginationActivated(boolean paginationActivated) {
         this.paginationActivated = paginationActivated;
+    }
+
+    class FilterResult {
+        int nbLines;
+        int nbFiltered;
+        StringBuffer content;
+
+        FilterResult(int nbLines, int nbFiltered, StringBuffer content) {
+            this.nbLines = nbLines;
+            this.nbFiltered = nbFiltered;
+            this.content = content;
+        }
     }
 
 }
