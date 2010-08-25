@@ -136,8 +136,8 @@ public class TestWorkflowDataspace extends FunctionalTest {
 
                 BufferedReader in = new BufferedReader(new FileReader(f));
                 String line = in.readLine();
-                Assert.assertTrue("Wrong content for " + f.getCanonicalPath(),
-                        line.equals("IT " + it + " DUP " + dup));
+                Assert.assertTrue("Wrong content for " + f.getCanonicalPath(), line.equals("IT " + it +
+                    " DUP " + dup));
             }
         }
     }
