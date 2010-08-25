@@ -248,8 +248,10 @@ public class SchedulerModel extends ConsoleModel {
         console.start(" > ");
         console.addCompletion(getCompletionList());
         console.print("Type command here (type '?' or help() to see the list of commands)" + newline);
+        console.print("");
         initialize();
         SchedulerStatus status;
+        console.print("");
         while (!terminated) {
             status = null;
             try {
@@ -267,13 +269,13 @@ public class SchedulerModel extends ConsoleModel {
             }
             String stmt = console.readStatement(prompt + "> ");
             if ("?".equals(stmt)) {
-                console.print(newline + helpScreen());
+                print(newline + helpScreen());
             } else if ("?c".equals(stmt)) {
-                console.print(newline + helpScreenCnsl());
+                print(newline + helpScreenCnsl());
             } else {
                 eval(stmt);
-                console.print("");
             }
+            print("");
         }
         console.stop();
     }
@@ -487,10 +489,10 @@ public class SchedulerModel extends ConsoleModel {
 
             JobInfo ji = js.getJobInfo();
 
-            String state = "\n   Job '" + ji.getJobId() + "'    name:" + ji.getJobId().getReadableName() +
-                "    owner:" + js.getOwner() + "    status:" + ji.getStatus() + "    #tasks:" +
-                ji.getTotalNumberOfTasks() + newline;
-            print(state);
+            String state = newline + "   Job '" + ji.getJobId() + "'    name:" +
+                ji.getJobId().getReadableName() + "    owner:" + js.getOwner() + "    status:" +
+                ji.getStatus() + "    #tasks:" + ji.getTotalNumberOfTasks() + newline + newline;
+
             //create formatter
             ObjectArrayFormatter oaf = new ObjectArrayFormatter();
             oaf.setMaxColumnLength(30);
@@ -533,7 +535,7 @@ public class SchedulerModel extends ConsoleModel {
                 oaf.addLine(list);
             }
             //print formatter
-            print(Tools.getStringAsArray(oaf));
+            print(state + Tools.getStringAsArray(oaf));
 
             return js;
         } catch (Exception e) {

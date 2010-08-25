@@ -192,18 +192,20 @@ public class ResourceManagerModel extends ConsoleModel {
         console.start(" > ");
         console.addCompletion(getCompletionList());
         console.print("Type command here (type '?' or help() to see the list of commands)\n");
+        console.print("");
         initialize();
+        console.print("");
         String stmt;
         while (!terminated) {
             stmt = console.readStatement();
             if ("?".equals(stmt)) {
-                console.print(newline + helpScreen());
+                print(newline + helpScreen());
             } else if ("?c".equals(stmt)) {
-                console.print(newline + helpScreenCnsl());
+                print(newline + helpScreenCnsl());
             } else {
                 eval(stmt);
-                console.print("");
             }
+            print("");
         }
         console.stop();
     }
