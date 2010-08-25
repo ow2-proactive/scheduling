@@ -72,6 +72,7 @@ import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.ow2.proactive.db.annotation.Unloadable;
+import org.ow2.proactive.scheduler.common.exception.ExecutableCreationException;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.task.Task;
@@ -207,8 +208,13 @@ public abstract class InternalTask extends TaskState {
      * {@inheritDoc}
      */
     @Override
-    public TaskState duplicate() throws Exception {
-        InternalTask nt = (InternalTask) this.getClass().newInstance();
+    public TaskState duplicate() throws ExecutableCreationException {
+        InternalTask nt = null;
+        try {
+            nt = (InternalTask) this.getClass().newInstance();
+        } catch (Exception e) {
+            throw new ExecutableCreationException("Could not instantiate " + this.getClass(), e);
+        }
 
         try {
             DatabaseManager.getInstance().load(this);
@@ -236,20 +242,24 @@ public abstract class InternalTask extends TaskState {
             try {
                 nt.setPreScript(new SimpleScript(this.getPreScript()));
             } catch (InvalidScriptException e) {
-                throw new Exception("Could not copy PreScript", e);
+                throw new ExecutableCreationException("Could not copy PreScript", e);
             }
         }
         if (this.getPostScript() != null) {
             try {
                 nt.setPostScript(new SimpleScript(this.getPostScript()));
             } catch (InvalidScriptException e) {
-                throw new Exception("Could not copy PostScript", e);
+                throw new ExecutableCreationException("Could not copy PostScript", e);
             }
         }
         if (this.getSelectionScripts() != null) {
             List<SelectionScript> sel = new ArrayList<SelectionScript>();
             for (SelectionScript script : this.getSelectionScripts()) {
-                sel.add(new SelectionScript(script, script.isDynamic()));
+                try {
+                    sel.add(new SelectionScript(script, script.isDynamic()));
+                } catch (InvalidScriptException e) {
+                    throw new ExecutableCreationException("Could not copy selection script", e);
+                }
             }
             nt.setSelectionScripts(sel);
         }
@@ -257,14 +267,14 @@ public abstract class InternalTask extends TaskState {
             try {
                 nt.setFlowScript(new FlowScript(this.getFlowScript()));
             } catch (InvalidScriptException e) {
-                throw new Exception("Could not copy FlowScript", e);
+                throw new ExecutableCreationException("Could not copy FlowScript", e);
             }
         }
         if (this.getCleaningScript() != null) {
             try {
                 nt.setCleaningScript(new SimpleScript(this.getCleaningScript()));
             } catch (InvalidScriptException e) {
-                throw new Exception("Could not copy CleaningScript", e);
+                throw new ExecutableCreationException("Could not copy CleaningScript", e);
             }
         }
 
@@ -301,7 +311,7 @@ public abstract class InternalTask extends TaskState {
      * @param the original container to copy
      * @return the new container to return
      */
-    private static ExecutableContainer copyContainer(ExecutableContainer original) {
+    private static ExecutableContainer copyContainer(ExecutableContainer original) throws ExecutableCreationException {
         ExecutableContainer copy = null;
         if (original instanceof ForkedJavaExecutableContainer) {
             copy = new ForkedJavaExecutableContainer((ForkedJavaExecutableContainer) original);
@@ -324,10 +334,10 @@ public abstract class InternalTask extends TaskState {
      *                 duplication index to set to the old tasks if <code>ifAction == false</code>
      * @param itIndex iteration index threshold it <code>ifAction == true</code>
      *        
-     * @throws Exception
+     * @throws ExecutableCreationException one task could not be duplicated
      */
     public void duplicateTree(Map<TaskId, InternalTask> acc, TaskId target, boolean loopAction, int dupIndex,
-            int itIndex) throws Exception {
+            int itIndex) throws ExecutableCreationException {
 
         Map<TaskId, InternalTask> tmp = new HashMap<TaskId, InternalTask>();
 
@@ -366,10 +376,10 @@ public abstract class InternalTask extends TaskState {
      *                 duplication index to set to the old tasks if <code>ifAction == false</code>
      * @param itIndex iteration index threshold it <code>ifAction == true</code>
      *
-     * @throws Exception instantiation error
+     * @throws ExecutableCreationException one task could not be duplicated
      */
     private void internalDuplicateTree(Map<TaskId, InternalTask> acc, TaskId target, boolean loopAction,
-            int dupIndex, int itIndex) throws Exception {
+            int dupIndex, int itIndex) throws ExecutableCreationException {
 
         InternalTask nt = null;
         if (!acc.containsKey(this.getId())) {

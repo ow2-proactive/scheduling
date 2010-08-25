@@ -74,6 +74,7 @@ import org.objectweb.proactive.extensions.dataspaces.core.naming.NamingService;
 import org.ow2.proactive.db.annotation.Alterable;
 import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
+import org.ow2.proactive.scheduler.common.exception.ExecutableCreationException;
 import org.ow2.proactive.scheduler.common.job.JobDescriptor;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
@@ -575,7 +576,7 @@ public abstract class InternalJob extends JobState {
                         try {
                             initiator.duplicateTree(dup, targetId, true, initiator.getDuplicationIndex(),
                                     initiator.getIterationIndex());
-                        } catch (Exception e) {
+                        } catch (ExecutableCreationException e) {
                             logger_dev.error("", e);
                             break;
                         }

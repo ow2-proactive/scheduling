@@ -123,7 +123,7 @@ public class NativeExecutableContainer extends ExecutableContainer {
      * 
      * @param cont original object to copy
      */
-    public NativeExecutableContainer(NativeExecutableContainer cont) {
+    public NativeExecutableContainer(NativeExecutableContainer cont) throws ExecutableCreationException {
         this.command = new String[cont.command.length];
         for (int i = 0; i < cont.command.length; i++) {
             this.command[i] = new String(cont.command[i]);
@@ -134,7 +134,7 @@ public class NativeExecutableContainer extends ExecutableContainer {
             try {
                 this.generated = new GenerationScript(cont.generated);
             } catch (InvalidScriptException e) {
-                e.printStackTrace();
+                throw new ExecutableCreationException("Could not copy generation script", e);
             }
         }
         if (cont.workingDir == null) {
