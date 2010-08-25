@@ -40,7 +40,6 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -490,13 +489,14 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
     /**
      * {@inheritDoc}
      */
-    public void removeJob(JobId jobId) throws NotConnectedException, UnknownJobException, PermissionException {
+    public boolean removeJob(JobId jobId) throws NotConnectedException, UnknownJobException,
+            PermissionException {
 
         //checking permissions
         checkJobOwner("removeJob", jobId, "You do not have permission to remove this job !");
 
         //asking the scheduler for the result
-        scheduler.removeJob(jobId);
+        return scheduler.removeJob(jobId);
     }
 
     /**
@@ -863,9 +863,9 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
     /**
      * {@inheritDoc}
      */
-    public void removeJob(String jobId) throws NotConnectedException, UnknownJobException,
+    public boolean removeJob(String jobId) throws NotConnectedException, UnknownJobException,
             PermissionException {
-        this.removeJob(JobIdImpl.makeJobId(jobId));
+        return this.removeJob(JobIdImpl.makeJobId(jobId));
     }
 
     /**

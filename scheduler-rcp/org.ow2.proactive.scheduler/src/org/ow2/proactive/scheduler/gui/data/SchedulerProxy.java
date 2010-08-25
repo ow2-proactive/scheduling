@@ -287,12 +287,13 @@ public class SchedulerProxy implements Scheduler {
     /**
      * {@inheritDoc}
      */
-    public void removeJob(JobId jobId) {
+    public boolean removeJob(JobId jobId) {
         try {
-            scheduler.removeJob(jobId);
+            return scheduler.removeJob(jobId);
         } catch (SchedulerException e) {
             Activator.log(IStatus.ERROR, "- Scheduler Proxy: Error on remove job action ", e);
             displayError(e.getMessage());
+            return false;
         }
     }
 
@@ -629,9 +630,9 @@ public class SchedulerProxy implements Scheduler {
     /**
      * {@inheritDoc}
      */
-    public void removeJob(String jobId) throws NotConnectedException, UnknownJobException,
+    public boolean removeJob(String jobId) throws NotConnectedException, UnknownJobException,
             PermissionException {
-        scheduler.removeJob(jobId);
+        return scheduler.removeJob(jobId);
     }
 
     /**

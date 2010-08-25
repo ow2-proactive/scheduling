@@ -1447,7 +1447,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
     /**
      * {@inheritDoc}
      */
-    public void removeJob(JobId jobId) {
+    public boolean removeJob(JobId jobId) {
         InternalJob job = jobs.get(jobId);
 
         logger_dev.info("Request to remove job '" + jobId + "'");
@@ -1477,8 +1477,10 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
             //send event to front-end
             frontend.jobStateUpdated(job.getOwner(), new NotificationData<JobInfo>(
                 SchedulerEvent.JOB_REMOVE_FINISHED, job.getJobInfo()));
+            return true;
         } else {
             logger_dev.info("Job '" + jobId + "' has already been removed or is not finished !");
+            return false;
         }
     }
 

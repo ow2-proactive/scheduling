@@ -110,7 +110,8 @@ public interface SchedulerCoreMethods {
      * @throws UnknownJobException if the job does not exist.
      * @throws PermissionException if you can't access to this particular job.
      */
-    public void removeJob(JobId jobId) throws NotConnectedException, UnknownJobException, PermissionException;
+    public boolean removeJob(JobId jobId) throws NotConnectedException, UnknownJobException,
+            PermissionException;
 
     /**
      * Listen for the tasks user logs.<br>

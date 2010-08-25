@@ -250,12 +250,12 @@ public class SchedulerProxyUserInterface implements Scheduler {
     }
 
     //@Override
-    public void removeJob(JobId jobId) throws NotConnectedException, UnknownJobException, PermissionException {
+    public boolean removeJob(JobId jobId) throws NotConnectedException, UnknownJobException, PermissionException {
         if (uischeduler == null) {
             throw new NotConnectedException("Not connected to the schecduler.");
         }
 
-        uischeduler.removeJob(jobId);
+        return uischeduler.removeJob(jobId);
 
     }
 
@@ -306,9 +306,9 @@ public class SchedulerProxyUserInterface implements Scheduler {
     }
 
     //@Override
-    public void removeJob(String jobId) throws NotConnectedException, UnknownJobException,
+    public boolean removeJob(String jobId) throws NotConnectedException, UnknownJobException,
             PermissionException {
-        uischeduler.removeJob(jobId);
+        return uischeduler.removeJob(jobId);
     }
 
     //@Override

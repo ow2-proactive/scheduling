@@ -136,11 +136,12 @@ public interface Scheduler extends SchedulerCoreMethods {
      * If the job does not exist, a schedulerException is sent with the proper message.
      *
      * @param jobId the job to be removed.
+     * @return true if success, false if job is not terminated.
      * @throws NotConnectedException if you are not authenticated.
      * @throws UnknownJobException if the job does not exist.
      * @throws PermissionException if you can't access to this particular job.
      */
-    public void removeJob(String jobId) throws NotConnectedException, UnknownJobException,
+    public boolean removeJob(String jobId) throws NotConnectedException, UnknownJobException,
             PermissionException;
 
     /**
