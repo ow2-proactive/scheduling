@@ -879,7 +879,7 @@ public abstract class InternalJob extends JobState {
                                         .getDuplicationIndex() *
                                     runs, 0);
                             } catch (Exception e) {
-                                e.printStackTrace();
+                                logger_dev.error("DUPLICATE: could not duplicate tree", e);
                                 break;
                             }
 

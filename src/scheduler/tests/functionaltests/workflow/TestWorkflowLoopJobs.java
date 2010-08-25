@@ -43,7 +43,7 @@ import org.ow2.proactive.scheduler.flow.FlowActionType;
  * Tests the correctness of workflow-controlled jobs including {@link FlowActionType#LOOP} actions
  *
  * @author The ProActive Team
- * @since ProActive Scheduling 2.1
+ * @since ProActive Scheduling 2.2
  */
 public class TestWorkflowLoopJobs extends TWorkflowJobs {
 

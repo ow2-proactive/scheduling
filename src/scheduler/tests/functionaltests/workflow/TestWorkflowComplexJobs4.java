@@ -44,7 +44,7 @@ import org.ow2.proactive.scheduler.flow.FlowActionType;
  * {@link FlowActionType#IF} actions
  * 
  * @author The ProActive Team
- * @since ProActive Scheduling 2.1
+ * @since ProActive Scheduling 2.2
  */
 public class TestWorkflowComplexJobs4 extends TWorkflowJobs {
 

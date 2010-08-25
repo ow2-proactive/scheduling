@@ -45,7 +45,7 @@ import java.util.List;
  * 
  *  
  * @author The ProActive Team
- * @since ProActive Scheduling 2.1
+ * @since ProActive Scheduling 2.2
  * 
  */
 public class FlowError extends Exception {

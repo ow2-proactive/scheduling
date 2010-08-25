@@ -54,7 +54,7 @@ import functionaltests.SchedulerTHelper;
  * Crashes the scheduler while job are being scheduled
  *
  * @author The ProActive Team
- * @since ProActive Scheduling 2.1
+ * @since ProActive Scheduling 2.2
  */
 public class TestWorkflowRecoveryInterrupted extends FunctionalTest {
 

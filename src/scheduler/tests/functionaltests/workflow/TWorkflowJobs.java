@@ -66,7 +66,7 @@ import functionaltests.SchedulerTHelper;
  * Tests the correctness of workflow-controlled jobs
  *
  * @author The ProActive Team
- * @since ProActive Scheduling 2.1
+ * @since ProActive Scheduling 2.2
  */
 public abstract class TWorkflowJobs extends FunctionalTest {
 

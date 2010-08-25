@@ -61,6 +61,7 @@ import functionaltests.SchedulerTHelper;
  * Ensures Dataspace features work properly when combined with control flow operations
  * 
  * @author The ProActive Team
+ * @since ProActive Scheduling 2.2
  */
 public class TestWorkflowDataspace extends FunctionalTest {
 

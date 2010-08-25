@@ -36,6 +36,9 @@
  */
 package org.ow2.proactive.scheduler.flow;
 
+import org.objectweb.proactive.annotation.PublicAPI;
+
+
 /**
  * Possible values for Task Block declaration
  * <p>
@@ -44,9 +47,10 @@ package org.ow2.proactive.scheduler.flow;
  * 
  * 
  * @author The ProActive Team
- * @since ProActive Scheduling 2.1
+ * @since ProActive Scheduling 2.2
  * 
  */
+@PublicAPI
 public enum FlowBlock {
 
     /**

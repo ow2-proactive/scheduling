@@ -50,7 +50,7 @@ import functionaltests.SchedulerTHelper;
  * and invalid workflows-enabled jobs rejected
  *
  * @author The ProActive Team
- * @since ProActive Scheduling 2.1
+ * @since ProActive Scheduling 2.2
  */
 public class TestWorkflowSubmission extends FunctionalTest {
 

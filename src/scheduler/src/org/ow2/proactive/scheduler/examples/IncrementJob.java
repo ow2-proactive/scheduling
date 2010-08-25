@@ -47,7 +47,7 @@ import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
  * 
  * 
  * @author The ProActive Team
- * @since ProActive Scheduling 2.1
+ * @since ProActive Scheduling 2.2
  * 
  */
 public class IncrementJob extends JavaExecutable {

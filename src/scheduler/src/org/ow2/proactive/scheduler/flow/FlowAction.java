@@ -56,7 +56,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
  * 
  * 
  * @author The ProActive Team
- * @since ProActive Scheduling 2.1
+ * @since ProActive Scheduling 2.2
  * @see FlowActionType
  * 
  */

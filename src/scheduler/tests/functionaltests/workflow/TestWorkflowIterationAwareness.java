@@ -62,6 +62,7 @@ import functionaltests.SchedulerTHelper;
  * when needed in workflow-enabled tasks
  *
  * @author The ProActive Team
+ * @since ProActive Scheduling 2.2
  */
 public class TestWorkflowIterationAwareness extends FunctionalTest {
 

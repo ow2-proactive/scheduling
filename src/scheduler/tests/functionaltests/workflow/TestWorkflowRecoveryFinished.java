@@ -54,7 +54,7 @@ import functionaltests.SchedulerTHelper;
  * jobs are not interrupted: the scheduler is crashed after they have finished
  *
  * @author The ProActive Team
- * @since ProActive Scheduling 2.1
+ * @since ProActive Scheduling 2.2
  */
 public class TestWorkflowRecoveryFinished extends FunctionalTest {
 

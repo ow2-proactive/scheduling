@@ -74,7 +74,7 @@ import org.ow2.proactive.scripting.SimpleScript;
  * 
  * 
  * @author The ProActive Team
- * @since ProActive Scheduling 2.1
+ * @since ProActive Scheduling 2.2
  * @see FlowAction
  * 
  */

@@ -45,6 +45,12 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 
 
+/**
+ * Tests the correctness of dataspace workflow jobs
+ * 
+ * @author The ProActive Team
+ * @since ProActive Scheduling 2.2
+ */
 public class JobWorkflowDataspace extends JavaExecutable {
 
     @Override
