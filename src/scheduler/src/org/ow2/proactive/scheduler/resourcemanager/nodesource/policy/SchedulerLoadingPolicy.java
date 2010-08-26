@@ -234,7 +234,7 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
     @Override
     protected SchedulerEvent[] getEventsList() {
         return new SchedulerEvent[] { SchedulerEvent.JOB_RUNNING_TO_FINISHED, SchedulerEvent.JOB_SUBMITTED,
-                SchedulerEvent.TASK_RUNNING_TO_FINISHED };
+                SchedulerEvent.TASK_RUNNING_TO_FINISHED, SchedulerEvent.JOB_PENDING_TO_FINISHED };
     }
 
     @Override
@@ -283,6 +283,7 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
     public void jobStateUpdatedEvent(NotificationData<JobInfo> notification) {
         switch (notification.getEventType()) {
             case JOB_RUNNING_TO_FINISHED:
+            case JOB_PENDING_TO_FINISHED:
                 int tasksLeft = activeTasks.remove(notification.getData().getJobId());
                 activeTask -= tasksLeft;
                 break;
