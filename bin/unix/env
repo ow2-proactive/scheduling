@@ -47,7 +47,8 @@ else
     CLASSPATH=$CLASSPATH:"$PA_SCHEDULER/dist/lib/jruby-engine.jar"
     CLASSPATH=$CLASSPATH:"$PA_SCHEDULER/dist/lib/jython-engine.jar"
     #  Needed explicitly by VFS (file transfer in pre/post script
-    CLASSPATH=$CLASSPATH:"$PA_SCHEDULER/dist/lib/commons-logging-1.0.4.jar"
+    CLASSPATH=$CLASSPATH:"$PA_SCHEDULER/dist/lib/commons-logging-1.1.1.jar"
+    CLASSPATH=$CLASSPATH:"$PA_SCHEDULER/dist/lib/commons-httpclient-3.1.jar"
     # fill with ProActive.jar : use jar index for ProActive dependencies
     CLASSPATH=$CLASSPATH:"$PA_SCHEDULER/dist/lib/ProActive.jar"
     # fill with Scheduler jars : use jar index for Scheduler dependencies
