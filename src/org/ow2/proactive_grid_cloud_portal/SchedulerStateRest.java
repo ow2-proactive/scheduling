@@ -47,11 +47,6 @@ public class SchedulerStateRest {
 			jobs.addAll(runningJobs);
 			jobs.addAll(finishedJobs);
 
-			final List<String> names = new ArrayList<String>(totalSize);
-			for (final JobState j : jobs) {
-				names.add(j.getId().toString());
-			}
-
 			final List<UserJobInfo> jobInfoList = new ArrayList<UserJobInfo>(
 					totalSize);
 			for (JobState j : jobs) {
