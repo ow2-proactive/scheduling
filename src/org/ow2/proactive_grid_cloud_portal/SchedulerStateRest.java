@@ -29,17 +29,19 @@ public class SchedulerStateRest {
 	@GET
 	@Path("/jobs")
 	@Produces("application/json")
-	public List<UserJobInfo> jobs(@HeaderParam("sessionid") final String sessionId) {
-		final Scheduler s = SchedulerSessionMapper.getInstance().getSessionsMap()
-				.get(sessionId);
-		// TODO: Handle null value for s ... invalid session id		
+	public List<UserJobInfo> jobs(
+			@HeaderParam("sessionid") final String sessionId) {
+		final Scheduler s = SchedulerSessionMapper.getInstance()
+				.getSessionsMap().get(sessionId);
+		// TODO: Handle null value for s ... invalid session id
 		try {
 			final List<JobState> pendingJobs = s.getState().getPendingJobs();
 			final List<JobState> runningJobs = s.getState().getRunningJobs();
-			final List<JobState> finishedJobs = s.getState().getFinishedJobs();			
-			
-			final int totalSize = pendingJobs.size() + runningJobs.size() + finishedJobs.size();
-			
+			final List<JobState> finishedJobs = s.getState().getFinishedJobs();
+
+			final int totalSize = pendingJobs.size() + runningJobs.size()
+					+ finishedJobs.size();
+
 			final List<JobState> jobs = new ArrayList<JobState>(totalSize);
 			jobs.addAll(pendingJobs);
 			jobs.addAll(runningJobs);
@@ -50,7 +52,8 @@ public class SchedulerStateRest {
 				names.add(j.getId().toString());
 			}
 
-			final List<UserJobInfo> jobInfoList = new ArrayList<UserJobInfo>(totalSize);
+			final List<UserJobInfo> jobInfoList = new ArrayList<UserJobInfo>(
+					totalSize);
 			for (JobState j : jobs) {
 				jobInfoList.add(new UserJobInfo(j.getId().value(),
 						j.getOwner(), j.getJobInfo()));
@@ -69,11 +72,11 @@ public class SchedulerStateRest {
 	@Path("/jobs/{jobid}")
 	public JobState job(@HeaderParam("sessionid") String sessionId,
 			@PathParam("jobid") String jobId) {
-		final Scheduler s = SchedulerSessionMapper.getInstance().getSessionsMap()
-				.get(sessionId);
+		final Scheduler s = SchedulerSessionMapper.getInstance()
+				.getSessionsMap().get(sessionId);
 		// TODO: Handle null value for s ... invalid session id
 		try {
-			final JobState js = s.getJobState(jobId);			
+			final JobState js = s.getJobState(jobId);
 			return PAFuture.getFutureValue(js);
 		} catch (NotConnectedException e) {
 			e.printStackTrace();
@@ -89,8 +92,8 @@ public class SchedulerStateRest {
 	@Path("/jobs/{jobid}/result")
 	public JobResult jobResult(@HeaderParam("sessionid") String sessionId,
 			@PathParam("jobid") String jobId) {
-		final Scheduler s = SchedulerSessionMapper.getInstance().getSessionsMap()
-				.get(sessionId);
+		final Scheduler s = SchedulerSessionMapper.getInstance()
+				.getSessionsMap().get(sessionId);
 		// TODO: Handle null value for s ... invalid session id
 		try {
 			return PAFuture.getFutureValue(s.getJobResult(jobId));
@@ -103,7 +106,7 @@ public class SchedulerStateRest {
 		}
 		return null;
 	}
-	
+
 	@POST
 	@Path("/jobs/{jobid}/pause")
 	public boolean pauseJob(@HeaderParam("sessionid") final String sessionId,
@@ -140,15 +143,15 @@ public class SchedulerStateRest {
 			e.printStackTrace();
 		}
 		return false;
-	}	
+	}
 
 	@POST
 	@Path("/jobs/{jobid}/kill")
 	public void killJob(@HeaderParam("sessionid") String sessionId,
 			@PathParam("jobid") String jobId) {
-		final Scheduler s = SchedulerSessionMapper.getInstance().getSessionsMap()
-				.get(sessionId);
-		// TODO: Handle null value for s ... invalid session id		
+		final Scheduler s = SchedulerSessionMapper.getInstance()
+				.getSessionsMap().get(sessionId);
+		// TODO: Handle null value for s ... invalid session id
 		try {
 			s.killJob(jobId);
 		} catch (NotConnectedException e) {
@@ -159,14 +162,14 @@ public class SchedulerStateRest {
 			e.printStackTrace();
 		}
 	}
-	
+
 	@DELETE
 	@Path("/jobs/{jobid}")
 	public boolean removeJob(@HeaderParam("sessionid") String sessionId,
 			@PathParam("jobid") String jobId) {
-		final Scheduler s = SchedulerSessionMapper.getInstance().getSessionsMap()
-				.get(sessionId);
-		// TODO: Handle null value for s ... invalid session id		
+		final Scheduler s = SchedulerSessionMapper.getInstance()
+				.getSessionsMap().get(sessionId);
+		// TODO: Handle null value for s ... invalid session id
 		try {
 			s.removeJob(jobId);
 			return true;
@@ -184,9 +187,9 @@ public class SchedulerStateRest {
 	@Path("/jobs/{jobid}/tasks")
 	public List<String> jobtasks(@HeaderParam("sessionid") String sessionId,
 			@PathParam("jobid") String jobId) {
-		final Scheduler s = SchedulerSessionMapper.getInstance().getSessionsMap()
-				.get(sessionId);
-		// TODO: Handle null value for s ... invalid session id				
+		final Scheduler s = SchedulerSessionMapper.getInstance()
+				.getSessionsMap().get(sessionId);
+		// TODO: Handle null value for s ... invalid session id
 		try {
 			JobState jobState = s.getJobState(jobId);
 			System.out.println("jobState " + jobId + " : " + jobState);
@@ -213,9 +216,9 @@ public class SchedulerStateRest {
 	@Path("/jobs/{jobid}/tasks/{taskid}")
 	public TaskState jobtasks(@HeaderParam("sessionid") String sessionId,
 			@PathParam("jobid") String jobId, @PathParam("taskid") String taskid) {
-		final Scheduler s = SchedulerSessionMapper.getInstance().getSessionsMap()
-				.get(sessionId);
-		// TODO: Handle null value for s ... invalid session id		
+		final Scheduler s = SchedulerSessionMapper.getInstance()
+				.getSessionsMap().get(sessionId);
+		// TODO: Handle null value for s ... invalid session id
 		try {
 			JobState jobState = s.getJobState(jobId);
 			for (TaskState ts : jobState.getTasks()) {
@@ -237,12 +240,13 @@ public class SchedulerStateRest {
 	@GET
 	@Path("/jobs/{jobid}/tasks/{taskid}/result")
 	public Serializable taskresult(@HeaderParam("sessionid") String sessionId,
-			@PathParam("jobid") String jobId, @PathParam("taskid") String taskId)
-			throws Throwable {
-		final Scheduler s = SchedulerSessionMapper.getInstance().getSessionsMap()
-				.get(sessionId);		
+			@PathParam("jobid") String jobId, @PathParam("taskid") String taskId) {
+		final Scheduler s = SchedulerSessionMapper.getInstance()
+				.getSessionsMap().get(sessionId);
 		try {
 			TaskResult tr = s.getTaskResult(jobId, taskId);
+			// TODO: this call throws a Throwable it should be handled with an
+			// appropriate HTTP error
 			return tr.value();
 		} catch (NotConnectedException e) {
 			e.printStackTrace();
