@@ -311,7 +311,8 @@ public abstract class InternalTask extends TaskState {
      * @param the original container to copy
      * @return the new container to return
      */
-    private static ExecutableContainer copyContainer(ExecutableContainer original) throws ExecutableCreationException {
+    private static ExecutableContainer copyContainer(ExecutableContainer original)
+            throws ExecutableCreationException {
         ExecutableContainer copy = null;
         if (original instanceof ForkedJavaExecutableContainer) {
             copy = new ForkedJavaExecutableContainer((ForkedJavaExecutableContainer) original);

@@ -250,7 +250,8 @@ public class SchedulerProxyUserInterface implements Scheduler {
     }
 
     //@Override
-    public boolean removeJob(JobId jobId) throws NotConnectedException, UnknownJobException, PermissionException {
+    public boolean removeJob(JobId jobId) throws NotConnectedException, UnknownJobException,
+            PermissionException {
         if (uischeduler == null) {
             throw new NotConnectedException("Not connected to the schecduler.");
         }
