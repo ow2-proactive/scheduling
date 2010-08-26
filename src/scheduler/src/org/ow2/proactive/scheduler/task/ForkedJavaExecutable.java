@@ -275,6 +275,7 @@ public class ForkedJavaExecutable extends JavaExecutable {
                 command.append(" -Djava.security.policy=" + fpolicy.getAbsolutePath() + " ");
             } catch (Exception e) {
                 //java policy not set
+                logger_dev.debug("", e);
             }
         }
         if (forkEnvironment != null && forkEnvironment.getJVMParameters() != null &&
@@ -316,10 +317,14 @@ public class ForkedJavaExecutable extends JavaExecutable {
             }
 
             try {
-                process.exitValue();
+                int ec = process.exitValue();
                 // process terminated abnormally:
-                throw new InternalSchedulerException("Unable to create a separate java process");
+                throw new InternalSchedulerException(
+                    "Unable to create a separate java process. Exit code : " + ec);
             } catch (IllegalThreadStateException e) {
+                logger_dev.debug("", e);
+                throw new InternalSchedulerException("Unable to retrieve exit value. Message : " +
+                    e.getMessage());
             }
         }
         if (numberOfTrials == RETRY_ACQUIRE) {
