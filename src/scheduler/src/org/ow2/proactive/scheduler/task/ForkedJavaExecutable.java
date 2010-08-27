@@ -322,9 +322,8 @@ public class ForkedJavaExecutable extends JavaExecutable {
                 throw new InternalSchedulerException(
                     "Unable to create a separate java process. Exit code : " + ec);
             } catch (IllegalThreadStateException e) {
-                logger_dev.debug("", e);
-                throw new InternalSchedulerException("Unable to retrieve exit value. Message : " +
-                    e.getMessage());
+                logger_dev.debug("Process not terminated, continue Forked VM launching (try number " +
+                    numberOfTrials + ")");
             }
         }
         if (numberOfTrials == RETRY_ACQUIRE) {
