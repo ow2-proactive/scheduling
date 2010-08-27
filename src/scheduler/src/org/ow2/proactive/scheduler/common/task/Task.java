@@ -66,9 +66,9 @@ import org.ow2.proactive.scheduler.common.task.dataspaces.InputAccessMode;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputSelector;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
-import org.ow2.proactive.scheduler.flow.FlowAction;
-import org.ow2.proactive.scheduler.flow.FlowBlock;
-import org.ow2.proactive.scheduler.flow.FlowScript;
+import org.ow2.proactive.scheduler.common.task.flow.FlowAction;
+import org.ow2.proactive.scheduler.common.task.flow.FlowBlock;
+import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.scripting.SimpleScript;
@@ -105,10 +105,6 @@ public abstract class Task extends CommonAttribute {
     /** Name of the task. */
     @Column(name = "NAME")
     protected String name = SchedulerConstants.TASK_DEFAULT_NAME;
-
-    /** Entry point: spontaneously startable */
-    @Column(name = "ENTRY_POINT")
-    protected boolean entryPoint = false;
 
     /** block declaration : syntactic scopes used for workflows
      * string representation of a FlowBlock enum */
@@ -303,20 +299,6 @@ public abstract class Task extends CommonAttribute {
                 name);
         }
         this.name = name;
-    }
-
-    /**
-     * @return true if this task is an entry point for the job
-     */
-    public boolean isEntryPoint() {
-        return this.entryPoint;
-    }
-
-    /**
-     * @param e true if the task should be an entry point for the job, or false
-     */
-    public void setEntryPoint(boolean e) {
-        this.entryPoint = e;
     }
 
     /**

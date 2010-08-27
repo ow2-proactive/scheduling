@@ -50,14 +50,14 @@ import org.ow2.proactive.scheduler.common.exception.InternalException;
 import org.ow2.proactive.scheduler.common.exception.JobCreationException;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
+import org.ow2.proactive.scheduler.common.job.factories.FlowChecker;
+import org.ow2.proactive.scheduler.common.job.factories.FlowError;
 import org.ow2.proactive.scheduler.common.task.CommonAttribute;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.NativeTask;
 import org.ow2.proactive.scheduler.common.task.Task;
-import org.ow2.proactive.scheduler.flow.FlowActionType;
-import org.ow2.proactive.scheduler.flow.FlowChecker;
-import org.ow2.proactive.scheduler.flow.FlowError;
-import org.ow2.proactive.scheduler.flow.FlowScript;
+import org.ow2.proactive.scheduler.common.task.flow.FlowActionType;
+import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
 import org.ow2.proactive.scheduler.task.ForkedJavaExecutableContainer;
 import org.ow2.proactive.scheduler.task.JavaExecutableContainer;
 import org.ow2.proactive.scheduler.task.NativeExecutableContainer;
@@ -127,8 +127,6 @@ public class InternalJobFactory {
             logger_dev.info("Job '" + userJob.getName() + "' must contain tasks !");
             throw new JobCreationException("This job must contains tasks !");
         }
-
-        createEntryPoints(userJob);
 
         // validate taskflow
         List<FlowChecker.Block> blocks = new ArrayList<FlowChecker.Block>();
@@ -408,57 +406,6 @@ public class InternalJobFactory {
             if (!Modifier.isPrivate(f.getModifiers()) && !Modifier.isStatic(f.getModifiers())) {
                 f.setAccessible(true);
                 f.set(to, f.get(from));
-            }
-        }
-    }
-
-    /**
-     * Tags all startable tasks as entry point
-     * a startable task : has no dependency, and is not target of an if control flow action
-     * 
-     * @param job
-     */
-    private static void createEntryPoints(TaskFlowJob job) {
-        for (Task t1 : job.getTasks()) {
-            List<Task> deps = t1.getDependencesList();
-            boolean candidate = false;
-
-            // a startable task has no dependency
-            if (deps == null || deps.size() == 0) {
-                candidate = true;
-            } else {
-                continue;
-            }
-
-            // a startable task is not target of an if
-            for (Task t2 : job.getTasks()) {
-                if (t1.equals(t2)) {
-                    continue;
-                }
-                FlowScript sc = t2.getFlowScript();
-                if (sc != null) {
-                    String actionType = sc.getActionType();
-                    if (FlowActionType.parse(actionType).equals(FlowActionType.IF)) {
-                        String tIf = sc.getActionTarget();
-                        String tElse = sc.getActionTargetElse();
-                        String tJoin = sc.getActionJoin();
-                        if (tIf != null && tIf.equals(t1.getName())) {
-                            candidate = false;
-                            break;
-                        }
-                        if (tElse != null && tElse.equals(t1.getName())) {
-                            candidate = false;
-                            break;
-                        }
-                        if (tJoin != null && tJoin.equals(t1.getName())) {
-                            candidate = false;
-                            break;
-                        }
-                    }
-                }
-            }
-            if (candidate) {
-                t1.setEntryPoint(true);
             }
         }
     }

@@ -56,7 +56,7 @@ import org.ow2.proactive.scheduler.common.task.Task;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
-import org.ow2.proactive.scheduler.flow.FlowActionType;
+import org.ow2.proactive.scheduler.common.task.flow.FlowActionType;
 
 import functionalTests.FunctionalTest;
 import functionaltests.SchedulerTHelper;

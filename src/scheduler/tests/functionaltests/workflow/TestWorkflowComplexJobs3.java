@@ -36,7 +36,7 @@
  */
 package functionaltests.workflow;
 
-import org.ow2.proactive.scheduler.flow.FlowActionType;
+import org.ow2.proactive.scheduler.common.task.flow.FlowActionType;
 
 
 /**

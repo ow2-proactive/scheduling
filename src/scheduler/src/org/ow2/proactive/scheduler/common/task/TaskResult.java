@@ -42,7 +42,7 @@ import java.util.Map;
 import javax.swing.JPanel;
 
 import org.objectweb.proactive.annotation.PublicAPI;
-import org.ow2.proactive.scheduler.flow.FlowAction;
+import org.ow2.proactive.scheduler.common.task.flow.FlowAction;
 
 
 /**

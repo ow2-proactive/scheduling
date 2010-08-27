@@ -50,8 +50,8 @@ import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputAccessMode;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
-import org.ow2.proactive.scheduler.flow.FlowBlock;
-import org.ow2.proactive.scheduler.flow.FlowScript;
+import org.ow2.proactive.scheduler.common.task.flow.FlowBlock;
+import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
 
 import functionalTests.FunctionalTest;
 import functionaltests.SchedulerTHelper;

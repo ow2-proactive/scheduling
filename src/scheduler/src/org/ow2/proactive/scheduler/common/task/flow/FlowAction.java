@@ -34,7 +34,7 @@
  * ################################################################
  * $$ACTIVEEON_INITIAL_DEV$$
  */
-package org.ow2.proactive.scheduler.flow;
+package org.ow2.proactive.scheduler.common.task.flow;
 
 import java.io.Serializable;
 

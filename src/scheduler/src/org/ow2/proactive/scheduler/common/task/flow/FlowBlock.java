@@ -34,38 +34,39 @@
  * ################################################################
  * $$ACTIVEEON_INITIAL_DEV$$
  */
+package org.ow2.proactive.scheduler.common.task.flow;
 
-package org.ow2.proactive.scheduler.flow;
+import org.objectweb.proactive.annotation.PublicAPI;
+
 
 /**
- * Control Flow Action types
- *
+ * Possible values for Task Block declaration
+ * <p>
+ * Each Task can hold a FlowBlock element;
+ * at least two tasks are needed to create a Task Block
+ * 
  * 
  * @author The ProActive Team
  * @since ProActive Scheduling 2.2
  * 
  */
-public enum FlowActionType {
+@PublicAPI
+public enum FlowBlock {
 
-    /** 
-     * Fallback case: no action is performed
+    /**
+     * No specific block information
      */
-    CONTINUE("continue"),
+    NONE("none"),
 
-    /** 
-     * Exclusive branching with optional join
+    /**
+     * Marks the beginning of a new block
      */
-    IF("if"),
+    START("start"),
 
-    /** 
-     * Parallel split with join
+    /**
+     * Marks the ending of the last opened block
      */
-    DUPLICATE("duplicate"),
-
-    /** 
-     * Loop back in the flow to a previously executed task
-     */
-    LOOP("loop");
+    END("end");
 
     private String str = "";
 
@@ -74,7 +75,7 @@ public enum FlowActionType {
      * 
      * @param str string representation
      */
-    private FlowActionType(String str) {
+    private FlowBlock(String str) {
         this.str = str;
     }
 
@@ -84,23 +85,21 @@ public enum FlowActionType {
     }
 
     /**
-     * Parses a string containing the textual representation of a FlowActionType
+     * Parses a string containing the textual representation of a FlowBlock
      * 
      * @param str the string to parse
-     * @return the type reflected by the string, or continue if none matches
+     * @return the type reflected by the string, or NONE if none matches
      */
-    public static FlowActionType parse(String str) {
+    public static FlowBlock parse(String str) {
         if (str == null) {
-            return FlowActionType.CONTINUE;
+            return FlowBlock.NONE;
         }
-        if (str.equalsIgnoreCase(FlowActionType.IF.toString())) {
-            return FlowActionType.IF;
-        } else if (str.equalsIgnoreCase(FlowActionType.DUPLICATE.toString())) {
-            return FlowActionType.DUPLICATE;
-        } else if (str.equalsIgnoreCase(FlowActionType.LOOP.toString())) {
-            return FlowActionType.LOOP;
+        if (str.equalsIgnoreCase(FlowBlock.START.toString())) {
+            return FlowBlock.START;
+        } else if (str.equalsIgnoreCase(FlowBlock.END.toString())) {
+            return FlowBlock.END;
         } else {
-            return FlowActionType.CONTINUE;
+            return FlowBlock.NONE;
         }
     }
 

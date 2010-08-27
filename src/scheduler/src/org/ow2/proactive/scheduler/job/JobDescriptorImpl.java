@@ -55,9 +55,13 @@ import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobType;
 import org.ow2.proactive.scheduler.common.task.EligibleTaskDescriptor;
+import org.ow2.proactive.scheduler.common.task.Task;
 import org.ow2.proactive.scheduler.common.task.TaskDescriptor;
 import org.ow2.proactive.scheduler.common.task.TaskId;
+import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
+import org.ow2.proactive.scheduler.common.task.flow.FlowActionType;
+import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
 import org.ow2.proactive.scheduler.task.EligibleTaskDescriptorImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
@@ -152,7 +156,7 @@ public class JobDescriptorImpl implements JobDescriptor {
             //if this task is a first task, put it in eligible tasks list
             EligibleTaskDescriptor lt = new EligibleTaskDescriptorImpl(td);
 
-            if (td.isEntryPoint()) {
+            if (isEntryPoint(td, job.getITasks())) {
                 eligibleTasks.put(td.getId(), lt);
             }
 
@@ -178,6 +182,52 @@ public class JobDescriptorImpl implements JobDescriptor {
                 }
             }
         }
+    }
+
+    /**
+     * Tags all startable tasks as entry point
+     * a startable task : has no dependency, and is not target of an if control flow action
+     * 
+     * @param t a Task
+     * @param otherTasks the other tasks contained in the job containing task t
+     * @return true if t is an entry point among all tasks in otherTasks, or false
+     */
+    private boolean isEntryPoint(InternalTask t, List<InternalTask> otherTasks) {
+        List<TaskState> deps = t.getDependences();
+        boolean entryPoint = false;
+
+        // an entry point has no dependency
+        if (deps == null || deps.size() == 0) {
+            entryPoint = true;
+        } else {
+            return false;
+        }
+
+        // a entry point is not target of an if
+        for (Task t2 : otherTasks) {
+            if (t.equals(t2)) {
+                continue;
+            }
+            FlowScript sc = t2.getFlowScript();
+            if (sc != null) {
+                String actionType = sc.getActionType();
+                if (FlowActionType.parse(actionType).equals(FlowActionType.IF)) {
+                    String tIf = sc.getActionTarget();
+                    String tElse = sc.getActionTargetElse();
+                    String tJoin = sc.getActionJoin();
+                    if (tIf != null && tIf.equals(t.getName())) {
+                        return false;
+                    }
+                    if (tElse != null && tElse.equals(t.getName())) {
+                        return false;
+                    }
+                    if (tJoin != null && tJoin.equals(t.getName())) {
+                        return false;
+                    }
+                }
+            }
+        }
+        return entryPoint;
     }
 
     /**

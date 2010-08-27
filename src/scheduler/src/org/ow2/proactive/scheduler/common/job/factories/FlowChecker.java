@@ -34,7 +34,7 @@
  * ################################################################
  * $$ACTIVEEON_INITIAL_DEV$$
  */
-package org.ow2.proactive.scheduler.flow;
+package org.ow2.proactive.scheduler.common.job.factories;
 
 import java.util.ArrayList;
 import java.util.EmptyStackException;
@@ -46,9 +46,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.Task;
 import org.ow2.proactive.scheduler.common.task.TaskId;
+import org.ow2.proactive.scheduler.common.task.flow.FlowActionType;
+import org.ow2.proactive.scheduler.common.task.flow.FlowBlock;
 
 
 /**
@@ -62,6 +65,7 @@ import org.ow2.proactive.scheduler.common.task.TaskId;
  * @since ProActive Scheduling 2.2
  * 
  */
+@PublicAPI
 public class FlowChecker {
 
     /**
@@ -141,7 +145,11 @@ public class FlowChecker {
      */
     private FlowChecker(TaskFlowJob job, List<Block> blocks) throws FlowError {
         this.job = job;
-        this.blocks = blocks;
+        if (blocks != null) {
+            this.blocks = blocks;
+        } else {
+            this.blocks = new ArrayList<Block>();
+        }
         blocks.clear();
         createTaskTree(job);
     }
@@ -156,8 +164,7 @@ public class FlowChecker {
      * @return a FlowError if the Job is not valid, or null if it is valid.
      */
     public static FlowError validate(TaskFlowJob job) {
-        List<Block> blocks = new ArrayList<Block>();
-        return validate(job, blocks);
+        return validate(job, null);
     }
 
     /**

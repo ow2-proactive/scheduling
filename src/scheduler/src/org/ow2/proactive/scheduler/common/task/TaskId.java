@@ -40,7 +40,7 @@ import java.io.Serializable;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.scheduler.common.job.JobId;
-import org.ow2.proactive.scheduler.flow.FlowActionType;
+import org.ow2.proactive.scheduler.common.task.flow.FlowActionType;
 
 
 /**

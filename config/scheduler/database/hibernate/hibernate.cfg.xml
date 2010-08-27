@@ -67,10 +67,10 @@
         <mapping class="org.ow2.proactive.scheduler.common.task.dataspaces.FileSelector"/>
         <mapping class="org.ow2.proactive.scheduler.common.task.dataspaces.InputSelector"/>
         <mapping class="org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector"/>
+		<mapping class="org.ow2.proactive.scheduler.common.task.flow.FlowAction"/>
+		<mapping class="org.ow2.proactive.scheduler.common.task.flow.FlowScript"/>
         <mapping class="org.ow2.proactive.scheduler.task.TaskInfoImpl"/>
         <mapping class="org.ow2.proactive.scheduler.task.TaskIdImpl"/>
-		<mapping class="org.ow2.proactive.scheduler.flow.FlowAction"/>
-		<mapping class="org.ow2.proactive.scheduler.flow.FlowScript"/>
         <!-- UTIL -->
         <mapping class="org.ow2.proactive.scheduler.common.task.util.BooleanWrapper"/>
         <mapping class="org.ow2.proactive.scheduler.common.task.util.IntegerWrapper"/>

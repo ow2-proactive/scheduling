@@ -47,10 +47,10 @@ import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.common.task.flow.FlowActionType;
+import org.ow2.proactive.scheduler.common.task.flow.FlowBlock;
+import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
-import org.ow2.proactive.scheduler.flow.FlowActionType;
-import org.ow2.proactive.scheduler.flow.FlowBlock;
-import org.ow2.proactive.scheduler.flow.FlowScript;
 import org.ow2.proactive.scripting.SimpleScript;
 
 import functionalTests.FunctionalTest;

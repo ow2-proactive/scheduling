@@ -34,61 +34,78 @@
  * ################################################################
  * $$ACTIVEEON_INITIAL_DEV$$
  */
-package org.ow2.proactive.scheduler.flow;
 
-import java.util.ArrayList;
-import java.util.List;
+package org.ow2.proactive.scheduler.common.task.flow;
+
+import org.objectweb.proactive.annotation.PublicAPI;
 
 
 /**
- * Exception thrown upon detection of an invalid workflow
+ * Control Flow Action types
+ *
  * 
- *  
  * @author The ProActive Team
  * @since ProActive Scheduling 2.2
  * 
  */
-public class FlowError extends Exception {
+@PublicAPI
+public enum FlowActionType {
 
-    private List<String> tasks;
+    /** 
+     * Fallback case: no action is performed
+     */
+    CONTINUE("continue"),
+
+    /** 
+     * Exclusive branching with optional join
+     */
+    IF("if"),
+
+    /** 
+     * Parallel split with join
+     */
+    DUPLICATE("duplicate"),
+
+    /** 
+     * Loop back in the flow to a previously executed task
+     */
+    LOOP("loop");
+
+    private String str = "";
 
     /**
      * Default constructor
      * 
-     * @param reason informative message
+     * @param str string representation
      */
-    public FlowError(String reason) {
-        super(reason);
-        this.tasks = new ArrayList<String>();
+    private FlowActionType(String str) {
+        this.str = str;
+    }
+
+    @Override
+    public String toString() {
+        return this.str;
     }
 
     /**
-     * Default constructor
+     * Parses a string containing the textual representation of a FlowActionType
      * 
-     * @param reason informative message
-     * @param e chained exception
+     * @param str the string to parse
+     * @return the type reflected by the string, or continue if none matches
      */
-    public FlowError(String reason, Exception e) {
-        super(reason, e);
-        this.tasks = new ArrayList<String>();
-    }
-
-    /**
-     * Gives hint to the probable cause of the error by adding
-     * task names as String to this FlowError.
-     * 
-     * @param cause add this task name to the causes
-     */
-    public void addTask(String cause) {
-        tasks.add(cause);
-    }
-
-    /**
-     * @return a List of String representing Task names hinting for a probable
-     * cause for the error
-     */
-    public List<String> getTasks() {
-        return this.tasks;
+    public static FlowActionType parse(String str) {
+        if (str == null) {
+            return FlowActionType.CONTINUE;
+        }
+        if (str.equalsIgnoreCase(FlowActionType.IF.toString())) {
+            return FlowActionType.IF;
+        } else if (str.equalsIgnoreCase(FlowActionType.DUPLICATE.toString())) {
+            return FlowActionType.DUPLICATE;
+        } else if (str.equalsIgnoreCase(FlowActionType.LOOP.toString())) {
+            return FlowActionType.LOOP;
+        } else {
+            return FlowActionType.CONTINUE;
+        }
     }
 
 }

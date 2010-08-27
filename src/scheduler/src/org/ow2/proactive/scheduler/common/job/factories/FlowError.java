@@ -34,73 +34,65 @@
  * ################################################################
  * $$ACTIVEEON_INITIAL_DEV$$
  */
-package org.ow2.proactive.scheduler.flow;
+package org.ow2.proactive.scheduler.common.job.factories;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 
 
 /**
- * Possible values for Task Block declaration
- * <p>
- * Each Task can hold a FlowBlock element;
- * at least two tasks are needed to create a Task Block
+ * Exception thrown upon detection of an invalid workflow,
+ * see {@link FlowChecker#validate(org.ow2.proactive.scheduler.common.job.TaskFlowJob)}
  * 
- * 
+ *  
  * @author The ProActive Team
  * @since ProActive Scheduling 2.2
  * 
  */
 @PublicAPI
-public enum FlowBlock {
+public class FlowError extends Exception {
 
-    /**
-     * No specific block information
-     */
-    NONE("none"),
-
-    /**
-     * Marks the beginning of a new block
-     */
-    START("start"),
-
-    /**
-     * Marks the ending of the last opened block
-     */
-    END("end");
-
-    private String str = "";
+    private List<String> tasks;
 
     /**
      * Default constructor
      * 
-     * @param str string representation
+     * @param reason informative message
      */
-    private FlowBlock(String str) {
-        this.str = str;
-    }
-
-    @Override
-    public String toString() {
-        return this.str;
+    public FlowError(String reason) {
+        super(reason);
+        this.tasks = new ArrayList<String>();
     }
 
     /**
-     * Parses a string containing the textual representation of a FlowBlock
+     * Default constructor
      * 
-     * @param str the string to parse
-     * @return the type reflected by the string, or NONE if none matches
+     * @param reason informative message
+     * @param e chained exception
      */
-    public static FlowBlock parse(String str) {
-        if (str == null) {
-            return FlowBlock.NONE;
-        }
-        if (str.equalsIgnoreCase(FlowBlock.START.toString())) {
-            return FlowBlock.START;
-        } else if (str.equalsIgnoreCase(FlowBlock.END.toString())) {
-            return FlowBlock.END;
-        } else {
-            return FlowBlock.NONE;
-        }
+    public FlowError(String reason, Exception e) {
+        super(reason, e);
+        this.tasks = new ArrayList<String>();
+    }
+
+    /**
+     * Gives hint to the probable cause of the error by adding
+     * task names as String to this FlowError.
+     * 
+     * @param cause add this task name to the causes
+     */
+    public void addTask(String cause) {
+        tasks.add(cause);
+    }
+
+    /**
+     * @return a List of String representing Task names hinting for a probable
+     * cause for the error
+     */
+    public List<String> getTasks() {
+        return this.tasks;
     }
 
 }

@@ -41,7 +41,7 @@ import java.util.List;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.job.JobId;
-import org.ow2.proactive.scheduler.flow.FlowActionType;
+import org.ow2.proactive.scheduler.common.task.flow.FlowActionType;
 
 
 /**
@@ -125,18 +125,6 @@ public abstract class TaskState extends Task implements Comparable<TaskState> {
      */
     @Override
     public void addDependences(List<Task> tasks) {
-        throw new IllegalStateException("This method cannot be used on a submitted task");
-    }
-
-    /**
-     * If the Task was submitted, a call to this method will throw a
-     * RuntimeException.
-     * 
-     * @param e true if the task should be an entry point for the job, or false
-     * @throws IllegalStateException if this task was already submitted to the scheduler
-     */
-    @Override
-    public void setEntryPoint(boolean e) {
         throw new IllegalStateException("This method cannot be used on a submitted task");
     }
 
