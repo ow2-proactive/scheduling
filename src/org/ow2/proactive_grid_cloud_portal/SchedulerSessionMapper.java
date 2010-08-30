@@ -4,7 +4,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.objectweb.proactive.core.security.crypto.Session;
 import org.ow2.proactive.scheduler.common.Scheduler;
 
 

@@ -13,9 +13,11 @@ Supported  URL
 
 Scheduler 
   /login                        POST username&password, return sessionid
-  /jobs                         list job by ids
+  /jobsids                      list job by ids
+  /jobs                         list job by ids+additional data 
   /jobs/{id}                    describe the job 'id'
-  /jobs/{id}/tasks              list job's tasks
+  /jobs/{id}/tasks              list job's tasks + additional data
+  /jobs/{id}/tasksids           list job's tasks by id
   /jobs/{id}/tasks/{tasksid}    describe task {taskid} of job {id}
   /jobs/{id}/tasks/{tasksid}/result    return the result of the task {taskid} of the job {id}
 
@@ -27,7 +29,7 @@ Resource Manager
 
 So far, the scheduler and the resource manager urls are hard-coded within the source, edit then compile the war file and deploy it.
 
-The Scheduler and the resource manager login mechanism are seperate processes.
+The Scheduler and the resource manager login mechanism are separate processes.
 One must log on on each subsystem to be able to query REST commands.
 When a user logs on, a session id is returned and must be send within the header of any call otherwise an 401 (unauthorized) error is thrown.
 
@@ -48,11 +50,11 @@ curl -H "sessionid:1" -F 'file=<Job_2_tasks.xml' http://localhost:8080/proactive
 
 
 #list jobs (pending, running, finished)
-curl -H "sessionid:1" -H "Accept: application/json" http://localhost:8080/proactive_grid_cloud_portal/jobs/ 
+curl -H "sessionid:1" -H "Accept: application/json" http://localhost:8080/proactive_grid_cloud_portal/jobsids/ 
 
 # list job 10's tasks 
 
-curl -H "sessionid:1" -H "Accept: application/json" http://localhost:8080/proactive_grid_cloud_portal/jobs/12/tasks
+curl -H "sessionid:1" -H "Accept: application/json" http://localhost:8080/proactive_grid_cloud_portal/jobs/12/tasksids
 
 
 #delete a job

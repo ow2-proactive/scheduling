@@ -235,7 +235,6 @@ public class SchedulerStateRest {
     public Serializable taskresult(@HeaderParam("sessionid") String sessionId,
             @PathParam("jobid") String jobId, @PathParam("taskid") String taskId) throws Throwable {
         Scheduler s = checkAccess(sessionId);
-        JobState jobState;
         try {
             TaskResult tr = s.getTaskResult(jobId, taskId);
             return tr.value();
