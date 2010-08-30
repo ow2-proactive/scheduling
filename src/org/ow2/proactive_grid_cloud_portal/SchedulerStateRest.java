@@ -33,8 +33,7 @@ public class SchedulerStateRest {
     @Path("/jobsids")
     @Produces("application/json")
     public List<String> getJobsIds(@HeaderParam("sessionid") String sessionId) {
-        Scheduler s = SchedulerSessionMapper.getInstance().getSessionsMap().get(sessionId);
-        System.out.println("sessionid " + sessionId);
+        Scheduler s = checkAccess(sessionId);
         try {
             List<JobState> jobs = new ArrayList<JobState>();
 
@@ -49,18 +48,11 @@ public class SchedulerStateRest {
 
             return names;
         } catch (NotConnectedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            handleNotConnectedException(sessionId);
         } catch (PermissionException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            handlePermissionException(sessionId, "list jobs by ids");
         }
         return null;
-        /*
-         * try { return s.getState().toString(); } catch (NotConnectedException e) { // TODO
-         * Auto-generated catch block e.printStackTrace(); } catch (PermissionException e) {
-         * e.printStackTrace(); } return "";
-         */
     }
 
     @GET
@@ -81,11 +73,9 @@ public class SchedulerStateRest {
             }
             return jobInfoList;
         } catch (NotConnectedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            handleNotConnectedException(sessionId);
         } catch (PermissionException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            handlePermissionException(sessionId, "list jobs");
         }
         return null;
 
@@ -93,23 +83,21 @@ public class SchedulerStateRest {
 
     @GET
     @Path("/jobs/{jobid}")
+    @Produces("application/json")
     public JobState job(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId) {
         Scheduler s = checkAccess(sessionId);
         try {
-            JobState js = s.getJobState(jobId);
-            System.out.println(js);
+            JobState js;
+            js = s.getJobState(jobId);
             return PAFuture.getFutureValue(js);
         } catch (NotConnectedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (UnknownJobException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-
+            handleNotConnectedException(sessionId);
         } catch (PermissionException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            handlePermissionException(sessionId, "get description for the job " + jobId);
+        } catch (UnknownJobException e) {
+            handleUnknowJobException(sessionId, jobId);
         }
+        // somehow impossible to reach
         return null;
     }
 
@@ -120,15 +108,11 @@ public class SchedulerStateRest {
         try {
             return PAFuture.getFutureValue(s.getJobResult(jobId));
         } catch (NotConnectedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (UnknownJobException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-
+            handleNotConnectedException(sessionId);
         } catch (PermissionException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            handlePermissionException(sessionId, "get result for the job " + jobId);
+        } catch (UnknownJobException e) {
+            handleUnknowJobException(sessionId, jobId);
         }
         return null;
     }
@@ -140,15 +124,11 @@ public class SchedulerStateRest {
         try {
             s.removeJob(jobId);
         } catch (NotConnectedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (UnknownJobException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-
+            handleNotConnectedException(sessionId);
         } catch (PermissionException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            handlePermissionException(sessionId, "remove the job" + jobId);
+        } catch (UnknownJobException e) {
+            handleUnknowJobException(sessionId, jobId);
         }
         return false;
     }
@@ -160,15 +140,11 @@ public class SchedulerStateRest {
         try {
             s.killJob(jobId);
         } catch (NotConnectedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (UnknownJobException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-
+            handleNotConnectedException(sessionId);
         } catch (PermissionException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            handlePermissionException(sessionId, "kill the job " + jobId);
+        } catch (UnknownJobException e) {
+            handleUnknowJobException(sessionId, jobId);
         }
 
     }
@@ -188,14 +164,11 @@ public class SchedulerStateRest {
 
             return tasksName;
         } catch (NotConnectedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (UnknownJobException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            handleNotConnectedException(sessionId);
         } catch (PermissionException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            handlePermissionException(sessionId, "get the tasks'ids of the job " + jobId);
+        } catch (UnknownJobException e) {
+            handleUnknowJobException(sessionId, jobId);
         }
         return null;
     }
@@ -209,23 +182,18 @@ public class SchedulerStateRest {
         try {
             jobState = s.getJobState(jobId);
 
-            List<String> tasksName = new ArrayList<String>();
             for (TaskState ts : jobState.getTasks()) {
                 if (ts.getId().getReadableName().equals(taskid)) {
-                    System.out.println(ts);
                     return ts;
                 }
             }
 
         } catch (NotConnectedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (UnknownJobException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            handleNotConnectedException(sessionId);
         } catch (PermissionException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            handlePermissionException(sessionId, "get description for the task " + taskid);
+        } catch (UnknownJobException e) {
+            handleUnknowJobException(sessionId, jobId);
         }
         return null;
     }
@@ -239,17 +207,13 @@ public class SchedulerStateRest {
             TaskResult tr = s.getTaskResult(jobId, taskId);
             return tr.value();
         } catch (NotConnectedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (UnknownJobException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            handleNotConnectedException(sessionId);
         } catch (PermissionException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            handlePermissionException(sessionId, "get the result of the task " + taskId);
+        } catch (UnknownJobException e) {
+            handleUnknowJobException(sessionId, jobId);
         } catch (UnknownTaskException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            handleUnknowTaskException(sessionId, taskId);
         }
         return null;
     }
@@ -262,7 +226,7 @@ public class SchedulerStateRest {
      * @return the scheduler linked to the session id, an WebApplicationException, if no 
      * such mapping exists.
      */
-    public Scheduler checkAccess(String sessionId) throws WebApplicationException{
+    public Scheduler checkAccess(String sessionId) throws WebApplicationException {
         Scheduler s = SchedulerSessionMapper.getInstance().getSessionsMap().get(sessionId);
 
         if (s == null) {
@@ -273,6 +237,45 @@ public class SchedulerStateRest {
         return s;
     }
 
+    /**
+     * @param sessionId
+     * @throws WebApplicationException http status code 401 Unauthorized
+     */
+    public void handleNotConnectedException(String sessionId) throws WebApplicationException {
+        throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_UNAUTHORIZED)
+                .entity("you are not connected, try to log in first").build());
+    }
+
+    /**
+     * @param sessionId
+     * @param message
+     * @throws WebApplicationException http status code 403 Forbidden
+     */
+    public void handlePermissionException(String sessionId, String message) throws WebApplicationException {
+        throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_FORBIDDEN)
+                .entity("you are not authorized to perform the action:" + message).build());
+    }
+
+    /**
+     * @param sessionId
+     * @param jobId
+     * @throws WebApplicationException http status code 404 Not Found
+     */
+    public void handleUnknowJobException(String sessionId, String jobId) throws WebApplicationException {
+        throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_NOT_FOUND)
+                .entity("job " + jobId + "not found").build());
+    }
+
+    /**
+     * @param sessionId
+     * @param taskId
+     * @throws WebApplicationException http status code 404 Not Found
+     */
+    public void handleUnknowTaskException(String sessionId, String taskId) throws WebApplicationException {
+        throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_NOT_FOUND)
+                .entity("task " + taskId + "not found").build());
+    }
+
     @POST
     @Path("/jobs/{jobid}/pause")
     public boolean pauseJob(@HeaderParam("sessionid") final String sessionId,
@@ -281,11 +284,11 @@ public class SchedulerStateRest {
         try {
             return s.pauseJob(jobId);
         } catch (NotConnectedException e) {
-            e.printStackTrace();
-        } catch (UnknownJobException e) {
-            e.printStackTrace();
+            handleNotConnectedException(sessionId);
         } catch (PermissionException e) {
-            e.printStackTrace();
+            handlePermissionException(sessionId, "to pause the job " + jobId);
+        } catch (UnknownJobException e) {
+            handleUnknowJobException(sessionId, jobId);
         }
         return false;
     }
@@ -298,11 +301,11 @@ public class SchedulerStateRest {
         try {
             return s.resumeJob(jobId);
         } catch (NotConnectedException e) {
-            e.printStackTrace();
-        } catch (UnknownJobException e) {
-            e.printStackTrace();
+            handleNotConnectedException(sessionId);
         } catch (PermissionException e) {
-            e.printStackTrace();
+            handlePermissionException(sessionId, "to resume the job " + jobId);
+        } catch (UnknownJobException e) {
+            handleUnknowJobException(sessionId, jobId);
         }
         return false;
     }
