@@ -255,7 +255,15 @@ public class SchedulerStateRest {
         return null;
     }
 
-    public Scheduler checkAccess(String sessionId) {
+    /**
+     * the method check is the session id is valid i.e. a scheduler client
+     * is associated to the session id in the session map. If not, a WebApplicationException 
+     * is thrown specifying the invalid access      *  
+     * @param sessionId
+     * @return the scheduler linked to the session id, an WebApplicationException, if no 
+     * such mapping exists.
+     */
+    public Scheduler checkAccess(String sessionId) throws WebApplicationException{
         Scheduler s = SchedulerSessionMapper.getInstance().getSessionsMap().get(sessionId);
 
         if (s == null) {
