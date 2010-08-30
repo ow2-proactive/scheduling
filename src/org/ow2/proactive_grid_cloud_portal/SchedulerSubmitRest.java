@@ -20,30 +20,28 @@ import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.factories.JobFactory;
 
+
 @Path("/")
 public class SchedulerSubmitRest {
 
-    
     @POST
     @Path("/submit")
-    public  JobId jobs(@HeaderParam("sessionid") String sessionId, MultipartInput multipart) {
+    public JobId jobs(@HeaderParam("sessionid") String sessionId, MultipartInput multipart) {
         Scheduler s = SchedulerSessionMapper.getInstance().getSessionsMap().get(sessionId);
         System.out.println("sessionid " + sessionId);
         File tmp;
         try {
             tmp = File.createTempFile("prefix", "suffix");
-            for (InputPart part : multipart.getParts())
-                  {
-            
-                    BufferedWriter outf = new BufferedWriter(new FileWriter(tmp));
-                    outf.write(part.getBodyAsString());
-                    outf.close();
-            
-                  }
-        
-      
-           Job j=  JobFactory.getFactory().createJob(tmp.getAbsolutePath());
-           return s.submit(j);
+            for (InputPart part : multipart.getParts()) {
+
+                BufferedWriter outf = new BufferedWriter(new FileWriter(tmp));
+                outf.write(part.getBodyAsString());
+                outf.close();
+
+            }
+
+            Job j = JobFactory.getFactory().createJob(tmp.getAbsolutePath());
+            return s.submit(j);
         } catch (JobCreationException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -60,8 +58,8 @@ public class SchedulerSubmitRest {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        
+
         return null;
-        }
-    
+    }
+
 }

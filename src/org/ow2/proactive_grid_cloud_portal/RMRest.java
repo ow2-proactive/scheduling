@@ -14,32 +14,29 @@ import org.ow2.proactive.resourcemanager.common.event.RMInitialState;
 import org.ow2.proactive.resourcemanager.frontend.RMMonitoring;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 
+
 @Path("/rm")
 public class RMRest {
 
     @POST
     @Path("login")
-    public String rmConnect(@FormParam("username") String username, 
-                          @FormParam("password") String password) {
-        
+    public String rmConnect(@FormParam("username") String username, @FormParam("password") String password) {
+
         try {
-            
-            RMProxy rm =  PAActiveObject.newActive(
-                    RMProxy.class, new Object[] {});
-        
+
+            RMProxy rm = PAActiveObject.newActive(RMProxy.class, new Object[] {});
+
             rm.init("rmi://localhost:1099/RM", username, password);
-        
-        return ""+RMSessionMapper.getInstance().add(rm);
-        
+
+            return "" + RMSessionMapper.getInstance().add(rm);
+
         } catch (Throwable e) {
             e.printStackTrace();
             throw new UnauthorizedException(e);
         }
-       
 
     }
-    
-    
+
     @GET
     @Path("state")
     public RMState getState(@HeaderParam("sessionid") String sessionId) {
@@ -47,10 +44,10 @@ public class RMRest {
         if (rm == null) {
             throw new UnauthorizedException();
         }
-        
-        return  PAFuture.getFutureValue(rm.getState());
+
+        return PAFuture.getFutureValue(rm.getState());
     }
-    
+
     @GET
     @Path("monitoring")
     public RMInitialState getInitialState(@HeaderParam("sessionid") String sessionId) {
@@ -60,18 +57,15 @@ public class RMRest {
         }
         return PAFuture.getFutureValue(rm.getMonitoring().getState());
     }
- 
+
     @POST
     @Path("node")
-    public boolean  addNode(@HeaderParam("sessionid") String sessionId, @FormParam("nodeurl") String nodeUrl) {
+    public boolean addNode(@HeaderParam("sessionid") String sessionId, @FormParam("nodeurl") String nodeUrl) {
         ResourceManager rm = RMSessionMapper.getInstance().getSessionsMap().get(sessionId);
         if (rm == null) {
             throw new UnauthorizedException();
         }
         return rm.addNode(nodeUrl).booleanValue();
     }
-    
-    
-    
-    
+
 }

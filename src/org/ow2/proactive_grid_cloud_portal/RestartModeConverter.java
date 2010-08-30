@@ -7,15 +7,12 @@ import org.ow2.proactive.scheduler.common.task.RestartMode;
 
 
 @Provider
-public class RestartModeConverter implements StringConverter<RestartMode>
-{
-   public RestartMode fromString(String str)
-   {
-      return RestartMode.getMode(str);
-   }
+public class RestartModeConverter implements StringConverter<RestartMode> {
+    public RestartMode fromString(String str) {
+        return RestartMode.getMode(str);
+    }
 
-   public String toString(RestartMode value)
-   {
-      return value.toString();
-   }
+    public String toString(RestartMode value) {
+        return value.toString();
+    }
 }

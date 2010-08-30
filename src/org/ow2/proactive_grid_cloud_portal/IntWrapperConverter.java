@@ -8,15 +8,12 @@ import org.ow2.proactive.scheduler.common.task.RestartMode;
 
 
 @Provider
-public class IntWrapperConverter implements StringConverter<IntWrapper>
-{
-   public IntWrapper fromString(String str)
-   {
-      return new IntWrapper(Integer.parseInt(str));
-   }
+public class IntWrapperConverter implements StringConverter<IntWrapper> {
+    public IntWrapper fromString(String str) {
+        return new IntWrapper(Integer.parseInt(str));
+    }
 
-   public String toString(IntWrapper value)
-   {
-      return value.toString();
-   }
+    public String toString(IntWrapper value) {
+        return value.toString();
+    }
 }

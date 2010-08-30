@@ -20,28 +20,27 @@ import org.ow2.proactive.resourcemanager.nodesource.common.PluginDescriptor;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.utils.NodeSet;
 
-public class RMProxy implements ResourceManager{
+
+public class RMProxy implements ResourceManager {
 
     private ResourceManager target;
 
     private String rmUrl;
     private String userName;
     private String password;
-    
-    
-    public boolean init(String url, String user, String pwd) throws RMException, KeyException, LoginException  {
+
+    public boolean init(String url, String user, String pwd) throws RMException, KeyException, LoginException {
         this.rmUrl = url;
         this.userName = user;
         this.password = pwd;
 
-            RMAuthentication rmAuth = RMConnection.join("rmi://dalek.activeeon.com:1099/");
-            Credentials cred = Credentials.createCredentials("admin", "admin", rmAuth.getPublicKey());
-            target = rmAuth.login(cred);
-     
+        RMAuthentication rmAuth = RMConnection.join("rmi://dalek.activeeon.com:1099/");
+        Credentials cred = Credentials.createCredentials("admin", "admin", rmAuth.getPublicKey());
+        target = rmAuth.login(cred);
+
         return true;
     }
-    
-    
+
     public BooleanWrapper addNode(String arg0) {
         return target.addNode(arg0);
     }

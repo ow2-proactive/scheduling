@@ -20,37 +20,40 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.ext.filessplitmerge.schedulertools.SchedulerProxyUserInterface;
 
+
 @Path("/login")
 public class Login {
 
     @POST
-   
-    public String login(@FormParam("username") String username, 
-            @FormParam("password") String password) throws UnauthorizedException{
-        
+    public String login(@FormParam("username") String username, @FormParam("password") String password) {
+
         try {
-            
-            SchedulerProxyUserInterface scheduler =  PAActiveObject.newActive(
+
+            SchedulerProxyUserInterface scheduler = PAActiveObject.newActive(
                     SchedulerProxyUserInterface.class, new Object[] {});
-        
+
             scheduler.init("rmi://localhost:1099/SCHEDULER", username, password);
-        
-        return ""+SchedulerSessionMapper.getInstance().add(scheduler);
-        
+
+            return "" + SchedulerSessionMapper.getInstance().add(scheduler);
+
         } catch (LoginException e) {
             e.printStackTrace();
-            throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_UNAUTHORIZED).entity("invalid login/password").build());
-// throw new UnauthorizedException(e);
+            throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_UNAUTHORIZED)
+                    .entity("invalid login/password").build());
+            // throw new UnauthorizedException(e);
         } catch (SchedulerException e) {
-            throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR).entity("no scheduler available").build());
+            throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
+                    .entity("no scheduler available").build());
         } catch (ActiveObjectCreationException e) {
-            throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR).entity("no scheduler available").build());        
+            throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
+                    .entity("no scheduler available").build());
         } catch (NodeException e) {
-            throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR).entity("no scheduler available").build());
-        } 
-        
+            throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
+                    .entity("no scheduler available").build());
+        }
+
     }
-    
+
     public static void main(String[] args) {
         GetMethod method = new GetMethod("http://localhost:8080/proactive_grid_cloud_portal/jobs");
         method.addRequestHeader("sessionid", "1");
@@ -65,7 +68,6 @@ public class Login {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        
-        
+
     }
 }
