@@ -376,9 +376,13 @@ maxNodes serviceUrl userName password trustStore trustStorePassword javaPath rmP
 				construct the ssh command to launch remote JVMs. Java path and rm distribution path on remote hosts
 				have to be specified together with other parameters. Example:
 			</para>
-			<screen>$RM_HOME>./bin/unix/rm-client --createns sshns -infrastructure org.ow2.proactive.resourcemanager.nodesource.infrastructure.SSHInfrastructure JAVA_PATH RM_HOME rmi 1099 \"\" config/rm/deployment/hostslist</screen>
-			<para>This infrastructure needs 6 arguments, described hereafter:</para>
+			<para>This infrastructure needs 9 arguments, described hereafter:</para>
 			<itemizedlist>
+				<listitem>
+					<para>
+						<emphasis role="bold">SSH Options</emphasis> - Options you can pass to the SSHClient executable ( -l inria to specify the user for instance )
+					</para>
+				</listitem>
 				<listitem>
 					<para>
 						<emphasis role="bold">Java Path</emphasis> - Path to the java executable on the remote hosts.
@@ -391,17 +395,27 @@ maxNodes serviceUrl userName password trustStore trustStorePassword javaPath rmP
 				</listitem>
 				<listitem>
 					<para>
-						<emphasis role="bold">Protocol</emphasis> - Protocol (rmi, http...) used by the remote host to communicate with the RM.
+						<emphasis role="bold">Node Time Out</emphasis> - A duration after which one the remote nodes are considered to be lost.
 					</para>
 				</listitem>
 				<listitem>
 					<para>
-						<emphasis role="bold">Port</emphasis> - Port used by the remote host to communicate with the RM.
+						<emphasis role="bold">Target OS</emphasis> - One of 'LINUX', 'CYGWIN' or 'WINDOWS' depending on the machines' ( in Hosts List file ) operating system.
 					</para>
 				</listitem>
 				<listitem>
 					<para>
 						<emphasis role="bold">Java Options</emphasis> - Java options appended to the command used to start the node on the remote host.
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						<emphasis role="bold">Rm Url</emphasis> - The resource manager's url that will be used by the deployed nodes to register by themself.
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						<emphasis role="bold">Rm Credentials Path</emphasis> - The absolute path of the 'rm.cred' file to make the deployed nodes able to register to the resource manager ( config/authentication/rm.cred ).
 					</para>
 				</listitem>
 				<listitem>
