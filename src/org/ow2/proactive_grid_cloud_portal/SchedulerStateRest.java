@@ -172,6 +172,32 @@ public class SchedulerStateRest {
         }
         return null;
     }
+    
+    @GET
+    @Path("/jobs/{jobid}/tasks")
+    public List<TaskStateWrapper> getJobTasks(@HeaderParam("sessionid") String sessionId,
+            @PathParam("jobid") String jobId) {
+        Scheduler s = checkAccess(sessionId);
+        JobState jobState;
+        try {
+            jobState = s.getJobState(jobId);
+            List<TaskStateWrapper> taskW= new ArrayList<TaskStateWrapper>();
+            for (TaskState ts : jobState.getTasks()) {
+                taskW.add(new TaskStateWrapper(ts));
+            }
+            
+            
+            return taskW;
+        } catch (NotConnectedException e) {
+            handleNotConnectedException(sessionId);
+        } catch (PermissionException e) {
+            handlePermissionException(sessionId, "get the tasks'ids of the job " + jobId);
+        } catch (UnknownJobException e) {
+            handleUnknowJobException(sessionId, jobId);
+        }
+        return null;
+    }
+    
 
     @GET
     @Path("/jobs/{jobid}/tasks/{taskid}")
