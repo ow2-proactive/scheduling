@@ -171,10 +171,12 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
 
         for (JobState js : state.getPendingJobs()) {
             activeTask += js.getTotalNumberOfTasks();
+            activeTasks.put(js.getId(), js.getTotalNumberOfTasks());
         }
         for (JobState js : state.getRunningJobs()) {
-            activeTask += js.getNumberOfPendingTasks();
-            activeTask += js.getNumberOfRunningTasks();
+            int jobTasks = js.getNumberOfPendingTasks() + js.getNumberOfRunningTasks();
+            activeTask += jobTasks;
+            activeTasks.put(js.getId(), jobTasks);
         }
         nodeSourceName = nodeSource.getName();
 
@@ -344,9 +346,13 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
         switch (notification.getEventType()) {
             case TASK_RUNNING_TO_FINISHED:
                 JobId id = notification.getData().getJobId();
-                activeTasks.put(id, activeTasks.get(id) - 1);
-                activeTask--;
-                logger.debug("Task finished. Current number of tasks " + activeTask);
+                if (activeTasks.containsKey(id)) {
+                    activeTasks.put(id, activeTasks.get(id) - 1);
+                    activeTask--;
+                    logger.debug("Task finished. Current number of tasks " + activeTask);
+                } else {
+                    logger.error("Unknown job id " + id);
+                }
                 break;
         }
     }
