@@ -86,6 +86,9 @@ import org.ow2.proactive.utils.FileToBytesConverter;
  */
 public class SSHInfrastructure2 extends InfrastructureManager {
 
+    /**  */
+    private static final long serialVersionUID = 21L;
+
     /**
      * class' logger
      */
