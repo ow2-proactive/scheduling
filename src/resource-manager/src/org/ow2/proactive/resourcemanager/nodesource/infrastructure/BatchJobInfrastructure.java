@@ -296,10 +296,13 @@ public abstract class BatchJobInfrastructure extends InfrastructureManager {
                 try {
                     int exitCode = p.exitValue();
                     if (exitCode != 0 && !isJobIDValid) {
-                        logger.warn("SSH subprocess at " + host.getHostName() +
-                            " exit code != 0 but IM tries to recover from this error...Current jobID: " + id +
-                            " and associated node's name: " + nodeName);
-                        if (id.matches("\\d+[.]*.*")) {
+                        logger
+                                .warn("SSH subprocess at " +
+                                    host.getHostName() +
+                                    " exit code != 0 but IM tries to recover from this error...Current submit command's output: " +
+                                    id + " and associated node's name: " + nodeName);
+                        String extractedID = this.extractSubmitOutput(id);
+                        if (extractedID != null && !extractedID.equals("")) {
                             isJobIDValid = true;
                             if (expectedNodes.contains(nodeName)) {
                                 logger
@@ -374,7 +377,7 @@ public abstract class BatchJobInfrastructure extends InfrastructureManager {
 
             }
         }
-        addNodeAndDecrementPendingNode(nodeName, id);
+        addNodeAndDecrementPendingNode(nodeName, this.extractSubmitOutput(id));
     }
 
     @Override
@@ -382,7 +385,7 @@ public abstract class BatchJobInfrastructure extends InfrastructureManager {
         if (parameters != null && parameters.length >= 10) {
             int index = 0;
             this.javaPath = parameters[index++].toString();
-            if (!new File(this.javaPath).isAbsolute()) {
+            if (this.javaPath == null || this.javaPath.equals("")) {
                 this.javaPath = "java";
             }
             this.sshOptions = parameters[index++].toString();
@@ -561,6 +564,13 @@ public abstract class BatchJobInfrastructure extends InfrastructureManager {
      * @return target Batching Job System's name
      */
     protected abstract String getBatchinJobSystemName();
+
+    /**
+     * Parses the submit ({@link #getSubmitJobCommand()}) command output to extract job's ID.
+     * @param output the submit command output
+     * @return the job's ID in case of success, empty string or null if the method is unable to compute the job's ID.
+     */
+    protected abstract String extractSubmitOutput(String output);
 
     /**
      * Returns the path of the script used to start {@link PAAgentServiceRMStarter} on the
