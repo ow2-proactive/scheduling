@@ -101,7 +101,7 @@ public class SchedulerConnection extends Connection<SchedulerAuthenticationInter
         try {
             return getInstance().connect(normalizeScheduler(url));
         } catch (Exception e) {
-            throw new ConnectionException(e.getMessage());
+            throw new ConnectionException(e);
         }
     }
 
