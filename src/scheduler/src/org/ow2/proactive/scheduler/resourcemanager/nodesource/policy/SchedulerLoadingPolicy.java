@@ -294,8 +294,9 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
                 JobId jid = notification.getData().getJobId();
                 JobInfo ji = notification.getData();
                 int i = ji.getNumberOfPendingTasks() + ji.getNumberOfRunningTasks();
+                int oldActiveTask = activeTasks.get(jid);
                 activeTasks.put(jid, i);
-                activeTask = i;
+                activeTask += (i - oldActiveTask);
                 logger.debug("Tasks duplicated. Current number of tasks " + activeTask);
                 break;
         }

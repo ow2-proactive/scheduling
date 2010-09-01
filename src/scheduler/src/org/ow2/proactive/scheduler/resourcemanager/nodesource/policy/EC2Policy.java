@@ -347,8 +347,9 @@ public class EC2Policy extends SchedulerAwarePolicy implements InitActive, RunAc
                 JobId jid = notification.getData().getJobId();
                 JobInfo ji = notification.getData();
                 int i = ji.getNumberOfPendingTasks() + ji.getNumberOfRunningTasks();
+                int oldActiveTask = activeTasks.get(jid);
                 activeTasks.put(jid, i);
-                activeTask = i;
+                activeTask += (i - oldActiveTask);
                 logger.debug("Tasks duplicated. Current number of tasks " + activeTask);
                 break;
         }
