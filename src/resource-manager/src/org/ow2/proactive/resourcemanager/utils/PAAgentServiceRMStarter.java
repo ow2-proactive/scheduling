@@ -42,6 +42,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.GnuParser;
@@ -49,6 +51,8 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.Parser;
+import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.ow2.proactive.authentication.crypto.Credentials;
@@ -78,6 +82,9 @@ public final class PAAgentServiceRMStarter {
 
     /** Name of the java property to set the rank */
     private final static String RANK_PROP_NAME = "proactive.agent.rank";
+
+    /** class' logger */
+    private static final Logger logger = Logger.getLogger(RMLoggers.RMNODE);
 
     /**
      * The starter will try to connect to the Resource Manager before killing
@@ -118,6 +125,54 @@ public final class PAAgentServiceRMStarter {
      */
     public String getNodeURL() {
         return this.nodeURL;
+    }
+
+    /**
+     * To define the default log4j configuration if log4j.configuration property has not been set.
+     */
+    public static void checkLog4jConfiguration() {
+        try {
+            String log4jPath = System.getProperty("log4j.configuration");
+            if (log4jPath == null) {
+                //either sched-home/dist/lib/PA-RM.jar or sched-home/classes/resource-manager/
+                File origin = new File(PAAgentServiceRMStarter.class.getProtectionDomain().getCodeSource()
+                        .getLocation().getFile());
+                File parent = origin.getParentFile();
+                configuration: {
+                    while (parent != null && parent.isDirectory()) {
+                        File[] childs = parent.listFiles();
+                        for (File child : childs) {
+                            if ("config".equals(child.getName())) {
+                                //we have found the sched-home/config/ directory!
+                                log4jPath = child.getAbsolutePath() + File.separator + "log4j" +
+                                    File.separator + "rm-log4j-server";
+                                File log4j = new File(log4jPath);
+                                if (log4j.exists()) {
+                                    URL log4jURL;
+                                    try {
+                                        log4jURL = log4j.toURL();
+                                        PropertyConfigurator.configure(log4jURL);
+                                        System.setProperty("log4j.configuration", log4jPath);
+                                        logger.trace("log4j.configuration not set, " + log4jPath +
+                                            " defiined as default log4j configuration.");
+                                    } catch (MalformedURLException e) {
+                                        logger.trace("Cannot configure log4j", e);
+                                    }
+                                } else {
+                                    logger.trace("Log4J configuration not found. Cannot configure log4j");
+                                }
+                                break configuration;
+                            }
+                        }
+                        parent = parent.getParentFile();
+                    }
+                }
+            } else {
+                logger.trace("Does not override log4j.configuration");
+            }
+        } catch (Exception ex) {
+            logger.trace("Cannot set log4j Configuration", ex);
+        }
     }
 
     /**
@@ -202,6 +257,7 @@ public final class PAAgentServiceRMStarter {
      *            The arguments needed to join the Resource Manager
      */
     public static void main(final String args[]) {
+        checkLog4jConfiguration();
         Credentials credentials = null;
         String rmURL = PAAgentServiceRMStarter.DEFAULT_RM_URL;
         String nodeName = PAAgentServiceRMStarter.PAAGENT_DEFAULT_NODE_NAME;
