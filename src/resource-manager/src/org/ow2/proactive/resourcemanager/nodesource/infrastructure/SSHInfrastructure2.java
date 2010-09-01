@@ -714,7 +714,7 @@ public class SSHInfrastructure2 extends InfrastructureManager {
      */
     @Override
     public String toString() {
-        return "SSH Infrastructure";
+        return "SSH Infrastructure 2";
     }
 
     @Override

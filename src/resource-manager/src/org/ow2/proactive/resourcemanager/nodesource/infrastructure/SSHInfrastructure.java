@@ -77,6 +77,7 @@ import org.ow2.proactive.utils.FileToBytesConverter;
  * 
  * @author The ProActive Team
  * @since ProActive Scheduling 2.0
+ * @deprecated Use {@link SSHInfrastructure2} instead
  *
  */
 public class SSHInfrastructure extends InfrastructureManager {
@@ -420,7 +421,7 @@ public class SSHInfrastructure extends InfrastructureManager {
      * @return short description of the IM
      */
     public String getDescription() {
-        return "Creates remote runtimes using SSH";
+        return "[DEPRECATED : Use SSHInfrastructure2 instead] Creates remote runtimes using SSH";
     }
 
     /**
