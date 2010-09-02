@@ -48,6 +48,7 @@ import java.util.Stack;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
+import org.ow2.proactive.scheduler.common.job.factories.FlowError.FlowErrorType;
 import org.ow2.proactive.scheduler.common.task.Task;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.flow.FlowActionType;
@@ -210,17 +211,15 @@ public class FlowChecker {
 
             if (name.indexOf(TaskId.iterationSeparator) != -1) {
                 throw new FlowError("Task name cannot contain special character '" +
-                    TaskId.iterationSeparator + "':" + name);
+                    TaskId.iterationSeparator + "'", FlowErrorType.NAME, name);
             }
             if (name.indexOf(TaskId.duplicationSeparator) != -1) {
                 throw new FlowError("Task name cannot contain special character '" +
-                    TaskId.duplicationSeparator + "':" + name);
+                    TaskId.duplicationSeparator + "'", FlowErrorType.NAME, name);
             }
 
             if (tasks.contains(name)) {
-                FlowError err = new FlowError("Task names are not unique");
-                err.addTask(name);
-                throw err;
+                throw new FlowError("Task names are not unique", FlowErrorType.NAME, name);
             } else {
                 tasks.add(name);
             }
@@ -257,13 +256,11 @@ public class FlowChecker {
             }
         } while (change);
         if (reached.size() != job.getTasks().size()) {
-            FlowError err = new FlowError("Some tasks can not be reached");
             for (Task t : job.getTasks()) {
                 if (!reached.contains(t)) {
-                    err.addTask(t.getName());
+                    throw new FlowError("Unreachable task", FlowErrorType.UNREACHABLE, t.getName());
                 }
             }
-            throw err;
         }
     }
 
@@ -283,9 +280,8 @@ public class FlowChecker {
 
             dfsBlocks(tt, done, env, join);
             if (env.size() > 0) {
-                FlowError err = new FlowError("Unmatched start block");
-                err.addTask(env.firstElement().element.getName());
-                throw err;
+                throw new FlowError("Unmatched start block", FlowErrorType.BLOCK, env.firstElement().element
+                        .getName());
             }
         }
 
@@ -336,13 +332,9 @@ public class FlowChecker {
                 try {
                     start = env.pop();
                 } catch (EmptyStackException e) {
-                    FlowError err = new FlowError("Unmatched end block", e);
-                    err.addTask(name);
-                    throw err;
+                    throw new FlowError("Unmatched end block", FlowErrorType.BLOCK, name);
                 }
                 Block blk = new Block(start, tree);
-                //   start.element.setMatchingBlock(tree.element.getName());
-                //   tree.element.setMatchingBlock(start.element.getName());
                 blocks.add(blk);
                 break;
             case NONE:
@@ -411,14 +403,10 @@ public class FlowChecker {
                 if (tT != null) {
                     TaskTree tt = tasks.get(tT);
                     if (tt == null) {
-                        FlowError err = new FlowError("IF target if null");
-                        err.addTask(tT);
-                        throw err;
+                        throw new FlowError("IF target is null", FlowErrorType.IF, tT);
                     }
                     if (tt.targetOf != null) {
-                        FlowError err = new FlowError("Task is target of multiple IF actions");
-                        err.addTask(tT);
-                        throw err;
+                        throw new FlowError("Task is target of multiple IF actions", FlowErrorType.IF, tT);
                     } else {
                         tt.targetOf = treeDown;
                         treeDown.targets.add(tt);
@@ -427,14 +415,10 @@ public class FlowChecker {
                 if (tE != null) {
                     TaskTree tt = tasks.get(tE);
                     if (tt == null) {
-                        FlowError err = new FlowError("ELSE target if null");
-                        err.addTask(tE);
-                        throw err;
+                        throw new FlowError("ELSE target is null", FlowErrorType.IF, tE);
                     }
                     if (tt.targetOf != null) {
-                        FlowError err = new FlowError("Task is target of multiple IF actions");
-                        err.addTask(tE);
-                        throw err;
+                        throw new FlowError("Task is target of multiple IF actions", FlowErrorType.IF, tE);
                     } else {
                         tt.targetOf = treeDown;
                         treeDown.targets.add(tt);
@@ -522,10 +506,8 @@ public class FlowChecker {
         if (node.element.getName().equals(endBlock.element.getName())) {
             return;
         } else if (children.size() == 0) {
-            FlowError err = new FlowError("Task Block ending at " + endBlock.element.getName() +
-                " does not join all its flows");
-            err.addTask(node.element.getName());
-            throw err;
+            throw new FlowError("Task Block ending at " + endBlock.element.getName() +
+                " does not join all its flows", FlowErrorType.BLOCK, node.element.getName());
         } else {
             for (TaskTree child : children) {
                 if (child != null) {
@@ -555,10 +537,8 @@ public class FlowChecker {
         if (node.element.getName().equals(startBlock.element.getName())) {
             return;
         } else if (parents.size() == 0) {
-            FlowError err = new FlowError("Task Block starting at " + startBlock.element.getName() +
-                " has external dependencies");
-            err.addTask(node.element.getName());
-            throw err;
+            throw new FlowError("Task Block starting at " + startBlock.element.getName() +
+                " has external dependencies", FlowErrorType.BLOCK, node.element.getName());
         } else {
             for (TaskTree parent : parents) {
                 if (parent != null) {
@@ -596,16 +576,12 @@ public class FlowChecker {
 
                 for (TaskTree child : tree.children) {
                     if (child.parents.size() != 1) {
-                        FlowError err = new FlowError(
-                            "The Target of a DUPLICATE must have only one dependency");
-                        err.addTask(child.element.getName());
-                        throw err;
+                        throw new FlowError("The Target of a DUPLICATE must have only one dependency",
+                            FlowErrorType.DUPLICATE, child.element.getName());
                     }
                     if (child.element.getFlowBlock().equals(FlowBlock.END)) {
-                        FlowError err = new FlowError(
-                            "The target of a DUPLICATE cannot be the end of a task block");
-                        err.addTask(child.element.getName());
-                        throw err;
+                        throw new FlowError("The target of a DUPLICATE cannot be the end of a task block",
+                            FlowErrorType.DUPLICATE, child.element.getName());
                     }
                     Block block = null;
                     for (Block b : this.blocks) {
@@ -620,9 +596,8 @@ public class FlowChecker {
                         endBlock = child;
                     }
                     if (endBlock.children.size() < 1) {
-                        FlowError err = new FlowError("No merge point for DUPLICATE block");
-                        err.addTask(endBlock.element.getName());
-                        throw err;
+                        throw new FlowError("No merge point for DUPLICATE block", FlowErrorType.DUPLICATE,
+                            endBlock.element.getName());
                     }
 
                     if (endBlock.element.getFlowScript() != null) {
@@ -630,10 +605,9 @@ public class FlowChecker {
                                 FlowActionType.DUPLICATE.toString()) ||
                             endBlock.element.getFlowScript().getActionType().equals(
                                     FlowActionType.IF.toString())) {
-                            FlowError err = new FlowError(
-                                "Last action of a DUPLICATE block cannot perform IF or DUPLICATE action");
-                            err.addTask(endBlock.element.getName());
-                            throw err;
+                            throw new FlowError(
+                                "Last action of a DUPLICATE block cannot perform IF or DUPLICATE action",
+                                FlowErrorType.DUPLICATE, endBlock.element.getName());
                         }
                     }
                 }
@@ -656,33 +630,26 @@ public class FlowChecker {
                 TaskTree targetJoin = findTask(tree.element.getFlowScript().getActionJoin());
 
                 if (targetIf == null) {
-                    FlowError err = new FlowError("IF action has no target");
-                    err.addTask(tree.element.getName());
-                    throw err;
+                    throw new FlowError("IF action has no target", FlowErrorType.IF, tree.element.getName());
                 }
                 if (targetElse == null) {
-                    FlowError err = new FlowError("IF action has no ELSE target");
-                    err.addTask(tree.element.getName());
-                    throw err;
+                    throw new FlowError("IF action has no ELSE target", FlowErrorType.IF, tree.element
+                            .getName());
                 }
                 if (targetIf.equals(targetElse)) {
-                    FlowError err = new FlowError("IF and ELSE targets are the same");
-                    err.addTask(targetIf.element.getName());
-                    err.addTask(targetElse.element.getName());
-                    throw err;
+                    throw new FlowError("IF and ELSE targets are the same", FlowErrorType.IF,
+                        targetIf.element.getName());
                 }
 
                 // No join : IF and ELSE are /loose/ blocks
                 if (targetJoin == null) {
                     if (targetIf.parents.size() > 0) {
-                        FlowError err = new FlowError("IF target task cannot have dependencies");
-                        err.addTask(targetIf.element.getName());
-                        throw err;
+                        throw new FlowError("IF target task cannot have dependencies", FlowErrorType.IF,
+                            targetIf.element.getName());
                     }
                     if (targetElse.parents.size() > 0) {
-                        FlowError err = new FlowError("IF target task ELSE cannot have dependencies");
-                        err.addTask(targetElse.element.getName());
-                        throw err;
+                        throw new FlowError("IF target task ELSE cannot have dependencies", FlowErrorType.IF,
+                            targetElse.element.getName());
                     }
 
                     List<TaskTree> targets = new ArrayList<TaskTree>();
@@ -715,12 +682,8 @@ public class FlowChecker {
                             try {
                                 checkBlockUp(target, t);
                             } catch (FlowError e) {
-                                FlowError err = new FlowError("IF block at " + target.element.getName() +
-                                    " has external dependencies");
-                                for (String str : e.getTasks()) {
-                                    err.addTask(str);
-                                }
-                                throw err;
+                                throw new FlowError("IF block at " + target.element.getName() +
+                                    " has external dependencies", FlowErrorType.IF, e.getTask());
                             }
                         }
                     }
@@ -746,9 +709,8 @@ public class FlowChecker {
                         if (!(targetIf.children.size() > 0 || targetIf.targets.size() > 0)) {
                             ifBlock = new Block(targetIf, targetIf);
                         } else {
-                            FlowError err = new FlowError("IF action target is not a Task Block");
-                            err.addTask(targetIf.element.getName());
-                            throw err;
+                            throw new FlowError("IF action target is not a Task Block", FlowErrorType.IF,
+                                targetIf.element.getName());
                         }
                     }
 
@@ -757,9 +719,8 @@ public class FlowChecker {
                         if (!(targetElse.children.size() > 0 || targetElse.targets.size() > 0)) {
                             elseBlock = new Block(targetElse, targetElse);
                         } else {
-                            FlowError err = new FlowError("IF action ELSE target is not a Task Block");
-                            err.addTask(targetElse.element.getName());
-                            throw err;
+                            throw new FlowError("IF action ELSE target is not a Task Block",
+                                FlowErrorType.IF, targetElse.element.getName());
                         }
                     }
 
@@ -770,37 +731,31 @@ public class FlowChecker {
 
                             if (!(jN.equals(ifBlock.end.element.getName()) || jN.equals(elseBlock.end.element
                                     .getName()))) {
-                                FlowError err = new FlowError("JOIN task merges multiple IF actions");
-                                err.addTask(targetJoin.element.getName());
-                                throw err;
+                                throw new FlowError("JOIN task merges multiple IF actions", FlowErrorType.IF,
+                                    targetJoin.element.getName());
                             }
                         }
                     }
 
                     if (ifBlock.start.parents.size() > 0) {
-                        FlowError err = new FlowError("IF task block cannot have dependencies");
-                        err.addTask(ifBlock.start.element.getName());
-                        throw err;
+                        throw new FlowError("IF task block cannot have dependencies", FlowErrorType.IF,
+                            ifBlock.start.element.getName());
                     }
                     if (ifBlock.end.children.size() > 0) {
-                        FlowError err = new FlowError("IF task block cannot have children");
-                        err.addTask(ifBlock.end.element.getName());
-                        throw err;
+                        throw new FlowError("IF task block cannot have children", FlowErrorType.IF,
+                            ifBlock.end.element.getName());
                     }
                     if (elseBlock.start.parents.size() > 0) {
-                        FlowError err = new FlowError("ELSE task block cannot have dependencies");
-                        err.addTask(elseBlock.start.element.getName());
-                        throw err;
+                        throw new FlowError("ELSE task block cannot have dependencies", FlowErrorType.IF,
+                            elseBlock.start.element.getName());
                     }
                     if (elseBlock.end.children.size() > 0) {
-                        FlowError err = new FlowError("ELSE task block cannot have children");
-                        err.addTask(elseBlock.end.element.getName());
-                        throw err;
+                        throw new FlowError("ELSE task block cannot have children", FlowErrorType.IF,
+                            elseBlock.end.element.getName());
                     }
                     if (targetJoin.parents.size() > 0) {
-                        FlowError err = new FlowError("JOIN task cannot have dependencies");
-                        err.addTask(targetJoin.element.getName());
-                        throw err;
+                        throw new FlowError("JOIN task cannot have dependencies", FlowErrorType.IF,
+                            targetJoin.element.getName());
                     }
                 }
             }
@@ -819,9 +774,8 @@ public class FlowChecker {
                 tree.element.getFlowScript().getActionType().equals(FlowActionType.LOOP.toString())) {
                 TaskTree target = findTask(tree.element.getFlowScript().getActionTarget());
                 if (target == null) {
-                    FlowError err = new FlowError("LOOP action has no target");
-                    err.addTask(tree.element.getName());
-                    throw err;
+                    throw new FlowError("LOOP action has no target", FlowErrorType.LOOP, tree.element
+                            .getName());
                 } else {
                     boolean isBlock = false;
                     for (Block b : this.blocks) {
@@ -837,30 +791,14 @@ public class FlowChecker {
                         isBlock = true;
                     }
                     if (!isBlock) {
-                        FlowError err = new FlowError("The scope of a LOOP action should be a Task Block");
-                        err.addTask(tree.element.getName());
-                        err.addTask(target.element.getName());
-                        throw err;
+                        throw new FlowError("The scope of a LOOP action should be a Task Block",
+                            FlowErrorType.LOOP, tree.element.getName());
                     }
 
                     if (target.parents.size() > 1) {
-                        FlowError err = new FlowError("The Target of a LOOP must have only one dependency");
-                        err.addTask(target.element.getName());
-                        throw err;
+                        throw new FlowError("The Target of a LOOP must have only one dependency",
+                            FlowErrorType.LOOP, target.element.getName());
                     }
-                    /***
-                    if (target.targetOf != null) {
-                        FlowError err = new FlowError("Target of an IF/ELSE cannot be target of a LOOP");
-                        err.addTask(target.element.getName());
-                        err.addTask(target.targetOf.element.getName());
-                        throw err;
-                    }
-                    if (target.joins != null && target.joins.size() > 0) {
-                        FlowError err = new FlowError("JOIN task of an if action cannot be target of a LOOP");
-                        err.addTask(target.element.getName());
-                        throw err;
-                    }
-                    ***/
                 }
             }
         }

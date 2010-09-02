@@ -36,9 +36,6 @@
  */
 package org.ow2.proactive.scheduler.common.job.factories;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.objectweb.proactive.annotation.PublicAPI;
 
 
@@ -54,45 +51,55 @@ import org.objectweb.proactive.annotation.PublicAPI;
 @PublicAPI
 public class FlowError extends Exception {
 
-    private List<String> tasks;
+    /** task responsible for the error */
+    private String task;
+
+    /**
+     * Generic category of the error type,
+     * for a specific message use {@link FlowError#getMessage()}
+     */
+    public enum FlowErrorType {
+        /** an IF action is invalid */
+        IF,
+        /** a DUPLICATE action is invalid */
+        DUPLICATE,
+        /** a LOOP action is invalid */
+        LOOP,
+        /** a BLOCK is invalid */
+        BLOCK,
+        /** the name of a task is invalid */
+        NAME,
+        /** a task is unreachable in the flow */
+        UNREACHABLE;
+    };
+
+    private FlowErrorType errorType;
 
     /**
      * Default constructor
      * 
-     * @param reason informative message
+     * @param reason informative message hinting how to fix the issue
+     * @param errorType general category of the error
+     * @param taskName unique name of the task that caused the error
      */
-    public FlowError(String reason) {
+    public FlowError(String reason, FlowErrorType errorType, String taskName) {
         super(reason);
-        this.tasks = new ArrayList<String>();
+        this.task = taskName;
+        this.errorType = errorType;
     }
 
     /**
-     * Default constructor
-     * 
-     * @param reason informative message
-     * @param e chained exception
+     * @return the name of the task the most likely to be responsible for the error
      */
-    public FlowError(String reason, Exception e) {
-        super(reason, e);
-        this.tasks = new ArrayList<String>();
+    public String getTask() {
+        return this.task;
     }
 
     /**
-     * Gives hint to the probable cause of the error by adding
-     * task names as String to this FlowError.
-     * 
-     * @param cause add this task name to the causes
+     * @return the type of flow error
      */
-    public void addTask(String cause) {
-        tasks.add(cause);
-    }
-
-    /**
-     * @return a List of String representing Task names hinting for a probable
-     * cause for the error
-     */
-    public List<String> getTasks() {
-        return this.tasks;
+    public FlowErrorType getErrorType() {
+        return this.errorType;
     }
 
 }

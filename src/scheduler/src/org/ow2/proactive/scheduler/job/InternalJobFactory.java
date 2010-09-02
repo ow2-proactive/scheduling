@@ -134,20 +134,7 @@ public class InternalJobFactory {
         if (err != null) {
             String e = "";
 
-            e += "Invalid taskflow: " + err.getMessage();
-            if (err.getTasks().size() > 0) {
-                e += " (Context task" + ((err.getTasks().size() > 1) ? "s" : "") + ": ";
-                List<String> tt = err.getTasks();
-                for (int i = 0; i < tt.size(); i++) {
-                    e += tt.get(i);
-                    if (i != tt.size() - 1) {
-                        e += " ";
-                    }
-                }
-                e += ")";
-            }
-            e += ".";
-
+            e += "Invalid taskflow: " + err.getMessage() + "; context: " + err.getTask();
             logger_dev.error(e);
             throw new JobCreationException(e, err);
         }
