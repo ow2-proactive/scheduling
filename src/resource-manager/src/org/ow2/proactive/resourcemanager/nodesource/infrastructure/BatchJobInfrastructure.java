@@ -47,6 +47,8 @@ import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Set;
 
+import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.ssh.SSHClient;
 import org.objectweb.proactive.core.util.ProActiveCounter;
@@ -81,7 +83,7 @@ public abstract class BatchJobInfrastructure extends InfrastructureManager {
     /**
      * Path to the Java executable on the remote hosts
      */
-    @Configurable
+    @Configurable(description = "Absolute path of the java\nexecutable on the remote hosts")
     protected String javaPath = System.getProperty("java.home") + "/bin/java";
 
     /**
@@ -98,50 +100,54 @@ public abstract class BatchJobInfrastructure extends InfrastructureManager {
     /**
      * ShhClient options (@see {@link SSHClient})
      */
-    @Configurable
+    @Configurable(description = "Options of the ssh command used\nto log in the batch system head node")
     protected String sshOptions;
     /**
      * Path to the Scheduling installation on the remote hosts
      */
-    @Configurable
+    @Configurable(description = "Absolute path of the Resource Manager\nroot directory on the remote hosts")
     protected String schedulingPath = PAResourceManagerProperties.RM_HOME.getValueAsString();
     /**
      * Additional java options to append to the command executed on the remote host
      */
-    @Configurable
-    protected String javaOptions;
+    @Configurable(description = "Options used by the java command\nlaunching the node on the remote hosts")
+    protected String javaOptions = CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL.isSet() ? CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL
+            .getCmdLine() +
+        CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL.getValue()
+            : "";
     /**
      * maximum number of nodes this infrastructure can ask simultaneously to the Job Batching system
      */
-    @Configurable
+    @Configurable(description = "The maximum number of nodes\nto be requested to the batch system")
     protected int maxNodes = 1;
     /**
      * time out after which one nodes are not expected to register anymore. When this time expires,
      * nodes which register are in reponse of the previous "acquireNode" request are discarded.
      * This time out is also used to time out submit job and delete job command's exit status
      */
-    @Configurable(description = "in ms")
+    @Configurable(description = "in ms. After this timeout expired\nthe node is considered to be lost")
     protected int nodeTimeOut = 1000 * 60 * 5;//5mn
     /**
      * name of the server on which the job batching software is running.
      * will be contacted using ssh
      */
-    @Configurable
+    @Configurable(description = "The batch system\nhead node address")
     protected String serverName;
     /**
      * URL of the resource manager the newly created nodes will attempt to contact
      */
-    @Configurable
-    protected String rmUrl;
+    @Configurable(description = "Resource Manager's url")
+    protected String rmUrl = PAActiveObject.getActiveObjectNodeUrl(PAActiveObject.getStubOnThis()).replace(
+            PAResourceManagerProperties.RM_NODE_NAME.getValueAsString(), "");
     /**
      * Path to the credentials file user for RM authentication
      */
-    @Configurable(credential = true)
+    @Configurable(credential = true, description = "Absolute path of the rm.cred file")
     protected File rmCredentialsPath;
     /**
      * options for the submit job command executed on {@link #serverName}
      */
-    @Configurable
+    @Configurable(description = "Options used by the\njob submission command")
     protected String submitJobOpt;
     /**
      * Shutdown flag

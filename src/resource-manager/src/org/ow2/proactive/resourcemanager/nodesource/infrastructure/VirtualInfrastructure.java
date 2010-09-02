@@ -59,11 +59,13 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
+import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
@@ -91,7 +93,7 @@ public class VirtualInfrastructure extends InfrastructureManager {
 
     private static Logger logger = ProActiveLogger.getLogger(RMLoggers.NODESOURCE);
 
-    @Configurable(description = "Virtual Infrastructure Type")
+    @Configurable(description = "Virtual Infrastructure Type:\nxenserver, virtualbox, vmware, hyperv-winrm or hyperv-wmi")
     protected String infrastructure;
     /** The hypervisor's url */
     @Configurable(description = "Hypervisor's url")
@@ -124,7 +126,7 @@ public class VirtualInfrastructure extends InfrastructureManager {
     public static final long NODE_URL_ACQUISITION_TIMEOUT = 300000;
 
     /** The name of the template virtual machine */
-    @Configurable(description = "Template virtual machine")
+    @Configurable(description = "Template virtual machine's name")
     protected String VMTemplate;
     /** The list of started virtual machines */
     protected ArrayList<String> runningVM = new ArrayList<String>();
@@ -146,10 +148,11 @@ public class VirtualInfrastructure extends InfrastructureManager {
     @Configurable(fileBrowser = true, description = "ProActive Configuration file path")
     protected File PAConfig;
     /** The resource manager's url */
-    @Configurable(description = "The RM's url")
-    protected String RMUrl;
+    @Configurable(description = "Resource Manager's url")
+    protected String RMUrl = PAActiveObject.getActiveObjectNodeUrl(PAActiveObject.getStubOnThis()).replace(
+            PAResourceManagerProperties.RM_NODE_NAME.getValueAsString(), "");
     /** A path to a credentials file */
-    @Configurable(credential = true, fileBrowser = true, description = "Credentials file path")
+    @Configurable(credential = true, fileBrowser = true, description = "Absolute path of the rm.cred file")
     protected File RMCredentials;
     protected String cred;
     /** The properties used for the {@link VirtualInfrastructure} configuration.

@@ -50,13 +50,16 @@ import java.util.Hashtable;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.ssh.SSHClient;
 import org.objectweb.proactive.core.util.ProActiveCounter;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
+import org.ow2.proactive.authentication.Authentication;
 import org.ow2.proactive.authentication.crypto.Credentials;
+import org.ow2.proactive.resourcemanager.common.RMConstants;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
@@ -97,12 +100,12 @@ public class SSHInfrastructure2 extends InfrastructureManager {
     /**
      * ShhClient options (@see {@link SSHClient})
      */
-    @Configurable
+    @Configurable(description = "Options used by the ssh command\nto log in the remote hosts")
     protected String sshOptions;
     /**
      * Path to the Java executable on the remote hosts
      */
-    @Configurable
+    @Configurable(description = "Absolute path of the java\nexecutable on the remote hosts")
     protected String javaPath = System.getProperty("java.home") + "/bin/java";
 
     /**
@@ -118,33 +121,37 @@ public class SSHInfrastructure2 extends InfrastructureManager {
     /**
      * Path to the Scheduling installation on the remote hosts
      */
-    @Configurable
+    @Configurable(description = "Absolute path of the Resource Manager\nroot directory on the remote hosts")
     protected String schedulingPath = PAResourceManagerProperties.RM_HOME.getValueAsString();
     /**
      * Node acquisition timeout
      */
-    @Configurable(description = "in ms")
+    @Configurable(description = "in ms. After this timeout expired\nthe node is considered to be lost")
     protected int nodeTimeOut = 60 * 1000;
     /**
      * The type of the OS on the remote machine, 'Linux', 'Windows' or 'Cygwin'
      */
-    @Configurable
+    @Configurable(description = "Linux, Cygwin or Windows depending on\nthe operating system of the remote hosts")
     protected String targetOs = "Linux";
     protected OperatingSystem targetOSObj = null;
     /**
      * Additional java options to append to the command executed on the remote host
      */
-    @Configurable
-    protected String javaOptions;
+    @Configurable(description = "Options used by the java command\nlaunching the node on the remote hosts")
+    protected String javaOptions = CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL.isSet() ? CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL
+            .getCmdLine() +
+        CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL.getValue()
+            : "";
     /**
      * The rm's url
      */
-    @Configurable
-    protected String rmUrl;
+    @Configurable(description = "Resource Manager's url")
+    protected String rmUrl = PAActiveObject.getActiveObjectNodeUrl(PAActiveObject.getStubOnThis()).replace(
+            PAResourceManagerProperties.RM_NODE_NAME.getValueAsString(), "");
     /**
      * Path to the credentials file user for RM authentication
      */
-    @Configurable(credential = true)
+    @Configurable(credential = true, description = "Absolute path of the rm.cred file")
     protected File rmCredentialsPath;
     protected Credentials credentials = null;
     /**
@@ -154,7 +161,7 @@ public class SSHInfrastructure2 extends InfrastructureManager {
     /**
      * The list of the remote machines to use
      */
-    @Configurable(fileBrowser = true)
+    @Configurable(fileBrowser = true, description = "Absolute path of the file containing\nthe list of remote hosts")
     protected File hostsList;
 
     /**

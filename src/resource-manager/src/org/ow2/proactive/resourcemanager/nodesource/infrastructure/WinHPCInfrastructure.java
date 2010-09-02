@@ -47,6 +47,7 @@ import org.ggf.schemas.bes._2006._08.bes_factory.HPCBPServiceStub.ActivityStateE
 import org.ggf.schemas.bes._2006._08.bes_factory.HPCBPServiceStub.EndpointReferenceType;
 import org.ggf.schemas.bes._2006._08.bes_factory.HPCBPServiceStub.GetActivityStatusResponseType;
 import org.ggf.schemas.bes._2006._08.bes_factory.HPCBPServiceStub.ReferenceParametersType;
+import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -94,31 +95,32 @@ public class WinHPCInfrastructure extends DefaultInfrastructureManager {
     /**
      * Path to the Java executable on the remote hosts
      */
-    @Configurable
+    @Configurable(description = "Absolute path of the java\nexecutable on the remote hosts")
     protected String javaPath = System.getProperty("java.home") + "/bin/java";
 
     /**
      * Path to the Resource Manager installation on the remote hosts
      */
-    @Configurable
+    @Configurable(description = "Absolute path of the Resource Manager\nroot directory on the remote hosts")
     protected String rmPath = PAResourceManagerProperties.RM_HOME.getValueAsString();
 
     /**
      * URL of the resource manager the newly created nodes will attempt to contact
      */
-    @Configurable
-    protected String RMUrl;
+    @Configurable(description = "Resource Manager's url")
+    protected String RMUrl = PAActiveObject.getActiveObjectNodeUrl(PAActiveObject.getStubOnThis()).replace(
+            PAResourceManagerProperties.RM_NODE_NAME.getValueAsString(), "");
 
     /**
      * Path to the credentials file user for RM authentication
      */
-    @Configurable(credential = true)
+    @Configurable(credential = true, description = "Absolute path of the rm.cred file")
     protected File RMCredentialsPath;
 
     /**
      * Additional java options to append to the command executed on the remote host
      */
-    @Configurable
+    @Configurable(description = "Options used by the java command\nlaunching the node on the remote hosts")
     protected String javaOptions;
 
     @Configurable
