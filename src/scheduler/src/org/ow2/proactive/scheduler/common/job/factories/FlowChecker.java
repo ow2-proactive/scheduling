@@ -150,7 +150,7 @@ public class FlowChecker {
         } else {
             this.blocks = new ArrayList<Block>();
         }
-        blocks.clear();
+        this.blocks.clear();
         createTaskTree(job);
     }
 
