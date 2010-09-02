@@ -376,11 +376,10 @@ public class JobDescriptorImpl implements JobDescriptor {
                 // find the matching end block task 
                 do {
                     EligibleTaskDescriptorImpl ptr = q.poll();
-                    if (ptr.getChildren() == null || ptr.getChildren().size() == 0) {
-                        if (ptr.getId().equals(branchEnd)) {
-                            // no child : if the block is valid this is the end
-                            end = ptr;
-                        }
+
+                    // if (ptr.getChildren() == null || ptr.getChildren().size() == 0) {
+                    if (ptr.getId().equals(branchEnd)) {
+                        end = ptr;
                         break;
                     } else {
                         for (TaskDescriptor desc : ptr.getChildren()) {
