@@ -72,6 +72,7 @@ import org.ow2.proactive.scheduler.common.task.TaskInfo;
         "org.ow2.proactive.resourcemanager.nodesource.infrastructure.GCMCustomisedInfrastructure",
         "org.ow2.proactive.resourcemanager.nodesource.infrastructure.PBSInfrastructure",
         "org.ow2.proactive.resourcemanager.nodesource.infrastructure.LSFInfrastructure",
+        "org.ow2.proactive.resourcemanager.nodesource.infrastructure.GenericBatchJobInfrastructure",
         "org.ow2.proactive.resourcemanager.nodesource.infrastructure.SSHInfrastructure",
         "org.ow2.proactive.resourcemanager.nodesource.infrastructure.SSHInfrastructure2",
         "org.ow2.proactive.resourcemanager.nodesource.infrastructure.EC2Infrastructure",
