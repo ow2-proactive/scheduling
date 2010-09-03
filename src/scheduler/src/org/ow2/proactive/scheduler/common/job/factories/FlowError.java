@@ -70,7 +70,9 @@ public class FlowError extends Exception {
         /** the name of a task is invalid */
         NAME,
         /** a task is unreachable in the flow */
-        UNREACHABLE;
+        UNREACHABLE,
+        /** infinite loop */
+        RECURSION;
     };
 
     private FlowErrorType errorType;

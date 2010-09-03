@@ -59,7 +59,7 @@ public class TestWorkflowSubmission extends FunctionalTest {
 
     private static final int jobs_valid = 17;
 
-    private static final int jobs_fail = 39;
+    private static final int jobs_fail = 44;
 
     @org.junit.Test
     public void run() throws Throwable {

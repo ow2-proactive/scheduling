@@ -41,6 +41,7 @@ import java.util.EmptyStackException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -185,6 +186,7 @@ public class FlowChecker {
             FlowChecker fc = new FlowChecker(job, blocks);
 
             fc.checkNames();
+            fc.checkRecursion();
             fc.checkReachable();
             fc.checkBlocks();
             fc.checkDuplicate();
@@ -223,6 +225,47 @@ public class FlowChecker {
             } else {
                 tasks.add(name);
             }
+        }
+    }
+
+    /**
+     * Check no infinite loop is defined using dependencies or IF/ELSE/JOIN links;
+     * loop termination through LOOP cannot be checked statically
+     * 
+     * @throws FlowError
+     */
+    private void checkRecursion() throws FlowError {
+        for (TaskTree tree : this.roots) {
+            LinkedList<TaskTree> env = new LinkedList<TaskTree>();
+            internalCheckRecursion(env, tree);
+        }
+    }
+
+    private void internalCheckRecursion(LinkedList<TaskTree> env, TaskTree cur) throws FlowError {
+
+        for (TaskTree t : env) {
+            if (t.equals(cur)) {
+                throw new FlowError("Infinite recursion detected", FlowErrorType.RECURSION, t.element
+                        .getName());
+            }
+        }
+        env.addFirst(cur);
+
+        if (cur.children != null && cur.children.size() > 0) {
+            for (TaskTree child : cur.children) {
+                LinkedList<TaskTree> n = new LinkedList<TaskTree>(env);
+                internalCheckRecursion(n, child);
+            }
+        }
+        if (cur.targets != null && cur.targets.size() > 0) {
+            for (TaskTree child : cur.targets) {
+                LinkedList<TaskTree> n = new LinkedList<TaskTree>(env);
+                internalCheckRecursion(n, child);
+            }
+        }
+        if (cur.joinedBy != null) {
+            LinkedList<TaskTree> n = new LinkedList<TaskTree>(env);
+            internalCheckRecursion(n, cur.joinedBy);
         }
     }
 
@@ -403,7 +446,7 @@ public class FlowChecker {
                 if (tT != null) {
                     TaskTree tt = tasks.get(tT);
                     if (tt == null) {
-                        throw new FlowError("IF target is null", FlowErrorType.IF, tT);
+                        throw new FlowError("IF target is null", FlowErrorType.IF, treeDown.element.getName());
                     }
                     if (tt.targetOf != null) {
                         throw new FlowError("Task is target of multiple IF actions", FlowErrorType.IF, tT);
@@ -415,7 +458,8 @@ public class FlowChecker {
                 if (tE != null) {
                     TaskTree tt = tasks.get(tE);
                     if (tt == null) {
-                        throw new FlowError("ELSE target is null", FlowErrorType.IF, tE);
+                        throw new FlowError("ELSE target is null", FlowErrorType.IF, treeDown.element
+                                .getName());
                     }
                     if (tt.targetOf != null) {
                         throw new FlowError("Task is target of multiple IF actions", FlowErrorType.IF, tE);
