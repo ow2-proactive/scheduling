@@ -96,17 +96,17 @@ public abstract class BatchJobInfrastructure extends InfrastructureManager {
     /**
      * ShhClient options (@see {@link SSHClient})
      */
-    @Configurable(description = "Options of the ssh command used\nto log in the batch system head node")
+    @Configurable(description = "Options for the ssh command used\nto log in the batch system head node")
     protected String sshOptions;
     /**
      * Path to the Scheduling installation on the remote hosts
      */
-    @Configurable(description = "Absolute path of the Resource Manager\nroot directory on the remote hosts")
+    @Configurable(description = "Absolute path of the Resource Manager (or Scheduler)\nroot directory on the remote hosts")
     protected String schedulingPath = PAResourceManagerProperties.RM_HOME.getValueAsString();
     /**
      * Additional java options to append to the command executed on the remote host
      */
-    @Configurable(description = "Options used by the java command\nlaunching the node on the remote hosts")
+    @Configurable(description = "Options for the java command\nlaunching the node on the remote hosts")
     protected String javaOptions = CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL.isSet() ? CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL
             .getCmdLine() +
         CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL.getValue()
@@ -127,23 +127,23 @@ public abstract class BatchJobInfrastructure extends InfrastructureManager {
      * name of the server on which the job batching software is running.
      * will be contacted using ssh
      */
-    @Configurable(description = "The batch system\nhead node address")
+    @Configurable(description = "The batch system\nhead node name or IP adress")
     protected String serverName;
     /**
      * URL of the resource manager the newly created nodes will attempt to contact
      */
-    @Configurable(description = "Resource Manager's url")
+    @Configurable(description = "URL of the Resource Manager")
     protected String rmUrl = PAActiveObject.getActiveObjectNodeUrl(PAActiveObject.getStubOnThis()).replace(
             PAResourceManagerProperties.RM_NODE_NAME.getValueAsString(), "");
     /**
      * Path to the credentials file user for RM authentication
      */
-    @Configurable(credential = true, description = "Absolute path of the rm.cred file")
+    @Configurable(credential = true, description = "Absolute path of the credential file")
     protected File rmCredentialsPath;
     /**
      * options for the submit job command executed on {@link #serverName}
      */
-    @Configurable(description = "Options used by the\njob submission command")
+    @Configurable(description = "Options for the\njob submission command")
     protected String submitJobOpt;
     /**
      * Shutdown flag

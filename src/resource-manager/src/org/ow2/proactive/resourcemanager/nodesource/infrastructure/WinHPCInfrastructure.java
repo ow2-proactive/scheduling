@@ -68,25 +68,25 @@ public class WinHPCInfrastructure extends DefaultInfrastructureManager {
     /**
      * maximum number of nodes this infrastructure can ask simultaneously to the WinHPC scheduler
      */
-    @Configurable
+    @Configurable(description = "Maximum number of nodes to deploy")
     protected int maxNodes = 1;
 
     /**
      * A url of HPC basic profile web service
      */
-    @Configurable
+    @Configurable(description = "Url of the WinHPC web service")
     String serviceUrl = "https://<computerName>/HPCBasicProfile";
 
-    @Configurable(description = "for windows scheduler")
+    @Configurable(description = "Username for windows scheduler connection")
     private String userName;
 
-    @Configurable(password = true)
+    @Configurable(password = true, description = "Password for windows scheduler connection")
     private String password;
 
-    @Configurable(fileBrowser = true, description = "signed with web service sertificat")
+    @Configurable(fileBrowser = true, description = "Name of the trustStore")
     private String trustStore;
 
-    @Configurable(password = true)
+    @Configurable(password = true, description = "Password for the trustStore")
     private String trustStorePassword;
 
     /**
@@ -104,23 +104,23 @@ public class WinHPCInfrastructure extends DefaultInfrastructureManager {
     /**
      * URL of the resource manager the newly created nodes will attempt to contact
      */
-    @Configurable(description = "Resource Manager's url")
+    @Configurable(description = "URL of the Resource Manager")
     protected String RMUrl = PAActiveObject.getActiveObjectNodeUrl(PAActiveObject.getStubOnThis()).replace(
             PAResourceManagerProperties.RM_NODE_NAME.getValueAsString(), "");
 
     /**
      * Path to the credentials file user for RM authentication
      */
-    @Configurable(credential = true, description = "Absolute path of the rm.cred file")
+    @Configurable(credential = true, description = "Absolute path of the credential file")
     protected File RMCredentialsPath;
 
     /**
      * Additional java options to append to the command executed on the remote host
      */
-    @Configurable(description = "Options used by the java command\nlaunching the node on the remote hosts")
+    @Configurable(description = "Options for the java command\nlaunching the node on the remote hosts")
     protected String javaOptions;
 
-    @Configurable
+    @Configurable(description = "Additional classpath for the java command\nlaunching the node on the remote hosts")
     protected String extraClassPath;
 
     /**
