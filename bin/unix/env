@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 # ----------------------------------------------------------------------------
 #
 # This variable should be set to the directory where is installed PA_SCHEDULER
