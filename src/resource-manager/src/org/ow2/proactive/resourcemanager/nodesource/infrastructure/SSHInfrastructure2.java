@@ -100,7 +100,7 @@ public class SSHInfrastructure2 extends InfrastructureManager {
     /**
      * ShhClient options (@see {@link SSHClient})
      */
-    @Configurable(description = "Options used by the ssh command\nto log in the remote hosts")
+    @Configurable(description = "Options for the ssh command\nto log in the remote hosts")
     protected String sshOptions;
     /**
      * Path to the Java executable on the remote hosts
@@ -121,7 +121,7 @@ public class SSHInfrastructure2 extends InfrastructureManager {
     /**
      * Path to the Scheduling installation on the remote hosts
      */
-    @Configurable(description = "Absolute path of the Resource Manager\nroot directory on the remote hosts")
+    @Configurable(description = "Absolute path of the Resource Manager (or Scheduler)\nroot directory on the remote hosts")
     protected String schedulingPath = PAResourceManagerProperties.RM_HOME.getValueAsString();
     /**
      * Node acquisition timeout
@@ -137,7 +137,7 @@ public class SSHInfrastructure2 extends InfrastructureManager {
     /**
      * Additional java options to append to the command executed on the remote host
      */
-    @Configurable(description = "Options used by the java command\nlaunching the node on the remote hosts")
+    @Configurable(description = "Options for the java command\nlaunching the node on the remote hosts")
     protected String javaOptions = CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL.isSet() ? CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL
             .getCmdLine() +
         CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL.getValue()
@@ -145,13 +145,13 @@ public class SSHInfrastructure2 extends InfrastructureManager {
     /**
      * The rm's url
      */
-    @Configurable(description = "Resource Manager's url")
+    @Configurable(description = "URL of the Resource Manager")
     protected String rmUrl = PAActiveObject.getActiveObjectNodeUrl(PAActiveObject.getStubOnThis()).replace(
             PAResourceManagerProperties.RM_NODE_NAME.getValueAsString(), "");
     /**
      * Path to the credentials file user for RM authentication
      */
-    @Configurable(credential = true, description = "Absolute path of the rm.cred file")
+    @Configurable(credential = true, description = "Absolute path of the credential file")
     protected File rmCredentialsPath;
     protected Credentials credentials = null;
     /**

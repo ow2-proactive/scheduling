@@ -82,12 +82,13 @@ public class EC2Infrastructure extends InfrastructureManager {
 
     /**  */
     private static final long serialVersionUID = 21L;
-    @Configurable(fileBrowser = true)
+
+    @Configurable(fileBrowser = true, description = "Absolute path of EC2 configuration file")
     protected File configurationFile;
-    @Configurable
+    @Configurable(description = "URL of the Resource Manager")
     protected String rmUrl = PAActiveObject.getActiveObjectNodeUrl(PAActiveObject.getStubOnThis()).replace(
             PAResourceManagerProperties.RM_NODE_NAME.getValueAsString(), "");
-    @Configurable(credential = true)
+    @Configurable(credential = true, description = "Absolute path of the credential file")
     protected File RMCredentialsPath;
     @Configurable
     protected String nodeHttpPort = "80";
