@@ -81,7 +81,7 @@ public class TestWorkflowReplicateJobs2 extends TWorkflowJobs {
 
     @Override
     public final String getJobPrefix() {
-        return "/functionaltests/workflow/descriptors/flow_replicate_2_";
+        return "/functionaltests/workflow/descriptors/flow_duplicate_2_";
     }
 
     @org.junit.Test
