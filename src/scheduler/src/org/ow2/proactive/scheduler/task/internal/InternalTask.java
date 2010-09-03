@@ -164,13 +164,13 @@ public abstract class InternalTask extends TaskState {
     private int maxNumberOfExecutionOnFailure = PASchedulerProperties.NUMBER_OF_EXECUTION_ON_FAILURE
             .getValueAsInt();
 
-    /** iteration number if the task was duplicated by a IF control flow action */
+    /** iteration number if the task was replicated by a IF control flow action */
     @Column(name = "ITERATION")
     private int iteration = 0;
 
-    /** duplication number if the task was duplicated by a DUPLICATE control flow action */
-    @Column(name = "DUPLICATION")
-    private int duplication = 0;
+    /** replication number if the task was replicated by a REPLICATE control flow action */
+    @Column(name = "REPLICATION")
+    private int replication = 0;
 
     /** If this{@link #getFlowBlock()} != {@link FlowBlock#NONE}, 
      * each start block has a matching end block and vice versa */
@@ -208,7 +208,7 @@ public abstract class InternalTask extends TaskState {
      * {@inheritDoc}
      */
     @Override
-    public TaskState duplicate() throws ExecutableCreationException {
+    public TaskState replicate() throws ExecutableCreationException {
         InternalTask nt = null;
         try {
             nt = (InternalTask) this.getClass().newInstance();
@@ -279,7 +279,7 @@ public abstract class InternalTask extends TaskState {
         }
 
         nt.setIterationIndex(this.getIterationIndex());
-        nt.setDuplicationIndex(this.getDuplicationIndex());
+        nt.setReplicationIndex(this.getReplicationIndex());
         nt.setFlowBlock(this.getFlowBlock());
         if (this.getMatchingBlock() != null) {
             nt.setMatchingBlock(new String(this.getMatchingBlock()));
@@ -325,27 +325,27 @@ public abstract class InternalTask extends TaskState {
     }
 
     /**
-     * Accumulates in <code>acc</code>  duplications of all the tasks that recursively 
+     * Accumulates in <code>acc</code>  replications of all the tasks that recursively 
      * depend on <code>this</code> until <code>target</code> is met
      * 
      * @param acc tasks accumulator
      * @param target stopping condition
-     * @param loopAction true if the action performed is a LOOP, false is it is a duplicate
-     * @param dupIndex duplication index threshold if <code>ifAction == true</code>
-     *                 duplication index to set to the old tasks if <code>ifAction == false</code>
+     * @param loopAction true if the action performed is a LOOP, false is it is a replicate
+     * @param dupIndex replication index threshold if <code>ifAction == true</code>
+     *                 replication index to set to the old tasks if <code>ifAction == false</code>
      * @param itIndex iteration index threshold it <code>ifAction == true</code>
      *        
-     * @throws ExecutableCreationException one task could not be duplicated
+     * @throws ExecutableCreationException one task could not be replicated
      */
-    public void duplicateTree(Map<TaskId, InternalTask> acc, TaskId target, boolean loopAction, int dupIndex,
+    public void replicateTree(Map<TaskId, InternalTask> acc, TaskId target, boolean loopAction, int dupIndex,
             int itIndex) throws ExecutableCreationException {
 
         Map<TaskId, InternalTask> tmp = new HashMap<TaskId, InternalTask>();
 
-        // duplicate the tasks
-        internalDuplicateTree(tmp, target, loopAction, dupIndex, itIndex);
+        // replicate the tasks
+        internalReplicateTree(tmp, target, loopAction, dupIndex, itIndex);
 
-        // remove duplicates from nested LOOP action
+        // remove replicates from nested LOOP action
         Map<String, Entry<TaskId, InternalTask>> map = new HashMap<String, Entry<TaskId, InternalTask>>();
         for (Entry<TaskId, InternalTask> it : tmp.entrySet()) {
             String name = it.getValue().getAmbiguousName();
@@ -368,27 +368,27 @@ public abstract class InternalTask extends TaskState {
     }
 
     /**
-     * Internal recursive delegate of {@link #duplicateTree(Map, TaskId)} for task duplication
+     * Internal recursive delegate of {@link #replicateTree(Map, TaskId)} for task replication
      * 
      * @param acc accumulator
      * @param target end condition
-     * @param loopAction true if the action performed is a LOOP, false is it is a duplicate
-     * @param initDupIndex duplication index threshold if <code>ifAction == true</code>
-     *                 duplication index to set to the old tasks if <code>ifAction == false</code>
+     * @param loopAction true if the action performed is a LOOP, false is it is a replicate
+     * @param initDupIndex replication index threshold if <code>ifAction == true</code>
+     *                 replication index to set to the old tasks if <code>ifAction == false</code>
      * @param itIndex iteration index threshold it <code>ifAction == true</code>
      *
-     * @throws ExecutableCreationException one task could not be duplicated
+     * @throws ExecutableCreationException one task could not be replicated
      */
-    private void internalDuplicateTree(Map<TaskId, InternalTask> acc, TaskId target, boolean loopAction,
+    private void internalReplicateTree(Map<TaskId, InternalTask> acc, TaskId target, boolean loopAction,
             int dupIndex, int itIndex) throws ExecutableCreationException {
 
         InternalTask nt = null;
         if (!acc.containsKey(this.getId())) {
-            nt = (InternalTask) this.duplicate();
+            nt = (InternalTask) this.replicate();
 
-            // when nesting DUPLICATE actions, the duplication index of the original tasks will change
+            // when nesting REPLICATE actions, the replication index of the original tasks will change
             if (!loopAction) {
-                this.setDuplicationIndex(dupIndex);
+                this.setReplicationIndex(dupIndex);
             } else {
                 nt.setIterationIndex(this.getIterationIndex() + 1);
             }
@@ -400,10 +400,10 @@ public abstract class InternalTask extends TaskState {
                 if (this.getIDependences() != null) {
                     Map<String, InternalTask> deps = new HashMap<String, InternalTask>();
                     for (InternalTask parent : this.getIDependences()) {
-                        // filter out duplicated tasks
+                        // filter out replicated tasks
                         if (deps.containsKey(parent.getAmbiguousName())) {
                             InternalTask dep = deps.get(parent.getAmbiguousName());
-                            if (dep.getDuplicationIndex() > parent.getDuplicationIndex()) {
+                            if (dep.getReplicationIndex() > parent.getReplicationIndex()) {
                                 deps.put(parent.getAmbiguousName(), parent);
                             }
                         } else {
@@ -411,29 +411,29 @@ public abstract class InternalTask extends TaskState {
                         }
                     }
                     for (InternalTask parent : deps.values()) {
-                        parent.internalDuplicateTree(acc, target, loopAction, dupIndex, itIndex);
+                        parent.internalReplicateTree(acc, target, loopAction, dupIndex, itIndex);
                     }
                 }
                 if (this.getJoinedBranches() != null) {
                     for (InternalTask parent : this.getJoinedBranches()) {
-                        parent.internalDuplicateTree(acc, target, loopAction, dupIndex, itIndex);
+                        parent.internalReplicateTree(acc, target, loopAction, dupIndex, itIndex);
                     }
                 }
                 if (this.getIfBranch() != null) {
-                    this.getIfBranch().internalDuplicateTree(acc, target, loopAction, dupIndex, itIndex);
+                    this.getIfBranch().internalReplicateTree(acc, target, loopAction, dupIndex, itIndex);
                 }
             }
         }
     }
 
     /**
-     * Internal recursive delegate of {@link #duplicateTree(Map, TaskId)} for dependence duplication
+     * Internal recursive delegate of {@link #replicateTree(Map, TaskId)} for dependence replication
      * 
      * @param acc accumulator
      * @param target end condition
-     * @param loopAction true if the action performed is an if, false is it is a duplicate
-     * @param initDupIndex duplication index threshold if <code>ifAction == true</code>
-     *                 duplication index to set to the old tasks if <code>ifAction == false</code>
+     * @param loopAction true if the action performed is an if, false is it is a replicate
+     * @param initDupIndex replication index threshold if <code>ifAction == true</code>
+     *                 replication index to set to the old tasks if <code>ifAction == false</code>
      * @param itIndex iteration index threshold it <code>ifAction == true</code>
      *
      * @throws Exception instantiation error
@@ -458,13 +458,13 @@ public abstract class InternalTask extends TaskState {
         } else if (this.hasDependences()) {
             // hard dependency check has to be exclusive and AFTER if branch checks :
             // if an FlowAction#IF was executed, we should have both weak and hard dependencies,
-            // although only the weak one should be copied on the duplicated task
+            // although only the weak one should be copied on the replicated task
             // ideps.addAll(this.getIDependences());
             for (InternalTask parent : this.getIDependences()) {
-                // filter out duplicated tasks
+                // filter out replicated tasks
                 if (ideps.containsKey(parent.getAmbiguousName())) {
                     InternalTask dep = ideps.get(parent.getAmbiguousName());
-                    if (dep.getDuplicationIndex() > parent.getDuplicationIndex()) {
+                    if (dep.getReplicationIndex() > parent.getReplicationIndex()) {
                         ideps.put(parent.getAmbiguousName(), parent);
                     }
                 } else {
@@ -840,9 +840,9 @@ public abstract class InternalTask extends TaskState {
     /**
      * To set the name of this task.
      * <p>
-     * The provided String will be appended the iteration and duplication index
+     * The provided String will be appended the iteration and replication index
      * if > 0, so that: <br>
-     * <code>name = name [iterationSeparator iteration] [duplicationSeparator duplication]</code>
+     * <code>name = name [iterationSeparator iteration] [replicationSeparator replication]</code>
      *
      * @param newName
      *            the name to set.
@@ -854,7 +854,7 @@ public abstract class InternalTask extends TaskState {
         int i = -1;
         if ((i = newName.indexOf(TaskId.iterationSeparator)) != -1) {
             newName = newName.substring(0, i);
-        } else if ((i = newName.indexOf(TaskId.duplicationSeparator)) != -1) {
+        } else if ((i = newName.indexOf(TaskId.replicationSeparator)) != -1) {
             newName = newName.substring(0, i);
         }
 
@@ -870,7 +870,7 @@ public abstract class InternalTask extends TaskState {
         }
 
         // update matching block name if it exists
-        // start/end block tasks should always have the same iteration & duplication
+        // start/end block tasks should always have the same iteration & replication
         if (this.matchingBlock != null && this.matchingBlock.length() > 0) {
             String m = getInitialName(this.matchingBlock);
             this.setMatchingBlock(m + getTaskNameSuffix());
@@ -901,9 +901,9 @@ public abstract class InternalTask extends TaskState {
 
     /**
      * Constructs the suffix to append to a task name so that is 
-     * can be unique among duplicated tasks in complex taskflows with loops/duplications
+     * can be unique among replicated tasks in complex taskflows with loops/replications
      * 
-     * @return the String suffix to append to a duplicated task so that
+     * @return the String suffix to append to a replicated task so that
      * it can be distinguished from the original
      */
     private String getTaskNameSuffix() {
@@ -911,20 +911,20 @@ public abstract class InternalTask extends TaskState {
         if (this.iteration > 0) {
             n += TaskId.iterationSeparator + this.iteration;
         }
-        if (this.duplication > 0) {
-            n += TaskId.duplicationSeparator + this.duplication;
+        if (this.replication > 0) {
+            n += TaskId.replicationSeparator + this.replication;
         }
         return n;
     }
 
     /**
      * Extracts the original task name if it was added a suffix to
-     * make it unique among duplicated tasks
+     * make it unique among replicated tasks
      * <p>
      * <b>This methods returns an ambiguous name: several tasks can share this name;
      * it cannot be used as an identifier.
      * </b>
-     * @return the original task name, without the added suffixes for iteration and duplication
+     * @return the original task name, without the added suffixes for iteration and replication
      */
     private String getAmbiguousName() {
         return getInitialName(this.getName());
@@ -932,19 +932,19 @@ public abstract class InternalTask extends TaskState {
 
     /**
      * Extracts the original task name if it was added a suffix to
-     * make it unique among duplicated tasks
+     * make it unique among replicated tasks
      * <p>
      * <b>This methods returns an ambiguous name: several tasks can share this name;
      * it cannot be used as an identifier.
      * </b>
-     * @param fullTaskName name with the iteration and duplication suffixes
-     * @return the original task name, without the added suffixes for iteration and duplication
+     * @param fullTaskName name with the iteration and replication suffixes
+     * @return the original task name, without the added suffixes for iteration and replication
      */
     public static String getInitialName(String fullTaskname) {
         String taskName = null;
 
         String[] str = new String[] { "^(.*)[" + TaskId.iterationSeparator + "].*$",
-                "^(.*)[" + TaskId.duplicationSeparator + "].*$", "^(.*)$" };
+                "^(.*)[" + TaskId.replicationSeparator + "].*$", "^(.*)$" };
 
         Matcher matcher = null;
         for (String regex : str) {
@@ -959,17 +959,17 @@ public abstract class InternalTask extends TaskState {
     }
 
     /**
-     * Extracts the duplication index from a non ambiguous name:
-     * <p>ie: getDuplicationIndexFromName("task1*3") returns 3.
+     * Extracts the replication index from a non ambiguous name:
+     * <p>ie: getReplicationIndexFromName("task1*3") returns 3.
      * 
      * @param name non ambiguous task name
-     * @return the duplication index contained in the name
+     * @return the replication index contained in the name
      */
-    public static int getDuplicationIndexFromName(String name) {
-        if (name.indexOf(TaskId.duplicationSeparator) == -1) {
+    public static int getReplicationIndexFromName(String name) {
+        if (name.indexOf(TaskId.replicationSeparator) == -1) {
             return 0;
         } else {
-            return Integer.parseInt(name.split("[" + TaskId.duplicationSeparator + "]")[1]);
+            return Integer.parseInt(name.split("[" + TaskId.replicationSeparator + "]")[1]);
         }
     }
 
@@ -978,19 +978,19 @@ public abstract class InternalTask extends TaskState {
      * <p>ie: getIterationIndexFromName("task1#3") returns 3.
      * 
      * @param name non ambiguous task name
-     * @return the duplication index contained in the name
+     * @return the replication index contained in the name
      */
     public static int getIterationIndexFromName(String name) {
         if (name.indexOf(TaskId.iterationSeparator) == -1) {
             return 0;
         } else {
             String suffix = name.split("[" + TaskId.iterationSeparator + "]")[1];
-            return Integer.parseInt(suffix.split("[" + TaskId.duplicationSeparator + "]")[0]);
+            return Integer.parseInt(suffix.split("[" + TaskId.replicationSeparator + "]")[0]);
         }
     }
 
     /**
-     * Set the iteration number of this task if it was duplicated by a IF flow operations
+     * Set the iteration number of this task if it was replicated by a IF flow operations
      * <p>
      * Updates the Task's name consequently, see {@link Task#setName(String)}
      * 
@@ -1006,7 +1006,7 @@ public abstract class InternalTask extends TaskState {
     }
 
     /**
-     * @return the iteration number of this task if it was duplicated by a LOOP flow operations (>= 0)
+     * @return the iteration number of this task if it was replicated by a LOOP flow operations (>= 0)
      */
     @Override
     public int getIterationIndex() {
@@ -1014,25 +1014,25 @@ public abstract class InternalTask extends TaskState {
     }
 
     /**
-     * Set the duplication number of this task if it was duplicated by a DUPLICATE flow operations
+     * Set the replication number of this task if it was replicated by a REPLICATE flow operations
      * 
      * @param it iteration number, must be >= 0
      */
-    public void setDuplicationIndex(int it) {
+    public void setReplicationIndex(int it) {
         if (it < 0) {
-            throw new IllegalArgumentException("Cannot set negative duplication index: " + it);
+            throw new IllegalArgumentException("Cannot set negative replication index: " + it);
         }
         String taskName = getInitialName(this.getName());
-        this.duplication = it;
+        this.replication = it;
         this.setName(taskName);
     }
 
     /**
-     * @return the duplication number of this task if it was duplicated by a DUPLICATE flow operations (>= 0)
+     * @return the replication number of this task if it was replicated by a REPLICATE flow operations (>= 0)
      */
     @Override
-    public int getDuplicationIndex() {
-        return this.duplication;
+    public int getReplicationIndex() {
+        return this.replication;
     }
 
     /**
@@ -1125,7 +1125,7 @@ public abstract class InternalTask extends TaskState {
         tli.setTaskOutputFiles(getOutputFilesList());
         tli.setNamingServiceUrl(job.getJobDataSpaceApplication().getNamingServiceURL());
         tli.setIterationIndex(getIterationIndex());
-        tli.setDuplicationIndex(getDuplicationIndex());
+        tli.setReplicationIndex(getReplicationIndex());
         if (isWallTime()) {
             tli.setWalltime(wallTime);
         }

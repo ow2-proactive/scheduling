@@ -64,7 +64,7 @@ public enum FlowActionType {
     /** 
      * Parallel split with join
      */
-    DUPLICATE("duplicate"),
+    REPLICATE("replicate"),
 
     /** 
      * Loop back in the flow to a previously executed task
@@ -99,8 +99,8 @@ public enum FlowActionType {
         }
         if (str.equalsIgnoreCase(FlowActionType.IF.toString())) {
             return FlowActionType.IF;
-        } else if (str.equalsIgnoreCase(FlowActionType.DUPLICATE.toString())) {
-            return FlowActionType.DUPLICATE;
+        } else if (str.equalsIgnoreCase(FlowActionType.REPLICATE.toString())) {
+            return FlowActionType.REPLICATE;
         } else if (str.equalsIgnoreCase(FlowActionType.LOOP.toString())) {
             return FlowActionType.LOOP;
         } else {

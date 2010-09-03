@@ -173,7 +173,7 @@ public class JobFactory_stax extends JobFactory {
     private static final String ELEMENT_FLOW = "flowControl";
     private static final String ATTRIBUTE_FLOW_BLOCK = "block";
     private static final String ELEMENT_FLOW_IF = "if";
-    private static final String ELEMENT_FLOW_DUPLICATE = "duplicate";
+    private static final String ELEMENT_FLOW_REPLICATE = "replicate";
     private static final String ELEMENT_FLOW_LOOP = "loop";
     private static final String ATTRIBUTE_FLOW_TARGET = "target";
     private static final String ATTRIBUTE_FLOW_ELSE = "else";
@@ -829,7 +829,7 @@ public class JobFactory_stax extends JobFactory {
         }
 
         try {
-            // <control>  =>  <if> | <loop> | <duplicate>
+            // <control>  =>  <if> | <loop> | <replicate>
             while (cursorTask.hasNext()) {
                 event = cursorTask.next();
                 if (event == XMLEvent.START_ELEMENT) {
@@ -840,13 +840,13 @@ public class JobFactory_stax extends JobFactory {
                 }
             }
             if (event != XMLEvent.START_ELEMENT) {
-                throw new JobCreationException("Expected start element IF, DUPLICATE or LOOP at line " +
+                throw new JobCreationException("Expected start element IF, REPLICATE or LOOP at line " +
                     cursorTask.getLocation().getLineNumber());
             }
 
-            // DUPLICATE : no attribute
-            if (cursorTask.getLocalName().equals(JobFactory_stax.ELEMENT_FLOW_DUPLICATE)) {
-                type = FlowActionType.DUPLICATE.toString();
+            // REPLICATE : no attribute
+            if (cursorTask.getLocalName().equals(JobFactory_stax.ELEMENT_FLOW_REPLICATE)) {
+                type = FlowActionType.REPLICATE.toString();
             }
             // IF : attributes TARGET_IF and TARGET_ELSE and TARGET_JOIN
             else if (cursorTask.getLocalName().equals(JobFactory_stax.ELEMENT_FLOW_IF)) {
@@ -872,7 +872,7 @@ public class JobFactory_stax extends JobFactory {
                     }
                 }
             } else {
-                throw new XMLStreamException("Awaited element " + JobFactory_stax.ELEMENT_FLOW_DUPLICATE +
+                throw new XMLStreamException("Awaited element " + JobFactory_stax.ELEMENT_FLOW_REPLICATE +
                     "," + JobFactory_stax.ELEMENT_FLOW_IF + " or " + JobFactory_stax.ELEMENT_FLOW_LOOP +
                     ", got " + cursorTask.getLocalName());
             }
@@ -884,8 +884,8 @@ public class JobFactory_stax extends JobFactory {
                     case IF:
                         sc = FlowScript.createIfFlowScript(internalScript, target, targetElse, targetJoin);
                         break;
-                    case DUPLICATE:
-                        sc = FlowScript.createDuplicateFlowScript(internalScript);
+                    case REPLICATE:
+                        sc = FlowScript.createReplicateFlowScript(internalScript);
                         break;
                     case LOOP:
                         sc = FlowScript.createLoopFlowScript(internalScript, target);
@@ -895,7 +895,7 @@ public class JobFactory_stax extends JobFactory {
                 throw new XMLStreamException("Could not create Control Flow Script", e);
             }
 
-            // </script>  -->  </if> | </duplicate> | </loop>
+            // </script>  -->  </if> | </replicate> | </loop>
             while (cursorTask.hasNext()) {
                 event = cursorTask.next();
                 if (event == XMLEvent.END_ELEMENT) {
@@ -903,7 +903,7 @@ public class JobFactory_stax extends JobFactory {
                 }
             }
             if (event != XMLEvent.END_ELEMENT) {
-                throw new JobCreationException("Expected end element IF, DUPLICATE or LOOP at line " +
+                throw new JobCreationException("Expected end element IF, REPLICATE or LOOP at line " +
                     cursorTask.getLocation().getLineNumber());
             }
 

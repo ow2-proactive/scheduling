@@ -11,11 +11,11 @@ if [ ! -d $OUT ]; then
 	mkdir -p $OUT
 fi
 
-num=$PAS_TASK_DUPLICATION
+num=$PAS_TASK_REPLICATION
 
 IN=$1/tmp.in/$PAS_TASK_ITERATION/$num.jpg
 
 convert $IN \
 	-quantize RGB +dither -colors 4 \
 	-contrast-stretch 3% \
-	$OUT/$PAS_TASK_DUPLICATION.jpg
+	$OUT/$PAS_TASK_REPLICATION.jpg

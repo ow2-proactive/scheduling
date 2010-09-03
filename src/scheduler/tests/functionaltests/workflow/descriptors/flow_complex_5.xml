@@ -22,7 +22,7 @@
       <javaExecutable class="org.ow2.proactive.scheduler.examples.IncrementJob">
       </javaExecutable>
       <flowControl block="none" >
-        <duplicate>
+        <replicate>
           <script>
             <code language="javascript">
 // <![CDATA[
@@ -30,7 +30,7 @@ runs = 2;
 // ]]>
             </code>
           </script>
-        </duplicate>
+        </replicate>
       </flowControl>
     </task>
     <task name="T5" maxNumberOfExecution="4">
@@ -43,7 +43,7 @@ runs = 2;
       <javaExecutable class="org.ow2.proactive.scheduler.examples.IncrementJob">
       </javaExecutable>
       <flowControl block="start" >
-        <duplicate>
+        <replicate>
           <script>
             <code language="javascript">
 // <![CDATA[
@@ -51,7 +51,7 @@ runs = 2;
 // ]]>
             </code>
           </script>
-        </duplicate>
+        </replicate>
       </flowControl>
     </task>
     <task name="T8" maxNumberOfExecution="4">
@@ -81,7 +81,7 @@ runs = 2;
 // <![CDATA[
 
 importPackage(java.io);
-var ID   = 9 + "_" + $DUP;
+var ID   = 9 + "_" + $REP;
 var RUNS = 2;
 var f = new File(".test_flow_lock_" + ID);
 var it = 0;
@@ -123,7 +123,7 @@ loop = false;
 // <![CDATA[
 
 importPackage(java.io);
-var ID   = 4 + "_" + $DUP;
+var ID   = 4 + "_" + $REP;
 var RUNS = 2;
 var f = new File(".test_flow_lock_" + ID);
 var it = 0;

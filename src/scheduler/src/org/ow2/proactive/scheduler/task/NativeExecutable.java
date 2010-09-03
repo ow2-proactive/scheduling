@@ -222,8 +222,8 @@ public class NativeExecutable extends Executable {
                 .getProperty(SchedulerVars.JAVAENV_TASK_NAME_VARNAME.toString()));
         taskEnvVariables.put(SchedulerVars.JAVAENV_TASK_ITERATION.toString(), System
                 .getProperty(SchedulerVars.JAVAENV_TASK_ITERATION.toString()));
-        taskEnvVariables.put(SchedulerVars.JAVAENV_TASK_DUPLICATION.toString(), System
-                .getProperty(SchedulerVars.JAVAENV_TASK_DUPLICATION.toString()));
+        taskEnvVariables.put(SchedulerVars.JAVAENV_TASK_REPLICATION.toString(), System
+                .getProperty(SchedulerVars.JAVAENV_TASK_REPLICATION.toString()));
 
         // exported properties
         String allVars = System.getProperty(PropertyUtils.EXPORTED_PROPERTIES_VAR_NAME);

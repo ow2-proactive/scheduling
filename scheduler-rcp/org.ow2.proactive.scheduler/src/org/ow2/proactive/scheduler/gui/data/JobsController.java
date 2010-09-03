@@ -158,10 +158,10 @@ public class JobsController implements SchedulerEventListener {
             listener.taskSkipped(jobId);
     }
 
-    /** call "taskDuplicated" method on listeners */
-    private void taskDuplicatedEventInternal(JobId jobId) {
+    /** call "taskReplicated" method on listeners */
+    private void taskReplicatedEventInternal(JobId jobId) {
         for (RunningJobsListener listener : runningJobsListeners)
-            listener.taskDuplicated(jobId);
+            listener.taskReplicated(jobId);
     }
 
     /** call "addFinishedJob" method on listeners */
@@ -350,8 +350,8 @@ public class JobsController implements SchedulerEventListener {
             case JOB_CHANGE_PRIORITY:
                 jobChangePriorityEvent(notification.getData());
                 break;
-            case TASK_DUPLICATED:
-                taskDuplicated(notification.getData());
+            case TASK_REPLICATED:
+                taskReplicated(notification.getData());
                 break;
             case TASK_SKIPPED:
                 taskSkipped(notification.getData());
@@ -897,12 +897,12 @@ public class JobsController implements SchedulerEventListener {
 
     }
 
-    private void taskDuplicated(JobInfo info) {
+    private void taskReplicated(JobInfo info) {
         JobId jobId = info.getJobId();
         JobState job = getJobById(jobId);
         job.update(info);
 
-        taskDuplicatedEventInternal(info.getJobId());
+        taskReplicatedEventInternal(info.getJobId());
 
         // if this job is selected in the Running table
         if (TableManager.getInstance().isJobSelected(jobId)) {

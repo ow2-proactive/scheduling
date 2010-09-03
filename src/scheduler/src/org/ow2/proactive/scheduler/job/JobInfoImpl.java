@@ -158,28 +158,28 @@ public class JobInfoImpl implements JobInfo {
     private Map<TaskId, Long> taskFinishedTimeModify = null;
 
     /**
-     * contains the ids of the original and the duplicated task,
-     * as well as ids of the dependencies of the duplicated task
+     * contains the ids of the original and the replicated task,
+     * as well as ids of the dependencies of the replicated task
      */
-    public static class DuplicatedTask implements Serializable {
+    public static class ReplicatedTask implements Serializable {
         public TaskId originalId = null;
-        public TaskId duplicatedId = null;
+        public TaskId replicatedId = null;
         public List<TaskId> deps = null;
 
-        public DuplicatedTask(TaskId original, TaskId duplicated) {
+        public ReplicatedTask(TaskId original, TaskId replicated) {
             this.originalId = original;
-            this.duplicatedId = duplicated;
+            this.replicatedId = replicated;
             this.deps = new ArrayList<TaskId>();
         }
     }
 
-    /** Tasks duplicated by a Control Flow Action */
+    /** Tasks replicated by a Control Flow Action */
     @Transient
-    private List<DuplicatedTask> tasksDuplicated = null;
+    private List<ReplicatedTask> tasksReplicated = null;
 
     /** Tasks loop by a Control Flow Action */
     @Transient
-    private List<DuplicatedTask> tasksLooped = null;
+    private List<ReplicatedTask> tasksLooped = null;
 
     /** Tasks skipped by a Control Flow Action */
     @Transient
@@ -313,42 +313,42 @@ public class JobInfoImpl implements JobInfo {
     }
 
     /**
-     * Used as an argument for {@link SchedulerEvent#TASK_DUPLICATED} to
-     * specify which tasks were duplicated
+     * Used as an argument for {@link SchedulerEvent#TASK_REPLICATED} to
+     * specify which tasks were replicated
      * 
-     * @param m list of the duplicated tasks
+     * @param m list of the replicated tasks
      */
-    public void setTasksDuplicated(List<DuplicatedTask> m) {
-        this.tasksDuplicated = m;
+    public void setTasksReplicated(List<ReplicatedTask> m) {
+        this.tasksReplicated = m;
     }
 
     /**
-     * Used as an argument for {@link SchedulerEvent#TASK_DUPLICATED} to
-     * specify which tasks were duplicated
+     * Used as an argument for {@link SchedulerEvent#TASK_REPLICATED} to
+     * specify which tasks were replicated
      * 
-     * @return a list of the duplicated tasks
+     * @return a list of the replicated tasks
      */
-    public List<DuplicatedTask> getTasksDuplicated() {
-        return this.tasksDuplicated;
+    public List<ReplicatedTask> getTasksReplicated() {
+        return this.tasksReplicated;
     }
 
     /**
-     * Used as an argument for {@link SchedulerEvent#TASK_DUPLICATED} to
-     * specify which tasks were duplicated
+     * Used as an argument for {@link SchedulerEvent#TASK_REPLICATED} to
+     * specify which tasks were replicated
      * 
-     * @param m list of the duplicated tasks
+     * @param m list of the replicated tasks
      */
-    public void setTasksLooped(List<DuplicatedTask> m) {
+    public void setTasksLooped(List<ReplicatedTask> m) {
         this.tasksLooped = m;
     }
 
     /**
-     * Used as an argument for {@link SchedulerEvent#TASK_DUPLICATED} to
-     * specify which tasks were duplicated
+     * Used as an argument for {@link SchedulerEvent#TASK_REPLICATED} to
+     * specify which tasks were replicated
      * 
-     * @return a list of the duplicated tasks
+     * @return a list of the replicated tasks
      */
-    public List<DuplicatedTask> getTasksLooped() {
+    public List<ReplicatedTask> getTasksLooped() {
         return this.tasksLooped;
     }
 

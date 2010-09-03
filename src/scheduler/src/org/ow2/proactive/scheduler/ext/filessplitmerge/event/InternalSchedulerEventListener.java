@@ -519,7 +519,7 @@ public class InternalSchedulerEventListener extends Observable implements Schedu
             case JOB_RESUMED:
             case JOB_CHANGE_PRIORITY:
             case JOB_PAUSED:
-            case TASK_DUPLICATED:
+            case TASK_REPLICATED:
             case TASK_SKIPPED:
                 final JobState job = getJobById(data.getJobId().value());
                 job.update(data);

@@ -140,7 +140,7 @@ public abstract class TaskLauncher implements InitActive {
         /**  */
         JAVAENV_TASK_ITERATION("pas.task.iteration"),
         /**  */
-        JAVAENV_TASK_DUPLICATION("pas.task.duplication");
+        JAVAENV_TASK_REPLICATION("pas.task.replication");
 
         String varName;
 
@@ -162,9 +162,9 @@ public abstract class TaskLauncher implements InitActive {
     protected Script<?> post;
     protected FlowScript flow;
 
-    /** duplication index: task was duplicated in parallel */
-    protected int duplicationIndex = 0;
-    /** iteration index: task was duplicated sequentially */
+    /** replication index: task was replicated in parallel */
+    protected int replicationIndex = 0;
+    /** iteration index: task was replicated sequentially */
     protected int iterationIndex = 0;
 
     // handle streams
@@ -193,8 +193,8 @@ public abstract class TaskLauncher implements InitActive {
     /** Will be replaced in file paths by the task's iteration index */
     protected static final String ITERATION_INDEX_TAG = "\\$IT";
 
-    /** Will be replaced in file paths by the task's duplication index */
-    protected static final String DUPLICATION_INDEX_TAG = "\\$DUP";
+    /** Will be replaced in file paths by the task's replication index */
+    protected static final String REPLICATION_INDEX_TAG = "\\$REP";
 
     /**
      * ProActive empty constructor.
@@ -220,7 +220,7 @@ public abstract class TaskLauncher implements InitActive {
         this.inputFiles = initializer.getTaskInputFiles();
         this.outputFiles = initializer.getTaskOutputFiles();
         this.namingServiceUrl = initializer.getNamingServiceUrl();
-        this.duplicationIndex = initializer.getDuplicationIndex();
+        this.replicationIndex = initializer.getReplicationIndex();
         this.iterationIndex = initializer.getIterationIndex();
     }
 
@@ -355,7 +355,7 @@ public abstract class TaskLauncher implements InitActive {
         System.setProperty(SchedulerVars.JAVAENV_TASK_ID_VARNAME.toString(), this.taskId.value());
         System.setProperty(SchedulerVars.JAVAENV_TASK_NAME_VARNAME.toString(), this.taskId.getReadableName());
         System.setProperty(SchedulerVars.JAVAENV_TASK_ITERATION.toString(), "" + this.iterationIndex);
-        System.setProperty(SchedulerVars.JAVAENV_TASK_DUPLICATION.toString(), "" + this.duplicationIndex);
+        System.setProperty(SchedulerVars.JAVAENV_TASK_REPLICATION.toString(), "" + this.replicationIndex);
 
         // previously exported and propagated vars must be deleted
         System.clearProperty(PropertyUtils.EXPORTED_PROPERTIES_VAR_NAME);
@@ -371,7 +371,7 @@ public abstract class TaskLauncher implements InitActive {
         System.clearProperty(SchedulerVars.JAVAENV_TASK_ID_VARNAME.toString());
         System.clearProperty(SchedulerVars.JAVAENV_TASK_NAME_VARNAME.toString());
         System.clearProperty(SchedulerVars.JAVAENV_TASK_ITERATION.toString());
-        System.clearProperty(SchedulerVars.JAVAENV_TASK_DUPLICATION.toString());
+        System.clearProperty(SchedulerVars.JAVAENV_TASK_REPLICATION.toString());
     }
 
     /**
@@ -859,7 +859,7 @@ public abstract class TaskLauncher implements InitActive {
     }
 
     /**
-     * Replace iteration and duplication helper tags in the dataspace's input and output descriptions
+     * Replace iteration and replication helper tags in the dataspace's input and output descriptions
      */
     protected void replaceDSIterationTag() {
         if (isDataspaceAware()) {
@@ -871,13 +871,13 @@ public abstract class TaskLauncher implements InitActive {
                     if (inc != null) {
                         for (int i = 0; i < inc.length; i++) {
                             inc[i] = inc[i].replaceAll(ITERATION_INDEX_TAG, "" + this.iterationIndex);
-                            inc[i] = inc[i].replaceAll(DUPLICATION_INDEX_TAG, "" + this.duplicationIndex);
+                            inc[i] = inc[i].replaceAll(REPLICATION_INDEX_TAG, "" + this.replicationIndex);
                         }
                     }
                     if (exc != null) {
                         for (int i = 0; i < exc.length; i++) {
                             exc[i] = exc[i].replaceAll(ITERATION_INDEX_TAG, "" + this.iterationIndex);
-                            exc[i] = exc[i].replaceAll(DUPLICATION_INDEX_TAG, "" + this.duplicationIndex);
+                            exc[i] = exc[i].replaceAll(REPLICATION_INDEX_TAG, "" + this.replicationIndex);
                         }
                     }
 
@@ -893,13 +893,13 @@ public abstract class TaskLauncher implements InitActive {
                     if (inc != null) {
                         for (int i = 0; i < inc.length; i++) {
                             inc[i] = inc[i].replaceAll(ITERATION_INDEX_TAG, "" + this.iterationIndex);
-                            inc[i] = inc[i].replaceAll(DUPLICATION_INDEX_TAG, "" + this.duplicationIndex);
+                            inc[i] = inc[i].replaceAll(REPLICATION_INDEX_TAG, "" + this.replicationIndex);
                         }
                     }
                     if (exc != null) {
                         for (int i = 0; i < exc.length; i++) {
                             exc[i] = exc[i].replaceAll(ITERATION_INDEX_TAG, "" + this.iterationIndex);
-                            exc[i] = exc[i].replaceAll(DUPLICATION_INDEX_TAG, "" + this.duplicationIndex);
+                            exc[i] = exc[i].replaceAll(REPLICATION_INDEX_TAG, "" + this.replicationIndex);
                         }
                     }
 
@@ -911,7 +911,7 @@ public abstract class TaskLauncher implements InitActive {
     }
 
     /**
-     * Replace iteration and duplication helper tags in the scripts' contents and parameters
+     * Replace iteration and replication helper tags in the scripts' contents and parameters
      * 
      * @param script the script where tags should be replaced
      */
@@ -923,11 +923,11 @@ public abstract class TaskLauncher implements InitActive {
         String[] args = script.getParameters();
 
         code = code.replaceAll(ITERATION_INDEX_TAG, "" + this.iterationIndex);
-        code = code.replaceAll(DUPLICATION_INDEX_TAG, "" + this.duplicationIndex);
+        code = code.replaceAll(REPLICATION_INDEX_TAG, "" + this.replicationIndex);
         if (args != null) {
             for (int i = 0; i < args.length; i++) {
                 args[i] = args[i].replaceAll(ITERATION_INDEX_TAG, "" + this.iterationIndex);
-                args[i] = args[i].replaceAll(DUPLICATION_INDEX_TAG, "" + this.duplicationIndex);
+                args[i] = args[i].replaceAll(REPLICATION_INDEX_TAG, "" + this.replicationIndex);
             }
         }
 

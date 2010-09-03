@@ -19,7 +19,7 @@
             <code language="javascript">
 // <![CDATA[
 importPackage(java.io);
-var ID   = 1 + "_" + $DUP;
+var ID   = 1 + "_" + $REP;
 var RUNS = 3;
 var f = new File(".test_flow_lock_" + ID);
 var it = 0;
@@ -63,7 +63,7 @@ loop = false;
       <javaExecutable class="org.ow2.proactive.scheduler.examples.IncrementJob">
       </javaExecutable>
       <flowControl block="none" >
-        <duplicate>
+        <replicate>
           <script>
             <code language="javascript">
 // <![CDATA[
@@ -71,7 +71,7 @@ runs=3;
 // ]]>
             </code>
           </script>
-        </duplicate>
+        </replicate>
       </flowControl>
     </task>
   </taskFlow>

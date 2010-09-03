@@ -39,9 +39,9 @@
 	  </nativeExecutable>
 	  <!-- start block because target of a loop -->
 	  <flowControl block="start">
-		<duplicate>
+		<replicate>
 		  <script>
-			<!-- will duplicate the child task X times, where X is the number
+			<!-- will replicate the child task X times, where X is the number
 				 of images created by cut.sh -->
 			<file path="${root}/dup.js">
 			  <arguments>
@@ -49,12 +49,12 @@
 			  </arguments>
 			</file>
 		  </script>
-		</duplicate>
+		</replicate>
 	  </flowControl>
 	</task>
 
     <!-- applies a filter on one single image part
-		 depending the iteration (image) and duplication (sub-image) number -->
+		 depending the iteration (image) and replication (sub-image) number -->
 	<task name="filter">
 	  <depends>
 		<task ref="split" />

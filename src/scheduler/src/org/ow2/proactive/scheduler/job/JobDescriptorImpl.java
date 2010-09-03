@@ -264,7 +264,7 @@ public class JobDescriptorImpl implements JobDescriptor {
      * Complete LOOP action on JobDescriptor side
      * 
      * @param initiator Task initiating the LOOP action
-     * @param tree InternalTask tree of duplicated tasks
+     * @param tree InternalTask tree of replicated tasks
      * @param target Target task of the LOOP action
      */
     public void doLoop(TaskId initiator, Map<TaskId, InternalTask> tree, InternalTask target,
@@ -423,15 +423,15 @@ public class JobDescriptorImpl implements JobDescriptor {
     }
 
     /**
-     * Complete DUPLICATE action on JobDescriptor side
+     * Complete REPLICATE action on JobDescriptor side
      * 
-     * @param initiator Task initiating the DUPLICATE action
-     * @param tree InternalTask tree of duplicated tasks
-     * @param target Target task of the DUPLICATE action: first task of the block
-     * @param oldEnd End task of the duplicated block ; original version
-     * @param newEnd End task of the duplicated block ; dup version
+     * @param initiator Task initiating the REPLICATE action
+     * @param tree InternalTask tree of replicated tasks
+     * @param target Target task of the REPLICATE action: first task of the block
+     * @param oldEnd End task of the replicated block ; original version
+     * @param newEnd End task of the replicated block ; dup version
      */
-    public void doDuplicate(TaskId initiator, Map<TaskId, InternalTask> tree, InternalTask target,
+    public void doReplicate(TaskId initiator, Map<TaskId, InternalTask> tree, InternalTask target,
             TaskId oldEnd, TaskId newEnd) {
         Map<TaskId, EligibleTaskDescriptorImpl> acc = new HashMap<TaskId, EligibleTaskDescriptorImpl>();
 

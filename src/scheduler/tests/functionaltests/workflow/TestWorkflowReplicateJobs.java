@@ -42,35 +42,35 @@ package functionaltests.workflow;
  * @author The ProActive Team
  * @since ProActive Scheduling 2.2
  */
-public class TestWorkflowDuplicateJobs extends TWorkflowJobs {
+public class TestWorkflowReplicateJobs extends TWorkflowJobs {
 
     // private static final String[][] jobs = 
     @Override
     public final String[][] getJobs() {
         return new String[][] {
 
-        // 1: duplicate on one single task
+        // 1: replicate on one single task
                 { "T 0", "T1 1", "T1*1 1", "T2 3" },
 
-                // 2: duplicate on a simple task block
+                // 2: replicate on a simple task block
                 { "T 0", "T1 1", "T1*1 1", "T2 2", "T2*1 2", "T3 5" },
 
-                // 3: duplicate on a complex task block
+                // 3: replicate on a complex task block
                 { "T 0", "T1 1", "T2 2", "T3 2", "T4 3", "T5 3", "T6 9", "T1*1 1", "T2*1 2", "T3*1 2",
                         "T4*1 3", "T5*1 3", "T6*1 9", "T7 19" },
 
-                // 4: nested duplicate: block -> single task
+                // 4: nested replicate: block -> single task
                 { "T 0", "T1 1", "T2 2", "T3 5", "T1*1 1", "T2*1 2", "T3*1 5", "T2*2 2", "T2*3 2", "T4 11" },
 
-                // 5: nested duplicate: block -> block
+                // 5: nested replicate: block -> block
                 { "T 0", "T1 1", "T1*1 1", "T2 2", "T2*1 2", "T2*2 2", "T2*3 2", "T3 3", "T3*1 3", "T3*2 3",
                         "T3*3 3", "T4 7", "T4*1 7", "T5 15" },
 
-                // 6: double duplicate: single task / block
+                // 6: double replicate: single task / block
                 { "T 0", "T1 1", "T1*1 1", "T4 3", "T2 1", "T2*1 1", "T3 2", "T3*1 2", "T5 3", "T5*1 3",
                         "T7 10" },
 
-                // 7: nested double duplicate: block -> complex block / block
+                // 7: nested double replicate: block -> complex block / block
                 { "T 0", "T2 1", "T2*1 1", "T3 2", "T3*1 2", "T5 3", "T5*1 3", "T1 1", "T1*1 1", "T8 2",
                         "T8*1 2", "T10 3", "T10*1 3", "T10*2 3", "T10*3 3", "T4 4", "T4*1 4", "T4*2 4",
                         "T4*3 4", "T9 4", "T9*1 4", "T9*2 4", "T9*3 4", "T11 9", "T11*1 9", "T11*2 9",
@@ -83,7 +83,7 @@ public class TestWorkflowDuplicateJobs extends TWorkflowJobs {
 
     @Override
     public final String getJobPrefix() {
-        return "/functionaltests/workflow/descriptors/flow_duplicate_";
+        return "/functionaltests/workflow/descriptors/flow_replicate_";
     }
 
     @org.junit.Test

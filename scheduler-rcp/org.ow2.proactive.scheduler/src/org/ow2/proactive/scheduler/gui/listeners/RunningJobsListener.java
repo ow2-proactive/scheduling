@@ -62,12 +62,12 @@ public interface RunningJobsListener {
     public void removeRunningJob(JobId jobId);
 
     /**
-     * One or more tasks have been duplicated inside this job,
+     * One or more tasks have been replicated inside this job,
      * some updates may be necessary
      * 
      * @param jobId the jobid
      */
-    public void taskDuplicated(JobId jobId);
+    public void taskReplicated(JobId jobId);
 
     /**
      * Tasks were skipped due to branching flow action

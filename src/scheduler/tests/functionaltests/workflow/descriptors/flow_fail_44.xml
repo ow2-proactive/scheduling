@@ -52,12 +52,12 @@
       <javaExecutable class="org.ow2.proactive.scheduler.examples.IncrementJob">
       </javaExecutable>
       <flowControl block="start" >
-        <duplicate>
+        <replicate>
           <script>
             <code language="javascript">
             </code>
           </script>
-        </duplicate>
+        </replicate>
       </flowControl>
     </task>
     <task name="T" maxNumberOfExecution="4">

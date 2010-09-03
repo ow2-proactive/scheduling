@@ -41,7 +41,7 @@ import org.ow2.proactive.scheduler.common.task.flow.FlowActionType;
 
 /**
  * Tests the correctness of workflow-controlled jobs including {@link FlowActionType#LOOP} and 
- * {@link FlowActionType#DUPLICATE} actions
+ * {@link FlowActionType#REPLICATE} actions
  *
  * @author The ProActive Team
  * @since ProActive Scheduling 2.2
@@ -57,20 +57,20 @@ public class TestWorkflowComplexJobs extends TWorkflowJobs {
     public String[][] getJobs() {
         return new String[][] {
 
-        // 1: loop block -> duplicate block
+        // 1: loop block -> replicate block
                 { "T 0", "T1 1", "T3 2", "T4 2", "T5 5", "T1*1 1", "T3*1 2", "T4*1 2", "T5*1 5", "T2 11",
                         "T#1 12", "T1#1 13", "T3#1 14", "T5#1 29", "T4#1 14", "T1#1*1 13", "T3#1*1 14",
                         "T5#1*1 29", "T4#1*1 14", "T2#1 59" },
 
-                // 2: loop block -> duplicate single task
+                // 2: loop block -> replicate single task
                 { "T 0", "T1 1", "T1*1 1", "T1*2 1", "T2 4", "T#1 5", "T1#1 6", "T1#1*1 6", "T1#1*2 6",
                         "T2#1 19", "T#2 20", "T1#2 21", "T1#2*1 21", "T1#2*2 21", "T2#2 64" },
 
-                // 3: duplicate single task -> loop single task
+                // 3: replicate single task -> loop single task
                 { "T 0", "T1 1", "T1*1 1", "T1*2 1", "T1#1 2", "T1#1*1 2", "T1#1*2 2", "T1#2 3", "T1#2*1 3",
                         "T1#2*2 3", "T2 10" },
 
-                // 4: loop block -> duplicate task -> loop task
+                // 4: loop block -> replicate task -> loop task
                 { "T 0", "T1 1", "T1*1 1", "T1*2 1", "T1#1 2", "T1#1*1 2", "T1#1*2 2", "T1#2 3", "T1#2*1 3",
                         "T1#2*2 3", "T2 10", "T#1 11", "T1#3 12", "T1#3*1 12", "T1#3*2 12", "T1#4 13",
                         "T1#4*1 13", "T1#4*2 13", "T1#5 14", "T1#5*1 14", "T1#5*2 14", "T2#1 43", "T#2 44",

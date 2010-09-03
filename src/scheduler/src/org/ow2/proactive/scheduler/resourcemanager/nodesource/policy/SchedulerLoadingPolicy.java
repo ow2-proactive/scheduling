@@ -292,7 +292,7 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
                 int tasksLeft = activeTasks.remove(notification.getData().getJobId());
                 activeTask -= tasksLeft;
                 break;
-            case TASK_DUPLICATED:
+            case TASK_REPLICATED:
             case TASK_SKIPPED:
                 JobId jid = notification.getData().getJobId();
                 JobInfo ji = notification.getData();
@@ -300,7 +300,7 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
                 int oldActiveTask = activeTasks.get(jid);
                 activeTasks.put(jid, i);
                 activeTask += (i - oldActiveTask);
-                logger.debug("Tasks duplicated. Current number of tasks " + activeTask);
+                logger.debug("Tasks replicated. Current number of tasks " + activeTask);
                 break;
         }
     }

@@ -176,7 +176,7 @@ public class JavaTaskLauncher extends TaskLauncher {
     }
 
     /**
-     * Replaces iteration and duplication index syntactic macros
+     * Replaces iteration and replication index syntactic macros
      * in various string locations across the task descriptor
      *
      * @param init the executable initializer containing the Java arguments
@@ -190,7 +190,7 @@ public class JavaTaskLauncher extends TaskLauncher {
                 if (arg.getValue() instanceof String) {
                     String str = ((String) arg.getValue()).replaceAll(ITERATION_INDEX_TAG, "" +
                         this.iterationIndex);
-                    str = str.replaceAll(DUPLICATION_INDEX_TAG, "" + this.duplicationIndex);
+                    str = str.replaceAll(REPLICATION_INDEX_TAG, "" + this.replicationIndex);
                     jinit.setArgument(arg.getKey(), str);
                 }
             }

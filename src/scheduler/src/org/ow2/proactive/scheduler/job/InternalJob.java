@@ -94,7 +94,7 @@ import org.ow2.proactive.scheduler.core.SchedulerFrontend;
 import org.ow2.proactive.scheduler.core.annotation.TransientInSerialization;
 import org.ow2.proactive.scheduler.core.db.DatabaseManager;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
-import org.ow2.proactive.scheduler.job.JobInfoImpl.DuplicatedTask;
+import org.ow2.proactive.scheduler.job.JobInfoImpl.ReplicatedTask;
 import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalForkedJavaTask;
@@ -250,62 +250,62 @@ public abstract class InternalJob extends JobState {
                 }
             }
         }
-        // duplicated tasks have been added through FlowAction#DUPLICATE
-        if (this.jobInfo.getTasksDuplicated() != null) {
-            updateTasksDuplicated();
+        // replicated tasks have been added through FlowAction#REPLICATE
+        if (this.jobInfo.getTasksReplicated() != null) {
+            updateTasksReplicated();
         }
-        // duplicated tasks have been added through FlowAction#LOOP
+        // replicated tasks have been added through FlowAction#LOOP
         if (this.jobInfo.getTasksLooped() != null) {
             updateTasksLooped();
         }
     }
 
     /**
-     * Updates this job when tasks were duplicated due to a {@link FlowActionType#DUPLICATE} action
+     * Updates this job when tasks were replicated due to a {@link FlowActionType#REPLICATE} action
      * <p>
      * The internal state of the job will change: new tasks will be added,
      * existing tasks will be modified.
      */
-    private void updateTasksDuplicated() {
-        // key: duplicated task / value : id of the original task
-        // originalId not used as key because tasks can be duplicated multiple times
+    private void updateTasksReplicated() {
+        // key: replicated task / value : id of the original task
+        // originalId not used as key because tasks can be replicated multiple times
         Map<InternalTask, TaskId> newTasks = new TreeMap<InternalTask, TaskId>();
 
         // create the new tasks
-        for (DuplicatedTask it : this.jobInfo.getTasksDuplicated()) {
+        for (ReplicatedTask it : this.jobInfo.getTasksReplicated()) {
             InternalTask original = this.tasks.get(it.originalId);
-            InternalTask duplicated = null;
+            InternalTask replicated = null;
             try {
-                duplicated = (InternalTask) original.duplicate();
+                replicated = (InternalTask) original.replicate();
             } catch (Exception e) {
             }
-            duplicated.setId(it.duplicatedId);
+            replicated.setId(it.replicatedId);
             // for some reason the indices are embedded in the Readable name and not where they belong
-            int dupId = InternalTask.getDuplicationIndexFromName(it.duplicatedId.getReadableName());
-            int itId = InternalTask.getIterationIndexFromName(it.duplicatedId.getReadableName());
-            duplicated.setDuplicationIndex(dupId);
-            duplicated.setIterationIndex(itId);
+            int dupId = InternalTask.getReplicationIndexFromName(it.replicatedId.getReadableName());
+            int itId = InternalTask.getIterationIndexFromName(it.replicatedId.getReadableName());
+            replicated.setReplicationIndex(dupId);
+            replicated.setIterationIndex(itId);
 
-            this.tasks.put(it.duplicatedId, duplicated);
-            newTasks.put(duplicated, it.originalId);
+            this.tasks.put(it.replicatedId, replicated);
+            newTasks.put(replicated, it.originalId);
 
-            // when nesting DUPLICATE, the original duplicated task can have its Duplication Index changed:
-            // the new Duplication Id of the original task is the lowest id among duplicated tasks minus one
+            // when nesting REPLICATE, the original replicated task can have its Replication Index changed:
+            // the new Replication Id of the original task is the lowest id among replicated tasks minus one
             int minDup = Integer.MAX_VALUE;
-            for (DuplicatedTask it2 : this.jobInfo.getTasksDuplicated()) {
-                String iDup = InternalTask.getInitialName(it2.duplicatedId.getReadableName());
+            for (ReplicatedTask it2 : this.jobInfo.getTasksReplicated()) {
+                String iDup = InternalTask.getInitialName(it2.replicatedId.getReadableName());
                 String iOr = InternalTask.getInitialName(it.originalId.getReadableName());
                 if (iDup.equals(iOr)) {
-                    int iDupId = InternalTask.getDuplicationIndexFromName(it2.duplicatedId.getReadableName());
+                    int iDupId = InternalTask.getReplicationIndexFromName(it2.replicatedId.getReadableName());
                     minDup = Math.min(iDupId, minDup);
                 }
             }
-            original.setDuplicationIndex(minDup - 1);
+            original.setReplicationIndex(minDup - 1);
         }
 
         // recreate deps contained in the data struct
-        for (DuplicatedTask it : this.jobInfo.getTasksDuplicated()) {
-            InternalTask newtask = this.tasks.get(it.duplicatedId);
+        for (ReplicatedTask it : this.jobInfo.getTasksReplicated()) {
+            InternalTask newtask = this.tasks.get(it.replicatedId);
             for (TaskId depId : it.deps) {
                 InternalTask dep = this.tasks.get(depId);
                 newtask.addDependence(dep);
@@ -315,12 +315,12 @@ public abstract class InternalJob extends JobState {
         // plug mergers
         List<InternalTask> toAdd = new ArrayList<InternalTask>();
         for (InternalTask old : this.tasks.values()) {
-            // task is not a duplicated one, has dependencies
+            // task is not a replicated one, has dependencies
             if (!newTasks.containsValue(old.getId()) && old.hasDependences()) {
                 for (InternalTask oldDep : old.getIDependences()) {
-                    // one of its dependencies is a duplicated task
+                    // one of its dependencies is a replicated task
                     if (newTasks.containsValue(oldDep.getId())) {
-                        // connect those duplicated tasks to the merger
+                        // connect those replicated tasks to the merger
                         for (Entry<InternalTask, TaskId> newTask : newTasks.entrySet()) {
                             if (newTask.getValue().equals(oldDep.getId())) {
                                 toAdd.add(newTask.getKey());
@@ -339,7 +339,7 @@ public abstract class InternalJob extends JobState {
     }
 
     /**
-     * Updates this job when tasks were duplicated due to a {@link FlowActionType#LOOP} action
+     * Updates this job when tasks were replicated due to a {@link FlowActionType#LOOP} action
      * <p>
      * The internal state of the job will change: new tasks will be added,
      * existing tasks will be modified.
@@ -348,28 +348,28 @@ public abstract class InternalJob extends JobState {
         Map<TaskId, InternalTask> newTasks = new TreeMap<TaskId, InternalTask>();
 
         // create the new tasks
-        for (DuplicatedTask it : this.jobInfo.getTasksLooped()) {
+        for (ReplicatedTask it : this.jobInfo.getTasksLooped()) {
             InternalTask original = this.tasks.get(it.originalId);
-            InternalTask duplicated = null;
+            InternalTask replicated = null;
             try {
-                duplicated = (InternalTask) original.duplicate();
+                replicated = (InternalTask) original.replicate();
             } catch (Exception e) {
             }
-            duplicated.setId(it.duplicatedId);
+            replicated.setId(it.replicatedId);
             // for some reason the indices are embedded in the Readable name and not where they belong
-            int dupId = InternalTask.getDuplicationIndexFromName(it.duplicatedId.getReadableName());
-            int itId = InternalTask.getIterationIndexFromName(it.duplicatedId.getReadableName());
-            duplicated.setDuplicationIndex(dupId);
-            duplicated.setIterationIndex(itId);
+            int dupId = InternalTask.getReplicationIndexFromName(it.replicatedId.getReadableName());
+            int itId = InternalTask.getIterationIndexFromName(it.replicatedId.getReadableName());
+            replicated.setReplicationIndex(dupId);
+            replicated.setIterationIndex(itId);
 
-            this.tasks.put(it.duplicatedId, duplicated);
-            newTasks.put(it.originalId, duplicated);
+            this.tasks.put(it.replicatedId, replicated);
+            newTasks.put(it.originalId, replicated);
         }
 
         InternalTask oldInit = null;
         // recreate deps contained in the data struct
-        for (DuplicatedTask it : this.jobInfo.getTasksLooped()) {
-            InternalTask newtask = this.tasks.get(it.duplicatedId);
+        for (ReplicatedTask it : this.jobInfo.getTasksLooped()) {
+            InternalTask newtask = this.tasks.get(it.replicatedId);
             for (TaskId depId : it.deps) {
                 InternalTask dep = this.tasks.get(depId);
                 if (!newTasks.containsValue(dep)) {
@@ -383,7 +383,7 @@ public abstract class InternalJob extends JobState {
         InternalTask newInit = null;
         InternalTask merger = null;
         for (InternalTask old : this.tasks.values()) {
-            // the merger is not a duplicated task, nor has been duplicated
+            // the merger is not a replicated task, nor has been replicated
             if (!newTasks.containsKey(old.getId()) && !newTasks.containsValue(old) && old.hasDependences()) {
                 for (InternalTask oldDep : old.getIDependences()) {
                     // merger's deps contains the initiator of the LOOP
@@ -526,7 +526,7 @@ public abstract class InternalJob extends JobState {
      * 
      * @param errorOccurred has an error occurred for this termination
      * @param taskId the task to terminate.
-     * @param frontend Used to notify all listeners of the duplication of tasks, triggered by the FlowAction
+     * @param frontend Used to notify all listeners of the replication of tasks, triggered by the FlowAction
      * @param action a Control Flow Action that will potentially create new tasks inside the job
      * @return the taskDescriptor that has just been terminated.
      */
@@ -572,9 +572,9 @@ public abstract class InternalJob extends JobState {
                         // accumulates the tasks between the initiator and the target
                         Map<TaskId, InternalTask> dup = new HashMap<TaskId, InternalTask>();
 
-                        // duplicate the tasks between the initiator and the target
+                        // replicate the tasks between the initiator and the target
                         try {
-                            initiator.duplicateTree(dup, targetId, true, initiator.getDuplicationIndex(),
+                            initiator.replicateTree(dup, targetId, true, initiator.getReplicationIndex(),
                                     initiator.getIterationIndex());
                         } catch (ExecutableCreationException e) {
                             logger_dev.error("", e);
@@ -615,7 +615,7 @@ public abstract class InternalJob extends JobState {
                             this.addTask(nt);
                         }
 
-                        // connect duplicated tree
+                        // connect replicated tree
                         newTarget.addDependence(initiator);
 
                         // connect mergers
@@ -640,9 +640,9 @@ public abstract class InternalJob extends JobState {
                         // propagate the changes in the job descriptor
                         getJobDescriptor().doLoop(taskId, dup, newTarget, newInit);
 
-                        List<DuplicatedTask> tev = new ArrayList<DuplicatedTask>();
+                        List<ReplicatedTask> tev = new ArrayList<ReplicatedTask>();
                         for (Entry<TaskId, InternalTask> it : dup.entrySet()) {
-                            DuplicatedTask tid = new DuplicatedTask(it.getKey(), it.getValue().getId());
+                            ReplicatedTask tid = new ReplicatedTask(it.getKey(), it.getValue().getId());
                             if (it.getValue().hasDependences()) {
                                 for (InternalTask dep : it.getValue().getIDependences()) {
                                     tid.deps.add(dep.getId());
@@ -654,7 +654,7 @@ public abstract class InternalJob extends JobState {
                         this.jobInfo.setTasksLooped(tev);
                         // notify listeners that tasks were added to the job
                         frontend.jobStateUpdated(this.getOwner(), new NotificationData<JobInfo>(
-                            SchedulerEvent.TASK_DUPLICATED, this.getJobInfo()));
+                            SchedulerEvent.TASK_REPLICATED, this.getJobInfo()));
                         this.jobInfo.setTasksLooped(null);
 
                         didAction = true;
@@ -711,7 +711,7 @@ public abstract class InternalJob extends JobState {
                     for (InternalTask it : tasks.values()) {
 
                         // does not share the same dup index : cannot be the same scope
-                        if (it.getDuplicationIndex() != initiator.getDuplicationIndex()) {
+                        if (it.getReplicationIndex() != initiator.getReplicationIndex()) {
                             continue;
                         }
 
@@ -813,10 +813,10 @@ public abstract class InternalJob extends JobState {
                 }
 
                     /*
-                     * DUPLICATE action
+                     * REPLICATE action
                      * 
                      */
-                case DUPLICATE:
+                case REPLICATE:
 
                 {
                     int runs = action.getDupNumber();
@@ -824,31 +824,31 @@ public abstract class InternalJob extends JobState {
                         runs = 1;
                     }
 
-                    logger_dev.info("Control Flow Action DUPLICATE (runs:" + runs + ")");
-                    List<InternalTask> toDuplicate = new ArrayList<InternalTask>();
+                    logger_dev.info("Control Flow Action REPLICATE (runs:" + runs + ")");
+                    List<InternalTask> toReplicate = new ArrayList<InternalTask>();
 
-                    // find the tasks that need to be duplicated
+                    // find the tasks that need to be replicated
                     for (InternalTask ti : tasks.values()) {
                         List<InternalTask> tl = ti.getIDependences();
                         if (tl != null) {
                             for (InternalTask ts : tl) {
-                                if (ts.getId().equals(initiator.getId()) && !toDuplicate.contains(ti)) {
-                                    // ti needs to be duplicated
-                                    toDuplicate.add(ti);
+                                if (ts.getId().equals(initiator.getId()) && !toReplicate.contains(ti)) {
+                                    // ti needs to be replicated
+                                    toReplicate.add(ti);
                                 }
                             }
                         }
                     }
 
-                    List<DuplicatedTask> tasksEvent = new ArrayList<DuplicatedTask>();
+                    List<ReplicatedTask> tasksEvent = new ArrayList<ReplicatedTask>();
 
-                    // for each initial task to duplicate
-                    for (InternalTask todup : toDuplicate) {
+                    // for each initial task to replicate
+                    for (InternalTask todup : toReplicate) {
 
-                        // determine the target of the duplication whether it is a block or a single task
+                        // determine the target of the replication whether it is a block or a single task
                         InternalTask target = null;
 
-                        // target is a task block start : duplication of the block
+                        // target is a task block start : replication of the block
                         if (todup.getFlowBlock().equals(FlowBlock.START)) {
                             String tg = todup.getMatchingBlock();
                             for (InternalTask t : tasks.values()) {
@@ -860,11 +860,11 @@ public abstract class InternalJob extends JobState {
                                 }
                             }
                             if (target == null) {
-                                logger_dev.error("DUPLICATE: could not find matching block '" + tg + "'");
+                                logger_dev.error("REPLICATE: could not find matching block '" + tg + "'");
                                 continue;
                             }
                         }
-                        // target is not a block : duplication of the task
+                        // target is not a block : replication of the task
                         else {
                             target = todup;
                         }
@@ -874,13 +874,13 @@ public abstract class InternalJob extends JobState {
 
                             // accumulates the tasks between the initiator and the target
                             Map<TaskId, InternalTask> dup = new HashMap<TaskId, InternalTask>();
-                            // duplicate the tasks between the initiator and the target
+                            // replicate the tasks between the initiator and the target
                             try {
-                                target.duplicateTree(dup, todup.getId(), false, initiator
-                                        .getDuplicationIndex() *
+                                target.replicateTree(dup, todup.getId(), false, initiator
+                                        .getReplicationIndex() *
                                     runs, 0);
                             } catch (Exception e) {
-                                logger_dev.error("DUPLICATE: could not duplicate tree", e);
+                                logger_dev.error("REPLICATE: could not replicate tree", e);
                                 break;
                             }
 
@@ -888,7 +888,7 @@ public abstract class InternalJob extends JobState {
                                     .getNumberOfPendingTasks() +
                                 dup.size());
 
-                            // pointers to the new duplicated tasks corresponding the begin and 
+                            // pointers to the new replicated tasks corresponding the begin and 
                             // the end of the block ; can be the same
                             InternalTask newTarget = null;
                             InternalTask newEnd = null;
@@ -898,15 +898,15 @@ public abstract class InternalJob extends JobState {
                                 InternalTask nt = it.getValue();
                                 nt.setJobInfo(getJobInfo());
                                 this.addTask(nt);
-                                int dupIndex = initiator.getDuplicationIndex() * runs + i;
-                                nt.setDuplicationIndex(dupIndex);
+                                int dupIndex = initiator.getReplicationIndex() * runs + i;
+                                nt.setReplicationIndex(dupIndex);
                             }
 
-                            // find the beginning and the ending of the duplicated block
+                            // find the beginning and the ending of the replicated block
                             for (Entry<TaskId, InternalTask> it : dup.entrySet()) {
                                 InternalTask nt = it.getValue();
 
-                                // connect the first task of the duplicated block to the initiator
+                                // connect the first task of the replicated block to the initiator
                                 if (todup.getId().equals(it.getKey())) {
                                     newTarget = nt;
                                     newTarget.addDependence(initiator);
@@ -935,12 +935,12 @@ public abstract class InternalJob extends JobState {
                             }
 
                             // propagate the changes on the JobDescriptor
-                            getJobDescriptor().doDuplicate(taskId, dup, newTarget, target.getId(),
+                            getJobDescriptor().doReplicate(taskId, dup, newTarget, target.getId(),
                                     newEnd.getId());
 
                             // used by the event dispatcher
                             for (Entry<TaskId, InternalTask> it : dup.entrySet()) {
-                                DuplicatedTask tid = new DuplicatedTask(it.getKey(), it.getValue().getId());
+                                ReplicatedTask tid = new ReplicatedTask(it.getKey(), it.getValue().getId());
                                 if (it.getValue().hasDependences()) {
                                     for (InternalTask dep : it.getValue().getIDependences()) {
                                         tid.deps.add(dep.getId());
@@ -951,12 +951,12 @@ public abstract class InternalJob extends JobState {
                         }
                     }
                     // notify listeners that tasks were added to the job
-                    this.jobInfo.setTasksDuplicated(tasksEvent);
+                    this.jobInfo.setTasksReplicated(tasksEvent);
                     frontend.jobStateUpdated(this.getOwner(), new NotificationData<JobInfo>(
-                        SchedulerEvent.TASK_DUPLICATED, this.getJobInfo()));
-                    this.jobInfo.setTasksDuplicated(null);
+                        SchedulerEvent.TASK_REPLICATED, this.getJobInfo()));
+                    this.jobInfo.setTasksReplicated(null);
 
-                    // no jump is performed ; now that the tasks have been duplicated and
+                    // no jump is performed ; now that the tasks have been replicated and
                     // configured, the flow can continue its normal operation
                     getJobDescriptor().terminate(taskId);
                     didAction = true;
@@ -1346,12 +1346,12 @@ public abstract class InternalJob extends JobState {
     }
 
     /**
-     * To set the tasksDuplicated
+     * To set the tasksReplicated
      *
-     * @param d tasksDuplicated
+     * @param d tasksReplicated
      */
-    public void setDuplicatedTasksModify(List<DuplicatedTask> d) {
-        jobInfo.setTasksDuplicated(d);
+    public void setReplicatedTasksModify(List<ReplicatedTask> d) {
+        jobInfo.setTasksReplicated(d);
     }
 
     /**
@@ -1359,7 +1359,7 @@ public abstract class InternalJob extends JobState {
      *
      * @param d tasksLooped
      */
-    public void setLoopedTasksModify(List<DuplicatedTask> d) {
+    public void setLoopedTasksModify(List<ReplicatedTask> d) {
         jobInfo.setTasksLooped(d);
     }
 

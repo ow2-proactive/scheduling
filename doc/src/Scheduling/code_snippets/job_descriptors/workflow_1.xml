@@ -4,9 +4,9 @@
 	<task name="split">
 	  <javaExecutable class="/path/to/class/Split" />
 	  <flowControl>
-		<duplicate>
+		<replicate>
 		  <script><file path="/path/to/script/duplicate.js" /></script>
-		</duplicate>
+		</replicate>
       </flowControl>
     </task>
 

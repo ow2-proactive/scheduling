@@ -250,14 +250,14 @@ public final class TaskIdImpl implements TaskId {
     }
 
     /**
-     * @see TaskId#getDuplicationIndex()
+     * @see TaskId#getReplicationIndex()
      */
-    public int getDuplicationIndex() {
+    public int getReplicationIndex() {
         // implementation note :
         // this has to match what is done in InternalTask#setName(String)
         int dup = 0;
         int pos = -1;
-        if ((pos = this.readableName.indexOf(TaskId.duplicationSeparator)) != -1) {
+        if ((pos = this.readableName.indexOf(TaskId.replicationSeparator)) != -1) {
             int read = Integer.parseInt("" + this.readableName.charAt(pos + 1));
             dup = Math.max(0, read);
         }

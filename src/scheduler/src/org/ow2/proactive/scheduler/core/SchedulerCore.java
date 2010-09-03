@@ -462,8 +462,8 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
         currentJob.setTaskStatusModify(null);
         // used when a job has failed
         currentJob.setTaskFinishedTimeModify(null);
-        // also duplicated tasks
-        currentJob.setDuplicatedTasksModify(null);
+        // also replicated tasks
+        currentJob.setReplicatedTasksModify(null);
         currentJob.setLoopedTasksModify(null);
         currentJob.setSkippedTasksModify(null);
         // and to database

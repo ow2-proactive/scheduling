@@ -344,33 +344,33 @@ public abstract class TaskState extends Task implements Comparable<TaskState> {
     }
 
     /**
-     * Duplicates a task
+     * Replicates a task
      * <p>
      * Deep copies all fields, does not share any reference
      * 
      * @return the newly created task, cast as a TaskState
      * @throws Exception
      */
-    public abstract TaskState duplicate() throws Exception;
+    public abstract TaskState replicate() throws Exception;
 
     /**
      * When Control Flow actions are performed (see {@link #getFlowScript()}),
-     * some tasks are duplicated. 
-     * A task duplicated by a {@link FlowActionType#LOOP} action
+     * some tasks are replicated. 
+     * A task replicated by a {@link FlowActionType#LOOP} action
      * is differentiated from the original by an incremented Iteration Index.
      * 
-     * @return the iteration number of this task if it was duplicated by a LOOP flow operation (>= 0)
+     * @return the iteration number of this task if it was replicated by a LOOP flow operation (>= 0)
      */
     public abstract int getIterationIndex();
 
     /**
      * When Control Flow actions are performed (see {@link #getFlowScript()}),
-     * some tasks are duplicated. 
-     * A task duplicated by a {@link FlowActionType#DUPLICATE} action
-     * is differentiated from the original by an incremented Duplication Index.
+     * some tasks are replicated. 
+     * A task replicated by a {@link FlowActionType#REPLICATE} action
+     * is differentiated from the original by an incremented Replication Index.
      
-     * @return the duplication number of this task if it was duplicated by a DUPLICATE flow operations (>= 0)
+     * @return the replication number of this task if it was replicated by a REPLICATE flow operations (>= 0)
      */
-    public abstract int getDuplicationIndex();
+    public abstract int getReplicationIndex();
 
 }

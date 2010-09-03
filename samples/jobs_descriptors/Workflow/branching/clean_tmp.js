@@ -1,6 +1,6 @@
 importPackage(java.io);
 
-if ($IT == 0 && $DUP == 0) {
+if ($IT == 0 && $REP == 0) {
 	if (args.length < 1) {
 		print("Requires a directory as first argument");
 	} else {

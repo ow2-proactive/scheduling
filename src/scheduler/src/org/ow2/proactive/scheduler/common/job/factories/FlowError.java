@@ -61,8 +61,8 @@ public class FlowError extends Exception {
     public enum FlowErrorType {
         /** an IF action is invalid */
         IF,
-        /** a DUPLICATE action is invalid */
-        DUPLICATE,
+        /** a REPLICATE action is invalid */
+        REPLICATE,
         /** a LOOP action is invalid */
         LOOP,
         /** a BLOCK is invalid */

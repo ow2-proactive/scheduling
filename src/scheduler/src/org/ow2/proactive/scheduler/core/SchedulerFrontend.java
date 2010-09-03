@@ -1210,7 +1210,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
             case JOB_PAUSED:
             case JOB_RESUMED:
             case JOB_CHANGE_PRIORITY:
-            case TASK_DUPLICATED:
+            case TASK_REPLICATED:
             case TASK_SKIPPED:
                 dispatchJobStateUpdated(owner, notification);
                 this.jmxHelper.getSchedulerRuntimeMBean().jobStateUpdatedEvent(notification);

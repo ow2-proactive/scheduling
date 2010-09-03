@@ -521,7 +521,7 @@ public class SchedulerModel extends ConsoleModel {
                 list.add(ts.getId().toString());
                 list.add(ts.getName());
                 list.add((ts.getIterationIndex() > 0) ? "" + ts.getIterationIndex() : "");
-                list.add((ts.getDuplicationIndex() > 0) ? "" + ts.getDuplicationIndex() : "");
+                list.add((ts.getReplicationIndex() > 0) ? "" + ts.getReplicationIndex() : "");
                 list.add(ts.getStatus().toString());
                 list.add((ts.getExecutionHostName() == null) ? "unknown" : ts.getExecutionHostName());
                 list.add(Tools.getFormattedDuration(0, ts.getExecutionDuration()));

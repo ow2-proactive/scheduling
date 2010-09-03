@@ -77,7 +77,7 @@ public class FlowAction implements Serializable {
     @Column(name = "TYPE")
     private String type;
 
-    /** Number of parallel runs if {@link #type} is {@link FlowActionType#DUPLICATE} */
+    /** Number of parallel runs if {@link #type} is {@link FlowActionType#REPLICATE} */
     @Column(name = "DUP_NUMBER")
     private int dupNumber = 1;
 
@@ -119,7 +119,7 @@ public class FlowAction implements Serializable {
 
     /**
      * @return the number of parallel runs if the type of 
-     * this action is {@link FlowActionType#DUPLICATE}
+     * this action is {@link FlowActionType#REPLICATE}
      */
     public int getDupNumber() {
         return this.dupNumber;
@@ -127,7 +127,7 @@ public class FlowAction implements Serializable {
 
     /**
      * @return the main action target if 
-     * this action is {@link FlowActionType#DUPLICATE} or
+     * this action is {@link FlowActionType#REPLICATE} or
      * {@link FlowActionType#IF}
      */
     public String getTarget() {
@@ -143,7 +143,7 @@ public class FlowAction implements Serializable {
 
     /**
      * @param args the number of parallel runs if the type of 
-     * this action is {@link FlowActionType#DUPLICATE}
+     * this action is {@link FlowActionType#REPLICATE}
      */
     public void setDupNumber(int args) {
         this.dupNumber = args;
@@ -151,7 +151,7 @@ public class FlowAction implements Serializable {
 
     /**
      * @param t the main action target if 
-     * this action is {@link FlowActionType#DUPLICATE} or
+     * this action is {@link FlowActionType#REPLICATE} or
      * {@link FlowActionType#IF}
      */
     public void setTarget(String t) {

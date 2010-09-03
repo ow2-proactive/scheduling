@@ -1374,7 +1374,7 @@ public class DSTest extends JavaExecutable {
 		  </section>
 		  <section xml:id="scheduler_workflow_spec"><info><title>Specification</title></info>
 			<para>
-			  Workflows provide three main features: the ability to duplicate tasks, the ability to loop on a set of tasks, and the ability to choose between two paths in the flow.
+			  Workflows provide three main features: the ability to replicate tasks, the ability to loop on a set of tasks, and the ability to choose between two paths in the flow.
 			  These features are defined and restricted by syntactic and semantic rules, in order to ensure the correctness of the job prior to submission.
 			</para>
 			<section xml:id="scheduler_workflow_spec_common"><info><title>Common rules</title></info>
@@ -1433,18 +1433,18 @@ public class DSTest extends JavaExecutable {
 				  </listitem>
 				  <listitem>
 					<para>
-					  Three distinct operations are defined: <emphasis>duplicate</emphasis> (parallelization),
+					  Three distinct operations are defined: <emphasis>replicate</emphasis> (parallelization),
 					  <emphasis>if</emphasis> (branching) and <emphasis>loop</emphasis> (looping).
 					</para>
 				  </listitem>
 				</itemizedlist>
 			  </para>
 			</section>
-			<section xml:id="scheduler_workflow_spec_duplicate"><info><title>Parallelization</title></info>
+			<section xml:id="scheduler_workflow_spec_replicate"><info><title>Parallelization</title></info>
 			  <para>
-				The &lt;duplicate&gt; action allows the execution of multiple tasks in parallel when only one task is written in the descriptor,
+				The &lt;replicate&gt; action allows the execution of multiple tasks in parallel when only one task is written in the descriptor,
 				and the number of parallel runs is not statically known.
-				<figure xml:id="scheduler_workflow_spec_duplicate_img"><info><title><emphasis>Duplicate</emphasis> control flow action</title></info>
+				<figure xml:id="scheduler_workflow_spec_replicate_img"><info><title><emphasis>Replicate</emphasis> control flow action</title></info>
 				  <mediaobject>
 					<imageobject>
 					  <imagedata width="100%" align="center" fileref="images/png/user_manual/flow_spec_duplicate.png" format="PNG"/>
@@ -1459,12 +1459,12 @@ public class DSTest extends JavaExecutable {
 				  </listitem>
 				  <listitem>
 					<para>
-					  The initiator can have multiple children; each child is duplicated.
+					  The initiator can have multiple children; each child is replicated.
 					</para>
 				  </listitem>
 				  <listitem>
 					<para>
-					  If the target is a <emphasis>start block</emphasis>, the whole block is duplicated.
+					  If the target is a <emphasis>start block</emphasis>, the whole block is replicated.
 					</para>
 				  </listitem>
 				  <listitem>
@@ -1475,19 +1475,19 @@ public class DSTest extends JavaExecutable {
 				  </listitem>
 				  <listitem>
 					<para>
-					  There should always be a merge task after the target of a duplicate: if the target is not a start block,
+					  There should always be a merge task after the target of a replicate: if the target is not a start block,
 					  it should have at least one child, if the target is a start block, the corresponding end block should have at least one child.
 					</para>
 				  </listitem>
 				  <listitem>
 					<para>
-					  The last task of a duplicated task block (or the duplicated task if there is no block) cannot perform
-					  a <emphasis>branching</emphasis> or  <emphasis>duplicate</emphasis> action.
+					  The last task of a replicated task block (or the replicated task if there is no block) cannot perform
+					  a <emphasis>branching</emphasis> or  <emphasis>replicate</emphasis> action.
 					</para>
 				  </listitem>
 				  <listitem>
 					<para>
-					  The target of a <emphasis>duplicate</emphasis> action can not be tagged as <emphasis>end block</emphasis>.
+					  The target of a <emphasis>replicate</emphasis> action can not be tagged as <emphasis>end block</emphasis>.
 					</para>
 				  </listitem>
 				</itemizedlist>
@@ -1600,7 +1600,7 @@ public class DSTest extends JavaExecutable {
 		  </section>
 		  <section xml:id="scheduler_workflow_create"><info><title>Create a Workflow enabled job</title></info>
 			<para>
-			  The following section demonstrates the combined use of task duplication, branching and looping.
+			  The following section demonstrates the combined use of task replication, branching and looping.
 			  <figure xml:id="scheduler_workflow_create_img"><info><title>A job combining all control flow actions</title></info>
 				<mediaobject>
 				  <imageobject>
@@ -1624,13 +1624,13 @@ done</programlisting>
 			  <itemizedlist>
 				<listitem>
 				  <para>
-					Task A performs a <emphasis>duplicate</emphasis> control flow action.
-					This means all tasks that depend on task A will be duplicated.
+					Task A performs a <emphasis>replicate</emphasis> control flow action.
+					This means all tasks that depend on task A will be replicated.
 				  </para>
 				</listitem>
 				<listitem>
 				  <para>
-					Task B will be duplicated, as it depends on task A, but so will
+					Task B will be replicated, as it depends on task A, but so will
 					tasks C, D and E as they are included in the same <emphasis>task block</emphasis>.
 					Tasks B and E are resepectively the start and end block tasks.
 				  </para>
@@ -1695,7 +1695,7 @@ done</programlisting>
 				  </listitem>
 				  <listitem>
 					<para>
-					  If the child of a <emphasis>duplicate</emphasis> task is a task block, the whole block will be duplicated and not only the child of the initiator.
+					  If the child of a <emphasis>replicate</emphasis> task is a task block, the whole block will be replicated and not only the child of the initiator.
 					</para>
 				  </listitem>
 				</itemizedlist>
@@ -1703,7 +1703,7 @@ done</programlisting>
 			</section>
 			<section xml:id="scheduler_workflow_script"><info><title>Control Flow Scripts</title></info>
 			  <para>
-				To perform a control flow action such as if, duplicate or loop, a <emphasis>Control Flow Script</emphasis> is executed on the execution node.
+				To perform a control flow action such as if, replicate or loop, a <emphasis>Control Flow Script</emphasis> is executed on the execution node.
 				This script takes the result of the task as input; meaning a Java object if it was a Java task, or nothing if it was a native task.
 			  </para>
 			  <para>
@@ -1730,7 +1730,7 @@ if (! resFile.exists()) {
 				<itemizedlist>
 				  <listitem>
 					<para>
-					  A <emphasis>duplicate</emphasis> control flow action needs to define how many parallel runs will be executed,
+					  A <emphasis>replicate</emphasis> control flow action needs to define how many parallel runs will be executed,
 					  by defining the variable <emphasis>runs</emphasis>:
 				<programlisting language="java"><![CDATA[
 // assuming result is a java.lang.Integer
@@ -1784,7 +1784,7 @@ TaskFlowJob job = new TaskFlowJob();
 JavaTask split = new JavaTask();
 split.setName("split");
 split.setExecutableClassName("net.example.Split");
-FlowScript dup = FlowScript.createDuplicateFlowScript(dupScriptContent);
+FlowScript dup = FlowScript.createReplicateFlowScript(dupScriptContent);
 split.setFlowScript(dup);
 
 JavaTask processing_1 = new JavaTask();
@@ -1824,10 +1824,10 @@ join.setExecutableClassName("net.example.Join");</programlisting>
 			  </para>
 			</section>
 		  </section>
-		  <section xml:id="scheduler_workflow_awareness"><info><title>Iteration and duplication awareness</title></info>
+		  <section xml:id="scheduler_workflow_awareness"><info><title>Iteration and replication awareness</title></info>
 			<para>
-			  When Control Flow actions such as <emphasis>duplicate</emphasis> or <emphasis>loop</emphasis> are performed, some tasks are duplicated.
-			  To be able to identify duplicated tasks uniquely, each duplicated task has an <emphasis>iteration index</emphasis> and <emphasis>duplication index</emphasis>.
+			  When Control Flow actions such as <emphasis>replicate</emphasis> or <emphasis>loop</emphasis> are performed, some tasks are replicated.
+			  To be able to identify replicated tasks uniquely, each replicated task has an <emphasis>iteration index</emphasis> and <emphasis>replication index</emphasis>.
 			</para>
 			<section xml:id="scheduler_workflow_awareness_names"><info><title>Task names</title></info>
 			  <para>
@@ -1836,14 +1836,14 @@ join.setExecutableClassName("net.example.Join");</programlisting>
 				<itemizedlist>
 				  <listitem>
 					<para>
-					  If a task named "T" is duplicated after a <emphasis>loop</emphasis> action, the newly created tasks will be named "T#1", "T#2", etc.
+					  If a task named "T" is replicated after a <emphasis>loop</emphasis> action, the newly created tasks will be named "T#1", "T#2", etc.
 					  The number following the  <emphasis>#</emphasis> separator character represents the <emphasis>iteration index</emphasis>.
 					</para>
 				  </listitem>
 				  <listitem>
 					<para>
-					  The same scheme is used upon <emphasis>duplicate</emphasis> actions: newly created tasks are named "T*1", "T*2", and so on.
-					  The separator character  <emphasis>*</emphasis>, and the following number is the <emphasis>duplication index</emphasis>.
+					  The same scheme is used upon <emphasis>replicate</emphasis> actions: newly created tasks are named "T*1", "T*2", and so on.
+					  The separator character  <emphasis>*</emphasis>, and the following number is the <emphasis>replication index</emphasis>.
 					</para>
 				  </listitem>
 				  <listitem>
@@ -1857,16 +1857,16 @@ join.setExecutableClassName("net.example.Join");</programlisting>
 JobResult jobResult = scheduler.getJobResult(jobId);
 for (Entry<String, TaskResult> result : res.getAllResults().entrySet()) {
    int it = result.getValue().getTaskId().getIterationIndex();
-   int dup = result.getValue().getTaskid().getDuplicationIndex();
+   int dup = result.getValue().getTaskid().getReplicationIndex();
    ...
 }			  ]]></programlisting>
 			  </para>
 			</section>
-			<section xml:id="scheduler_workflow_awareness_descriptor"><info><title>Iteration and duplication indexes in task description</title></info>
+			<section xml:id="scheduler_workflow_awareness_descriptor"><info><title>Iteration and replication indexes in task description</title></info>
 			  <para>
 				Those indexes are also available when creating a task. They can be obtained using a special string that will be substituted
-				with the actual iteration or duplication index at runtime: <emphasis>$IT</emphasis> for the iteration index, and <emphasis>$DUP</emphasis>
-				for the duplication index. Those macro can be used in the following locations:
+				with the actual iteration or replication index at runtime: <emphasis>$IT</emphasis> for the iteration index, and <emphasis>$REP</emphasis>
+				for the replication index. Those macro can be used in the following locations:
 				<itemizedlist>
 				  <listitem>
 					<para>
@@ -1874,11 +1874,11 @@ for (Entry<String, TaskResult> result : res.getAllResults().entrySet()) {
 					  <programlisting language="xml"><![CDATA[
 <javaExecutable class="net.example.Executable">
   <parameters>
-    <parameter name="images" value="/some/path/images/pic_$IT_$DUP.jpg" />  ]]></programlisting>
+    <parameter name="images" value="/some/path/images/pic_$IT_$REP.jpg" />  ]]></programlisting>
 					  <programlisting language="java"><![CDATA[
 JavaTask t = new JavaTask();
 t.setExecutableClassName("net.example.Executable");
-t.addArgument("images","/some/path/images/pic_$IT_$DUP.jpg");  ]]></programlisting>
+t.addArgument("images","/some/path/images/pic_$IT_$REP.jpg");  ]]></programlisting>
 					</para>
 				  </listitem>
 				  <listitem>
@@ -1887,10 +1887,10 @@ t.addArgument("images","/some/path/images/pic_$IT_$DUP.jpg");  ]]></programlisti
 					  <programlisting language="xml"><![CDATA[
 <staticCommand value="/path/to/bin.sh">
   <arguments>
-    <argument value="/some/path/$IT/$DUP.dat" />  ]]></programlisting>
+    <argument value="/some/path/$IT/$REP.dat" />  ]]></programlisting>
 					  <programlisting language="java"><![CDATA[
 NativeTask nt = new NativeTask();
-nt.setCommandLine(new String[] { "/path/to/bin.sh", "/path/to/$ID/$DUP.dat" });  ]]></programlisting>
+nt.setCommandLine(new String[] { "/path/to/bin.sh", "/path/to/$ID/$REP.dat" });  ]]></programlisting>
 					</para>
 				  </listitem>
 				  <listitem>
@@ -1899,12 +1899,12 @@ nt.setCommandLine(new String[] { "/path/to/bin.sh", "/path/to/$ID/$DUP.dat" }); 
 					  <programlisting language="xml"><![CDATA[
 <task name="t1" retries="2">
   <inputFiles>
-    <files includes="foo_$IT_$DUP.dat" accessMode="transferFromInputSpace"/>
+    <files includes="foo_$IT_$REP.dat" accessMode="transferFromInputSpace"/>
   </inputFiles><outputFiles>
-    <files includes="bar_$IT_$DUP.res" accessMode="transferToOutputSpace"/>  ]]></programlisting>
+    <files includes="bar_$IT_$REP.res" accessMode="transferToOutputSpace"/>  ]]></programlisting>
 					  <programlisting language="java"><![CDATA[
-task.addInputFiles("foo_$IT_$DUP.dat",OutputAccessMode.TransferToOutputSpace);
-task.addOutputFiles("bar_$IT_$DUP.res",OutputAccessMode.none);  ]]></programlisting>
+task.addInputFiles("foo_$IT_$REP.dat",OutputAccessMode.TransferToOutputSpace);
+task.addOutputFiles("bar_$IT_$REP.res",OutputAccessMode.none);  ]]></programlisting>
 					</para>
 				  </listitem>
 				  <listitem>
@@ -1913,11 +1913,11 @@ task.addOutputFiles("bar_$IT_$DUP.res",OutputAccessMode.none);  ]]></programlist
 					  <programlisting language="xml"><![CDATA[
 <task>
   <pre><script><code language="javascript">
-		var f = new java.io.File(".lock_$IT_$DUP");
+		var f = new java.io.File(".lock_$IT_$REP");
 		f.createNewFile();
   </code></script></pre>  ]]></programlisting>
 					  <programlisting language="java"><![CDATA[
-task.setPreScript(new SimpleScript("var f = new java.io.File(\".lock_$ID_$DUP\"); f.createNewFile();", "javascript"));  ]]></programlisting>
+task.setPreScript(new SimpleScript("var f = new java.io.File(\".lock_$ID_$REP\"); f.createNewFile();", "javascript"));  ]]></programlisting>
 					  Scripts affected by the macro substitution are: Pre, Post, Command generation and Control Flow.
 					  <emphasis>No substitution will occur in selection scripts.</emphasis>
 					</para>
@@ -1925,23 +1925,23 @@ task.setPreScript(new SimpleScript("var f = new java.io.File(\".lock_$ID_$DUP\")
 				</itemizedlist>
 			  </para>
 			</section>
-			<section xml:id="scheduler_workflow_awareness_exec"><info><title>Iteration and duplication indexes in executables</title></info>
+			<section xml:id="scheduler_workflow_awareness_exec"><info><title>Iteration and replication indexes in executables</title></info>
 			  <para>
-				The iteration and duplication indexes are available inside the executables launched by tasks.
+				The iteration and replication indexes are available inside the executables launched by tasks.
 			  </para>
 			  <para>
-				In Java tasks, the indexes are exported through the following Java properties: <emphasis>pas.task.iteration</emphasis> and <emphasis>pas.task.duplication</emphasis>.
+				In Java tasks, the indexes are exported through the following Java properties: <emphasis>pas.task.iteration</emphasis> and <emphasis>pas.task.replication</emphasis>.
 				<programlisting language="java"><![CDATA[
 public Serializable execute(TaskResult... results) throws Throwable {
   int it  = System.getProperty("pas.task.iteration");
-  int dup = System.getProperty("pas.task.duplication");
+  int dup = System.getProperty("pas.task.replication");
 } ]]></programlisting>
 			  </para>
 			  <para>
-				In a similar fashion, environment variables are set when launching a native executable: <emphasis>PAS_TASK_ITERATION</emphasis> and <emphasis>PAS_TASK_DUPLICATION</emphasis>:
+				In a similar fashion, environment variables are set when launching a native executable: <emphasis>PAS_TASK_ITERATION</emphasis> and <emphasis>PAS_TASK_REPLICATION</emphasis>:
 				<programlisting language="sh"><![CDATA[
 #!/bin/sh
-/path/to/bin.sh /path/to/file/${PAS_TASK_ITERATION}/${PAS_TASK_DUPLICATION}.dat
+/path/to/bin.sh /path/to/file/${PAS_TASK_ITERATION}/${PAS_TASK_REPLICATION}.dat
  ]]></programlisting>
 			  </para>
 			</section>

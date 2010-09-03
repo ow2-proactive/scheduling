@@ -69,9 +69,9 @@ public class TaskLauncherInitializer implements Serializable {
     /** policy content to be prepared before being sent to node */
     private String policyContent;
 
-    /** duplication index: task was duplicated in parallel */
-    private int duplicationIndex = 0;
-    /** iteration index: task was duplicated sequentially */
+    /** replication index: task was replicated in parallel */
+    private int replicationIndex = 0;
+    /** iteration index: task was replicated sequentially */
     private int iterationIndex = 0;
 
     /** DataSpaces needed parameter */
@@ -242,30 +242,30 @@ public class TaskLauncherInitializer implements Serializable {
     }
 
     /**
-     * @param id the duplication index: task was duplicated in parallel 
+     * @param id the replication index: task was replicated in parallel 
      */
     public void setIterationIndex(int id) {
         this.iterationIndex = id;
     }
 
     /**
-     * @return the duplication index: task was duplicated in parallel 
+     * @return the replication index: task was replicated in parallel 
      */
     public int getIterationIndex() {
         return this.iterationIndex;
     }
 
     /**
-     * @param id the iteration index: task was duplicated sequentially 
+     * @param id the iteration index: task was replicated sequentially 
      */
-    public void setDuplicationIndex(int id) {
-        this.duplicationIndex = id;
+    public void setReplicationIndex(int id) {
+        this.replicationIndex = id;
     }
 
     /**
-     * @return the iteration index: task was duplicated sequentially 
+     * @return the iteration index: task was replicated sequentially 
      */
-    public int getDuplicationIndex() {
-        return this.duplicationIndex;
+    public int getReplicationIndex() {
+        return this.replicationIndex;
     }
 }

@@ -40,7 +40,7 @@ import org.ow2.proactive.scheduler.common.task.flow.FlowActionType;
 
 
 /**
- * Tests the correctness of workflow-controlled jobs including {@link FlowActionType#DUPLICATE},
+ * Tests the correctness of workflow-controlled jobs including {@link FlowActionType#REPLICATE},
  * {@link FlowActionType#IF} and {@link FlowActionType#LOOP} actions
  * 
  * @author The ProActive Team

@@ -294,9 +294,9 @@ public class RunningJobComposite extends AbstractJobComposite implements Running
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.gui.listeners.RunningJobsListener#taskDuplicated(JobId)
+     * @see org.ow2.proactive.scheduler.gui.listeners.RunningJobsListener#taskReplicated(JobId)
      */
-    public void taskDuplicated(JobId jobId) {
+    public void taskReplicated(JobId jobId) {
         super.stateUpdate(jobId);
 
         if (!this.isDisposed()) {
@@ -317,7 +317,7 @@ public class RunningJobComposite extends AbstractJobComposite implements Running
 
                     JobState job = JobsController.getLocalView().getJobById(jobi);
                     ((ProgressBar) item.getData("bar")).setMaximum(job.getTotalNumberOfTasks() * 100);
-                    ((DotTask) item.getData("dotTask")).tasksDuplicated();
+                    ((DotTask) item.getData("dotTask")).tasksReplicated();
 
                     TableColumn[] cols = table.getColumns();
                     for (int i = 0; i < cols.length; i++) {
@@ -625,9 +625,9 @@ class DotTask extends TimerTask {
     }
 
     /**
-     * An unknown number of tasks was duplicated
+     * An unknown number of tasks was replicated
      */
-    public void tasksDuplicated() {
+    public void tasksReplicated() {
         int n = Math.max(this.job.getTotalNumberOfTasks(), this.tasks.length);
         double[] tasks_new = new double[n];
         for (int i = 0; i < n; i++) {

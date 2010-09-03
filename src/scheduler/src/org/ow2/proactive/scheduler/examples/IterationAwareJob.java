@@ -45,7 +45,7 @@ import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 
 
 /**
- * Prints iteration and duplication exported properties for testing purposes
+ * Prints iteration and replication exported properties for testing purposes
  * 
  * @author The ProActive Team
  * @since ProActive Scheduling 2.2
@@ -65,7 +65,7 @@ public class IterationAwareJob extends JavaExecutable {
     @Override
     public Serializable execute(TaskResult... results) throws Throwable {
         report += "prop it " + System.getProperty("pas.task.iteration") + ":";
-        report += "prop dup " + System.getProperty("pas.task.duplication") + ":";
+        report += "prop dup " + System.getProperty("pas.task.replication") + ":";
 
         return report;
     }

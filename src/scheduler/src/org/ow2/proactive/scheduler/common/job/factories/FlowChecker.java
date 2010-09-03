@@ -189,7 +189,7 @@ public class FlowChecker {
             fc.checkRecursion();
             fc.checkReachable();
             fc.checkBlocks();
-            fc.checkDuplicate();
+            fc.checkReplicate();
             fc.checkLoop();
             fc.checkIf();
         } catch (FlowError e) {
@@ -215,9 +215,9 @@ public class FlowChecker {
                 throw new FlowError("Task name cannot contain special character '" +
                     TaskId.iterationSeparator + "'", FlowErrorType.NAME, name);
             }
-            if (name.indexOf(TaskId.duplicationSeparator) != -1) {
+            if (name.indexOf(TaskId.replicationSeparator) != -1) {
                 throw new FlowError("Task name cannot contain special character '" +
-                    TaskId.duplicationSeparator + "'", FlowErrorType.NAME, name);
+                    TaskId.replicationSeparator + "'", FlowErrorType.NAME, name);
             }
 
             if (tasks.contains(name)) {
@@ -608,24 +608,24 @@ public class FlowChecker {
     }
 
     /**
-     * Checks the provided taskflow against rules specific to the DUPLICATE control flow action
+     * Checks the provided taskflow against rules specific to the REPLICATE control flow action
      * 
      * @param job the job to check
      * @throws FlowError
      */
-    private void checkDuplicate() throws FlowError {
+    private void checkReplicate() throws FlowError {
         for (TaskTree tree : tasksFlat) {
             if (tree.element.getFlowScript() != null &&
-                tree.element.getFlowScript().getActionType().equals(FlowActionType.DUPLICATE.toString())) {
+                tree.element.getFlowScript().getActionType().equals(FlowActionType.REPLICATE.toString())) {
 
                 for (TaskTree child : tree.children) {
                     if (child.parents.size() != 1) {
-                        throw new FlowError("The Target of a DUPLICATE must have only one dependency",
-                            FlowErrorType.DUPLICATE, child.element.getName());
+                        throw new FlowError("The Target of a REPLICATE must have only one dependency",
+                            FlowErrorType.REPLICATE, child.element.getName());
                     }
                     if (child.element.getFlowBlock().equals(FlowBlock.END)) {
-                        throw new FlowError("The target of a DUPLICATE cannot be the end of a task block",
-                            FlowErrorType.DUPLICATE, child.element.getName());
+                        throw new FlowError("The target of a REPLICATE cannot be the end of a task block",
+                            FlowErrorType.REPLICATE, child.element.getName());
                     }
                     Block block = null;
                     for (Block b : this.blocks) {
@@ -640,18 +640,18 @@ public class FlowChecker {
                         endBlock = child;
                     }
                     if (endBlock.children.size() < 1) {
-                        throw new FlowError("No merge point for DUPLICATE block", FlowErrorType.DUPLICATE,
+                        throw new FlowError("No merge point for REPLICATE block", FlowErrorType.REPLICATE,
                             endBlock.element.getName());
                     }
 
                     if (endBlock.element.getFlowScript() != null) {
                         if (endBlock.element.getFlowScript().getActionType().equals(
-                                FlowActionType.DUPLICATE.toString()) ||
+                                FlowActionType.REPLICATE.toString()) ||
                             endBlock.element.getFlowScript().getActionType().equals(
                                     FlowActionType.IF.toString())) {
                             throw new FlowError(
-                                "Last action of a DUPLICATE block cannot perform IF or DUPLICATE action",
-                                FlowErrorType.DUPLICATE, endBlock.element.getName());
+                                "Last action of a REPLICATE block cannot perform IF or REPLICATE action",
+                                FlowErrorType.REPLICATE, endBlock.element.getName());
                         }
                     }
                 }

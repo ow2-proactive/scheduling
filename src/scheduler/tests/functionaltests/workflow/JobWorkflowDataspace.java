@@ -57,7 +57,7 @@ public class JobWorkflowDataspace extends JavaExecutable {
     public Serializable execute(TaskResult... results) throws Throwable {
 
         DataSpacesFileObject dsf = getLocalFile(System.getProperty("pas.task.iteration") + "_" +
-            System.getProperty("pas.task.duplication") + ".in");
+            System.getProperty("pas.task.replication") + ".in");
 
         InputStream in = dsf.getContent().getInputStream();
 
@@ -70,10 +70,10 @@ public class JobWorkflowDataspace extends JavaExecutable {
         line = line.toUpperCase();
 
         getLocalFile(
-                System.getProperty("pas.task.iteration") + "_" + System.getProperty("pas.task.duplication") +
+                System.getProperty("pas.task.iteration") + "_" + System.getProperty("pas.task.replication") +
                     ".out").createFile();
         DataSpacesFileObject dsfOut = getLocalFile(System.getProperty("pas.task.iteration") + "_" +
-            System.getProperty("pas.task.duplication") + ".out");
+            System.getProperty("pas.task.replication") + ".out");
         OutputStream out = dsfOut.getContent().getOutputStream();
         out.write(line.getBytes());
         out.close();

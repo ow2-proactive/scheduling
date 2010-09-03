@@ -360,7 +360,7 @@
       <optional>
         <choice>
           <ref name="actionIf"/>
-          <ref name="actionDuplicate"/>
+          <ref name="actionReplicate"/>
           <ref name="actionLoop"/>
         </choice>
       </optional>
@@ -727,9 +727,9 @@
       <ref name="script"/>
     </element>
   </define>
-  <define name="actionDuplicate">
-    <element name="duplicate">
-      <doc:documentation>duplicate control flow action</doc:documentation>
+  <define name="actionReplicate">
+    <element name="replicate">
+      <doc:documentation>replicate control flow action</doc:documentation>
       <ref name="script"/>
     </element>
   </define>
@@ -789,7 +789,7 @@
   <define name="controlFlowAction">
     <choice>
       <value>goto</value>
-      <value>duplicate</value>
+      <value>replicate</value>
       <value>continue</value>
     </choice>
   </define>

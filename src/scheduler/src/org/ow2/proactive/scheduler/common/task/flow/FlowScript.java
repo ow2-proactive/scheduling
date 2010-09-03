@@ -69,8 +69,8 @@ import org.ow2.proactive.scripting.SimpleScript;
  * the method {@link FlowScript#getResult(Bindings)} returns the {@link FlowAction} which is enabled
  * or disabled depending the value of the {@link FlowScript#enabledVariable} variable set in the script.
  * <p>
- * When using the action type {@link FlowActionType#DUPLICATE}, the value of the 
- * {@link FlowScript#duplicateRunsVariable} determines the number of parallel runs.
+ * When using the action type {@link FlowActionType#REPLICATE}, the value of the 
+ * {@link FlowScript#replicateRunsVariable} determines the number of parallel runs.
  * 
  * 
  * @author The ProActive Team
@@ -131,8 +131,8 @@ public class FlowScript extends Script<FlowAction> {
     public static final String loopVariable = "loop";
 
     /** Name of the Integer variable to set in the script to determine
-     * the number of parallel runs of a DUPLICATE action */
-    public static final String duplicateRunsVariable = "runs";
+     * the number of parallel runs of a REPLICATE action */
+    public static final String replicateRunsVariable = "runs";
 
     /** Name of the variable to set in the script to determine
      * which one of the IF or ELSE branch is selected in an IF
@@ -151,7 +151,7 @@ public class FlowScript extends Script<FlowAction> {
      * Hibernate default constructor,
      * use {@link #createContinueFlowScript()},
      * {@link #createLoopFlowScript(Script, String)} or
-     * {@link #createDuplicateFlowScript(Script)} to
+     * {@link #createReplicateFlowScript(Script)} to
      * create a FlowScript
      */
     public FlowScript() {
@@ -287,41 +287,41 @@ public class FlowScript extends Script<FlowAction> {
     }
 
     /**
-     * Creates a Control Flow Script configured to perform a DUPLICATE control flow action
+     * Creates a Control Flow Script configured to perform a REPLICATE control flow action
      * the code will be run using a javascript engine
      * 
      * @param script code of the Javascript script 
      * @return a newly allocated and configured Control Flow Script
      * @throws InvalidScriptException
      */
-    public static FlowScript createDuplicateFlowScript(String script) throws InvalidScriptException {
-        return createDuplicateFlowScript(script, "javascript");
+    public static FlowScript createReplicateFlowScript(String script) throws InvalidScriptException {
+        return createReplicateFlowScript(script, "javascript");
     }
 
     /**
-     * Creates a Control Flow Script configured to perform a Duplicate control flow action
+     * Creates a Control Flow Script configured to perform a Replicate control flow action
      * 
      * @param script code of the script
      * @param engine engine running the script
      * @return a newly allocated and configured Control Flow Script
      * @throws InvalidScriptException
      */
-    public static FlowScript createDuplicateFlowScript(String script, String engine)
+    public static FlowScript createReplicateFlowScript(String script, String engine)
             throws InvalidScriptException {
         Script<?> scr = new SimpleScript(script, engine);
-        return createDuplicateFlowScript(scr);
+        return createReplicateFlowScript(scr);
     }
 
     /**
-     * Creates a Control Flow Script configured to perform a DUPLICATE control flow action
+     * Creates a Control Flow Script configured to perform a REPLICATE control flow action
      * 
      * @param script the script to execute
      * @return a newly allocated and configured Control Flow Script
      * @throws InvalidScriptException
      */
-    public static FlowScript createDuplicateFlowScript(Script<?> script) throws InvalidScriptException {
+    public static FlowScript createReplicateFlowScript(Script<?> script) throws InvalidScriptException {
         FlowScript flow = new FlowScript(script);
-        flow.setActionType(FlowActionType.DUPLICATE);
+        flow.setActionType(FlowActionType.REPLICATE);
         return flow;
     }
 
@@ -534,35 +534,35 @@ public class FlowScript extends Script<FlowAction> {
                 }
             }
             /*
-             * duplicate
+             * replicate
              */
-            else if (this.actionType.equals(FlowActionType.DUPLICATE.toString())) {
-                if (bindings.containsKey(duplicateRunsVariable)) {
-                    act.setType(FlowActionType.DUPLICATE);
+            else if (this.actionType.equals(FlowActionType.REPLICATE.toString())) {
+                if (bindings.containsKey(replicateRunsVariable)) {
+                    act.setType(FlowActionType.REPLICATE);
                     int args = 1;
-                    Object o = bindings.get(duplicateRunsVariable);
+                    Object o = bindings.get(replicateRunsVariable);
                     try {
                         args = Integer.parseInt("" + o);
                     } catch (NumberFormatException e) {
                         try {
                             args = (int) Math.floor(Double.parseDouble("" + o));
                         } catch (Exception e2) {
-                            String msg = "DUPLICATE action: could not parse value for variable " +
-                                duplicateRunsVariable;
+                            String msg = "REPLICATE action: could not parse value for variable " +
+                                replicateRunsVariable;
                             logger_dev.error(msg);
                             return new ScriptResult<FlowAction>(new Exception(msg, e2));
                         }
                     }
                     if (args < 1) {
-                        String msg = "DUPLICATE action: value of variable " + duplicateRunsVariable +
+                        String msg = "REPLICATE action: value of variable " + replicateRunsVariable +
                             " cannot be negative";
                         logger_dev.error(msg);
                         return new ScriptResult<FlowAction>(new Exception(msg));
                     }
                     act.setDupNumber(args);
                 } else {
-                    String msg = "Script environment for DUPLICATE action needs to define variable " +
-                        duplicateRunsVariable;
+                    String msg = "Script environment for REPLICATE action needs to define variable " +
+                        replicateRunsVariable;
                     logger_dev.error(msg);
                     return new ScriptResult<FlowAction>(new Exception(msg));
                 }

@@ -25,7 +25,7 @@
       <javaExecutable class="org.ow2.proactive.scheduler.examples.IncrementJob">
       </javaExecutable>
       <flowControl block="start" >
-        <duplicate>
+        <replicate>
           <script>
             <code language="javascript">
 // <![CDATA[
@@ -33,7 +33,7 @@ runs=3;
 // ]]>
             </code>
           </script>
-        </duplicate>
+        </replicate>
       </flowControl>
     </task>
     <task name="T" maxNumberOfExecution="4">
@@ -125,7 +125,7 @@ runs=3;
             <code language="javascript">
 // <![CDATA[
 importPackage(java.io);
-var ID   = 8 + "_" + $DUP;
+var ID   = 8 + "_" + $REP;
 var RUNS = 5;
 var f = new File(".test_flow_lock_" + ID);
 var it = 0;
@@ -202,7 +202,7 @@ loop = false;
             <code language="javascript">
 // <![CDATA[
 importPackage(java.io);
-var ID   = 7 + "_" + $DUP;
+var ID   = 7 + "_" + $REP;
 var RUNS = 3;
 var f = new File(".test_flow_lock_" + ID);
 var it = 0;
@@ -336,7 +336,7 @@ loop = false;
             <code language="javascript">
 // <![CDATA[
 importPackage(java.io);
-var ID   = 3 + "_" + $DUP;
+var ID   = 3 + "_" + $REP;
 var RUNS = 3;
 var f = new File(".test_flow_lock_" + ID);
 var it = 0;
@@ -379,7 +379,7 @@ loop = false;
             <code language="javascript">
 // <![CDATA[
 importPackage(java.io);
-var ID   = 2 + "_" + $DUP;
+var ID   = 2 + "_" + $REP;
 var RUNS = 2;
 var f = new File(".test_flow_lock_" + ID);
 var it = 0;
@@ -454,7 +454,7 @@ loop = false;
             <code language="javascript">
 // <![CDATA[
 importPackage(java.io);
-var ID   = 4 + "_" + $DUP;
+var ID   = 4 + "_" + $REP;
 var RUNS = 5;
 var f = new File(".test_flow_lock_" + ID);
 var it = 0;
@@ -506,7 +506,7 @@ loop = false;
             <code language="javascript">
 // <![CDATA[
 importPackage(java.io);
-var ID   = 5 + "_" + $DUP;
+var ID   = 5 + "_" + $REP;
 var RUNS = 5;
 var f = new File(".test_flow_lock_" + ID);
 var it = 0;
@@ -542,7 +542,7 @@ loop = false;
       <javaExecutable class="org.ow2.proactive.scheduler.examples.IncrementJob">
       </javaExecutable>
       <flowControl block="none" >
-        <duplicate>
+        <replicate>
           <script>
             <code language="javascript">
 // <![CDATA[
@@ -550,7 +550,7 @@ runs = 2;
 // ]]>
             </code>
           </script>
-        </duplicate>
+        </replicate>
       </flowControl>
     </task>
     <task name="T32" maxNumberOfExecution="4">
@@ -580,7 +580,7 @@ runs = 2;
             <code language="javascript">
 // <![CDATA[
 importPackage(java.io);
-var ID   = 6 + "_" + $DUP;
+var ID   = 6 + "_" + $REP;
 var RUNS = 5;
 var f = new File(".test_flow_lock_" + ID);
 var it = 0;

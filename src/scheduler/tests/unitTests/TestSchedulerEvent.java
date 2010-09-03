@@ -77,7 +77,7 @@ public class TestSchedulerEvent {
         Assert.assertEquals(SchedulerEvent.USERS_UPDATE.ordinal(), 20);
         Assert.assertEquals(SchedulerEvent.POLICY_CHANGED.ordinal(), 21);
         Assert.assertEquals(SchedulerEvent.JOB_PENDING_TO_FINISHED.ordinal(), 22);
-        Assert.assertEquals(SchedulerEvent.TASK_DUPLICATED.ordinal(), 23);
+        Assert.assertEquals(SchedulerEvent.TASK_REPLICATED.ordinal(), 23);
         Assert.assertEquals(SchedulerEvent.TASK_SKIPPED.ordinal(), 24);
         Assert.assertEquals(25, SchedulerEvent.values().length);
     }

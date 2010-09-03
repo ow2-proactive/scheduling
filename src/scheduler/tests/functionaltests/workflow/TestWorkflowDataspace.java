@@ -100,7 +100,7 @@ public class TestWorkflowDataspace extends FunctionalTest {
         JavaTask t = new JavaTask();
         t.setName("T");
         t.setExecutableClassName("org.ow2.proactive.scheduler.examples.EmptyTask");
-        t.setFlowScript(FlowScript.createDuplicateFlowScript("runs = 3;"));
+        t.setFlowScript(FlowScript.createReplicateFlowScript("runs = 3;"));
         t.setFlowBlock(FlowBlock.START);
         job.addTask(t);
 
@@ -108,8 +108,8 @@ public class TestWorkflowDataspace extends FunctionalTest {
         t1.setName("T1");
         t1.setExecutableClassName(JobWorkflowDataspace.class.getCanonicalName());
         t1.addDependence(t);
-        t1.addInputFiles("$IT_$DUP.in", InputAccessMode.TransferFromInputSpace);
-        t1.addOutputFiles("$IT_$DUP.out", OutputAccessMode.TransferToOutputSpace);
+        t1.addInputFiles("$IT_$REP.in", InputAccessMode.TransferFromInputSpace);
+        t1.addOutputFiles("$IT_$REP.out", OutputAccessMode.TransferToOutputSpace);
         job.addTask(t1);
 
         JavaTask t2 = new JavaTask();

@@ -208,7 +208,7 @@ public class NativeTaskLauncher extends TaskLauncher {
     }
 
     /**
-     * Replaces iteration and duplication index syntactic macros
+     * Replaces iteration and replication index syntactic macros
      * in various string locations across the task descriptor
      * 
      * @param init the executable initializer containing the native command
@@ -219,7 +219,7 @@ public class NativeTaskLauncher extends TaskLauncher {
         if (cmd != null) {
             for (int i = 0; i < cmd.length; i++) {
                 cmd[i] = cmd[i].replaceAll(ITERATION_INDEX_TAG, "" + this.iterationIndex);
-                cmd[i] = cmd[i].replaceAll(DUPLICATION_INDEX_TAG, "" + this.duplicationIndex);
+                cmd[i] = cmd[i].replaceAll(REPLICATION_INDEX_TAG, "" + this.replicationIndex);
             }
         }
     }

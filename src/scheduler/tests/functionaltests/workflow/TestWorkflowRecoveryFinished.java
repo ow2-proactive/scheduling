@@ -61,11 +61,11 @@ public class TestWorkflowRecoveryFinished extends FunctionalTest {
     private static final String job_prefix = "/functionaltests/workflow/descriptors/flow_crash_";
 
     private static final String[][] jobs_1 = {
-    // 1: duplicate one single task
+    // 1: replicate one single task
             { "T 0", "T1 1", "T1*1 1", "T2 3" },
             // 2: loop a simple block
             { "T 0", "T1 1", "T2 2", "T1#1 3", "T2#1 4", "T3 5" },
-            // 3: loop on a simple block / duplicate a single task
+            // 3: loop on a simple block / replicate a single task
             { "T 0", "T1 1", "T2 2", "T2*1 2", "T3 5", "T1#1 6", "T2#1 7", "T2#1*1 7", "T3#1 15", "T4 16" },
 
     };

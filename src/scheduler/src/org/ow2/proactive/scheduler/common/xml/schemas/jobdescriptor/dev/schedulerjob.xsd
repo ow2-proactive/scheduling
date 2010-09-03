@@ -432,7 +432,7 @@
     <xs:complexType>
       <xs:choice minOccurs="0">
         <xs:element ref="jd:if"/>
-        <xs:element ref="jd:duplicate"/>
+        <xs:element ref="jd:replicate"/>
         <xs:element ref="jd:loop"/>
       </xs:choice>
       <xs:attribute name="block" type="jd:blockAttr">
@@ -913,9 +913,9 @@
       </xs:complexContent>
     </xs:complexType>
   </xs:element>
-  <xs:element name="duplicate" type="jd:script">
+  <xs:element name="replicate" type="jd:script">
     <xs:annotation>
-      <xs:documentation>duplicate control flow action</xs:documentation>
+      <xs:documentation>replicate control flow action</xs:documentation>
     </xs:annotation>
   </xs:element>
   <!-- +++++++++++++ User define types -->
@@ -1018,7 +1018,7 @@
   <xs:simpleType name="controlFlowAction">
     <xs:restriction base="xs:token">
       <xs:enumeration value="goto"/>
-      <xs:enumeration value="duplicate"/>
+      <xs:enumeration value="replicate"/>
       <xs:enumeration value="continue"/>
     </xs:restriction>
   </xs:simpleType>

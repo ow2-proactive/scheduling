@@ -12,7 +12,7 @@
       <javaExecutable class="org.ow2.proactive.scheduler.examples.EmptyTask">
       </javaExecutable>
       <flowControl block="start" >
-        <duplicate>
+        <replicate>
           <script>
             <code language="javascript">
 // <![CDATA[ 
@@ -20,7 +20,7 @@ runs=2;
 // ]]>
             </code>
           </script>
-        </duplicate>
+        </replicate>
       </flowControl>
     </task>
     <task name="T1" maxNumberOfExecution="4">
@@ -35,7 +35,7 @@ runs=2;
 		  <code language="javascript">
 // <![CDATA[
 importPackage(java.io);
-var f = new File("${pa.scheduler.home}/PRE_$IT_$DUP");
+var f = new File("${pa.scheduler.home}/PRE_$IT_$REP");
 f.createNewFile();
 // ]]>
 		  </code>
@@ -44,7 +44,7 @@ f.createNewFile();
       <javaExecutable class="org.ow2.proactive.scheduler.examples.IterationAwareJob">
 		<parameters>
 		  <parameter name="it" value="$IT" />
-		  <parameter name="dup" value="$DUP" />
+		  <parameter name="dup" value="$REP" />
 		</parameters>
       </javaExecutable>
 	  <post>
@@ -52,7 +52,7 @@ f.createNewFile();
 		  <code language="javascript">
 // <![CDATA[
 importPackage(java.io);
-var f = new File("${pa.scheduler.home}/POST_$IT_$DUP");
+var f = new File("${pa.scheduler.home}/POST_$IT_$REP");
 f.createNewFile();
 // ]]>
 		  </code>

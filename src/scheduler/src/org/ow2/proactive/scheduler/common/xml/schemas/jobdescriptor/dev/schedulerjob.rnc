@@ -78,7 +78,7 @@ dependsTask = ## A task from which this task depends
 selection = ## A script used to select resources that can handle the task 
     element selection { selectionScript+ }
 flow = ## Flow control : block declaration, flow action
-    element flowControl { block?, (actionIf | actionDuplicate | actionLoop)? }
+    element flowControl { block?, (actionIf | actionReplicate | actionLoop)? }
 block = ## block declaration
     attribute block { blockAttr }
 pre = ## A script launched before the task execution in the task node
@@ -179,8 +179,8 @@ targetJoin = ## branching else target
     attribute join { xsd:string }
 actionLoop = ## looping control flow action
 	 element loop { target, script }
-actionDuplicate = ## duplicate control flow action
-	 element duplicate { script }
+actionReplicate = ## replicate control flow action
+	 element replicate { script }
 
 # +++++++++++++ User define types
 jobPriority = 'highest' | 'high' | 'normal' | 'low' | 'lowest' | variableRefType
@@ -191,5 +191,5 @@ classPattern = xsd:string { pattern="([A-Za-z_$][A-Za-z_0-9$]*\.)*[A-Za-z_$][A-Z
 walltimePattern = xsd:string { pattern="[0-9]*[1-9][0-9]*(:[0-5][0-9]){0,2}" }
 variableRefType = xsd:string { pattern="$\{[A-Za-z0-9._]+\}" }
 inexcludePattern = xsd:string { pattern=".+(,.+)*" }
-controlFlowAction = 'goto' | 'duplicate' | 'continue'
+controlFlowAction = 'goto' | 'replicate' | 'continue'
 blockAttr = 'start' | 'end' | 'none'

@@ -58,7 +58,7 @@ import functionaltests.SchedulerTHelper;
 
 
 /**
- * Ensures iteration and duplication index are properly propagated and replaced
+ * Ensures iteration and replication index are properly propagated and replaced
  * when needed in workflow-enabled tasks
  *
  * @author The ProActive Team
@@ -76,14 +76,14 @@ public class TestWorkflowIterationAwareness extends FunctionalTest {
         +
         "var f = new File(\"" +
         PASchedulerProperties.SCHEDULER_HOME.getValueAsString() +
-        "/PRE_$IT_$DUP\"); \n" + //
+        "/PRE_$IT_$REP\"); \n" + //
         "f.createNewFile(); \n";
 
     private static final String postScript = //
     "importPackage(java.io); \n" //
         +
         "var f = new File(\"" //
-        + PASchedulerProperties.SCHEDULER_HOME.getValueAsString() + "/POST_$IT_$DUP\"); \n" //
+        + PASchedulerProperties.SCHEDULER_HOME.getValueAsString() + "/POST_$IT_$REP\"); \n" //
         + "f.createNewFile(); \n";
 
     private static final String dupScript = "enabled = true; \n" + "runs = 2; \n";
@@ -112,7 +112,7 @@ public class TestWorkflowIterationAwareness extends FunctionalTest {
 
     /**
      * Checks Java, Native and ForkedJava executables
-     * on a loop/duplicate job for propagation of iteration and duplication indexes in :
+     * on a loop/replicate job for propagation of iteration and replication indexes in :
      * native arguments, java arguments, pre/post scripts, native environment variables, java properties
      * 
      * @throws Throwable
@@ -214,7 +214,7 @@ public class TestWorkflowIterationAwareness extends FunctionalTest {
         t.setFork(true);
         t.setMaxNumberOfExecution(4);
         t.setFlowBlock(FlowBlock.START);
-        FlowScript dup = FlowScript.createDuplicateFlowScript(dupScript);
+        FlowScript dup = FlowScript.createReplicateFlowScript(dupScript);
         t.setFlowScript(dup);
         job.addTask(t);
 
@@ -222,7 +222,7 @@ public class TestWorkflowIterationAwareness extends FunctionalTest {
         t1.setName("T1");
         t1.setExecutableClassName("org.ow2.proactive.scheduler.examples.IterationAwareJob");
         t1.addArgument("it", "$IT");
-        t1.addArgument("dup", "$DUP");
+        t1.addArgument("dup", "$REP");
         t1.setFork(true);
         t1.setMaxNumberOfExecution(4);
         t1.addDependence(t);
@@ -276,13 +276,13 @@ public class TestWorkflowIterationAwareness extends FunctionalTest {
                 if (ar[1].equals("it")) {
                     Assert.assertEquals("Wrong iteration index in arguments for task " + name, it, ar[2]);
                 } else if (ar[1].equals("dup")) {
-                    Assert.assertEquals("Wrong duplication index in arguments for task " + name, dup, ar[2]);
+                    Assert.assertEquals("Wrong replication index in arguments for task " + name, dup, ar[2]);
                 }
             } else if (ar[0].equals("prop")) {
                 if (ar[1].equals("it")) {
                     Assert.assertEquals("Wrong iteration index in properties for task " + name, it, ar[2]);
                 } else if (ar[1].equals("dup")) {
-                    Assert.assertEquals("Wrong duplication index in properties for task " + name, dup, ar[2]);
+                    Assert.assertEquals("Wrong replication index in properties for task " + name, dup, ar[2]);
                 }
             }
         }
