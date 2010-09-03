@@ -41,6 +41,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.StringTokenizer;
 
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
@@ -70,9 +71,44 @@ public class GenericBatchJobInfrastructure extends BatchJobInfrastructure {
 
         // read the class file and create a BatchJobInfrastructure instance
         try {
-            File f = File.createTempFile("BatchJobClass", "GENERATED");
+
+            //create dir for tmp classpath
+            File f = File.createTempFile("BatchJobClassDir", "GENERATED");
+            f.delete();
+            f.mkdir();
             f.deleteOnExit();
-            FileToBytesConverter.convertByteArrayToFile(implemtationClassfile, f);
+
+            // if the class name contains the ".class", remove it
+            if (this.implementationClassname.endsWith(".class")) {
+                this.implementationClassname = this.implementationClassname.substring(0,
+                        this.implementationClassname.lastIndexOf("."));
+            }
+            int lastIndexOfDot = this.implementationClassname.lastIndexOf(".");
+            boolean inPackage = lastIndexOfDot != -1;
+            StringBuffer currentDirName = new StringBuffer(f.getAbsolutePath());
+
+            // create hierarchy for class file
+            if (inPackage) {
+                StringTokenizer packages = new StringTokenizer(this.implementationClassname.substring(0,
+                        lastIndexOfDot), ".");
+                while (packages.hasMoreTokens()) {
+                    currentDirName.append(File.separator + packages.nextToken());
+                    File currentDir = new File(currentDirName.toString());
+                    currentDir.mkdir();
+                    currentDir.deleteOnExit();
+                }
+            }
+            //create the classfile
+            File classFile = new File(currentDirName +
+                File.separator +
+                this.implementationClassname.substring(lastIndexOfDot + 1, this.implementationClassname
+                        .length()) + ".class");
+            classFile.deleteOnExit();
+            if (logger.isDebugEnabled()) {
+                logger.debug("Created class file for generic BatchJobInfrastructure : " +
+                    classFile.getAbsolutePath());
+            }
+            FileToBytesConverter.convertByteArrayToFile(implemtationClassfile, classFile);
             URLClassLoader cl = new URLClassLoader(new URL[] { f.toURL() }, this.getClass().getClassLoader());
             Class<? extends BatchJobInfrastructure> implementationClass = (Class<? extends BatchJobInfrastructure>) cl
                     .loadClass(this.implementationClassname);
@@ -102,7 +138,11 @@ public class GenericBatchJobInfrastructure extends BatchJobInfrastructure {
 
     @Override
     protected String getBatchinJobSystemName() {
-        return implementation.getBatchinJobSystemName();
+        if (implementation != null) {
+            return implementation.getBatchinJobSystemName();
+        } else {
+            return "GENERIC";
+        }
     }
 
     @Override
