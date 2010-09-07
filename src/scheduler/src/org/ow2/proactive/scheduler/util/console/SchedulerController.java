@@ -289,7 +289,7 @@ public class SchedulerController {
     protected void connect() throws LoginException, AlreadyConnectedException {
         model.connectScheduler(auth, credentials);
         String userStr = (user != null) ? "'" + user + "' " : "";
-        logger.info("\t-> Admin " + userStr + "successfully connected" + newline);
+        logger.info("\t-> Client " + userStr + "successfully connected" + newline);
     }
 
     private void start() throws Exception {
