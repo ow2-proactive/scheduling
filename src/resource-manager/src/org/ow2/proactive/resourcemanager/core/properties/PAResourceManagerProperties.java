@@ -108,6 +108,9 @@ public enum PAResourceManagerProperties {
     /** Resource Manager ldap configuration file */
     RM_LDAP_CONFIG("pa.rm.ldap.config.path", PropertyType.STRING),
 
+    /** Resource Manager ldap2 configuration file */
+    RM_LDAP2_CONFIG("pa.rm.ldap2.config.path", PropertyType.STRING),
+
     /** Resource Manager login file name */
     RM_LOGIN_FILE("pa.rm.defaultloginfilename", PropertyType.STRING),
 

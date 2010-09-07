@@ -5,8 +5,8 @@
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2010 INRIA/University of 
- * 				Nice-Sophia Antipolis/ActiveEon
+ * Copyright (C) 1997-2010 INRIA/University of
+ *                              Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
  * This library is free software; you can redistribute it and/or
@@ -24,16 +24,17 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
- * If needed, contact us to obtain a release under GPL Version 2 
+ * If needed, contact us to obtain a release under GPL Version 2
  * or a different license than the GPL.
  *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
+ *  Initial developer(s):               The ActiveEon Team
+ *                        http://www.activeeon.com/
  *  Contributor(s):
  *
  * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
+ * $$ACTIVEEON_INITIAL_DEV$$
  */
+
 package org.ow2.proactive.authentication;
 
 import java.util.Hashtable;
@@ -62,27 +63,22 @@ import org.ow2.proactive.authentication.principals.UserNamePrincipal;
 /**
  * Authentication based on LDAP system.
  *
- * This class extends FileLoginModule in order to use authentication fall back mechanism :
+ * Improved version of @see{LDAPLoginModule}
  *
- * If user entry is not found in LDAP and file authentication fall back is activated
- * {@link org.ow2.proactive.authentication.LDAPProperties#FALLBACK_USER_AUTH}, it tries authentication (login/password and group membership
- * with file login module.
- *
- * If no group is found in LDAP and group membership file checking fall back is activated
- * {@link org.ow2.proactive.authentication.LDAPProperties#FALLBACK_GROUP_MEMBERSHIP}, its group membership is checked with file login module.
+ * support custom filters for username and group
  *
  *
- * @author The ProActive Team
- * @since ProActive Scheduling 0.9.1
+ * @author The ActiveEon Team
+ * @since ProActive Scheduling 2.1.1
  */
-public abstract class LDAPLoginModule extends FileLoginModule implements Loggable {
+public abstract class LDAP2LoginModule extends FileLoginModule implements Loggable {
 
     /** connection logger */
     private final Logger logger = getLogger();
 
     /** LDAP configuration properties */
-    private LDAPProperties ldapProperties = new LDAPProperties(getLDAPConfigFileName());
-    /** default value for Context.SECURITY_AUTHENTICATION 
+    private LDAP2Properties ldapProperties = new LDAP2Properties(getLDAPConfigFileName());
+    /** default value for Context.SECURITY_AUTHENTICATION
      * that correspond to anonymous connection
     */
     private final String ANONYMOUS_LDAP_CONNECTION = "none";
@@ -100,38 +96,31 @@ public abstract class LDAPLoginModule extends FileLoginModule implements Loggabl
     private final String SSL_TRUSTSTORE_PASSWD_PROPERTY = "javax.net.ssl.trustStorePassword";
 
     /** LDAP used to perform authentication */
-    private final String LDAP_URL = ldapProperties.getProperty(LDAPProperties.LDAP_URL);
+    private final String LDAP_URL = ldapProperties.getProperty(LDAP2Properties.LDAP_URL);
 
     /** LDAP Subtree wherein users entries are searched*/
-    private final String USER_DN = ldapProperties.getProperty(LDAPProperties.LDAP_USERS_SUBTREE);
+    private final String BASE_DN = ldapProperties.getProperty(LDAP2Properties.LDAP_USERS_SUBTREE);
 
-    /** object class of users in LDAP server configuration */
-    private final String USER_OBJECT_CLASS = ldapProperties
-            .getProperty(LDAPProperties.LDAP_USER_OBJECT_CLASS);
-
-    /** object class of groups in LDAP server configuration */
-    private final String GROUP_OBJECT_CLASS = ldapProperties
-            .getProperty(LDAPProperties.LDAP_GROUP_OBJECT_CLASS);
     /**
-     * Authentication method used to bind to LDAP : none, simple, 
+     * Authentication method used to bind to LDAP : none, simple,
      * or one of the SASL authentication methods
      */
     private final String AUTHENTICATION_METHOD = ldapProperties
-            .getProperty(LDAPProperties.LDAP_AUTHENTICATION_METHOD);
+            .getProperty(LDAP2Properties.LDAP_AUTHENTICATION_METHOD);
 
     /** user name used to bind to LDAP (if authentication method is different from none) */
-    private final String BIND_LOGIN = ldapProperties.getProperty(LDAPProperties.LDAP_BIND_LOGIN);
+    private final String BIND_LOGIN = ldapProperties.getProperty(LDAP2Properties.LDAP_BIND_LOGIN);
 
     /** user password used to bind to LDAP (if authentication method is different from none) */
-    private String BIND_PASSWD = ldapProperties.getProperty(LDAPProperties.LDAP_BIND_PASSWD);
+    private String BIND_PASSWD = ldapProperties.getProperty(LDAP2Properties.LDAP_BIND_PASSWD);
 
     /**fall back property, check user/password and group in files if user in not found in LDAP */
     private boolean fallbackUserAuth = Boolean.valueOf(ldapProperties
-            .getProperty(LDAPProperties.FALLBACK_USER_AUTH));
+            .getProperty(LDAP2Properties.FALLBACK_USER_AUTH));
 
     /**group fall back property, check user group membership group file if user in not found in corresponding LDAP group*/
     private boolean fallbackGroupMembership = Boolean.valueOf(ldapProperties
-            .getProperty(LDAPProperties.FALLBACK_GROUP_MEMBERSHIP));
+            .getProperty(LDAP2Properties.FALLBACK_GROUP_MEMBERSHIP));
 
     /** authentication status */
     private boolean succeeded = false;
@@ -139,7 +128,7 @@ public abstract class LDAPLoginModule extends FileLoginModule implements Loggabl
     /**
      * Creates a new instance of LDAPLoginModule
      */
-    public LDAPLoginModule() {
+    public LDAP2LoginModule() {
         if (fallbackUserAuth) {
             checkLoginFile();
             checkGroupFile();
@@ -151,18 +140,19 @@ public abstract class LDAPLoginModule extends FileLoginModule implements Loggabl
         }
 
         //initialize system properties for SSL/TLS connection
-        String keyStore = ldapProperties.getProperty(LDAPProperties.LDAP_KEYSTORE_PATH);
-        if (!alreadyDefined(SSL_KEYSTORE_PATH_PROPERTY, keyStore)) {
+        String keyStore = ldapProperties.getProperty(LDAP2Properties.LDAP_KEYSTORE_PATH);
+
+        if ((keyStore != null) && (!alreadyDefined(SSL_KEYSTORE_PATH_PROPERTY, keyStore))) {
             System.setProperty(SSL_KEYSTORE_PATH_PROPERTY, keyStore);
             System.setProperty(SSL_KEYSTORE_PASSWD_PROPERTY, ldapProperties
-                    .getProperty(LDAPProperties.LDAP_KEYSTORE_PASSWD));
+                    .getProperty(LDAP2Properties.LDAP_KEYSTORE_PASSWD));
         }
 
-        String trustStore = ldapProperties.getProperty(LDAPProperties.LDAP_TRUSTSTORE_PATH);
-        if (!alreadyDefined(SSL_TRUSTSTORE_PATH_PROPERTY, trustStore)) {
+        String trustStore = ldapProperties.getProperty(LDAP2Properties.LDAP_TRUSTSTORE_PATH);
+        if ((trustStore != null) && (!alreadyDefined(SSL_TRUSTSTORE_PATH_PROPERTY, trustStore))) {
             System.setProperty(SSL_TRUSTSTORE_PATH_PROPERTY, trustStore);
             System.setProperty(SSL_TRUSTSTORE_PASSWD_PROPERTY, ldapProperties
-                    .getProperty(LDAPProperties.LDAP_TRUSTSTORE_PASSWD));
+                    .getProperty(LDAP2Properties.LDAP_TRUSTSTORE_PASSWD));
         }
     }
 
@@ -277,11 +267,11 @@ public abstract class LDAPLoginModule extends FileLoginModule implements Loggabl
      * check group membership in LDAP groups.
      *
      * If user entry is not found in LDAP and file authentication fall back is activated
-     * {@link org.ow2.proactive.authentication.LDAPProperties#FALLBACK_USER_AUTH}, it tries authentication (login/password and group membership)
+     * {@link org.ow2.proactive.authentication.LDAP2Properties#FALLBACK_USER_AUTH}, it tries authentication (login/password and group membership)
      * with file login module.
      *
      * If no group is found in LDAP and group membership fall back is activated
-     * {@link org.ow2.proactive.authentication.LDAPProperties#FALLBACK_GROUP_MEMBERSHIP}, its group membership is checked with file login module.
+     * {@link org.ow2.proactive.authentication.LDAP2Properties#FALLBACK_GROUP_MEMBERSHIP}, its group membership is checked with file login module.
      *
      * @param username user's login
      * @param password user's password
@@ -305,7 +295,7 @@ public abstract class LDAPLoginModule extends FileLoginModule implements Loggabl
         }
 
         if (userDN == null) {
-            logger.info("user entry not found in subtree " + USER_DN + " for user " + username);
+            logger.info("user entry not found in subtree " + BASE_DN + " for user " + username);
             if (fallbackUserAuth) {
                 logger.info("fall back to file authentication for user : " + username);
                 return super.logUser(username, password);
@@ -456,10 +446,10 @@ public abstract class LDAPLoginModule extends FileLoginModule implements Loggabl
             ctx = this.connectAndGetContext();
             SearchControls sControl = new SearchControls();
             sControl.setSearchScope(SearchControls.SUBTREE_SCOPE);
-            String filter = "(&(objectclass=" + USER_OBJECT_CLASS + ")(cn=" + username + "))";
-
+            String filter = String.format(ldapProperties.getProperty(LDAP2Properties.LDAP_USER_FILTER),
+                    username);
             // looking for the user dn (distinguish name)
-            NamingEnumeration<SearchResult> answer = ctx.search(USER_DN, filter, sControl);
+            NamingEnumeration<SearchResult> answer = ctx.search(BASE_DN, filter, sControl);
             if (answer.hasMoreElements()) {
                 SearchResult result = (SearchResult) answer.next();
                 userDN = result.getNameInNamespace();
@@ -469,12 +459,14 @@ public abstract class LDAPLoginModule extends FileLoginModule implements Loggabl
                 subject.getPrincipals().add(new UserNamePrincipal(username));
 
                 // looking for the user groups
-                String groupFilter = "(&(objectclass=" + GROUP_OBJECT_CLASS + ")(uniqueMember=" + userDN +
-                    "))";
-                NamingEnumeration<SearchResult> groupResults = ctx.search(USER_DN, groupFilter, sControl);
+                String groupFilter = String.format(ldapProperties
+                        .getProperty(LDAP2Properties.LDAP_GROUP_FILTER), userDN);
+
+                NamingEnumeration<SearchResult> groupResults = ctx.search(BASE_DN, groupFilter, sControl);
                 while (groupResults.hasMoreElements()) {
                     SearchResult res = (SearchResult) groupResults.next();
-                    Attribute attr = res.getAttributes().get("cn");
+                    Attribute attr = res.getAttributes().get(
+                            ldapProperties.getProperty(LDAP2Properties.LDAP_GROUPNAME_ATTR));
                     if (attr != null) {
                         String groupName = attr.get().toString();
                         subject.getPrincipals().add(new GroupNamePrincipal(groupName));
@@ -535,5 +527,9 @@ public abstract class LDAPLoginModule extends FileLoginModule implements Loggabl
      * @return name of the file with LDAP configuration.
      */
     protected abstract String getLDAPConfigFileName();
+
+    public static void main(String[] args) {
+
+    }
 
 }
