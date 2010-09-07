@@ -169,7 +169,7 @@ public class SchedulerUserAdapter implements UserSchedulerInterface {
      * {@inheritDoc}
      */
     public BooleanWrapper pause(String jobId) throws SchedulerException {
-        return new BooleanWrapper(frontend.pause());
+        return new BooleanWrapper(frontend.pauseJob(jobId));
     }
 
     /**
