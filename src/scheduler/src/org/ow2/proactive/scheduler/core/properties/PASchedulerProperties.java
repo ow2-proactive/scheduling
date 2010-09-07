@@ -123,6 +123,8 @@ public enum PASchedulerProperties {
      */
     SCHEDULER_LDAP_CONFIG_FILE_PATH("pa.scheduler.ldap.config.path", PropertyType.STRING),
 
+    SCHEDULER_LDAP2_CONFIG_FILE_PATH("pa.scheduler.ldap2.config.path", PropertyType.STRING),
+
     /** Login default file name */
     SCHEDULER_LOGIN_FILENAME("pa.scheduler.core.defaultloginfilename", PropertyType.STRING),
 
