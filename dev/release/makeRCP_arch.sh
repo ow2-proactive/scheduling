@@ -2,12 +2,9 @@
 
 MAKE_CLIENT_RELEASE=true
 
-# cmd example
-# ./makeRCP_arch.sh . ../Public/RCP 1.0.2 ../Public/RCP
-
 if [ $# -ne 4 ]
 then
-    echo usage : $0 RCPs_directory version destination
+    echo usage : $0 root_directory RCPs_directory version destination
 	echo
 	echo "    root_directory   : Root directory of the Scheduling project : must contains license files"
 	echo "    RCPs_directory   : Directory containing the different built RCPs for both products (must contain the \'scheduler\' and \'rm\' directories)"
@@ -15,9 +12,10 @@ then
 	echo "    destination      : Destination path for the final generated archive"
 	echo
 	echo "    Example :"
-	echo "    ./makeRCP_arch.sh . ../Public/RCP 1.0.2 ../Public/RCP"
+	echo "    ./makeRCP_arch.sh /tmp/ProActiveScheduling-1.0.0_server /home/Public/RCP 1.0.0 /home/Public/ProActiveScheduling-1.0.0"
 	echo "    "
-	echo "    To export plugins (via Eclipse) Root directory must be :"
+	echo "    In product export wizard :"
+	echo "    To export plugins, Root directory must be :"
 	echo "       'ResourceManager'    for RM"
 	echo "       'Scheduler'          for Scheduler"
 	echo "    Generated plugins directories must be :"
