@@ -48,7 +48,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -86,8 +85,7 @@ public class EC2Infrastructure extends InfrastructureManager {
     @Configurable(fileBrowser = true, description = "Absolute path of EC2 configuration file")
     protected File configurationFile;
     @Configurable(description = "URL of the Resource Manager")
-    protected String rmUrl = PAActiveObject.getActiveObjectNodeUrl(PAActiveObject.getStubOnThis()).replace(
-            PAResourceManagerProperties.RM_NODE_NAME.getValueAsString(), "");
+    protected String rmUrl;
     @Configurable(credential = true, description = "Absolute path of the credential file")
     protected File RMCredentialsPath;
     @Configurable

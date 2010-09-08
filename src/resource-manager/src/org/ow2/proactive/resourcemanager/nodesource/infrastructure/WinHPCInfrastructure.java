@@ -47,7 +47,6 @@ import org.ggf.schemas.bes._2006._08.bes_factory.HPCBPServiceStub.ActivityStateE
 import org.ggf.schemas.bes._2006._08.bes_factory.HPCBPServiceStub.EndpointReferenceType;
 import org.ggf.schemas.bes._2006._08.bes_factory.HPCBPServiceStub.GetActivityStatusResponseType;
 import org.ggf.schemas.bes._2006._08.bes_factory.HPCBPServiceStub.ReferenceParametersType;
-import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -108,8 +107,7 @@ public class WinHPCInfrastructure extends DefaultInfrastructureManager {
      * URL of the resource manager the newly created nodes will attempt to contact
      */
     @Configurable(description = "URL of the Resource Manager")
-    protected String RMUrl = PAActiveObject.getActiveObjectNodeUrl(PAActiveObject.getStubOnThis()).replace(
-            PAResourceManagerProperties.RM_NODE_NAME.getValueAsString(), "");
+    protected String RMUrl;
 
     /**
      * Path to the credentials file user for RM authentication
