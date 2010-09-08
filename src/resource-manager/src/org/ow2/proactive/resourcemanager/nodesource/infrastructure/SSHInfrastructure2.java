@@ -50,7 +50,6 @@ import java.util.Hashtable;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.ssh.SSHClient;
@@ -135,16 +134,12 @@ public class SSHInfrastructure2 extends InfrastructureManager {
      * Additional java options to append to the command executed on the remote host
      */
     @Configurable(description = "Options for the java command\nlaunching the node on the remote hosts")
-    protected String javaOptions = CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL.isSet() ? CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL
-            .getCmdLine() +
-        CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL.getValue()
-            : "";
+    protected String javaOptions;
     /**
      * The rm's url
      */
     @Configurable(description = "URL of the Resource Manager")
-    protected String rmUrl = PAActiveObject.getActiveObjectNodeUrl(PAActiveObject.getStubOnThis()).replace(
-            PAResourceManagerProperties.RM_NODE_NAME.getValueAsString(), "");
+    protected String rmUrl;
     /**
      * Path to the credentials file user for RM authentication
      */
