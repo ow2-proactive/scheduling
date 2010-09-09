@@ -36,7 +36,11 @@
  */
 package org.ow2.proactive.scheduler.common.exception;
 
+import java.util.Stack;
+
 import org.objectweb.proactive.annotation.PublicAPI;
+import org.ow2.proactive.scheduler.common.job.factories.XMLAttributes;
+import org.ow2.proactive.scheduler.common.job.factories.XMLTags;
 
 
 /**
@@ -48,30 +52,161 @@ import org.objectweb.proactive.annotation.PublicAPI;
 @PublicAPI
 public class JobCreationException extends SchedulerException {
 
+    private String taskName = null;
+    private Stack<XMLTags> tags = new Stack<XMLTags>();
+    private XMLAttributes attribute = null;
+    private boolean isSchemaException = false;
+
     /**
-     * Create a new instance of JobCreationException with the given message and cause
+     * Create a new instance of JobCreationException using the given message string
      *
-     * @param msg the message to attach.
-     * @param cause the cause of the exception.
+     * @param message the reason of the exception
      */
-    public JobCreationException(String msg, Exception cause) {
-        super(msg, cause);
+    public JobCreationException(String message) {
+        super(message);
     }
 
     /**
-     * Create a new instance of JobCreationException with the given message.
-     * @param msg message to attach.
+     * Create a new instance of JobCreationException using the given message string
+     *
+     * @param message the reason of the exception
      */
-    public JobCreationException(String msg) {
-        super(msg);
+    public JobCreationException(Throwable cause) {
+        super(cause.getMessage(), cause);
     }
 
     /**
-     * Create a new instance of JobCreationException with the given cause
+     * Create a new instance of JobCreationException using the given message string and cause
      *
-     * @param cause the cause of the exception.
+     * @param message the reason of the exception
+     * @param cause the cause of this exception
      */
-    public JobCreationException(Exception cause) {
-        super(cause);
+    public JobCreationException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    /**
+     * Create a new instance of JobCreationException and tell if it was a schema exception
+     *
+     * @param schemaException true if this exception is due to a Schema exception, false otherwise.
+     * @param cause the cause of this exception
+     */
+    public JobCreationException(boolean schemaException, Throwable cause) {
+        super(cause.getMessage(), cause);
+        this.isSchemaException = schemaException;
+    }
+
+    /**
+     * Create a new instance of JobCreationException using the given tag, attribute and cause.
+     * Tag and attribute can be null.
+     *
+     * @param Tag the XML tag name where the exception is thrown
+     * @param Attribute the XML attribute name where the exception is thrown
+     * @param cause the cause of this exception
+     */
+    public JobCreationException(String tag, String attribute, Exception cause) {
+        super(cause.getMessage(), cause);
+        if (tag != null) {
+            this.tags.push(XMLTags.getFromXMLName(tag));
+        }
+        if (attribute != null) {
+            this.attribute = XMLAttributes.getFromXMLName(attribute);
+        }
+    }
+
+    /**
+     * Set the task name on which the problem was found
+     *
+     * @param taskName the name of the task that generate the problem
+     */
+    public void setTaskName(String taskName) {
+        this.taskName = taskName;
+    }
+
+    /**
+     * Push a new tag on the stack of tag for this exception
+     *
+     * @param currentTag the tag to stack.
+     */
+    public void pushTag(String currentTag) {
+        this.tags.push(XMLTags.getFromXMLName(currentTag));
+    }
+
+    /**
+     * Return a stack that contains every tags (path) to the element that causes the exception.
+     * The first element is always the 'job' tag.
+     *
+     * @return a stack that contains every tags (path) to the element that causes the exception.
+     */
+    public Stack<XMLTags> getXMLTagsStack() {
+        return this.tags;
+    }
+
+    /**
+     * Return the detail message string of this exception.
+     * This message contains the task name, tag hierarchy, and attribute that generate the exception and
+     * then the short message associate to this exception.
+     *
+     * @return the detail message string of this exception.
+     */
+    @Override
+    public String getMessage() {
+        StringBuilder sb = new StringBuilder();
+        if (taskName != null) {
+            sb.append("[task=" + taskName + "] ");
+        }
+        if (tags != null && tags.size() > 0) {
+            sb.append("[tag:" + tags.elementAt(tags.size() - 1));
+            for (int i = tags.size() - 2; i >= 0; i--) {
+                sb.append("/" + tags.elementAt(i));
+            }
+            sb.append("] ");
+        }
+        if (attribute != null) {
+            sb.append("[attribute:" + attribute + "] ");
+        }
+        if (sb.length() > 0) {
+            sb = new StringBuilder("At " + sb.toString() + ": ");
+        }
+        sb.append(getShortMessage());
+        return sb.toString();
+    }
+
+    /**
+     * Return only the message that is the cause of the exception.
+     *
+     * @return the message that is the cause of the exception.
+     */
+    public String getShortMessage() {
+        return super.getMessage();
+    }
+
+    /**
+     * Get the isSchemaException
+     *
+     * @return the isSchemaException
+     */
+    public boolean isSchemaException() {
+        return isSchemaException;
+    }
+
+    /**
+     * Get the taskName where the exception has been thrown.
+     *
+     * @return the taskName where the exception has been thrown, null if no taskName was set (ie: exception
+     * 			was thrown in job header.)
+     */
+    public String getTaskName() {
+        return taskName;
+    }
+
+    /**
+     * Get the attribute where the exception has been thrown.
+     *
+     * @return the attribute where the exception has been thrown, null if no attribute was set (ie: exception
+     * 			was thrown in a tag that does not contains an attribute.)
+     */
+    public XMLAttributes getAttribute() {
+        return attribute;
     }
 }

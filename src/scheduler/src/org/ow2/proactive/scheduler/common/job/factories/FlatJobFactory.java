@@ -38,9 +38,7 @@ package org.ow2.proactive.scheduler.common.job.factories;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.IOException;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 
@@ -48,7 +46,6 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.scheduler.common.exception.JobCreationException;
-import org.ow2.proactive.scheduler.common.exception.UserException;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.NativeTask;
@@ -184,14 +181,8 @@ public class FlatJobFactory {
                 logger.debug("-> Task Name = " + t.getName());
                 logger.debug("-> command = " + t.getCommandLine() + "\n");
             }
-        } catch (FileNotFoundException e) {
-            throw new JobCreationException(e.getMessage(), e);
-        } catch (IOException e) {
-            throw new JobCreationException(e.getMessage(), e);
-        } catch (InvalidScriptException e) {
-            throw new JobCreationException(e.getMessage(), e);
-        } catch (UserException e) {
-            throw new JobCreationException(e.getMessage(), e);
+        } catch (Exception e) {
+            throw new JobCreationException(e);
         }
         return nativeJob;
     }
@@ -233,10 +224,8 @@ public class FlatJobFactory {
             ((TaskFlowJob) nativeJob).addTask(t);
             logger.debug("-> Task Name = " + t.getName());
             logger.debug("-> command = " + t.getCommandLine() + "\n");
-        } catch (UserException e) {
-            throw new JobCreationException(e.getMessage(), e);
-        } catch (InvalidScriptException e) {
-            throw new JobCreationException(e.getMessage(), e);
+        } catch (Exception e) {
+            throw new JobCreationException(e);
         }
         return nativeJob;
     }
