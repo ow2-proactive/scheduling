@@ -221,8 +221,8 @@ public final class RuntimeDataMBeanImpl extends StandardMBean implements Runtime
             case JOB_RUNNING_TO_FINISHED:
                 // Check for killed job (see SCHEDULING-776)            	
                 if (jobInfo.getStartTime() == -1) {
-                    this.pendingJobsCount--;
-                    this.finishedJobsCount++;
+                    // The call to jobPendingToFinishedEvent was added since 
+                    jobPendingToFinishedEvent(jobInfo);
                 } else {
                     jobRunningToFinishedEvent(jobInfo);
                 }
@@ -259,8 +259,33 @@ public final class RuntimeDataMBeanImpl extends StandardMBean implements Runtime
         // Update the status
         this.pendingJobsCount--;
         this.runningJobsCount++;
+
+        // After a given number of Jobs we can have a good current estimation of the mean Job Pending Time
+        // calculated each time dividing the accumulator time by the counter.        
+
         // Call the private method to calculate the mean pending time
-        calculateMeanJobPendingTime(info);
+        // Calculate the Pending time for this Job (startTime - submittedTime)
+        final long jobPendingTime = (info.getStartTime() - info.getSubmittedTime());
+        calculateMeanJobPendingTime(info.getJobId().value(), jobPendingTime);
+    }
+
+    protected void jobPendingToFinishedEvent(final JobInfo info) {
+        final String jobId = info.getJobId().value();
+        // Decrement pending job count
+        this.pendingJobsCount--;
+        // Call the private method to calculate the mean pending time
+        // Calculate the Pending time for this Job (finishTime - submittedTime)
+        final long jobPendingTime = (info.getFinishedTime() - info.getSubmittedTime());
+        // Compute pending mean  
+        calculateMeanJobPendingTime(jobId, jobPendingTime);
+        // The job is finished
+        this.finishedJobsCount++;
+        // No more pending tasks
+        this.numberOfPendingTasks.put(jobId, 0);
+        // 
+        // Add the meanTaskPendingTime for this job to the meanTaskPendingTimeMap in position [jobId]
+        // long mean = this.computeMean(this.taskPendingTimeMap, jobId);
+        // this.meanTaskPendingTimeMap.put(jobId, mean);
     }
 
     /**
@@ -462,14 +487,10 @@ public final class RuntimeDataMBeanImpl extends StandardMBean implements Runtime
     // PRIVATE METHODS FOR CALCULATING KPIs
 
     /**
-     * After a given number of Jobs we can have a good current estimation of the mean Job Pending Time
-     * calculated each time dividing the accumulator time by the counter.
-     *
+
      * @param info the job information
      */
-    private void calculateMeanJobPendingTime(final JobInfo info) {
-        // Calculate the Pending time for this Job (startTime - submittedTime)
-        long jobPendingTime = (info.getStartTime() - info.getSubmittedTime());
+    private void calculateMeanJobPendingTime(final String jobId, final long jobPendingTime) {
         // Increment the cumulative pending time
         this.cumulativePendingTime += jobPendingTime;
         // Increment the related counter
@@ -477,7 +498,7 @@ public final class RuntimeDataMBeanImpl extends StandardMBean implements Runtime
         // Update the mean pending time dividing the cumulative pending time by the related counter
         this.meanJobPendingTime = (this.cumulativePendingTime / this.counterJobPendingTime);
         // Add the jobPendingTime for this job to the jobPendingTimeMap in position [jobId]
-        this.jobPendingTimeMap.put(info.getJobId().value(), jobPendingTime);
+        this.jobPendingTimeMap.put(jobId, jobPendingTime);
     }
 
     /**
