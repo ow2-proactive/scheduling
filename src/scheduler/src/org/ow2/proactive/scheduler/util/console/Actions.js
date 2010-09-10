@@ -62,7 +62,7 @@ function killjob(jobId){
 }
 
 function removejob(jobId){
-	s_.remove_(""+jobId);
+	return s_.remove_(""+jobId);
 }
 
 function jobresult(jobId){

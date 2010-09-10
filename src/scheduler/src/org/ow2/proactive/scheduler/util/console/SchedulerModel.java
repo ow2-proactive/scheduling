@@ -371,13 +371,20 @@ public class SchedulerModel extends ConsoleModel {
         return success;
     }
 
-    public void remove_(String jobId) {
+    public boolean remove_(String jobId) {
+        boolean success = false;
         try {
-            scheduler.removeJob(jobId);
-            print("Job " + jobId + " removed.");
+            success = scheduler.removeJob(jobId);
         } catch (Exception e) {
             handleExceptionDisplay("Error while removing job  " + jobId, e);
+            return false;
         }
+        if (success) {
+            print("Job " + jobId + " removed.");
+        } else {
+            print("Remove job " + jobId + " is not possible !!");
+        }
+        return success;
     }
 
     public JobResult result_(String jobId) {
