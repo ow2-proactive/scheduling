@@ -64,27 +64,33 @@ public class ClientRequestHandler {
     private static final ExecutorService threadPoolForNetworkCalls = Executors
             .newFixedThreadPool(THREAD_NUMBER);
 
-    private static AtomicInteger requestLeft = new AtomicInteger();
+    private static final AtomicInteger requestLeft = new AtomicInteger();
 
     public static void terminate() {
+        // Precondition: no new event is emitted
         try {
-            requestLeft.wait();
+            synchronized (requestLeft) {
+                //obviously wait for events to be sent only if their are events
+                if (requestLeft.get() > 0) {
+                    requestLeft.wait();
+                }
+            }
             threadPoolForNetworkCalls.shutdown();
-            threadPoolForNetworkCalls.awaitTermination(12, TimeUnit.SECONDS);
+            threadPoolForNetworkCalls.awaitTermination(13, TimeUnit.SECONDS);
         } catch (Exception e) {
         }
     }
 
     /** Busy state of this client request queue */
-    private AtomicBoolean busy = new AtomicBoolean(false);
+    private final AtomicBoolean busy = new AtomicBoolean(false);
     /** Client id on which to send the request */
-    private UniqueID clientId;
+    private final UniqueID clientId;
     /** Client (listener) on which to send the request */
-    private SchedulerEventListener client;
+    private final SchedulerEventListener client;
     /** Events queue to be stored */
-    private LinkedList<ReifiedMethodCall> eventCallsToStore;
+    private final LinkedList<ReifiedMethodCall> eventCallsToStore;
     /** Cross reference to the front-end : used to mark client as dirty */
-    private SchedulerFrontend frontend;
+    private final SchedulerFrontend frontend;
 
     /**
      * Create a new instance of ClientRequestHandler
@@ -126,8 +132,8 @@ public class ClientRequestHandler {
             if (eventCallsToStore.size() > 0 && !busy.get()) {
                 LinkedList<ReifiedMethodCall> tasks = (LinkedList<ReifiedMethodCall>) eventCallsToStore
                         .clone();
-                requestLeft.addAndGet(tasks.size());
                 eventCallsToStore.clear();
+                busy.set(true);
                 threadPoolForNetworkCalls.execute(new TaskRunnable(tasks));
             }
         }
@@ -142,7 +148,7 @@ public class ClientRequestHandler {
     class TaskRunnable implements Runnable {
 
         /** Events queue to be sent */
-        private LinkedList<ReifiedMethodCall> eventCallsToSend;
+        private final LinkedList<ReifiedMethodCall> eventCallsToSend;
 
         /**
          * Create a new instance of Task
@@ -161,10 +167,12 @@ public class ClientRequestHandler {
          */
         public void run() {
             try {
-                busy.set(true);
-                //unlock shutdown request
+                //unlock shutdown request if needed
                 if (requestLeft.addAndGet(-eventCallsToSend.size()) == 0) {
-                    requestLeft.notify();
+                    synchronized (requestLeft) {
+                        //inner synchronized OK since only used during termination (= no new event)
+                        requestLeft.notify();
+                    }
                 }
                 //loop on the list and send events
                 while (!eventCallsToSend.isEmpty()) {
