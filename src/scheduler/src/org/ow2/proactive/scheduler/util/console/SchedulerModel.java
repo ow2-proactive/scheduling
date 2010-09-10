@@ -374,7 +374,7 @@ public class SchedulerModel extends ConsoleModel {
     public void remove_(String jobId) {
         try {
             scheduler.removeJob(jobId);
-            print("Job " + jobId + " removed.");
+            print("Job " + jobId + " removal request sent to Scheduler.");
         } catch (Exception e) {
             handleExceptionDisplay("Error while removing job  " + jobId, e);
         }
