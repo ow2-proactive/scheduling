@@ -830,8 +830,8 @@ public class JobFactory_stax extends JobFactory {
             }
         }
 
+        // <control>  =>  <if> | <loop> | <replicate>
         try {
-            // <control>  =>  <if> | <loop> | <replicate>
             while (cursorTask.hasNext()) {
                 event = cursorTask.next();
                 if (event == XMLEvent.START_ELEMENT) {
@@ -840,78 +840,81 @@ public class JobFactory_stax extends JobFactory {
                     return null;
                 }
             }
-            if (event != XMLEvent.START_ELEMENT) {
-                throw new JobCreationException("Expected start element IF, REPLICATE or LOOP at line " +
-                    cursorTask.getLocation().getLineNumber());
-            }
+        } catch (Exception e) {
+            throw new JobCreationException(XMLTags.FLOW.getXMLName(), null, e);
+        }
+        if (event != XMLEvent.START_ELEMENT) {
+            throw new JobCreationException(XMLTags.FLOW.getXMLName(), null, null);
+        }
 
-            // REPLICATE : no attribute
-            if (XMLTags.FLOW_REPLICATE.matches(cursorTask.getLocalName())) {
-                type = FlowActionType.REPLICATE.toString();
-            }
-            // IF : attributes TARGET_IF and TARGET_ELSE and TARGET_JOIN
-            else if (XMLTags.FLOW_IF.matches(cursorTask.getLocalName())) {
-                type = FlowActionType.IF.toString();
-                for (int i = 0; i < cursorTask.getAttributeCount(); i++) {
-                    String attrName = cursorTask.getAttributeLocalName(i);
-                    if (XMLAttributes.FLOW_TARGET.matches(attrName)) {
-                        target = cursorTask.getAttributeValue(i);
-                    } else if (XMLAttributes.FLOW_ELSE.matches(attrName)) {
-                        targetElse = cursorTask.getAttributeValue(i);
-                    } else if (XMLAttributes.FLOW_JOIN.matches(attrName)) {
-                        targetJoin = cursorTask.getAttributeValue(i);
-                    }
-                }
-            }
-            // LOOP : attribute TARGET
-            else if (XMLTags.FLOW_LOOP.matches(cursorTask.getLocalName())) {
-                type = FlowActionType.LOOP.toString();
-                for (int i = 0; i < cursorTask.getAttributeCount(); i++) {
-                    String attrName = cursorTask.getAttributeLocalName(i);
-                    if (XMLAttributes.FLOW_TARGET.matches(attrName)) {
-                        target = cursorTask.getAttributeValue(i);
-                    }
-                }
-            } else {
-                throw new XMLStreamException("Awaited element " + XMLTags.FLOW_REPLICATE.getXMLName() + "," +
-                    XMLTags.FLOW_IF.getXMLName() + " or " + XMLTags.FLOW_LOOP.getXMLName() + ", got " +
-                    cursorTask.getLocalName());
-            }
-            FlowScript sc = null;
-            Script<?> internalScript = null;
-            try {
-                internalScript = createScript(cursorTask, 2);
-                switch (FlowActionType.parse(type)) {
-                    case IF:
-                        sc = FlowScript.createIfFlowScript(internalScript, target, targetElse, targetJoin);
-                        break;
-                    case REPLICATE:
-                        sc = FlowScript.createReplicateFlowScript(internalScript);
-                        break;
-                    case LOOP:
-                        sc = FlowScript.createLoopFlowScript(internalScript, target);
-                        break;
-                }
-            } catch (Exception e) {
-                throw new XMLStreamException("Could not create Control Flow Script", e);
-            }
+        String tag = null;
 
-            // </script>  -->  </if> | </replicate> | </loop>
+        // REPLICATE : no attribute
+        if (XMLTags.FLOW_REPLICATE.matches(cursorTask.getLocalName())) {
+            type = FlowActionType.REPLICATE.toString();
+            tag = XMLTags.FLOW_REPLICATE.getXMLName();
+        }
+        // IF : attributes TARGET_IF and TARGET_ELSE and TARGET_JOIN
+        else if (XMLTags.FLOW_IF.matches(cursorTask.getLocalName())) {
+            type = FlowActionType.IF.toString();
+            tag = XMLTags.FLOW_IF.getXMLName();
+            for (int i = 0; i < cursorTask.getAttributeCount(); i++) {
+                String attrName = cursorTask.getAttributeLocalName(i);
+                if (XMLAttributes.FLOW_TARGET.matches(attrName)) {
+                    target = cursorTask.getAttributeValue(i);
+                } else if (XMLAttributes.FLOW_ELSE.matches(attrName)) {
+                    targetElse = cursorTask.getAttributeValue(i);
+                } else if (XMLAttributes.FLOW_JOIN.matches(attrName)) {
+                    targetJoin = cursorTask.getAttributeValue(i);
+                }
+            }
+        }
+        // LOOP : attribute TARGET
+        else if (XMLTags.FLOW_LOOP.matches(cursorTask.getLocalName())) {
+            type = FlowActionType.LOOP.toString();
+            tag = XMLTags.FLOW_LOOP.getXMLName();
+            for (int i = 0; i < cursorTask.getAttributeCount(); i++) {
+                String attrName = cursorTask.getAttributeLocalName(i);
+                if (XMLAttributes.FLOW_TARGET.matches(attrName)) {
+                    target = cursorTask.getAttributeValue(i);
+                }
+            }
+        }
+        FlowScript sc = null;
+        Script<?> internalScript = null;
+        try {
+            internalScript = createScript(cursorTask, 2);
+            switch (FlowActionType.parse(type)) {
+                case IF:
+                    sc = FlowScript.createIfFlowScript(internalScript, target, targetElse, targetJoin);
+                    break;
+                case REPLICATE:
+                    sc = FlowScript.createReplicateFlowScript(internalScript);
+                    break;
+                case LOOP:
+                    sc = FlowScript.createLoopFlowScript(internalScript, target);
+                    break;
+            }
+        } catch (Exception e) {
+            throw new JobCreationException(tag, null, e);
+        }
+
+        // </script>  -->  </if> | </replicate> | </loop>
+        try {
             while (cursorTask.hasNext()) {
                 event = cursorTask.next();
                 if (event == XMLEvent.END_ELEMENT) {
                     break;
                 }
             }
-            if (event != XMLEvent.END_ELEMENT) {
-                throw new JobCreationException("Expected end element IF, REPLICATE or LOOP at line " +
-                    cursorTask.getLocation().getLineNumber());
-            }
-
-            return sc;
         } catch (XMLStreamException e) {
-            throw new JobCreationException(e);
+            throw new JobCreationException(tag, null, e);
         }
+        if (event != XMLEvent.END_ELEMENT) {
+            throw new JobCreationException(tag, null, null);
+        }
+
+        return sc;
     }
 
     /**
