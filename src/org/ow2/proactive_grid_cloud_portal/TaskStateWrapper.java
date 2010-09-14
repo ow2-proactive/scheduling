@@ -31,5 +31,28 @@ public class TaskStateWrapper  {
         return ts.getFinishedTime();
     }
     
+    public String getName(){
+    	return ts.getName();
+    }
+    
+    public String getId(){
+    	return ts.getId().value();
+    }
+    
+    public String getStatus(){
+    	return ts.getStatus().name();
+    }
+    
+    public String getHostName(){
+    	return ts.getExecutionHostName();
+    }
+    
+    public long getExecutionDuration(){
+    	return ts.getExecutionDuration();
+    }
+    
+    public String getResultPreview(){
+    	return ts.getResultPreview();
+    }
     
 }
