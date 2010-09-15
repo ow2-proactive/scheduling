@@ -50,7 +50,7 @@ public class SchedulerStateRest {
         } catch (NotConnectedException e) {
             handleNotConnectedException(sessionId);
         } catch (PermissionException e) {
-            handlePermissionException(sessionId, "list jobs by ids");
+            handlePermissionException(sessionId, "to list the jobs by ids");
         }
         return null;
     }
@@ -75,7 +75,7 @@ public class SchedulerStateRest {
         } catch (NotConnectedException e) {
             handleNotConnectedException(sessionId);
         } catch (PermissionException e) {
-            handlePermissionException(sessionId, "list jobs");
+            handlePermissionException(sessionId, "to list the jobs");
         }
         return null;
 
@@ -93,7 +93,7 @@ public class SchedulerStateRest {
         } catch (NotConnectedException e) {
             handleNotConnectedException(sessionId);
         } catch (PermissionException e) {
-            handlePermissionException(sessionId, "get description for the job " + jobId);
+            handlePermissionException(sessionId, "to get a description of the job " + jobId);
         } catch (UnknownJobException e) {
             handleUnknowJobException(sessionId, jobId);
         }
@@ -110,7 +110,7 @@ public class SchedulerStateRest {
         } catch (NotConnectedException e) {
             handleNotConnectedException(sessionId);
         } catch (PermissionException e) {
-            handlePermissionException(sessionId, "get result for the job " + jobId);
+            handlePermissionException(sessionId, "to get result of the job " + jobId);
         } catch (UnknownJobException e) {
             handleUnknowJobException(sessionId, jobId);
         }
@@ -126,7 +126,7 @@ public class SchedulerStateRest {
         } catch (NotConnectedException e) {
             handleNotConnectedException(sessionId);
         } catch (PermissionException e) {
-            handlePermissionException(sessionId, "remove the job" + jobId);
+            handlePermissionException(sessionId, "to remove the job" + jobId);
         } catch (UnknownJobException e) {
             handleUnknowJobException(sessionId, jobId);
         }
@@ -142,7 +142,7 @@ public class SchedulerStateRest {
         } catch (NotConnectedException e) {
             handleNotConnectedException(sessionId);
         } catch (PermissionException e) {
-            handlePermissionException(sessionId, "kill the job " + jobId);
+            handlePermissionException(sessionId, "to kill the job " + jobId);
         } catch (UnknownJobException e) {
             handleUnknowJobException(sessionId, jobId);
         }
@@ -166,7 +166,7 @@ public class SchedulerStateRest {
         } catch (NotConnectedException e) {
             handleNotConnectedException(sessionId);
         } catch (PermissionException e) {
-            handlePermissionException(sessionId, "get the tasks'ids of the job " + jobId);
+            handlePermissionException(sessionId, "to get the tasks' ids of the job " + jobId);
         } catch (UnknownJobException e) {
             handleUnknowJobException(sessionId, jobId);
         }
@@ -217,7 +217,7 @@ public class SchedulerStateRest {
         } catch (NotConnectedException e) {
             handleNotConnectedException(sessionId);
         } catch (PermissionException e) {
-            handlePermissionException(sessionId, "get description for the task " + taskid);
+            handlePermissionException(sessionId, "to get the description of the task " + taskid);
         } catch (UnknownJobException e) {
             handleUnknowJobException(sessionId, jobId);
         }
@@ -235,7 +235,7 @@ public class SchedulerStateRest {
         } catch (NotConnectedException e) {
             handleNotConnectedException(sessionId);
         } catch (PermissionException e) {
-            handlePermissionException(sessionId, "get the result of the task " + taskId);
+            handlePermissionException(sessionId, "to get the result of the task " + taskId);
         } catch (UnknownJobException e) {
             handleUnknowJobException(sessionId, jobId);
         } catch (UnknownTaskException e) {
