@@ -36,6 +36,8 @@
  */
 package functionaltests;
 
+import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.net.URL;
 
@@ -199,12 +201,38 @@ public class SchedulerTHelper {
         if (schedPropertiesFilePath == null) {
             schedPropertiesFilePath = functionalTestSchedulerProperties;
         }
+        cleanTMP();
         deploySchedulerGCMA();
         GCMVirtualNode vn = gcmad.getVirtualNode("VN");
         Node node = vn.getANode();
         MyAO myAO = (MyAO) PAActiveObject.newActive(MyAO.class.getName(), null, node);
         schedulerAuth = myAO.createAndJoinForkedScheduler(GCMDPath, schedPropertiesFilePath,
                 functionalTestRMProperties);
+    }
+
+    /* convenience method to clean TMP from dataspace when executing test */
+    private static void cleanTMP() {
+        File tmp = new File(System.getProperty("java.io.tmpdir"));
+        for (File f : tmp.listFiles(new FilenameFilter() {
+            public boolean accept(File dir, String name) {
+                return name.startsWith("PA_JVM");
+            }
+        })) {
+            removeDir(f);
+        }
+    }
+
+    /* remove directories recursively */
+    private static void removeDir(File dir) {
+        if (dir.isDirectory()) {
+            for (File f : dir.listFiles()) {
+                removeDir(f);
+            }
+        }
+        try {
+            dir.delete();
+        } catch (Exception e) {
+        }
     }
 
     /**
