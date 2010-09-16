@@ -235,6 +235,19 @@ public class Credentials implements Serializable {
             throw new KeyException("Cannot re-generate private key", e);
         }
 
+        return decrypt(privKey);
+    }
+
+    /**
+     * Decrypts the encapsulated credentials
+     * 
+     * @see org.ow2.proactive.authentication.crypto.KeyPairUtil#decrypt(String, String, String, byte[])
+     * @param privKey the private key
+     * @return A String array containing the clear data: login at the first
+     *         index and password at the second
+     * @throws KeyException decryption failure, malformed data
+     */
+    public String[] decrypt(PrivateKey privKey) throws KeyException {
         byte[] data = null;
         byte[] aesClear = null;
 
