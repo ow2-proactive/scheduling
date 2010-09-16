@@ -17,7 +17,8 @@ public class SchedulerSessionMapper {
         sessions = Collections.synchronizedMap(new HashMap<String, Scheduler>());
     }
 
-    public static synchronized SchedulerSessionMapper getInstance() {
+    public 
+    static synchronized SchedulerSessionMapper getInstance() {
         if (sessionMapper == null) {
             sessionMapper = new SchedulerSessionMapper();
         }

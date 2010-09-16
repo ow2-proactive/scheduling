@@ -21,7 +21,7 @@ import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.ext.filessplitmerge.schedulertools.SchedulerProxyUserInterface;
 
 
-@Path("/login")
+@Path("/scheduler/login")
 public class Login {
 
     @POST
