@@ -34,7 +34,7 @@ public class RMProxy implements ResourceManager {
         this.userName = user;
         this.password = pwd;
 
-        RMAuthentication rmAuth = RMConnection.join("rmi://dalek.activeeon.com:1099/");
+        RMAuthentication rmAuth = RMConnection.join("rmi://localhost:1099/");
         Credentials cred = Credentials.createCredentials("admin", "admin", rmAuth.getPublicKey());
         target = rmAuth.login(cred);
 
