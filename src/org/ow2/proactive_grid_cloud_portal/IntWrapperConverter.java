@@ -4,7 +4,6 @@ import javax.ws.rs.ext.Provider;
 
 import org.jboss.resteasy.spi.StringConverter;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
-import org.ow2.proactive.scheduler.common.task.RestartMode;
 
 
 @Provider
