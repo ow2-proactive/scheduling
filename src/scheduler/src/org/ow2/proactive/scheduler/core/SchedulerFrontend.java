@@ -97,6 +97,7 @@ import org.ow2.proactive.scheduler.job.UserIdentificationImpl;
 import org.ow2.proactive.scheduler.permissions.ChangePolicyPermission;
 import org.ow2.proactive.scheduler.permissions.ChangePriorityPermission;
 import org.ow2.proactive.scheduler.permissions.ConnectToResourceManagerPermission;
+import org.ow2.proactive.scheduler.permissions.GetOwnStateOnlyPermission;
 import org.ow2.proactive.scheduler.resourcemanager.ResourceManagerProxy;
 import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 
@@ -532,9 +533,38 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
      * {@inheritDoc}
      */
     public SchedulerState getState() throws NotConnectedException, PermissionException {
+        return getState(false);
+    }
+
+    /**
+     * Check if the given user can get the state as it is demanded (full or user only)
+     *
+     * @param myOnly true, if the user wants only its events or jobs, false if user want the full state
+     * @param ui the user identication
+     * @throws PermissionException if permission is denied
+     */
+    private void checkOwnStatePermission(boolean myOnly, UserIdentificationImpl ui)
+            throws PermissionException {
+        ui.checkPermission(new GetOwnStateOnlyPermission(myOnly), ui.getUsername() +
+            " does not have permissions to retreive full state");
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public SchedulerState getState(boolean myJobsOnly) throws NotConnectedException, PermissionException {
         //checking permissions
         checkPermission("getState", "You do not have permission to get the state !");
-        return sState;
+
+        UserIdentificationImpl ui = identifications.get(PAActiveObject.getContext().getCurrentRequest()
+                .getSourceBodyID());
+        try {
+            checkOwnStatePermission(myJobsOnly, ui);
+            return myJobsOnly ? sState.filterOnUser(ui.getUsername()) : sState;
+        } catch (PermissionException ex) {
+            logger_dev.info(ex.getMessage());
+            throw ex;
+        }
     }
 
     /**
@@ -568,6 +598,16 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
             throw new IllegalArgumentException(msg);
         }
 
+        //get the scheduler State
+        SchedulerState currentState = null;
+        if (getCurrentState) {
+            //check get state permission is checked in getState method
+            currentState = getState(myEventsOnly);
+        } else {
+            //check get state permission
+            checkOwnStatePermission(myEventsOnly, uIdent);
+        }
+        //prepare user for receiving events
         uIdent.setUserEvents(events);
         //set if the user wants to get its events only or every events
         uIdent.setMyEventsOnly(myEventsOnly);
@@ -576,11 +616,6 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
         uIdent.setListener(new ClientRequestHandler(this, id, sel));
         //cancel timer for this user : session is now managed by events
         uIdent.getSession().cancel();
-        //get the scheduler State
-        SchedulerState currentState = null;
-        if (getCurrentState) {
-            currentState = getState();
-        }
         //return to the user
         return currentState;
     }
@@ -1276,4 +1311,5 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
                     notification.getEventType());
         }
     }
+
 }

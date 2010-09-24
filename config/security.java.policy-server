@@ -41,11 +41,15 @@ grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "
     permission javax.management.MBeanPermission "org.ow2.proactive.resourcemanager.core.jmx.mbean.MyAccountMBeanImpl#*[*:*]", "*";
     permission javax.management.MBeanPermission "org.ow2.proactive.resourcemanager.core.jmx.mbean.RuntimeDataMBeanImpl#*[*:*]", "*";
 
-//    All JMX permissions could be granted as following
-//    permission javax.management.MBeanPermission "*", "*";
+	//All JMX permissions could be granted as following
+	//permission javax.management.MBeanPermission "*", "*";
 
 
-	// scheduling related permission
+	// --------------------------- scheduling related permission
+	//use the following line to allow a user to download full scheduler state and get events from any user
+	//"true" means that this user can get only its job in the state and listen for its events
+	//"false" means user can get full state and listen for any events.
+    permission org.ow2.proactive.scheduler.permissions.GetOwnStateOnlyPermission "false";
     permission org.ow2.proactive.scheduler.permissions.ChangePriorityPermission "1,2,3";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.scheduler.core.SchedulerFrontend.submit";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.scheduler.core.SchedulerFrontend.getJobResult";

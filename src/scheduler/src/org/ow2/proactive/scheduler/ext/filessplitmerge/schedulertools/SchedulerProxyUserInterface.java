@@ -393,4 +393,9 @@ public class SchedulerProxyUserInterface implements Scheduler {
         return false;
     }
 
+    public SchedulerState getState(boolean myJobsOnly) throws NotConnectedException, PermissionException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
 }

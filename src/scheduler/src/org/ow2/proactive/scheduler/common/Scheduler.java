@@ -267,13 +267,28 @@ public interface Scheduler extends SchedulerCoreMethods {
 
     /**
      * Get the list of job states that describe every jobs in the Scheduler.
-     * The SchedulerState contains 3 list of jobs, pending, running, and finished
+     * The SchedulerState contains 3 list of jobs, pending, running, and finished.
+     * Every jobs will be returned depending on your right. <br/>
+     * If a PermissionException is thrown, try using {@link #getState(boolean)} method with argument 'true'.
      *
      * @return the list of every jobs in the Scheduler
      * @throws NotConnectedException if you are not authenticated.
      * @throws PermissionException if you can't access to this particular method.
      */
     public SchedulerState getState() throws NotConnectedException, PermissionException;
+
+    /**
+     * Get the list of job states that describe every jobs in the Scheduler.
+     * The SchedulerState contains 3 list of jobs, pending, running, and finished
+     * If the given argument is true, only job that you own will be returned, otherwise every jobs
+     * will be returned depending on your right.
+     *
+     * @param myJobsOnly true to get only my jobs, false to get any.
+     * @return the list of every jobs in the Scheduler
+     * @throws NotConnectedException if you are not authenticated.
+     * @throws PermissionException if you can't access to this particular method.
+     */
+    public SchedulerState getState(boolean myJobsOnly) throws NotConnectedException, PermissionException;
 
     /**
      * Add a scheduler event Listener. this listener provides method to notice of

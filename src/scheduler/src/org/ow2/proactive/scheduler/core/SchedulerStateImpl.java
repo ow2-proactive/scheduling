@@ -159,4 +159,42 @@ public final class SchedulerStateImpl implements SchedulerState {
     public void setUsers(SchedulerUsers users) {
         sUsers = users;
     }
+
+    /**
+     * Filter the state on the given user name and return a new instance of scheduler state impl
+     * After this call, this instance remains the same.
+     *
+     * @param name username to be filtered
+     * @return a new state filtered on job owner name
+     */
+    SchedulerStateImpl filterOnUser(String name) {
+        SchedulerStateImpl ssi = new SchedulerStateImpl();
+        ssi.setState(getStatus());
+        ssi.setUsers(getUsers());
+        //pending
+        Vector<JobState> tmp = new Vector<JobState>();
+        for (JobState js : getPendingJobs()) {
+            if (js.getOwner().equals(name)) {
+                tmp.add(js);
+            }
+        }
+        ssi.setPendingJobs(tmp);
+        //running
+        tmp = new Vector<JobState>();
+        for (JobState js : getRunningJobs()) {
+            if (js.getOwner().equals(name)) {
+                tmp.add(js);
+            }
+        }
+        ssi.setRunningJobs(tmp);
+        //finished
+        tmp = new Vector<JobState>();
+        for (JobState js : getFinishedJobs()) {
+            if (js.getOwner().equals(name)) {
+                tmp.add(js);
+            }
+        }
+        ssi.setFinishedJobs(tmp);
+        return ssi;
+    }
 }

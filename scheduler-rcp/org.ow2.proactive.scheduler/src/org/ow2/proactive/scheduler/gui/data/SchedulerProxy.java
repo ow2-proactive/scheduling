@@ -142,6 +142,14 @@ public class SchedulerProxy implements Scheduler {
         try {
             return (SchedulerState) scheduler.addEventListener(listener, myEventsOnly, getSchedulerState,
                     events);
+        } catch (PermissionException pe) {
+            Activator.log(IStatus.ERROR, "Error getting full state : " + pe.getMessage(), pe);
+            try {
+                return (SchedulerState) scheduler.addEventListener(listener, true, getSchedulerState, events);
+            } catch (SchedulerException e) {
+                Activator.log(IStatus.ERROR, "Error in Scheduler Proxy ", e);
+                displayError(e.getMessage());
+            }
         } catch (SchedulerException e) {
             Activator.log(IStatus.ERROR, "Error in Scheduler Proxy ", e);
             displayError(e.getMessage());
@@ -685,6 +693,10 @@ public class SchedulerProxy implements Scheduler {
      */
     public SchedulerState getState() throws NotConnectedException, PermissionException {
         return scheduler.getState();
+    }
+
+    public SchedulerState getState(boolean arg0) throws NotConnectedException, PermissionException {
+        return scheduler.getState(arg0);
     }
 
 }
