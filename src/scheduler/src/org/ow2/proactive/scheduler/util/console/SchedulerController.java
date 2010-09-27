@@ -599,15 +599,6 @@ public class SchedulerController {
         return false;
     }
 
-    protected void connectJMXClient() {
-        final MBeanInfoViewer viewer = new MBeanInfoViewer(auth, user, credentials);
-        this.model.setJMXInfo(viewer);
-    }
-
-    protected String getCommandName() {
-        return "scheduler-client";
-    }
-
     private String submitCMD() {
         try {
             Job job;
@@ -648,4 +639,14 @@ public class SchedulerController {
         }
         return "";
     }
+
+    protected void connectJMXClient() {
+        final MBeanInfoViewer viewer = new MBeanInfoViewer(auth, user, credentials);
+        this.model.setJMXInfo(viewer);
+    }
+
+    protected String getCommandName() {
+        return "scheduler-client";
+    }
+
 }

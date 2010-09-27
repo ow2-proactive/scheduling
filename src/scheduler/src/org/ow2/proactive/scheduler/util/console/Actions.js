@@ -49,6 +49,19 @@ function submit(xmlDescriptor){
     return s_.submit_(""+xmlDescriptor);
 }
 
+function submitCmd(commandFilePath, jobName, output, selectscript) {
+	if (jobName == undefined){
+		jobName = null;
+	}
+	if (output == undefined){
+		output = null;
+	}
+	if (selectscript == undefined){
+		selectscript = null;
+	}
+	return s_.submitCmd_(commandFilePath, jobName, output, selectscript);
+}
+
 function pausejob(jobId){
     return s_.pause_(""+jobId);
 }

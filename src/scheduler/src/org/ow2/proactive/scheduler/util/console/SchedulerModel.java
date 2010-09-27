@@ -66,6 +66,7 @@ import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.JobState;
+import org.ow2.proactive.scheduler.common.job.factories.FlatJobFactory;
 import org.ow2.proactive.scheduler.common.job.factories.JobFactory;
 import org.ow2.proactive.scheduler.common.policy.Policy;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
@@ -140,6 +141,9 @@ public class SchedulerModel extends ConsoleModel {
         this.allowExitCommand = allowExitCommand;
         commands.add(new Command("submit(XMLdescriptor)",
             "Submit a new job (parameter is a string representing the job XML descriptor URL)"));
+        commands
+                .add(new Command("submitCmd(CommandFilePath,jobName,output,selectionScript)",
+                    "Submit a new job where each task is a line in the commandFile path. Other arguments are optional."));
         commands
                 .add(new Command(
                     "priority(id,priority)",
@@ -319,6 +323,19 @@ public class SchedulerModel extends ConsoleModel {
             return id.value();
         } catch (Exception e) {
             handleExceptionDisplay("Error on job Submission (path=" + xmlDescriptor + ")", e);
+        }
+        return "";
+    }
+
+    public String submitCmd_(String commandFilePath, String jobName, String output, String selectscript) {
+        try {
+            Job job = FlatJobFactory.getFactory().createNativeJobFromCommandsFile(commandFilePath, jobName,
+                    selectscript, output, selectscript);
+            JobId id = scheduler.submit(job);
+            print("Job '" + commandFilePath + "' successfully submitted ! (id=" + id.value() + ")");
+            return id.value();
+        } catch (Exception e) {
+            handleExceptionDisplay("Error on job Submission (path=" + commandFilePath + ")", e);
         }
         return "";
     }
