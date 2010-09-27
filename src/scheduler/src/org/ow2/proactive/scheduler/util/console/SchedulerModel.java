@@ -515,6 +515,7 @@ public class SchedulerModel extends ConsoleModel {
             list.add("HOSTNAME");
             list.add("EXEC DURATION");
             list.add("TOT DURATION");
+            list.add("#NODES USED");
             list.add("#EXECUTIONS");
             list.add("#NODES KILLED");
             oaf.setTitle(list);
@@ -533,6 +534,7 @@ public class SchedulerModel extends ConsoleModel {
                 list.add((ts.getExecutionHostName() == null) ? "unknown" : ts.getExecutionHostName());
                 list.add(Tools.getFormattedDuration(0, ts.getExecutionDuration()));
                 list.add(Tools.getFormattedDuration(ts.getFinishedTime(), ts.getStartTime()));
+                list.add("" + ts.getNumberOfNodesNeeded());
                 if (ts.getMaxNumberOfExecution() - ts.getNumberOfExecutionLeft() < ts
                         .getMaxNumberOfExecution()) {
                     list.add((ts.getMaxNumberOfExecution() - ts.getNumberOfExecutionLeft() + 1) + "/" +
