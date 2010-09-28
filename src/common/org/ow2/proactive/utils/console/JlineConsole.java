@@ -36,10 +36,16 @@
  */
 package org.ow2.proactive.utils.console;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.Reader;
+import java.util.List;
+import java.util.Map;
 import java.util.Stack;
 
 import jline.ArgumentCompletor;
@@ -47,6 +53,7 @@ import jline.ClassNameCompletor;
 import jline.Completor;
 import jline.ConsoleReader;
 import jline.FileNameCompletor;
+import jline.History;
 import jline.MultiCompletor;
 import jline.SimpleCompletor;
 
@@ -73,6 +80,10 @@ public class JlineConsole implements Console {
     private SimpleCompletor completor;
     private boolean paginationActivated = true;
     private Stack<String> filters = new Stack<String>();
+
+    private File historyFile = new File(System.getProperty("user.home") + File.separator + ".proactive" +
+        File.separator + "console.hist");
+    private int historySize = 20;
 
     /**
      * Create a new instance of SimpleConsole.
@@ -111,6 +122,39 @@ public class JlineConsole implements Console {
                 });
             comp.setStrict(false);
             console.addCompletor(comp);
+            //Load history
+            if (!historyFile.exists()) {
+                historyFile.createNewFile();
+            } else {
+                History history = new History();
+                FileReader fr = new FileReader(historyFile);
+                BufferedReader br = new BufferedReader(fr);
+                String line;
+                while ((line = br.readLine()) != null) {
+                    history.addToHistory(line);
+                }
+                fr.close();
+                br.close();
+                console.setHistory(history);
+            }
+            Runtime.getRuntime().addShutdownHook(new Thread() {
+                @Override
+                public void run() {
+                    try {
+                        if (historyFile.exists()) {
+                            historyFile.delete();
+                        }
+                        historyFile.createNewFile();
+                        PrintStream ps = new PrintStream(historyFile);
+                        List h = console.getHistory().getHistoryList();
+                        for (int i = h.size() - historySize > 0 ? h.size() - historySize : 0; i < h.size(); i++) {
+                            ps.println(h.get(i));
+                        }
+                        ps.close();
+                    } catch (IOException e) {
+                    }
+                }
+            });
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -397,6 +441,37 @@ public class JlineConsole implements Console {
             this.nbLines = nbLines;
             this.nbFiltered = nbFiltered;
             this.content = content;
+        }
+    }
+
+    /**
+     * Configure this console.<br>
+     * Configuration key:value is :<br>
+     * <ul>
+     * 	<li>'history_filepath' : value is the path to the file that will contains the history</li>
+     * 	<li>'history_size' : value is the number of lines of the history</li>
+     * <ul>
+     * 
+     */
+    public void configure(Map<String, String> params) {
+        if (this.started) {
+            throw new IllegalStateException("Configure can only be called before starting the console");
+        }
+        if (params == null) {
+            throw new IllegalArgumentException("Cannot configure with a null map of parameters");
+        }
+        if (params.get("history_filepath") != null) {
+            historyFile = new File(params.get("history_filepath"));
+            if (!historyFile.exists()) {
+                try {
+                    historyFile.createNewFile();
+                } catch (IOException e) {
+                    throw new IllegalStateException("Cannot create the history file");
+                }
+            }
+        }
+        if (params.get("history_size") != null) {
+            historySize = Integer.parseInt(params.get("history_size"));
         }
     }
 

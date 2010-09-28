@@ -51,6 +51,7 @@ import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.util.LinkedList;
+import java.util.Map;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -527,6 +528,14 @@ public class VisualConsole extends JFrame implements Console, KeyListener {
      * NOT IMPLEMENTED IN THIS CONSOLE
      */
     public void setPaginationActivated(boolean paginationActivated) {
+    }
+
+    /**
+     * NOT IMPLEMENTED IN THIS CONSOLE
+     */
+    public void configure(Map<String, String> params) {
+        // TODO Auto-generated method stub
+
     }
 
 }

@@ -44,7 +44,9 @@ import java.io.InputStreamReader;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.security.auth.login.LoginException;
@@ -249,6 +251,11 @@ public class SchedulerModel extends ConsoleModel {
     @Override
     public void startModel() throws Exception {
         checkIsReady();
+        Map<String, String> conf = new HashMap<String, String>();
+        conf.put("history_filepath", System.getProperty("user.home") + File.separator + ".proactive" +
+            File.separator + "scheduler.hist");
+        conf.put("history_size", "" + 30);
+        console.configure(conf);
         console.start(" > ");
         console.addCompletion(getCompletionList());
         console.print("Type command here (type '?' or help() to see the list of commands)" + newline);

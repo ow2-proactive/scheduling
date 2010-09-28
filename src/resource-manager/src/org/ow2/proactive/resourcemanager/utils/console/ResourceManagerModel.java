@@ -44,7 +44,9 @@ import java.io.InputStreamReader;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.security.auth.login.LoginException;
 
@@ -189,6 +191,11 @@ public class ResourceManagerModel extends ConsoleModel {
     @Override
     public void startModel() throws Exception {
         checkIsReady();
+        Map<String, String> conf = new HashMap<String, String>();
+        conf.put("history_filepath", System.getProperty("user.home") + File.separator + ".proactive" +
+            File.separator + "rm.hist");
+        conf.put("history_size", "" + 30);
+        console.configure(conf);
         console.start(" > ");
         console.addCompletion(getCompletionList());
         console.print("Type command here (type '?' or help() to see the list of commands)\n");

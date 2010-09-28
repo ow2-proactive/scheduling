@@ -39,6 +39,7 @@ package org.ow2.proactive.utils.console;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Reader;
+import java.util.Map;
 
 
 /**
@@ -173,5 +174,12 @@ public interface Console {
      * @param paginationActivated the new state of the pagination
      */
     public void setPaginationActivated(boolean paginationActivated);
+
+    /**
+     * Use this method to configure the console.
+     * 
+     * @param params
+     */
+    public void configure(Map<String, String> params);
 
 }
