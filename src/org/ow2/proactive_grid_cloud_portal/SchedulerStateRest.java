@@ -20,9 +20,12 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
+import org.hibernate.collection.PersistentMap;
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
+import org.jboss.resteasy.spi.ResteasyProviderFactory;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
 import org.ow2.proactive.scheduler.common.Scheduler;
@@ -42,6 +45,8 @@ import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.factories.JobFactory;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskState;
+
+@XmlJavaTypeAdapter(value=PersistentMapConverter.class,type=PersistentMap.class)
 
 
 @Path("/scheduler/")
@@ -74,7 +79,7 @@ public class SchedulerStateRest {
 
     @GET
     @Path("jobs")
-    @Produces("application/json")
+    @Produces({"application/json","application/xml"})
     public List<UserJobInfo> jobs(@HeaderParam("sessionid") String sessionId) {
         Scheduler s = checkAccess(sessionId);
         try {
@@ -100,13 +105,42 @@ public class SchedulerStateRest {
 
     @GET
     @Path("jobs/{jobid}")
-    @Produces("application/json")
-    public JobState job(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId) {
+    @Produces({"application/json","application/xml"})
+    @XmlJavaTypeAdapter(value=PersistentMapConverter.class,type=PersistentMap.class)
+    public MyJobState job(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId) {
         Scheduler s = checkAccess(sessionId);
+        ResteasyProviderFactory dispatcher  = ResteasyProviderFactory.getInstance();
+        dispatcher.addStringConverter(RestartModeConverter.class);
+        dispatcher.addStringConverter(IntWrapperConverter.class);
+        dispatcher.registerProvider(PersistentMapConverter.class);
+        
         try {
             JobState js;
             js = s.getJobState(jobId);
-            return PAFuture.getFutureValue(js);
+            js = PAFuture.getFutureValue(js); 
+//            js.setGenericInformations(new HashMap<String,String>(js.getGenericInformations()));
+//            try {
+//                Field tasks = InternalJob.class.getDeclaredField("tasks");
+//                
+//                tasks.setAccessible(true);
+//                Map<TaskId, InternalTask> old = (Map<TaskId, InternalTask>) tasks.get(js);
+//                tasks.set(js, new HashMap<TaskId, InternalTask>(old));
+                return new MyJobState(js);
+//            } catch (SecurityException e) {
+//                // TODO Auto-generated catch block
+//                e.printStackTrace();
+//            } catch (IllegalArgumentException e) {
+//                // TODO Auto-generated catch block
+//                e.printStackTrace();
+//            } catch (NoSuchFieldException e) {
+//                // TODO Auto-generated catch block
+//                e.printStackTrace();
+//            } catch (IllegalAccessException e) {
+//                // TODO Auto-generated catch block
+//                e.printStackTrace();
+//            }
+            
+          
         } catch (NotConnectedException e) {
             handleNotConnectedException(sessionId);
         } catch (PermissionException e) {
@@ -243,12 +277,72 @@ public class SchedulerStateRest {
 
     @GET
     @Path("jobs/{jobid}/tasks/{taskid}/result")
+    @Produces("*/*")
     public Serializable taskresult(@HeaderParam("sessionid") String sessionId,
             @PathParam("jobid") String jobId, @PathParam("taskid") String taskId) throws Throwable {
         Scheduler s = checkAccess(sessionId);
         try {
             TaskResult tr = s.getTaskResult(jobId, taskId);
-            return tr.value();
+            return  tr.value();
+        } catch (NotConnectedException e) {
+            handleNotConnectedException(sessionId);
+        } catch (PermissionException e) {
+            handlePermissionException(sessionId, "to get the result of the task " + taskId);
+        } catch (UnknownJobException e) {
+            handleUnknowJobException(sessionId, jobId);
+        } catch (UnknownTaskException e) {
+            handleUnknowTaskException(sessionId, taskId);
+        }
+        return null;
+    }
+    @GET
+    @Path("jobs/{jobid}/tasks/{taskid}/log/all")
+    @Produces("*/*")
+    public String tasklog(@HeaderParam("sessionid") String sessionId,
+            @PathParam("jobid") String jobId, @PathParam("taskid") String taskId) throws Throwable {
+        Scheduler s = checkAccess(sessionId);
+        try {
+            return s.getTaskResult(jobId, taskId).getOutput().getAllLogs(true);
+        } catch (NotConnectedException e) {
+            handleNotConnectedException(sessionId);
+        } catch (PermissionException e) {
+            handlePermissionException(sessionId, "to get the result of the task " + taskId);
+        } catch (UnknownJobException e) {
+            handleUnknowJobException(sessionId, jobId);
+        } catch (UnknownTaskException e) {
+            handleUnknowTaskException(sessionId, taskId);
+        }
+        return null;
+    }
+    
+    @GET
+    @Path("jobs/{jobid}/tasks/{taskid}/log/err")
+    @Produces("*/*")
+    public String tasklogErr(@HeaderParam("sessionid") String sessionId,
+            @PathParam("jobid") String jobId, @PathParam("taskid") String taskId) throws Throwable {
+        Scheduler s = checkAccess(sessionId);
+        try {
+            return s.getTaskResult(jobId, taskId).getOutput().getStderrLogs(true);
+        } catch (NotConnectedException e) {
+            handleNotConnectedException(sessionId);
+        } catch (PermissionException e) {
+            handlePermissionException(sessionId, "to get the result of the task " + taskId);
+        } catch (UnknownJobException e) {
+            handleUnknowJobException(sessionId, jobId);
+        } catch (UnknownTaskException e) {
+            handleUnknowTaskException(sessionId, taskId);
+        }
+        return null;
+    }
+    
+    @GET
+    @Path("jobs/{jobid}/tasks/{taskid}/log/out")
+    @Produces("*/*")
+    public String tasklogout(@HeaderParam("sessionid") String sessionId,
+            @PathParam("jobid") String jobId, @PathParam("taskid") String taskId) throws Throwable {
+        Scheduler s = checkAccess(sessionId);
+        try {
+            return s.getTaskResult(jobId, taskId).getOutput().getStdoutLogs(true);
         } catch (NotConnectedException e) {
             handleNotConnectedException(sessionId);
         } catch (PermissionException e) {
@@ -529,7 +623,7 @@ public class SchedulerStateRest {
     public SchedulerStatus getSchedulerStatus(@HeaderParam("sessionid") final String sessionId) {
         final Scheduler s = checkAccess(sessionId);
         try {
-             return s.getStatus();
+             return PAFuture.getFutureValue(s.getStatus());
         } catch (NotConnectedException e) {
             handleNotConnectedException(sessionId);
         } catch (PermissionException e) {
@@ -581,6 +675,7 @@ public class SchedulerStateRest {
         return false;
     }
     
+
     
     
 }
