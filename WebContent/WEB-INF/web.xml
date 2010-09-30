@@ -41,16 +41,18 @@
      -->
 
     <listener>
-        <listener-class>org.ow2.proactive_grid_cloud_portal.MyResteasyBootstrap</listener-class>
+        <listener-class>org.ow2.proactive_grid_cloud_portal.MyResteasyBootstrap</listener-class> 
+        
+			<!-- <listener-class>org.jboss.resteasy.plugins.server.servlet.ResteasyBootstrap</listener-class> -->
     </listener>
 
     <servlet>
         <servlet-name>Resteasy</servlet-name>
         <servlet-class>org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher</servlet-class>
-       <!--   <init-param>
+        <init-param>
             <param-name>javax.ws.rs.Application</param-name>
-            <param-value>org.ow2.proactive_grid_cloud_portal.MyResteasyBootstrap</param-value>
-        </init-param> -->
+            <param-value>org.ow2.proactive_grid_cloud_portal.MyPortalApplication</param-value>
+        </init-param>
     
     </servlet>
 
