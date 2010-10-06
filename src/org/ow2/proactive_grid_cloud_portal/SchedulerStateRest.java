@@ -358,7 +358,7 @@ public class SchedulerStateRest {
 
     @PUT
     @Path("disconnect")
-    public void disconnet(@HeaderParam("sessionid") final String sessionId) throws NotConnectedException,
+    public void disconnect(@HeaderParam("sessionid") final String sessionId) throws NotConnectedException,
             PermissionException {
         final Scheduler s = checkAccess(sessionId);
 
