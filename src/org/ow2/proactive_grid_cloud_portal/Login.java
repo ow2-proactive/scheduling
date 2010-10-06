@@ -13,9 +13,9 @@ import javax.ws.rs.core.Response;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.methods.GetMethod;
-import org.jboss.resteasy.spi.UnauthorizedException;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.NodeException;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.ext.filessplitmerge.schedulertools.SchedulerProxyUserInterface;
@@ -32,7 +32,14 @@ public class Login {
             SchedulerProxyUserInterface scheduler = PAActiveObject.newActive(
                     SchedulerProxyUserInterface.class, new Object[] {});
 
-            scheduler.init("rmi://localhost:1099/SCHEDULER", username, password);
+//            scheduler.init(Config.getProperty("scheduler.url"), username, password);
+          scheduler.init("rmi://localhost:1099", username, password);
+          try {
+            scheduler.enableCaching();
+        } catch (ProActiveException e) {
+            System.out.println("Login.login() cannot activate caching");
+            e.printStackTrace();
+        }
 
             return "" + SchedulerSessionMapper.getInstance().add(scheduler);
 
