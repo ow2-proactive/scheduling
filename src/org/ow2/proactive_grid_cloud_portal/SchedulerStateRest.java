@@ -8,7 +8,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.security.auth.login.LoginException;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
@@ -26,8 +25,6 @@ import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
-import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.node.NodeException;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.SchedulerStatus;
 import org.ow2.proactive.scheduler.common.exception.JobAlreadyFinishedException;
@@ -45,7 +42,6 @@ import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.factories.JobFactory;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskState;
-import org.ow2.proactive.scheduler.ext.filessplitmerge.schedulertools.SchedulerProxyUserInterface;
 
 
 @XmlJavaTypeAdapter(value = PersistentMapConverter.class, type = PersistentMap.class)

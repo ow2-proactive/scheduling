@@ -41,9 +41,7 @@ public class RMRest {
 
             RMProxy rm = PAActiveObject.newActive(RMProxy.class, new Object[] {});
 
-
-//            rm.init(Config.getProperty("rm.url"), username, password);
-          rm.init("rmi://localhost:1099", username, password);
+           rm.init(PortalConfiguration.getProperties().getProperty(PortalConfiguration.rm_url), username, password);
 
             return "" + RMSessionMapper.getInstance().add(rm);
 

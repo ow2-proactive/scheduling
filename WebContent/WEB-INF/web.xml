@@ -42,7 +42,6 @@
 
     <listener>
         <listener-class>org.ow2.proactive_grid_cloud_portal.MyResteasyBootstrap</listener-class> 
-        
 			<!-- <listener-class>org.jboss.resteasy.plugins.server.servlet.ResteasyBootstrap</listener-class> -->
     </listener>
 
@@ -53,7 +52,11 @@
             <param-name>javax.ws.rs.Application</param-name>
             <param-value>org.ow2.proactive_grid_cloud_portal.MyPortalApplication</param-value>
         </init-param>
-    
+        <init-param>
+            <param-name>scheduler.url</param-name>
+            <param-value>rmi://localhost:noaos</param-value>
+        </init-param>
+
     </servlet>
 
     <servlet-mapping>

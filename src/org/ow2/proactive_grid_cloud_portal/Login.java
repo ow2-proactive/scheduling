@@ -32,8 +32,8 @@ public class Login {
             SchedulerProxyUserInterface scheduler = PAActiveObject.newActive(
                     SchedulerProxyUserInterface.class, new Object[] {});
 
-//            scheduler.init(Config.getProperty("scheduler.url"), username, password);
-          scheduler.init("rmi://localhost:1099", username, password);
+          scheduler.init(PortalConfiguration.getProperties().getProperty(PortalConfiguration.scheduler_url), username, password);
+
           try {
             scheduler.enableCaching();
         } catch (ProActiveException e) {
