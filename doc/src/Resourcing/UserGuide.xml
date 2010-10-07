@@ -40,12 +40,13 @@
 		      <para>
 			<programlisting language="sh"><![CDATA[
 # use local public key to generate credentials for user 'demo'
-/bin/unix $ ./create-cred -P $HOME/.proactive/rm_pubkey -o $HOME/.proactive/my_encrypted_credentials -l demo
+/bin/unix $ ./create-cred -F $HOME/.proactive/rm_pubkey -o $HOME/.proactive/my_encrypted_credentials -l demo
 # use rmi://example.com/RMAUTHENTICATION's public key to generate credentials for user 'admin' with pass 'admin' in non-interactive mode
-/bin/unix $ ./create-cred -U rmi://example.com/RMAUTHENTICATION -o $HOME/.proactive/my_encrypted_credentials -l admin -p admin
+/bin/unix $ ./create-cred -R rmi://example.com/RMAUTHENTICATION -o $HOME/.proactive/my_encrypted_credentials -l admin -p admin
 ]]></programlisting>
 			Credentials can now be retreived when properly designated by the <emphasis>pa.common.auth.credentials</emphasis> property; i.e. using
-			<emphasis>java -Dpa.common.auth.credentials=$HOME/.proactive/my_encrypted_credentials</emphasis>.
+			<emphasis>java -Dpa.common.auth.credentials=$HOME/.proactive/my_encrypted_credentials</emphasis>. Please type <literal>create-cred -h</literal>
+			to have a complete list of possible options.
 		    </para></listitem>
 		    <listitem><para>
 			Create the encrypted Credentials on client side: as safe as the previous method, but requires user input, which prevents automation,
