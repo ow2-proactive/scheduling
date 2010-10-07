@@ -140,19 +140,7 @@ public class JlineConsole implements Console {
             Runtime.getRuntime().addShutdownHook(new Thread() {
                 @Override
                 public void run() {
-                    try {
-                        if (historyFile.exists()) {
-                            historyFile.delete();
-                        }
-                        historyFile.createNewFile();
-                        PrintStream ps = new PrintStream(historyFile);
-                        List h = console.getHistory().getHistoryList();
-                        for (int i = h.size() - historySize > 0 ? h.size() - historySize : 0; i < h.size(); i++) {
-                            ps.println(h.get(i));
-                        }
-                        ps.close();
-                    } catch (IOException e) {
-                    }
+                    dumpHistory();
                 }
             });
         } catch (IOException e) {
@@ -163,13 +151,34 @@ public class JlineConsole implements Console {
         return this;
     }
 
+    boolean dumped = false;
+
+    private synchronized void dumpHistory() {
+        if (!dumped) {
+            dumped = true;
+            try {
+                if (historyFile.exists()) {
+                    historyFile.delete();
+                }
+                historyFile.createNewFile();
+                PrintStream ps = new PrintStream(historyFile);
+                List h = console.getHistory().getHistoryList();
+                for (int i = h.size() - historySize > 0 ? h.size() - historySize : 0; i < h.size(); i++) {
+                    ps.println(h.get(i));
+                }
+                ps.close();
+            } catch (IOException e) {
+            }
+        }
+    }
+
     /**
      * {@inheritDoc}
      */
     public void stop() {
         if (this.started) {
-            this.console = null;
             this.started = false;
+            dumpHistory();
         }
     }
 
