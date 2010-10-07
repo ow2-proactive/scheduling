@@ -227,7 +227,7 @@
 		    <figure xml:id="RM_crypto_pic"><info><title>Credentials encryption</title></info>
 		      <mediaobject>
 			<imageobject>
-			  <imagedata width="100%" align="center" fileref="images/png/rmCrypto.png" format="PNG"/>
+			  <imagedata width="100%" fileref="images/png/rmCrypto.png" format="PNG"/>
 			</imageobject>
 		      </mediaobject>
 		    </figure>

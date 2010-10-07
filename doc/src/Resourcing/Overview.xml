@@ -229,7 +229,7 @@
 
 					<mediaobject>
 						<imageobject>
-							<imagedata scalefit="1" width="100%" contentdepth="100%" align="center" fileref="images/png/rm_overview.png" format="PNG"/>
+							<imagedata scalefit="1" width="100%" contentdepth="100%" fileref="images/png/rm_overview.png" format="PNG"/>
 						</imageobject>
 					</mediaobject>
 				</figure>
