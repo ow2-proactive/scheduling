@@ -41,7 +41,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 
@@ -62,18 +61,68 @@ public class FileToBytesConverter {
      * @throws IOException
      */
     public static byte[] convertFileToByteArray(File file) throws IOException {
-        InputStream in = null;
-        in = new FileInputStream(file);
+        FileInputStream fis = new FileInputStream(file);
+        try {
+            long length = file.length();
+            if (length > 0) {
+                return fastConversion(fis, length);
+            } else {
+                return slowConversion(fis);
+            }
+        } finally {
+            try {
+                fis.close();
+            } catch (IOException e) {
+                // We want to throw the exception thrown by the outer try block
+                // not by the close()
+            }
+        }
+    }
+
+    /**
+     * Read content of a file of known length and return it as a byte array
+     *  
+     * @param fis The stream to read
+     * @param length The number of byte to read
+     * @return an array of bytes containing file's data
+     * @throws IOException If an I/O error occurs, the file is too large or less bytes than length can be read
+     */
+    private static byte[] fastConversion(final FileInputStream fis, long length) throws IOException {
+        if (length > Integer.MAX_VALUE) {
+            throw new IOException("File too large to fit in a byte array");
+        }
+
+        final byte[] buf = new byte[(int) length];
+        int offset = 0;
+        while (offset < buf.length) {
+            int r = fis.read(buf, offset, buf.length - offset);
+            if (r >= 0) {
+                offset += r;
+            } else {
+                throw new IOException("EOF encountered but fewer bits than expected has been read");
+            }
+        }
+
+        return buf;
+    }
+
+    /**
+     * Read content of a file of unknown length (or empty file) and return it as a byte array
+     *  
+     * @param fis the stream to read
+     * @return an array of bytes containing file's data
+     * @throws IOException If an I/O error occurs
+     */
+    private static byte[] slowConversion(final FileInputStream fis) throws IOException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
 
         byte[] buffer = new byte[1024];
         long count = 0;
         int n = 0;
-        while (-1 != (n = in.read(buffer))) {
+        while (-1 != (n = fis.read(buffer))) {
             output.write(buffer, 0, n);
             count += n;
         }
-        in.close();
         return output.toByteArray();
     }
 
