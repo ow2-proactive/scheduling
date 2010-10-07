@@ -206,35 +206,7 @@ public class Credentials implements Serializable {
      * @throws KeyException decryption failure, malformed data
      */
     public String[] decrypt(String privPath) throws KeyException {
-
-        KeyFactory keyFactory = null;
-        try {
-            keyFactory = KeyFactory.getInstance(algorithm);
-        } catch (NoSuchAlgorithmException e) {
-            throw new KeyException("Cannot initialize key factory", e);
-        }
-
-        // recover private key bytes
-        byte[] bytes = null;
-        try {
-            File pkFile = new File(privPath);
-            DataInputStream pkStream = new DataInputStream(new FileInputStream(pkFile));
-            bytes = new byte[(int) pkFile.length()];
-            pkStream.readFully(bytes);
-            pkStream.close();
-        } catch (Exception e) {
-            throw new KeyException("Could not recover private key", e);
-        }
-
-        // reconstruct private key
-        PKCS8EncodedKeySpec privKeySpec = new PKCS8EncodedKeySpec(bytes);
-        PrivateKey privKey = null;
-        try {
-            privKey = keyFactory.generatePrivate(privKeySpec);
-        } catch (InvalidKeySpecException e) {
-            throw new KeyException("Cannot re-generate private key", e);
-        }
-
+        PrivateKey privKey = Credentials.getPrivateKey(privPath, new String[] { algorithm });
         return decrypt(privKey);
     }
 
@@ -337,6 +309,90 @@ public class Credentials implements Serializable {
         }
 
         return pubKey;
+    }
+
+    /**
+     * Retrieves a private key stored in a local file
+     * <p>
+     * Tries to guess the algorithm used for keypair generation which
+     * is not included in the file. According to {@link http://download.oracle.com/javase/1.5.0/docs/guide/security/CryptoSpec.html#AppA},
+     * the algorithm can be only one of "RSA" or "DSA", so this method will try using both.
+     * If the algorithm used to generate the key is neither RSA or DSA
+     * (highly unlikely), this method cannot recreate the private key, but {@link #decrypt(String)}
+     * maybe will.
+     * 
+     * @param pubPath
+     *            path to the public key on the local filesystem
+     * @return the key encapsulated in a regular JCE container
+     * @throws KeyException
+     *             the key could not be retrieved or is malformed, or the algorithm used
+     *             for generation is different from the ones used by this method
+     */
+    public static PrivateKey getPrivateKey(String privPath) throws KeyException {
+        return getPrivateKey(privPath, new String[] { "RSA", "DSA" });
+    }
+
+    /**
+     * Retrieves a private key stored in a local file
+     * <p>
+     * Tries to guess the algorithm used for keypair generation which
+     * is not included in the file. According to {@link http://download.oracle.com/javase/1.5.0/docs/guide/security/CryptoSpec.html#AppA},
+     * the algorithm can be only one of "RSA" or "DSA", so we can just try both using the
+     * <code>algorithms</code> param. If the algorithm used to generate the key is neither RSA or DSA
+     * (highly unlikely), this method cannot recreate the private key, but {@link #decrypt(String)}
+     * maybe will.
+     * 
+     * @param pubPath
+     *            path to the public key on the local filesystem
+     * @param algorithms a list of algorithms to try for creating the PK. Recommanded value:
+     * 			{"RSA","DSA"}
+     * @return the key encapsulated in a regular JCE container
+     * @throws KeyException
+     *             the key could not be retrieved or is malformed, or the algorithm used for generation
+     *             is not one of <code>algorithms</code>
+     */
+    public static PrivateKey getPrivateKey(String privPath, String[] algorithms) throws KeyException {
+
+        PrivateKey privKey = null;
+
+        for (String algo : algorithms) {
+            try {
+                KeyFactory keyFactory = null;
+                keyFactory = KeyFactory.getInstance(algo);
+
+                // recover private key bytes
+                byte[] bytes = null;
+                try {
+                    File pkFile = new File(privPath);
+                    DataInputStream pkStream = new DataInputStream(new FileInputStream(pkFile));
+                    bytes = new byte[(int) pkFile.length()];
+                    pkStream.readFully(bytes);
+                    pkStream.close();
+                } catch (Exception e) {
+                    throw new KeyException("Could not recover private key (algo=" + algo + ")", e);
+                }
+
+                // reconstruct private key
+                PKCS8EncodedKeySpec privKeySpec = new PKCS8EncodedKeySpec(bytes);
+                try {
+                    privKey = keyFactory.generatePrivate(privKeySpec);
+                } catch (InvalidKeySpecException e) {
+                    throw new KeyException("Cannot re-generate private key  (algo=" + algo + ")", e);
+                }
+            } catch (Exception e) {
+            }
+        }
+
+        if (privKey == null) {
+            String str = "Could not generate Private Key (algorithms: ";
+            for (String algo : algorithms) {
+                str += algo + " ";
+            }
+            str += ")";
+            throw new KeyException(str);
+        }
+
+        return privKey;
     }
 
     /**
