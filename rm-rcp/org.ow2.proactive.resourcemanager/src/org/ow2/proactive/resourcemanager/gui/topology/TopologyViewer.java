@@ -41,8 +41,12 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
@@ -69,17 +73,18 @@ import javax.swing.JPanel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.awt.SWT_AWT;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.frontend.topology.Topology;
 import org.ow2.proactive.resourcemanager.gui.data.RMStore;
 import org.ow2.proactive.resourcemanager.gui.data.model.Node;
 import org.ow2.proactive.resourcemanager.gui.data.model.TreeLeafElement;
 import org.ow2.proactive.resourcemanager.gui.data.model.TreeParentElement;
+import org.ow2.proactive.resourcemanager.gui.views.ResourceExplorerView;
 
 import prefuse.Constants;
 import prefuse.Visualization;
@@ -89,17 +94,16 @@ import prefuse.action.assignment.ColorAction;
 import prefuse.action.assignment.DataColorAction;
 import prefuse.action.layout.Layout;
 import prefuse.activity.Activity;
+import prefuse.controls.Control;
+import prefuse.controls.ControlAdapter;
 import prefuse.controls.DragControl;
-import prefuse.controls.FocusControl;
-import prefuse.controls.NeighborHighlightControl;
 import prefuse.controls.PanControl;
 import prefuse.controls.WheelZoomControl;
 import prefuse.controls.ZoomControl;
 import prefuse.data.Edge;
 import prefuse.data.Graph;
 import prefuse.data.Schema;
-import prefuse.data.Tuple;
-import prefuse.data.event.TupleSetListener;
+import prefuse.data.expression.Predicate;
 import prefuse.data.tuple.TupleSet;
 import prefuse.render.DefaultRendererFactory;
 import prefuse.render.LabelRenderer;
@@ -109,6 +113,7 @@ import prefuse.util.PrefuseLib;
 import prefuse.util.force.DragForce;
 import prefuse.util.force.ForceSimulator;
 import prefuse.util.force.NBodyForce;
+import prefuse.util.ui.UILib;
 import prefuse.visual.DecoratorItem;
 import prefuse.visual.EdgeItem;
 import prefuse.visual.NodeItem;
@@ -151,7 +156,13 @@ public class TopologyViewer {
     private Visualization visualization;
     private TopologyForceDirectedLayout topologyForceDirectedLayout;
 
+    private Set<VisualItem> selectedItems = new HashSet<VisualItem>();
+
     private final Lock lock = new ReentrantLock();
+    /**
+     * Lock used to manager 'selectedItems' list
+     */
+    private final Lock selectionLock = new ReentrantLock();
 
     /**
      * Creates new CompactViewer.
@@ -166,6 +177,10 @@ public class TopologyViewer {
     public void init() {
         initComposite();
         initLayout();
+        if (ResourceExplorerView.getTreeViewer() != null) {
+            System.out.println("TopologyViewer.init() addSelectionListener");
+            ResourceExplorerView.getTreeViewer().addSelectionChangedListener(new TopologySelectionListener());
+        }
     }
 
     /**
@@ -206,7 +221,8 @@ public class TopologyViewer {
         } finally {
             lock.unlock();
         }
-        if (!init && RMStore.isConnected()) {
+        if (!init && RMStore.isConnected() && node.getState() == NodeState.BUSY ||
+            node.getState() == NodeState.FREE) {
             Display.getDefault().asyncExec(new Runnable() {
                 public void run() {
                     lock.lock();
@@ -279,8 +295,8 @@ public class TopologyViewer {
                                 visualization.run("unique");
                                 visualization.run("dynamicColor");
                             }
-                            System.out.println("TopologyViewer.addNode() time = " +
-                                (System.nanoTime() - time) / 1000);
+                            System.out.println("TopologyViewer.addNode() node = " + node.getName() +
+                                " time = " + (System.nanoTime() - time) / 1000);
                         } finally {
                             lock.unlock();
                         }
@@ -385,7 +401,7 @@ public class TopologyViewer {
                             final ColorAction colorFillNodes = new ColorAction(NODES, VisualItem.FILLCOLOR,
                                 ColorLib.rgb(255, 255, 255));
                             colorFillNodes.add(VisualItem.HOVER, ColorLib.rgb(255, 100, 100));
-                            colorFillNodes.add(VisualItem.FIXED, ColorLib.rgb(255, 100, 100));
+                            colorFillNodes.add(VisualItem.HIGHLIGHT, ColorLib.rgb(255, 100, 100));
 
                             final int[] defaultPalette = new int[226];
                             final int[] fixedPalette = new int[226];
@@ -442,6 +458,7 @@ public class TopologyViewer {
                             m_fsim.addForce(new NBodyForce());//2.0f, NBodyForce.DEFAULT_DISTANCE, NBodyForce.DEFAULT_THETA));
                             m_fsim.addForce(new LatencyForce());
                             m_fsim.addForce(new DragForce());
+
                             final ActionList layout = new ActionList(Activity.INFINITY);
                             topologyForceDirectedLayout = new TopologyForceDirectedLayout(GRAPH, m_fsim,
                                 false);
@@ -460,12 +477,13 @@ public class TopologyViewer {
                             display.setPreferredSize(new Dimension(parent.getSize().x - 310,
                                 parent.getSize().y));
                             display.setHighQuality(true);
-                            display.addControlListener(new FocusControl(1));
+                            //							display.addControlListener(new FocusControl(1));
+                            display.addControlListener(new SelectNodeControl(1));
                             display.addControlListener(new DragControl()); // drag items around
                             display.addControlListener(new PanControl()); // pan with background left-drag
                             display.addControlListener(new ZoomControl()); // zoom with vertical right-drag
                             display.addControlListener(new WheelZoomControl()); // mouse zoom
-                            display.addControlListener(new NeighborHighlightControl("dynamicColor")); // sets the highlighted status for edges of the node under the mouse pointer
+                            display.addControlListener(new NeighborEdgesHighlightControl("dynamicColor")); // sets the highlighted status for edges of the node under the mouse pointer
 
                             // Option panel
                             final JPanel fpanel = new JPanel();
@@ -609,41 +627,43 @@ public class TopologyViewer {
                             mainPanel.add(display);
                             mainPanel.add(fpanel);
 
-                            // fix selected focus nodes
-                            TupleSet focusGroup = visualization.getGroup(Visualization.FOCUS_ITEMS);
-                            focusGroup.addTupleSetListener(new TupleSetListener() {
-                                public void tupleSetChanged(TupleSet ts, Tuple[] add, Tuple[] rem) {
-                                    for (int i = 0; i < rem.length; ++i) {
-                                        if (rem[i] instanceof NodeItem) {
-                                            NodeItem node = (NodeItem) (rem[i]);
-                                            node.setFixed(false);
-                                            Iterator edgeIt = node.edges();
-                                            while (edgeIt.hasNext()) {
-                                                EdgeItem edge = (EdgeItem) (edgeIt.next());
-                                                edge.setFixed(false);
-                                                //edge.setHighlighted(false);
-                                            }
-                                        }
-                                    }
-
-                                    for (int i = 0; i < add.length; ++i) {
-                                        if (add[i] instanceof NodeItem) {
-                                            NodeItem node = (NodeItem) (add[i]);
-                                            node.setFixed(false);
-                                            node.setFixed(true);
-                                            Iterator edgeIt = node.edges();
-                                            while (edgeIt.hasNext()) {
-                                                EdgeItem edge = (EdgeItem) (edgeIt.next());
-                                                edge.setFixed(false);
-                                                edge.setFixed(true);
-                                            }
-                                        }
-                                    }
-
-                                    visualization.run("latencyFilter");
-                                    visualization.run("dynamicColor");
-                                }
-                            });
+                            //							// fix selected focus nodes
+                            //							TupleSet focusGroup = visualization.getGroup(Visualization.FOCUS_ITEMS);
+                            //							focusGroup.addTupleSetListener(new TupleSetListener() {
+                            //								public void tupleSetChanged(TupleSet ts, Tuple[] add, Tuple[] rem) {
+                            //									System.out
+                            //									.println("TopologyViewer.loadMatrix(...).new Runnable() {...}.run().new TupleSetListener() {...}.tupleSetChanged()");
+                            //									for (int i = 0; i < rem.length; ++i) {
+                            //										if (rem[i] instanceof NodeItem) {
+                            //											NodeItem node = (NodeItem) (rem[i]);
+                            //											node.setFixed(false);
+                            //											Iterator edgeIt = node.edges();
+                            //											while (edgeIt.hasNext()) {
+                            //												EdgeItem edge = (EdgeItem) (edgeIt.next());
+                            //												edge.setFixed(false);
+                            //												//edge.setHighlighted(false);
+                            //											}
+                            //										}
+                            //									}
+                            //
+                            //									for (int i = 0; i < add.length; ++i) {
+                            //										if (add[i] instanceof NodeItem) {
+                            //											NodeItem node = (NodeItem) (add[i]);
+                            //											node.setFixed(false);
+                            //											node.setFixed(true);
+                            //											Iterator edgeIt = node.edges();
+                            //											while (edgeIt.hasNext()) {
+                            //												EdgeItem edge = (EdgeItem) (edgeIt.next());
+                            //												edge.setFixed(false);
+                            //												edge.setFixed(true);
+                            //											}
+                            //										}
+                            //									}
+                            //
+                            //									visualization.run("latencyFilter");
+                            //									visualization.run("dynamicColor");
+                            //								}
+                            //							});
 
                             if (frame == null) {
                                 Composite swtAwtComponent = new Composite(parent, SWT.EMBEDDED);
@@ -665,10 +685,7 @@ public class TopologyViewer {
                             });
 
                             // Resize listener
-                            frame.addComponentListener(new ComponentListener() {
-                                public void componentShown(ComponentEvent e) {
-                                }
-
+                            frame.addComponentListener(new ComponentAdapter() {
                                 public void componentResized(ComponentEvent e) {
                                     if (visualization != null) {
                                         Dimension d = new Dimension(e.getComponent().getSize().width - 315, e
@@ -679,13 +696,17 @@ public class TopologyViewer {
                                         mainPanel.doLayout();
                                     }
                                 }
-
-                                public void componentMoved(ComponentEvent e) {
-                                }
-
-                                public void componentHidden(ComponentEvent e) {
-                                }
                             });
+
+                            MouseListener focus = new MouseAdapter() {
+                                public void mouseEntered(MouseEvent e) {
+                                    if (!frame.hasFocus()) {
+                                        frame.requestFocus();
+                                    }
+                                }
+                            };
+                            frame.addMouseListener(focus);
+                            display.addMouseListener(focus);
 
                             frame.add(mainPanel);
                             frame.pack();
@@ -738,23 +759,25 @@ public class TopologyViewer {
                     }
                 } else {
                     // element is a Proactive Node
-                    String nodeUrl = element.getName();
                     String host = element.getParent().getParent().getName();
-                    if (hosts.containsKey(host)) {
-                        // Add a node to an already existing host
-                        prefuse.data.Node node = hosts.get(host);
-                        Set<Node> hostNodes = (Set<Node>) node.get("nodes");
-                        hostNodes.add((Node) element);
-                    } else {
-                        // New host to add to the graph
-                        prefuse.data.Node node = graph.addNode();
-                        System.out.println("TopologyViewer.createGraph() ajout de " + host);
-                        node.set("name", host);
-                        //						node.set("address", host);
-                        Set<Node> hostNodes = new HashSet<Node>();
-                        hostNodes.add((Node) element);
-                        node.set("nodes", hostNodes);
-                        hosts.put(host, node);
+                    NodeState state = ((Node) element).getState();
+                    if (state == NodeState.BUSY || state == NodeState.FREE) {
+                        if (hosts.containsKey(host)) {
+                            // Add a node to an already existing host
+                            prefuse.data.Node node = hosts.get(host);
+                            Set<Node> hostNodes = (Set<Node>) node.get("nodes");
+                            hostNodes.add((Node) element);
+                        } else {
+                            // New host to add to the graph
+                            prefuse.data.Node node = graph.addNode();
+                            System.out.println("TopologyViewer.createGraph() ajout de " + host);
+                            node.set("name", host);
+                            //						node.set("address", host);
+                            Set<Node> hostNodes = new HashSet<Node>();
+                            hostNodes.add((Node) element);
+                            node.set("nodes", hostNodes);
+                            hosts.put(host, node);
+                        }
                     }
                 }
             }
@@ -808,10 +831,86 @@ public class TopologyViewer {
         }
     }
 
-    /**
-     * Dummy implementation of ISelectionProvider
-     */
-    public void addSelectionChangedListener(ISelectionChangedListener listener) {
+    public void setFocus() {
+        if (frame != null) {
+            frame.requestFocus();
+        }
+    }
+
+    public void setSelection(List<Node> elements) {
+        if (visualization != null) {
+            Set<String> hosts = new HashSet<String>();
+            Set<VisualItem> selectedItems = new HashSet<VisualItem>();
+            for (Node node : elements) {
+                String host = node.getParent().getParent().getName();
+                hosts.add(host);
+            }
+            TupleSet focusGroup = visualization.getFocusGroup(Visualization.FOCUS_ITEMS);
+            focusGroup.clear();
+            TupleSet src = visualization.getGroup(NODES);
+            Iterator nodeIterator = src.tuples();
+            while (nodeIterator.hasNext()) {
+                NodeItem node = (NodeItem) nodeIterator.next();
+                String host = node.getString("name");
+                if (hosts.contains(host)) {
+                    focusGroup.addTuple(node);
+                    selectedItems.add(node);
+                }
+            }
+            this.setSelectecItems(selectedItems);
+        }
+    }
+
+    public void setSelectecItems(Set<VisualItem> items) {
+        selectionLock.lock();
+        try {
+            for (VisualItem item : selectedItems) {
+                item.setHighlighted(false);
+            }
+            this.selectedItems = items;
+            for (VisualItem item : selectedItems) {
+                item.setHighlighted(false);
+                item.setHighlighted(true);
+            }
+            visualization.run("latencyFilter");
+            visualization.run("dynamicColor");
+        } finally {
+            selectionLock.unlock();
+        }
+    }
+
+    public void addToSelectedItems(VisualItem item) {
+        selectionLock.lock();
+        try {
+            selectedItems.add(item);
+            item.setHighlighted(false);
+            item.setHighlighted(true);
+            visualization.run("latencyFilter");
+            visualization.run("dynamicColor");
+        } finally {
+            selectionLock.unlock();
+        }
+    }
+
+    public void removeFromSelectedItems(VisualItem item) {
+        selectionLock.lock();
+        try {
+            selectedItems.remove(item);
+            item.setHighlighted(false);
+            visualization.run("latencyFilter");
+            visualization.run("dynamicColor");
+        } finally {
+            selectionLock.unlock();
+        }
+    }
+
+    public boolean IsInSelectedItems(VisualItem item) {
+        selectionLock.lock();
+        try {
+            return selectedItems.contains(item);
+        } finally {
+            selectionLock.unlock();
+        }
     }
 
     /**
@@ -864,6 +963,83 @@ public class TopologyViewer {
         }
         return graph;
     }
+
+    class SelectNodeControl extends ControlAdapter {
+
+        private String group = Visualization.FOCUS_ITEMS;
+        protected VisualItem curFocus;
+        protected int ccount = 1;
+        protected int button = Control.LEFT_MOUSE_BUTTON;
+        protected Predicate filter = null;
+
+        public SelectNodeControl(int clicks) {
+            ccount = clicks;
+        }
+
+        //	    /**
+        //	     * @see prefuse.controls.Control#itemEntered(prefuse.visual.VisualItem, java.awt.event.MouseEvent)
+        //	     */
+        //	    public void itemEntered(VisualItem item, MouseEvent e) {
+        ////	        Display d = (Display)e.getSource();
+        ////	        d.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        //	        if ( ccount == 0 ) {
+        //	            Visualization vis = item.getVisualization();
+        //	            TupleSet ts = vis.getFocusGroup(group);
+        //	            ts.setTuple(item);
+        //	            curFocus = item;
+        //	            runActivity(vis);
+        //	        }
+        //	    }
+
+        //	    /**
+        //	     * @see prefuse.controls.Control#itemExited(prefuse.visual.VisualItem, java.awt.event.MouseEvent)
+        //	     */
+        //	    public void itemExited(VisualItem item, MouseEvent e) {
+        //	        Display d = (Display)e.getSource();
+        //	        d.setCursor(Cursor.getDefaultCursor());
+        //	        if ( ccount == 0 ) {
+        //	            curFocus = null;
+        //	            Visualization vis = item.getVisualization();
+        //	            TupleSet ts = vis.getFocusGroup(group);
+        //	            ts.removeTuple(item);
+        //	            runActivity(vis);
+        //	        }
+        //	    }
+
+        /**
+         * @see prefuse.controls.Control#itemClicked(prefuse.visual.VisualItem, java.awt.event.MouseEvent)
+         */
+        public void itemClicked(VisualItem item, MouseEvent e) {
+            if (UILib.isButtonPressed(e, button) && e.getClickCount() == ccount) {
+                TupleSet focusGroup = visualization.getFocusGroup(Visualization.FOCUS_ITEMS);
+                if (item != curFocus) {
+                    //	                TupleSet ts = vis.getFocusGroup(group);
+
+                    boolean ctrl = e.isControlDown();
+                    if (!ctrl) {
+                        curFocus = item;
+                        //	                    ts.setTuple(item);
+                        Set<VisualItem> selectedItems = new HashSet<VisualItem>();
+                        selectedItems.add(item);
+                        focusGroup.clear();
+                        focusGroup.setTuple(item);
+                        setSelectecItems(selectedItems);
+                    } else if (IsInSelectedItems(item)) {
+                        focusGroup.removeTuple(item);
+                        removeFromSelectedItems(item);
+                    } else {
+                        focusGroup.addTuple(item);
+                        addToSelectedItems(item);
+                    }
+
+                } else if (e.isControlDown()) {
+                    focusGroup.removeTuple(item);
+                    removeFromSelectedItems(item);
+                    curFocus = null;
+                }
+            }
+        }
+    } // end of class FocusControl
 }
 
 /**
@@ -905,3 +1081,64 @@ class LabelLayout extends Layout {
         }
     }
 } // end of inner class LabelLayout
+
+/**
+ * A ControlListener that sets the highlighted status for edges neighboring the node
+ * currently under the mouse pointer. The highlight flag might then be used
+ * by a color function to change node appearance as desired.
+ */
+class NeighborEdgesHighlightControl extends ControlAdapter {
+
+    private String activity = null;
+
+    /**
+     * Creates a new highlight control.
+     */
+    public NeighborEdgesHighlightControl() {
+        this(null);
+    }
+
+    /**
+     * Creates a new highlight control that runs the given activity
+     * whenever the neighbor highlight changes.
+     * @param activity the update Activity to run
+     */
+    public NeighborEdgesHighlightControl(String activity) {
+        this.activity = activity;
+    }
+
+    /**
+     * @see prefuse.controls.Control#itemEntered(prefuse.visual.VisualItem, java.awt.event.MouseEvent)
+     */
+    public void itemEntered(VisualItem item, MouseEvent e) {
+        if (item instanceof NodeItem)
+            setNeighborHighlight((NodeItem) item, true);
+    }
+
+    /**
+     * @see prefuse.controls.Control#itemExited(prefuse.visual.VisualItem, java.awt.event.MouseEvent)
+     */
+    public void itemExited(VisualItem item, MouseEvent e) {
+        if (item instanceof NodeItem)
+            setNeighborHighlight((NodeItem) item, false);
+    }
+
+    /**
+     * Set the highlighted state of the neighbors of a node.
+     * @param n the node under consideration
+     * @param state the highlighting state to apply to neighbors
+     */
+    protected void setNeighborHighlight(NodeItem n, boolean state) {
+        Iterator iter = n.edges();
+        while (iter.hasNext()) {
+            EdgeItem eitem = (EdgeItem) iter.next();
+            //            NodeItem nitem = eitem.getAdjacentItem(n);
+            if (eitem.isVisible()) {
+                eitem.setHighlighted(state);
+                //                nitem.setHighlighted(state);
+            }
+        }
+        if (activity != null)
+            n.getVisualization().run(activity);
+    }
+} // end of class NeighborHighlightControl

@@ -191,7 +191,7 @@ public class RMModel implements Serializable {
     public void changeNodeState(RMNodeEvent nodeEvent) {
         Node node;
         String hostname;
-        NodeState previousState;
+        NodeState previousState, state;
         synchronized (root) {
             TreeParentElement source = (TreeParentElement) find(root, nodeEvent.getNodeSource());
             TreeParentElement host = (TreeParentElement) find(source, nodeEvent.getHostName());
@@ -200,6 +200,7 @@ public class RMModel implements Serializable {
             hostname = host.getName();
             previousState = node.getState();
             node.setState(nodeEvent);
+            state = nodeEvent.getNodeState();
         }
         switch (previousState) {
             case FREE:
@@ -212,7 +213,7 @@ public class RMModel implements Serializable {
             case TO_BE_RELEASED:
                 this.busyNodesNumber--;
         }
-        switch (nodeEvent.getNodeState()) {
+        switch (state) {
             case FREE:
                 this.freeNodesNumber++;
                 break;
@@ -225,6 +226,7 @@ public class RMModel implements Serializable {
                 this.busyNodesNumber++;
         }
 
+        this.actualyseTopologyView(node, previousState);
         this.actualizeTreeView(node);
         this.updateCompactView(node);
         this.actualizeStatsView();
@@ -307,6 +309,17 @@ public class RMModel implements Serializable {
         //actualize tree view if exists
         if (updateViews && ResourcesTopologyView.getTopologyViewer() != null) {
             ResourcesTopologyView.getTopologyViewer().removeNode(node, host);
+        }
+    }
+
+    private void actualyseTopologyView(Node node, NodeState previousState) {
+        // actualize topology view if exists
+        if (updateViews && ResourcesTopologyView.getTopologyViewer() != null) {
+            NodeState state = node.getState();
+            if ((previousState == NodeState.DOWN || previousState == NodeState.TO_BE_RELEASED) &&
+                (state == NodeState.FREE || state == NodeState.BUSY)) {
+                ResourcesTopologyView.getTopologyViewer().addNode(node);
+            }
         }
     }
 

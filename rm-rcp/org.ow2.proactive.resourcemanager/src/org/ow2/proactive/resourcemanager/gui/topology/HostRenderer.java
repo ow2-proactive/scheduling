@@ -105,9 +105,13 @@ public class HostRenderer extends AbstractShapeRenderer {
      * as the field name for looking up text, and no image is used.
      */
     public HostRenderer() {
-        String imgPath = "workspace/SHORT_RM_Topology/rm-rcp/org.ow2.proactive.resourcemanager/icons/";
-        freeNode = Toolkit.getDefaultToolkit().createImage(imgPath + "free.gif");
-        busyNode = Toolkit.getDefaultToolkit().createImage(imgPath + Internal.IMG_BUSY);
+        //        String imgPath = "workspace/SHORT_RM_Topology/rm-rcp/org.ow2.proactive.resourcemanager/icons/";
+        org.eclipse.swt.graphics.Image freeNodeIcon = Internal.getImageByNodeState(NodeState.FREE);
+        org.eclipse.swt.graphics.Image busyNodeIcon = Internal.getImageByNodeState(NodeState.BUSY);
+        freeNode = Internal.convertToAWT(freeNodeIcon.getImageData());
+        busyNode = Internal.convertToAWT(busyNodeIcon.getImageData());
+        //        freeNode = Toolkit.getDefaultToolkit().createImage(imgPath + "free.gif");
+        //        busyNode = Toolkit.getDefaultToolkit().createImage(imgPath + Internal.IMG_BUSY);
         m_imagePos = Constants.RIGHT;
     }
 

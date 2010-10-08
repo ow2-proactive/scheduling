@@ -90,6 +90,9 @@ public class ResourcesTopologyView extends ViewPart {
 
     @Override
     public void setFocus() {
+        if (topologyViewer != null) {
+            topologyViewer.setFocus();
+        }
     }
 
     public static TopologyViewer getTopologyViewer() {
