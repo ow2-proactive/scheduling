@@ -65,7 +65,7 @@ public class MatrixBasedTests {
         gridMatrix = new DummyNode[width][height][9];
         gridWidth = width;
         gridHeight = height;
-        List<Node> pivots = new ArrayList<Node>();
+        List<Node> pivots = null;
 
         //create nodes in the matrix
         // the matrix has to be constructed as follows:
@@ -87,12 +87,15 @@ public class MatrixBasedTests {
             //pivot matrix.
             // similar to the one before, but the number shows
             // how many nodes we add to the pivot from a given host
-            for (int j = 0; j < height; j++) {
-                for (int i = 0; i < width; i++) {
-                    if (pivotMatrix.charAt(j * width + i) != '.') {
-                        int cnt = Integer.parseInt("" + pivotMatrix.charAt(j * width + i));
-                        for (int c = 0; c < cnt; c++) {
-                            pivots.add(gridMatrix[i][j][c]);
+            if (pivotMatrix!=null){
+                pivots = new ArrayList<Node>();;
+                for (int j = 0; j < height; j++) {
+                    for (int i = 0; i < width; i++) {
+                        if (pivotMatrix.charAt(j * width + i) != '.') {
+                            int cnt = Integer.parseInt("" + pivotMatrix.charAt(j * width + i));
+                            for (int c = 0; c < cnt; c++) {
+                                pivots.add(gridMatrix[i][j][c]);
+                            }
                         }
                     }
                 }
@@ -127,7 +130,7 @@ public class MatrixBasedTests {
      * @param sels
      * @return
      */
-    protected String processSelected(List<Node> sels) {
+    protected static String processSelected(List<Node> sels) {
         Integer[][] selMat = new Integer[gridWidth][gridHeight];
         for (Node i : sels) {
             String[] nif = i.toString().split("_");
@@ -152,6 +155,33 @@ public class MatrixBasedTests {
             }
         }
         return out;
+    }
+
+    protected static String createRandomMap(int w, int h, double density) {
+        double chance;
+        String map = "";
+        for (int y=0; y<h; y++) {
+            for (int x=0; x<w; x++) {
+                chance = Math.random();
+                if (chance<=density) {
+                    int toAdd = (int) (Math.floor(Math.random()*10));
+                    if (toAdd<1) map+='.';
+                    else map+=toAdd;
+                } else {
+                    map+='.';
+                }
+            }
+        }
+        return map;
+    }
+
+    protected static void printMap(int w, int h, String map){
+        for (int y=0; y<h; y++) {
+            System.out.println("");
+            for (int x=0; x<w; x++) {
+                System.out.print(map.charAt(y*w+x)+"");
+            }
+        }
     }
 
     /**
@@ -333,5 +363,104 @@ public class MatrixBasedTests {
 
         assertTrue("The algorithm did not choose the closest nodes!",
                 doHACTest(W, H, prob, pivotSE, infinity, 1).equals(resultSE));
+    }
+
+    @org.junit.Test(timeout=60000)
+    public void reasonableTimeTestNoPivot() {
+        int w = 20;
+        int h = 20;
+        double density = 0.30;
+
+        //made with w=20; h=20; density=0.3
+        String map =    ".2..16............8."+
+                        "...7...7.963.....6.7"+
+                        "....4...87.7...6..1."+
+                        ".9....677.1.75...9.."+
+                        "...4.....64.2.....7."+
+                        "5........9....4.2..2"+
+                        ".................6.."+
+                        "........5....6.8...."+
+                        "...6....4.........23"+
+                        ".3...8.9.......9...."+
+                        "...8..9..........5.3"+
+                        "..6......7295....1.."+
+                        "9.8..4.29..55......."+
+                        "..6..7.......2......"+
+                        ".4..8...74.....5...."+
+                        ".2.7.6.....7.7....8."+
+                        "1...637.....71..5..."+
+                        ".1...9.......6....38"+
+                        "9.............9.914."+
+                        "....7..95.3...3..89.";
+
+        int onePercent = (int) Math.round((w*h*density*5)/100);
+
+        doHACTest(w, h, map, null, (long) 99999, onePercent);
+        System.out.println("1");
+        doHACTest(w, h, map, null, (long) 99999, onePercent*5);
+        System.out.println("2");
+        doHACTest(w, h, map, null, (long) 99999, onePercent*10);
+        System.out.println("3");
+
+    }
+
+    @org.junit.Test(timeout=20000)
+    public void reasonableTimeTestWithPivot() {
+        int w = 20;
+        int h = 20;
+        double density = 0.30;
+
+        //made with w=20; h=20; density=0.3
+        String map =    ".2..16............8."+
+                        "...7...7.963.....6.7"+
+                        "....4...87.7...6..1."+
+                        ".9....677.1.75...9.."+
+                        "...4.....64.2.....7."+
+                        "5........9....4.2..2"+
+                        ".................6.."+
+                        "........5....6.8...."+
+                        "...6....4.........23"+
+                        ".3...8.9.......9...."+
+                        "...8..9..........5.3"+
+                        "..6......7295....1.."+
+                        "9.8..4.29..55......."+
+                        "..6..7.......2......"+
+                        ".4..8...74.....5...."+
+                        ".2.7.6.....7.7....8."+
+                        "1...637.....71..5..."+
+                        ".1...9.......6....38"+
+                        "9.............9.914."+
+                        "....7..95.3...3..89.";
+
+        //this was made by putting a pivot on every
+        // 5 node host
+        String pivot =
+                        ".0..00............0."+
+                        "...0...0.000.....0.0"+
+                        "....0...00.0...0..0."+
+                        ".0....000.0.01...0.."+
+                        "...0.....00.0.....0."+
+                        "1........0....0.0..0"+
+                        ".................0.."+
+                        "........1....0.0...."+
+                        "...0....0.........00"+
+                        ".0...0.0.......0...."+
+                        "...0..0..........1.0"+
+                        "..0......0001....0.."+
+                        "0.0..0.00..11......."+
+                        "..0..0.......0......"+
+                        ".0..0...00.....1...."+
+                        ".0.0.0.....0.0....0."+
+                        "0...000.....00..1..."+
+                        ".0...0.......0....00"+
+                        "0.............0.000."+
+                        "....0..01.0...0..00.";
+
+        int onePercent = (int) Math.round((w*h*density*5)/100);
+
+        doHACTest(w, h, map, pivot, (long) 99999, onePercent);
+        doHACTest(w, h, map, pivot, (long) 99999, onePercent*5);
+        doHACTest(w, h, map, pivot, (long) 99999, onePercent*10);
+
     }
 }
