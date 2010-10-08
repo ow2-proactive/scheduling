@@ -32,21 +32,24 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.ow2.proactive.resourcemanager.frontend.topology;
+package org.ow2.proactive.resourcemanager.frontend.topology.pinging;
 
-import org.objectweb.proactive.annotation.PublicAPI;
-import org.ow2.proactive.resourcemanager.frontend.topology.descriptor.TopologyDescriptor;
+import java.net.InetAddress;
+import java.util.HashMap;
+
+import org.ow2.proactive.utils.NodeSet;
 
 
 /**
- * This descriptor allows to select nodes on the single hosts.
+ * Interface represents a pinger executed on just registered node.
  */
-@PublicAPI
-public class SingleHostDescriptor extends TopologyDescriptor {
+public interface Pinger {
+
     /**
-     * Constructs the new instance of this class.
+     * Pings remote nodes and returns distances to hosts where these nodes are located.
+     *
+     * @param nodes to ping
+     * @return distances map to hosts where these nodes are located
      */
-    public SingleHostDescriptor() {
-        super(true);
-    }
+    public HashMap<InetAddress, Long> ping(NodeSet nodes);
 }

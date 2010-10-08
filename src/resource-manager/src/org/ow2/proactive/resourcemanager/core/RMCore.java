@@ -91,8 +91,8 @@ import org.ow2.proactive.resourcemanager.frontend.RMMonitoringImpl;
 import org.ow2.proactive.resourcemanager.frontend.RMUser;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.frontend.topology.Topology;
-import org.ow2.proactive.resourcemanager.frontend.topology.TopologyDescriptor;
 import org.ow2.proactive.resourcemanager.frontend.topology.TopologyException;
+import org.ow2.proactive.resourcemanager.frontend.topology.descriptor.TopologyDescriptor;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.resourcemanager.nodesource.common.PluginDescriptor;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.DefaultInfrastructureManager;
@@ -345,6 +345,8 @@ public class RMCore implements ResourceManager, RMAdmin, RMUser, InitActive, Run
         } catch (NodeException e) {
             logger.error("", e);
         } catch (ProActiveException e) {
+            logger.error("", e);
+        } catch (ClassNotFoundException e) {
             logger.error("", e);
         }
         if (logger.isDebugEnabled()) {

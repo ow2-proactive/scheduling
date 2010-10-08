@@ -37,7 +37,7 @@ package org.ow2.proactive.resourcemanager.selection.topology;
 import java.util.List;
 
 import org.objectweb.proactive.core.node.Node;
-import org.ow2.proactive.resourcemanager.frontend.topology.TopologyDescriptor;
+import org.ow2.proactive.resourcemanager.frontend.topology.descriptor.TopologyDescriptor;
 
 
 /**

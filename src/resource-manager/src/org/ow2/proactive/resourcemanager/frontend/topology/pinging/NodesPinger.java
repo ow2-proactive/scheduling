@@ -32,41 +32,39 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.ow2.proactive.resourcemanager.frontend.topology;
+package org.ow2.proactive.resourcemanager.frontend.topology.pinging;
 
-import java.io.IOException;
 import java.net.InetAddress;
 import java.util.HashMap;
-import java.util.List;
 
+import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
+import org.ow2.proactive.utils.NodeSet;
 
 
 /**
- * Class used for pinging hosts.
- * One new host is added to the resource manager the pinger will be executed there.
- * As a result it gets all the distances to already added hosts, which are registered in
- * the resource manager.
- *
+ * Pings ProActive nodes using Node.getNumberOfActiveObjects().
  */
-public class HostPinger {
+public class NodesPinger implements Pinger {
 
     /**
-     * Ping all hosts in the list sequentially.
+     * Pings remote nodes and returns distances to hosts where these nodes are located.
      *
-     * @param hosts to ping
-     * @return map with distances to other hosts
+     * @param nodes to ping
+     * @return distances map to hosts where these nodes are located
      */
-    public HashMap<InetAddress, Long> ping(List<InetAddress> hosts) {
+    public HashMap<InetAddress, Long> ping(NodeSet nodes) {
         HashMap<InetAddress, Long> results = new HashMap<InetAddress, Long>();
-        for (InetAddress host : hosts) {
+        for (Node node : nodes) {
             try {
-                if (NodeFactory.getDefaultNode().getVMInformation().getInetAddress().equals(host)) {
+                InetAddress current = NodeFactory.getDefaultNode().getVMInformation().getInetAddress();
+                InetAddress nodeAddress = node.getVMInformation().getInetAddress();
+                if (current.equals(nodeAddress)) {
                     // nodes on the same host
-                    results.put(host, new Long(0));
+                    results.put(nodeAddress, new Long(0));
                 } else {
-                    results.put(host, pingHost(host));
+                    results.put(nodeAddress, pingNode(node));
                 }
             } catch (NodeException e) {
             }
@@ -75,21 +73,21 @@ public class HostPinger {
     }
 
     /**
-     * Ping the host: method pings the host several time and takes the minimum value as it
-     * reflects better the network bandwidth.
+     * Method pings the node by calling Node.getNumberOfActiveObjects()
+     * several time.
      *
-     * @param host to ping
-     * @return ping value to the host specified from the one it is executing on
+     * @param node to ping
+     * @return ping value to this node from the one it is executing on
      */
-    private Long pingHost(InetAddress host) {
+    private Long pingNode(Node node) {
 
         final int ATTEMPS = 10;
         long minPing = Long.MAX_VALUE;
         for (int i = 0; i < ATTEMPS; i++) {
             long start = System.nanoTime();
             try {
-                host.isReachable(60 * 1000);
-            } catch (IOException e) {
+                node.getNumberOfActiveObjects();
+            } catch (Exception e) {
                 // cannot reach the node
                 return (long) -1;
             }

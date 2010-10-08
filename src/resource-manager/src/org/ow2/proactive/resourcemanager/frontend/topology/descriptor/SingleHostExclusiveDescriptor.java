@@ -32,38 +32,37 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.ow2.proactive.resourcemanager.frontend.topology;
+package org.ow2.proactive.resourcemanager.frontend.topology.descriptor;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
+import org.ow2.proactive.resourcemanager.frontend.topology.SingleHostDescriptor;
 
 
 /**
- * This descriptor allows to select nodes on multiple hosts exclusively.
- * Hosts with selected nodes will be reserved for the user.
+ * This descriptor allows to select nodes on the single hosts exclusively.
+ * The host with selected nodes will be reserved for the user.
  *
  * By specifying this descriptor in {@link ResourceManager.getAtMostNodes} user may get
- * more nodes than it asked for due to the fact that total capacity of all machines is
- * bigger (even thought the resource manager tries to find the optimal set of host
+ * more nodes than it asked for due to the fact that total capacity of hosts is
+ * bigger (even thought the resource manager tries to find the optimal host
  * minimizing the waist of resources), namely
  *
  * if user requested k nodes
  *
- * - if one machine exists with the capacity k it will be selected
- * - if several machines give exact number of nodes they will be selected
- *   (in case of several possibilities number of machines will be minimized)
- * - if it not possible to find exact number of nodes but it's possible to
- *   find more than they will be selected. The number of waisted resources
- *   & number of machines will be minimized
- * - otherwise less nodes will be provided but as the closest as possible to k
+ * - the machine with exact capacity will be selected if exists
+ * - the machine with bigger capacity will be selected if exists.
+ *   The capacity of the selected machine will be the closest to k.
+ * - the machine with smaller capacity than k will be selected.
+ *   In this case the capacity of selected host will be the biggest among all other.
  *
  */
 @PublicAPI
-public class MultipleHostsExclusiveDescriptor extends TopologyDescriptor {
+public class SingleHostExclusiveDescriptor extends SingleHostDescriptor {
     /**
-     * Constructs a new instance of the class.
+     * Constructs the new instance of this class.
      */
-    public MultipleHostsExclusiveDescriptor() {
-        super(true);
+    public SingleHostExclusiveDescriptor() {
+        super();
     }
 }

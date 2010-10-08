@@ -32,12 +32,13 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.ow2.proactive.resourcemanager.frontend.topology;
+package org.ow2.proactive.resourcemanager.frontend.topology.descriptor;
 
 import java.util.List;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.node.Node;
+import org.ow2.proactive.resourcemanager.frontend.topology.DistanceFunction;
 
 
 /**

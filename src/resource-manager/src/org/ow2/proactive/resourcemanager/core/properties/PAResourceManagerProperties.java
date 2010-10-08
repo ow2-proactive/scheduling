@@ -160,7 +160,9 @@ public enum PAResourceManagerProperties {
     RM_ACCOUNT_REFRESH_RATE("pa.rm.account.refreshrate", PropertyType.INTEGER),
 
     /** Topology feature enable option */
-    RM_TOPOLOGY_ENABLED("pa.rm.topology.enabled", PropertyType.BOOLEAN);
+    RM_TOPOLOGY_ENABLED("pa.rm.topology.enabled", PropertyType.BOOLEAN),
+
+    RM_TOPOLOGY_PINGER("pa.rm.topology.pinger.class", PropertyType.STRING);
 
     /* ***************************************************************************** */
     /* ***************************************************************************** */

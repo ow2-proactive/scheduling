@@ -10,11 +10,11 @@ import java.util.List;
 import java.util.Set;
 
 import org.objectweb.proactive.core.node.Node;
-import org.ow2.proactive.resourcemanager.frontend.topology.BestProximityDescriptor;
 import org.ow2.proactive.resourcemanager.frontend.topology.DistanceFunction;
 import org.ow2.proactive.resourcemanager.frontend.topology.Topology;
 import org.ow2.proactive.resourcemanager.frontend.topology.clustering.Cluster;
 import org.ow2.proactive.resourcemanager.frontend.topology.clustering.HAC;
+import org.ow2.proactive.resourcemanager.frontend.topology.descriptor.BestProximityDescriptor;
 
 
 /**

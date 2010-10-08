@@ -50,19 +50,20 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
-import org.ow2.proactive.resourcemanager.frontend.topology.ArbitraryTopologyDescriptor;
-import org.ow2.proactive.resourcemanager.frontend.topology.BestProximityDescriptor;
-import org.ow2.proactive.resourcemanager.frontend.topology.MultipleHostsExclusiveDescriptor;
-import org.ow2.proactive.resourcemanager.frontend.topology.HostPinger;
 import org.ow2.proactive.resourcemanager.frontend.topology.SingleHostDescriptor;
-import org.ow2.proactive.resourcemanager.frontend.topology.SingleHostExclusiveDescriptor;
-import org.ow2.proactive.resourcemanager.frontend.topology.ThresholdProximityDescriptor;
 import org.ow2.proactive.resourcemanager.frontend.topology.Topology;
-import org.ow2.proactive.resourcemanager.frontend.topology.TopologyDescriptor;
 import org.ow2.proactive.resourcemanager.frontend.topology.TopologyException;
 import org.ow2.proactive.resourcemanager.frontend.topology.TopologyImpl;
 import org.ow2.proactive.resourcemanager.frontend.topology.clustering.HAC;
+import org.ow2.proactive.resourcemanager.frontend.topology.descriptor.ArbitraryTopologyDescriptor;
+import org.ow2.proactive.resourcemanager.frontend.topology.descriptor.BestProximityDescriptor;
+import org.ow2.proactive.resourcemanager.frontend.topology.descriptor.MultipleHostsExclusiveDescriptor;
+import org.ow2.proactive.resourcemanager.frontend.topology.descriptor.SingleHostExclusiveDescriptor;
+import org.ow2.proactive.resourcemanager.frontend.topology.descriptor.ThresholdProximityDescriptor;
+import org.ow2.proactive.resourcemanager.frontend.topology.descriptor.TopologyDescriptor;
+import org.ow2.proactive.resourcemanager.frontend.topology.pinging.Pinger;
 import org.ow2.proactive.resourcemanager.utils.RMLoggers;
+import org.ow2.proactive.utils.NodeSet;
 
 import edu.emory.mathcs.backport.java.util.Collections;
 
@@ -76,13 +77,20 @@ public class TopologyManager {
     private HashMap<InetAddress, Set<Node>> nodesOnHost = new HashMap<InetAddress, Set<Node>>();
     private final HashMap<Class<? extends TopologyDescriptor>, TopologyHandler> handlers = new HashMap<Class<? extends TopologyDescriptor>, TopologyHandler>();
 
-    public TopologyManager() {
+    // class using for pinging
+    Class<? extends Pinger> pingerClass;
+
+    @SuppressWarnings(value = "unchecked")
+    public TopologyManager() throws ClassNotFoundException {
         handlers.put(ArbitraryTopologyDescriptor.class, new ArbitraryTopologyHandler());
         handlers.put(BestProximityDescriptor.class, new BestProximityHandler());
         handlers.put(ThresholdProximityDescriptor.class, new TresholdProximityHandler());
         handlers.put(SingleHostDescriptor.class, new SingleHostHandler());
         handlers.put(SingleHostExclusiveDescriptor.class, new SingleHostExclusiveHandler());
         handlers.put(MultipleHostsExclusiveDescriptor.class, new MultipleHostsExclusiveHandler());
+
+        pingerClass = (Class<? extends Pinger>) Class.forName(PAResourceManagerProperties.RM_TOPOLOGY_PINGER
+                .getValueAsString());
     }
 
     public TopologyHandler getHandler(TopologyDescriptor topologyDescriptor) {
@@ -116,13 +124,18 @@ public class TopologyManager {
         }
 
         // unknown host => start pinging process
-        List<InetAddress> toPing = null;
+        NodeSet toPing = new NodeSet();
         synchronized (topology) {
-            toPing = new LinkedList<InetAddress>(topology.getHosts());
+            // adding one node from each host
+            for (InetAddress h : nodesOnHost.keySet()) {
+                // always have at least one node on each host
+                toPing.add(nodesOnHost.get(h).iterator().next());
+            }
         }
-        HashMap<InetAddress, Long> hostTopology = pingNode(node, toPing);
+        HashMap<InetAddress, Long> hostsTopology = pingNode(node, toPing);
         synchronized (topology) {
-            topology.addHostTopology(node.getVMInformation().getHostName(), host, hostTopology);
+
+            topology.addHostTopology(node.getVMInformation().getHostName(), host, hostsTopology);
             Set<Node> nodesSet = new HashSet<Node>();
             nodesSet.add(node);
             nodesOnHost.put(node.getVMInformation().getInetAddress(), nodesSet);
@@ -150,13 +163,14 @@ public class TopologyManager {
         }
     }
 
-    private HashMap<InetAddress, Long> pingNode(Node node, List<InetAddress> hosts) {
+    private HashMap<InetAddress, Long> pingNode(Node node, NodeSet nodes) {
 
         try {
             logger.debug("Launching ping process on node " + node.getNodeInformation().getURL());
             long timeStamp = System.currentTimeMillis();
-            HostPinger pinger = PAActiveObject.newActive(HostPinger.class, null, node);
-            HashMap<InetAddress, Long> result = pinger.ping(hosts);
+
+            Pinger pinger = PAActiveObject.newActive(pingerClass, null, node);
+            HashMap<InetAddress, Long> result = pinger.ping(nodes);
             PAFuture.waitFor(result);
             logger.debug(result.size() + " hosts were pinged from " + node.getNodeInformation().getURL() +
                 " in " + (System.currentTimeMillis() - timeStamp) + " ms");
