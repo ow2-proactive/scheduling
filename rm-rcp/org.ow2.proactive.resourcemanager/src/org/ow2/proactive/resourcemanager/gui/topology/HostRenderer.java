@@ -1,5 +1,6 @@
 package org.ow2.proactive.resourcemanager.gui.topology;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
@@ -97,7 +98,7 @@ public class HostRenderer extends AbstractShapeRenderer {
     protected String m_text; // label text
     protected Dimension m_textDim = new Dimension(); // text width / height
 
-    private final static int WIDTH_NODES = 24;
+    private final static int WIDTH_NODES = 26;
 
     /**
      * Create a new LabelRenderer. By default the field "label" is used
@@ -423,16 +424,13 @@ public class HostRenderer extends AbstractShapeRenderer {
             } else if (nbNodes <= 8) {
                 size /= 2;
             }
-            //			else if (nbNodes <= 8) {
-            //				size /= 4;
-            //			}
         }
 
         boolean useInt = 1.5 > Math.max(g.getTransform().getScaleX(), g.getTransform().getScaleY());
         double x = shape.getMinX() + size * m_horizBorder;
         double y = shape.getMinY() + size * m_vertBorder;
 
-        // render image
+        // render nodes states
         {
             double w = size * freeNode.getWidth(null);
             double h = size * freeNode.getHeight(null);
@@ -442,8 +440,7 @@ public class HostRenderer extends AbstractShapeRenderer {
             ix = shape.getMaxX() - m_horizBorder - WIDTH_NODES;
             if (nbNodes == 1) {
                 ix += WIDTH_NODES / 2;
-            }
-            if (nbNodes == 2) {
+            } else if (nbNodes == 2) {
                 ix += 1;
             }
 
@@ -452,38 +449,69 @@ public class HostRenderer extends AbstractShapeRenderer {
                 iy = shape.getCenterY() - h / 2;
             } else if (nbNodes <= 8) {
                 iy = shape.getMinY() + 0.9;
+            } else {
+                iy = shape.getMaxY() - 3;
             }
 
-            int i = 1;
-            for (Node node : nodes) {
-                Image img = null;
-                if (node.getState().equals(NodeState.FREE)) {
-                    img = freeNode;
-                } else if (node.getState().equals(NodeState.BUSY)) {
-                    img = busyNode;
-                }
-                if (img != null) {
-                    m_transform.setTransform(size, 0, 0, size, ix, iy);
-                    g.drawImage(img, m_transform, null);
-                }
-                switch (nbNodes) {
-                    case 1:
-                    case 2:
-                    case 3:
-                    case 4:
-                        ix += size * freeNode.getWidth(null) + 1;
-                        break;
-                    case 5:
-                    case 6:
-                    case 7:
-                    case 8:
-                        if (i++ == 4) {
+            if (nbNodes <= 8) {
+                int i = 1;
+                for (Node node : nodes) {
+                    Image img = null;
+                    if (node.getState().equals(NodeState.FREE)) {
+                        img = freeNode;
+                    } else if (node.getState().equals(NodeState.BUSY)) {
+                        img = busyNode;
+                    }
+                    if (img != null) {
+                        m_transform.setTransform(size, 0, 0, size, ix, iy);
+                        g.drawImage(img, m_transform, null);
+                        if (nbNodes > 4 && i++ == 4) {
                             ix = shape.getMaxX() - m_horizBorder - WIDTH_NODES;
                             iy += h + 0.25;
                         } else {
-                            ix += size * freeNode.getWidth(null) + 1;
+                            ix += w + 1;
                         }
+                    }
                 }
+            } else { // more than 8 nodes, draw only number of free/busy nodes
+                int nbFreeNodes = 0, nbBusyNodes = 0;
+                double step, step2;
+                for (Node node : nodes) {
+                    if (node.getState().equals(NodeState.FREE)) {
+                        nbFreeNodes++;
+                    } else if (node.getState().equals(NodeState.BUSY)) {
+                        nbBusyNodes++;
+                    }
+                }
+                g.setFont(FontLib.getFont("georgia", Font.BOLD, 9));
+                if (nbFreeNodes < 10 && nbBusyNodes < 10) {
+                    ix += 11.5;
+                } else if (nbFreeNodes >= 10 && nbBusyNodes < 10) {
+                    ix += 5.8;
+                } else if (nbFreeNodes < 10 && nbBusyNodes >= 10) {
+                    ix += 6;
+                } else {
+                    ix += 2.1;
+                }
+                g.setColor(new Color(11, 158, 11));
+                g.drawString(nbFreeNodes + "", (float) ix + 1, (float) iy);
+                g.setColor(Color.BLACK);
+                if (nbFreeNodes < 10 && nbBusyNodes < 10) {
+                    ix += WIDTH_NODES / 2 - 7.4;
+                    step2 = 3.6;
+                } else if (nbFreeNodes >= 10 && nbBusyNodes < 10) {
+                    ix += WIDTH_NODES / 2 - 1.5;
+                    step2 = 3.6;
+                } else if (nbFreeNodes < 10 && nbBusyNodes >= 10) {
+                    ix += WIDTH_NODES / 2 - 7.5;
+                    step2 = 3.4;
+                } else {
+                    ix += WIDTH_NODES / 2 - 2.1;
+                    step2 = 3;
+                }
+                g.drawString("/", (float) ix, (float) iy - 0.7f);
+                g.setColor(new Color(226, 123, 20));
+                g.drawString(nbBusyNodes + "", (float) (ix + step2), (float) iy);
             }
         }
 

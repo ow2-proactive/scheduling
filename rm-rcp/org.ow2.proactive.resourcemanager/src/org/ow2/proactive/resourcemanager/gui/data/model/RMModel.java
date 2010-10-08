@@ -136,7 +136,7 @@ public class RMModel implements Serializable {
                 this.busyNodesNumber++;
         }
         this.actualizeTreeView(parentToRefresh);
-        this.addToCompactAndTopologyViews(elementToAdd);
+        this.addToCompactView(elementToAdd);
         this.addTableItem(newNode);
         this.actualizeStatsView();
         this.addNodeToTopologyView(newNode);
@@ -147,12 +147,14 @@ public class RMModel implements Serializable {
         TreeParentElement parentToRefresh = null;
         TreeLeafElement elementToRemove = null;
         Node node;
+        String hostname;
 
         synchronized (root) {
             TreeParentElement source = (TreeParentElement) find(root, nodeEvent.getNodeSource());
             TreeParentElement host = (TreeParentElement) find(source, nodeEvent.getHostName());
             TreeParentElement vm = (TreeParentElement) find(host, nodeEvent.getVMName());
             node = (Node) find(vm, nodeEvent.getNodeUrl());
+            hostname = host.getName();
 
             elementToRemove = remove(vm, nodeEvent.getNodeUrl());
             parentToRefresh = vm;
@@ -181,19 +183,21 @@ public class RMModel implements Serializable {
 
         this.actualizeTreeView(parentToRefresh);
         this.removeTableItem(node);
-        this.removeFromCompactAndTopologyViews(elementToRemove);
+        this.removeFromCompactView(elementToRemove);
         this.actualizeStatsView();
-        this.removeNodeFromTopologyView(node);
+        this.removeNodeFromTopologyView(node, hostname);
     }
 
     public void changeNodeState(RMNodeEvent nodeEvent) {
         Node node;
+        String hostname;
         NodeState previousState;
         synchronized (root) {
             TreeParentElement source = (TreeParentElement) find(root, nodeEvent.getNodeSource());
             TreeParentElement host = (TreeParentElement) find(source, nodeEvent.getHostName());
             TreeParentElement vm = (TreeParentElement) find(host, nodeEvent.getVMName());
             node = (Node) find(vm, nodeEvent.getNodeUrl());
+            hostname = host.getName();
             previousState = node.getState();
             node.setState(nodeEvent);
         }
@@ -214,6 +218,7 @@ public class RMModel implements Serializable {
                 break;
             case DOWN:
                 this.downNodesNumber++;
+                this.removeNodeFromTopologyView(node, hostname);
                 break;
             case BUSY:
             case TO_BE_RELEASED:
@@ -221,7 +226,7 @@ public class RMModel implements Serializable {
         }
 
         this.actualizeTreeView(node);
-        this.updateCompactAndTopologyViews(node);
+        this.updateCompactView(node);
         this.actualizeStatsView();
         this.updateTableItem(node);
     }
@@ -236,7 +241,7 @@ public class RMModel implements Serializable {
             }
         }
         actualizeTreeView(root);
-        addToCompactAndTopologyViews(source);
+        addToCompactView(source);
         //refresh node source removal command state
         refreshNodeSourceRemovalHandler();
 
@@ -254,7 +259,7 @@ public class RMModel implements Serializable {
             }
         }
         actualizeTreeView(root);
-        removeFromCompactAndTopologyViews(source);
+        removeFromCompactView(source);
         //refresh node source removal command state
         refreshNodeSourceRemovalHandler();
     }
@@ -298,10 +303,10 @@ public class RMModel implements Serializable {
         }
     }
 
-    private void removeNodeFromTopologyView(Node node) {
+    private void removeNodeFromTopologyView(Node node, String host) {
         //actualize tree view if exists
         if (updateViews && ResourcesTopologyView.getTopologyViewer() != null) {
-            ResourcesTopologyView.getTopologyViewer().removeNode(node.getName());
+            ResourcesTopologyView.getTopologyViewer().removeNode(node, host);
         }
     }
 
@@ -312,35 +317,26 @@ public class RMModel implements Serializable {
         }
     }
 
-    private void addToCompactAndTopologyViews(TreeLeafElement element) {
+    private void addToCompactView(TreeLeafElement element) {
         if (updateViews) {
             if (ResourcesCompactView.getCompactViewer() != null) {
                 ResourcesCompactView.getCompactViewer().addView(element);
             }
-            if (ResourcesTopologyView.getTopologyViewer() != null) {
-                ResourcesTopologyView.getTopologyViewer().addView(element);
-            }
         }
     }
 
-    private void removeFromCompactAndTopologyViews(TreeLeafElement element) {
+    private void removeFromCompactView(TreeLeafElement element) {
         if (updateViews) {
             if (ResourcesCompactView.getCompactViewer() != null) {
                 ResourcesCompactView.getCompactViewer().removeView(element);
             }
-            if (ResourcesTopologyView.getTopologyViewer() != null) {
-                ResourcesTopologyView.getTopologyViewer().removeView(element);
-            }
         }
     }
 
-    private void updateCompactAndTopologyViews(TreeLeafElement element) {
+    private void updateCompactView(TreeLeafElement element) {
         if (updateViews) {
             if (ResourcesCompactView.getCompactViewer() != null) {
                 ResourcesCompactView.getCompactViewer().updateView(element);
-            }
-            if (ResourcesTopologyView.getTopologyViewer() != null) {
-                ResourcesTopologyView.getTopologyViewer().updateView(element);
             }
         }
     }

@@ -101,11 +101,8 @@ public class TopologyForceDirectedLayout extends ForceDirectedLayout {
 
     @Override
     protected float getSpringLength(EdgeItem arg0) {
-        //        float coeff = getForceSimulator().getForces()[2].getParameter(1);
         double val = arg0.getLong("weight") / 150.0;
-        //		float val = (float) Math.log(arg0.getFloat("weight")+1);
-        //		return (val+1) * (val+1) * coeff;
-        return (float) val * coeff;
+        return (float) val * (coeff + 40);
     }
 
 }

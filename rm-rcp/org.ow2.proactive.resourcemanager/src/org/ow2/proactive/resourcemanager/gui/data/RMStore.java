@@ -229,7 +229,7 @@ public class RMStore {
         }
         //clear topology view if topology panel is displayed
         if (ResourcesTopologyView.getTopologyViewer() != null) {
-            ResourcesTopologyView.getTopologyViewer().disconnect();
+            ResourcesTopologyView.getTopologyViewer().clear();
         }
 
         // Disconnect JMX ChartIt action

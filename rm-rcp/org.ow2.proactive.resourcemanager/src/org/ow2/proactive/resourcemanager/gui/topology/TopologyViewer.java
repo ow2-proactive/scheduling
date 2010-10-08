@@ -50,8 +50,6 @@ import java.awt.geom.Rectangle2D;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -79,7 +77,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.ow2.proactive.resourcemanager.frontend.topology.Topology;
 import org.ow2.proactive.resourcemanager.gui.data.RMStore;
-import org.ow2.proactive.resourcemanager.gui.data.model.Host;
 import org.ow2.proactive.resourcemanager.gui.data.model.Node;
 import org.ow2.proactive.resourcemanager.gui.data.model.TreeLeafElement;
 import org.ow2.proactive.resourcemanager.gui.data.model.TreeParentElement;
@@ -136,7 +133,6 @@ public class TopologyViewer {
     public static final String NODES = "graph.nodes";
     public static final String EDGES = "graph.edges";
     public static final String EDGE_DECORATORS = "edgeDeco";
-    public static final String NODE_DECORATORS = "nodeDeco";
 
     private static final Schema DECORATOR_SCHEMA = PrefuseLib.getVisualItemSchema();
     static {
@@ -151,11 +147,11 @@ public class TopologyViewer {
     private java.awt.Frame frame;
     /** Slider for selecting the latency threshold of nodes to display */
     private JValueSlider latencySlider;
+    private ColorAction aFill;
     private Visualization visualization;
     private TopologyForceDirectedLayout topologyForceDirectedLayout;
 
     private final Lock lock = new ReentrantLock();
-    private boolean initialised = false;
 
     /**
      * Creates new CompactViewer.
@@ -178,9 +174,6 @@ public class TopologyViewer {
     private void initComposite() {
         parent.setLayout(new FillLayout());
         parent.setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_WHITE));
-        //composite = new Composite(parent, SWT.NONE);
-        //Color white = parent.getDisplay().getSystemColor(SWT.COLOR_WHITE);
-        //        composite.setBackground(white);
     }
 
     /**
@@ -196,10 +189,6 @@ public class TopologyViewer {
             Topology topology = RMStore.getInstance().getResourceManager().getTopology();
             loadMatrix(topology);
         }
-    }
-
-    public boolean isInitialised() {
-        return initialised;
     }
 
     /**
@@ -221,6 +210,7 @@ public class TopologyViewer {
             Display.getDefault().asyncExec(new Runnable() {
                 public void run() {
                     lock.lock();
+                    long time = System.nanoTime();
                     synchronized (visualization) {
                         try {
                             String nodeURL = node.getName();
@@ -228,19 +218,11 @@ public class TopologyViewer {
                             String host = node.getParent().getParent().getName();
                             Topology topology = RMStore.getInstance().getResourceManager().getTopology();
 
-                            InetAddress address;
-                            try {
-                                address = InetAddress.getByName(host);
-                            } catch (UnknownHostException e) {
-                                e.printStackTrace();
-                                return;
-                            }
-
                             prefuse.data.Node hostNode = null;
                             Iterator nodes = graph.nodes();
                             while (nodes.hasNext()) {
                                 prefuse.data.Node anotherNode = (prefuse.data.Node) nodes.next();
-                                if (anotherNode.get("address").equals(address)) {
+                                if (anotherNode.get("name").equals(host)) {
                                     hostNode = anotherNode;
                                     break;
                                 }
@@ -252,7 +234,6 @@ public class TopologyViewer {
                             } else {
                                 prefuse.data.Node nodeToAdd = graph.addNode();
                                 nodeToAdd.set("name", host);
-                                nodeToAdd.set("address", address);
                                 Set<Node> hostNodes = new HashSet<Node>();
                                 hostNodes.add(node);
                                 nodeToAdd.set("nodes", hostNodes);
@@ -264,8 +245,8 @@ public class TopologyViewer {
                                         continue;
                                     }
 
-                                    InetAddress anotherHostAddress = (InetAddress) anotherNode.get("address");
-                                    Long latency = topology.getDistance(address, anotherHostAddress);
+                                    String anotherHost = (String) anotherNode.get("name");
+                                    Long latency = topology.getDistance(host, anotherHost);
 
                                     if (latency != null && latency < Long.MAX_VALUE) {
                                         if (graph.getEdge(nodeToAdd, anotherNode) == null &&
@@ -287,9 +268,19 @@ public class TopologyViewer {
                                     }
                                 }
                                 visualization.setValue(EDGES, null, VisualItem.INTERACTIVE, Boolean.FALSE);
+
+                                if (graph.getNodeCount() == 2) {
+                                    ActionList dynamicColor = (ActionList) visualization
+                                            .removeAction("dynamicColor");
+                                    dynamicColor.add(0, aFill);
+                                    visualization.putAction("dynamicColor", dynamicColor);
+                                }
+
                                 visualization.run("unique");
                                 visualization.run("dynamicColor");
                             }
+                            System.out.println("TopologyViewer.addNode() time = " +
+                                (System.nanoTime() - time) / 1000);
                         } finally {
                             lock.unlock();
                         }
@@ -303,28 +294,21 @@ public class TopologyViewer {
      * Remove a node from the graph
      * @param nodeURL URL of the node to remove
      */
-    public void removeNode(final String nodeURL) {
+    public void removeNode(final Node node, final String host) {
         if (visualization != null) {
             Display.getDefault().asyncExec(new Runnable() {
                 public void run() {
                     lock.lock();
                     synchronized (visualization) {
                         try {
-                            String host = nodeURL.split("//")[1].split(":")[0];
-
-                            InetAddress address;
-                            try {
-                                address = InetAddress.getByName(host);
-                            } catch (UnknownHostException e) {
-                                System.out.println(e);
-                                return;
-                            }
+                            String nodeURL = node.getName();
+                            //								String host = node.getParent().getParent().getName();
 
                             prefuse.data.Node hostNode = null;
                             Iterator nodes = graph.nodes();
                             while (nodes.hasNext()) {
                                 prefuse.data.Node anotherNode = (prefuse.data.Node) nodes.next();
-                                if (anotherNode.get("address").equals(address)) {
+                                if (anotherNode.get("name").equals(host)) {
                                     hostNode = anotherNode;
                                     break;
                                 }
@@ -339,12 +323,16 @@ public class TopologyViewer {
                                 Node node = it.next();
                                 if (node.getName().equals(nodeURL)) {
                                     it.remove();
+                                    break;
                                 }
                             }
                             if (hostNodes.size() == 0) {
                                 // No more Proactive Nodes on this host
                                 // Remove Prefuse node and all incident edges
                                 graph.removeNode(hostNode);
+                                if (graph.getNodeCount() == 1) {
+                                    ((ActionList) visualization.getAction("dynamicColor")).remove(aFill);
+                                }
                             }
 
                             visualization.run("latencyFilter");
@@ -364,7 +352,7 @@ public class TopologyViewer {
      * @param topology
      */
     public void loadMatrix(final Topology topology) {
-        if (RMStore.isConnected() && topology.getHosts().size() > 1) {
+        if (RMStore.isConnected()) {
             lock.lock();
             try {
                 if (visualization == null) {
@@ -407,8 +395,8 @@ public class TopologyViewer {
                                 highlightPalette[i] = ColorLib.rgba(255, 119, 22, i + 30);
                                 defaultPalette[i] = ColorLib.rgba(50, 50, 50, i + 15);
                             }
-                            final ColorAction aFill = new DataColorAction(EDGES, "weight",
-                                Constants.NUMERICAL, VisualItem.STROKECOLOR, defaultPalette);
+                            aFill = new DataColorAction(EDGES, "weight", Constants.NUMERICAL,
+                                VisualItem.STROKECOLOR, defaultPalette);
                             aFill.add(VisualItem.HIGHLIGHT, new DataColorAction(EDGES, "weight",
                                 Constants.NUMERICAL, VisualItem.STROKECOLOR, highlightPalette));
                             aFill.add(VisualItem.FIXED, new DataColorAction(EDGES, "weight",
@@ -439,9 +427,14 @@ public class TopologyViewer {
                             // action list containing all dynamic colors
                             final ActionList dynamicColor = new ActionList();
                             dynamicColor.add(colorFillNodes);
-                            dynamicColor.add(aFill);
+                            if (graph.getNodeCount() > 1) {
+                                dynamicColor.add(aFill);
+                            }
                             dynamicColor.add(new LabelLayout(EDGE_DECORATORS));
                             dynamicColor.add(new RepaintAction());
+
+                            final ActionList repaint = new ActionList();
+                            repaint.add(new RepaintAction());
 
                             // create an action list with an animated layout
                             // the INFINITY parameter tells the action list to run indefinitely
@@ -460,12 +453,13 @@ public class TopologyViewer {
                             visualization.putAction("latencyFilter", latencyFilter);
                             visualization.putAction("layout", layout);
                             visualization.putAction("dynamicColor", dynamicColor);
+                            visualization.putAction("repaint", repaint);
 
                             // create a new Display that pull from our Visualization
                             final prefuse.Display display = new prefuse.Display(visualization);
                             display.setPreferredSize(new Dimension(parent.getSize().x - 310,
                                 parent.getSize().y));
-                            //							display.setHighQuality(true);
+                            display.setHighQuality(true);
                             display.addControlListener(new FocusControl(1));
                             display.addControlListener(new DragControl()); // drag items around
                             display.addControlListener(new PanControl()); // pan with background left-drag
@@ -474,7 +468,6 @@ public class TopologyViewer {
                             display.addControlListener(new NeighborHighlightControl("dynamicColor")); // sets the highlighted status for edges of the node under the mouse pointer
 
                             // Option panel
-                            //							final JForcePanel fpanel = new JForcePanel(m_fsim);
                             final JPanel fpanel = new JPanel();
                             fpanel.setBackground(Color.WHITE);
                             fpanel.setLayout(new BoxLayout(fpanel, BoxLayout.Y_AXIS));
@@ -696,7 +689,6 @@ public class TopologyViewer {
 
                             frame.add(mainPanel);
                             frame.pack();
-
                             parent.layout();
 
                             visualization.setValue(EDGES, null, VisualItem.INTERACTIVE, Boolean.FALSE); // Cannot select edges
@@ -734,7 +726,6 @@ public class TopologyViewer {
             graph.getNodeTable().addColumns(
                     new Schema(new String[] { "name", "nodes" }, new Class[] { String.class, Set.class }));
             graph.getEdgeTable().addColumns(new Schema(new String[] { "weight" }, new Class[] { int.class }));
-
             List<TreeLeafElement> leafsToProcess = new ArrayList<TreeLeafElement>();
             Map<String, prefuse.data.Node> hosts = new HashMap<String, prefuse.data.Node>();
             leafsToProcess.add(RMStore.getInstance().getModel().getRoot());
@@ -757,7 +748,8 @@ public class TopologyViewer {
                     } else {
                         // New host to add to the graph
                         prefuse.data.Node node = graph.addNode();
-                        node.set("name", host.toString());
+                        System.out.println("TopologyViewer.createGraph() ajout de " + host);
+                        node.set("name", host);
                         //						node.set("address", host);
                         Set<Node> hostNodes = new HashSet<Node>();
                         hostNodes.add((Node) element);
@@ -782,12 +774,8 @@ public class TopologyViewer {
                             if (latency > maxLatency) {
                                 maxLatency = latency;
                             }
-
                             Edge edge = graph.addEdge(node1, node2);
                             edge.setInt("weight", latency.intValue());
-                            //							System.out.println("TopologyViewer.createGraph() distance entre " +
-                            //									paNode.getVMInformation().getHostName() + " et " +
-                            //									anotherPaNode.getVMInformation().getHostName() + " = " + edge.get("weight"));
                         }
                     }
                 }
@@ -795,25 +783,12 @@ public class TopologyViewer {
             return graph;
         }
         return null;
-        //return GraphLib.getGrid(15, 15);
     }
 
     /**
-     * Recursively creates graphical representation of the element and all its child.
+     * Clears view. Removes all elements and resets internal states.
      */
-    private void updateGraph(Graph graph, TreeLeafElement element, List<prefuse.data.Node> nodes) {
-        List<TreeLeafElement> leafsToProcess = new ArrayList<TreeLeafElement>();
-        leafsToProcess.add(element);
-        if (element instanceof TreeParentElement) {
-            for (TreeLeafElement elem : ((TreeParentElement) element).getChildren()) {
-                leafsToProcess.add(elem);
-            }
-        } else {
-
-        }
-    }
-
-    public void disconnect() {
+    public void clear() {
         if (visualization != null) {
             for (ComponentListener cl : frame.getComponentListeners()) {
                 frame.removeComponentListener(cl);
@@ -830,39 +805,7 @@ public class TopologyViewer {
             visualization.removeAction("dynamicColor");
             visualization.reset();
             visualization = null;
-
         }
-    }
-
-    /**
-     * Adds new element to the matrix. If the element is inserted into the
-     * middle of the matrix reloads everything (otherwise it's too complex to
-     * reloads only affected elements).
-     */
-    public void addView(final TreeLeafElement element) {
-        if (visualization == null) {
-            loadMatrix();
-        }
-    }
-
-    /**
-     * Removes element from the matrix. Disposes all required elements and
-     * recalculates all positions in the tree.
-     */
-    public void removeView(final TreeLeafElement element) {
-    }
-
-    /**
-     * Reloads state of the element. Finds all nodes of this element and updates
-     * their states.
-     */
-    public void updateView(final TreeLeafElement element) {
-    }
-
-    /**
-     * Clears view. Removes all elements and resets internal states.
-     */
-    public void clear() {
     }
 
     /**
