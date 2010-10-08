@@ -35,9 +35,12 @@
 package org.ow2.proactive.resourcemanager.frontend.topology;
 
 import java.util.List;
+
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.node.Node;
 
 
+@PublicAPI
 public class SingleHostExclusiveDescriptor extends SingleHostDescriptor {
     public SingleHostExclusiveDescriptor() {
         super();

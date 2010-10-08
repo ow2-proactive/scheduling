@@ -44,7 +44,7 @@ import junit.framework.Assert;
 
 import org.objectweb.proactive.core.node.Node;
 import org.ow2.proactive.resourcemanager.frontend.topology.BestProximityDescriptor;
-import org.ow2.proactive.resourcemanager.selection.topology.clustering.DistanceFunction;
+import org.ow2.proactive.resourcemanager.frontend.topology.DistanceFunction;
 import org.ow2.proactive.resourcemanager.selection.topology.clustering.HAC;
 
 import edu.emory.mathcs.backport.java.util.Collections;

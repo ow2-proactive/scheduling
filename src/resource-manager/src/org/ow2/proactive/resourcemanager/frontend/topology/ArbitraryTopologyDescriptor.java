@@ -34,6 +34,10 @@
  */
 package org.ow2.proactive.resourcemanager.frontend.topology;
 
+import org.objectweb.proactive.annotation.PublicAPI;
+
+
+@PublicAPI
 public class ArbitraryTopologyDescriptor extends TopologyDescriptor {
     public ArbitraryTopologyDescriptor() {
         super(false);

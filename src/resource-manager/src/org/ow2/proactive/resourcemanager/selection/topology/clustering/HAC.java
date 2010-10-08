@@ -48,6 +48,7 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.resourcemanager.core.RMCore;
+import org.ow2.proactive.resourcemanager.frontend.topology.DistanceFunction;
 import org.ow2.proactive.resourcemanager.frontend.topology.TopologyException;
 import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 

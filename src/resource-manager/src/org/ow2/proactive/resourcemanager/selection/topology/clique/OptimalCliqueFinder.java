@@ -38,7 +38,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.objectweb.proactive.core.node.Node;
-import org.ow2.proactive.resourcemanager.selection.topology.clustering.DistanceFunction;
+import org.ow2.proactive.resourcemanager.frontend.topology.DistanceFunction;
 
 
 /**

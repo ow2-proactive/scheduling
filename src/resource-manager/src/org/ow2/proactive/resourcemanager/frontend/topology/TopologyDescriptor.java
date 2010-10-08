@@ -35,8 +35,10 @@
 package org.ow2.proactive.resourcemanager.frontend.topology;
 
 import java.io.Serializable;
+import org.objectweb.proactive.annotation.PublicAPI;
 
 
+@PublicAPI
 public class TopologyDescriptor implements Serializable {
 
     // default descriptors without start point

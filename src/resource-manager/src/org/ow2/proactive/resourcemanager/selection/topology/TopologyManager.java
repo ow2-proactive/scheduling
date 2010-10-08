@@ -59,6 +59,7 @@ import org.ow2.proactive.resourcemanager.frontend.topology.ThresholdProximityDes
 import org.ow2.proactive.resourcemanager.frontend.topology.Topology;
 import org.ow2.proactive.resourcemanager.frontend.topology.TopologyDescriptor;
 import org.ow2.proactive.resourcemanager.frontend.topology.TopologyException;
+import org.ow2.proactive.resourcemanager.frontend.topology.TopologyImpl;
 import org.ow2.proactive.resourcemanager.selection.topology.clique.CliqueFinder;
 import org.ow2.proactive.resourcemanager.selection.topology.clique.OptimalCliqueFinder;
 import org.ow2.proactive.resourcemanager.selection.topology.clustering.HAC;
@@ -70,16 +71,15 @@ public class TopologyManager {
     private final static Logger logger = ProActiveLogger.getLogger(RMLoggers.TOPOLOGY);
 
     // hosts topology
-    private Topology topology = new Topology();
+    private Topology topology = new TopologyImpl();
     private HashMap<InetAddress, Set<Node>> nodesOnHost = new HashMap<InetAddress, Set<Node>>();
-
     private final HashMap<Class<? extends TopologyDescriptor>, TopologyHandler> handlers = new HashMap<Class<? extends TopologyDescriptor>, TopologyHandler>();
 
     public TopologyManager() {
         handlers.put(ArbitraryTopologyDescriptor.class, new ArbitraryTopologyHandler());
         handlers.put(BestProximityDescriptor.class, new BestProximityHandler());
         handlers.put(ThresholdProximityDescriptor.class, new TresholdProximityHandler());
-        handlers.put(SingleHostDescriptor.class, new TresholdProximityHandler());
+        handlers.put(SingleHostDescriptor.class, new SingleHostHandler());
         handlers.put(SingleHostExclusiveDescriptor.class, new SingleHostExclusiveHandler());
         handlers.put(MultipleHostsExclusiveDescriptor.class, new MultipleHostsExclusiveHandler());
     }
@@ -179,7 +179,7 @@ public class TopologyManager {
 
     public Topology getTopology() {
         synchronized (topology) {
-            return (Topology) topology.clone();
+            return (Topology) ((TopologyImpl) topology).clone();
         }
     }
 
@@ -242,17 +242,93 @@ public class TopologyManager {
         }
     }
 
+    private class SingleHostHandler extends TopologyHandler {
+        @Override
+        public List<Node> select(int number, List<Node> matchedNodes) {
+            if (number == 0) {
+                return new LinkedList<Node>();
+            }
+
+            List<Node> result = new LinkedList<Node>();
+            for (InetAddress host : nodesOnHost.keySet()) {
+                if (nodesOnHost.get(host).size() >= number) {
+                    // found the host with required capacity
+                    // checking that all nodes are free
+                    for (Node nodeOnHost : nodesOnHost.get(host)) {
+                        if (matchedNodes.contains(nodeOnHost)) {
+                            result.add(nodeOnHost);
+                            if (result.size() == number) {
+                                // found enough nodes on the same host
+                                return result;
+                            }
+                        } else {
+                            continue;
+                        }
+                    }
+                    result.clear();
+                }
+            }
+            return select(number - 1, matchedNodes);
+        }
+    }
+
     private class SingleHostExclusiveHandler extends TopologyHandler {
         @Override
         public List<Node> select(int number, List<Node> matchedNodes) {
-            return null;
+            if (number == 0) {
+                return new LinkedList<Node>();
+            }
+
+            for (InetAddress host : nodesOnHost.keySet()) {
+                if (nodesOnHost.get(host).size() >= number) {
+                    // found the host with required capacity
+                    // checking that all nodes are free
+                    boolean busyNode = false;
+                    for (Node nodeOnHost : nodesOnHost.get(host)) {
+                        if (!matchedNodes.contains(nodeOnHost)) {
+                            busyNode = true;
+                            break;
+                        }
+                    }
+                    // all nodes are free on host
+                    if (!busyNode) {
+                        // found enough nodes on the same host
+                        return new LinkedList<Node>(nodesOnHost.get(host));
+                    }
+                }
+            }
+            return select(number - 1, matchedNodes);
         }
     }
 
     private class MultipleHostsExclusiveHandler extends TopologyHandler {
         @Override
         public List<Node> select(int number, List<Node> matchedNodes) {
-            return null;
+            if (number == 0) {
+                return new LinkedList<Node>();
+            }
+
+            List<Node> result = new LinkedList<Node>();
+            for (InetAddress host : nodesOnHost.keySet()) {
+                boolean busyNode = false;
+                for (Node nodeOnHost : nodesOnHost.get(host)) {
+                    if (!matchedNodes.contains(nodeOnHost)) {
+                        busyNode = true;
+                        break;
+                    }
+                }
+                // all nodes are free on host
+                if (!busyNode) {
+                    // found enough nodes on the same host
+                    result.addAll(nodesOnHost.get(host));
+                    if (result.size() >= number) {
+                        // found enough nodes
+                        break;
+                    }
+                }
+            }
+
+            return result;
         }
     }
 }

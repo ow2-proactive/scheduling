@@ -32,11 +32,13 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.ow2.proactive.resourcemanager.selection.topology.clustering;
+package org.ow2.proactive.resourcemanager.frontend.topology;
 
 import java.io.Serializable;
+import org.objectweb.proactive.annotation.PublicAPI;
 
 
+@PublicAPI
 public interface DistanceFunction extends Serializable {
     /**
      * Distance recalculation function

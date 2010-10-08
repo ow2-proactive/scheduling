@@ -39,71 +39,31 @@ import java.net.InetAddress;
 import java.util.HashMap;
 import java.util.Set;
 
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.node.Node;
 
 
 /**
  *
- * Class represents the hosts topology handled by resource manager.
+ * Interface represents the hosts topology handled by resource manager.
  *
  */
-public class Topology implements Serializable, Cloneable {
+@PublicAPI
+public interface Topology extends Serializable {
 
-    // Host -> Host -> Distance
-    private HashMap<InetAddress, HashMap<InetAddress, Long>> distances = new HashMap<InetAddress, HashMap<InetAddress, Long>>();
+    public Long getDistance(Node node, Node node2);
 
-    public Long getDistance(Node node, Node node2) {
-        InetAddress host = node.getVMInformation().getInetAddress();
-        InetAddress host2 = node2.getVMInformation().getInetAddress();
-        return getDistance(host, host2);
-    }
+    public Long getDistance(InetAddress host, InetAddress host2);
 
-    public Long getDistance(InetAddress host, InetAddress host2) {
-        if (host.equals(host2)) {
-            return new Long(0);
-        } else if (distances.get(host) != null && distances.get(host).get(host2) != null) {
-            return distances.get(host).get(host2);
-        } else if (distances.get(host2) != null && distances.get(host2).get(host) != null) {
-            return distances.get(host2).get(host);
-        }
-        return null;
-    }
+    public boolean onSameHost(Node node, Node node2);
 
-    public boolean onSameHost(Node node, Node node2) {
-        return getDistance(node, node2) == 0;
-    }
+    public boolean knownHost(InetAddress host);
 
-    public Set<InetAddress> getHosts() {
-        return distances.keySet();
-    }
+    public Set<InetAddress> getHosts();
 
-    public void addHostTopology(InetAddress host, HashMap<InetAddress, Long> hostTopology) {
-        distances.put(host, hostTopology);
-    }
+    public void addHostTopology(InetAddress host, HashMap<InetAddress, Long> hostTopology);
 
-    public void removeHostTopology(InetAddress host) {
-        distances.remove(host);
-        // removing links to "host"
-        for (InetAddress h : distances.keySet()) {
-            if (distances.get(h).containsKey(host)) {
-                distances.get(h).remove(host);
-            }
-        }
-    }
+    public void removeHostTopology(InetAddress host);
 
-    public HashMap<InetAddress, Long> getHostTopology(InetAddress host) {
-        return distances.get(host);
-    }
-
-    public boolean knownHost(InetAddress host) {
-        return distances.containsKey(host);
-    }
-
-    public Object clone() {
-        try {
-            return super.clone();
-        } catch (CloneNotSupportedException e) {
-        }
-        return null;
-    }
+    public HashMap<InetAddress, Long> getHostTopology(InetAddress host);
 }

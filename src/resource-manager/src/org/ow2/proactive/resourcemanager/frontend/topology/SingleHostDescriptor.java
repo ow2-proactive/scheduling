@@ -36,9 +36,11 @@ package org.ow2.proactive.resourcemanager.frontend.topology;
 
 import java.util.List;
 
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.node.Node;
 
 
+@PublicAPI
 public class SingleHostDescriptor extends ThresholdProximityDescriptor {
     public SingleHostDescriptor() {
         super(0);

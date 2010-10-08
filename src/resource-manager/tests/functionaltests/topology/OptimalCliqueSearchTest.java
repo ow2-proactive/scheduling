@@ -45,9 +45,9 @@ import junit.framework.Assert;
 
 import org.objectweb.proactive.core.node.Node;
 import org.ow2.proactive.resourcemanager.frontend.topology.BestProximityDescriptor;
+import org.ow2.proactive.resourcemanager.frontend.topology.DistanceFunction;
 import org.ow2.proactive.resourcemanager.selection.topology.clique.CliqueFinder;
 import org.ow2.proactive.resourcemanager.selection.topology.clique.OptimalCliqueFinder;
-import org.ow2.proactive.resourcemanager.selection.topology.clustering.DistanceFunction;
 
 import functionaltests.RMTHelper;
 

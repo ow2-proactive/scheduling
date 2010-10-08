@@ -36,11 +36,11 @@ package org.ow2.proactive.resourcemanager.frontend.topology;
 
 import java.util.List;
 
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.node.Node;
-import org.ow2.proactive.resourcemanager.selection.topology.clustering.DistanceFunction;
 
 
-// if nodes == null => floating pivot
+@PublicAPI
 public class BestProximityDescriptor extends TopologyDescriptor {
 
     // pivot nodes
