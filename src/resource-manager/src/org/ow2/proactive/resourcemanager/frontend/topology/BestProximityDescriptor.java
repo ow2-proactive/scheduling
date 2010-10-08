@@ -59,7 +59,12 @@ public class BestProximityDescriptor extends TopologyDescriptor {
     protected List<Node> pivot = null;
     protected DistanceFunction function;
 
-    /** AVG - the mean distance between elements of each cluster (also called average linkage clustering) */
+    /**
+     * AVG - the mean distance between elements of each cluster (also called average linkage clustering)
+     * The similarity of two clusters is the similarity of their centers.
+     * This complete-link merge criterion is non-local; the entire structure of the
+     * clustering can influence merge decisions.
+     */
     public final static DistanceFunction AVG = new DistanceFunction() {
         public long distance(long d1, long d2) {
             // not connected
@@ -70,7 +75,12 @@ public class BestProximityDescriptor extends TopologyDescriptor {
         }
     };
 
-    /** MAX - the maximum distance between elements of each cluster (also called complete linkage clustering) */
+    /**
+     * MAX - the maximum distance between elements of each cluster (also called complete linkage clustering)
+     * The similarity of two clusters is the similarity of their most dissimilar members.
+     * This complete-link merge criterion is non-local; the entire structure of the
+     * clustering can influence merge decisions.
+     */
     public final static DistanceFunction MAX = new DistanceFunction() {
         public long distance(long d1, long d2) {
             // not connected
@@ -81,7 +91,12 @@ public class BestProximityDescriptor extends TopologyDescriptor {
         }
     };
 
-    /** MIN - the minimum distance between elements of each cluster (also called single-linkage clustering) */
+    /**
+     * MIN - the minimum distance between elements of each cluster (also called single-linkage clustering)
+     * The similarity of two clusters is the similarity of their most similar members.
+     * This single-link merge criterion is local. We pay attention solely to the area where
+     * the two clusters come closest to each other.
+     */
     public final static DistanceFunction MIN = new DistanceFunction() {
         public long distance(long d1, long d2) {
             return Math.min(d1, d2);
@@ -129,6 +144,6 @@ public class BestProximityDescriptor extends TopologyDescriptor {
      * @return the distance function
      */
     public DistanceFunction getDistanceFunction() {
-        return function == null ? AVG : function;
+        return function == null ? MAX : function;
     }
 }

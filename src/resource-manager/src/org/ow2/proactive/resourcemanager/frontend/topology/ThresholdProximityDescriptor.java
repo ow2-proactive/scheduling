@@ -53,7 +53,7 @@ public class ThresholdProximityDescriptor extends BestProximityDescriptor {
     /**
      * Creates a new instance of the descriptor with specified threshold.
      *
-     * @param threshold parameter defining maximum distance value between nodes
+     * @param threshold parameter defining maximum distance value between nodes (in microseconds)
      */
     public ThresholdProximityDescriptor(long threshold) {
         if (threshold < 0) {
@@ -76,7 +76,7 @@ public class ThresholdProximityDescriptor extends BestProximityDescriptor {
     }
 
     /**
-     * Gets the threshold value
+     * Gets the threshold value (in microseconds)
      * @return the threshold value
      */
     public long getThreshold() {

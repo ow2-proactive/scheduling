@@ -259,6 +259,10 @@ public class TopologyManager {
             if (number == 0) {
                 return new LinkedList<Node>();
             }
+            if (number > matchedNodes.size()) {
+                // cannot select more than matchedNodes.size()
+                number = matchedNodes.size();
+            }
 
             List<Node> result = new LinkedList<Node>();
             for (InetAddress host : nodesOnHost.keySet()) {
@@ -313,6 +317,14 @@ public class TopologyManager {
 
         private List<Node> selectRecursively(int number, List<InetAddress> hostsSortedByNodesNumber,
                 List<Node> matchedNodes) {
+
+            if (number == 0) {
+                return new LinkedList<Node>();
+            }
+            if (number > matchedNodes.size()) {
+                // cannot select more than matchedNodes.size()
+                number = matchedNodes.size();
+            }
 
             List<InetAddress> busyHosts = new LinkedList<InetAddress>();
             for (InetAddress host : hostsSortedByNodesNumber) {

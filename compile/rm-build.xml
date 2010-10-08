@@ -116,7 +116,12 @@
 			testsuite="rm.testsuite"
 			testclasspath="rm.test.classpath"
 			log4jconfig="-Dlog4j.configuration=file:${base.dir}/compile/rm-log4j"
-		/>
+		>
+            <jvmargs>
+                    <jvmarg value="-DneighborHost=${neighborHost}" />
+                    <jvmarg value="-DdistantHost=${distantHost}" />
+            </jvmargs>
+		</junitMacro>
 	</target>
 
 	<!-- ************
