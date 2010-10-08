@@ -84,8 +84,10 @@ public abstract class SelectionManager {
 
     private RMCore rmcore;
 
-    private ExecutorService scriptExecutorThreadPool = Executors
-            .newFixedThreadPool(PAResourceManagerProperties.RM_SELECTION_MAX_THREAD_NUMBER.getValueAsInt());
+    private static final int SELECTION_THEADS_NUMBER = PAResourceManagerProperties.RM_SELECTION_MAX_THREAD_NUMBER
+            .getValueAsInt();
+
+    private ExecutorService scriptExecutorThreadPool = Executors.newFixedThreadPool(SELECTION_THEADS_NUMBER);
 
     private Set<String> inProgress = Collections.synchronizedSet(new HashSet<String>());
 
@@ -152,9 +154,20 @@ public abstract class SelectionManager {
             // until required node set is found
             matchedNodes = new LinkedList<Node>();
             while (matchedNodes.size() < number) {
-                int currentRequiredNodesNumber = number - matchedNodes.size();
+                int requiredNodesNumber = number - matchedNodes.size();
+                int numberOfNodesForScriptExecution = requiredNodesNumber;
 
-                List<RMNode> subset = arrangedNodes.subList(0, Math.min(currentRequiredNodesNumber,
+                if (numberOfNodesForScriptExecution < SELECTION_THEADS_NUMBER) {
+                    // we can run "SELECTION_THEADS_NUMBER" scripts in parallel
+                    // in case when we need less nodes it still useful to
+                    // the full capacity of the thread pool to find nodes quicker
+
+                    // it is not important if we find more nodes than needed
+                    // subset will be selected later (topology handlers)
+                    numberOfNodesForScriptExecution = SELECTION_THEADS_NUMBER;
+                }
+
+                List<RMNode> subset = arrangedNodes.subList(0, Math.min(numberOfNodesForScriptExecution,
                         arrangedNodes.size()));
                 matchedNodes.addAll(runScripts(subset, scripts));
                 // removing subset of arrangedNodes

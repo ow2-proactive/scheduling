@@ -38,6 +38,7 @@ import java.net.InetAddress;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -118,7 +119,7 @@ public class TopologyManager {
                 // host topology is already known
                 logger.debug("The topology information has been already added for node " +
                     node.getNodeInformation().getURL());
-                nodesOnHost.get(node.getVMInformation().getInetAddress()).add(node);
+                nodesOnHost.get(host).add(node);
                 return;
             }
         }
@@ -132,9 +133,9 @@ public class TopologyManager {
                 toPing.add(nodesOnHost.get(h).iterator().next());
             }
         }
+
         HashMap<InetAddress, Long> hostsTopology = pingNode(node, toPing);
         synchronized (topology) {
-
             topology.addHostTopology(node.getVMInformation().getHostName(), host, hostsTopology);
             Set<Node> nodesSet = new HashSet<Node>();
             nodesSet.add(node);
@@ -158,6 +159,7 @@ public class TopologyManager {
                 if (nodesOnHost.get(host).size() == 0) {
                     // no more nodes on the host
                     topology.removeHostTopology(node.getVMInformation().getHostName(), host);
+                    nodesOnHost.remove(host);
                 }
             }
         }
