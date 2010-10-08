@@ -263,4 +263,75 @@ public class MatrixBasedTests {
                 doHACTest(W, H, probCorners, bipartPivot, infinity, 1).equals(resultCorners));
     }
 
+    @org.junit.Test
+    public void consequencyTest() {
+        Long infinity = new Long(99999);
+        int W = 10;
+        int H = 5;
+        String prob =   "22........" +
+                        "22........" +
+                        ".........." +
+                        ".........." +
+                        "..........";
+
+        String pivotSW= "00........" +
+                        "10........" +
+                        ".........." +
+                        ".........." +
+                        "..........";
+
+        String resultSW=".........." +
+                        "2........." +
+                        ".........." +
+                        ".........." +
+                        "..........";
+
+        assertTrue("The algorithm did not choose the closest nodes!",
+                doHACTest(W, H, prob, pivotSW, infinity, 1).equals(resultSW));
+
+        String pivotNW= "10........" +
+                        "00........" +
+                        ".........." +
+                        ".........." +
+                        "..........";
+
+        String resultNW="2........." +
+                        ".........." +
+                        ".........." +
+                        ".........." +
+                        "..........";
+
+        assertTrue("The algorithm did not choose the closest nodes!",
+                doHACTest(W, H, prob, pivotNW, infinity, 1).equals(resultNW));
+
+        String pivotNE= "01........" +
+                        "00........" +
+                        ".........." +
+                        ".........." +
+                        "..........";
+
+        String resultNE=".2........" +
+                        ".........." +
+                        ".........." +
+                        ".........." +
+                        "..........";
+
+        assertTrue("The algorithm did not choose the closest nodes!",
+                doHACTest(W, H, prob, pivotNE, infinity, 1).equals(resultNE));
+
+        String pivotSE= "00........" +
+                        "01........" +
+                        ".........." +
+                        ".........." +
+                        "..........";
+
+        String resultSE=".........." +
+                        ".2........" +
+                        ".........." +
+                        ".........." +
+                        "..........";
+
+        assertTrue("The algorithm did not choose the closest nodes!",
+                doHACTest(W, H, prob, pivotSE, infinity, 1).equals(resultSE));
+    }
 }
