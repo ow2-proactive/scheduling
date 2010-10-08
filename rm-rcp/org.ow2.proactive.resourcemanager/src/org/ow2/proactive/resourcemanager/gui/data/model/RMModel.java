@@ -294,7 +294,7 @@ public class RMModel implements Serializable {
     private void addNodeToTopologyView(Node node) {
         //actualize tree view if exists
         if (updateViews && ResourcesTopologyView.getTopologyViewer() != null) {
-            ResourcesTopologyView.getTopologyViewer().addNode(node.getName());
+            ResourcesTopologyView.getTopologyViewer().addNode(node);
         }
     }
 

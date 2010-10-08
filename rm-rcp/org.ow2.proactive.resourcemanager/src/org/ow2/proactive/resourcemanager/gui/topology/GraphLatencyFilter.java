@@ -151,7 +151,7 @@ public class GraphLatencyFilter extends GroupAction {
                 while (edgesIt.hasNext()) {
                     EdgeItem edge = (EdgeItem) (edgesIt.next());
                     NodeItem node = edge.getAdjacentItem(fixedNode);
-                    Double latency = (Double) (edge.get("weight"));
+                    Integer latency = (Integer) (edge.get("weight"));
                     if (!exclusive && (latency <= m_latency || node.isFixed())) {
                         visiblesNodes.add(node);
                     } else if (exclusive && latency > m_latency && !node.isFixed()) {
