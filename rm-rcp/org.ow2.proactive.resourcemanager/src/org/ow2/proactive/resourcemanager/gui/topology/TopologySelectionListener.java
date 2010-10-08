@@ -46,7 +46,6 @@ import org.ow2.proactive.resourcemanager.gui.data.model.Node;
 import org.ow2.proactive.resourcemanager.gui.data.model.TreeElementType;
 import org.ow2.proactive.resourcemanager.gui.data.model.TreeLeafElement;
 import org.ow2.proactive.resourcemanager.gui.data.model.TreeParentElement;
-import org.ow2.proactive.resourcemanager.gui.handlers.RemoveNodesHandler;
 import org.ow2.proactive.resourcemanager.gui.views.ResourcesTopologyView;
 
 

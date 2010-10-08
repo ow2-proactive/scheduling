@@ -68,9 +68,9 @@ import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -80,8 +80,6 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.ow2.proactive.resourcemanager.common.NodeState;
-import org.ow2.proactive.resourcemanager.frontend.topology.BestProximityDescriptor;
-import org.ow2.proactive.resourcemanager.frontend.topology.DistanceFunction;
 import org.ow2.proactive.resourcemanager.frontend.topology.Topology;
 import org.ow2.proactive.resourcemanager.frontend.topology.clustering.Cluster;
 import org.ow2.proactive.resourcemanager.gui.data.RMStore;
@@ -162,7 +160,6 @@ public class TopologyViewer {
     /** Biggest latency of the graph */
     private long maxLatency;
     private int nbClusters = 0;
-    private String clusteringMode = "Avg";
 
     /*
      *  GUI Objects
@@ -173,12 +170,12 @@ public class TopologyViewer {
     private Visualization visualization;
     /** Slider for selecting the latency threshold of nodes to display */
     private JValueSlider latencySlider;
-    private JCheckBox runLayout;
     private ColorAction edgeColor;
     private TopologyForceDirectedLayout topologyForceDirectedLayout;
     private GraphLatencyFilter latencyFilter;
     /** palette of color used to draw edges in function of their latency */
     int[] defaultPalette = new int[226];
+    //private ButtonGroup clusteringMode = new ButtonGroup();
 
     /** Name of the graph */
     public static final String GRAPH = "graph";
@@ -192,6 +189,12 @@ public class TopologyViewer {
         DECORATOR_SCHEMA.setDefault(VisualItem.INTERACTIVE, false);
         DECORATOR_SCHEMA.setDefault(VisualItem.TEXTCOLOR, ColorLib.gray(60));
         DECORATOR_SCHEMA.setDefault(VisualItem.FONT, FontLib.getFont("Tahoma", 11));
+
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 
     /**
@@ -411,8 +414,6 @@ public class TopologyViewer {
                 if (visualization == null) {
                     Display.getDefault().syncExec(new Runnable() {
                         public void run() {
-                            // graph =
-                            // createGraph("/auto/sop-nas2a/u/sop-nas2a/vol/home_oasis/mvaldene/workspace/graph8.txt");
                             graph = createGraph(topology);
                             if (graph == null) {
                                 return;
@@ -521,7 +522,7 @@ public class TopologyViewer {
                             // create an action list with an animated layout
                             // the INFINITY parameter tells the action list to
                             // run indefinitely
-                            final ActionList layout = new ActionList(Activity.INFINITY);
+                            final ActionList layout = new ActionList(5000);
                             topologyForceDirectedLayout = new TopologyForceDirectedLayout(GRAPH, m_fsim,
                                 false);
                             layout.add(topologyForceDirectedLayout);
@@ -592,82 +593,99 @@ public class TopologyViewer {
         fpanel.setPreferredSize(new Dimension(300, parent.getSize().y));
         fpanel.setMaximumSize(new Dimension(300, parent.getSize().y));
 
-        final JValueSlider springForceSlider = new JValueSlider("Distance",
+        final JValueSlider springForceSlider = new JValueSlider("Spring force",
             TopologyForceDirectedLayout.COEFF_MIN, TopologyForceDirectedLayout.COEFF_MAX,
             topologyForceDirectedLayout.getSpringLenghtCoeff());
         springForceSlider.setBackground(Color.WHITE);
-        springForceSlider.setPreferredSize(new Dimension(300, 20));
-        springForceSlider.setMaximumSize(new Dimension(300, 20));
+        springForceSlider.setPreferredSize(new Dimension(300, 40));
+        springForceSlider.setMaximumSize(new Dimension(300, 40));
         springForceSlider.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
                 topologyForceDirectedLayout.setSpringLengthCoeff(springForceSlider.getValue().floatValue());
+                visualization.run("layout");
             }
         });
 
-        // Slider to select number of clusters
-        final JValueSlider clustersSlider = new JValueSlider("Clusters", 0, 6, 0);
-        clustersSlider.setBackground(Color.WHITE);
-        clustersSlider.setPreferredSize(new Dimension(300, 22));
-        clustersSlider.setMaximumSize(new Dimension(300, 22));
-        clustersSlider.addChangeListener(new ChangeListener() {
-            public void stateChanged(ChangeEvent e) {
-                int nb = clustersSlider.getValue().intValue();
-                if (nb != nbClusters) {
-                    nbClusters = nb;
-                    clusterize();
-                }
-            }
-        });
-
-        final JComboBox clusterAlgo = new JComboBox();
-        clusterAlgo.addItem("Min");
-        clusterAlgo.addItem("Avg");
-        clusterAlgo.addItem("Max");
-        clusterAlgo.setSelectedIndex(1);
-        //							clusterAlgo.setToolTipText("Select th");
-        clusterAlgo.setBackground(Color.WHITE);
-        clusterAlgo.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                String item = (String) clusterAlgo.getSelectedItem();
-                //				fpanel.repaint();
-                if (!item.equals(clusteringMode)) {
-                    clusteringMode = item;
-                    clusterize();
-                }
-            }
-        });
-        clusterAlgo.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                super.mouseClicked(e);
-                fpanel.repaint();
-            }
-        });
-
-        // box of 'clusterAlgo' combobox + label
-        Box clusterAlgoBox = new Box(BoxLayout.X_AXIS);
-        clusterAlgoBox.setPreferredSize(new Dimension(300, 20));
-        clusterAlgoBox.setMaximumSize(new Dimension(300, 20));
-        clusterAlgoBox.add(Box.createVerticalGlue());
-        JLabel lab = new JLabel("Mode");
-        lab.setToolTipText("Set clustering selection mode");
-        clusterAlgoBox.add(lab);
-        clusterAlgoBox.add(Box.createRigidArea(new Dimension(70, 20)));
-        clusterAlgoBox.add(clusterAlgo);
-
-        // Box containing ClusersSlider and
-        Box ClusterBox = new Box(BoxLayout.Y_AXIS);
-        ClusterBox.setPreferredSize(new Dimension(300, 44));
-        ClusterBox.setMaximumSize(new Dimension(300, 44));
-        ClusterBox.add(clustersSlider);
-        ClusterBox.add(clusterAlgoBox);
+        //	TODO: add clustering information to the topology view
+        //        // Slider to select number of clusters
+        //        final JValueSlider clustersSlider = new JValueSlider("Clusters", 0, 6, 0);
+        //        clustersSlider.setBackground(Color.WHITE);
+        //        clustersSlider.setPreferredSize(new Dimension(300, 22));
+        //        clustersSlider.setMaximumSize(new Dimension(300, 22));
+        //        clustersSlider.addChangeListener(new ChangeListener() {
+        //            public void stateChanged(ChangeEvent e) {
+        //                int nb = clustersSlider.getValue().intValue();
+        //                if (nb != nbClusters) {
+        //                    nbClusters = nb;
+        //                    clusterize();
+        //                }
+        //            }
+        //        });
+        //
+        //        JRadioButton max = new JRadioButton("MAX");
+        //        max.setSelected(true);
+        //        JRadioButton avg = new JRadioButton("AVG");
+        //        JRadioButton min = new JRadioButton("MIN");
+        //
+        //        clusteringMode.add(max);
+        //        clusteringMode.add(avg);
+        //        clusteringMode.add(min);
+        //
+        //        max.addActionListener(new ActionListener() {
+        //			public void actionPerformed(ActionEvent e) {
+        //				String clusteringModeStr = clusteringMode.getSelection().toString();
+        //				if (nbClusters <= 0 ) {
+        //					return;
+        //				}
+        //		        List<Cluster<String>> clusters = topology.clusterize(nbClusters, BestProximityDescriptor.MAX);
+        //		        clusterize(clusters);
+        //			}
+        //		});
+        //        avg.addActionListener(new ActionListener() {
+        //			public void actionPerformed(ActionEvent e) {
+        //				if (nbClusters <= 0 ) {
+        //					return;
+        //				}
+        //		        List<Cluster<String>> clusters = topology.clusterize(nbClusters, BestProximityDescriptor.AVG);
+        //		        clusterize(clusters);
+        //			}
+        //		});
+        //        min.addActionListener(new ActionListener() {
+        //			public void actionPerformed(ActionEvent e) {
+        //				if (nbClusters <= 0 ) {
+        //					return;
+        //				}
+        //		        List<Cluster<String>> clusters = topology.clusterize(nbClusters, BestProximityDescriptor.MIN);
+        //		        clusterize(clusters);
+        //			}
+        //		});
+        //
+        //        // box of 'clusterAlgo' combobox + label
+        //        Box clusterAlgoBox = new Box(BoxLayout.X_AXIS);
+        //        clusterAlgoBox.setPreferredSize(new Dimension(300, 20));
+        //        clusterAlgoBox.setMaximumSize(new Dimension(300, 20));
+        //        clusterAlgoBox.add(Box.createVerticalGlue());
+        //        JLabel lab = new JLabel("Mode");
+        //        lab.setToolTipText("Set clustering selection mode");
+        //        clusterAlgoBox.add(lab);
+        //        clusterAlgoBox.add(Box.createRigidArea(new Dimension(70, 20)));
+        //        clusterAlgoBox.add(max);
+        //        clusterAlgoBox.add(avg);
+        //        clusterAlgoBox.add(min);
+        //
+        //        // Box containing ClusersSlider and
+        //        Box ClusterBox = new Box(BoxLayout.Y_AXIS);
+        //        ClusterBox.setPreferredSize(new Dimension(300, 44));
+        //        ClusterBox.setMaximumSize(new Dimension(300, 44));
+        //        ClusterBox.add(clustersSlider);
+        //        ClusterBox.add(clusterAlgoBox);
 
         // max latency slider, set the latency threshold
         latencySlider = new JValueSlider("Threshold", 0, maxLatency > 0 ? maxLatency : 1, maxLatency);
         latencySlider.setToolTipText("Set the latency threshold of neighbours of selected nodes to display");
         latencySlider.setBackground(Color.WHITE);
-        latencySlider.setPreferredSize(new Dimension(300, 20));
-        latencySlider.setMaximumSize(new Dimension(300, 20));
+        latencySlider.setPreferredSize(new Dimension(300, 40));
+        latencySlider.setMaximumSize(new Dimension(300, 40));
         latencySlider.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
                 latencyFilter.setLatencyThreshold(latencySlider.getValue().longValue());
@@ -675,38 +693,6 @@ public class TopologyViewer {
                 visualization.run("dynamicColor");
             }
         });
-
-        // checkbox, set the latency filter exclusive mode
-        final JCheckBox exclusive = new JCheckBox("");
-        exclusive
-                .setToolTipText("If exclusive show only neighbours of selected nodes whose latency with all selected nodes is under the threshold");
-        exclusive.setBackground(Color.WHITE);
-        exclusive.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                latencyFilter.setExclusive(exclusive.isSelected());
-                latencyFilter.run();
-                visualization.run("dynamicColor");
-            }
-        });
-
-        // box of 'exclusive' checkbox + label
-        Box exclusiveBox = new Box(BoxLayout.X_AXIS);
-        exclusiveBox.setPreferredSize(new Dimension(300, 20));
-        exclusiveBox.setMaximumSize(new Dimension(300, 20));
-        exclusiveBox.add(Box.createVerticalGlue());
-        JLabel lab1 = new JLabel("Exclusive");
-        lab1
-                .setToolTipText("If exclusive show only neighbours of selected nodes whose latency with all selected nodes is under the threshold");
-        exclusiveBox.add(lab1);
-        exclusiveBox.add(Box.createRigidArea(new Dimension(46, 20)));
-        exclusiveBox.add(exclusive);
-        // cf2.setBorder(BorderFactory.createLoweredBevelBorder());
-
-        Box latencyFilterBox = new Box(BoxLayout.Y_AXIS);
-        latencyFilterBox.setPreferredSize(new Dimension(300, 44));
-        latencyFilterBox.setMaximumSize(new Dimension(300, 44));
-        latencyFilterBox.add(latencySlider);
-        latencyFilterBox.add(exclusiveBox);
 
         // checkbox to show/hide edges of unselected nodes
         final JCheckBox displayEdges = new JCheckBox("");
@@ -732,48 +718,21 @@ public class TopologyViewer {
 
         // Box of 'displayEdges' checkbox
         Box displayEdgesBox = new Box(BoxLayout.X_AXIS);
-        displayEdgesBox.setPreferredSize(new Dimension(300, 28));
-        displayEdgesBox.setMaximumSize(new Dimension(300, 28));
+        displayEdgesBox.setPreferredSize(new Dimension(300, 40));
+        displayEdgesBox.setMaximumSize(new Dimension(300, 40));
         displayEdgesBox.add(Box.createVerticalGlue());
-        JLabel lab2 = new JLabel("Edges");
+        JLabel lab2 = new JLabel("Show edges");
         lab2.setToolTipText("Show/hide edges of unselected nodes");
         displayEdgesBox.add(lab2);
-        displayEdgesBox.add(Box.createRigidArea(new Dimension(66, 28)));
+        displayEdgesBox.add(Box.createRigidArea(new Dimension(30, 40)));
         displayEdgesBox.add(displayEdges);
-
-        // checkBox to run/stop the animation of the force layout
-        runLayout = new JCheckBox("");
-        runLayout.setToolTipText("Run/Stop the animation");
-        runLayout.setBackground(Color.WHITE);
-        runLayout.setSelected(true);
-        runLayout.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                if (runLayout.isSelected()) {
-                    visualization.run("layout");
-                } else {
-                    visualization.cancel("layout");
-                }
-            }
-        });
-
-        // Box of the 'runLayout' checkBox
-        Box runLayoutBox = new Box(BoxLayout.X_AXIS);
-        runLayoutBox.setPreferredSize(new Dimension(300, 28));
-        runLayoutBox.setMaximumSize(new Dimension(300, 28));
-        runLayoutBox.add(Box.createVerticalGlue());
-        JLabel lab3 = new JLabel("Animation");
-        lab3.setToolTipText("Run/Stop the animation");
-        runLayoutBox.add(lab3);
-        runLayoutBox.add(Box.createRigidArea(new Dimension(38, 28)));
-        runLayoutBox.add(runLayout);
 
         // box of visibility filter
         Box visibilityFilterBox = new Box(BoxLayout.Y_AXIS);
         visibilityFilterBox.add(springForceSlider);
-        visibilityFilterBox.add(ClusterBox);
-        visibilityFilterBox.add(latencyFilterBox);
+        //visibilityFilterBox.add(ClusterBox);
+        visibilityFilterBox.add(latencySlider);
         visibilityFilterBox.add(displayEdgesBox);
-        visibilityFilterBox.add(runLayoutBox);
         visibilityFilterBox.setBorder(BorderFactory.createTitledBorder("Visibility filter"));
         fpanel.add(visibilityFilterBox);
 
@@ -791,7 +750,7 @@ public class TopologyViewer {
 
         frame.addWindowListener(new WindowAdapter() {
             public void windowActivated(WindowEvent e) {
-                if (visualization != null && runLayout.isSelected()) {
+                if (visualization != null) {
                     visualization.run("layout");
                 }
             }
@@ -1009,28 +968,6 @@ public class TopologyViewer {
         }
     }
 
-    private void clusterize() {
-        visualization.cancel("cluster");
-        visualization.cancel("layout");
-        DistanceFunction df;
-        if (clusteringMode.equals("Min")) {
-            df = BestProximityDescriptor.MIN;
-        } else if (clusteringMode.equals("Avg")) {
-            df = BestProximityDescriptor.AVG;
-        } else {
-            df = BestProximityDescriptor.MAX;
-        }
-        List<Cluster<String>> clusters = (nbClusters > 0) ? topology.clusterize(nbClusters, df) : null;
-        clusterize(clusters);
-        visualization.run("cluster");
-        if (runLayout.isSelected()) {
-            visualization.run("layout");
-        }
-        if (nbClusters == 0) {
-            visualization.cancel("cluster");
-        }
-    }
-
     public void clusterize(List<Cluster<String>> clusters) {
         AggregateTable at = (AggregateTable) visualization.getGroup(CLUSTERS);
         Table nodes = graph.getNodeTable();
@@ -1056,6 +993,9 @@ public class TopologyViewer {
             }
         }
         visualization.run("unique");
+        if (nbClusters > 0) {
+            visualization.run("cluster");
+        }
     }
 
     /**
