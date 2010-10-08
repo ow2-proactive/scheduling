@@ -61,8 +61,6 @@ import org.ow2.proactive.resourcemanager.frontend.topology.Topology;
 import org.ow2.proactive.resourcemanager.frontend.topology.TopologyDescriptor;
 import org.ow2.proactive.resourcemanager.frontend.topology.TopologyException;
 import org.ow2.proactive.resourcemanager.frontend.topology.TopologyImpl;
-import org.ow2.proactive.resourcemanager.selection.topology.clique.CliqueFinder;
-import org.ow2.proactive.resourcemanager.selection.topology.clique.OptimalCliqueFinder;
 import org.ow2.proactive.resourcemanager.selection.topology.clustering.HAC;
 import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 
@@ -124,7 +122,7 @@ public class TopologyManager {
         }
         HashMap<InetAddress, Long> hostTopology = pingNode(node, toPing);
         synchronized (topology) {
-            topology.addHostTopology(host, hostTopology);
+            topology.addHostTopology(node.getVMInformation().getHostName(), host, hostTopology);
             Set<Node> nodesSet = new HashSet<Node>();
             nodesSet.add(node);
             nodesOnHost.put(node.getVMInformation().getInetAddress(), nodesSet);
@@ -146,7 +144,7 @@ public class TopologyManager {
                 nodesOnHost.get(host).remove(node);
                 if (nodesOnHost.get(host).size() == 0) {
                     // no more nodes on the host
-                    topology.removeHostTopology(host);
+                    topology.removeHostTopology(node.getVMInformation().getHostName(), host);
                 }
             }
         }
@@ -218,18 +216,6 @@ public class TopologyManager {
                 logger.info("Running clustering algorithm in order to find closest nodes");
                 HAC hac = new HAC(descriptor.getPivot(), descriptor.getDistanceFunction(), Long.MAX_VALUE);
                 return hac.select(number, matchedNodes);
-                /*
-                List<Node> hacResult = hac.select(number, matchedNodes);
-                if (hacResult.size() < number && hacResult.size() < matchedNodes.size()) {
-                    logger
-                            .info("Switching to clique search algorithm as clustering did not produce a required node set");
-                    OptimalCliqueFinder cliqueFinder = new OptimalCliqueFinder(descriptor.getPivot(),
-                        Long.MAX_VALUE, descriptor.getDistanceFunction());
-                    return cliqueFinder.getClique(number, matchedNodes);
-                } else {
-                    return hacResult;
-                }
-                 */
             }
         }
     }
@@ -243,13 +229,6 @@ public class TopologyManager {
                 HAC hac = new HAC(descriptor.getPivot(), BestProximityDescriptor.MAX, descriptor
                         .getThreshold());
                 return hac.select(number, matchedNodes);
-                /*
-                 logger
-                 .info("Running clique search algorithm in order to find nodes with threshold proximity " +
-                 descriptor.getThreshold());
-                 CliqueFinder cliqueFinder = new CliqueFinder(descriptor.getPivot(), descriptor.getThreshold());
-                 return cliqueFinder.getClique(number, matchedNodes);
-                 */
             }
         }
     }

@@ -82,27 +82,4 @@ public class NodePinger {
 
         return minPing;
     }
-    /*
-    private Long pingNode(InetAddress host) {
-
-        final int ATTEMPS = 10;
-        long minPing = Long.MAX_VALUE;
-        for (int i = 0; i < ATTEMPS; i++) {
-            long start = System.nanoTime();
-            host.isReachable(60 * 1000);
-            try {
-                node.getNumberOfActiveObjects();
-            } catch (Exception e) {
-                // cannot reach the node
-                return (long) -1;
-            }
-
-            // microseconds
-            long ping = (System.nanoTime() - start) / 1000;
-            if (ping < minPing)
-                minPing = ping;
-        }
-
-        return minPing;
-    }*/
 }

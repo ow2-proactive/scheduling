@@ -8,9 +8,9 @@ import prefuse.visual.VisualItem;
 
 public class TopologyForceDirectedLayout extends ForceDirectedLayout {
 
-	public final static float COEFF_MIN = 0;
-	public final static float COEFF_MAX= 400;
-	private float coeff = 80;
+    public final static float COEFF_MIN = 0;
+    public final static float COEFF_MAX = 400;
+    private float coeff = 80;
 
     /**
      * Create a new ForceDirectedLayout. By default, this layout will not
@@ -90,18 +90,18 @@ public class TopologyForceDirectedLayout extends ForceDirectedLayout {
     }
 
     public void setSpringLengthCoeff(float coeff) {
-	if (coeff >= COEFF_MIN && coeff <= COEFF_MAX) {
-		this.coeff = coeff;
-	}
+        if (coeff >= COEFF_MIN && coeff <= COEFF_MAX) {
+            this.coeff = coeff;
+        }
     }
 
     public float getSpringLenghtCoeff() {
-	return coeff;
+        return coeff;
     }
 
     @Override
     protected float getSpringLength(EdgeItem arg0) {
-//        float coeff = getForceSimulator().getForces()[2].getParameter(1);
+        //        float coeff = getForceSimulator().getForces()[2].getParameter(1);
         double val = arg0.getLong("weight") / 150.0;
         //		float val = (float) Math.log(arg0.getFloat("weight")+1);
         //		return (val+1) * (val+1) * coeff;

@@ -53,17 +53,20 @@ public interface Topology extends Serializable {
 
     public Long getDistance(Node node, Node node2);
 
-    public Long getDistance(InetAddress host, InetAddress host2);
+    public Long getDistance(InetAddress hostAddress, InetAddress hostAddress2);
+
+    public Long getDistance(String hostName, String hostName2);
 
     public boolean onSameHost(Node node, Node node2);
 
-    public boolean knownHost(InetAddress host);
+    public boolean knownHost(InetAddress hostAddress);
 
     public Set<InetAddress> getHosts();
 
-    public void addHostTopology(InetAddress host, HashMap<InetAddress, Long> hostTopology);
+    public void addHostTopology(String hostName, InetAddress hostAddress,
+            HashMap<InetAddress, Long> hostTopology);
 
-    public void removeHostTopology(InetAddress host);
+    public void removeHostTopology(String hostName, InetAddress hostAddress);
 
-    public HashMap<InetAddress, Long> getHostTopology(InetAddress host);
+    public HashMap<InetAddress, Long> getHostTopology(InetAddress hostAddress);
 }

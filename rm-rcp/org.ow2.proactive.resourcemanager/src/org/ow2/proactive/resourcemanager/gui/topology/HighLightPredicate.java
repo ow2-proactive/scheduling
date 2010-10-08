@@ -7,15 +7,14 @@ import prefuse.data.expression.NotPredicate;
 import prefuse.data.expression.Predicate;
 import prefuse.visual.VisualItem;
 
+
 /**
  * Expression that indicates if an item is currently under the mouse
  * pointer.
  *
  * @author <a href="http://jheer.org">jeffrey heer</a>
  */
-public class HighLightPredicate extends ColumnExpression
-    implements Predicate, Function
-{
+public class HighLightPredicate extends ColumnExpression implements Predicate, Function {
     /** Convenience instance for the hover == true case. */
     public static final Predicate TRUE = new HighLightPredicate();
     /** Convenience instance for the hover == false case. */
@@ -53,7 +52,7 @@ public class HighLightPredicate extends ColumnExpression
      * @see java.lang.Object#toString()
      */
     public String toString() {
-        return getName()+"()";
+        return getName() + "()";
     }
 
 } // end of class HoverPredicate
