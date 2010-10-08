@@ -106,19 +106,29 @@ public class BestProximityDescriptor extends TopologyDescriptor {
 
     /**
      * Constructs new instance of the class.
+     * In this case the function for clustering is BestProximityDescriptor.MAX, pivot is empty.
      */
     public BestProximityDescriptor() {
-        super(true);
+        this(MAX, null);
     }
 
     /**
-     * Constructs new instance of the class with specified distance function.
+     * Constructs new instance of the class with specified distance function and empty pivot.
      *
      * @param function - the distance function used for clustering
      */
     public BestProximityDescriptor(DistanceFunction function) {
-        super(true);
-        this.function = function;
+        this(function, null);
+    }
+
+    /**
+     * Constructs new instance of the class with specified pivot.
+     * The function for clustering is BestProximityDescriptor.MAX.
+     *
+     * @param pivot - the set of nodes from which the proximity should be the best.
+     */
+    public BestProximityDescriptor(List<Node> pivot) {
+        this(MAX, pivot);
     }
 
     /**
@@ -128,7 +138,8 @@ public class BestProximityDescriptor extends TopologyDescriptor {
      * @param pivot - the set of nodes from which the proximity should be the best.
      */
     public BestProximityDescriptor(DistanceFunction function, List<Node> pivot) {
-        this(function);
+        super(true);
+        this.function = function;
         this.pivot = pivot;
     }
 
