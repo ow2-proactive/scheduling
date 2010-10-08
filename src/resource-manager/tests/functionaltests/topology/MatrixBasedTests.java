@@ -2,15 +2,19 @@ package functionaltests.topology;
 
 import static org.junit.Assert.assertTrue;
 
+import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import org.objectweb.proactive.core.node.Node;
 import org.ow2.proactive.resourcemanager.frontend.topology.BestProximityDescriptor;
 import org.ow2.proactive.resourcemanager.frontend.topology.DistanceFunction;
-import org.ow2.proactive.resourcemanager.selection.topology.clustering.HAC;
+import org.ow2.proactive.resourcemanager.frontend.topology.Topology;
+import org.ow2.proactive.resourcemanager.frontend.topology.clustering.Cluster;
+import org.ow2.proactive.resourcemanager.frontend.topology.clustering.HAC;
 
 
 /**
@@ -25,29 +29,44 @@ public class MatrixBasedTests {
     protected static int gridWidth;
     protected static int gridHeight;
 
-    protected static Long getTestDistances(Node node, Node node2) {
-        Long distance = null;
-        if (distances.get(node) != null && distances.get(node).get(node2) != null) {
-            distance = distances.get(node).get(node2);
-        }
-        if (distances.get(node2) != null && distances.get(node2).get(node) != null) {
-            distance = distances.get(node2).get(node);
-        }
-        return distance;
-    }
-
-    private static class LocalHAC extends HAC {
-
-        public LocalHAC(List<Node> pivot, DistanceFunction distanceFunction, Long threshold) {
-            super(pivot, distanceFunction, threshold);
+    private class LocalTopology implements Topology {
+        public Long getDistance(Node node, Node node2) {
+            Long distance = null;
+            if (distances.get(node) != null && distances.get(node).get(node2) != null) {
+                distance = distances.get(node).get(node2);
+            }
+            if (distances.get(node2) != null && distances.get(node2).get(node) != null) {
+                distance = distances.get(node2).get(node);
+            }
+            return distance;
         }
 
-        public LocalHAC(List<Node> pivot, DistanceFunction distanceFunction) {
-            super(pivot, distanceFunction, 999999);
+        public Long getDistance(InetAddress hostAddress, InetAddress hostAddress2) {
+            return null;
         }
 
-        protected Long getDistance(Node node, Node node2) {
-            return getTestDistances(node, node2);
+        public Long getDistance(String hostName, String hostName2) {
+            return null;
+        }
+
+        public HashMap<InetAddress, Long> getHostTopology(InetAddress hostAddress) {
+            return null;
+        }
+
+        public Set<InetAddress> getHosts() {
+            return null;
+        }
+
+        public boolean knownHost(InetAddress hostAddress) {
+            return false;
+        }
+
+        public boolean onSameHost(Node node, Node node2) {
+            return false;
+        }
+
+        public List<Cluster<String>> clusterize(int numberOfClusters, DistanceFunction distanceFunction) {
+            return null;
         }
     }
 
@@ -202,7 +221,7 @@ public class MatrixBasedTests {
 
         List<Node> pivots = initDistances(width, height, matrix, pivotMatrix);
 
-        HAC cfPivot = new LocalHAC(pivots, BestProximityDescriptor.AVG, threshold);
+        HAC cfPivot = new HAC(new LocalTopology(), pivots, BestProximityDescriptor.AVG, threshold);
         List<Node> cliqueRes = cfPivot.select(cliqueSize, new LinkedList<Node>(distances.keySet()));
 
         int resultSize = cliqueRes.size();

@@ -37,10 +37,12 @@ package org.ow2.proactive.resourcemanager.frontend.topology;
 import java.io.Serializable;
 import java.net.InetAddress;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Set;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.node.Node;
+import org.ow2.proactive.resourcemanager.frontend.topology.clustering.Cluster;
 
 
 /**
@@ -101,4 +103,13 @@ public interface Topology extends Serializable {
      * @return distances map to nodes added before this one
      */
     public HashMap<InetAddress, Long> getHostTopology(InetAddress hostAddress);
+
+    /**
+     * Clustirizes hosts into clusters based on their proximity
+     *
+     * @param numberOfClusters the number of clusters to produce
+     * @param distanceFunction the function for distances recalculation
+     * @return the list of host clusters
+     */
+    public List<Cluster<String>> clusterize(int numberOfClusters, DistanceFunction distanceFunction);
 }

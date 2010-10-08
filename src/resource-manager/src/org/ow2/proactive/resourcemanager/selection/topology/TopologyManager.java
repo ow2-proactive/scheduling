@@ -61,7 +61,7 @@ import org.ow2.proactive.resourcemanager.frontend.topology.Topology;
 import org.ow2.proactive.resourcemanager.frontend.topology.TopologyDescriptor;
 import org.ow2.proactive.resourcemanager.frontend.topology.TopologyException;
 import org.ow2.proactive.resourcemanager.frontend.topology.TopologyImpl;
-import org.ow2.proactive.resourcemanager.selection.topology.clustering.HAC;
+import org.ow2.proactive.resourcemanager.frontend.topology.clustering.HAC;
 import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 
 import edu.emory.mathcs.backport.java.util.Collections;
@@ -184,18 +184,7 @@ public class TopologyManager {
         }
     }
 
-    public Long getDistance(Node node, Node node2) {
-        synchronized (topology) {
-            Long distance = topology.getDistance(node, node2);
-            if (distance == null) {
-                logger.warn("No distance between " + node.getNodeInformation().getURL() + " and " +
-                    node2.getNodeInformation().getURL());
-            }
-            return distance;
-        }
-    }
-
-    // Handler implementations
+    // Handlers implementations
 
     /**
      * Handler for arbitrary topology descriptor, which just select a sublist
@@ -222,7 +211,8 @@ public class TopologyManager {
                 BestProximityDescriptor descriptor = (BestProximityDescriptor) topologyDescriptor;
                 // HAC is very efficient algorithm but it does not guarantee the complete solution
                 logger.info("Running clustering algorithm in order to find closest nodes");
-                HAC hac = new HAC(descriptor.getPivot(), descriptor.getDistanceFunction(), Long.MAX_VALUE);
+                HAC hac = new HAC(topology, descriptor.getPivot(), descriptor.getDistanceFunction(),
+                    Long.MAX_VALUE);
                 return hac.select(number, matchedNodes);
             }
         }
@@ -243,7 +233,7 @@ public class TopologyManager {
             synchronized (topology) {
                 ThresholdProximityDescriptor descriptor = (ThresholdProximityDescriptor) topologyDescriptor;
                 logger.info("Running clustering algorithm in order to find closest nodes");
-                HAC hac = new HAC(descriptor.getPivot(), BestProximityDescriptor.MAX, descriptor
+                HAC hac = new HAC(topology, descriptor.getPivot(), BestProximityDescriptor.MAX, descriptor
                         .getThreshold());
                 return hac.select(number, matchedNodes);
             }

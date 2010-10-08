@@ -32,7 +32,7 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.ow2.proactive.resourcemanager.selection.topology.clustering;
+package org.ow2.proactive.resourcemanager.frontend.topology.clustering;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -40,12 +40,13 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.ow2.proactive.resourcemanager.core.RMCore;
 import org.ow2.proactive.resourcemanager.frontend.topology.DistanceFunction;
+import org.ow2.proactive.resourcemanager.frontend.topology.Topology;
 import org.ow2.proactive.resourcemanager.frontend.topology.TopologyException;
 import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 
@@ -60,12 +61,14 @@ import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 public class HAC {
 
     private final static Logger logger = ProActiveLogger.getLogger(RMLoggers.TOPOLOGY);
+    private Topology topology;
     private final List<Node> pivot;
     private DistanceFunction distanceFunction;
     private long threshold;
 
-    public HAC(List<Node> pivot, DistanceFunction distanceFunction, long threshold) {
+    public HAC(Topology topology, List<Node> pivot, DistanceFunction distanceFunction, long threshold) {
 
+        this.topology = topology;
         this.pivot = pivot == null ? new LinkedList<Node>() : pivot;
         this.distanceFunction = distanceFunction;
         this.threshold = threshold;
@@ -98,70 +101,72 @@ public class HAC {
         // initializing cluster distances map
         // cluster is a group of nodes, initially each cluster consist of one node
         logger.debug("Initializing clusters map");
-        HashMap<Cluster, HashMap<Cluster, Long>> clusterDistances = initClusterDistances(from);
+        HashMap<Cluster<Node>, HashMap<Cluster<Node>, Long>> clusterDistances = initClusterDistances(from);
 
         // no topology information for provided nodes
         if (from.size() > 0 && clusterDistances.size() == 0) {
             throw new TopologyException("Topology information is not available");
         }
 
-        Cluster target = null;
+        Cluster<Node> target = null;
         if (pivot.size() > 0) {
             // fixed orientation clustering
             Iterator<Node> it = pivot.iterator();
-            target = new Cluster(it.next());
+            Node pivotNode = it.next();
+            target = new Cluster<Node>(getNodeId(pivotNode), pivotNode);
             // merging pivot nodes into one cluster and recalculating distances
             logger.debug("Merging pivot nodes into one cluster");
             while (it.hasNext()) {
                 // merging clusters and recalculating distances between others
-                target = recalculateDistances(new Cluster[] { target, new Cluster(it.next()) },
-                        clusterDistances);
+                pivotNode = it.next();
+                Cluster<Node> pivotCluster = new Cluster<Node>(getNodeId(pivotNode), pivotNode);
+                target = recalculateDistances(target, pivotCluster, clusterDistances);
             }
 
             // clustering centralized to the pivot
             logger.debug("Begin centralized hierarchical agglomerative clustering");
-            while (clusterDistances.size() > 1 && target.getSize() < (number + pivot.size())) {
-                Cluster closest = findClosestClustersTo(target, clusterDistances);
+            while (clusterDistances.size() > 1 && target.size() < (number + pivot.size())) {
+                Cluster<Node> closest = findClosestClustersTo(target, clusterDistances);
 
                 if (closest == null) {
                     // no clusters found => cannot merge anything => stop where we are
                     break;
                 }
                 // merging clusters and recalculating distances between others
-                target = recalculateDistances(new Cluster[] { target, closest }, clusterDistances);
+                target = recalculateDistances(target, closest, clusterDistances);
             }
 
             // removing pivot nodes from the result
             target.remove(pivot);
         } else {
             logger.debug("Begin hierarchical agglomerative clustering");
-            target = clusterDistances.keySet().iterator().next();
+            target = (Cluster<Node>) clusterDistances.keySet().iterator().next();
             // floating clustering
             while (clusterDistances.size() > 1) {
                 // finding two clusters to merge according
-                Cluster[] clustersToMerge = findClosestClusters(clusterDistances);
+                Cluster<Node>[] clustersToMerge = findClosestClusters(clusterDistances);
                 if (clustersToMerge == null) {
                     // there is no clusters close to each other
                     // stop the process
                     break;
                 }
                 // merging clusters and recalculating distances between others
-                target = recalculateDistances(clustersToMerge, clusterDistances);
+                target = recalculateDistances(clustersToMerge[0], clustersToMerge[1], clusterDistances);
 
-                if (target.getSize() == number) {
+                if (target.size() == number) {
                     // found all the nodes we need
                     break;
-                } else if (target.getSize() > number) {
+                } else if (target.size() > number) {
                     // found more nodes that we need,
                     // target cluster contains all nodes from another cluster
 
                     logger.debug("Number of node in the cluster exceeded required node number " +
-                        target.getSize() + " vs " + number);
+                        target.size() + " vs " + number);
 
-                    Cluster anotherCluster = clustersToMerge[0] == target ? clustersToMerge[1]
+                    Cluster<Node> anotherCluster = clustersToMerge[0] == target ? clustersToMerge[1]
                             : clustersToMerge[0];
-                    target.removeLast(anotherCluster.getSize());
-                    final Cluster finalTarget = target;
+                    target.removeLast(anotherCluster.size());
+                    final Cluster<Node> finalTarget = target;
 
                     Comparator<Node> nodeDistanceComparator = new Comparator<Node>() {
                         public int compare(Node n1, Node n2) {
@@ -176,28 +181,28 @@ public class HAC {
                         }
                     };
                     // sorting nodes in the smaller cluster according to their distances to target
-                    Collections.sort(anotherCluster.getNodes(), nodeDistanceComparator);
+                    Collections.sort(anotherCluster.getElements(), nodeDistanceComparator);
 
-                    int neededNodesNumber = number - target.getSize();
-                    target.add(anotherCluster.getNodes().subList(0, neededNodesNumber));
+                    int neededNodesNumber = number - target.size();
+                    target.add(anotherCluster.getElements().subList(0, neededNodesNumber));
                     break;
                 }
             }
         }
 
         if (logger.isDebugEnabled()) {
-            logger.debug("Found " + target.getSize() + " nodes out of " + number + ": " + target);
+            logger.debug("Found " + target.size() + " nodes out of " + number + ": " + target);
         }
-        return target.getNodes();
+        return target.getElements();
     }
 
     /**
      * Calculate the distance from given node to the cluster.
      * This is used in order to filter out the cluster of bigger than needed size.
      */
-    private long getDistance(Node from, Cluster to) {
+    private long getDistance(Node from, Cluster<Node> to) {
         long globalDistance = 0;
-        for (Node n : to.getNodes()) {
+        for (Node n : to.getElements()) {
             long distance = getDistance(from, n);
             globalDistance = distanceFunction.distance(globalDistance, distance);
         }
@@ -205,10 +210,10 @@ public class HAC {
     }
 
     protected Long getDistance(Node node, Node node2) {
-        return RMCore.topologyManager.getDistance(node, node2);
+        return topology.getDistance(node, node2);
     }
 
-    private HashMap<Cluster, HashMap<Cluster, Long>> initClusterDistances(List<Node> from) {
+    private HashMap<Cluster<Node>, HashMap<Cluster<Node>, Long>> initClusterDistances(List<Node> from) {
         if (pivot.size() > 0) {
             from = new LinkedList<Node>(from);
             for (Node piv : pivot) {
@@ -217,33 +222,34 @@ public class HAC {
             }
         }
 
-        HashMap<Cluster, HashMap<Cluster, Long>> clusterDistances = new HashMap<Cluster, HashMap<Cluster, Long>>();
+        HashMap<Cluster<Node>, HashMap<Cluster<Node>, Long>> clusterDistances = new HashMap<Cluster<Node>, HashMap<Cluster<Node>, Long>>();
 
         for (Node node : from) {
-            Cluster newCluster = new Cluster(node);
-            HashMap<Cluster, Long> dist = new HashMap<Cluster, Long>();
-            for (Cluster cluster : clusterDistances.keySet()) {
-                dist.put(cluster, getDistance(node, cluster.getNodes().get(0)));
+            Cluster<Node> newCluster = new Cluster<Node>(getNodeId(node), node);
+            HashMap<Cluster<Node>, Long> dist = new HashMap<Cluster<Node>, Long>();
+            for (Cluster<Node> cluster : clusterDistances.keySet()) {
+                dist.put(cluster, getDistance(node, cluster.getElements().get(0)));
             }
             clusterDistances.put(newCluster, dist);
         }
         return clusterDistances;
     }
 
-    private Cluster[] findClosestClusters(HashMap<Cluster, HashMap<Cluster, Long>> curDistances) {
+    @SuppressWarnings(value = "unchecked")
+    private <T> Cluster<T>[] findClosestClusters(HashMap<Cluster<T>, HashMap<Cluster<T>, Long>> curDistances) {
 
-        Cluster[] res = null;
+        Cluster<T>[] res = null;
         long proximity = threshold;
 
-        for (Cluster a : curDistances.keySet()) {
-            for (Cluster b : curDistances.get(a).keySet()) {
+        for (Cluster<?> a : curDistances.keySet()) {
+            for (Cluster<?> b : curDistances.get(a).keySet()) {
                 if (a.equals(b)) {
                     continue;
                 }
 
                 Long distance = curDistances.get(a).get(b);
                 if (distance >= 0 && distance <= proximity) {
-                    res = new Cluster[] { a, b };
+                    res = (Cluster<T>[]) new Cluster[] { a, b };
                     proximity = curDistances.get(a).get(b);
                 }
             }
@@ -252,21 +258,22 @@ public class HAC {
         return res;
     }
 
-    private Cluster findClosestClustersTo(Cluster cluster,
-            HashMap<Cluster, HashMap<Cluster, Long>> curDistances) {
+    @SuppressWarnings(value = "unchecked")
+    private <T> Cluster<T> findClosestClustersTo(Cluster<T> cluster,
+            HashMap<Cluster<T>, HashMap<Cluster<T>, Long>> curDistances) {
 
-        Cluster[] res = null;
+        Cluster<T>[] res = null;
         long proximity = threshold;
 
-        for (Cluster a : curDistances.keySet()) {
-            for (Cluster b : curDistances.get(a).keySet()) {
+        for (Cluster<T> a : curDistances.keySet()) {
+            for (Cluster<T> b : curDistances.get(a).keySet()) {
                 if (a.equals(b) || (!a.equals(cluster) && !b.equals(cluster))) {
                     continue;
                 }
 
                 Long distance = curDistances.get(a).get(b);
                 if (distance >= 0 && distance <= proximity) {
-                    res = new Cluster[] { a, b };
+                    res = (Cluster<T>[]) new Cluster[] { a, b };
                     proximity = distance;
                 }
             }
@@ -281,26 +288,33 @@ public class HAC {
 
     }
 
+    private String getNodeId(Node node) {
+        if (node.getNodeInformation() == null) {
+            // for test purpose when nodes are imitated
+            return node.toString();
+        } else {
+            return node.getNodeInformation().getURL();
+        }
+    }
+
     /**
      * Merges two cluster and recalculates distances to other.
      * To achieve better performance new cluster is not created.
      * Instead the bigger cluster is used as a container for nodes
      * from smaller one.
      */
-    private Cluster recalculateDistances(Cluster[] clusters2Merge,
-            HashMap<Cluster, HashMap<Cluster, Long>> curDistances) {
+    private <T> Cluster<T> recalculateDistances(Cluster<T> cluster1, Cluster<T> cluster2,
+            HashMap<Cluster<T>, HashMap<Cluster<T>, Long>> curDistances) {
 
-        final Cluster biggerCluster = clusters2Merge[0].getSize() > clusters2Merge[1].getSize() ? clusters2Merge[0]
-                : clusters2Merge[1];
-        final Cluster smallerCluster = clusters2Merge[0].getSize() > clusters2Merge[1].getSize() ? clusters2Merge[1]
-                : clusters2Merge[0];
+        final Cluster<T> biggerCluster = cluster1.size() > cluster2.size() ? cluster1 : cluster2;
+        final Cluster<T> smallerCluster = cluster1.size() > cluster2.size() ? cluster2 : cluster1;
 
         if (logger.isDebugEnabled()) {
             logger.debug("Recalculating distances");
-            logger.debug("Clusters to merge:\n" + clusters2Merge[0] + "\n" + clusters2Merge[1]);
+            logger.debug("Clusters to merge:\n" + biggerCluster + "\n" + smallerCluster);
         }
 
-        for (Cluster cluster : curDistances.keySet()) {
+        for (Cluster<T> cluster : curDistances.keySet()) {
             if (cluster.equals(smallerCluster) || cluster.equals(biggerCluster)) {
                 continue;
             }
@@ -327,7 +341,7 @@ public class HAC {
             }
         }
 
-        biggerCluster.add(smallerCluster.getNodes());
+        biggerCluster.add(smallerCluster.getElements());
         // we may actually add nodes to another instance of the cluster
         // so override the key value in the hash
         curDistances.put(biggerCluster, curDistances.remove(biggerCluster));
@@ -336,5 +350,38 @@ public class HAC {
         curDistances.get(biggerCluster).remove(smallerCluster);
 
         return biggerCluster;
+    }
+
+    public List<Cluster<String>> clusterize(int numberOfClusters, Set<String> hosts) {
+
+        if (numberOfClusters <= 0) {
+            throw new IllegalArgumentException("numberOfClusters must be positive");
+        }
+
+        logger.debug("Initializing clusters map");
+        HashMap<Cluster<String>, HashMap<Cluster<String>, Long>> clusterDistances = new HashMap<Cluster<String>, HashMap<Cluster<String>, Long>>();
+
+        for (String host : hosts) {
+            Cluster<String> newCluster = new Cluster<String>(host, host);
+            HashMap<Cluster<String>, Long> dist = new HashMap<Cluster<String>, Long>();
+            for (Cluster<String> cluster : clusterDistances.keySet()) {
+                dist.put(cluster, topology.getDistance(host, cluster.getElements().get(0)));
+            }
+            clusterDistances.put(newCluster, dist);
+        }
+
+        while (clusterDistances.size() > numberOfClusters) {
+            // finding two clusters to merge according
+            Cluster<String>[] clustersToMerge = findClosestClusters(clusterDistances);
+            if (clustersToMerge == null) {
+                // there is no clusters close to each other
+                // stop the process
+                break;
+            }
+            // merging clusters and recalculating distances between others
+            recalculateDistances(clustersToMerge[0], clustersToMerge[1], clusterDistances);
+        }
+
+        return new LinkedList<Cluster<String>>(clusterDistances.keySet());
     }
 }

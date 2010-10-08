@@ -32,83 +32,65 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.ow2.proactive.resourcemanager.selection.topology.clustering;
+package org.ow2.proactive.resourcemanager.frontend.topology.clustering;
 
 import java.util.LinkedList;
 import java.util.List;
 
-import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.annotation.PublicAPI;
 
 
-/*
- * Class represents the cluster of nodes grouped by the proximity.
- * One node can belong only to one cluster, so it is one-to-many relationship
+/**
+ * Class represents the cluster of elements grouped by their proximity.
+ * One element can belong only to one cluster, so it is one-to-many relationship
  * (one cluster - many nodes).
  *
- * The first node used in the constructor defines the cluster id. It in needed in order
- * to optimize hashCode() & equals() methods as the used a lot and their performance is
- * crucial for the HAC algorithm.
- *
  */
-public class Cluster {
+@PublicAPI
+public class Cluster<Element> {
 
     private String id = "";
     private int hashCode = 0;
-    private LinkedList<Node> nodes = new LinkedList<Node>();
+    private LinkedList<Element> elements = new LinkedList<Element>();
 
-    public Cluster(Node node) {
-        nodes.add(node);
-        if (node.getNodeInformation() == null) {
-            // for test purpose when nodes are imitated
-            id = node.toString();
-        } else {
-            id = node.getNodeInformation().getURL();
-        }
+    public Cluster(String id, Element element) {
+        elements.add(element);
+        this.id = id;
         hashCode = id.hashCode();
     }
 
-    public int getSize() {
-        return nodes.size();
+    public void add(List<Element> elements) {
+        this.elements.addAll(elements);
     }
 
-    public List<Node> getNodes() {
-        return nodes;
-    }
-
-    public void add(List<Node> nodes) {
-        this.nodes.addAll(nodes);
-    }
-
-    public void remove(List<Node> nodes) {
-        this.nodes.removeAll(nodes);
+    public void remove(List<Element> elements) {
+        this.elements.removeAll(elements);
     }
 
     public void removeLast(int number) {
         // removeLast will throw NoSuchElementException if number is bigger than list size
         for (int i = 0; i < number; i++) {
-            this.nodes.removeLast();
+            this.elements.removeLast();
         }
+    }
+
+    public List<Element> getElements() {
+        return elements;
+    }
+
+    public int size() {
+        return elements.size();
     }
 
     public String toString() {
-        String res = super.toString() + " [ ";
-        for (Node node : nodes) {
-            if (node.getNodeInformation() != null) {
-                res += node.getNodeInformation().getURL() + " ";
-            } else {
-                res += node + " ";
-            }
-        }
-        res += "]";
-
-        return res;
+        return elements.toString();
     }
 
     public boolean equals(Object obj) {
-        if (!(obj instanceof Cluster))
+        if (!(obj instanceof Cluster<?>))
             return false;
 
-        return this.id.equals(((Cluster) obj).id);
+        return this.id.equals(((Cluster<?>) obj).id);
     }
 
     public int hashCode() {

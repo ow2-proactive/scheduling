@@ -63,6 +63,7 @@ import org.ow2.proactive.utils.NodeSet;
 import functionalTests.FunctionalTest;
 import functionaltests.RMTHelper;
 
+
 /**
  *
  * Distributed test checking the topology selection mechanism with
@@ -198,7 +199,8 @@ public class SelectionTest extends FunctionalTest {
         ns = resourceManager.getAtMostNodes(6, TopologyDescriptor.BEST_PROXIMITY, null, null);
         Assert.assertEquals(6, ns.size());
         for (Node node : ns) {
-		if (pivotNode == null) pivotNode = node;
+            if (pivotNode == null)
+                pivotNode = node;
             if (!node.getNodeInformation().getURL().contains(currentHost)) {
                 Assert.assertTrue("All nodes have to be from " + currentHost, false);
             }
@@ -216,8 +218,8 @@ public class SelectionTest extends FunctionalTest {
         // pivot scenario
         List<Node> pivot = new LinkedList<Node>();
         pivot.add(pivotNode);
-        ns = resourceManager.getAtMostNodes(6, new BestProximityDescriptor(
-			BestProximityDescriptor.MAX, pivot), null, null);
+        ns = resourceManager.getAtMostNodes(6,
+                new BestProximityDescriptor(BestProximityDescriptor.MAX, pivot), null, null);
         Assert.assertEquals(6, ns.size());
         for (Node node : ns) {
             if (node.getNodeInformation().getURL().equals(pivotNode.getNodeInformation().getURL())) {
@@ -229,8 +231,8 @@ public class SelectionTest extends FunctionalTest {
         }
         resourceManager.releaseNodes(ns).booleanValue();
 
-        ns = resourceManager.getAtMostNodes(7, new BestProximityDescriptor(
-			BestProximityDescriptor.MAX, pivot), null, null);
+        ns = resourceManager.getAtMostNodes(7,
+                new BestProximityDescriptor(BestProximityDescriptor.MAX, pivot), null, null);
         Assert.assertEquals(7, ns.size());
         for (Node node : ns) {
             if (node.getNodeInformation().getURL().equals(pivotNode.getNodeInformation().getURL())) {
@@ -238,7 +240,6 @@ public class SelectionTest extends FunctionalTest {
             }
         }
         resourceManager.releaseNodes(ns).booleanValue();
-
 
         // checking TopologyDescriptor.ThresholdProximityDescriptor
         ns = resourceManager.getAtMostNodes(1, new ThresholdProximityDescriptor(Long.MAX_VALUE), null, null);
@@ -301,27 +302,25 @@ public class SelectionTest extends FunctionalTest {
         Assert.assertEquals(7, ns.size());
         resourceManager.releaseNodes(ns).booleanValue();
 
-        ns = resourceManager.getAtMostNodes(10, new ThresholdProximityDescriptor(maxThreshold), null,
-                null);
+        ns = resourceManager.getAtMostNodes(10, new ThresholdProximityDescriptor(maxThreshold), null, null);
         Assert.assertEquals(8, ns.size());
         resourceManager.releaseNodes(ns).booleanValue();
         // pivot scenario
-        ns = resourceManager.getAtMostNodes(1, new ThresholdProximityDescriptor(
-			0, pivot), null, null);
+        ns = resourceManager.getAtMostNodes(1, new ThresholdProximityDescriptor(0, pivot), null, null);
         Assert.assertEquals(1, ns.size());
         for (Node node : ns) {
             if (node.getNodeInformation().getURL().equals(pivotNode.getNodeInformation().getURL())) {
                 Assert.assertTrue("Pivot must not be in results", false);
             }
             if (node.getNodeInformation().getURL().contains(distantHost) ||
-		node.getNodeInformation().getURL().contains(neighborHost)) {
+                node.getNodeInformation().getURL().contains(neighborHost)) {
                 Assert.assertTrue("Incorrect node selected", false);
             }
         }
         resourceManager.releaseNodes(ns).booleanValue();
 
-        ns = resourceManager.getAtMostNodes(6, new ThresholdProximityDescriptor(
-			current2neighborDistance, pivot), null, null);
+        ns = resourceManager.getAtMostNodes(6, new ThresholdProximityDescriptor(current2neighborDistance,
+            pivot), null, null);
         Assert.assertEquals(6, ns.size());
         for (Node node : ns) {
             if (node.getNodeInformation().getURL().equals(pivotNode.getNodeInformation().getURL())) {

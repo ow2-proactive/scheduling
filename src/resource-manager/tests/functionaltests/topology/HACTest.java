@@ -36,16 +36,20 @@
  */
 package functionaltests.topology;
 
+import java.net.InetAddress;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import junit.framework.Assert;
 
 import org.objectweb.proactive.core.node.Node;
 import org.ow2.proactive.resourcemanager.frontend.topology.BestProximityDescriptor;
 import org.ow2.proactive.resourcemanager.frontend.topology.DistanceFunction;
-import org.ow2.proactive.resourcemanager.selection.topology.clustering.HAC;
+import org.ow2.proactive.resourcemanager.frontend.topology.Topology;
+import org.ow2.proactive.resourcemanager.frontend.topology.clustering.Cluster;
+import org.ow2.proactive.resourcemanager.frontend.topology.clustering.HAC;
 
 import edu.emory.mathcs.backport.java.util.Collections;
 import functionalTests.FunctionalTest;
@@ -61,25 +65,44 @@ public class HACTest extends FunctionalTest {
 
     protected static HashMap<Node, HashMap<Node, Long>> distances = new HashMap<Node, HashMap<Node, Long>>();
 
-    protected static Long getTestDistances(Node node, Node node2) {
-        Long distance = null;
-        if (distances.get(node) != null && distances.get(node).get(node2) != null) {
-            distance = distances.get(node).get(node2);
-        }
-        if (distances.get(node2) != null && distances.get(node2).get(node) != null) {
-            distance = distances.get(node2).get(node);
-        }
-        return distance;
-    }
-
-    private static class LocalHAC extends HAC {
-
-        public LocalHAC(List<Node> pivot, DistanceFunction distanceFunction) {
-            super(pivot, distanceFunction, Long.MAX_VALUE);
+    private class LocalTopology implements Topology {
+        public Long getDistance(Node node, Node node2) {
+            Long distance = null;
+            if (distances.get(node) != null && distances.get(node).get(node2) != null) {
+                distance = distances.get(node).get(node2);
+            }
+            if (distances.get(node2) != null && distances.get(node2).get(node) != null) {
+                distance = distances.get(node2).get(node);
+            }
+            return distance;
         }
 
-        protected Long getDistance(Node node, Node node2) {
-            return getTestDistances(node, node2);
+        public Long getDistance(InetAddress hostAddress, InetAddress hostAddress2) {
+            return null;
+        }
+
+        public Long getDistance(String hostName, String hostName2) {
+            return null;
+        }
+
+        public HashMap<InetAddress, Long> getHostTopology(InetAddress hostAddress) {
+            return null;
+        }
+
+        public Set<InetAddress> getHosts() {
+            return null;
+        }
+
+        public boolean knownHost(InetAddress hostAddress) {
+            return false;
+        }
+
+        public boolean onSameHost(Node node, Node node2) {
+            return false;
+        }
+
+        public List<Cluster<String>> clusterize(int numberOfClusters, DistanceFunction distanceFunction) {
+            return null;
         }
     }
 
@@ -100,8 +123,9 @@ public class HACTest extends FunctionalTest {
         distances.get(n1).put(n3, new Long(4));
         distances.get(n2).put(n3, new Long(-1));
 
-        HAC hac = new LocalHAC(null, BestProximityDescriptor.AVG);
-        HAC hacPivot = new LocalHAC(Collections.singletonList(n1), BestProximityDescriptor.AVG);
+        HAC hac = new HAC(new LocalTopology(), null, BestProximityDescriptor.AVG, Long.MAX_VALUE);
+        HAC hacPivot = new HAC(new LocalTopology(), Collections.singletonList(n1),
+            BestProximityDescriptor.AVG, Long.MAX_VALUE);
         RMTHelper.log("Test 1: [no pivot], graph [1 -(2)- 2 , 1 -(4)- 3]");
         List<Node> result = hac.select(20, new LinkedList<Node>(distances.keySet()));
         Assert.assertTrue("Selection size is not 2", result.size() == 2);
@@ -182,7 +206,8 @@ public class HACTest extends FunctionalTest {
         Node n5 = new DummyNode("5");
         distances.put(n5, new HashMap<Node, Long>());
 
-        hacPivot = new LocalHAC(Collections.singletonList(n5), BestProximityDescriptor.AVG);
+        hacPivot = new HAC(new LocalTopology(), Collections.singletonList(n5), BestProximityDescriptor.AVG,
+            Long.MAX_VALUE);
         distances.get(n5).put(n1, new Long(-1));
         distances.get(n5).put(n2, new Long(-1));
         distances.get(n5).put(n3, new Long(10));

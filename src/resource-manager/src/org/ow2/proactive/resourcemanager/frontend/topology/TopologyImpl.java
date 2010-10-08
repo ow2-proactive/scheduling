@@ -36,9 +36,13 @@ package org.ow2.proactive.resourcemanager.frontend.topology;
 
 import java.net.InetAddress;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 
 import org.objectweb.proactive.core.node.Node;
+import org.ow2.proactive.resourcemanager.frontend.topology.clustering.Cluster;
+import org.ow2.proactive.resourcemanager.frontend.topology.clustering.HAC;
 
 
 /**
@@ -169,4 +173,11 @@ public class TopologyImpl implements Topology, Cloneable {
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public List<Cluster<String>> clusterize(int numberOfClusters, DistanceFunction distanceFunction) {
+        HAC hac = new HAC(this, new LinkedList<Node>(), distanceFunction, Long.MAX_VALUE);
+        return hac.clusterize(numberOfClusters, hosts.keySet());
+    }
 }
