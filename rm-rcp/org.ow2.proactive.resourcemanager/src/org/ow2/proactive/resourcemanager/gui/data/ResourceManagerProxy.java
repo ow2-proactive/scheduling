@@ -50,6 +50,8 @@ import org.ow2.proactive.resourcemanager.common.RMState;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.frontend.RMMonitoring;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
+import org.ow2.proactive.resourcemanager.frontend.topology.Topology;
+import org.ow2.proactive.resourcemanager.frontend.topology.TopologyDescriptor;
 import org.ow2.proactive.resourcemanager.nodesource.common.PluginDescriptor;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.utils.NodeSet;
@@ -99,6 +101,11 @@ public class ResourceManagerProxy implements ResourceManager {
 
     public NodeSet getAtMostNodes(int arg0, List<SelectionScript> arg1, NodeSet arg2) {
         return resourceManager.getAtMostNodes(arg0, arg1, arg2);
+    }
+
+    public NodeSet getAtMostNodes(int number, TopologyDescriptor topology, List<SelectionScript> scripts,
+            NodeSet exclusion) {
+        return resourceManager.getAtMostNodes(number, topology, scripts, exclusion);
     }
 
     public RMMonitoring getMonitoring() {
@@ -151,5 +158,9 @@ public class ResourceManagerProxy implements ResourceManager {
 
     public BooleanWrapper shutdown(boolean arg0) {
         return resourceManager.shutdown(arg0);
+    }
+
+    public Topology getTopology() {
+        return resourceManager.getTopology();
     }
 }

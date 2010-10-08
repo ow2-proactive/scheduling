@@ -102,6 +102,14 @@
             id="org.ow2.proactive.resourcemanager.gui.views.ResourcesCompactView"
             name="Compact View">
       </view>
+       <view
+            allowMultiple="false"
+            category="org.ow2.proactive.resourcemanager.gui.views.category"
+            class="org.ow2.proactive.resourcemanager.gui.views.ResourcesTopologyView"
+            icon="icons/pa_icon_16.gif"
+            id="org.ow2.proactive.resourcemanager.gui.views.ResourcesTopologyView"
+            name="Topology View">
+      </view>
    </extension>
    <extension
          point="org.eclipse.ui.commands">

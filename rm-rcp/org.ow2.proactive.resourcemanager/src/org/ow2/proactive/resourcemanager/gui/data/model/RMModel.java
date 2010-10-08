@@ -45,10 +45,12 @@ import org.eclipse.swt.widgets.Display;
 import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
+import org.ow2.proactive.resourcemanager.gui.data.RMStore;
 import org.ow2.proactive.resourcemanager.gui.handlers.RemoveNodeSourceHandler;
 import org.ow2.proactive.resourcemanager.gui.views.ResourceExplorerView;
 import org.ow2.proactive.resourcemanager.gui.views.ResourcesCompactView;
 import org.ow2.proactive.resourcemanager.gui.views.ResourcesTabView;
+import org.ow2.proactive.resourcemanager.gui.views.ResourcesTopologyView;
 import org.ow2.proactive.resourcemanager.gui.views.StatisticsView;
 
 
@@ -134,9 +136,11 @@ public class RMModel implements Serializable {
                 this.busyNodesNumber++;
         }
         this.actualizeTreeView(parentToRefresh);
-        this.addToCompactView(elementToAdd);
+        this.addToCompactAndTopologyViews(elementToAdd);
         this.addTableItem(newNode);
         this.actualizeStatsView();
+        this.addNodeToTopologyView(newNode);
+
     }
 
     public void removeNode(RMNodeEvent nodeEvent) {
@@ -177,8 +181,9 @@ public class RMModel implements Serializable {
 
         this.actualizeTreeView(parentToRefresh);
         this.removeTableItem(node);
-        this.removeFromCompactView(elementToRemove);
+        this.removeFromCompactAndTopologyViews(elementToRemove);
         this.actualizeStatsView();
+        this.removeNodeFromTopologyView(node);
     }
 
     public void changeNodeState(RMNodeEvent nodeEvent) {
@@ -216,10 +221,9 @@ public class RMModel implements Serializable {
         }
 
         this.actualizeTreeView(node);
-        this.updateCompactView(node);
+        this.updateCompactAndTopologyViews(node);
         this.actualizeStatsView();
         this.updateTableItem(node);
-
     }
 
     public void addNodeSource(RMNodeSourceEvent nodeSourceEvent) {
@@ -232,7 +236,7 @@ public class RMModel implements Serializable {
             }
         }
         actualizeTreeView(root);
-        addToCompactView(source);
+        addToCompactAndTopologyViews(source);
         //refresh node source removal command state
         refreshNodeSourceRemovalHandler();
 
@@ -250,7 +254,7 @@ public class RMModel implements Serializable {
             }
         }
         actualizeTreeView(root);
-        removeFromCompactView(source);
+        removeFromCompactAndTopologyViews(source);
         //refresh node source removal command state
         refreshNodeSourceRemovalHandler();
     }
@@ -287,6 +291,20 @@ public class RMModel implements Serializable {
     /****************************************************/
     /* view update methods								*/
     /****************************************************/
+    private void addNodeToTopologyView(Node node) {
+        //actualize tree view if exists
+        if (updateViews && ResourcesTopologyView.getTopologyViewer() != null) {
+            ResourcesTopologyView.getTopologyViewer().addNode(node.getName());
+        }
+    }
+
+    private void removeNodeFromTopologyView(Node node) {
+        //actualize tree view if exists
+        if (updateViews && ResourcesTopologyView.getTopologyViewer() != null) {
+            ResourcesTopologyView.getTopologyViewer().removeNode(node.getName());
+        }
+    }
+
     private void actualizeTreeView(TreeLeafElement element) {
         //actualize tree view if exists
         if (updateViews && ResourceExplorerView.getTreeViewer() != null) {
@@ -294,21 +312,36 @@ public class RMModel implements Serializable {
         }
     }
 
-    private void addToCompactView(TreeLeafElement element) {
-        if (updateViews && ResourcesCompactView.getCompactViewer() != null) {
-            ResourcesCompactView.getCompactViewer().addView(element);
+    private void addToCompactAndTopologyViews(TreeLeafElement element) {
+        if (updateViews) {
+            if (ResourcesCompactView.getCompactViewer() != null) {
+                ResourcesCompactView.getCompactViewer().addView(element);
+            }
+            if (ResourcesTopologyView.getTopologyViewer() != null) {
+                ResourcesTopologyView.getTopologyViewer().addView(element);
+            }
         }
     }
 
-    private void removeFromCompactView(TreeLeafElement element) {
-        if (updateViews && ResourcesCompactView.getCompactViewer() != null) {
-            ResourcesCompactView.getCompactViewer().removeView(element);
+    private void removeFromCompactAndTopologyViews(TreeLeafElement element) {
+        if (updateViews) {
+            if (ResourcesCompactView.getCompactViewer() != null) {
+                ResourcesCompactView.getCompactViewer().removeView(element);
+            }
+            if (ResourcesTopologyView.getTopologyViewer() != null) {
+                ResourcesTopologyView.getTopologyViewer().removeView(element);
+            }
         }
     }
 
-    private void updateCompactView(TreeLeafElement element) {
-        if (updateViews && ResourcesCompactView.getCompactViewer() != null) {
-            ResourcesCompactView.getCompactViewer().updateView(element);
+    private void updateCompactAndTopologyViews(TreeLeafElement element) {
+        if (updateViews) {
+            if (ResourcesCompactView.getCompactViewer() != null) {
+                ResourcesCompactView.getCompactViewer().updateView(element);
+            }
+            if (ResourcesTopologyView.getTopologyViewer() != null) {
+                ResourcesTopologyView.getTopologyViewer().updateView(element);
+            }
         }
     }
 

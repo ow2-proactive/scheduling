@@ -77,6 +77,10 @@ function listnodes(){
     return rm_.listnodes_();
 }
 
+function topology(){
+    return rm_.topology_();
+}
+
 function listns(){
     return rm_.listns_();
 }

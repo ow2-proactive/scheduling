@@ -60,6 +60,7 @@ import org.ow2.proactive.resourcemanager.gui.dialog.SelectResourceManagerDialog;
 import org.ow2.proactive.resourcemanager.gui.views.ResourceExplorerView;
 import org.ow2.proactive.resourcemanager.gui.views.ResourcesCompactView;
 import org.ow2.proactive.resourcemanager.gui.views.ResourcesTabView;
+import org.ow2.proactive.resourcemanager.gui.views.ResourcesTopologyView;
 import org.ow2.proactive.resourcemanager.gui.views.StatisticsView;
 
 
@@ -226,6 +227,11 @@ public class RMStore {
         if (StatisticsView.getStatsViewer() != null) {
             StatisticsView.getStatsViewer().setInput(null);
         }
+        //clear topology view if topology panel is displayed
+        if (ResourcesTopologyView.getTopologyViewer() != null) {
+            ResourcesTopologyView.getTopologyViewer().disconnect();
+        }
+
         // Disconnect JMX ChartIt action
         JMXActionsManager.getInstance().disconnectJMXClient();
         try {

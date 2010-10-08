@@ -45,6 +45,8 @@ import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.ow2.proactive.resourcemanager.common.RMState;
 import org.ow2.proactive.resourcemanager.common.event.RMEvent;
+import org.ow2.proactive.resourcemanager.frontend.topology.Topology;
+import org.ow2.proactive.resourcemanager.frontend.topology.TopologyDescriptor;
 import org.ow2.proactive.resourcemanager.nodesource.common.PluginDescriptor;
 import org.ow2.proactive.resourcemanager.nodesource.policy.NodeSourcePolicyFactory;
 import org.ow2.proactive.scripting.SelectionScript;
@@ -233,6 +235,9 @@ public interface ResourceManager {
      */
     public NodeSet getAtMostNodes(int number, List<SelectionScript> selectionScriptsList, NodeSet exclusion);
 
+    public NodeSet getAtMostNodes(int number, TopologyDescriptor descriptor,
+            List<SelectionScript> selectionScriptsList, NodeSet exclusion);
+
     /**
      * Releases the node after computations. The specified node is marked as free and become
      * available to other users.
@@ -272,4 +277,5 @@ public interface ResourceManager {
      */
     public BooleanWrapper shutdown(boolean preempt);
 
+    public Topology getTopology();
 }

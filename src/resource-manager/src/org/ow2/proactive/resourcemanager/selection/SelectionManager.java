@@ -42,7 +42,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
@@ -54,12 +54,15 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.core.RMCore;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
+import org.ow2.proactive.resourcemanager.frontend.topology.TopologyDescriptor;
 import org.ow2.proactive.resourcemanager.rmnode.RMNode;
+import org.ow2.proactive.resourcemanager.selection.topology.TopologyHandler;
 import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive.scripting.SelectionScript;
@@ -94,17 +97,14 @@ public abstract class SelectionManager {
     }
 
     /**
-     * Arranges nodes for script execution, taking into
-     * account "free" and "exclusion" nodes lists.  
+     * Arranges nodes for script execution based on some criteria
+     * for example previous execution statistics.
      * 
-     * @param selectionScriptList - set of scripts to execute
-     * @param freeNodes - free nodes list provided by resource manager
-     * @param exclusionNodes - exclusion nodes list
+     * @param nodes - nodes list for script execution
+     * @param scripts - set of selection scripts
      * @return collection of arranged nodes
      */
-    public abstract Collection<RMNode> arrangeNodesForScriptExecution(
-            List<SelectionScript> selectionScriptList, final Collection<RMNode> freeNodes,
-            NodeSet exclusionNodes);
+    public abstract List<RMNode> arrangeNodes(final List<RMNode> nodes, List<SelectionScript> scripts);
 
     /**
      * Predicts script execution result. Allows to avoid duplicate script execution 
@@ -128,96 +128,164 @@ public abstract class SelectionManager {
     public abstract boolean processScriptResult(SelectionScript script, ScriptResult<Boolean> scriptResult,
             RMNode rmnode);
 
-    public NodeSet findAppropriateNodes(int nb, List<SelectionScript> selectionScriptList, NodeSet exclusion,
-            Client client) {
+    public NodeSet selectNodes(int number, TopologyDescriptor topologyDescriptor,
+            List<SelectionScript> scripts, NodeSet exclusion, Client client) {
 
-        ArrayList<RMNode> freeNodes = rmcore.getFreeNodes();
-        NodeSet result = new NodeSet();
-        // getting sorted by probability candidates nodes from selection manager
-        Collection<RMNode> candidatesNodes = arrangeNodesForScriptExecution(selectionScriptList, freeNodes,
-                exclusion);
+        List<RMNode> freeNodes = rmcore.getFreeNodes();
+        // filtering out the "free node list"
+        // removing exclusion and checking permissions
+        List<RMNode> filteredNodes = filterOut(freeNodes, exclusion, client);
 
-        HashMap<String, Permission> nsPermissions = new HashMap<String, Permission>();
-        // here we will contact the node either for script execution and cleaning or just
-        // for cleaning.
-        // So parallelizing this action and delegate execution to the thread pool
-        Iterator<RMNode> nodesIterator = candidatesNodes.iterator();
-
-        while (nodesIterator.hasNext() && result.size() < nb) {
-            int numberOfNodesNeeded = nb - result.size();
-
-            ArrayList<Callable<RMNode>> scriptExecutors = new ArrayList<Callable<RMNode>>();
-            for (int i = 0; i < numberOfNodesNeeded && nodesIterator.hasNext();) {
-                RMNode rmnode = nodesIterator.next();
-
-                Permission userPermission = nsPermissions.get(rmnode.getNodeSourceName());
-                if (userPermission == null) {
-                    userPermission = rmnode.getNodeSource().getUserPermission();
-                    nsPermissions.put(rmnode.getNodeSourceName(), userPermission);
-                }
-                // checking the permission
-                try {
-                    client.checkPermission(userPermission, client + " is not authorized to get the node " +
-                        rmnode.getNodeURL() + " from " + rmnode.getNodeSource());
-                } catch (SecurityException e) {
-                    // client does not have an access to this node
-                    logger.warn(e.getMessage());
-                    continue;
-                }
-
-                i++;
-
-                if (inProgress.contains(rmnode.getNodeURL())) {
-                    if (logger.isDebugEnabled())
-                        logger.debug("Script execution is in progress on node " + rmnode.getNodeURL() +
-                            " - skipping.");
-                    i--;
-                } else {
-                    inProgress.add(rmnode.getNodeURL());
-                    scriptExecutors.add(new ScriptExecutor(rmnode, selectionScriptList, this));
-                }
-            }
-
-            try {
-                Collection<Future<RMNode>> matchedNodes = scriptExecutorThreadPool.invokeAll(scriptExecutors,
-                        MAX_VERIF_TIMEOUT, TimeUnit.MILLISECONDS);
-                int index = 0;
-
-                for (Future<RMNode> futureNode : matchedNodes) {
-                    if (!futureNode.isCancelled()) {
-                        RMNode node = null;
-                        try {
-                            node = futureNode.get();
-                        } catch (InterruptedException e) {
-                            logger.warn("Interrupting the selection manager");
-                            return result;
-                        } catch (ExecutionException e) {
-                            throw (RuntimeException) e.getCause();
-                        }
-                        if (node != null) {
-                            try {
-                                rmcore.setBusyNode(node.getNodeURL(), client);
-                                result.add(node.getNode());
-                            } catch (NodeException e) {
-                                rmcore.setDownNode(node.getNodeURL());
-                            }
-                        }
-                    } else {
-                        // no script result was obtained
-                        logger.warn("Timeout on " + scriptExecutors.get(index));
-                    }
-                    index++;
-                }
-            } catch (InterruptedException e1) {
-                logger.warn("Interrupting the selection manager");
-                return result;
-            }
-
+        if (filteredNodes.size() == 0) {
+            return new NodeSet();
         }
 
-        logger.info(result.size() + " nodes found for " + client);
-        return result;
+        // arranging nodes for script execution
+        List<RMNode> arrangedNodes = arrangeNodes(filteredNodes, scripts);
 
+        List<Node> matchedNodes = null;
+        if (topologyDescriptor.isGreedy()) {
+            // run scripts on all available nodes
+            matchedNodes = runScripts(arrangedNodes, scripts);
+        } else {
+            // run scripts not on all nodes, but always on missing number of nodes
+            // until required node set is found
+            matchedNodes = new LinkedList<Node>();
+            while (matchedNodes.size() < number) {
+                int currentRequiredNodesNumber = number - matchedNodes.size();
+
+                List<RMNode> subset = arrangedNodes.subList(0, Math.min(currentRequiredNodesNumber,
+                        arrangedNodes.size()));
+                matchedNodes.addAll(runScripts(subset, scripts));
+                // removing subset of arrangedNodes
+                subset.clear();
+
+                if (arrangedNodes.size() == 0) {
+                    break;
+                }
+            }
+        }
+
+        logger.info(matchedNodes.size() + " nodes found after scripts execution for " + client);
+
+        // now we have a list of nodes which match to selection scripts
+        // selecting subset according to topology requirements
+        TopologyHandler handler = RMCore.topologyManager.getHandler(topologyDescriptor);
+        List<Node> selectedNodes = handler.select(number, matchedNodes);
+
+        logger.info(selectedNodes.size() + " nodes found after the topology is taken into account for " +
+            client);
+        // the nodes are selected, now mark them as busy.
+        NodeSet result = new NodeSet();
+        for (Node node : selectedNodes) {
+            try {
+                // Synchronous call
+                rmcore.setBusyNode(node.getNodeInformation().getURL(), client);
+                result.add(node);
+            } catch (NodeException e) {
+                rmcore.setDownNode(node.getNodeInformation().getURL());
+            }
+        }
+
+        return result;
+    }
+
+    /**
+     * Runs scripts on given set of nodes and returns matched nodes.
+     * It blocks until all results are obtained.
+     *
+     * @param candidates nodes to execute scripts on
+     * @param scripts set of scripts to execute on each node
+     * @return nodes matched to all scripts
+     */
+    private List<Node> runScripts(List<RMNode> candidates, List<SelectionScript> scripts) {
+        List<Node> matched = new LinkedList<Node>();
+
+        if (candidates.size() == 0) {
+            return matched;
+        }
+
+        // creating script executors object to be run in dedicated thread pool
+        List<Callable<Node>> scriptExecutors = new LinkedList<Callable<Node>>();
+        for (RMNode node : candidates) {
+            if (inProgress.contains(node.getNodeURL())) {
+                if (logger.isDebugEnabled())
+                    logger.debug("Script execution is in progress on node " + node.getNodeURL() +
+                        " - skipping.");
+            } else {
+                inProgress.add(node.getNodeURL());
+                scriptExecutors.add(new ScriptExecutor(node, scripts, this));
+            }
+        }
+
+        try {
+            // launching
+            Collection<Future<Node>> matchedNodes = scriptExecutorThreadPool.invokeAll(scriptExecutors,
+                    MAX_VERIF_TIMEOUT, TimeUnit.MILLISECONDS);
+            int index = 0;
+
+            // waiting for the results
+            for (Future<Node> futureNode : matchedNodes) {
+                if (!futureNode.isCancelled()) {
+                    Node node = null;
+                    try {
+                        node = futureNode.get();
+                        if (node != null) {
+                            matched.add(node);
+                        }
+                    } catch (InterruptedException e) {
+                        logger.warn("Interrupting the selection manager");
+                        return matched;
+                    } catch (ExecutionException e) {
+                        throw (RuntimeException) e.getCause();
+                    }
+                } else {
+                    // no script result was obtained
+                    logger.warn("Timeout on " + scriptExecutors.get(index));
+                }
+                index++;
+            }
+        } catch (InterruptedException e1) {
+            logger.warn("Interrupting the selection manager");
+        }
+
+        return matched;
+    }
+
+    /**
+     * Removes exclusion nodes and nodes not accessible for the client
+     *
+     * @param freeNodes
+     * @param exclusion
+     * @param client
+     * @return
+     */
+    private List<RMNode> filterOut(List<RMNode> freeNodes, NodeSet exclusion, Client client) {
+
+        List<RMNode> filteredList = new ArrayList<RMNode>();
+        HashMap<String, Permission> nsPermissions = new HashMap<String, Permission>();
+
+        for (RMNode node : freeNodes) {
+            Permission userPermission = nsPermissions.get(node.getNodeSourceName());
+            if (userPermission == null) {
+                userPermission = node.getNodeSource().getUserPermission();
+                nsPermissions.put(node.getNodeSourceName(), userPermission);
+            }
+            // checking the permission
+            try {
+                client.checkPermission(userPermission, client + " is not authorized to get the node " +
+                    node.getNodeURL() + " from " + node.getNodeSource());
+            } catch (SecurityException e) {
+                // client does not have an access to this node
+                logger.warn(e.getMessage());
+                continue;
+            }
+
+            if (!contains(exclusion, node)) {
+                filteredList.add(node);
+            }
+        }
+        return filteredList;
     }
 
     /**
@@ -235,4 +303,28 @@ public abstract class SelectionManager {
         scriptExecutorThreadPool.shutdownNow();
         PAActiveObject.terminateActiveObject(false);
     }
+
+    /**
+     * Return true if node contains the node set.
+     *
+     * @param nodeset - a list of nodes to inspect
+     * @param node - a node to find
+     * @return true if node contains the node set.
+     */
+    private boolean contains(NodeSet nodeset, RMNode node) {
+        if (nodeset == null)
+            return false;
+
+        for (Node n : nodeset) {
+            try {
+                if (n.getNodeInformation().getURL().equals(node.getNodeInformation().getURL())) {
+                    return true;
+                }
+            } catch (Exception e) {
+                continue;
+            }
+        }
+        return false;
+    }
+
 }

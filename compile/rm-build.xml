@@ -97,6 +97,7 @@
 				<include name="org/ow2/proactive/resourcemanager/frontend/RMMonitoring.class" />
 				<include name="org/ow2/proactive/resourcemanager/frontend/RMUser.class" />
 				<include name="org/ow2/proactive/resourcemanager/frontend/RMEventListener.class" />
+				<include name="org/ow2/proactive/resourcemanager/frontend/topology/**" />
 				<!-- RMNode is needed because it is used in RMNodeEvent-->
 				<include name="org/ow2/proactive/resourcemanager/rmnode/RMNode.class" />
 			</fileset>

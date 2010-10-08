@@ -353,6 +353,10 @@ public class ResourceManagerController {
         listNSOpt.setRequired(false);
         actionGroup.addOption(listNSOpt);
 
+        Option topologyOpt = new Option("t", "topology", false, control + "Displays nodes topology.");
+        topologyOpt.setRequired(false);
+        actionGroup.addOption(topologyOpt);
+
         Option removeNSOpt = new Option("r", "removens", true, control + "Remove given node sources");
         removeNSOpt.setArgName("names");
         removeNSOpt.setRequired(false);
@@ -492,6 +496,8 @@ public class ResourceManagerController {
             }
         } else if (cmd.hasOption("listnodes")) {
             model.listnodes_();
+        } else if (cmd.hasOption("topology")) {
+            model.topology_();
         } else if (cmd.hasOption("listns")) {
             model.listns_();
         } else if (cmd.hasOption("removens")) {

@@ -5,7 +5,7 @@
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2010 INRIA/University of 
+ * Copyright (C) 1997-2010 INRIA/University of
  * 				Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
@@ -24,7 +24,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
- * If needed, contact us to obtain a release under GPL Version 2 
+ * If needed, contact us to obtain a release under GPL Version 2
  * or a different license than the GPL.
  *
  *  Initial developer(s):               The ProActive Team
@@ -34,7 +34,7 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.ow2.proactive.resourcemanager.selection;
+package org.ow2.proactive.resourcemanager.selection.statistics;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -47,6 +47,7 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.resourcemanager.core.RMCore;
 import org.ow2.proactive.resourcemanager.rmnode.RMNode;
+import org.ow2.proactive.resourcemanager.selection.SelectionManager;
 import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive.scripting.SelectionScript;
@@ -54,20 +55,21 @@ import org.ow2.proactive.utils.NodeSet;
 
 
 /**
- * An implementation of {@link SelectionManager} interface, based on 
+ * An implementation of {@link SelectionManager} interface, based on
  * probabilistic approach. The purpose of selection manager is to choose the nodes for
  * further selection scripts execution. The goal is to find optimal strategy
  * of nodes selection from the nodes pool to minimize scripts execution.
- * 
+ *
  * In order to do that we assume that script will pass on the node with
- * some probability. This probability will be increased or decreased accordingly 
+ * some probability. This probability will be increased or decreased accordingly
  * depending on execution results.
- *    
+ *
  * The selection of nodes sorted by its probability for each particular script
- * gives an optimal strategy for scripts execution. For several scripts join probabilities 
+ * gives an optimal strategy for scripts execution. For several scripts join probabilities
  * are calculated for each nodes.
  *
  */
+
 public class ProbablisticSelectionManager extends SelectionManager {
 
     private final static Logger logger = ProActiveLogger.getLogger(RMLoggers.RMSELECTION);
@@ -83,44 +85,32 @@ public class ProbablisticSelectionManager extends SelectionManager {
     }
 
     /**
-     * Find appropriate candidates nodes for script execution, taking into 
-     * account "free" and "exclusion" nodes lists. 
-     * 
+     * Find appropriate candidates nodes for script execution, taking into
+     * account "free" and "exclusion" nodes lists.
+     *
      * @param selectionScriptList - set of scripts to execute
      * @param freeNodes - free nodes list provided by resource manager
      * @param exclusionNodes - exclusion nodes list
      * @return candidates node list for script execution
      */
     @Override
-    public Collection<RMNode> arrangeNodesForScriptExecution(List<SelectionScript> selectionScriptList,
-            final Collection<RMNode> freeNodes, NodeSet exclusionNodes) {
+    public List<RMNode> arrangeNodes(final List<RMNode> nodes, List<SelectionScript> scripts) {
 
         long startTime = System.currentTimeMillis();
-        logger.debug("Looking for appropriate nodes");
+        logger.debug("Arranging nodes");
 
-        List<RMNode> filteredList = new ArrayList<RMNode>();
-        if (exclusionNodes != null && exclusionNodes.size() > 0) {
-            for (RMNode rmnode : freeNodes) {
-                if (!contains(exclusionNodes, rmnode)) {
-                    filteredList.add(rmnode);
-                }
-            }
-        } else {
-            filteredList.addAll(freeNodes);
-        }
+        boolean scriptSpecified = scripts != null && scripts.size() > 0;
 
-        boolean scriptSpecified = selectionScriptList != null && selectionScriptList.size() > 0;
-
-        // if no scripts are specified return filtered free nodes 
+        // if no scripts are specified return filtered free nodes
         if (!scriptSpecified) {
             logger.debug("Selection script was not specified");
-            Collections.shuffle(filteredList);
-            return filteredList;
+            Collections.shuffle(nodes);
+            return nodes;
         }
 
         if (logger.isDebugEnabled()) {
-            logger.debug("Selection scripts count is " + selectionScriptList.size() + ": ");
-            for (SelectionScript script : selectionScriptList) {
+            logger.debug("Selection scripts count is " + scripts.size() + ": ");
+            for (SelectionScript script : scripts) {
                 logger.debug("Content of the script with id " + script.hashCode() + ":\n" +
                     script.getScript());
             }
@@ -128,10 +118,10 @@ public class ProbablisticSelectionManager extends SelectionManager {
 
         // finding intersection
         HashMap<RMNode, Probability> intersectionMap = new HashMap<RMNode, Probability>();
-        for (RMNode rmnode : filteredList) {
+        for (RMNode rmnode : nodes) {
             boolean intersection = true;
             double intersectionProbability = 1;
-            for (SelectionScript script : selectionScriptList) {
+            for (SelectionScript script : scripts) {
                 if (probabilities.containsKey(script) && probabilities.get(script).containsKey(rmnode)) {
                     double probability = probabilities.get(script).get(rmnode).value();
                     if (probability == 0) {
@@ -172,9 +162,9 @@ public class ProbablisticSelectionManager extends SelectionManager {
     }
 
     /**
-     * Predicts script execution result. Allows to avoid duplicate script execution 
+     * Predicts script execution result. Allows to avoid duplicate script execution
      * on the same node.
-     * 
+     *
      * @param script - script to execute
      * @param rmnode - target node
      * @return true if script will pass on the node
@@ -195,7 +185,7 @@ public class ProbablisticSelectionManager extends SelectionManager {
     }
 
     /**
-     * Processes script result and updates knowledge base of 
+     * Processes script result and updates knowledge base of
      * selection manager at the same time.
      *
      * @param script - executed script
@@ -245,26 +235,6 @@ public class ProbablisticSelectionManager extends SelectionManager {
 
         probabilities.get(script).put(rmnode, probability);
         return result;
-    }
-
-    /**
-     * Return true if node contains the node set.
-     * 
-     * @param nodeset - a list of nodes to inspect
-     * @param node - a node to find
-     * @return true if node contains the node set.
-     */
-    private boolean contains(NodeSet nodeset, RMNode node) {
-        for (Node n : nodeset) {
-            try {
-                if (n.getNodeInformation().getURL().equals(node.getNodeInformation().getURL())) {
-                    return true;
-                }
-            } catch (Exception e) {
-                continue;
-            }
-        }
-        return false;
     }
 
     /**

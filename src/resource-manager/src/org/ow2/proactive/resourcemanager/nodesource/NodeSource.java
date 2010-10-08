@@ -300,6 +300,9 @@ public class NodeSource implements InitActive, RunActive {
             throw new AddingNodesException(e);
         }
 
+        // blocking call involving running ping process on the node
+        RMCore.topologyManager.addNode(nodeToAdd);
+
         RMNode rmnode = new RMNodeImpl(nodeToAdd, stub, provider);
         return rmcore.internalAddNodeToCore(rmnode);
     }
@@ -407,6 +410,7 @@ public class NodeSource implements InitActive, RunActive {
                 // TODO this method call breaks parallel node removal - fix it
                 closeDataSpaceConfiguration(node);
                 infrastructureManager.removeNode(node);
+                RMCore.topologyManager.removeNode(node);
             } catch (RMException e) {
                 logger.error(e.getCause().getMessage());
             }
@@ -568,6 +572,7 @@ public class NodeSource implements InitActive, RunActive {
         Node downNode = nodes.remove(nodeUrl);
         if (downNode != null) {
             try {
+                RMCore.topologyManager.removeNode(downNode);
                 infrastructureManager.removeNode(downNode);
             } catch (RMException e) {
             }

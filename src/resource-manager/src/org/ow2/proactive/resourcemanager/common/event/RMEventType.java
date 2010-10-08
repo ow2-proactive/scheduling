@@ -89,5 +89,5 @@ public enum RMEventType {
     /**
      * The resource manager is alive
      */
-    ALIVE;
+    ALIVE,
 }

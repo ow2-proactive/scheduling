@@ -157,7 +157,10 @@ public enum PAResourceManagerProperties {
     RM_ALIVE_EVENT_FREQUENCY("pa.rm.aliveevent.frequency", PropertyType.INTEGER),
 
     /** Accounting refresh rate from the database in seconds */
-    RM_ACCOUNT_REFRESH_RATE("pa.rm.account.refreshrate", PropertyType.INTEGER);
+    RM_ACCOUNT_REFRESH_RATE("pa.rm.account.refreshrate", PropertyType.INTEGER),
+
+    /** Topology feature enable option */
+    RM_TOPOLOGY_ENABLED("pa.rm.topology.enabled", PropertyType.BOOLEAN);
 
     /* ***************************************************************************** */
     /* ***************************************************************************** */

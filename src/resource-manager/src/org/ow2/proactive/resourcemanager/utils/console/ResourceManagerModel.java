@@ -42,6 +42,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.RandomAccessFile;
+import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -59,6 +60,7 @@ import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.frontend.RMConnection;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
+import org.ow2.proactive.resourcemanager.frontend.topology.Topology;
 import org.ow2.proactive.resourcemanager.nodesource.common.PluginDescriptor;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.DefaultInfrastructureManager;
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
@@ -131,6 +133,7 @@ public class ResourceManagerModel extends ConsoleModel {
         commands.add(new Command("listns()", "List every handled node sources"));
         commands.add(new Command("listinfrastructures()", "List supported infrastructures"));
         commands.add(new Command("listpolicies()", "List available node sources policies"));
+        commands.add(new Command("topology()", "Displays nodes topology"));
         commands.add(new Command("shutdown(preempt)",
             "Shutdown the Resource Manager (RM shutdown immediately if parameter is true)"));
         commands.add(new Command("stats()", "Display some statistics about the Resource Manager"));
@@ -339,6 +342,59 @@ public class ResourceManagerModel extends ConsoleModel {
             handleExceptionDisplay("Error while retreiving nodes informations", e);
             return null;
         }
+    }
+
+    public void topology_() {
+        Topology topology = rm.getTopology();
+        print("Hosts list(" + topology.getHosts().size() + "): ");
+        for (InetAddress host : topology.getHosts()) {
+            print(host.toString());
+        }
+
+        print("\nHosts topology: ");
+        final int COLUMN_NUMBERS = 3;
+        int count = 1;
+
+        ObjectArrayFormatter oaf = new ObjectArrayFormatter();
+        oaf.setMaxColumnLength(80);
+        oaf.setSpace(5);
+        ArrayList<String> line = new ArrayList<String>();
+
+        for (int i = 0; i < COLUMN_NUMBERS; i++) {
+            line.add("Host");
+            line.add("Distance (mrs)");
+            line.add("Host");
+        }
+
+        oaf.setTitle(line);
+        oaf.addEmptyLine();
+
+        line = new ArrayList<String>();
+        for (InetAddress host : topology.getHosts()) {
+            HashMap<InetAddress, Long> hostTopology = topology.getHostTopology(host);
+            if (hostTopology != null) {
+                for (InetAddress anotherHost : hostTopology.keySet()) {
+                    line.add(host.toString());
+                    line.add(String.valueOf(hostTopology.get(anotherHost)));
+                    line.add(anotherHost.toString());
+
+                    if (count++ % COLUMN_NUMBERS == 0) {
+                        oaf.addLine(line);
+                        line = new ArrayList<String>();
+                    }
+                }
+            }
+        }
+
+        if (line.size() > 0) {
+            for (int i = line.size() / 3; i < COLUMN_NUMBERS; i++) {
+                line.add("");
+                line.add("");
+                line.add("");
+            }
+            oaf.addLine(line);
+        }
+        print(Tools.getStringAsArray(oaf));
     }
 
     private Object[] packPluginParameters(String[] params) throws RMException, ClassNotFoundException {

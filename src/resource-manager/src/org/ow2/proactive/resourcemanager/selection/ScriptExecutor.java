@@ -43,6 +43,7 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.ProActiveTimeoutException;
 import org.objectweb.proactive.core.mop.MOP;
+import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.rmnode.RMNode;
@@ -52,7 +53,7 @@ import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive.scripting.SelectionScript;
 
 
-public class ScriptExecutor implements Callable<RMNode> {
+public class ScriptExecutor implements Callable<Node> {
 
     private final static Logger logger = ProActiveLogger.getLogger(RMLoggers.RMSELECTION);
     private final static int TIMEOUT = PAResourceManagerProperties.RM_SELECT_SCRIPT_TIMEOUT.getValueAsInt();
@@ -70,7 +71,7 @@ public class ScriptExecutor implements Callable<RMNode> {
      * Runs selection scripts and process the results
      * returns node if it matches, null otherwise
      */
-    public RMNode call() throws Exception {
+    public Node call() throws Exception {
 
         LinkedList<ScriptResult<Boolean>> scriptExecitionResults = new LinkedList<ScriptResult<Boolean>>();
         boolean selectionScriptSpecified = selectionScriptList != null && selectionScriptList.size() > 0;
@@ -151,7 +152,7 @@ public class ScriptExecutor implements Callable<RMNode> {
             throw exception;
         }
         if (nodeMatch) {
-            return rmnode;
+            return rmnode.getNode();
         }
         return null;
     }

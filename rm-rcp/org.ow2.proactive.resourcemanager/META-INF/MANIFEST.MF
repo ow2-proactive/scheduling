@@ -12,6 +12,17 @@ Require-Bundle: org.eclipse.ui,
  org.objectweb.proactive.ic2d.chartit;bundle-version="1.0.0"
 Bundle-ActivationPolicy: lazy
 Eclipse-RegisterBuddy: org.ow2.proactive.resourcemanager.lib
-Bundle-ClassPath: bin/
+Bundle-ClassPath: bin/,
+ lib/
 Import-Package: org.objectweb.proactive.core.ssh.httpssh
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Export-Package: org.ow2.proactive.resourcemanager;
+  uses:="org.eclipse.jface.action,
+   org.eclipse.jface.resource,
+   org.eclipse.ui.application,
+   org.objectweb.proactive.core.ssh.httpssh,
+   org.eclipse.ui.plugin,
+   org.eclipse.equinox.app,
+   org.osgi.service.url,
+   org.osgi.framework",
+ org.ow2.proactive.resourcemanager.gui;uses:="org.ow2.proactive.resourcemanager.common,org.eclipse.ui,org.eclipse.swt.graphics"

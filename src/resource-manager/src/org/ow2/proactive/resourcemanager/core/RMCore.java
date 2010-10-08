@@ -90,6 +90,9 @@ import org.ow2.proactive.resourcemanager.frontend.RMMonitoring;
 import org.ow2.proactive.resourcemanager.frontend.RMMonitoringImpl;
 import org.ow2.proactive.resourcemanager.frontend.RMUser;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
+import org.ow2.proactive.resourcemanager.frontend.topology.Topology;
+import org.ow2.proactive.resourcemanager.frontend.topology.TopologyDescriptor;
+import org.ow2.proactive.resourcemanager.frontend.topology.TopologyException;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.resourcemanager.nodesource.common.PluginDescriptor;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.DefaultInfrastructureManager;
@@ -99,8 +102,9 @@ import org.ow2.proactive.resourcemanager.nodesource.policy.NodeSourcePolicy;
 import org.ow2.proactive.resourcemanager.nodesource.policy.NodeSourcePolicyFactory;
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.ow2.proactive.resourcemanager.rmnode.RMNode;
-import org.ow2.proactive.resourcemanager.selection.ProbablisticSelectionManager;
 import org.ow2.proactive.resourcemanager.selection.SelectionManager;
+import org.ow2.proactive.resourcemanager.selection.statistics.ProbablisticSelectionManager;
+import org.ow2.proactive.resourcemanager.selection.topology.TopologyManager;
 import org.ow2.proactive.resourcemanager.utils.ClientPinger;
 import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 import org.ow2.proactive.scripting.SelectionScript;
@@ -189,6 +193,9 @@ public class RMCore implements ResourceManager, RMAdmin, RMUser, InitActive, Run
      */
     public static Map<UniqueID, Client> clients = Collections
             .synchronizedMap(new HashMap<UniqueID, Client>());
+
+    /** nodes topology */
+    public static TopologyManager topologyManager;
 
     /** Client pinger */
     private ClientPinger clientPinger;
@@ -295,6 +302,8 @@ public class RMCore implements ResourceManager, RMAdmin, RMUser, InitActive, Run
             }
             clientPinger = (ClientPinger) PAActiveObject.newActive(ClientPinger.class.getName(),
                     new Object[] { PAActiveObject.getStubOnThis() }, nodeRM);
+
+            topologyManager = new TopologyManager();
 
             // adding shutdown hook
             final RMCore rmcoreStub = (RMCore) PAActiveObject.getStubOnThis();
@@ -501,6 +510,7 @@ public class RMCore implements ResourceManager, RMAdmin, RMUser, InitActive, Run
 
         this.freeNodes.add(rmnode);
         this.allNodes.put(rmnode.getNodeURL(), rmnode);
+
         // create the event
         this.registerAndEmitNodeEvent(new RMNodeEvent(rmnode, RMEventType.NODE_ADDED, null, rmnode
                 .getProvider().getName()));
@@ -677,7 +687,14 @@ public class RMCore implements ResourceManager, RMAdmin, RMUser, InitActive, Run
     public BooleanWrapper nodeIsAvailable(String nodeUrl) {
         final RMNode checked = this.allNodes.get(nodeUrl);
         return new BooleanWrapper(checked != null && !checked.isDown());
+    }
 
+    public NodeState getNodeState(String nodeUrl) {
+        RMNode node = this.allNodes.get(nodeUrl);
+        if (node == null) {
+            throw new IllegalArgumentException("Unknown node " + nodeUrl);
+        }
+        return node.getState();
     }
 
     /**
@@ -876,30 +893,39 @@ public class RMCore implements ResourceManager, RMAdmin, RMUser, InitActive, Run
     public NodeSet getAtMostNodes(int nbNodes, SelectionScript selectionScript) {
         List<SelectionScript> selectionScriptList = selectionScript == null ? null : Collections
                 .singletonList(selectionScript);
-        return getAtMostNodes(nbNodes, selectionScriptList, null);
+        return getAtMostNodes(nbNodes, TopologyDescriptor.ARBITRARY, selectionScriptList, null);
     }
 
     /**
      * {@inheritDoc}
      */
-    public NodeSet getAtMostNodes(int nbNodes, SelectionScript selectionScript, NodeSet exclusion) {
+    public NodeSet getAtMostNodes(int number, SelectionScript selectionScript, NodeSet exclusion) {
         List<SelectionScript> selectionScriptList = selectionScript == null ? null : Collections
                 .singletonList(selectionScript);
-        return getAtMostNodes(nbNodes, selectionScriptList, exclusion);
+        return getAtMostNodes(number, TopologyDescriptor.ARBITRARY, selectionScriptList, exclusion);
     }
 
     /**
      * {@inheritDoc}
      */
-    public NodeSet getAtMostNodes(int nb, List<SelectionScript> selectionScriptList, NodeSet exclusion) {
+    public NodeSet getAtMostNodes(int number, List<SelectionScript> scripts, NodeSet exclusion) {
+        return getAtMostNodes(number, TopologyDescriptor.ARBITRARY, scripts, exclusion);
+    }
 
-        // if RM is in shutdown state, it doesn't give nodes
-        if (this.toShutDown) {
+    public NodeSet getAtMostNodes(int number, TopologyDescriptor descriptor,
+            List<SelectionScript> selectionScrips, NodeSet exclusion) {
+
+        if (number <= 0) {
+            throw new IllegalArgumentException("Illegal node number " + number);
+        } else if (this.toShutDown) {
+            // if the resource manager is about to shutdown, do not provide any node
             return new NodeSet();
         } else {
-
-            logger.info(caller + " requested " + nb + " nodes");
-            return selectionManager.findAppropriateNodes(nb, selectionScriptList, exclusion, caller);
+            logger.info(caller + " requested " + number + " nodes");
+            if (descriptor == null) {
+                descriptor = TopologyDescriptor.ARBITRARY;
+            }
+            return selectionManager.selectNodes(number, descriptor, selectionScrips, exclusion, caller);
         }
     }
 
@@ -1333,4 +1359,10 @@ public class RMCore implements ResourceManager, RMAdmin, RMUser, InitActive, Run
         releaseNodes(nodes);
     }
 
+    public Topology getTopology() {
+        if (!PAResourceManagerProperties.RM_TOPOLOGY_ENABLED.getValueAsBoolean()) {
+            throw new TopologyException("Topology is disabled");
+        }
+        return topologyManager.getTopology();
+    }
 }

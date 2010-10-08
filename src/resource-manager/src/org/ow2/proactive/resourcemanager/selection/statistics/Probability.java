@@ -5,7 +5,7 @@
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2010 INRIA/University of 
+ * Copyright (C) 1997-2010 INRIA/University of
  * 				Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
@@ -24,7 +24,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
- * If needed, contact us to obtain a release under GPL Version 2 
+ * If needed, contact us to obtain a release under GPL Version 2
  * or a different license than the GPL.
  *
  *  Initial developer(s):               The ProActive Team
@@ -34,16 +34,16 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.ow2.proactive.resourcemanager.selection;
+package org.ow2.proactive.resourcemanager.selection.statistics;
 
 /**
- * 
+ *
  * This class represents probability entity, provides means for
  * increasing and decreasing it indefinitely and subjects to the following
  * properties: <BR>
- * 
+ *
  * 1. Value always stays in bounds between 0 and 1 including ends. <BR>
- * 2. By calling "increase" method it goes to 1 but never reach it. <BR> 
+ * 2. By calling "increase" method it goes to 1 but never reach it. <BR>
  * 3. By calling "decrease" method it goes to 0 but never reach it. <BR>
  * 4. By calling "increase" method N times and then "decrease" method N times
  * it goes to the initial value.<BR>
@@ -74,7 +74,7 @@ public class Probability {
     }
 
     /**
-     * Calculates default probability value  
+     * Calculates default probability value
      */
     public static double defaultValue() {
         return calcProbability(0);
