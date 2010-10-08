@@ -17,6 +17,7 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import org.hibernate.collection.PersistentMap;
@@ -100,10 +101,6 @@ public class SchedulerStateRest {
     public MyJobState job(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId)
             throws NotConnectedException, UnknownJobException, PermissionException {
         Scheduler s = checkAccess(sessionId);
-        ResteasyProviderFactory dispatcher = ResteasyProviderFactory.getInstance();
-        dispatcher.addStringConverter(RestartModeConverter.class);
-        dispatcher.addStringConverter(IntWrapperConverter.class);
-        dispatcher.registerProvider(PersistentMapConverter.class);
 
         JobState js;
         js = s.getJobState(jobId);
@@ -116,6 +113,8 @@ public class SchedulerStateRest {
 
     @GET
     @Path("jobs/{jobid}/result")
+        @Produces("application/json")
+        
     public JobResult jobResult(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId)
             throws NotConnectedException, PermissionException, UnknownJobException {
         Scheduler s = checkAccess(sessionId);
@@ -126,6 +125,7 @@ public class SchedulerStateRest {
 
     @DELETE
     @Path("jobs/{jobid}")
+        @Produces("application/json")
     public boolean removeJob(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId)
             throws NotConnectedException, UnknownJobException, PermissionException {
         Scheduler s = checkAccess(sessionId);
@@ -133,7 +133,8 @@ public class SchedulerStateRest {
     }
 
     @POST
-    @Path("jobs/{jobid}/kill")
+    @Path("jobs/{jobid}/kill")   
+    @Produces("application/json")
     public boolean killJob(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId)
             throws NotConnectedException, UnknownJobException, PermissionException {
         Scheduler s = checkAccess(sessionId);
@@ -142,7 +143,8 @@ public class SchedulerStateRest {
     }
 
     @GET
-    @Path("jobs/{jobid}/tasksids")
+    @Path("jobs/{jobid}/tasksids")  
+    @Produces("application/json")
     public List<String> getJobTasksIds(@HeaderParam("sessionid") String sessionId,
             @PathParam("jobid") String jobId) throws NotConnectedException, UnknownJobException,
             PermissionException {
@@ -160,7 +162,8 @@ public class SchedulerStateRest {
     }
 
     @GET
-    @Path("jobs/{jobid}/tasks")
+    @Path("jobs/{jobid}/tasks")  
+    @Produces("application/json")
     public List<TaskStateWrapper> getJobTasks(@HeaderParam("sessionid") String sessionId,
             @PathParam("jobid") String jobId) throws NotConnectedException, UnknownJobException,
             PermissionException {
@@ -178,7 +181,8 @@ public class SchedulerStateRest {
     }
 
     @GET
-    @Path("jobs/{jobid}/tasks/{taskid}")
+    @Path("jobs/{jobid}/tasks/{taskid}")  
+    @Produces("application/json")
     public TaskState jobtasks(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId,
             @PathParam("taskid") String taskid) throws NotConnectedException, UnknownJobException,
             PermissionException, UnknownTaskException {
@@ -310,7 +314,8 @@ public class SchedulerStateRest {
     //    }
 
     @POST
-    @Path("jobs/{jobid}/pause")
+    @Path("jobs/{jobid}/pause")   
+    @Produces("application/json")
     public boolean pauseJob(@HeaderParam("sessionid") final String sessionId,
             @PathParam("jobid") final String jobId) throws NotConnectedException, UnknownJobException,
             PermissionException {
@@ -322,6 +327,7 @@ public class SchedulerStateRest {
 
     @POST
     @Path("jobs/{jobid}/resume")
+    @Produces("application/json")
     public boolean resumeJob(@HeaderParam("sessionid") final String sessionId,
             @PathParam("jobid") final String jobId) throws NotConnectedException, UnknownJobException,
             PermissionException {
@@ -331,16 +337,17 @@ public class SchedulerStateRest {
     }
 
     @POST
-    @Path("submit")
+    @Path("submit")      
+    @Produces("application/json")
     public JobId submit(@HeaderParam("sessionid") String sessionId, MultipartInput multipart)
             throws IOException, JobCreationException, NotConnectedException, PermissionException,
             SubmissionClosedException {
         Scheduler s = checkAccess(sessionId);
         File tmp;
-
+        
         tmp = File.createTempFile("prefix", "suffix");
         for (InputPart part : multipart.getParts()) {
-
+            MultivaluedMap<String, String> toto = part.getHeaders();
             BufferedWriter outf = new BufferedWriter(new FileWriter(tmp));
             outf.write(part.getBodyAsString());
             outf.close();
@@ -353,7 +360,8 @@ public class SchedulerStateRest {
     }
 
     @PUT
-    @Path("disconnect")
+    @Path("disconnect")   
+    @Produces("application/json")
     public void disconnect(@HeaderParam("sessionid") final String sessionId) throws NotConnectedException,
             PermissionException {
         final Scheduler s = checkAccess(sessionId);
@@ -366,6 +374,7 @@ public class SchedulerStateRest {
 
     @PUT
     @Path("pause")
+    @Produces("application/json")
     public boolean pauseScheduler(@HeaderParam("sessionid") final String sessionId)
             throws NotConnectedException, PermissionException {
         final Scheduler s = checkAccess(sessionId);
@@ -374,7 +383,8 @@ public class SchedulerStateRest {
     }
 
     @PUT
-    @Path("stop")
+    @Path("stop") 
+    @Produces("application/json")
     public boolean stopScheduler(@HeaderParam("sessionid") final String sessionId)
             throws NotConnectedException, PermissionException {
         final Scheduler s = checkAccess(sessionId);
@@ -382,7 +392,8 @@ public class SchedulerStateRest {
     }
 
     @PUT
-    @Path("resume")
+    @Path("resume") 
+    @Produces("application/json")
     public boolean resumeScheduler(@HeaderParam("sessionid") final String sessionId)
             throws NotConnectedException, PermissionException {
         final Scheduler s = checkAccess(sessionId);
@@ -413,7 +424,8 @@ public class SchedulerStateRest {
     }
 
     @PUT
-    @Path("freeze")
+    @Path("freeze")   
+    @Produces("application/json")
     public boolean freezeScheduler(@HeaderParam("sessionid") final String sessionId)
             throws NotConnectedException, PermissionException {
         final Scheduler s = checkAccess(sessionId);
@@ -422,7 +434,8 @@ public class SchedulerStateRest {
     }
 
     @GET
-    @Path("status")
+    @Path("status")   
+    @Produces("application/json")
     public SchedulerStatus getSchedulerStatus(@HeaderParam("sessionid") final String sessionId)
             throws NotConnectedException, PermissionException {
         final Scheduler s = checkAccess(sessionId);
@@ -431,7 +444,8 @@ public class SchedulerStateRest {
     }
 
     @PUT
-    @Path("start")
+    @Path("start")  
+    @Produces("application/json")
     public boolean startScheduler(@HeaderParam("sessionid") final String sessionId)
             throws NotConnectedException, PermissionException {
         final Scheduler s = checkAccess(sessionId);
@@ -440,7 +454,8 @@ public class SchedulerStateRest {
     }
 
     @PUT
-    @Path("kill")
+    @Path("kill")  
+    @Produces("application/json")
     public boolean killScheduler(@HeaderParam("sessionid") final String sessionId)
             throws NotConnectedException, PermissionException {
         final Scheduler s = checkAccess(sessionId);
@@ -449,7 +464,8 @@ public class SchedulerStateRest {
     }
 
     @POST
-    @Path("linkrm")
+    @Path("linkrm")   
+    @Produces("application/json")
     public boolean killScheduler(@HeaderParam("sessionid") final String sessionId,
             @FormParam("rmurl") String rmURL) throws NotConnectedException, PermissionException {
         final Scheduler s = checkAccess(sessionId);
