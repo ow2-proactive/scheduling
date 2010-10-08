@@ -68,6 +68,7 @@ import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.event.ChangeEvent;
@@ -79,11 +80,22 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.ow2.proactive.resourcemanager.common.NodeState;
+import org.ow2.proactive.resourcemanager.frontend.topology.BestProximityDescriptor;
+import org.ow2.proactive.resourcemanager.frontend.topology.DistanceFunction;
 import org.ow2.proactive.resourcemanager.frontend.topology.Topology;
+import org.ow2.proactive.resourcemanager.frontend.topology.clustering.Cluster;
 import org.ow2.proactive.resourcemanager.gui.data.RMStore;
 import org.ow2.proactive.resourcemanager.gui.data.model.Node;
 import org.ow2.proactive.resourcemanager.gui.data.model.TreeLeafElement;
 import org.ow2.proactive.resourcemanager.gui.data.model.TreeParentElement;
+import org.ow2.proactive.resourcemanager.gui.topology.prefuse.AggregateDragControl;
+import org.ow2.proactive.resourcemanager.gui.topology.prefuse.AggregateLayout;
+import org.ow2.proactive.resourcemanager.gui.topology.prefuse.GraphLatencyFilter;
+import org.ow2.proactive.resourcemanager.gui.topology.prefuse.HighLightPredicate;
+import org.ow2.proactive.resourcemanager.gui.topology.prefuse.HostRenderer;
+import org.ow2.proactive.resourcemanager.gui.topology.prefuse.LatencyForce;
+import org.ow2.proactive.resourcemanager.gui.topology.prefuse.NeighborEdgesHighlightControl;
+import org.ow2.proactive.resourcemanager.gui.topology.prefuse.TopologyForceDirectedLayout;
 import org.ow2.proactive.resourcemanager.gui.views.ResourceExplorerView;
 
 import prefuse.Constants;
@@ -96,17 +108,21 @@ import prefuse.action.layout.Layout;
 import prefuse.activity.Activity;
 import prefuse.controls.Control;
 import prefuse.controls.ControlAdapter;
-import prefuse.controls.DragControl;
 import prefuse.controls.PanControl;
 import prefuse.controls.WheelZoomControl;
 import prefuse.controls.ZoomControl;
 import prefuse.data.Edge;
 import prefuse.data.Graph;
 import prefuse.data.Schema;
-import prefuse.data.expression.Predicate;
+import prefuse.data.Table;
+import prefuse.data.query.SearchQueryBinding;
+import prefuse.data.search.SearchTupleSet;
+import prefuse.data.tuple.TableTuple;
 import prefuse.data.tuple.TupleSet;
 import prefuse.render.DefaultRendererFactory;
 import prefuse.render.LabelRenderer;
+import prefuse.render.PolygonRenderer;
+import prefuse.render.Renderer;
 import prefuse.util.ColorLib;
 import prefuse.util.FontLib;
 import prefuse.util.PrefuseLib;
@@ -114,6 +130,8 @@ import prefuse.util.force.DragForce;
 import prefuse.util.force.ForceSimulator;
 import prefuse.util.force.NBodyForce;
 import prefuse.util.ui.UILib;
+import prefuse.visual.AggregateItem;
+import prefuse.visual.AggregateTable;
 import prefuse.visual.DecoratorItem;
 import prefuse.visual.EdgeItem;
 import prefuse.visual.NodeItem;
@@ -128,15 +146,45 @@ import prefuse.visual.expression.InGroupPredicate;
  */
 public class TopologyViewer {
 
-    // parent composite
+    /** parent composite */
     private Composite parent;
 
+    /** Graph representing the latencies between nodes */
+    private Graph graph;
+    /** Topology displayed **/
+    private Topology topology;
+
+    private final Lock lock = new ReentrantLock();
+    /** Lock used to manager 'selectedItems' list */
+    private final Lock selectionLock = new ReentrantLock();
+
+    private Set<VisualItem> selectedItems = new HashSet<VisualItem>();
     /** Biggest latency of the graph */
     private long maxLatency;
+    private int nbClusters = 0;
+    private String clusteringMode = "Avg";
+
+    /*
+     *  GUI Objects
+     */
+    /** Main frame */
+    private java.awt.Frame frame;
+    private prefuse.Display display;
+    private Visualization visualization;
+    /** Slider for selecting the latency threshold of nodes to display */
+    private JValueSlider latencySlider;
+    private JCheckBox runLayout;
+    private ColorAction edgeColor;
+    private TopologyForceDirectedLayout topologyForceDirectedLayout;
+    private GraphLatencyFilter latencyFilter;
+    /** palette of color used to draw edges in function of their latency */
+    int[] defaultPalette = new int[226];
+
     /** Name of the graph */
     public static final String GRAPH = "graph";
     public static final String NODES = "graph.nodes";
     public static final String EDGES = "graph.edges";
+    public static final String CLUSTERS = "clusters";
     public static final String EDGE_DECORATORS = "edgeDeco";
 
     private static final Schema DECORATOR_SCHEMA = PrefuseLib.getVisualItemSchema();
@@ -146,33 +194,15 @@ public class TopologyViewer {
         DECORATOR_SCHEMA.setDefault(VisualItem.FONT, FontLib.getFont("Tahoma", 11));
     }
 
-    /** Graph representing the latencies between nodes */
-    private Graph graph;
-    /** Main frame */
-    private java.awt.Frame frame;
-    /** Slider for selecting the latency threshold of nodes to display */
-    private JValueSlider latencySlider;
-    private ColorAction aFill;
-    private Visualization visualization;
-    private TopologyForceDirectedLayout topologyForceDirectedLayout;
-
-    private Set<VisualItem> selectedItems = new HashSet<VisualItem>();
-
-    private final Lock lock = new ReentrantLock();
     /**
-     * Lock used to manager 'selectedItems' list
-     */
-    private final Lock selectionLock = new ReentrantLock();
-
-    /**
-     * Creates new CompactViewer.
+     * Creates new TopologyViewer.
      */
     public TopologyViewer(final Composite parent) {
         this.parent = parent;
     }
 
     /**
-     * Initialization of CompactViewer.
+     * Initialization of TopologyViewer.
      */
     public void init() {
         initComposite();
@@ -201,14 +231,16 @@ public class TopologyViewer {
 
     public void loadMatrix() {
         if (RMStore.isConnected()) {
-            Topology topology = RMStore.getInstance().getResourceManager().getTopology();
+            topology = RMStore.getInstance().getResourceManager().getTopology();
             loadMatrix(topology);
         }
     }
 
     /**
      * Add a new Proactive Node to the graph
-     * @param nodeURL URL of the node
+     *
+     * @param nodeURL
+     *            URL of the node
      */
     public void addNode(final Node node) {
         lock.lock();
@@ -232,7 +264,8 @@ public class TopologyViewer {
                             String nodeURL = node.getName();
                             System.out.println("TopologyViewer.addNode() " + nodeURL);
                             String host = node.getParent().getParent().getName();
-                            Topology topology = RMStore.getInstance().getResourceManager().getTopology();
+                            // Topology topology =
+                            // RMStore.getInstance().getResourceManager().getTopology();
 
                             prefuse.data.Node hostNode = null;
                             Iterator nodes = graph.nodes();
@@ -265,30 +298,30 @@ public class TopologyViewer {
                                     Long latency = topology.getDistance(host, anotherHost);
 
                                     if (latency != null && latency < Long.MAX_VALUE) {
-                                        if (graph.getEdge(nodeToAdd, anotherNode) == null &&
-                                            graph.getEdge(anotherNode, nodeToAdd) == null) {
-                                            if (latency > maxLatency) {
-                                                maxLatency = latency;
-                                                Number oldMaxValue = latencySlider.getMaxValue();
-                                                latencySlider.setMaxValue(maxLatency);
-                                                if (oldMaxValue.longValue() == 1 ||
-                                                    oldMaxValue.equals(latencySlider.getValue())) {
-                                                    latencySlider.setValue(maxLatency);
-                                                    latencySlider.fireChangeEvent();
-                                                }
+                                        //										if (graph.getEdge(nodeToAdd,anotherNode) == null
+                                        //												&& graph.getEdge(anotherNode,nodeToAdd) == null) {
+                                        if (latency > maxLatency) {
+                                            maxLatency = latency;
+                                            Number oldMaxValue = latencySlider.getMaxValue();
+                                            latencySlider.setMaxValue(maxLatency);
+                                            if (oldMaxValue.longValue() == 1 ||
+                                                oldMaxValue.equals(latencySlider.getValue())) {
+                                                latencySlider.setValue(maxLatency);
+                                                latencySlider.fireChangeEvent();
                                             }
-
-                                            Edge edge = graph.addEdge(nodeToAdd, anotherNode);
-                                            edge.setInt("weight", latency.intValue());
                                         }
+
+                                        Edge edge = graph.addEdge(nodeToAdd, anotherNode);
+                                        edge.setInt("weight", latency.intValue());
                                     }
+                                    //									}
                                 }
                                 visualization.setValue(EDGES, null, VisualItem.INTERACTIVE, Boolean.FALSE);
 
                                 if (graph.getNodeCount() == 2) {
                                     ActionList dynamicColor = (ActionList) visualization
                                             .removeAction("dynamicColor");
-                                    dynamicColor.add(0, aFill);
+                                    dynamicColor.add(0, edgeColor);
                                     visualization.putAction("dynamicColor", dynamicColor);
                                 }
 
@@ -308,7 +341,9 @@ public class TopologyViewer {
 
     /**
      * Remove a node from the graph
-     * @param nodeURL URL of the node to remove
+     *
+     * @param nodeURL
+     *            URL of the node to remove
      */
     public void removeNode(final Node node, final String host) {
         if (visualization != null) {
@@ -318,7 +353,8 @@ public class TopologyViewer {
                     synchronized (visualization) {
                         try {
                             String nodeURL = node.getName();
-                            //								String host = node.getParent().getParent().getName();
+                            // String host =
+                            // node.getParent().getParent().getName();
 
                             prefuse.data.Node hostNode = null;
                             Iterator nodes = graph.nodes();
@@ -347,7 +383,7 @@ public class TopologyViewer {
                                 // Remove Prefuse node and all incident edges
                                 graph.removeNode(hostNode);
                                 if (graph.getNodeCount() == 1) {
-                                    ((ActionList) visualization.getAction("dynamicColor")).remove(aFill);
+                                    ((ActionList) visualization.getAction("dynamicColor")).remove(edgeColor);
                                 }
                             }
 
@@ -365,6 +401,7 @@ public class TopologyViewer {
 
     /**
      * Loads data from resource manager model.
+     *
      * @param topology
      */
     public void loadMatrix(final Topology topology) {
@@ -374,36 +411,53 @@ public class TopologyViewer {
                 if (visualization == null) {
                     Display.getDefault().syncExec(new Runnable() {
                         public void run() {
-                            //												graph = createGraph("/auto/sop-nas2a/u/sop-nas2a/vol/home_oasis/mvaldene/workspace/graph8.txt");
+                            // graph =
+                            // createGraph("/auto/sop-nas2a/u/sop-nas2a/vol/home_oasis/mvaldene/workspace/graph8.txt");
                             graph = createGraph(topology);
                             if (graph == null) {
                                 return;
                             }
 
                             visualization = new Visualization();
+                            // Add the graph representing the topology
                             visualization.add(GRAPH, graph);
 
-                            // draw the "name" label for NodeItems
+                            // Add an aggregate table which represent clusters
+                            AggregateTable clusters = visualization.addAggregates(CLUSTERS);
+                            clusters.addColumn(VisualItem.POLYGON, float[].class);
+                            clusters.addColumn("id", int.class);
+
+                            // draw the "name" label for Nodes
                             HostRenderer nodeRenderer = new HostRenderer("name");
-                            nodeRenderer.setRoundedCorner(8, 8); // round the corners
+                            nodeRenderer.setRoundedCorner(8, 8); // round the
+                            // corners
 
                             DefaultRendererFactory rf = new DefaultRendererFactory(nodeRenderer);
+
+                            // draw clusters as polygons with curved edges
+                            Renderer polyR = new PolygonRenderer(Constants.POLY_TYPE_CURVE);
+                            ((PolygonRenderer) polyR).setCurveSlack(0.15f);
+                            rf.add(new InGroupPredicate(CLUSTERS), polyR);
+
+                            // decorator which draw latencies of edges
                             rf.add(new InGroupPredicate(EDGE_DECORATORS), new LabelRenderer("weight"));
 
                             // create a new default renderer factory
                             visualization.setRendererFactory(rf);
 
                             // adding edge decorators,
-                            //							DECORATOR_SCHEMA.setDefault(VisualItem.TEXTCOLOR, ColorLib.gray(0));
                             visualization.addDecorators(EDGE_DECORATORS, EDGES, new HighLightPredicate(),
                                     DECORATOR_SCHEMA);
 
+                            // Fill color of nodes
                             final ColorAction colorFillNodes = new ColorAction(NODES, VisualItem.FILLCOLOR,
                                 ColorLib.rgb(255, 255, 255));
                             colorFillNodes.add(VisualItem.HOVER, ColorLib.rgb(255, 100, 100));
                             colorFillNodes.add(VisualItem.HIGHLIGHT, ColorLib.rgb(255, 100, 100));
 
-                            final int[] defaultPalette = new int[226];
+                            // palette of color used to draw edges in function
+                            // of their latency
+                            defaultPalette = new int[226];
                             final int[] fixedPalette = new int[226];
                             final int[] highlightPalette = new int[226];
                             for (int i = 0; i < 226; i++) {
@@ -411,54 +465,62 @@ public class TopologyViewer {
                                 highlightPalette[i] = ColorLib.rgba(255, 119, 22, i + 30);
                                 defaultPalette[i] = ColorLib.rgba(50, 50, 50, i + 15);
                             }
-                            aFill = new DataColorAction(EDGES, "weight", Constants.NUMERICAL,
+                            // Color of edges
+                            edgeColor = new DataColorAction(EDGES, "weight", Constants.NUMERICAL,
                                 VisualItem.STROKECOLOR, defaultPalette);
-                            aFill.add(VisualItem.HIGHLIGHT, new DataColorAction(EDGES, "weight",
+                            edgeColor.add(VisualItem.HIGHLIGHT, new DataColorAction(EDGES, "weight",
                                 Constants.NUMERICAL, VisualItem.STROKECOLOR, highlightPalette));
-                            aFill.add(VisualItem.FIXED, new DataColorAction(EDGES, "weight",
+                            edgeColor.add(VisualItem.FIXED, new DataColorAction(EDGES, "weight",
                                 Constants.NUMERICAL, VisualItem.STROKECOLOR, fixedPalette));
 
-                            final ColorAction colorEdges = new ColorAction(EDGES, VisualItem.STROKECOLOR,
-                                ColorLib.rgba(100, 100, 100, 120));
-                            colorEdges.add(new ColorStrokeEdgePredicate(GRAPH, visualization), ColorLib.rgb(
-                                    255, 50, 50));
-                            colorEdges.add(VisualItem.HIGHLIGHT, ColorLib.rgb(255, 119, 22));
-                            colorEdges.add(VisualItem.FIXED, ColorLib.rgba(17, 48, 250, 240));
-
+                            // Text color of edges
                             final ColorAction colorTextEdges = new ColorAction(EDGES, VisualItem.TEXTCOLOR,
                                 ColorLib.alpha(0));
                             colorTextEdges.add(VisualItem.HIGHLIGHT, ColorLib.rgb(255, 119, 22));
                             colorTextEdges.add(VisualItem.FIXED, ColorLib.rgba(17, 48, 250, 240));
 
-                            // Latency filter
-                            final GraphLatencyFilter latencyFilter = new GraphLatencyFilter(GRAPH,
-                                maxLatency, false);
+                            // Cluster stroke color
+                            final ColorAction clusterStroke = new ColorAction(CLUSTERS,
+                                VisualItem.STROKECOLOR);
+                            clusterStroke.setDefaultColor(ColorLib.gray(50));
+                            clusterStroke.add(VisualItem.HOVER, ColorLib.rgb(255, 100, 100));
 
-                            // create an action list containing all unique assignments
+                            // Cluster fill color
+                            int[] palette = new int[] { ColorLib.rgba(255, 200, 200, 150),
+                                    ColorLib.rgba(200, 255, 200, 150), ColorLib.rgba(200, 200, 255, 100),
+                                    ColorLib.rgba(255, 100, 0, 100), ColorLib.rgba(204, 51, 204, 100),
+                                    ColorLib.rgba(255, 204, 0, 100), ColorLib.rgba(0, 204, 204, 100) };
+                            final ColorAction clusterFill = new DataColorAction(CLUSTERS, "id",
+                                Constants.NOMINAL, VisualItem.FILLCOLOR, palette);
+
+                            // Latency filter
+                            latencyFilter = new GraphLatencyFilter(GRAPH, maxLatency, false);
+
+                            // action list containing all static colors
                             final ActionList staticActions = new ActionList();
                             staticActions.add(new ColorAction(NODES, VisualItem.TEXTCOLOR, ColorLib.gray(0)));
                             staticActions.add(new ColorAction(NODES, VisualItem.STROKECOLOR, ColorLib.rgb(0,
                                     0, 200)));
+                            staticActions.add(clusterFill);
 
                             // action list containing all dynamic colors
                             final ActionList dynamicColor = new ActionList();
                             dynamicColor.add(colorFillNodes);
                             if (graph.getNodeCount() > 1) {
-                                dynamicColor.add(aFill);
+                                dynamicColor.add(edgeColor);
                             }
                             dynamicColor.add(new LabelLayout(EDGE_DECORATORS));
                             dynamicColor.add(new RepaintAction());
 
-                            final ActionList repaint = new ActionList();
-                            repaint.add(new RepaintAction());
-
-                            // create an action list with an animated layout
-                            // the INFINITY parameter tells the action list to run indefinitely
+                            // Force simulator used by the animated layout
                             ForceSimulator m_fsim = new ForceSimulator();
-                            m_fsim.addForce(new NBodyForce());//2.0f, NBodyForce.DEFAULT_DISTANCE, NBodyForce.DEFAULT_THETA));
+                            m_fsim.addForce(new NBodyForce());
                             m_fsim.addForce(new LatencyForce());
                             m_fsim.addForce(new DragForce());
 
+                            // create an action list with an animated layout
+                            // the INFINITY parameter tells the action list to
+                            // run indefinitely
                             final ActionList layout = new ActionList(Activity.INFINITY);
                             topologyForceDirectedLayout = new TopologyForceDirectedLayout(GRAPH, m_fsim,
                                 false);
@@ -466,251 +528,32 @@ public class TopologyViewer {
                             layout.add(new LabelLayout(EDGE_DECORATORS));
                             layout.add(new RepaintAction());
 
+                            final ActionList clustersAL = new ActionList(Activity.INFINITY);
+                            clustersAL.add(clusterStroke);
+                            clustersAL.add(new AggregateLayout(CLUSTERS));
+                            clustersAL.add(new RepaintAction());
+
+                            // Put actions
                             visualization.putAction("unique", staticActions);
                             visualization.putAction("latencyFilter", latencyFilter);
                             visualization.putAction("layout", layout);
                             visualization.putAction("dynamicColor", dynamicColor);
-                            visualization.putAction("repaint", repaint);
+                            visualization.putAction("cluster", clustersAL);
 
-                            // create a new Display that pull from our Visualization
-                            final prefuse.Display display = new prefuse.Display(visualization);
+                            // create a new Display that pull from our
+                            // Visualization
+                            display = new prefuse.Display(visualization);
                             display.setPreferredSize(new Dimension(parent.getSize().x - 310,
                                 parent.getSize().y));
                             display.setHighQuality(true);
-                            //							display.addControlListener(new FocusControl(1));
-                            display.addControlListener(new SelectNodeControl(1));
-                            display.addControlListener(new DragControl()); // drag items around
+                            display.addControlListener(new SelectNodeControl(1)); // select nodes
+                            display.addControlListener(new AggregateDragControl()); // drag nodes and clusters
                             display.addControlListener(new PanControl()); // pan with background left-drag
                             display.addControlListener(new ZoomControl()); // zoom with vertical right-drag
                             display.addControlListener(new WheelZoomControl()); // mouse zoom
                             display.addControlListener(new NeighborEdgesHighlightControl("dynamicColor")); // sets the highlighted status for edges of the node under the mouse pointer
 
-                            // Option panel
-                            final JPanel fpanel = new JPanel();
-                            fpanel.setBackground(Color.WHITE);
-                            fpanel.setLayout(new BoxLayout(fpanel, BoxLayout.Y_AXIS));
-                            fpanel.setPreferredSize(new Dimension(300, parent.getSize().y));
-                            fpanel.setMaximumSize(new Dimension(300, parent.getSize().y));
-
-                            final JValueSlider springCoeffSlider = new JValueSlider("Coeff",
-                                TopologyForceDirectedLayout.COEFF_MIN, TopologyForceDirectedLayout.COEFF_MAX,
-                                topologyForceDirectedLayout.getSpringLenghtCoeff());
-                            springCoeffSlider.setToolTipText("blabla");
-                            springCoeffSlider.setBackground(Color.WHITE);
-                            springCoeffSlider.setPreferredSize(new Dimension(300, 20));
-                            springCoeffSlider.setMaximumSize(new Dimension(300, 20));
-                            springCoeffSlider.addChangeListener(new ChangeListener() {
-                                public void stateChanged(ChangeEvent e) {
-                                    topologyForceDirectedLayout.setSpringLengthCoeff(springCoeffSlider
-                                            .getValue().floatValue());
-                                }
-                            });
-
-                            // max latency slider, set the latency threshold
-                            latencySlider = new JValueSlider("Latency threshold", 0,
-                                maxLatency > 0 ? maxLatency : 1, maxLatency);
-                            latencySlider
-                                    .setToolTipText("Set the latency threshold of neighbours of selected nodes to display");
-                            latencySlider.setBackground(Color.WHITE);
-                            latencySlider.setPreferredSize(new Dimension(300, 20));
-                            latencySlider.setMaximumSize(new Dimension(300, 20));
-                            latencySlider.addChangeListener(new ChangeListener() {
-                                public void stateChanged(ChangeEvent e) {
-                                    latencyFilter.setLatencyThreshold(latencySlider.getValue().longValue());
-                                    latencyFilter.run();
-                                    visualization.run("dynamicColor");
-                                }
-                            });
-
-                            // checkbox, set the latency filter exclusive mode
-                            final JCheckBox exclusive = new JCheckBox("");
-                            exclusive
-                                    .setToolTipText("If exclusive show only neighbours of selected nodes whose latency with all selected nodes is under the threshold");
-                            exclusive.setBackground(Color.WHITE);
-                            exclusive.addActionListener(new ActionListener() {
-                                public void actionPerformed(ActionEvent e) {
-                                    latencyFilter.setExclusive(exclusive.isSelected());
-                                    latencyFilter.run();
-                                    visualization.run("dynamicColor");
-                                }
-                            });
-
-                            // box of 'exclusive' checkbox + label
-                            Box exclusiveBox = new Box(BoxLayout.X_AXIS);
-                            exclusiveBox.setPreferredSize(new Dimension(300, 20));
-                            exclusiveBox.setMaximumSize(new Dimension(300, 20));
-                            exclusiveBox.add(Box.createVerticalGlue());
-                            JLabel lab = new JLabel("Exclusive");
-                            lab
-                                    .setToolTipText("If exclusive show only neighbours of selected nodes whose latency with all selected nodes is under the threshold");
-                            exclusiveBox.add(lab);
-                            exclusiveBox.add(Box.createRigidArea(new Dimension(46, 20)));
-                            exclusiveBox.add(exclusive);
-                            //cf2.setBorder(BorderFactory.createLoweredBevelBorder());
-
-                            Box latencyFilterBox = new Box(BoxLayout.Y_AXIS);
-                            latencyFilterBox.setPreferredSize(new Dimension(300, 44));
-                            latencyFilterBox.setMaximumSize(new Dimension(300, 44));
-                            latencyFilterBox.add(latencySlider);
-                            latencyFilterBox.add(exclusiveBox);
-
-                            // checkbox to show/hide edges of unselected nodes
-                            final JCheckBox displayEdges = new JCheckBox("");
-                            displayEdges.setBackground(Color.WHITE);
-                            displayEdges.setToolTipText("Show/hide edges of unselected nodes");
-                            displayEdges.addActionListener(new ActionListener() {
-                                public void actionPerformed(ActionEvent e) {
-                                    if (displayEdges.isSelected()) {
-                                        for (int i = 0; i < 226; i++) {
-                                            defaultPalette[i] = ColorLib.rgba(50, 50, 50, i + 15);
-                                        }
-                                        visualization.run("dynamicColor");
-                                    } else {
-                                        for (int i = 0; i < 226; i++) {
-                                            defaultPalette[i] = ColorLib.rgba(0, 0, 0, 0);
-                                        }
-                                        visualization.run("dynamicColor");
-                                    }
-                                }
-                            });
-                            displayEdges.setSelected(true);
-                            displayEdges.doClick();
-
-                            // Box of 'displayEdges' checkbox
-                            Box displayEdgesBox = new Box(BoxLayout.X_AXIS);
-                            displayEdgesBox.setPreferredSize(new Dimension(300, 28));
-                            displayEdgesBox.setMaximumSize(new Dimension(300, 28));
-                            displayEdgesBox.add(Box.createVerticalGlue());
-                            JLabel lab2 = new JLabel("Edges");
-                            lab2.setToolTipText("Show/hide edges of unselected nodes");
-                            displayEdgesBox.add(lab2);
-                            displayEdgesBox.add(Box.createRigidArea(new Dimension(66, 28)));
-                            displayEdgesBox.add(displayEdges);
-
-                            // checkBox to run/stop the animation of the force layout
-                            final JCheckBox runLayout = new JCheckBox("");
-                            runLayout.setToolTipText("Run/Stop the animation");
-                            runLayout.setBackground(Color.WHITE);
-                            runLayout.setSelected(true);
-                            runLayout.addActionListener(new ActionListener() {
-                                public void actionPerformed(ActionEvent e) {
-                                    if (runLayout.isSelected()) {
-                                        visualization.run("layout");
-                                    } else {
-                                        visualization.cancel("layout");
-                                    }
-                                }
-                            });
-
-                            // Box of the 'runLayout' checkBox
-                            Box runLayoutBox = new Box(BoxLayout.X_AXIS);
-                            runLayoutBox.setPreferredSize(new Dimension(300, 28));
-                            runLayoutBox.setMaximumSize(new Dimension(300, 28));
-                            runLayoutBox.add(Box.createVerticalGlue());
-                            JLabel lab3 = new JLabel("Animation");
-                            lab3.setToolTipText("Run/Stop the animation");
-                            runLayoutBox.add(lab3);
-                            runLayoutBox.add(Box.createRigidArea(new Dimension(38, 28)));
-                            runLayoutBox.add(runLayout);
-
-                            // box of visibility filter
-                            Box visibilityFilterBox = new Box(BoxLayout.Y_AXIS);
-                            visibilityFilterBox.add(springCoeffSlider);
-                            visibilityFilterBox.add(latencyFilterBox);
-                            visibilityFilterBox.add(displayEdgesBox);
-                            visibilityFilterBox.add(runLayoutBox);
-                            visibilityFilterBox.setBorder(BorderFactory
-                                    .createTitledBorder("Visibility filter"));
-                            fpanel.add(visibilityFilterBox);
-
-                            final JPanel mainPanel = new JPanel(new FlowLayout(FlowLayout.TRAILING));
-                            mainPanel.add(display);
-                            mainPanel.add(fpanel);
-
-                            //							// fix selected focus nodes
-                            //							TupleSet focusGroup = visualization.getGroup(Visualization.FOCUS_ITEMS);
-                            //							focusGroup.addTupleSetListener(new TupleSetListener() {
-                            //								public void tupleSetChanged(TupleSet ts, Tuple[] add, Tuple[] rem) {
-                            //									System.out
-                            //									.println("TopologyViewer.loadMatrix(...).new Runnable() {...}.run().new TupleSetListener() {...}.tupleSetChanged()");
-                            //									for (int i = 0; i < rem.length; ++i) {
-                            //										if (rem[i] instanceof NodeItem) {
-                            //											NodeItem node = (NodeItem) (rem[i]);
-                            //											node.setFixed(false);
-                            //											Iterator edgeIt = node.edges();
-                            //											while (edgeIt.hasNext()) {
-                            //												EdgeItem edge = (EdgeItem) (edgeIt.next());
-                            //												edge.setFixed(false);
-                            //												//edge.setHighlighted(false);
-                            //											}
-                            //										}
-                            //									}
-                            //
-                            //									for (int i = 0; i < add.length; ++i) {
-                            //										if (add[i] instanceof NodeItem) {
-                            //											NodeItem node = (NodeItem) (add[i]);
-                            //											node.setFixed(false);
-                            //											node.setFixed(true);
-                            //											Iterator edgeIt = node.edges();
-                            //											while (edgeIt.hasNext()) {
-                            //												EdgeItem edge = (EdgeItem) (edgeIt.next());
-                            //												edge.setFixed(false);
-                            //												edge.setFixed(true);
-                            //											}
-                            //										}
-                            //									}
-                            //
-                            //									visualization.run("latencyFilter");
-                            //									visualization.run("dynamicColor");
-                            //								}
-                            //							});
-
-                            if (frame == null) {
-                                Composite swtAwtComponent = new Composite(parent, SWT.EMBEDDED);
-                                frame = SWT_AWT.new_Frame(swtAwtComponent);
-                            }
-
-                            frame.addWindowListener(new WindowAdapter() {
-                                public void windowActivated(WindowEvent e) {
-                                    if (visualization != null && runLayout.isSelected()) {
-                                        visualization.run("layout");
-                                    }
-                                }
-
-                                public void windowDeactivated(WindowEvent e) {
-                                    if (visualization != null) {
-                                        visualization.cancel("layout");
-                                    }
-                                }
-                            });
-
-                            // Resize listener
-                            frame.addComponentListener(new ComponentAdapter() {
-                                public void componentResized(ComponentEvent e) {
-                                    if (visualization != null) {
-                                        Dimension d = new Dimension(e.getComponent().getSize().width - 315, e
-                                                .getComponent().getSize().height);
-                                        display.setPreferredSize(d);
-                                        fpanel.setPreferredSize(new Dimension(300,
-                                            e.getComponent().getSize().height));
-                                        mainPanel.doLayout();
-                                    }
-                                }
-                            });
-
-                            MouseListener focus = new MouseAdapter() {
-                                public void mouseEntered(MouseEvent e) {
-                                    if (!frame.hasFocus()) {
-                                        frame.requestFocus();
-                                    }
-                                }
-                            };
-                            frame.addMouseListener(focus);
-                            display.addMouseListener(focus);
-
-                            frame.add(mainPanel);
-                            frame.pack();
-                            parent.layout();
+                            buildGUI();
 
                             visualization.setValue(EDGES, null, VisualItem.INTERACTIVE, Boolean.FALSE); // Cannot select edges
                             visualization.run("unique");
@@ -737,7 +580,260 @@ public class TopologyViewer {
     }
 
     /**
+     * Construct all GUI related components
+     */
+    private void buildGUI() {
+        /*
+         * Construction of the Option Panel
+         */
+        final JPanel fpanel = new JPanel();
+        fpanel.setBackground(Color.WHITE);
+        fpanel.setLayout(new BoxLayout(fpanel, BoxLayout.Y_AXIS));
+        fpanel.setPreferredSize(new Dimension(300, parent.getSize().y));
+        fpanel.setMaximumSize(new Dimension(300, parent.getSize().y));
+
+        final JValueSlider springForceSlider = new JValueSlider("Distance",
+            TopologyForceDirectedLayout.COEFF_MIN, TopologyForceDirectedLayout.COEFF_MAX,
+            topologyForceDirectedLayout.getSpringLenghtCoeff());
+        springForceSlider.setBackground(Color.WHITE);
+        springForceSlider.setPreferredSize(new Dimension(300, 20));
+        springForceSlider.setMaximumSize(new Dimension(300, 20));
+        springForceSlider.addChangeListener(new ChangeListener() {
+            public void stateChanged(ChangeEvent e) {
+                topologyForceDirectedLayout.setSpringLengthCoeff(springForceSlider.getValue().floatValue());
+            }
+        });
+
+        // Slider to select number of clusters
+        final JValueSlider clustersSlider = new JValueSlider("Clusters", 0, 6, 0);
+        clustersSlider.setBackground(Color.WHITE);
+        clustersSlider.setPreferredSize(new Dimension(300, 22));
+        clustersSlider.setMaximumSize(new Dimension(300, 22));
+        clustersSlider.addChangeListener(new ChangeListener() {
+            public void stateChanged(ChangeEvent e) {
+                int nb = clustersSlider.getValue().intValue();
+                if (nb != nbClusters) {
+                    nbClusters = nb;
+                    clusterize();
+                }
+            }
+        });
+
+        final JComboBox clusterAlgo = new JComboBox();
+        clusterAlgo.addItem("Min");
+        clusterAlgo.addItem("Avg");
+        clusterAlgo.addItem("Max");
+        clusterAlgo.setSelectedIndex(1);
+        //							clusterAlgo.setToolTipText("Select th");
+        clusterAlgo.setBackground(Color.WHITE);
+        clusterAlgo.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                String item = (String) clusterAlgo.getSelectedItem();
+                //				fpanel.repaint();
+                if (!item.equals(clusteringMode)) {
+                    clusteringMode = item;
+                    clusterize();
+                }
+            }
+        });
+        clusterAlgo.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                super.mouseClicked(e);
+                fpanel.repaint();
+            }
+        });
+
+        // box of 'clusterAlgo' combobox + label
+        Box clusterAlgoBox = new Box(BoxLayout.X_AXIS);
+        clusterAlgoBox.setPreferredSize(new Dimension(300, 20));
+        clusterAlgoBox.setMaximumSize(new Dimension(300, 20));
+        clusterAlgoBox.add(Box.createVerticalGlue());
+        JLabel lab = new JLabel("Mode");
+        lab.setToolTipText("Set clustering selection mode");
+        clusterAlgoBox.add(lab);
+        clusterAlgoBox.add(Box.createRigidArea(new Dimension(70, 20)));
+        clusterAlgoBox.add(clusterAlgo);
+
+        // Box containing ClusersSlider and
+        Box ClusterBox = new Box(BoxLayout.Y_AXIS);
+        ClusterBox.setPreferredSize(new Dimension(300, 44));
+        ClusterBox.setMaximumSize(new Dimension(300, 44));
+        ClusterBox.add(clustersSlider);
+        ClusterBox.add(clusterAlgoBox);
+
+        // max latency slider, set the latency threshold
+        latencySlider = new JValueSlider("Threshold", 0, maxLatency > 0 ? maxLatency : 1, maxLatency);
+        latencySlider.setToolTipText("Set the latency threshold of neighbours of selected nodes to display");
+        latencySlider.setBackground(Color.WHITE);
+        latencySlider.setPreferredSize(new Dimension(300, 20));
+        latencySlider.setMaximumSize(new Dimension(300, 20));
+        latencySlider.addChangeListener(new ChangeListener() {
+            public void stateChanged(ChangeEvent e) {
+                latencyFilter.setLatencyThreshold(latencySlider.getValue().longValue());
+                latencyFilter.run();
+                visualization.run("dynamicColor");
+            }
+        });
+
+        // checkbox, set the latency filter exclusive mode
+        final JCheckBox exclusive = new JCheckBox("");
+        exclusive
+                .setToolTipText("If exclusive show only neighbours of selected nodes whose latency with all selected nodes is under the threshold");
+        exclusive.setBackground(Color.WHITE);
+        exclusive.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                latencyFilter.setExclusive(exclusive.isSelected());
+                latencyFilter.run();
+                visualization.run("dynamicColor");
+            }
+        });
+
+        // box of 'exclusive' checkbox + label
+        Box exclusiveBox = new Box(BoxLayout.X_AXIS);
+        exclusiveBox.setPreferredSize(new Dimension(300, 20));
+        exclusiveBox.setMaximumSize(new Dimension(300, 20));
+        exclusiveBox.add(Box.createVerticalGlue());
+        JLabel lab1 = new JLabel("Exclusive");
+        lab1
+                .setToolTipText("If exclusive show only neighbours of selected nodes whose latency with all selected nodes is under the threshold");
+        exclusiveBox.add(lab1);
+        exclusiveBox.add(Box.createRigidArea(new Dimension(46, 20)));
+        exclusiveBox.add(exclusive);
+        // cf2.setBorder(BorderFactory.createLoweredBevelBorder());
+
+        Box latencyFilterBox = new Box(BoxLayout.Y_AXIS);
+        latencyFilterBox.setPreferredSize(new Dimension(300, 44));
+        latencyFilterBox.setMaximumSize(new Dimension(300, 44));
+        latencyFilterBox.add(latencySlider);
+        latencyFilterBox.add(exclusiveBox);
+
+        // checkbox to show/hide edges of unselected nodes
+        final JCheckBox displayEdges = new JCheckBox("");
+        displayEdges.setBackground(Color.WHITE);
+        displayEdges.setToolTipText("Show/hide edges of unselected nodes");
+        displayEdges.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                if (displayEdges.isSelected()) {
+                    for (int i = 0; i < 226; i++) {
+                        defaultPalette[i] = ColorLib.rgba(50, 50, 50, i + 15);
+                    }
+                    visualization.run("dynamicColor");
+                } else {
+                    for (int i = 0; i < 226; i++) {
+                        defaultPalette[i] = ColorLib.rgba(0, 0, 0, 0);
+                    }
+                    visualization.run("dynamicColor");
+                }
+            }
+        });
+        displayEdges.setSelected(true);
+        displayEdges.doClick();
+
+        // Box of 'displayEdges' checkbox
+        Box displayEdgesBox = new Box(BoxLayout.X_AXIS);
+        displayEdgesBox.setPreferredSize(new Dimension(300, 28));
+        displayEdgesBox.setMaximumSize(new Dimension(300, 28));
+        displayEdgesBox.add(Box.createVerticalGlue());
+        JLabel lab2 = new JLabel("Edges");
+        lab2.setToolTipText("Show/hide edges of unselected nodes");
+        displayEdgesBox.add(lab2);
+        displayEdgesBox.add(Box.createRigidArea(new Dimension(66, 28)));
+        displayEdgesBox.add(displayEdges);
+
+        // checkBox to run/stop the animation of the force layout
+        runLayout = new JCheckBox("");
+        runLayout.setToolTipText("Run/Stop the animation");
+        runLayout.setBackground(Color.WHITE);
+        runLayout.setSelected(true);
+        runLayout.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                if (runLayout.isSelected()) {
+                    visualization.run("layout");
+                } else {
+                    visualization.cancel("layout");
+                }
+            }
+        });
+
+        // Box of the 'runLayout' checkBox
+        Box runLayoutBox = new Box(BoxLayout.X_AXIS);
+        runLayoutBox.setPreferredSize(new Dimension(300, 28));
+        runLayoutBox.setMaximumSize(new Dimension(300, 28));
+        runLayoutBox.add(Box.createVerticalGlue());
+        JLabel lab3 = new JLabel("Animation");
+        lab3.setToolTipText("Run/Stop the animation");
+        runLayoutBox.add(lab3);
+        runLayoutBox.add(Box.createRigidArea(new Dimension(38, 28)));
+        runLayoutBox.add(runLayout);
+
+        // box of visibility filter
+        Box visibilityFilterBox = new Box(BoxLayout.Y_AXIS);
+        visibilityFilterBox.add(springForceSlider);
+        visibilityFilterBox.add(ClusterBox);
+        visibilityFilterBox.add(latencyFilterBox);
+        visibilityFilterBox.add(displayEdgesBox);
+        visibilityFilterBox.add(runLayoutBox);
+        visibilityFilterBox.setBorder(BorderFactory.createTitledBorder("Visibility filter"));
+        fpanel.add(visibilityFilterBox);
+
+        final JPanel mainPanel = new JPanel(new FlowLayout(FlowLayout.TRAILING));
+        mainPanel.add(display);
+        mainPanel.add(fpanel);
+
+        /*
+         * Frame Listeners
+         */
+        if (frame == null) {
+            Composite swtAwtComponent = new Composite(parent, SWT.EMBEDDED);
+            frame = SWT_AWT.new_Frame(swtAwtComponent);
+        }
+
+        frame.addWindowListener(new WindowAdapter() {
+            public void windowActivated(WindowEvent e) {
+                if (visualization != null && runLayout.isSelected()) {
+                    visualization.run("layout");
+                }
+            }
+
+            public void windowDeactivated(WindowEvent e) {
+                if (visualization != null) {
+                    visualization.cancel("layout");
+                }
+            }
+        });
+
+        // Resize listener
+        frame.addComponentListener(new ComponentAdapter() {
+            public void componentResized(ComponentEvent e) {
+                if (visualization != null) {
+                    Dimension d = new Dimension(e.getComponent().getSize().width - 315, e.getComponent()
+                            .getSize().height);
+                    display.setPreferredSize(d);
+                    fpanel.setPreferredSize(new Dimension(300, e.getComponent().getSize().height));
+                    mainPanel.doLayout();
+                }
+            }
+        });
+
+        MouseListener focus = new MouseAdapter() {
+            public void mouseEntered(MouseEvent e) {
+                if (!frame.hasFocus()) {
+                    frame.requestFocus();
+                }
+            }
+        };
+        frame.addMouseListener(focus);
+        display.addMouseListener(focus);
+
+        frame.add(mainPanel);
+        frame.pack();
+        parent.layout();
+    }
+
+    /**
      * Creates a graph from RM's topology
+     *
      * @param topology
      * @return
      */
@@ -772,7 +868,7 @@ public class TopologyViewer {
                             prefuse.data.Node node = graph.addNode();
                             System.out.println("TopologyViewer.createGraph() ajout de " + host);
                             node.set("name", host);
-                            //						node.set("address", host);
+                            // node.set("address", host);
                             Set<Node> hostNodes = new HashSet<Node>();
                             hostNodes.add((Node) element);
                             node.set("nodes", hostNodes);
@@ -913,11 +1009,59 @@ public class TopologyViewer {
         }
     }
 
+    private void clusterize() {
+        visualization.cancel("cluster");
+        visualization.cancel("layout");
+        DistanceFunction df;
+        if (clusteringMode.equals("Min")) {
+            df = BestProximityDescriptor.MIN;
+        } else if (clusteringMode.equals("Avg")) {
+            df = BestProximityDescriptor.AVG;
+        } else {
+            df = BestProximityDescriptor.MAX;
+        }
+        List<Cluster<String>> clusters = (nbClusters > 0) ? topology.clusterize(nbClusters, df) : null;
+        clusterize(clusters);
+        visualization.run("cluster");
+        if (runLayout.isSelected()) {
+            visualization.run("layout");
+        }
+        if (nbClusters == 0) {
+            visualization.cancel("cluster");
+        }
+    }
+
+    public void clusterize(List<Cluster<String>> clusters) {
+        AggregateTable at = (AggregateTable) visualization.getGroup(CLUSTERS);
+        Table nodes = graph.getNodeTable();
+        SearchQueryBinding searchQ;
+        at.clear();
+        if (clusters == null || clusters.size() == 0) {
+            // don't display clusters
+            return;
+        }
+        int i = 0;
+        for (Cluster<String> clusterHosts : clusters) {
+            AggregateItem cluster = (AggregateItem) at.addItem();
+            cluster.setInt("id", i++);
+            for (String host : clusterHosts.getElements()) {
+                searchQ = new SearchQueryBinding(nodes, "name");
+                SearchTupleSet sts = searchQ.getSearchSet();
+                sts.search(host);
+                if (sts.getTupleCount() == 1) {
+                    TableTuple t = (TableTuple) sts.tuples().next();
+                    cluster.addItem(visualization.getVisualItem(NODES, t));
+                } else
+                    System.out.println("ERREUR : TopologyViewer.clusterize() taille incorecte res = " + sts);
+            }
+        }
+        visualization.run("unique");
+    }
+
     /**
-     * Return a Graph for test purpose
-     * The graph is extracted from a parsed file
-     * the file should contain the number of nodes on the first line
-     * and then the matrice.
+     * Return a Graph for test purpose The graph is extracted from a parsed file
+     * the file should contain the number of nodes on the first line and then
+     * the matrice.
      */
     private Graph createGraph(String filename) {
         Graph graph = new Graph();
@@ -965,77 +1109,47 @@ public class TopologyViewer {
     }
 
     class SelectNodeControl extends ControlAdapter {
-
-        private String group = Visualization.FOCUS_ITEMS;
         protected VisualItem curFocus;
         protected int ccount = 1;
         protected int button = Control.LEFT_MOUSE_BUTTON;
-        protected Predicate filter = null;
 
         public SelectNodeControl(int clicks) {
             ccount = clicks;
         }
 
-        //	    /**
-        //	     * @see prefuse.controls.Control#itemEntered(prefuse.visual.VisualItem, java.awt.event.MouseEvent)
-        //	     */
-        //	    public void itemEntered(VisualItem item, MouseEvent e) {
-        ////	        Display d = (Display)e.getSource();
-        ////	        d.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        //	        if ( ccount == 0 ) {
-        //	            Visualization vis = item.getVisualization();
-        //	            TupleSet ts = vis.getFocusGroup(group);
-        //	            ts.setTuple(item);
-        //	            curFocus = item;
-        //	            runActivity(vis);
-        //	        }
-        //	    }
-
-        //	    /**
-        //	     * @see prefuse.controls.Control#itemExited(prefuse.visual.VisualItem, java.awt.event.MouseEvent)
-        //	     */
-        //	    public void itemExited(VisualItem item, MouseEvent e) {
-        //	        Display d = (Display)e.getSource();
-        //	        d.setCursor(Cursor.getDefaultCursor());
-        //	        if ( ccount == 0 ) {
-        //	            curFocus = null;
-        //	            Visualization vis = item.getVisualization();
-        //	            TupleSet ts = vis.getFocusGroup(group);
-        //	            ts.removeTuple(item);
-        //	            runActivity(vis);
-        //	        }
-        //	    }
-
         /**
-         * @see prefuse.controls.Control#itemClicked(prefuse.visual.VisualItem, java.awt.event.MouseEvent)
+         * @see prefuse.controls.Control#itemClicked(prefuse.visual.VisualItem,
+         *      java.awt.event.MouseEvent)
          */
         public void itemClicked(VisualItem item, MouseEvent e) {
             if (UILib.isButtonPressed(e, button) && e.getClickCount() == ccount) {
-                TupleSet focusGroup = visualization.getFocusGroup(Visualization.FOCUS_ITEMS);
-                if (item != curFocus) {
-                    //	                TupleSet ts = vis.getFocusGroup(group);
+                if (item instanceof NodeItem) {
+                    TupleSet focusGroup = visualization.getFocusGroup(Visualization.FOCUS_ITEMS);
+                    if (item != curFocus) {
+                        // TupleSet ts = vis.getFocusGroup(group);
 
-                    boolean ctrl = e.isControlDown();
-                    if (!ctrl) {
-                        curFocus = item;
-                        //	                    ts.setTuple(item);
-                        Set<VisualItem> selectedItems = new HashSet<VisualItem>();
-                        selectedItems.add(item);
-                        focusGroup.clear();
-                        focusGroup.setTuple(item);
-                        setSelectecItems(selectedItems);
-                    } else if (IsInSelectedItems(item)) {
+                        boolean ctrl = e.isControlDown();
+                        if (!ctrl) {
+                            curFocus = item;
+                            // ts.setTuple(item);
+                            Set<VisualItem> selectedItems = new HashSet<VisualItem>();
+                            selectedItems.add(item);
+                            focusGroup.clear();
+                            focusGroup.setTuple(item);
+                            setSelectecItems(selectedItems);
+                        } else if (IsInSelectedItems(item)) {
+                            focusGroup.removeTuple(item);
+                            removeFromSelectedItems(item);
+                        } else {
+                            focusGroup.addTuple(item);
+                            addToSelectedItems(item);
+                        }
+
+                    } else if (e.isControlDown()) {
                         focusGroup.removeTuple(item);
                         removeFromSelectedItems(item);
-                    } else {
-                        focusGroup.addTuple(item);
-                        addToSelectedItems(item);
+                        curFocus = null;
                     }
-
-                } else if (e.isControlDown()) {
-                    focusGroup.removeTuple(item);
-                    removeFromSelectedItems(item);
-                    curFocus = null;
                 }
             }
         }
@@ -1044,9 +1158,9 @@ public class TopologyViewer {
 
 /**
  * Set label positions. Labels are assumed to be DecoratorItem instances,
- * decorating their respective nodes. The layout simply gets the bounds
- * of the decorated node and assigns the label coordinates to the center
- * of those bounds.
+ * decorating their respective nodes. The layout simply gets the bounds of the
+ * decorated node and assigns the label coordinates to the center of those
+ * bounds.
  */
 class LabelLayout extends Layout {
     public LabelLayout(String group) {
@@ -1082,63 +1196,3 @@ class LabelLayout extends Layout {
     }
 } // end of inner class LabelLayout
 
-/**
- * A ControlListener that sets the highlighted status for edges neighboring the node
- * currently under the mouse pointer. The highlight flag might then be used
- * by a color function to change node appearance as desired.
- */
-class NeighborEdgesHighlightControl extends ControlAdapter {
-
-    private String activity = null;
-
-    /**
-     * Creates a new highlight control.
-     */
-    public NeighborEdgesHighlightControl() {
-        this(null);
-    }
-
-    /**
-     * Creates a new highlight control that runs the given activity
-     * whenever the neighbor highlight changes.
-     * @param activity the update Activity to run
-     */
-    public NeighborEdgesHighlightControl(String activity) {
-        this.activity = activity;
-    }
-
-    /**
-     * @see prefuse.controls.Control#itemEntered(prefuse.visual.VisualItem, java.awt.event.MouseEvent)
-     */
-    public void itemEntered(VisualItem item, MouseEvent e) {
-        if (item instanceof NodeItem)
-            setNeighborHighlight((NodeItem) item, true);
-    }
-
-    /**
-     * @see prefuse.controls.Control#itemExited(prefuse.visual.VisualItem, java.awt.event.MouseEvent)
-     */
-    public void itemExited(VisualItem item, MouseEvent e) {
-        if (item instanceof NodeItem)
-            setNeighborHighlight((NodeItem) item, false);
-    }
-
-    /**
-     * Set the highlighted state of the neighbors of a node.
-     * @param n the node under consideration
-     * @param state the highlighting state to apply to neighbors
-     */
-    protected void setNeighborHighlight(NodeItem n, boolean state) {
-        Iterator iter = n.edges();
-        while (iter.hasNext()) {
-            EdgeItem eitem = (EdgeItem) iter.next();
-            //            NodeItem nitem = eitem.getAdjacentItem(n);
-            if (eitem.isVisible()) {
-                eitem.setHighlighted(state);
-                //                nitem.setHighlighted(state);
-            }
-        }
-        if (activity != null)
-            n.getVisualization().run(activity);
-    }
-} // end of class NeighborHighlightControl

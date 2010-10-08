@@ -1,4 +1,4 @@
-package org.ow2.proactive.resourcemanager.gui.topology;
+package org.ow2.proactive.resourcemanager.gui.topology.prefuse;
 
 import prefuse.util.force.AbstractForce;
 import prefuse.util.force.ForceItem;

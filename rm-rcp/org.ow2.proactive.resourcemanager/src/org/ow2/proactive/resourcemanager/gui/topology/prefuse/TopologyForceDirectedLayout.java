@@ -1,4 +1,4 @@
-package org.ow2.proactive.resourcemanager.gui.topology;
+package org.ow2.proactive.resourcemanager.gui.topology.prefuse;
 
 import prefuse.action.layout.graph.ForceDirectedLayout;
 import prefuse.util.force.ForceSimulator;
