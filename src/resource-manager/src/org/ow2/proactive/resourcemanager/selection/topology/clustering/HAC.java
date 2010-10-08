@@ -255,27 +255,30 @@ public class HAC {
 
     private Cluster findClosestClustersTo(Cluster cluster,
             HashMap<Cluster, HashMap<Cluster, Long>> curDistances) {
-        Cluster closest = null;
-        Long closestDistance = null;
 
-        for (Cluster c : curDistances.get(cluster).keySet()) {
-            if (c.equals(cluster))
-                continue;
+        Cluster[] res = null;
+        long proximity = threshold;
 
-            Long distance = getDistance(c.getNodes().get(0), cluster);
-            if (distance > threshold) {
-                continue;
-            }
-            if (distance > 0 && closestDistance == null) {
-                closest = c;
-                closestDistance = distance;
-            } else if (distance > 0 && distance < closestDistance) {
-                closest = c;
-                closestDistance = distance;
+        for (Cluster a : curDistances.keySet()) {
+            for (Cluster b : curDistances.get(a).keySet()) {
+                if (a.equals(b) || (!a.equals(cluster) && !b.equals(cluster))) {
+                    continue;
+                }
+
+                Long distance = curDistances.get(a).get(b);
+                if (distance >= 0 && distance <= proximity) {
+                    res = new Cluster[] { a, b };
+                    proximity = curDistances.get(a).get(b);
+                }
             }
         }
 
-        return closest;
+        // no closest found
+        if (res==null) return null;
+
+        //return the one that is not 'cluster'
+        return (res[0].equals(cluster)) ? res[1] : res[0];
+
     }
 
     private Cluster recalculateDistances(Cluster[] clusters2Merge,
