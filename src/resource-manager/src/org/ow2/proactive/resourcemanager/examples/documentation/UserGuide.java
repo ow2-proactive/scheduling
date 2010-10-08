@@ -4,6 +4,7 @@ import java.io.File;
 import java.security.KeyException;
 import java.security.PublicKey;
 import java.util.Iterator;
+import java.util.List;
 
 import javax.security.auth.login.LoginException;
 
@@ -15,6 +16,9 @@ import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProper
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.frontend.RMConnection;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
+import org.ow2.proactive.resourcemanager.frontend.topology.ThresholdProximityDescriptor;
+import org.ow2.proactive.resourcemanager.frontend.topology.TopologyDescriptor;
+import org.ow2.proactive.resourcemanager.frontend.topology.TopologyException;
 import org.ow2.proactive.scripting.InvalidScriptException;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.utils.NodeSet;
@@ -78,6 +82,51 @@ public class UserGuide {
         NodeSet nodeSet = resourceManager.getAtMostNodes(nbOfNodes, selectionScript);
         //@snippet-end UserGuide_GetNodes
         return nodeSet;
+    }
+
+    public static NodeSet getClosestNodes(ResourceManager resourceManager, int nbOfNodes) {
+        NodeSet exclution = null;
+        List<SelectionScript> selectionScripts = null;
+        long threshold = 1020;// microseconds
+        //@snippet-start UserGuide_GetClosestNodes
+        try {
+            // For running your you parallel application, you need a set of closest nodes from the
+            // resource manager.
+            NodeSet closestNodes = resourceManager.getAtMostNodes(nbOfNodes,
+                    TopologyDescriptor.BEST_PROXIMITY, selectionScripts, exclution);
+
+            // The previous request does not guarantee than nodes are interconnected with some reasonable threshold.
+            // If you want this kind of guarantee use the following request.
+            NodeSet thresholdNodes = resourceManager.getAtMostNodes(nbOfNodes,
+                    new ThresholdProximityDescriptor(threshold), selectionScripts, exclution);
+
+            // In order to get nodes on the single host, just run
+            NodeSet singleHostNodes = resourceManager.getAtMostNodes(nbOfNodes,
+                    TopologyDescriptor.SINGLE_HOST, selectionScripts, exclution);
+
+            // In order to get nodes on the single host exclusively, meaning that no other
+            // clients use this host, run
+            NodeSet singleHostExclusiveNodes = resourceManager.getAtMostNodes(nbOfNodes,
+                    TopologyDescriptor.SINGLE_HOST, selectionScripts, exclution);
+            // here we can get more nodes
+            System.out.println("The host capasicy is " + singleHostExclusiveNodes.size());
+            if (singleHostExclusiveNodes.size() > nbOfNodes) {
+                // we have got the host with bigger capacity
+            } else if (singleHostExclusiveNodes.size() < nbOfNodes) {
+                // we have got the host with smaller capacity
+            }
+
+            // In order to get nodes on multiple hosts exclusively user may also get
+            // more nodes (reflected hosts capacity) than requested.
+            NodeSet multipleHostsExclusiveNodes = resourceManager.getAtMostNodes(nbOfNodes,
+                    TopologyDescriptor.MULTIPLE_HOSTS_EXCLUSIVE, selectionScripts, exclution);
+
+        } catch (TopologyException ex) {
+            // topology is not enabled in the resource manager
+            ex.printStackTrace();
+        }
+        //@snippet-end UserGuide_GetClosestNodes
+        return null;
     }
 
     public static BooleanWrapper releaseNodes(ResourceManager resourceManager, NodeSet nodeSet) {

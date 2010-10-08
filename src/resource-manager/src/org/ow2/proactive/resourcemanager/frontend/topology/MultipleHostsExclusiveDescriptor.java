@@ -39,13 +39,15 @@ import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 
 
 /**
- * This descriptor allows to select nodes on the multiple hosts exclusively.
+ * This descriptor allows to select nodes on multiple hosts exclusively.
  * Hosts with selected nodes will be reserved for the user.
  *
  * By specifying this descriptor in {@link ResourceManager.getAtMostNodes} user may get
  * more nodes than it asked for due to the fact that total capacity of all machines is
  * bigger (even thought the resource manager tries to find the optimal set of host
  * minimizing the waist of resources), namely
+ *
+ * if user requested k nodes
  *
  * - if one machine exists with the capacity k it will be selected
  * - if several machines give exact number of nodes they will be selected

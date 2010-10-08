@@ -115,9 +115,171 @@
 	   <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://proactive.inria.fr/release-doc/ResourceManager/api_published/">the Resource Manager API</link>.
 	</para>
 	</section>
+	<section xml:id="RM_API_topology"><info><title>Nodes topology</title></info>
+        <para>
+        If the resource manager is configured to discover nodes topology (option
+        <emphasis>pa.rm.topology.enabled=true</emphasis> is specified in the config file) the user may
+        request nodes not only with selection scripts but also with topology parameters.
+
+        The following topology parameters are available:
+        </para>
+        <itemizedlist>
+            <listitem>
+                <para>
+                    <emphasis>ArbitraryTopologyDescriptor</emphasis> - no constraint on node location.
+                    This descriptor is used by default and provides the quickest way of finding nodes.
+                </para>
+            </listitem>
+            <listitem>
+                <para>
+                    <emphasis>BestProximityDescriptor</emphasis> - the set of closest nodes.
+                    Could be useful for parallel communicative applications which suppose to
+                    be executed on several nodes simultaneously.
+
+                    The concept of closeness could be controlled by user but in order to understand it
+                    lets take a look at how it works internally. The resource manager has a matrix of
+                    distances between all nodes it handles. When a new selection request comes
+                    the RM starts group nodes into clusters using
+                    <link xlink:href="http://en.wikipedia.org/wiki/Cluster_analysis#Agglomerative_hierarchical_clustering">agglomerative hierarchical clustering</link>.
+                   The process of clustering can be driven by the function used in distances recalculation between clusters
+                   while merging. For now there are 3 predefined functions:
+                 </para>
+	             <para>
+                    <itemizedlist>
+                    <listitem>
+                         <para>
+                               <emphasis>BestProximityDescriptor.MAX</emphasis> - the maximum distance between elements
+                             of each cluster (also called complete linkage clustering).
+                             The similarity of two clusters is the similarity of their most dissimilar members.
+                             This complete-link merge criterion is non-local; the entire structure of the
+                             clustering can influence merge decisions.
+                        </para>
+                    </listitem>
+                    <listitem>
+                         <para>
+                               <emphasis>BestProximityDescriptor.MIN</emphasis> - the minimum distance between elements of each cluster (also called                                                 single-linkage clustering)
+                                The similarity of two clusters is the similarity of their most similar members.
+                                This single-link merge criterion is local. We pay attention solely to the area where
+                                the two clusters come closest to each other.
+                        </para>
+                    </listitem>
+                    <listitem>
+                         <para>
+                               <emphasis>BestProximityDescriptor.AVG</emphasis> - the mean distance between elements of each cluster (also called average                                             linkage clustering)
+                               The similarity of two clusters is the similarity of their centres.
+                               This complete-link merge criterion is non-local; the entire structure of the
+                               clustering can influence merge decisions.
+                        </para>
+                    </listitem>
+                    </itemizedlist>
+	             </para>
+                 <para>
+                   By default <emphasis>BestProximityDescriptor.MAX</emphasis> is used which better finds clouds of nodes.
+                 </para>
+                 <para>
+                   The descriptor also allows to specify a set of <emphasis>pivot</emphasis> nodes which are used as startpoint for clustering.
+                   In this case the result set will contain nodes which are better interconnected with pivot nodes.
+	             </para>
+            </listitem>
+            <listitem>
+                <para>
+                    <emphasis>ThresholdProximityDescriptor</emphasis> - the set of nodes within a threshold proximity.
+                    This descriptor guarantees that the resource manager returns a set of nodes which are
+                    interconnected within specified proximity. Note that previous descriptor does not
+                    guarantee this.
+                </para>
+                <para>
+                   The descriptor also allows to specify a set of <emphasis>pivot</emphasis> nodes.
+                   In this case the result set will contain nodes which are interconnected under
+                   given threshold with pivot nodes.
+	            </para>
+            </listitem>
+            <listitem>
+                <para>
+                    <emphasis>SingleHostDescriptor</emphasis> - the set of nodes on a single host.
+                </para>
+            </listitem>
+            <listitem>
+                <para>
+                    <emphasis>SingleHostExclusiveDescriptor</emphasis> - the set of nodes of a single host exclusively.
+                    The host with selected nodes will be reserved for the user.
+	        </para>
+	        <para>
+					 By specifying this descriptor in <emphasis>ResourceManager.getAtMostNodes</emphasis> user may get
+					 more nodes than it asked for due to the fact that the capacity of the host is
+					 bigger (even thought the resource manager tries to find the optimal host
+					 minimizing the waist of resources), namely if user requested k nodes
+			        <itemizedlist>
+			            <listitem>
+			                <para>
+							   The machine with exact capacity will be selected if exists.
+			                </para>
+			            </listitem>
+			            <listitem>
+			                <para>
+							   The machine with bigger capacity will be selected if exists.
+							    The capacity of the selected machine will be the closest to k.
+			                </para>
+			            </listitem>
+			            <listitem>
+			                <para>
+							   The machine with smaller capacity than k will be selected.
+							    In this case the capacity of selected host will be the biggest among all other.
+			                </para>
+			            </listitem>
+			        </itemizedlist>
+                </para>
+            </listitem>
+            <listitem>
+                <para>
+                    <emphasis>MultipleHostsExclusiveDescriptor</emphasis> - the set of nodes on multiple hosts exclusively.
+                    Hosts with selected nodes will be reserved for the user.
+	           </para>
+                <para>
+					 By specifying this descriptor in <emphasis>ResourceManager.getAtMostNodes</emphasis> user may get
+					 more nodes than it asked for due to the fact that total capacity of hosts is
+					 bigger (even thought the resource manager tries to find the optimal host
+					 minimizing the waist of resources), namely if user requested k nodes
+			        <itemizedlist>
+			            <listitem>
+			                <para>
+							   If one machine exists with the capacity k it will be selected.
+			                </para>
+			            </listitem>
+			            <listitem>
+			                <para>
+							   If several machines give exact number of nodes they will be selected
+							    (in case of several possibilities number of machines will be minimized).
+			                </para>
+			            </listitem>
+			            <listitem>
+			                <para>
+							   If it not possible to find exact number of nodes but it's possible to
+							    find more than they will be selected. The number of waisted resources
+							    and number of machines will be minimized.
+			                </para>
+			            </listitem>
+			            <listitem>
+			                <para>
+						Otherwise less nodes will be provided but as the closest as possible to k.
+			                </para>
+			            </listitem>
+			        </itemizedlist>
+                </para>
+            </listitem>
+        </itemizedlist>
+
+		<para>
+        Lets take a look how we apply it in practice
+		<programlisting language="java"><textobject><textdata fileref="automatic_snippets/UserGuide_GetClosestNodes.snip"/></textobject></programlisting>
+		</para>
+
+    </section>
+
 	<section xml:id="RM_API_limitations"><info><title>Limitations</title></info>
 		<para>
-		When the resource manager is used directly, there are two limitations:
+		When the resource manager is used in standalone mode (without ProActive Scheduler)
+		there are two limitations:
 		</para>
 		<itemizedlist>
 			<listitem>
