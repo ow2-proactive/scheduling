@@ -40,21 +40,31 @@ import java.util.List;
 import org.objectweb.proactive.core.node.Node;
 
 
+/*
+ * Class represents the cluster of nodes grouped by the proximity.
+ * One node can belong only to one cluster, so it is one-to-many relationship
+ * (one cluster - many nodes).
+ *
+ * The first node used in the constructor defines the cluster id. It in needed in order
+ * to optimize hashCode() & equals() methods as the used a lot and their performance is
+ * crucial for the HAC algorithm.
+ *
+ */
 public class Cluster {
 
-    private List<Node> nodes = new LinkedList<Node>();
-
-    public Cluster() {
-    }
-
-    public Cluster(Cluster[] clusters) {
-        for (Cluster c : clusters) {
-            nodes.addAll(c.getNodes());
-        }
-    }
+    private String id = "";
+    private int hashCode = 0;
+    private LinkedList<Node> nodes = new LinkedList<Node>();
 
     public Cluster(Node node) {
         nodes.add(node);
+        if (node.getNodeInformation() == null) {
+            // for test purpose when nodes are imitated
+            id = node.toString();
+        } else {
+            id = node.getNodeInformation().getURL();
+        }
+        hashCode = id.hashCode();
     }
 
     public int getSize() {
@@ -71,6 +81,13 @@ public class Cluster {
 
     public void remove(List<Node> nodes) {
         this.nodes.removeAll(nodes);
+    }
+
+    public void removeLast(int number) {
+        // removeLast will throw NoSuchElementException if number is bigger than list size
+        for (int i = 0; i < number; i++) {
+            this.nodes.removeLast();
+        }
     }
 
     public String toString() {
@@ -90,10 +107,11 @@ public class Cluster {
     public boolean equals(Object obj) {
         if (!(obj instanceof Cluster))
             return false;
-        return nodes.equals(((Cluster) obj).getNodes());
+
+        return this.id.equals(((Cluster) obj).id);
     }
 
     public int hashCode() {
-        return nodes.hashCode();
+        return hashCode;
     }
 }

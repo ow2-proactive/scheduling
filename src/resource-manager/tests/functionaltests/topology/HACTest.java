@@ -136,7 +136,7 @@ public class HACTest extends FunctionalTest {
         RMTHelper.log("Test 5: [no pivot], graph [1 -(2)- 2 , 1 -(4)- 3, 2 -(10)- 3, 2 -(1)- 4, 3 -(3)- 4]");
         result = hac.select(4, new LinkedList<Node>(distances.keySet()));
         // HAC cannot cluster 3 nodes together so the expected result is 2
-        Assert.assertTrue("Selection size is not 3", result.size() == 2);
+        Assert.assertTrue("Selection size is not 2", result.size() == 2);
 
         RMTHelper
                 .log("Test 6: [pivot - node 1], graph [1 -(2)- 2 , 1 -(4)- 3, 2 -(10)- 3, 2 -(1)- 4, 3 -(3)- 4]");

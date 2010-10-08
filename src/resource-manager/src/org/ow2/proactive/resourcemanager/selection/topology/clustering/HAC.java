@@ -124,7 +124,7 @@ public class HAC {
                 Cluster closest = findClosestClustersTo(target, clusterDistances);
 
                 if (closest == null) {
-                    // there is no clusters close to the target
+                    // no clusters found => cannot merge anything => stop where we are
                     break;
                 }
                 // merging clusters and recalculating distances between others
@@ -153,19 +153,19 @@ public class HAC {
                     break;
                 } else if (target.getSize() > number) {
                     // found more nodes that we need,
-                    // in order to filter out the nodes list checking distances from nodes
-                    // in smaller cluster on previous step to the bigger one
+                    // target cluster contains all nodes from another cluster
 
                     logger.debug("Number of node in the cluster exceeded required node number " +
                         target.getSize() + " vs " + number);
-                    final Cluster biggerCluster = clustersToMerge[0].getSize() > clustersToMerge[1].getSize() ? clustersToMerge[0]
-                            : clustersToMerge[1];
-                    final Cluster smallerCluster = clustersToMerge[0].getSize() > clustersToMerge[1]
-                            .getSize() ? clustersToMerge[1] : clustersToMerge[0];
+
+                    Cluster anotherCluster = clustersToMerge[0] == target ? clustersToMerge[1]
+                            : clustersToMerge[0];
+                    target.removeLast(anotherCluster.getSize());
+                    final Cluster finalTarget = target;
 
                     Comparator<Node> nodeDistanceComparator = new Comparator<Node>() {
                         public int compare(Node n1, Node n2) {
-                            long res = getDistance(n1, biggerCluster) - getDistance(n2, biggerCluster);
+                            long res = getDistance(n1, finalTarget) - getDistance(n2, finalTarget);
                             if (res < 0) {
                                 return -1;
                             } else if (res > 0) {
@@ -175,16 +175,11 @@ public class HAC {
                             }
                         }
                     };
-                    // sorting nodes in the smaller cluster according to their distances to bigger cluster
-                    List<Node> sortedNodes = new LinkedList<Node>();
-                    for (Node node : smallerCluster.getNodes()) {
-                        sortedNodes.add(node);
-                    }
-                    Collections.sort(sortedNodes, nodeDistanceComparator);
+                    // sorting nodes in the smaller cluster according to their distances to target
+                    Collections.sort(anotherCluster.getNodes(), nodeDistanceComparator);
 
-                    int neededNodesNumber = number - biggerCluster.getSize();
-                    biggerCluster.add(sortedNodes.subList(0, neededNodesNumber));
-                    target = biggerCluster;
+                    int neededNodesNumber = number - target.getSize();
+                    target.add(anotherCluster.getNodes().subList(0, neededNodesNumber));
                     break;
                 }
             }
@@ -268,13 +263,14 @@ public class HAC {
                 Long distance = curDistances.get(a).get(b);
                 if (distance >= 0 && distance <= proximity) {
                     res = new Cluster[] { a, b };
-                    proximity = curDistances.get(a).get(b);
+                    proximity = distance;
                 }
             }
         }
 
         // no closest found
-        if (res==null) return null;
+        if (res == null)
+            return null;
 
         //return the one that is not 'cluster'
         return (res[0].equals(cluster)) ? res[1] : res[0];
@@ -284,8 +280,10 @@ public class HAC {
     private Cluster recalculateDistances(Cluster[] clusters2Merge,
             HashMap<Cluster, HashMap<Cluster, Long>> curDistances) {
 
-        Cluster merged = new Cluster(clusters2Merge);
-        curDistances.put(merged, new HashMap<Cluster, Long>());
+        final Cluster biggerCluster = clusters2Merge[0].getSize() > clusters2Merge[1].getSize() ? clusters2Merge[0]
+                : clusters2Merge[1];
+        final Cluster smallerCluster = clusters2Merge[0].getSize() > clusters2Merge[1].getSize() ? clusters2Merge[1]
+                : clusters2Merge[0];
 
         if (logger.isDebugEnabled()) {
             logger.debug("Recalculating distances");
@@ -293,36 +291,40 @@ public class HAC {
         }
 
         for (Cluster cluster : curDistances.keySet()) {
-            if (cluster.equals(clusters2Merge[0]) || cluster.equals(clusters2Merge[1]) ||
-                cluster.equals(merged)) {
+            if (cluster.equals(smallerCluster) || cluster.equals(biggerCluster)) {
                 continue;
             }
 
             //logger.debug(curDistances);
             long d0, d1;
-            if (curDistances.get(cluster) != null && curDistances.get(cluster).containsKey(clusters2Merge[0])) {
-                d0 = curDistances.get(cluster).get(clusters2Merge[0]);
+            if (curDistances.get(cluster) != null && curDistances.get(cluster).containsKey(biggerCluster)) {
+                d0 = curDistances.get(cluster).get(biggerCluster);
             } else {
-                d0 = curDistances.get(clusters2Merge[0]).get(cluster);
+                d0 = curDistances.get(biggerCluster).get(cluster);
             }
-            if (curDistances.get(cluster) != null && curDistances.get(cluster).containsKey(clusters2Merge[1])) {
-                d1 = curDistances.get(cluster).get(clusters2Merge[1]);
+            if (curDistances.get(cluster) != null && curDistances.get(cluster).containsKey(smallerCluster)) {
+                d1 = curDistances.get(cluster).get(smallerCluster);
             } else {
-                d1 = curDistances.get(clusters2Merge[1]).get(cluster);
+                d1 = curDistances.get(smallerCluster).get(cluster);
             }
 
             long newDistance = distanceFunction.distance(d0, d1);
-            curDistances.get(merged).put(cluster, newDistance);
+            curDistances.get(biggerCluster).put(cluster, newDistance);
 
             if (curDistances.get(cluster) != null) {
-                curDistances.get(cluster).remove(clusters2Merge[0]);
-                curDistances.get(cluster).remove(clusters2Merge[1]);
+                curDistances.get(cluster).remove(smallerCluster);
+                curDistances.get(cluster).remove(biggerCluster);
             }
         }
 
-        curDistances.remove(clusters2Merge[0]);
-        curDistances.remove(clusters2Merge[1]);
+        biggerCluster.add(smallerCluster.getNodes());
+        // we may actually add nodes to another instance of the cluster
+        // so override the key value in the hash
+        curDistances.put(biggerCluster, curDistances.remove(biggerCluster));
 
-        return merged;
+        curDistances.remove(smallerCluster);
+        curDistances.get(biggerCluster).remove(smallerCluster);
+
+        return biggerCluster;
     }
 }

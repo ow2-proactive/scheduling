@@ -274,20 +274,20 @@ public class MatrixBasedTests {
         String probCorners = "9........." +
                              ".........." +
                              ".........." +
-                             "........11" +
-                             "9.......11";
+                             ".........1" +
+                             "9.......1.";
 
         String bipartPivot = "9........." +
                              ".........." +
                              ".........." +
                              ".........." +
-                             ".........1";
+                             "........1.";
 
         String resultCorners="9........." +
                              ".........." +
                              ".........." +
                              ".........." +
-                             "1........1";
+                             "1.......1.";
 
         assertTrue("The algorithm did not deal well with far away pivots!",
                 doHACTest(W, H, probCorners, bipartPivot, infinity, 1).equals(resultCorners));
