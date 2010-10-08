@@ -75,7 +75,7 @@ public class HACTest extends FunctionalTest {
     private static class LocalHAC extends HAC {
 
         public LocalHAC(List<Node> pivot, DistanceFunction distanceFunction) {
-            super(pivot, distanceFunction);
+            super(pivot, distanceFunction, Long.MAX_VALUE);
         }
 
         protected Long getDistance(Node node, Node node2) {

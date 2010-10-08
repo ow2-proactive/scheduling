@@ -41,8 +41,6 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
@@ -218,7 +216,9 @@ public class TopologyManager {
                 BestProximityDescriptor descriptor = (BestProximityDescriptor) topologyDescriptor;
                 // HAC is very efficient algorithm but it does not guarantee the complete solution
                 logger.info("Running clustering algorithm in order to find closest nodes");
-                HAC hac = new HAC(descriptor.getPivot(), descriptor.getDistanceFunction());
+                HAC hac = new HAC(descriptor.getPivot(), descriptor.getDistanceFunction(), Long.MAX_VALUE);
+                return hac.select(number, matchedNodes);
+                /*
                 List<Node> hacResult = hac.select(number, matchedNodes);
                 if (hacResult.size() < number && hacResult.size() < matchedNodes.size()) {
                     logger
@@ -229,6 +229,7 @@ public class TopologyManager {
                 } else {
                     return hacResult;
                 }
+                 */
             }
         }
     }
@@ -238,11 +239,17 @@ public class TopologyManager {
         public List<Node> select(int number, List<Node> matchedNodes) {
             synchronized (topology) {
                 ThresholdProximityDescriptor descriptor = (ThresholdProximityDescriptor) topologyDescriptor;
-                logger
-                        .info("Running clique search algorithm in order to find nodes with threshold proximity " +
-                            descriptor.getThreshold());
-                CliqueFinder cliqueFinder = new CliqueFinder(descriptor.getPivot(), descriptor.getThreshold());
-                return cliqueFinder.getClique(number, matchedNodes);
+                logger.info("Running clustering algorithm in order to find closest nodes");
+                HAC hac = new HAC(descriptor.getPivot(), BestProximityDescriptor.MAX, descriptor
+                        .getThreshold());
+                return hac.select(number, matchedNodes);
+                /*
+                 logger
+                 .info("Running clique search algorithm in order to find nodes with threshold proximity " +
+                 descriptor.getThreshold());
+                 CliqueFinder cliqueFinder = new CliqueFinder(descriptor.getPivot(), descriptor.getThreshold());
+                 return cliqueFinder.getClique(number, matchedNodes);
+                 */
             }
         }
     }

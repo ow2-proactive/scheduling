@@ -40,9 +40,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.SortedMap;
-import java.util.SortedSet;
-import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.node.Node;
@@ -65,11 +62,13 @@ public class HAC {
     private final static Logger logger = ProActiveLogger.getLogger(RMLoggers.TOPOLOGY);
     private final List<Node> pivot;
     private DistanceFunction distanceFunction;
+    private long threshold;
 
-    public HAC(List<Node> pivot, DistanceFunction distanceFunction) {
+    public HAC(List<Node> pivot, DistanceFunction distanceFunction, long threshold) {
 
         this.pivot = pivot == null ? new LinkedList<Node>() : pivot;
         this.distanceFunction = distanceFunction;
+        this.threshold = threshold;
 
         // check that all distances for pivot nodes are presented
         for (Node node : this.pivot) {
@@ -235,7 +234,7 @@ public class HAC {
     private Cluster[] findClosestClusters(HashMap<Cluster, HashMap<Cluster, Long>> curDistances) {
 
         Cluster[] res = null;
-        long proximity = Long.MAX_VALUE;
+        long proximity = threshold;
 
         for (Cluster a : curDistances.keySet()) {
             for (Cluster b : curDistances.get(a).keySet()) {
@@ -244,7 +243,7 @@ public class HAC {
                 }
 
                 Long distance = curDistances.get(a).get(b);
-                if (distance >= 0 && distance < proximity) {
+                if (distance >= 0 && distance <= proximity) {
                     res = new Cluster[] { a, b };
                     proximity = curDistances.get(a).get(b);
                 }
@@ -264,6 +263,9 @@ public class HAC {
                 continue;
 
             Long distance = getDistance(c.getNodes().get(0), cluster);
+            if (distance > threshold) {
+                continue;
+            }
             if (distance > 0 && closestDistance == null) {
                 closest = c;
                 closestDistance = distance;
