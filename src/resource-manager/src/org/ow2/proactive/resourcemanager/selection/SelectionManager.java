@@ -207,14 +207,16 @@ public abstract class SelectionManager {
 
         // creating script executors object to be run in dedicated thread pool
         List<Callable<Node>> scriptExecutors = new LinkedList<Callable<Node>>();
-        for (RMNode node : candidates) {
-            if (inProgress.contains(node.getNodeURL())) {
-                if (logger.isDebugEnabled())
-                    logger.debug("Script execution is in progress on node " + node.getNodeURL() +
-                        " - skipping.");
-            } else {
-                inProgress.add(node.getNodeURL());
-                scriptExecutors.add(new ScriptExecutor(node, scripts, this));
+        synchronized (inProgress) {
+            for (RMNode node : candidates) {
+                if (inProgress.contains(node.getNodeURL())) {
+                    if (logger.isDebugEnabled())
+                        logger.debug("Script execution is in progress on node " + node.getNodeURL() +
+                            " - skipping.");
+                } else {
+                    inProgress.add(node.getNodeURL());
+                    scriptExecutors.add(new ScriptExecutor(node, scripts, this));
+                }
             }
         }
 
@@ -291,8 +293,10 @@ public abstract class SelectionManager {
     /**
      * Indicates that script execution is finished for the node with specified url.
      */
-    public synchronized void scriptExecutionFinished(String nodeUrl) {
-        inProgress.remove(nodeUrl);
+    public void scriptExecutionFinished(String nodeUrl) {
+        synchronized (inProgress) {
+            inProgress.remove(nodeUrl);
+        }
     }
 
     /**

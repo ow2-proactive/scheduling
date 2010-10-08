@@ -51,9 +51,6 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.awt.geom.Rectangle2D;
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -211,7 +208,6 @@ public class TopologyViewer {
         initComposite();
         initLayout();
         if (ResourceExplorerView.getTreeViewer() != null) {
-            System.out.println("TopologyViewer.init() addSelectionListener");
             ResourceExplorerView.getTreeViewer().addSelectionChangedListener(new TopologySelectionListener());
         }
     }
@@ -256,16 +252,13 @@ public class TopologyViewer {
         } finally {
             lock.unlock();
         }
-        if (!init && RMStore.isConnected() && node.getState() == NodeState.BUSY ||
-            node.getState() == NodeState.FREE) {
+        if (!init && RMStore.isConnected() && node.getState() != NodeState.DOWN) {
             Display.getDefault().asyncExec(new Runnable() {
                 public void run() {
                     lock.lock();
-                    long time = System.nanoTime();
                     synchronized (visualization) {
                         try {
-                            String nodeURL = node.getName();
-                            System.out.println("TopologyViewer.addNode() " + nodeURL);
+                            topology = RMStore.getInstance().getResourceManager().getTopology();
                             String host = node.getParent().getParent().getName();
                             // Topology topology =
                             // RMStore.getInstance().getResourceManager().getTopology();
@@ -330,9 +323,8 @@ public class TopologyViewer {
 
                                 visualization.run("unique");
                                 visualization.run("dynamicColor");
+                                visualization.run("layout");
                             }
-                            System.out.println("TopologyViewer.addNode() node = " + node.getName() +
-                                " time = " + (System.nanoTime() - time) / 1000);
                         } finally {
                             lock.unlock();
                         }
@@ -393,6 +385,7 @@ public class TopologyViewer {
                             visualization.run("latencyFilter");
                             visualization.run("unique");
                             visualization.run("dynamicColor");
+                            visualization.run("layout");
                         } finally {
                             lock.unlock();
                         }
@@ -539,7 +532,7 @@ public class TopologyViewer {
                             visualization.putAction("latencyFilter", latencyFilter);
                             visualization.putAction("layout", layout);
                             visualization.putAction("dynamicColor", dynamicColor);
-                            visualization.putAction("cluster", clustersAL);
+                            //visualization.putAction("cluster", clustersAL);
 
                             // create a new Display that pull from our
                             // Visualization
@@ -825,7 +818,6 @@ public class TopologyViewer {
                         } else {
                             // New host to add to the graph
                             prefuse.data.Node node = graph.addNode();
-                            System.out.println("TopologyViewer.createGraph() ajout de " + host);
                             node.set("name", host);
                             // node.set("address", host);
                             Set<Node> hostNodes = new HashSet<Node>();
@@ -996,56 +988,6 @@ public class TopologyViewer {
         if (nbClusters > 0) {
             visualization.run("cluster");
         }
-    }
-
-    /**
-     * Return a Graph for test purpose The graph is extracted from a parsed file
-     * the file should contain the number of nodes on the first line and then
-     * the matrice.
-     */
-    private Graph createGraph(String filename) {
-        Graph graph = new Graph();
-        graph.getNodeTable().addColumns(new Schema(new String[] { "name" }, new Class[] { String.class }));
-        graph.getEdgeTable().addColumns(new Schema(new String[] { "weight" }, new Class[] { double.class }));
-
-        BufferedReader br = null;
-        try {
-            br = new BufferedReader(new InputStreamReader(new FileInputStream(filename)));
-
-            int nbNodes = new Integer(br.readLine());
-            System.out.println("nbNodes = " + nbNodes);
-
-            prefuse.data.Node[] nodes = new prefuse.data.Node[nbNodes];
-            for (int i = 0; i < nbNodes; i++) {
-                nodes[i] = graph.addNode();
-                nodes[i].set("name", "node" + i);
-            }
-
-            maxLatency = 0;
-            for (int i = 0; i < nbNodes; i++) {
-                String line = br.readLine();
-                String[] values = line.split("\\s+");
-                for (int j = 0; j < nbNodes; j++) {
-                    if (i != j) {
-                        int distance = new Integer(values[j]);
-                        System.out.print(distance + " ");
-                        if (distance > maxLatency) {
-                            maxLatency = distance;
-                        }
-                        if (graph.getEdge(nodes[i], nodes[j]) == null &&
-                            graph.getEdge(nodes[j], nodes[i]) == null) {
-                            Edge edge = graph.addEdge(nodes[i], nodes[j]);
-                            edge.setDouble("weight", distance);
-                        }
-                    } else
-                        System.out.print("-1 ");
-                }
-                System.out.println();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return graph;
     }
 
     class SelectNodeControl extends ControlAdapter {
