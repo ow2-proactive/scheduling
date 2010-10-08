@@ -35,11 +35,14 @@
 package org.ow2.proactive.resourcemanager.selection.topology;
 
 import java.net.InetAddress;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
@@ -64,6 +67,8 @@ import org.ow2.proactive.resourcemanager.selection.topology.clique.CliqueFinder;
 import org.ow2.proactive.resourcemanager.selection.topology.clique.OptimalCliqueFinder;
 import org.ow2.proactive.resourcemanager.selection.topology.clustering.HAC;
 import org.ow2.proactive.resourcemanager.utils.RMLoggers;
+
+import edu.emory.mathcs.backport.java.util.Collections;
 
 
 public class TopologyManager {
@@ -279,7 +284,22 @@ public class TopologyManager {
                 return new LinkedList<Node>();
             }
 
-            for (InetAddress host : nodesOnHost.keySet()) {
+            List<InetAddress> sortedByNodesNumber = new LinkedList<InetAddress>(nodesOnHost.keySet());
+
+            Collections.sort(sortedByNodesNumber, new Comparator<InetAddress>() {
+                public int compare(InetAddress host, InetAddress host2) {
+                    return nodesOnHost.get(host).size() - nodesOnHost.get(host2).size();
+                }
+            });
+
+            return selectRecursively(number, sortedByNodesNumber, matchedNodes);
+        }
+
+        private List<Node> selectRecursively(int number, List<InetAddress> hostsSortedByNodesNumber,
+                List<Node> matchedNodes) {
+
+            List<InetAddress> busyHosts = new LinkedList<InetAddress>();
+            for (InetAddress host : hostsSortedByNodesNumber) {
                 if (nodesOnHost.get(host).size() >= number) {
                     // found the host with required capacity
                     // checking that all nodes are free
@@ -287,6 +307,7 @@ public class TopologyManager {
                     for (Node nodeOnHost : nodesOnHost.get(host)) {
                         if (!matchedNodes.contains(nodeOnHost)) {
                             busyNode = true;
+                            busyHosts.add(host);
                             break;
                         }
                     }
@@ -297,7 +318,9 @@ public class TopologyManager {
                     }
                 }
             }
-            return select(number - 1, matchedNodes);
+
+            hostsSortedByNodesNumber.removeAll(busyHosts);
+            return selectRecursively(number - 1, hostsSortedByNodesNumber, matchedNodes);
         }
     }
 
@@ -308,7 +331,14 @@ public class TopologyManager {
                 return new LinkedList<Node>();
             }
 
-            List<Node> result = new LinkedList<Node>();
+            // try to find the optimal set of hosts which give us the required set
+            //
+            // "optimal" means the minimization of hosts while the number of nodes has to
+            // be bigger but as close as possible to the requested one
+            //
+            // in order to do it forming the map
+            // [number -> [nodes list_1 giving this nodes number]...[nodes list_k giving this nodes number]]
+            HashMap<Integer, List<List<InetAddress>>> hostsMap = new HashMap<Integer, List<List<InetAddress>>>();
             for (InetAddress host : nodesOnHost.keySet()) {
                 boolean busyNode = false;
                 for (Node nodeOnHost : nodesOnHost.get(host)) {
@@ -317,17 +347,69 @@ public class TopologyManager {
                         break;
                     }
                 }
-                // all nodes are free on host
                 if (!busyNode) {
-                    // found enough nodes on the same host
-                    result.addAll(nodesOnHost.get(host));
-                    if (result.size() >= number) {
-                        // found enough nodes
-                        break;
+                    int nodesNumber = nodesOnHost.get(host).size();
+                    if (nodesNumber == number) {
+                        // found exactly required number of nodes on one host
+                        return new LinkedList<Node>(nodesOnHost.get(host));
+                    }
+
+                    for (Integer i : new LinkedList<Integer>(hostsMap.keySet())) {
+                        if (i > number) {
+                            // do not updates records above "number"
+                            continue;
+                        }
+
+                        int n = i + nodesNumber;
+                        if (!hostsMap.containsKey(n)) {
+                            hostsMap.put(n, new LinkedList<List<InetAddress>>());
+                        }
+                        for (List<InetAddress> hosts : hostsMap.get(i)) {
+                            List<InetAddress> list = new LinkedList<InetAddress>(hosts);
+                            list.add(host);
+                            hostsMap.get(n).add(list);
+                        }
+
+                    }
+
+                    if (!hostsMap.containsKey(nodesNumber)) {
+                        hostsMap.put(nodesNumber, new LinkedList<List<InetAddress>>());
+                        hostsMap.get(nodesNumber).add(Collections.singletonList(host));
                     }
                 }
             }
 
+            if (hostsMap.size() == 0) {
+                return new LinkedList<Node>();
+            }
+
+            // looking for the index we are going to use in the map
+            // it should be either the smallest index >= number or if there is no such index
+            // the closest bigger one
+            int index = -1;
+            for (Integer i : hostsMap.keySet()) {
+                if (i >= number) {
+                    if (index < number || i < index) {
+                        index = i;
+                    }
+                } else if (i < number) {
+                    if (i > index) {
+                        index = i;
+                    }
+                }
+            }
+
+            // selecting the list with the smallest size
+            List<InetAddress> minSizeList = null;
+            for (List<InetAddress> hosts : hostsMap.get(index)) {
+                if (minSizeList == null || minSizeList != null && minSizeList.size() > hosts.size()) {
+                    minSizeList = hosts;
+                }
+            }
+            List<Node> result = new LinkedList<Node>();
+            for (InetAddress host : minSizeList) {
+                result.addAll(nodesOnHost.get(host));
+            }
             return result;
         }
     }
