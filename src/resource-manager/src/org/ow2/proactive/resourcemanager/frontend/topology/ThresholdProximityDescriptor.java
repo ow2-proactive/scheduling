@@ -40,11 +40,21 @@ import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.node.Node;
 
 
+/**
+ * The descriptor allows to select a set of nodes within a threshold proximity.
+ * If pivot is specified the set of required nodes has to be within the
+ * threshold proximity with all nodes from the pivot.
+ */
 @PublicAPI
 public class ThresholdProximityDescriptor extends BestProximityDescriptor {
 
     private long threshold = 0;
 
+    /**
+     * Creates a new instance of the descriptor with specified threshold.
+     *
+     * @param threshold parameter defining maximum distance value between nodes
+     */
     public ThresholdProximityDescriptor(long threshold) {
         if (threshold < 0) {
             throw new IllegalArgumentException("Threshold cannot be negative");
@@ -53,11 +63,22 @@ public class ThresholdProximityDescriptor extends BestProximityDescriptor {
         this.threshold = threshold;
     }
 
+    /**
+     * Creates a new instance of the descriptor with specified threshold and pivot.
+     *
+     * @param threshold parameter defining maximum distance value between nodes
+     * @param pivot a set of nodes which must be within threshold proximity
+     * with nodes user requires
+     */
     public ThresholdProximityDescriptor(long threshold, List<Node> pivot) {
         this(threshold);
         this.pivot = pivot;
     }
 
+    /**
+     * Gets the threshold value
+     * @return the threshold value
+     */
     public long getThreshold() {
         return threshold;
     }

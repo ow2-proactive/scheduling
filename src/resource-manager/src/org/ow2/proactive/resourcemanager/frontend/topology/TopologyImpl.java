@@ -43,21 +43,36 @@ import org.objectweb.proactive.core.node.Node;
 
 /**
  *
- * Class represents the hosts topology handled by resource manager.
+ * Class represents hosts topology handled by resource manager.
  *
  */
 public class TopologyImpl implements Topology, Cloneable {
 
-    // Host -> Host -> Distance
+    /**
+     * Host -> Hosts -> Distance
+     * Store here only half of matrix - each host have distances to hosts added before.
+     * Assume that they are symmetrical.
+     */
     private HashMap<InetAddress, HashMap<InetAddress, Long>> distances = new HashMap<InetAddress, HashMap<InetAddress, Long>>();
+    /**
+     * This map is needed to store the dependency between host name and address.
+     * All listeners of the RM receive only host name in events, so for them it's simpler to
+     * operate with strings.
+     */
     private HashMap<String, InetAddress> hosts = new HashMap<String, InetAddress>();
 
+    /**
+     * {@inheritDoc}
+     */
     public Long getDistance(Node node, Node node2) {
         InetAddress host = node.getVMInformation().getInetAddress();
         InetAddress host2 = node2.getVMInformation().getInetAddress();
         return getDistance(host, host2);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public Long getDistance(InetAddress host, InetAddress host2) {
         if (host.equals(host2)) {
             return new Long(0);
@@ -69,6 +84,9 @@ public class TopologyImpl implements Topology, Cloneable {
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public Long getDistance(String hostName, String hostName2) {
         InetAddress host = hosts.get(hostName);
         InetAddress host2 = hosts.get(hostName2);
@@ -79,20 +97,42 @@ public class TopologyImpl implements Topology, Cloneable {
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public boolean onSameHost(Node node, Node node2) {
         return getDistance(node, node2) == 0;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public Set<InetAddress> getHosts() {
         return distances.keySet();
     }
 
+    /**
+     * Adds host information to the topology.
+     * Pass both name and address of host avoiding to do a conversion inside.
+     *
+     * @param hostName the name of the host
+     * @param hostAddress the address of the host
+     * @param hostTopology distances to other hosts
+     */
     public void addHostTopology(String hostName, InetAddress hostAddress,
             HashMap<InetAddress, Long> hostTopology) {
         distances.put(hostAddress, hostTopology);
         hosts.put(hostName, hostAddress);
     }
 
+    /**
+     * Removes all information about host from the topology.
+     * As it stores internally names and addresses we do not try to convert one into
+     * another (as it may lead to network call) but rather pass them is parameters.
+     *
+     * @param hostName name of host to be removed
+     * @param hostAddress host address to be removed
+     */
     public void removeHostTopology(String hostName, InetAddress hostAddress) {
         distances.remove(hostAddress);
         hosts.remove(hostName);
@@ -104,14 +144,23 @@ public class TopologyImpl implements Topology, Cloneable {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public HashMap<InetAddress, Long> getHostTopology(InetAddress hostAddress) {
         return distances.get(hostAddress);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public boolean knownHost(InetAddress hostAddress) {
         return distances.containsKey(hostAddress);
     }
 
+    /**
+     * Clones the topology object, which is uses for synchronization purposes.
+     */
     public Object clone() {
         try {
             return super.clone();

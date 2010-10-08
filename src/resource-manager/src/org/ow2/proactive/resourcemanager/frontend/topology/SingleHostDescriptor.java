@@ -34,19 +34,18 @@
  */
 package org.ow2.proactive.resourcemanager.frontend.topology;
 
-import java.util.List;
-
 import org.objectweb.proactive.annotation.PublicAPI;
-import org.objectweb.proactive.core.node.Node;
 
 
+/**
+ * This descriptor allows to select nodes on the single hosts.
+ */
 @PublicAPI
-public class SingleHostDescriptor extends ThresholdProximityDescriptor {
+public class SingleHostDescriptor extends TopologyDescriptor {
+    /**
+     * Constructs the new instance of this class.
+     */
     public SingleHostDescriptor() {
-        super(0);
-    }
-
-    public SingleHostDescriptor(List<Node> pivot) {
-        super(0, pivot);
+        super(true);
     }
 }

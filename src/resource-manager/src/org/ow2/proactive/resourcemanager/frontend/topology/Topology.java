@@ -45,28 +45,60 @@ import org.objectweb.proactive.core.node.Node;
 
 /**
  *
- * Interface represents the hosts topology handled by resource manager.
- *
+ * Interface represents hosts topology handled by resource manager.
+ * Users may receive the topology information using {@link ResourceManager.getTopology()} method.
  */
 @PublicAPI
 public interface Topology extends Serializable {
 
+    /**
+     * Returns the distance between 2 nodes.
+     *
+     * @return the distance between 2 nodes
+     */
     public Long getDistance(Node node, Node node2);
 
+    /**
+     * Returns the distance between 2 hosts identified by their inet addresses.
+     *
+     * @return the distance between 2 nodes
+     */
     public Long getDistance(InetAddress hostAddress, InetAddress hostAddress2);
 
+    /**
+     * Returns the distance between 2 hosts identified by their domain names.
+     *
+     * @return the distance between 2 nodes
+     */
     public Long getDistance(String hostName, String hostName2);
 
+    /**
+     * Checks if 2 nodes are on the sane host.
+     * @return true if 2 nodes are on the same hosts, false otherwise
+     */
     public boolean onSameHost(Node node, Node node2);
 
+    /**
+     * Checks if the information about host is presented in the topology records.
+     * @param hostAddress the address of the host
+     * @return true if the host is known, false otherwise
+     */
     public boolean knownHost(InetAddress hostAddress);
 
+    /**
+     * Gets the set of hosts handled by resource manager.
+     *
+     * @return the set of hosts handled by resource manager
+     */
     public Set<InetAddress> getHosts();
 
-    public void addHostTopology(String hostName, InetAddress hostAddress,
-            HashMap<InetAddress, Long> hostTopology);
-
-    public void removeHostTopology(String hostName, InetAddress hostAddress);
-
+    /**
+     * Gets the distances associated to the host.
+     * Note that it does not return information about all hosts handled by the resource manager
+     * but rather the information about hosts added before the one specified.
+     *
+     * @param hostAddress - inet address of the host
+     * @return distances map to nodes added before this one
+     */
     public HashMap<InetAddress, Long> getHostTopology(InetAddress hostAddress);
 }

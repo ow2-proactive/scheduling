@@ -43,8 +43,21 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
 
 
-public class NodePinger {
+/**
+ * Class used for pinging hosts.
+ * One new host is added to the resource manager the pinger will be executed there.
+ * As a result it gets all the distances to already added hosts, which are registered in
+ * the resource manager.
+ *
+ */
+public class HostPinger {
 
+    /**
+     * Ping all hosts in the list sequentially.
+     *
+     * @param hosts to ping
+     * @return map with distances to other hosts
+     */
     public HashMap<InetAddress, Long> ping(List<InetAddress> hosts) {
         HashMap<InetAddress, Long> results = new HashMap<InetAddress, Long>();
         for (InetAddress host : hosts) {
@@ -53,7 +66,7 @@ public class NodePinger {
                     // nodes on the same host
                     results.put(host, new Long(0));
                 } else {
-                    results.put(host, pingNode(host));
+                    results.put(host, pingHost(host));
                 }
             } catch (NodeException e) {
             }
@@ -61,7 +74,14 @@ public class NodePinger {
         return results;
     }
 
-    private Long pingNode(InetAddress host) {
+    /**
+     * Ping the host: method pings the host several time and takes the minimum value as it
+     * reflects better the network bandwidth.
+     *
+     * @param host to ping
+     * @return ping value to the host specified from the one it is executing on
+     */
+    private Long pingHost(InetAddress host) {
 
         final int ATTEMPS = 10;
         long minPing = Long.MAX_VALUE;

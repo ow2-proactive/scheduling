@@ -38,14 +38,17 @@ import java.io.Serializable;
 import org.objectweb.proactive.annotation.PublicAPI;
 
 
+/**
+ * This class represent a distance function for hierarchical agglomerative clustering.
+ */
 @PublicAPI
 public interface DistanceFunction extends Serializable {
     /**
-     * Distance recalculation function
+     * Defines the way how distances are calculated in clustering
      *
-     * @param d1
-     * @param d2
-     * @return
+     * @param d1 first distance
+     * @param d2 second distance
+     * @return result distance
      */
     public long distance(long d1, long d2);
 }

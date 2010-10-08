@@ -40,6 +40,18 @@ import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.node.Node;
 
 
+/**
+ * The descriptor allows to select a set of closest nodes which is currently
+ * available in the resource manager.
+ *
+ * In order to specify more precisely what "closets" means user may select various distance
+ * functions (for details see http://en.wikipedia.org/wiki/Cluster_analysis#Agglomerative_hierarchical_clustering)
+ *
+ * AVG - the mean distance between elements of each cluster (also called average linkage clustering).
+ * MAX - the maximum distance between elements of each cluster (also called complete linkage clustering).
+ * MIN - the minimum distance between elements of each cluster (also called single-linkage clustering).
+ *
+ */
 @PublicAPI
 public class BestProximityDescriptor extends TopologyDescriptor {
 
@@ -47,6 +59,7 @@ public class BestProximityDescriptor extends TopologyDescriptor {
     protected List<Node> pivot = null;
     protected DistanceFunction function;
 
+    /** AVG - the mean distance between elements of each cluster (also called average linkage clustering) */
     public final static DistanceFunction AVG = new DistanceFunction() {
         public long distance(long d1, long d2) {
             // not connected
@@ -57,6 +70,7 @@ public class BestProximityDescriptor extends TopologyDescriptor {
         }
     };
 
+    /** MAX - the maximum distance between elements of each cluster (also called complete linkage clustering) */
     public final static DistanceFunction MAX = new DistanceFunction() {
         public long distance(long d1, long d2) {
             // not connected
@@ -67,30 +81,53 @@ public class BestProximityDescriptor extends TopologyDescriptor {
         }
     };
 
+    /** MIN - the minimum distance between elements of each cluster (also called single-linkage clustering) */
     public final static DistanceFunction MIN = new DistanceFunction() {
         public long distance(long d1, long d2) {
             return Math.min(d1, d2);
         }
     };
 
+    /**
+     * Constructs new instance of the class.
+     */
     public BestProximityDescriptor() {
         super(true);
     }
 
+    /**
+     * Constructs new instance of the class with specified distance function.
+     *
+     * @param function - the distance function used for clustering
+     */
     public BestProximityDescriptor(DistanceFunction function) {
         super(true);
         this.function = function;
     }
 
+    /**
+     * Constructs new instance of the class with specified distance function and pivot.
+     *
+     * @param function - the distance function used for clustering
+     * @param pivot - the set of nodes from which the proximity should be the best.
+     */
     public BestProximityDescriptor(DistanceFunction function, List<Node> pivot) {
         this(function);
         this.pivot = pivot;
     }
 
+    /**
+     * Gets pivot nodes
+     * @return pivot nodes
+     */
     public List<Node> getPivot() {
         return pivot;
     }
 
+    /**
+     * Gets the distance function. AVG by default.
+     * @return the distance function
+     */
     public DistanceFunction getDistanceFunction() {
         return function == null ? AVG : function;
     }

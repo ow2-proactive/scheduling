@@ -35,26 +35,57 @@
 package org.ow2.proactive.resourcemanager.frontend.topology;
 
 import java.io.Serializable;
+
 import org.objectweb.proactive.annotation.PublicAPI;
+import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 
 
+/**
+ *
+ * Class represents the descriptor of the desired nodes topology
+ * which could be used with {@link ResourceManager.getAtMostNodes} request.
+ *
+ * User may create his own instance id defined descriptors and parameterize it or
+ * use one of predefined constant instances when it is sufficient.
+ */
 @PublicAPI
 public class TopologyDescriptor implements Serializable {
 
-    // default descriptors without start point
+    /** no constraint on node location */
     public static final TopologyDescriptor ARBITRARY = new ArbitraryTopologyDescriptor();
+    /** the set of closest nodes */
     public static final TopologyDescriptor BEST_PROXIMITY = new BestProximityDescriptor(
         BestProximityDescriptor.AVG);
+    /** the set of nodes on a single host */
     public static final TopologyDescriptor SINGLE_HOST = new SingleHostDescriptor();
+    /**
+     * the set of nodes of a single host exclusively
+     * (the host is reserved for the user)
+     */
     public static final TopologyDescriptor SINGLE_HOST_EXCLUSIVE = new SingleHostExclusiveDescriptor();
+    /**
+     * the set of nodes of several hosts exclusively
+     * (hosts are reserved for the user)
+     */
     public static final TopologyDescriptor MULTIPLE_HOSTS_EXCLUSIVE = new MultipleHostsExclusiveDescriptor();
 
     private boolean greedy = true;
 
+    /**
+     * Creates the descriptor
+     * @param greedy defines if selection scripts have to be executed on all
+     * available nodes before the topology information will be processed.
+     */
     protected TopologyDescriptor(boolean greedy) {
         this.greedy = greedy;
     }
 
+    /**
+     * Defines if selection scripts have to be executed on all
+     * available nodes before the topology information will be processed.
+     *
+     * @return true in case of greedy behavior false otherwise
+     */
     public boolean isGreedy() {
         return greedy;
     }

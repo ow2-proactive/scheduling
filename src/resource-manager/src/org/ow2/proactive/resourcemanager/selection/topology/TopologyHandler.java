@@ -40,12 +40,28 @@ import org.objectweb.proactive.core.node.Node;
 import org.ow2.proactive.resourcemanager.frontend.topology.TopologyDescriptor;
 
 
+/**
+ * The base class for handlers which are associated to
+ * the particular topology descriptor and implement the
+ * semantic of the request.
+ */
 public abstract class TopologyHandler {
 
     protected TopologyDescriptor topologyDescriptor;
 
+    /**
+     * Selects nodes according to the topology descriptor.
+     *
+     * @param number of needed nodes
+     * @param matchedNodes list of "free" nodes satisfied to the selection scripts
+     * @return list of nodes located according to the specified topology
+     */
     public abstract List<Node> select(int number, List<Node> matchedNodes);
 
+    /**
+     * Sets the descriptor.
+     * @param topologyDescriptor a new descriptor to be set
+     */
     public void setDescriptor(TopologyDescriptor topologyDescriptor) {
         this.topologyDescriptor = topologyDescriptor;
     }

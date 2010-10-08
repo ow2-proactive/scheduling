@@ -37,8 +37,14 @@ package org.ow2.proactive.resourcemanager.frontend.topology;
 import org.objectweb.proactive.annotation.PublicAPI;
 
 
+/**
+ * The descriptor indicated that there is no constraints on node location.
+ */
 @PublicAPI
 public class ArbitraryTopologyDescriptor extends TopologyDescriptor {
+    /**
+     * Creates a new instance of the descriptor
+     */
     public ArbitraryTopologyDescriptor() {
         super(false);
     }

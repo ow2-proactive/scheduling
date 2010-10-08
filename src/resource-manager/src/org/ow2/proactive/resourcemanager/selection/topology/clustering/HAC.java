@@ -191,6 +191,10 @@ public class HAC {
         return target.getNodes();
     }
 
+    /**
+     * Calculate the distance from given node to the cluster.
+     * This is used in order to filter out the cluster of bigger than needed size.
+     */
     private long getDistance(Node from, Cluster to) {
         long globalDistance = 0;
         for (Node n : to.getNodes()) {
@@ -277,6 +281,12 @@ public class HAC {
 
     }
 
+    /**
+     * Merges two cluster and recalculates distances to other.
+     * To achieve better performance new cluster is not created.
+     * Instead the bigger cluster is used as a container for nodes
+     * from smaller one.
+     */
     private Cluster recalculateDistances(Cluster[] clusters2Merge,
             HashMap<Cluster, HashMap<Cluster, Long>> curDistances) {
 

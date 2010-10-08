@@ -35,10 +35,32 @@
 package org.ow2.proactive.resourcemanager.frontend.topology;
 
 import org.objectweb.proactive.annotation.PublicAPI;
+import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 
 
+/**
+ * This descriptor allows to select nodes on the multiple hosts exclusively.
+ * Hosts with selected nodes will be reserved for the user.
+ *
+ * By specifying this descriptor in {@link ResourceManager.getAtMostNodes} user may get
+ * more nodes than it asked for due to the fact that total capacity of all machines is
+ * bigger (even thought the resource manager tries to find the optimal set of host
+ * minimizing the waist of resources), namely
+ *
+ * - if one machine exists with the capacity k it will be selected
+ * - if several machines give exact number of nodes they will be selected
+ *   (in case of several possibilities number of machines will be minimized)
+ * - if it not possible to find exact number of nodes but it's possible to
+ *   find more than they will be selected. The number of waisted resources
+ *   & number of machines will be minimized
+ * - otherwise less nodes will be provided but as the closest as possible to k
+ *
+ */
 @PublicAPI
 public class MultipleHostsExclusiveDescriptor extends TopologyDescriptor {
+    /**
+     * Constructs a new instance of the class.
+     */
     public MultipleHostsExclusiveDescriptor() {
         super(true);
     }

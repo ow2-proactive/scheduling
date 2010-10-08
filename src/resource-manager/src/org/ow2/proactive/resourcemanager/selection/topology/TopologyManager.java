@@ -53,7 +53,7 @@ import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProper
 import org.ow2.proactive.resourcemanager.frontend.topology.ArbitraryTopologyDescriptor;
 import org.ow2.proactive.resourcemanager.frontend.topology.BestProximityDescriptor;
 import org.ow2.proactive.resourcemanager.frontend.topology.MultipleHostsExclusiveDescriptor;
-import org.ow2.proactive.resourcemanager.frontend.topology.NodePinger;
+import org.ow2.proactive.resourcemanager.frontend.topology.HostPinger;
 import org.ow2.proactive.resourcemanager.frontend.topology.SingleHostDescriptor;
 import org.ow2.proactive.resourcemanager.frontend.topology.SingleHostExclusiveDescriptor;
 import org.ow2.proactive.resourcemanager.frontend.topology.ThresholdProximityDescriptor;
@@ -71,8 +71,8 @@ public class TopologyManager {
 
     private final static Logger logger = ProActiveLogger.getLogger(RMLoggers.TOPOLOGY);
 
-    // hosts topology
-    private Topology topology = new TopologyImpl();
+    // hosts distances
+    private TopologyImpl topology = new TopologyImpl();
     private HashMap<InetAddress, Set<Node>> nodesOnHost = new HashMap<InetAddress, Set<Node>>();
     private final HashMap<Class<? extends TopologyDescriptor>, TopologyHandler> handlers = new HashMap<Class<? extends TopologyDescriptor>, TopologyHandler>();
 
@@ -155,7 +155,7 @@ public class TopologyManager {
         try {
             logger.debug("Launching ping process on node " + node.getNodeInformation().getURL());
             long timeStamp = System.currentTimeMillis();
-            NodePinger pinger = PAActiveObject.newActive(NodePinger.class, null, node);
+            HostPinger pinger = PAActiveObject.newActive(HostPinger.class, null, node);
             HashMap<InetAddress, Long> result = pinger.ping(hosts);
             PAFuture.waitFor(result);
             logger.debug(result.size() + " hosts were pinged from " + node.getNodeInformation().getURL() +
@@ -196,6 +196,11 @@ public class TopologyManager {
     }
 
     // Handler implementations
+
+    /**
+     * Handler for arbitrary topology descriptor, which just select a sublist
+     * from given list.
+     */
     private class ArbitraryTopologyHandler extends TopologyHandler {
         @Override
         public List<Node> select(int number, List<Node> matchedNodes) {
@@ -207,6 +212,9 @@ public class TopologyManager {
         }
     }
 
+    /**
+     * Handler finds the set of the closest nodes by running HAC algorithm.
+     */
     private class BestProximityHandler extends TopologyHandler {
         @Override
         public List<Node> select(int number, List<Node> matchedNodes) {
@@ -220,6 +228,15 @@ public class TopologyManager {
         }
     }
 
+    /**
+     * Handler finds the set of the closest nodes by running HAC
+     * algorithm with a given threshold.
+     *
+     * Note: initially clique search algorithm has been used
+     * but the performance of searching the clique in graph
+     * is not acceptable for real-time requests.
+     *
+     */
     private class TresholdProximityHandler extends TopologyHandler {
         @Override
         public List<Node> select(int number, List<Node> matchedNodes) {
@@ -233,6 +250,9 @@ public class TopologyManager {
         }
     }
 
+    /**
+     * The handler finds nodes on the same hosts.
+     */
     private class SingleHostHandler extends TopologyHandler {
         @Override
         public List<Node> select(int number, List<Node> matchedNodes) {
@@ -263,6 +283,16 @@ public class TopologyManager {
         }
     }
 
+    /**
+     *  The selection handler for "single host exclusive" requests.
+     *
+     *  For "single host exclusive" if user requests k nodes
+     *  - the machine with exact capacity will be selected if exists
+     *  - the machine with bigger capacity will be selected if exists.
+     *    The capacity of the selected machine will be the closest to k.
+     *  - the machine with smaller capacity than k will be selected.
+     *    In this case the capacity of selected host will be the biggest among all other.
+     */
     private class SingleHostExclusiveHandler extends TopologyHandler {
         @Override
         public List<Node> select(int number, List<Node> matchedNodes) {
@@ -310,6 +340,18 @@ public class TopologyManager {
         }
     }
 
+    /**
+     *
+     * For "multiple host exclusive" request (k nodes)
+     * - if one machine exists with the capacity k it will be selected
+     * - if several machines give exact number of nodes they will be selected
+     *   (in case of several possibilities number of machines will be minimized)
+     * - if it not possible to find exact number of nodes but it's possible to
+     *   find more than they will be selected. The number of waisted resources
+     *   & number of machines will be minimized
+     * - otherwise less nodes will be provided but as the closest as possible to k
+     *
+     */
     private class MultipleHostsExclusiveHandler extends TopologyHandler {
         @Override
         public List<Node> select(int number, List<Node> matchedNodes) {
