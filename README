@@ -12,14 +12,14 @@ An ant file is provided, targets are
 Supported  URL
 
 Scheduler 
-  /login                        POST username&password, return sessionid
-  /jobsids                      list job by ids
-  /jobs                         list job by ids+additional data 
-  /jobs/{id}                    describe the job 'id'
-  /jobs/{id}/tasks              list job's tasks + additional data
-  /jobs/{id}/tasksids           list job's tasks by id
-  /jobs/{id}/tasks/{tasksid}    describe task {taskid} of job {id}
-  /jobs/{id}/tasks/{tasksid}/result    return the result of the task {taskid} of the job {id}
+  scheduler/login                        POST username&password, return sessionid
+  scheduler/jobsids                      list job by ids
+  scheduler/jobs                         list job by ids+additional data 
+  scheduler/jobs/{id}                    describe the job 'id'
+  scheduler/jobs/{id}/tasks              list job's tasks + additional data
+  scheduler/jobs/{id}/tasksids           list job's tasks by id
+  scheduler/jobs/{id}/tasks/{tasksid}    describe task {taskid} of job {id}
+  scheduler/jobs/{id}/tasks/{tasksid}/result    return the result of the task {taskid} of the job {id}
 
 Resource Manager
   rm/login      POST username&password, return session id 
@@ -42,27 +42,27 @@ some command-line usage :
 
 # login 
 
-curl -d "username=demo&password=demo" http://localhost:8080/proactive_grid_cloud_portal/login
+curl -d "username=demo&password=demo" http://localhost:8080/proactive_grid_cloud_portal/scheduler/login
 
 #submit a job
 
-curl -H "sessionid:1" -F 'file=<Job_2_tasks.xml' http://localhost:8080/proactive_grid_cloud_portal/submit
+curl -H "sessionid:1" -F 'file=<Job_2_tasks.xml' http://localhost:8080/proactive_grid_cloud_portal/scheduler/submit
 
 
 #list jobs (pending, running, finished)
-curl -H "sessionid:1" -H "Accept: application/json" http://localhost:8080/proactive_grid_cloud_portal/jobsids/ 
+curl -H "sessionid:1" -H "Accept: application/json" http://localhost:8080/proactive_grid_cloud_portal/scheduler/jobsids/ 
 
 # list job 10's tasks 
 
-curl -H "sessionid:1" -H "Accept: application/json" http://localhost:8080/proactive_grid_cloud_portal/jobs/12/tasksids
+curl -H "sessionid:1" -H "Accept: application/json" http://localhost:8080/proactive_grid_cloud_portal/scheduler/jobs/12/tasksids
 
 
 #delete a job
 
-curl -X DELETE -H "sessionid:1" -H "Accept: application/json" http://localhost:8080/proactive_grid_cloud_portal/jobs/10
+curl -X DELETE -H "sessionid:1" -H "Accept: application/json" http://localhost:8080/proactive_grid_cloud_portal/scheduler/jobs/10
 
 #result from a task 
-curl -H "sessionid:1" -H "Accept: application/json" http://localhost:8080/proactive_grid_cloud_portal/jobs/1/tasks/task1/result
+curl -H "sessionid:1" -H "Accept: application/json" http://localhost:8080/proactive_grid_cloud_portal/scheduler/jobs/1/tasks/task1/result
 
 
   ### Resource Manager
