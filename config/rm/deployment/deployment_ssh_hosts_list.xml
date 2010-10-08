@@ -9,7 +9,7 @@
 	-->
 	<environment>
 		<!-- CHANGE THIS -->
-		<descriptorVariable name="HOSTS" value="eon[16-20]" />
+		<descriptorVariable name="HOSTS" value="host1 host2 host3" />
 
 		<javaPropertyVariable name="user.dir" />
 	</environment>
@@ -23,7 +23,7 @@
 	<infrastructure>
 
 		<hosts>
-			<host id="host" os="unix" hostCapacity="1" vmCapacity="4">
+			<host id="host" os="unix" hostCapacity="1" vmCapacity="1">
 				<homeDirectory base="root" relpath="${user.dir}" />
 			</host>
 

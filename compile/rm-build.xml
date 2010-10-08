@@ -57,7 +57,7 @@
 			<generateorcheck_stub_for_class targetedClasspath="rm.classpath" srcDir="${cl.rm.dir}" class="org/ow2/proactive/resourcemanager/authentication/RMAuthentication" mode="@{mode}"/>
 			<generateorcheck_stub_for_class targetedClasspath="rm.classpath" srcDir="${cl.rm.dir}" class="org/ow2/proactive/resourcemanager/authentication/RMAuthenticationImpl" mode="@{mode}"/>
 			<generateorcheck_stub_for_class targetedClasspath="rm.classpath" srcDir="${cl.rm.dir}" class="org/ow2/proactive/resourcemanager/frontend/RMMonitoringImpl" mode="@{mode}"/>
-			<generateorcheck_stub_for_class targetedClasspath="rm.classpath" srcDir="${cl.rm.dir}" class="org/ow2/proactive/resourcemanager/selection/ProbablisticSelectionManager" mode="@{mode}"/>
+			<generateorcheck_stub_for_class targetedClasspath="rm.classpath" srcDir="${cl.rm.dir}" class="org/ow2/proactive/resourcemanager/selection/statistics/ProbablisticSelectionManager" mode="@{mode}"/>
 			<generateorcheck_stub_for_class targetedClasspath="rm.classpath" srcDir="${cl.rm.dir}" class="org/ow2/proactive/resourcemanager/nodesource/NodeSource" mode="@{mode}"/>
 			<generateorcheck_stub_for_class targetedClasspath="rm.classpath" srcDir="${cl.rm.dir}" class="org/ow2/proactive/resourcemanager/examples/windowsagent/Test" mode="@{mode}"/>
 			<generateorcheck_stub_for_class targetedClasspath="rm.classpath" srcDir="${cl.rm.dir}" class="org/ow2/proactive/resourcemanager/nodesource/dataspace/DataSpaceNodeConfigurationAgent" mode="@{mode}"/>
@@ -130,6 +130,9 @@
 	<target name="rcp.libCopy.rm" depends="rcp.libClean.rm, deploy.rm, deploy.rm.client" description="Copy all required libraries to RM plugins">
 		<copy todir="${rcp.rm.dir}/${rcp.rm.lib}/lib" includeemptydirs="no">
 			<fileset dir="${deploy.lib.dir}" excludes="ProActive_tests.jar" />
+		</copy>
+		<copy todir="${rcp.rm.dir}/${rcp.rm.lib}/lib" includeemptydirs="no">
+			<fileset dir="${rcp.rm.dir}/${rcp.rm.lib}/local/lib"/>
 		</copy>
 	</target>
 
