@@ -7,7 +7,20 @@ if (args.length < 1) {
 	var dirOut = new File(args[0] + "/out/");
 
 	var listIn = dirIn.listFiles();
-	var listOut = dirOut.listFiles();
+	var listInLen = listIn.length;
+	for (var i=0; i < listIn.length; i++) {
+		if (listIn[i].getName().substring(0, 1).equals(".")) {
+			listInLen--;
+		}
+	}
 
-	loop = (listIn.length != listOut.length);
+	var listOut = dirOut.listFiles();
+	var listOutLen = listOut.length;
+	for (var i=0; i < listOut.length; i++) {
+		if (listOut[i].getName().substring(0, 1).equals(".")) {
+			listOutLen--;
+		}
+	}
+
+	loop = (listInLen != listOutLen);
 }
