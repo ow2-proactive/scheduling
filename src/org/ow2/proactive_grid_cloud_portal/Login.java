@@ -15,10 +15,9 @@ import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
-import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.NodeException;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
-import org.ow2.proactive.scheduler.ext.filessplitmerge.schedulertools.SchedulerProxyUserInterface;
+import org.ow2.proactive.scheduler.common.util.CachingSchedulerProxyUserInterface;
 
 
 @Path("/scheduler/login")
@@ -29,17 +28,12 @@ public class Login {
 
         try {
 
-            SchedulerProxyUserInterface scheduler = PAActiveObject.newActive(
-                    SchedulerProxyUserInterface.class, new Object[] {});
+            CachingSchedulerProxyUserInterface scheduler = PAActiveObject.newActive(
+                    CachingSchedulerProxyUserInterface.class, new Object[] {});
 
           scheduler.init(PortalConfiguration.getProperties().getProperty(PortalConfiguration.scheduler_url), username, password);
 
-          try {
-            scheduler.enableCaching();
-        } catch (ProActiveException e) {
-            System.out.println("Login.login() cannot activate caching");
-            e.printStackTrace();
-        }
+       
 
             return "" + SchedulerSessionMapper.getInstance().add(scheduler);
 

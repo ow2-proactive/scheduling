@@ -23,7 +23,6 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import org.hibernate.collection.PersistentMap;
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
-import org.jboss.resteasy.spi.ResteasyProviderFactory;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
 import org.ow2.proactive.scheduler.common.Scheduler;
@@ -113,7 +112,7 @@ public class SchedulerStateRest {
 
     @GET
     @Path("jobs/{jobid}/result")
-        @Produces("application/json")
+    @Produces("*/*")
         
     public JobResult jobResult(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId)
             throws NotConnectedException, PermissionException, UnknownJobException {
@@ -125,7 +124,7 @@ public class SchedulerStateRest {
 
     @DELETE
     @Path("jobs/{jobid}")
-        @Produces("application/json")
+    @Produces("application/json")
     public boolean removeJob(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId)
             throws NotConnectedException, UnknownJobException, PermissionException {
         Scheduler s = checkAccess(sessionId);
@@ -347,7 +346,6 @@ public class SchedulerStateRest {
         
         tmp = File.createTempFile("prefix", "suffix");
         for (InputPart part : multipart.getParts()) {
-            MultivaluedMap<String, String> toto = part.getHeaders();
             BufferedWriter outf = new BufferedWriter(new FileWriter(tmp));
             outf.write(part.getBodyAsString());
             outf.close();
