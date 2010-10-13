@@ -39,8 +39,14 @@ package org.ow2.proactive.scheduler.common;
 import java.io.Serializable;
 import java.util.Vector;
 
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+
 import org.objectweb.proactive.annotation.PublicAPI;
+import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobState;
+import org.ow2.proactive.scheduler.common.job.UserIdentification;
+import org.ow2.proactive.scheduler.common.task.TaskInfo;
 
 
 /**
@@ -51,6 +57,7 @@ import org.ow2.proactive.scheduler.common.job.JobState;
  * @since ProActive Scheduling 0.9
  */
 @PublicAPI
+@XmlRootElement(name = "schedulerstate")
 public interface SchedulerState extends Serializable {
 
     /**
@@ -79,6 +86,7 @@ public interface SchedulerState extends Serializable {
      *
      * @return the status of the scheduler
      */
+    @XmlElement(name = "status")
     public SchedulerStatus getStatus();
 
     /**
@@ -88,4 +96,18 @@ public interface SchedulerState extends Serializable {
      */
     public SchedulerUsers getUsers();
 
+    /**
+     * Updates the scheduler state given the event passed as a parameter
+     */
+    public void update(SchedulerEvent eventType);
+
+    /**
+     * Updates the scheduler state given the event passed as a parameter
+     */
+    public void update(NotificationData<?> notification);
+
+    /**
+     * Updates the scheduler state given the event passed as a parameter
+     */
+    public void update(JobState jobState);
 }

@@ -36,6 +36,8 @@
  */
 package org.ow2.proactive.scheduler.common;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
 import org.objectweb.proactive.annotation.PublicAPI;
 
 
@@ -48,6 +50,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
  * @since ProActive Scheduling 0.9
  */
 @PublicAPI
+@XmlRootElement(name = "schedulerstatus")
 public enum SchedulerStatus implements java.io.Serializable {
 
     /**

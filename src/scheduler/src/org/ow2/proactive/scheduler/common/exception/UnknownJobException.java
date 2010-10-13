@@ -37,6 +37,7 @@
 package org.ow2.proactive.scheduler.common.exception;
 
 import org.objectweb.proactive.annotation.PublicAPI;
+import org.ow2.proactive.scheduler.common.job.JobId;
 
 
 /**
@@ -49,6 +50,8 @@ import org.objectweb.proactive.annotation.PublicAPI;
 @PublicAPI
 public class UnknownJobException extends SchedulerException {
 
+    private JobId jobId;
+
     /**
      * Create a new instance of UnknownJobException
      *
@@ -56,6 +59,11 @@ public class UnknownJobException extends SchedulerException {
      */
     public UnknownJobException(String msg) {
         super(msg);
+    }
+
+    public UnknownJobException(JobId jobId) {
+        super("The job " + jobId + " does not exist !");
+        this.jobId = jobId;
     }
 
     /**
@@ -81,6 +89,10 @@ public class UnknownJobException extends SchedulerException {
      */
     public UnknownJobException(Throwable cause) {
         super(cause);
+    }
+
+    public JobId getJobId() {
+        return jobId;
     }
 
 }

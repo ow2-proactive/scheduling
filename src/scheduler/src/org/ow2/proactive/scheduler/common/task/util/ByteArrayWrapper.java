@@ -73,7 +73,7 @@ public class ByteArrayWrapper implements Serializable {
     @Column(name = "VALUE", updatable = false, length = Integer.MAX_VALUE)
     @Type(type = "org.ow2.proactive.scheduler.core.db.schedulerType.BinaryLargeOBject")
     @Lob
-    private byte[] value;
+    private byte[] byteArray;
 
     /** HIBERNATE default constructor */
     @SuppressWarnings("unused")
@@ -86,7 +86,7 @@ public class ByteArrayWrapper implements Serializable {
      * @param value the value of this wrapper.
      */
     public ByteArrayWrapper(byte[] value) {
-        this.value = value;
+        this.byteArray = value;
     }
 
     /**
@@ -94,8 +94,8 @@ public class ByteArrayWrapper implements Serializable {
      *
      * @return the ByteArray value.
      */
-    public byte[] byteArrayValue() {
-        return value;
+    public byte[] getByteArray() {
+        return byteArray;
     }
 
 }

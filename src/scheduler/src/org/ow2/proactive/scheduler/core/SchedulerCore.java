@@ -1243,7 +1243,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
         InternalJob target = this.jobs.get(jobId);
 
         if (target == null) {
-            throw new UnknownJobException("The job " + jobId + " does not exist !");
+            throw new UnknownJobException(jobId);
         }
 
         // get or create appender for the targeted job
@@ -1356,7 +1356,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
         final SchedulerCore schedulerStub = (SchedulerCore) PAActiveObject.getStubOnThis();
 
         if (job == null) {
-            throw new UnknownJobException("The job " + jobId + " does not exist !");
+            throw new UnknownJobException(jobId);
         }
 
         logger_dev.info("Trying to get JobResult of job '" + jobId + "'");
@@ -1412,7 +1412,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
 
         if (job == null) {
             logger_dev.info("Job '" + jobId + "' does not exist");
-            throw new UnknownJobException("The job does not exist !");
+            throw new UnknownJobException(jobId);
         }
 
         //extract taskResult reference from memory (weak instance)

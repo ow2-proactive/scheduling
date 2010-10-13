@@ -170,7 +170,7 @@ public class TestDatabaseCRUD {
                 Assert.assertEquals(it.getNumberOfNodesNeeded(), 1);
                 Assert.assertNull(it.getResultPreview());
                 Assert.assertEquals(it.getWallTime(), 12 * 1000);
-                Assert.assertEquals(it.isWallTime(), true);
+                Assert.assertEquals(it.isWallTimeSet(), true);
                 Assert.assertEquals(it.getGenericInformations().size(), 0);
                 Assert.assertNull(it.getExecutableContainer());
                 DatabaseManager.getInstance().load(it);
@@ -178,10 +178,10 @@ public class TestDatabaseCRUD {
                 f.setAccessible(true);
                 Assert.assertEquals(ByteToObjectConverter.ObjectStream
                         .convert(((Map<String, ByteArrayWrapper>) f.get(it.getExecutableContainer())).get(
-                                "sleepTime").byteArrayValue()), "1");
+                                "sleepTime").getByteArray()), "1");
                 Assert.assertEquals(ByteToObjectConverter.ObjectStream
                         .convert(((Map<String, ByteArrayWrapper>) f.get(it.getExecutableContainer())).get(
-                                "number").byteArrayValue()), "1");
+                                "number").getByteArray()), "1");
                 f = JavaExecutableContainer.class.getDeclaredField("userExecutableClassName");
                 f.setAccessible(true);
                 Assert.assertEquals((String) f.get(it.getExecutableContainer()),
@@ -205,7 +205,7 @@ public class TestDatabaseCRUD {
                 Assert.assertEquals(it.getNumberOfNodesNeeded(), 1);
                 Assert.assertNull(it.getResultPreview());
                 Assert.assertEquals(it.getWallTime(), 0);
-                Assert.assertEquals(it.isWallTime(), false);
+                Assert.assertEquals(it.isWallTimeSet(), false);
                 Assert.assertEquals(it.getGenericInformations().size(), 0);
                 Assert.assertNull(it.getExecutableContainer());
                 DatabaseManager.getInstance().load(it);
@@ -213,19 +213,19 @@ public class TestDatabaseCRUD {
                 f.setAccessible(true);
                 Assert.assertEquals(ByteToObjectConverter.ObjectStream
                         .convert(((Map<String, ByteArrayWrapper>) f.get(it.getExecutableContainer())).get(
-                                "sleepTime").byteArrayValue()), "12");
+                                "sleepTime").getByteArray()), "12");
                 Assert.assertEquals(ByteToObjectConverter.ObjectStream
                         .convert(((Map<String, ByteArrayWrapper>) f.get(it.getExecutableContainer())).get(
-                                "number").byteArrayValue()), "21");
+                                "number").getByteArray()), "21");
                 Assert.assertEquals(ByteToObjectConverter.ObjectStream
                         .convert(((Map<String, ByteArrayWrapper>) f.get(it.getExecutableContainer())).get(
-                                "test").byteArrayValue()), "/bin/java/jdk1.5");
+                                "test").getByteArray()), "/bin/java/jdk1.5");
                 f = JavaExecutableContainer.class.getDeclaredField("userExecutableClassName");
                 f.setAccessible(true);
                 Assert.assertEquals((String) f.get(it.getExecutableContainer()),
                         "org.ow2.proactive.scheduler.examples.WaitAndPrint");
                 Assert.assertTrue(it.getExecutableContainer() instanceof ForkedJavaExecutableContainer);
-                Assert.assertEquals(((InternalJavaTask) it).isWallTime(), false);
+                Assert.assertEquals(((InternalJavaTask) it).isWallTimeSet(), false);
                 Assert.assertEquals(((ForkedJavaExecutableContainer) it.getExecutableContainer())
                         .getForkEnvironment().getJavaHome(), "/bin/java/jdk1.5");
                 Assert.assertEquals(((ForkedJavaExecutableContainer) it.getExecutableContainer())
@@ -250,7 +250,7 @@ public class TestDatabaseCRUD {
                 Assert.assertEquals(3, it.getNumberOfNodesNeeded());
                 Assert.assertNull(it.getResultPreview());
                 Assert.assertEquals(it.getWallTime(), 10 * 60 * 1000 + 53 * 1000);
-                Assert.assertEquals(it.isWallTime(), true);
+                Assert.assertEquals(it.isWallTimeSet(), true);
                 Assert.assertEquals(it.getGenericInformations().size(), 0);
                 Assert.assertNull(it.getExecutableContainer());
                 DatabaseManager.getInstance().load(it);
@@ -280,7 +280,7 @@ public class TestDatabaseCRUD {
                 Assert.assertEquals(10, it.getNumberOfNodesNeeded());
                 Assert.assertEquals(it.getResultPreview(), "tadzaam");
                 Assert.assertEquals(it.getWallTime(), 0);
-                Assert.assertEquals(it.isWallTime(), false);
+                Assert.assertEquals(it.isWallTimeSet(), false);
                 Assert.assertEquals(it.getGenericInformations().get("n11"), "v11");
                 Assert.assertEquals(it.getGenericInformations().get("n22"), "v22");
                 Assert.assertNull(it.getExecutableContainer());
@@ -324,10 +324,10 @@ public class TestDatabaseCRUD {
 
                 Assert.assertEquals(ByteToObjectConverter.ObjectStream
                         .convert(((Map<String, ByteArrayWrapper>) f.get(it.getExecutableContainer())).get(
-                                "sleepTime").byteArrayValue()), "1");
+                                "sleepTime").getByteArray()), "1");
                 Assert.assertEquals(ByteToObjectConverter.ObjectStream
                         .convert(((Map<String, ByteArrayWrapper>) f.get(it.getExecutableContainer())).get(
-                                "number").byteArrayValue()), "1");
+                                "number").getByteArray()), "1");
                 f = JavaExecutableContainer.class.getDeclaredField("userExecutableClassName");
                 f.setAccessible(true);
                 Assert.assertEquals((String) f.get(it.getExecutableContainer()),
@@ -337,13 +337,13 @@ public class TestDatabaseCRUD {
                 f.setAccessible(true);
                 Assert.assertEquals(ByteToObjectConverter.ObjectStream
                         .convert(((Map<String, ByteArrayWrapper>) f.get(it.getExecutableContainer())).get(
-                                "sleepTime").byteArrayValue()), "12");
+                                "sleepTime").getByteArray()), "12");
                 Assert.assertEquals(ByteToObjectConverter.ObjectStream
                         .convert(((Map<String, ByteArrayWrapper>) f.get(it.getExecutableContainer())).get(
-                                "number").byteArrayValue()), "21");
+                                "number").getByteArray()), "21");
                 Assert.assertEquals(ByteToObjectConverter.ObjectStream
                         .convert(((Map<String, ByteArrayWrapper>) f.get(it.getExecutableContainer())).get(
-                                "test").byteArrayValue()), "/bin/java/jdk1.5");
+                                "test").getByteArray()), "/bin/java/jdk1.5");
                 f = JavaExecutableContainer.class.getDeclaredField("userExecutableClassName");
                 f.setAccessible(true);
                 Assert.assertEquals((String) f.get(it.getExecutableContainer()),

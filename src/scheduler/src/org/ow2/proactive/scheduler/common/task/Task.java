@@ -49,6 +49,10 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 import org.hibernate.annotations.AccessType;
 import org.hibernate.annotations.AnyMetaDef;
@@ -96,6 +100,8 @@ import org.ow2.proactive.scripting.SimpleScript;
 @Table(name = "TASK")
 @AccessType("field")
 @Proxy(lazy = false)
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlRootElement(name = "task")
 public abstract class Task extends CommonAttribute {
 
     /** Number of nodes asked by the user. */
@@ -181,6 +187,7 @@ public abstract class Task extends CommonAttribute {
 
     /** List of dependences if necessary. */
     @Transient
+    @XmlTransient
     private List<Task> dependences = null;
 
     /** maximum execution time of the task (in milliseconds), the variable is only valid if isWallTime is true */
@@ -489,6 +496,7 @@ public abstract class Task extends CommonAttribute {
      *
      * @return the the list of dependences of the task.
      */
+    @XmlTransient
     public List<Task> getDependencesList() {
         return dependences;
     }
@@ -526,7 +534,7 @@ public abstract class Task extends CommonAttribute {
      * 
      * @return the isWallTime
      */
-    public boolean isWallTime() {
+    public boolean isWallTimeSet() {
         return wallTime > 0;
     }
 

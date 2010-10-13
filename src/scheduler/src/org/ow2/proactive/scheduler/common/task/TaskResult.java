@@ -40,6 +40,8 @@ import java.io.Serializable;
 import java.util.Map;
 
 import javax.swing.JPanel;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.scheduler.common.task.flow.FlowAction;
@@ -55,6 +57,7 @@ import org.ow2.proactive.scheduler.common.task.flow.FlowAction;
  * @since ProActive Scheduling 0.9
  */
 @PublicAPI
+@XmlRootElement
 public interface TaskResult extends Serializable {
 
     /**

@@ -38,6 +38,11 @@ package org.ow2.proactive.scheduler.common.task;
 
 import java.util.List;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
+
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.job.JobId;
@@ -52,6 +57,7 @@ import org.ow2.proactive.scheduler.common.task.flow.FlowActionType;
  * @since ProActive Scheduling 0.9
  */
 @PublicAPI
+@XmlAccessorType(XmlAccessType.FIELD)
 public abstract class TaskState extends Task implements Comparable<TaskState> {
 
     /** Sorting constant, this will allow the user to sort the descriptor. */
@@ -87,6 +93,7 @@ public abstract class TaskState extends Task implements Comparable<TaskState> {
      *
      * @return the dependences of this task
      */
+    @XmlTransient
     public abstract List<TaskState> getDependences();
 
     /**
@@ -99,6 +106,7 @@ public abstract class TaskState extends Task implements Comparable<TaskState> {
      * @throws IllegalStateException if this task was already submitted to the scheduler
      */
     @Override
+    @XmlTransient
     public List<Task> getDependencesList() {
         throw new IllegalStateException("This method cannot be used on a submitted task;" + "use " +
             this.getClass().getCanonicalName() + "#getDependences()");

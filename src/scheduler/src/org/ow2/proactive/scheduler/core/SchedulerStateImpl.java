@@ -36,12 +36,23 @@
  */
 package org.ow2.proactive.scheduler.core;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Vector;
 
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+
+import org.ow2.proactive.scheduler.common.NotificationData;
+import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SchedulerState;
 import org.ow2.proactive.scheduler.common.SchedulerStatus;
 import org.ow2.proactive.scheduler.common.SchedulerUsers;
+import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobState;
+import org.ow2.proactive.scheduler.common.job.UserIdentification;
+import org.ow2.proactive.scheduler.common.task.TaskInfo;
 
 
 /**
@@ -51,6 +62,7 @@ import org.ow2.proactive.scheduler.common.job.JobState;
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9
  */
+@XmlRootElement(name = "schedulerstate")
 public final class SchedulerStateImpl implements SchedulerState {
 
     /** Pending jobs */
@@ -68,6 +80,18 @@ public final class SchedulerStateImpl implements SchedulerState {
     /** List of connected user. */
     private SchedulerUsers sUsers = new SchedulerUsers();
 
+    /**
+     * keep a map of all jobs (pending, running finished) to facilitate
+     * their updates
+     */
+    Map<JobId, JobState> jobs = new HashMap<JobId, JobState>();
+
+    /**
+     * indicates if the <code>jobs</code> field has already been
+     * initialized. Used only when this state is updated through
+     * events.
+     */
+    private boolean initialized = false;
     /**
      * ProActive Empty constructor.
      */
@@ -131,6 +155,7 @@ public final class SchedulerStateImpl implements SchedulerState {
     /**
      * @return the status
      */
+    @XmlElement(name = "status")
     public SchedulerStatus getStatus() {
         return status;
     }
@@ -197,4 +222,130 @@ public final class SchedulerStateImpl implements SchedulerState {
         ssi.setFinishedJobs(tmp);
         return ssi;
     }
+
+    /**
+     * Updates the scheduler state given the event passed as a parameter
+     */
+    public void update(SchedulerEvent eventType) {
+        switch (eventType) {
+            case FROZEN:
+                status = SchedulerStatus.FROZEN;
+                break;
+            case KILLED:
+                status = SchedulerStatus.KILLED;
+                break;
+            case STARTED:
+                status = SchedulerStatus.STARTED;
+                break;
+            case STOPPED:
+                status = SchedulerStatus.STOPPED;
+                break;
+            case PAUSED:
+                status = SchedulerStatus.PAUSED;
+                break;
+            case SHUTTING_DOWN:
+                status = SchedulerStatus.SHUTTING_DOWN;
+                break;
+            case RM_DOWN:
+                status = SchedulerStatus.UNLINKED;
+                break;
+            case RM_UP:
+                break;
+
+        }
+    }
+
+    /**
+     * Updates the scheduler state given the event passed as a parameter
+     */
+    private void updateJobState(NotificationData<JobState> notification) {
+        this.pendingJobs.add(notification.getData());
+        this.jobs.put(notification.getData().getId(), notification.getData());
+    }
+
+    /**
+     * Updates the scheduler state given the event passed as a parameter
+     */
+    private void updateJobInfo(NotificationData<JobInfo> notification) {
+
+        JobState js = jobs.get(notification.getData().getJobId());
+        js.update(notification.getData());
+        switch (notification.getEventType()) {
+            case JOB_PENDING_TO_FINISHED:
+                pendingJobs.remove(js);
+                finishedJobs.add(js);
+                break;
+            case JOB_REMOVE_FINISHED:
+                finishedJobs.remove(js);
+                break;
+            case JOB_PENDING_TO_RUNNING:
+                pendingJobs.remove(js);
+                runningJobs.add(js);
+                break;
+            case JOB_RUNNING_TO_FINISHED:
+                runningJobs.remove(js);
+                finishedJobs.add(js);
+                break;
+        }
+    }
+
+    private void updateTaskInfo(NotificationData<TaskInfo> notification) {
+        jobs.get(notification.getData().getJobId()).update(notification.getData());
+    }
+
+    private void updateUserIdentification(NotificationData<UserIdentification> notification) {
+        sUsers.update(notification.getData());
+    }
+
+
+    @SuppressWarnings("unchecked")
+	public synchronized void update(NotificationData<?> notification) {
+
+        if (!initialized) {
+            for (JobState j : pendingJobs) {
+                jobs.put(j.getId(), j);
+            }
+            for (JobState j : runningJobs) {
+                jobs.put(j.getId(), j);
+            }
+            for (JobState j : finishedJobs) {
+                jobs.put(j.getId(), j);
+            }
+            initialized = true;
+        }
+
+        switch (notification.getEventType()) {
+            case JOB_CHANGE_PRIORITY:
+            case JOB_PAUSED:
+            case JOB_PENDING_TO_FINISHED:
+            case JOB_RESUMED:
+            case JOB_PENDING_TO_RUNNING:
+            case JOB_RUNNING_TO_FINISHED:
+                updateJobInfo((NotificationData<JobInfo>) notification);
+                break;
+            case JOB_REMOVE_FINISHED:
+                updateJobInfo((NotificationData<JobInfo>) notification);
+                jobs.remove(((NotificationData<JobInfo>) notification).getData().getJobId());
+                break;
+            case TASK_PENDING_TO_RUNNING:
+            case TASK_REPLICATED:
+            case TASK_RUNNING_TO_FINISHED:
+            case TASK_SKIPPED:
+            case TASK_WAITING_FOR_RESTART:
+                updateTaskInfo((NotificationData<TaskInfo>) notification);
+                break;
+            case USERS_UPDATE:
+                updateUserIdentification((NotificationData<UserIdentification>) notification);
+                break;
+            case JOB_SUBMITTED:
+                updateJobState((NotificationData<JobState>) notification);
+                break;
+        }
+    }
+
+    public synchronized void update(JobState js) {
+        pendingJobs.add(js);
+        this.jobs.put(js.getId(), js);
+    }
+
 }

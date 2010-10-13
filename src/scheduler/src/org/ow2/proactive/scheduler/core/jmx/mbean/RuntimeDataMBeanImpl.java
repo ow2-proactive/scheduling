@@ -485,7 +485,9 @@ public final class RuntimeDataMBeanImpl extends StandardMBean implements Runtime
     // PRIVATE METHODS FOR CALCULATING KPIs
 
     /**
-
+     * After a given number of Jobs we can have a good current estimation of the mean Job Pending Time
+     * calculated each time dividing the accumulator time by the counter.
+     *
      * @param info the job information
      */
     private void calculateMeanJobPendingTime(final String jobId, final long jobPendingTime) {

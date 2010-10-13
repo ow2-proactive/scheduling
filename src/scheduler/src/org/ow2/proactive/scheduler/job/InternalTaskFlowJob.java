@@ -42,6 +42,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.xml.bind.annotation.XmlRootElement;
 
 import org.hibernate.annotations.AccessType;
 import org.hibernate.annotations.Proxy;
@@ -61,6 +62,7 @@ import org.ow2.proactive.scheduler.task.internal.InternalTask;
 @Table(name = "INTERNAL_TF_JOB")
 @AccessType("field")
 @Proxy(lazy = false)
+@XmlRootElement
 public class InternalTaskFlowJob extends InternalJob {
     @Id
     @GeneratedValue

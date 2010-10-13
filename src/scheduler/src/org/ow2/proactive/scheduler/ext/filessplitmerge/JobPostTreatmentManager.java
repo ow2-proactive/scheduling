@@ -30,13 +30,14 @@ import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
+import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
 import org.ow2.proactive.scheduler.ext.filessplitmerge.event.EventType;
 import org.ow2.proactive.scheduler.ext.filessplitmerge.event.InternalEvent;
 import org.ow2.proactive.scheduler.ext.filessplitmerge.event.InternalSchedulerEventListener;
 import org.ow2.proactive.scheduler.ext.filessplitmerge.exceptions.ExceptionToStringHelper;
 import org.ow2.proactive.scheduler.ext.filessplitmerge.logging.LoggerManager;
-import org.ow2.proactive.scheduler.ext.filessplitmerge.schedulertools.SchedulerProxyUserInterface;
 import org.ow2.proactive.scheduler.ext.filessplitmerge.util.FilesTools;
+import org.ow2.proactive.scheduler.ext.filessplitmerge.util.MySchedulerProxy;
 import org.ow2.proactive.scheduler.job.InternalJob;
 
 
@@ -114,7 +115,7 @@ public abstract class JobPostTreatmentManager implements Observer {
         }
 
         try {
-            uiScheduler = SchedulerProxyUserInterface.getActiveInstance();
+            uiScheduler = MySchedulerProxy.getActiveInstance();
         } catch (NodeException ne) {
             LoggerManager.getInstane().error("Could not initiate the post treatment process", ne);
         } catch (ActiveObjectCreationException e) {

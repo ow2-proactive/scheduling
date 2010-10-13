@@ -69,7 +69,7 @@ public class BooleanWrapper implements Serializable {
     private long hId;
 
     @Column(name = "VALUE")
-    private boolean value;
+    private boolean booleanValue;
 
     /** HIBERNATE default constructor */
     @SuppressWarnings("unused")
@@ -82,7 +82,7 @@ public class BooleanWrapper implements Serializable {
      * @param value the boolean value of this wrapper.
      */
     public BooleanWrapper(boolean value) {
-        this.value = value;
+        this.booleanValue = value;
     }
 
     /**
@@ -90,8 +90,8 @@ public class BooleanWrapper implements Serializable {
      *
      * @return the boolean value.
      */
-    public boolean booleanValue() {
-        return value;
+    public boolean getBooleanValue() {
+        return this.booleanValue;
     }
 
 }

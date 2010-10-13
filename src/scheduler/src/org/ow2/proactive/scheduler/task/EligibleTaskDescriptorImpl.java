@@ -39,6 +39,8 @@ package org.ow2.proactive.scheduler.task;
 import java.util.Map;
 import java.util.Vector;
 
+import javax.xml.bind.annotation.XmlTransient;
+
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.task.EligibleTaskDescriptor;
 import org.ow2.proactive.scheduler.common.task.TaskDescriptor;
@@ -74,9 +76,11 @@ public class EligibleTaskDescriptorImpl implements EligibleTaskDescriptor {
     private Map<String, String> genericInformations;
 
     /** list of parent tasks for this task (null if jobType!=TASK_FLOW) */
+    @XmlTransient
     private Vector<TaskDescriptor> parents;
 
     /** list of ordered children tasks for this task (null if jobType!=TASK_FLOW) */
+    @XmlTransient
     private Vector<TaskDescriptor> children;
 
     /**
@@ -96,6 +100,7 @@ public class EligibleTaskDescriptorImpl implements EligibleTaskDescriptor {
      *
      * @return the children
      */
+    @XmlTransient
     public Vector<TaskDescriptor> getChildren() {
         if (children == null) {
             return new Vector<TaskDescriptor>();
@@ -118,6 +123,7 @@ public class EligibleTaskDescriptorImpl implements EligibleTaskDescriptor {
      *
      * @return the parents
      */
+    @XmlTransient
     public Vector<TaskDescriptor> getParents() {
         if (parents == null) {
             return new Vector<TaskDescriptor>();

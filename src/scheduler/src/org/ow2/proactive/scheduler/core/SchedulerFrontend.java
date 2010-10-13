@@ -799,7 +799,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
         IdentifiedJob ij = jobs.get(jobId);
 
         if (ij == null) {
-            String msg = "The job represented by this ID is unknow !";
+            String msg = "The job represented by this ID '" + jobId + "' is unknown !";
             logger_dev.info(msg);
             throw new UnknownJobException(msg);
         }

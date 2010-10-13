@@ -57,6 +57,7 @@ import javax.persistence.MappedSuperclass;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+import javax.xml.bind.annotation.XmlTransient;
 
 import org.apache.log4j.Logger;
 import org.hibernate.annotations.AccessType;
@@ -147,12 +148,14 @@ public abstract class InternalJob extends JobState {
     //Not DB managed, created once needed.
     @Transient
     @TransientInSerialization
+    @XmlTransient
     private JobDescriptor jobDescriptor;
 
     /** DataSpace application manager for this job */
     //Not DB managed, created once needed.
     @Transient
     @TransientInSerialization
+    @XmlTransient
     private JobDataSpaceApplication jobDataSpaceApplication;
 
     /** Job result */
@@ -1453,6 +1456,7 @@ public abstract class InternalJob extends JobState {
      *
      * @return the jobDescriptor
      */
+    @XmlTransient
     public JobDescriptorImpl getJobDescriptor() {
         if (jobDescriptor == null) {
             jobDescriptor = new JobDescriptorImpl(this);

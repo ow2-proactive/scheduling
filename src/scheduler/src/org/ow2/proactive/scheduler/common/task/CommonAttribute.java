@@ -46,6 +46,8 @@ import javax.persistence.MappedSuperclass;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
 
 import org.hibernate.annotations.AccessType;
 import org.hibernate.annotations.Cascade;
@@ -70,6 +72,7 @@ import org.ow2.proactive.scheduler.common.task.util.IntegerWrapper;
 @Table(name = "COMMON_ATTRIBUTE")
 @AccessType("field")
 @Proxy(lazy = false)
+@XmlAccessorType(XmlAccessType.FIELD)
 public abstract class CommonAttribute implements Serializable {
     /** 
      * Do the job has to cancel when an exception occurs in a task. (default is false) <br />
@@ -111,7 +114,7 @@ public abstract class CommonAttribute implements Serializable {
      * @return the cancelOnError property
      */
     public boolean isCancelJobOnError() {
-        return cancelJobOnError.getValue().booleanValue();
+        return cancelJobOnError.getValue().getBooleanValue();
     }
 
     /**
@@ -165,7 +168,7 @@ public abstract class CommonAttribute implements Serializable {
      * @return the number of execution allowed for this task
      */
     public int getMaxNumberOfExecution() {
-        return maxNumberOfExecution.getValue().integerValue();
+        return maxNumberOfExecution.getValue().getIntegerValue();
     }
 
     /**

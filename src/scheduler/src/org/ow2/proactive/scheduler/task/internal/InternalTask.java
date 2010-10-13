@@ -57,6 +57,9 @@ import javax.persistence.MappedSuperclass;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlTransient;
 
 import org.hibernate.annotations.AccessType;
 import org.hibernate.annotations.Any;
@@ -118,6 +121,7 @@ import org.ow2.proactive.utils.NodeSet;
 @Table(name = "INTERNAL_TASK")
 @AccessType("field")
 @Proxy(lazy = false)
+@XmlAccessorType(XmlAccessType.FIELD)
 public abstract class InternalTask extends TaskState {
 
     /** Parents list : null if no dependences */
@@ -145,6 +149,7 @@ public abstract class InternalTask extends TaskState {
     /** Node exclusion for this task if desired */
     @Transient
     @TransientInSerialization
+    @XmlTransient
     private NodeSet nodeExclusion = null;
 
     /** Contains the user executable */
@@ -157,6 +162,7 @@ public abstract class InternalTask extends TaskState {
     @JoinColumn(name = "EXEC_CONTAINER_ID", updatable = false)
     @Cascade(CascadeType.ALL)
     @TransientInSerialization
+    @XmlTransient
     protected ExecutableContainer executableContainer = null;
 
     /** Maximum number of execution for this task in case of failure (node down) */
@@ -189,6 +195,7 @@ public abstract class InternalTask extends TaskState {
     @LazyCollection(value = LazyCollectionOption.FALSE)
     @Cascade(CascadeType.ALL)
     @TransientInSerialization
+    @XmlTransient
     @Column(name = "JOIN_BRANCH")
     private List<InternalTask> joinedBranches = null;
 
@@ -202,6 +209,7 @@ public abstract class InternalTask extends TaskState {
     @JoinColumn(name = "ITASK_ID", updatable = false)
     @Cascade(CascadeType.ALL)
     @TransientInSerialization
+    @XmlTransient
     private InternalTask ifBranch = null;
 
     /**
@@ -757,6 +765,7 @@ public abstract class InternalTask extends TaskState {
      * {@inheritDoc}
      */
     @Override
+    @XmlTransient
     public List<TaskState> getDependences() {
         //set to null if needed
         if (ideps == null || ideps.size() == 0) {
@@ -1126,7 +1135,7 @@ public abstract class InternalTask extends TaskState {
         tli.setNamingServiceUrl(job.getJobDataSpaceApplication().getNamingServiceURL());
         tli.setIterationIndex(getIterationIndex());
         tli.setReplicationIndex(getReplicationIndex());
-        if (isWallTime()) {
+        if (isWallTimeSet()) {
             tli.setWalltime(wallTime);
         }
         return tli;

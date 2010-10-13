@@ -36,6 +36,8 @@
  */
 package org.ow2.proactive.scheduler.common;
 
+import java.io.Serializable;
+
 import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.UserIdentification;
@@ -50,7 +52,7 @@ import org.ow2.proactive.scheduler.common.task.TaskInfo;
  * @author The ProActive Team
  * @since ProActive Scheduling 2.1
  */
-public class UniversalSchedulerListener implements SchedulerEventListener {
+public class UniversalSchedulerListener implements SchedulerEventListener,Serializable {
 
     // wrapped listener
     private final SchedulerEventListener internalListener;

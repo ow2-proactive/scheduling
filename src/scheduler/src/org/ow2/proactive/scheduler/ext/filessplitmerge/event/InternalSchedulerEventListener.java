@@ -33,9 +33,10 @@ import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.UserIdentification;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
+import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
 import org.ow2.proactive.scheduler.ext.filessplitmerge.exceptions.ExceptionToStringHelper;
 import org.ow2.proactive.scheduler.ext.filessplitmerge.logging.LoggerManager;
-import org.ow2.proactive.scheduler.ext.filessplitmerge.schedulertools.SchedulerProxyUserInterface;
+import org.ow2.proactive.scheduler.ext.filessplitmerge.util.MySchedulerProxy;
 
 
 /**
@@ -143,7 +144,7 @@ public class InternalSchedulerEventListener extends Observable implements Schedu
 
         SchedulerProxyUserInterface proxyUserInterface = null;
         try {
-            proxyUserInterface = SchedulerProxyUserInterface.getActiveInstance();
+            proxyUserInterface = MySchedulerProxy.getActiveInstance();
         } catch (ActiveObjectCreationException e1) {
             LoggerManager.getInstane().error(
                     "ProActive exception occured while initializing gold listener. ", e1);

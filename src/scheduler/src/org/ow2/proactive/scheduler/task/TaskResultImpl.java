@@ -57,6 +57,7 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.swing.JPanel;
+import javax.xml.bind.annotation.XmlTransient;
 
 import org.apache.log4j.Logger;
 import org.hibernate.annotations.AccessType;
@@ -387,6 +388,7 @@ public class TaskResultImpl implements TaskResult {
     /**
      * @see org.ow2.proactive.scheduler.common.task.TaskResult#getGraphicalDescription()
      */
+    @XmlTransient
     public JPanel getGraphicalDescription() {
         boolean instanciation = false;
         try {

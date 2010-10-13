@@ -1,21 +1,13 @@
-//============================================================================
-// Name        : ProActive Files Split-Merge Framework
-// Author      : Emil Salageanu, ActiveEon team
-// Version     : 0.1
-// Copyright   : Copyright ActiveEon 2008-2009, Tous Droits Réservés (All Rights Reserved)
-// Description : Framework for building distribution layers for native applications
-//================================================================================
+package org.ow2.proactive.scheduler.common.util;
 
-package org.ow2.proactive.scheduler.ext.filessplitmerge.schedulertools;
 
+import java.io.Serializable;
 import java.security.KeyException;
 import java.security.PublicKey;
 
 import javax.security.auth.login.LoginException;
 
-import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.api.PAActiveObject;
-import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
@@ -46,43 +38,26 @@ import org.ow2.proactive.scheduler.ext.filessplitmerge.logging.LoggerManager;
 
 /**
  * This class implements an active object managing a connection to the Scheduler (a proxy to the Scheduler)
- * You must init this  proxy (once) by calling the {@link #init(String, String, String)} method after the first call to 
- * the static method {@link #getActiveInstance()}
- * Next, any entity can obtain the active instance of this object and perform requests on it    
- * @author esalagea
- *
+ * You must init the proxy by calling the {@link #init(String, String, String)} method after having created it
  */
-public class SchedulerProxyUserInterface implements Scheduler {
 
-    private Scheduler uischeduler;
+@ActiveObject
+public class SchedulerProxyUserInterface implements Scheduler,Serializable{
 
-    private String schedulerUrl;
-    private String userName;
-    private String password;
+    protected Scheduler uischeduler;
 
-    private static SchedulerProxyUserInterface activeInstance;
+
 
     public SchedulerProxyUserInterface() {
 
     }
 
-    public static SchedulerProxyUserInterface getActiveInstance() throws ActiveObjectCreationException,
-            NodeException {
-        if (activeInstance == null) {
-            activeInstance = (SchedulerProxyUserInterface) PAActiveObject.newActive(
-                    SchedulerProxyUserInterface.class.getName(), new Object[] {});
-        }
 
-        return activeInstance;
-    }
 
     public boolean init(String url, String user, String pwd) throws SchedulerException, LoginException {
-        this.schedulerUrl = url;
-        this.userName = user;
-        this.password = pwd;
+
 
         SchedulerAuthenticationInterface auth = SchedulerConnection.join(url);
-        //this.uischeduler = auth.logAsUser(userName, passwd);
         PublicKey pubKey = auth.getPublicKey();
 
         try {
@@ -92,7 +67,6 @@ public class SchedulerProxyUserInterface implements Scheduler {
             throw new InternalSchedulerException(e);
         }
 
-        //LoggerManager.getInstane().info("Connection to the scheduler successfully established. ");
         return true;
     }
 
@@ -107,7 +81,6 @@ public class SchedulerProxyUserInterface implements Scheduler {
             throw new NotConnectedException("Not connected to the scheduler.");
         }
 
-        //return uischeduler.addSchedulerEventListener(arg0, onlyMyEvents, arg1);
         return uischeduler.addEventListener(sel, myEventsOnly, true, events);
 
     }
@@ -120,14 +93,6 @@ public class SchedulerProxyUserInterface implements Scheduler {
         uischeduler.disconnect();
 
     }
-
-    //	//@Override
-    //	public Stats getStats() throws SchedulerException {
-    //		if (uischeduler==null)
-    //			throw new SchedulerException("Not connected to the schecduler.");
-    //
-    //		return uischeduler.getStats();
-    //	}
 
     //@Override
     public boolean isConnected() {
@@ -151,7 +116,6 @@ public class SchedulerProxyUserInterface implements Scheduler {
             throw new NotConnectedException("Not connected to the schecduler.");
         }
 
-        //uischeduler.removeSchedulerEventListener();
         uischeduler.removeEventListener();
 
     }
@@ -264,22 +228,9 @@ public class SchedulerProxyUserInterface implements Scheduler {
     public boolean resumeJob(JobId jobId) throws NotConnectedException, UnknownJobException,
             PermissionException {
         if (uischeduler == null) {
-            throw new NotConnectedException("Not connected to the schecduler.");
+            throw new NotConnectedException("Not connected to the scheduler.");
         }
-
         return uischeduler.resumeJob(jobId);
-    }
-
-    public String getSchedulerUrl() {
-        return schedulerUrl;
-    }
-
-    public String getUserName() {
-        return userName;
-    }
-
-    public String getPassword() {
-        return password;
     }
 
     //@Override
@@ -320,82 +271,68 @@ public class SchedulerProxyUserInterface implements Scheduler {
 
     public void addEventListener(SchedulerEventListener sel, boolean myEventsOnly, SchedulerEvent... events)
             throws NotConnectedException, PermissionException {
-        // TODO Auto-generated method stub
-
+        uischeduler.addEventListener(sel, myEventsOnly, events);
     }
 
     public JobState getJobState(String jobId) throws NotConnectedException, UnknownJobException,
             PermissionException {
-        // TODO Auto-generated method stub
-        return null;
+        return uischeduler.getJobState(jobId);
     }
 
     public void listenJobLogs(String jobId, AppenderProvider appenderProvider) throws NotConnectedException,
             UnknownJobException, PermissionException {
-        // TODO Auto-generated method stub
-
+        uischeduler.listenJobLogs(jobId, appenderProvider);
     }
 
     public boolean changePolicy(Class<? extends Policy> newPolicyFile) throws NotConnectedException,
             PermissionException {
-        // TODO Auto-generated method stub
-        return false;
+        return uischeduler.changePolicy(newPolicyFile);
     }
 
     public boolean freeze() throws NotConnectedException, PermissionException {
-        // TODO Auto-generated method stub
-        return false;
+        return uischeduler.freeze();
     }
 
     public JobState getJobState(JobId jobId) throws NotConnectedException, UnknownJobException,
             PermissionException {
-        // TODO Auto-generated method stub
-        return null;
+        return uischeduler.getJobState(jobId);
     }
 
     public SchedulerState getState() throws NotConnectedException, PermissionException {
-        // TODO Auto-generated method stub
-        return null;
+            return uischeduler.getState();
     }
 
     public boolean kill() throws NotConnectedException, PermissionException {
-        // TODO Auto-generated method stub
-        return false;
+        return uischeduler.kill();
     }
 
     public boolean linkResourceManager(String rmURL) throws NotConnectedException, PermissionException {
-        // TODO Auto-generated method stub
-        return false;
+        return uischeduler.linkResourceManager(rmURL);
     }
 
     public boolean pause() throws NotConnectedException, PermissionException {
-        // TODO Auto-generated method stub
-        return false;
+        return uischeduler.pause();
     }
 
     public boolean resume() throws NotConnectedException, PermissionException {
-        // TODO Auto-generated method stub
-        return false;
+        return uischeduler.resume();
     }
 
     public boolean shutdown() throws NotConnectedException, PermissionException {
-        // TODO Auto-generated method stub
-        return false;
+        return uischeduler.shutdown();
     }
 
     public boolean start() throws NotConnectedException, PermissionException {
-        // TODO Auto-generated method stub
-        return false;
+        return uischeduler.start();
     }
 
     public boolean stop() throws NotConnectedException, PermissionException {
-        // TODO Auto-generated method stub
-        return false;
+        return uischeduler.stop();
     }
 
     public SchedulerState getState(boolean myJobsOnly) throws NotConnectedException, PermissionException {
-        // TODO Auto-generated method stub
-        return null;
+        return uischeduler.getState(myJobsOnly);
     }
+
 
 }

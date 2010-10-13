@@ -34,7 +34,7 @@ import org.ow2.proactive.scheduler.common.task.RestartMode;
 import org.ow2.proactive.scheduler.ext.filessplitmerge.exceptions.InvalidInputDataException;
 import org.ow2.proactive.scheduler.ext.filessplitmerge.exceptions.NotInitializedException;
 import org.ow2.proactive.scheduler.ext.filessplitmerge.logging.LoggerManager;
-import org.ow2.proactive.scheduler.ext.filessplitmerge.schedulertools.SchedulerProxyUserInterface;
+import org.ow2.proactive.scheduler.ext.filessplitmerge.util.MySchedulerProxy;
 import org.ow2.proactive.scripting.GenerationScript;
 import org.ow2.proactive.scripting.InvalidScriptException;
 import org.ow2.proactive.scripting.Script;
@@ -167,7 +167,7 @@ public abstract class JobCreator {
         // this id will be used to talk to the scheduler about this job.
         JobId jobId = null;
         try {
-            jobId = SchedulerProxyUserInterface.getActiveInstance().submit(job);
+            jobId = MySchedulerProxy.getActiveInstance().submit(job);
         } catch (ActiveObjectCreationException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();

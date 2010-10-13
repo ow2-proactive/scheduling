@@ -48,6 +48,8 @@ import java.util.Set;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.xml.bind.annotation.XmlTransient;
+
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.scheduler.common.job.JobDescriptor;
@@ -101,9 +103,11 @@ public class JobDescriptorImpl implements JobDescriptor {
     private Set<TaskId> hasChildren = new HashSet<TaskId>();
 
     /** Job tasks to be able to be schedule */
+    @XmlTransient
     private Map<TaskId, EligibleTaskDescriptor> eligibleTasks = new ConcurrentHashMap<TaskId, EligibleTaskDescriptor>();
 
     /** Those are not directly eligible, and will be triggered by an IF control flow action */
+    @XmlTransient
     private Map<TaskId, EligibleTaskDescriptor> branchTasks = new ConcurrentHashMap<TaskId, EligibleTaskDescriptor>();
 
     /** Job running tasks */
@@ -644,6 +648,7 @@ public class JobDescriptorImpl implements JobDescriptor {
      *
      * @return the tasks.
      */
+    @XmlTransient
     public Collection<EligibleTaskDescriptor> getEligibleTasks() {
         return new Vector<EligibleTaskDescriptor>(eligibleTasks.values());
     }

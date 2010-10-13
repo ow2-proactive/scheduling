@@ -13,13 +13,14 @@ import javax.security.auth.login.LoginException;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.core.node.NodeException;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
+import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
 import org.ow2.proactive.scheduler.ext.filessplitmerge.event.InternalSchedulerEventListener;
 import org.ow2.proactive.scheduler.ext.filessplitmerge.exceptions.NotInitializedException;
 import org.ow2.proactive.scheduler.ext.filessplitmerge.logging.LoggerManager;
-import org.ow2.proactive.scheduler.ext.filessplitmerge.schedulertools.SchedulerProxyUserInterface;
 import org.ow2.proactive.scheduler.ext.filessplitmerge.textualui.GeneralMenuCreator;
 import org.ow2.proactive.scheduler.ext.filessplitmerge.textualui.MenuCreatorHoloder;
 import org.ow2.proactive.scheduler.ext.filessplitmerge.textualui.TextualUI;
+import org.ow2.proactive.scheduler.ext.filessplitmerge.util.MySchedulerProxy;
 
 
 /**
@@ -158,7 +159,7 @@ public class EmbarrasinglyParrallelApplication {
 
         /** INIT THE SCHEDULER PROXY */
         try {
-            SchedulerProxyUserInterface proxy = SchedulerProxyUserInterface.getActiveInstance();
+            SchedulerProxyUserInterface proxy = MySchedulerProxy.getActiveInstance();
             boolean c = proxy.init(schedulerURL, userName, passwd);
         } catch (ActiveObjectCreationException e1) {
             LoggerManager.getInstane().error("Could not create connection to the scheduler. ", e1);

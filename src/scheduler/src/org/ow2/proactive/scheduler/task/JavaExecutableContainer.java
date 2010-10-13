@@ -132,8 +132,8 @@ public class JavaExecutableContainer extends ExecutableContainer {
     public JavaExecutableContainer(JavaExecutableContainer cont) {
         this.userExecutableClassName = cont.userExecutableClassName;
         for (Entry<String, ByteArrayWrapper> e : cont.serializedArguments.entrySet()) {
-            this.serializedArguments.put(new String(e.getKey()), new ByteArrayWrapper(e.getValue()
-                    .byteArrayValue()));
+            this.serializedArguments.put(new String(e.getKey()),
+                    new ByteArrayWrapper(e.getValue().getByteArray()));
         }
     }
 
@@ -195,7 +195,7 @@ public class JavaExecutableContainer extends ExecutableContainer {
         JavaExecutableInitializer jei = new JavaExecutableInitializer();
         Map<String, byte[]> tmp = new HashMap<String, byte[]>();
         for (Entry<String, ByteArrayWrapper> e : this.serializedArguments.entrySet()) {
-            tmp.put(e.getKey(), e.getValue().byteArrayValue());
+            tmp.put(e.getKey(), e.getValue().getByteArray());
         }
         jei.setSerializedArguments(tmp);
         jei.setNodes(nodes);
