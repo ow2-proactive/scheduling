@@ -44,6 +44,9 @@ import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlTransient;
 
 import org.hibernate.annotations.AccessType;
 import org.hibernate.annotations.Cascade;
@@ -72,6 +75,7 @@ import org.ow2.proactive.scheduler.job.JobInfoImpl;
 @Table(name = "TASK_INFO")
 @AccessType("field")
 @Proxy(lazy = false)
+@XmlAccessorType(XmlAccessType.FIELD)
 public class TaskInfoImpl implements TaskInfo {
 
     private static final String HOSTNAME_SEPARATOR = ",";
@@ -79,6 +83,7 @@ public class TaskInfoImpl implements TaskInfo {
     @Id
     @GeneratedValue
     @SuppressWarnings("unused")
+    @XmlTransient
     private long hId;
 
     /** id of the task */

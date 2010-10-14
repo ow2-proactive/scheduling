@@ -45,6 +45,9 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlTransient;
 
 import org.hibernate.annotations.AccessType;
 import org.hibernate.annotations.Cascade;
@@ -64,10 +67,12 @@ import org.objectweb.proactive.annotation.PublicAPI;
 @Table(name = "INPUT_SELECTOR")
 @AccessType("field")
 @Proxy(lazy = false)
+@XmlAccessorType(XmlAccessType.FIELD)
 public class InputSelector implements Serializable {
 
     @Id
     @GeneratedValue
+    @XmlTransient
     protected long hId;
 
     @Cascade(CascadeType.ALL)

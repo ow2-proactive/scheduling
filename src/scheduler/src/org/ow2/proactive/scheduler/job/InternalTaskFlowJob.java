@@ -42,7 +42,10 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 import org.hibernate.annotations.AccessType;
 import org.hibernate.annotations.Proxy;
@@ -63,10 +66,12 @@ import org.ow2.proactive.scheduler.task.internal.InternalTask;
 @AccessType("field")
 @Proxy(lazy = false)
 @XmlRootElement
+@XmlAccessorType(XmlAccessType.FIELD)
 public class InternalTaskFlowJob extends InternalJob {
     @Id
     @GeneratedValue
     @SuppressWarnings("unused")
+    @XmlTransient
     private long hId;
 
     /**

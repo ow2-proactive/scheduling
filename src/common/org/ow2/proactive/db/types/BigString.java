@@ -44,6 +44,9 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.Table;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlTransient;
 
 import org.hibernate.annotations.AccessType;
 import org.hibernate.annotations.Proxy;
@@ -62,11 +65,13 @@ import org.objectweb.proactive.annotation.PublicAPI;
 @Table(name = "BIG_STRING")
 @AccessType("field")
 @Proxy(lazy = false)
+@XmlAccessorType(XmlAccessType.FIELD)
 public final class BigString implements Serializable {
     @Id
     @GeneratedValue
     @Column(name = "ID")
     @SuppressWarnings("unused")
+    @XmlTransient
     private long hId;
 
     @Column(name = "VALUE", length = Integer.MAX_VALUE)

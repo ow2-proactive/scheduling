@@ -44,6 +44,10 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.Table;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlTransient;
+import javax.xml.bind.annotation.XmlValue;
 
 import org.hibernate.annotations.AccessType;
 import org.hibernate.annotations.Any;
@@ -70,11 +74,13 @@ import org.ow2.proactive.scheduler.common.task.util.IntegerWrapper;
 @Table(name = "UPDATABLE_PROPERTIES")
 @AccessType("field")
 @Proxy(lazy = false)
+@XmlAccessorType(XmlAccessType.FIELD)
 @PublicAPI
 public class UpdatableProperties<T> implements Serializable {
     @Id
     @GeneratedValue
     @SuppressWarnings("unused")
+    @XmlTransient
     private long hId;
 
     /** The value of this property. */
@@ -85,10 +91,12 @@ public class UpdatableProperties<T> implements Serializable {
             @MetaValue(targetEntity = IntegerWrapper.class, value = "IW") })
     @JoinColumn(name = "VALUE_ID")
     @Cascade(CascadeType.ALL)
+    @XmlValue
     private T value = null;
 
     /** If the property has been set. */
     @Column(name = "SET_")
+    @XmlTransient
     private boolean set = false;
 
     /** HIBERNATE default constructor */

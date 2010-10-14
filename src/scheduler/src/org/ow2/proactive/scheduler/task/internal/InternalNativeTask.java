@@ -44,6 +44,7 @@ import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 import org.apache.log4j.Logger;
 import org.hibernate.annotations.AccessType;
@@ -81,6 +82,7 @@ public class InternalNativeTask extends InternalTask {
 
     @Id
     @GeneratedValue
+    @XmlTransient
     protected long hId;
 
     /**

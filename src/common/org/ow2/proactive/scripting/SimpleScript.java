@@ -48,6 +48,9 @@ import javax.persistence.Table;
 import javax.script.Bindings;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlTransient;
 
 import org.hibernate.annotations.AccessType;
 import org.hibernate.annotations.Proxy;
@@ -65,10 +68,12 @@ import org.objectweb.proactive.annotation.PublicAPI;
 @Table(name = "SIMPLE_SCRIPT")
 @AccessType("field")
 @Proxy(lazy = false)
+@XmlAccessorType(XmlAccessType.FIELD)
 public class SimpleScript extends Script {
     @Id
     @GeneratedValue
     @SuppressWarnings("unused")
+    @XmlTransient
     private long hId;
 
     /** Hibernate default constructor*/

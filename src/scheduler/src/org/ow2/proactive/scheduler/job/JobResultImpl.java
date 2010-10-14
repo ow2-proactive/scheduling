@@ -49,6 +49,9 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlTransient;
 
 import org.hibernate.annotations.AccessType;
 import org.hibernate.annotations.Cascade;
@@ -64,6 +67,7 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 
 
+
 /**
  * Class representing a job result. A job result is a map of task result. The
  * key of the map is the name of the task on which to get the result. To
@@ -77,10 +81,12 @@ import org.ow2.proactive.scheduler.task.TaskResultImpl;
 @Table(name = "JOB_RESULT_IMPL")
 @AccessType("field")
 @Proxy(lazy = false)
+@XmlAccessorType(XmlAccessType.FIELD)
 public class JobResultImpl implements JobResult {
     @Id
     @GeneratedValue
     @SuppressWarnings("unused")
+    @XmlTransient
     private long hId;
 
     /** Referenced JobId */

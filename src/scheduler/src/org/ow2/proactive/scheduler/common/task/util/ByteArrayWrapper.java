@@ -44,6 +44,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.Table;
+import javax.xml.bind.annotation.XmlTransient;
 
 import org.hibernate.annotations.AccessType;
 import org.hibernate.annotations.Proxy;
@@ -68,6 +69,7 @@ public class ByteArrayWrapper implements Serializable {
     @GeneratedValue
     @Column(name = "ID")
     @SuppressWarnings("unused")
+    @XmlTransient
     private long hId;
 
     @Column(name = "VALUE", updatable = false, length = Integer.MAX_VALUE)

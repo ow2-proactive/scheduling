@@ -48,6 +48,9 @@ import javax.persistence.Table;
 import javax.script.Bindings;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlTransient;
 
 import org.apache.log4j.Logger;
 import org.hibernate.annotations.AccessType;
@@ -69,6 +72,7 @@ import org.ow2.proactive.utils.SchedulerLoggers;
 @Table(name = "GENERATION_SCRIPT")
 @AccessType("field")
 @Proxy(lazy = false)
+@XmlAccessorType(XmlAccessType.FIELD)
 public class GenerationScript extends Script<String> {
     /** Loggers */
     public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerLoggers.SCRIPT);
@@ -76,6 +80,7 @@ public class GenerationScript extends Script<String> {
     @Id
     @GeneratedValue
     @SuppressWarnings("unused")
+    @XmlTransient
     private long hId;
 
     /**

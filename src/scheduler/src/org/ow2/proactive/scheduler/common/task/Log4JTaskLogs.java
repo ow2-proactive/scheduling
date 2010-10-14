@@ -43,6 +43,9 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlTransient;
 
 import org.apache.log4j.Layout;
 import org.apache.log4j.Level;
@@ -65,10 +68,12 @@ import org.objectweb.proactive.annotation.PublicAPI;
 @Table(name = "LOG4J_TASK_LOGS")
 @AccessType("field")
 @Proxy(lazy = false)
+@XmlAccessorType(XmlAccessType.FIELD)
 public class Log4JTaskLogs implements TaskLogs {
     @Id
     @GeneratedValue
     @SuppressWarnings("unused")
+    @XmlTransient
     private long hId;
 
     /** Prefix for job logger */

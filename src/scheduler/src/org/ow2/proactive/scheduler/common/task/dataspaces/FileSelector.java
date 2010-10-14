@@ -43,6 +43,9 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlTransient;
 
 import org.hibernate.annotations.AccessType;
 import org.hibernate.annotations.Proxy;
@@ -131,10 +134,12 @@ import org.objectweb.proactive.annotation.PublicAPI;
 @Table(name = "FILE_SELECTOR")
 @AccessType("field")
 @Proxy(lazy = false)
+@XmlAccessorType(XmlAccessType.FIELD)
 public class FileSelector implements Serializable {
 
     @Id
     @GeneratedValue
+    @XmlTransient
     protected long hId;
 
     @Column(name = "INCLUDES", columnDefinition = "BLOB")

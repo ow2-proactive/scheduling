@@ -54,6 +54,9 @@ import javax.persistence.JoinTable;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlTransient;
 
 import org.hibernate.annotations.AccessType;
 import org.hibernate.annotations.Cascade;
@@ -84,10 +87,12 @@ import org.ow2.proactive.scheduler.util.classloading.TaskClassServer;
 @DiscriminatorValue("JEC")
 @AccessType("field")
 @Proxy(lazy = true)
+@XmlAccessorType(XmlAccessType.FIELD)
 public class JavaExecutableContainer extends ExecutableContainer {
 
     @Id
     @GeneratedValue
+    @XmlTransient
     protected long hId;
 
     @Column(name = "EXECUTABLE_CLASS")

@@ -46,6 +46,9 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlTransient;
 
 import org.apache.log4j.Logger;
 import org.hibernate.annotations.AccessType;
@@ -72,12 +75,14 @@ import org.ow2.proactive.scripting.InvalidScriptException;
 @Table(name = "NATIVE_EXEC_CONTAINER")
 @AccessType("field")
 @Proxy(lazy = true)
+@XmlAccessorType(XmlAccessType.FIELD)
 public class NativeExecutableContainer extends ExecutableContainer {
 
     public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.CORE);
 
     @Id
     @GeneratedValue
+    @XmlTransient
     protected long hId;
 
     // actual executable data

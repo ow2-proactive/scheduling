@@ -43,6 +43,9 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlTransient;
 
 import org.hibernate.annotations.AccessType;
 import org.hibernate.annotations.Cascade;
@@ -66,10 +69,12 @@ import org.ow2.proactive.scheduler.job.JobIdImpl;
 @Table(name = "TASK_ID")
 @AccessType("field")
 @Proxy(lazy = false)
+@XmlAccessorType(XmlAccessType.FIELD)
 public final class TaskIdImpl implements TaskId {
     @Id
     @GeneratedValue
     @SuppressWarnings("unused")
+    @XmlTransient
     private long hId;
 
     /**
@@ -79,6 +84,7 @@ public final class TaskIdImpl implements TaskId {
     public static final int JOB_FACTOR = PASchedulerProperties.JOB_FACTOR.getValueAsInt();
 
     /** the global id count */
+    @XmlTransient
     private static int currentId = 0;
 
     /** task id */
