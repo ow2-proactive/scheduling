@@ -1,6 +1,5 @@
 package org.ow2.proactive.scheduler.common.util;
 
-
 import java.io.Serializable;
 import java.security.KeyException;
 import java.security.PublicKey;
@@ -42,20 +41,15 @@ import org.ow2.proactive.scheduler.ext.filessplitmerge.logging.LoggerManager;
  */
 
 @ActiveObject
-public class SchedulerProxyUserInterface implements Scheduler,Serializable{
+public class SchedulerProxyUserInterface implements Scheduler, Serializable {
 
     protected Scheduler uischeduler;
-
-
 
     public SchedulerProxyUserInterface() {
 
     }
 
-
-
     public boolean init(String url, String user, String pwd) throws SchedulerException, LoginException {
-
 
         SchedulerAuthenticationInterface auth = SchedulerConnection.join(url);
         PublicKey pubKey = auth.getPublicKey();
@@ -299,7 +293,7 @@ public class SchedulerProxyUserInterface implements Scheduler,Serializable{
     }
 
     public SchedulerState getState() throws NotConnectedException, PermissionException {
-            return uischeduler.getState();
+        return uischeduler.getState();
     }
 
     public boolean kill() throws NotConnectedException, PermissionException {
@@ -333,6 +327,5 @@ public class SchedulerProxyUserInterface implements Scheduler,Serializable{
     public SchedulerState getState(boolean myJobsOnly) throws NotConnectedException, PermissionException {
         return uischeduler.getState(myJobsOnly);
     }
-
 
 }

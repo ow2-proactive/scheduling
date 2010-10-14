@@ -52,7 +52,7 @@ import org.ow2.proactive.scheduler.common.task.TaskInfo;
  * @author The ProActive Team
  * @since ProActive Scheduling 2.1
  */
-public class UniversalSchedulerListener implements SchedulerEventListener,Serializable {
+public class UniversalSchedulerListener implements SchedulerEventListener, Serializable {
 
     // wrapped listener
     private final SchedulerEventListener internalListener;

@@ -92,6 +92,7 @@ public final class SchedulerStateImpl implements SchedulerState {
      * events.
      */
     private boolean initialized = false;
+
     /**
      * ProActive Empty constructor.
      */
@@ -297,9 +298,8 @@ public final class SchedulerStateImpl implements SchedulerState {
         sUsers.update(notification.getData());
     }
 
-
     @SuppressWarnings("unchecked")
-	public synchronized void update(NotificationData<?> notification) {
+    public synchronized void update(NotificationData<?> notification) {
 
         if (!initialized) {
             for (JobState j : pendingJobs) {

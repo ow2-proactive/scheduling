@@ -67,7 +67,6 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 
 
-
 /**
  * Class representing a job result. A job result is a map of task result. The
  * key of the map is the name of the task on which to get the result. To

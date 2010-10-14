@@ -137,8 +137,8 @@ public class JavaExecutableContainer extends ExecutableContainer {
     public JavaExecutableContainer(JavaExecutableContainer cont) {
         this.userExecutableClassName = cont.userExecutableClassName;
         for (Entry<String, ByteArrayWrapper> e : cont.serializedArguments.entrySet()) {
-            this.serializedArguments.put(new String(e.getKey()),
-                    new ByteArrayWrapper(e.getValue().getByteArray()));
+            this.serializedArguments.put(new String(e.getKey()), new ByteArrayWrapper(e.getValue()
+                    .getByteArray()));
         }
     }
 

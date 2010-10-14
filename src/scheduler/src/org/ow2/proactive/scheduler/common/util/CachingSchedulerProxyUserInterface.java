@@ -31,18 +31,17 @@ import org.ow2.proactive.scheduler.common.task.TaskInfo;
  *  through events received from the scheduler.
  *
  */
-public class CachingSchedulerProxyUserInterface extends SchedulerProxyUserInterface implements  SchedulerEventListener {
+public class CachingSchedulerProxyUserInterface extends SchedulerProxyUserInterface implements
+        SchedulerEventListener {
     protected boolean isCachingEnabled = false;
 
     protected SchedulerState schedulerState = null;
 
     public SchedulerState getState() throws NotConnectedException, PermissionException {
-            return schedulerState;
-        }
-
+        return schedulerState;
+    }
 
     public boolean init(String url, String user, String pwd) throws SchedulerException, LoginException {
-
 
         SchedulerAuthenticationInterface auth = SchedulerConnection.join(url);
         PublicKey pubKey = auth.getPublicKey();
@@ -53,7 +52,8 @@ public class CachingSchedulerProxyUserInterface extends SchedulerProxyUserInterf
         } catch (KeyException e) {
             throw new InternalSchedulerException(e);
         }
-        CachingSchedulerProxyUserInterface ao = (CachingSchedulerProxyUserInterface) PAActiveObject.getStubOnThis();
+        CachingSchedulerProxyUserInterface ao = (CachingSchedulerProxyUserInterface) PAActiveObject
+                .getStubOnThis();
         schedulerState = this.uischeduler.addEventListener(ao, false, true);
         schedulerState = PAFuture.getFutureValue(schedulerState);
         return true;
