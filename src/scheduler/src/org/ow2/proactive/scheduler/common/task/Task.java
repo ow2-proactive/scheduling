@@ -185,6 +185,9 @@ public abstract class Task extends CommonAttribute {
     @Column(name = "PRECIOUS_RESULT")
     protected boolean preciousResult;
 
+    @Column(name = "RUN_AS_ME")
+    protected boolean runAsMe;
+
     /** List of dependences if necessary. */
     @Transient
     @XmlTransient
@@ -280,6 +283,25 @@ public abstract class Task extends CommonAttribute {
      */
     public void setPreciousResult(boolean preciousResult) {
         this.preciousResult = preciousResult;
+    }
+
+    /**
+     * To know if the task will be executed under the user identity or not.
+     *
+     * @return true if the task will be executed as the user identity.
+     */
+    public boolean isRunAsMe() {
+        return this.runAsMe;
+    }
+
+    /**
+     * Set if this task will be run under user identity.
+     * This could impact the performance.
+     *
+     * @param runAsMe true if this task will be run under user identity.
+     */
+    public void setRunAsMe(boolean runAsMe) {
+        this.runAsMe = runAsMe;
     }
 
     /**

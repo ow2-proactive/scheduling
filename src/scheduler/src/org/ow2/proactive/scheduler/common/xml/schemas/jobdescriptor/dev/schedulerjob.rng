@@ -214,6 +214,9 @@
         <ref name="numberOfExecution_t"/>
       </optional>
       <optional>
+        <ref name="runAsMe"/>
+      </optional>
+      <optional>
         <ref name="walltime"/>
       </optional>
       <optional>
@@ -389,6 +392,15 @@
       <doc:documentation>A script launched by the Resource Manager after the task or post script</doc:documentation>
       <ref name="script"/>
     </element>
+  </define>
+  <define name="runAsMe">
+    <attribute name="runAsMe">
+      <doc:documentation>Do we run this task under the job owner user identity</doc:documentation>
+      <choice>
+        <data type="boolean"/>
+        <ref name="variableRefType"/>
+      </choice>
+    </attribute>
   </define>
   <!-- +++++++++++++ scripts -->
   <define name="script">

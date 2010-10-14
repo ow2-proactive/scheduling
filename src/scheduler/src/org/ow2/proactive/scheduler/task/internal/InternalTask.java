@@ -1126,6 +1126,8 @@ public abstract class InternalTask extends TaskState {
      */
     protected TaskLauncherInitializer getDefaultTaskLauncherInitializer(InternalJob job) {
         TaskLauncherInitializer tli = new TaskLauncherInitializer();
+        tli.setOwner(job.getOwner());
+        tli.setRunAsUser(isRunAsMe());
         tli.setTaskId(getId());
         tli.setPreScript(getPreScript());
         tli.setPostScript(getPostScript());

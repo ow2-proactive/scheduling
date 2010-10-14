@@ -40,13 +40,23 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.Serializable;
+import java.security.KeyException;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.SecureRandom;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Random;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
 import javax.management.Notification;
 import javax.management.NotificationListener;
+import javax.security.auth.login.LoginException;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAActiveObject;
@@ -65,6 +75,11 @@ import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.core.runtime.StartPARuntime;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.extensions.processbuilder.OSProcessBuilder;
+import org.objectweb.proactive.extensions.processbuilder.OSProcessBuilderFactory;
+import org.objectweb.proactive.extensions.processbuilder.OSUser;
+import org.ow2.proactive.authentication.crypto.Credentials;
+import org.ow2.proactive.scheduler.authentication.SchedulerAuthentication;
 import org.ow2.proactive.scheduler.common.exception.InternalSchedulerException;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
@@ -118,7 +133,7 @@ public class ForkedJavaExecutable extends JavaExecutable {
 
     private String forkedNodeName;
     private long deploymentID;
-    private StringBuffer command;
+    private List<String> command;
     private ForkedJavaExecutableInitializer execInitializer;
     private File fpolicy = null;
 
@@ -159,7 +174,7 @@ public class ForkedJavaExecutable extends JavaExecutable {
         try {
             createRegistrationListener();
 
-            logger_dev.debug("Create JVM process with command : " + command);
+            logger_dev.info("Create JVM process with command : " + command);
             createJVMProcess();
 
             waitForRegistration();
@@ -257,7 +272,8 @@ public class ForkedJavaExecutable extends JavaExecutable {
         } else {
             java_home = System.getProperty("java.home");
         }
-        command = new StringBuffer(java_home + File.separatorChar + "bin" + File.separatorChar + "java ");
+        command = new ArrayList<String>();
+        command.add(java_home + File.separatorChar + "bin" + File.separatorChar + "java");
     }
 
     /**
@@ -272,7 +288,7 @@ public class ForkedJavaExecutable extends JavaExecutable {
                 PrintStream out = new PrintStream(fpolicy);
                 out.print(execInitializer.getJavaTaskLauncherInitializer().getPolicyContent());
                 out.close();
-                command.append(" -Djava.security.policy=" + fpolicy.getAbsolutePath() + " ");
+                command.add("-Djava.security.policy=" + fpolicy.getAbsolutePath());
             } catch (Exception e) {
                 //java policy not set
                 logger_dev.debug("", e);
@@ -280,7 +296,7 @@ public class ForkedJavaExecutable extends JavaExecutable {
         }
         if (forkEnvironment != null && forkEnvironment.getJVMParameters() != null &&
             !"".equals(forkEnvironment.getJVMParameters())) {
-            command.append(" " + forkEnvironment.getJVMParameters() + " ");
+            command.add(forkEnvironment.getJVMParameters());
         }
     }
 
@@ -289,7 +305,8 @@ public class ForkedJavaExecutable extends JavaExecutable {
      */
     private void addClasspath() {
         String classPath = System.getProperty("java.class.path", ".");
-        command.append(" -cp " + classPath + " ");
+        command.add("-cp");
+        command.add(classPath);
     }
 
     /**
@@ -298,10 +315,13 @@ public class ForkedJavaExecutable extends JavaExecutable {
      * @param nodeURL URL of the node on which to deploy
      */
     private void addRuntime() throws ProActiveException {
-        command.append(" " + StartPARuntime.class.getName() + " ");
-        command.append(" -p " + RuntimeFactory.getDefaultRuntime().getURL() + " ");
-        command.append(" -c 1 ");
-        command.append(" -d " + deploymentID + " ");
+        command.add(StartPARuntime.class.getName());
+        command.add("-p");
+        command.add(RuntimeFactory.getDefaultRuntime().getURL());
+        command.add("-c");
+        command.add("1");
+        command.add("-d");
+        command.add("" + deploymentID);
     }
 
     /**
@@ -344,11 +364,43 @@ public class ForkedJavaExecutable extends JavaExecutable {
 
     /**
      * creating a child JVM, intercepting stdout and stderr
-     *
+     * Also ask for credentials with new generated keypair
      * @throws IOException
      */
-    private void createJVMProcess() throws IOException {
-        process = Runtime.getRuntime().exec(command.toString());
+    private void createJVMProcess() throws Exception {
+        //build process
+        OSProcessBuilder ospb = OSProcessBuilderFactory.getBuilder();
+        ospb.command(command.toArray(new String[command.size()]));
+        //check if it must be run under user
+        boolean runAsUser = this.execInitializer.getJavaTaskLauncherInitializer().isRunAsUser();
+        if (runAsUser) {
+            //generate new keypair
+            KeyPairGenerator keyGen = null;
+            try {
+                keyGen = KeyPairGenerator.getInstance("RSA");
+            } catch (NoSuchAlgorithmException e) {
+                //should never happen as RSA exists
+            }
+            keyGen.initialize(1024, new SecureRandom());
+            KeyPair keyPair = keyGen.generateKeyPair();
+
+            //connect to the authentication interface and ask for new cred
+            SchedulerAuthentication schedAuth = null;
+            Credentials cred = schedAuth.getUserCrendentials(this.execInitializer
+                    .getJavaTaskLauncherInitializer().getOwner(), keyPair.getPublic());
+
+            //decrypt
+            String[] credentials = null;
+            try {
+                credentials = cred.decrypt(keyPair.getPrivate());
+                ospb.user(new OSUser(credentials[0], credentials[1]));
+            } catch (KeyException e) {
+                throw new LoginException("Could not decrypt credentials: " + e);
+            }
+        }
+
+        //and start process
+        process = ospb.start();
     }
 
     /**

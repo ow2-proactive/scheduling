@@ -37,7 +37,6 @@
 package org.ow2.proactive.scheduler.task.launcher;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
 import org.ow2.proactive.scheduler.common.task.TaskLogs;

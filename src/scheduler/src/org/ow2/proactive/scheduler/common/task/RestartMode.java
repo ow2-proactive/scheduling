@@ -46,7 +46,6 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
-
 import org.hibernate.annotations.AccessType;
 import org.hibernate.annotations.Proxy;
 import org.objectweb.proactive.annotation.PublicAPI;

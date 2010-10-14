@@ -52,7 +52,7 @@ taskFlow = ## A job composed of a flow of tasks with or without dependencies
 
 # +++++++++++++ task
 task = ## A task is the smallest computation unit for the scheduler 
-    element task { taskName, nodesNumber_t?, cancelJobOnError_t?, restartTaskOnError_t?, numberOfExecution_t?, walltime?, preciousResult?, resultPreviewClass?, taskDescription?, genericInformation?, depends?, inputFiles?, selection?, pre?, executable, flow?, post?, cleaning?, outputFiles?}
+    element task { taskName, nodesNumber_t?, cancelJobOnError_t?, restartTaskOnError_t?, numberOfExecution_t?, runAsMe? ,walltime?, preciousResult?, resultPreviewClass?, taskDescription?, genericInformation?, depends?, inputFiles?, selection?, pre?, executable, flow?, post?, cleaning?, outputFiles?}
 taskName = ## Identification of this task (identifier) 
     attribute name { xsd:ID }
 nodesNumber_t = ## number of cores needed for the task (identifier)
@@ -87,6 +87,8 @@ post = ## A script launched after the task execution in the task node
     element post { script }
 cleaning = ## A script launched by the Resource Manager after the task or post script
     element cleaning { script }
+runAsMe = ## Do we run this task under the job owner user identity
+    attribute runAsMe { xsd:boolean | variableRefType}
 
 # +++++++++++++ scripts
 script = ## Definition of a standard script 

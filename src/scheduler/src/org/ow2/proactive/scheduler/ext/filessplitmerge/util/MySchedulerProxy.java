@@ -5,12 +5,10 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.NodeException;
 import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
 
-
 /**
  * A class that maintains a reference to the scheduler
  *
  */
-
 public class MySchedulerProxy {
 
     protected static SchedulerProxyUserInterface activeInstance;

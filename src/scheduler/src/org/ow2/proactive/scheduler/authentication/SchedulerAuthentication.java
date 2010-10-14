@@ -37,6 +37,9 @@
 package org.ow2.proactive.scheduler.authentication;
 
 import java.security.KeyException;
+import java.security.PublicKey;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 import javax.management.JMException;
@@ -88,6 +91,9 @@ public class SchedulerAuthentication extends AuthenticationImpl implements Sched
     /** TODO Adapter for backward compatibility : to be removed in 3.X.X */
     private AdminSchedulerInterface useradminAdapter;
 
+    /** Store valid and authenticated user key pair */
+    private Map<String, Credentials> keysPairs;
+
     /**
      * ProActive empty constructor.
      */
@@ -109,6 +115,7 @@ public class SchedulerAuthentication extends AuthenticationImpl implements Sched
         this.frontend = frontend;
         //TODO to be removed in 3.X.X
         this.useradminAdapter = new SchedulerAdminAdapter(frontend);
+        this.keysPairs = new HashMap<String, Credentials>();
     }
 
     /**
@@ -227,6 +234,9 @@ public class SchedulerAuthentication extends AuthenticationImpl implements Sched
         UserNamePrincipal unPrincipal = subject.getPrincipals(UserNamePrincipal.class).iterator().next();
         String user = unPrincipal.getName();
 
+        //store to keypairs
+        this.keysPairs.put(user, cred);
+
         logger_dev.info("user : " + user);
         // add this user to the scheduler front-end
         UserIdentificationImpl ident = new UserIdentificationImpl(user, subject);
@@ -236,6 +246,27 @@ public class SchedulerAuthentication extends AuthenticationImpl implements Sched
 
         // return the created interface
         return this.frontend;
+    }
+
+    /**
+     * Ask for the login/pwd of the specified user encrypted with the given public key.
+     *
+     * TODO to be secured -> java.security.policy?
+     *
+     * @return a new credentials containing user and password encrypted with the given public key
+     */
+    public Credentials getUserCrendentials(String username, PublicKey pubkey) throws KeyException {
+        Credentials cred = this.keysPairs.get(username);
+        try {
+            //decrypt -> credentials[1] will contains the password
+            String[] credentials = cred.decrypt(privateKeyPath);
+            //cred becomes the credentials to be returned with new publicKey encryption
+            return Credentials.createCredentials(username, credentials[1], pubkey);
+        } catch (KeyException e) {
+            e.printStackTrace();
+            //TODO qué fa si problem
+            throw e;
+        }
     }
 
     /**

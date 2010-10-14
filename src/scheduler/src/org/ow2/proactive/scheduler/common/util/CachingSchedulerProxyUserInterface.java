@@ -42,7 +42,6 @@ public class CachingSchedulerProxyUserInterface extends SchedulerProxyUserInterf
     }
 
     public boolean init(String url, String user, String pwd) throws SchedulerException, LoginException {
-
         SchedulerAuthenticationInterface auth = SchedulerConnection.join(url);
         PublicKey pubKey = auth.getPublicKey();
 

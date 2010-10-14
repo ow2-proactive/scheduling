@@ -40,6 +40,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -81,6 +82,9 @@ public class ForkedJavaExecutableContainer extends JavaExecutableContainer {
     @Cascade(CascadeType.ALL)
     @OneToOne(fetch = FetchType.EAGER, targetEntity = ForkEnvironment.class)
     protected ForkEnvironment forkEnvironment = null;
+
+    @Column(name = "RUN_AS_USER")
+    protected boolean runAsUser;
 
     /**
      * Hibernate default constructor
@@ -146,6 +150,24 @@ public class ForkedJavaExecutableContainer extends JavaExecutableContainer {
      */
     public ForkEnvironment getForkEnvironment() {
         return forkEnvironment;
+    }
+
+    /**
+     * Get the runAsUser property
+     *
+     * @return the runAsUser property
+     */
+    public boolean isRunAsUser() {
+        return runAsUser;
+    }
+
+    /**
+     * Set the runAsUser value to the given runAsUser value
+     *
+     * @param runAsUser the runAsUser to set
+     */
+    public void setRunAsUser(boolean runAsUser) {
+        this.runAsUser = runAsUser;
     }
 
 }

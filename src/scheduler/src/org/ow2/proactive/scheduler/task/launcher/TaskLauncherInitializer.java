@@ -78,6 +78,8 @@ public class TaskLauncherInitializer implements Serializable {
     private List<InputSelector> taskInputFiles = null;
     private List<OutputSelector> taskOutputFiles = null;
     private String namingServiceUrl;
+    private String owner;
+    private boolean runAsUser;
 
     /**
      * Get the taskId
@@ -185,6 +187,42 @@ public class TaskLauncherInitializer implements Serializable {
      */
     public String getPolicyContent() {
         return policyContent;
+    }
+
+    /**
+     * Get the owner
+     *
+     * @return the owner
+     */
+    public String getOwner() {
+        return owner;
+    }
+
+    /**
+     * Set the owner value to the given owner value
+     *
+     * @param owner the owner to set
+     */
+    public void setOwner(String owner) {
+        this.owner = owner;
+    }
+
+    /**
+     * Get the runAsUser
+     *
+     * @return the runAsUser
+     */
+    public boolean isRunAsUser() {
+        return runAsUser;
+    }
+
+    /**
+     * Set the runAsUser value to the given runAsUser value
+     *
+     * @param runAsUser the runAsUser to set
+     */
+    public void setRunAsUser(boolean runAsUser) {
+        this.runAsUser = runAsUser;
     }
 
     /**

@@ -286,6 +286,14 @@
               <xs:union memberTypes="xs:nonNegativeInteger jd:variableRefType"/>
             </xs:simpleType>
           </xs:attribute>
+          <xs:attribute name="runAsMe">
+            <xs:annotation>
+              <xs:documentation>Do we run this task under the job owner user identity</xs:documentation>
+            </xs:annotation>
+            <xs:simpleType>
+              <xs:union memberTypes="xs:boolean jd:variableRefType"/>
+            </xs:simpleType>
+          </xs:attribute>
           <xs:attribute name="walltime">
             <xs:annotation>
               <xs:documentation>Defines walltime - maximum execution time of the task. (patterns are 'ss' OR 'mm:ss' OR 'hh:mm:ss')</xs:documentation>
@@ -464,6 +472,16 @@
       <xs:documentation>A script launched by the Resource Manager after the task or post script</xs:documentation>
     </xs:annotation>
   </xs:element>
+  <xs:attributeGroup name="runAsMe">
+    <xs:attribute name="runAsMe" use="required">
+      <xs:annotation>
+        <xs:documentation>Do we run this task under the job owner user identity</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:union memberTypes="xs:boolean jd:variableRefType"/>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
   <!-- +++++++++++++ scripts -->
   <xs:complexType name="script">
     <xs:sequence>
