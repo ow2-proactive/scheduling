@@ -533,7 +533,7 @@ public class SchedulerModel extends ConsoleModel {
             list = new ArrayList<String>();
             list.add("ID");
             list.add("NAME");
-            list.add("ID");
+            list.add("ITER");
             list.add("DUP");
             list.add("STATUS");
             list.add("HOSTNAME");
