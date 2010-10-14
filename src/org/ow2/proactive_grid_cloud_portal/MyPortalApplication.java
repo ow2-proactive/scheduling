@@ -34,6 +34,7 @@ public class MyPortalApplication extends Application
     set.add(JobAlreadyFinishedExceptionMapper.class); 
     set.add(SubmissionClosedExceptionMapper.class);
     set.add(UnknownJobExceptionMapper.class);
+    set.add(UpdatablePropertiesConverter.class);
     return set;
   }
 
