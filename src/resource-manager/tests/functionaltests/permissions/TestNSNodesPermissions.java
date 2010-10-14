@@ -106,6 +106,9 @@ public class TestNSNodesPermissions extends FunctionalTest {
         nsadmin.releaseNodes(nodes);
 
         nsadmin.removeNodeSource(nsName, true).booleanValue();
+        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
+        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
+        RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, nsName);
         nsadmin.disconnect();
 
         RMTHelper.log("Test2 - node users = MY_GROUPS");
