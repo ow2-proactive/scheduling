@@ -56,7 +56,6 @@
 			<generateorcheck_stub_for_class targetedClasspath="scheduler.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/core/SchedulerFrontend" mode="@{mode}"/>
 			<generateorcheck_stub_for_class targetedClasspath="scheduler.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/authentication/SchedulerAuthentication" mode="@{mode}"/>
 			<generateorcheck_stub_for_class targetedClasspath="scheduler.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/examples/Worker" mode="@{mode}"/>
-			<generateorcheck_stub_for_class targetedClasspath="scheduler.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/ext/filessplitmerge/schedulertools/SchedulerProxyUserInterface" mode="@{mode}"/>
 			<generateorcheck_stub_for_class targetedClasspath="scheduler.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/ext/masterworker/AOSchedulerWorker" mode="@{mode}"/>
 			<generateorcheck_stub_for_class targetedClasspath="scheduler.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/ext/matlab/AOMatlabWorker" mode="@{mode}"/>
 			<generateorcheck_stub_for_class targetedClasspath="scheduler.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/ext/matlab/embedded/AOMatlabEnvironment" mode="@{mode}"/>
