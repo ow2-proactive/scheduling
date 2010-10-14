@@ -66,6 +66,7 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.body.request.RequestFilter;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.Scheduler;
@@ -176,7 +177,7 @@ public class AOMatlabEnvironment implements Serializable, SchedulerEventListener
 
         Credentials creds = null;
         try {
-            creds = Credentials.createCredentials(user, passwd, auth.getPublicKey());
+            creds = Credentials.createCredentials(new CredData(user, passwd), auth.getPublicKey());
         } catch (KeyException e) {
             throw new LoginException("" + e);
         } catch (LoginException e) {

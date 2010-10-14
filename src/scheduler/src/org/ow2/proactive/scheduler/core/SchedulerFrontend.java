@@ -227,8 +227,8 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
             // creating the scheduler authentication interface.
             // if this fails then it will not continue.
             logger_dev.info("Creating scheduler authentication interface...");
-            authentication = (SchedulerAuthentication) PAActiveObject.newActive(SchedulerAuthentication.class
-                    .getName(), new Object[] { PAActiveObject.getStubOnThis() });
+            authentication = PAActiveObject.newActive(SchedulerAuthentication.class,
+                    new Object[] { PAActiveObject.getStubOnThis() });
             //creating scheduler core
             logger_dev.info("Creating scheduler core...");
             SchedulerCore scheduler_local = new SchedulerCore(resourceManager,
@@ -373,7 +373,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
             throw new SubmissionClosedException(msg);
         }
         //get the internal job.
-        InternalJob job = InternalJobFactory.createJob(userJob);
+        InternalJob job = InternalJobFactory.createJob(userJob, ident.getCredentials());
         //setting job informations
         if (job.getTasks().size() == 0) {
             String msg = "This job does not contain Tasks !! Insert tasks before submitting job";

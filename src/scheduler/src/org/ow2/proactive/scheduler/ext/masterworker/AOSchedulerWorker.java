@@ -58,6 +58,7 @@ import org.objectweb.proactive.extensions.masterworker.core.ResultInternImpl;
 import org.objectweb.proactive.extensions.masterworker.interfaces.internal.ResultIntern;
 import org.objectweb.proactive.extensions.masterworker.interfaces.internal.TaskIntern;
 import org.objectweb.proactive.extensions.masterworker.interfaces.internal.WorkerMaster;
+import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.Scheduler;
@@ -155,7 +156,7 @@ public class AOSchedulerWorker extends AOWorker implements SchedulerEventListene
             auth = SchedulerConnection.join(schedulerUrl);
             Credentials creds = null;
             try {
-                creds = Credentials.createCredentials(user, password, auth.getPublicKey());
+                creds = Credentials.createCredentials(new CredData(user, password), auth.getPublicKey());
             } catch (KeyException e) {
                 throw new LoginException("" + e);
             } catch (LoginException e) {

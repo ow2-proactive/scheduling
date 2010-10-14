@@ -34,10 +34,15 @@
  */
 package org.ow2.proactive.scheduler.core;
 
+import java.security.KeyException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.ow2.proactive.authentication.crypto.CredData;
+import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.task.launcher.TaskLauncher;
@@ -60,6 +65,7 @@ public class TimedDoTaskAction implements CallableWithTimeoutAction<TaskResult> 
     private TaskLauncher launcher;
     private SchedulerCore coreStub;
     private TaskResult[] parameters;
+    private PrivateKey corePk;
 
     /**
      * Create a new instance of TimedDoTaskAction
@@ -70,11 +76,12 @@ public class TimedDoTaskAction implements CallableWithTimeoutAction<TaskResult> 
      * @param parameters the parameters to be given to the task
      */
     public TimedDoTaskAction(InternalTask task, TaskLauncher launcher, SchedulerCore coreStub,
-            TaskResult[] parameters) {
+            TaskResult[] parameters, PrivateKey corePk) {
         this.task = task;
         this.launcher = launcher;
         this.coreStub = coreStub;
         this.parameters = parameters;
+        this.corePk = corePk;
     }
 
     /**
@@ -84,6 +91,7 @@ public class TimedDoTaskAction implements CallableWithTimeoutAction<TaskResult> 
         try {
             //if a task has been launched
             if (launcher != null) {
+                FillContainerWithEncryption();
                 //try launch the task
                 TaskResult tr = launcher.doTask(coreStub, task.getExecutableContainer(), parameters);
                 //check if timeout occurs
@@ -105,6 +113,24 @@ public class TimedDoTaskAction implements CallableWithTimeoutAction<TaskResult> 
             logger_dev.warn("DoTask had an exception : " + e.getMessage());
             logger_dev.debug("StackTrace :", e);
             return null;
+        }
+    }
+
+    /**
+     * If runAsMe is true, get the public key of the execution node,
+     * decrypt user credentials, and re-encrypt them using the received public key.
+     *
+     * @throws KeyException if there was a problem while moving credentials
+     */
+    private void FillContainerWithEncryption() throws KeyException {
+        //do nothing if runAsMe is false or not set
+        if (task.isRunAsMe()) {
+            PublicKey pubkey = launcher.generatePublicKey();
+            //decrypt -> credentials[1] will contains the password
+            CredData credentials = task.getCredentials().decrypt(corePk);
+            //cred becomes the credentials to be returned with new publicKey encryption
+            Credentials cred = Credentials.createCredentials(credentials, pubkey);
+            task.getExecutableContainer().setCredentials(cred);
         }
     }
 

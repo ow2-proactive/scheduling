@@ -48,6 +48,7 @@ import javax.management.remote.JMXConnectorFactory;
 import javax.management.remote.JMXServiceURL;
 
 import org.junit.Assert;
+import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.jmx.JMXClientHelper;
 import org.ow2.proactive.jmx.naming.JMXTransportProtocol;
@@ -91,7 +92,8 @@ public final class SchedulerJMXTest extends FunctionalTest {
 
         // final Credentials userCreds =
         // Credentials.createCredentials(userLogin, userPassword, pubKey);
-        final Credentials adminCreds = Credentials.createCredentials(adminLogin, adminPassword, pubKey);
+        final Credentials adminCreds = Credentials.createCredentials(new CredData(adminLogin, adminPassword),
+                pubKey);
 
         final JMXServiceURL jmxRmiServiceURL = new JMXServiceURL(auth
                 .getJMXConnectorURL(JMXTransportProtocol.RMI));

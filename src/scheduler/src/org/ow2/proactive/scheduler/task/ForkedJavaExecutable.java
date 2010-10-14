@@ -40,13 +40,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.Serializable;
-import java.security.KeyException;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -56,7 +49,6 @@ import java.util.concurrent.TimeUnit;
 
 import javax.management.Notification;
 import javax.management.NotificationListener;
-import javax.security.auth.login.LoginException;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAActiveObject;
@@ -77,9 +69,6 @@ import org.objectweb.proactive.core.runtime.StartPARuntime;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.processbuilder.OSProcessBuilder;
 import org.objectweb.proactive.extensions.processbuilder.OSProcessBuilderFactory;
-import org.objectweb.proactive.extensions.processbuilder.OSUser;
-import org.ow2.proactive.authentication.crypto.Credentials;
-import org.ow2.proactive.scheduler.authentication.SchedulerAuthentication;
 import org.ow2.proactive.scheduler.common.exception.InternalSchedulerException;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
@@ -109,9 +98,6 @@ public class ForkedJavaExecutable extends JavaExecutable {
 
     /** When creating a ProActive node on a dedicated JVM, assign a default name of VN */
     public static final String DEFAULT_VN_NAME = "ForkedTasksVN";
-
-    /** When creating a ProActive node on a dedicated JVM, assign a default JobID */
-    public static final String DEFAULT_JOB_ID = "ForkedTasksJobID";
 
     /** Forked execution time out checking interval */
     private static final int TIMEOUT = 1000;
@@ -174,7 +160,7 @@ public class ForkedJavaExecutable extends JavaExecutable {
         try {
             createRegistrationListener();
 
-            logger_dev.info("Create JVM process with command : " + command);
+            logger_dev.debug("Create JVM process with command : " + command);
             createJVMProcess();
 
             waitForRegistration();
@@ -368,35 +354,14 @@ public class ForkedJavaExecutable extends JavaExecutable {
      * @throws IOException
      */
     private void createJVMProcess() throws Exception {
+        System.setProperty("proactive.home", ProActiveRuntimeImpl.getProActiveRuntime().getProActiveHome());
         //build process
         OSProcessBuilder ospb = OSProcessBuilderFactory.getBuilder();
         ospb.command(command.toArray(new String[command.size()]));
         //check if it must be run under user
-        boolean runAsUser = this.execInitializer.getJavaTaskLauncherInitializer().isRunAsUser();
-        if (runAsUser) {
-            //generate new keypair
-            KeyPairGenerator keyGen = null;
-            try {
-                keyGen = KeyPairGenerator.getInstance("RSA");
-            } catch (NoSuchAlgorithmException e) {
-                //should never happen as RSA exists
-            }
-            keyGen.initialize(1024, new SecureRandom());
-            KeyPair keyPair = keyGen.generateKeyPair();
-
-            //connect to the authentication interface and ask for new cred
-            SchedulerAuthentication schedAuth = null;
-            Credentials cred = schedAuth.getUserCrendentials(this.execInitializer
-                    .getJavaTaskLauncherInitializer().getOwner(), keyPair.getPublic());
-
-            //decrypt
-            String[] credentials = null;
-            try {
-                credentials = cred.decrypt(keyPair.getPrivate());
-                ospb.user(new OSUser(credentials[0], credentials[1]));
-            } catch (KeyException e) {
-                throw new LoginException("Could not decrypt credentials: " + e);
-            }
+        if (this.execInitializer.getJavaTaskLauncherInitializer().isRunAsUser()) {
+            //TODO
+            //ospb.user(new OSUser(credentials[0], credentials[1]));
         }
 
         //and start process
@@ -411,8 +376,7 @@ public class ForkedJavaExecutable extends JavaExecutable {
      */
     private JavaTaskLauncher createForkedTaskLauncher() throws Exception {
         /* creating a ProActive node on a newly created JVM */
-        Node forkedNode = childRuntime.createLocalNode(forkedNodeName, true, null, DEFAULT_VN_NAME,
-                DEFAULT_JOB_ID);
+        Node forkedNode = childRuntime.createLocalNode(forkedNodeName, true, null, DEFAULT_VN_NAME);
 
         /* JavaTaskLauncher will be an active object created on a newly created ProActive node */
         logger_dev.info("Create java task launcher");

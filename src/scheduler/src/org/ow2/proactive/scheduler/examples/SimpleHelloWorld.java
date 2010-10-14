@@ -42,6 +42,7 @@ import java.security.KeyException;
 import javax.security.auth.login.LoginException;
 
 import org.objectweb.proactive.core.util.ProActiveInet;
+import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
@@ -89,7 +90,8 @@ public class SimpleHelloWorld {
             //you can also log on as admin if your username is in admin group. (it provides you more power ;) )
             //your need to create encrypted credentials so that it cannot be intercepted by network sniffers;
             //the scheduler will offer the public key required for encryption
-            Credentials cred = Credentials.createCredentials("user", "pwd", auth.getPublicKey());
+            Credentials cred = Credentials
+                    .createCredentials(new CredData("user", "pwd"), auth.getPublicKey());
             Scheduler scheduler = auth.login(cred);
 
             //if this point is reached, that's we are connected to the scheduler under "user".

@@ -65,6 +65,7 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
 import org.objectweb.proactive.annotation.PublicAPI;
+import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 
@@ -138,8 +139,8 @@ public class SchedulerAuthenticationGUIHelper {
             SchedulerAuthenticationInterface schedAuth = auth.getAuth();
             Credentials cred = null;
             try {
-                cred = Credentials.createCredentials(auth.getUsername(), auth.getPassword(), schedAuth
-                        .getPublicKey());
+                cred = Credentials.createCredentials(new CredData(auth.getUsername(), auth.getPassword()),
+                        schedAuth.getPublicKey());
             } catch (LoginException e) {
                 throw new LoginException("Could not retrieve public key from Scheduler " + schedulerURL +
                     ", contact the administrator" + e);

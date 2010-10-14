@@ -101,7 +101,7 @@ public class RMFactory {
                 configure(initializer);
             }
             Node nodeRM = NodeFactory.createLocalNode(PAResourceManagerProperties.RM_NODE_NAME
-                    .getValueAsString(), false, null, null, null);
+                    .getValueAsString(), false, null, null);
             String RMCoreName = RMConstants.NAME_ACTIVE_OBJECT_RMCORE;
             rmcore = (RMCore) PAActiveObject.newActive(RMCore.class.getName(), // the class to deploy
                     new Object[] { RMCoreName, nodeRM }, nodeRM);

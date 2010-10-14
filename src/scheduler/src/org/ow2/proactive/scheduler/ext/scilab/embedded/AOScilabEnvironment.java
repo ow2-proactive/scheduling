@@ -47,7 +47,6 @@ import java.util.Collections;
 import java.util.Map;
 
 import javasci.SciData;
-import javasci.SciStringMatrix;
 
 import javax.security.auth.login.LoginException;
 import javax.swing.SwingUtilities;
@@ -63,6 +62,7 @@ import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.body.request.RequestFilter;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.Scheduler;
@@ -72,7 +72,6 @@ import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SchedulerEventListener;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.exception.UserException;
-import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobResult;
@@ -183,7 +182,7 @@ public class AOScilabEnvironment implements Serializable, SchedulerEventListener
 
         Credentials creds = null;
         try {
-            creds = Credentials.createCredentials(user, passwd, auth.getPublicKey());
+            creds = Credentials.createCredentials(new CredData(user, passwd), auth.getPublicKey());
         } catch (KeyException e) {
             throw new LoginException("" + e);
         } catch (LoginException e) {

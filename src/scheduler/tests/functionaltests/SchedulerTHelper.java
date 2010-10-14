@@ -55,6 +55,7 @@ import org.objectweb.proactive.core.xml.VariableContractType;
 import org.objectweb.proactive.extensions.gcmdeployment.PAGCMDeployment;
 import org.objectweb.proactive.gcmdeployment.GCMApplication;
 import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
+import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.scheduler.common.Scheduler;
@@ -808,7 +809,8 @@ public class SchedulerTHelper {
      */
     private static void connect() throws Exception {
         SchedulerAuthenticationInterface authInt = getSchedulerAuth();
-        Credentials cred = Credentials.createCredentials(username, password, authInt.getPublicKey());
+        Credentials cred = Credentials.createCredentials(new CredData(username, password), authInt
+                .getPublicKey());
         adminSchedInterface = authInt.login(cred);
         initEventReceiver(adminSchedInterface);
     }

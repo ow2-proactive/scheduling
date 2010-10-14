@@ -394,7 +394,7 @@ public final class PAAgentServiceRMStarter {
         // 1 - Create the local node that will be registered in RM
         Node localNode = null;
         try {
-            localNode = NodeFactory.createLocalNode(nodeName, false, null, null, null);
+            localNode = NodeFactory.createLocalNode(nodeName, false, null, null);
             if (localNode == null) {
                 throw new RuntimeException("The node returned by the NodeFactory is null");
             }

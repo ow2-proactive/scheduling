@@ -115,7 +115,7 @@ public final class VirtualInfrastructureNodeStarterRegister {
             final String vmName, final int processID) {
         Node node = null;
         try {
-            node = NodeFactory.createLocalNode(vmName + "_node_" + processID, false, null, null, null);
+            node = NodeFactory.createLocalNode(vmName + "_node_" + processID, false, null, null);
             if (node == null) {
                 throw new RuntimeException("The node returned by the NodeFactory is null");
             }

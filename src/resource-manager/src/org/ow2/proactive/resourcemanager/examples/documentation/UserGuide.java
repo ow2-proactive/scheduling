@@ -10,6 +10,7 @@ import javax.security.auth.login.LoginException;
 
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
+import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
@@ -55,7 +56,7 @@ public class UserGuide {
                     // e.g. by default, "user" and "pwd" are valid
                     // refer to ${rm.home}/config/authentification/login.cfg to see all valid
                     // pairs and to add some others.
-                    Credentials cred = Credentials.createCredentials(user, password, pubKey);
+                    Credentials cred = Credentials.createCredentials(new CredData(user, password), pubKey);
                     resourceManager = auth.login(cred);
                 }
             } catch (KeyException ex) {

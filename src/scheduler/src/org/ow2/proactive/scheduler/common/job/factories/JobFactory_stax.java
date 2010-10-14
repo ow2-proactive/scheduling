@@ -628,6 +628,8 @@ public class JobFactory_stax extends JobFactory {
                     tmpTask.setPreciousResult(Boolean.parseBoolean(replace(cursorTask.getAttributeValue(i))));
                 } else if (XMLAttributes.TASK_WALLTIME.matches(attrName)) {
                     tmpTask.setWallTime(Tools.formatDate(replace(cursorTask.getAttributeValue(i))));
+                } else if (XMLAttributes.TASK_RUNASME.matches(attrName)) {
+                    tmpTask.setRunAsMe(Boolean.parseBoolean(replace(cursorTask.getAttributeValue(i))));
                 }
             }
             int eventType;

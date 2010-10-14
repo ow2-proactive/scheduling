@@ -59,6 +59,7 @@ import org.apache.commons.cli.Parser;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.NodeException;
+import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.common.SchedulerConnection;
@@ -340,7 +341,8 @@ public class SchedulerJobSubmission {
                 jobSubmissionScenario.loadInfrastructure();
                 List<AbstractSchedulerUser<JobId>> schedulerUsers = null;
                 if (singleLogin) {
-                    Credentials credentials = Credentials.createCredentials(username, password, pubKey);
+                    Credentials credentials = Credentials.createCredentials(new CredData(username, password),
+                            pubKey);
                     schedulerUsers = jobSubmissionScenario.deployConnectedUsers(schedulerUserClazz,
                             schedulerUrl, credentials);
                 } else {
@@ -423,7 +425,7 @@ public class SchedulerJobSubmission {
                     }
                     String user = lineTokens[0];
                     String pwd = lineTokens[1];
-                    Credentials credentials = Credentials.createCredentials(user, pwd, pubKey);
+                    Credentials credentials = Credentials.createCredentials(new CredData(user, pwd), pubKey);
                     credentialsList.add(credentials);
                 }
             } catch (FileNotFoundException e) {

@@ -136,6 +136,12 @@
         <copy todir="${deploy.dir}/scripts">
 		   <fileset dir="${scripts.dir}"/>
 		</copy>
+		<chmod perm="755">
+                <fileset dir="${deploy.dir}/scripts" />
+                <include name="**/*.sh" />
+				<include name="processbuilder/linux/suer32" />
+				<include name="processbuilder/linux/suer64" />
+		</chmod>
     </target>
 
 	<target name="deploy.common" depends="-deployCopy, compile.common" description="Creates common core jar">

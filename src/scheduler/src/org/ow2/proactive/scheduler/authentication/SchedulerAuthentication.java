@@ -37,9 +37,6 @@
 package org.ow2.proactive.scheduler.authentication;
 
 import java.security.KeyException;
-import java.security.PublicKey;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 
 import javax.management.JMException;
@@ -50,6 +47,7 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.authentication.AuthenticationImpl;
+import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.authentication.principals.GroupNamePrincipal;
 import org.ow2.proactive.authentication.principals.UserNamePrincipal;
@@ -91,9 +89,6 @@ public class SchedulerAuthentication extends AuthenticationImpl implements Sched
     /** TODO Adapter for backward compatibility : to be removed in 3.X.X */
     private AdminSchedulerInterface useradminAdapter;
 
-    /** Store valid and authenticated user key pair */
-    private Map<String, Credentials> keysPairs;
-
     /**
      * ProActive empty constructor.
      */
@@ -115,7 +110,6 @@ public class SchedulerAuthentication extends AuthenticationImpl implements Sched
         this.frontend = frontend;
         //TODO to be removed in 3.X.X
         this.useradminAdapter = new SchedulerAdminAdapter(frontend);
-        this.keysPairs = new HashMap<String, Credentials>();
     }
 
     /**
@@ -132,7 +126,7 @@ public class SchedulerAuthentication extends AuthenticationImpl implements Sched
         try {
             // encrypting the data here is useless, only done to conform to the
             // signature of the real method
-            return logAsUser(Credentials.createCredentials(user, password, publicKeyPath));
+            return logAsUser(Credentials.createCredentials(new CredData(user, password), publicKeyPath));
         } catch (KeyException e) {
             logger_dev.error("", e);
             throw new LoginException("Could not encrypt credentials: " + e.getMessage());
@@ -153,7 +147,7 @@ public class SchedulerAuthentication extends AuthenticationImpl implements Sched
         try {
             // encrypting the data here is useless, only done to conform to the
             // signature of the real method
-            return logAsAdmin(Credentials.createCredentials(user, password, publicKeyPath));
+            return logAsAdmin(Credentials.createCredentials(new CredData(user, password), publicKeyPath));
         } catch (KeyException e) {
             logger_dev.error("", e);
             throw new LoginException("Could not encrypt credentials: " + e.getMessage());
@@ -180,7 +174,7 @@ public class SchedulerAuthentication extends AuthenticationImpl implements Sched
 
         logger_dev.info("user : " + user);
         // add this user to the scheduler front-end
-        UserIdentificationImpl ident = new UserIdentificationImpl(user, subject);
+        UserIdentificationImpl ident = new UserIdentificationImpl(user, subject, cred);
         ident.setHostName(getSenderHostName());
         try {
             this.frontend.connect(PAActiveObject.getContext().getCurrentRequest().getSourceBodyID(), ident);
@@ -212,7 +206,7 @@ public class SchedulerAuthentication extends AuthenticationImpl implements Sched
 
         logger_dev.info("user : " + user);
         // add this user to the scheduler front-end
-        UserIdentificationImpl ident = new UserIdentificationImpl(user, subject);
+        UserIdentificationImpl ident = new UserIdentificationImpl(user, subject, cred);
         ident.setHostName(getSenderHostName());
         try {
             this.frontend.connect(PAActiveObject.getContext().getCurrentRequest().getSourceBodyID(), ident);
@@ -234,39 +228,15 @@ public class SchedulerAuthentication extends AuthenticationImpl implements Sched
         UserNamePrincipal unPrincipal = subject.getPrincipals(UserNamePrincipal.class).iterator().next();
         String user = unPrincipal.getName();
 
-        //store to keypairs
-        this.keysPairs.put(user, cred);
-
         logger_dev.info("user : " + user);
         // add this user to the scheduler front-end
-        UserIdentificationImpl ident = new UserIdentificationImpl(user, subject);
+        UserIdentificationImpl ident = new UserIdentificationImpl(user, subject, cred);
         ident.setHostName(getSenderHostName());
 
         this.frontend.connect(PAActiveObject.getContext().getCurrentRequest().getSourceBodyID(), ident);
 
         // return the created interface
         return this.frontend;
-    }
-
-    /**
-     * Ask for the login/pwd of the specified user encrypted with the given public key.
-     *
-     * TODO to be secured -> java.security.policy?
-     *
-     * @return a new credentials containing user and password encrypted with the given public key
-     */
-    public Credentials getUserCrendentials(String username, PublicKey pubkey) throws KeyException {
-        Credentials cred = this.keysPairs.get(username);
-        try {
-            //decrypt -> credentials[1] will contains the password
-            String[] credentials = cred.decrypt(privateKeyPath);
-            //cred becomes the credentials to be returned with new publicKey encryption
-            return Credentials.createCredentials(username, credentials[1], pubkey);
-        } catch (KeyException e) {
-            e.printStackTrace();
-            //TODO qué fa si problem
-            throw e;
-        }
     }
 
     /**

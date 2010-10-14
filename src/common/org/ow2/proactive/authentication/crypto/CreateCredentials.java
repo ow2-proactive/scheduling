@@ -36,6 +36,7 @@
  */
 package org.ow2.proactive.authentication.crypto;
 
+import java.io.File;
 import java.io.IOException;
 import java.security.KeyException;
 import java.security.PublicKey;
@@ -46,6 +47,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.passwordhandler.PasswordField;
 import org.ow2.proactive.authentication.AuthenticationImpl;
 import org.ow2.proactive.authentication.Connection;
+import org.ow2.proactive.utils.FileToBytesConverter;
 
 
 /**
@@ -75,11 +77,17 @@ public class CreateCredentials {
         PublicKey pubKey = null;
         String login = null;
         String pass = null;
+        String keyfile = null;
         String cipher = "RSA/ECB/PKCS1Padding";
         String path = Credentials.getCredentialsPath();
         String rm = null;
         String scheduler = null;
         String url = null;
+
+        if (args.length == 0) {
+            displayHelp(path, cipher);
+            return;
+        }
 
         /**
          * Arguments handling
@@ -121,6 +129,13 @@ public class CreateCredentials {
                 }
                 pass = args[index];
             }
+            if (args[index].equals("--keyfile") || args[index].equals("-k")) {
+                if (++index == args.length) {
+                    System.out.println("No value provided for option --keyfile");
+                    return;
+                }
+                keyfile = args[index];
+            }
             if (args[index].equals("--output") || args[index].equals("-o")) {
                 if (++index == args.length) {
                     System.out.println("No value provided for option --output");
@@ -137,36 +152,7 @@ public class CreateCredentials {
             }
 
             if (args[index].equals("--help") || args[index].equals("-h")) {
-                System.out.println("Usage:");
-                System.out.println("\tjava " + CreateCredentials.class.getCanonicalName() +
-                    " pubkey [options]");
-                System.out.println("");
-                System.out.println("Description:");
-                System.out.println("\tCreates encrypted credentials for");
-                System.out.println("\tfuture non-interactive authentications.");
-                System.out.println("");
-                System.out.println("Public key must be one of:");
-                System.out.println("\t-F, --file PATH [=" + Credentials.getPubKeyPath() + "]");
-                System.out.println("\t\tPath to the public key on the local filesystem.");
-                System.out.println("\t\tIf no pubkey argument is specified, default location will be used.");
-                System.out.println("\t-R, --rm URL");
-                System.out.println("\t\tRequest the public key to the Resource Manager at URL.");
-                System.out.println("\t-S, --scheduler URL");
-                System.out.println("\t\tRequest the public key to the Scheduler at URL.");
-                System.out.println("");
-                System.out.println("Options:");
-                System.out.println("\t-l, --login LOGIN");
-                System.out.println("\t\tGenerate credentials for a specific user,");
-                System.out.println("\t\twill be asked interactively if not specified.");
-                System.out.println("\t-p, --password PASS\t");
-                System.out.println("\t\tUse specified password and runs in non-interactive");
-                System.out.println("\t\tmode. Ignored if used without the --login switch.");
-                System.out.println("\t-o, --output PATH [=" + path + "]\t");
-                System.out.println("\t\tOutput the resulting credentials to the specified file.");
-                System.out.println("\t-c, --cipher PARAMS [=" + cipher + "]");
-                System.out.println("\t\tUse specified cipher parameters, need to be compatible");
-                System.out.println("\t\twith the specified key.");
-                return;
+                displayHelp(path, cipher);
             }
             index++;
         }
@@ -258,9 +244,19 @@ public class CreateCredentials {
             System.out.println();
         }
 
+        byte[] keyfileContent = null;
+        //load keyfile if specified
+        if (keyfile != null) {
+            try {
+                keyfileContent = FileToBytesConverter.convertFileToByteArray(new File(keyfile));
+            } catch (Throwable t) {
+                t.printStackTrace();
+                return;
+            }
+        }
         Credentials cred = null;
         try {
-            cred = Credentials.createCredentials(login, pass, pubKey, cipher);
+            cred = Credentials.createCredentials(new CredData(login, pass, keyfileContent), pubKey, cipher);
             cred.writeToDisk(path);
         } catch (KeyException e) {
             e.printStackTrace();
@@ -271,6 +267,40 @@ public class CreateCredentials {
         System.out.println("\t" + path);
 
         System.exit(0);
+    }
+
+    private static void displayHelp(String path, String cipher) {
+        System.out.println("Usage:");
+        System.out.println("\tjava " + CreateCredentials.class.getCanonicalName() + " pubkey [options]");
+        System.out.println("");
+        System.out.println("Description:");
+        System.out.println("\tCreates encrypted credentials for");
+        System.out.println("\tfuture non-interactive authentications.");
+        System.out.println("");
+        System.out.println("Public key must be one of:");
+        System.out.println("\t-F, --file PATH [=" + Credentials.getPubKeyPath() + "]");
+        System.out.println("\t\tPath to the public key on the local filesystem.");
+        System.out.println("\t\tIf no pubkey argument is specified, default location will be used.");
+        System.out.println("\t-R, --rm URL");
+        System.out.println("\t\tRequest the public key to the Resource Manager at URL.");
+        System.out.println("\t-S, --scheduler URL");
+        System.out.println("\t\tRequest the public key to the Scheduler at URL.");
+        System.out.println("");
+        System.out.println("Options:");
+        System.out.println("\t-l, --login LOGIN");
+        System.out.println("\t\tGenerate credentials for a specific user,");
+        System.out.println("\t\twill be asked interactively if not specified.");
+        System.out.println("\t-p, --password PASS\t");
+        System.out.println("\t\tUse specified password and runs in non-interactive");
+        System.out.println("\t\tmode. Ignored if used without the --login switch.");
+        System.out.println("\t-k, --keyfile KEY\t");
+        System.out.println("\t\tUse specified ssh private key");
+        System.out.println("\t\tThis option is not mandatory");
+        System.out.println("\t-o, --output PATH [=" + path + "]\t");
+        System.out.println("\t\tOutput the resulting credentials to the specified file.");
+        System.out.println("\t-c, --cipher PARAMS [=" + cipher + "]");
+        System.out.println("\t\tUse specified cipher parameters, need to be compatible");
+        System.out.println("\t\twith the specified key.");
     }
 
 }

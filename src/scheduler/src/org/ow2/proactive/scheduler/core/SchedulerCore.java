@@ -68,6 +68,7 @@ import org.objectweb.proactive.annotation.ImmediateService;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAException;
 import org.objectweb.proactive.api.PAFuture;
+import org.objectweb.proactive.api.PALifeCycle;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.request.RequestFilter;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectAdapter;
@@ -308,6 +309,33 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
             }
         }
         return (tcs != null);
+    }
+
+    /**
+     * Exit the scheduler and the JVM displaying stacktrace cause in logger
+     * and message on standard output.<br/>
+     * If the given message is null, the message of the throwable will be displayed.<br/>
+     * If the given throwable is null, message will be displayed and logged.<br/>
+     * If both are null, displayed and logged message will be something like 'Unknown reason'.
+     *
+     * @param t the throwable that causes the JVM to stop
+     * @param message a human readable message for this cause
+     */
+    static void exitFailure(Throwable t, String message) {
+        if (t == null && message == null) {
+            message = "Unknown reason";
+        } else {
+            if (message == null) {
+                message = t.getMessage();
+            }
+        }
+        if (t == null) {
+            logger.fatal("**** " + message + "****");
+        } else {
+            logger.fatal(message, t);
+        }
+        System.out.println("Scheduling JVM has exited - Reason : " + message);
+        PALifeCycle.exitFailure();
     }
 
     /**
@@ -664,7 +692,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
         PAActiveObject.terminateActiveObject(false);
         logger.info("Scheduler is now shutdown !");
         //exit
-        System.exit(0);
+        PALifeCycle.exitSuccess();
     }
 
     /**

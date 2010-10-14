@@ -7,6 +7,7 @@ import java.io.IOException;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.NodeException;
+import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.Scheduler;
@@ -62,7 +63,7 @@ public class SchedulerClientEventsLogger implements SchedulerEventListener {
         //1. get the authentication interface using the SchedulerConnection
         SchedulerAuthenticationInterface auth = SchedulerConnection.waitAndJoin(schedulerURL);
         //2. get the user interface using the retrieved SchedulerAuthenticationInterface
-        Credentials cred = Credentials.createCredentials("admin", "admin", auth.getPublicKey());
+        Credentials cred = Credentials.createCredentials(new CredData("admin", "admin"), auth.getPublicKey());
         user = auth.login(cred);
 
         //let the client be notified of its own 'job termination' -> job running to finished event

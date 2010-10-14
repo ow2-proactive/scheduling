@@ -90,7 +90,7 @@ public final class VirtualInfrastructureNodeStarter {
      */
     private static void startLocalNode(String vmName, int processID, Formatter output) throws Throwable {
         try {
-            Node n = NodeFactory.createLocalNode(vmName + "_node_" + processID, false, null, null, null);
+            Node n = NodeFactory.createLocalNode(vmName + "_node_" + processID, false, null, null);
             if (n == null) {
                 throw new RuntimeException("The node returned by the NodeFactory is null");
             }

@@ -134,24 +134,6 @@ public class Credentials implements Serializable {
     private byte[] aes;
 
     /**
-     * Dummy class used to properly separate login and pass:
-     * will be serialized and encrypted
-     */
-    public static class CredData implements Serializable {
-        public CredData() {
-        }
-
-        public String login = null;
-        public String pass = null;
-    }
-
-    /**
-     * Empty constructor
-     */
-    public Credentials() {
-    }
-
-    /**
      * Default constructor
      * <p>
      * Constructor is kept private, use {@link org.ow2.proactive.authentication.crypto.Credentials#getCredentials()} or
@@ -194,62 +176,6 @@ public class Credentials implements Serializable {
         } catch (Exception e) {
             throw new KeyException("Could not write credentials to " + path, e);
         }
-    }
-
-    /**
-     * Decrypts the encapsulated credentials
-     * 
-     * @see org.ow2.proactive.authentication.crypto.KeyPairUtil#decrypt(String, String, String, byte[])
-     * @param privPath path to the private key file
-     * @return A String array containing the clear data: login at the first
-     *         index and password at the second
-     * @throws KeyException decryption failure, malformed data
-     */
-    public String[] decrypt(String privPath) throws KeyException {
-        PrivateKey privKey = Credentials.getPrivateKey(privPath, new String[] { algorithm });
-        return decrypt(privKey);
-    }
-
-    /**
-     * Decrypts the encapsulated credentials
-     * 
-     * @see org.ow2.proactive.authentication.crypto.KeyPairUtil#decrypt(String, String, String, byte[])
-     * @param privKey the private key
-     * @return A String array containing the clear data: login at the first
-     *         index and password at the second
-     * @throws KeyException decryption failure, malformed data
-     */
-    public String[] decrypt(PrivateKey privKey) throws KeyException {
-        byte[] data = null;
-        byte[] aesClear = null;
-
-        // recover clear AES key using the private key
-        try {
-            aesClear = KeyPairUtil.decrypt(this.algorithm, privKey, this.cipher, this.aes);
-        } catch (KeyException e) {
-            throw new KeyException("Could not decrypt symmetric key", e);
-        }
-
-        // recover clear credentials using the AES key
-        try {
-            data = KeyUtil.decrypt(new SecretKeySpec(aesClear, AES_ALGO), AES_CIPHER, this.data);
-        } catch (KeyException e) {
-            throw new KeyException("Could not decrypt data", e);
-        }
-
-        // deserialize clear credentials and obtain login & password
-        CredData cd = null;
-        try {
-            cd = (CredData) ByteToObjectConverter.ObjectStream.convert(data);
-        } catch (Exception e) {
-            throw new KeyException(e.getMessage());
-        }
-
-        String[] data2 = new String[2];
-        data2[0] = cd.login;
-        data2[1] = cd.pass;
-
-        return data2;
     }
 
     /**
@@ -551,80 +477,49 @@ public class Credentials implements Serializable {
     /**
      * Creates new encrypted credentials
      * <p>
-     * See {@link org.ow2.proactive.authentication.crypto.Credentials#createCredentials(String, String, String, String)
-     * 
-     * @param login the login to encrypt
-     * @param password the corresponding password to encrypt
+     * See {@link org.ow2.proactive.authentication.crypto.Credentials#createCredentials(CredData, PublicKey))
+     *
+     * @param cc the data to be encrypted
      * @param pubPath path to the public key
      * @return the Credentials object containing the encrypted data
      * @throws KeyException key generation or encryption failed
      */
-    public static Credentials createCredentials(String login, String password, String pubPath)
-            throws KeyException {
-
-        return createCredentials(login, password, pubPath, "RSA/ECB/PKCS1Padding");
+    public static Credentials createCredentials(final CredData cc, final String pubPath) throws KeyException {
+        PublicKey pubKey = getPublicKey(pubPath);
+        return createCredentials(cc, pubKey);
     }
 
     /**
      * Creates new encrypted credentials
      * <p>
-     * See {@link org.ow2.proactive.authentication.crypto.Credentials#createCredentials(String, String, String, String)
-     * 
-     * @param login the login to encrypt
-     * @param password the corresponding password to encrypt
+     * See {@link org.ow2.proactive.authentication.crypto.Credentials#createCredentials(CredData, PublicKey, String)
+     *
+     * @param cc the data to be encrypted
      * @param pubKey the public key
      * @return the Credentials object containing the encrypted data
      * @throws KeyException key generation or encryption failed
      */
-    public static Credentials createCredentials(String login, String password, PublicKey pubKey)
+    public static Credentials createCredentials(final CredData cc, final PublicKey pubKey)
             throws KeyException {
-
-        return createCredentials(login, password, pubKey, "RSA/ECB/PKCS1Padding");
+        return createCredentials(cc, pubKey, "RSA/ECB/PKCS1Padding");
     }
 
     /**
      * Creates new encrypted credentials
      * <p>
-     * Encrypts the message '<code>login</code>:<code>password</code>' using the
-     * public key at <code>pubPath</code> and <code>cipher</code>
-     * and store it in a new Credentials object.
-     * 
-     * @see KeyPairUtil#encrypt(String, String, String, byte[])
-     * @param login the login to encrypt
-     * @param password the corresponding password to encrypt
-     * @param pubPath path to the public key used for encryption
-     * @param cipher cipher parameters: combination of transformations
-     * @return the Credentials object containing the encrypted data
-     * @throws KeyException key generation or encryption failed
-     */
-    public static Credentials createCredentials(String login, String password, String pubPath, String cipher)
-            throws KeyException {
-        PublicKey pubKey = getPublicKey(pubPath);
-        return createCredentials(login, password, pubKey, cipher);
-    }
-
-    /**
-     * Creates new encrypted credentials
-     * <p>
-     * Encrypts the message '<code>login</code>:<code>password</code>' using the
+     * Encrypts the message '<code>credData</code>' using the
      * public key <code>pubKey</code> and <code>cipher</code>
      * and store it in a new Credentials object.
-     * 
+     *
      * @see KeyPairUtil#encrypt(String, String, String, byte[])
-     * @param login the login to encrypt
-     * @param password the corresponding password to encrypt
+     * @param cc, the class containing the data to be crypted
      * @param pubKey public key used for encryption
      * @param cipher cipher parameters: combination of transformations
      * @return the Credentials object containing the encrypted data
      * @throws KeyException key generation or encryption failed
      */
-    public static Credentials createCredentials(String login, String password, PublicKey pubKey, String cipher)
+    public static Credentials createCredentials(final CredData cc, final PublicKey pubKey, final String cipher)
             throws KeyException {
-
-        CredData cc = new CredData();
-        cc.login = login;
-        cc.pass = password;
-
         // serialize clear credentials to byte array
         byte[] clearCred = null;
         try {
@@ -667,10 +562,180 @@ public class Credentials implements Serializable {
     }
 
     /**
+     * Decrypts the encapsulated credentials
+     *
+     * @see org.ow2.proactive.authentication.crypto.KeyPairUtil#decrypt(String, String, String, byte[])
+     * @param privPath path to the private key file
+     * @return the credential data containing the clear data:login, password and key
+     * @throws KeyException decryption failure, malformed data
+     */
+    public CredData decrypt(String privPath) throws KeyException {
+        PrivateKey privKey = Credentials.getPrivateKey(privPath, new String[] { algorithm });
+        return decrypt(privKey);
+    }
+
+    /**
+     * Decrypts the encapsulated credentials
+     *
+     * @see org.ow2.proactive.authentication.crypto.KeyPairUtil#decrypt(String, String, String, byte[])
+     * @param privKey the private key
+     * @return the credential data containing the clear data:login, password and key
+     * @throws KeyException decryption failure, malformed data
+     */
+    public CredData decrypt(PrivateKey privKey) throws KeyException {
+        byte[] data = null;
+        byte[] aesClear = null;
+
+        // recover clear AES key using the private key
+        try {
+            aesClear = KeyPairUtil.decrypt(this.algorithm, privKey, this.cipher, this.aes);
+        } catch (KeyException e) {
+            throw new KeyException("Could not decrypt symmetric key", e);
+        }
+
+        // recover clear credentials using the AES key
+        try {
+            data = KeyUtil.decrypt(new SecretKeySpec(aesClear, AES_ALGO), AES_CIPHER, this.data);
+        } catch (KeyException e) {
+            throw new KeyException("Could not decrypt data", e);
+        }
+
+        // deserialize clear credentials and obtain login & password
+        try {
+            return (CredData) ByteToObjectConverter.ObjectStream.convert(data);
+        } catch (Exception e) {
+            throw new KeyException(e.getMessage());
+        }
+
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
     public String toString() {
         return "[" + algorithm + " " + size + "b " + cipher + "]";
     }
+
+    /**
+     * Creates new encrypted credentials
+     * <p>
+     * See {@link org.ow2.proactive.authentication.crypto.Credentials#createCredentials(String, String, String, String)
+     * 
+     * @param login the login to encrypt
+     * @param password the corresponding password to encrypt
+     * @param pubPath path to the public key
+     * @return the Credentials object containing the encrypted data
+     * @throws KeyException key generation or encryption failed
+     */
+    @Deprecated
+    public static Credentials createCredentials(String login, String password, String pubPath)
+            throws KeyException {
+        return createCredentials(login, password, pubPath, "RSA/ECB/PKCS1Padding");
+    }
+
+    /**
+     * Creates new encrypted credentials
+     * <p>
+     * See {@link org.ow2.proactive.authentication.crypto.Credentials#createCredentials(String, String, String, String)
+     * 
+     * @param login the login to encrypt
+     * @param password the corresponding password to encrypt
+     * @param pubKey the public key
+     * @return the Credentials object containing the encrypted data
+     * @throws KeyException key generation or encryption failed
+     */
+    @Deprecated
+    public static Credentials createCredentials(String login, String password, PublicKey pubKey)
+            throws KeyException {
+        return createCredentials(login, password, null, pubKey, "RSA/ECB/PKCS1Padding");
+    }
+
+    /**
+     * Creates new encrypted credentials
+     * <p>
+     * Encrypts the message '<code>login</code>:<code>password</code>' using the
+     * public key at <code>pubPath</code> and <code>cipher</code>
+     * and store it in a new Credentials object.
+     * 
+     * @see KeyPairUtil#encrypt(String, String, String, byte[])
+     * @param login the login to encrypt
+     * @param password the corresponding password to encrypt
+     * @param pubPath path to the public key used for encryption
+     * @param cipher cipher parameters: combination of transformations
+     * @return the Credentials object containing the encrypted data
+     * @throws KeyException key generation or encryption failed
+     */
+    @Deprecated
+    public static Credentials createCredentials(String login, String password, String pubPath, String cipher)
+            throws KeyException {
+        PublicKey pubKey = getPublicKey(pubPath);
+        return createCredentials(login, password, null, pubKey, cipher);
+    }
+
+    /**
+     * Creates new encrypted credentials
+     * <p>
+     * Encrypts the message '<code>login</code>:<code>password</code>' using the
+     * public key <code>pubKey</code> and <code>cipher</code>
+     * and store it in a new Credentials object.
+     * 
+     * @see KeyPairUtil#encrypt(String, String, String, byte[])
+     * @param login the login to encrypt
+     * @param password the corresponding password to encrypt
+     * @param pubKey public key used for encryption
+     * @param cipher cipher parameters: combination of transformations
+     * @return the Credentials object containing the encrypted data
+     * @throws KeyException key generation or encryption failed
+     */
+    @Deprecated
+    public static Credentials createCredentials(String login, String password, byte[] datakey,
+            PublicKey pubKey, String cipher) throws KeyException {
+
+        CredData cc = new CredData();
+        cc.setLogin(login);
+        cc.setPassword(password);
+        cc.setKey(datakey);
+
+        // serialize clear credentials to byte array
+        byte[] clearCred = null;
+        try {
+            clearCred = ObjectToByteConverter.ObjectStream.convert(cc);
+        } catch (IOException e1) {
+            throw new KeyException(e1.getMessage());
+        }
+
+        int size = -1;
+        if (pubKey instanceof java.security.interfaces.RSAPublicKey) {
+            size = ((RSAPublicKey) pubKey).getModulus().bitLength();
+        } else if (pubKey instanceof java.security.interfaces.DSAPublicKey) {
+            size = ((DSAPublicKey) pubKey).getParams().getP().bitLength();
+        } else if (pubKey instanceof javax.crypto.interfaces.DHPublicKey) {
+            size = ((DHPublicKey) pubKey).getParams().getP().bitLength();
+        }
+
+        // generate symmetric key
+        SecretKey aesKey = KeyUtil.generateKey(AES_ALGO, AES_KEYSIZE);
+
+        byte[] encData = null;
+        byte[] encAes = null;
+
+        // encrypt AES key with public RSA key
+        try {
+            encAes = KeyPairUtil.encrypt(pubKey, size, cipher, aesKey.getEncoded());
+        } catch (KeyException e) {
+            throw new KeyException("Symmetric key encryption failed", e);
+        }
+
+        // encrypt clear credentials with AES key
+        try {
+            encData = KeyUtil.encrypt(aesKey, AES_CIPHER, clearCred);
+        } catch (KeyException e) {
+            throw new KeyException("Message encryption failed", e);
+        }
+
+        Credentials cred = new Credentials(pubKey.getAlgorithm(), size, cipher, encAes, encData);
+        return cred;
+    }
+
 }

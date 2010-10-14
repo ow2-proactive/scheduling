@@ -46,6 +46,7 @@ import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.common.exception.InternalException;
 import org.ow2.proactive.scheduler.common.exception.JobCreationException;
 import org.ow2.proactive.scheduler.common.job.Job;
@@ -80,6 +81,8 @@ public class InternalJobFactory {
 
     public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.FACTORY);
 
+    private static final Map<Job, Credentials> credentials = new HashMap<Job, Credentials>();
+
     /**
      * Create a new internal job with the given job (user).
      *
@@ -87,7 +90,7 @@ public class InternalJobFactory {
      * @return the created internal job.
      * @throws JobCreationException an exception if the factory cannot create the given job.
      */
-    public static InternalJob createJob(Job job) throws JobCreationException {
+    public static InternalJob createJob(Job job, Credentials cred) throws JobCreationException {
         InternalJob iJob = null;
 
         logger_dev.info("Create job '" + job.getName() + "' - " + job.getClass().getName());
@@ -97,7 +100,9 @@ public class InternalJobFactory {
                 logger_dev.error("The type of the given job is not yet implemented !");
                 throw new JobCreationException("The type of the given job is not yet implemented !");
             case TASKSFLOW:
+                credentials.put(job, cred);
                 iJob = createJob((TaskFlowJob) job);
+                credentials.remove(job);
                 break;
             default:
                 logger_dev.error("The type of the given job is unknown !");
@@ -373,6 +378,10 @@ public class InternalJobFactory {
             taskToSet.setMaxNumberOfExecution(task.getMaxNumberOfExecution());
         } else {
             taskToSet.setMaxNumberOfExecution(userJob.getMaxNumberOfExecution());
+        }
+        //add credentials if needed
+        if (task.isRunAsMe()) {
+            taskToSet.setCredentials(credentials.get(userJob));
         }
     }
 

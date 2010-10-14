@@ -51,6 +51,7 @@ import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
@@ -287,7 +288,8 @@ public class SchedulerTester {
 
             // connect from a different thread (i.e. not in the constructor)
             try {
-                Credentials cred = Credentials.createCredentials(login, pswd, authentication.getPublicKey());
+                Credentials cred = Credentials.createCredentials(new CredData(login, pswd), authentication
+                        .getPublicKey());
                 this.scheduler = authentication.login(cred);
             } catch (Exception e) {
                 logger.error(e);

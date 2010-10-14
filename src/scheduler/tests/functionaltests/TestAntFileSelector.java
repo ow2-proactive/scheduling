@@ -50,8 +50,7 @@ public class TestAntFileSelector {
         predefinedSpaces.add(new SpaceInstanceInfo(12, isc));
         namingService.registerApplication(12, predefinedSpaces);
         //create node, start active object and configure node
-        Node n = NodeFactory
-                .createLocalNode("node" + ((int) (Math.random() * 10000)), true, null, null, null);
+        Node n = NodeFactory.createLocalNode("node" + ((int) (Math.random() * 10000)), true, null, null);
         TestAntFileSelector tafs = PAActiveObject.newActive(TestAntFileSelector.class, new Object[] {}, n);
         tafs.configure();
         //configure node application

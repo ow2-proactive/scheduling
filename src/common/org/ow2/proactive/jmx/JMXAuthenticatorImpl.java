@@ -40,6 +40,7 @@ import javax.security.auth.Subject;
 import javax.security.auth.login.LoginException;
 
 import org.ow2.proactive.authentication.AuthenticationImpl;
+import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 
 
@@ -91,8 +92,8 @@ public final class JMXAuthenticatorImpl implements JMXAuthenticator {
             // If username/password (ex: JConsole)
         } else if (arr[1] instanceof String) {
             try {
-                internalCredentials = Credentials.createCredentials(username, (String) arr[1], authentication
-                        .getPublicKey());
+                internalCredentials = Credentials.createCredentials(new CredData(username, (String) arr[1]),
+                        authentication.getPublicKey());
             } catch (Exception e) {
                 throw new SecurityException("Invalid credentials", e);
             }

@@ -45,6 +45,7 @@ import javax.security.auth.login.LoginException;
 import org.junit.Assert;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.util.ProActiveInet;
+import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
@@ -107,8 +108,8 @@ public class NonBlockingCoreTest extends FunctionalTest {
         //mandatory to use RMUser AO, otherwise, getAtMostNode we be send in RMAdmin request queue
         final RMAuthentication auth = RMConnection.waitAndJoin(null);
 
-        final Credentials cred = Credentials.createCredentials(RMTHelper.username, RMTHelper.password, auth
-                .getPublicKey());
+        final Credentials cred = Credentials.createCredentials(new CredData(RMTHelper.username,
+            RMTHelper.password), auth.getPublicKey());
 
         // cannot connect twice from the same active object
         // so creating another thread

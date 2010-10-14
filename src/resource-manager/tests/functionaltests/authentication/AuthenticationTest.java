@@ -38,6 +38,7 @@ package functionaltests.authentication;
 
 import static junit.framework.Assert.assertTrue;
 
+import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
@@ -75,7 +76,8 @@ public class AuthenticationTest extends FunctionalTest {
         RMTHelper.log("Trying to authorized with correct admin name and password");
 
         try {
-            Credentials cred = Credentials.createCredentials(adminName, adminPwd, auth.getPublicKey());
+            Credentials cred = Credentials.createCredentials(new CredData(adminName, adminPwd), auth
+                    .getPublicKey());
             ResourceManager admin = auth.login(cred);
             admin.disconnect();
             RMTHelper.log("Passed: successful authentication");
@@ -89,7 +91,8 @@ public class AuthenticationTest extends FunctionalTest {
         RMTHelper.log("Trying to authorized with correct user name and password");
 
         try {
-            Credentials cred = Credentials.createCredentials(userName, userPwd, auth.getPublicKey());
+            Credentials cred = Credentials.createCredentials(new CredData(userName, userPwd), auth
+                    .getPublicKey());
             ResourceManager user = auth.login(cred);
             user.disconnect();
             RMTHelper.log("Passed: successful authentication");
@@ -104,7 +107,8 @@ public class AuthenticationTest extends FunctionalTest {
         RMTHelper.log("Trying to authorized with incorrect user name and password");
 
         try {
-            Credentials cred = Credentials.createCredentials(adminName, "b", auth.getPublicKey());
+            Credentials cred = Credentials.createCredentials(new CredData(adminName, "b"), auth
+                    .getPublicKey());
             auth.login(cred);
             RMTHelper.log("Error: successful authentication");
             assertTrue(false);
@@ -116,7 +120,8 @@ public class AuthenticationTest extends FunctionalTest {
         RMTHelper.log("Trying to authorized with incorrect user name and password");
 
         try {
-            Credentials cred = Credentials.createCredentials(userName, "b", auth.getPublicKey());
+            Credentials cred = Credentials
+                    .createCredentials(new CredData(userName, "b"), auth.getPublicKey());
             auth.login(cred);
             RMTHelper.log("Error: successful authentication");
             assertTrue(false);
@@ -128,7 +133,8 @@ public class AuthenticationTest extends FunctionalTest {
         RMTHelper.log("Trying to connect twice from one active object");
 
         try {
-            Credentials cred = Credentials.createCredentials(adminName, adminPwd, auth.getPublicKey());
+            Credentials cred = Credentials.createCredentials(new CredData(adminName, adminPwd), auth
+                    .getPublicKey());
             auth.login(cred);
             auth.login(cred);
             RMTHelper.log("Error: second authentication was successful");

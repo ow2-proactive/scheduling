@@ -61,6 +61,7 @@ import org.apache.commons.cli.UnrecognizedOptionException;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.exception.RMException;
@@ -233,7 +234,7 @@ public class ResourceManagerController {
                         }
                     }
                     try {
-                        this.credentials = Credentials.createCredentials(user, pwd, pubKey);
+                        this.credentials = Credentials.createCredentials(new CredData(user, pwd), pubKey);
                     } catch (KeyException e) {
                         logger.error("Could not create credentials... " + e);
                         throw e;

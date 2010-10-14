@@ -44,6 +44,7 @@ import javax.persistence.Transient;
 
 import org.hibernate.annotations.AccessType;
 import org.hibernate.annotations.Proxy;
+import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.common.exception.ExecutableCreationException;
 import org.ow2.proactive.scheduler.common.task.ExecutableInitializer;
 import org.ow2.proactive.scheduler.common.task.executable.Executable;
@@ -65,6 +66,9 @@ public abstract class ExecutableContainer implements Serializable {
     // node set : not DB managed
     @Transient
     protected NodeSet nodes;
+
+    @Transient
+    protected Credentials credentials;
 
     /**
      * Create and return the contained executable
@@ -105,6 +109,24 @@ public abstract class ExecutableContainer implements Serializable {
      */
     public NodeSet getNodes() {
         return this.nodes;
+    }
+
+    /**
+     * Get the credentials crypted with launcher public key
+     *
+     * @return the credentials crypted with launcher public key
+     */
+    public Credentials getCredentials() {
+        return credentials;
+    }
+
+    /**
+     * Set the credentials value to the given credentials value
+     *
+     * @param credentials the credentials to set
+     */
+    public void setCredentials(Credentials credentials) {
+        this.credentials = credentials;
     }
 
 }

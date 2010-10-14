@@ -38,6 +38,12 @@ package org.ow2.proactive.scheduler.task.launcher;
 
 import java.io.PrintStream;
 import java.lang.reflect.Method;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Hashtable;
@@ -111,6 +117,7 @@ public abstract class TaskLauncher implements InitActive {
     public static final Logger logger_dev_dataspace = ProActiveLogger
             .getLogger(SchedulerDevLoggers.DATASPACE);
     public static final String EXECUTION_SUCCEED_BINDING_NAME = "success";
+    private static final int KEY_SIZE = 1024;
 
     // to define the max line number of a task logs
     // DO NOT USE SCHEDULER PROPERTY FOR THAT (those properties are not available on node side)
@@ -122,6 +129,8 @@ public abstract class TaskLauncher implements InitActive {
     protected String namingServiceUrl = null;
     protected List<InputSelector> inputFiles;
     protected List<OutputSelector> outputFiles;
+
+    protected PrivateKey privateKey = null;
 
     /**
      * Scheduler related java properties. Thoses properties are automatically
@@ -287,6 +296,26 @@ public abstract class TaskLauncher implements InitActive {
         Method m = targetedClass.getDeclaredMethod("internalInit", parameterType);
         m.setAccessible(true);
         m.invoke(currentExecutable, argument);
+    }
+
+    /**
+     * Generate a couple of key and return the public one
+     *
+     * @return the generated public key
+     */
+    public PublicKey generatePublicKey() {
+        KeyPairGenerator keyGen = null;
+        try {
+            keyGen = KeyPairGenerator.getInstance("RSA");
+        } catch (NoSuchAlgorithmException e) {
+            //should not happen as RSA is well known
+            logger_dev.fatal("", e);
+        }
+        keyGen.initialize(KEY_SIZE, new SecureRandom());
+        KeyPair keyPair = keyGen.generateKeyPair();
+        //connect to the authentication interface and ask for new cred
+        privateKey = keyPair.getPrivate();
+        return keyPair.getPublic();
     }
 
     /**

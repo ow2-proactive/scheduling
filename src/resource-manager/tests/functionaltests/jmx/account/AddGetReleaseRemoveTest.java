@@ -47,6 +47,7 @@ import javax.management.remote.JMXServiceURL;
 
 import org.junit.Assert;
 import org.objectweb.proactive.core.node.Node;
+import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.jmx.naming.JMXTransportProtocol;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
@@ -92,7 +93,8 @@ public final class AddGetReleaseRemoveTest extends FunctionalTest {
         // All accounting values are checked through JMX
         final RMAuthentication auth = (RMAuthentication) RMTHelper.getRMAuth();
         final PublicKey pubKey = auth.getPublicKey();
-        final Credentials adminCreds = Credentials.createCredentials(adminLogin, adminPassword, pubKey);
+        final Credentials adminCreds = Credentials.createCredentials(new CredData(adminLogin, adminPassword),
+                pubKey);
 
         final JMXServiceURL jmxRmiServiceURL = new JMXServiceURL(auth
                 .getJMXConnectorURL(JMXTransportProtocol.RMI));

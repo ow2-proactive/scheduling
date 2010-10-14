@@ -74,6 +74,7 @@ import org.hibernate.annotations.Proxy;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
+import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.db.annotation.Unloadable;
 import org.ow2.proactive.scheduler.common.exception.ExecutableCreationException;
 import org.ow2.proactive.scheduler.common.job.JobId;
@@ -211,6 +212,11 @@ public abstract class InternalTask extends TaskState {
     @TransientInSerialization
     @XmlTransient
     private InternalTask ifBranch = null;
+
+    /** used credentials to fork as user id. Can be null, or contain user/pwd[/key] */
+    @Transient
+    @TransientInSerialization
+    private Credentials credentials = null;
 
     /**
      * {@inheritDoc}
@@ -844,6 +850,24 @@ public abstract class InternalTask extends TaskState {
     @Override
     public int getMaxNumberOfExecutionOnFailure() {
         return maxNumberOfExecutionOnFailure;
+    }
+
+    /**
+     * Get the credentials
+     *
+     * @return the credentials
+     */
+    public Credentials getCredentials() {
+        return credentials;
+    }
+
+    /**
+     * Set the credentials value to the given credentials value
+     *
+     * @param credentials the credentials to set
+     */
+    public void setCredentials(Credentials credentials) {
+        this.credentials = credentials;
     }
 
     /**

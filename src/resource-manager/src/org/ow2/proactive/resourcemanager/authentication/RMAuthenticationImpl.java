@@ -50,6 +50,7 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.authentication.AuthenticationImpl;
+import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.authentication.principals.GroupNamePrincipal;
 import org.ow2.proactive.jmx.naming.JMXTransportProtocol;
@@ -99,7 +100,7 @@ public class RMAuthenticationImpl extends AuthenticationImpl implements RMAuthen
         try {
             // encrypting the data here is useless, only done to conform to the
             // signature of the real method
-            return logAsUser(Credentials.createCredentials(user, password, publicKeyPath));
+            return logAsUser(Credentials.createCredentials(new CredData(user, password), publicKeyPath));
         } catch (KeyException e) {
             throw new LoginException("Could not encrypt credentials: " + e.getMessage());
         }
@@ -113,7 +114,7 @@ public class RMAuthenticationImpl extends AuthenticationImpl implements RMAuthen
         try {
             // encrypting the data here is useless, only done to conform to the
             // signature of the real method
-            return logAsAdmin(Credentials.createCredentials(user, password, publicKeyPath));
+            return logAsAdmin(Credentials.createCredentials(new CredData(user, password), publicKeyPath));
         } catch (KeyException e) {
             throw new LoginException("Could not encrypt credentials: " + e.getMessage());
         }

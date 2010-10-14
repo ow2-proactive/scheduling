@@ -36,6 +36,8 @@
  */
 package org.ow2.proactive.scheduler.core;
 
+import java.security.KeyException;
+import java.security.PrivateKey;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -50,6 +52,7 @@ import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.common.RMState;
 import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
@@ -104,9 +107,17 @@ final class SchedulingMethodImpl implements SchedulingMethod {
 
     protected ExecutorService threadPool;
 
+    protected PrivateKey corePrivateKey;
+
     SchedulingMethodImpl(SchedulerCore core) {
         this.core = core;
         this.threadPool = Executors.newFixedThreadPool(DOTASK_ACTION_THREADNUMBER);
+        try {
+            this.corePrivateKey = Credentials.getPrivateKey(PASchedulerProperties
+                    .getAbsolutePath(PASchedulerProperties.SCHEDULER_AUTH_PRIVKEY_PATH.getValueAsString()));
+        } catch (KeyException e) {
+            SchedulerCore.exitFailure(e, null);
+        }
     }
 
     /**
@@ -471,7 +482,7 @@ final class SchedulingMethodImpl implements SchedulingMethod {
 
                 //enqueue next instruction, and execute whole process in the thread-pool controller
                 TimedDoTaskAction tdta = new TimedDoTaskAction(task, launcher, (SchedulerCore) PAActiveObject
-                        .getStubOnThis(), params);
+                        .getStubOnThis(), params, corePrivateKey);
                 List<Future<TaskResult>> futurResults = ExecutorServiceTasksInvocator
                         .invokeAllWithTimeoutAction(threadPool, Collections.singletonList(tdta),
                                 DOTASK_ACTION_TIMEOUT);

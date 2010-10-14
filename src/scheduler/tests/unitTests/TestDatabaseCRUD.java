@@ -117,7 +117,7 @@ public class TestDatabaseCRUD {
     public void run() throws Throwable {
         String URLbegin = System.getProperty("pa.scheduler.home") + "/";
         log("Test CREATE");
-        itfJob = (InternalTaskFlowJob) InternalJobFactory.createJob(tfJob);
+        itfJob = (InternalTaskFlowJob) InternalJobFactory.createJob(tfJob, null);
         itfJob.setId(JobIdImpl.nextId(itfJob.getName()));
         itfJob.setOwner("toto");
         //prepare tasks in order to be send into the core

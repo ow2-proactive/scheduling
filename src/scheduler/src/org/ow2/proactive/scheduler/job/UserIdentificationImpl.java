@@ -43,6 +43,7 @@ import java.util.TimerTask;
 
 import javax.security.auth.Subject;
 
+import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.authentication.principals.UserNamePrincipal;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.exception.PermissionException;
@@ -63,6 +64,9 @@ public class UserIdentificationImpl extends UserIdentification {
 
     /** user subject */
     private Subject subject;
+
+    /** user credential encrypted with scheduler public key */
+    private Credentials credential;
 
     /** Number of submit for this user */
     private int submitNumber = 0;
@@ -108,9 +112,10 @@ public class UserIdentificationImpl extends UserIdentification {
      * @param username the user name.
      * @param subject contains all user's principals and permissions
      */
-    public UserIdentificationImpl(String username, Subject subject) {
+    public UserIdentificationImpl(String username, Subject subject, Credentials cred) {
         this.username = username;
         this.subject = subject;
+        this.credential = cred;
         this.connectionTime = System.currentTimeMillis();
     }
 
@@ -127,6 +132,16 @@ public class UserIdentificationImpl extends UserIdentification {
     @Override
     public String getUsername() {
         return username;
+    }
+
+    /**
+     * Retreive the credentials given at connection time.
+     * This credential has been encrypted using Scheduling private key
+     *
+     * @return the credentials given at connection time
+     */
+    public Credentials getCredentials() {
+        return this.credential;
     }
 
     /**

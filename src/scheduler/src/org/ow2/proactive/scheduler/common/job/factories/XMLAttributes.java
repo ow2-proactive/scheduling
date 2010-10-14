@@ -55,7 +55,7 @@ public enum XMLAttributes {
             "maxNumberOfExecution"), COMMON_NAME("name"),
     //TASKS
     TASK_RESULTPREVIEW("resultPreviewClass"), TASK_PRECIOUSRESULT("preciousResult"), TASK_CLASSNAME("class"), TASK_WALLTIME(
-            "walltime"), TASK_FORK("fork"),
+            "walltime"), TASK_FORK("fork"), TASK_RUNASME("runAsMe"),
     //NATIVE TASK ATTRIBUTES
     TASK_NB_NODES("numberOfNodes"), TASK_COMMAND_VALUE("value"), TASK_WORKDING_DIR("workingDir"),
     //SCRIPTS

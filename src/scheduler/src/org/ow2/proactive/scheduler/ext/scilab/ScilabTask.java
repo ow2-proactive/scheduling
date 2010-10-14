@@ -818,7 +818,7 @@ public class ScilabTask extends JavaExecutable {
                     Node scilabNode = null;
                     try {
                         scilabNode = childRuntime.createLocalNode("Scilab_" + nodeName + "_" + nodeCount,
-                                true, null, null, null);
+                                true, null, null);
                     } catch (Throwable e) {
                         if (debug) {
                             e.printStackTrace();

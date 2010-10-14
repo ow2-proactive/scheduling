@@ -48,6 +48,7 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.authentication.SchedulerAuthentication;
 import org.ow2.proactive.scheduler.common.Scheduler;
@@ -256,7 +257,7 @@ public class SchedulerFactory {
         SchedulerAuthenticationInterface auth = SchedulerConnection.waitAndJoin("//localhost/");
         Credentials creds = null;
         try {
-            Credentials.createCredentials(login, password, auth.getPublicKey());
+            Credentials.createCredentials(new CredData(login, password), auth.getPublicKey());
         } catch (LoginException e) {
             logger.error("Could not recover public key from Scheduler, check your configuration" + e);
             throw new LoginException("Could not encrypt credentials");

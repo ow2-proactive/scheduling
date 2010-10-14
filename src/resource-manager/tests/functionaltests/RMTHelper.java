@@ -60,6 +60,7 @@ import org.objectweb.proactive.core.xml.VariableContractType;
 import org.objectweb.proactive.extensions.gcmdeployment.PAGCMDeployment;
 import org.objectweb.proactive.gcmdeployment.GCMApplication;
 import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
+import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.RMFactory;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
@@ -471,7 +472,7 @@ public class RMTHelper {
      */
     public static ResourceManager connect(String name, String pass) throws Exception {
         RMAuthentication authInt = getRMAuth();
-        Credentials cred = Credentials.createCredentials(name, pass, authInt.getPublicKey());
+        Credentials cred = Credentials.createCredentials(new CredData(name, pass), authInt.getPublicKey());
 
         return authInt.login(cred);
     }
@@ -481,7 +482,7 @@ public class RMTHelper {
      */
     public static ResourceManager join(String name, String pass) throws Exception {
         RMAuthentication authInt = getRMAuth();
-        Credentials cred = Credentials.createCredentials(name, pass, authInt.getPublicKey());
+        Credentials cred = Credentials.createCredentials(new CredData(name, pass), authInt.getPublicKey());
 
         while (true) {
             try {

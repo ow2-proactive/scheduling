@@ -36,6 +36,7 @@
  */
 package functionaltests.nodestate;
 
+import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.frontend.RMConnection;
@@ -47,7 +48,8 @@ public class GetAllNodes {
         RMAuthentication auth;
         try {
             auth = RMConnection.join(null);
-            Credentials cred = Credentials.createCredentials("demo", "demo", auth.getPublicKey());
+            Credentials cred = Credentials.createCredentials(new CredData("demo", "demo"), auth
+                    .getPublicKey());
             ResourceManager rm = auth.login(cred);
             rm.getAtMostNodes(rm.getState().getFreeNodesNumber(), null);
         } catch (Exception e) {

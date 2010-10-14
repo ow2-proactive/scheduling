@@ -47,6 +47,7 @@ import javax.security.auth.login.LoginContext;
 import javax.security.auth.login.LoginException;
 
 import org.objectweb.proactive.api.PAActiveObject;
+import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 
 
@@ -135,14 +136,14 @@ public abstract class AuthenticationImpl implements Authentication {
             throw new LoginException("Authentication active object is not activated.");
         }
 
-        String[] credentials = null;
+        CredData credentials = null;
         try {
             credentials = cred.decrypt(privateKeyPath);
         } catch (KeyException e) {
             throw new LoginException("Could not decrypt credentials: " + e);
         }
-        String username = credentials[0];
-        String password = credentials[1];
+        String username = credentials.getLogin();
+        String password = credentials.getPassword();
 
         if (username == null || username.equals("")) {
             throw new LoginException("Bad user name (user is null or empty)");
