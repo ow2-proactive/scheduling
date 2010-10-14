@@ -38,6 +38,7 @@ package org.ow2.proactive.resourcemanager.rmnode;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.security.Permission;
 import java.util.HashMap;
 
 import org.objectweb.proactive.core.ProActiveException;
@@ -46,6 +47,8 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeInformation;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
+import org.ow2.proactive.authentication.principals.UserNamePrincipal;
+import org.ow2.proactive.permissions.PrincipalPermission;
 import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
@@ -118,6 +121,9 @@ public class RMNodeImpl implements RMNode, Serializable {
     /** client taken the node for computations */
     private Client owner;
 
+    /** Node access permission*/
+    private Permission nodeAccessPermission;
+
     /** The add event */
     private RMNodeEvent addEvent;
 
@@ -130,11 +136,12 @@ public class RMNodeImpl implements RMNode, Serializable {
      * @param nodeSource {@link VirtualNode} name of the node.
      * @param nodeSource {@link NodeSource} Stub of NodeSource that handle the RMNode.
      */
-    public RMNodeImpl(Node node, NodeSource nodeSource, Client provider) {
+    public RMNodeImpl(Node node, NodeSource nodeSource, Client provider, Permission nodeAccessPermission) {
         this.node = node;
         this.nodeSource = nodeSource;
         this.nodeSourceName = nodeSource.getName();
         this.provider = provider;
+        this.nodeAccessPermission = nodeAccessPermission;
         this.nodeName = node.getNodeInformation().getName();
         this.nodeURL = node.getNodeInformation().getURL();
         this.hostName = node.getNodeInformation().getVMInformation().getHostName();
@@ -428,6 +435,21 @@ public class RMNodeImpl implements RMNode, Serializable {
      */
     public Client getProvider() {
         return provider;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Permission getUserPermission() {
+        return nodeAccessPermission;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Permission getAdminPermission() {
+        return new PrincipalPermission(provider.getName(), provider.getSubject().getPrincipals(
+                UserNamePrincipal.class));
     }
 
     /**

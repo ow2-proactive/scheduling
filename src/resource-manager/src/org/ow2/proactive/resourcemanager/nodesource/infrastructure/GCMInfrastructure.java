@@ -271,7 +271,7 @@ public class GCMInfrastructure extends DefaultInfrastructureManager {
     public synchronized void receiveDeployedNode(Node node, String vnodeName) {
         // make the call to node source through the stub in order to
         // correctly control the security access in the core
-        nodeSource.getStub().acquireNode(node.getNodeInformation().getURL(), nodeSource.getProvider());
+        nodeSource.getStub().acquireNode(node.getNodeInformation().getURL(), nodeSource.getAdministrator());
     }
 
     /**

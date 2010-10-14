@@ -62,7 +62,7 @@ public class TestGCMInfrastructureTimeSlotPolicy extends FunctionalTest {
     protected int descriptorNodeNumber = 1;
 
     protected Object[] getPolicyParams() {
-        return new Object[] { "USER", "ALL", TimeSlotPolicy.dateFormat.format(System.currentTimeMillis()),
+        return new Object[] { "ME", "ALL", TimeSlotPolicy.dateFormat.format(System.currentTimeMillis()),
                 TimeSlotPolicy.dateFormat.format(System.currentTimeMillis() + 15000), "0", "true" };
     }
 

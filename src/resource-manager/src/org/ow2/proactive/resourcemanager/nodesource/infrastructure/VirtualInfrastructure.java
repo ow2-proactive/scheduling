@@ -779,7 +779,7 @@ public class VirtualInfrastructure extends InfrastructureManager {
             if (nodeUrl == null) {
                 return false;
             } else {
-                return nodeSource.acquireNode(nodeUrl, nodeSource.getProvider()).booleanValue();
+                return nodeSource.acquireNode(nodeUrl, nodeSource.getAdministrator()).booleanValue();
             }
         } catch (Throwable t) {
             logger.error("Failled to add an available node to RMCore.", t);
@@ -934,7 +934,7 @@ public class VirtualInfrastructure extends InfrastructureManager {
                             availableNodesLock.lock();
                             if (numberOfRequiredNodes > 0) {
                                 logger.debug("Retrieved a new node url: " + nodeUrl);
-                                nodeSource.acquireNode(nodeUrl, nodeSource.getProvider());
+                                nodeSource.acquireNode(nodeUrl, nodeSource.getAdministrator());
                                 numberOfRequiredNodes--;
                                 logger.debug("Number of required nodes = " + numberOfRequiredNodes);
                             } else {

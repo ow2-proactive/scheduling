@@ -36,6 +36,7 @@
  */
 package org.ow2.proactive.resourcemanager.rmnode;
 
+import java.security.Permission;
 import java.util.HashMap;
 
 import org.objectweb.proactive.core.node.Node;
@@ -177,6 +178,20 @@ public interface RMNode extends Comparable<RMNode> {
      * @return the node owner
      */
     public Client getOwner();
+
+    /**
+     * Gets the permission which defines who can user this node.
+     * For instance if at the moment of node source creation "node users" is set to "PROVIDER" it means
+     * that only node providers can use it for computations.
+     *
+     * @return node usage permission
+     */
+    public Permission getUserPermission();
+
+    /**
+     * Gets the permission which defines who can remove this node.
+     */
+    public Permission getAdminPermission();
 
     /**
      * Returns the id of the add event {@link RMNodeEvent}.

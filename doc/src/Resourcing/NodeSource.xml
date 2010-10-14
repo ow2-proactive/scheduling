@@ -86,6 +86,54 @@ maxNodes serviceUrl userName password trustStore trustStorePassword javaPath rmP
 			</listitem>
 			<listitem>
 				<para>
+					Permissions to the node source. Each policy has two parameters:
+					<itemizedlist>
+						<listitem>
+							<para><emphasis role="bold">nodeUsers</emphasis> - utilization permission defined who can get nodes
+							for computations from this node source. It has to take one of the following values:
+								<itemizedlist>
+									<listitem>
+										<para><emphasis role="bold">"ME"</emphasis> - Only the node source creator </para>
+									</listitem>
+									<listitem>
+										<para><emphasis role="bold">"MY_GROUPS"</emphasis> - Only groups in which the node source creator belongs to</para>
+									</listitem>
+									<listitem>
+										<para><emphasis role="bold">"PROVIDER"</emphasis> - Only the node provider who added the node. Provider can use only its nodes</para>
+									</listitem>
+									<listitem>
+										<para><emphasis role="bold">"PROVIDER_GROUPS"</emphasis> - Only groups in which the node provider belongs to. Users from this groups can user only nodes of this provider</para>
+									</listitem>
+									<listitem>
+										<para><emphasis role="bold">"ALL"</emphasis> - Everybody</para>
+									</listitem>
+								</itemizedlist>
+							</para>
+						</listitem>
+						<listitem>
+							<para><emphasis role="bold">nodeProviders</emphasis> - Provider permission defines who can add nodes to this node source.
+							It should take one of the following values:
+								<itemizedlist>
+									<listitem>
+										<para><emphasis role="bold">"ME"</emphasis> - Only the node source creator </para>
+									</listitem>
+									<listitem>
+										<para><emphasis role="bold">"MY_GROUPS"</emphasis> - Only the group in which the node source creator belongs to</para>
+									</listitem>
+									<listitem>
+										<para><emphasis role="bold">"ALL"</emphasis> - Everybody</para>
+									</listitem>
+								</itemizedlist>
+							</para>
+						</listitem>
+					</itemizedlist>
+					The user created the node source is the administrator of this node source. It can add and removed
+					nodes to it, remove the node source itself, but cannot use nodes if usage policy is set to PROVIDER
+					or PROVIDER_GROUPS (unless it's granted AllPermissions).
+				</para>
+			</listitem>
+			<listitem>
+				<para>
 					New infrastructure manager or node source policy can be dynamically plugged into the Resource Manager.
 					In order to do that, it is just required to add new implemented classes in the class path and update
 					corresponding list in the configuration file (<literal>[RM_HOME]/config/rm/nodesource</literal>).
@@ -544,13 +592,20 @@ test.example.net 5
 				<para>For using this policy, you have to precise the following parameters:</para>
 				<itemizedlist>
 					<listitem>
-						<para><emphasis role="bold">nodesAvailableTo</emphasis> - utilization permission. It should take one of the following values:
+						<para><emphasis role="bold">nodeUsers</emphasis> - utilization permission defined who can get nodes
+						for computations from this node source. It has to take one of the following values:
 							<itemizedlist>
 								<listitem>
-									<para><emphasis role="bold">"USER"</emphasis> - Only the node source creator </para>
+									<para><emphasis role="bold">"ME"</emphasis> - Only the node source creator </para>
 								</listitem>
 								<listitem>
-									<para><emphasis role="bold">"GROUP"</emphasis> - Only the group in which the node source creator belongs to</para>
+									<para><emphasis role="bold">"MY_GROUPS"</emphasis> - Only groups in which the node source creator belongs to</para>
+								</listitem>
+								<listitem>
+									<para><emphasis role="bold">"PROVIDER"</emphasis> - Only the node provider who added the node. Provider can use only its nodes</para>
+								</listitem>
+								<listitem>
+									<para><emphasis role="bold">"PROVIDER_GROUPS"</emphasis> - Only groups in which the node provider belongs to. Users from this groups can user only nodes of this provider</para>
 								</listitem>
 								<listitem>
 									<para><emphasis role="bold">"ALL"</emphasis> - Everybody</para>
@@ -559,13 +614,14 @@ test.example.net 5
 						</para>
 					</listitem>
 					<listitem>
-						<para><emphasis role="bold">administrator</emphasis> - Administration permission. It should take one of the following values:
+						<para><emphasis role="bold">nodeProviders</emphasis> - Provider permission defines who can add nodes to this node source.
+						It should take one of the following values:
 							<itemizedlist>
 								<listitem>
-									<para><emphasis role="bold">"USER"</emphasis> - Only the node source creator </para>
+									<para><emphasis role="bold">"ME"</emphasis> - Only the node source creator </para>
 								</listitem>
 								<listitem>
-									<para><emphasis role="bold">"GROUP"</emphasis> - Only the group in which the node source creator belongs to</para>
+									<para><emphasis role="bold">"MY_GROUPS"</emphasis> - Only the group in which the node source creator belongs to</para>
 								</listitem>
 								<listitem>
 									<para><emphasis role="bold">"ALL"</emphasis> - Everybody</para>
@@ -582,13 +638,20 @@ test.example.net 5
 				<para>For using this policy, you have to precise the following parameters:</para>
 				<itemizedlist>
 					<listitem>
-						<para><emphasis role="bold">nodesAvailableTo</emphasis> - utilization permission. It should take one of the following values:
+						<para><emphasis role="bold">nodeUsers</emphasis> - utilization permission defined who can get nodes
+						for computations from this node source. It has to take one of the following values:
 							<itemizedlist>
 								<listitem>
-									<para><emphasis role="bold">"USER"</emphasis> - Only the node source creator</para>
+									<para><emphasis role="bold">"ME"</emphasis> - Only the node source creator </para>
 								</listitem>
 								<listitem>
-									<para><emphasis role="bold">"GROUP"</emphasis> - Only the group in which the node source creator belongs to</para>
+									<para><emphasis role="bold">"MY_GROUPS"</emphasis> - Only groups in which the node source creator belongs to</para>
+								</listitem>
+								<listitem>
+									<para><emphasis role="bold">"PROVIDER"</emphasis> - Only the node provider who added the node. Provider can use only its nodes</para>
+								</listitem>
+								<listitem>
+									<para><emphasis role="bold">"PROVIDER_GROUPS"</emphasis> - Only groups in which the node provider belongs to. Users from this groups can user only nodes of this provider</para>
 								</listitem>
 								<listitem>
 									<para><emphasis role="bold">"ALL"</emphasis> - Everybody</para>
@@ -597,13 +660,14 @@ test.example.net 5
 						</para>
 					</listitem>
 					<listitem>
-						<para><emphasis role="bold">administrator</emphasis> - Administration permission. It should take one of the following values:
+						<para><emphasis role="bold">nodeProviders</emphasis> - Provider permission defines who can add nodes to this node source.
+						It should take one of the following values:
 							<itemizedlist>
 								<listitem>
-									<para><emphasis role="bold">"USER"</emphasis> - Only the node source creator</para>
+									<para><emphasis role="bold">"ME"</emphasis> - Only the node source creator </para>
 								</listitem>
 								<listitem>
-									<para><emphasis role="bold">"GROUP"</emphasis> - Only the group in which the node source creator belongs to</para>
+									<para><emphasis role="bold">"MY_GROUPS"</emphasis> - Only the group in which the node source creator belongs to</para>
 								</listitem>
 								<listitem>
 									<para><emphasis role="bold">"ALL"</emphasis> - Everybody</para>
@@ -637,13 +701,20 @@ test.example.net 5
 				<para>For using this policy, you have to precise the following parameters:</para>
 				<itemizedlist>
 					<listitem>
-						<para><emphasis role="bold">nodesAvailableTo</emphasis> - utilization permission. It should take one of the following values:
+						<para><emphasis role="bold">nodeUsers</emphasis> - utilization permission defined who can get nodes
+						for computations from this node source. It has to take one of the following values:
 							<itemizedlist>
 								<listitem>
-									<para><emphasis role="bold">"USER"</emphasis> - Only the node source creator</para>
+									<para><emphasis role="bold">"ME"</emphasis> - Only the node source creator </para>
 								</listitem>
 								<listitem>
-									<para><emphasis role="bold">"GROUP"</emphasis> - Only the group in which the node source creator belongs to</para>
+									<para><emphasis role="bold">"MY_GROUPS"</emphasis> - Only groups in which the node source creator belongs to</para>
+								</listitem>
+								<listitem>
+									<para><emphasis role="bold">"PROVIDER"</emphasis> - Only the node provider who added the node. Provider can use only its nodes</para>
+								</listitem>
+								<listitem>
+									<para><emphasis role="bold">"PROVIDER_GROUPS"</emphasis> - Only groups in which the node provider belongs to. Users from this groups can user only nodes of this provider</para>
 								</listitem>
 								<listitem>
 									<para><emphasis role="bold">"ALL"</emphasis> - Everybody</para>
@@ -652,13 +723,14 @@ test.example.net 5
 						</para>
 					</listitem>
 					<listitem>
-						<para><emphasis role="bold">administrator</emphasis> - Administration permission. It should take one of the following values:
+						<para><emphasis role="bold">nodeProviders</emphasis> - Provider permission defines who can add nodes to this node source.
+						It should take one of the following values:
 							<itemizedlist>
 								<listitem>
-									<para><emphasis role="bold">"USER"</emphasis> - Only the node source creator</para>
+									<para><emphasis role="bold">"ME"</emphasis> - Only the node source creator </para>
 								</listitem>
 								<listitem>
-									<para><emphasis role="bold">"GROUP"</emphasis> - Only the group in which the node source creator belongs to</para>
+									<para><emphasis role="bold">"MY_GROUPS"</emphasis> - Only the group in which the node source creator belongs to</para>
 								</listitem>
 								<listitem>
 									<para><emphasis role="bold">"ALL"</emphasis> - Everybody</para>
@@ -697,13 +769,20 @@ test.example.net 5
 				<para>For using this policy, you have to precise the following parameters:</para>
 				<itemizedlist>
 					<listitem>
-						<para><emphasis role="bold">nodesAvailableTo</emphasis> - utilization permission. It should take one of the following values:
+						<para><emphasis role="bold">nodeUsers</emphasis> - utilization permission defined who can get nodes
+						for computations from this node source. It has to take one of the following values:
 							<itemizedlist>
 								<listitem>
-									<para><emphasis role="bold">"USER"</emphasis> - Only the node source creator</para>
+									<para><emphasis role="bold">"ME"</emphasis> - Only the node source creator </para>
 								</listitem>
 								<listitem>
-									<para><emphasis role="bold">"GROUP"</emphasis> - Only the group in which the node source creator belongs to</para>
+									<para><emphasis role="bold">"MY_GROUPS"</emphasis> - Only groups in which the node source creator belongs to</para>
+								</listitem>
+								<listitem>
+									<para><emphasis role="bold">"PROVIDER"</emphasis> - Only the node provider who added the node. Provider can use only its nodes</para>
+								</listitem>
+								<listitem>
+									<para><emphasis role="bold">"PROVIDER_GROUPS"</emphasis> - Only groups in which the node provider belongs to. Users from this groups can user only nodes of this provider</para>
 								</listitem>
 								<listitem>
 									<para><emphasis role="bold">"ALL"</emphasis> - Everybody</para>
@@ -712,13 +791,14 @@ test.example.net 5
 						</para>
 					</listitem>
 					<listitem>
-						<para><emphasis role="bold">administrator</emphasis> - Administration permission. It should take one of the following values:
+						<para><emphasis role="bold">nodeProviders</emphasis> - Provider permission defines who can add nodes to this node source.
+						It should take one of the following values:
 							<itemizedlist>
 								<listitem>
-									<para><emphasis role="bold">"USER"</emphasis> - Only the node source creator</para>
+									<para><emphasis role="bold">"ME"</emphasis> - Only the node source creator </para>
 								</listitem>
 								<listitem>
-									<para><emphasis role="bold">"GROUP"</emphasis> - Only the group in which the node source creator belongs to</para>
+									<para><emphasis role="bold">"MY_GROUPS"</emphasis> - Only the group in which the node source creator belongs to</para>
 								</listitem>
 								<listitem>
 									<para><emphasis role="bold">"ALL"</emphasis> - Everybody</para>
@@ -771,13 +851,20 @@ test.example.net 5
 				<para>For using this policy, you have to precise the following parameters:</para>
 				<itemizedlist>
 					<listitem>
-						<para><emphasis role="bold">nodesAvailableTo</emphasis> - utilization permission. It should take one of the following values:
+						<para><emphasis role="bold">nodeUsers</emphasis> - utilization permission defined who can get nodes
+						for computations from this node source. It has to take one of the following values:
 							<itemizedlist>
 								<listitem>
-									<para><emphasis role="bold">"USER"</emphasis> - Only the node source creator</para>
+									<para><emphasis role="bold">"ME"</emphasis> - Only the node source creator </para>
 								</listitem>
 								<listitem>
-									<para><emphasis role="bold">"GROUP"</emphasis> - Only the group in which the node source creator belongs to</para>
+									<para><emphasis role="bold">"MY_GROUPS"</emphasis> - Only groups in which the node source creator belongs to</para>
+								</listitem>
+								<listitem>
+									<para><emphasis role="bold">"PROVIDER"</emphasis> - Only the node provider who added the node. Provider can use only its nodes</para>
+								</listitem>
+								<listitem>
+									<para><emphasis role="bold">"PROVIDER_GROUPS"</emphasis> - Only groups in which the node provider belongs to. Users from this groups can user only nodes of this provider</para>
 								</listitem>
 								<listitem>
 									<para><emphasis role="bold">"ALL"</emphasis> - Everybody</para>
@@ -786,13 +873,14 @@ test.example.net 5
 						</para>
 					</listitem>
 					<listitem>
-						<para><emphasis role="bold">administrator</emphasis> - Administration permission. It should take one of the following values:
+						<para><emphasis role="bold">nodeProviders</emphasis> - Provider permission defines who can add nodes to this node source.
+						It should take one of the following values:
 							<itemizedlist>
 								<listitem>
-									<para><emphasis role="bold">"USER"</emphasis> - Only the node source creator</para>
+									<para><emphasis role="bold">"ME"</emphasis> - Only the node source creator </para>
 								</listitem>
 								<listitem>
-									<para><emphasis role="bold">"GROUP"</emphasis> - Only the group in which the node source creator belongs to</para>
+									<para><emphasis role="bold">"MY_GROUPS"</emphasis> - Only the group in which the node source creator belongs to</para>
 								</listitem>
 								<listitem>
 									<para><emphasis role="bold">"ALL"</emphasis> - Everybody</para>

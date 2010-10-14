@@ -80,8 +80,8 @@ public class RMNodeSourceEvent extends RMEvent {
     @Lob
     private BigString nodeSourceDescription = null;
 
-    @Column(name = "nodeSourceProvider")
-    private String nodeSourceProvider = null;
+    @Column(name = "nodeSourceAdmin")
+    private String nodeSourceAdmin = null;
 
     /**
      * ProActive Empty constructor.
@@ -96,7 +96,7 @@ public class RMNodeSourceEvent extends RMEvent {
     public RMNodeSourceEvent(NodeSource source) {
         this.nodeSourceName = source.getName();
         this.nodeSourceDescription = new BigString(source.getDescription());
-        this.nodeSourceProvider = source.getProvider().getName();
+        this.nodeSourceAdmin = source.getAdministrator().getName();
     }
 
     /**
@@ -107,7 +107,7 @@ public class RMNodeSourceEvent extends RMEvent {
         this.initiator = initiator;
         this.nodeSourceName = source.getName();
         this.nodeSourceDescription = new BigString(source.getDescription());
-        this.nodeSourceProvider = source.getProvider().getName();
+        this.nodeSourceAdmin = source.getAdministrator().getName();
     }
 
     /**
@@ -140,11 +140,11 @@ public class RMNodeSourceEvent extends RMEvent {
     }
 
     /**
-     * Returns the name of the node source provider.
-     * @return the node source provider name.
+     * Returns the name of the node source administrator.
+     * @return the node source administrator name.
      */
-    public String getNodeSourceProvider() {
-        return nodeSourceProvider;
+    public String getNodeSourceAdmin() {
+        return nodeSourceAdmin;
     }
 
     /**

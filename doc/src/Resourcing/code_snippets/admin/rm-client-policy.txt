@@ -5,26 +5,26 @@ Name: Release Resources When Scheduler Idle
 Description: Releases all resources when scheduler is idle for specified
 time. Acquires them back on job submission.
 Class name: org.ow2.proactive.scheduler.resourcemanager.nodesource.policy.ReleaseResourcesWhenSchedulerIdle
-Parameters: <class name> nodesAvailableTo administrator schedulerUrl schedulerCredentialsPath idleTime
+Parameters: <class name> nodeUsers nodeProviders schedulerUrl schedulerCredentialsPath idleTime
 
 Name: EC2 Policy
 Description: Allocates resources according to the Scheduler loading factor,
 releases resources considering EC2 instances are paid by the hour
 Class name: org.ow2.proactive.scheduler.resourcemanager.nodesource.policy.EC2Policy
-Parameters: <class name> nodesAvailableTo administrator schedulerUrl schedulerCredentialsPath refreshTime loadFactor releaseDelay
+Parameters: <class name> nodeUsers nodeProviders schedulerUrl schedulerCredentialsPath refreshTime loadFactor releaseDelay
 
 Name: Time Slot Policy
 Description: Acquires and releases nodes at specified time.
 Class name: org.ow2.proactive.resourcemanager.nodesource.policy.TimeSlotPolicy
-Parameters: <class name> nodesAvailableTo administrator acquireTime releaseTime period preemptive
+Parameters: <class name> nodeUsers nodeProviders acquireTime releaseTime period preemptive
 
 Name: Scheduler Loading Policy
 Description: Allocates as many resources as scheduler required according
 to loading factor. Releases resources smoothly.
 Class name: org.ow2.proactive.scheduler.resourcemanager.nodesource.policy.SchedulerLoadingPolicy
-Parameters: <class name> nodesAvailableTo administrator schedulerUrl schedulerCredentialsPath refreshTime minNodes maxNodes loadFactor releaseDelay
+Parameters: <class name> nodeUsers nodeProviders schedulerUrl schedulerCredentialsPath refreshTime minNodes maxNodes loadFactor nodeDeploymentTimeout
 
 Name: Static Policy
 Description: Static nodes acquisition.
 Class name: org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy
-Parameters: <class name> nodesAvailableTo administrator
+Parameters: <class name> nodeUsers nodeProviders

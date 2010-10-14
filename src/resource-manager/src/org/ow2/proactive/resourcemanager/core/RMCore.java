@@ -558,10 +558,6 @@ public class RMCore implements ResourceManager, RMAdmin, RMUser, InitActive, Run
         if (nodeSources.containsKey(sourceName)) {
             NodeSource nodeSource = this.nodeSources.get(sourceName);
 
-            // checking that client has a right to change this node source
-            caller.checkPermission(nodeSource.getAdminPermission(), caller +
-                " is not authorized to add node " + nodeUrl + " to " + sourceName);
-
             // Known URL, so do some cleanup before replacing it
             if (allNodes.containsKey(nodeUrl)) {
 
@@ -591,17 +587,21 @@ public class RMCore implements ResourceManager, RMAdmin, RMUser, InitActive, Run
             logger.debug("Request to remove node " + rmnode);
 
             NodeSource nodeSource = rmnode.getNodeSource();
-            // checking that client has the permission to change this node source
-            caller.checkPermission(nodeSource.getAdminPermission(), caller +
-                " is not authorized to remove node " + rmnode.getNodeURL() + " from " +
-                rmnode.getNodeSourceName());
-
-            // checking that client has the permission to remove the node
-            // it has to be a user who added the node or the one with AllPermissions
-            PrincipalPermission pp = new PrincipalPermission(nodeUrl, rmnode.getProvider().getSubject()
-                    .getPrincipals(UserNamePrincipal.class));
-            caller.checkPermission(pp, caller + " is not authorized to remove node " + rmnode.getNodeURL() +
-                " from " + rmnode.getNodeSourceName());
+            // in order to remove the node it has to be either
+            // the administrator of the RM (with AllPermissions) or
+            // the administrator of the node source (creator) or
+            // the node provider
+            try {
+                // checking if the caller is an administrator
+                caller.checkPermission(nodeSource.getAdminPermission(), caller +
+                    " is not authorized to remove node " + rmnode.getNodeURL() + " from " +
+                    rmnode.getNodeSourceName());
+            } catch (SecurityException ex) {
+                // the caller is not an administrator, so checking if it is a node provider
+                caller.checkPermission(rmnode.getAdminPermission(), caller +
+                    " is not authorized to remove node " + rmnode.getNodeURL() + " from " +
+                    rmnode.getNodeSourceName());
+            }
 
             if (rmnode.isDown() || preempt || rmnode.isFree()) {
                 removeNodeFromCoreAndSource(rmnode, caller);
@@ -1161,6 +1161,7 @@ public class RMCore implements ResourceManager, RMAdmin, RMUser, InitActive, Run
      */
     public BooleanWrapper removeNodeSource(String sourceName, boolean preempt) {
         if (nodeSources.containsKey(sourceName)) {
+            // need to have an admin permission to remove the node source
             NodeSource nodeSource = nodeSources.get(sourceName);
             caller.checkPermission(nodeSource.getAdminPermission(), caller + " is not authorized to remove " +
                 sourceName);

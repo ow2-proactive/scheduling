@@ -37,15 +37,11 @@
 package org.ow2.proactive.resourcemanager.nodesource.policy;
 
 import java.io.Serializable;
-import java.util.Arrays;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
-import org.ow2.proactive.authentication.principals.GroupNamePrincipal;
-import org.ow2.proactive.authentication.principals.IdentityPrincipal;
-import org.ow2.proactive.authentication.principals.UserNamePrincipal;
 import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
@@ -74,13 +70,15 @@ public abstract class NodeSourcePolicy implements Serializable {
     /** Node source of the policy */
     protected NodeSource nodeSource;
 
-    private static String[] security = new String[] { "USER", "GROUP", "ALL" };
+    public enum AccessType {
+        ME, MY_GROUPS, PROVIDER, PROVIDER_GROUPS, ALL
+    };
 
-    @Configurable(description = "USER|GROUP|ALL")
-    private String nodesAvailableTo = "ALL";
+    @Configurable(description = "ME|MY_GROUPS|PROVIDER|PROVIDER_GROUPS|ALL")
+    private AccessType nodeUsers = AccessType.ALL;
 
-    @Configurable(description = "USER|GROUP|ALL")
-    private String administrator = "USER";
+    @Configurable(description = "ME|MY_GROUPS|ALL")
+    private AccessType nodeProviders = AccessType.ME;
 
     /**
      * Configure a policy with given parameters.
@@ -89,14 +87,20 @@ public abstract class NodeSourcePolicy implements Serializable {
      */
     public BooleanWrapper configure(Object... policyParameters) {
         if (policyParameters != null && policyParameters.length >= 2) {
-            if (!Arrays.asList(security).contains(policyParameters[0])) {
+            try {
+                nodeUsers = AccessType.valueOf(policyParameters[0].toString());
+            } catch (IllegalArgumentException e) {
                 throw new IllegalArgumentException("Incorrect parameter value " + policyParameters[0]);
             }
-            if (!Arrays.asList(security).contains(policyParameters[1])) {
+            try {
+                nodeProviders = AccessType.valueOf(policyParameters[1].toString());
+                if (nodeProviders == AccessType.PROVIDER || nodeProviders == AccessType.PROVIDER_GROUPS) {
+                    // these values are not allowed for admin access
+                    throw new IllegalArgumentException("Incorrect parameter value " + policyParameters[1]);
+                }
+            } catch (IllegalArgumentException e) {
                 throw new IllegalArgumentException("Incorrect parameter value " + policyParameters[1]);
             }
-            nodesAvailableTo = policyParameters[0].toString();
-            administrator = policyParameters[1].toString();
         }
 
         // else using default values
@@ -198,46 +202,22 @@ public abstract class NodeSourcePolicy implements Serializable {
     }
 
     /**
-     * Returns the type of principal of the node source administrator.
-     * Based on this type the appropriate PrincipalPermission is created
-     * in the node source which will control the administrator access to it.
-     * <p>
-     * The PrincipalPermission which will be created could be represented by
-     * the following pseudo code: PrincipalPermission(nodeSourceOwner.getPrincipals(type))
+     * Returns a node source administration type.
+     * Could be ME, MY_GROUPS, ALL
+     *
+     * @return a node source administration type
      */
-    public Class<? extends IdentityPrincipal> getAdminPrincipalType() {
-        if (administrator.equals(security[0])) {
-            // USER
-            return UserNamePrincipal.class;
-        } else if (administrator.equals(security[1])) {
-            // GROP
-            return GroupNamePrincipal.class;
-        }
-        // creating fake anonymous class to filter out all meaningful principals
-        // in node source and create permission like PrincipalPermission(empty)
-        return new IdentityPrincipal("") {
-        }.getClass();
+    public AccessType getProviderAccessType() {
+        return nodeProviders;
     }
 
     /**
-     * Returns the type of principal of the node source user.
-     * Based on this type the appropriate PrincipalPermission is created
-     * in the node source which will control the user access to it.
-     * <p>
-     * The PrincipalPermission which will be created could be represented by
-     * the following pseudo code: PrincipalPermission(nodeSourceOwner.getPrincipals(type))
+     * Returns a nodes access type.
+     * Could be ME, MY_GROUPS, PROVIDER, PROVIDER_GROUPS, ALL
+     *
+     * @return a nodes access type
      */
-    public Class<? extends IdentityPrincipal> getUserPrincipalType() {
-        if (nodesAvailableTo.equals(security[0])) {
-            // USER
-            return UserNamePrincipal.class;
-        } else if (nodesAvailableTo.equals(security[1])) {
-            // GROP
-            return GroupNamePrincipal.class;
-        }
-        // creating fake anonymous class to filter out all meaningful principals
-        // in node source and create permission like PrincipalPermission(empty)
-        return new IdentityPrincipal("") {
-        }.getClass();
+    public AccessType getUserAccessType() {
+        return nodeUsers;
     }
 }

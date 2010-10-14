@@ -58,6 +58,9 @@ import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
+import org.ow2.proactive.authentication.principals.GroupNamePrincipal;
+import org.ow2.proactive.authentication.principals.IdentityPrincipal;
+import org.ow2.proactive.authentication.principals.UserNamePrincipal;
 import org.ow2.proactive.permissions.PrincipalPermission;
 import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
@@ -69,6 +72,7 @@ import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.nodesource.dataspace.DataSpaceNodeConfigurationAgent;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.InfrastructureManager;
 import org.ow2.proactive.resourcemanager.nodesource.policy.NodeSourcePolicy;
+import org.ow2.proactive.resourcemanager.nodesource.policy.NodeSourcePolicy.AccessType;
 import org.ow2.proactive.resourcemanager.rmnode.RMNode;
 import org.ow2.proactive.resourcemanager.rmnode.RMNodeImpl;
 import org.ow2.proactive.resourcemanager.utils.RMLoggers;
@@ -116,10 +120,19 @@ public class NodeSource implements InitActive, RunActive {
     private static ExecutorService internalThreadPool;
     private static ExecutorService externalThreadPool;
     private NodeSource stub;
-    private final Client provider;
+    private final Client administrator;
 
-    private final PrincipalPermission adminPermission;
-    private final PrincipalPermission userPermission;
+    // admin can remove node source, add nodes to the node source, remove any node
+    // it is a PrincipalPermission of the user who created this node source
+    private final Permission adminPermission;
+    // provider can add nodes to the node source, remove only its nodes
+    // level is configured by ns admin at the moment of ns creation
+    // NOTE: the administrator is always the provider because each provider is one of those:
+    // ns creator, ns creator groups, all
+    private final Permission providerPermission;
+    // user can get nodes for running computations
+    // level is configured by ns admin at the moment of ns creation
+    private NodeSourcePolicy.AccessType nodeUserAccessType;
 
     /**
      * Creates a new instance of NodeSource.
@@ -131,9 +144,9 @@ public class NodeSource implements InitActive, RunActive {
         nodeSourcePolicy = null;
         description = null;
         rmcore = null;
-        provider = null;
+        administrator = null;
         adminPermission = null;
-        userPermission = null;
+        providerPermission = null;
     }
 
     /**
@@ -147,17 +160,22 @@ public class NodeSource implements InitActive, RunActive {
     public NodeSource(String name, Client provider, InfrastructureManager im, NodeSourcePolicy policy,
             RMCore rmcore) {
         this.name = name;
-        this.provider = provider;
+        this.administrator = provider;
         this.infrastructureManager = im;
         this.nodeSourcePolicy = policy;
         this.rmcore = rmcore;
         this.description = "Infrastructure:" + im + ", Policy: " + policy;
 
-        // creating node source admin and user permissions
-        this.userPermission = new PrincipalPermission(name, provider.getSubject().getPrincipals(
-                nodeSourcePolicy.getUserPrincipalType()));
-        this.adminPermission = new PrincipalPermission(name, provider.getSubject().getPrincipals(
-                nodeSourcePolicy.getAdminPrincipalType()));
+        // node source admin permission
+        // it's the PrincipalPermission of the user who created the node source
+        this.adminPermission = new PrincipalPermission(provider.getName(), provider.getSubject()
+                .getPrincipals(UserNamePrincipal.class));
+        // creating node source provider permission
+        // could be one of the following: PrincipalPermission (NS creator) or PrincipalPermission (NS creator groups)
+        // or PrincipalPermission (anyone)
+        this.providerPermission = new PrincipalPermission(provider.getName(), provider.getSubject()
+                .getPrincipals(getPrincipalType(nodeSourcePolicy.getProviderAccessType())));
+        this.nodeUserAccessType = nodeSourcePolicy.getUserAccessType();
     }
 
     /**
@@ -232,6 +250,11 @@ public class NodeSource implements InitActive, RunActive {
                 " adding request discarded because node source is shutting down");
         }
 
+        // checking that client has a right to change this node source
+        // if the provider is the administrator of the node source it always has this permission
+        provider.checkPermission(providerPermission, provider + " is not authorized to add node " + nodeUrl +
+            " to " + name);
+
         // lookup for a new Node
         Node nodeToAdd = null;
         try {
@@ -303,7 +326,20 @@ public class NodeSource implements InitActive, RunActive {
         // blocking call involving running ping process on the node
         RMCore.topologyManager.addNode(nodeToAdd);
 
-        RMNode rmnode = new RMNodeImpl(nodeToAdd, stub, provider);
+        // creating a node access permission
+        // it could be either PROVIDER/PROVIDER_GROUPS and in this case
+        // the provider principals will be taken or
+        // ME/MY_GROUPS (ns creator/ns creator groups) and in this case
+        // creator's principals will be used
+        Client permissionOwner = administrator;
+        if (nodeUserAccessType == AccessType.PROVIDER || nodeUserAccessType == AccessType.PROVIDER_GROUPS) {
+            permissionOwner = provider;
+        }
+        // now selecting the type (user or group) and construct the permission
+        PrincipalPermission nodeAccessPermission = new PrincipalPermission(nodeToAdd.getNodeInformation()
+                .getURL(), permissionOwner.getSubject().getPrincipals(getPrincipalType(nodeUserAccessType)));
+
+        RMNode rmnode = new RMNodeImpl(nodeToAdd, stub, provider, nodeAccessPermission);
         return rmcore.internalAddNodeToCore(rmnode);
     }
 
@@ -641,8 +677,8 @@ public class NodeSource implements InitActive, RunActive {
      * @return the node source provider
      */
     @ImmediateService
-    public Client getProvider() {
-        return provider;
+    public Client getAdministrator() {
+        return administrator;
     }
 
     /**
@@ -653,7 +689,8 @@ public class NodeSource implements InitActive, RunActive {
     }
 
     /**
-     * Returns the permission required to administrate the node source
+     * Returns the permission which administrator must have.
+     * Administrator of the node source can remove it, add nodes to this node source and remove any node.
      */
     @ImmediateService
     public Permission getAdminPermission() {
@@ -661,10 +698,34 @@ public class NodeSource implements InitActive, RunActive {
     }
 
     /**
-     * Returns the permission required to use the node source
+     * Returns the permission required to add/remove nodes to/from the node source.
+     * Provider can remove only its one nodes.
      */
     @ImmediateService
-    public Permission getUserPermission() {
-        return userPermission;
+    public Permission getProviderPermission() {
+        return providerPermission;
     }
+
+    /**
+     * Returns the type of principal of the node source administrator.
+     * Based on this type the appropriate PrincipalPermission is created
+     * in the node source which will control the administrator access to it.
+     * <p>
+     * The PrincipalPermission which will be created could be represented by
+     * the following pseudo code: PrincipalPermission(nodeSourceOwner.getPrincipals(type))
+     */
+    private Class<? extends IdentityPrincipal> getPrincipalType(NodeSourcePolicy.AccessType accessLevel) {
+        if (accessLevel == AccessType.ME || accessLevel == AccessType.PROVIDER) {
+            // USER
+            return UserNamePrincipal.class;
+        } else if (accessLevel == AccessType.MY_GROUPS || accessLevel == AccessType.PROVIDER_GROUPS) {
+            // GROP
+            return GroupNamePrincipal.class;
+        }
+        // creating fake anonymous class to filter out all meaningful principals
+        // in node source and create permission like PrincipalPermission(empty)
+        return new IdentityPrincipal("") {
+        }.getClass();
+    }
+
 }

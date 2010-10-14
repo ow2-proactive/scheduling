@@ -262,7 +262,7 @@ public class SSHInfrastructure extends InfrastructureManager {
             }
 
             try {
-                if (nodeSource.getStub().acquireNode(nodeUrl, nodeSource.getProvider()).booleanValue()) {
+                if (nodeSource.getStub().acquireNode(nodeUrl, nodeSource.getAdministrator()).booleanValue()) {
                     try {
                         // don't destroy the process if launched on localhost without SSH;
                         // it would kill it

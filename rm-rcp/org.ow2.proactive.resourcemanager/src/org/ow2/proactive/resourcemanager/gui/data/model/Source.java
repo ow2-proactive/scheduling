@@ -46,12 +46,12 @@ import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 public class Source extends TreeParentElement {
 
     private String description = null;
-    private String provider = null;
+    private String administrator = null;
 
     public Source(RMNodeSourceEvent nodeSourceEvent) {
         super(nodeSourceEvent.getSourceName(), TreeElementType.SOURCE);
         this.description = nodeSourceEvent.getSourceDescription();
-        this.provider = nodeSourceEvent.getNodeSourceProvider();
+        this.administrator = nodeSourceEvent.getNodeSourceAdmin();
     }
 
     public boolean isTheDefault() {
@@ -62,12 +62,12 @@ public class Source extends TreeParentElement {
         return description;
     }
 
-    public String getProvider() {
-        return provider;
+    public String getAdministrator() {
+        return administrator;
     }
 
     @Override
     public String toString() {
-        return getName() + " [" + description + "]" + " provided by \"" + provider + "\"";
+        return getName() + " [" + description + "]" + " created by \"" + administrator + "\"";
     }
 }

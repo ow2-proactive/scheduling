@@ -282,7 +282,7 @@ public class ResourceManagerModel extends ConsoleModel {
             list = new ArrayList<String>();
             list.add("SOURCE NAME");
             list.add("DESCRIPTION");
-            list.add("PROVIDER");
+            list.add("ADMINISTRATOR");
             oaf.setTitle(list);
             //separator
             oaf.addEmptyLine();
@@ -290,7 +290,7 @@ public class ResourceManagerModel extends ConsoleModel {
                 list = new ArrayList<String>();
                 list.add(evt.getSourceName());
                 list.add(evt.getSourceDescription());
-                list.add(evt.getNodeSourceProvider());
+                list.add(evt.getNodeSourceAdmin());
                 oaf.addLine(list);
             }
             print(Tools.getStringAsArray(oaf));

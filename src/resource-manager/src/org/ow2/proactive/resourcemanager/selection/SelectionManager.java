@@ -36,11 +36,9 @@
  */
 package org.ow2.proactive.resourcemanager.selection;
 
-import java.security.Permission;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -278,21 +276,16 @@ public abstract class SelectionManager {
     private List<RMNode> filterOut(List<RMNode> freeNodes, NodeSet exclusion, Client client) {
 
         List<RMNode> filteredList = new ArrayList<RMNode>();
-        HashMap<String, Permission> nsPermissions = new HashMap<String, Permission>();
 
         for (RMNode node : freeNodes) {
-            Permission userPermission = nsPermissions.get(node.getNodeSourceName());
-            if (userPermission == null) {
-                userPermission = node.getNodeSource().getUserPermission();
-                nsPermissions.put(node.getNodeSourceName(), userPermission);
-            }
             // checking the permission
             try {
-                client.checkPermission(userPermission, client + " is not authorized to get the node " +
-                    node.getNodeURL() + " from " + node.getNodeSource());
+                client.checkPermission(node.getUserPermission(), client +
+                    " is not authorized to get the node " + node.getNodeURL() + " from " +
+                    node.getNodeSource().getName());
             } catch (SecurityException e) {
                 // client does not have an access to this node
-                logger.warn(e.getMessage());
+                logger.debug(e.getMessage());
                 continue;
             }
 

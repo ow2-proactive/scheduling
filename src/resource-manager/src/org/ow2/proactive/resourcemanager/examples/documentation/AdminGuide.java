@@ -65,7 +65,7 @@ public class AdminGuide {
                 PAResourceManagerProperties.RM_HOME.toString(), "rmi", "1099", javaOptions,
                 "kisscool.inria.fr".getBytes() };
 
-        Object[] policyParameters = new Object[] { "GROUP", "USER" };
+        Object[] policyParameters = new Object[] { "MY_GROUPS", "ME" };
 
         resourceManager.createNodeSource("MySshNodeSource", SSHInfrastructure.class.getName(),
                 infrastructureParameters, StaticPolicy.class.getName(), policyParameters);
