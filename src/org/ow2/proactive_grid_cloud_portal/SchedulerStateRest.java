@@ -17,7 +17,6 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.core.MultivaluedMap;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import org.hibernate.collection.PersistentMap;
@@ -26,6 +25,7 @@ import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
 import org.ow2.proactive.scheduler.common.Scheduler;
+import org.ow2.proactive.scheduler.common.SchedulerState;
 import org.ow2.proactive.scheduler.common.SchedulerStatus;
 import org.ow2.proactive.scheduler.common.exception.JobAlreadyFinishedException;
 import org.ow2.proactive.scheduler.common.exception.JobCreationException;
@@ -50,7 +50,7 @@ public class SchedulerStateRest {
 
 
     @GET
-    @Path("jobsids")
+    @Path("jobs")
     @Produces("application/json")
     public List<String> getJobsIds(@HeaderParam("sessionid") String sessionId) throws NotConnectedException,
             PermissionException {
@@ -59,10 +59,10 @@ public class SchedulerStateRest {
         s = checkAccess(sessionId);
 
         List<JobState> jobs = new ArrayList<JobState>();
-
-        jobs.addAll(s.getState().getPendingJobs());
-        jobs.addAll(s.getState().getRunningJobs());
-        jobs.addAll(s.getState().getFinishedJobs());
+        SchedulerState state = s.getState();
+        jobs.addAll(state.getPendingJobs());
+        jobs.addAll(state.getRunningJobs());
+        jobs.addAll(state.getFinishedJobs());
 
         List<String> names = new ArrayList<String>();
         for (JobState j : jobs) {
@@ -74,16 +74,16 @@ public class SchedulerStateRest {
     }
 
     @GET
-    @Path("jobs")
+    @Path("jobsinfo")
     @Produces({ "application/json", "application/xml" })
     public List<UserJobInfo> jobs(@HeaderParam("sessionid") String sessionId) throws PermissionException,
             NotConnectedException {
         Scheduler s = checkAccess(sessionId);
         List<JobState> jobs = new ArrayList<JobState>();
-
-        jobs.addAll(s.getState().getPendingJobs());
-        jobs.addAll(s.getState().getRunningJobs());
-        jobs.addAll(s.getState().getFinishedJobs());
+        SchedulerState state = s.getState();
+        jobs.addAll(state.getPendingJobs());
+        jobs.addAll(state.getRunningJobs());
+        jobs.addAll(state.getFinishedJobs());
 
         List<UserJobInfo> jobInfoList = new ArrayList<UserJobInfo>();
         for (JobState j : jobs) {
@@ -92,12 +92,31 @@ public class SchedulerStateRest {
         return jobInfoList;
 
     }
+    
+    @GET
+    @Path("state")
+    @Produces({ "application/json", "application/xml" })
+    public SchedulerState schedulerState(@HeaderParam("sessionid") String sessionId) throws PermissionException,
+            NotConnectedException {
+        Scheduler s = checkAccess(sessionId);
+        return PAFuture.getFutureValue(s.getState());
+    }
+    
+    @GET
+    @Path("state/myjobsonly")
+    @Produces({ "application/json", "application/xml" })
+    public SchedulerState getSchedulerStateMyJobsOnly(@HeaderParam("sessionid") String sessionId) throws PermissionException,
+            NotConnectedException {
+        Scheduler s = checkAccess(sessionId);
+        return PAFuture.getFutureValue(s.getState(true));
+    }
+    
 
     @GET
     @Path("jobs/{jobid}")
     @Produces({ "application/json", "application/xml" })
     @XmlJavaTypeAdapter(value = PersistentMapConverter.class, type = PersistentMap.class)
-    public MyJobState job(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId)
+    public JobState job(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId)
             throws NotConnectedException, UnknownJobException, PermissionException {
         Scheduler s = checkAccess(sessionId);
 
@@ -105,14 +124,14 @@ public class SchedulerStateRest {
         js = s.getJobState(jobId);
         js = PAFuture.getFutureValue(js);
       
-        return new MyJobState(js);
+        return js;
       
 
     }
 
     @GET
     @Path("jobs/{jobid}/result")
-    @Produces("*/*")
+    @Produces("application/json")
         
     public JobResult jobResult(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId)
             throws NotConnectedException, PermissionException, UnknownJobException {
@@ -142,7 +161,7 @@ public class SchedulerStateRest {
     }
 
     @GET
-    @Path("jobs/{jobid}/tasksids")  
+    @Path("jobs/{jobid}/tasks")  
     @Produces("application/json")
     public List<String> getJobTasksIds(@HeaderParam("sessionid") String sessionId,
             @PathParam("jobid") String jobId) throws NotConnectedException, UnknownJobException,
@@ -161,21 +180,22 @@ public class SchedulerStateRest {
     }
 
     @GET
-    @Path("jobs/{jobid}/tasks")  
+    @Path("jobs/{jobid}/taskstates")  
     @Produces("application/json")
-    public List<TaskStateWrapper> getJobTasks(@HeaderParam("sessionid") String sessionId,
+    public List<TaskState> getJobTaskStates(@HeaderParam("sessionid") String sessionId,
             @PathParam("jobid") String jobId) throws NotConnectedException, UnknownJobException,
             PermissionException {
         Scheduler s = checkAccess(sessionId);
         JobState jobState;
 
         jobState = s.getJobState(jobId);
-        List<TaskStateWrapper> taskW = new ArrayList<TaskStateWrapper>();
-        for (TaskState ts : jobState.getTasks()) {
-            taskW.add(new TaskStateWrapper(ts));
-        }
 
-        return taskW;
+        List<TaskState> tasks = new ArrayList<TaskState>();
+      for (TaskState ts : jobState.getTasks()) {
+          tasks.add(ts);
+      } 
+        
+        return tasks;
 
     }
 
@@ -200,18 +220,28 @@ public class SchedulerStateRest {
     }
 
     @GET
-    @Path("jobs/{jobid}/tasks/{taskid}/result")
+    @Path("jobs/{jobid}/tasks/{taskid}/result/value")
     @Produces("*/*")
-    public Serializable taskresult(@HeaderParam("sessionid") String sessionId,
+    public Serializable valueOftaskresult(@HeaderParam("sessionid") String sessionId,
             @PathParam("jobid") String jobId, @PathParam("taskid") String taskId) throws Throwable {
         Scheduler s = checkAccess(sessionId);
 
         TaskResult tr = s.getTaskResult(jobId, taskId);
         return tr.value();
     }
+    
+    @GET
+    @Path("jobs/{jobid}/tasks/{taskid}/result")
+    @Produces("application/json")
+    public TaskResult taskresult(@HeaderParam("sessionid") String sessionId,
+            @PathParam("jobid") String jobId, @PathParam("taskid") String taskId) throws Throwable {
+        Scheduler s = checkAccess(sessionId);
+        TaskResult tr = s.getTaskResult(jobId, taskId);
+        return PAFuture.getFutureValue(tr);
+    }
 
     @GET
-    @Path("jobs/{jobid}/tasks/{taskid}/log/all")
+    @Path("jobs/{jobid}/tasks/{taskid}/result/log/all")
     @Produces("*/*")
     public String tasklog(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId,
             @PathParam("taskid") String taskId) throws NotConnectedException, UnknownJobException,
@@ -222,7 +252,7 @@ public class SchedulerStateRest {
     }
 
     @GET
-    @Path("jobs/{jobid}/tasks/{taskid}/log/err")
+    @Path("jobs/{jobid}/tasks/{taskid}/result/log/err")
     @Produces("*/*")
     public String tasklogErr(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId,
             @PathParam("taskid") String taskId) throws NotConnectedException, UnknownJobException,
@@ -234,7 +264,7 @@ public class SchedulerStateRest {
     }
 
     @GET
-    @Path("jobs/{jobid}/tasks/{taskid}/log/out")
+    @Path("jobs/{jobid}/tasks/{taskid}/result/log/out")
     @Produces("*/*")
     public String tasklogout(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId,
             @PathParam("taskid") String taskId) throws NotConnectedException, UnknownJobException,
@@ -469,6 +499,15 @@ public class SchedulerStateRest {
         final Scheduler s = checkAccess(sessionId);
         return s.linkResourceManager(rmURL);
 
+    }
+    
+    @PUT
+    @Path("isconnected")
+    @Produces("application/json")
+    public boolean isConnected(@HeaderParam("sessionid") final String sessionId)
+            throws NotConnectedException, PermissionException {
+        final Scheduler s = checkAccess(sessionId);
+        return s.isConnected();
     }
 
 }
