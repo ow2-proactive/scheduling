@@ -79,7 +79,6 @@ public class TaskLauncherInitializer implements Serializable {
     private List<OutputSelector> taskOutputFiles = null;
     private String namingServiceUrl;
     private String owner;
-    private boolean runAsUser;
 
     /**
      * Get the taskId
@@ -205,24 +204,6 @@ public class TaskLauncherInitializer implements Serializable {
      */
     public void setOwner(String owner) {
         this.owner = owner;
-    }
-
-    /**
-     * Get the runAsUser
-     *
-     * @return the runAsUser
-     */
-    public boolean isRunAsUser() {
-        return runAsUser;
-    }
-
-    /**
-     * Set the runAsUser value to the given runAsUser value
-     *
-     * @param runAsUser the runAsUser to set
-     */
-    public void setRunAsUser(boolean runAsUser) {
-        this.runAsUser = runAsUser;
     }
 
     /**

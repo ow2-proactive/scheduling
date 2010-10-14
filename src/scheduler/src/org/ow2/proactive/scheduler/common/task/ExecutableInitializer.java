@@ -38,6 +38,8 @@ package org.ow2.proactive.scheduler.common.task;
 
 import java.io.Serializable;
 
+import org.ow2.proactive.scheduler.task.launcher.TaskLauncher.OneShotDecrypter;
+
 
 /**
  * ExecutableInitializer is used to initialized the executable.
@@ -47,5 +49,19 @@ import java.io.Serializable;
  * @since ProActive Scheduling 1.0
  */
 public interface ExecutableInitializer extends Serializable {
+
+    /**
+     * Set the decrypter value to the given decrypter value
+     *
+     * @param decrypter the decrypter to set
+     */
+    public void setDecrypter(OneShotDecrypter decrypter);
+
+    /**
+     * Get the decrypter from this initializer
+     *
+     * @return the decrypter from this initializer
+     */
+    public OneShotDecrypter getDecrypter();
 
 }

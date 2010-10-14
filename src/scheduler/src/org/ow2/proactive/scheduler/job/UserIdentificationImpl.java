@@ -65,9 +65,6 @@ public class UserIdentificationImpl extends UserIdentification {
     /** user subject */
     private Subject subject;
 
-    /** user credential encrypted with scheduler public key */
-    private Credentials credential;
-
     /** Number of submit for this user */
     private int submitNumber = 0;
 
@@ -82,6 +79,10 @@ public class UserIdentificationImpl extends UserIdentification {
 
     /** Tell if this user want to receive all events or only his events */
     private boolean myEventsOnly = false;
+
+    /** User credential encrypted with scheduler public key */
+    //WARNING - must be transient as it MUST NOT be sent to client side
+    private transient Credentials credential;
 
     /** List of events that the user want to receive. */
     private transient HashSet<SchedulerEvent> userEvents = null;

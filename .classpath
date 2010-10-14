@@ -129,7 +129,7 @@
 	<classpathentry kind="lib" path="lib/ProActive/XmlSchema-1.4.5.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/bcel-5.2.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/commons-discovery-0.4.jar"/>
-	<classpathentry kind="lib" path="lib/ProActive/ProActive.jar" sourcepath="/ProActive"/>
+	<classpathentry kind="lib" path="lib/ProActive/ProActive.jar"/>
 	<classpathentry kind="lib" path="lib/winhpc/WinHPCWebserviceStubs.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/commons-codec-1.3.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/fractal-api-2.0.3-SNAPSHOT.jar"/>

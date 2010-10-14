@@ -39,6 +39,7 @@ package org.ow2.proactive.scheduler.task;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.util.HashMap;
@@ -52,12 +53,15 @@ import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.extensions.processbuilder.OSProcessBuilder;
 import org.ow2.proactive.scheduler.common.exception.UserException;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.Executable;
 import org.ow2.proactive.scheduler.exception.RunningProcessException;
 import org.ow2.proactive.scheduler.exception.StartProcessException;
+import org.ow2.proactive.scheduler.task.launcher.TaskLauncher.OneShotDecrypter;
 import org.ow2.proactive.scheduler.task.launcher.TaskLauncher.SchedulerVars;
+import org.ow2.proactive.scheduler.task.launcher.utils.ForkerUtils;
 import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 import org.ow2.proactive.scheduler.util.process.ProcessTreeKiller;
 import org.ow2.proactive.scheduler.util.process.ThreadReader;
@@ -109,13 +113,16 @@ public class NativeExecutable extends Executable {
     private Map<String, String> modelEnvVar = null;
 
     /** Env vars used by system call */
-    private String[] envVarsTab;
+    private Map<String, String> envVarsTab;
 
     /** Generated command */
     private String[] command;
 
     /** File used to store nodes URL */
     private File nodesFiles = null;
+
+    /** Decrypter to start native process */
+    private OneShotDecrypter decrypter = null;
 
     /**
      * Initialize the executable using the given executable container.
@@ -170,6 +177,8 @@ public class NativeExecutable extends Executable {
 
         //set environment variables
         this.setEnvironmentVariables(nodes.size());
+        //set decrypter
+        this.decrypter = execInitializer.getDecrypter();
     }
 
     /**
@@ -247,30 +256,25 @@ public class NativeExecutable extends Executable {
         // current env
         Map<String, String> systemEnvVariables = System.getenv();
 
-        int i = 0;
-        int nbVars = taskEnvVariables.size() + systemEnvVariables.size() +
-            ((taskExportedProperties != null) ? taskExportedProperties.size() : 0);
+        envVarsTab = new HashMap<String, String>();
         if (nodesFiles != null) {
-            envVarsTab = new String[nbVars + 3];
-            envVarsTab[i++] = CORE_FILE_ENV + "=" + nodesFiles.getAbsolutePath();
-        } else {
-            envVarsTab = new String[nbVars + 2];
+            envVarsTab.put(CORE_FILE_ENV, nodesFiles.getAbsolutePath());
         }
 
-        envVarsTab[i++] = CORE_NB + "=" + coresNumber;
+        envVarsTab.put(CORE_NB, "" + coresNumber);
 
         //first we add to the returnTab the task environment variables
         for (Map.Entry<String, String> entry : taskEnvVariables.entrySet()) {
             String name = entry.getKey();
             String value = entry.getValue();
-            envVarsTab[i++] = convertJavaenvNameToSysenvName(name) + "=" + value;
+            envVarsTab.put(convertJavaenvNameToSysenvName(name), value);
         }
 
         //after we add to the returnTab the system environment variables
         for (Map.Entry<String, String> entry : systemEnvVariables.entrySet()) {
             String name = entry.getKey();
             String value = entry.getValue();
-            envVarsTab[i++] = name + "=" + value;
+            envVarsTab.put(name, value);
         }
 
         //then we add exported properties
@@ -278,12 +282,12 @@ public class NativeExecutable extends Executable {
             for (Map.Entry<String, String> entry : taskExportedProperties.entrySet()) {
                 String name = entry.getKey();
                 String value = entry.getValue();
-                envVarsTab[i++] = convertJavaenvNameToSysenvName(name) + "=" + value;
+                envVarsTab.put(convertJavaenvNameToSysenvName(name), value);
             }
         }
 
         //then the cookie used by ProcessTreeKiller
-        envVarsTab[i] = COOKIE_ENV + "=" + cookie_value;
+        envVarsTab.put(COOKIE_ENV, cookie_value);
     }
 
     /**
@@ -295,7 +299,7 @@ public class NativeExecutable extends Executable {
             //WARNING : if this.command is unknown, it will create a defunct process
             //it's due to a known java bug
             try {
-                process = Runtime.getRuntime().exec(this.command, this.envVarsTab, this.wDirFile);
+                process = createProcessAndStart();
             } catch (Exception e) {
                 //in this case, the error is certainly due to the user (ie : command not found)
                 //we have to inform him about the cause.
@@ -331,6 +335,36 @@ public class NativeExecutable extends Executable {
                 nodesFiles.delete();
             }
         }
+    }
+
+    /**
+     * Creating a child native process, intercepting stdout and stderr
+     * Also ask for credentials with new generated keypair if needed
+     *
+     * @throws IOException
+     */
+    private Process createProcessAndStart() throws Exception {
+        //build process
+        OSProcessBuilder ospb = ForkerUtils.getOSProcessBuilderFactory().getBuilder();
+        ospb.command(this.command);
+        ospb.directory(this.wDirFile);
+        Map<String, String> env = ospb.environment();
+        env.putAll(this.envVarsTab);
+        //check if it must be run under user and if so, apply the proper method
+        if (isRunAsUser()) {
+            ForkerUtils.checkConfigAndAddUserToProcess(ospb, this.decrypter);
+        }
+        //and start process
+        return ospb.start();
+    }
+
+    /**
+     * Return true if this task is to be ran under a user account id or not.
+     *
+     * @return true if this task is to be ran under a user account id, false otherwise.
+     */
+    private boolean isRunAsUser() {
+        return this.decrypter != null;
     }
 
     /**

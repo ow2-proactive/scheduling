@@ -103,6 +103,11 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher {
                     .createExecutableInitializer();
             replaceIterationTags(fjei);
             fjei.setJavaTaskLauncherInitializer(initializer);
+            //decrypt credentials if needed
+            if (executableContainer.isRunAsUser()) {
+                decrypter.setCredentials(executableContainer.getCredentials());
+                fjei.setDecrypter(decrypter);
+            }
             //create initializer
             ExecutableContainerInitializer eci = new ExecutableContainerInitializer();
             eci.setClassServer(((ForkedJavaExecutableContainer) executableContainer).getClassServer());

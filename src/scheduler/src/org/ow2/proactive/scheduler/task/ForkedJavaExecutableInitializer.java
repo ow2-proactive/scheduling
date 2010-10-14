@@ -39,6 +39,7 @@ package org.ow2.proactive.scheduler.task;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.JavaExecutableInitializer;
 import org.ow2.proactive.scheduler.task.launcher.TaskLauncherInitializer;
+import org.ow2.proactive.scheduler.task.launcher.TaskLauncher.OneShotDecrypter;
 
 
 /**
@@ -57,6 +58,9 @@ public class ForkedJavaExecutableInitializer extends JavaExecutableInitializer {
 
     /** Java executable container for the forked java task */
     private JavaExecutableContainer javaExecutableContainer;
+
+    /** Decrypter from launcher */
+    private OneShotDecrypter decrypter = null;
 
     /**
      * Create a new instance of ForkedJavaExecutableInitializer
@@ -120,6 +124,20 @@ public class ForkedJavaExecutableInitializer extends JavaExecutableInitializer {
      */
     public void setJavaExecutableContainer(JavaExecutableContainer javaExecutableContainer) {
         this.javaExecutableContainer = javaExecutableContainer;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public OneShotDecrypter getDecrypter() {
+        return decrypter;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setDecrypter(OneShotDecrypter decrypter) {
+        this.decrypter = decrypter;
     }
 
 }

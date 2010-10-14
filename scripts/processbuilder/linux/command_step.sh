@@ -26,6 +26,11 @@ if [ ! -e $tmp ]; then
   exit 1;
 fi;
 
+# if we have data in the file, then it is the dump of the environment
+if [ -s $tmp ]; then
+  source $tmp
+fi;
+
 # working directory for the user command
 workdir="$2"
 
@@ -63,7 +68,7 @@ if [ -e "$cmd_path" ]; then
     "$@"
     # write return value to the temp file
     error=$?
-    echo $error >> $tmp;
+    echo $error > $tmp;
     exit 0;
   else
     error="$OSPL_E_PREFIX java.io.IOException $OSPL_E_CAUSE error=13, Permission denied ";

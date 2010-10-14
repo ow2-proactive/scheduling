@@ -45,6 +45,14 @@ goto :skip
 :use_psexec
 set passw=%PA_OSPB_USER_PASSWORD%
 set PA_OSPB_USER_PASSWORD=***
+
+:: OPTIONAL - BUT SAFER
+:: check if we have the PsExec around
+for %%a in ("PsExec.exe") do set foundps=%%~$PATH:a
+IF EXIST PsExec.exe set foundps=%foundps%found
+IF "%foundps%"=="" (echo %OSPL_E_PREFIX% %OSLP_PACKAGE%FatalProcessBuilderException %OSPL_E_CAUSE% Could not locate PsExec.exe on the system! 1>&2) && (exit 0)
+:: END OF OPTIONAL
+
 (PsExec.exe -u %usr% -p "%passw%" %CD%\command_step_redirect.bat %CD% %workdir% %envfile% %outpipe% 2>NUL) || ((echo %OSPL_E_PREFIX% %OSLP_PACKAGE%OSUserException %OSPL_E_CAUSE% Cannot execute as user %usr%! 1>&2) && (echo 1 > %outpipe%o) && (echo 1 > %outpipe%e) && (exit 0))
 
 :skip

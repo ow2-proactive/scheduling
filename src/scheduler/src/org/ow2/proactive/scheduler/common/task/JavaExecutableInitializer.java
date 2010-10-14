@@ -44,6 +44,7 @@ import java.util.Map.Entry;
 
 import org.objectweb.proactive.core.util.converter.ByteToObjectConverter;
 import org.objectweb.proactive.core.util.converter.ObjectToByteConverter;
+import org.ow2.proactive.scheduler.task.launcher.TaskLauncher.OneShotDecrypter;
 import org.ow2.proactive.utils.NodeSet;
 
 
@@ -133,6 +134,20 @@ public class JavaExecutableInitializer implements ExecutableInitializer {
      */
     public void setSerializedArguments(Map<String, byte[]> serializedArguments) {
         this.serializedArguments = serializedArguments;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public OneShotDecrypter getDecrypter() {
+        throw new RuntimeException("Should not be called in this context");
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setDecrypter(OneShotDecrypter decrypter) {
+        throw new RuntimeException("Should not be called in this context");
     }
 
 }

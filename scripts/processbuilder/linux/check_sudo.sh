@@ -3,32 +3,53 @@
 
 # arguments:
 #	$1 - username
-#	$2 - password in plaintext (optional)
-#	$3 - scripts home folder (needed only if we also have a password)
+#	$2 - scripts home folder (needed only if we also have a password)
+username=$1
+passw=$PA_OSPB_USER_PASSWORD
+keycont=$PA_OSPB_USER_KEY_CONTENT
 
-if [ "$2" == "" ]; then
-  echo 0 | sudo -Su "$1" whoami
+export PA_OSPB_USER_PASSWORD=***
+export PA_OSPB_USER_KEY_CONTENT=***
+
+if [ "$passw" == "" ]; then
+  if [ "$keycont" == "" ]; then
+    echo 0 | sudo -Su "$username" whoami
+  else
+    # use ssh
+    keyfile=`mktemp`
+    echo "$keycont" > $keyfile
+    chmod 400 $keyfile
+    echo $keyfile $username
+    ssh -n -i $keyfile $username@localhost whoami
+    if [ $? == 0 ]; then
+      echo $usr
+    else
+      echo FAIL
+    fi;
+    rm $keyfile
+    exit 0;
+  fi;
 else
   # check if we are running on a 64bit arch, or a 32bit one.
   # The only difference between the 'suer' executables is their
   # target architecture used at compilation time.
   if [[ `uname -i` == *64* ]];
   then
-    if [ ! -e "$3/suer64" ];
+    if [ ! -e "$2/suer64" ];
     then
-      error="$OSPL_E_PREFIX java.io.IOException $OSPL_E_CAUSE error=2, No such file (${3}/suer64) ";
+      error="$OSPL_E_PREFIX java.io.IOException $OSPL_E_CAUSE error=2, No such file (${2}/suer64) ";
       echo $error 1>&2;
       exit 1;
     fi
-    "$3/suer64" "$1" "$2" whoami;
+    "$2/suer64" "$username" "$passw" whoami;
   else
-    if [ ! -e "$3/suer32" ];
+    if [ ! -e "$2/suer32" ];
     then
-      error="$OSPL_E_PREFIX java.io.IOException $OSPL_E_CAUSE error=2, No such file (${3}/suer32) ";
+      error="$OSPL_E_PREFIX java.io.IOException $OSPL_E_CAUSE error=2, No such file (${2}/suer32) ";
       echo $error 1>&2;
       exit 1;
     fi
-    "$3/suer32" "$1" "$2" whoami;
+    "$2/suer32" "$username" "$passw" whoami;
   fi
   ###### DEVELOPER NOTE:
   #	In case the 'suer' solution does not meet all requirements, it is possible to conveniently replace

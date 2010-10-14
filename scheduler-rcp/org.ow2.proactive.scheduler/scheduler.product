@@ -34,10 +34,8 @@
       </win>
    </launcher>
 
-
    <vm>
    </vm>
-
 
    <plugins>
       <plugin id="org.objectweb.proactive.ic2d.chartit"/>

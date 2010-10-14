@@ -130,6 +130,11 @@ public class NativeTaskLauncher extends TaskLauncher {
             ExecutableInitializer execInit = executableContainer.createExecutableInitializer();
             replaceWorkingDirDSTags(execInit);
             replaceIterationTag(((NativeExecutableInitializer) execInit).getGenerationScript());
+            //decrypt credentials if needed
+            if (executableContainer.isRunAsUser()) {
+                decrypter.setCredentials(executableContainer.getCredentials());
+                execInit.setDecrypter(decrypter);
+            }
             callInternalInit(NativeExecutable.class, NativeExecutableInitializer.class, execInit);
             replaceIterationTags(execInit);
 

@@ -39,6 +39,7 @@ package org.ow2.proactive.scheduler.task;
 import java.util.List;
 
 import org.ow2.proactive.scheduler.common.task.ExecutableInitializer;
+import org.ow2.proactive.scheduler.task.launcher.TaskLauncher.OneShotDecrypter;
 import org.ow2.proactive.scripting.GenerationScript;
 
 
@@ -61,6 +62,9 @@ public class NativeExecutableInitializer implements ExecutableInitializer {
 
     /** Store required node host name list */
     protected List<String> nodesHost;
+
+    /** Decrypter from launcher */
+    private OneShotDecrypter decrypter = null;
 
     /**
      * Get the command
@@ -132,6 +136,20 @@ public class NativeExecutableInitializer implements ExecutableInitializer {
      */
     public void setNodesHost(List<String> nodesHost) {
         this.nodesHost = nodesHost;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public OneShotDecrypter getDecrypter() {
+        return decrypter;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setDecrypter(OneShotDecrypter decrypter) {
+        this.decrypter = decrypter;
     }
 
 }

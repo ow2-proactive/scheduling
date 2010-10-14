@@ -129,4 +129,13 @@ public abstract class ExecutableContainer implements Serializable {
         this.credentials = credentials;
     }
 
+    /**
+     * Return true if user want to run the task under his account id, false otherwise.
+     *
+     * @return true if user want to run the task under his account id, false otherwise.
+     */
+    public boolean isRunAsUser() {
+        return this.credentials != null;
+    }
+
 }

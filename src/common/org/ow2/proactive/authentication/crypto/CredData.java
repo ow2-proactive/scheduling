@@ -44,6 +44,9 @@ import org.objectweb.proactive.annotation.PublicAPI;
 /**
  * Dummy class used to properly separate login, password and key:
  * will be serialized and encrypted
+ *
+ * @author The ProActive Team
+ * @since ProActive Scheduling 2.2
  */
 @PublicAPI
 public class CredData implements Serializable {

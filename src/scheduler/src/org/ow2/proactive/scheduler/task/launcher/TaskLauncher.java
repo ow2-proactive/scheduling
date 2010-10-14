@@ -38,6 +38,7 @@ package org.ow2.proactive.scheduler.task.launcher;
 
 import java.io.PrintStream;
 import java.lang.reflect.Method;
+import java.security.KeyException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
@@ -73,6 +74,8 @@ import org.objectweb.proactive.extensions.dataspaces.core.DataSpacesNodes;
 import org.objectweb.proactive.extensions.dataspaces.exceptions.FileSystemException;
 import org.objectweb.proactive.extensions.dataspaces.vfs.selector.fast.FastFileSelector;
 import org.objectweb.proactive.extensions.dataspaces.vfs.selector.fast.FastSelector;
+import org.ow2.proactive.authentication.crypto.CredData;
+import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.db.types.BigString;
 import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
 import org.ow2.proactive.scheduler.common.exception.UserException;
@@ -130,7 +133,7 @@ public abstract class TaskLauncher implements InitActive {
     protected List<InputSelector> inputFiles;
     protected List<OutputSelector> outputFiles;
 
-    protected PrivateKey privateKey = null;
+    protected OneShotDecrypter decrypter = null;
 
     /**
      * Scheduler related java properties. Thoses properties are automatically
@@ -302,19 +305,15 @@ public abstract class TaskLauncher implements InitActive {
      * Generate a couple of key and return the public one
      *
      * @return the generated public key
+     * @throws NoSuchAlgorithmException if RSA is unknown
      */
-    public PublicKey generatePublicKey() {
+    public PublicKey generatePublicKey() throws NoSuchAlgorithmException {
         KeyPairGenerator keyGen = null;
-        try {
-            keyGen = KeyPairGenerator.getInstance("RSA");
-        } catch (NoSuchAlgorithmException e) {
-            //should not happen as RSA is well known
-            logger_dev.fatal("", e);
-        }
+        keyGen = KeyPairGenerator.getInstance("RSA");
         keyGen.initialize(KEY_SIZE, new SecureRandom());
         KeyPair keyPair = keyGen.generateKeyPair();
         //connect to the authentication interface and ask for new cred
-        privateKey = keyPair.getPrivate();
+        decrypter = new OneShotDecrypter(keyPair.getPrivate());
         return keyPair.getPublic();
     }
 
@@ -961,5 +960,73 @@ public abstract class TaskLauncher implements InitActive {
         }
 
         script.setScript(code);
+    }
+
+    /**
+     * OneShotDecrypter is used to ensure one shot usage of private key for a decryption.
+     *
+     * @author The ProActive Team
+     * @since ProActive Scheduling 2.2
+     */
+    public static final class OneShotDecrypter {
+        private PrivateKey key = null;
+        private Credentials credentials = null;
+
+        /**
+         * Create a new instance of OneShotDecrypter
+         *
+         * @param key the private key that will be used for decryption
+         */
+        OneShotDecrypter(PrivateKey key) {
+            if (key == null) {
+                throw new IllegalArgumentException("Given key cannot be null");
+            }
+            this.key = key;
+        }
+
+        /**
+         * Set the credentials to be decrypted.
+         * This method is not mandatory. It allows to store the credentials temporarily.
+         * A call to {@link #decrypt(Credentials)} or {@link #decrypt()} will clear the key and credentials.
+         *
+         * @param cred the credentials to be decrypted.
+         */
+        public void setCredentials(Credentials cred) {
+            this.credentials = cred;
+        }
+
+        /**
+         * Decrypt the given credential with this object private key.
+         *
+         * @param cred the credentials to be decrypted
+         * @return the decrypted credData
+         * @throws IllegalAccessException if the key is null or have already been used to decrypt a credential
+         * @throws KeyException decryption failure, malformed data
+         */
+        public CredData decrypt(final Credentials cred) throws IllegalAccessException, KeyException {
+            if (this.key == null) {
+                throw new IllegalAccessException("Cannot decrypt credentials !");
+            }
+            //decrypt
+            CredData data = cred.decrypt(this.key);
+            //reset key
+            this.key = null;
+            return data;
+        }
+
+        /**
+         * Decrypt the stored credential with this object private key.
+         *
+         * @return the decrypted credData
+         * @throws IllegalAccessException if the key is null or have already been used to decrypt a credential
+         * 			or if no credentials has been provided before this call.
+         * @throws KeyException decryption failure, malformed data
+         */
+        public CredData decrypt() throws IllegalAccessException, KeyException {
+            if (this.credentials == null) {
+                throw new IllegalAccessException("Cannot decrypt credentials !");
+            }
+            return decrypt(this.credentials);
+        }
     }
 }

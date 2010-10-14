@@ -204,6 +204,7 @@
 				<include name="org/ow2/proactive/scheduler/task/KillTask.java" />
 				<include name="org/ow2/proactive/scheduler/task/NativeExecutableContainer.java" />
 				<include name="org/ow2/proactive/scheduler/task/NativeExecutableInitializer.java" />
+				<include name="org/ow2/proactive/scheduler/task/launcher/utils/ForkerUtils.java" />
 				<include name="org/ow2/proactive/scheduler/core/properties/PASchedulerProperties.java" />
 				<include name="org/ow2/proactive/scheduler/util/SchedulerDevLoggers.java" />
 				<include name="org/ow2/proactive/scheduler/util/process/EnvVars.java" />

@@ -192,7 +192,6 @@ public class Credentials implements Serializable {
         FileInputStream fin = null;
 
         String algo = "", tmp = "";
-        int size = 0;
 
         // recover public key bytes
         try {
@@ -209,7 +208,6 @@ public class Credentials implements Serializable {
                 tot++;
             }
             tot++;
-            size = Integer.parseInt(tmp);
 
             bytes = new byte[(int) f.length() - tot];
             in.readFully(bytes);

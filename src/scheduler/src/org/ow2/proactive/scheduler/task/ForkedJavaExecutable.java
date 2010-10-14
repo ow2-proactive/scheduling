@@ -68,7 +68,6 @@ import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.core.runtime.StartPARuntime;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.processbuilder.OSProcessBuilder;
-import org.objectweb.proactive.extensions.processbuilder.OSProcessBuilderFactory;
 import org.ow2.proactive.scheduler.common.exception.InternalSchedulerException;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
@@ -78,6 +77,7 @@ import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
 import org.ow2.proactive.scheduler.task.launcher.JavaTaskLauncher;
 import org.ow2.proactive.scheduler.task.launcher.TaskLauncherInitializer;
+import org.ow2.proactive.scheduler.task.launcher.utils.ForkerUtils;
 import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 
 
@@ -161,7 +161,7 @@ public class ForkedJavaExecutable extends JavaExecutable {
             createRegistrationListener();
 
             logger_dev.debug("Create JVM process with command : " + command);
-            createJVMProcess();
+            process = createJVMProcess();
 
             waitForRegistration();
 
@@ -353,23 +353,29 @@ public class ForkedJavaExecutable extends JavaExecutable {
      * Also ask for credentials with new generated keypair
      * @throws IOException
      */
-    private void createJVMProcess() throws Exception {
-        System.setProperty("proactive.home", ProActiveRuntimeImpl.getProActiveRuntime().getProActiveHome());
+    private Process createJVMProcess() throws Exception {
         //build process
-        OSProcessBuilder ospb = OSProcessBuilderFactory.getBuilder();
+        OSProcessBuilder ospb = ForkerUtils.getOSProcessBuilderFactory().getBuilder();
         ospb.command(command.toArray(new String[command.size()]));
-        //check if it must be run under user
-        if (this.execInitializer.getJavaTaskLauncherInitializer().isRunAsUser()) {
-            //TODO
-            //ospb.user(new OSUser(credentials[0], credentials[1]));
+        //check if it must be run under user and if so, apply the proper method
+        if (isRunAsUser()) {
+            ForkerUtils.checkConfigAndAddUserToProcess(ospb, this.execInitializer.getDecrypter());
         }
-
         //and start process
-        process = ospb.start();
+        return ospb.start();
     }
 
     /**
-     * Create a java task launcher on the loval new JVM
+     * Return true if this task is to be ran under a user account id or not.
+     *
+     * @return true if this task is to be ran under a user account id, false otherwise.
+     */
+    private boolean isRunAsUser() {
+        return this.execInitializer.getDecrypter() != null;
+    }
+
+    /**
+     * Create a java task launcher on the local new JVM
      *
      * @return the created java task launcher
      * @throws Exception

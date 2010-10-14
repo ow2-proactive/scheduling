@@ -33,12 +33,32 @@ workdir=$2
 shift; shift; shift;
 
 passw=$PA_OSPB_USER_PASSWORD
+keycont=$PA_OSPB_USER_KEY_CONTENT
+
 export PA_OSPB_USER_PASSWORD=***
+export PA_OSPB_USER_KEY_CONTENT=***
 
 if [ "$passw" == "" ]; then
-  # use sudo
-  echo 0 | sudo -ESHu $usr ./command_step.sh $tmp "$workdir" "$@";
-  exitc=$?
+  if [ "$keycont" == "" ]; then
+    # use sudo
+    echo 0 | sudo -ESHu $usr ./command_step.sh $tmp "$workdir" "$@";
+    exitc=$?
+  else
+    # use ssh
+    export >> $tmp;
+
+    keyfile=`mktemp`
+    echo "$keycont" > $keyfile
+    chmod 400 $keyfile
+
+    for i in "$@"
+      do
+      args="${args} ""'"${i//\'/\'\"\'\"\'}"'"
+    done
+    ssh -n -i $keyfile $usr@localhost `pwd`/command_step.sh $tmp "$workdir" $args
+    exitc=$?
+    rm $keyfile
+  fi;
 else
   # if we use the 'suer' than since it will write the command to the shell as text, we have to make
   # sure that our command will always be wellformed. Thus, we write it out to environment variables
@@ -58,10 +78,10 @@ else
   # target architecture used at compilation time.
   if [[ `uname -i` == *64* ]];
   then
-    ./suer64 $usr "$passw" ./command_step.sh $tmp "$workdir" $args;
+    echo "$passw" | ./suer64 $usr ./command_step.sh $tmp "$workdir" $args;
     exitc=$?
   else
-    ./suer32 $usr "$passw" ./command_step.sh $tmp "$workdir" $args;
+    echo "$passw" | ./suer32 $usr ./command_step.sh $tmp "$workdir" $args;
     exitc=$?
   fi
   ###### DEVELOPER NOTE:
@@ -75,9 +95,8 @@ fi;
 
 # sudo should exit with error code 1 only in case it was unsuccessful
 # the command which is executed inside will pass its return value through a tempfile
-if [ $exitc == 1 ]; then
-  error="$OSPL_E_PREFIX ${OSLP_PACKAGE}OSUserException $OSPL_E_CAUSE Cannot execute as user $usr!";
+if [ $exitc != 0 ]; then
+  error="$OSPL_E_PREFIX ${OSLP_PACKAGE}OSUserException $OSPL_E_CAUSE Cannot execute as user $usr! (Code=$exitc)";
   echo $error 1>&2;
   exit 1;
 fi;
-

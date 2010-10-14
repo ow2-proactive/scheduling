@@ -35,6 +35,7 @@
 package org.ow2.proactive.scheduler.core;
 
 import java.security.KeyException;
+import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -121,16 +122,17 @@ public class TimedDoTaskAction implements CallableWithTimeoutAction<TaskResult> 
      * decrypt user credentials, and re-encrypt them using the received public key.
      *
      * @throws KeyException if there was a problem while moving credentials
+     * @throws NoSuchAlgorithmException if RSA is unknown
      */
-    private void FillContainerWithEncryption() throws KeyException {
+    private void FillContainerWithEncryption() throws KeyException, NoSuchAlgorithmException {
         //do nothing if runAsMe is false or not set
         if (task.isRunAsMe()) {
             PublicKey pubkey = launcher.generatePublicKey();
-            //decrypt -> credentials[1] will contains the password
-            CredData credentials = task.getCredentials().decrypt(corePk);
+            //decrypt user credential with core private key
+            CredData credDataFromClient = task.getCredentials().decrypt(corePk);
             //cred becomes the credentials to be returned with new publicKey encryption
-            Credentials cred = Credentials.createCredentials(credentials, pubkey);
-            task.getExecutableContainer().setCredentials(cred);
+            Credentials credForNode = Credentials.createCredentials(credDataFromClient, pubkey);
+            task.getExecutableContainer().setCredentials(credForNode);
         }
     }
 
