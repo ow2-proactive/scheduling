@@ -41,7 +41,7 @@ import org.ow2.proactive.scheduler.ext.filessplitmerge.logging.LoggerManager;
  * You must init the proxy by calling the {@link #init(String, String, String)} method after having created it
  */
 @ActiveObject
-public class SchedulerProxyUserInterface implements Scheduler,Serializable{
+public class SchedulerProxyUserInterface implements Scheduler, Serializable {
 
     protected Scheduler uischeduler;
 
@@ -327,6 +327,5 @@ public class SchedulerProxyUserInterface implements Scheduler,Serializable{
     public SchedulerState getState(boolean myJobsOnly) throws NotConnectedException, PermissionException {
         return uischeduler.getState(myJobsOnly);
     }
-
 
 }

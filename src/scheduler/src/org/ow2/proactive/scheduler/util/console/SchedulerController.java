@@ -36,6 +36,8 @@
  */
 package org.ow2.proactive.scheduler.util.console;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.security.KeyException;
@@ -69,12 +71,12 @@ import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.factories.FlatJobFactory;
 import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
+import org.ow2.proactive.utils.FileToBytesConverter;
 import org.ow2.proactive.utils.Tools;
 import org.ow2.proactive.utils.console.Console;
 import org.ow2.proactive.utils.console.JVMPropertiesPreloader;
 import org.ow2.proactive.utils.console.JlineConsole;
 import org.ow2.proactive.utils.console.MBeanInfoViewer;
-import org.ow2.proactive.utils.console.VisualConsole;
 
 
 /**
@@ -148,9 +150,11 @@ public class SchedulerController {
         schedulerURL.setRequired(false);
         options.addOption(schedulerURL);
 
-        Option visual = new Option("g", "gui", false, "Start the console in a graphical view");
-        schedulerURL.setRequired(false);
-        options.addOption(visual);
+        Option keyfile = new Option("k", "key", true, "(Optional) The path to a private SSH key");
+        keyfile.setArgName("sshkeyFilePath");
+        keyfile.setArgs(1);
+        keyfile.setRequired(false);
+        options.addOption(keyfile);
 
         addCommandLineOptions(options);
 
@@ -233,8 +237,18 @@ public class SchedulerController {
                         }
                     }
                     try {
-                        this.credentials = Credentials.createCredentials(new CredData(user, pwd), pubKey);
-                    } catch (KeyException e) {
+                        if (cmd.hasOption("key")) {
+                            byte[] keyfileContent = FileToBytesConverter.convertFileToByteArray(new File(cmd
+                                    .getOptionValue("key")));
+                            this.credentials = Credentials.createCredentials(new CredData(user, pwd,
+                                keyfileContent), pubKey);
+                        } else {
+                            this.credentials = Credentials.createCredentials(new CredData(user, pwd), pubKey);
+                        }
+                    } catch (FileNotFoundException fnfe) {
+                        logger.error("SSH keyfile not found : '" + cmd.getOptionValue("key") + "'");
+                        System.exit(1);
+                    } catch (Exception e) {
                         logger.error("Could not create credentials... " + e);
                         throw e;
                     }
@@ -511,11 +525,7 @@ public class SchedulerController {
 
     private void startCommandListener() throws Exception {
         Console console;
-        if (cmd.hasOption("gui")) {
-            console = new VisualConsole();
-        } else {
-            console = new JlineConsole();
-        }
+        console = new JlineConsole();
         model.connectConsole(console);
         model.startModel();
     }

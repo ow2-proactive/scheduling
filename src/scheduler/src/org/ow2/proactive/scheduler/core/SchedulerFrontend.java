@@ -51,6 +51,7 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.mop.MOP;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.permissions.MethodCallPermission;
 import org.ow2.proactive.policy.ClientsPolicy;
 import org.ow2.proactive.scheduler.authentication.SchedulerAuthentication;
@@ -131,6 +132,9 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
     /** Mapping on the UniqueId of the sender and the user/admin identifications */
     private Map<UniqueID, UserIdentificationImpl> identifications;
 
+    /** Map that link uniqueID to user credentials */
+    private Map<UniqueID, Credentials> credentials;
+
     /** List used to mark the user that does not respond anymore */
     private Set<UniqueID> dirtyList;
 
@@ -186,6 +190,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
      */
     public SchedulerFrontend(ResourceManagerProxy imp, String policyFullClassName) {
         this.identifications = new HashMap<UniqueID, UserIdentificationImpl>();
+        this.credentials = new HashMap<UniqueID, Credentials>();
         this.dirtyList = new HashSet<UniqueID>();
         this.currentJobToSubmit = new InternalJobWrapper();
         this.accountsManager = new SchedulerAccountsManager();
@@ -312,7 +317,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
      * @param identification the identification of the connected user
      * @throws SchedulerException If an error occurred during connection with the front-end.
      */
-    public void connect(UniqueID sourceBodyID, UserIdentificationImpl identification)
+    public void connect(UniqueID sourceBodyID, UserIdentificationImpl identification, Credentials cred)
             throws AlreadyConnectedException {
         if (identifications.containsKey(sourceBodyID)) {
             logger.warn("Active object already connected for this user :" + identification.getUsername());
@@ -320,6 +325,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
         }
         logger.info(identification.getUsername() + " successfully connected !");
         identifications.put(sourceBodyID, identification);
+        credentials.put(sourceBodyID, cred);
         renewUserSession(sourceBodyID, identification);
         //add this new user in the list of connected user
         sState.getUsers().update(identification);
@@ -363,6 +369,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
             SubmissionClosedException, JobCreationException {
         logger_dev.info("New job submission requested : " + userJob.getName());
 
+        UniqueID id = checkAccess();
         UserIdentificationImpl ident = checkPermission("submit",
                 "You do not have permission to submit a job !");
 
@@ -373,7 +380,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
             throw new SubmissionClosedException(msg);
         }
         //get the internal job.
-        InternalJob job = InternalJobFactory.createJob(userJob, ident.getCredentials());
+        InternalJob job = InternalJobFactory.createJob(userJob, this.credentials.get(id));
         //setting job informations
         if (job.getTasks().size() == 0) {
             String msg = "This job does not contain Tasks !! Insert tasks before submitting job";
@@ -752,6 +759,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
      * @param id the uniqueID of the user
      */
     private void disconnect(UniqueID id) {
+        credentials.remove(id);
         UserIdentificationImpl ident = identifications.remove(id);
         if (ident != null) {
             //remove listeners if needed

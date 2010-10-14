@@ -43,7 +43,6 @@ import java.util.TimerTask;
 
 import javax.security.auth.Subject;
 
-import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.authentication.principals.UserNamePrincipal;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.exception.PermissionException;
@@ -80,10 +79,6 @@ public class UserIdentificationImpl extends UserIdentification {
     /** Tell if this user want to receive all events or only his events */
     private boolean myEventsOnly = false;
 
-    /** User credential encrypted with scheduler public key */
-    //WARNING - must be transient as it MUST NOT be sent to client side
-    private transient Credentials credential;
-
     /** List of events that the user want to receive. */
     private transient HashSet<SchedulerEvent> userEvents = null;
 
@@ -113,10 +108,9 @@ public class UserIdentificationImpl extends UserIdentification {
      * @param username the user name.
      * @param subject contains all user's principals and permissions
      */
-    public UserIdentificationImpl(String username, Subject subject, Credentials cred) {
+    public UserIdentificationImpl(String username, Subject subject) {
         this.username = username;
         this.subject = subject;
-        this.credential = cred;
         this.connectionTime = System.currentTimeMillis();
     }
 
@@ -133,16 +127,6 @@ public class UserIdentificationImpl extends UserIdentification {
     @Override
     public String getUsername() {
         return username;
-    }
-
-    /**
-     * Retreive the credentials given at connection time.
-     * This credential has been encrypted using Scheduling private key
-     *
-     * @return the credentials given at connection time
-     */
-    public Credentials getCredentials() {
-        return this.credential;
     }
 
     /**

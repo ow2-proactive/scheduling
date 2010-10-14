@@ -38,13 +38,14 @@ package org.ow2.proactive.authentication.crypto;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.security.KeyException;
 import java.security.PublicKey;
-import java.util.Scanner;
+
+import jline.ConsoleReader;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.core.util.passwordhandler.PasswordField;
 import org.ow2.proactive.authentication.AuthenticationImpl;
 import org.ow2.proactive.authentication.Connection;
 import org.ow2.proactive.utils.FileToBytesConverter;
@@ -65,10 +66,11 @@ public class CreateCredentials {
      * 
      * @see org.ow2.proactive.authentication.crypto.Credentials
      * @param args arguments, try '-h' for help
+     * @throws IOException
      *
      */
-    public static void main(String[] args) {
-
+    public static void main(String[] args) throws IOException {
+        ConsoleReader console = new ConsoleReader(System.in, new PrintWriter(System.out));
         /**
          * default values
          */
@@ -189,7 +191,7 @@ public class CreateCredentials {
             } catch (Exception e) {
                 System.out.println("Could not retrieve public key from " + url + ": ");
                 e.printStackTrace();
-                System.exit(0);
+                return;
             }
             System.out.println("Successfully obtained public key from " + url + ".\n");
         } else if (pubKeyPath != null) {
@@ -198,6 +200,7 @@ public class CreateCredentials {
             } catch (KeyException e) {
                 System.out.println("Could not retrieve public key from " + pubKeyPath + ":");
                 e.printStackTrace();
+                return;
             }
         } else {
             System.out.println("No public key specified, attempting to retrieve it from default location.");
@@ -211,11 +214,11 @@ public class CreateCredentials {
             }
         }
 
-        if (login != null && pass != null) {
+        if (login != null && pass != null && keyfile != null) {
             System.out.println("Running in non-interactive mode.\n");
             interactive = false;
-        } else if (pass != null) {
-            System.out.println("Ignoring argument --password: used without --login.");
+        } else {
+            System.out.println("Running in interactive mode.");
         }
 
         if (interactive) {
@@ -224,42 +227,38 @@ public class CreateCredentials {
 
             System.out.print("login: ");
             if (login == null) {
-                Scanner scanner = new Scanner(System.in);
-                login = scanner.nextLine();
+                login = console.readLine();
             } else {
                 System.out.println(login);
             }
-            char[] pw;
-            try {
-                pw = PasswordField.getPassword(System.in, "password: ");
-                if (pw == null) {
-                    pass = "";
-                } else {
-                    pass = String.valueOf(pw);
-                }
-            } catch (IOException ioe) {
-                ioe.printStackTrace();
-                return;
+            System.out.print("password: ");
+            if (pass == null) {
+                pass = console.readLine('*');
+            } else {
+                System.out.println("********");
+            }
+            System.out.print("keyfile (optional - press enter to ignore): ");
+            if (keyfile == null) {
+                keyfile = console.readLine();
+            } else {
+                System.out.println(keyfile);
             }
             System.out.println();
         }
 
-        byte[] keyfileContent = null;
-        //load keyfile if specified
-        if (keyfile != null) {
-            try {
-                keyfileContent = FileToBytesConverter.convertFileToByteArray(new File(keyfile));
-            } catch (Throwable t) {
-                t.printStackTrace();
-                return;
-            }
-        }
-        Credentials cred = null;
         try {
-            cred = Credentials.createCredentials(new CredData(login, pass, keyfileContent), pubKey, cipher);
+            CredData credData;
+            if (keyfile.length() > 0) {
+                byte[] keyfileContent = FileToBytesConverter.convertFileToByteArray(new File(keyfile));
+                credData = new CredData(login, pass, keyfileContent);
+            } else {
+                System.out.println("--> Ignoring keyfile, credential does not contain SSH key");
+                credData = new CredData(login, pass);
+            }
+            Credentials cred = Credentials.createCredentials(credData, pubKey, cipher);
             cred.writeToDisk(path);
-        } catch (KeyException e) {
-            e.printStackTrace();
+        } catch (Throwable t) {
+            t.printStackTrace();
             return;
         }
 

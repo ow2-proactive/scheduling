@@ -174,10 +174,11 @@ public class SchedulerAuthentication extends AuthenticationImpl implements Sched
 
         logger_dev.info("user : " + user);
         // add this user to the scheduler front-end
-        UserIdentificationImpl ident = new UserIdentificationImpl(user, subject, cred);
+        UserIdentificationImpl ident = new UserIdentificationImpl(user, subject);
         ident.setHostName(getSenderHostName());
         try {
-            this.frontend.connect(PAActiveObject.getContext().getCurrentRequest().getSourceBodyID(), ident);
+            this.frontend.connect(PAActiveObject.getContext().getCurrentRequest().getSourceBodyID(), ident,
+                    cred);
         } catch (SchedulerException e) {
             logger_dev.error("", e);
             throw new LoginException(e.getMessage());
@@ -206,10 +207,11 @@ public class SchedulerAuthentication extends AuthenticationImpl implements Sched
 
         logger_dev.info("user : " + user);
         // add this user to the scheduler front-end
-        UserIdentificationImpl ident = new UserIdentificationImpl(user, subject, cred);
+        UserIdentificationImpl ident = new UserIdentificationImpl(user, subject);
         ident.setHostName(getSenderHostName());
         try {
-            this.frontend.connect(PAActiveObject.getContext().getCurrentRequest().getSourceBodyID(), ident);
+            this.frontend.connect(PAActiveObject.getContext().getCurrentRequest().getSourceBodyID(), ident,
+                    cred);
         } catch (SchedulerException e) {
             logger_dev.error("", e);
             throw new LoginException(e.getMessage());
@@ -230,10 +232,10 @@ public class SchedulerAuthentication extends AuthenticationImpl implements Sched
 
         logger_dev.info("user : " + user);
         // add this user to the scheduler front-end
-        UserIdentificationImpl ident = new UserIdentificationImpl(user, subject, cred);
+        UserIdentificationImpl ident = new UserIdentificationImpl(user, subject);
         ident.setHostName(getSenderHostName());
 
-        this.frontend.connect(PAActiveObject.getContext().getCurrentRequest().getSourceBodyID(), ident);
+        this.frontend.connect(PAActiveObject.getContext().getCurrentRequest().getSourceBodyID(), ident, cred);
 
         // return the created interface
         return this.frontend;

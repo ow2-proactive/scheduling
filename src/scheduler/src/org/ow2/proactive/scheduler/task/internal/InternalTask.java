@@ -53,6 +53,7 @@ import javax.persistence.Column;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
+import javax.persistence.Lob;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
@@ -214,7 +215,9 @@ public abstract class InternalTask extends TaskState {
     private InternalTask ifBranch = null;
 
     /** used credentials to fork as user id. Can be null, or contain user/pwd[/key] */
-    @Transient
+    @Lob
+    @Column(name = "CREDENTIALS", updatable = false, length = 16384/* 16Ko */)
+    @XmlTransient
     @TransientInSerialization
     private Credentials credentials = null;
 
