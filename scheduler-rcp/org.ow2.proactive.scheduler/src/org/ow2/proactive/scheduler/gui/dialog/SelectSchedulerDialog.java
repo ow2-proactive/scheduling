@@ -61,6 +61,7 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Dialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
@@ -68,6 +69,7 @@ import org.eclipse.swt.widgets.Text;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.util.URIBuilder;
 import org.ow2.proactive.scheduler.Activator;
+import org.ow2.proactive.utils.FileToBytesConverter;
 
 
 /**
@@ -82,8 +84,10 @@ public class SelectSchedulerDialog extends Dialog {
     public static final String URL_FILE = "urls";
 
     /** Name of the file which store good logins */
-    // proactive/scheduler/
     public static final String LOGIN_FILE = "logins";
+
+    /** Name of the file which store good logins */
+    public static final String SSHKEY_FILE = "sshpath";
 
     private static List<String> urls = null;
     private static List<String> logins = null;
@@ -92,11 +96,17 @@ public class SelectSchedulerDialog extends Dialog {
     private static String defaultUrl = null;
     private static String login = null;
     private static String pwd = null;
+    private static boolean useSSH = false;
+    private static String SSHkeyPath = null;
     private static Combo urlCombo = null;
     private static Combo loginCombo = null;
+    private static Text sshText = null;
     private Shell shell = null;
     private Button okButton = null;
     private Button cancelButton = null;
+    private Button useSSHKey = null;
+    private Label sshLabel = null;
+    private Button chooseButton = null;
 
     // -------------------------------------------------------------------- //
     // --------------------------- constructor ---------------------------- //
@@ -128,6 +138,10 @@ public class SelectSchedulerDialog extends Dialog {
         loginCombo = new Combo(shell, SWT.BORDER);
         Label pwdLabel = new Label(shell, SWT.NONE);
         final Text pwdText = new Text(shell, SWT.SINGLE | SWT.PASSWORD | SWT.BORDER);
+        useSSHKey = new Button(shell, SWT.CHECK);
+        sshLabel = new Label(shell, SWT.NONE);
+        sshText = new Text(shell, SWT.SINGLE | SWT.BORDER);
+        chooseButton = new Button(shell, SWT.NONE);
         okButton = new Button(shell, SWT.NONE);
         cancelButton = new Button(shell, SWT.NONE);
 
@@ -135,6 +149,7 @@ public class SelectSchedulerDialog extends Dialog {
         urlLabel.setText("Url :");
         FormData urlLabelFormData = new FormData();
         urlLabelFormData.top = new FormAttachment(urlCombo, 0, SWT.CENTER);
+        urlLabelFormData.left = new FormAttachment(0, 5);
         urlLabel.setLayoutData(urlLabelFormData);
 
         // combo url
@@ -157,6 +172,7 @@ public class SelectSchedulerDialog extends Dialog {
         loginLabel.setText("login :");
         FormData loginLabelFormData = new FormData();
         loginLabelFormData.top = new FormAttachment(loginCombo, 0, SWT.CENTER);
+        loginLabelFormData.left = new FormAttachment(0, 5);
         loginLabel.setLayoutData(loginLabelFormData);
 
         // text login
@@ -181,6 +197,53 @@ public class SelectSchedulerDialog extends Dialog {
         pwdFormData.right = new FormAttachment(100, -5);
         pwdText.setLayoutData(pwdFormData);
 
+        //ssh checkbox
+        useSSHKey.setText("Provide private SSH key");
+        FormData sshFormData = new FormData();
+        sshFormData.top = new FormAttachment(pwdText, 16, SWT.BOTTOM);
+        sshFormData.left = new FormAttachment(0, 1);
+        useSSHKey.setLayoutData(sshFormData);
+        useSSHKey.addListener(SWT.Selection, new Listener() {
+            public void handleEvent(Event event) {
+                setSSHformEnabled(useSSHKey.getSelection());
+                loadSSHPath();
+            }
+        });
+
+        //ssh label / text field / browse
+        sshLabel.setText("SSH private key path :");
+        FormData sshLabelFormData = new FormData();
+        sshLabelFormData.top = new FormAttachment(useSSHKey, 6, SWT.BOTTOM);
+        sshLabelFormData.left = new FormAttachment(0, 5);
+        sshLabel.setLayoutData(sshLabelFormData);
+
+        FormData sshTextFormData = new FormData();
+        sshTextFormData.top = new FormAttachment(useSSHKey, 3);
+        sshTextFormData.left = new FormAttachment(sshLabel, 5);
+        sshTextFormData.right = new FormAttachment(80, -5);
+        sshText.setLayoutData(sshTextFormData);
+
+        chooseButton.setText("Choose file");
+        FormData chooseButtonTextFormData = new FormData();
+        chooseButtonTextFormData.top = new FormAttachment(useSSHKey, 2);
+        chooseButtonTextFormData.left = new FormAttachment(sshText, 5);
+        chooseButtonTextFormData.right = new FormAttachment(100, -5);
+        chooseButton.setLayoutData(chooseButtonTextFormData);
+        final Text sshTextf = sshText;
+        chooseButton.addListener(SWT.Selection, new Listener() {
+            public void handleEvent(Event event) {
+                FileDialog fileDialog = new FileDialog(shell, SWT.OPEN);
+                if (sshTextf.getText() != null && sshTextf.getText().length() > 0) {
+                    fileDialog.setFileName(sshTextf.getText());
+                }
+                String fileName = fileDialog.open();
+                if (fileName != null) {
+                    sshTextf.setText(fileName);
+                }
+            }
+        });
+        setSSHformEnabled(false);
+
         // button "OK"
         okButton.setText("OK");
         okButton.addListener(SWT.Selection, new Listener() {
@@ -189,12 +252,18 @@ public class SelectSchedulerDialog extends Dialog {
                 url = urlCombo.getText();
                 login = loginCombo.getText();
                 pwd = pwdText.getText();
+                useSSH = useSSHKey.getSelection();
+                if (useSSH) {
+                    SSHkeyPath = sshText.getText();
+                } else {
+                    SSHkeyPath = null;
+                }
                 shell.close();
             }
         });
 
         FormData okFormData = new FormData();
-        okFormData.top = new FormAttachment(loginCombo, 5);
+        okFormData.top = new FormAttachment(chooseButton, 6);
         okFormData.left = new FormAttachment(25, 20);
         okFormData.right = new FormAttachment(50, -10);
         okButton.setLayoutData(okFormData);
@@ -210,7 +279,7 @@ public class SelectSchedulerDialog extends Dialog {
         });
 
         FormData cancelFormData = new FormData();
-        cancelFormData.top = new FormAttachment(loginCombo, 5);
+        cancelFormData.top = new FormAttachment(chooseButton, 6);
         cancelFormData.left = new FormAttachment(50, 10);
         cancelFormData.right = new FormAttachment(75, -20);
         cancelButton.setLayoutData(cancelFormData);
@@ -230,6 +299,12 @@ public class SelectSchedulerDialog extends Dialog {
     // -------------------------------------------------------------------- //
     // ----------------------------- private ------------------------------ //
     // -------------------------------------------------------------------- //
+    private void setSSHformEnabled(boolean enabled) {
+        sshLabel.setEnabled(enabled);
+        chooseButton.setEnabled(enabled);
+        sshText.setEnabled(enabled);
+    }
+
     private static void setInitialHostName() {
         String initialHostValue = "";
         String port = null;
@@ -423,6 +498,61 @@ public class SelectSchedulerDialog extends Dialog {
         }
     }
 
+    private static void recordSSHPath() {
+        if (useSSH) {
+            BufferedWriter bw = null;
+            PrintWriter pw = null;
+            try {
+                File file = new File(System.getProperty("user.home") + "/.ProActive_Scheduler/");
+                if (!file.exists()) {
+                    file.mkdir();
+                }
+                bw = new BufferedWriter(new FileWriter(System.getProperty("user.home") +
+                    "/.ProActive_Scheduler/" + SSHKEY_FILE, false));
+                pw = new PrintWriter(bw, true);
+
+                // Record path
+                pw.println(SSHkeyPath);
+            } catch (IOException e) {
+                Activator.log(IStatus.ERROR, "An Exception occured when recording sshkey", e);
+                e.printStackTrace();
+                /* Do-Nothing */
+            } finally {
+                try {
+                    if (bw != null) {
+                        bw.close();
+                    }
+                    if (pw != null) {
+                        pw.close();
+                    }
+                } catch (IOException e) {
+                    Activator.log(IStatus.ERROR, "An Exception occured when recording sshkey", e);
+                    /* Do-Nothing */
+                }
+            }
+        }
+    }
+
+    private static void loadSSHPath() {
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader(System.getProperty("user.home") +
+                "/.ProActive_Scheduler/" + SSHKEY_FILE));
+            try {
+                sshText.setText(reader.readLine());
+            } catch (IOException e) {
+                /* Do-nothing */
+            } finally {
+                try {
+                    reader.close();
+                } catch (IOException e) {
+                    /* Do-Nothing */
+                }
+            }
+        } catch (FileNotFoundException e) {
+            /* Do-Nothing */
+        }
+    }
+
     // -------------------------------------------------------------------- //
     // ------------------------------ public ------------------------------ //
     // -------------------------------------------------------------------- //
@@ -445,7 +575,17 @@ public class SelectSchedulerDialog extends Dialog {
                 return null;
             }
             url = url.trim();
-            return new SelectSchedulerDialogResult(url, login, pwd);
+            if (useSSH) {
+                try {
+                    byte[] keyfileContent = FileToBytesConverter.convertFileToByteArray(new File(SSHkeyPath));
+                    return new SelectSchedulerDialogResult(url, login, pwd, keyfileContent);
+                } catch (Exception e) {
+                    MessageDialog.openError(parent, "Error", "SSh key file not found : " + SSHkeyPath);
+                    return null;
+                }
+            } else {
+                return new SelectSchedulerDialogResult(url, login, pwd);
+            }
         }
         return null;
     }
@@ -458,5 +598,6 @@ public class SelectSchedulerDialog extends Dialog {
         if (defaultUrl == null) {
             recordUrls();
         }
+        recordSSHPath();
     }
 }

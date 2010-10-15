@@ -47,11 +47,17 @@ public class SelectSchedulerDialogResult implements Serializable {
     private final String url;
     private final String login;
     private final String password;
+    private byte[] sshkey = null;
 
     public SelectSchedulerDialogResult(String url, String login, String password) {
         this.url = url;
         this.login = login;
         this.password = password;
+    }
+
+    public SelectSchedulerDialogResult(String url, String login, String password, byte[] sshkey) {
+        this(url, login, password);
+        this.sshkey = sshkey;
     }
 
     public String getUrl() {
@@ -64,5 +70,9 @@ public class SelectSchedulerDialogResult implements Serializable {
 
     public String getPassword() {
         return password;
+    }
+
+    public byte[] getSshkey() {
+        return sshkey;
     }
 }

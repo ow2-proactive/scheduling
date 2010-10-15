@@ -47,6 +47,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
 import org.objectweb.proactive.api.PAActiveObject;
+import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.Activator;
 import org.ow2.proactive.scheduler.common.Scheduler;
@@ -457,11 +458,16 @@ public class SchedulerProxy implements Scheduler {
         try {
             userName = dialogResult.getLogin();
             schedulerURL = dialogResult.getUrl();
+            CredData cd;
+            if (dialogResult.getSshkey() == null) {
+                cd = new CredData(userName, dialogResult.getPassword());
+            } else {
+                cd = new CredData(userName, dialogResult.getPassword(), dialogResult.getSshkey());
+            }
 
             sai = SchedulerConnection.join(schedulerURL);
 
-            Credentials credentials = Credentials.createCredentials(userName, dialogResult.getPassword(), sai
-                    .getPublicKey());
+            Credentials credentials = Credentials.createCredentials(cd, sai.getPublicKey());
 
             if (scheduler == null || !scheduler.isConnected()) {
                 scheduler = sai.login(credentials);
