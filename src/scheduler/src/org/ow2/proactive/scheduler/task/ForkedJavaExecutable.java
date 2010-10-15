@@ -425,6 +425,7 @@ public class ForkedJavaExecutable extends JavaExecutable {
             if (childRuntime != null) {
                 try {
                     childRuntime.killAllNodes();
+                    childRuntime.killRT(false);
                     childRuntime = null;
                 } catch (Exception e) {
                 }
