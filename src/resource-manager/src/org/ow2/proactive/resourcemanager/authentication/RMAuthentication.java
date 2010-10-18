@@ -40,48 +40,22 @@ import javax.security.auth.login.LoginException;
 
 import org.ow2.proactive.authentication.Authentication;
 import org.ow2.proactive.authentication.crypto.Credentials;
-import org.ow2.proactive.resourcemanager.frontend.RMAdmin;
-import org.ow2.proactive.resourcemanager.frontend.RMMonitoring;
-import org.ow2.proactive.resourcemanager.frontend.RMUser;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 
 
 /**
  * 
- * Authentication interface of resource manager.
+ * Authentication interface of the resource manager.
  *
  */
 public interface RMAuthentication extends Authentication {
 
     /**
-     * Performs user authentication
+     * Performs the user authentication into the resource manager.
+     *
+     * @param credentials - user encrypted login and password
+     * @return the resource manager interface if the login is successful
+     * @throws LoginException if user does not exist or password is incorrect
      */
-    @Deprecated
-    public RMUser logAsUser(String user, String password) throws LoginException;
-
-    /**
-     * Performs admin authentication
-     */
-    @Deprecated
-    public RMAdmin logAsAdmin(String user, String password) throws LoginException;
-
-    /**
-     * Performs user authentication
-     */
-    @Deprecated
-    public RMUser logAsUser(Credentials cred) throws LoginException;
-
-    /**
-     * Performs admin authentication
-     */
-    @Deprecated
-    public RMAdmin logAsAdmin(Credentials cred) throws LoginException;
-
-    /**
-     * Performs monitor authentication.
-     */
-    @Deprecated
-    public RMMonitoring logAsMonitor();
-
-    public ResourceManager login(Credentials cred) throws LoginException;
+    public ResourceManager login(Credentials credentials) throws LoginException;
 }

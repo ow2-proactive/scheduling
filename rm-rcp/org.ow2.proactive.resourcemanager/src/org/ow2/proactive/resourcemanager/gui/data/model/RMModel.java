@@ -45,7 +45,6 @@ import org.eclipse.swt.widgets.Display;
 import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
-import org.ow2.proactive.resourcemanager.gui.data.RMStore;
 import org.ow2.proactive.resourcemanager.gui.handlers.RemoveNodeSourceHandler;
 import org.ow2.proactive.resourcemanager.gui.views.ResourceExplorerView;
 import org.ow2.proactive.resourcemanager.gui.views.ResourcesCompactView;
@@ -132,7 +131,7 @@ public class RMModel implements Serializable {
                 this.downNodesNumber++;
                 break;
             case BUSY:
-            case TO_BE_RELEASED:
+            case TO_BE_REMOVED:
                 this.busyNodesNumber++;
         }
         this.actualizeTreeView(parentToRefresh);
@@ -177,7 +176,7 @@ public class RMModel implements Serializable {
                 this.downNodesNumber--;
                 break;
             case BUSY:
-            case TO_BE_RELEASED:
+            case TO_BE_REMOVED:
                 this.busyNodesNumber--;
         }
 
@@ -210,7 +209,7 @@ public class RMModel implements Serializable {
                 this.downNodesNumber--;
                 break;
             case BUSY:
-            case TO_BE_RELEASED:
+            case TO_BE_REMOVED:
                 this.busyNodesNumber--;
         }
         switch (state) {
@@ -222,7 +221,7 @@ public class RMModel implements Serializable {
                 this.removeNodeFromTopologyView(node, hostname);
                 break;
             case BUSY:
-            case TO_BE_RELEASED:
+            case TO_BE_REMOVED:
                 this.busyNodesNumber++;
         }
 
@@ -316,7 +315,7 @@ public class RMModel implements Serializable {
         // actualize topology view if exists
         if (updateViews && ResourcesTopologyView.getTopologyViewer() != null) {
             NodeState state = node.getState();
-            if ((previousState == NodeState.DOWN || previousState == NodeState.TO_BE_RELEASED) &&
+            if ((previousState == NodeState.DOWN || previousState == NodeState.TO_BE_REMOVED) &&
                 (state == NodeState.FREE || state == NodeState.BUSY)) {
                 ResourcesTopologyView.getTopologyViewer().addNode(node);
             }

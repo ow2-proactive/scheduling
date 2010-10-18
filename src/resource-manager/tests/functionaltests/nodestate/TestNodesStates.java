@@ -157,7 +157,7 @@ public class TestNodesStates extends FunctionalTest {
         //check that node toRelease event has been thrown
         RMNodeEvent evt = RMTHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, n.getNodeInformation()
                 .getURL());
-        Assert.assertEquals(evt.getNodeState(), NodeState.TO_BE_RELEASED);
+        Assert.assertEquals(evt.getNodeState(), NodeState.TO_BE_REMOVED);
 
         //node is in "ToRelease" state, so always handled by RM
         assertTrue(resourceManager.getState().getTotalNodesNumber() == RMTHelper.defaultNodesNumber);
@@ -239,7 +239,7 @@ public class TestNodesStates extends FunctionalTest {
         resourceManager.removeNode(n.getNodeInformation().getURL(), false);
 
         evt = RMTHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, n.getNodeInformation().getURL());
-        Assert.assertEquals(evt.getNodeState(), NodeState.TO_BE_RELEASED);
+        Assert.assertEquals(evt.getNodeState(), NodeState.TO_BE_REMOVED);
 
         RMTHelper.log("Test 6 Bis");
 

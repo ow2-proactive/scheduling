@@ -121,7 +121,7 @@ public class TestNodeSourcesActions extends FunctionalTest {
 
         RMNodeEvent evt = RMTHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, n1.getNodeInformation()
                 .getURL());
-        Assert.assertEquals(evt.getNodeState(), NodeState.TO_BE_RELEASED);
+        Assert.assertEquals(evt.getNodeState(), NodeState.TO_BE_REMOVED);
 
         //put one of the busy node in 'down' state
         Node n2 = nodes.remove(0);
@@ -186,7 +186,7 @@ public class TestNodeSourcesActions extends FunctionalTest {
         resourceManager.removeNode(n1.getNodeInformation().getURL(), false);
 
         evt = RMTHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, n1.getNodeInformation().getURL());
-        Assert.assertEquals(evt.getNodeState(), NodeState.TO_BE_RELEASED);
+        Assert.assertEquals(evt.getNodeState(), NodeState.TO_BE_REMOVED);
 
         //put one of the busy node in 'down' state
         n2 = nodes.remove(0);
@@ -217,7 +217,7 @@ public class TestNodeSourcesActions extends FunctionalTest {
 
         //the busy node (n3) becomes a 'to release' node
         evt = RMTHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, n3.getNodeInformation().getURL());
-        Assert.assertEquals(evt.getNodeState(), NodeState.TO_BE_RELEASED);
+        Assert.assertEquals(evt.getNodeState(), NodeState.TO_BE_REMOVED);
 
         assertTrue(resourceManager.getState().getFreeNodesNumber() == 0);
         assertTrue(resourceManager.getState().getTotalNodesNumber() == 2);

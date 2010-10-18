@@ -166,7 +166,7 @@ public final class RMStatistics {
                     case BUSY:
                         this.decrementBusyNodesCount();
                         break;
-                    case TO_BE_RELEASED:
+                    case TO_BE_REMOVED:
                         this.decrementToBeRemovedNodesCount();
                         break;
                     case DOWN:
@@ -188,7 +188,7 @@ public final class RMStatistics {
                         case BUSY:
                             this.decrementBusyNodesCount();
                             break;
-                        case TO_BE_RELEASED:
+                        case TO_BE_REMOVED:
                             this.decrementToBeRemovedNodesCount();
                             break;
                         case DOWN:
@@ -207,7 +207,7 @@ public final class RMStatistics {
                     case BUSY:
                         this.incrementBusyNodesCount();
                         break;
-                    case TO_BE_RELEASED:
+                    case TO_BE_REMOVED:
                         this.incrementToBeRemovedNodesCount();
                         break;
                     case DOWN:

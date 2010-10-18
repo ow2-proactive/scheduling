@@ -237,7 +237,7 @@ public class TestAdminAddingNodes extends FunctionalTest {
 
         //wait the node to release event
         evt = RMTHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node2URL);
-        Assert.assertEquals(evt.getNodeState(), NodeState.TO_BE_RELEASED);
+        Assert.assertEquals(evt.getNodeState(), NodeState.TO_BE_REMOVED);
 
         assertTrue(resourceManager.getState().getTotalNodesNumber() == 1);
         assertTrue(resourceManager.getState().getFreeNodesNumber() == 0);

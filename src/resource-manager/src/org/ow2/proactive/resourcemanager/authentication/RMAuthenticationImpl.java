@@ -37,8 +37,6 @@
 package org.ow2.proactive.resourcemanager.authentication;
 
 import java.net.URI;
-import java.security.KeyException;
-import java.util.Set;
 
 import javax.management.JMException;
 import javax.security.auth.login.LoginException;
@@ -52,15 +50,11 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.authentication.AuthenticationImpl;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
-import org.ow2.proactive.authentication.principals.GroupNamePrincipal;
 import org.ow2.proactive.jmx.naming.JMXTransportProtocol;
 import org.ow2.proactive.resourcemanager.common.RMConstants;
 import org.ow2.proactive.resourcemanager.core.RMCore;
 import org.ow2.proactive.resourcemanager.core.jmx.RMJMXHelper;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
-import org.ow2.proactive.resourcemanager.frontend.RMAdmin;
-import org.ow2.proactive.resourcemanager.frontend.RMMonitoring;
-import org.ow2.proactive.resourcemanager.frontend.RMUser;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 
@@ -95,79 +89,6 @@ public class RMAuthenticationImpl extends AuthenticationImpl implements RMAuthen
     /**
      * Performs user authentication
      */
-    @Deprecated
-    public RMUser logAsUser(String user, String password) throws LoginException {
-        try {
-            // encrypting the data here is useless, only done to conform to the
-            // signature of the real method
-            return logAsUser(Credentials.createCredentials(new CredData(user, password), publicKeyPath));
-        } catch (KeyException e) {
-            throw new LoginException("Could not encrypt credentials: " + e.getMessage());
-        }
-    }
-
-    /**
-     * Performs admin authentication
-     */
-    @Deprecated
-    public RMAdmin logAsAdmin(String user, String password) throws LoginException {
-        try {
-            // encrypting the data here is useless, only done to conform to the
-            // signature of the real method
-            return logAsAdmin(Credentials.createCredentials(new CredData(user, password), publicKeyPath));
-        } catch (KeyException e) {
-            throw new LoginException("Could not encrypt credentials: " + e.getMessage());
-        }
-    }
-
-    /**
-     * Performs admin authentication
-     */
-    @Deprecated
-    public RMAdmin logAsAdmin(Credentials cred) throws LoginException {
-        Client client = new Client(authenticate(cred), true);
-
-        Set<GroupNamePrincipal> groupPrincipals = client.getSubject().getPrincipals(GroupNamePrincipal.class);
-        boolean userOrAdmin = groupPrincipals.contains(new GroupNamePrincipal("admin"));
-        if (!userOrAdmin) {
-            throw new LoginException("User does not belong to \"admins\" group");
-        }
-
-        if (RMCore.clients.containsKey(client.getId())) {
-            throw new LoginException(ERROR_ALREADY_CONNECTED);
-        }
-
-        RMCore.clients.put(client.getId(), client);
-        logger.info(client + " connected");
-        return rmcore;
-    }
-
-    /**
-     * Performs user authentication
-     */
-    @Deprecated
-    public RMUser logAsUser(Credentials cred) throws LoginException {
-        Client client = new Client(authenticate(cred), true);
-
-        Set<GroupNamePrincipal> groupPrincipals = client.getSubject().getPrincipals(GroupNamePrincipal.class);
-        boolean userOrAdmin = groupPrincipals.contains(new GroupNamePrincipal("user")) ||
-            groupPrincipals.contains(new GroupNamePrincipal("admin"));
-        if (!userOrAdmin) {
-            throw new LoginException("User does not belong to either \"users\" or \"admins\" group");
-        }
-
-        if (RMCore.clients.containsKey(client.getId())) {
-            throw new LoginException(ERROR_ALREADY_CONNECTED);
-        }
-
-        RMCore.clients.put(client.getId(), client);
-        logger.info(client + " connected");
-        return rmcore;
-    }
-
-    /**
-     * Performs client authentication
-     */
     public ResourceManager login(Credentials cred) throws LoginException {
         Client client = new Client(authenticate(cred), true);
 
@@ -178,14 +99,6 @@ public class RMAuthenticationImpl extends AuthenticationImpl implements RMAuthen
         RMCore.clients.put(client.getId(), client);
         logger.info(client + " connected");
         return rmcore;
-    }
-
-    /**
-     * Returns RM monitor
-     */
-    @Deprecated
-    public RMMonitoring logAsMonitor() {
-        return rmcore.getMonitoring();
     }
 
     /**

@@ -84,11 +84,8 @@ import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProper
 import org.ow2.proactive.resourcemanager.db.DatabaseManager;
 import org.ow2.proactive.resourcemanager.exception.AddingNodesException;
 import org.ow2.proactive.resourcemanager.exception.NotConnectedException;
-import org.ow2.proactive.resourcemanager.exception.RMException;
-import org.ow2.proactive.resourcemanager.frontend.RMAdmin;
 import org.ow2.proactive.resourcemanager.frontend.RMMonitoring;
 import org.ow2.proactive.resourcemanager.frontend.RMMonitoringImpl;
-import org.ow2.proactive.resourcemanager.frontend.RMUser;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.frontend.topology.Topology;
 import org.ow2.proactive.resourcemanager.frontend.topology.TopologyException;
@@ -151,7 +148,7 @@ import org.ow2.proactive.utils.NodeSet;
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9
  */
-public class RMCore implements ResourceManager, RMAdmin, RMUser, InitActive, RunActive {
+public class RMCore implements ResourceManager, InitActive, RunActive {
 
     /** Log4J logger name for RMCore */
     private final static Logger logger = ProActiveLogger.getLogger(RMLoggers.CORE);
@@ -795,15 +792,14 @@ public class RMCore implements ResourceManager, RMAdmin, RMUser, InitActive, Run
      * Gives total number of alive nodes handled by RM
      * @return total number of alive nodes
      */
-    @Deprecated
-    public IntWrapper getTotalAliveNodesNumber() {
+    private int getTotalAliveNodesNumber() {
         // TODO get the number of alive nodes in a more effective way
         int count = 0;
         for (RMNode node : allNodes.values()) {
             if (!node.isDown())
                 count++;
         }
-        return new IntWrapper(count);
+        return count;
     }
 
     /**
@@ -866,32 +862,6 @@ public class RMCore implements ResourceManager, RMAdmin, RMUser, InitActive, Run
     /**
      * {@inheritDoc}
      */
-    public NodeSet getAtMostNodes(IntWrapper nbNodes, SelectionScript selectionScript) {
-        List<SelectionScript> selectionScriptList = selectionScript == null ? null : Collections
-                .singletonList(selectionScript);
-        return getAtMostNodes(nbNodes.intValue(), selectionScriptList, null);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public NodeSet getAtMostNodes(IntWrapper nbNodes, SelectionScript selectionScript, NodeSet exclusion) {
-        List<SelectionScript> selectionScriptList = selectionScript == null ? null : Collections
-                .singletonList(selectionScript);
-        return getAtMostNodes(nbNodes.intValue(), selectionScriptList, exclusion);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public NodeSet getAtMostNodes(IntWrapper nbNodes, List<SelectionScript> selectionScriptsList,
-            NodeSet exclusion) {
-        return getAtMostNodes(nbNodes.intValue(), selectionScriptsList, exclusion);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public NodeSet getAtMostNodes(int nbNodes, SelectionScript selectionScript) {
         List<SelectionScript> selectionScriptList = selectionScript == null ? null : Collections
                 .singletonList(selectionScript);
@@ -929,13 +899,6 @@ public class RMCore implements ResourceManager, RMAdmin, RMUser, InitActive, Run
             }
             return selectionManager.selectNodes(number, descriptor, selectionScrips, exclusion, caller);
         }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public NodeSet getExactlyNodes(IntWrapper nbNodes, SelectionScript selectionScript) {
-        return getExactlyNodes(nbNodes.intValue(), selectionScript);
     }
 
     /**
@@ -1182,16 +1145,8 @@ public class RMCore implements ResourceManager, RMAdmin, RMUser, InitActive, Run
      * {@inheritDoc}
      */
     public RMState getState() {
-        RMState state = new RMState(freeNodes.size(), getTotalAliveNodesNumber().intValue(), allNodes.size());
+        RMState state = new RMState(freeNodes.size(), getTotalAliveNodesNumber(), allNodes.size());
         return state;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Deprecated
-    public boolean isAlive() {
-        return !toShutDown;
     }
 
     /**
@@ -1270,96 +1225,6 @@ public class RMCore implements ResourceManager, RMAdmin, RMUser, InitActive, Run
 
         client.checkPermission(methodCallPermission, client + " is not authorized to call " + fullMethodName);
         return client;
-    }
-
-    // Deprecated methods
-    /**
-     * {@inheritDoc}
-     */
-    @Deprecated
-    public void createNodesource(String nodeSourceName, String infrastructureType,
-            Object[] infrastructureParameters, String policyType, Object[] policyParameters)
-            throws RMException {
-        try {
-            createNodeSource(nodeSourceName, infrastructureType, infrastructureParameters, policyType,
-                    policyParameters);
-        } catch (RuntimeException e) {
-            throw new RMException(e);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Deprecated
-    public void removeSource(String sourceName, boolean preempt) throws RMException {
-        try {
-            removeNodeSource(sourceName, preempt);
-        } catch (RuntimeException e) {
-            throw new RMException(e);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Deprecated
-    public void setAllNodeSourcesPingFrequency(int frequency) {
-        for (String nsName : nodeSources.keySet()) {
-            setNodeSourcePingFrequency(frequency, nsName);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Deprecated
-    public void setDefaultNodeSourcePingFrequency(int frequency) throws RMException {
-        try {
-            setNodeSourcePingFrequency(frequency, NodeSource.DEFAULT);
-        } catch (RuntimeException e) {
-            throw new RMException(e);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Deprecated
-    public IntWrapper getFreeNodesNumber() {
-        return getState().getNumberOfFreeResources();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Deprecated
-    public RMState getRMState() {
-        return getState();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Deprecated
-    public IntWrapper getTotalNodesNumber() {
-        return getState().getNumberOfAllResources();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Deprecated
-    public void freeNode(Node node) {
-        releaseNode(node);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Deprecated
-    public void freeNodes(NodeSet nodes) {
-        releaseNodes(nodes);
     }
 
     public Topology getTopology() {

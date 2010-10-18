@@ -40,7 +40,6 @@ import java.io.Serializable;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
-import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 
 
 /**
@@ -61,46 +60,6 @@ public class RMState implements Serializable {
         this.freeNodesNumber = freeNodesNumber;
         this.totalAliveNodesNumber = totalAliveNodesNumber;
         this.totalNodesNumber = totalNodesNumber;
-    }
-
-    /**
-     * Get the number of all resources.
-     * 
-     * @return the number of all resources.
-     */
-    @Deprecated
-    public IntWrapper getNumberOfAllResources() {
-        return new IntWrapper(totalNodesNumber);
-    }
-
-    /**
-     * Get the number of free resources.
-     * 
-     * @return the number of free resources.
-     */
-    @Deprecated
-    public IntWrapper getNumberOfFreeResources() {
-        return new IntWrapper(freeNodesNumber);
-    }
-
-    /**
-     * Sets the number Of All Resources to the given numberOfAllResources value.
-     *
-     * @param numberOfAllResources the number Of All Resources to set.
-     */
-    @Deprecated
-    public void setNumberOfAllResources(IntWrapper numberOfAllResources) {
-        this.totalNodesNumber = numberOfAllResources.intValue();
-    }
-
-    /**
-     * Sets the number Of Free Resources to the given numberOfFreeResources value.
-     *
-     * @param numberOfFreeResources the number Of Free Resources to set.
-     */
-    @Deprecated
-    public void setNumberOfFreeResources(IntWrapper numberOfFreeResources) {
-        this.freeNodesNumber = numberOfFreeResources.intValue();
     }
 
     /**

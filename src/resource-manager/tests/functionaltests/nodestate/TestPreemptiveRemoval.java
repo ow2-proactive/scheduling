@@ -185,7 +185,7 @@ public class TestPreemptiveRemoval extends FunctionalTest {
         resourceManager.removeNode(n3.getNodeInformation().getURL(), false);
 
         evt = RMTHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, n3.getNodeInformation().getURL());
-        Assert.assertEquals(evt.getNodeState(), NodeState.TO_BE_RELEASED);
+        Assert.assertEquals(evt.getNodeState(), NodeState.TO_BE_REMOVED);
 
         assertTrue(resourceManager.getState().getTotalNodesNumber() == RMTHelper.defaultNodesNumber - 2);
 

@@ -265,7 +265,7 @@ public class RMNodeImpl implements RMNode, Serializable {
         if (this.isDown()) {
             throw new NodeException("The node is down");
         }
-        this.state = NodeState.TO_BE_RELEASED;
+        this.state = NodeState.TO_BE_REMOVED;
         this.stateChangeTime = System.currentTimeMillis();
     }
 
@@ -294,7 +294,7 @@ public class RMNodeImpl implements RMNode, Serializable {
      * @return true if the node is 'to be released', false otherwise.
      */
     public boolean isToRemove() {
-        return this.state == NodeState.TO_BE_RELEASED;
+        return this.state == NodeState.TO_BE_REMOVED;
     }
 
     /**

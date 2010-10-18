@@ -67,11 +67,8 @@ public enum NodeState {
     /**
      * a busy node which must be removed from resource manager when the user
      * will give back the node.
-     * 
-     * The constant will be replaced with TO_BE_REMOVED in the future.
      */
-    @Deprecated
-    TO_BE_RELEASED("To be removed");
+    TO_BE_REMOVED("To be removed");
 
     private String desc;
 

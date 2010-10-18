@@ -47,8 +47,8 @@ import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.common.RMConstants;
-import org.ow2.proactive.resourcemanager.frontend.RMAdmin;
 import org.ow2.proactive.resourcemanager.frontend.RMConnection;
+import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.VirtualInfrastructure;
 
 
@@ -139,10 +139,10 @@ public final class VirtualInfrastructureNodeStarterRegister {
             return false;
         }
         // 3 - Log as admin with the provided username and password
-        RMAdmin admin = null;
+        ResourceManager resourceManager = null;
         try {
-            admin = auth.logAsAdmin(creds);
-            if (admin == null) {
+            resourceManager = auth.login(creds);
+            if (resourceManager == null) {
                 throw new RuntimeException("The RMAdmin instance is null");
             }
         } catch (Throwable t) {
@@ -154,7 +154,7 @@ public final class VirtualInfrastructureNodeStarterRegister {
             boolean added = false;
             int cb = 0, cbTreshHold = 10;
             while (!added && cb < cbTreshHold) {
-                BooleanWrapper res = admin.addNode(node.getNodeInformation().getURL(), nodeSource);
+                BooleanWrapper res = resourceManager.addNode(node.getNodeInformation().getURL(), nodeSource);
                 added = res.booleanValue();
                 cb++;
             }
