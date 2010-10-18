@@ -6,7 +6,10 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
@@ -27,6 +30,7 @@ import org.objectweb.proactive.api.PAFuture;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.SchedulerState;
 import org.ow2.proactive.scheduler.common.SchedulerStatus;
+import org.ow2.proactive.scheduler.common.exception.InternalSchedulerException;
 import org.ow2.proactive.scheduler.common.exception.JobAlreadyFinishedException;
 import org.ow2.proactive.scheduler.common.exception.JobCreationException;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
@@ -48,8 +52,9 @@ import org.ow2.proactive.scheduler.task.TaskResultImpl;
 @XmlJavaTypeAdapter(value = PersistentMapConverter.class, type = PersistentMap.class)
 @Path("/scheduler/")
 public class SchedulerStateRest {
-
-
+	/** If the rest api was unable to instantiate the value from byte array representation*/	
+	public static final String UNKNOWN_VALUE_TYPE = "Unknown value type";	
+	
     @GET
     @Path("jobs")
     @Produces("application/json")
@@ -110,8 +115,7 @@ public class SchedulerStateRest {
             NotConnectedException {
         Scheduler s = checkAccess(sessionId);
         return PAFuture.getFutureValue(s.getState(true));
-    }
-    
+    }   
 
     @GET
     @Path("jobs/{jobid}")
@@ -125,9 +129,7 @@ public class SchedulerStateRest {
         js = s.getJobState(jobId);
         js = PAFuture.getFutureValue(js);
       
-        return js;
-      
-
+        return js;      
     }
 
     @GET
@@ -137,10 +139,44 @@ public class SchedulerStateRest {
     public JobResult jobResult(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId)
             throws NotConnectedException, PermissionException, UnknownJobException {
         Scheduler s = checkAccess(sessionId);
-
+        
         return PAFuture.getFutureValue(s.getJobResult(jobId));
-
-    }
+    }    
+    
+    @GET
+    @Path("jobs/{jobid}/result/value")
+    @Produces("application/json")        
+    public Map<String, Serializable> jobResultValue(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId)
+    throws NotConnectedException, PermissionException, UnknownJobException {
+    	Scheduler s = checkAccess(sessionId);
+    	JobResult jobResult = PAFuture.getFutureValue(s.getJobResult(jobId));
+    	if (jobResult == null) {
+    		return null;
+    	}
+    	Map<String, TaskResult> allResults = jobResult.getAllResults();
+    	Map<String, Serializable> res = new HashMap<String, Serializable>(allResults.size());
+    	for(final Entry<String, TaskResult> entry : allResults.entrySet()){        	
+    		TaskResult taskResult = entry.getValue();
+    		String value = null;
+    		// No entry if the task had exception
+    		if (taskResult.hadException()) {
+    			value = taskResult.getException().getMessage();
+    		} else {        		
+    			try {
+    				Serializable instanciatedValue = taskResult.value();
+    				if (instanciatedValue != null) {
+    					value = instanciatedValue.toString();
+    				}
+    			} catch (InternalSchedulerException e) {
+    				value = UNKNOWN_VALUE_TYPE;
+    			} catch (Throwable t) {
+    				value = "Unable to get the value due to " + t.getMessage();
+    			}
+    		}
+    		res.put(entry.getKey(), value);
+    	}        
+    	return res;  
+    }    
 
     @DELETE
     @Path("jobs/{jobid}")
@@ -224,11 +260,30 @@ public class SchedulerStateRest {
     @Path("jobs/{jobid}/tasks/{taskid}/result/value")
     @Produces("*/*")
     public Serializable valueOftaskresult(@HeaderParam("sessionid") String sessionId,
-            @PathParam("jobid") String jobId, @PathParam("taskid") String taskId) throws Throwable {
-        Scheduler s = checkAccess(sessionId);
-
-        TaskResult tr = s.getTaskResult(jobId, taskId);
-        return tr.value();
+    		@PathParam("jobid") String jobId, @PathParam("taskid") String taskId) throws Throwable {
+    	Scheduler s = checkAccess(sessionId);
+    	TaskResult taskResult = s.getTaskResult(jobId, taskId);
+    	if (taskResult==null){
+    		// task is not finished yet
+    		return null;
+    	}
+    	String value = null;
+    	// No entry if the task had exception
+    	if (taskResult.hadException()) {
+    		value = taskResult.getException().getMessage();
+    	} else {        		
+    		try {
+    			Serializable instanciatedValue = taskResult.value();
+    			if (instanciatedValue != null) {
+    				value = instanciatedValue.toString();
+    			}
+    		} catch (InternalSchedulerException e) {
+    			value = UNKNOWN_VALUE_TYPE;
+    		} catch (Throwable t) {
+    			value = "Unable to get the value due to " + t.getMessage();
+    		}
+    	}               
+    	return value;
     }
     
     @GET
