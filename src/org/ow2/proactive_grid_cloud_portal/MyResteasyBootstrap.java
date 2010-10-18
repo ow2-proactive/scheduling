@@ -27,7 +27,8 @@ public class MyResteasyBootstrap extends ResteasyBootstrap {
         dispatcher.registerProvider(PersistentMapConverter.class);
         dispatcher.registerProvider(NotConnectedExceptionMapper.class);
         dispatcher.registerProvider( JacksonProvider.class);
-
+        dispatcher.addStringConverter(UpdatablePropertiesConverter.class);
+        
         try {
             PortalConfiguration.load(new File(event.getServletContext().getRealPath(
                     "WEB-INF/portal.properties")));

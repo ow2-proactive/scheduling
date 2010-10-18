@@ -42,6 +42,7 @@ import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.factories.JobFactory;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskState;
+import org.ow2.proactive.scheduler.task.TaskResultImpl;
 
 
 @XmlJavaTypeAdapter(value = PersistentMapConverter.class, type = PersistentMap.class)
@@ -231,10 +232,21 @@ public class SchedulerStateRest {
     }
     
     @GET
+    @Path("jobs/{jobid}/tasks/{taskid}/result/serializedvalue")
+    @Produces("*/*")
+    public Serializable serializedValueOftaskresult(@HeaderParam("sessionid") String sessionId,
+            @PathParam("jobid") String jobId, @PathParam("taskid") String taskId) throws Throwable {
+        Scheduler s = checkAccess(sessionId);
+        TaskResult tr = s.getTaskResult(jobId, taskId);
+        tr = PAFuture.getFutureValue(tr);
+        return ((TaskResultImpl)tr).getSerializedValue();
+    }
+    
+    @GET
     @Path("jobs/{jobid}/tasks/{taskid}/result")
     @Produces("application/json")
     public TaskResult taskresult(@HeaderParam("sessionid") String sessionId,
-            @PathParam("jobid") String jobId, @PathParam("taskid") String taskId) throws Throwable {
+            @PathParam("jobid") String jobId, @PathParam("taskid") String taskId) throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
         Scheduler s = checkAccess(sessionId);
         TaskResult tr = s.getTaskResult(jobId, taskId);
         return PAFuture.getFutureValue(tr);
