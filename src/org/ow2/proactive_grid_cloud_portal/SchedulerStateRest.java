@@ -237,10 +237,10 @@ public class SchedulerStateRest {
     }
 
     @GET
-    @Path("jobs/{jobid}/tasks/{taskid}")  
+    @Path("jobs/{jobid}/tasks/{taskname}")  
     @Produces("application/json")
     public TaskState jobtasks(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId,
-            @PathParam("taskid") String taskid) throws NotConnectedException, UnknownJobException,
+            @PathParam("taskname") String taskname) throws NotConnectedException, UnknownJobException,
             PermissionException, UnknownTaskException {
         Scheduler s = checkAccess(sessionId);
         JobState jobState;
@@ -248,21 +248,22 @@ public class SchedulerStateRest {
         jobState = s.getJobState(jobId);
 
         for (TaskState ts : jobState.getTasks()) {
-            if (ts.getId().getReadableName().equals(taskid)) {
+            if (ts.getId().getReadableName().equals(taskname)) {
                 return ts;
             }
         }
 
-        throw new UnknownTaskException("task " + taskid + "not found");
+        throw new UnknownTaskException("task " + taskname + "not found");
     }
 
     @GET
-    @Path("jobs/{jobid}/tasks/{taskid}/result/value")
+    @Path("jobs/{jobid}/tasks/{taskname}/result/value")
     @Produces("*/*")
     public Serializable valueOftaskresult(@HeaderParam("sessionid") String sessionId,
-    		@PathParam("jobid") String jobId, @PathParam("taskid") String taskId) throws Throwable {
+    		@PathParam("jobid") String jobId, @PathParam("taskname") String taskname) throws Throwable {
     	Scheduler s = checkAccess(sessionId);
-    	TaskResult taskResult = s.getTaskResult(jobId, taskId);
+//    	TaskResult taskResult = s.getTaskResult(jobId, taskname);
+    	TaskResult taskResult = workaroundforSCHEDULING863(s, jobId, taskname);
     	if (taskResult==null){
     		// task is not finished yet
     		return null;
@@ -287,57 +288,61 @@ public class SchedulerStateRest {
     }
     
     @GET
-    @Path("jobs/{jobid}/tasks/{taskid}/result/serializedvalue")
+    @Path("jobs/{jobid}/tasks/{taskname}/result/serializedvalue")
     @Produces("*/*")
     public Serializable serializedValueOftaskresult(@HeaderParam("sessionid") String sessionId,
-            @PathParam("jobid") String jobId, @PathParam("taskid") String taskId) throws Throwable {
+            @PathParam("jobid") String jobId, @PathParam("taskname") String taskname) throws Throwable {
         Scheduler s = checkAccess(sessionId);
-        TaskResult tr = s.getTaskResult(jobId, taskId);
+//        TaskResult tr = s.getTaskResult(jobId, taskname);
+        TaskResult tr = workaroundforSCHEDULING863(s, jobId, taskname);
         tr = PAFuture.getFutureValue(tr);
         return ((TaskResultImpl)tr).getSerializedValue();
     }
     
     @GET
-    @Path("jobs/{jobid}/tasks/{taskid}/result")
+    @Path("jobs/{jobid}/tasks/{taskname}/result")
     @Produces("application/json")
     public TaskResult taskresult(@HeaderParam("sessionid") String sessionId,
-            @PathParam("jobid") String jobId, @PathParam("taskid") String taskId) throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
+            @PathParam("jobid") String jobId, @PathParam("taskname") String taskname) throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
         Scheduler s = checkAccess(sessionId);
-        TaskResult tr = s.getTaskResult(jobId, taskId);
+//        TaskResult tr = s.getTaskResult(jobId, taskname);     
+        TaskResult tr = workaroundforSCHEDULING863(s, jobId, taskname);
         return PAFuture.getFutureValue(tr);
     }
 
     @GET
-    @Path("jobs/{jobid}/tasks/{taskid}/result/log/all")
+    @Path("jobs/{jobid}/tasks/{taskname}/result/log/all")
     @Produces("*/*")
     public String tasklog(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId,
-            @PathParam("taskid") String taskId) throws NotConnectedException, UnknownJobException,
+            @PathParam("taskname") String taskname) throws NotConnectedException, UnknownJobException,
             UnknownTaskException, PermissionException {
         Scheduler s = checkAccess(sessionId);
-        return s.getTaskResult(jobId, taskId).getOutput().getAllLogs(true);
+        TaskResult tr = workaroundforSCHEDULING863(s, jobId, taskname);
+        return tr.getOutput().getAllLogs(true);
 
     }
 
     @GET
-    @Path("jobs/{jobid}/tasks/{taskid}/result/log/err")
+    @Path("jobs/{jobid}/tasks/{taskname}/result/log/err")
     @Produces("*/*")
     public String tasklogErr(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId,
-            @PathParam("taskid") String taskId) throws NotConnectedException, UnknownJobException,
+            @PathParam("taskname") String taskname) throws NotConnectedException, UnknownJobException,
             UnknownTaskException, PermissionException {
         Scheduler s = checkAccess(sessionId);
-
-        return s.getTaskResult(jobId, taskId).getOutput().getStderrLogs(true);
+        TaskResult tr = workaroundforSCHEDULING863(s, jobId, taskname);
+        return tr.getOutput().getStderrLogs(true);
 
     }
 
     @GET
-    @Path("jobs/{jobid}/tasks/{taskid}/result/log/out")
+    @Path("jobs/{jobid}/tasks/{taskname}/result/log/out")
     @Produces("*/*")
     public String tasklogout(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId,
-            @PathParam("taskid") String taskId) throws NotConnectedException, UnknownJobException,
+            @PathParam("taskname") String taskname) throws NotConnectedException, UnknownJobException,
             UnknownTaskException, PermissionException {
         Scheduler s = checkAccess(sessionId);
-        return s.getTaskResult(jobId, taskId).getOutput().getStdoutLogs(true);
+        TaskResult tr = workaroundforSCHEDULING863(s, jobId, taskname);
+        return tr.getOutput().getStdoutLogs(true);
 
     }
 
@@ -391,17 +396,17 @@ public class SchedulerStateRest {
     //    }
     //    /**
     //     * @param sessionId
-    //     * @param taskId
+    //     * @param taskname
     //     * @throws WebApplicationException http status code 404 Not Found
     //     */
-    //    public void handleUnknowTaskException(String sessionId, String taskId) throws WebApplicationException {
+    //    public void handleUnknowTaskException(String sessionId, String taskname) throws WebApplicationException {
     //        throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_NOT_FOUND)
-    //                .entity("task " + taskId + "not found").build());
+    //                .entity("task " + taskname + "not found").build());
     //    }
 
     //    /**
     //     * @param sessionId
-    //     * @param taskId
+    //     * @param taskname
     //     * @throws WebApplicationException http status code 404 Not Found
     //     */
     //    public void handleJobAlreadyFinishedException(String sessionId, String msg) throws WebApplicationException {
@@ -577,4 +582,18 @@ public class SchedulerStateRest {
         return s.isConnected();
     }
 
+    
+    private TaskResult workaroundforSCHEDULING863(Scheduler s,String jobId, String taskName) throws UnknownTaskException, NotConnectedException, UnknownJobException, PermissionException {
+        try {
+            return s.getTaskResult(jobId, taskName);
+        } catch (RuntimeException e) {
+            if (e.getMessage().contains("has not been found in this job result")) {
+                throw new UnknownTaskException("Result of task " + taskName + " does not exist or task is not yet finished");
+            } else {
+              throw e;
+            }
+        }
+        
+    }
+    
 }
