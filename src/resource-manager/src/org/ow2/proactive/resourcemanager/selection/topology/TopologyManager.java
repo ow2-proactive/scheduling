@@ -38,7 +38,6 @@ import java.net.InetAddress;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -95,10 +94,12 @@ public class TopologyManager {
     }
 
     public TopologyHandler getHandler(TopologyDescriptor topologyDescriptor) {
-        if (!PAResourceManagerProperties.RM_TOPOLOGY_ENABLED.getValueAsBoolean()) {
+        if (topologyDescriptor instanceof ArbitraryTopologyDescriptor) {
+            // this descriptor does not use the topology information
+            // and can be used even if the topology is disabled
+        } else if (!PAResourceManagerProperties.RM_TOPOLOGY_ENABLED.getValueAsBoolean()) {
             throw new TopologyException("Topology is disabled");
         }
-
         TopologyHandler handler = handlers.get(topologyDescriptor.getClass());
         if (handler == null) {
             throw new IllegalArgumentException("Unknown descriptor type " + topologyDescriptor.getClass());
@@ -195,6 +196,10 @@ public class TopologyManager {
     }
 
     public Topology getTopology() {
+        if (!PAResourceManagerProperties.RM_TOPOLOGY_ENABLED.getValueAsBoolean()) {
+            throw new TopologyException("Topology is disabled");
+        }
+
         synchronized (topology) {
             return (Topology) ((TopologyImpl) topology).clone();
         }
