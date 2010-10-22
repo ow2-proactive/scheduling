@@ -40,6 +40,7 @@ import static junit.framework.Assert.assertTrue;
 
 import java.io.File;
 
+import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.RMFactory;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;

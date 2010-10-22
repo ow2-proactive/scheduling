@@ -40,6 +40,7 @@ import static junit.framework.Assert.assertTrue;
 
 import java.net.InetAddress;
 
+import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
