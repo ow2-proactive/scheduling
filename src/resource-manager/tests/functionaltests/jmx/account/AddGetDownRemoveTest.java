@@ -130,7 +130,7 @@ public final class AddGetDownRemoveTest extends FunctionalTest {
         final String name = "test";
         Node node = RMTHelper.createNode(name);
         final String nodeURL = node.getNodeInformation().getURL();
-        r.addNode(nodeURL).booleanValue();
+        r.addNode(nodeURL).getBooleanValue();
 
         // 2) GET
         final long beforeGetTime = System.currentTimeMillis();
@@ -141,14 +141,14 @@ public final class AddGetDownRemoveTest extends FunctionalTest {
 
         // 3) Kill the node to ensure that the RM considers it as being DOWN
         node.getProActiveRuntime().killNode(name);
-        while (r.nodeIsAvailable(nodeURL).booleanValue()) {
+        while (r.nodeIsAvailable(nodeURL).getBooleanValue()) {
             Thread.sleep(500);
         }
 
         final long getDownMaxDuration = System.currentTimeMillis() - beforeGetTime;
 
         // 4) REMOVE  
-        r.removeNode(nodeURL, true).booleanValue();
+        r.removeNode(nodeURL, true).getBooleanValue();
 
         // Refresh the account manager
         conn.invoke(managementMBeanName, "refreshAllAccounts", null, null);

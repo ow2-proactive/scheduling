@@ -44,7 +44,6 @@ import org.ow2.proactive.scheduler.ext.scilab.util.ScilabConfiguration;
 import org.ow2.proactive.scheduler.ext.scilab.exception.InvalidParameterException;
 
 import java.io.*;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

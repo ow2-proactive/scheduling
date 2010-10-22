@@ -101,7 +101,7 @@ public class TestConcurrentUsers extends FunctionalTest {
             public void run() {
                 try {
                     ResourceManager rm2 = RMTHelper.connect("user", "pwd");
-                    rm2.releaseNode(ns.get(0)).booleanValue();
+                    rm2.releaseNode(ns.get(0)).getBooleanValue();
                 } catch (Exception e) {
                     System.out.println(e.getMessage());
                 }

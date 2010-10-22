@@ -267,7 +267,7 @@ public class TestAdminAddingNodes extends FunctionalTest {
         //add the same node twice and check that RM will not kill the node. If it does
         //second attempt will fail
         BooleanWrapper result = resourceManager.addNode(node2URL, NodeSource.DEFAULT);
-        if (result.booleanValue()) {
+        if (result.getBooleanValue()) {
             assertTrue("Successfully added the same node twice - incorrect", false);
         }
 

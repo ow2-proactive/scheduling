@@ -122,7 +122,7 @@ public class SelectionTest extends FunctionalTest {
                             (distantHost + "\n" + neighborHost).getBytes() }, StaticPolicy.class.getName(),
                     null);
 
-            if (result.booleanValue()) {
+            if (result.getBooleanValue()) {
                 RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
                 RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
             }
@@ -168,32 +168,32 @@ public class SelectionTest extends FunctionalTest {
         // checking TopologyDescriptor.ARBITRARY
         NodeSet ns = resourceManager.getAtMostNodes(1, TopologyDescriptor.ARBITRARY, null, null);
         Assert.assertEquals(1, ns.size());
-        resourceManager.releaseNodes(ns).booleanValue();
+        resourceManager.releaseNodes(ns).getBooleanValue();
 
         ns = resourceManager.getAtMostNodes(8, TopologyDescriptor.ARBITRARY, null, null);
         Assert.assertEquals(8, ns.size());
-        resourceManager.releaseNodes(ns).booleanValue();
+        resourceManager.releaseNodes(ns).getBooleanValue();
 
         ns = resourceManager.getAtMostNodes(100, TopologyDescriptor.ARBITRARY, null, null);
         Assert.assertEquals(8, ns.size());
-        resourceManager.releaseNodes(ns).booleanValue();
+        resourceManager.releaseNodes(ns).getBooleanValue();
 
         ns = resourceManager.getAtMostNodes(100, TopologyDescriptor.ARBITRARY, scriptList, null);
         Assert.assertEquals(1, ns.size());
-        resourceManager.releaseNodes(ns).booleanValue();
+        resourceManager.releaseNodes(ns).getBooleanValue();
 
         // checking TopologyDescriptor.BEST_PROXIMITY
         ns = resourceManager.getAtMostNodes(1, TopologyDescriptor.BEST_PROXIMITY, null, null);
         Assert.assertEquals(1, ns.size());
-        resourceManager.releaseNodes(ns).booleanValue();
+        resourceManager.releaseNodes(ns).getBooleanValue();
 
         ns = resourceManager.getAtMostNodes(8, TopologyDescriptor.BEST_PROXIMITY, null, null);
         Assert.assertEquals(8, ns.size());
-        resourceManager.releaseNodes(ns).booleanValue();
+        resourceManager.releaseNodes(ns).getBooleanValue();
 
         ns = resourceManager.getAtMostNodes(100, TopologyDescriptor.BEST_PROXIMITY, null, null);
         Assert.assertEquals(8, ns.size());
-        resourceManager.releaseNodes(ns).booleanValue();
+        resourceManager.releaseNodes(ns).getBooleanValue();
 
         Node pivotNode = null;
         ns = resourceManager.getAtMostNodes(6, TopologyDescriptor.BEST_PROXIMITY, null, null);
@@ -205,7 +205,7 @@ public class SelectionTest extends FunctionalTest {
                 Assert.assertTrue("All nodes have to be from " + currentHost, false);
             }
         }
-        resourceManager.releaseNodes(ns).booleanValue();
+        resourceManager.releaseNodes(ns).getBooleanValue();
 
         ns = resourceManager.getAtMostNodes(7, TopologyDescriptor.BEST_PROXIMITY, null, null);
         Assert.assertEquals(7, ns.size());
@@ -214,7 +214,7 @@ public class SelectionTest extends FunctionalTest {
                 Assert.assertTrue("Node from distant host selected", false);
             }
         }
-        resourceManager.releaseNodes(ns).booleanValue();
+        resourceManager.releaseNodes(ns).getBooleanValue();
         // pivot scenario
         List<Node> pivot = new LinkedList<Node>();
         pivot.add(pivotNode);
@@ -229,7 +229,7 @@ public class SelectionTest extends FunctionalTest {
                 Assert.assertTrue("Node from distant host selected", false);
             }
         }
-        resourceManager.releaseNodes(ns).booleanValue();
+        resourceManager.releaseNodes(ns).getBooleanValue();
 
         ns = resourceManager.getAtMostNodes(7,
                 new BestProximityDescriptor(BestProximityDescriptor.MAX, pivot), null, null);
@@ -239,21 +239,21 @@ public class SelectionTest extends FunctionalTest {
                 Assert.assertTrue("Pivot must not be in results", false);
             }
         }
-        resourceManager.releaseNodes(ns).booleanValue();
+        resourceManager.releaseNodes(ns).getBooleanValue();
 
         // checking TopologyDescriptor.ThresholdProximityDescriptor
         ns = resourceManager.getAtMostNodes(1, new ThresholdProximityDescriptor(Long.MAX_VALUE), null, null);
         Assert.assertEquals(1, ns.size());
-        resourceManager.releaseNodes(ns).booleanValue();
+        resourceManager.releaseNodes(ns).getBooleanValue();
 
         ns = resourceManager.getAtMostNodes(8, new ThresholdProximityDescriptor(Long.MAX_VALUE), null, null);
         Assert.assertEquals(8, ns.size());
-        resourceManager.releaseNodes(ns).booleanValue();
+        resourceManager.releaseNodes(ns).getBooleanValue();
 
         ns = resourceManager
                 .getAtMostNodes(100, new ThresholdProximityDescriptor(Long.MAX_VALUE), null, null);
         Assert.assertEquals(8, ns.size());
-        resourceManager.releaseNodes(ns).booleanValue();
+        resourceManager.releaseNodes(ns).getBooleanValue();
 
         // getting information about topology
         Topology topology = resourceManager.getTopology();
@@ -285,12 +285,12 @@ public class SelectionTest extends FunctionalTest {
         ns = resourceManager.getAtMostNodes(100, new ThresholdProximityDescriptor(
             current2neighborDistance - 1), null, null);
         Assert.assertEquals(6, ns.size());
-        resourceManager.releaseNodes(ns).booleanValue();
+        resourceManager.releaseNodes(ns).getBooleanValue();
 
         ns = resourceManager.getAtMostNodes(100, new ThresholdProximityDescriptor(current2neighborDistance),
                 null, null);
         Assert.assertEquals(7, ns.size());
-        resourceManager.releaseNodes(ns).booleanValue();
+        resourceManager.releaseNodes(ns).getBooleanValue();
 
         ns = resourceManager.getAtMostNodes(100, new ThresholdProximityDescriptor(maxThreshold - 1), null,
                 null);
@@ -300,11 +300,11 @@ public class SelectionTest extends FunctionalTest {
             }
         }
         Assert.assertEquals(7, ns.size());
-        resourceManager.releaseNodes(ns).booleanValue();
+        resourceManager.releaseNodes(ns).getBooleanValue();
 
         ns = resourceManager.getAtMostNodes(10, new ThresholdProximityDescriptor(maxThreshold), null, null);
         Assert.assertEquals(8, ns.size());
-        resourceManager.releaseNodes(ns).booleanValue();
+        resourceManager.releaseNodes(ns).getBooleanValue();
         // pivot scenario
         ns = resourceManager.getAtMostNodes(1, new ThresholdProximityDescriptor(0, pivot), null, null);
         Assert.assertEquals(1, ns.size());
@@ -317,7 +317,7 @@ public class SelectionTest extends FunctionalTest {
                 Assert.assertTrue("Incorrect node selected", false);
             }
         }
-        resourceManager.releaseNodes(ns).booleanValue();
+        resourceManager.releaseNodes(ns).getBooleanValue();
 
         ns = resourceManager.getAtMostNodes(6, new ThresholdProximityDescriptor(current2neighborDistance,
             pivot), null, null);
@@ -330,63 +330,63 @@ public class SelectionTest extends FunctionalTest {
                 Assert.assertTrue("Node from distant host selected", false);
             }
         }
-        resourceManager.releaseNodes(ns).booleanValue();
+        resourceManager.releaseNodes(ns).getBooleanValue();
 
         // checking TopologyDescriptor.SINGLE_HOST
         ns = resourceManager.getAtMostNodes(1, TopologyDescriptor.SINGLE_HOST, null, null);
         Assert.assertEquals(1, ns.size());
-        resourceManager.releaseNodes(ns).booleanValue();
+        resourceManager.releaseNodes(ns).getBooleanValue();
 
         ns = resourceManager.getAtMostNodes(8, TopologyDescriptor.SINGLE_HOST, null, null);
         Assert.assertEquals(6, ns.size());
-        resourceManager.releaseNodes(ns).booleanValue();
+        resourceManager.releaseNodes(ns).getBooleanValue();
 
         ns = resourceManager.getAtMostNodes(100, TopologyDescriptor.SINGLE_HOST, null, null);
         Assert.assertEquals(6, ns.size());
-        resourceManager.releaseNodes(ns).booleanValue();
+        resourceManager.releaseNodes(ns).getBooleanValue();
 
         ns = resourceManager.getAtMostNodes(100, TopologyDescriptor.SINGLE_HOST, scriptList, null);
         Assert.assertEquals(1, ns.size());
-        resourceManager.releaseNodes(ns).booleanValue();
+        resourceManager.releaseNodes(ns).getBooleanValue();
 
         // checking TopologyDescriptor.SINGLE_HOST_EXCLUSIVE
         ns = resourceManager.getAtMostNodes(1, TopologyDescriptor.SINGLE_HOST_EXCLUSIVE, null, null);
         Assert.assertEquals(1, ns.size());
-        resourceManager.releaseNodes(ns).booleanValue();
+        resourceManager.releaseNodes(ns).getBooleanValue();
 
         ns = resourceManager.getAtMostNodes(8, TopologyDescriptor.SINGLE_HOST_EXCLUSIVE, null, null);
         Assert.assertEquals(6, ns.size());
-        resourceManager.releaseNodes(ns).booleanValue();
+        resourceManager.releaseNodes(ns).getBooleanValue();
 
         ns = resourceManager.getAtMostNodes(2, TopologyDescriptor.SINGLE_HOST_EXCLUSIVE, null, null);
         Assert.assertEquals(6, ns.size());
-        resourceManager.releaseNodes(ns).booleanValue();
+        resourceManager.releaseNodes(ns).getBooleanValue();
 
         ns = resourceManager.getAtMostNodes(100, TopologyDescriptor.SINGLE_HOST_EXCLUSIVE, scriptList, null);
         Assert.assertEquals(0, ns.size());
-        resourceManager.releaseNodes(ns).booleanValue();
+        resourceManager.releaseNodes(ns).getBooleanValue();
 
         // checking TopologyDescriptor.MULTIPLE_HOSTS_EXCLUSIVE
         ns = resourceManager.getAtMostNodes(1, TopologyDescriptor.MULTIPLE_HOSTS_EXCLUSIVE, null, null);
         Assert.assertEquals(1, ns.size());
-        resourceManager.releaseNodes(ns).booleanValue();
+        resourceManager.releaseNodes(ns).getBooleanValue();
 
         ns = resourceManager.getAtMostNodes(8, TopologyDescriptor.MULTIPLE_HOSTS_EXCLUSIVE, null, null);
         Assert.assertEquals(8, ns.size());
-        resourceManager.releaseNodes(ns).booleanValue();
+        resourceManager.releaseNodes(ns).getBooleanValue();
 
         ns = resourceManager.getAtMostNodes(2, TopologyDescriptor.MULTIPLE_HOSTS_EXCLUSIVE, null, null);
         Assert.assertEquals(2, ns.size());
-        resourceManager.releaseNodes(ns).booleanValue();
+        resourceManager.releaseNodes(ns).getBooleanValue();
 
         ns = resourceManager.getAtMostNodes(7, TopologyDescriptor.MULTIPLE_HOSTS_EXCLUSIVE, null, null);
         Assert.assertEquals(7, ns.size());
-        resourceManager.releaseNodes(ns).booleanValue();
+        resourceManager.releaseNodes(ns).getBooleanValue();
 
         ns = resourceManager.getAtMostNodes(100, TopologyDescriptor.MULTIPLE_HOSTS_EXCLUSIVE, scriptList,
                 null);
         Assert.assertEquals(0, ns.size());
-        resourceManager.releaseNodes(ns).booleanValue();
+        resourceManager.releaseNodes(ns).getBooleanValue();
 
         PAFuture.waitFor(resourceManager.removeNodeSource("remote", true));
     }

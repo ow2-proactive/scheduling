@@ -45,8 +45,6 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlRootElement;
-
 import org.apache.log4j.Logger;
 import org.hibernate.annotations.AccessType;
 import org.hibernate.annotations.Proxy;

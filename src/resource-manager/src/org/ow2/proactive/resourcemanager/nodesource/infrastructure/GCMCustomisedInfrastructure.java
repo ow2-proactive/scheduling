@@ -42,7 +42,6 @@ import java.util.HashMap;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
-import org.ow2.proactive.resourcemanager.core.RMCore;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;

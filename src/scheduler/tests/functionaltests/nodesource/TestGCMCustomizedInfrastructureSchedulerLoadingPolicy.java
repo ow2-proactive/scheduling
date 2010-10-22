@@ -40,7 +40,6 @@ import static junit.framework.Assert.assertTrue;
 
 import java.net.InetAddress;
 
-import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
@@ -126,7 +125,7 @@ public class TestGCMCustomizedInfrastructureSchedulerLoadingPolicy extends
             // incorrect infrastructure for the policy
             resourceManager.createNodeSource(source1, GCMInfrastructure.class.getName(),
                     new Object[] { GCMDeploymentData }, SchedulerLoadingPolicy.class.getName(),
-                    getPolicyParams()).booleanValue();
+                    getPolicyParams()).getBooleanValue();
             assertTrue(false);
         } catch (Exception e) {
         }

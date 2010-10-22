@@ -344,7 +344,7 @@ public final class PAAgentServiceRMStarter {
             // if not connected just exit
             // isActive throws an exception is not connected
             try {
-                while (rm.nodeIsAvailable(starter.getNodeURL()).booleanValue()) {
+                while (rm.nodeIsAvailable(starter.getNodeURL()).getBooleanValue()) {
                     try {
                         Thread.sleep(PING_DELAY_IN_MS);
                     } catch (InterruptedException e) {
@@ -443,9 +443,9 @@ public final class PAAgentServiceRMStarter {
             attempts++;
             try {
                 if (nodeSourceName == null) {
-                    isNodeAdded = rm.addNode(this.nodeURL).booleanValue();
+                    isNodeAdded = rm.addNode(this.nodeURL).getBooleanValue();
                 } else {
-                    isNodeAdded = rm.addNode(this.nodeURL, nodeSourceName).booleanValue();
+                    isNodeAdded = rm.addNode(this.nodeURL, nodeSourceName).getBooleanValue();
                 }
             } catch (AddingNodesException ex) {
                 System.out.println("Unable to add the local node to the Resource Manager at " + rmURL);

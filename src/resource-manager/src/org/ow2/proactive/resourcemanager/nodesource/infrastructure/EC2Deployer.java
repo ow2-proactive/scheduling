@@ -44,7 +44,6 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 
 import com.xerox.amazonws.ec2.EC2Exception;

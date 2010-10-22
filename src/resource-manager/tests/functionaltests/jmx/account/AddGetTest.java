@@ -130,7 +130,7 @@ public final class AddGetTest extends FunctionalTest {
         final long beforeAddTime = System.currentTimeMillis();
         Node node = RMTHelper.createNode("test");
         final String nodeURL = node.getNodeInformation().getURL();
-        r.addNode(nodeURL).booleanValue();
+        r.addNode(nodeURL).getBooleanValue();
 
         // 2) GET
         final long beforeGetTime = System.currentTimeMillis();

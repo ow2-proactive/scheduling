@@ -43,7 +43,6 @@ import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
-import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
 import org.ow2.proactive.resourcemanager.nodesource.utils.NamesConvertor;
 import org.ow2.proactive.scheduler.common.NotificationData;
@@ -89,7 +88,7 @@ public class ReleaseResourcesWhenSchedulerIdle extends SchedulerAwarePolicy impl
     @Override
     public BooleanWrapper activate() {
         BooleanWrapper activationStatus = super.activate();
-        if (!activationStatus.booleanValue()) {
+        if (!activationStatus.getBooleanValue()) {
             return activationStatus;
         }
 

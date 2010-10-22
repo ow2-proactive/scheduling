@@ -83,7 +83,7 @@ public class TestNSAdminPermissions extends FunctionalTest {
         // user does not have an access to change the node source
         ResourceManager userRMAccess = RMTHelper.join("radmin", "pwd");
         try {
-            userRMAccess.removeNodeSource(nsName, true).booleanValue();
+            userRMAccess.removeNodeSource(nsName, true).getBooleanValue();
             Assert.assertTrue(false);
         } catch (Exception e) {
             System.out.println(e.getMessage());
@@ -93,7 +93,7 @@ public class TestNSAdminPermissions extends FunctionalTest {
         // admin and provider are in "nsadmins" group
         ResourceManager providerRMAccess = RMTHelper.join("nsadmin", "pwd");
         try {
-            providerRMAccess.removeNodeSource(nsName, true).booleanValue();
+            providerRMAccess.removeNodeSource(nsName, true).getBooleanValue();
             Assert.assertTrue(false);
         } catch (Exception e) {
             System.out.println(e.getMessage());
@@ -102,7 +102,7 @@ public class TestNSAdminPermissions extends FunctionalTest {
 
         adminRMAccess = RMTHelper.join("admin", "admin");
         try {
-            adminRMAccess.removeNodeSource(nsName, true).booleanValue();
+            adminRMAccess.removeNodeSource(nsName, true).getBooleanValue();
         } catch (Exception e) {
             Assert.assertTrue(false);
         }
@@ -121,7 +121,7 @@ public class TestNSAdminPermissions extends FunctionalTest {
         Node node = RMTHelper.createNode("node1");
         try {
             // adding the node as provider
-            providerRMAccess.addNode(node.getNodeInformation().getURL(), nsName).booleanValue();
+            providerRMAccess.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
             RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
         } catch (Exception e) {
             Assert.assertTrue(false);
@@ -131,7 +131,7 @@ public class TestNSAdminPermissions extends FunctionalTest {
         userRMAccess = RMTHelper.join("radmin", "pwd");
         try {
             // this is an administrator of the node source, so it can remove the foreign node
-            userRMAccess.removeNode(node.getNodeInformation().getURL(), true).booleanValue();
+            userRMAccess.removeNode(node.getNodeInformation().getURL(), true).getBooleanValue();
             RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
         } catch (Exception e) {
             Assert.assertTrue(false);
@@ -143,7 +143,7 @@ public class TestNSAdminPermissions extends FunctionalTest {
         Node node2 = RMTHelper.createNode("node2");
         try {
             // adding the node as provider
-            providerRMAccess.addNode(node2.getNodeInformation().getURL(), nsName).booleanValue();
+            providerRMAccess.addNode(node2.getNodeInformation().getURL(), nsName).getBooleanValue();
             RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
         } catch (Exception e) {
             Assert.assertTrue(false);
@@ -165,7 +165,7 @@ public class TestNSAdminPermissions extends FunctionalTest {
 
         adminRMAccess = RMTHelper.join("admin", "admin");
         try {
-            adminRMAccess.removeNodeSource(nsName, true).booleanValue();
+            adminRMAccess.removeNodeSource(nsName, true).getBooleanValue();
         } catch (Exception e) {
             Assert.assertTrue(false);
         }

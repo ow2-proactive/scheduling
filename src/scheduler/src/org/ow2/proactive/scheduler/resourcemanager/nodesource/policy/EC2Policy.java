@@ -222,7 +222,7 @@ public class EC2Policy extends SchedulerAwarePolicy implements InitActive, RunAc
     public BooleanWrapper activate() {
         thisStub = (EC2Policy) PAActiveObject.getStubOnThis();
         BooleanWrapper activationStatus = super.activate();
-        if (!activationStatus.booleanValue()) {
+        if (!activationStatus.getBooleanValue()) {
             return activationStatus;
         }
 
@@ -268,7 +268,7 @@ public class EC2Policy extends SchedulerAwarePolicy implements InitActive, RunAc
      * <code>N * releaseCycle</code> seconds have passed since the node acquisition
      */
     private void refreshNodes() {
-        int rmNodeNumber = thisStub.getTotalNodeNumber().intValue();
+        int rmNodeNumber = thisStub.getTotalNodeNumber().getIntValue();
         int nsNodeNumber = nodeSource.getNodesCount();
 
         if (nsNodeNumber != nodeNumber) {

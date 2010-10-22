@@ -80,11 +80,11 @@ public class TestNSNodesPermissions extends FunctionalTest {
 
         ResourceManager nsadmin = RMTHelper.join("nsadmin", "pwd");
         nsadmin.createNodeSource(nsName, DefaultInfrastructureManager.class.getName(), null,
-                StaticPolicy.class.getName(), new Object[] { "ME", "ALL" }).booleanValue();
+                StaticPolicy.class.getName(), new Object[] { "ME", "ALL" }).getBooleanValue();
 
         Node node = RMTHelper.createNode("node1");
         Node node2 = RMTHelper.createNode("node2");
-        nsadmin.addNode(node.getNodeInformation().getURL(), nsName).booleanValue();
+        nsadmin.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
         RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
 
         NodeSet nodes = nsadmin.getAtMostNodes(1, null);
@@ -96,7 +96,7 @@ public class TestNSNodesPermissions extends FunctionalTest {
         nodes = user.getAtMostNodes(1, null);
         Assert.assertEquals("User cannot get foreign node", 0, nodes.size());
 
-        user.addNode(node2.getNodeInformation().getURL(), nsName).booleanValue();
+        user.addNode(node2.getNodeInformation().getURL(), nsName).getBooleanValue();
         RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
         user.disconnect();
 
@@ -105,7 +105,7 @@ public class TestNSNodesPermissions extends FunctionalTest {
         Assert.assertEquals("Did not get foreign node", 2, nodes.size());
         nsadmin.releaseNodes(nodes);
 
-        nsadmin.removeNodeSource(nsName, true).booleanValue();
+        nsadmin.removeNodeSource(nsName, true).getBooleanValue();
         RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
         RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
         RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, nsName);
@@ -114,11 +114,11 @@ public class TestNSNodesPermissions extends FunctionalTest {
         RMTHelper.log("Test2 - node users = MY_GROUPS");
         ResourceManager admin = RMTHelper.join("admin", "admin");
         admin.createNodeSource(nsName, DefaultInfrastructureManager.class.getName(), null,
-                StaticPolicy.class.getName(), new Object[] { "MY_GROUPS", "ALL" }).booleanValue();
+                StaticPolicy.class.getName(), new Object[] { "MY_GROUPS", "ALL" }).getBooleanValue();
 
         node = RMTHelper.createNode("node1");
         node2 = RMTHelper.createNode("node2");
-        admin.addNode(node.getNodeInformation().getURL(), nsName).booleanValue();
+        admin.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
         RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
         admin.disconnect();
 
@@ -126,7 +126,7 @@ public class TestNSNodesPermissions extends FunctionalTest {
         nodes = user.getAtMostNodes(1, null);
         Assert.assertEquals("User cannot get foreign node", 0, nodes.size());
 
-        user.addNode(node2.getNodeInformation().getURL(), nsName).booleanValue();
+        user.addNode(node2.getNodeInformation().getURL(), nsName).getBooleanValue();
         RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
         user.disconnect();
 
@@ -138,7 +138,7 @@ public class TestNSNodesPermissions extends FunctionalTest {
 
         // removing the node source
         admin = RMTHelper.join("admin", "admin");
-        admin.removeNodeSource(nsName, true).booleanValue();
+        admin.removeNodeSource(nsName, true).getBooleanValue();
         RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
         RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
         RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, nsName);
@@ -147,17 +147,17 @@ public class TestNSNodesPermissions extends FunctionalTest {
         RMTHelper.log("Test3 - node users = PROVIDER");
         user = RMTHelper.join("radmin", "pwd");
         user.createNodeSource(nsName, DefaultInfrastructureManager.class.getName(), null,
-                StaticPolicy.class.getName(), new Object[] { "PROVIDER", "ALL" }).booleanValue();
+                StaticPolicy.class.getName(), new Object[] { "PROVIDER", "ALL" }).getBooleanValue();
 
         node = RMTHelper.createNode("node1");
         node2 = RMTHelper.createNode("node2");
 
-        user.addNode(node.getNodeInformation().getURL(), nsName).booleanValue();
+        user.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
         RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
         user.disconnect();
 
         admin = RMTHelper.join("admin", "admin");
-        admin.addNode(node2.getNodeInformation().getURL(), nsName).booleanValue();
+        admin.addNode(node2.getNodeInformation().getURL(), nsName).getBooleanValue();
         RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
 
         // admin can get 2 nodes as it has AllPermissions
@@ -180,7 +180,7 @@ public class TestNSNodesPermissions extends FunctionalTest {
 
         // removing the node source
         admin = RMTHelper.join("admin", "admin");
-        admin.removeNodeSource(nsName, true).booleanValue();
+        admin.removeNodeSource(nsName, true).getBooleanValue();
         RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
         RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
         RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, nsName);
@@ -189,17 +189,17 @@ public class TestNSNodesPermissions extends FunctionalTest {
         RMTHelper.log("Test4 - node users = PROVIDER_GROUPS");
         user = RMTHelper.join("radmin", "pwd");
         user.createNodeSource(nsName, DefaultInfrastructureManager.class.getName(), null,
-                StaticPolicy.class.getName(), new Object[] { "PROVIDER_GROUPS", "ALL" }).booleanValue();
+                StaticPolicy.class.getName(), new Object[] { "PROVIDER_GROUPS", "ALL" }).getBooleanValue();
 
         node = RMTHelper.createNode("node1");
         node2 = RMTHelper.createNode("node2");
 
-        user.addNode(node.getNodeInformation().getURL(), nsName).booleanValue();
+        user.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
         RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
         user.disconnect();
 
         admin = RMTHelper.join("admin", "admin");
-        admin.addNode(node2.getNodeInformation().getURL(), nsName).booleanValue();
+        admin.addNode(node2.getNodeInformation().getURL(), nsName).getBooleanValue();
         RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
 
         // admin can get 2 nodes as it has AllPermissions
@@ -224,7 +224,7 @@ public class TestNSNodesPermissions extends FunctionalTest {
 
         // removing the node source
         admin = RMTHelper.join("admin", "admin");
-        admin.removeNodeSource(nsName, true).booleanValue();
+        admin.removeNodeSource(nsName, true).getBooleanValue();
         RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
         RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
         RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, nsName);
@@ -233,10 +233,10 @@ public class TestNSNodesPermissions extends FunctionalTest {
         RMTHelper.log("Test5 - node users = ALL");
         user = RMTHelper.join("radmin", "pwd");
         user.createNodeSource(nsName, DefaultInfrastructureManager.class.getName(), null,
-                StaticPolicy.class.getName(), new Object[] { "ALL", "ALL" }).booleanValue();
+                StaticPolicy.class.getName(), new Object[] { "ALL", "ALL" }).getBooleanValue();
 
         node = RMTHelper.createNode("node1");
-        user.addNode(node.getNodeInformation().getURL(), nsName).booleanValue();
+        user.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
         RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
         user.disconnect();
 
@@ -248,7 +248,7 @@ public class TestNSNodesPermissions extends FunctionalTest {
 
         // removing the node source
         admin = RMTHelper.join("admin", "admin");
-        admin.removeNodeSource(nsName, true).booleanValue();
+        admin.removeNodeSource(nsName, true).getBooleanValue();
         admin.disconnect();
 
         System.out.println("Success");

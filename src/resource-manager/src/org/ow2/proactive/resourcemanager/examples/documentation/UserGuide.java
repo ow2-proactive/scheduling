@@ -213,7 +213,7 @@ public class UserGuide {
 
         BooleanWrapper released = UserGuide.releaseNodes(resourceManager, nodeSet);
 
-        if (released.booleanValue()) {
+        if (released.getBooleanValue()) {
             System.out.println("Nodes have been released properly");
         } else {
             System.out.println("Nodes have not been released");
@@ -221,7 +221,7 @@ public class UserGuide {
 
         BooleanWrapper disconnected = UserGuide.disconnect(resourceManager);
 
-        if (disconnected.booleanValue()) {
+        if (disconnected.getBooleanValue()) {
             System.out.println("The resource manager has been disconnected");
         } else {
             System.out.println("The resource manager has not been disconnected");

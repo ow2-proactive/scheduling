@@ -218,7 +218,7 @@ public class EmbarrasinglyParrallelApplication {
             InternalSchedulerEventListener internalSchedulerEnevtlistener_localRef = refs[0];
             InternalSchedulerEventListener internalSchedulerEnevtlistener_activeRef = refs[1];
 
-            if (!internalSchedulerEnevtlistener_activeRef.isConnected().booleanValue()) {
+            if (!internalSchedulerEnevtlistener_activeRef.isConnected().getBooleanValue()) {
                 // System.out.println("localConnected:"+goldSchedulerEnevtlistener_localRef.isConnected().booleanValue());
                 loggerManager.error("Could not connect listener to the scheduler. Application will exit. ");
                 System.exit(0);

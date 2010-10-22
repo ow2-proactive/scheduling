@@ -36,7 +36,6 @@
  */
 package org.ow2.proactive.scheduler.ext.scilab.embedded;
 
-import javasci.SciStringMatrix;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;

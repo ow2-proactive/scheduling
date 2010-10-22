@@ -117,7 +117,7 @@ public class NodeSourcePolicyFactory {
 
         // initializing parameters
         BooleanWrapper result = stub.configure(policyParameters);
-        if (!result.booleanValue()) {
+        if (!result.getBooleanValue()) {
             throw new RuntimeException("Cannot configure the policy " + policyClassName);
         }
 

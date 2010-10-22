@@ -128,7 +128,7 @@ public class GenericBatchJobInfrastructure extends BatchJobInfrastructure {
                 this.implementationClassname, e);
         }
 
-        return resSuper.booleanValue() ? new BooleanWrapper(true) : new BooleanWrapper(false);
+        return resSuper.getBooleanValue() ? new BooleanWrapper(true) : new BooleanWrapper(false);
     }
 
     @Override

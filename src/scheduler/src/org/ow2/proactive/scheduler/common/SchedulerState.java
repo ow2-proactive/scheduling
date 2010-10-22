@@ -43,10 +43,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.objectweb.proactive.annotation.PublicAPI;
-import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobState;
-import org.ow2.proactive.scheduler.common.job.UserIdentification;
-import org.ow2.proactive.scheduler.common.task.TaskInfo;
 
 
 /**

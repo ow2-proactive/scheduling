@@ -155,7 +155,7 @@ public final class VirtualInfrastructureNodeStarterRegister {
             int cb = 0, cbTreshHold = 10;
             while (!added && cb < cbTreshHold) {
                 BooleanWrapper res = resourceManager.addNode(node.getNodeInformation().getURL(), nodeSource);
-                added = res.booleanValue();
+                added = res.getBooleanValue();
                 cb++;
             }
         } catch (Throwable t) {

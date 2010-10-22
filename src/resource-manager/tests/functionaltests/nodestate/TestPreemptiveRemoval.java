@@ -123,7 +123,7 @@ public class TestPreemptiveRemoval extends FunctionalTest {
 
         //try to give back removed node => no effect
         try {
-            resourceManager.releaseNode(n1).booleanValue();
+            resourceManager.releaseNode(n1).getBooleanValue();
             assertTrue("Released node which had been removed", false);
         } catch (RuntimeException e) {
         }

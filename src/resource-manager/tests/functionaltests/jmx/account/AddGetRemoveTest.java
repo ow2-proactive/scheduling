@@ -129,7 +129,7 @@ public final class AddGetRemoveTest extends FunctionalTest {
         // 1) ADD
         Node node = RMTHelper.createNode("test");
         final String nodeURL = node.getNodeInformation().getURL();
-        r.addNode(nodeURL).booleanValue();
+        r.addNode(nodeURL).getBooleanValue();
 
         // 2) GET
         final long beforeGetTime = System.currentTimeMillis();
@@ -139,7 +139,7 @@ public final class AddGetRemoveTest extends FunctionalTest {
         Thread.sleep(GR_DURATION);
 
         // 3) REMOVE  
-        r.removeNode(nodeURL, true).booleanValue();
+        r.removeNode(nodeURL, true).getBooleanValue();
         final long getRemoveMaxDuration = System.currentTimeMillis() - beforeGetTime;
 
         // Refresh the account manager

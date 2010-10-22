@@ -133,7 +133,7 @@ public class ResourceManagerProxy implements InitActive, RunActive {
     }
 
     public boolean isAlive() {
-        return resourceManager.isActive().booleanValue();
+        return resourceManager.isActive().getBooleanValue();
     }
 
     // FREE NODES *********************************************

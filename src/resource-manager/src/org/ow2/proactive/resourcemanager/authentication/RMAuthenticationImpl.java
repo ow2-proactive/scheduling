@@ -48,7 +48,6 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.authentication.AuthenticationImpl;
-import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.jmx.naming.JMXTransportProtocol;
 import org.ow2.proactive.resourcemanager.common.RMConstants;

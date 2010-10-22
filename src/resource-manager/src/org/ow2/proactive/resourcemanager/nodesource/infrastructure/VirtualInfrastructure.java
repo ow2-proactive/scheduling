@@ -779,7 +779,7 @@ public class VirtualInfrastructure extends InfrastructureManager {
             if (nodeUrl == null) {
                 return false;
             } else {
-                return nodeSource.acquireNode(nodeUrl, nodeSource.getAdministrator()).booleanValue();
+                return nodeSource.acquireNode(nodeUrl, nodeSource.getAdministrator()).getBooleanValue();
             }
         } catch (Throwable t) {
             logger.error("Failled to add an available node to RMCore.", t);

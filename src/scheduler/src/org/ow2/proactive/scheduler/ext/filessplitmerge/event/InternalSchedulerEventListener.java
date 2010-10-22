@@ -113,7 +113,7 @@ public class InternalSchedulerEventListener extends Observable implements Schedu
         final InternalSchedulerEventListener[] res = new InternalSchedulerEventListener[2];
         res[0] = InternalSchedulerEventListener.getLocalView();
         res[1] = InternalSchedulerEventListener.getActiveView();
-        if (!res[1].isConnected().booleanValue()) {
+        if (!res[1].isConnected().getBooleanValue()) {
             // System.out
             // .println("InternalSchedulerEventListener.getActiveAndLocalReferences()
             // -> not connected, calling init ");

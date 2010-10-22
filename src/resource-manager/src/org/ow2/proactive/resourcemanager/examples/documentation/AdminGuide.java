@@ -84,7 +84,7 @@ public class AdminGuide {
         BooleanWrapper isAdded = resourceManager.addNode(nodeUrl);
         // @snippet-end JavaAPIAdmin_AddNode
 
-        if (isAdded.booleanValue()) {
+        if (isAdded.getBooleanValue()) {
             System.out.println("The node whose url is \"" + nodeUrl +
                 "\" has been added to the resource manager");
         } else {
@@ -97,7 +97,7 @@ public class AdminGuide {
         BooleanWrapper isRemoved = resourceManager.removeNode(nodeUrl, true);
         // @snippet-end JavaAPIAdmin_RemoveNode
 
-        if (isRemoved.booleanValue()) {
+        if (isRemoved.getBooleanValue()) {
             System.out.println("The node whose url is \"" + nodeUrl +
                 "\" has been removed from the resource manager");
         } else {

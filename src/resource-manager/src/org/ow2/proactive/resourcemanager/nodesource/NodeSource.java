@@ -281,7 +281,7 @@ public class NodeSource implements InitActive, RunActive {
             // adding a new node and removing old one from the down list
             logger.debug("Removing existing node from down nodes list");
             BooleanWrapper result = rmcore.removeNodeFromCore(nodeUrl);
-            if (result.booleanValue()) {
+            if (result.getBooleanValue()) {
                 if (logger.isDebugEnabled())
                     logger.debug("[" + name + "] successfully removed node " + nodeUrl + " from the core");
                 // just removing it from down nodes list
@@ -304,7 +304,7 @@ public class NodeSource implements InitActive, RunActive {
                 logger
                         .debug("Removing existing node from the RM without request propagation to the infrastructure manager");
                 BooleanWrapper result = rmcore.removeNodeFromCore(nodeUrl);
-                if (result.booleanValue()) {
+                if (result.getBooleanValue()) {
                     if (logger.isDebugEnabled())
                         logger
                                 .debug("[" + name + "] successfully removed node " + nodeUrl +

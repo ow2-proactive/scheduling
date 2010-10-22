@@ -163,7 +163,7 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
     @Override
     public BooleanWrapper activate() {
         BooleanWrapper activationStatus = super.activate();
-        if (!activationStatus.booleanValue()) {
+        if (!activationStatus.getBooleanValue()) {
             return activationStatus;
         }
 

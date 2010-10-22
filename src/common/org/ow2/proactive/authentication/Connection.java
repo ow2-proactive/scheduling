@@ -40,7 +40,6 @@ import java.io.Serializable;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAActiveObject;
-import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.remoteobject.AbstractRemoteObjectFactory;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectFactory;
 import org.objectweb.proactive.core.util.ProActiveInet;

@@ -37,13 +37,11 @@
 package org.ow2.proactive.resourcemanager.selection.statistics;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.resourcemanager.core.RMCore;
 import org.ow2.proactive.resourcemanager.rmnode.RMNode;
@@ -51,7 +49,6 @@ import org.ow2.proactive.resourcemanager.selection.SelectionManager;
 import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive.scripting.SelectionScript;
-import org.ow2.proactive.utils.NodeSet;
 
 
 /**

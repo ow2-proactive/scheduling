@@ -549,7 +549,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         if (!existingNodeSource && sourceName.equals(NodeSource.DEFAULT)) {
             // creating the default node source
             createNodeSource(NodeSource.DEFAULT, DefaultInfrastructureManager.class.getName(), null,
-                    StaticPolicy.class.getName(), null).booleanValue();
+                    StaticPolicy.class.getName(), null).getBooleanValue();
         }
 
         if (nodeSources.containsKey(sourceName)) {
@@ -738,7 +738,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         }
 
         BooleanWrapper result = nodeSource.activate();
-        if (!result.booleanValue()) {
+        if (!result.getBooleanValue()) {
             logger.error("Node source " + nodeSourceName + " cannot be activated");
         }
 
