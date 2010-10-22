@@ -177,19 +177,3 @@ function reconnect(schedURL){
 	s_.reconnect_();
 }
 
-
-function setlogsdir(logsDir){
-	if (logsDir == undefined){
-		logsDir = "";
-	}
-	s_.setLogsDir_(""+logsDir);
-}
-
-function viewlogs(nbLines){
-	s_.viewlogs_(""+nbLines);
-}
-
-function viewdevlogs(nbLines){
-	s_.viewDevlogs_(""+nbLines);
-}
-

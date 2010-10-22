@@ -41,7 +41,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -96,12 +95,6 @@ public class SchedulerModel extends ConsoleModel {
     private static final String YES = "yes";
     private static final String NO = "no";
     private static final String YES_NO = "(" + YES + "/" + NO + ")";
-
-    private static int logsNbLines = 20;
-    private static String logsDirectory = System.getProperty("pa.scheduler.home") + File.separator + ".logs";
-
-    private static final String schedulerLogFile = "Scheduler.log";
-    private static final String schedulerDevLogFile = "SchedulerDev.log";
 
     protected Scheduler scheduler;
     protected MBeanInfoViewer jmxInfoViewer = null;
@@ -903,81 +896,6 @@ public class SchedulerModel extends ConsoleModel {
         } catch (Exception e) {
             handleExceptionDisplay("*ERROR*", e);
         }
-    }
-
-    public void setLogsDir_(String logsDir) {
-        if (logsDir == null || "".equals(logsDir)) {
-            error("Given logs directory is null or empty !");
-            return;
-        }
-        File dir = new File(logsDir);
-        if (!dir.exists()) {
-            error("Given logs directory does not exist !");
-            return;
-        }
-        if (!dir.isDirectory()) {
-            error("Given logsDir is not a directory !");
-            return;
-        }
-        dir = new File(logsDir + File.separator + schedulerLogFile);
-        if (!dir.exists()) {
-            error("Given logs directory does not contains Scheduler logs files !");
-            return;
-        }
-        print("Logs Directory set to '" + logsDir + "' !");
-        logsDirectory = logsDir;
-    }
-
-    public void viewlogs_(String nbLines) {
-        if (!"".equals(nbLines)) {
-            try {
-                logsNbLines = Integer.parseInt(nbLines);
-            } catch (NumberFormatException nfe) {
-                //logsNbLines not set
-            }
-        }
-        print(readLastNLines(schedulerLogFile));
-    }
-
-    public void viewDevlogs_(String nbLines) {
-        if (!"".equals(nbLines)) {
-            try {
-                logsNbLines = Integer.parseInt(nbLines);
-            } catch (NumberFormatException nfe) {
-                //logsNbLines not set
-            }
-        }
-        print(readLastNLines(schedulerDevLogFile));
-    }
-
-    /**
-     * Return the logsNbLines last lines of the given file.
-     *
-     * @param fileName the file to be displayed
-     * @return the N last lines of the given file
-     */
-    private static String readLastNLines(String fileName) {
-        StringBuilder toret = new StringBuilder();
-        File f = new File(logsDirectory + File.separator + fileName);
-        try {
-            RandomAccessFile raf = new RandomAccessFile(f, "r");
-            long cursor = raf.length() - 2;
-            int nbLines = logsNbLines;
-            byte b;
-            raf.seek(cursor);
-            while (nbLines > 0) {
-                if ((b = raf.readByte()) == '\n') {
-                    nbLines--;
-                }
-                cursor--;
-                raf.seek(cursor);
-                if (nbLines > 0) {
-                    toret.insert(0, (char) b);
-                }
-            }
-        } catch (Exception e) {
-        }
-        return toret.toString();
     }
 
     @SuppressWarnings("unchecked")

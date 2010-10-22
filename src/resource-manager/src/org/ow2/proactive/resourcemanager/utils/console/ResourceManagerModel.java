@@ -41,7 +41,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.RandomAccessFile;
 import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -89,11 +88,6 @@ public class ResourceManagerModel extends ConsoleModel {
     private static final String YES_NO = "(" + YES + "/" + NO + ")";
 
     protected ResourceManager rm;
-
-    private static int logsNbLines = 20;
-    private static String logsDirectory = System.getProperty("pa.rm.home") + File.separator + ".logs";
-
-    private static final String rmLogFile = "RM.log";
 
     protected MBeanInfoViewer jmxInfoViewer = null;
 
@@ -144,10 +138,6 @@ public class ResourceManagerModel extends ConsoleModel {
         commands
                 .add(new Command("exec(scriptFilePath)",
                     "Execute the content of the given script file (parameter is a string representing a script-file path)"));
-        commands.add(new Command("setlogsdir(logsDir)",
-            "Set the directory where the log are located, (default is RM_HOME/.logs"));
-        commands.add(new Command("viewlogs(nbLines)",
-            "View the last nbLines lines of the logs file, (default nbLines is 20)"));
         commands.add(new Command("cnslhelp() or ?c", "Displays help about the console functions itself"));
         if (allowExitCommand) {
             commands.add(new Command("exit()", "Exits RM controller"));
@@ -260,7 +250,7 @@ public class ResourceManagerModel extends ConsoleModel {
     public void removens_(String nodeSourceName, boolean preempt) {
         try {
             BooleanWrapper res = rm.removeNodeSource(nodeSourceName, preempt);
-            if (res.booleanValue()) {
+            if (res.getBooleanValue()) {
                 print("Node source '" + nodeSourceName + "' removal request sent to Resource Manager");
             } else {
                 print("Cannot send '" + nodeSourceName + "' removal request to Resource Manager");
@@ -438,7 +428,7 @@ public class ResourceManagerModel extends ConsoleModel {
 
             BooleanWrapper result = rm.createNodeSource(nodeSourceName, imName, imPackedParams, policyName,
                     policyPackedParams);
-            if (result.booleanValue()) {
+            if (result.getBooleanValue()) {
                 print("Node source '" + nodeSourceName + "' creation request sent to Resource Manager");
             }
         } catch (Exception e) {
@@ -466,7 +456,7 @@ public class ResourceManagerModel extends ConsoleModel {
                 result = rm.addNode(nodeName);
             }
 
-            if (result.booleanValue()) {
+            if (result.getBooleanValue()) {
                 print("Adding node '" + nodeName + "' request sent to Resource Manager");
             }
         } catch (Exception e) {
@@ -565,70 +555,6 @@ public class ResourceManagerModel extends ConsoleModel {
         } catch (Exception e) {
             handleExceptionDisplay("*ERROR*", e);
         }
-    }
-
-    public void setLogsDir_(String logsDir) {
-        if (logsDir == null || "".equals(logsDir)) {
-            error("Given logs directory is null or empty !");
-            return;
-        }
-        File dir = new File(logsDir);
-        if (!dir.exists()) {
-            error("Given logs directory does not exist !");
-            return;
-        }
-        if (!dir.isDirectory()) {
-            error("Given logsDir is not a directory !");
-            return;
-        }
-        dir = new File(logsDir + File.separator + rmLogFile);
-        if (!dir.exists()) {
-            error("Given logs directory does not contains Scheduler logs files !");
-            return;
-        }
-        print("Logs Directory set to '" + logsDir + "' !");
-        logsDirectory = logsDir;
-    }
-
-    public void viewlogs_(String nbLines) {
-        if (!"".equals(nbLines)) {
-            try {
-                logsNbLines = Integer.parseInt(nbLines);
-            } catch (NumberFormatException nfe) {
-                //logsNbLines not set
-            }
-        }
-        print(readLastNLines(rmLogFile));
-    }
-
-    /**
-     * Return the logsNbLines last lines of the given file.
-     *
-     * @param fileName the file to be displayed
-     * @return the N last lines of the given file
-     */
-    private static String readLastNLines(String fileName) {
-        StringBuilder toret = new StringBuilder();
-        File f = new File(logsDirectory + File.separator + fileName);
-        try {
-            RandomAccessFile raf = new RandomAccessFile(f, "r");
-            long cursor = raf.length() - 2;
-            int nbLines = logsNbLines;
-            byte b;
-            raf.seek(cursor);
-            while (nbLines > 0) {
-                if ((b = raf.readByte()) == '\n') {
-                    nbLines--;
-                }
-                cursor--;
-                raf.seek(cursor);
-                if (nbLines > 0) {
-                    toret.insert(0, (char) b);
-                }
-            }
-        } catch (Exception e) {
-        }
-        return toret.toString();
     }
 
     public void exit_() {

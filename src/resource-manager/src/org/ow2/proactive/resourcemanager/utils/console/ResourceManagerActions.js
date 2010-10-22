@@ -128,17 +128,6 @@ function exec(commandFilePath){
 	return rm_.exec_(commandFilePath);
 }
 
-function setlogsdir(logsDir){
-	if (logsDir == undefined){
-		logsDir = "";
-	}
-	rm_.setLogsDir_(""+logsDir);
-}
-
-function viewlogs(nbLines){
-	rm_.viewlogs_(""+nbLines);
-}
-
 function exit(){
 	return rm_.exit_();
 }
