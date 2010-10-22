@@ -224,12 +224,12 @@ public class SchedulerModel extends ConsoleModel {
         eval(readFileContent(br));
         //read default js env file if exist
         if (new File(DEFAULT_INIT_JS).exists()) {
-            console.print("! Loading environment from '" + DEFAULT_INIT_JS + "' !" + newline);
+            print("! Loading environment from '" + DEFAULT_INIT_JS + "' !" + newline);
             this.exec_(DEFAULT_INIT_JS);
         }
         //read js env argument if any
         if (this.initEnvFileName != null) {
-            console.print("! Loading environment from '" + this.initEnvFileName + "' !" + newline);
+            print("! Loading environment from '" + this.initEnvFileName + "' !" + newline);
             this.exec_(this.initEnvFileName);
         }
     }
