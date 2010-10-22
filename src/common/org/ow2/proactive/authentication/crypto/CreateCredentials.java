@@ -37,6 +37,7 @@
 package org.ow2.proactive.authentication.crypto;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.security.KeyException;
@@ -44,11 +45,20 @@ import java.security.PublicKey;
 
 import jline.ConsoleReader;
 
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.GnuParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.OptionGroup;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
+import org.apache.commons.cli.Parser;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.authentication.AuthenticationImpl;
 import org.ow2.proactive.authentication.Connection;
 import org.ow2.proactive.utils.FileToBytesConverter;
+import org.ow2.proactive.utils.Tools;
 
 
 /**
@@ -61,15 +71,18 @@ import org.ow2.proactive.utils.FileToBytesConverter;
  */
 public class CreateCredentials {
 
+    private static final String newline = System.getProperty("line.separator");
+
     /**
      * Entry point
      * 
      * @see org.ow2.proactive.authentication.crypto.Credentials
      * @param args arguments, try '-h' for help
      * @throws IOException
+     * @throws ParseException
      *
      */
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, ParseException {
         ConsoleReader console = new ConsoleReader(System.in, new PrintWriter(System.out));
         /**
          * default values
@@ -86,80 +99,115 @@ public class CreateCredentials {
         String scheduler = null;
         String url = null;
 
-        if (args.length == 0) {
-            displayHelp(path, cipher);
-            return;
+        Options options = new Options();
+
+        Option opt = new Option("h", "help", false, "Display this help");
+        opt.setRequired(false);
+        options.addOption(opt);
+
+        OptionGroup group = new OptionGroup();
+        group.setRequired(false);
+        opt = new Option("F", "file", true, "Public key path on the local filesystem [default:" +
+            Credentials.getPubKeyPath() + "]");
+        opt.setArgName("PATH");
+        opt.setArgs(1);
+        opt.setRequired(false);
+        group.addOption(opt);
+
+        opt = new Option("R", "rm", true, "Request the public key to the Resource Manager at URL");
+        opt.setArgName("URL");
+        opt.setArgs(1);
+        opt.setRequired(false);
+        group.addOption(opt);
+
+        opt = new Option("S", "scheduler", true, "Request the public key to the Scheduler at URL");
+        opt.setArgName("URL");
+        opt.setArgs(1);
+        opt.setRequired(false);
+        group.addOption(opt);
+        options.addOptionGroup(group);
+
+        opt = new Option("l", "login", true,
+            "Generate credentials for this specific user, will be asked interactively if not specified");
+        opt.setArgName("LOGIN");
+        opt.setArgs(1);
+        opt.setRequired(false);
+        options.addOption(opt);
+
+        opt = new Option("p", "password", true,
+            "Use this password, will be asked interactively if not specified");
+        opt.setArgName("PWD");
+        opt.setArgs(1);
+        opt.setRequired(false);
+        options.addOption(opt);
+
+        opt = new Option("k", "keyfile", true,
+            "Use specified ssh private key, asked interactively if specified without PATH, not specified otherwise.");
+        opt.setArgName("PATH");
+        opt.setOptionalArg(true);
+        opt.setRequired(false);
+        options.addOption(opt);
+
+        opt = new Option("o", "output", true,
+            "Output the resulting credentials to the specified file [default:" + path + "]");
+        opt.setArgName("PATH");
+        opt.setArgs(1);
+        opt.setRequired(false);
+        options.addOption(opt);
+
+        opt = new Option("c", "cipher", true,
+            "Use specified cipher parameters, need to be compatible with the specified key [default:" +
+                cipher + "]");
+        opt.setArgName("PARAMS");
+        opt.setArgs(1);
+        opt.setRequired(false);
+        options.addOption(opt);
+
+        Parser parser = new GnuParser();
+        CommandLine cmd = null;
+        try {
+            cmd = parser.parse(options, args);
+        } catch (Exception e) {
+            System.err.println(newline + "ERROR : " + e.getMessage() + newline);
+            System.out.println("type -h or --help to display help screen");
+            System.exit(1);
         }
 
-        /**
-         * Arguments handling
-         */
-        int index = 0;
-        while (index < args.length) {
-            if (args[index].equals("--file") || args[index].equals("-F")) {
-                if (++index == args.length) {
-                    System.out.println("No value provided for argument --public");
-                    return;
-                }
-                pubKeyPath = args[index];
-            }
-            if (args[index].equals("--rm") || args[index].equals("-R")) {
-                if (++index == args.length) {
-                    System.out.println("No value provided for argument --rm");
-                    return;
-                }
-                rm = args[index];
-            }
-            if (args[index].equals("--scheduler") || args[index].equals("-S")) {
-                if (++index == args.length) {
-                    System.out.println("No value provided for argument --scheduler");
-                    return;
-                }
-                scheduler = args[index];
-            }
-            if (args[index].equals("--login") || args[index].equals("-l")) {
-                if (++index == args.length) {
-                    System.out.println("No value provided for option --login");
-                    return;
-                }
-                login = args[index];
-            }
-            if (args[index].equals("--password") || args[index].equals("-p")) {
-                if (++index == args.length) {
-                    System.out.println("No value provided for option --password");
-                    return;
-                }
-                pass = args[index];
-            }
-            if (args[index].equals("--keyfile") || args[index].equals("-k")) {
-                if (++index == args.length) {
-                    System.out.println("No value provided for option --keyfile");
-                    return;
-                }
-                keyfile = args[index];
-            }
-            if (args[index].equals("--output") || args[index].equals("-o")) {
-                if (++index == args.length) {
-                    System.out.println("No value provided for option --output");
-                    return;
-                }
-                path = args[index];
-            }
-            if (args[index].equals("--cipher") || args[index].equals("-c")) {
-                if (++index == args.length) {
-                    System.out.println("No value provided for option --cipher");
-                    return;
-                }
-                cipher = args[index];
-            }
+        if (cmd.hasOption("help")) {
+            displayHelp(path, cipher, options);
+        }
 
-            if (args[index].equals("--help") || args[index].equals("-h")) {
-                displayHelp(path, cipher);
-            }
-            index++;
+        if (cmd.hasOption("file")) {
+            pubKeyPath = cmd.getOptionValue("file");
+        }
+        if (cmd.hasOption("rm")) {
+            rm = cmd.getOptionValue("rm");
+        }
+        if (cmd.hasOption("scheduler")) {
+            scheduler = cmd.getOptionValue("scheduler");
+        }
+
+        if (cmd.hasOption("login")) {
+            login = cmd.getOptionValue("login");
+        }
+        if (cmd.hasOption("password")) {
+            pass = cmd.getOptionValue("password");
+        }
+        if (cmd.hasOption("keyfile") && cmd.getOptionValues("keyfile") != null) {
+            keyfile = cmd.getOptionValue("keyfile");
+        }
+
+        if (cmd.hasOption("output")) {
+            path = cmd.getOptionValue("output");
+        }
+        if (cmd.hasOption("cipher")) {
+            cipher = cmd.getOptionValue("cipher");
         }
 
         int acc = 0;
+        if (pubKeyPath != null) {
+            acc++;
+        }
         if (scheduler != null) {
             url = Connection.normalize(scheduler) + "SCHEDULER";
             acc++;
@@ -169,13 +217,10 @@ public class CreateCredentials {
             url = Connection.normalize(rm) + "RMAUTHENTICATION";
             acc++;
         }
-        if (pubKeyPath != null) {
-            acc++;
-        }
         if (acc > 1) {
             System.out.println("--rm, --scheduler and --file arguments cannot be combined.");
             System.out.println("try -h for help.");
-            return;
+            System.exit(1);
         }
 
         if (url != null) {
@@ -189,18 +234,18 @@ public class CreateCredentials {
                 AuthenticationImpl auth = conn.connect(url);
                 pubKey = auth.getPublicKey();
             } catch (Exception e) {
-                System.out.println("Could not retrieve public key from " + url + ": ");
+                System.err.println("ERROR : Could not retrieve public key from '" + url + "'");
                 e.printStackTrace();
-                return;
+                System.exit(3);
             }
-            System.out.println("Successfully obtained public key from " + url + ".\n");
+            System.out.println("Successfully obtained public key from " + url + newline);
         } else if (pubKeyPath != null) {
             try {
                 pubKey = Credentials.getPublicKey(pubKeyPath);
             } catch (KeyException e) {
-                System.out.println("Could not retrieve public key from " + pubKeyPath + ":");
-                e.printStackTrace();
-                return;
+                System.err.println("ERROR : Could not retrieve public key from '" + pubKeyPath +
+                    "' (no such file)");
+                System.exit(4);
             }
         } else {
             System.out.println("No public key specified, attempting to retrieve it from default location.");
@@ -208,14 +253,15 @@ public class CreateCredentials {
             try {
                 pubKey = Credentials.getPublicKey(pubKeyPath);
             } catch (KeyException e) {
-                System.out.println("Could not retrieve public key from " + pubKeyPath + ":");
-                e.printStackTrace();
-                return;
+                System.err.println("ERROR : Could not retrieve public key from '" + pubKeyPath +
+                    "' (no such file)");
+                System.exit(5);
             }
         }
 
-        if (login != null && pass != null && keyfile != null) {
-            System.out.println("Running in non-interactive mode.\n");
+        if (login != null && pass != null &&
+            (!cmd.hasOption("keyfile") || cmd.getOptionValues("keyfile") != null)) {
+            System.out.println("Running in non-interactive mode." + newline);
             interactive = false;
         } else {
             System.out.println("Running in interactive mode.");
@@ -223,8 +269,7 @@ public class CreateCredentials {
 
         if (interactive) {
             System.out.println("Please enter Scheduler credentials,");
-            System.out.println("they will be stored encrypted on disk for future logins.\n");
-
+            System.out.println("they will be stored encrypted on disk for future logins." + newline);
             System.out.print("login: ");
             if (login == null) {
                 login = console.readLine();
@@ -235,20 +280,21 @@ public class CreateCredentials {
             if (pass == null) {
                 pass = console.readLine('*');
             } else {
-                System.out.println("********");
+                System.out.println("*******");
             }
-            System.out.print("keyfile (optional - press enter to ignore): ");
-            if (keyfile == null) {
-                keyfile = console.readLine();
-            } else {
+            System.out.print("keyfile: ");
+            if (!cmd.hasOption("keyfile")) {
+                System.out.println("no key file specified");
+            } else if (cmd.hasOption("keyfile") && cmd.getOptionValues("keyfile") != null) {
                 System.out.println(keyfile);
+            } else {
+                keyfile = console.readLine();
             }
-            System.out.println();
         }
 
         try {
             CredData credData;
-            if (keyfile.length() > 0) {
+            if (keyfile != null && keyfile.length() > 0) {
                 byte[] keyfileContent = FileToBytesConverter.convertFileToByteArray(new File(keyfile));
                 credData = new CredData(login, pass, keyfileContent);
             } else {
@@ -257,9 +303,13 @@ public class CreateCredentials {
             }
             Credentials cred = Credentials.createCredentials(credData, pubKey, cipher);
             cred.writeToDisk(path);
+        } catch (FileNotFoundException e) {
+            System.err.println("ERROR : Could not retrieve ssh private key from '" + keyfile +
+                "' (no such file)");
+            System.exit(6);
         } catch (Throwable t) {
             t.printStackTrace();
-            return;
+            System.exit(7);
         }
 
         System.out.println("Successfully stored encrypted credentials on disk at :");
@@ -268,38 +318,12 @@ public class CreateCredentials {
         System.exit(0);
     }
 
-    private static void displayHelp(String path, String cipher) {
-        System.out.println("Usage:");
-        System.out.println("\tjava " + CreateCredentials.class.getCanonicalName() + " pubkey [options]");
+    private static void displayHelp(String path, String cipher, Options options) {
         System.out.println("");
-        System.out.println("Description:");
-        System.out.println("\tCreates encrypted credentials for");
-        System.out.println("\tfuture non-interactive authentications.");
-        System.out.println("");
-        System.out.println("Public key must be one of:");
-        System.out.println("\t-F, --file PATH [=" + Credentials.getPubKeyPath() + "]");
-        System.out.println("\t\tPath to the public key on the local filesystem.");
-        System.out.println("\t\tIf no pubkey argument is specified, default location will be used.");
-        System.out.println("\t-R, --rm URL");
-        System.out.println("\t\tRequest the public key to the Resource Manager at URL.");
-        System.out.println("\t-S, --scheduler URL");
-        System.out.println("\t\tRequest the public key to the Scheduler at URL.");
-        System.out.println("");
-        System.out.println("Options:");
-        System.out.println("\t-l, --login LOGIN");
-        System.out.println("\t\tGenerate credentials for a specific user,");
-        System.out.println("\t\twill be asked interactively if not specified.");
-        System.out.println("\t-p, --password PASS\t");
-        System.out.println("\t\tUse specified password and runs in non-interactive");
-        System.out.println("\t\tmode. Ignored if used without the --login switch.");
-        System.out.println("\t-k, --keyfile KEY\t");
-        System.out.println("\t\tUse specified ssh private key");
-        System.out.println("\t\tThis option is not mandatory");
-        System.out.println("\t-o, --output PATH [=" + path + "]\t");
-        System.out.println("\t\tOutput the resulting credentials to the specified file.");
-        System.out.println("\t-c, --cipher PARAMS [=" + cipher + "]");
-        System.out.println("\t\tUse specified cipher parameters, need to be compatible");
-        System.out.println("\t\twith the specified key.");
+        HelpFormatter hf = new HelpFormatter();
+        hf.setWidth(135);
+        hf.printHelp("create-cred" + Tools.shellExtension(), "", options, "", true);
+        System.exit(2);
     }
 
 }
