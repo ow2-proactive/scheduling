@@ -951,6 +951,18 @@ task2.setGenerationScript(gscript);
 					</listitem>
 					<listitem>
 						<para>
+							<emphasis>runAsMe</emphasis> (optional, default is false) -
+							specifify if your task must be executed under your user account or not.
+							If this property is set to 'true', the node on which it will be executed must be configured
+							to accept the fact you can executre a task in your own process. Ask your administrator
+							for more details about the behavior of the nodes.
+							This property also implies you have a valid system account on the execution targeted node machine and you have made your connection
+							to the scheduler using your system password and/or your ssh key if required by the node configuration.
+							See <xref linkend="Submit_a_job_java"/> for more details about job submission.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
 							<emphasis>scripts</emphasis> (optional) -
 							The ProActive scheduler supports portable script execution through the
 							JSR 223 Java Scripting capabilities. Scripts can be written in any language
@@ -2050,7 +2062,7 @@ try {
 	        if (pubKey == null) {
 	             pubKey = Credentials.getPublicKey(Credentials.getPubKeyPath());
 	        }
-	        scheduler = auth.login(Credentials.createCredentials("demo", "demo", pubKey));
+	        scheduler = auth.login(Credentials.createCredentials(new CredData("demo", "demo"), pubKey));
 	    } catch (KeyException ke2) {
 	        //cannot find public key !
 	    }
@@ -2064,7 +2076,7 @@ try {
 				</programlisting>
 				<para>
 				  Connecting to the Scheduler implicates using a keypair infrastructure to establish a secure channel on
-				  which the credentials (username and password) will be sent securely. There are three ways to connect
+				  which the credentials (username and password) will be sent securely. There are two ways to connect
 				  to the Scheduler, as described in the example above:
 				  <orderedlist>
 				    <listitem><para>
@@ -2074,10 +2086,12 @@ try {
 				      </para>
 				      <para>
 					<programlisting language="sh"><![CDATA[
-# use local public key to generate credentials for user 'demo'
+# use local public key to generate credentials for user 'demo', password will be specified in interactive mode
 /bin/unix $ ./create-cred -F $HOME/.proactive/scheduler_pubkey -o $HOME/.proactive/my_encrypted_credentials -l demo
-# use rmi://example.com/SCHEDULER's public key to generate credentials for user 'admin' with pass 'admin' in non-interactive mode
-/bin/unix $ ./create-cred -S rmi://example.com/SCHEDULER -o $HOME/.proactive/my_encrypted_credentials -l admin -p admin
+# use rmi://example.com:1099/'s public key to generate credentials for user 'admin' with pass 'admin' in non-interactive mode
+/bin/unix $ ./create-cred -S rmi://example.com:1099/ -o $HOME/.proactive/my_encrypted_credentials -l admin -p admin
+# also store user ssh private key in credentials to be able to execute task under user ID
+/bin/unix $ ./create-cred -S rmi://example.com:1099/ -o $HOME/.proactive/my_encrypted_credentials -l admin -p admin -k $HOME/.ssh/id_rsa
 ]]></programlisting>
 					Credentials can now be retreived when properly designated by the <emphasis>pa.common.auth.credentials</emphasis> property; ie using
 					<emphasis>java -Dpa.common.auth.credentials=$HOME/.proactive/my_encrypted_credentials</emphasis>. Please type <literal>create-cred -h</literal> to
@@ -2090,10 +2104,12 @@ try {
 					If the Scheduler doesn't know the public key, it can be stored locally on client side and designated by the
 					<emphasis>pa.common.auth.pubkey</emphasis> Java property; ie using <emphasis>java -Dpa.common.auth.pubkey=$HOME/.proactive/pub.key</emphasis>.
 				    </para></listitem>
-				    <listitem><para>
-					If you can not retreive the public key, you can use the old deprecated API, which sends clear credentials on the network, and requires user input.
-				    </para></listitem>
 				  </orderedlist>
+				</para>
+				<para>
+					In any cases, you can create your own encrypted credentials using login/password and an optional ssh private key.
+					The ssh private key (if specified) will only be used if the task property 'runAsMe' is true and if the node is configured to accept
+					ssh key authentication.
 				</para>
 				<para>
 					As you can see, submitting a job will return a Job ID. This is the identification code of

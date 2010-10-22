@@ -1349,7 +1349,7 @@ admin:nsadmins</programlisting>
 					<listitem><para>
 					If LDAP group membership checking fails, fall back to group membership checking with group file.
 					To activate this behavior set <emphasis>pa.ldap.group.membership.fallback</emphasis>
-					to <emphasis>true</emphasis>in the LDAP configuration file.</para>
+					to <emphasis>true</emphasis> in the LDAP configuration file.</para>
 					</listitem>
 					<listitem><para>
 					If a user is not found in LDAP, fall back to authentication and group membership checking with login and group files.
@@ -1358,6 +1358,65 @@ admin:nsadmins</programlisting>
 					</listitem>
 				</itemizedlist>
 			</section>
+		</section>
+		<section xml:id="Configure_node_auth"><info><title>Configure node to allow task execution under user system account</title></info>
+			<para>
+				The ProActive Scheduling is also able to start task under system user account ID if configured. The mechanism requires some system administration
+				but remains quite simple. The goal is to configure system to be able to accept user account connection (password or ssh) and then configured the node
+				to specify what kind of authentication method it will accept :
+			</para>
+			<para>
+				<orderedlist>
+					<listitem>
+						<para>
+						<emphasis>System configuration : </emphasis>The system must be configured to accept user system connection.
+						So you must add account to user which must have the same username as the name in Scheduler account.
+						You can authorized user accessing host throught password and/or using ssh connection.
+						For exemple, if you don't want to use password authentication, you can generate public and private couple of key,
+						add the public key to 'authorized_keys' file in every host that will authorized this key and give the private key to every user that should be able
+						to access those hosts.
+						</para>
+						<para>
+							Note : if you use only password authentication, username/password of Scheduler users must be the same as system username/password.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+						<emphasis>User configuration : </emphasis>The only thing user must do is to create credentials including the private
+						ssh key you've generated for him. The section <xref linkend="Submit_a_job_java"/> describe how a user can create his credentials using
+						private ssh key.
+						</para>
+						<para>
+							If not using ssh authentication, user has nothing special to do except setting the runAsMe property
+							to 'true' in his tasks.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+						<emphasis>Node configuration : </emphasis>The node must also be configured to accept this king of execution.
+						Configure the <emphasis>node</emphasis> is just setting a java property at node deployment. See Resource Manager documentation to know how to specify java properties at node deployment.
+						If not configured (default) every "runAsUser" executions will be rejected. If configured, the behavior will depend on the following java property :
+						</para>
+						<itemizedlist>
+							<listitem>
+								<para>
+								<emphasis>pas.launcher.forkas.method=none :</emphasis> the node won't accept execution under user account.
+								</para>
+								<para>
+								<emphasis>pas.launcher.forkas.method=pwd :</emphasis> the node will only accept execution under user account using password authentication.
+								In such a case, the username/password of the Scheduler user must be the same as the system one.
+								</para>
+								<para>
+								<emphasis>pas.launcher.forkas.method=key :</emphasis> the node will only accept execution under user account using ssh authentication method.
+								Scheduler username must be the same as the system account one, password can be different as the system authentication will be done with
+								ssh key. This method only work on unix system and is safer for system account. (system password is never sent to user, security is just based on a line
+								in 'authorized_keys' file.)
+								</para>
+							</listitem>
+						</itemizedlist>
+					</listitem>
+				</orderedlist>
+			</para>
 		</section>
 	</section>
 </chapter>
