@@ -189,8 +189,8 @@ public class SchedulerController {
                     user = cmd.getOptionValue("login");
                 }
 
-                if (cmd.hasOption("usecreds")) {
-                    if (cmd.hasOption("credentials")) {
+                if (cmd.hasOption("credentials")) {
+                    if (cmd.getOptionValues("credentials").length == 1) {
                         System.setProperty(Credentials.credentialsPathProperty, cmd
                                 .getOptionValue("credentials"));
                     }
@@ -463,15 +463,10 @@ public class SchedulerController {
         opt.setArgs(0);
         actionGroup.addOption(opt);
 
-        opt = new Option("uc", "usecreds", false, "Use credentials retreived from disk");
-        opt.setRequired(false);
-        opt.setArgs(0);
-        options.addOption(opt);
-
         opt = new Option("c", "credentials", true, "Path to the credentials (" +
             Credentials.getCredentialsPath() + ").");
         opt.setRequired(false);
-        opt.setArgs(1);
+        opt.setOptionalArg(true);
         options.addOption(opt);
 
         options.addOptionGroup(actionGroup);

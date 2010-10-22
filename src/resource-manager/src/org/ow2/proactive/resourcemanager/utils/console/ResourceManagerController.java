@@ -187,9 +187,10 @@ public class ResourceManagerController {
                 if (cmd.hasOption("l")) {
                     user = cmd.getOptionValue("l");
                 }
-                if (cmd.hasOption("uc")) {
-                    if (cmd.hasOption("c")) {
-                        System.setProperty(Credentials.credentialsPathProperty, cmd.getOptionValue("c"));
+                if (cmd.hasOption("credentials")) {
+                    if (cmd.getOptionValues("credentials").length == 1) {
+                        System.setProperty(Credentials.credentialsPathProperty, cmd
+                                .getOptionValue("credentials"));
                     }
                     try {
                         this.credentials = Credentials.getCredentials();
@@ -416,13 +417,8 @@ public class ResourceManagerController {
             "Execute the given script and go into interactive mode");
         script.setArgName("filePath");
         script.setRequired(false);
-        script.setArgs(1);
+        script.setOptionalArg(true);
         options.addOption(script);
-
-        Option useCreds = new Option("uc", "usecreds", false, "Use credentials retreived from disk");
-        useCreds.setRequired(false);
-        useCreds.setArgs(0);
-        options.addOption(useCreds);
 
         Option opt = new Option("c", "credentials", true, "Path to the credentials (" +
             Credentials.getCredentialsPath() + ").");
