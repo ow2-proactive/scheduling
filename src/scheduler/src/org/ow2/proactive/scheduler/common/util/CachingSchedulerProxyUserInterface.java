@@ -7,6 +7,7 @@ import javax.security.auth.login.LoginException;
 
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
+import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
@@ -14,7 +15,6 @@ import org.ow2.proactive.scheduler.common.SchedulerConnection;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SchedulerEventListener;
 import org.ow2.proactive.scheduler.common.SchedulerState;
-import org.ow2.proactive.scheduler.common.UniversalSchedulerListener;
 import org.ow2.proactive.scheduler.common.exception.InternalSchedulerException;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.exception.PermissionException;
@@ -46,7 +46,7 @@ public class CachingSchedulerProxyUserInterface extends SchedulerProxyUserInterf
         PublicKey pubKey = auth.getPublicKey();
 
         try {
-            Credentials cred = Credentials.createCredentials(user, pwd, pubKey);
+            Credentials cred = Credentials.createCredentials(new CredData(user, pwd), pubKey);
             this.uischeduler = auth.login(cred);
         } catch (KeyException e) {
             throw new InternalSchedulerException(e);
