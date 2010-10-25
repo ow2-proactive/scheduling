@@ -193,12 +193,6 @@ public class SchedulerModel extends ConsoleModel {
         commands.add(new Command("changepolicy(fullName)",
             "Change the current scheduling policy, (argument is the new policy full name)"));
         commands.add(new Command("reconnect()", "Try to reconnect this console to the server"));
-        commands.add(new Command("setlogsdir(logsDir)",
-            "Set the directory where the log are located, (default is SCHEDULER_HOME/.logs"));
-        commands.add(new Command("viewlogs(nbLines)",
-            "View the last nbLines lines of the admin logs file, (default nbLines is 20)"));
-        commands.add(new Command("viewdevlogs(nbLines)",
-            "View the last nbLines lines of the dev logs file, (default nbLines is 20)"));
         commands.add(new Command("cnslhelp() or ?c", "Displays help about the console functions itself"));
         if (allowExitCommand) {
             commands.add(new Command("exit()", "Exit Scheduler controller"));
