@@ -43,6 +43,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable;
 import java.security.KeyException;
 import java.security.KeyFactory;
@@ -354,6 +355,31 @@ public class Credentials implements Serializable {
             throw new KeyException("Could not read credentials from " + path, e);
         }
         return getCredentialsBase64(bytes);
+    }
+
+    /**
+     * Constructs a Credentials given an InputStream
+     * 
+     * @param is contains the base64 representation of a Credentials upon read
+     * @return the Credentials object contained in the InputStream
+     * @throws KeyException the Credentials data was read but could not be reconstructed
+     * @throws IOException the Credentials data could not be read from the stream
+     */
+    public static Credentials getCredentials(InputStream is) throws KeyException, IOException {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        byte[] buf = new byte[1024];
+        int len = 0;
+        while (true) {
+            len = is.read(buf);
+            if (len > 0) {
+                out.write(buf, 0, len);
+            } else {
+                break;
+            }
+        }
+        byte[] bytes = out.toByteArray();
+        out.close();
+        return Credentials.getCredentialsBase64(bytes);
     }
 
     /**
