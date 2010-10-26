@@ -168,12 +168,12 @@ public class ResourceManagerModel extends ConsoleModel {
         eval(readFileContent(br));
         //read default js env file if exist
         if (new File(DEFAULT_INIT_JS).exists()) {
-            console.print("! Loading environment from '" + DEFAULT_INIT_JS + "' !" + newline);
+            print("! Loading environment from '" + DEFAULT_INIT_JS + "' !" + newline);
             this.exec_(DEFAULT_INIT_JS);
         }
         //read js env argument if any
         if (this.initEnvFileName != null) {
-            console.print("! Loading environment from '" + this.initEnvFileName + "' !" + newline);
+            print("! Loading environment from '" + this.initEnvFileName + "' !" + newline);
             this.exec_(this.initEnvFileName);
         }
     }
@@ -551,6 +551,30 @@ public class ResourceManagerModel extends ConsoleModel {
             File f = new File(commandFilePath.trim());
             BufferedReader br = new BufferedReader(new FileReader(f));
             eval(readFileContent(br));
+            br.close();
+        } catch (Exception e) {
+            handleExceptionDisplay("*ERROR*", e);
+        }
+    }
+
+    /**
+     * Execute a JS command file with arguments.
+     * 
+     * @param params command file path must be the first param
+     */
+    public void execWithParam_(String... params) {
+        try {
+            File f = new File(params[0].trim());
+            //parse arguments
+            Map<String, String> mArgs = new HashMap<String, String>();
+            for (String p : params) {
+                if (p.contains("=")) {
+                    String[] argVal = p.split("=");
+                    mArgs.put(argVal[0], argVal[1]);
+                }
+            }
+            BufferedReader br = new BufferedReader(new FileReader(f));
+            eval(readFileContent(br), mArgs);
             br.close();
         } catch (Exception e) {
             handleExceptionDisplay("*ERROR*", e);

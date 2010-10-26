@@ -407,9 +407,10 @@ public class ResourceManagerController {
         options.addOption(preeemptiveRemovalOpt);
 
         Option script = new Option("sf", "script", true, control +
-            "Execute the given script (javascript is supported)");
-        script.setArgName("filePath");
-        script.setArgs(1);
+            "Execute the given javascript file with optional arguments.");
+        script.setArgName("filePath arg1=val1 arg2=val2 ...");
+        script.setArgs(Option.UNLIMITED_VALUES);
+        script.setOptionalArg(true);
         script.setRequired(false);
         options.addOption(script);
 
@@ -514,7 +515,7 @@ public class ResourceManagerController {
         } else if (cmd.hasOption("rp")) {
             model.refreshPermissionPolicy_();
         } else if (cmd.hasOption("script")) {
-            model.exec_(cmd.getOptionValue("script"));
+            model.execWithParam_(cmd.getOptionValues("script"));
         } else {
             model.setDisplayOnStdStream(false);
             return true;

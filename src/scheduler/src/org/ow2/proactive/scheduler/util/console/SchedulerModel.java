@@ -701,6 +701,30 @@ public class SchedulerModel extends ConsoleModel {
         }
     }
 
+    /**
+     * Execute a JS command file with arguments.
+     * 
+     * @param params command file path must be the first param
+     */
+    public void execWithParam_(String... params) {
+        try {
+            File f = new File(params[0].trim());
+            //parse arguments
+            Map<String, String> mArgs = new HashMap<String, String>();
+            for (String p : params) {
+                if (p.contains("=")) {
+                    String[] argVal = p.split("=");
+                    mArgs.put(argVal[0], argVal[1]);
+                }
+            }
+            BufferedReader br = new BufferedReader(new FileReader(f));
+            eval(readFileContent(br), mArgs);
+            br.close();
+        } catch (Exception e) {
+            handleExceptionDisplay("*ERROR*", e);
+        }
+    }
+
     public void exit_() {
         if (allowExitCommand) {
             console.print("Exiting controller.");

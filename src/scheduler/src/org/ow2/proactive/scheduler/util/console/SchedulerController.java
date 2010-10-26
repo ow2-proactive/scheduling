@@ -444,10 +444,12 @@ public class SchedulerController {
         opt.setArgs(0);
         actionGroup.addOption(opt);
 
-        opt = new Option("sf", "script", true, control + "Execute the given script (javascript is supported)");
-        opt.setArgName("filePath");
+        opt = new Option("sf", "script", true, control +
+            "Execute the given javascript file with optional arguments.");
+        opt.setArgName("filePath arg1=val1 arg2=val2 ...");
         opt.setRequired(false);
-        opt.setArgs(1);
+        opt.setArgs(Option.UNLIMITED_VALUES);
+        opt.setOptionalArg(true);
         actionGroup.addOption(opt);
 
         opt = new Option("env", "environment", true,
@@ -577,7 +579,7 @@ public class SchedulerController {
         } else if (cmd.hasOption("rp")) {
             model.refreshPermissionPolicy_();
         } else if (cmd.hasOption("script")) {
-            model.exec_(cmd.getOptionValue("script"));
+            model.execWithParam_(cmd.getOptionValues("script"));
         } else if (cmd.hasOption("test")) {
             model.test_();
         } else if (cmd.hasOption("start")) {

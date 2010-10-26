@@ -40,7 +40,10 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Map;
 
+import javax.script.Bindings;
+import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
@@ -265,16 +268,25 @@ public abstract class ConsoleModel {
                 engine.getContext().setWriter(console.writer());
             }
             initialized = true;
-
         }
+    }
+
+    /**
+     * Convenience method use to evaluate a new script command.
+     *
+     * @param cmd the command to evaluate
+     */
+    protected void eval(String cmd) {
+        eval(cmd, null);
     }
 
     /**
      * Method use to evaluate a new script command.
      *
      * @param cmd the command to evaluate
+     * @param bindings will be added to the JS context if not null
      */
-    protected void eval(String cmd) {
+    protected void eval(String cmd, Map<String, String> bindings) {
         try {
             if (!initialized) {
                 initialize();
@@ -285,6 +297,12 @@ public abstract class ConsoleModel {
                 terminated = true;
             } else {
                 checkIsReady();
+                if (bindings != null && bindings.size() > 0) {
+                    Bindings bdgs = engine.getBindings(ScriptContext.ENGINE_SCOPE);
+                    if (bdgs != null) {
+                        bdgs.putAll(bindings);
+                    }
+                }
                 engine.eval(cmd);
             }
         } catch (ScriptException e) {
