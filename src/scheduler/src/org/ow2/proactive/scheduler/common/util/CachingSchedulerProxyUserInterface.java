@@ -41,7 +41,35 @@ public class CachingSchedulerProxyUserInterface extends SchedulerProxyUserInterf
         return schedulerState;
     }
 
-    public boolean init(String url, String user, String pwd) throws SchedulerException, LoginException {
+    /**
+     * initialize the connection the scheduler. 
+     * Must be called only once
+     * @param url the scheduler's url 
+     * @param credentials the credential to be passed to the scheduler
+     * @throws SchedulerException thrown if the scheduler is not available
+     * @throws LoginException thrown if the credential is invalid
+     */
+    public void init(String url, Credentials credentials) throws SchedulerException, LoginException {
+        SchedulerAuthenticationInterface auth = SchedulerConnection.join(url);
+        this.uischeduler = auth.login(credentials);
+        CachingSchedulerProxyUserInterface ao = (CachingSchedulerProxyUserInterface) PAActiveObject
+                .getStubOnThis();
+        schedulerState = this.uischeduler.addEventListener(ao, false, true);
+        schedulerState = PAFuture.getFutureValue(schedulerState);
+    }
+
+    /**
+     * initialize the connection the scheduler. 
+     * Must be called only once.
+     * Create the corresponding credential object before sending it
+     * to the scheduler.
+     * @param url the scheduler's url 
+     * @param user the username to use
+     * @param pwd the password to use
+     * @throws SchedulerException thrown if the scheduler is not available
+     * @throws LoginException if the couple username/password is invalid
+     */
+    public void init(String url, String user, String pwd) throws SchedulerException, LoginException {
         SchedulerAuthenticationInterface auth = SchedulerConnection.join(url);
         PublicKey pubKey = auth.getPublicKey();
 
@@ -55,7 +83,6 @@ public class CachingSchedulerProxyUserInterface extends SchedulerProxyUserInterf
                 .getStubOnThis();
         schedulerState = this.uischeduler.addEventListener(ao, false, true);
         schedulerState = PAFuture.getFutureValue(schedulerState);
-        return true;
     }
 
     public void schedulerStateUpdatedEvent(SchedulerEvent eventType) {

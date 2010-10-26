@@ -160,7 +160,7 @@ public class EmbarrasinglyParrallelApplication {
         /** INIT THE SCHEDULER PROXY */
         try {
             SchedulerProxyUserInterface proxy = MySchedulerProxy.getActiveInstance();
-            boolean c = proxy.init(schedulerURL, userName, passwd);
+            proxy.init(schedulerURL, userName, passwd);
         } catch (ActiveObjectCreationException e1) {
             LoggerManager.getInstane().error("Could not create connection to the scheduler. ", e1);
             e1.printStackTrace();
