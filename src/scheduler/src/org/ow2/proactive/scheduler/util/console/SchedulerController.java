@@ -77,6 +77,7 @@ import org.ow2.proactive.utils.console.Console;
 import org.ow2.proactive.utils.console.JVMPropertiesPreloader;
 import org.ow2.proactive.utils.console.JlineConsole;
 import org.ow2.proactive.utils.console.MBeanInfoViewer;
+import org.ow2.proactive.utils.console.StdOutConsole;
 
 
 /**
@@ -528,7 +529,8 @@ public class SchedulerController {
     }
 
     protected boolean startCommandLine(CommandLine cmd) {
-        model.setDisplayOnStdStream(true);
+        /* start stdConsole */
+        model.connectConsole(new StdOutConsole());
         if (cmd.hasOption("pausejob")) {
             model.pause_(cmd.getOptionValue("pausejob"));
         } else if (cmd.hasOption("resumejob")) {
@@ -601,7 +603,6 @@ public class SchedulerController {
         } else if (cmd.hasOption("policy")) {
             model.changePolicy_(cmd.getOptionValue("policy"));
         } else {
-            model.setDisplayOnStdStream(false);
             return true;
         }
         return false;

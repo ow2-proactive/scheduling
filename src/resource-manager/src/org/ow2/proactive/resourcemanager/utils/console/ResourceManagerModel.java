@@ -214,11 +214,7 @@ public class ResourceManagerModel extends ConsoleModel {
     public void handleExceptionDisplay(String msg, Throwable t) {
         if (t instanceof ProActiveRuntimeException) {
             String tmp = msg + " : ResourceManager server seems to be unreachable !";
-            if (!displayOnStdStream) {
-                console.error(tmp);
-            } else {
-                System.err.printf(tmp);
-            }
+            console.error(tmp);
         } else {
             super.handleExceptionDisplay(msg, t);
         }
@@ -230,12 +226,11 @@ public class ResourceManagerModel extends ConsoleModel {
     public void shutdown_(boolean preempt) {
         try {
             boolean success = false;
-            if (!displayOnStdStream) {
-                String s = console.readStatement("Are you sure you want to shutdown the Resource Manager ? " +
-                    YES_NO + " > ");
-                success = s.equalsIgnoreCase(YES);
-            }
-            if (success || displayOnStdStream) {
+            String s = console.readStatement("Are you sure you want to shutdown the Resource Manager ? " +
+                YES_NO + " > ");
+            //s == null is true if console has no input
+            success = (s == null || s.equalsIgnoreCase(YES));
+            if (success) {
                 rm.shutdown(preempt);
                 print("Shutdown request sent to Resource Manager, controller will shutdown !");
                 terminated = true;

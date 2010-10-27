@@ -71,6 +71,7 @@ import org.ow2.proactive.utils.console.Console;
 import org.ow2.proactive.utils.console.JVMPropertiesPreloader;
 import org.ow2.proactive.utils.console.JlineConsole;
 import org.ow2.proactive.utils.console.MBeanInfoViewer;
+import org.ow2.proactive.utils.console.StdOutConsole;
 import org.ow2.proactive.utils.console.VisualConsole;
 
 
@@ -441,8 +442,9 @@ public class ResourceManagerController {
         model.startModel();
     }
 
-    protected boolean startCommandLine(CommandLine cmd) {
-        model.setDisplayOnStdStream(true);
+    protected boolean startCommandLine(CommandLine cmd) throws Exception {
+        /* start stdConsole */
+        model.connectConsole(new StdOutConsole());
         if (cmd.hasOption("addnodes")) {
             String[] nodesURls = cmd.getOptionValues("addnodes");
             if (cmd.hasOption("ns")) {
@@ -517,7 +519,6 @@ public class ResourceManagerController {
         } else if (cmd.hasOption("script")) {
             model.execWithParam_(cmd.getOptionValues("script"));
         } else {
-            model.setDisplayOnStdStream(false);
             return true;
         }
         return false;

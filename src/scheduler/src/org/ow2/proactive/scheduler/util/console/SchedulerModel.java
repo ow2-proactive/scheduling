@@ -282,25 +282,13 @@ public class SchedulerModel extends ConsoleModel {
     public void handleExceptionDisplay(String msg, Throwable t) {
         if (t instanceof NotConnectedException) {
             String tmp = "Your session has expired, please try to reconnect server using reconnect() command !";
-            if (!displayOnStdStream) {
-                console.error(tmp);
-            } else {
-                System.err.printf(tmp);
-            }
+            console.error(tmp);
         } else if (t instanceof PermissionException) {
             String tmp = msg + " : " + (t.getMessage() == null ? t : t.getMessage());
-            if (!displayOnStdStream) {
-                console.error(tmp);
-            } else {
-                System.err.printf(tmp);
-            }
+            console.error(tmp);
         } else if (t instanceof ProActiveRuntimeException) {
             String tmp = msg + " : Scheduler server seems to be unreachable !";
-            if (!displayOnStdStream) {
-                console.error(tmp);
-            } else {
-                System.err.printf(tmp);
-            }
+            console.error(tmp);
         } else {
             super.handleExceptionDisplay(msg, t);
         }
@@ -825,12 +813,11 @@ public class SchedulerModel extends ConsoleModel {
     public boolean shutdown_() {
         boolean success = false;
         try {
-            if (!displayOnStdStream) {
-                String s = console.readStatement("Are you sure you want to shutdown the Scheduler ? " +
-                    YES_NO + " > ");
-                success = s.equalsIgnoreCase(YES);
-            }
-            if (success || displayOnStdStream) {
+            String s = console.readStatement("Are you sure you want to shutdown the Scheduler ? " + YES_NO +
+                " > ");
+            //s == null is true if console has no input
+            success = (s == null || s.equalsIgnoreCase(YES));
+            if (success) {
                 try {
                     success = scheduler.shutdown();
                 } catch (SchedulerException e) {
@@ -855,12 +842,11 @@ public class SchedulerModel extends ConsoleModel {
     public boolean kill_() {
         boolean success = false;
         try {
-            if (!displayOnStdStream) {
-                String s = console.readStatement("Are you sure you want to kill the Scheduler ? " + YES_NO +
-                    " > ");
-                success = s.equalsIgnoreCase(YES);
-            }
-            if (success || displayOnStdStream) {
+            String s = console.readStatement("Are you sure you want to kill the Scheduler ? " + YES_NO +
+                " > ");
+            //s == null is true if console has no input
+            success = (s == null || s.equalsIgnoreCase(YES));
+            if (success) {
                 try {
                     success = scheduler.kill();
                 } catch (SchedulerException e) {

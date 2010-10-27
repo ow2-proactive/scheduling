@@ -38,7 +38,6 @@ package org.ow2.proactive.utils.console;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -62,7 +61,6 @@ public abstract class ConsoleModel {
 
     protected boolean initialized = false;
     protected boolean terminated = false;
-    protected boolean displayOnStdStream = false;
 
     protected boolean displayStack = true;
     protected boolean displayOnDemand = true;
@@ -136,19 +134,14 @@ public abstract class ConsoleModel {
      * @param t the exception to manage
      */
     public void handleExceptionDisplay(String msg, Throwable t) {
-        if (!displayOnStdStream) {
-            if (!displayStack) {
-                console.error(msg + " : " + (t.getMessage() == null ? t : t.getMessage()));
-            } else {
-                if (displayOnDemand) {
-                    console.handleExceptionDisplay(msg, t);
-                } else {
-                    console.printStackTrace(t);
-                }
-            }
+        if (!displayStack) {
+            console.error(msg + " : " + (t.getMessage() == null ? t : t.getMessage()));
         } else {
-            System.err.printf(msg + newline);
-            t.printStackTrace();
+            if (displayOnDemand) {
+                console.handleExceptionDisplay(msg, t);
+            } else {
+                console.printStackTrace(t);
+            }
         }
     }
 
@@ -158,11 +151,7 @@ public abstract class ConsoleModel {
      * @param msg the message to print
      */
     public void print(String msg) {
-        if (!displayOnStdStream) {
-            console.print(msg);
-        } else {
-            System.out.println(msg);
-        }
+        console.print(msg);
     }
 
     /**
@@ -171,11 +160,7 @@ public abstract class ConsoleModel {
      * @param msg the message to print
      */
     public void error(String msg) {
-        if (!displayOnStdStream) {
-            console.error(msg);
-        } else {
-            System.err.println(msg);
-        }
+        console.error(msg);
     }
 
     //***************** COMMAND LISTENER *******************
@@ -246,7 +231,7 @@ public abstract class ConsoleModel {
      * Check if the model is ready. First check if the console is set and the display is not set on standard output.
      */
     protected void checkIsReady() {
-        if (console == null && displayOnStdStream == false) {
+        if (console == null) {
             throw new RuntimeException("Console is not set, it must be set before starting the model");
         }
     }
@@ -262,11 +247,7 @@ public abstract class ConsoleModel {
             ScriptEngineManager manager = new ScriptEngineManager();
             // Engine selection
             engine = manager.getEngineByExtension("js");
-            if (console == null) {
-                engine.getContext().setWriter(new PrintWriter(System.out));
-            } else {
-                engine.getContext().setWriter(console.writer());
-            }
+            engine.getContext().setWriter(console.writer());
             initialized = true;
         }
     }
@@ -377,24 +358,6 @@ public abstract class ConsoleModel {
             throw new NullPointerException("Given console is null");
         }
         this.console = console;
-    }
-
-    /**
-     * Get the displayOnStdStream
-     *
-     * @return the displayOnStdStream
-     */
-    public boolean isDisplayOnStdStream() {
-        return displayOnStdStream;
-    }
-
-    /**
-     * Set the displayOnStdStream value to the given displayOnStdStream value
-     *
-     * @param displayOnStdStream the displayOnStdStream to set
-     */
-    public void setDisplayOnStdStream(boolean displayOnStdStream) {
-        this.displayOnStdStream = displayOnStdStream;
     }
 
 }
