@@ -36,7 +36,6 @@ package org.ow2.proactive.resourcemanager.frontend.topology.descriptor;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
-import org.ow2.proactive.resourcemanager.frontend.topology.SingleHostDescriptor;
 
 
 /**

@@ -38,16 +38,15 @@ import java.io.Serializable;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
-import org.ow2.proactive.resourcemanager.frontend.topology.SingleHostDescriptor;
 
 
 /**
  *
- * Class represents the descriptor of the desired nodes topology
+ * Class represents the descriptor of the nodes topology (network location)
  * which could be used with {@link ResourceManager.getAtMostNodes} request.
  *
- * User may create his own instance id defined descriptors and parameterize it or
- * use one of predefined constant instances when it is sufficient.
+ * User may create its own instance of available descriptors and parameterize it or
+ * use one of predefined constants when it is sufficient.
  */
 @PublicAPI
 public class TopologyDescriptor implements Serializable {
@@ -70,15 +69,27 @@ public class TopologyDescriptor implements Serializable {
      */
     public static final TopologyDescriptor MULTIPLE_HOSTS_EXCLUSIVE = new MultipleHostsExclusiveDescriptor();
 
-    private boolean greedy = true;
+    /**
+     * the flag indicated that descriptor requires the topology information in the resource manager.
+     * It affects the scripts execution strategy: if true selection scripts are executed on all nodes
+     * first and then the topology information is taken into account. If false scripts are executed
+     * only on required number of nodes.
+     * If this field is set to false the descriptor could be used even when the topology is
+     * disabled in the resource manager.
+     */
+    private boolean topologyBased;
 
     /**
      * Creates the descriptor
-     * @param greedy defines if selection scripts have to be executed on all
-     * available nodes before the topology information will be processed.
+     * @param topologyBased indicates that descriptor requires the topology information in the resource manager.
+     * It affects the scripts execution strategy: if true selection scripts are executed on all nodes
+     * first and then the topology information is taken into account. If false scripts are executed
+     * only on required number of nodes.
+     * If this field is set to false the descriptor could be used even when the topology is
+     * disabled in the resource manager.
      */
-    protected TopologyDescriptor(boolean greedy) {
-        this.greedy = greedy;
+    protected TopologyDescriptor(boolean topologyBased) {
+        this.topologyBased = topologyBased;
     }
 
     /**
@@ -87,7 +98,7 @@ public class TopologyDescriptor implements Serializable {
      *
      * @return true in case of greedy behavior false otherwise
      */
-    public boolean isGreedy() {
-        return greedy;
+    public boolean isTopologyBased() {
+        return topologyBased;
     }
 }

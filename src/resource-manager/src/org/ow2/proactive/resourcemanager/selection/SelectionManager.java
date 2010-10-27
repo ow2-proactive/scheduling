@@ -144,7 +144,7 @@ public abstract class SelectionManager {
         List<RMNode> arrangedNodes = arrangeNodes(filteredNodes, scripts);
 
         List<Node> matchedNodes = null;
-        if (topologyDescriptor.isGreedy()) {
+        if (topologyDescriptor.isTopologyBased()) {
             // run scripts on all available nodes
             matchedNodes = runScripts(arrangedNodes, scripts);
         } else {

@@ -235,6 +235,22 @@ public interface ResourceManager {
      */
     public NodeSet getAtMostNodes(int number, List<SelectionScript> selectionScriptsList, NodeSet exclusion);
 
+    /**
+     * Finds "number" nodes for computations according to the selection scripts
+     * (node must be complaint to all scripts).
+     * All nodes which are returned to the client as marked internally as busy and cannot
+     * be used by others until the client frees them.
+     * <p>
+     * If the resource manager does not have enough nodes it returns as much as it
+     * has, but only those which correspond the to selection criteria.
+     *
+     * @param number the number of nodes
+     * @param descriptor the topology descriptor of nodes 
+     * @see {@link TopologyDescriptor}
+     * @param selectionScriptList criteria to be verified by the returned nodes
+     * @param exclusion a list of node which should not be in the result set
+     * @return a list of nodes
+     */
     public NodeSet getAtMostNodes(int number, TopologyDescriptor descriptor,
             List<SelectionScript> selectionScriptsList, NodeSet exclusion);
 
@@ -277,5 +293,9 @@ public interface ResourceManager {
      */
     public BooleanWrapper shutdown(boolean preempt);
 
+    /**
+     * Returns the topology information of nodes.
+     * @return nodes topology
+     */
     public Topology getTopology();
 }

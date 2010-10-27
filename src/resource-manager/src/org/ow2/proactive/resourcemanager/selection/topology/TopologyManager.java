@@ -50,7 +50,6 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
-import org.ow2.proactive.resourcemanager.frontend.topology.SingleHostDescriptor;
 import org.ow2.proactive.resourcemanager.frontend.topology.Topology;
 import org.ow2.proactive.resourcemanager.frontend.topology.TopologyException;
 import org.ow2.proactive.resourcemanager.frontend.topology.TopologyImpl;
@@ -58,6 +57,7 @@ import org.ow2.proactive.resourcemanager.frontend.topology.clustering.HAC;
 import org.ow2.proactive.resourcemanager.frontend.topology.descriptor.ArbitraryTopologyDescriptor;
 import org.ow2.proactive.resourcemanager.frontend.topology.descriptor.BestProximityDescriptor;
 import org.ow2.proactive.resourcemanager.frontend.topology.descriptor.MultipleHostsExclusiveDescriptor;
+import org.ow2.proactive.resourcemanager.frontend.topology.descriptor.SingleHostDescriptor;
 import org.ow2.proactive.resourcemanager.frontend.topology.descriptor.SingleHostExclusiveDescriptor;
 import org.ow2.proactive.resourcemanager.frontend.topology.descriptor.ThresholdProximityDescriptor;
 import org.ow2.proactive.resourcemanager.frontend.topology.descriptor.TopologyDescriptor;
@@ -68,18 +68,31 @@ import org.ow2.proactive.utils.NodeSet;
 import edu.emory.mathcs.backport.java.util.Collections;
 
 
+/**
+ * Class is responsible for collecting the topology information, keeping it up to date and taking it into
+ * account for nodes selection.
+ * 
+ */
 public class TopologyManager {
 
+    // logger
     private final static Logger logger = ProActiveLogger.getLogger(RMLoggers.TOPOLOGY);
 
     // hosts distances
     private TopologyImpl topology = new TopologyImpl();
+    // this hash map allows to quickly find nodes on a single host (much faster than from the topology).
     private HashMap<InetAddress, Set<Node>> nodesOnHost = new HashMap<InetAddress, Set<Node>>();
+    // list of handlers corresponded to topology descriptors
     private final HashMap<Class<? extends TopologyDescriptor>, TopologyHandler> handlers = new HashMap<Class<? extends TopologyDescriptor>, TopologyHandler>();
 
     // class using for pinging
-    Class<? extends Pinger> pingerClass;
+    private Class<? extends Pinger> pingerClass;
 
+    /**
+     * Constructs new instance of the topology descriptor.
+     * @throws ClassNotFoundException when pinger class specified 
+     * in the RM configuration file is not found
+     */
     @SuppressWarnings(value = "unchecked")
     public TopologyManager() throws ClassNotFoundException {
         handlers.put(ArbitraryTopologyDescriptor.class, new ArbitraryTopologyHandler());
@@ -93,11 +106,13 @@ public class TopologyManager {
                 .getValueAsString());
     }
 
+    /**
+     * Returns the handler of corresponding descriptor. HAndles contains the logic of nodes
+     * selection in respect of the topology information.
+     */
     public TopologyHandler getHandler(TopologyDescriptor topologyDescriptor) {
-        if (topologyDescriptor instanceof ArbitraryTopologyDescriptor) {
-            // this descriptor does not use the topology information
-            // and can be used even if the topology is disabled
-        } else if (!PAResourceManagerProperties.RM_TOPOLOGY_ENABLED.getValueAsBoolean()) {
+        if (topologyDescriptor.isTopologyBased() &&
+            !PAResourceManagerProperties.RM_TOPOLOGY_ENABLED.getValueAsBoolean()) {
             throw new TopologyException("Topology is disabled");
         }
         TopologyHandler handler = handlers.get(topologyDescriptor.getClass());
@@ -108,6 +123,10 @@ public class TopologyManager {
         return handler;
     }
 
+    /**
+     * Updates the topology for new node. Executes the pinger on new node when this node belongs
+     * to unknow host.
+     */
     public synchronized void addNode(Node node) {
         if (!PAResourceManagerProperties.RM_TOPOLOGY_ENABLED.getValueAsBoolean()) {
             // do not do anything if topology disabled
@@ -144,6 +163,9 @@ public class TopologyManager {
         }
     }
 
+    /**
+     * Node is removed or down. Method removes corresponding topology information.
+     */
     public void removeNode(Node node) {
         if (!PAResourceManagerProperties.RM_TOPOLOGY_ENABLED.getValueAsBoolean()) {
             // do not do anything if topology disabled
@@ -166,6 +188,10 @@ public class TopologyManager {
         }
     }
 
+    /**
+     * Launches the pinging process from new host. It will ping all other hosts
+     * according to the pinger logic.
+     */
     private HashMap<InetAddress, Long> pingNode(Node node, NodeSet nodes) {
 
         try {
@@ -195,6 +221,10 @@ public class TopologyManager {
         return null;
     }
 
+    /**
+     * Returns the topology representation. As the Topology is not a thread-safe class
+     * and all synchronization happens on TopologyManager level, the topology is cloned.
+     */
     public Topology getTopology() {
         if (!PAResourceManagerProperties.RM_TOPOLOGY_ENABLED.getValueAsBoolean()) {
             throw new TopologyException("Topology is disabled");
