@@ -63,6 +63,7 @@ import org.ow2.proactive.resourcemanager.common.RMState;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.frontend.RMConnection;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
+import org.ow2.proactive.resourcemanager.frontend.topology.descriptor.TopologyDescriptor;
 import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
@@ -263,6 +264,22 @@ public class ResourceManagerProxy implements InitActive, RunActive {
      */
     public NodeSet getAtMostNodes(int nbNodes, List<SelectionScript> selectionScriptsList, NodeSet exclusion) {
         return resourceManager.getAtMostNodes(nbNodes, selectionScriptsList, exclusion);
+    }
+
+    /**
+     * Provides nbNodes nodes verifying several selection scripts AND the exclusion nodes.
+     * If the Resource manager (RM) don't have enough free nodes
+     * it returns the maximum amount of valid free nodes
+     * @param nbNodes the number of nodes.
+     * @param descriptor the type of topology to apply to the search
+     * @param selectionScriptsList : a list of scripts to be verified. Returned nodes
+     * verify ALL selection scripts of this list.
+     * @param exclusion the exclusion nodes that cannot be returned
+     * @return an array list of nodes.
+     */
+    public NodeSet getAtMostNodes(int nbNodes, TopologyDescriptor descriptor,
+            List<SelectionScript> selectionScriptsList, NodeSet exclusion) {
+        return resourceManager.getAtMostNodes(nbNodes, descriptor, selectionScriptsList, exclusion);
     }
 
     /**

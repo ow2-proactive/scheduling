@@ -54,6 +54,7 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.common.RMState;
+import org.ow2.proactive.resourcemanager.frontend.topology.descriptor.TopologyDescriptor;
 import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SchedulerStatus;
@@ -289,7 +290,8 @@ final class SchedulingMethodImpl implements SchedulingMethod {
             InternalJob currentJob = core.jobs.get(etd.getJobId());
             InternalTask internalTask = currentJob.getIHMTasks().get(etd.getId());
             int neededNodes = internalTask.getNumberOfNodesNeeded();
-            SchedulingTaskComparator referent = new SchedulingTaskComparator(internalTask);
+            SchedulingTaskComparator referent = new SchedulingTaskComparator(internalTask, currentJob
+                    .getOwner());
             logger_dev.debug("Get the most nodes matching the current selection");
             boolean firstLoop = true;
             do {
@@ -313,7 +315,7 @@ final class SchedulingMethodImpl implements SchedulingMethod {
                     //(multi-nodes starvation may occurs)
                 } else {
                     //check if the task is compatible with the other previous one
-                    if (referent.equals(new SchedulingTaskComparator(internalTask))) {
+                    if (referent.equals(new SchedulingTaskComparator(internalTask, currentJob.getOwner()))) {
                         neededResource += neededNodes;
                         maxResource -= neededNodes;
                         toFill.add(etd);
@@ -351,7 +353,8 @@ final class SchedulingMethodImpl implements SchedulingMethod {
         InternalTask internalTask = currentJob.getIHMTasks().get(etd.getId());
 
         if (logger.isDebugEnabled()) {
-            SchedulingTaskComparator referent = new SchedulingTaskComparator(internalTask);
+            SchedulingTaskComparator referent = new SchedulingTaskComparator(internalTask, currentJob
+                    .getOwner());
             logger.debug("Referent task         : " + internalTask.getId());
             logger.debug("Selection script(s)   : " +
                 ((referent.getSsHashCode() == 0) ? "no" : "yes (" + referent.getSsHashCode() + ")"));
@@ -359,7 +362,12 @@ final class SchedulingMethodImpl implements SchedulingMethod {
         }
 
         try {
-            nodeSet = core.resourceManager.getAtMostNodes(neededResourcesNumber, internalTask
+            //apply topology if number of resource demanded is more than one
+            TopologyDescriptor tdescriptor = null;
+            if (neededResourcesNumber > 1) {
+                tdescriptor = TopologyDescriptor.BEST_PROXIMITY;
+            }
+            nodeSet = core.resourceManager.getAtMostNodes(neededResourcesNumber, tdescriptor, internalTask
                     .getSelectionScripts(), internalTask.getNodeExclusion());
             //the following line is used to unwrap the future, warning when moving or removing
             //it may also throw a ScriptException which is a RuntimeException

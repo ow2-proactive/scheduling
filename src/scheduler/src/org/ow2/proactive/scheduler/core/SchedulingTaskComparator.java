@@ -51,15 +51,17 @@ public class SchedulingTaskComparator {
 
     private InternalTask task;
     private int ssHashCode;
+    private String owner;
 
     /**
      * Create a new instance of SchedulingTaskComparator
      *
      * @param task
      */
-    public SchedulingTaskComparator(InternalTask task) {
+    public SchedulingTaskComparator(InternalTask task, String owner) {
         this.task = task;
         this.ssHashCode = SelectionScript.hashCodeFromList(task.getSelectionScripts());
+        this.owner = owner;
     }
 
     /**
@@ -85,8 +87,13 @@ public class SchedulingTaskComparator {
         //...or they are equals
         sameNodeEx = sameNodeEx ||
             (task.getNodeExclusion() != null && task.getNodeExclusion().equals(tcomp.task.getNodeExclusion()));
+        //test whether owner is the same
+        boolean sameOwner = this.owner.equals(tcomp.owner);
+        //test whether both task are multi-node or not
+        boolean sameMutliNode = (task.getNumberOfNodesNeeded() == 1 && tcomp.task.getNumberOfNodesNeeded() == 1) ||
+            (task.getNumberOfNodesNeeded() > 1 && tcomp.task.getNumberOfNodesNeeded() > 1);
         //add the two tests to the returned value
-        return sameSsHash && sameNodeEx;
+        return sameSsHash && sameNodeEx && sameOwner && sameMutliNode;
     }
 
     /**
