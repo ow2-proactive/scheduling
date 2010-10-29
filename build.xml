@@ -6,7 +6,8 @@
 	
 	<property file="./build.properties"/>
 	
-	<property name="classes.dir" value="build/classes" />
+	<property name="build.dir" value="build" />
+	<property name="classes.dir" value="${build.dir}/classes" />
 	<property name="lib.dir" value="WebContent/WEB-INF/lib" />
 	<property name="src.dir" value="src" />
 	
@@ -56,4 +57,24 @@
 		<war destfile="proactive_grid_cloud_portal.war" webxml="WebContent/WEB-INF/web.xml" basedir="WebContent"></war>
 	</target>
 	
+	<target name="doc-jaxrs" depends="doc-jaxb" description="Generate JAX-RS documentation">
+		<javadoc classpathref="src.classpath" sourcepath="${src.dir}"
+			destdir="${build.dir}/jaxrsdocs/" extdirs="${lib.dir}"
+			doclet="com.lunatech.doclets.jax.jaxrs.JAXRSDoclet"
+			docletpathref="src.classpath">
+			<package name="org.ow2.proactive_grid_cloud_portal.test.*"/>
+			<link href="../jaxbdocs/"/>
+		</javadoc>
+	</target>
+
+	
+	<target name="doc-jaxb" description="Generate JAXB documentation">
+		<javadoc classpathref="src.classpath" sourcepath="${src.dir}"
+			destdir="${build.dir}/jaxbdocs/" extdirs="${lib.dir}"
+			doclet="com.lunatech.doclets.jax.jaxb.JAXBDoclet"
+			docletpathref="src.classpath">
+			<package name="org.ow2.proactive_grid_cloud_portal.test.*"/>
+		</javadoc>
+	</target>
+
 </project>
