@@ -36,9 +36,6 @@
  */
 package org.ow2.proactive.scheduler.authentication;
 
-import java.security.KeyException;
-import java.util.Set;
-
 import javax.management.JMException;
 import javax.security.auth.Subject;
 import javax.security.auth.login.LoginException;
@@ -47,18 +44,12 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.authentication.AuthenticationImpl;
-import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
-import org.ow2.proactive.authentication.principals.GroupNamePrincipal;
 import org.ow2.proactive.authentication.principals.UserNamePrincipal;
 import org.ow2.proactive.jmx.naming.JMXTransportProtocol;
-import org.ow2.proactive.scheduler.common.AdminSchedulerInterface;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
-import org.ow2.proactive.scheduler.common.UserSchedulerInterface;
-import org.ow2.proactive.scheduler.common.backwardcompatibility.SchedulerAdminAdapter;
 import org.ow2.proactive.scheduler.common.exception.AlreadyConnectedException;
-import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 import org.ow2.proactive.scheduler.core.SchedulerFrontend;
 import org.ow2.proactive.scheduler.core.jmx.SchedulerJMXHelper;
@@ -86,9 +77,6 @@ public class SchedulerAuthentication extends AuthenticationImpl implements Sched
     /** The scheduler front-end connected to this authentication interface */
     private SchedulerFrontend frontend;
 
-    /** TODO Adapter for backward compatibility : to be removed in 3.X.X */
-    private AdminSchedulerInterface useradminAdapter;
-
     /**
      * ProActive empty constructor.
      */
@@ -108,117 +96,6 @@ public class SchedulerAuthentication extends AuthenticationImpl implements Sched
                 PASchedulerProperties.getAbsolutePath(PASchedulerProperties.SCHEDULER_AUTH_PUBKEY_PATH
                         .getValueAsString()));
         this.frontend = frontend;
-        //TODO to be removed in 3.X.X
-        this.useradminAdapter = new SchedulerAdminAdapter(frontend);
-    }
-
-    /**
-     * 
-     * Kept for compatibility reasons, should be removed in future versions.
-     * <p>
-     * Prefer its secure counterpart,
-     * {@link org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface#logAsUser(Credentials)}
-     * 
-     * @see org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface#logAsUser(java.lang.String, java.lang.String)
-     */
-    @Deprecated
-    public UserSchedulerInterface logAsUser(String user, String password) throws LoginException {
-        try {
-            // encrypting the data here is useless, only done to conform to the
-            // signature of the real method
-            return logAsUser(Credentials.createCredentials(new CredData(user, password), publicKeyPath));
-        } catch (KeyException e) {
-            logger_dev.error("", e);
-            throw new LoginException("Could not encrypt credentials: " + e.getMessage());
-        }
-    }
-
-    /**
-     * 
-     * Kept for compatibility reasons, should be removed in future versions.
-     * <p>
-     * Prefer its secure counterpart,
-     * {@link org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface#logAsAdmin(Credentials)}
-     * 
-     * @see org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface#logAsAdmin(java.lang.String, java.lang.String)
-     */
-    @Deprecated
-    public AdminSchedulerInterface logAsAdmin(String user, String password) throws LoginException {
-        try {
-            // encrypting the data here is useless, only done to conform to the
-            // signature of the real method
-            return logAsAdmin(Credentials.createCredentials(new CredData(user, password), publicKeyPath));
-        } catch (KeyException e) {
-            logger_dev.error("", e);
-            throw new LoginException("Could not encrypt credentials: " + e.getMessage());
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Deprecated
-    public UserSchedulerInterface logAsUser(Credentials cred) throws LoginException {
-
-        Subject subject = authenticate(cred);
-
-        Set<GroupNamePrincipal> groupPrincipals = subject.getPrincipals(GroupNamePrincipal.class);
-        boolean userOrAdmin = groupPrincipals.contains(new GroupNamePrincipal("user")) ||
-            groupPrincipals.contains(new GroupNamePrincipal("admin"));
-        if (!userOrAdmin) {
-            throw new LoginException("User does not belong to either \"users\" or \"admins\" group");
-        }
-
-        UserNamePrincipal unPrincipal = subject.getPrincipals(UserNamePrincipal.class).iterator().next();
-        String user = unPrincipal.getName();
-
-        logger_dev.info("user : " + user);
-        // add this user to the scheduler front-end
-        UserIdentificationImpl ident = new UserIdentificationImpl(user, subject);
-        ident.setHostName(getSenderHostName());
-        try {
-            this.frontend.connect(PAActiveObject.getContext().getCurrentRequest().getSourceBodyID(), ident,
-                    cred);
-        } catch (SchedulerException e) {
-            logger_dev.error("", e);
-            throw new LoginException(e.getMessage());
-        }
-
-        // return the created interface
-        return this.useradminAdapter;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Deprecated
-    public AdminSchedulerInterface logAsAdmin(Credentials cred) throws LoginException {
-
-        Subject subject = authenticate(cred);
-
-        Set<GroupNamePrincipal> groupPrincipals = subject.getPrincipals(GroupNamePrincipal.class);
-        boolean userOrAdmin = groupPrincipals.contains(new GroupNamePrincipal("admin"));
-        if (!userOrAdmin) {
-            throw new LoginException("User does not belong to \"admins\" group");
-        }
-
-        UserNamePrincipal unPrincipal = subject.getPrincipals(UserNamePrincipal.class).iterator().next();
-        String user = unPrincipal.getName();
-
-        logger_dev.info("user : " + user);
-        // add this user to the scheduler front-end
-        UserIdentificationImpl ident = new UserIdentificationImpl(user, subject);
-        ident.setHostName(getSenderHostName());
-        try {
-            this.frontend.connect(PAActiveObject.getContext().getCurrentRequest().getSourceBodyID(), ident,
-                    cred);
-        } catch (SchedulerException e) {
-            logger_dev.error("", e);
-            throw new LoginException(e.getMessage());
-        }
-
-        // return the created interface
-        return this.useradminAdapter;
     }
 
     /**

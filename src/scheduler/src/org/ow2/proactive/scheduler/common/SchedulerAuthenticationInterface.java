@@ -42,7 +42,6 @@ import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.authentication.Authentication;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.common.exception.AlreadyConnectedException;
-import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 
 
 /**
@@ -55,80 +54,6 @@ import org.ow2.proactive.scheduler.common.exception.SchedulerException;
  */
 @PublicAPI
 public interface SchedulerAuthenticationInterface extends Authentication {
-
-    /**
-     * Connect the user interface to a scheduler with the given scheduler URL.<br>
-     * If the login or/and password do not match an allowed one,
-     * it will throw an LoginException.<br>
-     * If the authentication succeed, it will return a new scheduler user API to managed job.<br>
-     * Note that you can use the provided {@link SchedulerAuthenticationGUIHelper} class to display a
-     * graphical interface that will ask the URL, login and password.
-     *
-     * @param user the user name of the user to connect.
-     * @param password the password of the user to connect.
-     * @return The {@link org.ow2.proactive.scheduler.core.UserScheduler} interface if this user can access to the scheduler.
-     * @throws LoginException thrown if this user/password does not match any entries.
-     * @throws SchedulerException thrown if the connection to the scheduler cannot be established.
-     */
-    @Deprecated
-    public UserSchedulerInterface logAsUser(String user, String password) throws LoginException;
-
-    /**
-     * Connect the administrator interface to a scheduler with the given scheduler URL.<br>
-     * If the login or/and password do not match an allowed one,
-     * it will throw an LoginException.<br>
-     * If the authentication succeed, it will return a new scheduler administrator API.<br>
-     * This authentication requires that the user has administrator rights.<br>
-     * Note that you can use the provided {@link SchedulerAuthenticationGUIHelper} class to display a
-     * graphical interface that will ask the URL, login and password.
-     *
-     * @param user the user name of the user to connect.
-     * @param password the password of the user to connect.
-     * @return The {@link org.ow2.proactive.scheduler.core.UserScheduler} interface if this user can access to the scheduler.
-     * @throws LoginException thrown if this user/password does not match any entries.
-     * @throws SchedulerException thrown if the connection to the scheduler cannot be established.
-     */
-    @Deprecated
-    public AdminSchedulerInterface logAsAdmin(String user, String password) throws LoginException;
-
-    /**
-     * Connect the user interface to a scheduler with the given scheduler URL,
-     * sending login and password in an encrypted state.<br>
-     * If the login or/and password do not match an allowed one, it will throw
-     * an LoginException.<br>
-     * If the authentication succeed, it will return a new scheduler user API to
-     * managed job.<br>
-     * Note that you can use the provided
-     * {@link SchedulerAuthenticationGUIHelper} class to display a graphical
-     * interface that will ask the URL, login and password.
-     * 
-     * @param cred Object encapsulating encrypted credentials, and information on how to decrypt them
-     * @return The {@link org.ow2.proactive.scheduler.core.UserScheduler} interface if this user can access to the scheduler.
-     * @throws LoginException thrown if this user/password does not match any entries.
-     * @throws SchedulerException thrown if the connection to the scheduler cannot be established.
-     */
-    @Deprecated
-    public UserSchedulerInterface logAsUser(Credentials cred) throws LoginException;
-
-    /**
-     * Connect the administrator interface to a scheduler with the given
-     * scheduler URL, sending login and password in an encrypted state.<br>
-     * If the login or/and password do not match an allowed one, it will throw
-     * an LoginException.<br>
-     * If the authentication succeed, it will return a new scheduler
-     * administrator API.<br>
-     * This authentication requires that the user has administrator rights.<br>
-     * Note that you can use the provided
-     * {@link SchedulerAuthenticationGUIHelper} class to display a graphical
-     * interface that will ask the URL, login and password.
-     * 
-     * @param cred Object encapsulating encrypted credentials, and information on how to decrypt them
-     * @return The {@link org.ow2.proactive.scheduler.core.UserScheduler} interface if this user can access to the scheduler.
-     * @throws LoginException thrown if this user/password does not match any entries.
-     * @throws SchedulerException thrown if the connection to the scheduler cannot be established.
-     */
-    @Deprecated
-    public AdminSchedulerInterface logAsAdmin(Credentials cred) throws LoginException;
 
     /**
      * Try to login a client to the scheduler sending login and password in an encrypted state.<br>

@@ -7,7 +7,7 @@ import org.ow2.proactive.resourcemanager.RMInitializer;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
-import org.ow2.proactive.resourcemanager.nodesource.infrastructure.SSHInfrastructure;
+import org.ow2.proactive.resourcemanager.nodesource.infrastructure.SSHInfrastructure2;
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 
 
@@ -67,7 +67,7 @@ public class AdminGuide {
 
         Object[] policyParameters = new Object[] { "MY_GROUPS", "ME" };
 
-        resourceManager.createNodeSource("MySshNodeSource", SSHInfrastructure.class.getName(),
+        resourceManager.createNodeSource("MySshNodeSource", SSHInfrastructure2.class.getName(),
                 infrastructureParameters, StaticPolicy.class.getName(), policyParameters);
 
         while (resourceManager.getState().getTotalNodesNumber() != 1) {
