@@ -36,6 +36,7 @@
  */
 package org.ow2.proactive.utils;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.LinkedList;
 
@@ -48,8 +49,9 @@ import java.util.LinkedList;
  * @author The ProActive Team
  * @since ProActive Scheduling 1.0
  */
-public class BoundedLinkedList<E> extends LinkedList<E> {
+public class BoundedLinkedList<E> implements Serializable {
 
+    private LinkedList<E> list;
     private int size;
 
     /**
@@ -59,6 +61,7 @@ public class BoundedLinkedList<E> extends LinkedList<E> {
      */
     public BoundedLinkedList(int size) {
         this.size = size;
+        list = new LinkedList<E>();
     }
 
     /**
@@ -67,11 +70,10 @@ public class BoundedLinkedList<E> extends LinkedList<E> {
      *
      * @see java.util.LinkedList#add(java.lang.Object)
      */
-    @Override
     public boolean add(E o) {
-        super.addFirst(o);
-        if (this.size() > size) {
-            super.removeLast();
+        list.addFirst(o);
+        if (list.size() > size) {
+            list.removeLast();
         }
         return true;
     }
@@ -82,13 +84,13 @@ public class BoundedLinkedList<E> extends LinkedList<E> {
      *
      * @see java.util.LinkedList#add(int, java.lang.Object)
      */
-    @Override
     public void add(int index, E element) {
-        if (index == size)
+        if (index >= size) {
             throw new ArrayIndexOutOfBoundsException("Given index : " + index + ", max size : " + size);
-        super.add(index, element);
-        if (this.size() > size) {
-            super.removeLast();
+        }
+        list.add(index, element);
+        if (list.size() > size) {
+            list.removeLast();
         }
     }
 
@@ -98,7 +100,6 @@ public class BoundedLinkedList<E> extends LinkedList<E> {
      *
      * @see java.util.LinkedList#addAll(java.util.Collection)
      */
-    @Override
     public boolean addAll(Collection<? extends E> c) {
         return this.addAll(0, c);
     }
@@ -109,15 +110,15 @@ public class BoundedLinkedList<E> extends LinkedList<E> {
      *
      * @see java.util.LinkedList#addAll(int, java.util.Collection)
      */
-    @Override
     public boolean addAll(int index, Collection<? extends E> c) {
-        if (index == size)
+        if (index >= size) {
             throw new ArrayIndexOutOfBoundsException("Given index : " + index + ", max size : " + size);
-        boolean ret = super.addAll(index, c);
+        }
+        boolean ret = list.addAll(index, c);
         if (ret) {
             for (int i = 0; i < c.size(); i++) {
-                if (this.size() > size) {
-                    super.removeLast();
+                if (list.size() > size) {
+                    list.removeLast();
                 } else {
                     break;
                 }
@@ -144,4 +145,68 @@ public class BoundedLinkedList<E> extends LinkedList<E> {
         this.size = newSize;
     }
 
+    /**
+     * @see java.util.LinkedList#size()
+     */
+    public int size() {
+        return list.size();
+    }
+
+    /**
+     * @see java.util.Queue#element()
+     */
+    public E element() {
+        return list.element();
+    }
+
+    /**
+     * @see java.util.LinkedList#getFirst()
+     */
+    public E getFirst() {
+        return list.getFirst();
+    }
+
+    /**
+     * @see java.util.LinkedList#peek()
+     */
+    public E peek() {
+        return list.peek();
+    }
+
+    /**
+     * @see java.util.LinkedList#remove()
+     */
+    public E remove() {
+        return list.remove();
+    }
+
+    /**
+     * @see java.util.LinkedList#poll()
+     */
+    public E poll() {
+        return list.poll();
+    }
+
+    /**
+     * @see java.util.LinkedList#getLast()
+     */
+    public E getLast() {
+        return list.getLast();
+    }
+
+    /**
+     * @see java.util.LinkedList#get(int)
+     */
+    public E get(int n) {
+        return list.get(n);
+    }
+
+    /**
+     * Convert the current Bounded list into a collection
+     * 
+     * @return the collection representing this bounded linked list.
+     */
+    public Collection<E> toCollection() {
+        return list;
+    }
 }

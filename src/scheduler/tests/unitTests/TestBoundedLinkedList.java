@@ -93,7 +93,7 @@ public class TestBoundedLinkedList {
         Assert.assertEquals(5, list.size());
         Assert.assertEquals(100, list.element());
         Assert.assertEquals(60, list.getLast());
-        list.addAll(1, list);
+        list.addAll(1, list.toCollection());
         Assert.assertEquals(5, list.size());
         Assert.assertEquals(100, list.getFirst());
         Assert.assertEquals(70, list.getLast());
@@ -103,7 +103,7 @@ public class TestBoundedLinkedList {
         } catch (ArrayIndexOutOfBoundsException e) {
         }
         try {
-            list.addAll(5, list);//must throw the exception
+            list.addAll(5, list.toCollection());//must throw the exception
             Assert.assertTrue(false);
         } catch (ArrayIndexOutOfBoundsException e) {
         }

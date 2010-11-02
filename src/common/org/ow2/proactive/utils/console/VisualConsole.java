@@ -50,7 +50,6 @@ import java.io.PipedWriter;
 import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.StringWriter;
-import java.util.LinkedList;
 import java.util.Map;
 
 import javax.swing.JFrame;
@@ -83,7 +82,7 @@ public class VisualConsole extends JFrame implements Console, KeyListener {
     private JScrollPane jScrollPanePrompt = null;
     private JTextArea jTextArea = null;
     private JTextArea jTextAreaPrompt = null;
-    private LinkedList<String> history = null;
+    private BoundedLinkedList<String> history = null;
     private PipedReader reader;
     private PipedWriter writer;
     private PipedWriter internalPipedWriter;
