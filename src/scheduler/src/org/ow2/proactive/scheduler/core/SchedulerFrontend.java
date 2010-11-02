@@ -717,7 +717,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
      * {@inheritDoc}
      */
     public boolean freeze() throws NotConnectedException, PermissionException {
-        checkPermission("freeze", "You do not have permission to pause the scheduler !");
+        checkPermission("freeze", "You do not have permission to freeze the scheduler !");
         return scheduler.freeze();
     }
 
