@@ -62,7 +62,7 @@
 			destdir="${build.dir}/jaxrsdocs/" extdirs="${lib.dir}"
 			doclet="com.lunatech.doclets.jax.jaxrs.JAXRSDoclet"
 			docletpathref="src.classpath">
-			<package name="org.ow2.proactive_grid_cloud_portal.test.*"/>
+			<package name="org.ow2.proactive_grid_cloud_portal.*"/>
 			<link href="../jaxbdocs/"/>
 		</javadoc>
 	</target>
@@ -73,7 +73,7 @@
 			destdir="${build.dir}/jaxbdocs/" extdirs="${lib.dir}"
 			doclet="com.lunatech.doclets.jax.jaxb.JAXBDoclet"
 			docletpathref="src.classpath">
-			<package name="org.ow2.proactive_grid_cloud_portal.test.*"/>
+			<package name="org.ow2.proactive_grid_cloud_portal.*"/>
 		</javadoc>
 	</target>
 
