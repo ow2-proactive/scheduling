@@ -39,6 +39,8 @@ package org.ow2.proactive.resourcemanager.common.event;
 import java.io.Serializable;
 import java.util.ArrayList;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.resourcemanager.frontend.RMEventListener;
 import org.ow2.proactive.resourcemanager.frontend.RMMonitoring;
@@ -60,6 +62,7 @@ import org.ow2.proactive.resourcemanager.frontend.RMMonitoring;
  * @since ProActive Scheduling 0.9
  */
 @PublicAPI
+@XmlRootElement
 public class RMInitialState implements Serializable {
 
     /** Nodes events */

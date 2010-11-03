@@ -38,6 +38,8 @@ package org.ow2.proactive.resourcemanager.common;
 
 import java.io.Serializable;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 
@@ -50,6 +52,7 @@ import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
  * $Id$
  */
 @PublicAPI
+@XmlRootElement
 public class RMState implements Serializable {
 
     private int freeNodesNumber;
