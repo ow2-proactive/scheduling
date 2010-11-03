@@ -353,7 +353,7 @@ public interface Scheduler extends SchedulerCoreMethods {
 
     /**
      * Test whether or not the user is connected to the ProActive Scheduler.
-     *
+     * Note that a call to this method DOES NOT renew the connection lease.
      * @return true if the user connected to a Scheduler, false otherwise.
      */
     public boolean isConnected();
