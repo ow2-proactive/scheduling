@@ -404,7 +404,7 @@ public class SchedulerModel extends ConsoleModel {
                     }
                 }
             } else {
-                print("Job " + jobId + " is not finished or unknown !");
+                print("Job " + jobId + " is not finished !");
             }
             return result;
         } catch (Exception e) {
@@ -426,7 +426,7 @@ public class SchedulerModel extends ConsoleModel {
                     handleExceptionDisplay("\t " + result.getException().getMessage(), e1);
                 }
             } else {
-                print("Task '" + taskName + "' is still running !");
+                print("Task '" + taskName + "' is not finished !");
             }
             return result;
         } catch (Exception e) {
@@ -452,7 +452,7 @@ public class SchedulerModel extends ConsoleModel {
                     }
                 }
             } else {
-                print("Job " + jobId + " is not finished or unknown !");
+                print("Job " + jobId + " is not finished !");
             }
         } catch (Exception e) {
             handleExceptionDisplay("Error on job " + jobId, e);
@@ -471,7 +471,7 @@ public class SchedulerModel extends ConsoleModel {
                     handleExceptionDisplay("\t " + result.getException().getMessage(), e1);
                 }
             } else {
-                print("Task '" + taskName + "' is still running !");
+                print("Task '" + taskName + "' is not finished !");
             }
         } catch (Exception e) {
             handleExceptionDisplay("Error on task " + taskName, e);
