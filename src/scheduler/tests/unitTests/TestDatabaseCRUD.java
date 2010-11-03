@@ -125,7 +125,7 @@ public class TestDatabaseCRUD {
         //create job descriptor
         itfJob.setJobDescriptor(new JobDescriptorImpl(itfJob));
         //add a taskResult
-        itfJob.setJobResult(new JobResultImpl(itfJob.getId()));
+        itfJob.setJobResult(new JobResultImpl(itfJob));
         ((JobResultImpl) itfJob.getJobResult()).addTaskResult("task2", new TaskResultImpl(TaskIdImpl
                 .nextId(itfJob.getJobInfo().getJobId()), "salut", null, 1, null, new FlowAction()), true);
         //register the job

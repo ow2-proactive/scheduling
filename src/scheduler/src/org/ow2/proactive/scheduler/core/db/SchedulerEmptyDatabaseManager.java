@@ -43,6 +43,7 @@ import java.util.Map;
 
 import org.ow2.proactive.db.Condition;
 import org.ow2.proactive.db.EmptyDatabaseManager;
+import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.task.TaskId;
@@ -99,7 +100,11 @@ public class SchedulerEmptyDatabaseManager extends EmptyDatabaseManager implemen
         } else if (TaskResult.class.isAssignableFrom(egClass)) {
             ArrayList<T> res = new ArrayList<T>();
             TaskId id = (TaskId) conditions[0].getValue();
-            res.add((T) jobs.get(id.getJobId()).getJobResult().getResult(id.getReadableName()));
+            try {
+                res.add((T) jobs.get(id.getJobId()).getJobResult().getResult(id.getReadableName()));
+            } catch (UnknownTaskException ute) {
+                //should never happen : taskName is unknown
+            }
             return res;
         } else {
             return new ArrayList<T>();

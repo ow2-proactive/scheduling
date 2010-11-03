@@ -60,11 +60,13 @@ import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 import org.hibernate.annotations.Proxy;
 import org.objectweb.proactive.api.PAFuture;
+import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
+import org.ow2.proactive.scheduler.task.internal.InternalTask;
 
 
 /**
@@ -126,10 +128,13 @@ public class JobResultImpl implements JobResult {
      *
      * @param id the jobId associated with this result
      */
-    public JobResultImpl(JobId id) {
-        this.id = id;
-        this.allResults = new HashMap<String, TaskResult>();
+    public JobResultImpl(InternalJob job) {
+        this.id = job.getId();
+        this.allResults = new HashMap<String, TaskResult>(job.getTasks().size());
         this.preciousResults = new HashMap<String, TaskResult>();
+        for (InternalTask it : job.getIHMTasks().values()) {
+            this.allResults.put(it.getName(), null);
+        }
     }
 
     /**
@@ -197,7 +202,23 @@ public class JobResultImpl implements JobResult {
      * @see org.ow2.proactive.scheduler.common.job.JobResult#getAllResults()
      */
     public Map<String, TaskResult> getAllResults() {
-        return allResults;
+        return filterNullResults(allResults);
+    }
+
+    /**
+     * Remove every key that have null value
+     *
+     * @param trs the map to filter
+     * @return a new filtered map
+     */
+    private Map<String, TaskResult> filterNullResults(Map<String, TaskResult> trs) {
+        Map<String, TaskResult> tmp = new HashMap<String, TaskResult>();
+        for (Entry<String, TaskResult> e : trs.entrySet()) {
+            if (e.getValue() != null) {
+                tmp.put(e.getKey(), e.getValue());
+            }
+        }
+        return tmp;
     }
 
     /**
@@ -206,7 +227,7 @@ public class JobResultImpl implements JobResult {
     public Map<String, TaskResult> getExceptionResults() {
         Map<String, TaskResult> exceptions = new HashMap<String, TaskResult>();
         for (Entry<String, TaskResult> e : allResults.entrySet()) {
-            if (e.getValue().hadException()) {
+            if (e.getValue() != null && e.getValue().hadException()) {
                 exceptions.put(e.getKey(), e.getValue());
             }
         }
@@ -223,16 +244,13 @@ public class JobResultImpl implements JobResult {
     /**
      * @see org.ow2.proactive.scheduler.common.job.JobResult#getResult(java.lang.String)
      */
-    public TaskResult getResult(String taskName) {
+    public TaskResult getResult(String taskName) throws UnknownTaskException {
+        if (!allResults.containsKey(taskName)) {
+            throw new UnknownTaskException(taskName + " does not exist in this job (jobId=" + id + ")");
+        }
         TaskResult tr = futurResults.get(taskName);
         if (tr == null) {
-            tr = allResults.get(taskName);
-            if (tr == null) {
-                throw new RuntimeException(taskName + " has not been found in this job result (jobId=" + id +
-                    ")");
-            } else {
-                return tr;
-            }
+            return allResults.get(taskName);
         } else if (!PAFuture.isAwaited(tr)) {
             return tr;
         } else {
@@ -243,11 +261,12 @@ public class JobResultImpl implements JobResult {
     /**
      * Return any result even if it is awaited futur.
      * Null is returned only if the given taskName is unknown
+     * <u>For internal Use.</u>
      *
      * @param taskName the task name of the result to get.
      * @return the result if it exists, null if not.
      */
-    public TaskResult getAnyResult(String taskName) {
+    public TaskResult getAnyResult(String taskName) throws UnknownTaskException {
         TaskResult tr = futurResults.get(taskName);
         if (tr == null) {
             return allResults.get(taskName);
@@ -260,20 +279,18 @@ public class JobResultImpl implements JobResult {
      * @see org.ow2.proactive.scheduler.common.job.JobResult#hadException()
      */
     public boolean hadException() {
-        for (TaskResult tr : allResults.values()) {
-            if (tr.hadException()) {
-                return true;
-            }
-        }
-        return false;
+        return getExceptionResults().size() > 0;
     }
 
     /**
      * @see org.ow2.proactive.scheduler.common.job.JobResult#removeResult(java.lang.String)
      */
-    public void removeResult(String task) {
-        allResults.remove(task);
-        preciousResults.remove(task);
+    public void removeResult(String taskName) throws UnknownTaskException {
+        if (!allResults.containsKey(taskName)) {
+            throw new UnknownTaskException(taskName + " does not exist in this job (jobId=" + id + ")");
+        }
+        allResults.put(taskName, null);
+        preciousResults.remove(taskName);
     }
 
     /**
@@ -281,22 +298,25 @@ public class JobResultImpl implements JobResult {
      */
     @Override
     public String toString() {
-        if (allResults.size() == 0) {
-            return "No result available in this job !";
-        }
-
         StringBuilder toReturn = new StringBuilder("\n");
-
+        boolean hasResult = false;
         for (TaskResult res : allResults.values()) {
-            toReturn.append("\t" + res.getTaskId().getReadableName() + " : ");
-            try {
-                toReturn.append(res.value() + "\n");
-            } catch (Throwable e) {
-                toReturn.append(res.getException().getMessage() + "\n");
+            if (res != null) {
+                hasResult = true;
+                toReturn.append("\t" + res.getTaskId().getReadableName() + " : ");
+                try {
+                    toReturn.append(res.value() + "\n");
+                } catch (Throwable e) {
+                    toReturn.append(res.getException().getMessage() + "\n");
+                }
             }
         }
 
-        return toReturn.toString();
+        if (!hasResult) {
+            return "No result available in this job !";
+        } else {
+            return toReturn.toString();
+        }
     }
 
 }

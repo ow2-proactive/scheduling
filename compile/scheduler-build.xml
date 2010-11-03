@@ -246,6 +246,7 @@
 				<include name="org/ow2/proactive/scheduler/common/exception/MaxJobIdReachedException.java" />
 				<include name="org/ow2/proactive/scheduler/common/exception/InternalSchedulerException.java" />
 				<include name="org/ow2/proactive/scheduler/common/exception/InternalException.java" />
+				<include name="org/ow2/proactive/scheduler/common/exception/UnknownTaskException.java" />
 				<include name="org/ow2/proactive/scheduler/common/SchedulerConstants.java" />
 				<include name="org/ow2/proactive/scheduler/common/task/RestartMode.java" />
 				<include name="org/ow2/proactive/scheduler/common/task/TaskDescriptor.java" />

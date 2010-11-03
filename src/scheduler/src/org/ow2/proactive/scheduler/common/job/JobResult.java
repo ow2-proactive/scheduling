@@ -40,6 +40,7 @@ import java.io.Serializable;
 import java.util.Map;
 
 import org.objectweb.proactive.annotation.PublicAPI;
+import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 
 
@@ -110,19 +111,21 @@ public interface JobResult extends Serializable {
     /**
      * Return the task Result corresponding to the given name.
      * A result is returned if the taskName exist and if the result is available.
-     * Null is returned if the task is not finished (has no result) or if the task name is unknown.
+     * Null is returned if the task is not finished (has no result).
      *
      * @param taskName the task name of the result to get.
      * @return the result corresponding to the given task name, null if not found or not finished.
+     * @throws UnknownTaskException if the given task name does not exist in this job
      */
-    public TaskResult getResult(String taskName);
+    public TaskResult getResult(String taskName) throws UnknownTaskException;
 
     /**
      * Remove the result of the given task in this jobResult.
      * 
-     * @param task the identification name of the task.
+     * @param taskName the identification name of the task.
+     * @throws UnknownTaskException if the given task name does not exist in this job
      */
-    public void removeResult(String task);
+    public void removeResult(String taskName) throws UnknownTaskException;
 
     /**
      * Returns true  if the job has generated an exception, false if not.

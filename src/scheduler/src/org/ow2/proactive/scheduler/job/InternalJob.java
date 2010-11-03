@@ -46,8 +46,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.TreeMap;
+import java.util.Map.Entry;
 
 import javax.persistence.Column;
 import javax.persistence.FetchType;
@@ -76,6 +76,7 @@ import org.ow2.proactive.db.annotation.Alterable;
 import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.exception.ExecutableCreationException;
+import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
 import org.ow2.proactive.scheduler.common.job.JobDescriptor;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
@@ -539,8 +540,13 @@ public abstract class InternalJob extends JobState {
         InternalTask descriptor = tasks.get(taskId);
         descriptor.setFinishedTime(System.currentTimeMillis());
         descriptor.setStatus(errorOccurred ? TaskStatus.FAULTY : TaskStatus.FINISHED);
-        descriptor.setExecutionDuration(((TaskResultImpl) getJobResult().getResult(descriptor.getName()))
-                .getTaskDuration());
+        try {
+            descriptor.setExecutionDuration(((TaskResultImpl) getJobResult().getResult(descriptor.getName()))
+                    .getTaskDuration());
+        } catch (UnknownTaskException ute) {
+            //should never happen : taskName is unknown
+            logger_dev.error("", ute);
+        }
         setNumberOfRunningTasks(getNumberOfRunningTasks() - 1);
         setNumberOfFinishedTasks(getNumberOfFinishedTasks() + 1);
 

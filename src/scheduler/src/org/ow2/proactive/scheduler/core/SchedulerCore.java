@@ -785,7 +785,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
         job.submitAction();
 
         //create job result storage
-        JobResult jobResult = new JobResultImpl(job.getId());
+        JobResult jobResult = new JobResultImpl(job);
         //store the job result until user get it  (MUST BE SET BEFORE DB STORAGE)
         job.setJobResult(jobResult);
 
@@ -869,15 +869,20 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
                 if (jobStatus != JobStatus.KILLED) {
                     //deleting tasks results except the one that causes the error
                     if (!td.getId().equals(task.getId())) {
-                        job.getJobResult().removeResult(td.getName());
+                        try {
+                            job.getJobResult().removeResult(td.getName());
+                        } catch (UnknownTaskException ute) {
+                            //should never happen
+                            logger_dev.error("", ute);
+                        }
                     }
                     //if canceled, get the result of the canceled task
                     if ((jobStatus == JobStatus.CANCELED) && td.getId().equals(task.getId())) {
                         try {
                             taskResult = job.getJobResult().getResult(task.getName());
-                        } catch (RuntimeException e) {
+                        } catch (UnknownTaskException ute) {
                             //should never append
-                            logger_dev.error("", e);
+                            logger_dev.error("", ute);
                         }
                     }
                 }
@@ -1208,6 +1213,9 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
 
             //free every execution nodes in the finally
 
+        } catch (UnknownTaskException ute) {
+            //should never happen : taskName is unknown
+            logger_dev.error("", ute);
         } catch (NullPointerException eNull) {
             logger_dev.error("", eNull);
             //avoid race condition between kill and terminate task
