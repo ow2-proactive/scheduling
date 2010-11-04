@@ -88,7 +88,8 @@ public class RMConnection extends Connection<RMAuthentication> {
         try {
             return getInstance().connect(normalizeRM(url));
         } catch (Exception e) {
-            throw new RMException(e.getMessage());
+            throw new RMException("Cannot join the Resource Manager at " + url + " due to " + e.getMessage(),
+                e);
         }
     }
 
@@ -109,7 +110,8 @@ public class RMConnection extends Connection<RMAuthentication> {
         try {
             return getInstance().waitAndConnect(normalizeRM(url), timeout);
         } catch (Exception e) {
-            throw new RMException(e.getMessage());
+            throw new RMException("Cannot join the Resource Manager at " + url + " due to " + e.getMessage(),
+                e);
         }
     }
 
