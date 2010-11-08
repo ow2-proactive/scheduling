@@ -893,7 +893,11 @@
         <xs:extension base="jd:script">
           <xs:attributeGroup ref="jd:target"/>
           <xs:attributeGroup ref="jd:targetElse"/>
-          <xs:attributeGroup ref="jd:targetContinuation"/>
+          <xs:attribute name="continuation" type="xs:string">
+            <xs:annotation>
+              <xs:documentation>branching else target</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
         </xs:extension>
       </xs:complexContent>
     </xs:complexType>

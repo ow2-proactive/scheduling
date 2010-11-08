@@ -710,7 +710,9 @@
       <doc:documentation>branching Control flow action</doc:documentation>
       <ref name="target"/>
       <ref name="targetElse"/>
-      <ref name="targetContinuation"/>
+      <optional>
+        <ref name="targetContinuation"/>
+      </optional>
       <ref name="script"/>
     </element>
   </define>
