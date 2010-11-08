@@ -39,7 +39,7 @@
 		</staticCommand>
 	  </nativeExecutable>
 	  <!-- start block: LOOP target -->
-	  <flowControl block="start">
+	  <controlFlow block="start">
 	    <!-- if the line is < 40 chars do B1, else do B2,
 							  but always do C afterwars-->
 			 <if target="B1" else="B2" join="C">
@@ -51,7 +51,7 @@
 				 </file>
 			   </script>
 			 </if>
-	  </flowControl>
+	  </controlFlow>
 	</task>
 
     <!-- tranform the current line's chars in '_' -->
@@ -86,7 +86,7 @@
 		</staticCommand>
 	  </nativeExecutable>
 	  <!-- end block: looped block -->
-	  <flowControl block="end">
+	  <controlFlow block="end">
 	    <!-- while lines are left untreated in the input file
 			 make another iteration -->
 		<loop target="A">
@@ -98,7 +98,7 @@
 			</file>
           </script>
 		</loop>
-	  </flowControl>
+	  </controlFlow>
 	</task>
 
 

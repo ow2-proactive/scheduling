@@ -3,36 +3,36 @@
   <taskFlow>
 	<task name="split">
 	  <javaExecutable class="/path/to/class/Split" />
-	  <flowControl>
+	  <controlFlow>
 		<replicate>
 		  <script><file path="/path/to/script/duplicate.js" /></script>
 		</replicate>
-      </flowControl>
+      </controlFlow>
     </task>
 
 	<task name="processing_1">
 	  <depends><task ref="split" /></depends>
 	  <javaExecutable class="/path/to/class/Processing_1" />
-	  <flowControl block="start">
+	  <controlFlow block="start">
 		<if target="processing_2_a" else="processing_2_b" join="processing_3">
 		  <script><file path="/path/to/script/if.js" /></script>
 		</if>
-	  </flowControl>
+	  </controlFlow>
 	</task>
 
 	<task name="processing_2_a">
 	  <javaExecutable class="/path/to/class/Processing_1" />
-	  <flowControl block="start" />
+	  <controlFlow block="start" />
 	</task>
 
 	<task name="processing_2_b">
 	  <javaExecutable class="/path/to/class/Processing_1" />
-	  <flowControl block="start" />
+	  <controlFlow block="start" />
 	</task>
 
 	<task name="processing_3">
 	  <javaExecutable class="/path/to/class/Processing_2" />
-	  <flowControl block="end">
+	  <controlFlow block="end">
 		<loop target="processing_1">
           <script><file path="/path/to/script/loop.js" /></script>
 		</loop>

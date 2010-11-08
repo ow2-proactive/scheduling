@@ -13,7 +13,7 @@
       </depends>
       <javaExecutable class="org.ow2.proactive.scheduler.examples.IncrementJob">
       </javaExecutable>
-      <flowControl block="none" >
+      <controlFlow block="none" >
         <loop target="T1">
           <script>
             <code language="javascript">
@@ -43,7 +43,7 @@ loop = false;
             </code>
           </script>
         </loop>
-      </flowControl>
+      </controlFlow>
     </task>
     <task name="T2" maxNumberOfExecution="4">
       <description> // <![CDATA[
@@ -54,7 +54,7 @@ loop = false;
       </depends>
       <javaExecutable class="org.ow2.proactive.scheduler.examples.IncrementJob">
       </javaExecutable>
-      <flowControl block="none" />
+      <controlFlow block="none" />
     </task>
     <task name="T" maxNumberOfExecution="4">
       <description> // <![CDATA[
@@ -62,7 +62,7 @@ loop = false;
       // ]]> </description>
       <javaExecutable class="org.ow2.proactive.scheduler.examples.IncrementJob">
       </javaExecutable>
-      <flowControl block="none" >
+      <controlFlow block="none" >
         <replicate>
           <script>
             <code language="javascript">
@@ -72,7 +72,7 @@ runs=3;
             </code>
           </script>
         </replicate>
-      </flowControl>
+      </controlFlow>
     </task>
   </taskFlow>
 </job>

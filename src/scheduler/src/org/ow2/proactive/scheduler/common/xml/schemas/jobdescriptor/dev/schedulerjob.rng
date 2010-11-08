@@ -355,7 +355,7 @@
     </element>
   </define>
   <define name="flow">
-    <element name="flowControl">
+    <element name="controlFlow">
       <doc:documentation>Flow control : block declaration, flow action</doc:documentation>
       <optional>
         <ref name="block"/>

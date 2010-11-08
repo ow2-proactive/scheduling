@@ -38,7 +38,7 @@
 		</staticCommand>
 	  </nativeExecutable>
 	  <!-- start block because target of a loop -->
-	  <flowControl block="start">
+	  <controlFlow block="start">
 		<replicate>
 		  <script>
 			<!-- will replicate the child task X times, where X is the number
@@ -50,7 +50,7 @@
 			</file>
 		  </script>
 		</replicate>
-	  </flowControl>
+	  </controlFlow>
 	</task>
 
     <!-- applies a filter on one single image part
@@ -85,7 +85,7 @@
 		</staticCommand>
 	  </nativeExecutable>
 	  <!-- end block: looped block -->
-	  <flowControl block="end">
+	  <controlFlow block="end">
 	    <!-- while some images are left untreated in the input folder,
 			 make another iteration of the treatment -->
 		<loop target="split">
@@ -97,7 +97,7 @@
 			</file>
           </script>
 		</loop>
-	  </flowControl>
+	  </controlFlow>
 	</task>
   </taskFlow>
 </job>

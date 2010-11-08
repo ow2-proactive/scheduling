@@ -251,7 +251,7 @@
             <xs:element minOccurs="0" ref="jd:selection"/>
             <xs:element minOccurs="0" ref="jd:pre"/>
             <xs:element ref="jd:executable"/>
-            <xs:element minOccurs="0" ref="jd:flowControl"/>
+            <xs:element minOccurs="0" ref="jd:controlFlow"/>
             <xs:element minOccurs="0" ref="jd:post"/>
             <xs:element minOccurs="0" ref="jd:cleaning"/>
             <xs:element minOccurs="0" ref="jd:outputFiles"/>
@@ -433,7 +433,7 @@
       <xs:group maxOccurs="unbounded" ref="jd:selectionScript"/>
     </xs:complexType>
   </xs:element>
-  <xs:element name="flowControl">
+  <xs:element name="controlFlow">
     <xs:annotation>
       <xs:documentation>Flow control : block declaration, flow action</xs:documentation>
     </xs:annotation>

@@ -20,7 +20,7 @@
       </depends>
       <javaExecutable class="org.ow2.proactive.scheduler.examples.IncrementJob">
       </javaExecutable>
-      <flowControl block="end" />
+      <controlFlow block="end" />
     </task>
   </taskFlow>
 </job>

@@ -10,7 +10,7 @@
       // ]]> </description>
       <javaExecutable class="org.ow2.proactive.scheduler.examples.IncrementJob">
       </javaExecutable>
-      <flowControl block="start" />
+      <controlFlow block="start" />
     </task>
     <task name="T3" maxNumberOfExecution="4">
       <description> // <![CDATA[
@@ -18,7 +18,7 @@
       // ]]> </description>
       <javaExecutable class="org.ow2.proactive.scheduler.examples.IncrementJob">
       </javaExecutable>
-      <flowControl block="start" >
+      <controlFlow block="start" >
         <replicate>
           <script>
             <code language="javascript">
@@ -28,7 +28,7 @@ runs = 3
             </code>
           </script>
         </replicate>
-      </flowControl>
+      </controlFlow>
     </task>
     <task name="T2" maxNumberOfExecution="4">
       <description> // <![CDATA[
@@ -36,7 +36,7 @@ runs = 3
       // ]]> </description>
       <javaExecutable class="org.ow2.proactive.scheduler.examples.IncrementJob">
       </javaExecutable>
-      <flowControl block="start" >
+      <controlFlow block="start" >
         <if target="T3" else="T11" continuation="T13">
           <script>
             <code language="javascript">
@@ -46,7 +46,7 @@ branch = "if";
             </code>
           </script>
         </if>
-      </flowControl>
+      </controlFlow>
     </task>
     <task name="T6" maxNumberOfExecution="4">
       <description> // <![CDATA[
@@ -58,7 +58,7 @@ branch = "if";
       </depends>
       <javaExecutable class="org.ow2.proactive.scheduler.examples.IncrementJob">
       </javaExecutable>
-      <flowControl block="end" />
+      <controlFlow block="end" />
     </task>
     <task name="T" maxNumberOfExecution="4">
       <description> // <![CDATA[
@@ -69,7 +69,7 @@ branch = "if";
       </depends>
       <javaExecutable class="org.ow2.proactive.scheduler.examples.IncrementJob">
       </javaExecutable>
-      <flowControl block="start" >
+      <controlFlow block="start" >
         <if target="T1" else="T2" continuation="T15">
           <script>
             <code language="javascript">
@@ -79,7 +79,7 @@ branch = "else";
             </code>
           </script>
         </if>
-      </flowControl>
+      </controlFlow>
     </task>
     <task name="T7" maxNumberOfExecution="4">
       <description> // <![CDATA[
@@ -90,7 +90,7 @@ branch = "else";
       </depends>
       <javaExecutable class="org.ow2.proactive.scheduler.examples.IncrementJob">
       </javaExecutable>
-      <flowControl block="none" >
+      <controlFlow block="none" >
         <replicate>
           <script>
             <code language="javascript">
@@ -100,7 +100,7 @@ runs = 4;
             </code>
           </script>
         </replicate>
-      </flowControl>
+      </controlFlow>
     </task>
     <task name="T4" maxNumberOfExecution="4">
       <description> // <![CDATA[
@@ -111,7 +111,7 @@ runs = 4;
       </depends>
       <javaExecutable class="org.ow2.proactive.scheduler.examples.IncrementJob">
       </javaExecutable>
-      <flowControl block="start" >
+      <controlFlow block="start" >
         <if target="T8" else="T5" continuation="T10">
           <script>
             <code language="javascript">
@@ -121,7 +121,7 @@ branch = "else";
             </code>
           </script>
         </if>
-      </flowControl>
+      </controlFlow>
     </task>
     <task name="T5" maxNumberOfExecution="4">
       <description> // <![CDATA[
@@ -129,7 +129,7 @@ branch = "else";
       // ]]> </description>
       <javaExecutable class="org.ow2.proactive.scheduler.examples.IncrementJob">
       </javaExecutable>
-      <flowControl block="start" />
+      <controlFlow block="start" />
     </task>
     <task name="T10" maxNumberOfExecution="4">
       <description> // <![CDATA[
@@ -137,7 +137,7 @@ branch = "else";
       // ]]> </description>
       <javaExecutable class="org.ow2.proactive.scheduler.examples.IncrementJob">
       </javaExecutable>
-      <flowControl block="end" />
+      <controlFlow block="end" />
     </task>
     <task name="T11" maxNumberOfExecution="4">
       <description> // <![CDATA[
@@ -145,7 +145,7 @@ branch = "else";
       // ]]> </description>
       <javaExecutable class="org.ow2.proactive.scheduler.examples.IncrementJob">
       </javaExecutable>
-      <flowControl block="start" />
+      <controlFlow block="start" />
     </task>
     <task name="T12" maxNumberOfExecution="4">
       <description> // <![CDATA[
@@ -156,7 +156,7 @@ branch = "else";
       </depends>
       <javaExecutable class="org.ow2.proactive.scheduler.examples.IncrementJob">
       </javaExecutable>
-      <flowControl block="end" />
+      <controlFlow block="end" />
     </task>
     <task name="T13" maxNumberOfExecution="4">
       <description> // <![CDATA[
@@ -164,7 +164,7 @@ branch = "else";
       // ]]> </description>
       <javaExecutable class="org.ow2.proactive.scheduler.examples.IncrementJob">
       </javaExecutable>
-      <flowControl block="end" />
+      <controlFlow block="end" />
     </task>
     <task name="T8" maxNumberOfExecution="4">
       <description> // <![CDATA[
@@ -172,7 +172,7 @@ branch = "else";
       // ]]> </description>
       <javaExecutable class="org.ow2.proactive.scheduler.examples.IncrementJob">
       </javaExecutable>
-      <flowControl block="start" />
+      <controlFlow block="start" />
     </task>
     <task name="T14" maxNumberOfExecution="4">
       <description> // <![CDATA[
@@ -183,7 +183,7 @@ branch = "else";
       </depends>
       <javaExecutable class="org.ow2.proactive.scheduler.examples.IncrementJob">
       </javaExecutable>
-      <flowControl block="end" />
+      <controlFlow block="end" />
     </task>
     <task name="T9" maxNumberOfExecution="4">
       <description> // <![CDATA[
@@ -194,7 +194,7 @@ branch = "else";
       </depends>
       <javaExecutable class="org.ow2.proactive.scheduler.examples.IncrementJob">
       </javaExecutable>
-      <flowControl block="end" />
+      <controlFlow block="end" />
     </task>
     <task name="T15" maxNumberOfExecution="4">
       <description> // <![CDATA[
@@ -202,7 +202,7 @@ branch = "else";
       // ]]> </description>
       <javaExecutable class="org.ow2.proactive.scheduler.examples.IncrementJob">
       </javaExecutable>
-      <flowControl block="end" />
+      <controlFlow block="end" />
     </task>
     <task name="T16" maxNumberOfExecution="4">
       <description> // <![CDATA[
@@ -210,7 +210,7 @@ branch = "else";
       // ]]> </description>
       <javaExecutable class="org.ow2.proactive.scheduler.examples.IncrementJob">
       </javaExecutable>
-      <flowControl block="none" >
+      <controlFlow block="none" >
         <replicate>
           <script>
             <code language="javascript">
@@ -220,7 +220,7 @@ runs = 2;
             </code>
           </script>
         </replicate>
-      </flowControl>
+      </controlFlow>
     </task>
     <task name="T17" maxNumberOfExecution="4">
       <description> // <![CDATA[
@@ -251,7 +251,7 @@ runs = 2;
       </depends>
       <javaExecutable class="org.ow2.proactive.scheduler.examples.IncrementJob">
       </javaExecutable>
-      <flowControl block="end" />
+      <controlFlow block="end" />
     </task>
     <task name="T19" maxNumberOfExecution="4">
       <description> // <![CDATA[

@@ -65,7 +65,7 @@ public enum XMLTags {
     //FORK ENVIRONMENT
     FORK_ENVIRONMENT("forkEnvironment"),
     // FLOW CONTROL
-    FLOW("flowControl"), FLOW_IF("if"), FLOW_REPLICATE("replicate"), FLOW_LOOP("loop"),
+    FLOW("controlFlow"), FLOW_IF("if"), FLOW_REPLICATE("replicate"), FLOW_LOOP("loop"),
     //DATASPACES
     DS_INPUTSPACE("inputSpace"), DS_OUTPUTSPACE("outputSpace"), DS_INPUTFILES("inputFiles"), DS_OUTPUTFILES(
             "outputFiles"), DS_FILES("files");

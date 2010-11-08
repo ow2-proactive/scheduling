@@ -78,7 +78,7 @@ dependsTask = ## A task from which this task depends
 selection = ## A script used to select resources that can handle the task 
     element selection { selectionScript+ }
 flow = ## Flow control : block declaration, flow action
-    element flowControl { block?, (actionIf | actionReplicate | actionLoop)? }
+    element controlFlow { block?, (actionIf | actionReplicate | actionLoop)? }
 block = ## block declaration
     attribute block { blockAttr }
 pre = ## A script launched before the task execution in the task node

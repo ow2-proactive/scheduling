@@ -10,7 +10,7 @@
       // ]]> </description>
       <javaExecutable class="org.ow2.proactive.scheduler.examples.IncrementJob">
       </javaExecutable>
-      <flowControl block="none" >
+      <controlFlow block="none" >
         <if target="T1" else="T2" continuation="">
           <script>
             <code language="javascript">
@@ -20,7 +20,7 @@ branch = "if";
             </code>
           </script>
         </if>
-      </flowControl>
+      </controlFlow>
     </task>
     <task name="T1" maxNumberOfExecution="4">
       <description> // <![CDATA[

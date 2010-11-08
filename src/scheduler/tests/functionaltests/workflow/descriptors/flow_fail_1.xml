@@ -10,7 +10,7 @@
       // ]]> </description>
       <javaExecutable class="org.ow2.proactive.scheduler.examples.IncrementJob">
       </javaExecutable>
-      <flowControl block="start" />
+      <controlFlow block="start" />
     </task>
     <task name="T1" maxNumberOfExecution="4">
       <description> // <![CDATA[

@@ -15,7 +15,7 @@
       // ]]> </description>
       <javaExecutable class="org.ow2.proactive.scheduler.examples.EmptyTask">
       </javaExecutable>
-      <flowControl block="start" >
+      <controlFlow block="start" >
         <replicate>
           <script>
             <code language="javascript">
@@ -25,7 +25,7 @@ runs=2;
             </code>
           </script>
         </replicate>
-      </flowControl>
+      </controlFlow>
     </task>
     <task name="T1" maxNumberOfExecution="4">
       <description> // <![CDATA[
@@ -75,7 +75,7 @@ f.createNewFile();
       </depends>
       <javaExecutable class="org.ow2.proactive.scheduler.examples.EmptyTask">
       </javaExecutable>
-      <flowControl block="end" >
+      <controlFlow block="end" >
         <loop target="T">
           <script>
             <code language="javascript">
@@ -105,7 +105,7 @@ loop = false;
             </code>
           </script>
         </loop>
-      </flowControl>
+      </controlFlow>
     </task>
   </taskFlow>
 </job>

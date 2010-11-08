@@ -13,7 +13,7 @@
       </depends>
       <javaExecutable class="org.ow2.proactive.scheduler.examples.IncrementJob">
       </javaExecutable>
-      <flowControl block="end" />
+      <controlFlow block="end" />
     </task>
     <task name="T7" maxNumberOfExecution="4">
       <description>x=210,y=446</description>
@@ -22,13 +22,13 @@
       </depends>
       <javaExecutable class="org.ow2.proactive.scheduler.examples.IncrementJob">
       </javaExecutable>
-      <flowControl block="none" />
+      <controlFlow block="none" />
     </task>
     <task name="T" maxNumberOfExecution="4">
       <description>x=208,y=90</description>
       <javaExecutable class="org.ow2.proactive.scheduler.examples.IncrementJob">
       </javaExecutable>
-      <flowControl block="none" >
+      <controlFlow block="none" >
         <replicate>
           <script>
             <code language="javascript">
@@ -38,7 +38,7 @@
             </code>
           </script>
         </replicate>
-      </flowControl>
+      </controlFlow>
     </task>
     <task name="T4" maxNumberOfExecution="4">
       <description>x=195,y=283</description>
@@ -47,7 +47,7 @@
       </depends>
       <javaExecutable class="org.ow2.proactive.scheduler.examples.IncrementJob">
       </javaExecutable>
-      <flowControl block="none" />
+      <controlFlow block="none" />
     </task>
     <task name="T5" maxNumberOfExecution="4">
       <description>x=98,y=281</description>
@@ -56,7 +56,7 @@
       </depends>
       <javaExecutable class="org.ow2.proactive.scheduler.examples.IncrementJob">
       </javaExecutable>
-      <flowControl block="none" />
+      <controlFlow block="none" />
     </task>
     <task name="T1" maxNumberOfExecution="4">
       <description>x=208,y=178</description>
@@ -65,7 +65,7 @@
       </depends>
       <javaExecutable class="org.ow2.proactive.scheduler.examples.IncrementJob">
       </javaExecutable>
-      <flowControl block="start" />
+      <controlFlow block="start" />
     </task>
     <task name="T3" maxNumberOfExecution="4">
       <description>x=302,y=281</description>
@@ -74,7 +74,7 @@
       </depends>
       <javaExecutable class="org.ow2.proactive.scheduler.examples.IncrementJob">
       </javaExecutable>
-      <flowControl block="none" />
+      <controlFlow block="none" />
     </task>
     <task name="T2" maxNumberOfExecution="4">
       <description>x=144,y=220</description>
@@ -83,7 +83,7 @@
       </depends>
       <javaExecutable class="org.ow2.proactive.scheduler.examples.IncrementJob">
       </javaExecutable>
-      <flowControl block="none" />
+      <controlFlow block="none" />
     </task>
   </taskFlow>
 </job>

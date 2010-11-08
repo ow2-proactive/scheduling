@@ -23,7 +23,7 @@
       </depends>
       <javaExecutable class="org.ow2.proactive.scheduler.examples.IncrementJob">
       </javaExecutable>
-      <flowControl block="end" />
+      <controlFlow block="end" />
     </task>
     <task name="T" maxNumberOfExecution="4">
       <description> // <![CDATA[
@@ -31,14 +31,14 @@
       // ]]> </description>
       <javaExecutable class="org.ow2.proactive.scheduler.examples.IncrementJob">
       </javaExecutable>
-      <flowControl block="start" >
+      <controlFlow block="start" >
         <replicate>
           <script>
             <code language="javascript">
             </code>
           </script>
         </replicate>
-      </flowControl>
+      </controlFlow>
     </task>
   </taskFlow>
 </job>

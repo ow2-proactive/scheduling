@@ -11,7 +11,7 @@
       </depends>
       <javaExecutable class="org.ow2.proactive.scheduler.examples.IncrementJob">
       </javaExecutable>
-      <flowControl block="end" />
+      <controlFlow block="end" />
     </task>
     <task name="T7" maxNumberOfExecution="4">
       <description>x=191,y=509</description>
@@ -21,13 +21,13 @@
       </depends>
       <javaExecutable class="org.ow2.proactive.scheduler.examples.IncrementJob">
       </javaExecutable>
-      <flowControl block="none" />
+      <controlFlow block="none" />
     </task>
     <task name="T" maxNumberOfExecution="4">
       <description>x=195,y=118</description>
       <javaExecutable class="org.ow2.proactive.scheduler.examples.IncrementJob">
       </javaExecutable>
-      <flowControl block="none" >
+      <controlFlow block="none" >
         <replicate>
           <script>
             <code language="javascript">
@@ -37,7 +37,7 @@
             </code>
           </script>
         </replicate>
-      </flowControl>
+      </controlFlow>
     </task>
     <task name="T4" maxNumberOfExecution="4">
       <description>x=83,y=344</description>
@@ -46,7 +46,7 @@
       </depends>
       <javaExecutable class="org.ow2.proactive.scheduler.examples.IncrementJob">
       </javaExecutable>
-      <flowControl block="none" />
+      <controlFlow block="none" />
     </task>
     <task name="T10" maxNumberOfExecution="4">
       <description>x=126,y=312</description>
@@ -55,7 +55,7 @@
       </depends>
       <javaExecutable class="org.ow2.proactive.scheduler.examples.IncrementJob">
       </javaExecutable>
-      <flowControl block="start" />
+      <controlFlow block="start" />
     </task>
     <task name="T5" maxNumberOfExecution="4">
       <description>x=262,y=444</description>
@@ -64,7 +64,7 @@
       </depends>
       <javaExecutable class="org.ow2.proactive.scheduler.examples.IncrementJob">
       </javaExecutable>
-      <flowControl block="end" />
+      <controlFlow block="end" />
     </task>
     <task name="T11" maxNumberOfExecution="4">
       <description>x=127,y=376</description>
@@ -74,7 +74,7 @@
       </depends>
       <javaExecutable class="org.ow2.proactive.scheduler.examples.IncrementJob">
       </javaExecutable>
-      <flowControl block="end" />
+      <controlFlow block="end" />
     </task>
     <task name="T8" maxNumberOfExecution="4">
       <description>x=126,y=257</description>
@@ -83,7 +83,7 @@
       </depends>
       <javaExecutable class="org.ow2.proactive.scheduler.examples.IncrementJob">
       </javaExecutable>
-      <flowControl block="none" >
+      <controlFlow block="none" >
         <replicate>
           <script>
             <code language="javascript">
@@ -93,7 +93,7 @@
             </code>
           </script>
         </replicate>
-      </flowControl>
+      </controlFlow>
     </task>
     <task name="T9" maxNumberOfExecution="4">
       <description>x=171,y=345</description>
@@ -102,7 +102,7 @@
       </depends>
       <javaExecutable class="org.ow2.proactive.scheduler.examples.IncrementJob">
       </javaExecutable>
-      <flowControl block="none" />
+      <controlFlow block="none" />
     </task>
     <task name="T1" maxNumberOfExecution="4">
       <description>x=128,y=194</description>
@@ -111,7 +111,7 @@
       </depends>
       <javaExecutable class="org.ow2.proactive.scheduler.examples.IncrementJob">
       </javaExecutable>
-      <flowControl block="start" />
+      <controlFlow block="start" />
     </task>
     <task name="T3" maxNumberOfExecution="4">
       <description>x=264,y=311</description>
@@ -120,7 +120,7 @@
       </depends>
       <javaExecutable class="org.ow2.proactive.scheduler.examples.IncrementJob">
       </javaExecutable>
-      <flowControl block="none" />
+      <controlFlow block="none" />
     </task>
     <task name="T2" maxNumberOfExecution="4">
       <description>x=265,y=189</description>
@@ -129,7 +129,7 @@
       </depends>
       <javaExecutable class="org.ow2.proactive.scheduler.examples.IncrementJob">
       </javaExecutable>
-      <flowControl block="start" />
+      <controlFlow block="start" />
     </task>
   </taskFlow>
 </job>
