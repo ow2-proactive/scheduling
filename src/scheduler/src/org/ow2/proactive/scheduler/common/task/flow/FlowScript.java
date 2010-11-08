@@ -589,10 +589,10 @@ public class FlowScript extends Script<FlowAction> {
 
                     if (bindings.containsKey(branchSelectionVariable)) {
                         String val = new String((String) bindings.get(branchSelectionVariable));
-                        if (val.equals(ifBranchSelectedVariable)) {
+                        if (val.toLowerCase().equals(ifBranchSelectedVariable)) {
                             act.setTarget(this.target);
                             act.setTargetElse(this.targetElse);
-                        } else if (val.equals(elseBranchSelectedVariable)) {
+                        } else if (val.toLowerCase().equals(elseBranchSelectedVariable)) {
                             act.setTarget(this.targetElse);
                             act.setTargetElse(this.target);
                         } else {
