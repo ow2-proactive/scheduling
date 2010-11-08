@@ -866,7 +866,7 @@ public class JobFactory_stax extends JobFactory {
                     target = cursorTask.getAttributeValue(i);
                 } else if (XMLAttributes.FLOW_ELSE.matches(attrName)) {
                     targetElse = cursorTask.getAttributeValue(i);
-                } else if (XMLAttributes.FLOW_JOIN.matches(attrName)) {
+                } else if (XMLAttributes.FLOW_CONTINUATION.matches(attrName)) {
                     targetJoin = cursorTask.getAttributeValue(i);
                 }
             }

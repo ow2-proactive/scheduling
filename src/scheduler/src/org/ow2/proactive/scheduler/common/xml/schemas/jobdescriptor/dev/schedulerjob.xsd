@@ -893,7 +893,7 @@
         <xs:extension base="jd:script">
           <xs:attributeGroup ref="jd:target"/>
           <xs:attributeGroup ref="jd:targetElse"/>
-          <xs:attributeGroup ref="jd:targetJoin"/>
+          <xs:attributeGroup ref="jd:targetContinuation"/>
         </xs:extension>
       </xs:complexContent>
     </xs:complexType>
@@ -912,8 +912,8 @@
       </xs:annotation>
     </xs:attribute>
   </xs:attributeGroup>
-  <xs:attributeGroup name="targetJoin">
-    <xs:attribute name="join" use="required" type="xs:string">
+  <xs:attributeGroup name="targetContinuation">
+    <xs:attribute name="continuation" use="required" type="xs:string">
       <xs:annotation>
         <xs:documentation>branching else target</xs:documentation>
       </xs:annotation>

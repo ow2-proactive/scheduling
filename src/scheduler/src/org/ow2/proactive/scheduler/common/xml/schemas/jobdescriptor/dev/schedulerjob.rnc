@@ -172,13 +172,13 @@ excludes_ = ## Pattern of the files to exclude among the included one, relative 
 
 # +++++++++++++ Control flow
 actionIf = ## branching Control flow action
-	 element if { target, targetElse, targetJoin, script }
+	 element if { target, targetElse, targetContinuation, script }
 target = ## branching if target
     attribute target { xsd:string }
 targetElse = ## branching else target
     attribute else { xsd:string }
-targetJoin = ## branching else target
-    attribute join { xsd:string }
+targetContinuation = ## branching else target
+    attribute continuation { xsd:string }
 actionLoop = ## looping control flow action
 	 element loop { target, script }
 actionReplicate = ## replicate control flow action

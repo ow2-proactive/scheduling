@@ -701,7 +701,7 @@ public abstract class InternalJob extends JobState {
                             if (it.getIfBranch().equals(initiator)) {
                                 targetElse = it;
                             }
-                        } else if (action.getTargetJoin().equals(it.getName())) {
+                        } else if (action.getTargetContinuation().equals(it.getName())) {
                             if (findTaskUp(initiator.getName(), it).equals(initiator)) {
                                 targetJoin = it;
                             }
@@ -741,7 +741,7 @@ public abstract class InternalJob extends JobState {
                                 targetElse = it;
                             }
                         } else if (searchJoin &&
-                            InternalTask.getInitialName(action.getTargetJoin()).equals(name)) {
+                            InternalTask.getInitialName(action.getTargetContinuation()).equals(name)) {
                             if (targetJoin == null || targetJoin.getIterationIndex() < it.getIterationIndex()) {
                                 targetJoin = it;
                             }

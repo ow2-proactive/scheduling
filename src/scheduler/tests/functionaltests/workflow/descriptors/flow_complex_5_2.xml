@@ -131,7 +131,7 @@ loop = false;
       <javaExecutable class="org.ow2.proactive.scheduler.examples.IncrementJob">
       </javaExecutable>
       <flowControl block="start" >
-        <if target="T2" else="T4" join="T6">
+        <if target="T2" else="T4" continuation="T6">
           <script>
             <code language="javascript">
 // <![CDATA[

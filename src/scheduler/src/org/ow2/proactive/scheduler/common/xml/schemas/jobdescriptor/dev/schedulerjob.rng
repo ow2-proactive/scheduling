@@ -710,7 +710,7 @@
       <doc:documentation>branching Control flow action</doc:documentation>
       <ref name="target"/>
       <ref name="targetElse"/>
-      <ref name="targetJoin"/>
+      <ref name="targetContinuation"/>
       <ref name="script"/>
     </element>
   </define>
@@ -726,8 +726,8 @@
       <data type="string"/>
     </attribute>
   </define>
-  <define name="targetJoin">
-    <attribute name="join">
+  <define name="targetContinuation">
+    <attribute name="continuation">
       <doc:documentation>branching else target</doc:documentation>
       <data type="string"/>
     </attribute>

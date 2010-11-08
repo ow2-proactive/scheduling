@@ -56,14 +56,14 @@ public class TestWorkflowComplexJobs3 extends TWorkflowJobs {
     @Override
     public String[][] getJobs() {
         return new String[][] {
-        // loop block : if/else/join single task
+        // loop block : if/else/continuation single task
                 { "T 0", "T1 1", "T2 2", "T4 3", "T3 -1", "T5 4", "T#1 5", "T1#1 6", "T2#1 7", "T3#1 -1",
                         "T4#1 8", "T5#1 9" },
 
-                // loop block : if/else/join single task; different configuration
+                // loop block : if/else/continuation single task; different configuration
                 { "T 0", "T1 1", "T3 2", "T2 -1", "T4 3", "T1#1 4", "T3#1 5", "T2#1 -1", "T4#1 6", "T5 7" },
 
-                // loop block : if: loop block /else/join
+                // loop block : if: loop block /else/continuation
                 { "T 0", "T1 1", "T3 -1", "T5 -1", "T2 2", "T4 3", "T2#1 4", "T4#1 5", "T2#2 6", "T4#2 7",
                         "T6 8", "T7 9", "T#1 10", "T1#1 11", "T3#1 -1", "T5#1 -1", "T2#3 12", "T4#3 13",
                         "T2#4 14", "T4#4 15", "T2#5 16", "T4#5 17", "T6#1 18", "T7#1 19" },

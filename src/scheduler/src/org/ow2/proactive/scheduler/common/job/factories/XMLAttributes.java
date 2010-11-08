@@ -63,7 +63,7 @@ public enum XMLAttributes {
     //FORK ENVIRONMENT
     FORK_JAVAHOME("javaHome"), FORK_JVMPARAMETERS("jvmParameters"),
     // FLOW CONTROL
-    FLOW_BLOCK("block"), FLOW_TARGET("target"), FLOW_ELSE("else"), FLOW_JOIN("join"),
+    FLOW_BLOCK("block"), FLOW_TARGET("target"), FLOW_ELSE("else"), FLOW_CONTINUATION("continuation"),
     //DATASPACES
     DS_INCLUDES("includes"), DS_EXCLUDES("excludes"), DS_ACCESSMODE("accessMode"),
     //NOT USED IN XML FACTORY BUT USED IN XML DESCRIPTION

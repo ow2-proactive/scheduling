@@ -14,7 +14,7 @@
       <javaExecutable class="org.ow2.proactive.scheduler.examples.IncrementJob">
       </javaExecutable>
       <flowControl block="none" >
-        <if target="T2" else="T3" join="T9">
+        <if target="T2" else="T3" continuation="T9">
           <script>
             <code language="javascript">
             </code>
@@ -29,7 +29,7 @@
       <javaExecutable class="org.ow2.proactive.scheduler.examples.IncrementJob">
       </javaExecutable>
       <flowControl block="start" >
-        <if target="T4" else="T6" join="T8">
+        <if target="T4" else="T6" continuation="T8">
           <script>
             <code language="javascript">
             </code>

@@ -91,9 +91,9 @@ public class FlowAction implements Serializable {
     @Column(name = "TARGET")
     private String target = "";
 
-    /** Join task for If and Else branches if  {@link #type} is {@link FlowActionType#IF} */
-    @Column(name = "TARGET_JOIN")
-    private String targetJoin = "";
+    /** Continuation task for If and Else branches if  {@link #type} is {@link FlowActionType#IF} */
+    @Column(name = "TARGET_CONT")
+    private String targetContinuation = "";
 
     /** Branch that was NOT chosen if  {@link #type} is {@link FlowActionType#IF} */
     @Column(name = "TARGET_ELSE")
@@ -180,18 +180,18 @@ public class FlowAction implements Serializable {
     }
 
     /**
-     * @param t the Join task for the If and Else branches,
+     * @param t the Continuation task for the If and Else branches,
      *  if this action is {@link FlowActionType#IF}
      */
-    public void setTargetJoin(String t) {
-        this.targetJoin = t;
+    public void setTargetContinuation(String t) {
+        this.targetContinuation = t;
     }
 
     /**
-     * @return the Join task for the If and else branches,
+     * @return the Continuation task for the If and else branches,
      *  if this action is {@link FlowActionType#IF}
      */
-    public String getTargetJoin() {
-        return this.targetJoin;
+    public String getTargetContinuation() {
+        return this.targetContinuation;
     }
 }

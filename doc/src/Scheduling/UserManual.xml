@@ -1524,8 +1524,9 @@ public class DSTest extends JavaExecutable {
 				  </listitem>
 				  <listitem>
 					<para>
-					  The <emphasis>if</emphasis> and <emphasis>else</emphasis> flows can be merged by a <emphasis>join</emphasis> task referenced in the <emphasis>if</emphasis> task,
-					  playing the role of an <emphasis>endif</emphasis> construct.
+					  The <emphasis>if</emphasis> and <emphasis>else</emphasis> flows can be merged by a <emphasis>continuation</emphasis> task referenced in the <emphasis>if</emphasis> task,
+					  playing the role of an <emphasis>endif</emphasis> construct. After the branching task, the flow will either be that of the <emphasis>if</emphasis> or the 
+					  <emphasis>else</emphasis> task, but it will be continued by the <emphasis>continuation</emphasis> task.
 					</para>
 				  </listitem>
 				  <listitem>
@@ -1536,37 +1537,37 @@ public class DSTest extends JavaExecutable {
 				  </listitem>
 				  <listitem>
 					<para>
-					  A <emphasis>task block</emphasis> can be defined across <emphasis>if</emphasis>, <emphasis>else</emphasis> and <emphasis>join</emphasis> links,
+					  A <emphasis>task block</emphasis> can be defined across <emphasis>if</emphasis>, <emphasis>else</emphasis> and <emphasis>continuation</emphasis> links,
 					  and not just plain dependencies
 					  (i.e. with <emphasis>A</emphasis> as <emphasis>start</emphasis> and <emphasis>F</emphasis> as <emphasis>end</emphasis> in <xref linkend="scheduler_workflow_spec_if_img" />).
 					</para>
 				  </listitem>
 				  <listitem>
 					<para>
-					  If using no join task, the if and else targets, along with their children, must be strictly distinct.
+					  If using no continuation task, the if and else targets, along with their children, must be strictly distinct.
 					</para>
 				  </listitem>
 				  <listitem>
 					<para>
-					  If using a join task, the if and else targets must be strictly distinct and valid task blocks.
+					  If using a continuation task, the if and else targets must be strictly distinct and valid task blocks.
 					</para>
 				  </listitem>
 				  <listitem>
 					<para>
-					  <emphasis>if</emphasis>, <emphasis>else</emphasis> and <emphasis>join</emphasis> tasks (B, D and F in <xref linkend="scheduler_workflow_spec_if_img" />)
+					  <emphasis>if</emphasis>, <emphasis>else</emphasis> and <emphasis>continuation</emphasis> tasks (B, D and F in <xref linkend="scheduler_workflow_spec_if_img" />)
 					  cannot have an explicit dependency.
 					</para>
 				  </listitem>
 				  <listitem>
 					<para>
-					  <emphasis>if</emphasis>, <emphasis>else</emphasis> and <emphasis>join</emphasis> tasks
+					  <emphasis>if</emphasis>, <emphasis>else</emphasis> and <emphasis>continuation</emphasis> tasks
 					  cannot be entry points for the job, they must be triggered by the <emphasis>if</emphasis> control flow action.
 					</para>
 				  </listitem>
 				  <listitem>
 					<para>
 					  A task can be target of only one <emphasis>if</emphasis> or <emphasis>else</emphasis> action.
-					  A <emphasis>join</emphasis> task can not merge two different <emphasis>if</emphasis> actions.
+					  A <emphasis>continuation</emphasis> task can not merge two different <emphasis>if</emphasis> actions.
 					</para>
 				  </listitem>
 				</itemizedlist>
@@ -1650,7 +1651,7 @@ done</programlisting>
 				<listitem>
 				  <para>
 					Task B performs an <emphasis>if</emphasis> action. The <emphasis>if</emphasis> and <emphasis>else</emphasis> targets are tasks C and D,
-					and a <emphasis>join</emphasis> is performed on task E. An if with join operates on task blocks targets, which tasks C and D are,
+					and a <emphasis>continuation</emphasis> is performed on task E. An if with continuation operates on task blocks targets, which tasks C and D are,
 					being single tasks.
 				  </para>
 				</listitem>
@@ -1702,7 +1703,7 @@ done</programlisting>
 				  </listitem>
 				  <listitem>
 					<para>
-					  When using a <emphasis>join</emphasis> task in an <emphasis>if</emphasis> flow action, the <emphasis>if</emphasis> and <emphasis>else</emphasis> branches must be task blocks.
+					  When using a <emphasis>continuation</emphasis> task in an <emphasis>if</emphasis> flow action, the <emphasis>if</emphasis> and <emphasis>else</emphasis> branches must be task blocks.
 					</para>
 				  </listitem>
 				  <listitem>

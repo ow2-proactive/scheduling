@@ -928,9 +928,9 @@ public abstract class InternalTask extends TaskState {
             this.getFlowScript().setActionTarget(ifBranch + getTaskNameSuffix());
             this.getFlowScript().setActionTargetElse(elseBranch + getTaskNameSuffix());
 
-            if (this.getFlowScript().getActionJoin() != null) {
-                String join = getInitialName(this.getFlowScript().getActionJoin());
-                this.getFlowScript().setActionJoin(join + getTaskNameSuffix());
+            if (this.getFlowScript().getActionContinuation() != null) {
+                String join = getInitialName(this.getFlowScript().getActionContinuation());
+                this.getFlowScript().setActionContinuation(join + getTaskNameSuffix());
             }
         }
     }

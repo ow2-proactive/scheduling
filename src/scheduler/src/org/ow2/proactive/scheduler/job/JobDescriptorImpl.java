@@ -218,7 +218,7 @@ public class JobDescriptorImpl implements JobDescriptor {
                 if (FlowActionType.parse(actionType).equals(FlowActionType.IF)) {
                     String tIf = sc.getActionTarget();
                     String tElse = sc.getActionTargetElse();
-                    String tJoin = sc.getActionJoin();
+                    String tJoin = sc.getActionContinuation();
                     if (tIf != null && tIf.equals(t.getName())) {
                         return false;
                     }

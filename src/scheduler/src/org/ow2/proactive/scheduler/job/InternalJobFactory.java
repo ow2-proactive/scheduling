@@ -188,7 +188,7 @@ public class InternalJobFactory {
                 it.getFlowScript().getActionType().equals(FlowActionType.IF.toString())) {
                 String ifBranch = it.getFlowScript().getActionTarget();
                 String elseBranch = it.getFlowScript().getActionTargetElse();
-                String join = it.getFlowScript().getActionJoin();
+                String join = it.getFlowScript().getActionContinuation();
                 List<InternalTask> joinedBranches = new ArrayList<InternalTask>();
 
                 // find the ifBranch task

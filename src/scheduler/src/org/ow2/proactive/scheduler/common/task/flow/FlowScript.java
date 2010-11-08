@@ -101,7 +101,7 @@ public class FlowScript extends Script<FlowAction> {
     private String actionType = null;
 
     // implementation note:
-    // target / targetElse / targetJoin
+    // target / targetElse / targetContinuation
     // would be much better represented with an InternalTask or a TaskId, but :
     // - InternalTask cannot be used because of project setup :
     //   it is not exported on the worker on which this script executes;
@@ -123,9 +123,9 @@ public class FlowScript extends Script<FlowAction> {
     @Column(name = "TARGET_ELSE")
     private String targetElse = null;
 
-    /** Name of the 'Join' target task if this action is an 'If' */
-    @Column(name = "TARGET_JOIN")
-    private String targetJoin = null;
+    /** Name of the 'Continuation' target task if this action is an 'If' */
+    @Column(name = "TARGET_CONT")
+    private String targetContinuation = null;
 
     /** Name of the variable that will be set in the script's environment
      * to contain the result of the Task executed along this script */
@@ -179,8 +179,8 @@ public class FlowScript extends Script<FlowAction> {
         if (fl.getActionTargetElse() != null) {
             this.targetElse = new String(fl.getActionTargetElse());
         }
-        if (fl.getActionJoin() != null) {
-            this.targetJoin = new String(fl.getActionJoin());
+        if (fl.getActionContinuation() != null) {
+            this.targetContinuation = new String(fl.getActionContinuation());
         }
     }
 
@@ -245,13 +245,13 @@ public class FlowScript extends Script<FlowAction> {
      * @param script code of the Javascript script 
      * @param targetIf IF branch
      * @param targetElse ELSE branch
-     * @param targetJoin JOIN branch, can be null
+     * @param targetCont CONTINUATION branch, can be null
      * @return a newly allocated and configured Control Flow Script
      * @throws InvalidScriptException
      */
     public static FlowScript createIfFlowScript(String script, String targetIf, String targetElse,
-            String targetJoin) throws InvalidScriptException {
-        return createIfFlowScript(script, "javascript", targetIf, targetElse, targetJoin);
+            String targetCont) throws InvalidScriptException {
+        return createIfFlowScript(script, "javascript", targetIf, targetElse, targetCont);
     }
 
     /**
@@ -261,14 +261,14 @@ public class FlowScript extends Script<FlowAction> {
      * @param engine engine running the script
      * @param targetIf IF branch
      * @param targetElse ELSE branch
-     * @param targetJoin JOIN branch, can be null
+     * @param targetCont CONTINUATION branch, can be null
      * @return a newly allocated and configured Control Flow Script
      * @throws InvalidScriptException
      */
     public static FlowScript createIfFlowScript(String script, String engine, String targetIf,
-            String targetElse, String targetJoin) throws InvalidScriptException {
+            String targetElse, String targetCont) throws InvalidScriptException {
         Script<?> scr = new SimpleScript(script, engine);
-        return createIfFlowScript(scr, targetIf, targetElse, targetJoin);
+        return createIfFlowScript(scr, targetIf, targetElse, targetCont);
     }
 
     /**
@@ -277,17 +277,17 @@ public class FlowScript extends Script<FlowAction> {
      * @param script the script to execute
      * @param targetIf IF branch
      * @param targetElse ELSE branch
-     * @param targetJoin JOIN branch, can be null
+     * @param targetCont CONTINUATION branch, can be null
      * @return a newly allocated and configured Control Flow Script
      * @throws InvalidScriptException
      */
     public static FlowScript createIfFlowScript(Script<?> script, String targetIf, String targetElse,
-            String targetJoin) throws InvalidScriptException {
+            String targetCont) throws InvalidScriptException {
         FlowScript flow = new FlowScript(script);
         flow.setActionType(FlowActionType.IF);
         flow.setActionTarget(targetIf);
         flow.setActionTargetElse(targetElse);
-        flow.setActionJoin(targetJoin);
+        flow.setActionContinuation(targetCont);
         return flow;
     }
 
@@ -448,41 +448,41 @@ public class FlowScript extends Script<FlowAction> {
 
     /**
      * If the Action type (see {@link #getActionType()}) of this FlowScript 
-     * is {@link FlowActionType#IF}, the targetJoin is the Task on which both
+     * is {@link FlowActionType#IF}, the targetContinuation is the Task on which both
      * if and else branches will join after either one has been executed.
      * <p>
      * This value has no effect on the execution of the script
      * 
-     * @param target the Join target of the action of this script
+     * @param target the Continuation target of the action of this script
      */
-    public void setActionJoin(String target) {
-        this.targetJoin = target;
+    public void setActionContinuation(String target) {
+        this.targetContinuation = target;
     }
 
     /**
      * If the Action type (see {@link #getActionType()}) of this FlowScript 
-     * is {@link FlowActionType#IF}, the targetJoin is the Task on which both
+     * is {@link FlowActionType#IF}, the targetContinuation is the Task on which both
      * if and else branches will join after either one has been executed.
      * <p>
      * This value has no effect on the execution of the script
      * 
-     * @param target the Join target of the action of this script
+     * @param target the Continuation target of the action of this script
      */
-    public void setActionJoin(Task target) {
-        this.targetJoin = target.getName();
+    public void setActionContinuation(Task target) {
+        this.targetContinuation = target.getName();
     }
 
     /**
      * If the Action type (see {@link #getActionType()}) of this FlowScript 
-     * is {@link FlowActionType#IF}, the targetJoin is the Task on which both
+     * is {@link FlowActionType#IF}, the targetContinuation is the Task on which both
      * if and else branches will join after either one has been executed.
      * <p>
      * This value has no effect on the execution of the script
      * 
-     * @return the Join target of the action of this script
+     * @return the Continuation target of the action of this script
      */
-    public String getActionJoin() {
-        return this.targetJoin;
+    public String getActionContinuation() {
+        return this.targetContinuation;
     }
 
     @Override
@@ -609,8 +609,8 @@ public class FlowScript extends Script<FlowAction> {
                         return new ScriptResult<FlowAction>(new Exception(msg));
                     }
 
-                    if (this.targetJoin != null) {
-                        act.setTargetJoin(this.targetJoin);
+                    if (this.targetContinuation != null) {
+                        act.setTargetContinuation(this.targetContinuation);
                     }
                 }
             }

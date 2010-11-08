@@ -442,7 +442,7 @@ public class FlowChecker {
                 treeDown.element.getFlowScript().getActionType().equals(FlowActionType.IF.toString())) {
                 String tT = treeDown.element.getFlowScript().getActionTarget();
                 String tE = treeDown.element.getFlowScript().getActionTargetElse();
-                String tJ = treeDown.element.getFlowScript().getActionJoin();
+                String tJ = treeDown.element.getFlowScript().getActionContinuation();
                 if (tT != null) {
                     TaskTree tt = tasks.get(tT);
                     if (tt == null) {
@@ -477,7 +477,7 @@ public class FlowChecker {
         for (TaskTree tree : tasks.values()) {
             if (tree.element.getFlowScript() != null &&
                 tree.element.getFlowScript().getActionType().equals(FlowActionType.IF.toString())) {
-                String tJ = tree.element.getFlowScript().getActionJoin();
+                String tJ = tree.element.getFlowScript().getActionContinuation();
 
                 if (tJ != null && tJ.length() > 0) {
 
@@ -495,8 +495,8 @@ public class FlowChecker {
                         do {
                             target2 = target;
                             if (target.element.getFlowScript() != null &&
-                                target.element.getFlowScript().getActionJoin() != null) {
-                                String jT = target.element.getFlowScript().getActionJoin();
+                                target.element.getFlowScript().getActionContinuation() != null) {
+                                String jT = target.element.getFlowScript().getActionContinuation();
                                 if (jT != null && jT.length() > 0) {
                                     jOpen.push(jT);
                                 }
@@ -671,7 +671,7 @@ public class FlowChecker {
                 tree.element.getFlowScript().getActionType().equals(FlowActionType.IF.toString())) {
                 TaskTree targetIf = findTask(tree.element.getFlowScript().getActionTarget());
                 TaskTree targetElse = findTask(tree.element.getFlowScript().getActionTargetElse());
-                TaskTree targetJoin = findTask(tree.element.getFlowScript().getActionJoin());
+                TaskTree targetJoin = findTask(tree.element.getFlowScript().getActionContinuation());
 
                 if (targetIf == null) {
                     throw new FlowError("IF action has no target", FlowErrorType.IF, tree.element.getName());
