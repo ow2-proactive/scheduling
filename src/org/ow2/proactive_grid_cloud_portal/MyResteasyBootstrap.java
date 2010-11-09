@@ -21,7 +21,7 @@ import org.ow2.proactive_grid_cloud_portal.exceptions.NotConnectedExceptionMappe
 public class MyResteasyBootstrap extends ResteasyBootstrap {
 
     private Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.PREFIX + ".rest.webapps");
-
+    private SessionsCleaner schedulerSessionCleaner;
 
     public void contextInitialized(ServletContextEvent event) {
 
@@ -50,6 +50,8 @@ public class MyResteasyBootstrap extends ResteasyBootstrap {
 
         PropertyConfigurator.configure(event.getServletContext().getRealPath("WEB-INF/log4j.properties"));
 
+        schedulerSessionCleaner = new SessionsCleaner(SchedulerSessionMapper.getInstance());
+        new Thread(this.schedulerSessionCleaner,"Scheduler Sessions Cleaner Thread").start();
 
     }
 
@@ -80,6 +82,8 @@ public class MyResteasyBootstrap extends ResteasyBootstrap {
             }
         }
 
+        schedulerSessionCleaner.stop();
+        
         // force the shutdown of the runtime
         ProActiveRuntimeImpl.getProActiveRuntime().cleanJvmFromPA();
 
