@@ -9,6 +9,7 @@ import org.ow2.proactive_grid_cloud_portal.exceptions.IOExceptionMapper;
 import org.ow2.proactive_grid_cloud_portal.exceptions.JobAlreadyFinishedExceptionMapper;
 import org.ow2.proactive_grid_cloud_portal.exceptions.NotConnectedExceptionMapper;
 import org.ow2.proactive_grid_cloud_portal.exceptions.PermissionExceptionExceptionMapper;
+import org.ow2.proactive_grid_cloud_portal.exceptions.SchedulerExceptionMapper;
 import org.ow2.proactive_grid_cloud_portal.exceptions.SubmissionClosedExceptionMapper;
 import org.ow2.proactive_grid_cloud_portal.exceptions.UnknownJobExceptionMapper;
 import org.ow2.proactive_grid_cloud_portal.exceptions.UnknownTaskExceptionMapper;
@@ -20,7 +21,8 @@ public class MyPortalApplication extends Application
   public MyPortalApplication()
   {
 //    singletons.add(new NotConnectedExceptionMapper()); 
-//    singletons.add(new PermissionExceptionExceptionMapper()); 
+//    singletons.add(new PermissionExceptionExceptionMapper());
+//      singletons.add(new LoggingExecutionInterceptor());
   }
 
   @Override
@@ -35,6 +37,8 @@ public class MyPortalApplication extends Application
     set.add(SubmissionClosedExceptionMapper.class);
     set.add(UnknownJobExceptionMapper.class);
     set.add(UpdatablePropertiesConverter.class);
+    set.add(SchedulerExceptionMapper.class);
+    set.add(LoggingExecutionInterceptor.class);
     return set;
   }
 

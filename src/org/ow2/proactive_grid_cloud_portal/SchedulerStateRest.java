@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.security.auth.login.LoginException;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
@@ -22,11 +23,15 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
+import org.apache.log4j.Logger;
 import org.hibernate.collection.PersistentMap;
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
+import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
+import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.SchedulerState;
 import org.ow2.proactive.scheduler.common.SchedulerStatus;
@@ -35,6 +40,7 @@ import org.ow2.proactive.scheduler.common.exception.JobAlreadyFinishedException;
 import org.ow2.proactive.scheduler.common.exception.JobCreationException;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.exception.PermissionException;
+import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.exception.SubmissionClosedException;
 import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
 import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
@@ -46,6 +52,8 @@ import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.factories.JobFactory;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskState;
+import org.ow2.proactive.scheduler.common.util.CachingSchedulerProxyUserInterface;
+import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 
 
@@ -54,11 +62,15 @@ import org.ow2.proactive.scheduler.task.TaskResultImpl;
 public class SchedulerStateRest {
 	/** If the rest api was unable to instantiate the value from byte array representation*/	
 	public static final String UNKNOWN_VALUE_TYPE = "Unknown value type";	
+	private Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.PREFIX + ".rest");
+	private CachingSchedulerProxyUserInterface cachedState;
+	private volatile boolean isCacheEnabled = true;
+
 	
     @GET
     @Path("jobs")
     @Produces("application/json")
-    public List<String> getJobsIds(@HeaderParam("sessionid") String sessionId) throws NotConnectedException,
+    public List<String> jobs(@HeaderParam("sessionid") String sessionId) throws NotConnectedException,
             PermissionException {
         Scheduler s = null;
 
@@ -82,7 +94,7 @@ public class SchedulerStateRest {
     @GET
     @Path("jobsinfo")
     @Produces({ "application/json", "application/xml" })
-    public List<UserJobInfo> jobs(@HeaderParam("sessionid") String sessionId) throws PermissionException,
+    public List<UserJobInfo> jobsinfo(@HeaderParam("sessionid") String sessionId) throws PermissionException,
             NotConnectedException {
         Scheduler s = checkAccess(sessionId);
         List<JobState> jobs = new ArrayList<JobState>();
@@ -357,11 +369,11 @@ public class SchedulerStateRest {
      */
     public Scheduler checkAccess(String sessionId) throws NotConnectedException {
         Scheduler s = SchedulerSessionMapper.getInstance().getSessionsMap().get(sessionId);
-
         if (s == null) {
+            logger.trace("not found a scheduler frontend for sessionId " + sessionId);
             throw new NotConnectedException("you are not connected to the scheduler, you should log on first");
         }
-
+        logger.trace("found a scheduler frontend for sessionId " + sessionId);
         return s;
     }
 
@@ -466,9 +478,13 @@ public class SchedulerStateRest {
             PermissionException {
         final Scheduler s = checkAccess(sessionId);
 
-        s.disconnect();
-        PAActiveObject.terminateActiveObject(s, true);
-        SchedulerSessionMapper.getInstance().getSessionsMap().remove(sessionId);
+        try{
+            s.disconnect();
+        } finally {
+            SchedulerSessionMapper.getInstance().getSessionsMap().remove(sessionId);
+            PAActiveObject.terminateActiveObject(s, true);
+            logger.debug("sessionid " + sessionId + "terminated");
+        }
 
     }
 
@@ -596,4 +612,43 @@ public class SchedulerStateRest {
         
     }
     
+    @POST
+    @Path("login")
+    public String login(@FormParam("username") String username, @FormParam("password") String password) throws ActiveObjectCreationException, NodeException, LoginException, SchedulerException {
+
+        // activate the cache mechanism at first login
+
+        synchronized(this) {
+            try {
+            if ((isCacheEnabled) && (cachedState == null)){
+                cachedState  = PAActiveObject.newActive(
+                        CachingSchedulerProxyUserInterface.class, new Object[] {});
+
+
+                cachedState.init(PortalConfiguration.getProperties().getProperty(PortalConfiguration.scheduler_url),
+                        PortalConfiguration.getProperties().getProperty(PortalConfiguration.scheduler_cache_login),
+                        PortalConfiguration.getProperties().getProperty(PortalConfiguration.scheduler_cache_password));
+            }
+            } catch (Throwable e) {
+                logger.warn("unable to log in using the 'caching' account with username '" +
+                        PortalConfiguration.getProperties().getProperty(PortalConfiguration.scheduler_cache_login)+
+                        ", cache is disabled");
+            }
+        }
+
+
+            CachingSchedulerProxyUserInterface scheduler = PAActiveObject.newActive(
+                    CachingSchedulerProxyUserInterface.class, new Object[] {});
+
+          scheduler.init(PortalConfiguration.getProperties().getProperty(PortalConfiguration.scheduler_url), username, password);
+
+
+
+            String sessionId = "" + SchedulerSessionMapper.getInstance().add(scheduler);
+            logger.info("binding user "+ username + " to session " + sessionId );
+            return sessionId;
+
+
+    }
+
 }

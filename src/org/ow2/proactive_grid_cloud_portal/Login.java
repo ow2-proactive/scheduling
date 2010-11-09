@@ -20,40 +20,10 @@ import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.util.CachingSchedulerProxyUserInterface;
 
 
-@Path("/scheduler/login")
+
 public class Login {
 
-    @POST
-    public String login(@FormParam("username") String username, @FormParam("password") String password) {
 
-        try {
-
-            CachingSchedulerProxyUserInterface scheduler = PAActiveObject.newActive(
-                    CachingSchedulerProxyUserInterface.class, new Object[] {});
-
-          scheduler.init(PortalConfiguration.getProperties().getProperty(PortalConfiguration.scheduler_url), username, password);
-
-       
-
-            return "" + SchedulerSessionMapper.getInstance().add(scheduler);
-
-        } catch (LoginException e) {
-            e.printStackTrace();
-            throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_UNAUTHORIZED)
-                    .entity("invalid login/password").build());
-            // throw new UnauthorizedException(e);
-        } catch (SchedulerException e) {
-            throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
-                    .entity("no scheduler available").build());
-        } catch (ActiveObjectCreationException e) {
-            throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
-                    .entity("no scheduler available").build());
-        } catch (NodeException e) {
-            throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
-                    .entity("no scheduler available").build());
-        }
-
-    }
 
     public static void main(String[] args) {
         GetMethod method = new GetMethod("http://localhost:8080/proactive_grid_cloud_portal/jobs");
