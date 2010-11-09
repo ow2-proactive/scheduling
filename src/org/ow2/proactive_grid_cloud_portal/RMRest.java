@@ -1,3 +1,39 @@
+/*
+ * ################################################################
+ *
+ * ProActive Parallel Suite(TM): The Java(TM) library for
+ *    Parallel, Distributed, Multi-Core Computing for
+ *    Enterprise Grids & Clouds
+ *
+ * Copyright (C) 1997-2010 INRIA/University of 
+ * 				Nice-Sophia Antipolis/ActiveEon
+ * Contact: proactive@ow2.org or contact@activeeon.com
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; version 3 of
+ * the License.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ * If needed, contact us to obtain a release under GPL Version 2 
+ * or a different license than the GPL.
+ *
+ *  Initial developer(s):               The ActiveEon Team
+ *                        http://www.activeeon.com/
+ *  Contributor(s):
+ *
+ * ################################################################
+ * $$ACTIVEEON_INITIAL_DEV$$
+ */
 package org.ow2.proactive_grid_cloud_portal;
 
 import java.net.HttpURLConnection;
@@ -28,13 +64,13 @@ public class RMRest {
         ResourceManager s = RMSessionMapper.getInstance().getSessionsMap().get(sessionId);
 
         if (s == null) {
-            throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_UNAUTHORIZED)
-                    .entity("you are not connected, try to log in first").build());
+            throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_UNAUTHORIZED).entity(
+                    "you are not connected, try to log in first").build());
         }
 
         return s;
     }
-    
+
     /**
      * 
      * @param username
@@ -43,13 +79,16 @@ public class RMRest {
      */
     @POST
     @Path("login")
-    public String rmConnect(@FormParam("username") String username, @FormParam("password") String password) {
+    public String rmConnect(@FormParam("username")
+    String username, @FormParam("password")
+    String password) {
 
         try {
 
             RMProxy rm = PAActiveObject.newActive(RMProxy.class, new Object[] {});
 
-           rm.init(PortalConfiguration.getProperties().getProperty(PortalConfiguration.rm_url), username, password);
+            rm.init(PortalConfiguration.getProperties().getProperty(PortalConfiguration.rm_url), username,
+                    password);
 
             return "" + RMSessionMapper.getInstance().add(rm);
 
@@ -67,7 +106,8 @@ public class RMRest {
      */
     @GET
     @Path("state")
-    public RMState getState(@HeaderParam("sessionid") String sessionId) {
+    public RMState getState(@HeaderParam("sessionid")
+    String sessionId) {
         ResourceManager rm = checkAccess(sessionId);
         return PAFuture.getFutureValue(rm.getState());
     }
@@ -79,7 +119,8 @@ public class RMRest {
      */
     @GET
     @Path("monitoring")
-    public RMInitialState getInitialState(@HeaderParam("sessionid") String sessionId) {
+    public RMInitialState getInitialState(@HeaderParam("sessionid")
+    String sessionId) {
         ResourceManager rm = checkAccess(sessionId);
         return PAFuture.getFutureValue(rm.getMonitoring().getState());
     }
@@ -91,11 +132,12 @@ public class RMRest {
      */
     @GET
     @Path("isactive")
-    public boolean isActive(@HeaderParam("sessionid") String sessionId) {
+    public boolean isActive(@HeaderParam("sessionid")
+    String sessionId) {
         ResourceManager rm = checkAccess(sessionId);
         return rm.isActive().getBooleanValue();
     }
-    
+
     /**
      * Adds an existing node to the default node source of the resource manager.
      * @param sessionId
@@ -104,11 +146,13 @@ public class RMRest {
      */
     @POST
     @Path("node")
-    public boolean addNode(@HeaderParam("sessionid") String sessionId, @FormParam("nodeurl") String nodeUrl) {
+    public boolean addNode(@HeaderParam("sessionid")
+    String sessionId, @FormParam("nodeurl")
+    String nodeUrl) {
         ResourceManager rm = checkAccess(sessionId);
         return rm.addNode(nodeUrl).getBooleanValue();
     }
-    
+
     /**
      * Adds an existing node to the particular node source.
      * @param sessionId a valid session id 
@@ -118,12 +162,14 @@ public class RMRest {
      */
     @POST
     @Path("node")
-    public boolean addNode(@HeaderParam("sessionid") String sessionId,
-            @FormParam("nodeurl") String url, @FormParam("nodesource") String nodesource) {
+    public boolean addNode(@HeaderParam("sessionid")
+    String sessionId, @FormParam("nodeurl")
+    String url, @FormParam("nodesource")
+    String nodesource) {
         ResourceManager rm = checkAccess(sessionId);
-        return rm.addNode(url,nodesource).getBooleanValue();
+        return rm.addNode(url, nodesource).getBooleanValue();
     }
-    
+
     /**
      * Returns true if the node nodeUrl is registered (i.e. known by the RM) and not down.
      * @param sessionId a valid session id 
@@ -132,11 +178,13 @@ public class RMRest {
      */
     @GET
     @Path("node/isavailable")
-    public boolean nodeIsAvailable(@HeaderParam("sessionid")String sessionId,@FormParam("nodeurl") String url) {
+    public boolean nodeIsAvailable(@HeaderParam("sessionid")
+    String sessionId, @FormParam("nodeurl")
+    String url) {
         ResourceManager rm = checkAccess(sessionId);
         return rm.nodeIsAvailable(url).getBooleanValue();
     }
-    
+
     /**
      * Disconnects from resource manager and releases all the nodes taken by user for computations.
      * @param sessionId a valid session id 
@@ -144,35 +192,30 @@ public class RMRest {
      */
     @POST
     @Path("disconnect")
-    public boolean disconnect(@HeaderParam("sessionid") String sessionId) {
+    public boolean disconnect(@HeaderParam("sessionid")
+    String sessionId) {
         ResourceManager rm = checkAccess(sessionId);
         RMSessionMapper.getInstance().getSessionsMap().remove(rm);
         return rm.disconnect().getBooleanValue();
     }
-    
-  
 
-    public boolean createNodeSource(@HeaderParam("sessionid") String sessionId,
-            String nodeSourceName, String infrastructureType, Object[] infrastructureParameters, String policyType, 
-            Object[] policyParameters) {
+    public boolean createNodeSource(@HeaderParam("sessionid")
+    String sessionId, String nodeSourceName, String infrastructureType, Object[] infrastructureParameters,
+            String policyType, Object[] policyParameters) {
         ResourceManager rm = checkAccess(sessionId);
-        
-        return rm.createNodeSource(nodeSourceName, infrastructureType, infrastructureParameters, policyType, 
+
+        return rm.createNodeSource(nodeSourceName, infrastructureType, infrastructureParameters, policyType,
                 policyParameters).getBooleanValue();
     }
 
-   
-    
     @POST
     @Path("nodesource/pingfrequency")
-    public int getNodeSourcePingFrequency(@HeaderParam("sessionid") String sessionId,
-            @FormParam("sourcename") String sourceName) {       
+    public int getNodeSourcePingFrequency(@HeaderParam("sessionid")
+    String sessionId, @FormParam("sourcename")
+    String sourceName) {
         ResourceManager rm = checkAccess(sessionId);
         return rm.getNodeSourcePingFrequency(sourceName).getIntValue();
     }
-
-
-
 
     /**
      * 
@@ -181,22 +224,22 @@ public class RMRest {
      * @return
      * @throws NodeException 
      */
-    public boolean releaseNode(@HeaderParam("sessionid") String sessionId, 
-            String url) throws NodeException {
+    public boolean releaseNode(@HeaderParam("sessionid")
+    String sessionId, String url) throws NodeException {
         ResourceManager rm = checkAccess(sessionId);
         Node n;
-            n = NodeFactory.getNode(url);
+        n = NodeFactory.getNode(url);
         return rm.releaseNode(n).getBooleanValue();
     }
 
-
-    public boolean removeNode(@HeaderParam("sessionid") String sessionId,String nodeUrl, boolean preempt) {
+    public boolean removeNode(@HeaderParam("sessionid")
+    String sessionId, String nodeUrl, boolean preempt) {
         ResourceManager rm = checkAccess(sessionId);
-        return rm.removeNode(nodeUrl,preempt).getBooleanValue();
+        return rm.removeNode(nodeUrl, preempt).getBooleanValue();
     }
 
-    public boolean removeNodeSource(@HeaderParam("sessionid") String sessionId,
-            String sourceName, boolean preempt) {
+    public boolean removeNodeSource(@HeaderParam("sessionid")
+    String sessionId, String sourceName, boolean preempt) {
         ResourceManager rm = checkAccess(sessionId);
         return rm.removeNodeSource(sourceName, preempt).getBooleanValue();
     }
@@ -208,8 +251,8 @@ public class RMRest {
      * @param arg1
      * @return
      */
-    public boolean setNodeSourcePingFrequency(@HeaderParam("sessionid") String sessionId,
-            int frequency, String sourcename) {
+    public boolean setNodeSourcePingFrequency(@HeaderParam("sessionid")
+    String sessionId, int frequency, String sourcename) {
         ResourceManager rm = checkAccess(sessionId);
         return rm.setNodeSourcePingFrequency(frequency, sourcename).getBooleanValue();
     }
@@ -221,8 +264,8 @@ public class RMRest {
      * @param arg0
      * @return
      */
-    public boolean shutdown(@HeaderParam("sessionid") String sessionId,
-            boolean preempt) {
+    public boolean shutdown(@HeaderParam("sessionid")
+    String sessionId, boolean preempt) {
         ResourceManager rm = checkAccess(sessionId);
         return rm.shutdown(preempt).getBooleanValue();
     }
@@ -258,5 +301,5 @@ public class RMRest {
     public Collection<PluginDescriptor> getSupportedNodeSourcePolicies() {
         return target.getSupportedNodeSourcePolicies();
     }
-    */
+     */
 }
