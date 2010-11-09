@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Serializable;
+import java.security.KeyException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -12,6 +13,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.security.auth.login.LoginException;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
@@ -21,10 +23,13 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import org.apache.log4j.Logger;
+import org.hibernate.annotations.AccessType;
 import org.hibernate.collection.PersistentMap;
+import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
 import org.objectweb.proactive.ActiveObjectCreationException;
@@ -32,6 +37,7 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.SchedulerState;
 import org.ow2.proactive.scheduler.common.SchedulerStatus;
@@ -450,7 +456,8 @@ public class SchedulerStateRest {
     }
 
     @POST
-    @Path("submit")      
+    @Path("submit")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces("application/json")
     public JobId submit(@HeaderParam("sessionid") String sessionId, MultipartInput multipart)
             throws IOException, JobCreationException, NotConnectedException, PermissionException,
@@ -614,13 +621,15 @@ public class SchedulerStateRest {
         }
         
     }
-    
+
     @POST
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Path("login")
-    public String login(@FormParam("username") String username, @FormParam("password") String password) throws ActiveObjectCreationException, NodeException, LoginException, SchedulerException {
+    public String login(@FormParam("username") String username,
+            @FormParam("password") String password) throws ActiveObjectCreationException, NodeException, LoginException, SchedulerException, KeyException {
 
         // activate the cache mechanism at first login
-
+        /*
         synchronized(this) {
             try {
             if ((isCacheEnabled) && (cachedState == null)){
@@ -638,13 +647,16 @@ public class SchedulerStateRest {
                         ", cache is disabled");
             }
         }
-
+        */
 
             CachingSchedulerProxyUserInterface scheduler = PAActiveObject.newActive(
                     CachingSchedulerProxyUserInterface.class, new Object[] {});
 
-          scheduler.init(PortalConfiguration.getProperties().getProperty(PortalConfiguration.scheduler_url), username, password);
 
+           String url = PortalConfiguration.getProperties().getProperty(PortalConfiguration.scheduler_url);
+
+
+          scheduler.init(url , username, password);
 
 
             String sessionId = "" + SchedulerSessionMapper.getInstance().add(scheduler);
@@ -654,4 +666,28 @@ public class SchedulerStateRest {
 
     }
 
+    @POST
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Path("login")
+     public String loginWithCredential(@MultipartForm  LoginForm multipart) throws ActiveObjectCreationException, NodeException, KeyException, LoginException, SchedulerException, IOException {
+
+        CachingSchedulerProxyUserInterface scheduler = PAActiveObject.newActive(
+                CachingSchedulerProxyUserInterface.class, new Object[] {});
+
+
+       String url = PortalConfiguration.getProperties().getProperty(PortalConfiguration.scheduler_url);
+
+       if (multipart.getCredential() != null) {
+       Credentials cred = Credentials.getCredentials(multipart.getCredential());
+           scheduler.init(url ,cred);
+       } else {
+           scheduler.init(url, multipart.getUsername(), multipart.getPassword());
+       }
+
+
+       String sessionId = "" + SchedulerSessionMapper.getInstance().add(scheduler);
+//      logger.info("binding user "+  " to session " + sessionId );
+      return sessionId;
+
+    }
 }

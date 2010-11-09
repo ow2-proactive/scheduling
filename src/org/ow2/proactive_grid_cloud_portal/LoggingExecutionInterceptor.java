@@ -1,13 +1,15 @@
 package org.ow2.proactive_grid_cloud_portal;
 
 import java.io.IOException;
+import java.lang.reflect.Method;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.ext.Provider;
 
 import org.apache.log4j.Logger;
-import org.jboss.resteasy.annotations.interception.Precedence;
+import org.jboss.resteasy.annotations.interception.DecoderPrecedence;
 import org.jboss.resteasy.annotations.interception.ServerInterceptor;
+import org.jboss.resteasy.spi.interception.AcceptedByMethod;
 import org.jboss.resteasy.spi.interception.MessageBodyReaderContext;
 import org.jboss.resteasy.spi.interception.MessageBodyReaderInterceptor;
 import org.jboss.util.StopWatch;
@@ -16,8 +18,8 @@ import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 
 @Provider
 @ServerInterceptor
-@Precedence("HEADER_DECORATOR")
-public class LoggingExecutionInterceptor implements MessageBodyReaderInterceptor
+@DecoderPrecedence
+public class LoggingExecutionInterceptor implements MessageBodyReaderInterceptor,AcceptedByMethod
 {
    private static Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.PREFIX + ".rest");
 
@@ -61,4 +63,11 @@ public class LoggingExecutionInterceptor implements MessageBodyReaderInterceptor
                  stopWatch.getTime()));
       }
    }
+
+
+
+public boolean accept(Class declaring, Method method) {
+    System.out.println("should I accept ?");
+    return true;
+}
 }
