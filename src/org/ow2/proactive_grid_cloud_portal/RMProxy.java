@@ -37,7 +37,7 @@ public class RMProxy implements ResourceManager {
         this.password = pwd;
 
         RMAuthentication rmAuth = RMConnection.join(url);
-        Credentials cred = Credentials.createCredentials("admin", "admin", rmAuth.getPublicKey());
+        Credentials cred = Credentials.createCredentials(user, pwd, rmAuth.getPublicKey());
         target = rmAuth.login(cred);
 
         return true;
