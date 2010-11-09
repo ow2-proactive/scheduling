@@ -45,7 +45,7 @@
 	</target>
 	
 	
-	<target name="war" depends="compile">
+	<target name="war" depends="compile" description="Generate the war file">
 		<!-- copy classes -->
 		
 		<copy todir="WebContent/WEB-INF/classes" >
