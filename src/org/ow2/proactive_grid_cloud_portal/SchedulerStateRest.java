@@ -463,10 +463,13 @@ public class SchedulerStateRest {
             BufferedWriter outf = new BufferedWriter(new FileWriter(tmp));
             outf.write(part.getBodyAsString());
             outf.close();
-
         }
 
         Job j = JobFactory.getFactory().createJob(tmp.getAbsolutePath());
+
+        // clean the temporary file
+        tmp.delete();
+
         return s.submit(j);
 
     }
