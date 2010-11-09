@@ -27,7 +27,6 @@ import javax.ws.rs.core.MediaType;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import org.apache.log4j.Logger;
-import org.hibernate.annotations.AccessType;
 import org.hibernate.collection.PersistentMap;
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
@@ -63,6 +62,11 @@ import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 
 
+/**
+ * 
+ * this class exposes the Scheduler as a RESTful service.
+ *
+ */
 @XmlJavaTypeAdapter(value = PersistentMapConverter.class, type = PersistentMap.class)
 @Path("/scheduler/")
 public class SchedulerStateRest {
@@ -73,6 +77,11 @@ public class SchedulerStateRest {
 	private volatile boolean isCacheEnabled = true;
 
 	
+	/**
+	 * Returns the ids of the current jobs under a list of string.
+	 * @param sessionId a valid session id
+	 * @return a list of jobs' ids under the form of a list of string
+	*/
     @GET
     @Path("jobs")
     @Produces("application/json")
@@ -97,6 +106,16 @@ public class SchedulerStateRest {
 
     }
 
+    /**
+     * Returns a subset of the scheduler state, including pending, running, finished
+     * jobs (in this particular order).
+     * each jobs is described using
+     *   - its id
+     *   - its owner
+     *   - the JobInfo class
+     * @param sessionId a valid session id
+     * @return a list of UserJobInfo
+     */ 
     @GET
     @Path("jobsinfo")
     @Produces({ "application/json", "application/xml" })
@@ -117,6 +136,11 @@ public class SchedulerStateRest {
 
     }
     
+    /**
+     * Returns the state of the scheduler
+     * @param sessionId a valid session id.
+     * @return the scheduler state 
+     */
     @GET
     @Path("state")
     @Produces({ "application/json", "application/xml" })
@@ -126,6 +150,12 @@ public class SchedulerStateRest {
         return PAFuture.getFutureValue(s.getState());
     }
     
+    /**
+     * returns only the jobs of the current user
+     * @param sessionId a valid session id
+     * @return a scheduler state that contains only the jobs of the user that
+     * owns the session <code>sessionid</code>  
+    */
     @GET
     @Path("state/myjobsonly")
     @Produces({ "application/json", "application/xml" })
@@ -135,11 +165,16 @@ public class SchedulerStateRest {
         return PAFuture.getFutureValue(s.getState(true));
     }   
 
+    /**
+     * Returns a JobState of the job identified by the id <code>jobid</code>
+     * @param sessionid a valid session id
+     * @param jobid the id of the job to retrieve
+     */
     @GET
     @Path("jobs/{jobid}")
     @Produces({ "application/json", "application/xml" })
     @XmlJavaTypeAdapter(value = PersistentMapConverter.class, type = PersistentMap.class)
-    public JobState job(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId)
+    public JobState listJobs(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId)
             throws NotConnectedException, UnknownJobException, PermissionException {
         Scheduler s = checkAccess(sessionId);
 
@@ -149,7 +184,13 @@ public class SchedulerStateRest {
       
         return js;      
     }
-
+    
+    /**
+     * Returns the job result associated to the job referenced by the 
+     * id <code>jobid</code>
+     * @param sessionid a valid session id
+     * @result the job result of the corresponding job  
+     */ 
     @GET
     @Path("jobs/{jobid}/result")
     @Produces("application/json")
@@ -161,6 +202,16 @@ public class SchedulerStateRest {
         return PAFuture.getFutureValue(s.getJobResult(jobId));
     }    
     
+    /**
+     * Returns all the task results of this job as a map whose the key is the
+     * name of the task and its task result.<br>
+     * If the result cannot be instantiated, the content is replaced by the 
+     * string 'Unknown value type'. To get the serialized form of a given result,
+     * one has to call the following restful service 
+     * jobs/{jobid}/tasks/{taskname}/result/serializedvalue
+     * @param sessionid a valid session id
+     * @param jobid a job id
+     */ 
     @GET
     @Path("jobs/{jobid}/result/value")
     @Produces("application/json")        
@@ -196,6 +247,14 @@ public class SchedulerStateRest {
     	return res;  
     }    
 
+    /**
+     * Delete a job
+     * @param sessionId a valid session id
+     * @param jobId the id of the job to delete
+     * @return true if success, false if the job not yet finished (not removed,
+     * kill the job then remove it) 
+     * 
+     */
     @DELETE
     @Path("jobs/{jobid}")
     @Produces("application/json")
@@ -205,7 +264,14 @@ public class SchedulerStateRest {
         return s.removeJob(jobId);
     }
 
-    @POST
+    /**
+    * Kill the job represented by jobId.<br>
+    *
+    * @param sessionId a valid session id
+    * @param jobId the job to kill.
+    * @return true if success, false if not.
+    */ 
+    @PUT
     @Path("jobs/{jobid}/kill")   
     @Produces("application/json")
     public boolean killJob(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId)
@@ -215,6 +281,12 @@ public class SchedulerStateRest {
 
     }
 
+    /**
+     * Returns a list of the name of the tasks belonging to job <code>jobId</code>
+     * @param sessionId a valid session id
+     * @param the jobid one wants to list the tasks' name
+     * @return a list of tasks' name 
+     */ 
     @GET
     @Path("jobs/{jobid}/tasks")  
     @Produces("application/json")
@@ -234,6 +306,12 @@ public class SchedulerStateRest {
 
     }
 
+    /**
+     * Returns a list of taskState 
+     * @param sessionId a valid session id
+     * @param jobId the job id
+     * @return a list of task' states of the job <code>jobId</code>
+     */ 
     @GET
     @Path("jobs/{jobid}/taskstates")  
     @Produces("application/json")
@@ -254,6 +332,13 @@ public class SchedulerStateRest {
 
     }
 
+    /**
+     * Return the task state of the task <code>taskname</code> of the job <code>jobId</code> 
+     * @param sessionId a valid session id
+     * @param jobId the id of the job
+     * @param taskname the name of the task
+     * @return the task state of the task  <code>taskname</code> of the job <code>jobId</code> 
+     */ 
     @GET
     @Path("jobs/{jobid}/tasks/{taskname}")  
     @Produces("application/json")
@@ -274,6 +359,17 @@ public class SchedulerStateRest {
         throw new UnknownTaskException("task " + taskname + "not found");
     }
 
+    /**
+     * Returns the value of the task result of task <code>taskName</code> of the job <code>jobId</code>
+     * <strong>the result is deserialized before sending to the client, if the class is
+     * not found the content is replaced by the string 'Unknown value type' </strong>. To get the serialized form of a given result,
+     * one has to call the following restful service 
+     * jobs/{jobid}/tasks/{taskname}/result/serializedvalue
+     * @param sessionId a valid session id
+     * @param jobId the id of the job
+     * @param taskname the name of the task
+     * @return the value of the task result
+     */ 
     @GET
     @Path("jobs/{jobid}/tasks/{taskname}/result/value")
     @Produces("*/*")
@@ -305,29 +401,50 @@ public class SchedulerStateRest {
     	return value;
     }
     
+    /**
+     * Returns the value of the task result of the task <code>taskName</code> of the job <code>jobId</code>
+     * This method returns the result as a byte array whatever the result is.
+     * @param sessionId a valid session id
+     * @param jobId the id of the job
+     * @param taskname the name of the task
+     * @return the value of the task result as a byte array.
+     */ 
     @GET
     @Path("jobs/{jobid}/tasks/{taskname}/result/serializedvalue")
     @Produces("*/*")
-    public Serializable serializedValueOftaskresult(@HeaderParam("sessionid") String sessionId,
+    public byte[] serializedValueOftaskresult(@HeaderParam("sessionid") String sessionId,
             @PathParam("jobid") String jobId, @PathParam("taskname") String taskname) throws Throwable {
         Scheduler s = checkAccess(sessionId);
-//        TaskResult tr = s.getTaskResult(jobId, taskname);
         TaskResult tr = workaroundforSCHEDULING863(s, jobId, taskname);
         tr = PAFuture.getFutureValue(tr);
         return ((TaskResultImpl)tr).getSerializedValue();
     }
     
+    /**
+     * Returns the task result of the task <code>taskName</code> 
+     * of the job <code>jobId</code>
+     * @param sessionId a valid session id
+     * @param jobId the id of the job
+     * @param taskname the name of the task
+     * @return the task result of the task <code>taskName</code> 
+     */ 
     @GET
     @Path("jobs/{jobid}/tasks/{taskname}/result")
     @Produces("application/json")
     public TaskResult taskresult(@HeaderParam("sessionid") String sessionId,
             @PathParam("jobid") String jobId, @PathParam("taskname") String taskname) throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
         Scheduler s = checkAccess(sessionId);
-//        TaskResult tr = s.getTaskResult(jobId, taskname);     
         TaskResult tr = workaroundforSCHEDULING863(s, jobId, taskname);
         return PAFuture.getFutureValue(tr);
     }
 
+    /**
+     *  Returns all the logs generated by the task (either stdout and stderr)
+     * @param sessionId a valid session id
+     * @param jobId the id of the job
+     * @param taskname the name of the task
+     * @return  all the logs generated by the task (either stdout and stderr)
+    */
     @GET
     @Path("jobs/{jobid}/tasks/{taskname}/result/log/all")
     @Produces("*/*")
@@ -340,6 +457,13 @@ public class SchedulerStateRest {
 
     }
 
+    /**
+     *  Returns the standard error output (stderr) generated by the task
+     * @param sessionId a valid session id
+     * @param jobId the id of the job
+     * @param taskname the name of the task
+     * @return  the stderr generated by the task
+    */
     @GET
     @Path("jobs/{jobid}/tasks/{taskname}/result/log/err")
     @Produces("*/*")
@@ -352,6 +476,13 @@ public class SchedulerStateRest {
 
     }
 
+    /**
+     *  Returns the standard output (stderr) generated by the task
+     * @param sessionId a valid session id
+     * @param jobId the id of the job
+     * @param taskname the name of the task
+     * @return  the stdout generated by the task
+    */
     @GET
     @Path("jobs/{jobid}/tasks/{taskname}/result/log/out")
     @Produces("*/*")
@@ -432,6 +563,12 @@ public class SchedulerStateRest {
     //                .entity(msg).build());
     //    }
 
+    /**
+     * Pauses the job represented by jobid
+     * @param sessionId a valid session id
+     * @param jobId the id of the job
+     * @return true if success, false if not
+     */
     @POST
     @Path("jobs/{jobid}/pause")   
     @Produces("application/json")
@@ -444,6 +581,12 @@ public class SchedulerStateRest {
 
     }
 
+    /**
+     * Resumes the job represented by jobid
+     * @param sessionId a valid session id
+     * @param jobId the id of the job
+     * @return true if success, false if not
+     */
     @POST
     @Path("jobs/{jobid}/resume")
     @Produces("application/json")
@@ -455,6 +598,12 @@ public class SchedulerStateRest {
 
     }
 
+    /**
+     * Submits a job to the scheduler 
+     * @param sessionId a valid session id
+     * @param jobId the id of the job
+     * @return the <code>jobid</code> of the newly created job 
+     */
     @POST
     @Path("submit")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
@@ -481,6 +630,52 @@ public class SchedulerStateRest {
 
     }
 
+    /*
+      // Kept for later use if we discover that using MultipartInput does not
+      // longer match our needs. Uploads of byte-encoded job descriptors for instance.
+       
+    @POST
+    @Path("submit")
+    
+    public String submit(@Context HttpServletRequest req) throws Exception {
+
+     FileItemFactory factory = new DiskFileItemFactory();
+     ServletFileUpload upload = new ServletFileUpload(factory);
+
+     List  items = upload.parseRequest(req);
+     Iterator iter = items.iterator();
+
+     while (iter.hasNext()) {
+         FileItem item = (FileItem) iter.next();
+
+         if (item.isFormField()) {
+             System.out.println("FORM FIELD");
+
+         } else {
+          if (!item.isFormField()) {
+
+              String fileName = item.getName();
+              System.out.println("File Name:" + fileName);
+
+           File fullFile  = new File(item.getName());  
+           File savedFile = new File("/test", fullFile.getName());
+
+           item.write(savedFile);
+          }
+         }
+     }
+
+     return "OK";
+    }
+    
+    */
+    
+    /**
+     * terminates the session id <code>sessionId</code>
+     * @param sessionId a valid session id
+     * @throws NotConnectedException if the scheduler cannot be contacted
+     * @throws PermissionException if you are not authorized to perform the action
+     */
     @PUT
     @Path("disconnect")   
     @Produces("application/json")
@@ -497,7 +692,13 @@ public class SchedulerStateRest {
         }
 
     }
-
+    /**
+     * pauses the scheduler 
+     * @param sessionId a valid session id
+     * @return true if success, false otherwise
+     * @throws NotConnectedException
+     * @throws PermissionException
+     */
     @PUT
     @Path("pause")
     @Produces("application/json")
@@ -508,6 +709,13 @@ public class SchedulerStateRest {
 
     }
 
+    /**
+     * stops the scheduler 
+     * @param sessionId a valid session id
+     * @return true if success, false otherwise
+     * @throws NotConnectedException
+     * @throws PermissionException
+     */
     @PUT
     @Path("stop") 
     @Produces("application/json")
@@ -516,7 +724,14 @@ public class SchedulerStateRest {
         final Scheduler s = checkAccess(sessionId);
         return s.stop();
     }
-
+    
+    /**
+     * resumes the scheduler 
+     * @param sessionId a valid session id
+     * @return true if success, false otherwise
+     * @throws NotConnectedException
+     * @throws PermissionException
+     */
     @PUT
     @Path("resume") 
     @Produces("application/json")
@@ -527,6 +742,16 @@ public class SchedulerStateRest {
 
     }
 
+    /**
+     * changes the priority of a job
+     * @param sessionId a valid session id 
+     * @param jobId the job id 
+     * @param priorityName a string representing the name of the priority
+     * @throws NotConnectedException
+     * @throws UnknownJobException
+     * @throws PermissionException
+     * @throws JobAlreadyFinishedException
+     */
     @PUT
     @Path("jobs/{jobid}/priority/byname/{name}")
     public void schedulerChangeJobPriorityByName(@HeaderParam("sessionid") final String sessionId,
@@ -538,6 +763,17 @@ public class SchedulerStateRest {
 
     }
 
+    /**
+     * changes the priority of a job
+     * @param sessionId a valid session id 
+     * @param jobId the job id 
+     * @param priorityValue a string representing the value of the priority
+     * @throws NumberFormatException
+     * @throws NotConnectedException
+     * @throws UnknownJobException
+     * @throws PermissionException
+     * @throws JobAlreadyFinishedException
+     */
     @PUT
     @Path("jobs/{jobid}/priority/byvalue/{value}")
     public void schedulerChangeJobPriorityByValue(@HeaderParam("sessionid") final String sessionId,
@@ -548,7 +784,14 @@ public class SchedulerStateRest {
         s.changeJobPriority(jobId, JobPriority.findPriority(Integer.parseInt(priorityValue)));
 
     }
-
+    
+    /**
+     * freezes the scheduler 
+     * @param sessionId a valid session id
+     * @return true if success, false otherwise
+     * @throws NotConnectedException
+     * @throws PermissionException
+     */
     @PUT
     @Path("freeze")   
     @Produces("application/json")
@@ -559,6 +802,13 @@ public class SchedulerStateRest {
 
     }
 
+    /**
+     * returns the status of the scheduler 
+     * @param sessionId a valid session id
+     * @return the scheduler status
+     * @throws NotConnectedException
+     * @throws PermissionException
+     */
     @GET
     @Path("status")   
     @Produces("application/json")
@@ -569,6 +819,13 @@ public class SchedulerStateRest {
 
     }
 
+    /**
+     * starts the scheduler 
+     * @param sessionId a valid session id
+     * @return true if success, false otherwise
+     * @throws NotConnectedException
+     * @throws PermissionException
+     */
     @PUT
     @Path("start")  
     @Produces("application/json")
@@ -578,7 +835,13 @@ public class SchedulerStateRest {
         return s.start();
 
     }
-
+    /**
+     * kills and shutdowns the scheduler 
+     * @param sessionId a valid session id
+     * @return true if success, false if not
+     * @throws NotConnectedException
+     * @throws PermissionException
+     */
     @PUT
     @Path("kill")  
     @Produces("application/json")
@@ -589,6 +852,15 @@ public class SchedulerStateRest {
 
     }
 
+    /**
+     * Reconnect a new Resource Manager to the scheduler. 
+     * Can be used if the resource manager has crashed.
+     * @param sessionId a valid session id
+     * @param rmURL the url of the resource manager 
+     * @return true if success, false otherwise.
+     * @throws NotConnectedException
+     * @throws PermissionException
+     */
     @POST
     @Path("linkrm")   
     @Produces("application/json")
@@ -599,6 +871,13 @@ public class SchedulerStateRest {
 
     }
     
+    /**
+     * Tests whether or not the user is connected to the ProActive Scheduler
+     * @param sessionId the session to test
+     * @return true if the user connected to a Scheduler, false otherwise.
+     * @throws NotConnectedException
+     * @throws PermissionException
+     */
     @PUT
     @Path("isconnected")
     @Produces("application/json")
@@ -622,6 +901,18 @@ public class SchedulerStateRest {
         
     }
 
+    /**
+     * login to the scheduler using an form containing 2 fields (username & password)
+     *  
+     * @param username username
+     * @param password password 
+     * @return the session id associated to the login
+     * @throws ActiveObjectCreationException
+     * @throws NodeException
+     * @throws LoginException
+     * @throws SchedulerException
+     * @throws KeyException
+     */
     @POST
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Path("login")
@@ -665,7 +956,20 @@ public class SchedulerStateRest {
 
 
     }
-
+    /**
+     * login to the scheduler using a multipart form
+     *  can be used either by submitting 
+     *   - 2 fields username & password
+     *   - a credential file with field name 'credential'
+     * @param multipart
+     * @return the session id associated to this new connection
+     * @throws ActiveObjectCreationException
+     * @throws NodeException
+     * @throws KeyException
+     * @throws LoginException
+     * @throws SchedulerException
+     * @throws IOException
+     */
     @POST
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Path("login")
@@ -691,3 +995,5 @@ public class SchedulerStateRest {
 
     }
 }
+
+
