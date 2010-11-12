@@ -119,7 +119,12 @@ public abstract class TaskLauncher implements InitActive {
     public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.LAUNCHER);
     public static final Logger logger_dev_dataspace = ProActiveLogger
             .getLogger(SchedulerDevLoggers.DATASPACE);
+    
     public static final String EXECUTION_SUCCEED_BINDING_NAME = "success";
+    public static final String DS_SCRATCH_BINDING_NAME = "localspace";
+    public static final String DS_INPUT_BINDING_NAME = "input";
+    public static final String DS_OUTPUT_BINDING_NAME = "output";
+    
     private static final int KEY_SIZE = 1024;
 
     // to define the max line number of a task logs
@@ -553,7 +558,8 @@ public abstract class TaskLauncher implements InitActive {
             UserException {
         replaceIterationTag(pre);
         logger_dev.info("Executing pre-script");
-        ScriptHandler handler = ScriptLoader.createHandler(n);
+        ScriptHandler handler = ScriptLoader.createLocalHandler();
+        this.addDataspaceBinding(handler);
         ScriptResult<String> res = handler.handle(pre);
 
         if (res.errorOccured()) {
@@ -579,7 +585,8 @@ public abstract class TaskLauncher implements InitActive {
             NodeException, UserException {
         replaceIterationTag(post);
         logger_dev.info("Executing post-script");
-        ScriptHandler handler = ScriptLoader.createHandler(n);
+        ScriptHandler handler = ScriptLoader.createLocalHandler();
+        this.addDataspaceBinding(handler);
         handler.addBinding(EXECUTION_SUCCEED_BINDING_NAME, executionSucceed);
         ScriptResult<String> res = handler.handle(post);
 
@@ -603,7 +610,8 @@ public abstract class TaskLauncher implements InitActive {
     protected void executeFlowScript(Node n, TaskResult res) throws Throwable {
         replaceIterationTag(flow);
         logger_dev.info("Executing flow-script");
-        ScriptHandler handler = ScriptLoader.createHandler(n);
+        ScriptHandler handler = ScriptLoader.createLocalHandler();
+        this.addDataspaceBinding(handler);
         handler.addBinding(FlowScript.resultVariable, res.value());
         ScriptResult<FlowAction> sRes = handler.handle(flow);
 
@@ -621,6 +629,17 @@ public abstract class TaskLauncher implements InitActive {
         ((TaskResultImpl) res).setAction(action);
     }
 
+    /**
+     * Adds in the given ScriptHandler bindings for this Launcher's Dataspace handlers
+     * 
+     * @param script the ScriptHandler in which bindings will be added
+     */
+    private void addDataspaceBinding(ScriptHandler script) {
+        script.addBinding(DS_SCRATCH_BINDING_NAME, this.SCRATCH);
+        script.addBinding(DS_INPUT_BINDING_NAME, this.INPUT);
+        script.addBinding(DS_OUTPUT_BINDING_NAME, this.OUTPUT);
+    }
+    
     /**
      * This method will terminate the task that has been launched.
      * In fact it will terminate the launcher.

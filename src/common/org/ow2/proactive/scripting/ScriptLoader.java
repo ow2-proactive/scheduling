@@ -70,6 +70,15 @@ public class ScriptLoader {
     }
 
     /**
+     * Creates a local script handler: not an AO
+     * 
+     * @return a ScriptHandler for Script execution
+     */
+    public static ScriptHandler createLocalHandler() {
+        return new ScriptHandler();
+    }
+
+    /**
      * Main function
      * @param args command arguments.
      * @throws Exception if fails.
