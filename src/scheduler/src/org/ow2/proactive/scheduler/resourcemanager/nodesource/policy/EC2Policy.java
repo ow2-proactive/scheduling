@@ -60,7 +60,6 @@ import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.frontend.RMEventListener;
 import org.ow2.proactive.resourcemanager.frontend.RMMonitoring;
 import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
-import org.ow2.proactive.resourcemanager.nodesource.policy.PolicyRestriction;
 import org.ow2.proactive.resourcemanager.nodesource.utils.NamesConvertor;
 import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 import org.ow2.proactive.scheduler.common.NotificationData;
@@ -88,7 +87,6 @@ import org.ow2.proactive.scheduler.common.task.TaskInfo;
  * 
  */
 
-@PolicyRestriction(supportedInfrastructures = { "org.ow2.proactive.resourcemanager.nodesource.infrastructure.EC2Infrastructure" })
 public class EC2Policy extends SchedulerAwarePolicy implements InitActive, RunActive, RMEventListener {
 
     protected static Logger logger = ProActiveLogger.getLogger(RMLoggers.POLICY);

@@ -40,6 +40,8 @@ then
     CLASSPATH=$CLASSPATH:"$PA_SCHEDULER/classes/scheduler"
     CP=`print_jars "$PA_SCHEDULER/lib/"`
     CLASSPATH=$CLASSPATH:$CP
+    CP=`print_jars "$PA_SCHEDULER/addons/"`
+    CLASSPATH=${CLASSPATH}${PA_SCHEDULER}/addons/:$CP
 else
     # Script engines must be added to classpath to be found
     # it must also placed before jars containing jar-index
@@ -55,6 +57,8 @@ else
     CLASSPATH=$CLASSPATH:"$PA_SCHEDULER/dist/lib/ProActive_SRM-common.jar"
     CLASSPATH=$CLASSPATH:"$PA_SCHEDULER/dist/lib/ProActive_ResourceManager.jar"
     CLASSPATH=$CLASSPATH:"$PA_SCHEDULER/dist/lib/ProActive_Scheduler-core.jar"
+    CP=`print_jars "$PA_SCHEDULER/addons/"`
+    CLASSPATH=$CLASSPATH:$PA_SCHEDULER/addons/:$CP
 fi
 
 export CLASSPATH

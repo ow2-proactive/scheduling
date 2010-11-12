@@ -56,7 +56,6 @@ import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.frontend.RMEventListener;
 import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
-import org.ow2.proactive.resourcemanager.nodesource.policy.PolicyRestriction;
 import org.ow2.proactive.resourcemanager.nodesource.utils.NamesConvertor;
 import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 import org.ow2.proactive.scheduler.common.NotificationData;
@@ -68,16 +67,6 @@ import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 
 
-@PolicyRestriction(supportedInfrastructures = {
-        "org.ow2.proactive.resourcemanager.nodesource.infrastructure.GCMCustomisedInfrastructure",
-        "org.ow2.proactive.resourcemanager.nodesource.infrastructure.PBSInfrastructure",
-        "org.ow2.proactive.resourcemanager.nodesource.infrastructure.LSFInfrastructure",
-        "org.ow2.proactive.resourcemanager.nodesource.infrastructure.GenericBatchJobInfrastructure",
-        "org.ow2.proactive.resourcemanager.nodesource.infrastructure.SSHInfrastructure",
-        "org.ow2.proactive.resourcemanager.nodesource.infrastructure.SSHInfrastructure2",
-        "org.ow2.proactive.resourcemanager.nodesource.infrastructure.EC2Infrastructure",
-        "org.ow2.proactive.resourcemanager.nodesource.infrastructure.VirtualInfrastructure",
-        "org.ow2.proactive.resourcemanager.nodesource.infrastructure.WinHPCInfrastructure" })
 public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements InitActive, RunActive,
         RMEventListener {
 

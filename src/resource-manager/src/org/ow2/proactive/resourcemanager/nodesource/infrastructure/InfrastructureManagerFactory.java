@@ -42,8 +42,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Properties;
 
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.exception.RMException;
+import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 
 
 /**
@@ -96,29 +98,30 @@ public class InfrastructureManagerFactory {
      * @return list of supported infrastructures
      */
     public static Collection<Class<?>> getSupportedInfrastructures() {
-        if (supportedInfrastructures == null) {
-            supportedInfrastructures = new ArrayList<Class<?>>();
-            Properties properties = new Properties();
-            try {
-                String propFileName = PAResourceManagerProperties.RM_NODESOURCE_INFRASTRUCTURE_FILE
-                        .getValueAsString();
-                if (!(new File(propFileName).isAbsolute())) {
-                    // file path is relative, so we complete the path with the prefix RM_Home constant
-                    propFileName = PAResourceManagerProperties.RM_HOME.getValueAsString() + File.separator +
-                        propFileName;
-                }
-
-                properties.load(new FileInputStream(propFileName));
-            } catch (Exception e) {
-                e.printStackTrace();
+        // reload file each time as it can be updated while the rm is running
+        supportedInfrastructures = new ArrayList<Class<?>>();
+        Properties properties = new Properties();
+        try {
+            String propFileName = PAResourceManagerProperties.RM_NODESOURCE_INFRASTRUCTURE_FILE
+                    .getValueAsString();
+            if (!(new File(propFileName).isAbsolute())) {
+                // file path is relative, so we complete the path with the prefix RM_Home constant
+                propFileName = PAResourceManagerProperties.RM_HOME.getValueAsString() + File.separator +
+                    propFileName;
             }
 
-            for (Object className : properties.keySet()) {
-                try {
-                    Class<?> cls = Class.forName(className.toString());
-                    supportedInfrastructures.add(cls);
-                } catch (ClassNotFoundException e) {
-                }
+            properties.load(new FileInputStream(propFileName));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        for (Object className : properties.keySet()) {
+            try {
+                Class<?> cls = Class.forName(className.toString());
+                supportedInfrastructures.add(cls);
+            } catch (ClassNotFoundException e) {
+                ProActiveLogger.getLogger(RMLoggers.NODESOURCE).warn(
+                        "Cannot find class " + className.toString());
             }
         }
         return supportedInfrastructures;

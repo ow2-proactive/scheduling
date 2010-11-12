@@ -64,6 +64,7 @@ import org.ow2.proactive.utils.FileToBytesConverter;
  * nodes from the infrastructure.
  *
  */
+@Deprecated
 public class GCMInfrastructure extends DefaultInfrastructureManager {
 
     /**
@@ -286,7 +287,7 @@ public class GCMInfrastructure extends DefaultInfrastructureManager {
      */
     @Override
     public String getDescription() {
-        return "Infrastructure described in GCM deployment descriptor";
+        return "[DEPRECATED] Infrastructure described in GCM deployment descriptor";
     }
 
     /**

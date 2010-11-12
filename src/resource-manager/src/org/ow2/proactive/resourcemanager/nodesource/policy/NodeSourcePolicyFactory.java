@@ -43,9 +43,11 @@ import java.util.Collection;
 import java.util.Properties;
 
 import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.exception.RMException;
+import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 
 
 /**
@@ -87,21 +89,6 @@ public class NodeSourcePolicyFactory {
             }
 
             Class<?> policyClass = Class.forName(policyClassName);
-            PolicyRestriction policyAnnotation = policyClass.getAnnotation(PolicyRestriction.class);
-            if (policyAnnotation != null) {
-                // checking policy restrictions
-                boolean compatible = false;
-                for (String supportedInfrastructure : policyAnnotation.supportedInfrastructures()) {
-                    if (supportedInfrastructure.equals(infrastructureType)) {
-                        compatible = true;
-                        break;
-                    }
-                }
-                if (!compatible) {
-                    throw new RMException(policyClass.getSimpleName() + " cannot be used with " +
-                        infrastructureType);
-                }
-            }
             policy = (NodeSourcePolicy) policyClass.newInstance();
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -129,29 +116,29 @@ public class NodeSourcePolicyFactory {
      * @return list of supported infrastructures
      */
     public static Collection<Class<?>> getSupportedPolicies() {
-        if (supportedPolicies == null) {
-            supportedPolicies = new ArrayList<Class<?>>();
-            Properties properties = new Properties();
-            try {
-                String propFileName = PAResourceManagerProperties.RM_NODESOURCE_POLICY_FILE
-                        .getValueAsString();
-                if (!(new File(propFileName).isAbsolute())) {
-                    //file path is relative, so we complete the path with the prefix RM_Home constant
-                    propFileName = PAResourceManagerProperties.RM_HOME.getValueAsString() + File.separator +
-                        propFileName;
-                }
-
-                properties.load(new FileInputStream(propFileName));
-            } catch (Exception e) {
-                e.printStackTrace();
+        // reload file each time as it can be updated while the rm is running
+        supportedPolicies = new ArrayList<Class<?>>();
+        Properties properties = new Properties();
+        try {
+            String propFileName = PAResourceManagerProperties.RM_NODESOURCE_POLICY_FILE.getValueAsString();
+            if (!(new File(propFileName).isAbsolute())) {
+                //file path is relative, so we complete the path with the prefix RM_Home constant
+                propFileName = PAResourceManagerProperties.RM_HOME.getValueAsString() + File.separator +
+                    propFileName;
             }
 
-            for (Object className : properties.keySet()) {
-                try {
-                    Class<?> cls = Class.forName(className.toString());
-                    supportedPolicies.add(cls);
-                } catch (ClassNotFoundException e) {
-                }
+            properties.load(new FileInputStream(propFileName));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        for (Object className : properties.keySet()) {
+            try {
+                Class<?> cls = Class.forName(className.toString());
+                supportedPolicies.add(cls);
+            } catch (ClassNotFoundException e) {
+                ProActiveLogger.getLogger(RMLoggers.NODESOURCE).warn(
+                        "Cannot find class " + className.toString());
             }
         }
         return supportedPolicies;
