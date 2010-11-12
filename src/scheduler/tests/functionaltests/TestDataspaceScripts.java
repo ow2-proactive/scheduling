@@ -127,7 +127,6 @@ public class TestDataspaceScripts extends FunctionalTest {
 		TaskFlowJob job = new TaskFlowJob();
 		job.setInputSpace(input.toURI().toString());
 		job.setOutputSpace(output.toURI().toString());
-		job.setLogFile("/tmp/LOLOLG");
 
 		JavaTask t = new JavaTask();
 		job.addTask(t);

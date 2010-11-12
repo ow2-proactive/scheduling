@@ -1362,6 +1362,34 @@ public class DSTest extends JavaExecutable {
 						At the end of the task, LOCALSPACE is cleared, every files deleted.
 					</para>
 				</section>
+				<section xml:id="Dataspace_scripts"><info><title>Retrieving files in a script</title></info>
+				  <para>
+					Similarly to what is achieved in <xref linkend="Dataspace_java" /> in Java tasks, Dataspace objects are
+					available in the scripted environments of pre, post and flow scripts (flow scripts are similar to
+					pre/post scripts introduced in <xref linkend="scheduler_workflow" />).
+
+					This allows taking decisions in scripts based, for instance, on the input available to the task
+					or the output that was produced.
+				  </para>
+				  <para>
+					A DataSpacesFileObject is bound to the script environment for inputspace, outputspace and localspace.
+					The exported variables are respectively <emphasis>input</emphasis>, <emphasis>output</emphasis> and
+					<emphasis>localspace</emphasis>. Here is an usage example:
+				  <programlisting language="java"><![CDATA[
+importPackage(org.objectweb.proactive.extensions.dataspaces.api);
+importPackage(java.io);
+// output here is a DataSpacesFileObject representing this job's OutputSpace
+var f = output.resolveFile("out.dat");
+var br = new BufferedReader(new InputStreamReader(f.getContent().getInputStream()));
+var line;
+while ((line = br.readLine()) != null) {
+   if (line.match(regex) != null) {
+      // ... do stuff
+   }
+}
+					]]></programlisting>
+				</para>
+				</section>
 			</section>
 		</section>
 		<section xml:id="scheduler_workflow"><info><title>Enabling Workflows in a Task Flow job</title></info>
