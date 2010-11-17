@@ -55,6 +55,7 @@ import org.ow2.proactive.scripting.SimpleScript;
 
 import functionalTests.FunctionalTest;
 
+
 /**
  * Tests that Dataspaces are available in pre/post/flow scripts
  *
@@ -63,120 +64,116 @@ import functionalTests.FunctionalTest;
  */
 public class TestDataspaceScripts extends FunctionalTest {
 
-	private static final String[] fileContent = new String[] { "This is",
-			"the content", "of the", "file line", "by line." };
+    private static final String[] fileContent = new String[] { "This is", "the content", "of the",
+            "file line", "by line." };
 
-	private static final String fileName = "test";
+    private static final String fileName = "test";
 
-	private static final String spaceMacro = "!SPACE";
+    private static final String spaceMacro = "!SPACE";
 
-	private static final String scriptContent = ""
-			+ "importPackage(org.objectweb.proactive.extensions.dataspaces.api); \n" //
-			+ "importPackage(java.io); \n" //
-			+ "var f = "
-			+ spaceMacro
-			+ ".resolveFile(\""
-			+ fileName
-			+ "\"); \n" //
-			+ "var br = new BufferedReader(new InputStreamReader(f.getContent().getInputStream())); \n" //
-			+ "var out = new PrintWriter(new BufferedWriter(new FileWriter(new File(\"out_"
-			+ spaceMacro + "\")))); \n" //
-			+ "var line; \n" //
-			+ "while ((line = br.readLine()) != null) { \n" //
-			+ "out.println(line); \n" //
-			+ "} \n" //
-			+ "out.close(); \n" //
-			+ "loop=false;"; //
+    private static final String scriptContent = "" +
+        "importPackage(org.objectweb.proactive.extensions.dataspaces.api); \n" //
+        +
+        "importPackage(java.io); \n" //
+        + "var f = " + spaceMacro + ".resolveFile(\"" + fileName +
+        "\"); \n" //
+        +
+        "var br = new BufferedReader(new InputStreamReader(f.getContent().getInputStream())); \n" //
+        + "var out = new PrintWriter(new BufferedWriter(new FileWriter(new File(\"out_" + spaceMacro +
+        "\")))); \n" //
+        + "var line; \n" //
+        + "while ((line = br.readLine()) != null) { \n" //
+        + "out.println(line); \n" //
+        + "} \n" //
+        + "out.close(); \n" //
+        + "loop=false;"; //
 
-	/**
-	 * Creates a task with a Pre/Post/Flow script that opens a file in
-	 * the Input/Output/Local space, copies its content, and checks both are identical 
-	 */
-	@org.junit.Test
-	public void run() throws Throwable {
+    /**
+     * Creates a task with a Pre/Post/Flow script that opens a file in
+     * the Input/Output/Local space, copies its content, and checks both are identical 
+     */
+    @org.junit.Test
+    public void run() throws Throwable {
 
-		/**
-		 * creates input and output spaces in temporary dirs
-		 */
-		File input = File.createTempFile("test", ".input");
-		input.delete();
-		input.mkdir();
-		File output = File.createTempFile("test", ".output");
-		output.delete();
-		output.mkdir();
+        /**
+         * creates input and output spaces in temporary dirs
+         */
+        File input = File.createTempFile("test", ".input");
+        input.delete();
+        input.mkdir();
+        File output = File.createTempFile("test", ".output");
+        output.delete();
+        output.mkdir();
 
-		/**
-		 * creates the testfile in both input and output spaces
-		 */
-		BufferedOutputStream inout = new BufferedOutputStream(
-				new FileOutputStream(new File(input.getAbsolutePath()
-						+ File.separator + fileName)));
-		BufferedOutputStream outout = new BufferedOutputStream(
-				new FileOutputStream(new File(output.getAbsolutePath()
-						+ File.separator + fileName)));
-		for (String line : fileContent) {
-			inout.write((line + "\n").getBytes());
-			outout.write((line + "\n").getBytes());
-		}
-		inout.close();
-		outout.close();
+        /**
+         * creates the testfile in both input and output spaces
+         */
+        BufferedOutputStream inout = new BufferedOutputStream(new FileOutputStream(new File(input
+                .getAbsolutePath() +
+            File.separator + fileName)));
+        BufferedOutputStream outout = new BufferedOutputStream(new FileOutputStream(new File(output
+                .getAbsolutePath() +
+            File.separator + fileName)));
+        for (String line : fileContent) {
+            inout.write((line + "\n").getBytes());
+            outout.write((line + "\n").getBytes());
+        }
+        inout.close();
+        outout.close();
 
-		/**
-		 * single job with single empty task
-		 */
-		TaskFlowJob job = new TaskFlowJob();
-		job.setInputSpace(input.toURI().toString());
-		job.setOutputSpace(output.toURI().toString());
+        /**
+         * single job with single empty task
+         */
+        TaskFlowJob job = new TaskFlowJob();
+        job.setInputSpace(input.toURI().toString());
+        job.setOutputSpace(output.toURI().toString());
 
-		JavaTask t = new JavaTask();
-		job.addTask(t);
-		t.setExecutableClassName("org.ow2.proactive.scheduler.examples.EmptyTask");
-		t.setName("T");
-		t.addInputFiles(fileName, InputAccessMode.TransferFromInputSpace);
-		// PRE : reads from INPUT
-		t.setPreScript(new SimpleScript(scriptContent.replaceAll(spaceMacro,
-				TaskLauncher.DS_INPUT_BINDING_NAME), "javascript"));
-		// POST : reads from SCRATCH
-		t.setPostScript(new SimpleScript(scriptContent.replaceAll(spaceMacro,
-				TaskLauncher.DS_SCRATCH_BINDING_NAME), "javascript"));
-		// FLOW : reads from OUTPUT
-		t.setFlowScript(FlowScript.createLoopFlowScript(scriptContent
-				.replaceAll(spaceMacro, TaskLauncher.DS_OUTPUT_BINDING_NAME),
-				"T"));
+        JavaTask t = new JavaTask();
+        job.addTask(t);
+        t.setExecutableClassName("org.ow2.proactive.scheduler.examples.EmptyTask");
+        t.setName("T");
+        t.addInputFiles(fileName, InputAccessMode.TransferFromInputSpace);
+        // PRE : reads from INPUT
+        t.setPreScript(new SimpleScript(scriptContent.replaceAll(spaceMacro,
+                TaskLauncher.DS_INPUT_BINDING_NAME), "javascript"));
+        // POST : reads from SCRATCH
+        t.setPostScript(new SimpleScript(scriptContent.replaceAll(spaceMacro,
+                TaskLauncher.DS_SCRATCH_BINDING_NAME), "javascript"));
+        // FLOW : reads from OUTPUT
+        t.setFlowScript(FlowScript.createLoopFlowScript(scriptContent.replaceAll(spaceMacro,
+                TaskLauncher.DS_OUTPUT_BINDING_NAME), "T"));
 
-		/**
-		 * job submission, wait on result, removal
-		 */
-		JobId id = SchedulerTHelper.testJobSubmission(job);
-		JobResult res = SchedulerTHelper.getJobResult(id);
-		Assert.assertFalse(SchedulerTHelper.getJobResult(id).hadException());
-		// SchedulerTHelper.removeJob(id);
-		// SchedulerTHelper.waitForEventJobRemoved(id);
+        /**
+         * job submission, wait on result, removal
+         */
+        JobId id = SchedulerTHelper.testJobSubmission(job);
+        JobResult res = SchedulerTHelper.getJobResult(id);
+        Assert.assertFalse(SchedulerTHelper.getJobResult(id).hadException());
+        // SchedulerTHelper.removeJob(id);
+        // SchedulerTHelper.waitForEventJobRemoved(id);
 
-		/**
-		 * check content of the files created by the script
-		 */
-		File preFile = new File("out_" + TaskLauncher.DS_INPUT_BINDING_NAME);
-		File postFile = new File("out_" + TaskLauncher.DS_SCRATCH_BINDING_NAME);
-		File flowFile = new File("out_" + TaskLauncher.DS_OUTPUT_BINDING_NAME);
+        /**
+         * check content of the files created by the script
+         */
+        File preFile = new File("out_" + TaskLauncher.DS_INPUT_BINDING_NAME);
+        File postFile = new File("out_" + TaskLauncher.DS_SCRATCH_BINDING_NAME);
+        File flowFile = new File("out_" + TaskLauncher.DS_OUTPUT_BINDING_NAME);
 
-		checkFile(preFile);
-		checkFile(postFile);
-		checkFile(flowFile);
-	}
+        checkFile(preFile);
+        checkFile(postFile);
+        checkFile(flowFile);
+    }
 
-	private void checkFile(File f) throws Throwable {
-		Assert.assertTrue(f.exists());
-		BufferedReader in = new BufferedReader(new InputStreamReader(
-				new FileInputStream(f)));
-		String line;
-		int i = 0;
-		while ((line = in.readLine()) != null) {
-			Assert.assertTrue("Original and copied files differ",
-					fileContent[i].equals(line));
-			i++;
-		}
-		in.close();
-		f.delete();
-	}
+    private void checkFile(File f) throws Throwable {
+        Assert.assertTrue(f.exists());
+        BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(f)));
+        String line;
+        int i = 0;
+        while ((line = in.readLine()) != null) {
+            Assert.assertTrue("Original and copied files differ", fileContent[i].equals(line));
+            i++;
+        }
+        in.close();
+        f.delete();
+    }
 }

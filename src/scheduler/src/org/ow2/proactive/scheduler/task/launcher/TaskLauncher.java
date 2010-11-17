@@ -119,12 +119,12 @@ public abstract class TaskLauncher implements InitActive {
     public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.LAUNCHER);
     public static final Logger logger_dev_dataspace = ProActiveLogger
             .getLogger(SchedulerDevLoggers.DATASPACE);
-    
+
     public static final String EXECUTION_SUCCEED_BINDING_NAME = "success";
     public static final String DS_SCRATCH_BINDING_NAME = "localspace";
     public static final String DS_INPUT_BINDING_NAME = "input";
     public static final String DS_OUTPUT_BINDING_NAME = "output";
-    
+
     private static final int KEY_SIZE = 1024;
 
     // to define the max line number of a task logs
@@ -639,7 +639,7 @@ public abstract class TaskLauncher implements InitActive {
         script.addBinding(DS_INPUT_BINDING_NAME, this.INPUT);
         script.addBinding(DS_OUTPUT_BINDING_NAME, this.OUTPUT);
     }
-    
+
     /**
      * This method will terminate the task that has been launched.
      * In fact it will terminate the launcher.
