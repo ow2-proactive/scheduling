@@ -37,6 +37,7 @@
 package org.ow2.proactive.scheduler.task.launcher;
 
 import java.io.Serializable;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -119,7 +120,13 @@ public class JavaTaskLauncher extends TaskLauncher {
             //init task
             ExecutableInitializer initializer = executableContainer.createExecutableInitializer();
             replaceIterationTags(initializer);
-            callInternalInit(JavaExecutable.class, JavaExecutableInitializer.class, initializer);
+            // if an exception occurs in init method, unwrapp the InvocationTargetException
+            // the result of the execution is the user level exception
+            try {
+                callInternalInit(JavaExecutable.class, JavaExecutableInitializer.class, initializer);
+            } catch (InvocationTargetException e) {
+                throw e.getCause() != null ? e.getCause() : e;
+            }
             Throwable exception = null;
             Serializable userResult = null;
             sample = System.currentTimeMillis();

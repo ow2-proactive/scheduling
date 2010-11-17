@@ -37,6 +37,7 @@
 package org.ow2.proactive.scheduler.task.launcher;
 
 import java.io.Serializable;
+import java.lang.reflect.InvocationTargetException;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
@@ -135,9 +136,15 @@ public class NativeTaskLauncher extends TaskLauncher {
                 decrypter.setCredentials(executableContainer.getCredentials());
                 execInit.setDecrypter(decrypter);
             }
-            callInternalInit(NativeExecutable.class, NativeExecutableInitializer.class, execInit);
-            replaceIterationTags(execInit);
+            // if an exception occurs in init method, unwrapp the InvocationTargetException
+            // the result of the execution is the user level exception
+            try {
+                callInternalInit(NativeExecutable.class, NativeExecutableInitializer.class, execInit);
+            } catch (InvocationTargetException e) {
+                throw e.getCause() != null ? e.getCause() : e;
+            }
 
+            replaceIterationTags(execInit);
             //replace dataspace tags in command (if needed) by local scratch directory
             replaceCommandDSTags();
 

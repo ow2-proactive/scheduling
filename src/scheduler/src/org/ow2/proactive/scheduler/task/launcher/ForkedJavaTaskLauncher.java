@@ -36,6 +36,8 @@
  */
 package org.ow2.proactive.scheduler.task.launcher;
 
+import java.lang.reflect.InvocationTargetException;
+
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
@@ -112,8 +114,13 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher {
             ExecutableContainerInitializer eci = new ExecutableContainerInitializer();
             eci.setClassServer(((ForkedJavaExecutableContainer) executableContainer).getClassServer());
             fjei.getJavaExecutableContainer().init(eci);
-            //initialize
-            callInternalInit(ForkedJavaExecutable.class, ForkedJavaExecutableInitializer.class, fjei);
+            // if an exception occurs in init method, unwrapp the InvocationTargetException
+            // the result of the execution is the user level exception
+            try {
+                callInternalInit(ForkedJavaExecutable.class, ForkedJavaExecutableInitializer.class, fjei);
+            } catch (InvocationTargetException e) {
+                throw e.getCause() != null ? e.getCause() : e;
+            }
 
             //activate logs if necessary
             if (activateLogs) {
