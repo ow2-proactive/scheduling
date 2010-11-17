@@ -1123,13 +1123,13 @@ task2.setGenerationScript(gscript);
 				<programlisting language="xml"><textobject><textdata fileref="code_snippets/job_descriptors/job_dataspace.xml"/></textobject></programlisting>
 				<para>
 					This example shows how to define both INPUT and OUTPUT spaces. The INPUT space is defined on a HTTP server whereas
-					the OUTPUT one is defined on a remote file system provided by the ProActive provider server.
+					the OUTPUT one is defined on a remote file system provided by the ProActive data server.
 					The only constraint to take care about is to be sure that the OUTPUT space is a writable space.
 					(for example, it cannot be HTTP protocol).
 				</para>
 				<para>
-					In the above example, a ProActive provider server should be started. To do so, just go into the <literal>bin</literal> directory
-					and launch the <emphasis>PAProviderServer[.bat]</emphasis> script that takes a mandatory argument and a optional one:
+					In the above example, a ProActive data server should be started. To do so, just go into the <literal>bin</literal> directory
+					and launch the <emphasis>pa-dataserver[.bat]</emphasis> script that takes a mandatory argument and a optional one:
 					<itemizedlist>
 						<listitem>
 							<para>
@@ -1158,7 +1158,7 @@ job.setOutputSpace("paprmi://host:1099/myOutputSpace?proactive_vfs_provider_path
 				<para>
 					From now on, every files that will be picked or put in those spaces has to be represented
 					by a "virtual" path whose root is "http://myserver/directory" for the INPUT space,
-					and the path passed (to the PAProviderServer) as first argument for the OUTPUT space.
+					and the path passed (to pa-dataserver) as first argument for the OUTPUT space.
 				</para>
 				<para>
 					Let's continue with the description of the tasks.

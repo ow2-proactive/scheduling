@@ -837,8 +837,8 @@ scheduler.changePolicy(org.ow2.proactive.scheduler.policy.PriorityPolicy.class);
 			</para>
 			<para>
 				It is also possible to set a remote files system as a server of files thanks to the ProActive
-				provider server. In this new example, just locate the path to be served and start the ProActive
-				provider server: <emphasis>PAProviderServer[.bat] D:\scheduling\outputSpace myOutput</emphasis>.
+				data server. In this new example, just locate the path to be served and start the ProActive
+				data server: <emphasis>pa-dataserver[.bat] D:\scheduling\outputSpace myOutput</emphasis>.
 				The first argument is the absolute path to the root space directory, the second one is
 				the name of the server (could be useful to start more than one server on the same host).
 			</para>
