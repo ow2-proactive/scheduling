@@ -192,7 +192,7 @@ public abstract class AuthenticationImpl implements Authentication {
         try {
             return Credentials.getPublicKey(this.publicKeyPath);
         } catch (KeyException e) {
-            getLogger().error(e);
+            getLogger().error("", e);
             throw new LoginException("Could not retrieve public key");
         }
     }
