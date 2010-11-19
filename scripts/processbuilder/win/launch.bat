@@ -39,3 +39,5 @@ for /f "tokens=1-7*" %%a in ("%*") do (
 )
 cd /D %scriptdir:?= %
 (user_step.bat %outpipe% %usr% %haspass% %workdir% %envfile% "%therest%") || ((echo %OSPL_E_PREFIX% %OSLP_PACKAGE%FatalProcessBuilderException %OSPL_E_CAUSE% User change script could not execute! 1>&2) && (echo 1 > %outpipe%o) && (echo 1 > %outpipe%e) && (exit 0))
+
+
