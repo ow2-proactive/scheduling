@@ -399,8 +399,7 @@ public class SchedulerModel extends ConsoleModel {
                     try {
                         print("\t " + e.getKey() + " : " + tRes.value());
                     } catch (Throwable e1) {
-                        handleExceptionDisplay("\t " + e.getKey() + " : " + tRes.getException().getMessage(),
-                                e1);
+                        handleExceptionDisplay("\t " + e.getKey(), e1);
                     }
                 }
             } else {

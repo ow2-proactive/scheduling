@@ -37,6 +37,7 @@
 package org.ow2.proactive.scheduler.core;
 
 import java.lang.reflect.Method;
+import java.net.URI;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -47,6 +48,7 @@ import java.util.TimerTask;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
+import org.objectweb.proactive.annotation.ImmediateService;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.mop.MOP;
@@ -99,7 +101,6 @@ import org.ow2.proactive.scheduler.permissions.ChangePolicyPermission;
 import org.ow2.proactive.scheduler.permissions.ChangePriorityPermission;
 import org.ow2.proactive.scheduler.permissions.ConnectToResourceManagerPermission;
 import org.ow2.proactive.scheduler.permissions.GetOwnStateOnlyPermission;
-import org.ow2.proactive.scheduler.resourcemanager.ResourceManagerProxy;
 import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 
 
@@ -138,8 +139,8 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
     /** List used to mark the user that does not respond anymore */
     private Set<UniqueID> dirtyList;
 
-    /** Implementation of Resource Manager */
-    private ResourceManagerProxy resourceManager;
+    /** Temporary rmURL at starting process */
+    private URI rmURL;
 
     /** Authentication Interface */
     private SchedulerAuthentication authentication;
@@ -184,11 +185,11 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
     /**
      * Scheduler Front-end constructor.
      *
-     * @param imp a resource manager which
-     *                                 be able to managed the resource used by scheduler.
+     * @param rmURL a started Resource Manager URL which
+     *              be able to managed the resource used by scheduler.
      * @param policyFullClassName the full class name of the policy to use.
      */
-    public SchedulerFrontend(ResourceManagerProxy imp, String policyFullClassName) {
+    public SchedulerFrontend(URI rmURL, String policyFullClassName) {
         this.identifications = new HashMap<UniqueID, UserIdentificationImpl>();
         this.credentials = new HashMap<UniqueID, Credentials>();
         this.dirtyList = new HashSet<UniqueID>();
@@ -198,12 +199,12 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
         this.jobsMap = new HashMap<JobId, JobState>();
 
         logger_dev.info("Creating scheduler Front-end...");
-        resourceManager = imp;
-        policyFullName = policyFullClassName;
+        this.rmURL = rmURL;
+        this.policyFullName = policyFullClassName;
         logger_dev.debug("Policy used is " + policyFullClassName);
-        jobs = new HashMap<JobId, IdentifiedJob>();
-        sessionTimer = new Timer("SessionTimer");
-        makeEventMethodsList();
+        this.jobs = new HashMap<JobId, IdentifiedJob>();
+        this.sessionTimer = new Timer("SessionTimer");
+        this.makeEventMethodsList();
     }
 
     /**
@@ -225,10 +226,6 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
             logger.info("Setting up scheduler security policy");
             ClientsPolicy.init();
 
-            body.setImmediateService("getTaskResult", false);
-            body.setImmediateService("getJobResult", false);
-            logger_dev.debug("Front-end immediate services : getTaskResult,getJobResult");
-
             // creating the scheduler authentication interface.
             // if this fails then it will not continue.
             logger_dev.info("Creating scheduler authentication interface...");
@@ -236,8 +233,8 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
                     new Object[] { PAActiveObject.getStubOnThis() });
             //creating scheduler core
             logger_dev.info("Creating scheduler core...");
-            SchedulerCore scheduler_local = new SchedulerCore(resourceManager,
-                (SchedulerFrontend) PAActiveObject.getStubOnThis(), policyFullName, currentJobToSubmit);
+            SchedulerCore scheduler_local = new SchedulerCore(rmURL, (SchedulerFrontend) PAActiveObject
+                    .getStubOnThis(), policyFullName, currentJobToSubmit);
             scheduler = (SchedulerCore) PAActiveObject.turnActive(scheduler_local);
 
             logger_dev.info("Registering scheduler...");
@@ -444,6 +441,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
     /**
      * {@inheritDoc}
      */
+    @ImmediateService
     public JobResult getJobResult(JobId jobId) throws NotConnectedException, PermissionException,
             UnknownJobException {
 
@@ -465,6 +463,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
     /**
      * {@inheritDoc}
      */
+    @ImmediateService
     public JobResult getJobResult(String jobId) throws NotConnectedException, PermissionException,
             UnknownJobException {
         return this.getJobResult(JobIdImpl.makeJobId(jobId));
@@ -473,6 +472,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
     /**
      * {@inheritDoc}
      */
+    @ImmediateService
     public TaskResult getTaskResult(JobId jobId, String taskName) throws NotConnectedException,
             UnknownJobException, UnknownTaskException, PermissionException {
 
@@ -489,6 +489,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
     /**
      * {@inheritDoc}
      */
+    @ImmediateService
     public TaskResult getTaskResult(String jobId, String taskName) throws NotConnectedException,
             UnknownJobException, UnknownTaskException, PermissionException {
         return this.getTaskResult(JobIdImpl.makeJobId(jobId), taskName);

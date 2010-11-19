@@ -50,6 +50,7 @@ import java.util.concurrent.Future;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.authentication.crypto.Credentials;
@@ -68,6 +69,7 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 import org.ow2.proactive.scheduler.core.db.DatabaseManager;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
+import org.ow2.proactive.scheduler.core.rmproxies.RMProxyCreationException;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.job.JobResultImpl;
 import org.ow2.proactive.scheduler.task.ExecutableContainerInitializer;
@@ -136,6 +138,8 @@ final class SchedulingMethodImpl implements SchedulingMethod {
      * 		</ul>
      * 	<li>Manage exception while deploying tasks on nodes
      * </ul>
+     *
+     * @return the number of tasks that have been started
      */
     public int schedule() {
 
@@ -159,7 +163,13 @@ final class SchedulingMethodImpl implements SchedulingMethod {
 
         while (!taskRetrivedFromPolicy.isEmpty()) {
             //get rmState and update it in scheduling policy
-            RMState rmState = core.resourceManager.getRMState();
+            RMState rmState = null;
+            try {
+                rmState = core.rmProxiesManager.getSchedulerRMProxy().getState();
+            } catch (RMProxyCreationException rmpce) {
+                logger_dev.error("", rmpce);
+                break;
+            }
             core.policy.RMState = rmState;
             int freeResourcesNb = rmState.getFreeNodesNumber();
             logger_dev.info("Number of free resources : " + freeResourcesNb);
@@ -182,10 +192,11 @@ final class SchedulingMethodImpl implements SchedulingMethod {
 
             //start selected tasks
             Node node = null;
+            InternalJob currentJob = null;
             try {
                 while (nodeSet != null && !nodeSet.isEmpty()) {
                     EligibleTaskDescriptor taskDescriptor = tasksToSchedule.removeFirst();
-                    InternalJob currentJob = core.jobs.get(taskDescriptor.getJobId());
+                    currentJob = core.jobs.get(taskDescriptor.getJobId());
                     InternalTask internalTask = currentJob.getIHMTasks().get(taskDescriptor.getId());
 
                     // load and Initialize the executable container
@@ -200,7 +211,7 @@ final class SchedulingMethodImpl implements SchedulingMethod {
                     if (tasksToSchedule.isEmpty()) {
                         //get back unused nodes to the RManager
                         if (!nodeSet.isEmpty()) {
-                            core.resourceManager.freeNodes(nodeSet);
+                            core.rmProxiesManager.getUserRMProxy(currentJob).releaseNodes(nodeSet);
                         }
                         //and leave the loop
                         break;
@@ -211,7 +222,7 @@ final class SchedulingMethodImpl implements SchedulingMethod {
                 logger.warn("", e1);
                 //so try to get back every remaining nodes to the resource manager
                 try {
-                    core.resourceManager.freeNodes(nodeSet);
+                    core.rmProxiesManager.getUserRMProxy(currentJob).releaseNodes(nodeSet);
                 } catch (Exception e2) {
                     logger_dev.info("Unable to get back the nodeSet to the RM", e2);
                 }
@@ -223,7 +234,7 @@ final class SchedulingMethodImpl implements SchedulingMethod {
                 logger.warn("", e1);
                 //so try to get back every remaining nodes to the resource manager
                 try {
-                    core.resourceManager.freeNodes(nodeSet);
+                    core.rmProxiesManager.getUserRMProxy(currentJob).releaseNodes(nodeSet);
                 } catch (Exception e2) {
                     logger_dev.info("Unable to get back the nodeSet to the RM", e2);
                 }
@@ -367,10 +378,11 @@ final class SchedulingMethodImpl implements SchedulingMethod {
             if (neededResourcesNumber > 1) {
                 tdescriptor = TopologyDescriptor.BEST_PROXIMITY;
             }
-            nodeSet = core.resourceManager.getAtMostNodes(neededResourcesNumber, tdescriptor, internalTask
-                    .getSelectionScripts(), internalTask.getNodeExclusion());
+            nodeSet = core.rmProxiesManager.getUserRMProxy(currentJob).getAtMostNodes(neededResourcesNumber,
+                    tdescriptor, internalTask.getSelectionScripts(), internalTask.getNodeExclusion());
             //the following line is used to unwrap the future, warning when moving or removing
             //it may also throw a ScriptException which is a RuntimeException
+            PAFuture.waitFor(nodeSet, true);
             logger.debug("Got " + nodeSet.size() + " node(s)");
             return nodeSet;
         } catch (ScriptException e) {
@@ -379,30 +391,48 @@ final class SchedulingMethodImpl implements SchedulingMethod {
                 t = t.getCause();
             }
             logger_dev.info("Selection script throws an exception : " + t);
+            logger_dev.debug("", t);
             //simulate jobs starts and cancel it
-            Set<InternalJob> alreadyDone = new HashSet<InternalJob>();
-            for (EligibleTaskDescriptor eltd : tasksToSchedule) {
-                InternalJob ij = core.jobs.get(eltd.getJobId());
-                InternalTask it = ij.getIHMTasks().get(eltd.getId());
-                if (alreadyDone.contains(ij)) {
-                    continue;
-                } else {
-                    alreadyDone.add(ij);
-                }
-                // set the different informations on job if it is the first task of this job
-                if (ij.getStartTime() < 0) {
-                    ij.start();
-                    core.pendingJobs.remove(ij);
-                    core.runningJobs.add(ij);
-                    //update tasks events list and send it to front-end
-                    core.updateTaskInfosList(ij, SchedulerEvent.JOB_PENDING_TO_RUNNING);
-                    logger.info("Job '" + ij.getId() + "' started");
-                }
-                //selection script has failed : end the job
-                core.endJob(ij, it, "Selection script has failed : " + t, JobStatus.CANCELED);
-            }
+            simulateJobStartAndCancelIt(tasksToSchedule, "Selection script has failed : " + t);
             //leave the method by ss failure
             return null;
+        } catch (RMProxyCreationException e) {
+            logger_dev.info("Failed to create User RM Proxy : " + e.getMessage());
+            logger_dev.debug("", e);
+            //simulate jobs starts and cancel it
+            simulateJobStartAndCancelIt(tasksToSchedule,
+                    "Failed to create User RM Proxy : Authentication Failed to Resource Manager for user '" +
+                        currentJob.getOwner() + "'");
+            //leave the method by ss failure
+            return null;
+        }
+    }
+
+    /**
+     * simulate jobs starts and cancel it
+     */
+    private void simulateJobStartAndCancelIt(LinkedList<EligibleTaskDescriptor> tasksToSchedule,
+            String errorMsg) {
+        Set<InternalJob> alreadyDone = new HashSet<InternalJob>();
+        for (EligibleTaskDescriptor eltd : tasksToSchedule) {
+            InternalJob ij = core.jobs.get(eltd.getJobId());
+            InternalTask it = ij.getIHMTasks().get(eltd.getId());
+            if (alreadyDone.contains(ij)) {
+                continue;
+            } else {
+                alreadyDone.add(ij);
+            }
+            // set the different informations on job if it is the first task of this job
+            if (ij.getStartTime() < 0) {
+                ij.start();
+                core.pendingJobs.remove(ij);
+                core.runningJobs.add(ij);
+                //update tasks events list and send it to front-end
+                core.updateTaskInfosList(ij, SchedulerEvent.JOB_PENDING_TO_RUNNING);
+                logger.info("Job '" + ij.getId() + "' started");
+            }
+            //selection script has failed : end the job
+            core.endJob(ij, it, errorMsg, JobStatus.CANCELED);
         }
     }
 
@@ -519,7 +549,7 @@ final class SchedulingMethodImpl implements SchedulingMethod {
                     //exception can come from future.get() -> cancellationException
                     //exception can also come from (1) or (2)
                     nodes.add(node);
-                    core.resourceManager.freeNodes(nodes);
+                    core.rmProxiesManager.getUserRMProxy(job).releaseNodes(nodes);
                 } catch (Throwable ni) {
                     //miam miam
                 }

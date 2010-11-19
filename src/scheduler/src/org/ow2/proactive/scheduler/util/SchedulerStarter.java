@@ -69,7 +69,6 @@ import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.exception.AdminSchedulerException;
-import org.ow2.proactive.scheduler.resourcemanager.ResourceManagerProxy;
 import org.ow2.proactive.utils.FileToBytesConverter;
 import org.ow2.proactive.utils.Tools;
 import org.ow2.proactive.utils.console.JVMPropertiesPreloader;
@@ -156,7 +155,7 @@ public class SchedulerStarter {
                 if (rm != null) {
                     try {
                         logger_dev.info("Trying to connect to Resource Manager on " + rm);
-                        ResourceManagerProxy.getProxy(new URI(rm));
+                        SchedulerFactory.tryJoinRM(new URI(rm));
                         onlySched = true;
                     } catch (Exception e) {
                         logger.error("ERROR while connecting the RM on " + rm + ", no RM found !");
@@ -168,7 +167,7 @@ public class SchedulerStarter {
                     //trying to connect to a started local RM
                     logger_dev.info("Trying to connect to a started Resource Manager on " + uri);
                     try {
-                        ResourceManagerProxy.getProxy(uri);
+                        SchedulerFactory.tryJoinRM(uri);
                         logger
                                 .info("Resource Manager URL was not specified, connection made to the local Resource Manager at " +
                                     uri);
@@ -208,7 +207,8 @@ public class SchedulerStarter {
                     if (!onlySched) {
                         logger.info("Starting scheduler...");
                     }
-                    SchedulerAuthenticationInterface sai = SchedulerFactory.startLocal(rm, policyFullName);
+                    SchedulerAuthenticationInterface sai = SchedulerFactory.startLocal(new URI(rm),
+                            policyFullName);
                     logger.info("Scheduler successfully created on " + sai.getHostURL());
                 } catch (AdminSchedulerException e) {
                     logger.warn("", e);

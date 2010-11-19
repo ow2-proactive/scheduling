@@ -558,7 +558,12 @@ public final class RuntimeDataMBeanImpl extends StandardMBean implements Runtime
         }
         // Initialize the mean for the given job
         long mean = 0;
-        for (final Long value : map.get(jobId)) {
+        List<Long> jobVals = map.get(jobId);
+        if (jobVals == null) {
+            return 0;
+        }
+        //if everything OK
+        for (final Long value : jobVals) {
             mean += value;
         }
         return mean / size;

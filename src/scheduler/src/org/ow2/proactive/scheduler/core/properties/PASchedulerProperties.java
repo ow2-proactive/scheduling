@@ -217,6 +217,14 @@ public enum PASchedulerProperties {
     /** Path to the Scheduler credentials file for RM authentication */
     RESOURCE_MANAGER_CREDS("pa.scheduler.resourcemanager.authentication.credentials", PropertyType.STRING),
 
+    /**
+     * Use single or multiple connection to RM
+     * (If true)  the scheduler user will do the requests to rm
+     * (If false) each Scheduler users have their own connection to RM using same credentials
+     */
+    RESOURCE_MANAGER_SINGLE_CONNECTION("pa.scheduler.resourcemanager.authentication.single",
+            PropertyType.BOOLEAN),
+
     /* ***************************************************************** */
     /* ********************** HIBERNATE PROPERTIES ********************* */
     /* ***************************************************************** */

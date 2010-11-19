@@ -37,7 +37,6 @@
 package org.ow2.proactive.scheduler;
 
 import java.net.URI;
-import java.security.KeyException;
 
 import javax.security.auth.login.LoginException;
 
@@ -45,11 +44,12 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.api.PAActiveObject;
-import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
+import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
+import org.ow2.proactive.resourcemanager.exception.RMException;
+import org.ow2.proactive.resourcemanager.frontend.RMConnection;
 import org.ow2.proactive.scheduler.authentication.SchedulerAuthentication;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
@@ -60,7 +60,6 @@ import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 import org.ow2.proactive.scheduler.core.SchedulerFrontend;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.exception.AdminSchedulerException;
-import org.ow2.proactive.scheduler.resourcemanager.ResourceManagerProxy;
 import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 
 
@@ -84,8 +83,19 @@ public class SchedulerFactory {
     public static final Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.SCHEDULER);
     public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.SCHEDULER);
 
-    private static ResourceManagerProxy imp = null;
     private static boolean allowNullInit = false;
+    private static boolean schedulerStarted = false;
+
+    /**
+     * Try to join Resource Manager at given URI.
+     *
+     * @param uriRM the resource manager URL
+     * @return a Resource Manager authentication interface if success.
+     * @throws RMException if no RM could be joined at this URI.
+     */
+    public static RMAuthentication tryJoinRM(URI uriRM) throws RMException {
+        return RMConnection.join(uriRM.toString());
+    }
 
     /**
      * Creates and starts a Scheduler on the local host using the given initializer to configure it.
@@ -100,9 +110,9 @@ public class SchedulerFactory {
      *
      * @throws ActiveObjectCreationException If Scheduler cannot be created
      */
-    public static SchedulerAuthenticationInterface startLocal(String rmURL, SchedulerInitializer initializer)
-            throws InternalSchedulerException {
-        if (imp == null) {
+    public static synchronized SchedulerAuthenticationInterface startLocal(URI rmURL,
+            SchedulerInitializer initializer) throws InternalSchedulerException {
+        if (!schedulerStarted) {
             if (!allowNullInit) {
                 if (initializer != null) {
                     //configure application
@@ -111,15 +121,17 @@ public class SchedulerFactory {
                     throw new IllegalArgumentException("Initializer cannot be null !");
                 }
             }
-            if (rmURL == null || rmURL.length() == 0) {
-                throw new IllegalArgumentException("RM url is null or empty !");
+            if (rmURL == null) {
+                throw new IllegalArgumentException("RM url is null !");
             }
             try {
-                ResourceManagerProxy imp = ResourceManagerProxy.getProxy(new URI(rmURL));
+                tryJoinRM(rmURL);
                 String policy = initializer.getPolicyFullClassName();
                 //start scheduler
-                createScheduler(imp, policy);
-                return SchedulerConnection.waitAndJoin(null);
+                createScheduler(rmURL, policy);
+                SchedulerAuthenticationInterface sai = SchedulerConnection.waitAndJoin(null);
+                schedulerStarted = true;
+                return sai;
             } catch (Exception e) {
                 throw new InternalSchedulerException(e);
             }
@@ -174,7 +186,7 @@ public class SchedulerFactory {
      *
      * @throws ActiveObjectCreationException If Scheduler cannot be created
      */
-    public static SchedulerAuthenticationInterface startLocal(String rmURL, String policy) throws Exception {
+    public static SchedulerAuthenticationInterface startLocal(URI rmURL, String policy) throws Exception {
         SchedulerInitializer init = new SchedulerInitializer();
         init.setPolicyFullClassName(policy);
         allowNullInit = true;
@@ -188,38 +200,25 @@ public class SchedulerFactory {
      * This will provide a connection interface to allow the access to a restricted number of user.<br>
      * Use {@link SchedulerConnection} class to join the Scheduler.
      *
-     * @param rm the resource manager to plug on the scheduler.
+     * @param rmURL the resource manager URL on which the scheduler will connect
      * @param policyFullClassName the full policy class name for the scheduler.
      * @throws AdminSchedulerException If an error occurred during creation process
      */
-    public static void createScheduler(ResourceManagerProxy rm, String policyFullClassName)
-            throws AdminSchedulerException {
+    public static void createScheduler(URI rmURL, String policyFullClassName) throws AdminSchedulerException {
         logger.info("Starting new Scheduler");
 
         //check arguments...
-        if (rm == null) {
-            String msg = "The Resource Manager must be set !";
+        if (rmURL == null) {
+            String msg = "The Resource Manager URL must not be null";
             logger_dev.error(msg);
             throw new AdminSchedulerException(msg);
         }
 
-        //check that the RM is an active object
         try {
-            PAActiveObject.getActiveObjectNodeUrl(rm);
-        } catch (ProActiveRuntimeException e) {
-            logger
-                    .warn("The Resource Manager is not an active object, this will decrease the scheduler performance.");
-        } catch (Exception e) {
-            logger_dev.error(e);
-            throw new AdminSchedulerException("An error has occured trying to access the Resource Manager " +
-                e.getMessage());
-        }
-
-        try {
-            // creating the scheduler proxy.
+            // creating the scheduler
             // if this fails then it will not continue.
             logger.info("Creating scheduler frontend...");
-            PAActiveObject.newActive(SchedulerFrontend.class.getName(), new Object[] { rm,
+            PAActiveObject.newActive(SchedulerFrontend.class.getName(), new Object[] { rmURL,
                     policyFullClassName });
 
             //ready
@@ -232,38 +231,25 @@ public class SchedulerFactory {
 
     /**
      * Create a new scheduler on the local host plugged on the given resource manager.<br>
-     * This constructor also requires the username//password of the client to connect.<br><br>
-     * This will provide a connection interface to allow the access to a restricted number of user.
+     * This constructor also requires the credentials of the client to connect.<br><br>
      * It will return a client scheduler able to managed the scheduler.<br><br>
      * <font color="red">WARNING :</font> this method provides a way to connect to the scheduler after its creation,
      * BUT if the scheduler is restarting after failure, this method will create the scheduler
      * but will throw a SchedulerException due to the failure of client connection.<br>
      * In fact, while the scheduler is restarting after a crash, no one can connect it during the whole restore process.<br><br>
-     * The method will block until connection is allowed or error occurred.
+     * In any other case, the method will block until connection is allowed or error occurred.
      *
-     * @param login the client login.
-     * @param password the client password.
-     * @param rm the resource manager to plug on the scheduler.
+     * @param rmURL the resource manager URL on which the scheduler will connect
      * @param policyFullClassName the full policy class name for the scheduler.
      * @return a scheduler interface to manage the scheduler.
      * @throws SchedulerException if the scheduler cannot be created.
      * @throws AdminSchedulerException if a client connection exception occurs.
      * @throws LoginException if a user login/password exception occurs.
      */
-    public static Scheduler createScheduler(String login, String password, ResourceManagerProxy rm,
-            String policyFullClassName) throws AdminSchedulerException, SchedulerException, LoginException {
-        createScheduler(rm, policyFullClassName);
-
-        SchedulerAuthenticationInterface auth = SchedulerConnection.waitAndJoin("//localhost/");
-        Credentials creds = null;
-        try {
-            Credentials.createCredentials(new CredData(login, password), auth.getPublicKey());
-        } catch (LoginException e) {
-            logger.error("Could not recover public key from Scheduler, check your configuration" + e);
-            throw new LoginException("Could not encrypt credentials");
-        } catch (KeyException e) {
-            throw new LoginException("Could not encrypt credentials");
-        }
+    public static Scheduler createScheduler(Credentials creds, URI rmURL, String policyFullClassName)
+            throws AdminSchedulerException, SchedulerException, LoginException {
+        createScheduler(rmURL, policyFullClassName);
+        SchedulerAuthenticationInterface auth = SchedulerConnection.waitAndJoin(null);
         return auth.login(creds);
     }
 

@@ -41,7 +41,6 @@ import java.util.Set;
 import org.objectweb.proactive.annotation.ImmediateService;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.resourcemanager.common.RMState;
-import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 
 
 /**
@@ -53,12 +52,14 @@ import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
  */
 public class SchedulerRMProxy extends UserRMProxy {
 
-    SchedulerRMProxy(ResourceManager rm) {
-        super(rm);
+    /**
+     * ProActive constructor, DO NOT USE
+     */
+    public SchedulerRMProxy() {
     }
 
-    SchedulerRMProxy(ResourceManager rm, Set<String> filters) {
-        super(rm, filters);
+    public SchedulerRMProxy(Set<String> filters) {
+        super(filters);
     }
 
     /************************ INHERITED FROM RESOURCE-MANAGER **********************/

@@ -46,6 +46,8 @@ import java.util.Set;
 import java.util.Map.Entry;
 import java.util.concurrent.Future;
 
+import javax.security.auth.login.LoginException;
+
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.RunActive;
@@ -59,6 +61,8 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
+import org.ow2.proactive.authentication.crypto.Credentials;
+import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.common.RMState;
 import org.ow2.proactive.resourcemanager.core.ThrowExceptionRequest;
 import org.ow2.proactive.resourcemanager.frontend.RMMonitoring;
@@ -92,23 +96,34 @@ public class UserRMProxy implements ResourceManager, RunActive {
     protected Set<String> filters;
 
     /** Reference to RM */
-    protected ResourceManager rm;
+    protected ResourceManager rm = null;
 
     /** list of nodes and clean script being executed */
     private Map<Node, ScriptResult<?>> nodes;
 
-    UserRMProxy(ResourceManager rm) {
-        this(rm, null);
+    /**
+     * ProActive constructor, DO NOT USE
+     */
+    public UserRMProxy() {
     }
 
-    UserRMProxy(ResourceManager rm, Set<String> filters) {
-        this.rm = rm;
+    public UserRMProxy(Set<String> filters) {
         this.nodes = new HashMap<Node, ScriptResult<?>>();
         if (filters == null) {
             this.filters = new HashSet<String>();
         } else {
             this.filters = filters;
         }
+    }
+
+    /**
+     * Connect the proxy to the Resource Manager
+     *
+     * @throws LoginException if authentication fails due to wrong login/pwd
+     */
+    @ImmediateService
+    public void connect(RMAuthentication rmAuth, Credentials creds) throws LoginException {
+        this.rm = rmAuth.login(creds);
     }
 
     /**
@@ -136,8 +151,13 @@ public class UserRMProxy implements ResourceManager, RunActive {
      */
     @ImmediateService
     public void terminateProxy() {
-        disconnect();
-        PAActiveObject.terminateActiveObject(true);
+        try {
+            //try disconnect
+            PAFuture.waitFor(disconnect());
+        } catch (Exception e) {
+            //RM is not responding, do nothing
+        }
+        PAActiveObject.terminateActiveObject(false);
     }
 
     /**
@@ -192,7 +212,8 @@ public class UserRMProxy implements ResourceManager, RunActive {
             try {
                 PAEventProgramming.addActionOnFuture(future, "cleanCallBack");
             } catch (IllegalArgumentException e) {
-                //TODO - linked to PROACTIVE-936
+                //TODO - linked to PROACTIVE-936 -> IllegalArgumentException is raised if method name is unknown
+                //should be replaced by checked exception
                 logger_dev
                         .error(
                                 "ERROR : Callback method won't be executed, node won't be released. This is a critical state, check the callback method name",
