@@ -108,6 +108,16 @@ public class SimpleScript extends Script {
         super(url, parameters);
     }
 
+    /** Directly create a script with a string.
+     * @param script a String containing script code
+     * @param engine script's engine execution name.
+     * @param parameters execution parameters
+     * @throws InvalidScriptException if the creation fails.
+     */
+    public SimpleScript(String script, String engine, String[] parameters) throws InvalidScriptException {
+        super(script, engine, parameters);
+    }
+
     /**
      * Copy constructor
      * 
