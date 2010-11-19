@@ -53,6 +53,7 @@ import javax.persistence.Column;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
+import javax.persistence.Lob;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
@@ -72,6 +73,7 @@ import org.hibernate.annotations.MetaValue;
 import org.hibernate.annotations.Proxy;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.dataspaces.core.naming.NamingService;
+import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.db.annotation.Alterable;
 import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
@@ -169,6 +171,14 @@ public abstract class InternalJob extends JobState {
     @Column(name = "RESTART_TIMER")
     @TransientInSerialization
     private long restartWaitingTimer = PASchedulerProperties.REEXECUTION_INITIAL_WAITING_TIME.getValueAsInt();
+
+    /** used credentials to fork as user id. Can be null, or contain user/pwd[/key] */
+    @Lob
+    @Column(name = "CREDENTIALS", updatable = false, length = 16384/* 16Ko max */)
+    @XmlTransient
+    @TransientInSerialization
+    private Credentials credentials = null;
+
 
     /** Hibernate default constructor */
     public InternalJob() {
@@ -1517,6 +1527,24 @@ public abstract class InternalJob extends JobState {
      */
     public void setJobResult(JobResult jobResult) {
         this.jobResult = jobResult;
+    }
+
+    /**
+     * Get the credentials for this job
+     *
+     * @return the credentials for this job
+     */
+    public Credentials getCredentials() {
+        return credentials;
+    }
+
+    /**
+     * Set the credentials value to the given credentials value
+     *
+     * @param credentials the credentials to set
+     */
+    public void setCredentials(Credentials credentials) {
+        this.credentials = credentials;
     }
 
     /**

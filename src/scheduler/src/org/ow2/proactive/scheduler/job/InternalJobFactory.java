@@ -81,8 +81,6 @@ public class InternalJobFactory {
 
     public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.FACTORY);
 
-    private static final Map<Job, Credentials> credentials = new HashMap<Job, Credentials>();
-
     /**
      * Create a new internal job with the given job (user).
      *
@@ -100,9 +98,7 @@ public class InternalJobFactory {
                 logger_dev.error("The type of the given job is not yet implemented !");
                 throw new JobCreationException("The type of the given job is not yet implemented !");
             case TASKSFLOW:
-                credentials.put(job, cred);
                 iJob = createJob((TaskFlowJob) job);
-                credentials.remove(job);
                 break;
             default:
                 logger_dev.error("The type of the given job is unknown !");
@@ -111,6 +107,7 @@ public class InternalJobFactory {
 
         try {
             //set the job common properties
+		iJob.setCredentials(cred);
             setJobCommonProperties(job, iJob);
             return iJob;
         } catch (Exception e) {
@@ -378,10 +375,6 @@ public class InternalJobFactory {
             taskToSet.setMaxNumberOfExecution(task.getMaxNumberOfExecution());
         } else {
             taskToSet.setMaxNumberOfExecution(userJob.getMaxNumberOfExecution());
-        }
-        //add credentials if needed
-        if (task.isRunAsMe()) {
-            taskToSet.setCredentials(credentials.get(userJob));
         }
     }
 

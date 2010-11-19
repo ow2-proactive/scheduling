@@ -45,6 +45,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.task.launcher.TaskLauncher;
 import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
@@ -62,6 +63,7 @@ public class TimedDoTaskAction implements CallableWithTimeoutAction<TaskResult> 
     private static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.SCHEDULE);
 
     private AtomicBoolean timeoutCalled = new AtomicBoolean(false);
+    private InternalJob job;
     private InternalTask task;
     private TaskLauncher launcher;
     private SchedulerCore coreStub;
@@ -76,9 +78,10 @@ public class TimedDoTaskAction implements CallableWithTimeoutAction<TaskResult> 
      * @param coreStub the stub on SchedulerCore
      * @param parameters the parameters to be given to the task
      */
-    public TimedDoTaskAction(InternalTask task, TaskLauncher launcher, SchedulerCore coreStub,
+    public TimedDoTaskAction(InternalJob job, InternalTask task, TaskLauncher launcher, SchedulerCore coreStub,
             TaskResult[] parameters, PrivateKey corePk) {
-        this.task = task;
+        this.job = job;
+	this.task = task;
         this.launcher = launcher;
         this.coreStub = coreStub;
         this.parameters = parameters;
@@ -129,7 +132,7 @@ public class TimedDoTaskAction implements CallableWithTimeoutAction<TaskResult> 
         if (task.isRunAsMe()) {
             PublicKey pubkey = launcher.generatePublicKey();
             //decrypt user credential with core private key
-            CredData credDataFromClient = task.getCredentials().decrypt(corePk);
+            CredData credDataFromClient = job.getCredentials().decrypt(corePk);
             //cred becomes the credentials to be returned with new publicKey encryption
             Credentials credForNode = Credentials.createCredentials(credDataFromClient, pubkey);
             task.getExecutableContainer().setCredentials(credForNode);
