@@ -78,8 +78,8 @@ public class TimedDoTaskAction implements CallableWithTimeoutAction<TaskResult> 
      * @param coreStub the stub on SchedulerCore
      * @param parameters the parameters to be given to the task
      */
-    public TimedDoTaskAction(InternalJob job, InternalTask task, TaskLauncher launcher, SchedulerCore coreStub,
-            TaskResult[] parameters, PrivateKey corePk) {
+    public TimedDoTaskAction(InternalJob job, InternalTask task, TaskLauncher launcher,
+            SchedulerCore coreStub, TaskResult[] parameters, PrivateKey corePk) {
         this.job = job;
 	this.task = task;
         this.launcher = launcher;

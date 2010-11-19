@@ -489,8 +489,8 @@ final class SchedulingMethodImpl implements SchedulingMethod {
                     job.getId() + "'");
 
                 //enqueue next instruction, and execute whole process in the thread-pool controller
-                TimedDoTaskAction tdta = new TimedDoTaskAction(job, task, launcher, (SchedulerCore) PAActiveObject
-                        .getStubOnThis(), params, corePrivateKey);
+                TimedDoTaskAction tdta = new TimedDoTaskAction(job, task, launcher,
+                    (SchedulerCore) PAActiveObject.getStubOnThis(), params, corePrivateKey);
                 List<Future<TaskResult>> futurResults = ExecutorServiceTasksInvocator
                         .invokeAllWithTimeoutAction(threadPool, Collections.singletonList(tdta),
                                 DOTASK_ACTION_TIMEOUT);

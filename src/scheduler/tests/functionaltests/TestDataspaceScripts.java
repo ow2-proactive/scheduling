@@ -90,7 +90,7 @@ public class TestDataspaceScripts extends FunctionalTest {
 
     /**
      * Creates a task with a Pre/Post/Flow script that opens a file in
-     * the Input/Output/Local space, copies its content, and checks both are identical 
+     * the Input/Output/Local space, copies its content, and checks both are identical
      */
     @org.junit.Test
     public void run() throws Throwable {
