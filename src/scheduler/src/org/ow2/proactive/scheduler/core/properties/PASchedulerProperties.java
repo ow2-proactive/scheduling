@@ -200,7 +200,7 @@ public enum PASchedulerProperties {
     DATASPACE_GLOBAL_URL_LOCALPATH("pa.scheduler.dataspace.globalurl.localpath", PropertyType.STRING),
 
     /** GlobalSpace local shortcut hostname */
-    DATASPACE_GLOBAL_URL_HOSTNAME("pa.scheduler.dataspace.globalurl.", PropertyType.STRING),
+    DATASPACE_GLOBAL_URL_HOSTNAME("pa.scheduler.dataspace.globalurl.hostname", PropertyType.STRING),
 
     /* ***************************************************************** */
     /* ************************* LOGS PROPERTIES *********************** */

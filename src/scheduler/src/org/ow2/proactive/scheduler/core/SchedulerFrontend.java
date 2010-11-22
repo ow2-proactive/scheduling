@@ -37,8 +37,6 @@
 package org.ow2.proactive.scheduler.core;
 
 import java.lang.reflect.Method;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -55,8 +53,6 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.mop.MOP;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.extensions.dataspaces.core.InputOutputSpaceConfiguration;
-import org.objectweb.proactive.extensions.dataspaces.exceptions.ConfigurationException;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.permissions.MethodCallPermission;
 import org.ow2.proactive.policy.ClientsPolicy;
@@ -395,7 +391,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
         }
 
         // if no GLOBAL spaces, reject a job that attempts to use it
-        if (!this.checkHasGlobalSpaces()) {
+        if (!PASchedulerProperties.DATASPACE_GLOBAL_URL.isSet()) {
             for (InternalTask it : job.getITasks()) {
                 if (it.getInputFilesList() != null) {
                     for (InputSelector in : it.getInputFilesList()) {
@@ -1353,41 +1349,4 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
                     notification.getEventType());
         }
     }
-
-    /**
-     * Conservative check : this returning false means GlobalSpace would never have worked ;
-     * this returning true means GlobalSpace may or may not work. The only way to know is to actually
-     * try to write in it, and it makes more sense from the nodes than from here anyway 
-     * 
-     * @return true if this Scheduler enables GLOBAL SPACE
-     */
-    private boolean checkHasGlobalSpaces() {
-        boolean res = false;
-        if (PASchedulerProperties.DATASPACE_GLOBAL_URL.isSet()) {
-            String localpath = null;
-            String hostname = null;
-            if (PASchedulerProperties.DATASPACE_GLOBAL_URL_LOCALPATH.isSet() &&
-                PASchedulerProperties.DATASPACE_GLOBAL_URL_HOSTNAME.isSet()) {
-                localpath = PASchedulerProperties.DATASPACE_GLOBAL_URL_LOCALPATH.getValueAsString();
-                hostname = PASchedulerProperties.DATASPACE_GLOBAL_URL_LOCALPATH.getValueAsString();
-            }
-            try {
-                InputOutputSpaceConfiguration.createOutputSpaceConfiguration(
-                        PASchedulerProperties.DATASPACE_GLOBAL_URL.getValueAsString(), localpath, hostname,
-                        SchedulerConstants.GLOBALSPACE_NAME);
-            } catch (ConfigurationException e) {
-                logger.error("GLOBALSPACE is disabled", e);
-                return false;
-            }
-            try {
-                new URL(PASchedulerProperties.DATASPACE_GLOBAL_URL.getValueAsString());
-            } catch (MalformedURLException e) {
-                logger.error("GLOBALSPACE is disabled", e);
-                return false;
-            }
-            res = true;
-        }
-        return res;
-    }
-
 }
