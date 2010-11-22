@@ -375,9 +375,11 @@ final class SchedulingMethodImpl implements SchedulingMethod {
         try {
             //apply topology if number of resource demanded is more than one
             TopologyDescriptor tdescriptor = null;
-            if (neededResourcesNumber > 1) {
+            //temporary commit to disable topology
+            //links to SCHEDULING-893
+            /*if (neededResourcesNumber > 1) {
                 tdescriptor = TopologyDescriptor.BEST_PROXIMITY;
-            }
+            }*/
             nodeSet = core.rmProxiesManager.getUserRMProxy(currentJob).getAtMostNodes(neededResourcesNumber,
                     tdescriptor, internalTask.getSelectionScripts(), internalTask.getNodeExclusion());
             //the following line is used to unwrap the future, warning when moving or removing
