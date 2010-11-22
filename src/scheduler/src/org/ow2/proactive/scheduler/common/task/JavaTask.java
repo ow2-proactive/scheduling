@@ -94,7 +94,7 @@ public class JavaTask extends Task {
 
     /**
      * To set the executable task class name.
-     * It may be a class that extends {@link JavaExecutable}.
+     * It must be a class that extends {@link JavaExecutable}.
      *
      * @param executableClassName the task Class to set.
      */
