@@ -397,7 +397,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
         try {
             //try connect to RM with Scheduler user
             this.rmProxiesManager = RMProxiesManager.getRMProxiesManager(rmURL);
-            this.rmProxiesManager.getSchedulerRMProxy();
+            this.rmProxiesManager.getSchedulerRMProxy();//-> used to connect RM
             //init
             this.jobs = new HashMap<JobId, InternalJob>();
             this.pendingJobs = new Vector<InternalJob>();
@@ -522,17 +522,27 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
      * @see org.objectweb.proactive.RunActive#runActivity(org.objectweb.proactive.Body)
      */
     public void runActivity(Body body) {
-
+        //start Dataspace naming service
         try {
-            //start Dataspace naming service
             dataSpaceNSStarter = new DataSpaceServiceStarter();
             dataSpaceNSStarter.startNamingService();
-            //Start DB and rebuild the scheduler if needed.
+        } catch (Throwable e) {
+            ProActiveLogger.getLogger(SchedulerLoggers.CONSOLE).info("Cannot start Scheduler :", e);
+            //terminate this active object
+            try {
+                PAActiveObject.terminateActiveObject(false);
+            } catch (ProActiveRuntimeException pare) {
+            }
+            //exit
+            PALifeCycle.exitSuccess();
+            return;
+        }
+        //Start DB and rebuild the scheduler if needed.
+        try {
             recover();
         } catch (Throwable e) {
-            ProActiveLogger.getLogger(SchedulerLoggers.CONSOLE).info("Cannot start Scheduler ", e);
+            ProActiveLogger.getLogger(SchedulerLoggers.CONSOLE).info("Cannot start Scheduler :", e);
             kill();
-            return;
         }
 
         if (status != SchedulerStatus.KILLED) {

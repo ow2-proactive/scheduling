@@ -50,10 +50,10 @@ import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 
 public final class DataSpaceServiceStarter implements Serializable {
 
-    private static final String DEFAULT_LOCAL_INPUT = System.getProperty("java.io.tmpdir") + File.separator +
-        "scheduling" + File.separator + "defaultinput";
-    private static final String DEFAULT_LOCAL_OUTPUT = System.getProperty("java.io.tmpdir") + File.separator +
-        "scheduling" + File.separator + "defaultoutput";
+    private static final String DEFAULT_LOCAL = System.getProperty("java.io.tmpdir") + File.separator +
+        "scheduling";
+    private static final String DEFAULT_LOCAL_INPUT = DEFAULT_LOCAL + File.separator + "defaultinput";
+    private static final String DEFAULT_LOCAL_OUTPUT = DEFAULT_LOCAL + File.separator + "defaultoutput";
 
     private String namingServiceURL;
     private NamingServiceDeployer namingServiceDeployer;
@@ -77,31 +77,41 @@ public final class DataSpaceServiceStarter implements Serializable {
         //set default INPUT/OUTPUT spaces if needed
         String hostname = PAActiveObject.getActiveObjectNode(PAActiveObject.getStubOnThis())
                 .getVMInformation().getHostName();
-        //INPUT
-        if (!PASchedulerProperties.DATASPACE_DEFAULTINPUTURL.isSet()) {
-            File dir = new File(DEFAULT_LOCAL_INPUT);
-            if (!dir.exists()) {
-                dir.mkdirs();
+        //variable used to precise exception
+        String currentDir = null;
+        try {
+            //INPUT
+            if (!PASchedulerProperties.DATASPACE_DEFAULTINPUTURL.isSet()) {
+                currentDir = DEFAULT_LOCAL_INPUT;
+                File dir = new File(DEFAULT_LOCAL_INPUT);
+                if (!dir.exists()) {
+                    dir.mkdirs();
+                }
+                inputFilesServer = new FileSystemServerDeployer("defaultSchedulingInput",
+                    DEFAULT_LOCAL_INPUT, true, true);
+                String url = inputFilesServer.getVFSRootURL();
+                PASchedulerProperties.DATASPACE_DEFAULTINPUTURL.updateProperty(url);
+                PASchedulerProperties.DATASPACE_DEFAULTINPUTURL_LOCALPATH.updateProperty(DEFAULT_LOCAL_INPUT);
+                PASchedulerProperties.DATASPACE_DEFAULTINPUTURL_HOSTNAME.updateProperty(hostname);
             }
-            inputFilesServer = new FileSystemServerDeployer("defaultSchedulingInput", DEFAULT_LOCAL_INPUT,
-                true, true);
-            String url = inputFilesServer.getVFSRootURL();
-            PASchedulerProperties.DATASPACE_DEFAULTINPUTURL.updateProperty(url);
-            PASchedulerProperties.DATASPACE_DEFAULTINPUTURL_LOCALPATH.updateProperty(DEFAULT_LOCAL_INPUT);
-            PASchedulerProperties.DATASPACE_DEFAULTINPUTURL_HOSTNAME.updateProperty(hostname);
-        }
-        //OUTPUT
-        if (!PASchedulerProperties.DATASPACE_DEFAULTOUTPUTURL.isSet()) {
-            File dir = new File(DEFAULT_LOCAL_OUTPUT);
-            if (!dir.exists()) {
-                dir.mkdirs();
+            //OUTPUT
+            if (!PASchedulerProperties.DATASPACE_DEFAULTOUTPUTURL.isSet()) {
+                currentDir = DEFAULT_LOCAL_OUTPUT;
+                File dir = new File(DEFAULT_LOCAL_OUTPUT);
+                if (!dir.exists()) {
+                    dir.mkdirs();
+                }
+                outputFilesServer = new FileSystemServerDeployer("defaultSchedulingOutput",
+                    DEFAULT_LOCAL_OUTPUT, true, true);
+                String url = outputFilesServer.getVFSRootURL();
+                PASchedulerProperties.DATASPACE_DEFAULTOUTPUTURL.updateProperty(url);
+                PASchedulerProperties.DATASPACE_DEFAULTOUTPUTURL_LOCALPATH
+                        .updateProperty(DEFAULT_LOCAL_OUTPUT);
+                PASchedulerProperties.DATASPACE_DEFAULTOUTPUTURL_HOSTNAME.updateProperty(hostname);
             }
-            outputFilesServer = new FileSystemServerDeployer("defaultSchedulingOutput", DEFAULT_LOCAL_OUTPUT,
-                true, true);
-            String url = outputFilesServer.getVFSRootURL();
-            PASchedulerProperties.DATASPACE_DEFAULTOUTPUTURL.updateProperty(url);
-            PASchedulerProperties.DATASPACE_DEFAULTOUTPUTURL_LOCALPATH.updateProperty(DEFAULT_LOCAL_OUTPUT);
-            PASchedulerProperties.DATASPACE_DEFAULTOUTPUTURL_HOSTNAME.updateProperty(hostname);
+        } catch (IllegalArgumentException iae) {
+            throw new IllegalArgumentException("Directory '" + currentDir +
+                "' cannot be accessed. Check directory exists or you have read/write right.");
         }
         //let URL terminate by /
         String url = PASchedulerProperties.DATASPACE_DEFAULTINPUTURL.getValueAsString();
