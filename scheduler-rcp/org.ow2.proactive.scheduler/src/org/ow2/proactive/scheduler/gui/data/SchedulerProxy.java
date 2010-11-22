@@ -78,7 +78,6 @@ import org.ow2.proactive.scheduler.gui.actions.JMXActionsManager;
 import org.ow2.proactive.scheduler.gui.composite.StatusLabel;
 import org.ow2.proactive.scheduler.gui.dialog.SelectSchedulerDialogResult;
 import org.ow2.proactive.scheduler.gui.listeners.SchedulerConnectionListener;
-import org.ow2.proactive.scheduler.gui.views.ControllerView;
 import org.ow2.proactive.scheduler.gui.views.SeparatedJobView;
 
 
@@ -477,7 +476,6 @@ public class SchedulerProxy implements Scheduler {
 
             startPinger();
             connected = true;
-            ControllerView.getInstance().connectedEvent();
 
             JMXActionsManager.getInstance().initJMXClient(schedulerURL, sai,
                     new Object[] { dialogResult.getLogin(), credentials });

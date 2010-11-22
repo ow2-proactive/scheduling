@@ -377,7 +377,6 @@ public class SeparatedJobView extends ViewPart {
         }
         PAActiveObject.terminateActiveObject(SchedulerProxy.getInstance(), false);
         SchedulerProxy.clearInstance();
-        ControllerView.clearInstance();
         ActionsManager.getInstance().update();
     }
 
@@ -478,7 +477,6 @@ public class SeparatedJobView extends ViewPart {
         PAActiveObject.terminateActiveObject(SchedulerProxy.getInstance(), false);
         JobsController.clearInstances();
         SchedulerProxy.clearInstance();
-        ControllerView.clearInstance();
         super.dispose();
     }
 }
