@@ -55,7 +55,7 @@ if [ "$passw" == "" ]; then
       do
       args="${args} ""'"${i//\'/\'\"\'\"\'}"'"
     done
-    ssh -n -i $keyfile $usr@localhost `pwd`/command_step.sh $tmp "$workdir" $args
+    ssh -n -o PasswordAuthentication=no -i $keyfile $usr@localhost `pwd`/command_step.sh $tmp "$workdir" $args
     exitc=$?
     rm $keyfile
   fi;
@@ -100,4 +100,3 @@ if [ $exitc != 0 ]; then
   echo $error 1>&2;
   exit 1;
 fi;
-

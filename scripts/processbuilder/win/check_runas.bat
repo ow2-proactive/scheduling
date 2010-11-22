@@ -23,4 +23,3 @@ IF NOT EXIST "%path:?= %" (echo %OSPL_E_PREFIX% java.io.IOException %OSPL_E_CAUS
 cd /d "%path:?= %"
 PsExec.exe -u %1 -p %2 cmd.exe /c exit
 IF %ERRORLEVEL% == 0 echo %1
-
