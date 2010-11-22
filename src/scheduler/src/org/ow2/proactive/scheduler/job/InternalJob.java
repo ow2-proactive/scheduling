@@ -179,7 +179,6 @@ public abstract class InternalJob extends JobState {
     @TransientInSerialization
     private Credentials credentials = null;
 
-
     /** Hibernate default constructor */
     public InternalJob() {
     }
