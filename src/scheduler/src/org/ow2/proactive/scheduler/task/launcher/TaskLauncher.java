@@ -77,6 +77,7 @@ import org.objectweb.proactive.extensions.dataspaces.vfs.selector.fast.FastSelec
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.db.types.BigString;
+import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
 import org.ow2.proactive.scheduler.common.exception.UserException;
 import org.ow2.proactive.scheduler.common.task.ExecutableInitializer;
@@ -124,6 +125,7 @@ public abstract class TaskLauncher implements InitActive {
     public static final String DS_SCRATCH_BINDING_NAME = "localspace";
     public static final String DS_INPUT_BINDING_NAME = "input";
     public static final String DS_OUTPUT_BINDING_NAME = "output";
+    public static final String DS_GLOBAL_BINDING_NAME = "globalspace";
 
     private static final int KEY_SIZE = 1024;
 
@@ -134,6 +136,8 @@ public abstract class TaskLauncher implements InitActive {
     protected DataSpacesFileObject SCRATCH = null;
     protected DataSpacesFileObject INPUT = null;
     protected DataSpacesFileObject OUTPUT = null;
+    protected DataSpacesFileObject GLOBAL = null;
+
     protected String namingServiceUrl = null;
     protected List<InputSelector> inputFiles;
     protected List<OutputSelector> outputFiles;
@@ -638,6 +642,7 @@ public abstract class TaskLauncher implements InitActive {
         script.addBinding(DS_SCRATCH_BINDING_NAME, this.SCRATCH);
         script.addBinding(DS_INPUT_BINDING_NAME, this.INPUT);
         script.addBinding(DS_OUTPUT_BINDING_NAME, this.OUTPUT);
+        script.addBinding(DS_GLOBAL_BINDING_NAME, this.GLOBAL);
     }
 
     /**
@@ -713,6 +718,12 @@ public abstract class TaskLauncher implements InitActive {
                 SCRATCH = PADataSpaces.resolveScratchForAO();
                 INPUT = PADataSpaces.resolveDefaultInput();
                 OUTPUT = PADataSpaces.resolveDefaultOutput();
+                try {
+                    GLOBAL = PADataSpaces.resolveOutput(SchedulerConstants.GLOBALSPACE_NAME);
+                } catch (Throwable t) {
+                    logger_dev_dataspace.warn("GLOBALSPACE is disabled");
+                    logger_dev_dataspace.debug("", t);
+                }
             } catch (Throwable t) {
                 logger_dev_dataspace.warn(
                         "There was a problem while initializing dataSpaces, they won't be activated", t);
@@ -750,7 +761,10 @@ public abstract class TaskLauncher implements InitActive {
                 return;
             }
 
-            ArrayList<DataSpacesFileObject> results = new ArrayList<DataSpacesFileObject>();
+            ArrayList<DataSpacesFileObject> inResults = new ArrayList<DataSpacesFileObject>();
+            ArrayList<DataSpacesFileObject> outResults = new ArrayList<DataSpacesFileObject>();
+            ArrayList<DataSpacesFileObject> globResults = new ArrayList<DataSpacesFileObject>();
+
             FileSystemException toBeThrown = null;
             for (InputSelector is : inputFiles) {
                 //fill fast file selector
@@ -762,7 +776,7 @@ public abstract class TaskLauncher implements InitActive {
                     case TransferFromInputSpace:
                         //search in INPUT
                         try {
-                            FastSelector.findFiles(INPUT, fast, true, results);
+                            FastSelector.findFiles(INPUT, fast, true, inResults);
                         } catch (FileSystemException fse) {
                             logger_dev_dataspace.info("", fse);
                             toBeThrown = new FileSystemException(
@@ -774,13 +788,23 @@ public abstract class TaskLauncher implements InitActive {
                     case TransferFromOutputSpace:
                         //search in OUTPUT
                         try {
-                            FastSelector.findFiles(OUTPUT, fast, true, results);
+                            FastSelector.findFiles(OUTPUT, fast, true, outResults);
                         } catch (FileSystemException fse) {
                             logger_dev_dataspace.info("", fse);
                             toBeThrown = new FileSystemException(
                                 "Could not contact OUTPUT space. Check that OUTPUT space is still reachable !");
                         } catch (NullPointerException npe) {
                             //do nothing
+                        }
+                        break;
+                    case TransferFromGlobalSpace:
+                        try {
+                            FastSelector.findFiles(GLOBAL, fast, true, globResults);
+                        } catch (FileSystemException fse) {
+                            logger_dev_dataspace.info("", fse);
+                            toBeThrown = new FileSystemException(
+                                "Could not contact GLOBAL space. Check that GLOBAL space is still reachable !");
+                        } catch (NullPointerException npe) {
                         }
                         break;
                     case none:
@@ -794,9 +818,15 @@ public abstract class TaskLauncher implements InitActive {
             }
 
             String outuri = (OUTPUT == null) ? "" : OUTPUT.getVirtualURI();
+            String globuri = (GLOBAL == null) ? "" : GLOBAL.getVirtualURI();
             String inuri = (INPUT == null) ? "" : INPUT.getVirtualURI();
 
             Set<String> relPathes = new HashSet<String>();
+
+            ArrayList<DataSpacesFileObject> results = new ArrayList<DataSpacesFileObject>();
+            results.addAll(inResults);
+            results.addAll(outResults);
+            results.addAll(globResults);
 
             //debug ---
             if (!logger_dev_dataspace.isDebugEnabled()) {
@@ -813,13 +843,16 @@ public abstract class TaskLauncher implements InitActive {
             for (DataSpacesFileObject dsfo : results) {
                 try {
                     String relativePath;
-                    if (dsfo.isWritable()) {
-                        relativePath = dsfo.getVirtualURI().replaceFirst(outuri + "/?", "");
-                    } else {
+                    if (inResults.contains(dsfo)) {
                         relativePath = dsfo.getVirtualURI().replaceFirst(inuri + "/?", "");
+                    } else if (outResults.contains(dsfo)) {
+                        relativePath = dsfo.getVirtualURI().replaceFirst(outuri + "/?", "");
+                    } else { // if (globResults.contains(dsfo)) {
+                        relativePath = dsfo.getVirtualURI().replaceFirst(globuri + "/?", "");
                     }
                     logger_dev_dataspace.debug("* " + relativePath);
                     if (!relPathes.contains(relativePath)) {
+                        logger_dev.info("------------ resolving " + relativePath);
                         SCRATCH.resolveFile(relativePath).copyFrom(dsfo,
                                 org.objectweb.proactive.extensions.dataspaces.api.FileSelector.SELECT_SELF);
                     }
@@ -858,33 +891,15 @@ public abstract class TaskLauncher implements InitActive {
                 switch (os.getMode()) {
                     case TransferToOutputSpace:
                         try {
-                            FastSelector.findFiles(SCRATCH, fast, true, results);
-                            //debug ---
-                            if (!logger_dev_dataspace.isDebugEnabled()) {
-                                if (results == null || results.size() == 0) {
-                                    logger_dev_dataspace
-                                            .debug("No file found to copy from LOCAL space to OUTPUT space");
-                                } else {
-                                    logger_dev_dataspace
-                                            .debug("Files that will be copied from LOCAL space to OUTPUT space :");
-                                }
-                            }
-                            //debug ---
-                            String buri = SCRATCH.getVirtualURI();
-                            for (DataSpacesFileObject dsfo : results) {
-                                try {
-                                    String relativePath = dsfo.getVirtualURI().replaceFirst(buri + "/?", "");
-                                    logger_dev_dataspace.debug("* " + relativePath);
-                                    OUTPUT
-                                            .resolveFile(relativePath)
-                                            .copyFrom(
-                                                    dsfo,
-                                                    org.objectweb.proactive.extensions.dataspaces.api.FileSelector.SELECT_SELF);
-                                } catch (FileSystemException fse) {
-                                    logger_dev_dataspace.warn("", fse);
-                                    toBeThrown = fse;
-                                }
-                            }
+                            handleOutput(OUTPUT, fast, results);
+                        } catch (FileSystemException fse) {
+                            logger_dev_dataspace.warn("", fse);
+                            toBeThrown = fse;
+                        }
+                        break;
+                    case TransferToGlobalSpace:
+                        try {
+                            handleOutput(GLOBAL, fast, results);
                         } catch (FileSystemException fse) {
                             logger_dev_dataspace.warn("", fse);
                             toBeThrown = fse;
@@ -893,10 +908,35 @@ public abstract class TaskLauncher implements InitActive {
                     case none:
                         break;
                 }
+                results.clear();
             }
 
             if (toBeThrown != null) {
                 throw toBeThrown;
+            }
+        }
+    }
+
+    private void handleOutput(DataSpacesFileObject out, FastFileSelector fast,
+            ArrayList<DataSpacesFileObject> results) throws FileSystemException {
+        FastSelector.findFiles(SCRATCH, fast, true, results);
+        if (!logger_dev_dataspace.isDebugEnabled()) {
+            if (results == null || results.size() == 0) {
+                logger_dev_dataspace.debug("No file found to copy from LOCAL space to OUTPUT space");
+            } else {
+                logger_dev_dataspace.debug("Files that will be copied from LOCAL space to OUTPUT space :");
+            }
+        }
+        String buri = SCRATCH.getVirtualURI();
+        for (DataSpacesFileObject dsfo : results) {
+            try {
+                String relativePath = dsfo.getVirtualURI().replaceFirst(buri + "/?", "");
+                logger_dev_dataspace.debug("* " + relativePath);
+                out.resolveFile(relativePath).copyFrom(dsfo,
+                        org.objectweb.proactive.extensions.dataspaces.api.FileSelector.SELECT_SELF);
+            } catch (FileSystemException fse) {
+                logger_dev_dataspace.warn("", fse);
+                throw fse;
             }
         }
     }

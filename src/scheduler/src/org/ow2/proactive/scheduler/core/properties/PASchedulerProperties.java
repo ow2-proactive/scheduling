@@ -193,6 +193,15 @@ public enum PASchedulerProperties {
     DATASPACE_DEFAULTOUTPUTURL_HOSTNAME("pa.scheduler.dataspace.defaultoutputurl.hostname",
             PropertyType.STRING),
 
+    /** GlobalSpace URL : DataSpaces for all nodes */
+    DATASPACE_GLOBAL_URL("pa.scheduler.dataspace.globalurl", PropertyType.STRING),
+
+    /** GlobalSpace local shortcut */
+    DATASPACE_GLOBAL_URL_LOCALPATH("pa.scheduler.dataspace.globalurl.localpath", PropertyType.STRING),
+
+    /** GlobalSpace local shortcut hostname */
+    DATASPACE_GLOBAL_URL_HOSTNAME("pa.scheduler.dataspace.globalurl.", PropertyType.STRING),
+
     /* ***************************************************************** */
     /* ************************* LOGS PROPERTIES *********************** */
     /* ***************************************************************** */

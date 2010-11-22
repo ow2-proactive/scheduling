@@ -14,10 +14,12 @@
 			<inputFiles>
 				<files includes="tata" accessMode="transferFromInputSpace"/>
 				<files includes="txt/toto*.txt" excludes="txt/toto*2.txt" accessMode="transferFromOutputSpace"/>
+				<files includes="txt/tutu*.txt" excludes="txt/tutu*2.txt" accessMode="transferFromGlobalSpace"/>
 			</inputFiles>
 			<!-- Java or native Executable -->
 			<outputFiles>
 				<files includes="titi*.dat" excludes="titi*1.dat" accessMode="transferToOutputSpace"/>
+				<files includes="titi*.bak" excludes="titi*1.bak" accessMode="transferToGlobalSpace"/>
 				<files includes="titi*.txt" accessMode="none"/>
 			</outputFiles>
 			...

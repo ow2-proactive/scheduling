@@ -49,6 +49,7 @@ import org.objectweb.proactive.extensions.dataspaces.exceptions.ConfigurationExc
 import org.objectweb.proactive.extensions.dataspaces.exceptions.FileSystemException;
 import org.objectweb.proactive.extensions.dataspaces.exceptions.NotConfiguredException;
 import org.objectweb.proactive.extensions.dataspaces.exceptions.SpaceNotFoundException;
+import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.task.JavaExecutableInitializer;
 import org.ow2.proactive.utils.NodeSet;
 
@@ -200,6 +201,31 @@ public abstract class JavaExecutable extends Executable {
     }
 
     /**
+     * Retrieve the root of the GLOBAL space. This allow you to resolve files, copy, move, delete, etc...
+     * from and to other defined spaces.<br />
+     * The GLOBAL space is a full access space, so you can get files, create, move, copy, etc...</br>
+     * It's real path is defined by the GLOBAL space specified by the Scheduler administrator.<br />
+     * GLOBAL space is shared among all nodes and all users.
+     * GLOBAL space can be a local or a distant space.
+     *
+     * @return the root of the OUTPUT space
+     * @throws FileSystemException if the node is not configured for DATASPACE,
+     *                             if the node is not properly configured,
+     *                             or if the OUTPUT space cannot be reached or has not be found.
+     */
+    public final DataSpacesFileObject getGlobalSpace() throws FileSystemException {
+        try {
+            return PADataSpaces.resolveOutput(SchedulerConstants.GLOBALSPACE_NAME);
+        } catch (NotConfiguredException e) {
+            throw new FileSystemException("Node is not configured for GLOBAL space");
+        } catch (SpaceNotFoundException e) {
+            throw new FileSystemException("Configuration problems for GLOBAL space");
+        } catch (ConfigurationException e) {
+            throw new FileSystemException("GLOBAL space not found");
+        }
+    }
+
+    /**
      * Retrieve the root of the LOCAL space. This allow you to resolve files, copy, move, delete, etc...
      * from and to other defined spaces.<br />
      * The LOCAL space is a full local access space, so you can get files, create, move, copy, etc...</br>
@@ -257,6 +283,20 @@ public abstract class JavaExecutable extends Executable {
      */
     public final DataSpacesFileObject getOutputFile(String path) throws FileSystemException {
         return getOutputSpace().resolveFile(path);
+    }
+
+    /**
+     * Retrieve the given file resolved relative to the GLOBAL space.<br />
+     *
+     * @param path the file path to be resolve relative to the GLOBAL space.
+     * @return the given file resolved in the OUTPUT space
+     * @throws FileSystemException if the node is not configured for DATASPACE,
+     *                             if the node is not properly configured,
+     *                             or if the GLOBAL space cannot be reached or has not be found.
+     * @see #getOutputSpace() for details
+     */
+    public final DataSpacesFileObject getGlobalFile(String path) throws FileSystemException {
+        return getGlobalSpace().resolveFile(path);
     }
 
     /**

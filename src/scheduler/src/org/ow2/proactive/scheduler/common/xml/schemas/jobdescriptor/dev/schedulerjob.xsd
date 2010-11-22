@@ -998,6 +998,11 @@
       </xs:simpleType>
       <xs:simpleType>
         <xs:restriction base="xs:token">
+          <xs:enumeration value="transferFromGlobalSpace"/>
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
           <xs:enumeration value="none"/>
         </xs:restriction>
       </xs:simpleType>
@@ -1008,6 +1013,11 @@
       <xs:simpleType>
         <xs:restriction base="xs:token">
           <xs:enumeration value="transferToOutputSpace"/>
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="transferToGlobalSpace"/>
         </xs:restriction>
       </xs:simpleType>
       <xs:simpleType>

@@ -1113,6 +1113,17 @@ task2.setGenerationScript(gscript);
 				be the root of the space. Ask your administrator if you cannot locate the default targeted spaces.
 			</para>
 			<para>
+			  OUTPUT and INPUT are configured by the user that submits the job, or when not specified by the user, by the Scheduler administrator.
+			  Each job execution has an unique INPUT and OUTPUT definition.
+			  In addition to these, the GLOBAL space is an input/output space that is always configured by the Scheduler administrator,
+			  and is accessible by all nodes. The GLOBAL space can be used as a intermediary storage available for all nodes that is
+			  cheaper to acces than the OUTPUT space.
+			</para>
+			<para>
+			  GLOBAL space has to be set by the Scheduler administrator through the <emphasis>pa.scheduler.dataspace.globalurl</emphasis> property.
+			  The value to use needs to be an URL to a writable space: ie file:/example.com/ or ftp:/example.com/ (HTTP cannot be used as it is read only).
+			</para>
+			<para>
 				Let's continue with an example of use through a job containing a native task and a Java task.
 			</para>
 			<section xml:id="Dataspace_job"><info><title>Using data spaces in a job</title></info>
@@ -1167,7 +1178,7 @@ job.setOutputSpace("paprmi://host:1099/myOutputSpace?proactive_vfs_provider_path
 			<section xml:id="Dataspace_tasks"><info><title>Specifying data spaces in the tasks</title></info>
 				<para>
 					A task can define a set of input and output files. Input files can be picked from
-					the job INPUT or OUTPUT space. To specify a file to be transfered, it is necessary to set
+					the job INPUT, OUTPUT or GLOBAL space. To specify a file to be transfered, it is necessary to set
 					two mandatory fields. A third is also useful but is not mandatory:
 					<itemizedlist>
 						<listitem>
@@ -1182,9 +1193,9 @@ job.setOutputSpace("paprmi://host:1099/myOutputSpace?proactive_vfs_provider_path
 						<listitem>
 							<para>
 								<emphasis>accessMode</emphasis>: specify if the selected files has to be transfered from
-								INPUT or OUTPUT, to OUTPUT, or not transfered. (mandatory)
-								Possible values for the input files are: 'transferFromInputSpace', 'transferFromOutputSpace', 'none'.
-								Possible values for the output files are: 'transferToOutputSpace', 'none'.
+								INPUT or OUTPUT or GLOBAL, to OUTPUT or GLOBAL, or not transfered. (mandatory)
+								Possible values for the input files are: 'transferFromInputSpace', 'transferFromOutputSpace', 'transferFromGlobalSpace', 'none'.
+								Possible values for the output files are: 'transferToOutputSpace','transferToGlobalSpace',  'none'.
 							</para>
 						</listitem>
 						<listitem>
@@ -1205,12 +1216,12 @@ job.setOutputSpace("paprmi://host:1099/myOutputSpace?proactive_vfs_provider_path
 					Until now, LOCALSPACE will be used as the root of the space local to the task execution (green data space on the picture above).
 					In this example, the file 'tata' located at the root of the INPUT space will be transfered from INPUT
 					space to LOCALSPACE and every 'toto*.txt' files excepted 'toto*2.txt' in the 'txt' directory will be transfered from OUTPUT space
-					to LOCALSPACE.
+					to LOCALSPACE. Additionally, files matching 'tutu*.txt' excepted 'tutu*2.txt' in the 'dat' directory will be transfered from GLOBAL space to LOCAL space.
 				</para>
 				<para>
 					At the end of the execution, every produced files 'titi*.dat' excepted the 'titi*1.dat' files will be transfered
-					from LOCALSPACE to OUTPUT space. The 'titi*.txt' files won't be transfered, it is just identified as an output file
-					by the Scheduler.
+					from LOCALSPACE to OUTPUT space. Additionally, the 'titi*.bak' excepted 'titi*1.bak' will be transferred from LOCAL space to GLOBAL space.
+					The 'titi*.txt' files won't be transfered, it is just identified as an output file by the Scheduler.
 				</para>
 				<para>
 					Here's the same description using the java API:
@@ -1221,10 +1232,14 @@ job.setOutputSpace("paprmi://host:1099/myOutputSpace?proactive_vfs_provider_path
 task.addInputFiles("tata",InputAccessMode.TransferFromInputSpace);
 FileSelector fs = new FileSelector(new String[]{"txt/toto*.txt"}, new String[]{"txt/toto*2.txt"});
 task.addInputFiles(fs,InputAccessMode.transferFromOutputSpace);
+FileSelector fs2 = new FileSelector(new String[]{"dat/tutu*.txt"}, new String[]{"dat/tutu*2.txt"});
+task.addInputFiles(fs2,InputAccessMode.transferFromGlobalSpace);
 //...
 //add output files
 fs = new FileSelector(new String[]{"titi*.dat"}, new String[]{"titi*1.dat"});
 task.addOutputFiles(fs,OutputAccessMode.TransferToOutputSpace);
+fss = new FileSelector(new String[]{"titi*.bak"}, new String[]{"titi*1.bak"});
+task.addOutputFiles(fs,OutputAccessMode.TransferToGlobalSpace);
 task.addOutputFiles("titi*.txt",OutputAccessMode.none);
 //...
 				</programlisting>
@@ -1292,6 +1307,13 @@ t.setCommandLine(new String[]{"myExec", "$LOCALSPACE/tata", "$LOCALSPACE/txt", "
 							</listitem>
 							<listitem>
 								<para>
+									<emphasis>getGlobalSpace()</emphasis>: retrieves the root of GLOBAL space.
+									You will get a DataSpacesFileObject on which it is possible to perform some file operations.
+									(Warning ! Files are probably not on the node host)
+								</para>
+							</listitem>
+							<listitem>
+								<para>
 									<emphasis>getLocalSpace()</emphasis>: retrieves the root of the LOCAL space.
 									You will get a DataSpacesFileObject on which it is possible to perform some file operations.
 								</para>
@@ -1309,6 +1331,15 @@ t.setCommandLine(new String[]{"myExec", "$LOCALSPACE/tata", "$LOCALSPACE/txt", "
 								<para>
 									<emphasis>getOutputFile(pathName)</emphasis>: selects the file located at "pathName" in the OUTPUT space.
 									"pathName" has to be relative to the root of the OUTPUT.
+									You will get a DataSpacesFileObject on which it is possible to perform some file operations.
+									File can be moved, copied, read or written.
+									(Warning ! Files are probably not on the node host)
+								</para>
+							</listitem>
+							<listitem>
+								<para>
+									<emphasis>getGlobalFile(pathName)</emphasis>: selects the file located at "pathName" in the GLOBAL space.
+									"pathName" has to be relative to the root of the GLOBAL.
 									You will get a DataSpacesFileObject on which it is possible to perform some file operations.
 									File can be moved, copied, read or written.
 									(Warning ! Files are probably not on the node host)
@@ -1372,8 +1403,8 @@ public class DSTest extends JavaExecutable {
 					or the output that was produced.
 				  </para>
 				  <para>
-					A DataSpacesFileObject is bound to the script environment for inputspace, outputspace and localspace.
-					The exported variables are respectively <emphasis>input</emphasis>, <emphasis>output</emphasis> and
+					A DataSpacesFileObject is bound to the script environment for inputspace, outputspace, globalspace and localspace.
+					The exported variables are respectively <emphasis>input</emphasis>, <emphasis>output</emphasis>, <emphasis>globalspace</emphasis> and
 					<emphasis>localspace</emphasis>. Here is an usage example:
 				  <programlisting language="java"><![CDATA[
 importPackage(org.objectweb.proactive.extensions.dataspaces.api);

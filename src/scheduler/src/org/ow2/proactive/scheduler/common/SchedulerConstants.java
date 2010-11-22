@@ -67,4 +67,6 @@ public class SchedulerConstants {
     /** Name of the environment variable for unix home directory on the common file system. */
     public static final String UNIX_HOME_ENV_VAR = "UNIX_HOME";
 
+    /** Name of the GlobalSpace for DataSpaces registration */
+    public static final String GLOBALSPACE_NAME = "GLOBALSPACE";
 }

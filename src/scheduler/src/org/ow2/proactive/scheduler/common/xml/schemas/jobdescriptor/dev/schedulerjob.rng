@@ -769,6 +769,7 @@
     <choice>
       <value>transferFromInputSpace</value>
       <value>transferFromOutputSpace</value>
+      <value>transferFromGlobalSpace</value>
       <value>none</value>
       <ref name="variableRefType"/>
     </choice>
@@ -776,6 +777,7 @@
   <define name="outaccessModeType">
     <choice>
       <value>transferToOutputSpace</value>
+      <value>transferToGlobalSpace</value>
       <value>none</value>
       <ref name="variableRefType"/>
     </choice>

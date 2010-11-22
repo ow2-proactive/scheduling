@@ -50,6 +50,8 @@ import org.objectweb.proactive.annotation.PublicAPI;
 public enum OutputAccessMode {
     /** Transfer files from LOCAL space to OUTPUT space */
     TransferToOutputSpace("TransferToOutputSpace"),
+    /** LOCAL to GLOBAL */
+    TransferToGlobalSpace("TransferToGlobalSpace"),
     /** Do nothing */
     none("none");
 
@@ -62,6 +64,8 @@ public enum OutputAccessMode {
     public static OutputAccessMode getAccessMode(String accessMode) {
         if (TransferToOutputSpace.title.equalsIgnoreCase(accessMode)) {
             return TransferToOutputSpace;
+        } else if (TransferToGlobalSpace.title.equalsIgnoreCase(accessMode)) {
+            return TransferToGlobalSpace;
         } else if (none.title.equalsIgnoreCase(accessMode)) {
             return none;
         } else {

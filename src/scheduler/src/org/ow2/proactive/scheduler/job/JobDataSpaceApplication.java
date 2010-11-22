@@ -43,11 +43,11 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.extensions.dataspaces.api.DataSpacesFileObject;
 import org.objectweb.proactive.extensions.dataspaces.api.PADataSpaces;
 import org.objectweb.proactive.extensions.dataspaces.core.InputOutputSpaceConfiguration;
 import org.objectweb.proactive.extensions.dataspaces.core.SpaceInstanceInfo;
 import org.objectweb.proactive.extensions.dataspaces.core.naming.NamingService;
+import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 
@@ -59,9 +59,6 @@ public class JobDataSpaceApplication implements Serializable {
     private long applicationId;
     private String namingServiceURL;
     private NamingService namingService;
-
-    private DataSpacesFileObject inputSpace;
-    private DataSpacesFileObject outputSpace;
 
     private boolean alreadyRegistered = false;
 
@@ -91,6 +88,8 @@ public class JobDataSpaceApplication implements Serializable {
                 Set<SpaceInstanceInfo> predefinedSpaces = new HashSet<SpaceInstanceInfo>();
                 InputOutputSpaceConfiguration isc;
                 InputOutputSpaceConfiguration osc;
+                InputOutputSpaceConfiguration glob;
+
                 // create INPUT space
                 if (inputURL != null) {
                     isc = InputOutputSpaceConfiguration.createInputSpaceConfiguration(inputURL, null, null,
@@ -129,6 +128,23 @@ public class JobDataSpaceApplication implements Serializable {
                             PASchedulerProperties.DATASPACE_DEFAULTOUTPUTURL.getValueAsString() + username,
                             localpath, hostname, PADataSpaces.DEFAULT_IN_OUT_NAME);
                 }
+
+                if (PASchedulerProperties.DATASPACE_GLOBAL_URL.isSet()) {
+                    String localpath = null;
+                    String hostname = null;
+                    if (PASchedulerProperties.DATASPACE_GLOBAL_URL_LOCALPATH.isSet() &&
+                        PASchedulerProperties.DATASPACE_GLOBAL_URL_HOSTNAME.isSet()) {
+                        localpath = PASchedulerProperties.DATASPACE_GLOBAL_URL_LOCALPATH.getValueAsString() +
+                            File.separator + username;
+                        hostname = PASchedulerProperties.DATASPACE_GLOBAL_URL_LOCALPATH.getValueAsString();
+                    }
+                    glob = InputOutputSpaceConfiguration.createOutputSpaceConfiguration(
+                            PASchedulerProperties.DATASPACE_GLOBAL_URL.getValueAsString(), localpath,
+                            hostname, SchedulerConstants.GLOBALSPACE_NAME);
+
+                    predefinedSpaces.add(new SpaceInstanceInfo(applicationId, glob));
+                }
+
                 predefinedSpaces.add(new SpaceInstanceInfo(applicationId, isc));
                 predefinedSpaces.add(new SpaceInstanceInfo(applicationId, osc));
                 // register application
@@ -155,23 +171,4 @@ public class JobDataSpaceApplication implements Serializable {
     public String getNamingServiceURL() {
         return namingServiceURL;
     }
-
-    /**
-     * Get the inputSpace
-     *
-     * @return the inputSpace
-     */
-    public DataSpacesFileObject getInputSpace() {
-        return inputSpace;
-    }
-
-    /**
-     * Get the outputSpace
-     *
-     * @return the outputSpace
-     */
-    public DataSpacesFileObject getOutputSpace() {
-        return outputSpace;
-    }
-
 }
