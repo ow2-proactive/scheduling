@@ -215,6 +215,7 @@ public class ResourceManagerController {
                         pwd = console.readLine('*');
                     } catch (IOException ioe) {
                         logger.error("" + ioe);
+                        logger.debug("", ioe);
                     }
 
                     PublicKey pubKey = null;
@@ -222,17 +223,17 @@ public class ResourceManagerController {
                         // first attempt at getting the pubkey : ask the RM
                         RMAuthentication auth = RMConnection.join(url);
                         pubKey = auth.getPublicKey();
-                        System.out.println("Retrieved public key from Resource Manager at " + url);
+                        logger.info("Retrieved public key from Resource Manager at " + url);
                     } catch (Exception e) {
                         try {
                             // second attempt : try default location
                             pubKey = Credentials.getPublicKey(Credentials.getPubKeyPath());
-                            System.out.println("Using public key at " + Credentials.getPubKeyPath());
+                            logger.info("Using public key at " + Credentials.getPubKeyPath());
                         } catch (Exception exc) {
-                            System.out
-                                    .println("Could not find a public key. Contact the administrator of the Resource Manager.");
-                            exc.printStackTrace();
-                            System.exit(0);
+                            logger
+                                    .error("Could not find a public key. Contact the administrator of the Resource Manager.");
+                            logger.debug("", exc);
+                            System.exit(1);
                         }
                     }
                     try {
@@ -253,29 +254,37 @@ public class ResourceManagerController {
             }
         } catch (MissingArgumentException e) {
             logger.error(e.getLocalizedMessage());
+            logger.debug("", e);
             displayHelp = true;
         } catch (MissingOptionException e) {
             logger.error("Missing option: " + e.getLocalizedMessage());
+            logger.debug("", e);
             displayHelp = true;
         } catch (UnrecognizedOptionException e) {
             logger.error(e.getLocalizedMessage());
+            logger.debug("", e);
             displayHelp = true;
         } catch (AlreadySelectedException e) {
             logger.error(e.getClass().getSimpleName() + " : " + e.getLocalizedMessage());
+            logger.debug("", e);
             displayHelp = true;
         } catch (ParseException e) {
+            logger.debug("", e);
             displayHelp = true;
         } catch (RMException e) {
             logger.error("Error at connection : " + e.getMessage() + newline + "Shutdown the controller." +
                 newline);
-            System.exit(1);
+            logger.debug("", e);
+            System.exit(2);
         } catch (LoginException e) {
             logger.error(e.getMessage() + newline + "Shutdown the controller." + newline);
-            System.exit(1);
+            logger.debug("", e);
+            System.exit(3);
         } catch (Exception e) {
             logger.error("An error has occurred : " + e.getMessage() + newline + "Shutdown the controller." +
                 newline, e);
-            System.exit(1);
+            logger.debug("", e);
+            System.exit(4);
         }
 
         if (displayHelp) {
@@ -285,7 +294,7 @@ public class ResourceManagerController {
             String note = newline + "NOTE : if no " + control +
                 " command is specified, the controller will start in interactive mode.";
             hf.printHelp(commandName + shellExtension(), "", options, note, true);
-            System.exit(2);
+            System.exit(5);
         }
 
         // if execution reaches this point this means it must exit

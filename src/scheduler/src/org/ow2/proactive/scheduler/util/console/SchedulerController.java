@@ -217,6 +217,7 @@ public class SchedulerController {
                         pwd = console.readLine('*');
                     } catch (IOException ioe) {
                         logger.error("" + ioe);
+                        logger.debug("", ioe);
                     }
 
                     PublicKey pubKey = null;
@@ -224,17 +225,17 @@ public class SchedulerController {
                         // first attempt at getting the pubkey : ask the scheduler
                         SchedulerAuthenticationInterface auth = SchedulerConnection.join(url);
                         pubKey = auth.getPublicKey();
-                        System.out.println("Retrieved public key from Scheduler at " + url);
+                        logger.info("Retrieved public key from Scheduler at " + url);
                     } catch (Exception e) {
                         try {
                             // second attempt : try default location
                             pubKey = Credentials.getPublicKey(Credentials.getPubKeyPath());
-                            System.out.println("Using public key at " + Credentials.getPubKeyPath());
+                            logger.info("Using public key at " + Credentials.getPubKeyPath());
                         } catch (Exception exc) {
-                            System.out
-                                    .println("Could not find a public key. Contact the administrator of the Scheduler.");
-                            exc.printStackTrace();
-                            System.exit(0);
+                            logger
+                                    .error("Could not find a public key. Contact the administrator of the Scheduler.");
+                            logger.debug("", exc);
+                            System.exit(7);
                         }
                     }
                     try {
@@ -248,7 +249,8 @@ public class SchedulerController {
                         }
                     } catch (FileNotFoundException fnfe) {
                         logger.error("SSH keyfile not found : '" + cmd.getOptionValue("key") + "'");
-                        System.exit(1);
+                        logger.debug("", fnfe);
+                        System.exit(8);
                     } catch (Exception e) {
                         logger.error("Could not create credentials... " + e);
                         throw e;
@@ -264,28 +266,35 @@ public class SchedulerController {
             }
         } catch (MissingArgumentException e) {
             logger.error(e.getLocalizedMessage());
+            logger.debug("", e);
             displayHelp = true;
         } catch (MissingOptionException e) {
             logger.error("Missing option: " + e.getLocalizedMessage());
+            logger.debug("", e);
             displayHelp = true;
         } catch (UnrecognizedOptionException e) {
             logger.error(e.getLocalizedMessage());
+            logger.debug("", e);
             displayHelp = true;
         } catch (AlreadySelectedException e) {
             logger.error(e.getClass().getSimpleName() + " : " + e.getLocalizedMessage());
+            logger.debug("", e);
             displayHelp = true;
         } catch (ParseException e) {
             displayHelp = true;
         } catch (LoginException e) {
             logger.error(e.getMessage() + newline + "Shutdown the controller." + newline);
-            System.exit(1);
+            logger.debug("", e);
+            System.exit(3);
         } catch (SchedulerException e) {
             logger.error(e.getMessage() + newline + "Shutdown the controller." + newline);
-            System.exit(1);
+            logger.debug("", e);
+            System.exit(4);
         } catch (Exception e) {
             logger.error("An error has occurred : " + e.getMessage() + newline + "Shutdown the controller." +
                 newline, e);
-            System.exit(1);
+            logger.debug("", e);
+            System.exit(5);
         }
 
         if (displayHelp) {
@@ -295,7 +304,7 @@ public class SchedulerController {
             String note = newline + "NOTE : if no " + control +
                 "command is specified, the controller will start in interactive mode.";
             hf.printHelp(getCommandName() + Tools.shellExtension(), "", options, note, true);
-            System.exit(2);
+            System.exit(6);
         }
 
         // if execution reaches this point this means it must exit
