@@ -131,7 +131,7 @@ do
 				rm $NEW_FILE_DIR/bin/windows/scheduler*
 				rm $NEW_FILE_DIR/bin/windows/rm-start.bat
 				rm $NEW_FILE_DIR/bin/windows/rm-start-clean.bat
-				sed -i "s#dist\\\\lib#plugins\\\\org.ow2.proactive.resourcemanager.lib_$VERSION\\\\\lib#g" $NEW_FILE_DIR/bin/windows/init.bat
+				sed -i "s#dist\\\\lib#plugins\\\\org.ow2.proactive.resourcemanager.lib_$VERSION\\\\lib#g" $NEW_FILE_DIR/bin/windows/init.bat
 			fi
 		else
 			mkdir $NEW_FILE_DIR/bin/unix
