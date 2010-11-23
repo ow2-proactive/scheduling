@@ -126,6 +126,7 @@ public class ScriptExecutor implements Callable<Node> {
                     // selection manager at the same time. Returns whether node is selected.
                     if (!manager.processScriptResult(script, scriptResult, rmnode)) {
                         nodeMatch = false;
+                        break;
                     }
 
                 }
