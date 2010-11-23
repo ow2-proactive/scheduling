@@ -123,18 +123,19 @@ public final class ForkerUtils {
      * If the process must be run under a specific user,
      * check the configuration of '{@value #FORK_METHOD_KEY}' property and proceed as follow :
      * <ul>
-     * 	<li><b>if {@value #FORK_METHOD_KEY}=none :</b> do not fork under user account</li>
-     * 	<li><b>if {@value #FORK_METHOD_KEY}=pwd :</b> fork under the user using its login and password</li>
-     * 	<li><b>if {@value #FORK_METHOD_KEY}=key :</b> fork under the user using its ssh key</li>
+     * 	<li><b>if {@value #FORK_METHOD_KEY}=none :</b> return null</li>
+     * 	<li><b>if {@value #FORK_METHOD_KEY}=pwd :</b> return the user using its login and password</li>
+     * 	<li><b>if {@value #FORK_METHOD_KEY}=key :</b> return the user using its ssh key</li>
      * </ul>
      *
      * @param decrypter the decrypter that should be a self decryption one.
-     * @param ospb the process builder to be triggered
+     * @return the OSUser to be passed to the OSPRocess, or null if no fork method is set.
      * @throws IllegalAccessException if the node configuration method is not compatible with incoming credentials
      * @throws KeyException decryption failure, malformed data
+     * @throws IllegalArgumentException if decrypter is null
      */
-    public static void checkConfigAndAddUserToProcess(OSProcessBuilder ospb, OneShotDecrypter decrypter)
-            throws IllegalAccessException, KeyException {
+    public static OSUser checkConfigAndGetUser(OneShotDecrypter decrypter) throws IllegalAccessException,
+            KeyException {
         if (decrypter != null) {
             CredData data = decrypter.decrypt();
             if (ForkMethod.PWD == FORK_METHOD_VALUE) {
@@ -143,19 +144,19 @@ public final class ForkerUtils {
                         "Password not found in Credentials, cannot fork using password");
                 }
                 String[] lp = data.getLoginPassword();
-                ospb.user(new OSUser(lp[0], lp[1]));
-                return;
+                return new OSUser(lp[0], lp[1]);
             }
             if (ForkMethod.KEY == FORK_METHOD_VALUE) {
                 if (data.getKey() == null) {
                     throw new IllegalAccessException(
                         "SSH key not found in Credentials, cannot fork using ssh Key");
                 }
-                ospb.user(new OSUser(data.getLogin(), data.getKey()));
-                return;
+                return new OSUser(data.getLogin(), data.getKey());
             }
             throw new IllegalAccessException("Cannot fork under " + data.getLogin() + ", Property " +
                 FORK_METHOD_KEY + " is not configured.");
+        } else {
+            throw new IllegalArgumentException("Decrypter could not be null");
         }
     }
 }

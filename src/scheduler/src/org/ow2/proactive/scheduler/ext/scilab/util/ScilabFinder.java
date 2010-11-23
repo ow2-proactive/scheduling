@@ -36,17 +36,23 @@
  */
 package org.ow2.proactive.scheduler.ext.scilab.util;
 
-import org.objectweb.proactive.core.util.OperatingSystem;
-import org.objectweb.proactive.core.node.NodeException;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.List;
+
 import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.utils.OperatingSystem;
 import org.ow2.proactive.scheduler.ext.common.util.IOTools;
 import org.ow2.proactive.scheduler.ext.common.util.LinuxShellExecuter;
 import org.ow2.proactive.scheduler.ext.common.util.ProcessResult;
 import org.ow2.proactive.scheduler.ext.common.util.Shell;
 import org.ow2.proactive.scheduler.ext.scilab.exception.ScilabInitException;
-
-import java.io.*;
-import java.util.List;
 
 
 public class ScilabFinder {

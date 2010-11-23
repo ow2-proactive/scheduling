@@ -40,7 +40,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.objectweb.proactive.core.ProActiveTimeoutException;
-import org.objectweb.proactive.core.util.TimeoutAccounter;
+import org.objectweb.proactive.utils.TimeoutAccounter;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;

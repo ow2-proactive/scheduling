@@ -49,9 +49,9 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
 
-import org.objectweb.proactive.core.util.OperatingSystem;
-import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.utils.OperatingSystem;
 import org.ow2.proactive.scheduler.ext.common.util.IOTools;
 import org.ow2.proactive.scheduler.ext.common.util.LinuxShellExecuter;
 import org.ow2.proactive.scheduler.ext.common.util.ProcessResult;

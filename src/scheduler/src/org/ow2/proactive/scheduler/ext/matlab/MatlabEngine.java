@@ -36,18 +36,19 @@
  */
 package org.ow2.proactive.scheduler.ext.matlab;
 
-import org.objectweb.proactive.core.util.OperatingSystem;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+
+import org.objectweb.proactive.utils.OperatingSystem;
 import org.ow2.proactive.scheduler.ext.matlab.util.MatlabConfiguration;
+
 import ptolemy.data.Token;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.matlab.Engine;
 import ptolemy.matlab.Engine.ConversionParameters;
-
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.TimeUnit;
 
 
 /**

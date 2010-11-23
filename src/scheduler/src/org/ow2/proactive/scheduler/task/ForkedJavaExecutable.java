@@ -355,12 +355,15 @@ public class ForkedJavaExecutable extends JavaExecutable {
      */
     private Process createJVMProcess() throws Exception {
         //build process
-        OSProcessBuilder ospb = ForkerUtils.getOSProcessBuilderFactory().getBuilder();
+        OSProcessBuilder ospb = null;
+        if (isRunAsUser()) {
+            ospb = ForkerUtils.getOSProcessBuilderFactory().getBuilder(
+                    ForkerUtils.checkConfigAndGetUser(this.execInitializer.getDecrypter()));
+        } else {
+            ospb = ForkerUtils.getOSProcessBuilderFactory().getBuilder();
+        }
         ospb.command(command.toArray(new String[command.size()]));
         //check if it must be run under user and if so, apply the proper method
-        if (isRunAsUser()) {
-            ForkerUtils.checkConfigAndAddUserToProcess(ospb, this.execInitializer.getDecrypter());
-        }
         //and start process
         return ospb.start();
     }

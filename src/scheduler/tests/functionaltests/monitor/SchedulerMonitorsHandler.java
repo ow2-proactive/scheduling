@@ -43,7 +43,7 @@ import java.util.Vector;
 import java.util.Map.Entry;
 
 import org.objectweb.proactive.core.ProActiveTimeoutException;
-import org.objectweb.proactive.core.util.TimeoutAccounter;
+import org.objectweb.proactive.utils.TimeoutAccounter;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SchedulerState;
 import org.ow2.proactive.scheduler.common.job.JobId;

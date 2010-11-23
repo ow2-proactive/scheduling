@@ -345,15 +345,19 @@ public class NativeExecutable extends Executable {
      */
     private Process createProcessAndStart() throws Exception {
         //build process
-        OSProcessBuilder ospb = ForkerUtils.getOSProcessBuilderFactory().getBuilder();
-        ospb.command(this.command);
-        ospb.directory(this.wDirFile);
-        Map<String, String> env = ospb.environment();
-        env.putAll(this.envVarsTab);
+        OSProcessBuilder ospb = null;
         //check if it must be run under user and if so, apply the proper method
         if (isRunAsUser()) {
-            ForkerUtils.checkConfigAndAddUserToProcess(ospb, this.decrypter);
+            ospb = ForkerUtils.getOSProcessBuilderFactory().getBuilder(
+                    ForkerUtils.checkConfigAndGetUser(this.decrypter));
+        } else {
+            ospb = ForkerUtils.getOSProcessBuilderFactory().getBuilder();
         }
+        ospb.command(this.command);
+        ospb.directory(this.wDirFile);
+        // SCHEDULING-905 : this call can throw a processbuilder.exception.NotImplementedException
+        Map<String, String> env = ospb.environment();
+        env.putAll(this.envVarsTab);
         //and start process
         return ospb.start();
     }

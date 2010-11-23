@@ -36,6 +36,28 @@
  */
 package org.ow2.proactive.scheduler.ext.scilab;
 
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.PrintStream;
+import java.io.Serializable;
+import java.lang.management.ManagementFactory;
+import java.net.URI;
+import java.net.URL;
+import java.security.SecureRandom;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.StringTokenizer;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
+
+import javax.management.Notification;
+import javax.management.NotificationListener;
+
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.body.exceptions.FutureMonitoringPingFailureException;
@@ -49,8 +71,8 @@ import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.core.runtime.StartPARuntime;
-import org.objectweb.proactive.core.util.OperatingSystem;
 import org.objectweb.proactive.extensions.pamr.PAMRConfig;
+import org.objectweb.proactive.utils.OperatingSystem;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import org.ow2.proactive.scheduler.ext.common.util.IOTools;
@@ -58,17 +80,6 @@ import org.ow2.proactive.scheduler.ext.common.util.IOTools.LoggingThread;
 import org.ow2.proactive.scheduler.ext.scilab.util.ScilabConfiguration;
 import org.ow2.proactive.scheduler.ext.scilab.util.ScilabFinder;
 import org.ow2.proactive.scheduler.ext.scilab.util.ScilabJVMInfo;
-
-import javax.management.Notification;
-import javax.management.NotificationListener;
-import java.io.*;
-import java.lang.management.ManagementFactory;
-import java.net.URI;
-import java.net.URL;
-import java.security.SecureRandom;
-import java.util.*;
-import java.util.concurrent.Semaphore;
-import java.util.concurrent.TimeUnit;
 
 
 /**
