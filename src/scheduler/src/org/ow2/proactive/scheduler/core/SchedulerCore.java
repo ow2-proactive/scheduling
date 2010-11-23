@@ -889,7 +889,8 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
                     //free every execution nodes
                     ((UserRMProxy) rmProxiesManager.getUserRMProxy(job)).releaseNodes(nodes, td
                             .getCleaningScript());
-                } catch (Exception e) {
+                } catch (Throwable e) {
+                    logger_dev.debug("", e);
                     //we did our best
                 }
 
@@ -1103,6 +1104,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
                         ((UserRMProxy) rmProxiesManager.getUserRMProxy(job)).releaseNodes(descriptor
                                 .getExecuterInformations().getNodes(), descriptor.getCleaningScript());
                     } catch (RMProxyCreationException rmpce) {
+                        logger_dev.debug("", rmpce);
                         //we did our best - should not be thrown here
                     }
                     hasBeenReleased = true;
@@ -1259,6 +1261,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
                     ((UserRMProxy) rmProxiesManager.getUserRMProxy(job)).releaseNodes(descriptor
                             .getExecuterInformations().getNodes(), descriptor.getCleaningScript());
                 } catch (RMProxyCreationException e) {
+                    logger_dev.debug("", e);
                     //we did our best > should not be thrown
                 }
             }
@@ -1733,7 +1736,8 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
                         try {
                             ((UserRMProxy) rmProxiesManager.getUserRMProxy(j)).releaseNodes(nodes, td
                                     .getCleaningScript());
-                        } catch (Exception e) {
+                        } catch (Throwable e) {
+                            logger_dev.debug("", e);
                             //we did our best - should not be thrown here
                         }
                     } catch (Exception e) {
