@@ -73,7 +73,7 @@ public class ScriptExecutor implements Callable<Node> {
      */
     public Node call() throws Exception {
 
-        LinkedList<ScriptResult<Boolean>> scriptExecitionResults = new LinkedList<ScriptResult<Boolean>>();
+        //LinkedList<ScriptResult<Boolean>> scriptExecitionResults = new LinkedList<ScriptResult<Boolean>>();
         boolean selectionScriptSpecified = selectionScriptList != null && selectionScriptList.size() > 0;
         boolean nodeMatch = true;
         ScriptException exception = null;
@@ -85,24 +85,21 @@ public class ScriptExecutor implements Callable<Node> {
                     // already executed static script
                     logger.info("Skipping script execution " + script.hashCode() + " on node " +
                         rmnode.getNodeURL());
-                    scriptExecitionResults.add(new ScriptResult<Boolean>(true));
+                    //scriptExecitionResults.add(new ScriptResult<Boolean>(true));
                     continue;
                 }
 
                 logger.info("Executing script " + script.hashCode() + " on node " + rmnode.getNodeURL());
                 ScriptResult<Boolean> scriptResult = rmnode.executeScript(script);
-                scriptExecitionResults.add(scriptResult);
-            }
 
-            // processing the results
-            Iterator<SelectionScript> selectionScriptIterator = selectionScriptList.iterator();
-            for (ScriptResult<Boolean> scriptResult : scriptExecitionResults) {
-                SelectionScript selectionScript = selectionScriptIterator.next();
+                // SCHEDULING-883 : scripts must be executed sequentially to avoid unexpected script side effect
+                //scriptExecitionResults.add(scriptResult);
 
+                // processing the results
                 if (!MOP.isReifiedObject(scriptResult) && scriptResult.getException() != null) {
                     // could not create script execution handler
                     // probably the node id down
-                    logger.warn("Cannot execute script " + selectionScript.hashCode() + " on the node " +
+                    logger.warn("Cannot execute script " + script.hashCode() + " on the node " +
                         rmnode.getNodeURL(), scriptResult.getException());
                     logger.warn("Checking if the node " + rmnode.getNodeURL() + " is still alive");
                     rmnode.getNodeSource().pingNode(rmnode.getNodeURL());
@@ -127,7 +124,7 @@ public class ScriptExecutor implements Callable<Node> {
 
                     // processing script result and updating knowledge base of
                     // selection manager at the same time. Returns whether node is selected.
-                    if (!manager.processScriptResult(selectionScript, scriptResult, rmnode)) {
+                    if (!manager.processScriptResult(script, scriptResult, rmnode)) {
                         nodeMatch = false;
                     }
 
