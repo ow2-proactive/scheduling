@@ -505,7 +505,7 @@ public class JobFactory_stax extends JobFactory {
         } catch (JobCreationException jce) {
             throw jce;
         } catch (Exception e) {
-            throw new JobCreationException(null, null, e);
+            throw new JobCreationException((String) null, null, e);
         }
     }
 
@@ -530,7 +530,7 @@ public class JobFactory_stax extends JobFactory {
             if (cursorVariables.isStartElement() && cursorVariables.getAttributeCount() == 1) {
                 attrtmp = cursorVariables.getAttributeLocalName(0);
             }
-            throw new JobCreationException(null, attrtmp, e);
+            throw new JobCreationException((String) null, attrtmp, e);
         }
     }
 
@@ -541,7 +541,7 @@ public class JobFactory_stax extends JobFactory {
      * @param cursorTask the streamReader with the cursor on the first 'ELEMENT_TASK' tag.
      */
     private void fillJobWithTasks(XMLStreamReader cursorTask) throws JobCreationException {
-        String current = null;
+        XMLTags current = null;
         try {
             int eventType = -1;
             while (cursorTask.hasNext()) {
@@ -555,14 +555,14 @@ public class JobFactory_stax extends JobFactory {
                     Task t;
                     switch (job.getType()) {
                         case TASKSFLOW:
-                            current = cursorTask.getLocalName();
+                            current = XMLTags.TASK;
                             //create new task
                             t = createTask(cursorTask);
                             //add task to the job
                             ((TaskFlowJob) job).addTask(t);
                             break;
                         case PARAMETER_SWEEPING:
-                            current = cursorTask.getLocalName();
+                            current = XMLTags.TASK;
                             throw new RuntimeException("Job Parameter Sweeping is not yet implemented !");
                     }
                 }
@@ -596,6 +596,7 @@ public class JobFactory_stax extends JobFactory {
      */
     private Task createTask(XMLStreamReader cursorTask, Task taskToFill) throws JobCreationException {
         int i = 0;
+        XMLTags currentTag = null;
         String current = null;
         String taskName = null;
         try {
@@ -639,6 +640,7 @@ public class JobFactory_stax extends JobFactory {
                 switch (eventType) {
                     case XMLEvent.START_ELEMENT:
                         current = cursorTask.getLocalName();
+                        currentTag = null;
                         if (XMLTags.COMMON_GENERIC_INFORMATION.matches(current)) {
                             tmpTask.setGenericInformations(getGenericInformations(cursorTask));
                         } else if (XMLTags.COMMON_DESCRIPTION.matches(current)) {
@@ -658,6 +660,7 @@ public class JobFactory_stax extends JobFactory {
                         } else if (XMLTags.FLOW.matches(current)) {
                             tmpTask.setFlowScript(createControlFlowScript(cursorTask, tmpTask));
                         } else if (XMLTags.TASK_DEPENDENCES.matches(current)) {
+                            currentTag = XMLTags.TASK_DEPENDENCES;
                             createdependences(cursorTask, tmpTask);
                         } else if (XMLTags.JAVA_EXECUTABLE.matches(current)) {
                             toReturn = (taskToFill != null) ? taskToFill : new JavaTask();
@@ -698,14 +701,22 @@ public class JobFactory_stax extends JobFactory {
             return toReturn;
         } catch (JobCreationException jce) {
             jce.setTaskName(taskName);
-            jce.pushTag(current);
+            if (currentTag != null) {
+                jce.pushTag(currentTag);
+            } else {
+                jce.pushTag(current);
+            }
             throw jce;
         } catch (Exception e) {
             String attrtmp = null;
             if (cursorTask.isStartElement() && cursorTask.getAttributeCount() > i) {
                 attrtmp = cursorTask.getAttributeLocalName(i);
             }
-            throw new JobCreationException(current, attrtmp, e);
+            if (currentTag != null) {
+                throw new JobCreationException(currentTag, attrtmp, e);
+            } else {
+                throw new JobCreationException(current, attrtmp, e);
+            }
         }
     }
 

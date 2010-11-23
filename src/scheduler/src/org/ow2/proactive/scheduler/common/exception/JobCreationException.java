@@ -100,14 +100,26 @@ public class JobCreationException extends SchedulerException {
      * Create a new instance of JobCreationException using the given tag, attribute and cause.
      * Tag and attribute can be null.
      *
-     * @param Tag the XML tag name where the exception is thrown
-     * @param Attribute the XML attribute name where the exception is thrown
+     * @param tag the XML tag name where the exception is thrown
+     * @param attribute the XML attribute name where the exception is thrown
      * @param cause the cause of this exception
      */
     public JobCreationException(String tag, String attribute, Exception cause) {
+        this(XMLTags.getFromXMLName(tag), attribute, cause);
+    }
+
+    /**
+     * Create a new instance of JobCreationException using the given tag, attribute and cause.
+     * Tag and attribute can be null.
+     *
+     * @param tag the XML tag where the exception is thrown
+     * @param attribute the XML attribute name where the exception is thrown
+     * @param cause the cause of this exception
+     */
+    public JobCreationException(XMLTags tag, String attribute, Exception cause) {
         super(cause.getMessage(), cause);
         if (tag != null) {
-            this.tags.push(XMLTags.getFromXMLName(tag));
+            this.tags.push(tag);
         }
         if (attribute != null) {
             this.attribute = XMLAttributes.getFromXMLName(attribute);
@@ -126,10 +138,19 @@ public class JobCreationException extends SchedulerException {
     /**
      * Push a new tag on the stack of tag for this exception
      *
-     * @param currentTag the tag to stack.
+     * @param currentTag the tag name to stack.
      */
     public void pushTag(String currentTag) {
-        this.tags.push(XMLTags.getFromXMLName(currentTag));
+        this.pushTag(XMLTags.getFromXMLName(currentTag));
+    }
+
+    /**
+     * Push a new tag on the stack of tag for this exception
+     *
+     * @param currentTag the tag to stack.
+     */
+    public void pushTag(XMLTags currentTag) {
+        this.tags.push(currentTag);
     }
 
     /**
