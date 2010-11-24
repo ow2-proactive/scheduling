@@ -308,49 +308,54 @@ public class RMNodeStarter {
 
         try {
 
-            // The path to the file that contains the credential
-            if (cl.hasOption(OPTION_CREDENTIAL_FILE)) {
-                try {
-                    credentials = Credentials.getCredentials(cl.getOptionValue(OPTION_CREDENTIAL_FILE));
-                } catch (KeyException ke) {
-                    System.err.println(ExitStatus.CRED_UNREADABLE.description);
-                    System.exit(ExitStatus.CRED_UNREADABLE.exitCode);
-                }
-                // The name of the env variable that contains
-            } else if (cl.hasOption(OPTION_CREDENTIAL_ENV)) {
-                final String variableName = cl.getOptionValue(OPTION_CREDENTIAL_ENV);
-                final String value = System.getenv(variableName);
-                if (value == null) {
-                    System.err.println(ExitStatus.CRED_ENVIRONMENT.description);
-                    System.exit(ExitStatus.CRED_ENVIRONMENT.exitCode);
-                }
-                try {
-                    credentials = Credentials.getCredentialsBase64(value.getBytes());
-                } catch (KeyException ke) {
-                    ke.printStackTrace();
-                    System.exit(ExitStatus.CRED_DECODE.exitCode);
-                }
-                // Read the credentials directly from the command-line argument
-            } else if (cl.hasOption(OPTION_CREDENTIAL_VAL)) {
-                final String str = cl.getOptionValue(OPTION_CREDENTIAL_VAL);
-                try {
-                    credentials = Credentials.getCredentialsBase64(str.getBytes());
-                } catch (KeyException ke) {
-                    ke.printStackTrace();
-                    System.exit(ExitStatus.CRED_DECODE.exitCode);
-                }
-            } else {
-                try {
-                    credentials = Credentials.getCredentials();
-                } catch (KeyException ke) {
-                    ke.printStackTrace();
-                    System.exit(ExitStatus.CRED_UNREADABLE.exitCode);
-                }
-            }
             // Optional rmURL option
             if (cl.hasOption(OPTION_RM_URL)) {
                 rmURL = cl.getOptionValue(OPTION_RM_URL);
             }
+
+            // if the user doesn't provide a rm URL, we don't care about the credentials
+            if (rmURL != null) {
+                // The path to the file that contains the credential
+                if (cl.hasOption(OPTION_CREDENTIAL_FILE)) {
+                    try {
+                        credentials = Credentials.getCredentials(cl.getOptionValue(OPTION_CREDENTIAL_FILE));
+                    } catch (KeyException ke) {
+                        System.err.println(ExitStatus.CRED_UNREADABLE.description);
+                        System.exit(ExitStatus.CRED_UNREADABLE.exitCode);
+                    }
+                    // The name of the env variable that contains
+                } else if (cl.hasOption(OPTION_CREDENTIAL_ENV)) {
+                    final String variableName = cl.getOptionValue(OPTION_CREDENTIAL_ENV);
+                    final String value = System.getenv(variableName);
+                    if (value == null) {
+                        System.err.println(ExitStatus.CRED_ENVIRONMENT.description);
+                        System.exit(ExitStatus.CRED_ENVIRONMENT.exitCode);
+                    }
+                    try {
+                        credentials = Credentials.getCredentialsBase64(value.getBytes());
+                    } catch (KeyException ke) {
+                        ke.printStackTrace();
+                        System.exit(ExitStatus.CRED_DECODE.exitCode);
+                    }
+                    // Read the credentials directly from the command-line argument
+                } else if (cl.hasOption(OPTION_CREDENTIAL_VAL)) {
+                    final String str = cl.getOptionValue(OPTION_CREDENTIAL_VAL);
+                    try {
+                        credentials = Credentials.getCredentialsBase64(str.getBytes());
+                    } catch (KeyException ke) {
+                        ke.printStackTrace();
+                        System.exit(ExitStatus.CRED_DECODE.exitCode);
+                    }
+                } else {
+                    try {
+                        credentials = Credentials.getCredentials();
+                    } catch (KeyException ke) {
+                        ke.printStackTrace();
+                        System.exit(ExitStatus.CRED_UNREADABLE.exitCode);
+                    }
+                }
+            }
+
             // Optional node name
             if (cl.hasOption(OPTION_NODE_NAME)) {
                 nodeName = cl.getOptionValue(OPTION_NODE_NAME);
@@ -515,7 +520,11 @@ public class RMNodeStarter {
         while ((!isNodeAdded) && (attempts < NB_OF_ADD_NODE_ATTEMPTS)) {
             attempts++;
             try {
-                isNodeAdded = rm.addNode(this.nodeURL, this.nodeSourceName).getBooleanValue();
+                if (this.nodeSourceName != null) {
+                    isNodeAdded = rm.addNode(this.nodeURL, this.nodeSourceName).getBooleanValue();
+                } else {
+                    isNodeAdded = rm.addNode(this.nodeURL).getBooleanValue();
+                }
             } catch (AddingNodesException addException) {
                 addException.printStackTrace();
                 System.exit(ExitStatus.RMNODE_ADD_ERROR.exitCode);
