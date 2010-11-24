@@ -5,10 +5,10 @@ echo --- StartNode -------------------------------------------
 if [ $# -lt 1 ]; then
     echo "
        Start a new Node
-         rm-start-node <the url of the node to create>
+         rm-start-node <the name of the node to create>
 
-         ex : rm-start-node  rmi://$HOSTNAME/node1
-         ex : rm-start-node jini://$HOSTNAME/node2
+         ex : rm-start-node node1
+         ex : rm-start-node node2
 
     "
     exit 1
