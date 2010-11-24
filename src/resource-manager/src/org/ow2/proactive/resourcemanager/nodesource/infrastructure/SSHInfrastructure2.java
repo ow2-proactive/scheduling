@@ -122,6 +122,8 @@ public class SSHInfrastructure2 extends InfrastructureManager {
      */
     @Configurable(description = "in ms. After this timeout expired\nthe node is considered to be lost")
     protected int nodeTimeOut = 60 * 1000;
+    @Configurable(description = "The number of failed attempt to deploy\na node before discarding it")
+    protected int attempt = 5;
     /**
      * The type of the OS on the remote machine, 'Linux', 'Windows' or 'Cygwin'
      */
@@ -159,6 +161,8 @@ public class SSHInfrastructure2 extends InfrastructureManager {
      * of this list will contain twice host AA.
      */
     private List<InetAddress> freeHosts = Collections.synchronizedList(new ArrayList<InetAddress>());
+    /** Maintains tresholds per hosts to be able to know if the deployment fails and to retry a given number of time */
+    private Hashtable<InetAddress, Integer> hostsThresholds = new Hashtable<InetAddress, Integer>();
 
     /**
      * The set of nodes for which one the registerAcquiredNode has been run.
@@ -205,8 +209,22 @@ public class SSHInfrastructure2 extends InfrastructureManager {
                     logger.debug("Node acquisition ended. #freeHosts:" + freeHosts.size() + " #registered: " +
                         registeredNodes.size() + " #expected: " + expectedNodes.size() +
                         " (#expected not accurate)");
+                    //node acquisition went well for host so we update the threshold
+                    synchronized (freeHosts) {
+                        hostsThresholds.put(host, attempt);
+                    }
                 } catch (Exception e) {
-                    freeHosts.add(host);
+                    synchronized (freeHosts) {
+                        Integer tries = hostsThresholds.get(host);
+                        tries--;
+                        if (tries > 0) {
+                            hostsThresholds.put(host, tries);
+                            freeHosts.add(host);
+                        } else {
+                            logger.debug("Tries threshold reached for host " + host +
+                                ". This host is not part of the deployment process anymore.");
+                        }
+                    }
                     String description = "Could not acquire SSH Node on host " + host.toString() +
                         ". NS's state refreshed regarding last checked excpetion: #freeHosts:" +
                         freeHosts.size() + " #registered: " + registeredNodes.size() + " #expected: " +
@@ -457,7 +475,7 @@ public class SSHInfrastructure2 extends InfrastructureManager {
             }
 
             try {
-                Thread.sleep(3000);
+                Thread.sleep(1000);
             } catch (Exception e) {
                 circuitBreakerThreshold--;
                 logger.trace("An exception occurred while monitoring ssh subprocess", e);
@@ -477,16 +495,17 @@ public class SSHInfrastructure2 extends InfrastructureManager {
      *			  parameters[1]   : java path on the remote machines
      *			  parameters[2]   : Scheduling path on remote machines
      *			  parameters[3]   : acq timeout
-     *			  parameters[4]   : target OS' type (Linux, Windows or Cygwin)
-     *            parameters[5]   : extra java options
-     *            parameters[6]   : rm url
-     *            parameters[7]   : rm cred
-     *            parameters[8]   : host list file
+     *			  parameters[4]	  : number of attempt to deploy a node
+     *			  parameters[5]   : target OS' type (Linux, Windows or Cygwin)
+     *            parameters[6]   : extra java options
+     *            parameters[7]   : rm url
+     *            parameters[8]   : rm cred
+     *            parameters[9]   : host list file
      * @throws IllegalArgumentException configuration failed
      */
     @Override
     public BooleanWrapper configure(Object... parameters) {
-        if (parameters != null && parameters.length >= 9) {
+        if (parameters != null && parameters.length >= 10) {
             this.sshOptions = parameters[0].toString();
             this.javaPath = parameters[1].toString();
             if (this.javaPath == null || this.javaPath.equals("")) {
@@ -501,9 +520,16 @@ public class SSHInfrastructure2 extends InfrastructureManager {
                 this.nodeTimeOut = 60 * 1000;
             }
 
+            try {
+                this.attempt = Integer.parseInt(parameters[4].toString());
+            } catch (NumberFormatException e) {
+                logger
+                        .warn("Number format exception occurred at ns configuration, default attemp value set: 5");
+                this.attempt = 5;
+            }
             //target OS
-            if (parameters[4] != null) {
-                this.targetOSObj = OperatingSystem.getOperatingSystem(parameters[4].toString());
+            if (parameters[5] != null) {
+                this.targetOSObj = OperatingSystem.getOperatingSystem(parameters[5].toString());
                 if (this.targetOSObj == null) {
                     throw new IllegalArgumentException(
                         "Only 'Linux', 'Windows' and 'Cygwin' are valid values for Target OS Property.");
@@ -512,28 +538,28 @@ public class SSHInfrastructure2 extends InfrastructureManager {
                 throw new IllegalArgumentException("Target OS parameter cannot be null");
             }
 
-            this.javaOptions = parameters[5].toString();
-            this.rmUrl = parameters[6].toString();
+            this.javaOptions = parameters[6].toString();
+            this.rmUrl = parameters[7].toString();
             if (this.rmUrl.equals("")) {
                 throw new IllegalArgumentException("rmUrl must be specified");
             }
 
             //credentials
-            if (parameters[7] == null) {
+            if (parameters[8] == null) {
                 throw new IllegalArgumentException("Credentials must be specified");
             }
             try {
-                this.credentials = Credentials.getCredentialsBase64((byte[]) parameters[7]);
+                this.credentials = Credentials.getCredentialsBase64((byte[]) parameters[8]);
             } catch (KeyException e) {
                 throw new IllegalArgumentException("Could not retrieve base64 credentials", e);
             }
 
             //host list
-            if (parameters[8] == null) {
+            if (parameters[9] == null) {
                 throw new IllegalArgumentException("Host file must be specified");
             }
             try {
-                byte[] hosts = (byte[]) parameters[8];
+                byte[] hosts = (byte[]) parameters[9];
                 File f = File.createTempFile("hosts", "list");
                 FileToBytesConverter.convertByteArrayToFile(hosts, f);
                 readHosts(f);
@@ -590,6 +616,7 @@ public class SSHInfrastructure2 extends InfrastructureManager {
                         this.freeHosts.add(addr);
                     }
                 }
+                hostsThresholds.put(addr, attempt);
             } catch (UnknownHostException ex) {
                 throw new RuntimeException("Unknown host: " + host, ex);
             }
