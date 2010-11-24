@@ -46,6 +46,7 @@ import javax.management.remote.JMXConnectorFactory;
 import javax.management.remote.JMXServiceURL;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.objectweb.proactive.core.node.Node;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
@@ -74,6 +75,7 @@ import functionaltests.RMTHelper;
  *  
  * @author The ProActive Team 
  */
+@Ignore
 public final class AddGetTest extends FunctionalTest {
 
     /** GET->RELEASE duration time in ms */
