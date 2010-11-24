@@ -36,6 +36,8 @@
  */
 package org.ow2.proactive.resourcemanager.core;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.security.Permission;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -91,6 +93,7 @@ import org.ow2.proactive.resourcemanager.frontend.topology.Topology;
 import org.ow2.proactive.resourcemanager.frontend.topology.TopologyException;
 import org.ow2.proactive.resourcemanager.frontend.topology.descriptor.TopologyDescriptor;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
+import org.ow2.proactive.resourcemanager.nodesource.RMNodeConfigurator;
 import org.ow2.proactive.resourcemanager.nodesource.common.PluginDescriptor;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.DefaultInfrastructureManager;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.InfrastructureManager;
@@ -99,6 +102,7 @@ import org.ow2.proactive.resourcemanager.nodesource.policy.NodeSourcePolicy;
 import org.ow2.proactive.resourcemanager.nodesource.policy.NodeSourcePolicyFactory;
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.ow2.proactive.resourcemanager.rmnode.RMNode;
+import org.ow2.proactive.resourcemanager.rmnode.RMDeployingNode;
 import org.ow2.proactive.resourcemanager.selection.SelectionManager;
 import org.ow2.proactive.resourcemanager.selection.statistics.ProbablisticSelectionManager;
 import org.ow2.proactive.resourcemanager.selection.topology.TopologyManager;
@@ -201,6 +205,9 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
     private RMJMXHelper jmxHelper;
 
+    /** utility ao used to configure nodes (compute topology, configure dataspaces...) */
+    private RMNodeConfigurator nodeConfigurator;
+
     /**
      * ProActive Empty constructor
      */
@@ -302,6 +309,9 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
             topologyManager = new TopologyManager();
 
+            nodeConfigurator = (RMNodeConfigurator) PAActiveObject.newActive(RMNodeConfigurator.class
+                    .getName(), new Object[] { PAActiveObject.getStubOnThis() }, nodeRM);
+
             // adding shutdown hook
             final RMCore rmcoreStub = (RMCore) PAActiveObject.getStubOnThis();
             Runtime.getRuntime().addShutdownHook(new Thread() {
@@ -329,6 +339,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             this.monitoring.rmEvent(new RMEvent(RMEventType.STARTED));
 
             // registering internal clients of the core
+            clients.put(Client.getId(nodeConfigurator), new Client(null, false));
             clients.put(Client.getId(authentication), new Client(null, false));
             clients.put(Client.getId(monitoring), new Client(null, false));
             clients.put(Client.getId(selectionManager), new Client(null, false));
@@ -492,36 +503,84 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     }
 
     /**
-     * Internal operation of registering a new node in the Core ; adding the
-     * node to the all nodes list Creating the RMNode object related to the
-     * node, and put the node in free state.
+     * Internal operation of registering a new node in the Core
+     * This step is done after node configuration ran by {@link RMNodeConfigurator} active object.
      * 
-     * @param rmnode
-     *            node object to add
+     * @param nodeURL the node's url of the node that is going to be added
      */
-    public BooleanWrapper internalAddNodeToCore(RMNode rmnode) {
+    public void internalAddNodeToCore(String nodeURL) {
+        if (!this.allNodes.containsKey(nodeURL)) {
+            throw new IllegalArgumentException("Cannot retrieve the RMNode to add");
+        }
+        //was added during internalRegisterConfiguringNode
+        RMNode rmnode = this.allNodes.get(nodeURL);
+
         if (toShutDown) {
             logger.warn("Node " + rmnode.getNodeURL() +
                 " will not be added to the core as the resource manager is shutting down");
-            rmnode.getNodeSource().removeNode(rmnode.getNodeURL(), rmnode.getProvider());
-            return new BooleanWrapper(false);
+            removeNodeFromCoreAndSource(rmnode, rmnode.getProvider());
+            return;
         }
 
-        this.freeNodes.add(rmnode);
+        //during the configuration process, the rmnode can be removed. Its state would be toRemove
+        if (rmnode.isToRemove()) {
+            removeNodeFromCoreAndSource(rmnode, rmnode.getProvider());
+            return;
+        }
+
+        internalSetFree(rmnode);
+    }
+
+    /**
+     * Internal operation of configuring a node. The node is not useable by a final user
+     * ( not eligible thanks to getNode methods ) if it is in configuration state.
+     * This method is called by {@link RMNodeConfigurator} to notify the core that the
+     * process of configuring the rmnode has started. The end of the process will be
+     * notified thanks to the method internalAddNodeToCore(RMNode)
+     * @param rmnode the node in the configuration state
+     */
+    public void internalRegisterConfiguringNode(RMNode rmnode) {
+        if (toShutDown) {
+            logger.warn("The RM core is shutting down, cannot configure the node");
+            rmnode.getNodeSource().removeNode(rmnode.getNodeURL(), rmnode.getProvider());
+            return;
+        }
+
+        rmnode.setConfiguring(rmnode.getProvider());
+        //we add the configuring node to the collection to be able to ping it
         this.allNodes.put(rmnode.getNodeURL(), rmnode);
 
         // create the event
         this.registerAndEmitNodeEvent(new RMNodeEvent(rmnode, RMEventType.NODE_ADDED, null, rmnode
                 .getProvider().getName()));
-        if (logger.isInfoEnabled()) {
-            logger.info("New node " + rmnode.getNodeURL() + " added to the node source " +
-                rmnode.getNodeSourceName() + " by " + rmnode.getProvider());
+        if (logger.isDebugEnabled()) {
+            logger.debug("Configuring node " + rmnode.getNodeURL());
         }
-        return new BooleanWrapper(true);
+
+        //now configuring the newly looked up node
+        nodeConfigurator.configureNode(rmnode);
     }
 
     public String getId() {
         return this.id;
+    }
+
+    /**
+     * Returns the url of the node where the rm core is running
+     * @return the url of the node where the rm core is running
+     */
+    private String getUrl() {
+        try {
+            String tmp = PAActiveObject.getActiveObjectNodeUrl(PAActiveObject.getStubOnThis());
+            if (tmp != null) {
+                return tmp.replaceAll(PAResourceManagerProperties.RM_NODE_NAME.getValueAsString(), "");
+            } else {
+                return "No default RM URL";
+            }
+        } catch (Throwable e) {
+            logger.error("Unable to get RM URL", e);
+            return "No default RM URL";
+        }
     }
 
     // ----------------------------------------------------------------------
@@ -572,12 +631,19 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     }
 
     /**
-     * Removes a node from the RM.
+     * Removes a node from the RM. This method also handles pending node removal ( pending node's url
+     * follow the scheme pending:// ). In such a case, the preempt parameter is not used.
      *
      * @param nodeUrl URL of the node to remove.
-     * @param preempt if true remove the node immediately without waiting while it will be freed.
+     * @param preempt if true remove the node immediately without waiting while it will be freed. ( ignored if pending node )
      */
     public BooleanWrapper removeNode(String nodeUrl, boolean preempt) {
+
+        //waiting for better integration of pending node
+        //if we get a "pending node url" we change the flow
+        if (isPendingNodeURL(nodeUrl)) {
+            return new BooleanWrapper(removePendingNode(nodeUrl));
+        }
 
         if (this.allNodes.containsKey(nodeUrl)) {
             RMNode rmnode = this.allNodes.get(nodeUrl);
@@ -602,7 +668,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
             if (rmnode.isDown() || preempt || rmnode.isFree()) {
                 removeNodeFromCoreAndSource(rmnode, caller);
-            } else if (rmnode.isBusy()) {
+            } else if (rmnode.isBusy() || rmnode.isConfiguring()) {
                 internalSetToRemove(rmnode, caller);
             }
         } else {
@@ -674,6 +740,9 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         for (Node node : nodeSources.get(nodeSourceName).getDownNodes()) {
             removeNode(node.getNodeInformation().getURL(), preemptive);
         }
+        for (RMDeployingNode pn : nodeSources.get(nodeSourceName).getPendingNodes()) {
+            removeNode(pn.getNodeURL(), preemptive);
+        }
     }
 
     /**
@@ -723,7 +792,8 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         NodeSource nodeSource;
         try {
             nodeSource = (NodeSource) PAActiveObject.newActive(NodeSource.class.getName(), new Object[] {
-                    nodeSourceName, caller, im, policy, PAActiveObject.getStubOnThis() }, nodeRM);
+                    this.getUrl(), nodeSourceName, caller, im, policy, PAActiveObject.getStubOnThis() },
+                    nodeRM);
         } catch (Exception e) {
             throw new RuntimeException("Cannot create node source " + nodeSourceName, e);
         }
@@ -926,6 +996,9 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         ArrayList<RMNodeSourceEvent> nodeSourcesList = new ArrayList<RMNodeSourceEvent>();
         for (NodeSource s : this.nodeSources.values()) {
             nodeSourcesList.add(new RMNodeSourceEvent(s));
+            for (RMDeployingNode pn : s.getPendingNodes()) {
+                nodesList.add(new RMNodeEvent(pn));
+            }
         }
 
         return new RMInitialState(nodesList, nodeSourcesList);
@@ -1203,7 +1276,9 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     private Collection<PluginDescriptor> getPluginsDescriptor(Collection<Class<?>> plugins) {
         Collection<PluginDescriptor> descriptors = new ArrayList<PluginDescriptor>();
         for (Class<?> cls : plugins) {
-            descriptors.add(new PluginDescriptor(cls));
+            Map<String, String> defaultValues = new HashMap<String, String>();
+            defaultValues.put(InfrastructureManager.RM_URL_FIELD_NAME, this.getUrl());
+            descriptors.add(new PluginDescriptor(cls, defaultValues));
         }
         return descriptors;
     }
@@ -1232,5 +1307,43 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             throw new TopologyException("Topology is disabled");
         }
         return topologyManager.getTopology();
+    }
+
+    /**
+     * Returns true if the given parameter is the representation of
+     * a pending node ( starts with pending://nsName/nodeName )
+     * @param url
+     * @return true if the parameter is a pending node's url, false otherwise
+     */
+    private boolean isPendingNodeURL(String url) {
+        if (url != null && url.startsWith(RMDeployingNode.PROTOCOL_ID + "://")) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * To handle the pending node removal
+     * @param url the url of the pending node to remove
+     * @return true if successful, false otherwise
+     */
+    private boolean removePendingNode(String url) {
+        String nsName = "";
+        try {
+            URI urlObj = new URI(url);
+            nsName = urlObj.getHost();
+        } catch (URISyntaxException e) {
+            logger.warn("No such pending node: " + url);
+            return false;
+        }
+        NodeSource ns = this.nodeSources.get(nsName);
+        if (ns == null) {
+            logger
+                    .warn("No such nodesource: " + nsName + ", cannot remove the pending node with url: " +
+                        url);
+            return false;
+        }
+        return ns.removePendingNode(url);
     }
 }

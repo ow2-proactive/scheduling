@@ -157,8 +157,9 @@ public class RMTHelper {
         RMFactory.setOsJavaProperty();
         byte[] GCMDeploymentData = FileToBytesConverter.convertFileToByteArray((new File(defaultDescriptor)));
         ResourceManager rm = getResourceManager();
-        rm.createNodeSource(NodeSource.GCM_LOCAL, GCMInfrastructure.class.getName(),
-                new Object[] { GCMDeploymentData }, StaticPolicy.class.getName(), null);
+        //first emtpy im parameter is default rm url
+        rm.createNodeSource(NodeSource.GCM_LOCAL, GCMInfrastructure.class.getName(), new Object[] { "",
+                GCMDeploymentData }, StaticPolicy.class.getName(), null);
     }
 
     /**

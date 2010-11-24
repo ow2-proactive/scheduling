@@ -38,6 +38,7 @@ package org.ow2.proactive.resourcemanager.common.event;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Lob;
 import javax.persistence.Table;
 
 import org.objectweb.proactive.annotation.PublicAPI;
@@ -119,6 +120,11 @@ public final class RMNodeEvent extends RMEvent {
     @Column(name = "addEventId")
     private long addEventId;
 
+    /** The description of the node */
+    @Column(name = "nodeInfo", length = Integer.MAX_VALUE)
+    @Lob
+    private String description;
+
     /**
      * ProActive empty constructor
      */
@@ -135,6 +141,7 @@ public final class RMNodeEvent extends RMEvent {
         this.nodeOwner = null;
         this.previousEventId = 0l;
         this.addEventId = 0l;
+        this.description = null;
     }
 
     /**
@@ -165,6 +172,7 @@ public final class RMNodeEvent extends RMEvent {
         this.hostName = rmNode.getHostName();
         this.VMName = rmNode.getDescriptorVMName();
         this.nodeState = rmNode.getState();
+        this.description = rmNode.toString();
 
         // when node is requested to be removed
         // there is no state change in the node itself
@@ -302,6 +310,14 @@ public final class RMNodeEvent extends RMEvent {
     @Override
     public String toString() {
         return this.getEventType() + "[" + this.nodeUrl + ":" + this.nodeState + "]";
+    }
+
+    /**
+     * Gets information about the associated node
+     * @return information about the associated node
+     */
+    public String getNodeInfo() {
+        return this.description;
     }
 
 }

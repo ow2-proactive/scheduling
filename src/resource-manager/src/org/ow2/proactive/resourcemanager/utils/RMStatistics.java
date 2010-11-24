@@ -57,6 +57,12 @@ public final class RMStatistics {
     private RMEventType rmStatus;
     /** The current available nodes count */
     private int availableNodesCount;
+    /** The count of nodes in {@link NodeState#DEPLOYING} state */
+    private int pendingNodesCount;
+    /** The count of nodes in {@link NodeState#CONFIGURING} state */
+    private int configuringNodesCount;
+    /** The count of nodes in {@link NodeState#LOST} state */
+    private int lostNodesCount;
     /** The count of nodes in {@link NodeState#FREE} state */
     private int freeNodesCount;
     /** The count of nodes in {@link NodeState#BUSY} state */
@@ -67,6 +73,12 @@ public final class RMStatistics {
     private int downNodesCount;
     /** The maximum free nodes count */
     private int maxFreeNodes;
+    /** The maximum free nodes count */
+    private int maxPendingNodes;
+    /** The maximum configuring nodes count */
+    private int maxConfiguringNodes;
+    /** The maximum lost nodes count */
+    private int maxLostNodes;
     /** The maximum busy nodes count */
     private int maxBusyNodes;
     /** The maximum to be released nodes count */
@@ -89,6 +101,9 @@ public final class RMStatistics {
 
         // Initialize all nodes related counts
         this.availableNodesCount = 0;
+        this.configuringNodesCount = 0;
+        this.pendingNodesCount = 0;
+        this.lostNodesCount = 0;
         this.freeNodesCount = 0;
         this.busyNodesCount = 0;
         this.toBeRemovedNodesCount = 0;
@@ -121,10 +136,16 @@ public final class RMStatistics {
     public RMStatistics updateFrom(final RMStatistics rmStatistics) {
         this.rmStatus = rmStatistics.rmStatus;
         this.availableNodesCount = rmStatistics.availableNodesCount;
+        this.configuringNodesCount = rmStatistics.configuringNodesCount;
+        this.lostNodesCount = rmStatistics.lostNodesCount;
+        this.pendingNodesCount = rmStatistics.pendingNodesCount;
         this.freeNodesCount = rmStatistics.freeNodesCount;
         this.busyNodesCount = rmStatistics.busyNodesCount;
         this.toBeRemovedNodesCount = rmStatistics.toBeRemovedNodesCount;
         this.downNodesCount = rmStatistics.downNodesCount;
+        this.maxConfiguringNodes = rmStatistics.maxConfiguringNodes;
+        this.maxPendingNodes = rmStatistics.maxPendingNodes;
+        this.maxLostNodes = rmStatistics.maxLostNodes;
         this.maxFreeNodes = rmStatistics.maxFreeNodes;
         this.maxBusyNodes = rmStatistics.maxBusyNodes;
         this.maxToBeRemovedNodes = rmStatistics.toBeRemovedNodesCount;
@@ -153,8 +174,33 @@ public final class RMStatistics {
             case NODE_ADDED:
                 // Increment the available nodes count
                 this.availableNodesCount++;
-                // When a node is added, it is free so increment the free nodes count
-                this.incrementFreeNodesCount();
+                // We define the state of the added node
+                final NodeState addNodeState = event.getNodeState();
+                switch (addNodeState) {
+                    case FREE:
+                        this.incrementFreeNodesCount();
+                        break;
+                    case CONFIGURING:
+                        this.incrementConfiguringNodesCount();
+                        break;
+                    case DEPLOYING:
+                        this.incrementPendingNodesCount();
+                        break;
+                    case LOST:
+                        this.incrementLostNodesCount();
+                        break;
+                    case BUSY:
+                        this.incrementBusyNodesCount();
+                        break;
+                    case DOWN:
+                        this.incrementDownNodesCount();
+                        break;
+                    case TO_BE_REMOVED:
+                        this.incrementToBeRemovedNodesCount();
+                        break;
+                    default:
+                        // Unknown NodeState
+                }
                 break;
             case NODE_REMOVED:
                 // Get the state of the node before it was removed
@@ -171,6 +217,15 @@ public final class RMStatistics {
                         break;
                     case DOWN:
                         this.decrementDownNodesCount();
+                        break;
+                    case CONFIGURING:
+                        this.decrementConfiguringNodesCount();
+                        break;
+                    case LOST:
+                        this.decrementLostNodesCount();
+                        break;
+                    case DEPLOYING:
+                        this.decrementPendingNodesCount();
                         break;
                     default:
                         // Unknown NodeState
@@ -194,6 +249,15 @@ public final class RMStatistics {
                         case DOWN:
                             this.decrementDownNodesCount();
                             break;
+                        case CONFIGURING:
+                            this.decrementConfiguringNodesCount();
+                            break;
+                        case LOST:
+                            this.decrementLostNodesCount();
+                            break;
+                        case DEPLOYING:
+                            this.decrementPendingNodesCount();
+                            break;
                         default:
                             // Unknown NodeState
                     }
@@ -212,6 +276,15 @@ public final class RMStatistics {
                         break;
                     case DOWN:
                         this.incrementDownNodesCount();
+                        break;
+                    case CONFIGURING:
+                        this.incrementConfiguringNodesCount();
+                        break;
+                    case LOST:
+                        this.incrementLostNodesCount();
+                        break;
+                    case DEPLOYING:
+                        this.incrementPendingNodesCount();
                         break;
                     default:
                         // Unknown NodeState
@@ -232,6 +305,27 @@ public final class RMStatistics {
     ////////////////////////////
     // INTERNAL METHODS
     ////////////////////////////
+
+    private void incrementConfiguringNodesCount() {
+        // Increment and update configuring nodes max value
+        if (++this.configuringNodesCount > this.maxConfiguringNodes) {
+            this.maxConfiguringNodes = this.configuringNodesCount;
+        }
+    }
+
+    private void incrementPendingNodesCount() {
+        // Increment and update pending nodes max value
+        if (++this.pendingNodesCount > this.maxPendingNodes) {
+            this.maxPendingNodes = this.pendingNodesCount;
+        }
+    }
+
+    private void incrementLostNodesCount() {
+        // Increment and update lost nodes max value
+        if (++this.lostNodesCount > this.maxLostNodes) {
+            this.maxLostNodes = this.lostNodesCount;
+        }
+    }
 
     private void incrementFreeNodesCount() {
         // Increment and update free nodes max value		
@@ -265,6 +359,27 @@ public final class RMStatistics {
         // Decrement available nodes count (keep always >= 0)
         if (this.availableNodesCount > 0) {
             this.availableNodesCount--;
+        }
+    }
+
+    private void decrementConfiguringNodesCount() {
+        // Decrement configuring nodes count (keep always >= 0)
+        if (this.configuringNodesCount > 0) {
+            this.configuringNodesCount--;
+        }
+    }
+
+    private void decrementPendingNodesCount() {
+        // Decrement pending nodes count (keep always >= 0)
+        if (this.pendingNodesCount > 0) {
+            this.pendingNodesCount--;
+        }
+    }
+
+    private void decrementLostNodesCount() {
+        // Decrement lost nodes count (keep always >= 0)
+        if (this.lostNodesCount > 0) {
+            this.lostNodesCount--;
         }
     }
 
@@ -316,6 +431,30 @@ public final class RMStatistics {
         return this.availableNodesCount;
     }
 
+    /**
+     * Returns the current number of nodes in {@link NodeState#CONFIGURING} state.
+     * @return the current number of nodes in {@link NodeState#CONFIGURING} state.
+     */
+    public int getConfiguringNodesCount() {
+        return this.configuringNodesCount;
+    }
+
+    /**
+     * Returns the current number of nodes in {@link NodeState#DEPLOYING} state.
+     * @return the current number of nodes in {@link NodeState#DEPLOYING} state.
+     */
+    public int getDeployingNodesCount() {
+        return this.pendingNodesCount;
+    }
+
+    /**
+     * Returns the current number of nodes in {@link NodeState#LOST} state.
+     * @return the current number of nodes in {@link NodeState#LOST} state.
+     */
+    public int getLostNodesCount() {
+        return this.lostNodesCount;
+    }
+
     /** 
      * Returns the current number of nodes in {@link NodeState#FREE} state.
      * @return the current number of free nodes
@@ -346,6 +485,30 @@ public final class RMStatistics {
      */
     public int getDownNodesCount() {
         return this.downNodesCount;
+    }
+
+    /**
+     * Returns the maximum number of configuring nodes.
+     * @return the maximum number of configuring nodes.
+     */
+    public int getMaxConfiguringNodes() {
+        return this.maxConfiguringNodes;
+    }
+
+    /**
+     * Returns the maximum number of pending nodes.
+     * @return the maximum number of pending nodes.
+     */
+    public int getMaxDeployingNodes() {
+        return this.maxPendingNodes;
+    }
+
+    /**
+     * Returns the maximum number of lost nodes.
+     * @return the maximum number of lost nodes.
+     */
+    public int getMaxLostNodes() {
+        return this.maxLostNodes;
     }
 
     /**

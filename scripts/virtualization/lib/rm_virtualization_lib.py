@@ -45,10 +45,8 @@ else :
         import urllib
         urlopen = urllib.urlopen
 
-#The name of the java program in charge of running RM Nodes and passing back the nodes' url
-NODE_STARTER = "org.ow2.proactive.resourcemanager.utils.VirtualInfrastructureNodeStarter"
 #Java program responsible for the creation of RM Nodes and their registration to the RM Core.
-NODE_STARTER_REGISTER = "org.ow2.proactive.resourcemanager.utils.VirtualInfrastructureNodeStarterRegister"
+NODE_STARTER_REGISTER = "org.ow2.proactive.resourcemanager.utils.VIRMNodeStarter"
 #A watch dog to end communication when passing nodes' url and the message's length
 EOF_MARKER = "EOF"
 PA_MESSAGE_LENGTH = 1000
@@ -95,31 +93,16 @@ class Abstract_Runtime :
             command.append( "-classpath" )
             command.append(classpath)
             command.append(NODE_STARTER_REGISTER)
+            command.append("-n")
+            command.append(holdingVM + "_node_" + repr(i))
+            command.append("-v")
             command.append(creds)
+            command.append("-r")
             command.append(rmUrl)
+            command.append("-s")
             command.append(nodesourceName)
+            command.append("-t")
             command.append(holdingVM)
-            command.append(repr(i))
-            print("command" + repr(i) + ": " + repr(command))
-            proc = Popen(args = command, stdout = PIPE, stderr = PIPE)
-            Abstract_Runtime.__registerRuntime(proc)
-            procs.append(proc)
-        return procs
-
-    def _buildCommandForStarter(self,holdingVM,propList,hostCapacity):
-        """build the command and start the node starter"""
-        classpath = Abstract_Runtime.__buildClassPath()
-        procs = []
-        for i in range(hostCapacity) :
-            command = [ "java" ]
-            for prop in propList:
-                command.append(prop)
-            command.append( "-classpath" )
-            command.append(classpath)
-            command.append(NODE_STARTER)
-            command.append(repr(Abstract_Runtime.__socketServer.getPort()))
-            command.append(holdingVM)
-            command.append(repr(i+1))
             print("command" + repr(i) + ": " + repr(command))
             proc = Popen(args = command, stdout = PIPE, stderr = PIPE)
             Abstract_Runtime.__registerRuntime(proc)
@@ -135,19 +118,7 @@ class Abstract_Runtime :
         nodeName: the node's name -> string
         propList: dynamic properties set by user -> list"""
         procs = []
-        if rmUrl is not None and rmUrl != "":
-            procs = self._buildCommandForStarterRegister(rmUrl,creds,nodesourceName,holdingVM,hostCapacity,propList)
-        else:
-            Abstract_Runtime.__socketServer = ProActiveSocketServer(hostCapacity)
-            procs = self._buildCommandForStarter(holdingVM,propList,hostCapacity)
-        offset = 0
-        if rmUrl is None or rmUrl == "":
-            for proc in procs:
-                urls = Abstract_Runtime.__socketServer.processChildComm()
-                for varI, url in enumerate(urls):
-                    self._writeNodeURL(url,offset + varI )
-                    offset = offset + len(urls)
-            Abstract_Runtime.__socketServer.clean()
+        procs = self._buildCommandForStarterRegister(rmUrl,creds,nodesourceName,holdingVM,hostCapacity,propList)
         print("Node acquisition ended, now waiting for child process to exit...")
         for child in procs:
             child.wait()

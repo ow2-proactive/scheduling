@@ -64,17 +64,20 @@ import org.ow2.proactive.authentication.principals.UserNamePrincipal;
 import org.ow2.proactive.permissions.PrincipalPermission;
 import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
+import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.core.RMCore;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.exception.AddingNodesException;
 import org.ow2.proactive.resourcemanager.exception.RMException;
+import org.ow2.proactive.resourcemanager.frontend.RMMonitoringImpl;
 import org.ow2.proactive.resourcemanager.nodesource.dataspace.DataSpaceNodeConfigurationAgent;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.InfrastructureManager;
 import org.ow2.proactive.resourcemanager.nodesource.policy.NodeSourcePolicy;
 import org.ow2.proactive.resourcemanager.nodesource.policy.NodeSourcePolicy.AccessType;
 import org.ow2.proactive.resourcemanager.rmnode.RMNode;
 import org.ow2.proactive.resourcemanager.rmnode.RMNodeImpl;
+import org.ow2.proactive.resourcemanager.rmnode.RMDeployingNode;
 import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 
 
@@ -110,6 +113,8 @@ public class NodeSource implements InitActive, RunActive {
     private final NodeSourcePolicy nodeSourcePolicy;
     private final String description;
     private final RMCore rmcore;
+    // The url used by spawn nodes to register themself
+    private final String registrationURL;
     private boolean toShutdown = false;
 
     // all nodes except down
@@ -121,6 +126,11 @@ public class NodeSource implements InitActive, RunActive {
     private static ExecutorService externalThreadPool;
     private NodeSource stub;
     private final Client administrator;
+
+    //shared field, needs to be volatile
+    //exposed as RMMonitoringImpl to be able to emit PendingNode related node events.
+    private volatile RMMonitoringImpl monitoring;
+    private final Object monitorinLock = new Object();
 
     // admin can remove node source, add nodes to the node source, remove any node
     // it is a PrincipalPermission of the user who created this node source
@@ -139,6 +149,7 @@ public class NodeSource implements InitActive, RunActive {
      * This constructor is used by Proactive as one of requirements for active objects.
      */
     public NodeSource() {
+        registrationURL = null;
         name = null;
         infrastructureManager = null;
         nodeSourcePolicy = null;
@@ -153,12 +164,14 @@ public class NodeSource implements InitActive, RunActive {
      * Creates a new instance of NodeSource.
      *
      * @param name node source name
+     * @param registrationURL the url used by the spawn nodes to register
      * @param im underlying infrastructure manager
      * @param policy nodes acquisition policy
      * @param rmcore resource manager core
      */
-    public NodeSource(String name, Client provider, InfrastructureManager im, NodeSourcePolicy policy,
-            RMCore rmcore) {
+    public NodeSource(String registrationURL, String name, Client provider, InfrastructureManager im,
+            NodeSourcePolicy policy, RMCore rmcore) {
+        this.registrationURL = registrationURL;
         this.name = name;
         this.administrator = provider;
         this.infrastructureManager = im;
@@ -233,7 +246,7 @@ public class NodeSource implements InitActive, RunActive {
         }
 
         logger.info("[" + name + "] new node available : " + node.getNodeInformation().getURL());
-        infrastructureManager.registerAcquiredNode(node);
+        infrastructureManager.internalRegisterAcquiredNode(node);
         nodes.put(nodeUrl, node);
     }
 
@@ -322,10 +335,22 @@ public class NodeSource implements InitActive, RunActive {
         } catch (RMException e) {
             throw new AddingNodesException(e);
         }
+        //we build the rmnode
+        RMNode rmnodeToAdd = buildRMNode(nodeToAdd, provider);
+        //we notify the configuration of the node to the rmcore
+        //it then will be seen as "configuring"
+        rmcore.internalRegisterConfiguringNode(rmnodeToAdd);
 
-        // blocking call involving running ping process on the node
-        RMCore.topologyManager.addNode(nodeToAdd);
+        return new BooleanWrapper(true);
+    }
 
+    /**
+     * Builds a RMNode from a raw Node
+     * @param node the node object
+     * @param provider the client of the request
+     * @return the expected RMNode
+     */
+    private RMNode buildRMNode(Node node, Client provider) {
         // creating a node access permission
         // it could be either PROVIDER/PROVIDER_GROUPS and in this case
         // the provider principals will be taken or
@@ -336,26 +361,11 @@ public class NodeSource implements InitActive, RunActive {
             permissionOwner = provider;
         }
         // now selecting the type (user or group) and construct the permission
-        PrincipalPermission nodeAccessPermission = new PrincipalPermission(nodeToAdd.getNodeInformation()
-                .getURL(), permissionOwner.getSubject().getPrincipals(getPrincipalType(nodeUserAccessType)));
+        PrincipalPermission nodeAccessPermission = new PrincipalPermission(
+            node.getNodeInformation().getURL(), permissionOwner.getSubject().getPrincipals(
+                    getPrincipalType(nodeUserAccessType)));
 
-        RMNode rmnode = new RMNodeImpl(nodeToAdd, stub, provider, nodeAccessPermission);
-        return rmcore.internalAddNodeToCore(rmnode);
-    }
-
-    /**
-     * Configure node for dataSpaces
-     *
-     * @param node the node to be configured
-     */
-    private void configureForDataSpace(Node node) {
-        try {
-            DataSpaceNodeConfigurationAgent conf = (DataSpaceNodeConfigurationAgent) PAActiveObject
-                    .newActive(DataSpaceNodeConfigurationAgent.class.getName(), null, node);
-            conf.configureNode();
-        } catch (Throwable t) {
-            logger.warn("Cannot configure dataSpaces", t);
-        }
+        return new RMNodeImpl(node, stub, provider, nodeAccessPermission);
     }
 
     /**
@@ -385,7 +395,6 @@ public class NodeSource implements InitActive, RunActive {
 
         public Node call() throws Exception {
             Node node = NodeFactory.getNode(nodeUrl);
-            configureForDataSpace(node);
             return node;
         }
     }
@@ -445,7 +454,7 @@ public class NodeSource implements InitActive, RunActive {
             try {
                 // TODO this method call breaks parallel node removal - fix it
                 closeDataSpaceConfiguration(node);
-                infrastructureManager.removeNode(node);
+                infrastructureManager.internalRemoveNode(node);
                 RMCore.topologyManager.removeNode(node);
             } catch (RMException e) {
                 logger.error(e.getCause().getMessage());
@@ -479,6 +488,29 @@ public class NodeSource implements InitActive, RunActive {
         if (nodes.size() == 0) {
             shutdownNodeSourceServices(initiator);
         }
+    }
+
+    /**
+     * To emit a pending node event
+     * @param event the pending node event to emit
+     */
+    @ImmediateService
+    public void internalEmitDeployingNodeEvent(final RMNodeEvent event) {
+        RMMonitoringImpl monitoringImpl = this.getRMMonitoringImpl();
+        if (monitoringImpl != null) {
+            monitoringImpl.nodeEvent(event);
+        } else {
+            logger.warn("No reference on RMMonitoringImpl, cannot send deploying node event");
+        }
+    }
+
+    /**
+     * Removes the pending node from the nodesource's infrastructure manager.
+     * @param pnUrl the pendingnode's url
+     * @return true in case of succes, false otherwise
+     */
+    public boolean removePendingNode(String pnUrl) {
+        return this.infrastructureManager.internalRemoveDeployingNode(pnUrl);
     }
 
     /**
@@ -584,6 +616,16 @@ public class NodeSource implements InitActive, RunActive {
     }
 
     /**
+     * Retrieves the list of pending nodes handled by the infrastructure manager
+     * @return the list of pending nodes handled by the infrastructure manager
+     */
+    public LinkedList<RMDeployingNode> getPendingNodes() {
+        LinkedList<RMDeployingNode> result = new LinkedList<RMDeployingNode>();
+        result.addAll(this.infrastructureManager.getDeployingNodes());
+        return result;
+    }
+
+    /**
      * Gets the nodes size excluding down nodes.
      * @return the node size
      */
@@ -609,7 +651,7 @@ public class NodeSource implements InitActive, RunActive {
         if (downNode != null) {
             try {
                 RMCore.topologyManager.removeNode(downNode);
-                infrastructureManager.removeNode(downNode);
+                infrastructureManager.internalRemoveNode(downNode);
             } catch (RMException e) {
             }
             downNodes.put(nodeUrl, downNode);
@@ -728,4 +770,35 @@ public class NodeSource implements InitActive, RunActive {
         }.getClass();
     }
 
+    /**
+     * Returns the registration url the node spawn by this nodesource
+     * must use.
+     * @return the registration url the node spawn by this nodesource
+     * must use.
+     */
+    @ImmediateService
+    public String getRegistrationURL() {
+        return this.registrationURL;
+    }
+
+    /**
+     * To be able to emit pending node events. Returns
+     * the rm core instance of the rm monitoring impl object
+     * @return the rm core instance of the rm monitoring impl object
+     */
+    protected RMMonitoringImpl getRMMonitoringImpl() {
+        if (monitoring == null) {
+            synchronized (monitorinLock) {
+                if (monitoring == null) {
+                    try {
+                        monitoring = (RMMonitoringImpl) PAFuture.getFutureValue(this.getRMCore()
+                                .getMonitoring());
+                    } catch (Exception e) {
+                        logger.trace("Cannot get a valid reference on RMMonitoringImpl object", e);
+                    }
+                }
+            }
+        }
+        return monitoring;
+    }
 }

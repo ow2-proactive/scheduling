@@ -51,6 +51,7 @@ import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.jmx.naming.JMXTransportProtocol;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
+import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.core.account.RMAccountsManager;
 import org.ow2.proactive.resourcemanager.core.jmx.RMJMXHelper;
 import org.ow2.proactive.resourcemanager.core.jmx.mbean.ManagementMBean;
@@ -132,6 +133,9 @@ public final class AddGetReleaseRemoveTest extends FunctionalTest {
         final String nodeURL = node.getNodeInformation().getURL();
         r.addNode(nodeURL).getBooleanValue();
 
+        // We eat the configuring to free event
+        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
+        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
         // 2) GET
         final long beforeGetTime = System.currentTimeMillis();
         node = r.getAtMostNodes(1, null).get(0);

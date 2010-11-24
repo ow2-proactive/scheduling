@@ -125,11 +125,6 @@ public abstract class BatchJobInfrastructure extends InfrastructureManager {
     @Configurable(description = "The batch system\nhead node name or IP adress")
     protected String serverName;
     /**
-     * URL of the resource manager the newly created nodes will attempt to contact
-     */
-    @Configurable(description = "URL of the Resource Manager")
-    protected String rmUrl;
-    /**
      * Path to the credentials file user for RM authentication
      */
     @Configurable(credential = true, description = "Absolute path of the credential file")
@@ -224,7 +219,7 @@ public abstract class BatchJobInfrastructure extends InfrastructureManager {
 
     /**
      * Builds the command line to execute on the PBS frontend and wait for every launched nodes
-     * to register. If the node doesn't register (ie. runs {@link #registerAcquiredNode(Node)} isn't called)
+     * to register. If the node doesn't register (ie. runs {@link #internalRegisterAcquiredNode(Node)} isn't called)
      * before the timeout (configurable) value, an exception is raised.
      * If the qSub command submitted to the PBS frontend fails, the node supposed to be launched is not expected anymore and
      * will be discarded at registration time.
@@ -381,8 +376,8 @@ public abstract class BatchJobInfrastructure extends InfrastructureManager {
     }
 
     @Override
-    public BooleanWrapper configure(Object... parameters) {
-        if (parameters != null && parameters.length >= 10) {
+    public void configure(Object... parameters) {
+        if (parameters != null && parameters.length >= 9) {
             int index = 0;
             this.javaPath = parameters[index++].toString();
             if (this.javaPath == null || this.javaPath.equals("")) {
@@ -402,7 +397,6 @@ public abstract class BatchJobInfrastructure extends InfrastructureManager {
                 this.nodeTimeOut = 1000 * 60 * 5;
             }
             this.serverName = parameters[index++].toString();
-            this.rmUrl = parameters[index++].toString();
             if (parameters[index] == null) {
                 throw new IllegalArgumentException("Credentials must be specified");
             }
@@ -418,7 +412,6 @@ public abstract class BatchJobInfrastructure extends InfrastructureManager {
             throw new IllegalArgumentException("Invalid parameters for IM creation");
         }
 
-        return new BooleanWrapper(true);
     }
 
     @Override

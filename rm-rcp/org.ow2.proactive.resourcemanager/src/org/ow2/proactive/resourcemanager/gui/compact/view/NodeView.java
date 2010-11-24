@@ -53,6 +53,10 @@ import org.ow2.proactive.resourcemanager.gui.views.ResourcesCompactView;
  */
 public class NodeView extends View {
 
+    protected NodeView(TreeLeafElement element) {
+        super(element);
+    }
+
     public NodeView(TreeLeafElement element, Filter filter) {
         super(element);
 

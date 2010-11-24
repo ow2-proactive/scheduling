@@ -73,7 +73,10 @@ public class TopologySelectionListener implements ISelectionChangedListener {
     private void getSubTreeNodesList(TreeLeafElement leaf, ArrayList<Node> selectList) {
         // Find the source of the selected item for the removing source and add node combo
         RMStore.getInstance().getModel().findSelectedSource(leaf);
-
+        //if the leaf is a pending node, returns
+        if (leaf.getType().equals(TreeElementType.PENDING_NODE)) {
+            return;
+        }
         if (leaf.getType().equals(TreeElementType.NODE)) {
             if (!selectList.contains(leaf.getName()))
                 selectList.add((Node) leaf);

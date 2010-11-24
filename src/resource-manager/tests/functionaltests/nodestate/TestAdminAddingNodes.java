@@ -105,6 +105,9 @@ public class TestAdminAddingNodes extends FunctionalTest {
         resourceManager.addNode(node1URL, NodeSource.DEFAULT);
 
         RMTHelper.waitForNodeEvent(RMEventType.NODE_ADDED, node1URL);
+        //wait for the node to be in free state
+        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+
         assertTrue(resourceManager.getState().getTotalNodesNumber() == 1);
         assertTrue(resourceManager.getState().getTotalAliveNodesNumber() == 1);
         assertTrue(resourceManager.getState().getFreeNodesNumber() == 1);
@@ -127,8 +130,10 @@ public class TestAdminAddingNodes extends FunctionalTest {
 
         resourceManager.addNode(node2URL, NodeSource.DEFAULT);
 
-        RMTHelper.waitForNodeEvent(RMEventType.NODE_ADDED, node2URL);
         //wait the node added event
+        RMTHelper.waitForNodeEvent(RMEventType.NODE_ADDED, node2URL);
+        //wait for the node to be in free state
+        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
         assertTrue(resourceManager.getState().getTotalNodesNumber() == 1);
         assertTrue(resourceManager.getState().getFreeNodesNumber() == 1);
         assertTrue(resourceManager.getState().getTotalAliveNodesNumber() == 1);
@@ -153,6 +158,8 @@ public class TestAdminAddingNodes extends FunctionalTest {
 
         //wait the node added event
         RMTHelper.waitForNodeEvent(RMEventType.NODE_ADDED, node2URL);
+        //wait for the node to be in free state
+        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
 
         Assert.assertEquals(resourceManager.getState().getTotalNodesNumber(), 1);
         Assert.assertEquals(resourceManager.getState().getFreeNodesNumber(), 1);
@@ -175,14 +182,17 @@ public class TestAdminAddingNodes extends FunctionalTest {
 
         //wait for removal of the previous free node with the same URL
         RMTHelper.waitForNodeEvent(RMEventType.NODE_REMOVED, node2URL);
+
         try {
             NodeFactory.getNode(node2URL);
         } catch (Exception e) {
             assertTrue("Runtime of the new node was killed", false);
         }
 
-        //wait the node added event, node added is free
+        //wait the node added event, node added is configuring
         RMTHelper.waitForNodeEvent(RMEventType.NODE_ADDED, node2URL);
+        //wait for the node to be in free state
+        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
         Assert.assertEquals(resourceManager.getState().getTotalNodesNumber(), 1);
         Assert.assertEquals(resourceManager.getState().getFreeNodesNumber(), 1);
 
@@ -214,8 +224,10 @@ public class TestAdminAddingNodes extends FunctionalTest {
             assertTrue("Runtime of the new node was killed", false);
         }
 
-        //wait the node added event, node added is free
+        //wait the node added event, node added is configuring
         RMTHelper.waitForNodeEvent(RMEventType.NODE_ADDED, node2URL);
+        //wait for the node to be in free state
+        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
         assertTrue(resourceManager.getState().getTotalNodesNumber() == 1);
         assertTrue(resourceManager.getState().getFreeNodesNumber() == 1);
 
@@ -257,8 +269,10 @@ public class TestAdminAddingNodes extends FunctionalTest {
             assertTrue("Runtime of the new node was killed", false);
         }
 
-        //wait the node added event, node added is free
+        //wait the node added event, node added is configuring
         RMTHelper.waitForNodeEvent(RMEventType.NODE_ADDED, node2URL);
+        //wait for the node to be in free state
+        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
         assertTrue(resourceManager.getState().getTotalNodesNumber() == 1);
         assertTrue(resourceManager.getState().getFreeNodesNumber() == 1);
 

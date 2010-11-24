@@ -44,6 +44,7 @@ import org.eclipse.ui.PlatformUI;
 import org.ow2.proactive.resourcemanager.Activator;
 import org.ow2.proactive.resourcemanager.gui.Internal;
 import org.ow2.proactive.resourcemanager.gui.data.model.Node;
+import org.ow2.proactive.resourcemanager.gui.data.model.DeployingNode;
 import org.ow2.proactive.resourcemanager.gui.data.model.TreeElementType;
 import org.ow2.proactive.resourcemanager.gui.data.model.TreeLeafElement;
 
@@ -57,6 +58,8 @@ public class TreeLabelProvider extends ColumnLabelProvider {
                 return Activator.getDefault().getImageRegistry().get(Internal.IMG_HOST);
             case NODE:
                 return Internal.getImageByNodeState(((Node) obj).getState());
+            case PENDING_NODE:
+                return Internal.getImageByNodeState(((DeployingNode) obj).getState());
             case SOURCE:
                 return Activator.getDefault().getImageRegistry().get(Internal.IMG_SOURCE);
             case VIRTUAL_MACHINE:
@@ -92,8 +95,11 @@ public class TreeLabelProvider extends ColumnLabelProvider {
 
     @Override
     public String getToolTipText(Object obj) {
-        if (((TreeLeafElement) obj).getType() == TreeElementType.NODE) {
+        TreeElementType type = ((TreeLeafElement) obj).getType();
+        if (type == TreeElementType.NODE || type == TreeElementType.PENDING_NODE) {
             switch (((Node) obj).getState()) {
+                case CONFIGURING:
+                    return "Node is configuring";
                 case DOWN:
                     return "Node is down or unreachable";
                 case FREE:
@@ -102,6 +108,10 @@ public class TreeLabelProvider extends ColumnLabelProvider {
                     return "Node is currently performing a task";
                 case TO_BE_REMOVED:
                     return "Node is busy and will be removed at task's end";
+                case DEPLOYING:
+                    return "Node deployment has been triggered";
+                case LOST:
+                    return "Node deployment has failed";
             }
         }
         return null;

@@ -129,7 +129,7 @@ public class GCMInfrastructure extends DefaultInfrastructureManager {
      * policy.
      */
     @Override
-    public BooleanWrapper configure(Object... parameters) {
+    public void configure(Object... parameters) {
         if (parameters == null) {
             // nothing to add
             throw new IllegalArgumentException("No parameters were specified");
@@ -145,7 +145,6 @@ public class GCMInfrastructure extends DefaultInfrastructureManager {
         }
         deploymentData.data = (byte[]) parameters[0];
 
-        return new BooleanWrapper(true);
     }
 
     /**

@@ -39,6 +39,7 @@ package org.ow2.proactive.resourcemanager.gui.compact.view;
 import org.ow2.proactive.resourcemanager.gui.compact.Filter;
 import org.ow2.proactive.resourcemanager.gui.data.model.Host;
 import org.ow2.proactive.resourcemanager.gui.data.model.Node;
+import org.ow2.proactive.resourcemanager.gui.data.model.DeployingNode;
 import org.ow2.proactive.resourcemanager.gui.data.model.Source;
 import org.ow2.proactive.resourcemanager.gui.data.model.TreeLeafElement;
 import org.ow2.proactive.resourcemanager.gui.data.model.VirtualMachine;
@@ -56,7 +57,9 @@ public class ViewFractory {
      */
     public static View createView(TreeLeafElement element, Filter filter) {
         View view = null;
-        if (element instanceof Node) {
+        if (element instanceof DeployingNode) {
+            view = new DeployingNodeView(element, filter);
+        } else if (element instanceof Node) {
             view = new NodeView(element, filter);
         } else if (element instanceof VirtualMachine) {
             view = new JVMView(element, filter);

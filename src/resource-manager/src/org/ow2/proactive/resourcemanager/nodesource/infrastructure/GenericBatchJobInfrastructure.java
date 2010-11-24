@@ -64,10 +64,10 @@ public class GenericBatchJobInfrastructure extends BatchJobInfrastructure {
     private BatchJobInfrastructure implementation;
 
     @Override
-    public BooleanWrapper configure(Object... parameters) {
-        BooleanWrapper resSuper = super.configure(parameters);
-        this.implementationClassname = parameters[10].toString();
-        byte[] implemtationClassfile = (byte[]) parameters[11];
+    public void configure(Object... parameters) {
+        super.configure(parameters);
+        this.implementationClassname = parameters[9].toString();
+        byte[] implemtationClassfile = (byte[]) parameters[10];
 
         // read the class file and create a BatchJobInfrastructure instance
         try {
@@ -128,7 +128,6 @@ public class GenericBatchJobInfrastructure extends BatchJobInfrastructure {
                 this.implementationClassname, e);
         }
 
-        return resSuper.getBooleanValue() ? new BooleanWrapper(true) : new BooleanWrapper(false);
     }
 
     @Override

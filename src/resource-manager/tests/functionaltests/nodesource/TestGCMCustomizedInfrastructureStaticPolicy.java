@@ -74,8 +74,9 @@ public class TestGCMCustomizedInfrastructureStaticPolicy extends TestGCMInfrastr
 
     @Override
     protected void createEmptyNodeSource(String sourceName) throws Exception {
+        // first empty parameter of im is default rm url
         RMTHelper.getResourceManager().createNodeSource(sourceName,
-                GCMCustomisedInfrastructure.class.getName(), new Object[] { emptyGCMD, hostsListData },
+                GCMCustomisedInfrastructure.class.getName(), new Object[] { "", emptyGCMD, hostsListData },
                 StaticPolicy.class.getName(), null);
 
         RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, sourceName);
@@ -85,13 +86,16 @@ public class TestGCMCustomizedInfrastructureStaticPolicy extends TestGCMInfrastr
     protected void createNodeSourceWithNodes(String sourceName) throws Exception {
 
         // creating node source
+        // first empty parameter of im is default rm url
         RMTHelper.getResourceManager().createNodeSource(sourceName,
                 GCMCustomisedInfrastructure.class.getName(),
-                new Object[] { GCMDeploymentData, hostsListData }, StaticPolicy.class.getName(), null);
+                new Object[] { "", GCMDeploymentData, hostsListData }, StaticPolicy.class.getName(), null);
 
         RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, sourceName);
         for (int i = 0; i < defaultDescriptorNodesNb; i++) {
             RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
+            //wait for the nodes to be in free state
+            RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
         }
     }
 }

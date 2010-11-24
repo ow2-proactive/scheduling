@@ -101,12 +101,6 @@ public class WinHPCInfrastructure extends DefaultInfrastructureManager {
     protected String rmPath = PAResourceManagerProperties.RM_HOME.getValueAsString();
 
     /**
-     * URL of the resource manager the newly created nodes will attempt to contact
-     */
-    @Configurable(description = "URL of the Resource Manager")
-    protected String RMUrl;
-
-    /**
      * Path to the credentials file user for RM authentication
      */
     @Configurable(credential = true, description = "Absolute path of the credential file")
@@ -254,7 +248,7 @@ public class WinHPCInfrastructure extends DefaultInfrastructureManager {
     }
 
     @Override
-    public BooleanWrapper configure(Object... parameters) {
+    public void configure(Object... parameters) {
 
         try {
             maxNodes = Integer.parseInt(parameters[0].toString());
@@ -282,16 +276,15 @@ public class WinHPCInfrastructure extends DefaultInfrastructureManager {
 
         javaPath = parameters[6].toString();
         rmPath = parameters[7].toString();
-        RMUrl = parameters[8].toString();
 
         try {
-            this.credentials = Credentials.getCredentialsBase64((byte[]) parameters[9]);
+            this.credentials = Credentials.getCredentialsBase64((byte[]) parameters[8]);
         } catch (KeyException e) {
             throw new IllegalArgumentException("Could not retrieve base64 credentials", e);
         }
 
-        javaOptions = parameters[10].toString();
-        extraClassPath = parameters[11].toString();
+        javaOptions = parameters[9].toString();
+        extraClassPath = parameters[10].toString();
 
         String classpath = rmPath + "/dist/lib/ProActive.jar;";
         classpath += rmPath + "/dist/lib/ProActive_ResourceManager.jar;";
@@ -313,7 +306,7 @@ public class WinHPCInfrastructure extends DefaultInfrastructureManager {
         command += " " + this.javaOptions + " ";
         command += " org.ow2.proactive.resourcemanager.utils.PAAgentServiceRMStarter ";
 
-        command += " -r " + RMUrl;
+        command += " -r " + this.rmUrl;
 
         try {
             command += " -v " + new String(this.credentials.getBase64()) + " ";
@@ -321,7 +314,6 @@ public class WinHPCInfrastructure extends DefaultInfrastructureManager {
             throw new IllegalArgumentException("Could not get base64 credentials", e1);
         }
 
-        return new BooleanWrapper(true);
     }
 
     protected String randomString() {

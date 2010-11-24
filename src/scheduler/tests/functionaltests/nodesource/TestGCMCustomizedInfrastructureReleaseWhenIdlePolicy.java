@@ -67,8 +67,9 @@ public class TestGCMCustomizedInfrastructureReleaseWhenIdlePolicy extends
 
         byte[] hosts = "localhost1 localhost2 localhost3 localhost4 localhost5".getBytes();
         // creating node source
+        // first parameter of im is empty rm url
         RMTHelper.getResourceManager().createNodeSource(sourceName,
-                GCMCustomisedInfrastructure.class.getName(), new Object[] { GCMDeploymentData, hosts },
+                GCMCustomisedInfrastructure.class.getName(), new Object[] { "", GCMDeploymentData, hosts },
                 ReleaseResourcesWhenSchedulerIdle.class.getName(), getPolicyParams());
 
         RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, sourceName);

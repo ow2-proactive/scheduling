@@ -86,8 +86,9 @@ public class TestGCMInfrastructureReleaseWhenIdlePolicy extends FunctionalTest {
 
     protected void createDefaultNodeSource(String sourceName) throws Exception {
         // creating node source
+        // first im parameter is default rm url
         RMTHelper.getResourceManager().createNodeSource(sourceName, GCMInfrastructure.class.getName(),
-                new Object[] { GCMDeploymentData }, ReleaseResourcesWhenSchedulerIdle.class.getName(),
+                new Object[] { "", GCMDeploymentData }, ReleaseResourcesWhenSchedulerIdle.class.getName(),
                 getPolicyParams());
 
         RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, sourceName);

@@ -43,7 +43,7 @@ import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.ow2.proactive.resourcemanager.gui.data.RMStore;
-import org.ow2.proactive.resourcemanager.gui.data.model.Node;
+import org.ow2.proactive.resourcemanager.gui.data.model.Selectable;
 import org.ow2.proactive.resourcemanager.gui.handlers.RemoveNodesHandler;
 
 
@@ -52,9 +52,9 @@ public class TableSelectionListener implements ISelectionChangedListener {
     public void selectionChanged(SelectionChangedEvent event) {
         final Object[] arr = ((IStructuredSelection) event.getSelectionProvider().getSelection()).toArray();
         if (arr.length != 0) {
-            final List<Node> list = new ArrayList<Node>(arr.length);
+            final List<Selectable> list = new ArrayList<Selectable>(arr.length);
             for (final Object o : arr) {
-                list.add((Node) o);
+                list.add((Selectable) o);
             }
             // normally RM is connected if I can select something...
             if (RMStore.isConnected()) {

@@ -167,8 +167,9 @@ public class RMStarter {
                     byte[] GCMDeploymentData = FileToBytesConverter.convertFileToByteArray(new File(
                         deploymentDescriptor));
 
+                    //first im parameter is default rm url
                     resourceManager.createNodeSource(nodeSourceName, GCMInfrastructure.class.getName(),
-                            new Object[] { GCMDeploymentData }, StaticPolicy.class.getName(), null);
+                            new Object[] { "", GCMDeploymentData }, StaticPolicy.class.getName(), null);
 
                     nodeSourceName = NodeSource.GCM_LOCAL + counter;
                     counter++;

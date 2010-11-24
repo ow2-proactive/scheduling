@@ -109,6 +109,8 @@ public class SelectionWithNodesExclusionTest extends FunctionalTest {
 
         for (int i = 0; i < RMTHelper.defaultNodesNumber; i++) {
             RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
+            //wait for the nodes to be in free state
+            RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
         }
 
         RMTHelper.log("Test 1");
@@ -245,6 +247,9 @@ public class SelectionWithNodesExclusionTest extends FunctionalTest {
         Thread.sleep(5000);
         RMTHelper.waitForNodeEvent(RMEventType.NODE_ADDED, node1URL);
         RMTHelper.waitForNodeEvent(RMEventType.NODE_ADDED, node2URL);
+        //wait for the nodes to be in free state
+        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
 
         //wait for nodes added events
         assertTrue(resourceManager.getState().getFreeNodesNumber() == RMTHelper.defaultNodesNumber + 2);

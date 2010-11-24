@@ -104,6 +104,8 @@ public class dynamicSelectionScriptTest extends FunctionalTest {
 
         for (int i = 0; i < RMTHelper.defaultNodesNumber; i++) {
             RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
+            //waiting for the nodes to be in free state
+            RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
         }
 
         ResourceManager resourceManager = RMTHelper.getResourceManager();
@@ -120,6 +122,8 @@ public class dynamicSelectionScriptTest extends FunctionalTest {
 
         //wait node adding event
         RMTHelper.waitForNodeEvent(RMEventType.NODE_ADDED, node1URL);
+        //wait for the node to be in free state
+        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
 
         //create the dynamic selection script object
         SelectionScript sScript = new SelectionScript(new File(vmPropSelectionScriptpath), new String[] {
@@ -175,6 +179,8 @@ public class dynamicSelectionScriptTest extends FunctionalTest {
 
         //wait node adding event
         RMTHelper.waitForNodeEvent(RMEventType.NODE_ADDED, node2URL);
+        //wait for the node to be in free state
+        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
 
         nodes = resourceManager.getAtMostNodes(3, sScript);
 

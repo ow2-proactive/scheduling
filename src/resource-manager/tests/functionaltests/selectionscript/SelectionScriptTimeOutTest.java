@@ -85,6 +85,8 @@ public class SelectionScriptTimeOutTest extends FunctionalTest {
 
         for (int i = 0; i < RMTHelper.defaultNodesNumber; i++) {
             RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
+            //wait for the nodes to be in free state
+            RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
         }
 
         int scriptSleepingTime = PAResourceManagerProperties.RM_SELECT_SCRIPT_TIMEOUT.getValueAsInt() * 2;
@@ -117,6 +119,8 @@ public class SelectionScriptTimeOutTest extends FunctionalTest {
         String nodeURL = RMTHelper.createNode(nodeName, vmProperties).getNodeInformation().getURL();
         resourceManager.addNode(nodeURL, NodeSource.GCM_LOCAL);
         RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
+        //wait for the nodes to be in free state
+        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
 
         // now we have RMTHelper.defaultNodesNumber + 1 nodes
         script = new SelectionScript(new File(selectionScriptWithtimeOutPath), new String[] {

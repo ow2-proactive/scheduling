@@ -72,11 +72,14 @@ public final class Internal {
     public static final String IMG_EXPANDALL = "expandall.gif";
     public static final String IMG_FREE = "free.gif";
     public static final String IMG_HOST = "host.gif";
+    public static final String IMG_DEPLOYING = "pending.gif";
+    public static final String IMG_LOST = "lost.gif";
     public static final String IMG_REMOVENODE = "remove_node.gif";
     public static final String IMG_REMOVESOURCE = "remove_source.gif";
     public static final String IMG_RMSHUTDOWN = "rm_shutdown.gif";
     public static final String IMG_SOURCE = "source.gif";
     public static final String IMG_TORELEASE = "to_release.gif";
+    public static final String IMG_CONFIGURING = "configuring.gif";
 
     /**
      * Given a node state returns the corresponding image taken from the registry of this plugin.
@@ -87,6 +90,8 @@ public final class Internal {
      */
     public static Image getImageByNodeState(final NodeState nodeState) {
         switch (nodeState) {
+            case CONFIGURING:
+                return Activator.getDefault().getImageRegistry().get(Internal.IMG_CONFIGURING);
             case DOWN:
                 return Activator.getDefault().getImageRegistry().get(Internal.IMG_DOWN);
             case FREE:
@@ -95,6 +100,10 @@ public final class Internal {
                 return Activator.getDefault().getImageRegistry().get(Internal.IMG_BUSY);
             case TO_BE_REMOVED:
                 return Activator.getDefault().getImageRegistry().get(Internal.IMG_TORELEASE);
+            case LOST:
+                return Activator.getDefault().getImageRegistry().get(Internal.IMG_LOST);
+            case DEPLOYING:
+                return Activator.getDefault().getImageRegistry().get(Internal.IMG_DEPLOYING);
             default:
                 return Activator.getDefault().getImageRegistry().get(ISharedImages.IMG_OBJS_ERROR_TSK);
         }

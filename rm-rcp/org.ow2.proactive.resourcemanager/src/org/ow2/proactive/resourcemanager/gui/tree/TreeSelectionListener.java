@@ -42,17 +42,18 @@ import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.ow2.proactive.resourcemanager.gui.data.RMStore;
-import org.ow2.proactive.resourcemanager.gui.data.model.Node;
+import org.ow2.proactive.resourcemanager.gui.data.model.Selectable;
 import org.ow2.proactive.resourcemanager.gui.data.model.TreeElementType;
 import org.ow2.proactive.resourcemanager.gui.data.model.TreeLeafElement;
 import org.ow2.proactive.resourcemanager.gui.data.model.TreeParentElement;
+import org.ow2.proactive.resourcemanager.gui.handlers.DescribeCommandHandler;
 import org.ow2.proactive.resourcemanager.gui.handlers.RemoveNodesHandler;
 
 
 public class TreeSelectionListener implements ISelectionChangedListener {
 
     public void selectionChanged(SelectionChangedEvent event) {
-        ArrayList<Node> selectionList = new ArrayList<Node>();
+        ArrayList<Selectable> selectionList = new ArrayList<Selectable>();
         if (event != null && event.getSelectionProvider() != null) {
             Object selection = event.getSelectionProvider().getSelection();
 
@@ -66,20 +67,24 @@ public class TreeSelectionListener implements ISelectionChangedListener {
         //normally RM is connected if I can select something...
         if (RMStore.isConnected()) {
             RemoveNodesHandler.getInstance().setSelectedNodes(selectionList);
+            DescribeCommandHandler.getInstance().setSelectedNodes(selectionList);
         }
 
     }
 
-    private void getSubTreeNodesList(TreeLeafElement leaf, ArrayList<Node> selectList) {
+    private void getSubTreeNodesList(TreeLeafElement leaf, ArrayList<Selectable> selectList) {
         // Find the source of the selected item for the removing source and add node combo
         RMStore.getInstance().getModel().findSelectedSource(leaf);
 
-        if (leaf.getType().equals(TreeElementType.NODE)) {
+        if (leaf.getType().equals(TreeElementType.NODE) ||
+            leaf.getType().equals(TreeElementType.PENDING_NODE)) {
             if (!selectList.contains(leaf.getName()))
-                selectList.add((Node) leaf);
-        } else if (((TreeParentElement) leaf).hasChildren()) {
-            for (TreeLeafElement element : ((TreeParentElement) leaf).getChildren()) {
-                getSubTreeNodesList(element, selectList);
+                selectList.add((Selectable) leaf);
+        } else if (leaf instanceof TreeParentElement) {
+            if (((TreeParentElement) leaf).hasChildren()) {
+                for (TreeLeafElement element : ((TreeParentElement) leaf).getChildren()) {
+                    getSubTreeNodesList(element, selectList);
+                }
             }
         }
     }

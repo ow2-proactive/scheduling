@@ -36,15 +36,14 @@
  */
 package org.ow2.proactive.resourcemanager.nodesource.infrastructure;
 
-import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
+import java.security.KeyException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -52,25 +51,26 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Random;
 import java.util.Set;
+import java.util.Map.Entry;
 import java.util.concurrent.locks.ReentrantLock;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeFactory;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
+import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
 import org.ow2.proactive.resourcemanager.nodesource.utils.NamesConvertor;
-import org.ow2.proactive.resourcemanager.utils.RMLoggers;
+import org.ow2.proactive.resourcemanager.utils.VIRMNodeStarter;
 import org.ow2.proactive.resourcemanager.utils.VirtualInfrastructureNodeStarter;
 import org.ow2.proactive.resourcemanager.utils.VirtualInfrastructureNodeStarterRegister;
+import org.ow2.proactive.virtualizing.core.VMGuestStatus;
 import org.ow2.proactive.virtualizing.core.VirtualMachine2;
 import org.ow2.proactive.virtualizing.core.VirtualMachineManager2;
 import org.ow2.proactive.virtualizing.core.error.VirtualServiceException;
@@ -86,8 +86,6 @@ import org.xml.sax.SAXException;
 /** This class provides a way to manager Virtualized Infrastructure. */
 public class VirtualInfrastructure extends InfrastructureManager {
 
-    private static Logger logger = ProActiveLogger.getLogger(RMLoggers.NODESOURCE);
-
     @Configurable(description = "Virtual Infrastructure Type:\nxenserver, virtualbox, vmware, hyperv-winrm or hyperv-wmi")
     protected String infrastructure;
     /** The hypervisor's url */
@@ -100,19 +98,14 @@ public class VirtualInfrastructure extends InfrastructureManager {
     @Configurable(password = true, description = "Hypervisor's user's password")
     protected String VMMPwd;
 
-    /** To maintains the number of Nodes registered within the Resource Manager per Virtual Machine.
+    /** To maintain the number of Nodes registered within the Resource Manager per Virtual Machine.
      * To be able to decide to power off/destroy the machine. */
-    private Map<String, Integer> numberOfRegisteredNode = new HashMap<String, Integer>();
-    /** To maintain the number of required nodes asked by the node source. */
-    private int numberOfPendingNodes = 0;
+    private Map<String, Integer> numberOfRegisteredNode = null;
     /** To be able to register the exact number of nodes the RM asked for.
      * Is used only in case of local Node registration. */
     private int numberOfRequiredNodes = 0;
-    /** To be able to queue acquireNodeRequest because a newlly started vm is
-     * supposed to acquire hostCapacity Nodes. */
-    private long lastStartedVMTimeStamp = Long.MIN_VALUE;
     /** To keep track of available Nodes per virtual machines */
-    private VMNodeCache availableNodes = new VMNodeCache();
+    private VMNodeCache availableNodes = null;
     /** When not using rm authentication for remote registration of newly
      * created nodes, shared variables are set to allow communication between
      * hypervisor provider and infrastructure manager. Virtual infrastructure
@@ -124,9 +117,9 @@ public class VirtualInfrastructure extends InfrastructureManager {
     @Configurable(description = "Template virtual machine's name")
     protected String VMTemplate;
     /** The list of started virtual machines */
-    protected ArrayList<String> runningVM = new ArrayList<String>();
+    protected ArrayList<String> runningVM = null;
     /** The list of clone virtual machines */
-    protected ArrayList<String> cloneVM = new ArrayList<String>();
+    protected ArrayList<String> cloneVM = null;
     /** The maximum number of runnable instance of the template virtual machine */
     @Configurable(description = "The maximum number of vm")
     protected int VMMax;
@@ -142,28 +135,35 @@ public class VirtualInfrastructure extends InfrastructureManager {
     /** A path to a ProActive configuration file */
     @Configurable(fileBrowser = true, description = "ProActive Configuration file path")
     protected File PAConfig;
-    /** The resource manager's url */
-    @Configurable(description = "Resource Manager's url")
-    protected String RMUrl;
     /** A path to a credentials file */
     @Configurable(credential = true, fileBrowser = true, description = "Absolute path of the rm.cred file")
     protected File RMCredentials;
-    protected String cred;
+    protected String credentials;
     /** The properties used for the {@link VirtualInfrastructure} configuration.
      * See {@link VirtualInfrastructure.Prop} */
     protected Properties properties;
     /** The configuration of the managed virtual machine PART ( from paConf ). */
-    protected Hashtable<String, String> confTable = new Hashtable<String, String>();
+    protected Hashtable<String, String> confTable = null;
 
-    private ReentrantLock availableNodesLock = new ReentrantLock();
-    private ReentrantLock deploymentLock = new ReentrantLock();
-    private ReentrantLock requiredNodesLock = new ReentrantLock();
-    private ReentrantLock registeredNodesLock = new ReentrantLock();
+    private ReentrantLock availableNodesLock = null;
+    private ReentrantLock deploymentLock = null;
+    private ReentrantLock requiredNodesLock = null;
+    private ReentrantLock registeredNodesLock = null;
 
     /** This constant is used as a circuit broker threshold */
     public static final int circuitBrokerThreshold = 5;
 
+    /** This thread update the deployed virtual machines' guest status */
+    private VMDeploymentMonitor vmGuestStatusMonitor = null;
+    /** The monitored guest OSes refresh frequency in ms */
+    public static final int GUEST_STATUS_UPDATE_FREQUENCY = 3000;
+
     public VirtualInfrastructure() {
+    }
+
+    @Override
+    public void setNodeSource(NodeSource nodeSource) {
+        super.setNodeSource(nodeSource);
     }
 
     /**
@@ -172,7 +172,7 @@ public class VirtualInfrastructure extends InfrastructureManager {
     @Override
     public void acquireAllNodes() {
         logger.debug("Acquiring all nodes.");
-        getAllAvailableNodes();
+        addAllCachedNodesToCore();
         try {
             deploymentLock.lock();
             while (count < VMMax) {
@@ -191,7 +191,7 @@ public class VirtualInfrastructure extends InfrastructureManager {
     @Override
     public void acquireNode() {
         logger.debug("Acquiring one node.");
-        if (getAnAvailableNode()) {
+        if (addACachedNodeToCore()) {
             return;
         } else {
             try {
@@ -202,53 +202,17 @@ public class VirtualInfrastructure extends InfrastructureManager {
         }
     }
 
-    /**
-     * Caches the node for future reuse or destroy it if forever == true
-     * @param node the node to remove
-     * @param forever destroy the node if equal true, cache it otherwise
-     * @throws RMException if a problem occurs.
-     */
-    private void removeNode(Node node, boolean forever) throws RMException {
-        String holdingVM = null;
-        try {
-            availableNodesLock.lock();
-            registeredNodesLock.lock();
-            try {
-                holdingVM = node.getProperty(Prop.HOLDING_VIRTUAL_MACHINE.getValue());
-                if (holdingVM == null) {
-                    throw new RMException("Trying to remove a node without holding virtual machine.");
-                }
-            } catch (ProActiveException e) {
-                throw new RMException("An error occured while removing a node.", e);
-            }
-            String nodeName = node.getNodeInformation().getName();
-            if (forever) {
-                logger.debug("Destroying node " + nodeName + " within vm " + holdingVM);
-                decNumberOfRegisteredNodes(holdingVM);
-                try {
-                    node.getProActiveRuntime().killNode(nodeName);
-                    node.getProActiveRuntime().killRT(true);
-                } catch (ProActiveException e) {
-                    throw new RMException("An error occured while removing a node.", e);
-                }
-            } else {
-                logger.debug("Node " + nodeName + " added in node cache for vm " + holdingVM + ".");
-                availableNodes.addNode(holdingVM, node.getNodeInformation().getURL());
-            }
-        } finally {
-            if (availableNodes.numberOfAvailableNodes(holdingVM) >= numberOfRegisteredNode.get(holdingVM)) {
-                logger.debug("The size of node cache has reached " + holdingVM + "'s capacity.");
-                if (holdingVM != null) {
-                    try {
-                        destroyVM(holdingVM);
-                    } catch (VirtualServiceException e) {
-                        throw new RMException("Cannot destroy virtual machine " + holdingVM, e);
-                    }
-                }
-            }
-            registeredNodesLock.unlock();
-            availableNodesLock.unlock();
-        }
+    private void initFields() {
+        this.numberOfRegisteredNode = new HashMap<String, Integer>();
+        this.availableNodes = new VMNodeCache();
+        this.runningVM = new ArrayList<String>();
+        this.cloneVM = new ArrayList<String>();
+        this.confTable = new Hashtable<String, String>();
+        this.availableNodesLock = new ReentrantLock();
+        this.deploymentLock = new ReentrantLock();
+        this.requiredNodesLock = new ReentrantLock();
+        this.registeredNodesLock = new ReentrantLock();
+        this.vmGuestStatusMonitor = new VMDeploymentMonitor();
     }
 
     /**
@@ -262,12 +226,12 @@ public class VirtualInfrastructure extends InfrastructureManager {
      * 		  parameters[5] is the maximum number of template virtual machine
      * 		  parameters[6] is the host capacity
      * 		  parameters[7] is the path to a ProActive Configuration file
-     * 		  parameters[8] is the RM's url
-     * 		  parameters[9] is the path to a credentials file
+     *        parameters[8] is the rm credentials used to connect to the RM from within the Virtual machines
      */
     @Override
-    public BooleanWrapper configure(Object... parameters) {
+    public void configure(Object... parameters) {
         logger.info("Configuration read from user input");
+        initFields();
         int index = 0;
         infrastructure = parameters[index++].toString();
         InfrastructureType it = InfrastructureType.getInfrastructureType(infrastructure);
@@ -281,18 +245,28 @@ public class VirtualInfrastructure extends InfrastructureManager {
         VMMax = Integer.parseInt(parameters[index++].toString());
         hostCapacity = Integer.parseInt(parameters[index++].toString());
         virtualMachineManagerHolder = new VirtualMachineManagerHolder(it, VMMUrl, VMMUser, VMMPwd);
+        //fail fast... if the vm doesn't exist, raises an exception
+        try {
+            VirtualMachine2 tmp = virtualMachineManagerHolder.getVirtualMachine(VMTemplate);
+            if (tmp == null) {
+                throw new RMException("Cannot get virtual machine: " + VMTemplate);
+            }
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Cannot get virtual machine: " + VMTemplate, e);
+        }
         if (parameters[index] != null) {
             definePARTConf((byte[]) parameters[index++]);
         }
         if (parameters[index] != null) {
-            RMUrl = parameters[index++].toString();
-        }
-        if (parameters[index] != null) {
-            defineCredentials((byte[]) parameters[index++]);
+            try {
+                Credentials tmpCred = Credentials.getCredentialsBase64((byte[]) parameters[index++]);
+                credentials = new String(tmpCred.getBase64());
+            } catch (KeyException e) {
+                throw new IllegalArgumentException("Could not retrieve base64 credentials", e);
+            }
         } else {
-            logger.info("Credentials not supplied, will register nodes locally.");
+            throw new IllegalArgumentException("Credential file is mandatory.");
         }
-        return new BooleanWrapper(true);
     }
 
     @Override
@@ -301,23 +275,38 @@ public class VirtualInfrastructure extends InfrastructureManager {
             requiredNodesLock.lock();
             String holdingVM = node.getProperty(Prop.HOLDING_VIRTUAL_MACHINE.getValue());
             if (node.getProperty(Prop.IS_ALREADY_REGISTERED.getValue()) == null) {
+                if (holdingVM == null) {
+                    logger.error("Cannot determine holding virtual machine");
+                    throw new RMException("Cannot determine holding virtual machine");
+                }
                 incNumberOfRegisteredNodes(holdingVM);
                 node.setProperty(Prop.IS_ALREADY_REGISTERED.getValue(), "true");
                 logger.debug("A New node was added by " + this.getClass().getSimpleName() + ". " +
                     "Property isAlreadyRegistered is now true.");
+                //this is the first time one deploys this node, it is pending...
+                //even if the policy didn't request it we deployed it as deamon
+                //now it should be added to the core... it will be cached later
+                if (numberOfRequiredNodes <= 0) {
+                    logger.debug("First time not required node acquisition, not discarded: " +
+                        node.getNodeInformation().getURL());
+                    return;
+                }
             } else {
                 logger.debug("A previously used node was added by " + this.getClass().getSimpleName() + ". " +
                     "Property isAlreadyRegistered was true.");
             }
+            if (numberOfRequiredNodes > 0) {
+                numberOfRequiredNodes--;
+            } else {
+                logger.debug("A new node was added to RM but not required. Caching it for futur use");
+                availableNodes.addNode(holdingVM, node.getNodeInformation().getURL());
+                throw new RMException("Not expected node registered. Caching it for futur use.");
+            }
         } catch (ProActiveException e) {
             logger.error("Unable to state about node registration " + node.getNodeInformation().getURL());
+            throw new RMException("Unable to state about node registration " +
+                node.getNodeInformation().getURL());
         } finally {
-            //if not using local node registration, must decrease the number of required nodes.
-            //otherwise, this is done by the node registration waiting thread
-            if (!useLocalNodeRegistration()) {
-                if (numberOfRequiredNodes > 0)
-                    numberOfRequiredNodes--;
-            }
             requiredNodesLock.unlock();
         }
     }
@@ -348,70 +337,41 @@ public class VirtualInfrastructure extends InfrastructureManager {
                 }
             }
         } finally {
+            this.vmGuestStatusMonitor.exit();
             deploymentLock.unlock();
         }
     }
 
     @Override
     public void removeNode(Node node) throws RMException {
-        this.removeNode(node, false);
-    }
-
-    /**
-     * Check that the supplied properties are sufficient.
-     * @throws RMException
-     */
-    private void checkInitialization() throws RMException {
-        //Check that user property was supplied
-        String user = properties.getProperty(Prop.HYPERVISOR_USER.getValue());
-        if (user == null || user.equals(""))
-            throw new RMException("Cannot find " + Prop.HYPERVISOR_USER.getValue() +
-                " in configuration file.");
-
-        //Check that user's password property was supplied
-        String pwd = properties.getProperty(Prop.HYPERVISOR_PWD.getValue());
-        if (pwd == null || pwd.equals(""))
-            throw new RMException("Cannot find " + Prop.HYPERVISOR_PWD.getValue() + " in configuration file.");
-
-        //Check that hypervisor's url was supplied
-        String url = properties.getProperty(Prop.HYPERVISOR_URL.getValue());
-        if (url == null || url.equals(""))
-            throw new RMException("Cannot find " + Prop.HYPERVISOR_URL.getValue() + " in configuration file.");
-
-        //Check that the template Virtual Machine's name was supplied
-        VMTemplate = properties.getProperty(Prop.VIRTUAL_MACHINE.getValue());
-        if (VMTemplate == null || VMTemplate.equals(""))
-            throw new RMException("Cannot find " + Prop.VIRTUAL_MACHINE.getValue() +
-                " in configuration file.");
-
-        //Check the infrastructure type
-        String infrastructureType = properties.getProperty(Prop.INFRASTRUCTURE.getValue());
-        if (infrastructureType == null || infrastructureType.equals(""))
-            throw new RMException("Cannot find " + Prop.INFRASTRUCTURE.getValue() + " in configuration file.");
-        InfrastructureType it = InfrastructureType.getInfrastructureType(infrastructureType);
-        if (it == null) {
-            throw new RMException("A bad virtual infrastructure type was supplied");
-        }
-        virtualMachineManagerHolder = new VirtualMachineManagerHolder(it, url, user, pwd);
-
-        //Initializes the max instance count
-        String maxInstanceString = properties.getProperty(Prop.MAX_INSTANCE.getValue());
-        if (maxInstanceString != null) {
+        String holdingVM = null;
+        try {
+            availableNodesLock.lock();
+            registeredNodesLock.lock();
             try {
-                VMMax = Integer.parseInt(maxInstanceString);
-            } catch (Throwable e) {
-                logger.warn("The maximum number of instances is " + VMMax, e);
+                holdingVM = node.getProperty(Prop.HOLDING_VIRTUAL_MACHINE.getValue());
+                if (holdingVM == null) {
+                    throw new RMException("Trying to remove a node without holding virtual machine.");
+                }
+            } catch (ProActiveException e) {
+                throw new RMException("An error occured while removing a node.", e);
             }
-        }
-
-        //Initializes the host capacity for virtual machines
-        String hostCapacityString = properties.getProperty(Prop.HOST_CAPACITY.getValue());
-        if (hostCapacityString != null) {
-            try {
-                hostCapacity = Integer.parseInt(hostCapacityString);
-            } catch (Throwable e) {
-                logger.warn("The number of nodes per virtual machines is " + hostCapacity, e);
+            String nodeName = node.getNodeInformation().getName();
+            logger.debug("Node " + nodeName + " added in node cache for vm " + holdingVM + ".");
+            availableNodes.addNode(holdingVM, node.getNodeInformation().getURL());
+        } finally {
+            if (availableNodes.numberOfAvailableNodes(holdingVM) >= numberOfRegisteredNode.get(holdingVM)) {
+                logger.debug("The size of node cache has reached " + holdingVM + "'s capacity.");
+                if (holdingVM != null) {
+                    try {
+                        destroyVM(holdingVM);
+                    } catch (VirtualServiceException e) {
+                        throw new RMException("Cannot destroy virtual machine " + holdingVM, e);
+                    }
+                }
             }
+            registeredNodesLock.unlock();
+            availableNodesLock.unlock();
         }
     }
 
@@ -430,35 +390,13 @@ public class VirtualInfrastructure extends InfrastructureManager {
      * Loads the PART configuration file for virtual machine.
      * @param bs a byte array containing a proactive configuration
      */
-    private void definePARTConf(String file) {
-        InputStream is = null;
-        try {
-            is = new FileInputStream(new File(file));
-            populateConfTable(is);
-        } catch (Exception e) {
-            throw new IllegalArgumentException("Cannot read ProActive configuration from supplied file.");
-        } finally {
-            try {
-                if (is != null) {
-                    is.close();
-                }
-            } catch (IOException e) {
-                logger.warn(e);
-            }
-        }
-    }
-
-    /**
-     * Loads the PART configuration file for virtual machine.
-     * @param bs a byte array containing a proactive configuration
-     */
     private void definePARTConf(byte[] bs) {
         InputStream is = null;
         try {
             is = new ByteArrayInputStream(bs);
             populateConfTable(is);
         } catch (Exception e) {
-            throw new IllegalArgumentException("Cannot read ProActive configuration from supplied file.");
+            throw new IllegalArgumentException("Cannot read ProActive configuration from supplied file.", e);
         } finally {
             try {
                 if (is != null) {
@@ -491,59 +429,10 @@ public class VirtualInfrastructure extends InfrastructureManager {
         }
     }
 
-    /** Defines the credentials value */
-    private void defineCredentials(byte[] bs) {
-        cred = new String(bs);
-    }
-
-    /** Defines the credentials value
-     * @throws IOException */
-    private void defineCredentials(String file) throws IOException {
-        BufferedReader br = null;
-        StringBuilder sb = new StringBuilder();
-        try {
-            br = new BufferedReader(new FileReader(new File(file)));
-            int read;
-            while ((read = br.read()) != -1) {
-                sb.append((char) read);
-            }
-            cred = sb.toString();
-        } finally {
-            if (br != null) {
-                br.close();
-            }
-        }
-    }
-
-    /**
-     * Parse parameters from {@link #addNodesAcquisitionInfo(Object...)} to
-     * update configuration file path field.
-     * @param config a byte array containing a set of key=value for configuration.
-     * @throws RMException
-     */
-    private boolean defineConfigFile(byte[] config) throws RMException {
-        InputStream is = null;
-        Properties prop = new Properties();
-        try {
-            try {
-                is = new ByteArrayInputStream(config);
-                prop.load(is);
-            } catch (Throwable e) {
-                logger.info("Cannot read configuration from supplied config file");
-                return false;
-            }
-            properties = prop;
-            return true;
-        } finally {
-            if (is != null) {
-                try {
-                    is.close();
-                } catch (IOException e) {
-                    logger.warn(e);
-                }
-            }
-        }
-    }
+    //	/** Defines the credentials value */
+    //	private void defineCredentials(byte[] bs) {
+    //		cred = new String(bs);
+    //	}
 
     /**
      * Return an immutable (cloned) ProActive Configuration
@@ -551,7 +440,7 @@ public class VirtualInfrastructure extends InfrastructureManager {
      * @return The remote PART configuration that will be used for
      * a newly started virtual machine.
      */
-    public Hashtable<String, String> getProActiveConfiguration() {
+    private Hashtable<String, String> getProActiveConfiguration() {
         return (Hashtable<String, String>) confTable.clone();
     }
 
@@ -566,29 +455,13 @@ public class VirtualInfrastructure extends InfrastructureManager {
         try {
             deploymentLock.lock();
             requiredNodesLock.lock();
-            //updating variable regarding timeout
-            long currentTimeStamp = System.currentTimeMillis();
-            if ((currentTimeStamp - lastStartedVMTimeStamp) > NODE_URL_ACQUISITION_TIMEOUT) {
-                if (numberOfPendingNodes != 0) {
-                    logger
-                            .debug("The number of pending node acquisition is not zero and is reseted because of a timeout." +
-                                "Previous value was " + numberOfPendingNodes);
-                    numberOfPendingNodes = 0;
-                }
-                if (numberOfRequiredNodes != 0) {
-                    logger
-                            .debug("The number of required nodes is not zero and is reseted because of a timeout." +
-                                "Previous value was " + numberOfRequiredNodes);
-                    numberOfRequiredNodes = 0;
-                }
-            }
             //a previously deployed vm can handle node acquisition request
-            if (numberOfPendingNodes >= required) {
+            if (vmGuestStatusMonitor.getNumberOfNonUsedNode() >= required) {
                 numberOfRequiredNodes += required;
-                numberOfPendingNodes -= required;
                 logger.debug("A node acquisition can be served by a recently started Virtual Machine.");
-                logger.debug("Required & pending nodes numbers updated: req=" + numberOfRequiredNodes +
-                    " pend=" + numberOfPendingNodes);
+                //                vmGuestStatusMonitor.internalNewPendingNode(required);
+                logger.debug("Required & non used nodes numbers updated: req=" + numberOfRequiredNodes +
+                    " non used=" + vmGuestStatusMonitor.getNumberOfNonUsedNode());
                 return;
             }
             //VIM has reached max vm capacity
@@ -614,42 +487,18 @@ public class VirtualInfrastructure extends InfrastructureManager {
                 toStart = templateVM.clone(toStartName);
             }
             logger.info("Powering " + toStartName + " on");
-            if (!useLocalNodeRegistration()) { //will connect to rm from virtual machine
-                logger.debug("Using remote node registration");
-                setEnvironmentForStarterRegisterAndStart(toStart);
-            } else {
-                logger.debug("Using local node registration");
-                setEnvironmentForStarterAndStart(toStart);
-                WaitingForNewNodeThread myThread = new WaitingForNewNodeThread(nodeSource, toStartName,
-                    hostCapacity);
-                myThread.start();
-            }
-            numberOfPendingNodes += (hostCapacity - required);
-            lastStartedVMTimeStamp = System.currentTimeMillis();
-            logger.debug("Required & pending nodes numbers updated: req=" + numberOfRequiredNodes + " pend=" +
-                numberOfPendingNodes);
+            setEnvironmentForStarterRegisterAndStart(toStart);
+            initializeNumberOfRegisteredNode(toStartName);
             runningVM.add(toStartName);
+            vmGuestStatusMonitor.newPendingNodes(toStartName, this.hostCapacity);
             count++;
+            logger.debug("Required & non used nodes numbers updated: req=" + numberOfRequiredNodes +
+                " non used=" + vmGuestStatusMonitor.getNumberOfNonUsedNode());
             logger.debug("A new Virtual Machine was started, current count: " + count);
         } finally {
             deploymentLock.unlock();
             requiredNodesLock.unlock();
         }
-    }
-
-    /**
-     * Sets the environment of the virtual machine to be able to run
-     * {@link VirtualInfrastructureNodeStarter} from within the virtual machine
-     * and starts the virtual machine.
-     * @param toStart the virtual machine to start
-     * @return true if the virtual machine has been started, false otherwise.
-     * @throws RMException
-     * @throws VirtualServiceException
-     */
-    private boolean setEnvironmentForStarterAndStart(VirtualMachine2 toStart) throws RMException,
-            VirtualServiceException {
-        setEnvrionmentForStarter(toStart);
-        return toStart.powerOn();
     }
 
     /**
@@ -661,30 +510,12 @@ public class VirtualInfrastructure extends InfrastructureManager {
      * @throws RMException
      * @throws VirtualServiceException
      */
-    private boolean setEnvironmentForStarterRegisterAndStart(VirtualMachine2 toStart) throws RMException,
+    private boolean setEnvironmentForStarterRegisterAndStart(VirtualMachine2 toDeploy) throws RMException,
             VirtualServiceException {
-        setEnvrionmentForStarter(toStart);
-        setEnvironmentForStarterRegister(toStart);
-        return toStart.powerOn();
-    }
-
-    /**
-     * Sets the environment of the virtual machine to be able to run
-     * {@link VirtualInfrastructureNodeStarter} from within the virtual machine.
-     * 	 * @param toStart the virtual machine to start
-     * @return true if the virtual machine has been started, false otherwise.
-     * @throws RMException
-     * @throws VirtualServiceException
-     */
-    private void setEnvrionmentForStarter(VirtualMachine2 toDeploy) throws RMException {
+        //TODO : also push classpath & executable's name... requires to modify python scripts
         Hashtable<String, String> partConf = getProActiveConfiguration();
         Set<String> keys = partConf.keySet();
         try {
-            toDeploy.pushData(VirtualInfrastructure.Prop.RM_URL.getValue(), null);
-            toDeploy.pushData(VirtualInfrastructure.Prop.RM_CREDS.getValue(), null);
-            for (int j = 0; j < hostCapacity; j++) {
-                toDeploy.pushData(VirtualInfrastructure.Prop.NODE_URL.getValue() + "." + j, null);
-            }
             int i = 0;
             for (String key : keys) {
                 String value = partConf.get(key);
@@ -701,25 +532,15 @@ public class VirtualInfrastructure extends InfrastructureManager {
             //push capacity information
             toDeploy.pushData(VirtualInfrastructure.Prop.HOST_CAPACITY.getValue(), new Integer(hostCapacity)
                     .toString());
+
+            toDeploy.pushData(VirtualInfrastructure.Prop.RM_URL.getValue(), this.rmUrl);
+            toDeploy.pushData(VirtualInfrastructure.Prop.RM_CREDS.getValue(), this.credentials);
+            //push the nodeSource's name
+            toDeploy.pushData(VirtualInfrastructure.Prop.NODESOURCE.getValue(), nodeSource.getName());
         } catch (VirtualServiceException e) {
             throw new RMException("Unnable to deploy virtual machine " + toDeploy, e);
         }
-    }
-
-    /**
-     * Sets the environment of the virtual machine to be able to run
-     * {@link VirtualInfrastructureNodeStarterRegister} from within the virtual machine.
-     * 	 * @param toStart the virtual machine to start
-     * @return true if the virtual machine has been started, false otherwise.
-     * @throws RMException
-     * @throws VirtualServiceException
-     */
-    private void setEnvironmentForStarterRegister(VirtualMachine2 toDeploy) throws RMException,
-            VirtualServiceException {
-        toDeploy.pushData(VirtualInfrastructure.Prop.RM_URL.getValue(), RMUrl);
-        toDeploy.pushData(VirtualInfrastructure.Prop.RM_CREDS.getValue(), cred);
-        //push the nodeSource's name
-        toDeploy.pushData(VirtualInfrastructure.Prop.NODESOURCE.getValue(), nodeSource.getName());
+        return toDeploy.powerOn();
     }
 
     /**
@@ -767,24 +588,44 @@ public class VirtualInfrastructure extends InfrastructureManager {
         }
     }
 
+    private void initializeNumberOfRegisteredNode(String vmName) {
+        try {
+            registeredNodesLock.lock();
+            if (!numberOfRegisteredNode.containsKey(vmName) || numberOfRegisteredNode.get(vmName) == null) {
+                numberOfRegisteredNode.put(vmName, new Integer(0));
+            }
+        } finally {
+            registeredNodesLock.unlock();
+        }
+    }
+
     /**
      * Tries to add a node to the RMCore from a previously deployed VM.
      * @return true if such a node exists and has been added to the RMCore,
      * false otherwise
      */
-    private boolean getAnAvailableNode() {
+    private boolean addACachedNodeToCore() {
         try {
             availableNodesLock.lock();
+            requiredNodesLock.lock();
+            numberOfRequiredNodes++;
             String nodeUrl = availableNodes.removeRandomNodeUrl();
             if (nodeUrl == null) {
                 return false;
             } else {
-                return nodeSource.acquireNode(nodeUrl, nodeSource.getAdministrator()).getBooleanValue();
+                Node toAdd = NodeFactory.getNode(nodeUrl);
+                String nodeName = toAdd.getNodeInformation().getName();
+                super.addDeployingNode(nodeName, "Launched as daemon",
+                        "Pending node cached by Virtual Infrastructure Manager",
+                        VirtualInfrastructure.NODE_URL_ACQUISITION_TIMEOUT);
+                this.nodeSource.acquireNode(nodeUrl, this.nodeSource.getAdministrator());
+                return true;
             }
         } catch (Throwable t) {
             logger.error("Failled to add an available node to RMCore.", t);
             return false;
         } finally {
+            requiredNodesLock.unlock();
             availableNodesLock.unlock();
         }
     }
@@ -793,34 +634,9 @@ public class VirtualInfrastructure extends InfrastructureManager {
      * Add all previously released Nodes of a still
      * running VM to the RMCore
      */
-    private void getAllAvailableNodes() {
-        while (getAnAvailableNode()) {
-            try {
-                Thread.currentThread().sleep(100);
-            } catch (InterruptedException e) {
-                logger.error(e);
-            }
-        }
-    }
-
-    /**
-     * Decrease the number of registered nodes for a given virtual machine.
-     * See {@link this#numberOfRegisteredNode}.
-     * @param vm The virtual machine which needs update.
-     */
-    private void decNumberOfRegisteredNodes(String vm) {
-        try {
-            registeredNodesLock.lock();
-            if (!numberOfRegisteredNode.containsKey(vm)) {
-                numberOfRegisteredNode.put(vm, new Integer(0));
-                return;
-            }
-            Integer current = numberOfRegisteredNode.get(vm);
-            numberOfRegisteredNode.put(vm, current - 1);
-            logger.debug("Number of registered nodes for " + vm + " decremented. Current value: " +
-                (current - 1));
-        } finally {
-            registeredNodesLock.unlock();
+    private void addAllCachedNodesToCore() {
+        while (addACachedNodeToCore()) {
+            Thread.yield();
         }
     }
 
@@ -860,100 +676,180 @@ public class VirtualInfrastructure extends InfrastructureManager {
         }
     }
 
-    /**
-     * To be able to know is the user want to use local or remote
-     * node registration.
-     * This is decided regarding the configuration supplied by the user.
-     * If RM User & RM User's password are supplied, remote registration will
-     * be used, otherwise, local registration will be used.
-     * @return true if using local registration, false otherwise.
-     */
-    private boolean useLocalNodeRegistration() {
-        return RMUrl == null || RMUrl.equals("");
-    }
-
     /*----------------------------------------
      * Member classes
      *---------------------------------------*/
 
-    /**
-     * This private class is in charge of waiting for newly created nodes to be
-     * registered in the VirtualMachine configuration data file thanks to a guest property.
-     */
-    private class WaitingForNewNodeThread extends Thread {
-        private String vmName;
-        private int capacity;
-        private NodeSource nodeSource;
+    private class VMDeploymentMonitor implements Serializable, Runnable {
+        private volatile boolean run = false;
+        private static final String PENDING_NODE_NAME_FRAGMENT = "_node_";
+        private Hashtable<String, VMGuestStatus> status = new Hashtable<String, VMGuestStatus>();
+        private Hashtable<String, String[]> pendingNodes = new Hashtable<String, String[]>();
 
-        WaitingForNewNodeThread(NodeSource ns, String vmName, int c) {
-            this.nodeSource = ns;
-            this.capacity = c;
-            this.vmName = vmName;
+        private VMDeploymentMonitor() {
         }
 
-        @Override
         public void run() {
-            logger.debug("A WaitingForNewNodeThread was started.");
-            for (int i = 0; i < capacity; i++) {
+            int circuitBroker = 0;
+            while (this.run) {
                 try {
-                    long begin = System.currentTimeMillis();
-                    int interruptedExceptionCB = 0, virtualServiceExceptionCB = 0;
-                    String nodeUrl = null;
-                    while ((System.currentTimeMillis() - NODE_URL_ACQUISITION_TIMEOUT) < begin) {
+                    for (Entry<String, VMGuestStatus> entry : status.entrySet()) {
                         try {
-                            VirtualMachine2 vm = virtualMachineManagerHolder.getVirtualMachine(vmName);
-                            nodeUrl = vm.getData(Prop.NODE_URL.getValue() + "." + i);
-                            logger.debug(vmName + "." + Prop.NODE_URL.getValue() + "." + i + " returned " +
-                                nodeUrl);
-                            if (nodeUrl != null && !nodeUrl.equals("")) {
-                                break;
-                            } else {
-                                logger.debug("waiting...");
-                                Thread.sleep(2000);
+                            VirtualMachine2 vm = VirtualInfrastructure.this.virtualMachineManagerHolder
+                                    .getVirtualMachine(entry.getKey());
+                            VMGuestStatus previous = entry.getValue(), current = vm.getVMGuestStatus();
+                            if (previous != null) {
+                                if (!previous.equals(current)) {
+                                    org.ow2.proactive.virtualizing.core.State vmState = vm.getState();
+                                    VMDeploymentMonitor.this._firePendingNodeUpdate(entry.getKey(),
+                                            _buildDescription(entry.getKey(), current, vmState));
+
+                                }
                             }
-                        } catch (InterruptedException e) {
-                            if (interruptedExceptionCB == circuitBrokerThreshold) {
-                                Thread.currentThread().interrupt();
-                                logger.error("Cannot retrieve node's information from virtual machine.", e);
-                                break;
-                            }
-                            interruptedExceptionCB++;
-                        } catch (VirtualServiceException e) {
-                            if (virtualServiceExceptionCB == circuitBrokerThreshold) {
-                                logger.error("Unable to retrieve node's url ( id " +
-                                    Prop.NODE_URL.getValue() + "." + i + " ) from virtual machine " + vmName,
-                                        e);
-                                continue;
-                            }
-                            virtualServiceExceptionCB++;
+                            entry.setValue(current);
+                        } catch (Exception e) {
+                            logger
+                                    .warn(
+                                            "An exception occured while monitoring VMGuestStatus for virtual machine: " +
+                                                entry.getKey(), e);
                         }
                     }
-                    if (nodeUrl != null && !nodeUrl.equals("")) {
-                        try {
-                            requiredNodesLock.lock();
-                            availableNodesLock.lock();
-                            if (numberOfRequiredNodes > 0) {
-                                logger.debug("Retrieved a new node url: " + nodeUrl);
-                                nodeSource.acquireNode(nodeUrl, nodeSource.getAdministrator());
-                                numberOfRequiredNodes--;
-                                logger.debug("Number of required nodes = " + numberOfRequiredNodes);
-                            } else {
-                                logger.debug("New node creation received but not required." +
-                                    "New node added in cache. Number of required nodes = " +
-                                    numberOfRequiredNodes);
-                                availableNodes.addNode(this.vmName, nodeUrl);
-                            }
-                        } catch (Throwable t) {
-                            logger.error("An Error occured while adding a node to RMCore.", t);
-                        } finally {
-                            requiredNodesLock.unlock();
-                            availableNodesLock.unlock();
-                        }
-                    } else {
-                        logger.warn("The node acquisition #" + (i + 1) + " failled due to timeout.");
+                    Thread.sleep(VirtualInfrastructure.GUEST_STATUS_UPDATE_FREQUENCY);
+                } catch (InterruptedException e) {
+                    logger.warn("Interrupted while updating guest status", e);
+                    circuitBroker++;
+                    if (circuitBroker >= VirtualInfrastructure.circuitBrokerThreshold) {
+                        logger.warn("Exited monitoring thread because circuit broker threshold was reached.");
+                        exit();
                     }
-                } catch (RMException e) {
-                    logger.error("A RMException occured.", e);
+                }
+            }
+            logger.debug("Guest status monitoring thread exiting");
+        }
+
+        private int getNumberOfNonUsedNode() {
+            int result = 0;
+            Collection<String[]> pendings = pendingNodes.values();
+            for (String[] tmpURL : pendings) {
+                if (tmpURL != null) {
+                    for (int i = 0; i < tmpURL.length; i++) {
+                        if (tmpURL[i] == null) {
+                            result++;
+                        }
+                    }
+                }
+            }
+            return result;
+        }
+
+        /**
+         * This method must be called when notifying pending node for a given virtual machine for the first time.
+         * It creates and store the VMGuestStatus associated to the holding virtual machine. It also creates and store
+         * howMany PendingNodes in a String Array initialized with a length of VirtualMachine.this.hostCapacity.
+         * The length of the array will be used to compute pending nodes that have not been added to the monitoring thread yet.
+         * @param vmName The holding virtual machine's name.
+         * @param howMany The number of pending node whose state must be monitored.
+         */
+        private void newPendingNodes(String vmName, int howMany) {
+            synchronized (pendingNodes) {
+                String description = "Cannot determine guest status for this pending node";
+                String[] pendings = pendingNodes.get(vmName);
+                if (pendings == null) {
+                    pendings = new String[VirtualInfrastructure.this.hostCapacity];
+                }
+                VMGuestStatus guestStatus = null;
+                org.ow2.proactive.virtualizing.core.State vmState = null;
+                try {
+                    VirtualMachine2 vm = VirtualInfrastructure.this.virtualMachineManagerHolder
+                            .getVirtualMachine(vmName);
+                    guestStatus = vm.getVMGuestStatus();
+                    vmState = vm.getState();
+                } catch (Exception e) {
+                    logger.warn("An exception occured while declaring new Pending Nodes.", e);
+                }
+                if (guestStatus != null && vmState != null) {
+                    description = _buildDescription(vmName, guestStatus, vmState);
+                }
+                howMany = (howMany <= VirtualInfrastructure.this.hostCapacity ? howMany
+                        : VirtualInfrastructure.this.hostCapacity);
+                for (int i = 0; i < howMany; i++) {
+                    String pendingNodeName = vmName + PENDING_NODE_NAME_FRAGMENT + (i + 1);
+                    String tmpURL = addDeployingNode(pendingNodeName, "daemon command", description,
+                            VirtualInfrastructure.NODE_URL_ACQUISITION_TIMEOUT);
+                    pendings[i] = tmpURL;
+                }
+                if (guestStatus != null) {
+                    status.put(vmName, guestStatus);
+                }
+                pendingNodes.put(vmName, pendings);
+                if (this.run == false) {
+                    this.run = true;
+                    VirtualInfrastructure.this.nodeSource.executeInParallel(this);
+                    logger
+                            .debug("Thread watching pending node status update for VirtualInfrastructure started.");
+                }
+            }
+        }
+
+        /**
+         * Stop monitoring vm's guest status.
+         */
+        private void exit() {
+            this.run = false;
+        }
+
+        private String _buildDescription(String vmName, VMGuestStatus guestStatus,
+                org.ow2.proactive.virtualizing.core.State vmState) {
+            String lf = System.getProperty("line.separator");
+            StringBuilder sb = new StringBuilder("Pending node on virtual machine ");
+            sb.append(vmName);
+            sb.append(lf);
+            sb.append("\tVM's state: ");
+            sb.append(vmState);
+            sb.append(lf);
+            sb.append("\tVM's Heart Beat: ");
+            sb.append(guestStatus.getHeartBeat());
+            sb.append(lf);
+            sb.append("\tVM's Mac addresses: ");
+            String[] tmp = guestStatus.getMacAddresses();
+            if (tmp == null || tmp.length == 0) {
+                sb.append("Unknown");
+                sb.append(lf);
+            } else {
+                for (int i = 0; i < tmp.length; i++) {
+                    sb.append(tmp[i]);
+                    if (i != (tmp.length - 1)) {
+                        sb.append(" - ");
+                    }
+                }
+                sb.append(lf);
+            }
+            sb.append("\tVM's IP addresses: ");
+            tmp = guestStatus.getIPAddresses();
+            if (tmp == null || tmp.length == 0) {
+                sb.append("Unknown");
+            } else {
+                for (int i = 0; i < tmp.length; i++) {
+                    sb.append(tmp[i]);
+                    if (i != (tmp.length - 1)) {
+                        sb.append(" - ");
+                    }
+                }
+            }
+            return sb.toString();
+        }
+
+        private void _firePendingNodeUpdate(String vmName, String description) {
+            synchronized (pendingNodes) {
+                String[] pendings = pendingNodes.get(vmName);
+                if (pendings != null) {
+                    for (String pnURL : pendings) {
+                        if (pnURL != null) {
+                            updateDeployingNodeDescription(pnURL, description);
+                        }
+                    }
+                } else {
+                    pendingNodes.remove(vmName);
                 }
             }
         }
@@ -1004,34 +900,22 @@ public class VirtualInfrastructure extends InfrastructureManager {
 
     /** This class allows to cache registered nodes. */
     private class VMNodeCache implements Serializable {
-        private HashMap<String, ArrayList<String>> vmNodeCache = new HashMap<String, ArrayList<String>>();
+        private final HashMap<String, ArrayList<String>> vmNodeCache = new HashMap<String, ArrayList<String>>();
 
-        void addNode(String holdingVM, String node) {
+        private void addNode(String holdingVM, String node) {
             getVMCache(holdingVM).add(node);
             logger.debug("Node added to cache. Current Node cache size: " + getVMCache(holdingVM).size());
         }
 
-        boolean removeNode(String holdingVM, String node) {
-            boolean res = getVMCache(holdingVM).remove(node);
-            if (res) {
-                logger.debug("Node removed from cache for " + holdingVM + ". Current node cache size is " +
-                    getVMCache(holdingVM).size());
-            } else {
-                logger.warn("Removing Node from cache failled. Current Node cache size: " +
-                    getVMCache(holdingVM).size());
-            }
-            return res;
-        }
-
-        boolean hasAvailableNode(String holdingVM) {
+        private boolean hasAvailableNode(String holdingVM) {
             return !getVMCache(holdingVM).isEmpty();
         }
 
-        int numberOfAvailableNodes(String holdingVM) {
+        private int numberOfAvailableNodes(String holdingVM) {
             return getVMCache(holdingVM).size();
         }
 
-        String removeNodeUrl(String holdingVM) {
+        private String removeNodeUrl(String holdingVM) {
             ArrayList<String> vmCache = getVMCache(holdingVM);
             String res = vmCache.remove(vmCache.size() - 1);
             logger.debug("Node removed from cache for " + holdingVM + ". Current node cache size is " +
@@ -1039,7 +923,7 @@ public class VirtualInfrastructure extends InfrastructureManager {
             return res;
         }
 
-        String removeRandomNodeUrl() {
+        private String removeRandomNodeUrl() {
             while (!vmNodeCache.isEmpty()) {
                 String holdingVM = (String) this.vmNodeCache.keySet().toArray()[0];
                 ArrayList<String> vmCache = this.vmNodeCache.get(holdingVM);
@@ -1064,7 +948,7 @@ public class VirtualInfrastructure extends InfrastructureManager {
             return res;
         }
 
-        void removeCache(String holdingVM) {
+        private void removeCache(String holdingVM) {
             this.vmNodeCache.remove(holdingVM);
         }
     }
@@ -1162,7 +1046,7 @@ public class VirtualInfrastructure extends InfrastructureManager {
         /** this key will be used (set) by the virtual infrastructure starter
          * to fix the holding virtual machine's name. It will also be used when removing a node to kill this holding
          * virtual machine - NOT REQUIRED*/
-        HOLDING_VIRTUAL_MACHINE("holdingVM"),
+        HOLDING_VIRTUAL_MACHINE(VIRMNodeStarter.HOLDING_VM_KEY),
         /** The manager user of your virtualized infrastructure - COMPULSORY*/
         HYPERVISOR_USER("vmmuser"),
         /** The manager's password - COMPULSORY */

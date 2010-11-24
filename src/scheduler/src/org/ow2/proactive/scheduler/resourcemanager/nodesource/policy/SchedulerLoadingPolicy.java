@@ -240,7 +240,8 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
         RMInitialState state = nodeSource.getRMCore().getMonitoring().addRMEventListener(
                 (RMEventListener) PAActiveObject.getStubOnThis());
         for (RMNodeEvent event : state.getNodesEvents()) {
-            if (event.getNodeState() != NodeState.DOWN) {
+            //we only count "useable" nodes
+            if (checkNodeStates(event)) {
                 nodesNumberInRM++;
             }
         }
@@ -303,6 +304,11 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
     public void nodeEvent(RMNodeEvent event) {
         switch (event.getEventType()) {
             case NODE_ADDED:
+                //if node addition is related to pending nodes/down nodes
+                //we discard the computation
+                if (!checkNodeStates(event)) {
+                    break;
+                }
                 nodesNumberInRM++;
                 if (event.getNodeSource().equals(nodeSourceName)) {
                     nodesNumberInNodeSource++;
@@ -318,6 +324,10 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
                 }
                 break;
             case NODE_REMOVED:
+                //we only care about non pending nodes
+                if (event.getNodeState() == NodeState.LOST || event.getNodeState() == NodeState.DEPLOYING) {
+                    break;
+                }
                 nodesNumberInRM--;
                 if (event.getNodeSource().equals(nodeSourceName)) {
                     nodesNumberInNodeSource--;
@@ -334,6 +344,14 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
 
                 break;
         }
+    }
+
+    private boolean checkNodeStates(RMNodeEvent event) {
+        NodeState ns = event.getNodeState();
+        if (ns == NodeState.LOST || ns == NodeState.DEPLOYING || ns == NodeState.DOWN) {
+            return false;
+        }
+        return true;
     }
 
     /**

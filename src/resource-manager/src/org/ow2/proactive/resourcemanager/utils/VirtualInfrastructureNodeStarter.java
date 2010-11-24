@@ -53,7 +53,9 @@ import org.ow2.proactive.resourcemanager.nodesource.infrastructure.VirtualInfras
  * argument on the command line.
  *
  * @author ProActive team
+ * @deprecated use {@link VIRMNodeStarter} instead
  */
+@Deprecated
 public final class VirtualInfrastructureNodeStarter {
 
     /** for local inter process communication */

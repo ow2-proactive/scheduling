@@ -81,6 +81,8 @@ public class TestConcurrentUsers extends FunctionalTest {
 
         // waiting for node adding event
         RMTHelper.waitForNodeEvent(RMEventType.NODE_ADDED, node1URL);
+        // waiting for the node to be free
+        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
 
         assertTrue(resourceManager.getState().getTotalNodesNumber() == 1);
         assertTrue(resourceManager.getState().getFreeNodesNumber() == 1);

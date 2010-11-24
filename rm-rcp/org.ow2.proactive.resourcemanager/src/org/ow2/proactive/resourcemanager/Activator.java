@@ -168,6 +168,8 @@ public final class Activator extends AbstractUIPlugin {
         reg.put(Internal.IMG_EXPANDALL, Activator.getImageDescriptor("icons/" + Internal.IMG_EXPANDALL));
         reg.put(Internal.IMG_FREE, Activator.getImageDescriptor("icons/" + Internal.IMG_FREE));
         reg.put(Internal.IMG_HOST, Activator.getImageDescriptor("icons/" + Internal.IMG_HOST));
+        reg.put(Internal.IMG_DEPLOYING, Activator.getImageDescriptor("icons/" + Internal.IMG_DEPLOYING));
+        reg.put(Internal.IMG_LOST, Activator.getImageDescriptor("icons/" + Internal.IMG_LOST));
         reg.put(Internal.IMG_REMOVENODE, Activator.getImageDescriptor("icons/" + Internal.IMG_REMOVENODE));
         reg
                 .put(Internal.IMG_REMOVESOURCE, Activator.getImageDescriptor("icons/" +
@@ -175,6 +177,7 @@ public final class Activator extends AbstractUIPlugin {
         reg.put(Internal.IMG_RMSHUTDOWN, Activator.getImageDescriptor("icons/" + Internal.IMG_RMSHUTDOWN));
         reg.put(Internal.IMG_SOURCE, Activator.getImageDescriptor("icons/" + Internal.IMG_SOURCE));
         reg.put(Internal.IMG_TORELEASE, Activator.getImageDescriptor("icons/" + Internal.IMG_TORELEASE));
+        reg.put(Internal.IMG_CONFIGURING, Activator.getImageDescriptor("icons/" + Internal.IMG_CONFIGURING));
     }
 
     /**

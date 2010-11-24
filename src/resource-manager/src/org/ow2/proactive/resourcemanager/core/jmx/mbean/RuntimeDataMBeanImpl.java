@@ -89,6 +89,27 @@ public class RuntimeDataMBeanImpl extends StandardMBean implements RuntimeDataMB
     }
 
     /**
+     * @see RuntimeDataMBean#getConfiguringNodesCount()
+     */
+    public int getConfiguringNodesCount() {
+        return this.rmStatisticsHolder.getStatistics().getConfiguringNodesCount();
+    }
+
+    /**
+     * @see  RuntimeDataMBean#getLostNodesCount()
+     */
+    public int getLostNodesCount() {
+        return this.rmStatisticsHolder.getStatistics().getLostNodesCount();
+    }
+
+    /**
+     * @see RuntimeDataMBean#getDeployingNodesCount()
+     */
+    public int getDeployingNodesCount() {
+        return this.rmStatisticsHolder.getStatistics().getDeployingNodesCount();
+    }
+
+    /**
      * @see org.ow2.proactive.resourcemanager.core.jmx.mbean.RuntimeDataMBean#getFreeNodesCount()
      */
     public int getFreeNodesCount() {
@@ -114,6 +135,27 @@ public class RuntimeDataMBeanImpl extends StandardMBean implements RuntimeDataMB
      */
     public int getDownNodesCount() {
         return this.rmStatisticsHolder.getStatistics().getDownNodesCount();
+    }
+
+    /**
+     * @see org.ow2.proactive.resourcemanager.core.jmx.mbean.RuntimeDataMBean#getMaxConfiguringNodes()
+     */
+    public int getMaxConfiguringNodes() {
+        return this.rmStatisticsHolder.getStatistics().getMaxConfiguringNodes();
+    }
+
+    /**
+     * @see org.ow2.proactive.resourcemanager.core.jmx.mbean.RuntimeDataMBean#getMaxLostNodes()
+     */
+    public int getMaxLostNodes() {
+        return this.rmStatisticsHolder.getStatistics().getMaxLostNodes();
+    }
+
+    /**
+     * @see org.ow2.proactive.resourcemanager.core.jmx.mbean.RuntimeDataMBean#getMaxDeployingNodes()
+     */
+    public int getMaxDeployingNodes() {
+        return this.rmStatisticsHolder.getStatistics().getMaxDeployingNodes();
     }
 
     /**

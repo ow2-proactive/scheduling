@@ -77,7 +77,8 @@ public class TestGCMInfrastructureTimeSlotPolicy extends FunctionalTest {
 
     protected void createEmptyNodeSource(String sourceName) throws Exception {
         RMTHelper.getResourceManager().createNodeSource(sourceName, GCMInfrastructure.class.getName(),
-                new Object[] { emptyGCMD }, TimeSlotPolicy.class.getName(), getPolicyParams());
+        //first null parameter is the rm url
+                new Object[] { "", emptyGCMD }, TimeSlotPolicy.class.getName(), getPolicyParams());
 
         RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, sourceName);
     }
@@ -85,7 +86,8 @@ public class TestGCMInfrastructureTimeSlotPolicy extends FunctionalTest {
     protected void createDefaultNodeSource(String sourceName) throws Exception {
         // creating node source
         RMTHelper.getResourceManager().createNodeSource(sourceName, GCMInfrastructure.class.getName(),
-                new Object[] { GCMDeploymentData }, TimeSlotPolicy.class.getName(), getPolicyParams());
+        //first parameter is empty rm url
+                new Object[] { "", GCMDeploymentData }, TimeSlotPolicy.class.getName(), getPolicyParams());
         RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, sourceName);
 
     }
@@ -118,6 +120,8 @@ public class TestGCMInfrastructureTimeSlotPolicy extends FunctionalTest {
 
         for (int i = 0; i < descriptorNodeNumber; i++) {
             RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
+            //we eat the configuring to free event
+            RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
         }
 
         RMTHelper.log("Test 2 - nodes will be removed in 15 secs");

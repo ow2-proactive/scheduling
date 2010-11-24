@@ -51,7 +51,7 @@ $JAVA -cp $JARS \
     -Dpa.rm.home=$PA_SCHEDULER \
 	-Djava.security.policy=$PA_SCHEDULER/config/security.java.policy-client \
     $CONFIG \
-    org.ow2.proactive.resourcemanager.utils.PAAgentServiceRMStarter \
+    org.ow2.proactive.resourcemanager.utils.RMNodeStarter \
     -r $URL -n $NAME -s $NS -v $CRED
 
 wait

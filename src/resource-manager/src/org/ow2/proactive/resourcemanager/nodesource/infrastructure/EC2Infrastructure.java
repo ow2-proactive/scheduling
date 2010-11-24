@@ -51,7 +51,6 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
@@ -81,8 +80,6 @@ public class EC2Infrastructure extends InfrastructureManager {
 
     @Configurable(fileBrowser = true, description = "Absolute path of EC2 configuration file")
     protected File configurationFile;
-    @Configurable(description = "URL of the Resource Manager")
-    protected String rmUrl;
     @Configurable(credential = true, description = "Absolute path of the credential file")
     protected File RMCredentialsPath;
     @Configurable
@@ -175,15 +172,14 @@ public class EC2Infrastructure extends InfrastructureManager {
      *
      * @param parameters
      *            parameters[0]: Configuration file as byte array
-     *            parameters[1]: Fully qualified URL of the Resource Manager (proto://IP:port)
-     *            parameters[2]: RM credentials
-     *            parameters[3]: HTTP node port
+     *            parameters[1]: RM credentials
+     *            parameters[2]: HTTP node port
      */
     @Override
-    public BooleanWrapper configure(Object... parameters) {
+    public void configure(Object... parameters) {
 
         /** parameters look fine */
-        if (parameters != null && parameters.length == 4) {
+        if (parameters != null && parameters.length == 3) {
 
             if (parameters[0] == null) {
                 throw new IllegalArgumentException("EC2 config file must be specified");
@@ -201,12 +197,11 @@ public class EC2Infrastructure extends InfrastructureManager {
                 readConf(PAResourceManagerProperties.RM_EC2_PATH_PROPERTY_NAME.getValueAsString());
                 logger.debug("Expected File as 1st parameter for EC2Infrastructure: " + e.getMessage());
             }
-            String rmu = parameters[1].toString();
-            if (parameters[2] == null) {
+            if (parameters[1] == null) {
                 throw new IllegalArgumentException("Credentials must be specified");
             }
-            String creds64 = new String((byte[]) parameters[2]);
-            String nodep = parameters[3].toString();
+            String creds64 = new String((byte[]) parameters[1]);
+            String nodep = parameters[2].toString();
 
             try {
                 int pp = Integer.parseInt(nodep);
@@ -217,7 +212,7 @@ public class EC2Infrastructure extends InfrastructureManager {
                 throw new IllegalArgumentException("Invalid value for parameter Node Port", e);
             }
 
-            this.ec2d.setUserData(rmu, creds64, nodep);
+            this.ec2d.setUserData(this.rmUrl, creds64, nodep);
 
         }
         /**
@@ -227,7 +222,6 @@ public class EC2Infrastructure extends InfrastructureManager {
             throw new IllegalArgumentException("Invalid parameters for EC2Infrastructure creation");
         }
 
-        return new BooleanWrapper(false);
     }
 
     /**

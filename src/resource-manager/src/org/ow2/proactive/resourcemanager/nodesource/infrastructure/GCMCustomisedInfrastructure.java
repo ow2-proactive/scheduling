@@ -77,7 +77,7 @@ public class GCMCustomisedInfrastructure extends GCMInfrastructure {
      * policy.
      */
     @Override
-    public BooleanWrapper configure(Object... parameters) {
+    public void configure(Object... parameters) {
         if (parameters == null) {
             // nothing to do
             throw new IllegalArgumentException("No parameters were specified");
@@ -104,7 +104,6 @@ public class GCMCustomisedInfrastructure extends GCMInfrastructure {
             }
         }
 
-        return new BooleanWrapper(true);
     }
 
     /**

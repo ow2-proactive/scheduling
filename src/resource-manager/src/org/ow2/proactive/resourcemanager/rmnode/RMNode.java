@@ -229,6 +229,11 @@ public interface RMNode extends Comparable<RMNode> {
      */
     public boolean isBusy();
 
+    /**
+     * @return true if the node is configuring, false otherwise.
+     */
+    public boolean isConfiguring();
+
     // ---------------------------------------------------------------------//
     // SET
     //----------------------------------------------------------------------//
@@ -256,6 +261,11 @@ public interface RMNode extends Comparable<RMNode> {
      * change the node's status to down.
      */
     public void setDown();
+
+    /**
+     * change the node's status to configuring
+     */
+    public void setConfiguring(Client owner);
 
     /**
      * Change the {@link NodeSource} from where the node is.

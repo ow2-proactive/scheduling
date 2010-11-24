@@ -36,12 +36,32 @@
  */
 package org.ow2.proactive.resourcemanager.nodesource.infrastructure;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.locks.ReentrantLock;
 
+import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.ow2.proactive.resourcemanager.authentication.Client;
+import org.ow2.proactive.resourcemanager.common.NodeState;
+import org.ow2.proactive.resourcemanager.common.event.RMEventType;
+import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
+import org.ow2.proactive.resourcemanager.db.DatabaseManager;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
+import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
+import org.ow2.proactive.resourcemanager.rmnode.RMDeployingNode;
+import org.ow2.proactive.resourcemanager.rmnode.RMNode;
+import org.ow2.proactive.resourcemanager.utils.RMLoggers;
+import org.ow2.proactive.resourcemanager.utils.RMNodeStarter;
+import org.ow2.proactive.resourcemanager.utils.RMNodeStarter.OperatingSystem;
 
 
 /**
@@ -49,39 +69,218 @@ import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
  * Represents underlying infrastructure and defines ways to acquire / release nodes.<br>
  *
  * Acquisition requests are supposed to be asynchronous. When new new node is available it
- * should register itself into the resource manager by calling {@link InfrastructureManager#registerAcquiredNode(Node)}<br>
+ * should register itself into the resource manager by calling {@link InfrastructureManager#internalRegisterAcquiredNode(Node)}<br>
  *
  * To define a new infrastructure manager
  * - define a way to add information about further node acquisition implementing {@link InfrastructureManager#configure(Object...)}
  * - define a way to acquire a single node from underlying infrastructure in {@link InfrastructureManager#acquireNode()}
  * - define a way to acquire all available nodes from the infrastructure in the method {@link InfrastructureManager#acquireAllNodes()}
- * - register available nodes in the resource manager using {@link InfrastructureManager#registerAcquiredNode(Node)}, so they till be taken into account.
+ * - register available nodes in the resource manager using {@link InfrastructureManager#internalRegisterAcquiredNode(Node)}, so they till be taken into account.
  * - add the name of new class to the resource manager configuration file (config/rm/nodesource/infrastructures).
  *
  */
 public abstract class InfrastructureManager implements Serializable {
 
+    /** class' logger */
+    protected static final Logger logger = ProActiveLogger.getLogger(RMLoggers.NODESOURCE);
+
     /** manager's node source */
     protected NodeSource nodeSource;
 
+    /** pending nodes list */
+    private Hashtable<String, RMDeployingNode> pendingNodes = new Hashtable<String, RMDeployingNode>();
+    private Hashtable<String, RMDeployingNode> lostNodes = new Hashtable<String, RMDeployingNode>();
+
+    /** node list, miror of nodesource.getAliveNodes(), to implement random access */
+    private Hashtable<String, Node> acquiredNodes = new Hashtable<String, Node>();
+
+    private final ReentrantLock nodeAcquisitionLock = new ReentrantLock();
+
+    //shared fields, needs to be volatile not to cache it
+    private volatile boolean usingPendingNodes = false;
+    //used to timeout the nodes
+    private transient Timer timeouter = null;
+
+    /**
+     * The resource manager url. Should be provided by user.
+     */
+    // This url is populated during the call to the internalConfigure method
+    // or setNodesource depending on the valued provided by users for the call to
+    // internalConfigure.
+    // Implementations can also use getRegistrationURL once the nodesource is set.
+    @Configurable(description = "The URL of the resource manager")
+    protected String rmUrl;
+    // if true, we guess the rmurl when the nodesource is set,
+    // if false, means that the user supplied a rm url.
+    private boolean rmUrlGuess = false;
+    //export of the field's name, used by the RMCore
+    public static final String RM_URL_FIELD_NAME = "rmUrl";
+
+    public InfrastructureManager() {
+    }
+
+    /**
+     * Sets an infrastructure node source.
+     * Also sets the field rmUrl if it is not provided by users.
+     * @param nodeSource policy node source
+     */
+    public void setNodeSource(NodeSource nodeSource) {
+        this.nodeSource = nodeSource;
+        if (rmUrlGuess) {
+            this.rmUrl = this.nodeSource.getRegistrationURL();
+        }
+    }
+
+    /**
+     * To retrieve nodes whose registration status is deploying or lost.
+     * @return nodes whose registration status is deploying or lost.
+     */
+    public ArrayList<RMDeployingNode> getDeployingNodes() {
+        ArrayList<RMDeployingNode> result = new ArrayList<RMDeployingNode>();
+        synchronized (pendingNodes) {
+            result.addAll(this.pendingNodes.values());
+            result.addAll(this.lostNodes.values());
+        }
+        return result;
+    }
+
+    /**
+     * To remove a pending node given its url
+     * @param pnUrl the url of the pending node to remove.
+     * @return true if successful, false otherwise
+     */
+    public final boolean internalRemoveDeployingNode(String pnUrl) {
+        RMDeployingNode pn = null;
+        synchronized (pendingNodes) {
+            pn = this.pendingNodes.remove(pnUrl);
+            if (pn == null) {
+                pn = this.lostNodes.remove(pnUrl);
+            }
+        }
+        //if such a pending or lost node exists
+        if (pn != null) {
+            String url = pn.getNodeURL();
+            RMNodeEvent event = new RMNodeEvent(pn, RMEventType.NODE_REMOVED, pn.getState(), pn.getProvider()
+                    .getName());
+            emitEvent(event);
+            logger.trace("DeployingNode " + url + " removed from IM");
+            //one notifies listeners about the pending node removal
+            this.registerRemovedDeployingNode(pn.getNodeURL());
+            return true;
+        } else {
+            logger.trace("DeployingNode: " + pnUrl + " no more managed by IM, cannot remove it");
+            return false;
+        }
+    }
+
+    /**
+     * Performs some cleanup ( essentially removal of the cached node ) and call removeNodeImpl
+     * @param node the node to be removed
+     * @throws RMException
+     */
+    public final void internalRemoveNode(Node node) throws RMException {
+        try {
+            this.acquiredNodes.remove(node.getNodeInformation().getName());
+        } catch (Exception e) {
+            logger.warn("Exception occurred while removing node " + node);
+        }
+        this.removeNode(node);
+    }
+
+    /**
+     * This method is called by the RMCore to notify the InfrastructureManager
+     * that a new node was added to the core. If the IM throws an exception,
+     * the node is not added.
+     * Note that this method is in mutual exclusion with {@link #checkNodeIsAcquiredAndDo(String, Runnable, Runnable)}
+     * At this point, if a previous call to {@link InfrastructureManager#addDeployingNode(String, String, String, long)} was made (means that
+     * implementor uses pending nodes features), this method ensures that the implementation method (see {@link InfrastructureManager#registerAcquiredNode(Node)}
+     * is only called if no timeout has occurred for the associated pending node.
+     * @param node the newly added node
+     * @throws RMException
+     */
+    public final void internalRegisterAcquiredNode(Node node) throws RMException {
+        //if implementation doesn't use pending nodes, we just execute factory method and return
+        if (!usingPendingNodes) {
+            this.registerAcquiredNode(node);
+            return;
+        }
+        //here we use pending nodes and timeout
+        RMDeployingNode pn = null;
+        //we build the url of the associated pending node
+        String pendingNodeURL = this.buildDeployingNodeURL(node.getNodeInformation().getName());
+        synchronized (nodeAcquisitionLock) {
+            pn = this.pendingNodes.remove(pendingNodeURL);
+            //if a pending node with this name exists, one runs the implementation callback
+            if (pn != null) {
+                RMNodeEvent event = new RMNodeEvent(pn, RMEventType.NODE_REMOVED, pn.getState(), pn
+                        .getProvider().getName());
+                emitEvent(event);
+                this.registerAcquiredNode(node);
+                //if everything went well with the new node, caching it
+                try {
+                    this.acquiredNodes.put(node.getNodeInformation().getName(), node);
+                } catch (Exception e) {
+                    //if an exception occurred, we don't want to discard the node registration
+                    logger.warn("Cannot cache the node in the InfrastructureManager after registration: " +
+                        node, e);
+                }
+            } else {
+                String url = node.getNodeInformation().getURL();
+                logger.warn("Not expected node registered, discarding it: " + url);
+                throw new RMException("Not expected node registered, discarding it: " + url);
+            }
+        }
+    }
+
+    /**
+     * called by the node source at configuration time. Shifts the parameter array
+     * once done to let implementation only care about their own configurable parameters.
+     * @param parameters the parameters of the infrastructure manager
+     * @throws IllegalArgumentException if the parameters are invalid
+     */
+    public final void internalConfigure(Object... parameters) {
+        Object[] shiftedParams = null;
+        if (parameters == null || parameters.length < 1) {
+            //no parameter was supplied, guess the rm url
+            this.rmUrlGuess = true;
+            //cannot call this.nodeSource.getRegistrationURL();
+            //as the nodesource is not set yet
+        } else {
+            String url = parameters[0].toString();
+            if (url.equals("")) {
+                //we guess the url
+                this.rmUrlGuess = true;
+            } else {
+                this.rmUrl = url;
+            }
+            //we get the rm's url, know shifting the array for implementations
+            shiftedParams = new Object[parameters.length - 1];
+            System.arraycopy(parameters, 1, shiftedParams, 0, parameters.length - 1);
+        }
+        this.configure(shiftedParams);
+    }
+
+    //**********************************************************************************************\\
+    //**************************************** SPI methods *****************************************\\
+    //**********************************************************************************************\\
     /**
      * Adds information required to deploy nodes in the future.
      * Do not initiate a real nodes deployment/acquisition as it's up to the
      * policy.
-     *
-     * @return true if configuration is successful, RuntimeException otherwise
+     * @param the parameters of the infrastructure manager
+     * @throws IllegalArgumentException if the parameters are invalid
      */
-    public abstract BooleanWrapper configure(Object... parameters);
+    protected abstract void configure(Object... parameters);
 
     /**
      * Asynchronous node acquisition request.
-     * Proactive node should be registered by calling {@link InfrastructureManager#registerAcquiredNode(Node)}
+     * Proactive node should be registered by calling {@link InfrastructureManager#internalRegisterAcquiredNode(Node)}
      */
     public abstract void acquireNode();
 
     /**
      * Asynchronous request of all nodes acquisition.
-     * Proactive nodes should be registered by calling {@link InfrastructureManager#registerAcquiredNode(Node)}
+     * Proactive nodes should be registered by calling {@link InfrastructureManager#internalRegisterAcquiredNode(Node)}
      */
     public abstract void acquireAllNodes();
 
@@ -93,26 +292,311 @@ public abstract class InfrastructureManager implements Serializable {
     public abstract void removeNode(Node node) throws RMException;
 
     /**
-     * Sets an infrastructure node source
-     * @param nodeSource policy node source
+     * Notifies the user that the pending node was removed (because of a timeout, user interaction...)
+     * Default empty implementation is provided because implementors don't
+     * necessary use this feature. Anyway, if they decide to do so, they can
+     * override this method, for instance, to change a flag that would
+     * get a control loop to exit...
+     * @param pnURL the pending node's URL for which one the timeout occurred.
      */
-    public final void setNodeSource(NodeSource nodeSource) {
-        this.nodeSource = nodeSource;
+    protected void registerRemovedDeployingNode(String pnURL) {
     }
 
     /**
-     * Notifies an infrastructure manager (IM) that node which belongs to it is registering in the core.
-     * So the IM could maintain its internal structure up to date.
-     * Throwing an exception inside this method prevents node to be registered in RMCore
-     *
-     * @param node an available node to register
-     * @throws RMException if any problems occurred
+     * Notifies the implementation of the infrastructure manager that a new node has been registered.
+     * If this method throws an exception, the node registration will be discarded.
+     * This method is always called if implementor doesn't use pending nodes (no call to {@link InfrastructureManager#addDeployingNode(String, String, String, long)}
+     * was made), and is called only for pending nodes for which one no timeout occurred.
+     * @param node the newly registered node
+     * @throws RMException if the implementation does not approve the node acquisition request
      */
-    public abstract void registerAcquiredNode(Node node) throws RMException;
+    protected abstract void registerAcquiredNode(Node node) throws RMException;
 
     /**
      * Notify this infrastructure it is going to be shut down along with
      * its nodesource. All necessary cleanup should be done here.
+     * @param initiator
+     * @return mainly to be able to put a checkpoint and to be sure that
      */
-    public abstract void shutDown();
+    public void shutDown() {
+    }
+
+    //**********************************************************************************************\\
+    //**************************************** API methods *****************************************\\
+    //**********************************************************************************************\\
+
+    /**
+     * This method returns a {@link RMNodeStarter.CommandLineBuilder} filled in with "default" settings.
+     * That means that the returned CommandLineBuilder is useable as such.
+     * <ul><li>
+     * It tries to set the Java Path to use, either JAVA_HOME retrieved from your environment or java.home
+     * set by Java itself.
+     * </li><li>
+     * The target operating system is set to {@link OperatingSystem#UNIX}
+     * </li><li>
+     * If a ProActive configuration file is provided, it is used as such.
+     * </li><li>
+     * Finally, it tries to set the nodesource's name, the rm's URL and the node's name.
+     * </li></ul>
+     * @param targetOS the operating system on which one the node will be deployed
+     */
+    protected final RMNodeStarter.CommandLineBuilder getDefaultCommandLineBuilder(OperatingSystem targetOS) {
+        RMNodeStarter.CommandLineBuilder result = new RMNodeStarter.CommandLineBuilder();
+        result.setJavaPath(System.getenv("JAVA_HOME") != null ? System.getenv("JAVA_HOME") : System
+                .getProperty("java.home"));
+        result.setTargetOS(targetOS);
+        if (CentralPAPropertyRepository.PA_CONFIGURATION_FILE.isSet()) {
+            try {
+                result
+                        .setPaProperties(new File(CentralPAPropertyRepository.PA_CONFIGURATION_FILE
+                                .getValue()));
+            } catch (IOException e) {
+                logger.debug("Cannot set default pa configuration file for " +
+                    RMNodeStarter.CommandLineBuilder.class.getSimpleName(), e);
+            }
+        }
+        result.setRmURL(this.rmUrl);
+        if (this.nodeSource != null) {
+            String nsName = this.nodeSource.getName();
+            result.setSourceName(nsName);
+            result.setNodeName(nsName + "_DefaultNodeName");
+        }
+        return result;
+    }
+
+    /**
+     * Returns an empty {@link RMNodeStarter.CommandLineBuilder}
+     * @return Returns an empty {@link RMNodeStarter.CommandLineBuilder}
+     */
+    protected final RMNodeStarter.CommandLineBuilder getEmptyCommandLineBuilder() {
+        return new RMNodeStarter.CommandLineBuilder();
+    }
+
+    /** Creates a new RMDeployingNode's, stores it in a local ArrayList and notify the
+     * owning NodeSource of the RMPendingNode creation
+     * @param name The RMDeployingNode's name.
+     * @param description The RMDeployingNode's description
+     * @param the timeout after which one the pending node will be declared lost. ( node acquisition after this timeout is discarded )
+     * @return The newly created RMDeployingNode's URL.
+     */
+    protected final String addDeployingNode(String name, String command, String description,
+            final long timeout) {
+        checkName(name);
+        checkTimeout(timeout);
+        //if the user calls this method, we use the require nodes/timeout mecanism
+        usingPendingNodes = true;
+        NodeSource nsStub = this.nodeSource.getStub();
+        RMDeployingNode result = RMDeployingNodeAccessor.getDefault().newRMDeployingNode(name, nsStub,
+                command, nsStub.getAdministrator(), description);
+        final String resultURL = result.getNodeURL();
+        this.pendingNodes.put(result.getNodeURL(), result);
+        logger.trace("New DeployingNode " + name + " instanciated in IM");
+        RMNodeEvent event = new RMNodeEvent(result, RMEventType.NODE_ADDED, null, result.getProvider()
+                .getName());
+        emitEvent(event);
+        this.sched(new TimerTask() {
+            @Override
+            public void run() {
+                InfrastructureManager.this.timeout(resultURL, timeout);
+            }
+        }, timeout);
+        return result.getNodeURL();
+    }
+
+    /**
+     * To update the description of a deploying node. If a timeout has occurred for this node, the update is discarded.
+     * @param toUpdateURL The RMDeployingNode's URL whose description will be updated.
+     * @param newDescription The new description
+     * @return true in case of success, false if the deploying node is not managed by the IM anymore.
+     */
+    protected final boolean updateDeployingNodeDescription(String toUpdateURL, String newDescription) {
+        RMDeployingNode pn = this.pendingNodes.get(toUpdateURL);
+        if (pn != null) {
+            NodeState previousState = pn.getState();
+            RMDeployingNodeAccessor.getDefault().setDescription(pn, newDescription);
+            RMNodeEvent event = new RMNodeEvent(pn, RMEventType.NODE_STATE_CHANGED, previousState, pn
+                    .getProvider().getName());
+            emitEvent(event);
+            logger.trace("DeployingNode " + toUpdateURL + " updated in IM");
+            return true;
+        } else {
+            logger.trace("DeployingNode " + toUpdateURL + " no more managed by the IM, cannot update it");
+            return false;
+        }
+    }
+
+    /**
+     * Declares a pending node lost. Future attempts to modify the deploying node will be ignored.
+     * @param toUpdateURL The RMDeployingNode's URL which is to be declared as lost
+     * @param description the new rmpendingnode's description, can be null.
+     * @return true if the method ran successfully, false otherwise.
+     */
+    protected final boolean declareDeployingNodeLost(String toUpdateURL, String description) {
+        RMDeployingNode pn = null;
+        //we need to atomically move the node from the pending collection to the lost one.
+        synchronized (pendingNodes) {
+            pn = this.pendingNodes.remove(toUpdateURL);
+            if (pn != null) {
+                this.lostNodes.put(toUpdateURL, pn);
+            }
+        }
+        if (pn != null) {
+            NodeState previousState = pn.getState();
+            RMDeployingNodeAccessor.getDefault().setLost(pn);
+            if (description != null) {
+                RMDeployingNodeAccessor.getDefault().setDescription(pn, description);
+            }
+            RMNodeEvent event = new RMNodeEvent(pn, RMEventType.NODE_STATE_CHANGED, previousState, pn
+                    .getProvider().getName());
+            emitEvent(event);
+            logger.trace("PendingNode " + toUpdateURL + " declared lost in IM");
+            return true;
+        } else {
+            logger.trace("PendingNode: " + toUpdateURL + " no more managed by IM, cannot declare it as lost");
+            return false;
+        }
+    }
+
+    /**
+     * Check if the Node with the given name is already acquired ( usefull when the launcher of the process which is supposed to launch a RMNode
+     * waits for its registration ). At the same time, this methode executes the first runnable is the node has been found amoung acquired nodes and
+     * executes the second runnable if the node has not been found. Note that this method is in mutual exclusion with
+     * {@link InfrastructureManager#internalRegisterAcquiredNode(Node)} to avoid races.
+     * @param nodeName the node's name
+     * @param toRunWhenOK the Runnable that will be launched if the node is already acquired (can be null)
+     * @param toRunWhenKO the Runnable that will be launched if the node has not been found among nodesource.getAliveNodes(). (can be null)
+     * @return true if the node with such name is already acquired false otherwise.
+     */
+    protected final boolean checkNodeIsAcquiredAndDo(String nodeName, Runnable toRunWhenOK,
+            Runnable toRunWhenKO) {
+        synchronized (nodeAcquisitionLock) {
+            if (this.acquiredNodes.containsKey(nodeName)) {
+                if (toRunWhenOK != null) {
+                    try {
+                        toRunWhenOK.run();
+                    } catch (Exception e) {
+                        logger
+                                .warn(
+                                        "An exception occurred while running implementation's code whereas the node " +
+                                            nodeName + " was found.", e);
+                    }
+                }
+                return true;
+            } else {
+                if (toRunWhenKO != null) {
+                    try {
+                        toRunWhenKO.run();
+                    } catch (Exception e) {
+                        logger
+                                .warn(
+                                        "An exception occurred while running implementation's code whereas the node " +
+                                            nodeName + " was not found.", e);
+                    }
+                }
+                return false;
+            }
+        }
+    }
+
+    //**********************************************************************************************//
+    //*********************** Package private accessors & Helpers **********************************//
+    //**********************************************************************************************//
+
+    /**
+     * To emit an event and register it in the database
+     */
+    private void emitEvent(final RMNodeEvent event) {
+        NodeSource nsStub = this.nodeSource.getStub();
+        nsStub.internalEmitDeployingNodeEvent(event);
+        DatabaseManager.getInstance().register(event);
+    }
+
+    private void timeout(String pnURL, long timeout) {
+        if (this.declareDeployingNodeLost(pnURL, "Timeout occurred after " + timeout + "ms.")) {
+            this.registerRemovedDeployingNode(pnURL);
+        }
+    }
+
+    private synchronized void sched(TimerTask task, long delay) {
+        if (this.timeouter == null) {
+            this.timeouter = new Timer();
+        }
+        this.timeouter.schedule(task, delay);
+    }
+
+    private void checkTimeout(long timeout) {
+        if (timeout <= 0) {
+            throw new IllegalArgumentException("Timeout cannot be negative");
+        }
+
+    }
+
+    private void checkName(String name) {
+        if (name.contains(" ")) {
+            throw new IllegalArgumentException("Pending node name cannot contain white spaces");
+        }
+        String pnURL = this.buildDeployingNodeURL(name);
+        if (this.pendingNodes.containsKey(pnURL) || this.lostNodes.contains(pnURL)) {
+            throw new IllegalArgumentException("A Pending node with the same name has already been created");
+        }
+    }
+
+    /**
+     * Builds the name of the pending node given its name
+     * @param pnName The name of the pending node
+     * @return the URL of the pending node
+     */
+    private String buildDeployingNodeURL(String pnName) {
+        return RMDeployingNode.PROTOCOL_ID + "://" + this.nodeSource.getName() + "/" + pnName;
+    }
+
+    /**
+     * Helper nested class. Used not to expose methods that should be package private of the
+     * {@link RMDeployingNode} object.
+     */
+    public static abstract class RMDeployingNodeAccessor implements Serializable {
+        private static volatile RMDeployingNodeAccessor DEFAULT;
+
+        public static void setDefault(RMDeployingNodeAccessor d) {
+            RMDeployingNodeAccessor.DEFAULT = d;
+        }
+
+        private static RMDeployingNodeAccessor getDefault() {
+            if (RMDeployingNodeAccessor.DEFAULT != null) {
+                return RMDeployingNodeAccessor.DEFAULT;
+            }
+            try {
+                Class.forName(RMDeployingNode.class.getName(), true, RMDeployingNode.class.getClassLoader());
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+            return RMDeployingNodeAccessor.DEFAULT;
+        }
+
+        /**
+         * Instantiate a new {@link RMDeployingNode} with the given parameters
+         * @param name The pending node's name
+         * @param ns The node source owning the pending node
+         * @param command The command that has been used to launch the {@link RMNode}
+         * @param provider The node's provider
+         * @param description A first description of the node
+         * @return The newly created pending node
+         */
+        protected abstract RMDeployingNode newRMDeployingNode(String name, NodeSource ns, String command,
+                Client provider, String description);
+
+        /**
+         * To set the Description of the {@link RMDeployingNode}
+         * @param pn the pending node to update
+         * @param newDescription the new description
+         */
+        protected abstract void setDescription(RMDeployingNode pn, String newDescription);
+
+        /**
+         * To update the lost field of the pending node
+         * @param pn The pending node to update
+         * @param lost the value of lost
+         */
+        protected abstract void setLost(RMDeployingNode pn);
+    }
 }

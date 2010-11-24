@@ -202,10 +202,11 @@ public final class ResourceManagerJMXTest extends FunctionalTest {
             // Start a new node and add it to the rm
             final Node node = RMTHelper.createNode("test");
             final String nodeURL = node.getNodeInformation().getURL();
-            RMTHelper.getResourceManager().addNode(nodeURL).getBooleanValue(); // force sync
+            RMTHelper.getResourceManager().addNode(nodeURL).getBooleanValue(); // force sync, now the node is in configuring state
 
             RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
-
+            // We eat configuring to free events
+            RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
             // Get all attributes to test
             AttributeList list = conn.getAttributes(runtimeDataMBeanName, new String[] { "Status",
                     "AvailableNodesCount", "FreeNodesCount" });

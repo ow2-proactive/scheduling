@@ -41,7 +41,10 @@ import org.objectweb.proactive.annotation.PublicAPI;
 
 /**
  * Enumeration of all states of a RMNode :<BR>
+ * -deploying : node deployment is on going. <BR>
+ * -lost : node deployment failed. <BR>
  * -free : node is ready to perform a task.<BR>
+ * -configuring: node has been added to the RM but is in configuring state, not ready to perform a task.<BR>
  * -busy : node is executing a task.<BR>
  * -to be removed : node is busy and have to be removed at the end of its current task.<BR>
  * -down : node is broken, and not anymore able to perform tasks.<BR>
@@ -68,7 +71,19 @@ public enum NodeState {
      * a busy node which must be removed from resource manager when the user
      * will give back the node.
      */
-    TO_BE_REMOVED("To be removed");
+    TO_BE_REMOVED("To be removed"),
+    /**
+     * a node for which one the deployment process is pending
+     */
+    DEPLOYING("Deploying"),
+    /**
+     * a node for which one the deployment process failed
+     */
+    LOST("Lost"),
+    /**
+     * a node thant cannot be provided to a RM user, it is under configuration
+     */
+    CONFIGURING("Configuring");
 
     private String desc;
 

@@ -72,8 +72,7 @@ public class DefaultInfrastructureManager extends InfrastructureManager {
      * {@inheritDoc}
      */
     @Override
-    public BooleanWrapper configure(Object... parameters) {
-        return new BooleanWrapper(true);
+    public void configure(Object... parameters) {
     }
 
     /**

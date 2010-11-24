@@ -89,8 +89,9 @@ public class TestGCMCustomizedInfrastructureSchedulerLoadingPolicy extends
 
         byte[] hosts = InetAddress.getLocalHost().getHostName().getBytes();
         // creating node source
+        // first parameter of im is default rm url
         RMTHelper.getResourceManager().createNodeSource(sourceName,
-                GCMCustomisedInfrastructure.class.getName(), new Object[] { GCMDeploymentData, hosts },
+                GCMCustomisedInfrastructure.class.getName(), new Object[] { "", GCMDeploymentData, hosts },
                 SchedulerLoadingPolicy.class.getName(), getPolicyParams());
 
         RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, sourceName);
@@ -124,8 +125,9 @@ public class TestGCMCustomizedInfrastructureSchedulerLoadingPolicy extends
         SchedulerTHelper.log("Test 2");
         try {
             // incorrect infrastructure for the policy
+            // first im parameter is default rm url
             resourceManager.createNodeSource(source1, GCMInfrastructure.class.getName(),
-                    new Object[] { GCMDeploymentData }, SchedulerLoadingPolicy.class.getName(),
+                    new Object[] { "", GCMDeploymentData }, SchedulerLoadingPolicy.class.getName(),
                     getPolicyParams()).getBooleanValue();
             assertTrue(false);
         } catch (Exception e) {

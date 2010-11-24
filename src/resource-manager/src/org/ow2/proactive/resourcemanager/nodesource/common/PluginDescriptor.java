@@ -45,6 +45,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.resourcemanager.exception.RMException;
@@ -65,14 +66,16 @@ public class PluginDescriptor implements Serializable {
     private String pluginDescription;
 
     private Collection<ConfigurableField> configurableFields = new LinkedList<ConfigurableField>();
+    private Map<String, String> defaultValues;
 
     public PluginDescriptor() {
     }
 
-    public PluginDescriptor(Class<?> cls) {
+    public PluginDescriptor(Class<?> cls, Map<String, String> defaultValues) {
         try {
             Object instance = cls.newInstance();
             pluginName = cls.getName();
+            this.defaultValues = defaultValues;
 
             findConfigurableFileds(cls, instance);
 
@@ -105,8 +108,8 @@ public class PluginDescriptor implements Serializable {
                     valueObj = f.get(instance);
                 } catch (Exception e) {
                 }
-
-                String value = valueObj == null ? "" : valueObj.toString();
+                String value = valueObj == null ? (this.defaultValues.get(name) != null ? this.defaultValues
+                        .get(name) : "") : valueObj.toString();
                 configurableFields.add(new ConfigurableField(name, value, configurable));
             }
         }
@@ -125,6 +128,13 @@ public class PluginDescriptor implements Serializable {
     }
 
     /**
+     * @return the default values set by the rm core for this plugin
+     */
+    public Map<String, String> getDefaultValues() {
+        return this.defaultValues;
+    }
+
+    /**
      * Packs parameters inputed by user into appropriate parameters set required for this plugin.
      * Performs some operations such as file loading on user side.
      *
@@ -137,7 +147,7 @@ public class PluginDescriptor implements Serializable {
 
         if (parameters.length != configurableFields.size()) {
             throw new RMException("Incorrect number of parameters: expected " + configurableFields.size() +
-                ", actually " + parameters.length);
+                ", provided " + parameters.length);
         }
 
         int counter = 0;
@@ -204,7 +214,11 @@ public class PluginDescriptor implements Serializable {
         if (configurableFields.size() > 0) {
             String params = "";
             for (ConfigurableField field : configurableFields) {
-                params += field.getName() + " ";
+                params += field.getName();
+                //we add a default value
+                if (!field.getValue().equals("")) {
+                    params += "[" + field.getValue() + "]" + " ";
+                }
             }
             result += "Parameters: <class name> " + params + "\n";
         }

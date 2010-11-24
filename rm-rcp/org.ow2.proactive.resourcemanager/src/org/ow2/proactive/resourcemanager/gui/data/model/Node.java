@@ -36,18 +36,26 @@
  */
 package org.ow2.proactive.resourcemanager.gui.data.model;
 
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.swt.widgets.Display;
 import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
+import org.ow2.proactive.resourcemanager.gui.data.RMStore;
 
 
 /**
  * @author The ProActive Team
  */
-public class Node extends TreeLeafElement {
-    private NodeState state = null;
-    private String stateChangeTime;
-    private String provider;
-    private String owner;
+public class Node extends TreeLeafElement implements Removable, Describable {
+    protected NodeState state = null;
+    protected String stateChangeTime;
+    protected String provider;
+    protected String owner;
+    protected String description;
+
+    protected Node(String name, TreeElementType type) {
+        super(name, type);
+    }
 
     public Node(RMNodeEvent nodeEvent) {
         super(nodeEvent.getNodeUrl(), TreeElementType.NODE);
@@ -55,6 +63,7 @@ public class Node extends TreeLeafElement {
         this.stateChangeTime = nodeEvent.getTimeStampFormatted();
         this.provider = nodeEvent.getNodeProvider();
         this.owner = nodeEvent.getNodeOwner();
+        this.description = nodeEvent.getNodeInfo();
     }
 
     /**
@@ -77,6 +86,14 @@ public class Node extends TreeLeafElement {
         this.owner = event.getNodeOwner();
     }
 
+    /**
+     * Returns a description of the node
+     * @return the description of the node
+     */
+    public String getDescription() {
+        return this.description;
+    }
+
     public String getStateChangeTime() {
         return stateChangeTime;
     }
@@ -89,4 +106,31 @@ public class Node extends TreeLeafElement {
         return owner;
     }
 
+    /**
+     * @param description the new description of the node
+     */
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    /**
+     * Handles the removal of the node from the model
+     * {@inheritDoc}
+     */
+    public void removeFromModel(boolean preemptive, boolean removeDownNodes) {
+        if (removeDownNodes && this.getState() != NodeState.DOWN) {
+            return;
+        }
+        try {
+            RMStore.getInstance().getResourceManager().removeNode(this.getName(), preemptive)
+                    .getBooleanValue();
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+            String message = e.getMessage();
+            if (e.getCause() != null) {
+                message = e.getCause().getMessage();
+            }
+            MessageDialog.openError(Display.getDefault().getActiveShell(), "Cannot remove node", message);
+        }
+    }
 }

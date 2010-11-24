@@ -39,7 +39,7 @@ package org.ow2.proactive.resourcemanager.gui.data.model;
 /**
  * @author The ProActive Team
  */
-public abstract class TreeLeafElement {
+public abstract class TreeLeafElement implements Selectable {
     private String name = null;
     private TreeElementType type = null;
     private TreeParentElement parent;

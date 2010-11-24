@@ -86,7 +86,7 @@ public class InfrastructureManagerFactory {
 
             Class<?> imClass = Class.forName(infrastructureType);
             im = (InfrastructureManager) imClass.newInstance();
-            im.configure(infrastructureParameters);
+            im.internalConfigure(infrastructureParameters);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

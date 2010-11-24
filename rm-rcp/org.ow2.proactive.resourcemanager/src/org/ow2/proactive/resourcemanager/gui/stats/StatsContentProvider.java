@@ -46,6 +46,12 @@ public class StatsContentProvider implements IStructuredContentProvider {
     public Object[] getElements(Object model) {
         if (model instanceof RMModel) {
             RMModel rmmodel = (RMModel) model;
+            StatsItem pendingNodesStat = new StatsItem("# deploying nodes", Integer.toString(rmmodel
+                    .getPendingNodesNumber()));
+            StatsItem lostNodesStat = new StatsItem("# lost nodes", Integer.toString(rmmodel
+                    .getLostNodesNumber()));
+            StatsItem configuringNodesStat = new StatsItem("# configuring nodes", Integer.toString(rmmodel
+                    .getConfiguringNodesNumber()));
             StatsItem freeNodesStat = new StatsItem("# free nodes", Integer.toString(rmmodel
                     .getFreeNodesNumber()));
             StatsItem busyNodesStat = new StatsItem("# busy nodes", Integer.toString(rmmodel
@@ -54,7 +60,8 @@ public class StatsContentProvider implements IStructuredContentProvider {
                     .getDownNodesNumber()));
             StatsItem totalNodesStat = new StatsItem("# total nodes", Integer.toString(rmmodel
                     .getTotalNodesNumber()));
-            return new StatsItem[] { freeNodesStat, busyNodesStat, downNodesStat, totalNodesStat };
+            return new StatsItem[] { pendingNodesStat, lostNodesStat, configuringNodesStat, freeNodesStat,
+                    busyNodesStat, downNodesStat, totalNodesStat };
         }
         //should never return this, RMStatsViewer
         return new Object[] {};

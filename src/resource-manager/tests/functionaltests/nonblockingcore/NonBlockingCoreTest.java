@@ -94,6 +94,8 @@ public class NonBlockingCoreTest extends FunctionalTest {
 
         for (int i = 0; i < RMTHelper.defaultNodesNumber; i++) {
             RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
+            //waiting for node to be in free state
+            RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
         }
 
         int coreScriptExecutionTimeout = PAResourceManagerProperties.RM_SELECT_SCRIPT_TIMEOUT.getValueAsInt();
@@ -134,6 +136,8 @@ public class NonBlockingCoreTest extends FunctionalTest {
         resourceManager.addNode(node1URL, NodeSource.GCM_LOCAL);
 
         RMTHelper.waitForNodeEvent(RMEventType.NODE_ADDED, node1URL);
+        //waiting for node to be in free state, it is in configuring state when added...
+        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
 
         assertTrue(resourceManager.getState().getTotalNodesNumber() == RMTHelper.defaultNodesNumber + 1);
         assertTrue(resourceManager.getState().getFreeNodesNumber() == RMTHelper.defaultNodesNumber + 1);
@@ -151,13 +155,16 @@ public class NonBlockingCoreTest extends FunctionalTest {
         RMTHelper.log("Creating GCM node source " + nsName);
         byte[] GCMDeploymentData = FileToBytesConverter.convertFileToByteArray((new File(
             RMTHelper.defaultDescriptor)));
-        resourceManager.createNodeSource(nsName, GCMInfrastructure.class.getName(),
-                new Object[] { GCMDeploymentData }, StaticPolicy.class.getName(), null);
+        //first im parameter is default rm url
+        resourceManager.createNodeSource(nsName, GCMInfrastructure.class.getName(), new Object[] { "",
+                GCMDeploymentData }, StaticPolicy.class.getName(), null);
 
         //wait for creation of GCM Node Source event, and deployment of its nodes
         RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, nsName);
         for (int i = 0; i < RMTHelper.defaultNodesNumber; i++) {
             RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
+            //waiting for the node to be in free state
+            RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
         }
 
         assertTrue(resourceManager.getState().getTotalNodesNumber() == RMTHelper.defaultNodesNumber * 2);

@@ -106,6 +106,8 @@ public class SelectionWithSeveralScriptsTest extends FunctionalTest {
 
         for (int i = 0; i < RMTHelper.defaultNodesNumber; i++) {
             RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
+            //wait for the nodes to be in free state
+            RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
         }
 
         String node1Name = "node1";
@@ -124,6 +126,8 @@ public class SelectionWithSeveralScriptsTest extends FunctionalTest {
 
         //wait node adding event
         RMTHelper.waitForNodeEvent(RMEventType.NODE_ADDED, node1URL);
+        //wait for the nodes to be in free state
+        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
 
         //--------------------------------------------------
         //create a second node with only the first VM property
@@ -137,6 +141,8 @@ public class SelectionWithSeveralScriptsTest extends FunctionalTest {
 
         //wait node adding event
         RMTHelper.waitForNodeEvent(RMEventType.NODE_ADDED, node2URL);
+        //wait for the nodes to be in free state
+        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
 
         //--------------------------------------------------
         //create a third node with only the second VM property
@@ -150,6 +156,8 @@ public class SelectionWithSeveralScriptsTest extends FunctionalTest {
 
         //wait node adding event
         RMTHelper.waitForNodeEvent(RMEventType.NODE_ADDED, node3URL);
+        //wait for the nodes to be in free state
+        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
 
         //create the static selection script object that check vm prop1
         SelectionScript sScript1 = new SelectionScript(new File(vmPropSelectionScriptpath), new String[] {

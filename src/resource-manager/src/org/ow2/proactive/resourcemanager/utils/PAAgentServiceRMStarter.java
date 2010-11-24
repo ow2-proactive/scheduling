@@ -67,8 +67,10 @@ import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
  * This class is responsible for creating a local node and add it
  * to the Resource Manager.
  * 
+ * @deprecated use {@link RMNodeStarter} instead
  * @author ProActive team
  */
+@Deprecated
 public final class PAAgentServiceRMStarter {
 
     /** The default url of the Resource Manager */

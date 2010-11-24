@@ -79,6 +79,7 @@ public class EventsReceiver implements RMEventListener {
             for (RMNodeEvent nodeEvent : initialState.getNodesEvents()) {
                 model.addNode(nodeEvent);
             }
+
             model.setUpdateViews(true);
             // Init opened views AFTER model's construction
             Display.getDefault().syncExec(new Runnable() {
@@ -153,11 +154,16 @@ public class EventsReceiver implements RMEventListener {
                 break;
             case NODE_STATE_CHANGED:
                 switch (event.getNodeState()) {
+                    case CONFIGURING:
                     case BUSY:
                     case DOWN:
                     case TO_BE_REMOVED:
                     case FREE:
                         model.changeNodeState(event);
+                        break;
+                    case DEPLOYING:
+                    case LOST:
+                        model.updateDeployingNode(event);
                         break;
                 }
         }

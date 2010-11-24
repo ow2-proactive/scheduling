@@ -382,7 +382,8 @@ public class ResourceManagerModel extends ConsoleModel {
         print(Tools.getStringAsArray(oaf));
     }
 
-    private Object[] packPluginParameters(String[] params) throws RMException, ClassNotFoundException {
+    private Object[] packPluginParameters(String[] params, Map<String, String> defaultValues)
+            throws RMException, ClassNotFoundException {
         // extracting plugin name from the first param
         if (params != null && params.length > 0) {
             String name = params[0];
@@ -392,7 +393,7 @@ public class ResourceManagerModel extends ConsoleModel {
 
             //TODO if we want to run the command line remotely this part has to be rewritten
             Class<?> cls = Class.forName(name);
-            PluginDescriptor pd = new PluginDescriptor(cls);
+            PluginDescriptor pd = new PluginDescriptor(cls, defaultValues);
             // packing parameters (reading files on client side, processing login information, etc)
             try {
                 return pd.packParameters(shiftedParams);
@@ -418,8 +419,33 @@ public class ResourceManagerModel extends ConsoleModel {
                 policyName = policyInputParams[0];
             }
 
-            Object[] imPackedParams = packPluginParameters(imInputParams);
-            Object[] policyPackedParams = packPluginParameters(policyInputParams);
+            //we get the default values for the im plugin
+            Collection<PluginDescriptor> imPlugins = rm.getSupportedNodeSourceInfrastructures();
+            //we get the associated default values
+            Map<String, String> imDefaultValues = new HashMap<String, String>();
+            if (imName != null) {
+                for (PluginDescriptor pd : imPlugins) {
+                    if (imName.equals(pd.getPluginName())) {
+                        imDefaultValues = pd.getDefaultValues();
+                        break;
+                    }
+                }
+            }
+            //we do the same for the ns policy
+            Collection<PluginDescriptor> nspPlugins = rm.getSupportedNodeSourcePolicies();
+            Map<String, String> nspDefaultValues = new HashMap<String, String>();
+            if (policyName != null) {
+                for (PluginDescriptor pd : nspPlugins) {
+                    if (policyName.equals(pd.getPluginName())) {
+                        nspDefaultValues = pd.getDefaultValues();
+                        break;
+                    }
+
+                }
+            }
+            //even if we provide coherent default values, user must supply his
+            Object[] imPackedParams = packPluginParameters(imInputParams, imDefaultValues);
+            Object[] policyPackedParams = packPluginParameters(policyInputParams, nspDefaultValues);
 
             BooleanWrapper result = rm.createNodeSource(nodeSourceName, imName, imPackedParams, policyName,
                     policyPackedParams);

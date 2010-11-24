@@ -89,4 +89,5 @@ public class RMMonitorEventReceiver implements RMEventListener {
         RMMonitoring monitor = auth.login(cred).getMonitoring();
         return monitor.addRMEventListener((RMEventListener) PAActiveObject.getStubOnThis());
     }
+
 }

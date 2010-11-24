@@ -36,6 +36,7 @@
  */
 package org.ow2.proactive.resourcemanager.gui.handlers;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.commands.AbstractHandler;
@@ -45,7 +46,8 @@ import org.eclipse.core.commands.HandlerEvent;
 import org.eclipse.core.commands.IHandler;
 import org.eclipse.ui.handlers.HandlerUtil;
 import org.ow2.proactive.resourcemanager.gui.data.RMStore;
-import org.ow2.proactive.resourcemanager.gui.data.model.Node;
+import org.ow2.proactive.resourcemanager.gui.data.model.Removable;
+import org.ow2.proactive.resourcemanager.gui.data.model.Selectable;
 import org.ow2.proactive.resourcemanager.gui.dialog.RemoveNodeDialog;
 
 
@@ -54,7 +56,7 @@ public class RemoveNodesHandler extends AbstractHandler implements IHandler {
     private static RemoveNodesHandler instance;
 
     private boolean previousState = true;
-    private List<Node> selectedNodes = null;
+    private List<Removable> selectedNodes = null;
 
     public RemoveNodesHandler() {
         super();
@@ -91,8 +93,14 @@ public class RemoveNodesHandler extends AbstractHandler implements IHandler {
         return null;
     }
 
-    public void setSelectedNodes(List<Node> selectedNodes) {
-        this.selectedNodes = selectedNodes;
+    public void setSelectedNodes(List<Selectable> selectedNodes) {
+        List<Removable> toRemove = new ArrayList<Removable>();
+        for (Selectable selected : selectedNodes) {
+            if (selected instanceof Removable) {
+                toRemove.add((Removable) selected);
+            }
+        }
+        this.selectedNodes = toRemove;
         if (!previousState && selectedNodes.size() > 0) {
             fireHandlerChanged(new HandlerEvent(this, true, false));
         } else if (previousState && selectedNodes.size() == 0) {

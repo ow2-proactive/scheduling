@@ -189,8 +189,10 @@ public class SchedulerStarter {
                                                     .getValueAsString())));
                             byte[] GCMDeploymentData = FileToBytesConverter.convertFileToByteArray(new File(
                                 deploymentFile));
+                            //first im parameter is default rm url
                             rman.createNodeSource(NodeSource.GCM_LOCAL, GCMInfrastructure.class.getName(),
-                                    new Object[] { GCMDeploymentData }, StaticPolicy.class.getName(), null);
+                                    new Object[] { "", GCMDeploymentData }, StaticPolicy.class.getName(),
+                                    null);
 
                             logger.info("Resource Manager created on " + rmAuth.getHostURL());
                         } catch (AlreadyBoundException abe) {

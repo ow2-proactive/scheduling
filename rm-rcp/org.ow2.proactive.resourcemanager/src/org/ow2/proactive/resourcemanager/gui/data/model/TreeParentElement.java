@@ -36,7 +36,7 @@
  */
 package org.ow2.proactive.resourcemanager.gui.data.model;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 
 
 /**
@@ -44,11 +44,16 @@ import java.util.ArrayList;
  *
  */
 public abstract class TreeParentElement extends TreeLeafElement {
-    protected ArrayList<TreeLeafElement> children;
+    protected LinkedList<TreeLeafElement> children;
 
     public TreeParentElement(String name, TreeElementType type) {
         super(name, type);
-        this.children = new ArrayList<TreeLeafElement>();
+        this.children = new LinkedList<TreeLeafElement>();
+    }
+
+    public void addFirstChild(TreeLeafElement child) {
+        children.addFirst(child);
+        child.setParent(this);
     }
 
     public void addChild(TreeLeafElement child) {

@@ -86,10 +86,16 @@ public class TestNSNodesPermissions extends FunctionalTest {
         Node node2 = RMTHelper.createNode("node2");
         nsadmin.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
         RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
+        //we eat the configuring to free nodeevent
+        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
 
         NodeSet nodes = nsadmin.getAtMostNodes(1, null);
+        //we eat free -> busy
+        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
         Assert.assertEquals(1, nodes.size());
         nsadmin.releaseNodes(nodes);
+        //busy -> free
+        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
         nsadmin.disconnect();
 
         ResourceManager user = RMTHelper.join("radmin", "pwd");
@@ -98,12 +104,20 @@ public class TestNSNodesPermissions extends FunctionalTest {
 
         user.addNode(node2.getNodeInformation().getURL(), nsName).getBooleanValue();
         RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
+        //we eat the configuring to free nodeevent
+        RMTHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node2.getNodeInformation().getURL());
         user.disconnect();
 
         nsadmin = RMTHelper.join("nsadmin", "pwd");
         nodes = nsadmin.getAtMostNodes(2, null);
+        //we eat free -> busy * 2
+        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
         Assert.assertEquals("Did not get foreign node", 2, nodes.size());
         nsadmin.releaseNodes(nodes);
+        //busy -> free * 2
+        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
 
         nsadmin.removeNodeSource(nsName, true).getBooleanValue();
         RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
@@ -120,6 +134,8 @@ public class TestNSNodesPermissions extends FunctionalTest {
         node2 = RMTHelper.createNode("node2");
         admin.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
         RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
+        //we eat the configuring to free nodeevent
+        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
         admin.disconnect();
 
         user = RMTHelper.join("radmin", "pwd");
@@ -127,13 +143,21 @@ public class TestNSNodesPermissions extends FunctionalTest {
         Assert.assertEquals("User cannot get foreign node", 0, nodes.size());
 
         user.addNode(node2.getNodeInformation().getURL(), nsName).getBooleanValue();
-        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
+        RMTHelper.waitForNodeEvent(RMEventType.NODE_ADDED, node2.getNodeInformation().getURL());
+        //we eat the configuring to free nodeevent
+        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
         user.disconnect();
 
         nsadmin = RMTHelper.join("nsadmin", "pwd");
         nodes = nsadmin.getAtMostNodes(2, null);
         Assert.assertEquals(2, nodes.size());
+        //we eat free -> busy * 2
+        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
         nsadmin.releaseNodes(nodes);
+        //busy -> free * 2
+        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
         nsadmin.disconnect();
 
         // removing the node source
@@ -154,22 +178,36 @@ public class TestNSNodesPermissions extends FunctionalTest {
 
         user.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
         RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
+        //we eat the configuring to free nodeevent
+        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
         user.disconnect();
 
         admin = RMTHelper.join("admin", "admin");
         admin.addNode(node2.getNodeInformation().getURL(), nsName).getBooleanValue();
         RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
+        //we eat the configuring to free nodeevent
+        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
 
         // admin can get 2 nodes as it has AllPermissions
         nodes = admin.getAtMostNodes(2, null);
         Assert.assertEquals("Admin did not get foreign node", 2, nodes.size());
+        //we eat free -> busy * 2
+        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
         admin.releaseNodes(nodes);
+        //busy -> free * 2
+        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
         admin.disconnect();
 
         user = RMTHelper.join("radmin", "pwd");
         nodes = admin.getAtMostNodes(2, null);
         Assert.assertEquals(1, nodes.size());
+        //we eat free -> busy
+        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
         user.releaseNodes(nodes);
+        //busy -> free
+        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
         user.disconnect();
 
         nsadmin = RMTHelper.join("nsadmin", "pwd");
@@ -196,30 +234,48 @@ public class TestNSNodesPermissions extends FunctionalTest {
 
         user.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
         RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
+        //we eat the configuring to free nodeevent
+        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
         user.disconnect();
 
         admin = RMTHelper.join("admin", "admin");
         admin.addNode(node2.getNodeInformation().getURL(), nsName).getBooleanValue();
         RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
+        //we eat the configuring to free nodeevent
+        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
 
         // admin can get 2 nodes as it has AllPermissions
         nodes = admin.getAtMostNodes(2, null);
         Assert.assertEquals("Admin did not get foreign node", 2, nodes.size());
+        //we eat free -> busy * 2
+        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
         admin.releaseNodes(nodes);
+        //we eat busy -> free * 2
+        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
         admin.disconnect();
 
         user = RMTHelper.join("radmin", "pwd");
         nodes = admin.getAtMostNodes(2, null);
         Assert.assertEquals(1, nodes.size());
         Assert.assertTrue(nodes.get(0).getNodeInformation().getURL().contains("node1"));
+        //we eat free -> busy
+        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
         user.releaseNodes(nodes);
+        //we eat busy -> free
+        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
         user.disconnect();
 
         nsadmin = RMTHelper.join("nsadmin", "pwd");
         nodes = nsadmin.getAtMostNodes(2, null);
         Assert.assertEquals("Have not get an admin node", 1, nodes.size());
         Assert.assertTrue(nodes.get(0).getNodeInformation().getURL().contains("node2"));
+        //we eat free -> busy
+        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
         nsadmin.releaseNodes(nodes);
+        //we eat busy -> free
+        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
         nsadmin.disconnect();
 
         // removing the node source
@@ -238,12 +294,18 @@ public class TestNSNodesPermissions extends FunctionalTest {
         node = RMTHelper.createNode("node1");
         user.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
         RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
+        //we eat the configuring to free nodeevent
+        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
         user.disconnect();
 
         nsadmin = RMTHelper.join("nsadmin", "pwd");
         nodes = nsadmin.getAtMostNodes(1, null);
         Assert.assertEquals("Have got a foreign node", 1, nodes.size());
+        //we eat the free to busy
+        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
         nsadmin.releaseNodes(nodes);
+        //we eat the busy to free
+        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
         nsadmin.disconnect();
 
         // removing the node source

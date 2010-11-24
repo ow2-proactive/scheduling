@@ -41,6 +41,7 @@ import static junit.framework.Assert.assertTrue;
 import java.io.File;
 
 import org.objectweb.proactive.core.node.Node;
+import org.ow2.proactive.resourcemanager.common.RMState;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.GCMInfrastructure;
@@ -68,20 +69,26 @@ public class TestGCMInfrastructureStaticPolicy extends FunctionalTest {
     protected int defaultDescriptorNodesNb = 3;
 
     protected void createEmptyNodeSource(String sourceName) throws Exception {
+        //first parameter of im is empty default rm url
         RMTHelper.getResourceManager().createNodeSource(sourceName, GCMInfrastructure.class.getName(),
-                new Object[] { emptyGCMD }, StaticPolicy.class.getName(), null);
+                new Object[] { "", emptyGCMD }, StaticPolicy.class.getName(), null);
 
         RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, sourceName);
     }
 
     protected void createNodeSourceWithNodes(String sourceName) throws Exception {
         // creating node source
+        // first parameter of im is empty default rm url
         RMTHelper.getResourceManager().createNodeSource(sourceName, GCMInfrastructure.class.getName(),
-                new Object[] { GCMDeploymentData }, StaticPolicy.class.getName(), null);
+                new Object[] { "", GCMDeploymentData }, StaticPolicy.class.getName(), null);
 
         RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, sourceName);
         for (int i = 0; i < defaultDescriptorNodesNb; i++) {
             RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
+        }
+        // once added, wait for nodes to be configured
+        for (int i = 0; i < defaultDescriptorNodesNb; i++) {
+            RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
         }
     }
 
@@ -130,12 +137,15 @@ public class TestGCMInfrastructureStaticPolicy extends FunctionalTest {
         RMTHelper.log("Test 2 - creation/removal of the node source with nodes");
         createNodeSourceWithNodes(source1);
 
-        assertTrue(resourceManager.getState().getTotalNodesNumber() == defaultDescriptorNodesNb);
-        assertTrue(resourceManager.getState().getFreeNodesNumber() == defaultDescriptorNodesNb);
+        RMState s = resourceManager.getState();
+        assertTrue(s.getTotalNodesNumber() == defaultDescriptorNodesNb);
+        assertTrue(s.getFreeNodesNumber() == defaultDescriptorNodesNb);
         // releasing some nodes
         NodeSet ns = resourceManager.getAtMostNodes(defaultDescriptorNodesNb, null);
 
         for (Node n : ns) {
+            // eat the freeToBusy event
+            RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
             resourceManager.removeNode(n.getNodeInformation().getURL(), true);
             RMTHelper.waitForNodeEvent(RMEventType.NODE_REMOVED, n.getNodeInformation().getURL());
         }

@@ -48,6 +48,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
@@ -60,8 +61,10 @@ import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
-import org.ow2.proactive.resourcemanager.utils.PAAgentServiceRMStarter;
 import org.ow2.proactive.resourcemanager.utils.RMLoggers;
+import org.ow2.proactive.resourcemanager.utils.RMNodeStarter;
+import org.ow2.proactive.resourcemanager.utils.RMNodeStarter.CommandLineBuilder;
+import org.ow2.proactive.resourcemanager.utils.RMNodeStarter.OperatingSystem;
 import org.ow2.proactive.utils.FileToBytesConverter;
 
 
@@ -136,11 +139,6 @@ public class SSHInfrastructure2 extends InfrastructureManager {
     @Configurable(description = "Options for the java command\nlaunching the node on the remote hosts")
     protected String javaOptions;
     /**
-     * The rm's url
-     */
-    @Configurable(description = "URL of the Resource Manager")
-    protected String rmUrl;
-    /**
      * Path to the credentials file user for RM authentication
      */
     @Configurable(credential = true, description = "Absolute path of the credential file")
@@ -170,9 +168,9 @@ public class SSHInfrastructure2 extends InfrastructureManager {
     private Hashtable<String, InetAddress> registeredNodes = new Hashtable<String, InetAddress>();
 
     /**
-     * expected nodes. safe check... If a node is not expected, its registration must be discarded
+     * To notify the control loop of the pending node timeout
      */
-    private Hashtable<String, InetAddress> expectedNodes = new Hashtable<String, InetAddress>();
+    private ConcurrentHashMap<String, Boolean> pnTimeout = new ConcurrentHashMap<String, Boolean>();
 
     /**
      * Acquire one node per available host
@@ -199,7 +197,7 @@ public class SSHInfrastructure2 extends InfrastructureManager {
             }
             tmpHost = freeHosts.remove(0);
             logger.debug("Acquiring a new SSH Node. #freeHosts:" + freeHosts.size() + " #registered: " +
-                registeredNodes.size() + " #expected: " + expectedNodes.size() + " (#expected not accurate)");
+                registeredNodes.size());
         }
         final InetAddress host = tmpHost;
         this.nodeSource.executeInParallel(new Runnable() {
@@ -207,8 +205,8 @@ public class SSHInfrastructure2 extends InfrastructureManager {
                 try {
                     startRemoteNode(host);
                     logger.debug("Node acquisition ended. #freeHosts:" + freeHosts.size() + " #registered: " +
-                        registeredNodes.size() + " #expected: " + expectedNodes.size() +
-                        " (#expected not accurate)");
+                        registeredNodes.size());
+                    //node acquisition went well for host so we update the threshold
                     //node acquisition went well for host so we update the threshold
                     synchronized (freeHosts) {
                         hostsThresholds.put(host, attempt);
@@ -227,8 +225,7 @@ public class SSHInfrastructure2 extends InfrastructureManager {
                     }
                     String description = "Could not acquire SSH Node on host " + host.toString() +
                         ". NS's state refreshed regarding last checked excpetion: #freeHosts:" +
-                        freeHosts.size() + " #registered: " + registeredNodes.size() + " #expected: " +
-                        expectedNodes.size() + " (#expected not accurate)";
+                        freeHosts.size() + " #registered: " + registeredNodes.size();
                     logger.error(description, e);
                     return;
                 }
@@ -246,16 +243,14 @@ public class SSHInfrastructure2 extends InfrastructureManager {
      * @throws RMException acquisition failed
      */
     private void startRemoteNode(InetAddress host) throws RMException {
-        StringBuilder sb = new StringBuilder();
-        String ps = this.targetOSObj.ps;
         String fs = this.targetOSObj.fs;
-        sb.append(this.javaPath);
-        sb.append(" ");
+        CommandLineBuilder clb = super.getDefaultCommandLineBuilder(this.targetOSObj);
+        //we take care of spaces in java path
+        clb.setJavaPath(this.javaPath);
         //we set the rm.home prop
-        sb.append(PAResourceManagerProperties.RM_HOME.getCmdLine());
-        sb.append(schedulingPath);
-        sb.append(" ");
+        clb.setRmHome(schedulingPath);
         //we set the java security policy file
+        StringBuilder sb = new StringBuilder();
         sb.append(CentralPAPropertyRepository.JAVA_SECURITY_POLICY.getCmdLine());
         sb.append(schedulingPath);
         sb.append(fs);
@@ -265,6 +260,7 @@ public class SSHInfrastructure2 extends InfrastructureManager {
         //we set the log4j configuration file
         String log4jcmd = CentralPAPropertyRepository.LOG4J.getCmdLine();
         if (!this.javaOptions.contains(log4jcmd) && targetOSObj.equals(OperatingSystem.CYGWIN)) {
+            //especially on cygwin, there is an issue if no log4j configuration is provided
             sb.append(log4jcmd);
             sb.append(schedulingPath);
             sb.append(fs);
@@ -276,139 +272,54 @@ public class SSHInfrastructure2 extends InfrastructureManager {
         }
         //we add extra java/PA configuration
         sb.append(this.javaOptions);
-        //we build classpath
-        sb.append(" -cp ");
-        if (targetOSObj.equals(OperatingSystem.CYGWIN)) {
-            sb.append("\\\"");//especially on cygwin, we need to quote the cp
-        }
-        sb.append(schedulingPath);
-        sb.append(fs);
-        sb.append("dist");
-        sb.append(fs);
-        sb.append("lib");
-        sb.append(fs);
-        sb.append("jython-engine.jar");
-        sb.append(ps);
-        sb.append(schedulingPath);
-        sb.append(fs);
-        sb.append("dist");
-        sb.append(fs);
-        sb.append("lib");
-        sb.append(fs);
-        sb.append("script-js.jar");
-        sb.append(ps);
-        sb.append(schedulingPath);
-        sb.append(fs);
-        sb.append("dist");
-        sb.append(fs);
-        sb.append("lib");
-        sb.append(fs);
-        sb.append("jruby-engine.jar");
-        sb.append(ps);
-        sb.append(schedulingPath);
-        sb.append(fs);
-        sb.append("dist");
-        sb.append(fs);
-        sb.append("lib");
-        sb.append(fs);
-        sb.append("ProActive.jar");
-        sb.append(ps);
-        sb.append(schedulingPath);
-        sb.append(fs);
-        sb.append("dist");
-        sb.append(fs);
-        sb.append("lib");
-        sb.append(fs);
-        sb.append("ProActive_ResourceManager.jar");
-        sb.append(ps);
-        sb.append(schedulingPath);
-        sb.append(fs);
-        sb.append("dist");
-        sb.append(fs);
-        sb.append("lib");
-        sb.append(fs);
-        sb.append("ProActive_Scheduler-worker.jar");
-        sb.append(ps);
-        sb.append(schedulingPath);
-        sb.append(fs);
-        sb.append("dist");
-        sb.append(fs);
-        sb.append("lib");
-        sb.append(fs);
-        sb.append("ProActive_SRM-common.jar");
-        sb.append(ps);
-        sb.append(schedulingPath);
-        sb.append(fs);
-        sb.append("dist");
-        sb.append(fs);
-        sb.append("lib");
-        sb.append(fs);
-        sb.append("commons-logging-1.1.1.jar");
-        sb.append(ps);
-        sb.append(schedulingPath);
-        sb.append(fs);
-        sb.append("dist");
-        sb.append(fs);
-        sb.append("lib");
-        sb.append(fs);
-        sb.append("commons-httpclient-3.1.jar");
-        sb.append(ps);
-        sb.append(schedulingPath);
-        sb.append(fs);
-        sb.append("dist");
-        sb.append(fs);
-        sb.append("lib");
-        sb.append(fs);
-        sb.append("commons-codec-1.3.jar");
-        sb.append(ps);
-        sb.append(".");
-        if (targetOSObj.equals(OperatingSystem.CYGWIN)) {
-            sb.append("\\\"");//especially on cygwin, we need to quote the cp
-        }
-        sb.append(" ");
-        //we set the executable's name
-        sb.append(PAAgentServiceRMStarter.class.getName());
-
-        //now we set PAAgentServiceRMStarter parameters
-        //first rm's url
-        sb.append(" -r ");
-        sb.append(this.rmUrl);
+        clb.setPaProperties(sb.toString());
         //afterwards, node's name
         // generate the node name
         // current rmcore shortID should be added to ensure uniqueness
-        String nodeName = "SSH-" + this.nodeSource.getName().replace(" ", "_") + "-" +
+        final String nodeName = "SSH-" + this.nodeSource.getName().replace(" ", "_") + "-" +
             ProActiveCounter.getUniqID();
-        sb.append(" -n ");
-        sb.append(nodeName);
-        //the nodesource's name
-        sb.append(" -s ");
-        sb.append(this.nodeSource.getName());
+        clb.setNodeName(nodeName);
         //finally, the credential's value
         String credString = null;
         try {
-            credString = new String(this.credentials.getBase64()) + " ";
+            credString = new String(this.credentials.getBase64());
         } catch (KeyException e1) {
             throw new RMException("Could not get base64 credentials", e1);
         }
-        sb.append(" -v ");
-        sb.append(credString);
+        clb.setCredentialsValueAndNullOthers(credString);
 
         //add an expected node. every unexpected node will be discarded
-        expectedNodes.put(nodeName, host);
+        String cmdLine;
+        try {
+            cmdLine = clb.buildCommandLine();
+        } catch (IOException e2) {
+            throw new RMException("Cannot build the " + RMNodeStarter.class.getSimpleName() +
+                "'s command line.", e2);
+        }
 
-        String cmdLine = sb.toString();
+        //one escape the command to make it runnable through ssh
+        if (cmdLine.contains("\"")) {
+            cmdLine = cmdLine.replaceAll("\"", "\\\\\"");
+        }
+
+        //we create a new pending node before ssh command ran
+        final String pnURL = super.addDeployingNode(nodeName, cmdLine, "Deploying node on host " + host,
+                this.nodeTimeOut);
+        this.pnTimeout.put(pnURL, new Boolean(false));
+
         Process p = null;
         try {
             p = Utils.runSSHCommand(host, cmdLine, sshOptions);
         } catch (IOException e1) {
+            super.declareDeployingNodeLost(pnURL, "Cannot run command: " + cmdLine + ", with ssh options: " +
+                sshOptions + " - " + e1.getMessage());
             throw new RMException("Cannot run command: " + cmdLine + ", with ssh options: " + sshOptions, e1);
         }
 
         String lf = System.getProperty("line.separator");
 
-        long t1 = System.currentTimeMillis();
         int circuitBreakerThreshold = 5;
-        while (true && circuitBreakerThreshold > 0) {
+        while (!this.pnTimeout.get(pnURL) && circuitBreakerThreshold > 0) {
             try {
                 int exitCode = p.exitValue();
                 if (exitCode != 0) {
@@ -419,59 +330,28 @@ public class SSHInfrastructure2 extends InfrastructureManager {
                 }
                 String pOutPut = extractProcessOutput(p);
                 String pErrPut = extractProcessErrput(p);
-                String description = "SSH command failed to launch node on host " + host.getHostName() + lf +
-                    "Error code: " + exitCode + lf + "Errput: " + pErrPut + lf + "Output: " + pOutPut;
+                final String description = "SSH command failed to launch node on host " + host.getHostName() +
+                    lf + "Error code: " + exitCode + lf + "Errput: " + pErrPut + lf + "Output: " + pOutPut;
                 logger.error(description);
-                synchronized (expectedNodes) {
-                    if (expectedNodes.remove(nodeName) != null) {
-                        //there isn't any race regarding node registration
-                        throw new RMException("SSH Node " + nodeName +
-                            " is not expected anymore because of an error.");
-                    } else {
-                        if (registeredNodes.containsKey(nodeName)) {
-                            //ok, we reached a correct state
-                            //no way to destroy the process, we get its exit code...
-                            return;
-                        } else {
-                            throw new RMException("Invalid state, node " + nodeName +
-                                " seems to be registered but is not found.");
-                        }
+                if (super.checkNodeIsAcquiredAndDo(nodeName, null, new Runnable() {
+                    public void run() {
+                        SSHInfrastructure2.this.declareDeployingNodeLost(pnURL, description);
                     }
+                })) {
+                    return;
+                } else {
+                    //there isn't any race regarding node registration
+                    throw new RMException("SSH Node " + nodeName +
+                        " is not expected anymore because of an error.");
                 }
             } catch (IllegalThreadStateException e) {
                 logger.trace("IllegalThreadStateException while waiting for " + nodeName + " registration");
             }
 
-            if (registeredNodes.containsKey(nodeName)) {
+            if (super.checkNodeIsAcquiredAndDo(nodeName, null, null)) {
                 //registration is ok, we destroy the process if it is not running localy
                 this.destroyProcessIfRemote(p, host);
                 return;
-            }
-
-            long t2 = System.currentTimeMillis();
-            if (t2 - t1 > this.nodeTimeOut || shutdown) {
-                synchronized (expectedNodes) {
-                    if (expectedNodes.remove(nodeName) != null) {
-                        //there isn't any race regarding node registration
-                        p.destroy();
-                        String pErrPut = extractProcessErrput(p);
-                        String pOutPut = extractProcessOutput(p);
-                        String description = "SSH command timed out for node " + nodeName + " on host " +
-                            host.getHostName() + lf + "Output: " + pOutPut + lf + "Errput: " + pErrPut;
-                        logger.error(description);
-                        throw new RMException("Timeout occured for node " + nodeName + " on host " +
-                            host.getHostAddress());
-                    } else {
-                        if (registeredNodes.containsKey(nodeName)) {
-                            //ok, we reached a correct state
-                            this.destroyProcessIfRemote(p, host);
-                            return;
-                        } else {
-                            throw new RMException("Invalid state, node " + nodeName +
-                                " seems to be registered but is not found.");
-                        }
-                    }
-                }
             }
 
             try {
@@ -481,9 +361,18 @@ public class SSHInfrastructure2 extends InfrastructureManager {
                 logger.trace("An exception occurred while monitoring ssh subprocess", e);
             }
         }
+
+        //if we exit because of a timeout
+        if (this.pnTimeout.get(pnURL)) {
+            //we remove it
+            this.pnTimeout.remove(pnURL);
+            //we destroy the process
+            p.destroy();
+            throw new RMException("Deploying Node " + nodeName + " not expected any more");
+        }
         if (circuitBreakerThreshold <= 0) {
             logger.error("Circuit breaker threshold reached while monitoring ssh subprocess.");
-            throw new RMException("Several xceptions occurred while monitoring ssh subprocess.");
+            throw new RMException("Several exceptions occurred while monitoring ssh subprocess.");
         }
     }
 
@@ -498,14 +387,13 @@ public class SSHInfrastructure2 extends InfrastructureManager {
      *			  parameters[4]	  : number of attempt to deploy a node
      *			  parameters[5]   : target OS' type (Linux, Windows or Cygwin)
      *            parameters[6]   : extra java options
-     *            parameters[7]   : rm url
-     *            parameters[8]   : rm cred
-     *            parameters[9]   : host list file
+     *            parameters[7]   : rm cred
+     *            parameters[8]   : host list file
      * @throws IllegalArgumentException configuration failed
      */
     @Override
-    public BooleanWrapper configure(Object... parameters) {
-        if (parameters != null && parameters.length >= 10) {
+    public void configure(Object... parameters) {
+        if (parameters != null && parameters.length >= 9) {
             this.sshOptions = parameters[0].toString();
             this.javaPath = parameters[1].toString();
             if (this.javaPath == null || this.javaPath.equals("")) {
@@ -539,27 +427,23 @@ public class SSHInfrastructure2 extends InfrastructureManager {
             }
 
             this.javaOptions = parameters[6].toString();
-            this.rmUrl = parameters[7].toString();
-            if (this.rmUrl.equals("")) {
-                throw new IllegalArgumentException("rmUrl must be specified");
-            }
 
             //credentials
-            if (parameters[8] == null) {
+            if (parameters[7] == null) {
                 throw new IllegalArgumentException("Credentials must be specified");
             }
             try {
-                this.credentials = Credentials.getCredentialsBase64((byte[]) parameters[8]);
+                this.credentials = Credentials.getCredentialsBase64((byte[]) parameters[7]);
             } catch (KeyException e) {
                 throw new IllegalArgumentException("Could not retrieve base64 credentials", e);
             }
 
             //host list
-            if (parameters[9] == null) {
+            if (parameters[8] == null) {
                 throw new IllegalArgumentException("Host file must be specified");
             }
             try {
-                byte[] hosts = (byte[]) parameters[9];
+                byte[] hosts = (byte[]) parameters[8];
                 File f = File.createTempFile("hosts", "list");
                 FileToBytesConverter.convertByteArrayToFile(hosts, f);
                 readHosts(f);
@@ -570,7 +454,6 @@ public class SSHInfrastructure2 extends InfrastructureManager {
         } else {
             throw new IllegalArgumentException("Invalid parameters for infrastructure creation");
         }
-        return new BooleanWrapper(true);
     }
 
     /**
@@ -623,6 +506,11 @@ public class SSHInfrastructure2 extends InfrastructureManager {
         }
     }
 
+    /**
+     * Extracts remote process errput and returns it
+     * @param p the remote process frow which one errput will be extracted.
+     * @return the remote process' errput
+     */
     private String extractProcessErrput(Process p) {
         BufferedReader br = new BufferedReader(new InputStreamReader(p.getErrorStream()));
         StringBuilder sb = new StringBuilder();
@@ -647,6 +535,11 @@ public class SSHInfrastructure2 extends InfrastructureManager {
         return sb.toString();
     }
 
+    /**
+     * Extracts remote process output and returns it
+     * @param p the remote process frow which one output will be extracted.
+     * @return the remote process' output
+     */
     private String extractProcessOutput(Process p) {
         BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream()));
         StringBuilder sb = new StringBuilder();
@@ -671,6 +564,12 @@ public class SSHInfrastructure2 extends InfrastructureManager {
         return sb.toString();
     }
 
+    /**
+     * Destroys the process only if it runs on a remote host
+     * (ie. kills the SSH process)
+     * @param p the process to kill if remote
+     * @param host the host on which one the process is running.
+     */
     private void destroyProcessIfRemote(Process p, InetAddress host) {
         boolean isRemote = true;
         try {
@@ -685,20 +584,26 @@ public class SSHInfrastructure2 extends InfrastructureManager {
         }
     }
 
+    /**
+     * This method is called by Infrastructure Manager in case of a pending node removal.
+     * We take advantage of it to specify to the remote process control loop of the removal.
+     * This one will then exit.
+     */
     @Override
-    public void registerAcquiredNode(Node node) throws RMException {
+    protected void registerRemovedDeployingNode(String pnURL) {
+        this.pnTimeout.put(pnURL, new Boolean(true));
+    }
+
+    /**
+     * Parent IM notifies about a new node registration
+     */
+    @Override
+    protected void registerAcquiredNode(Node node) throws RMException {
         String nodeName = node.getNodeInformation().getName();
-        synchronized (expectedNodes) {
-            InetAddress host = expectedNodes.remove(nodeName);
-            if (host != null) {
-                registeredNodes.put(nodeName, host);
-                logger.debug("New expected node registered: #freeHosts:" + freeHosts.size() +
-                    " #registered: " + registeredNodes.size() + " #expected: " + expectedNodes.size() +
-                    " (#expected not accurate)");
-            } else {
-                logger.debug("Non expected node not registered: " + nodeName);
-                throw new RMException("Node " + nodeName + " not expected. Rejecting it.");
-            }
+        registeredNodes.put(nodeName, node.getVMInformation().getInetAddress());
+        if (logger.isDebugEnabled()) {
+            logger.debug("New expected node registered: #freeHosts:" + freeHosts.size() + " #registered: " +
+                registeredNodes.size());
         }
     }
 
@@ -712,7 +617,7 @@ public class SSHInfrastructure2 extends InfrastructureManager {
         if ((host = registeredNodes.remove(nodeName)) != null) {
             freeHosts.add(host);
             logger.debug("Node " + nodeName + " removed. #freeHosts:" + freeHosts.size() + " #registered: " +
-                registeredNodes.size() + " #expected: " + expectedNodes.size() + " (#expected not accurate)");
+                registeredNodes.size());
             final Node n = node;
             this.nodeSource.executeInParallel(new Runnable() {
                 public void run() {
@@ -747,43 +652,5 @@ public class SSHInfrastructure2 extends InfrastructureManager {
     @Override
     public void shutDown() {
         this.shutdown = true;
-    }
-
-    /*####################################
-     * Helpers
-     *###################################*/
-    /**
-     * Private inner enum which represents supported operating systems
-     */
-    private enum OperatingSystem {
-        WINDOWS(";", "\\\\"), LINUX(":", "/"), CYGWIN(";", "/");
-        private String ps, fs;
-
-        private OperatingSystem(String ps, String fs) {
-            this.fs = fs;
-            this.ps = ps;
-        }
-
-        /**
-         * Returns the operating system corresponding to the provided String parameter: 'LINUX', 'WINDOWS' or 'CYGWIN'
-         * @param desc one of 'LINUX', 'WINDOWS' or 'CYGWIN'
-         * @return the appropriate Operating System
-         */
-        private static OperatingSystem getOperatingSystem(String desc) {
-            if (desc == null) {
-                throw new IllegalArgumentException("String description of operating system cannot be null");
-            }
-            desc = desc.toUpperCase();
-            if ("LINUX".equals(desc)) {
-                return OperatingSystem.LINUX;
-            }
-            if ("WINDOWS".equals(desc)) {
-                return OperatingSystem.WINDOWS;
-            }
-            if ("CYGWIN".equals(desc)) {
-                return OperatingSystem.CYGWIN;
-            }
-            return null;
-        }
     }
 }

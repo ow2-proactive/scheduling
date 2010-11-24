@@ -38,7 +38,6 @@ package org.ow2.proactive.resourcemanager.gui.dialog;
 
 import java.util.List;
 
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
@@ -50,9 +49,7 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
-import org.ow2.proactive.resourcemanager.common.NodeState;
-import org.ow2.proactive.resourcemanager.gui.data.RMStore;
-import org.ow2.proactive.resourcemanager.gui.data.model.Node;
+import org.ow2.proactive.resourcemanager.gui.data.model.Removable;
 
 
 /**
@@ -65,7 +62,7 @@ public class RemoveNodeDialog extends Dialog {
     // -------------------------------------------------------------------- //
     // --------------------------- constructor ---------------------------- //
     // -------------------------------------------------------------------- //
-    private RemoveNodeDialog(final Shell parent, final List<Node> nodes) {
+    private RemoveNodeDialog(final Shell parent, final List<Removable> nodes) {
 
         // Pass the default styles here
         super(parent, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
@@ -120,22 +117,8 @@ public class RemoveNodeDialog extends Dialog {
             public void handleEvent(Event event) {
                 boolean removeDownNodes = downCheck.getSelection();
                 boolean preemptive = !preemptCheck.getSelection();
-                for (Node node : nodes) {
-                    if (removeDownNodes && node.getState() != NodeState.DOWN) {
-                        continue;
-                    }
-                    try {
-                        RMStore.getInstance().getResourceManager().removeNode(node.getName(), preemptive)
-                                .booleanValue();
-                    } catch (RuntimeException e) {
-                        e.printStackTrace();
-                        String message = e.getMessage();
-                        if (e.getCause() != null) {
-                            message = e.getCause().getMessage();
-                        }
-                        MessageDialog.openError(Display.getDefault().getActiveShell(), "Cannot remove node",
-                                message);
-                    }
+                for (Removable node : nodes) {
+                    node.removeFromModel(preemptive, removeDownNodes);
                 }
                 shell.close();
             }
@@ -182,7 +165,7 @@ public class RemoveNodeDialog extends Dialog {
      * @param parent
      *            the parent
      */
-    public static void showDialog(Shell parent, List<Node> nodes) {
+    public static void showDialog(Shell parent, List<Removable> nodes) {
         new RemoveNodeDialog(parent, nodes);
     }
 }

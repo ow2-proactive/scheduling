@@ -250,6 +250,17 @@ public class RMNodeImpl implements RMNode, Serializable {
     }
 
     /**
+     * Changes the state of this node to {@link NodeState#CONFIGURING}
+     */
+    public void setConfiguring(Client owner) {
+        if (!this.isDown()) {
+            this.state = NodeState.CONFIGURING;
+            this.stateChangeTime = System.currentTimeMillis();
+            this.owner = owner;
+        }
+    }
+
+    /**
      * Changes the state of this node to {@link NodeState#DOWN}.
      */
     public void setDown() {
@@ -295,6 +306,13 @@ public class RMNodeImpl implements RMNode, Serializable {
      */
     public boolean isToRemove() {
         return this.state == NodeState.TO_BE_REMOVED;
+    }
+
+    /**
+     * @return true if the node is 'configuring', false otherwise.
+     */
+    public boolean isConfiguring() {
+        return this.state == NodeState.CONFIGURING;
     }
 
     /**

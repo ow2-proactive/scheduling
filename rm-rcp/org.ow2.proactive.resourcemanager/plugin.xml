@@ -167,6 +167,13 @@
             id="org.ow2.proactive.resourcemanager.plugin.removeNodes"
             name="Remove nodes">
       </command>
+      <command
+            categoryId="org.ow2.proactive.resourcemanager.plugin.gui.connectionCategory"
+            defaultHandler="org.ow2.proactive.resourcemanager.gui.handlers.DescribeCommandHandler"
+            description="Describe node command"
+            id="org.ow2.proactive.resourcemanager.plugin.describeCommand"
+            name="Desccribe node">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.popupMenus">
@@ -278,6 +285,11 @@
                   icon="icons/remove_node.gif"
                   label="Remove nodes"
                   tooltip="remove nodes">
+            </command>
+            <command
+                  commandId="org.ow2.proactive.resourcemanager.plugin.describeCommand"
+                  label="Describe node"
+                  tooltip="Describe node command">
             </command>
             <command
                   commandId="org.ow2.proactive.resourcemanager.plugin.createNodesource"

@@ -78,6 +78,24 @@ public interface RuntimeDataMBean {
     public int getAvailableNodesCount();
 
     /**
+     * Returns the current number of nodes in {@link NodeState#CONFIGURING} state.
+     * @return the current number of nodes in {@link NodeState#CONFIGURING} state.
+     */
+    public int getConfiguringNodesCount();
+
+    /**
+     * Returns the current number of nodes in {@link NodeState#DEPLOYING} state.
+     * @return the current number of nodes in {@link NodeState#DEPLOYING} state.
+     */
+    public int getDeployingNodesCount();
+
+    /**
+     * Returns the current number of nodes in {@link NodeState#LOST} state.
+     * @return the current number of nodes in {@link NodeState#LOST} state.
+     */
+    public int getLostNodesCount();
+
+    /**
      * Returns the current number of nodes in {@link NodeState#FREE} state.
      * @return the current number of free nodes
      */
@@ -100,6 +118,27 @@ public interface RuntimeDataMBean {
      * @return the current number of down nodes
      */
     public int getDownNodesCount();
+
+    /**
+     * Returns the maximum number of nodes in {@link NodeState#CONFIGURING} state.
+     *
+     * @return the maximum number of nodes in {@link NodeState#CONFIGURING} state.
+     */
+    public int getMaxConfiguringNodes();
+
+    /**
+     * Returns the maximum number of nodes in {@link NodeState#DEPLOYING} state.
+     *
+     * @return the maximum number of nodes in {@link NodeState#DEPLOYING} state.
+     */
+    public int getMaxDeployingNodes();
+
+    /**
+     * Returns the maximum number of nodes in {@link NodeState#LOST} state.
+     *
+     * @return the maximum number of nodes in {@link NodeState#LOST} state.
+     */
+    public int getMaxLostNodes();
 
     /**
      * Returns the maximum number of nodes in {@link NodeState#FREE} state.
