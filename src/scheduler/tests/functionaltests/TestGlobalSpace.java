@@ -78,11 +78,14 @@ public class TestGlobalSpace extends FunctionalTest {
         File glob = File.createTempFile("global", "space");
         glob.delete();
         glob.mkdir();
+        File gloDir = new File(glob.getAbsolutePath() + File.separator + "1");
+        gloDir.mkdirs();
+        String gloPath = gloDir.getAbsolutePath();
 
         /**
          * Writes inFiles in GLOBAL
          */
-        writeFiles(inFiles, glob.getAbsolutePath());
+        writeFiles(inFiles, gloPath);
 
         /**
          * The Job : one task with a POST script
@@ -147,7 +150,7 @@ public class TestGlobalSpace extends FunctionalTest {
          * check that outFiles > POST > SCRATCH > GLOBAL went ok
          */
         for (int i = 0; i < outFiles.length; i++) {
-            File f = new File(glob.getAbsolutePath() + File.separator + outFiles[i][0]);
+            File f = new File(gloPath + File.separator + outFiles[i][0]);
             Assert.assertTrue("File does not exist: " + outFiles[i][0], f.exists());
             Assert.assertEquals("Original and copied files differ", outFiles[i][1], getContent(f));
             f.delete();
@@ -157,7 +160,7 @@ public class TestGlobalSpace extends FunctionalTest {
          * check that inFiles > GLOBAL > SCRATCH > GLOBAL+".dup" went ok
          */
         for (int i = 0; i < inFiles.length; i++) {
-            File f = new File(glob.getAbsolutePath() + File.separator + inFiles[i][0] + ".dup");
+            File f = new File(gloPath + File.separator + inFiles[i][0] + ".dup");
             Assert.assertTrue("File does not exist: " + f.getAbsolutePath(), f.exists());
             Assert.assertEquals("Original and copied files differ", inFiles[i][1], getContent(f));
             f.delete();

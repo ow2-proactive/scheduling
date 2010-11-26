@@ -48,6 +48,7 @@ import org.objectweb.proactive.extensions.dataspaces.core.InputOutputSpaceConfig
 import org.objectweb.proactive.extensions.dataspaces.core.SpaceInstanceInfo;
 import org.objectweb.proactive.extensions.dataspaces.core.naming.NamingService;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
+import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 
@@ -80,8 +81,9 @@ public class JobDataSpaceApplication implements Serializable {
      * @param inputURL the input URL given in the job, if null default scheduler INPUT space URL will be used
      * @param outputURL the output URL given in the job, if null default scheduler OUTPUT space URL will be used
      * @param username the owner of the job
+     * @param id unique identificator for the current job; used to separated GLOBAL space among jobs
      */
-    public void startDataSpaceApplication(String inputURL, String outputURL, String username) {
+    public void startDataSpaceApplication(String inputURL, String outputURL, String username, JobId jobId) {
         if (!alreadyRegistered) {
             try {
                 // create list of spaces
@@ -135,12 +137,12 @@ public class JobDataSpaceApplication implements Serializable {
                     if (PASchedulerProperties.DATASPACE_GLOBAL_URL_LOCALPATH.isSet() &&
                         PASchedulerProperties.DATASPACE_GLOBAL_URL_HOSTNAME.isSet()) {
                         localpath = PASchedulerProperties.DATASPACE_GLOBAL_URL_LOCALPATH.getValueAsString() +
-                            File.separator + username;
+                            File.separator + jobId.value();
                         hostname = PASchedulerProperties.DATASPACE_GLOBAL_URL_LOCALPATH.getValueAsString();
                     }
                     glob = InputOutputSpaceConfiguration.createOutputSpaceConfiguration(
-                            PASchedulerProperties.DATASPACE_GLOBAL_URL.getValueAsString(), localpath,
-                            hostname, SchedulerConstants.GLOBALSPACE_NAME);
+                            PASchedulerProperties.DATASPACE_GLOBAL_URL.getValueAsString() + File.separator +
+                                jobId.value(), localpath, hostname, SchedulerConstants.GLOBALSPACE_NAME);
 
                     predefinedSpaces.add(new SpaceInstanceInfo(applicationId, glob));
                 }

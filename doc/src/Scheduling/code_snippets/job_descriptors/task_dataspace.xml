@@ -14,7 +14,7 @@
 			<inputFiles>
 				<files includes="tata" accessMode="transferFromInputSpace"/>
 				<files includes="txt/toto*.txt" excludes="txt/toto*2.txt" accessMode="transferFromOutputSpace"/>
-				<files includes="txt/tutu*.txt" excludes="txt/tutu*2.txt" accessMode="transferFromGlobalSpace"/>
+				<files includes="dat/tutu*.dat" excludes="dat/tutu*2.dat" accessMode="transferFromGlobalSpace"/>
 			</inputFiles>
 			<!-- Java or native Executable -->
 			<outputFiles>

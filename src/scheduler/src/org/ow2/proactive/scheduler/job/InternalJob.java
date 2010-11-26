@@ -496,7 +496,8 @@ public abstract class InternalJob extends JobState {
             long appId = getJobInfo().getJobId().hashCode();
             jobDataSpaceApplication = new JobDataSpaceApplication(appId, namingService, namingServiceURL);
         }
-        jobDataSpaceApplication.startDataSpaceApplication(getInputSpace(), getOutputSpace(), getOwner());
+        jobDataSpaceApplication.startDataSpaceApplication(getInputSpace(), getOutputSpace(), getOwner(),
+                getId());
     }
 
     /**

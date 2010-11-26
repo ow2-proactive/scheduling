@@ -1122,6 +1122,9 @@ task2.setGenerationScript(gscript);
 			<para>
 			  GLOBAL space has to be set by the Scheduler administrator through the <emphasis>pa.scheduler.dataspace.globalurl</emphasis> property.
 			  The value to use needs to be an URL to a writable space: ie file:/example.com/ or ftp:/example.com/ (HTTP cannot be used as it is read only).
+			  Each GLOBAL space directory is unique for a job execution in the scheduler: the virtual path of the GLOBAL space that can be used
+			  by a task includes the job id. This means that GLOBAL spaces cannot be used as an initial input space: at the beginning of a job it
+			  will always be empty. Additionally, at the end of the job, the GLOBAL subdir for each job will be deleted.
 			</para>
 			<para>
 				Let's continue with an example of use through a job containing a native task and a Java task.
