@@ -173,8 +173,7 @@ public class JobDataSpaceApplication implements Serializable {
 
                 DataSpacesFileObject global = PADataSpaces.resolveOutput(SchedulerConstants.GLOBALSPACE_NAME);
                 global.delete(FileSelector.SELECT_ALL);
-                boolean res = global.delete();
-                System.out.println("DELETE ROOT GLOBAL " + res);
+                global.delete();
             } catch (Throwable e) {
                 logger_dev.warn("Could not clear GLOBAL subdir", e);
             } finally {
