@@ -25,9 +25,8 @@ import functionalTests.FunctionalTest;
 public class TestGlobalSpace extends FunctionalTest {
 
     private static final String[][] inFiles = { { "A", "Content of A" }, { "B", "not much" },
-            { "_1234", "!@#%$@%54vc54\b\t\\\\\nasd123!@#" } };
-    private static final String[][] outFiles = { { "res1", "one of the output files" },
-            { "res2", "second\noutput\nfile" }, { "__.res_3?", "third\toutput\nfile\t&^%$$#@!\n" }, };
+            { "_1234", "!@#%$@%54vc54\b\t\\\\\nasd123!@#", "res1", "one of the output files" },
+            { "res2", "second\noutput\nfile" }, { "__.res_3?", "third\toutput\nfile\t&^%$$#@!\n" } };
 
     private static String inFileArr = "";
     static {
@@ -41,26 +40,38 @@ public class TestGlobalSpace extends FunctionalTest {
         inFileArr += "]";
     }
 
-    private static final String script = "" + //
+    private static final String scriptA = "" + //
         "importPackage(java.io);                               \n" + //
         "var out;                                              \n" + //
-        "for (var i=0; i < args.length; i++) {                 \n" + //
-        "  if (i % 2 == 0) {                                   \n" + //
-        "    var ff = globalspace.resolveFile(args[i]);        \n" + //
-        "    ff.createFile();                                  \n" + //
-        "    out = new PrintWriter(new OutputStreamWriter(     \n" + //
-        "      ff.getContent().getOutputStream()));            \n" + //
-        "  } else {                                            \n" + //
-        "    out.print(args[i]);                               \n" + //
-        "    out.close();                                      \n" + //
-        "  }                                                   \n" + //
-        "}                                                     \n" + //
         "var arr = " + inFileArr + ";                          \n" + //
         "for (var i=0; i < arr.length; i++) {                  \n" + //
         "  var input = localspace.resolveFile(arr[i]);         \n" + //
         "  if (! input) continue;                              \n" + //
         "  var br = input.getContent().getInputStream();       \n" + //
-        "  var ff = globalspace.resolveFile(arr[i] + \".dup\");\n" + //
+        "  var ff = localspace.resolveFile(                    \n" + //
+        "     arr[i] + \".glob.A\");\n                         \n" + //
+        "  ff.createFile();                                    \n" + //
+        "  out = ff.getContent().getOutputStream();            \n" + //
+        "  var c;                                              \n" + //
+        "  while ((c = br.read()) > 0) {                       \n" + //
+        "    out.write(c);                                     \n" + //
+        "  }                                                   \n" + //
+        "  out.close();                                        \n" + //
+        "}                                                     \n" + //
+        "                                                      \n" + //
+        "";
+
+    private static final String scriptB = "" + //
+        "importPackage(java.io);                               \n" + //
+        "var out;                                              \n" + //
+        "var arr = " + inFileArr + ";                          \n" + //
+        "for (var i=0; i < arr.length; i++) {                  \n" + //
+        "  var input = localspace.resolveFile(                 \n" + //
+        "      arr[i] + \".glob.A\");                          \n" + //
+        "  if (! input) continue;                              \n" + //
+        "  var br = input.getContent().getInputStream();       \n" + //
+        "  var ff = localspace.resolveFile(                    \n" + //
+        "     arr[i] + \".out\");\n                            \n" + //
         "  ff.createFile();                                    \n" + //
         "  out = ff.getContent().getOutputStream();            \n" + //
         "  var c;                                              \n" + //
@@ -80,38 +91,45 @@ public class TestGlobalSpace extends FunctionalTest {
         glob.mkdir();
         File gloDir = new File(glob.getAbsolutePath() + File.separator + "1");
         gloDir.mkdirs();
-        String gloPath = gloDir.getAbsolutePath();
+
+        File in = File.createTempFile("input", "space");
+        in.delete();
+        in.mkdir();
+        String inPath = in.getAbsolutePath();
+
+        File out = File.createTempFile("output", "space");
+        out.delete();
+        out.mkdir();
+        String outPath = out.getAbsolutePath();
 
         /**
-         * Writes inFiles in GLOBAL
+         * Writes inFiles in INPUT
          */
-        writeFiles(inFiles, gloPath);
+        writeFiles(inFiles, inPath);
 
-        /**
-         * The Job : one task with a POST script
-         * transfers inFiles from GLOBAL to SCRATCH
-         * writes outFiles to SCRATCH
-         * transfers outFiles from SCRATCH to GLOBAL
-         * copies inFiles+".dup" from SCRATCH to GLOBAL
-         */
         TaskFlowJob job = new TaskFlowJob();
-        JavaTask t = new JavaTask();
-        job.addTask(t);
-        job.setLogFile("/tmp/LOGGRR");
-        t.setExecutableClassName("org.ow2.proactive.scheduler.examples.EmptyTask");
-        t.setName("T");
+        job.setInputSpace(in.toURL().toString());
+        job.setOutputSpace(out.toURL().toString());
+
+        JavaTask A = new JavaTask();
+        A.setExecutableClassName("org.ow2.proactive.scheduler.examples.EmptyTask");
+        A.setName("A");
         for (String[] file : inFiles) {
-            t.addInputFiles(file[0], InputAccessMode.TransferFromGlobalSpace);
+            A.addInputFiles(file[0], InputAccessMode.TransferFromInputSpace);
+            A.addOutputFiles(file[0] + ".glob.A", OutputAccessMode.TransferToGlobalSpace);
         }
-        for (String[] file : outFiles) {
-            t.addOutputFiles(file[0], OutputAccessMode.TransferToGlobalSpace);
+        A.setPreScript(new SimpleScript(scriptA, "javascript"));
+        job.addTask(A);
+
+        JavaTask B = new JavaTask();
+        B.setExecutableClassName("org.ow2.proactive.scheduler.examples.EmptyTask");
+        B.setName("B");
+        for (String[] file : inFiles) {
+            B.addInputFiles(file[0] + ".glob.A", InputAccessMode.TransferFromGlobalSpace);
+            B.addOutputFiles(file[0] + ".out", OutputAccessMode.TransferToOutputSpace);
         }
-        String[] params = new String[outFiles.length * 2];
-        for (int i = 0; i < outFiles.length; i++) {
-            params[i * 2] = outFiles[i][0];
-            params[i * 2 + 1] = outFiles[i][1];
-        }
-        t.setPostScript(new SimpleScript(script, "javascript", params));
+        B.setPreScript(new SimpleScript(scriptB, "javascript"));
+        job.addTask(B);
 
         /**
          * appends GLOBALSPACE property to Scheduler .ini file
@@ -124,7 +142,7 @@ public class TestGlobalSpace extends FunctionalTest {
         while ((line = br.readLine()) != null) {
             pw.println(line);
         }
-        pw.println("pa.scheduler.dataspace.globalurl=" + glob.toURL().toString());
+        pw.println("pa.scheduler.dataspace.globalurl=" + gloDir.toURL().toString());
         pw.close();
         br.close();
 
@@ -133,7 +151,6 @@ public class TestGlobalSpace extends FunctionalTest {
          */
         SchedulerTHelper.startScheduler(tmpProps.getAbsolutePath());
         JobId id = SchedulerTHelper.getSchedulerInterface().submit(job);
-        // JobId id = SchedulerTHelper.testJobSubmission(job);
         while (true) {
             try {
                 if (SchedulerTHelper.getJobResult(id) != null) {
@@ -147,23 +164,20 @@ public class TestGlobalSpace extends FunctionalTest {
         Assert.assertFalse(SchedulerTHelper.getJobResult(id).hadException());
 
         /**
-         * check that outFiles > POST > SCRATCH > GLOBAL went ok
+         * check: global was cleaned
          */
-        for (int i = 0; i < outFiles.length; i++) {
-            File f = new File(gloPath + File.separator + outFiles[i][0]);
-            Assert.assertTrue("File does not exist: " + outFiles[i][0], f.exists());
-            Assert.assertEquals("Original and copied files differ", outFiles[i][1], getContent(f));
-            f.delete();
-        }
+        Assert.assertTrue("GLOBAL dir " + glob + " was not cleared", gloDir.list().length == 0);
 
         /**
-         * check that inFiles > GLOBAL > SCRATCH > GLOBAL+".dup" went ok
+         * check: inFiles > IN > LOCAL A > GLOBAL > LOCAL B > OUT 
          */
         for (int i = 0; i < inFiles.length; i++) {
-            File f = new File(gloPath + File.separator + inFiles[i][0] + ".dup");
+            File f = new File(outPath + File.separator + inFiles[i][0] + ".out");
             Assert.assertTrue("File does not exist: " + f.getAbsolutePath(), f.exists());
             Assert.assertEquals("Original and copied files differ", inFiles[i][1], getContent(f));
             f.delete();
+            File inf = new File(inPath + File.separator + inFiles[i][0]);
+            inf.delete();
         }
     }
 

@@ -42,8 +42,12 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.extensions.dataspaces.api.DataSpacesFileObject;
+import org.objectweb.proactive.extensions.dataspaces.api.FileSelector;
 import org.objectweb.proactive.extensions.dataspaces.api.PADataSpaces;
+import org.objectweb.proactive.extensions.dataspaces.core.DataSpacesNodes;
 import org.objectweb.proactive.extensions.dataspaces.core.InputOutputSpaceConfiguration;
 import org.objectweb.proactive.extensions.dataspaces.core.SpaceInstanceInfo;
 import org.objectweb.proactive.extensions.dataspaces.core.naming.NamingService;
@@ -159,6 +163,31 @@ public class JobDataSpaceApplication implements Serializable {
     }
 
     public void terminateDataSpaceApplication() {
+        // remove GLOBAL sub directory for this job
+        if (PASchedulerProperties.DATASPACE_GLOBAL_URL.isSet()) {
+            try {
+                DataSpacesNodes.configureNode(PAActiveObject.getActiveObjectNode(PAActiveObject
+                        .getStubOnThis()), null);
+                DataSpacesNodes.configureApplication(PAActiveObject.getActiveObjectNode(PAActiveObject
+                        .getStubOnThis()), this.applicationId, this.namingServiceURL);
+
+                DataSpacesFileObject global = PADataSpaces.resolveOutput(SchedulerConstants.GLOBALSPACE_NAME);
+                global.delete(FileSelector.SELECT_ALL);
+                boolean res = global.delete();
+                System.out.println("DELETE ROOT GLOBAL " + res);
+            } catch (Throwable e) {
+                logger_dev.warn("Could not clear GLOBAL subdir", e);
+            } finally {
+                try {
+                    DataSpacesNodes.tryCloseNodeApplicationConfig(PAActiveObject
+                            .getActiveObjectNode(PAActiveObject.getStubOnThis()));
+                    DataSpacesNodes.closeNodeConfig(PAActiveObject.getActiveObjectNode(PAActiveObject
+                            .getStubOnThis()));
+                } catch (Throwable e) {
+                }
+            }
+        }
+
         try {
             namingService.unregisterApplication(applicationId);
         } catch (Exception e) {
