@@ -438,7 +438,10 @@ public class SelectResourceManagerDialog extends Dialog {
             return null;
         }
         url = url.trim();
-        return new SelectResourceManagerDialogResult(hasBeenCanceled, url, login, pwd, logAsAdmin);
+        SelectResourceManagerDialogResult res = new SelectResourceManagerDialogResult(hasBeenCanceled, url,
+            login, pwd, logAsAdmin);
+        pwd = null;
+        return res;
     }
 
     /**
