@@ -51,6 +51,7 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.topology.Topology;
+import org.ow2.proactive.resourcemanager.frontend.topology.TopologyDisabledException;
 import org.ow2.proactive.resourcemanager.frontend.topology.TopologyException;
 import org.ow2.proactive.resourcemanager.frontend.topology.TopologyImpl;
 import org.ow2.proactive.resourcemanager.frontend.topology.clustering.HAC;
@@ -113,7 +114,7 @@ public class TopologyManager {
     public TopologyHandler getHandler(TopologyDescriptor topologyDescriptor) {
         if (topologyDescriptor.isTopologyBased() &&
             !PAResourceManagerProperties.RM_TOPOLOGY_ENABLED.getValueAsBoolean()) {
-            throw new TopologyException("Topology is disabled");
+            throw new TopologyDisabledException("Topology is disabled");
         }
         TopologyHandler handler = handlers.get(topologyDescriptor.getClass());
         if (handler == null) {

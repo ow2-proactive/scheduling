@@ -131,6 +131,9 @@ public abstract class SelectionManager {
     public NodeSet selectNodes(int number, TopologyDescriptor topologyDescriptor,
             List<SelectionScript> scripts, NodeSet exclusion, Client client) {
 
+        // can throw Exception if topology is disabled
+        TopologyHandler handler = RMCore.topologyManager.getHandler(topologyDescriptor);
+
         List<RMNode> freeNodes = rmcore.getFreeNodes();
         // filtering out the "free node list"
         // removing exclusion and checking permissions
@@ -181,7 +184,7 @@ public abstract class SelectionManager {
 
         // now we have a list of nodes which match to selection scripts
         // selecting subset according to topology requirements
-        TopologyHandler handler = RMCore.topologyManager.getHandler(topologyDescriptor);
+        // TopologyHandler handler = RMCore.topologyManager.getHandler(topologyDescriptor);
         List<Node> selectedNodes = handler.select(number, matchedNodes);
 
         logger.info(selectedNodes.size() + " nodes found after the topology is taken into account for " +

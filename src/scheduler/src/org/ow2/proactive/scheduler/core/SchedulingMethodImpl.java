@@ -55,6 +55,7 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.common.RMState;
+import org.ow2.proactive.resourcemanager.frontend.topology.TopologyDisabledException;
 import org.ow2.proactive.resourcemanager.frontend.topology.descriptor.TopologyDescriptor;
 import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
@@ -111,6 +112,8 @@ final class SchedulingMethodImpl implements SchedulingMethod {
     protected ExecutorService threadPool;
 
     protected PrivateKey corePrivateKey;
+
+    protected boolean topologyDisabled = false;
 
     SchedulingMethodImpl(SchedulerCore core) {
         this.core = core;
@@ -375,13 +378,25 @@ final class SchedulingMethodImpl implements SchedulingMethod {
         try {
             //apply topology if number of resource demanded is more than one
             TopologyDescriptor tdescriptor = null;
-            //temporary commit to disable topology
-            //links to SCHEDULING-893
-            /*if (neededResourcesNumber > 1) {
+            //if multinode is demanded, every following internal task have more than one task
+            //if simple node task is demanded, every internal task have only one node
+            if (!isTopologyDisabled() && internalTask.getNumberOfNodesNeeded() > 1) {
                 tdescriptor = TopologyDescriptor.BEST_PROXIMITY;
-            }*/
-            nodeSet = core.rmProxiesManager.getUserRMProxy(currentJob).getAtMostNodes(neededResourcesNumber,
-                    tdescriptor, internalTask.getSelectionScripts(), internalTask.getNodeExclusion());
+            }
+            try {
+                nodeSet = core.rmProxiesManager.getUserRMProxy(currentJob).getAtMostNodes(
+                        neededResourcesNumber, tdescriptor, internalTask.getSelectionScripts(),
+                        internalTask.getNodeExclusion());
+            } catch (TopologyDisabledException tde) {
+                //TopologyDisabledException exception is runtimeException
+                logger_dev
+                        .info("UNARBITRARY Topology was demanded and topology is disabled : switch to ARBITRARY");
+                setTopologyDisabled(true);
+                tdescriptor = null;
+                nodeSet = core.rmProxiesManager.getUserRMProxy(currentJob).getAtMostNodes(
+                        neededResourcesNumber, tdescriptor, internalTask.getSelectionScripts(),
+                        internalTask.getNodeExclusion());
+            }
             //the following line is used to unwrap the future, warning when moving or removing
             //it may also throw a ScriptException which is a RuntimeException
             PAFuture.waitFor(nodeSet, true);
@@ -591,6 +606,24 @@ final class SchedulingMethodImpl implements SchedulingMethod {
         // send task event to front-end
         core.frontend.taskStateUpdated(job.getOwner(), new NotificationData<TaskInfo>(
             SchedulerEvent.TASK_PENDING_TO_RUNNING, task.getTaskInfo()));
+    }
+
+    /**
+     * Get the topologyDisabled
+     *
+     * @return the topologyDisabled
+     */
+    boolean isTopologyDisabled() {
+        return topologyDisabled;
+    }
+
+    /**
+     * Set the topologyDisabled value to the given topologyDisabled value
+     *
+     * @param topologyDisabled the topologyDisabled to set
+     */
+    public void setTopologyDisabled(boolean topologyDisabled) {
+        this.topologyDisabled = topologyDisabled;
     }
 
 }

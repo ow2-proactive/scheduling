@@ -40,17 +40,17 @@ import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 
 /**
  * An exception thrown by {@link ResourceManager.getAtMostNodes} request when
- * the topology information is missing.
+ * a particular topology is demanded and not active.
  *
  */
 @PublicAPI
-public class TopologyException extends IllegalArgumentException {
+public class TopologyDisabledException extends TopologyException {
 
     /**
      * Create a new instance of TopologyException
      *
      */
-    public TopologyException() {
+    public TopologyDisabledException() {
         super();
     }
 
@@ -60,7 +60,7 @@ public class TopologyException extends IllegalArgumentException {
      * @param message
      * @param cause
      */
-    public TopologyException(String message, Throwable cause) {
+    public TopologyDisabledException(String message, Throwable cause) {
         super(message, cause);
     }
 
@@ -69,7 +69,7 @@ public class TopologyException extends IllegalArgumentException {
      *
      * @param s
      */
-    public TopologyException(String s) {
+    public TopologyDisabledException(String s) {
         super(s);
     }
 
@@ -78,7 +78,7 @@ public class TopologyException extends IllegalArgumentException {
      *
      * @param cause
      */
-    public TopologyException(Throwable cause) {
+    public TopologyDisabledException(Throwable cause) {
         super(cause);
     }
 

@@ -47,6 +47,13 @@ interface SchedulingMethod {
     /**
      * Scheduling process.
      */
-    int schedule();
+    public int schedule();
+
+    /**
+     * Set if topology is disabled or not.
+     *
+     * @param disabled the disabled state of the topology
+     */
+    public void setTopologyDisabled(boolean disabled);
 
 }
