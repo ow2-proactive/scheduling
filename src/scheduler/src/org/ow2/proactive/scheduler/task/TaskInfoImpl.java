@@ -94,6 +94,7 @@ public class TaskInfoImpl implements TaskInfo {
     /** informations about the job */
     @Cascade(CascadeType.ALL)
     @OneToOne(fetch = FetchType.EAGER, targetEntity = JobInfoImpl.class)
+    @XmlTransient
     private JobInfo jobInfo = null;
 
     /** task started time */

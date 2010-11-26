@@ -98,6 +98,7 @@ public final class TaskIdImpl implements TaskId {
     /** Job id */
     @Cascade(CascadeType.ALL)
     @OneToOne(fetch = FetchType.EAGER, targetEntity = JobIdImpl.class)
+    @XmlTransient
     private JobId jobId = null;
 
     /** Hibernate default constructor */
