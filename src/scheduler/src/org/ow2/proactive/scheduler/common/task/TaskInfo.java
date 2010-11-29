@@ -103,6 +103,17 @@ public interface TaskInfo extends Serializable {
     public TaskStatus getStatus();
 
     /**
+     * <B>This method has no effect in Scheduling 2.2.0.</B>
+     */
+    /*
+     * Return the latest progress value for this task.
+     * Progress value is ranged between 0 and 100.
+     *
+     * @return the latest progress value for this task.
+     */
+    public int getProgress();
+
+    /**
      * Get the last execution HostName of the task.
      *
      * @return the last execution HostName.

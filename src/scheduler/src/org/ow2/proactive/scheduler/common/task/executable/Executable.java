@@ -37,6 +37,7 @@
 package org.ow2.proactive.scheduler.common.task.executable;
 
 import java.io.Serializable;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
@@ -60,6 +61,9 @@ public abstract class Executable {
 
     /** Executable state. True if the executable has been killed */
     private volatile boolean killed = false;
+
+    /** execution progress value (between 0 and 100) */
+    private final AtomicInteger progress = new AtomicInteger(0);
 
     /**
      * The content of this method will be executed once after being scheduled.<br>
@@ -87,6 +91,34 @@ public abstract class Executable {
      */
     public boolean isKilled() {
         return this.killed;
+    }
+
+    /**
+     * <B>This method has no effect in Scheduling 2.2.0.</B>
+     */
+    /*
+     * Set the progress value for this Executable. Progress value must be ranged
+     * between 0 and 100.
+     * @param newValue the new progress value
+     * @return the previous progress value
+     * @throws IllegalArgumentException if the value is not ranged between 0 and 100.
+     */
+    protected final int setProgress(int newValue) throws IllegalArgumentException {
+        if (newValue < 0 || newValue > 100) {
+            throw new IllegalArgumentException("Progress value must be ranged between 0 and 100");
+        }
+        return this.progress.getAndSet(newValue);
+    }
+
+    /**
+     * <B>This method always returns 0 in Scheduling 2.2.0</B>
+     */
+    /*
+     * Return the current progress value for this executable, ranged between 0 and 100.
+     * @return the current progress value for this executable.
+     */
+    public int getProgress() {
+        return 0; //this.progress.get();
     }
 
 }

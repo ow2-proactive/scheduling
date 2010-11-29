@@ -41,6 +41,7 @@ import java.io.FileNotFoundException;
 import java.lang.reflect.Field;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.extensions.dataspaces.api.DataSpacesFileObject;

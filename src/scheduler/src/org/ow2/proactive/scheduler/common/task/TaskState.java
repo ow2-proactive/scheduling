@@ -253,6 +253,19 @@ public abstract class TaskState extends Task implements Comparable<TaskState> {
     }
 
     /**
+     * <B>This method always returns 0 in Scheduling 2.2.0.</B>
+     */
+    /*
+     * Return the latest progress value for this task.
+     * Progress value is ranged between 0 and 100.
+     *
+     * @return the latest progress value for this task.
+     */
+    public int getProgress() {
+        return this.getTaskInfo().getProgress();
+    }
+
+    /**
      * Get the last execution HostName of the task.
      *
      * @return the last execution HostName.

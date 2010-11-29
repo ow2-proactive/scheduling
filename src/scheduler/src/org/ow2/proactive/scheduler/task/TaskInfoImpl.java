@@ -117,6 +117,11 @@ public class TaskInfoImpl implements TaskInfo {
     @Column(name = "TASK_STATE")
     private TaskStatus taskStatus = TaskStatus.SUBMITTED;
 
+    /** Current progress value of the task */
+    @Alterable
+    @Column(name = "PROGRESS")
+    private int progress = 0;
+
     /** name of the host where the task is executed */
     @Alterable
     @Column(name = "EXEC_HOSTNAME", length = Integer.MAX_VALUE)
@@ -229,6 +234,25 @@ public class TaskInfoImpl implements TaskInfo {
      */
     public void setTaskId(TaskId taskId) {
         this.taskId = taskId;
+    }
+
+    /**
+     * @see org.ow2.proactive.scheduler.common.task.TaskInfo#getProgress()
+     */
+    public int getProgress() {
+        return this.progress;
+    }
+
+    /**
+     * To set the progress value
+     *
+     * @throws IllegalArgumentException if the new valus is not ranged between 0 and 100.
+     */
+    public void setProgress(int newValue) {
+        if (newValue < 0 || newValue > 100) {
+            throw new IllegalArgumentException("Progress value must be ranged between 0 and 100");
+        }
+        this.progress = newValue;
     }
 
     /**
@@ -352,5 +376,4 @@ public class TaskInfoImpl implements TaskInfo {
     public String toString() {
         return getClass().getSimpleName() + "[" + taskId + "]";
     }
-
 }

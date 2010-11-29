@@ -237,6 +237,13 @@ public class ForkedJavaExecutable extends JavaExecutable {
     }
 
     /**
+     * Return the progress value of the executable that runs in the forked JVM.
+     */
+    public int getProgress() {
+        return this.newJavaTaskLauncher.getProgress();
+    }
+
+    /**
      * We need to set deployment ID. The new JVM will register itself in the current JVM.
      * The current JVM will recognize it by this deployment ID.
      */

@@ -63,6 +63,7 @@ import org.apache.log4j.spi.LoggingEvent;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
+import org.objectweb.proactive.annotation.ImmediateService;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
@@ -548,6 +549,15 @@ public abstract class TaskLauncher implements InitActive {
         this.flushStreams();
         TaskLogs logs = new Log4JTaskLogs(this.logAppender.getStorage());
         return logs;
+    }
+
+    /**
+     * Return the latest progress value set by the launched executable.
+     * @return the latest progress value set by the launched executable.
+     */
+    @ImmediateService
+    public int getProgress() {
+        return this.currentExecutable.getProgress();
     }
 
     /**

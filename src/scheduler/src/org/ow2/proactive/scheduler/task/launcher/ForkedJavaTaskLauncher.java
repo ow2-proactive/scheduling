@@ -167,6 +167,14 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher {
     }
 
     /**
+     * @see org.ow2.proactive.scheduler.task.launcher.TaskLauncher#getProgress()
+     */
+    @Override
+    public int getProgress() {
+        return ((ForkedJavaExecutable) currentExecutable).getProgress();
+    }
+
+    /**
      * @see org.ow2.proactive.scheduler.task.launcher.TaskLauncher#initEnv()
      */
     @Override
