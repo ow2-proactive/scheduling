@@ -1,29 +1,32 @@
 <!DOCTYPE project>
 
 <project name="proactive_grid_cloud_portal" default="compile" basedir=".">
-	
-	<property name="project-name" value="ProActive Grid Cloud Portal"/>
-	
-	<property file="./build.properties"/>
-	
+
+	<property name="project-name" value="ProActive Grid Cloud Portal" />
+
+	<property file="./build.properties" />
+
 	<property name="build.dir" value="build" />
 	<property name="classes.dir" value="${build.dir}/classes" />
-	<property name="lib.dir" value="WebContent/WEB-INF/lib" />
+	<property name="lib.dir" value="lib" />
+	<property name="webinf.lib.dir" value="WebContent/WEB-INF/lib" />
 	<property name="src.dir" value="src" />
-	
-	
+
+
 	<!-- 
 		 Compile all
 	-->
 
 	<target name="prepare" description="Create dir for class files">
 		<mkdir dir="${classes.dir}" />
+		<mkdir dir="${webinf.lib.dir}" />
 	</target>
-	
+
 	<target name="clean" description="Delete class files">
 		<delete dir="${classes.dir}" />
+		<delete dir="${webinf.lib.dir}" />
 	</target>
-	
+
 	<path id="src.classpath">
 		<fileset dir="${lib.dir}">
 			<include name="**/*.jar" />
@@ -34,46 +37,47 @@
 	<!-- NB: all the source files are the project source files -->
 
 	<target name="compile" depends="clean,prepare" description="Compiles the Java source code">
-		<echo message="Compiling src files"/>
-		<javac
-			srcdir="${src.dir}"
-			destdir="${classes.dir}"
-			deprecation="false"
-			failonerror="true" debug="true">
-			<classpath refid="src.classpath"/>
+		<echo message="Compiling src files" />
+		<javac srcdir="${src.dir}" destdir="${classes.dir}" deprecation="false" failonerror="true" debug="true">
+			<classpath refid="src.classpath" />
 		</javac>
 	</target>
-	
-	
+
+
 	<target name="war" depends="compile" description="Generate the war file">
 		<!-- copy classes -->
-		
-		<copy todir="WebContent/WEB-INF/classes" >
-			<fileset dir="build/classes" >
-				<include name="**"/>
+
+		<copy todir="WebContent/WEB-INF/classes">
+			<fileset dir="build/classes">
+				<include name="**" />
 			</fileset>
 		</copy>
 		
-		<war destfile="proactive_grid_cloud_portal.war" webxml="WebContent/WEB-INF/web.xml" basedir="WebContent"></war>
+		<!-- copy jars -->
+		<copy todir="${webinf.lib.dir}" flatten="true">
+			<fileset dir="${lib.dir}/scheduling">
+				<include name="**/*.jar" />
+			</fileset>
+			<fileset dir="${lib.dir}/resteasy">
+				<include name="**/*.jar" />
+			</fileset>
+		</copy>
+		
+		<war destfile="proactive_grid_cloud_portal.war" webxml="WebContent/WEB-INF/web.xml" basedir="WebContent">
+		</war>
 	</target>
-	
+
 	<target name="doc-jaxrs" depends="doc-jaxb" description="Generate JAX-RS documentation">
-		<javadoc classpathref="src.classpath" sourcepath="${src.dir}"
-			destdir="${build.dir}/jaxrsdocs/" extdirs="${lib.dir}"
-			doclet="com.lunatech.doclets.jax.jaxrs.JAXRSDoclet"
-			docletpathref="src.classpath">
-			<package name="org.ow2.proactive_grid_cloud_portal.*"/>
-			<link href="../jaxbdocs/"/>
+		<javadoc classpathref="src.classpath" sourcepath="${src.dir}" destdir="${build.dir}/jaxrsdocs/" extdirs="${lib.dir}" doclet="com.lunatech.doclets.jax.jaxrs.JAXRSDoclet" docletpathref="src.classpath">
+			<package name="org.ow2.proactive_grid_cloud_portal.*" />
+			<link href="../jaxbdocs/" />
 		</javadoc>
 	</target>
 
-	
+
 	<target name="doc-jaxb" description="Generate JAXB documentation">
-		<javadoc classpathref="src.classpath" sourcepath="${src.dir}"
-			destdir="${build.dir}/jaxbdocs/" extdirs="${lib.dir}"
-			doclet="com.lunatech.doclets.jax.jaxb.JAXBDoclet"
-			docletpathref="src.classpath">
-			<package name="org.ow2.proactive_grid_cloud_portal.*"/>
+		<javadoc classpathref="src.classpath" sourcepath="${src.dir}" destdir="${build.dir}/jaxbdocs/" extdirs="${lib.dir}" doclet="com.lunatech.doclets.jax.jaxb.JAXBDoclet" docletpathref="src.classpath">
+			<package name="org.ow2.proactive_grid_cloud_portal.*" />
 		</javadoc>
 	</target>
 

@@ -16,6 +16,12 @@ Installation:
 	   (must have the right to download the scheduler state)
 	scheduler.cache.password = password linked to the 'cache' user
 
+Updating the version of scheduling or resteasy
+  the jar files of ProActive Scheduling are located under lib/scheduling,
+  those of resteasy under lib/resteasy
+  these jar files are copied to WebContent/WEB-INF before compiling
+  the project or creating the war file.
+
 	 
 The Scheduler and the resource manager login mechanism are separate processes.
 One must log on on each subsystem to be able to query REST commands.
