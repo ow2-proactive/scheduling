@@ -104,10 +104,11 @@ public abstract class Executable {
      * @throws IllegalArgumentException if the value is not ranged between 0 and 100.
      */
     protected final int setProgress(int newValue) throws IllegalArgumentException {
-        if (newValue < 0 || newValue > 100) {
-            throw new IllegalArgumentException("Progress value must be ranged between 0 and 100");
-        }
-        return this.progress.getAndSet(newValue);
+        //if (newValue < 0 || newValue > 100) {
+        //    throw new IllegalArgumentException("Progress value must be ranged between 0 and 100");
+        //}
+        //return this.progress.getAndSet(newValue);
+        return 0;
     }
 
     /**
@@ -118,7 +119,8 @@ public abstract class Executable {
      * @return the current progress value for this executable.
      */
     public int getProgress() {
-        return 0; //this.progress.get();
+        //this.progress.get();
+        return 0;
     }
 
 }

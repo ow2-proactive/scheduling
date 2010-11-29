@@ -240,19 +240,23 @@ public class TaskInfoImpl implements TaskInfo {
      * @see org.ow2.proactive.scheduler.common.task.TaskInfo#getProgress()
      */
     public int getProgress() {
-        return this.progress;
+        //return this.progress;
+        return 0;
     }
 
     /**
+     * <B>This method has no effect in Scheduling 2.2.0.</B>
+     */
+    /*
      * To set the progress value
      *
-     * @throws IllegalArgumentException if the new valus is not ranged between 0 and 100.
+     * @throws IllegalArgumentException if the new value is not ranged between 0 and 100.
      */
     public void setProgress(int newValue) {
-        if (newValue < 0 || newValue > 100) {
-            throw new IllegalArgumentException("Progress value must be ranged between 0 and 100");
-        }
-        this.progress = newValue;
+        //if (newValue < 0 || newValue > 100) {
+        //    throw new IllegalArgumentException("Progress value must be ranged between 0 and 100");
+        //}
+        //this.progress = newValue;
     }
 
     /**

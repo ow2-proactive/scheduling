@@ -103,7 +103,7 @@ public interface TaskInfo extends Serializable {
     public TaskStatus getStatus();
 
     /**
-     * <B>This method has no effect in Scheduling 2.2.0.</B>
+     * <B>This method always returns 0 in Scheduling 2.2.0.</B>
      */
     /*
      * Return the latest progress value for this task.
