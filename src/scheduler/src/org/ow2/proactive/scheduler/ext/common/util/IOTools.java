@@ -36,15 +36,9 @@
  */
 package org.ow2.proactive.scheduler.ext.common.util;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.PrintStream;
-import java.io.Serializable;
+import java.io.*;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 
 
@@ -92,6 +86,35 @@ public class IOTools {
             e.printStackTrace(); //To change body of catch statement use File | Settings | File Templates.
         }
         return new ProcessResult(retValue, out_lines.toArray(new String[0]), err_lines.toArray(new String[0]));
+    }
+
+    public static String generateHash(String pathname) throws NoSuchAlgorithmException,
+            FileNotFoundException, IOException {
+        File file = new File(pathname);
+        if (!file.exists() || !file.canRead()) {
+            throw new IOException("File doesn't exist : " + file);
+        }
+        MessageDigest md = MessageDigest.getInstance("SHA"); // SHA or MD5
+        String hash = "";
+
+        byte[] data = new byte[(int) file.length()];
+        FileInputStream fis = new FileInputStream(file);
+        fis.read(data);
+        fis.close();
+
+        md.update(data); // Reads it all at one go. Might be better to chunk it.
+
+        byte[] digest = md.digest();
+
+        for (int i = 0; i < digest.length; i++) {
+            String hex = Integer.toHexString(digest[i]);
+            if (hex.length() == 1)
+                hex = "0" + hex;
+            hex = hex.substring(hex.length() - 2);
+            hash += hex;
+        }
+
+        return hash;
     }
 
     /**

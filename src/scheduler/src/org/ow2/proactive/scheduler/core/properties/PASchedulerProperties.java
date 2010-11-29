@@ -36,12 +36,12 @@
  */
 package org.ow2.proactive.scheduler.core.properties;
 
+import org.objectweb.proactive.annotation.PublicAPI;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
-
-import org.objectweb.proactive.annotation.PublicAPI;
 
 
 /**
@@ -245,7 +245,15 @@ public enum PASchedulerProperties {
      * If this value is true, the database will be dropped and then re-created
      * If this value is false, database will be updated from the existing one.
      */
-    SCHEDULER_DB_HIBERNATE_DROPDB("pa.scheduler.db.hibernate.dropdb", PropertyType.BOOLEAN);
+    SCHEDULER_DB_HIBERNATE_DROPDB("pa.scheduler.db.hibernate.dropdb", PropertyType.BOOLEAN),
+
+    /* ***************************************************************** */
+    /* ********************** MATLAB/SCILAB PROPERTIES ***************** */
+    /* ***************************************************************** */
+    /** Tells where to find matlab worker configuration file */
+    MATLAB_WORKER_CONFIGURATION_FILE("pa.scheduler.ext.matlab.config.worker", PropertyType.STRING),
+    /** Tells where to find scilab worker configuration file */
+    SCILAB_WORKER_CONFIGURATION_FILE("pa.scheduler.ext.scilab.config.worker", PropertyType.STRING);
 
     /* ***************************************************************************** */
     /* ***************************************************************************** */

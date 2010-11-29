@@ -66,6 +66,8 @@ public interface SchedulerLoggers {
 
     static final public String SCILAB = SCHEDULER + ".scilab";
 
+    static final public String MATSCI = SCHEDULER + ".matsci";
+
     static final public String UTIL = SCHEDULER + ".util";
 
     static final public String RMPROXY = SCHEDULER + ".RMproxy";

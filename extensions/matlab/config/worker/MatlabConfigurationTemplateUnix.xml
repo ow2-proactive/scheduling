@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="ISO-8859-15"?>
+<!-- Rename this file to MatlabConfiguration.xml to configure matlab installations on the current machine -->
+<MatlabInstallations>
+    <installation>
+        <version>7.9</version> <!-- matlab version in numeric format -->
+        <home>/usr/local/matlab2009b</home> <!-- Matlab home directory -->
+        <libdir>bin/glnxa64</libdir>  <!-- relative path to native libraries-->
+        <extdir>sys/os/glnxa64</extdir>  <!-- relative path to native external libraries (valid only on linux, must be ommited on windows) -->
+        <bindir>bin</bindir> <!-- relative path to bin directory which contains the matlab executable -->
+        <command>matlab</command> <!-- matlab command name (could be matlab or matlab.exe -->
+        <ptolemydir>dist/lib/7.9/bin/glnxa64</ptolemydir>  <!-- path to ptolemy lib directory for the given matlab version and os -->
+    </installation>
+    <installation>
+        <version>7.7</version>
+        <home>/usr/local/matlab2008b</home>
+        <libdir>bin/glnxa64</libdir>
+        <extdir>sys/os/glnxa64</extdir>
+        <bindir>bin</bindir>
+        <command>matlab</command>
+        <ptolemydir>dist/lib/7.7/bin/glnxa64</ptolemydir>        
+    </installation>
+    <installation>
+        <version>7.5</version>
+        <home>/usr/local/matlab2007b</home>
+        <libdir>bin/glnxa64</libdir>
+        <extdir>sys/os/glnxa64</extdir>
+        <bindir>bin</bindir>
+        <command>matlab</command>
+        <ptolemydir>dist/lib/7.5/bin/glnxa64</ptolemydir>        
+    </installation>
+</MatlabInstallations>

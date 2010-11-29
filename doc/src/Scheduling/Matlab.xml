@@ -740,13 +740,13 @@ Awaited Result
                     </title>
                 </info>
 
-                <programlisting language="xml"><![CDATA[<javaExecutable class="org.ow2.proactive.scheduler.ext.matlab.MatlabTask
+                <programlisting language="xml"><![CDATA[<![CDATA[<javaExecutable class="org.ow2.proactive.scheduler.ext.matlab.worker.MatlabTask
  */">
                 <parameters>
                     <parameter name="index" value="0"/>
                     <parameter name="scriptFile" value="${MATLAB_SCRIPTS}/summer.m"/>
                 </parameters>
-            </javaExecutable>]]></programlisting>
+            </javaExecutable>]]>]]></programlisting>
                 <para>
                     A new parameter appears in this descriptor for the
                     SimpleMatlab task : the

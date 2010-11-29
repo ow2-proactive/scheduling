@@ -57,12 +57,12 @@
 			<generateorcheck_stub_for_class targetedClasspath="scheduler.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/authentication/SchedulerAuthentication" mode="@{mode}"/>
 			<generateorcheck_stub_for_class targetedClasspath="scheduler.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/examples/Worker" mode="@{mode}"/>
 			<generateorcheck_stub_for_class targetedClasspath="scheduler.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/ext/masterworker/AOSchedulerWorker" mode="@{mode}"/>
-			<generateorcheck_stub_for_class targetedClasspath="scheduler.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/ext/matlab/AOMatlabWorker" mode="@{mode}"/>
-			<generateorcheck_stub_for_class targetedClasspath="scheduler.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/ext/matlab/embedded/AOMatlabEnvironment" mode="@{mode}"/>
-			<generateorcheck_stub_for_class targetedClasspath="scheduler.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/ext/matlab/AOMatlabSplitter" mode="@{mode}"/>
-			<generateorcheck_stub_for_class targetedClasspath="scheduler.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/ext/matlab/AOMatlabCollector" mode="@{mode}"/>
-			<generateorcheck_stub_for_class targetedClasspath="scheduler.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/ext/scilab/embedded/AOScilabEnvironment" mode="@{mode}"/>
-			<generateorcheck_stub_for_class targetedClasspath="scheduler.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/ext/scilab/AOScilabWorker" mode="@{mode}"/>
+			<generateorcheck_stub_for_class targetedClasspath="scheduler.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/ext/matlab/client/AOMatlabEnvironment" mode="@{mode}"/>
+			<generateorcheck_stub_for_class targetedClasspath="scheduler.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/ext/matlab/worker/AOMatlabWorker" mode="@{mode}"/>
+			<generateorcheck_stub_for_class targetedClasspath="scheduler.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/ext/matlab/worker/AOMatlabSplitter" mode="@{mode}"/>
+			<generateorcheck_stub_for_class targetedClasspath="scheduler.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/ext/matlab/worker/AOMatlabCollector" mode="@{mode}"/>
+			<generateorcheck_stub_for_class targetedClasspath="scheduler.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/ext/scilab/client/AOScilabEnvironment" mode="@{mode}"/>
+			<generateorcheck_stub_for_class targetedClasspath="scheduler.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/ext/scilab/worker/AOScilabWorker" mode="@{mode}"/>
 			<generateorcheck_stub_for_class targetedClasspath="all.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/core/rmproxies/SchedulerRMProxy" mode="@{mode}"/>
 			<generateorcheck_stub_for_class targetedClasspath="all.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/core/rmproxies/UserRMProxy" mode="@{mode}"/>
 			<generateorcheck_stub_for_class targetedClasspath="scheduler.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/task/launcher/ForkedJavaTaskLauncher" mode="@{mode}"/>
@@ -96,6 +96,7 @@
 			<fileset dir="${cl.scheduler.dir}" includes="org/ow2/proactive/scheduler/common/**" />
 			<fileset dir="${cl.scheduler.dir}" includes="org/ow2/proactive/scheduler/resourcemanager/nodesource/policy/**" />
 			<fileset dir="${cl.scheduler.dir}" includes="org/ow2/proactive/scheduler/util/adminconsole/*" />
+            <fileset dir="${cl.scheduler.dir}" includes="org/ow2/proactive/scheduler/ext/masterworker/**" />
 			<fileset dir="${cl.rm.dir}" includes="org/ow2/proactive/resourcemanager/common/*" />
 			<indexjars>
 				<fileset refid="jar.index.fileset" />
@@ -103,13 +104,14 @@
 	    </jar>
 	</target>
 
-	<target name="deploy.scheduler.matlab" depends="-deployCopy, compile.scheduler, deploy.common.client" description="Creates scheduler matlab/scilab jar">
-		<jar destfile="${deploy.lib.dir}/${scheduler.matlab.jar}" manifest="${basedir}/scheduler-Manifest-base.mf">
+	<target name="deploy.scheduler.matsci" depends="-deployCopy, compile.scheduler, deploy.common.client" description="Creates scheduler matlab/scilab jar">
+		<jar destfile="${deploy.lib.dir}/${scheduler.matsci.jar}" manifest="${basedir}/scheduler-Manifest-base.mf">
 			<fileset dir="${cl.scheduler.dir}" includes="org/ow2/proactive/scheduler/common/Main.class" />
 			<fileset dir="${cl.scheduler.dir}" includes="org/ow2/proactive/scheduler/ext/common/**" />
+            <fileset dir="${cl.scheduler.dir}" includes="org/ow2/proactive/scheduler/ext/matsci/**" />
 			<fileset dir="${cl.scheduler.dir}" includes="org/ow2/proactive/scheduler/ext/matlab/**" />
 			<fileset dir="${cl.scheduler.dir}" includes="org/ow2/proactive/scheduler/ext/scilab/**" />
-			<fileset dir="${cl.scheduler.dir}" includes="org/ow2/proactive/scheduler/ext/masterworker/**" />
+
 			<indexjars>
 				<fileset refid="jar.index.fileset" />
 			</indexjars>
@@ -317,12 +319,6 @@
 	            <include name="org/ow2/proactive/scheduler/util/Shell.java"/>
 	            <include name="org/ow2/proactive/scheduler/util/LinuxShellExecuter.java"/>
 	            <include name="org/ow2/proactive/scheduler/ext/common/util/*.java"/>
-	            <include name="org/ow2/proactive/scheduler/ext/matlab/*.java"/>
-	            <include name="org/ow2/proactive/scheduler/ext/matlab/exception/*.java"/>
-	            <include name="org/ow2/proactive/scheduler/ext/matlab/util/*.java"/>
-	            <include name="org/ow2/proactive/scheduler/ext/scilab/*.java"/>
-	            <include name="org/ow2/proactive/scheduler/ext/scilab/exception/*.java"/>
-	            <include name="org/ow2/proactive/scheduler/ext/scilab/util/*.java"/>
                 <include name="org/ow2/proactive/scheduler/ext/masterworker/SchedulerExecutableAdapter.java"/>
 				<include name="org/ow2/proactive/scheduler/ext/**/*.sh"/>
                 <include name="org/ow2/proactive/scheduler/ext/**/*.bat"/>
