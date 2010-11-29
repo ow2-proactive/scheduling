@@ -42,8 +42,8 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.util.Sleeper;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.utils.Sleeper;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 
@@ -88,7 +88,7 @@ public class SessionsCleaner implements Runnable {
                         }
                     } catch (Throwable t) {
                         logger.info("cleaning session " + entry.getKey() + ", connection issue");
-                        sessionMap.remove(s);
+                        sessionMap.remove(entry.getKey());
                     }
 
                 }
