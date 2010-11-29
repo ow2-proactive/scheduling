@@ -113,6 +113,10 @@ function account(username){
 	rm_.showAccount_(username);
 }
 
+function nodeinfo(nodeURL){
+	rm_.nodeinfo_(nodeURL);
+}
+
 function reloadpermissions(){
 	rm_.refreshPermissionPolicy_();
 }

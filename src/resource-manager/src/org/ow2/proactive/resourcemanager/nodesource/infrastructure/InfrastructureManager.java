@@ -512,7 +512,7 @@ public abstract class InfrastructureManager implements Serializable {
     }
 
     private void timeout(String pnURL, long timeout) {
-        if (this.declareDeployingNodeLost(pnURL, "Timeout occurred after " + timeout + "ms.")) {
+        if (this.declareDeployingNodeLost(pnURL, "Timeout occurred after " + timeout + " ms.")) {
             this.registerRemovedDeployingNode(pnURL);
         }
     }

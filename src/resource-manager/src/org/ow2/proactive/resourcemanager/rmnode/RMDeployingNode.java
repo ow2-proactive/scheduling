@@ -210,10 +210,10 @@ public final class RMDeployingNode implements RMNode, Serializable {
     }
 
     /**
-     * @throws UnsupportedOperationException
+     * {@inheritDoc}
      */
     public String getNodeName() {
-        throw new UnsupportedOperationException();
+        return this.nodeName;
     }
 
     /**
@@ -231,14 +231,14 @@ public final class RMDeployingNode implements RMNode, Serializable {
     }
 
     /**
-     * returns null
+     * Always return null (a deploying node cannot be owned)
      */
     public Client getOwner() {
         return null;
     }
 
     /**
-     * returns null
+     * {@inheritDoc}
      */
     public Client getProvider() {
         return this.provider;
@@ -405,14 +405,21 @@ public final class RMDeployingNode implements RMNode, Serializable {
 
     @Override
     public String toString() {
-        String lf = System.getProperty("line.separator");
         StringBuilder sb = new StringBuilder();
-        sb.append(description);
+        String lf = System.getProperty("line.separator");
+        sb.append("Node " + this.getNodeName());
         sb.append(lf);
+        sb.append("URL : " + this.getNodeURL());
         sb.append(lf);
-        sb.append("command:");
+        sb.append("Node source : " + this.getNodeSourceName());
         sb.append(lf);
-        sb.append(commandLine);
+        sb.append("Provider : " + this.getProvider().getName());
+        sb.append(lf);
+        sb.append("State : " + this.getState());
+        sb.append(lf);
+        sb.append("Description : " + this.getDescription());
+        sb.append(lf);
+        sb.append("Command : " + this.getCommandLine());
         return sb.toString();
     }
 }

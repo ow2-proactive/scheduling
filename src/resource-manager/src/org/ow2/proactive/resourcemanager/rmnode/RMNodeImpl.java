@@ -320,16 +320,20 @@ public class RMNodeImpl implements RMNode, Serializable {
      */
     @Override
     public String toString() {
-        String mes = "\n";
-
-        mes += ("| Name of this Node  :  " + getNodeURL() + "\n");
-        mes += "+-----------------------------------------------+\n";
-        mes += ("| Node is free ?  	: " + this.isFree() + "\n");
-        mes += ("| VNode 		  	: " + vnodeName + "\n");
-        mes += ("| Host  		  	: " + getHostName() + "\n");
-        mes += ("| Name of the VM 	: " + getNodeInformation().getVMInformation().getDescriptorVMName() + "\n");
-        mes += "+-----------------------------------------------+\n";
-        return mes;
+        String lf = System.getProperty("line.separator");
+        StringBuilder sb = new StringBuilder();
+        sb.append("Node " + this.getNodeName());
+        sb.append(lf);
+        sb.append("URL : " + this.getNodeURL());
+        sb.append(lf);
+        sb.append("Node source : " + this.getNodeSourceName());
+        sb.append(lf);
+        sb.append("Provider : " + this.getProvider().getName());
+        sb.append(lf);
+        sb.append("Owner : " + (this.getOwner() == null ? "nobody" : this.getOwner().getName()));
+        sb.append(lf);
+        sb.append("State : " + this.getState());
+        return sb.toString();
     }
 
     /**

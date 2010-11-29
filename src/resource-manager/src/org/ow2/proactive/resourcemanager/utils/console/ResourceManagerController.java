@@ -396,6 +396,12 @@ public class ResourceManagerController {
         acopt.setArgName("username");
         actionGroup.addOption(acopt);
 
+        acopt = new Option("ni", "nodeinfo", true, control + "Display node information");
+        acopt.setRequired(false);
+        acopt.setArgs(1);
+        acopt.setArgName("nodeURL");
+        actionGroup.addOption(acopt);
+
         acopt = new Option("rp", "reloadpermissions", false, control + "Reload the permission file");
         acopt.setRequired(false);
         acopt.setArgs(0);

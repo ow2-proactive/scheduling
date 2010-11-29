@@ -125,6 +125,7 @@ public class ResourceManagerModel extends ConsoleModel {
                 + " nodeSource is removed immediately if second parameter is true)"));
         commands.add(new Command("listnodes()", "List every handled nodes"));
         commands.add(new Command("listns()", "List every handled node sources"));
+        commands.add(new Command("nodeinfo(nodeURL)", "Displays node informations"));
         commands.add(new Command("listinfrastructures()", "List supported infrastructures"));
         commands.add(new Command("listpolicies()", "List available node sources policies"));
         commands.add(new Command("topology()", "Displays nodes topology"));
@@ -554,6 +555,25 @@ public class ResourceManagerModel extends ConsoleModel {
             print(jmxInfoViewer.getInfo("ProActiveResourceManager:name=AllAccounts"));
         } catch (Exception e) {
             handleExceptionDisplay("Error while retrieving JMX informations", e);
+        }
+    }
+
+    public void nodeinfo_(final String nodeURL) {
+        try {
+            List<RMNodeEvent> allnodes = this.rm.getMonitoring().getState().getNodesEvents();
+            boolean found = false;
+            for (RMNodeEvent node : allnodes) {
+                if (node.getNodeUrl().equals(nodeURL)) {
+                    print(node.getNodeInfo());
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                throw new IllegalArgumentException("Node with URL " + nodeURL + " has not been found.");
+            }
+        } catch (Exception e) {
+            handleExceptionDisplay("Error while retrieving node informations", e);
         }
     }
 

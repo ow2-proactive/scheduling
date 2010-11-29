@@ -331,7 +331,8 @@ public class SSHInfrastructure2 extends InfrastructureManager {
                 String pOutPut = extractProcessOutput(p);
                 String pErrPut = extractProcessErrput(p);
                 final String description = "SSH command failed to launch node on host " + host.getHostName() +
-                    lf + "Error code: " + exitCode + lf + "Errput: " + pErrPut + lf + "Output: " + pOutPut;
+                    lf + "   >Error code: " + exitCode + lf + "   >Errput: " + pErrPut + "   >Output: " +
+                    pOutPut;
                 logger.error(description);
                 if (super.checkNodeIsAcquiredAndDo(nodeName, null, new Runnable() {
                     public void run() {
