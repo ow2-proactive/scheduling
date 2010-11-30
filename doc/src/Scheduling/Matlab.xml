@@ -746,7 +746,7 @@ Awaited Result
                     <parameter name="index" value="0"/>
                     <parameter name="scriptFile" value="${MATLAB_SCRIPTS}/summer.m"/>
                 </parameters>
-            </javaExecutable>]]>]]></programlisting>
+            </javaExecutable>]]></programlisting>
                 <para>
                     A new parameter appears in this descriptor for the
                     SimpleMatlab task : the
