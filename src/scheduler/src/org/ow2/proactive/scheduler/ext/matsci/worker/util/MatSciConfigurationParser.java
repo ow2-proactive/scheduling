@@ -56,7 +56,7 @@ public class MatSciConfigurationParser {
         if (!file.canRead()) {
             throw new IOException("In " + conf + ", " + file + " is not readable");
         }
-        if (executable && !file.canExecute()) {
+        if (executable && !file.canRead()) {
             throw new IOException("In " + conf + ", " + file + " is not executable");
         }
     }
