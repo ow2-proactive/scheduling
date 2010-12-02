@@ -87,7 +87,7 @@ import org.ow2.proactive.scheduler.gui.data.JobsOutputController;
 import org.ow2.proactive.scheduler.gui.data.SchedulerProxy;
 import org.ow2.proactive.scheduler.gui.preferences.PreferenceInitializer;
 import org.ow2.proactive.scheduler.gui.views.JobOutput;
-import org.ow2.proactive.scheduler.gui.views.JobOutput.VisuHint;
+import org.ow2.proactive.scheduler.gui.views.JobOutput.RemoteHint;
 import org.ow2.proactive.scheduler.gui.views.ResultPreview;
 import org.ow2.proactive.scheduler.gui.views.TaskView;
 import org.ow2.proactive.utils.Tools;
@@ -150,7 +150,7 @@ public class TaskComposite extends Composite implements Comparator<TaskState> {
     private int order = TaskState.ASC_ORDER;
     private int lastSorting = TaskState.SORT_BY_ID;
 
-    private Action visuAction;
+    private Action remoteAction;
     private TaskId selectedId = null;
 
     /**
@@ -162,7 +162,7 @@ public class TaskComposite extends Composite implements Comparator<TaskState> {
         super(parent, SWT.NONE);
         this.setLayout(new GridLayout());
         this.label = createLabel(parent);
-        createVisuBar(parent, view);
+        createTaskBar(parent, view);
         this.table = createTable(parent);
     }
 
@@ -174,11 +174,11 @@ public class TaskComposite extends Composite implements Comparator<TaskState> {
         return label;
     }
 
-    private void createVisuBar(final Composite parent, final TaskView view) {
+    private void createTaskBar(final Composite parent, final TaskView view) {
         ImageDescriptor imgDesc = Activator.getDefault().getImageRegistry().getDescriptor(
-                Internal.IMG_VISUALIZATION);
+                Internal.IMG_REMOTE_CONNECTION);
 
-        visuAction = new Action("Launch visualization for the selected task", imgDesc) {
+        remoteAction = new Action("Attempt a remote connection to the selected task", imgDesc) {
             @Override
             public void run() {
                 if (selectedId == null) {
@@ -196,18 +196,18 @@ public class TaskComposite extends Composite implements Comparator<TaskState> {
                                 Thread.sleep(2000);
                             } catch (InterruptedException e) {
                             }
-                            fireVisuButton(selectedId);
+                            fireRemoteButton(selectedId);
                         }
                     }.start();
                 } else {
                     // log was already fetched, do not wait
-                    fireVisuButton(selectedId);
+                    fireRemoteButton(selectedId);
                 }
 
             }
         };
-        visuAction.setEnabled(false);
-        view.getViewSite().getActionBars().getToolBarManager().add(visuAction);
+        remoteAction.setEnabled(false);
+        view.getViewSite().getActionBars().getToolBarManager().add(remoteAction);
 
     }
 
@@ -333,7 +333,7 @@ public class TaskComposite extends Composite implements Comparator<TaskState> {
                     TaskId id = (TaskId) widget.getData();
                     updateResultPreview(id, false);
                     selectedId = id;
-                    visuAction.setEnabled(true);
+                    remoteAction.setEnabled(true);
                 }
             }
         });
@@ -357,63 +357,66 @@ public class TaskComposite extends Composite implements Comparator<TaskState> {
     }
 
     /**
-     * Called when the visualization button is clicked
+     * Called when the remote connection button is clicked
      * <p>
-     * try to find a visualization hint for the selected task,
+     * try to find a remote connection hint for the selected task,
      * try to find an application associated to the protocol,
      * try to launch it
      * 
      * @param id currently selected id
      */
-    private void fireVisuButton(final TaskId id) {
+    private void fireRemoteButton(final TaskId id) {
         JobOutput out = JobsOutputController.getInstance().getJobOutput(id.getJobId());
         if (out == null) {
             Activator.log(IStatus.ERROR, "Unable to retrieve Output for Job " + id.getJobId(), null);
             return;
         }
-        VisuHint visu = null;
-        for (Entry<String, VisuHint> visuHint : out.getVisuHints().entrySet()) {
-            if (id.value().equals(visuHint.getKey())) {
-                visu = visuHint.getValue();
+        RemoteHint remote = null;
+        for (Entry<String, RemoteHint> remoteHint : out.getRemoteConnHints().entrySet()) {
+            if (id.value().equals(remoteHint.getKey())) {
+                remote = remoteHint.getValue();
                 break;
             }
         }
-        if (visu == null) {
+        if (remote == null) {
             final String msg = "Task " + id.getReadableName() + "(" + id.value() + ")" +
-                " does not provide visualization information.";
+                " does not provide remote connection information.";
             Activator.log(IStatus.INFO, msg, null);
             getDisplay().asyncExec(new Runnable() {
                 public void run() {
-                    MessageDialog.openInformation(getShell(), "Visualization", msg + "\n");
+                    MessageDialog.openInformation(getShell(), "Remote Connection", msg + "\n");
                 }
             });
             return;
         }
 
-        String app = PreferenceInitializer.getVisualizationProperties().getProperty(
-                visu.protocol.toLowerCase());
+        String app = PreferenceInitializer.getRemoteConnectionProperties().getProperty(
+                remote.protocol.toLowerCase());
         if (app == null || "".equals(app)) {
-            final String msg = "No application association is defined for protocol '" + visu.protocol + "'";
+            final String msg = "No Remote Connection application association is defined for protocol '" +
+                remote.protocol + "'";
             Activator.log(IStatus.ERROR, msg, null);
             getDisplay().asyncExec(new Runnable() {
                 public void run() {
-                    MessageDialog.openInformation(getShell(), "Visualization", msg + "\n");
+                    MessageDialog.openInformation(getShell(), "Remote Connection", msg + "\n");
                 }
             });
             return;
         }
 
         try {
-            Activator.log(IStatus.INFO, "Launching visualization for task " + id.getReadableName() + "(" +
-                id.value() + ") [proto=" + visu.protocol + " app=" + app + " url=" + visu.url + "]", null);
-            Runtime.getRuntime().exec(new String[] { app, visu.url });
+            Activator
+                    .log(IStatus.INFO, "Launching Remote Connection for task " + id.getReadableName() + "(" +
+                        id.value() + ") [proto=" + remote.protocol + " app=" + app + " url=" + remote.url +
+                        "]", null);
+            Runtime.getRuntime().exec(app + " " + remote.url);
         } catch (IOException e) {
-            final String msg = "Failed to launch application visualization command '" + app + " " + visu.url +
-                "'";
+            final String msg = "Failed to launch application Remote Connection command '" + app + " " +
+                remote.url + "'";
             Activator.log(IStatus.ERROR, msg, e);
             getDisplay().asyncExec(new Runnable() {
                 public void run() {
-                    MessageDialog.openInformation(getShell(), "Visualization", msg + "\n");
+                    MessageDialog.openInformation(getShell(), "Remote Connection", msg + "\n");
                 }
             });
         }
@@ -578,7 +581,7 @@ public class TaskComposite extends Composite implements Comparator<TaskState> {
         // We remove all the table entries
         this.table.removeAll();
 
-        this.visuAction.setEnabled(false);
+        this.remoteAction.setEnabled(false);
 
         // then add the entries
         for (final TaskState taskState : this.tasks) {

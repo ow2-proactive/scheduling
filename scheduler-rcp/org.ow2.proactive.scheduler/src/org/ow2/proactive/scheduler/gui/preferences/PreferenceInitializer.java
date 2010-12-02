@@ -49,32 +49,32 @@ import org.ow2.proactive.scheduler.gui.Internal;
 
 
 /**
- * Because of VisualizationPreferences, 
+ * Because of RemoteConnectionPreferences, 
  * Eclipse throws exceptions like crazy if this class does not exist.
- * Otherwise, it would have been named something like VisualizationProperties instead.
+ * Otherwise, it would have been named something like RemoteConnectionProperties instead.
  * <p>
  * This holds a static reference to the protocol/application association used by 
- * the VisualizationPreferences editor
+ * the RemoteConnectionPreferences editor
  * 
  */
 public class PreferenceInitializer extends AbstractPreferenceInitializer {
 
-    private static Properties visuProps = null;
+    private static Properties remoteProps = null;
 
     /**
      * @return properties mapping a lowercase protocol name to a path to a local application used
-     *     to visualize this protocol, ie ("vnc", "/usr/bin/vncviewer"). 
+     *     to connect to this protocol, ie ("vnc", "/usr/bin/vncviewer"). 
      *     Also, this should be platform specific
      */
-    public static Properties getVisualizationProperties() {
-        if (visuProps == null) {
-            loadVisualizationProperties();
+    public static Properties getRemoteConnectionProperties() {
+        if (remoteProps == null) {
+            loadRemoteConnectionProperties();
         }
-        return visuProps;
+        return remoteProps;
     }
 
-    private static void loadVisualizationProperties() {
-        if (visuProps != null) {
+    private static void loadRemoteConnectionProperties() {
+        if (remoteProps != null) {
             return;
         }
         Map<String, String> vis = null;
@@ -82,11 +82,11 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 
         String sys = System.getProperty("os.name").toLowerCase();
         if (sys.indexOf("win") >= 0) {
-            vis = Internal.winVisualizationAssociation;
+            vis = Internal.winRemoteConnAssociation;
         } else if (sys.indexOf("mac") >= 0) {
-            vis = Internal.macVisualizationAssociation;
+            vis = Internal.macRemoteConnAssociation;
         } else if (sys.indexOf("nix") >= 0 || sys.indexOf("nux") >= 0) {
-            vis = Internal.unixVisualizationAssociation;
+            vis = Internal.unixRemoteConnAssociation;
         }
 
         /** set default values */
@@ -94,29 +94,29 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
             props.setProperty(assoc.getKey(), assoc.getValue());
         }
 
-        if (!VisualizationPreferences.visuPropsFile.exists()) {
+        if (!RemoteConnectionPreferences.remoteConnPropsFile.exists()) {
             try {
-                VisualizationPreferences.visuPropsFile.createNewFile();
+                RemoteConnectionPreferences.remoteConnPropsFile.createNewFile();
             } catch (IOException e) {
                 Activator.log(IStatus.ERROR, "Failed to create property file " +
-                    VisualizationPreferences.visuPropsFile.getAbsolutePath(), e);
+                    RemoteConnectionPreferences.remoteConnPropsFile.getAbsolutePath(), e);
             }
         }
 
         /** override with the content of the file */
         try {
-            props.load(new FileInputStream(VisualizationPreferences.visuPropsFile));
+            props.load(new FileInputStream(RemoteConnectionPreferences.remoteConnPropsFile));
         } catch (IOException e) {
             Activator.log(IStatus.ERROR,
-                    "Failed to load visualization application association property file in " +
-                        VisualizationPreferences.visuPropsFile.getAbsolutePath(), e);
+                    "Failed to load remote connection application association property file in " +
+                        RemoteConnectionPreferences.remoteConnPropsFile.getAbsolutePath(), e);
         }
 
-        visuProps = props;
+        remoteProps = props;
     }
 
     @Override
     public void initializeDefaultPreferences() {
-        loadVisualizationProperties();
+        loadRemoteConnectionProperties();
     }
 }

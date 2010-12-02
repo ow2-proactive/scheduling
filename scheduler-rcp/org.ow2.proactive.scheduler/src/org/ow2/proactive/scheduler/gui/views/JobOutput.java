@@ -84,18 +84,18 @@ public class JobOutput extends MessageConsole {
     // the default stream to write in
     private MessageConsoleStream defaultStream;
 
-    public static class VisuHint {
+    public static class RemoteHint {
         public String protocol;
         public String url;
 
-        public VisuHint(String proto, String url) {
+        public RemoteHint(String proto, String url) {
             this.protocol = proto;
             this.url = url;
         }
     }
 
-    /** maps a Task ID to a visualization hint extracted from the logs */
-    private Map<String, VisuHint> visuHints = new HashMap<String, VisuHint>();
+    /** maps a Task ID to a remote connection hint extracted from the logs */
+    private Map<String, RemoteHint> remoteConnHints = new HashMap<String, RemoteHint>();
 
     // -------------------------------------------------------------------- //
     // --------------------------- constructor ---------------------------- //
@@ -139,33 +139,35 @@ public class JobOutput extends MessageConsole {
             public void run() {
                 defaultStream.setColor(col);
                 defaultStream.print(mess);
-                findVisuHint(mess);
+                findRemoteHint(mess);
             }
         });
     }
 
     /**
-     * Search for visualization hints in this log message
+     * Search for remote connection hints in this log message
      * 
      * @param message log message ; may contain multiple lines
      */
-    private void findVisuHint(String message) {
-        BufferedReader br = new BufferedReader(new StringReader(message));
-        String line = null;
-        try {
-            while ((line = br.readLine()) != null) {
-                String[] expl = line.split(" ");
-                for (int i = 0; i < expl.length; i++) {
-                    if (expl[i].equals(SchedulerConstants.VISUALIZATION_OUTPUT_MARKER)) {
-                        if (i + 3 < expl.length) {
-                            VisuHint h = new VisuHint(expl[i + 2], expl[i + 3]);
-                            this.visuHints.put(expl[i + 1], h);
-                            break;
+    private void findRemoteHint(String message) {
+        if (message.indexOf(SchedulerConstants.REMOTE_CONNECTION_OUTPUT_MARKER) != -1) {
+            BufferedReader br = new BufferedReader(new StringReader(message));
+            String line = null;
+            try {
+                while ((line = br.readLine()) != null) {
+                    String[] expl = line.split(" ");
+                    for (int i = 0; i < expl.length; i++) {
+                        if (expl[i].equals(SchedulerConstants.REMOTE_CONNECTION_OUTPUT_MARKER)) {
+                            if (i + 3 < expl.length) {
+                                RemoteHint h = new RemoteHint(expl[i + 2], expl[i + 3]);
+                                this.remoteConnHints.put(expl[i + 1], h);
+                                break;
+                            }
                         }
                     }
                 }
+            } catch (IOException e) {
             }
-        } catch (IOException e) {
         }
 
     }
@@ -257,10 +259,10 @@ public class JobOutput extends MessageConsole {
     }
 
     /**
-     * @return maps a TaskID value (ie "10001") to a visualization hint : protocol and url
+     * @return maps a TaskID value (ie "10001") to a remote connection hint : protocol and url
      *      all tasks may not have a visualization hint
      */
-    public Map<String, VisuHint> getVisuHints() {
-        return this.visuHints;
+    public Map<String, RemoteHint> getRemoteConnHints() {
+        return this.remoteConnHints;
     }
 }

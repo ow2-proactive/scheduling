@@ -67,24 +67,24 @@ import org.ow2.proactive.scheduler.Activator;
 
 
 /**
- * Manages File association for visualization
+ * Manages File association for remote connection
  * <p>
  * example : associate 'vnc' with '/usr/bin/vncviewer'
  * 
  *  
  */
-public class VisualizationPreferences extends PreferencePage implements IWorkbenchPreferencePage {
+public class RemoteConnectionPreferences extends PreferencePage implements IWorkbenchPreferencePage {
 
-    public static final File visuPropsFile = new File(System.getProperty("user.home") +
-        "/.ProActive_Scheduler/visu.apps.prop");
+    public static final File remoteConnPropsFile = new File(System.getProperty("user.home") +
+        "/.ProActive_Scheduler/remote.apps.prop");
 
     private Table table = null;
 
     private boolean dirty = false;
 
-    public VisualizationPreferences() {
+    public RemoteConnectionPreferences() {
         setPreferenceStore(Activator.getDefault().getPreferenceStore());
-        setDescription("Associate a visualization method with an application available on this system.");
+        setDescription("Associate a remote connection method with an application available on this system.");
     }
 
     @Override
@@ -241,7 +241,7 @@ public class VisualizationPreferences extends PreferencePage implements IWorkben
     private void resetTable() {
         table.removeAll();
 
-        for (Entry<Object, Object> props : PreferenceInitializer.getVisualizationProperties().entrySet()) {
+        for (Entry<Object, Object> props : PreferenceInitializer.getRemoteConnectionProperties().entrySet()) {
             TableItem it = new TableItem(this.table, SWT.NORMAL);
             it.setText(0, (String) props.getKey());
             it.setText(1, (String) props.getValue());
@@ -250,18 +250,18 @@ public class VisualizationPreferences extends PreferencePage implements IWorkben
     }
 
     private void saveProps() {
-        PreferenceInitializer.getVisualizationProperties().clear();
+        PreferenceInitializer.getRemoteConnectionProperties().clear();
         for (TableItem it : this.table.getItems()) {
-            PreferenceInitializer.getVisualizationProperties().setProperty(it.getText(0), it.getText(1));
+            PreferenceInitializer.getRemoteConnectionProperties().setProperty(it.getText(0), it.getText(1));
         }
 
         try {
-            PreferenceInitializer.getVisualizationProperties().store(
-                    new FileOutputStream(visuPropsFile, false), "protocol=/path/to/viewer");
+            PreferenceInitializer.getRemoteConnectionProperties().store(
+                    new FileOutputStream(remoteConnPropsFile, false), "protocol=/path/to/viewer");
             dirty = false;
         } catch (IOException e) {
-            Activator.log(IStatus.ERROR, "Failed to write property file " + visuPropsFile.getAbsolutePath(),
-                    e);
+            Activator.log(IStatus.ERROR, "Failed to write property file " +
+                remoteConnPropsFile.getAbsolutePath(), e);
         }
     }
 

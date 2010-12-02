@@ -128,9 +128,9 @@
    <extension
          point="org.eclipse.ui.preferencePages">
       <page
-            class="org.ow2.proactive.scheduler.gui.preferences.VisualizationPreferences"
-            id="org.ow2.proactive.scheduler.gui.preferences.VisualizationPreferences"
-            name="Visualization">
+            class="org.ow2.proactive.scheduler.gui.preferences.RemoteConnectionPreferences"
+            id="org.ow2.proactive.scheduler.gui.preferences.RemoteConnectionPreferences"
+            name="Remote Connection">
       </page>
    </extension>
    <extension

@@ -67,22 +67,22 @@ public final class Internal {
     public static final String IMG_SCHEDULERSTART = "scheduler_start.png";
     public static final String IMG_SCHEDULERSTOP = "scheduler_stop.png";
     public static final String IMG_VERTICAL = "vertical.gif";
-    public static final String IMG_VISUALIZATION = "visualization.png";
+    public static final String IMG_REMOTE_CONNECTION = "visualization.png";
 
     /**
-     * associates a protocol with a binary on the local system
+     * associates a remote connection protocol with a binary on the local system
      */
-    public static final Map<String, String> unixVisualizationAssociation = new HashMap<String, String>();
+    public static final Map<String, String> unixRemoteConnAssociation = new HashMap<String, String>();
     static {
-        unixVisualizationAssociation.put("vnc", "/usr/bin/vncviewer");
+        unixRemoteConnAssociation.put("vnc", "/usr/bin/vncviewer");
     }
-    public static final Map<String, String> winVisualizationAssociation = new HashMap<String, String>();
+    public static final Map<String, String> winRemoteConnAssociation = new HashMap<String, String>();
     static {
-        winVisualizationAssociation.put("vnc", "C:\\path\\to\\vncviewer");
+        winRemoteConnAssociation.put("vnc", "C:\\path\\to\\vncviewer");
     }
-    public static final Map<String, String> macVisualizationAssociation = new HashMap<String, String>();
+    public static final Map<String, String> macRemoteConnAssociation = new HashMap<String, String>();
     static {
-        macVisualizationAssociation.put("vnc", "/path/to/vncviewer");
+        macRemoteConnAssociation.put("vnc", "/path/to/vncviewer");
     }
 
 }
