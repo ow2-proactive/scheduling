@@ -66,8 +66,6 @@ public enum XMLAttributes {
     FLOW_BLOCK("block"), FLOW_TARGET("target"), FLOW_ELSE("else"), FLOW_CONTINUATION("continuation"),
     //DATASPACES
     DS_INCLUDES("includes"), DS_EXCLUDES("excludes"), DS_ACCESSMODE("accessMode"),
-    // VISUALIZATION
-    VISU_PROTO("protocol"), VISU_URL("url"),
     //NOT USED IN XML FACTORY BUT USED IN XML DESCRIPTION
     PATH("path"), LANGUAGE("language");
 

@@ -70,6 +70,12 @@ public class SchedulerConstants {
     /** Name of the GlobalSpace for DataSpaces registration */
     public static final String GLOBALSPACE_NAME = "GLOBALSPACE";
 
-    /** Marker in the task output to locate the remote Visualization hint */
+    /**
+     * Marker in the task output to locate the remote Visualization hint 
+     * for the hint to be detected client side, the following String has 
+     * to be printed to the task log :
+     *  X-VISU-HINT TaskId  protocol url
+     *  example : 'X-VISU-HINT 10005 vnc localhost:5109'
+     */
     public static final String VISUALIZATION_OUTPUT_MARKER = "X-VISU-HINT";
 }

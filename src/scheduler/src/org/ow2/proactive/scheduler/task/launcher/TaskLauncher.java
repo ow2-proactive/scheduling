@@ -145,11 +145,6 @@ public abstract class TaskLauncher implements InitActive {
 
     protected OneShotDecrypter decrypter = null;
 
-    /** remote visualization hint url */
-    protected String visuUrl = null;
-    /** remote visualization hint protocol */
-    protected String visuProto = null;
-
     /**
      * Scheduler related java properties. Thoses properties are automatically
      * translated into system property when the task is native (see NativeTaskLauncher) :
@@ -249,8 +244,6 @@ public abstract class TaskLauncher implements InitActive {
         this.namingServiceUrl = initializer.getNamingServiceUrl();
         this.replicationIndex = initializer.getReplicationIndex();
         this.iterationIndex = initializer.getIterationIndex();
-        this.visuProto = initializer.getVisuProto();
-        this.visuUrl = initializer.getVisuUrl();
     }
 
     /**
