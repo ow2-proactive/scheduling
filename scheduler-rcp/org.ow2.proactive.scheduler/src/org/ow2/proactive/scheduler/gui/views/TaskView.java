@@ -179,7 +179,7 @@ public class TaskView extends ViewPart {
     @Override
     public void createPartControl(Composite parent) {
         isDisposed = false;
-        taskComposite = new TaskComposite(parent);
+        taskComposite = new TaskComposite(parent, this);
 
         TableManager tableManager = TableManager.getInstance();
         if (tableManager != null) {

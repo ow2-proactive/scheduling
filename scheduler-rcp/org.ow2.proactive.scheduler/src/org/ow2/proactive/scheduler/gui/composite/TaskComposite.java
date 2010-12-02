@@ -36,15 +36,20 @@
  */
 package org.ow2.proactive.scheduler.gui.composite;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Map.Entry;
 
 import javax.swing.JPanel;
 
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
@@ -76,9 +81,15 @@ import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.common.task.util.ResultPreviewTool.SimpleTextPanel;
 import org.ow2.proactive.scheduler.gui.Colors;
+import org.ow2.proactive.scheduler.gui.Internal;
 import org.ow2.proactive.scheduler.gui.data.JobsController;
+import org.ow2.proactive.scheduler.gui.data.JobsOutputController;
 import org.ow2.proactive.scheduler.gui.data.SchedulerProxy;
+import org.ow2.proactive.scheduler.gui.preferences.PreferenceInitializer;
+import org.ow2.proactive.scheduler.gui.views.JobOutput;
+import org.ow2.proactive.scheduler.gui.views.JobOutput.VisuHint;
 import org.ow2.proactive.scheduler.gui.views.ResultPreview;
+import org.ow2.proactive.scheduler.gui.views.TaskView;
 import org.ow2.proactive.utils.Tools;
 
 
@@ -139,15 +150,19 @@ public class TaskComposite extends Composite implements Comparator<TaskState> {
     private int order = TaskState.ASC_ORDER;
     private int lastSorting = TaskState.SORT_BY_ID;
 
+    private Action visuAction;
+    private TaskId selectedId = null;
+
     /**
      * This is the default constructor.
      *
      * @param parent
      */
-    public TaskComposite(final Composite parent) {
+    public TaskComposite(final Composite parent, final TaskView view) {
         super(parent, SWT.NONE);
         this.setLayout(new GridLayout());
         this.label = createLabel(parent);
+        createVisuBar(parent, view);
         this.table = createTable(parent);
     }
 
@@ -157,6 +172,43 @@ public class TaskComposite extends Composite implements Comparator<TaskState> {
         label.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         label.setForeground(Colors.RED);
         return label;
+    }
+
+    private void createVisuBar(final Composite parent, final TaskView view) {
+        ImageDescriptor imgDesc = Activator.getDefault().getImageRegistry().getDescriptor(
+                Internal.IMG_VISUALIZATION);
+
+        visuAction = new Action("Launch visualization for the selected task", imgDesc) {
+            @Override
+            public void run() {
+                if (selectedId == null) {
+                    return;
+                }
+                // fetch the job output if we did not have it
+                JobOutput out = JobsOutputController.getInstance().getJobOutput(selectedId.getJobId());
+                if (out == null) {
+                    JobsOutputController.getInstance().createJobOutput(selectedId.getJobId(), false);
+                    // wait a little to for the async log fetching to be done
+                    new Thread() {
+                        @Override
+                        public void run() {
+                            try {
+                                Thread.sleep(2000);
+                            } catch (InterruptedException e) {
+                            }
+                            fireVisuButton(selectedId);
+                        }
+                    }.start();
+                } else {
+                    // log was already fetched, do not wait
+                    fireVisuButton(selectedId);
+                }
+
+            }
+        };
+        visuAction.setEnabled(false);
+        view.getViewSite().getActionBars().getToolBarManager().add(visuAction);
+
     }
 
     private Table createTable(final Composite parent) {
@@ -277,10 +329,11 @@ public class TaskComposite extends Composite implements Comparator<TaskState> {
 
             public void handleEvent(Event event) {
                 Widget widget = event.item;
-
                 if ((widget != null) && (!widget.isDisposed())) {
                     TaskId id = (TaskId) widget.getData();
                     updateResultPreview(id, false);
+                    selectedId = id;
+                    visuAction.setEnabled(true);
                 }
             }
         });
@@ -301,6 +354,69 @@ public class TaskComposite extends Composite implements Comparator<TaskState> {
 
         });
         return table;
+    }
+
+    /**
+     * Called when the visualization button is clicked
+     * <p>
+     * try to find a visualization hint for the selected task,
+     * try to find an application associated to the protocol,
+     * try to launch it
+     * 
+     * @param id currently selected id
+     */
+    private void fireVisuButton(final TaskId id) {
+        JobOutput out = JobsOutputController.getInstance().getJobOutput(id.getJobId());
+        if (out == null) {
+            Activator.log(IStatus.ERROR, "Unable to retrieve Output for Job " + id.getJobId(), null);
+            return;
+        }
+        VisuHint visu = null;
+        for (Entry<String, VisuHint> visuHint : out.getVisuHints().entrySet()) {
+            if (id.value().equals(visuHint.getKey())) {
+                visu = visuHint.getValue();
+                break;
+            }
+        }
+        if (visu == null) {
+            final String msg = "Task " + id.getReadableName() + "(" + id.value() + ")" +
+                " does not provide visualization information.";
+            Activator.log(IStatus.INFO, msg, null);
+            getDisplay().asyncExec(new Runnable() {
+                public void run() {
+                    MessageDialog.openInformation(getShell(), "Visualization", msg + "\n");
+                }
+            });
+            return;
+        }
+
+        String app = PreferenceInitializer.getVisualizationProperties().getProperty(
+                visu.protocol.toLowerCase());
+        if (app == null || "".equals(app)) {
+            final String msg = "No application association is defined for protocol '" + visu.protocol + "'";
+            Activator.log(IStatus.ERROR, msg, null);
+            getDisplay().asyncExec(new Runnable() {
+                public void run() {
+                    MessageDialog.openInformation(getShell(), "Visualization", msg + "\n");
+                }
+            });
+            return;
+        }
+
+        try {
+            Activator.log(IStatus.INFO, "Launching visualization for task " + id.getReadableName() + "(" +
+                id.value() + ") [proto=" + visu.protocol + " app=" + app + " url=" + visu.url + "]", null);
+            Runtime.getRuntime().exec(new String[] { app, visu.url });
+        } catch (IOException e) {
+            final String msg = "Failed to launch application visualization command '" + app + " " + visu.url +
+                "'";
+            Activator.log(IStatus.ERROR, msg, e);
+            getDisplay().asyncExec(new Runnable() {
+                public void run() {
+                    MessageDialog.openInformation(getShell(), "Visualization", msg + "\n");
+                }
+            });
+        }
     }
 
     private void initResultPreviewDisplay() {
@@ -461,6 +577,8 @@ public class TaskComposite extends Composite implements Comparator<TaskState> {
 
         // We remove all the table entries
         this.table.removeAll();
+
+        this.visuAction.setEnabled(false);
 
         // then add the entries
         for (final TaskState taskState : this.tasks) {

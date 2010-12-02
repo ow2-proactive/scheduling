@@ -43,6 +43,7 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
 import org.ow2.proactive.scheduler.common.task.ExecutableInitializer;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
@@ -180,6 +181,12 @@ public class NativeTaskLauncher extends TaskLauncher {
 
             if (flow != null) {
                 this.executeFlowScript(PAActiveObject.getNode(), res);
+            }
+
+            // write the visualization hint at the end of the output
+            if (this.visuProto != null && this.visuUrl != null) {
+                this.redirectedStdout.println(SchedulerConstants.VISUALIZATION_OUTPUT_MARKER + " " +
+                    this.taskId.value() + " " + this.visuProto + " " + this.visuUrl);
             }
 
             res.setPropagatedProperties(retreivePropagatedProperties());

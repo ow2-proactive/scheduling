@@ -510,6 +510,31 @@ public class JobFactory_stax extends JobFactory {
     }
 
     /**
+     * Read the attributes of the visualization tag
+     * 
+     * @param task current task
+     * @param cursor current xml element, <visualization>
+     * @throws JobCreationException
+     */
+    private void setVisu(Task task, XMLStreamReader cursor) throws JobCreationException {
+        try {
+            for (int i = 0; i < cursor.getAttributeCount(); i++) {
+                if (cursor.getAttributeLocalName(i).equals(XMLAttributes.VISU_PROTO.getXMLName())) {
+                    task.setVisuProto(cursor.getAttributeValue(i));
+                } else if (cursor.getAttributeLocalName(i).equals(XMLAttributes.VISU_URL.getXMLName())) {
+                    task.setVisuUrl(cursor.getAttributeValue(i));
+                }
+            }
+
+            while (cursor.next() != XMLEvent.END_ELEMENT)
+                ;
+
+        } catch (Exception e) {
+            throw new JobCreationException(XMLTags.VISUALIZATION, null, e);
+        }
+    }
+
+    /**
      * Get the INPUT/OUTPUT space URL of the job.
      * Leave the method with the cursor at the end of 'ELEMENT_DS_INPUT/OUTPUTSPACE' tag.
      *
@@ -668,6 +693,8 @@ public class JobFactory_stax extends JobFactory {
                         } else if (XMLTags.NATIVE_EXECUTABLE.matches(current)) {
                             toReturn = (taskToFill != null) ? taskToFill : new NativeTask();
                             setNativeExecutable((NativeTask) toReturn, cursorTask);
+                        } else if (XMLTags.VISUALIZATION.matches(current)) {
+                            setVisu(tmpTask, cursorTask);
                         }
                         break;
                     case XMLEvent.END_ELEMENT:

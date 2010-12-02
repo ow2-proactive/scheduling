@@ -223,8 +223,8 @@ public class TestGlobalSpace extends FunctionalTest {
          * check: global was cleaned
          */
         File globSubDir = new File(glob.getAbsoluteFile() + File.separator + "1");
-        Assert.assertTrue("GLOBAL dir " + globSubDir.getAbsolutePath() + " was not cleared",
-                !globSubDir.exists());
+        Assert.assertTrue("GLOBAL dir " + globSubDir.getAbsolutePath() + " was not cleared", !globSubDir
+                .exists());
 
         /**
          * check: inFiles > IN > LOCAL A > GLOBAL > LOCAL B > OUT 

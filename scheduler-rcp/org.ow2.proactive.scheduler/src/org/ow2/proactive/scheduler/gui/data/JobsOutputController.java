@@ -120,13 +120,30 @@ public class JobsOutputController {
     }
 
     /**
+     * If the JobOutput for specified JobId is available, return it, else return null.
+     * 
+     * @param jobId valid Id for a running job
+     * @return the output of the specified job, or null
+     * @see JobsOutputController#createJobOutput(JobId)
+     */
+    public JobOutput getJobOutput(JobId jobId) {
+        JobOutputAppender joa = appenders.get(jobId);
+        if (joa == null) {
+            return null;
+        } else {
+            return joa.getJobOutput();
+        }
+    }
+
+    /**
      * Create an output for a job identified by the given jobId
      *
      * @param jobId
      *            the jobId
+     * @param showOutput if true, show the output view after the logs have been obtained
      * @throws SchedulerException
      */
-    public void createJobOutput(JobId jobId) { //TODO cdelbe: get log from job result for finished jobs ?
+    public void createJobOutput(JobId jobId, boolean showOutput) { //TODO cdelbe: get log from job result for finished jobs ?
         if (!showJobOutput(jobId)) {
             try {
                 JobOutputAppender joa = new JobOutputAppender(new JobOutput(PREFIX_JOB_OUTPUT_TITLE + jobId,
@@ -139,7 +156,9 @@ public class JobsOutputController {
                 log.addAppender(joa);
                 appenders.put(jobId, joa);
                 SchedulerProxy.getInstance().listenJobLogs(jobId, Activator.lfs.getAppenderProvider());
-                showJobOutput(jobId);
+                if (showOutput) {
+                    showJobOutput(jobId);
+                }
             } catch (LogForwardingException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();

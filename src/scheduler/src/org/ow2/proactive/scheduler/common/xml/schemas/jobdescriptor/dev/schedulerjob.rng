@@ -256,6 +256,9 @@
       <optional>
         <ref name="outputFiles"/>
       </optional>
+      <optional>
+        <ref name="visualization"/>
+      </optional>
     </element>
   </define>
   <define name="taskName">
@@ -398,6 +401,33 @@
       <doc:documentation>Do we run this task under the job owner user identity</doc:documentation>
       <choice>
         <data type="boolean"/>
+        <ref name="variableRefType"/>
+      </choice>
+    </attribute>
+  </define>
+  <define name="visualization">
+    <element name="visualization">
+      <doc:documentation>remote visualization after completion of the task</doc:documentation>
+      <ref name="visuProto"/>
+      <ref name="visuUrl"/>
+    </element>
+  </define>
+  <define name="visuProto">
+    <attribute name="protocol">
+      <doc:documentation>visualization protocol : alpha only string</doc:documentation>
+      <choice>
+        <data type="string">
+          <param name="pattern">[a-zA-Z]+</param>
+        </data>
+        <ref name="variableRefType"/>
+      </choice>
+    </attribute>
+  </define>
+  <define name="visuUrl">
+    <attribute name="url">
+      <doc:documentation>remote visualization URL</doc:documentation>
+      <choice>
+        <data type="anyURI"/>
         <ref name="variableRefType"/>
       </choice>
     </attribute>

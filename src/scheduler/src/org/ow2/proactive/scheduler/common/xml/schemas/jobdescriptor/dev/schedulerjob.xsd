@@ -255,6 +255,7 @@
             <xs:element minOccurs="0" ref="jd:post"/>
             <xs:element minOccurs="0" ref="jd:cleaning"/>
             <xs:element minOccurs="0" ref="jd:outputFiles"/>
+            <xs:element minOccurs="0" ref="jd:visualization"/>
           </xs:sequence>
           <xs:attributeGroup ref="jd:taskName"/>
           <xs:attribute name="numberOfNodes">
@@ -479,6 +480,41 @@
       </xs:annotation>
       <xs:simpleType>
         <xs:union memberTypes="xs:boolean jd:variableRefType"/>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:element name="visualization">
+    <xs:annotation>
+      <xs:documentation>remote visualization after completion of the task</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:attributeGroup ref="jd:visuProto"/>
+      <xs:attributeGroup ref="jd:visuUrl"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="visuProto">
+    <xs:attribute name="protocol" use="required">
+      <xs:annotation>
+        <xs:documentation>visualization protocol : alpha only string</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:union memberTypes="jd:variableRefType">
+          <xs:simpleType>
+            <xs:restriction base="xs:string">
+              <xs:pattern value="[a-zA-Z]+"/>
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:union>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="visuUrl">
+    <xs:attribute name="url" use="required">
+      <xs:annotation>
+        <xs:documentation>remote visualization URL</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:union memberTypes="xs:anyURI jd:variableRefType"/>
       </xs:simpleType>
     </xs:attribute>
   </xs:attributeGroup>

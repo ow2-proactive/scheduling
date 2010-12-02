@@ -80,6 +80,11 @@ public class TaskLauncherInitializer implements Serializable {
     private String namingServiceUrl;
     private String owner;
 
+    /** visualization hint protocol */
+    private String visuProto = null;
+    /** visualization hint url */
+    private String visuUrl = null;
+
     /**
      * Get the taskId
      *
@@ -286,5 +291,33 @@ public class TaskLauncherInitializer implements Serializable {
      */
     public int getReplicationIndex() {
         return this.replicationIndex;
+    }
+
+    /**
+     * @param url the remote visualization hint URL
+     */
+    public void setVisuUrl(String url) {
+        this.visuUrl = url;
+    }
+
+    /**
+     * @return the remote visualization hint URL
+     */
+    public String getVisuUrl() {
+        return this.visuUrl;
+    }
+
+    /**
+     * @param proto the remote visualization hint protocol
+     */
+    public void setVisuProto(String proto) {
+        this.visuProto = proto;
+    }
+
+    /**
+     * @return the remote visualization hint protocol
+     */
+    public String getVisuProto() {
+        return this.visuProto;
     }
 }

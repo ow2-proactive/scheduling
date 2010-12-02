@@ -69,4 +69,7 @@ public class SchedulerConstants {
 
     /** Name of the GlobalSpace for DataSpaces registration */
     public static final String GLOBALSPACE_NAME = "GLOBALSPACE";
+
+    /** Marker in the task output to locate the remote Visualization hint */
+    public static final String VISUALIZATION_OUTPUT_MARKER = "X-VISU-HINT";
 }

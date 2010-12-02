@@ -1136,6 +1136,8 @@ public abstract class InternalTask extends TaskState {
         tli.setNamingServiceUrl(job.getJobDataSpaceApplication().getNamingServiceURL());
         tli.setIterationIndex(getIterationIndex());
         tli.setReplicationIndex(getReplicationIndex());
+        tli.setVisuProto(getVisuProto());
+        tli.setVisuUrl(getVisuUrl());
         if (isWallTimeSet()) {
             tli.setWalltime(wallTime);
         }

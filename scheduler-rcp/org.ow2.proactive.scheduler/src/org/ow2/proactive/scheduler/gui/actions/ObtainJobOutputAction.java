@@ -63,7 +63,7 @@ public class ObtainJobOutputAction extends SchedulerGUIAction {
     public void run() {
         List<JobId> jobsId = TableManager.getInstance().getJobsIdOfSelectedItems();
         for (JobId jobId : jobsId)
-            JobsOutputController.getInstance().createJobOutput(jobId);
+            JobsOutputController.getInstance().createJobOutput(jobId, true);
     }
 
     @Override

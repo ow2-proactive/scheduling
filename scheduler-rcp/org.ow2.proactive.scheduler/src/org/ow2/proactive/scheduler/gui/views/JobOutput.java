@@ -36,12 +36,19 @@
  */
 package org.ow2.proactive.scheduler.gui.views;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.StringReader;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.console.ConsolePlugin;
 import org.eclipse.ui.console.IConsole;
 import org.eclipse.ui.console.MessageConsole;
 import org.eclipse.ui.console.MessageConsoleStream;
+import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.gui.Colors;
 
 
@@ -76,6 +83,19 @@ public class JobOutput extends MessageConsole {
 
     // the default stream to write in
     private MessageConsoleStream defaultStream;
+
+    public static class VisuHint {
+        public String protocol;
+        public String url;
+
+        public VisuHint(String proto, String url) {
+            this.protocol = proto;
+            this.url = url;
+        }
+    }
+
+    /** maps a Task ID to a visualization hint extracted from the logs */
+    private Map<String, VisuHint> visuHints = new HashMap<String, VisuHint>();
 
     // -------------------------------------------------------------------- //
     // --------------------------- constructor ---------------------------- //
@@ -119,8 +139,35 @@ public class JobOutput extends MessageConsole {
             public void run() {
                 defaultStream.setColor(col);
                 defaultStream.print(mess);
+                findVisuHint(mess);
             }
         });
+    }
+
+    /**
+     * Search for visualization hints in this log message
+     * 
+     * @param message log message ; may contain multiple lines
+     */
+    private void findVisuHint(String message) {
+        BufferedReader br = new BufferedReader(new StringReader(message));
+        String line = null;
+        try {
+            while ((line = br.readLine()) != null) {
+                String[] expl = line.split(" ");
+                for (int i = 0; i < expl.length; i++) {
+                    if (expl[i].equals(SchedulerConstants.VISUALIZATION_OUTPUT_MARKER)) {
+                        if (i + 3 < expl.length) {
+                            VisuHint h = new VisuHint(expl[i + 2], expl[i + 3]);
+                            this.visuHints.put(expl[i + 1], h);
+                            break;
+                        }
+                    }
+                }
+            }
+        } catch (IOException e) {
+        }
+
     }
 
     // -------------------------------------------------------------------- //
@@ -207,5 +254,13 @@ public class JobOutput extends MessageConsole {
      * Do nothing.
      */
     public synchronized void off() {
+    }
+
+    /**
+     * @return maps a TaskID value (ie "10001") to a visualization hint : protocol and url
+     *      all tasks may not have a visualization hint
+     */
+    public Map<String, VisuHint> getVisuHints() {
+        return this.visuHints;
     }
 }

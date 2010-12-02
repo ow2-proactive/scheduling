@@ -141,7 +141,6 @@ public class Activator extends AbstractUIPlugin {
         properties.put(URLConstants.URL_HANDLER_PROTOCOL, new String[] { "httpssh" });
         String serviceClass = URLStreamHandlerService.class.getName();
         context.registerService(serviceClass, new IC2DHandler(), properties);
-
     }
 
     /**
@@ -250,6 +249,8 @@ public class Activator extends AbstractUIPlugin {
         reg.put(Internal.IMG_SCHEDULERSTOP, Activator.getImageDescriptor("icons/" +
             Internal.IMG_SCHEDULERSTOP));
         reg.put(Internal.IMG_VERTICAL, Activator.getImageDescriptor("icons/" + Internal.IMG_VERTICAL));
+        reg.put(Internal.IMG_VISUALIZATION, Activator.getImageDescriptor("icons/" +
+            Internal.IMG_VISUALIZATION));
     }
 
     //

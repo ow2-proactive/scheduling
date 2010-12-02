@@ -197,6 +197,14 @@ public abstract class Task extends CommonAttribute {
     @Column(name = "WALLTIME")
     protected long wallTime = 0;
 
+    /** protocol for remote visualization (ie 'vnc') */
+    @Column(name = "VISU_PROTO")
+    protected String visuProto = null;
+
+    /** URL for remote visualization (ie 'example.net:5601') */
+    @Column(name = "VISU_URL")
+    protected String visuUrl = null;
+
     /**
      * Add a dependence to the task. <font color="red">Warning : the dependence order is very
      * important.</font><br>
@@ -672,6 +680,61 @@ public abstract class Task extends CommonAttribute {
      */
     public List<OutputSelector> getOutputFilesList() {
         return outputFiles;
+    }
+
+    /**
+     * If defined along with {@link #setVisuUrl(String)},
+     * will be written to the log of the running task as a hint 
+     * for every listening client to visualize this task. 
+     * ie start a VNC client or a remote X session 
+     * 
+     * @param proto the name of the visualization protocol, ie 'vnc'
+     */
+    public void setVisuProto(String proto) {
+        if (!proto.matches("[a-zA-Z]+")) {
+            throw new IllegalArgumentException(
+                "Visualization Protocol must be a sequence of alphabetic characters");
+        }
+        this.visuProto = proto;
+    }
+
+    /**
+     * If defined along with {@link #setVisuUrl(String)},
+     * will be written to the log of the running task as a hint 
+     * for every listening client to visualize this task. 
+     * ie start a VNC client or a remote X session 
+     * 
+     * @return url the name of the visualization protocol, ie 'vnc'
+     */
+    public String getVisuProto() {
+        return this.visuProto;
+    }
+
+    /**
+     * If defined along with {@link #setVisuUrl(String)},
+     * will be written to the log of the running task as a hint 
+     * for every listening client to visualize this task. 
+     * ie start a VNC client or a remote X session 
+     * 
+     * @param url visualization server, ie the vnc server at example.net:5901
+     */
+    public void setVisuUrl(String url) {
+        if (url.matches("\\s")) {
+            throw new IllegalArgumentException("Visualization URL cannot contain whitespace characters");
+        }
+        this.visuUrl = url;
+    }
+
+    /**
+     * If defined along with {@link #setVisuUrl(String)},
+     * will be written to the log of the running task as a hint 
+     * for every listening client to visualize this task. 
+     * ie start a VNC client or a remote X session 
+     * 
+     * @return the visualization server url, ie the vnc server at example.net:5901
+     */
+    public String getVisuUrl() {
+        return this.visuUrl;
     }
 
 }
