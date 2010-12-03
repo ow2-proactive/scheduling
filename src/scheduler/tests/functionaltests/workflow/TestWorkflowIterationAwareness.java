@@ -45,6 +45,7 @@ import org.junit.Assert;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
+import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.flow.FlowActionType;
@@ -211,7 +212,7 @@ public class TestWorkflowIterationAwareness extends FunctionalTest {
         JavaTask t = new JavaTask();
         t.setName("T");
         t.setExecutableClassName("org.ow2.proactive.scheduler.examples.EmptyTask");
-        t.setFork(true);
+        t.setForkEnvironment(new ForkEnvironment());
         t.setMaxNumberOfExecution(4);
         t.setFlowBlock(FlowBlock.START);
         FlowScript dup = FlowScript.createReplicateFlowScript(dupScript);
@@ -223,7 +224,7 @@ public class TestWorkflowIterationAwareness extends FunctionalTest {
         t1.setExecutableClassName("org.ow2.proactive.scheduler.examples.IterationAwareJob");
         t1.addArgument("it", "$IT");
         t1.addArgument("dup", "$REP");
-        t1.setFork(true);
+        t1.setForkEnvironment(new ForkEnvironment());
         t1.setMaxNumberOfExecution(4);
         t1.addDependence(t);
         t1.setPreScript(new SimpleScript(preScript, "javascript"));
@@ -234,7 +235,7 @@ public class TestWorkflowIterationAwareness extends FunctionalTest {
         t2.setName("T2");
         t2.addDependence(t1);
         t2.setExecutableClassName("org.ow2.proactive.scheduler.examples.EmptyTask");
-        t2.setFork(true);
+        t2.setForkEnvironment(new ForkEnvironment());
         t2.setMaxNumberOfExecution(4);
         t2.setFlowBlock(FlowBlock.END);
         FlowScript loop = FlowScript.createLoopFlowScript(loopScript, t.getName());

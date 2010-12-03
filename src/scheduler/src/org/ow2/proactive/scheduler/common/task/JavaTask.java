@@ -71,9 +71,6 @@ public class JavaTask extends Task {
     /** For internal use : name of the field that stores task arguments */
     public static final String ARGS_FIELD_NAME = "serializedArguments";
 
-    /** if the task will be executed in a separate JVM */
-    private boolean fork;
-
     /** Environment of a new dedicated JVM */
     private ForkEnvironment forkEnvironment = null;
 
@@ -181,17 +178,10 @@ public class JavaTask extends Task {
     }
 
     /**
-     * @return the fork if the task will be executed in a separate JVM 
+     * @return true if the task will be executed in a separate JVM
      */
     public boolean isFork() {
-        return fork;
-    }
-
-    /**
-     * @param fork the fork to set - if the task will be executed in a separate JVM 
-     */
-    public void setFork(boolean fork) {
-        this.fork = fork;
+        return this.forkEnvironment != null || super.isWallTimeSet() || super.isRunAsMe();
     }
 
     /**

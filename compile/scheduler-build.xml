@@ -199,6 +199,7 @@
 				<include name="org/ow2/proactive/scheduler/task/launcher/TaskLauncher.java" />
 				<include name="org/ow2/proactive/scheduler/task/launcher/ProActiveTaskLauncher.java" />
 				<include name="org/ow2/proactive/scheduler/task/launcher/TaskLauncherInitializer.java" />
+				<include name="org/ow2/proactive/scheduler/task/launcher/InternalForkEnvironment.java" />
 				<include name="org/ow2/proactive/scheduler/task/ExecutableContainerInitializer.java" />
 				<include name="org/ow2/proactive/scheduler/task/JavaExecutableContainer.java" />
 				<include name="org/ow2/proactive/scheduler/task/ForkedJavaExecutable.java" />
@@ -257,6 +258,7 @@
 				<include name="org/ow2/proactive/scheduler/common/task/ExecutableInitializer.java" />
 				<include name="org/ow2/proactive/scheduler/common/task/JavaExecutableInitializer.java" />
 				<include name="org/ow2/proactive/scheduler/common/task/ForkEnvironment.java" />
+				<include name="org/ow2/proactive/scheduler/common/task/PropertyModifier.java" />
 				<include name="org/ow2/proactive/scheduler/common/task/TaskLogs.java" />
 				<include name="org/ow2/proactive/scheduler/common/task/NativeTask.java" />
 				<include name="org/ow2/proactive/scheduler/common/task/util/BooleanWrapper.java" />

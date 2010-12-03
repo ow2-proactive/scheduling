@@ -36,6 +36,9 @@
  */
 package unitTests;
 
+import java.util.List;
+import java.util.Map;
+
 import junit.framework.Assert;
 
 import org.junit.Test;
@@ -184,10 +187,32 @@ public class TestJobFactory {
         Assert.assertEquals(((JavaTask) tfJob.getTask("task2")).isWallTimeSet(), false);
         Assert.assertEquals(((JavaTask) tfJob.getTask("task2")).getForkEnvironment().getJavaHome(),
                 "/bin/java/jdk1.5");
-        Assert.assertEquals(((JavaTask) tfJob.getTask("task2")).getForkEnvironment().getJVMArguments()[0],
+        Assert.assertEquals(((JavaTask) tfJob.getTask("task2")).getForkEnvironment().getWorkingDir(),
+                "/bin/java/jdk1.5/toto");
+        Assert.assertEquals(
+                ((JavaTask) tfJob.getTask("task2")).getForkEnvironment().getJVMArguments().get(0),
                 "-dparam=12");
-        Assert.assertEquals(((JavaTask) tfJob.getTask("task2")).getForkEnvironment().getJVMArguments()[1],
+        Assert.assertEquals(
+                ((JavaTask) tfJob.getTask("task2")).getForkEnvironment().getJVMArguments().get(1),
                 "-djhome=/bin/java/jdk1.5");
+        Map<String, String> props = ((JavaTask) tfJob.getTask("task2")).getForkEnvironment()
+                .getSystemProperties();
+        Assert.assertEquals(3, props.size());
+        Assert.assertEquals("ioioio#123:456", props.get("toto"));
+        Assert.assertEquals("456", props.get("tata"));
+        Assert.assertEquals("123!456", props.get("titi"));
+        Assert.assertEquals("ioioio#123:456", ((JavaTask) tfJob.getTask("task2")).getForkEnvironment()
+                .getSystemProperty("toto"));
+        Assert.assertEquals("456", ((JavaTask) tfJob.getTask("task2")).getForkEnvironment()
+                .getSystemProperty("tata"));
+        Assert.assertEquals("123!456", ((JavaTask) tfJob.getTask("task2")).getForkEnvironment()
+                .getSystemProperty("titi"));
+        List<String> addcp = ((JavaTask) tfJob.getTask("task2")).getForkEnvironment()
+                .getAdditionalClasspath();
+        Assert.assertEquals(2, addcp.size());
+        Assert.assertEquals("a", addcp.get(0));
+        Assert.assertEquals("b", addcp.get(1));
+        Assert.assertNotNull(((JavaTask) tfJob.getTask("task2")).getForkEnvironment().getEnvScript());
         //Check task 3 properties
         Assert.assertEquals(tfJob.getTask("task3").getName(), "task3");
         //the following commented check fails, it is what we expect, because replacement is done in the internal factory.

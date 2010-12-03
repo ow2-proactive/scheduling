@@ -49,7 +49,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
@@ -694,11 +693,6 @@ public class JobFactory_stax extends JobFactory {
                     toReturn.setMaxNumberOfExecution(toReturn.getMaxNumberOfExecution());
                 }
             }
-            //check if walltime and fork are consistent
-            if ((toReturn instanceof JavaTask) && toReturn.getWallTime() > 0 &&
-                !((JavaTask) toReturn).isFork()) {
-                ((JavaTask) toReturn).setFork(true);
-            }
             return toReturn;
         } catch (JobCreationException jce) {
             jce.setTaskName(taskName);
@@ -1251,8 +1245,6 @@ public class JobFactory_stax extends JobFactory {
                 String attrName = cursorExec.getAttributeLocalName(i);
                 if (XMLAttributes.TASK_CLASSNAME.matches(attrName)) {
                     javaTask.setExecutableClassName(cursorExec.getAttributeValue(i));
-                } else if (XMLAttributes.TASK_FORK.matches(attrName)) {
-                    javaTask.setFork(Boolean.parseBoolean(replace(cursorExec.getAttributeValue(i))));
                 }
             }
             //parsing executable tags
@@ -1308,11 +1300,11 @@ public class JobFactory_stax extends JobFactory {
                 if (XMLAttributes.FORK_JAVAHOME.matches(attrName)) {
                     forkEnv.setJavaHome(replace(cursorExec.getAttributeValue(i)));
                 }
+                if (XMLAttributes.TASK_WORKDING_DIR.matches(attrName)) {
+                    forkEnv.setWorkingDir(replace(cursorExec.getAttributeValue(i)));
+                }
             }
             //parsing executable tags
-            Map<String, String> sysProps = new HashMap<String, String>();
-            List<String> jvmArgs = new ArrayList<String>();
-            List<String> classpath = new ArrayList<String>();
             int eventType;
             while (cursorExec.hasNext()) {
                 eventType = cursorExec.next();
@@ -1320,28 +1312,41 @@ public class JobFactory_stax extends JobFactory {
                     case XMLEvent.START_ELEMENT:
                         current = cursorExec.getLocalName();
                         if (XMLTags.FORK_SYSTEM_PROPERTY.matches(current)) {
-                            sysProps.put(cursorExec.getAttributeValue(0), replace(cursorExec
-                                    .getAttributeValue(1)));
+                            attrCount = cursorExec.getAttributeCount();
+                            boolean append = false;
+                            char ac = 0;
+                            String name = null, value = null;
+                            for (i = 0; i < attrCount; i++) {
+                                String attrName = cursorExec.getAttributeLocalName(i);
+                                if (XMLAttributes.COMMON_NAME.matches(attrName)) {
+                                    name = replace(cursorExec.getAttributeValue(i));
+                                }
+                                if (XMLAttributes.COMMON_VALUE.matches(attrName)) {
+                                    value = replace(cursorExec.getAttributeValue(i));
+                                }
+                                if (XMLAttributes.FORK_APPEND.matches(attrName)) {
+                                    append = "true"
+                                            .equalsIgnoreCase(replace(cursorExec.getAttributeValue(i)));
+                                }
+                                if (XMLAttributes.FORK_APPENDCHAR.matches(attrName)) {
+                                    ac = cursorExec.getAttributeValue(i).charAt(0);
+                                }
+                            }
+                            if (ac != 0) {
+                                forkEnv.addSystemProperty(name, value, ac);
+                            } else {
+                                forkEnv.addSystemProperty(name, value, append);
+                            }
                         } else if (XMLTags.FORK_JVM_ARG.matches(current)) {
-                            jvmArgs.add(replace(cursorExec.getAttributeValue(0)));
+                            forkEnv.addJVMArgument(replace(cursorExec.getAttributeValue(0)));
                         } else if (XMLTags.JOB_PATH_ELEMENT.matches(current)) {
-                            classpath.add(replace(cursorExec.getAttributeValue(0)));
+                            forkEnv.addAdditionalClasspath(replace(cursorExec.getAttributeValue(0)));
                         } else if (XMLTags.SCRIPT_ENV.matches(current)) {
-                            forkEnv.setScript(createScript(cursorExec));
+                            forkEnv.setEnvScript(createScript(cursorExec));
                         }
                         break;
                     case XMLEvent.END_ELEMENT:
                         if (XMLTags.FORK_ENVIRONMENT.matches(cursorExec.getLocalName())) {
-                            if (sysProps.size() > 0) {
-                                forkEnv.setSystemProperties(sysProps);
-                            }
-                            if (jvmArgs.size() > 0) {
-                                forkEnv.setJVMArguments(jvmArgs.toArray(new String[jvmArgs.size()]));
-                            }
-                            if (classpath.size() > 0) {
-                                forkEnv.setAdditionalClasspath(classpath
-                                        .toArray(new String[classpath.size()]));
-                            }
                             return forkEnv;
                         }
                         break;
@@ -1555,7 +1560,7 @@ public class JobFactory_stax extends JobFactory {
                         logger.debug("forkJVM: " + ((JavaTask) t).getForkEnvironment().getJVMArguments());
                         logger.debug("forkCP : " +
                             ((JavaTask) t).getForkEnvironment().getAdditionalClasspath());
-                        logger.debug("forkScr: " + ((JavaTask) t).getForkEnvironment().getScript());
+                        logger.debug("forkScr: " + ((JavaTask) t).getForkEnvironment().getEnvScript());
                     }
                 } else if (t instanceof NativeTask) {
                     logger.debug("cmd   : " + ((NativeTask) t).getCommandLine());

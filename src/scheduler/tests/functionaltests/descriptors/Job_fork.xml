@@ -18,8 +18,13 @@
 			</nativeExecutable>
 		</task>
 		<task name="Task2">
-			<javaExecutable class="org.ow2.proactive.scheduler.examples.MonteCarlo" fork="true">
-			<forkEnvironment jvmParameters="-Dproactive.test=true" />
+			<javaExecutable class="org.ow2.proactive.scheduler.examples.MonteCarlo">
+				<!-- forkEnvironment automatically fork -->
+				<forkEnvironment>
+					<jvmArgs>
+						<jvmArg value="-Dproactive.test=true"/>
+					</jvmArgs>
+				</forkEnvironment>
 				<parameters>
 					<parameter name="steps" value="20"/>
 					<parameter name="iterations" value="10000000"/>
@@ -39,7 +44,11 @@
 		<!-- walltime automatically fork -->
 		<task name="Fork2" walltime="3" >
 			<javaExecutable class="org.ow2.proactive.scheduler.examples.MonteCarlo">
-			<forkEnvironment jvmParameters="-Dproactive.test=true" />
+				<forkEnvironment>
+					<jvmArgs>
+						<jvmArg value="-Dproactive.test=true"/>
+					</jvmArgs>
+				</forkEnvironment>
 				<parameters>
 					<parameter name="steps" value="20"/>
 					<parameter name="iterations" value="100000000"/>

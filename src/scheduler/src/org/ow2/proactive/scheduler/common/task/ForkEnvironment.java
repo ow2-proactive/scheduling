@@ -37,6 +37,9 @@
 package org.ow2.proactive.scheduler.common.task;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.persistence.Column;
@@ -49,6 +52,7 @@ import javax.persistence.Lob;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlTransient;
@@ -60,9 +64,7 @@ import org.hibernate.annotations.CollectionOfElements;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 import org.hibernate.annotations.Proxy;
-import org.hibernate.annotations.Type;
 import org.objectweb.proactive.annotation.PublicAPI;
-import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.SimpleScript;
 
@@ -97,35 +99,71 @@ public class ForkEnvironment implements Serializable {
     private String javaHome = null;
 
     /**
+     * Path to the working directory
+     */
+    @Column(name = "WORKING_DIR", length = Integer.MAX_VALUE)
+    @Lob
+    private String workingDir = null;
+
+    /**
+     * Base environment : used by internal constructor to set up
+     * a base environment on which to apply client env
+     */
+    @Transient
+    private transient Map<String, String> baseSystemProperties = null;
+
+    /**
+     * Arguments passed to Java (not an application) (example: memory settings or properties)
+     */
+    @OneToMany(targetEntity = PropertyModifier.class)
+    @LazyCollection(value = LazyCollectionOption.FALSE)
+    @Cascade(CascadeType.ALL)
+    private List<PropertyModifier> systemProperties = null;
+
+    /**
      * Arguments passed to Java (not an application) (example: memory settings or properties)
      */
     @CollectionOfElements
     @Cascade(CascadeType.ALL)
     @LazyCollection(value = LazyCollectionOption.FALSE)
-    @JoinColumn(name = "SYSTEM_PROPS")
-    private Map<String, String> systemProperties = null;
-
-    /**
-     * Arguments passed to Java (not an application) (example: memory settings or properties)
-     */
-    @Column(name = "JVM_ARGUMENTS", columnDefinition = "BLOB")
-    @Type(type = "org.ow2.proactive.scheduler.core.db.schedulerType.CharacterLargeOBject")
-    private String[] jvmArguments = null;
+    @JoinColumn(name = "JVM_ARGUMENTS")
+    private List<String> jvmArguments = null;
 
     /**
      * Additional classpath when new JVM will be started
      */
-    @Column(name = "CLASSPATH", columnDefinition = "BLOB")
-    @Type(type = "org.ow2.proactive.scheduler.core.db.schedulerType.CharacterLargeOBject")
-    private String[] additionalClasspath = null;
+    @CollectionOfElements
+    @Cascade(CascadeType.ALL)
+    @LazyCollection(value = LazyCollectionOption.FALSE)
+    @JoinColumn(name = "CLASSPATH")
+    private List<String> additionalClasspath = null;
 
     /**
-     * PreScript : can be used to launch script just before the task
-     * execution.
+     * EnvScript : can be used to initialize environment just before JVM fork.
      */
     @Cascade(CascadeType.ALL)
     @OneToOne(fetch = FetchType.EAGER, targetEntity = SimpleScript.class)
-    protected Script<?> script = null;
+    private Script<?> script = null;
+
+    public ForkEnvironment() {
+    }
+
+    /**
+     * This constructor is used for internal stuff only.
+     * It allows an internal subtype to create a ForkEnvironement with a base env.
+     *
+     * @param forkEnv the fork environment that should be decorated with a base env
+     * @param baseEnv the environment on witch to base the user env.
+     */
+    protected ForkEnvironment(ForkEnvironment forkEnv, Map<String, String> baseEnv) {
+        this.javaHome = forkEnv.javaHome;
+        this.workingDir = forkEnv.workingDir;
+        this.baseSystemProperties = baseEnv;
+        this.systemProperties = forkEnv.systemProperties;
+        this.jvmArguments = forkEnv.jvmArguments;
+        this.additionalClasspath = forkEnv.additionalClasspath;
+        this.script = forkEnv.script;
+    }
 
     /**
      * Returns the javaHome.
@@ -146,57 +184,168 @@ public class ForkEnvironment implements Serializable {
     }
 
     /**
-     * Get the systemProperties
+     * Return the working Directory
      *
-     * @return the systemProperties
+     * @return the working Directory
+     */
+    public String getWorkingDir() {
+        return workingDir;
+    }
+
+    /**
+     * Set the working directory value to the given workingDir value
+     *
+     * @param workingDir the working directory to set
+     */
+    public void setWorkingDir(String workingDir) {
+        this.workingDir = workingDir;
+    }
+
+    /**
+     * Return a copy of the system properties, empty map if no properties.
+     *
+     * @return a copy of the system properties, empty map if no properties.
      */
     public Map<String, String> getSystemProperties() {
-        return systemProperties;
+        if (this.systemProperties == null && this.baseSystemProperties == null) {
+            return new HashMap<String, String>(0);
+        }
+        Map<String, String> props;
+        if (baseSystemProperties == null) {
+            props = new HashMap<String, String>();
+        } else {
+            props = new HashMap<String, String>(baseSystemProperties);
+        }
+        for (PropertyModifier pm : systemProperties) {
+            pm.update(props);
+        }
+        return props;
     }
 
     /**
-     * Set the systemProperties value to the given systemProperties value
+     * Add a new systemProperty value from its name and value.
+     * The value can overwrite or be appended to a previous property value with the same name.<br/>
+     * If the append boolean is true, the value will be appended to the old one or to a existing system property.
+     * If not, the value will overwrite the old one.
      *
-     * @param systemProperties the systemProperties to set
+     * @param name the name of the property to add
+     * @param value the the value associated to the given name
+     * @param append true if this value must be appended to a previous one or a system one, false if overwrite.
+     * @throws IllegalArgumentException if name is null
      */
-    public void setSystemProperties(Map<String, String> systemProperties) {
-        this.systemProperties = systemProperties;
+    public void addSystemProperty(String name, String value, boolean append) {
+        if (name == null) {
+            throw new IllegalArgumentException("Name cannot be null");
+        }
+        if (this.systemProperties == null) {
+            this.systemProperties = new ArrayList<PropertyModifier>(5);
+        }
+        this.systemProperties.add(new PropertyModifier(name, value, append));
     }
 
     /**
-     * Returns the jvmArguments.
+     * Add a new systemProperty value from its name and value.
+     * The value will be appended to a previous property value with the same name using the given appendChar.<br/>
+     * If this value is the first, no append character will be inserted.
+     * Each time a new value is inserted, it appends the appendChar and the new value.
      *
-     * @return the jvmArguments.
+     * @param name the name of the property to add
+     * @param value the the value associated to the given name
+     * @param appendChar The character used to append this value with a previous one.
+     * @throws IllegalArgumentException if name is null
      */
-    public String[] getJVMArguments() {
-        return jvmArguments;
+    public void addSystemProperty(String name, String value, char appendChar) {
+        if (name == null) {
+            throw new IllegalArgumentException("Name cannot be null");
+        }
+        if (this.systemProperties == null) {
+            this.systemProperties = new ArrayList<PropertyModifier>(5);
+        }
+        this.systemProperties.add(new PropertyModifier(name, value, appendChar));
     }
 
     /**
-     * Sets the jvmArguments to the given jvmArguments value.
+     * Get the system property value associated with the given name.
      *
-     * @param jvmArguments the jvmArguments to set.
+     * @param name the name of the property value to get
+     * @return the system property value associated with the given name, or null if the property does not exist.
      */
-    public void setJVMArguments(String[] jvmArguments) {
-        this.jvmArguments = jvmArguments;
+    public String getSystemProperty(String name) {
+        if (this.systemProperties == null) {
+            return null;
+        }
+        StringBuilder sb = new StringBuilder();
+        boolean hadValue = false;
+        if (baseSystemProperties != null) {
+            String tmp = baseSystemProperties.get(name);
+            if (tmp != null) {
+                sb.append(tmp);
+                hadValue = true;
+            }
+        }
+        for (PropertyModifier pm : systemProperties) {
+            if (pm.getName().equals(name)) {
+                pm.update(sb);
+                hadValue = true;
+            }
+        }
+        return hadValue ? sb.toString() : null;
     }
 
     /**
-     * Get the additional Classpath
+     * Return a copy of the JVM arguments, empty list if no arguments.
      *
-     * @return the additional Classpath
+     * @return a copy of the JVM arguments, empty list if no arguments.
      */
-    public String[] getAdditionalClasspath() {
-        return additionalClasspath;
+    public List<String> getJVMArguments() {
+        if (this.jvmArguments == null) {
+            return new ArrayList<String>(0);
+        }
+        return new ArrayList<String>(this.jvmArguments);
     }
 
     /**
-     * Set the additional Classpath value to the given additionalClasspath value
+     * Add a new JVM argument value.
      *
-     * @param additionalClasspath the additional Classpath to set
+     * @param value the value of the property to be added
+     * @throws IllegalArgumentException if value is null
      */
-    public void setAdditionalClasspath(String[] additionalClasspath) {
-        this.additionalClasspath = additionalClasspath;
+    public void addJVMArgument(String value) {
+        if (value == null) {
+            throw new IllegalArgumentException("Value cannot be null");
+        }
+        if (this.jvmArguments == null) {
+            this.jvmArguments = new ArrayList<String>(5);
+        }
+        this.jvmArguments.add(value);
+    }
+
+    /**
+     * Return a copy of the additional classpath, empty list if no arguments.
+     *
+     * @return a copy of the additional classpath, empty list if no arguments.
+     */
+    public List<String> getAdditionalClasspath() {
+        if (this.additionalClasspath == null) {
+            return new ArrayList<String>(0);
+        }
+        return new ArrayList<String>(this.additionalClasspath);
+    }
+
+    /**
+     * Add a new additional Classpath value
+     *
+     * @param value the additional Classpath to add
+     * @throws IllegalArgumentException if value is null
+     */
+    public void addAdditionalClasspath(String value) {
+        if (value == null) {
+            throw new IllegalArgumentException("Value cannot be null");
+        }
+        if (this.additionalClasspath == null) {
+            this.additionalClasspath = new ArrayList<String>(5);
+        }
+        this.additionalClasspath.add(value);
     }
 
     /**
@@ -204,18 +353,18 @@ public class ForkEnvironment implements Serializable {
      *
      * @return the environment script
      */
-    public Script<?> getScript() {
+    public Script<?> getEnvScript() {
         return script;
     }
 
     /**
      * Set the environment script value to the given script value.<br/>
-     * This script allows the user to programmatically set systemProperties, JVM arguments, additional classpath
-     * Use TODO(Utils) methods to set each desired element.
+     * This script allows the user to programaticaly set systemProperties, JVM arguments, additional classpath
+     * Use the binding variable name <b>forkEnvironment</b> to fill this object in this given script.
      *
      * @param script the script to set
      */
-    public void setScript(Script<?> script) {
+    public void setEnvScript(Script<?> script) {
         this.script = script;
     }
 

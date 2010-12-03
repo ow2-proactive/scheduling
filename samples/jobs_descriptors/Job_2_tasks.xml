@@ -25,6 +25,26 @@
 			<!-- Task human description -->
 			<description>task WaitAndPrint - will sleep for 20s</description>
 			<javaExecutable class="org.ow2.proactive.scheduler.examples.WaitAndPrint">
+				<forkEnvironment workingDir="sdf" javaHome="qdfdsf">
+					<SystemProperties>
+						<property name="toto" value="ioi"/>
+						<property name="toto" value="oio" append="true"/>
+						<property name="toto" appendChar="#" value="123" />
+					</SystemProperties>
+					<jvmArgs>
+						<jvmArg value="-Dtoto=tata"/>
+					</jvmArgs>
+					<additionalClasspath>
+						<pathElement path="toto.jar"/>
+					</additionalClasspath>
+					<envScript>
+						<script>
+							<code language="javascript">
+								var toto;
+							</code>
+						</script>
+					</envScript>
+				</forkEnvironment>
 				<parameters>
 					<parameter name="sleepTime" value="20"/>
 					<parameter name="number" value="2"/>

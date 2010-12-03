@@ -52,16 +52,16 @@ public enum XMLAttributes {
     JOB_PRIORITY("priority"), JOB_PROJECTNAME("projectName"), JOB_LOGFILE("logFile"),
     //COMMON
     COMMON_CANCELJOBONERROR("cancelJobOnError"), COMMON_RESTARTTASKONERROR("restartTaskOnError"), COMMON_MAXNUMBEROFEXECUTION(
-            "maxNumberOfExecution"), COMMON_NAME("name"),
+            "maxNumberOfExecution"), COMMON_NAME("name"), COMMON_VALUE("value"),
     //TASKS
     TASK_RESULTPREVIEW("resultPreviewClass"), TASK_PRECIOUSRESULT("preciousResult"), TASK_CLASSNAME("class"), TASK_WALLTIME(
-            "walltime"), TASK_FORK("fork"), TASK_RUNASME("runAsMe"),
+            "walltime"), TASK_RUNASME("runAsMe"),
     //NATIVE TASK ATTRIBUTES
     TASK_NB_NODES("numberOfNodes"), TASK_COMMAND_VALUE("value"), TASK_WORKDING_DIR("workingDir"),
     //SCRIPTS
     SCRIPT_URL("url"),
     //FORK ENVIRONMENT
-    FORK_JAVAHOME("javaHome"),
+    FORK_JAVAHOME("javaHome"), FORK_APPENDCHAR("appendChar"), FORK_APPEND("append"),
     // FLOW CONTROL
     FLOW_BLOCK("block"), FLOW_TARGET("target"), FLOW_ELSE("else"), FLOW_CONTINUATION("continuation"),
     //DATASPACES

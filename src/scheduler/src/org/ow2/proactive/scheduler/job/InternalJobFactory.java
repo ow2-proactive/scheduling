@@ -278,7 +278,7 @@ public class InternalJobFactory {
                 throw new Error("Internal error : implementation must be revised.", e);
             }
 
-            if (task.isWallTimeSet() || task.isFork() || task.isRunAsMe()) {
+            if (task.isFork()) {
                 ForkedJavaExecutableContainer fjec = new ForkedJavaExecutableContainer(task
                         .getExecutableClassName(), args);
                 fjec.setForkEnvironment(task.getForkEnvironment());

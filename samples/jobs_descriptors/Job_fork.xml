@@ -10,8 +10,12 @@
 	<taskFlow>
 		<task name="Computation" walltime="30" maxNumberOfExecution="2">
 			<description>Compute Pi and return it</description>
-			<javaExecutable fork="true" class="org.ow2.proactive.scheduler.examples.MonteCarlo" >
-			    <forkEnvironment jvmParameters="-D32" />
+			<javaExecutable class="org.ow2.proactive.scheduler.examples.MonteCarlo" >
+			    <forkEnvironment>
+				<jvmArgs>
+						<jvmArg value="-D32"/>
+					</jvmArgs>
+				</forkEnvironment>
 				<parameters>
 					<parameter name="steps" value="20"/>
 					<parameter name="iterations" value="100000000"/>

@@ -105,6 +105,9 @@ public class ForkedJavaExecutable extends JavaExecutable {
     /** When creating a ProActive node on a dedicated JVM, assign a default name of VN */
     public static final String DEFAULT_VN_NAME = "ForkedTasksVN";
 
+    /** Fork environment script binding name */
+    public static final String FORKENV_BINDING_NAME = "forkEnvironment";
+
     /** Forked execution time out checking interval */
     private static final int TIMEOUT = 1000;
 
@@ -231,10 +234,11 @@ public class ForkedJavaExecutable extends JavaExecutable {
     @SuppressWarnings("unchecked")
     private void executeEnvScript() throws ActiveObjectCreationException, NodeException, UserException {
         ForkEnvironment fe = this.execInitializer.getForkEnvironment();
-        if (fe != null && fe.getScript() != null) {
+        if (fe != null && fe.getEnvScript() != null) {
             logger_dev.info("Executing env-script");
             ScriptHandler handler = ScriptLoader.createLocalHandler();
-            ScriptResult<String> res = handler.handle(fe.getScript());
+            handler.addBinding(FORKENV_BINDING_NAME, fe);
+            ScriptResult<String> res = handler.handle(fe.getEnvScript());
 
             if (res.errorOccured()) {
                 res.getException().printStackTrace();
@@ -318,8 +322,7 @@ public class ForkedJavaExecutable extends JavaExecutable {
                 logger_dev.debug("", e);
             }
         }
-        if (forkEnvironment != null && forkEnvironment.getJVMArguments() != null &&
-            forkEnvironment.getJVMArguments().length > 0) {
+        if (forkEnvironment != null && forkEnvironment.getJVMArguments().size() > 0) {
             for (String s : forkEnvironment.getJVMArguments()) {
                 command.add(s);
             }
@@ -334,7 +337,7 @@ public class ForkedJavaExecutable extends JavaExecutable {
      * @throws IllegalArgumentException if pattern is null
      * @return true if the given array contains the given string, false otherwise.
      */
-    private boolean contains(String pattern, String[] array) {
+    private boolean contains(String pattern, List<String> array) {
         if (pattern == null) {
             throw new IllegalArgumentException("Null pattern is not allowed");
         }

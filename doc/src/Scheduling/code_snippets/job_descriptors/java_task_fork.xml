@@ -2,8 +2,12 @@
 	<genericInformation>
 		<info name="name1" value="val1"/>
 	</genericInformation>
-	<javaExecutable fork="true" class="org.ow2.proactive.scheduler.examples.MonteCarlo" >
-	    <forkEnvironment javaHome="" jvmParameters="-d32" />
+	<javaExecutable class="org.ow2.proactive.scheduler.examples.MonteCarlo" >
+	    <forkEnvironment javaHome="">
+		<jvmArgs>
+				<jvmArg value="-d12"/>
+			</jvmArgs>
+	    </forkEnvironment>
 		<parameters>
 			<parameter name="steps" value="20"/>
 			<parameter name="iterations" value="100000000"/>

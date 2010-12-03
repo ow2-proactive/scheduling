@@ -697,14 +697,6 @@
         <xs:element minOccurs="0" ref="jd:parameters"/>
       </xs:sequence>
       <xs:attributeGroup ref="jd:class"/>
-      <xs:attribute name="fork">
-        <xs:annotation>
-          <xs:documentation>Do we have to fork this task or not</xs:documentation>
-        </xs:annotation>
-        <xs:simpleType>
-          <xs:union memberTypes="xs:boolean jd:variableRefType"/>
-        </xs:simpleType>
-      </xs:attribute>
     </xs:complexType>
   </xs:element>
   <xs:attributeGroup name="class">
@@ -714,16 +706,6 @@
       </xs:annotation>
       <xs:simpleType>
         <xs:union memberTypes="jd:classPattern jd:variableRefType"/>
-      </xs:simpleType>
-    </xs:attribute>
-  </xs:attributeGroup>
-  <xs:attributeGroup name="fork">
-    <xs:attribute name="fork" use="required">
-      <xs:annotation>
-        <xs:documentation>Do we have to fork this task or not</xs:documentation>
-      </xs:annotation>
-      <xs:simpleType>
-        <xs:union memberTypes="xs:boolean jd:variableRefType"/>
       </xs:simpleType>
     </xs:attribute>
   </xs:attributeGroup>
@@ -738,6 +720,11 @@
         <xs:element minOccurs="0" ref="jd:additionalClasspath"/>
         <xs:element minOccurs="0" ref="jd:envScript"/>
       </xs:sequence>
+      <xs:attribute name="workingDir" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>working dir for native command to execute (ie launching dir, pwd...)</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
       <xs:attribute name="javaHome">
         <xs:annotation>
           <xs:documentation>Path to installed java directory, to this path '/bin/java' will be added, if attribute does not exist only 'java' command will be called</xs:documentation>
@@ -770,13 +757,43 @@
   </xs:element>
   <xs:element name="property">
     <xs:annotation>
-      <xs:documentation>A parameter in the form of key/value pair </xs:documentation>
+      <xs:documentation>A parameter in the form of key/value pair</xs:documentation>
     </xs:annotation>
     <xs:complexType>
       <xs:attribute name="name" use="required" type="xs:string"/>
       <xs:attribute name="value" use="required" type="xs:string"/>
+      <xs:attribute name="append">
+        <xs:annotation>
+          <xs:documentation>append or not this property to a previous declared or to the system one</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:union memberTypes="xs:boolean jd:variableRefType"/>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="appendChar" type="jd:propertyAppendChar">
+        <xs:annotation>
+          <xs:documentation>append character, if set, append mode is ON</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
     </xs:complexType>
   </xs:element>
+  <xs:attributeGroup name="sysPropAppend">
+    <xs:attribute name="append" use="required">
+      <xs:annotation>
+        <xs:documentation>append or not this property to a previous declared or to the system one</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:union memberTypes="xs:boolean jd:variableRefType"/>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="sysPropAppendChar">
+    <xs:attribute name="appendChar" use="required" type="jd:propertyAppendChar">
+      <xs:annotation>
+        <xs:documentation>append character, if set, append mode is ON</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
   <xs:element name="jvmArgs">
     <xs:annotation>
       <xs:documentation>A list of java properties or options</xs:documentation>
@@ -1102,6 +1119,11 @@
       <xs:enumeration value="start"/>
       <xs:enumeration value="end"/>
       <xs:enumeration value="none"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="propertyAppendChar">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="."/>
     </xs:restriction>
   </xs:simpleType>
 </xs:schema>
