@@ -229,7 +229,9 @@ public class TestDatabaseCRUD {
                 Assert.assertEquals(((ForkedJavaExecutableContainer) it.getExecutableContainer())
                         .getForkEnvironment().getJavaHome(), "/bin/java/jdk1.5");
                 Assert.assertEquals(((ForkedJavaExecutableContainer) it.getExecutableContainer())
-                        .getForkEnvironment().getJVMParameters(), "-dparam=12 -djhome=/bin/java/jdk1.5");
+                        .getForkEnvironment().getJVMArguments()[0], "-dparam=12");
+                Assert.assertEquals(((ForkedJavaExecutableContainer) it.getExecutableContainer())
+                        .getForkEnvironment().getJVMArguments()[1], "-djhome=/bin/java/jdk1.5");
             } else if (it.getName().equals("task3")) {
                 //Check task 3 properties
                 Assert.assertEquals(it.getName(), "task3");

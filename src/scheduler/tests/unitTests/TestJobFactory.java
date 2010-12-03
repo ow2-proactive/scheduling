@@ -184,8 +184,10 @@ public class TestJobFactory {
         Assert.assertEquals(((JavaTask) tfJob.getTask("task2")).isWallTimeSet(), false);
         Assert.assertEquals(((JavaTask) tfJob.getTask("task2")).getForkEnvironment().getJavaHome(),
                 "/bin/java/jdk1.5");
-        Assert.assertEquals(((JavaTask) tfJob.getTask("task2")).getForkEnvironment().getJVMParameters(),
-                "-dparam=12 -djhome=/bin/java/jdk1.5");
+        Assert.assertEquals(((JavaTask) tfJob.getTask("task2")).getForkEnvironment().getJVMArguments()[0],
+                "-dparam=12");
+        Assert.assertEquals(((JavaTask) tfJob.getTask("task2")).getForkEnvironment().getJVMArguments()[1],
+                "-djhome=/bin/java/jdk1.5");
         //Check task 3 properties
         Assert.assertEquals(tfJob.getTask("task3").getName(), "task3");
         //the following commented check fails, it is what we expect, because replacement is done in the internal factory.

@@ -168,16 +168,9 @@
       <xs:documentation>Path element (one pathElement for each classpath entry)</xs:documentation>
     </xs:annotation>
     <xs:complexType>
-      <xs:attributeGroup ref="jd:pathElem"/>
+      <xs:attribute name="path" use="required" type="xs:string"/>
     </xs:complexType>
   </xs:element>
-  <xs:attributeGroup name="pathElem">
-    <xs:attribute name="path" use="required" type="xs:string">
-      <xs:annotation>
-        <xs:documentation>The classpath content</xs:documentation>
-      </xs:annotation>
-    </xs:attribute>
-  </xs:attributeGroup>
   <xs:element name="genericInformation">
     <xs:annotation>
       <xs:documentation>Definition of any information you would like to get in the policy</xs:documentation>
@@ -739,6 +732,12 @@
       <xs:documentation>Fork environment if needed</xs:documentation>
     </xs:annotation>
     <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" ref="jd:SystemProperties"/>
+        <xs:element minOccurs="0" ref="jd:jvmArgs"/>
+        <xs:element minOccurs="0" ref="jd:additionalClasspath"/>
+        <xs:element minOccurs="0" ref="jd:envScript"/>
+      </xs:sequence>
       <xs:attribute name="javaHome">
         <xs:annotation>
           <xs:documentation>Path to installed java directory, to this path '/bin/java' will be added, if attribute does not exist only 'java' command will be called</xs:documentation>
@@ -747,7 +746,6 @@
           <xs:union memberTypes="xs:anyURI jd:variableRefType"/>
         </xs:simpleType>
       </xs:attribute>
-      <xs:attributeGroup ref="jd:jvmParameters"/>
     </xs:complexType>
   </xs:element>
   <xs:attributeGroup name="javaHome">
@@ -760,13 +758,58 @@
       </xs:simpleType>
     </xs:attribute>
   </xs:attributeGroup>
-  <xs:attributeGroup name="jvmParameters">
-    <xs:attribute name="jvmParameters" use="required" type="xs:string">
-      <xs:annotation>
-        <xs:documentation>Options passed to Java (not an application) (example: memory settings or properties) </xs:documentation>
-      </xs:annotation>
-    </xs:attribute>
-  </xs:attributeGroup>
+  <xs:element name="SystemProperties">
+    <xs:annotation>
+      <xs:documentation>a list of sysProp</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="jd:property"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="property">
+    <xs:annotation>
+      <xs:documentation>A parameter in the form of key/value pair </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:attribute name="name" use="required" type="xs:string"/>
+      <xs:attribute name="value" use="required" type="xs:string"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="jvmArgs">
+    <xs:annotation>
+      <xs:documentation>A list of java properties or options</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="jd:jvmArg"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="jvmArg">
+    <xs:annotation>
+      <xs:documentation>A list of java properties or options</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:attribute name="value" use="required" type="xs:string"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="additionalClasspath">
+    <xs:annotation>
+      <xs:documentation>classpath entries to add to the new java process</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="jd:pathElement"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="envScript" type="jd:script">
+    <xs:annotation>
+      <xs:documentation>environment script to execute for setting forked process environment</xs:documentation>
+    </xs:annotation>
+  </xs:element>
   <xs:element name="parameters">
     <xs:annotation>
       <xs:documentation>A list of parameters that will be given to the Java task through the init method </xs:documentation>

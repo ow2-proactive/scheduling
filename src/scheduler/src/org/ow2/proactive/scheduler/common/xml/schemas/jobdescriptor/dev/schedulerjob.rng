@@ -140,14 +140,10 @@
   <define name="pathElement">
     <element name="pathElement">
       <doc:documentation>Path element (one pathElement for each classpath entry)</doc:documentation>
-      <ref name="pathElem"/>
+      <attribute name="path">
+        <data type="string"/>
+      </attribute>
     </element>
-  </define>
-  <define name="pathElem">
-    <attribute name="path">
-      <doc:documentation>The classpath content</doc:documentation>
-      <data type="string"/>
-    </attribute>
   </define>
   <define name="genericInformation">
     <element name="genericInformation">
@@ -594,7 +590,18 @@
       <optional>
         <ref name="javaHome"/>
       </optional>
-      <ref name="jvmParameters"/>
+      <optional>
+        <ref name="sysProps"/>
+      </optional>
+      <optional>
+        <ref name="jvmArgs"/>
+      </optional>
+      <optional>
+        <ref name="additionalClasspath"/>
+      </optional>
+      <optional>
+        <ref name="envScript"/>
+      </optional>
     </element>
   </define>
   <define name="javaHome">
@@ -606,11 +613,54 @@
       </choice>
     </attribute>
   </define>
-  <define name="jvmParameters">
-    <attribute name="jvmParameters">
-      <doc:documentation>Options passed to Java (not an application) (example: memory settings or properties) </doc:documentation>
-      <data type="string"/>
-    </attribute>
+  <define name="sysProps">
+    <element name="SystemProperties">
+      <doc:documentation>a list of sysProp</doc:documentation>
+      <oneOrMore>
+        <ref name="sysProp"/>
+      </oneOrMore>
+    </element>
+  </define>
+  <define name="sysProp">
+    <element name="property">
+      <doc:documentation>A parameter in the form of key/value pair </doc:documentation>
+      <attribute name="name">
+        <data type="string"/>
+      </attribute>
+      <attribute name="value">
+        <data type="string"/>
+      </attribute>
+    </element>
+  </define>
+  <define name="jvmArgs">
+    <element name="jvmArgs">
+      <doc:documentation>A list of java properties or options</doc:documentation>
+      <oneOrMore>
+        <ref name="jvmArg"/>
+      </oneOrMore>
+    </element>
+  </define>
+  <define name="jvmArg">
+    <element name="jvmArg">
+      <doc:documentation>A list of java properties or options</doc:documentation>
+      <attribute name="value">
+        <data type="string"/>
+      </attribute>
+    </element>
+  </define>
+  <define name="additionalClasspath">
+    <element name="additionalClasspath">
+      <doc:documentation>classpath entries to add to the new java process</doc:documentation>
+      <oneOrMore>
+        <ref name="pathElement"/>
+      </oneOrMore>
+    </element>
+  </define>
+  <define name="envScript">
+    <element name="envScript">
+      <doc:documentation>environment script to execute for setting forked process environment</doc:documentation>
+      <ref name="script"/>
+    </element>
   </define>
   <define name="javaParameters">
     <element name="parameters">

@@ -146,7 +146,7 @@ public class ForkedJavaExecutable extends JavaExecutable {
         /* building command for executing java */
         logger_dev.info("Preparing new java command");
         createJavaCommand();
-        addJVMParameters();
+        addJVMArguments();
         addClasspath();
         addRuntime();
     }
@@ -272,10 +272,9 @@ public class ForkedJavaExecutable extends JavaExecutable {
     /**
      * Add jvm parameters
      */
-    private void addJVMParameters() {
+    private void addJVMArguments() {
         ForkEnvironment forkEnvironment = execInitializer.getForkEnvironment();
-        if (forkEnvironment == null || forkEnvironment.getJVMParameters() == null ||
-            !forkEnvironment.getJVMParameters().matches(".*java.security.policy=.*")) {
+        if (forkEnvironment == null || !contains("java.security.policy", forkEnvironment.getJVMArguments())) {
             try {
                 fpolicy = File.createTempFile("forked_jt", null);
                 PrintStream out = new PrintStream(fpolicy);
@@ -287,10 +286,35 @@ public class ForkedJavaExecutable extends JavaExecutable {
                 logger_dev.debug("", e);
             }
         }
-        if (forkEnvironment != null && forkEnvironment.getJVMParameters() != null &&
-            !"".equals(forkEnvironment.getJVMParameters())) {
-            command.add(forkEnvironment.getJVMParameters());
+        if (forkEnvironment != null && forkEnvironment.getJVMArguments() != null &&
+            forkEnvironment.getJVMArguments().length > 0) {
+            for (String s : forkEnvironment.getJVMArguments()) {
+                command.add(s);
+            }
         }
+    }
+
+    /**
+     * Return true if the given array is null or contains the given string, false otherwise.
+     *
+     * @param pattern the string to search
+     * @param array the String array in which to search. If this argument is null, it returns false;
+     * @throws IllegalArgumentException if pattern is null
+     * @return true if the given array contains the given string, false otherwise.
+     */
+    private boolean contains(String pattern, String[] array) {
+        if (pattern == null) {
+            throw new IllegalArgumentException("Null pattern is not allowed");
+        }
+        if (array == null) {
+            return false;
+        }
+        for (String s : array) {
+            if (s != null && s.contains(pattern)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
