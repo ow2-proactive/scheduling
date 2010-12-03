@@ -60,11 +60,11 @@ import javax.xml.bind.annotation.XmlTransient;
 import org.hibernate.annotations.AccessType;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
-import org.hibernate.annotations.CollectionOfElements;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 import org.hibernate.annotations.Proxy;
 import org.objectweb.proactive.annotation.PublicAPI;
+import org.ow2.proactive.db.types.BigString;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.SimpleScript;
 
@@ -123,20 +123,20 @@ public class ForkEnvironment implements Serializable {
     /**
      * Arguments passed to Java (not an application) (example: memory settings or properties)
      */
-    @CollectionOfElements
+    @OneToMany(targetEntity = BigString.class)
     @Cascade(CascadeType.ALL)
     @LazyCollection(value = LazyCollectionOption.FALSE)
     @JoinColumn(name = "JVM_ARGUMENTS")
-    private List<String> jvmArguments = null;
+    private List<BigString> jvmArguments = null;
 
     /**
      * Additional classpath when new JVM will be started
      */
-    @CollectionOfElements
+    @OneToMany(targetEntity = BigString.class)
     @Cascade(CascadeType.ALL)
     @LazyCollection(value = LazyCollectionOption.FALSE)
     @JoinColumn(name = "CLASSPATH")
-    private List<String> additionalClasspath = null;
+    private List<BigString> additionalClasspath = null;
 
     /**
      * EnvScript : can be used to initialize environment just before JVM fork.
@@ -218,8 +218,10 @@ public class ForkEnvironment implements Serializable {
         } else {
             props = new HashMap<String, String>(baseSystemProperties);
         }
-        for (PropertyModifier pm : systemProperties) {
-            pm.update(props);
+        if (systemProperties != null) {
+            for (PropertyModifier pm : systemProperties) {
+                pm.update(props);
+            }
         }
         return props;
     }
@@ -303,11 +305,15 @@ public class ForkEnvironment implements Serializable {
         if (this.jvmArguments == null) {
             return new ArrayList<String>(0);
         }
-        return new ArrayList<String>(this.jvmArguments);
+        List<String> l = new ArrayList<String>();
+        for (BigString bs : this.jvmArguments) {
+            l.add(bs.getValue());
+        }
+        return l;
     }
 
     /**
-     * Add a new JVM argument value.
+     * Add a new JVM argument value. (-Dname=value, -Xmx=.., -server)
      *
      * @param value the value of the property to be added
      * @throws IllegalArgumentException if value is null
@@ -317,9 +323,9 @@ public class ForkEnvironment implements Serializable {
             throw new IllegalArgumentException("Value cannot be null");
         }
         if (this.jvmArguments == null) {
-            this.jvmArguments = new ArrayList<String>(5);
+            this.jvmArguments = new ArrayList<BigString>(5);
         }
-        this.jvmArguments.add(value);
+        this.jvmArguments.add(new BigString(value));
     }
 
     /**
@@ -331,7 +337,11 @@ public class ForkEnvironment implements Serializable {
         if (this.additionalClasspath == null) {
             return new ArrayList<String>(0);
         }
-        return new ArrayList<String>(this.additionalClasspath);
+        List<String> l = new ArrayList<String>();
+        for (BigString bs : this.additionalClasspath) {
+            l.add(bs.getValue());
+        }
+        return l;
     }
 
     /**
@@ -345,9 +355,9 @@ public class ForkEnvironment implements Serializable {
             throw new IllegalArgumentException("Value cannot be null");
         }
         if (this.additionalClasspath == null) {
-            this.additionalClasspath = new ArrayList<String>(5);
+            this.additionalClasspath = new ArrayList<BigString>(5);
         }
-        this.additionalClasspath.add(value);
+        this.additionalClasspath.add(new BigString(value));
     }
 
     /**

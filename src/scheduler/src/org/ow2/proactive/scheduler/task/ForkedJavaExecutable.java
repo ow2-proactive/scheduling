@@ -400,7 +400,7 @@ public class ForkedJavaExecutable extends JavaExecutable {
                 PrintStream out = new PrintStream(flog4j);
                 out.print(execInitializer.getJavaTaskLauncherInitializer().getLog4JContent());
                 out.close();
-                command.add("-Dlog4j.configuration=" + flog4j.getAbsolutePath());
+                command.add("-Dlog4j.configuration=file:" + flog4j.getAbsolutePath());
             } catch (Exception e) {
                 //log4j not set
                 logger_dev.debug("", e);

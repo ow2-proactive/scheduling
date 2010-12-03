@@ -51,6 +51,7 @@
         <mapping class="org.ow2.proactive.scheduler.common.task.RestartMode"/>
         <mapping class="org.ow2.proactive.scheduler.common.task.Task"/>
         <mapping class="org.ow2.proactive.scheduler.common.task.ForkEnvironment"/>
+        <mapping class="org.ow2.proactive.scheduler.common.task.PropertyModifier"/>
         <mapping class="org.ow2.proactive.scheduler.common.task.Log4JTaskLogs"/>
         <mapping class="org.ow2.proactive.scheduler.common.task.SimpleTaskLogs"/>
         <mapping class="org.ow2.proactive.scheduler.common.task.dataspaces.FileSelector"/>
