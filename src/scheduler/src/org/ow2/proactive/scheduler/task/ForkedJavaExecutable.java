@@ -43,7 +43,9 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
+import java.util.Map.Entry;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
@@ -51,7 +53,6 @@ import javax.management.Notification;
 import javax.management.NotificationListener;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.ProActiveException;
@@ -63,13 +64,13 @@ import org.objectweb.proactive.core.jmx.notification.NotificationType;
 import org.objectweb.proactive.core.jmx.util.JMXNotificationManager;
 import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.core.runtime.StartPARuntime;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.processbuilder.OSProcessBuilder;
+import org.objectweb.proactive.extensions.processbuilder.exception.NotImplementedException;
 import org.ow2.proactive.scheduler.common.exception.InternalSchedulerException;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.exception.UserException;
@@ -78,6 +79,7 @@ import org.ow2.proactive.scheduler.common.task.TaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
+import org.ow2.proactive.scheduler.task.launcher.InternalForkEnvironment;
 import org.ow2.proactive.scheduler.task.launcher.JavaTaskLauncher;
 import org.ow2.proactive.scheduler.task.launcher.TaskLauncherInitializer;
 import org.ow2.proactive.scheduler.task.launcher.utils.ForkerUtils;
@@ -128,7 +130,6 @@ public class ForkedJavaExecutable extends JavaExecutable {
 
     private String forkedNodeName;
     private long deploymentID;
-    private List<String> command;
     private ForkedJavaExecutableInitializer execInitializer;
     private File fpolicy = null;
     private File flog4j = null;
@@ -153,12 +154,6 @@ public class ForkedJavaExecutable extends JavaExecutable {
         execState = ExecutableState.INITIALIZING;
         this.execInitializer = execInitializer;
         init();
-        /* building command for executing java */
-        logger_dev.info("Preparing new java command");
-        createJavaCommand();
-        addJVMArguments();
-        addClasspath();
-        addRuntime();
     }
 
     /**
@@ -168,16 +163,13 @@ public class ForkedJavaExecutable extends JavaExecutable {
     @Override
     public Serializable execute(TaskResult... results) throws Throwable {
         try {
-            //execute environment script
-            executeEnvScript();
-
+            // building command for executing java and start process
+            OSProcessBuilder ospb = createProcessAndPrepareCommand();
             createRegistrationListener();
-
-            logger_dev.debug("Create JVM process with command : " + command);
-            process = createJVMProcess();
-
+            process = startProcess(ospb);
             waitForRegistration();
 
+            //create task launcher on new JVM node
             logger_dev.debug("Create remote task launcher");
             newJavaTaskLauncher = createForkedTaskLauncher();
 
@@ -226,21 +218,93 @@ public class ForkedJavaExecutable extends JavaExecutable {
     }
 
     /**
-     * Execute the envScript on the node n, or on the default node if n is null.
+     * <ul>
+     * <li>Create new process builder</li>
+     * <li>Update fork env with system env</li>
+     * <li>Execute environment script if needed</li>
+     * <li>Create command and add it to process builder</li>
+     * <li>Set working dir</li>
+     * <li>Set system environment</li>
+     * <li>And return the created OS process builder</li>
+     * </ul>
      *
-     * @throws ActiveObjectCreationException if the script handler cannot be created
-     * @throws NodeException if the script handler cannot be created
-     * @throws UserException if an error occurred during the execution of the script
+     * @return the created OS process builder
+     * @throws Exception if a problem occurs while creating the process
+     */
+    private OSProcessBuilder createProcessAndPrepareCommand() throws Exception {
+        //TODO pass to debug
+        logger_dev.info("Preparing new java process");
+        //create process builder
+        OSProcessBuilder ospb = createProcess();
+        //update fork env with forked system env
+        createInternalForkEnvironment(ospb);
+        //execute environment script
+        executeEnvScript(ospb);
+        //create command and set it to process builder
+        List<String> command = createJavaCommand();
+        addJVMArguments(command);
+        addClasspath(command);
+        addRuntime(command);
+        //set command
+        setCommand(ospb, command);
+        //set working dir
+        setWorkingDir(ospb);
+        //set system environment
+        setSystemEnvironment(ospb);
+        if (logger_dev.isInfoEnabled()) {
+            logger_dev.info("JVM process and command created with command : " + command);
+        }
+        return ospb;
+    }
+
+    /**
+     * This method takes the system environment from the given OS Process Builder
+     * and update the user fork environment.<br/>
+     * When this method returns, the fork environment is updated with the forked system environment
+     *
+     * @param ospb the process builder on which to get the system environment
+     */
+    private void createInternalForkEnvironment(OSProcessBuilder ospb) {
+        ForkEnvironment fe = this.execInitializer.getForkEnvironment();
+        InternalForkEnvironment ife;
+        try {
+            //ospb.environment() can throw an exception if env cannot be created :
+            //will be reported to user via exception in user task
+            Map<String, String> env = ospb.environment();
+            ife = new InternalForkEnvironment(fe, env);
+        } catch (NotImplementedException e) {
+            //if user has not set any system properties, create the internal fork environment
+            //without any sys env and in read only mode on system env
+            //else, the state is not consistent -> throw an exception
+            if (fe == null || fe.getSystemProperties().size() == 0) {
+                ife = new InternalForkEnvironment(fe, null, true);
+            } else {
+                throw new IllegalStateException(
+                    "System property was set and fork process environment could not be obtained", e);
+            }
+        }
+        //change reference of forkEnv to the internal one
+        this.execInitializer.setForkEnvironment(ife);
+    }
+
+    /**
+     * Execute the envScript on the node n, or on the default node if n is null.<br/>
+     * The script will be executed only if fork environment has been set and a script is set.<br/>
+     * When this method returns, the fork environment is updated with new value set in the script
+     *
+     * @param ospb the process builder on which to get the system environment
+     * @throws Exception if the script handler cannot be created of
+     * 			if an error occurred during the execution of the script
      */
     @SuppressWarnings("unchecked")
-    private void executeEnvScript() throws ActiveObjectCreationException, NodeException, UserException {
+    private void executeEnvScript(OSProcessBuilder ospb) throws Exception {
         ForkEnvironment fe = this.execInitializer.getForkEnvironment();
         if (fe != null && fe.getEnvScript() != null) {
             logger_dev.info("Executing env-script");
             ScriptHandler handler = ScriptLoader.createLocalHandler();
             handler.addBinding(FORKENV_BINDING_NAME, fe);
             ScriptResult<String> res = handler.handle(fe.getEnvScript());
-
+            //result
             if (res.errorOccured()) {
                 res.getException().printStackTrace();
                 logger_dev.error("Error on env-script occured : ", res.getException());
@@ -292,8 +356,10 @@ public class ForkedJavaExecutable extends JavaExecutable {
 
     /**
      * Prepare java command
+     *
+     * @return a new command as a list of string that can be completed
      */
-    private void createJavaCommand() {
+    private List<String> createJavaCommand() {
         ForkEnvironment forkEnvironment = this.execInitializer.getForkEnvironment();
         String java_home;
         if (forkEnvironment != null && forkEnvironment.getJavaHome() != null &&
@@ -302,14 +368,17 @@ public class ForkedJavaExecutable extends JavaExecutable {
         } else {
             java_home = System.getProperty("java.home");
         }
-        command = new ArrayList<String>();
+        List<String> command = new ArrayList<String>();
         command.add(java_home + File.separatorChar + "bin" + File.separatorChar + "java");
+        return command;
     }
 
     /**
-     * Add JVM arguments
+     * Add JVM arguments to the given command
+     *
+     * @param command the command to be completed
      */
-    private void addJVMArguments() {
+    private void addJVMArguments(List<String> command) {
         ForkEnvironment forkEnvironment = execInitializer.getForkEnvironment();
         //set mandatory security policy
         if (forkEnvironment == null || !contains("java.security.policy", forkEnvironment.getJVMArguments())) {
@@ -368,20 +437,29 @@ public class ForkedJavaExecutable extends JavaExecutable {
     }
 
     /**
-     * Add classpath
+     * Add classpath to the given command
+     *
+     * @param command the command to be completed
      */
-    private void addClasspath() {
-        String classPath = System.getProperty("java.class.path", ".");
+    private void addClasspath(List<String> command) {
+        StringBuilder classPath = new StringBuilder("." + File.pathSeparatorChar);
+        classPath.append(System.getProperty("java.class.path", ""));
+        ForkEnvironment forkEnvironment = execInitializer.getForkEnvironment();
+        if (forkEnvironment != null) {
+            for (String s : forkEnvironment.getAdditionalClasspath()) {
+                classPath.append(File.pathSeparatorChar + s);
+            }
+        }
         command.add("-cp");
-        command.add(classPath);
+        command.add(classPath.toString());
     }
 
     /**
-     * Add runtime class name to be launched
+     * Add runtime class name to be launched to the given command
      *
-     * @param nodeURL URL of the node on which to deploy
+     * @param command the command to be completed
      */
-    private void addRuntime() throws ProActiveException {
+    private void addRuntime(List<String> command) throws ProActiveException {
         command.add(StartPARuntime.class.getName());
         command.add("-p");
         command.add(RuntimeFactory.getDefaultRuntime().getURL());
@@ -430,12 +508,13 @@ public class ForkedJavaExecutable extends JavaExecutable {
     }
 
     /**
-     * creating a child JVM, intercepting stdout and stderr
-     * Also ask for credentials with new generated keypair
+     * Create a new process builder with user credentials if needed
+     *
+     * @returns an OS Process Builder
      * @throws IOException
      */
-    private Process createJVMProcess() throws Exception {
-        //build process
+    private OSProcessBuilder createProcess() throws Exception {
+        //check if it must be run under user and if so, apply the proper method
         OSProcessBuilder ospb = null;
         if (isRunAsUser()) {
             ospb = ForkerUtils.getOSProcessBuilderFactory().getBuilder(
@@ -443,9 +522,63 @@ public class ForkedJavaExecutable extends JavaExecutable {
         } else {
             ospb = ForkerUtils.getOSProcessBuilderFactory().getBuilder();
         }
+        return ospb;
+    }
+
+    /**
+     * Set the given command to the given OS Process Builder
+     *
+     * @param ospb the process builder on which to set the command
+     * @param command the command to be set
+     */
+    private void setCommand(OSProcessBuilder ospb, List<String> command) {
         ospb.command(command.toArray(new String[command.size()]));
-        //check if it must be run under user and if so, apply the proper method
-        //and start process
+    }
+
+    /**
+     * Set the working directory of the given OS process builder
+     *
+     * @param ospb the process builder on which to set the working directory
+     */
+    private void setWorkingDir(OSProcessBuilder ospb) {
+        ForkEnvironment forkEnvironment = execInitializer.getForkEnvironment();
+        if (forkEnvironment != null && forkEnvironment.getWorkingDir() != null) {
+            ospb.directory(new File(forkEnvironment.getWorkingDir()));
+        }
+    }
+
+    /**
+     * Set the system environment of the given OS process builder
+     *
+     * @param ospb the process builder on which to set the system environment
+     */
+    private void setSystemEnvironment(OSProcessBuilder ospb) {
+        try {
+            Map<String, String> env = ospb.environment();
+            ForkEnvironment forkEnvironment = execInitializer.getForkEnvironment();
+            if (forkEnvironment != null) {
+                Map<String, String> fenv = forkEnvironment.getSystemProperties();
+                if (fenv != null) {
+                    for (Entry<String, String> e : fenv.entrySet()) {
+                        env.put(e.getKey(), e.getValue());
+                    }
+                }
+            }
+        } catch (NotImplementedException e) {
+            //normal behavior if user has not set any sys property in fork env
+            logger_dev.info("OS ProcessBuilder environment could not be retreived : " + e.getMessage());
+        }
+    }
+
+    /**
+     * Start the process built on the given OS Process Builder.<br/>
+     * Also creating a child JVM, intercepting stdout and stderr
+     *
+     * @param ospb the process builder on which to start a process
+     * @return the started process
+     * @throws Exception if a problem occurs when starting the process
+     */
+    private Process startProcess(OSProcessBuilder ospb) throws Exception {
         return ospb.start();
     }
 
@@ -501,9 +634,12 @@ public class ForkedJavaExecutable extends JavaExecutable {
     private void clean() {
         try {
             logger_dev.info("Cleaning forked java executable");
-            //if tmp file has been set, destroy it.
+            //if tmp file have been set, destroy it.
             if (fpolicy != null) {
                 fpolicy.delete();
+            }
+            if (flog4j != null) {
+                flog4j.delete();
             }
             // if the process did not register then childRuntime will be null and/or process will be null
             if (childRuntime != null) {

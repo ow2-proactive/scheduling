@@ -152,17 +152,19 @@ public class ForkEnvironment implements Serializable {
      * This constructor is used for internal stuff only.
      * It allows an internal subtype to create a ForkEnvironement with a base env.
      *
-     * @param forkEnv the fork environment that should be decorated with a base env
+     * @param forkEnv the fork environment that should be decorated with a base env, if null, empty fork env will be used
      * @param baseEnv the environment on witch to base the user env.
      */
     protected ForkEnvironment(ForkEnvironment forkEnv, Map<String, String> baseEnv) {
-        this.javaHome = forkEnv.javaHome;
-        this.workingDir = forkEnv.workingDir;
         this.baseSystemProperties = baseEnv;
-        this.systemProperties = forkEnv.systemProperties;
-        this.jvmArguments = forkEnv.jvmArguments;
-        this.additionalClasspath = forkEnv.additionalClasspath;
-        this.script = forkEnv.script;
+        if (forkEnv != null) {
+            this.javaHome = forkEnv.javaHome;
+            this.workingDir = forkEnv.workingDir;
+            this.systemProperties = forkEnv.systemProperties;
+            this.jvmArguments = forkEnv.jvmArguments;
+            this.additionalClasspath = forkEnv.additionalClasspath;
+            this.script = forkEnv.script;
+        }
     }
 
     /**

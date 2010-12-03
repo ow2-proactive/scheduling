@@ -39,6 +39,7 @@ package org.ow2.proactive.scheduler.task.launcher;
 import java.util.Map;
 
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
+import org.ow2.proactive.scripting.Script;
 
 
 /**
@@ -49,15 +50,18 @@ import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
  * @since ProActive Scheduling 2.2
  */
 public final class InternalForkEnvironment extends ForkEnvironment {
+
+    private boolean envReadOnly = false;
+
     /**
      * Create a new instance of InternalForkEnvironment using a fork environment and a base env.<br/>
      * This solution was the only one to decorate a fork environment according to those constraints :
      * <ul>
-     * <li>ForkEnvironment type and API must be the same at user side and in the worker side (executed in the envscript)
-     * <li>No additional constructor is allowed in ForkEnvironment
-     * <li>We cannot use getter from ForkEnvironment as they don't match the real field type
-     * <li>It's not possible for the internal type and the user type to be in the same package as the internal type must be in internal package
-     * <li>We must "replay" user environment at worker side in the same order as he put it in ForkEnvironment at user side
+     * <li>ForkEnvironment type and API must be the same at user side and in the worker side (executed in the envscript)</li>
+     * <li>No additional constructor is allowed in ForkEnvironment</li>
+     * <li>We cannot use getter from ForkEnvironment as they don't match the real field type</li>
+     * <li>It's not possible for the internal type and the user type to be in the same package as the internal type must be in internal package</li>
+     * <li>We must "replay" user environment at worker side in the same order as he put it in ForkEnvironment at user side</li>
      * </ul>
      * <br/>
      * The goal of this class and constructor is just to have a way to create an object extending ForkEnvironment
@@ -69,10 +73,54 @@ public final class InternalForkEnvironment extends ForkEnvironment {
      * <br/>
      * Note : if baseEnv is null, an empty one is used.<br/>
      * <br/>
-     * @param forkEnv the user side fork environment
+     *
+     * @param forkEnv the user side fork environment, if null, an empty fork environment is used
      * @param baseEnv a base environment on which the user on will be computed
      */
     public InternalForkEnvironment(ForkEnvironment forkEnv, Map<String, String> baseEnv) {
+        this(forkEnv, baseEnv, false);
+    }
+
+    /**
+     * Create a new instance of InternalForkEnvironment
+     *
+     * @param forkEnv the user side fork environment, if null, an empty fork environment is used
+     * @param baseEnv a base environment on which the user on will be computed
+     * @param envReadOnly true if the system environment is read only, false if it can be modified.
+     * 			if read only, methods that could modify system env will throw an UnsupportedOperationException
+     */
+    public InternalForkEnvironment(ForkEnvironment forkEnv, Map<String, String> baseEnv, boolean envReadOnly) {
         super(forkEnv, baseEnv);
+        this.envReadOnly = envReadOnly;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void addSystemProperty(String name, String value, boolean append) {
+        if (envReadOnly) {
+            throw new UnsupportedOperationException("System environment is read only, you cannot modify it.");
+        }
+        super.addSystemProperty(name, value, append);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void addSystemProperty(String name, String value, char appendChar) {
+        if (envReadOnly) {
+            throw new UnsupportedOperationException("System environment is read only, you cannot modify it.");
+        }
+        super.addSystemProperty(name, value, appendChar);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setEnvScript(Script<?> script) {
+        throw new UnsupportedOperationException("Environment script should not be modified in this context.");
     }
 }
