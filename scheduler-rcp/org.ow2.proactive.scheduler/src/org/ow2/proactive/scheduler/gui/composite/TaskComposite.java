@@ -176,8 +176,8 @@ public class TaskComposite extends Composite implements Comparator<TaskState> {
     }
 
     private void createTaskBar(final Composite parent, final TaskView view) {
-        ImageDescriptor imgDesc = Activator.getDefault().getImageRegistry()
-                .getDescriptor(Internal.IMG_REMOTE_CONNECTION);
+        ImageDescriptor imgDesc = Activator.getDefault().getImageRegistry().getDescriptor(
+                Internal.IMG_REMOTE_CONNECTION);
 
         remoteAction = new Action("Remote connection", imgDesc) {
             @Override
@@ -674,32 +674,25 @@ public class TaskComposite extends Composite implements Comparator<TaskState> {
             } else if (title.equals(COLUMN_NAME_TITLE)) {
                 item.setText(i, taskState.getName());
             } else if (title.equals(COLUMN_DESCRIPTION_TITLE)) {
-                item.setText(
-                        i,
-                        (taskState.getDescription() == null) ? "no description available" : taskState
-                                .getDescription());
+                item.setText(i, (taskState.getDescription() == null) ? "no description available" : taskState
+                        .getDescription());
             } else if (title.equals(COLUMN_START_TIME_TITLE)) {
                 item.setText(i, Tools.getFormattedDate(taskState.getStartTime()));
             } else if (title.equals(COLUMN_FINISHED_TIME_TITLE)) {
                 item.setText(i, Tools.getFormattedDate(taskState.getFinishedTime()));
             } else if (title.equals(COLUMN_DURATION_TITLE)) {
-                item.setText(i,
-                        Tools.getFormattedDuration(taskState.getFinishedTime(), taskState.getStartTime()));
+                item.setText(i, Tools.getFormattedDuration(taskState.getFinishedTime(), taskState
+                        .getStartTime()));
             } else if (title.equals(COLUMN_EXEC_DURATION_TITLE)) {
                 item.setText(i, Tools.getFormattedDuration(0, taskState.getExecutionDuration()));
             } else if (title.equals(COLUMN_NODEFAILURE_TITLE)) {
                 if (taskState.getStatus() == TaskStatus.FAILED) {
-                    item.setText(
-                            i,
-                            taskState.getMaxNumberOfExecutionOnFailure() + "/" +
-                                taskState.getMaxNumberOfExecutionOnFailure());
+                    item.setText(i, taskState.getMaxNumberOfExecutionOnFailure() + "/" +
+                        taskState.getMaxNumberOfExecutionOnFailure());
                 } else {
-                    item.setText(
-                            i,
-                            (taskState.getMaxNumberOfExecutionOnFailure() - taskState
-                                    .getNumberOfExecutionOnFailureLeft()) +
-                                "/" +
-                                taskState.getMaxNumberOfExecutionOnFailure());
+                    item.setText(i, (taskState.getMaxNumberOfExecutionOnFailure() - taskState
+                            .getNumberOfExecutionOnFailureLeft()) +
+                        "/" + taskState.getMaxNumberOfExecutionOnFailure());
                 }
             } else if (title.equals(COLUMN_HOST_NAME_TITLE)) {
                 String hostName = taskState.getExecutionHostName();
