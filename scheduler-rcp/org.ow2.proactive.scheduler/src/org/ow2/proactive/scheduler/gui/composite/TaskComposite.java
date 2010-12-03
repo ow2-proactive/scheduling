@@ -48,6 +48,7 @@ import javax.swing.JPanel;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
@@ -175,10 +176,10 @@ public class TaskComposite extends Composite implements Comparator<TaskState> {
     }
 
     private void createTaskBar(final Composite parent, final TaskView view) {
-        ImageDescriptor imgDesc = Activator.getDefault().getImageRegistry().getDescriptor(
-                Internal.IMG_REMOTE_CONNECTION);
+        ImageDescriptor imgDesc = Activator.getDefault().getImageRegistry()
+                .getDescriptor(Internal.IMG_REMOTE_CONNECTION);
 
-        remoteAction = new Action("Attempt a remote connection to the selected task", imgDesc) {
+        remoteAction = new Action("Remote connection", imgDesc) {
             @Override
             public void run() {
                 if (selectedId == null) {
@@ -208,7 +209,6 @@ public class TaskComposite extends Composite implements Comparator<TaskState> {
         };
         remoteAction.setEnabled(false);
         view.getViewSite().getActionBars().getToolBarManager().add(remoteAction);
-
     }
 
     private Table createTable(final Composite parent) {
@@ -353,6 +353,11 @@ public class TaskComposite extends Composite implements Comparator<TaskState> {
             }
 
         });
+
+        MenuManager menuMgr = new MenuManager();
+        menuMgr.add(remoteAction);
+        table.setMenu(menuMgr.createContextMenu(this));
+
         return table;
     }
 
@@ -669,25 +674,32 @@ public class TaskComposite extends Composite implements Comparator<TaskState> {
             } else if (title.equals(COLUMN_NAME_TITLE)) {
                 item.setText(i, taskState.getName());
             } else if (title.equals(COLUMN_DESCRIPTION_TITLE)) {
-                item.setText(i, (taskState.getDescription() == null) ? "no description available" : taskState
-                        .getDescription());
+                item.setText(
+                        i,
+                        (taskState.getDescription() == null) ? "no description available" : taskState
+                                .getDescription());
             } else if (title.equals(COLUMN_START_TIME_TITLE)) {
                 item.setText(i, Tools.getFormattedDate(taskState.getStartTime()));
             } else if (title.equals(COLUMN_FINISHED_TIME_TITLE)) {
                 item.setText(i, Tools.getFormattedDate(taskState.getFinishedTime()));
             } else if (title.equals(COLUMN_DURATION_TITLE)) {
-                item.setText(i, Tools.getFormattedDuration(taskState.getFinishedTime(), taskState
-                        .getStartTime()));
+                item.setText(i,
+                        Tools.getFormattedDuration(taskState.getFinishedTime(), taskState.getStartTime()));
             } else if (title.equals(COLUMN_EXEC_DURATION_TITLE)) {
                 item.setText(i, Tools.getFormattedDuration(0, taskState.getExecutionDuration()));
             } else if (title.equals(COLUMN_NODEFAILURE_TITLE)) {
                 if (taskState.getStatus() == TaskStatus.FAILED) {
-                    item.setText(i, taskState.getMaxNumberOfExecutionOnFailure() + "/" +
-                        taskState.getMaxNumberOfExecutionOnFailure());
+                    item.setText(
+                            i,
+                            taskState.getMaxNumberOfExecutionOnFailure() + "/" +
+                                taskState.getMaxNumberOfExecutionOnFailure());
                 } else {
-                    item.setText(i, (taskState.getMaxNumberOfExecutionOnFailure() - taskState
-                            .getNumberOfExecutionOnFailureLeft()) +
-                        "/" + taskState.getMaxNumberOfExecutionOnFailure());
+                    item.setText(
+                            i,
+                            (taskState.getMaxNumberOfExecutionOnFailure() - taskState
+                                    .getNumberOfExecutionOnFailureLeft()) +
+                                "/" +
+                                taskState.getMaxNumberOfExecutionOnFailure());
                 }
             } else if (title.equals(COLUMN_HOST_NAME_TITLE)) {
                 String hostName = taskState.getExecutionHostName();
