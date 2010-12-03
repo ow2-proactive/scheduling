@@ -123,16 +123,17 @@ public final class ForkerUtils {
      * If the process must be run under a specific user,
      * check the configuration of '{@value #FORK_METHOD_KEY}' property and proceed as follow :
      * <ul>
-     * 	<li><b>if {@value #FORK_METHOD_KEY}=none :</b> return null</li>
+     * 	<li><b>if {@value #FORK_METHOD_KEY}=none :</b> throws IllegalAccessException</li>
      * 	<li><b>if {@value #FORK_METHOD_KEY}=pwd :</b> return the user using its login and password</li>
      * 	<li><b>if {@value #FORK_METHOD_KEY}=key :</b> return the user using its ssh key</li>
      * </ul>
      *
      * @param decrypter the decrypter that should be a self decryption one.
-     * @return the OSUser to be passed to the OSPRocess, or null if no fork method is set.
+     * @return the OSUser to be passed to the OSPRocess if node fork method is configured.
      * @throws IllegalAccessException if the node configuration method is not compatible with incoming credentials
      * @throws KeyException decryption failure, malformed data
      * @throws IllegalArgumentException if decrypter is null
+     * @throws IllegalAccessException if node fork method is not set
      */
     public static OSUser checkConfigAndGetUser(OneShotDecrypter decrypter) throws IllegalAccessException,
             KeyException {

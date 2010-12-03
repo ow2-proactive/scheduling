@@ -131,6 +131,7 @@ public class ForkedJavaExecutable extends JavaExecutable {
     private List<String> command;
     private ForkedJavaExecutableInitializer execInitializer;
     private File fpolicy = null;
+    private File flog4j = null;
 
     private Process process = null;
     private ProActiveRuntime childRuntime = null;
@@ -293,7 +294,7 @@ public class ForkedJavaExecutable extends JavaExecutable {
      * Prepare java command
      */
     private void createJavaCommand() {
-        ForkEnvironment forkEnvironment = execInitializer.getForkEnvironment();
+        ForkEnvironment forkEnvironment = this.execInitializer.getForkEnvironment();
         String java_home;
         if (forkEnvironment != null && forkEnvironment.getJavaHome() != null &&
             !"".equals(forkEnvironment.getJavaHome())) {
@@ -306,10 +307,11 @@ public class ForkedJavaExecutable extends JavaExecutable {
     }
 
     /**
-     * Add jvm parameters
+     * Add JVM arguments
      */
     private void addJVMArguments() {
         ForkEnvironment forkEnvironment = execInitializer.getForkEnvironment();
+        //set mandatory security policy
         if (forkEnvironment == null || !contains("java.security.policy", forkEnvironment.getJVMArguments())) {
             try {
                 fpolicy = File.createTempFile("forked_jt", null);
@@ -319,6 +321,19 @@ public class ForkedJavaExecutable extends JavaExecutable {
                 command.add("-Djava.security.policy=" + fpolicy.getAbsolutePath());
             } catch (Exception e) {
                 //java policy not set
+                logger_dev.debug("", e);
+            }
+        }
+        //set mandatory log4j file
+        if (forkEnvironment == null || !contains("log4j.configuration", forkEnvironment.getJVMArguments())) {
+            try {
+                flog4j = File.createTempFile("forked_jt", null);
+                PrintStream out = new PrintStream(flog4j);
+                out.print(execInitializer.getJavaTaskLauncherInitializer().getLog4JContent());
+                out.close();
+                command.add("-Dlog4j.configuration=" + flog4j.getAbsolutePath());
+            } catch (Exception e) {
+                //log4j not set
                 logger_dev.debug("", e);
             }
         }

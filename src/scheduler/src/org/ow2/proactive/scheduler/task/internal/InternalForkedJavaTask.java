@@ -45,6 +45,7 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+
 import org.apache.log4j.Logger;
 import org.hibernate.annotations.AccessType;
 import org.hibernate.annotations.Proxy;
@@ -82,6 +83,10 @@ public class InternalForkedJavaTask extends InternalJavaTask {
     @Transient
     private static StringBuilder policyContent = null;
 
+    /** Log4j content for the forked VM (declared as static element to be done once) */
+    @Transient
+    private static StringBuilder log4JContent = null;
+
     /**
      * ProActive empty constructor
      */
@@ -106,6 +111,7 @@ public class InternalForkedJavaTask extends InternalJavaTask {
 
         TaskLauncherInitializer tli = getDefaultTaskLauncherInitializer(job);
         tli.setPolicyContent(getJavaPolicy());
+        tli.setLog4JContent(getLog4J());
         logger_dev.info("Create forked java task launcher");
         TaskLauncher launcher = (TaskLauncher) PAActiveObject.newActive(ForkedJavaTaskLauncher.class
                 .getName(), new Object[] { tli }, node);
@@ -122,20 +128,57 @@ public class InternalForkedJavaTask extends InternalJavaTask {
     private static String getJavaPolicy() {
         if (policyContent == null) {
             try {
-                policyContent = new StringBuilder("");
-                String forkedPolicyFilePath = PASchedulerProperties
+                policyContent = getFileContent(PASchedulerProperties
                         .getAbsolutePath(PASchedulerProperties.SCHEDULER_DEFAULT_FJT_SECURITY_POLICY
-                                .getValueAsString());
-                BufferedReader brin = new BufferedReader(new FileReader(forkedPolicyFilePath));
-                String line;
-                while ((line = brin.readLine()) != null) {
-                    policyContent.append(line + "\n");
-                }
+                                .getValueAsString()));
             } catch (Exception e) {
                 logger_dev.error("Policy file not read, applying default basic permission", e);
                 policyContent = new StringBuilder("grant {\npermission java.security.BasicPermission;\n};\n");
             }
         }
         return policyContent.toString();
+    }
+
+    /**
+     * Return the content of the log4J file or a default one if not found.
+     *
+     * @return the content of the log4J file or a default one if not found.
+     */
+    private static String getLog4J() {
+        if (log4JContent == null) {
+            try {
+                log4JContent = getFileContent(PASchedulerProperties
+                        .getAbsolutePath(PASchedulerProperties.SCHEDULER_DEFAULT_FJT_LOG4J.getValueAsString()));
+            } catch (Exception e) {
+                logger_dev.error("Log4J file not read, applying default basic content", e);
+                //default ProActive log4j file is not suitable because CONSOLE appender is not supported under windows
+                log4JContent = new StringBuilder("log4j.rootLogger=INFO,NULL\n");
+            }
+        }
+        return log4JContent.toString();
+    }
+
+    /**
+     * Return the content of a file in a string
+     *
+     * @param filePath the file path to be read
+     * @return a string that represents the content of the given filePath
+     * @throws Exception if an exception occurs while reading file
+     */
+    private static StringBuilder getFileContent(String filePath) throws Exception {
+        BufferedReader brin = null;
+        try {
+            StringBuilder fileContent = new StringBuilder("");
+            brin = new BufferedReader(new FileReader(filePath));
+            String line;
+            while ((line = brin.readLine()) != null) {
+                fileContent.append(line + "\n");
+            }
+            return fileContent;
+        } finally {
+            if (brin != null) {
+                brin.close();
+            }
+        }
     }
 }

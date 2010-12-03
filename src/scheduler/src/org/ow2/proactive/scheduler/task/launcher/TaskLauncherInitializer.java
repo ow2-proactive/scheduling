@@ -68,6 +68,8 @@ public class TaskLauncherInitializer implements Serializable {
     private long walltime;
     /** policy content to be prepared before being sent to node */
     private String policyContent;
+    /** log4j content to be prepared before being sent to node */
+    private String log4JContent;
 
     /** replication index: task was replicated in parallel */
     private int replicationIndex = 0;
@@ -186,6 +188,24 @@ public class TaskLauncherInitializer implements Serializable {
      */
     public String getPolicyContent() {
         return policyContent;
+    }
+
+    /**
+     * Get the log4JContent
+     *
+     * @return the log4JContent
+     */
+    public String getLog4JContent() {
+        return log4JContent;
+    }
+
+    /**
+     * Set the log4JContent value to the given log4jContent value
+     *
+     * @param log4jContent the log4JContent to set
+     */
+    public void setLog4JContent(String log4jContent) {
+        log4JContent = log4jContent;
     }
 
     /**

@@ -1,0 +1,20 @@
+# This file represents the log4j config file for forked task.
+
+# The default logging level is INFO
+# The root logger does not log by default
+
+log4j.rootLogger=INFO,NULL
+
+# avoid displaying additivity of the inherit loggers
+log4j.additivity.proactive.scheduler=false
+log4j.additivity.proactive.scheduler.dev=false
+log4j.additivity.proactive.scheduler.dev.admin=true
+# avoid displaying additivity of the inherit loggers
+log4j.additivity.proactive.resourceManager=false
+
+# File appender for debugging
+log4j.appender.debugFileAppender=org.apache.log4j.FileAppender
+log4j.appender.debugFileAppender.File=${java.io.tmpdir}/forkedTaskOutput.log
+log4j.appender.debugFileAppender.MaxFileSize=10MB
+log4j.appender.debugFileAppender.layout=org.apache.log4j.PatternLayout
+log4j.appender.debugFileAppender.layout.ConversionPattern=[%-1p %d{ISO8601}] %m%n
