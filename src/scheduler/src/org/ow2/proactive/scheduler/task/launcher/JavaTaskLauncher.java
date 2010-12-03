@@ -110,7 +110,7 @@ public class JavaTaskLauncher extends TaskLauncher {
             sample = System.currentTimeMillis();
             //launch pre script
             if (pre != null) {
-                this.executePreScript(PAActiveObject.getNode());
+                this.executePreScript();
             }
             duration = System.currentTimeMillis() - sample;
 
@@ -144,7 +144,7 @@ public class JavaTaskLauncher extends TaskLauncher {
             sample = System.currentTimeMillis();
             //launch post script
             if (post != null) {
-                this.executePostScript(PAActiveObject.getNode(), exception == null);
+                this.executePostScript(exception == null);
             }
             duration += System.currentTimeMillis() - sample;
 
@@ -156,7 +156,7 @@ public class JavaTaskLauncher extends TaskLauncher {
             TaskResultImpl res = new TaskResultImpl(taskId, userResult, null, duration, null, null);
 
             if (flow != null) {
-                this.executeFlowScript(PAActiveObject.getNode(), res);
+                this.executeFlowScript(res);
             }
 
             //return result

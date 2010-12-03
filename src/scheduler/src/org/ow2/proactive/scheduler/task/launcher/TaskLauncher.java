@@ -65,7 +65,6 @@ import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.annotation.ImmediateService;
 import org.objectweb.proactive.api.PAActiveObject;
-import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.dataspaces.api.DataSpacesFileObject;
@@ -561,15 +560,14 @@ public abstract class TaskLauncher implements InitActive {
     }
 
     /**
-     * Execute the preScript on the node n, or on the default node if n is null.
+     * Execute the preScript on the local node.
      * 
      * @throws ActiveObjectCreationException if the script handler cannot be created
      * @throws NodeException if the script handler cannot be created
      * @throws UserException if an error occurred during the execution of the script
      */
     @SuppressWarnings("unchecked")
-    protected void executePreScript(Node n) throws ActiveObjectCreationException, NodeException,
-            UserException {
+    protected void executePreScript() throws ActiveObjectCreationException, NodeException, UserException {
         replaceIterationTag(pre);
         logger_dev.info("Executing pre-script");
         ScriptHandler handler = ScriptLoader.createLocalHandler();
@@ -586,16 +584,15 @@ public abstract class TaskLauncher implements InitActive {
     }
 
     /**
-     * Execute the postScript on the node n, or on the default node if n is null.
+     * Execute the postScript on the local node.
      * 
-     * @param Node the node on which to execute the post script
      * @param executionSucceed a boolean describing the state of the task execution.(true if execution succeed, false if not)
      * @throws ActiveObjectCreationException if the script handler cannot be created
      * @throws NodeException if the script handler cannot be created
      * @throws UserException if an error occurred during the execution of the script
      */
     @SuppressWarnings("unchecked")
-    protected void executePostScript(Node n, boolean executionSucceed) throws ActiveObjectCreationException,
+    protected void executePostScript(boolean executionSucceed) throws ActiveObjectCreationException,
             NodeException, UserException {
         replaceIterationTag(post);
         logger_dev.info("Executing post-script");
@@ -614,14 +611,13 @@ public abstract class TaskLauncher implements InitActive {
     }
 
     /**
-     * Execute the control flow script on the node n or on the default node if n is null
+     * Execute the control flow script on the local node
      * 
-     * @param n the node on which the script is to be executed
      * @param res TaskResult of this launcher's task, input of the script
      * @throws Throwable
      */
     @SuppressWarnings("unchecked")
-    protected void executeFlowScript(Node n, TaskResult res) throws Throwable {
+    protected void executeFlowScript(TaskResult res) throws Throwable {
         replaceIterationTag(flow);
         logger_dev.info("Executing flow-script");
         ScriptHandler handler = ScriptLoader.createLocalHandler();

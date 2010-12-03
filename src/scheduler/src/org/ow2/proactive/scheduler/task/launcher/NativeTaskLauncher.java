@@ -41,7 +41,6 @@ import java.lang.reflect.InvocationTargetException;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
-import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
 import org.ow2.proactive.scheduler.common.task.ExecutableInitializer;
@@ -123,7 +122,7 @@ public class NativeTaskLauncher extends TaskLauncher {
             sample = System.currentTimeMillis();
             //execute pre-script
             if (pre != null) {
-                this.executePreScript(PAActiveObject.getNode());
+                this.executePreScript();
             }
             duration = System.currentTimeMillis() - sample;
 
@@ -167,7 +166,7 @@ public class NativeTaskLauncher extends TaskLauncher {
             //launch post script
             if (post != null) {
                 int retCode = Integer.parseInt(userResult.toString());
-                this.executePostScript(PAActiveObject.getNode(), retCode == 0 && exception == null);
+                this.executePostScript(retCode == 0 && exception == null);
             }
             duration += System.currentTimeMillis() - sample;
 
@@ -179,7 +178,7 @@ public class NativeTaskLauncher extends TaskLauncher {
             TaskResultImpl res = new TaskResultImpl(taskId, userResult, null, duration, null, null);
 
             if (flow != null) {
-                this.executeFlowScript(PAActiveObject.getNode(), res);
+                this.executeFlowScript(res);
             }
 
             res.setPropagatedProperties(retreivePropagatedProperties());

@@ -51,6 +51,7 @@ import javax.management.Notification;
 import javax.management.NotificationListener;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.ProActiveException;
@@ -62,6 +63,7 @@ import org.objectweb.proactive.core.jmx.notification.NotificationType;
 import org.objectweb.proactive.core.jmx.util.JMXNotificationManager;
 import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
@@ -70,6 +72,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.processbuilder.OSProcessBuilder;
 import org.ow2.proactive.scheduler.common.exception.InternalSchedulerException;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
+import org.ow2.proactive.scheduler.common.exception.UserException;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.TaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
@@ -79,6 +82,9 @@ import org.ow2.proactive.scheduler.task.launcher.JavaTaskLauncher;
 import org.ow2.proactive.scheduler.task.launcher.TaskLauncherInitializer;
 import org.ow2.proactive.scheduler.task.launcher.utils.ForkerUtils;
 import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
+import org.ow2.proactive.scripting.ScriptHandler;
+import org.ow2.proactive.scripting.ScriptLoader;
+import org.ow2.proactive.scripting.ScriptResult;
 
 
 /**
@@ -158,6 +164,9 @@ public class ForkedJavaExecutable extends JavaExecutable {
     @Override
     public Serializable execute(TaskResult... results) throws Throwable {
         try {
+            //execute environment script
+            executeEnvScript();
+
             createRegistrationListener();
 
             logger_dev.debug("Create JVM process with command : " + command);
@@ -209,6 +218,29 @@ public class ForkedJavaExecutable extends JavaExecutable {
             return result;
         } finally {
             clean();
+        }
+    }
+
+    /**
+     * Execute the envScript on the node n, or on the default node if n is null.
+     *
+     * @throws ActiveObjectCreationException if the script handler cannot be created
+     * @throws NodeException if the script handler cannot be created
+     * @throws UserException if an error occurred during the execution of the script
+     */
+    @SuppressWarnings("unchecked")
+    private void executeEnvScript() throws ActiveObjectCreationException, NodeException, UserException {
+        ForkEnvironment fe = this.execInitializer.getForkEnvironment();
+        if (fe != null && fe.getScript() != null) {
+            logger_dev.info("Executing env-script");
+            ScriptHandler handler = ScriptLoader.createLocalHandler();
+            ScriptResult<String> res = handler.handle(fe.getScript());
+
+            if (res.errorOccured()) {
+                res.getException().printStackTrace();
+                logger_dev.error("Error on env-script occured : ", res.getException());
+                throw new UserException("Env-script has failed on the current node", res.getException());
+            }
         }
     }
 
