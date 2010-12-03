@@ -58,6 +58,7 @@ import org.ow2.proactive.resourcemanager.frontend.topology.clustering.HAC;
 import org.ow2.proactive.resourcemanager.frontend.topology.descriptor.ArbitraryTopologyDescriptor;
 import org.ow2.proactive.resourcemanager.frontend.topology.descriptor.BestProximityDescriptor;
 import org.ow2.proactive.resourcemanager.frontend.topology.descriptor.MultipleHostsExclusiveDescriptor;
+import org.ow2.proactive.resourcemanager.frontend.topology.descriptor.OneNodePerHostExclusiveDescriptor;
 import org.ow2.proactive.resourcemanager.frontend.topology.descriptor.SingleHostDescriptor;
 import org.ow2.proactive.resourcemanager.frontend.topology.descriptor.SingleHostExclusiveDescriptor;
 import org.ow2.proactive.resourcemanager.frontend.topology.descriptor.ThresholdProximityDescriptor;
@@ -102,6 +103,7 @@ public class TopologyManager {
         handlers.put(SingleHostDescriptor.class, new SingleHostHandler());
         handlers.put(SingleHostExclusiveDescriptor.class, new SingleHostExclusiveHandler());
         handlers.put(MultipleHostsExclusiveDescriptor.class, new MultipleHostsExclusiveHandler());
+        handlers.put(OneNodePerHostExclusiveDescriptor.class, new OneNodePerHostExclusiveHandler());
 
         pingerClass = (Class<? extends Pinger>) Class.forName(PAResourceManagerProperties.RM_TOPOLOGY_PINGER
                 .getValueAsString());
@@ -419,7 +421,7 @@ public class TopologyManager {
             // be bigger but as close as possible to the requested one
             //
             // in order to do it forming the map
-            // [number -> [nodes list_1 giving this nodes number]...[nodes list_k giving this nodes number]]
+            // [number -> [list_1 given this nodes number]...[list_k given this nodes number]]
             HashMap<Integer, List<List<InetAddress>>> hostsMap = new HashMap<Integer, List<List<InetAddress>>>();
             for (InetAddress host : nodesOnHost.keySet()) {
                 boolean busyNode = false;
@@ -438,7 +440,7 @@ public class TopologyManager {
 
                     for (Integer i : new LinkedList<Integer>(hostsMap.keySet())) {
                         if (i > number) {
-                            // do not updates records above "number"
+                            // do not updates records above the "number"
                             continue;
                         }
 
@@ -492,6 +494,63 @@ public class TopologyManager {
             for (InetAddress host : minSizeList) {
                 result.addAll(nodesOnHost.get(host));
             }
+            return result;
+        }
+    }
+
+    /**
+     * 
+     * If k nodes are requested
+     * - trying to find hosts with 1 node
+     * - if there are no more such hosts add hosts with two nodes and so on.
+     * 
+     */
+    private class OneNodePerHostExclusiveHandler extends TopologyHandler {
+        @Override
+        public List<Node> select(int number, List<Node> matchedNodes) {
+            if (number == 0) {
+                return new LinkedList<Node>();
+            }
+
+            // create the map of free hosts: nodes_number -> list of hosts
+            HashMap<Integer, List<InetAddress>> hostsMap = new HashMap<Integer, List<InetAddress>>();
+            for (InetAddress host : nodesOnHost.keySet()) {
+                boolean busyNode = false;
+                for (Node nodeOnHost : nodesOnHost.get(host)) {
+                    if (!matchedNodes.contains(nodeOnHost)) {
+                        busyNode = true;
+                        break;
+                    }
+                }
+                if (!busyNode) {
+                    int nodesNumber = nodesOnHost.get(host).size();
+                    if (!hostsMap.containsKey(nodesNumber)) {
+                        hostsMap.put(nodesNumber, new LinkedList<InetAddress>());
+                    }
+                    hostsMap.get(nodesNumber).add(host);
+                }
+            }
+
+            // if empty => no entirely free hosts
+            if (hostsMap.size() == 0) {
+                return new LinkedList<Node>();
+            }
+
+            // sort by nodes number and accumulate the result
+            List<Integer> sortedCapacities = new LinkedList<Integer>(hostsMap.keySet());
+            Collections.sort(sortedCapacities);
+
+            List<Node> result = new LinkedList<Node>();
+            for (Integer i : sortedCapacities) {
+                for (InetAddress host : hostsMap.get(i)) {
+                    result.addAll(nodesOnHost.get(host));
+                    if (--number <= 0) {
+                        // found required node set
+                        return result;
+                    }
+                }
+            }
+            // best effort: return less than have
             return result;
         }
     }

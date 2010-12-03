@@ -388,6 +388,23 @@ public class SelectionTest extends FunctionalTest {
         Assert.assertEquals(0, ns.size());
         resourceManager.releaseNodes(ns).getBooleanValue();
 
+        // checking TopologyDescriptor.ONE_NODE_PER_HOST_EXCLUSIVE
+        ns = resourceManager.getAtMostNodes(1, TopologyDescriptor.ONE_NODE_PER_HOST_EXCLUSIVE, null, null);
+        Assert.assertEquals(1, ns.size());
+        resourceManager.releaseNodes(ns).getBooleanValue();
+
+        ns = resourceManager.getAtMostNodes(2, TopologyDescriptor.ONE_NODE_PER_HOST_EXCLUSIVE, null, null);
+        Assert.assertEquals(2, ns.size());
+        resourceManager.releaseNodes(ns).getBooleanValue();
+
+        ns = resourceManager.getAtMostNodes(3, TopologyDescriptor.ONE_NODE_PER_HOST_EXCLUSIVE, null, null);
+        Assert.assertEquals(8, ns.size());
+        resourceManager.releaseNodes(ns).getBooleanValue();
+
+        ns = resourceManager.getAtMostNodes(4, TopologyDescriptor.ONE_NODE_PER_HOST_EXCLUSIVE, null, null);
+        Assert.assertEquals(8, ns.size());
+        resourceManager.releaseNodes(ns).getBooleanValue();
+
         PAFuture.waitFor(resourceManager.removeNodeSource("remote", true));
     }
 }

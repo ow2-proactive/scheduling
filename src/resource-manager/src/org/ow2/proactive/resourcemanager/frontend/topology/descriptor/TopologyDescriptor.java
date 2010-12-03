@@ -68,6 +68,11 @@ public class TopologyDescriptor implements Serializable {
      * (hosts are reserved for the user)
      */
     public static final TopologyDescriptor MULTIPLE_HOSTS_EXCLUSIVE = new MultipleHostsExclusiveDescriptor();
+    /**
+     * the set of nodes one per host exclusively
+     * (hosts are reserved for the user)
+     */
+    public static final TopologyDescriptor ONE_NODE_PER_HOST_EXCLUSIVE = new OneNodePerHostExclusiveDescriptor();
 
     /**
      * the flag indicated that descriptor requires the topology information in the resource manager.
