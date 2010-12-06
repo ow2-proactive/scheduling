@@ -1245,7 +1245,9 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         if (client != null) {
             // expensive but relatively rare operation
             for (RMNode rmnode : allNodes.values()) {
-                if (client.equals(rmnode.getOwner())) {
+                // checking that it is not only the same client but also 
+                // the same connection
+                if (client.equals(rmnode.getOwner()) && clientId.equals(rmnode.getOwner().getId())) {
                     if (rmnode.isToRemove()) {
                         removeNodeFromCoreAndSource(rmnode, client);
                     } else if (rmnode.isBusy()) {

@@ -39,11 +39,17 @@ package functionaltests.nodestate;
 import static junit.framework.Assert.assertTrue;
 import junit.framework.Assert;
 
+import org.objectweb.proactive.api.PAFuture;
+import org.objectweb.proactive.core.ProActiveTimeoutException;
 import org.objectweb.proactive.core.process.JVMProcessImpl;
 import org.objectweb.proactive.core.util.ProActiveInet;
+import org.ow2.proactive.authentication.crypto.CredData;
+import org.ow2.proactive.authentication.crypto.Credentials;
+import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
+import org.ow2.proactive.resourcemanager.frontend.RMConnection;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.DefaultInfrastructureManager;
@@ -150,6 +156,41 @@ public class TestConcurrentUsers extends FunctionalTest {
         Assert.assertEquals(evt.getNodeState(), NodeState.FREE);
         assertTrue(resourceManager.getState().getTotalNodesNumber() == 1);
         assertTrue(resourceManager.getState().getFreeNodesNumber() == 1);
+
+        RMTHelper.log("Test 4 - disconnecting");
+
+        NodeSet ns2 = resourceManager.getAtMostNodes(1, null);
+        RMNodeEvent event = RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED, 10000);
+        Assert.assertTrue(event.getNodeState() == NodeState.BUSY);
+        try {
+            PAFuture.waitFor(ns2);
+            System.out.println("Number of found nodes " + ns2.size());
+            Assert.assertEquals(1, ns2.size());
+        } catch (RuntimeException e) {
+            Assert.assertTrue(false);
+        }
+
+        t = new Thread() {
+            public void run() {
+                try {
+                    RMAuthentication auth = RMConnection.join(null);
+                    Credentials cred = Credentials.createCredentials(new CredData(RMTHelper.username,
+                        RMTHelper.username), auth.getPublicKey());
+                    ResourceManager rm = auth.login(cred);
+                    rm.disconnect().getBooleanValue();
+                } catch (Exception e) {
+                    Assert.assertTrue(false);
+                }
+            }
+        };
+        t.start();
+        t.join();
+
+        try {
+            event = RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED, 10000);
+            Assert.assertTrue(event.toString(), false);
+        } catch (ProActiveTimeoutException e) {
+        }
 
     }
 }
