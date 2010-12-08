@@ -36,8 +36,10 @@
  */
 package org.ow2.proactive.scheduler.task.launcher;
 
+import java.io.File;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
+import java.net.URI;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
@@ -62,7 +64,7 @@ public class NativeTaskLauncher extends TaskLauncher {
 
     public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.LAUNCHER);
 
-    private static final String DATASPACE_TAG = "\\$LOCALSPACE";
+    private static final String DATASPACE_TAG = "$LOCALSPACE";
 
     /**
      * ProActive Empty Constructor
@@ -199,10 +201,11 @@ public class NativeTaskLauncher extends TaskLauncher {
         }
     }
 
-    private void replaceWorkingDirDSTags(ExecutableInitializer execInit) {
+    private void replaceWorkingDirDSTags(ExecutableInitializer execInit) throws Exception {
         String wd = ((NativeExecutableInitializer) execInit).getWorkingDir();
         if (wd != null) {
-            wd = wd.replaceAll(DATASPACE_TAG, SCRATCH.getRealURI().replace("file://", ""));
+            String fullScratchPath = new File(new URI(SCRATCH.getRealURI())).getAbsolutePath();
+            wd = wd.replace(DATASPACE_TAG, fullScratchPath);
         }
         ((NativeExecutableInitializer) execInit).setWorkingDir(wd);
     }
@@ -211,9 +214,9 @@ public class NativeTaskLauncher extends TaskLauncher {
         String[] args = ((NativeExecutable) currentExecutable).getCommand();
         //I cannot use DataSpace to get the local scratch path
         if (SCRATCH != null) {
-            String fullScratchPath = SCRATCH.getRealURI().replace("file://", "");
+            String fullScratchPath = new File(new URI(SCRATCH.getRealURI())).getAbsolutePath();
             for (int i = 0; i < args.length; i++) {
-                args[i] = args[i].replaceAll(DATASPACE_TAG, fullScratchPath);
+                args[i] = args[i].replace(DATASPACE_TAG, fullScratchPath);
             }
         }
     }
