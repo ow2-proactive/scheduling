@@ -41,6 +41,7 @@ import java.lang.reflect.InvocationTargetException;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
+import org.ow2.proactive.scheduler.common.task.SimpleTaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
@@ -138,7 +139,11 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher {
             return userResult;
         } catch (Throwable ex) {
             logger_dev.info("", ex);
-            return new TaskResultImpl(taskId, ex, this.getLogs(), duration, null);
+            if (this.getLogs() == null) {
+                return new TaskResultImpl(taskId, ex, new SimpleTaskLogs("", ex.toString()), duration, null);
+            } else {
+                return new TaskResultImpl(taskId, ex, this.getLogs(), duration, null);
+            }
         } finally {
             cancelTimer();
             finalizeTask(core);

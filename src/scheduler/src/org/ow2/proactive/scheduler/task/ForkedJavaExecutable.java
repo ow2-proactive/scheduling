@@ -75,7 +75,6 @@ import org.ow2.proactive.scheduler.common.exception.InternalSchedulerException;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.exception.UserException;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
-import org.ow2.proactive.scheduler.common.task.SimpleTaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
@@ -335,10 +334,6 @@ public class ForkedJavaExecutable extends JavaExecutable {
      * @return The taskLogs representing the
      */
     public TaskLogs getLogs() {
-        //if envscript has failed, logs can be null
-        if (logs == null) {
-            return new SimpleTaskLogs();
-        }
         return logs;
     }
 
