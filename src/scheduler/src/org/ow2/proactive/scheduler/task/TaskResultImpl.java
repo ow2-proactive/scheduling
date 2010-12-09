@@ -39,7 +39,9 @@ package org.ow2.proactive.scheduler.task;
 import java.io.File;
 import java.io.IOException;
 import java.io.NotSerializableException;
+import java.io.PrintWriter;
 import java.io.Serializable;
+import java.io.StringWriter;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Hashtable;
@@ -436,8 +438,35 @@ public class TaskResultImpl implements TaskResult {
             return "[DEFAULT DESCRIPTION] " + value;
         } else {
             // yes, Guillaume, I know...
-            return "[DEFAULT DESCRIPTION] " + exception;
+            return "[DEFAULT DESCRIPTION] " + stackTraceToString(exception);
         }
+    }
+
+    /**
+     * Return the stack trace of the given exception in a string.
+     *
+     * @param e an exception or throwable
+     * @return the stack trace of the given exception in a string.
+     */
+    private String stackTraceToString(Throwable e) {
+        String retValue = null;
+        StringWriter sw = null;
+        PrintWriter pw = null;
+        try {
+            sw = new StringWriter();
+            pw = new PrintWriter(sw);
+            e.printStackTrace(pw);
+            retValue = sw.toString();
+        } finally {
+            try {
+                if (pw != null)
+                    pw.close();
+                if (sw != null)
+                    sw.close();
+            } catch (IOException ignore) {
+            }
+        }
+        return retValue;
     }
 
     /**
