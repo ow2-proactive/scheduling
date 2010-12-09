@@ -420,7 +420,7 @@ public class SchedulerStateRest {
     String taskname) throws Throwable {
         Scheduler s = checkAccess(sessionId);
         //    	TaskResult taskResult = s.getTaskResult(jobId, taskname);
-        TaskResult taskResult = workaroundforSCHEDULING863(s, jobId, taskname);
+        TaskResult taskResult = s.getTaskResult(jobId, taskname);
         if (taskResult == null) {
             // task is not finished yet
             return null;
@@ -460,7 +460,7 @@ public class SchedulerStateRest {
     String jobId, @PathParam("taskname")
     String taskname) throws Throwable {
         Scheduler s = checkAccess(sessionId);
-        TaskResult tr = workaroundforSCHEDULING863(s, jobId, taskname);
+        TaskResult tr = s.getTaskResult(jobId, taskname);
         tr = PAFuture.getFutureValue(tr);
         return ((TaskResultImpl) tr).getSerializedValue();
     }
@@ -482,7 +482,7 @@ public class SchedulerStateRest {
     String taskname) throws NotConnectedException, UnknownJobException, UnknownTaskException,
             PermissionException {
         Scheduler s = checkAccess(sessionId);
-        TaskResult tr = workaroundforSCHEDULING863(s, jobId, taskname);
+        TaskResult tr = s.getTaskResult(jobId, taskname);
         return PAFuture.getFutureValue(tr);
     }
 
@@ -502,7 +502,7 @@ public class SchedulerStateRest {
     String taskname) throws NotConnectedException, UnknownJobException, UnknownTaskException,
             PermissionException {
         Scheduler s = checkAccess(sessionId);
-        TaskResult tr = workaroundforSCHEDULING863(s, jobId, taskname);
+        TaskResult tr = s.getTaskResult(jobId, taskname);
         return tr.getOutput().getAllLogs(true);
 
     }
@@ -523,7 +523,7 @@ public class SchedulerStateRest {
     String taskname) throws NotConnectedException, UnknownJobException, UnknownTaskException,
             PermissionException {
         Scheduler s = checkAccess(sessionId);
-        TaskResult tr = workaroundforSCHEDULING863(s, jobId, taskname);
+        TaskResult tr = s.getTaskResult(jobId, taskname);
         return tr.getOutput().getStderrLogs(true);
 
     }
@@ -544,7 +544,7 @@ public class SchedulerStateRest {
     String taskname) throws NotConnectedException, UnknownJobException, UnknownTaskException,
             PermissionException {
         Scheduler s = checkAccess(sessionId);
-        TaskResult tr = workaroundforSCHEDULING863(s, jobId, taskname);
+        TaskResult tr = s.getTaskResult(jobId, taskname);
         return tr.getOutput().getStdoutLogs(true);
 
     }
@@ -944,21 +944,6 @@ public class SchedulerStateRest {
     final String sessionId) throws NotConnectedException, PermissionException {
         final Scheduler s = checkAccess(sessionId);
         return s.isConnected();
-    }
-
-    private TaskResult workaroundforSCHEDULING863(Scheduler s, String jobId, String taskName)
-            throws UnknownTaskException, NotConnectedException, UnknownJobException, PermissionException {
-        try {
-            return s.getTaskResult(jobId, taskName);
-        } catch (RuntimeException e) {
-            if (e.getMessage().contains("has not been found in this job result")) {
-                throw new UnknownTaskException("Result of task " + taskName +
-                    " does not exist or task is not yet finished");
-            } else {
-                throw e;
-            }
-        }
-
     }
 
     /**
