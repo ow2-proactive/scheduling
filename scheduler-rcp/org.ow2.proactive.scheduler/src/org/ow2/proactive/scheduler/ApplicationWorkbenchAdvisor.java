@@ -61,13 +61,10 @@ public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
         // To restore window preferences
         configurer.setSaveAndRestore(true);
 
-        // Sets the look of the tabs like Eclipse 3.x
         PlatformUI.getPreferenceStore().setValue(IWorkbenchPreferenceConstants.SHOW_TRADITIONAL_STYLE_TABS,
-                false);
+                true);
         PlatformUI.getPreferenceStore()
                 .setValue(IWorkbenchPreferenceConstants.SHOW_PROGRESS_ON_STARTUP, true);
-        PlatformUI.getPreferenceStore().setValue(IWorkbenchPreferenceConstants.DOCK_PERSPECTIVE_BAR,
-                "topRight");
     }
 
     /**
