@@ -113,6 +113,8 @@ final class SchedulingMethodImpl implements SchedulingMethod {
 
     protected PrivateKey corePrivateKey;
 
+    protected TopologyDescriptor tdescriptor = null;
+
     protected boolean topologyDisabled = false;
 
     SchedulingMethodImpl(SchedulerCore core) {
@@ -305,7 +307,7 @@ final class SchedulingMethodImpl implements SchedulingMethod {
             InternalTask internalTask = currentJob.getIHMTasks().get(etd.getId());
             int neededNodes = internalTask.getNumberOfNodesNeeded();
             SchedulingTaskComparator referent = new SchedulingTaskComparator(internalTask, currentJob
-                    .getOwner());
+                    .getOwner(), tdescriptor);
             logger_dev.debug("Get the most nodes matching the current selection");
             boolean firstLoop = true;
             do {
@@ -329,7 +331,8 @@ final class SchedulingMethodImpl implements SchedulingMethod {
                     //(multi-nodes starvation may occurs)
                 } else {
                     //check if the task is compatible with the other previous one
-                    if (referent.equals(new SchedulingTaskComparator(internalTask, currentJob.getOwner()))) {
+                    if (referent.equals(new SchedulingTaskComparator(internalTask, currentJob.getOwner(),
+                        tdescriptor))) {
                         neededResource += neededNodes;
                         maxResource -= neededNodes;
                         toFill.add(etd);
@@ -368,7 +371,7 @@ final class SchedulingMethodImpl implements SchedulingMethod {
 
         if (logger.isDebugEnabled()) {
             SchedulingTaskComparator referent = new SchedulingTaskComparator(internalTask, currentJob
-                    .getOwner());
+                    .getOwner(), null);
             logger.debug("Referent task         : " + internalTask.getId());
             logger.debug("Selection script(s)   : " +
                 ((referent.getSsHashCode() == 0) ? "no" : "yes (" + referent.getSsHashCode() + ")"));
@@ -377,7 +380,6 @@ final class SchedulingMethodImpl implements SchedulingMethod {
 
         try {
             //apply topology if number of resource demanded is more than one
-            TopologyDescriptor tdescriptor = null;
             //if multinode is demanded, every following internal task have more than one task
             //if simple node task is demanded, every internal task have only one node
             if (!isTopologyDisabled() && internalTask.getNumberOfNodesNeeded() > 1) {

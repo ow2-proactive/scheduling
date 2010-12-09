@@ -36,6 +36,7 @@
  */
 package org.ow2.proactive.scheduler.core;
 
+import org.ow2.proactive.resourcemanager.frontend.topology.descriptor.TopologyDescriptor;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scripting.SelectionScript;
 
@@ -52,16 +53,18 @@ public class SchedulingTaskComparator {
     private InternalTask task;
     private int ssHashCode;
     private String owner;
+    private TopologyDescriptor topoDesc;
 
     /**
      * Create a new instance of SchedulingTaskComparator
      *
      * @param task
      */
-    public SchedulingTaskComparator(InternalTask task, String owner) {
+    public SchedulingTaskComparator(InternalTask task, String owner, TopologyDescriptor desc) {
         this.task = task;
         this.ssHashCode = SelectionScript.hashCodeFromList(task.getSelectionScripts());
         this.owner = owner;
+        this.topoDesc = desc;
     }
 
     /**
@@ -92,8 +95,10 @@ public class SchedulingTaskComparator {
         //test whether both task are multi-node or not
         boolean sameMutliNode = (task.getNumberOfNodesNeeded() == 1 && tcomp.task.getNumberOfNodesNeeded() == 1) ||
             (task.getNumberOfNodesNeeded() > 1 && tcomp.task.getNumberOfNodesNeeded() > 1);
-        //add the two tests to the returned value
-        return sameSsHash && sameNodeEx && sameOwner && sameMutliNode;
+        //test whether topology is active or not : if active, do not allow multi-node to be together
+        boolean topo = !((topoDesc != null) && sameMutliNode && task.getNumberOfNodesNeeded() > 1);
+        //add the 5 tests to the returned value
+        return sameSsHash && sameNodeEx && sameOwner && sameMutliNode && topo;
     }
 
     /**
