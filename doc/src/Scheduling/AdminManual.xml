@@ -469,6 +469,16 @@ PASchedulerProperties.updateProperties("your_property_file");
 						</para>
 					</listitem>
 				</itemizedlist>
+				<itemizedlist>
+					<listitem>
+						<para>
+							<emphasis role="italics">pa.scheduler.resourcemanager.authentication.single</emphasis>:
+							Use single or multiple connection to RM : If true the scheduler user will do the requests to RM,
+							if false each Scheduler users have their own connection to RM using their scheduling credentials
+							(default is true)
+						</para>
+					</listitem>
+				</itemizedlist>
 				<para>
 					<emphasis>Hibernate properties</emphasis>
 				</para>
@@ -633,14 +643,13 @@ System.out.println("Scheduler successfully started at : " + sAuth.getHostURL());
 				</para>
 				<programlisting language="java">
 SchedulerFactory.createScheduler(
-	"login",
-	"password",
-	rmp,
+	credentials,
+	new URI("rmi://host:port/"),
 	"org.ow2.proactive.scheduler.policy.PriorityPolicy");
 				</programlisting>
 				<para>
-					where arguments are the sames plus a <emphasis>login</emphasis> and a <emphasis>password</emphasis>
-					as a string that authenticate the administrator who wants to connect. The user has to be in the login file and
+					where arguments are the sames plus a <emphasis>credentials</emphasis>
+					that authenticate the administrator who wants to connect. The user has to be in the login file and
 					his group has to be 'admin' in the group file.
 				</para>
 			</section>
@@ -867,6 +876,90 @@ scheduler.changePolicy(org.ow2.proactive.scheduler.policy.PriorityPolicy.class);
 				</itemizedlist>
 			</para>
 		</section>
+		<section xml:id="configuring_task_runasme"><info><title>Configuring task for execution under user account</title></info>
+				<para>
+					To allow scheduler users to run task under their account login and password, administrator must configure workers
+					machines (user name//password must be the same as system user name//password) :
+					<orderedlist>
+						<listitem>
+							<para>
+								<emphasis>At system level :</emphasis> Every host machine where tasks will be executed under user account
+								must accept such an execution, the following describe the different system requirement :
+							</para>
+							<itemizedlist>
+								<listitem>
+									<para>
+										<emphasis>On unix system :</emphasis> There are 3 possible ways to allow a user to do so.
+										For each method, user account must be accessible (created or mount) from host (node) :
+										<orderedlist>
+											<listitem>
+												<para>
+													<emphasis role="italics">Use login authentication only :</emphasis>
+													User login (that is scheduler login also) must be put in sudoer list. In this case, scheduler
+													user could start process using his login only.
+												</para>
+											</listitem>
+											<listitem>
+												<para>
+													<emphasis role="italics">Use login//password authentication :</emphasis>
+													User login and password (that is scheduler login//password also) will be used to authenticate user on the node.
+													Requirement is just a valid unix account.
+												</para>
+											</listitem>
+											<listitem>
+												<para>
+													<emphasis role="italics">Use SSH key authentication :</emphasis>
+													User login and password are not used here, administrator must generate ssh key pair,
+													add public key in authorized key and give private key to users. SSH localhost will be used for this method.
+													User must provide (to the scheduler) a credentials containing the corresponding private ssh key. Here's an example of a command to create such a credential :
+												</para>
+												<para>
+													<emphasis>bin/unix/create-cred -F config/authentication/keys/pub.key -l username -p userpwd -k path/to/private/sshkey -o myCredentials.cred</emphasis> :
+													This command will create a new credentials with "username" as login, "userpwd" as password, using scheduler public key at "config/authentication/keys/pub.key"
+													for credentials encryption and using the private ssh key at "path/to/private/sshkey" provided by administrator. The new credential will be stored in "myCredentials.cred"
+												</para>
+											</listitem>
+										</orderedlist>
+									</para>
+								</listitem>
+								<listitem>
+									<para>
+										<emphasis>On Windows system :</emphasis> User account must be created on the windows host with
+										same username//password as the corresponding scheduler user account. The process running the node must be started under
+										administrator user with 2 needed privileges (default windows configuration) : SE_ASSIGNPRIMARYTOKEN_NAME and SE_INCREASE_QUOTA_NAME.
+									</para>
+								</listitem>
+							</itemizedlist>
+						</listitem>
+						<listitem>
+							<para>
+								<emphasis>At node level :</emphasis> The node must be configured by setting the method of system authentication
+								the administrator wants to use. It is done by setting a Java property at node startup,
+								<emphasis role="italics">pa.laucher.forkas.method</emphasis> which value can be :
+								<itemizedlist>
+									<listitem>
+										<para>
+											"none" : no method is used, user cannot execute task under his account
+										</para>
+									</listitem>
+									<listitem>
+										<para>
+											"pwd" : password method is used, user will start the task using his scheduling login and password.
+											On Unix, if sudoer list is used, user will be authenticated using his username only.
+										</para>
+									</listitem>
+									<listitem>
+										<para>
+											"key" : ssh private key is used, user must provide a credentials containing login//password
+											and a private ssh key provided by administrator to allow user to execute process with ssh on localhost.
+										</para>
+									</listitem>
+								</itemizedlist>
+							</para>
+						</listitem>
+					</orderedlist>
+				</para>
+			</section>
 		<section xml:id="accounting"><info><title>Accounting</title></info>
 			<para>
 				The Scheduler keeps track on how much jobs and tasks were done by a user. All the values are computed since the creation of the

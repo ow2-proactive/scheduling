@@ -4,7 +4,7 @@
 	</genericInformation>
 	<javaExecutable class="org.ow2.proactive.scheduler.examples.MonteCarlo" >
 	    <forkEnvironment javaHome="">
-		<jvmArgs>
+			<jvmArgs>
 				<jvmArg value="-d12"/>
 			</jvmArgs>
 	    </forkEnvironment>

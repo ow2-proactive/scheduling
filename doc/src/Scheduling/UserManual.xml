@@ -476,7 +476,7 @@ aTask.setExecutableClassName("org.ow2.proactive.scheduler.examples.WaitAndPrint"
 aTask.setName("task 1");
 aTask.setDescription("This task will do something...");
 aTask.addGenericInformation("key","value");
-aTask.setMxNumberOfExecution(3);
+aTask.setMaxNumberOfExecution(3);
 aTask.setRestartTaskOnError(RestartMode.ELSEWHERE);
 aTask.setCancelJobOnError(false);
 aTask.setResultPreview(UserDefinedResultPreview.class);
@@ -531,20 +531,18 @@ task5.addDependence(task3);
 //or use the addDependences(list&lt;Task&gt;) method as shown
 //task5.addDependences(new ArrayList&lt;Task&gt;(task2,task3));
 
-//set this task as forked
-aTask.setFork(true);
 //set a walltime
 aTask.setWallTime(10000);
-//you can also define a fork environment
+//Define a fork environment to fork the executable (can be empty)
 ForkEnvironment env = new ForkEnvironment();
 env.setJavaHome("Your/java/home/path");
-env.setJVMParameters("-d12");
+env.addJVMArgument("-d12");
 aTask.setForkEnvironment(env);
 				</programlisting>
 				<para>
-					If the fork attribute is 'true', the java executable will be started on a brand new JVM
-					with new environment. If fork remains unset and a walltime is define, so the task will
-					automatically be forked. This allows the Scehduler to kill the java process at the end of walltime.
+					If a forkEnvironment is set (even empty), the java executable will be started on a brand new JVM
+					with new environment. If a walltime is defined, so the task will
+					automatically be forked. This allows the Scheduler to kill the java process at the end of walltime.
 				</para>
 				<para>
 					To have an exhaustive list of available options and theirs functions, please refer to
@@ -866,23 +864,81 @@ task2.setGenerationScript(gscript);
 					</listitem>
 					<listitem>
 						<para>
-							<emphasis>fork and forkEnvironment</emphasis> (optional, only for Java Task) -
-							defines respectively whether a task has to be forked and if so, defines the fork environment.
+							<emphasis>runAsMe</emphasis> (optional - default false) -
+							defines if the executable process should be executed under user specific name using
+							its authentication credentials (such as login, password, or ssh key).
+							If the targeted executable is a java executable, setting this argument (true) implies
+							having a forked JVM : It means a new JVM will be created in a process owned by the user himself.
+							For further information about this feature, please go to <xref linkend="starting_task_runasme"/>
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							<emphasis>forkEnvironment</emphasis> (optional, only for Java Executable) -
+							defines whether a task has to be forked and defines its the forked environment.
 							The purpose of a Forked Java Task is to gain more flexibility with
 							respect to the execution environment of a task.
-							A new JVM is started with an inherited classpath and (possibly) redefined Java home path and JVM properties.
-							It allows to use a JVM from a different provider and specify options to be passed to JVM (like memory usage).
+							A new JVM is started with an inherited classpath and (possibly) add classpath or redefined Java home path, JVM arguments,
+							sytem environment, working directory or set a script to programmatically configure this fork environment.
+						</para>
+						<para>
+							A Forked Java Task is just defined as a Java Task with a forkEnvironment element.
 
-							A Forked Java Task is defined as a Java Task with a forkEnvironment element.
-
-							A forkEnvironment element aims at providing javaHome and jvmParameters attributes.
-							For any undefined attribute a default environment value will be applied. Note that, the javaHome
+							For any undefined elements a default empty value will be applied. Note that, the javaHome
 							attribute points only to the Java installation directory and not the Java application itself.
 
 							If the javaHome is not specified then the ProActive Scheduler will execute simply a Java command assuming
-							that it is defined in the user path. The 'jvmParameters' attribute is a string composed of a sequence
-							of Java options separated by spaces.
+							that it is defined in the user path.
 							See <xref linkend="Create_java_task"/> for an illustration of their usage.
+						</para>
+						<para>
+							A fork environment can contains the following items :
+							<itemizedlist>
+								<listitem>
+									<para>
+										<emphasis>javaHome</emphasis> : string containing the Java installation directory
+										that will be used on worker side to start the JVM. (Default is java property "java.home")
+									</para>
+								</listitem>
+								<listitem>
+									<para>
+										<emphasis>workingDir</emphasis> : string representing the working directory of the
+										newly created JVM. Every relative path will be relative to this directory in the application.
+										Note : the application itself is not started inside this directory.
+									</para>
+								</listitem>
+								<listitem>
+									<para>
+										<emphasis>SystemProperties</emphasis> : list of system "property" representing
+										the system environment that will be applied to the forked JVM process.
+										A property can be append or not to a previous existing property.
+									</para>
+								</listitem>
+								<listitem>
+									<para>
+										<emphasis>jvmArgs</emphasis> : list of "jvmArg" representing every
+										java argument that will be passed to JVM at startup
+									</para>
+								</listitem>
+								<listitem>
+									<para>
+										<emphasis>additionalClasspath</emphasis> : list of "pathElement" representing the classpath
+										to be added when starting the new JVM.
+									</para>
+								</listitem>
+								<listitem>
+									<para>
+										<emphasis>envScript</emphasis> : Environment script (javascript, ruby, python) that is able
+										to add/change each items of the fork environment programmatically.
+										This script will be executed on worker side. We provide a variable named "forkEnvironment" which
+										is exactly representing the java object that was set at client side plus the local worker environment.
+										For exemple, if user set the PATH variable to append "my/path", the fork environment in the script
+										will contain a variable PATH that will be "LOCAL_PATH_VARIABLE:my/path" where LOCAL_PATH_VARIABLE is
+										the PATH content of the process to be started.
+										In this script, the "forkEnvironment" variable can be used exactly as it is in java API.
+									</para>
+								</listitem>
+							</itemizedlist>
 						</para>
 					</listitem>
 					<listitem>
@@ -1029,7 +1085,7 @@ task2.setGenerationScript(gscript);
 							</listitem>
 							<listitem>
 								<para>
-									<emphasis>post-script</emphasis>  - the post-script is executed on the same node
+									<emphasis>post-script</emphasis> - the post-script is executed on the same node
 									<emphasis>after</emphasis> the task itself in any case.
 									A boolean variable named "success" is available in this script in order to
 									inform user about the success of the task execution. if success is true, the execution
@@ -1075,6 +1131,45 @@ task2.setGenerationScript(gscript);
 				</itemizedlist>
 				<para>
 					Once your job created, next step is to submit it to the ProActive Scheduler.
+				</para>
+			</section>
+			<section xml:id="starting_task_runasme"><info><title>Starting a task under a specific user (runAsMe=true)</title></info>
+				<para>
+					It is possible to start a task under the job owner if the system is configured for that purpose.
+					Their are 3 possible ways to run the task under user account (in any case, the administrator should have set
+					the workers to authorize one of the 3 methods) :
+				</para>
+				<itemizedlist>
+					<listitem>
+						<para>
+						<emphasis>using your Scheduling login</emphasis> : if workers are configured and user is authorized
+						to run a process under his login without password.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+						<emphasis>using your Scheduling login and password</emphasis> : if workers are configured and user is authorized
+						to run a process under his login and password.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							<emphasis>using an ssh key</emphasis> provided by the administrator : if workers are configured,
+							the administrator should have gave user a sshkey. User must first create a credential containing this key :
+						</para>
+						<para>
+							<emphasis>bin/unix/create-cred -F config/authentication/keys/pub.key -l username -p userpwd -k path/to/private/sshkey -o myCredentials.cred</emphasis> :
+							This command will create a new credentials with "username" as login, "userpwd" as password, using scheduler public key at "config/authentication/keys/pub.key"
+							for credentials encryption and using the private ssh key at "path/to/private/sshkey" provided by administrator. The new credential will be stored in "myCredentials.cred"
+						</para>
+						<para>
+							Once created, user must connect the scheduler using this credential. (In this case, workers must be under UNIX system)
+						</para>
+					</listitem>
+				</itemizedlist>
+				<para>
+					<emphasis>Note :</emphasis> In the current version and for technical issues, system properties in ForkEnvironment won't be taken into account
+					when "runAsMe" property is true.
 				</para>
 			</section>
 		</section>
@@ -2203,7 +2298,7 @@ scheduler.submit(job);
 			</section>
 			<section xml:id="get_result_sh"><info><title>Get a job result using the shell command</title></info>
 				<para>
-					To get the result of you job using a command line, launch the command <emphasis>scheduler-client[.bat] -result jobID</emphasis> script in the bin/[os]/ directory.
+					To get the result of you job using a command line, launch the command <emphasis>scheduler-client[.bat] -jobresult jobID</emphasis> script in the bin/[os]/ directory.
 					This script has 2 optional options:
 					<itemizedlist>
 						<listitem>
@@ -2365,13 +2460,13 @@ scheduler.addEventListener(mySchedulerEventListener, true, SchedulerEvent.JOB_RU
 					</listitem>
 					<listitem>
 						<para>
-							<emphasis>scheduler-client[.bat] -output 12</emphasis>: prompts for a username and
+							<emphasis>scheduler-client[.bat] -joboutput 12</emphasis>: prompts for a username and
 							its password and displays the output written by job 12 if it is finished.
 						</para>
 					</listitem>
 					<listitem>
 						<para>
-							<emphasis>scheduler-client[.bat] -result 34</emphasis>: prompts for a username and
+							<emphasis>scheduler-client[.bat] -jobresult 34</emphasis>: prompts for a username and
 							its password and displays the result of job 34 if it is finished.
 						</para>
 					</listitem>
@@ -2398,9 +2493,9 @@ scheduler.addEventListener(mySchedulerEventListener, true, SchedulerEvent.JOB_RU
 					In batch mode, this public key will be used when encrypting the credentials with the bin/[os]/createCred[.bat] script:
 					<programlisting language="sh"><![CDATA[
 # use local public key to generate credentials for user 'demo'
-/bin/unix $ ./create-cred -P $HOME/.proactive/scheduler_pubkey -o $HOME/.proactive/my_encrypted_credentials -l demo
-# use rmi://example.com/SCHEDULER's public key to generate credentials for user 'admin' with pass 'admin' in non-interactive mode
-/bin/unix $ ./create-cred -U rmi://example.com/SCHEDULER -o $HOME/.proactive/my_encrypted_credentials -l admin -p admin
+/bin/unix $ ./create-cred -F $HOME/.proactive/scheduler_pubkey -o $HOME/.proactive/my_encrypted_credentials -l demo
+# use rmi://example.com/'s public key to generate credentials for user 'admin' with pass 'admin' in non-interactive mode
+/bin/unix $ ./create-cred -S rmi://example.com/ -o $HOME/.proactive/my_encrypted_credentials -l admin -p admin
 ]]></programlisting>
 					When running the controller, Credentials will now be retreived when properly designated by the
 					<emphasis>pa.common.auth.credentials</emphasis> property; ie. using
@@ -2450,7 +2545,7 @@ Job 1 paused.
   &gt; resumejob(1);
 Job 1 resumed.
 
-  &gt; result(myId);
+  &gt; jobresult(myId);
 Job 2 result =&gt;
 
 	 Average1 : 3.1414783733333334
@@ -2463,7 +2558,7 @@ Job 2 result =&gt;
 	 Computation2 : 3.14152068
 	 Computation6 : 3.1417134
 
-  &gt; output(myId);
+  &gt; joboutput(myId);
 Job 2 output =&gt;
 
 Average1 :
@@ -2487,7 +2582,7 @@ Parameters are :
 Average is : 3.1414993000000004
 
 
-  &gt; myResult = result(1)
+  &gt; myResult = jobresult(1)
 Job 1 result =&gt;
 
 	 Average1 : 3.14164032
@@ -2529,7 +2624,7 @@ duration = 94386 ms
 					just insert the code below in a '.js' file with:
 				</para>
 				<programlisting>
-myResult = result(1);
+myr = jobresult(1);
 prio = myr.getJobInfo().getPriority();
 status = myr.getJobInfo().getStatus();
 nbfinished =  myr.getJobInfo().getNumberOfFinishedTasks();
@@ -2561,7 +2656,7 @@ Job successfully submitted ! (id=5)
 Job successfully submitted ! (id=6)
 Job successfully submitted ! (id=7)
 
-  &gt; for (i=0;i&lt;5;i++){result(i);}
+  &gt; for (i=0;i&lt;5;i++){jobresult(i);}
 Error on job 0 : The job represented by this ID is unknow !
 Error on job 1 : The job represented by this ID is unknow !
 Error on job 2 : The job represented by this ID is unknow !
@@ -2588,8 +2683,9 @@ Job 4 is not finished or unknown !
 					<itemizedlist>
 						<listitem>
 							<para>
-								<emphasis>scheduler-client -uc -js myenv.js</emphasis> : This command will
-								start the scheduler controller in interactive mode first loading the 'myenv.js' script !
+								<emphasis>scheduler-client -c -js myenv.js</emphasis> : This command will
+								start the scheduler controller in interactive mode first loading the 'myenv.js' script and then connecting
+								the scheduler using default credentials path !
 							</para>
 						</listitem>
 					</itemizedlist>

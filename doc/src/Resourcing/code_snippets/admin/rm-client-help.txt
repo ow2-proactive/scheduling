@@ -1,26 +1,32 @@
 $RM_HOME/bin/unix$ rm-client -h
 
-usage: rm-client [-a <node URLs> | -cn <names> | -d <node URLs> | -jmxinfo | -ln | -lns | -r <names> | -s] [-c <arg>]   [-f] [-g] [-h] [-infrastructure
-       <params>]  [-js <filePath>] [-l <login>]   [-ns <nodes URLs>] [-policy <params>]   [-sf <filePath>] [-u <rmURL>] [-uc]
- -a,--addnodes <node URLs>       <ctl> Add nodes by their URLs
- -c,--credentials <arg>          Path to the credentials (/user/ffonteno/home/.proactive/security/creds.enc).
- -cn,--createns <names>          <ctl> Create new node sources
- -d,--removenodes <node URLs>    <ctl> Remove nodes by their URLs
- -f,--force                      <ctl> Do not wait for busy nodes to be freed before nodes removal, node source removal and shutdown actions (-d, -r and -s)
- -g,--gui                        Start the console in a graphical view
- -h,--help                       Display this help
- -infrastructure <params>        Specify an infrastructure when node source is created
- -jmxinfo                        <ctl> Display some statistics provided by the Scheduler MBean
- -js,--jsenv <filePath>          Execute the given script and go into interactive mode
- -l,--login <login>              The username to join the Resource Manager
- -ln,--listnodes                 <ctl> List nodes handled by Resource Manager. Display is : NODESOURCE HOSTNAME STATE NODE_URL
- -lns,--listns                   <ctl> List node sources on Resource Manager. Display is : NODESOURCE TYPE
- -ns,--nodesource <nodes URLs>   <ctl> Specify an existing node source name for adding nodes
- -policy <params>                Specify a policy when node source is created
- -r,--removens <names>           <ctl> Remove given node sources
- -s,--shutdown                   <ctl> Shutdown Resource Manager
- -sf,--script <filePath>         <ctl> Execute the given script (javascript is supported)
- -u,--rmURL <rmURL>              The Resource manager URL (default rmi://localhost:1099/)
- -uc,--use-creds                 Use credentials retreived from disk
+usage: rm-client [-a <node URLs> | -cn <names> | -d <node URLs> | -ln | -lns | -ma | -ni <nodeURL> | -r <names> | -rp | -s | -stats | -t | -ua <username>] [-c
+       <arg>]   [-env <filePath>] [-f] [-g] [-h] [-i <params>] [-l <login>]     [-ns <nodes URLs>] [-p <params>]    [-sf <filePath arg1=val1 arg2=val2 ...>]   [-u
+       <rmURL>]
+ -a,--addnodes <node URLs>                         <ctl> Add nodes by their URLs
+ -c,--credentials <arg>                            Path to the credentials (/home/jlscheef/.proactive/security/creds.enc).
+ -cn,--createns <names>                            <ctl> Create new node sources
+ -d,--removenodes <node URLs>                      <ctl> Remove nodes by their URLs
+ -env,--environment <filePath>                     Execute the given script and go into interactive mode
+ -f,--force                                        <ctl> Do not wait for busy nodes to be freed before nodes removal, node source removal and shutdown actions
+                                                   (-d, -r and -s)
+ -g,--gui                                          Start the console in a graphical view
+ -h,--help                                         Display this help
+ -i,--infrastructure <params>                      Specify an infrastructure when node source is created
+ -l,--login <login>                                The username to join the Resource Manager
+ -ln,--listnodes                                   <ctl> List nodes handled by Resource Manager. Display is : NODESOURCE HOSTNAME STATE NODE_URL
+ -lns,--listns                                     <ctl> List node sources on Resource Manager. Display is : NODESOURCE TYPE
+ -ma,--myaccount                                   <ctl> Display current user account informations
+ -ni,--nodeinfo <nodeURL>                          <ctl> Display node information
+ -ns,--nodesource <nodes URLs>                     <ctl> Specify an existing node source name for adding nodes
+ -p,--policy <params>                              Specify a policy when node source is created
+ -r,--removens <names>                             <ctl> Remove given node sources
+ -rp,--reloadpermissions                           <ctl> Reload the permission file
+ -s,--shutdown                                     <ctl> Shutdown Resource Manager
+ -sf,--script <filePath arg1=val1 arg2=val2 ...>   <ctl> Execute the given javascript file with optional arguments.
+ -stats,--statistics                               <ctl> Display some statistics about the Resource Manager
+ -t,--topology                                     <ctl> Displays nodes topology.
+ -u,--rmURL <rmURL>                                The Resource manager URL (default rmi://localhost:1099/)
+ -ua,--useraccount <username>                      <ctl> Display account information by username
 
 NOTE : if no <ctl>  command is specified, the controller will start in interactive mode.

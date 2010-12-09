@@ -852,7 +852,7 @@ public class HelloTask extends JavaExecutable{
 
 		<mediaobject>
 		<imageobject>
-		<imagedata scalefit="1" width="100%" contentdepth="100%" fileref="images/png/tutorial/context_menu.png" format="PNG"/>
+		<imagedata scalefit="1" width="80%" contentdepth="100%" fileref="images/png/tutorial/context_menu.png" format="PNG"/>
 		</imageobject>
 	</mediaobject>
 	</figure>
