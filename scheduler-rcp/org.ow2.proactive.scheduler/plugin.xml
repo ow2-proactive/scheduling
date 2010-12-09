@@ -139,5 +139,29 @@
             class="org.ow2.proactive.scheduler.gui.preferences.PreferenceInitializer">
       </initializer>
    </extension>
+   <extension
+         point="org.eclipse.ui.actionSets">
+      <actionSet
+            id="org.ow2.proactive.scheduler.actionSet"
+            label="Sample Action Set"
+            visible="true">
+         <menu
+               id="schedulerMenu"
+               label="&amp;Scheduler">
+            <groupMarker
+                  name="schedulerGroup2">
+            </groupMarker>
+         </menu>
+         <action
+               class="org.ow2.proactive.scheduler.gui.actions.ExitAction"
+               icon="icons/exit.png"
+               id="org.ow2.proactive.scheduler.gui.actions.ExitAction"
+               label="E&amp;xit"
+               menubarPath="schedulerMenu/schedulerGroup2"
+               style="push"
+               tooltip="Exit Scheduler">
+         </action>
+      </actionSet>
+   </extension>
 
 </plugin>

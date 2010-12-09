@@ -104,10 +104,12 @@ public class ResultPreview extends ViewPart {
             toBeDisplayed.revalidate();
         }
         container.repaint();
-        root.pack();
-        root.redraw();
-        root.update();
-        root.getParent().layout();
+        if (!root.isDisposed()) {
+            root.pack();
+            root.redraw();
+            root.update();
+            root.getParent().layout();
+        }
     }
 
     /**
