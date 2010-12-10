@@ -217,8 +217,9 @@ public class PluginDescriptor implements Serializable {
                 params += field.getName();
                 //we add a default value
                 if (!field.getValue().equals("")) {
-                    params += "[" + field.getValue() + "]" + " ";
+                    params += "[" + field.getValue() + "]";
                 }
+                params += " ";
             }
             result += "Parameters: <class name> " + params + "\n";
         }
