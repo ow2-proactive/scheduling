@@ -195,9 +195,9 @@ public class JavaTaskLauncher extends TaskLauncher {
                     .getContextClassLoader());
             for (Entry<String, Serializable> arg : args.entrySet()) {
                 if (arg.getValue() instanceof String) {
-                    String str = ((String) arg.getValue()).replaceAll(ITERATION_INDEX_TAG, "" +
+                    String str = ((String) arg.getValue()).replace(ITERATION_INDEX_TAG, "" +
                         this.iterationIndex);
-                    str = str.replaceAll(REPLICATION_INDEX_TAG, "" + this.replicationIndex);
+                    str = str.replace(REPLICATION_INDEX_TAG, "" + this.replicationIndex);
                     jinit.setArgument(arg.getKey(), str);
                 }
             }

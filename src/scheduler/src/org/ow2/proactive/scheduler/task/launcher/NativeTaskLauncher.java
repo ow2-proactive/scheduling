@@ -232,8 +232,8 @@ public class NativeTaskLauncher extends TaskLauncher {
         String[] cmd = ne.getCommand();
         if (cmd != null) {
             for (int i = 0; i < cmd.length; i++) {
-                cmd[i] = cmd[i].replaceAll(ITERATION_INDEX_TAG, "" + this.iterationIndex);
-                cmd[i] = cmd[i].replaceAll(REPLICATION_INDEX_TAG, "" + this.replicationIndex);
+                cmd[i] = cmd[i].replace(ITERATION_INDEX_TAG, "" + this.iterationIndex);
+                cmd[i] = cmd[i].replace(REPLICATION_INDEX_TAG, "" + this.replicationIndex);
             }
         }
     }

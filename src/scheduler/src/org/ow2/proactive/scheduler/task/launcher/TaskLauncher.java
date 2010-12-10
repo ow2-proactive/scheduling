@@ -212,10 +212,10 @@ public abstract class TaskLauncher implements InitActive {
     protected KillTask killTaskTimer = null;
 
     /** Will be replaced in file paths by the task's iteration index */
-    protected static final String ITERATION_INDEX_TAG = "\\$IT";
+    protected static final String ITERATION_INDEX_TAG = "$IT";
 
     /** Will be replaced in file paths by the task's replication index */
-    protected static final String REPLICATION_INDEX_TAG = "\\$REP";
+    protected static final String REPLICATION_INDEX_TAG = "$REP";
 
     /**
      * ProActive empty constructor.
@@ -963,14 +963,14 @@ public abstract class TaskLauncher implements InitActive {
 
                     if (inc != null) {
                         for (int i = 0; i < inc.length; i++) {
-                            inc[i] = inc[i].replaceAll(ITERATION_INDEX_TAG, "" + this.iterationIndex);
-                            inc[i] = inc[i].replaceAll(REPLICATION_INDEX_TAG, "" + this.replicationIndex);
+                            inc[i] = inc[i].replace(ITERATION_INDEX_TAG, "" + this.iterationIndex);
+                            inc[i] = inc[i].replace(REPLICATION_INDEX_TAG, "" + this.replicationIndex);
                         }
                     }
                     if (exc != null) {
                         for (int i = 0; i < exc.length; i++) {
-                            exc[i] = exc[i].replaceAll(ITERATION_INDEX_TAG, "" + this.iterationIndex);
-                            exc[i] = exc[i].replaceAll(REPLICATION_INDEX_TAG, "" + this.replicationIndex);
+                            exc[i] = exc[i].replace(ITERATION_INDEX_TAG, "" + this.iterationIndex);
+                            exc[i] = exc[i].replace(REPLICATION_INDEX_TAG, "" + this.replicationIndex);
                         }
                     }
 
@@ -985,14 +985,14 @@ public abstract class TaskLauncher implements InitActive {
 
                     if (inc != null) {
                         for (int i = 0; i < inc.length; i++) {
-                            inc[i] = inc[i].replaceAll(ITERATION_INDEX_TAG, "" + this.iterationIndex);
-                            inc[i] = inc[i].replaceAll(REPLICATION_INDEX_TAG, "" + this.replicationIndex);
+                            inc[i] = inc[i].replace(ITERATION_INDEX_TAG, "" + this.iterationIndex);
+                            inc[i] = inc[i].replace(REPLICATION_INDEX_TAG, "" + this.replicationIndex);
                         }
                     }
                     if (exc != null) {
                         for (int i = 0; i < exc.length; i++) {
-                            exc[i] = exc[i].replaceAll(ITERATION_INDEX_TAG, "" + this.iterationIndex);
-                            exc[i] = exc[i].replaceAll(REPLICATION_INDEX_TAG, "" + this.replicationIndex);
+                            exc[i] = exc[i].replace(ITERATION_INDEX_TAG, "" + this.iterationIndex);
+                            exc[i] = exc[i].replace(REPLICATION_INDEX_TAG, "" + this.replicationIndex);
                         }
                     }
 
@@ -1015,12 +1015,12 @@ public abstract class TaskLauncher implements InitActive {
         String code = script.getScript();
         String[] args = script.getParameters();
 
-        code = code.replaceAll(ITERATION_INDEX_TAG, "" + this.iterationIndex);
-        code = code.replaceAll(REPLICATION_INDEX_TAG, "" + this.replicationIndex);
+        code = code.replace(ITERATION_INDEX_TAG, "" + this.iterationIndex);
+        code = code.replace(REPLICATION_INDEX_TAG, "" + this.replicationIndex);
         if (args != null) {
             for (int i = 0; i < args.length; i++) {
-                args[i] = args[i].replaceAll(ITERATION_INDEX_TAG, "" + this.iterationIndex);
-                args[i] = args[i].replaceAll(REPLICATION_INDEX_TAG, "" + this.replicationIndex);
+                args[i] = args[i].replace(ITERATION_INDEX_TAG, "" + this.iterationIndex);
+                args[i] = args[i].replace(REPLICATION_INDEX_TAG, "" + this.replicationIndex);
             }
         }
 
