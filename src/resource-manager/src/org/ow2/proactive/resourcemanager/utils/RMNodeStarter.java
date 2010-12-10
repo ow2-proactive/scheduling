@@ -103,7 +103,7 @@ public class RMNodeStarter {
     protected static final String URL_TMPFILE_PREFIX = "PA-AGENT_URL";
 
     /** Name of the java property to set the rank */
-    protected final static String RANK_PROP_NAME = "pa.agent.rank";
+    protected final static String RANK_PROP_NAME = "proactive.agent.rank";
 
     /**
      * The starter will try to connect to the Resource Manager before killing
@@ -654,9 +654,10 @@ public class RMNodeStarter {
     /**
      * Create the name of the temp file for storing node URL.
      */
-    protected String getNodeURLFilename(String nodeName, int rank) {
+    private String getNodeURLFilename(String nodeName, int rank) {
         final String tmpDir = System.getProperty("java.io.tmpdir");
-        final String tmpFile = tmpDir + "_" + URL_TMPFILE_PREFIX + "_" + nodeName + "-" + rank;
+        final String tmpFile = new File(tmpDir, URL_TMPFILE_PREFIX + "_" + nodeName + "-" + rank)
+                .getAbsolutePath();
         return tmpFile;
     }
 
