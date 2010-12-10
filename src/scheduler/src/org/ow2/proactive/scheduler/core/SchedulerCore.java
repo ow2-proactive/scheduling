@@ -615,8 +615,8 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
                                 (System.currentTimeMillis() - startTerm));
                         }
 
-                    } catch (Throwable e) {
-                        //this point is reached in case of big problem, sometimes unknown
+                    } catch (Exception e) {
+                        //this point is reached in case of unknown problems
                         logger
                                 .error(
                                         "\nSchedulerCore.runActivity(MAIN_LOOP) caught an EXCEPTION - it will not terminate the body !",
@@ -643,6 +643,17 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
                                         + "*****************************************************************************************************************");
                             frontend.schedulerStateUpdated(SchedulerEvent.RM_DOWN);
                         }
+                    } catch (Error e) {
+                        //this point is reached in case of big problem, sometimes unknown
+                        logger.error("\nSchedulerCore.runActivity(MAIN_LOOP) caught an ERROR !", e);
+                        //Terminate proxy and disconnecting RM
+                        logger_dev.error("Resource Manager will be disconnected");
+                        rmProxiesManager.terminateSchedulerRMProxy();
+                        rmProxiesManager.terminateAllUsersRMProxies();
+                        //if failed
+                        freeze();
+                        //scheduler functionality are reduced until now
+                        status = SchedulerStatus.UNLINKED;
                     }
                 }
 
