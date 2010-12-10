@@ -510,7 +510,9 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      */
     public void internalAddNodeToCore(String nodeURL) {
         if (!this.allNodes.containsKey(nodeURL)) {
-            throw new IllegalArgumentException("Cannot retrieve the RMNode to add");
+            //does nothing, the node has been removed preemptively
+            //during its configuration
+            return;
         }
         //was added during internalRegisterConfiguringNode
         RMNode rmnode = this.allNodes.get(nodeURL);

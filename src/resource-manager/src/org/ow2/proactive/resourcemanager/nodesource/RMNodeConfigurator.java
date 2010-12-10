@@ -80,7 +80,9 @@ public class RMNodeConfigurator {
             rmcore.internalAddNodeToCore(nodeURL);
         } catch (Exception e) {
             logger.warn("Cannot add node to core because of an error during configuration phase", e);
-            rmcore.removeNode(nodeURL, false);
+            //preemtpive removal compulsory, otherwise the nodes is
+            //"toBeRemoved" forever
+            rmcore.removeNode(nodeURL, true);
         }
     }
 
