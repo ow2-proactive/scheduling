@@ -1151,24 +1151,30 @@ public class RMNodeStarter {
                 sb.append(" ");
                 sb.append(this.getCredentialsValue());
             }
-            sb.append(" -");
-            sb.append(OPTION_NODE_NAME);
-            sb.append(" ");
-            sb.append(this.getNodeName());
-            sb.append(" -");
-            sb.append(OPTION_PING_DELAY);
-            sb.append(" ");
-            sb.append(this.getPingDelay());
+            if (this.getNodeName() != null) {
+                sb.append(" -");
+                sb.append(OPTION_NODE_NAME);
+                sb.append(" ");
+                sb.append(this.getNodeName());
+            }
             if (this.getSourceName() != null) {
                 sb.append(" -");
                 sb.append(OPTION_SOURCE_NAME);
                 sb.append(" ");
                 sb.append(this.getSourceName());
             }
-            sb.append(" -");
-            sb.append(OPTION_RM_URL);
-            sb.append(" ");
-            sb.append(this.getRmURL());
+            if (this.getRmURL() != null) {
+                //if the rm url != null we can specify a ping delay
+                //it is not relevant if the rm url == null
+                sb.append(" -");
+                sb.append(OPTION_PING_DELAY);
+                sb.append(" ");
+                sb.append(this.getPingDelay());
+                sb.append(" -");
+                sb.append(OPTION_RM_URL);
+                sb.append(" ");
+                sb.append(this.getRmURL());
+            }
             return sb.toString();
         }
 
