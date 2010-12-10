@@ -110,15 +110,15 @@ public class ForkEnvironment implements Serializable {
      * a base environment on which to apply client env
      */
     @Transient
-    private transient Map<String, String> baseSystemProperties = null;
+    private transient Map<String, String> baseSystemEnvironment = null;
 
     /**
-     * Arguments passed to Java (not an application) (example: memory settings or properties)
+     * User custom system environment : can modify base env or create new variable
      */
     @OneToMany(targetEntity = PropertyModifier.class)
     @LazyCollection(value = LazyCollectionOption.FALSE)
     @Cascade(CascadeType.ALL)
-    private List<PropertyModifier> systemProperties = null;
+    private List<PropertyModifier> systemEnvironment = null;
 
     /**
      * Arguments passed to Java (not an application) (example: memory settings or properties)
@@ -156,11 +156,11 @@ public class ForkEnvironment implements Serializable {
      * @param baseEnv the environment on witch to base the user env.
      */
     protected ForkEnvironment(ForkEnvironment forkEnv, Map<String, String> baseEnv) {
-        this.baseSystemProperties = baseEnv;
+        this.baseSystemEnvironment = baseEnv;
         if (forkEnv != null) {
             this.javaHome = forkEnv.javaHome;
             this.workingDir = forkEnv.workingDir;
-            this.systemProperties = forkEnv.systemProperties;
+            this.systemEnvironment = forkEnv.systemEnvironment;
             this.jvmArguments = forkEnv.jvmArguments;
             this.additionalClasspath = forkEnv.additionalClasspath;
             this.script = forkEnv.script;
@@ -204,22 +204,22 @@ public class ForkEnvironment implements Serializable {
     }
 
     /**
-     * Return a copy of the system properties, empty map if no properties.
+     * Return a copy of the system environment, empty map if no variables.
      *
-     * @return a copy of the system properties, empty map if no properties.
+     * @return a copy of the system environment, empty map if no variables.
      */
-    public Map<String, String> getSystemProperties() {
-        if (this.systemProperties == null && this.baseSystemProperties == null) {
+    public Map<String, String> getSystemEnvironment() {
+        if (this.systemEnvironment == null && this.baseSystemEnvironment == null) {
             return new HashMap<String, String>(0);
         }
         Map<String, String> props;
-        if (baseSystemProperties == null) {
+        if (baseSystemEnvironment == null) {
             props = new HashMap<String, String>();
         } else {
-            props = new HashMap<String, String>(baseSystemProperties);
+            props = new HashMap<String, String>(baseSystemEnvironment);
         }
-        if (systemProperties != null) {
-            for (PropertyModifier pm : systemProperties) {
+        if (systemEnvironment != null) {
+            for (PropertyModifier pm : systemEnvironment) {
                 pm.update(props);
             }
         }
@@ -227,73 +227,73 @@ public class ForkEnvironment implements Serializable {
     }
 
     /**
-     * Add a new systemProperty value from its name and value.
-     * The value can overwrite or be appended to a previous property value with the same name.<br/>
-     * If the append boolean is true, the value will be appended to the old one or to a existing system property.
-     * If not, the value will overwrite the old one.
+     * Get the system environment variable value associated with the given name.
      *
-     * @param name the name of the property to add
-     * @param value the the value associated to the given name
-     * @param append true if this value must be appended to a previous one or a system one, false if overwrite.
-     * @throws IllegalArgumentException if name is null
+     * @param name the name of the variable value to get
+     * @return the system variable value associated with the given name, or null if the variable does not exist.
      */
-    public void addSystemProperty(String name, String value, boolean append) {
-        if (name == null) {
-            throw new IllegalArgumentException("Name cannot be null");
-        }
-        if (this.systemProperties == null) {
-            this.systemProperties = new ArrayList<PropertyModifier>(5);
-        }
-        this.systemProperties.add(new PropertyModifier(name, value, append));
-    }
-
-    /**
-     * Add a new systemProperty value from its name and value.
-     * The value will be appended to a previous property value with the same name using the given appendChar.<br/>
-     * If this value is the first, no append character will be inserted.
-     * Each time a new value is inserted, it appends the appendChar and the new value.
-     *
-     * @param name the name of the property to add
-     * @param value the the value associated to the given name
-     * @param appendChar The character used to append this value with a previous one.
-     * @throws IllegalArgumentException if name is null
-     */
-    public void addSystemProperty(String name, String value, char appendChar) {
-        if (name == null) {
-            throw new IllegalArgumentException("Name cannot be null");
-        }
-        if (this.systemProperties == null) {
-            this.systemProperties = new ArrayList<PropertyModifier>(5);
-        }
-        this.systemProperties.add(new PropertyModifier(name, value, appendChar));
-    }
-
-    /**
-     * Get the system property value associated with the given name.
-     *
-     * @param name the name of the property value to get
-     * @return the system property value associated with the given name, or null if the property does not exist.
-     */
-    public String getSystemProperty(String name) {
-        if (this.systemProperties == null) {
+    public String getSystemEnvironmentVariable(String name) {
+        if (this.systemEnvironment == null) {
             return null;
         }
         StringBuilder sb = new StringBuilder();
         boolean hadValue = false;
-        if (baseSystemProperties != null) {
-            String tmp = baseSystemProperties.get(name);
+        if (baseSystemEnvironment != null) {
+            String tmp = baseSystemEnvironment.get(name);
             if (tmp != null) {
                 sb.append(tmp);
                 hadValue = true;
             }
         }
-        for (PropertyModifier pm : systemProperties) {
+        for (PropertyModifier pm : systemEnvironment) {
             if (pm.getName().equals(name)) {
                 pm.update(sb);
                 hadValue = true;
             }
         }
         return hadValue ? sb.toString() : null;
+    }
+
+    /**
+     * Add a new system environment variables value from its name and value.
+     * The value can overwrite or be appended to a previous variable value with the same name.<br/>
+     * If the append boolean is true, the value will be appended to the old one or to a existing system variable.
+     * If not, the value will overwrite the old one.
+     *
+     * @param name the name of the variable to add
+     * @param value the the value associated to the given name
+     * @param append true if this value must be appended to a previous one or a system one, false if overwrite.
+     * @throws IllegalArgumentException if name is null
+     */
+    public void addSystemEnvironmentVariable(String name, String value, boolean append) {
+        if (name == null) {
+            throw new IllegalArgumentException("Name cannot be null");
+        }
+        if (this.systemEnvironment == null) {
+            this.systemEnvironment = new ArrayList<PropertyModifier>(5);
+        }
+        this.systemEnvironment.add(new PropertyModifier(name, value, append));
+    }
+
+    /**
+     * Add a new system environment variables value from its name and value.
+     * The value will be appended to a previous variable value with the same name using the given appendChar.<br/>
+     * If this value is the first, no append character will be inserted.
+     * Each time a new value is inserted, it appends the appendChar and the new value.
+     *
+     * @param name the name of the variable to add
+     * @param value the the value associated to the given name
+     * @param appendChar The character used to append this value with a previous one.
+     * @throws IllegalArgumentException if name is null
+     */
+    public void addSystemEnvironmentVariable(String name, String value, char appendChar) {
+        if (name == null) {
+            throw new IllegalArgumentException("Name cannot be null");
+        }
+        if (this.systemEnvironment == null) {
+            this.systemEnvironment = new ArrayList<PropertyModifier>(5);
+        }
+        this.systemEnvironment.add(new PropertyModifier(name, value, appendChar));
     }
 
     /**
@@ -371,7 +371,7 @@ public class ForkEnvironment implements Serializable {
 
     /**
      * Set the environment script value to the given script value.<br/>
-     * This script allows the user to programaticaly set systemProperties, JVM arguments, additional classpath
+     * This script allows the user to programmatically set system variables, JVM arguments, additional classpath
      * Use the binding variable name <b>forkEnvironment</b> to fill this object in this given script.
      *
      * @param script the script to set

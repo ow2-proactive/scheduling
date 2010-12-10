@@ -98,22 +98,22 @@ public final class InternalForkEnvironment extends ForkEnvironment {
      * {@inheritDoc}
      */
     @Override
-    public void addSystemProperty(String name, String value, boolean append) {
+    public void addSystemEnvironmentVariable(String name, String value, boolean append) {
         if (envReadOnly) {
             throw new UnsupportedOperationException("System environment is read only, you cannot modify it.");
         }
-        super.addSystemProperty(name, value, append);
+        super.addSystemEnvironmentVariable(name, value, append);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void addSystemProperty(String name, String value, char appendChar) {
+    public void addSystemEnvironmentVariable(String name, String value, char appendChar) {
         if (envReadOnly) {
             throw new UnsupportedOperationException("System environment is read only, you cannot modify it.");
         }
-        super.addSystemProperty(name, value, appendChar);
+        super.addSystemEnvironmentVariable(name, value, appendChar);
     }
 
     /**

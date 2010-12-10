@@ -63,8 +63,8 @@ public enum XMLTags {
             "arguments"), SCRIPT_ARGUMENT("argument"), SCRIPT_FILE("file"), SCRIPT_CODE("code"), SCRIPT_GENERATION(
             "generation"),
     //FORK ENVIRONMENT
-    FORK_ENVIRONMENT("forkEnvironment"), FORK_SYSTEM_PROPERTIES("SystemProperties"), FORK_SYSTEM_PROPERTY(
-            "property"), FORK_JVM_ARGS("jvmArgs"), FORK_JVM_ARG("jvmArg"), FORK_ADDITIONAL_CLASSPATH(
+    FORK_ENVIRONMENT("forkEnvironment"), FORK_SYSTEM_PROPERTIES("SystemEnvironment"), FORK_SYSTEM_PROPERTY(
+            "variable"), FORK_JVM_ARGS("jvmArgs"), FORK_JVM_ARG("jvmArg"), FORK_ADDITIONAL_CLASSPATH(
             "additionalClasspath"), SCRIPT_ENV("envScript"),
     // FLOW CONTROL
     FLOW("controlFlow"), FLOW_IF("if"), FLOW_REPLICATE("replicate"), FLOW_LOOP("loop"),

@@ -196,17 +196,17 @@ public class TestJobFactory {
                 ((JavaTask) tfJob.getTask("task2")).getForkEnvironment().getJVMArguments().get(1),
                 "-djhome=/bin/java/jdk1.5");
         Map<String, String> props = ((JavaTask) tfJob.getTask("task2")).getForkEnvironment()
-                .getSystemProperties();
+                .getSystemEnvironment();
         Assert.assertEquals(3, props.size());
         Assert.assertEquals("ioioio#123:456", props.get("toto"));
         Assert.assertEquals("456", props.get("tata"));
         Assert.assertEquals("123!456", props.get("titi"));
         Assert.assertEquals("ioioio#123:456", ((JavaTask) tfJob.getTask("task2")).getForkEnvironment()
-                .getSystemProperty("toto"));
+                .getSystemEnvironmentVariable("toto"));
         Assert.assertEquals("456", ((JavaTask) tfJob.getTask("task2")).getForkEnvironment()
-                .getSystemProperty("tata"));
+                .getSystemEnvironmentVariable("tata"));
         Assert.assertEquals("123!456", ((JavaTask) tfJob.getTask("task2")).getForkEnvironment()
-                .getSystemProperty("titi"));
+                .getSystemEnvironmentVariable("titi"));
         List<String> addcp = ((JavaTask) tfJob.getTask("task2")).getForkEnvironment()
                 .getAdditionalClasspath();
         Assert.assertEquals(2, addcp.size());

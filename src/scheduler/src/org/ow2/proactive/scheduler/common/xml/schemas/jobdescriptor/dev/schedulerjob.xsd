@@ -75,20 +75,22 @@
       <xs:documentation>Definition of variables which can be reused throughout this descriptor</xs:documentation>
     </xs:annotation>
     <xs:complexType>
-      <xs:sequence>
-        <xs:element maxOccurs="unbounded" ref="jd:variable"/>
-      </xs:sequence>
+      <xs:group maxOccurs="unbounded" ref="jd:variable"/>
     </xs:complexType>
   </xs:element>
-  <xs:element name="variable">
-    <xs:annotation>
-      <xs:documentation>Definition of one variable, the variable can be reused (even in another following variable definition) by using the syntax ${name_of_variable}</xs:documentation>
-    </xs:annotation>
-    <xs:complexType>
-      <xs:attributeGroup ref="jd:variableName"/>
-      <xs:attributeGroup ref="jd:variableValue"/>
-    </xs:complexType>
-  </xs:element>
+  <xs:group name="variable">
+    <xs:sequence>
+      <xs:element name="variable">
+        <xs:annotation>
+          <xs:documentation>Definition of one variable, the variable can be reused (even in another following variable definition) by using the syntax ${name_of_variable}</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+          <xs:attributeGroup ref="jd:variableName"/>
+          <xs:attributeGroup ref="jd:variableValue"/>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:group>
   <xs:attributeGroup name="variableName">
     <xs:attribute name="name" use="required" type="xs:string">
       <xs:annotation>
@@ -715,7 +717,7 @@
     </xs:annotation>
     <xs:complexType>
       <xs:sequence>
-        <xs:element minOccurs="0" ref="jd:SystemProperties"/>
+        <xs:element minOccurs="0" ref="jd:SystemEnvironment"/>
         <xs:element minOccurs="0" ref="jd:jvmArgs"/>
         <xs:element minOccurs="0" ref="jd:additionalClasspath"/>
         <xs:element minOccurs="0" ref="jd:envScript"/>
@@ -745,38 +747,40 @@
       </xs:simpleType>
     </xs:attribute>
   </xs:attributeGroup>
-  <xs:element name="SystemProperties">
+  <xs:element name="SystemEnvironment">
     <xs:annotation>
       <xs:documentation>a list of sysProp</xs:documentation>
     </xs:annotation>
     <xs:complexType>
-      <xs:sequence>
-        <xs:element maxOccurs="unbounded" ref="jd:property"/>
-      </xs:sequence>
+      <xs:group maxOccurs="unbounded" ref="jd:sysProp"/>
     </xs:complexType>
   </xs:element>
-  <xs:element name="property">
-    <xs:annotation>
-      <xs:documentation>A parameter in the form of key/value pair</xs:documentation>
-    </xs:annotation>
-    <xs:complexType>
-      <xs:attribute name="name" use="required" type="xs:string"/>
-      <xs:attribute name="value" use="required" type="xs:string"/>
-      <xs:attribute name="append">
+  <xs:group name="sysProp">
+    <xs:sequence>
+      <xs:element name="variable">
         <xs:annotation>
-          <xs:documentation>append or not this property to a previous declared or to the system one</xs:documentation>
+          <xs:documentation>A parameter in the form of key/value pair</xs:documentation>
         </xs:annotation>
-        <xs:simpleType>
-          <xs:union memberTypes="xs:boolean jd:variableRefType"/>
-        </xs:simpleType>
-      </xs:attribute>
-      <xs:attribute name="appendChar" type="jd:propertyAppendChar">
-        <xs:annotation>
-          <xs:documentation>append character, if set, append mode is ON</xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-    </xs:complexType>
-  </xs:element>
+        <xs:complexType>
+          <xs:attribute name="name" use="required" type="xs:string"/>
+          <xs:attribute name="value" use="required" type="xs:string"/>
+          <xs:attribute name="append">
+            <xs:annotation>
+              <xs:documentation>append or not this property to a previous declared or to the system one</xs:documentation>
+            </xs:annotation>
+            <xs:simpleType>
+              <xs:union memberTypes="xs:boolean jd:variableRefType"/>
+            </xs:simpleType>
+          </xs:attribute>
+          <xs:attribute name="appendChar" type="jd:propertyAppendChar">
+            <xs:annotation>
+              <xs:documentation>append character, if set, append mode is ON</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:group>
   <xs:attributeGroup name="sysPropAppend">
     <xs:attribute name="append" use="required">
       <xs:annotation>

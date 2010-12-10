@@ -135,9 +135,9 @@ forkEnvironment = ## Fork environment if needed
 javaHome = ## Path to installed java directory, to this path '/bin/java' will be added, if attribute does not exist only 'java' command will be called
 	attribute javaHome { xsd:anyURI | variableRefType}
 sysProps = ## a list of sysProp
-	element SystemProperties { sysProp+ }
+	element SystemEnvironment { sysProp+ }
 sysProp = ## A parameter in the form of key/value pair
-    element property { attribute name { xsd:string }, attribute value { xsd:string }, sysPropAppend?, sysPropAppendChar? }
+    element variable { attribute name { xsd:string }, attribute value { xsd:string }, sysPropAppend?, sysPropAppendChar? }
 sysPropAppend = ## append or not this property to a previous declared or to the system one
 	attribute append { xsd:boolean | variableRefType }
 sysPropAppendChar = ## append character, if set, append mode is ON

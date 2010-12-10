@@ -1333,9 +1333,9 @@ public class JobFactory_stax extends JobFactory {
                                 }
                             }
                             if (ac != 0) {
-                                forkEnv.addSystemProperty(name, value, ac);
+                                forkEnv.addSystemEnvironmentVariable(name, value, ac);
                             } else {
-                                forkEnv.addSystemProperty(name, value, append);
+                                forkEnv.addSystemEnvironmentVariable(name, value, append);
                             }
                         } else if (XMLTags.FORK_JVM_ARG.matches(current)) {
                             forkEnv.addJVMArgument(replace(cursorExec.getAttributeValue(0)));
@@ -1556,7 +1556,9 @@ public class JobFactory_stax extends JobFactory {
                     logger.debug("fork  : " + ((JavaTask) t).isFork());
                     if (((JavaTask) t).getForkEnvironment() != null) {
                         logger.debug("forkJ  : " + ((JavaTask) t).getForkEnvironment().getJavaHome());
-                        logger.debug("forkSys: " + ((JavaTask) t).getForkEnvironment().getSystemProperties());
+                        logger
+                                .debug("forkSys: " +
+                                    ((JavaTask) t).getForkEnvironment().getSystemEnvironment());
                         logger.debug("forkJVM: " + ((JavaTask) t).getForkEnvironment().getJVMArguments());
                         logger.debug("forkCP : " +
                             ((JavaTask) t).getForkEnvironment().getAdditionalClasspath());

@@ -276,7 +276,7 @@ public class ForkedJavaExecutable extends JavaExecutable {
             //if user has not set any system properties, create the internal fork environment
             //without any sys env and in read only mode on system env
             //else, the state is not consistent -> throw an exception
-            if (fe == null || fe.getSystemProperties().size() == 0) {
+            if (fe == null || fe.getSystemEnvironment().size() == 0) {
                 ife = new InternalForkEnvironment(fe, null, true);
             } else {
                 throw new IllegalStateException(
@@ -557,7 +557,7 @@ public class ForkedJavaExecutable extends JavaExecutable {
             Map<String, String> env = ospb.environment();
             ForkEnvironment forkEnvironment = execInitializer.getForkEnvironment();
             if (forkEnvironment != null) {
-                Map<String, String> fenv = forkEnvironment.getSystemProperties();
+                Map<String, String> fenv = forkEnvironment.getSystemEnvironment();
                 if (fenv != null) {
                     for (Entry<String, String> e : fenv.entrySet()) {
                         env.put(e.getKey(), e.getValue());

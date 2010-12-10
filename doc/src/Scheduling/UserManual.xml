@@ -909,9 +909,9 @@ task2.setGenerationScript(gscript);
 								</listitem>
 								<listitem>
 									<para>
-										<emphasis>SystemProperties</emphasis> : list of system "property" representing
+										<emphasis>SystemEnvironment</emphasis> : list of system "variables" representing
 										the system environment that will be applied to the forked JVM process.
-										A property can be append or not to a previous existing property.
+										A variable can append a previous existing variable, can be created or overwritten.
 									</para>
 								</listitem>
 								<listitem>

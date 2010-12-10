@@ -77,16 +77,16 @@
 			</pre>
 			<javaExecutable class="org.ow2.proactive.scheduler.examples.WaitAndPrint">
 				<forkEnvironment javaHome="${JAVA_HOME}" workingDir="${JAVA_HOME}/toto">
-					<SystemProperties>
-						<property name="toto" value="ioi"/>
-						<property name="toto" value="oio" append="true"/>
-						<property name="toto" appendChar="#" value="123" />
-						<property name="toto" append="false" appendChar=":" value="456" />
-						<property name="tata" appendChar="#" value="123" />
-						<property name="tata" value="456"/>
-						<property name="titi" value="123" appendChar="!"/>
-						<property name="titi" value="456" appendChar="!"/>
-					</SystemProperties>
+					<SystemEnvironment>
+						<variable name="toto" value="ioi"/>
+						<variable name="toto" value="oio" append="true"/>
+						<variable name="toto" appendChar="#" value="123" />
+						<variable name="toto" append="false" appendChar=":" value="456" />
+						<variable name="tata" appendChar="#" value="123" />
+						<variable name="tata" value="456"/>
+						<variable name="titi" value="123" appendChar="!"/>
+						<variable name="titi" value="456" appendChar="!"/>
+					</SystemEnvironment>
 					<jvmArgs>
 						<jvmArg value="-dparam=12"/>
 						<jvmArg value="-djhome=${JAVA_HOME}"/>

@@ -605,7 +605,7 @@
     </attribute>
   </define>
   <define name="sysProps">
-    <element name="SystemProperties">
+    <element name="SystemEnvironment">
       <doc:documentation>a list of sysProp</doc:documentation>
       <oneOrMore>
         <ref name="sysProp"/>
@@ -613,7 +613,7 @@
     </element>
   </define>
   <define name="sysProp">
-    <element name="property">
+    <element name="variable">
       <doc:documentation>A parameter in the form of key/value pair</doc:documentation>
       <attribute name="name">
         <data type="string"/>

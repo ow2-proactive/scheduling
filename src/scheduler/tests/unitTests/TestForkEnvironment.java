@@ -59,42 +59,42 @@ public class TestForkEnvironment {
     public void run() throws Throwable {
         ForkEnvironment fe = new ForkEnvironment();
         //test initial values
-        Assert.assertEquals(0, fe.getSystemProperties().size());
+        Assert.assertEquals(0, fe.getSystemEnvironment().size());
         Assert.assertEquals(0, fe.getJVMArguments().size());
         Assert.assertEquals(0, fe.getAdditionalClasspath().size());
         Assert.assertNull(fe.getEnvScript());
         //test system properties
-        fe.addSystemProperty("toto", "ioi", true);
-        Assert.assertEquals(1, fe.getSystemProperties().size());
-        Assert.assertEquals("ioi", fe.getSystemProperty("toto"));
-        fe.addSystemProperty("toto", "oio", true);
-        Assert.assertEquals(1, fe.getSystemProperties().size());
-        Assert.assertEquals("ioioio", fe.getSystemProperty("toto"));
-        fe.addSystemProperty("toto", "123", false);
-        Assert.assertEquals(1, fe.getSystemProperties().size());
-        Assert.assertEquals("123", fe.getSystemProperty("toto"));
-        fe.addSystemProperty("tata", "456", false);
-        Assert.assertEquals(2, fe.getSystemProperties().size());
-        Assert.assertFalse(fe.getSystemProperties() == fe.getSystemProperties());
-        fe.addSystemProperty("tata", "789", '#');
-        Assert.assertEquals(2, fe.getSystemProperties().size());
-        Assert.assertEquals("456#789", fe.getSystemProperty("tata"));
+        fe.addSystemEnvironmentVariable("toto", "ioi", true);
+        Assert.assertEquals(1, fe.getSystemEnvironment().size());
+        Assert.assertEquals("ioi", fe.getSystemEnvironmentVariable("toto"));
+        fe.addSystemEnvironmentVariable("toto", "oio", true);
+        Assert.assertEquals(1, fe.getSystemEnvironment().size());
+        Assert.assertEquals("ioioio", fe.getSystemEnvironmentVariable("toto"));
+        fe.addSystemEnvironmentVariable("toto", "123", false);
+        Assert.assertEquals(1, fe.getSystemEnvironment().size());
+        Assert.assertEquals("123", fe.getSystemEnvironmentVariable("toto"));
+        fe.addSystemEnvironmentVariable("tata", "456", false);
+        Assert.assertEquals(2, fe.getSystemEnvironment().size());
+        Assert.assertFalse(fe.getSystemEnvironment() == fe.getSystemEnvironment());
+        fe.addSystemEnvironmentVariable("tata", "789", '#');
+        Assert.assertEquals(2, fe.getSystemEnvironment().size());
+        Assert.assertEquals("456#789", fe.getSystemEnvironmentVariable("tata"));
         Map<String, String> baseEnv = new HashMap<String, String>();
         baseEnv.put("tata", "123");
         baseEnv.put("titi", "#@");
         baseEnv.put("toto", "eue");
         ForkEnvironment ife = new InternalForkEnvironment(fe, baseEnv);
-        Assert.assertEquals(3, ife.getSystemProperties().size());
-        Assert.assertEquals("456#789", ife.getSystemProperty("tata"));
-        Assert.assertEquals("#@", ife.getSystemProperty("titi"));
-        Assert.assertEquals("123", ife.getSystemProperty("toto"));
-        ife.addSystemProperty("titi", "@#", ':');
-        Assert.assertEquals("#@:@#", ife.getSystemProperty("titi"));
+        Assert.assertEquals(3, ife.getSystemEnvironment().size());
+        Assert.assertEquals("456#789", ife.getSystemEnvironmentVariable("tata"));
+        Assert.assertEquals("#@", ife.getSystemEnvironmentVariable("titi"));
+        Assert.assertEquals("123", ife.getSystemEnvironmentVariable("toto"));
+        ife.addSystemEnvironmentVariable("titi", "@#", ':');
+        Assert.assertEquals("#@:@#", ife.getSystemEnvironmentVariable("titi"));
         try {
-            ife.addSystemProperty("toto", null, false);
-            fe.addSystemProperty(null, "tata", false);
+            ife.addSystemEnvironmentVariable("toto", null, false);
+            fe.addSystemEnvironmentVariable(null, "tata", false);
             throw new RuntimeException(
-                "fe.addSystemProperty(null,value) did not throw an IllegalArgumentException");
+                "fe.addSystemEnvironmentVariable(null,value) did not throw an IllegalArgumentException");
         } catch (IllegalArgumentException e) {
         }
         //test jvm arguments
@@ -145,7 +145,7 @@ public class TestForkEnvironment {
         ife = new InternalForkEnvironment(fe, null);
         Assert.assertEquals(fe.getAdditionalClasspath(), ife.getAdditionalClasspath());
         Assert.assertEquals(fe.getJavaHome(), ife.getJavaHome());
-        Assert.assertEquals(fe.getSystemProperties(), ife.getSystemProperties());
+        Assert.assertEquals(fe.getSystemEnvironment(), ife.getSystemEnvironment());
         Assert.assertEquals(fe.getWorkingDir(), ife.getWorkingDir());
         Assert.assertEquals(fe.getEnvScript(), ife.getEnvScript());
         Assert.assertEquals(fe.getJVMArguments(), ife.getJVMArguments());
