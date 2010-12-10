@@ -499,8 +499,14 @@ final class SchedulingMethodImpl implements SchedulingMethod {
 
             NodeSet nodes = new NodeSet();
             try {
-                for (int i = 0; i < (task.getNumberOfNodesNeeded() - 1); i++) {
-                    nodes.add(nodeSet.remove(0));
+                //if topology is enabled and it is a multi task, give every nodes to the multi-nodes task
+                if (!isTopologyDisabled() && task.getNumberOfNodesNeeded() > 1) {
+                    nodes = new NodeSet(nodeSet);
+                } else {
+                    //else distribute normally
+                    for (int i = 0; i < (task.getNumberOfNodesNeeded() - 1); i++) {
+                        nodes.add(nodeSet.remove(0));
+                    }
                 }
                 task.getExecuterInformations().addNodes(nodes);
 
