@@ -672,7 +672,8 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                 internalSetToRemove(rmnode, caller);
             }
         } else {
-            throw new IllegalArgumentException("An attempt to remove non existing node " + nodeUrl);
+            logger.warn("An attempt to remove a non existing node: " + nodeUrl + " was made. Ignoring it");
+            return new BooleanWrapper(false);
         }
         return new BooleanWrapper(true);
     }
@@ -734,14 +735,14 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      */
     public void removeAllNodes(String nodeSourceName, boolean preemptive) {
 
+        for (RMDeployingNode pn : nodeSources.get(nodeSourceName).getPendingNodes()) {
+            removeNode(pn.getNodeURL(), preemptive);
+        }
         for (Node node : nodeSources.get(nodeSourceName).getAliveNodes()) {
             removeNode(node.getNodeInformation().getURL(), preemptive);
         }
         for (Node node : nodeSources.get(nodeSourceName).getDownNodes()) {
             removeNode(node.getNodeInformation().getURL(), preemptive);
-        }
-        for (RMDeployingNode pn : nodeSources.get(nodeSourceName).getPendingNodes()) {
-            removeNode(pn.getNodeURL(), preemptive);
         }
     }
 

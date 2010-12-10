@@ -37,8 +37,10 @@
 package org.ow2.proactive.resourcemanager.nodesource;
 
 import java.security.Permission;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -75,9 +77,9 @@ import org.ow2.proactive.resourcemanager.nodesource.dataspace.DataSpaceNodeConfi
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.InfrastructureManager;
 import org.ow2.proactive.resourcemanager.nodesource.policy.NodeSourcePolicy;
 import org.ow2.proactive.resourcemanager.nodesource.policy.NodeSourcePolicy.AccessType;
+import org.ow2.proactive.resourcemanager.rmnode.RMDeployingNode;
 import org.ow2.proactive.resourcemanager.rmnode.RMNode;
 import org.ow2.proactive.resourcemanager.rmnode.RMNodeImpl;
-import org.ow2.proactive.resourcemanager.rmnode.RMDeployingNode;
 import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 
 
@@ -118,8 +120,8 @@ public class NodeSource implements InitActive, RunActive {
     private boolean toShutdown = false;
 
     // all nodes except down
-    private HashMap<String, Node> nodes = new HashMap<String, Node>();
-    private HashMap<String, Node> downNodes = new HashMap<String, Node>();
+    private Map<String, Node> nodes = Collections.synchronizedMap(new HashMap<String, Node>());
+    private Map<String, Node> downNodes = Collections.synchronizedMap(new HashMap<String, Node>());
 
     private static int instanceCount = 0;
     private static ExecutorService internalThreadPool;
@@ -599,6 +601,7 @@ public class NodeSource implements InitActive, RunActive {
      * Retrieves a list of alive nodes
      * @return a list of alive nodes
      */
+    @ImmediateService
     public LinkedList<Node> getAliveNodes() {
         LinkedList<Node> nodes = new LinkedList<Node>();
         nodes.addAll(this.nodes.values());
@@ -609,6 +612,7 @@ public class NodeSource implements InitActive, RunActive {
      * Retrieves a list of down nodes
      * @return a list of down nodes
      */
+    @ImmediateService
     public LinkedList<Node> getDownNodes() {
         LinkedList<Node> downNodes = new LinkedList<Node>();
         downNodes.addAll(this.downNodes.values());
@@ -619,6 +623,7 @@ public class NodeSource implements InitActive, RunActive {
      * Retrieves the list of pending nodes handled by the infrastructure manager
      * @return the list of pending nodes handled by the infrastructure manager
      */
+    @ImmediateService
     public LinkedList<RMDeployingNode> getPendingNodes() {
         LinkedList<RMDeployingNode> result = new LinkedList<RMDeployingNode>();
         result.addAll(this.infrastructureManager.getDeployingNodes());
