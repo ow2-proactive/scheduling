@@ -5,10 +5,10 @@ echo --- StartNode -------------------------------------------
 if [ $# -lt 1 ]; then
     echo "
        Start a new Node
-         rm-start-node <the name of the node to create>
+         rm-start-node -n <the name of the node to create>
 
-         ex : rm-start-node node1
-         ex : rm-start-node node2
+         ex : rm-start-node -n node1
+         ex : rm-start-node -n node2
 
     "
     exit 1
@@ -16,7 +16,7 @@ fi
 
 workingDir=`dirname $0`
 . $workingDir/env log4j-client
-eval $JAVACMD org.objectweb.proactive.core.node.StartNode "$@"
+eval $JAVACMD org.ow2.proactive.resourcemanager.utils.RMNodeStarter "$@"
 
 echo
 echo ---------------------------------------------------------

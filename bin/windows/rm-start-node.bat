@@ -9,11 +9,11 @@ goto doit
 :usage
 echo.
 echo Start a new Node
-echo    - 1 : the name of the node to create
+echo    -n : the name of the node to create
 echo.
-echo ex : rm-start-node.bat node1
+echo ex : rm-start-node.bat -n node1
 echo.
-echo Node started with a random name
+echo Node started with default name
 echo.
 goto doit
 
@@ -21,7 +21,7 @@ goto doit
 :doit
 SETLOCAL ENABLEDELAYEDEXPANSION
 call init.bat log4j-client
-%JAVA_CMD%  org.objectweb.proactive.core.node.StartNode %*
+%JAVA_CMD%  org.ow2.proactive.resourcemanager.utils.RMNodeStarter %*
 ENDLOCAL
 
 :end
