@@ -43,6 +43,7 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.Map.Entry;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.log4j.Logger;
@@ -260,6 +261,27 @@ public abstract class InfrastructureManager implements Serializable {
         this.configure(shiftedParams);
     }
 
+    /**
+     * Called by the node source at shutdown time.
+     * First removes every registered Deploying and Lost nodes
+     * and delegates the call to the implementation thanks to
+     * the method {@link #shutDown()}
+     */
+    public final void internalShutDown() {
+        //first removing deploying nodes
+        for (String dnUrl : this.pendingNodes.keySet()) {
+            this.internalRemoveDeployingNode(dnUrl);
+        }
+        this.pendingNodes.clear();
+        //afterwards, lost nodes
+        for (String lnUrl : this.lostNodes.keySet()) {
+            this.internalRemoveDeployingNode(lnUrl);
+        }
+        this.lostNodes.clear();
+        //delegating the call to the implementation
+        this.shutDown();
+    }
+
     //**********************************************************************************************\\
     //**************************************** SPI methods *****************************************\\
     //**********************************************************************************************\\
@@ -318,7 +340,7 @@ public abstract class InfrastructureManager implements Serializable {
      * @param initiator
      * @return mainly to be able to put a checkpoint and to be sure that
      */
-    public void shutDown() {
+    protected void shutDown() {
     }
 
     //**********************************************************************************************\\

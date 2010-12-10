@@ -563,7 +563,7 @@ public class NodeSource implements InitActive, RunActive {
         logger.info("[" + name + "] Shutdown finalization");
 
         nodeSourcePolicy.shutdown(initiator);
-        infrastructureManager.shutDown();
+        infrastructureManager.internalShutDown();
     }
 
     /**
