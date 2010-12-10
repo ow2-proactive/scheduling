@@ -545,7 +545,8 @@ public final class PAAgentServiceRMStarter {
      */
     private String getNodeURLFilename(String nodeName, int rank) {
         final String tmpDir = System.getProperty("java.io.tmpdir");
-        final String tmpFile = tmpDir + "_" + URL_TMPFILE_PREFIX + "_" + nodeName + "-" + rank;
+        final String tmpFile = new File(tmpDir, URL_TMPFILE_PREFIX + "_" + nodeName + "-" + rank)
+                .getAbsolutePath();
         return tmpFile;
     }
 
