@@ -384,6 +384,8 @@ final class SchedulingMethodImpl implements SchedulingMethod {
             //if simple node task is demanded, every internal task have only one node
             if (!isTopologyDisabled() && internalTask.getNumberOfNodesNeeded() > 1) {
                 tdescriptor = TopologyDescriptor.BEST_PROXIMITY;
+            } else {
+                tdescriptor = null;
             }
             try {
                 nodeSet = core.rmProxiesManager.getUserRMProxy(currentJob).getAtMostNodes(
