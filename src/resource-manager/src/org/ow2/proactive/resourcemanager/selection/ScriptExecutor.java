@@ -34,8 +34,6 @@
  */
 package org.ow2.proactive.resourcemanager.selection;
 
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Callable;
 
@@ -102,7 +100,7 @@ public class ScriptExecutor implements Callable<Node> {
                     logger.warn("Cannot execute script " + script.hashCode() + " on the node " +
                         rmnode.getNodeURL(), scriptResult.getException());
                     logger.warn("Checking if the node " + rmnode.getNodeURL() + " is still alive");
-                    rmnode.getNodeSource().pingNode(rmnode.getNodeURL());
+                    rmnode.getNodeSource().pingNode(rmnode.getNode());
 
                     nodeMatch = false;
                     break;
@@ -139,7 +137,7 @@ public class ScriptExecutor implements Callable<Node> {
         } catch (Throwable t) {
             logger.warn("Exception while cleaning the node " + rmnode.getNodeURL() + ": " + t.getMessage());
             logger.warn("Checking if the node " + rmnode.getNodeURL() + " is alive");
-            rmnode.getNodeSource().pingNode(rmnode.getNodeURL());
+            rmnode.getNodeSource().pingNode(rmnode.getNode());
         }
 
         manager.scriptExecutionFinished(rmnode.getNodeURL());

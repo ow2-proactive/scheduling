@@ -231,7 +231,7 @@ public class NodeSource implements InitActive, RunActive {
             if (delta > pingFrequency) {
                 logger.info("[" + name + "] Pinging alive nodes");
                 for (Node node : getAliveNodes()) {
-                    pingNode(node.getNodeInformation().getURL());
+                    pingNode(node);
                 }
                 delta = 0;
             }
@@ -702,16 +702,15 @@ public class NodeSource implements InitActive, RunActive {
      * Pings the node with specified url.
      * If the node is dead sends the request to the node source.
      */
-    public void pingNode(final String url) {
+    public void pingNode(final Node node) {
         executeInParallel(new Runnable() {
             public void run() {
                 try {
-                    Node node = NodeFactory.getNode(url);
                     node.getNumberOfActiveObjects();
                     if (logger.isDebugEnabled())
-                        logger.debug("Node " + url + " is alive");
+                        logger.debug("Node " + node.getNodeInformation().getURL() + " is alive");
                 } catch (Throwable t) {
-                    stub.detectedPingedDownNode(url);
+                    stub.detectedPingedDownNode(node.getNodeInformation().getURL());
                 }
             }
         });
