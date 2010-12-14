@@ -36,11 +36,13 @@
  */
 package org.ow2.proactive.scheduler.task.launcher;
 
+import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
+import org.ow2.proactive.scheduler.common.exception.ForkedJavaTaskException;
 import org.ow2.proactive.scheduler.common.task.SimpleTaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
@@ -104,7 +106,6 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher {
             //init task
             ForkedJavaExecutableInitializer fjei = (ForkedJavaExecutableInitializer) executableContainer
                     .createExecutableInitializer();
-            fjei.setTaskId(taskId);
             replaceIterationTags(fjei);
             fjei.setJavaTaskLauncherInitializer(initializer);
             //decrypt credentials if needed
@@ -133,11 +134,27 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher {
             scheduleTimer();
 
             duration = System.currentTimeMillis();
-            //launch task : here, result is obviously a TaskResult
-            TaskResult userResult = (TaskResult) currentExecutable.execute(results);
+            //launch task : here, result is a taskLauncher if everything terminated without error,
+            //result is an integer if forkedJVM has exited abnormally (integer contains the error code)
+            Serializable userResult = currentExecutable.execute(results);
             duration = System.currentTimeMillis() - duration;
 
-            return userResult;
+            if (userResult instanceof TaskResult) {
+                return (TaskResult) userResult;
+            } else {
+                Integer ec = (Integer) userResult;
+                if (ec == 0) {
+                    return new TaskResultImpl(taskId, ec, new SimpleTaskLogs(
+                        "Forked JVM process has been terminated with exit code " + ec +
+                            ", no result has been retreived.", ""), duration);
+                } else {
+                    Throwable t = new ForkedJavaTaskException(
+                        "Forked JVM process has been terminated with exit code " + ec, ec);
+                    return new TaskResultImpl(taskId, t, new SimpleTaskLogs("",
+                        "Forked JVM process has been terminated with exit code " + ec +
+                            ", no result has been retreived."), duration, null);
+                }
+            }
         } catch (Throwable ex) {
             logger_dev.info("", ex);
             if (this.getLogs() == null) {

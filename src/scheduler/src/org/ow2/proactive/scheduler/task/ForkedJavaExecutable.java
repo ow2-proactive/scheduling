@@ -171,8 +171,6 @@ public class ForkedJavaExecutable extends JavaExecutable {
             process = startProcess(ospb);
             waitForRegistration();
 
-            long duration = System.currentTimeMillis();
-
             //create task launcher on new JVM node
             logger_dev.debug("Create remote task launcher");
             newJavaTaskLauncher = createForkedTaskLauncher();
@@ -205,18 +203,13 @@ public class ForkedJavaExecutable extends JavaExecutable {
                 }
             }
 
-            duration = System.currentTimeMillis() - duration;
             execState = ExecutableState.TERMINATED;
 
             try {
                 Integer ec = process.exitValue();
-                if (ec != 0) {
-                    throw new ForkedJavaTaskException(
-                        "Forked JVM process has been terminated with exit code : " + ec, ec);
-                }
-                return new TaskResultImpl(this.execInitializer.getTaskId(), ec, new SimpleTaskLogs(
-                    "Forked JVM process has been terminated with exit code 0, no result has been retreived.",
-                    ""), duration);
+                //if no exception, JVM has terminated and task result is not available
+                //so return exit code that must be handle correctly by forkedJavaTaskLauncher
+                return ec;
             } catch (IllegalThreadStateException e) {
                 //process not terminated
             }
