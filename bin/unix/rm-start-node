@@ -15,7 +15,7 @@ if [ $# -lt 1 ]; then
 fi
 
 workingDir=`dirname $0`
-. $workingDir/env log4j-client
+. $workingDir/env log4j-defaultNode
 eval $JAVACMD org.ow2.proactive.resourcemanager.utils.RMNodeStarter "$@"
 
 echo
