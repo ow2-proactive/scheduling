@@ -71,10 +71,12 @@ import org.objectweb.proactive.core.runtime.StartPARuntime;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.processbuilder.OSProcessBuilder;
 import org.objectweb.proactive.extensions.processbuilder.exception.NotImplementedException;
+import org.ow2.proactive.scheduler.common.exception.ForkedJavaTaskException;
 import org.ow2.proactive.scheduler.common.exception.InternalSchedulerException;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.exception.UserException;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
+import org.ow2.proactive.scheduler.common.task.SimpleTaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
@@ -169,6 +171,8 @@ public class ForkedJavaExecutable extends JavaExecutable {
             process = startProcess(ospb);
             waitForRegistration();
 
+            long duration = System.currentTimeMillis();
+
             //create task launcher on new JVM node
             logger_dev.debug("Create remote task launcher");
             newJavaTaskLauncher = createForkedTaskLauncher();
@@ -201,7 +205,21 @@ public class ForkedJavaExecutable extends JavaExecutable {
                 }
             }
 
+            duration = System.currentTimeMillis() - duration;
             execState = ExecutableState.TERMINATED;
+
+            try {
+                Integer ec = process.exitValue();
+                if (ec != 0) {
+                    throw new ForkedJavaTaskException(
+                        "Forked JVM process has been terminated with exit code : " + ec, ec);
+                }
+                return new TaskResultImpl(this.execInitializer.getTaskId(), ec, new SimpleTaskLogs(
+                    "Forked JVM process has been terminated with exit code 0, no result has been retreived.",
+                    ""), duration);
+            } catch (IllegalThreadStateException e) {
+                //process not terminated
+            }
 
             if (!isKilled()) {
                 logs = newJavaTaskLauncher.getLogs();

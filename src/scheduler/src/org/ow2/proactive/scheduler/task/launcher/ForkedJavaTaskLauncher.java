@@ -104,6 +104,7 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher {
             //init task
             ForkedJavaExecutableInitializer fjei = (ForkedJavaExecutableInitializer) executableContainer
                     .createExecutableInitializer();
+            fjei.setTaskId(taskId);
             replaceIterationTags(fjei);
             fjei.setJavaTaskLauncherInitializer(initializer);
             //decrypt credentials if needed
