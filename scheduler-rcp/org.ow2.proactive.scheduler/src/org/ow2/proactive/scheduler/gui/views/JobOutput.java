@@ -42,12 +42,14 @@ import java.io.StringReader;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.console.ConsolePlugin;
 import org.eclipse.ui.console.IConsole;
 import org.eclipse.ui.console.MessageConsole;
 import org.eclipse.ui.console.MessageConsoleStream;
+import org.ow2.proactive.scheduler.Activator;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.gui.Colors;
 
@@ -85,12 +87,20 @@ public class JobOutput extends MessageConsole {
     private MessageConsoleStream defaultStream;
 
     public static class RemoteHint {
-        public String protocol;
+        public String appType;
         public String url;
 
-        public RemoteHint(String proto, String url) {
-            this.protocol = proto;
+        /** if the other fields are null, this explains why; 
+         * put it in the error message */
+        public String errorMsg;
+
+        public RemoteHint(String appType, String url) {
+            this.appType = appType;
             this.url = url;
+        }
+
+        public RemoteHint(String errorMsg) {
+            this.errorMsg = errorMsg;
         }
     }
 
@@ -150,23 +160,40 @@ public class JobOutput extends MessageConsole {
      * @param message log message ; may contain multiple lines
      */
     private void findRemoteHint(String message) {
-        if (message.indexOf(SchedulerConstants.REMOTE_CONNECTION_OUTPUT_MARKER) != -1) {
+        if (message.indexOf(SchedulerConstants.REMOTE_CONNECTION_MARKER) != -1) {
             BufferedReader br = new BufferedReader(new StringReader(message));
             String line = null;
             try {
                 while ((line = br.readLine()) != null) {
-                    String[] expl = line.split(" ");
-                    for (int i = 0; i < expl.length; i++) {
-                        if (expl[i].equals(SchedulerConstants.REMOTE_CONNECTION_OUTPUT_MARKER)) {
-                            if (i + 3 < expl.length) {
-                                RemoteHint h = new RemoteHint(expl[i + 2], expl[i + 3]);
-                                this.remoteConnHints.put(expl[i + 1], h);
-                                break;
-                            }
+                    String[] hint = line.split(SchedulerConstants.REMOTE_CONNECTION_MARKER);
+                    if (hint.length > 1) {
+                        String[] expl = hint[1].split("" + SchedulerConstants.REMOTE_CONNECTION_SEPARATOR);
+
+                        // expl = { '', 'taskid', 'application type', 'url', 'maybe more url' }
+                        String url = expl[3];
+
+                        // some URLs may contain the separator : 'http://foo.com:99/A&amp;B'
+                        // accumulate everything until EOF as the URL
+                        for (int j = 4; j < expl.length; j++)
+                            url += SchedulerConstants.REMOTE_CONNECTION_SEPARATOR + expl[j];
+
+                        String appType = expl[2];
+                        String taskId = expl[1];
+
+                        if (!appType.matches("[a-zA-Z]+")) {
+                            this.remoteConnHints.put(taskId, new RemoteHint(
+                                "Application type needs to contain alphabetical characters only (was '" +
+                                    appType + "')"));
+                            break;
                         }
+
+                        RemoteHint h = new RemoteHint(appType, url);
+                        this.remoteConnHints.put(taskId, h);
+                        break;
                     }
                 }
             } catch (IOException e) {
+                Activator.log(IStatus.ERROR, "Failed to parse Job Output", e);
             }
         }
 

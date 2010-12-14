@@ -38,6 +38,7 @@ package org.ow2.proactive.scheduler.gui.data;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -186,9 +187,13 @@ public class JobsOutputController {
      * Remove all output ! This method clear the console.
      */
     public void removeAllJobOutput() {
-        for (JobId jid : this.appenders.keySet()) {
-            this.removeJobOutput(jid);
+        // do NOT call removeJobOutput(JobId), 
+        // you are going to throw a ConcurrentModificationException
+        for (Entry<JobId, JobOutputAppender> out : appenders.entrySet()) {
+            ConsolePlugin.getDefault().getConsoleManager().removeConsoles(
+                    new IConsole[] { out.getValue().getJobOutput() });
+            out.getValue().close();
         }
-
+        appenders.clear();
     }
 }

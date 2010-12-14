@@ -365,7 +365,7 @@ public class TaskComposite extends Composite implements Comparator<TaskState> {
      * Called when the remote connection button is clicked
      * <p>
      * try to find a remote connection hint for the selected task,
-     * try to find an application associated to the protocol,
+     * try to find the application association,
      * try to launch it
      * 
      * @param id currently selected id
@@ -395,11 +395,22 @@ public class TaskComposite extends Composite implements Comparator<TaskState> {
             return;
         }
 
+        if (remote.appType == null && remote.url == null && remote.errorMsg != null) {
+            final String msg = "Invalid remote connection information:\n" + remote.errorMsg;
+            Activator.log(IStatus.ERROR, msg, null);
+            getDisplay().asyncExec(new Runnable() {
+                public void run() {
+                    MessageDialog.openInformation(getShell(), "Remote Connection", msg + "\n");
+                }
+            });
+            return;
+        }
+
         String app = PreferenceInitializer.getRemoteConnectionProperties().getProperty(
-                remote.protocol.toLowerCase());
+                remote.appType.toLowerCase());
         if (app == null || "".equals(app)) {
-            final String msg = "No Remote Connection application association is defined for protocol '" +
-                remote.protocol + "'";
+            final String msg = "No Remote Connection application association is defined for application type '" +
+                remote.appType + "'";
             Activator.log(IStatus.ERROR, msg, null);
             getDisplay().asyncExec(new Runnable() {
                 public void run() {
@@ -410,10 +421,8 @@ public class TaskComposite extends Composite implements Comparator<TaskState> {
         }
 
         try {
-            Activator
-                    .log(IStatus.INFO, "Launching Remote Connection for task " + id.getReadableName() + "(" +
-                        id.value() + ") [proto=" + remote.protocol + " app=" + app + " url=" + remote.url +
-                        "]", null);
+            Activator.log(IStatus.INFO, "Launching Remote Connection for task " + id.getReadableName() + "(" +
+                id.value() + ") [type=" + remote.appType + " app=" + app + " url=" + remote.url + "]", null);
             Runtime.getRuntime().exec(app + " " + remote.url);
         } catch (IOException e) {
             final String msg = "Failed to launch application Remote Connection command '" + app + " " +

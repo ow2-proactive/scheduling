@@ -42,6 +42,7 @@ import java.io.IOException;
 import java.util.Map.Entry;
 
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -105,7 +106,7 @@ public class RemoteConnectionPreferences extends PreferencePage implements IWork
         table.setLayoutData(gd);
 
         TableColumn tc1 = new TableColumn(table, SWT.LEFT);
-        tc1.setText("Protocol");
+        tc1.setText("Type");
         tc1.setWidth(100);
         TableColumn tc2 = new TableColumn(table, SWT.LEFT);
         tc2.setText("Application");
@@ -128,20 +129,20 @@ public class RemoteConnectionPreferences extends PreferencePage implements IWork
                 l.numColumns = 2;
                 dialog.setLayout(l);
 
-                // line 1 column 1 : protocol label
+                // line 1 column 1 : appType label
                 Label l1 = new Label(dialog, SWT.NULL);
-                l1.setText("Protocol");
+                l1.setText("Application type");
                 GridData g1 = new GridData(GridData.BEGINNING);
                 l1.setLayoutData(g1);
 
-                // line 2 column 2 : protocol text box
+                // line 2 column 2 : appType text box
                 final Text t1 = new Text(dialog, SWT.SINGLE | SWT.BORDER);
                 GridData g2 = new GridData(GridData.FILL_HORIZONTAL | GridData.END);
                 t1.setLayoutData(g2);
 
                 // line 2 column 1 : path label
                 Label l2 = new Label(dialog, SWT.NULL);
-                l2.setText("Path to application");
+                l2.setText("Path to executable");
                 GridData g3 = new GridData(GridData.BEGINNING);
                 l2.setLayoutData(g3);
 
@@ -203,10 +204,26 @@ public class RemoteConnectionPreferences extends PreferencePage implements IWork
                 c2.setText("OK");
                 c2.addListener(SWT.Selection, new Listener() {
                     public void handleEvent(Event event) {
-                        TableItem it = new TableItem(table, SWT.NORMAL);
-                        it.setText(0, t1.getText());
-                        it.setText(1, t2.getText());
+                        String type = t1.getText().toLowerCase();
 
+                        if (!type.matches("[a-z]+")) {
+                            MessageDialog.openError(parent.getShell(), "Add new association",
+                                    "An application type needs to contain only alphabetical characters");
+                            return;
+                        }
+
+                        for (int i = 0; i < table.getItemCount(); i++) {
+                            if (table.getItem(i).getText(0).equals(type)) {
+                                MessageDialog.openError(parent.getShell(), "Add new association",
+                                        "The association table already contains an entry for type '" + type +
+                                            "', remove it or choose another name");
+                                return;
+                            }
+                        }
+
+                        TableItem it = new TableItem(table, SWT.NORMAL);
+                        it.setText(0, type);
+                        it.setText(1, t2.getText());
                         dialog.close();
                     }
                 });
@@ -257,7 +274,7 @@ public class RemoteConnectionPreferences extends PreferencePage implements IWork
 
         try {
             PreferenceInitializer.getRemoteConnectionProperties().store(
-                    new FileOutputStream(remoteConnPropsFile, false), "protocol=/path/to/viewer");
+                    new FileOutputStream(remoteConnPropsFile, false), "application_type=/path/to/executable");
             dirty = false;
         } catch (IOException e) {
             Activator.log(IStatus.ERROR, "Failed to write property file " +

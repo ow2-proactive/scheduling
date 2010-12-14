@@ -76,9 +76,12 @@ public class SchedulerConstants {
      * for the hint to be detected client side, the following String has 
      * to be printed to the task log :
      * 
-     *  REMOTE-HINT TaskId  protocol url
+     *  PA_REMOTE_CONNECTION;TaskId;type;url
      *  
-     *  example : 'REMOTE-HINT 10005 vnc localhost:5901'
+     *  example : 'PA_REMOTE_CONNECTION;10005;vnc;localhost:5901'
      */
-    public static final String REMOTE_CONNECTION_OUTPUT_MARKER = "REMOTE-HINT";
+    public static final String REMOTE_CONNECTION_MARKER = "PA_REMOTE_CONNECTION";
+
+    /** Separator character for the String located by the {@link #REMOTE_CONNECTION_MARKER} */
+    public static final char REMOTE_CONNECTION_SEPARATOR = ';';
 }

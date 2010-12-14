@@ -53,7 +53,7 @@ import org.ow2.proactive.scheduler.gui.Internal;
  * Eclipse throws exceptions like crazy if this class does not exist.
  * Otherwise, it would have been named something like RemoteConnectionProperties instead.
  * <p>
- * This holds a static reference to the protocol/application association used by 
+ * This holds a static reference to the type/application association used by 
  * the RemoteConnectionPreferences editor
  * 
  */
@@ -62,8 +62,8 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
     private static Properties remoteProps = null;
 
     /**
-     * @return properties mapping a lowercase protocol name to a path to a local application used
-     *     to connect to this protocol, ie ("vnc", "/usr/bin/vncviewer"). 
+     * @return properties mapping a lowercase type name to a path to a local application used
+     *     to connect to this application type, ie ("vnc", "/usr/bin/vncviewer"). 
      *     Also, this should be platform specific
      */
     public static Properties getRemoteConnectionProperties() {

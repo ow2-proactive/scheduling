@@ -171,7 +171,7 @@ public class SubmitJobAction extends SchedulerGUIAction {
                 doc = docBuilder.parse(file);
             } catch (Exception e) {
                 String msg = "Failed to parse descriptor " + file + ":\n" + e.getMessage();
-                ErrorDialog.openError(parent.getShell(), "Edit Variables", msg, null);
+                MessageDialog.openError(parent.getShell(), "Edit Variables", msg);
                 Activator.log(IStatus.ERROR, msg, e);
                 return null;
             }
@@ -211,7 +211,7 @@ public class SubmitJobAction extends SchedulerGUIAction {
                 }
             } catch (Exception e) {
                 String msg = "Error while reading variables in '" + file + "':\n" + e.getMessage();
-                ErrorDialog.openError(parent.getShell(), "Edit Variables", msg, null);
+                MessageDialog.openError(parent.getShell(), "Edit Variables", msg);
                 Activator.log(IStatus.ERROR, msg, e);
                 return null;
             }
@@ -259,7 +259,7 @@ public class SubmitJobAction extends SchedulerGUIAction {
             } catch (Exception e) {
                 String msg = "Error while writing variables for '" + varMap.originalFile + "':\n" +
                     e.getMessage();
-                ErrorDialog.openError(parent.getShell(), "Edit Variables", msg, null);
+                MessageDialog.openError(parent.getShell(), "Edit Variables", msg);
                 Activator.log(IStatus.ERROR, msg, e);
                 return null;
             }
@@ -278,7 +278,7 @@ public class SubmitJobAction extends SchedulerGUIAction {
             } catch (Exception e) {
                 String msg = "Error while writing descriptor to '" + varMap.out.getAbsolutePath() + "':\n" +
                     e.getMessage();
-                ErrorDialog.openError(parent.getShell(), "Edit Variables", msg, null);
+                MessageDialog.openError(parent.getShell(), "Edit Variables", msg);
                 Activator.log(IStatus.ERROR, msg, e);
                 return null;
             }
