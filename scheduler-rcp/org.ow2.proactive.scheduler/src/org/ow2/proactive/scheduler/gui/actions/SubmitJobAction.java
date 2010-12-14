@@ -451,7 +451,7 @@ public class SubmitJobAction extends SchedulerGUIAction {
                 });
 
                 final Button okButton = new Button(buttons, SWT.PUSH);
-                okButton.setText("   OK   ");
+                okButton.setText("Submit Job" + ((variables.size() > 1) ? "s" : ""));
                 okButton.addListener(SWT.Selection, new Listener() {
                     public void handleEvent(Event event) {
                         dialogReturn = true;

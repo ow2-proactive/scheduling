@@ -126,7 +126,7 @@ public class ServersView extends ViewPart {
             // column 1 : rootDir
             if (index == 0) {
                 return s.getRootDir();
-            } 
+            }
             // column 2 : url
             else if (index == 1) {
                 return s.getUrl();
