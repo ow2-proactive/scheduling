@@ -34,7 +34,7 @@
 					<pathElement base="proactive" relpath="/dist/lib/jython.jar"/> -->
 				</applicationClasspath>
 				<securityPolicy base="proactive" relpath="/config/security.java.policy-client"/>
-				<log4jProperties base="proactive" relpath="/config/log4j/defaultNode-log4j"/>
+				<log4jProperties base="proactive" relpath="/config/log4j/log4j-defaultNode"/>
 			</configuration>
 			<virtualNode id="Workers">
 				<nodeProvider refid="workers" />

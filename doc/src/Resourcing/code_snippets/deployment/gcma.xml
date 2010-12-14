@@ -27,7 +27,7 @@
 					<pathElement base="proactive" relpath="/dist/lib/jsch-0.1.38.jar"/>
 					<pathElement base="proactive" relpath="/dist/lib/jakarta-oro-2.0.8.jar"/>
 				</applicationClasspath>
-				<log4jProperties base="proactive" relpath="/config/log4j/defaultNode-log4j"/>
+				<log4jProperties base="proactive" relpath="/config/log4j/log4j-defaultNode"/>
 			</configuration>
 			<virtualNode id="Workers">
 				<nodeProvider refid="workers" />

@@ -268,7 +268,7 @@ public class SSHInfrastructure2 extends InfrastructureManager {
             sb.append(fs);
             sb.append("log4j");
             sb.append(fs);
-            sb.append("defaultNode-log4j ");
+            sb.append("log4j-defaultNode ");
         }
         //we add extra java/PA configuration
         sb.append(this.javaOptions);

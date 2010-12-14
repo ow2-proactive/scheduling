@@ -3,7 +3,7 @@ echo.
 echo --- StartRouter----------------------------------------
 
 SETLOCAL ENABLEDELAYEDEXPANSION
-call init.bat defaultNode-log4j
+call init.bat log4j-client
 
 %JAVA_CMD% org.objectweb.proactive.extensions.pamr.router.Main %*
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 workingDir=`dirname $0`
-. $workingDir/env defaultNode-log4j
+. $workingDir/env log4j-client
 
 VM_ARGS="-Xmx512m -Xms512m -server"
 
