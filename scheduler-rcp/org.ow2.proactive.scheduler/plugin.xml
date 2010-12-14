@@ -100,6 +100,13 @@
             id="org.ow2.proactive.scheduler.gui.views.Users"
             name="Open user sessions">
       </view>
+      <view
+            category="org.ow2.proactive.scheduler.gui"
+            class="org.ow2.proactive.scheduler.gui.views.ServersView"
+            icon="icons/server.png"
+            id="org.ow2.proactive.scheduler.gui.views.ServersView"
+            name="Data Servers">
+      </view>
    </extension>
    <extension
          point="org.eclipse.ui.perspectiveExtensions">
@@ -122,6 +129,9 @@
          </viewShortcut>
          <viewShortcut
                id="org.ow2.proactive.scheduler.gui.views.ResultPreview">
+         </viewShortcut>
+         <viewShortcut
+               id="org.ow2.proactive.scheduler.gui.views.ServersView">
          </viewShortcut>
       </perspectiveExtension>
    </extension>

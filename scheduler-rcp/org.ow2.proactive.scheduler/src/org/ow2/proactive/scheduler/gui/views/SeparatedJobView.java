@@ -74,6 +74,7 @@ import org.ow2.proactive.scheduler.gui.actions.ShutdownSchedulerAction;
 import org.ow2.proactive.scheduler.gui.actions.StartStopSchedulerAction;
 import org.ow2.proactive.scheduler.gui.actions.SubmitFlatFileJobAction;
 import org.ow2.proactive.scheduler.gui.actions.SubmitJobAction;
+import org.ow2.proactive.scheduler.gui.actions.SubmitListAction;
 import org.ow2.proactive.scheduler.gui.composite.AbstractJobComposite;
 import org.ow2.proactive.scheduler.gui.composite.FinishedJobComposite;
 import org.ow2.proactive.scheduler.gui.composite.PendingJobComposite;
@@ -111,6 +112,8 @@ public class SeparatedJobView extends ViewPart {
 
     private static Action obtainJobOutputAction = null;
     private static Action submitJob = null;
+    private static Action submitJobEditVars = null;
+    private static SubmitListAction submitList = null;
     private static Action submitFlatJob = null;
     private static Action pauseResumeJobAction = null;
     private static Action killJobAction = null;
@@ -184,6 +187,7 @@ public class SeparatedJobView extends ViewPart {
         subMenuJob = new MenuManager("Submit job");
         manager.add(subMenuJob);
         subMenuJob.add(submitJob);
+        subMenuJob.add(submitJobEditVars);
         subMenuJob.add(submitFlatJob);
 
         manager.add(pauseResumeJobAction);
@@ -223,8 +227,12 @@ public class SeparatedJobView extends ViewPart {
             manager.add(action);
         }
         manager.add(new Separator());
-        manager.add(submitJob);
-        manager.add(submitFlatJob);
+
+        submitList.add(submitJob);
+        submitList.add(submitJobEditVars);
+        submitList.add(submitFlatJob);
+        manager.add(submitList);
+
         manager.add(pauseResumeJobAction);
         manager.add(changePriorityJobAction);
         manager.add(obtainJobOutputAction);
@@ -255,7 +263,9 @@ public class SeparatedJobView extends ViewPart {
                 MaximizeListAction.FINISHED);
 
         obtainJobOutputAction = new ObtainJobOutputAction();
-        submitJob = new SubmitJobAction(parent);
+        submitJob = new SubmitJobAction(parent, false);
+        submitJobEditVars = new SubmitJobAction(parent, true);
+        submitList = new SubmitListAction();
         submitFlatJob = new SubmitFlatFileJobAction(parent);
         pauseResumeJobAction = new PauseResumeJobAction();
         killJobAction = new KillRemoveJobAction(shell);

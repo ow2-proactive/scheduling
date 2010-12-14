@@ -42,6 +42,7 @@ import org.eclipse.jface.action.IMenuCreator;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Menu;
 import org.ow2.proactive.scheduler.Activator;
+import org.ow2.proactive.scheduler.common.SchedulerStatus;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.gui.Internal;
 
@@ -49,7 +50,7 @@ import org.ow2.proactive.scheduler.gui.Internal;
 /**
  * @author The ProActive Team
  */
-public class ChangePriorityJobAction extends Action implements IMenuCreator {
+public class ChangePriorityJobAction extends SchedulerGUIAction implements IMenuCreator {
     private Menu fMenu;
 
     public ChangePriorityJobAction() {
@@ -57,6 +58,7 @@ public class ChangePriorityJobAction extends Action implements IMenuCreator {
         setToolTipText("Change job priority");
         setImageDescriptor(Activator.getDefault().getImageRegistry().getDescriptor(Internal.IMG_JOBPRIORITY));
         setMenuCreator(this);
+        setEnabled(false);
     }
 
     /**
@@ -99,5 +101,14 @@ public class ChangePriorityJobAction extends Action implements IMenuCreator {
      */
     public Menu getMenu(Menu parent) {
         return null;
+    }
+
+    @Override
+    public void setEnabled(boolean connected, SchedulerStatus schedulerStatus, boolean admin,
+            boolean jobSelected, boolean owner, boolean jobInFinishQueue) {
+        if (connected)
+            setEnabled(true);
+        else
+            setEnabled(false);
     }
 }

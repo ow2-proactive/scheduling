@@ -36,6 +36,8 @@
  */
 package org.ow2.proactive.scheduler.gui.actions;
 
+import java.util.ArrayList;
+
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IMenuCreator;
@@ -49,13 +51,15 @@ import org.ow2.proactive.scheduler.gui.Internal;
 /**
  * @author The ProActive Team
  */
-public class ChangeMaximizeListAction extends SchedulerGUIAction implements IMenuCreator {
+public class SubmitListAction extends SchedulerGUIAction implements IMenuCreator {
     private Menu fMenu;
+    private ArrayList<Action> actions;
 
-    public ChangeMaximizeListAction() {
-        setText("Maximize list");
-        setToolTipText("Maximize a job list");
-        setImageDescriptor(Activator.getDefault().getImageRegistry().getDescriptor(Internal.IMG_MAXIMIZE));
+    public SubmitListAction() {
+        actions = new ArrayList<Action>();
+        setText("Submit job");
+        setToolTipText("Submit a new Job to the Scheduler");
+        setImageDescriptor(Activator.getDefault().getImageRegistry().getDescriptor(Internal.IMG_JOBSUBMIT));
         setMenuCreator(this);
         setEnabled(false);
     }
@@ -70,6 +74,13 @@ public class ChangeMaximizeListAction extends SchedulerGUIAction implements IMen
         fMenu = null;
     }
 
+    @Override
+    public void run() {
+        if (actions.size() > 0) {
+            actions.get(0).run();
+        }
+    }
+
     /**
      * @see org.eclipse.jface.action.IMenuCreator#getMenu(org.eclipse.swt.widgets.Control)
      */
@@ -80,10 +91,10 @@ public class ChangeMaximizeListAction extends SchedulerGUIAction implements IMen
 
         fMenu = new Menu(parent);
 
-        addActionToMenu(fMenu, MaximizeListAction.getInstance(MaximizeListAction.NONE));
-        addActionToMenu(fMenu, MaximizeListAction.getInstance(MaximizeListAction.PENDING));
-        addActionToMenu(fMenu, MaximizeListAction.getInstance(MaximizeListAction.RUNNING));
-        addActionToMenu(fMenu, MaximizeListAction.getInstance(MaximizeListAction.FINISHED));
+        for (Action act : actions) {
+            addActionToMenu(fMenu, act);
+        }
+
         return fMenu;
     }
 
@@ -97,6 +108,10 @@ public class ChangeMaximizeListAction extends SchedulerGUIAction implements IMen
      */
     public Menu getMenu(Menu parent) {
         return null;
+    }
+
+    public void add(Action act) {
+        actions.add(act);
     }
 
     @Override

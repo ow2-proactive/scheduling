@@ -68,7 +68,12 @@ public final class Internal {
     public static final String IMG_SCHEDULERSTOP = "scheduler_stop.png";
     public static final String IMG_VERTICAL = "vertical.gif";
     public static final String IMG_REMOTE_CONNECTION = "visualization.png";
+    public static final String IMG_SERVER = "server.png";
+    public static final String IMG_SERVER_ADD = "server_add.png";
+    public static final String IMG_SERVER_REMOVE = "server_remove.png";
+    public static final String IMG_DATA = "data.png";
     public static final String IMG_EXIT = "exit.png";
+    public static final String IMG_COPY = "copy.png";
 
     /**
      * associates a remote connection protocol with a binary on the local system

@@ -61,6 +61,7 @@ import org.osgi.service.url.URLStreamHandlerSetter;
 import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingException;
 import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingService;
 import org.ow2.proactive.scheduler.gui.Internal;
+import org.ow2.proactive.scheduler.gui.data.DataServers;
 
 
 /**
@@ -147,8 +148,9 @@ public class Activator extends AbstractUIPlugin {
      * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
      */
     @Override
-    public void stop(BundleContext context) throws Exception {
+    public void stop(final BundleContext context) throws Exception {
         plugin = null;
+        DataServers.cleanup();
         terminateLoggerServer();
         // Dispose the image registry
         final ImageRegistry reg = super.getImageRegistry();
@@ -252,6 +254,12 @@ public class Activator extends AbstractUIPlugin {
         reg.put(Internal.IMG_REMOTE_CONNECTION, Activator.getImageDescriptor("icons/" +
             Internal.IMG_REMOTE_CONNECTION));
         reg.put(Internal.IMG_EXIT, Activator.getImageDescriptor("icons/" + Internal.IMG_EXIT));
+        reg.put(Internal.IMG_SERVER, Activator.getImageDescriptor("icons/" + Internal.IMG_SERVER));
+        reg.put(Internal.IMG_SERVER_ADD, Activator.getImageDescriptor("icons/" + Internal.IMG_SERVER_ADD));
+        reg.put(Internal.IMG_SERVER_REMOVE, Activator.getImageDescriptor("icons/" +
+            Internal.IMG_SERVER_REMOVE));
+        reg.put(Internal.IMG_DATA, Activator.getImageDescriptor("icons/" + Internal.IMG_DATA));
+        reg.put(Internal.IMG_COPY, Activator.getImageDescriptor("icons/" + Internal.IMG_COPY));
     }
 
     //

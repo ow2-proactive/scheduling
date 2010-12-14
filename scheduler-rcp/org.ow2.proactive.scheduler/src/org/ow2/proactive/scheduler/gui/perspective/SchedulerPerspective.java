@@ -40,6 +40,7 @@ import org.eclipse.ui.IFolderLayout;
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPerspectiveFactory;
 import org.eclipse.ui.console.IConsoleConstants;
+import org.ow2.proactive.scheduler.gui.views.ServersView;
 import org.ow2.proactive.scheduler.gui.views.JobInfo;
 import org.ow2.proactive.scheduler.gui.views.ResultPreview;
 import org.ow2.proactive.scheduler.gui.views.SeparatedJobView;
@@ -79,6 +80,7 @@ public class SchedulerPerspective implements IPerspectiveFactory {
 
         IFolderLayout topFolder = layout.createFolder(ID_TOP_FOLDER, IPageLayout.TOP, 0.62f, editorArea);
         topFolder.addView(SeparatedJobView.ID);
+        topFolder.addView(ServersView.ID);
 
         IFolderLayout leftFolder = layout.createFolder(ID_LEFT_FOLDER, IPageLayout.LEFT, 0.72f, editorArea);
         leftFolder.addView(IConsoleConstants.ID_CONSOLE_VIEW);
