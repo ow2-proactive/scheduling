@@ -42,7 +42,11 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.ScrolledComposite;
+import org.eclipse.swt.events.ControlEvent;
+import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -75,6 +79,8 @@ public class CompactViewer implements ISelectionProvider {
     private int currentPosition = 0;
     // filter
     private Filter filter = new Filter();
+    // Scrolls the view composite
+    private ScrolledComposite scroll = null;
 
     /**
      * Creates new CompactViewer.
@@ -92,14 +98,38 @@ public class CompactViewer implements ISelectionProvider {
         loadMatrix();
     }
 
+    private long lastResize = System.currentTimeMillis();
+
     /**
      * Initialization of composite.
      */
     private void initComposite() {
         parent.setLayout(new FillLayout());
-        composite = new Composite(parent, SWT.NONE);
+
+        scroll = new ScrolledComposite(parent, SWT.H_SCROLL | SWT.V_SCROLL);
+        scroll.setExpandHorizontal(true);
+        scroll.setExpandVertical(true);
+
+        composite = new Composite(scroll, SWT.NONE);
         Color white = parent.getDisplay().getSystemColor(SWT.COLOR_WHITE);
         composite.setBackground(white);
+
+        parent.addControlListener(new ControlListener() {
+            public void controlMoved(ControlEvent e) {
+            }
+
+            public void controlResized(ControlEvent e) {
+                long t = System.currentTimeMillis();
+                if (t - lastResize > 200) {
+                    lastResize = t;
+                    layoutComposite(true);
+                }
+            }
+
+        });
+
+        scroll.setContent(composite);
+
     }
 
     /**
@@ -121,7 +151,7 @@ public class CompactViewer implements ISelectionProvider {
             Display.getDefault().syncExec(new Runnable() {
                 public void run() {
                     rootView = createView(RMStore.getInstance().getModel().getRoot());
-                    composite.layout();
+                    layoutComposite(false);
                 }
             });
         }
@@ -172,7 +202,7 @@ public class CompactViewer implements ISelectionProvider {
                             View view = createView(element);
                             parent.getChilds().add(view);
                             view.setParent(parent);
-                            composite.layout();
+                            layoutComposite(false);
                         }
                     }
                 }
@@ -224,7 +254,7 @@ public class CompactViewer implements ISelectionProvider {
                         public void run() {
                             clear();
                             loadMatrix();
-                            composite.layout();
+                            layoutComposite(false);
                         }
                     });
                     // sleeping for a while after full reloading
@@ -291,7 +321,7 @@ public class CompactViewer implements ISelectionProvider {
                     currentPosition = 0;
                     updatePositions(root);
                 }
-                composite.layout();
+                layoutComposite(false);
             }
         });
     }
@@ -321,12 +351,25 @@ public class CompactViewer implements ISelectionProvider {
                     if (view != null) {
                         view.update();
                     }
-                    composite.layout();
+                    layoutComposite(false);
+
                 } catch (Throwable t) {
                     t.printStackTrace();
                 }
             }
         });
+    }
+
+    private void layoutComposite(boolean packScroll) {
+        int x = parent.getSize().x - 20;
+        int y = SWT.DEFAULT;
+
+        Point prefSize = composite.computeSize(x, y);
+        scroll.setMinSize(prefSize);
+        composite.setSize(prefSize);
+
+        if (packScroll)
+            scroll.pack();
     }
 
     /**
