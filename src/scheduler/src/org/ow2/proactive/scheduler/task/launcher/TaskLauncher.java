@@ -629,6 +629,9 @@ public abstract class TaskLauncher implements InitActive {
             Throwable ee = sRes.getException();
             if (ee != null) {
                 ee.printStackTrace();
+
+                ((TaskResultImpl) res).setAction(FlowAction.getDefaultAction(this.flow));
+
                 logger_dev.error("Error on flow-script occured : ", ee);
                 throw new UserException("Flow-script has failed on the current node", ee);
             }

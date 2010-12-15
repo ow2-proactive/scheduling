@@ -49,7 +49,6 @@ import javax.xml.bind.annotation.XmlTransient;
 
 import org.hibernate.annotations.AccessType;
 import org.hibernate.annotations.Proxy;
-import org.objectweb.proactive.annotation.PublicAPI;
 
 
 /**
@@ -63,7 +62,6 @@ import org.objectweb.proactive.annotation.PublicAPI;
  * @see FlowActionType
  * 
  */
-@PublicAPI
 @Entity
 @Table(name = "CONTROL_FLOW_ACTION")
 @AccessType("field")
@@ -113,6 +111,41 @@ public class FlowAction implements Serializable {
      */
     public FlowAction(FlowActionType type) {
         this.type = type.toString();
+    }
+
+    /**
+     * If a FlowScript cannot be performed and the execution of the
+     * job must continue, a default 'neutral' action must be provided 
+     * <p>
+     * 
+     * @param script the FlowScript defining the action type and parameters
+     * @return the neutral FlowAction mathcing the provided parameters 
+     */
+    public static FlowAction getDefaultAction(FlowScript script) {
+        FlowAction ret = null;
+
+        switch (FlowActionType.parse(script.getActionType())) {
+            case REPLICATE:
+                // this is equivalent to REPLICATE with runs==1
+                ret = new FlowAction(FlowActionType.CONTINUE);
+                break;
+            case LOOP:
+                ret = new FlowAction(FlowActionType.CONTINUE);
+                break;
+            case IF:
+                // if we CONTINUE here the flow will be blocked indefinitely
+                // we perform the IF action as if the first target was selected
+                ret = new FlowAction(FlowActionType.IF);
+                ret.setTarget(script.getActionTarget());
+                ret.setTargetElse(script.getActionTargetElse());
+                ret.setTargetContinuation(script.getActionContinuation());
+                break;
+            case CONTINUE:
+                ret = new FlowAction(FlowActionType.CONTINUE);
+                break;
+        }
+
+        return ret;
     }
 
     /**
