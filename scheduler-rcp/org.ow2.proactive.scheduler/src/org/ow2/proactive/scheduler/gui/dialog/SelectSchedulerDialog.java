@@ -58,7 +58,6 @@ import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
-import org.eclipse.swt.widgets.Dialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.FileDialog;
@@ -78,7 +77,7 @@ import org.ow2.proactive.utils.FileToBytesConverter;
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9
  */
-public class SelectSchedulerDialog extends Dialog {
+public class SelectSchedulerDialog {
 
     /** Name of the file which store good urls */
     public static final String URL_FILE = "urls";
@@ -112,9 +111,6 @@ public class SelectSchedulerDialog extends Dialog {
     // --------------------------- constructor ---------------------------- //
     // -------------------------------------------------------------------- //
     private SelectSchedulerDialog(Shell parent) {
-        // Pass the default styles here
-        super(parent, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
-
         // Load the proactive default configuration
         ProActiveConfiguration.load();
 
@@ -124,7 +120,7 @@ public class SelectSchedulerDialog extends Dialog {
         Display display = parent.getDisplay();
 
         // Init the shell
-        shell = new Shell(parent, SWT.BORDER | SWT.CLOSE);
+        shell = new Shell(display, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
         shell.setText("Connect to scheduler");
         FormLayout layout = new FormLayout();
         layout.marginHeight = 5;

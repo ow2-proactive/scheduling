@@ -103,7 +103,7 @@ public class ConnectHandler extends AbstractHandler implements IHandler {
 
         if (dialogResult != null && !dialogResult.isCanceled()) {
             // Create a temporary shell with a progress bar during the downloading of the RM state
-            final Shell waitShell = new Shell(parent.getShell(), SWT.APPLICATION_MODAL);
+            final Shell waitShell = new Shell(parent.getDisplay(), SWT.APPLICATION_MODAL);
             // Disable the escape key
             waitShell.addListener(SWT.Traverse, new Listener() {
                 public void handleEvent(Event e) {

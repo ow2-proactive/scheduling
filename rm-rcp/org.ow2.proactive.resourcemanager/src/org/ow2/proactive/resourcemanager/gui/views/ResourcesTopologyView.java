@@ -58,12 +58,12 @@ public class ResourcesTopologyView extends ViewPart {
     }
 
     @Override
-    public void createPartControl(Composite parent) {
+    public void createPartControl(final Composite parent) {
         topologyViewer = new TopologyViewer(parent);
         if (!RMStore.isConnected()) {
             Display.getCurrent().asyncExec(new Runnable() {
                 public void run() {
-                    ConnectHandler.getHandler().execute(Display.getDefault().getActiveShell());
+                    ConnectHandler.getHandler().execute(parent.getShell());
                 }
             });
         }

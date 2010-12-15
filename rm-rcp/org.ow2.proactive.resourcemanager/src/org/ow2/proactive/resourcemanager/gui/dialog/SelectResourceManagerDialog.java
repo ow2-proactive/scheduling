@@ -57,7 +57,6 @@ import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
-import org.eclipse.swt.widgets.Dialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
@@ -74,7 +73,7 @@ import org.ow2.proactive.resourcemanager.Activator;
  *
  * @author The ProActive Team
  */
-public class SelectResourceManagerDialog extends Dialog {
+public class SelectResourceManagerDialog {
 
     public static final String RM_CONFIG_DIR = ".ProActive_ResourceManager";
     public static final String USER_DIR = System.getProperty("user.home");
@@ -108,9 +107,6 @@ public class SelectResourceManagerDialog extends Dialog {
     // --------------------------- constructor ---------------------------- //
     // -------------------------------------------------------------------- //
     private SelectResourceManagerDialog(Shell parent) {
-        // Pass the default styles here
-        super(parent, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
-
         // Load the proactive default configuration
         ProActiveConfiguration.load();
 
@@ -118,7 +114,7 @@ public class SelectResourceManagerDialog extends Dialog {
         Display display = parent.getDisplay();
 
         // Init the shell
-        shell = new Shell(parent, SWT.BORDER | SWT.CLOSE);
+        shell = new Shell(parent.getDisplay(), SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
         shell.setText("Connect to a resource manager");
         FormLayout layout = new FormLayout();
         layout.marginHeight = 5;
