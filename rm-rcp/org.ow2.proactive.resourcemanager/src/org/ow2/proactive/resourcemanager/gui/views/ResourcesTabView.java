@@ -68,7 +68,7 @@ public class ResourcesTabView extends ViewPart {
     }
 
     @Override
-    public void createPartControl(Composite parent) {
+    public void createPartControl(final Composite parent) {
         tabViewer = new RMTableViewer(parent);
         Table table = tabViewer.getTable();
         table.setLayoutData(new GridData(GridData.FILL_BOTH));
@@ -122,7 +122,7 @@ public class ResourcesTabView extends ViewPart {
         } else {
             Display.getCurrent().asyncExec(new Runnable() {
                 public void run() {
-                    ConnectHandler.getHandler().execute(Display.getDefault().getActiveShell());
+                    ConnectHandler.getHandler().execute(parent.getShell());
                 }
             });
         }

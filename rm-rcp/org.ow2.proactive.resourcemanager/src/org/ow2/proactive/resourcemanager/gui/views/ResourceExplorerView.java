@@ -95,7 +95,7 @@ public class ResourceExplorerView extends ViewPart {
      * Callback that will allow us to create the viewer and initialize it.
      */
     @Override
-    public void createPartControl(Composite theParent) {
+    public void createPartControl(final Composite theParent) {
         parent = theParent;
         treeViewer = new RMTreeViewer(this, parent);
 
@@ -114,7 +114,7 @@ public class ResourceExplorerView extends ViewPart {
         } else {
             Display.getCurrent().asyncExec(new Runnable() {
                 public void run() {
-                    ConnectHandler.getHandler().execute(Display.getDefault().getActiveShell());
+                    ConnectHandler.getHandler().execute(theParent.getShell());
                 }
             });
         }
