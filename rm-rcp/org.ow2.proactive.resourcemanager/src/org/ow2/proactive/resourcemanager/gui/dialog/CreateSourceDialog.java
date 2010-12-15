@@ -40,15 +40,18 @@ import java.util.Collection;
 
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.layout.FormAttachment;
-import org.eclipse.swt.layout.FormData;
-import org.eclipse.swt.layout.FormLayout;
+import org.eclipse.swt.custom.ScrolledComposite;
+import org.eclipse.swt.events.ControlEvent;
+import org.eclipse.swt.events.ControlListener;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Dialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
@@ -65,100 +68,50 @@ import org.ow2.proactive.resourcemanager.nodesource.common.PluginDescriptor;
  *
  * @author The ProActive Team
  */
-public class CreateSourceDialog extends Dialog {
+public class CreateSourceDialog {
 
-    public class NodeSourceButtons extends Composite {
-
-        public NodeSourceButtons(Shell parent, int style) {
-            super(parent, style);
-
-            FormLayout layout = new FormLayout();
-            layout.marginHeight = 5;
-            layout.marginWidth = 5;
-            setLayout(layout);
-
-            Button okButton = new Button(this, SWT.NONE);
-            Button cancelButton = new Button(this, SWT.NONE);
-
-            okButton.setText("OK");
-            cancelButton.setText("Cancel");
-
-            FormData okFormData = new FormData();
-            okFormData.left = new FormAttachment(1, 100);
-            okFormData.width = 100;
-            okButton.setLayoutData(okFormData);
-            shell.setDefaultButton(okButton);
-
-            FormData cancelFormData = new FormData();
-            cancelFormData.left = new FormAttachment(okButton, 10);
-            cancelFormData.width = 100;
-            cancelButton.setLayoutData(cancelFormData);
-
-            okButton.addListener(SWT.Selection, new Listener() {
-                public void handleEvent(Event event) {
-                    try {
-                        validateForm();
-                        ResourceManager rm = RMStore.getInstance().getResourceManager();
-                        Object[] policyParams = policy.getParameters();
-                        rm.createNodeSource(name.getNodeSourceName(),
-                                infrastructure.getSelectedPlugin().getPluginName(),
-                                infrastructure.getParameters(), policy.getSelectedPlugin().getPluginName(),
-                                policyParams).booleanValue();
-
-                        shell.close();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        String message = e.getMessage();
-                        if (e.getCause() != null) {
-                            message = e.getCause().getMessage();
-                        }
-                        MessageDialog.openError(Display.getDefault().getActiveShell(),
-                                "Cannot create nodesource", message);
-                    }
-                }
-            });
-
-            cancelButton.addListener(SWT.Selection, new Listener() {
-                public void handleEvent(Event event) {
-                    shell.close();
-                }
-            });
-
-            pack();
-        }
-
-        @Override
-        protected void checkSubclass() {
-        }
-
-    }
-
-    private Shell shell;
+    private Shell dialog;
     private NodeSourceName name;
     private ConfigurablePanel infrastructure;
     private ConfigurablePanel policy;
+    private ScrolledComposite scroll = null;
+    private Composite view = null;
 
     private CreateSourceDialog(Shell parent) throws RMException {
-        // Pass the default styles here
-        super(parent, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
 
-        // Load the proactive default configuration
         ProActiveConfiguration.load();
 
-        // Init the display
         Display display = parent.getDisplay();
 
-        // Init the shell
-        shell = new Shell(parent, SWT.BORDER | SWT.CLOSE);
-        shell.setText("Create a node source");
-        RowLayout layout = new RowLayout(SWT.VERTICAL);
-        layout.spacing = 5;
-        shell.setLayout(layout);
+        dialog = new Shell(parent.getDisplay(), SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL | SWT.RESIZE);
+        dialog.setText("Create a node source");
+        GridLayout shellLayout = new GridLayout(1, false);
+        shellLayout.marginLeft = 0;
+        shellLayout.marginRight = 0;
+        shellLayout.horizontalSpacing = 0;
+        shellLayout.marginWidth = 0;
+        dialog.setLayout(shellLayout);
+
+        scroll = new ScrolledComposite(dialog, SWT.H_SCROLL | SWT.V_SCROLL);
+        scroll.setLayoutData(new GridData(GridData.BEGINNING | GridData.FILL_BOTH));
+
+        view = new Composite(scroll, SWT.NONE);
+        GridLayout l = new GridLayout(1, false);
+        view.setLayout(l);
+
+        scroll.setExpandHorizontal(true);
+        scroll.setExpandVertical(true);
+        scroll.setContent(view);
 
         // creation
-        name = new NodeSourceName(shell, SWT.NONE);
-        infrastructure = new ConfigurablePanel(shell, "Node source infrastructure");
-        policy = new ConfigurablePanel(shell, "Node source policy");
+        name = new NodeSourceName(view, SWT.NONE);
+        name.setLayoutData(new GridData(GridData.BEGINNING));
+
+        infrastructure = new ConfigurablePanel(view, "Node source infrastructure", this);
+        infrastructure.setLayoutData(new GridData(GridData.BEGINNING | GridData.FILL_BOTH));
+
+        policy = new ConfigurablePanel(view, "Node source policy", this);
+        policy.setLayoutData(new GridData(GridData.BEGINNING | GridData.FILL_BOTH));
 
         ResourceManager rm = RMStore.getInstance().getResourceManager();
         Collection<PluginDescriptor> infrastructures = rm.getSupportedNodeSourceInfrastructures();
@@ -177,16 +130,73 @@ public class CreateSourceDialog extends Dialog {
             policy.addComboValue(descriptor);
         }
 
-        new NodeSourceButtons(shell, SWT.NONE);
+        final Label sep = new Label(dialog, SWT.SEPARATOR | SWT.HORIZONTAL);
+        GridData gs = new GridData(GridData.FILL_HORIZONTAL | GridData.VERTICAL_ALIGN_END);
+        gs.horizontalSpan = 2;
+        sep.setLayoutData(gs);
 
-        shell.pack();
-        shell.open();
+        Composite buttons = new Composite(dialog, 0);
+        GridData gb = new GridData(GridData.HORIZONTAL_ALIGN_END | GridData.VERTICAL_ALIGN_END);
+        buttons.setLayoutData(gb);
+        RowLayout rl = new RowLayout(SWT.HORIZONTAL);
+        rl.marginRight = 20;
+        rl.spacing = 20;
+        buttons.setLayout(rl);
 
-        while (!shell.isDisposed()) {
+        final Button cancelButton = new Button(buttons, SWT.PUSH);
+        cancelButton.setText("   Cancel   ");
+        cancelButton.addListener(SWT.Selection, new Listener() {
+            public void handleEvent(Event event) {
+                dialog.close();
+            }
+        });
+
+        final Button okButton = new Button(buttons, SWT.PUSH);
+        okButton.setText("     OK     ");
+        okButton.addListener(SWT.Selection, new Listener() {
+            public void handleEvent(Event event) {
+                try {
+                    validateForm();
+                    ResourceManager rm = RMStore.getInstance().getResourceManager();
+                    Object[] policyParams = policy.getParameters();
+                    rm.createNodeSource(name.getNodeSourceName(),
+                            infrastructure.getSelectedPlugin().getPluginName(),
+                            infrastructure.getParameters(), policy.getSelectedPlugin().getPluginName(),
+                            policyParams).getBooleanValue();
+
+                    dialog.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    String message = e.getMessage();
+                    if (e.getCause() != null) {
+                        message = e.getCause().getMessage();
+                    }
+                    MessageDialog.openError(Display.getDefault().getActiveShell(),
+                            "Cannot create nodesource", message);
+                }
+            }
+        });
+
+        scroll.setMinSize(view.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+        dialog.pack();
+        dialog.open();
+        dialog.setMinimumSize(100, 100);
+
+        while (!dialog.isDisposed()) {
             if (!display.readAndDispatch()) {
                 display.sleep();
             }
         }
+    }
+
+    public void repack() {
+        scroll.setMinSize(view.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+        view.pack();
+
+        Point pref = dialog.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+        int h = Display.getCurrent().getPrimaryMonitor().getBounds().height;
+        int rh = Math.min(pref.y, h * 4 / 5);
+        dialog.setSize(pref.x, rh);
     }
 
     /**

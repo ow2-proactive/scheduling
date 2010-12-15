@@ -36,11 +36,8 @@
  */
 package org.ow2.proactive.resourcemanager.gui.dialog.nodesources;
 
-import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -65,11 +62,11 @@ import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.ow2.proactive.resourcemanager.Activator;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.gui.dialog.CreateCredentialDialog;
+import org.ow2.proactive.resourcemanager.gui.dialog.CreateSourceDialog;
 import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
 import org.ow2.proactive.resourcemanager.nodesource.common.ConfigurableField;
 import org.ow2.proactive.resourcemanager.nodesource.common.PluginDescriptor;
@@ -118,7 +115,8 @@ public class ConfigurablePanel extends Group {
                 chooseButton.setText("Choose file");
                 chooseButton.addListener(SWT.Selection, new Listener() {
                     public void handleEvent(Event event) {
-                        FileDialog fileDialog = new FileDialog(ConfigurablePanel.this.parent, SWT.OPEN);
+                        FileDialog fileDialog = new FileDialog(ConfigurablePanel.this.parent.getShell(),
+                            SWT.OPEN);
                         String fileName = fileDialog.open();
                         if (fileName != null)
                             text.setText(fileName);
@@ -135,7 +133,7 @@ public class ConfigurablePanel extends Group {
                     createCredentialButton.addListener(SWT.Selection, new Listener() {
                         public void handleEvent(Event event) {
                             CreateCredentialDialog dialog = new CreateCredentialDialog(
-                                ConfigurablePanel.this.parent, null);
+                                ConfigurablePanel.this.parent.getShell(), null);
                             value = dialog.getCredentials();
                             if (value != null)
                                 text.setText("<generated>");
@@ -181,9 +179,10 @@ public class ConfigurablePanel extends Group {
     private Label description;
     private PluginDescriptor selectedDescriptor = null;
     private HashMap<String, PluginDescriptor> comboStates = new HashMap<String, PluginDescriptor>();
-    private Shell parent;
+    private Composite parent;
+    private int selectedComboIndex = -1;
 
-    public ConfigurablePanel(final Shell parent, String labelText) {
+    public ConfigurablePanel(final Composite parent, String labelText, final CreateSourceDialog dialog) {
         super(parent, SWT.NONE);
 
         this.parent = parent;
@@ -220,6 +219,12 @@ public class ConfigurablePanel extends Group {
             }
 
             public void widgetSelected(SelectionEvent e) {
+                if (combo.getSelectionIndex() == selectedComboIndex) {
+                    return;
+                } else {
+                    selectedComboIndex = combo.getSelectionIndex();
+                }
+
                 for (Property l : properties) {
                     l.dispose();
                 }
@@ -233,10 +238,11 @@ public class ConfigurablePanel extends Group {
                     saveToFile = null;
                 }
                 properties.clear();
-                parent.pack();
 
                 generateGui(comboStates.get(combo.getText()));
                 parent.pack();
+
+                dialog.repack();
             }
         });
     }

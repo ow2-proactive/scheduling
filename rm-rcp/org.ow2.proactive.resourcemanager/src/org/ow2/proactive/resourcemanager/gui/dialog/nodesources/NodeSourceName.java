@@ -42,7 +42,6 @@ import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
 
@@ -50,7 +49,7 @@ public class NodeSourceName extends Composite {
 
     private Text nameText;
 
-    public NodeSourceName(Shell parent, int style) {
+    public NodeSourceName(Composite parent, int style) {
         super(parent, style);
         setLayout(new FormLayout());
 
