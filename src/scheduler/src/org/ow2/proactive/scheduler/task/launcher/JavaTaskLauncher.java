@@ -165,7 +165,7 @@ public class JavaTaskLauncher extends TaskLauncher {
             try {
                 // logs have to be retrieved after flowscript exec if any
                 if (flow != null) {
-                    // *WARNING* : flow action is set in res even if an exception is thrown !
+                    // *WARNING* : flow action is set in res UNLESS an exception is thrown !
                     // see FlowAction.getDefaultAction()
                     this.executeFlowScript(res);
                 }
@@ -173,6 +173,8 @@ public class JavaTaskLauncher extends TaskLauncher {
                 // task result is now the exception thrown by flowscript
                 // flowaction is set to default
                 res = new TaskResultImpl(taskId, e, null, duration, null);
+                // action is set to default as the script was not evaluated
+                res.setAction(FlowAction.getDefaultAction(this.flow));
             }
             res.setPropagatedProperties(retreivePropagatedProperties());
             res.setLogs(this.getLogs());

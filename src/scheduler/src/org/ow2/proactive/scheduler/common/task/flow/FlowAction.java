@@ -176,7 +176,8 @@ public class FlowAction implements Serializable {
      * @param type the type of this FlowAction
      */
     public void setType(FlowActionType type) {
-        this.type = type.toString();
+        if (type != null)
+            this.type = type.toString();
     }
 
     /**
@@ -193,7 +194,8 @@ public class FlowAction implements Serializable {
      * {@link FlowActionType#IF}
      */
     public void setTarget(String t) {
-        this.target = t;
+        if (t != null)
+            this.target = t;
     }
 
     /**
@@ -209,7 +211,8 @@ public class FlowAction implements Serializable {
      *  this action is {@link FlowActionType#IF} 
      */
     public void setTargetElse(String s) {
-        this.targetElse = s;
+        if (s != null)
+            this.targetElse = s;
     }
 
     /**
@@ -217,7 +220,8 @@ public class FlowAction implements Serializable {
      *  if this action is {@link FlowActionType#IF}
      */
     public void setTargetContinuation(String t) {
-        this.targetContinuation = t;
+        if (t != null)
+            this.targetContinuation = t;
     }
 
     /**
