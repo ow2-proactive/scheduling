@@ -52,6 +52,7 @@ import org.ow2.proactive.scheduler.common.task.JavaExecutableInitializer;
 import org.ow2.proactive.scheduler.common.task.TaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
+import org.ow2.proactive.scheduler.common.task.flow.FlowAction;
 import org.ow2.proactive.scheduler.task.ExecutableContainer;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
@@ -96,6 +97,11 @@ public class JavaTaskLauncher extends TaskLauncher {
             TaskResult... results) {
         long duration = -1;
         long sample = 0;
+        // Executable result (res or ex)
+        Throwable exception = null;
+        Serializable userResult = null;
+        // TaskResult produced by doTask
+        TaskResultImpl res = null;
         try {
             //init dataspace
             initDataSpaces();
@@ -127,8 +133,6 @@ public class JavaTaskLauncher extends TaskLauncher {
             } catch (InvocationTargetException e) {
                 throw e.getCause() != null ? e.getCause() : e;
             }
-            Throwable exception = null;
-            Serializable userResult = null;
             sample = System.currentTimeMillis();
             try {
                 //launch task
@@ -147,39 +151,44 @@ public class JavaTaskLauncher extends TaskLauncher {
                 this.executePostScript(exception == null);
             }
             duration += System.currentTimeMillis() - sample;
-
-            //throw exception if needed
-            if (exception != null) {
-                throw exception;
-            }
-
-            TaskResultImpl res = new TaskResultImpl(taskId, userResult, null, duration, null);
-
-            if (flow != null) {
-                this.executeFlowScript(res);
-            }
-
-            //return result
-            res.setPropagatedProperties(retreivePropagatedProperties());
-            TaskLogs tl = this.getLogs();
-            res.setLogs(tl);
-            return res;
         } catch (Throwable ex) {
-            logger_dev.info("", ex);
-            // exceptions are always handled at scheduler core level
-            return new TaskResultImpl(taskId, ex, this.getLogs(), duration, retreivePropagatedProperties());
+            logger_dev.debug("Exception occured while running task " + this.taskId + ": ", ex);
+            exception = ex;
+            userResult = null;
         } finally {
+            // set the result
+            if (exception != null) {
+                res = new TaskResultImpl(taskId, exception, null, duration, null);
+            } else {
+                res = new TaskResultImpl(taskId, userResult, null, duration, null);
+            }
+            try {
+                // logs have to be retrieved after flowscript exec if any
+                if (flow != null) {
+                    // *WARNING* : flow action is set in res even if an exception is thrown !
+                    // see FlowAction.getDefaultAction()
+                    this.executeFlowScript(res);
+                }
+            } catch (Throwable e) {
+                // task result is now the exception thrown by flowscript
+                // flowaction is set to default
+                res = new TaskResultImpl(taskId, e, null, duration, null);
+            }
+            res.setPropagatedProperties(retreivePropagatedProperties());
+            res.setLogs(this.getLogs());
+
+            // finalize doTask
             terminateDataSpace();
             if (core != null) {
                 // This call should be conditioned by the isKilled ... ?
                 this.finalizeTask(core);
             } else {
-                /* if core == null then don't finalize the task. An example when we don't want to finalize task is when using
-                 * forked java task, then only finalizing loggers is enough.
-                 */
+                // if core == null then don't finalize the task. An example when we don't want to finalize task is when using
+                // forked java task, then only finalizing loggers is enough.
                 this.finalizeLoggers();
             }
         }
+        return res;
     }
 
     /**

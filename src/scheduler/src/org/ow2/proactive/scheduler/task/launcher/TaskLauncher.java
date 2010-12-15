@@ -612,10 +612,10 @@ public abstract class TaskLauncher implements InitActive {
     }
 
     /**
-     * Execute the control flow script on the local node
+     * Execute the control flow script on the local node and set the flow action in res.
      * 
-     * @param res TaskResult of this launcher's task, input of the script
-     * @throws Throwable
+     * @param res TaskResult of this launcher's task, input of the script.
+     * @throws Throwable if an exception occurred in the flow script. res.SetAction() is set to default action. 
      */
     @SuppressWarnings("unchecked")
     protected void executeFlowScript(TaskResult res) throws Throwable {
@@ -625,22 +625,22 @@ public abstract class TaskLauncher implements InitActive {
         this.addDataspaceBinding(handler);
         handler.addBinding(FlowScript.resultVariable, res.value());
         ScriptResult<FlowAction> sRes = handler.handle(flow);
+        this.flushStreams();
 
         if (sRes.errorOccured()) {
             Throwable ee = sRes.getException();
             if (ee != null) {
+                // stacktraced on user logs
                 ee.printStackTrace();
-
+                // action is set to default as the script cannot be evaluated
                 ((TaskResultImpl) res).setAction(FlowAction.getDefaultAction(this.flow));
-
                 logger_dev.error("Error on flow-script occured : ", ee);
                 throw new UserException("Flow-script has failed on the current node", ee);
             }
+        } else {
+            FlowAction action = sRes.getResult();
+            ((TaskResultImpl) res).setAction(action);
         }
-
-        this.flushStreams();
-        FlowAction action = sRes.getResult();
-        ((TaskResultImpl) res).setAction(action);
     }
 
     /**

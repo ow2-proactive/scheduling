@@ -103,6 +103,11 @@ public class NativeTaskLauncher extends TaskLauncher {
             TaskResult... results) {
         long duration = -1;
         long sample = 0;
+        // Executable result (res or ex)
+        Throwable exception = null;
+        Serializable userResult = null;
+        // TaskResult produced by doTask
+        TaskResultImpl res = null;
         try {
             //init dataspace
             initDataSpaces();
@@ -149,8 +154,6 @@ public class NativeTaskLauncher extends TaskLauncher {
             //replace dataspace tags in command (if needed) by local scratch directory
             replaceCommandDSTags();
 
-            Throwable exception = null;
-            Serializable userResult = null;
             sample = System.currentTimeMillis();
             try {
                 //launch task
@@ -171,34 +174,40 @@ public class NativeTaskLauncher extends TaskLauncher {
                 this.executePostScript(retCode == 0 && exception == null);
             }
             duration += System.currentTimeMillis() - sample;
-
-            //throw exception if needed
+        } catch (Throwable ex) {
+            logger_dev.debug("Exception occured while running task " + this.taskId + ": ", ex);
+            exception = ex;
+            userResult = null;
+        } finally {
+            // set the result
             if (exception != null) {
-                throw exception;
+                res = new TaskResultImpl(taskId, exception, null, duration, null);
+            } else {
+                res = new TaskResultImpl(taskId, userResult, null, duration, null);
             }
-
-            TaskResultImpl res = new TaskResultImpl(taskId, userResult, null, duration, null);
-
-            if (flow != null) {
-                this.executeFlowScript(res);
+            try {
+                // logs have to be retrieved after flowscript exec if any
+                if (flow != null) {
+                    // *WARNING* : flow action is set in res even if an exception is thrown !
+                    // see FlowAction.getDefaultAction()
+                    this.executeFlowScript(res);
+                }
+            } catch (Throwable e) {
+                // task result is now the exception thrown by flowscript
+                // flowaction is set to default
+                res = new TaskResultImpl(taskId, e, null, duration, null);
             }
-
             res.setPropagatedProperties(retreivePropagatedProperties());
             res.setLogs(this.getLogs());
 
-            //return result
-            return res;
-        } catch (Throwable ex) {
-            logger_dev.info("", ex);
-            // exceptions are always handled at scheduler core level
-            return new TaskResultImpl(taskId, ex, this.getLogs(), duration, retreivePropagatedProperties());
-        } finally {
+            // finalize task
             terminateDataSpace();
             if (isWallTime()) {
                 cancelTimer();
             }
             this.finalizeTask(core);
         }
+        return res;
     }
 
     private void replaceWorkingDirDSTags(ExecutableInitializer execInit) throws Exception {
