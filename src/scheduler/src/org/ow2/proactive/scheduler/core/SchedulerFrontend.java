@@ -583,7 +583,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
     private void checkOwnStatePermission(boolean myOnly, UserIdentificationImpl ui)
             throws PermissionException {
         ui.checkPermission(new GetOwnStateOnlyPermission(myOnly), ui.getUsername() +
-            " does not have permissions to retreive full state");
+            " does not have permissions to retrieve full state");
     }
 
     /**
