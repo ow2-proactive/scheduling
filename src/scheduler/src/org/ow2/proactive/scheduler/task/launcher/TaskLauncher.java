@@ -103,6 +103,7 @@ import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.ScriptHandler;
 import org.ow2.proactive.scripting.ScriptLoader;
 import org.ow2.proactive.scripting.ScriptResult;
+import org.ow2.proactive.utils.Formatter;
 
 
 /**
@@ -738,8 +739,8 @@ public abstract class TaskLauncher implements InitActive {
                         "There was a problem while initializing dataSpaces, they won't be activated", t);
                 //print for user task
                 System.err
-                        .println("There was a problem while initializing dataSpaces, they won't be activated : " +
-                            t.getMessage());
+                        .println("There was a problem while initializing dataSpaces, they won't be activated : \n" +
+                            Formatter.stackTraceToString(t));
             }
         }
     }
