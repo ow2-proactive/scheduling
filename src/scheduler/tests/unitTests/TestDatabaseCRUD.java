@@ -127,7 +127,7 @@ public class TestDatabaseCRUD {
         //add a taskResult
         itfJob.setJobResult(new JobResultImpl(itfJob));
         ((JobResultImpl) itfJob.getJobResult()).addTaskResult("task2", new TaskResultImpl(TaskIdImpl
-                .nextId(itfJob.getJobInfo().getJobId()), "salut", null, 1, null, new FlowAction()), true);
+                .nextId(itfJob.getJobInfo().getJobId()), "salut", null, 1, null), true);
         //register the job
         DatabaseManager.getInstance().register(itfJob);
         //list of internal job to recover

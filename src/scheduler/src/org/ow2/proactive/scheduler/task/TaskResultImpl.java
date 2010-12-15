@@ -190,8 +190,29 @@ public class TaskResultImpl implements TaskResult {
         this.output = output;
     }
 
+    /**
+     * Return a new instance of task result represented by a task id, its result and its output.
+     *
+     * @param id the identification of the task that send this result.
+     * @param value the result of the task.
+     * @param output the output of the task.
+     * @param execDuration the execution duration of the task itself
+     * @throws IOException
+     */
     public TaskResultImpl(TaskId id, Serializable value, TaskLogs output, long execDuration) {
-        this(id, value, output, execDuration, null, null);
+        this(id, value, output, execDuration, null);
+    }
+
+    /**
+     * Return a new instance of task result represented by a task id and its exception.
+     *
+     * @param id the identification of the task that send this result.
+     * @param exception the exception that occurred in the task.
+     * @param output the output of the task.
+     * @param execDuration the execution duration of the task itself
+     */
+    public TaskResultImpl(TaskId id, Throwable value, TaskLogs output, long execDuration) {
+        this(id, value, output, execDuration, null);
     }
 
     /**
@@ -205,11 +226,10 @@ public class TaskResultImpl implements TaskResult {
      * @throws IOException
      */
     public TaskResultImpl(TaskId id, Serializable value, TaskLogs output, long execDuration,
-            Map<String, BigString> propagatedProperties, FlowAction action) {
+            Map<String, BigString> propagatedProperties) {
         this(id, output);
         this.taskDuration = execDuration;
         this.value = value;
-        this.flowAction = action;
         this.propagatedProperties = propagatedProperties;
         try {
             //try to serialize user result

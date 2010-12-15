@@ -152,7 +152,7 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher {
                         "Forked JVM process has been terminated with exit code " + ec, ec);
                     return new TaskResultImpl(taskId, t, new SimpleTaskLogs("",
                         "Forked JVM process has been terminated with exit code " + ec +
-                            ", no result has been retreived."), duration, null);
+                            ", no result has been retreived."), duration);
                 }
             }
         } catch (Throwable ex) {

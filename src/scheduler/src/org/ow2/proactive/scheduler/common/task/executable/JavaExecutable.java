@@ -36,12 +36,11 @@
  */
 package org.ow2.proactive.scheduler.common.task.executable;
 
-import java.io.Serializable;
 import java.io.FileNotFoundException;
+import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.extensions.dataspaces.api.DataSpacesFileObject;

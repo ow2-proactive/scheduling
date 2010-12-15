@@ -153,7 +153,7 @@ public class JavaTaskLauncher extends TaskLauncher {
                 throw exception;
             }
 
-            TaskResultImpl res = new TaskResultImpl(taskId, userResult, null, duration, null, null);
+            TaskResultImpl res = new TaskResultImpl(taskId, userResult, null, duration, null);
 
             if (flow != null) {
                 this.executeFlowScript(res);

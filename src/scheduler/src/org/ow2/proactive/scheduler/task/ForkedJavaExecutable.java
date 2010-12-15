@@ -71,12 +71,10 @@ import org.objectweb.proactive.core.runtime.StartPARuntime;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.processbuilder.OSProcessBuilder;
 import org.objectweb.proactive.extensions.processbuilder.exception.NotImplementedException;
-import org.ow2.proactive.scheduler.common.exception.ForkedJavaTaskException;
 import org.ow2.proactive.scheduler.common.exception.InternalSchedulerException;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.exception.UserException;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
-import org.ow2.proactive.scheduler.common.task.SimpleTaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
@@ -206,10 +204,9 @@ public class ForkedJavaExecutable extends JavaExecutable {
             execState = ExecutableState.TERMINATED;
 
             try {
-                Integer ec = process.exitValue();
                 //if no exception, JVM has terminated and task result is not available
                 //so return exit code that must be handle correctly by forkedJavaTaskLauncher
-                return ec;
+                return process.exitValue();
             } catch (IllegalThreadStateException e) {
                 //process not terminated
             }
