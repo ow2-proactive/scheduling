@@ -36,7 +36,9 @@
  */
 package org.ow2.proactive_grid_cloud_portal;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -68,7 +70,9 @@ public class SessionsCleaner implements Runnable {
     public void run() {
         while (!stop) {
             Map<String, Scheduler> sessionMap = ssm.getSessionsMap();
-            logger.info("start cleaning session");
+            logger.info("cleaning session started, " + sessionMap.size() + " existing session(s) ");
+            int removedSession = 0;
+            List<Entry<String, Scheduler>> scheduledforRemoval = new ArrayList<Entry<String, Scheduler>>();
             synchronized (sessionMap) {
                 Set<Entry<String, Scheduler>> entrySet = sessionMap.entrySet();
                 Iterator<Entry<String, Scheduler>> it = entrySet.iterator();
@@ -78,22 +82,32 @@ public class SessionsCleaner implements Runnable {
                     try {
 
                         // isConnected does not reset the lease of the stub
-                        boolean connected = s.isConnected();
+                        boolean connected = false;
+                        connected = s.isConnected();
 
                         // if not connected, removing it from the session map
                         // to clean 
                         if (!connected) {
-                            logger.info("cleaning session " + entry.getKey() + ", not connected");
-                            sessionMap.remove(s);
+                            logger.info("session " + entry.getKey() + " is scheduled for deletion, not connected");
+                            scheduledforRemoval.add(entry);
+                            removedSession++;
                         }
                     } catch (Throwable t) {
-                        logger.info("cleaning session " + entry.getKey() + ", connection issue");
-                        sessionMap.remove(entry.getKey());
+                        logger.info("session " + entry.getKey() + " is scheduled for deletion, connection issue");
+                        scheduledforRemoval.add(entry);
+                        removedSession++;
                     }
 
                 }
+                
+                // effective deletion
+                for (Entry<String, Scheduler> entry : scheduledforRemoval) {
+                    sessionMap.remove(entry.getKey());
+                }
+                
             }
             // clean every 5 minutes
+            logger.info("cleaning session ended, " + removedSession+ " session(s) removed");
             new Sleeper(5 * 60 * 1000).sleep();
         }
         logger.info(Thread.currentThread().getName() + " terminated");
