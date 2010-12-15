@@ -58,6 +58,12 @@ import org.ow2.proactive.scheduler.common.task.TaskInfo;
  * acts a listener for all the events sent by the scheduler and updates
  * the schedulerState according to the received events.
  *
+ * This implementation uses a remote object as scheduler listener.
+ * This implies that updates on the scheduler state can happen at any time,
+ * even when the scheduler state is serialized leading to ConcurrentModificationException.
+ *
+ * If unsure, try using @see org.ow2.proactive.scheduler.common.util.CachingSchedulerProxyUserInterface
+ *
  */
 public class CachingSchedulerEventListener implements SchedulerEventListener {
 
