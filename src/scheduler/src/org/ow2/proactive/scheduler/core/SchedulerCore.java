@@ -1529,13 +1529,8 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
         //useful to get the task result with the task name
         TaskResult result = ((JobResultImpl) job.getJobResult()).getResult(taskName);
         if (result == null) {
-            //the task is unknown
-            logger_dev.info("Result of task " + taskName + " does not exist !");
-            throw new UnknownTaskException("Result of task " + taskName + " does not exist !");
-        }
-        if (PAFuture.isAwaited(result)) {
-            //the result is not yet available
-            logger_dev.info("Task '" + taskName + "' is running");
+            //the task is not finished : means not yet started or running
+            logger_dev.info("Task " + taskName + " is not finished");
             return null;
         }
         //extract full taskResult from DB
