@@ -256,6 +256,7 @@
 				<include name="org/ow2/proactive/scheduler/common/task/RestartMode.java" />
 				<include name="org/ow2/proactive/scheduler/common/task/TaskDescriptor.java" />
 				<include name="org/ow2/proactive/scheduler/common/task/JavaTask.java" />
+				<include name="org/ow2/proactive/scheduler/common/task/ParallelEnvironment.java" />
 				<include name="org/ow2/proactive/scheduler/common/task/ExecutableInitializer.java" />
 				<include name="org/ow2/proactive/scheduler/common/task/JavaExecutableInitializer.java" />
 				<include name="org/ow2/proactive/scheduler/common/task/ForkEnvironment.java" />

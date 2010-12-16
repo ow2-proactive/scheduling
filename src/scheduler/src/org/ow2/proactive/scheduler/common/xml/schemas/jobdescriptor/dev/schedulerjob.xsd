@@ -243,6 +243,7 @@
             <xs:element minOccurs="0" ref="jd:genericInformation"/>
             <xs:element minOccurs="0" ref="jd:depends"/>
             <xs:element minOccurs="0" ref="jd:inputFiles"/>
+            <xs:element minOccurs="0" ref="jd:parallel"/>
             <xs:element minOccurs="0" ref="jd:selection"/>
             <xs:element minOccurs="0" ref="jd:pre"/>
             <xs:element ref="jd:executable"/>
@@ -420,6 +421,33 @@
       </xs:element>
     </xs:sequence>
   </xs:group>
+  <xs:element name="parallel">
+    <xs:annotation>
+      <xs:documentation>An information related parallel task including nodes number and topology</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" ref="jd:topology"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="jd:nodesNumber_t"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="topology">
+    <xs:annotation>
+      <xs:documentation>A topology descriptor of the parallel task</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:choice>
+        <xs:element ref="jd:arbitrary"/>
+        <xs:element ref="jd:bestProximity"/>
+        <xs:element ref="jd:thresholdProximity"/>
+        <xs:element ref="jd:singleHost"/>
+        <xs:element ref="jd:singleHostExclusive"/>
+        <xs:element ref="jd:multipleHostsExclusive"/>
+        <xs:element ref="jd:differentHostsExclusive"/>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
   <xs:element name="selection">
     <xs:annotation>
       <xs:documentation>A script used to select resources that can handle the task </xs:documentation>
@@ -608,6 +636,58 @@
       </xs:element>
     </xs:sequence>
   </xs:group>
+  <!-- +++++++++++++ Topology -->
+  <xs:element name="arbitrary">
+    <xs:annotation>
+      <xs:documentation>arbitrary topology</xs:documentation>
+    </xs:annotation>
+    <xs:complexType/>
+  </xs:element>
+  <xs:element name="bestProximity">
+    <xs:annotation>
+      <xs:documentation>best nodes proximity</xs:documentation>
+    </xs:annotation>
+    <xs:complexType/>
+  </xs:element>
+  <xs:element name="thresholdProximity">
+    <xs:annotation>
+      <xs:documentation>threshold nodes proximity</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:attributeGroup ref="jd:threshold"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="singleHost">
+    <xs:annotation>
+      <xs:documentation>nodes on single host</xs:documentation>
+    </xs:annotation>
+    <xs:complexType/>
+  </xs:element>
+  <xs:element name="singleHostExclusive">
+    <xs:annotation>
+      <xs:documentation>nodes on single host exclusively</xs:documentation>
+    </xs:annotation>
+    <xs:complexType/>
+  </xs:element>
+  <xs:element name="multipleHostsExclusive">
+    <xs:annotation>
+      <xs:documentation>nodes on multiple hosts exclusively</xs:documentation>
+    </xs:annotation>
+    <xs:complexType/>
+  </xs:element>
+  <xs:element name="differentHostsExclusive">
+    <xs:annotation>
+      <xs:documentation>nodes on single host exclusively</xs:documentation>
+    </xs:annotation>
+    <xs:complexType/>
+  </xs:element>
+  <xs:attributeGroup name="threshold">
+    <xs:attribute name="threshold" use="required" type="xs:nonNegativeInteger">
+      <xs:annotation>
+        <xs:documentation>threshold value</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
   <!-- +++++++++++++ executables -->
   <xs:element name="executable" abstract="true"/>
   <xs:element name="nativeExecutable" substitutionGroup="jd:executable">

@@ -77,6 +77,17 @@
         <mapping class="org.ow2.proactive.scheduler.common.task.util.IntegerWrapper"/>
         <mapping class="org.ow2.proactive.db.types.BigString"/>
         <mapping class="org.ow2.proactive.scheduler.common.task.util.ByteArrayWrapper"/>
+        <!-- TOPOLOGY -->
+		<mapping class="org.ow2.proactive.scheduler.common.task.ParallelEnvironment"/>
+		<mapping class="org.ow2.proactive.topology.descriptor.TopologyDescriptor"/>
+		<mapping class="org.ow2.proactive.topology.descriptor.ArbitraryTopologyDescriptor"/>
+		<mapping class="org.ow2.proactive.topology.descriptor.BestProximityDescriptor"/>
+		<mapping class="org.ow2.proactive.topology.descriptor.ThresholdProximityDescriptor"/>
+		<mapping class="org.ow2.proactive.topology.descriptor.SingleHostDescriptor"/>
+		<mapping class="org.ow2.proactive.topology.descriptor.SingleHostExclusiveDescriptor"/>
+		<mapping class="org.ow2.proactive.topology.descriptor.MultipleHostsExclusiveDescriptor"/>
+		<mapping class="org.ow2.proactive.topology.descriptor.DifferentHostsExclusiveDescriptor"/>
+
         <!-- SCRIPTING -->
         <mapping class="org.ow2.proactive.scripting.Script"/>
         <mapping class="org.ow2.proactive.scripting.GenerationScript"/>

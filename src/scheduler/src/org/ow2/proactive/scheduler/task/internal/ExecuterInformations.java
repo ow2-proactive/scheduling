@@ -37,6 +37,8 @@
 package org.ow2.proactive.scheduler.task.internal;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.LinkedList;
 
 import org.objectweb.proactive.core.node.Node;
 import org.ow2.proactive.scheduler.task.launcher.TaskLauncher;
@@ -104,6 +106,12 @@ public class ExecuterInformations implements Serializable {
      */
     public void addNodes(NodeSet nodes) {
         this.nodes.addAll(nodes);
+        if (nodes.getExtraNodes() != null) {
+            if (this.nodes.getExtraNodes() == null) {
+                this.nodes.setExtraNodes(new LinkedList<Node>());
+            }
+            this.nodes.getExtraNodes().addAll(nodes.getExtraNodes());
+        }
     }
 
     /**

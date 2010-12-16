@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job xmlns="urn:proactive:jobdescriptor:dev" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="urn:proactive:jobdescriptor:dev ../../src/scheduler/src/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/dev/schedulerjob.xsd"
+	name="job_MultiNodes" priority="high">
+	<description>
+	    A TaskFlow job that will find out the Nth first prime number where N is given as
+		argument. It will use the multi-nodes feature to compute it on several node
+	</description>
+	<taskFlow>
+		<task name="Controller0">
+			<description>Will control the workers in order to find the prime number</description>
+			<parallel numberOfNodes="4"/>
+			<javaExecutable
+				class="org.ow2.proactive.scheduler.examples.MultiNodeExample">
+				<parameters>
+					<parameter name="numberToFind" value="100"/>
+				</parameters>
+			</javaExecutable>
+		</task>
+		<task name="Controller1">
+			<description>Will control the workers in order to find the prime number</description>
+			<parallel numberOfNodes="4">
+				<topology>
+					<arbitrary/>
+				</topology>
+			</parallel>
+			<javaExecutable
+				class="org.ow2.proactive.scheduler.examples.MultiNodeExample">
+				<parameters>
+					<parameter name="numberToFind" value="100"/>
+				</parameters>
+			</javaExecutable>
+		</task>
+		<task name="Controller2">
+			<description>Will control the workers in order to find the prime number</description>
+			<parallel numberOfNodes="4">
+				<topology>
+					<bestProximity/>
+				</topology>
+			</parallel>
+			<javaExecutable
+				class="org.ow2.proactive.scheduler.examples.MultiNodeExample">
+				<parameters>
+					<parameter name="numberToFind" value="100"/>
+				</parameters>
+			</javaExecutable>
+		</task>
+
+		<task name="Controller3">
+			<description>Will control the workers in order to find the prime number</description>
+			<parallel numberOfNodes="4">
+				<topology>
+					<thresholdProximity threshold="100"/>
+				</topology>
+			</parallel>
+			<javaExecutable
+				class="org.ow2.proactive.scheduler.examples.MultiNodeExample">
+				<parameters>
+					<parameter name="numberToFind" value="100"/>
+				</parameters>
+			</javaExecutable>
+		</task>
+
+		<task name="Controller4">
+			<description>Will control the workers in order to find the prime number</description>
+			<parallel numberOfNodes="4">
+				<topology>
+					<singleHost/>
+				</topology>
+			</parallel>
+			<javaExecutable
+				class="org.ow2.proactive.scheduler.examples.MultiNodeExample">
+				<parameters>
+					<parameter name="numberToFind" value="100"/>
+				</parameters>
+			</javaExecutable>
+		</task>
+		<task name="Controller5">
+			<description>Will control the workers in order to find the prime number</description>
+			<parallel numberOfNodes="4">
+				<topology>
+					<singleHostExclusive/>
+				</topology>
+			</parallel>
+			<javaExecutable
+				class="org.ow2.proactive.scheduler.examples.MultiNodeExample">
+				<parameters>
+					<parameter name="numberToFind" value="100"/>
+				</parameters>
+			</javaExecutable>
+		</task>
+		<task name="Controller6">
+			<description>Will control the workers in order to find the prime number</description>
+			<parallel numberOfNodes="4">
+				<topology>
+					<multipleHostsExclusive/>
+				</topology>
+			</parallel>
+			<javaExecutable
+				class="org.ow2.proactive.scheduler.examples.MultiNodeExample">
+				<parameters>
+					<parameter name="numberToFind" value="100"/>
+				</parameters>
+			</javaExecutable>
+		</task>
+		<task name="Controller7">
+			<description>Will control the workers in order to find the prime number</description>
+			<parallel numberOfNodes="4">
+				<topology>
+					<differentHostsExclusive/>
+				</topology>
+			</parallel>
+			<javaExecutable
+				class="org.ow2.proactive.scheduler.examples.MultiNodeExample">
+				<parameters>
+					<parameter name="numberToFind" value="100"/>
+				</parameters>
+			</javaExecutable>
+		</task>
+	</taskFlow>
+</job>

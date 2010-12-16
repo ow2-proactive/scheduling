@@ -1909,7 +1909,6 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
             //re-link the RM
             rmProxiesManager = RMProxiesManager.rebindRMProxiesManager(new URI(rmURL.trim()));
             rmProxiesManager.getSchedulerRMProxy();
-            schedulingMethod.setTopologyDisabled(false);
             logger
                     .info("New resource manager has been linked to the scheduler.\n\t-> Resume to continue the scheduling.");
             frontend.schedulerStateUpdated(SchedulerEvent.RM_UP);

@@ -7,7 +7,7 @@
 		argument. It will use the multi-nodes feature to compute it on several node
 	</description>
 	<taskFlow>
-		<task name="Controller" numberOfNodes="5">
+		<task name="Controller" numberOfNodes="4">
 			<description>Will control the workers in order to find the prime number</description>
 			<javaExecutable
 				class="org.ow2.proactive.scheduler.examples.MultiNodeExample">

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<grammar xmlns:doc="http://relaxng.org/ns/compatibility/annotations/1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jd="urn:proactive:jobdescriptor:dev" ns="urn:proactive:jobdescriptor:dev" xmlns="http://relaxng.org/ns/structure/1.0" datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
+<grammar ns="urn:proactive:jobdescriptor:dev" xmlns:jd="urn:proactive:jobdescriptor:dev" xmlns:doc="http://relaxng.org/ns/compatibility/annotations/1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://relaxng.org/ns/structure/1.0" datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
   <start>
     <ref name="job"/>
   </start>
@@ -234,6 +234,9 @@
         <ref name="inputFiles"/>
       </optional>
       <optional>
+        <ref name="parallel"/>
+      </optional>
+      <optional>
         <ref name="selection"/>
       </optional>
       <optional>
@@ -340,6 +343,29 @@
       <attribute name="ref">
         <data type="IDREF"/>
       </attribute>
+    </element>
+  </define>
+  <define name="parallel">
+    <element name="parallel">
+      <doc:documentation>An information related parallel task including nodes number and topology</doc:documentation>
+      <ref name="nodesNumber_t"/>
+      <optional>
+        <ref name="topology"/>
+      </optional>
+    </element>
+  </define>
+  <define name="topology">
+    <element name="topology">
+      <doc:documentation>A topology descriptor of the parallel task</doc:documentation>
+      <choice>
+        <ref name="arbitrary"/>
+        <ref name="bestProximity"/>
+        <ref name="thresholdProximity"/>
+        <ref name="singleHost"/>
+        <ref name="singleHostExclusive"/>
+        <ref name="multipleHostsExclusive"/>
+        <ref name="differentHostsExclusive"/>
+      </choice>
     </element>
   </define>
   <define name="selection">
@@ -483,6 +509,55 @@
         <data type="string"/>
       </attribute>
     </element>
+  </define>
+  <!-- +++++++++++++ Topology -->
+  <define name="arbitrary">
+    <element name="arbitrary">
+      <doc:documentation>arbitrary topology</doc:documentation>
+      <empty/>
+    </element>
+  </define>
+  <define name="bestProximity">
+    <element name="bestProximity">
+      <doc:documentation>best nodes proximity</doc:documentation>
+      <empty/>
+    </element>
+  </define>
+  <define name="thresholdProximity">
+    <element name="thresholdProximity">
+      <doc:documentation>threshold nodes proximity</doc:documentation>
+      <ref name="threshold"/>
+    </element>
+  </define>
+  <define name="singleHost">
+    <element name="singleHost">
+      <doc:documentation>nodes on single host</doc:documentation>
+      <empty/>
+    </element>
+  </define>
+  <define name="singleHostExclusive">
+    <element name="singleHostExclusive">
+      <doc:documentation>nodes on single host exclusively</doc:documentation>
+      <empty/>
+    </element>
+  </define>
+  <define name="multipleHostsExclusive">
+    <element name="multipleHostsExclusive">
+      <doc:documentation>nodes on multiple hosts exclusively</doc:documentation>
+      <empty/>
+    </element>
+  </define>
+  <define name="differentHostsExclusive">
+    <element name="differentHostsExclusive">
+      <doc:documentation>nodes on single host exclusively</doc:documentation>
+      <empty/>
+    </element>
+  </define>
+  <define name="threshold">
+    <attribute name="threshold">
+      <doc:documentation>threshold value</doc:documentation>
+      <data type="nonNegativeInteger"/>
+    </attribute>
   </define>
   <!-- +++++++++++++ executables -->
   <define name="executable">

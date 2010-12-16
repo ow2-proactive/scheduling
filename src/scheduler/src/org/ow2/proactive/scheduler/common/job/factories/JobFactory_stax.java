@@ -71,6 +71,7 @@ import org.ow2.proactive.scheduler.common.task.CommonAttribute;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.NativeTask;
+import org.ow2.proactive.scheduler.common.task.ParallelEnvironment;
 import org.ow2.proactive.scheduler.common.task.RestartMode;
 import org.ow2.proactive.scheduler.common.task.Task;
 import org.ow2.proactive.scheduler.common.task.dataspaces.FileSelector;
@@ -84,10 +85,14 @@ import org.ow2.proactive.scripting.GenerationScript;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.scripting.SimpleScript;
+import org.ow2.proactive.topology.descriptor.ThresholdProximityDescriptor;
+import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
 import org.ow2.proactive.utils.Tools;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
+
+import com.sun.crypto.provider.DESCipher;
 
 
 /**
@@ -649,6 +654,8 @@ public class JobFactory_stax extends JobFactory {
                             setIOFIles(cursorTask, XMLTags.DS_INPUTFILES.getXMLName(), tmpTask);
                         } else if (XMLTags.DS_OUTPUTFILES.matches(current)) {
                             setIOFIles(cursorTask, XMLTags.DS_OUTPUTFILES.getXMLName(), tmpTask);
+                        } else if (XMLTags.PARALLEL_ENV.matches(current)) {
+                            tmpTask.setParallelEnvironment(createParallelEnvironment(cursorTask));
                         } else if (XMLTags.SCRIPT_SELECTION.matches(current)) {
                             tmpTask.setSelectionScripts(createSelectionScript(cursorTask));
                         } else if (XMLTags.SCRIPT_PRE.matches(current)) {
@@ -923,6 +930,93 @@ public class JobFactory_stax extends JobFactory {
         }
 
         return sc;
+    }
+
+    /**
+     * Creates the parallel environment from the xml descriptor.
+     */
+    private ParallelEnvironment createParallelEnvironment(XMLStreamReader cursorTask)
+            throws JobCreationException {
+        int event = -1;
+        int nodesNumber = 0;
+        TopologyDescriptor topologyDescriptor = null;
+
+        // parallelEnvironment -> <topology>
+        try {
+            // cursor is parallelEnvironment
+            for (int i = 0; i < cursorTask.getAttributeCount(); i++) {
+                String attrName = cursorTask.getAttributeLocalName(i);
+                if (XMLAttributes.TASK_NB_NODES.matches(attrName)) {
+                    String value = cursorTask.getAttributeValue(i);
+                    nodesNumber = Integer.parseInt(value);
+                }
+            }
+
+            while (cursorTask.hasNext()) {
+                event = cursorTask.next();
+                if (event == XMLEvent.START_ELEMENT) {
+                    break;
+                } else if (event == XMLEvent.END_ELEMENT &&
+                    XMLTags.PARALLEL_ENV.matches(cursorTask.getLocalName())) {
+                    return new ParallelEnvironment(nodesNumber, TopologyDescriptor.ARBITRARY);
+                }
+            }
+
+            if (XMLTags.TOPOLOGY.matches(cursorTask.getLocalName())) {
+                // topology element found
+                while (cursorTask.hasNext()) {
+                    event = cursorTask.next();
+                    if (event == XMLEvent.START_ELEMENT) {
+                        break;
+                    } else if (event == XMLEvent.END_ELEMENT &&
+                        XMLTags.TOPOLOGY.matches(cursorTask.getLocalName())) {
+                        throw new RuntimeException("Incorrect topology description");
+                    }
+                }
+
+                // arbitrary : no attributes
+                if (XMLTags.TOPOLOGY_ARBITRARY.matches(cursorTask.getLocalName())) {
+                    topologyDescriptor = TopologyDescriptor.ARBITRARY;
+                }
+                // bestProximity : no attributes
+                else if (XMLTags.TOPOLOGY_BEST_PROXIMITY.matches(cursorTask.getLocalName())) {
+                    topologyDescriptor = TopologyDescriptor.BEST_PROXIMITY;
+                }
+                // thresholdProximity : elements threshold
+                else if (XMLTags.TOPOLOGY_THRESHOLD_PROXIMITY.matches(cursorTask.getLocalName())) {
+                    // attribute threshold
+                    for (int i = 0; i < cursorTask.getAttributeCount(); i++) {
+                        String attrName = cursorTask.getAttributeLocalName(i);
+                        if (XMLAttributes.TOPOLOGY_THRESHOLD.matches(attrName)) {
+                            String value = cursorTask.getAttributeValue(i);
+                            long threshold = Long.parseLong(value);
+                            topologyDescriptor = new ThresholdProximityDescriptor(threshold);
+                        }
+                    }
+                }
+                // singleHost : no attributes
+                else if (XMLTags.TOPOLOGY_SINGLE_HOST.matches(cursorTask.getLocalName())) {
+                    topologyDescriptor = TopologyDescriptor.SINGLE_HOST;
+                }
+                // singleHostExclusive : no attributes
+                else if (XMLTags.TOPOLOGY_SINGLE_HOST_EXCLUSIVE.matches(cursorTask.getLocalName())) {
+                    topologyDescriptor = TopologyDescriptor.SINGLE_HOST_EXCLUSIVE;
+                }
+                // multipleHostsExclusive : no attributes
+                else if (XMLTags.TOPOLOGY_MULTIPLE_HOSTS_EXCLUSIVE.matches(cursorTask.getLocalName())) {
+                    topologyDescriptor = TopologyDescriptor.MULTIPLE_HOSTS_EXCLUSIVE;
+                }
+                // oneNodePerHostHostsExclusive : no attributes
+                else if (XMLTags.TOPOLOGY_DIFFERENT_HOSTS_EXCLUSIVE.matches(cursorTask.getLocalName())) {
+                    topologyDescriptor = TopologyDescriptor.DIFFERENT_HOSTS_EXCLUSIVE;
+                }
+            }
+
+        } catch (Exception e) {
+            throw new JobCreationException(XMLTags.TOPOLOGY.getXMLName(), null, e);
+        }
+
+        return new ParallelEnvironment(nodesNumber, topologyDescriptor);
     }
 
     /**
@@ -1517,7 +1611,8 @@ public class JobFactory_stax extends JobFactory {
             for (Task t : tasks) {
                 logger.debug("name  : " + t.getName());
                 logger.debug("desc  : " + t.getDescription());
-                logger.debug("node  : " + t.getNumberOfNodesNeeded());
+                logger.debug("paral : " + t.isParallel());
+                logger.debug("node  : " + t.getParallelEnvironment().getNodesNumber());
                 logger.debug("cjoe  : " + t.isCancelJobOnError());
                 logger.debug("res   : " + t.isPreciousResult());
                 logger.debug("rtoe  : " + t.getRestartTaskOnError());

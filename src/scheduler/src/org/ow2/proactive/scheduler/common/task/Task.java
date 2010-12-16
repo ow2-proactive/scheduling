@@ -104,10 +104,6 @@ import org.ow2.proactive.scripting.SimpleScript;
 @XmlRootElement(name = "task")
 public abstract class Task extends CommonAttribute {
 
-    /** Number of nodes asked by the user. */
-    @Column(name = "NEEDED_NODES")
-    protected int numberOfNodesNeeded = 1;
-
     /** Name of the task. */
     @Column(name = "NAME")
     protected String name = SchedulerConstants.TASK_DEFAULT_NAME;
@@ -138,6 +134,14 @@ public abstract class Task extends CommonAttribute {
     @LazyCollection(value = LazyCollectionOption.FALSE)
     @Cascade(CascadeType.ALL)
     protected List<OutputSelector> outputFiles = null;
+
+    /**
+     * The parallel environment of the task included number of nodes and topology definition
+     * required to execute this task.
+     */
+    @Cascade(CascadeType.ALL)
+    @OneToOne(fetch = FetchType.EAGER, targetEntity = ParallelEnvironment.class)
+    protected ParallelEnvironment parallelEnvironment = null;
 
     /**
      * selection script : can be launched before getting a node in order to
@@ -460,6 +464,30 @@ public abstract class Task extends CommonAttribute {
     }
 
     /**
+     * Checks if the task is parallel.
+     * @return true if the task is parallel, false otherwise.
+     */
+    public boolean isParallel() {
+        return parallelEnvironment != null && parallelEnvironment.getNodesNumber() > 1;
+    }
+
+    /**
+     * Returns the parallel environment of the task.
+     * @return the parallel environment of the task.
+     */
+    public ParallelEnvironment getParallelEnvironment() {
+        return parallelEnvironment;
+    }
+
+    /**
+     * Sets new parallel environment of the task.
+     * @param parallelEnvironment new parallel environment of the task.
+     */
+    public void setParallelEnvironment(ParallelEnvironment parallelEnvironment) {
+        this.parallelEnvironment = parallelEnvironment;
+    }
+
+    /**
      * To get the number of execution for this task.
      *
      * @return the number of times this task can be executed.
@@ -526,10 +554,11 @@ public abstract class Task extends CommonAttribute {
     /**
      * Get the number of nodes needed for this task. (by default : 1)
      *
+     * The method is deprecated. Use {@link Task.getParallelEnvironment().getNodesNumber()}
      * @return the number Of Nodes Needed
      */
     public int getNumberOfNodesNeeded() {
-        return numberOfNodesNeeded;
+        return isParallel() ? getParallelEnvironment().getNodesNumber() : 1;
     }
 
     /**
@@ -567,11 +596,13 @@ public abstract class Task extends CommonAttribute {
      *
      * @param numberOfNodesNeeded the number Of Nodes Needed to set.
      */
+    @Deprecated
     public void setNumberOfNeededNodes(int numberOfNodesNeeded) {
-        if (this.numberOfNodesNeeded < 1) {
-            this.numberOfNodesNeeded = 1;
+        if (parallelEnvironment != null) {
+            throw new IllegalStateException(
+                "Cannot set numberOfNodesNeeded as it could be inconsistent with the parallel environment");
         }
-        this.numberOfNodesNeeded = numberOfNodesNeeded;
+        this.parallelEnvironment = new ParallelEnvironment(numberOfNodesNeeded);
     }
 
     /**

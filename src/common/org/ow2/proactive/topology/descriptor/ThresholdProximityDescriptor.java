@@ -32,12 +32,15 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.ow2.proactive.resourcemanager.frontend.topology.descriptor;
+package org.ow2.proactive.topology.descriptor;
 
-import java.util.List;
+import javax.persistence.Column;
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
 
+import org.hibernate.annotations.AccessType;
+import org.hibernate.annotations.Proxy;
 import org.objectweb.proactive.annotation.PublicAPI;
-import org.objectweb.proactive.core.node.Node;
 
 
 /**
@@ -46,9 +49,20 @@ import org.objectweb.proactive.core.node.Node;
  * threshold proximity with all nodes from the pivot.
  */
 @PublicAPI
+@Entity
+@DiscriminatorValue("ThresholdProximity")
+@AccessType("field")
+@Proxy(lazy = false)
 public class ThresholdProximityDescriptor extends BestProximityDescriptor {
 
+    @Column(name = "THRESHOLD")
     private long threshold = 0;
+
+    /**
+     * Default constructor for hibernate
+     */
+    protected ThresholdProximityDescriptor() {
+    }
 
     /**
      * Creates a new instance of the descriptor with specified threshold.
@@ -63,17 +77,18 @@ public class ThresholdProximityDescriptor extends BestProximityDescriptor {
         this.threshold = threshold;
     }
 
-    /**
-     * Creates a new instance of the descriptor with specified threshold and pivot.
-     *
-     * @param threshold parameter defining maximum distance value between nodes
-     * @param pivot a set of nodes which must be within threshold proximity
-     * with nodes user requires
-     */
-    public ThresholdProximityDescriptor(long threshold, List<Node> pivot) {
-        this(threshold);
-        this.pivot = pivot;
-    }
+    //
+    //    /**
+    //     * Creates a new instance of the descriptor with specified threshold and pivot.
+    //     *
+    //     * @param threshold parameter defining maximum distance value between nodes
+    //     * @param pivot a set of nodes which must be within threshold proximity
+    //     * with nodes user requires
+    //     */
+    //    public ThresholdProximityDescriptor(long threshold, List<Node> pivot) {
+    //        this(threshold);
+    //        this.pivot = pivot;
+    //    }
 
     /**
      * Gets the threshold value (in microseconds)
@@ -81,5 +96,9 @@ public class ThresholdProximityDescriptor extends BestProximityDescriptor {
      */
     public long getThreshold() {
         return threshold;
+    }
+
+    public String toString() {
+        return super.toString() + " threshold is " + threshold;
     }
 }

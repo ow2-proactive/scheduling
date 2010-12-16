@@ -43,6 +43,7 @@ import java.util.Set;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.node.Node;
 import org.ow2.proactive.resourcemanager.frontend.topology.clustering.Cluster;
+import org.ow2.proactive.topology.descriptor.DistanceFunction;
 
 
 /**

@@ -57,6 +57,12 @@ public enum XMLTags {
     //TASKS
     TASK("task"), JAVA_EXECUTABLE("javaExecutable"), NATIVE_EXECUTABLE("nativeExecutable"), TASK_DEPENDENCES(
             "depends"), TASK_DEPENDENCES_TASK("task"), TASK_PARAMETER("parameter"),
+    //TOPOLOGY
+    PARALLEL_ENV("parallel"), TOPOLOGY("topology"), TOPOLOGY_ARBITRARY("arbitrary"), TOPOLOGY_BEST_PROXIMITY(
+            "bestProximity"), TOPOLOGY_THRESHOLD_PROXIMITY("thresholdProximity"), TOPOLOGY_SINGLE_HOST(
+            "singleHost"), TOPOLOGY_SINGLE_HOST_EXCLUSIVE("singleHostExclusive"), TOPOLOGY_MULTIPLE_HOSTS_EXCLUSIVE(
+            "multipleHostsExclusive"), TOPOLOGY_DIFFERENT_HOSTS_EXCLUSIVE("differentHostsExclusive"),
+
     //SCRIPTS
     SCRIPT_SELECTION("selection"), SCRIPT_PRE("pre"), SCRIPT_POST("post"), SCRIPT_CLEANING("cleaning"), SCRIPT_SCRIPT(
             "script"), SCRIPT_STATICCOMMAND("staticCommand"), SCRIPT_DYNAMICCOMMAND("dynamicCommand"), SCRIPT_ARGUMENTS(

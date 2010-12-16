@@ -32,33 +32,23 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.ow2.proactive.resourcemanager.frontend.topology.descriptor;
+package org.ow2.proactive.topology.descriptor;
 
+import java.io.Serializable;
 import org.objectweb.proactive.annotation.PublicAPI;
-import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 
 
 /**
- * This descriptor allows to select one node per host exclusively.
- * Hosts with selected nodes will be reserved for the user.
- *
- * By specifying this descriptor in {@link ResourceManager.getAtMostNodes} user may get
- * more nodes than it asked for due to the fact that total capacity of all machines is
- * bigger. 
- * 
- * The resource manager first will try to find hosts with only one node
- * to optimize the utilization of resources. If there no such hosts (or their quantity is
- * below required) it will continue looking for hosts with 2 nodes and so on.
- * 
- * If number of hosts is not enough the found subset will be provided. 
- * 
+ * This class represent a distance function for hierarchical agglomerative clustering.
  */
 @PublicAPI
-public class OneNodePerHostExclusiveDescriptor extends TopologyDescriptor {
+public interface DistanceFunction extends Serializable {
     /**
-     * Constructs a new instance of the class.
+     * Defines the way how distances are calculated in clustering
+     *
+     * @param d1 first distance
+     * @param d2 second distance
+     * @return result distance
      */
-    public OneNodePerHostExclusiveDescriptor() {
-        super(true);
-    }
+    public long distance(long d1, long d2);
 }

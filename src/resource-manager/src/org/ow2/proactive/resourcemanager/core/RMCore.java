@@ -93,7 +93,6 @@ import org.ow2.proactive.resourcemanager.frontend.RMMonitoringImpl;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.frontend.topology.Topology;
 import org.ow2.proactive.resourcemanager.frontend.topology.TopologyException;
-import org.ow2.proactive.resourcemanager.frontend.topology.descriptor.TopologyDescriptor;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.resourcemanager.nodesource.RMNodeConfigurator;
 import org.ow2.proactive.resourcemanager.nodesource.common.PluginDescriptor;
@@ -111,6 +110,7 @@ import org.ow2.proactive.resourcemanager.selection.topology.TopologyManager;
 import org.ow2.proactive.resourcemanager.utils.ClientPinger;
 import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 import org.ow2.proactive.scripting.SelectionScript;
+import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
 import org.ow2.proactive.utils.NodeSet;
 
 
@@ -943,6 +943,11 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     public BooleanWrapper releaseNodes(NodeSet nodes) {
         for (Node node : nodes) {
             releaseNode(node);
+        }
+        if (nodes.getExtraNodes() != null) {
+            for (Node node : nodes.getExtraNodes()) {
+                releaseNode(node);
+            }
         }
         return new BooleanWrapper(true);
     }

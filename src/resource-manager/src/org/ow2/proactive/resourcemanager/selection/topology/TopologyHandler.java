@@ -37,7 +37,8 @@ package org.ow2.proactive.resourcemanager.selection.topology;
 import java.util.List;
 
 import org.objectweb.proactive.core.node.Node;
-import org.ow2.proactive.resourcemanager.frontend.topology.descriptor.TopologyDescriptor;
+import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
+import org.ow2.proactive.utils.NodeSet;
 
 
 /**
@@ -56,7 +57,7 @@ public abstract class TopologyHandler {
      * @param matchedNodes list of "free" nodes satisfied to the selection scripts
      * @return list of nodes located according to the specified topology
      */
-    public abstract List<Node> select(int number, List<Node> matchedNodes);
+    public abstract NodeSet select(int number, List<Node> matchedNodes);
 
     /**
      * Sets the descriptor.

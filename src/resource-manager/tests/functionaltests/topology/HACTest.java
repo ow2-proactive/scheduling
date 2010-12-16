@@ -45,11 +45,11 @@ import java.util.Set;
 import junit.framework.Assert;
 
 import org.objectweb.proactive.core.node.Node;
-import org.ow2.proactive.resourcemanager.frontend.topology.DistanceFunction;
 import org.ow2.proactive.resourcemanager.frontend.topology.Topology;
 import org.ow2.proactive.resourcemanager.frontend.topology.clustering.Cluster;
 import org.ow2.proactive.resourcemanager.frontend.topology.clustering.HAC;
-import org.ow2.proactive.resourcemanager.frontend.topology.descriptor.BestProximityDescriptor;
+import org.ow2.proactive.topology.descriptor.BestProximityDescriptor;
+import org.ow2.proactive.topology.descriptor.DistanceFunction;
 
 import edu.emory.mathcs.backport.java.util.Collections;
 import functionalTests.FunctionalTest;

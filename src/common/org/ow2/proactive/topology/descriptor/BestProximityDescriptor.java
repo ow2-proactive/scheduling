@@ -32,13 +32,15 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.ow2.proactive.resourcemanager.frontend.topology.descriptor;
+package org.ow2.proactive.topology.descriptor;
 
-import java.util.List;
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+import javax.persistence.Transient;
 
+import org.hibernate.annotations.AccessType;
+import org.hibernate.annotations.Proxy;
 import org.objectweb.proactive.annotation.PublicAPI;
-import org.objectweb.proactive.core.node.Node;
-import org.ow2.proactive.resourcemanager.frontend.topology.DistanceFunction;
 
 
 /**
@@ -54,10 +56,13 @@ import org.ow2.proactive.resourcemanager.frontend.topology.DistanceFunction;
  *
  */
 @PublicAPI
+@Entity
+@DiscriminatorValue("BestProximity")
+@AccessType("field")
+@Proxy(lazy = false)
 public class BestProximityDescriptor extends TopologyDescriptor {
 
-    // pivot nodes
-    protected List<Node> pivot = null;
+    @Transient
     protected DistanceFunction function;
 
     /**
@@ -109,46 +114,8 @@ public class BestProximityDescriptor extends TopologyDescriptor {
      * In this case the function for clustering is BestProximityDescriptor.MAX, pivot is empty.
      */
     public BestProximityDescriptor() {
-        this(MAX, null);
-    }
-
-    /**
-     * Constructs new instance of the class with specified distance function and empty pivot.
-     *
-     * @param function - the distance function used for clustering
-     */
-    public BestProximityDescriptor(DistanceFunction function) {
-        this(function, null);
-    }
-
-    /**
-     * Constructs new instance of the class with specified pivot.
-     * The function for clustering is BestProximityDescriptor.MAX.
-     *
-     * @param pivot - the set of nodes from which the proximity should be the best.
-     */
-    public BestProximityDescriptor(List<Node> pivot) {
-        this(MAX, pivot);
-    }
-
-    /**
-     * Constructs new instance of the class with specified distance function and pivot.
-     *
-     * @param function - the distance function used for clustering
-     * @param pivot - the set of nodes from which the proximity should be the best.
-     */
-    public BestProximityDescriptor(DistanceFunction function, List<Node> pivot) {
         super(true);
-        this.function = function;
-        this.pivot = pivot;
-    }
-
-    /**
-     * Gets pivot nodes
-     * @return pivot nodes
-     */
-    public List<Node> getPivot() {
-        return pivot;
+        function = MAX;
     }
 
     /**

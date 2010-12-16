@@ -58,12 +58,12 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.core.RMCore;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
-import org.ow2.proactive.resourcemanager.frontend.topology.descriptor.TopologyDescriptor;
 import org.ow2.proactive.resourcemanager.rmnode.RMNode;
 import org.ow2.proactive.resourcemanager.selection.topology.TopologyHandler;
 import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive.scripting.SelectionScript;
+import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
 import org.ow2.proactive.utils.NodeSet;
 
 
@@ -180,28 +180,44 @@ public abstract class SelectionManager {
             }
         }
 
-        logger.info(matchedNodes.size() + " nodes found after scripts execution for " + client);
+        logger.debug(matchedNodes.size() + " nodes found after scripts execution for " + client);
 
         // now we have a list of nodes which match to selection scripts
         // selecting subset according to topology requirements
         // TopologyHandler handler = RMCore.topologyManager.getHandler(topologyDescriptor);
-        List<Node> selectedNodes = handler.select(number, matchedNodes);
+        logger.info("Looking for nodes using " + topologyDescriptor);
+        NodeSet selectedNodes = handler.select(number, matchedNodes);
 
-        logger.info(selectedNodes.size() + " nodes found after the topology is taken into account for " +
-            client);
         // the nodes are selected, now mark them as busy.
-        NodeSet result = new NodeSet();
-        for (Node node : selectedNodes) {
+        for (Node node : new LinkedList<Node>(selectedNodes)) {
             try {
                 // Synchronous call
                 rmcore.setBusyNode(node.getNodeInformation().getURL(), client);
-                result.add(node);
             } catch (NodeException e) {
+                // if something happened with node after scripts were executed
+                // just return less nodes and do not restart the search
+                selectedNodes.remove(node);
                 rmcore.setDownNode(node.getNodeInformation().getURL());
             }
         }
+        // marking extra selected nodes as busy
+        if (selectedNodes.size() > 0 && selectedNodes.getExtraNodes() != null) {
+            for (Node node : new LinkedList<Node>(selectedNodes.getExtraNodes())) {
+                try {
+                    // synchronous call
+                    rmcore.setBusyNode(node.getNodeInformation().getURL(), client);
+                } catch (NodeException e) {
+                    selectedNodes.getExtraNodes().remove(node);
+                    rmcore.setDownNode(node.getNodeInformation().getURL());
+                }
+            }
+        }
 
-        return result;
+        String extraNodes = selectedNodes.getExtraNodes() != null && selectedNodes.getExtraNodes().size() > 0 ? "and " +
+            selectedNodes.getExtraNodes().size() + " extra nodes"
+                : "";
+        logger.info(client + " will get " + selectedNodes.size() + " nodes " + extraNodes);
+        return selectedNodes;
     }
 
     /**

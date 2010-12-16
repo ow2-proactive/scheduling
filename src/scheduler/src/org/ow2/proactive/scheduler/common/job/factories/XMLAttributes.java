@@ -58,6 +58,8 @@ public enum XMLAttributes {
             "walltime"), TASK_RUNASME("runAsMe"),
     //NATIVE TASK ATTRIBUTES
     TASK_NB_NODES("numberOfNodes"), TASK_COMMAND_VALUE("value"), TASK_WORKDING_DIR("workingDir"),
+    //TOPOLOGY
+    TOPOLOGY_THRESHOLD("threshold"),
     //SCRIPTS
     SCRIPT_URL("url"),
     //FORK ENVIRONMENT

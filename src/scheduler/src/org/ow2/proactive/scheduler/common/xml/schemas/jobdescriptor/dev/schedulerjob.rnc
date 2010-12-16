@@ -50,7 +50,7 @@ taskFlow = ## A job composed of a flow of tasks with or without dependencies
 
 # +++++++++++++ task
 task = ## A task is the smallest computation unit for the scheduler 
-    element task { taskName, nodesNumber_t?, cancelJobOnError_t?, restartTaskOnError_t?, numberOfExecution_t?, runAsMe? ,walltime?, preciousResult?, resultPreviewClass?, taskDescription?, genericInformation?, depends?, inputFiles?, selection?, pre?, executable, flow?, post?, cleaning?, outputFiles?}
+    element task { taskName, nodesNumber_t?, cancelJobOnError_t?, restartTaskOnError_t?, numberOfExecution_t?, runAsMe? ,walltime?, preciousResult?, resultPreviewClass?, taskDescription?, genericInformation?, depends?, inputFiles?, parallel?, selection?, pre?, executable, flow?, post?, cleaning?, outputFiles?}
 taskName = ## Identification of this task (identifier) 
     attribute name { xsd:ID }
 nodesNumber_t = ## number of cores needed for the task (identifier)
@@ -73,6 +73,10 @@ depends = ## A list of dependencies for this task
     element depends { dependsTask+ }
 dependsTask = ## A task from which this task depends 
     element task { attribute ref { xsd:IDREF} }
+parallel = ## An information related parallel task including nodes number and topology
+	element parallel { nodesNumber_t, topology? }
+topology = ## A topology descriptor of the parallel task
+    element topology { arbitrary | bestProximity | thresholdProximity | singleHost | singleHostExclusive | multipleHostsExclusive | differentHostsExclusive }
 selection = ## A script used to select resources that can handle the task 
     element selection { selectionScript+ }
 flow = ## Flow control : block declaration, flow action
@@ -108,6 +112,23 @@ fileScriptArguments = ## A list of arguments of this script
 fileScriptArgument = ## An argument of this script  
     element argument { attribute value { xsd:string } }
 
+# +++++++++++++ Topology
+arbitrary = ## arbitrary topology
+	 element arbitrary { empty }
+bestProximity = ## best nodes proximity
+	 element bestProximity { empty }
+thresholdProximity = ## threshold nodes proximity
+	 element thresholdProximity { threshold }
+singleHost = ## nodes on single host
+	 element singleHost { empty }
+singleHostExclusive = ## nodes on single host exclusively
+	 element singleHostExclusive { empty }
+multipleHostsExclusive = ## nodes on multiple hosts exclusively
+	 element multipleHostsExclusive { empty }
+differentHostsExclusive = ## nodes on single host exclusively
+	 element differentHostsExclusive { empty }
+threshold = ## threshold value
+     attribute threshold { xsd:nonNegativeInteger }
 
 # +++++++++++++ executables
 executable = ## The task executable is the actual code that will be run on the selected resource. It can be a native command or a Java class 

@@ -38,16 +38,22 @@ package org.ow2.proactive.utils;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedList;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.node.Node;
 
 
 /**
- * Representation of a node set.
- * In this first version, the node set contains only the nodes given by the Resource Manager.
- * In a future version, it will give also further informations like why nodes haven't been given,
- * or more specifications on the nodes, like distance between them, etc...
+ * The set of nodes given by the resource manager for computations.
+ * The set may contain another collection of nodes (extra nodes) that
+ * basically are not intended to be used for computations but occupied
+ * by used according to the request.
+ *
+ * For example when 1 node is requested on a single host exclusively
+ * and there is no host available with a single node on it. In this case
+ * the resource manager may find another a host with bigger capacity and
+ * put all all nodes with were not requested explicitly into the extra nodes collection.
  *
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9
@@ -57,28 +63,57 @@ import org.objectweb.proactive.core.node.Node;
 public class NodeSet extends ArrayList<Node> {
 
     /**
+     * extra nodes
+     */
+    private Collection<Node> extraNodes;
+
+    /**
      * constructor.
      */
     public NodeSet() {
         super();
-        // TODO Auto-generated constructor stub
     }
 
     /**
-     * Create a node containing a nodes collection.
-     * @param c collection to put ion the NodeSet
+     * Creates a node set containing given nodes.
+     * @param nodes collection to put into the NodeSet
      */
-    public NodeSet(Collection<? extends Node> c) {
-        super(c);
-        // TODO Auto-generated constructor stub
+    public NodeSet(Collection<Node> nodes) {
+        super(nodes);
     }
 
     /**
      * Constructs an empty list with the specified initial capacity.
-     * @param   initialCapacity   the initial capacity of the list
+     * @param initialCapacity the initial capacity of the list
      */
     public NodeSet(int initialCapacity) {
         super(initialCapacity);
-        // TODO Auto-generated constructor stub
+    }
+
+    /**
+     * Constructs the nodes set from another node set.
+     * @param another
+     */
+    public NodeSet(NodeSet another) {
+        super(another);
+        // coping the extra nodes
+        if (another.getExtraNodes() != null) {
+            this.extraNodes = new LinkedList<Node>(another.getExtraNodes());
+        }
+    }
+
+    /**
+     * Returns the collection of extra nodes associated to this node set.
+     */
+    public Collection<Node> getExtraNodes() {
+        return extraNodes;
+    }
+
+    /**
+     * Sets new extra nodes list.
+     * @param extraNodes
+     */
+    public void setExtraNodes(Collection<Node> extraNodes) {
+        this.extraNodes = extraNodes;
     }
 }

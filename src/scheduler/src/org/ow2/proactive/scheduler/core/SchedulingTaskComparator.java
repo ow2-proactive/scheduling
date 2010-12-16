@@ -36,7 +36,6 @@
  */
 package org.ow2.proactive.scheduler.core;
 
-import org.ow2.proactive.resourcemanager.frontend.topology.descriptor.TopologyDescriptor;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scripting.SelectionScript;
 
@@ -53,18 +52,16 @@ public class SchedulingTaskComparator {
     private InternalTask task;
     private int ssHashCode;
     private String owner;
-    private TopologyDescriptor topoDesc;
 
     /**
      * Create a new instance of SchedulingTaskComparator
      *
      * @param task
      */
-    public SchedulingTaskComparator(InternalTask task, String owner, TopologyDescriptor desc) {
+    public SchedulingTaskComparator(InternalTask task, String owner) {
         this.task = task;
         this.ssHashCode = SelectionScript.hashCodeFromList(task.getSelectionScripts());
         this.owner = owner;
-        this.topoDesc = desc;
     }
 
     /**
@@ -83,6 +80,9 @@ public class SchedulingTaskComparator {
         }
         //ELSE : get given task comparator
         SchedulingTaskComparator tcomp = (SchedulingTaskComparator) obj;
+        if (task == tcomp.task) {
+            return true;
+        }
         //test whether the selections script are the same
         boolean sameSsHash = (ssHashCode == tcomp.ssHashCode);
         //test whether nodes exclusion are the same (both is null...
@@ -92,13 +92,16 @@ public class SchedulingTaskComparator {
             (task.getNodeExclusion() != null && task.getNodeExclusion().equals(tcomp.task.getNodeExclusion()));
         //test whether owner is the same
         boolean sameOwner = this.owner.equals(tcomp.owner);
-        //test whether both task are multi-node or not
-        boolean sameMutliNode = (task.getNumberOfNodesNeeded() == 1 && tcomp.task.getNumberOfNodesNeeded() == 1) ||
-            (task.getNumberOfNodesNeeded() > 1 && tcomp.task.getNumberOfNodesNeeded() > 1);
-        //test whether topology is active or not : if active, do not allow multi-node to be together
-        boolean topo = !((topoDesc != null) && sameMutliNode && task.getNumberOfNodesNeeded() > 1);
+        //if the parallel environment is specified for any of tasks => not equal
+        boolean isParallel = task.isParallel() || tcomp.task.isParallel();
+
+        // if topology is specified for any of task => not equal
+        // for now topology is allowed only for parallel tasks which is
+        // checked before
+
+        // boolean topologySpecified = task.isTopologySpecified() || tcomp.task.isTopologySpecified();
         //add the 5 tests to the returned value
-        return sameSsHash && sameNodeEx && sameOwner && sameMutliNode && topo;
+        return sameSsHash && sameNodeEx && sameOwner && !isParallel;
     }
 
     /**

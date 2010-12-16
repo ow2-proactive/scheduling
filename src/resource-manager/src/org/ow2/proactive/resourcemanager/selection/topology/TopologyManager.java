@@ -37,10 +37,8 @@ package org.ow2.proactive.resourcemanager.selection.topology;
 import java.net.InetAddress;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
@@ -55,16 +53,16 @@ import org.ow2.proactive.resourcemanager.frontend.topology.TopologyDisabledExcep
 import org.ow2.proactive.resourcemanager.frontend.topology.TopologyException;
 import org.ow2.proactive.resourcemanager.frontend.topology.TopologyImpl;
 import org.ow2.proactive.resourcemanager.frontend.topology.clustering.HAC;
-import org.ow2.proactive.resourcemanager.frontend.topology.descriptor.ArbitraryTopologyDescriptor;
-import org.ow2.proactive.resourcemanager.frontend.topology.descriptor.BestProximityDescriptor;
-import org.ow2.proactive.resourcemanager.frontend.topology.descriptor.MultipleHostsExclusiveDescriptor;
-import org.ow2.proactive.resourcemanager.frontend.topology.descriptor.OneNodePerHostExclusiveDescriptor;
-import org.ow2.proactive.resourcemanager.frontend.topology.descriptor.SingleHostDescriptor;
-import org.ow2.proactive.resourcemanager.frontend.topology.descriptor.SingleHostExclusiveDescriptor;
-import org.ow2.proactive.resourcemanager.frontend.topology.descriptor.ThresholdProximityDescriptor;
-import org.ow2.proactive.resourcemanager.frontend.topology.descriptor.TopologyDescriptor;
 import org.ow2.proactive.resourcemanager.frontend.topology.pinging.Pinger;
 import org.ow2.proactive.resourcemanager.utils.RMLoggers;
+import org.ow2.proactive.topology.descriptor.ArbitraryTopologyDescriptor;
+import org.ow2.proactive.topology.descriptor.BestProximityDescriptor;
+import org.ow2.proactive.topology.descriptor.DifferentHostsExclusiveDescriptor;
+import org.ow2.proactive.topology.descriptor.MultipleHostsExclusiveDescriptor;
+import org.ow2.proactive.topology.descriptor.SingleHostDescriptor;
+import org.ow2.proactive.topology.descriptor.SingleHostExclusiveDescriptor;
+import org.ow2.proactive.topology.descriptor.ThresholdProximityDescriptor;
+import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
 import org.ow2.proactive.utils.NodeSet;
 
 import edu.emory.mathcs.backport.java.util.Collections;
@@ -83,7 +81,7 @@ public class TopologyManager {
     // hosts distances
     private TopologyImpl topology = new TopologyImpl();
     // this hash map allows to quickly find nodes on a single host (much faster than from the topology).
-    private HashMap<InetAddress, Set<Node>> nodesOnHost = new HashMap<InetAddress, Set<Node>>();
+    private HashMap<InetAddress, List<Node>> nodesOnHost = new HashMap<InetAddress, List<Node>>();
     // list of handlers corresponded to topology descriptors
     private final HashMap<Class<? extends TopologyDescriptor>, TopologyHandler> handlers = new HashMap<Class<? extends TopologyDescriptor>, TopologyHandler>();
 
@@ -103,7 +101,7 @@ public class TopologyManager {
         handlers.put(SingleHostDescriptor.class, new SingleHostHandler());
         handlers.put(SingleHostExclusiveDescriptor.class, new SingleHostExclusiveHandler());
         handlers.put(MultipleHostsExclusiveDescriptor.class, new MultipleHostsExclusiveHandler());
-        handlers.put(OneNodePerHostExclusiveDescriptor.class, new OneNodePerHostExclusiveHandler());
+        handlers.put(DifferentHostsExclusiveDescriptor.class, new DifferentHostsExclusiveHandler());
 
         pingerClass = (Class<? extends Pinger>) Class.forName(PAResourceManagerProperties.RM_TOPOLOGY_PINGER
                 .getValueAsString());
@@ -160,9 +158,9 @@ public class TopologyManager {
         HashMap<InetAddress, Long> hostsTopology = pingNode(node, toPing);
         synchronized (topology) {
             topology.addHostTopology(node.getVMInformation().getHostName(), host, hostsTopology);
-            Set<Node> nodesSet = new HashSet<Node>();
-            nodesSet.add(node);
-            nodesOnHost.put(node.getVMInformation().getInetAddress(), nodesSet);
+            List<Node> nodesList = new LinkedList<Node>();
+            nodesList.add(node);
+            nodesOnHost.put(node.getVMInformation().getInetAddress(), nodesList);
         }
     }
 
@@ -246,12 +244,12 @@ public class TopologyManager {
      */
     private class ArbitraryTopologyHandler extends TopologyHandler {
         @Override
-        public List<Node> select(int number, List<Node> matchedNodes) {
+        public NodeSet select(int number, List<Node> matchedNodes) {
 
             if (number < matchedNodes.size()) {
-                return matchedNodes.subList(0, number);
+                return new NodeSet(matchedNodes.subList(0, number));
             }
-            return matchedNodes;
+            return new NodeSet(matchedNodes);
         }
     }
 
@@ -260,14 +258,13 @@ public class TopologyManager {
      */
     private class BestProximityHandler extends TopologyHandler {
         @Override
-        public List<Node> select(int number, List<Node> matchedNodes) {
+        public NodeSet select(int number, List<Node> matchedNodes) {
             synchronized (topology) {
                 BestProximityDescriptor descriptor = (BestProximityDescriptor) topologyDescriptor;
                 // HAC is very efficient algorithm but it does not guarantee the complete solution
                 logger.info("Running clustering algorithm in order to find closest nodes");
-                HAC hac = new HAC(topology, descriptor.getPivot(), descriptor.getDistanceFunction(),
-                    Long.MAX_VALUE);
-                return hac.select(number, matchedNodes);
+                HAC hac = new HAC(topology, null, descriptor.getDistanceFunction(), Long.MAX_VALUE);
+                return new NodeSet(hac.select(number, matchedNodes));
             }
         }
     }
@@ -283,13 +280,12 @@ public class TopologyManager {
      */
     private class TresholdProximityHandler extends TopologyHandler {
         @Override
-        public List<Node> select(int number, List<Node> matchedNodes) {
+        public NodeSet select(int number, List<Node> matchedNodes) {
             synchronized (topology) {
                 ThresholdProximityDescriptor descriptor = (ThresholdProximityDescriptor) topologyDescriptor;
                 logger.info("Running clustering algorithm in order to find closest nodes");
-                HAC hac = new HAC(topology, descriptor.getPivot(), BestProximityDescriptor.MAX, descriptor
-                        .getThreshold());
-                return hac.select(number, matchedNodes);
+                HAC hac = new HAC(topology, null, descriptor.getDistanceFunction(), descriptor.getThreshold());
+                return new NodeSet(hac.select(number, matchedNodes));
             }
         }
     }
@@ -299,16 +295,16 @@ public class TopologyManager {
      */
     private class SingleHostHandler extends TopologyHandler {
         @Override
-        public List<Node> select(int number, List<Node> matchedNodes) {
+        public NodeSet select(int number, List<Node> matchedNodes) {
             if (number == 0) {
-                return new LinkedList<Node>();
+                return new NodeSet();
             }
             if (number > matchedNodes.size()) {
                 // cannot select more than matchedNodes.size()
                 number = matchedNodes.size();
             }
 
-            List<Node> result = new LinkedList<Node>();
+            NodeSet result = new NodeSet();
             for (InetAddress host : nodesOnHost.keySet()) {
                 if (nodesOnHost.get(host).size() >= number) {
                     // found the host with required capacity
@@ -343,9 +339,9 @@ public class TopologyManager {
      */
     private class SingleHostExclusiveHandler extends TopologyHandler {
         @Override
-        public List<Node> select(int number, List<Node> matchedNodes) {
+        public NodeSet select(int number, List<Node> matchedNodes) {
             if (number == 0) {
-                return new LinkedList<Node>();
+                return new NodeSet();
             }
 
             List<InetAddress> sortedByNodesNumber = new LinkedList<InetAddress>(nodesOnHost.keySet());
@@ -359,11 +355,11 @@ public class TopologyManager {
             return selectRecursively(number, sortedByNodesNumber, matchedNodes);
         }
 
-        private List<Node> selectRecursively(int number, List<InetAddress> hostsSortedByNodesNumber,
+        private NodeSet selectRecursively(int number, List<InetAddress> hostsSortedByNodesNumber,
                 List<Node> matchedNodes) {
 
             if (number == 0) {
-                return new LinkedList<Node>();
+                return new NodeSet();
             }
             if (number > matchedNodes.size()) {
                 // cannot select more than matchedNodes.size()
@@ -386,7 +382,16 @@ public class TopologyManager {
                     // all nodes are free on host
                     if (!busyNode) {
                         // found enough nodes on the same host
-                        return new LinkedList<Node>(nodesOnHost.get(host));
+                        if (nodesOnHost.get(host).size() > number) {
+                            // some extra nodes will be provided
+                            List<Node> nodes = nodesOnHost.get(host);
+                            NodeSet result = new NodeSet(nodes.subList(0, number));
+                            result.setExtraNodes(new LinkedList<Node>(nodes.subList(number, nodes.size())));
+                            return result;
+                        } else {
+                            // all nodes required for computation
+                            return new NodeSet(nodesOnHost.get(host));
+                        }
                     }
                 }
             }
@@ -410,9 +415,9 @@ public class TopologyManager {
      */
     private class MultipleHostsExclusiveHandler extends TopologyHandler {
         @Override
-        public List<Node> select(int number, List<Node> matchedNodes) {
+        public NodeSet select(int number, List<Node> matchedNodes) {
             if (number == 0) {
-                return new LinkedList<Node>();
+                return new NodeSet();
             }
 
             // try to find the optimal set of hosts which give us the required set
@@ -435,7 +440,7 @@ public class TopologyManager {
                     int nodesNumber = nodesOnHost.get(host).size();
                     if (nodesNumber == number) {
                         // found exactly required number of nodes on one host
-                        return new LinkedList<Node>(nodesOnHost.get(host));
+                        return new NodeSet(nodesOnHost.get(host));
                     }
 
                     for (Integer i : new LinkedList<Integer>(hostsMap.keySet())) {
@@ -464,7 +469,7 @@ public class TopologyManager {
             }
 
             if (hostsMap.size() == 0) {
-                return new LinkedList<Node>();
+                return new NodeSet();
             }
 
             // looking for the index we are going to use in the map
@@ -490,11 +495,20 @@ public class TopologyManager {
                     minSizeList = hosts;
                 }
             }
-            List<Node> result = new LinkedList<Node>();
+            NodeSet hostsNodes = new NodeSet();
             for (InetAddress host : minSizeList) {
-                result.addAll(nodesOnHost.get(host));
+                hostsNodes.addAll(nodesOnHost.get(host));
             }
-            return result;
+
+            if (hostsNodes.size() <= number) {
+                // no extra nodes
+                return hostsNodes;
+            } else {
+                // more nodes found than needed, put them into the extra nodes list
+                NodeSet result = new NodeSet(hostsNodes.subList(0, number));
+                result.setExtraNodes(new LinkedList<Node>(hostsNodes.subList(number, hostsNodes.size())));
+                return result;
+            }
         }
     }
 
@@ -505,11 +519,11 @@ public class TopologyManager {
      * - if there are no more such hosts add hosts with two nodes and so on.
      * 
      */
-    private class OneNodePerHostExclusiveHandler extends TopologyHandler {
+    private class DifferentHostsExclusiveHandler extends TopologyHandler {
         @Override
-        public List<Node> select(int number, List<Node> matchedNodes) {
+        public NodeSet select(int number, List<Node> matchedNodes) {
             if (number == 0) {
-                return new LinkedList<Node>();
+                return new NodeSet();
             }
 
             // create the map of free hosts: nodes_number -> list of hosts
@@ -533,24 +547,28 @@ public class TopologyManager {
 
             // if empty => no entirely free hosts
             if (hostsMap.size() == 0) {
-                return new LinkedList<Node>();
+                return new NodeSet();
             }
 
             // sort by nodes number and accumulate the result
             List<Integer> sortedCapacities = new LinkedList<Integer>(hostsMap.keySet());
             Collections.sort(sortedCapacities);
 
-            List<Node> result = new LinkedList<Node>();
+            NodeSet result = new NodeSet();
             for (Integer i : sortedCapacities) {
                 for (InetAddress host : hostsMap.get(i)) {
-                    result.addAll(nodesOnHost.get(host));
+                    List<Node> hostNodes = nodesOnHost.get(host);
+                    result.add(hostNodes.get(0));
+                    if (hostNodes.size() > 1) {
+                        result.setExtraNodes(new LinkedList<Node>(hostNodes.subList(1, hostNodes.size())));
+                    }
                     if (--number <= 0) {
                         // found required node set
                         return result;
                     }
                 }
             }
-            // best effort: return less than have
+            // best effort: return less than needed
             return result;
         }
     }

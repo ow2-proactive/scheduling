@@ -32,12 +32,21 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.ow2.proactive.resourcemanager.frontend.topology.descriptor;
+package org.ow2.proactive.topology.descriptor;
 
 import java.io.Serializable;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
+import javax.persistence.Table;
+
+import org.hibernate.annotations.AccessType;
+import org.hibernate.annotations.Proxy;
 import org.objectweb.proactive.annotation.PublicAPI;
-import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 
 
 /**
@@ -49,13 +58,17 @@ import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
  * use one of predefined constants when it is sufficient.
  */
 @PublicAPI
+@Entity
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@Table(name = "TOPOLOGY_DESCRIPTOR")
+@AccessType("field")
+@Proxy(lazy = false)
 public class TopologyDescriptor implements Serializable {
 
     /** no constraint on node location */
     public static final TopologyDescriptor ARBITRARY = new ArbitraryTopologyDescriptor();
     /** the set of closest nodes */
-    public static final TopologyDescriptor BEST_PROXIMITY = new BestProximityDescriptor(
-        BestProximityDescriptor.AVG);
+    public static final TopologyDescriptor BEST_PROXIMITY = new BestProximityDescriptor();
     /** the set of nodes on a single host */
     public static final TopologyDescriptor SINGLE_HOST = new SingleHostDescriptor();
     /**
@@ -72,7 +85,11 @@ public class TopologyDescriptor implements Serializable {
      * the set of nodes one per host exclusively
      * (hosts are reserved for the user)
      */
-    public static final TopologyDescriptor ONE_NODE_PER_HOST_EXCLUSIVE = new OneNodePerHostExclusiveDescriptor();
+    public static final TopologyDescriptor DIFFERENT_HOSTS_EXCLUSIVE = new DifferentHostsExclusiveDescriptor();
+
+    @Id
+    @GeneratedValue
+    private long hibernateId;
 
     /**
      * the flag indicated that descriptor requires the topology information in the resource manager.
@@ -82,10 +99,11 @@ public class TopologyDescriptor implements Serializable {
      * If this field is set to false the descriptor could be used even when the topology is
      * disabled in the resource manager.
      */
+    @Column(name = "TOPOLOGY_BASED")
     private boolean topologyBased;
 
     /**
-     * Creates the descriptor
+     * Creates the descriptor.
      * @param topologyBased indicates that descriptor requires the topology information in the resource manager.
      * It affects the scripts execution strategy: if true selection scripts are executed on all nodes
      * first and then the topology information is taken into account. If false scripts are executed
@@ -105,5 +123,12 @@ public class TopologyDescriptor implements Serializable {
      */
     public boolean isTopologyBased() {
         return topologyBased;
+    }
+
+    /**
+     * Returns the string representation of the descriptor.
+     */
+    public String toString() {
+        return this.getClass().getSimpleName();
     }
 }

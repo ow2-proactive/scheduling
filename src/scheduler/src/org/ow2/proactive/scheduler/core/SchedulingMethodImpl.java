@@ -56,7 +56,6 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.common.RMState;
 import org.ow2.proactive.resourcemanager.frontend.topology.TopologyDisabledException;
-import org.ow2.proactive.resourcemanager.frontend.topology.descriptor.TopologyDescriptor;
 import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SchedulerStatus;
@@ -79,6 +78,7 @@ import org.ow2.proactive.scheduler.task.launcher.TaskLauncher;
 import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 import org.ow2.proactive.scripting.ScriptException;
 import org.ow2.proactive.threading.ExecutorServiceTasksInvocator;
+import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
 import org.ow2.proactive.utils.NodeSet;
 
 import edu.emory.mathcs.backport.java.util.Collections;
@@ -112,10 +112,6 @@ final class SchedulingMethodImpl implements SchedulingMethod {
     protected ExecutorService threadPool;
 
     protected PrivateKey corePrivateKey;
-
-    protected TopologyDescriptor tdescriptor = null;
-
-    protected boolean topologyDisabled = false;
 
     SchedulingMethodImpl(SchedulerCore core) {
         this.core = core;
@@ -307,8 +303,8 @@ final class SchedulingMethodImpl implements SchedulingMethod {
             InternalTask internalTask = currentJob.getIHMTasks().get(etd.getId());
             int neededNodes = internalTask.getNumberOfNodesNeeded();
             SchedulingTaskComparator referent = new SchedulingTaskComparator(internalTask, currentJob
-                    .getOwner(), tdescriptor);
-            logger_dev.debug("Get the most nodes matching the current selection");
+                    .getOwner());
+            logger_dev.debug("Get the most nodes matching the current selection ");
             boolean firstLoop = true;
             do {
                 if (!firstLoop) {
@@ -331,8 +327,7 @@ final class SchedulingMethodImpl implements SchedulingMethod {
                     //(multi-nodes starvation may occurs)
                 } else {
                     //check if the task is compatible with the other previous one
-                    if (referent.equals(new SchedulingTaskComparator(internalTask, currentJob.getOwner(),
-                        tdescriptor))) {
+                    if (referent.equals(new SchedulingTaskComparator(internalTask, currentJob.getOwner()))) {
                         neededResource += neededNodes;
                         maxResource -= neededNodes;
                         toFill.add(etd);
@@ -371,7 +366,7 @@ final class SchedulingMethodImpl implements SchedulingMethod {
 
         if (logger.isDebugEnabled()) {
             SchedulingTaskComparator referent = new SchedulingTaskComparator(internalTask, currentJob
-                    .getOwner(), null);
+                    .getOwner());
             logger.debug("Referent task         : " + internalTask.getId());
             logger.debug("Selection script(s)   : " +
                 ((referent.getSsHashCode() == 0) ? "no" : "yes (" + referent.getSsHashCode() + ")"));
@@ -379,27 +374,26 @@ final class SchedulingMethodImpl implements SchedulingMethod {
         }
 
         try {
-            //apply topology if number of resource demanded is more than one
-            //if multinode is demanded, every following internal task have more than one task
-            //if simple node task is demanded, every internal task have only one node
-            if (!isTopologyDisabled() && internalTask.getNumberOfNodesNeeded() > 1) {
-                tdescriptor = TopologyDescriptor.BEST_PROXIMITY;
-            } else {
-                tdescriptor = null;
+            TopologyDescriptor descriptor = null;
+            if (internalTask.isParallel()) {
+                descriptor = internalTask.getParallelEnvironment().getTopologyDescriptor();
+                if (descriptor == null) {
+                    logger.debug("Topology is not defined for the task " + internalTask.getName());
+                }
             }
+            if (descriptor == null) {
+                // descriptor is not defined, use default
+                descriptor = TopologyDescriptor.ARBITRARY;
+            }
+
             try {
                 nodeSet = core.rmProxiesManager.getUserRMProxy(currentJob).getAtMostNodes(
-                        neededResourcesNumber, tdescriptor, internalTask.getSelectionScripts(),
+                        neededResourcesNumber, descriptor, internalTask.getSelectionScripts(),
                         internalTask.getNodeExclusion());
             } catch (TopologyDisabledException tde) {
-                //TopologyDisabledException exception is runtimeException
-                logger_dev
-                        .info("UNARBITRARY Topology was demanded and topology is disabled : switch to ARBITRARY");
-                setTopologyDisabled(true);
-                tdescriptor = null;
-                nodeSet = core.rmProxiesManager.getUserRMProxy(currentJob).getAtMostNodes(
-                        neededResourcesNumber, tdescriptor, internalTask.getSelectionScripts(),
-                        internalTask.getNodeExclusion());
+                logger_dev.info("Cancel job " + currentJob.getName() + " as the topology is disabled");
+                simulateJobStartAndCancelIt(tasksToSchedule, "Topology is disabled");
+                return null;
             }
             //the following line is used to unwrap the future, warning when moving or removing
             //it may also throw a ScriptException which is a RuntimeException
@@ -502,15 +496,12 @@ final class SchedulingMethodImpl implements SchedulingMethod {
             NodeSet nodes = new NodeSet();
             try {
                 //if topology is enabled and it is a multi task, give every nodes to the multi-nodes task
-                if (!isTopologyDisabled() && task.getNumberOfNodesNeeded() > 1) {
+                // we will need to update this code once topology will be allowed for single-node task
+                if (task.isParallel()) {
                     nodes = new NodeSet(nodeSet);
-                } else {
-                    //else distribute normally
-                    for (int i = 0; i < (task.getNumberOfNodesNeeded() - 1); i++) {
-                        nodes.add(nodeSet.remove(0));
-                    }
+                    task.getExecuterInformations().addNodes(nodes);
+                    nodeSet.clear();
                 }
-                task.getExecuterInformations().addNodes(nodes);
 
                 // activate loggers for this task if needed
                 if (core.jobsToBeLogged.containsKey(job.getId()) ||
@@ -617,23 +608,4 @@ final class SchedulingMethodImpl implements SchedulingMethod {
         core.frontend.taskStateUpdated(job.getOwner(), new NotificationData<TaskInfo>(
             SchedulerEvent.TASK_PENDING_TO_RUNNING, task.getTaskInfo()));
     }
-
-    /**
-     * Get the topologyDisabled
-     *
-     * @return the topologyDisabled
-     */
-    boolean isTopologyDisabled() {
-        return topologyDisabled;
-    }
-
-    /**
-     * Set the topologyDisabled value to the given topologyDisabled value
-     *
-     * @param topologyDisabled the topologyDisabled to set
-     */
-    public void setTopologyDisabled(boolean topologyDisabled) {
-        this.topologyDisabled = topologyDisabled;
-    }
-
 }
