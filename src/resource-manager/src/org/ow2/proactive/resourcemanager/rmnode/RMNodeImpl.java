@@ -199,12 +199,7 @@ public class RMNodeImpl implements RMNode, Serializable {
      * @return the java virtual machine name of the RMNode.
      */
     public String getDescriptorVMName() {
-        try {
-            return RuntimeFactory.getDefaultRuntime().getURL();
-        } catch (ProActiveException e) {
-        }
-
-        return "";
+        return this.node.getProActiveRuntime().getURL();
     }
 
     /**
