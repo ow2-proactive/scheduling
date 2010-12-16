@@ -41,8 +41,6 @@ import java.security.KeyException;
 import java.security.PublicKey;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 
 import javax.security.auth.login.LoginException;
@@ -196,21 +194,13 @@ public class CachingSchedulerProxyUserInterface extends SchedulerProxyUserInterf
     /**
      * return the revision version and the scheduler state at once. Only one entry
      * in the map.
-     * @return an pair (entry) containing the reversion as key and the
-     * scheduler state as value
+     * @return a map containing only one entry the reversion as key and the
+     * scheduler state as content
      */
-    public Entry<AtomicLong, SchedulerState> getRevisionVersionAndSchedulerState() {
-
-        // hack to get an pair object (key, value) based on
-        // Map.Entry. Unfortunately SimpleEntry only exists in java 6
-        // and we still support java 5.
-        // TODO to be cleaned when java 5 is no longer supported.
-
+    public Map<AtomicLong, SchedulerState> getRevisionVersionAndSchedulerState() {
         HashMap<AtomicLong, SchedulerState> s = new HashMap<AtomicLong, SchedulerState>();
         s.put(new AtomicLong(schedulerStateRevision.longValue()), schedulerState);
-        Set<Entry<AtomicLong, SchedulerState>> set = s.entrySet();
-        Entry<AtomicLong, SchedulerState> result = set.iterator().next();
-        return result;
+        return s;
     }
 
 }
