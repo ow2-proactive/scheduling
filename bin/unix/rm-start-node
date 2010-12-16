@@ -1,18 +1,14 @@
 #!/usr/bin/env bash
-echo
-echo --- StartNode -------------------------------------------
 
 if [ $# -lt 1 ]; then
-    echo "
-       Start a new Node
-         rm-start-node -n <the name of the node to create>
-
-         ex : rm-start-node -n node1
-         ex : rm-start-node -n node2
-
-    "
-    exit 1
+	echo
+	echo "using default values. -h to display help message."
+	echo
+echo
 fi
+
+echo --- StartNode -------------------------------------------
+echo
 
 workingDir=`dirname $0`
 . $workingDir/env log4j-defaultNode

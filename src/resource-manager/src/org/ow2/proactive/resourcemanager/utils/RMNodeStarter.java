@@ -398,6 +398,7 @@ public class RMNodeStarter {
                 HelpFormatter formatter = new HelpFormatter();
                 // Prints usage
                 formatter.printHelp("java " + RMNodeStarter.class.getName(), options);
+                System.exit(ExitStatus.OK.exitCode);
             }
         }
     }
