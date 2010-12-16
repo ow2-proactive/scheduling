@@ -80,7 +80,7 @@ public class DefaultInfrastructureManager extends InfrastructureManager {
      */
     @Override
     public void acquireNode() {
-        logger.error("acquireNode() is invalid operation");
+        logger.info("acquireNode() implementation is emtpy for " + this.getClass().getSimpleName());
     }
 
     /**
@@ -88,7 +88,7 @@ public class DefaultInfrastructureManager extends InfrastructureManager {
      */
     @Override
     public void acquireAllNodes() {
-        logger.error("acquireAllNodes() is invalid operation");
+        logger.info("acquireAllNodes() implementation is emtpy for " + this.getClass().getSimpleName());
     }
 
     /**

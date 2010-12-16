@@ -512,6 +512,8 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         if (!this.allNodes.containsKey(nodeURL)) {
             //does nothing, the node has been removed preemptively
             //during its configuration
+            logger.debug("internalAddNodeToCore returned immediately because the node " + nodeURL +
+                " was not known");
             return;
         }
         //was added during internalRegisterConfiguringNode
@@ -1128,6 +1130,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             // the nodes has been removed from core asynchronously
             // when pinger of selection manager tried to access it
             // do nothing in this case
+            logger.debug("setDownNode returned immediately because the node " + nodeUrl + " was not known");
         }
     }
 
