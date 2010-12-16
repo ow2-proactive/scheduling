@@ -42,9 +42,11 @@ import java.util.List;
 import org.ow2.proactive.resourcemanager.gui.compact.view.NodeView;
 import org.ow2.proactive.resourcemanager.gui.compact.view.View;
 import org.ow2.proactive.resourcemanager.gui.data.RMStore;
+import org.ow2.proactive.resourcemanager.gui.data.model.Node;
 import org.ow2.proactive.resourcemanager.gui.data.model.Selectable;
 import org.ow2.proactive.resourcemanager.gui.handlers.DescribeCommandHandler;
 import org.ow2.proactive.resourcemanager.gui.handlers.RemoveNodesHandler;
+import org.ow2.proactive.resourcemanager.gui.views.NodeInfoView;
 
 
 /**
@@ -87,6 +89,10 @@ public class SelectionManager {
             selected.add(view);
             for (View v : view.getChilds()) {
                 select(v);
+            }
+
+            if (view.getElement() != null) {
+                NodeInfoView.setNode((Node) view.getElement());
             }
         }
     }

@@ -39,6 +39,7 @@ package org.ow2.proactive.resourcemanager.gui;
 import org.eclipse.ui.IFolderLayout;
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPerspectiveFactory;
+import org.ow2.proactive.resourcemanager.gui.views.NodeInfoView;
 import org.ow2.proactive.resourcemanager.gui.views.ResourceExplorerView;
 import org.ow2.proactive.resourcemanager.gui.views.ResourcesCompactView;
 import org.ow2.proactive.resourcemanager.gui.views.ResourcesTabView;
@@ -76,6 +77,7 @@ public final class ResourceManagerPerspective implements IPerspectiveFactory {
         final IFolderLayout bottomLeftFolder = layout.createFolder("bottomLeft", IPageLayout.BOTTOM, 0.7f,
                 "topLeft");
         bottomLeftFolder.addView(StatisticsView.ID);
+        bottomLeftFolder.addView(NodeInfoView.ID);
 
         // The bottom left folder contains the compact view
         final IFolderLayout bottomRightFolder = layout.createFolder("bottomRight", IPageLayout.RIGHT, 0.5f,

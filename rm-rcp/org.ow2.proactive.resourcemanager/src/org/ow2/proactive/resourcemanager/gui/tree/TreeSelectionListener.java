@@ -42,12 +42,14 @@ import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.ow2.proactive.resourcemanager.gui.data.RMStore;
+import org.ow2.proactive.resourcemanager.gui.data.model.Node;
 import org.ow2.proactive.resourcemanager.gui.data.model.Selectable;
 import org.ow2.proactive.resourcemanager.gui.data.model.TreeElementType;
 import org.ow2.proactive.resourcemanager.gui.data.model.TreeLeafElement;
 import org.ow2.proactive.resourcemanager.gui.data.model.TreeParentElement;
 import org.ow2.proactive.resourcemanager.gui.handlers.DescribeCommandHandler;
 import org.ow2.proactive.resourcemanager.gui.handlers.RemoveNodesHandler;
+import org.ow2.proactive.resourcemanager.gui.views.NodeInfoView;
 
 
 public class TreeSelectionListener implements ISelectionChangedListener {
@@ -70,6 +72,8 @@ public class TreeSelectionListener implements ISelectionChangedListener {
             DescribeCommandHandler.getInstance().setSelectedNodes(selectionList);
         }
 
+        if (selectionList.size() > 0)
+            NodeInfoView.setNode((Node) selectionList.get(0));
     }
 
     private void getSubTreeNodesList(TreeLeafElement leaf, ArrayList<Selectable> selectList) {

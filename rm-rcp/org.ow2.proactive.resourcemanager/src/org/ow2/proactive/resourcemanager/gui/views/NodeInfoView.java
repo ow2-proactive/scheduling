@@ -37,11 +37,15 @@
 package org.ow2.proactive.resourcemanager.gui.views;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Table;
-import org.eclipse.swt.widgets.TableColumn;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.part.ViewPart;
+import org.ow2.proactive.resourcemanager.gui.data.model.Node;
 
 
 /**
@@ -52,30 +56,88 @@ public class NodeInfoView extends ViewPart {
     /** the view part id */
     public static final String ID = "org.ow2.proactive.resourcemanager.gui.views.NodeInfoView";
 
+    private static NodeInfoView instance = null;
+
+    private static final int textFlags = SWT.MULTI | SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL | SWT.READ_ONLY;
+
+    private Text text = null;
+    private Text textWrap = null;
+    private boolean wrap = false;
+
     /**
      * The constructor.
      */
     public NodeInfoView() {
+        instance = this;
     }
 
     /**
      * This is a callback that will allow us to create the viewer and initialize it.
      */
     @Override
-    public void createPartControl(Composite parent) {
-        Table table = new Table(parent, SWT.BORDER | SWT.SINGLE);
-        table.setLayoutData(new GridData(GridData.FILL_BOTH));
-        table.setHeaderVisible(true);
-        table.setLinesVisible(true);
+    public void createPartControl(final Composite parent) {
 
-        TableColumn tc1 = new TableColumn(table, SWT.LEFT);
-        TableColumn tc2 = new TableColumn(table, SWT.LEFT);
-        tc1.setText("name");
-        tc2.setText("value");
-        tc1.setWidth(100);
-        tc2.setWidth(100);
-        tc1.setMoveable(true);
-        tc2.setMoveable(true);
+        GridLayout g = new GridLayout(1, false);
+        parent.setLayout(g);
+
+        final GridData hidden = new GridData();
+        hidden.exclude = true;
+
+        final GridData expand = new GridData(GridData.BEGINNING | GridData.FILL_BOTH);
+
+        // create two Text fields, one with wrap enabled, and switch the visibility
+        // of each one when checking 'wrap lines'
+        // styles can not be dynamically changed (SWT < Swing)
+
+        text = new Text(parent, textFlags);
+        text.setLayoutData(expand);
+
+        textWrap = new Text(parent, textFlags | SWT.WRAP);
+        textWrap.setVisible(false);
+        textWrap.setLayoutData(hidden);
+
+        Button check = new Button(parent, SWT.CHECK);
+        GridData tc = new GridData(GridData.BEGINNING | GridData.FILL_HORIZONTAL);
+        check.setLayoutData(tc);
+
+        check.setText("Wrap lines");
+        check.addSelectionListener(new SelectionListener() {
+            public void widgetSelected(SelectionEvent e) {
+                wrap = !wrap;
+
+                if (wrap) {
+                    text.setVisible(false);
+                    text.setLayoutData(hidden);
+
+                    textWrap.setVisible(true);
+                    textWrap.setLayoutData(expand);
+
+                } else {
+                    text.setVisible(true);
+                    text.setLayoutData(expand);
+
+                    textWrap.setVisible(false);
+                    textWrap.setLayoutData(hidden);
+                }
+
+                parent.layout();
+            }
+
+            public void widgetDefaultSelected(SelectionEvent e) {
+            }
+        });
+
+    }
+
+    private void updateText(String text) {
+        this.text.setText(text);
+        this.textWrap.setText(text);
+    }
+
+    public static void setNode(Node node) {
+        if (instance != null) {
+            instance.updateText(node.getDescription());
+        }
     }
 
     /**

@@ -43,8 +43,10 @@ import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.ow2.proactive.resourcemanager.gui.data.RMStore;
+import org.ow2.proactive.resourcemanager.gui.data.model.Node;
 import org.ow2.proactive.resourcemanager.gui.data.model.Selectable;
 import org.ow2.proactive.resourcemanager.gui.handlers.RemoveNodesHandler;
+import org.ow2.proactive.resourcemanager.gui.views.NodeInfoView;
 
 
 public class TableSelectionListener implements ISelectionChangedListener {
@@ -60,6 +62,10 @@ public class TableSelectionListener implements ISelectionChangedListener {
             if (RMStore.isConnected()) {
                 RemoveNodesHandler.getInstance().setSelectedNodes(list);
             }
+
+            if (list.size() > 0)
+                NodeInfoView.setNode((Node) list.get(0));
+
         }
     }
 }
