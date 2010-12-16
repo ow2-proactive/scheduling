@@ -96,7 +96,7 @@ public interface SchedulerCoreMethods {
      * 		If the task result is not yet available, null is returned.
      * @throws NotConnectedException if you are not authenticated.
      * @throws UnknownJobException if the job does not exist.
-     * @throws UnknownTaskException if this task result does not exist or is unknown.
+     * @throws UnknownTaskException if this task does not exist in the job.
      * @throws PermissionException if you can't access to this particular job.
      */
     public TaskResult getTaskResult(JobId jobId, String taskName) throws NotConnectedException,

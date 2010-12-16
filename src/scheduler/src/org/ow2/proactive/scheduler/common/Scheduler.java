@@ -123,7 +123,7 @@ public interface Scheduler extends SchedulerCoreMethods {
      * 		If null is returned, this task is not yet terminated or not available.
      * @throws NotConnectedException if you are not authenticated.
      * @throws UnknownJobException if the job does not exist.
-     * @throws UnknownTaskException if this task is unknown in the Job.
+     * @throws UnknownTaskException if this task does not exist in the job.
      * @throws PermissionException if you can't access to this particular job.
      */
     public TaskResult getTaskResult(String jobId, String taskName) throws NotConnectedException,
