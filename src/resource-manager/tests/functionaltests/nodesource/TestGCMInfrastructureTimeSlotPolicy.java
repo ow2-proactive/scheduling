@@ -109,7 +109,7 @@ public class TestGCMInfrastructureTimeSlotPolicy extends FunctionalTest {
 
         init();
 
-        String source1 = "Node source 1";
+        String source1 = "Node_source_1";
 
         RMTHelper.log("Test 1 - creation/removal of empty node source");
         createEmptyNodeSource(source1);

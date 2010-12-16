@@ -105,7 +105,7 @@ public class TestGCMCustomizedInfrastructureSchedulerLoadingPolicy extends
 
         ResourceManager resourceManager = RMTHelper.getResourceManager();
 
-        String source1 = "Node source 1";
+        String source1 = "Node_source_1";
 
         SchedulerTHelper.log("Test 1");
         createDefaultNodeSource(source1);

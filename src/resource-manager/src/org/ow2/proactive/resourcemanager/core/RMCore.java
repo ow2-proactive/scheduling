@@ -48,6 +48,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
@@ -101,8 +103,8 @@ import org.ow2.proactive.resourcemanager.nodesource.infrastructure.Infrastructur
 import org.ow2.proactive.resourcemanager.nodesource.policy.NodeSourcePolicy;
 import org.ow2.proactive.resourcemanager.nodesource.policy.NodeSourcePolicyFactory;
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
-import org.ow2.proactive.resourcemanager.rmnode.RMNode;
 import org.ow2.proactive.resourcemanager.rmnode.RMDeployingNode;
+import org.ow2.proactive.resourcemanager.rmnode.RMNode;
 import org.ow2.proactive.resourcemanager.selection.SelectionManager;
 import org.ow2.proactive.resourcemanager.selection.statistics.ProbablisticSelectionManager;
 import org.ow2.proactive.resourcemanager.selection.topology.TopologyManager;
@@ -791,9 +793,12 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     public BooleanWrapper createNodeSource(String nodeSourceName, String infrastructureType,
             Object[] infrastructureParameters, String policyType, Object[] policyParameters) {
 
-        if (this.nodeSources.containsKey(nodeSourceName)) {
-            throw new IllegalArgumentException("Node Source name " + nodeSourceName + " already exist");
+        //checking that nsname doesn't contain invalid characters and doesn't exist yet
+        if (nodeSourceName == null) {
+            throw new IllegalArgumentException("Node Source name cannot be null");
         }
+        nodeSourceName = nodeSourceName.trim();
+        checkNodeSourceName(nodeSourceName);
 
         logger.info("Creating a node source : " + nodeSourceName);
 
@@ -1360,5 +1365,26 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             return false;
         }
         return ns.removeDeployingNode(url);
+    }
+
+    /**
+     * Checks if the string parameter is a valid nodesource name.
+     * Throws an IllegalArgumentException if it doesn't
+     * @param nodeSourceName the name to test
+     */
+    private void checkNodeSourceName(String nodeSourceName) {
+        //we are sure that the parameter isn't null
+        if (nodeSourceName.length() == 0) {
+            throw new IllegalArgumentException("Node Source Name cannot be empty");
+        }
+        if (this.nodeSources.containsKey(nodeSourceName)) {
+            throw new IllegalArgumentException("Node Source name " + nodeSourceName + " already exist");
+        }
+        Pattern pattern = Pattern.compile("[^-\\w]");//letters,digits,_and-
+        Matcher matcher = pattern.matcher(nodeSourceName);
+        if (matcher.find()) {
+            throw new IllegalArgumentException("Node Source name \"" + nodeSourceName +
+                "\" is invalid because it contains invalid characters. Only [-a-zA-Z_0-9] are valid.");
+        }
     }
 }

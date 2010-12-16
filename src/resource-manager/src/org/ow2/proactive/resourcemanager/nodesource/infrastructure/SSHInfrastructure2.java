@@ -273,11 +273,10 @@ public class SSHInfrastructure2 extends InfrastructureManager {
         //we add extra java/PA configuration
         sb.append(this.javaOptions);
         clb.setPaProperties(sb.toString());
-        //afterwards, node's name
+        // afterwards, node's name
         // generate the node name
         // current rmcore shortID should be added to ensure uniqueness
-        final String nodeName = "SSH-" + this.nodeSource.getName().replace(" ", "_") + "-" +
-            ProActiveCounter.getUniqID();
+        final String nodeName = "SSH-" + this.nodeSource.getName() + "-" + ProActiveCounter.getUniqID();
         clb.setNodeName(nodeName);
         //finally, the credential's value
         String credString = null;

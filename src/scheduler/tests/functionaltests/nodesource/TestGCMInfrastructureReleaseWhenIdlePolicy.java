@@ -118,7 +118,7 @@ public class TestGCMInfrastructureReleaseWhenIdlePolicy extends FunctionalTest {
 
         init();
 
-        String source1 = "Node source 1";
+        String source1 = "Node_source_1";
         SchedulerTHelper.log("Test 1");
 
         ResourceManager resourceManager = RMTHelper.getResourceManager();

@@ -120,8 +120,8 @@ public class TestGCMInfrastructureStaticPolicy extends FunctionalTest {
     public void action() throws Exception {
 
         init();
-        String source1 = "Node source 1";
-        String source2 = "Node source 2";
+        String source1 = "Node_source_1";
+        String source2 = "Node_source_2";
 
         ResourceManager resourceManager = RMTHelper.getResourceManager();
 
