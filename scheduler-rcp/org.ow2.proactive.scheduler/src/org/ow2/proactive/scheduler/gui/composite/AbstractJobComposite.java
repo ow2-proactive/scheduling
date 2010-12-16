@@ -41,6 +41,8 @@ import java.util.Vector;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
@@ -60,6 +62,7 @@ import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.ow2.proactive.scheduler.Activator;
 import org.ow2.proactive.scheduler.common.job.JobId;
@@ -384,6 +387,25 @@ public abstract class AbstractJobComposite extends Composite {
                 }
             }
         });
+
+        // show the task view on double click
+        table.addMouseListener(new MouseListener() {
+            public void mouseDoubleClick(MouseEvent e) {
+                try {
+                    PlatformUI.getWorkbench().getActiveWorkbenchWindow().getPages()[0].showView(TaskView.ID,
+                            null, IWorkbenchPage.VIEW_ACTIVATE);
+                } catch (PartInitException e1) {
+                    Activator.log(IStatus.ERROR, "Error while bringing focus to TaskView", e1);
+                }
+            }
+
+            public void mouseDown(MouseEvent e) {
+            }
+
+            public void mouseUp(MouseEvent e) {
+            }
+        });
+
         return table;
     }
 
