@@ -23,6 +23,7 @@ public class ResultsAndLogs<R> implements Serializable {
 
     public void setLogs(String logs) {
         this.logs = logs;
+        compressLogs();
     }
 
     public void setException(Throwable exception) {
@@ -54,6 +55,7 @@ public class ResultsAndLogs<R> implements Serializable {
     public ResultsAndLogs(R result, String logs, Throwable exception, MatSciTaskStatus status) {
         this.result = result;
         this.logs = logs;
+        compressLogs();
         this.exception = exception;
         this.status = status;
 
@@ -84,5 +86,20 @@ public class ResultsAndLogs<R> implements Serializable {
 
     public Throwable getException() {
         return exception;
+    }
+
+    private void compressLogs() {
+        if (logs.length() > 0) {
+            StringBuilder sb = new StringBuilder(logs);
+            char last = sb.charAt(0);
+            for (int i = 1; i < sb.length(); i++) {
+                if (last == '\r' && sb.charAt(i) == '\n') {
+                    sb.deleteCharAt(i - 1);
+                } else {
+                    last = sb.charAt(i);
+                }
+            }
+            logs = sb.toString();
+        }
     }
 }

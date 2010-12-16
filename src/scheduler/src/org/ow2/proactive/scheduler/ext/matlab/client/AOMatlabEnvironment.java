@@ -126,7 +126,13 @@ public class AOMatlabEnvironment extends AOMatSciEnvironment<Token, MatlabResult
     }
 
     public ArrayList<MatlabResultsAndLogs> retrieve(MatSciJobPermanentInfo jpinfo) {
-        return null;
+
+        syncRetrieve(jpinfo);
+        ArrayList<MatlabResultsAndLogs> answers = new ArrayList<MatlabResultsAndLogs>(jpinfo.getNbres());
+        for (String ftname : jpinfo.getFinalTaskNames()) {
+            answers.add(((AOMatlabEnvironment) stubOnThis).waitResult(jpinfo.getJobId(), ftname));
+        }
+        return answers;
     }
 
     /**
@@ -322,14 +328,11 @@ public class AOMatlabEnvironment extends AOMatSciEnvironment<Token, MatlabResult
         String jid = null;
         try {
             jid = scheduler.submit(job).value();
-            lastSubJobId.add(jid);
             if (config.isDebug()) {
                 System.out.println("[AOMatlabEnvironment] Job " + jid + " submitted.");
             }
             jpinfo = new MatSciJobPermanentInfo(jid, nbResults, depth, config, tnames, finaltnames);
             currentJobs.put(jid, new MatSciJobVolatileInfo(jpinfo));
-
-            writeCjobsToLog(currentJobs);
 
         } catch (SchedulerException e) {
             throw new RuntimeException(e);
@@ -343,7 +346,8 @@ public class AOMatlabEnvironment extends AOMatSciEnvironment<Token, MatlabResult
         // The last call puts a method in the RequestQueue 
         // that won't be executed until all the results are received (see runactivity)
         // return stubOnThis.waitAllResults();
-        return new Pair<MatSciJobPermanentInfo, ArrayList<MatlabResultsAndLogs>>(jpinfo, answers);
+        return new Pair<MatSciJobPermanentInfo, ArrayList<MatlabResultsAndLogs>>(
+            (MatSciJobPermanentInfo) jpinfo.clone(), answers);
     }
 
 }

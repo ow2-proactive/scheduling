@@ -49,7 +49,7 @@ java.util.Locale.setDefault(java.util.Locale.ENGLISH);
 
 % Scheduler root
 javafile = java.io.File(pathstr);
-scheduling_dir_java = javafile.getParentFile().getParentFile().getParent();
+scheduling_dir_java = javafile.getParentFile().getParentFile().getParentFile().getParentFile().getParent();
 scheduling_dir = char(scheduling_dir_java.toString());
 
 opt=PAoptions;
@@ -94,32 +94,41 @@ if ~proactiveset
     ucpf.setAccessible(true);
     ucp = ucpf.get(cl);
     urls = ucp.getURLs();
-    stack = java.util.Stack();
+    stack1 = java.util.Stack();    
+    % We put proactive classes in the bottom, so they won't interfere with
+    % matlab's jars
+    for i=1:length(jars)
+        url = java.net.URL(['file:' jarsFullPath{i}]);
+        stack1.push(url);         
+    end
     for i=1:urls.length
         %if any(strfind(char(urls(i).toString()), 'jini'))
         %else
-        stack.push(urls(i));
+        stack1.push(urls(i));
         %end
     end
-    for i=1:length(jars)
-        url = java.net.URL(['file:' jarsFullPath{i}]);
-        stack.push(url);
-        
+    
+    
+    %% handling the classpath variable    ;
+    cp = char(java.lang.System.getProperty('java.class.path'));    
+    for i=length(jarsFullPath):-1:1
+        cp = [jarsFullPath{i} pathsep cp];
     end
+    warning('off')
+    java.lang.System.setProperty('java.class.path', cp);
     
-    urls = javaArray('java.net.URL',1);
     
-    ucp2=sun.misc.URLClassPath(stack.toArray(urls));
+    urls = javaArray('java.net.URL',1);    
+    ucp2=sun.misc.URLClassPath(stack1.toArray(urls));
     
     ucpf.set(cl, ucp2);
     
     for i=1:length(jars)
-        javaaddpath(jarsFullPath{i});
+        javaaddpath(jarsFullPath{i},'-END');
     end
     
     java.lang.System.setProperty('java.rmi.server.RMIClassLoaderSpi','default');
-    nl = org.jruby.common.NullWarnings();
-    rl = com.sun.script.jruby.JRubyScriptEngine();
+    warning('on')
     
 end
 

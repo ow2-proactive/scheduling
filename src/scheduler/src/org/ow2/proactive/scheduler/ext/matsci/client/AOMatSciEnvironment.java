@@ -40,11 +40,6 @@ public abstract class AOMatSciEnvironment<R, RL> implements Serializable, Schedu
      */
     protected Scheduler scheduler;
 
-    /**
-     * job id of the last submitted job (useful for runactivity method)
-     */
-    protected Queue<String> lastSubJobId = new LinkedList<String>();
-
     protected String waitAllResultsJobID;
 
     /**
@@ -97,7 +92,6 @@ public abstract class AOMatSciEnvironment<R, RL> implements Serializable, Schedu
     protected boolean loggedin;
 
     protected SchedulerAuthenticationInterface auth;
-    protected TreeMap<String, Integer[]> previousJobs;
 
     /**
      * Trys to log into the scheduler, using the provided user and password
@@ -123,7 +117,9 @@ public abstract class AOMatSciEnvironment<R, RL> implements Serializable, Schedu
         }
         this.scheduler = auth.login(creds);
 
-        // myEventsOnly doesn't work with the deconnected mode, so we disable it
+        loggedin = true;
+
+        // myEventsOnly doesn't work with the disconnected mode, so we disable it
         this.scheduler.addEventListener(stubOnThis, false, SchedulerEvent.JOB_RUNNING_TO_FINISHED,
                 SchedulerEvent.JOB_PENDING_TO_FINISHED, SchedulerEvent.KILLED, SchedulerEvent.SHUTDOWN,
                 SchedulerEvent.SHUTTING_DOWN, SchedulerEvent.TASK_RUNNING_TO_FINISHED);
@@ -163,70 +159,6 @@ public abstract class AOMatSciEnvironment<R, RL> implements Serializable, Schedu
     public void initActivity(Body body) {
         stubOnThis = (AOMatSciEnvironment) PAActiveObject.getStubOnThis();
 
-        //        // Open the file used for persistance
-        //        String tmpPath = System.getProperty("java.io.tmpdir");
-        //        jobLogFile = new File(tmpPath, "matsci_jobs.tmp");
-        //        if (jobLogFile.exists()) {
-        //            try {
-        //                FileInputStream fis = new FileInputStream(jobLogFile);
-        //
-        //                ObjectInputStream ois = new ObjectInputStream(fis);
-        //
-        //                previousJobs = (TreeMap<String, Integer[]>) ois.readObject();
-        //
-        //                if (previousJobs != null && previousJobs.size() > 0) {
-        //                    System.out
-        //                            .println("[AOMatSciEnvironment] " + previousJobs.size() +
-        //                                " jobs were unfinished before shutdown of last Matlab session, trying te retrieve them.");
-        //                }
-        //
-        //            } catch (FileNotFoundException e) {
-        //                e.printStackTrace();
-        //            } catch (IOException e1) {
-        //                e1.printStackTrace();
-        //            } catch (ClassNotFoundException e2) {
-        //                System.out
-        //                        .println("[AOMatSciEnvironment] Warning : Previous jobs contained invalid classes definitions:");
-        //                System.out.println(e2.getMessage());
-        //            }
-        //        } else {
-        //            try {
-        //                jobLogFile.createNewFile();
-        //            } catch (IOException e) {
-        //                e.printStackTrace();
-        //            }
-        //        }
-        //
-        //        if (previousJobs == null) {
-        //            previousJobs = new TreeMap<String, Integer[]>(new IntStrComparator());
-        //        }
-        //
-        //        writeIdListToLog(previousJobs);
-
-    }
-
-    protected void writeCjobsToLog(HashMap<String, MatSciJobVolatileInfo<R>> cjobs) {
-        //        TreeMap<String, Integer[]> idList = new TreeMap<String, Integer[]>(new IntStrComparator());
-        //
-        //        for (String key : cjobs.keySet()) {
-        //            idList.put(key, new Integer[] { cjobs.get(key).nbResults(), cjobs.get(key).getDepth() });
-        //        }
-        //        writeIdListToLog(idList);
-    }
-
-    protected void writeIdListToLog(TreeMap<String, Integer[]> idList) {
-        //        FileOutputStream fos = null;
-        //        try {
-        //            fos = new FileOutputStream(jobLogFile);
-        //            ObjectOutputStream oos = new ObjectOutputStream(fos);
-        //            oos.writeObject(idList);
-        //            oos.close();
-        //
-        //        } catch (FileNotFoundException e) {
-        //            e.printStackTrace();
-        //        } catch (IOException e) {
-        //            e.printStackTrace();
-        //        }
     }
 
     /**
@@ -242,49 +174,58 @@ public abstract class AOMatSciEnvironment<R, RL> implements Serializable, Schedu
     }
 
     /**
-     * Try to get the results of jobs submitted before the Matlab client was disconnected
-     *
-     * @return
-     */
-    //    public ArrayList<ArrayList<RL>> getPreviousJobResults() {
-    //        ArrayList<ArrayList<RL>> answer = new ArrayList<ArrayList<RL>>();
-    //
-    //        for (String jid : previousJobs.keySet()) {
-    //            Integer[] nbres = previousJobs.get(jid);
-    //            currentJobs.put(jid, new MatSciJobVolatileInfo<R>(false, true, nbres[0], nbres[1]));
-    //            JobResult jResult = null;
-    //            try {
-    //                jResult = scheduler.getJobResult(jid);
-    //                if (jResult != null) {
-    //                    // If the result is already received
-    //                    updateJobResult(jid, jResult);
-    //                    answer.add(waitResultOfJob(jid));
-    //                } else {
-    //                    // If the answer is null, this means the job is known but not finished yet
-    //                    // Consequently we delay the answer and put a future
-    //                    lastSubJobId.add(jid);
-    //                    //answer.add(stubOnThis.waitAllResults());
-    //                }
-    //            } catch (SchedulerException e) {
-    //                // The job is not known to the scheduler, we choose to ignore this case
-    //            }
-    //
-    //        }
-    //        return answer;
-    //    }
-    /**
      * Returns all the results in an array or throw a RuntimeException in case of error
      *
      * @return array of ptolemy tokens
      */
 
-    protected void updateJobResult(String jid, JobResult jResult) {
+    protected void syncRetrieve(MatSciJobPermanentInfo jpinfo) {
+        String jid = jpinfo.getJobId();
+        MatSciJobVolatileInfo jinfo = new MatSciJobVolatileInfo(jpinfo);
+        if (currentJobs.get(jid) != null) {
+            throw new IllegalStateException("Wrong usage of retrieve");
+        }
+        currentJobs.put(jid, jinfo);
+        JobResult jResult = null;
+        try {
+            jResult = scheduler.getJobResult(jid);
+        } catch (SchedulerException e) {
+            e.printStackTrace();
+        }
+        if (jResult != null) {
+            // full update if the job is finished
+            updateJobResult(jid, jResult, jResult.getJobInfo().getStatus());
+        }
+        // partial update otherwise
+        for (String tname : jpinfo.getTaskNames()) {
+            TaskResult tres = null;
+            try {
+                tres = scheduler.getTaskResult(jid, tname);
+            } catch (NotConnectedException e) {
+                e.printStackTrace();
+            } catch (UnknownJobException e) {
+                e.printStackTrace();
+            } catch (UnknownTaskException e) {
+                // ignore this exception
+            } catch (PermissionException e) {
+                e.printStackTrace();
+            }
+            if (tres != null) {
+                updateTaskResult(null, tres, jid, tname);
+            }
+        }
+
+    }
+
+    protected void updateJobResult(String jid, JobResult jResult, JobStatus status) {
         // Getting the Job result from the Scheduler
         MatSciJobVolatileInfo jinfo = currentJobs.get(jid);
         if (jinfo.isDebugCurrentJob()) {
-            System.out.println("[AOMatlabEnvironment] Updating results of job: " + jResult.getName() + "(" +
-                jid + ") : " + jinfo.getStatus());
+            System.out.println("[AOMatlabEnvironment] Updating results of job: " + jid + "(" + jid + ") : " +
+                status);
         }
+        jinfo.setStatus(status);
+        jinfo.setJobFinished(true);
 
         Throwable mainException = null;
         if (schedulerStopped) {
@@ -317,26 +258,21 @@ public abstract class AOMatSciEnvironment<R, RL> implements Serializable, Schedu
                             System.out.println("[AOMatSciEnvironment] Looking for result of task: " + tname);
                         }
 
-                        handleResult(mainException, res, jid, tname);
+                        updateTaskResult(mainException, res, jid, tname);
                     }
 
                 }
             }
             TreeSet<String> missinglist = jinfo.missingResults();
             for (String missing : missinglist) {
-                handleResult(null, null, jid, missing);
+                updateTaskResult(null, null, jid, missing);
             }
-
-        }
-        if (jResult != null) {
-            jinfo.setStatus(jResult.getJobInfo().getStatus());
-            jinfo.setJobFinished(true);
         }
     }
 
     //abstract protected void handleResult(Throwable mainException, TaskResult res, String jid, int tid, int d);
 
-    protected void handleResult(Throwable mainException, TaskResult res, String jid, String tname) {
+    protected void updateTaskResult(Throwable mainException, TaskResult res, String jid, String tname) {
         MatSciJobVolatileInfo jinfo = currentJobs.get(jid);
 
         boolean intermediate = !jinfo.getFinalTasksNames().contains(tname);
@@ -369,10 +305,10 @@ public abstract class AOMatSciEnvironment<R, RL> implements Serializable, Schedu
             if (jinfo.isDebugCurrentJob()) {
                 if (intermediate) {
                     System.out.println("[AOMatSciEnvironment] Intermediate task " + tname + " for job " +
-                        jid + " threw an exception : " + ex.getMessage());
+                        jid + " threw an exception : " + ex.getClass() + " " + ex.getMessage());
                 } else {
                     System.out.println("[AOMatSciEnvironment] Task " + tname + " for job " + jid +
-                        " threw an exception : " + ex.getMessage());
+                        " threw an exception : " + ex.getClass() + " " + ex.getMessage());
                 }
             }
             jinfo.setException(tname, ex);
@@ -403,28 +339,34 @@ public abstract class AOMatSciEnvironment<R, RL> implements Serializable, Schedu
 
     protected boolean checkScript(URL script) throws Exception {
         // We verify that the scripts are available (otherwise we just ignore it)
-        boolean answer = false;
+        boolean answer = true;
 
-        InputStream is = script.openStream();
-        is.close();
-        answer = true;
+        // The following code is commented because apparently File handles didn't close properly on windows
+
+        //        InputStream is = null;
+        //        try {
+        //            is = script.openStream();
+        //        } catch (Exception e) {
+        //            answer = false;
+        //        } finally {
+        //            if (is != null) {
+        //                try {
+        //                    is.close();
+        //                } catch (Exception e2) {
+        //
+        //                }
+        //            }
+        //        }
 
         return answer;
     }
 
     /**
-     * Returns all the results in an array or throw a RuntimeException in case of error
-     *
-     * @return array of ptolemy tokens
+     * User-side waiting for the results of one task
+     * @param jid
+     * @param tname
+     * @return
      */
-    //    public ArrayList<R> waitAllResults() {
-    //
-    //        return waitResultOfJob(waitAllResultsJobID);
-    //    }
-    //
-    //    public R waitResult(int tid) {
-    //        return waitResultOfTask(waitAllResultsJobID, tid);
-    //    }
     protected abstract RL waitResultOfTask(String jid, String tname);
 
     /**
@@ -448,10 +390,7 @@ public abstract class AOMatSciEnvironment<R, RL> implements Serializable, Schedu
                 }
                 schedulerStopped = true;
                 for (String jid : currentJobs.keySet()) {
-                    currentJobs.get(jid).setStatus(JobStatus.KILLED);
-                    currentJobs.get(jid).setJobFinished(true);
-
-                    updateJobResult(jid, null);
+                    updateJobResult(jid, null, JobStatus.KILLED);
                 }
                 break;
         }
@@ -477,10 +416,7 @@ public abstract class AOMatSciEnvironment<R, RL> implements Serializable, Schedu
                         return;
                     }
 
-                    currentJobs.get(jid).setStatus(info.getStatus());
-                    currentJobs.get(jid).setJobFinished(true);
-
-                    updateJobResult(jid, null);
+                    updateJobResult(jid, null, JobStatus.KILLED);
                 }
 
             case JOB_RUNNING_TO_FINISHED:
@@ -495,15 +431,13 @@ public abstract class AOMatSciEnvironment<R, RL> implements Serializable, Schedu
                         return;
                     }
 
-                    currentJobs.get(jid).setStatus(info.getStatus());
-                    currentJobs.get(jid).setJobFinished(true);
                     JobResult jResult = null;
                     try {
                         jResult = scheduler.getJobResult(jid);
                     } catch (SchedulerException e) {
                         e.printStackTrace();
                     }
-                    updateJobResult(jid, jResult);
+                    updateJobResult(jid, jResult, JobStatus.KILLED);
                 } else {
                     if (debug) {
                         System.out
@@ -518,15 +452,13 @@ public abstract class AOMatSciEnvironment<R, RL> implements Serializable, Schedu
                     if (!currentJobs.containsKey(jid)) {
                         return;
                     }
-                    currentJobs.get(jid).setStatus(info.getStatus());
-                    currentJobs.get(jid).setJobFinished(true);
                     JobResult jResult = null;
                     try {
                         jResult = scheduler.getJobResult(jid);
                     } catch (SchedulerException e) {
                         e.printStackTrace();
                     }
-                    updateJobResult(jid, jResult);
+                    updateJobResult(jid, jResult, info.getStatus());
                 }
                 break;
         }
@@ -570,7 +502,7 @@ public abstract class AOMatSciEnvironment<R, RL> implements Serializable, Schedu
                 } catch (PermissionException e) {
                     e.printStackTrace();
                 }
-                handleResult(null, tres, jid, tnm);
+                updateTaskResult(null, tres, jid, tnm);
         }
     }
 
@@ -586,7 +518,6 @@ public abstract class AOMatSciEnvironment<R, RL> implements Serializable, Schedu
      */
     public void runActivity(final Body body) {
         Service service = new Service(body);
-        int cpt = 0;
         while (!terminated) {
             try {
 
@@ -595,17 +526,7 @@ public abstract class AOMatSciEnvironment<R, RL> implements Serializable, Schedu
                     logger.debug("Request received");
                 }
                 Request randomRequest = service.getOldest();
-                if (randomRequest.getMethodName().equals("waitAllResults")) {
-                    // We detect a waitXXX request in the request queue
-                    // if there is one request we remove it and store it for later
-                    // we look at the last submitted job id
-                    currentJobs.get(lastSubJobId.remove()).setPendingWaitAllRequest(randomRequest);
-                    if (debug) {
-                        System.out.println("[AOMatSciEnvironment] Removed waitAllResults " + lastSubJobId +
-                            " request from the queue");
-                    }
-                    service.blockingRemoveOldest("waitAllResults");
-                } else if (randomRequest.getMethodName().equals("waitResult")) {
+                if (randomRequest.getMethodName().equals("waitResult")) {
                     //System.out.println("lastSubJobId.peek() => "+lastSubJobId.peek() );
                     String jid = (String) randomRequest.getParameter(0);
                     String tname = (String) randomRequest.getParameter(1);
@@ -616,12 +537,6 @@ public abstract class AOMatSciEnvironment<R, RL> implements Serializable, Schedu
                             " for job=" + jid + " request from the queue");
                     }
                     service.blockingRemoveOldest("waitResult");
-                    cpt++;
-                    if (cpt == jinfo.nbResults()) {
-                        cpt = 0;
-                        lastSubJobId.remove();
-                    }
-
                 } else {
                     service.serveOldest();
                 }

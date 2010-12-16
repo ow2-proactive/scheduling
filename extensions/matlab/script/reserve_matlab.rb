@@ -6,7 +6,7 @@ import org.ow2.proactive.scheduler.ext.matlab.worker.util.MatlabFinder
 import java.lang.System
 
 module JavaIO
-    include_package "java.io"
+  include_package "java.io"
 end
 import java.net.InetAddress
 import java.util.Date
@@ -19,45 +19,45 @@ class ReserveMatlab
 
   def initialize
     @toolboxmap = {
-            # Standard Matlab
-            "matlab" => %q!a=1!,
-            # Simulink
-            "simulink" => %q!a=a&&license('checkout','control_toolbox')!,
-            # Control System
-            "control" => %q!a=a&&license('checkout','control_toolbox')!,
-            # Fixed Point
-            # The fixed point toolbox has a very weird licencing scheme, it takes no toolbox licence
-            # if the logging mode is not activated, here the command simulates that a licence is being taken
-            # If you want to use fixed point without the logging, replace the matlab command below with a dummy commmand like "a=1;"
-            "fixedpoint" => %q!pref = fipref('LoggingMode','on'),a = fi!,
-            # Image Processing
-            "images" => %q!a=a&&license('checkout','image_toolbox')!,
-            # Neural Networks
-            "nnet" => %q!a=a&&license('checkout','neural_network_toolbox')!,
-            # Optimization
-            "optim" => %q!a=a&&license('checkout','optimization_toolbox')!,
-            # PDE
-            "pde" => %q!a=a&&license('checkout','pde_toolbox')!,
-            # Robust Control
-            "robust" => %q!a=a&&license('checkout','robust_toolbox')!,
-            # Signal Processing
-            "signal" => %q!a=a&&license('checkout','signal_toolbox')!,
-            # Spline
-            "spline" => %q!a=a&&license('checkout','spline_toolbox')!,
-            # Statistics
-            "stats" => %q!a=a&&license('checkout','statistics_toolbox')!,
-            # Symbolic Maths
-            "symbolic" => %q!a=a&&license('checkout','symbolic_toolbox')!,
-            # System Identification
-            "ident" => %q!a=a&&license('checkout','identification_toolbox')!,
-            # Virtual Reality
-            "vr" => %q!myworld = vrworld([])!,
-            # Simulink Control Design
-            "slcontrol" => %q!a=a&&license('checkout','simulink_control_design')!,
-            # Simulink Stateflow
-            "stateflow" => %q!object = sfclipboard!,
-            # Compiler
-            "compiler" => %q!a=a&&license('checkout','compiler')!
+        # Standard Matlab
+        "matlab" => %q!a=1!,
+        # Simulink
+        "simulink" => %q!a=a&&license('checkout','control_toolbox')!,
+        # Control System
+        "control" => %q!a=a&&license('checkout','control_toolbox')!,
+        # Fixed Point
+        # The fixed point toolbox has a very weird licencing scheme, it takes no toolbox licence
+        # if the logging mode is not activated, here the command simulates that a licence is being taken
+        # If you want to use fixed point without the logging, replace the matlab command below with a dummy commmand like "a=1;"
+        "fixedpoint" => %q!pref = fipref('LoggingMode','on'),a = fi!,
+        # Image Processing
+        "images" => %q!a=a&&license('checkout','image_toolbox')!,
+        # Neural Networks
+        "nnet" => %q!a=a&&license('checkout','neural_network_toolbox')!,
+        # Optimization
+        "optim" => %q!a=a&&license('checkout','optimization_toolbox')!,
+        # PDE
+        "pde" => %q!a=a&&license('checkout','pde_toolbox')!,
+        # Robust Control
+        "robust" => %q!a=a&&license('checkout','robust_toolbox')!,
+        # Signal Processing
+        "signal" => %q!a=a&&license('checkout','signal_toolbox')!,
+        # Spline
+        "spline" => %q!a=a&&license('checkout','spline_toolbox')!,
+        # Statistics
+        "stats" => %q!a=a&&license('checkout','statistics_toolbox')!,
+        # Symbolic Maths
+        "symbolic" => %q!a=a&&license('checkout','symbolic_toolbox')!,
+        # System Identification
+        "ident" => %q!a=a&&license('checkout','identification_toolbox')!,
+        # Virtual Reality
+        "vr" => %q!myworld = vrworld([])!,
+        # Simulink Control Design
+        "slcontrol" => %q!a=a&&license('checkout','simulink_control_design')!,
+        # Simulink Stateflow
+        "stateflow" => %q!object = sfclipboard!,
+        # Compiler
+        "compiler" => %q!a=a&&license('checkout','compiler')!
 
     }
     begin
@@ -67,18 +67,18 @@ class ReserveMatlab
       @nodeName = "DummyNode"
     end
 
-    tmpPath = System.getProperty("java.io.tmpdir");
+    @tmpPath = System.getProperty("java.io.tmpdir");
 
-    logFileJava = JavaIO::File.new(tmpPath, "ReserveMatlab"+@nodeName+".log");
+    logFileJava = JavaIO::File.new(@tmpPath, "ReserveMatlab"+@nodeName+".log");
     @orig_stdout = $stdout
     @orig_stderr = $stderr
     $stdout.reopen(logFileJava.toString(), "a")
     $stdout.sync=true
-    $stderr.reopen $stdout    
+    $stderr.reopen $stdout
 
     #@logWriter = JavaIO::PrintStream.new(JavaIO::BufferedOutputStream.new(JavaIO::FileOutputStream.new(logFile, true)));
 
-    @nodeDir = JavaIO::File.new(tmpPath, @nodeName);
+    @nodeDir = JavaIO::File.new(@tmpPath, @nodeName);
     if not @nodeDir.exists()
       @nodeDir.mkdir();
     end
@@ -95,7 +95,7 @@ class ReserveMatlab
 
   def close
     #@logWriter.close();
-        
+
     $stdout = @orig_stdout
     $stderr = @orig_stderr
   end
@@ -138,13 +138,45 @@ class ReserveMatlab
     return @conf
   end
 
+  def flock(file, mode)
+    success = file.flock(mode)
+    if success
+      begin
+        yield file
+      ensure
+        file.flock(File::LOCK_UN)
+      end
+    end
+    return success
+  end
+
+  def open_lock(filename, openmode="r", lockmode=nil)
+    if openmode == 'r' || openmode == 'rb'
+      lockmode ||= File::LOCK_SH
+    else
+      lockmode ||= File::LOCK_EX
+    end
+    value = nil
+    open(filename, openmode) do |f|
+      flock(f, lockmode) do
+        begin
+          value = yield f
+        ensure
+          f.flock(File::LOCK_UN) # Comment this line out on Windows.
+        end
+      end
+      return value
+    end
+  end
+
+
   def runMatlab
-    
+
     log(Date.new().to_string()+" : Executing toolbox checking script on " + @host)
     puts Date.new().to_string()+" : Executing toolbox checking script on " + @host
 
-    testF = JavaIO::File.new(@nodeDir, "matlabTest1.lock");
-    testF2 = JavaIO::File.new(@nodeDir, "matlabTest2.lock");
+    testF = JavaIO::File.new(@nodeDir, "matlabTest1.lock")
+    testF2 = JavaIO::File.new(@nodeDir, "matlabTest2.lock")
     if testF2.exists
       testF2.delete()
     end
@@ -154,27 +186,52 @@ class ReserveMatlab
     commandArray = Array.new
     case os
       when :windows
-        regCommandArray = Array.new
-        regCommandArray << @conf.get_matlab_home() + @sep + @conf.get_matlab_bin_dir + @sep + @conf.get_matlab_command_name
-        regCommandArray << "/regserver"
-        regCommandArray << "-r"
-        regCommandArray << %q!fid = fopen('!+testF2.getAbsolutePath()+%q!','w');fclose(fid);exit();!        
-        puts regCommandArray
-        proc2 = Runtime.getRuntime().exec(regCommandArray.to_java java.lang.String)
-        cpt = 0
-        while (not testF2.exists()) and (cpt < 200)
-          sleep(0.05)
-          cpt = cpt + 1
+        if @conf.hasManyConfig()
+          lastregjfile = JavaIO::File.new(@tmpPath, 'matlabLastReg.txt')
+          currentversion = false;
+          if lastregjfile.exists
+            open_lock(lastregjfile.toString, 'r') do |f|
+              version = f.gets
+              if version != nil
+                currentversion = (version == @conf.getVersion)
+              end
+            end
+          end
+          if !currentversion
+            open_lock(lastregjfile.toString, 'w') do |f|
+
+              lastregfile = File.new(lastregjfile.toString, 'w')
+              lastregfile.flock(File::LOCK_EX)
+              regCommandArray = Array.new
+              regCommandArray << @conf.get_matlab_home() + @sep + @conf.get_matlab_bin_dir + @sep + @conf.get_matlab_command_name
+              regCommandArray << "/regserver"
+              regCommandArray << "-r"
+              regCommandArray << %q!fid = fopen('!+testF2.getAbsolutePath()+%q!','w');fclose(fid);exit();!
+              puts regCommandArray
+              proc2 = Runtime.getRuntime().exec(regCommandArray.to_java java.lang.String)
+              cpt = 0
+              while (not testF2.exists()) and (cpt < 1000)
+                sleep(0.05)
+                cpt = cpt + 1
+              end
+              if testF2.exists()
+                f << @conf.getVersion()
+                log("OK");
+                puts "OK"
+                testF2.delete
+                proc2.destroy();
+              else
+                proc2.destroy();
+                log("KO");
+                puts "KO"
+                return false
+              end
+            end
+          end
+
+
         end
-        if testF2.exists()
-          testF2.delete
-        else
-          proc2.destroy();
-          log("KO");
-          puts "KO"
-        return false
-        end
-        proc2.waitFor();
+
 
         commandArray << @conf.get_matlab_home() + @sep + @conf.get_matlab_bin_dir + @sep + @conf.get_matlab_command_name
         commandArray << "/MLAutomation"
@@ -194,15 +251,15 @@ class ReserveMatlab
     if (defined? $args) && ($args.size > 0)
       $args.each do |a|
         tcode += toolbox_code(a) + ','
-      end    
+      end
     end
-    commandArray << tcode + %q!if a,fid = fopen('!+testF.getAbsolutePath()+%q!','w'),fclose(fid),else exit(),end;while true,pause(500),! + tcode + %q!end;exit()! 
+    commandArray << tcode + %q!if a,fid = fopen('!+testF.getAbsolutePath()+%q!','w'),fclose(fid),else exit(),end;while true,pause(500),! + tcode + %q!end;exit()!
 
     puts commandArray
     #cmdList = java.util.Arrays.asList(commandArray.to_java java.lang.String)
     #log(cmdList)
 
-    
+
     pb = ProcessBuilder.new(commandArray.to_java java.lang.String)
     mapenv = pb.environment
     mapenv.put("SELECTION_SCRIPT", @nodeName)
@@ -211,7 +268,7 @@ class ReserveMatlab
 
     puts 'command executed'
     cpt = 0
-    while (not testF.exists()) and (cpt < 200)
+    while (not testF.exists()) and (cpt < 1000)
       sleep(0.05)
       cpt = cpt + 1
     end
@@ -251,5 +308,5 @@ rescue Exception => e
   puts e.message + "\n" + e.backtrace.join("\n")
   raise java.lang.RuntimeException.new(e.message + "\n" + e.backtrace.join("\n"))
 ensure
-  cm.close  
+  cm.close
 end

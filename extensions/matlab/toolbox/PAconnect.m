@@ -1,21 +1,22 @@
 %   PAconnect() - connects to the ProActive scheduler
 %
 %   Usage:
-%       >> res = PAconnect(url);
-%       >> res = PAconnect('//eon1')
+%       >> PAconnect(url);
+%       >> jobs = PAconnect(url);
 %
-%       >> res = PAconnect(proactive, url);
-%       >> res = PAconnect('my_path_to-proactive', '//eon1')
+%   Example :
+%
+%       >> jobs = PAconnect('rmi://scheduler:1099')
+%
 %
 %   Inputs:
-%       proactive - path to the proactive installation directory,
-%                   if this parameter is not specified, the proactive directory
-%                   needs to be selected manually.
+%
 %       url - url of the scheduler
-%       res - cell array which is not empty when jobs were submitted before the previous Matlab session closed
-%             and results were not retrieved then. The array will contain the results not retrieved before. 
-% 
-%   Ouputs: none
+%
+%   Ouputs:
+%
+%       jobs - id of jobs that were not terminated at matlab's previous
+%       shutdown
 %
 %/*
 % * ################################################################
@@ -23,7 +24,7 @@
 % * ProActive: The Java(TM) library for Parallel, Distributed,
 % *            Concurrent computing with Security and Mobility
 % *
-% * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
+% * Copyright (C) 1997-2010 INRIA/University of Nice-Sophia Antipolis
 % * Contact: proactive@ow2.org
 % *
 % * This library is free software; you can redistribute it and/or
@@ -47,21 +48,14 @@
 % *
 % * ################################################################
 % */
-function oldres = PAconnect(varargin)
+function jobs = PAconnect(varargin)
 
-if nargin > 1
-    proactive = varargin{1};
-    url = varargin{2};
-    if ~isa(proactive, 'char')
-        error('proactive parameter should be a character array pointing to proactive path');
-    end
-else
-    url = varargin{1};
+if nargin ~= 1 || ~ischar(varargin{1})
+    error('PAconnect accepts only one argument (the url to the scheduler)');
 end
-if ~isa(url, 'char')
-    error('url parameter should be a character array containing the scheduler url');
-end
+url = varargin{1};
 
+sched = PAScheduler;
 
 % Verify that proactive is already on the path or not
 p = javaclasspath('-all');
@@ -72,71 +66,99 @@ for i = 1:length(p)
     end
 end
 if cptoadd == 1
-    if nargin > 1
-        PAprepare(proactive);
-    else
-        PAprepare();
-    end
+    sched.PAprepare();
 end
 
-tmpsolver = PAgetsolver();
+tmpsolver = sched.PAgetsolver();
 if ~strcmp(class(tmpsolver), 'double')
-    if tmpsolver.isConnected() 
+    if tmpsolver.isLoggedIn()
         error('This session is already connected to a scheduler, only one connection can be issued at a time');
     end
     solver = tmpsolver;
 else
-    % Creating the connection    
-   
+    % Creating the connection
+
     solver = org.objectweb.proactive.api.PAActiveObject.newActive('org.ow2.proactive.scheduler.ext.matlab.client.AOMatlabEnvironment',[] );
-    
-   
+
+    ok = solver.join(url);
+    if ~ok
+        error('Error while connecting');
+    end
     % Recording the solver inside the session, each further call to PAgetsolver
     % will retrieve it
-    PAgetsolver(solver);
+    sched.PAgetsolver(solver);
 end
 
-
-ok = solver.join(url)
-if ~ok
-    error('Error while connecting');
-end
 
 % create the frame
-loginFrame = org.ow2.proactive.scheduler.ext.matlab.client.LoginFrame(solver);
-% display it
-loginFrame.start();
-% get the button from the frame
-button = loginFrame.getLoginButton();
-% convert it to a special java object
-button = handle(button, 'callbackproperties');
-% set callback
-set(button, 'ActionPerformedCallback', {@doAction});
-global button_handle_global_data;
-button_handle_global_data.loginFrame = loginFrame;
-button_handle_global_data.solver = solver;
-button_handle_global_data.ok = false;
+
 disp('Connection successful, please enter login/password');
-while ~button_handle_global_data.ok
-    pause(0.1);
+loggedin = false;
+msg = 'Connect to the Scheduler';
+attempts = 1;
+while ~loggedin && attempts <= 3
+    [login,pwd]=sched.logindlg('Title',msg);
+    try
+        solver.login(login,pwd);
+        loggedin = true;
+    catch ME
+        attempts = attempts+1;
+        msg = ['Incorrect Login/Password, try ' num2str(attempts)];
+    end
+end
+sched.PAgetlogin(login);
+
+disp('Login succesful');
+%PAoptions('Debug',true);
+opt = PAoptions();
+reconnected = false;
+if exist(opt.DisconnectedModeFile,'file')
+
+    if isnumeric(opt.CustomDataspaceURL) && isempty(opt.CustomDataspaceURL)
+        try
+            load(opt.DisconnectedModeFile, 'registryurl');
+            disp('Reconnecting to existing dataspace handler, please wait...');
+            org.ow2.proactive.scheduler.ext.matsci.client.DataspaceHelper.init(registryurl,'MatlabInputSpace', 'MatlabOutputSpace', opt.Debug);
+        catch ME
+            disp('There was a problem reconnecting to previous dataspace handler.');
+            if isa(ME,'MException')
+                disp(getReport(ME));
+            elseif isa(ME, 'java.lang.Throwable')
+                ME.printStackTrace();
+            end
+            if exist(opt.DisconnectedModeFile,'file')
+                delete(opt.DisconnectedModeFile);
+            end
+            return;
+        end
+    end
+    reconnected = true;
+    try
+        sched = PAScheduler;
+        sched.PATaskRepository('load');
+        jobs = sched.PATaskRepository('uncomplete');
+        if length(jobs) > 0
+            str='';
+            for i=1:length(jobs)
+                str = [ str ' ' jobs{i}];
+            end
+            disp(['The following jobs were uncomplete before last matlab shutdown : ' str ]);
+        end
+    catch ME
+        disp('There was a problem retrieving previous jobs.');
+        disp(getReport(ME));
+        if exist(opt.DisconnectedModeFile,'file')
+            delete(opt.DisconnectedModeFile);
+        end
+    end
+
+end
+if ~reconnected && isnumeric(opt.CustomDataspaceURL) && isempty(opt.CustomDataspaceURL)
+    disp('Creating dataspace handler, please wait...');
+    org.ow2.proactive.scheduler.ext.matsci.client.DataspaceHelper.init([],'MatlabInputSpace', 'MatlabOutputSpace', opt.Debug);
+    disp('Dataspace handler created');
 end
 
-% listresults = solver.getPreviousJobResults();
-% oldres = cell(1,listresults.size());
-% for i=0:(listresults.size()-1)
-%     futureornot = listresults.get(i);
-%     oldres{i+1} = PAResultList(futureornot);
-% end
-
-
-function doAction(srcObj, evd)
-% srcObj is the button object from above
-% evd is the ActionEvent object
-global button_handle_global_data;
-if button_handle_global_data.loginFrame.checkLogin()
-   disp('Connected'); 
-   button_handle_global_data.ok = true;
-end
 
 
 

@@ -36,20 +36,18 @@
  */
 package org.ow2.proactive.scheduler.ext.scilab.worker;
 
-import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.utils.OperatingSystem;
-import org.objectweb.proactive.extensions.pamr.PAMRConfig;
 import org.ow2.proactive.scheduler.ext.common.util.IOTools;
+import org.ow2.proactive.scheduler.ext.matsci.common.DummyJVMProcess;
+import org.ow2.proactive.scheduler.ext.matsci.worker.MatSciTask;
 import org.ow2.proactive.scheduler.ext.matsci.worker.util.MatSciEngineConfig;
 import org.ow2.proactive.scheduler.ext.matsci.worker.util.MatSciJVMInfo;
-import org.ow2.proactive.scheduler.ext.matsci.worker.MatSciTask;
 import org.ow2.proactive.scheduler.ext.matsci.worker.util.MatSciTaskServerConfig;
 import org.ow2.proactive.scheduler.ext.scilab.common.PASolveScilabGlobalConfig;
 import org.ow2.proactive.scheduler.ext.scilab.common.PASolveScilabTaskConfig;
 import org.ow2.proactive.scheduler.ext.scilab.worker.util.ScilabEngineConfig;
 import org.ow2.proactive.scheduler.ext.scilab.worker.util.ScilabFinder;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.Serializable;
@@ -236,7 +234,18 @@ public class ScilabTask<W extends AOScilabWorker> extends
     }
 
     @Override
-    protected void afterExecute() {
+    protected void afterExecute(MatSciJVMInfo jvminfo) {
+        if (paconfig.isDebug()) {
+            System.out.println("[" + new java.util.Date() + " " + host + " " +
+                this.getClass().getSimpleName() + "] Closing output");
+            outDebug.println("[" + new java.util.Date() + " " + host + " " + this.getClass().getSimpleName() +
+                "] Closing output");
+            outDebug.close();
+        }
+        if (jvminfo.getLogger() != null) {
+            jvminfo.getLogger().closeStream();
+            jvminfo.getEsLogger().closeStream();
+        }
 
     }
 
@@ -250,22 +259,21 @@ public class ScilabTask<W extends AOScilabWorker> extends
                 taskconfig, scilabConfig);
     }
 
-    protected void initProcess(MatSciTask.DummyJVMProcess jvmprocess, Map<String, String> env)
-            throws Throwable {
-        // we add scilab directories to LD_LIBRARY_PATH
-        String libPath = env.get("LD_LIBRARY_PATH");
-        libPath = addScilabToPath(libPath);
-
-        env.put("LD_LIBRARY_PATH", libPath);
-
-        // we add scilab directories to PATH (Windows)
-        String path = env.get("PATH");
-
-        if (path == null) {
-            path = env.get("Path");
+    public void initProcess(DummyJVMProcess javaCommandBuilder, Map<String, String> env) throws Throwable {
+        if (os.equals(OperatingSystem.unix)) {
+            String libPath = env.get("LD_LIBRARY_PATH");
+            libPath = addScilabToPath(libPath);
+            env.put("LD_LIBRARY_PATH", libPath);
         }
 
-        env.put("PATH", addScilabToPath(path));
+        // we add scilab directories to PATH (Windows)
+        if (os.equals(OperatingSystem.windows)) {
+            String path = env.get("Path");
+
+            env.put("Path", addScilabToPath(path));
+        }
+        // used to kill the process later
+        env.put("NODE_NAME", nodeName);
 
         // This tells scilab to run without graphical interface
         env.put("SCI_JAVA_ENABLE_HEADLESS", "1");
@@ -279,44 +287,9 @@ public class ScilabTask<W extends AOScilabWorker> extends
         env.put("SCI", scilabConfig.getScilabSCIDir());
         env.put("SCIDIR", scilabConfig.getScilabSCIDir());
 
-        // javaCommandBuilder.setJavaPath(System.getenv("JAVA_HOME") +
-        //     "/bin/java");
-        // we set as well the java.library.path property (precaution)
-        if (CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL.getValue().equals("pamr")) {
-            String jvmOptions = "-Djava.library.path=\"" + libPath + "\"" +
-                " -Dproactive.communication.protocol=" +
-                CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL.getValue();
-            if (PAMRConfig.PA_NET_ROUTER_ADDRESS.isSet()) {
-                jvmOptions += " -Dproactive.net.router.address=" +
-                    PAMRConfig.PA_NET_ROUTER_ADDRESS.getValue();
-            }
-            if (PAMRConfig.PA_NET_ROUTER_PORT.isSet()) {
-                jvmOptions += " -Dproactive.net.router.port=" + PAMRConfig.PA_NET_ROUTER_PORT.getValue();
-            }
-            if (PAMRConfig.PA_PAMR_SOCKET_FACTORY.isSet()) {
-                jvmOptions += " -Dproactive.communication.pamr.socketfactory=" +
-                    PAMRConfig.PA_PAMR_SOCKET_FACTORY.getValue();
-            }
-            if (PAMRConfig.PA_PAMRSSH_KEY_DIR.isSet()) {
-                jvmOptions += " -Dproactive.communication.pamrssh.key_directory=" +
-                    PAMRConfig.PA_PAMRSSH_KEY_DIR.getValue();
-            }
-            if (PAMRConfig.PA_PAMRSSH_REMOTE_USERNAME.isSet()) {
-                jvmOptions += " -Dproactive.communication.pamrssh.username=" +
-                    PAMRConfig.PA_PAMRSSH_REMOTE_USERNAME.getValue();
-            }
-            if (PAMRConfig.PA_PAMRSSH_REMOTE_PORT.isSet()) {
-                jvmOptions += " -Dproactive.communication.pamrssh.port=" +
-                    PAMRConfig.PA_PAMRSSH_REMOTE_PORT.getValue();
-            }
-
-            javaCommandBuilder.setJvmOptions(jvmOptions);
-        } else {
-            javaCommandBuilder.setJvmOptions("-Djava.library.path=\"" + libPath + "\"" +
-                " -Dproactive.rmi.port=" + CentralPAPropertyRepository.PA_RMI_PORT.getValue() +
-                " -Dproactive.communication.protocol=" +
-                CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL.getValue());
-        }
+        String options = javaCommandBuilder.getJvmOptions();
+        options += " -Djava.library.path=\"" + addScilabToPath(null) + "\"";
+        javaCommandBuilder.setJvmOptions(options);
     }
 
     /**
@@ -351,7 +324,7 @@ public class ScilabTask<W extends AOScilabWorker> extends
     private String addScilabToPath(String path) {
         String newPath;
 
-        if (path == null) {
+        if ((path == null) || (path == "")) {
             newPath = "";
         } else {
             newPath = os.pathSeparator() + path;
@@ -360,10 +333,9 @@ public class ScilabTask<W extends AOScilabWorker> extends
         newPath = (scilabConfig.getScilabHome() + os.fileSeparator() + scilabConfig.getScilabLibDir()) +
             newPath;
 
-        File thirdpartyFolder = new File(scilabConfig.getScilabHome() + os.fileSeparator() +
-            scilabConfig.getScilabLibDir() + os.fileSeparator() + ".." + os.fileSeparator() + "thirdparty");
-        if (thirdpartyFolder.exists() && (os == OperatingSystem.unix)) {
-            newPath = thirdpartyFolder.getPath() + os.pathSeparator() + newPath;
+        if (scilabConfig.getThirdPartyDir() != null) {
+            newPath = (scilabConfig.getScilabHome() + os.fileSeparator() + scilabConfig.getThirdPartyDir()) +
+                os.pathSeparator() + newPath;
         }
 
         return newPath;

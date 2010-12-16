@@ -75,6 +75,8 @@ public class MatlabEngineConfig extends MatSciEngineConfigBase {
      */
     private String matlabCommandName = null;
 
+    private boolean hasManyConfigs;
+
     /**
      * Path to the ptolemy library dir.
      */
@@ -83,7 +85,7 @@ public class MatlabEngineConfig extends MatSciEngineConfigBase {
     private static final String nl = System.getProperty("line.separator");
 
     public MatlabEngineConfig(String matlabHome, String matlabVersion, String matlabLibDirName,
-            String matlabBinDir, String matlabExtDirName, String matlabCommandName) {
+            String matlabBinDir, String matlabExtDirName, String matlabCommandName, boolean hasManyConfigs) {
         this.matlabHome = matlabHome.replaceAll("" + '\u0000', "");
         this.matlabVersion = matlabVersion.replaceAll("" + '\u0000', "");
         this.matlabLibDirName = matlabLibDirName.replaceAll("" + '\u0000', "");
@@ -92,11 +94,14 @@ public class MatlabEngineConfig extends MatSciEngineConfigBase {
             this.matlabExtDir = matlabExtDirName.replaceAll("" + '\u0000', "");
         }
         this.matlabCommandName = matlabCommandName.replaceAll("" + '\u0000', "");
+        this.hasManyConfigs = hasManyConfigs;
     }
 
     public MatlabEngineConfig(String matlabHome, String matlabVersion, String matlabLibDirName,
-            String matlabBinDir, String matlabExtDirName, String matlabCommandName, String ptolemyPath) {
-        this(matlabHome, matlabVersion, matlabLibDirName, matlabBinDir, matlabExtDirName, matlabCommandName);
+            String matlabBinDir, String matlabExtDirName, String matlabCommandName, boolean hasManyConfigs,
+            String ptolemyPath) {
+        this(matlabHome, matlabVersion, matlabLibDirName, matlabBinDir, matlabExtDirName, matlabCommandName,
+                hasManyConfigs);
         this.ptolemyPath = ptolemyPath.replaceAll("" + '\u0000', "");
     }
 
@@ -145,6 +150,10 @@ public class MatlabEngineConfig extends MatSciEngineConfigBase {
      */
     public String getPtolemyPath() {
         return ptolemyPath;
+    }
+
+    public boolean hasManyConfig() {
+        return hasManyConfigs;
     }
 
     /**

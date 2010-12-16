@@ -6,22 +6,14 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.exceptions.FutureMonitoringPingFailureException;
-import org.objectweb.proactive.core.jmx.notification.GCMRuntimeRegistrationNotificationData;
-import org.objectweb.proactive.core.jmx.notification.NotificationType;
-import org.objectweb.proactive.core.jmx.util.JMXNotificationManager;
-import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.core.process.JVMProcessImpl;
-import org.objectweb.proactive.core.runtime.ProActiveRuntime;
-import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
-import org.objectweb.proactive.core.runtime.RuntimeFactory;
-import org.objectweb.proactive.core.runtime.StartPARuntime;
 import org.objectweb.proactive.utils.OperatingSystem;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import org.ow2.proactive.scheduler.ext.common.util.IOTools;
-import org.ow2.proactive.scheduler.ext.common.util.PropertiesDumper;
+import org.ow2.proactive.scheduler.ext.matsci.common.JVMSpawnHelper;
 import org.ow2.proactive.scheduler.ext.matsci.common.PASolveMatSciGlobalConfig;
 import org.ow2.proactive.scheduler.ext.matsci.common.PASolveMatSciTaskConfig;
+import org.ow2.proactive.scheduler.ext.matsci.common.ProcessInitializer;
 import org.ow2.proactive.scheduler.ext.matsci.worker.util.MatSciEngineConfig;
 import org.ow2.proactive.scheduler.ext.matsci.worker.util.MatSciEngineConfigBase;
 import org.ow2.proactive.scheduler.ext.matsci.worker.util.MatSciJVMInfo;
@@ -30,18 +22,11 @@ import org.ow2.proactive.scheduler.ext.scilab.common.exception.ScilabInitializat
 import org.ow2.proactive.scheduler.ext.scilab.common.exception.ScilabInitializationHanged;
 import org.ow2.proactive.scheduler.util.process.ProcessTreeKiller;
 
-import javax.management.Notification;
-import javax.management.NotificationListener;
 import java.io.*;
-import java.lang.management.ManagementFactory;
 import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.net.UnknownHostException;
-import java.security.SecureRandom;
-import java.util.*;
-import java.util.concurrent.Semaphore;
-import java.util.concurrent.TimeUnit;
+import java.util.HashMap;
+import java.util.Map;
 
 
 /**
@@ -50,7 +35,7 @@ import java.util.concurrent.TimeUnit;
  * @author The ProActive Team
  */
 public abstract class MatSciTask<W extends MatSciWorker, C extends MatSciEngineConfig, P extends PASolveMatSciGlobalConfig, T extends PASolveMatSciTaskConfig>
-        extends JavaExecutable {
+        extends JavaExecutable implements ProcessInitializer {
 
     /**
      * the index when the input is the result of a SplitTask
@@ -81,7 +66,6 @@ public abstract class MatSciTask<W extends MatSciWorker, C extends MatSciEngineC
 
     protected int taskCount = 0;
     protected static int taskCountBeforeJVMRespawn;
-    protected static int nodeCount = 0;
 
     protected boolean startingProcess = false;
     protected boolean redeploying = false;
@@ -93,37 +77,21 @@ public abstract class MatSciTask<W extends MatSciWorker, C extends MatSciEngineC
     protected T taskconfig;
 
     /**
-     *  Thread which collects the JVM's stdout
-     */
-    //protected static LoggingThread isLogger = null;
-    /**
-     *  Thread which collects the JVM's stderr
-     */
-    //protected static LoggingThread esLogger = null;
-    /**
-     * tool to build the JavaCommand
-     */
-    protected DummyJVMProcess javaCommandBuilder;
-
-    /**
      * the OS where this JVM is running
      */
     protected static OperatingSystem os = OperatingSystem.getOperatingSystem();
 
     private static boolean threadstarted = false;
 
-    private long SEMAPHORE_TIMEOUT;
-    private int RETRY_ACQUIRE;
     private int MAX_NB_ATTEMPTS;
-    private Semaphore semaphore = new Semaphore(0);
 
     private int nbAttempts = 0;
-
-    private RegistrationListener registrationListener;
 
     protected PrintStream outDebug;
 
     protected File nodeTmpDir;
+
+    protected JVMSpawnHelper helper;
 
     /**
      *  The process holding the spawned JVM
@@ -152,12 +120,6 @@ public abstract class MatSciTask<W extends MatSciWorker, C extends MatSciEngineC
     abstract protected MatSciTaskServerConfig getTaskServerConfig();
 
     abstract protected void initPASolveConfig(Map<String, Serializable> args);
-
-    protected URL writeConfigFile() throws IOException, URISyntaxException {
-        File tmpConf = new File(nodeTmpDir, "ProActiveConfiguration.xml");
-        PropertiesDumper.dumpProperties(tmpConf);
-        return tmpConf.toURI().toURL();
-    }
 
     public void init(Map<String, Serializable> args) throws Exception {
 
@@ -214,9 +176,11 @@ public abstract class MatSciTask<W extends MatSciWorker, C extends MatSciEngineC
 
         if (paconfig.isDebug()) {
             System.out.println("[" + new java.util.Date() + " " + host + " " +
-                this.getClass().getSimpleName() + "] Initializing");
+                this.getClass().getSimpleName() + "] Initializing : " +
+                PAActiveObject.getBodyOnThis().getID());
             outDebug.println("[" + new java.util.Date() + " " + host + " " + this.getClass().getSimpleName() +
-                "] Initializing");
+                "] Initializing : " + PAActiveObject.getBodyOnThis().getID());
+
         }
 
         if (paconfig.isTransferSource()) {
@@ -313,7 +277,7 @@ public abstract class MatSciTask<W extends MatSciWorker, C extends MatSciEngineC
                         this.getClass().getSimpleName() + "] Packing memory in " + getExtensionName() +
                         "engine");
                 }
-                boolean ok = sw.pack();
+                boolean ok = sw.cleanup();
             }
         }
 
@@ -365,7 +329,7 @@ public abstract class MatSciTask<W extends MatSciWorker, C extends MatSciEngineC
 
                 if (paconfig.isDebug()) {
                     System.out.println("[" + new java.util.Date() + " " + host + " " +
-                        this.getClass().getSimpleName() + "] Executing the task");
+                        this.getClass().getSimpleName() + "] Executing the task, try " + nbAttempts);
                     outDebug.println("[" + new java.util.Date() + " " + host + " " +
                         this.getClass().getSimpleName() + "] Executing the task, try " + nbAttempts);
                 }
@@ -388,30 +352,32 @@ public abstract class MatSciTask<W extends MatSciWorker, C extends MatSciEngineC
                     redeployOrLeave(e, jvminfo, "Unable to initialize Matlab Engine, or engine error");
 
                 } catch (java.lang.OutOfMemoryError e) {
-                    leave(e, jvminfo, "Unable to initialize Matlab Engine, or engine error");
+                    leave(e, jvminfo, "Out of memory error in spawned JVM");
+                } catch (Throwable e) {
+                    if (paconfig.isDebug()) {
+                        System.out.println("[" + new java.util.Date() + " " + host + " " +
+                            this.getClass().getSimpleName() + "] Exception occurred");
+                        e.printStackTrace();
+                        e.printStackTrace(outDebug);
+                    }
+                    throw e;
+
                 }
             }
         } finally {
-
-            afterExecute();
             if (paconfig.isDebug()) {
                 System.out.println("[" + new java.util.Date() + " " + host + " " +
-                    this.getClass().getSimpleName() + "] Closing output");
+                    this.getClass().getSimpleName() + "] Performing after task actions");
                 outDebug.println("[" + new java.util.Date() + " " + host + " " +
-                    this.getClass().getSimpleName() + "] Closing output");
-                outDebug.close();
+                    this.getClass().getSimpleName() + "] Performing after task actions ");
             }
-            if (jvminfo.getLogger() != null) {
-                jvminfo.getLogger().closeStream();
-                jvminfo.getEsLogger().closeStream();
-            }
-
+            afterExecute(jvminfo);
         }
 
         return res;
     }
 
-    abstract protected void afterExecute();
+    abstract protected void afterExecute(MatSciJVMInfo jvminfo);
 
     protected MatSciJVMInfo firstInit() throws Throwable {
         nodeName = MatSciEngineConfigBase.getNodeName();
@@ -422,8 +388,7 @@ public abstract class MatSciTask<W extends MatSciWorker, C extends MatSciEngineC
         } else {
             taskCountBeforeJVMRespawn = serverConfig.getTaskCountBeforeJVMRespawn();
         }
-        SEMAPHORE_TIMEOUT = serverConfig.getSemaphoreTimeout();
-        RETRY_ACQUIRE = serverConfig.getSemaphoreRetryAquire();
+
         MAX_NB_ATTEMPTS = serverConfig.getMaxNbAttempts();
 
         if (paconfig.isDebug()) {
@@ -637,9 +602,13 @@ public abstract class MatSciTask<W extends MatSciWorker, C extends MatSciEngineC
             public void run() {
                 for (MatSciJVMInfo info : jvmInfos.values()) {
                     try {
+                        try {
+                            afterExecute(info);
+                        } catch (Throwable e) {
+                        }
                         destroyProcess(info);
                         //info.getProcess().destroy();
-                    } catch (Exception e) {
+                    } catch (Throwable e) {
                     }
                 }
             }
@@ -652,35 +621,6 @@ public abstract class MatSciTask<W extends MatSciWorker, C extends MatSciEngineC
         Runtime.getRuntime().removeShutdownHook(shutdownHook);
         shutdownHook = null;
         shutdownhookSet = false;
-    }
-
-    /**
-     * wait until the child runtime registers itself at the current JVM
-     * in case it fails to register (because of any reason), we don't start the task at all exiting with an exception
-     */
-    private void waitForRegistration() throws InterruptedException {
-        int numberOfTrials = 0;
-        for (; numberOfTrials < RETRY_ACQUIRE; numberOfTrials++) {
-            boolean permit = semaphore.tryAcquire(SEMAPHORE_TIMEOUT, TimeUnit.SECONDS);
-            if (permit) {
-                break;
-            }
-
-        }
-
-        if (numberOfTrials == RETRY_ACQUIRE) {
-            if (paconfig.isDebug()) {
-                System.out.println("[" + new java.util.Date() + " " + host + " " +
-                    this.getClass().getSimpleName() + "] Unable to create a separate java process after " +
-                    RETRY_ACQUIRE + " tries");
-                outDebug.println("[" + new java.util.Date() + " " + host + " " +
-                    this.getClass().getSimpleName() + "] Unable to create a separate java process after " +
-                    RETRY_ACQUIRE + " tries");
-            }
-            throw new IllegalStateException("Unable to create a separate java process after " +
-                RETRY_ACQUIRE + " tries");
-        }
-
     }
 
     protected void handleProcess(MatSciJVMInfo<W, C> jvminfo, String workerClassName) throws Throwable {
@@ -700,7 +640,10 @@ public abstract class MatSciTask<W extends MatSciWorker, C extends MatSciEngineC
             }
 
             // We spawn a new JVM with the library paths
-            Process p = startProcess();
+            helper = new JVMSpawnHelper(paconfig.isDebug(), outDebug, nodeTmpDir, nodeName,
+                getTaskServerConfig().getSemaphoreTimeout(), getTaskServerConfig().getSemaphoreRetryAquire());
+            startingProcess = true;
+            Process p = helper.startProcess(getExtensionName(), this, jvminfo);
             jvminfo.setProcess(p);
             if (paconfig.isDebug()) {
                 System.out.println("[" + new java.util.Date() + " " + host + " " +
@@ -817,11 +760,11 @@ public abstract class MatSciTask<W extends MatSciWorker, C extends MatSciEngineC
                 outDebug.println("[" + new java.util.Date() + " " + host + " " +
                     this.getClass().getSimpleName() + "] waiting for deployment");
             }
-            waitForRegistration();
+            helper.waitForRegistration();
 
             sw = deploy(workerClassName);
 
-            registrationListener.unsubscribeJMXRuntimeEvent();
+            helper.unsubscribeJMXRuntimeEvent();
         }
     }
 
@@ -858,201 +801,6 @@ public abstract class MatSciTask<W extends MatSciWorker, C extends MatSciEngineC
         return worker;
     }
 
-    /**
-     * Starts the java process on the given Node uri
-     *
-     * @return process
-     * @throws Throwable
-     */
-    private final Process startProcess() throws Throwable {
-
-        if (paconfig.isDebug()) {
-            System.out.println("[" + new java.util.Date() + " " + host + " " +
-                this.getClass().getSimpleName() + "] Starting a new JVM");
-            outDebug.println("[" + new java.util.Date() + " " + host + " " + this.getClass().getSimpleName() +
-                "] Starting a new JVM");
-        }
-        MatSciJVMInfo jvminfo = jvmInfos.get(nodeName);
-        // Build java command
-        javaCommandBuilder = new DummyJVMProcess();
-        javaCommandBuilder.setClassname(StartPARuntime.class.getName());
-
-        int deployid = new SecureRandom().nextInt();
-        jvminfo.setDeployID(deployid);
-
-        registrationListener = new RegistrationListener();
-        registrationListener.subscribeJMXRuntimeEvent();
-
-        startingProcess = true;
-
-        javaCommandBuilder.setParameters("-d " + jvminfo.getDeployID() + " -c 1 -p " +
-            RuntimeFactory.getDefaultRuntime().getURL());
-
-        // We build the process with a separate environment
-        ProcessBuilder pb = new ProcessBuilder();
-
-        // Setting Environment variables
-        Map<String, String> env = pb.environment();
-
-        // Specific to the extension
-        initProcess(javaCommandBuilder, env);
-
-        if (paconfig.isDebug()) {
-            System.out.println("Starting Process:");
-            outDebug.println("Starting Process:");
-            System.out.println(javaCommandBuilder.getJavaCommand());
-            outDebug.println(javaCommandBuilder.getJavaCommand());
-            System.out.println("With Environment: {");
-            outDebug.println("With Environment: {");
-            for (Map.Entry<String, String> entry : pb.environment().entrySet()) {
-                System.out.println(entry.getKey() + "=" + entry.getValue());
-                outDebug.println(entry.getKey() + "=" + entry.getValue());
-            }
-            System.out.println("}");
-            outDebug.println("}");
-        }
-
-        pb.command(javaCommandBuilder.getJavaCommand());
-
-        return pb.start();
-    }
-
-    abstract protected void initProcess(DummyJVMProcess jvmprocess, Map<String, String> env) throws Throwable;
-
     abstract protected void initWorker(W worker) throws Throwable;
 
-    class RegistrationListener implements NotificationListener {
-
-        private void subscribeJMXRuntimeEvent() {
-            if (paconfig.isDebug()) {
-                System.out.println("[" + new java.util.Date() + " " + host + " " +
-                    this.getClass().getSimpleName() + "] Subscribe JMX Runtime");
-                outDebug.println("[" + new java.util.Date() + " " + host + " " +
-                    this.getClass().getSimpleName() + "] Subscribe JMX Runtime");
-
-            }
-            MatSciJVMInfo jvminfo = jvmInfos.get(nodeName);
-            ProActiveRuntimeImpl part = ProActiveRuntimeImpl.getProActiveRuntime();
-            part.addDeployment(jvminfo.getDeployID());
-            JMXNotificationManager.getInstance().subscribe(part.getMBean().getObjectName(), this);
-            if (paconfig.isDebug()) {
-                System.out.println("[" + new java.util.Date() + " " + host + " " +
-                    this.getClass().getSimpleName() + "] Subscribed");
-                outDebug.println("[" + new java.util.Date() + " " + host + " " +
-                    this.getClass().getSimpleName() + "] Subscribed");
-            }
-
-        }
-
-        private void unsubscribeJMXRuntimeEvent() {
-            ProActiveRuntimeImpl part = ProActiveRuntimeImpl.getProActiveRuntime();
-            try {
-                ManagementFactory.getPlatformMBeanServer().removeNotificationListener(
-                        part.getMBean().getObjectName(), this);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            //JMXNotificationManager.getInstance().unsubscribe(part.getMBean().getObjectName(), this);
-        }
-
-        public void handleNotification(Notification notification, Object handback) {
-            try {
-                String type = notification.getType();
-
-                if (NotificationType.GCMRuntimeRegistered.equals(type)) {
-                    if (paconfig.isDebug()) {
-                        System.out.println("[" + new java.util.Date() + " " + host + " " +
-                            this.getClass().getSimpleName() + "] Notification received");
-                        outDebug.println("[" + new java.util.Date() + " " + host + " " +
-                            this.getClass().getSimpleName() + "] Notification received");
-                    }
-                    GCMRuntimeRegistrationNotificationData data = (GCMRuntimeRegistrationNotificationData) notification
-                            .getUserData();
-                    MatSciJVMInfo jvminfo = jvmInfos.get(nodeName);
-                    if (data.getDeploymentId() != jvminfo.getDeployID()) {
-                        return;
-                    }
-                    if (paconfig.isDebug()) {
-                        System.out.println("[" + new java.util.Date() + " " + host + " " +
-                            this.getClass().getSimpleName() + "] Notification accepted");
-                        outDebug.println("[" + new java.util.Date() + " " + host + " " +
-                            this.getClass().getSimpleName() + "] Notification accepted");
-                        outDebug.flush();
-                    }
-
-                    ProActiveRuntime childRuntime = data.getChildRuntime();
-                    if (paconfig.isDebug()) {
-                        System.out.println("[" + new java.util.Date() + " " + host + " " +
-                            this.getClass().getSimpleName() + "] Creating Node");
-                        outDebug.println("[" + new java.util.Date() + " " + host + " " +
-                            this.getClass().getSimpleName() + "] Creating Node");
-                    }
-                    Node scilabNode = null;
-                    try {
-                        scilabNode = childRuntime.createLocalNode(getExtensionName() + "_" + nodeName + "_" +
-                            nodeCount, true, null, null);
-                    } catch (Exception e) {
-                        if (paconfig.isDebug()) {
-                            e.printStackTrace();
-                            e.printStackTrace(outDebug);
-                        }
-                        throw e;
-                    }
-                    nodeCount++;
-                    if (paconfig.isDebug()) {
-                        System.out.println("[" + new java.util.Date() + " " + host + " " +
-                            this.getClass().getSimpleName() + "] Node Created : " + scilabNode);
-                        outDebug.println("[" + new java.util.Date() + " " + host + " " +
-                            this.getClass().getSimpleName() + "] Node Created :" + scilabNode);
-                    }
-                    jvminfo.setNode(scilabNode);
-
-                    if (paconfig.isDebug()) {
-                        System.out.println("[" + new java.util.Date() + " " + host + " " +
-                            this.getClass().getSimpleName() + "] Waking up main thread");
-                        outDebug.println("[" + new java.util.Date() + " " + host + " " +
-                            this.getClass().getSimpleName() + "] Waking up main thread");
-
-                    }
-
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-                if (paconfig.isDebug()) {
-                    e.printStackTrace(outDebug);
-                }
-            } finally {
-                semaphore.release();
-            }
-
-        }
-
-    }
-
-    /**
-     * An utility class to build the Java command
-     *
-     * @author The ProActive Team
-     */
-    public static class DummyJVMProcess extends JVMProcessImpl implements Serializable {
-
-        public DummyJVMProcess() {
-            super();
-        }
-
-        /**
-         *
-         */
-        public List<String> getJavaCommand() {
-            String javaCommand = buildJavaCommand();
-            List<String> javaCommandList = new ArrayList<String>();
-            StringTokenizer st = new StringTokenizer(javaCommand, " ");
-
-            while (st.hasMoreElements()) {
-                javaCommandList.add(st.nextToken());
-            }
-
-            return javaCommandList;
-        }
-    }
 }

@@ -203,7 +203,6 @@ public class IOTools {
         public Boolean goon = true;
         private PrintStream out;
         private BufferedReader br;
-        private boolean skipNextNL = false;
 
         /**  */
         public ArrayList<String> output = new ArrayList<String>();
@@ -284,8 +283,9 @@ public class IOTools {
         }
 
         private String readLine() throws IOException {
-            StringBuilder line = new StringBuilder();
+            StringBuilder line = new StringBuilder(200);
             int chr;
+            boolean r = false;
 
             while (true) {
                 while (!ready()) {
@@ -294,26 +294,31 @@ public class IOTools {
                     } catch (InterruptedException e) {
                     }
                 }
+
                 synchronized (br) {
                     chr = br.read();
                 }
                 if (chr < 0) {
-                    skipNextNL = false;
                     return line.toString();
                 } else if (chr == '\n') {
-                    if (skipNextNL) {
-                        skipNextNL = false;
-                    } else {
-                        return line.toString();
-                    }
-                } else if (chr == '\r') {
-                    //eating \n
-                    skipNextNL = true;
                     return line.toString();
+                } else if (chr == '\r') {
+                    if (r) {
+                        br.reset();
+                        return line.toString();
+                    } else {
+                        r = true;
+                        br.mark(3);
+                    }
                 } else {
-                    skipNextNL = false;
-                    line.append((char) chr);
+                    if (r) {
+                        br.reset();
+                        return line.toString();
+                    } else {
+                        line.append((char) chr);
+                    }
                 }
+
             }
 
         }

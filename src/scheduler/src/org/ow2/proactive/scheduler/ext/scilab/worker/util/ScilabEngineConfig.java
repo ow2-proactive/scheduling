@@ -125,6 +125,10 @@ public class ScilabEngineConfig implements MatSciEngineConfig {
         return scilabHome + os.fileSeparator() + scilabBinDir + os.fileSeparator() + scilabCommandName;
     }
 
+    public boolean hasManyConfig() {
+        return false;
+    }
+
     @Override
     public String toString() {
         return "Scilab Home : " + scilabHome + nl + "Scilab Version : " + version + nl + "Scilab libDir : " +

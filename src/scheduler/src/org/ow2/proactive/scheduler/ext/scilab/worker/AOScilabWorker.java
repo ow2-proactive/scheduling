@@ -320,7 +320,7 @@ public class AOScilabWorker implements Serializable, MatSciWorker {
         return true;
     }
 
-    public boolean pack() {
+    public boolean cleanup() {
         // Pack not yet supported on scilab
         return true;
     }

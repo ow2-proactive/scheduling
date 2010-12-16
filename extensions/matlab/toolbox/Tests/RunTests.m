@@ -1,7 +1,8 @@
 function [ok, msg]=RunTests(nbiter,timeout)
 
-runimage = true;
-runsignal = true;
+runimage = false;
+runsignal = false;
+runbigarray = false;
 
 for i=1:nbiter
     disp(['Iteration ' num2str(i)]);
@@ -9,7 +10,7 @@ for i=1:nbiter
         [ok,msg] = TestBasic(timeout);
     else
         [ok,msg] = TestBasic();
-    end    
+    end
     if ~ok disp(msg),return; end
     if exist('timeout', 'var')
         [ok,msg] = TestCompose(timeout);
@@ -23,12 +24,14 @@ for i=1:nbiter
         [ok,msg] = TestObjectArguments();
     end
     if ~ok disp(msg),return; end
-    if exist('timeout', 'var')
-        [ok,msg] = TestBigArrayAndKeepEngine(timeout);
-    else
-        [ok,msg] = TestBigArrayAndKeepEngine();
+    if runbigarray
+        if exist('timeout', 'var')
+            [ok,msg] = TestBigArrayAndKeepEngine(timeout);
+        else
+            [ok,msg] = TestBigArrayAndKeepEngine();
+        end
+        if ~ok disp(msg),return; end
     end
-    if ~ok disp(msg),return; end
     if runimage
         if exist('timeout', 'var')
             [ok,msg] = TestPATask(timeout);
@@ -49,6 +52,12 @@ for i=1:nbiter
         [ok,msg] = TestMultipleSubmit(timeout);
     else
         [ok,msg] = TestMultipleSubmit();
+    end
+    if ~ok disp(msg),return; end
+    if exist('timeout', 'var')
+        [ok,msg] = TestDummyDisconnected(timeout);
+    else
+        [ok,msg] = TestDummyDisconnected();
     end
     if ~ok disp(msg),return; end
 end

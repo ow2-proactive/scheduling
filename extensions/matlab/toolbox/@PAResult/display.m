@@ -34,11 +34,12 @@ function display(R)
 s=size(R);
 for i=1:s(1)
     for j=1:s(2)
-        if PAisAwaited(R(i,j))
-            disp('Awaited')
+        RR = R(i,j);
+        if PAisAwaited(RR)
+            disp(['Awaited (J:' char(RR.jobid) ')'])
         else
             try
-            dp(PAwaitFor(R(i,j)), inputname(1))
+            dp(PAwaitFor(RR), inputname(1))
             catch ME
                 disp(getReport(ME));
             end

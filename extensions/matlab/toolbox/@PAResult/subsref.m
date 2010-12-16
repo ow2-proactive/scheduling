@@ -1,21 +1,5 @@
 function varargout = subsref(this,S)
 
-% switch S.type
-% case '.'
-%    switch S.subs
-%        case 'val'
-%        B = PAwaitFor(R);
-%        case 'logs'
-%         if R.logsPrinted.get()
-%             B=char(R.logs.toString());
-%         else
-%            PAwaitFor(R);
-%            B=char(R.logs.toString());
-%         end
-%    otherwise
-%        error([S.subs ,' is not a valid property'])
-%    end
-% end
 
 val{1}=this;
 for i=1:length(S)
@@ -93,12 +77,3 @@ if n > 1
 else
     varargout = { val{i+1} };
 end
-%if nargout <= 1
-
-%    varargout={val{i+1}};
-%else
-%    varargout={val{i+1}{:}};
-%end
-%else
-%    varargout={val{i+1}{:}};
-%end

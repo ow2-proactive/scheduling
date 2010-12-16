@@ -1,8 +1,38 @@
-%   PAsolve() - distribute a matlab function using parametric sweep
+%   PAsolve() - run matlab functions remotely
+%
+%   The call to PAsolve is synchronous until the scheduler has received the
+%   information necessary to run the tasks. PAsolve returns right
+%   afterwards and doesn't block matlab until the tasks have been scheduled
+%   and completed.
+%
+%   PAsolve is based on the principle of parametric sweep, i.e. one
+%   task/many parameters (see Basic syntax).
+%
+%   In addition, it allows to define and run simplified "column" workflows
+%   (see Advanced syntax).
+%
+%
+%
 %
 %   Usage:
-%       >> results = PAsolve(function, arg1, arg2, ...);
-%       >> results = PAsolve(function, PATask1, PATask2, ...);
+%
+%       Basic syntax:
+%       >> results = PAsolve(func, arg1, arg2, ...);
+%
+%       where :
+%
+%           func : a handle to a function with only one return value (but
+%               can have several input parameters)
+%
+%           arg1, arg2, ... :
+%
+%
+%       Advanced syntax:
+%       >> results = PAsolve(PATask1(1..k), PATask2(1..k), ... , PATaskn(1..k));
+%
+%       or
+%
+%       >> results = PAsolve(PATask(1..n,1..k));
 %
 %   Inputs:
 %       func - a handle to a Matlab or user-defined function
@@ -25,7 +55,7 @@
 % * ProActive: The Java(TM) library for Parallel, Distributed,
 % *            Concurrent computing with Security and Mobility
 % *
-% * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
+% * Copyright (C) 1997-2010 INRIA/University of Nice-Sophia Antipolis
 % * Contact: proactive@ow2.org
 % *
 % * This library is free software; you can redistribute it and/or
@@ -88,7 +118,7 @@ elseif isa(varargin{1}, 'PATask')
                 if MM == -1
                     MM = sz;
                 elseif MM ~= sz
-                    error(['parameter ' num2str(i) ' should be a column vector of the same length then other parameters.']);
+                    error(['parameter ' num2str(i) ' should be a column vector of the same length than other parameters.']);
                 end
                 Tasks(1:sz,i) = varargin{i};
             else
@@ -109,9 +139,9 @@ end
 % if ~isa(solver, 'pa.stub.org.ow2.proactive.scheduler.ext.matlab.embedded._StubAOMatlabEnvironment')
 %     error('solver parameter should be a connection to the proactive scheduler obtained from the PAconnect function');
 % end
-
+sched = PAScheduler;
 % Get the solver from memory
-solver = PAgetsolver();
+solver = sched.PAgetsolver();
 if strcmp(class(solver),'double')
     error('connexion to the scheduler is not established');
 end
@@ -151,7 +181,7 @@ vmin = str2num(vmin);
     function sp = findScriptParams(foo,foostr)
         % find the list of toolboxes used by the user function and give it as parameter to the script
         if foostr(2) ~= '('
-            tblist = findUsedToolboxes(func2str(foo));
+            tblist = sched.findUsedToolboxes(func2str(foo));
         else
             % if func is an anonymous function, we can't find dependencies
             tblist = {'matlab'}
@@ -195,9 +225,6 @@ if ~curr_dir_java.canWrite()
 end
 
 subdir = '.PAScheduler';
-if (~exist([curr_dir fs subdir],'dir'))
-    mkdir(curr_dir,subdir);
-end
 
 if isnumeric(opt.CustomDataspaceURL) && isempty(opt.CustomDataspaceURL)
     if (~exist([curr_dir fs subdir],'dir'))
@@ -225,22 +252,11 @@ end
 % Initializing data spaces
 
 if isnumeric(opt.CustomDataspaceURL) && isempty(opt.CustomDataspaceURL)
-    jcurr = java.io.File(curr_dir);
-    jpath = jcurr.getCanonicalPath();
-    ji=jpath.hashCode();
-    dirhash=char(java.lang.Integer.toHexString(ji));
-    outdeployer = PAgetOutputDeployer(dirhash);
-    indeployer = PAgetInputDeployer(dirhash);
-    if strcmp(class(outdeployer),'double')
-        indeployer = org.objectweb.proactive.extensions.vfsprovider.FileSystemServerDeployer(['MatlabInputSpace_' dirhash],curr_dir,0,1);
-        disp(indeployer.getVFSRootURL());
-        PAgetInputDeployer(dirhash,indeployer);
-        outdeployer = org.objectweb.proactive.extensions.vfsprovider.FileSystemServerDeployer(['MatlabOutputSpace_' dirhash],curr_dir,0,1);
-        disp(outdeployer.getVFSRootURL());
-        PAgetOutputDeployer(dirhash,outdeployer);
-    end
-    solve_config.setOutputSpaceURL(outdeployer.getVFSRootURL());
-    solve_config.setInputSpaceURL(indeployer.getVFSRootURL());
+    helper = org.ow2.proactive.scheduler.ext.matsci.client.DataspaceHelper.getInstance();
+    pair = helper.createDataSpace(curr_dir);
+    solve_config.setInputSpaceURL(pair.getX());
+    solve_config.setOutputSpaceURL(pair.getY());
+
 else
     solve_config.setOutputSpaceURL(opt.CustomDataspaceURL);
     solve_config.setInputSpaceURL(opt.CustomDataspaceURL);
@@ -262,7 +278,7 @@ sourceZipBaseName = ['MatlabPAsolveSrc_' num2str(solveid)];
     end
 
     function  [zFN zFP h]=buildZiplist(strfoo,ind,envziplist,paramziplist)
-        [mfiles classdirs] = findDependency(strfoo(2:end));
+        [mfiles classdirs] = sched.findDependency(strfoo(2:end));
         z = union(mfiles, classdirs);
         z=union(z,envziplist);
         z=union(z,paramziplist);
@@ -290,7 +306,7 @@ if opt.TransferSource
             c=sp(i).class;
             if ismember(c, stdclasses) || evalin('caller', ['iscom(' sp(i).name ')']) || evalin('caller', ['isjava(' sp(i).name ')']) || evalin('caller', ['isinterface(' sp(i).name ')'])
             else
-                [envmfiles envclassdirs] = findDependency(c);
+                [envmfiles envclassdirs] = sched.findDependency(c);
                 envziplist = union(envmfiles, envclassdirs);
             end
         end
@@ -305,7 +321,7 @@ if opt.TransferSource
                     c=class(argi{k});
                     if ismember(c, stdclasses) || iscom(argi{k}) || isjava(argi{k}) || isinterface(argi{k})
                     else
-                        [parammfiles paramclassdirs] = findDependency(c);
+                        [parammfiles paramclassdirs] = sched.findDependency(c);
                         paramziplist = union(parammfiles, paramclassdirs);
                     end
                 end
@@ -474,7 +490,11 @@ for i=1:NN
                 save(inVarFP,'-struct','in');
             end
             taskFilesToClean{i}=union(taskFilesToClean{i}, {inVarFP});
-            taskFilesToClean{i}=union(taskFilesToClean{i}, {outVarFP});
+            %% because of disconnected mode, the final out is handled
+            %% differently
+            if j < MM
+                taskFilesToClean{i}=union(taskFilesToClean{i}, {outVarFP});
+            end
             task_config(i,j).setInputVariablesFileName(inVarFN);
             task_config(i,j).setOutputVariablesFileName(outVarFN);
             if j > 1 && Tasks(j,i).Compose
@@ -488,7 +508,7 @@ for i=1:NN
 
         else
             for k=1:length(argi)
-                main = [main 'in' num2str(k) ' = ' serialize(argi{k}) ';'];
+                main = [main 'in' num2str(k) ' = ' sched.serialize(argi{k}) ';'];
             end
         end
 
@@ -517,8 +537,8 @@ for i=1:NN
                 ok = true;
             catch ME
                 ok = false;
-            end                         
-            
+            end
+
             if ~ok
                 task_config(i,j).setCustomScriptUrl(['file:' select]);
             else
@@ -557,7 +577,7 @@ if ischar(opt.CustomScript)
     catch ME
         ok = false;
     end
-    
+
     if ~ok
         solve_config.setCustomScriptUrl(['file:' select]);
     else
@@ -571,13 +591,29 @@ pairinfolist = solver.solve(solve_config, task_config);
 
 jobinfo = pairinfolist.getX();
 resfutureList = pairinfolist.getY();
-PAaddDirToClean(pa_dir);
+jid = char(jobinfo.getJobId());
+disp(['Job submitted : ' jid]);
+%sched.PAJobInfo(jobinfo.getJobId(), jobinfo);
+sched.PAaddDirToClean(jid, pa_dir);
+%taskinfos = {};
+ftn = jobinfo.getFinalTaskNames();
+sched.PATaskRepository(jid, jobinfo);
+tnit = ftn.iterator();
 for i=1:NN
-    results(i)=PAResult(resfutureList.get(i-1), taskFilesToClean{i}, {pa_dir}, opt.TransferVariables, outVarFiles{i}, 0);
+    taskinfo.cleanFileSet = taskFilesToClean{i};
+    taskinfo.cleanDirSet = {pa_dir};
+    taskinfo.transferVariables = opt.TransferVariables;
+    taskinfo.outFile = outVarFiles{i};
+    taskinfo.jobid = jid;
+    taskinfo.taskid = char(tnit.next());
+    sched.PATaskRepository(jid, taskinfo.taskid, taskinfo);
+    results(i)=PAResult(resfutureList.get(i-1), taskinfo);
     for j=1:length(taskFilesToClean{i})
-        PAaddFileToClean(taskFilesToClean{i}{j});
+        sched.PAaddFileToClean(jid, taskFilesToClean{i}{j});
     end
 end
+
+%sched.PAJobInfo(jid, taskinfos);
 
 end
 

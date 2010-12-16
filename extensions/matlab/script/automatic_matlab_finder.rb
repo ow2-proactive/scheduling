@@ -91,6 +91,8 @@ class MatsciFinder
       reg.each_key { |k, v| matlab_versions_found.push k.chomp }
     end
 
+    manyconfigs = (matlab_versions_found.length() > 1)
+
     matlab_versions_found.each do |version|
       version.delete!(0.chr)
       matlabhome = Registry::HKEY_LOCAL_MACHINE.open(keyname+"\\"+version, access).read("MATLABROOT")[1]
@@ -99,7 +101,7 @@ class MatsciFinder
         puts version + " rejected"
         log(version + " rejected")
       elsif version == version_pref
-          conf = checkConfig(matlabhome, version, libDirectory, binDirectory, extDirectory, "matlab.exe")
+          conf = checkConfig(matlabhome, version, libDirectory, binDirectory, extDirectory, "matlab.exe", manyconfigs)
           if conf != nil
              _configs.clear
              _configs.push conf
@@ -108,7 +110,7 @@ class MatsciFinder
           end
           return _configs
         else
-          conf = checkConfig(matlabhome, version, libDirectory, binDirectory, extDirectory, "matlab.exe")
+          conf = checkConfig(matlabhome, version, libDirectory, binDirectory, extDirectory, "matlab.exe", manyconfigs)
           if conf != nil
             puts version + ' accepted'
             log(version + " accepted")
@@ -146,7 +148,7 @@ class MatsciFinder
           puts version + ' rejected'
           log(version + " rejected")
         elsif version == version_pref
-          conf = checkConfig(matlabhome, version, libDirectory, binDirectory, extDirectory, "matlab")
+          conf = checkConfig(matlabhome, version, libDirectory, binDirectory, extDirectory, "matlab", false)
           if conf != nil
              _configs.clear
              _configs.push conf
@@ -155,7 +157,7 @@ class MatsciFinder
           end                             
           return _configs
         else
-          conf = checkConfig(matlabhome, version, libDirectory, binDirectory, extDirectory, "matlab")
+          conf = checkConfig(matlabhome, version, libDirectory, binDirectory, extDirectory, "matlab", false)
           if conf != nil
             puts version + ' accepted'
             log(version + " accepted")
@@ -167,32 +169,32 @@ class MatsciFinder
     return _configs
   end
 
-  def checkConfig(matlabhome, version, libDirectory, binDirectory, extDirectory, command)
+  def checkConfig(matlabhome, version, libDirectory, binDirectory, extDirectory, command, manyconfigs)
     home = JavaIO::File.new(matlabhome);
     if (!home.exists || !home.canRead || !home.isDirectory)
-      puts home.toString " cannot be found."
+      puts home.toString() + " cannot be found."
       return nil;
     end
     libdir = JavaIO::File.new(home, libDirectory)
     if (!libdir.exists || !libdir.canRead || !libdir.isDirectory)
-      puts libdir.toString " cannot be found."
+      puts libdir.toString() + " cannot be found."
       return nil;
     end
     bindir = JavaIO::File.new(home, binDirectory)
     if (!bindir.exists || !bindir.canRead || !bindir.isDirectory)
-      puts bindir.toString " cannot be found."
+      puts bindir.toString() + " cannot be found."
       return nil;
     end
     comm = JavaIO::File.new(bindir, command)
     if (!comm.exists || !comm.canExecute || !comm.isFile)
-      puts comm.toString " cannot be found."
+      puts comm.toString() + " cannot be found."
       return nil;
     end
-    conf = MatlabEngineConfig.new(matlabhome, version, libDirectory, binDirectory, extDirectory, command)
+    conf = MatlabEngineConfig.new(matlabhome, version, libDirectory, binDirectory, extDirectory, command, manyconfigs)
     ptodir = ptolemyDir(conf)
     ptodirjava  = JavaIO::File.new(ptodir)
     if (!ptodirjava.exists || !ptodirjava.canRead || !ptodirjava.isDirectory)
-      puts ptodirjava.toString " cannot be found."
+      puts ptodirjava.toString() + " cannot be found."
       return nil;
     end
     conf.setPtolemyPath(ptodir)

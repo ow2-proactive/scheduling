@@ -12,6 +12,8 @@ if ~R.cleaned.get()
             rmdir(setd{i});
         end
     end    
+    sched = PAScheduler;
+    sched.PATaskRepository(R.jobid, R.taskid, 'received');      
     R.cleaned.set(1);
     warning('on')
 end

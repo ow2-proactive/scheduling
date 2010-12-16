@@ -10,7 +10,7 @@ import java.util.TreeSet;
  *
  * @author The ProActive Team
  */
-public class MatSciJobPermanentInfo implements java.io.Serializable {
+public class MatSciJobPermanentInfo implements java.io.Serializable, Cloneable {
 
     String jobId;
 
@@ -56,5 +56,13 @@ public class MatSciJobPermanentInfo implements java.io.Serializable {
 
     public TreeSet<String> getFinalTaskNames() {
         return finaltnames;
+    }
+
+    @Override
+    public Object clone() throws CloneNotSupportedException {
+        MatSciJobPermanentInfo newinfo = (MatSciJobPermanentInfo) super.clone();
+        newinfo.tnames = (TreeSet<String>) tnames.clone();
+        newinfo.finaltnames = (TreeSet<String>) finaltnames.clone();
+        return newinfo;
     }
 }

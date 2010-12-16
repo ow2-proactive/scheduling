@@ -276,14 +276,12 @@ public class AOScilabEnvironment extends AOMatSciEnvironment<SciData, ScilabResu
         String jid = null;
         try {
             jid = scheduler.submit(job).value();
-            lastSubJobId.add(jid);
             if (config.isDebug()) {
                 System.out.println("[AOScilabEnvironment] Job " + jid + " submitted.");
             }
             jpinfo = new MatSciJobPermanentInfo(jid, nbResults, depth, config, tnames, finaltnames);
             currentJobs.put(jid, new MatSciJobVolatileInfo(jpinfo));
 
-            writeCjobsToLog(currentJobs);
         } catch (SchedulerException e) {
             throw new RuntimeException(e);
         }

@@ -1,9 +1,9 @@
 function [ok, msg]=TestMultipleSubmit(timeout)
 if ~exist('timeout', 'var')
     if ispc()
-        timeout = 400000;
+        timeout = 500000;
     else
-        timeout =200000;
+        timeout = 200000;
     end
 end
 

@@ -3,6 +3,8 @@ package org.ow2.proactive.scheduler.ext.matlab.worker.util;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.input.SAXBuilder;
+import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
+import org.objectweb.proactive.utils.OperatingSystem;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.ext.matsci.worker.util.MatSciConfigurationParser;
 import org.ow2.proactive.scheduler.ext.matsci.worker.util.MatSciEngineConfig;
@@ -13,6 +15,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.regex.Matcher;
 
 
 /**
@@ -24,6 +27,8 @@ public class MatlabConfigurationParser extends MatSciConfigurationParser {
 
     static final String configPath = "extensions/matlab/config/worker/MatlabConfiguration.xml";
 
+    protected static OperatingSystem os = OperatingSystem.getOperatingSystem();
+
     static Document document;
     static Element racine;
 
@@ -31,6 +36,8 @@ public class MatlabConfigurationParser extends MatSciConfigurationParser {
         File configFile;
         ArrayList<MatSciEngineConfig> configs = new ArrayList<MatSciEngineConfig>();
 
+        String homestr = ProActiveRuntimeImpl.getProActiveRuntime().getProActiveHome();
+        File homesched = new File(homestr);
         if (PASchedulerProperties.MATLAB_WORKER_CONFIGURATION_FILE != null &&
             PASchedulerProperties.MATLAB_WORKER_CONFIGURATION_FILE.getValueAsString() != "") {
             configFile = new File(PASchedulerProperties.MATLAB_WORKER_CONFIGURATION_FILE.getValueAsString());
@@ -38,8 +45,7 @@ public class MatlabConfigurationParser extends MatSciConfigurationParser {
             configFile = new File(System.getProperty(PASchedulerProperties.MATLAB_WORKER_CONFIGURATION_FILE
                     .getKey()));
         } else {
-            File home = findSchedulerHome();
-            URI configFileURI = home.toURI().resolve(configPath);
+            URI configFileURI = homesched.toURI().resolve(configPath);
             configFile = new File(configFileURI);
         }
         if (!configFile.exists() || !configFile.canRead()) {
@@ -53,6 +59,8 @@ public class MatlabConfigurationParser extends MatSciConfigurationParser {
         racine = document.getRootElement();
 
         List listInstallations = racine.getChildren("installation");
+
+        boolean hasManyConfigs = (listInstallations.size() > 1);
 
         //On crée un Iterator sur notre liste
         Iterator i = listInstallations.iterator();
@@ -72,7 +80,8 @@ public class MatlabConfigurationParser extends MatSciConfigurationParser {
             if ((home == null) || (home.trim().length() == 0)) {
                 throw new IllegalArgumentException("In " + configFile + ", home element must not be empty");
             }
-            home = home.trim();
+
+            home = home.trim().replaceAll("/", Matcher.quoteReplacement("" + os.fileSeparator()));
             File filehome = new File(home);
             checkDir(filehome, configFile);
 
@@ -80,7 +89,7 @@ public class MatlabConfigurationParser extends MatSciConfigurationParser {
             if ((libdir == null) || (libdir.trim().length() == 0)) {
                 throw new IllegalArgumentException("In " + configFile + ", libdir element must not be empty");
             }
-            libdir = libdir.trim();
+            libdir = libdir.trim().replaceAll("/", Matcher.quoteReplacement("" + os.fileSeparator()));
             File filelib = new File(filehome, libdir);
             checkDir(filelib, configFile);
 
@@ -95,7 +104,7 @@ public class MatlabConfigurationParser extends MatSciConfigurationParser {
             if ((bindir == null) || (bindir.trim().length() == 0)) {
                 throw new IllegalArgumentException("In " + configFile + ", bindir element must not be empty");
             }
-            bindir = bindir.trim();
+            bindir = bindir.trim().replaceAll("/", Matcher.quoteReplacement("" + os.fileSeparator()));
             File filebin = new File(filehome, bindir.trim());
             checkDir(filebin, configFile);
 
@@ -112,17 +121,16 @@ public class MatlabConfigurationParser extends MatSciConfigurationParser {
                 throw new IllegalArgumentException("In " + configFile +
                     ", ptolemydir element must not be empty");
             }
-            ptolemydir = ptolemydir.trim();
+            ptolemydir = ptolemydir.trim().replaceAll("/", Matcher.quoteReplacement("" + os.fileSeparator()));
 
             File ptolemydirfile = new File(ptolemydir);
             if (!ptolemydirfile.isAbsolute()) {
-                File schedhome = findSchedulerHome();
-                ptolemydirfile = new File(schedhome, ptolemydir);
+                ptolemydirfile = new File(homesched, ptolemydir);
             }
             checkDir(ptolemydirfile, configFile);
 
-            configs.add(new MatlabEngineConfig(home, version, libdir, bindir, extdir, command, ptolemydirfile
-                    .toString()));
+            configs.add(new MatlabEngineConfig(home, version, libdir, bindir, extdir, command,
+                hasManyConfigs, ptolemydirfile.toString()));
         }
 
         return configs;

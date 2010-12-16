@@ -55,7 +55,7 @@ for i=1:s(1)
             R.iserror.set(true);
             exception = MException('PAResult:PAwaitFor','Internal Error');            
         end
-        clean(R);
+        clean(R);                  
     end
 end
 

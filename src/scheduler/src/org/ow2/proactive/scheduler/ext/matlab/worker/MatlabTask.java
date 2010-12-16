@@ -44,9 +44,10 @@ import org.ow2.proactive.scheduler.ext.matlab.common.PASolveMatlabTaskConfig;
 import org.ow2.proactive.scheduler.ext.matlab.common.exception.MatlabInitException;
 import org.ow2.proactive.scheduler.ext.matlab.worker.util.MatlabEngineConfig;
 import org.ow2.proactive.scheduler.ext.matlab.worker.util.MatlabFinder;
+import org.ow2.proactive.scheduler.ext.matsci.common.DummyJVMProcess;
+import org.ow2.proactive.scheduler.ext.matsci.worker.MatSciTask;
 import org.ow2.proactive.scheduler.ext.matsci.worker.util.MatSciEngineConfig;
 import org.ow2.proactive.scheduler.ext.matsci.worker.util.MatSciJVMInfo;
-import org.ow2.proactive.scheduler.ext.matsci.worker.MatSciTask;
 import org.ow2.proactive.scheduler.ext.matsci.worker.util.MatSciTaskServerConfig;
 
 import java.io.FileInputStream;
@@ -240,7 +241,22 @@ public class MatlabTask<W extends AOMatlabWorker> extends
     }
 
     @Override
-    protected void afterExecute() {
+    protected void afterExecute(MatSciJVMInfo jvminfo) {
+        if (paconfig.isDebug()) {
+            System.out.println("[" + new java.util.Date() + " " + host + " " +
+                this.getClass().getSimpleName() + "] Closing output");
+            outDebug.println("[" + new java.util.Date() + " " + host + " " + this.getClass().getSimpleName() +
+                "] Closing output");
+            outDebug.close();
+        }
+        if (jvminfo.getLogger() != null) {
+            jvminfo.getLogger().closeStream();
+            jvminfo.getEsLogger().closeStream();
+        }
+        killReserveMatlabProcess();
+    }
+
+    private void killReserveMatlabProcess() {
         if (paconfig.isDebug()) {
             System.out.println("[" + new java.util.Date() + " " + host + " " +
                 this.getClass().getSimpleName() + "] Killing selection process...");
@@ -266,18 +282,17 @@ public class MatlabTask<W extends AOMatlabWorker> extends
             p.destroy();
         }
         matlabEngineConfig.setSelectionScriptProcess(p);
-
     }
 
     protected void initWorker(W worker) throws Throwable {
         worker.init(inputScript, scriptLines, paconfig, taskconfig, matlabEngineConfig);
     }
 
-    protected void initProcess(DummyJVMProcess jvmprocess, Map<String, String> env) throws Throwable {
+    public void initProcess(DummyJVMProcess javaCommandBuilder, Map<String, String> env) throws Throwable {
 
         // Classpath specific
-        String classpath = prependPtolemyLibDirToClassPath(jvmprocess.getClasspath());
-        jvmprocess.setClasspath(classpath);
+        String classpath = prependPtolemyLibDirToClassPath(javaCommandBuilder.getClasspath());
+        javaCommandBuilder.setClasspath(classpath);
 
         // we add matlab directories to LD_LIBRARY_PATH
         if (os.equals(OperatingSystem.unix)) {
@@ -300,8 +315,9 @@ public class MatlabTask<W extends AOMatlabWorker> extends
         String jvlpath = addPtolemyLibDirToPath(null);
 
         // we set as well the java.library.path property (precaution), we forward as well the RMI port in use
-        javaCommandBuilder.setJvmOptions("-Djava.library.path=\"" + jvlpath + "\"" +
-            " -Dproactive.configuration=" + writeConfigFile());
+        String options = javaCommandBuilder.getJvmOptions();
+        options += " -Djava.library.path=\"" + jvlpath + "\"";
+        javaCommandBuilder.setJvmOptions(options);
 
     }
 

@@ -1,5 +1,4 @@
 %   PAresult() - constructor of PAresult object
-%   p = PAresult(l) creates a PAresult from PAResultList l
 %
 %/*
 % * ################################################################
@@ -34,26 +33,21 @@
 function varargout = PAResult(varargin)
 if nargin > 0    
     this.future = varargin{1};
-    this.cleanFileSet = varargin{2};
-    this.cleanDirSet = varargin{3};
-    this.transferVariables = varargin{4};
-    this.outFile = varargin{5};
-    this.id = varargin{6};
-    if nargin > 6
-        this.cleaned = varargin{7};
-        this.logsPrinted = varargin{8}; 
-        this.logs = varargin{9};
-        this.waited = varargin{10};
-        this.iserror = varargin{11};                          
-        this.resultSet = varargin{12}; 
-    else
+    taskinfo = varargin{2};
+    this.cleanFileSet = taskinfo.cleanFileSet;
+    this.cleanDirSet = taskinfo.cleanDirSet;
+    this.transferVariables = taskinfo.transferVariables;
+    this.outFile = taskinfo.outFile;
+    this.jobid = taskinfo.jobid;
+    this.taskid = taskinfo.taskid;
+    
         this.cleaned = java.util.concurrent.atomic.AtomicBoolean(false);
         this.logsPrinted = java.util.concurrent.atomic.AtomicBoolean(false);
         this.logs = java.lang.StringBuilder();
         this.waited = java.util.concurrent.atomic.AtomicBoolean(false);
         this.iserror = java.util.concurrent.atomic.AtomicBoolean(false);                       
         this.resultSet = java.util.concurrent.atomic.AtomicBoolean(false);        
-    end
+    
     
 else
     this.future = [];    
@@ -61,7 +55,8 @@ else
     this.cleanDirSet = [];
     this.transferVariables = true;
     this.outFile = [];
-    this.id = 0;
+    this.jobid = 0;
+    this.taskid = [];
     this.cleaned = java.util.concurrent.atomic.AtomicBoolean(true);
     this.logsPrinted = java.util.concurrent.atomic.AtomicBoolean(true);
     this.logs = java.lang.StringBuilder();

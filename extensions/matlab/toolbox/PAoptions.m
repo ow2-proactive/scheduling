@@ -88,12 +88,6 @@
 %               Wether the output files of a job should be zipped first
 %               before being sent to the scheduler (default to 'off')
 %
-%   ProActiveJars
-%               Comma separated list of jar files used by ProActive
-%               (internal)
-%
-%   ProActiveConfiguration
-%               path to ProActive configuration file (internal)
 %
 %   CustomScript
 %               url or path of a user-defined selection script used in
@@ -107,6 +101,16 @@
 %               url or path of selection script used to reserve matlab
 %               tokens (internal)
 %
+%   ProActiveJars
+%               Comma separated list of jar files used by ProActive
+%               (internal)
+%
+%   ProActiveConfiguration
+%               path to ProActive configuration file (internal)
+%
+%   DisconnectedModeFile
+%               path to disconnected mode temporary file (internal)
+%
 %
 %
 %/*
@@ -115,7 +119,7 @@
 % * ProActive: The Java(TM) library for Parallel, Distributed,
 % *            Concurrent computing with Security and Mobility
 % *
-% * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
+% * Copyright (C) 1997-2010 INRIA/University of Nice-Sophia Antipolis
 % * Contact: proactive@ow2.org
 % *
 % * This library is free software; you can redistribute it and/or
@@ -141,7 +145,7 @@
 % */
 function opts = PAoptions(varargin)
 
-%mlock
+mlock
 persistent pa_options
 
 if  nargin == 0 && exist('pa_options','var') == 1 && ~isempty(pa_options)
@@ -158,7 +162,7 @@ versionlistcheck = @(x)((isnumeric(x)&&isempty(x)) || (ischar(x) &&  ~isempty(re
 jarlistcheck = @(x)(ischar(x) &&  ~isempty(regexp(x, '^([\w\-]+\.jar[ ;,]+)*[\w\-]+\.jar$')));
 jarlisttrans = @jarlisttocell;
 
-urlcheck=@(x)((isnumeric(x)&&isempty(x)) || ischar(char(java.net.URL(x))));
+urlcheck=@(x)((isnumeric(x)&&isempty(x)) || ischar(x));
 
 charornull = @(x)((isnumeric(x)&&isempty(x)) || ischar(x));
 
@@ -172,10 +176,15 @@ v = version;
 [pathstr, name, ext] = fileparts(mfilename('fullpath'));
 javafile = java.io.File(pathstr);
 scheduling_dir = char(javafile.getParentFile().getParentFile().getParent().toString());
+tmp_dir = char(java.lang.System.getProperty('java.io.tmpdir'));
+home_dir = char(java.lang.System.getProperty('user.home'));
 logtrans = @(x)((islogical(x) && x) || (ischar(x) && (strcmp(x,'on') || strcmp(x,'true'))) || (isnumeric(x)&&(x==1)));
-scripttrans = @(x)(['file:' strrep(strrep(x, '$SCHEDULER$', scheduling_dir), '\', '/')]);
-conftrans = @(x)(strrep(strrep(x, '$SCHEDULER$', scheduling_dir),'/',filesep));
+variabletrans = @(x)(strrep(strrep(strrep(x, '$SCHEDULER$', scheduling_dir),'$TMP$',tmp_dir), '$HOME$', home_dir));
+scripttrans = @(x)(['file:' strrep(variabletrans(x), '\', '/')]);
+conftrans = @(x)(strrep(variabletrans(x),'/',filesep));
+
 ischarornull = @(x)(ischar(x) || isnumeric(x)&&isempty(x));
+
 id = @(x)x;
 
 
@@ -282,6 +291,11 @@ inputs(j).trans = jarlisttrans;
 j=j+1;
 inputs(j).name = 'ProActiveConfiguration';
 inputs(j).default = ['$SCHEDULER$' filesep 'config' filesep 'proactive' filesep 'ProActiveConfiguration.xml'];
+inputs(j).check = @ischar;
+inputs(j).trans = conftrans;
+j=j+1;
+inputs(j).name = 'DisconnectedModeFile';
+inputs(j).default = ['$HOME$' filesep '.PAsolveTmp.mat'];
 inputs(j).check = @ischar;
 inputs(j).trans = conftrans;
 

@@ -18,7 +18,7 @@ catch err
 end
 
 disp('....Then create more big matrixes on the same engines (we verify that they recover)');
-for i=1:10
+for i=1:8
     disp(['..........................Iteration ' num2str(i)]);
     resl = PAsolve(@makeBigArray,{i*1000},{i*1000},{i*1000},{i*1000});
     val=PAwaitAll(resl,timeout)

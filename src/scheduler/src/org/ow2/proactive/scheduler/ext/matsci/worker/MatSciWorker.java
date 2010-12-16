@@ -16,5 +16,5 @@ public interface MatSciWorker {
 
     boolean terminate();
 
-    boolean pack();
+    boolean cleanup();
 }

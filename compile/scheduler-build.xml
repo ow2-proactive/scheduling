@@ -63,6 +63,7 @@
 			<generateorcheck_stub_for_class targetedClasspath="scheduler.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/ext/matlab/worker/AOMatlabCollector" mode="@{mode}"/>
 			<generateorcheck_stub_for_class targetedClasspath="scheduler.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/ext/scilab/client/AOScilabEnvironment" mode="@{mode}"/>
 			<generateorcheck_stub_for_class targetedClasspath="scheduler.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/ext/scilab/worker/AOScilabWorker" mode="@{mode}"/>
+            <generateorcheck_stub_for_class targetedClasspath="scheduler.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/ext/matsci/client/AODataspaceRegistry" mode="@{mode}"/>
 			<generateorcheck_stub_for_class targetedClasspath="all.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/core/rmproxies/SchedulerRMProxy" mode="@{mode}"/>
 			<generateorcheck_stub_for_class targetedClasspath="all.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/core/rmproxies/UserRMProxy" mode="@{mode}"/>
 			<generateorcheck_stub_for_class targetedClasspath="scheduler.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/task/launcher/ForkedJavaTaskLauncher" mode="@{mode}"/>

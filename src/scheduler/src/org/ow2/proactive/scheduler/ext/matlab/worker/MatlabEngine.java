@@ -38,6 +38,7 @@ package org.ow2.proactive.scheduler.ext.matlab.worker;
 
 import org.objectweb.proactive.utils.OperatingSystem;
 import org.ow2.proactive.scheduler.ext.matlab.worker.util.MatlabEngineConfig;
+import ptolemy.data.IntToken;
 import ptolemy.data.Token;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.matlab.Engine;
@@ -45,9 +46,9 @@ import ptolemy.matlab.Engine.ConversionParameters;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.Condition;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
 
 
 /**
@@ -195,6 +196,9 @@ public class MatlabEngine {
     public static void setDebug(byte dL) {
         debugLevel = dL;
         debug = (dL > 0);
+        if (eng != null) {
+            eng.setDebugging(debugLevel);
+        }
 
     }
 
@@ -225,6 +229,30 @@ public class MatlabEngine {
      */
     private static void release() {
         lock.unlock();
+    }
+
+    private static void testEngineInitOrRestart() throws IllegalActionException {
+        init();
+        try {
+            IntToken test = new IntToken(1);
+            put("test", test);
+            Token answer = get("test");
+            if ((answer == null) || !(answer instanceof IntToken)) {
+                restart();
+            }
+            if (((IntToken) answer).intValue() != 1) {
+                restart();
+            }
+            evalString("clear test");
+        } catch (IllegalActionException e) {
+            restart();
+        }
+        // ok
+    }
+
+    private static void restart() throws IllegalActionException {
+        eng = null;
+        init();
     }
 
     /**
@@ -301,6 +329,12 @@ public class MatlabEngine {
         boolean released = false;
 
         public Connection() {
+        }
+
+        public void testEngineInitOrRestart() throws IllegalActionException {
+            if (released)
+                throw new IllegalActionException("Connection is released");
+            MatlabEngine.testEngineInitOrRestart();
         }
 
         /**

@@ -10,7 +10,8 @@ import org.ow2.proactive.scheduler.ext.matsci.worker.MatSciWorker;
  *
  * @author The ProActive Team
  */
-public class MatSciJVMInfo<W extends MatSciWorker, C extends MatSciEngineConfig> {
+public class MatSciJVMInfo<W extends MatSciWorker, C extends MatSciEngineConfig> implements
+        org.ow2.proactive.scheduler.ext.matsci.common.ProcessListener {
     IOTools.LoggingThread esLogger = null;
     IOTools.LoggingThread isLogger = null;
     IOTools.RedirectionThread ioThread = null;
