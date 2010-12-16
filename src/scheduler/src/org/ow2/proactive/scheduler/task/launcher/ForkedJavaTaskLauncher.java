@@ -40,13 +40,12 @@ import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
 import org.ow2.proactive.scheduler.common.exception.ForkedJavaTaskException;
 import org.ow2.proactive.scheduler.common.task.SimpleTaskLogs;
-import org.ow2.proactive.scheduler.common.task.TaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
-import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
 import org.ow2.proactive.scheduler.task.ExecutableContainer;
 import org.ow2.proactive.scheduler.task.ExecutableContainerInitializer;
 import org.ow2.proactive.scheduler.task.ForkedJavaExecutable;
@@ -68,9 +67,6 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher {
     public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.LAUNCHER);
 
     private TaskLauncherInitializer initializer;
-    //next fields are used to activate logs whenever the call to activate logs is done
-    private boolean activateLogs = false;
-    private AppenderProvider logSink;
 
     /**
      * Create a new instance of ForkedJavaTaskLauncher.<br/>
@@ -125,11 +121,6 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher {
                 throw e.getCause() != null ? e.getCause() : e;
             }
 
-            //activate logs if necessary
-            if (activateLogs) {
-                ((ForkedJavaExecutable) currentExecutable).activateLogs(logSink);
-            }
-
             //schedule timer at any time
             scheduleTimer();
 
@@ -140,19 +131,18 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher {
             duration = System.currentTimeMillis() - duration;
 
             if (userResult instanceof TaskResult) {
-                return (TaskResult) userResult;
+                TaskResultImpl r = (TaskResultImpl) PAFuture.getFutureValue(userResult);
+                // Override the logs since they are stored on forker side
+                r.setLogs(getLogs());
+                return r;
             } else {
                 Integer ec = (Integer) userResult;
                 if (ec == 0) {
-                    return new TaskResultImpl(taskId, ec, new SimpleTaskLogs(
-                        "Forked JVM process has been terminated with exit code " + ec +
-                            ", no result has been retreived.", ""), duration);
+                    return new TaskResultImpl(taskId, ec, getLogs(), duration);
                 } else {
                     Throwable t = new ForkedJavaTaskException(
                         "Forked JVM process has been terminated with exit code " + ec, ec);
-                    return new TaskResultImpl(taskId, t, new SimpleTaskLogs("",
-                        "Forked JVM process has been terminated with exit code " + ec +
-                            ", no result has been retreived."), duration);
+                    return new TaskResultImpl(taskId, t, getLogs(), duration);
                 }
             }
         } catch (Throwable ex) {
@@ -166,27 +156,6 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher {
             cancelTimer();
             finalizeTask(core);
         }
-    }
-
-    /**
-     * @see org.ow2.proactive.scheduler.task.launcher.TaskLauncher#activateLogs(org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider)
-     */
-    @Override
-    public void activateLogs(AppenderProvider logSink) {
-        this.logSink = logSink;
-        if (currentExecutable == null) {
-            activateLogs = true;
-        } else {
-            ((ForkedJavaExecutable) currentExecutable).activateLogs(logSink);
-        }
-    }
-
-    /**
-     * @see org.ow2.proactive.scheduler.task.launcher.TaskLauncher#getLogs()
-     */
-    @Override
-    public TaskLogs getLogs() {
-        return ((ForkedJavaExecutable) currentExecutable).getLogs();
     }
 
     /**
@@ -204,24 +173,6 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher {
     protected void initEnv() {
         //cancel default behavior defined in taskLauncher
         //it is useless to init environment in forked tasklauncher
-    }
-
-    /**
-     * @see org.ow2.proactive.scheduler.task.launcher.TaskLauncher#initLoggers()
-     */
-    @Override
-    protected void initLoggers() {
-        //cancel default behavior defined in taskLauncher
-        //we must NOT initialize loggers in forked tasklauncher
-    }
-
-    /**
-     * @see org.ow2.proactive.scheduler.task.launcher.TaskLauncher#finalizeLoggers()
-     */
-    @Override
-    protected void finalizeLoggers() {
-        //cancel default behavior defined in taskLauncher
-        //we must NOT finalize loggers in forked tasklauncher as it was not initialize
     }
 
     /**

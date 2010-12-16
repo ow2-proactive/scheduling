@@ -36,8 +36,10 @@
  */
 package org.ow2.proactive.scheduler.task;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -52,7 +54,10 @@ import java.util.concurrent.TimeUnit;
 import javax.management.Notification;
 import javax.management.NotificationListener;
 
+import org.apache.log4j.Appender;
+import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.Logger;
+import org.apache.log4j.spi.LoggingEvent;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.ProActiveException;
@@ -74,16 +79,20 @@ import org.objectweb.proactive.extensions.processbuilder.exception.NotImplemente
 import org.ow2.proactive.scheduler.common.exception.InternalSchedulerException;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.exception.UserException;
+import org.ow2.proactive.scheduler.common.exception.WalltimeExceededException;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
-import org.ow2.proactive.scheduler.common.task.TaskLogs;
+import org.ow2.proactive.scheduler.common.task.Log4JTaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
+import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingException;
 import org.ow2.proactive.scheduler.task.launcher.InternalForkEnvironment;
 import org.ow2.proactive.scheduler.task.launcher.JavaTaskLauncher;
+import org.ow2.proactive.scheduler.task.launcher.TaskLauncher;
 import org.ow2.proactive.scheduler.task.launcher.TaskLauncherInitializer;
 import org.ow2.proactive.scheduler.task.launcher.utils.ForkerUtils;
 import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
+import org.ow2.proactive.scheduler.util.process.ThreadReader;
 import org.ow2.proactive.scripting.ScriptHandler;
 import org.ow2.proactive.scripting.ScriptLoader;
 import org.ow2.proactive.scripting.ScriptResult;
@@ -98,10 +107,6 @@ import org.ow2.proactive.scripting.ScriptResult;
  */
 public class ForkedJavaExecutable extends JavaExecutable {
 
-    enum ExecutableState {
-        INITIALIZING, STARTED, LISTEN_DEMANDED, LISTENNING, TERMINATED;
-    }
-
     public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.LAUNCHER);
 
     /** When creating a ProActive node on a dedicated JVM, assign a default name of VN */
@@ -109,6 +114,9 @@ public class ForkedJavaExecutable extends JavaExecutable {
 
     /** Fork environment script binding name */
     public static final String FORKENV_BINDING_NAME = "forkEnvironment";
+
+    /** Size of the log buffer on forked side ; logs are buffered on forker side */
+    private static final int FORKED_LOG_BUFFER_SIZE = 0;
 
     /** Forked execution time out checking interval */
     private static final int TIMEOUT = 1000;
@@ -118,15 +126,11 @@ public class ForkedJavaExecutable extends JavaExecutable {
     /** For tryAcquire primitive */
     private static final int RETRY_ACQUIRE = 10;
 
-    /** State of this executable, used to know when activating logs */
-    private ExecutableState execState = null;
-    /** Remember appender provider if demanded before the start of the task */
-    private AppenderProvider logSink = null;
     /** Java task launcher reference kept to activate logs on it if necessary */
     private JavaTaskLauncher newJavaTaskLauncher;
 
-    /** save task logs when finished */
-    private TaskLogs logs;
+    /** Thread for listening out/err of the forked JVM */
+    private transient Thread tsout, tserr;
 
     private String forkedNodeName;
     private long deploymentID;
@@ -151,7 +155,6 @@ public class ForkedJavaExecutable extends JavaExecutable {
      */
     // WARNING WHEN REMOVE OR RENAME, called by task launcher by introspection
     private void internalInit(ForkedJavaExecutableInitializer execInitializer) throws Exception {
-        execState = ExecutableState.INITIALIZING;
         this.execInitializer = execInitializer;
         init();
     }
@@ -163,6 +166,7 @@ public class ForkedJavaExecutable extends JavaExecutable {
     @Override
     public Serializable execute(TaskResult... results) throws Throwable {
         try {
+
             // building command for executing java and start process
             OSProcessBuilder ospb = createProcessAndPrepareCommand();
             createRegistrationListener();
@@ -173,6 +177,10 @@ public class ForkedJavaExecutable extends JavaExecutable {
             logger_dev.debug("Create remote task launcher");
             newJavaTaskLauncher = createForkedTaskLauncher();
 
+            // redirect tasks logs to local stdout/err
+            this.initStreamReaders();
+            newJavaTaskLauncher.activateLogs(new StdAppenderProvider());
+
             execInitializer.getJavaExecutableContainer().setNodes(execInitializer.getNodes());
             //do task must not pass schedulerCore object,
             //the deployed java task must not notify the core from termination
@@ -181,13 +189,6 @@ public class ForkedJavaExecutable extends JavaExecutable {
             newJavaTaskLauncher.configureNode();
             TaskResult result = newJavaTaskLauncher.doTask(null,
                     execInitializer.getJavaExecutableContainer(), results);
-
-            if (execState == ExecutableState.LISTEN_DEMANDED) {
-                newJavaTaskLauncher.activateLogs(logSink);
-                execState = ExecutableState.LISTENNING;
-            } else {
-                execState = ExecutableState.STARTED;
-            }
 
             //waiting for task result futur
             //as it is forked, wait until futur has arrive or someone kill the task (core OR tasktimer)
@@ -201,8 +202,6 @@ public class ForkedJavaExecutable extends JavaExecutable {
                 }
             }
 
-            execState = ExecutableState.TERMINATED;
-
             try {
                 //if no exception, JVM has terminated and task result is not available
                 //so return exit code that must be handle correctly by forkedJavaTaskLauncher
@@ -212,16 +211,43 @@ public class ForkedJavaExecutable extends JavaExecutable {
             }
 
             if (!isKilled()) {
-                logs = newJavaTaskLauncher.getLogs();
                 newJavaTaskLauncher.closeNodeConfiguration();
             } else {
                 logger_dev.debug("Task has been killed");
                 FutureMonitoring.removeFuture(((FutureProxy) ((StubObject) result).getProxy()));
-                throw new InternalSchedulerException("Walltime exceeded");
+                throw new WalltimeExceededException("Walltime exceeded");
             }
             return result;
         } finally {
             clean();
+        }
+    }
+
+    /**
+     * Start listening thread on process out/err
+     */
+    private void initStreamReaders() {
+        // redirect streams to local stdout/err
+        BufferedReader sout = new BufferedReader(new InputStreamReader(process.getInputStream()));
+        BufferedReader serr = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+        tsout = new Thread(new ThreadReader(sout, System.out, this));
+        tserr = new Thread(new ThreadReader(serr, System.err, this));
+        tsout.start();
+        tserr.start();
+    }
+
+    /**
+     * Wait for listening threads completion.
+     */
+    private void terminateStreamReaders() {
+        try {
+            // wait for log flush
+            tsout.join();
+            tserr.join();
+        } catch (InterruptedException e) {
+        } finally {
+            tsout = null;
+            tserr = null;
         }
     }
 
@@ -240,8 +266,7 @@ public class ForkedJavaExecutable extends JavaExecutable {
      * @throws Exception if a problem occurs while creating the process
      */
     private OSProcessBuilder createProcessAndPrepareCommand() throws Exception {
-        //TODO pass to debug
-        logger_dev.info("Preparing new java process");
+        logger_dev.debug("Preparing new java process");
         //create process builder
         OSProcessBuilder ospb = createProcess();
         //update fork env with forked system env
@@ -259,8 +284,8 @@ public class ForkedJavaExecutable extends JavaExecutable {
         setWorkingDir(ospb);
         //set system environment
         setSystemEnvironment(ospb);
-        if (logger_dev.isInfoEnabled()) {
-            logger_dev.info("JVM process and command created with command : " + command);
+        if (logger_dev.isDebugEnabled()) {
+            logger_dev.debug("JVM process and command created with command : " + command);
         }
         return ospb;
     }
@@ -319,30 +344,6 @@ public class ForkedJavaExecutable extends JavaExecutable {
                 throw new UserException("Env-script has failed on the current node", res.getException());
             }
         }
-    }
-
-    /**
-     * Activate logs on the forked 'java task launcher'
-     *
-     * @param logSink appender provider
-     */
-    public void activateLogs(AppenderProvider logSink) {
-        this.logSink = logSink;
-        if (execState == ExecutableState.STARTED) {
-            newJavaTaskLauncher.activateLogs(this.logSink);
-            execState = ExecutableState.LISTENNING;
-        } else if (execState != ExecutableState.TERMINATED && execState != ExecutableState.LISTENNING) {
-            execState = ExecutableState.LISTEN_DEMANDED;
-        }
-    }
-
-    /**
-     * Get the logs generated by this forked executable
-     *
-     * @return The taskLogs representing the
-     */
-    public TaskLogs getLogs() {
-        return logs;
     }
 
     /**
@@ -414,6 +415,12 @@ public class ForkedJavaExecutable extends JavaExecutable {
                 logger_dev.debug("", e);
             }
         }
+        // set log size to minmum value as log are handled on forker side
+        if (forkEnvironment == null ||
+            !contains(TaskLauncher.MAX_LOG_SIZE_PROPERTY, forkEnvironment.getJVMArguments())) {
+            command.add("-D" + TaskLauncher.MAX_LOG_SIZE_PROPERTY + "=" + FORKED_LOG_BUFFER_SIZE);
+        }
+
         if (forkEnvironment != null && forkEnvironment.getJVMArguments().size() > 0) {
             for (String s : forkEnvironment.getJVMArguments()) {
                 command.add(s);
@@ -618,25 +625,6 @@ public class ForkedJavaExecutable extends JavaExecutable {
     }
 
     /**
-     * The kill method should result in killing the executable, and cleaning after launching the separate JVM
-     *
-     * @see org.ow2.proactive.scheduler.common.task.executable.Executable#kill()
-     */
-    @Override
-    public void kill() {
-        //this method is called by the scheduler core or by the TimerTask of the walltime.
-        //No need to terminate current taskLauncher for both cases because :
-        //If the schedulerCore call it, the task is killed and the taskLauncher terminated.
-        //If the TimerTask call it, so the taskLauncher is already terminated by throwing an exception.
-        try {
-            logs = (TaskLogs) PAFuture.getFutureValue(newJavaTaskLauncher.getLogs());
-        } catch (Throwable t) {
-        }
-        clean();
-        super.kill();
-    }
-
-    /**
      * Cleaning method kills all nodes on the dedicated JVM, destroys java process, and closes threads responsible for process output
      */
     private void clean() {
@@ -662,6 +650,7 @@ public class ForkedJavaExecutable extends JavaExecutable {
                 process.destroy();
                 process = null;
             }
+            terminateStreamReaders();
         } catch (Exception e) {
             logger_dev.error("", e);
         }
@@ -699,6 +688,47 @@ public class ForkedJavaExecutable extends JavaExecutable {
                     return;
                 }
             }
+        }
+
+    }
+
+    /**
+     * Simple AppenderProvider that provides an appender that redirect all logs
+     * on REAL stdout/stderr, i.e. OUT and ERR defined by the system.
+     * @see TaskLauncher.SYSTEM_OUT
+
+     */
+    public static class StdAppenderProvider implements AppenderProvider {
+
+        /**
+         * Returns an appender that redirect all logs on stdout/stderr depending on the level.
+         * @return  an appender that redirect all logs on stdout/stderr depending on the level.
+         */
+        public Appender getAppender() throws LogForwardingException {
+            return new AppenderSkeleton() {
+
+                @Override
+                public boolean requiresLayout() {
+                    return false;
+                }
+
+                @Override
+                public void close() {
+                    this.closed = true;
+                }
+
+                @Override
+                protected void append(LoggingEvent event) {
+                    if (event.getLevel().equals(Log4JTaskLogs.STDOUT_LEVEL)) {
+                        TaskLauncher.SYSTEM_OUT.println(event.getMessage());
+                    } else if (event.getLevel().equals(Log4JTaskLogs.STDERR_LEVEL)) {
+                        TaskLauncher.SYSTEM_ERR.println(event.getMessage());
+                    } else {
+                        TaskLauncher.SYSTEM_ERR.println("[INCORRECT STREAM] " + event.getMessage());
+                    }
+
+                }
+            };
         }
 
     }

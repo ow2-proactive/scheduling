@@ -18,3 +18,6 @@ log4j.appender.debugFileAppender.File=${java.io.tmpdir}/forkedTaskOutput.log
 log4j.appender.debugFileAppender.MaxFileSize=10MB
 log4j.appender.debugFileAppender.layout=org.apache.log4j.PatternLayout
 log4j.appender.debugFileAppender.layout.ConversionPattern=[%-1p %d{ISO8601}] %m%n
+
+# NULL appender
+log4j.appender.NULL=org.apache.log4j.varia.NullAppender

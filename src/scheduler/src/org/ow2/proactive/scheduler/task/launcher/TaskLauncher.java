@@ -122,6 +122,10 @@ public abstract class TaskLauncher implements InitActive {
     public static final Logger logger_dev_dataspace = ProActiveLogger
             .getLogger(SchedulerDevLoggers.DATASPACE);
 
+    // Standard out/err are stored to be restored after execution
+    public static final PrintStream SYSTEM_OUT = System.out;
+    public static final PrintStream SYSTEM_ERR = System.err;
+
     public static final String EXECUTION_SUCCEED_BINDING_NAME = "success";
     public static final String DS_SCRATCH_BINDING_NAME = "localspace";
     public static final String DS_INPUT_BINDING_NAME = "input";
@@ -192,6 +196,7 @@ public abstract class TaskLauncher implements InitActive {
     // handle streams
     protected transient PrintStream redirectedStdout;
     protected transient PrintStream redirectedStderr;
+
     // default appender for log storage
     protected transient AsyncAppenderWithStorage logAppender;
 
@@ -376,8 +381,8 @@ public abstract class TaskLauncher implements InitActive {
         }
         l.addAppender(this.logAppender);
         // redirect stdout and err
-        this.redirectedStdout = new PrintStream(new LoggingOutputStream(l, Level.INFO), true);
-        this.redirectedStderr = new PrintStream(new LoggingOutputStream(l, Level.ERROR), true);
+        this.redirectedStdout = new PrintStream(new LoggingOutputStream(l, Log4JTaskLogs.STDOUT_LEVEL), true);
+        this.redirectedStderr = new PrintStream(new LoggingOutputStream(l, Log4JTaskLogs.STDERR_LEVEL), true);
         System.setOut(redirectedStdout);
         System.setErr(redirectedStderr);
     }
@@ -522,8 +527,8 @@ public abstract class TaskLauncher implements InitActive {
             //Unhandle loggers
             this.flushStreams();
             this.logAppender.close();
-            System.setOut(System.out);
-            System.setErr(System.err);
+            System.setOut(TaskLauncher.SYSTEM_OUT);
+            System.setErr(TaskLauncher.SYSTEM_ERR);
             logger_dev.debug("Terminated loggers for task " + this.taskId);
         }
     }

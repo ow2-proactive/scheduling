@@ -5,7 +5,7 @@
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2010 INRIA/University of 
+ * Copyright (C) 1997-2010 INRIA/University of
  * 				Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
@@ -24,7 +24,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
- * If needed, contact us to obtain a release under GPL Version 2 
+ * If needed, contact us to obtain a release under GPL Version 2
  * or a different license than the GPL.
  *
  *  Initial developer(s):               The ProActive Team
@@ -34,40 +34,27 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.ow2.proactive.scheduler.examples;
-
-import java.io.Serializable;
-
-import org.ow2.proactive.scheduler.common.task.TaskResult;
-import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
-
+package org.ow2.proactive.scheduler.common.exception;
 
 /**
- * KillJob is a task that will kill the JVM 5 seconds after start.<br />
- * Used only by Test classes.
- *
- * @author The ProActive Team
- *
+ * Exception returned as result of a task which execution time exceeded the
+ * walltime.
  */
-public class KillJob extends JavaExecutable {
+public class WalltimeExceededException extends SchedulerException {
 
-    public int exitcode;
-
-    /**
-     * @see org.ow2.proactive.scheduler.common.task.executable.Executable#execute(org.ow2.proactive.scheduler.common.task.TaskResult[])
-     */
-    @Override
-    public Serializable execute(TaskResult... results) throws Throwable {
-
-        try {
-            System.out.println("I will kill in 5 sec the node on which i was started with exit code = " +
-                exitcode);
-
-            Thread.sleep(5000);
-
-        } catch (Exception e) {
-        }
-        System.exit(exitcode);
-        return null;
+    public WalltimeExceededException(String msg) {
+        super(msg);
     }
+
+    public WalltimeExceededException() {
+    }
+
+    public WalltimeExceededException(String msg, Throwable cause) {
+        super(msg, cause);
+    }
+
+    public WalltimeExceededException(Throwable cause) {
+        super(cause);
+    }
+
 }

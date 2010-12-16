@@ -54,13 +54,13 @@ public class AsyncAppenderWithStorage extends AsyncAppender {
     /**
      * Default buffer size. Infinite by default.
      */
-    public static final int DEFAULT_STORAGE_SIZE = 0;
+    public static final int DEFAULT_STORAGE_SIZE = Integer.MAX_VALUE;
 
     // logEvents buffer
-    private transient LinkedList<LoggingEvent> storage;
+    private final transient LinkedList<LoggingEvent> storage;
 
     // buffer size
-    private int storageSize;
+    private final int storageSize;
 
     // number of fired events ; if nbFiredEvents>bufferSize,
     // buffer is reduced by the head
@@ -102,7 +102,7 @@ public class AsyncAppenderWithStorage extends AsyncAppender {
     public AsyncAppenderWithStorage(String name, int storageSize) {
         super();
         this.name = name;
-        this.storageSize = (storageSize == 0) ? Integer.MAX_VALUE : storageSize;
+        this.storageSize = storageSize;
         this.storage = new LinkedList<LoggingEvent>();
     }
 
@@ -135,13 +135,12 @@ public class AsyncAppenderWithStorage extends AsyncAppender {
      * @param event the log event to be added in the storage.
      */
     private void fillInStorage(LoggingEvent event) {
-        assert (this.storage.size() <= this.storageSize);
-
-        if (this.nbFiredEvents > this.storageSize) {
-            this.storage.removeFirst();
+        if (this.storageSize > 0) {
+            if (this.nbFiredEvents > this.storageSize) {
+                this.storage.removeFirst();
+            }
+            this.storage.addLast(event);
         }
-
-        this.storage.addLast(event);
         this.nbFiredEvents++;
     }
 
