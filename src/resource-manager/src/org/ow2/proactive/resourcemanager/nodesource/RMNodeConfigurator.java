@@ -79,10 +79,11 @@ public class RMNodeConfigurator {
             RMCore.topologyManager.addNode(nodeToAdd);
             rmcore.internalAddNodeToCore(nodeURL);
         } catch (Exception e) {
-            logger.warn("Cannot add node to core because of an error during configuration phase", e);
-            //preemtpive removal compulsory, otherwise the nodes is
-            //"toBeRemoved" forever
-            rmcore.removeNode(nodeURL, true);
+            logger.warn("Cannot properly configure the node " + nodeURL +
+                " because of an error during configuration phase", e);
+            //if a problem occurs during the configuration step,
+            //the node is set to down
+            rmcore.setDownNode(nodeURL);
         }
     }
 

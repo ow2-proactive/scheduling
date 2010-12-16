@@ -532,6 +532,14 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             return;
         }
 
+        //during the configuration process, the node has been detected down by the nodesource.
+        //discarding the registration
+        if (rmnode.isDown()) {
+            logger.debug("internalAddNodeToCore returned immediately because the node " + nodeURL +
+                " is already down");
+            return;
+        }
+
         internalSetFree(rmnode);
     }
 
