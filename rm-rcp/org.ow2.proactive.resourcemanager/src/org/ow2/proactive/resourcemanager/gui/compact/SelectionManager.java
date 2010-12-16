@@ -92,7 +92,9 @@ public class SelectionManager {
             }
 
             if (view.getElement() != null) {
-                NodeInfoView.setNode((Node) view.getElement());
+                if (view.getElement() instanceof Node) {
+                    NodeInfoView.setNode((Node) view.getElement());
+                }
             }
         }
     }
