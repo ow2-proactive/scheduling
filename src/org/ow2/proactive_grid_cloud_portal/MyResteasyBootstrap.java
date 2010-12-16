@@ -47,9 +47,11 @@ import org.jboss.resteasy.spi.ResteasyProviderFactory;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.exception.PermissionException;
+import org.ow2.proactive.scheduler.common.util.CachingSchedulerProxyUserInterface;
 import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 import org.ow2.proactive_grid_cloud_portal.exceptions.NotConnectedExceptionMapper;
 
@@ -84,8 +86,12 @@ public class MyResteasyBootstrap extends ResteasyBootstrap {
             throw new IllegalStateException("configuration file ('WEB-INF/portal.properties') not found", e);
         }
 
+        // configure the loggers
         PropertyConfigurator.configure(event.getServletContext().getRealPath("WEB-INF/log4j.properties"));
 
+        SchedulerStateCaching.init();
+       
+        // start the session cleaner
         schedulerSessionCleaner = new SessionsCleaner(SchedulerSessionMapper.getInstance());
         new Thread(this.schedulerSessionCleaner, "Scheduler Sessions Cleaner Thread").start();
 
@@ -120,7 +126,9 @@ public class MyResteasyBootstrap extends ResteasyBootstrap {
         }
 
         schedulerSessionCleaner.stop();
-
+        
+        SchedulerStateCaching.setKill(true);
+        
         // force the shutdown of the runtime
         ProActiveRuntimeImpl.getProActiveRuntime().cleanJvmFromPA();
 

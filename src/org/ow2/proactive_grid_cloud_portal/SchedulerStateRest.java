@@ -95,6 +95,7 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.util.CachingSchedulerProxyUserInterface;
 import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
+import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 
 
@@ -182,9 +183,24 @@ public class SchedulerStateRest {
     public SchedulerState schedulerState(@HeaderParam("sessionid")
     String sessionId) throws PermissionException, NotConnectedException {
         Scheduler s = checkAccess(sessionId);
-        return PAFuture.getFutureValue(s.getState());
+//        return PAFuture.getFutureValue(s.getState());
+        return SchedulerStateCaching.getLocalState();
     }
 
+    /**
+     * Returns the revision number of the scheduler state
+     * @param sessionId a valid session id.
+     * @return the revision of the scheduler state 
+     */
+    @GET
+    @Path("state/revision")
+    @Produces( { "application/json", "application/xml" })
+    public long schedulerStateRevision(@HeaderParam("sessionid")
+    String sessionId) throws PermissionException, NotConnectedException {
+        Scheduler s = checkAccess(sessionId);
+        return SchedulerStateCaching.getSchedulerRevision();
+    }
+    
     /**
      * returns only the jobs of the current user
      * @param sessionId a valid session id
@@ -987,8 +1003,8 @@ public class SchedulerStateRest {
         }
          */
 
-        CachingSchedulerProxyUserInterface scheduler = PAActiveObject.newActive(
-                CachingSchedulerProxyUserInterface.class, new Object[] {});
+        SchedulerProxyUserInterface scheduler = PAActiveObject.newActive(
+                SchedulerProxyUserInterface.class, new Object[] {});
 
         String url = PortalConfiguration.getProperties().getProperty(PortalConfiguration.scheduler_url);
 
@@ -1021,8 +1037,8 @@ public class SchedulerStateRest {
     LoginForm multipart) throws ActiveObjectCreationException, NodeException, KeyException, LoginException,
             SchedulerException, IOException {
 
-        CachingSchedulerProxyUserInterface scheduler = PAActiveObject.newActive(
-                CachingSchedulerProxyUserInterface.class, new Object[] {});
+        SchedulerProxyUserInterface scheduler = PAActiveObject.newActive(
+                SchedulerProxyUserInterface.class, new Object[] {});
 
         String url = PortalConfiguration.getProperties().getProperty(PortalConfiguration.scheduler_url);
 

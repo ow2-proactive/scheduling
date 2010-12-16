@@ -48,6 +48,8 @@ public class PortalConfiguration {
     public static String scheduler_url = "scheduler.url";
     public static String scheduler_cache_login = "scheduler.cache.login";
     public static String scheduler_cache_password = "scheduler.cache.password";
+    public static String scheduler_cache_credential = "scheduler.cache.credential";
+    public static String scheduler_cache_refreshrate = "scheduler.cache.refreshrate";
     public static String rm_url = "rm.url";
 
     private static Properties properties;
