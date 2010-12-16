@@ -168,7 +168,7 @@ public class SSHInfrastructure2 extends InfrastructureManager {
     private Hashtable<String, InetAddress> registeredNodes = new Hashtable<String, InetAddress>();
 
     /**
-     * To notify the control loop of the pending node timeout
+     * To notify the control loop of the deploying node timeout
      */
     private ConcurrentHashMap<String, Boolean> pnTimeout = new ConcurrentHashMap<String, Boolean>();
 
@@ -302,7 +302,7 @@ public class SSHInfrastructure2 extends InfrastructureManager {
             cmdLine = cmdLine.replaceAll("\"", "\\\\\"");
         }
 
-        //we create a new pending node before ssh command ran
+        //we create a new deploying node before ssh command ran
         final String pnURL = super.addDeployingNode(nodeName, cmdLine, "Deploying node on host " + host,
                 this.nodeTimeOut);
         this.pnTimeout.put(pnURL, new Boolean(false));
@@ -586,7 +586,7 @@ public class SSHInfrastructure2 extends InfrastructureManager {
     }
 
     /**
-     * This method is called by Infrastructure Manager in case of a pending node removal.
+     * This method is called by Infrastructure Manager in case of a deploying node removal.
      * We take advantage of it to specify to the remote process control loop of the removal.
      * This one will then exit.
      */

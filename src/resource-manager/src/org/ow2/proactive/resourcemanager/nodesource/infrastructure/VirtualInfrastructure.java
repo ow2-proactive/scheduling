@@ -67,6 +67,7 @@ import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
 import org.ow2.proactive.resourcemanager.nodesource.utils.NamesConvertor;
+import org.ow2.proactive.resourcemanager.rmnode.RMDeployingNode;
 import org.ow2.proactive.resourcemanager.utils.VIRMNodeStarter;
 import org.ow2.proactive.resourcemanager.utils.VirtualInfrastructureNodeStarter;
 import org.ow2.proactive.resourcemanager.utils.VirtualInfrastructureNodeStarterRegister;
@@ -283,7 +284,7 @@ public class VirtualInfrastructure extends InfrastructureManager {
                 node.setProperty(Prop.IS_ALREADY_REGISTERED.getValue(), "true");
                 logger.debug("A New node was added by " + this.getClass().getSimpleName() + ". " +
                     "Property isAlreadyRegistered is now true.");
-                //this is the first time one deploys this node, it is pending...
+                //this is the first time one deploys this node, it is deploying...
                 //even if the policy didn't request it we deployed it as deamon
                 //now it should be added to the core... it will be cached later
                 if (numberOfRequiredNodes <= 0) {
@@ -490,7 +491,7 @@ public class VirtualInfrastructure extends InfrastructureManager {
             setEnvironmentForStarterRegisterAndStart(toStart);
             initializeNumberOfRegisteredNode(toStartName);
             runningVM.add(toStartName);
-            vmGuestStatusMonitor.newPendingNodes(toStartName, this.hostCapacity);
+            vmGuestStatusMonitor.newDeployingNodes(toStartName, this.hostCapacity);
             count++;
             logger.debug("Required & non used nodes numbers updated: req=" + numberOfRequiredNodes +
                 " non used=" + vmGuestStatusMonitor.getNumberOfNonUsedNode());
@@ -615,8 +616,8 @@ public class VirtualInfrastructure extends InfrastructureManager {
             } else {
                 Node toAdd = NodeFactory.getNode(nodeUrl);
                 String nodeName = toAdd.getNodeInformation().getName();
-                super.addDeployingNode(nodeName, "Launched as daemon",
-                        "Pending node cached by Virtual Infrastructure Manager",
+                super.addDeployingNode(nodeName, "Launched as daemon", RMDeployingNode.class.getSimpleName() +
+                    " cached by Virtual Infrastructure Manager",
                         VirtualInfrastructure.NODE_URL_ACQUISITION_TIMEOUT);
                 this.nodeSource.acquireNode(nodeUrl, this.nodeSource.getAdministrator());
                 return true;
@@ -682,9 +683,9 @@ public class VirtualInfrastructure extends InfrastructureManager {
 
     private class VMDeploymentMonitor implements Serializable, Runnable {
         private volatile boolean run = false;
-        private static final String PENDING_NODE_NAME_FRAGMENT = "_node_";
+        private static final String DEPLOYING_NODE_NAME_FRAGMENT = "_node_";
         private Hashtable<String, VMGuestStatus> status = new Hashtable<String, VMGuestStatus>();
-        private Hashtable<String, String[]> pendingNodes = new Hashtable<String, String[]>();
+        private Hashtable<String, String[]> deployingNodes = new Hashtable<String, String[]>();
 
         private VMDeploymentMonitor() {
         }
@@ -701,7 +702,7 @@ public class VirtualInfrastructure extends InfrastructureManager {
                             if (previous != null) {
                                 if (!previous.equals(current)) {
                                     org.ow2.proactive.virtualizing.core.State vmState = vm.getState();
-                                    VMDeploymentMonitor.this._firePendingNodeUpdate(entry.getKey(),
+                                    VMDeploymentMonitor.this._fireDeployingNodeUpdate(entry.getKey(),
                                             _buildDescription(entry.getKey(), current, vmState));
 
                                 }
@@ -729,7 +730,7 @@ public class VirtualInfrastructure extends InfrastructureManager {
 
         private int getNumberOfNonUsedNode() {
             int result = 0;
-            Collection<String[]> pendings = pendingNodes.values();
+            Collection<String[]> pendings = deployingNodes.values();
             for (String[] tmpURL : pendings) {
                 if (tmpURL != null) {
                     for (int i = 0; i < tmpURL.length; i++) {
@@ -743,17 +744,18 @@ public class VirtualInfrastructure extends InfrastructureManager {
         }
 
         /**
-         * This method must be called when notifying pending node for a given virtual machine for the first time.
+         * This method must be called when notifying deploying node for a given virtual machine for the first time.
          * It creates and store the VMGuestStatus associated to the holding virtual machine. It also creates and store
-         * howMany PendingNodes in a String Array initialized with a length of VirtualMachine.this.hostCapacity.
-         * The length of the array will be used to compute pending nodes that have not been added to the monitoring thread yet.
+         * howMany RMDeployingNode in a String Array initialized with a length of VirtualMachine.this.hostCapacity.
+         * The length of the array will be used to compute deploying nodes that have not been added to the monitoring thread yet.
          * @param vmName The holding virtual machine's name.
-         * @param howMany The number of pending node whose state must be monitored.
+         * @param howMany The number of deploying node whose state must be monitored.
          */
-        private void newPendingNodes(String vmName, int howMany) {
-            synchronized (pendingNodes) {
-                String description = "Cannot determine guest status for this pending node";
-                String[] pendings = pendingNodes.get(vmName);
+        private void newDeployingNodes(String vmName, int howMany) {
+            synchronized (deployingNodes) {
+                String description = "Cannot determine guest status for this " +
+                    RMDeployingNode.class.getSimpleName();
+                String[] pendings = deployingNodes.get(vmName);
                 if (pendings == null) {
                     pendings = new String[VirtualInfrastructure.this.hostCapacity];
                 }
@@ -765,7 +767,8 @@ public class VirtualInfrastructure extends InfrastructureManager {
                     guestStatus = vm.getVMGuestStatus();
                     vmState = vm.getState();
                 } catch (Exception e) {
-                    logger.warn("An exception occured while declaring new Pending Nodes.", e);
+                    logger.warn("An exception occured while declaring new " +
+                        RMDeployingNode.class.getSimpleName(), e);
                 }
                 if (guestStatus != null && vmState != null) {
                     description = _buildDescription(vmName, guestStatus, vmState);
@@ -773,7 +776,7 @@ public class VirtualInfrastructure extends InfrastructureManager {
                 howMany = (howMany <= VirtualInfrastructure.this.hostCapacity ? howMany
                         : VirtualInfrastructure.this.hostCapacity);
                 for (int i = 0; i < howMany; i++) {
-                    String pendingNodeName = vmName + PENDING_NODE_NAME_FRAGMENT + (i + 1);
+                    String pendingNodeName = vmName + DEPLOYING_NODE_NAME_FRAGMENT + (i + 1);
                     String tmpURL = addDeployingNode(pendingNodeName, "daemon command", description,
                             VirtualInfrastructure.NODE_URL_ACQUISITION_TIMEOUT);
                     pendings[i] = tmpURL;
@@ -781,12 +784,12 @@ public class VirtualInfrastructure extends InfrastructureManager {
                 if (guestStatus != null) {
                     status.put(vmName, guestStatus);
                 }
-                pendingNodes.put(vmName, pendings);
+                deployingNodes.put(vmName, pendings);
                 if (this.run == false) {
                     this.run = true;
                     VirtualInfrastructure.this.nodeSource.executeInParallel(this);
                     logger
-                            .debug("Thread watching pending node status update for VirtualInfrastructure started.");
+                            .debug("Thread watching deploying node status update for VirtualInfrastructure started.");
                 }
             }
         }
@@ -801,7 +804,8 @@ public class VirtualInfrastructure extends InfrastructureManager {
         private String _buildDescription(String vmName, VMGuestStatus guestStatus,
                 org.ow2.proactive.virtualizing.core.State vmState) {
             String lf = System.getProperty("line.separator");
-            StringBuilder sb = new StringBuilder("Pending node on virtual machine ");
+            StringBuilder sb = new StringBuilder(RMDeployingNode.class.getSimpleName() +
+                " on virtual machine ");
             sb.append(vmName);
             sb.append(lf);
             sb.append("\tVM's state: ");
@@ -839,9 +843,9 @@ public class VirtualInfrastructure extends InfrastructureManager {
             return sb.toString();
         }
 
-        private void _firePendingNodeUpdate(String vmName, String description) {
-            synchronized (pendingNodes) {
-                String[] pendings = pendingNodes.get(vmName);
+        private void _fireDeployingNodeUpdate(String vmName, String description) {
+            synchronized (deployingNodes) {
+                String[] pendings = deployingNodes.get(vmName);
                 if (pendings != null) {
                     for (String pnURL : pendings) {
                         if (pnURL != null) {
@@ -849,7 +853,7 @@ public class VirtualInfrastructure extends InfrastructureManager {
                         }
                     }
                 } else {
-                    pendingNodes.remove(vmName);
+                    deployingNodes.remove(vmName);
                 }
             }
         }

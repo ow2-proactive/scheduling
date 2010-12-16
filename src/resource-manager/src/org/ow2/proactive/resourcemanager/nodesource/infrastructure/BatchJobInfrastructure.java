@@ -157,9 +157,9 @@ public abstract class BatchJobInfrastructure extends InfrastructureManager {
      */
     private Set<String> expectedNodes = Collections.synchronizedSet(new HashSet<String>());
     /**
-     * the number of pending nodes
+     * the number of deploying nodes
      */
-    private volatile Integer pendingNodes = 0;
+    private volatile Integer deployingNodes = 0;
     /**
      * nodes that spontaneously registered to the IM
      */
@@ -171,8 +171,8 @@ public abstract class BatchJobInfrastructure extends InfrastructureManager {
     @Override
     public void acquireAllNodes() {
         synchronized (currentNodes) {
-            //pendingNodes and currentNodes updated in acquireNode
-            for (; (currentNodes.size() + pendingNodes) < maxNodes;) {
+            //deployingNodes and currentNodes updated in acquireNode
+            for (; (currentNodes.size() + deployingNodes) < maxNodes;) {
                 acquireNode();
             }
         }
@@ -186,33 +186,33 @@ public abstract class BatchJobInfrastructure extends InfrastructureManager {
         final String bjs = getBatchinJobSystemName();
         synchronized (currentNodes) {
             int currentNodesSize = currentNodes.size();
-            if ((currentNodesSize + pendingNodes) >= maxNodes) {
+            if ((currentNodesSize + deployingNodes) >= maxNodes) {
                 logger.warn("Attempting to acquire nodes while maximum reached");
                 return;
             } else {
-                pendingNodes++;
+                deployingNodes++;
             }
             logger.debug("Acquiring a new " + bjs + " node. # of current nodes: " + currentNodesSize +
-                " - # of pending nodes: " + pendingNodes);
+                " - # of deploying nodes: " + deployingNodes);
         }
 
         // new thread: call will block until registration of the node to the RM
         nodeSource.executeInParallel(new Runnable() {
             public void run() {
                 try {
-                    //currentNodes & pendingNodes are updated in startNode
+                    //currentNodes & deployingNodes are updated in startNode
                     startNode();
                     logger.debug("new " + bjs + " Node acquired. # of current nodes: " + currentNodes.size() +
-                        " - # of pending nodes: " + pendingNodes);
+                        " - # of deploying nodes: " + deployingNodes);
                     return;
                 } catch (Exception e) {
                     logger.error("Could not acquire node ", e);
                 }
-                //deployment failed, one "pendingNodes" (volatile) not expected anymore...
-                pendingNodes--;
+                //deployment failed, one "deployingNodes" (volatile) not expected anymore...
+                deployingNodes--;
                 logger
-                        .debug("# of pending nodes arranged given the last checked exception. # of current nodes: " +
-                            currentNodes.size() + " - # of pending nodes: " + pendingNodes);
+                        .debug("# of deploying nodes arranged given the last checked exception. # of current nodes: " +
+                            currentNodes.size() + " - # of deploying nodes: " + deployingNodes);
             }
         });
     }
@@ -372,7 +372,7 @@ public abstract class BatchJobInfrastructure extends InfrastructureManager {
 
             }
         }
-        addNodeAndDecrementPendingNode(nodeName, this.extractSubmitOutput(id));
+        addNodeAndDecrementDeployingNode(nodeName, this.extractSubmitOutput(id));
     }
 
     @Override
@@ -445,7 +445,7 @@ public abstract class BatchJobInfrastructure extends InfrastructureManager {
             synchronized (currentNodes) {
                 currentNodes.remove(nodeName);
                 logger.debug("Node " + nodeName + " removed. # of current nodes: " + currentNodes.size() +
-                    " # of pending nodes: " + pendingNodes);
+                    " # of deploying nodes: " + deployingNodes);
             }
         } else {
             logger.error("Node " + nodeName + " is not known as a Node belonging to this " +
@@ -522,14 +522,14 @@ public abstract class BatchJobInfrastructure extends InfrastructureManager {
 
     /**
      * Adds the given node's name and its associated jobID to the
-     * {@link #currentNodes} hashtable and decrements the number of pending nodes.
+     * {@link #currentNodes} hashtable and decrements the number of deploying nodes.
      * @param nodeName
      * @param id
      */
-    private void addNodeAndDecrementPendingNode(String nodeName, String id) {
+    private void addNodeAndDecrementDeployingNode(String nodeName, String id) {
         synchronized (currentNodes) {
             currentNodes.put(nodeName, id);
-            pendingNodes--;
+            deployingNodes--;
         }
     }
 

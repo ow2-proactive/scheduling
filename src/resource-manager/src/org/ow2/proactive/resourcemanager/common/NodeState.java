@@ -73,7 +73,8 @@ public enum NodeState {
      */
     TO_BE_REMOVED("To be removed"),
     /**
-     * a node for which one the deployment process is pending
+     * a node for which one the deployment process has been triggered but which
+     * is not registered yet.
      */
     DEPLOYING("Deploying"),
     /**

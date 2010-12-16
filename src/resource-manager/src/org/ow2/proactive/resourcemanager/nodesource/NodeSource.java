@@ -130,7 +130,7 @@ public class NodeSource implements InitActive, RunActive {
     private final Client administrator;
 
     //shared field, needs to be volatile
-    //exposed as RMMonitoringImpl to be able to emit PendingNode related node events.
+    //exposed as RMMonitoringImpl to be able to emit RMDeployingNode related node events.
     private volatile RMMonitoringImpl monitoring;
     private final Object monitorinLock = new Object();
 
@@ -493,8 +493,8 @@ public class NodeSource implements InitActive, RunActive {
     }
 
     /**
-     * To emit a pending node event
-     * @param event the pending node event to emit
+     * To emit a deploying node event
+     * @param event the deploying node event to emit
      */
     @ImmediateService
     public void internalEmitDeployingNodeEvent(final RMNodeEvent event) {
@@ -507,11 +507,11 @@ public class NodeSource implements InitActive, RunActive {
     }
 
     /**
-     * Removes the pending node from the nodesource's infrastructure manager.
-     * @param pnUrl the pendingnode's url
+     * Removes the deploying node from the nodesource's infrastructure manager.
+     * @param pnUrl the deploying url
      * @return true in case of succes, false otherwise
      */
-    public boolean removePendingNode(String pnUrl) {
+    public boolean removeDeployingNode(String pnUrl) {
         return this.infrastructureManager.internalRemoveDeployingNode(pnUrl);
     }
 
@@ -620,11 +620,11 @@ public class NodeSource implements InitActive, RunActive {
     }
 
     /**
-     * Retrieves the list of pending nodes handled by the infrastructure manager
-     * @return the list of pending nodes handled by the infrastructure manager
+     * Retrieves the list of deploying nodes handled by the infrastructure manager
+     * @return the list of deploying nodes handled by the infrastructure manager
      */
     @ImmediateService
-    public LinkedList<RMDeployingNode> getPendingNodes() {
+    public LinkedList<RMDeployingNode> getDeployingNodes() {
         LinkedList<RMDeployingNode> result = new LinkedList<RMDeployingNode>();
         result.addAll(this.infrastructureManager.getDeployingNodes());
         return result;
@@ -786,7 +786,7 @@ public class NodeSource implements InitActive, RunActive {
     }
 
     /**
-     * To be able to emit pending node events. Returns
+     * To be able to emit deploying node events. Returns
      * the rm core instance of the rm monitoring impl object
      * @return the rm core instance of the rm monitoring impl object
      */

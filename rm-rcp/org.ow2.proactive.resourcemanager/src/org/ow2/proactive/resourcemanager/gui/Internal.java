@@ -72,7 +72,7 @@ public final class Internal {
     public static final String IMG_EXPANDALL = "expandall.gif";
     public static final String IMG_FREE = "free.gif";
     public static final String IMG_HOST = "host.gif";
-    public static final String IMG_DEPLOYING = "pending.gif";
+    public static final String IMG_DEPLOYING = "deploying.gif";
     public static final String IMG_LOST = "lost.gif";
     public static final String IMG_REMOVENODE = "remove_node.gif";
     public static final String IMG_REMOVESOURCE = "remove_source.gif";

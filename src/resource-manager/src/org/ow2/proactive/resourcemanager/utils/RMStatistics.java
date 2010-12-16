@@ -58,7 +58,7 @@ public final class RMStatistics {
     /** The current available nodes count */
     private int availableNodesCount;
     /** The count of nodes in {@link NodeState#DEPLOYING} state */
-    private int pendingNodesCount;
+    private int deployingNodesCount;
     /** The count of nodes in {@link NodeState#CONFIGURING} state */
     private int configuringNodesCount;
     /** The count of nodes in {@link NodeState#LOST} state */
@@ -74,7 +74,7 @@ public final class RMStatistics {
     /** The maximum free nodes count */
     private int maxFreeNodes;
     /** The maximum free nodes count */
-    private int maxPendingNodes;
+    private int maxDeployingNodes;
     /** The maximum configuring nodes count */
     private int maxConfiguringNodes;
     /** The maximum lost nodes count */
@@ -102,7 +102,7 @@ public final class RMStatistics {
         // Initialize all nodes related counts
         this.availableNodesCount = 0;
         this.configuringNodesCount = 0;
-        this.pendingNodesCount = 0;
+        this.deployingNodesCount = 0;
         this.lostNodesCount = 0;
         this.freeNodesCount = 0;
         this.busyNodesCount = 0;
@@ -138,13 +138,13 @@ public final class RMStatistics {
         this.availableNodesCount = rmStatistics.availableNodesCount;
         this.configuringNodesCount = rmStatistics.configuringNodesCount;
         this.lostNodesCount = rmStatistics.lostNodesCount;
-        this.pendingNodesCount = rmStatistics.pendingNodesCount;
+        this.deployingNodesCount = rmStatistics.deployingNodesCount;
         this.freeNodesCount = rmStatistics.freeNodesCount;
         this.busyNodesCount = rmStatistics.busyNodesCount;
         this.toBeRemovedNodesCount = rmStatistics.toBeRemovedNodesCount;
         this.downNodesCount = rmStatistics.downNodesCount;
         this.maxConfiguringNodes = rmStatistics.maxConfiguringNodes;
-        this.maxPendingNodes = rmStatistics.maxPendingNodes;
+        this.maxDeployingNodes = rmStatistics.maxDeployingNodes;
         this.maxLostNodes = rmStatistics.maxLostNodes;
         this.maxFreeNodes = rmStatistics.maxFreeNodes;
         this.maxBusyNodes = rmStatistics.maxBusyNodes;
@@ -184,7 +184,7 @@ public final class RMStatistics {
                         this.incrementConfiguringNodesCount();
                         break;
                     case DEPLOYING:
-                        this.incrementPendingNodesCount();
+                        this.incrementDeployingNodesCount();
                         break;
                     case LOST:
                         this.incrementLostNodesCount();
@@ -225,7 +225,7 @@ public final class RMStatistics {
                         this.decrementLostNodesCount();
                         break;
                     case DEPLOYING:
-                        this.decrementPendingNodesCount();
+                        this.decrementDeployingNodesCount();
                         break;
                     default:
                         // Unknown NodeState
@@ -256,7 +256,7 @@ public final class RMStatistics {
                             this.decrementLostNodesCount();
                             break;
                         case DEPLOYING:
-                            this.decrementPendingNodesCount();
+                            this.decrementDeployingNodesCount();
                             break;
                         default:
                             // Unknown NodeState
@@ -284,7 +284,7 @@ public final class RMStatistics {
                         this.incrementLostNodesCount();
                         break;
                     case DEPLOYING:
-                        this.incrementPendingNodesCount();
+                        this.incrementDeployingNodesCount();
                         break;
                     default:
                         // Unknown NodeState
@@ -313,10 +313,10 @@ public final class RMStatistics {
         }
     }
 
-    private void incrementPendingNodesCount() {
-        // Increment and update pending nodes max value
-        if (++this.pendingNodesCount > this.maxPendingNodes) {
-            this.maxPendingNodes = this.pendingNodesCount;
+    private void incrementDeployingNodesCount() {
+        // Increment and update deploying nodes max value
+        if (++this.deployingNodesCount > this.maxDeployingNodes) {
+            this.maxDeployingNodes = this.deployingNodesCount;
         }
     }
 
@@ -369,10 +369,10 @@ public final class RMStatistics {
         }
     }
 
-    private void decrementPendingNodesCount() {
-        // Decrement pending nodes count (keep always >= 0)
-        if (this.pendingNodesCount > 0) {
-            this.pendingNodesCount--;
+    private void decrementDeployingNodesCount() {
+        // Decrement deploying nodes count (keep always >= 0)
+        if (this.deployingNodesCount > 0) {
+            this.deployingNodesCount--;
         }
     }
 
@@ -444,7 +444,7 @@ public final class RMStatistics {
      * @return the current number of nodes in {@link NodeState#DEPLOYING} state.
      */
     public int getDeployingNodesCount() {
-        return this.pendingNodesCount;
+        return this.deployingNodesCount;
     }
 
     /**
@@ -496,11 +496,11 @@ public final class RMStatistics {
     }
 
     /**
-     * Returns the maximum number of pending nodes.
-     * @return the maximum number of pending nodes.
+     * Returns the maximum number of deploying nodes.
+     * @return the maximum number of deploying nodes.
      */
     public int getMaxDeployingNodes() {
-        return this.maxPendingNodes;
+        return this.maxDeployingNodes;
     }
 
     /**

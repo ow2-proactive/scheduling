@@ -315,7 +315,7 @@ public final class RMDeployingNode implements RMNode, Serializable {
     }
 
     /**
-     * Sets this pending node's state to lost
+     * Sets this deploying node's state to lost
      */
     public void setLost() {
         this.state = NodeState.LOST;

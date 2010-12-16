@@ -88,8 +88,8 @@ public abstract class InfrastructureManager implements Serializable {
     /** manager's node source */
     protected NodeSource nodeSource;
 
-    /** pending nodes list */
-    private Hashtable<String, RMDeployingNode> pendingNodes = new Hashtable<String, RMDeployingNode>();
+    /** deploying nodes list */
+    private Hashtable<String, RMDeployingNode> deployingNodes = new Hashtable<String, RMDeployingNode>();
     private Hashtable<String, RMDeployingNode> lostNodes = new Hashtable<String, RMDeployingNode>();
 
     /** node list, miror of nodesource.getAliveNodes(), to implement random access */
@@ -98,7 +98,7 @@ public abstract class InfrastructureManager implements Serializable {
     private final ReentrantLock nodeAcquisitionLock = new ReentrantLock();
 
     //shared fields, needs to be volatile not to cache it
-    private volatile boolean usingPendingNodes = false;
+    private volatile boolean usingDeployingNodes = false;
     //used to timeout the nodes
     private transient Timer timeouter = null;
 
@@ -138,34 +138,34 @@ public abstract class InfrastructureManager implements Serializable {
      */
     public ArrayList<RMDeployingNode> getDeployingNodes() {
         ArrayList<RMDeployingNode> result = new ArrayList<RMDeployingNode>();
-        synchronized (pendingNodes) {
-            result.addAll(this.pendingNodes.values());
+        synchronized (deployingNodes) {
+            result.addAll(this.deployingNodes.values());
             result.addAll(this.lostNodes.values());
         }
         return result;
     }
 
     /**
-     * To remove a pending node given its url
-     * @param pnUrl the url of the pending node to remove.
+     * To remove a deploying node given its url
+     * @param pnUrl the url of the deploying node to remove.
      * @return true if successful, false otherwise
      */
     public final boolean internalRemoveDeployingNode(String pnUrl) {
         RMDeployingNode pn = null;
-        synchronized (pendingNodes) {
-            pn = this.pendingNodes.remove(pnUrl);
+        synchronized (deployingNodes) {
+            pn = this.deployingNodes.remove(pnUrl);
             if (pn == null) {
                 pn = this.lostNodes.remove(pnUrl);
             }
         }
-        //if such a pending or lost node exists
+        //if such a deploying or lost node exists
         if (pn != null) {
             String url = pn.getNodeURL();
             RMNodeEvent event = new RMNodeEvent(pn, RMEventType.NODE_REMOVED, pn.getState(), pn.getProvider()
                     .getName());
             emitEvent(event);
             logger.trace("DeployingNode " + url + " removed from IM");
-            //one notifies listeners about the pending node removal
+            //one notifies listeners about the deploying node removal
             this.registerRemovedDeployingNode(pn.getNodeURL());
             return true;
         } else {
@@ -194,24 +194,24 @@ public abstract class InfrastructureManager implements Serializable {
      * the node is not added.
      * Note that this method is in mutual exclusion with {@link #checkNodeIsAcquiredAndDo(String, Runnable, Runnable)}
      * At this point, if a previous call to {@link InfrastructureManager#addDeployingNode(String, String, String, long)} was made (means that
-     * implementor uses pending nodes features), this method ensures that the implementation method (see {@link InfrastructureManager#registerAcquiredNode(Node)}
-     * is only called if no timeout has occurred for the associated pending node.
+     * implementor uses deploying nodes features), this method ensures that the implementation method (see {@link InfrastructureManager#registerAcquiredNode(Node)}
+     * is only called if no timeout has occurred for the associated deploying node.
      * @param node the newly added node
      * @throws RMException
      */
     public final void internalRegisterAcquiredNode(Node node) throws RMException {
-        //if implementation doesn't use pending nodes, we just execute factory method and return
-        if (!usingPendingNodes) {
+        //if implementation doesn't use deploying nodes, we just execute factory method and return
+        if (!usingDeployingNodes) {
             this.registerAcquiredNode(node);
             return;
         }
-        //here we use pending nodes and timeout
+        //here we use deploying nodes and timeout
         RMDeployingNode pn = null;
-        //we build the url of the associated pending node
-        String pendingNodeURL = this.buildDeployingNodeURL(node.getNodeInformation().getName());
+        //we build the url of the associated deploying node
+        String deployingNodeURL = this.buildDeployingNodeURL(node.getNodeInformation().getName());
         synchronized (nodeAcquisitionLock) {
-            pn = this.pendingNodes.remove(pendingNodeURL);
-            //if a pending node with this name exists, one runs the implementation callback
+            pn = this.deployingNodes.remove(deployingNodeURL);
+            //if a deploying node with this name exists, one runs the implementation callback
             if (pn != null) {
                 RMNodeEvent event = new RMNodeEvent(pn, RMEventType.NODE_REMOVED, pn.getState(), pn
                         .getProvider().getName());
@@ -269,10 +269,10 @@ public abstract class InfrastructureManager implements Serializable {
      */
     public final void internalShutDown() {
         //first removing deploying nodes
-        for (String dnUrl : this.pendingNodes.keySet()) {
+        for (String dnUrl : this.deployingNodes.keySet()) {
             this.internalRemoveDeployingNode(dnUrl);
         }
-        this.pendingNodes.clear();
+        this.deployingNodes.clear();
         //afterwards, lost nodes
         for (String lnUrl : this.lostNodes.keySet()) {
             this.internalRemoveDeployingNode(lnUrl);
@@ -314,12 +314,12 @@ public abstract class InfrastructureManager implements Serializable {
     public abstract void removeNode(Node node) throws RMException;
 
     /**
-     * Notifies the user that the pending node was removed (because of a timeout, user interaction...)
+     * Notifies the user that the deploying node was removed (because of a timeout, user interaction...)
      * Default empty implementation is provided because implementors don't
      * necessary use this feature. Anyway, if they decide to do so, they can
      * override this method, for instance, to change a flag that would
      * get a control loop to exit...
-     * @param pnURL the pending node's URL for which one the timeout occurred.
+     * @param pnURL the deploying node's URL for which one the timeout occurred.
      */
     protected void registerRemovedDeployingNode(String pnURL) {
     }
@@ -327,8 +327,8 @@ public abstract class InfrastructureManager implements Serializable {
     /**
      * Notifies the implementation of the infrastructure manager that a new node has been registered.
      * If this method throws an exception, the node registration will be discarded.
-     * This method is always called if implementor doesn't use pending nodes (no call to {@link InfrastructureManager#addDeployingNode(String, String, String, long)}
-     * was made), and is called only for pending nodes for which one no timeout occurred.
+     * This method is always called if implementor doesn't use deploying nodes (no call to {@link InfrastructureManager#addDeployingNode(String, String, String, long)}
+     * was made), and is called only for deploying nodes for which one no timeout occurred.
      * @param node the newly registered node
      * @throws RMException if the implementation does not approve the node acquisition request
      */
@@ -395,10 +395,10 @@ public abstract class InfrastructureManager implements Serializable {
     }
 
     /** Creates a new RMDeployingNode's, stores it in a local ArrayList and notify the
-     * owning NodeSource of the RMPendingNode creation
+     * owning NodeSource of the RMDeployingNode creation
      * @param name The RMDeployingNode's name.
      * @param description The RMDeployingNode's description
-     * @param the timeout after which one the pending node will be declared lost. ( node acquisition after this timeout is discarded )
+     * @param the timeout after which one the deploying node will be declared lost. ( node acquisition after this timeout is discarded )
      * @return The newly created RMDeployingNode's URL.
      */
     protected final String addDeployingNode(String name, String command, String description,
@@ -406,12 +406,12 @@ public abstract class InfrastructureManager implements Serializable {
         checkName(name);
         checkTimeout(timeout);
         //if the user calls this method, we use the require nodes/timeout mecanism
-        usingPendingNodes = true;
+        usingDeployingNodes = true;
         NodeSource nsStub = this.nodeSource.getStub();
         RMDeployingNode result = RMDeployingNodeAccessor.getDefault().newRMDeployingNode(name, nsStub,
                 command, nsStub.getAdministrator(), description);
         final String resultURL = result.getNodeURL();
-        this.pendingNodes.put(result.getNodeURL(), result);
+        this.deployingNodes.put(result.getNodeURL(), result);
         logger.trace("New DeployingNode " + name + " instanciated in IM");
         RMNodeEvent event = new RMNodeEvent(result, RMEventType.NODE_ADDED, null, result.getProvider()
                 .getName());
@@ -432,7 +432,7 @@ public abstract class InfrastructureManager implements Serializable {
      * @return true in case of success, false if the deploying node is not managed by the IM anymore.
      */
     protected final boolean updateDeployingNodeDescription(String toUpdateURL, String newDescription) {
-        RMDeployingNode pn = this.pendingNodes.get(toUpdateURL);
+        RMDeployingNode pn = this.deployingNodes.get(toUpdateURL);
         if (pn != null) {
             NodeState previousState = pn.getState();
             RMDeployingNodeAccessor.getDefault().setDescription(pn, newDescription);
@@ -448,16 +448,16 @@ public abstract class InfrastructureManager implements Serializable {
     }
 
     /**
-     * Declares a pending node lost. Future attempts to modify the deploying node will be ignored.
+     * Declares a deploying node lost. Future attempts to modify the deploying node will be ignored.
      * @param toUpdateURL The RMDeployingNode's URL which is to be declared as lost
-     * @param description the new rmpendingnode's description, can be null.
+     * @param description the new rmdeployingnode's description, can be null.
      * @return true if the method ran successfully, false otherwise.
      */
     protected final boolean declareDeployingNodeLost(String toUpdateURL, String description) {
         RMDeployingNode pn = null;
-        //we need to atomically move the node from the pending collection to the lost one.
-        synchronized (pendingNodes) {
-            pn = this.pendingNodes.remove(toUpdateURL);
+        //we need to atomically move the node from the deploying collection to the lost one.
+        synchronized (deployingNodes) {
+            pn = this.deployingNodes.remove(toUpdateURL);
             if (pn != null) {
                 this.lostNodes.put(toUpdateURL, pn);
             }
@@ -471,10 +471,16 @@ public abstract class InfrastructureManager implements Serializable {
             RMNodeEvent event = new RMNodeEvent(pn, RMEventType.NODE_STATE_CHANGED, previousState, pn
                     .getProvider().getName());
             emitEvent(event);
-            logger.trace("PendingNode " + toUpdateURL + " declared lost in IM");
+            if (logger.isTraceEnabled()) {
+                logger.trace(RMDeployingNode.class.getSimpleName() + " " + toUpdateURL +
+                    " declared lost in IM");
+            }
             return true;
         } else {
-            logger.trace("PendingNode: " + toUpdateURL + " no more managed by IM, cannot declare it as lost");
+            if (logger.isTraceEnabled()) {
+                logger.trace(RMDeployingNode.class.getSimpleName() + " " + toUpdateURL +
+                    " no more managed by IM, cannot declare it as lost");
+            }
             return false;
         }
     }
@@ -555,18 +561,19 @@ public abstract class InfrastructureManager implements Serializable {
 
     private void checkName(String name) {
         if (name.contains(" ")) {
-            throw new IllegalArgumentException("Pending node name cannot contain white spaces");
+            throw new IllegalArgumentException("Deploying node name cannot contain white spaces");
         }
         String pnURL = this.buildDeployingNodeURL(name);
-        if (this.pendingNodes.containsKey(pnURL) || this.lostNodes.contains(pnURL)) {
-            throw new IllegalArgumentException("A Pending node with the same name has already been created");
+        if (this.deployingNodes.containsKey(pnURL) || this.lostNodes.contains(pnURL)) {
+            throw new IllegalArgumentException(RMDeployingNode.class.getSimpleName() +
+                " with the same name has already been created");
         }
     }
 
     /**
-     * Builds the name of the pending node given its name
-     * @param pnName The name of the pending node
-     * @return the URL of the pending node
+     * Builds the name of the deploying node given its name
+     * @param pnName The name of the deploying node
+     * @return the URL of the deploying node
      */
     private String buildDeployingNodeURL(String pnName) {
         return RMDeployingNode.PROTOCOL_ID + "://" + this.nodeSource.getName() + "/" + pnName;
@@ -597,26 +604,26 @@ public abstract class InfrastructureManager implements Serializable {
 
         /**
          * Instantiate a new {@link RMDeployingNode} with the given parameters
-         * @param name The pending node's name
-         * @param ns The node source owning the pending node
+         * @param name The deploying node's name
+         * @param ns The node source owning the deploying node
          * @param command The command that has been used to launch the {@link RMNode}
          * @param provider The node's provider
          * @param description A first description of the node
-         * @return The newly created pending node
+         * @return The newly created deploying node
          */
         protected abstract RMDeployingNode newRMDeployingNode(String name, NodeSource ns, String command,
                 Client provider, String description);
 
         /**
          * To set the Description of the {@link RMDeployingNode}
-         * @param pn the pending node to update
+         * @param pn the deploying node to update
          * @param newDescription the new description
          */
         protected abstract void setDescription(RMDeployingNode pn, String newDescription);
 
         /**
-         * To update the lost field of the pending node
-         * @param pn The pending node to update
+         * To update the lost field of the deploying node
+         * @param pn The deploying node to update
          * @param lost the value of lost
          */
         protected abstract void setLost(RMDeployingNode pn);

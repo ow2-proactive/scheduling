@@ -633,18 +633,18 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     }
 
     /**
-     * Removes a node from the RM. This method also handles pending node removal ( pending node's url
-     * follow the scheme pending:// ). In such a case, the preempt parameter is not used.
+     * Removes a node from the RM. This method also handles deploying node removal ( deploying node's url
+     * follow the scheme deploying:// ). In such a case, the preempt parameter is not used.
      *
      * @param nodeUrl URL of the node to remove.
-     * @param preempt if true remove the node immediately without waiting while it will be freed. ( ignored if pending node )
+     * @param preempt if true remove the node immediately without waiting while it will be freed. ( ignored if deploying node )
      */
     public BooleanWrapper removeNode(String nodeUrl, boolean preempt) {
 
-        //waiting for better integration of pending node
-        //if we get a "pending node url" we change the flow
-        if (isPendingNodeURL(nodeUrl)) {
-            return new BooleanWrapper(removePendingNode(nodeUrl));
+        //waiting for better integration of deploying node
+        //if we get a "deploying node url" we change the flow
+        if (isDeployingNodeURL(nodeUrl)) {
+            return new BooleanWrapper(removeDeployingNode(nodeUrl));
         }
 
         if (this.allNodes.containsKey(nodeUrl)) {
@@ -737,7 +737,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      */
     public void removeAllNodes(String nodeSourceName, boolean preemptive) {
 
-        for (RMDeployingNode pn : nodeSources.get(nodeSourceName).getPendingNodes()) {
+        for (RMDeployingNode pn : nodeSources.get(nodeSourceName).getDeployingNodes()) {
             removeNode(pn.getNodeURL(), preemptive);
         }
         for (Node node : nodeSources.get(nodeSourceName).getAliveNodes()) {
@@ -999,7 +999,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         ArrayList<RMNodeSourceEvent> nodeSourcesList = new ArrayList<RMNodeSourceEvent>();
         for (NodeSource s : this.nodeSources.values()) {
             nodeSourcesList.add(new RMNodeSourceEvent(s));
-            for (RMDeployingNode pn : s.getPendingNodes()) {
+            for (RMDeployingNode pn : s.getDeployingNodes()) {
                 nodesList.add(new RMNodeEvent(pn));
             }
         }
@@ -1316,11 +1316,11 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
     /**
      * Returns true if the given parameter is the representation of
-     * a pending node ( starts with pending://nsName/nodeName )
+     * a deploying node ( starts with deploying://nsName/nodeName )
      * @param url
-     * @return true if the parameter is a pending node's url, false otherwise
+     * @return true if the parameter is a deploying node's url, false otherwise
      */
-    private boolean isPendingNodeURL(String url) {
+    private boolean isDeployingNodeURL(String url) {
         if (url != null && url.startsWith(RMDeployingNode.PROTOCOL_ID + "://")) {
             return true;
         } else {
@@ -1329,26 +1329,25 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     }
 
     /**
-     * To handle the pending node removal
-     * @param url the url of the pending node to remove
+     * To handle the deploying node removal
+     * @param url the url of the deploying node to remove
      * @return true if successful, false otherwise
      */
-    private boolean removePendingNode(String url) {
+    private boolean removeDeployingNode(String url) {
         String nsName = "";
         try {
             URI urlObj = new URI(url);
             nsName = urlObj.getHost();
         } catch (URISyntaxException e) {
-            logger.warn("No such pending node: " + url);
+            logger.warn("No such deploying node: " + url);
             return false;
         }
         NodeSource ns = this.nodeSources.get(nsName);
         if (ns == null) {
-            logger
-                    .warn("No such nodesource: " + nsName + ", cannot remove the pending node with url: " +
-                        url);
+            logger.warn("No such nodesource: " + nsName + ", cannot remove the deploying node with url: " +
+                url);
             return false;
         }
-        return ns.removePendingNode(url);
+        return ns.removeDeployingNode(url);
     }
 }
