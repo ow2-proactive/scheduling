@@ -145,22 +145,25 @@ public class TopologyManager {
             }
         }
 
-        // unknown host => start pinging process
-        NodeSet toPing = new NodeSet();
-        synchronized (topology) {
-            // adding one node from each host
-            for (InetAddress h : nodesOnHost.keySet()) {
-                // always have at least one node on each host
-                toPing.add(nodesOnHost.get(h).iterator().next());
+        // lock the current node while pinging
+        synchronized (node.getNodeInformation().getURL().intern()) {
+            // unknown host => start pinging process
+            NodeSet toPing = new NodeSet();
+            synchronized (topology) {
+                // adding one node from each host
+                for (InetAddress h : nodesOnHost.keySet()) {
+                    // always have at least one node on each host
+                    toPing.add(nodesOnHost.get(h).iterator().next());
+                }
             }
-        }
 
-        HashMap<InetAddress, Long> hostsTopology = pingNode(node, toPing);
-        synchronized (topology) {
-            topology.addHostTopology(node.getVMInformation().getHostName(), host, hostsTopology);
-            List<Node> nodesList = new LinkedList<Node>();
-            nodesList.add(node);
-            nodesOnHost.put(node.getVMInformation().getInetAddress(), nodesList);
+            HashMap<InetAddress, Long> hostsTopology = pingNode(node, toPing);
+            synchronized (topology) {
+                topology.addHostTopology(node.getVMInformation().getHostName(), host, hostsTopology);
+                List<Node> nodesList = new LinkedList<Node>();
+                nodesList.add(node);
+                nodesOnHost.put(node.getVMInformation().getInetAddress(), nodesList);
+            }
         }
     }
 
@@ -173,17 +176,22 @@ public class TopologyManager {
             return;
         }
 
-        synchronized (topology) {
-            InetAddress host = node.getVMInformation().getInetAddress();
-            if (!topology.knownHost(host)) {
-                logger.warn("Topology info does not exist for node " + node.getNodeInformation().getURL());
-            } else {
+        // if the node we're trying to remove is in process of pinging => wait
+        synchronized (node.getNodeInformation().getURL().intern()) {
+            synchronized (topology) {
+                InetAddress host = node.getVMInformation().getInetAddress();
+                if (!topology.knownHost(host)) {
+                    logger
+                            .warn("Topology info does not exist for node " +
+                                node.getNodeInformation().getURL());
+                } else {
 
-                nodesOnHost.get(host).remove(node);
-                if (nodesOnHost.get(host).size() == 0) {
-                    // no more nodes on the host
-                    topology.removeHostTopology(node.getVMInformation().getHostName(), host);
-                    nodesOnHost.remove(host);
+                    nodesOnHost.get(host).remove(node);
+                    if (nodesOnHost.get(host).size() == 0) {
+                        // no more nodes on the host
+                        topology.removeHostTopology(node.getVMInformation().getHostName(), host);
+                        nodesOnHost.remove(host);
+                    }
                 }
             }
         }
