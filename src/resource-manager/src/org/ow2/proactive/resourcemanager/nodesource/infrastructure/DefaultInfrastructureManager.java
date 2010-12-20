@@ -157,7 +157,7 @@ public class DefaultInfrastructureManager extends InfrastructureManager {
      * {@inheritDoc}
      */
     @Override
-    public void registerAcquiredNode(Node node) throws RMException {
+    public void notifyAcquiredNode(Node node) throws RMException {
         nodesCount++;
     }
 

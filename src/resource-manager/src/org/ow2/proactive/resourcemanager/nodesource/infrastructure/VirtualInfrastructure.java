@@ -271,7 +271,7 @@ public class VirtualInfrastructure extends InfrastructureManager {
     }
 
     @Override
-    public void registerAcquiredNode(Node node) throws RMException {
+    public void notifyAcquiredNode(Node node) throws RMException {
         try {
             requiredNodesLock.lock();
             String holdingVM = node.getProperty(Prop.HOLDING_VIRTUAL_MACHINE.getValue());

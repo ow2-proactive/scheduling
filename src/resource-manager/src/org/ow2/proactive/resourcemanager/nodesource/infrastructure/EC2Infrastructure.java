@@ -356,7 +356,7 @@ public class EC2Infrastructure extends InfrastructureManager {
      * {@inheritDoc}
      */
     @Override
-    public void registerAcquiredNode(Node node) throws RMException {
+    public void notifyAcquiredNode(Node node) throws RMException {
         synchronized (this.ec2d) {
             InetAddress nodeAddr = node.getVMInformation().getInetAddress();
             List<Instance> ic = new ArrayList<Instance>();

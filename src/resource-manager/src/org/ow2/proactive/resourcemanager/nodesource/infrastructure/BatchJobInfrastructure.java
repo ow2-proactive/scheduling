@@ -415,7 +415,7 @@ public abstract class BatchJobInfrastructure extends InfrastructureManager {
     }
 
     @Override
-    public void registerAcquiredNode(Node node) throws RMException {
+    public void notifyAcquiredNode(Node node) throws RMException {
         String nodeName = node.getNodeInformation().getName();
         synchronized (expectedNodes) {
             if (expectedNodes.remove(nodeName)) {

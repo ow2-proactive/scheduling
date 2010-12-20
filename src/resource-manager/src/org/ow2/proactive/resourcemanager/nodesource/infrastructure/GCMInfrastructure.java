@@ -293,7 +293,7 @@ public class GCMInfrastructure extends DefaultInfrastructureManager {
      * {@inheritDoc}
      */
     @Override
-    public void registerAcquiredNode(Node node) throws RMException {
+    public void notifyAcquiredNode(Node node) throws RMException {
         nodesCount++;
     }
 

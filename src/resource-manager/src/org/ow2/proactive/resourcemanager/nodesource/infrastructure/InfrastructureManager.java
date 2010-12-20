@@ -173,7 +173,7 @@ public abstract class InfrastructureManager implements Serializable {
             //one notifies listeners about the deploying node removal
             //if the node is not lost
             if (!isLost) {
-                this.registerRemovedDeployingNode(pn.getNodeURL());
+                this.notifyDeployingNodeLost(pn.getNodeURL());
             }
             return true;
         } else {
@@ -202,7 +202,7 @@ public abstract class InfrastructureManager implements Serializable {
      * the node is not added.
      * Note that this method is in mutual exclusion with {@link #checkNodeIsAcquiredAndDo(String, Runnable, Runnable)}
      * At this point, if a previous call to {@link InfrastructureManager#addDeployingNode(String, String, String, long)} was made (means that
-     * implementor uses deploying nodes features), this method ensures that the implementation method (see {@link InfrastructureManager#registerAcquiredNode(Node)}
+     * implementor uses deploying nodes features), this method ensures that the implementation method (see {@link InfrastructureManager#notifyAcquiredNode(Node)}
      * is only called if no timeout has occurred for the associated deploying node.
      * @param node the newly added node
      * @throws RMException
@@ -210,7 +210,7 @@ public abstract class InfrastructureManager implements Serializable {
     public final void internalRegisterAcquiredNode(Node node) throws RMException {
         //if implementation doesn't use deploying nodes, we just execute factory method and return
         if (!usingDeployingNodes) {
-            this.registerAcquiredNode(node);
+            this.notifyAcquiredNode(node);
             return;
         }
         //here we use deploying nodes and timeout
@@ -224,7 +224,7 @@ public abstract class InfrastructureManager implements Serializable {
                 RMNodeEvent event = new RMNodeEvent(pn, RMEventType.NODE_REMOVED, pn.getState(), pn
                         .getProvider().getName());
                 emitEvent(event);
-                this.registerAcquiredNode(node);
+                this.notifyAcquiredNode(node);
                 //if everything went well with the new node, caching it
                 try {
                     this.acquiredNodes.put(node.getNodeInformation().getName(), node);
@@ -320,14 +320,14 @@ public abstract class InfrastructureManager implements Serializable {
     public abstract void removeNode(Node node) throws RMException;
 
     /**
-     * Notifies the user that the deploying node was removed (because of a timeout, user interaction...)
+     * Notifies the user that the deploying node was lost or removed (because of a timeout, user interaction...)
      * Default empty implementation is provided because implementors don't
      * necessary use this feature. Anyway, if they decide to do so, they can
      * override this method, for instance, to change a flag that would
      * get a control loop to exit...
      * @param pnURL the deploying node's URL for which one the timeout occurred.
      */
-    protected void registerRemovedDeployingNode(String pnURL) {
+    protected void notifyDeployingNodeLost(String pnURL) {
     }
 
     /**
@@ -338,7 +338,7 @@ public abstract class InfrastructureManager implements Serializable {
      * @param node the newly registered node
      * @throws RMException if the implementation does not approve the node acquisition request
      */
-    protected abstract void registerAcquiredNode(Node node) throws RMException;
+    protected abstract void notifyAcquiredNode(Node node) throws RMException;
 
     /**
      * Notify this infrastructure it is going to be shut down along with
@@ -551,7 +551,7 @@ public abstract class InfrastructureManager implements Serializable {
 
     private void timeout(String pnURL, long timeout) {
         if (this.declareDeployingNodeLost(pnURL, "Timeout occurred after " + timeout + " ms.")) {
-            this.registerRemovedDeployingNode(pnURL);
+            this.notifyDeployingNodeLost(pnURL);
         }
     }
 

@@ -590,7 +590,7 @@ public class SSHInfrastructure2 extends InfrastructureManager {
      * This one will then exit.
      */
     @Override
-    protected void registerRemovedDeployingNode(String pnURL) {
+    protected void notifyDeployingNodeLost(String pnURL) {
         this.pnTimeout.put(pnURL, new Boolean(true));
     }
 
@@ -598,7 +598,7 @@ public class SSHInfrastructure2 extends InfrastructureManager {
      * Parent IM notifies about a new node registration
      */
     @Override
-    protected void registerAcquiredNode(Node node) throws RMException {
+    protected void notifyAcquiredNode(Node node) throws RMException {
         String nodeName = node.getNodeInformation().getName();
         registeredNodes.put(nodeName, node.getVMInformation().getInetAddress());
         if (logger.isDebugEnabled()) {
