@@ -1197,7 +1197,7 @@ public class RMNodeStarter {
      * Private inner enum which represents supported operating systems
      */
     public enum OperatingSystem {
-        WINDOWS(";", "\\\\"), UNIX(":", "/"), CYGWIN(";", "/");
+        WINDOWS(";", "\\"), UNIX(":", "/"), CYGWIN(";", "/");
         /** the path separator, ie. ";" on windows systems and ":" on unix systems */
         public final String ps;
         /** the file path separator, ie. "/" on unix systems and "\" on windows systems */

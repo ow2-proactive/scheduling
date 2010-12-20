@@ -36,10 +36,16 @@
  */
 package org.ow2.proactive.resourcemanager.nodesource.infrastructure;
 
+import java.rmi.RemoteException;
+
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.ConfigurationContextFactory;
 import org.apache.log4j.Logger;
 import org.ggf.schemas.bes._2006._08.bes_factory.HPCBPServiceStub;
+import org.ggf.schemas.bes._2006._08.bes_factory.InvalidRequestMessageFaultException4;
+import org.ggf.schemas.bes._2006._08.bes_factory.NotAcceptingNewActivitiesFaultException3;
+import org.ggf.schemas.bes._2006._08.bes_factory.NotAuthorizedFaultException1;
+import org.ggf.schemas.bes._2006._08.bes_factory.UnsupportedFeatureFaultException5;
 import org.ggf.schemas.bes._2006._08.bes_factory.HPCBPServiceStub.ActivityDocumentType;
 import org.ggf.schemas.bes._2006._08.bes_factory.HPCBPServiceStub.Application_Type;
 import org.ggf.schemas.bes._2006._08.bes_factory.HPCBPServiceStub.CreateActivity;
@@ -110,11 +116,16 @@ public class WinHPCDeployer {
         return jobDefinition;
     }
 
-    public EndpointReferenceType createActivity(JobDefinition_Type jobDefinitionType) throws Exception {
+    public EndpointReferenceType createActivity(JobDefinition_Type jobDefinitionType) throws RemoteException,
+            NotAcceptingNewActivitiesFaultException3, InvalidRequestMessageFaultException4,
+            UnsupportedFeatureFaultException5, NotAuthorizedFaultException1 {
         return sendCreateActivityMessage(jobDefinitionType);
     }
 
-    private EndpointReferenceType sendCreateActivityMessage(JobDefinition_Type jobDefinitionType) {
+    private EndpointReferenceType sendCreateActivityMessage(JobDefinition_Type jobDefinitionType)
+            throws RemoteException, NotAcceptingNewActivitiesFaultException3,
+            InvalidRequestMessageFaultException4, UnsupportedFeatureFaultException5,
+            NotAuthorizedFaultException1 {
 
         ActivityDocumentType activityDocumentType = new ActivityDocumentType();
         activityDocumentType.setJobDefinition(jobDefinitionType);
@@ -122,14 +133,8 @@ public class WinHPCDeployer {
         createActivityType.setActivityDocument(activityDocumentType);
         CreateActivity activity = new CreateActivity();
         activity.setCreateActivity(createActivityType);
-
-        try {
-            CreateActivityResponse response = proxy.CreateActivity(activity);
-            return response.getCreateActivityResponse().getActivityIdentifier();
-        } catch (Exception ex) {
-            logger.warn(ex.getMessage(), ex);
-            return null;
-        }
+        CreateActivityResponse response = proxy.CreateActivity(activity);
+        return response.getCreateActivityResponse().getActivityIdentifier();
     }
 
     /**

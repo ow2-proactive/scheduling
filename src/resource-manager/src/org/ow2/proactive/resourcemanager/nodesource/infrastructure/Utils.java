@@ -38,6 +38,8 @@ package org.ow2.proactive.resourcemanager.nodesource.infrastructure;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
@@ -152,6 +154,20 @@ public class Utils {
         }
 
         return p;
+    }
+
+    /**
+     * Extract the stacktrace of a throwable object and returns it as a String
+     * @param t The throwable object from which one the stacktrace is going to be extracted
+     * @return the stacktrace of the parameter as a String
+     */
+    public static String getStacktrace(Throwable t) {
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        t.printStackTrace(pw);
+        String result = sw.toString();
+        pw.close();
+        return result;
     }
 
 }

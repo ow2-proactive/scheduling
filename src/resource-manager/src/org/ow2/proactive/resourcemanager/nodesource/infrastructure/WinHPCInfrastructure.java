@@ -37,38 +37,38 @@
 package org.ow2.proactive.resourcemanager.nodesource.infrastructure;
 
 import java.io.File;
+import java.io.IOException;
 import java.security.KeyException;
-import java.util.HashMap;
-import java.util.Random;
+import java.util.Hashtable;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.axiom.om.OMElement;
-import org.apache.log4j.Logger;
 import org.ggf.schemas.bes._2006._08.bes_factory.HPCBPServiceStub.ActivityStateEnumeration;
 import org.ggf.schemas.bes._2006._08.bes_factory.HPCBPServiceStub.EndpointReferenceType;
 import org.ggf.schemas.bes._2006._08.bes_factory.HPCBPServiceStub.GetActivityStatusResponseType;
 import org.ggf.schemas.bes._2006._08.bes_factory.HPCBPServiceStub.ReferenceParametersType;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
+import org.objectweb.proactive.core.util.ProActiveCounter;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
-import org.ow2.proactive.resourcemanager.utils.RMLoggers;
+import org.ow2.proactive.resourcemanager.utils.RMNodeStarter.CommandLineBuilder;
+import org.ow2.proactive.resourcemanager.utils.RMNodeStarter.OperatingSystem;
 import org.ow2.proactive.utils.FileToBytesConverter;
 
 
 public class WinHPCInfrastructure extends DefaultInfrastructureManager {
-
-    /** logger */
-    protected static Logger logger = ProActiveLogger.getLogger(RMLoggers.NODESOURCE);
 
     /**
      * maximum number of nodes this infrastructure can ask simultaneously to the WinHPC scheduler
      */
     @Configurable(description = "Maximum number of nodes to deploy")
     protected int maxNodes = 1;
+    /** The atomic value of max nodes */
+    protected AtomicInteger atomicMaxNodes = null;
 
     /**
      * A url of HPC basic profile web service
@@ -115,30 +115,48 @@ public class WinHPCInfrastructure extends DefaultInfrastructureManager {
     @Configurable(description = "Additional classpath for the java command\nlaunching the node on the remote hosts")
     protected String extraClassPath;
 
-    /**
-     * Credentials used by remote nodes to register to the NS
-     */
+    @Configurable(description = "in ms. After this timeout expired\nthe node is considered to be lost")
+    protected Integer timeout = 60 * 1000;//1 mn
+
+    /** Credentials used by remote nodes to register to the NS */
     private Credentials credentials = null;
-
+    /** The credentials value as a string */
+    private String credBase64 = null;
+    /** the path of the trust store which holds hpc server's certificate */
     private String trustStorePath;
+    /** the list of submitted jobs */
+    private Map<String, EndpointReferenceType[]> submittedJobs = new Hashtable<String, EndpointReferenceType[]>();
+    /** ensures that the deploying node's timeout is not finished */
+    private Map<String, Boolean> dnTimeout = new Hashtable<String, Boolean>();
+    /** to retrieve job's data from deploying node's url */
+    private Map<String, EndpointReferenceType[]> deployingNodeToEndpoint = new Hashtable<String, EndpointReferenceType[]>();
+    /** the deployer instance */
+    private transient WinHPCDeployer deployer;
+    /** the refresh rate of the job's state in ms */
+    private static final int JOB_STATE_REFRESH_RATE = 1000;
 
-    private String command = "";
-
-    private HashMap<String, EndpointReferenceType[]> submittedJobs = new HashMap<String, EndpointReferenceType[]>();
-
-    private WinHPCDeployer deployer;
+    /** threshold of retry in case of error/retry */
+    private static final int ERROR_HANDLE_THRESHOLD = 5;
 
     @Override
     public void acquireAllNodes() {
-        int cur = submittedJobs.size();
-        for (int i = 0; i < (maxNodes - cur); i++) {
-            acquireNode();
+        while (this.atomicMaxNodes.getAndDecrement() >= 1) {
+            acquireNodeImpl();
         }
+        //we decremented one too many
+        this.atomicMaxNodes.getAndIncrement();
+        logger.debug("Maximum number of node acquisition reached");
     }
 
     @Override
     public void acquireNode() {
-
+        if (this.atomicMaxNodes.getAndDecrement() >= 1) {
+            acquireNodeImpl();
+        } else {
+            //one decremented once too many
+            this.atomicMaxNodes.getAndIncrement();
+            logger.debug("Maximum number of node acquisition reached");
+        }
         synchronized (submittedJobs) {
             if (submittedJobs.size() >= maxNodes) {
                 logger.warn("Attempting to acquire nodes while maximum reached: max nodes " + maxNodes +
@@ -147,202 +165,267 @@ public class WinHPCInfrastructure extends DefaultInfrastructureManager {
             }
         }
 
-        // Set up the environment for the SSL verificaton
-        System.setProperty("javax.net.ssl.trustStore", trustStorePath);
-        System.setProperty("javax.net.ssl.keyStorePassword", trustStorePassword);
-        System.setProperty("javax.net.ssl.trustStoreType", "JKS");
-
-        try {
-            deployer = new WinHPCDeployer(PAResourceManagerProperties.RM_HOME.getValueAsString() +
-                "/config/rm/deployment/winhpc/", serviceUrl, userName, password);
-        } catch (Exception ex) {
-            logger.warn(ex.getMessage(), ex);
-        }
-
-        if (deployer != null) {
-            nodeSource.executeInParallel(new Runnable() {
-                public void run() {
-                    try {
-                        startNode();
-                    } catch (Exception e) {
-                        logger.error("Could not acquire node ", e);
-                        return;
-                    }
-                }
-            });
-        }
     }
 
-    public void startNode() {
-
-        try {
-            // Set up the environment for the SSL verificaton
-            System.setProperty("javax.net.ssl.trustStore", trustStorePath);
-            System.setProperty("javax.net.ssl.keyStorePassword", trustStorePassword);
-            System.setProperty("javax.net.ssl.trustStoreType", "JKS");
-
-            deployer = new WinHPCDeployer(PAResourceManagerProperties.RM_HOME.getValueAsString() +
-                "/config/rm/deployment/winhpc/", serviceUrl, userName, password);
-
-            EndpointReferenceType[] eprs = new EndpointReferenceType[1];
-
-            // Generate the HPCBP acitivty from Axis2 generated JSDL objects
-            String nodeName = "WINHPC-" + nodeSource.getName() + "-" + randomString();
-            String fullCommand = command + " -n " + nodeName;
-            fullCommand += " -s " + nodeSource.getName();
-            fullCommand = "cmd /C \" " + fullCommand + " \"";
-
-            synchronized (submittedJobs) {
-                if (submittedJobs.size() >= maxNodes) {
-                    logger.warn("Attempting to acquire nodes while maximum reached: max nodes " + maxNodes +
-                        ", current nodes " + submittedJobs.size());
+    /** async node acquisition implementation */
+    private void acquireNodeImpl() {
+        nodeSource.executeInParallel(new Runnable() {
+            public void run() {
+                try {
+                    startNode();
+                } catch (Exception e) {
+                    //could handle the exception here to increment the number of available nodes
+                    //or get it done in the handleFailedDeployment* methods...
+                    logger.error("Could not acquire node ", e);
                     return;
-                } else {
-                    submittedJobs.put(nodeName, eprs);
                 }
             }
+        });
+    }
 
-            logger.debug("Executing: " + fullCommand);
-            eprs[0] = deployer.createActivity(WinHPCDeployer.createJSDLDocument(fullCommand));
+    /**
+     * Queues a new command which starts a new node.
+     */
+    private void startNode() throws RMException {
+        EndpointReferenceType[] eprs = new EndpointReferenceType[1];
+        //Creates the command line builder
+        CommandLineBuilder clb = this.getCommandLineBuilder();
+        String nodeName = clb.getNodeName();
+        //we add the timeout flag
+        this.dnTimeout.put(nodeName, false);
+        //Generate the HPCBP acitivty from Axis2 generated JSDL objects
+        //escaping the built command if contains quotes
+        String fullCommand = null;
+        try {
+            fullCommand = "cmd /C \" " + clb.buildCommandLine().replace("\"", "\\\"") + " \"";
+        } catch (IOException e) {
+            this.handleFailedDeployment(clb, e);
+        }
 
-            if (eprs[0] == null) {
-                logger.warn("There was a problem creating the activity on the HPCBP web service.");
-                return;
-            }
+        String dNode = super.addDeployingNode(nodeName, fullCommand, "Node deployment on Windows HPC",
+                timeout);
+        this.submittedJobs.put(nodeName, eprs);
+        this.deployingNodeToEndpoint.put(dNode, eprs);
 
-            ReferenceParametersType rps = eprs[0].getReferenceParameters();
-            OMElement[] elements = rps.getExtraElement();
+        logger.debug("Executing: " + fullCommand);
+        try {
+            eprs[0] = this.getDeployer().createActivity(WinHPCDeployer.createJSDLDocument(fullCommand));
+        } catch (Exception e) {
+            this.handleFailedDeployment(dNode, clb, e);
+        }
+
+        ReferenceParametersType rps = eprs[0].getReferenceParameters();
+        OMElement[] elements = rps.getExtraElement();
+        if (logger.isDebugEnabled()) {
             for (int i = 0; i < elements.length; i++) {
-                logger.info(elements[i].toString());
+                logger.debug(elements[i].toString());
+            }
+        }
+
+        // getting job status to detect failed jobs
+        GetActivityStatusResponseType[] status = null;
+        String statusString = null;
+        int threshold = WinHPCInfrastructure.ERROR_HANDLE_THRESHOLD;
+        Throwable thresholdCause = null;
+        Boolean hasTimeouted = false;
+        do {
+            try {
+                Thread.sleep(WinHPCInfrastructure.JOB_STATE_REFRESH_RATE);
+            } catch (InterruptedException e) {
+                threshold--;
+                thresholdCause = e;
+            }
+            try {
+                status = this.getDeployer().getActivityStatuses(eprs);
+            } catch (RMException rmex) {
+                threshold--;
+                thresholdCause = rmex;
+            }
+            String currentStatus = status[0].getActivityStatus().getState().toString();
+            if (logger.isDebugEnabled()) {
+                logger.debug("Node " + nodeName + " deployment status - " + currentStatus);
+            }
+            if (status[0].getActivityStatus().getState() == ActivityStateEnumeration.Failed) {
+                // job failed
+                this.handleFailedDeployment(dNode, clb, "The job's status is failed.");
+            }
+            //if the status changed, we update it
+            if (currentStatus != null && !currentStatus.equals(statusString)) {
+                statusString = currentStatus;
+                super.updateDeployingNodeDescription(dNode, "Node deployment on Windows HPC" +
+                    System.getProperty("line.separator") + "job's status: " + statusString);
             }
 
-            // getting job status to detect failed jobs
-            GetActivityStatusResponseType[] status = null;
-            long timeStamp = System.currentTimeMillis();
-            long timeout = 5000; // 1 sec
-            do {
-                Thread.currentThread().sleep(1000);
-                status = deployer.getActivityStatuses(eprs);
-                logger.debug("Node " + nodeName + " deployment status - " +
-                    status[0].getActivityStatus().getState().toString());
-                if (status[0].getActivityStatus().getState() == ActivityStateEnumeration.Failed) {
-                    // job failed
-                    synchronized (submittedJobs) {
-                        submittedJobs.remove(nodeName);
-                    }
-                    break;
-                }
-                if (timeout > 0) {
-                    timeout -= System.currentTimeMillis() - timeStamp;
-                    timeStamp = System.currentTimeMillis();
-                } else {
-                    // did not detect failed job after 5 sec
-                    // probably it is queued
-                    break;
-                }
-            } while (status[0].getActivityStatus().getState() == ActivityStateEnumeration.Pending);
+            if (super.checkNodeIsAcquiredAndDo(nodeName, null, null)) {
+                //node has been acquired, can exit
+                return;
+            } else {
+                //waiting
+            }
+        } while (((hasTimeouted = this.dnTimeout.get(nodeName)) != null) && !hasTimeouted && threshold > 0);
 
-        } catch (Exception ex) {
-            logger.warn(ex.getMessage(), ex);
+        //we exited the loop because of the threshold
+        if (threshold <= 0) {
+            this.handleFailedDeployment(dNode, clb, thresholdCause);
+        }
+
+        //if we exit because of a timeout
+        if (hasTimeouted != null && hasTimeouted) {
+            //we remove it
+            this.dnTimeout.remove(dNode);
+            //has been terminated during the deploying node removal
+            this.submittedJobs.remove(clb.getNodeName());
+            throw new RMException("Deploying Node " + nodeName + " not expected any more");
         }
     }
 
+    /**
+     * Terminates the job associated with this deploying node.
+     */
+    protected void registerRemovedDeployingNode(String pnURL) {
+        //we notify the control loop to exit
+        this.dnTimeout.put(pnURL, true);
+        //we remove the job
+        EndpointReferenceType[] epr = this.deployingNodeToEndpoint.remove(pnURL);
+        if (epr != null) {
+            try {
+                this.getDeployer().terminateActivity(epr);
+            } catch (RMException e) {
+                logger.error("Cannot terminate the job associated with deploying node " + pnURL, e);
+            }
+        }
+    }
+
+    /**
+     * Changes the status of the deploying node passed as parameter
+     * and cleanup of internal maintained structures.
+     * @param dNode
+     * @param clb
+     * @param cause
+     * @throws RMException
+     */
+    private void handleFailedDeployment(String dNode, CommandLineBuilder clb, String cause)
+            throws RMException {
+        String nodeName = clb.getNodeName();
+        this.submittedJobs.remove(nodeName);
+        this.dnTimeout.remove(nodeName);
+        super.declareDeployingNodeLost(dNode, cause);
+        throw new RMException("The job's status is failed.");
+    }
+
+    /**
+     * Changes the status of the deploying node to lost an updates its description
+     * @param dNode The deploying node's url to update
+     * @param e the exception that caused the deployment to fail
+     * @throws RMException
+     */
+    private void handleFailedDeployment(String dNode, CommandLineBuilder clb, Throwable e) throws RMException {
+        String error = Utils.getStacktrace(e);
+        super.declareDeployingNodeLost(dNode, "The deployment failed because of an error: " +
+            System.getProperty("line.separator") + error);
+        String nodeName = clb.getNodeName();
+        this.submittedJobs.remove(nodeName);
+        this.dnTimeout.remove(nodeName);
+        throw new RMException("The deployment failed because of an error", e);
+    }
+
+    /**
+     * Creates a lost node to notify the user that the deployment
+     * faile because of an error
+     * @param clb
+     * @param e the error that caused the deployment to failed.
+     * @throws RMException
+     */
+    private void handleFailedDeployment(CommandLineBuilder clb, Throwable e) throws RMException {
+        String error = Utils.getStacktrace(e);
+        String command = null;
+        try {
+            command = clb.buildCommandLine();
+        } catch (Exception ex) {
+            command = "Cannot determine the command used to start the node.";
+        }
+        String lostNode = super.addDeployingNode(clb.getNodeName(), command,
+                "Cannot deploy the node because of an error:" + System.getProperty("line.separator") + error,
+                60000);
+        super.declareDeployingNodeLost(lostNode, null);
+        String nodeName = clb.getNodeName();
+        this.submittedJobs.remove(nodeName);
+        this.dnTimeout.remove(nodeName);
+        throw new RMException("The deployment failed because of an error", e);
+    }
+
+    /**
+     * parameters[0] = maxNodes
+     * parameters[1] = serviceUrl
+     * parameters[2] = username
+     * parameters[3] = password
+     * parameters[4] = keystore
+     * parameters[5] = keystore's password
+     * parameters[6] = java path
+     * parameters[7] = rmPath
+     * parameters[8] = credentials
+     * parameters[9] = java options
+     * parameters[10] = extra classpath
+     * parameters[11] = timeout
+     */
     @Override
     public void configure(Object... parameters) {
-
         try {
-            maxNodes = Integer.parseInt(parameters[0].toString());
+            this.maxNodes = Integer.parseInt(parameters[0].toString());
+            this.atomicMaxNodes = new AtomicInteger(this.maxNodes);
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException("Max Nodes value has to be integer");
         }
-        serviceUrl = parameters[1].toString();
-        userName = parameters[2].toString();
-        password = parameters[3].toString();
+        this.serviceUrl = parameters[1].toString();
+        this.userName = parameters[2].toString();
+        this.password = parameters[3].toString();
 
         try {
             String dir = System.getProperty("java.io.tmpdir");
-            if (dir == null) {
-                dir = "/tmp";
-            }
-            File file = new File(dir + "/castore");// + randomString());
+            File file = new File(dir, "castore");// + randomString());
             logger.info("Saving trust store file to " + file.getAbsolutePath());
             FileToBytesConverter.convertByteArrayToFile((byte[]) parameters[4], file);
-            trustStorePath = file.getAbsolutePath();
+            this.trustStorePath = file.getAbsolutePath();
         } catch (Exception e) {
             throw new IllegalArgumentException("Cannot save trust store file", e);
         }
 
-        trustStorePassword = parameters[5].toString();
+        this.trustStorePassword = parameters[5].toString();
 
-        javaPath = parameters[6].toString();
-        rmPath = parameters[7].toString();
+        this.javaPath = parameters[6].toString();
+        this.rmPath = parameters[7].toString();
 
         try {
             this.credentials = Credentials.getCredentialsBase64((byte[]) parameters[8]);
+            this.credBase64 = new String(this.credentials.getBase64());
         } catch (KeyException e) {
             throw new IllegalArgumentException("Could not retrieve base64 credentials", e);
         }
 
-        javaOptions = parameters[9].toString();
-        extraClassPath = parameters[10].toString();
-
-        String classpath = rmPath + "/dist/lib/ProActive.jar;";
-        classpath += rmPath + "/dist/lib/ProActive_ResourceManager.jar;";
-        classpath += rmPath + "/dist/lib/ProActive_Scheduler-worker.jar;";
-        classpath += rmPath + "/dist/lib/ProActive_SRM-common.jar;";
-        classpath += rmPath + "/dist/lib/script-js.jar;";
-        classpath += rmPath + "/dist/lib/jruby-engine.jar;";
-        classpath += rmPath + "/dist/lib/jython-engine.jar;";
-        classpath += rmPath + "/dist/lib/commons-logging-1.0.4.jar";
-
-        if (extraClassPath.length() > 0) {
-            classpath += ";" + extraClassPath;
-        }
-
-        command = this.javaPath + " -cp " + classpath;
-        command += " " + CentralPAPropertyRepository.JAVA_SECURITY_POLICY.getCmdLine();
-        command += rmPath + "/config/security.java.policy-server";
-        command += " -Dproactive.useIPaddress=true ";
-        command += " " + this.javaOptions + " ";
-        command += " org.ow2.proactive.resourcemanager.utils.PAAgentServiceRMStarter ";
-
-        command += " -r " + this.rmUrl;
+        this.javaOptions = parameters[9].toString();
+        this.extraClassPath = parameters[10].toString();
 
         try {
-            command += " -v " + new String(this.credentials.getBase64()) + " ";
-        } catch (KeyException e1) {
-            throw new IllegalArgumentException("Could not get base64 credentials", e1);
+            this.timeout = Integer.parseInt(parameters[11].toString());
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Timeout value must be an number");
         }
 
-    }
-
-    protected String randomString() {
-        Random rand = new Random();
-        String alpha = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-        String nn = "";
-        for (int i = 0; i < 16; i++) {
-            nn += alpha.charAt(rand.nextInt(alpha.length()));
-        }
-        return nn;
+        // Set up the environment for the SSL verificaton
+        System.setProperty("javax.net.ssl.trustStore", trustStorePath);
+        System.setProperty("javax.net.ssl.keyStorePassword", trustStorePassword);
+        System.setProperty("javax.net.ssl.trustStoreType", "JKS");
     }
 
     @Override
     public void shutDown() {
-        try {
-            new File(trustStorePath).delete();
-
-            synchronized (submittedJobs) {
-                for (EndpointReferenceType[] ert : submittedJobs.values()) {
-                    if (deployer != null) {
-                        deployer.terminateActivity(ert);
-                    } else {
-                        logger.error("Win HPC deployer cannot be null");
-                    }
-                }
+        new File(trustStorePath).delete();
+        for (EndpointReferenceType[] ert : submittedJobs.values()) {
+            try {
+                this.getDeployer().terminateActivity(ert);
+            } catch (Exception e) {
+                logger.warn("Cannot remove file " + trustStorePath);
             }
-
-        } catch (Exception e) {
-            logger.warn("Cannot remove file " + trustStorePath);
         }
     }
 
@@ -351,18 +434,77 @@ public class WinHPCInfrastructure extends DefaultInfrastructureManager {
      */
     public void removeNode(Node node) throws RMException {
         // the job will be finished when JVM is killed
-        synchronized (submittedJobs) {
-            logger.debug("Removing node " + node.getNodeInformation().getName());
-            if (submittedJobs.containsKey(node.getNodeInformation().getName())) {
-                submittedJobs.remove(node.getNodeInformation().getName());
-            } else {
-                logger.warn("Unknown node " + node.getNodeInformation().getName());
-            }
+        String nodeName = node.getNodeInformation().getName();
+        logger.debug("Removing node " + nodeName);
+        if (submittedJobs.remove(nodeName) != null) {
+            this.atomicMaxNodes.incrementAndGet();
+            //the job is automatically finished
+        } else {
+            logger.warn("Unknown node " + node.getNodeInformation().getName());
         }
-        super.removeNode(node);
+        final Node n = node;
+        this.nodeSource.executeInParallel(new Runnable() {
+            public void run() {
+                try {
+                    n.getProActiveRuntime().killRT(false);
+                } catch (Exception e) {
+                    logger.trace("An exception occurred during node removal", e);
+                }
+            }
+        });
     }
 
     public String getDescription() {
         return "Windows HPC infrasturcure";
+    }
+
+    /**
+     * Builds the command line builder to be used for the remote node
+     * startup
+     * @return The appropriate command line builder
+     */
+    private CommandLineBuilder getCommandLineBuilder() {
+        CommandLineBuilder result = super.getEmptyCommandLineBuilder();
+        result.setTargetOS(OperatingSystem.WINDOWS);
+        result.setRmHome(this.rmPath);
+        result.setJavaPath(this.javaPath);
+        //not only user provided...
+        StringBuilder sb = new StringBuilder();
+        sb.append(CentralPAPropertyRepository.JAVA_SECURITY_POLICY.getCmdLine());
+        sb.append(this.rmPath);
+        sb.append(OperatingSystem.WINDOWS.fs);
+        sb.append("config");
+        sb.append(OperatingSystem.WINDOWS.fs);
+        sb.append("security.java.policy-client ");
+        sb.append(this.javaOptions);
+        result.setPaProperties(sb.toString());
+        //HACK, if extra classpath is provided, append it
+        if (this.extraClassPath != null && this.extraClassPath.length() > 0) {
+            String[] jars = result.getRequiredJARs();
+            jars[jars.length - 1] = jars[jars.length - 1] + OperatingSystem.WINDOWS.ps + this.extraClassPath;
+        }
+        result.setCredentialsValueAndNullOthers(this.credBase64);
+        result.setRmURL(super.rmUrl);
+        result.setSourceName(this.nodeSource.getName());
+        result.setNodeName("WINHPC-" + result.getSourceName() + "-" + ProActiveCounter.getUniqID());
+        return result;
+    }
+
+    /**
+     * @return the win hpc deployer instance
+     * @throws RMException
+     */
+    private synchronized WinHPCDeployer getDeployer() throws RMException {
+        if (this.deployer == null) {
+            try {
+                this.deployer = new WinHPCDeployer(new File(PAResourceManagerProperties.RM_HOME
+                        .getValueAsString(), "config" + File.separator + "rm" + File.separator +
+                    "deployment" + File.separator + "winhpc" + File.separator).getAbsolutePath(), serviceUrl,
+                    userName, password);
+            } catch (Exception e) {
+                throw new RMException("Cannot instantiate the win hpc deployer", e);
+            }
+        }
+        return this.deployer;
     }
 }
