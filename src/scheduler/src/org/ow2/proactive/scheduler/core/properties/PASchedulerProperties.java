@@ -67,8 +67,11 @@ public enum PASchedulerProperties {
     /** Forked java task default policy path */
     SCHEDULER_DEFAULT_FJT_SECURITY_POLICY("pa.scheduler.forkedtask.security.policy", PropertyType.STRING),
 
-    /** Log4J java task default file path */
+    /** Log4J forked java task default file path */
     SCHEDULER_DEFAULT_FJT_LOG4J("pa.scheduler.forkedtask.log4j", PropertyType.STRING),
+
+    /** ProActiveConfiguration forked java task default file path */
+    SCHEDULER_DEFAULT_FJT_PAConfig("pa.scheduler.forkedtask.paconfig", PropertyType.STRING),
 
     /** Scheduler main loop time out */
     SCHEDULER_TIME_OUT("pa.scheduler.core.timeout", PropertyType.INTEGER),

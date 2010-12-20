@@ -79,13 +79,17 @@ public class InternalForkedJavaTask extends InternalJavaTask {
 
     public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.CORE);
 
-    /** Policy content for the forked VM (declared as static element to be done once) */
+    /** Policy content for the forked VM (declared as static element to be cached) */
     @Transient
     private static StringBuilder policyContent = null;
 
-    /** Log4j content for the forked VM (declared as static element to be done once) */
+    /** Log4j content for the forked VM (declared as static element to be cached) */
     @Transient
     private static StringBuilder log4JContent = null;
+
+    /** PAConfiguration content for the forked VM (declared as static element to be cached) */
+    @Transient
+    private static StringBuilder paConfigContent = null;
 
     /**
      * ProActive empty constructor
@@ -112,6 +116,7 @@ public class InternalForkedJavaTask extends InternalJavaTask {
         TaskLauncherInitializer tli = getDefaultTaskLauncherInitializer(job);
         tli.setPolicyContent(getJavaPolicy());
         tli.setLog4JContent(getLog4J());
+        tli.setPaConfigContent(getPAConfiguration());
         logger_dev.info("Create forked java task launcher");
         TaskLauncher launcher = (TaskLauncher) PAActiveObject.newActive(ForkedJavaTaskLauncher.class
                 .getName(), new Object[] { tli }, node);
@@ -156,6 +161,27 @@ public class InternalForkedJavaTask extends InternalJavaTask {
             }
         }
         return log4JContent.toString();
+    }
+
+    /**
+     * Return the content of the PAConfiguration file or a default one if not found.
+     *
+     * @return the content of the PAConfiguration file or a default one if not found.
+     */
+    private static String getPAConfiguration() {
+        if (paConfigContent == null) {
+            try {
+                paConfigContent = getFileContent(PASchedulerProperties
+                        .getAbsolutePath(PASchedulerProperties.SCHEDULER_DEFAULT_FJT_PAConfig
+                                .getValueAsString()));
+            } catch (Exception e) {
+                logger_dev.error("PAConfiguration file not read, applying default basic content", e);
+                paConfigContent = new StringBuilder("<ProActiveUserProperties>\n" + "<properties>\n"
+                    + "<prop key=\"proactive.rmi.port\" value=\"0\"/>\n" + "</properties>\n"
+                    + "</ProActiveUserProperties>\n");
+            }
+        }
+        return paConfigContent.toString();
     }
 
     /**

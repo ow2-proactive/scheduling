@@ -137,6 +137,7 @@ public class ForkedJavaExecutable extends JavaExecutable {
     private ForkedJavaExecutableInitializer execInitializer;
     private File fpolicy = null;
     private File flog4j = null;
+    private File fpaconfig = null;
 
     private Process process = null;
     private ProActiveRuntime childRuntime = null;
@@ -392,7 +393,7 @@ public class ForkedJavaExecutable extends JavaExecutable {
         //set mandatory security policy
         if (forkEnvironment == null || !contains("java.security.policy", forkEnvironment.getJVMArguments())) {
             try {
-                fpolicy = File.createTempFile("forked_jt", null);
+                fpolicy = File.createTempFile("forked_jts", null);
                 PrintStream out = new PrintStream(fpolicy);
                 out.print(execInitializer.getJavaTaskLauncherInitializer().getPolicyContent());
                 out.close();
@@ -405,13 +406,27 @@ public class ForkedJavaExecutable extends JavaExecutable {
         //set mandatory log4j file
         if (forkEnvironment == null || !contains("log4j.configuration", forkEnvironment.getJVMArguments())) {
             try {
-                flog4j = File.createTempFile("forked_jt", null);
+                flog4j = File.createTempFile("forked_jtl", null);
                 PrintStream out = new PrintStream(flog4j);
                 out.print(execInitializer.getJavaTaskLauncherInitializer().getLog4JContent());
                 out.close();
                 command.add("-Dlog4j.configuration=file:" + flog4j.getAbsolutePath());
             } catch (Exception e) {
                 //log4j not set
+                logger_dev.debug("", e);
+            }
+        }
+        //set default PAConfiguration
+        if (forkEnvironment == null ||
+            !contains("proactive.configuration", forkEnvironment.getJVMArguments())) {
+            try {
+                fpaconfig = File.createTempFile("forked_jtp", null);
+                PrintStream out = new PrintStream(fpaconfig);
+                out.print(execInitializer.getJavaTaskLauncherInitializer().getPaConfigContent());
+                out.close();
+                command.add("-Dproactive.configuration=file:" + fpaconfig.getAbsolutePath());
+            } catch (Exception e) {
+                //PAConfig not set
                 logger_dev.debug("", e);
             }
         }
@@ -636,6 +651,9 @@ public class ForkedJavaExecutable extends JavaExecutable {
             }
             if (flog4j != null) {
                 flog4j.delete();
+            }
+            if (fpaconfig != null) {
+                fpaconfig.delete();
             }
             // if the process did not register then childRuntime will be null and/or process will be null
             if (childRuntime != null) {

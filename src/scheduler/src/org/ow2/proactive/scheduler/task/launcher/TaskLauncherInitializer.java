@@ -70,6 +70,8 @@ public class TaskLauncherInitializer implements Serializable {
     private String policyContent;
     /** log4j content to be prepared before being sent to node */
     private String log4JContent;
+    /** PAConfiguration content to be prepared before being sent to node */
+    private String paConfigContent;
 
     /** replication index: task was replicated in parallel */
     private int replicationIndex = 0;
@@ -206,6 +208,24 @@ public class TaskLauncherInitializer implements Serializable {
      */
     public void setLog4JContent(String log4jContent) {
         log4JContent = log4jContent;
+    }
+
+    /**
+     * Get the paConfiguration content
+     *
+     * @return the paConfiguration content
+     */
+    public String getPaConfigContent() {
+        return paConfigContent;
+    }
+
+    /**
+     * Set the paConfiguration content value to the given paConfigContent value
+     *
+     * @param paConfiguration content the paConfigContent to set
+     */
+    public void setPaConfigContent(String paConfigContent) {
+        this.paConfigContent = paConfigContent;
     }
 
     /**
