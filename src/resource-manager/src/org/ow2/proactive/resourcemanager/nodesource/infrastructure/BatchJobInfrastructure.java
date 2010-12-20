@@ -36,28 +36,25 @@
  */
 package org.ow2.proactive.resourcemanager.nodesource.infrastructure;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.security.KeyException;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.Hashtable;
-import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.ssh.SSHClient;
 import org.objectweb.proactive.core.util.ProActiveCounter;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
-import org.ow2.proactive.resourcemanager.utils.PAAgentServiceRMStarter;
-import org.ow2.proactive.resourcemanager.utils.RMLoggers;
+import org.ow2.proactive.resourcemanager.utils.RMNodeStarter;
 
 
 /**
@@ -74,6 +71,9 @@ import org.ow2.proactive.resourcemanager.utils.RMLoggers;
  * </ul>
  */
 public abstract class BatchJobInfrastructure extends InfrastructureManager {
+
+    /** The frequency in ms for the refresh of the node acquisition */
+    private static final int NODE_ACQUISITION_CHECK_RATE = 1000;
     /**
      * Path to the Java executable on the remote hosts
      */
@@ -139,11 +139,6 @@ public abstract class BatchJobInfrastructure extends InfrastructureManager {
      */
     protected boolean shutdown = false;
     /**
-     * Class' logger
-     */
-    protected static org.apache.log4j.Logger logger = ProActiveLogger.getLogger(RMLoggers.NODESOURCE);
-
-    /**
      * Credentials used by remote nodes to register to the NS
      */
     private Credentials credentials = null;
@@ -153,17 +148,13 @@ public abstract class BatchJobInfrastructure extends InfrastructureManager {
      */
     private Hashtable<String, String> currentNodes = new Hashtable<String, String>();
     /**
-     * expected nodes. safe check...
-     */
-    private Set<String> expectedNodes = Collections.synchronizedSet(new HashSet<String>());
-    /**
-     * the number of deploying nodes
+     * the number of pending nodes
      */
     private volatile Integer deployingNodes = 0;
     /**
-     * nodes that spontaneously registered to the IM
+     * To notify the control loop of the pending node timeout
      */
-    private Set<String> registeredNodes = Collections.synchronizedSet(new HashSet<String>());
+    private ConcurrentHashMap<String, Boolean> pnTimeout = new ConcurrentHashMap<String, Boolean>();
 
     /**
      * Acquires as much nodes as possible, making one distinct reservation per node
@@ -256,8 +247,10 @@ public abstract class BatchJobInfrastructure extends InfrastructureManager {
         cmd += "\\\"";
         cmd += "| " + submitCmd + " " + this.submitJobOpt;
 
-        //add an expected node. every unexpected node will be discarded
-        expectedNodes.add(nodeName);
+        //add an deploying node.
+        final String dnURL = super.addDeployingNode(nodeName, cmd, "Deploying node on " +
+            getBatchinJobSystemName() + " scheduler", this.nodeTimeOut);
+        this.pnTimeout.put(dnURL, new Boolean(false));
 
         // executing the command
         Process p;
@@ -282,99 +275,146 @@ public abstract class BatchJobInfrastructure extends InfrastructureManager {
         }
 
         // check for registration
+        // at this point, the ssh process should have already exited because it
+        // only handle the job submission, not the execution... furthermore
+        // the "id" is defined
+        String lf = System.getProperty("line.separator");
         final long timeout = nodeTimeOut;
         long t1 = System.currentTimeMillis();
         boolean isJobIDValid = false;//Hack. SSHClient fails but qSub succeeds. Tries to wait for this node registration...
         int circuitBreakerThreshold = 5;
-        jobMonitoring: {
-            while (true) {
-                try {
-                    int exitCode = p.exitValue();
-                    if (exitCode != 0 && !isJobIDValid) {
-                        logger
-                                .warn("SSH subprocess at " +
-                                    host.getHostName() +
-                                    " exit code != 0 but IM tries to recover from this error...Current submit command's output: " +
-                                    id + " and associated node's name: " + nodeName);
-                        String extractedID = this.extractSubmitOutput(id);
-                        if (extractedID != null && !extractedID.equals("")) {
-                            isJobIDValid = true;
-                            if (expectedNodes.contains(nodeName)) {
-                                logger
-                                        .warn("jobID " + id +
-                                            " retrieved from SSH subprocess' output. Waiting for this node to register.");
-                            } else {
-                                logger.warn("It seems that node " + nodeName +
-                                    " is already registered. Everything is OK.");
-                            }
-                        } else {
-                            //if nodeName is not in the expectedNodes list, it has already been registered.
-                            if (expectedNodes.remove(nodeName)) {
-                                logger.error("Cannot get jobID from " + submitCmd + " output. Node " +
-                                    nodeName + " is not expected anymore.");
-                                throw new RMException("SSH subprocess at " + host.getHostName() +
-                                    " exited abnormally (" + exitCode + ").");
-                            } else {
-                                logger
-                                        .error("Node " +
-                                            nodeName +
-                                            " seems to be already registered but we don't have any associated valid jobID. We won't be able to submit a valid " +
-                                            deleteCmd + " command to remove the node.");
-                            }
-                        }
+        while (!this.pnTimeout.get(dnURL) && circuitBreakerThreshold > 0) {
+            try {
+                int exitCode = p.exitValue();
+                if (exitCode != 0 && !isJobIDValid) {
+                    logger
+                            .warn("SSH subprocess at " +
+                                host.getHostName() +
+                                " exit code != 0 but IM tries to recover from this error...Current submit command's output: " +
+                                id + " and associated node's name: " + nodeName);
+                    String extractedID = this.extractSubmitOutput(id);
+                    String errput = this.extractProcessErrput(p);
+                    final String description = "SSH command failed to launch node on " +
+                        getBatchinJobSystemName() + " scheduler" + lf + "   >Error code: " + exitCode + lf +
+                        "   >Errput: " + errput + "   >Output: " + id;
+                    // the job id may be valid, trying to wait for the node registration...
+                    if (extractedID != null && !extractedID.equals("")) {
+                        isJobIDValid = true;
                     }
-                } catch (IllegalThreadStateException e) {
-                    // process has not returned yet
+                    //defines how to recover from this state
+                    //throws a RMException if we can't
+                    handleWrongJobTermination(isJobIDValid, nodeName, dnURL, host, id, description, exitCode,
+                            submitCmd, deleteCmd);
                 }
+            } catch (IllegalThreadStateException e) {
+                // process has not returned yet
+            }
 
-                if (registeredNodes.remove(nodeName)) {
-                    break jobMonitoring;
-                }
+            if (super.checkNodeIsAcquiredAndDo(nodeName, null, null)) {
+                //registration is ok
+                addNodeAndDecrementDeployingNode(nodeName, this.extractSubmitOutput(id));
+                return;
+            }
 
-                long t2 = System.currentTimeMillis();
-                if (t2 - t1 > timeout || shutdown) {
-                    //nodeName not expected anymore. if
-                    synchronized (expectedNodes) {
-                        if (expectedNodes.remove(nodeName)) {
-                            p.destroy();
-                            try {
-                                deleteJob(id);
-                            } catch (RMException e) {
-                                logger.warn("node " + nodeName + " timed out and " + deleteCmd +
-                                    " command for jobID " + id +
-                                    " failed. Cannot ensure that the associated " + submitCmd +
-                                    " command is deleted.", e);
-                            }
-                            throw new RMException("Node " + nodeName + " timed out.");
-                        } else {
-                            //the node registered lately?
-                            if (registeredNodes.remove(nodeName)) {
-                                //ok, we reached a valid state
-                                break jobMonitoring;
-                            } else {
-                                throw new RMException("Invalid state, node " + nodeName +
-                                    " seems to be registered but is not found.");
-                            }
-                        }
-                    }
-                }
+            try {
+
                 logger.debug("Waiting for node " + nodeName + " registration... time to timeout: " +
                     (timeout - (System.currentTimeMillis() - t1)));
-                try {
-                    Thread.sleep(4000);
-                } catch (Exception e) {
-                    circuitBreakerThreshold--;
-                    if (circuitBreakerThreshold <= 0) {
-                        logger.error("While monitoring ssh subprocess.", e);
-                        throw new RMException("Exception occurred while monitoring ssh subprocess.", e);
-                    }
-                }
-
+                Thread.sleep(BatchJobInfrastructure.NODE_ACQUISITION_CHECK_RATE);
+            } catch (Exception e) {
+                circuitBreakerThreshold--;
+                logger.error("While monitoring ssh subprocess.", e);
             }
+        }//end of while loop, either deploying node timeout/removed of threshold reached
+
+        // the node is not excpected anymore
+        if (pnTimeout.get(dnURL)) {
+            //we remove it
+            this.pnTimeout.remove(dnURL);
+            //we destroy the process
+            p.destroy();
+            throw new RMException("Deploying Node " + nodeName + " not expected any more");
         }
-        addNodeAndDecrementDeployingNode(nodeName, this.extractSubmitOutput(id));
+
+        if (circuitBreakerThreshold <= 0) {
+            logger.error("Circuit breaker threshold reached while monitoring ssh subprocess.");
+            throw new RMException("Several exceptions occurred while monitoring ssh subprocess.");
+        }
+
+        //if we are here we reached an invalid state
+        throw new RMException(
+            "Invalid state, exit from a control loop with threshold > 0 and expected deploying node");
     }
 
+    /**
+     * Used to determine if we can recover from an exit value != 0 of the submit job command
+     * @param isJobIDValid If the implementation has been able to retrieve a job id from the command output
+     * @param nodeName The node's name
+     * @param dnURL The deploying node's url
+     * @param host The host on which one the scheduler (batch job) is running
+     * @param id The job id
+     * @param description The description of the state ( what is wrong )
+     * @param exitCode The process' exit code
+     * @param submitCmd The command used to submit the job
+     * @param deleteCmd The command used to delete the job
+     * @throws RMException If we cannot recover from this state and the deployed node is not expected anymore
+     */
+    private void handleWrongJobTermination(final boolean isJobIDValid, final String nodeName,
+            final String dnURL, final InetAddress host, final String id, final String description,
+            final int exitCode, final String submitCmd, final String deleteCmd) throws RMException {
+        if (super.checkNodeIsAcquiredAndDo(nodeName, null,
+        //executed if the node has not registered
+                new Runnable() {
+                    public void run() {
+                        //if the job id is not valid and the node hasn't registered yet
+                        //we discard the node acquisition
+                        if (!isJobIDValid) {
+                            BatchJobInfrastructure.this.declareDeployingNodeLost(dnURL, description);
+                        }
+                    }
+                })) {
+            //ok the node is registered...
+            if (isJobIDValid) {
+                //the job id is ok, just log something
+                logger.warn("It seems that node " + nodeName + " is already registered. Everything is OK.");
+            } else {
+                //the node is registered but we haven't got any job id to kill it
+                logger
+                        .error("Node " +
+                            nodeName +
+                            " seems to be already registered but we don't have any associated valid jobID. We won't be able to submit a valid " +
+                            deleteCmd + " command to remove the node.");
+
+            }
+        } else {
+            //ko, the node didn't register
+            if (isJobIDValid) {
+                //if the job id is valid, we still wait for it
+                logger.warn("jobID " + id +
+                    " retrieved from SSH subprocess' output. Waiting for this node to register.");
+            } else {
+                //otherwise, the node acquisition has been discarded, the node has been declared as lost
+                //in checkNodeIsAcquiredAndDo callback
+                logger.error("Cannot get jobID from " + submitCmd + " output. Node " + nodeName +
+                    " is not expected anymore.");
+                throw new RMException("SSH subprocess at " + host.getHostName() + " exited abnormally (" +
+                    exitCode + ").");
+            }
+        }
+    }
+
+    /**
+     * Configures this infrastructure manager
+     * parameters[0] = java path
+     * parameters[1] = ssh options
+     * parameters[2] = scheduling path
+     * parameters[3] = java options
+     * parameters[4] = max node
+     * parameters[5] = node timeout
+     * parameters[6] = scheduler server name
+     * parameters[7] = PA scheduler credentials
+     * parameters[8] = submit job options
+     */
     @Override
     public void configure(Object... parameters) {
         if (parameters != null && parameters.length >= 9) {
@@ -414,20 +454,28 @@ public abstract class BatchJobInfrastructure extends InfrastructureManager {
 
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void notifyAcquiredNode(Node node) throws RMException {
         String nodeName = node.getNodeInformation().getName();
-        synchronized (expectedNodes) {
-            if (expectedNodes.remove(nodeName)) {
-                registeredNodes.add(nodeName);
-                logger.debug("New expected node registered: " + nodeName);
-            } else {
-                logger.debug("Non expected node not registered: " + nodeName);
-                throw new RMException("Node " + nodeName + " not expected. Rejecting it.");
-            }
-        }
+        logger.debug("New expected node registered: " + nodeName);
     }
 
+    /**
+     * This method is called by Infrastructure Manager in case of a pending node removal.
+     * We take advantage of it to specify to the remote process control loop of the removal.
+     * This one will then exit.
+     */
+    @Override
+    protected void notifyDeployingNodeLost(String pnURL) {
+        this.pnTimeout.put(pnURL, true);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void removeNode(Node node) throws RMException {
         String deleteCmd = getDeleteJobCommand();
@@ -533,6 +581,35 @@ public abstract class BatchJobInfrastructure extends InfrastructureManager {
         }
     }
 
+    /**
+     * To extract the SSH process' errput
+     * @param p The ssh process
+     * @return a string which is the process errput
+     */
+    private String extractProcessErrput(Process p) {
+        BufferedReader br = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+        StringBuilder sb = new StringBuilder();
+        String line = null;
+        try {
+            String lf = System.getProperty("line.separator");
+            while (br.ready()) {
+                if ((line = br.readLine()) != null) {
+                    sb.append(line);
+                    sb.append(lf);
+                }
+            }
+        } catch (IOException e) {
+            sb.append("Cannot extract process errput");
+        } finally {
+            try {
+                br.close();
+            } catch (IOException e) {
+                logger.debug("Cannot close process error stream", e);
+            }
+        }
+        return sb.toString();
+    }
+
     /*##########################################
      * SPI Methods
      ##########################################*/
@@ -566,7 +643,7 @@ public abstract class BatchJobInfrastructure extends InfrastructureManager {
     protected abstract String extractSubmitOutput(String output);
 
     /**
-     * Returns the path of the script used to start {@link PAAgentServiceRMStarter} on the
+     * Returns the path of the script used to start {@link RMNodeStarter} on the
      * Batching Job System nodes. Implementation must override this methods if they provide a
      * new script.
      *
