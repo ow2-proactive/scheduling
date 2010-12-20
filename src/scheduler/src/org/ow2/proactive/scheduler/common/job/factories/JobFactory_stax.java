@@ -744,6 +744,7 @@ public class JobFactory_stax extends JobFactory {
                         if (XMLTags.DS_FILES.matches(current)) {
                             int attrLen = cursorTask.getAttributeCount();
                             FileSelector selector = null;
+                            String accessMode = null;
                             for (i = 0; i < attrLen; i++) {
                                 String attrName = cursorTask.getAttributeLocalName(i);
                                 if (XMLAttributes.DS_INCLUDES.matches(attrName)) {
@@ -758,14 +759,16 @@ public class JobFactory_stax extends JobFactory {
                                     }
                                     selector.setExcludes(new String[] { replace(cursorTask
                                             .getAttributeValue(i)) });
-                                } else if (XMLAttributes.DS_ACCESSMODE.matches(attrName) && selector != null) {
-                                    String accessMode = replace(cursorTask.getAttributeValue(i));
+                                } else if (XMLAttributes.DS_ACCESSMODE.matches(attrName)) {
+                                    accessMode = replace(cursorTask.getAttributeValue(i));
+                                }
+                                if (selector != null && accessMode != null) {
                                     if (XMLTags.DS_INPUTFILES.matches(endTag)) {
-                                        task.addInputFiles(selector, InputAccessMode
-                                                .getAccessMode(accessMode));
+                                        task.addInputFiles(selector,
+                                                InputAccessMode.getAccessMode(accessMode));
                                     } else {
-                                        task.addOutputFiles(selector, OutputAccessMode
-                                                .getAccessMode(accessMode));
+                                        task.addOutputFiles(selector,
+                                                OutputAccessMode.getAccessMode(accessMode));
                                     }
                                 }
                             }
