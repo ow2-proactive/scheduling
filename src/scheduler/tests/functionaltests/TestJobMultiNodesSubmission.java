@@ -39,6 +39,12 @@ package functionaltests;
 import java.util.Map.Entry;
 
 import org.junit.Assert;
+import org.ow2.proactive.authentication.crypto.Credentials;
+import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
+import org.ow2.proactive.resourcemanager.common.RMState;
+import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
+import org.ow2.proactive.resourcemanager.frontend.RMConnection;
+import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
@@ -78,7 +84,25 @@ public class TestJobMultiNodesSubmission extends FunctionalTest {
      */
     @org.junit.Test
     public void run() throws Throwable {
-        JobId id = SchedulerTHelper.testJobSubmission(jobDescriptor);
+    	//submit job
+    	JobId id = SchedulerTHelper.submitJob(jobDescriptor);
+    	//connect to RM
+    	RMAuthentication rmAuth = RMConnection.waitAndJoin(null);
+    	ResourceManager rmAdmin = rmAuth.login(Credentials.getCredentials(PAResourceManagerProperties
+    			.getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString())));
+    	
+    	
+    	//wait job is running
+    	SchedulerTHelper.waitForEventJobRunning(id);
+    	
+    	Thread.sleep(500);
+    	
+    	//check RM has 5 busy nodes
+        RMState rms = rmAdmin.getState();
+        Assert.assertEquals(5,rms.getTotalNodesNumber()-rms.getFreeNodesNumber());
+    	
+    	//wait for job to be finished
+        SchedulerTHelper.waitForEventJobFinished(id);
 
         // check result are not null
         JobResult res = SchedulerTHelper.getJobResult(id);
