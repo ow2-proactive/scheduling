@@ -810,8 +810,8 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         NodeSource nodeSource;
         try {
             nodeSource = (NodeSource) PAActiveObject.newActive(NodeSource.class.getName(), new Object[] {
-                    this.getUrl(), nodeSourceName, caller, im, policy, PAActiveObject.getStubOnThis() },
-                    nodeRM);
+                    this.getUrl(), nodeSourceName, caller, im, policy, PAActiveObject.getStubOnThis(),
+                    this.monitoring }, nodeRM);
         } catch (Exception e) {
             throw new RuntimeException("Cannot create node source " + nodeSourceName, e);
         }
@@ -1362,6 +1362,17 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         } catch (URISyntaxException e) {
             logger.warn("No such deploying node: " + url);
             return false;
+        }
+        if (nsName == null) {
+            //cannot compute the nsName using URI, try using Pattern
+            Matcher matcher = Pattern.compile(RMDeployingNode.PROTOCOL_ID + "://([-\\w]+)/.+").matcher(url);
+            if (matcher.find()) {
+                try {
+                    nsName = matcher.group(1);
+                } catch (IndexOutOfBoundsException e) {
+                    logger.debug("Was not able to determine nodesource's name for url " + url);
+                }
+            }
         }
         NodeSource ns = this.nodeSources.get(nsName);
         if (ns == null) {

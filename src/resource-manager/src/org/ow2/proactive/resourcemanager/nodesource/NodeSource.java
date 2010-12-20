@@ -129,11 +129,8 @@ public class NodeSource implements InitActive, RunActive {
     private NodeSource stub;
     private final Client administrator;
 
-    //shared field, needs to be volatile
-    //exposed as RMMonitoringImpl to be able to emit RMDeployingNode related node events.
-    private volatile RMMonitoringImpl monitoring;
-    private final Object monitorinLock = new Object();
-
+    // to be able to emit rmdeployingnode related events
+    private final RMMonitoringImpl monitoring;
     // admin can remove node source, add nodes to the node source, remove any node
     // it is a PrincipalPermission of the user who created this node source
     private final Permission adminPermission;
@@ -160,6 +157,7 @@ public class NodeSource implements InitActive, RunActive {
         administrator = null;
         adminPermission = null;
         providerPermission = null;
+        monitoring = null;
     }
 
     /**
@@ -172,13 +170,14 @@ public class NodeSource implements InitActive, RunActive {
      * @param rmcore resource manager core
      */
     public NodeSource(String registrationURL, String name, Client provider, InfrastructureManager im,
-            NodeSourcePolicy policy, RMCore rmcore) {
+            NodeSourcePolicy policy, RMCore rmcore, RMMonitoringImpl monitor) {
         this.registrationURL = registrationURL;
         this.name = name;
         this.administrator = provider;
         this.infrastructureManager = im;
         this.nodeSourcePolicy = policy;
         this.rmcore = rmcore;
+        this.monitoring = monitor;
         this.description = "Infrastructure:" + im + ", Policy: " + policy;
 
         // node source admin permission
@@ -498,12 +497,7 @@ public class NodeSource implements InitActive, RunActive {
      */
     @ImmediateService
     public void internalEmitDeployingNodeEvent(final RMNodeEvent event) {
-        RMMonitoringImpl monitoringImpl = this.getRMMonitoringImpl();
-        if (monitoringImpl != null) {
-            monitoringImpl.nodeEvent(event);
-        } else {
-            logger.warn("No reference on RMMonitoringImpl, cannot send deploying node event");
-        }
+        this.monitoring.nodeEvent(event);
     }
 
     /**
@@ -783,26 +777,5 @@ public class NodeSource implements InitActive, RunActive {
     @ImmediateService
     public String getRegistrationURL() {
         return this.registrationURL;
-    }
-
-    /**
-     * To be able to emit deploying node events. Returns
-     * the rm core instance of the rm monitoring impl object
-     * @return the rm core instance of the rm monitoring impl object
-     */
-    protected RMMonitoringImpl getRMMonitoringImpl() {
-        if (monitoring == null) {
-            synchronized (monitorinLock) {
-                if (monitoring == null) {
-                    try {
-                        monitoring = (RMMonitoringImpl) PAFuture.getFutureValue(this.getRMCore()
-                                .getMonitoring());
-                    } catch (Exception e) {
-                        logger.trace("Cannot get a valid reference on RMMonitoringImpl object", e);
-                    }
-                }
-            }
-        }
-        return monitoring;
     }
 }

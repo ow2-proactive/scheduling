@@ -41,9 +41,10 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.log4j.Logger;
@@ -89,8 +90,8 @@ public abstract class InfrastructureManager implements Serializable {
     protected NodeSource nodeSource;
 
     /** deploying nodes list */
-    private Hashtable<String, RMDeployingNode> deployingNodes = new Hashtable<String, RMDeployingNode>();
-    private Hashtable<String, RMDeployingNode> lostNodes = new Hashtable<String, RMDeployingNode>();
+    private Map<String, RMDeployingNode> deployingNodes = new ConcurrentHashMap<String, RMDeployingNode>();
+    private Map<String, RMDeployingNode> lostNodes = new ConcurrentHashMap<String, RMDeployingNode>();
 
     /** node list, miror of nodesource.getAliveNodes(), to implement random access */
     private Hashtable<String, Node> acquiredNodes = new Hashtable<String, Node>();
@@ -99,6 +100,8 @@ public abstract class InfrastructureManager implements Serializable {
 
     //shared fields, needs to be volatile not to cache it
     private volatile boolean usingDeployingNodes = false;
+    //shutdown marker
+    private volatile boolean shutdown = false;
     //used to timeout the nodes
     private transient Timer timeouter = null;
 
@@ -152,10 +155,12 @@ public abstract class InfrastructureManager implements Serializable {
      */
     public final boolean internalRemoveDeployingNode(String pnUrl) {
         RMDeployingNode pn = null;
+        boolean isLost = false;
         synchronized (deployingNodes) {
             pn = this.deployingNodes.remove(pnUrl);
             if (pn == null) {
                 pn = this.lostNodes.remove(pnUrl);
+                isLost = true;
             }
         }
         //if such a deploying or lost node exists
@@ -166,7 +171,10 @@ public abstract class InfrastructureManager implements Serializable {
             emitEvent(event);
             logger.trace("DeployingNode " + url + " removed from IM");
             //one notifies listeners about the deploying node removal
-            this.registerRemovedDeployingNode(pn.getNodeURL());
+            //if the node is not lost
+            if (!isLost) {
+                this.registerRemovedDeployingNode(pn.getNodeURL());
+            }
             return true;
         } else {
             logger.trace("DeployingNode: " + pnUrl + " no more managed by IM, cannot remove it");
@@ -268,16 +276,14 @@ public abstract class InfrastructureManager implements Serializable {
      * the method {@link #shutDown()}
      */
     public final void internalShutDown() {
+        this.shutdown = true;
         //first removing deploying nodes
         for (String dnUrl : this.deployingNodes.keySet()) {
             this.internalRemoveDeployingNode(dnUrl);
         }
+        //no need to remove lost nodes, implementation is notified
+        //at the timeout of the deploying node
         this.deployingNodes.clear();
-        //afterwards, lost nodes
-        for (String lnUrl : this.lostNodes.keySet()) {
-            this.internalRemoveDeployingNode(lnUrl);
-        }
-        this.lostNodes.clear();
         //delegating the call to the implementation
         this.shutDown();
     }
@@ -400,11 +406,15 @@ public abstract class InfrastructureManager implements Serializable {
      * @param description The RMDeployingNode's description
      * @param the timeout after which one the deploying node will be declared lost. ( node acquisition after this timeout is discarded )
      * @return The newly created RMDeployingNode's URL.
+     * @throws UnsupportedOperationException if the infrastructure manager is shuting down
      */
     protected final String addDeployingNode(String name, String command, String description,
             final long timeout) {
         checkName(name);
         checkTimeout(timeout);
+        if (shutdown) {
+            throw new UnsupportedOperationException("The infrastructure manager is shuting down.");
+        }
         //if the user calls this method, we use the require nodes/timeout mecanism
         usingDeployingNodes = true;
         NodeSource nsStub = this.nodeSource.getStub();
@@ -564,7 +574,7 @@ public abstract class InfrastructureManager implements Serializable {
             throw new IllegalArgumentException("Deploying node name cannot contain white spaces");
         }
         String pnURL = this.buildDeployingNodeURL(name);
-        if (this.deployingNodes.containsKey(pnURL) || this.lostNodes.contains(pnURL)) {
+        if (this.deployingNodes.containsKey(pnURL) || this.lostNodes.containsKey(pnURL)) {
             throw new IllegalArgumentException(RMDeployingNode.class.getSimpleName() +
                 " with the same name has already been created");
         }
