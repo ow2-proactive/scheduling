@@ -84,24 +84,23 @@ public class TestJobMultiNodesSubmission extends FunctionalTest {
      */
     @org.junit.Test
     public void run() throws Throwable {
-    	//submit job
-    	JobId id = SchedulerTHelper.submitJob(jobDescriptor);
-    	//connect to RM
-    	RMAuthentication rmAuth = RMConnection.waitAndJoin(null);
-    	ResourceManager rmAdmin = rmAuth.login(Credentials.getCredentials(PAResourceManagerProperties
-    			.getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString())));
-    	
-    	
-    	//wait job is running
-    	SchedulerTHelper.waitForEventJobRunning(id);
-    	
-    	Thread.sleep(500);
-    	
-    	//check RM has 5 busy nodes
+        //submit job
+        JobId id = SchedulerTHelper.submitJob(jobDescriptor);
+        //connect to RM
+        RMAuthentication rmAuth = RMConnection.waitAndJoin(null);
+        ResourceManager rmAdmin = rmAuth.login(Credentials.getCredentials(PAResourceManagerProperties
+                .getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString())));
+
+        //wait job is running
+        SchedulerTHelper.waitForEventJobRunning(id);
+
+        Thread.sleep(500);
+
+        //check RM has 5 busy nodes
         RMState rms = rmAdmin.getState();
-        Assert.assertEquals(5,rms.getTotalNodesNumber()-rms.getFreeNodesNumber());
-    	
-    	//wait for job to be finished
+        Assert.assertEquals(5, rms.getTotalNodesNumber() - rms.getFreeNodesNumber());
+
+        //wait for job to be finished
         SchedulerTHelper.waitForEventJobFinished(id);
 
         // check result are not null

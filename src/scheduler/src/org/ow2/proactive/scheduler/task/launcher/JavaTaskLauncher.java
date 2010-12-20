@@ -142,15 +142,17 @@ public class JavaTaskLauncher extends TaskLauncher {
             }
             duration += System.currentTimeMillis() - sample;
 
-            //copy output file
-            copyScratchDataToOutput();
+            if (!hasBeenKilled) {
+                //copy output file
+                copyScratchDataToOutput();
 
-            sample = System.currentTimeMillis();
-            //launch post script
-            if (post != null) {
-                this.executePostScript(exception == null);
+                sample = System.currentTimeMillis();
+                //launch post script
+                if (post != null) {
+                    this.executePostScript(exception == null);
+                }
+                duration += System.currentTimeMillis() - sample;
             }
-            duration += System.currentTimeMillis() - sample;
         } catch (Throwable ex) {
             logger_dev.debug("Exception occured while running task " + this.taskId + ": ", ex);
             exception = ex;
@@ -182,7 +184,7 @@ public class JavaTaskLauncher extends TaskLauncher {
             // finalize doTask
             terminateDataSpace();
             if (core != null) {
-                // This call should be conditioned by the isKilled ... ?
+                // This call is conditioned by the isKilled ...
                 this.finalizeTask(core);
             } else {
                 // if core == null then don't finalize the task. An example when we don't want to finalize task is when using

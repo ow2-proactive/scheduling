@@ -764,11 +764,11 @@ public class JobFactory_stax extends JobFactory {
                                 }
                                 if (selector != null && accessMode != null) {
                                     if (XMLTags.DS_INPUTFILES.matches(endTag)) {
-                                        task.addInputFiles(selector,
-                                                InputAccessMode.getAccessMode(accessMode));
+                                        task.addInputFiles(selector, InputAccessMode
+                                                .getAccessMode(accessMode));
                                     } else {
-                                        task.addOutputFiles(selector,
-                                                OutputAccessMode.getAccessMode(accessMode));
+                                        task.addOutputFiles(selector, OutputAccessMode
+                                                .getAccessMode(accessMode));
                                     }
                                 }
                             }
