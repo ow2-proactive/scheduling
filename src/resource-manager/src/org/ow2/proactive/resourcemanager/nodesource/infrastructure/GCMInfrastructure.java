@@ -45,13 +45,14 @@ import java.util.Map.Entry;
 
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
+import org.objectweb.proactive.core.xml.VariableContractImpl;
 import org.objectweb.proactive.extensions.gcmdeployment.PAGCMDeployment;
 import org.objectweb.proactive.gcmdeployment.GCMApplication;
 import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
 import org.ow2.proactive.resourcemanager.common.RMConstants;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.exception.RMException;
+import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
 import org.ow2.proactive.resourcemanager.nodesource.utils.NamesConvertor;
 import org.ow2.proactive.utils.FileToBytesConverter;
@@ -89,8 +90,9 @@ public class GCMInfrastructure extends DefaultInfrastructureManager {
     /**
      * Initializes required properties from resource manager configuration file.
      * Loads GCM application descriptor.
+     * @throws RMException
      */
-    protected void initialize() {
+    protected void initialize() throws RMException {
         if (gcmApplicationFile == null) {
             GCMD_PROPERTY_NAME = PAResourceManagerProperties.RM_GCMD_PATH_PROPERTY_NAME.getValueAsString();
             gcmApplicationFile = PAResourceManagerProperties.RM_GCM_TEMPLATE_APPLICATION_FILE
@@ -109,10 +111,13 @@ public class GCMInfrastructure extends DefaultInfrastructureManager {
                         .info("*********  ERROR ********** Cannot find default GCMApplication template file for deployment :" +
                             gcmApplicationFile +
                             ", Resource Manager will be unable to deploy nodes by GCM Deployment descriptor");
+                throw new RMException("The supplied GCMA descriptor " + gcmApplicationFile + " doesn't exist");
             } else if (GCMD_PROPERTY_NAME == null || "".equals(GCMD_PROPERTY_NAME)) {
                 logger.info("*********  ERROR ********** Java Property used by " + gcmApplicationFile +
                     ", to specify GCMD deployment file is not defined," +
                     " Resource Manager will be unable to deploy nodes by GCM Deployment descriptor.");
+                throw new RMException(PAResourceManagerProperties.RM_GCMD_PATH_PROPERTY_NAME.getKey() +
+                    " property not specified but required.");
             }
         }
     }
@@ -167,7 +172,7 @@ public class GCMInfrastructure extends DefaultInfrastructureManager {
             try {
                 logger.debug("Deploying nodes");
                 if (deploymentData.data != null) {
-                    deployGCMD(convertGCMdeploymentDataToGCMappl(deploymentData.data, null));
+                    deployGCMD(convertGCMdeploymentDataToGCMappl(deploymentData.data, null, null));
                 } else {
                     logger.warn("Empty gcmd descriptor");
                 }
@@ -224,8 +229,8 @@ public class GCMInfrastructure extends DefaultInfrastructureManager {
      * @return GCMApplication object ready to be deployed
      * @throws RMException
      */
-    protected GCMApplication convertGCMdeploymentDataToGCMappl(byte[] gcmDeploymentData, String host)
-            throws RMException {
+    protected GCMApplication convertGCMdeploymentDataToGCMappl(byte[] gcmDeploymentData, String host,
+            VariableContractImpl vContract) throws RMException {
 
         initialize();
 
@@ -240,10 +245,10 @@ public class GCMInfrastructure extends DefaultInfrastructureManager {
                 System.setProperty("HOST", host);
 
                 synchronized ("HOST".intern()) {
-                    appl = PAGCMDeployment.loadApplicationDescriptor(new File(gcmApplicationFile));
+                    appl = PAGCMDeployment.loadApplicationDescriptor(new File(gcmApplicationFile), vContract);
                 }
             } else {
-                appl = PAGCMDeployment.loadApplicationDescriptor(new File(gcmApplicationFile));
+                appl = PAGCMDeployment.loadApplicationDescriptor(new File(gcmApplicationFile), vContract);
             }
 
             //delete gcmd temp file

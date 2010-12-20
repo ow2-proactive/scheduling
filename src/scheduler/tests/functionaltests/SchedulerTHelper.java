@@ -192,6 +192,15 @@ public class SchedulerTHelper {
     }
 
     /**
+     * Same as startSchedulerWithEmptyResourceManager but allows to specify a rm property file path
+     * @param rmPropertyFilePath the file holding rm properties.
+     * @throws Exception if an error occurs.
+     */
+    public static void startSchedulerWithEmptyResourceManager(String rmPropertyFilePath) throws Exception {
+        startScheduler(null, null, rmPropertyFilePath);
+    }
+
+    /**
      * Starts Scheduler with a specific GCM deployment descriptor and scheduler properties file,
      * @param GCMDPath path to a GCMD deployment file
      * @param configuration the Scheduler configuration file to use (default is functionalTSchedulerProperties.ini)
@@ -199,8 +208,22 @@ public class SchedulerTHelper {
      * @throws Exception
      */
     public static void startScheduler(String GCMDPath, String schedPropertiesFilePath) throws Exception {
+        startScheduler(GCMDPath, schedPropertiesFilePath, null);
+    }
+
+    /**
+     * Same as startScheduler but allows to specify a file holding rm properties
+     * @param GCMDPath
+     * @param schedPropertiesFilePath
+     * @throws Exception
+     */
+    public static void startScheduler(String GCMDPath, String schedPropertiesFilePath,
+            String rmPropertiesFilePath) throws Exception {
         if (schedPropertiesFilePath == null) {
             schedPropertiesFilePath = functionalTestSchedulerProperties;
+        }
+        if (rmPropertiesFilePath == null) {
+            rmPropertiesFilePath = functionalTestRMProperties;
         }
         cleanTMP();
         deploySchedulerGCMA();
@@ -208,7 +231,7 @@ public class SchedulerTHelper {
         Node node = vn.getANode();
         MyAO myAO = (MyAO) PAActiveObject.newActive(MyAO.class.getName(), null, node);
         schedulerAuth = myAO.createAndJoinForkedScheduler(GCMDPath, schedPropertiesFilePath,
-                functionalTestRMProperties);
+                rmPropertiesFilePath);
     }
 
     /* convenience method to clean TMP from dataspace when executing test */

@@ -39,6 +39,7 @@ package functionaltests.nodesource;
 import java.net.InetAddress;
 
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
+import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.GCMCustomisedInfrastructure;
 import org.ow2.proactive.resourcemanager.nodesource.policy.TimeSlotPolicy;
 
@@ -60,19 +61,26 @@ import functionaltests.RMTHelper;
 public class TestGCMCustomizedInfrastructureTimeSlotPolicy extends TestGCMInfrastructureTimeSlotPolicy {
 
     protected byte[] hostsListData;
+    /** timeout for node acquisition */
+    private static final int TIMEOUT = 60 * 1000;
 
     @Override
     protected void init() throws Exception {
         super.init();
+        // overriding gcma file
+        RMTHelper.getResourceManager(RMTHelper.class.getResource(
+                "/functionaltests/config/functionalTRMProperties4Customised.ini").getPath());
         hostsListData = InetAddress.getLocalHost().getHostName().getBytes();
     }
 
     @Override
     protected void createEmptyNodeSource(String sourceName) throws Exception {
-        RMTHelper.getResourceManager().createNodeSource(sourceName,
+        RMTHelper.getResourceManager().createNodeSource(
+                sourceName,
                 // first parameter of im is rm url, empty means default
-                GCMCustomisedInfrastructure.class.getName(), new Object[] { "", emptyGCMD, hostsListData },
-                TimeSlotPolicy.class.getName(), getPolicyParams());
+                GCMCustomisedInfrastructure.class.getName(),
+                new Object[] { "", emptyGCMD, hostsListData, TIMEOUT }, TimeSlotPolicy.class.getName(),
+                getPolicyParams());
 
         RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, sourceName);
     }
@@ -83,9 +91,20 @@ public class TestGCMCustomizedInfrastructureTimeSlotPolicy extends TestGCMInfras
         RMTHelper.getResourceManager().createNodeSource(sourceName,
                 GCMCustomisedInfrastructure.class.getName(),
                 // first parameter of im is rm url, empty means default
-                new Object[] { "", GCMDeploymentData, hostsListData }, TimeSlotPolicy.class.getName(),
-                getPolicyParams());
+                new Object[] { "", GCMDeploymentData, hostsListData, TIMEOUT },
+                TimeSlotPolicy.class.getName(), getPolicyParams());
 
         RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, sourceName);
+
+        for (int i = 0; i < descriptorNodeNumber; i++) {
+            //deploying node added
+            RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
+            //deploying node removed
+            RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
+            //node added
+            RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
+            //we eat the configuring to free event
+            RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        }
     }
 }

@@ -36,11 +36,16 @@
  */
 package functionaltests.nodesource;
 
+import java.io.File;
+
+import org.ow2.proactive.resourcemanager.RMFactory;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.GCMCustomisedInfrastructure;
 import org.ow2.proactive.scheduler.resourcemanager.nodesource.policy.ReleaseResourcesWhenSchedulerIdle;
+import org.ow2.proactive.utils.FileToBytesConverter;
 
 import functionaltests.RMTHelper;
+import functionaltests.SchedulerTHelper;
 
 
 /**
@@ -56,6 +61,9 @@ import functionaltests.RMTHelper;
 public class TestGCMCustomizedInfrastructureReleaseWhenIdlePolicy extends
         TestGCMInfrastructureReleaseWhenIdlePolicy {
 
+    /** timeout for node acquisition */
+    protected static final int TIMEOUT = 60 * 1000;
+
     @Override
     protected String getDescriptor() {
         return TestGCMInfrastructureReleaseWhenIdlePolicy.class.getResource(
@@ -69,10 +77,21 @@ public class TestGCMCustomizedInfrastructureReleaseWhenIdlePolicy extends
         // creating node source
         // first parameter of im is empty rm url
         RMTHelper.getResourceManager().createNodeSource(sourceName,
-                GCMCustomisedInfrastructure.class.getName(), new Object[] { "", GCMDeploymentData, hosts },
+                GCMCustomisedInfrastructure.class.getName(),
+                new Object[] { "", GCMDeploymentData, hosts, TIMEOUT },
                 ReleaseResourcesWhenSchedulerIdle.class.getName(), getPolicyParams());
 
         RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, sourceName);
 
+    }
+
+    @Override
+    protected void init() throws Exception {
+        RMFactory.setOsJavaProperty();
+        GCMDeploymentData = FileToBytesConverter.convertFileToByteArray((new File(getDescriptor())));
+        //we override the gcm application file
+        SchedulerTHelper.startSchedulerWithEmptyResourceManager(SchedulerTHelper.class.getResource(
+                "config/functionalTRMProperties4Customised.ini").getPath());
+        RMTHelper.connectToExistingRM();
     }
 }

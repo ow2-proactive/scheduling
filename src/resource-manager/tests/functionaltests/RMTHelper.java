@@ -238,17 +238,6 @@ public class RMTHelper {
     }
 
     /**
-     * Start the scheduler using a forked JVM.
-     * It uses Scheduler Properties file designed for tests
-     * (database is recovered without jobs).
-     *
-     * @throws Exception
-     */
-    public static void startRM() throws Exception {
-        startRM(functionalTestRMProperties);
-    }
-
-    /**
      * Start the RM using a forked JVM and
      * deploys, with its associated Resource manager, 5 local ProActive nodes.
      *
@@ -257,6 +246,9 @@ public class RMTHelper {
      * @throws Exception if an error occurs.
      */
     public static void startRM(String configurationFile) throws Exception {
+        if (configurationFile == null) {
+            configurationFile = functionalTestRMProperties;
+        }
         PAResourceManagerProperties.updateProperties(configurationFile);
         deployRMGCMA();
         GCMVirtualNode vn = gcmad.getVirtualNode("VN");
@@ -274,8 +266,18 @@ public class RMTHelper {
      * @throws Exception
      */
     public static RMAuthentication getRMAuth() throws Exception {
+        return getRMAuth(null);
+    }
+
+    /**
+     * Same as getRMAuth but allows to specify a property file used to start the RM
+     * @param propertyFile
+     * @return
+     * @throws Exception
+     */
+    public static RMAuthentication getRMAuth(String propertyFile) throws Exception {
         if (auth == null) {
-            startRM();
+            startRM(propertyFile);
         }
         return auth;
     }
@@ -472,7 +474,14 @@ public class RMTHelper {
      * Connects to the resource manager
      */
     public static ResourceManager connect(String name, String pass) throws Exception {
-        RMAuthentication authInt = getRMAuth();
+        return connect(name, pass, null);
+    }
+
+    /**
+     * Idem than connect but allows to specify a propertyFile used to start the RM
+     */
+    public static ResourceManager connect(String name, String pass, String propertyFile) throws Exception {
+        RMAuthentication authInt = getRMAuth(propertyFile);
         Credentials cred = Credentials.createCredentials(new CredData(name, pass), authInt.getPublicKey());
 
         return authInt.login(cred);
@@ -500,6 +509,18 @@ public class RMTHelper {
     public static ResourceManager getResourceManager() throws Exception {
         if (resourceManager == null) {
             resourceManager = connect(username, password);
+        }
+        return resourceManager;
+    }
+
+    /**
+     * Idem than getResourceManager but allow to specify a propertyFile
+     * @return the resource manager
+     * @throws Exception
+     */
+    public static ResourceManager getResourceManager(String propertyFile) throws Exception {
+        if (resourceManager == null) {
+            resourceManager = connect(username, password, propertyFile);
         }
         return resourceManager;
     }

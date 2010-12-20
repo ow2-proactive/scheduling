@@ -91,7 +91,8 @@ public class TestGCMCustomizedInfrastructureSchedulerLoadingPolicy extends
         // creating node source
         // first parameter of im is default rm url
         RMTHelper.getResourceManager().createNodeSource(sourceName,
-                GCMCustomisedInfrastructure.class.getName(), new Object[] { "", GCMDeploymentData, hosts },
+                GCMCustomisedInfrastructure.class.getName(),
+                new Object[] { "", GCMDeploymentData, hosts, TIMEOUT },
                 SchedulerLoadingPolicy.class.getName(), getPolicyParams());
 
         RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, sourceName);

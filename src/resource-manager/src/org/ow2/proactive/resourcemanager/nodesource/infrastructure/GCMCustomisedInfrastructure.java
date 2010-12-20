@@ -39,9 +39,14 @@ package org.ow2.proactive.resourcemanager.nodesource.infrastructure;
 import java.io.File;
 import java.util.HashMap;
 
+import org.objectweb.proactive.core.Constants;
+import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.util.ProActiveCounter;
 import org.objectweb.proactive.core.util.URIBuilder;
-import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
+import org.objectweb.proactive.core.xml.VariableContractImpl;
+import org.objectweb.proactive.core.xml.VariableContractType;
+import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
@@ -59,11 +64,19 @@ import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
  */
 public class GCMCustomisedInfrastructure extends GCMInfrastructure {
 
+    private static final String DESCRIPTOR_DEFAULT_VARIABLE_JVM_ARGS = "jvmargDefinedByIM";
+
     /** hosts list */
     HashMap<String, DeploymentData> hosts = new HashMap<String, DeploymentData>();
     /** path to the file with host names */
-    @Configurable(fileBrowser = true)
+    @Configurable(fileBrowser = true, description = "List of host to use\nfor the deployment")
     protected File hostsList;
+    /**
+     * the timeout after which one the node is considered to be lost
+     * (ie. its registration after this timeout will be discarded)
+     */
+    @Configurable(description = "Timeout after which one the node\nis considered to be lost")
+    protected int timeout = 1 * 60 * 1000;//1mn
 
     /**
      * Default constructor
@@ -75,6 +88,9 @@ public class GCMCustomisedInfrastructure extends GCMInfrastructure {
      * Adds information required to deploy nodes in the future.
      * Do not initiate a real nodes deployment/acquisition as it's up to the
      * policy.
+     * parameters[0] = gcmd template
+     * parameters[1] = host list
+     * parameters[2] = timeout
      */
     @Override
     public void configure(Object... parameters) {
@@ -82,7 +98,7 @@ public class GCMCustomisedInfrastructure extends GCMInfrastructure {
             // nothing to do
             throw new IllegalArgumentException("No parameters were specified");
         }
-        if (parameters.length == 2) {
+        if (parameters.length == 3) {
             if (parameters[1] == null) {
                 throw new IllegalArgumentException("Host list file must be specified");
             }
@@ -91,17 +107,30 @@ public class GCMCustomisedInfrastructure extends GCMInfrastructure {
 
             String[] hostsList = hosts.split("\\s");
             logger.debug("Number of hosts " + hostsList.length);
+            if (hostsList != null) {
+                for (String host : hostsList) {
+                    if (host == null || "".equals(host)) {
+                        continue;
+                    }
+                    if (parameters[0] == null) {
+                        throw new IllegalArgumentException("GCMD template file must be specified");
+                    }
 
-            for (String host : hostsList) {
-                if (parameters[0] == null) {
-                    throw new IllegalArgumentException("GCMD template file must be specified");
+                    DeploymentData dd = new DeploymentData();
+                    dd.data = (byte[]) parameters[0];
+                    logger.debug("Registered deployment data for host " + host);
+                    this.hosts.put(host, dd);
                 }
-
-                DeploymentData dd = new DeploymentData();
-                dd.data = (byte[]) parameters[0];
-                logger.debug("Registed deployment data for host " + host);
-                this.hosts.put(host, dd);
             }
+            try {
+                this.timeout = Integer.parseInt(parameters[2].toString());
+            } catch (NumberFormatException e) {
+                logger
+                        .warn("Cannot determine the value of the supplied parameter for the timeout attribute, using the default one: " +
+                            this.timeout);
+            }
+        } else {
+            throw new IllegalArgumentException("Wrong number of parameters");
         }
 
     }
@@ -116,12 +145,11 @@ public class GCMCustomisedInfrastructure extends GCMInfrastructure {
         for (String host : hosts.keySet()) {
             DeploymentData dd = hosts.get(host);
             if (!dd.deployed) {
-                logger.debug("Acquiring node on " + host);
                 try {
-                    deployGCMD(convertGCMdeploymentDataToGCMappl(dd.data, host));
+                    this.acquireNodeImpl(dd, host);
                     dd.deployed = true;
                 } catch (Exception e) {
-                    logger.error(e.getMessage(), e);
+                    logger.error("Cannot add nodes for GCM node source", e);
                 }
             } else {
                 logger.debug("Nodes have already been deployed");
@@ -140,14 +168,58 @@ public class GCMCustomisedInfrastructure extends GCMInfrastructure {
             DeploymentData dd = hosts.get(host);
             if (!dd.deployed) {
                 try {
-                    logger.debug("Acquiring node on " + host);
-                    deployGCMD(convertGCMdeploymentDataToGCMappl(dd.data, host));
+                    this.acquireNodeImpl(dd, host);
                     dd.deployed = true; // if deployment fails it will work incorrect
                     break;
                 } catch (Exception e) {
-                    logger.error("Cannot add nodes for GCM node source");
+                    logger.error("Cannot add nodes for GCM node source", e);
                 }
             }
+        }
+    }
+
+    /**
+     * The method wich effectively launch the node deployment
+     * @param dd the deployment data used for this deployment
+     * @param host the host use for the deployment
+     * @param nodeName the name of the node
+     * @throws Exception
+     */
+    private void acquireNodeImpl(DeploymentData dd, String host) throws Exception {
+        String nodeName = "GCMCustomised-" + host + "-" + ProActiveCounter.getUniqID();
+        //hack - createGCMNode append the gcmnode name + the vm capacity, here forcibly 0
+        String deployingNodeName = nodeName + "_" + Constants.GCM_NODE_NAME + "0";
+        //create a deploying node
+        String dnURL = super.addDeployingNode(deployingNodeName,
+                "Deployed by GCMDeployment descriptor on host " + host, "Node deploying on host " + host,
+                this.timeout);
+        logger.debug("Acquiring node on " + host);
+        VariableContractImpl vContract = new VariableContractImpl();
+        StringBuilder properties = new StringBuilder();
+        properties.append(CentralPAPropertyRepository.PA_RUNTIME_NAME.getCmdLine());
+        properties.append(nodeName);
+        vContract.setVariableFromProgram(DESCRIPTOR_DEFAULT_VARIABLE_JVM_ARGS, properties.toString(),
+                VariableContractType.ProgramVariable);
+        try {
+            deployGCMD(convertGCMdeploymentDataToGCMappl(dd.data, host, vContract));
+        } catch (Exception e) {
+            handleExceptionAtDeployment(dnURL, e);
+            throw e;
+        }
+    }
+
+    /**
+     * Declares a deploying node lost
+     * @param dnURL the Deploying node url to declare lost
+     * @param t the cause of the faulty deployment
+     */
+    private void handleExceptionAtDeployment(String dnURL, Throwable t) {
+        if (dnURL != null) {
+            String lf = System.getProperty("line.separator");
+            super.declareDeployingNodeLost(dnURL, "An exception occurred during node deployment:" + lf +
+                Utils.getStacktrace(t));
+        } else {
+            logger.warn("Cannot declare deploying node lost, no deploying node URL found");
         }
     }
 
@@ -168,7 +240,7 @@ public class GCMCustomisedInfrastructure extends GCMInfrastructure {
             logger.info("Host " + hostName + " released");
             dd.deployed = false;
         } else {
-            logger.error("Cannot find deploymeny data for host " + hostName);
+            logger.error("Cannot find deployment data for host " + hostName);
         }
     }
 

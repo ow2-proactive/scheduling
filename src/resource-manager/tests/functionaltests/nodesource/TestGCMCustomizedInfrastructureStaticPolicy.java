@@ -39,6 +39,7 @@ package functionaltests.nodesource;
 import java.io.File;
 
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
+import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.GCMCustomisedInfrastructure;
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.ow2.proactive.utils.FileToBytesConverter;
@@ -57,16 +58,26 @@ import functionaltests.RMTHelper;
  */
 public class TestGCMCustomizedInfrastructureStaticPolicy extends TestGCMInfrastructureStaticPolicy {
 
+    protected byte[] emptyhostsListData;
     protected byte[] hostsListData;
+    /** timeout for node acquisition */
+    private static final int TIMEOUT = 60 * 1000;
 
     @Override
     protected void init() throws Exception {
+        // overriding gcma file
+        RMTHelper.getResourceManager(RMTHelper.class.getResource(
+                "/functionaltests/config/functionalTRMProperties4Customised.ini").getPath());
         // using localhost deployment for customized infrastructure
         String oneNodeescriptor = RMTHelper.class.getResource("/functionaltests/nodesource/1node.xml")
                 .getPath();
         GCMDeploymentData = FileToBytesConverter.convertFileToByteArray((new File(oneNodeescriptor)));
+        String hostListEmpty = RMTHelper.class.getResource("/functionaltests/nodesource/emptyhostlist")
+                .getPath();
         String hostList = RMTHelper.class.getResource("/functionaltests/nodesource/hostslist").getPath();
         hostsListData = FileToBytesConverter.convertFileToByteArray((new File(hostList)));
+        emptyhostsListData = FileToBytesConverter.convertFileToByteArray((new File(hostListEmpty)));
+
         String emptyNodeDescriptor = TestGCMInfrastructureTimeSlotPolicy.class.getResource(
                 "/functionaltests/nodesource/empty_gcmd.xml").getPath();
         emptyGCMD = FileToBytesConverter.convertFileToByteArray((new File(emptyNodeDescriptor)));
@@ -76,8 +87,9 @@ public class TestGCMCustomizedInfrastructureStaticPolicy extends TestGCMInfrastr
     protected void createEmptyNodeSource(String sourceName) throws Exception {
         // first empty parameter of im is default rm url
         RMTHelper.getResourceManager().createNodeSource(sourceName,
-                GCMCustomisedInfrastructure.class.getName(), new Object[] { "", emptyGCMD, hostsListData },
-                StaticPolicy.class.getName(), null);
+                GCMCustomisedInfrastructure.class.getName(),
+                new Object[] { "", emptyGCMD, emptyhostsListData, TIMEOUT }, StaticPolicy.class.getName(),
+                null);
 
         RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, sourceName);
     }
@@ -89,12 +101,18 @@ public class TestGCMCustomizedInfrastructureStaticPolicy extends TestGCMInfrastr
         // first empty parameter of im is default rm url
         RMTHelper.getResourceManager().createNodeSource(sourceName,
                 GCMCustomisedInfrastructure.class.getName(),
-                new Object[] { "", GCMDeploymentData, hostsListData }, StaticPolicy.class.getName(), null);
+                new Object[] { "", GCMDeploymentData, hostsListData, TIMEOUT }, StaticPolicy.class.getName(),
+                null);
 
         RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, sourceName);
         for (int i = 0; i < defaultDescriptorNodesNb; i++) {
+            //rmdeploying node added
             RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
-            //wait for the nodes to be in free state
+            //rmdeploying node removed
+            RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
+            //node added
+            RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
+            //configuring to free
             RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
         }
     }
