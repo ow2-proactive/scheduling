@@ -313,6 +313,7 @@ public class RMModel implements Serializable {
             hostname = host.getName();
             previousState = node.getState();
             node.setState(nodeEvent);
+            node.setDescription(nodeEvent.getNodeInfo());
             state = nodeEvent.getNodeState();
         }
         switch (previousState) {
