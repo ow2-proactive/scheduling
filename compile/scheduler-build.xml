@@ -186,6 +186,7 @@
 				<include name="org/ow2/proactive/scheduler/job/JobIdImpl.java" />
 				<include name="org/ow2/proactive/scheduler/exception/RunningProcessException.java" />
 				<include name="org/ow2/proactive/scheduler/exception/StartProcessException.java" />
+				<include name="org/ow2/proactive/scheduler/exception/StartForkedProcessException.java" />
 				<include name="org/ow2/proactive/scheduler/exception/AdminSchedulerException.java" />
 				<include name="org/ow2/proactive/scheduler/exception/DataBaseNotFoundException.java" />
 				<include name="org/ow2/proactive/scheduler/exception/ProcessException.java" />

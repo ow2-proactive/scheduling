@@ -76,7 +76,6 @@ import org.objectweb.proactive.core.runtime.StartPARuntime;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.processbuilder.OSProcessBuilder;
 import org.objectweb.proactive.extensions.processbuilder.exception.NotImplementedException;
-import org.ow2.proactive.scheduler.common.exception.InternalSchedulerException;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.exception.UserException;
 import org.ow2.proactive.scheduler.common.exception.WalltimeExceededException;
@@ -86,6 +85,7 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
 import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingException;
+import org.ow2.proactive.scheduler.exception.StartForkedProcessException;
 import org.ow2.proactive.scheduler.task.launcher.InternalForkEnvironment;
 import org.ow2.proactive.scheduler.task.launcher.JavaTaskLauncher;
 import org.ow2.proactive.scheduler.task.launcher.TaskLauncher;
@@ -172,7 +172,7 @@ public class ForkedJavaExecutable extends JavaExecutable {
             OSProcessBuilder ospb = createProcessAndPrepareCommand();
             createRegistrationListener();
             process = startProcess(ospb);
-            waitForRegistration();
+            waitForRegistration(ospb);
 
             //create task launcher on new JVM node
             logger_dev.debug("Create remote task launcher");
@@ -502,8 +502,10 @@ public class ForkedJavaExecutable extends JavaExecutable {
     /**
      * wait until the child runtime registers itself at the current JVM
      * in case it fails to register (because of any reason), we don't start the task at all exiting with an exception
+     *
+     * @param ospb the process builder that will execute the command
      */
-    private void waitForRegistration() throws SchedulerException, InterruptedException {
+    private void waitForRegistration(OSProcessBuilder ospb) throws SchedulerException, InterruptedException {
         int numberOfTrials = 0;
         for (; numberOfTrials < RETRY_ACQUIRE; numberOfTrials++) {
             boolean permit = semaphore.tryAcquire(SEMAPHORE_TIMEOUT, TimeUnit.SECONDS);
@@ -514,16 +516,16 @@ public class ForkedJavaExecutable extends JavaExecutable {
             try {
                 int ec = process.exitValue();
                 // process terminated abnormally:
-                throw new InternalSchedulerException(
-                    "Unable to create a separate java process. Exit code : " + ec);
+                throw new StartForkedProcessException(
+                    "Unable to create a separate java process. Exit code : " + ec, ospb.command());
             } catch (IllegalThreadStateException e) {
                 logger_dev.debug("Process not terminated, continue Forked VM launching (try number " +
                     numberOfTrials + ")");
             }
         }
         if (numberOfTrials == RETRY_ACQUIRE) {
-            throw new InternalSchedulerException("Unable to create a separate java process after " +
-                RETRY_ACQUIRE + " tries");
+            throw new StartForkedProcessException("Unable to create a separate java process after " +
+                RETRY_ACQUIRE + " tries", ospb.command());
         }
 
     }
