@@ -61,6 +61,7 @@ import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProper
 import org.ow2.proactive.resourcemanager.rmnode.RMNode;
 import org.ow2.proactive.resourcemanager.selection.topology.TopologyHandler;
 import org.ow2.proactive.resourcemanager.utils.RMLoggers;
+import org.ow2.proactive.scripting.ScriptException;
 import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
@@ -269,7 +270,9 @@ public abstract class SelectionManager {
                         logger.warn("Interrupting the selection manager");
                         return matched;
                     } catch (ExecutionException e) {
-                        throw (RuntimeException) e.getCause();
+                        // SCHEDULING-954 : an exception in script call is considered as an exception
+                        // thrown by the script itself.
+                        throw new ScriptException("Exception occurs in selection script call", e.getCause());
                     }
                 } else {
                     // no script result was obtained
