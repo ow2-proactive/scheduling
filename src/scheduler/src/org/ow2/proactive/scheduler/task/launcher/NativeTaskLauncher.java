@@ -165,16 +165,19 @@ public class NativeTaskLauncher extends TaskLauncher {
             }
             duration += System.currentTimeMillis() - sample;
 
+            //for the next two steps, task could be killed anywhere
             if (!hasBeenKilled) {
+                sample = System.currentTimeMillis();
                 //copy output file
                 copyScratchDataToOutput();
+                duration += System.currentTimeMillis() - sample;
+            }
 
+            if (post != null && !hasBeenKilled) {
                 sample = System.currentTimeMillis();
+                int retCode = Integer.parseInt(userResult.toString());
                 //launch post script
-                if (post != null) {
-                    int retCode = Integer.parseInt(userResult.toString());
-                    this.executePostScript(retCode == 0 && exception == null);
-                }
+                this.executePostScript(retCode == 0 && exception == null);
                 duration += System.currentTimeMillis() - sample;
             }
         } catch (Throwable ex) {

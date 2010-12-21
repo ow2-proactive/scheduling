@@ -49,7 +49,6 @@ import org.objectweb.proactive.extensions.dataspaces.core.DataSpacesNodes;
 import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
 import org.ow2.proactive.scheduler.common.task.ExecutableInitializer;
 import org.ow2.proactive.scheduler.common.task.JavaExecutableInitializer;
-import org.ow2.proactive.scheduler.common.task.TaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import org.ow2.proactive.scheduler.common.task.flow.FlowAction;
@@ -142,15 +141,18 @@ public class JavaTaskLauncher extends TaskLauncher {
             }
             duration += System.currentTimeMillis() - sample;
 
+            //for the next two steps, task could be killed anywhere
             if (!hasBeenKilled) {
+                sample = System.currentTimeMillis();
                 //copy output file
                 copyScratchDataToOutput();
+                duration += System.currentTimeMillis() - sample;
+            }
 
+            if (post != null && !hasBeenKilled) {
                 sample = System.currentTimeMillis();
                 //launch post script
-                if (post != null) {
-                    this.executePostScript(exception == null);
-                }
+                this.executePostScript(exception == null);
                 duration += System.currentTimeMillis() - sample;
             }
         } catch (Throwable ex) {
