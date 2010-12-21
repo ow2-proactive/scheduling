@@ -39,6 +39,7 @@ package org.ow2.proactive.resourcemanager.cleaning;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -82,7 +83,7 @@ public class NodesCleaner {
      * @return true if success, false if there is any error for any node
      */
     public BooleanWrapper cleanAndRelease(List<RMNode> nodes) {
-        List<NodeCleaner> cleaners = new LinkedList<NodeCleaner>();
+        List<Callable<Boolean>> cleaners = new LinkedList<Callable<Boolean>>();
         for (RMNode node : nodes) {
             logger.debug("Cleaning the node " + node.getNodeURL());
             cleaners.add(new NodeCleaner(node));
