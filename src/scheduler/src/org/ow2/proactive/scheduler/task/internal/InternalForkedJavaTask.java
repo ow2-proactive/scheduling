@@ -177,7 +177,7 @@ public class InternalForkedJavaTask extends InternalJavaTask {
             } catch (Exception e) {
                 logger_dev.error("PAConfiguration file not read, applying default basic content", e);
                 paConfigContent = new StringBuilder("<ProActiveUserProperties>\n" + "<properties>\n"
-                    + "<prop key=\"proactive.rmi.port\" value=\"0\"/>\n" + "</properties>\n"
+                    + "<prop key=\"proactive.communication.protocol\" value=\"http\"/>\n" + "</properties>\n"
                     + "</ProActiveUserProperties>\n");
             }
         }

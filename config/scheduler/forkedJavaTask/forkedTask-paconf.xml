@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ProActiveUserProperties>
     <properties>
-		<prop key="proactive.rmi.port" value="0"/>
+    	<prop key="proactive.communication.protocol" value="http"/>
     </properties>
     <javaProperties>
     </javaProperties>
