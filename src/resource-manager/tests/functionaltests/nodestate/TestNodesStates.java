@@ -128,7 +128,6 @@ public class TestNodesStates extends FunctionalTest {
         try {
             RMTHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, n.getNodeInformation().getURL(), 4000);
         } catch (ProActiveTimeoutException e) {
-            // TODO Auto-generated catch block
             timeouted = true;
         }
 

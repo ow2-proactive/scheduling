@@ -74,6 +74,7 @@ import org.ow2.proactive.permissions.PrincipalPermission;
 import org.ow2.proactive.policy.ClientsPolicy;
 import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthenticationImpl;
+import org.ow2.proactive.resourcemanager.cleaning.NodesCleaner;
 import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.common.RMConstants;
 import org.ow2.proactive.resourcemanager.common.RMState;
@@ -203,6 +204,9 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     /** Client pinger */
     private ClientPinger clientPinger;
 
+    /** an active object used to clean nodes when they are released after computations */
+    private NodesCleaner nodesCleaner;
+
     private RMAccountsManager accountsManager;
 
     private RMJMXHelper jmxHelper;
@@ -262,7 +266,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         }
         try {
             // setting up the policy
-            logger.info("Setting up resource manager security policy");
+            logger.info("Setting up the resource manager security policy");
             ClientsPolicy.init();
 
             PAActiveObject.registerByName(PAActiveObject.getStubOnThis(),
@@ -278,14 +282,14 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             logger.info("Hibernate successfully started !");
 
             if (logger.isDebugEnabled()) {
-                logger.debug("active object RMAuthentication");
+                logger.debug("Creating RMAuthentication active object");
             }
 
             authentication = (RMAuthenticationImpl) PAActiveObject.newActive(RMAuthenticationImpl.class
                     .getName(), new Object[] { PAActiveObject.getStubOnThis() }, nodeRM);
 
             if (logger.isDebugEnabled()) {
-                logger.debug("active object RMMonitoring");
+                logger.debug("Creating RMMonitoring active object");
             }
 
             // Boot the JMX infrastructure
@@ -298,15 +302,21 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                     new Object[] { PAActiveObject.getStubOnThis() }, nodeRM);
 
             if (logger.isDebugEnabled()) {
-                logger.debug("active object SelectionManager");
+                logger.debug("Creating SelectionManager active object");
             }
             selectionManager = (SelectionManager) PAActiveObject.newActive(ProbablisticSelectionManager.class
                     .getName(), new Object[] { PAActiveObject.getStubOnThis() }, nodeRM);
 
             if (logger.isDebugEnabled()) {
-                logger.debug("active object ClientPinger");
+                logger.debug("Creating ClientPinger active object");
             }
             clientPinger = (ClientPinger) PAActiveObject.newActive(ClientPinger.class.getName(),
+                    new Object[] { PAActiveObject.getStubOnThis() }, nodeRM);
+
+            if (logger.isDebugEnabled()) {
+                logger.debug("Creating NodeCleaner active object");
+            }
+            nodesCleaner = (NodesCleaner) PAActiveObject.newActive(NodesCleaner.class.getName(),
                     new Object[] { PAActiveObject.getStubOnThis() }, nodeRM);
 
             topologyManager = new TopologyManager();
@@ -342,6 +352,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
             // registering internal clients of the core
             clients.put(Client.getId(nodeConfigurator), new Client(null, false));
+            clients.put(Client.getId(nodesCleaner), new Client(null, false));
             clients.put(Client.getId(authentication), new Client(null, false));
             clients.put(Client.getId(monitoring), new Client(null, false));
             clients.put(Client.getId(selectionManager), new Client(null, false));
@@ -418,10 +429,10 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      * @param rmNode
      *            node to set free.
      */
-    private void internalSetFree(final RMNode rmNode) {
+    private BooleanWrapper internalSetFree(final RMNode rmNode) {
         // If the node is already free no need to go further
         if (rmNode.isFree()) {
-            return;
+            return new BooleanWrapper(true);
         }
         // Get the previous state of the node needed for the event
         final NodeState previousNodeState = rmNode.getState();
@@ -438,7 +449,26 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             // Exception on the node, we assume the node is down
             setDownNode(rmNode.getNodeURL());
             logger.debug("", e);
+            return new BooleanWrapper(false);
         }
+        return new BooleanWrapper(true);
+    }
+
+    /**
+     * Mark nodes as free after cleaning procedure.
+     *
+     * @param nodes to be free
+     * @return true if all successfull, false if error occurs
+     */
+    public BooleanWrapper setFreeNodes(List<RMNode> nodes) {
+        boolean result = true;
+        for (RMNode node : nodes) {
+            // getting the correct instance
+            RMNode rmnode = this.getNodebyUrl(node.getNodeURL());
+            // freeing it
+            result &= internalSetFree(rmnode).getBooleanValue();
+        }
+        return new BooleanWrapper(result);
     }
 
     /**
@@ -894,61 +924,66 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      * {@inheritDoc}
      */
     public BooleanWrapper releaseNode(Node node) {
-        String nodeURL = null;
-        try {
-            nodeURL = node.getNodeInformation().getURL();
-        } catch (RuntimeException e) {
-            logger.debug("A Runtime exception occured while obtaining information on the node,"
-                + "the node must be down (it will be detected later)", e);
-            // node is down, will be detected by pinger
-            throw new IllegalStateException(e.getMessage(), e);
-        }
-
-        // verify whether the node has not been removed from the RM
-        if (this.allNodes.containsKey(nodeURL)) {
-            RMNode rmnode = this.getNodebyUrl(nodeURL);
-
-            // prevent Scheduler Error : Scheduler try to render anode already
-            // free
-            if (rmnode.isFree()) {
-                logger.warn("Client " + caller + " tries to release the already free node " + nodeURL);
-            } else {
-                // verify that scheduler don't try to render a node detected
-                // down
-                if (!rmnode.isDown()) {
-                    Set<? extends IdentityPrincipal> userPrincipal = rmnode.getOwner().getSubject()
-                            .getPrincipals(UserNamePrincipal.class);
-                    Permission ownerPermission = new PrincipalPermission(rmnode.getOwner().getName(),
-                        userPrincipal);
-                    caller.checkPermission(ownerPermission, caller + " is not authorized to free node " +
-                        node.getNodeInformation().getURL());
-
-                    if (rmnode.isToRemove()) {
-                        removeNodeFromCoreAndSource(rmnode, caller);
-                    } else {
-                        internalSetFree(rmnode);
-                    }
-                }
-            }
-        } else {
-            logger.warn("Cannot release unknown node " + nodeURL);
-            throw new IllegalArgumentException("Cannot release unknown node " + nodeURL);
-        }
-        return new BooleanWrapper(true);
+        NodeSet nodes = new NodeSet();
+        nodes.add(node);
+        return releaseNodes(nodes);
     }
 
     /**
      * {@inheritDoc}
      */
     public BooleanWrapper releaseNodes(NodeSet nodes) {
-        for (Node node : nodes) {
-            releaseNode(node);
-        }
+
         if (nodes.getExtraNodes() != null) {
-            for (Node node : nodes.getExtraNodes()) {
-                releaseNode(node);
+            // do not forget to release extra nodes
+            nodes.addAll(nodes.getExtraNodes());
+        }
+
+        for (Node node : nodes) {
+            String nodeURL = null;
+            try {
+                nodeURL = node.getNodeInformation().getURL();
+            } catch (RuntimeException e) {
+                logger.debug("A Runtime exception occured while obtaining information on the node,"
+                    + "the node must be down (it will be detected later)", e);
+                // node is down, will be detected by pinger
+                throw new IllegalStateException(e.getMessage(), e);
+            }
+
+            // verify whether the node has not been removed from the RM
+            if (this.allNodes.containsKey(nodeURL)) {
+                RMNode rmnode = this.getNodebyUrl(nodeURL);
+
+                // prevent Scheduler Error : Scheduler try to render anode already
+                // free
+                if (rmnode.isFree()) {
+                    logger.warn("Client " + caller + " tries to release the already free node " + nodeURL);
+                } else {
+                    // verify that scheduler don't try to render a node detected down
+                    if (!rmnode.isDown()) {
+                        Set<? extends IdentityPrincipal> userPrincipal = rmnode.getOwner().getSubject()
+                                .getPrincipals(UserNamePrincipal.class);
+                        Permission ownerPermission = new PrincipalPermission(rmnode.getOwner().getName(),
+                            userPrincipal);
+                        caller.checkPermission(ownerPermission, caller + " is not authorized to free node " +
+                            node.getNodeInformation().getURL());
+
+                        if (rmnode.isToRemove()) {
+                            removeNodeFromCoreAndSource(rmnode, caller);
+                        } else {
+                            internalSetFree(rmnode);
+                        }
+                    } else {
+                        // down node, just ignore
+                        logger.warn("Down node " + rmnode.getNodeURL() + " will not be released");
+                    }
+                }
+            } else {
+                logger.warn("Cannot release unknown node " + nodeURL);
+                throw new IllegalArgumentException("Cannot release unknown node " + nodeURL);
             }
         }
+
         return new BooleanWrapper(true);
     }
 
@@ -1267,6 +1302,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     public void disconnect(UniqueID clientId) {
         Client client = RMCore.clients.remove(clientId);
         if (client != null) {
+            List<RMNode> nodesToRelease = new LinkedList<RMNode>();
             // expensive but relatively rare operation
             for (RMNode rmnode : allNodes.values()) {
                 // checking that it is not only the same client but also 
@@ -1275,10 +1311,14 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                     if (rmnode.isToRemove()) {
                         removeNodeFromCoreAndSource(rmnode, client);
                     } else if (rmnode.isBusy()) {
-                        internalSetFree(rmnode);
+                        nodesToRelease.add(rmnode);
                     }
                 }
             }
+            // Force the nodes cleaning here to avoid the situation
+            // when the disconnected client still uses nodes.
+            // In the future we may clean nodes for any release request
+            nodesCleaner.cleanAndRelease(nodesToRelease);
             logger.info(client + " disconnected");
         } else {
             logger.warn("Trying to disconnect unknown client with id " + clientId);
@@ -1403,4 +1443,5 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                 "\" is invalid because it contains invalid characters. Only [-a-zA-Z_0-9] are valid.");
         }
     }
+
 }

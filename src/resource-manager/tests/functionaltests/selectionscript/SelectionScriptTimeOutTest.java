@@ -140,8 +140,8 @@ public class SelectionScriptTimeOutTest extends FunctionalTest {
         Assert.assertEquals(1, nodes2.size());
         Assert.assertEquals(0, resourceManager.getState().getFreeNodesNumber());
 
-        resourceManager.releaseNodes(nodes);
-        resourceManager.releaseNodes(nodes2);
+        resourceManager.releaseNodes(nodes).getBooleanValue();
+        resourceManager.releaseNodes(nodes2).getBooleanValue();
 
         nodes = resourceManager.getAtMostNodes(2, script);
         Assert.assertEquals(2, nodes.size());

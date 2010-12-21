@@ -95,6 +95,8 @@ public interface RMLoggers {
 
     static final public String PINGER = RESOURCEMANAGER + ".pinger";
 
+    static final public String CLEANER = RESOURCEMANAGER + ".cleaner";
+
     static final public String DATABASE = ".DATABASE";
 
     public static final String TOPOLOGY = RESOURCEMANAGER + ".topology";
