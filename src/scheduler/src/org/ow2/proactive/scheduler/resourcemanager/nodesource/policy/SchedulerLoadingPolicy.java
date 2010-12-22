@@ -72,7 +72,7 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
 
     protected static Logger logger = ProActiveLogger.getLogger(RMLoggers.POLICY);
 
-    private Map<JobId, Integer> activeTasks = new HashMap<JobId, Integer>();
+    private Map<JobId, Integer> activeTasks;
     private int activeTask = 0;
 
     @Configurable(description = "refresh frequency (ms)")
@@ -107,6 +107,8 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
         super.configure(policyParameters);
 
         try {
+            activeTasks = new HashMap<JobId, Integer>();
+
             int index = 4;
             refreshTime = Integer.parseInt(policyParameters[index++].toString());
             minNodes = Integer.parseInt(policyParameters[index++].toString());

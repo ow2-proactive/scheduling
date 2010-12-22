@@ -120,8 +120,8 @@ public class NodeSource implements InitActive, RunActive {
     private boolean toShutdown = false;
 
     // all nodes except down
-    private Map<String, Node> nodes = Collections.synchronizedMap(new HashMap<String, Node>());
-    private Map<String, Node> downNodes = Collections.synchronizedMap(new HashMap<String, Node>());
+    private Map<String, Node> nodes;
+    private Map<String, Node> downNodes;
 
     private static int instanceCount = 0;
     private static ExecutorService internalThreadPool;
@@ -179,6 +179,9 @@ public class NodeSource implements InitActive, RunActive {
         this.rmcore = rmcore;
         this.monitoring = monitor;
         this.description = "Infrastructure:" + im + ", Policy: " + policy;
+
+        this.nodes = Collections.synchronizedMap(new HashMap<String, Node>());
+        this.downNodes = Collections.synchronizedMap(new HashMap<String, Node>());
 
         // node source admin permission
         // it's the PrincipalPermission of the user who created the node source

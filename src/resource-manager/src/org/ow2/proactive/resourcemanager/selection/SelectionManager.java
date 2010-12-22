@@ -86,15 +86,17 @@ public abstract class SelectionManager {
     private static final int SELECTION_THEADS_NUMBER = PAResourceManagerProperties.RM_SELECTION_MAX_THREAD_NUMBER
             .getValueAsInt();
 
-    private ExecutorService scriptExecutorThreadPool = Executors.newFixedThreadPool(SELECTION_THEADS_NUMBER);
+    private ExecutorService scriptExecutorThreadPool;
 
-    private Set<String> inProgress = Collections.synchronizedSet(new HashSet<String>());
+    private Set<String> inProgress;
 
     public SelectionManager() {
     }
 
     public SelectionManager(RMCore rmcore) {
         this.rmcore = rmcore;
+        this.scriptExecutorThreadPool = Executors.newFixedThreadPool(SELECTION_THEADS_NUMBER);
+        this.inProgress = Collections.synchronizedSet(new HashSet<String>());
     }
 
     /**

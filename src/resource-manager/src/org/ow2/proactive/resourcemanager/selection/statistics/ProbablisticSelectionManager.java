@@ -72,13 +72,14 @@ public class ProbablisticSelectionManager extends SelectionManager {
     private final static Logger logger = ProActiveLogger.getLogger(RMLoggers.RMSELECTION);
 
     // contains an information about already executed scripts
-    private HashMap<SelectionScript, HashMap<RMNode, Probability>> probabilities = new HashMap<SelectionScript, HashMap<RMNode, Probability>>();
+    private HashMap<SelectionScript, HashMap<RMNode, Probability>> probabilities;
 
     public ProbablisticSelectionManager() {
     }
 
     public ProbablisticSelectionManager(RMCore rmcore) {
         super(rmcore);
+        this.probabilities = new HashMap<SelectionScript, HashMap<RMNode, Probability>>();
     }
 
     /**

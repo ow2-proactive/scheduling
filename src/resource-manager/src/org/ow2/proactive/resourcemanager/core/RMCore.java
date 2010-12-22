@@ -426,8 +426,8 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      * and move the node to the internal free nodes list. An event informing the
      * node state's change is thrown to RMMonitoring.
      * 
-     * @param rmNode
-     *            node to set free.
+     * @param rmNode node to set free.
+     * @return true if the node successfully set as free, false if it was down before.
      */
     private BooleanWrapper internalSetFree(final RMNode rmNode) {
         // If the node is already free no need to go further
@@ -446,8 +446,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             this.registerAndEmitNodeEvent(new RMNodeEvent(rmNode, RMEventType.NODE_STATE_CHANGED,
                 previousNodeState, owner.getName()));
         } catch (NodeException e) {
-            // Exception on the node, we assume the node is down
-            setDownNode(rmNode.getNodeURL());
+            // the node is down
             logger.debug("", e);
             return new BooleanWrapper(false);
         }
@@ -458,7 +457,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      * Mark nodes as free after cleaning procedure.
      *
      * @param nodes to be free
-     * @return true if all successfull, false if error occurs
+     * @return true if all successful, false if there is a down node among nodes
      */
     public BooleanWrapper setFreeNodes(List<RMNode> nodes) {
         boolean result = true;

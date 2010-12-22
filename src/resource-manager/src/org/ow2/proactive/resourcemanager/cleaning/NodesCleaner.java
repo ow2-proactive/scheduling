@@ -62,8 +62,7 @@ public class NodesCleaner {
     /** class' logger */
     private static final Logger logger = ProActiveLogger.getLogger(RMLoggers.CLEANER);
 
-    private ExecutorService scriptExecutorThreadPool = Executors
-            .newFixedThreadPool(PAResourceManagerProperties.RM_CLEANING_MAX_THREAD_NUMBER.getValueAsInt());
+    private ExecutorService scriptExecutorThreadPool;
 
     /** RMCore reference to be able to set nodes free after the cleaning procedure */
     private RMCore rmcore;
@@ -74,13 +73,15 @@ public class NodesCleaner {
 
     public NodesCleaner(RMCore rmcore) {
         this.rmcore = rmcore;
+        this.scriptExecutorThreadPool = Executors
+                .newFixedThreadPool(PAResourceManagerProperties.RM_CLEANING_MAX_THREAD_NUMBER.getValueAsInt());
     }
 
     /**
      * Cleans nodes in parallel for the nodes specified.
      *
      * @param nodes to be cleaned
-     * @return true if success, false if there is any error for any node
+     * @return true if all the nodes were freed, false if error occurs on one of the node (it will be marked as down in this case)
      */
     public BooleanWrapper cleanAndRelease(List<RMNode> nodes) {
         List<Callable<Boolean>> cleaners = new LinkedList<Callable<Boolean>>();
@@ -102,18 +103,23 @@ public class NodesCleaner {
                         isClean = cleanNode.get();
                         if (!isClean.booleanValue()) {
                             logger.warn("Cannot clean the node " + node.getNodeURL());
+                            rmcore.setDownNode(node.getNodeURL());
                         } else {
                             logger.debug("The node " + node.getNodeURL() + " has been successfully cleaned");
                         }
                     } catch (ExecutionException e) {
                         logger.warn("Cannot clean the node " + node.getNodeURL(), e);
+                        rmcore.setDownNode(node.getNodeURL());
                     }
                 } else {
                     logger.warn("Cannot clean the node " + node.getNodeURL());
+                    rmcore.setDownNode(node.getNodeURL());
                 }
                 index++;
             }
 
+            // if we had any error while cleaning a node, this node would have been already marked as down
+            // in this case rmcore.setFreeNodes() will return false
             return rmcore.setFreeNodes(nodes);
         } catch (InterruptedException e) {
             logger.error("", e);

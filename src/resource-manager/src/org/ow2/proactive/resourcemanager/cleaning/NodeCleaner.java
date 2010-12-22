@@ -62,6 +62,7 @@ public class NodeCleaner implements Callable<Boolean> {
 
     /**
      * Performs the cleaning (for now just killing of all active objects).
+     * @return true if successfully cleaned, false in case of any exception (node will be marked as down in this case)
      */
     public Boolean call() throws Exception {
         // killing all active objects on the node

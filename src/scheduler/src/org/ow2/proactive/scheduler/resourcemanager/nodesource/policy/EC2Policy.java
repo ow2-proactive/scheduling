@@ -109,7 +109,7 @@ public class EC2Policy extends SchedulerAwarePolicy implements InitActive, RunAc
 
     private EC2Policy thisStub;
 
-    private Map<JobId, Integer> activeTasks = new HashMap<JobId, Integer>();
+    private Map<JobId, Integer> activeTasks;
     private int activeTask = 0;
 
     /**
@@ -121,7 +121,7 @@ public class EC2Policy extends SchedulerAwarePolicy implements InitActive, RunAc
      * <code>System.currentTimeMillis()</code> is added to the head of this structure;
      * each time a node registers in the NS, an element is removed from the tail. 
      */
-    private LinkedList<Long> pendingNodes = new LinkedList<Long>();
+    private LinkedList<Long> pendingNodes;
 
     private boolean rmShuttingDown = false;
     private RMMonitoring rmMonitoring;
@@ -129,7 +129,7 @@ public class EC2Policy extends SchedulerAwarePolicy implements InitActive, RunAc
     /**
      * Maps a Node Name to Date for all NS nodes
      */
-    private HashMap<String, Calendar> nodes = new HashMap<String, Calendar>();
+    private HashMap<String, Calendar> nodes;
 
     /**
      * Empty constructor
@@ -154,6 +154,10 @@ public class EC2Policy extends SchedulerAwarePolicy implements InitActive, RunAc
     public BooleanWrapper configure(Object... params) {
         super.configure(params);
         try {
+            activeTasks = new HashMap<JobId, Integer>();
+            pendingNodes = new LinkedList<Long>();
+            nodes = new HashMap<String, Calendar>();
+
             int index = 4;
             refreshTime = Integer.parseInt(params[index++].toString());
             loadFactor = Integer.parseInt(params[index++].toString());

@@ -55,7 +55,7 @@ import org.ow2.proactive.scheduler.common.job.JobState;
 public class ReleaseResourcesWhenSchedulerIdle extends SchedulerAwarePolicy implements InitActive,
         SchedulerEventListener {
 
-    private transient Timer timer = new Timer(true);
+    private transient Timer timer;
     private int activeJobs = 0;
 
     @Configurable(description = "ms")
@@ -74,6 +74,7 @@ public class ReleaseResourcesWhenSchedulerIdle extends SchedulerAwarePolicy impl
     public BooleanWrapper configure(Object... policyParameters) {
         super.configure(policyParameters);
         try {
+            timer = new Timer(true);
             idleTime = Long.parseLong(policyParameters[4].toString());
         } catch (RuntimeException e) {
             throw new IllegalArgumentException(e);

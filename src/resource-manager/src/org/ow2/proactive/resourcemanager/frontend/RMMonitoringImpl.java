@@ -86,7 +86,7 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
     // Attributes
     private RMCore rmcore;
     private Map<UniqueID, RMEventListener> listeners;
-    private HashMap<EventDispatcher, LinkedList<RMEvent>> pendingEvents = new HashMap<EventDispatcher, LinkedList<RMEvent>>();
+    private HashMap<EventDispatcher, LinkedList<RMEvent>> pendingEvents;
     private transient ExecutorService eventDispatcherThreadPool;
 
     /** Resource Manager's statistics */
@@ -104,8 +104,9 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
      * @param rmcore Stub of the RMCore active object.
      */
     public RMMonitoringImpl(RMCore rmcore) {
-        listeners = new HashMap<UniqueID, RMEventListener>();
+        this.listeners = new HashMap<UniqueID, RMEventListener>();
         this.rmcore = rmcore;
+        this.pendingEvents = new HashMap<EventDispatcher, LinkedList<RMEvent>>();
     }
 
     /**
