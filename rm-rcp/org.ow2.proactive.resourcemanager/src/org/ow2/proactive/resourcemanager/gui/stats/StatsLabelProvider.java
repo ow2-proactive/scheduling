@@ -39,19 +39,35 @@ package org.ow2.proactive.resourcemanager.gui.stats;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.swt.graphics.Image;
+import org.ow2.proactive.resourcemanager.common.NodeState;
+import org.ow2.proactive.resourcemanager.gui.Internal;
 
 
 public class StatsLabelProvider implements ITableLabelProvider {
 
     public Image getColumnImage(Object element, int columnIndex) {
-        return null;
+        if (columnIndex == 0) {
+            StatsItem o = (StatsItem) element;
+            NodeState ns;
+            try {
+                ns = NodeState.parse(o.getAggregate());
+            } catch (IllegalArgumentException e) {
+                return null;
+            }
+
+            return Internal.getImageByNodeState(ns);
+        } else {
+            return null;
+        }
     }
 
     public String getColumnText(Object element, int columnIndex) {
         switch (columnIndex) {
             case 0:
-                return ((StatsItem) element).getAggregate();
+                return "";
             case 1:
+                return ((StatsItem) element).getAggregate();
+            case 2:
                 return ((StatsItem) element).getValue();
         }
         return null;

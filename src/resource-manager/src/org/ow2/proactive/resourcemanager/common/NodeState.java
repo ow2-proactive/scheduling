@@ -97,6 +97,30 @@ public enum NodeState {
     }
 
     /**
+     * @param value value returned by NodeState.toString()
+     * @return enum instance corresponding the String representation provided
+     * @throws IllegalArgumentException provided value is no good
+     */
+    public static NodeState parse(String value) {
+        if (value.equals(FREE.toString()))
+            return NodeState.FREE;
+        else if (value.equals(BUSY.toString()))
+            return NodeState.BUSY;
+        else if (value.equals(DOWN.toString()))
+            return NodeState.DOWN;
+        else if (value.equals(TO_BE_REMOVED.toString()))
+            return NodeState.TO_BE_REMOVED;
+        else if (value.equals(DEPLOYING.toString()))
+            return NodeState.DEPLOYING;
+        else if (value.equals(LOST.toString()))
+            return NodeState.LOST;
+        else if (value.equals(CONFIGURING.toString()))
+            return NodeState.CONFIGURING;
+        else
+            throw new IllegalArgumentException("'" + value + "' is not a valid NodeState");
+    }
+
+    /**
      * Gives a string representation of the state.
      * @return String representation of the state.
      */

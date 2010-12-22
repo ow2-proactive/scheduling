@@ -38,6 +38,7 @@ package org.ow2.proactive.resourcemanager.gui.stats;
 
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.Viewer;
+import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.gui.data.model.RMModel;
 
 
@@ -46,19 +47,19 @@ public class StatsContentProvider implements IStructuredContentProvider {
     public Object[] getElements(Object model) {
         if (model instanceof RMModel) {
             RMModel rmmodel = (RMModel) model;
-            StatsItem pendingNodesStat = new StatsItem("# deploying nodes", Integer.toString(rmmodel
+            StatsItem pendingNodesStat = new StatsItem(NodeState.DEPLOYING.toString(), Integer.toString(rmmodel
                     .getPendingNodesNumber()));
-            StatsItem lostNodesStat = new StatsItem("# lost nodes", Integer.toString(rmmodel
+            StatsItem lostNodesStat = new StatsItem(NodeState.LOST.toString(), Integer.toString(rmmodel
                     .getLostNodesNumber()));
-            StatsItem configuringNodesStat = new StatsItem("# configuring nodes", Integer.toString(rmmodel
+            StatsItem configuringNodesStat = new StatsItem(NodeState.CONFIGURING.toString(), Integer.toString(rmmodel
                     .getConfiguringNodesNumber()));
-            StatsItem freeNodesStat = new StatsItem("# free nodes", Integer.toString(rmmodel
+            StatsItem freeNodesStat = new StatsItem(NodeState.FREE.toString(), Integer.toString(rmmodel
                     .getFreeNodesNumber()));
-            StatsItem busyNodesStat = new StatsItem("# busy nodes", Integer.toString(rmmodel
+            StatsItem busyNodesStat = new StatsItem(NodeState.BUSY.toString(), Integer.toString(rmmodel
                     .getBusyNodesNumber()));
-            StatsItem downNodesStat = new StatsItem("# down nodes", Integer.toString(rmmodel
+            StatsItem downNodesStat = new StatsItem(NodeState.DOWN.toString(), Integer.toString(rmmodel
                     .getDownNodesNumber()));
-            StatsItem totalNodesStat = new StatsItem("# total nodes", Integer.toString(rmmodel
+            StatsItem totalNodesStat = new StatsItem("Total", Integer.toString(rmmodel
                     .getTotalNodesNumber()));
             return new StatsItem[] { pendingNodesStat, lostNodesStat, configuringNodesStat, freeNodesStat,
                     busyNodesStat, downNodesStat, totalNodesStat };

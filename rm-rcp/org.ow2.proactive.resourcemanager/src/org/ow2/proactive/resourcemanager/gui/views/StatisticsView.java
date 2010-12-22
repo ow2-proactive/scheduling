@@ -71,14 +71,19 @@ public class StatisticsView extends ViewPart {
         table.setLayoutData(new GridData(GridData.FILL_BOTH));
         table.setHeaderVisible(true);
         table.setLinesVisible(true);
+        TableColumn tc0 = new TableColumn(table, SWT.LEFT);
         TableColumn tc1 = new TableColumn(table, SWT.LEFT);
         TableColumn tc2 = new TableColumn(table, SWT.LEFT);
-        tc1.setText("Name");
-        tc2.setText("Value");
+        tc0.setText("");
+        tc1.setText("Node Status");
+        tc2.setText("Count");
+        tc0.setWidth(30);
         tc1.setWidth(120);
         tc2.setWidth(150);
-        tc1.setMoveable(true);
-        tc2.setMoveable(true);
+        tc0.setMoveable(false);
+        tc0.setResizable(false);
+        tc1.setMoveable(false);
+        tc2.setMoveable(false);
 
         if (RMStore.isConnected()) {
             statsViewer.init();
