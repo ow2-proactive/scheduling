@@ -1065,10 +1065,11 @@ public class RMNodeStarter {
          * The required pieces of information that need to be set in order to allow the RMNode to start properly are:<br />
          * <ul><li>{@link RMNodeStarter.CommandLineBuilder#rmURL}</li><li>{@link RMNodeStarter.CommandLineBuilder#nodeName}</li>
          * <li>one of {@link RMNodeStarter.CommandLineBuilder#credentialsEnv}, {@link RMNodeStarter.CommandLineBuilder#credentialsFile} or {@link RMNodeStarter.CommandLineBuilder#credentialsValue}</li></ul>
+         * @param displayCreds if true displays the credentials in the command line if false, obfuscates them
          * @return The RMNodeStarter command line.
          * @throws IOException if you supplied a ProActive Configuration file that doesn't exist.
          */
-        public String buildCommandLine() throws IOException {
+        public String buildCommandLine(boolean displayCreds) throws IOException {
             Properties paProp = this.getPaProperties();
             String rmHome = this.getRmHome();
             if (rmHome != null) {
@@ -1151,7 +1152,7 @@ public class RMNodeStarter {
                 sb.append(" -");
                 sb.append(OPTION_CREDENTIAL_VAL);
                 sb.append(" ");
-                sb.append(this.getCredentialsValue());
+                sb.append(displayCreds ? this.getCredentialsValue() : "[OBFUSCATED_CRED]");
             }
             if (this.getNodeName() != null) {
                 sb.append(" -");
@@ -1183,7 +1184,7 @@ public class RMNodeStarter {
         @Override
         public String toString() {
             try {
-                return buildCommandLine();
+                return buildCommandLine(false);
             } catch (IOException e) {
                 return RMNodeStarter.CommandLineBuilder.class.getName() + " with invalid configuration";
             }

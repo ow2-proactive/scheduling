@@ -47,6 +47,7 @@ import java.security.KeyException;
 import java.util.Hashtable;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.ssh.SSHClient;
 import org.objectweb.proactive.core.util.ProActiveCounter;
@@ -54,7 +55,7 @@ import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
-import org.ow2.proactive.resourcemanager.utils.RMNodeStarter;
+import org.ow2.proactive.resourcemanager.utils.RMNodeStarter.CommandLineBuilder;
 
 
 /**
@@ -217,38 +218,45 @@ public abstract class BatchJobInfrastructure extends InfrastructureManager {
      * @throws RMException
      */
     private void startNode() throws RMException {
-
-        InetAddress host = null;
-        try {
-            host = InetAddress.getByName(this.serverName);
-        } catch (UnknownHostException e) {
-            throw new RMException(e);
-        }
-        String deleteCmd = getDeleteJobCommand();
-        String submitCmd = getSubmitJobCommand();
+        CommandLineBuilder clb = new CommandLineBuilder();
         // generate the node name
         // current rmcore shortID should be added to ensure uniqueness
         String nodeName = getBatchinJobSystemName() + "-" + nodeSource.getName() + "-" +
             ProActiveCounter.getUniqID();
+        clb.setNodeName(nodeName);
+        clb.setJavaPath(this.javaPath);
+        clb.setRmURL(this.rmUrl);
+        clb.setRmHome(this.schedulingPath);
+        clb.setSourceName(this.nodeSource.getName());
+        clb.setPaProperties(this.javaOptions);
+        try {
+            clb.setCredentialsValueAndNullOthers(new String(this.credentials.getBase64()));
+        } catch (KeyException e) {
+            this.handleFailedDeployment(clb, e);
+        }
+        InetAddress host = null;
+        try {
+            host = InetAddress.getByName(this.serverName);
+        } catch (UnknownHostException e) {
+            this.handleFailedDeployment(clb, e);
+        }
+        String deleteCmd = getDeleteJobCommand();
+        String submitCmd = getSubmitJobCommand();
 
         // build the command: echo "script.sh params"|qsub params
-        String cmd = "echo \\\"";
-        cmd += schedulingPath + getPAAgentRMNodeStarterScriptPath() + " ";
-        cmd += this.javaPath + " ";
+        String cmd = null;
+        String obfuscatedCmd = null;
         try {
-            cmd += new String(this.credentials.getBase64()) + " ";
-        } catch (KeyException e1) {
-            throw new RMException("Could not get base64 credentials", e1);
+            cmd = "echo \\\"" + clb.buildCommandLine(true).replace("\"", "\\\"") + "\\\" | " + submitCmd +
+                " " + this.submitJobOpt;
+            obfuscatedCmd = "echo \\\"" + clb.buildCommandLine(false).replace("\"", "\\\"") + "\\\" | " +
+                submitCmd + " " + this.submitJobOpt;
+        } catch (IOException e) {
+            this.handleFailedDeployment(clb, e);
         }
-        cmd += this.rmUrl + " ";
-        cmd += nodeName + " ";
-        cmd += this.nodeSource.getName() + " ";
-        cmd += this.javaOptions + " ";
-        cmd += "\\\"";
-        cmd += "| " + submitCmd + " " + this.submitJobOpt;
 
         //add an deploying node.
-        final String dnURL = super.addDeployingNode(nodeName, cmd, "Deploying node on " +
+        final String dnURL = super.addDeployingNode(nodeName, obfuscatedCmd, "Deploying node on " +
             getBatchinJobSystemName() + " scheduler", this.nodeTimeOut);
         this.pnTimeout.put(dnURL, new Boolean(false));
 
@@ -308,6 +316,7 @@ public abstract class BatchJobInfrastructure extends InfrastructureManager {
                 }
             } catch (IllegalThreadStateException e) {
                 // process has not returned yet
+                logger.trace("Waiting for ssh process to exit in BatchJobInfrastructure");
             }
 
             if (super.checkNodeIsAcquiredAndDo(nodeName, null, null)) {
@@ -328,10 +337,12 @@ public abstract class BatchJobInfrastructure extends InfrastructureManager {
             }
         }//end of while loop, either deploying node timeout/removed of threshold reached
 
-        // the node is not excpected anymore
+        // the node is not expected anymore
         if (pnTimeout.get(dnURL)) {
             //we remove it
             this.pnTimeout.remove(dnURL);
+            //removes the job
+            this.deleteJob(this.extractSubmitOutput(id));
             //we destroy the process
             p.destroy();
             throw new RMException("Deploying Node " + nodeName + " not expected any more");
@@ -427,6 +438,7 @@ public abstract class BatchJobInfrastructure extends InfrastructureManager {
             this.sshOptions = parameters[index++].toString();
             this.schedulingPath = parameters[index++].toString();
             this.javaOptions = parameters[index++].toString();
+            checkJavaOptions();
             try {
                 this.maxNodes = Integer.parseInt(parameters[index++].toString());
             } catch (Exception e) {
@@ -453,6 +465,27 @@ public abstract class BatchJobInfrastructure extends InfrastructureManager {
             throw new IllegalArgumentException("Invalid parameters for IM creation");
         }
 
+    }
+
+    /**
+     * Checks that the provided java options are sufficient
+     */
+    private void checkJavaOptions() {
+        if (this.javaOptions != null &&
+            !this.javaOptions.contains(CentralPAPropertyRepository.JAVA_SECURITY_POLICY.getName())) {
+            StringBuilder sb = new StringBuilder();
+            sb.append(CentralPAPropertyRepository.JAVA_SECURITY_POLICY.getCmdLine());
+            sb.append(schedulingPath);
+            //only targets unix systems
+            if (schedulingPath != null && !schedulingPath.endsWith("/")) {
+                sb.append("/");
+            }
+            sb.append("config");
+            sb.append("/");
+            sb.append("security.java.policy-client ");
+            sb.append(this.javaOptions);
+            this.javaOptions = sb.toString();
+        }
     }
 
     /**
@@ -611,6 +644,28 @@ public abstract class BatchJobInfrastructure extends InfrastructureManager {
         return sb.toString();
     }
 
+    /**
+     * Creates a lost node to notify the user that the deployment
+     * faile because of an error
+     * @param clb
+     * @param e the error that caused the deployment to failed.
+     * @throws RMException
+     */
+    private void handleFailedDeployment(CommandLineBuilder clb, Throwable e) throws RMException {
+        String error = Utils.getStacktrace(e);
+        String command = null;
+        try {
+            command = clb.buildCommandLine(false);
+        } catch (Exception ex) {
+            command = "Cannot determine the command used to start the node.";
+        }
+        String lostNode = super.addDeployingNode(clb.getNodeName(), command,
+                "Cannot deploy the node because of an error:" + System.getProperty("line.separator") + error,
+                60000);
+        super.declareDeployingNodeLost(lostNode, null);
+        throw new RMException("The deployment failed because of an error", e);
+    }
+
     /*##########################################
      * SPI Methods
      ##########################################*/
@@ -642,16 +697,5 @@ public abstract class BatchJobInfrastructure extends InfrastructureManager {
      * @return the job's ID in case of success, empty string or null if the method is unable to compute the job's ID.
      */
     protected abstract String extractSubmitOutput(String output);
-
-    /**
-     * Returns the path of the script used to start {@link RMNodeStarter} on the
-     * Batching Job System nodes. Implementation must override this methods if they provide a
-     * new script.
-     *
-     * @return "/scripts/unix/cluster/jobBatchingInfrastructure.sh" in the current implementation
-     */
-    protected String getPAAgentRMNodeStarterScriptPath() {
-        return "/scripts/unix/cluster/jobBatchingInfrastructure.sh";
-    }
 
 }

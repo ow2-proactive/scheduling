@@ -196,14 +196,16 @@ public class WinHPCInfrastructure extends DefaultInfrastructureManager {
         //Generate the HPCBP acitivty from Axis2 generated JSDL objects
         //escaping the built command if contains quotes
         String fullCommand = null;
+        String obfuscatedFullCommand = null;
         try {
-            fullCommand = "cmd /C \" " + clb.buildCommandLine().replace("\"", "\\\"") + " \"";
+            fullCommand = "cmd /C \" " + clb.buildCommandLine(true).replace("\"", "\\\"") + " \"";
+            obfuscatedFullCommand = "cmd /C \" " + clb.buildCommandLine(false).replace("\"", "\\\"") + " \"";
         } catch (IOException e) {
             this.handleFailedDeployment(clb, e);
         }
 
-        String dNode = super.addDeployingNode(nodeName, fullCommand, "Node deployment on Windows HPC",
-                timeout);
+        String dNode = super.addDeployingNode(nodeName, obfuscatedFullCommand,
+                "Node deployment on Windows HPC", timeout);
         this.submittedJobs.put(nodeName, eprs);
         this.deployingNodeToEndpoint.put(dNode, eprs);
 
@@ -340,7 +342,7 @@ public class WinHPCInfrastructure extends DefaultInfrastructureManager {
         String error = Utils.getStacktrace(e);
         String command = null;
         try {
-            command = clb.buildCommandLine();
+            command = clb.buildCommandLine(false);
         } catch (Exception ex) {
             command = "Cannot determine the command used to start the node.";
         }

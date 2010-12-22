@@ -56,7 +56,6 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.ssh.SSHClient;
 import org.objectweb.proactive.core.util.ProActiveCounter;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.exception.RMException;
@@ -289,8 +288,10 @@ public class SSHInfrastructure2 extends InfrastructureManager {
 
         //add an expected node. every unexpected node will be discarded
         String cmdLine;
+        String obfuscatedCmdLine;
         try {
-            cmdLine = clb.buildCommandLine();
+            cmdLine = clb.buildCommandLine(true);
+            obfuscatedCmdLine = clb.buildCommandLine(false);
         } catch (IOException e2) {
             throw new RMException("Cannot build the " + RMNodeStarter.class.getSimpleName() +
                 "'s command line.", e2);
@@ -302,8 +303,8 @@ public class SSHInfrastructure2 extends InfrastructureManager {
         }
 
         //we create a new deploying node before ssh command ran
-        final String pnURL = super.addDeployingNode(nodeName, cmdLine, "Deploying node on host " + host,
-                this.nodeTimeOut);
+        final String pnURL = super.addDeployingNode(nodeName, obfuscatedCmdLine, "Deploying node on host " +
+            host, this.nodeTimeOut);
         this.pnTimeout.put(pnURL, new Boolean(false));
 
         Process p = null;
