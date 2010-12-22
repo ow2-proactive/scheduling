@@ -139,6 +139,37 @@
 				<listitem>
 					<mediaobject>
 						<imageobject>
+							<imagedata scalefit="1" fileref="images/png/plugin/deploying.png" format="PNG"/>
+						</imageobject>
+					</mediaobject>
+					<para>
+					Node is <emphasis role="bold">deploying</emphasis>, its deployment has been triggered but the node didn't registered yet.
+					</para>
+				</listitem>
+				<listitem>
+					<mediaobject>
+						<imageobject>
+							<imagedata scalefit="1" fileref="images/png/plugin/lost.png" format="PNG"/>
+						</imageobject>
+					</mediaobject>
+					<para>
+					Node is <emphasis role="bold">lost</emphasis>. The deployment of the node failed. The node won't be added to the resource manager.
+					</para>
+				</listitem>
+				<listitem>
+					<mediaobject>
+						<imageobject>
+							<imagedata scalefit="1" fileref="images/png/plugin/configuring.png" format="PNG"/>
+						</imageobject>
+					</mediaobject>
+					<para>
+					Node is <emphasis role="bold">configuring</emphasis>. The node registered to the resource manager and is under configuration.
+					This step can be time consuming depending above all on the nodes already managed by the resource manager.
+					</para>
+				</listitem>
+				<listitem>
+					<mediaobject>
+						<imageobject>
 							<imagedata scalefit="1" fileref="images/png/plugin/free.png" format="PNG"/>
 						</imageobject>
 					</mediaobject>
@@ -253,23 +284,34 @@
 			  <para>
 			    To acquire nodes, this infrastructure needs to start runtimes on remote hosts.
 			    To do so, it needs to know some information, assumed to be true for all hosts:
-			    <itemizedlist>
-			      <listitem><para>
-				  <emphasis role="bold">Java Path</emphasis>: path to the java executable on the remote hosts.
+			  <itemizedlist>
+				  <listitem><para>
+				  <emphasis role="bold">Rm Url</emphasis> - The resource manager's url that will be used by the deployed nodes to register by themself.
+				  </para></listitem>
+				  <listitem><para>
+				  <emphasis role="bold">SSH Options</emphasis> - Options you can pass to the SSHClient executable ( -l inria to specify the user for instance )
+				  </para></listitem>
+				  <listitem><para>
+				  <emphasis role="bold">Java Path</emphasis> - Path to the java executable on the remote hosts.
 			      </para></listitem>
+				  <listitem><para>
+				  <emphasis role="bold">Scheduling Path</emphasis> - Path to the Scheduling/RM installation directory on the remote hosts.
+				  </para></listitem>
+				  <listitem><para>
+				  <emphasis role="bold">Node Time Out</emphasis> - A duration after which one the remote nodes are considered to be lost.
+				  </para></listitem>
 			      <listitem><para>
-				  <emphasis role="bold">Scheduling Path</emphasis>: path to the Scheduling/RM installation directory on the remote hosts.
-			      </para></listitem>
-			      <listitem><para>
-				  <emphasis role="bold">Protocol</emphasis>: protocol (rmi, http...) used by the remote host to communicate with the RM.
-			      </para></listitem>
-			      <listitem><para>
-				  <emphasis role="bold">Port</emphasis>: port used by the remote host to communicate with the RM.
-			      </para></listitem>
-			      <listitem><para>
-				  <emphasis role="bold">Java Options</emphasis>: Java options appended to the command used to start the node
-				  on the remote host.
-			      </para></listitem>
+				  <emphasis role="bold">Attempt</emphasis> - The number of time the resource manager tries to acquire a node for which one the deployment fails before discarding it forever.
+				  </para></listitem>
+				  <listitem><para>
+				  <emphasis role="bold">Target OS</emphasis> - One of 'LINUX', 'CYGWIN' or 'WINDOWS' depending on the machines' ( in Hosts List file ) operating system.
+				  </para></listitem>
+				  <listitem><para>
+				  <emphasis role="bold">Java Options</emphasis> - Java options appended to the command used to start the node on the remote host.
+				  </para></listitem>
+				  <listitem><para>
+				  <emphasis role="bold">Rm Credentials Path</emphasis> - The absolute path of the 'rm.cred' file to make the deployed nodes able to register to the resource manager ( config/authentication/rm.cred ).
+				  </para></listitem>
 			      <listitem><para>
 				  <emphasis role="bold">Hosts List</emphasis>: The path to a file containing the hosts on which resources should be acquired.
 				  This file should contain one host per line, described as a host name or a public IP address, optionally followed by a positive

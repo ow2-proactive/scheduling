@@ -21,7 +21,7 @@
 				<listitem>
 					<para>
 						Maintains and monitors the list of resources and manages their states
-						(i.e. free, busy, down).
+						(i.e. deploying, lost, configuring, free, busy, down).
 					</para>
 				</listitem>
 				<listitem>
@@ -152,6 +152,28 @@
 						maintains different node states:
 					</para>
 						<itemizedlist>
+							<listitem>
+								<para>
+									<emphasis>Deploying</emphasis> -
+									The deployment of the node has been triggered by the resource manager
+									but it has not yet been added.
+								</para>
+							</listitem>
+							<listitem>
+								<para>
+									<emphasis>Lost</emphasis> -
+									The deployment of the node has failed for some reason. The node
+									has never been added to the resource manager and won't be useable.
+								</para>
+							</listitem>
+							<listitem>
+								<para>
+									<emphasis>Configuring</emphasis> -
+									Node has been added to the resource manager and is under configuration.
+									The resource manager computes several information about the node.
+									This step can be time consuming depending.
+								</para>
+							</listitem>
 							<listitem>
 								<para>
 									<emphasis>Free</emphasis> -

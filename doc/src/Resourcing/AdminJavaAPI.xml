@@ -32,8 +32,27 @@
 		</para>
 		<programlisting language="java"><textobject><textdata fileref="automatic_snippets/JavaAPIAdmin_AddNode.snip"/></textobject></programlisting>
 		<note>
+			<para>
+				The snippet here above has the same behavior as:
+			</para>
+				<screen>BooleanWrapper isAdded = resourceManager.addNode(nodeUrl, "Default");</screen>
+			<para>
+				The second parameter stands for the name of the nodesource to which one the node is added.
+			</para>
 			<para>To start a node, you can use the <literal>rm-start-node</literal> script:</para>
-			<screen>$RM_HOME/bin/[os]> rm-start-node rmi://kisscool.inria.fr:1099/MyNode</screen>
+			<screen>$RM_HOME/bin/[os]> rm-start-node -n MyNode</screen>
+			<para>
+				The script prints the url of the node that you must provide to the addNode method.
+				You can also directly make the node register itself to the resource manager.
+				In this case you need to provide the appropriate url of the resource manager and
+				the credentials you want to use either specifying a file, an environment variable
+				or the value:
+			</para>
+			<screen>$RM_HOME/bin/[os]> rm-start-node -n MyNode -r rmi://kisscool.inria.fr:1099/ -f $RM_HOME/config/authentication/rm.cred</screen>
+			<para>
+				In the example above, -r rmi://kisscool.inria.fr:1099/ stands for the url of the resource manager and
+				-f $RM_HOME/config/authentication/rm.cred is the credentials file (use -s to provide the name of a nodesource).
+			</para>
 		</note>
 	</section>
 	<section xml:id="RM_API_remove_node"><info><title>Remove a node from the resource manager</title></info>

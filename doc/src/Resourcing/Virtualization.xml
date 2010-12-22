@@ -161,11 +161,18 @@
 	<para>
 		or
 	</para>
-	<screen>$RM_HOME>./bin/unix/rm-client -uc --createns virtual -infrastructure org.ow2.proactive.resourcemanager.nodesource.infrastructure.VirtualInfrastructure infrastructure VMMUrl VMMUser VMMPwd VMTemplate VMMax hostCapacity PAConfig RMUrl RMCredentials</screen>
+	<screen>$RM_HOME>./bin/unix/rm-client -uc --createns virtual -infrastructure org.ow2.proactive.resourcemanager.nodesource.infrastructure.VirtualInfrastructure RMUrl infrastructure VMMUrl VMMUser VMMPwd VMTemplate VMMax hostCapacity PAConfig RMCredentials</screen>
 
 	<para>where:</para>
 
 	<itemizedlist>
+		<listitem>
+			<para>
+				<emphasis>RMUrl</emphasis> field holds the Resource Manager's url that will be used to connect remotely, from the virtual
+				machine, by the RM Nodes to register themself as available. If you do not fill this field, local node registration will
+				be used.
+			</para>
+		</listitem>
 		<listitem>
 			<para>
 				<emphasis>infrastructure</emphasis> - Kind of virtualized infrastructre	to manage. For the time being, only <link linkend="virtualization-vmware">vmware</link>, <link linkend="virtualization-xenserver">xenserver</link> and <link linkend="virtualization-virtualbox">virtualbox</link> are supported.
@@ -206,13 +213,6 @@
 				<emphasis>PAConfig</emphasis> - File describing ProActive properties used to update
 				RM Nodes environment. You can thus dynamically precise the node's environment like a precise network communication
 				protocol.
-			</para>
-		</listitem>
-		<listitem>
-			<para>
-				<emphasis>RMUrl</emphasis> field holds the Resource Manager's url that will be used to connect remotely, from the virtual
-				machine, by the RM Nodes to register themself as available. If you do not fill this field, local node registration will
-				be used.
 			</para>
 		</listitem>
 		<listitem>

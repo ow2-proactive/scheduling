@@ -5,26 +5,26 @@ Name: Release Resources When Scheduler Idle
 Description: Releases all resources when scheduler is idle for specified
 time. Acquires them back on job submission.
 Class name: org.ow2.proactive.scheduler.resourcemanager.nodesource.policy.ReleaseResourcesWhenSchedulerIdle
-Parameters: <class name> nodeUsers nodeProviders schedulerUrl schedulerCredentialsPath idleTime
+Parameters: <class name> nodeUsers[ALL] nodeProviders[ME] schedulerUrl schedulerCredentialsPath idleTime[60000]
 
 Name: EC2 Policy
 Description: Allocates resources according to the Scheduler loading factor,
 releases resources considering EC2 instances are paid by the hour
 Class name: org.ow2.proactive.scheduler.resourcemanager.nodesource.policy.EC2Policy
-Parameters: <class name> nodeUsers nodeProviders schedulerUrl schedulerCredentialsPath refreshTime loadFactor releaseDelay
+Parameters: <class name> nodeUsers[ALL] nodeProviders[ME] schedulerUrl schedulerCredentialsPath refreshTime[5] loadFactor[10] releaseDelay[3600]
 
 Name: Time Slot Policy
 Description: Acquires and releases nodes at specified time.
 Class name: org.ow2.proactive.resourcemanager.nodesource.policy.TimeSlotPolicy
-Parameters: <class name> nodeUsers nodeProviders acquireTime releaseTime period preemptive
+Parameters: <class name> nodeUsers[ALL] nodeProviders[ME] acquireTime[12/21/10 5:25:30 PM CET] releaseTime[12/21/10 6:25:30 PM CET] period[86400000] preemptive[true]
 
 Name: Scheduler Loading Policy
 Description: Allocates as many resources as scheduler required according
 to loading factor. Releases resources smoothly.
 Class name: org.ow2.proactive.scheduler.resourcemanager.nodesource.policy.SchedulerLoadingPolicy
-Parameters: <class name> nodeUsers nodeProviders schedulerUrl schedulerCredentialsPath refreshTime minNodes maxNodes loadFactor nodeDeploymentTimeout
+Parameters: <class name> nodeUsers[ALL] nodeProviders[ME] schedulerUrl schedulerCredentialsPath refreshTime[1000] minNodes[0] maxNodes[10] loadFactor[10] nodeDeploymentTimeout[10000]
 
 Name: Static Policy
 Description: Static nodes acquisition.
 Class name: org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy
-Parameters: <class name> nodeUsers nodeProviders
+Parameters: <class name> nodeUsers[ALL] nodeProviders[ME]

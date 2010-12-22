@@ -7,10 +7,12 @@
 		<javaPropertyVariable name="proactive.home" />
 		<!-- this variable will be replaced by a path of a GCMD to deploy, by RMAdmin -->
 		<javaPropertyVariable name="gcmd.file" />
+		<programVariable name="jvmargDefinedByIM" />
 	</environment>
 	<application>
 		<proactive base="root" relpath="${proactive.home}">
 			<configuration>
+				<jvmarg value='${jvmargDefinedByIM}'/>
 				<applicationClasspath>
 					<pathElement base="proactive" relpath="/dist/lib/ProActive_ResourceManager.jar"/>
 					<pathElement base="proactive" relpath="/dist/lib/ProActive_Scheduler-worker.jar"/>

@@ -22,8 +22,9 @@
 			using GUI or command line interface. The first one is the node source
 			with "ssh infrastructure" and static deployment policy. The command would be
 			the following:
+
 			<screen><![CDATA[$RM_HOME>./bin/unix/rm-client --createns "MyCluster" -infrastructure org.ow2.proactive.resourcemanager.nodesource.infrastructure.SSHInfrastructure
-javaPath schedulingPath protocol port javaOptions hostsList]]></screen>
+rmURL sshOptions javaPath schedulingPath nodeTimeout attempt targetOS javaOptions rmCreds hostsList]]></screen>
 			The semantic of this command is quite straight forward, namely the resource
 			manager tries immediately to launch the command of JVM creation through ssh using a special
 			class which creates ProActive nodes inside JVMs and register them in the resource manager.
@@ -37,7 +38,7 @@ javaPath schedulingPath protocol port javaOptions hostsList]]></screen>
 			and submit a job launching the JVM process with ProActive. Here we also describe
 			when the deployment has to be triggered using time slot policy.
 			<screen><![CDATA[$RM_HOME>./bin/unix/rm-client --createns "WindowsCluster" -infrastructure org.ow2.proactive.resourcemanager.nodesource.infrastructure.WinHPCInfrastructure
-maxNodes serviceUrl userName password trustStore trustStorePassword javaPath rmPath RMUrl RMCredentialsPath javaOptions extraClassPath
+rmURL maxNodes serviceUrl userName password trustStore trustStorePassword javaPath rmPath RMCredentialsPath javaOptions extraClassPath timeout
 -policy org.ow2.proactive.resourcemanager.nodesource.policy.TimeSlotPolicy nodesAvailableTo administrator acquireTime releaseTime period preemptive]]></screen>
 		</para>
 		</note>
@@ -152,8 +153,14 @@ maxNodes serviceUrl userName password trustStore trustStorePassword javaPath rmP
 				<emphasis>Default infrastructure manager</emphasis> is designed to be used with ProActive agent.
 				It cannot perform an automatic deployment but any users (including an agent) can add already existing nodes
 				into it. In order to create a node source with this infrastructure, run the following command:
-				<screen>$RM_HOME>./bin/unix/rm-client --createns defaultns -infrastructure org.ow2.proactive.resourcemanager.nodesource.infrastructure.DefaultInfrastructureManager</screen>
+				<screen>$RM_HOME>./bin/unix/rm-client --createns defaultns -infrastructure org.ow2.proactive.resourcemanager.nodesource.infrastructure.DefaultInfrastructureManager rmURL</screen>
 			</para>
+			<para>The only parameter to provide is the following one:</para>
+			<itemizedlist>
+				<listitem>
+					<para><emphasis role="bold">rmURL</emphasis> - the URL of the resource manager.</para>
+				</listitem>
+			</itemizedlist>
 		</section>
 		<section xml:id="RM_GCM"><info><title>GCM infrastructure</title></info>
 			<para>
@@ -164,10 +171,13 @@ maxNodes serviceUrl userName password trustStore trustStorePassword javaPath rmP
 				and as a consequence cannot be used with some policies. Here is an example of such a node source
 				creation:
 			</para>
-			<screen>$RM_HOME>./bin/unix/rm-client --createns gcmdns -infrastructure org.ow2.proactive.resourcemanager.nodesource.infrastructure.GCMInfrastructure config/rm/deployment/Local4JVMDeployment.xml</screen>
+			<screen>$RM_HOME>./bin/unix/rm-client --createns gcmdns -infrastructure org.ow2.proactive.resourcemanager.nodesource.infrastructure.GCMInfrastructure rmURL config/rm/deployment/Local4JVMDeployment.xml</screen>
 
-			<para>The only argument that has to be provided to this infrastructure is the following one:</para>
+			<para>The 2 arguments that have to be provided to this infrastructure are the following:</para>
 			<itemizedlist>
+				<listitem>
+					<para><emphasis role="bold">rmURL</emphasis> - the URL of the resource manager.</para>
+				</listitem>
 				<listitem>
 					<para><emphasis role="bold">descriptor</emphasis> - path to a GCM Deployment descriptor file.</para>
 				</listitem>
@@ -407,25 +417,41 @@ maxNodes serviceUrl userName password trustStore trustStorePassword javaPath rmP
 					moment of deployment the resource manager associates host
 					to the gcmd (see <literal>$RM_HOME/config/rm/deployment/deployment_ssh_hosts_list_template.xml</literal>).
 				</para>
-				<screen>$RM_HOME>./bin/unix/rm-client --createns gcmns -infrastructure org.ow2.proactive.resourcemanager.nodesource.infrastructure.GCMCustomisedInfrastructure config/rm/deployment/deployment_ssh_hosts_list_template.xml config/rm/deployment/hostslist</screen>
-				<para>This infrastructure needs 2 arguments, described hereafter:</para>
+				<screen>$RM_HOME>./bin/unix/rm-client --createns gcmns -infrastructure org.ow2.proactive.resourcemanager.nodesource.infrastructure.GCMCustomisedInfrastructure rmURL config/rm/deployment/deployment_ssh_hosts_list_template.xml config/rm/deployment/hostslist nodeTimeout</screen>
+				<para>This infrastructure needs 4 arguments, described hereafter:</para>
 				<itemizedlist>
+					<listitem>
+						<para><emphasis role="bold">RMUrl</emphasis> - Url of the resource manager server</para>
+					</listitem>
 					<listitem>
 						<para><emphasis role="bold">descriptor</emphasis> - path to a template GCM Deployment descriptor file where the <literal>${HOST}</literal> variable is used.</para>
 					</listitem>
 					<listitem>
 						<para><emphasis role="bold">hostsList</emphasis> - path to a file containing a list of hosts (one host per line).</para>
 					</listitem>
+					<listitem>
+						<para><emphasis role="bold">timeout</emphasis> - The length in ms after which one a node is not expected anymore.</para>
+					</listitem>
 				</itemizedlist>
+				<para>
+					Even if GCM and GCMCustomized infrastructures used the same GCM Application descriptor file, only GCM Customized makes an optimal usage of it. The
+					main difference comes from the fact that the GCM Customized infrastructure manager predicts the deployment of the nodes by giving them a name.
+					This name can directly be set by the infrastructure manager filling in a variable contract (name jvmargDefinedByIM) of the xml descriptor file.
+				</para>
 		</section>
-		<section xml:id="SSH"><info><title>SSH infrastructure</title></info>
+		<section xml:id="SSH"><info><title>SSH infrastructure 2</title></info>
 			<para>
 				This infrastructure allows to deploy nodes over ssh. Having a list of hosts the resource manager
 				construct the ssh command to launch remote JVMs. Java path and rm distribution path on remote hosts
 				have to be specified together with other parameters. Example:
 			</para>
-			<para>This infrastructure needs 9 arguments, described hereafter:</para>
+			<para>This infrastructure needs 10 arguments, described hereafter:</para>
 			<itemizedlist>
+				<listitem>
+					<para>
+						<emphasis role="bold">Rm Url</emphasis> - The resource manager's url that will be used by the deployed nodes to register by themself.
+					</para>
+				</listitem>
 				<listitem>
 					<para>
 						<emphasis role="bold">SSH Options</emphasis> - Options you can pass to the SSHClient executable ( -l inria to specify the user for instance )
@@ -448,17 +474,17 @@ maxNodes serviceUrl userName password trustStore trustStorePassword javaPath rmP
 				</listitem>
 				<listitem>
 					<para>
+						<emphasis role="bold">Attempt</emphasis> - The number of time the resource manager tries to acquire a node for which one the deployment fails before discarding it forever.
+					</para>
+				</listitem>
+				<listitem>
+					<para>
 						<emphasis role="bold">Target OS</emphasis> - One of 'LINUX', 'CYGWIN' or 'WINDOWS' depending on the machines' ( in Hosts List file ) operating system.
 					</para>
 				</listitem>
 				<listitem>
 					<para>
 						<emphasis role="bold">Java Options</emphasis> - Java options appended to the command used to start the node on the remote host.
-					</para>
-				</listitem>
-				<listitem>
-					<para>
-						<emphasis role="bold">Rm Url</emphasis> - The resource manager's url that will be used by the deployed nodes to register by themself.
 					</para>
 				</listitem>
 				<listitem>
@@ -487,10 +513,13 @@ test.example.net 5
 					it from Java and submit any command. In our case, it is a command launching JVM on one of the
 					cluster nodes.
 				</para>
-				<screen>$RM_HOME>./bin/unix/rm-client --createns winhpc -infrastructure org.ow2.proactive.resourcemanager.nodesource.infrastructure.WinHPCInfrastructure 8 https://cluster_name/HPCBasicProfile username password trustStore trustStorePassword javaPath rmPath RMUrl RMCredentialsPath javaOptions extraClassPath</screen>
+				<screen>$RM_HOME>./bin/unix/rm-client --createns winhpc -infrastructure org.ow2.proactive.resourcemanager.nodesource.infrastructure.WinHPCInfrastructure rmURL 8 https://cluster_name/HPCBasicProfile username password trustStore trustStorePassword javaPath rmPath RMUrl RMCredentialsPath javaOptions extraClassPath nodeTimeout</screen>
 
 				<para>This infrastructure needs 12 arguments, described hereafter:</para>
 				<itemizedlist>
+					<listitem>
+						<para><emphasis role="bold">RMUrl</emphasis> - Url of the resource manager server</para>
+					</listitem>
 					<listitem>
 						<para><emphasis role="bold">maxNodes</emphasis> - Maximum number of nodes to deploy.</para>
 					</listitem>
@@ -516,9 +545,6 @@ test.example.net 5
 						<para><emphasis role="bold">rmPath</emphasis> - Path to the Resource Manager directory on the WinHPC server.</para>
 					</listitem>
 					<listitem>
-						<para><emphasis role="bold">RMUrl</emphasis> - Url of the resource manager server</para>
-					</listitem>
-					<listitem>
 						<para><emphasis role="bold">RMCredentialsPath</emphasis> - Path to the RM Credentials</para>
 					</listitem>
 					<listitem>
@@ -526,6 +552,9 @@ test.example.net 5
 					</listitem>
 					<listitem>
 						<para><emphasis role="bold">extraClassPath</emphasis> - Extra class path to be added.</para>
+					</listitem>
+					<listitem>
+						<para><emphasis role="bold">timeout</emphasis> - The length in ms after which one a node is not expected anymore.</para>
 					</listitem>
 				</itemizedlist>
 		</section>
@@ -540,20 +569,21 @@ test.example.net 5
 				As an alternative, you may consider using <link linkend="RM_GCM">the GCM infrastructure</link>
 				instead, which provides more control over the deployment, but requires more configuration.
 				</para>
-				<screen>$RM_HOME>./bin/unix/rm-client --createns pbs -infrastructure org.ow2.proactive.resourcemanager.nodesource.infrastructure.PBSInfrastructure javaPath schedulingPath protocol port javaOptions maxNodes PBSServer RMUrl RMCredentialsPath qsubOptions</screen>
+				<screen>$RM_HOME>./bin/unix/rm-client --createns pbs -infrastructure org.ow2.proactive.resourcemanager.nodesource.infrastructure.PBSInfrastructure rmURL javaPath sshOptions schedulingPath javaOptions maxNodes nodeTimeout PBSServer RMCredentialsPath qsubOptions</screen>
 				<para>where:</para>
 			    <itemizedlist>
 			      <listitem><para>
+				  <emphasis role="bold">RMUrl</emphasis> - URL of the Resource Manager from the PBS nodes point of view -
+				  this is the URL the nodes will try to lookup when attempting to register to the RM after their creation.
+			      </para></listitem>
+			      <listitem><para>
 				  <emphasis role="bold">javaPath</emphasis> - path to the java executable on the remote hosts (ie the PBS slaves).
 			      </para></listitem>
+				  <listitem><para>
+				  <emphasis role="bold">SSH Options</emphasis> - Options you can pass to the SSHClient executable ( -l inria to specify the user for instance )
+				  </para></listitem>
 			      <listitem><para>
 				  <emphasis role="bold">schedulingPath</emphasis> - path to the Scheduling/RM installation directory on the remote hosts.
-			      </para></listitem>
-			      <listitem><para>
-				  <emphasis role="bold">protocol</emphasis> - protocol (rmi, http...) used by the remote host to communicate with the RM.
-			      </para></listitem>
-			      <listitem><para>
-				  <emphasis role="bold">port</emphasis> - port used by the remote host to communicate with the RM.
 			      </para></listitem>
 			      <listitem><para>
 				  <emphasis role="bold">javaOptions</emphasis> - Java options appended to the command used to start the node
@@ -565,20 +595,19 @@ test.example.net 5
 				  This can result to asking more resources than physically available, and waiting for the resources to come up for a very long time
 				  as the request would be queued until satisfiable.
 			      </para></listitem>
+				  <listitem><para>
+				  <emphasis role="bold">Node Time Out</emphasis> - The length in ms after which one a node is not expected anymore.
+				  </para></listitem>
 			      <listitem><para>
-				  <emphasis role="bold">PBSServer</emphasis> - URL of the PBS server, which is responsible for acquiring PBS nodes.
+				  <emphasis role="bold">Server Name</emphasis> - URL of the PBS server, which is responsible for acquiring PBS nodes.
 				  This server will be contacted by the Resource Manager through an SSH connection.
 			      </para></listitem>
 			      <listitem><para>
-				  <emphasis role="bold">RMUrl</emphasis> - URL of the Resource Manager from the PBS nodes point of view -
-				  this is the URL the nodes will try to lookup when attempting to register to the RM after their creation.
-			      </para></listitem>
-			      <listitem><para>
-				  <emphasis role="bold">RMCredentials</emphasis> - Encrypted credentials file, as created by the create-cred[.bat] utility.
+				  <emphasis role="bold">RM Credentials Path</emphasis> - Encrypted credentials file, as created by the create-cred[.bat] utility.
 				  These credentials will be used by the nodes to authenticate on the Resource Manager.
 			      </para></listitem>
 			      <listitem><para>
-				  <emphasis role="bold">qsubOptions</emphasis> - Options for the qsub command client when acquiring nodes on the PBS master.
+				  <emphasis role="bold">Submit Job Opt</emphasis> - Options for the qsub command client when acquiring nodes on the PBS master.
 				  Default value should be enough in most cases, if not, refer to the documentation of the PBS cluster.
 			      </para></listitem>
 			    </itemizedlist>

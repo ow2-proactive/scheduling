@@ -61,7 +61,7 @@
 		<para>
 			Then select the appropriate one and specify it in the command line. Example:
 		</para>
-		<screen>>rm-client -l admin -cn myns -infrastructure org.ow2.proactive.resourcemanager.nodesource.infrastructure.DefaultInfrastructureManager -policy org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy</screen>
+		<screen>>rm-client -l admin -cn myns -infrastructure org.ow2.proactive.resourcemanager.nodesource.infrastructure.DefaultInfrastructureManager rmURL -policy org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy ALL ME</screen>
 
 	<section xml:id="rm_admin_js_console"><info><title>Interactive mode</title></info>
 	<para>
@@ -99,7 +99,7 @@ exMode(false,false);
 removens("my_node_source",true);
 
 /* create a new node source with GCMD and static nodes acquisition*/
-createns("my_node_source", ['org.ow2.proactive.resourcemanager.nodesource.infrastructure.GCMInfrastructure', 'path_to_descriptor'], ['org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy']);
+createns("my_node_source", ['org.ow2.proactive.resourcemanager.nodesource.infrastructure.GCMInfrastructure', 'rmURL', 'path_to_descriptor'], ['org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy', 'ALL', 'ME']);
 
 /* wait for a while */
 java.lang.Thread.sleep(10000);
