@@ -41,12 +41,9 @@ import java.io.Serializable;
 import java.security.Permission;
 import java.util.HashMap;
 
-import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.core.node.NodeInformation;
-import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.ow2.proactive.authentication.principals.UserNamePrincipal;
 import org.ow2.proactive.permissions.PrincipalPermission;
 import org.ow2.proactive.resourcemanager.authentication.Client;
@@ -100,6 +97,9 @@ public class RMNodeImpl implements RMNode, Serializable {
     /** Host name of the node */
     private String hostName;
 
+    /** JVM name of the node */
+    private String jvmName;
+
     /** Script handled, manage scripts launching and results recovering */
     private ScriptHandler handler = null;
 
@@ -145,6 +145,7 @@ public class RMNodeImpl implements RMNode, Serializable {
         this.nodeName = node.getNodeInformation().getName();
         this.nodeURL = node.getNodeInformation().getURL();
         this.hostName = node.getNodeInformation().getVMInformation().getHostName();
+        this.jvmName = node.getProActiveRuntime().getURL();
         this.scriptStatus = new HashMap<SelectionScript, Integer>();
         this.state = NodeState.FREE;
         this.stateChangeTime = System.currentTimeMillis();
@@ -171,14 +172,6 @@ public class RMNodeImpl implements RMNode, Serializable {
     }
 
     /**
-     * Returns the NodeInformation object of the RMNode.
-     * @return the NodeInformation object of the RMNode.
-     */
-    public NodeInformation getNodeInformation() {
-        return this.node.getNodeInformation();
-    }
-
-    /**
      * Returns the Virtual node name of the RMNode.
      * @return the Virtual node name  of the RMNode.
      */
@@ -199,7 +192,7 @@ public class RMNodeImpl implements RMNode, Serializable {
      * @return the java virtual machine name of the RMNode.
      */
     public String getDescriptorVMName() {
-        return this.node.getProActiveRuntime().getURL();
+        return this.jvmName;
     }
 
     /**
@@ -215,7 +208,7 @@ public class RMNodeImpl implements RMNode, Serializable {
      * @return the unique id of the RMNode represented by its URL.
      */
     public String getNodeURL() {
-        return this.node.getNodeInformation().getURL();
+        return nodeURL;
     }
 
     /**
@@ -317,17 +310,17 @@ public class RMNodeImpl implements RMNode, Serializable {
     public String toString() {
         String lf = System.getProperty("line.separator");
         StringBuilder sb = new StringBuilder();
-        sb.append("Node " + this.getNodeName());
+        sb.append("Node " + nodeName);
         sb.append(lf);
-        sb.append("URL : " + this.getNodeURL());
+        sb.append("URL : " + nodeURL);
         sb.append(lf);
-        sb.append("Node source : " + this.getNodeSourceName());
+        sb.append("Node source : " + nodeSourceName);
         sb.append(lf);
-        sb.append("Provider : " + this.getProvider().getName());
+        sb.append("Provider : " + provider.getName());
         sb.append(lf);
-        sb.append("Owner : " + (this.getOwner() == null ? "nobody" : this.getOwner().getName()));
+        sb.append("Owner : " + (owner == null ? "nobody" : owner.getName()));
         sb.append(lf);
-        sb.append("State : " + this.getState());
+        sb.append("State : " + state);
         return sb.toString();
     }
 

@@ -113,14 +113,6 @@ public interface RMNode extends Comparable<RMNode> {
     public Node getNode() throws NodeException;
 
     /**
-     *  Get the NodeInformation object of the node.
-     * @see org.objectweb.proactive.core.node.NodeInformation
-     * @return the node information, describing this node 
-     * @throws NodeException if the node is down.
-     */
-    public NodeInformation getNodeInformation() throws NodeException;
-
-    /**
      * @return the name of the virtual node
      */
     public String getVNodeName();

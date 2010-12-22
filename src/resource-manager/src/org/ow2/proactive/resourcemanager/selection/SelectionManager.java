@@ -351,7 +351,7 @@ public abstract class SelectionManager {
 
         for (Node n : nodeset) {
             try {
-                if (n.getNodeInformation().getURL().equals(node.getNodeInformation().getURL())) {
+                if (n.getNodeInformation().getURL().equals(node.getNodeURL())) {
                     return true;
                 }
             } catch (Exception e) {
