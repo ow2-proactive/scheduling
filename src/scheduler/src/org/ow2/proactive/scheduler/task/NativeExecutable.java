@@ -54,6 +54,7 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.processbuilder.OSProcessBuilder;
+import org.objectweb.proactive.extensions.processbuilder.exception.NotImplementedException;
 import org.ow2.proactive.scheduler.common.exception.UserException;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.Executable;
@@ -112,14 +113,14 @@ public class NativeExecutable extends Executable {
      */
     private Map<String, String> modelEnvVar = null;
 
-    /** Env vars used by system call */
-    private Map<String, String> envVarsTab;
-
     /** Generated command */
     private String[] command;
 
     /** File used to store nodes URL */
     private File nodesFiles = null;
+
+    /** Nodes number */
+    private int nodesNumber = 1;
 
     /** Decrypter to start native process */
     private OneShotDecrypter decrypter = null;
@@ -174,9 +175,7 @@ public class NativeExecutable extends Executable {
             }
             outputWriter.close();
         }
-
-        //set environment variables
-        this.setEnvironmentVariables(nodes.size());
+        nodesNumber = nodes.size();
         //set decrypter
         this.decrypter = execInitializer.getDecrypter();
     }
@@ -209,17 +208,16 @@ public class NativeExecutable extends Executable {
      * and the cookie environment variable used by ProcessTreeKiller
      *
      */
-    private void setEnvironmentVariables(int coresNumber) {
+    private Map<String, String> buildEnvironmentVariables(boolean processEnvAvailable) {
         //Set Model environment variable HashMap for the executable;
         //if this process must be killed by ProcessTreeKiller
         String cookie_value = ProcessTreeKiller.createCookie();
         modelEnvVar = new HashMap<String, String>();
         modelEnvVar.put(COOKIE_ENV, cookie_value);
 
+        Map<String, String> envVarsTab = new HashMap<String, String>();
         //Set environment variables array used to launch the external native command,
         //with system environment variables, ProActive Scheduling environment variables,
-        //and ProcessTreeKiller environment variable (cookie)
-
         Map<String, String> taskEnvVariables = new Hashtable<String, String>(4);
         taskEnvVariables.put(SchedulerVars.JAVAENV_JOB_ID_VARNAME.toString(), System
                 .getProperty(SchedulerVars.JAVAENV_JOB_ID_VARNAME.toString()));
@@ -233,8 +231,14 @@ public class NativeExecutable extends Executable {
                 .getProperty(SchedulerVars.JAVAENV_TASK_ITERATION.toString()));
         taskEnvVariables.put(SchedulerVars.JAVAENV_TASK_REPLICATION.toString(), System
                 .getProperty(SchedulerVars.JAVAENV_TASK_REPLICATION.toString()));
+        //add to the returnTab the task environment variables
+        for (Map.Entry<String, String> entry : taskEnvVariables.entrySet()) {
+            String name = entry.getKey();
+            String value = entry.getValue();
+            envVarsTab.put(convertJavaenvNameToSysenvName(name), value);
+        }
 
-        // exported properties
+        //get exported properties
         String allVars = System.getProperty(PropertyUtils.EXPORTED_PROPERTIES_VAR_NAME);
         Map<String, String> taskExportedProperties = null;
         if (allVars != null) {
@@ -252,33 +256,15 @@ public class NativeExecutable extends Executable {
             }
             System.clearProperty(PropertyUtils.EXPORTED_PROPERTIES_VAR_NAME);
         }
-
-        // current env
-        Map<String, String> systemEnvVariables = System.getenv();
-
-        envVarsTab = new HashMap<String, String>();
-        if (nodesFiles != null) {
-            envVarsTab.put(CORE_FILE_ENV, nodesFiles.getAbsolutePath());
-        }
-
-        envVarsTab.put(CORE_NB, "" + coresNumber);
-
-        //first we add to the returnTab the task environment variables
-        for (Map.Entry<String, String> entry : taskEnvVariables.entrySet()) {
-            String name = entry.getKey();
-            String value = entry.getValue();
-            envVarsTab.put(convertJavaenvNameToSysenvName(name), value);
-        }
-
-        //after we add to the returnTab the system environment variables
-        for (Map.Entry<String, String> entry : systemEnvVariables.entrySet()) {
-            String name = entry.getKey();
-            String value = entry.getValue();
-            envVarsTab.put(name, value);
-        }
-
-        //then we add exported properties
+        //add exported properties
         if (taskExportedProperties != null) {
+            //TODO SCHEDULING-986 : remove if when environment can be modified with runAsMe
+            //processEnvAvailable is true if environment can be passed to forked process
+            //if env cannot be passed, throws exception if user intend to alter env.
+            if (!processEnvAvailable && taskExportedProperties.size() > 0) {
+                throw new StartProcessException(
+                    "Process cannot be started because user intend to update system environment using exported property. This is not possible when runAsMe is activated.");
+            }
             for (Map.Entry<String, String> entry : taskExportedProperties.entrySet()) {
                 String name = entry.getKey();
                 String value = entry.getValue();
@@ -286,8 +272,16 @@ public class NativeExecutable extends Executable {
             }
         }
 
+        //add core number and core file
+        if (nodesFiles != null) {
+            envVarsTab.put(CORE_FILE_ENV, nodesFiles.getAbsolutePath());
+        }
+        envVarsTab.put(CORE_NB, "" + this.nodesNumber);
+
         //then the cookie used by ProcessTreeKiller
         envVarsTab.put(COOKIE_ENV, cookie_value);
+
+        return envVarsTab;
     }
 
     /**
@@ -353,11 +347,22 @@ public class NativeExecutable extends Executable {
         } else {
             ospb = ForkerUtils.getOSProcessBuilderFactory().getBuilder();
         }
+        //add command and directory
         ospb.command(this.command);
         ospb.directory(this.wDirFile);
-        // SCHEDULING-905 : this call can throw a processbuilder.exception.NotImplementedException
-        Map<String, String> env = ospb.environment();
-        env.putAll(this.envVarsTab);
+        //manage environment
+        try {
+            //the following line can throw NotImplementedException
+            Map<String, String> env = ospb.environment();
+            //if no exception was raised, add environment with no restriction
+            env.putAll(buildEnvironmentVariables(true));
+        } catch (NotImplementedException e) {
+            //TODO SCHEDULING-986 : remove catch block when environment can be modified with runAsMe
+            //if NotImplementedException was raised, just check for user environment modification
+            //as environment cannot be passed to sub process, the following method just check the user
+            //has not modified it. Throws an exception if modified, just do nothing if not modified.
+            buildEnvironmentVariables(false);
+        }
         //and start process
         return ospb.start();
     }

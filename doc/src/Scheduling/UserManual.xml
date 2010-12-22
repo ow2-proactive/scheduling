@@ -871,6 +871,11 @@ task2.setGenerationScript(gscript);
 							having a forked JVM : It means a new JVM will be created in a process owned by the user himself.
 							For further information about this feature, please go to <xref linkend="starting_task_runasme"/>
 						</para>
+						<para>
+							<emphasis role="italic">Important Note :</emphasis> if runAsMe is set, the task cannot be multi-node.
+							(The number of nodes used by the task must be one). It is also not possible to propagate properties
+							using the helper class PropertyUtils as explained in the pre/post scripts.
+						</para>
 					</listitem>
 					<listitem>
 						<para>
