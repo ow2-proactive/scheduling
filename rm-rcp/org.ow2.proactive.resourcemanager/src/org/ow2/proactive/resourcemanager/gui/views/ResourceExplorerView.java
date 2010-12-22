@@ -73,7 +73,6 @@ public class ResourceExplorerView extends ViewPart {
 
     private static Shell rmShell = null;
 
-    private DrillDownAdapter drillDownAdapter = null;
     private Composite parent = null;
 
     public static void init() {
@@ -103,7 +102,6 @@ public class ResourceExplorerView extends ViewPart {
         column.setLabelProvider(new TreeLabelProvider());
         column.getColumn().setWidth(200);
 
-        drillDownAdapter = new DrillDownAdapter(treeViewer);
         makeActions();
         hookContextMenu();
         contributeToActionBars();
@@ -149,20 +147,18 @@ public class ResourceExplorerView extends ViewPart {
     }
 
     private void fillContextMenu(IMenuManager manager) {
-        manager.add(new Separator());
-        drillDownAdapter.addNavigationActions(manager);
         manager.add(expandAllAction);
         manager.add(collapseAllAction);
+        manager.add(new Separator());
 
     }
 
     private void contributeToActionBars() {
         IActionBars bars = getViewSite().getActionBars();
         IToolBarManager manager = bars.getToolBarManager();
-        manager.add(new Separator());
-        drillDownAdapter.addNavigationActions(manager);
         manager.add(expandAllAction);
         manager.add(collapseAllAction);
+        manager.add(new Separator());
     }
 
     /**

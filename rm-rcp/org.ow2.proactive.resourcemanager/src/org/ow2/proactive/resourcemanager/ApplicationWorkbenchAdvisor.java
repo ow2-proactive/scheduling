@@ -41,6 +41,7 @@ import org.eclipse.ui.application.IWorkbenchWindowConfigurer;
 import org.eclipse.ui.application.WorkbenchAdvisor;
 import org.eclipse.ui.application.WorkbenchWindowAdvisor;
 import org.ow2.proactive.resourcemanager.gui.ResourceManagerPerspective;
+import org.ow2.proactive.resourcemanager.gui.handlers.ExitHandler;
 
 
 /**
@@ -72,5 +73,11 @@ public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
     @Override
     public String getInitialWindowPerspectiveId() {
         return ResourceManagerPerspective.ID;
+    }
+
+    @Override
+    public boolean preShutdown() {
+        ExitHandler.exit();
+        return true;
     }
 }

@@ -174,6 +174,21 @@
             id="org.ow2.proactive.resourcemanager.plugin.describeCommand"
             name="Desccribe node">
       </command>
+      <command
+            defaultHandler="org.ow2.proactive.resourcemanager.gui.handlers.ShowAccountHandler"
+            id="org.ow2.proactive.resourcemanager.command.ShowAccount"
+            name="Show my account">
+      </command>
+      <command
+            defaultHandler="org.ow2.proactive.resourcemanager.gui.handlers.ShowRuntimeDataHandler"
+            id="org.ow2.proactive.resourcemanager.command.ShowRuntimeData"
+            name="Show Runtime Data">
+      </command>
+      <command
+            defaultHandler="org.ow2.proactive.resourcemanager.gui.handlers.ExitHandler"
+            id="org.ow2.proactive.resourcemanager.ExitCommand"
+            name="Exit">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.popupMenus">
@@ -198,22 +213,6 @@
       <menuContribution
             locationURI="popup:org.eclipse.ui.popup.any">
          <command
-               commandId="org.ow2.proactive.resourcemanager.plugin.gui.connectCommand"
-               icon="icons/connect.gif"
-               label="Connect"
-               tooltip="connect to a Resource Manager">
-         </command>
-         <command
-               commandId="org.ow2.proactive.resourcemanager.plugin.gui.disconnectCommand"
-               icon="icons/disconnect.gif"
-               label="Disconnect"
-               tooltip="disconnect from a Resource Manager">
-         </command>
-         <separator
-               name="separator"
-               visible="true">
-         </separator>
-         <command
                commandId="org.ow2.proactive.resourcemanager.plugin.addNodes"
                icon="icons/add_node.gif"
                label="Add node"
@@ -237,43 +236,40 @@
                label="Remove node source"
                tooltip="Remove an existing node source with all its nodes">
          </command>
-         <command
-               commandId="org.ow2.proactive.resourcemanager.plugin.shutdown"
-               icon="icons/rm_shutdown.gif"
-               label="Shutdown"
-               tooltip="Shutdown connected Resource Manager">
-         </command>
       </menuContribution>
       <menuContribution
             locationURI="menu:org.eclipse.ui.main.menu">
          <menu
-               label="File">
-            <command
-                  commandId="org.eclipse.ui.file.exit"
-                  label="Exit"
-                  mnemonic="E"
-                  style="push">
-            </command>
-         </menu>
-         <menu
-               id="connectionMainMenu"
-               label="Connection">
+               label="ResourceManager"
+               mnemonic="R">
             <command
                   commandId="org.ow2.proactive.resourcemanager.plugin.gui.connectCommand"
                   icon="icons/connect.gif"
                   label="Connect"
+                  mnemonic="C"
                   tooltip="connect to a Resource Manager">
             </command>
             <command
                   commandId="org.ow2.proactive.resourcemanager.plugin.gui.disconnectCommand"
                   icon="icons/disconnect.gif"
                   label="Disconnect"
+                  mnemonic="D"
                   tooltip="disconnect from a Resource Manager">
+            </command>
+            <separator
+                  name="org.ow2.proactive.resourcemanager.separator1"
+                  visible="true">
+            </separator>
+            <command
+                  commandId="org.ow2.proactive.resourcemanager.ExitCommand"
+                  icon="icons/exit.png"
+                  label="E&amp;xit"
+                  style="push">
             </command>
          </menu>
          <menu
                id="ActionsMenu"
-               label="Actions">
+               label="&amp;Admin">
             <command
                   commandId="org.ow2.proactive.resourcemanager.plugin.addNodes"
                   icon="icons/add_node.gif"
@@ -286,11 +282,10 @@
                   label="Remove nodes"
                   tooltip="remove nodes">
             </command>
-            <command
-                  commandId="org.ow2.proactive.resourcemanager.plugin.describeCommand"
-                  label="Describe node"
-                  tooltip="Describe node command">
-            </command>
+            <separator
+                  name="org.ow2.proactive.resourcemanager.separator3"
+                  visible="true">
+            </separator>
             <command
                   commandId="org.ow2.proactive.resourcemanager.plugin.createNodesource"
                   icon="icons/create_source.gif"
@@ -303,6 +298,10 @@
                   label="Remove node source"
                   tooltip="Remove an existing node source with all its nodes">
             </command>
+            <separator
+                  name="org.ow2.proactive.resourcemanager.separator2"
+                  visible="true">
+            </separator>
             <command
                   commandId="org.ow2.proactive.resourcemanager.plugin.shutdown"
                   icon="icons/rm_shutdown.gif"
@@ -311,16 +310,39 @@
             </command>
          </menu>
          <menu
-               label="Window">
+               label="&amp;Window">
             <command
                   commandId="org.eclipse.ui.views.showView"
-                  label="Show View"
+                  label="Show View..."
+                  style="pulldown">
+            </command>
+            <command
+                  commandId="org.eclipse.ui.window.resetPerspective"
+                  label="Reset perspective..."
                   style="push">
+            </command>
+            <separator
+                  name="org.ow2.proactive.resourcemanager.separator4"
+                  visible="true">
+            </separator>
+            <command
+                  commandId="org.ow2.proactive.resourcemanager.command.ShowRuntimeData"
+                  icon="icons/areacharticon.gif"
+                  label="Show Runtime Data"
+                  style="push"
+                  tooltip="Show Runtime Data">
+            </command>
+            <command
+                  commandId="org.ow2.proactive.resourcemanager.command.ShowAccount"
+                  icon="icons/account.gif"
+                  label="Show My Account"
+                  style="push"
+                  tooltip="Shows accounting information">
             </command>
          </menu>
          <menu
                id="HelpMenu"
-               label="Help">
+               label="&amp;Help">
             <command
                   commandId="org.eclipse.ui.help.aboutAction"
                   label="About Resource Manager"

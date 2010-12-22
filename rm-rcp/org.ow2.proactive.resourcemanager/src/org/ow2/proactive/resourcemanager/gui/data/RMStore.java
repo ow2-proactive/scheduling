@@ -43,6 +43,7 @@ import javax.security.auth.login.LoginException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.PlatformUI;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.NodeException;
@@ -211,6 +212,12 @@ public class RMStore {
      *
      */
     public void disconnectionActions() {
+        // remove empty editor if it exists
+        try {
+            PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().setEditorAreaVisible(false);
+        } catch (Throwable t) {
+        }
+
         //clear Tab view if tab panel is displayed
         if (ResourcesTabView.getTabViewer() != null) {
             ResourcesTabView.getTabViewer().setInput(null);

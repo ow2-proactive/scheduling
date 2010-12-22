@@ -65,6 +65,7 @@ import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.util.ResultPreviewTool.SimpleTextPanel;
+import org.ow2.proactive.scheduler.gui.actions.DisconnectAction;
 import org.ow2.proactive.scheduler.gui.composite.AbstractJobComposite;
 import org.ow2.proactive.scheduler.gui.composite.TaskComposite;
 import org.ow2.proactive.scheduler.gui.listeners.EventJobsListener;
@@ -684,7 +685,7 @@ public class JobsController implements SchedulerEventListener {
         ActionsManager.getInstance().setSchedulerStatus(SchedulerStatus.KILLED);
         Display.getDefault().syncExec(new Runnable() {
             public void run() {
-                SeparatedJobView.clearOnDisconnection(false);
+                DisconnectAction.disconnection();
             }
         });
 
@@ -720,7 +721,7 @@ public class JobsController implements SchedulerEventListener {
         ActionsManager.getInstance().setSchedulerStatus(SchedulerStatus.KILLED);
         Display.getDefault().syncExec(new Runnable() {
             public void run() {
-                SeparatedJobView.clearOnDisconnection(false);
+                DisconnectAction.disconnection();
             }
         });
 

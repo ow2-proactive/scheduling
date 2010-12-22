@@ -59,22 +59,13 @@ import org.ow2.proactive.scheduler.common.task.util.ResultPreviewTool.SimpleText
 import org.ow2.proactive.scheduler.gui.actions.ChangeMaximizeListAction;
 import org.ow2.proactive.scheduler.gui.actions.ChangePriorityJobAction;
 import org.ow2.proactive.scheduler.gui.actions.ChangeViewModeAction;
-import org.ow2.proactive.scheduler.gui.actions.ConnectDeconnectSchedulerAction;
-import org.ow2.proactive.scheduler.gui.actions.FreezeSchedulerAction;
+import org.ow2.proactive.scheduler.gui.actions.ConnectAction;
 import org.ow2.proactive.scheduler.gui.actions.JMXActionsManager;
 import org.ow2.proactive.scheduler.gui.actions.KillRemoveJobAction;
-import org.ow2.proactive.scheduler.gui.actions.KillSchedulerAction;
 import org.ow2.proactive.scheduler.gui.actions.MaximizeListAction;
 import org.ow2.proactive.scheduler.gui.actions.ObtainJobOutputAction;
 import org.ow2.proactive.scheduler.gui.actions.PauseResumeJobAction;
-import org.ow2.proactive.scheduler.gui.actions.PauseSchedulerAction;
 import org.ow2.proactive.scheduler.gui.actions.PriorityJobAction;
-import org.ow2.proactive.scheduler.gui.actions.ResumeSchedulerAction;
-import org.ow2.proactive.scheduler.gui.actions.ShutdownSchedulerAction;
-import org.ow2.proactive.scheduler.gui.actions.StartStopSchedulerAction;
-import org.ow2.proactive.scheduler.gui.actions.SubmitFlatFileJobAction;
-import org.ow2.proactive.scheduler.gui.actions.SubmitJobAction;
-import org.ow2.proactive.scheduler.gui.actions.SubmitListAction;
 import org.ow2.proactive.scheduler.gui.composite.AbstractJobComposite;
 import org.ow2.proactive.scheduler.gui.composite.FinishedJobComposite;
 import org.ow2.proactive.scheduler.gui.composite.PendingJobComposite;
@@ -101,7 +92,6 @@ public class SeparatedJobView extends ViewPart {
     private static AbstractJobComposite pendingJobComposite = null;
     private static AbstractJobComposite runningJobComposite = null;
     private static AbstractJobComposite finishedJobComposite = null;
-    private static Action connectSchedulerAction = null;
     private static Action changeViewModeAction = null;
 
     private static Action changeMaximizeListAction = null;
@@ -111,10 +101,6 @@ public class SeparatedJobView extends ViewPart {
     private static Action maximizeNoneListAction = null;
 
     private static Action obtainJobOutputAction = null;
-    private static Action submitJob = null;
-    private static Action submitJobEditVars = null;
-    private static SubmitListAction submitList = null;
-    private static Action submitFlatJob = null;
     private static Action pauseResumeJobAction = null;
     private static Action killJobAction = null;
     private static Action changePriorityJobAction = null;
@@ -124,12 +110,7 @@ public class SeparatedJobView extends ViewPart {
     private static Action priorityNormalJobAction = null;
     private static Action priorityHighJobAction = null;
     private static Action priorityHighestJobAction = null;
-    private static Action startStopSchedulerAction = null;
-    private static Action freezeSchedulerAction = null;
-    private static Action pauseSchedulerAction = null;
-    private static Action resumeSchedulerAction = null;
-    private static Action shutdownSchedulerAction = null;
-    private static Action killSchedulerAction = null;
+
     private static Composite parent = null;
 
     private static IMenuManager subMenu = null;
@@ -169,7 +150,6 @@ public class SeparatedJobView extends ViewPart {
     private void fillContextMenu(IMenuManager manager) {
         // FIXME Maybe call ActionsManager.update() here
         // but I will remove some others calls to this method on others classes
-        manager.add(connectSchedulerAction);
         manager.add(changeViewModeAction);
         subMenu = new MenuManager("Maximize list") {
         };
@@ -178,17 +158,11 @@ public class SeparatedJobView extends ViewPart {
         subMenu.add(maximizePendingListAction);
         subMenu.add(maximizeRunningListAction);
         subMenu.add(maximizeFinishedListAction);
-        for (final Action action : JMXActionsManager.getInstance().getActions()) {
-            manager.add(action);
-        }
 
         manager.add(new Separator());
 
         subMenuJob = new MenuManager("Submit job");
         manager.add(subMenuJob);
-        subMenuJob.add(submitJob);
-        subMenuJob.add(submitJobEditVars);
-        subMenuJob.add(submitFlatJob);
 
         manager.add(pauseResumeJobAction);
         subMenuPriority = new MenuManager("Change job priority");
@@ -202,13 +176,6 @@ public class SeparatedJobView extends ViewPart {
 
         subMenuPriority.add(priorityHighJobAction);
         subMenuPriority.add(priorityHighestJobAction);
-        manager.add(new Separator());
-        manager.add(startStopSchedulerAction);
-        manager.add(freezeSchedulerAction);
-        manager.add(pauseSchedulerAction);
-        manager.add(resumeSchedulerAction);
-        manager.add(shutdownSchedulerAction);
-        manager.add(killSchedulerAction);
 
         // // Other plug-ins can contribute there actions here
         // manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
@@ -220,37 +187,21 @@ public class SeparatedJobView extends ViewPart {
     }
 
     private void fillLocalToolBar(IToolBarManager manager) {
-        manager.add(connectSchedulerAction);
         manager.add(changeViewModeAction);
         manager.add(changeMaximizeListAction);
-        for (final Action action : JMXActionsManager.getInstance().getActions()) {
-            manager.add(action);
-        }
-        manager.add(new Separator());
 
-        submitList.add(submitJob);
-        submitList.add(submitJobEditVars);
-        submitList.add(submitFlatJob);
-        manager.add(submitList);
+        manager.add(new Separator());
 
         manager.add(pauseResumeJobAction);
         manager.add(changePriorityJobAction);
         manager.add(obtainJobOutputAction);
         manager.add(killJobAction);
 
-        manager.add(new Separator());
-        manager.add(startStopSchedulerAction);
-        manager.add(freezeSchedulerAction);
-        manager.add(pauseSchedulerAction);
-        manager.add(resumeSchedulerAction);
-        manager.add(shutdownSchedulerAction);
-        manager.add(killSchedulerAction);
     }
 
     private void makeActions() {
         Shell shell = parent.getShell();
 
-        connectSchedulerAction = new ConnectDeconnectSchedulerAction(parent);
         changeViewModeAction = new ChangeViewModeAction();
 
         changeMaximizeListAction = new ChangeMaximizeListAction();
@@ -263,10 +214,6 @@ public class SeparatedJobView extends ViewPart {
                 MaximizeListAction.FINISHED);
 
         obtainJobOutputAction = new ObtainJobOutputAction();
-        submitJob = new SubmitJobAction(parent, false);
-        submitJobEditVars = new SubmitJobAction(parent, true);
-        submitList = new SubmitListAction();
-        submitFlatJob = new SubmitFlatFileJobAction(parent);
         pauseResumeJobAction = new PauseResumeJobAction();
         killJobAction = new KillRemoveJobAction(shell);
 
@@ -277,13 +224,6 @@ public class SeparatedJobView extends ViewPart {
         priorityNormalJobAction = PriorityJobAction.newInstance(JobPriority.NORMAL);
         priorityHighJobAction = PriorityJobAction.newInstance(JobPriority.HIGH);
         priorityHighestJobAction = PriorityJobAction.newInstance(JobPriority.HIGHEST);
-
-        startStopSchedulerAction = new StartStopSchedulerAction();
-        freezeSchedulerAction = new FreezeSchedulerAction();
-        pauseSchedulerAction = new PauseSchedulerAction();
-        resumeSchedulerAction = new ResumeSchedulerAction();
-        shutdownSchedulerAction = new ShutdownSchedulerAction(shell);
-        killSchedulerAction = new KillSchedulerAction(shell);
     }
 
     // -------------------------------------------------------------------- //
@@ -337,7 +277,7 @@ public class SeparatedJobView extends ViewPart {
         return finishedJobComposite;
     }
 
-    public static void clearOnDisconnection(Boolean sendDisconnectMessage) {
+    public static void clearOnDisconnection() {
         setVisible(false);
         TableManager.getInstance().clear();
         ActionsManager.getInstance().setConnected(false);
@@ -378,16 +318,6 @@ public class SeparatedJobView extends ViewPart {
         if (jobsOutputController != null) {
             jobsOutputController.removeAllJobOutput();
         }
-
-        // Disconnect the JMX client of ChartIt
-        JMXActionsManager.getInstance().disconnectJMXClient();
-
-        if (sendDisconnectMessage) {
-            SchedulerProxy.getInstance().disconnect();
-        }
-        PAActiveObject.terminateActiveObject(SchedulerProxy.getInstance(), false);
-        SchedulerProxy.clearInstance();
-        ActionsManager.getInstance().update();
     }
 
     // -------------------------------------------------------------------- //
@@ -439,9 +369,10 @@ public class SeparatedJobView extends ViewPart {
             }
         }
 
-        Display.getCurrent().asyncExec(new Runnable() {
+        Display.getDefault().asyncExec(new Runnable() {
             public void run() {
-                connectSchedulerAction.run();
+                ConnectAction conn = new ConnectAction();
+                conn.run();
             }
         });
 

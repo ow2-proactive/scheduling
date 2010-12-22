@@ -37,6 +37,9 @@
 package org.ow2.proactive.resourcemanager;
 
 import org.eclipse.jface.action.IStatusLineManager;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.actions.ActionFactory;
+import org.eclipse.ui.actions.ActionFactory.IWorkbenchAction;
 import org.eclipse.ui.application.ActionBarAdvisor;
 import org.eclipse.ui.application.IActionBarConfigurer;
 import org.ow2.proactive.resourcemanager.gui.data.RMStatusBarItem;
@@ -56,6 +59,15 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
      */
     public ApplicationActionBarAdvisor(IActionBarConfigurer configurer) {
         super(configurer);
+    }
+
+    @Override
+    protected void makeActions(IWorkbenchWindow window) {
+        IWorkbenchAction resetPerspectiveAction = ActionFactory.RESET_PERSPECTIVE.create(window);
+        register(resetPerspectiveAction);
+
+        IWorkbenchAction shv = ActionFactory.SHOW_VIEW_MENU.create(window);
+        register(shv);
     }
 
     @Override

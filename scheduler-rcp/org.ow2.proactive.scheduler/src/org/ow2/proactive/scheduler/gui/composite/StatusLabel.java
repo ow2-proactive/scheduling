@@ -136,8 +136,10 @@ public class StatusLabel implements EventSchedulerListener {
         if (!label.isDisposed()) {
             Display.getDefault().asyncExec(new Runnable() {
                 public void run() {
-                    label.setForeground(color);
-                    label.setText(text);
+                    if (!label.isDisposed()) { // might have changed since last call
+                        label.setForeground(color);
+                        label.setText(text);
+                    }
                 }
             });
         }

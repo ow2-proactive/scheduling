@@ -74,6 +74,7 @@ import org.ow2.proactive.scheduler.common.policy.Policy;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
 import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingException;
+import org.ow2.proactive.scheduler.gui.actions.DisconnectAction;
 import org.ow2.proactive.scheduler.gui.actions.JMXActionsManager;
 import org.ow2.proactive.scheduler.gui.composite.StatusLabel;
 import org.ow2.proactive.scheduler.gui.dialog.SelectSchedulerDialogResult;
@@ -201,7 +202,7 @@ public class SchedulerProxy implements Scheduler {
                             "- Scheduler Proxy: Error while terminating the logger server", e);
                     e.printStackTrace();
                 }
-                SeparatedJobView.clearOnDisconnection(false);
+                DisconnectAction.disconnection();
                 connected = false;
             }
         });

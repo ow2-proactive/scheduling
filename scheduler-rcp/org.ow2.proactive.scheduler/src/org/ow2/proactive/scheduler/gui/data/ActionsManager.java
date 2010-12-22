@@ -67,6 +67,10 @@ public class ActionsManager {
         this.connected = connected;
     }
 
+    public boolean isConnected() {
+        return this.connected;
+    }
+
     public void setSchedulerStatus(SchedulerStatus schedulerStatus) {
         this.schedulerStatus = schedulerStatus;
     }

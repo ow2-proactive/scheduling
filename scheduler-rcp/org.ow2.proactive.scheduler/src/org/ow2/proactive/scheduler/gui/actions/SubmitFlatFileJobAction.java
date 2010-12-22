@@ -48,10 +48,8 @@ import org.ow2.proactive.scheduler.gui.wizards.flatJobWizard.FlatFileJobWizard;
  * @author The ProActive Team
  */
 public class SubmitFlatFileJobAction extends SchedulerGUIAction {
-    private Composite parent = null;
 
-    public SubmitFlatFileJobAction(Composite parent) {
-        this.parent = parent;
+    public SubmitFlatFileJobAction() {
         this.setText("Submit a file containing commands");
         this.setToolTipText("Submit a file containing commands");
         this
@@ -67,7 +65,7 @@ public class SubmitFlatFileJobAction extends SchedulerGUIAction {
         //wizard.init(null, null);
 
         // Instantiates the wizard container with the wizard and opens it
-        WizardDialog dialog = new WizardDialog(parent.getShell(), wizard);
+        WizardDialog dialog = new WizardDialog(getParent().getShell(), wizard);
         dialog.create();
         dialog.open();
     }

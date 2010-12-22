@@ -37,7 +37,6 @@
 package org.ow2.proactive.scheduler.gui.actions;
 
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.swt.widgets.Shell;
 import org.ow2.proactive.scheduler.Activator;
 import org.ow2.proactive.scheduler.common.SchedulerStatus;
 import org.ow2.proactive.scheduler.gui.Internal;
@@ -48,23 +47,22 @@ import org.ow2.proactive.scheduler.gui.data.SchedulerProxy;
  * @author The ProActive Team
  */
 public class ShutdownSchedulerAction extends SchedulerGUIAction {
-    private Shell shell = null;
 
-    public ShutdownSchedulerAction(Shell shell) {
-        this.shell = shell;
+    public ShutdownSchedulerAction() {
         this.setText("Shutdown scheduler");
-        this
-                .setToolTipText("Shutdown the scheduler (This will finish all running and pending jobs before shutdown)");
-        this.setImageDescriptor(Activator.getDefault().getImageRegistry().getDescriptor(
-                Internal.IMG_SCHEDULERSHUTDOWN));
+        this.setToolTipText("Shutdown the scheduler (This will finish all running and pending jobs before shutdown)");
+        this.setImageDescriptor(Activator.getDefault().getImageRegistry()
+                .getDescriptor(Internal.IMG_SCHEDULERSHUTDOWN));
         this.setEnabled(false);
     }
 
     @Override
     public void run() {
-        if (MessageDialog.openConfirm(shell, "Confirm please",
+        if (MessageDialog.openConfirm(getParent(), "Confirm please",
                 "Are you sure you want to shutdown the scheduler ?")) {
-            SchedulerProxy.getInstance().shutdown();
+            if (SchedulerProxy.getInstance().shutdown()) {
+                DisconnectAction.disconnection();
+            }
         }
     }
 

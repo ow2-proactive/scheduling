@@ -1,39 +1,3 @@
-/*
- * ################################################################
- *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
- *
- * Copyright (C) 1997-2010 INRIA/University of 
- * 				Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; version 3 of
- * the License.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
- *
- * If needed, contact us to obtain a release under GPL Version 2 
- * or a different license than the GPL.
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s):
- *
- * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
- */
 package org.ow2.proactive.scheduler.gui.actions;
 
 import org.eclipse.core.runtime.IStatus;
@@ -45,7 +9,6 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
@@ -55,7 +18,6 @@ import org.ow2.proactive.scheduler.Activator;
 import org.ow2.proactive.scheduler.common.SchedulerStatus;
 import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingException;
 import org.ow2.proactive.scheduler.gui.Internal;
-import org.ow2.proactive.scheduler.gui.composite.StatusLabel;
 import org.ow2.proactive.scheduler.gui.data.ActionsManager;
 import org.ow2.proactive.scheduler.gui.data.JobsController;
 import org.ow2.proactive.scheduler.gui.data.SchedulerProxy;
@@ -64,36 +26,32 @@ import org.ow2.proactive.scheduler.gui.dialog.SelectSchedulerDialogResult;
 import org.ow2.proactive.scheduler.gui.views.SeparatedJobView;
 
 
-/**
- * @author The ProActive Team
- */
-public class ConnectDeconnectSchedulerAction extends SchedulerGUIAction {
-    private Composite parent = null;
-    private boolean isConnected = false;
+public class ConnectAction extends SchedulerGUIAction {
     private int res = 0;
 
-    public ConnectDeconnectSchedulerAction(Composite parent) {
-        this.parent = parent;
-        setDisconnectionMode();
+    public ConnectAction() {
+
+        this.setText("&Connect");
+        this.setToolTipText("Connect the started ProActive Scheduler by its url");
+        this
+                .setImageDescriptor(Activator.getDefault().getImageRegistry().getDescriptor(
+                        Internal.IMG_CONNECT));
+
     }
 
     @Override
     public void run() {
-        if (isConnected) {
-            disconnection();
-        } else {
-            connection();
-        }
+        connection();
     }
 
     private void connection() {
-        final SelectSchedulerDialogResult dialogResult = SelectSchedulerDialog.showDialog(parent.getShell());
+        final SelectSchedulerDialogResult dialogResult = SelectSchedulerDialog.showDialog(getParent()
+                .getShell());
 
         if (dialogResult != null) {
 
-            final ConnectDeconnectSchedulerAction btnConnect = this;
             // Create a temporary shell with a progress bar during the downloading of the RM state
-            final Shell waitShell = new Shell(parent.getShell(), SWT.APPLICATION_MODAL);
+            final Shell waitShell = new Shell(getParent().getShell(), SWT.APPLICATION_MODAL);
             // Disable the escape key
             waitShell.addListener(SWT.Traverse, new Listener() {
                 public void handleEvent(Event e) {
@@ -130,7 +88,7 @@ public class ConnectDeconnectSchedulerAction extends SchedulerGUIAction {
             //Label connectionCancel = new Label(waitShell, SWT.NONE);
             //connectionCancel.setText("Press Escape to cancel");
             waitShell.pack();
-            Rectangle parentBounds = parent.getShell().getBounds();
+            Rectangle parentBounds = getParent().getShell().getBounds();
             int x = parentBounds.x + parentBounds.width / 2;
             int y = parentBounds.y + parentBounds.height / 2;
             waitShell.setLocation(x - waitShell.getSize().x / 2, y - waitShell.getSize().y / 2);
@@ -149,7 +107,7 @@ public class ConnectDeconnectSchedulerAction extends SchedulerGUIAction {
                     }
 
                     if (res == 0/*init val*/) {
-                        parent.getDisplay().syncExec(new Runnable() {
+                        getParent().getDisplay().syncExec(new Runnable() {
                             public void run() {
                                 if (!waitShell.isDisposed()) {
                                     bar.dispose();
@@ -159,13 +117,13 @@ public class ConnectDeconnectSchedulerAction extends SchedulerGUIAction {
                         });
                         return;
                     } else if (res == SchedulerProxy.LOGIN_OR_PASSWORD_WRONG) {
-                        parent.getDisplay().syncExec(new Runnable() {
+                        getParent().getDisplay().syncExec(new Runnable() {
                             public void run() {
                                 if (!waitShell.isDisposed()) {
                                     bar.dispose();
                                     waitShell.dispose();
                                 }
-                                MessageDialog.openError(parent.getShell(), "Could not connect",
+                                MessageDialog.openError(getParent().getShell(), "Could not connect",
                                         "Incorrect username or password !");
                             }
                         });
@@ -176,12 +134,12 @@ public class ConnectDeconnectSchedulerAction extends SchedulerGUIAction {
 
                         // If the escape key was pressed, terminate thread
                         if (waitShell.isDisposed()) {
-                            //SchedulerProxy.getInstance().disconnect();									
+                            //SchedulerProxy.getInstance().disconnect();                                    
                             return;
                         }
 
                         // Get graphical thread for the progress bar
-                        parent.getDisplay().syncExec(new Runnable() {
+                        getParent().getDisplay().syncExec(new Runnable() {
 
                             public void run() {
                                 //synchronous call ; wait futur
@@ -196,7 +154,6 @@ public class ConnectDeconnectSchedulerAction extends SchedulerGUIAction {
                                 SeparatedJobView.getRunningJobComposite().initTable();
                                 SeparatedJobView.getFinishedJobComposite().initTable();
 
-                                isConnected = true;
                                 ActionsManager.getInstance().setConnected(true);
                                 SelectSchedulerDialog.saveInformations();
 
@@ -208,11 +165,6 @@ public class ConnectDeconnectSchedulerAction extends SchedulerGUIAction {
 
                                     SeparatedJobView.setVisible(true);
 
-                                    btnConnect.setText("Disconnect");
-                                    btnConnect.setToolTipText("Disconnect from the ProActive Scheduler");
-                                    btnConnect.setImageDescriptor(Activator.getDefault().getImageRegistry()
-                                            .getDescriptor(Internal.IMG_DISCONNECT));
-
                                 } catch (LogForwardingException e) {
                                     errorConnect(e, dialogResult);
                                 }
@@ -220,13 +172,13 @@ public class ConnectDeconnectSchedulerAction extends SchedulerGUIAction {
                         });
 
                     } else if (res == SchedulerProxy.LOGIN_OR_PASSWORD_WRONG) {
-                        parent.getDisplay().syncExec(new Runnable() {
+                        getParent().getDisplay().syncExec(new Runnable() {
                             public void run() {
                                 if (!waitShell.isDisposed()) {
                                     bar.dispose();
                                     waitShell.dispose();
                                 }
-                                MessageDialog.openError(parent.getShell(), "Could not connect",
+                                MessageDialog.openError(getParent().getShell(), "Could not connect",
                                         "Incorrect username or password !");
                             }
                         });
@@ -241,42 +193,18 @@ public class ConnectDeconnectSchedulerAction extends SchedulerGUIAction {
         e.printStackTrace();
         Activator.log(IStatus.ERROR, "Could not connect to the scheduler based on:" + dialogResult.getUrl(),
                 e);
-        parent.getDisplay().asyncExec(new Runnable() {
+        getParent().getDisplay().asyncExec(new Runnable() {
             public void run() {
-                MessageDialog.openError(parent.getShell(), "Couldn't connect",
+                MessageDialog.openError(getParent().getShell(), "Couldn't connect",
                         "Could not connect to the scheduler based on : " + dialogResult.getUrl() +
                             "\n\nCause\n : " + e.getMessage());
             }
         });
     }
 
-    private void disconnection() {
-        if (MessageDialog.openConfirm(parent.getShell(), "Confirm disconnection",
-                "Are you sure you want to disconnect from the ProActive Scheduler ?")) {
-            StatusLabel.getInstance().disconnect();
-            // stop log server
-            try {
-                Activator.terminateLoggerServer();
-            } catch (LogForwardingException e) {
-                e.printStackTrace();
-            }
-            SeparatedJobView.clearOnDisconnection(true);
-        }
-    }
-
-    public void setDisconnectionMode() {
-        isConnected = false;
-        this.setText("Connect the ProActive Scheduler");
-        this.setToolTipText("Connect the started ProActive Scheduler by its url");
-        this
-                .setImageDescriptor(Activator.getDefault().getImageRegistry().getDescriptor(
-                        Internal.IMG_CONNECT));
-    }
-
     @Override
     public void setEnabled(boolean connected, SchedulerStatus chedulerStatus, boolean admin,
             boolean jobSelected, boolean owner, boolean jobInFinishQueue) {
-        if (!connected)
-            setDisconnectionMode();
+        super.setEnabled(!connected);
     }
 }

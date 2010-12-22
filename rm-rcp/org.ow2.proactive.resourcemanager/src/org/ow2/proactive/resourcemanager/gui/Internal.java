@@ -80,6 +80,7 @@ public final class Internal {
     public static final String IMG_SOURCE = "source.gif";
     public static final String IMG_TORELEASE = "to_release.gif";
     public static final String IMG_CONFIGURING = "configuring.gif";
+    public static final String IMG_EXIT = "exit.png";
 
     /**
      * Given a node state returns the corresponding image taken from the registry of this plugin.

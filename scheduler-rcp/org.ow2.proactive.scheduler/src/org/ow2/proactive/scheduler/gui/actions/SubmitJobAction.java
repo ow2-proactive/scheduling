@@ -100,7 +100,6 @@ import org.w3c.dom.NodeList;
  * @author The ProActive Team
  */
 public class SubmitJobAction extends SchedulerGUIAction {
-    private Composite parent = null;
     private String lastDirectory = null;
 
     /** true if this Action should propose variable edition upon submission */
@@ -113,14 +112,13 @@ public class SubmitJobAction extends SchedulerGUIAction {
      * true for OK button, false for Cancel / close */
     private boolean dialogReturn = false;
 
-    public SubmitJobAction(Composite parent, boolean editVariables) {
+    public SubmitJobAction(boolean editVariables) {
         this.editVariables = editVariables;
-        this.parent = parent;
         if (editVariables) {
-            this.setText("Submit and edit variables");
+            this.setText("Submit and &edit variables");
             this.setToolTipText("Submit job from an XML file and edit the variables definitions");
         } else {
-            this.setText("Submit an XML job file");
+            this.setText("&Submit an XML job file");
             this.setToolTipText("Submit job from an XML file containing a job description");
         }
         this.setImageDescriptor(Activator.getDefault().getImageRegistry().getDescriptor(
@@ -171,7 +169,7 @@ public class SubmitJobAction extends SchedulerGUIAction {
                 doc = docBuilder.parse(file);
             } catch (Exception e) {
                 String msg = "Failed to parse descriptor " + file + ":\n" + e.getMessage();
-                MessageDialog.openError(parent.getShell(), "Edit Variables", msg);
+                MessageDialog.openError(getParent().getShell(), "Edit Variables", msg);
                 Activator.log(IStatus.ERROR, msg, e);
                 return null;
             }
@@ -211,7 +209,7 @@ public class SubmitJobAction extends SchedulerGUIAction {
                 }
             } catch (Exception e) {
                 String msg = "Error while reading variables in '" + file + "':\n" + e.getMessage();
-                MessageDialog.openError(parent.getShell(), "Edit Variables", msg);
+                MessageDialog.openError(getParent().getShell(), "Edit Variables", msg);
                 Activator.log(IStatus.ERROR, msg, e);
                 return null;
             }
@@ -259,7 +257,7 @@ public class SubmitJobAction extends SchedulerGUIAction {
             } catch (Exception e) {
                 String msg = "Error while writing variables for '" + varMap.originalFile + "':\n" +
                     e.getMessage();
-                MessageDialog.openError(parent.getShell(), "Edit Variables", msg);
+                MessageDialog.openError(getParent().getShell(), "Edit Variables", msg);
                 Activator.log(IStatus.ERROR, msg, e);
                 return null;
             }
@@ -278,7 +276,7 @@ public class SubmitJobAction extends SchedulerGUIAction {
             } catch (Exception e) {
                 String msg = "Error while writing descriptor to '" + varMap.out.getAbsolutePath() + "':\n" +
                     e.getMessage();
-                MessageDialog.openError(parent.getShell(), "Edit Variables", msg);
+                MessageDialog.openError(getParent().getShell(), "Edit Variables", msg);
                 Activator.log(IStatus.ERROR, msg, e);
                 return null;
             }
@@ -300,8 +298,8 @@ public class SubmitJobAction extends SchedulerGUIAction {
         Display.getDefault().asyncExec(new Runnable() {
             // create the dialog in SWT's gui thread
             public void run() {
-                final Shell dialog = new Shell(parent.getDisplay(), SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL |
-                    SWT.RESIZE);
+                final Shell dialog = new Shell(getParent().getDisplay(), SWT.DIALOG_TRIM |
+                    SWT.APPLICATION_MODAL | SWT.RESIZE);
                 dialog.setText("Edit variables");
 
                 // Grid Layout : 2 columns
@@ -480,7 +478,7 @@ public class SubmitJobAction extends SchedulerGUIAction {
 
     @Override
     public void run() {
-        FileDialog fileDialog = new FileDialog(parent.getShell(), SWT.OPEN | SWT.MULTI);
+        FileDialog fileDialog = new FileDialog(getParent().getShell(), SWT.OPEN | SWT.MULTI);
         fileDialog.setFilterExtensions(new String[] { "*.xml" });
         if (lastDirectory != null) {
             fileDialog.setFilterPath(lastDirectory);
@@ -542,10 +540,10 @@ public class SubmitJobAction extends SchedulerGUIAction {
                 if (failedJobs.size() != 0) {
                     //one error for one job to submit : display a simple dialog box
                     if (fileNames.length == 1) {
-                        parent.getDisplay().asyncExec(new Runnable() {
+                        getParent().getDisplay().asyncExec(new Runnable() {
                             public void run() {
-                                MessageDialog.openError(parent.getShell(), "Job submission error", failedJobs
-                                        .get(fileNames[0]));
+                                MessageDialog.openError(getParent().getShell(), "Job submission error",
+                                        failedJobs.get(fileNames[0]));
                             }
                         });
 
@@ -568,10 +566,10 @@ public class SubmitJobAction extends SchedulerGUIAction {
                             String ErrorText = "file name : " + entry.getKey() + "\n" + entry.getValue();
                             ms.add(new Status(IStatus.ERROR, pluginId, ErrorText));
                         }
-                        parent.getDisplay().asyncExec(new Runnable() {
+                        getParent().getDisplay().asyncExec(new Runnable() {
                             public void run() {
-                                ErrorDialog.openError(parent.getShell(), "Job submission error", text, ms,
-                                        IStatus.ERROR | IStatus.INFO);
+                                ErrorDialog.openError(getParent().getShell(), "Job submission error", text,
+                                        ms, IStatus.ERROR | IStatus.INFO);
                             }
                         });
                     }

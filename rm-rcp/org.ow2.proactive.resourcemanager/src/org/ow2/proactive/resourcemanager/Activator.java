@@ -178,6 +178,7 @@ public final class Activator extends AbstractUIPlugin {
         reg.put(Internal.IMG_SOURCE, Activator.getImageDescriptor("icons/" + Internal.IMG_SOURCE));
         reg.put(Internal.IMG_TORELEASE, Activator.getImageDescriptor("icons/" + Internal.IMG_TORELEASE));
         reg.put(Internal.IMG_CONFIGURING, Activator.getImageDescriptor("icons/" + Internal.IMG_CONFIGURING));
+        reg.put(Internal.IMG_EXIT, Activator.getImageDescriptor("icons/" + Internal.IMG_EXIT));
     }
 
     /**

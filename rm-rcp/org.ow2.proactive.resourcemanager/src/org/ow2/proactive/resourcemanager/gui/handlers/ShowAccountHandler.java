@@ -34,34 +34,41 @@
  * ################################################################
  * $$ACTIVEEON_CONTRIBUTOR$$
  */
-package org.ow2.proactive.scheduler.gui.actions;
+package org.ow2.proactive.resourcemanager.gui.handlers;
 
-import org.eclipse.jface.action.Action;
-import org.eclipse.swt.widgets.Shell;
-import org.eclipse.ui.PlatformUI;
-import org.ow2.proactive.scheduler.common.SchedulerStatus;
-import org.ow2.proactive.scheduler.gui.data.ActionsManager;
+import org.eclipse.core.commands.AbstractHandler;
+import org.eclipse.core.commands.ExecutionEvent;
+import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.commands.IHandler;
+import org.eclipse.core.runtime.IStatus;
+import org.ow2.proactive.resourcemanager.Activator;
+import org.ow2.proactive.resourcemanager.gui.actions.ShowMyAccountActionDelegate;
+import org.ow2.proactive.resourcemanager.gui.data.RMStore;
 
 
-/**
- *
- *
- * @author The ProActive Team
- */
-public abstract class SchedulerGUIAction extends Action {
+public class ShowAccountHandler extends AbstractHandler implements IHandler {
 
-    private Shell parent = null;
+    private ShowMyAccountActionDelegate delegate;
 
-    public SchedulerGUIAction() {
-        ActionsManager.getInstance().addAction(this);
+    public ShowAccountHandler() {
+        try {
+            delegate = new ShowMyAccountActionDelegate();
+        } catch (Exception e) {
+            Activator.log(IStatus.ERROR, "Failed to create JMX delegate", e);
+        }
     }
 
-    public abstract void setEnabled(boolean connected, SchedulerStatus schedulerStatus, boolean admin,
-            boolean jobSelected, boolean owner, boolean jobInFinishQueue);
+    @Override
+    public boolean isEnabled() {
+        return RMStore.isConnected();
+    }
 
-    protected Shell getParent() {
-        if (parent == null)
-            parent = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
-        return parent;
+    public Object execute(ExecutionEvent event) throws ExecutionException {
+        if (this.delegate != null) {
+            this.delegate.run(null);
+        } else {
+            throw new ExecutionException("No action delegate available");
+        }
+        return null;
     }
 }

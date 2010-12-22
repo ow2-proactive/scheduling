@@ -34,34 +34,52 @@
  * ################################################################
  * $$ACTIVEEON_CONTRIBUTOR$$
  */
-package org.ow2.proactive.scheduler.gui.actions;
+package org.ow2.proactive.resourcemanager.gui.handlers;
 
-import org.eclipse.jface.action.Action;
-import org.eclipse.swt.widgets.Shell;
+import org.eclipse.core.commands.AbstractHandler;
+import org.eclipse.core.commands.ExecutionEvent;
+import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.commands.IHandler;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.ui.PlatformUI;
-import org.ow2.proactive.scheduler.common.SchedulerStatus;
-import org.ow2.proactive.scheduler.gui.data.ActionsManager;
+import org.eclipse.ui.handlers.HandlerUtil;
+import org.ow2.proactive.resourcemanager.Activator;
+import org.ow2.proactive.resourcemanager.gui.data.RMStore;
 
 
-/**
- *
- *
- * @author The ProActive Team
- */
-public abstract class SchedulerGUIAction extends Action {
+public class ExitHandler extends AbstractHandler implements IHandler {
 
-    private Shell parent = null;
+    boolean previousState = true;
 
-    public SchedulerGUIAction() {
-        ActionsManager.getInstance().addAction(this);
+    @Override
+    public boolean isEnabled() {
+        return true;
     }
 
-    public abstract void setEnabled(boolean connected, SchedulerStatus schedulerStatus, boolean admin,
-            boolean jobSelected, boolean owner, boolean jobInFinishQueue);
+    public Object execute(ExecutionEvent event) throws ExecutionException {
+        boolean ret = MessageDialog.openConfirm(
+                HandlerUtil.getActiveWorkbenchWindowChecked(event).getShell(), "Exit Resource Manager",
+                "Do you really want to quit?");
+        if (ret) {
+            exit();
+            PlatformUI.getWorkbench().close();
+        }
 
-    protected Shell getParent() {
-        if (parent == null)
-            parent = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
-        return parent;
+        return null;
+    }
+
+    public static void exit() {
+        // remove empty editor if it exists
+        try {
+            PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().setEditorAreaVisible(false);
+        } catch (Throwable t) {
+        }
+
+        Activator.log(IStatus.INFO, "Shutting down...", null);
+
+        if (RMStore.isConnected()) {
+            RMStore.getInstance().disconnectionActions();
+        }
     }
 }

@@ -37,7 +37,6 @@
 package org.ow2.proactive.scheduler.gui.actions;
 
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.swt.widgets.Shell;
 import org.ow2.proactive.scheduler.Activator;
 import org.ow2.proactive.scheduler.common.SchedulerStatus;
 import org.ow2.proactive.scheduler.gui.Internal;
@@ -48,10 +47,8 @@ import org.ow2.proactive.scheduler.gui.data.SchedulerProxy;
  * @author The ProActive Team
  */
 public class KillSchedulerAction extends SchedulerGUIAction {
-    private Shell shell = null;
 
-    public KillSchedulerAction(Shell shell) {
-        this.shell = shell;
+    public KillSchedulerAction() {
         this.setText("Kill scheduler");
         this.setToolTipText("Kill the scheduler (this kill immediately the scheduler)");
         this.setImageDescriptor(Activator.getDefault().getImageRegistry().getDescriptor(
@@ -61,9 +58,11 @@ public class KillSchedulerAction extends SchedulerGUIAction {
 
     @Override
     public void run() {
-        if (MessageDialog.openConfirm(shell, "Confirm please",
+        if (MessageDialog.openConfirm(getParent(), "Confirm please",
                 "Are you sure you want to Kill the scheduler ?")) {
-            SchedulerProxy.getInstance().kill();
+            if (SchedulerProxy.getInstance().kill()) {
+                DisconnectAction.disconnection();
+            }
         }
     }
 
