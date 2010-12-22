@@ -73,69 +73,55 @@ public class Utils {
         // build the SSH command using ProActive's SSH client:
         // will recover keys/identities if they exist
         String sshCmd = null;
-        boolean isLocal = false;
-        try {
-            isLocal = host.equals(InetAddress.getLocalHost()) ||
-                host.equals(InetAddress.getByName("127.0.0.1"));
-        } catch (UnknownHostException e) {
-            logger.trace(
-                    "A problem occurred while determining if the ssh command is to be run on localhost.", e);
-        }
-        if (isLocal) {
-            logger.debug("The command will be executed locally");
-            //sshCmd = cmd.replaceAll("\\\\", ""); introduced by SCHEDULING-765
-            sshCmd = cmd;
-        } else {
-            StringBuilder sb = new StringBuilder();
-            //building path to java executable
-            String javaHome = System.getProperty("java.home");
-            if (javaHome.contains(" ")) {
-                switch (OperatingSystem.getOperatingSystem()) {
-                    case unix:
-                        javaHome = javaHome.replaceAll(" ", "\\\\ ");
-                        break;
-                    case windows:
-                        sb.append("\"");
-                        break;
-                }
+        StringBuilder sb = new StringBuilder();
+        //building path to java executable
+        String javaHome = System.getProperty("java.home");
+        if (javaHome.contains(" ")) {
+            switch (OperatingSystem.getOperatingSystem()) {
+                case unix:
+                    javaHome = javaHome.replace(" ", "\\ ");
+                    break;
+                case windows:
+                    sb.append("\"");
+                    break;
             }
-            sb.append(javaHome);
-            sb.append(File.separator);
-            sb.append("bin");
-            sb.append(File.separator);
-            sb.append("java");
-            if (javaHome.contains(" ")) {
-                switch (OperatingSystem.getOperatingSystem()) {
-                    case windows:
-                        sb.append("\"");
-                        break;
-                }
-            }
-            //building classpath
-            sb.append(" -cp ");
-            sb.append(PAResourceManagerProperties.RM_HOME.getValueAsString());
-            sb.append(File.separator);
-            sb.append("dist");
-            sb.append(File.separator);
-            sb.append("lib");
-            sb.append(File.separator);
-            sb.append("ProActive.jar");
-            sb.append(" ");
-            //mandatory property
-            //exe's name
-            sb.append(SSHClient.class.getName());
-            //SSH options supplied by user from cli|gui
-            sb.append(" ");
-            sb.append(sshOptions);
-            sb.append(" ");
-            //target machine
-            sb.append(host.getHostName());
-            //the command
-            sb.append(" \"");
-            sb.append(cmd);
-            sb.append("\"");
-            sshCmd = sb.toString();
         }
+        sb.append(javaHome);
+        sb.append(File.separator);
+        sb.append("bin");
+        sb.append(File.separator);
+        sb.append("java");
+        if (javaHome.contains(" ")) {
+            switch (OperatingSystem.getOperatingSystem()) {
+                case windows:
+                    sb.append("\"");
+                    break;
+            }
+        }
+        //building classpath
+        sb.append(" -cp ");
+        sb.append(PAResourceManagerProperties.RM_HOME.getValueAsString());
+        sb.append(File.separator);
+        sb.append("dist");
+        sb.append(File.separator);
+        sb.append("lib");
+        sb.append(File.separator);
+        sb.append("ProActive.jar");
+        sb.append(" ");
+        //mandatory property
+        //exe's name
+        sb.append(SSHClient.class.getName());
+        //SSH options supplied by user from cli|gui
+        sb.append(" ");
+        sb.append(sshOptions);
+        sb.append(" ");
+        //target machine
+        sb.append(host.getHostName());
+        //the command
+        sb.append(" \"");
+        sb.append(cmd);
+        sb.append("\"");
+        sshCmd = sb.toString();
 
         logger.info("Executing SSH command: '" + sshCmd + "'");
 

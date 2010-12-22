@@ -312,6 +312,7 @@ public abstract class BatchJobInfrastructure extends InfrastructureManager {
 
             if (super.checkNodeIsAcquiredAndDo(nodeName, null, null)) {
                 //registration is ok
+                p.destroy();
                 addNodeAndDecrementDeployingNode(nodeName, this.extractSubmitOutput(id));
                 return;
             }

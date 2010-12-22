@@ -349,8 +349,8 @@ public class SSHInfrastructure2 extends InfrastructureManager {
             }
 
             if (super.checkNodeIsAcquiredAndDo(nodeName, null, null)) {
-                //registration is ok, we destroy the process if it is not running localy
-                this.destroyProcessIfRemote(p, host);
+                //registration is ok, we destroy the process
+                p.destroy();
                 return;
             }
 
@@ -562,26 +562,6 @@ public class SSHInfrastructure2 extends InfrastructureManager {
             }
         }
         return sb.toString();
-    }
-
-    /**
-     * Destroys the process only if it runs on a remote host
-     * (ie. kills the SSH process)
-     * @param p the process to kill if remote
-     * @param host the host on which one the process is running.
-     */
-    private void destroyProcessIfRemote(Process p, InetAddress host) {
-        boolean isRemote = true;
-        try {
-            isRemote = !host.equals(InetAddress.getLocalHost()) &&
-                !host.equals(InetAddress.getByName("127.0.0.1"));
-        } catch (UnknownHostException e) {
-            logger.trace("A problem occurred while determining if the ssh command is running on localhost.",
-                    e);
-        }
-        if (isRemote) {
-            p.destroy();
-        }
     }
 
     /**
