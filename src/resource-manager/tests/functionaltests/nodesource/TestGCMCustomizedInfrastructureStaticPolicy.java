@@ -67,7 +67,7 @@ public class TestGCMCustomizedInfrastructureStaticPolicy extends TestGCMInfrastr
     protected void init() throws Exception {
         // overriding gcma file
         RMTHelper.getResourceManager(RMTHelper.class.getResource(
-                "/functionaltests/config/functionalTRMProperties4Customised.ini").getPath());
+                "/functionaltests/config/functionalTRMPropertiesForCustomisedIM.ini").getPath());
         // using localhost deployment for customized infrastructure
         String oneNodeescriptor = RMTHelper.class.getResource("/functionaltests/nodesource/1node.xml")
                 .getPath();

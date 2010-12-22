@@ -46,7 +46,6 @@ import org.objectweb.proactive.core.util.ProActiveCounter;
 import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.xml.VariableContractImpl;
 import org.objectweb.proactive.core.xml.VariableContractType;
-import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
@@ -63,8 +62,6 @@ import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
  *
  */
 public class GCMCustomisedInfrastructure extends GCMInfrastructure {
-
-    private static final String DESCRIPTOR_DEFAULT_VARIABLE_JVM_ARGS = "jvmargDefinedByIM";
 
     /** hosts list */
     HashMap<String, DeploymentData> hosts = new HashMap<String, DeploymentData>();

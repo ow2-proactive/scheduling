@@ -69,7 +69,7 @@ public class TestGCMCustomizedInfrastructureTimeSlotPolicy extends TestGCMInfras
         super.init();
         // overriding gcma file
         RMTHelper.getResourceManager(RMTHelper.class.getResource(
-                "/functionaltests/config/functionalTRMProperties4Customised.ini").getPath());
+                "/functionaltests/config/functionalTRMPropertiesForCustomisedIM.ini").getPath());
         hostsListData = InetAddress.getLocalHost().getHostName().getBytes();
     }
 

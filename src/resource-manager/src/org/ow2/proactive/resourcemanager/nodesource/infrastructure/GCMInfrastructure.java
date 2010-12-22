@@ -46,6 +46,7 @@ import java.util.Map.Entry;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.xml.VariableContractImpl;
+import org.objectweb.proactive.core.xml.VariableContractType;
 import org.objectweb.proactive.extensions.gcmdeployment.PAGCMDeployment;
 import org.objectweb.proactive.gcmdeployment.GCMApplication;
 import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
@@ -67,6 +68,9 @@ import org.ow2.proactive.utils.FileToBytesConverter;
  */
 @Deprecated
 public class GCMInfrastructure extends DefaultInfrastructureManager {
+
+    /** name of the program variable for variable contract, used to define child runtimes' properties */
+    protected static final String DESCRIPTOR_DEFAULT_VARIABLE_JVM_ARGS = "jvmargDefinedByIM";
 
     /**
      * Deployment data container
@@ -172,7 +176,10 @@ public class GCMInfrastructure extends DefaultInfrastructureManager {
             try {
                 logger.debug("Deploying nodes");
                 if (deploymentData.data != null) {
-                    deployGCMD(convertGCMdeploymentDataToGCMappl(deploymentData.data, null, null));
+                    VariableContractImpl vContract = new VariableContractImpl();
+                    vContract.setVariableFromProgram(DESCRIPTOR_DEFAULT_VARIABLE_JVM_ARGS, " ",
+                            VariableContractType.ProgramVariable);
+                    deployGCMD(convertGCMdeploymentDataToGCMappl(deploymentData.data, null, vContract));
                 } else {
                     logger.warn("Empty gcmd descriptor");
                 }

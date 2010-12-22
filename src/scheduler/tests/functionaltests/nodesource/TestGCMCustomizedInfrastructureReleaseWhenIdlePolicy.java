@@ -91,7 +91,7 @@ public class TestGCMCustomizedInfrastructureReleaseWhenIdlePolicy extends
         GCMDeploymentData = FileToBytesConverter.convertFileToByteArray((new File(getDescriptor())));
         //we override the gcm application file
         SchedulerTHelper.startSchedulerWithEmptyResourceManager(SchedulerTHelper.class.getResource(
-                "config/functionalTRMProperties4Customised.ini").getPath());
+                "config/functionalTRMPropertiesForCustomisedIM.ini").getPath());
         RMTHelper.connectToExistingRM();
     }
 }

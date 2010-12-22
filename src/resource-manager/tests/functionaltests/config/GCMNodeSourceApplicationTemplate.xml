@@ -7,11 +7,13 @@
 		<javaPropertyVariable name="proactive.home" />
 		<javaPropertyVariable name="user.dir" />
 		<javaPropertyVariable name="gcmd.file" />
+		<programVariable name="jvmargDefinedByIM"/>
 	</environment>
 	<application>
 		<proactive base="root" relpath="${proactive.home}">
 	<configuration>
 		<jvmarg value="-Dproactive.test=true"/>
+		<jvmarg value='${jvmargDefinedByIM}'/>
 		<jvmarg value="-Dproactive.http.jetty.xml=${proactive.home}/config/rm/deployment/jetty.xml"/>
 		<applicationClasspath>
 				<pathElement base="proactive" relpath="/dist/lib/script-js.jar"/>

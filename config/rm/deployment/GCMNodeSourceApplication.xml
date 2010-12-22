@@ -7,11 +7,13 @@
 		<javaPropertyVariable name="pa.rm.home" />
 		<!-- this variable will be replaced by a path of a GCMD to deploy, by RMAdmin -->
 		<javaPropertyVariable name="gcmd.file" />
+		<programVariable name="jvmargDefinedByIM" />
 	</environment>
 	<application>
 		<proactive base="root" relpath="${pa.rm.home}">
 			<configuration>
 				<jvmarg value='-Dproactive.http.jetty.xml="${pa.rm.home}/config/rm/deployment/jetty.xml"'/>
+				<jvmarg value='${jvmargDefinedByIM}'/>
 				<!--  <jvmarg value='-Dproactive.scheduler.logs.maxsize=50'/>-->
 				<applicationClasspath>
 					<!-- Commented dependencies are referenced through the Jar-Index of Scheduler jars -->
