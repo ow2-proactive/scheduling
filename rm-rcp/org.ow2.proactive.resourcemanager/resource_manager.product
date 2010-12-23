@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?pde version="3.5"?>
 
-<product name="ProActive Resource Manager GUI" id="org.ow2.proactive.resourcemanager.resourcemanager" application="org.ow2.proactive.resourcemanager.application" useFeatures="false" includeLaunchers="true">
+<product name="ProActive Resource Manager Client" id="org.ow2.proactive.resourcemanager.resourcemanager" application="org.ow2.proactive.resourcemanager.application" useFeatures="false" includeLaunchers="true">
 
    <aboutInfo>
       <image path="/org.ow2.proactive.resourcemanager/icons/alt_about.gif"/>
@@ -32,7 +32,6 @@
          <bmp/>
       </win>
    </launcher>
-
 
    <vm>
    </vm>
