@@ -50,7 +50,7 @@ import org.ow2.proactive.resourcemanager.gui.data.RMStore;
 
 public class ExitHandler extends AbstractHandler implements IHandler {
 
-    boolean previousState = true;
+    private static boolean shutDown = false;
 
     @Override
     public boolean isEnabled() {
@@ -70,6 +70,10 @@ public class ExitHandler extends AbstractHandler implements IHandler {
     }
 
     public static void exit() {
+        if (shutDown)
+            return;
+        shutDown = true;
+
         // remove empty editor if it exists
         try {
             PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().setEditorAreaVisible(false);

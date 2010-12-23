@@ -15,6 +15,8 @@ import org.ow2.proactive.scheduler.gui.data.ActionsManager;
  */
 public class ExitAction extends SchedulerGUIAction {
 
+    private static boolean shuttingDown = false;
+    
     public ExitAction() {
         this.setText("E&xit");
         this.setToolTipText("Exit the Scheduler client");
@@ -26,9 +28,8 @@ public class ExitAction extends SchedulerGUIAction {
         boolean ret = MessageDialog.openConfirm(null, "Scheduler", "Do you really want do quit?");
         if (ret) {
             exit();
+            PlatformUI.getWorkbench().close();
         }
-
-        PlatformUI.getWorkbench().close();
     }
 
     @Override
@@ -38,6 +39,11 @@ public class ExitAction extends SchedulerGUIAction {
     }
 
     public static void exit() {
+        if (shuttingDown)
+            return;
+        
+        shuttingDown = true;
+        
         // remove empty editor if it exists
         try {
             PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().setEditorAreaVisible(false);

@@ -62,24 +62,24 @@ public final class Internal {
      * Each icon image is represented by a unique ID that can be used to find the corresponding 
      * image from the registry.
      */
-    public static final String IMG_ADDNODE = "add_node.gif";
-    public static final String IMG_BUSY = "busy.gif";
+    public static final String IMG_ADDNODE = "add_node.png";
+    public static final String IMG_BUSY = "busy.png";
     public static final String IMG_COLLAPSEALL = "collapseall.gif";
     public static final String IMG_CONNECT = "connect.gif";
-    public static final String IMG_CREATESOURCE = "create_source.gif";
+    public static final String IMG_CREATESOURCE = "create_source.png";
     public static final String IMG_DISCONNECT = "disconnect.gif";
-    public static final String IMG_DOWN = "down.gif";
+    public static final String IMG_DOWN = "down.png";
     public static final String IMG_EXPANDALL = "expandall.gif";
-    public static final String IMG_FREE = "free.gif";
+    public static final String IMG_FREE = "free.png";
     public static final String IMG_HOST = "host.gif";
-    public static final String IMG_DEPLOYING = "deploying.gif";
-    public static final String IMG_LOST = "lost.gif";
-    public static final String IMG_REMOVENODE = "remove_node.gif";
-    public static final String IMG_REMOVESOURCE = "remove_source.gif";
+    public static final String IMG_DEPLOYING = "deploying.png";
+    public static final String IMG_LOST = "lost.png";
+    public static final String IMG_REMOVENODE = "remove_node.png";
+    public static final String IMG_REMOVESOURCE = "remove_source.png";
     public static final String IMG_RMSHUTDOWN = "rm_shutdown.gif";
     public static final String IMG_SOURCE = "source.gif";
-    public static final String IMG_TORELEASE = "to_release.gif";
-    public static final String IMG_CONFIGURING = "configuring.gif";
+    public static final String IMG_TORELEASE = "to_release.png";
+    public static final String IMG_CONFIGURING = "configuring.png";
     public static final String IMG_EXIT = "exit.png";
 
     /**

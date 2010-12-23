@@ -214,25 +214,25 @@
             locationURI="popup:org.eclipse.ui.popup.any">
          <command
                commandId="org.ow2.proactive.resourcemanager.plugin.addNodes"
-               icon="icons/add_node.gif"
+               icon="icons/add_node.png"
                label="Add node"
                tooltip="Add node by URL">
          </command>
          <command
                commandId="org.ow2.proactive.resourcemanager.plugin.removeNodes"
-               icon="icons/remove_node.gif"
+               icon="icons/remove_node.png"
                label="Remove nodes"
                tooltip="remove nodes">
          </command>
          <command
                commandId="org.ow2.proactive.resourcemanager.plugin.createNodesource"
-               icon="icons/create_source.gif"
+               icon="icons/create_source.png"
                label="Create node source"
                tooltip="Create a new node source on Resource Manager">
          </command>
          <command
                commandId="org.ow2.proactive.resourcemanager.plugin.removeNodesource"
-               icon="icons/remove_source.gif"
+               icon="icons/remove_source.png"
                label="Remove node source"
                tooltip="Remove an existing node source with all its nodes">
          </command>
@@ -272,13 +272,13 @@
                label="&amp;Admin">
             <command
                   commandId="org.ow2.proactive.resourcemanager.plugin.addNodes"
-                  icon="icons/add_node.gif"
+                  icon="icons/add_node.png"
                   label="Add node"
                   tooltip="Add node by URL">
             </command>
             <command
                   commandId="org.ow2.proactive.resourcemanager.plugin.removeNodes"
-                  icon="icons/remove_node.gif"
+                  icon="icons/remove_node.png"
                   label="Remove nodes"
                   tooltip="remove nodes">
             </command>
@@ -288,13 +288,13 @@
             </separator>
             <command
                   commandId="org.ow2.proactive.resourcemanager.plugin.createNodesource"
-                  icon="icons/create_source.gif"
+                  icon="icons/create_source.png"
                   label="Create node source"
                   tooltip="Create a new node source on Resource Manager">
             </command>
             <command
                   commandId="org.ow2.proactive.resourcemanager.plugin.removeNodesource"
-                  icon="icons/remove_source.gif"
+                  icon="icons/remove_source.png"
                   label="Remove node source"
                   tooltip="Remove an existing node source with all its nodes">
             </command>
@@ -376,25 +376,25 @@
             </separator>
             <command
                   commandId="org.ow2.proactive.resourcemanager.plugin.addNodes"
-                  icon="icons/add_node.gif"
+                  icon="icons/add_node.png"
                   label="Add node"
                   tooltip="Add node by URL">
             </command>
             <command
                   commandId="org.ow2.proactive.resourcemanager.plugin.removeNodes"
-                  icon="icons/remove_node.gif"
+                  icon="icons/remove_node.png"
                   label="Remove nodes"
                   tooltip="remove nodes">
             </command>
             <command
                   commandId="org.ow2.proactive.resourcemanager.plugin.createNodesource"
-                  icon="icons/create_source.gif"
+                  icon="icons/create_source.png"
                   label="Create node source"
                   tooltip="Create a new node source on Resource Manager">
             </command>
             <command
                   commandId="org.ow2.proactive.resourcemanager.plugin.removeNodesource"
-                  icon="icons/remove_source.gif"
+                  icon="icons/remove_source.png"
                   label="Remove node source"
                   tooltip="Remove an existing node source with all its nodes">
             </command>
