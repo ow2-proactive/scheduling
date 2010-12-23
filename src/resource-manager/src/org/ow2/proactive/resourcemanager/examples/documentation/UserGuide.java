@@ -110,11 +110,14 @@ public class UserGuide {
             NodeSet singleHostExclusiveNodes = resourceManager.getAtMostNodes(nbOfNodes,
                     TopologyDescriptor.SINGLE_HOST, selectionScripts, exclution);
             // here we can get more nodes
-            System.out.println("The host capasicy is " + singleHostExclusiveNodes.size());
-            if (singleHostExclusiveNodes.size() > nbOfNodes) {
+            System.out.println("The number of nodes " + singleHostExclusiveNodes.size());
+            if (singleHostExclusiveNodes.getExtraNodes() != null) {
                 // we have got the host with bigger capacity
+                System.out.println("The host capasicy is " + singleHostExclusiveNodes.size() +
+                    singleHostExclusiveNodes.getExtraNodes().size());
             } else if (singleHostExclusiveNodes.size() < nbOfNodes) {
                 // we have got the host with smaller capacity
+                System.out.println("The host capasicy is " + singleHostExclusiveNodes.size());
             }
 
             // In order to get nodes on multiple hosts exclusively user may also get
