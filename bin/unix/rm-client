@@ -6,6 +6,6 @@ workingDir=`dirname $0`
 
 opt="-Xms128m -Xmx2048m"
 
-eval $JAVACMD org.ow2.proactive.resourcemanager.utils.console.ResourceManagerController $@
+eval $JAVACMD -Djava.awt.headless=true org.ow2.proactive.resourcemanager.utils.console.ResourceManagerController $@
 
 echo
