@@ -73,7 +73,7 @@ import functionaltests.RMTHelper;
  * -DdistantHost="distant host DNS" -DneighborHost="neighbor host DNS"
  * otherwise test will not be executed (silently pass).
  *
- * Test creates 6 nodes on the current machine and one node on distant and neighbor machine.
+ * Test creates 6 nodes on the current machine, 2 node on distant and one on neighbor machine.
  * Nodes are created using ssh infrastructure manager, so all hosts have to be reachable by ssh.
  * RM distrib path as well as jdk path must be the same on all machines.
  *
@@ -119,13 +119,15 @@ public class SelectionTest extends FunctionalTest {
                             "Linux", // os
                             "", // java options
                             FileToBytesConverter.convertFileToByteArray(new File(rmCredPath)), // rm credential
-                            (distantHost + "\n" + neighborHost).getBytes() }, StaticPolicy.class.getName(),
+                            (distantHost + " 2\n" + neighborHost).getBytes() }, StaticPolicy.class.getName(),
                     null);
 
             if (result.getBooleanValue()) {
                 RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
                 RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
+                RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
                 //wait for the nodes to be in free state
+                RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
                 RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
                 RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
             }
@@ -169,8 +171,11 @@ public class SelectionTest extends FunctionalTest {
         //wait for the nodes to be in free state
         RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
 
-        // so now we have 6 nodes locally: 5 default, 1 marked with property
-        // and two remote nodes - one from neighbor host another from distant
+        // so now we have 9 node in total
+        // 6 local nodes (5 default, 1 marked with property)
+        // 2 nodes on distant host
+        // 1 node on neighbor host
+        Assert.assertEquals(9, resourceManager.getState().getFreeNodesNumber());
 
         // checking TopologyDescriptor.ARBITRARY
         NodeSet ns = resourceManager.getAtMostNodes(1, TopologyDescriptor.ARBITRARY, null, null);
@@ -182,7 +187,7 @@ public class SelectionTest extends FunctionalTest {
         resourceManager.releaseNodes(ns).getBooleanValue();
 
         ns = resourceManager.getAtMostNodes(100, TopologyDescriptor.ARBITRARY, null, null);
-        Assert.assertEquals(8, ns.size());
+        Assert.assertEquals(9, ns.size());
         resourceManager.releaseNodes(ns).getBooleanValue();
 
         ns = resourceManager.getAtMostNodes(100, TopologyDescriptor.ARBITRARY, scriptList, null);
@@ -194,20 +199,20 @@ public class SelectionTest extends FunctionalTest {
         Assert.assertEquals(1, ns.size());
         resourceManager.releaseNodes(ns).getBooleanValue();
 
-        ns = resourceManager.getAtMostNodes(8, TopologyDescriptor.BEST_PROXIMITY, null, null);
-        Assert.assertEquals(8, ns.size());
+        ns = resourceManager.getAtMostNodes(9, TopologyDescriptor.BEST_PROXIMITY, null, null);
+        Assert.assertEquals(9, ns.size());
         resourceManager.releaseNodes(ns).getBooleanValue();
 
         ns = resourceManager.getAtMostNodes(100, TopologyDescriptor.BEST_PROXIMITY, null, null);
-        Assert.assertEquals(8, ns.size());
+        Assert.assertEquals(9, ns.size());
         resourceManager.releaseNodes(ns).getBooleanValue();
 
-        Node pivotNode = null;
+        //        Node pivotNode = null;
         ns = resourceManager.getAtMostNodes(6, TopologyDescriptor.BEST_PROXIMITY, null, null);
         Assert.assertEquals(6, ns.size());
         for (Node node : ns) {
-            if (pivotNode == null)
-                pivotNode = node;
+            //            if (pivotNode == null)
+            //                pivotNode = node;
             if (!node.getNodeInformation().getURL().contains(currentHost)) {
                 Assert.assertTrue("All nodes have to be from " + currentHost, false);
             }
@@ -253,13 +258,13 @@ public class SelectionTest extends FunctionalTest {
         Assert.assertEquals(1, ns.size());
         resourceManager.releaseNodes(ns).getBooleanValue();
 
-        ns = resourceManager.getAtMostNodes(8, new ThresholdProximityDescriptor(Long.MAX_VALUE), null, null);
-        Assert.assertEquals(8, ns.size());
+        ns = resourceManager.getAtMostNodes(9, new ThresholdProximityDescriptor(Long.MAX_VALUE), null, null);
+        Assert.assertEquals(9, ns.size());
         resourceManager.releaseNodes(ns).getBooleanValue();
 
         ns = resourceManager
                 .getAtMostNodes(100, new ThresholdProximityDescriptor(Long.MAX_VALUE), null, null);
-        Assert.assertEquals(8, ns.size());
+        Assert.assertEquals(9, ns.size());
         resourceManager.releaseNodes(ns).getBooleanValue();
 
         // getting information about topology
@@ -310,7 +315,7 @@ public class SelectionTest extends FunctionalTest {
         resourceManager.releaseNodes(ns).getBooleanValue();
 
         ns = resourceManager.getAtMostNodes(10, new ThresholdProximityDescriptor(maxThreshold), null, null);
-        Assert.assertEquals(8, ns.size());
+        Assert.assertEquals(9, ns.size());
         resourceManager.releaseNodes(ns).getBooleanValue();
         // pivot scenario
         //        ns = resourceManager.getAtMostNodes(1, new ThresholdProximityDescriptor(0, pivot), null, null);
@@ -344,7 +349,7 @@ public class SelectionTest extends FunctionalTest {
         Assert.assertEquals(1, ns.size());
         resourceManager.releaseNodes(ns).getBooleanValue();
 
-        ns = resourceManager.getAtMostNodes(8, TopologyDescriptor.SINGLE_HOST, null, null);
+        ns = resourceManager.getAtMostNodes(9, TopologyDescriptor.SINGLE_HOST, null, null);
         Assert.assertEquals(6, ns.size());
         resourceManager.releaseNodes(ns).getBooleanValue();
 
@@ -359,15 +364,27 @@ public class SelectionTest extends FunctionalTest {
         // checking TopologyDescriptor.SINGLE_HOST_EXCLUSIVE
         ns = resourceManager.getAtMostNodes(1, TopologyDescriptor.SINGLE_HOST_EXCLUSIVE, null, null);
         Assert.assertEquals(1, ns.size());
+        Assert.assertEquals(null, ns.getExtraNodes());
+
+        if (!ns.get(0).getNodeInformation().getURL().contains(neighborHost)) {
+            Assert.assertTrue("Neighbor host shold be selected", false);
+        }
+
         resourceManager.releaseNodes(ns).getBooleanValue();
 
-        ns = resourceManager.getAtMostNodes(8, TopologyDescriptor.SINGLE_HOST_EXCLUSIVE, null, null);
+        ns = resourceManager.getAtMostNodes(9, TopologyDescriptor.SINGLE_HOST_EXCLUSIVE, null, null);
         Assert.assertEquals(6, ns.size());
+        Assert.assertEquals(null, ns.getExtraNodes());
         resourceManager.releaseNodes(ns).getBooleanValue();
 
         ns = resourceManager.getAtMostNodes(2, TopologyDescriptor.SINGLE_HOST_EXCLUSIVE, null, null);
         Assert.assertEquals(2, ns.size());
-        Assert.assertEquals(4, ns.getExtraNodes().size());
+        Assert.assertEquals(null, ns.getExtraNodes());
+        resourceManager.releaseNodes(ns).getBooleanValue();
+
+        ns = resourceManager.getAtMostNodes(3, TopologyDescriptor.SINGLE_HOST_EXCLUSIVE, null, null);
+        Assert.assertEquals(3, ns.size());
+        Assert.assertEquals(3, ns.getExtraNodes().size());
         resourceManager.releaseNodes(ns).getBooleanValue();
 
         ns = resourceManager.getAtMostNodes(100, TopologyDescriptor.SINGLE_HOST_EXCLUSIVE, scriptList, null);
@@ -383,23 +400,34 @@ public class SelectionTest extends FunctionalTest {
         // checking TopologyDescriptor.MULTIPLE_HOSTS_EXCLUSIVE
         ns = resourceManager.getAtMostNodes(1, TopologyDescriptor.MULTIPLE_HOSTS_EXCLUSIVE, null, null);
         Assert.assertEquals(1, ns.size());
+        Assert.assertEquals(null, ns.getExtraNodes());
         resourceManager.releaseNodes(ns).getBooleanValue();
 
         ns = resourceManager.getAtMostNodes(2, TopologyDescriptor.MULTIPLE_HOSTS_EXCLUSIVE, null, null);
         Assert.assertEquals(2, ns.size());
+        Assert.assertEquals(null, ns.getExtraNodes());
         resourceManager.releaseNodes(ns).getBooleanValue();
 
         ns = resourceManager.getAtMostNodes(3, TopologyDescriptor.MULTIPLE_HOSTS_EXCLUSIVE, null, null);
         Assert.assertEquals(3, ns.size());
-        Assert.assertEquals(3, ns.getExtraNodes().size());
+        Assert.assertEquals(null, ns.getExtraNodes());
+        resourceManager.releaseNodes(ns).getBooleanValue();
+
+        ns = resourceManager.getAtMostNodes(9, TopologyDescriptor.MULTIPLE_HOSTS_EXCLUSIVE, null, null);
+        Assert.assertEquals(9, ns.size());
+        Assert.assertEquals(null, ns.getExtraNodes());
         resourceManager.releaseNodes(ns).getBooleanValue();
 
         ns = resourceManager.getAtMostNodes(8, TopologyDescriptor.MULTIPLE_HOSTS_EXCLUSIVE, null, null);
+        // current + distant has to be selected
         Assert.assertEquals(8, ns.size());
+        Assert.assertEquals(null, ns.getExtraNodes());
         resourceManager.releaseNodes(ns).getBooleanValue();
 
         ns = resourceManager.getAtMostNodes(7, TopologyDescriptor.MULTIPLE_HOSTS_EXCLUSIVE, null, null);
+        // current + neighbor has to be selected
         Assert.assertEquals(7, ns.size());
+        Assert.assertEquals(null, ns.getExtraNodes());
         resourceManager.releaseNodes(ns).getBooleanValue();
 
         ns = resourceManager.getAtMostNodes(100, TopologyDescriptor.MULTIPLE_HOSTS_EXCLUSIVE, scriptList,
@@ -410,27 +438,28 @@ public class SelectionTest extends FunctionalTest {
 
         ns = resourceManager.getAtMostNodes(100, TopologyDescriptor.MULTIPLE_HOSTS_EXCLUSIVE, null, null);
         // get max possible capacity
-        Assert.assertEquals(8, ns.size());
+        Assert.assertEquals(9, ns.size());
         resourceManager.releaseNodes(ns).getBooleanValue();
 
         // checking TopologyDescriptor.ONE_NODE_PER_HOST_EXCLUSIVE
         ns = resourceManager.getAtMostNodes(1, TopologyDescriptor.DIFFERENT_HOSTS_EXCLUSIVE, null, null);
         Assert.assertEquals(1, ns.size());
+        Assert.assertEquals(null, ns.getExtraNodes());
         resourceManager.releaseNodes(ns).getBooleanValue();
 
         ns = resourceManager.getAtMostNodes(2, TopologyDescriptor.DIFFERENT_HOSTS_EXCLUSIVE, null, null);
         Assert.assertEquals(2, ns.size());
-        Assert.assertTrue(ns.getExtraNodes() == null);
+        Assert.assertEquals(1, ns.getExtraNodes().size());
         resourceManager.releaseNodes(ns).getBooleanValue();
 
         ns = resourceManager.getAtMostNodes(3, TopologyDescriptor.DIFFERENT_HOSTS_EXCLUSIVE, null, null);
         Assert.assertEquals(3, ns.size());
-        Assert.assertEquals(5, ns.getExtraNodes().size());
+        Assert.assertEquals(6, ns.getExtraNodes().size());
         resourceManager.releaseNodes(ns).getBooleanValue();
 
         ns = resourceManager.getAtMostNodes(4, TopologyDescriptor.DIFFERENT_HOSTS_EXCLUSIVE, null, null);
         Assert.assertEquals(3, ns.size());
-        Assert.assertEquals(5, ns.getExtraNodes().size());
+        Assert.assertEquals(6, ns.getExtraNodes().size());
         resourceManager.releaseNodes(ns).getBooleanValue();
 
         PAFuture.waitFor(resourceManager.removeNodeSource("remote", true));

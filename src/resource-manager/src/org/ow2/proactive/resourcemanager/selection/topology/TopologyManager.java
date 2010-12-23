@@ -568,7 +568,12 @@ public class TopologyManager {
                     List<Node> hostNodes = nodesOnHost.get(host);
                     result.add(hostNodes.get(0));
                     if (hostNodes.size() > 1) {
-                        result.setExtraNodes(new LinkedList<Node>(hostNodes.subList(1, hostNodes.size())));
+                        List<Node> newExtraNodes = new LinkedList<Node>(hostNodes
+                                .subList(1, hostNodes.size()));
+                        if (result.getExtraNodes() == null) {
+                            result.setExtraNodes(new LinkedList<Node>());
+                        }
+                        result.getExtraNodes().addAll(newExtraNodes);
                     }
                     if (--number <= 0) {
                         // found required node set
