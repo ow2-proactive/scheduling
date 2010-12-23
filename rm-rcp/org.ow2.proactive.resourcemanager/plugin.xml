@@ -334,7 +334,7 @@
             </command>
             <command
                   commandId="org.ow2.proactive.resourcemanager.command.ShowAccount"
-                  icon="icons/account.gif"
+                  icon="icons/user.png"
                   label="Show My Account"
                   style="push"
                   tooltip="Shows accounting information">
@@ -465,7 +465,7 @@
             visible="true">
          <action
                class="org.ow2.proactive.resourcemanager.gui.actions.ShowMyAccountActionDelegate"
-               icon="icons/account.gif"
+               icon="icons/user.png"
                id="org.ow2.proactive.resourcemanager.showMyAccount"
                label="Show My Account"
                style="push"

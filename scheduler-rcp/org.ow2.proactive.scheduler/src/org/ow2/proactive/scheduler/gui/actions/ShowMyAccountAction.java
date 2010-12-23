@@ -81,7 +81,7 @@ public final class ShowMyAccountAction extends Action {
 
         // Set a descriptive icon
         super.setImageDescriptor(ImageDescriptor.createFromURL(FileLocator.find(Activator.getDefault()
-                .getBundle(), new Path("icons/account.gif"), null)));
+                .getBundle(), new Path("icons/user.png"), null)));
         // This action is disabled by default
         super.setEnabled(false);
         super.setText("Show " + NAME);
