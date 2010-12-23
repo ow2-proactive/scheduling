@@ -16,7 +16,7 @@
          point="org.eclipse.core.runtime.products">
       <product
             application="org.ow2.proactive.resourcemanager.application"
-            name="ProActive Resource Manager GUI">
+            name="ProActive Resource Manager Client">
          <property
                name="windowImages"
                value="icons/alt_window_16.gif,icons/alt_window_32.gif"/>
@@ -31,7 +31,7 @@
                value="10,10,435,15"/>
          <property
                name="appName"
-               value="ProActive Resource Manager GUI">
+               value="ProActive Resource Manager Client">
          </property>
          <property
                name="preferenceCustomization"
@@ -328,7 +328,7 @@
             <command
                   commandId="org.ow2.proactive.resourcemanager.command.ShowRuntimeData"
                   icon="icons/areacharticon.gif"
-                  label="Show Runtime Data"
+                  label="Show Runtime Monitoring"
                   style="push"
                   tooltip="Show Runtime Data">
             </command>
@@ -476,7 +476,7 @@
                class="org.ow2.proactive.resourcemanager.gui.actions.ShowRuntimeDataActionDelegate"
                icon="icons/areacharticon.gif"
                id="org.ow2.proactive.resourcemanager.showRuntimeData"
-               label="Show Runtime Data"
+               label="Show Runtime Monitoring"
                style="push"
                toolbarPath="toolbar:org.eclipse.ui.main.toolbar"
                tooltip="Shows some runtime information about the Resource Manager">

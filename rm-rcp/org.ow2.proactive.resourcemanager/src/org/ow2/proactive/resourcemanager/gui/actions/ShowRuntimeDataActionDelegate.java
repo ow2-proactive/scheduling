@@ -63,7 +63,7 @@ import org.ow2.proactive.resourcemanager.Activator;
  */
 public class ShowRuntimeDataActionDelegate extends ActionDelegate implements IWorkbenchWindowActionDelegate {
 
-    public static final String NAME = "Runtime Data";
+    public static final String NAME = "Runtime Monitoring";
 
     /** The actions manager */
     private final JMXActionsManager manager;

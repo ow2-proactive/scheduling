@@ -61,7 +61,7 @@ import org.ow2.proactive.scheduler.Activator;
  */
 public final class ShowRuntimeDataAction extends Action {
 
-    public static final String NAME = "Runtime Data";
+    public static final String NAME = "Runtime Monitoring";
 
     /** The actions manager */
     private final JMXActionsManager manager;

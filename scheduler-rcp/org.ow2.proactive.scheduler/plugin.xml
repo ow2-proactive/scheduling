@@ -17,13 +17,13 @@
         point="org.eclipse.core.runtime.products">
      <product
            application="org.ow2.proactive.scheduler.application"
-           name="ProActive Scheduler">
+           name="ProActive Scheduler Client">
         <property
               name="aboutText"
               value="%About.text"/>
         <property
               name="appName"
-              value="ProActive Scheduler"/>
+              value="ProActive Scheduler Client"/>
         <property
               name="startupProgressRect"
               value="10,10,435,15"/>
@@ -98,7 +98,7 @@
             class="org.ow2.proactive.scheduler.gui.views.Users"
             icon="icons/info.png"
             id="org.ow2.proactive.scheduler.gui.views.Users"
-            name="Open user sessions">
+            name="Logged users">
       </view>
       <view
             category="org.ow2.proactive.scheduler.gui"
