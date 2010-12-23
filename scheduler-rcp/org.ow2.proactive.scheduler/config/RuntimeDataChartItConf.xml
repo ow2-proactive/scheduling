@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?> 
 <java version="1.5.0_21" class="java.beans.XMLDecoder"> 
- <int>7</int> 
+ <int>9</int> 
  <object class="org.objectweb.proactive.ic2d.chartit.data.ChartModel"> 
   <void property="name"> 
    <string>Pending and Running Jobs</string> 
@@ -20,10 +20,75 @@
   <void index="0"> 
    <object class="org.objectweb.proactive.ic2d.chartit.data.ChartDataElement"> 
     <void property="label"> 
-     <string>Pending</string> 
+     <string>Pending jobs</string> 
     </void> 
     <void property="rgb"> 
      <void index="0"> 
+      <int>128</int> 
+     </void> 
+     <void index="1"> 
+      <int>255</int> 
+     </void> 
+     <void index="2"> 
+      <int>255</int> 
+     </void> 
+    </void> 
+   </object> 
+  </void> 
+  <void index="1"> 
+   <object class="org.objectweb.proactive.ic2d.chartit.data.ChartDataElement"> 
+    <void property="label"> 
+     <string>Running jobs</string> 
+    </void> 
+    <void property="rgb"> 
+     <void index="0"> 
+      <int>201</int> 
+     </void> 
+     <void index="1"> 
+      <int>156</int> 
+     </void> 
+     <void index="2"> 
+      <int>1</int> 
+     </void> 
+    </void> 
+   </object> 
+  </void> 
+ </array> 
+ <object class="org.objectweb.proactive.ic2d.chartit.data.ChartModel"> 
+  <void property="chartType"> 
+   <object id="ChartType0" class="org.objectweb.proactive.ic2d.chartit.data.ChartType" method="valueOf"> 
+    <class>org.objectweb.proactive.ic2d.chartit.data.ChartType</class> 
+    <string>BAR</string> 
+   </object> 
+  </void> 
+  <void property="name"> 
+   <string>Pending and Running Jobs (2)</string> 
+  </void> 
+  <void property="runtimeNames"> 
+   <array class="java.lang.String" length="2"> 
+    <void index="0"> 
+     <string>PendingJobsCount</string> 
+    </void> 
+    <void index="1"> 
+     <string>RunningJobsCount</string> 
+    </void> 
+   </array> 
+  </void> 
+ </object> 
+ <array class="org.objectweb.proactive.ic2d.chartit.data.ChartDataElement" length="2"> 
+  <void index="0"> 
+   <object class="org.objectweb.proactive.ic2d.chartit.data.ChartDataElement"> 
+    <void property="label"> 
+     <string>PendingJobsCount</string> 
+    </void> 
+    <void property="rgb"> 
+     <void index="0"> 
+      <int>128</int> 
+     </void> 
+     <void index="1"> 
+      <int>255</int> 
+     </void> 
+     <void index="2"> 
       <int>255</int> 
      </void> 
     </void> 
@@ -35,11 +100,14 @@
      <string>RunningJobsCount</string> 
     </void> 
     <void property="rgb"> 
+     <void index="0"> 
+      <int>201</int> 
+     </void> 
      <void index="1"> 
-      <int>128</int> 
+      <int>156</int> 
      </void> 
      <void index="2"> 
-      <int>255</int> 
+      <int>1</int> 
      </void> 
     </void> 
    </object> 
@@ -64,10 +132,72 @@
   <void index="0"> 
    <object class="org.objectweb.proactive.ic2d.chartit.data.ChartDataElement"> 
     <void property="label"> 
+     <string>Pending tasks</string> 
+    </void> 
+    <void property="rgb"> 
+     <void index="0"> 
+      <int>128</int> 
+     </void> 
+     <void index="1"> 
+      <int>255</int> 
+     </void> 
+     <void index="2"> 
+      <int>255</int> 
+     </void> 
+    </void> 
+   </object> 
+  </void> 
+  <void index="1"> 
+   <object class="org.objectweb.proactive.ic2d.chartit.data.ChartDataElement"> 
+    <void property="label"> 
+     <string>Running tasks</string> 
+    </void> 
+    <void property="rgb"> 
+     <void index="0"> 
+      <int>201</int> 
+     </void> 
+     <void index="1"> 
+      <int>156</int> 
+     </void> 
+     <void index="2"> 
+      <int>1</int> 
+     </void> 
+    </void> 
+   </object> 
+  </void> 
+ </array> 
+ <object class="org.objectweb.proactive.ic2d.chartit.data.ChartModel"> 
+  <void property="chartType"> 
+   <object idref="ChartType0"/> 
+  </void> 
+  <void property="name"> 
+   <string>Pending and Running Tasks (2)</string> 
+  </void> 
+  <void property="runtimeNames"> 
+   <array class="java.lang.String" length="2"> 
+    <void index="0"> 
+     <string>PendingTasksCount</string> 
+    </void> 
+    <void index="1"> 
+     <string>RunningTasksCount</string> 
+    </void> 
+   </array> 
+  </void> 
+ </object> 
+ <array class="org.objectweb.proactive.ic2d.chartit.data.ChartDataElement" length="2"> 
+  <void index="0"> 
+   <object class="org.objectweb.proactive.ic2d.chartit.data.ChartDataElement"> 
+    <void property="label"> 
      <string>PendingTasksCount</string> 
     </void> 
     <void property="rgb"> 
      <void index="0"> 
+      <int>128</int> 
+     </void> 
+     <void index="1"> 
+      <int>255</int> 
+     </void> 
+     <void index="2"> 
       <int>255</int> 
      </void> 
     </void> 
@@ -79,11 +209,14 @@
      <string>RunningTasksCount</string> 
     </void> 
     <void property="rgb"> 
+     <void index="0"> 
+      <int>201</int> 
+     </void> 
      <void index="1"> 
-      <int>128</int> 
+      <int>156</int> 
      </void> 
      <void index="2"> 
-      <int>255</int> 
+      <int>1</int> 
      </void> 
     </void> 
    </object> 
@@ -91,7 +224,7 @@
  </array> 
  <object class="org.objectweb.proactive.ic2d.chartit.data.ChartModel"> 
   <void property="chartType"> 
-   <object id="ChartType0" class="org.objectweb.proactive.ic2d.chartit.data.ChartType" method="valueOf"> 
+   <object id="ChartType1" class="org.objectweb.proactive.ic2d.chartit.data.ChartType" method="valueOf"> 
     <class>org.objectweb.proactive.ic2d.chartit.data.ChartType</class> 
     <string>TIME_SERIES</string> 
    </object> 
@@ -113,12 +246,23 @@
     <void property="label"> 
      <string>Connected Users</string> 
     </void> 
+    <void property="rgb"> 
+     <void index="0"> 
+      <int>156</int> 
+     </void> 
+     <void index="1"> 
+      <int>156</int> 
+     </void> 
+     <void index="2"> 
+      <int>156</int> 
+     </void> 
+    </void> 
    </object> 
   </void> 
  </array> 
  <object class="org.objectweb.proactive.ic2d.chartit.data.ChartModel"> 
   <void property="chartType"> 
-   <object idref="ChartType0"/> 
+   <object idref="ChartType1"/> 
   </void> 
   <void property="name"> 
    <string>Finished Jobs History</string> 
@@ -137,12 +281,23 @@
     <void property="label"> 
      <string>Finished Jobs</string> 
     </void> 
+    <void property="rgb"> 
+     <void index="0"> 
+      <int>74</int> 
+     </void> 
+     <void index="1"> 
+      <int>119</int> 
+     </void> 
+     <void index="2"> 
+      <int>232</int> 
+     </void> 
+    </void> 
    </object> 
   </void> 
  </array> 
  <object class="org.objectweb.proactive.ic2d.chartit.data.ChartModel"> 
   <void property="chartType"> 
-   <object idref="ChartType0"/> 
+   <object idref="ChartType1"/> 
   </void> 
   <void property="name"> 
    <string>Average Job Pending Time</string> 
@@ -161,12 +316,23 @@
     <void property="label"> 
      <string>Avg. Pending (ms)</string> 
     </void> 
+    <void property="rgb"> 
+     <void index="0"> 
+      <int>128</int> 
+     </void> 
+     <void index="1"> 
+      <int>255</int> 
+     </void> 
+     <void index="2"> 
+      <int>255</int> 
+     </void> 
+    </void> 
    </object> 
   </void> 
  </array> 
  <object class="org.objectweb.proactive.ic2d.chartit.data.ChartModel"> 
   <void property="chartType"> 
-   <object idref="ChartType0"/> 
+   <object idref="ChartType1"/> 
   </void> 
   <void property="name"> 
    <string>Average Job Execution Time</string> 
@@ -185,12 +351,23 @@
     <void property="label"> 
      <string>Avg. Execution (ms)</string> 
     </void> 
+    <void property="rgb"> 
+     <void index="0"> 
+      <int>74</int> 
+     </void> 
+     <void index="1"> 
+      <int>119</int> 
+     </void> 
+     <void index="2"> 
+      <int>232</int> 
+     </void> 
+    </void> 
    </object> 
   </void> 
  </array> 
  <object class="org.objectweb.proactive.ic2d.chartit.data.ChartModel"> 
   <void property="chartType"> 
-   <object idref="ChartType0"/> 
+   <object idref="ChartType1"/> 
   </void> 
   <void property="name"> 
    <string>Job Submitting Period</string> 
@@ -208,6 +385,17 @@
    <object class="org.objectweb.proactive.ic2d.chartit.data.ChartDataElement"> 
     <void property="label"> 
      <string>Submitting Period (ms)</string> 
+    </void> 
+    <void property="rgb"> 
+     <void index="0"> 
+      <int>156</int> 
+     </void> 
+     <void index="1"> 
+      <int>156</int> 
+     </void> 
+     <void index="2"> 
+      <int>156</int> 
+     </void> 
     </void> 
    </object> 
   </void> 

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?> 
-<java version="1.5.0_16" class="java.beans.XMLDecoder"> 
+<java version="1.5.0_21" class="java.beans.XMLDecoder"> 
  <int>3</int> 
  <object class="org.objectweb.proactive.ic2d.chartit.data.ChartModel"> 
   <void property="chartType"> 
@@ -38,7 +38,7 @@
   <void index="0"> 
    <object class="org.objectweb.proactive.ic2d.chartit.data.ChartDataElement"> 
     <void property="label"> 
-     <string>Total Execution Time</string> 
+     <string>Total Usage Time</string> 
     </void> 
    </object> 
   </void> 
@@ -79,7 +79,7 @@
    </object> 
   </void> 
   <void property="name"> 
-   <string>Avarage Job/Task Duration</string> 
+   <string>Average Duration</string> 
   </void> 
   <void property="refreshPeriodInMs"> 
    <long>10000</long> 
@@ -99,7 +99,7 @@
   <void index="0"> 
    <object class="org.objectweb.proactive.ic2d.chartit.data.ChartDataElement"> 
     <void property="label"> 
-     <string>Average Job Duration</string> 
+     <string>Job Duration (s)</string> 
     </void> 
     <void property="rgb"> 
      <void index="1"> 
@@ -114,10 +114,16 @@
   <void index="1"> 
    <object class="org.objectweb.proactive.ic2d.chartit.data.ChartDataElement"> 
     <void property="label"> 
-     <string>Average Task Duration</string> 
+     <string>Task Duration (s)</string> 
     </void> 
     <void property="rgb"> 
      <void index="0"> 
+      <int>128</int> 
+     </void> 
+     <void index="1"> 
+      <int>255</int> 
+     </void> 
+     <void index="2"> 
       <int>255</int> 
      </void> 
     </void> 
@@ -132,7 +138,7 @@
    </object> 
   </void> 
   <void property="name"> 
-   <string>Total Execution Time History</string> 
+   <string>Cumulated Execution Time History</string> 
   </void> 
   <void property="refreshPeriodInMs"> 
    <long>10000</long> 
@@ -149,7 +155,18 @@
   <void index="0"> 
    <object class="org.objectweb.proactive.ic2d.chartit.data.ChartDataElement"> 
     <void property="label"> 
-     <string>Total Execution Time</string> 
+     <string>Total Execution Time (ms)</string> 
+    </void> 
+    <void property="rgb"> 
+     <void index="0"> 
+      <int>74</int> 
+     </void> 
+     <void index="1"> 
+      <int>119</int> 
+     </void> 
+     <void index="2"> 
+      <int>232</int> 
+     </void> 
     </void> 
    </object> 
   </void> 
