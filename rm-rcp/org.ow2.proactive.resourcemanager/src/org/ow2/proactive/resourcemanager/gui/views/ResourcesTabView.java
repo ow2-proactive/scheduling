@@ -49,6 +49,7 @@ import org.eclipse.ui.part.ViewPart;
 import org.ow2.proactive.resourcemanager.gui.data.RMStore;
 import org.ow2.proactive.resourcemanager.gui.handlers.ConnectHandler;
 import org.ow2.proactive.resourcemanager.gui.table.RMTableViewer;
+import org.ow2.proactive.resourcemanager.gui.table.TableColumnSorter;
 import org.ow2.proactive.resourcemanager.gui.table.TableLabelProvider;
 import org.ow2.proactive.resourcemanager.gui.table.TableSelectionListener;
 
@@ -126,6 +127,9 @@ public class ResourcesTabView extends ViewPart {
                 }
             });
         }
+        
+        tabViewer.setComparator(new TableColumnSorter(tabViewer));
+
     }
 
     private void hookContextMenu() {
