@@ -586,7 +586,7 @@ public class TopologyViewer {
         fpanel.setPreferredSize(new Dimension(300, parent.getSize().y));
         fpanel.setMaximumSize(new Dimension(300, parent.getSize().y));
 
-        final JValueSlider springForceSlider = new JValueSlider("Spring force",
+        final JValueSlider springForceSlider = new JValueSlider("Density",
             TopologyForceDirectedLayout.COEFF_MIN, TopologyForceDirectedLayout.COEFF_MAX,
             topologyForceDirectedLayout.getSpringLenghtCoeff());
         springForceSlider.setBackground(Color.WHITE);

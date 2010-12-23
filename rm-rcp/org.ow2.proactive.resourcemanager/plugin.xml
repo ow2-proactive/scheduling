@@ -108,7 +108,7 @@
             class="org.ow2.proactive.resourcemanager.gui.views.ResourcesTopologyView"
             icon="icons/pa_icon_16.gif"
             id="org.ow2.proactive.resourcemanager.gui.views.ResourcesTopologyView"
-            name="Topology View">
+            name="Topology View (beta)">
       </view>
    </extension>
    <extension
