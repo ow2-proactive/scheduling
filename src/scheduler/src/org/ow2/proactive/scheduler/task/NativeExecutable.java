@@ -385,10 +385,16 @@ public class NativeExecutable extends Executable {
     public void kill() {
         super.kill();
         if (process != null) {
-            ProcessTreeKiller.get().kill(process, modelEnvVar);
-            //WARN jlscheef destroy() may be useless but it's not working yet without it.
-            //processTreeKiller seems not to kill current process...
-            process.destroy();
+            try {
+                ProcessTreeKiller.get().kill(process, modelEnvVar);
+                // WARN jlscheef destroy() may be useless but it's not working
+                // yet without it.
+                // processTreeKiller seems not to kill current process...
+            } catch (Throwable e) {
+                logger_dev.info("Unable to kill " + command[0] + " process", e);
+            } finally {
+                process.destroy();
+            }
         }
     }
 
