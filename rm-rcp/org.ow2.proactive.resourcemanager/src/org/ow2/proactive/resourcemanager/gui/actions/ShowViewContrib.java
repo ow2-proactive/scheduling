@@ -45,6 +45,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.CompoundContributionItem;
 import org.eclipse.ui.actions.ContributionItemFactory;
 
+
 public class ShowViewContrib extends CompoundContributionItem {
 
     @Override

@@ -47,20 +47,19 @@ public class StatsContentProvider implements IStructuredContentProvider {
     public Object[] getElements(Object model) {
         if (model instanceof RMModel) {
             RMModel rmmodel = (RMModel) model;
-            StatsItem pendingNodesStat = new StatsItem(NodeState.DEPLOYING.toString(), Integer.toString(rmmodel
-                    .getPendingNodesNumber()));
+            StatsItem pendingNodesStat = new StatsItem(NodeState.DEPLOYING.toString(), Integer
+                    .toString(rmmodel.getPendingNodesNumber()));
             StatsItem lostNodesStat = new StatsItem(NodeState.LOST.toString(), Integer.toString(rmmodel
                     .getLostNodesNumber()));
-            StatsItem configuringNodesStat = new StatsItem(NodeState.CONFIGURING.toString(), Integer.toString(rmmodel
-                    .getConfiguringNodesNumber()));
+            StatsItem configuringNodesStat = new StatsItem(NodeState.CONFIGURING.toString(), Integer
+                    .toString(rmmodel.getConfiguringNodesNumber()));
             StatsItem freeNodesStat = new StatsItem(NodeState.FREE.toString(), Integer.toString(rmmodel
                     .getFreeNodesNumber()));
             StatsItem busyNodesStat = new StatsItem(NodeState.BUSY.toString(), Integer.toString(rmmodel
                     .getBusyNodesNumber()));
             StatsItem downNodesStat = new StatsItem(NodeState.DOWN.toString(), Integer.toString(rmmodel
                     .getDownNodesNumber()));
-            StatsItem totalNodesStat = new StatsItem("Total", Integer.toString(rmmodel
-                    .getTotalNodesNumber()));
+            StatsItem totalNodesStat = new StatsItem("Total", Integer.toString(rmmodel.getTotalNodesNumber()));
             return new StatsItem[] { pendingNodesStat, lostNodesStat, configuringNodesStat, freeNodesStat,
                     busyNodesStat, downNodesStat, totalNodesStat };
         }

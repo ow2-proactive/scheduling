@@ -50,9 +50,10 @@ public class ShutdownSchedulerAction extends SchedulerGUIAction {
 
     public ShutdownSchedulerAction() {
         this.setText("Shutdown scheduler");
-        this.setToolTipText("Shutdown the scheduler (This will finish all running and pending jobs before shutdown)");
-        this.setImageDescriptor(Activator.getDefault().getImageRegistry()
-                .getDescriptor(Internal.IMG_SCHEDULERSHUTDOWN));
+        this
+                .setToolTipText("Shutdown the scheduler (This will finish all running and pending jobs before shutdown)");
+        this.setImageDescriptor(Activator.getDefault().getImageRegistry().getDescriptor(
+                Internal.IMG_SCHEDULERSHUTDOWN));
         this.setEnabled(false);
     }
 
