@@ -42,7 +42,7 @@
 	  <controlFlow block="start">
 	    <!-- if the line is < 40 chars do B1, else do B2,
 							  but always do C afterwars-->
-			 <if target="B1" else="B2" join="C">
+			 <if target="B1" else="B2" continuation="C">
 			   <script>
 				 <file path="${root}/if.js">
 				   <arguments>
