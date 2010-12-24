@@ -47,6 +47,7 @@ import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 
+
 public class TableColumnSorter extends ViewerComparator {
     public static final int ASC = 1;
     public static final int NONE = 0;
@@ -77,15 +78,15 @@ public class TableColumnSorter extends ViewerComparator {
     public void setColumn(TableColumn selectedColumn) {
         if (column == selectedColumn) {
             switch (direction) {
-            case ASC:
-                direction = DESC;
-                break;
-            case DESC:
-                direction = ASC;
-                break;
-            default:
-                direction = ASC;
-                break;
+                case ASC:
+                    direction = DESC;
+                    break;
+                case DESC:
+                    direction = ASC;
+                    break;
+                default:
+                    direction = ASC;
+                    break;
             }
         } else {
             this.column = selectedColumn;
@@ -94,24 +95,25 @@ public class TableColumnSorter extends ViewerComparator {
 
         Table table = viewer.getTable();
         switch (direction) {
-        case ASC:
-            table.setSortColumn(selectedColumn);
-            table.setSortDirection(SWT.UP);
-            break;
-        case DESC:
-            table.setSortColumn(selectedColumn);
-            table.setSortDirection(SWT.DOWN);
-            break;
-        default:
-            table.setSortColumn(null);
-            table.setSortDirection(SWT.NONE);
-            break;
+            case ASC:
+                table.setSortColumn(selectedColumn);
+                table.setSortDirection(SWT.UP);
+                break;
+            case DESC:
+                table.setSortColumn(selectedColumn);
+                table.setSortDirection(SWT.DOWN);
+                break;
+            default:
+                table.setSortColumn(null);
+                table.setSortDirection(SWT.NONE);
+                break;
         }
 
         TableColumn[] columns = table.getColumns();
         for (int i = 0; i < columns.length; i++) {
             TableColumn theColumn = columns[i];
-            if (theColumn == this.column) columnIndex = i;
+            if (theColumn == this.column)
+                columnIndex = i;
         }
         viewer.setComparator(null);
         viewer.setComparator(this);
@@ -123,11 +125,13 @@ public class TableColumnSorter extends ViewerComparator {
     }
 
     protected int doCompare(Viewer v, Object e1, Object e2) {
-       ILabelProvider labelProvider = (ILabelProvider) viewer.getLabelProvider(columnIndex);
+        ILabelProvider labelProvider = (ILabelProvider) viewer.getLabelProvider(columnIndex);
         String t1 = labelProvider.getText(e1);
         String t2 = labelProvider.getText(e2);
-        if (t1 == null) t1 = "";
-        if (t2 == null) t2 = "";
+        if (t1 == null)
+            t1 = "";
+        if (t2 == null)
+            t2 = "";
         return t1.compareTo(t2);
     }
 }

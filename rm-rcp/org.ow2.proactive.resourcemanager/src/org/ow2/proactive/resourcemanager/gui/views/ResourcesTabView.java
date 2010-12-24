@@ -127,7 +127,7 @@ public class ResourcesTabView extends ViewPart {
                 }
             });
         }
-        
+
         tabViewer.setComparator(new TableColumnSorter(tabViewer));
 
     }
