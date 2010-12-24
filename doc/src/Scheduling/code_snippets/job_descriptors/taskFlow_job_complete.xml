@@ -28,10 +28,11 @@
 			</javaExecutable>
 		</task>
 
-		<task name="task2" numberOfNodes="3">
+		<task name="task2">
 			<depends>
 				<task ref="task1"/>
 			</depends>
+			<parallel numberOfNodes="3"/>
 			<javaExecutable class="org.ow2.proactive.scheduler.examples.MultiNodeExample">
 				<parameters>
 					<parameter name="numberToFind" value="100"/>

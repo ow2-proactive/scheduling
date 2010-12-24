@@ -133,6 +133,20 @@
 				</mediaobject>
 			</figure>
 		</section>
+		<section xml:id="rm_gui_topology_view"><info><title>Topology view</title></info>
+			<para>
+			The <emphasis>topology view</emphasis> visualizes nodes according to network latencies between them.
+			This view allows to see groups of nodes close to each other, latencies between all the nodes and
+			of course the information about free/busy nodes.
+			</para>
+			<figure xml:id="topology_view"><info><title>Compact view</title></info>
+				<mediaobject>
+					<imageobject>
+						<imagedata scalefit="1" width="65%" contentdepth="65%"  fileref="images/png/plugin/topology_view.png" format="PNG"/>
+					</imageobject>
+				</mediaobject>
+			</figure>
+		</section>
 		<section xml:id="rm_node_icons"><info><title>Node icons</title></info>
 			<para>In every view, a node is represented by a round icon changing according to its state:</para>
 			<itemizedlist>

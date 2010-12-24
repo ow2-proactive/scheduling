@@ -809,8 +809,8 @@ task2.setGenerationScript(gscript);
 					</listitem>
 					<listitem>
 						<para>
-							<emphasis>numberOfNodes</emphasis> (optional, default 1) -
-							number of nodes needed by the task.
+							<emphasis>parallel</emphasis> - describes the environment of multi-node task. <emphasis>numberOfNodes</emphasis> in this element
+							defines the number of nodes needed by the task (cannot be less than 2).
 							<itemizedlist>
 								<listitem>
 									<para>
@@ -838,6 +838,8 @@ task2.setGenerationScript(gscript);
 									</para>
 								</listitem>
 							</itemizedlist>
+							<emphasis>parallel</emphasis> allows to define the <emphasis>topology</emphasis> of nodes for multi-nodes tasks such as
+							"best proximity", "threshold proximity", "single host exclusive" and others (see the section <xref linkend="scheduler_topology"/> for details).
 						</para>
 					</listitem>
 					<listitem>
@@ -2122,6 +2124,103 @@ public Serializable execute(TaskResult... results) throws Throwable {
 			</section>
 		  </section>
 		</section>
+
+        <section xml:id="scheduler_topology"><info><title>Defining a Topology for Multi-Nodes Tasks</title></info>
+          <para>
+              If a multi-nodes task is highly communicative and you would like to execute
+              it on the set of the closest nodes or if it has other restrictions (i.e.
+              has to be executed exclusively on host) the topology parameter can be specified.
+              The topology in our case takes into account only network latencies between nodes and
+              does not imply bandwidth or other parameters. Using networks latencies you may ask
+              for you tasks the set of nodes within some latency threshold, nodes on the same host
+              and many more.
+          </para>
+
+          <para>
+                The definition of the topology is quite straightforward. First we need to define the <emphasis>parallel</emphasis> environment element:
+          </para>
+          <programlisting language="xml"><textobject><textdata fileref="automatic_snippets/java_task_multinodes_parallel.snip" /></textobject></programlisting>
+             <para>
+                Here we defined the task required 4 nodes to be executed. The number of nodes must be greater than 1 for
+                any multi-nodes task.
+          </para>
+
+          <section xml:id="scheduler_topology_types"><info><title>Topology types</title></info>
+            <para>
+                Then we define one of the possible topology types:
+            </para>
+            <itemizedlist>
+                <listitem>
+                    <para>
+                        <emphasis>Arbitrary</emphasis> topology does not imply any restrictions on nodes location
+                    </para>
+                    <programlisting language="xml"><textobject><textdata fileref="automatic_snippets/java_task_multinodes_arbitrary.snip" /></textobject></programlisting>
+                </listitem>
+                <listitem>
+                    <para>
+                        <emphasis>Best proximity</emphasis> - the set of closest nodes among those which are not
+                        executing other tasks.
+                    </para>
+                    <programlisting language="xml"><textobject><textdata fileref="automatic_snippets/java_task_multinodes_bp.snip" /></textobject></programlisting>
+                </listitem>
+                <listitem>
+                    <para>
+                        <emphasis>Threshold proximity</emphasis> - the set of nodes within a threshold proximity (in microseconds).
+                    </para>
+                    <programlisting language="xml"><textobject><textdata fileref="automatic_snippets/java_task_multinodes_tp.snip" /></textobject></programlisting>
+                </listitem>
+                <listitem>
+                    <para>
+                        <emphasis>Single Host</emphasis> - the set of nodes on a single host.
+                    </para>
+                    <programlisting language="xml"><textobject><textdata fileref="automatic_snippets/java_task_multinodes_sh.snip" /></textobject></programlisting>
+                </listitem>
+                <listitem>
+                    <para>
+                        <emphasis>Single Host Exclusive</emphasis> - the set of nodes of a single host exclusively.
+                        The host with selected nodes will be reserved for the user.
+                    </para>
+                    <programlisting language="xml"><textobject><textdata fileref="automatic_snippets/java_task_multinodes_she.snip" /></textobject></programlisting>
+                </listitem>
+                <listitem>
+                    <para>
+                        <emphasis>Multiple Hosts Exclusive</emphasis> - the set of nodes filled in multiple hosts.
+                        Hosts with selected nodes will be reserved for the user.
+                    </para>
+                    <programlisting language="xml"><textobject><textdata fileref="automatic_snippets/java_task_multinodes_mhe.snip" /></textobject></programlisting>
+                </listitem>
+                <listitem>
+                    <para>
+                        <emphasis>Different Hosts Exclusive</emphasis> - the set of nodes each from a different host.
+                        All hosts with selected nodes will be reserved for the user.
+                    </para>
+                    <programlisting language="xml"><textobject><textdata fileref="automatic_snippets/java_task_multinodes_dhe.snip" /></textobject></programlisting>
+                </listitem>
+            </itemizedlist>
+            <warning>
+            <para>
+                You should consider the topology as an optimization for multi-nodes task execution and use it with
+                moderation. Note that using the topology will delay you task to be scheduled
+                (especially when it is used in combination with selection scripts) as the resources
+                appropriate for you task will be harder to find. Even though the execution time of
+                the task should reduce the scheduling time will definitely increase.
+            </para>
+            </warning>
+           </section>
+          <section xml:id="scheduler_topology_java"><info><title>Setting up a topology using Java API</title></info>
+            <para>
+                  We already know how to create the task using Java API of the scheduler (see <xref linkend="Create_java_task_java"/>).
+                  The topology could be also specified as follows:
+            </para>
+            <programlisting language="xml"><textobject><textdata fileref="automatic_snippets/java_task_multinodes_java_api.snip" /></textobject></programlisting>
+              <para>
+                In order to select nodes according to the topology requirement the scheduler ask for nodes from the resource
+                manager using this criterion. The algorithms using by resource manager behind the scene could be found
+                in the <link xlink:href="http://proactive.inria.fr/trunk/Resourcing/multiple_html/index.html">Resourcing documentation</link>.
+              </para>
+           </section>
+        </section>
+
 		<section xml:id="Submit_a_job"><info><title>Submit a job to the Scheduler</title></info>
 			<para>
 				The submission will perform some verifications to ensure that a job is correctly formed.

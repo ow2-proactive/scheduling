@@ -7,7 +7,8 @@
 		argument. It will use the multi-nodes feature to compute it on several node
 	</description>
 	<taskFlow>
-		<task name="Controller0">
+<!-- @snippet-start java_task_multinodes_parallel -->
+		<task name="MultiNodesTask">
 			<description>Will control the workers in order to find the prime number</description>
 			<parallel numberOfNodes="4"/>
 			<javaExecutable
@@ -17,13 +18,16 @@
 				</parameters>
 			</javaExecutable>
 		</task>
-		<task name="Controller1">
+<!-- @snippet-end java_task_multinodes_parallel -->
+		<task name="MultiNodesTask1">
 			<description>Will control the workers in order to find the prime number</description>
+<!-- @snippet-start java_task_multinodes_arbitrary -->
 			<parallel numberOfNodes="4">
 				<topology>
 					<arbitrary/>
 				</topology>
 			</parallel>
+<!-- @snippet-end java_task_multinodes_arbitrary -->
 			<javaExecutable
 				class="org.ow2.proactive.scheduler.examples.MultiNodeExample">
 				<parameters>
@@ -31,13 +35,15 @@
 				</parameters>
 			</javaExecutable>
 		</task>
-		<task name="Controller2">
+		<task name="MultiNodesTask2">
 			<description>Will control the workers in order to find the prime number</description>
+<!-- @snippet-start java_task_multinodes_bp -->
 			<parallel numberOfNodes="4">
 				<topology>
 					<bestProximity/>
 				</topology>
 			</parallel>
+<!-- @snippet-end java_task_multinodes_bp -->
 			<javaExecutable
 				class="org.ow2.proactive.scheduler.examples.MultiNodeExample">
 				<parameters>
@@ -46,13 +52,15 @@
 			</javaExecutable>
 		</task>
 
-		<task name="Controller3">
+		<task name="MultiNodesTask3">
 			<description>Will control the workers in order to find the prime number</description>
+<!-- @snippet-start java_task_multinodes_tp -->
 			<parallel numberOfNodes="4">
 				<topology>
 					<thresholdProximity threshold="100"/>
 				</topology>
 			</parallel>
+<!-- @snippet-end java_task_multinodes_tp -->
 			<javaExecutable
 				class="org.ow2.proactive.scheduler.examples.MultiNodeExample">
 				<parameters>
@@ -61,13 +69,15 @@
 			</javaExecutable>
 		</task>
 
-		<task name="Controller4">
+		<task name="MultiNodesTask4">
 			<description>Will control the workers in order to find the prime number</description>
+<!-- @snippet-start java_task_multinodes_sh -->
 			<parallel numberOfNodes="4">
 				<topology>
 					<singleHost/>
 				</topology>
 			</parallel>
+<!-- @snippet-end java_task_multinodes_sh -->
 			<javaExecutable
 				class="org.ow2.proactive.scheduler.examples.MultiNodeExample">
 				<parameters>
@@ -75,13 +85,15 @@
 				</parameters>
 			</javaExecutable>
 		</task>
-		<task name="Controller5">
+		<task name="MultiNodesTask5">
 			<description>Will control the workers in order to find the prime number</description>
+<!-- @snippet-start java_task_multinodes_she -->
 			<parallel numberOfNodes="4">
 				<topology>
 					<singleHostExclusive/>
 				</topology>
 			</parallel>
+<!-- @snippet-end java_task_multinodes_she -->
 			<javaExecutable
 				class="org.ow2.proactive.scheduler.examples.MultiNodeExample">
 				<parameters>
@@ -89,13 +101,15 @@
 				</parameters>
 			</javaExecutable>
 		</task>
-		<task name="Controller6">
+		<task name="MultiNodesTask6">
 			<description>Will control the workers in order to find the prime number</description>
+<!-- @snippet-start java_task_multinodes_mhe -->
 			<parallel numberOfNodes="4">
 				<topology>
 					<multipleHostsExclusive/>
 				</topology>
 			</parallel>
+<!-- @snippet-end java_task_multinodes_mhe -->
 			<javaExecutable
 				class="org.ow2.proactive.scheduler.examples.MultiNodeExample">
 				<parameters>
@@ -103,13 +117,15 @@
 				</parameters>
 			</javaExecutable>
 		</task>
-		<task name="Controller7">
+		<task name="MultiNodesTask7">
 			<description>Will control the workers in order to find the prime number</description>
+<!-- @snippet-start java_task_multinodes_dhe -->
 			<parallel numberOfNodes="4">
 				<topology>
 					<differentHostsExclusive/>
 				</topology>
 			</parallel>
+<!-- @snippet-end java_task_multinodes_dhe -->
 			<javaExecutable
 				class="org.ow2.proactive.scheduler.examples.MultiNodeExample">
 				<parameters>
