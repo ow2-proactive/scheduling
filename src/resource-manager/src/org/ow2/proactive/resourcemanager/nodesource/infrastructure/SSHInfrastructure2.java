@@ -124,8 +124,8 @@ public class SSHInfrastructure2 extends InfrastructureManager {
      */
     @Configurable(description = "in ms. After this timeout expired\nthe node is considered to be lost")
     protected int nodeTimeOut = 60 * 1000;
-    @Configurable(description = "The number of failed attempt to deploy\na node before discarding it")
-    protected int attempt = 5;
+    @Configurable(description = "Maximum number of failed attempt to deploy on \na host before discarding it")
+    protected int maxDeploymentFailure = 5;
     /**
      * The type of the OS on the remote machine, 'Linux', 'Windows' or 'Cygwin'
      */
@@ -208,7 +208,7 @@ public class SSHInfrastructure2 extends InfrastructureManager {
                     //node acquisition went well for host so we update the threshold
                     //node acquisition went well for host so we update the threshold
                     synchronized (freeHosts) {
-                        hostsThresholds.put(host, attempt);
+                        hostsThresholds.put(host, maxDeploymentFailure);
                     }
                 } catch (Exception e) {
                     synchronized (freeHosts) {
@@ -410,11 +410,11 @@ public class SSHInfrastructure2 extends InfrastructureManager {
             }
 
             try {
-                this.attempt = Integer.parseInt(parameters[4].toString());
+                this.maxDeploymentFailure = Integer.parseInt(parameters[4].toString());
             } catch (NumberFormatException e) {
                 logger
                         .warn("Number format exception occurred at ns configuration, default attemp value set: 5");
-                this.attempt = 5;
+                this.maxDeploymentFailure = 5;
             }
             //target OS
             if (parameters[5] != null) {
@@ -500,7 +500,7 @@ public class SSHInfrastructure2 extends InfrastructureManager {
                         this.freeHosts.add(addr);
                     }
                 }
-                hostsThresholds.put(addr, attempt);
+                hostsThresholds.put(addr, maxDeploymentFailure);
             } catch (UnknownHostException ex) {
                 throw new RuntimeException("Unknown host: " + host, ex);
             }
