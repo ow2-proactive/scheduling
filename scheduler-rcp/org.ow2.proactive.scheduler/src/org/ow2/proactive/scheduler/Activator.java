@@ -260,6 +260,12 @@ public class Activator extends AbstractUIPlugin {
             Internal.IMG_SERVER_REMOVE));
         reg.put(Internal.IMG_DATA, Activator.getImageDescriptor("icons/" + Internal.IMG_DATA));
         reg.put(Internal.IMG_COPY, Activator.getImageDescriptor("icons/" + Internal.IMG_COPY));
+        reg.put(Internal.IMG_SERVER_STARTED, Activator.getImageDescriptor("icons/" +
+            Internal.IMG_SERVER_STARTED));
+        reg.put(Internal.IMG_SERVER_REBIND, Activator.getImageDescriptor("icons/" +
+            Internal.IMG_SERVER_REBIND));
+        reg.put(Internal.IMG_SERVER_STOPPED, Activator.getImageDescriptor("icons/" +
+            Internal.IMG_SERVER_STOPPED));
     }
 
     //

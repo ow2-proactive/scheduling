@@ -50,6 +50,9 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
 import org.ow2.proactive.scheduler.Activator;
 import org.ow2.proactive.scheduler.common.SchedulerStatus;
 import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingException;
@@ -64,6 +67,7 @@ import org.ow2.proactive.scheduler.gui.views.SeparatedJobView;
 
 public class ConnectAction extends SchedulerGUIAction {
     private int res = 0;
+    private static boolean connDialogUp = false;
 
     public ConnectAction() {
 
@@ -77,12 +81,24 @@ public class ConnectAction extends SchedulerGUIAction {
 
     @Override
     public void run() {
-        connection();
+        if (!connDialogUp)
+            connection();
     }
 
     private void connection() {
+        // poor design led to the connection being impossible if the JobView is not visible...
+        try {
+            PlatformUI.getWorkbench().getActiveWorkbenchWindow().getPages()[0].showView(SeparatedJobView.ID,
+                    null, IWorkbenchPage.VIEW_ACTIVATE);
+        } catch (PartInitException e1) {
+            e1.printStackTrace();
+            return;
+        }
+
+        connDialogUp = true;
         final SelectSchedulerDialogResult dialogResult = SelectSchedulerDialog.showDialog(getParent()
                 .getShell());
+        connDialogUp = false;
 
         if (dialogResult != null) {
 

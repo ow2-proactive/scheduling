@@ -1,12 +1,16 @@
 package org.ow2.proactive.scheduler.gui.data;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.core.runtime.IStatus;
 import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.extensions.dataspaces.exceptions.DataSpacesException;
 import org.objectweb.proactive.extensions.vfsprovider.FileSystemServerDeployer;
 import org.ow2.proactive.scheduler.Activator;
+import org.ow2.proactive.scheduler.gui.views.ServersView;
 
 
 /**
@@ -19,18 +23,20 @@ public class DataServers {
 
     private static DataServers instance = null;
 
+    private static final File serversHistoryFile = new File(System.getProperty("user.home") +
+        "/.ProActive_Scheduler/dataservers.history");
+
     private Map<String, Server> servers = null;
 
     /**
      * Holds DataServer data
      */
     public static class Server {
-        private FileSystemServerDeployer deployer;
-        private String url;
-        private String rootDir;
-        private String name;
-        private boolean forked;
-        private int pid;
+        private FileSystemServerDeployer deployer = null;
+        private String url = null;
+        private String rootDir = null;
+        private String name = null;
+        private boolean started = false;
 
         public FileSystemServerDeployer getDeployer() {
             return deployer;
@@ -48,22 +54,53 @@ public class DataServers {
             return name;
         }
 
-        public boolean isForked() {
-            return forked;
+        public boolean isStarted() {
+            return started;
         }
 
-        public int getPid() {
-            return pid;
+        /**
+         * Start this DataServer
+         * 
+         * @param rebind rebind an existing object
+         * @throws DataSpacesException deployment failed, or DS already started
+         */
+        public void start(boolean rebind) throws DataSpacesException {
+            if (this.isStarted())
+                throw new DataSpacesException("Server " + name + " is already running at " + url);
+
+            try {
+                this.deployer = new FileSystemServerDeployer(this.name, this.rootDir, true, rebind);
+            } catch (IOException e) {
+                throw new DataSpacesException("Failed to deploy DataServer " + name + " at " + rootDir, e);
+            }
+
+            this.url = this.deployer.getVFSRootURL();
+            this.started = true;
         }
 
-        public Server(FileSystemServerDeployer deployer, String url, String rootDir, String name,
-                boolean forked, int pid) {
-            this.deployer = deployer;
-            this.url = url;
+        /**
+         * Stops this server
+         * 
+         * @throws DataSpacesException termination failed, or DS is not running
+         */
+        public void stop() throws DataSpacesException {
+            if (!isStarted())
+                throw new DataSpacesException("Server " + name + " is not running");
+
+            try {
+                this.deployer.terminate();
+            } catch (ProActiveException e) {
+                throw new DataSpacesException("Failed to terminate DataServer " + name + " at " + url, e);
+            }
+            this.started = false;
+            this.url = null;
+            this.deployer = null;
+        }
+
+        public Server(String rootDir, String name) {
             this.rootDir = rootDir;
             this.name = name;
-            this.forked = forked;
-            this.pid = pid;
+            this.started = false;
         }
     }
 
@@ -72,63 +109,39 @@ public class DataServers {
     }
 
     /**
-     * @param deployer the DataServer
-     * @param url VFS url of the provider
+     * Adds a new Server to the list
+     * 
      * @param rootDir the rootDir used to create the Deployer
      * @param name the name of the server represented by this deployer
+     * @param rebind try to rebind an existing server
+     * @param start if true, start the server, else add it in a stopped state
+     * @throws DataSpacesException DS was added but could not be started
      */
-    public void addServer(FileSystemServerDeployer deployer, String url, String rootDir, String name) {
-        this.addServer(deployer, url, rootDir, name, false, 0);
-    }
+    public void addServer(String rootDir, String name, boolean rebind, boolean start)
+            throws DataSpacesException {
+        if (this.servers.containsKey(name))
+            throw new DataSpacesException("Name " + name + " is already used");
 
-    /**
-     * @param url VFS url of the provider
-     * @param rootDir the rootDir used to create the Deployer
-     * @param name the name of the server represented by this deployer
-     * @param forked true when the Server was launched in a forked process
-     * @param pid the PID of the forked process if appliable
-     */
-    public void addServer(String url, String rootDir, String name, boolean forked, int pid) {
-        this.addServer(null, url, rootDir, name, true, pid);
-    }
+        Server s = new Server(rootDir, name);
+        this.servers.put(name, s);
 
-    /**
-     * @param deployer the DataServer
-     * @param url VFS url of the provider
-     * @param rootDir the rootDir used to create the Deployer
-     * @param name the name of the server represented by this deployer
-     * @param forked true when the Server was launched in a forked process
-     * @param pid the PID of the forked process if appliable
-     */
-    public void addServer(FileSystemServerDeployer deployer, String url, String rootDir, String name,
-            boolean forked, int pid) {
-        Server s = new Server(deployer, url, rootDir, name, forked, pid);
-        this.servers.put(url, s);
-    }
-
-    /**
-     * @param url the URL of the Server to remove
-     */
-    public void removeServer(String url) {
-        Server s = this.servers.remove(url);
-
-        if (s.deployer != null) {
-            try {
-                s.deployer.terminate();
-            } catch (ProActiveException e) {
-                Activator.log(IStatus.ERROR, "Could terminate DataServer at '" + url + "'", e);
-            }
-        } else {
-            Activator.log(IStatus.INFO, "DataServer at '" + url + "' was not terminated", null);
+        if (start) {
+            s.start(rebind);
         }
     }
 
     /**
-     * @param url see {@link FileSystemServerDeployer#getVFSRootURL()}
-     * @return the server corresponding the URL, or null
+     * Remove the specified server, stop it if it was running
+     * 
+     * @param name the name of the Server to remove
+     * @throws DataSpacesException DS was removed but could not be stopped
      */
-    public Server getServer(String url) {
-        return this.servers.get(url);
+    public void removeServer(String name) throws DataSpacesException {
+        Server s = this.servers.remove(name);
+
+        if (s.isStarted()) {
+            s.stop();
+        }
     }
 
     /**
@@ -139,11 +152,36 @@ public class DataServers {
     }
 
     /**
+     * @param name the name of a deployed server
+     * @return the corresponding server
+     */
+    public Server getServer(String name) {
+        return this.servers.get(name);
+    }
+
+    /**
      * @return the singleton DataServers instance, cannot be null
      */
     public static DataServers getInstance() {
         if (instance == null) {
             instance = new DataServers();
+
+            // recover history
+            String[] lines = ServersView.getHistory(serversHistoryFile);
+            for (int i = 0; i < lines.length; i += 2) {
+                if (lines.length == i + 1)
+                    break;
+
+                String root = lines[i];
+                String name = lines[i + 1];
+
+                try {
+                    instance.addServer(root, name, false, false);
+                } catch (DataSpacesException e) {
+                    Activator.log(IStatus.ERROR, "Failed to restore server from history: root=" + root +
+                        " name" + name, e);
+                }
+            }
         }
         return instance;
     }
@@ -159,11 +197,19 @@ public class DataServers {
     }
 
     private void _cleanup() {
+        serversHistoryFile.delete();
+
         for (Server srv : this.servers.values()) {
-            try {
-                srv.deployer.terminate();
-            } catch (ProActiveException e) {
-                Activator.log(IStatus.ERROR, "Failed to terminate DataServer " + srv.getUrl(), e);
+            ServersView.addHistory(serversHistoryFile, srv.getName(), true);
+            ServersView.addHistory(serversHistoryFile, srv.getRootDir(), true);
+
+            if (srv.isStarted()) {
+                try {
+                    srv.deployer.terminate();
+                } catch (ProActiveException e) {
+                    Activator.log(IStatus.ERROR, "Failed to terminate DataServer " + srv.getName() + " at " +
+                        srv.getUrl(), e);
+                }
             }
         }
     }

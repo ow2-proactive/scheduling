@@ -362,14 +362,14 @@ public class SubmitJobAction extends SchedulerGUIAction {
 
                             // put the DataServers names in the suggestions
                             Map<String, Server> servers = DataServers.getInstance().getServers();
-                            String[] items = new String[1 + servers.size()];
-                            items[0] = vars.getValue();
-                            int i = 1;
+                            ArrayList<String> items = new ArrayList<String>();
+                            items.add(vars.getValue());
                             for (Server srv : servers.values()) {
-                                items[i] = srv.getUrl();
-                                i++;
+                                if (srv.isStarted()) {
+                                    items.add(srv.getUrl());
+                                }
                             }
-                            val.setItems(items);
+                            val.setItems(items.toArray(new String[items.size()]));
                             val.select(0);
                             val.setData(vars.getKey());
 

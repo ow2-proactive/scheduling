@@ -1,3 +1,39 @@
+/*
+ * ################################################################
+ *
+ * ProActive Parallel Suite(TM): The Java(TM) library for
+ *    Parallel, Distributed, Multi-Core Computing for
+ *    Enterprise Grids & Clouds
+ *
+ * Copyright (C) 1997-2010 INRIA/University of 
+ *              Nice-Sophia Antipolis/ActiveEon
+ * Contact: proactive@ow2.org or contact@activeeon.com
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; version 3 of
+ * the License.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ * If needed, contact us to obtain a release under GPL Version 2 
+ * or a different license than the GPL.
+ *
+ *  Initial developer(s):               The ProActive Team
+ *                        http://proactive.inria.fr/team_members.htm
+ *  Contributor(s):
+ *
+ * ################################################################
+ * $$PROACTIVE_INITIAL_DEV$$
+ */
 package org.ow2.proactive.scheduler.gui.views;
 
 import java.io.BufferedReader;
@@ -19,6 +55,7 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
@@ -43,6 +80,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.DirectoryDialog;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
@@ -56,12 +94,12 @@ import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.part.ViewPart;
-import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.extensions.vfsprovider.FileSystemServerDeployer;
+import org.objectweb.proactive.extensions.dataspaces.exceptions.DataSpacesException;
 import org.ow2.proactive.scheduler.Activator;
 import org.ow2.proactive.scheduler.gui.Internal;
 import org.ow2.proactive.scheduler.gui.data.DataServers;
 import org.ow2.proactive.scheduler.gui.data.DataServers.Server;
+import org.ow2.proactive.scheduler.gui.data.TableColumnSorter;
 
 
 /**
@@ -94,6 +132,9 @@ public class ServersView extends ViewPart {
     private Action removeServerAction;
     private Action exploreServerAction;
     private Action copyURLAction;
+    private Action startServer;
+    private Action rebindServer;
+    private Action stopServer;
 
     /*
      * Data contained by the table, will be used by the label provider 
@@ -121,14 +162,30 @@ public class ServersView extends ViewPart {
         private Image img = Activator.getDefault().getImageRegistry().getDescriptor(Internal.IMG_DATA)
                 .createImage();
 
+        private Image up = Activator.getDefault().getImageRegistry().getDescriptor(
+                Internal.IMG_SERVER_STARTED).createImage();
+        private Image down = Activator.getDefault().getImageRegistry().getDescriptor(
+                Internal.IMG_SERVER_STOPPED).createImage();
+
         public String getColumnText(Object obj, int index) {
             Server s = (Server) obj;
             // column 1 : rootDir
             if (index == 0) {
                 return s.getRootDir();
             }
-            // column 2 : url
+            // column 2 : name
             else if (index == 1) {
+                return s.getName();
+            }
+            // column 3 : status
+            else if (index == 2) {
+                if (s.isStarted())
+                    return "Running";
+                else
+                    return "Stopped";
+            }
+            // column 4 : url
+            else if (index == 3) {
                 return s.getUrl();
             }
             return "?";
@@ -138,6 +195,12 @@ public class ServersView extends ViewPart {
             if (index == 0) {
                 // put an image in the first column only 
                 return getImage(obj);
+            } else if (index == 2) {
+                Server s = (Server) obj;
+                if (s.isStarted())
+                    return this.up;
+                else
+                    return this.down;
             } else {
                 return null;
             }
@@ -166,15 +229,26 @@ public class ServersView extends ViewPart {
         column1.setWidth(200);
 
         TableColumn column2 = new TableColumn(table, SWT.LEFT);
-        column2.setText("URL");
+        column2.setText("Name");
         column2.setWidth(100);
+
+        TableColumn column3 = new TableColumn(table, SWT.LEFT);
+        column3.setText("Status");
+        column3.setWidth(100);
+
+        TableColumn column4 = new TableColumn(table, SWT.LEFT);
+        column4.setText("URL");
+        column4.setWidth(100);
 
         table.addListener(SWT.Selection, new Listener() {
             public void handleEvent(Event event) {
                 Widget widget = event.item;
                 selectedServer = (DataServers.Server) widget.getData();
                 removeServerAction.setEnabled(true);
-                copyURLAction.setEnabled(true);
+                copyURLAction.setEnabled(selectedServer.isStarted());
+                startServer.setEnabled(!selectedServer.isStarted());
+                rebindServer.setEnabled(!selectedServer.isStarted());
+                stopServer.setEnabled(selectedServer.isStarted());
             }
         });
 
@@ -182,6 +256,35 @@ public class ServersView extends ViewPart {
         viewer.setContentProvider(new ViewContentProvider());
         viewer.setLabelProvider(new ViewLabelProvider());
         viewer.setInput(getViewSite());
+        viewer.setComparator(new TableColumnSorter(viewer) {
+            @Override
+            protected int doCompare(Viewer v, int index, Object e1, Object e2) {
+                Server s1 = (Server) e1;
+                Server s2 = (Server) e2;
+                switch (index) {
+                    case 0:
+                        File dir1 = new File(s1.getRootDir());
+                        File dir2 = new File(s2.getRootDir());
+                        return dir1.compareTo(dir2);
+                    case 1:
+                        return s1.getName().compareTo(s2.getName());
+                    case 2:
+                        Boolean b1 = new Boolean(s1.isStarted());
+                        Boolean b2 = new Boolean(s2.isStarted());
+                        return b1.compareTo(b2);
+                    case 3:
+                        String u1 = s1.getUrl();
+                        String u2 = s2.getUrl();
+                        if (u1 == null)
+                            u1 = "";
+                        if (u2 == null)
+                            u2 = "";
+                        return u1.compareTo(u2);
+                    default:
+                        return 0;
+                }
+            }
+        });
 
         makeActions(parent);
         hookContextMenu();
@@ -208,16 +311,23 @@ public class ServersView extends ViewPart {
     }
 
     private void fillContextMenu(IMenuManager manager) {
+        manager.add(copyURLAction);
+        manager.add(startServer);
+        manager.add(rebindServer);
+        manager.add(stopServer);
+        manager.add(new Separator());
         manager.add(addServerAction);
         manager.add(removeServerAction);
-        manager.add(copyURLAction);
-        // Other plug-ins can contribute there actions here
         manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
     }
 
     private void fillLocalToolBar(IToolBarManager manager) {
         manager.add(addServerAction);
         manager.add(removeServerAction);
+        manager.add(new Separator());
+        manager.add(startServer);
+        manager.add(rebindServer);
+        manager.add(stopServer);
         manager.add(copyURLAction);
     }
 
@@ -296,13 +406,10 @@ public class ServersView extends ViewPart {
                 r2.setToolTipText("If a server with the same Name is currently bound, reuse it");
 
                 // fifth line : fork 
-                /*
                 final Button r3 = new Button(content, SWT.CHECK);
-                r3.setText("Fork server");
-                r3.setSelection(false);
-                r3.setToolTipText("Start the server in a separate process so it "
-                    + "keeps running when the client is closed");
-                 */
+                r3.setText("Start server");
+                r3.setSelection(true);
+                r3.setToolTipText("Start the Server immediately, or add it in a stopped state");
 
                 // hidden progress bar
                 final Composite progress = new Composite(dialog, 0);
@@ -403,9 +510,10 @@ public class ServersView extends ViewPart {
                         //     final boolean fork = r3.getSelection();
                         final StringBuilder message = new StringBuilder();
                         final StringBuilder error = new StringBuilder();
-                        final String t1atext = t1a.getText();
-                        final String t1btext = t1b.getText();
+                        final String rootDir = t1a.getText();
+                        final String dsName = t1b.getText();
                         final boolean[] errorOccurred = { false };
+                        final boolean startServer = r3.getSelection();
 
                         /*
                          * server creation needs to run in a worker thread
@@ -413,34 +521,29 @@ public class ServersView extends ViewPart {
                         Thread th = new Thread(new Runnable() {
                             public void run() {
 
-                                // create new dataserver
-                                FileSystemServerDeployer deployer = null;
                                 try {
-                                    /*
-                                    if (fork) {
-                                        int pid = 0;
-                                        String url = "";
+                                    if (dsName.trim().length() == 0) {
+                                        throw new DataSpacesException("Data Server name cannot be empty.");
+                                    }
+                                    File f = new File(rootDir);
+                                    if (!(f.exists() && f.isDirectory())) {
+                                        throw new DataSpacesException(
+                                            "Data Server root directory must be an existing directory");
+                                    }
 
-                                        // TODO
-                                        // System.exec
-                                        // get pid, url
+                                    DataServers.getInstance().addServer(rootDir, dsName, rebind, startServer);
 
-                                        DataServers.getInstance().addServer(url, t1atext, t1btext, true, pid);
-
-                                    } else {
-                                     */
-
-                                    deployer = new FileSystemServerDeployer(t1btext, t1atext, true, rebind);
-                                    DataServers.getInstance().addServer(deployer, deployer.getVFSRootURL(),
-                                            t1atext, t1btext);
-
-                                    addHistory(rootHistoryFile, t1atext);
-                                    addHistory(nameHistoryFile, t1btext);
+                                    addHistory(rootHistoryFile, rootDir, false);
+                                    addHistory(nameHistoryFile, dsName, false);
 
                                     message.append("Successfully created new Data Server");
                                     errorOccurred[0] = false;
+
                                 } catch (Throwable e) {
                                     message.append("Error while creating Data Server");
+                                    if (e.getMessage() != null && e.getMessage().trim().length() > 1) {
+                                        message.append(":\n" + e.getMessage());
+                                    }
                                     ByteArrayOutputStream os = new ByteArrayOutputStream();
                                     PrintWriter pw = new PrintWriter(os);
                                     e.printStackTrace(pw);
@@ -448,13 +551,6 @@ public class ServersView extends ViewPart {
                                     error.append(os.toString());
                                     Activator.log(IStatus.INFO, "Error while creating Data Server", e);
                                     errorOccurred[0] = true;
-
-                                    if (deployer != null) {
-                                        try {
-                                            deployer.terminate();
-                                        } catch (ProActiveException e1) {
-                                        }
-                                    }
                                 }
 
                                 /*
@@ -520,7 +616,7 @@ public class ServersView extends ViewPart {
                 dialog.open();
             }
         };
-        addServerAction.setToolTipText("Create or add an existing Data Server");
+        addServerAction.setToolTipText("Add a new Data Server");
 
         ImageDescriptor desc2 = Activator.getDefault().getImageRegistry().getDescriptor(
                 Internal.IMG_SERVER_REMOVE);
@@ -529,20 +625,32 @@ public class ServersView extends ViewPart {
                 final Shell dialog = new Shell(parent.getDisplay(), SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
                 dialog.setText("Remove Data Server");
 
-                dialog.setLayout(new GridLayout());
+                GridLayout gl = new GridLayout(2, false);
+                dialog.setLayout(gl);
 
                 Label l1 = new Label(dialog, SWT.NULL);
-                l1.setText("Removing Data Server '" + selectedServer.getName() + "' at URL:");
-                l1.setLayoutData(new GridData(SWT.LEFT, SWT.BOTTOM, true, true));
+                l1.setText("Remove Data Server:");
+                l1.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false));
 
-                Text t1 = new Text(dialog, SWT.SINGLE | SWT.H_SCROLL | SWT.BORDER | SWT.READ_ONLY);
-                t1.setText(selectedServer.getUrl());
-                t1.setEditable(false);
-                t1.setLayoutData(new GridData(SWT.LEFT, SWT.TOP, true, true));
+                final Combo t1 = new Combo(dialog, SWT.DROP_DOWN | SWT.READ_ONLY);
+                String[] items = new String[DataServers.getInstance().getServers().size()];
+                int i = 0, selIndex = -1;
+                for (Server srv : DataServers.getInstance().getServers().values()) {
+                    items[i] = srv.getName();
+                    if (srv.getName().equals(selectedServer.getName())) {
+                        selIndex = i;
+                    }
+                    i++;
+                }
+                t1.setItems(items);
+                t1.select(selIndex);
+                t1.setLayoutData(new GridData(GridData.BEGINNING | GridData.FILL_HORIZONTAL));
 
                 Label l2 = new Label(dialog, SWT.NULL);
                 l2.setText("Do you want to continue ?");
-                l2.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, true, true));
+                GridData l2gd = new GridData(SWT.CENTER, SWT.CENTER, true, true);
+                l2gd.horizontalSpan = 2;
+                l2.setLayoutData(l2gd);
 
                 Composite buttons = new Composite(dialog, 0);
                 GridData g5 = new GridData(SWT.CENTER, SWT.BOTTOM, true, false);
@@ -564,21 +672,33 @@ public class ServersView extends ViewPart {
                 c2.setText("  OK  ");
                 c2.addListener(SWT.Selection, new Listener() {
                     public void handleEvent(Event event) {
-                        DataServers.getInstance().removeServer(selectedServer.getUrl());
+                        String name = t1.getItem(t1.getSelectionIndex());
+                        try {
+                            DataServers.getInstance().removeServer(name);
+                        } catch (DataSpacesException e) {
+                            Activator.log(IStatus.ERROR, "Failed to Stop ", e);
+                            MessageDialog.openError(parent.getShell(), "Data Servers",
+                                    "Failed to stop Data Server " + name);
+                        }
                         viewer.refresh();
                         dialog.close();
+                        table.deselectAll();
                         removeServerAction.setEnabled(false);
                         copyURLAction.setEnabled(false);
+                        startServer.setEnabled(false);
+                        rebindServer.setEnabled(false);
+                        stopServer.setEnabled(false);
                     }
                 });
 
                 dialog.pack();
-                dialog.setSize(400, dialog.getSize().y + 50);
+                dialog.setSize(400, dialog.getSize().y + 25);
                 dialog.open();
             }
         };
         removeServerAction.setEnabled(false);
-        removeServerAction.setToolTipText("Remove or shutdown a Data Server");
+        removeServerAction.setToolTipText("Stop and Remove a Data Server");
+        removeServerAction.setToolTipText("Copy the Data Server URL to clipboard");
 
         ImageDescriptor desc3 = Activator.getDefault().getImageRegistry().getDescriptor(Internal.IMG_COPY);
         copyURLAction = new Action("Copy server URL", desc3) {
@@ -595,7 +715,121 @@ public class ServersView extends ViewPart {
             }
         };
         copyURLAction.setEnabled(false);
-        removeServerAction.setToolTipText("Copy the Data Server URL to clipboard");
+
+        ImageDescriptor desc4 = Activator.getDefault().getImageRegistry().getDescriptor(
+                Internal.IMG_SCHEDULERSTART);
+        startServer = new Action("Start", desc4) {
+            public void run() {
+                Thread th = new Thread(new Runnable() {
+                    public void run() {
+                        if (selectedServer != null && !selectedServer.isStarted()) {
+                            try {
+                                selectedServer.start(false);
+                                parent.getDisplay().asyncExec(new Runnable() {
+                                    public void run() {
+                                        viewer.refresh();
+                                    }
+                                });
+
+                                startServer.setEnabled(false);
+                                rebindServer.setEnabled(false);
+                                stopServer.setEnabled(true);
+                            } catch (final DataSpacesException e) {
+                                Activator.log(IStatus.ERROR, "Could not start server " +
+                                    selectedServer.getName(), e);
+                                parent.getDisplay().asyncExec(new Runnable() {
+                                    public void run() {
+                                        MessageDialog.openError(parent.getShell(), "Data Server",
+                                                "Could not start server " + selectedServer.getName() + ":\n" +
+                                                    e.getMessage());
+                                    }
+                                });
+                            }
+                        }
+                    }
+                });
+                th.start();
+            }
+        };
+        startServer.setEnabled(false);
+        startServer.setToolTipText("Start a stopped Data Server");
+
+        ImageDescriptor desc5 = Activator.getDefault().getImageRegistry().getDescriptor(
+                Internal.IMG_SCHEDULERSTOP);
+        stopServer = new Action("Stop", desc5) {
+            public void run() {
+                Thread th = new Thread(new Runnable() {
+                    public void run() {
+                        if (selectedServer != null && selectedServer.isStarted()) {
+                            try {
+                                selectedServer.stop();
+
+                                parent.getDisplay().asyncExec(new Runnable() {
+                                    public void run() {
+                                        viewer.refresh();
+                                    }
+                                });
+
+                                startServer.setEnabled(true);
+                                rebindServer.setEnabled(true);
+                                stopServer.setEnabled(false);
+                            } catch (final DataSpacesException e) {
+                                Activator.log(IStatus.ERROR, "Could not stop server " +
+                                    selectedServer.getName(), e);
+                                parent.getDisplay().asyncExec(new Runnable() {
+                                    public void run() {
+                                        MessageDialog.openError(parent.getShell(), "Data Server",
+                                                "Could not stop server " + selectedServer.getName() + ":\n" +
+                                                    e.getMessage());
+                                    }
+                                });
+                            }
+                        }
+                    }
+                });
+                th.start();
+            }
+        };
+        stopServer.setEnabled(false);
+        stopServer.setToolTipText("Stop a running Data Server");
+
+        ImageDescriptor desc6 = Activator.getDefault().getImageRegistry().getDescriptor(
+                Internal.IMG_SERVER_REBIND);
+        rebindServer = new Action("Rebind", desc6) {
+            public void run() {
+                Thread th = new Thread(new Runnable() {
+                    public void run() {
+                        if (selectedServer != null && !selectedServer.isStarted()) {
+                            try {
+                                selectedServer.start(true);
+                                parent.getDisplay().asyncExec(new Runnable() {
+                                    public void run() {
+                                        viewer.refresh();
+                                    }
+                                });
+
+                                startServer.setEnabled(false);
+                                rebindServer.setEnabled(false);
+                                stopServer.setEnabled(true);
+                            } catch (final DataSpacesException e) {
+                                Activator.log(IStatus.ERROR, "Could not rebind server " +
+                                    selectedServer.getName(), e);
+                                Display.getCurrent().asyncExec(new Runnable() {
+                                    public void run() {
+                                        MessageDialog.openError(parent.getShell(), "Data Server",
+                                                "Could not rebind server " + selectedServer.getName() +
+                                                    ":\n" + e.getMessage());
+                                    }
+                                });
+                            }
+                        }
+                    }
+                });
+                th.start();
+            }
+        };
+        rebindServer.setEnabled(false);
+        rebindServer.setToolTipText("Rebind an existing Data Server");
 
         exploreServerAction = new Action() {
             public void run() {
@@ -604,7 +838,7 @@ public class ServersView extends ViewPart {
         };
     }
 
-    private void addHistory(File file, String line) {
+    public static void addHistory(File file, String line, boolean keepDupesNoLimit) {
         if (!file.exists()) {
             try {
                 file.createNewFile();
@@ -613,10 +847,12 @@ public class ServersView extends ViewPart {
             }
         }
         String[] content = getHistory(file);
-        int len = Math.min(20, content.length);
+        int lim = (keepDupesNoLimit ? 100 : 20);
+        int len = Math.min(lim, content.length);
+
         ArrayList<String> ar = new ArrayList<String>(len);
         for (int i = 0; i < len; i++) {
-            if (!content[i].equals(line)) {
+            if (!content[i].equals(line) || keepDupesNoLimit) {
                 ar.add(content[i]);
             }
         }
@@ -633,7 +869,7 @@ public class ServersView extends ViewPart {
         }
     }
 
-    private String[] getHistory(File f) {
+    public static String[] getHistory(File f) {
         if (!f.exists()) {
             return new String[] {};
         } else {
