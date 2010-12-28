@@ -3,9 +3,9 @@ This folder is the scripts folder of OSProcessBuilder for Linux machines.
 For normal functioning, please verify:
 
 PERMISSIONS:
-  All users under whose ID the process-launching-user wants to work have to have READ+EXECUTE rights on all files.
+  All users under whose ID the process-launching-user wants to work have to have READ+EXECUTE rights on all files. 
   WRITE rights must not be granted, as they are an immediate security risk
-
+  
 CONTENTS:
   This folder has to contain the following files:
   * launch.sh - main script
@@ -13,6 +13,6 @@ CONTENTS:
   * command_step.sh - step for launching the user's command
   * check_sudo.sh - verification script
   * suer32/suer64 - EXECUTABLE - version depending on the machine type (32/64bit)
-
-
+  
+  
 

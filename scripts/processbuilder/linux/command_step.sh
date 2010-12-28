@@ -1,12 +1,13 @@
 # last step of the command launching mechanism
 # will test if a command can or can not be launched by the current user
-# If everything seems OK it will signal the java process builder on stdout and
+# If everything seems OK it will signal the java process builder on stdout and 
 # stderr that it will proceed with executing the user command
 
 # parameters:
-#	$1 - temp file to save exit value
-# 	$2 - absolute path to the working dir of user command
-#	$3... - command to execute
+#	$1 - the token
+#	$2 - temp file to save exit value
+# 	$3 - absolute path to the working dir of user command
+#	$4... - command to execute
 
 # IMPORTANT: On error messages refer to the JavaDoc of OSProcessBuilder
 
@@ -16,11 +17,13 @@ OSPL_E_CAUSE="CAUSE";
 OSLP_PACKAGE="org.objectweb.proactive.extensions.processbuilder.exception."
 #---------------
 
+token=$1
+
 # temp file
-tmp=$1
+tmp=$2
 
 if [ ! -e $tmp ]; then
-  # if the temp file is not OK
+  # if the temp file is not OK 
   error="$OSPL_E_PREFIX ${OSLP_PACKAGE}FatalProcessBuilderException $OSPL_E_CAUSE Could not access temp file for storing the return value!";
   echo $error 1>&2;
   exit 1;
@@ -31,16 +34,16 @@ if [ -s $tmp ]; then
   source $tmp
 fi;
 
-# working directory for the user command
-workdir="$2"
+# working directory for the user command 
+workdir="$3"
 
 # losing the first two arguments, all that remains is the user command
-shift;shift
+shift;shift;shift;
 
 # check if the workdir is OK
 if [ -d "${workdir}" ]; then
   cd "$workdir"
-else
+else 
   error="$OSPL_E_PREFIX java.io.IOException $OSPL_E_CAUSE error=2, No such directory (${workdir}) ";
   echo $error 1>&2;
   exit 1;
@@ -58,14 +61,16 @@ fi;
 
 if [ -e "$cmd_path" ]; then
   if [ -x "$cmd_path" ]; then
-
-    # let's tell the launcher that everything is OK
+    
+    # let's tell the launcher that everything is OK 
     confirm="_OS_PROCESS_LAUNCH_INIT_FINISHED_"
     echo $confirm;
     echo $confirm 1>&2;
 
     # execute it!
-    "$@"
+    (exec -a "Kill me $token" "$@")
+	
+	
     # write return value to the temp file
     error=$?
     echo $error > $tmp;
@@ -75,7 +80,7 @@ if [ -e "$cmd_path" ]; then
     echo $error 1>&2;
     exit 1;
   fi;
-else
+else 
   error="$OSPL_E_PREFIX java.io.IOException $OSPL_E_CAUSE error=2, No such file or directory ";
   echo $error 1>&2;
   exit 1;
