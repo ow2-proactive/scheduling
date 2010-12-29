@@ -1,0 +1,32 @@
+#!/bin/sh
+
+
+workingDir=`dirname $0`
+
+
+function warn_print_usage_and_exit {
+        echo "$1" 1>&2
+        echo "" 1>&2
+        echo "Usage: $0 ProgrammingDir" 1>&2
+        exit 1
+}
+
+
+if [ -d $1 ] ; then
+
+echo "Copying jar files ..."
+cp -v $1/dist/lib/ProActive.jar $workingDir/../../lib/ProActive/
+cp -v $1/dist/lib/ProActive_utils.jar $workingDir/../../lib/ProActive/
+cp -v $1/dist/lib/ProActive_tests.jar $workingDir/../../lib/ProActive/  
+
+echo "Copying OSProcessBuilder scripts ... "
+cp -v -r $1/dist/scripts/processbuilder/* $workingDir/../../scripts/processbuilder/
+
+else
+
+warn_print_usage_and_exit "Programming directory $1 is not correct"
+
+fi
+
+
+ 
