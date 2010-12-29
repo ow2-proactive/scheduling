@@ -48,7 +48,9 @@ if [ "$passw" == "" ]; then
     exitc=$?
   else 
     # use ssh
-    export >> $tmp;
+    # PROACTIVE-970 : default env is used
+    # Note that tmp is still used fo return value
+    # export >> $tmp;
     
     keyfile=`mktemp`
     echo "$keycont" > $keyfile

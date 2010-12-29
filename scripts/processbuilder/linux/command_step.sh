@@ -30,9 +30,10 @@ if [ ! -e $tmp ]; then
 fi;
 
 # if we have data in the file, then it is the dump of the environment
-if [ -s $tmp ]; then
-  source $tmp
-fi;
+# PROACTIVE-970 : default env is used
+#if [ -s $tmp ]; then
+#  source $tmp
+#fi;
 
 # working directory for the user command 
 workdir="$3"
