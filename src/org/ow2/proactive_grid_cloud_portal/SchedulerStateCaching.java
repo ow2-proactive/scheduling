@@ -35,64 +35,67 @@ public class SchedulerStateCaching {
     public static void init() {
         
         refreshInterval = Integer.parseInt(PortalConfiguration.getProperties().getProperty(PortalConfiguration.scheduler_cache_refreshrate));
+        String url = PortalConfiguration.getProperties().getProperty(PortalConfiguration.scheduler_url);
+        String cred_path = PortalConfiguration.getProperties().getProperty(PortalConfiguration.scheduler_cache_credential);
         
+        while (scheduler == null ) {
+        try {
+            
+            if (scheduler == null) {
+            
+            scheduler = PAActiveObject.newActive(
+                         CachingSchedulerProxyUserInterface.class, new Object[] {});
+
+          
+            // check is we use a credential file 
+            
+           
+            File f = new File(cred_path);
+            
+            if (f.exists()) {
+                Credentials credential = Credentials.getCredentials(cred_path);
+                scheduler.init(url, credential);
+            } else {
+                String login =  PortalConfiguration.getProperties().getProperty(PortalConfiguration.scheduler_cache_login);
+                String password =  PortalConfiguration.getProperties().getProperty(PortalConfiguration.scheduler_cache_password);           
+                scheduler.init(url, login, password);
+            }
+            
+            
+            }
+           } catch (Exception e) {
+               logger.warn("no scheduler found on " + url + "retrying in 8 seconds", e);
+               scheduler = null;
+               new Sleeper(8 * 1000).sleep();
+               continue;
+           }
+        }
+        
+    }
+
+    
+    public static void start() {
         t = new Thread(new Runnable() {
             public void run() {
                while (!kill) {
-                   
-            
-                   
-                   try {
-                       if (scheduler == null) {
-                       
-                       scheduler = PAActiveObject.newActive(
-                                    CachingSchedulerProxyUserInterface.class, new Object[] {});
-
-                       String url = PortalConfiguration.getProperties().getProperty(PortalConfiguration.scheduler_url);
-
-                       // check is we use a credential file 
-                       
-                       String cred_path = PortalConfiguration.getProperties().getProperty(PortalConfiguration.scheduler_cache_credential);
-                       
-                       File f = new File(cred_path);
-                       
-                       if (f.exists()) {
-                           Credentials credential = Credentials.getCredentials(cred_path);
-                           scheduler.init(url, credential);
-                       } else {
-                           String login =  PortalConfiguration.getProperties().getProperty(PortalConfiguration.scheduler_cache_login);
-                           String password =  PortalConfiguration.getProperties().getProperty(PortalConfiguration.scheduler_cache_password);           
-                           scheduler.init(url, login, password);
-                       }
-                       
-                       SchedulerStateCaching.setScheduler(scheduler);
-                       
-                       }
-                      } catch (Exception e) {
-                          logger.warn(e.getMessage(), e);
-                          new Sleeper(3 * 1000).sleep();
-                          continue;
-                      }
-                   
-                   
-                   
+  
                 long currentSchedulerStateRevision = scheduler.getSchedulerStateRevision();
                 
                 if (currentSchedulerStateRevision != schedulerRevision) {
                     Entry<AtomicLong, SchedulerState> tmp = scheduler.getRevisionVersionAndSchedulerState().entrySet().iterator().next();
                     localState = tmp.getValue();
                     schedulerRevision = tmp.getKey().longValue();
+                    logger.debug("updated scheduler state revision at " + schedulerRevision);
                 }
-                logger.info("updated scheduler state revision at " + schedulerRevision);
+
                 new Sleeper(refreshInterval).sleep();
                }
             }
         },"State Updater Thread");
         
         t.start();
-        
     }
-
+    
     public static SchedulerState getLocalState() {
         return localState;
     }

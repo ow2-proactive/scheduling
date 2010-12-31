@@ -90,7 +90,8 @@ public class MyResteasyBootstrap extends ResteasyBootstrap {
         PropertyConfigurator.configure(event.getServletContext().getRealPath("WEB-INF/log4j.properties"));
 
         SchedulerStateCaching.init();
-       
+        SchedulerStateCaching.start();
+        
         // start the session cleaner
         schedulerSessionCleaner = new SessionsCleaner(SchedulerSessionMapper.getInstance());
         new Thread(this.schedulerSessionCleaner, "Scheduler Sessions Cleaner Thread").start();
