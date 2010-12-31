@@ -128,7 +128,8 @@ public class SchedulerStateRest {
         s = checkAccess(sessionId);
 
         List<JobState> jobs = new ArrayList<JobState>();
-        SchedulerState state = s.getState();
+        SchedulerState state = SchedulerStateCaching.getLocalState();
+//        s.getState();
         jobs.addAll(state.getPendingJobs());
         jobs.addAll(state.getRunningJobs());
         jobs.addAll(state.getFinishedJobs());
@@ -159,7 +160,8 @@ public class SchedulerStateRest {
     String sessionId) throws PermissionException, NotConnectedException {
         Scheduler s = checkAccess(sessionId);
         List<JobState> jobs = new ArrayList<JobState>();
-        SchedulerState state = s.getState();
+        SchedulerState state = SchedulerStateCaching.getLocalState();
+//        s.getState();
         jobs.addAll(state.getPendingJobs());
         jobs.addAll(state.getRunningJobs());
         jobs.addAll(state.getFinishedJobs());
