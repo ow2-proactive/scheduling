@@ -845,8 +845,8 @@ public class HelloTask extends JavaExecutable{
 	list of finished jobs which are waiting to be retrieved by their submitters.
 	</para>
 	<para>
-	Now Launch again your job developped earlier,
-	right click in a blank area and <emphasis role="bold">choose submit a job: </emphasis>
+	  To submit a new Job to the Scheduler, use the submit button in the toolbar, or
+	  activate the Scheduler menu and Submit submenu as pictured, the click 'Submit an XML Job file':
 	</para>
 	<figure xml:id="rcp_submit"><info><title>Context menu</title></info>
 

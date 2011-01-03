@@ -14,59 +14,24 @@
 		).
 	</para>
 	<para>
-		The Scheduler Eclipse Plugin is available in two forms:
+		The Scheduler Graphical Client is a standalone application built on top of
+		<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://wiki.eclipse.org/index.php/Rich_Client_Platform">
+		  Eclipse Rich Client Platform (RCP)
+		</link>. It is available for all major platforms (Windows, Mac OS, Linux, Solaris).
 	</para>
-	<itemizedlist>
-		<listitem>
-			<para>
-				A
-				<emphasis role="bold">
-					Java stand alone application
-				</emphasis>
-				based on
-				<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://wiki.eclipse.org/index.php/Rich_Client_Platform">
-					Eclipse Rich Client Platform (RCP)
-				</link>
-				, available for any platform (Windows, Linux, Mac
-				OSX, Solaris...).
-			</para>
-		</listitem>
-		<listitem>
-			<para>
-				A set of
-				<emphasis role="bold">
-					<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://www.eclipse.org">
-						Eclipse
-					</link>
-					plugins
-				</emphasis>:
-				with all functionalities within the stand
-				alone application, enhanced with a tool that makes
-				easier the scheduling and monitoring of jobs and
-				applications.
-			</para>
-		</listitem>
-	</itemizedlist>
+	<para>
+	  Although the plugin is built as a standalone application, it can be integrated in an existing Eclipse
+	  installation by installing only the Scheduler Plugin, allowing the use of the Scheduler Perspective.
+	</para>
 
 	<section xml:id="Starting_GUI"><info><title>Starting  Scheduler Graphical User Interface</title></info>
 		<para>
-			Depending on the way you get the Scheduler plugin, just follow one of this step:
-			<itemizedlist>
-				<listitem><para>
-					<emphasis role="bold">If you are using the stand alone application</emphasis>, just start it using
-					provided executable ("Scheduler" on unix, "Scheduler.exe" on Windows).</para>
-				</listitem>
-				<listitem><para>
-					<emphasis role="bold">If you are using the Eclipse plugins set</emphasis>, install it as an eclipse plugin
-					and restart Eclipse. Then select the Scheduler Perspective.</para>
-				</listitem>
-			</itemizedlist>
-			Then, go to <emphasis role="bold">Window-&gt;Open Perspective-&gt;Other...-&gt;Scheduler</emphasis>
-			(it could be already opened as it is the default perspective).
+		  To start the ProActive Scheduler Client, run the executable named <emphasis>Scheduler</emphasis> (Unix) 
+		  or <emphasis>Scheduler.exe</emphasis> (Windows).
 		</para>
 		<para>
-			Once started, the first screen displayed is the following one:
-			<figure xml:id="Scheduler_Welcome_screen"><info><title>Scheduler welcome screen</title></info>
+			Once started, the main window of the client should look like this:
+			<figure xml:id="Scheduler_Welcome_screen"><info><title>Default Scheduler perspective</title></info>
 				<mediaobject>
 					<imageobject>
 						<imagedata scalefit="1" width="220%" contentdepth="220%" fileref="images/png/plugin/Screen1.png" format="PNG"/>
@@ -82,7 +47,8 @@
 			to <xref linkend="scheduler_installation"/>.
 		</para>
 		<para>
-			To connect to an existing Scheduler, just right click on the empty area in the middle of the windows and click on
+			To connect to an existing Scheduler, bring up the connection dialog by clicking the first icon in the toolbar, or its
+			menu entry in the 'Scheduler' menu. Note that the Scheduler Connection dialog should be showed automatically when starting the application.
 			"Connect the ProActive Scheduler" in the context menu as shown below:
 			<figure xml:id="RC_screen"><info><title>Scheduler connection (1)</title></info>
 				<mediaobject>
@@ -108,11 +74,6 @@
 			Url is made of the protocol, the host name on which the Scheduler is started and the port on
 			which it is listening.
 			Then, enter your user/admin name and password.
-		</para>
-		<para>
-			<emphasis>Note</emphasis>: If you check "log as admin" and your login is an admin one,
-			you'll be able to do more actions than an "simple" user (see <xref linkend="Scheduler_composing_controlPanel_admin"/>).
-			Connection right is performed by Scheduler itself, you won't be able to connect as admin with a 'user' name.
 		</para>
 	</section>
 
@@ -146,7 +107,12 @@
 		<itemizedlist>
 			<listitem>
 				<para>
-					<emphasis role="bold">Jobs</emphasis> view - shows pending, running and finished jobs in the scheduler.
+					<emphasis role="bold">Jobs</emphasis> view - shows pending, running and finished jobs in the scheduler, and interact with them.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					<emphasis role="bold">Data Servers</emphasis> view - start, stop, add or remove Data Servers to use for submitted jobs.
 				</para>
 			</listitem>
 			<listitem>
@@ -162,7 +128,7 @@
 			</listitem>
 			<listitem>
 				<para>
-					<emphasis role="bold">Users</emphasis> view - displays information about connected user.
+					<emphasis role="bold">Logged Users</emphasis> view - displays information about all users connected to the Scheduler this client is connected to.
 				</para>
 			</listitem>
 			<listitem>
@@ -179,8 +145,8 @@
 			</listitem>
 			<listitem>
 				<para>
-					A <emphasis role="bold">Control panel</emphasis> is provided at the top right of the windows in order
-					to manage jobs and the Scheduler itself.
+					A <emphasis role="bold">Scheduler toolbar</emphasis> - perform tasks relative to the entire application, or the connected scheduler itself:
+					connection, job submission, scheduler administration, statistics and accounting.
 				</para>
 			</listitem>
 		</itemizedlist>
@@ -200,9 +166,6 @@
 				</mediaobject>
 			</figure>
 			<para>
-				The control panel (on upper right) is described in the <xref linkend="Scheduler_composing_controlPanel"/>
-			</para>
-			<para>
 				This view is composed of 3 panels that represent respectively pending, running and finished jobs. In each panel you
 				can watch many different information about jobs, like their states, names, IDs, progress...
 				It is also possible to switch between vertical panel presentation and horizontal panel presentation as it will be described later.
@@ -210,13 +173,112 @@
 			<para>
 				In each panel, the list of jobs can be ordered by column.
 			</para>
-			<note><para>
-			 You can connect the same existing Scheduler with
-				more than one interface on more than one host if you want to monitor it from different hosts.</para>
-			</note>
-
+			<para>
+			  The contextual menu of the view, available when right-clicking on a selected task, enables the following actions:
+			</para>
+			<itemizedlist>
+			  <listitem><para>
+				  <emphasis>Pause/Resume a Job</emphasis> - use this button to
+				  pause a pending or running job, and to resume a paused job. Note that it is not possible to pause a running task.
+				  So once a job paused, each running task will be finished. If a task has to restart for any reasons,
+				  it will be paused instead of restarted.</para>
+			  </listitem>
+			  <listitem><para>
+				  <emphasis>Select Job priority</emphasis> - use this button to
+				  change the priority of your job. Allowed priorities for a user are:</para>
+				<itemizedlist>
+				  <listitem><para>
+					  Normal</para>
+				  </listitem>
+				  <listitem><para>
+					  Low</para>
+				  </listitem>
+				  <listitem><para>
+					  Lowest</para>
+				  </listitem>
+				</itemizedlist>
+			  </listitem>
+			  <listitem><para>
+				  <emphasis>View selected job output</emphasis> - use this button to
+				  view the selected job output. Job output is in fact the output that comes from the different
+				  tasks from both standard output and standard error stream.</para>
+			  </listitem>
+			  <listitem><para>
+				  <emphasis>Kill the selected job</emphasis> - use this button to
+				  kill a job. The job will be terminated immediately, removed from the queue where it was, and its
+				  results will be lost.</para>
+			  </listitem>
+			</itemizedlist>
 		</section>
 
+		<section xml:id="Scheduler_dataservers"><info><title>Data Servers view</title></info>
+		  <para>
+			The Data Server view enables users to start new instances of PADataServer that can mount local filesystems
+			as a DataSpaces object usable among all computation nodes.
+		  </para>
+		  <para>
+			Multiple servers can be defined, and not all servers must be running at the same time: they can be started or
+			stopped at will. When exiting the client and restarting it, all defined servers will be saved and automatically added
+			in a stopped state.
+		  </para>
+		  <para>
+			To create a new Server, use the contextual menu (right-click) or the view's iconbar:
+		  </para>
+		  <figure xml:id="ds1"><info><title>Default Data Server view</title></info>
+			<mediaobject>
+			  <imageobject>
+				<imagedata width="70%" fileref="images/png/plugin/ds1.png" format="PNG"/>
+			  </imageobject>
+			</mediaobject>
+		  </figure>
+
+		  <para>
+			Creation of a server requires the following information:
+			<itemizedlist>
+			  <listitem><para>
+				  Root directory: the directory on the local filesystem to use as the server root
+			  </para></listitem>
+			  <listitem><para>
+				  Name: an unique identifier for the server to start
+			  </para></listitem>
+			  <listitem><para>
+				  Rebind: if a server with the same name was already started outside the Scheduler Client,
+				  creation of the server will fail. Using the rebind option, the client will reclaim this already created
+				  server.
+			  </para></listitem>
+			  <listitem><para>
+				  Start server: either add the server in stopped or started mode.
+			  </para></listitem>
+			</itemizedlist>
+		  </para>
+
+		  <figure xml:id="ds3"><info><title>Create a new Server</title></info>
+			<mediaobject>
+			  <imageobject>
+				<imagedata width="100%" fileref="images/png/plugin/ds3.png" format="PNG"/>
+			  </imageobject>
+			</mediaobject>
+		  </figure>
+
+		  <para>
+			Once a server has been added to the list, users can interact with it using the contextual menu
+			by right-clicking on the requested server. The server can be started or stopped depending its state,
+			or even removed definitely from the list.
+		  </para>
+
+		  <para>
+			After you servers have been added and started, they can be used when submitting new jobs. See <xref linkend="submit_edit"/>.
+		  </para>
+
+		  <figure xml:id="ds2"><info><title>Interaction with the defined servers</title></info>
+			<mediaobject>
+			  <imageobject>
+				<imagedata width="70%" fileref="images/png/plugin/ds2.png" format="PNG"/>
+			  </imageobject>
+			</mediaobject>
+		  </figure>
+
+		</section>
 		<section xml:id="Scheduler_composing_console"><info><title>Console view</title></info>
 			<figure xml:id="consoleView"><info><title>Console view</title></info>
 				<mediaobject>
@@ -368,67 +430,31 @@
 			<section xml:id="Scheduler_composing_controlPanel_user"><info><title>User controls</title></info>
 				<itemizedlist>
 					<listitem><para>
-						<emphasis>[1] Connect/Disconnect the Scheduler</emphasis> - use this button to
+						<emphasis>(1)(2) Connect/Disconnect the Scheduler</emphasis> - use this button to
 						display the "Connect to scheduler" dialog in order to establish a connection to a remote ProActive Scheduler.
 						Once connected this button disconnects the user from the current connected Scheduler.</para>
 					</listitem>
 					<listitem><para>
-						<emphasis>[2] Switch between vertical and horizontal jobs view</emphasis> - use this button to
-						switch between the view that displays the three list of jobs vertically and the one that
-						displays them horizontally. Horizontal view can be used to see more informations about the listed jobs but
-						less jobs can be seen.</para>
-					</listitem>
-					<listitem><para>
-						<emphasis>[3] Enlarge the job queue of your choice</emphasis> - use this button to
-						enlarge the queue (pending/running/finished) of your choice. This will display the selected view in
-						the whole space.</para>
-					</listitem>
-					<listitem><para>
-						<emphasis>[4] Submit a Job from an XML file</emphasis> - use this button to
-						submit a new job to the Scheduler. This action will request you for an XML job descriptor.
+					 	<emphasis>(3) Submit a Job from an XML file</emphasis> - use this button to
+						submit a new job to the Scheduler. This action will prompt a file chooser dialog so that you can select one or several XML job descriptors.
 						If you don't know how to create such a descriptor, please refer to <xref linkend="Create_job_xml"/>.</para>
 					</listitem>
 					<listitem><para>
-						<emphasis>[5] Submit a file containing native commands</emphasis> - use this button to submit a job defined in flat file.
+						<emphasis>(4) Submit a Job from an XML file, edit variables definition</emphasis> - This button has the same effect as the previous one,
+						with the difference that after an XML job descriptor is selected for submission, a new dialog appears to edit the definitions of the job's
+						variables. See <xref linkend="submit_edit"/>.</para>
+					</listitem>
+					<listitem><para>
+						<emphasis>(5) Submit a file containing native commands</emphasis> - use this button to submit a job defined in flat file.
 						If you don't know how to create such a job descriptor, please refer to <xref linkend="flat_file_job"/>.
 						This button opens a wizard for submitting this kind of job (see section  <xref linkend="flat_file_wizard"/>).</para>
 					</listitem>
-					</itemizedlist>
-					<para>
-						For the next actions, note that you can also interact with the jobs that <emphasis>you</emphasis> have submitted (that you own).
-						To use these actions, just select a job and click on the desired button. Multiple selection is allowed.
-					</para>
-					<itemizedlist>
 					<listitem><para>
-						<emphasis>[6] Pause/Resume a Job</emphasis> - use this button to
-						pause a pending or running job, and to resume a paused job. Note that it is not possible to pause a running task.
-						So once a job paused, each running task will be finished. If a task has to restart for any reasons,
-						it will be paused instead of restarted.</para>
+						<emphasis>(13) </emphasis>Runtime monitoring - Show detailed monitoring information about the scheduler activity:
+					  pending, running, finished jobs, users.</para>
 					</listitem>
 					<listitem><para>
-						<emphasis>[7] Select Job priority</emphasis> - use this button to
-						change the priority of your job. Allowed priorities for a user are:</para>
-						<itemizedlist>
-							<listitem><para>
-								Normal</para>
-							</listitem>
-							<listitem><para>
-								Low</para>
-							</listitem>
-							<listitem><para>
-								Lowest</para>
-							</listitem>
-						</itemizedlist>
-					</listitem>
-					<listitem><para>
-						<emphasis>[8] View selected job output</emphasis> - use this button to
-						view the selected job output. Job output is in fact the output that comes from the different
-						tasks from both standard output and standard error stream.</para>
-					</listitem>
-					<listitem><para>
-						<emphasis>[9] Kill the selected job</emphasis> - use this button to
-						kill a job. The job will be terminated immediately, removed from the queue where it was, and its
-						results will be lost.</para>
+						<emphasis>(14) </emphasis>My Account - Show information about the user account currently logged to the scheduler.</para>
 					</listitem>
 				</itemizedlist>
 				<para>
@@ -444,50 +470,73 @@
 				</para>
 				<itemizedlist>
 					<listitem><para>
-						<emphasis>[6] Select Job priority</emphasis> - use this button to
-						change the priority of a job. Allowed priorities for an Administrator are the same
-						as the user plus the following one:</para>
-						<itemizedlist>
-							<listitem><para>
-								Idle: Priority lower than the 3 User priorities.</para>
-							</listitem>
-							<listitem><para>
-								High: Priority higher than the 3 User priorities.</para>
-							</listitem>
-							<listitem><para>
-								Highest: Highest priority that can be affected.</para>
-							</listitem>
-						</itemizedlist>
-					</listitem>
-					<listitem><para>
-						<emphasis>[A] Stop the Scheduler</emphasis> - This action places the Scheduler in a mode
+						<emphasis>(6) Stop the Scheduler</emphasis> - This action places the Scheduler in a mode
 						where no job can be submitted anymore until a restart.
 						Nevertheless, all running tasks will be terminated.</para>
 					</listitem>
 					<listitem><para>
-						<emphasis>[B] Freeze the Scheduler</emphasis> - The behavior is the same as those of the stop
+						<emphasis>(7) Freeze the Scheduler</emphasis> - The behavior is the same as those of the stop
 						button except that job can still be submitted.</para>
 					</listitem>
 					<listitem><para>
-						<emphasis>[C] Pause the Scheduler</emphasis> - This action put the Scheduler in a Pause status.
+						<emphasis>(9) Pause the Scheduler</emphasis> - This action put the Scheduler in a Pause status.
 						Job can be submitted again but no job will go to the running queue. Every running job will terminate.</para>
 					</listitem>
 					<listitem><para>
-						<emphasis>[D] Resume the Scheduler</emphasis> - Put the Scheduler to the normal scheduling mode, that is, to the Started mode.
+						<emphasis>(10) Resume the Scheduler</emphasis> - Put the Scheduler to the normal scheduling mode, that is, to the Started mode.
 						This action can be performed when the scheduler is Frozen or Paused.</para>
 					</listitem>
 					<listitem><para>
-						<emphasis>[E] Shutdown the Scheduler</emphasis> - Put the Scheduler in its shutdown sequence.
+						<emphasis>(11) Shutdown the Scheduler</emphasis> - Put the Scheduler in its shutdown sequence.
 						Submitting job is no longer available. It will wait for every pending and running job to be terminated.
 						Once done, the Scheduler will shutdown and disconnect.</para>
 					</listitem>
 					<listitem><para>
-						<emphasis>[F] Kill the Scheduler</emphasis> - Force the Scheduler to terminate immediately.
+						<emphasis>(12) Kill the Scheduler</emphasis> - Force the Scheduler to terminate immediately.
 						This action kills every task and job, get the resources back to the Resource Manager and kill the Scheduler.</para>
 					</listitem>
 				</itemizedlist>
 			</section>
 		</section>
+
+		<section xml:id="submit_edit"><info><title>Submit XML Job and edit variables</title></info>
+		  <para>
+			In addition to the regular submission button, a second job submission method allows users
+			to edit the variable definitions of an XML job descriptor, prior to submission.
+		  </para>
+		  <figure xml:id="submit_edit_pic2"><info><title>Submit a Job and edit variables</title></info>
+			<mediaobject>
+			  <imageobject>
+				<imagedata width="100%" fileref="images/png/plugin/submit_edit2.png" format="PNG"/>
+			  </imageobject>
+			</mediaobject>
+		  </figure>
+		  <para>
+			For each submitted job, all the variables defined in the <emphasis><![CDATA[<variables>]]></emphasis>
+			tag can be edited. This enables users to submit jobs with different runtime parameters for everything
+			that can be expressed in the descriptor with variables.
+		  </para>
+		  <para>
+			For each variable found in the descriptor, the dialog suggests the following values in a Combo list:
+			<itemizedlist>
+			  <listitem><para>
+				  The default value read in the descriptor
+			  </para></listitem>
+			  <listitem><para>
+				  The URL of each running Data Server defined in the Data Servers view. This allows specifying custom
+				  InputSpace or OutputSpace for the job, using the ones created in the client.
+			  </para></listitem>
+			</itemizedlist>
+		  </para>
+		  <figure xml:id="submit_edit_pic"><info><title>Variables edition</title></info>
+			<mediaobject>
+			  <imageobject>
+				<imagedata width="100%" fileref="images/png/plugin/submit_edit.png" format="PNG"/>
+			  </imageobject>
+			</mediaobject>
+		  </figure>
+		</section>
+
 		<section xml:id="flat_file_wizard"><info><title>Command file job submission</title></info>
 			<para>Once you have defined a file containing the path to native commands to submit (see <xref linkend="flat_file_job"/>), this wizard allows you to submit it.
 			Main page provides you with a way to specify additional parameters for your job:
@@ -544,6 +593,62 @@
 			Click on Finish to launch submission. Native commands are scheduled in parallel.
 			If there are enough free resources (nodes) for every command, all commands will be launched simultaneously.
 			</para>
+		</section>
+
+		<section xml:id="remote_conn"><info><title>Remote Connection</title></info>
+		  <para>
+			Sometimes, users want to provide visual feedback of the result of a task.
+			It can then be necessary to connect on a remote host to observe specific data,
+			or launch a specific application.
+		  </para>
+		  <para>
+			One specific scenario can be that a VNC server is started, and graphical clients
+			should be able to connect once the task that creates the data to observe is terminated.
+		  </para>
+		  <para>
+			To achieve this, the <emphasis>task</emphasis> has to print in its standard output the following string:
+			<code>'PA_REMOTE_CONNECTION;10005;vnc;localhost:5901'</code>. All but the fields separated by semicolons,
+			except the first, must be adapted:
+			<itemizedlist>
+			  <listitem><para>
+				  <emphasis>PA_REMOTE_CONNECTION</emphasis> : this is a mandatory constant to identify the String
+			  </para></listitem>
+			  <listitem><para>
+				  <emphasis>10005</emphasis> : this is the Task ID. It will allow the graphical client to bind this specific string to a task when reading the job output.
+			  </para></listitem>
+			  <listitem><para>
+				  <emphasis>vnc</emphasis> : this is a generic application type that will be used by the graphical client to associate a specific application on the local machine.
+			  </para></listitem>
+			  <listitem><para>
+				  <emphasis>localhost:5901</emphasis> : the URL that will be contacted.
+			  </para></listitem>
+			</itemizedlist>
+		  </para>
+
+		  <para>
+			On the client side, users need to define which application will be associated depending the type read.
+			This can be controlled by adding entries in the Window -> Preferences -> Remote Connection dialog.
+			<figure xml:id="conn_pic_1"><info><title>Application association preferences</title></info>
+			  <mediaobject>
+				<imageobject>
+				  <imagedata width="100%" fileref="images/png/plugin/remote2.png" format="PNG"/>
+				</imageobject>
+			  </mediaobject>
+			</figure>
+		  </para>
+
+		  <para>
+			Then, when the appropriate task terminates, simply select it in the Task View and
+			click 'Remote Connection' in the context menu or icon bar. If the identification String
+			was read and correctly formed, the remote connection application will be started.
+			<figure xml:id="conn_pic_2"><info><title>Application association preferences</title></info>
+			  <mediaobject>
+				<imageobject>
+				  <imagedata width="100%" fileref="images/png/plugin/remote1.png" format="PNG"/>
+				</imageobject>
+			  </mediaobject>
+			</figure>
+		  </para>
 		</section>
 	</section>
 </chapter>
