@@ -118,10 +118,10 @@
     </void> 
     <void property="rgb"> 
      <void index="0"> 
-      <int>128</int> 
+      <int>36</int> 
      </void> 
      <void index="1"> 
-      <int>255</int> 
+      <int>193</int> 
      </void> 
      <void index="2"> 
       <int>255</int> 

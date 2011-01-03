@@ -108,13 +108,13 @@
     </void> 
     <void property="rgb"> 
      <void index="0"> 
-      <int>201</int> 
+      <int>252</int> 
      </void> 
      <void index="1"> 
-      <int>156</int> 
+      <int>175</int> 
      </void> 
      <void index="2"> 
-      <int>1</int> 
+      <int>62</int> 
      </void> 
     </void> 
    </object> 
