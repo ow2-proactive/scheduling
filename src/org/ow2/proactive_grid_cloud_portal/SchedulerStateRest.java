@@ -5,27 +5,27 @@
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2010 INRIA/University of 
- * 				Nice-Sophia Antipolis/ActiveEon
+ * Copyright (C) 1997-2011 INRIA/University of
+ *                 Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
  * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
+ * modify it under the terms of the GNU Affero General Public License
  * as published by the Free Software Foundation; version 3 of
  * the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
+ * Affero General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
+ * You should have received a copy of the GNU Affero General Public License
  * along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
- * If needed, contact us to obtain a release under GPL Version 2 
- * or a different license than the GPL.
+ * If needed, contact us to obtain a release under GPL Version 2 or 3
+ * or a different license than the AGPL.
  *
  *  Initial developer(s):               The ActiveEon Team
  *                        http://www.activeeon.com/
@@ -126,7 +126,7 @@ public class SchedulerStateRest {
     String sessionId) throws NotConnectedException, PermissionException {
         Scheduler s = null;
 
-        s = checkAccess(sessionId);
+        s = checkAccess(sessionId,"/scheduler/jobs");
 
         List<JobState> jobs = new ArrayList<JobState>();
         SchedulerState state = SchedulerStateCaching.getLocalState();
@@ -160,7 +160,7 @@ public class SchedulerStateRest {
     @Produces( { "application/json", "application/xml" })
     public List<UserJobInfo> jobsinfo(@HeaderParam("sessionid")
     String sessionId) throws PermissionException, NotConnectedException {
-        Scheduler s = checkAccess(sessionId);
+        Scheduler s = checkAccess(sessionId,"/scheduler/jobsinfo");
         List<JobState> jobs = new ArrayList<JobState>();
         SchedulerState state = SchedulerStateCaching.getLocalState();
 //        s.getState();
@@ -186,7 +186,7 @@ public class SchedulerStateRest {
     @Produces( { "application/json", "application/xml" })
     public SchedulerState schedulerState(@HeaderParam("sessionid")
     String sessionId) throws PermissionException, NotConnectedException {
-        Scheduler s = checkAccess(sessionId);
+        Scheduler s = checkAccess(sessionId,"/scheduler/state");
 //        return PAFuture.getFutureValue(s.getState());
         return SchedulerStateCaching.getLocalState();
     }
@@ -201,7 +201,7 @@ public class SchedulerStateRest {
     @Produces( { "application/json", "application/xml" })
     public long schedulerStateRevision(@HeaderParam("sessionid")
     String sessionId) throws PermissionException, NotConnectedException {
-        Scheduler s = checkAccess(sessionId);
+        Scheduler s = checkAccess(sessionId,"/scheduler/revision");
         return SchedulerStateCaching.getSchedulerRevision();
     }
     
@@ -216,7 +216,7 @@ public class SchedulerStateRest {
     @Produces( { "application/json", "application/xml" })
     public SchedulerState getSchedulerStateMyJobsOnly(@HeaderParam("sessionid")
     String sessionId) throws PermissionException, NotConnectedException {
-        Scheduler s = checkAccess(sessionId);
+        Scheduler s = checkAccess(sessionId,"/scheduler/myjobsonly");
         return PAFuture.getFutureValue(s.getState(true));
     }
 
@@ -232,7 +232,7 @@ public class SchedulerStateRest {
     public JobState listJobs(@HeaderParam("sessionid")
     String sessionId, @PathParam("jobid")
     String jobId) throws NotConnectedException, UnknownJobException, PermissionException {
-        Scheduler s = checkAccess(sessionId);
+        Scheduler s = checkAccess(sessionId,"/scheduler/jobs"+jobId);
 
         JobState js;
         js = s.getJobState(jobId);
@@ -591,7 +591,7 @@ public class SchedulerStateRest {
      * such mapping exists.
      * @throws NotConnectedException 
      */
-    public Scheduler checkAccess(String sessionId) throws NotConnectedException {
+    public Scheduler checkAccess(String sessionId, String path) throws NotConnectedException {
         Scheduler s = SchedulerSessionMapper.getInstance().getSessionsMap().get(sessionId);
         if (s == null) {
             logger.trace("not found a scheduler frontend for sessionId " + sessionId);
@@ -599,6 +599,10 @@ public class SchedulerStateRest {
         }
         logger.trace("found a scheduler frontend for sessionId " + sessionId);
         return s;
+    }
+    
+    private Scheduler checkAccess(String sessionId) throws NotConnectedException {
+        return checkAccess(sessionId,"");
     }
 
     //    /**
