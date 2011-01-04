@@ -391,11 +391,15 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             Request request = service.blockingRemoveOldest(aliveEventFrequency);
             if (request != null) {
                 try {
-                    caller = checkMethodCallPermission(request.getMethodName(), request.getSourceBodyID());
-                    service.serve(request);
-                } catch (SecurityException ex) {
-                    logger.warn("Cannot serve request: " + request, ex);
-                    service.serve(new ThrowExceptionRequest(request, ex));
+                    try {
+                        caller = checkMethodCallPermission(request.getMethodName(), request.getSourceBodyID());
+                        service.serve(request);
+                    } catch (SecurityException ex) {
+                        logger.warn("Cannot serve request: " + request, ex);
+                        service.serve(new ThrowExceptionRequest(request, ex));
+                    }
+                } catch (Throwable e) {
+                    logger.error("Cannot serve request: " + request, e);
                 }
             }
 
