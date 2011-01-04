@@ -169,5 +169,7 @@
 	<classpathentry kind="lib" path="lib/ProActive/virtualization-hyperv-wmi.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/wbem.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/wiseman-tools.jar"/>
+	<classpathentry kind="lib" path="lib/matsci/javasci.jar"/>
+	<classpathentry kind="lib" path="lib/matsci/ptolemy.jar"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>
