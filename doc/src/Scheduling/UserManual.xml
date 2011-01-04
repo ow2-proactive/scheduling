@@ -2181,6 +2181,12 @@ public Serializable execute(TaskResult... results) throws Throwable {
                         The host with selected nodes will be reserved for the user.
                     </para>
                     <programlisting language="xml"><textobject><textdata fileref="automatic_snippets/java_task_multinodes_she.snip" /></textobject></programlisting>
+                    <para>
+                        For this task the scheduler will try to find a host with 4 nodes. If there is
+                        no such a host another one will be used with a bigger capacity (if exists). In this case
+                        extra nodes on this host will be also occupied by the task but will not be
+                        used for the execution.
+                    </para>
                 </listitem>
                 <listitem>
                     <para>
@@ -2188,6 +2194,13 @@ public Serializable execute(TaskResult... results) throws Throwable {
                         Hosts with selected nodes will be reserved for the user.
                     </para>
                     <programlisting language="xml"><textobject><textdata fileref="automatic_snippets/java_task_multinodes_mhe.snip" /></textobject></programlisting>
+                    <para>
+                        For this task the scheduler will try to find 4 nodes on a set of hosts. If there is
+                        no such a set which gives you exactly 4 nodes another
+                        one will be used with a bigger capacity (if exists). In this case
+                        extra nodes on this host will be also occupied by the task but will not be
+                        used for the execution.
+                    </para>
                 </listitem>
                 <listitem>
                     <para>
@@ -2195,6 +2208,12 @@ public Serializable execute(TaskResult... results) throws Throwable {
                         All hosts with selected nodes will be reserved for the user.
                     </para>
                     <programlisting language="xml"><textobject><textdata fileref="automatic_snippets/java_task_multinodes_dhe.snip" /></textobject></programlisting>
+                    <para>
+                        For this task the scheduler will try to find 4 hosts with one node on each.
+                        If number of "single node" hosts are not enough hosts with bigger capacity
+                        will be selected. In this case extra nodes on this host will be also occupied
+                        by the task but will not be used for the execution.
+                    </para>
                 </listitem>
             </itemizedlist>
             <warning>

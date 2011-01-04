@@ -165,7 +165,7 @@
 	        </para>
 	        <para>
 					 By specifying this descriptor in <emphasis>ResourceManager.getAtMostNodes</emphasis> user may get
-					 more nodes than it asked when host capacity exceeds the requested number of nodes.
+					 more nodes than he asked when host capacity exceeds the requested number of nodes.
 					 For instance if a user requests 1 node but there is only a free host with 5 nodes on it,
 					 all these 5 nodes will be provided to the user. To be more presize in the target node set
 					 1 node will be presented in the main list and 4 nodes in the extra list (see <emphasis>NodeSet.getExtraNodes()</emphasis>).
@@ -199,10 +199,10 @@
 	           </para>
                 <para>
 					 By specifying this descriptor in <emphasis>ResourceManager.getAtMostNodes</emphasis> user may get
-					 more nodes than it asked if the total capacity of found hosts exceeds the requested number of nodes.
+					 more nodes than he asked if the total capacity of found hosts exceeds the requested number of nodes.
 
 					 For example a user requests 6 nodes from the RM that handles 3 hosts with 5 nodes on each he gets
-					 the reference to 6 nodes in the node set plus 4 extra nodes in the node set extra list.
+					 the reference to 6 nodes in the node set plus 4 extra nodes (see <emphasis>NodeSet.getExtraNodes()</emphasis>).
 
 					 The resource manager tries to find the optimal host set
 					 minimizing the waist of resources, namely if user requested k nodes
@@ -214,8 +214,8 @@
 			            </listitem>
 			            <listitem>
 			                <para>
-							   If several machines give exact number of nodes they will be selected
-							    (in case of several possibilities number of machines will be minimized).
+							   If not the resource manager finds the machine with closest capasity to k and
+							   repeats the procedure for (k - "found host capacicy") nodes number.
 			                </para>
 			            </listitem>
 			            <listitem>
