@@ -173,19 +173,26 @@ public class ServersView extends ViewPart {
             if (index == 0) {
                 return s.getRootDir();
             }
-            // column 2 : name
+            // column 2 : protocol
             else if (index == 1) {
+                String proto = "default";
+                if (s.getProtocol() != null)
+                    proto = s.getProtocol().toUpperCase();
+                return proto;
+            }
+            // column 3 : name
+            else if (index == 2) {
                 return s.getName();
             }
-            // column 3 : status
-            else if (index == 2) {
+            // column 4 : status
+            else if (index == 3) {
                 if (s.isStarted())
                     return "Running";
                 else
                     return "Stopped";
             }
-            // column 4 : url
-            else if (index == 3) {
+            // column 5 : url
+            else if (index == 4) {
                 return s.getUrl();
             }
             return "?";
@@ -195,7 +202,7 @@ public class ServersView extends ViewPart {
             if (index == 0) {
                 // put an image in the first column only 
                 return getImage(obj);
-            } else if (index == 2) {
+            } else if (index == 3) {
                 Server s = (Server) obj;
                 if (s.isStarted())
                     return this.up;
@@ -227,6 +234,10 @@ public class ServersView extends ViewPart {
         TableColumn column1 = new TableColumn(table, SWT.LEFT);
         column1.setText("Path");
         column1.setWidth(200);
+
+        TableColumn column11 = new TableColumn(table, SWT.LEFT);
+        column11.setText("Protocol");
+        column11.setWidth(70);
 
         TableColumn column2 = new TableColumn(table, SWT.LEFT);
         column2.setText("Name");
@@ -339,7 +350,7 @@ public class ServersView extends ViewPart {
              * Pops up a new 'Add a Data Server dialog'
              */
             public void run() {
-                final Shell dialog = new Shell(parent.getDisplay(), SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
+                final Shell dialog = new Shell(parent.getDisplay(), SWT.RESIZE | SWT.APPLICATION_MODAL);
                 dialog.setText("New Data Server");
 
                 GridLayout l = new GridLayout(1, false);
@@ -405,11 +416,40 @@ public class ServersView extends ViewPart {
                 r2.setSelection(true);
                 r2.setToolTipText("If a server with the same Name is currently bound, reuse it");
 
-                // fifth line : fork 
+                // fifth line : autostart 
                 final Button r3 = new Button(content, SWT.CHECK);
                 r3.setText("Start server");
                 r3.setSelection(true);
                 r3.setToolTipText("Start the Server immediately, or add it in a stopped state");
+
+                // sixth line : protocol
+                final Button r4 = new Button(content, SWT.CHECK);
+                r4.setText("Use default protocol (recommanded)");
+                r4.setSelection(true);
+                r4.setToolTipText("Override protocol configuration. For experimented users only");
+
+                // seventh line : protocol selection
+                final Composite c4 = new Composite(content, 0);
+                GridLayout l4 = new GridLayout(2, false);
+                c4.setLayout(l4);
+                c4.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+                final Label l4a = new Label(c4, SWT.NULL);
+                l4a.setText("Protocol");
+                l4a.setEnabled(false);
+
+                final Combo c4b = new Combo(c4, SWT.DROP_DOWN);
+                c4b.setItems(new String[] { "rmi", "rmissh", "rmissl", "http", "pnp", "pnps", "pamr" });
+                GridData c4bg = new GridData(GridData.BEGINNING);
+                c4b.setLayoutData(c4bg);
+                c4b.setEnabled(false);
+
+                r4.addListener(SWT.Selection, new Listener() {
+                    public void handleEvent(Event event) {
+                        c4b.setEnabled(!r4.getSelection());
+                        l4a.setEnabled(!r4.getSelection());
+                    }
+                });
 
                 // hidden progress bar
                 final Composite progress = new Composite(dialog, 0);
@@ -514,6 +554,8 @@ public class ServersView extends ViewPart {
                         final String dsName = t1b.getText();
                         final boolean[] errorOccurred = { false };
                         final boolean startServer = r3.getSelection();
+                        final boolean hasProto = !r4.getSelection();
+                        final String proto = c4b.getText();
 
                         /*
                          * server creation needs to run in a worker thread
@@ -531,7 +573,12 @@ public class ServersView extends ViewPart {
                                             "Data Server root directory must be an existing directory");
                                     }
 
-                                    DataServers.getInstance().addServer(rootDir, dsName, rebind, startServer);
+                                    String pro = null;
+                                    if (hasProto && !proto.trim().equals(""))
+                                        pro = proto;
+
+                                    DataServers.getInstance().addServer(rootDir, dsName, rebind, startServer,
+                                            pro);
 
                                     addHistory(rootHistoryFile, rootDir, false);
                                     addHistory(nameHistoryFile, dsName, false);

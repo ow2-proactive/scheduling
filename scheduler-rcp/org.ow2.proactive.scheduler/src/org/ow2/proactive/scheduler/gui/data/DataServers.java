@@ -37,7 +37,6 @@
 package org.ow2.proactive.scheduler.gui.data;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -72,6 +71,7 @@ public class DataServers {
         private String url = null;
         private String rootDir = null;
         private String name = null;
+        private String proto = null;
         private boolean started = false;
 
         public FileSystemServerDeployer getDeployer() {
@@ -94,6 +94,10 @@ public class DataServers {
             return started;
         }
 
+        public String getProtocol() {
+            return this.proto;
+        }
+
         /**
          * Start this DataServer
          * 
@@ -105,9 +109,27 @@ public class DataServers {
                 throw new DataSpacesException("Server " + name + " is already running at " + url);
 
             try {
-                this.deployer = new FileSystemServerDeployer(this.name, this.rootDir, true, rebind);
-            } catch (IOException e) {
-                throw new DataSpacesException("Failed to deploy DataServer " + name + " at " + rootDir, e);
+                if (this.proto == null) {
+                    this.deployer = new FileSystemServerDeployer(this.name, this.rootDir, true, rebind);
+                } else {
+                    this.deployer = new FileSystemServerDeployer(this.name, this.rootDir, true, rebind,
+                        this.proto);
+                }
+            } catch (Throwable e) {
+                String msg = "";
+                if (e.getMessage() != null && !e.getMessage().trim().equals("")) {
+                    msg += ":\n" + e.getMessage();
+                } else {
+                    Throwable cause = e.getCause();
+                    while (cause != null) {
+                        if (cause.getMessage() != null) {
+                            msg += ":\n" + cause.getMessage();
+                            cause = cause.getCause();
+                        }
+                    }
+                }
+                throw new DataSpacesException("Failed to deploy DataServer " + name + " at " + rootDir + msg,
+                    e);
             }
 
             this.url = this.deployer.getVFSRootURL();
@@ -134,9 +156,14 @@ public class DataServers {
         }
 
         public Server(String rootDir, String name) {
+            this(rootDir, name, null);
+        }
+
+        public Server(String rootDir, String name, String protocol) {
             this.rootDir = rootDir;
             this.name = name;
             this.started = false;
+            this.proto = protocol;
         }
     }
 
@@ -151,19 +178,21 @@ public class DataServers {
      * @param name the name of the server represented by this deployer
      * @param rebind try to rebind an existing server
      * @param start if true, start the server, else add it in a stopped state
+     * @param protocol communication protocol
      * @throws DataSpacesException DS was added but could not be started
      */
-    public void addServer(String rootDir, String name, boolean rebind, boolean start)
+    public void addServer(String rootDir, String name, boolean rebind, boolean start, String protocol)
             throws DataSpacesException {
         if (this.servers.containsKey(name))
             throw new DataSpacesException("Name " + name + " is already used");
 
-        Server s = new Server(rootDir, name);
-        this.servers.put(name, s);
+        Server s = new Server(rootDir, name, protocol);
 
         if (start) {
             s.start(rebind);
         }
+
+        this.servers.put(name, s);
     }
 
     /**
@@ -204,15 +233,19 @@ public class DataServers {
 
             // recover history
             String[] lines = ServersView.getHistory(serversHistoryFile);
-            for (int i = 0; i < lines.length; i += 2) {
+            for (int i = 0; i < lines.length; i += 3) {
                 if (lines.length == i + 1)
                     break;
 
-                String root = lines[i];
-                String name = lines[i + 1];
+                String proto = lines[i];
+                String root = lines[i + 1];
+                String name = lines[i + 2];
+
+                if (proto.trim().equals(""))
+                    proto = null;
 
                 try {
-                    instance.addServer(root, name, false, false);
+                    instance.addServer(root, name, false, false, proto);
                 } catch (DataSpacesException e) {
                     Activator.log(IStatus.ERROR, "Failed to restore server from history: root=" + root +
                         " name" + name, e);
@@ -238,6 +271,10 @@ public class DataServers {
         for (Server srv : this.servers.values()) {
             ServersView.addHistory(serversHistoryFile, srv.getName(), true);
             ServersView.addHistory(serversHistoryFile, srv.getRootDir(), true);
+            String proto = srv.getProtocol();
+            if (proto == null || proto.trim().equals(""))
+                proto = "";
+            ServersView.addHistory(serversHistoryFile, proto, true);
 
             if (srv.isStarted()) {
                 try {
