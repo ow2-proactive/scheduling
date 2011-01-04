@@ -370,7 +370,7 @@
    <object idref="ChartType1"/> 
   </void> 
   <void property="name"> 
-   <string>Job Submitting Period</string> 
+   <string>Average Time between Job Submission</string> 
   </void> 
   <void property="runtimeNames"> 
    <array class="java.lang.String" length="1"> 
