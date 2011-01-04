@@ -114,8 +114,8 @@ public class SelectionTest extends FunctionalTest {
                             "", // ssh options
                             javaExec, // java executable path
                             rmHome, // rm distrib path
-                            "10000", // node lookup timeout
-                            "5", //attempts
+                            "30000", // node lookup timeout
+                            "2", //attempts
                             "Linux", // os
                             "", // java options
                             FileToBytesConverter.convertFileToByteArray(new File(rmCredPath)), // rm credential

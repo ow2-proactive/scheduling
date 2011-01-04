@@ -37,10 +37,14 @@
 package org.ow2.proactive.resourcemanager.selection.topology;
 
 import java.net.InetAddress;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.SortedSet;
+import java.util.TreeMap;
+import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
@@ -424,101 +428,119 @@ public class TopologyManager {
      *
      */
     private class MultipleHostsExclusiveHandler extends TopologyHandler {
+
+        private class Host implements Comparable<Host> {
+            private InetAddress address;
+            private int nodesNumber;
+
+            public Host(InetAddress address, int nodesNumber) {
+                this.address = address;
+                this.nodesNumber = nodesNumber;
+            }
+
+            public boolean equals(Object obj) {
+                if (obj instanceof Host) {
+                    Host host = (Host) obj;
+                    if (address == null && host.address == null) {
+                        return true;
+                    } else if (address != null && host.address != null) {
+                        return address.equals(host.address);
+                    }
+                }
+                return false;
+            }
+
+            public int compareTo(Host host) {
+                boolean equal = equals(host);
+                if (equal) {
+                    return 0;
+                } else {
+                    // must not return 0 in order to comply with equals()
+                    int nodesDiff = nodesNumber - host.nodesNumber;
+                    if (nodesDiff == 0) {
+                        // the same node number, use addresses to define what is bigger
+                        String thisAdd = address == null ? "" : address.toString();
+                        String hostAdd = host.address == null ? "" : host.address.toString();
+                        return thisAdd.compareTo(hostAdd);
+                    }
+                    return nodesDiff;
+                }
+            }
+        }
+
         @Override
         public NodeSet select(int number, List<Node> matchedNodes) {
             if (number == 0) {
                 return new NodeSet();
             }
 
-            // try to find the optimal set of hosts which give us the required set
-            //
-            // "optimal" means the minimization of hosts while the number of nodes has to
-            // be bigger but as close as possible to the requested one
-            //
-            // in order to do it forming the map
-            // [number -> [list_1 given this nodes number]...[list_k given this nodes number]]
-            HashMap<Integer, List<List<InetAddress>>> hostsMap = new HashMap<Integer, List<List<InetAddress>>>();
-            for (InetAddress host : nodesOnHost.keySet()) {
-                boolean busyNode = false;
-                for (Node nodeOnHost : nodesOnHost.get(host)) {
-                    if (!matchedNodes.contains(nodeOnHost)) {
-                        busyNode = true;
-                        break;
-                    }
-                }
-                if (!busyNode) {
-                    int nodesNumber = nodesOnHost.get(host).size();
-                    if (nodesNumber == number) {
-                        // found exactly required number of nodes on one host
-                        return new NodeSet(nodesOnHost.get(host));
-                    }
-
-                    for (Integer i : new LinkedList<Integer>(hostsMap.keySet())) {
-                        if (i > number) {
-                            // do not updates records above the "number"
-                            continue;
-                        }
-
-                        int n = i + nodesNumber;
-                        if (!hostsMap.containsKey(n)) {
-                            hostsMap.put(n, new LinkedList<List<InetAddress>>());
-                        }
-                        for (List<InetAddress> hosts : hostsMap.get(i)) {
-                            List<InetAddress> list = new LinkedList<InetAddress>(hosts);
-                            list.add(host);
-                            hostsMap.get(n).add(list);
-                        }
-
-                    }
-
-                    if (!hostsMap.containsKey(nodesNumber)) {
-                        hostsMap.put(nodesNumber, new LinkedList<List<InetAddress>>());
-                        hostsMap.get(nodesNumber).add(Collections.singletonList(host));
-                    }
+            // first we need to understand which hosts have busy nodes and filter them out
+            // building a map from matched nodes: host -> "number of matched nodes"
+            HashMap<InetAddress, Integer> matchedHosts = new HashMap<InetAddress, Integer>();
+            for (Node matchedNode : matchedNodes) {
+                InetAddress host = matchedNode.getVMInformation().getInetAddress();
+                if (matchedHosts.containsKey(host)) {
+                    matchedHosts.put(host, matchedHosts.get(host) + 1);
+                } else {
+                    matchedHosts.put(host, 1);
                 }
             }
 
-            if (hostsMap.size() == 0) {
+            // freeHosts contains hosts sorted by nodes number and allows
+            // to quickly find a host with given number of nodes (or closest if it is not in the tree)
+            TreeSet<Host> freeHosts = new TreeSet<Host>();
+            // if a host in matchedHosts map has the same number of nodes
+            // as in nodesOnHost map it means there no busy nodes on this host
+            for (InetAddress matchedHost : matchedHosts.keySet()) {
+                if (!nodesOnHost.containsKey(matchedHost)) {
+                    // should not be here
+                    throw new TopologyException("Inconsitent topology state");
+                }
+                if (nodesOnHost.get(matchedHost).size() == matchedHosts.get(matchedHost)) {
+                    // host has no busy nodes
+                    freeHosts.add(new Host(matchedHost, matchedHosts.get(matchedHost)));
+                }
+            }
+
+            // selecting nodes recursively taking on each step the host closest to the required node number
+            return selectRecursively(number, freeHosts);
+        }
+
+        private NodeSet selectRecursively(int number, TreeSet<Host> freeHosts) {
+            if (number <= 0 || freeHosts.size() == 0) {
                 return new NodeSet();
             }
 
-            // looking for the index we are going to use in the map
-            // it should be either the smallest index >= number or if there is no such index
-            // the closest bigger one
-            int index = -1;
-            for (Integer i : hostsMap.keySet()) {
-                if (i >= number) {
-                    if (index < number || i < index) {
-                        index = i;
-                    }
-                } else if (i < number) {
-                    if (i > index) {
-                        index = i;
-                    }
-                }
-            }
+            // freeHosts is sorted based on nodes number
+            // get the host with nodes number closest to the "number" (but smaller if possible)
+            // complexity is log(n)
+            InetAddress closestHost = removeClosest(number, freeHosts);
 
-            // selecting the list with the smallest size
-            List<InetAddress> minSizeList = null;
-            for (List<InetAddress> hosts : hostsMap.get(index)) {
-                if (minSizeList == null || minSizeList != null && minSizeList.size() > hosts.size()) {
-                    minSizeList = hosts;
-                }
-            }
-            NodeSet hostsNodes = new NodeSet();
-            for (InetAddress host : minSizeList) {
-                hostsNodes.addAll(nodesOnHost.get(host));
-            }
-
-            if (hostsNodes.size() <= number) {
-                // no extra nodes
-                return hostsNodes;
+            List<Node> nodes = nodesOnHost.get(closestHost);
+            if (nodes.size() > number) {
+                NodeSet result = new NodeSet(nodes.subList(0, number));
+                result.setExtraNodes(new LinkedList<Node>(nodes.subList(number, nodes.size())));
+                return result;
             } else {
-                // more nodes found than needed, put them into the extra nodes list
-                NodeSet result = new NodeSet(hostsNodes.subList(0, number));
-                result.setExtraNodes(new LinkedList<Node>(hostsNodes.subList(number, hostsNodes.size())));
+                NodeSet curNodes = new NodeSet(nodes);
+                NodeSet result = selectRecursively(number - nodes.size(), freeHosts);
+                result.addAll(curNodes);
                 return result;
             }
+        }
+
+        private InetAddress removeClosest(int target, TreeSet<Host> freeHosts) {
+            // search for element with target+1 nodes as the result is strictly less
+            SortedSet<Host> headSet = freeHosts.headSet(new Host(null, target + 1));
+            Host host = null;
+            if (headSet.size() == 0) {
+                // take the largest element from the tree
+                host = freeHosts.last();
+            } else {
+                host = headSet.last();
+            }
+            freeHosts.remove(host);
+            return host.address;
         }
     }
 
@@ -541,6 +563,7 @@ public class TopologyManager {
             for (InetAddress host : nodesOnHost.keySet()) {
                 boolean busyNode = false;
                 for (Node nodeOnHost : nodesOnHost.get(host)) {
+                    // TODO: this is n^2 complexity. Change it as in MultipleHostsExclusiveHandler
                     if (!matchedNodes.contains(nodeOnHost)) {
                         busyNode = true;
                         break;
