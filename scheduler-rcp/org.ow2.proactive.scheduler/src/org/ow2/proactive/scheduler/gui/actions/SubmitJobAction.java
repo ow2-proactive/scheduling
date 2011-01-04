@@ -115,7 +115,7 @@ public class SubmitJobAction extends SchedulerGUIAction {
     public SubmitJobAction(boolean editVariables) {
         this.editVariables = editVariables;
         if (editVariables) {
-            this.setText("Submit and &edit variables");
+            this.setText("Submit with &edition of variables");
             this.setToolTipText("Submit job from an XML file and edit the variables definitions");
         } else {
             this.setText("&Submit an XML job file");

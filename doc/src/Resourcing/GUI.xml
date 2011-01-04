@@ -207,7 +207,7 @@
 				</imageobject>
 				</mediaobject>
 				<para>
-					Node is <emphasis role="bold">to remove</emphasis>, it currently performs a task execution,
+					Node is <emphasis role="bold">to be removed</emphasis>, it currently performs a task execution,
 					and has to be removed at the end of this execution.
 					</para>
 				</listitem>
