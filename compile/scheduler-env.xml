@@ -42,6 +42,7 @@
 		<fileset dir="${lib.dir}">
 			<include name="ProActive/**/*.jar"/>
 			<include name="common/**/*.jar"/>
+			<include name="matsci/**/*.jar"/>
 			<!-- Hibernate libs -->
 			<include name="hibernate/**/*.jar"/>
 		</fileset>

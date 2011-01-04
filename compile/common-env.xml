@@ -83,6 +83,7 @@
         <include name="common/**/*.jar" />
         <include name="hibernate/**/*.jar" />
 	    <include name="ec2/**/*.jar" />
-	    <include name="winhpc/**/*.jar" />
+	    <include name="winhpc/**/*.jar"/>
+	<include name="matsci/**/*.jar"/>
     </fileset>
 </project>
