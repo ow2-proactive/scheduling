@@ -85,7 +85,7 @@ public class Cluster<Element> {
     }
 
     public String toString() {
-        return elements.toString();
+        return "Cluster \"" + id + "\"";
     }
 
     public boolean equals(Object obj) {

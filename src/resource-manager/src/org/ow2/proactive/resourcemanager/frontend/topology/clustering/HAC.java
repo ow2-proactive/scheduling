@@ -143,6 +143,7 @@ public class HAC {
         } else {
             logger.debug("Begin hierarchical agglomerative clustering");
             target = (Cluster<Node>) clusterDistances.keySet().iterator().next();
+            Cluster<Node> largest = target;
             // floating clustering
             while (clusterDistances.size() > 1) {
                 // finding two clusters to merge according
@@ -154,6 +155,9 @@ public class HAC {
                 }
                 // merging clusters and recalculating distances between others
                 target = recalculateDistances(clustersToMerge[0], clustersToMerge[1], clusterDistances);
+                if (target.size() >= largest.size()) {
+                    largest = target;
+                }
 
                 if (target.size() == number) {
                     // found all the nodes we need
@@ -161,6 +165,7 @@ public class HAC {
                 } else if (target.size() > number) {
                     // found more nodes that we need,
                     // target cluster contains all nodes from another cluster
+                    // largest is the target here
 
                     logger.debug("Number of node in the cluster exceeded required node number " +
                         target.size() + " vs " + number);
@@ -190,6 +195,7 @@ public class HAC {
                     break;
                 }
             }
+            target = largest;
         }
 
         if (logger.isDebugEnabled()) {
@@ -351,6 +357,9 @@ public class HAC {
         curDistances.remove(smallerCluster);
         curDistances.get(biggerCluster).remove(smallerCluster);
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(biggerCluster + " size = " + biggerCluster.size());
+        }
         return biggerCluster;
     }
 
