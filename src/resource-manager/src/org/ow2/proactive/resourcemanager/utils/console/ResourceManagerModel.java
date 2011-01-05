@@ -348,7 +348,7 @@ public class ResourceManagerModel extends ConsoleModel {
 
         for (int i = 0; i < COLUMN_NUMBERS; i++) {
             line.add("Host");
-            line.add("Distance (mrs)");
+            line.add("Distance (µs)");
             line.add("Host");
         }
 
