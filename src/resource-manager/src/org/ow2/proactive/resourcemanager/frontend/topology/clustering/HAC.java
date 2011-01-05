@@ -100,6 +100,13 @@ public class HAC {
      * @return list of nodes to be provided to the client
      */
     public List<Node> select(int number, List<Node> from) {
+
+        if (from.size() == 0) {
+            // no nodes after selection scripts execution
+            // return empty list
+            return new LinkedList<Node>();
+        }
+
         // initializing cluster distances map
         // cluster is a group of nodes, initially each cluster consist of one node
         logger.debug("Initializing clusters map");
