@@ -65,6 +65,8 @@ import org.hibernate.annotations.LazyCollectionOption;
 import org.hibernate.annotations.Proxy;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.db.types.BigString;
+import org.ow2.proactive.scheduler.common.exception.ExecutableCreationException;
+import org.ow2.proactive.scripting.InvalidScriptException;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.SimpleScript;
 
@@ -164,6 +166,42 @@ public class ForkEnvironment implements Serializable {
             this.jvmArguments = forkEnv.jvmArguments;
             this.additionalClasspath = forkEnv.additionalClasspath;
             this.script = forkEnv.script;
+        }
+    }
+    
+    /**
+     * Copy constructor
+     * 
+     * @param f the object to copy
+     * @throws ExecutableCreationException script copy failed
+     */
+    public ForkEnvironment(ForkEnvironment f) throws ExecutableCreationException {
+        if (f.javaHome != null)
+            this.javaHome = new String(f.javaHome);
+        if (f.workingDir != null)
+            this.workingDir = new String(f.workingDir);
+        if (f.systemEnvironment != null) {
+            for (PropertyModifier prop : f.systemEnvironment) {
+                this.addSystemEnvironmentVariable(new String(prop.getName()), new String(prop.getValue()),
+                        prop.getAppendChar());
+            }
+        }
+        if (f.jvmArguments != null) {
+            for (BigString bs : f.jvmArguments) {
+                this.addJVMArgument(new String(bs.getValue()));
+            }
+        }
+        if (f.additionalClasspath != null) {
+            for (BigString bs : f.additionalClasspath) {
+                this.addAdditionalClasspath(new String(bs.getValue()));
+            }
+        }
+        if (f.script != null) {
+            try {
+                this.script = new SimpleScript(f.script);
+            } catch (InvalidScriptException e) {
+                throw new ExecutableCreationException("Failed to copy ForkEnvironment Script", e);
+            }
         }
     }
 
