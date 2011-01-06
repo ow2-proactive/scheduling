@@ -184,13 +184,13 @@
     </void> 
     <void property="rgb"> 
      <void index="0"> 
-      <int>167</int> 
+      <int>36</int> 
      </void> 
      <void index="1"> 
-      <int>167</int> 
+      <int>193</int> 
      </void> 
      <void index="2"> 
-      <int>167</int> 
+      <int>255</int> 
      </void> 
     </void> 
    </object> 
@@ -233,7 +233,7 @@
  </array> 
  <object class="org.objectweb.proactive.ic2d.chartit.data.ChartModel"> 
   <void property="name"> 
-   <string>Load Average</string> 
+   <string>Load Average History</string> 
   </void> 
   <void property="runtimeNames"> 
    <array class="java.lang.String" length="2"> 
