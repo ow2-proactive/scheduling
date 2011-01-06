@@ -43,7 +43,6 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -239,8 +238,9 @@ public abstract class SelectionManager {
         }
 
         // creating script executors object to be run in dedicated thread pool
-        List<Callable<Node>> scriptExecutors = new LinkedList<Callable<Node>>();
+        List<ScriptExecutor> scriptExecutors = new LinkedList<ScriptExecutor>();
         synchronized (inProgress) {
+            logger.debug("Scripts are executing on " + inProgress.size() + " nodes");
             for (RMNode node : candidates) {
                 if (inProgress.contains(node.getNodeURL())) {
                     if (logger.isDebugEnabled())
@@ -279,6 +279,8 @@ public abstract class SelectionManager {
                 } else {
                     // no script result was obtained
                     logger.warn("Timeout on " + scriptExecutors.get(index));
+                    // in this case scriptExecutionFinished may not be called
+                    scriptExecutionFinished(scriptExecutors.get(index).getRMNode().getNodeURL());
                 }
                 index++;
             }

@@ -169,4 +169,11 @@ public class ScriptExecutor implements Callable<Node> {
             return "the node communication " + rmnode.getNodeURL();
         }
     }
+
+    /**
+     * Gets the RM node on which the script must be executed
+     */
+    public RMNode getRMNode() {
+        return rmnode;
+    }
 }
