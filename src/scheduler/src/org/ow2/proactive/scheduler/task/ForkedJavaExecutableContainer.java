@@ -103,7 +103,8 @@ public class ForkedJavaExecutableContainer extends JavaExecutableContainer {
      * @param original object to copy
      * @throws ExecutableCreationException forkenv script copy failed
      */
-    public ForkedJavaExecutableContainer(ForkedJavaExecutableContainer original) throws ExecutableCreationException {
+    public ForkedJavaExecutableContainer(ForkedJavaExecutableContainer original)
+            throws ExecutableCreationException {
         super(original);
         this.forkEnvironment = new ForkEnvironment(original.forkEnvironment);
     }

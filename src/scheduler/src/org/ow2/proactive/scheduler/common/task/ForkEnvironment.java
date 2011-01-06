@@ -168,7 +168,7 @@ public class ForkEnvironment implements Serializable {
             this.script = forkEnv.script;
         }
     }
-    
+
     /**
      * Copy constructor
      * 
