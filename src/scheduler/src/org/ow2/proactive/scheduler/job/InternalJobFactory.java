@@ -243,11 +243,6 @@ public class InternalJobFactory {
     }
 
     private static InternalTask createTask(Job userJob, Task task) throws JobCreationException {
-        //LINKED to SCHEDULING-988 : parallel task + runAsMe is forbidden from now on
-        if (task.isParallel() && task.isRunAsMe()) {
-            throw new JobCreationException(
-                "Using parallel task (multi-node) and runAsMe for the same task is not yet available.");
-        }
         //dispatch task creation
         if (task instanceof NativeTask) {
             return createTask(userJob, (NativeTask) task);

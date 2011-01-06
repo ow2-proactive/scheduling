@@ -96,8 +96,11 @@ public class NativeExecutable extends Executable {
      */
     private static String COOKIE_ENV = "PROACTIVE_COOKIE";
     /** Env var exported for the number and name of nodes */
-    private static String CORE_FILE_ENV = "PAS_NODEFILE";
-    private static String CORE_NB = "PAS_CORE_NB";
+    private static String CORE_FILE_ENV = "PAS_NODESFILE";
+    private static String CORE_NB = "PAS_NODESNUMBER";
+    // BACKWARD COMPATIBILITY
+    private static String LEGACY_CORE_FILE_ENV = "PAS_NODEFILE";
+    private static String LEGACY_CORE_NB = "PAS_CORE_NB";
 
     /** Process that start the native task */
     private transient Process process;
@@ -115,6 +118,9 @@ public class NativeExecutable extends Executable {
 
     /** Generated command */
     private String[] command;
+
+    // DO NOT RENAME nodesfiles and nodesNumber FIELDS
+    // see NativeTaskLauncher.replaceCommandNodesInfosTags()
 
     /** File used to store nodes URL */
     private File nodesFiles = null;
@@ -274,9 +280,12 @@ public class NativeExecutable extends Executable {
 
         //add core number and core file
         if (nodesFiles != null) {
-            envVarsTab.put(CORE_FILE_ENV, nodesFiles.getAbsolutePath());
+            final String nodesFilePath = nodesFiles.getAbsolutePath();
+            envVarsTab.put(CORE_FILE_ENV, nodesFilePath);
+            envVarsTab.put(LEGACY_CORE_FILE_ENV, nodesFilePath);
         }
         envVarsTab.put(CORE_NB, "" + this.nodesNumber);
+        envVarsTab.put(LEGACY_CORE_NB, "" + this.nodesNumber);
 
         //then the cookie used by ProcessTreeKiller
         envVarsTab.put(COOKIE_ENV, cookie_value);

@@ -825,12 +825,12 @@ task2.setGenerationScript(gscript);
 										<itemizedlist>
 											<listitem>
 												<para>
-													'PAS_CORE_NB' : contains the number of nodes available for the task.
+													'PAS_NODESNUMBER' : contains the number of nodes available for the task.
 												</para>
 											</listitem>
 											<listitem>
 												<para>
-													'PAS_NODEFILE' : is the path to a file that contains every available nodes URL (one URL by line)
+													'PAS_NODESFILE' : is the path to a file that contains every available nodes URL (one URL by line)
 												</para>
 											</listitem>
 										</itemizedlist>
@@ -874,9 +874,12 @@ task2.setGenerationScript(gscript);
 							For further information about this feature, please go to <xref linkend="starting_task_runasme"/>
 						</para>
 						<para>
-							<emphasis role="italic">Important Note :</emphasis> if runAsMe is set, the task cannot be multi-node.
-							(The number of nodes used by the task must be one). It is also not possible to propagate properties
-							using the helper class PropertyUtils as explained in the pre/post scripts.
+							<emphasis role="italic">Important Note :</emphasis> With a runAsMe task, it is not possible to propagate properties
+							using the helper class PropertyUtils as explained in the pre/post scripts. Moreover, the nodes file
+							(i.e. the temporary file that contains allocated resources) and the number of allocated nodes are not accessible
+							through <code>PAS_NODESFILE</code> and <code>PAS_NODESNUMBER</code> system environment variables ; those information have to
+							be explictely
+							passed as parameter in the command line respectively as <code>$NODESFILE</code> and <code>$NODESNUMBER</code>.
 						</para>
 					</listitem>
 					<listitem>

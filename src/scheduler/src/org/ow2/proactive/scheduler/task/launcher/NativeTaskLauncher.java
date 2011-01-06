@@ -38,6 +38,7 @@ package org.ow2.proactive.scheduler.task.launcher;
 
 import java.io.File;
 import java.io.Serializable;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 
@@ -66,6 +67,12 @@ public class NativeTaskLauncher extends TaskLauncher {
     public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.LAUNCHER);
 
     private static final String DATASPACE_TAG = "$LOCALSPACE";
+
+    // SCHEDULING-988 : only way to pass nodes to a runAsMe mutlinodes native task.
+    /** Tag for identifying in command line tmp file that contains allocated resource for a multi-node task */
+    private static final String NODESFILE_TAG = "$NODESFILE";
+    /** Tag for identifying in command line the number of resources allocated to a multi-node task */
+    private static final String NODESNUMBER_TAG = "$NODESNUMBER";
 
     /**
      * ProActive Empty Constructor
@@ -154,6 +161,8 @@ public class NativeTaskLauncher extends TaskLauncher {
             replaceIterationTags(execInit);
             //replace dataspace tags in command (if needed) by local scratch directory
             replaceCommandDSTags();
+            // pass the nodesfile as parameter if needed...
+            replaceCommandNodesInfosTags();
 
             sample = System.currentTimeMillis();
             try {
@@ -234,6 +243,38 @@ public class NativeTaskLauncher extends TaskLauncher {
             String fullScratchPath = new File(new URI(SCRATCH.getRealURI())).getAbsolutePath();
             for (int i = 0; i < args.length; i++) {
                 args[i] = args[i].replace(DATASPACE_TAG, fullScratchPath);
+            }
+        }
+    }
+
+    // SCHEDULING-988 : only way to pass nodes to a runAsMe mutlinodes native task.
+    private void replaceCommandNodesInfosTags() throws Exception {
+        NativeExecutable ne = ((NativeExecutable) currentExecutable);
+        String[] cmdElements = ne.getCommand();
+
+        // check if this replacement is actually needed
+        boolean needed = false;
+        for (int i = 0; i < cmdElements.length; i++) {
+            if (cmdElements[i].contains(NODESFILE_TAG) || cmdElements[i].contains(NODESNUMBER_TAG)) {
+                needed = true;
+                break;
+            }
+        }
+
+        if (needed) {
+            // Arrrgl... don't want to change APIs now, to late.
+            // to be implemented a little bit less ugly
+            Field nodesfileField = ne.getClass().getDeclaredField("nodesFiles");
+            Field nodesNumberField = ne.getClass().getDeclaredField("nodesNumber");
+            nodesfileField.setAccessible(true);
+            nodesNumberField.setAccessible(true);
+            File nodesFile = (File) (nodesfileField.get(ne));
+            int nodesNumber = nodesNumberField.getInt(ne);
+            String nodesFilePath = nodesFile != null ? nodesFile.getAbsolutePath() : "";
+            // no side effect hack : do the replacement even if no path is available
+            for (int i = 0; i < cmdElements.length; i++) {
+                cmdElements[i] = cmdElements[i].replace(NODESFILE_TAG, nodesFilePath);
+                cmdElements[i] = cmdElements[i].replace(NODESNUMBER_TAG, "" + nodesNumber);
             }
         }
     }
