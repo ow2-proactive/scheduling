@@ -106,7 +106,7 @@
 	</target>
 
 	<target name="deploy.scheduler.matsci" depends="-deployCopy, compile.scheduler, deploy.common.client" description="Creates scheduler matlab/scilab jar">
-		<jar destfile="${deploy.lib.dir}/${scheduler.matsci.jar}" manifest="${basedir}/scheduler-Manifest-base.mf">
+		<jar destfile="${deploy.lib.dir}/${scheduler.matsci.jar}" manifest="${basedir}/scheduler-Manifest-base.mf" index="true">
 			<fileset dir="${cl.scheduler.dir}" includes="org/ow2/proactive/scheduler/common/Main.class" />
 			<fileset dir="${cl.scheduler.dir}" includes="org/ow2/proactive/scheduler/ext/common/**" />
             <fileset dir="${cl.scheduler.dir}" includes="org/ow2/proactive/scheduler/ext/matsci/**" />

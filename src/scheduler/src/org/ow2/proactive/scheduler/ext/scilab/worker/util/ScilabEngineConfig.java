@@ -37,10 +37,10 @@
 package org.ow2.proactive.scheduler.ext.scilab.worker.util;
 
 import org.objectweb.proactive.utils.OperatingSystem;
-import org.ow2.proactive.scheduler.ext.matsci.worker.util.MatSciEngineConfig;
+import org.ow2.proactive.scheduler.ext.matsci.worker.util.MatSciEngineConfigBase;
 
 
-public class ScilabEngineConfig implements MatSciEngineConfig {
+public class ScilabEngineConfig extends MatSciEngineConfigBase {
 
     // the Home Dir of Scilab on this machine
     private String scilabHome = null;
@@ -67,7 +67,7 @@ public class ScilabEngineConfig implements MatSciEngineConfig {
     }
 
     public ScilabEngineConfig(String scilabHome, String version, String scilabLibDir, String scilabSciDir,
-            String thirdPartyDir, String scilabBinDir, String scilabCommandName) {
+            String thirdPartyDir, String scilabBinDir, String scilabCommandName, boolean hasManyConfigs) {
         this.scilabHome = scilabHome;
         this.scilabLibdir = scilabLibDir;
         this.scilabScidir = scilabSciDir;
@@ -76,14 +76,6 @@ public class ScilabEngineConfig implements MatSciEngineConfig {
         this.scilabBinDir = scilabBinDir;
         this.scilabCommandName = scilabCommandName;
 
-    }
-
-    public static void setCurrentConfiguration(ScilabEngineConfig conf) {
-        currentConf = conf;
-    }
-
-    public static ScilabEngineConfig getCurrentConfiguration() {
-        return currentConf;
     }
 
     /**

@@ -153,8 +153,8 @@ public class AOMatlabEnvironment extends AOMatSciEnvironment<Token, MatlabResult
         if (config.isDebug()) {
             System.out.println("[AOMatlabEnvironment] Submitting job of " + taskConfigs.length + " tasks...");
         }
-        Thread t = java.lang.Thread.currentThread();
-        t.setContextClassLoader(this.getClass().getClassLoader());
+        //Thread t = java.lang.Thread.currentThread();
+        //t.setContextClassLoader(this.getClass().getClassLoader());
         //System.out.println(this.getClass().getClassLoader());
 
         // Creating a task flow job
@@ -164,11 +164,11 @@ public class AOMatlabEnvironment extends AOMatSciEnvironment<Token, MatlabResult
         job.setCancelJobOnError(false);
         job.setDescription("Set of parallel matlab tasks");
 
-        if (config.isTransferSource() || config.isTransferEnv() || config.isTransferVariables()) {
-            job.setInputSpace(config.getInputSpaceURL());
+        //if (config.isTransferSource() || config.isTransferEnv() || config.isTransferVariables()) {
+        job.setInputSpace(config.getInputSpaceURL());
 
-            job.setOutputSpace(config.getOutputSpaceURL());
-        }
+        job.setOutputSpace(config.getOutputSpaceURL());
+        //}
         TreeSet<String> tnames = new TreeSet<String>(new TaskNameComparator());
         TreeSet<String> finaltnames = new TreeSet<String>(new TaskNameComparator());
         int nbResults = taskConfigs.length;
@@ -198,10 +198,17 @@ public class AOMatlabEnvironment extends AOMatSciEnvironment<Token, MatlabResult
                 oldTask = schedulerTask;
 
                 if (config.isTransferSource()) {
-                    if (taskConfigs[i][j].getSourceZipFileName() != null) {
+                    if (config.isZipSourceFiles() && taskConfigs[i][j].getSourceZipFileName() != null) {
                         schedulerTask.addInputFiles(config.getTempSubDirName() + "/" +
                             taskConfigs[i][j].getSourceZipFileName(), InputAccessMode.TransferFromInputSpace);
-                    } else {
+                    }
+                    if (!config.isZipSourceFiles() && taskConfigs[i][j].getSourceNames() != null) {
+                        for (String name : taskConfigs[i][j].getSourceNames()) {
+                            schedulerTask.addInputFiles(config.getTempSubDirName() + "/" + name,
+                                    InputAccessMode.TransferFromInputSpace);
+                        }
+                    }
+                    if (config.isZipSourceFiles() && config.getSourceZipFileName() != null) {
                         schedulerTask.addInputFiles(config.getTempSubDirName() + "/" +
                             config.getSourceZipFileName(), InputAccessMode.TransferFromInputSpace);
                     }

@@ -62,6 +62,23 @@ public abstract class MatSciEngineConfigBase implements MatSciEngineConfig {
         return currentConf;
     }
 
+    public static boolean infStrictVersion(String v1, String v2) {
+        String[] majmin1 = v1.split("\\.");
+        String[] majmin2 = v2.split("\\.");
+        int n = Math.min(majmin1.length, majmin2.length);
+        for (int i = 1; i < n; i++) {
+            if (Integer.parseInt(majmin1[i]) < Integer.parseInt(majmin2[i]))
+                return true;
+            else if (Integer.parseInt(majmin1[i]) > Integer.parseInt(majmin2[i]))
+                return false;
+        }
+        if (n < majmin1.length)
+            return false;
+        else if (n < majmin2.length)
+            return true;
+        return false;
+    }
+
     public static String getNodeName() throws Exception {
 
         return UniqueID.getCurrentVMID().toString().replace('-', '_').replace(':', '_');

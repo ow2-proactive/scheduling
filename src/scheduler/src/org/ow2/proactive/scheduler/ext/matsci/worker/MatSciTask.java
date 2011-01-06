@@ -220,14 +220,26 @@ public abstract class MatSciTask<W extends MatSciWorker, C extends MatSciEngineC
         }
 
         if (paconfig.isTransferSource()) {
-            if (taskconfig.getSourceZipFileName() != null) {
-                taskconfig
-                        .setSourceZipFileURI(new URI(getLocalFile(
-                                paconfig.getTempSubDirName() + "/" + taskconfig.getSourceZipFileName())
-                                .getRealURI()));
+            if (paconfig.isZipSourceFiles()) {
+                if (taskconfig.getSourceZipFileName() != null) {
+                    taskconfig.setSourceZipFileURI(new URI(getLocalFile(
+                            paconfig.getTempSubDirName() + "/" + taskconfig.getSourceZipFileName())
+                            .getRealURI()));
+                } else {
+                    taskconfig.setSourceZipFileURI(new URI(getLocalFile(
+                            paconfig.getTempSubDirName() + "/" + paconfig.getSourceZipFileName())
+                            .getRealURI()));
+                }
             } else {
-                taskconfig.setSourceZipFileURI(new URI(getLocalFile(
-                        paconfig.getTempSubDirName() + "/" + paconfig.getSourceZipFileName()).getRealURI()));
+                if (taskconfig.getSourceNames() != null) {
+                    String[] names = taskconfig.getSourceNames();
+                    URI[] sourceURIs = new URI[names.length];
+                    for (int i = 0; i < names.length; i++) {
+                        sourceURIs[i] = new URI(getLocalFile(paconfig.getTempSubDirName() + "/" + names[i])
+                                .getRealURI());
+                    }
+                    taskconfig.setSourcesFilesURIs(sourceURIs);
+                }
             }
         }
         if (paconfig.isTransferEnv()) {

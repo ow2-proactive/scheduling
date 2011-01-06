@@ -58,13 +58,30 @@ public class ScilabFinder extends MatSciFinder {
         return instance;
     }
 
+    /**
+     * Utility function to find Matlab
+     */
+    public MatSciEngineConfig findMatSci(String version_pref, String versionsRej, String versionMin,
+            String versionMax) throws Exception {
+        return findMatSci(version_pref, parseVersionRej(versionsRej), versionMin, versionMax);
+    }
+
     public MatSciEngineConfig findMatSci(String version_pref, HashSet<String> versionsRej, String versionMin,
             String versionMax) throws Exception {
         ArrayList<MatSciEngineConfig> confs = ScilabConfigurationParser.getConfigs();
-        if (confs == null)
+
+        if (confs == null) {
+            System.out.println("No configuration found");
             return null;
+        }
+        for (MatSciEngineConfig conf : confs) {
+            System.out.println("Found " + conf.getVersion());
+        }
         MatSciEngineConfig answer = chooseMatSciConfig(confs, version_pref, versionsRej, versionMin,
                 versionMax);
+        if (answer == null) {
+            System.out.println("No configuration accepted");
+        }
 
         return answer;
     }

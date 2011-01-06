@@ -68,8 +68,6 @@ set(handles.Go_plot_button,'Enable','off');
 set(handles.simulation_status,'Enable','off');
 set(handles.clear_plots_button,'Enable','off');
 set(handles.current_directory,'String',curr);
-global hy;
-hy = java.util.Properties; 
 
 %initializing the param files
 set(handles.listbox_param_files,'String',{});
@@ -87,25 +85,18 @@ set(handles.pushbutton_remove,'Enable','off');
 ud.filter = 'mdl';
 set(handles.edit_model,'UserData',ud);  
 
-solver = PAgetsolver();
+sched = PAScheduler;
+% Get the solver from memory
+solver = sched.PAgetsolver();
 if strcmp(class(solver),'double')
-    error('A connection to ProActive Scheduler must be established before using the GUI');
+    error('connexion to the scheduler is not established');
 end
 
+%check if the M_data mat-file exists
 
-%show up a selection msgbox regardless of the existence of the M_data file
-choose_button_mod = questdlg('Would you like to load an existing model ?','Load Model');
-if strcmp(choose_button_mod, 'Yes')
-    %set the correct path where the model is
-    %show a UI
-    [M_data_name, M_data_dir] = uigetfile('*.mat','Select the MAT-file with the model info','M_data.mat');
-    %perform the following actions if no cancel is pressed
-    if (~isnumeric(M_data_name) && strcmp(M_data_name,'M_data.mat'))    
-        %perform a CD to the selected directory, add it to the path and update
-        %the current directort bar
-        cd(M_data_dir);
-        addpath(M_data_dir);
-        set(handles.current_directory,'String',M_data_dir);
+if exist('M_data.mat') == 2
+    choose_button = questdlg('An existing model was detected. Would you like to load it ?','Model detected');
+    if strcmp(choose_button, 'Yes')
         load M_data;
         set(handles.current_directory, 'String', M_data.curr_dir);
         set(handles.edit_model,'String', M_data.model_Name);
@@ -119,10 +110,45 @@ if strcmp(choose_button_mod, 'Yes')
             %set(handles.resume_simulation,'Visible','on');
             set(handles.pushbutton_start,'Enable','off');
             set(handles.listbox_mat_files,'Enable','on');
-            continue_simulation(hObject, eventdata, handles);
+            continue_simulation(hObject, eventdata, handles,M_data.time,M_data.jobid);
         end
-    end    
+    else
+        load M_data;
+        delete([M_data.curr_dir filesep 'M_data.mat']);
+    end
+else
+    %show up a selection msgbox regardless of the existence of the M_data file
+    choose_button_mod = questdlg('Would you like to load an existing model ?','Load Model');
+    if strcmp(choose_button_mod, 'Yes')
+        %set the correct path where the model is
+        %show a UI
+        [M_data_name, M_data_dir] = uigetfile('*.mat','Select the MAT-file with the model info','M_data.mat');
+        %perform the following actions if no cancel is pressed
+        if (~isnumeric(M_data_name) && strcmp(M_data_name,'M_data.mat'))
+            %perform a CD to the selected directory, add it to the path and update
+            %the current directort bar
+            cd(M_data_dir);
+            addpath(M_data_dir);
+            set(handles.current_directory,'String',M_data_dir);
+            load M_data;
+            set(handles.current_directory, 'String', M_data.curr_dir);
+            set(handles.edit_model,'String', M_data.model_Name);
+            set(handles.listbox_param_files,'Value',1);
+            set(handles.listbox_param_files,'String', M_data.param_Files);
+            set(handles.Simulation_end_time,'String',M_data.end_time);
+            if ~isempty(M_data.param_Files)
+                set(handles.pushbutton_remove,'Enable','on');
+                set(handles.Sim_Matlab_button,'Enable','on');
+                set(handles.Sim_Matlab_button,'Enable','on');
+                %set(handles.resume_simulation,'Visible','on');
+                set(handles.pushbutton_start,'Enable','off');
+                set(handles.listbox_mat_files,'Enable','on');
+                continue_simulation(hObject, eventdata, handles,M_data.time,M_data.jobid);
+            end
+        end
+    end
 end
+
 
 % determine if connection to the scheduler was established
 
@@ -130,34 +156,7 @@ end
 
 
 
-%check if the M_data mat-file exists 
 
- 
-
-% if exist('M_data.mat') == 2
-%     choose_button = questdlg('An existing model was detected. Would you like to load it ?','Model detected');
-%     if strcmp(choose_button, 'Yes')
-%         load M_data;
-%         set(handles.current_directory, 'String', M_data.curr_dir);
-%         set(handles.edit_model,'String', M_data.model_Name);
-%         set(handles.listbox_param_files,'Value',1);
-%         set(handles.listbox_param_files,'String', M_data.param_Files);
-%         set(handles.Simulation_end_time,'String',M_data.end_time);
-%         if ~isempty(M_data.param_Files)
-%             set(handles.pushbutton_remove,'Enable','on');
-%             set(handles.Sim_Matlab_button,'Enable','on');
-%             set(handles.Sim_Matlab_button,'Enable','on');
-%             %set(handles.resume_simulation,'Visible','on');
-%             set(handles.pushbutton_start,'Enable','off');
-%             set(handles.listbox_mat_files,'Enable','on');
-%             continue_simulation(hObject, eventdata, handles);
-%         end   
-%     else
-%         load M_data;
-%         delete([M_data.curr_dir filesep 'M_data.mat']);
-%     end
-%     
-% end
 
 fig_data = imread('Logo-ProActive_small.png');
 
@@ -241,7 +240,6 @@ function listbox_param_files_Callback(hObject, eventdata, handles)
 % Hints: contents = get(hObject,'String') returns listbox_param_files contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from listbox_param_files
 %cd(get(handles.curr_dir,'UserData'));
-global hy;
 index_selected = get(handles.listbox_param_files,'Value');
 if ~isempty(index_selected)
     list = get(handles.listbox_param_files,'String');
@@ -415,15 +413,6 @@ set(handles.textLEDpercentDone,'Visible','off');
 period = 1;
 end_time = str2num(get(handles.Simulation_end_time,'String'));
 curr_dir = get(handles.curr_dir,'UserData');
-Save_Mat_File_Info(hObject, eventdata, handles);
-%create a timer object here
-
-T = timer('TimerFcn', {'timerFcn',end_time, param_files, handles.editLEDbkground, handles.textLEDpercentDone, curr_dir, handles.Go_plot_button, handles.pushbutton_start, handles.Sim_Matlab_button, handles.simulation_status, {handles.textLED1, handles.textLED2, handles.textLED3, handles.textLED4, handles.textLED5, handles.textLED6, handles.textLED7, handles.textLED8, handles.textLED9, handles.textLED10}, @stopTimer_Callback} ,'ExecutionMode','FixedRate','Period',period);
-%starting the timer before executing
-
-%saving the mat-file
-tic;
-start(T);
 
 paramList = cell(1,length(param_files));
 Tsk(1:length(param_files))=PATask;
@@ -456,8 +445,16 @@ for i = 1:length(param_files)
     Tsk(i).Description = ['Simulation of ' model_Name ' with ' param_files{i}]; 
     paramList{i} = {PAeval_param};
 end
-
+time = clock; 
 resl = PAsolve(Tsk); 
+jobid = resl(1).jobid;
+Save_Mat_File_Info(hObject, eventdata, handles,time, jobid);
+%create a timer object here
+T = timer('TimerFcn', {'timerFcn',end_time, param_files, handles.editLEDbkground, handles.textLEDpercentDone, curr_dir, handles.Go_plot_button, handles.pushbutton_start, handles.Sim_Matlab_button, handles.simulation_status, {handles.textLED1, handles.textLED2, handles.textLED3, handles.textLED4, handles.textLED5, handles.textLED6, handles.textLED7, handles.textLED8, handles.textLED9, handles.textLED10}, @stopTimer_Callback,time, resl,jobid} ,'ExecutionMode','FixedRate','Period',period);
+%starting the timer after executing
+
+%saving the mat-file
+start(T);
 
 % for i = 1:length(param_files)
 %     res = resl{i};
@@ -579,7 +576,6 @@ function add_mat_button_Callback(hObject, eventdata, handles)
 % hObject    handle to add_mat_button (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-global hy;
 specific_selection = strcat(get(handles.text5,'String'), filesep, '*.mat');
 str_File = uigetfile(specific_selection,'Select mat File');
 if ~isnumeric(str_File)
@@ -612,7 +608,6 @@ function remove_mat_button_Callback(hObject, eventdata, handles)
 % hObject    handle to remove_mat_button (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-global hy;
 index_selected = get(handles.listbox_mat_files,'Value');
 %str_List_cell = get(handles.listbox_mat_files,'UserData');
 list = get(handles.listbox_mat_files,'String');
@@ -738,7 +733,6 @@ end
 
 %remove all the folders corresponding to param-files
 param_files = get(handles.listbox_param_files,'String');
-Save_Mat_File_Info(hObject, eventdata, handles);
 for i = 1:length(param_files)
     str_app = strtrim(param_files{i});
     if (exist(str_app(1:end-2)) == 7)
@@ -782,15 +776,19 @@ params.current_dir = curr_dir;
 period = 1;
 end_time = params.end_time;
 %create a timer object here
-tcount = cputime;
-T = timer('TimerFcn', {'timerFcn',end_time, {param_file}, handles.editLEDbkground, handles.textLEDpercentDone, curr_dir, handles.Go_plot_button, handles.pushbutton_start, handles.Sim_Matlab_button, handles.simulation_status, {handles.textLED1, handles.textLED2, handles.textLED3, handles.textLED4, handles.textLED5, handles.textLED6, handles.textLED7, handles.textLED8, handles.textLED9, handles.textLED10}, @stopTimer_Callback} ,'ExecutionMode','FixedRate','Period',period);
+tcount = clock;
+time=clock;
+T = timer('TimerFcn', {'timerFcn',end_time, {param_file}, handles.editLEDbkground, handles.textLEDpercentDone, curr_dir, handles.Go_plot_button, handles.pushbutton_start, handles.Sim_Matlab_button, handles.simulation_status, {handles.textLED1, handles.textLED2, handles.textLED3, handles.textLED4, handles.textLED5, handles.textLED6, handles.textLED7, handles.textLED8, handles.textLED9, handles.textLED10}, @stopTimer_Callback,time,[],[]} ,'ExecutionMode','FixedRate','Period',period);
 %starting the timer before executing 
-tic;
+
 start(T);
 PAsolve_modelname(params);
     
 
-function stopTimer_Callback(obj, curr_dir, Go_plot_button, pushbutton_start, Sim_Matlab_button, simulation_status)
+function stopTimer_Callback(obj, curr_dir, Go_plot_button, pushbutton_start, Sim_Matlab_button, simulation_status, resl, jobid)
+    if isa(resl,'PAResult')
+        PAwaitAll(resl);
+    end
     stop(obj);
     %set(handles.simulation_status,'String','the simulation ended ');
     %set(Go_plot_button,'Enable','on');
@@ -1168,7 +1166,7 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
     set(hObject,'BackgroundColor','white');
 end
 
-function Save_Mat_File_Info(hObject, eventdata, handles)
+function Save_Mat_File_Info(hObject, eventdata, handles,time,jobid)
 %function being called upon starting the simulation
 %values to be stored: 
  
@@ -1184,6 +1182,12 @@ function Save_Mat_File_Info(hObject, eventdata, handles)
     %end time
     M_data.end_time = get(handles.Simulation_end_time,'String');
     
+    %start time
+    M_data.time = time;
+    
+    %job id
+    M_data.jobid = jobid;
+    
     %associate mat-files
     save M_data.mat M_data
 
@@ -1198,7 +1202,7 @@ exit
 
 
 
-function continue_simulation(hObject, eventdata, handles)
+function continue_simulation(hObject, eventdata, handles,time, jobid)
 % hObject    handle to resume_simulation (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -1213,10 +1217,11 @@ curr_dir = get(handles.curr_dir,'UserData');
 set(handles.pushbutton_start,'Enable','off');
 set(handles.Sim_Matlab_button,'Enable','off');
 
-T = timer('TimerFcn', {'timerFcn',end_time, param_files, handles.editLEDbkground, handles.textLEDpercentDone, curr_dir, handles.Go_plot_button, handles.pushbutton_start, handles.Sim_Matlab_button, handles.simulation_status, {handles.textLED1, handles.textLED2, handles.textLED3, handles.textLED4, handles.textLED5, handles.textLED6, handles.textLED7, handles.textLED8, handles.textLED9, handles.textLED10}, @stopTimer_Callback} ,'ExecutionMode','FixedRate','Period',period);
+resl=PAgetResults(jobid);
+
+T = timer('TimerFcn', {'timerFcn',end_time, param_files, handles.editLEDbkground, handles.textLEDpercentDone, curr_dir, handles.Go_plot_button, handles.pushbutton_start, handles.Sim_Matlab_button, handles.simulation_status, {handles.textLED1, handles.textLED2, handles.textLED3, handles.textLED4, handles.textLED5, handles.textLED6, handles.textLED7, handles.textLED8, handles.textLED9, handles.textLED10}, @stopTimer_Callback,time,resl,jobid} ,'ExecutionMode','FixedRate','Period',period);
 %starting the timer before executing
 %saving the mat-file
-
 start(T);
 
 function save_sampleTime_info(hObject, eventdata, handles)

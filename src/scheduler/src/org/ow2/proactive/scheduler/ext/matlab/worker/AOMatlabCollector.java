@@ -37,8 +37,8 @@
 package org.ow2.proactive.scheduler.ext.matlab.worker;
 
 import org.ow2.proactive.scheduler.common.task.TaskResult;
-import org.ow2.proactive.scheduler.ext.matlab.common.exception.InvalidNumberOfParametersException;
-import org.ow2.proactive.scheduler.ext.matlab.common.exception.InvalidParameterException;
+import org.ow2.proactive.scheduler.ext.matsci.common.exception.InvalidNumberOfParametersException;
+import org.ow2.proactive.scheduler.ext.matsci.common.exception.InvalidParameterException;
 import org.ow2.proactive.scheduler.ext.matlab.worker.util.MatlabEngineConfig;
 import ptolemy.data.ArrayToken;
 import ptolemy.data.Token;

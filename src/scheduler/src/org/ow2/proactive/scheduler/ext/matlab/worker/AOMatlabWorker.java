@@ -39,8 +39,8 @@ package org.ow2.proactive.scheduler.ext.matlab.worker;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.ext.matlab.common.PASolveMatlabGlobalConfig;
 import org.ow2.proactive.scheduler.ext.matlab.common.PASolveMatlabTaskConfig;
-import org.ow2.proactive.scheduler.ext.matlab.common.exception.InvalidNumberOfParametersException;
-import org.ow2.proactive.scheduler.ext.matlab.common.exception.InvalidParameterException;
+import org.ow2.proactive.scheduler.ext.matsci.common.exception.InvalidNumberOfParametersException;
+import org.ow2.proactive.scheduler.ext.matsci.common.exception.InvalidParameterException;
 import org.ow2.proactive.scheduler.ext.matlab.common.exception.MatlabTaskException;
 import org.ow2.proactive.scheduler.ext.matlab.worker.util.MatlabEngineConfig;
 import org.ow2.proactive.scheduler.ext.matsci.worker.MatSciWorker;
@@ -78,6 +78,12 @@ public class AOMatlabWorker implements Serializable, MatSciWorker {
      * input script
      */
     private String inputScript = null;
+
+    /** Path to local space subdirectory **/
+    private File tempSubDir = null;
+
+    /** Path to local space **/
+    private File localSpace = null;
 
     /**
      * lines of the main script
@@ -188,27 +194,25 @@ public class AOMatlabWorker implements Serializable, MatSciWorker {
         return true;
     }
 
-    /**
-     * Executes both input and main scripts on the engine
-     *
-     * @throws Throwable
-     */
-    protected final Token executeScript(MatlabEngine.Connection conn) throws Throwable {
-
-        Token out = null;
-
+    private void initDS(MatlabEngine.Connection conn) throws Exception {
         // Changing dir to local space
-        File localSpace = new File(paconfig.getLocalSpace());
-        if (localSpace.exists() && localSpace.canRead() && localSpace.canWrite()) {
-            conn.evalString("cd('" + localSpace + "');");
-        } else {
-            System.err.println("Error, can't write on : " + localSpace);
-            throw new IllegalStateException("Error, can't write on : " + localSpace);
+        URI ls = paconfig.getLocalSpace();
+        if (ls != null) {
+            localSpace = new File(ls);
+            if (localSpace.exists() && localSpace.canRead() && localSpace.canWrite()) {
+                conn.evalString("cd('" + localSpace + "');");
+                tempSubDir = new File(localSpace, paconfig.getTempSubDirName());
+
+            } else {
+                System.err.println("Error, can't write on : " + localSpace);
+                throw new IllegalStateException("Error, can't write on : " + localSpace);
+            }
         }
 
-        File tempSubDir = new File(localSpace, paconfig.getTempSubDirName());
+    }
 
-        if (paconfig.isTransferSource()) {
+    private void transferSource(MatlabEngine.Connection conn) throws Exception {
+        if (paconfig.isTransferSource() && tempSubDir != null) {
             if (paconfig.isDebug()) {
                 System.out.println("Unzipping source files");
             }
@@ -233,7 +237,9 @@ public class AOMatlabWorker implements Serializable, MatSciWorker {
                 throw new IllegalStateException("Error, source zip file cannot be accessed at : " + sourceZip);
             }
         }
+    }
 
+    private void transferEnv(MatlabEngine.Connection conn) throws Exception {
         if (paconfig.isTransferEnv()) {
             if (paconfig.isZipEnvFile()) {
                 if (paconfig.isDebug()) {
@@ -252,18 +258,23 @@ public class AOMatlabWorker implements Serializable, MatSciWorker {
             File envMat = new File(taskconfig.getEnvMatFileURI());
             conn.evalString("load('" + envMat + "');");
         }
+    }
+
+    private void transferInputVariables(MatlabEngine.Connection conn) throws Exception {
         if (paconfig.isTransferVariables()) {
             File inMat = new File(taskconfig.getInputVariablesFileURI());
+            if (paconfig.isDebug()) {
+                System.out.println("Loading Input Variable file " + inMat);
+            }
             conn.evalString("load('" + inMat + "');");
             if (taskconfig.getComposedInputVariablesFileURI() != null) {
                 File compinMat = new File(taskconfig.getComposedInputVariablesFileURI());
                 conn.evalString("load('" + compinMat + "');in=out;clear out;");
             }
         }
-        if (paconfig.isDebug()) {
-            conn.evalString("who");
-        }
+    }
 
+    private void transferInputFiles(MatlabEngine.Connection conn) throws Exception {
         if (taskconfig.isInputFilesThere() && paconfig.isZipInputFiles()) {
             if (paconfig.isDebug()) {
                 System.out.println("Unzipping input files");
@@ -280,6 +291,68 @@ public class AOMatlabWorker implements Serializable, MatSciWorker {
             }
 
         }
+    }
+
+    private Token transferOutputVariable(MatlabEngine.Connection conn) throws Exception {
+        File outputFile = new File(tempSubDir, taskconfig.getOutputVariablesFileName());
+        if (paconfig.isDebug()) {
+            System.out.println("Saving Output Variable file " + outputFile);
+        }
+        if (paconfig.getMatFileOptions() != null) {
+            conn.evalString("save('" + outputFile + "','out','" + paconfig.getMatFileOptions() + "');");
+        } else {
+            conn.evalString("save('" + outputFile + "','out');");
+        }
+
+        if (!outputFile.exists()) {
+            throw new MatlabTaskException();
+        }
+        Token out = new BooleanToken(true);
+        return out;
+    }
+
+    private void transferOutputFiles(MatlabEngine.Connection conn) throws Exception {
+        if (taskconfig.isOutputFilesThere() && paconfig.isZipOutputFiles()) {
+            if (paconfig.isDebug()) {
+                System.out.println("Zipping output files");
+            }
+            String[] outputFiles = taskconfig.getOutputFiles();
+            String[] names = taskconfig.getOutputFilesZipNames();
+            for (int i = 0; i < names.length; i++) {
+                File outputZip = new File(tempSubDir, names[i]);
+                //conn.evalString("ProActiveOutputFiles=cell(1,"+outputFiles.length+");");
+                //for (int i=0; i < outputFiles.length; i++) {
+                String updatedFile = outputFiles[i].replaceAll("/", fs);
+                //conn.evalString("ProActiveOutputFiles{"+(i+1)+"}='"+updatedFile+"';");
+                //}
+                conn.evalString("zip('" + outputZip + "',{'" + updatedFile + "'});");
+            }
+
+        }
+    }
+
+    /**
+     * Executes both input and main scripts on the engine
+     *
+     * @throws Throwable
+     */
+    protected final Token executeScript(MatlabEngine.Connection conn) throws Throwable {
+
+        Token out = null;
+
+        initDS(conn);
+
+        transferSource(conn);
+
+        transferEnv(conn);
+
+        transferInputVariables(conn);
+
+        if (paconfig.isDebug()) {
+            conn.evalString("who");
+        }
+
+        transferInputFiles(conn);
 
         if (inputScript != null) {
             if (paconfig.isDebug()) {
@@ -311,17 +384,7 @@ public class AOMatlabWorker implements Serializable, MatSciWorker {
             //outDebug.println("Receiving output:");
         }
         if (paconfig.isTransferVariables()) {
-            File outputFile = new File(tempSubDir, taskconfig.getOutputVariablesFileName());
-            if (paconfig.getMatFileOptions() != null) {
-                conn.evalString("save('" + outputFile + "','out','" + paconfig.getMatFileOptions() + "');");
-            } else {
-                conn.evalString("save('" + outputFile + "','out');");
-            }
-
-            if (!outputFile.exists()) {
-                throw new MatlabTaskException();
-            }
-            out = new BooleanToken(true);
+            out = transferOutputVariable(conn);
         } else {
             try {
                 out = conn.get("out");
@@ -337,23 +400,7 @@ public class AOMatlabWorker implements Serializable, MatSciWorker {
         }
 
         // outputFiles
-        if (taskconfig.isOutputFilesThere() && paconfig.isZipOutputFiles()) {
-            if (paconfig.isDebug()) {
-                System.out.println("Zipping output files");
-            }
-            String[] outputFiles = taskconfig.getOutputFiles();
-            String[] names = taskconfig.getOutputFilesZipNames();
-            for (int i = 0; i < names.length; i++) {
-                File outputZip = new File(tempSubDir, names[i]);
-                //conn.evalString("ProActiveOutputFiles=cell(1,"+outputFiles.length+");");
-                //for (int i=0; i < outputFiles.length; i++) {
-                String updatedFile = outputFiles[i].replaceAll("/", fs);
-                //conn.evalString("ProActiveOutputFiles{"+(i+1)+"}='"+updatedFile+"';");
-                //}
-                conn.evalString("zip('" + outputZip + "',{'" + updatedFile + "'});");
-            }
-
-        }
+        transferOutputFiles(conn);
 
         return out;
 

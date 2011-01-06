@@ -60,6 +60,8 @@ public class PASolveMatSciTaskConfig implements Serializable {
      */
     private String sourceZipFileName = null;
 
+    private String[] sourceNames;
+
     private String inputVariablesFileName = null;
 
     private String composedInputVariablesFileName = null;
@@ -86,6 +88,8 @@ public class PASolveMatSciTaskConfig implements Serializable {
     private String[] inputFiles;
 
     private URI sourceZipFileURI = null;
+
+    private URI[] sourcesFilesURIs = null;
 
     private URI envZipFileURI = null;
 
@@ -177,6 +181,14 @@ public class PASolveMatSciTaskConfig implements Serializable {
 
     public void setOutputZipFileURI(URI outputZipFileURI) {
         this.outputZipFileURI = outputZipFileURI;
+    }
+
+    public URI[] getSourcesFilesURIs() {
+        return sourcesFilesURIs;
+    }
+
+    public void setSourcesFilesURIs(URI[] sourcesFilesURIs) {
+        this.sourcesFilesURIs = sourcesFilesURIs;
     }
 
     public String[] getOutputFiles() {
@@ -277,6 +289,14 @@ public class PASolveMatSciTaskConfig implements Serializable {
 
     public void setSourceZipFileName(String sourceZipFileName) {
         this.sourceZipFileName = sourceZipFileName;
+    }
+
+    public void setSourceNames(String[] sourcesNames) {
+        this.sourceNames = sourcesNames;
+    }
+
+    public String[] getSourceNames() {
+        return sourceNames;
     }
 
     public String getSourceZipHash() {

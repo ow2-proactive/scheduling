@@ -127,6 +127,8 @@ public abstract class AOMatSciEnvironment<R, RL> implements Serializable, Schedu
 
     protected boolean loggedin;
 
+    protected boolean joined;
+
     protected SchedulerAuthenticationInterface auth;
 
     /**
@@ -206,7 +208,12 @@ public abstract class AOMatSciEnvironment<R, RL> implements Serializable, Schedu
     public boolean join(String url) throws SchedulerException {
         auth = SchedulerConnection.join(url);
         this.schedulerUrl = url;
+        joined = true;
         return true;
+    }
+
+    public boolean isJoined() {
+        return joined;
     }
 
     /**

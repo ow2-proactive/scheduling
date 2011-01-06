@@ -36,7 +36,6 @@
  */
 package org.ow2.proactive.scheduler.ext.scilab.client;
 
-import javasci.SciData;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
@@ -49,18 +48,18 @@ import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputAccessMode;
+import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
 import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
-import org.ow2.proactive.scheduler.ext.matsci.client.AOMatSciEnvironment;
-import org.ow2.proactive.scheduler.ext.matsci.client.MatSciJobPermanentInfo;
-import org.ow2.proactive.scheduler.ext.matsci.client.MatSciJobVolatileInfo;
-import org.ow2.proactive.scheduler.ext.matsci.client.PASolveException;
+import org.ow2.proactive.scheduler.ext.matsci.client.*;
 import org.ow2.proactive.scheduler.ext.scilab.common.PASolveScilabGlobalConfig;
+import org.ow2.proactive.scheduler.ext.scilab.common.PASolveScilabTaskConfig;
+import org.ow2.proactive.scheduler.ext.scilab.common.exception.ScilabTaskException;
 import org.ow2.proactive.scheduler.ext.scilab.worker.ScilabTask;
 import org.ow2.proactive.scripting.InvalidScriptException;
 import org.ow2.proactive.scripting.SelectionScript;
+import org.scilab.modules.types.ScilabType;
 
 import javax.security.auth.login.LoginException;
-import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.TreeSet;
@@ -71,7 +70,7 @@ import java.util.TreeSet;
  *
  * @author The ProActive Team
  */
-public class AOScilabEnvironment extends AOMatSciEnvironment<SciData, ScilabResultsAndLogs> {
+public class AOScilabEnvironment extends AOMatSciEnvironment<ScilabType, ScilabResultsAndLogs> {
 
     /**
      * log4j logger
@@ -82,193 +81,248 @@ public class AOScilabEnvironment extends AOMatSciEnvironment<SciData, ScilabResu
         super();
     }
 
-    /**
-     * Returns all the results in an array or throw a RuntimeException in case of error
-     *
-     * @return array of SciData tokens
-     */
-    //    public ArrayList<ScilabResultsAndLogs> waitResultOfJob(String jid) {
-    //        MatSciJobVolatileInfo<SciData> jinfo = currentJobs.get(jid);
-    //        ArrayList<ScilabResultsAndLogs> answer = new ArrayList<ScilabResultsAndLogs>();
-    //        if (jinfo.isDebugCurrentJob()) {
-    //            logger.info("[AOScilabEnvironment] Receiving result of job " + jid + " back...");
-    //        }
-    //
-    //        if (schedulerStopped) {
-    //            System.err.println("[AOScilabEnvironment] The scheduler has been stopped");
-    //           // jinfo.setErrorToThrow(new IllegalStateException("The scheduler has been stopped"));
-    //        } else if (jinfo.getStatus() == JobStatus.KILLED || jinfo.getStatus() == JobStatus.CANCELED) {
-    //            // Job killed
-    //            System.err.println("[AOScilabEnvironment] The job has been killed");
-    //            //jinfo.setErrorToThrow(new IllegalStateException("The job has been killed"));
-    //        }
-    //
-    //        try {
-    //           // if (jinfo.getErrorToThrow() != null) {
-    //
-    //                // Error inside job
-    //                if (debug) {
-    //                    System.err.println("[AOScilabEnvironment] Scheduler Exception");
-    //                }
-    //                answer.add(new ScilabResultsAndLogs(null, null, jinfo.getErrorToThrow(),
-    //                    MatSciTaskStatus.GLOBAL_ERROR));
-    //
-    //            } else {
-    //                // Normal termination
-    //                for (int i = 0; i < jinfo.getResults().size(); i++) {
-    //                    // answer.add(new ScilabResultsAndLogs(jinfo.getResults().get(i), jinfo.getLogs(i), null), MatSciTaskStatus.OK);
-    //                }
-    //            }
-    //        } finally {
-    //            currentJobs.remove(jid);
-    //            // updating persistance file
-    //            writeCjobsToLog(currentJobs);
-    //        }
-    //        return answer;
-    //    }
     protected ScilabResultsAndLogs waitResultOfTask(String jid, String tname) {
-        ScilabResultsAndLogs answer = null;
-        MatSciJobVolatileInfo<SciData> jinfo = currentJobs.get(jid);
+        ScilabResultsAndLogs answer = new ScilabResultsAndLogs();
+        MatSciJobVolatileInfo<ScilabType> jinfo = currentJobs.get(jid);
+
         if (jinfo.isDebugCurrentJob()) {
+
             System.out.println("[AOScilabEnvironment] Sending the results of task " + tname + " of job " +
                 jid + " back...");
+
         }
 
         Throwable t = null;
         if (schedulerStopped) {
-            throw new PASolveException("[AOScilabEnvironment] The scheduler has been stopped");
-        } else if (jinfo.getStatus() == JobStatus.KILLED || jinfo.getStatus() == JobStatus.CANCELED) {
+            answer.setStatus(MatSciTaskStatus.GLOBAL_ERROR);
+            answer.setException(new PASolveException("[AOScilabEnvironment] The scheduler has been stopped"));
+        } else if (jinfo.getStatus() == JobStatus.KILLED) {
             // Job killed
-            throw new PASolveException("[AOScilabEnvironment] The job has been killed");
+            answer.setStatus(MatSciTaskStatus.GLOBAL_ERROR);
+            answer.setException(new PASolveException("[AOScilabEnvironment] The job has been killed"));
         } else if ((t = jinfo.getException(tname)) != null) {
             // Error inside job
-            //answer = new ScilabResultsAndLogs(null, null, t, false, true);
+            if (t instanceof ScilabTaskException) {
+                answer.setStatus(MatSciTaskStatus.MATSCI_ERROR);
+                answer.setLogs(jinfo.getLogs(tname));
+                //System.err.println(jinfo.getLogs(tid));
+            } else {
+                answer.setStatus(MatSciTaskStatus.RUNTIME_ERROR);
+                answer.setException(new PASolveException(t));
+                if (jinfo.getLogs(tname) != null) {
+                    answer.setLogs(jinfo.getLogs(tname));
+                }
+            }
         } else {
             // Normal termination
-            //answer = jinfo.getResult(tid);
+            answer.setStatus(MatSciTaskStatus.OK);
+            //System.out.println(jinfo.getLogs(tid));
+            answer.setLogs(jinfo.getLogs(tname));
+            answer.setResult(jinfo.getResult(tname));
+        }
+
+        jinfo.addServedTask(tname);
+
+        if (jinfo.allServed()) {
+            currentJobs.remove(jid);
         }
 
         return answer;
     }
 
+    public ArrayList<ScilabResultsAndLogs> retrieve(MatSciJobPermanentInfo jpinfo) {
+
+        syncRetrieve(jpinfo);
+        ArrayList<ScilabResultsAndLogs> answers = new ArrayList<ScilabResultsAndLogs>(jpinfo.getNbres());
+        for (String ftname : jpinfo.getFinalTaskNames()) {
+            answers.add(((AOScilabEnvironment) stubOnThis).waitResult(jpinfo.getJobId(), ftname));
+        }
+        return answers;
+    }
+
     /**
      * Submit a new bunch of tasks to the scheduler, throws a runtime exception if a job is currently running
      *
-     * @param inputScripts input scripts (scripts executed before the main one)
-     * @param mainScripts  main scripts
+     * @param config      global job config
+     * @param taskConfigs config of individual tasks
      */
-    public ArrayList<ScilabResultsAndLogs> solve(String[] inputScripts, String functionName,
-            String functionsDefinition, String mainScripts, String[] inputFiles,
-            PASolveScilabGlobalConfig config) throws Throwable {
-        if (schedulerStopped) {
-            System.err.println("[AOScilabEnvironment] The Scheduler is stopped");
-            return new ArrayList<ScilabResultsAndLogs>();
-        }
+    public Pair<MatSciJobPermanentInfo, ArrayList<ScilabResultsAndLogs>> solve(
+            PASolveScilabGlobalConfig config, PASolveScilabTaskConfig[][] taskConfigs) throws Throwable {
 
+        if (schedulerStopped) {
+            throw new RuntimeException("[AOScilabEnvironment] the Scheduler is stopped");
+        }
+        // We store the script selecting the nodes to use it later at termination.
         debug = config.isDebug();
 
-        // We store the script selecting the nodes to use it later at termination.
-
         if (config.isDebug()) {
-            System.out
-                    .println("[AOScilabEnvironment] Submitting job of " + inputScripts.length + " tasks...");
+            System.out.println("[AOScilabEnvironment] Submitting job of " + taskConfigs.length + " tasks...");
         }
+        //Thread t = java.lang.Thread.currentThread();
+        //t.setContextClassLoader(this.getClass().getClassLoader());
+        //System.out.println(this.getClass().getClassLoader());
 
         // Creating a task flow job
         TaskFlowJob job = new TaskFlowJob();
         job.setName("Scilab Environment Job " + lastGenJobId++);
         job.setPriority(JobPriority.findPriority(config.getPriority()));
         job.setCancelJobOnError(false);
-        job.setDescription("Set of parallel scilab tasks");
+        job.setDescription("Set of parallel Scilab tasks");
 
-        if (config.isTransferSource() || config.isTransferEnv()) {
+        if (config.getInputSpaceURL() != null) {
             job.setInputSpace(config.getInputSpaceURL());
 
             job.setOutputSpace(config.getOutputSpaceURL());
         }
-
-        // the external log files as the output is forwarded into Scilab directly,
-        // in debug mode you might want to read these files though
-        if (config.isDebug()) {
-            File logFile = new File(System.getProperty("java.io.tmpdir"), "Scilab_job_" + lastGenJobId +
-                ".log");
-            System.out.println("[AOScilabEnvironment] Log file created at :" + logFile);
-            job.setLogFile(logFile.getPath());
-        }
-        if (config.isDebug()) {
-            System.out.println("[AOScilabEnvironment] function name:");
-            System.out.println(functionName);
-            System.out.println("[AOScilabEnvironment] function definition:");
-            System.out.println(functionsDefinition);
-            System.out.println("[AOScilabEnvironment] main script:");
-            System.out.println(mainScripts);
-            System.out.println("[AOScilabEnvironment] input scripts:");
-        }
-
-        int nbResults = inputScripts.length;
-        int depth = 1;
-
         TreeSet<String> tnames = new TreeSet<String>(new TaskNameComparator());
         TreeSet<String> finaltnames = new TreeSet<String>(new TaskNameComparator());
-
+        int nbResults = taskConfigs.length;
+        int depth = taskConfigs[0].length;
         for (int i = 0; i < nbResults; i++) {
-            PASolveScilabGlobalConfig clonedConfig = null;
-            JavaTask schedulerTask = new JavaTask();
+            JavaTask oldTask = null;
+            for (int j = 0; j < depth; j++) {
+                JavaTask schedulerTask = new JavaTask();
 
-            String tname = "" + i;
+                String tname = "" + i + "_" + j;
 
-            schedulerTask.setName(tname);
+                tnames.add(tname);
 
-            tnames.add(tname);
-            finaltnames.add(tname);
-
-            schedulerTask.setPreciousResult(true);
-            schedulerTask.addArgument("input", inputScripts[i]);
-
-            if (config.isDebug()) {
-                System.out.println(inputScripts[i]);
-            }
-            schedulerTask.addArgument("functionName", functionName);
-            schedulerTask.addArgument("functionsDefinition", functionsDefinition);
-            schedulerTask.addArgument("script", mainScripts);
-
-            schedulerTask.addArgument("outputs", "out");
-
-            schedulerTask.addArgument("config", config);
-
-            if (config.isTransferSource()) {
-                schedulerTask.addInputFiles(config.getSourceZipFileName(),
-                        InputAccessMode.TransferFromInputSpace);
-            }
-            if (config.isTransferEnv()) {
-                schedulerTask.addInputFiles(config.getEnvZipFileName(),
-                        InputAccessMode.TransferFromInputSpace);
-            }
-            if (inputFiles != null) {
-                for (String inputFile : inputFiles) {
-                    schedulerTask.addInputFiles(inputFile, InputAccessMode.TransferFromInputSpace);
+                if (j == depth - 1) {
+                    finaltnames.add(tname);
                 }
-            }
 
-            schedulerTask.setExecutableClassName(ScilabTask.class.getName());
+                schedulerTask.setName(tname);
+                if (j == depth - 1) {
+                    schedulerTask.setPreciousResult(true);
+                }
+                schedulerTask.addArgument("input", taskConfigs[i][j].getInputScript());
+                schedulerTask.addArgument("script", taskConfigs[i][j].getMainScript());
+                schedulerTask.addArgument("functionName", taskConfigs[i][j].getFunctionName());
+                schedulerTask.addArgument("functionsDefinition", taskConfigs[i][j].getFunctionDefinition());
+                schedulerTask.addArgument("outputs", taskConfigs[i][j].getOutputs());
+                if (oldTask != null) {
+                    schedulerTask.addDependence(oldTask);
+                }
+                oldTask = schedulerTask;
 
-            URL url = new URL(config.getCheckMatSciUrl());
-            if (checkScript(url)) {
-                SelectionScript sscript = null;
+                if (config.isTransferSource()) {
+                    if (config.isZipSourceFiles() && taskConfigs[i][j].getSourceZipFileName() != null) {
+                        schedulerTask.addInputFiles(config.getTempSubDirName() + "/" +
+                            taskConfigs[i][j].getSourceZipFileName(), InputAccessMode.TransferFromInputSpace);
+                    }
+                    if (!config.isZipSourceFiles() && taskConfigs[i][j].getSourceNames() != null) {
+                        for (String name : taskConfigs[i][j].getSourceNames()) {
+                            schedulerTask.addInputFiles(config.getTempSubDirName() + "/" + name,
+                                    InputAccessMode.TransferFromInputSpace);
+                        }
+                    }
+                    if (config.isZipSourceFiles() && config.getSourceZipFileName() != null) {
+                        schedulerTask.addInputFiles(config.getTempSubDirName() + "/" +
+                            config.getSourceZipFileName(), InputAccessMode.TransferFromInputSpace);
+                    }
+                }
+                if (config.isTransferEnv()) {
+                    if (config.isZipEnvFile()) {
+                        schedulerTask.addInputFiles(config.getTempSubDirName() + "/" +
+                            config.getEnvZipFileName(), InputAccessMode.TransferFromInputSpace);
+                    } else {
+                        schedulerTask.addInputFiles(config.getTempSubDirName() + "/" +
+                            config.getEnvMatFileName(), InputAccessMode.TransferFromInputSpace);
+                    }
+                }
+                if (config.isTransferVariables()) {
+                    schedulerTask
+                            .addInputFiles(config.getTempSubDirName() + "/" +
+                                taskConfigs[i][j].getInputVariablesFileName(),
+                                    InputAccessMode.TransferFromInputSpace);
+                    if (taskConfigs[i][j].getComposedInputVariablesFileName() != null) {
+                        schedulerTask.addInputFiles(config.getTempSubDirName() + "/" +
+                            taskConfigs[i][j].getComposedInputVariablesFileName(),
+                                InputAccessMode.TransferFromInputSpace);
+                    }
+                    schedulerTask.addOutputFiles(config.getTempSubDirName() + "/" +
+                        taskConfigs[i][j].getOutputVariablesFileName(),
+                            OutputAccessMode.TransferToOutputSpace);
+                }
+
+                String[] inputFiles = taskConfigs[i][j].getInputFiles();
+                if (inputFiles != null && inputFiles.length > 0) {
+                    for (String inputFile : inputFiles) {
+                        schedulerTask.addInputFiles(inputFile, InputAccessMode.TransferFromInputSpace);
+                    }
+                }
+
+                String[] outputFiles = taskConfigs[i][j].getOutputFiles();
+                if (outputFiles != null && outputFiles.length > 0) {
+
+                    for (String outputFile : outputFiles) {
+                        schedulerTask.addOutputFiles(outputFile, OutputAccessMode.TransferToOutputSpace);
+                    }
+                }
+
+                if (taskConfigs[i][j].getDescription() != null) {
+                    schedulerTask.setDescription(taskConfigs[i][j].getDescription());
+                } else {
+                    schedulerTask.setDescription(taskConfigs[i][j].getMainScript());
+                }
+
+                schedulerTask.setExecutableClassName(ScilabTask.class.getName());
+
+                if (taskConfigs[i][j].getCustomScriptUrl() != null) {
+                    URL url = new URL(taskConfigs[i][j].getCustomScriptUrl());
+                    if (checkScript(url)) {
+                        SelectionScript sscript = null;
+                        try {
+
+                            sscript = new SelectionScript(url, new String[0]);
+
+                        } catch (InvalidScriptException e1) {
+                            throw new RuntimeException(e1);
+                        }
+                        schedulerTask.addSelectionScript(sscript);
+                    }
+                }
+
+                if (config.getCustomScriptUrl() != null) {
+                    URL url = new URL(config.getCustomScriptUrl());
+                    if (checkScript(url)) {
+                        SelectionScript sscript = null;
+                        try {
+
+                            sscript = new SelectionScript(url, new String[0]);
+
+                        } catch (InvalidScriptException e1) {
+                            throw new RuntimeException(e1);
+                        }
+                        schedulerTask.addSelectionScript(sscript);
+                    }
+                }
+
+                URL url1 = new URL(config.getCheckMatSciUrl());
+                if (checkScript(url1)) {
+                    SelectionScript sscript = null;
+                    try {
+                        System.out.println(config.getVersionMax());
+                        if (config.getVersionMax() != null) {
+                            System.out.println(config.getVersionMax().getClass());
+                        }
+                        sscript = new SelectionScript(url1, new String[] { "versionPref",
+                                config.getVersionPref(), "versionRej", config.getVersionRejAsString(),
+                                "versionMin", config.getVersionMin(), "versionMax", config.getVersionMax() });
+                    } catch (InvalidScriptException e1) {
+                        throw new RuntimeException(e1);
+                    }
+                    schedulerTask.addSelectionScript(sscript);
+                }
+
+                schedulerTask.addArgument("global_config", config);
+                schedulerTask.addArgument("task_config", taskConfigs[i][j]);
+
                 try {
-                    sscript = new SelectionScript(url, new String[] { "versionPref", config.getVersionPref(),
-                            "versionRej", config.getVersionRejAsString(), "versionMin",
-                            config.getVersionMin(), "versionMax", config.getVersionMax() }, true);
-                } catch (InvalidScriptException e1) {
-                    throw new RuntimeException(e1);
+                    job.addTask(schedulerTask);
+                } catch (UserException e) {
+                    e.printStackTrace();
                 }
-                schedulerTask.addSelectionScript(sscript);
-            }
-
-            try {
-                job.addTask(schedulerTask);
-            } catch (UserException e) {
-                e.printStackTrace();
             }
 
         }
@@ -290,11 +344,12 @@ public class AOScilabEnvironment extends AOMatSciEnvironment<SciData, ScilabResu
         for (String ftname : finaltnames) {
             answers.add(((AOScilabEnvironment) stubOnThis).waitResult(jid, ftname));
         }
-        return answers;
 
         // The last call puts a method in the RequestQueue
         // that won't be executed until all the results are received (see runactivity)
-        //return stubOnThis.waitAllResults();
+        // return stubOnThis.waitAllResults();
+        return new Pair<MatSciJobPermanentInfo, ArrayList<ScilabResultsAndLogs>>(
+            (MatSciJobPermanentInfo) jpinfo.clone(), answers);
     }
 
     /**

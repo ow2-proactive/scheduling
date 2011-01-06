@@ -45,9 +45,15 @@ class MatsciFinder
     #logFile = File.new(logFileJava.toString(), "a");
     @orig_stdout = $stdout
     @orig_stderr = $stderr
+    fos = JavaIO::FileOutputStream.new(logFileJava);
+    @logout = JavaIO::PrintStream.new(fos);
+    @orig_jstdout = System.out
+    @orig_jstderr = System.err;
     $stdout.reopen(logFileJava.toString(), "a")
     $stdout.sync=true
-    $stderr.reopen $stdout    
+    $stderr.reopen $stdout
+    System.setOut(logout);
+    System.setErr(logout);
 
     #@logWriter = JavaIO::PrintStream.new(JavaIO::BufferedOutputStream.new(JavaIO::FileOutputStream.new(logFile, true)));
 
@@ -61,6 +67,9 @@ class MatsciFinder
     #@logWriter.close();
     $stdout = @orig_stdout
     $stderr = @orig_stderr
+    System.setOut(@orig_jstdout);
+    System.setErr(@orig_jstderr);
+    @logout.close();
   end
 
   def findMatlab(version_pref, versions_rejected, min_version, max_version)

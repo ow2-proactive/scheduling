@@ -16,18 +16,30 @@ for i=1:length(S)
                             Z=val{i}(l,m);
                             try
                                 PAwaitFor(Z);
-                                val{i+1}((l-1)*sz(2)+m) = 0;
+                                if sz(1) == 1 && sz(2) == 1
+                                    val{i+1} = 0;
+                                else
+                                    val{i+1}{(l-1)*sz(2)+m} = 0;
+                                end
                             catch ME
-                                val{i+1}((l-1)*sz(2)+m) = Z.iserror.get();
+                                if sz(1) == 1 && sz(2) == 1
+                                    val{i+1} = Z.iserror.get();
+                                else
+                                    val{i+1}{(l-1)*sz(2)+m} = Z.iserror.get();
+                                end                                
                             end
                         end
                     end
-                case 'id'
+                case 'jobid'
                     sz=size(val{i});
                     for l=1:sz(1)
                         for m=1:sz(2)
-                            Z=val{i}(l,m);                                                            
-                            val{i+1}((l-1)*sz(2)+m) = Z.id;                            
+                            Z=val{i}(l,m);
+                            if sz(1) == 1 && sz(2) == 1
+                                val{i+1} = Z.jobid;
+                            else
+                                val{i+1}{(l-1)*sz(2)+m} = Z.jobid;
+                            end
                         end
                     end
                 case 'logs'

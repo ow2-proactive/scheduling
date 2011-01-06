@@ -45,6 +45,37 @@ import org.ow2.proactive.scheduler.ext.matsci.common.PASolveMatSciTaskConfig;
  * @author The ProActive Team
  */
 public class PASolveScilabTaskConfig extends PASolveMatSciTaskConfig {
+
+    private String functionName;
+
+    private String functionDefinition;
+
+    public String getOutputs() {
+        return outputs;
+    }
+
+    public void setOutputs(String outputs) {
+        this.outputs = outputs;
+    }
+
+    private String outputs;
+
+    public String getFunctionName() {
+        return functionName;
+    }
+
+    public void setFunctionName(String functionName) {
+        this.functionName = functionName;
+    }
+
+    public String getFunctionDefinition() {
+        return functionDefinition;
+    }
+
+    public void setFunctionDefinition(String functionDefinition) {
+        this.functionDefinition = functionDefinition;
+    }
+
     public PASolveScilabTaskConfig() {
 
     }

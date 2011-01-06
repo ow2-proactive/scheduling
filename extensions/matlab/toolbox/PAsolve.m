@@ -586,6 +586,8 @@ if ischar(opt.CustomScript)
 end
 solve_config.setZipInputFiles(opt.ZipInputFiles);
 solve_config.setZipOutputFiles(opt.ZipOutputFiles);
+solve_config.setZipSourceFiles(true);
+solve_config.setZipEnvFile(false);
 
 pairinfolist = solver.solve(solve_config, task_config);
 

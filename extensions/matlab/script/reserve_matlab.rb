@@ -22,7 +22,7 @@ class ReserveMatlab
         # Standard Matlab
         "matlab" => %q!a=1!,
         # Simulink
-        "simulink" => %q!a=a&&license('checkout','control_toolbox')!,
+        "simulink" => %q!a=a&&license('checkout','simulink')!,
         # Control System
         "control" => %q!a=a&&license('checkout','control_toolbox')!,
         # Fixed Point

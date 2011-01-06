@@ -36,28 +36,32 @@
  */
 package org.ow2.proactive.scheduler.ext.scilab.worker;
 
-import javasci.SciData;
-import javasci.Scilab;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.ext.matsci.common.exception.InvalidNumberOfParametersException;
+import org.ow2.proactive.scheduler.ext.matsci.common.exception.InvalidParameterException;
 import org.ow2.proactive.scheduler.ext.matsci.worker.MatSciWorker;
+import org.ow2.proactive.scheduler.ext.matsci.worker.util.MatSciEngineConfigBase;
 import org.ow2.proactive.scheduler.ext.scilab.common.PASolveScilabGlobalConfig;
 import org.ow2.proactive.scheduler.ext.scilab.common.PASolveScilabTaskConfig;
-import org.ow2.proactive.scheduler.ext.scilab.common.exception.InvalidParameterException;
 import org.ow2.proactive.scheduler.ext.scilab.common.exception.ScilabInitializationException;
 import org.ow2.proactive.scheduler.ext.scilab.common.exception.ScilabInitializationHanged;
 import org.ow2.proactive.scheduler.ext.scilab.common.exception.ScilabTaskException;
 import org.ow2.proactive.scheduler.ext.scilab.worker.util.ScilabEngineConfig;
+import org.scilab.modules.javasci.Scilab;
+import org.scilab.modules.types.ScilabBoolean;
+import org.scilab.modules.types.ScilabType;
 
 import java.io.*;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 
 /**
  * An active object which handles the interaction between the ScilabTask and a local Scilab engine
+ *
  * @author The ProActive Team
  */
 public class AOScilabWorker implements Serializable, MatSciWorker {
@@ -75,14 +79,18 @@ public class AOScilabWorker implements Serializable, MatSciWorker {
     private String[] outputVars = null;
 
     /**
-     *  Main script to be executed
+     * Main script to be executed
      */
     private ArrayList<String> mainscriptLines = new ArrayList<String>();
 
     /**
      * Configuration of Scilab (paths)
      */
-    private ScilabEngineConfig config;
+    private ScilabEngineConfig engineConfig;
+
+    private boolean javasciv2 = false;
+
+    private org.scilab.modules.javasci.Scilab engine = null;
 
     private boolean initialized = false;
     private boolean initErrorOccured = false;
@@ -95,7 +103,14 @@ public class AOScilabWorker implements Serializable, MatSciWorker {
     private String functionName = null;
 
     private String nodeName = null;
+    static File tmpDir = new File(System.getProperty("java.io.tmpdir"));
+
     private File tmpDirNode = null;
+
+    File localSpace;
+
+    File tempSubDir;
+
     private PASolveScilabGlobalConfig paconfig = null;
     private PASolveScilabTaskConfig taskconfig;
 
@@ -108,7 +123,7 @@ public class AOScilabWorker implements Serializable, MatSciWorker {
      * @param scilabConfig the configuration for scilab
      */
     public AOScilabWorker(ScilabEngineConfig scilabConfig) throws Exception {
-        this.config = scilabConfig;
+        this.engineConfig = scilabConfig;
     }
 
     private void initializeEngine() throws Exception {
@@ -121,7 +136,7 @@ public class AOScilabWorker implements Serializable, MatSciWorker {
                     System.out.println("java.library.path=" + System.getProperty("java.library.path"));
                 }
                 System.out.println("Starting a new Scilab engine:");
-                System.out.println(config);
+                System.out.println(engineConfig);
                 scilabStarter();
 
                 if (paconfig.isDebug()) {
@@ -166,12 +181,13 @@ public class AOScilabWorker implements Serializable, MatSciWorker {
 
             Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
                 public void run() {
-                    Scilab.Finish();
+                    if (javasciv2) {
+                        engine.close();
+                    }
                 }
             }));
 
             nodeName = PAActiveObject.getNode().getVMInformation().getName().replace('-', '_');
-            File tmpDir = new File(System.getProperty("java.io.tmpdir"));
             tmpDirNode = new File(tmpDir, nodeName);
             if (!tmpDirNode.exists() || !tmpDirNode.isDirectory()) {
                 tmpDirNode.mkdir();
@@ -187,7 +203,16 @@ public class AOScilabWorker implements Serializable, MatSciWorker {
         Runnable runner = new Runnable() {
             public void run() {
                 try {
-                    Scilab.init();
+                    if (javasciv2) {
+                        engine = new Scilab();
+                        if (engine.open()) {
+
+                        } else {
+                            throw new IllegalStateException("Scilab engine could not start");
+                        }
+                    } else {
+                        throw new UnsupportedOperationException("javasci v1 not supported");
+                    }
                     initialized = true;
                 } catch (Throwable t) {
                     initError = t;
@@ -218,10 +243,11 @@ public class AOScilabWorker implements Serializable, MatSciWorker {
     public void init(String inputScript, String functionName, String functionsDefinition,
             ArrayList<String> scriptLines, String[] outputVars, PASolveScilabGlobalConfig paconfig,
             PASolveScilabTaskConfig taskconfig, ScilabEngineConfig conf) {
-        if (!this.config.equals(conf)) {
+        if (!this.engineConfig.equals(conf)) {
             terminate();
         }
-        this.config = conf;
+        this.engineConfig = conf;
+        this.javasciv2 = !MatSciEngineConfigBase.infStrictVersion(engineConfig.getVersion(), "5.3.0");
         this.inputScript = inputScript;
         this.mainscriptLines = scriptLines;
         this.outputVars = outputVars;
@@ -231,51 +257,146 @@ public class AOScilabWorker implements Serializable, MatSciWorker {
         this.functionName = functionName;
     }
 
+    private void testEngineInitOrRestart() throws Exception {
+        initializeEngine();
+        try {
+            ScilabBoolean test = new ScilabBoolean(true);
+            put("test", test);
+            ScilabType answer = get("test");
+            if ((answer == null) || !(answer instanceof ScilabBoolean)) {
+                restart();
+            }
+            if (answer.getHeight() != 1 || answer.getWidth() != 1) {
+                restart();
+            }
+            boolean[][] data = ((ScilabBoolean) answer).getData();
+            if (data[0][0] != true) {
+                restart();
+            }
+            exec("clear test");
+        } catch (Exception e) {
+            restart();
+        }
+        // ok
+    }
+
+    private void restart() throws Exception {
+
+        try {
+            terminate();
+        } catch (Exception e) {
+
+        }
+        initializeEngine();
+    }
+
+    private void initDS() throws Exception {
+        // Changing dir to local space
+        URI ls = paconfig.getLocalSpace();
+        if (ls != null) {
+            localSpace = new File(ls);
+            if (localSpace.exists() && localSpace.canRead() && localSpace.canWrite()) {
+                exec("cd('" + localSpace + "');");
+                tempSubDir = new File(localSpace, paconfig.getTempSubDirName());
+
+            } else {
+                System.err.println("Error, can't write on : " + localSpace);
+                throw new IllegalStateException("Error, can't write on : " + localSpace);
+            }
+        }
+
+    }
+
+    private void transferSource() throws Exception {
+        if (paconfig.isTransferSource() && tempSubDir != null) {
+            if (paconfig.isDebug()) {
+                System.out.println("Loading source files");
+            }
+            if (paconfig.isZipSourceFiles()) {
+                // TODO not implemented
+            } else {
+
+                String[] sourceNames = taskconfig.getSourceNames();
+                URI[] sourceUris = taskconfig.getSourcesFilesURIs();
+                if (sourceUris != null) {
+                    for (URI sourceuri : sourceUris) {
+                        File sourceFile = new File(sourceuri);
+                        if (paconfig.isDebug()) {
+                            System.out.println("Loading " + sourceFile);
+                        }
+                        exec("exec('" + sourceFile + "');");
+                    }
+                }
+            }
+        }
+    }
+
+    private void transferInputVariables() throws Exception {
+        if (paconfig.isTransferVariables()) {
+            File inMat = new File(taskconfig.getInputVariablesFileURI());
+            if (paconfig.isDebug()) {
+                System.out.println("Loading Input Variable file " + inMat);
+            }
+            exec("load('" + inMat + "');");
+            if (taskconfig.getComposedInputVariablesFileURI() != null) {
+                File compinMat = new File(taskconfig.getComposedInputVariablesFileURI());
+                exec("load('" + compinMat + "');in=out;clear out;");
+            }
+        }
+    }
+
+    private ScilabType transferOutputVariable() throws Exception {
+        File outputFile = new File(tempSubDir, taskconfig.getOutputVariablesFileName());
+        if (paconfig.isDebug()) {
+            System.out.println("Saving Output Variable file " + outputFile);
+        }
+        exec("save('" + outputFile + "',out);");
+
+        if (!outputFile.exists()) {
+            throw new ScilabTaskException();
+        }
+        ScilabType out = new ScilabBoolean(true);
+        return out;
+    }
+
     public Serializable execute(int index, TaskResult... results) throws Throwable {
 
-        initializeEngine();
+        testEngineInitOrRestart();
 
+        prepare();
         boolean ok = true;
+        if (!paconfig.isTransferVariables()) {
+            HashMap<String, List<ScilabType>> newEnv = new HashMap<String, List<ScilabType>>();
 
-        HashMap<String, List<SciData>> newEnv = new HashMap<String, List<SciData>>();
-
-        if (results != null) {
-
-            for (TaskResult res : results) {
-                if (!(res.value() instanceof List)) {
-                    throw new InvalidParameterException(res.value().getClass());
+            if (results != null) {
+                if (results.length > 1) {
+                    throw new InvalidNumberOfParametersException(results.length);
                 }
-
-                for (SciData in : (List<SciData>) res.value()) {
-                    if (newEnv.containsKey(in.getName())) {
-                        List<SciData> ldata = newEnv.get(in.getName());
-                        ldata.add(in);
-                    } else {
-                        ArrayList<SciData> ldata = new ArrayList<SciData>();
-                        ldata.add(in);
-                        newEnv.put(in.getName(), ldata);
+                if (results.length == 1) {
+                    TaskResult res = results[0];
+                    if (!(res.value() instanceof ScilabType)) {
+                        throw new InvalidParameterException(res.value().getClass());
                     }
 
-                    //Scilab.sendData(in);
+                    ScilabType in = (ScilabType) res.value();
+                    put("in", in);
                 }
+
             }
         }
 
-        for (Map.Entry<String, List<SciData>> entry : newEnv.entrySet()) {
-            List<SciData> ldata = entry.getValue();
-            int i = 1;
-            for (SciData in : ldata) {
-                in.setName(in.getName() + i);
-                i++;
-                Scilab.sendData(in);
-            }
-        }
         // Initialization, clearing up old variables :
-        if (paconfig.isDebug()) {
-            Scilab.Exec("errclear();clear;mode(3);lines(0);funcprot(0);");
-        } else {
-            Scilab.Exec("errclear();clear;mode(3);lines(0);funcprot(0);");
-        }
+        prepare();
+
+        initDS();
+
+        transferSource();
+
+        transferInputVariables();
+
+        //if (paconfig.isDebug()) {
+        //    exec("who");
+        //}
 
         if (functionsDefinition != null) {
             ok = executeFunctionDefinition();
@@ -292,8 +413,7 @@ public class AOScilabWorker implements Serializable, MatSciWorker {
                 System.out.println("[AOScilabWorker] End of inputscript execution");
             }
         }
-        if (!ok)
-            throw new IllegalStateException("Error executing inputscript");
+
         if (paconfig.isDebug()) {
             System.out.println("[AOScilabWorker] Executing mainscript");
         }
@@ -302,10 +422,10 @@ public class AOScilabWorker implements Serializable, MatSciWorker {
             System.out.println("[AOScilabWorker] End of mainscript execution " + (ok ? "ok" : "ko"));
         }
 
-        if (!ok)
-            throw new ScilabTaskException();
+        //if (!ok)
+        //    throw new ScilabTaskException();
 
-        return getResults(ok);
+        return getResults();
 
     }
 
@@ -315,19 +435,37 @@ public class AOScilabWorker implements Serializable, MatSciWorker {
      * @return true for synchronous call
      */
     public boolean terminate() {
-        Scilab.Finish();
+        if (javasciv2) {
+            engine.close();
+            engine = null;
+        } else {
+            throw new UnsupportedOperationException("javasci v1 not supported");
+        }
         initialized = false;
         return true;
     }
 
+    private void prepare() {
+        exec("errclear();clear;");
+        if (paconfig.isDebug()) {
+            // To be improved
+            exec("mode(3);lines(0);funcprot(0);");
+        } else {
+            exec("lines(0);funcprot(0);");
+        }
+    }
+
     public boolean cleanup() {
-        // Pack not yet supported on scilab
+        if (engine != null) {
+            exec("errclear();clear;");
+            exec("cd('" + tmpDir + "');");
+        }
         return true;
     }
 
     /**
      * Loads in Scilab the user-functions definitions
-     * 
+     *
      * @return success
      * @throws IOException
      */
@@ -346,12 +484,13 @@ public class AOScilabWorker implements Serializable, MatSciWorker {
         if (paconfig.isDebug()) {
             System.out.println("[AOScilabWorker] Executing function definition : " +
                 functionFile.getAbsolutePath());
-            Scilab.Exec("exec('" + functionFile.getAbsolutePath() + "')");
+            exec("exec('" + functionFile.getAbsolutePath() + "')");
 
         } else {
-            Scilab.Exec("exec('" + functionFile.getAbsolutePath() + "');");
+            exec("exec('" + functionFile.getAbsolutePath() + "');");
         }
-        int errorcode = Scilab.GetLastErrorCode();
+        int errorcode = lasterrorcode();
+
         if ((errorcode != 0) && (errorcode != 2)) {
             writeError();
             return false;
@@ -365,31 +504,21 @@ public class AOScilabWorker implements Serializable, MatSciWorker {
      *
      * @return list of Scilab data
      */
-    protected ArrayList<SciData> getResults(boolean error) {
-
+    protected ScilabType getResults() throws Exception {
+        ScilabType out;
         if (paconfig.isDebug()) {
             System.out.println("[AOScilabWorker] Receiving outputs");
         }
-        ArrayList<SciData> out = new ArrayList<SciData>();
-        int i = 0;
-        for (String var : outputVars) {
-            if (paconfig.isDebug()) {
-                System.out.println("[AOScilabWorker] Receiving output :" + var);
-            }
-            if (Scilab.ExistVar(var)) {
-                SciData output = Scilab.receiveDataByName(var);
-                if (output == null) {
-                    throw new IllegalStateException("Variable " + var +
-                        " existing in scilab engine but couldn't be retrieved (this is a known bug in Scilab 5.2)");
-                }
-                if (paconfig.isDebug()) {
-                    System.out.println(output);
-                }
-                out.add(output);
-            } else {
-                throw new IllegalStateException("Variable " + var + " not found");
+        if (paconfig.isTransferVariables()) {
+            out = transferOutputVariable();
+        } else {
+            try {
+                out = get("out");
+            } catch (Exception e) {
+                throw new ScilabTaskException();
             }
         }
+
         return out;
 
     }
@@ -417,8 +546,8 @@ public class AOScilabWorker implements Serializable, MatSciWorker {
                         if (paconfig.isDebug()) {
                             System.out.println("[AOScilabWorker] Executing : " + modifiedLine);
                         }
-                        Scilab.Exec(modifiedLine);
-                        int errorcode = Scilab.GetLastErrorCode();
+                        exec(modifiedLine);
+                        int errorcode = lasterrorcode();
                         if ((errorcode != 0) && (errorcode != 2)) {
                             writeError();
                             return false;
@@ -427,8 +556,8 @@ public class AOScilabWorker implements Serializable, MatSciWorker {
                         if (paconfig.isDebug()) {
                             System.out.println("[AOScilabWorker] Executing : " + line);
                         }
-                        Scilab.Exec(line);
-                        int errorcode = Scilab.GetLastErrorCode();
+                        exec(line);
+                        int errorcode = lasterrorcode();
                         if ((errorcode != 0) && (errorcode != 2)) {
                             writeError();
                             return false;
@@ -439,8 +568,8 @@ public class AOScilabWorker implements Serializable, MatSciWorker {
                 if (paconfig.isDebug()) {
                     System.out.println("[AOScilabWorker] Executing single-line: " + script);
                 }
-                Scilab.Exec(script);
-                int errorcode = Scilab.GetLastErrorCode();
+                exec(script);
+                int errorcode = lasterrorcode();
                 if ((errorcode != 0) && (errorcode != 2)) {
                     writeError();
                     return false;
@@ -463,29 +592,64 @@ public class AOScilabWorker implements Serializable, MatSciWorker {
             out.write(script);
             out.close();
             if (paconfig.isDebug()) {
-                Scilab.Exec("exec('" + temp.getAbsolutePath() + "',3);");
+                exec("exec('" + temp.getAbsolutePath() + "',3);");
             } else {
-                Scilab.Exec("exec('" + temp.getAbsolutePath() + "',0);");
+                exec("exec('" + temp.getAbsolutePath() + "',0);");
             }
-            int errorcode = Scilab.GetLastErrorCode();
+            int errorcode = lasterrorcode();
             if ((errorcode != 0) && (errorcode != 2)) {
-                Scilab.Exec("disp(lasterror())");
-                Scilab.Exec("errclear();");
+                exec("disp(lasterror())");
+                exec("errclear();");
                 return false;
             }
         }
         return true;
     }
 
+    private void put(String name, ScilabType var) throws Exception {
+        if (javasciv2) {
+            engine.put(name, var);
+        } else {
+            throw new UnsupportedOperationException("javasci v1 not supported");
+        }
+    }
+
+    private ScilabType get(String name) throws Exception {
+        if (javasciv2) {
+            return engine.get(name);
+        } else {
+            throw new UnsupportedOperationException("javasci v1 not supported");
+        }
+    }
+
+    private void exec(String code) {
+        if (javasciv2) {
+
+            engine.exec(code);
+        } else {
+            throw new UnsupportedOperationException("javasci v1 not supported");
+        }
+    }
+
+    private int lasterrorcode() {
+        if (javasciv2) {
+            return engine.getLastErrorCode();
+        } else {
+            throw new UnsupportedOperationException("javasci v1 not supported");
+        }
+    }
+
     /**
      * Ouput in scilab the error occured
      */
     private void writeError() {
-
-        Scilab
-                .Exec("[str2,n2,line2,func2]=lasterror(%t);printf('!-- error %i\n%s\n at line %i of function %s\n',n2,str2,line2,func2)");
-
-        Scilab.Exec("errclear();");
+        if (javasciv2) {
+            engine
+                    .exec("[str2,n2,line2,func2]=lasterror(%t);printf('!-- error %i\n%s\n at line %i of function %s\n',n2,str2,line2,func2)");
+            engine.exec("errclear();");
+        } else {
+            throw new UnsupportedOperationException("javasci v1 not supported");
+        }
     }
 
     /**

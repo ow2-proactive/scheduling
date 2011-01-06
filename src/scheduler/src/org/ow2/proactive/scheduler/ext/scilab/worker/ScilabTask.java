@@ -67,11 +67,6 @@ public class ScilabTask<W extends AOScilabWorker> extends
     final private static String[] DEFAULT_OUT_VARIABLE_SET = { "out" };
 
     /**
-     * This hostname, for debugging purpose
-     */
-    protected String host;
-
-    /**
      * the lines of inputScript
      */
     protected String inputScript = null;
@@ -93,11 +88,6 @@ public class ScilabTask<W extends AOScilabWorker> extends
     protected ArrayList<String> scriptLines = null;
 
     /**
-     * Node name where this task is being executed
-     */
-    protected String nodeName = null;
-
-    /**
      * the array of output variable names
      */
     protected String[] out_set = DEFAULT_OUT_VARIABLE_SET;
@@ -105,12 +95,7 @@ public class ScilabTask<W extends AOScilabWorker> extends
     /**
      * holds the Scilab environment information
      */
-    protected static ScilabEngineConfig scilabConfig = null;
-
-    /**
-     * the OS where this JVM is running
-     */
-    private static OperatingSystem os = OperatingSystem.getOperatingSystem();
+    protected static ScilabEngineConfig scilabEngineConfig = null;
 
     /**
      * ProActive No Arg Constructor
@@ -120,7 +105,7 @@ public class ScilabTask<W extends AOScilabWorker> extends
 
     @Override
     protected MatSciEngineConfig initEngineConfig(MatSciJVMInfo info) throws Throwable {
-        if (scilabConfig == null) {
+        if (scilabEngineConfig == null) {
             // First we try to find SCILAB
             if (paconfig.isDebug()) {
                 System.out.println("[" + new java.util.Date() + " " + host +
@@ -128,25 +113,27 @@ public class ScilabTask<W extends AOScilabWorker> extends
                 outDebug.println("[" + new java.util.Date() + " " + host +
                     " ScilabTask] launching script to find Scilab");
             }
-            scilabConfig = (ScilabEngineConfig) ScilabFinder.getInstance().findMatSci(
+            scilabEngineConfig = (ScilabEngineConfig) ScilabFinder.getInstance().findMatSci(
                     paconfig.getVersionPref(), paconfig.getVersionRej(), paconfig.getVersionMin(),
                     paconfig.getVersionMax());
 
             if (paconfig.isDebug()) {
-                System.out.println("[" + new java.util.Date() + " " + host + " ScilabTask] " + scilabConfig);
-                outDebug.println("[" + new java.util.Date() + " " + host + " ScilabTask] " + scilabConfig);
+                System.out.println("[" + new java.util.Date() + " " + host + " ScilabTask] " +
+                    scilabEngineConfig);
+                outDebug.println("[" + new java.util.Date() + " " + host + " ScilabTask] " +
+                    scilabEngineConfig);
             }
-            if (scilabConfig == null)
+            if (scilabEngineConfig == null)
                 throw new IllegalStateException("No valid Scilab configuration found, aborting...");
 
         } else {
-            ScilabEngineConfig conf = ScilabEngineConfig.getCurrentConfiguration();
+            ScilabEngineConfig conf = (ScilabEngineConfig) ScilabEngineConfig.getCurrentConfiguration();
             if (conf != null) {
-                scilabConfig = conf;
+                scilabEngineConfig = conf;
             }
         }
-        info.setConfig(scilabConfig);
-        return scilabConfig;
+        info.setConfig(scilabEngineConfig);
+        return scilabEngineConfig;
     }
 
     protected MatSciTaskServerConfig getTaskServerConfig() {
@@ -180,6 +167,9 @@ public class ScilabTask<W extends AOScilabWorker> extends
      */
     @Override
     public void init(Map<String, Serializable> args) throws Exception {
+        // Retrieving task parameters
+        super.init(args);
+
         Object s = args.get("script");
 
         if (s != null) {
@@ -256,7 +246,7 @@ public class ScilabTask<W extends AOScilabWorker> extends
 
     protected void initWorker(W worker) throws Throwable {
         worker.init(inputScript, functionName, functionsDefinition, scriptLines, out_set, paconfig,
-                taskconfig, scilabConfig);
+                taskconfig, scilabEngineConfig);
     }
 
     public void initProcess(DummyJVMProcess javaCommandBuilder, Map<String, String> env) throws Throwable {
@@ -280,15 +270,24 @@ public class ScilabTask<W extends AOScilabWorker> extends
         env.put("SCI_DISABLE_TK", "1");
 
         // Classpath specific
-        String classpath = addScilabJarsToClassPath(javaCommandBuilder.getClasspath());
-        javaCommandBuilder.setClasspath(classpath);
+        //String classpath = addScilabJarsToClassPath(javaCommandBuilder.getClasspath());
+        //javaCommandBuilder.setClasspath(classpath);
 
         // We add the Scilab specific env variables
-        env.put("SCI", scilabConfig.getScilabSCIDir());
-        env.put("SCIDIR", scilabConfig.getScilabSCIDir());
+        if (scilabEngineConfig.getScilabSCIDir() != null && scilabEngineConfig.getScilabSCIDir().length() > 0) {
+            env.put("SCI", scilabEngineConfig.getScilabHome() + os.fileSeparator() +
+                scilabEngineConfig.getScilabSCIDir());
+        } else {
+            env.put("SCI", scilabEngineConfig.getScilabHome());
+        }
+        //env.put("SCIDIR", scilabEngineConfig.getScilabSCIDir());
 
         String options = javaCommandBuilder.getJvmOptions();
-        options += " -Djava.library.path=\"" + addScilabToPath(null) + "\"";
+        if (os.equals(OperatingSystem.windows)) {
+            options += " -Djava.library.path=\"" + addScilabToPath(null) + "\"";
+        } else {
+            options += " -Djava.library.path=" + addScilabToPath(null);
+        }
         javaCommandBuilder.setJvmOptions(options);
     }
 
@@ -308,8 +307,8 @@ public class ScilabTask<W extends AOScilabWorker> extends
             newPath = os.pathSeparator() + classpath;
         }
 
-        newPath = (scilabConfig.getScilabSCIDir() + os.fileSeparator() + "modules" + os.fileSeparator() +
-            "jvm" + os.fileSeparator() + "jar" + os.fileSeparator() + "org.scilab.modules.jvm.jar") +
+        newPath = (scilabEngineConfig.getScilabSCIDir() + os.fileSeparator() + "modules" +
+            os.fileSeparator() + "jvm" + os.fileSeparator() + "jar" + os.fileSeparator() + "org.scilab.modules.jvm.jar") +
             newPath;
 
         return newPath;
@@ -330,11 +329,13 @@ public class ScilabTask<W extends AOScilabWorker> extends
             newPath = os.pathSeparator() + path;
         }
 
-        newPath = (scilabConfig.getScilabHome() + os.fileSeparator() + scilabConfig.getScilabLibDir()) +
+        newPath = (scilabEngineConfig.getScilabHome() + os.fileSeparator() + scilabEngineConfig
+                .getScilabLibDir()) +
             newPath;
 
-        if (scilabConfig.getThirdPartyDir() != null) {
-            newPath = (scilabConfig.getScilabHome() + os.fileSeparator() + scilabConfig.getThirdPartyDir()) +
+        if (scilabEngineConfig.getThirdPartyDir() != null) {
+            newPath = (scilabEngineConfig.getScilabHome() + os.fileSeparator() + scilabEngineConfig
+                    .getThirdPartyDir()) +
                 os.pathSeparator() + newPath;
         }
 

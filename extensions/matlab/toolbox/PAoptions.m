@@ -80,15 +80,6 @@
 %               Priority used by default for jobs submitted with PAsolve,
 %               default to 'Normal'
 %
-%   ZipInputFiles       true | false | 'on' | 'off'  
-%               Wether the input files of a job should be zipped first
-%               before being sent to the scheduler (default to 'off')
-%
-%   ZipOutputFiles       true | false | 'on' | 'off'  
-%               Wether the output files of a job should be zipped first
-%               before being sent to the scheduler (default to 'off')
-%
-%
 %   CustomScript
 %               url or path of a user-defined selection script used in
 %               addition to (before) FindMatlabScript and MatlabReservationScript
@@ -260,7 +251,7 @@ inputs(j).check = @ischar;
 inputs(j).trans = scripttrans;
 j=j+1;
 inputs(j).name = 'FindMatlabScript';
-inputs(j).default = ['$SCHEDULER$' filesep 'extensions' filesep 'matlab' filesep 'script' filesep 'automatic_matlab_finder.rb' ];
+inputs(j).default = ['$SCHEDULER$' filesep 'extensions' filesep 'matlab' filesep 'script' filesep 'file_matlab_finder.rb' ];
 inputs(j).check = @ischar;
 inputs(j).trans = scripttrans;
 j=j+1;
@@ -301,10 +292,12 @@ inputs(j).trans = conftrans;
 
 
 userdir = char(java.lang.System.getProperty('user.home'));
-if exist([userdir filesep '.matlab' filesep 'PAoptions.ini'], 'file');    
-    fid = fopen([userdir filesep '.matlab' filesep 'PAoptions.ini'], 'r'); 
+optionpath = [userdir filesep '.matlab' filesep 'PAoptions.ini'];
+if exist(optionpath, 'file');    
+    fid = fopen(optionpath, 'r'); 
 else
-    fid = fopen([scheduling_dir filesep 'extensions' filesep 'matlab' filesep 'config', filesep, 'toolbox', filesep, 'PAoptions.ini'], 'r');
+    optionpath = [scheduling_dir filesep 'extensions' filesep 'matlab' filesep 'config', filesep, 'toolbox', filesep, 'PAoptions.ini'];
+    fid = fopen(optionpath, 'r');
 end
 try
 C = textscan(fid, '%s = %[^\n]', 'CommentStyle', '%');
@@ -314,7 +307,7 @@ for i=1:length(C{1})
             chk = inputs(j).check;            
             tf = chk(C{2}{i});
             if ~tf
-                error(['Parse error when loading option file ' pathstr filesep 'PAoptions.ini, option ' C{1}{i} ' doesn''t satisfy check ' func2str(chk) ]);
+                error(['Parse error when loading option file ' optionpath ', option ' C{1}{i} ' doesn''t satisfy check ' func2str(chk) ]);
             end
             trans = inputs(j).trans;
             inputs(j).default = trans(C{2}{i});

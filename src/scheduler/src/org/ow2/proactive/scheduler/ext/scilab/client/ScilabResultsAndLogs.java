@@ -36,10 +36,9 @@
  */
 package org.ow2.proactive.scheduler.ext.scilab.client;
 
-import javasci.SciData;
-import javasci.SciStringMatrix;
 import org.ow2.proactive.scheduler.ext.matsci.client.MatSciTaskStatus;
 import org.ow2.proactive.scheduler.ext.matsci.client.ResultsAndLogs;
+import org.scilab.modules.types.ScilabType;
 
 
 /**
@@ -47,20 +46,14 @@ import org.ow2.proactive.scheduler.ext.matsci.client.ResultsAndLogs;
  *
  * @author The ProActive Team
  */
-public class ScilabResultsAndLogs extends ResultsAndLogs<SciData> {
+public class ScilabResultsAndLogs extends ResultsAndLogs<ScilabType> {
 
-    public ScilabResultsAndLogs(SciData result, String logs, Throwable exception, MatSciTaskStatus status) {
-        super(result, logs, exception, status);
+    public ScilabResultsAndLogs() {
+        super();
     }
 
-    public String getResultAsString() {
-        if (result == null)
-            return null;
-        if (((SciStringMatrix) result).getNbRow() > 0) {
-            return ((SciStringMatrix) result).getData()[0];
-        } else {
-            return "output = %f";
-        }
+    public ScilabResultsAndLogs(ScilabType result, String logs, Throwable exception, MatSciTaskStatus status) {
+        super(result, logs, exception, status);
     }
 
 }

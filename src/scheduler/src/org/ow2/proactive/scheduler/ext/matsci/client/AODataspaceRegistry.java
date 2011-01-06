@@ -59,6 +59,8 @@ public class AODataspaceRegistry {
     private String inbasename;
     private String outbasename;
 
+    private File logFile;
+
     private boolean debug;
 
     private PrintStream outDebug;
@@ -71,10 +73,9 @@ public class AODataspaceRegistry {
         this.inbasename = inbasename;
         this.outbasename = outbasename;
         this.debug = debug;
-        this.outDebug = outDebug;
 
         String tmpPath = System.getProperty("java.io.tmpdir");
-        File logFile = new File(tmpPath, "" + this.getClass().getSimpleName() + ".log");
+        logFile = new File(tmpPath, "" + this.getClass().getSimpleName() + ".log");
         if (!logFile.exists()) {
 
             try {
@@ -84,18 +85,17 @@ public class AODataspaceRegistry {
             }
 
         }
+    }
 
+    public Pair<String, String> createDataSpace(String path) {
         try {
             outDebug = new PrintStream(new BufferedOutputStream(new FileOutputStream(logFile, true)));
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
-    }
 
-    public Pair<String, String> createDataSpace(String path) {
-        if (debug) {
-            outDebug.println("Looking up or creating dataspaces for :" + path);
-        }
+        outDebug.println("Looking up or creating dataspaces for :" + path);
+
         File jcurr = new File(path);
         String jpath = null;
         try {
@@ -108,17 +108,17 @@ public class AODataspaceRegistry {
         FileSystemServerDeployer indepl = null;
         FileSystemServerDeployer outdepl = null;
         if (dataspacesin.containsKey(dirhash)) {
-            if (debug) {
-                outDebug.println("Reusing existing dataspaces");
-            }
+
+            outDebug.println("Reusing existing dataspaces");
+
             indepl = dataspacesin.get(dirhash);
             outdepl = dataspacesout.get(dirhash);
 
         } else {
             try {
-                if (debug) {
-                    outDebug.println("Creating new dataspaces");
-                }
+
+                outDebug.println("Creating new dataspaces");
+
                 indepl = new FileSystemServerDeployer(this.inbasename + "_" + dirhash, jpath, false, true);
                 outdepl = new FileSystemServerDeployer(this.outbasename + "_" + dirhash, jpath, false, true);
                 dataspacesin.put(dirhash, indepl);
@@ -128,6 +128,11 @@ public class AODataspaceRegistry {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        }
+        try {
+            outDebug.close();
+        } catch (Exception e) {
+
         }
         return new Pair<String, String>(indepl.getVFSRootURL(), outdepl.getVFSRootURL());
     }

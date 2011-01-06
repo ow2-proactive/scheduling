@@ -66,7 +66,7 @@ public class PASolveMatSciGlobalConfig implements Serializable {
     /**
      * Versions forbidden to use
      */
-    private HashSet<String> versionRej = null;
+    private HashSet<String> versionRej = new HashSet<String>();
 
     /**
      * Minimum version to use
@@ -105,8 +105,8 @@ public class PASolveMatSciGlobalConfig implements Serializable {
     private String sourceZipFileName = null;
 
     /**
-    * hash of zip file
-    */
+     * hash of zip file
+     */
     private String sourceZipHash = null;
 
     /**
@@ -122,6 +122,8 @@ public class PASolveMatSciGlobalConfig implements Serializable {
     private String envMatFileName = null;
 
     private boolean zipEnvFile;
+
+    private boolean zipSourceFiles;
 
     private String inputSpaceName = null;
 
@@ -227,15 +229,18 @@ public class PASolveMatSciGlobalConfig implements Serializable {
     }
 
     public void setVersionRejAsString(String vrej) {
-        if (vrej != null) {
+        HashSet<String> vrejSet = new HashSet<String>();
+        if ((vrej != null) && (vrej.length() > 0)) {
             vrej = vrej.trim();
             String[] vRejArr = vrej.split("[ ,;]+");
-            HashSet<String> vrejSet = new HashSet<String>();
+
             for (String rej : vRejArr) {
-                vrejSet.add(rej);
+                if (rej != null) {
+                    vrejSet.add(rej);
+                }
             }
-            versionRej = vrejSet;
         }
+        versionRej = vrejSet;
     }
 
     public void setVersionRej(HashSet<String> versionRej) {
@@ -320,6 +325,14 @@ public class PASolveMatSciGlobalConfig implements Serializable {
 
     public void setTransferSource(boolean transferSource) {
         this.transferSource = transferSource;
+    }
+
+    public boolean isZipSourceFiles() {
+        return zipSourceFiles;
+    }
+
+    public void setZipSourceFiles(boolean zipSourceFiles) {
+        this.zipSourceFiles = zipSourceFiles;
     }
 
     public boolean isTransferEnv() {

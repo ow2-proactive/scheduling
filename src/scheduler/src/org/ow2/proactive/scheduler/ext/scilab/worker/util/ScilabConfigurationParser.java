@@ -39,15 +39,19 @@ package org.ow2.proactive.scheduler.ext.scilab.worker.util;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.input.SAXBuilder;
+import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
+import org.objectweb.proactive.utils.OperatingSystem;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.ext.matsci.worker.util.MatSciConfigurationParser;
 import org.ow2.proactive.scheduler.ext.matsci.worker.util.MatSciEngineConfig;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.regex.Matcher;
 
 
 /**
@@ -59,6 +63,8 @@ public class ScilabConfigurationParser extends MatSciConfigurationParser {
 
     static final String configPath = "extensions/scilab/config/worker/ScilabConfiguration.xml";
 
+    protected static OperatingSystem os = OperatingSystem.getOperatingSystem();
+
     static Document document;
     static Element racine;
 
@@ -66,6 +72,8 @@ public class ScilabConfigurationParser extends MatSciConfigurationParser {
         File configFile;
         ArrayList<MatSciEngineConfig> configs = new ArrayList<MatSciEngineConfig>();
 
+        String homestr = ProActiveRuntimeImpl.getProActiveRuntime().getProActiveHome();
+        File homesched = new File(homestr);
         if (PASchedulerProperties.SCILAB_WORKER_CONFIGURATION_FILE != null &&
             PASchedulerProperties.SCILAB_WORKER_CONFIGURATION_FILE.getValueAsString() != "") {
             configFile = new File(PASchedulerProperties.SCILAB_WORKER_CONFIGURATION_FILE.getValueAsString());
@@ -73,10 +81,14 @@ public class ScilabConfigurationParser extends MatSciConfigurationParser {
             configFile = new File(System.getProperty(PASchedulerProperties.SCILAB_WORKER_CONFIGURATION_FILE
                     .getKey()));
         } else {
-            File home = findSchedulerHome();
-            URI configFileURI = home.toURI().resolve(configPath);
+            URI configFileURI = homesched.toURI().resolve(configPath);
             configFile = new File(configFileURI);
         }
+        if (!configFile.exists() || !configFile.canRead()) {
+            throw new FileNotFoundException(configFile + " not found, aborting...");
+        }
+
+        System.out.println("Parsing configuration file :" + configFile);
 
         SAXBuilder sxb = new SAXBuilder();
         Document document = sxb.build(configFile);
@@ -84,20 +96,74 @@ public class ScilabConfigurationParser extends MatSciConfigurationParser {
 
         List listInstallations = racine.getChildren("installation");
 
+        boolean hasManyConfigs = (listInstallations.size() > 1);
+
         //On crée un Iterator sur notre liste
         Iterator i = listInstallations.iterator();
         while (i.hasNext()) {
 
             Element courant = (Element) i.next();
             String version = courant.getChild("version").getText();
+            if ((version == null) || (version.trim().length() == 0)) {
+                throw new IllegalArgumentException("In " + configFile + ", version element must not be empty");
+            }
+            version = version.trim();
+            if (!version.matches("^([1-9][\\d]*\\.)*[\\d]+$")) {
+                throw new IllegalArgumentException("In " + configFile +
+                    ", version element must match XX.xx.xx, received : " + version);
+            }
             String home = courant.getChild("home").getText();
-            String libdir = courant.getChild("libdir").getText();
-            String tpdir = courant.getChild("tpdir").getText();
-            String scidir = courant.getChild("scidir").getText();
-            String bindir = courant.getChild("bindir").getText();
-            String command = courant.getChild("command").getText();
+            if ((home == null) || (home.trim().length() == 0)) {
+                throw new IllegalArgumentException("In " + configFile + ", home element must not be empty");
+            }
 
-            configs.add(new ScilabEngineConfig(home, version, libdir, scidir, tpdir, bindir, command));
+            home = home.trim().replaceAll("/", Matcher.quoteReplacement("" + os.fileSeparator()));
+            File filehome = new File(home);
+            checkDir(filehome, configFile);
+
+            String libdir = courant.getChild("libdir").getText();
+            if ((libdir == null) || (libdir.trim().length() == 0)) {
+                throw new IllegalArgumentException("In " + configFile + ", libdir element must not be empty");
+            }
+            libdir = libdir.trim().replaceAll("/", Matcher.quoteReplacement("" + os.fileSeparator()));
+            File filelib = new File(filehome, libdir);
+            checkDir(filelib, configFile);
+
+            Element sciel = courant.getChild("scidir");
+            String scidir = null;
+            if (sciel != null) {
+                scidir = sciel.getText();
+                if (scidir.length() > 0) {
+                    scidir = scidir.trim().replaceAll("/", Matcher.quoteReplacement("" + os.fileSeparator()));
+                    File filesci = new File(filehome, scidir);
+                    checkDir(filesci, configFile);
+                }
+            }
+
+            // extdir can be null
+            String tpdir = null;
+            Element extel = courant.getChild("tpdir");
+            if (extel != null) {
+                tpdir = extel.getText();
+            }
+
+            String bindir = courant.getChild("bindir").getText();
+            if ((bindir == null) || (bindir.trim().length() == 0)) {
+                throw new IllegalArgumentException("In " + configFile + ", bindir element must not be empty");
+            }
+            bindir = bindir.trim().replaceAll("/", Matcher.quoteReplacement("" + os.fileSeparator()));
+            File filebin = new File(filehome, bindir.trim());
+            checkDir(filebin, configFile);
+
+            String command = courant.getChild("command").getText();
+            if ((command == null) || (command.trim().length() == 0)) {
+                throw new IllegalArgumentException("In " + configFile + ", command element must not be empty");
+            }
+            command = command.trim();
+            File filecommand = new File(filebin, command);
+            checkFile(filecommand, configFile, true);
+
+            configs.add(new ScilabEngineConfig(home, version, libdir, scidir, tpdir, bindir, command, false));
         }
 
         return configs;

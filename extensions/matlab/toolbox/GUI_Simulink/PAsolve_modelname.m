@@ -1,9 +1,7 @@
 function res = PAsolve_modelname(params)
 bdclose all
 warning off all
-% Hack for SCHEDULING-352, replace \\ sequences by \
-wrongpwd = params.pwd_dir;
-rightpwd = regexprep(wrongpwd, '\\\\', '\');
+rightpwd = params.pwd_dir; 
 cd(rightpwd)
 %pwd
 set_param(0,'CharacterEncoding', 'ISO-8859-1');
@@ -32,4 +30,5 @@ close_system(modelName);
 
 sim(params.modelName,[],options);
     
+bdclose all
 res = 1;

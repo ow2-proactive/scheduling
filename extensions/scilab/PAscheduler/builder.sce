@@ -1,25 +1,18 @@
 mode(-1);
 lines(0);
 try
- getversion('scilab');
+    getversion('scilab');
 catch
- error(gettext('Scilab 5.0 or more is required.'));
- end;
- // ====================================================================
- if ~with_module('development_tools') then
-   error(msprintf(gettext('%s module not installed."),'development_tools'));
- end
- // ====================================================================
- TOOLBOX_NAME = 'toolbox_pascheduler';
- TOOLBOX_TITLE = 'ProActive Scheduler Interface';
- // ====================================================================
- toolbox_dir = get_absolute_file_path('builder.sce');
+    error(gettext('Scilab 5.0 or more is required.'));
+end;
+// ====================================================================
+if ~with_module('development_tools') then
+    error(msprintf(gettext('%s module not installed."),'development_tools'));
+end
+here=get_absolute_file_path('builder.sce');
+macros=here+'macros';
 
- tbx_builder_macros(toolbox_dir);
- tbx_builder_src(toolbox_dir);
- tbx_builder_gateway(toolbox_dir);
- tbx_builder_help(toolbox_dir);
- tbx_build_loader(TOOLBOX_NAME, toolbox_dir);
 
- clear toolbox_dir TOOLBOX_NAME TOOLBOX_TITLE;
- // ====================================================================
+//ilib_build('importjava',sci_gtw,[cpp c jni gateway],[],'','-ljvm',include);
+
+genlib('toolbox_pascheduler',macros);

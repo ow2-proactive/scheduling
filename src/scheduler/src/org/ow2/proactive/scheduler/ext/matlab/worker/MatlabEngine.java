@@ -251,7 +251,11 @@ public class MatlabEngine {
     }
 
     private static void restart() throws IllegalActionException {
-        eng = null;
+        try {
+            close();
+        } catch (Exception e) {
+
+        }
         init();
     }
 
