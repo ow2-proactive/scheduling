@@ -70,6 +70,7 @@ import org.ow2.proactive.scheduler.common.policy.Policy;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
 import org.ow2.proactive.scheduler.ext.filessplitmerge.logging.LoggerManager;
+import org.ow2.proactive.utils.console.MBeanInfoViewer;
 
 
 /**
@@ -80,6 +81,7 @@ import org.ow2.proactive.scheduler.ext.filessplitmerge.logging.LoggerManager;
 public class SchedulerProxyUserInterface implements Scheduler, Serializable {
 
     protected Scheduler uischeduler;
+    protected MBeanInfoViewer mbeaninfoviewer;
 
     public SchedulerProxyUserInterface() {
 
@@ -96,6 +98,7 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
     public void init(String url, Credentials credentials) throws SchedulerException, LoginException {
         SchedulerAuthenticationInterface auth = SchedulerConnection.join(url);
         this.uischeduler = auth.login(credentials);
+        mbeaninfoviewer = new MBeanInfoViewer(auth, null, credentials);
     }
 
     /**
@@ -117,6 +120,7 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
         try {
             Credentials cred = Credentials.createCredentials(new CredData(user, pwd), pubKey);
             this.uischeduler = auth.login(cred);
+            mbeaninfoviewer = new MBeanInfoViewer(auth, user, cred);
         } catch (KeyException e) {
             throw new InternalSchedulerException(e);
         }
@@ -386,4 +390,19 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
         return uischeduler.getState(myJobsOnly);
     }
 
+    /**
+     *
+     * Return the informations about the Scheduler MBean as a formatted string.
+     * The first time this method is called it connects to the JMX connector server.
+     * The default behavior will try to establish a connection using RMI protocol, if it fails
+     * the RO (Remote Object) protocol is used.
+     *
+     * @param mbeanName the object name of the MBean
+     * @return the informations about the MBean as a formatted string
+     *
+     * @see org.ow2.proactive.utils.console.MBeanInfoViewer#getInfo(String)
+     */
+    public String getInfo(String mbeanName) {
+        return mbeaninfoviewer.getInfo(mbeanName);
+    }
 }
