@@ -180,6 +180,49 @@ public class SchedulerStateRest {
     }
 
     /**
+     * Returns a map containing one entry with the revision id as key and the 
+     * list of UserJobInfo as value.
+     * each jobs is described using
+     *   - its id
+     *   - its owner
+     *   - the JobInfo class
+     * @param sessionId a valid session id
+     * @return a map containing one entry with the revision id as key and the 
+     * list of UserJobInfo as value.
+     */
+    @GET
+    @OPTIONS
+    @Path("revisionjobsinfo")
+    @Produces( { "application/json", "application/xml" })
+    public Map<AtomicLong,List<UserJobInfo>>  revisionAndjobsinfo(@HeaderParam("sessionid")
+    String sessionId) throws PermissionException, NotConnectedException {
+        Scheduler s = checkAccess(sessionId,"revisionjobsinfo");
+        List<JobState> jobs = new ArrayList<JobState>();
+        
+        Map<AtomicLong, SchedulerState> stateAndrevision = SchedulerStateCaching.getRevisionAndSchedulerState();
+        
+        Entry<AtomicLong, SchedulerState> entry = stateAndrevision.entrySet().iterator().next();
+        
+        SchedulerState state = entry.getValue();
+//        s.getState();
+        jobs.addAll(state.getPendingJobs());
+        jobs.addAll(state.getRunningJobs());
+        jobs.addAll(state.getFinishedJobs());
+
+        List<UserJobInfo> jobInfoList = new ArrayList<UserJobInfo>();
+        for (JobState j : jobs) {
+            jobInfoList.add(new UserJobInfo(j.getId().value(), j.getOwner(), j.getJobInfo()));
+        }
+        
+        HashMap<AtomicLong, List<UserJobInfo>> map = new HashMap<AtomicLong,List<UserJobInfo>>();
+        map.put(entry.getKey(),jobInfoList);
+        return map ;
+       
+        
+    }
+    
+    
+    /**
      * Returns the state of the scheduler
      * @param sessionId a valid session id.
      * @return the scheduler state 
