@@ -172,6 +172,7 @@ public class ForkedJavaExecutable extends JavaExecutable {
             OSProcessBuilder ospb = createProcessAndPrepareCommand();
             createRegistrationListener();
             process = startProcess(ospb);
+            this.initStreamReaders();
             waitForRegistration(ospb);
 
             //create task launcher on new JVM node
@@ -179,7 +180,6 @@ public class ForkedJavaExecutable extends JavaExecutable {
             newJavaTaskLauncher = createForkedTaskLauncher();
 
             // redirect tasks logs to local stdout/err
-            this.initStreamReaders();
             newJavaTaskLauncher.activateLogs(new StdAppenderProvider());
 
             execInitializer.getJavaExecutableContainer().setNodes(execInitializer.getNodes());
@@ -243,8 +243,12 @@ public class ForkedJavaExecutable extends JavaExecutable {
     private void terminateStreamReaders() {
         try {
             // wait for log flush
-            tsout.join();
-            tserr.join();
+            if (tsout != null) {
+                tsout.join();
+            }
+            if (tserr != null) {
+                tserr.join();
+            }
         } catch (InterruptedException e) {
         } finally {
             tsout = null;
