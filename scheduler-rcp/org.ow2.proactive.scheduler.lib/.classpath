@@ -114,7 +114,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/ibis-connect-1.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/ibis-util-1.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/isorelax.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/javasci.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/javassist.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jaxrpc.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jcommon-1.0.6.jar"/>

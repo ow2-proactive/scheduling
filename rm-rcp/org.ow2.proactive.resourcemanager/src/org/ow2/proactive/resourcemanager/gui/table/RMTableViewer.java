@@ -45,6 +45,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.ow2.proactive.resourcemanager.gui.data.RMStore;
 import org.ow2.proactive.resourcemanager.gui.data.model.Node;
+import org.ow2.proactive.resourcemanager.gui.data.model.TreeLeafElement;
 
 
 public class RMTableViewer extends TableViewer {
@@ -89,6 +90,18 @@ public class RMTableViewer extends TableViewer {
                 add(node);
             }
         });
+    }
+
+    public void select(final Node tlf) {
+        int res = this.getTable().getSelectionIndex();
+        for (int i = 0; i < this.getTable().getItemCount(); i++) {
+            Object o = this.getElementAt(i);
+            if (o.equals(tlf)) {
+                res = i;
+                break;
+            }
+        }
+        this.getTable().setSelection(res);
     }
 
     public void tabFocused() {

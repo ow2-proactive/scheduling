@@ -392,6 +392,10 @@ public class CompactViewer implements ISelectionProvider {
         currentPosition = 0;
     }
 
+    public View getRootView() {
+        return this.rootView;
+    }
+
     public Composite getComposite() {
         return composite;
     }

@@ -37,6 +37,7 @@
 package org.ow2.proactive.resourcemanager.gui.compact;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.ow2.proactive.resourcemanager.gui.compact.view.NodeView;
@@ -44,9 +45,14 @@ import org.ow2.proactive.resourcemanager.gui.compact.view.View;
 import org.ow2.proactive.resourcemanager.gui.data.RMStore;
 import org.ow2.proactive.resourcemanager.gui.data.model.Node;
 import org.ow2.proactive.resourcemanager.gui.data.model.Selectable;
+import org.ow2.proactive.resourcemanager.gui.data.model.TreeLeafElement;
 import org.ow2.proactive.resourcemanager.gui.handlers.DescribeCommandHandler;
 import org.ow2.proactive.resourcemanager.gui.handlers.RemoveNodesHandler;
 import org.ow2.proactive.resourcemanager.gui.views.NodeInfoView;
+import org.ow2.proactive.resourcemanager.gui.views.ResourceExplorerView;
+import org.ow2.proactive.resourcemanager.gui.views.ResourcesCompactView;
+import org.ow2.proactive.resourcemanager.gui.views.ResourcesTabView;
+import org.ow2.proactive.resourcemanager.gui.views.ResourcesTopologyView;
 
 
 /**
@@ -81,19 +87,67 @@ public class SelectionManager {
     }
 
     /**
+     * selects a view given the actual node it contains
+     */
+    public void select(List<Selectable> tl) {
+        select(tl, true);
+    }
+
+    public void select(List<Selectable> tl, boolean propagate) {
+        this.deselectAll();
+        for (Selectable sel : tl) {
+            TreeLeafElement elt = null;
+            if (TreeLeafElement.class.isAssignableFrom(sel.getClass())) {
+                elt = (TreeLeafElement) sel;
+            } else {
+                continue;
+            }
+            for (View nv : ResourcesCompactView.getCompactViewer().getRootView().getAllViews()) {
+                if (elt.equals(nv.getElement())) {
+                    select(nv, false, propagate);
+                    break;
+                }
+            }
+        }
+    }
+
+    /**
      * Selects view and its children.
      */
     public void select(View view) {
+        select(view, false, true);
+    }
+
+    private void select(View view, boolean rec, boolean propagate) {
         if (!selected.contains(view)) {
             view.setSelected(true);
             selected.add(view);
             for (View v : view.getChilds()) {
-                select(v);
+                select(v, true, propagate);
             }
 
             if (view.getElement() != null) {
                 if (view.getElement() instanceof Node) {
-                    NodeInfoView.setNode((Node) view.getElement());
+                    Node n = (Node) view.getElement();
+                    NodeInfoView.setNode(n);
+                    if (propagate && ResourcesTabView.getTabViewer() != null) {
+                        ResourcesTabView.getTabViewer().select(n);
+                    }
+                    if (propagate && !rec && ResourcesTopologyView.getTopologyViewer() != null) {
+                        ResourcesTopologyView.getTopologyViewer().setSelection(Collections.singletonList(n));
+                    }
+                } else if (propagate && !rec && ResourcesTopologyView.getTopologyViewer() != null) {
+                    List<NodeView> all = view.getAllNodeViews();
+                    if (all.size() > 0) {
+                        Node n = (Node) all.get(0).getElement();
+                        ResourcesTopologyView.getTopologyViewer().setSelection(Collections.singletonList(n));
+                    }
+                }
+
+                if (propagate && ResourceExplorerView.getTreeViewer() != null) {
+                    if (!rec) {
+                        ResourceExplorerView.getTreeViewer().select(view.getElement());
+                    }
                 }
             }
         }

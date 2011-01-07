@@ -37,6 +37,7 @@
 package org.ow2.proactive.resourcemanager.gui.tree;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -50,18 +51,23 @@ import org.ow2.proactive.resourcemanager.gui.data.model.TreeParentElement;
 import org.ow2.proactive.resourcemanager.gui.handlers.DescribeCommandHandler;
 import org.ow2.proactive.resourcemanager.gui.handlers.RemoveNodesHandler;
 import org.ow2.proactive.resourcemanager.gui.views.NodeInfoView;
+import org.ow2.proactive.resourcemanager.gui.views.ResourcesCompactView;
+import org.ow2.proactive.resourcemanager.gui.views.ResourcesTabView;
 
 
 public class TreeSelectionListener implements ISelectionChangedListener {
 
     public void selectionChanged(SelectionChangedEvent event) {
         ArrayList<Selectable> selectionList = new ArrayList<Selectable>();
+        List<Selectable> tlf = new ArrayList<Selectable>();
+
         if (event != null && event.getSelectionProvider() != null) {
             Object selection = event.getSelectionProvider().getSelection();
 
             if (selection != null) {
                 for (Object leaf : ((IStructuredSelection) selection).toList()) {
                     getSubTreeNodesList((TreeLeafElement) leaf, selectionList);
+                    tlf.add((Selectable) leaf);
                 }
 
             }
@@ -72,8 +78,16 @@ public class TreeSelectionListener implements ISelectionChangedListener {
             DescribeCommandHandler.getInstance().setSelectedNodes(selectionList);
         }
 
-        if (selectionList.size() > 0)
-            NodeInfoView.setNode((Node) selectionList.get(0));
+        if (selectionList.size() > 0) {
+            Node n = (Node) selectionList.get(0);
+            NodeInfoView.setNode(n);
+            if (ResourcesTabView.getTabViewer() != null)
+                ResourcesTabView.getTabViewer().select(n);
+        }
+
+        if (ResourcesCompactView.getCompactViewer() != null) {
+            ResourcesCompactView.getCompactViewer().getSelectionManager().select(tlf);
+        }
     }
 
     private void getSubTreeNodesList(TreeLeafElement leaf, ArrayList<Selectable> selectList) {

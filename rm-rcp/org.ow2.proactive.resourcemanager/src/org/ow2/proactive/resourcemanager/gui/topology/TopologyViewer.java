@@ -52,6 +52,7 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -81,6 +82,7 @@ import org.ow2.proactive.resourcemanager.frontend.topology.Topology;
 import org.ow2.proactive.resourcemanager.frontend.topology.clustering.Cluster;
 import org.ow2.proactive.resourcemanager.gui.data.RMStore;
 import org.ow2.proactive.resourcemanager.gui.data.model.Node;
+import org.ow2.proactive.resourcemanager.gui.data.model.Selectable;
 import org.ow2.proactive.resourcemanager.gui.data.model.TreeLeafElement;
 import org.ow2.proactive.resourcemanager.gui.data.model.TreeParentElement;
 import org.ow2.proactive.resourcemanager.gui.topology.prefuse.AggregateDragControl;
@@ -92,6 +94,7 @@ import org.ow2.proactive.resourcemanager.gui.topology.prefuse.LatencyForce;
 import org.ow2.proactive.resourcemanager.gui.topology.prefuse.NeighborEdgesHighlightControl;
 import org.ow2.proactive.resourcemanager.gui.topology.prefuse.TopologyForceDirectedLayout;
 import org.ow2.proactive.resourcemanager.gui.views.ResourceExplorerView;
+import org.ow2.proactive.resourcemanager.gui.views.ResourcesCompactView;
 
 import prefuse.Constants;
 import prefuse.Visualization;
@@ -904,11 +907,12 @@ public class TopologyViewer {
                     selectedItems.add(node);
                 }
             }
-            this.setSelectecItems(selectedItems);
+            this.setSelectecItems(selectedItems, false);
         }
     }
 
-    public void setSelectecItems(Set<VisualItem> items) {
+    public void setSelectecItems(Set<VisualItem> items, boolean propagate) {
+        VisualItem it = null;
         selectionLock.lock();
         try {
             for (VisualItem item : selectedItems) {
@@ -918,11 +922,27 @@ public class TopologyViewer {
             for (VisualItem item : selectedItems) {
                 item.setHighlighted(false);
                 item.setHighlighted(true);
+                it = item;
             }
             visualization.run("latencyFilter");
             visualization.run("dynamicColor");
         } finally {
             selectionLock.unlock();
+        }
+
+        if (propagate && it != null) {
+            Set<Node> hostNodes = (Set) it.get("nodes");
+            for (Node n : hostNodes) {
+                final Selectable host = n.getParent().getParent();
+
+                Display.getDefault().asyncExec(new Runnable() {
+                    public void run() {
+                        ResourcesCompactView.getCompactViewer().getSelectionManager().select(
+                                Collections.singletonList(host), true);
+                    }
+                });
+            }
+
         }
     }
 
@@ -1018,7 +1038,7 @@ public class TopologyViewer {
                             selectedItems.add(item);
                             focusGroup.clear();
                             focusGroup.setTuple(item);
-                            setSelectecItems(selectedItems);
+                            setSelectecItems(selectedItems, true);
                         } else if (IsInSelectedItems(item)) {
                             focusGroup.removeTuple(item);
                             removeFromSelectedItems(item);

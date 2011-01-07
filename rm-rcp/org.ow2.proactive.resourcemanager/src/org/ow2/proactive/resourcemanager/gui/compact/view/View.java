@@ -112,6 +112,22 @@ public class View {
     }
 
     /**
+     * @return all views recursively added in a list, not just nodes
+     */
+    public List<View> getAllViews() {
+        List<View> res = new ArrayList<View>();
+        _getAll(res);
+        return res;
+    }
+
+    private void _getAll(List<View> acc) {
+        acc.add(this);
+        for (View v : this.childs) {
+            v._getAll(acc);
+        }
+    }
+
+    /**
      * Recursively finds all node views.
      */
     public List<NodeView> getAllNodeViews() {

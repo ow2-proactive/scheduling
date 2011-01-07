@@ -47,6 +47,8 @@ import org.ow2.proactive.resourcemanager.gui.data.model.Node;
 import org.ow2.proactive.resourcemanager.gui.data.model.Selectable;
 import org.ow2.proactive.resourcemanager.gui.handlers.RemoveNodesHandler;
 import org.ow2.proactive.resourcemanager.gui.views.NodeInfoView;
+import org.ow2.proactive.resourcemanager.gui.views.ResourceExplorerView;
+import org.ow2.proactive.resourcemanager.gui.views.ResourcesCompactView;
 
 
 public class TableSelectionListener implements ISelectionChangedListener {
@@ -63,9 +65,17 @@ public class TableSelectionListener implements ISelectionChangedListener {
                 RemoveNodesHandler.getInstance().setSelectedNodes(list);
             }
 
-            if (list.size() > 0)
-                NodeInfoView.setNode((Node) list.get(0));
+            if (list.size() > 0) {
+                Node n = (Node) list.get(0);
+                NodeInfoView.setNode(n);
 
+                if (ResourceExplorerView.getTreeViewer() != null) {
+                    ResourceExplorerView.getTreeViewer().select(n);
+                }
+            }
+            if (ResourcesCompactView.getCompactViewer() != null) {
+                ResourcesCompactView.getCompactViewer().getSelectionManager().select(list);
+            }
         }
     }
 }
