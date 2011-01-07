@@ -286,6 +286,8 @@ public abstract class InternalTask extends TaskState {
             }
         }
 
+        nt.setRunAsMe(this.isRunAsMe());
+
         nt.setIterationIndex(this.getIterationIndex());
         nt.setReplicationIndex(this.getReplicationIndex());
         nt.setFlowBlock(this.getFlowBlock());
