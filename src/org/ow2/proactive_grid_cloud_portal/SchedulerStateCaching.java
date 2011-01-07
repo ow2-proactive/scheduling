@@ -37,6 +37,7 @@
 package org.ow2.proactive_grid_cloud_portal;
 
 import java.io.File;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -49,6 +50,14 @@ import org.ow2.proactive.scheduler.common.SchedulerState;
 import org.ow2.proactive.scheduler.common.util.CachingSchedulerProxyUserInterface;
 import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 
+/**
+ * This class keeps a cache of the scheduler state and periodically refresh it.
+ * This prevents to directly call the active object CachingSchedulerProxyUserInterface and thus
+ * to have the scheduler state being copied each time.
+ * the refresh rate can be configured using @see {org.ow2.proactive_grid_cloud_portal.PortalConfiguration.scheduler_cache_refreshrate}
+ * 
+ *
+ */
 public class SchedulerStateCaching {
     private static Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.PREFIX + ".rest.caching");
     
@@ -58,6 +67,8 @@ public class SchedulerStateCaching {
     private static int refreshInterval;
     private static boolean kill = false;
     private static Thread t;
+
+    protected static Map<AtomicLong, SchedulerState> revisionAndSchedulerState;
     
     
     public static CachingSchedulerProxyUserInterface getScheduler() {
@@ -109,6 +120,7 @@ public class SchedulerStateCaching {
         
     }
 
+
     
     public static void start() {
         t = new Thread(new Runnable() {
@@ -118,7 +130,8 @@ public class SchedulerStateCaching {
                 long currentSchedulerStateRevision = scheduler.getSchedulerStateRevision();
                 
                 if (currentSchedulerStateRevision != schedulerRevision) {
-                    Entry<AtomicLong, SchedulerState> tmp = scheduler.getRevisionVersionAndSchedulerState().entrySet().iterator().next();
+                    revisionAndSchedulerState =   scheduler.getRevisionVersionAndSchedulerState();
+                    Entry<AtomicLong, SchedulerState> tmp = revisionAndSchedulerState.entrySet().iterator().next();
                     localState = tmp.getValue();
                     schedulerRevision = tmp.getKey().longValue();
                     logger.debug("updated scheduler state revision at " + schedulerRevision);
@@ -143,6 +156,8 @@ public class SchedulerStateCaching {
     public static long getSchedulerRevision() {
         return schedulerRevision;
     }
+    
+    
 
     public static void setSchedulerRevision(long schedulerRevision) {
         SchedulerStateCaching.schedulerRevision = schedulerRevision;
@@ -164,4 +179,7 @@ public class SchedulerStateCaching {
         SchedulerStateCaching.kill = kill;
     }
     
+    public static Map<AtomicLong, SchedulerState> getRevisionAndSchedulerState() {
+        return revisionAndSchedulerState;
+    }
 }

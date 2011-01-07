@@ -48,6 +48,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.utils.Sleeper;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
+import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
 
 
 /**
@@ -69,15 +70,15 @@ public class SessionsCleaner implements Runnable {
 
     public void run() {
         while (!stop) {
-            Map<String, Scheduler> sessionMap = ssm.getSessionsMap();
+            Map<String, SchedulerProxyUserInterface> sessionMap = ssm.getSessionsMap();
             logger.info("cleaning session started, " + sessionMap.size() + " existing session(s) ");
             int removedSession = 0;
-            List<Entry<String, Scheduler>> scheduledforRemoval = new ArrayList<Entry<String, Scheduler>>();
+            List<Entry<String, SchedulerProxyUserInterface>> scheduledforRemoval = new ArrayList<Entry<String, SchedulerProxyUserInterface>>();
             synchronized (sessionMap) {
-                Set<Entry<String, Scheduler>> entrySet = sessionMap.entrySet();
-                Iterator<Entry<String, Scheduler>> it = entrySet.iterator();
+                Set<Entry<String, SchedulerProxyUserInterface>> entrySet = sessionMap.entrySet();
+                Iterator<Entry<String, SchedulerProxyUserInterface>> it = entrySet.iterator();
                 while (it.hasNext()) {
-                    Entry<String, Scheduler> entry = it.next();
+                    Entry<String, SchedulerProxyUserInterface> entry = it.next();
                     Scheduler s = entry.getValue();
                     try {
 
@@ -101,7 +102,7 @@ public class SessionsCleaner implements Runnable {
                 }
                 
                 // effective deletion
-                for (Entry<String, Scheduler> entry : scheduledforRemoval) {
+                for (Entry<String, SchedulerProxyUserInterface> entry : scheduledforRemoval) {
                     sessionMap.remove(entry.getKey());
                 }
                 

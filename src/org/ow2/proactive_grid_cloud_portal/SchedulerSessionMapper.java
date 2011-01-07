@@ -41,16 +41,17 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.ow2.proactive.scheduler.common.Scheduler;
+import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
 
 
 public class SchedulerSessionMapper {
 
-    private Map<String, Scheduler> sessions;
+    private Map<String, SchedulerProxyUserInterface> sessions;
     private static SchedulerSessionMapper sessionMapper;
     private long currentSessionid = 0l;
 
     private SchedulerSessionMapper() {
-        sessions = Collections.synchronizedMap(new HashMap<String, Scheduler>());
+        sessions = Collections.synchronizedMap(new HashMap<String, SchedulerProxyUserInterface >());
     }
 
     public static synchronized SchedulerSessionMapper getInstance() {
@@ -60,13 +61,13 @@ public class SchedulerSessionMapper {
         return sessionMapper;
     }
 
-    public long add(Scheduler s) {
+    public long add(SchedulerProxyUserInterface s) {
         long id = ++currentSessionid;
         sessions.put("" + id, s);
         return id;
     }
 
-    public Map<String, Scheduler> getSessionsMap() {
+    public Map<String, SchedulerProxyUserInterface> getSessionsMap() {
         return sessions;
     }
 }

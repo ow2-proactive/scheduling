@@ -47,6 +47,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.atomic.AtomicLong;
 
 import javax.security.auth.login.LoginException;
 import javax.ws.rs.Consumes;
@@ -75,6 +76,8 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.common.Scheduler;
+import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
+import org.ow2.proactive.scheduler.common.SchedulerConnection;
 import org.ow2.proactive.scheduler.common.SchedulerState;
 import org.ow2.proactive.scheduler.common.SchedulerStatus;
 import org.ow2.proactive.scheduler.common.exception.InternalSchedulerException;
@@ -204,6 +207,22 @@ public class SchedulerStateRest {
         Scheduler s = checkAccess(sessionId,"/scheduler/revision");
         return SchedulerStateCaching.getSchedulerRevision();
     }
+    
+    /**
+     * Returns a map with only one entry containing as key the revision and as content
+     * the scheduler state
+     * @param sessionId a valid session id.
+     * @return a map of one entry containing the revision and the corresponding scheduler state 
+     */
+    @GET
+    @Path("revisionandstate")
+    @Produces( { "application/json", "application/xml" })
+    public Map<AtomicLong, SchedulerState> getSchedulerStateAndRevision(@HeaderParam("sessionid")
+    String sessionId) throws PermissionException, NotConnectedException {
+        Scheduler s = checkAccess(sessionId,"/scheduler/staterevision");
+        return SchedulerStateCaching.getRevisionAndSchedulerState();
+    }
+    
     
     /**
      * returns only the jobs of the current user
@@ -591,8 +610,8 @@ public class SchedulerStateRest {
      * such mapping exists.
      * @throws NotConnectedException 
      */
-    public Scheduler checkAccess(String sessionId, String path) throws NotConnectedException {
-        Scheduler s = SchedulerSessionMapper.getInstance().getSessionsMap().get(sessionId);
+    public SchedulerProxyUserInterface checkAccess(String sessionId, String path) throws NotConnectedException {
+        SchedulerProxyUserInterface s = SchedulerSessionMapper.getInstance().getSessionsMap().get(sessionId);
         if (s == null) {
             logger.trace("not found a scheduler frontend for sessionId " + sessionId);
             throw new NotConnectedException("you are not connected to the scheduler, you should log on first");
@@ -601,7 +620,7 @@ public class SchedulerStateRest {
         return s;
     }
     
-    private Scheduler checkAccess(String sessionId) throws NotConnectedException {
+    private SchedulerProxyUserInterface checkAccess(String sessionId) throws NotConnectedException {
         return checkAccess(sessionId,"");
     }
 
@@ -1075,4 +1094,48 @@ public class SchedulerStateRest {
         return sessionId;
 
     }
+    
+    /**
+     * returns statistics about the scheduler
+     * @param sessionId the session id associated to this new connection
+     * @return a string containing the statistics
+     * @throws NotConnectedException
+     * @throws PermissionException
+     */
+    @GET
+    @Path("stats")
+    public String getStatistics(@HeaderParam("sessionid")
+    final String sessionId) throws NotConnectedException, PermissionException {
+        final SchedulerProxyUserInterface s = checkAccess(sessionId); 
+        
+        return s.getInfo("ProActiveScheduler:name=RuntimeData");
+    }
+    
+    /**
+     * returns a string containing some data regarding the user's account
+     * @param sessionId the session id associated to this new connection
+     * @return a string containing some data regarding the user's account
+     * @throws NotConnectedException
+     * @throws PermissionException
+     */
+    @GET
+    @Path("stats/myaccount")
+    public String getStatisticsOnMyAccount(@HeaderParam("sessionid")
+    final String sessionId) throws NotConnectedException, PermissionException {
+        final SchedulerProxyUserInterface s = checkAccess(sessionId); 
+        
+        return s.getInfo("ProActiveScheduler:name=MyAccount");
+    }
+    
+    
+    /*@GET
+     * 
+     * needs some tests
+    @Path("stats/allaccounts")
+    public String getStatisticsOnAllAccounts(@HeaderParam("sessionid")
+    final String sessionId) throws NotConnectedException, PermissionException {
+        final SchedulerProxyUserInterface s = checkAccess(sessionId); 
+        
+        return s.getInfo("ProActiveScheduler:name=AllAccounts");
+    }*/
 }
