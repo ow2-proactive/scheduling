@@ -403,6 +403,10 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
      * @see org.ow2.proactive.utils.console.MBeanInfoViewer#getInfo(String)
      */
     public String getInfo(String mbeanName) {
-        return mbeaninfoviewer.getInfo(mbeanName);
+        try {
+            return mbeaninfoviewer.getInfo(mbeanName);
+        } catch (RuntimeException e) {
+            return e.getMessage() + ", you are probably not authorized to access to this information.";
+        }
     }
 }
