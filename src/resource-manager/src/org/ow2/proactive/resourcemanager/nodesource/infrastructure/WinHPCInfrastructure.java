@@ -191,8 +191,6 @@ public class WinHPCInfrastructure extends DefaultInfrastructureManager {
         //Creates the command line builder
         CommandLineBuilder clb = this.getCommandLineBuilder();
         String nodeName = clb.getNodeName();
-        //we add the timeout flag
-        this.dnTimeout.put(nodeName, false);
         //Generate the HPCBP acitivty from Axis2 generated JSDL objects
         //escaping the built command if contains quotes
         String fullCommand = null;
@@ -206,6 +204,8 @@ public class WinHPCInfrastructure extends DefaultInfrastructureManager {
 
         String dNode = super.addDeployingNode(nodeName, obfuscatedFullCommand,
                 "Node deployment on Windows HPC", timeout);
+        //we add the timeout flag
+        this.dnTimeout.put(dNode, false);
         this.submittedJobs.put(nodeName, eprs);
         this.deployingNodeToEndpoint.put(dNode, eprs);
 
@@ -264,7 +264,7 @@ public class WinHPCInfrastructure extends DefaultInfrastructureManager {
             } else {
                 //waiting
             }
-        } while (((hasTimeouted = this.dnTimeout.get(nodeName)) != null) && !hasTimeouted && threshold > 0);
+        } while (((hasTimeouted = this.dnTimeout.get(dNode)) != null) && !hasTimeouted && threshold > 0);
 
         //we exited the loop because of the threshold
         if (threshold <= 0) {
@@ -284,8 +284,10 @@ public class WinHPCInfrastructure extends DefaultInfrastructureManager {
     /**
      * Terminates the job associated with this deploying node.
      */
-    protected void registerRemovedDeployingNode(String pnURL) {
+    @Override
+    protected void notifyDeployingNodeLost(String pnURL) {
         //we notify the control loop to exit
+        logger.debug("Terminating the job for node " + pnURL);
         this.dnTimeout.put(pnURL, true);
         //we remove the job
         EndpointReferenceType[] epr = this.deployingNodeToEndpoint.remove(pnURL);
@@ -310,7 +312,7 @@ public class WinHPCInfrastructure extends DefaultInfrastructureManager {
             throws RMException {
         String nodeName = clb.getNodeName();
         this.submittedJobs.remove(nodeName);
-        this.dnTimeout.remove(nodeName);
+        this.dnTimeout.remove(dNode);
         super.declareDeployingNodeLost(dNode, cause);
         throw new RMException("The job's status is failed.");
     }
@@ -327,7 +329,7 @@ public class WinHPCInfrastructure extends DefaultInfrastructureManager {
             System.getProperty("line.separator") + error);
         String nodeName = clb.getNodeName();
         this.submittedJobs.remove(nodeName);
-        this.dnTimeout.remove(nodeName);
+        this.dnTimeout.remove(dNode);
         throw new RMException("The deployment failed because of an error", e);
     }
 
@@ -352,7 +354,6 @@ public class WinHPCInfrastructure extends DefaultInfrastructureManager {
         super.declareDeployingNodeLost(lostNode, null);
         String nodeName = clb.getNodeName();
         this.submittedJobs.remove(nodeName);
-        this.dnTimeout.remove(nodeName);
         throw new RMException("The deployment failed because of an error", e);
     }
 
