@@ -52,7 +52,12 @@ import java.util.TreeSet;
  */
 public class MatSciJobVolatileInfo<R> implements Serializable {
 
-    protected JobStatus status;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 30L;
+
+	protected JobStatus status;
 
     protected Request pendingWaitAllRequest;
 

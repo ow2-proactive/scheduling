@@ -67,7 +67,12 @@ import com.xerox.amazonws.ec2.ReservationDescription.Instance;
  */
 public class EC2Deployer implements java.io.Serializable {
 
-    /** logger */
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 30L;
+
+	/** logger */
     protected static Logger logger = ProActiveLogger.getLogger(RMLoggers.NODESOURCE);
 
     /** Access Key */

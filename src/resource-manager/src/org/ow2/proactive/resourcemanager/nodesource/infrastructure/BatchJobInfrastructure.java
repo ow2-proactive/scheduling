@@ -73,7 +73,11 @@ import org.ow2.proactive.resourcemanager.utils.RMNodeStarter.CommandLineBuilder;
  */
 public abstract class BatchJobInfrastructure extends InfrastructureManager {
 
-    /** The frequency in ms for the refresh of the node acquisition */
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 30L;
+	/** The frequency in ms for the refresh of the node acquisition */
     private static final int NODE_ACQUISITION_CHECK_RATE = 1000;
     /**
      * Path to the Java executable on the remote hosts

@@ -42,7 +42,11 @@ import org.ow2.proactive.scheduler.ext.matsci.worker.util.MatSciEngineConfigBase
 
 public class MatlabEngineConfig extends MatSciEngineConfigBase {
 
-    protected transient static Process selectionScriptProcess = null;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 30L;
+	protected transient static Process selectionScriptProcess = null;
     private static OperatingSystem os = OperatingSystem.getOperatingSystem();
 
     /**

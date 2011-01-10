@@ -55,7 +55,11 @@ import org.ow2.proactive.scheduler.common.job.factories.JobFactory;
  */
 public class JobSubmissionAction implements Action<Scheduler, JobId>, Serializable {
 
-    private final Job job;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 30L;
+	private final Job job;
 
     public JobSubmissionAction(String jobDescriptorPath) {
         File jobDescriptor = new File(jobDescriptorPath);

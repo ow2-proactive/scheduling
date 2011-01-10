@@ -54,7 +54,11 @@ import org.ow2.proactive.resourcemanager.utils.RMLoggers;
  */
 public class DataSpaceNodeConfigurationAgent implements Serializable {
 
-    private static Logger logger = ProActiveLogger.getLogger(RMLoggers.DATASPACE);
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 30L;
+	private static Logger logger = ProActiveLogger.getLogger(RMLoggers.DATASPACE);
     protected static final String NODE_DATASPACE_SCRATCHDIR = "node.dataspace.scratchdir";
 
     /**

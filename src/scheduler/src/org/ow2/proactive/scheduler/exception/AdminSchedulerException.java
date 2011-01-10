@@ -47,6 +47,11 @@ public class AdminSchedulerException extends Exception {
     /**  */
 
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = 30L;
+
+	/**
      * Attaches a message to the Exception
      * @param msg message attached
      */

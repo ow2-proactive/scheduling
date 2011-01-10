@@ -50,7 +50,11 @@ import org.ow2.proactive.scheduler.common.job.JobId;
 @PublicAPI
 public class UnknownJobException extends SchedulerException {
 
-    private JobId jobId;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 30L;
+	private JobId jobId;
 
     /**
      * Create a new instance of UnknownJobException

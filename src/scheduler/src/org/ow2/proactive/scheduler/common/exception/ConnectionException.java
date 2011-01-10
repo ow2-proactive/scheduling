@@ -47,6 +47,11 @@ package org.ow2.proactive.scheduler.common.exception;
 public class ConnectionException extends SchedulerException {
 
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = 30L;
+
+	/**
      * Create a new instance of ConnectionException
      *
      * @param msg the message to attach.

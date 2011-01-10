@@ -67,7 +67,11 @@ import org.ow2.proactive.authentication.principals.UserNamePrincipal;
  */
 public class Client implements Serializable {
 
-    private static final Heartbeat hb = new Heartbeat();
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 30L;
+	private static final Heartbeat hb = new Heartbeat();
     /** client's name */
     private String name;
 

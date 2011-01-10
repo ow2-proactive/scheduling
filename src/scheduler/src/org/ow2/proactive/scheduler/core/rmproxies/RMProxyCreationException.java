@@ -45,6 +45,11 @@ package org.ow2.proactive.scheduler.core.rmproxies;
 public class RMProxyCreationException extends Exception {
 
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = 30L;
+
+	/**
      * Create a new instance of RMProxyCreationException
      *
      */

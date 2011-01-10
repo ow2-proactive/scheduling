@@ -40,7 +40,11 @@ import org.objectweb.proactive.core.node.NodeImpl;
 
 
 public class DummyNode extends NodeImpl {
-    private String name;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 30L;
+	private String name;
 
     public DummyNode(String name) {
         this.name = name;

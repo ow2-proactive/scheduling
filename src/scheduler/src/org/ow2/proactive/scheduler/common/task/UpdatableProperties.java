@@ -77,7 +77,12 @@ import org.ow2.proactive.scheduler.common.task.util.IntegerWrapper;
 @XmlAccessorType(XmlAccessType.FIELD)
 @PublicAPI
 public class UpdatableProperties<T> implements Serializable {
-    @Id
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 30L;
+
+	@Id
     @GeneratedValue
     @SuppressWarnings("unused")
     @XmlTransient

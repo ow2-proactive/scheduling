@@ -48,7 +48,12 @@ import org.scilab.modules.types.ScilabType;
  */
 public class ScilabResultsAndLogs extends ResultsAndLogs<ScilabType> {
 
-    public ScilabResultsAndLogs() {
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 30L;
+
+	public ScilabResultsAndLogs() {
         super();
     }
 

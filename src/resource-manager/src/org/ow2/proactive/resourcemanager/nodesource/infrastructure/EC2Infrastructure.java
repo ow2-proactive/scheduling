@@ -81,6 +81,10 @@ import com.xerox.amazonws.ec2.ReservationDescription.Instance;
 public class EC2Infrastructure extends InfrastructureManager {
 
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = 30L;
+	/**
      * The java home path on the ec2 instance
      */
     private static final String REMOTE_JAVA_EXE = "/root/JDK/bin/java";

@@ -53,7 +53,11 @@ import java.awt.event.ActionListener;
  */
 public class LoginFrame extends JDialog {
 
-    private JTextField username;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 30L;
+	private JTextField username;
     private JPasswordField password;
     private AOScilabEnvironment aose;
     private JButton login;

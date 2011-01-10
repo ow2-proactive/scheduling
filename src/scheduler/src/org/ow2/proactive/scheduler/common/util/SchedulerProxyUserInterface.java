@@ -80,7 +80,11 @@ import org.ow2.proactive.utils.console.MBeanInfoViewer;
 @ActiveObject
 public class SchedulerProxyUserInterface implements Scheduler, Serializable {
 
-    protected Scheduler uischeduler;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 30L;
+	protected Scheduler uischeduler;
     protected MBeanInfoViewer mbeaninfoviewer;
 
     public SchedulerProxyUserInterface() {

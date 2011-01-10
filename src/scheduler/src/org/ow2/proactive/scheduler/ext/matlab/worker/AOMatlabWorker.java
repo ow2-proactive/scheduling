@@ -62,7 +62,12 @@ import java.util.ArrayList;
  */
 public class AOMatlabWorker implements Serializable, MatSciWorker {
 
-    protected PASolveMatlabGlobalConfig paconfig;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 30L;
+
+	protected PASolveMatlabGlobalConfig paconfig;
 
     protected PASolveMatlabTaskConfig taskconfig;
 

@@ -70,7 +70,11 @@ import org.objectweb.proactive.annotation.PublicAPI;
 @Proxy(lazy = false)
 @XmlAccessorType(XmlAccessType.FIELD)
 public class SimpleScript extends Script {
-    @Id
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 30L;
+	@Id
     @GeneratedValue
     @SuppressWarnings("unused")
     @XmlTransient

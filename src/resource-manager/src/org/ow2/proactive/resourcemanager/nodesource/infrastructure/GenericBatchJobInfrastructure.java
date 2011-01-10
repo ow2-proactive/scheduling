@@ -43,7 +43,6 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.StringTokenizer;
 
-import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
 import org.ow2.proactive.utils.FileToBytesConverter;
 
@@ -54,7 +53,12 @@ import org.ow2.proactive.utils.FileToBytesConverter;
  */
 public class GenericBatchJobInfrastructure extends BatchJobInfrastructure {
 
-    @Configurable(description = "Fully qualified classname\nof the implementation")
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 30L;
+
+	@Configurable(description = "Fully qualified classname\nof the implementation")
     protected String implementationClassname;
 
     @Configurable(fileBrowser = true, description = "Absolute path to the\nclass file of the implementation")

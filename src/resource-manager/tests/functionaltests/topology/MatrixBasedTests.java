@@ -66,7 +66,12 @@ public class MatrixBasedTests {
     protected static int gridHeight;
 
     private class LocalTopology implements Topology {
-        public Long getDistance(Node node, Node node2) {
+        /**
+		 * 
+		 */
+		private static final long serialVersionUID = 30L;
+
+		public Long getDistance(Node node, Node node2) {
             Long distance = null;
             if (distances.get(node) != null && distances.get(node).get(node2) != null) {
                 distance = distances.get(node).get(node2);

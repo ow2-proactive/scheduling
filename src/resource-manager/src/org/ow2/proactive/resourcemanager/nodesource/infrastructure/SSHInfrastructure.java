@@ -89,6 +89,11 @@ import org.ow2.proactive.utils.FileToBytesConverter;
 public class SSHInfrastructure extends InfrastructureManager {
 
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = 30L;
+
+	/**
      * class' logger
      */
     private static final Logger logger = ProActiveLogger.getLogger(RMLoggers.NODESOURCE);

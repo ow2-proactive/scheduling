@@ -69,14 +69,22 @@ import org.ow2.proactive.utils.FileToBytesConverter;
 @Deprecated
 public class GCMInfrastructure extends DefaultInfrastructureManager {
 
-    /** name of the program variable for variable contract, used to define child runtimes' properties */
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 30L;
+	/** name of the program variable for variable contract, used to define child runtimes' properties */
     protected static final String DESCRIPTOR_DEFAULT_VARIABLE_JVM_ARGS = "jvmargDefinedByIM";
 
     /**
      * Deployment data container
      */
     protected class DeploymentData implements Serializable {
-        byte[] data;
+        /**
+		 * 
+		 */
+		private static final long serialVersionUID = 30L;
+		byte[] data;
         boolean deployed = false;
     }
 

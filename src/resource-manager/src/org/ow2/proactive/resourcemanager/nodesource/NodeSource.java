@@ -768,6 +768,11 @@ public class NodeSource implements InitActive, RunActive {
         // creating fake anonymous class to filter out all meaningful principals
         // in node source and create permission like PrincipalPermission(empty)
         return new IdentityPrincipal("") {
+
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 30L;
         }.getClass();
     }
 

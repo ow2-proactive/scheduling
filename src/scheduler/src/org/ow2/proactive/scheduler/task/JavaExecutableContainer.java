@@ -90,7 +90,12 @@ import org.ow2.proactive.scheduler.util.classloading.TaskClassServer;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class JavaExecutableContainer extends ExecutableContainer {
 
-    @Id
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 30L;
+
+	@Id
     @GeneratedValue
     @XmlTransient
     protected long hId;

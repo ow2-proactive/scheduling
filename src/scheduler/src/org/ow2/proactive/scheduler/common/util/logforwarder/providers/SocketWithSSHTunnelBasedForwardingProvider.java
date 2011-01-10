@@ -72,7 +72,11 @@ public class SocketWithSSHTunnelBasedForwardingProvider extends SocketBasedForwa
      */
     public static class SocketSSHAppenderProvider implements AppenderProvider {
 
-        private String hostname;
+        /**
+		 * 
+		 */
+		private static final long serialVersionUID = 30L;
+		private String hostname;
         private int port;
         private int remoteSSHPort;
 

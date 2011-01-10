@@ -70,7 +70,12 @@ import org.objectweb.proactive.annotation.PublicAPI;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class OutputSelector implements Serializable {
 
-    @Id
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 30L;
+
+	@Id
     @GeneratedValue
     @XmlTransient
     protected long hId;

@@ -65,7 +65,12 @@ import org.ow2.proactive.scheduler.common.task.TaskInfo;
 @XmlRootElement(name = "schedulerstate")
 public final class SchedulerStateImpl implements SchedulerState {
 
-    /** Pending jobs */
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 30L;
+
+	/** Pending jobs */
     private Vector<JobState> pendingJobs = new Vector<JobState>();
 
     /** Running jobs */

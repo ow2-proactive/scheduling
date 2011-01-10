@@ -62,7 +62,11 @@ import org.objectweb.proactive.annotation.PublicAPI;
 @Table(name = "RMEvent")
 public class RMEvent implements Serializable {
 
-    @Id
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 30L;
+	@Id
     @GeneratedValue
     @SuppressWarnings("unused")
     protected long id;

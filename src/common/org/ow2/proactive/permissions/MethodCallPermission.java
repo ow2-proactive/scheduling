@@ -40,7 +40,12 @@ package org.ow2.proactive.permissions;
  * Allows to remotely call a method of the service.
  */
 public class MethodCallPermission extends ClientPermission {
-    public MethodCallPermission(String name) {
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 30L;
+
+	public MethodCallPermission(String name) {
         super(name);
     }
 }

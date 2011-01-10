@@ -52,7 +52,11 @@ import org.objectweb.proactive.annotation.PublicAPI;
 @PublicAPI
 public class ScriptHandler implements Serializable {
 
-    Map<String, Object> additionalBindings = null;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 30L;
+	Map<String, Object> additionalBindings = null;
 
     /**
      * ProActive Constructor

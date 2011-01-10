@@ -124,7 +124,12 @@ import org.ow2.proactive.utils.NodeSet;
 @XmlAccessorType(XmlAccessType.FIELD)
 public abstract class InternalTask extends TaskState {
 
-    /** Parents list : null if no dependences */
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 30L;
+
+	/** Parents list : null if no dependences */
     @ManyToAny(metaColumn = @Column(name = "ITASK_TYPE", length = 5))
     @AnyMetaDef(idType = "long", metaType = "string", metaValues = {
             @MetaValue(targetEntity = InternalJavaTask.class, value = "IJT"),

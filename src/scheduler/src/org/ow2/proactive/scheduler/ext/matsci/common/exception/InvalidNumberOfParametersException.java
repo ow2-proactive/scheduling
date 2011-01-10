@@ -37,7 +37,12 @@
 package org.ow2.proactive.scheduler.ext.matsci.common.exception;
 
 public class InvalidNumberOfParametersException extends Exception {
-    public InvalidNumberOfParametersException(int number) {
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 30L;
+
+	public InvalidNumberOfParametersException(int number) {
         super("" + number + " parameters");
     }
 }

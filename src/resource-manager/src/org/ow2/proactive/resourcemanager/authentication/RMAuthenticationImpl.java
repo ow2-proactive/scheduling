@@ -66,7 +66,11 @@ import org.ow2.proactive.resourcemanager.utils.RMLoggers;
  */
 public class RMAuthenticationImpl extends AuthenticationImpl implements RMAuthentication, InitActive {
 
-    private static final String ERROR_ALREADY_CONNECTED = "This active object is already connected to the resource manager. Disconnect first.";
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 30L;
+	private static final String ERROR_ALREADY_CONNECTED = "This active object is already connected to the resource manager. Disconnect first.";
     private final static Logger logger = ProActiveLogger.getLogger(RMLoggers.CONNECTION);
     private RMCore rmcore;
 

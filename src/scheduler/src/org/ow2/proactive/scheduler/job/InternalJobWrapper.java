@@ -47,7 +47,11 @@ import java.io.Serializable;
  */
 public class InternalJobWrapper implements Serializable {
 
-    private InternalJob job;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 30L;
+	private InternalJob job;
 
     /**
      * Get the internal job.

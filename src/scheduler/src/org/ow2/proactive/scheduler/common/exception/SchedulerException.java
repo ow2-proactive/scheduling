@@ -50,6 +50,11 @@ import org.objectweb.proactive.annotation.PublicAPI;
 public class SchedulerException extends Exception {
 
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = 30L;
+
+	/**
      * Create a new instance of SchedulerException with the given message.
      *
      * @param msg the message to attach.

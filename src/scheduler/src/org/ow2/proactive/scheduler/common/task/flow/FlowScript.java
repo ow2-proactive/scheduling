@@ -89,7 +89,12 @@ import org.ow2.proactive.scripting.SimpleScript;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class FlowScript extends Script<FlowAction> {
 
-    @Id
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 30L;
+
+	@Id
     @GeneratedValue
     @SuppressWarnings("unused")
     @XmlTransient

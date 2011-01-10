@@ -64,7 +64,12 @@ import org.objectweb.proactive.annotation.PublicAPI;
 @Proxy(lazy = false)
 public class BestProximityDescriptor extends TopologyDescriptor {
 
-    @Transient
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 30L;
+
+	@Transient
     protected DistanceFunction function;
 
     /**
@@ -74,7 +79,12 @@ public class BestProximityDescriptor extends TopologyDescriptor {
      * clustering can influence merge decisions.
      */
     public final static DistanceFunction AVG = new DistanceFunction() {
-        public long distance(long d1, long d2) {
+        /**
+		 * 
+		 */
+		private static final long serialVersionUID = 30L;
+
+		public long distance(long d1, long d2) {
             // not connected
             if (d1 < 0 || d2 < 0)
                 return -1;
@@ -90,7 +100,12 @@ public class BestProximityDescriptor extends TopologyDescriptor {
      * clustering can influence merge decisions.
      */
     public final static DistanceFunction MAX = new DistanceFunction() {
-        public long distance(long d1, long d2) {
+        /**
+		 * 
+		 */
+		private static final long serialVersionUID = 30L;
+
+		public long distance(long d1, long d2) {
             // not connected
             if (d1 < 0 || d2 < 0)
                 return -1;
@@ -106,7 +121,12 @@ public class BestProximityDescriptor extends TopologyDescriptor {
      * the two clusters come closest to each other.
      */
     public final static DistanceFunction MIN = new DistanceFunction() {
-        public long distance(long d1, long d2) {
+        /**
+		 * 
+		 */
+		private static final long serialVersionUID = 30L;
+
+		public long distance(long d1, long d2) {
             return Math.min(d1, d2);
         }
     };

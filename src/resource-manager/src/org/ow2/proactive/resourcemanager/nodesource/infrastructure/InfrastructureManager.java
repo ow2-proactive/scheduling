@@ -83,7 +83,12 @@ import org.ow2.proactive.resourcemanager.utils.RMNodeStarter.OperatingSystem;
  */
 public abstract class InfrastructureManager implements Serializable {
 
-    /** class' logger */
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 30L;
+
+	/** class' logger */
     protected static final Logger logger = ProActiveLogger.getLogger(RMLoggers.NODESOURCE);
 
     /** manager's node source */
@@ -594,7 +599,11 @@ public abstract class InfrastructureManager implements Serializable {
      * {@link RMDeployingNode} object.
      */
     public static abstract class RMDeployingNodeAccessor implements Serializable {
-        private static volatile RMDeployingNodeAccessor DEFAULT;
+        /**
+		 * 
+		 */
+		private static final long serialVersionUID = 30L;
+		private static volatile RMDeployingNodeAccessor DEFAULT;
 
         public static void setDefault(RMDeployingNodeAccessor d) {
             RMDeployingNodeAccessor.DEFAULT = d;

@@ -156,7 +156,11 @@ public class IOTools {
 
     public static class RedirectionThread implements Runnable, Serializable {
 
-        private InputStream is;
+        /**
+		 * 
+		 */
+		private static final long serialVersionUID = 30L;
+		private InputStream is;
         private OutputStream os;
 
         private PrintStream out;
@@ -198,7 +202,11 @@ public class IOTools {
      */
     public static class LoggingThread implements Runnable, Serializable {
 
-        private String appendMessage;
+        /**
+		 * 
+		 */
+		private static final long serialVersionUID = 30L;
+		private String appendMessage;
         /**  */
         public Boolean goon = true;
         private PrintStream out;

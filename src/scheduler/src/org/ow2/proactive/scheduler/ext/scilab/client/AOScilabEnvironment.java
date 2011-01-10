@@ -73,6 +73,10 @@ import java.util.TreeSet;
 public class AOScilabEnvironment extends AOMatSciEnvironment<ScilabType, ScilabResultsAndLogs> {
 
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = 30L;
+	/**
      * log4j logger
      */
     protected static Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.SCILAB);

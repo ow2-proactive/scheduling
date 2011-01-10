@@ -36,7 +36,6 @@
  */
 package org.ow2.proactive.scheduler.resourcemanager.nodesource.policy;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -62,9 +61,6 @@ import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SchedulerEventListener;
-import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
-import org.ow2.proactive.scheduler.common.exception.PermissionException;
-import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobState;
@@ -76,7 +72,12 @@ import org.ow2.proactive.scheduler.common.task.TaskStatus;
 public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements InitActive, RunActive,
         RMEventListener {
 
-    protected static Logger logger = ProActiveLogger.getLogger(RMLoggers.POLICY);
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 30L;
+
+	protected static Logger logger = ProActiveLogger.getLogger(RMLoggers.POLICY);
 
     private Map<JobId, Integer> activeTasks;
     private int activeTask = 0;

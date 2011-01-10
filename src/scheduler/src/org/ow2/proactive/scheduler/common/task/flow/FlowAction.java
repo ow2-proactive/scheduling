@@ -69,7 +69,12 @@ import org.hibernate.annotations.Proxy;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class FlowAction implements Serializable {
 
-    @Id
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 30L;
+
+	@Id
     @GeneratedValue
     @SuppressWarnings("unused")
     @XmlTransient

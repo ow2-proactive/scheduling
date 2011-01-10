@@ -40,7 +40,12 @@ import ptolemy.data.Token;
 
 
 public class IllegalReturnTypeException extends Exception {
-    public IllegalReturnTypeException(Class<? extends Token> class1) {
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 30L;
+
+	public IllegalReturnTypeException(Class<? extends Token> class1) {
         super(class1.getCanonicalName());
     }
 }

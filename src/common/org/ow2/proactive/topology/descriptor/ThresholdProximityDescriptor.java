@@ -57,7 +57,11 @@ import org.objectweb.proactive.annotation.PublicAPI;
 @Proxy(lazy = false)
 public class ThresholdProximityDescriptor extends BestProximityDescriptor {
 
-    @Column(name = "THRESHOLD")
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 30L;
+	@Column(name = "THRESHOLD")
     private long threshold = 0;
 
     /**

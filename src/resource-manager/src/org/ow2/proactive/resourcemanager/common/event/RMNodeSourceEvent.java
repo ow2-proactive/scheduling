@@ -71,7 +71,12 @@ import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 @Table(name = "RMNodeSourceEvent")
 public class RMNodeSourceEvent extends RMEvent {
 
-    /** name of the source concerned by the event. */
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 30L;
+
+	/** name of the source concerned by the event. */
     @Column(name = "nodeSourceName")
     private String nodeSourceName = null;
 

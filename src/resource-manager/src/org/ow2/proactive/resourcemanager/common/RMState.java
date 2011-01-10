@@ -55,7 +55,11 @@ import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 @XmlRootElement
 public class RMState implements Serializable {
 
-    private int freeNodesNumber;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 30L;
+	private int freeNodesNumber;
     private int totalAliveNodesNumber;
     private int totalNodesNumber;
 

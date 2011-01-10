@@ -86,7 +86,12 @@ import org.ow2.proactive.scripting.SimpleScript;
 @Proxy(lazy = false)
 @XmlAccessorType(XmlAccessType.FIELD)
 public class ForkEnvironment implements Serializable {
-    @Id
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 30L;
+
+	@Id
     @GeneratedValue
     @SuppressWarnings("unused")
     @XmlTransient

@@ -49,7 +49,11 @@ import org.objectweb.proactive.core.util.ProActiveInet;
  */
 public class HelloWorldAction implements Action<String, Void>, Serializable {
 
-    private final static Logger logger = Logger.getLogger(HelloWorldAction.class);
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 30L;
+	private final static Logger logger = Logger.getLogger(HelloWorldAction.class);
 
     public HelloWorldAction() {
     }

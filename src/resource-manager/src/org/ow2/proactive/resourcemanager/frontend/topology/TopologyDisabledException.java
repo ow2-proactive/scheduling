@@ -49,6 +49,11 @@ import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 public class TopologyDisabledException extends TopologyException {
 
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = 30L;
+
+	/**
      * Create a new instance of TopologyException
      *
      */

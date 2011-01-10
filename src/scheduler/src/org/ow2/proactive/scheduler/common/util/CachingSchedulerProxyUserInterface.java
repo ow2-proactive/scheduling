@@ -36,7 +36,6 @@
  */
 package org.ow2.proactive.scheduler.common.util;
 
-import java.io.Serializable;
 import java.security.KeyException;
 import java.security.PublicKey;
 import java.util.HashMap;
@@ -81,7 +80,12 @@ import org.ow2.proactive.scheduler.common.task.TaskInfo;
 @ActiveObject
 public class CachingSchedulerProxyUserInterface extends SchedulerProxyUserInterface implements
         SchedulerEventListener {
-    protected boolean isCachingEnabled = false;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 30L;
+
+	protected boolean isCachingEnabled = false;
 
     /**
      * keep the

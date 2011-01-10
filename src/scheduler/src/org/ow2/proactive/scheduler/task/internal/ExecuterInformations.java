@@ -37,7 +37,6 @@
 package org.ow2.proactive.scheduler.task.internal;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.LinkedList;
 
 import org.objectweb.proactive.core.node.Node;
@@ -55,7 +54,12 @@ import org.ow2.proactive.utils.NodeSet;
  */
 public class ExecuterInformations implements Serializable {
 
-    /** Reference to the launcher of this task. */
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 30L;
+
+	/** Reference to the launcher of this task. */
     private TaskLauncher launcher;
 
     /** Reference to the node */
