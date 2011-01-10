@@ -41,20 +41,22 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetAddress;
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.Map.Entry;
 
-import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.core.util.ProActiveCounter;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
-import org.ow2.proactive.resourcemanager.utils.RMLoggers;
+import org.ow2.proactive.resourcemanager.utils.RMNodeStarter.CommandLineBuilder;
+import org.ow2.proactive.resourcemanager.utils.RMNodeStarter.OperatingSystem;
 import org.ow2.proactive.utils.FileToBytesConverter;
 
 import com.xerox.amazonws.ec2.ReservationDescription.Instance;
@@ -78,41 +80,52 @@ import com.xerox.amazonws.ec2.ReservationDescription.Instance;
  */
 public class EC2Infrastructure extends InfrastructureManager {
 
+    /**
+     * The java home path on the ec2 instance
+     */
+    private static final String REMOTE_JAVA_EXE = "/root/JDK/bin/java";
+    /**
+     * The resource manager home on the ec2 instance
+     */
+    private static final String REMOTE_RM_HOME = "/usr/share/ProActive";
+
     @Configurable(fileBrowser = true, description = "Absolute path of EC2 configuration file")
     protected File configurationFile;
     @Configurable(credential = true, description = "Absolute path of the credential file")
     protected File RMCredentialsPath;
-    @Configurable
-    protected String nodeHttpPort = "80";
-
     /**
-     * Deployment data
+     * The credentials as a String BASE64 encoded
      */
+    private String creds64;
+    @Configurable(description = "The http port used by the node\n on the EC2 instance")
+    protected Integer nodeHttpPort = 80;
+
+    /** Deployment data */
     protected EC2Deployer ec2d;
 
-    /** used to schedule the instance timeout checker */
-    private transient Timer timer = null;
-    /** requested instances waiting for the timeout checker's confirmation */
-    private List<Instance> instances = new ArrayList<Instance>();
+    /**
+     * The list of identifed and registered EC2 instances indexed with the nodeURL
+     * they deployed.
+     * Essentially used as safe check if the terminate by DNS name doesn't work...
+     */
+    private Hashtable<String, Instance> nodeNameToInstance = new Hashtable<String, Instance>();
 
     /** delay after which a requested EC2 instance is considered lost in ms */
-    private static final long timeoutDelay = 60000 * 45; // 45mn
-    /** timeout checker frequency in ms */
-    private static final long timeoutCheckerFreq = 60000 * 10; // 10mn
+    private static final long TIMEOUT_DELAY = 60000 * 45; // 45mn
 
-    /**
-     * Image descriptor to use will try the first available if null
-     */
-    String imgd;
+    /** the retry threshold */
+    private static final int RETRY_THRESHOLD = 5;
 
-    /** logger */
-    protected static Logger logger = ProActiveLogger.getLogger(RMLoggers.NODESOURCE);
+    /** Hashtable to be able to associate a deploying node to a given ec2 instance */
+    private final Hashtable<String, Instance> deployingNodeToInstance = new Hashtable<String, Instance>();
+
+    /** Image descriptor to use will try the first available if null */
+    private String imgd;
 
     /**
      * Default constructor
      */
     public EC2Infrastructure() {
-
     }
 
     /**
@@ -120,24 +133,22 @@ public class EC2Infrastructure extends InfrastructureManager {
      */
     @Override
     public void acquireAllNodes() {
-        if (timer == null) {
-            timer = new Timer(true);
-            timer.schedule(new NodeChecker(), timeoutCheckerFreq, timeoutCheckerFreq);
-        }
-
         synchronized (this.ec2d) {
-            if (ec2d.canGetMoreNodes()) {
+            int circuitBroker = EC2Infrastructure.RETRY_THRESHOLD;
+            while (ec2d.canGetMoreNodes()) {
                 try {
-                    int num = ec2d.getMaxInstances() - ec2d.getCurrentInstances();
-                    ec2d.setNsName(nodeSource.getName());
-                    this.instances.addAll(ec2d.runInstances(imgd));
-                    logger.info("Successfully acquired " + num + " EC2 instance" + ((num > 1) ? "s" : ""));
-                } catch (Exception e) {
-                    logger.error("Unable to acquire all EC2 instances", e);
+                    this.startEC2Instance();
+                } catch (RMException e) {
+                    circuitBroker--;
+                    if (circuitBroker > 0) {
+                        logger.warn("An exception occurred while starting a new EC2 instance. Retrying", e);
+                    } else {
+                        logger.error("Cannot start a new EC2 instance after several attempts", e);
+                        return;
+                    }
                 }
-            } else {
-                logger.info("Maximum simultaneous EC2 reservations already attained");
             }
+            logger.info("Maximum simultaneous EC2 reservations reached");
         }
     }
 
@@ -146,25 +157,124 @@ public class EC2Infrastructure extends InfrastructureManager {
      */
     @Override
     public void acquireNode() {
-        if (timer == null) {
-            timer = new Timer(true);
-            timer.schedule(new NodeChecker(), timeoutCheckerFreq, timeoutCheckerFreq);
-        }
-
         synchronized (this.ec2d) {
             if (ec2d.canGetMoreNodes()) {
                 try {
-                    this.ec2d.setNsName(nodeSource.getName());
-                    this.instances.addAll(ec2d.runInstances(1, 1, imgd));
-                    logger.info("Successfully acquired an EC2 instance");
+                    this.startEC2Instance();
+                } catch (RMException e) {
+                    logger.error("Cannot start a new EC2 instance", e);
                     return;
-                } catch (Exception e) {
-                    logger.error("Unable to acquire EC2 instance", e);
                 }
             } else {
-                logger.info("Maximum simultaneous EC2 reservations already attained");
+                logger.info("Maximum simultaneous EC2 reservations reached");
             }
         }
+    }
+
+    /**
+     * Starts a new EC2 instance.
+     * Adds a new entry in {@link #deployingNodeToInstance}
+     * @throws RMException if the deployment failed
+     */
+    private void startEC2Instance() throws RMException {
+        String deployingNodeURL = null;
+        CommandLineBuilder clb = this.buildEC2CommandLine();
+        try {
+            String cmd = clb.buildCommandLine(true);
+            deployingNodeURL = super.addDeployingNode(clb.getNodeName(), cmd,
+                    "Deploying node on EC2 instance", TIMEOUT_DELAY);
+            //we always deploy one by one to be able to match an instance with a deploying node
+            List<Instance> booteds = ec2d.runInstances(1, 1, this.imgd, cmd);
+            Instance booted = null;
+            int size = booteds.size();
+            if (size != 1) {
+                //doing some cleanup, safe check
+                logger.warn("The number of started instances doesn't match, expected 1 get " + size);
+                if (size <= 0) {
+                    logger.error("No instance started");
+                    if (deployingNodeURL != null) {
+                        //declaring the node lost
+                        super.declareDeployingNodeLost(deployingNodeURL,
+                                "The associated EC2 instance didn't start.");
+                    }
+                    return;
+                } else {//size >=2
+                    booted = booteds.remove(0);
+                    for (Instance toDestroy : booteds) {
+                        //creating deploying nodes to notify the user graphically about the issue which could cost money...
+                        String lostNodeURL = super.addDeployingNode(clb.getNodeName(), cmd,
+                                "An EC2 instance started but wasn't required.", TIMEOUT_DELAY);
+                        String lostDescription = "An EC2 instance started but wasn't required. This instance is now powered off.";
+                        if (!this.ec2d.terminateInstance(toDestroy)) {
+                            logger.error("Cannot terminate the instance " + toDestroy.getInstanceId() +
+                                " with ip " + this.ec2d.getInstanceHostname(toDestroy.getInstanceId()) +
+                                ", started whereas not expected. Terminate it by yourself.");
+                            lostDescription = "An EC2 instance started but wasn't required and we weren't able to terminate it." +
+                                System.getProperty("line.separator");
+                            lostDescription += "Terminate the instance " + toDestroy.getInstanceId() +
+                                " with ip " + this.ec2d.getInstanceHostname(toDestroy.getInstanceId()) +
+                                " by yourself";
+                        }
+                        super.declareDeployingNodeLost(lostNodeURL, lostDescription);
+                    }
+                }
+            } else {
+                booted = booteds.remove(0);
+            }
+            //booted != null
+            this.deployingNodeToInstance.put(deployingNodeURL, booted);
+            this.nodeNameToInstance.put(clb.getNodeName(), booted);
+            logger.info("New EC2 instance started");
+        } catch (ProActiveException e) {
+            this.handledStartInstanceException(e, deployingNodeURL);
+        } catch (IOException e) {
+            //thrown by cmb.buildCommand(), deployingNodeURL cannot be != null but safe check
+            this.handledStartInstanceException(e, deployingNodeURL);
+        }
+    }
+
+    /**
+     * Treat a throwable thrown during ec2 instance start procedure, rethrow a RM Exception after logging the throwable
+     * and declare the associated pendingNodeURL Lost...
+     * @param e the throwable
+     * @param deployingNodeURL the url of the pending node if it exists ( can be null )
+     * @throws RMException the throwable encapsulated in a rm exception
+     */
+    private void handledStartInstanceException(Throwable e, String deployingNodeURL) throws RMException {
+        logger.error("Unable to acquire EC2 instance", e);
+        if (deployingNodeURL != null) {
+            String lf = System.getProperty("line.separator");
+            super.declareDeployingNodeLost(deployingNodeURL,
+                    "Cannot deploy a new EC2 instance because of an Exception" + lf +
+                        "Be sure that the instance is effectively powered off" + lf + Utils.getStacktrace(e));
+        }
+        throw new RMException("Cannot start a new EC2 instance", e);
+    }
+
+    /**
+     * Builds the command that will be launched in the EC2 instance
+     * @return The command line builder correctly set
+     */
+    private CommandLineBuilder buildEC2CommandLine() {
+        CommandLineBuilder result = super.getEmptyCommandLineBuilder();
+        result.setTargetOS(OperatingSystem.UNIX);
+        result.setRmURL(this.rmUrl);
+        result.setCredentialsValueAndNullOthers(this.creds64);
+        result.setRmHome(REMOTE_RM_HOME);
+        result.setJavaPath(REMOTE_JAVA_EXE);
+        Map<String, String> properties = new HashMap<String, String>();
+        //we only use http as communication protocol
+        properties.put(CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL.getName(), "http");
+        properties.put(CentralPAPropertyRepository.PA_XMLHTTP_PORT.getName(), Integer
+                .toString(this.nodeHttpPort));
+        properties.put(PAResourceManagerProperties.RM_HOME.getKey(), REMOTE_RM_HOME);
+        properties.put(CentralPAPropertyRepository.PA_HOME.getName(), REMOTE_RM_HOME);
+        result.setPaProperties(properties);
+        String nodeSourceName = this.nodeSource.getName();
+        result.setSourceName(nodeSourceName);
+        String nodeName = "EC2-" + nodeSourceName + "-node-" + ProActiveCounter.getUniqID();
+        result.setNodeName(nodeName);
+        return result;
     }
 
     /**
@@ -200,7 +310,7 @@ public class EC2Infrastructure extends InfrastructureManager {
             if (parameters[1] == null) {
                 throw new IllegalArgumentException("Credentials must be specified");
             }
-            String creds64 = new String((byte[]) parameters[1]);
+            this.creds64 = new String((byte[]) parameters[1]);
             String nodep = parameters[2].toString();
 
             try {
@@ -208,13 +318,12 @@ public class EC2Infrastructure extends InfrastructureManager {
                 if (pp < 10 || pp > 65535) {
                     throw new Exception("Out of range");
                 }
+                this.nodeHttpPort = pp;
             } catch (Exception e) {
                 throw new IllegalArgumentException("Invalid value for parameter Node Port", e);
             }
-
-            this.ec2d.setUserData(this.rmUrl, creds64, nodep);
-
         }
+
         /**
          * missing or absent parameters, aborting
          */
@@ -225,54 +334,36 @@ public class EC2Infrastructure extends InfrastructureManager {
     }
 
     /**
-     * {@inheritDoc}
+     * Removes a node from this im. If the holding EC2 instance doesn't contain more node,
+     * terminates it.
      */
     @Override
     public void removeNode(Node node) throws RMException {
-
-        synchronized (this.ec2d) {
-
-            InetAddress addr = node.getVMInformation().getInetAddress();
-            if (!isThereNodesInSameInstance(node)) {
-                logger.info("No node left, closing instance on URL :" + addr.toString());
-
+        String nodeName = node.getNodeInformation().getName();
+        Instance instance = nodeNameToInstance.remove(nodeName);
+        if (instance == null) {
+            //we don't find the instance, trying to kill it with its dns name
+            logger.warn("Cannot find the ec2 instance associated with the node " + nodeName +
+                ". Trying to recover...");
+            synchronized (this.ec2d) {
+                InetAddress addr = node.getVMInformation().getInetAddress();
                 if (this.ec2d.terminateInstanceByAddr(addr)) {
                     logger.info("Instance closed: " + addr.toString());
-                    return;
                 } else {
                     logger.error("Could not close instance: " + addr.toString());
                 }
-
+            }
+        } else {
+            //we found the instance we deployed for this node
+            String instanceID = instance.getInstanceId();
+            String instanceIP = this.ec2d.getInstanceHostname(instanceID);
+            if (this.ec2d.terminateInstance(instance)) {
+                logger.info("Instance closed: " + instanceID + " with ip " + instanceIP);
+                return;
             } else {
-                try {
-                    node.getProActiveRuntime().killNode(node.getNodeInformation().getName());
-                } catch (ProActiveException e) {
-                    logger.error("Could not kill node: " + node.getNodeInformation().getName() + " on " +
-                        addr.toString());
-                }
+                logger.error("Could not close instance: " + instanceID + " with ip " + instanceIP);
             }
         }
-    }
-
-    /**
-     * Check if there are any other nodes handled by the NodeSource in the same Instance
-     * of the node passed in parameter. Allows the release of unused instances,
-     * and avoids releasing instances with nodes still deployed
-     *
-     * @param node
-     *            Node to check if there any other node of the NodeSource in the same instance
-     * @return true there is another node in the node's instance handled by the nodeSource, false
-     *         otherwise.
-     */
-    public boolean isThereNodesInSameInstance(Node node) {
-        InetAddress addr1 = node.getVMInformation().getInetAddress();
-        for (Node n : nodeSource.getAliveNodes()) {
-            InetAddress addr2 = n.getVMInformation().getInetAddress();
-            if (addr1.equals(addr2)) {
-                return true;
-            }
-        }
-        return false;
     }
 
     /**
@@ -357,29 +448,43 @@ public class EC2Infrastructure extends InfrastructureManager {
      */
     @Override
     public void notifyAcquiredNode(Node node) throws RMException {
+        //nothing to do here, safe check...
         synchronized (this.ec2d) {
-            InetAddress nodeAddr = node.getVMInformation().getInetAddress();
-            List<Instance> ic = new ArrayList<Instance>();
-            ic.addAll(instances);
-
-            for (Instance inst : ic) {
-                try {
-                    String ec2Host = this.ec2d.getInstanceHostname(inst.getInstanceId());
-                    if (ec2Host.equals("")) {
-                        continue;
+            String nodeName = node.getNodeInformation().getName();
+            Instance instance = nodeNameToInstance.get(nodeName);
+            if (instance == null) {
+                logger
+                        .warn("Node " + nodeName +
+                            " registered but isn't associated with any instance... trying to determine it by its IP address");
+                InetAddress nodeAddr = node.getVMInformation().getInetAddress();
+                for (Entry<String, Instance> entry : nodeNameToInstance.entrySet()) {
+                    Instance inst = entry.getValue();
+                    String ec2Host = null;
+                    try {
+                        ec2Host = this.ec2d.getInstanceHostname(inst.getInstanceId());
+                        if (ec2Host.equals("")) {
+                            logger.warn("Cannot determine hostname of EC2 instance " + inst.getInstanceId() +
+                                ". Ignoring it.");
+                            continue;
+                        }
+                        InetAddress ec2Addr = InetAddress.getByName(ec2Host);
+                        if (nodeAddr.equals(ec2Addr)) {
+                            logger.info("Found requested EC2 instance " + inst.getInstanceId() + " with ip " +
+                                ec2Host + " for node " + nodeName);
+                            return;
+                        }
+                    } catch (Exception e) {
+                        logger.error("Cannot determine IP address of EC2 instance " + inst.getInstanceId() +
+                            ": " + ec2Host, e);
                     }
-                    InetAddress ec2Addr = InetAddress.getByName(ec2Host);
-                    if (nodeAddr.equals(ec2Addr)) {
-                        instances.remove(inst);
-                        logger.info("Found requested EC2 instance: " + nodeAddr.toString());
-                        return;
-                    }
-                } catch (Exception e) {
-                    logger.error("Could not check node " + node.getNodeInformation().getURL() + ": " +
-                        e.getMessage());
                 }
+                throw new RMException("Cannot find EC2 instance holding node " +
+                    node.getNodeInformation().getURL() + ". Discarding id.");
+            } else {
+                logger.info("Node " + nodeName + " registered and is associated to EC2 instance " +
+                    instance.getInstanceId() + " with ip " +
+                    this.ec2d.getInstanceHostname(instance.getInstanceId()));
             }
-            logger.warn("New node " + nodeAddr.toString() + " was not a requested EC2 instance.");
         }
     }
 
@@ -391,49 +496,32 @@ public class EC2Infrastructure extends InfrastructureManager {
      */
     @Override
     public void shutDown() {
-        timer.cancel();
-
         synchronized (this.ec2d) {
-
             int ret = this.ec2d.terminateAll();
             if (ret > 0) {
                 logger.info("Terminated " + ret + " EC2 nodes.");
             }
-
         }
     }
 
     /**
-     * Checks requested EC2 instances successfully register to the nodesource
-     * before a given timeout period. Terminate the EC2 instance and redeploy 
-     * one to keep the nodesource's state consistent if a timeout is detected
+     * If the deploying node is removed or if a timeout occurred, this method is called by
+     * parent im. We benefit from this to terminate the associated EC2 instance
      */
-    private class NodeChecker extends TimerTask {
-
-        @Override
-        public void run() {
-            int redeploy = 0;
-
-            synchronized (ec2d) {
-                List<Instance> ic = new ArrayList<Instance>();
-                ic.addAll(instances);
-                for (Instance inst : ic) {
-                    long t1 = inst.getLaunchTime().getTimeInMillis();
-                    long t2 = System.currentTimeMillis();
-                    // this time difference is wildly inaccurate: t1 depends on amazon's clock, t2 the RM's
-                    if (t2 - t1 > timeoutDelay) {
-                        logger.info("Instance " + inst.getInstanceId() + " timed out, terminating.");
-                        ec2d.terminateInstance(inst);
-                        instances.remove(inst);
-                        redeploy++;
-
-                    }
+    @Override
+    protected void notifyDeployingNodeLost(String nodeURL) {
+        Instance toRemove = this.deployingNodeToInstance.remove(nodeURL);
+        if (toRemove != null) {
+            //terminate the instance which is not expected anymore
+            synchronized (this.ec2d) {
+                if (!ec2d.terminateInstance(toRemove)) {
+                    logger.warn("Cannot terminate the EC2 instance " + toRemove.getInstanceId() +
+                        " with ip " + this.ec2d.getInstanceHostname(toRemove.getInstanceId()) +
+                        ". Do it manually.");
                 }
             }
-            while (redeploy > 0) {
-                acquireNode();
-                redeploy--;
-            }
+        } else {
+            logger.warn("Deploying node removal not associated with any EC2 instance.");
         }
     }
 }

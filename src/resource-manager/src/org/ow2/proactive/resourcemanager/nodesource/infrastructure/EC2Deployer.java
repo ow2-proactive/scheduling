@@ -100,23 +100,9 @@ public class EC2Deployer implements java.io.Serializable {
     /** Current number of deployed instances */
     private int currentInstances;
 
-    /** Url of the RM, from the instance's viewpoint */
-    private String rmUrl;
-
     /** instance type: smaller is cheaper; bigger is faster;
      * x86_64 AMIs requires extra large, or will fail to deploy */
     private InstanceType instanceType;
-
-    /**
-     * base64-encoded RM credentials
-     */
-    private String cred64;
-
-    /** Name of the NodeSource bound to the EC2Infrastructure this Deployer bound to */
-    private String nsName;
-
-    /** HTTP port number on which the EC2 node will expose itself to the RM */
-    private String nodePort;
 
     /**
      * Constructs a new node deployer for Amazon EC2
@@ -314,6 +300,8 @@ public class EC2Deployer implements java.io.Serializable {
                 logger.debug("Successfully terminated orphan EC2 node: " + id);
                 t++;
             } catch (EC2Exception e) {
+                logger.error("Cannot terminate instance " + id + " with IP " + this.getInstanceHostname(id) +
+                    ". Do it manually.");
             }
         }
         return t;
@@ -324,12 +312,14 @@ public class EC2Deployer implements java.io.Serializable {
      *
      * @param imageId
      *            an unique AMI id
+     * @param userData
+     * 			  the user data to use for this deployment
      * @return the Reservation's id
      * @throws ProActiveException
      *             acquisition failed
      */
-    public List<Instance> runInstances(String imageId) throws ProActiveException {
-        return this.runInstances(this.minInstances, this.maxInstances, imageId);
+    public List<Instance> runInstances(String imageId, String userData) throws ProActiveException {
+        return this.runInstances(this.minInstances, this.maxInstances, imageId, userData);
     }
 
     /**
@@ -341,11 +331,13 @@ public class EC2Deployer implements java.io.Serializable {
      *            maximal number of instances to deploy
      * @param imageId
      *            an unique AMI id
+     * @param userData
+     * 			  the user data to use for this deployment
      * @return the Reservation's id
      * @throws ProActiveException
      *             acquisition failed
      */
-    public List<Instance> runInstances(int minNumber, int maxNumber, String imageId)
+    public List<Instance> runInstances(int minNumber, int maxNumber, String imageId, String userData)
             throws ProActiveException {
         ImageDescription imgd = getAvailableImages(imageId, true);
 
@@ -353,7 +345,7 @@ public class EC2Deployer implements java.io.Serializable {
             throw new ProActiveException("Could not find AMI : " + imageId);
         }
 
-        return this.runInstances(minNumber, maxNumber, imgd);
+        return this.runInstances(minNumber, maxNumber, imgd, userData);
     }
 
     /**
@@ -365,34 +357,31 @@ public class EC2Deployer implements java.io.Serializable {
      *            maximal number of instances to deploy
      * @param imgd
      *            an image description containing AMI id
+     * @param userData
+     * 			  the user data to use for this deployment
      * @return the Reservation's id
      * @throws ProActiveException
      *             acquisition failed
      */
-    public List<Instance> runInstances(int min, int max, ImageDescription imgd) throws ProActiveException {
+    public List<Instance> runInstances(int min, int max, ImageDescription imgd, String userData)
+            throws ProActiveException {
 
         Jec2 ec2req = getEC2Wrapper();
 
-        if (ec2req == null)
+        if (ec2req == null) {
             throw new ProActiveException();
+        }
 
-        if (this.currentInstances + min > this.maxInstances)
+        if (this.currentInstances + min > this.maxInstances) {
             max = this.maxInstances - this.currentInstances;
+        }
 
-        if (min > max)
+        if (min > max) {
             min = max;
+        }
 
-        if (imgd == null)
+        if (imgd == null) {
             imgd = this.getAvailableImages(false).get(0);
-
-        String userData = "";
-        try {
-            userData += "rmUrl=" + rmUrl + "\n";
-            userData += "creds=" + cred64 + "\n";
-            userData += "nodeSource=" + nsName + "\n";
-            userData += "nodePort=" + nodePort + "\n";
-        } catch (Exception exc) {
-            userData = "";
         }
 
         try {
@@ -513,32 +502,6 @@ public class EC2Deployer implements java.io.Serializable {
      */
     public boolean canGetMoreNodes() {
         return (currentInstances < maxInstances);
-    }
-
-    /**
-     * Defines all mandatory user-data for instance creation Those parameters allow instance
-     * configuration at runtime, with parameters dependent to the Resource Manager's configuration
-     *
-     * @param rmUrl
-     *            URL of the resource manager
-     * @param creds64
-     *            base64-encoded credentials for RM authentication
-     * @param nodePort
-     *            ec2 node port
-     */
-    public void setUserData(String rmUrl, String creds64, String nodePort) {
-        this.rmUrl = rmUrl;
-        this.cred64 = creds64;
-        this.nodePort = nodePort;
-    }
-
-    /**
-     *
-     * @param ns
-     *            name of the NodeSource to connect to
-     */
-    public void setNsName(String ns) {
-        this.nsName = ns;
     }
 
     /**
