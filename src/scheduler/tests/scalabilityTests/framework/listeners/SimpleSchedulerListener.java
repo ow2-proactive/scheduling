@@ -60,10 +60,10 @@ import org.ow2.proactive.scheduler.common.task.TaskInfo;
 public class SimpleSchedulerListener implements SchedulerEventListener, Serializable {
 
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 30L;
-	protected static final Logger logger = Logger.getLogger(SimpleSchedulerListener.class);
+     * 
+     */
+    private static final long serialVersionUID = 30L;
+    protected static final Logger logger = Logger.getLogger(SimpleSchedulerListener.class);
 
     public SimpleSchedulerListener() {
     }

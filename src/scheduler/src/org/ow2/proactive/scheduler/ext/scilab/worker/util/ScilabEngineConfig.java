@@ -43,10 +43,10 @@ import org.ow2.proactive.scheduler.ext.matsci.worker.util.MatSciEngineConfigBase
 public class ScilabEngineConfig extends MatSciEngineConfigBase {
 
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 30L;
-	// the Home Dir of Scilab on this machine
+     * 
+     */
+    private static final long serialVersionUID = 30L;
+    // the Home Dir of Scilab on this machine
     private String scilabHome = null;
     private String scilabLibdir = null;
     private String scilabScidir = null;

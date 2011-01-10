@@ -66,11 +66,11 @@ import java.util.regex.Pattern;
 public class PBSInfrastructure extends BatchJobInfrastructure {
 
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 30L;
+     * 
+     */
+    private static final long serialVersionUID = 30L;
 
-	public PBSInfrastructure() {
+    public PBSInfrastructure() {
         this.submitJobOpt = "-l \"nodes=1:ppn=1\"";
     }
 

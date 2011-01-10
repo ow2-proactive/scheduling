@@ -51,10 +51,10 @@ import org.objectweb.proactive.annotation.PublicAPI;
 @PublicAPI
 public class CredData implements Serializable {
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 30L;
-	private String login = null;
+     * 
+     */
+    private static final long serialVersionUID = 30L;
+    private String login = null;
     private String pass = null;
     private byte[] key = null;
 

@@ -57,11 +57,11 @@ import java.util.TreeMap;
 public class EnvVars extends TreeMap<String, String> {
 
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 30L;
+     * 
+     */
+    private static final long serialVersionUID = 30L;
 
-	/**
+    /**
      * Create a new instance of EnvVars.
      *
      */

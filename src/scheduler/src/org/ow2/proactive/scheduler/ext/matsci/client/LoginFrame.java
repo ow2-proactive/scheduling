@@ -54,10 +54,10 @@ import java.awt.event.ActionListener;
 public class LoginFrame<E extends AOMatSciEnvironment> extends JDialog {
 
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 30L;
-	private JTextField username;
+     * 
+     */
+    private static final long serialVersionUID = 30L;
+    private JTextField username;
     private JPasswordField password;
     private E aose;
     private JButton login;

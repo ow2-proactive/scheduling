@@ -49,11 +49,11 @@ import org.ow2.proactive.policy.ClientsPolicy;
 public class ClientPermission extends BasicPermission {
 
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 30L;
+     * 
+     */
+    private static final long serialVersionUID = 30L;
 
-	public ClientPermission() {
+    public ClientPermission() {
         super("*");
     }
 

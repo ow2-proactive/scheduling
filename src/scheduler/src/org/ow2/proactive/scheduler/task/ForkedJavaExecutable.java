@@ -725,11 +725,11 @@ public class ForkedJavaExecutable extends JavaExecutable {
     public static class StdAppenderProvider implements AppenderProvider {
 
         /**
-		 * 
-		 */
-		private static final long serialVersionUID = 30L;
+         * 
+         */
+        private static final long serialVersionUID = 30L;
 
-		/**
+        /**
          * Returns an appender that redirect all logs on stdout/stderr depending on the level.
          * @return  an appender that redirect all logs on stdout/stderr depending on the level.
          */

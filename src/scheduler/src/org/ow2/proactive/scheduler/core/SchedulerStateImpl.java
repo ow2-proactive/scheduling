@@ -66,11 +66,11 @@ import org.ow2.proactive.scheduler.common.task.TaskInfo;
 public final class SchedulerStateImpl implements SchedulerState {
 
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 30L;
+     * 
+     */
+    private static final long serialVersionUID = 30L;
 
-	/** Pending jobs */
+    /** Pending jobs */
     private Vector<JobState> pendingJobs = new Vector<JobState>();
 
     /** Running jobs */

@@ -49,11 +49,11 @@ import org.objectweb.proactive.annotation.PublicAPI;
 public class InvalidScriptException extends Exception {
 
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 30L;
+     * 
+     */
+    private static final long serialVersionUID = 30L;
 
-	/**
+    /**
      * Constructor.
      */
     public InvalidScriptException() {

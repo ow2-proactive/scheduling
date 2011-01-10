@@ -49,10 +49,10 @@ import org.objectweb.proactive.annotation.PublicAPI;
 public class ForkedJavaTaskException extends SchedulerException {
 
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 30L;
-	private int exitCode = -1;
+     * 
+     */
+    private static final long serialVersionUID = 30L;
+    private int exitCode = -1;
 
     /**
      * Create a new instance of JobCreationException using the given message string

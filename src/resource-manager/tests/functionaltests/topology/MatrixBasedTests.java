@@ -67,11 +67,11 @@ public class MatrixBasedTests {
 
     private class LocalTopology implements Topology {
         /**
-		 * 
-		 */
-		private static final long serialVersionUID = 30L;
+         * 
+         */
+        private static final long serialVersionUID = 30L;
 
-		public Long getDistance(Node node, Node node2) {
+        public Long getDistance(Node node, Node node2) {
             Long distance = null;
             if (distances.get(node) != null && distances.get(node).get(node2) != null) {
                 distance = distances.get(node).get(node2);

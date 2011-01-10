@@ -52,10 +52,10 @@ import org.objectweb.proactive.annotation.PublicAPI;
 public class FlowError extends Exception {
 
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 30L;
-	/** task responsible for the error */
+     * 
+     */
+    private static final long serialVersionUID = 30L;
+    /** task responsible for the error */
     private String task;
 
     /**

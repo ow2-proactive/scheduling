@@ -72,11 +72,11 @@ import org.ow2.proactive.scheduler.job.JobIdImpl;
 @XmlAccessorType(XmlAccessType.FIELD)
 public final class TaskIdImpl implements TaskId {
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 30L;
+     * 
+     */
+    private static final long serialVersionUID = 30L;
 
-	@Id
+    @Id
     @GeneratedValue
     @SuppressWarnings("unused")
     @XmlTransient

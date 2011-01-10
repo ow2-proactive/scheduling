@@ -49,11 +49,11 @@ import java.io.Serializable;
 public class AOMatlabCollector extends AOMatlabWorker {
 
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 30L;
+     * 
+     */
+    private static final long serialVersionUID = 30L;
 
-	/**
+    /**
      *
      */
     public AOMatlabCollector() {

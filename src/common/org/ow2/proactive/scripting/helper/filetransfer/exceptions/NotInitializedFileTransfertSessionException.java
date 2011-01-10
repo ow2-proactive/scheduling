@@ -45,11 +45,11 @@ package org.ow2.proactive.scripting.helper.filetransfer.exceptions;
 public class NotInitializedFileTransfertSessionException extends Exception {
 
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 30L;
+     * 
+     */
+    private static final long serialVersionUID = 30L;
 
-	public NotInitializedFileTransfertSessionException() {
+    public NotInitializedFileTransfertSessionException() {
         super();
     }
 

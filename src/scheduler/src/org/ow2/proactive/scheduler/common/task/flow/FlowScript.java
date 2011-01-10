@@ -90,11 +90,11 @@ import org.ow2.proactive.scripting.SimpleScript;
 public class FlowScript extends Script<FlowAction> {
 
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 30L;
+     * 
+     */
+    private static final long serialVersionUID = 30L;
 
-	@Id
+    @Id
     @GeneratedValue
     @SuppressWarnings("unused")
     @XmlTransient

@@ -70,10 +70,10 @@ import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 public class DefaultPolicy extends Policy {
 
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 30L;
-	private static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.SCHEDULE);
+     * 
+     */
+    private static final long serialVersionUID = 30L;
+    private static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.SCHEDULE);
     /** Configuration file name used to change current configuration */
     private String CONFIG_FILE_NAME = PASchedulerProperties
             .getAbsolutePath("config/scheduler/DefaultPolicy.conf");

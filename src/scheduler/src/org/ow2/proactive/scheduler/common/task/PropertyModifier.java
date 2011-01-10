@@ -67,11 +67,11 @@ import org.hibernate.annotations.Proxy;
 public final class PropertyModifier implements Serializable {
 
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 30L;
+     * 
+     */
+    private static final long serialVersionUID = 30L;
 
-	@Id
+    @Id
     @GeneratedValue
     @XmlTransient
     private long hId;

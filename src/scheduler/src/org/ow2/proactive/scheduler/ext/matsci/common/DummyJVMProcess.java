@@ -52,11 +52,11 @@ import java.util.StringTokenizer;
 public class DummyJVMProcess extends JVMProcessImpl implements Serializable {
 
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 30L;
+     * 
+     */
+    private static final long serialVersionUID = 30L;
 
-	public DummyJVMProcess() {
+    public DummyJVMProcess() {
         super();
     }
 

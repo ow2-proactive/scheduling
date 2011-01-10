@@ -58,10 +58,10 @@ import org.ow2.proactive.resourcemanager.frontend.RMMonitoring;
 public abstract class RMAwareNodeSourcePolicy extends NodeSourcePolicy implements RMEventListener {
 
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 30L;
-	private boolean rmShuttingDown = false;
+     * 
+     */
+    private static final long serialVersionUID = 30L;
+    private boolean rmShuttingDown = false;
     protected RMInitialState initialState;
     protected RMMonitoring rmMonitoring;
 

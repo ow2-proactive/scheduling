@@ -87,11 +87,11 @@ import org.ow2.proactive.scripting.SimpleScript;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class ForkEnvironment implements Serializable {
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 30L;
+     * 
+     */
+    private static final long serialVersionUID = 30L;
 
-	@Id
+    @Id
     @GeneratedValue
     @SuppressWarnings("unused")
     @XmlTransient

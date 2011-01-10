@@ -55,11 +55,11 @@ import org.ow2.proactive.scheduler.common.job.JobId;
 public class IdentifiedJob implements Serializable {
 
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 30L;
+     * 
+     */
+    private static final long serialVersionUID = 30L;
 
-	/** Job Identification */
+    /** Job Identification */
     private JobId jobId;
 
     /** User identification */

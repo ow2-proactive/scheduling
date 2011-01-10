@@ -50,11 +50,11 @@ import org.objectweb.proactive.annotation.PublicAPI;
 public class SubmissionClosedException extends SchedulerException {
 
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 30L;
+     * 
+     */
+    private static final long serialVersionUID = 30L;
 
-	/**
+    /**
      * Create a new instance of SubmissionClosedException with the given message.
      *
      * @param msg the message to attach.

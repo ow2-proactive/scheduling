@@ -63,10 +63,10 @@ import org.objectweb.proactive.core.node.Node;
 public class NodeSet extends ArrayList<Node> {
 
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 30L;
-	/**
+     * 
+     */
+    private static final long serialVersionUID = 30L;
+    /**
      * extra nodes
      */
     private Collection<Node> extraNodes;

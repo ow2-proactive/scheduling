@@ -43,11 +43,11 @@ package org.ow2.proactive.scheduler.ext.matsci.client;
  */
 public class PASolveException extends RuntimeException {
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 30L;
+     * 
+     */
+    private static final long serialVersionUID = 30L;
 
-	public PASolveException(String message) {
+    public PASolveException(String message) {
         super(message);
     }
 

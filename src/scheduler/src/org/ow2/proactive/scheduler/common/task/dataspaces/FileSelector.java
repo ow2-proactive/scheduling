@@ -138,11 +138,11 @@ import org.objectweb.proactive.annotation.PublicAPI;
 public class FileSelector implements Serializable {
 
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 30L;
+     * 
+     */
+    private static final long serialVersionUID = 30L;
 
-	@Id
+    @Id
     @GeneratedValue
     @XmlTransient
     protected long hId;

@@ -51,11 +51,11 @@ import org.ow2.proactive.scheduler.task.launcher.TaskLauncher.OneShotDecrypter;
 public class ForkedJavaExecutableInitializer extends JavaExecutableInitializer {
 
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 30L;
+     * 
+     */
+    private static final long serialVersionUID = 30L;
 
-	/** Environment of a new dedicated JVM */
+    /** Environment of a new dedicated JVM */
     private ForkEnvironment forkEnvironment = null;
 
     /** Launcher initializer containing scripts */

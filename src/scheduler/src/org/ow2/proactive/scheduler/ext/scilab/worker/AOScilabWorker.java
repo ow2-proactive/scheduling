@@ -67,11 +67,11 @@ import java.util.List;
 public class AOScilabWorker implements Serializable, MatSciWorker {
 
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 30L;
+     * 
+     */
+    private static final long serialVersionUID = 30L;
 
-	static String nl = System.getProperty("line.separator");
+    static String nl = System.getProperty("line.separator");
 
     /**
      * script executed to initialize the task (input parameter)

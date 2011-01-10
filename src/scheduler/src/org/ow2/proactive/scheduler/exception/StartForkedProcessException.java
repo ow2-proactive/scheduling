@@ -49,10 +49,10 @@ import java.util.List;
 public class StartForkedProcessException extends StartProcessException {
 
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 30L;
-	private List<String> command;
+     * 
+     */
+    private static final long serialVersionUID = 30L;
+    private List<String> command;
 
     /**
      * Create a new instance of StartForkedProcessException

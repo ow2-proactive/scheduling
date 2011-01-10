@@ -38,11 +38,11 @@ package org.ow2.proactive.scheduler.ext.matlab.common.exception;
 
 public class InvalidNumberOfParametersException extends Exception {
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 30L;
+     * 
+     */
+    private static final long serialVersionUID = 30L;
 
-	public InvalidNumberOfParametersException(int number) {
+    public InvalidNumberOfParametersException(int number) {
         super("" + number + " parameters");
     }
 }

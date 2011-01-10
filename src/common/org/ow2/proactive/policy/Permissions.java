@@ -54,10 +54,10 @@ import org.ow2.proactive.permissions.AllPermission;
 public final class Permissions extends PermissionCollection {
 
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 30L;
-	private java.security.Permissions permissions = new java.security.Permissions();
+     * 
+     */
+    private static final long serialVersionUID = 30L;
+    private java.security.Permissions permissions = new java.security.Permissions();
     private boolean paAllPermissions = false;
 
     @Override

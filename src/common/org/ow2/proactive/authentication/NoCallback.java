@@ -51,10 +51,10 @@ import javax.security.auth.callback.Callback;
  */
 public class NoCallback implements Callback, Serializable {
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 30L;
-	/**
+     * 
+     */
+    private static final long serialVersionUID = 30L;
+    /**
      * Properties map
      */
     private Map<String, Object> values;

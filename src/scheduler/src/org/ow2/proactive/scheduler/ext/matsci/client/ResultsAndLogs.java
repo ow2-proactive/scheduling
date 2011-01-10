@@ -46,10 +46,10 @@ import java.io.Serializable;
  */
 public class ResultsAndLogs<R> implements Serializable {
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 30L;
-	protected R result;
+     * 
+     */
+    private static final long serialVersionUID = 30L;
+    protected R result;
     protected String logs;
     protected Throwable exception;
 

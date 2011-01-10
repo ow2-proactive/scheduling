@@ -54,11 +54,11 @@ import org.ow2.proactive.utils.FileToBytesConverter;
 public class GenericBatchJobInfrastructure extends BatchJobInfrastructure {
 
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 30L;
+     * 
+     */
+    private static final long serialVersionUID = 30L;
 
-	@Configurable(description = "Fully qualified classname\nof the implementation")
+    @Configurable(description = "Fully qualified classname\nof the implementation")
     protected String implementationClassname;
 
     @Configurable(fileBrowser = true, description = "Absolute path to the\nclass file of the implementation")

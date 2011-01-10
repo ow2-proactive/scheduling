@@ -44,8 +44,8 @@ import org.ow2.proactive.permissions.ClientPermission;
  */
 public class ChangePolicyPermission extends ClientPermission {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 30L;
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 30L;
 }

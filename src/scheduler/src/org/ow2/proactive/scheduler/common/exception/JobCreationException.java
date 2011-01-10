@@ -53,10 +53,10 @@ import org.ow2.proactive.scheduler.common.job.factories.XMLTags;
 public class JobCreationException extends SchedulerException {
 
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 30L;
-	private String taskName = null;
+     * 
+     */
+    private static final long serialVersionUID = 30L;
+    private String taskName = null;
     private Stack<XMLTags> tags = new Stack<XMLTags>();
     private XMLAttributes attribute = null;
     private boolean isSchemaException = false;

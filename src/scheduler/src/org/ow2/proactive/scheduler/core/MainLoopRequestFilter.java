@@ -57,10 +57,10 @@ import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
  */
 public class MainLoopRequestFilter implements RequestFilter {
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 30L;
-	public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.CORE);
+     * 
+     */
+    private static final long serialVersionUID = 30L;
+    public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.CORE);
     private ArrayList<String> methodNames = new ArrayList<String>();
 
     /**

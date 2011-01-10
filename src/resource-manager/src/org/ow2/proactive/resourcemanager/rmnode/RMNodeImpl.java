@@ -80,11 +80,11 @@ import org.ow2.proactive.scripting.SelectionScript;
 public class RMNodeImpl implements RMNode, Serializable {
 
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 30L;
+     * 
+     */
+    private static final long serialVersionUID = 30L;
 
-	/** HashMap associates a selection Script to its result on the node */
+    /** HashMap associates a selection Script to its result on the node */
     private HashMap<SelectionScript, Integer> scriptStatus;
 
     /** ProActive Node Object of the RMNode */

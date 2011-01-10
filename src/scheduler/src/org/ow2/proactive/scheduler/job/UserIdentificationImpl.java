@@ -59,11 +59,11 @@ import org.ow2.proactive.scheduler.core.ClientRequestHandler;
 public class UserIdentificationImpl extends UserIdentification {
 
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 30L;
+     * 
+     */
+    private static final long serialVersionUID = 30L;
 
-	/** user name */
+    /** user name */
     private String username;
 
     /** user subject */

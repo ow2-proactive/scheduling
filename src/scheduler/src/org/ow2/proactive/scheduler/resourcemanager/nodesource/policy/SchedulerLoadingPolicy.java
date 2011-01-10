@@ -73,11 +73,11 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
         RMEventListener {
 
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 30L;
+     * 
+     */
+    private static final long serialVersionUID = 30L;
 
-	protected static Logger logger = ProActiveLogger.getLogger(RMLoggers.POLICY);
+    protected static Logger logger = ProActiveLogger.getLogger(RMLoggers.POLICY);
 
     private Map<JobId, Integer> activeTasks;
     private int activeTask = 0;

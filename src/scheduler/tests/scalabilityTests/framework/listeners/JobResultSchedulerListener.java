@@ -60,11 +60,11 @@ import scalabilityTests.framework.AbstractSchedulerUser;
 public class JobResultSchedulerListener extends SimpleSchedulerListener {
 
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 30L;
+     * 
+     */
+    private static final long serialVersionUID = 30L;
 
-	private volatile AbstractSchedulerUser<JobId> daddy;
+    private volatile AbstractSchedulerUser<JobId> daddy;
 
     protected static final Logger logger = Logger.getLogger(JobResultSchedulerListener.class);
 

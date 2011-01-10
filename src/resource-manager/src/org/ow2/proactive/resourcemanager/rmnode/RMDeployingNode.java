@@ -59,11 +59,11 @@ import org.ow2.proactive.scripting.SelectionScript;
  */
 public final class RMDeployingNode implements RMNode, Serializable {
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 30L;
+     * 
+     */
+    private static final long serialVersionUID = 30L;
 
-	static {
+    static {
         InfrastructureManager.RMDeployingNodeAccessor.setDefault(new RMDeployingNodeAccessorImpl());
     }
 
@@ -436,11 +436,11 @@ public final class RMDeployingNode implements RMNode, Serializable {
 class RMDeployingNodeAccessorImpl extends InfrastructureManager.RMDeployingNodeAccessor {
 
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 30L;
+     * 
+     */
+    private static final long serialVersionUID = 30L;
 
-	/** {@inheritDoc} */
+    /** {@inheritDoc} */
     @Override
     protected RMDeployingNode newRMDeployingNode(String name, NodeSource ns, String commandLine,
             Client provider, String description) {

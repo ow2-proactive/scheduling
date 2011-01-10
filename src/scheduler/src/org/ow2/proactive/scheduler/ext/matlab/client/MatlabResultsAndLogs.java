@@ -50,11 +50,11 @@ import ptolemy.data.Token;
 public class MatlabResultsAndLogs extends ResultsAndLogs<Token> {
 
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 30L;
+     * 
+     */
+    private static final long serialVersionUID = 30L;
 
-	public MatlabResultsAndLogs() {
+    public MatlabResultsAndLogs() {
         super();
     }
 

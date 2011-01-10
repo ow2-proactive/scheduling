@@ -75,11 +75,11 @@ import org.ow2.proactive.utils.SchedulerLoggers;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class GenerationScript extends Script<String> {
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 30L;
+     * 
+     */
+    private static final long serialVersionUID = 30L;
 
-	/** Loggers */
+    /** Loggers */
     public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerLoggers.SCRIPT);
 
     @Id

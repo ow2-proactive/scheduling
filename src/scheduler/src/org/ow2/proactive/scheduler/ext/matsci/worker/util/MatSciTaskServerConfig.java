@@ -47,10 +47,10 @@ import java.io.Serializable;
 public class MatSciTaskServerConfig implements Serializable {
 
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 30L;
-	private boolean deployIoThread;
+     * 
+     */
+    private static final long serialVersionUID = 30L;
+    private boolean deployIoThread;
     private int taskCountBeforeJVMRespawn;
     private int taskCountBeforeJVMRespawnWindows;
     private long semaphoreTimeout;

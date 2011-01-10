@@ -123,10 +123,10 @@ public class ResultPreviewTool {
      */
     public static class SimpleImagePanel extends JPanel {
         /**
-		 * 
-		 */
-		private static final long serialVersionUID = 30L;
-		private transient Image img;
+         * 
+         */
+        private static final long serialVersionUID = 30L;
+        private transient Image img;
         private String path;
 
         /**
@@ -173,10 +173,10 @@ public class ResultPreviewTool {
      */
     public static class SimpleTextPanel extends JPanel {
         /**
-		 * 
-		 */
-		private static final long serialVersionUID = 30L;
-		private String text;
+         * 
+         */
+        private static final long serialVersionUID = 30L;
+        private String text;
         JTextArea textZone = new JTextArea(15, 40);
 
         /**

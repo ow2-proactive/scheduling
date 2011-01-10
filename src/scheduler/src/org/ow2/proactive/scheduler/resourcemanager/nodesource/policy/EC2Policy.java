@@ -92,11 +92,11 @@ import org.ow2.proactive.scheduler.common.task.TaskStatus;
 public class EC2Policy extends SchedulerAwarePolicy implements InitActive, RunActive, RMEventListener {
 
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 30L;
+     * 
+     */
+    private static final long serialVersionUID = 30L;
 
-	protected static Logger logger = ProActiveLogger.getLogger(RMLoggers.POLICY);
+    protected static Logger logger = ProActiveLogger.getLogger(RMLoggers.POLICY);
 
     /**
      * Delay in seconds between each time the policy refreshes its internal state

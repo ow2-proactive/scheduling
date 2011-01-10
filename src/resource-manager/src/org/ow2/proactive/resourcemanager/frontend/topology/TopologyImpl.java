@@ -56,10 +56,10 @@ import org.ow2.proactive.topology.descriptor.DistanceFunction;
 public class TopologyImpl implements Topology, Cloneable {
 
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 30L;
-	/**
+     * 
+     */
+    private static final long serialVersionUID = 30L;
+    /**
      * Host -> Hosts -> Distance
      * Store here only half of matrix - each host have distances to hosts added before.
      * Assume that they are symmetrical.

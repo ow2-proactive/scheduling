@@ -48,11 +48,11 @@ import java.net.URI;
 public class PASolveMatSciTaskConfig implements Serializable {
 
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 30L;
+     * 
+     */
+    private static final long serialVersionUID = 30L;
 
-	private URI[] inputZipFilesURI = null;
+    private URI[] inputZipFilesURI = null;
 
     private URI outputZipFileURI = null;
 

@@ -91,10 +91,10 @@ import org.objectweb.proactive.core.util.converter.ObjectToByteConverter;
 public class Credentials implements Serializable {
 
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 30L;
-	/** symmetric encryption parameters */
+     * 
+     */
+    private static final long serialVersionUID = 30L;
+    /** symmetric encryption parameters */
     // more than that breaks with default provider / config, it *is* secure nonetheless
     private static final int AES_KEYSIZE = 128;
     // should work fine with default providers

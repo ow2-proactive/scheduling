@@ -85,11 +85,11 @@ import org.ow2.proactive.scheduler.task.internal.InternalTask;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class JobResultImpl implements JobResult {
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 30L;
+     * 
+     */
+    private static final long serialVersionUID = 30L;
 
-	@Id
+    @Id
     @GeneratedValue
     @SuppressWarnings("unused")
     @XmlTransient

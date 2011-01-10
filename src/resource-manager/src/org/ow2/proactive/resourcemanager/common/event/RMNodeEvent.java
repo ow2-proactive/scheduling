@@ -75,11 +75,11 @@ import org.ow2.proactive.resourcemanager.rmnode.RMNode;
 public final class RMNodeEvent extends RMEvent {
 
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 30L;
+     * 
+     */
+    private static final long serialVersionUID = 30L;
 
-	/** URL of the related node */
+    /** URL of the related node */
     @Column(name = "nodeUrl")
     private final String nodeUrl;
 

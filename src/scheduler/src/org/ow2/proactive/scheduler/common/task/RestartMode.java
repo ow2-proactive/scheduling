@@ -71,10 +71,10 @@ public class RestartMode implements java.io.Serializable {
     // 1="Anywhere", 2="Elsewhere" (Changing the index can create inconsistent state in DB)
 
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 30L;
-	/**
+     * 
+     */
+    private static final long serialVersionUID = 30L;
+    /**
      * The task will be restarted according to its possible resources.
      */
     public static final RestartMode ANYWHERE = new RestartMode(1, "Anywhere");

@@ -52,10 +52,10 @@ import org.ow2.proactive.scripting.Script;
 public final class InternalForkEnvironment extends ForkEnvironment {
 
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 30L;
-	private boolean envReadOnly = false;
+     * 
+     */
+    private static final long serialVersionUID = 30L;
+    private boolean envReadOnly = false;
 
     /**
      * Create a new instance of InternalForkEnvironment using a fork environment and a base env.<br/>

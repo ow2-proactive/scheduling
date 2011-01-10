@@ -49,11 +49,11 @@ import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 public class TopologyException extends IllegalArgumentException {
 
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 30L;
+     * 
+     */
+    private static final long serialVersionUID = 30L;
 
-	/**
+    /**
      * Create a new instance of TopologyException
      *
      */

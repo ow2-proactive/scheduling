@@ -49,11 +49,11 @@ import java.util.TreeSet;
 public class MatSciJobPermanentInfo implements java.io.Serializable, Cloneable {
 
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 30L;
+     * 
+     */
+    private static final long serialVersionUID = 30L;
 
-	String jobId;
+    String jobId;
 
     TreeSet<String> tnames;
     TreeSet<String> finaltnames;

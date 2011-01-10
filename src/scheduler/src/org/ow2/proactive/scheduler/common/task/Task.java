@@ -105,11 +105,11 @@ import org.ow2.proactive.scripting.SimpleScript;
 public abstract class Task extends CommonAttribute {
 
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 30L;
+     * 
+     */
+    private static final long serialVersionUID = 30L;
 
-	/** Name of the task. */
+    /** Name of the task. */
     @Column(name = "NAME")
     protected String name = SchedulerConstants.TASK_DEFAULT_NAME;
 

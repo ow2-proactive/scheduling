@@ -47,10 +47,10 @@ import org.ow2.proactive.scheduler.ext.matsci.common.PASolveMatSciTaskConfig;
 public class PASolveMatlabTaskConfig extends PASolveMatSciTaskConfig {
 
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 30L;
-	private String[] checkLicenceScriptParams;
+     * 
+     */
+    private static final long serialVersionUID = 30L;
+    private String[] checkLicenceScriptParams;
 
     public PASolveMatlabTaskConfig() {
 

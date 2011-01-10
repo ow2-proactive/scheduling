@@ -75,10 +75,10 @@ import org.ow2.proactive.jmx.provider.JMXProviderUtils;
  */
 public class ROConnection implements MBeanServerConnection, Serializable {
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 30L;
-	/** The attached MBean server */
+     * 
+     */
+    private static final long serialVersionUID = 30L;
+    /** The attached MBean server */
     private final transient MBeanServer mbs;
     /** The id of this connection */
     private final String connectionId;

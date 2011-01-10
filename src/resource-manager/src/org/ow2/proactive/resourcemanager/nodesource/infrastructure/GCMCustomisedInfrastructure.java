@@ -64,10 +64,10 @@ import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
 public class GCMCustomisedInfrastructure extends GCMInfrastructure {
 
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 30L;
-	/** hosts list */
+     * 
+     */
+    private static final long serialVersionUID = 30L;
+    /** hosts list */
     HashMap<String, DeploymentData> hosts = new HashMap<String, DeploymentData>();
     /** path to the file with host names */
     @Configurable(fileBrowser = true, description = "List of host to use\nfor the deployment")

@@ -50,10 +50,10 @@ import org.ow2.proactive.permissions.ClientPermission;
 public class GetOwnStateOnlyPermission extends ClientPermission {
 
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 30L;
-	private boolean fullStateAllowed = true;
+     * 
+     */
+    private static final long serialVersionUID = 30L;
+    private boolean fullStateAllowed = true;
 
     /**
      * Construct the permission with specified authorization string.

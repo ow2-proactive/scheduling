@@ -72,11 +72,11 @@ public abstract class AOMatSciEnvironment<R, RL> implements Serializable, Schedu
         RunActive {
 
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 30L;
+     * 
+     */
+    private static final long serialVersionUID = 30L;
 
-	/**
+    /**
      * Connection to the scheduler
      */
     protected Scheduler scheduler;
@@ -673,11 +673,11 @@ public abstract class AOMatSciEnvironment<R, RL> implements Serializable, Schedu
     protected class FindNotWaitFilter implements RequestFilter {
 
         /**
-		 * 
-		 */
-		private static final long serialVersionUID = 30L;
+         * 
+         */
+        private static final long serialVersionUID = 30L;
 
-		/**
+        /**
          * Creates the filter
          */
         public FindNotWaitFilter() {
@@ -701,11 +701,11 @@ public abstract class AOMatSciEnvironment<R, RL> implements Serializable, Schedu
     protected class IntStrComparator implements Comparator<String>, Serializable {
 
         /**
-		 * 
-		 */
-		private static final long serialVersionUID = 30L;
+         * 
+         */
+        private static final long serialVersionUID = 30L;
 
-		public IntStrComparator() {
+        public IntStrComparator() {
 
         }
 
@@ -730,11 +730,11 @@ public abstract class AOMatSciEnvironment<R, RL> implements Serializable, Schedu
     public static class TaskNameComparator implements Comparator<String>, Serializable {
 
         /**
-		 * 
-		 */
-		private static final long serialVersionUID = 30L;
+         * 
+         */
+        private static final long serialVersionUID = 30L;
 
-		public TaskNameComparator() {
+        public TaskNameComparator() {
 
         }
 

@@ -72,11 +72,11 @@ import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 public class RMNodeSourceEvent extends RMEvent {
 
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 30L;
+     * 
+     */
+    private static final long serialVersionUID = 30L;
 
-	/** name of the source concerned by the event. */
+    /** name of the source concerned by the event. */
     @Column(name = "nodeSourceName")
     private String nodeSourceName = null;
 

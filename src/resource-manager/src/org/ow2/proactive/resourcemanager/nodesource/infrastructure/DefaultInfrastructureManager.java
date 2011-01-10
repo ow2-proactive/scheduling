@@ -57,10 +57,10 @@ import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 public class DefaultInfrastructureManager extends InfrastructureManager {
 
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 30L;
-	/** logger*/
+     * 
+     */
+    private static final long serialVersionUID = 30L;
+    /** logger*/
     protected static Logger logger = ProActiveLogger.getLogger(RMLoggers.NODESOURCE);
     /** registered nodes number */
     protected int nodesCount = 0;

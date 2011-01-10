@@ -87,10 +87,10 @@ import org.xml.sax.SAXException;
 public class VirtualInfrastructure extends InfrastructureManager {
 
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 30L;
-	@Configurable(description = "Virtual Infrastructure Type:\nxenserver, virtualbox, vmware, hyperv-winrm or hyperv-wmi")
+     * 
+     */
+    private static final long serialVersionUID = 30L;
+    @Configurable(description = "Virtual Infrastructure Type:\nxenserver, virtualbox, vmware, hyperv-winrm or hyperv-wmi")
     protected String infrastructure;
     /** The hypervisor's url */
     @Configurable(description = "Hypervisor's url")
@@ -686,10 +686,10 @@ public class VirtualInfrastructure extends InfrastructureManager {
 
     private class VMDeploymentMonitor implements Serializable, Runnable {
         /**
-		 * 
-		 */
-		private static final long serialVersionUID = 30L;
-		private volatile boolean run = false;
+         * 
+         */
+        private static final long serialVersionUID = 30L;
+        private volatile boolean run = false;
         private static final String DEPLOYING_NODE_NAME_FRAGMENT = "_node_";
         private Hashtable<String, VMGuestStatus> status = new Hashtable<String, VMGuestStatus>();
         private Hashtable<String, String[]> deployingNodes = new Hashtable<String, String[]>();
@@ -874,10 +874,10 @@ public class VirtualInfrastructure extends InfrastructureManager {
      */
     private class VirtualMachineManagerHolder implements Serializable {
         /**
-		 * 
-		 */
-		private static final long serialVersionUID = 30L;
-		/** The kind of infrastructure to manage */
+         * 
+         */
+        private static final long serialVersionUID = 30L;
+        /** The kind of infrastructure to manage */
         protected final InfrastructureType infrastructureType;
         /** The hypervisor's url and authentication credentials */
         private final String url, user, pwd;
@@ -916,10 +916,10 @@ public class VirtualInfrastructure extends InfrastructureManager {
     /** This class allows to cache registered nodes. */
     private class VMNodeCache implements Serializable {
         /**
-		 * 
-		 */
-		private static final long serialVersionUID = 30L;
-		private final HashMap<String, ArrayList<String>> vmNodeCache = new HashMap<String, ArrayList<String>>();
+         * 
+         */
+        private static final long serialVersionUID = 30L;
+        private final HashMap<String, ArrayList<String>> vmNodeCache = new HashMap<String, ArrayList<String>>();
 
         private void addNode(String holdingVM, String node) {
             getVMCache(holdingVM).add(node);

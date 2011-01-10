@@ -43,10 +43,10 @@ import java.security.Principal;
 public class IdentityPrincipal implements Principal, Serializable {
 
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 30L;
-	private String name;
+     * 
+     */
+    private static final long serialVersionUID = 30L;
+    private String name;
 
     public IdentityPrincipal(String name) {
         this.name = name;

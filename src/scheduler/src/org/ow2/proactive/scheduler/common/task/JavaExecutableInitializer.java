@@ -57,11 +57,11 @@ import org.ow2.proactive.utils.NodeSet;
 public class JavaExecutableInitializer implements ExecutableInitializer {
 
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 30L;
+     * 
+     */
+    private static final long serialVersionUID = 30L;
 
-	/** Demanded nodes */
+    /** Demanded nodes */
     protected NodeSet nodes;
 
     /** Arguments of the java task */

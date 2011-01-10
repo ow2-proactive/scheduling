@@ -52,11 +52,11 @@ import org.ow2.proactive.scripting.GenerationScript;
 public class NativeExecutableInitializer implements ExecutableInitializer {
 
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 30L;
+     * 
+     */
+    private static final long serialVersionUID = 30L;
 
-	/** Command that should be executed */
+    /** Command that should be executed */
     protected String command[];
 
     /** Generation script for the given executable */

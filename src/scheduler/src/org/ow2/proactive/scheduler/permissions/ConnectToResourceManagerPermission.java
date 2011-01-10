@@ -46,8 +46,8 @@ import org.ow2.proactive.permissions.ClientPermission;
  */
 public class ConnectToResourceManagerPermission extends ClientPermission {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 30L;
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 30L;
 }

@@ -78,11 +78,11 @@ import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 public class InternalForkedJavaTask extends InternalJavaTask {
 
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 30L;
+     * 
+     */
+    private static final long serialVersionUID = 30L;
 
-	public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.CORE);
+    public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.CORE);
 
     /** Policy content for the forked VM (declared as static element to be cached) */
     @Transient
