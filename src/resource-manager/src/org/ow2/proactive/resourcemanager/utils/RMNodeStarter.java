@@ -111,17 +111,34 @@ public class RMNodeStarter {
      * WAIT_ON_JOIN_TIMEOUT_IN_MS milliseconds
      */
     protected static int WAIT_ON_JOIN_TIMEOUT_IN_MS = 60000;
+    /** to inform that the user supplied a value from the command line for the join rm timeout */
+    protected static boolean WAIT_ON_JOIN_TIMEOUT_IN_MS_USER_SUPPLIED = false;
+    /** Name of the java property to set the timeout value used to join the resource manager */
+    protected final static String WAIT_ON_JOIN_PROP_NAME = "proactive.node.joinrm.timeout";
+
     /**
      * The ping delay used in RMPinger that pings the RM and exists if the
      * Resource Manager is down
      */
     protected static long PING_DELAY_IN_MS = 30000;
+    /** to inform that the user supplied a value from the command line for the ping */
+    protected static boolean PING_DELAY_IN_MS_USER_SUPPLIED = false;
+    /** Name of the java property to set the node -> rm ping frequency value */
+    protected final static String PING_DELAY_PROP_NAME = "proactive.node.ping.delay";
 
     /** The number of attempts to add the local node to the RM before quitting */
     protected static int NB_OF_ADD_NODE_ATTEMPTS = 10;
+    /** to inform that the user supplied a value from the command line for the number of "add" attempts */
+    protected static boolean NB_OF_ADD_NODE_ATTEMPTS_USER_SUPPLIED = false;
+    /** Name of the java property to set the number of attempts performed to add a node to the resource manager */
+    protected final static String NB_OF_ADD_NODE_ATTEMPTS_PROP_NAME = "proactive.node.add.attempts";
 
     /** The delay, in millis, between two attempts to add a node */
     protected static int ADD_NODE_ATTEMPTS_DELAY_IN_MS = 5000;
+    /** to inform that the user supplied a value from the command line for the delay between two add attempts*/
+    protected static boolean ADD_NODE_ATTEMPTS_DELAY_IN_MS_USER_SUPPLIED = false;
+    /** Name of the java property to set the delay between two attempts performed to add a node to the resource manager */
+    protected final static String ADD_NODE_ATTEMPTS_DELAY_PROP_NAME = "proactive.node.add.delay";
 
     // The url of the created node
     protected String nodeURL = "Not defined";
@@ -368,20 +385,24 @@ public class RMNodeStarter {
             if (cl.hasOption(OPTION_WAIT_AND_JOIN_TIMEOUT)) {
                 RMNodeStarter.WAIT_ON_JOIN_TIMEOUT_IN_MS = Integer.valueOf(cl
                         .getOptionValue(OPTION_WAIT_AND_JOIN_TIMEOUT));
+                RMNodeStarter.WAIT_ON_JOIN_TIMEOUT_IN_MS_USER_SUPPLIED = true;
             }
             // Optional ping delay
             if (cl.hasOption(OPTION_PING_DELAY)) {
                 RMNodeStarter.PING_DELAY_IN_MS = Integer.valueOf(cl.getOptionValue(OPTION_PING_DELAY));
+                RMNodeStarter.PING_DELAY_IN_MS_USER_SUPPLIED = true;
             }
             // Optional number of add node attempts before quitting
             if (cl.hasOption(OPTION_ADD_NODE_ATTEMPTS)) {
                 RMNodeStarter.NB_OF_ADD_NODE_ATTEMPTS = Integer.valueOf(cl
                         .getOptionValue(OPTION_ADD_NODE_ATTEMPTS));
+                RMNodeStarter.NB_OF_ADD_NODE_ATTEMPTS_USER_SUPPLIED = true;
             }
             // Optional delay between add node attempts
             if (cl.hasOption(OPTION_ADD_NODE_ATTEMPTS_DELAY)) {
                 RMNodeStarter.ADD_NODE_ATTEMPTS_DELAY_IN_MS = Integer.valueOf(cl
                         .getOptionValue(OPTION_ADD_NODE_ATTEMPTS_DELAY));
+                RMNodeStarter.ADD_NODE_ATTEMPTS_DELAY_IN_MS_USER_SUPPLIED = true;
             }
             // Optional help option
             if (cl.hasOption(OPTION_HELP)) {
@@ -417,11 +438,107 @@ public class RMNodeStarter {
             cl = parser.parse(options, args);
             //now we update this object's fields given the options.
             fillParameters(cl, options);
+            //check the user supplied values
+            //performed after fillParameters to be able to override fillParameters in subclasses
+            checkUserSuppliedParameters();
         } catch (ParseException pe) {
             pe.printStackTrace();
             System.exit(ExitStatus.RMNODE_PARSE_ERROR.exitCode);
         }
 
+    }
+
+    /**
+     * Checks that user has supplied parameters or override them with java properties values...
+     */
+    private void checkUserSuppliedParameters() {
+        //need an exhaustive list...
+        //first, the number of add attempts
+        if (!NB_OF_ADD_NODE_ATTEMPTS_USER_SUPPLIED) {
+            String tmpNBAddString = System.getProperty(RMNodeStarter.NB_OF_ADD_NODE_ATTEMPTS_PROP_NAME);
+            if (tmpNBAddString != null) {
+                try {
+                    RMNodeStarter.NB_OF_ADD_NODE_ATTEMPTS = Integer.parseInt(tmpNBAddString);
+                    logger.debug("Number of add node attempts not supplied by user, using java property: " +
+                        RMNodeStarter.NB_OF_ADD_NODE_ATTEMPTS);
+                } catch (Exception e) {
+                    logger.warn("Cannot use the value supplied by java property " +
+                        RMNodeStarter.NB_OF_ADD_NODE_ATTEMPTS_PROP_NAME + " : " + tmpNBAddString +
+                        ". Using default " + RMNodeStarter.NB_OF_ADD_NODE_ATTEMPTS);
+                }
+            } else {
+                logger.debug("Using default value for the number of add node attempts: " +
+                    RMNodeStarter.NB_OF_ADD_NODE_ATTEMPTS);
+            }
+        } else {
+            logger.debug("Using value supplied by user for the number of add node attempts: " +
+                RMNodeStarter.NB_OF_ADD_NODE_ATTEMPTS);
+        }
+
+        //the delay between two add node attempts
+        if (!ADD_NODE_ATTEMPTS_DELAY_IN_MS_USER_SUPPLIED) {
+            String tmpADDNodeDelay = System.getProperty(RMNodeStarter.ADD_NODE_ATTEMPTS_DELAY_PROP_NAME);
+            if (tmpADDNodeDelay != null) {
+                try {
+                    RMNodeStarter.ADD_NODE_ATTEMPTS_DELAY_IN_MS = Integer.parseInt(tmpADDNodeDelay);
+                    logger.debug("Add node attempts delay not supplied by user, using java property: " +
+                        RMNodeStarter.ADD_NODE_ATTEMPTS_DELAY_IN_MS);
+                } catch (Exception e) {
+                    logger.warn("Cannot use the value supplied by java property " +
+                        RMNodeStarter.ADD_NODE_ATTEMPTS_DELAY_PROP_NAME + " : " + tmpADDNodeDelay +
+                        ". Using default " + RMNodeStarter.ADD_NODE_ATTEMPTS_DELAY_IN_MS);
+                }
+            } else {
+                logger.debug("Using default value for the add node attempts delay: " +
+                    RMNodeStarter.ADD_NODE_ATTEMPTS_DELAY_IN_MS);
+            }
+        } else {
+            logger.debug("Using value supplied by user for the number the add node attempts delay: " +
+                RMNodeStarter.ADD_NODE_ATTEMPTS_DELAY_IN_MS);
+        }
+
+        //the delay of the node -> rm ping
+        if (!PING_DELAY_IN_MS_USER_SUPPLIED) {
+            String tmpPingDelay = System.getProperty(RMNodeStarter.PING_DELAY_PROP_NAME);
+            if (tmpPingDelay != null) {
+                try {
+                    RMNodeStarter.PING_DELAY_IN_MS = Integer.parseInt(tmpPingDelay);
+                    logger.debug("RM Ping delay not supplied by user, using java property: " +
+                        RMNodeStarter.PING_DELAY_IN_MS);
+                } catch (Exception e) {
+                    logger.warn("Cannot use the value supplied by java property " +
+                        RMNodeStarter.PING_DELAY_PROP_NAME + " : " + tmpPingDelay + ". Using default " +
+                        RMNodeStarter.PING_DELAY_IN_MS);
+                }
+            } else {
+                logger.debug("Using default value for the rm ping delay: " + RMNodeStarter.PING_DELAY_IN_MS);
+            }
+        } else {
+            logger.debug("Using value supplied by user for the rm ping delay: " +
+                RMNodeStarter.PING_DELAY_IN_MS);
+        }
+
+        //the "joinRM" timeout
+        if (!WAIT_ON_JOIN_TIMEOUT_IN_MS_USER_SUPPLIED) {
+            String tmpWait = System.getProperty(RMNodeStarter.WAIT_ON_JOIN_PROP_NAME);
+            if (tmpWait != null) {
+                try {
+                    RMNodeStarter.WAIT_ON_JOIN_TIMEOUT_IN_MS = Integer.parseInt(tmpWait);
+                    logger.debug("Wait on join not supplied by user, using java property: " +
+                        RMNodeStarter.WAIT_ON_JOIN_TIMEOUT_IN_MS);
+                } catch (Exception e) {
+                    logger.warn("Cannot use the value supplied by java property " +
+                        RMNodeStarter.WAIT_ON_JOIN_PROP_NAME + " : " + tmpWait + ". Using default " +
+                        RMNodeStarter.WAIT_ON_JOIN_TIMEOUT_IN_MS);
+                }
+            } else {
+                logger.debug("Using default value for the wait on join: " +
+                    RMNodeStarter.WAIT_ON_JOIN_TIMEOUT_IN_MS);
+            }
+        } else {
+            logger.debug("Using value supplied by user for the wait on join timeout: " +
+                RMNodeStarter.WAIT_ON_JOIN_TIMEOUT_IN_MS);
+        }
     }
 
     /**
