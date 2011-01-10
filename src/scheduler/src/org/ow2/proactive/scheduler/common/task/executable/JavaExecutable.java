@@ -51,6 +51,9 @@ import org.objectweb.proactive.extensions.dataspaces.exceptions.NotConfiguredExc
 import org.objectweb.proactive.extensions.dataspaces.exceptions.SpaceNotFoundException;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.task.JavaExecutableInitializer;
+import org.ow2.proactive.scheduler.common.task.flow.FlowAction;
+import org.ow2.proactive.scheduler.common.task.flow.FlowActionType;
+import org.ow2.proactive.scheduler.task.launcher.TaskLauncher;
 import org.ow2.proactive.utils.NodeSet;
 
 
@@ -310,5 +313,35 @@ public abstract class JavaExecutable extends Executable {
      */
     public final DataSpacesFileObject getLocalFile(String path) throws FileSystemException {
         return getLocalSpace().resolveFile(path);
+    }
+
+    /**
+     * When iteration occurs due to a {@link FlowActionType#LOOP} FlowAction,
+     * each new iterated instance of a task is assigned an iteration index so
+     * that it can be uniquely identified.
+     * <p>
+     * This is a convenience method to retrieve the Iteration Index that was exported
+     * as a Java Property by the TaskLauncher.
+     * 
+     * @return the Iteration Index of this Task
+     */
+    public final int getIterationIndex() {
+        return Integer.parseInt(System.getProperty(TaskLauncher.SchedulerVars.JAVAENV_TASK_ITERATION
+                .toString(), "0"));
+    }
+
+    /**
+     * When replication occurs due to a {@link FlowActionType#REPLICATE} FlowAction,
+     * each new replicated instance of a task is assigned a replication index so
+     * that it can be uniquely identified.
+     * <p>
+     * This is a convenience method to retrieve the Replication Index that was exported
+     * as a Java Property by the TaskLauncher.
+     * 
+     * @return the Replication Index of this Task
+     */
+    public final int getReplicationIndex() {
+        return Integer.parseInt(System.getProperty(TaskLauncher.SchedulerVars.JAVAENV_TASK_REPLICATION
+                .toString(), "0"));
     }
 }
