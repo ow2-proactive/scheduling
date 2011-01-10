@@ -18,8 +18,8 @@ to -->
 
 	<author><orgname/></author>
 
-	<copyright>
-		<year>1997-2010</year>
+<copyright>
+		<year>1997-2011</year>
 
 		<holder>INRIA/University of Nice-Sophia Antipolis/ActiveEon</holder>
 	</copyright>
@@ -27,31 +27,32 @@ to -->
 	<legalnotice xml:id="LegalNotice">
 		<title>Legal Notice</title>
 		<para>
-			This library is free software; you can redistribute it and/or
-			modify it under the terms of the GNU General Public License
-			as published by the Free Software Foundation; version 3 of
-			the License.
+		 This library is free software; you can redistribute it and/or
+		 modify it under the terms of the GNU Affero General Public License
+		 as published by the Free Software Foundation; version 3 of
+		 the License.
 		</para>
 		<para>
-			This library is distributed in the hope that it will be useful,
-			but WITHOUT ANY WARRANTY; without even the implied warranty of
-			MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-			General Public License for more details.
+		 This library is distributed in the hope that it will be useful,
+		 but WITHOUT ANY WARRANTY; without even the implied warranty of
+		 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+		 Affero General Public License for more details.
 		</para>
 		<para>
-			You should have received a copy of the GNU General Public License
-			along with this library; if not, write to the Free Software
-			Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
-			USA
+		You should have received a copy of the GNU Affero General Public License
+		along with this library; if not, write to the Free Software
+		Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+		USA
 		</para>
 		<para>
-			If needed, contact us to obtain a release under GPL Version 2, or a different license than the GPL.
+		If needed, contact us to obtain a release under GPL Version 2 or 3
+		or a different license than the AGPL.
 		</para>
 		<para>
 			Contact: <email>proactive@ow2.org</email> or <email>contact@activeeon.com</email>
 		</para>
 		<para>
-			Copyright 1997-2010 INRIA/University of Nice-Sophia Antipolis/ActiveEon.
+			Copyright 1997-2011 INRIA/University of Nice-Sophia Antipolis/ActiveEon.
 		</para>
 	</legalnotice>
 
