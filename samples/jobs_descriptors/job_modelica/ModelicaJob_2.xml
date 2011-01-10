@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<job xmlns="urn:proactive:jobdescriptor:dev" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:proactive:jobdescriptor:dev ../../src/scheduler/src/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/dev/schedulerjob.xsd" name="job_nativ" priority="normal" cancelJobOnError="false">
+<job xmlns="urn:proactive:jobdescriptor:3.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:proactive:jobdescriptor:3.0 ../../src/scheduler/src/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/3.0/schedulerjob.xsd" name="job_nativ" priority="normal" cancelJobOnError="false">
   <variables>
     <!-- pa.scheduler.home is known as java property - ie : start with -Dpa.scheduler.home=value -->
     <variable name="WORK_DIR" value="${pa.scheduler.home}/samples/jobs_descriptors/job_modelica"/>

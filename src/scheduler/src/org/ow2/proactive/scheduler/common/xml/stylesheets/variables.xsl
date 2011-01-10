@@ -1,5 +1,5 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-    xmlns="urn:proactive:jobdescriptor:dev" xmlns:p="urn:proactive:jobdescriptor:dev"
+    xmlns="urn:proactive:jobdescriptor:3.0" xmlns:p="urn:proactive:jobdescriptor:3.0"
     xmlns:my="urn:proactive:jobdescriptor:stylesheet:dev"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="2.0">
     <xsl:variable name="nameList" select="for $v in /p:job/p:variables/p:variable return $v/@name"/>
