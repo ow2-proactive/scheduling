@@ -36,6 +36,7 @@
  */
 package org.ow2.proactive.scheduler.resourcemanager.nodesource.policy;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -61,10 +62,15 @@ import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SchedulerEventListener;
+import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
+import org.ow2.proactive.scheduler.common.exception.PermissionException;
+import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
+import org.ow2.proactive.scheduler.common.task.TaskState;
+import org.ow2.proactive.scheduler.common.task.TaskStatus;
 
 
 public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements InitActive, RunActive,
@@ -159,13 +165,15 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
         }
 
         for (JobState js : state.getPendingJobs()) {
-            activeTask += js.getTotalNumberOfTasks();
-            activeTasks.put(js.getId(), js.getTotalNumberOfTasks());
+            int nodesForThisJob = this.computeRequiredNodesForPendingJob(js);
+            activeTask += nodesForThisJob;
+            activeTasks.put(js.getId(), nodesForThisJob);
         }
+
         for (JobState js : state.getRunningJobs()) {
-            int jobTasks = js.getNumberOfPendingTasks() + js.getNumberOfRunningTasks();
-            activeTask += jobTasks;
-            activeTasks.put(js.getId(), jobTasks);
+            int nodesForThisJob = this.computeRequiredNodesForRunningJob(js);
+            activeTask += nodesForThisJob;
+            activeTasks.put(js.getId(), nodesForThisJob);
         }
         nodeSourceName = nodeSource.getName();
 
@@ -267,9 +275,10 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
      */
     @Override
     public void jobSubmittedEvent(JobState jobState) {
-        int nbTasks = jobState.getTotalNumberOfTasks();
-        activeTasks.put(jobState.getId(), nbTasks);
-        activeTask += nbTasks;
+        //computing the required number of nodes regarding tasks' parallel environment
+        int nodesForThisJob = this.computeRequiredNodesForPendingJob(jobState);
+        activeTasks.put(jobState.getId(), nodesForThisJob);
+        activeTask += nodesForThisJob;
         logger.debug("Job submitted. Current number of tasks " + activeTask);
     }
 
@@ -287,11 +296,20 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
             case TASK_REPLICATED:
             case TASK_SKIPPED:
                 JobId jid = notification.getData().getJobId();
-                JobInfo ji = notification.getData();
-                int i = ji.getNumberOfPendingTasks() + ji.getNumberOfRunningTasks();
+                //need to get an up to date job view from the scheduler
+                //computing the required number of nodes from 0...
+                JobState jobState = null;
+                try {
+                    jobState = this.scheduler.getJobState(jid);
+                } catch (Exception e) {
+                    logger.error("Cannot update the " + this.getClass().getSimpleName() +
+                        " state as an exception occured", e);
+                    break;
+                }
+                int nodesForThisTask = this.computeRequiredNodesForRunningJob(jobState);
                 int oldActiveTask = activeTasks.get(jid);
-                activeTasks.put(jid, i);
-                activeTask += (i - oldActiveTask);
+                activeTasks.put(jid, nodesForThisTask);
+                activeTask += (nodesForThisTask - oldActiveTask);
                 logger.debug("Tasks replicated. Current number of tasks " + activeTask);
                 break;
         }
@@ -365,14 +383,66 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
             case TASK_RUNNING_TO_FINISHED:
                 JobId id = notification.getData().getJobId();
                 if (activeTasks.containsKey(id)) {
-                    activeTasks.put(id, activeTasks.get(id) - 1);
-                    activeTask--;
+                    JobState jobState = null;
+                    int nodesForThisTask = 0;
+                    try {
+                        jobState = this.scheduler.getJobState(id);
+                        TaskState taskState = jobState.getHMTasks().get(notification.getData().getTaskId());
+                        if (taskState.isParallel()) {
+                            nodesForThisTask = taskState.getParallelEnvironment().getNodesNumber();
+                        } else {
+                            nodesForThisTask = 1;
+                        }
+                    } catch (Exception e) {
+                        logger.error("Cannot update " + this.getClass().getSimpleName() +
+                            "'s state because of an exception.", e);
+                        break;
+                    }
+                    activeTasks.put(id, activeTasks.get(id) - nodesForThisTask);
+                    activeTask -= nodesForThisTask;
                     logger.debug("Task finished. Current number of tasks " + activeTask);
                 } else {
                     logger.error("Unknown job id " + id);
                 }
                 break;
         }
+    }
+
+    /**
+     * Returns the required number of nodes for a pending job
+     * @param jobState
+     * @return Returns the required number of nodes for a pending job
+     */
+    private int computeRequiredNodesForPendingJob(JobState jobState) {
+        int nodesForThisJob = 0;
+        for (TaskState taskState : jobState.getTasks()) {
+            if (taskState.isParallel()) {
+                nodesForThisJob += taskState.getParallelEnvironment().getNodesNumber();
+            } else {
+                nodesForThisJob++;
+            }
+        }
+        return nodesForThisJob;
+    }
+
+    /**
+     * Returns the required number of nodes for a running job
+     * @param jobState
+     * @return the required number of nodes for a running job
+     */
+    private int computeRequiredNodesForRunningJob(JobState jobState) {
+        int nodesForThisJob = 0;
+        for (TaskState taskState : jobState.getTasks()) {
+            if (TaskStatus.PENDING.equals(taskState.getStatus()) ||
+                TaskStatus.RUNNING.equals(taskState.getStatus())) {
+                if (taskState.isParallel()) {
+                    nodesForThisJob += taskState.getParallelEnvironment().getNodesNumber();
+                } else {
+                    nodesForThisJob++;
+                }
+            }
+        }
+        return nodesForThisJob;
     }
 
     /**
