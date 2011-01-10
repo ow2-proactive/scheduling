@@ -37,9 +37,9 @@ Description: Acquires nodes from a PBS resource manager.
 Class name: org.ow2.proactive.resourcemanager.nodesource.infrastructure.PBSInfrastructure
 Parameters: <class name> rmUrl[rmi://slave1:2007/] javaPath[/user/jmguilla/home/bin/jdk1.5.0_22/bin/java] sshOptions schedulingPath[/user/jmguilla/home/workspace-git/Scheduler] javaOptions maxNodes[1] nodeTimeOut[300000] serverName rmCredentialsPath submitJobOpt[-l "nodes=1:ppn=1"]
 
-Name: SSH Infrastructure 2
+Name: SSH Infrastructure
 Description: Creates remote runtimes using SSH
-Class name: org.ow2.proactive.resourcemanager.nodesource.infrastructure.SSHInfrastructure2
+Class name: org.ow2.proactive.resourcemanager.nodesource.infrastructure.SSHInfrastructure
 Parameters: <class name> rmUrl[rmi://slave1:2007/] sshOptions javaPath[/user/jmguilla/home/bin/jdk1.5.0_22/bin/java] schedulingPath[/user/jmguilla/home/workspace-git/Scheduler] nodeTimeOut[60000] attempt[5] targetOs[Linux] javaOptions rmCredentialsPath hostsList
 
 Name: EC2 Infrastructure

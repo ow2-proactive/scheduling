@@ -51,7 +51,7 @@ import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.frontend.topology.Topology;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
-import org.ow2.proactive.resourcemanager.nodesource.infrastructure.SSHInfrastructure2;
+import org.ow2.proactive.resourcemanager.nodesource.infrastructure.SSHInfrastructure;
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.topology.descriptor.ThresholdProximityDescriptor;
@@ -110,7 +110,7 @@ public class SelectionTest extends FunctionalTest {
 
             // properties are defined, trying to deploy nodes to these hosts
             BooleanWrapper result = RMTHelper.getResourceManager().createNodeSource("remote",
-                    SSHInfrastructure2.class.getName(), new Object[] { rmUrl, // rm url
+                    SSHInfrastructure.class.getName(), new Object[] { rmUrl, // rm url
                             "", // ssh options
                             javaExec, // java executable path
                             rmHome, // rm distrib path

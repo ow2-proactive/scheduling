@@ -86,7 +86,7 @@ import org.ow2.proactive.utils.FileToBytesConverter;
  * @since ProActive Scheduling 2.0
  *
  */
-public class SSHInfrastructure2 extends InfrastructureManager {
+public class SSHInfrastructure extends InfrastructureManager {
 
     /**
      * class' logger
@@ -336,7 +336,7 @@ public class SSHInfrastructure2 extends InfrastructureManager {
                 logger.error(description);
                 if (super.checkNodeIsAcquiredAndDo(nodeName, null, new Runnable() {
                     public void run() {
-                        SSHInfrastructure2.this.declareDeployingNodeLost(pnURL, description);
+                        SSHInfrastructure.this.declareDeployingNodeLost(pnURL, description);
                     }
                 })) {
                     return;
