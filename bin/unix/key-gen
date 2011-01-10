@@ -7,4 +7,6 @@ workingDir=`dirname $0`
 eval $JAVACMD \
     org.ow2.proactive.authentication.crypto.KeyGen $@
 
+retCode=$?
 echo
+exit $retCode

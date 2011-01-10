@@ -6,5 +6,6 @@ workingDir=`dirname $0`
 
 eval $JAVACMD -Djava.awt.headless=true org.ow2.proactive.scheduler.util.console.SchedulerController $@
 
-
+retCode=$?
 echo
+exit $retCode

@@ -8,4 +8,6 @@ opt="-Xms128m -Xmx2048m"
 
 eval $JAVACMD -Djava.awt.headless=true org.ow2.proactive.resourcemanager.utils.console.ResourceManagerController $@
 
+retCode=$?
 echo
+exit $retCode

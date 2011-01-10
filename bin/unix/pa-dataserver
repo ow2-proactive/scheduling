@@ -6,5 +6,6 @@ workingDir=`dirname $0`
 
 eval $JAVACMD org.objectweb.proactive.extensions.vfsprovider.console.PADataserverStarter $@
 
+retCode=$?
 echo
-
+exit $retCode

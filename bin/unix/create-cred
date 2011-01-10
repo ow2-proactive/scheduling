@@ -4,7 +4,8 @@ CLASSPATH=.
 workingDir=`dirname $0`
 . $workingDir/env log4j-client
 
-eval $JAVACMD \
-    org.ow2.proactive.authentication.crypto.CreateCredentials $@
+eval $JAVACMD org.ow2.proactive.authentication.crypto.CreateCredentials $@
 
+retCode=$?
 echo
+exit $retCode
