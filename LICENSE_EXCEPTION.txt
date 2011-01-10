@@ -2,7 +2,7 @@
 	PROACTIVE PARALLEL SUITE LICENSE EXCEPTION
 
 
-Proactive Parallel Suite 4.3 (Programming 4.3.0, Scheduling 2.1.0, Resourcing 2.1.0, IC2D 4.3.0) is linked with and distributed with :
+Proactive Parallel Suite 5 (Programming 5.0.0, Scheduling 3.0.0, Resourcing 3.0.0, IC2D 5.0.0) is linked with and distributed with :
 
 org.eclipse.jface.databinding_1.3.100.I20090825-0800.jar
 org.eclipse.birt.chart.ui.extension_2.5.0.v20090604.jar
@@ -54,4 +54,4 @@ org.eclipse.birt.chart.engine_2.5.0.v20090604.jar
 org.eclipse.birt.report.data.adapter_2.5.0.v20090605.jar
 org.eclipse.datatools.connectivity.oda_3.2.2.v200911031100.jar
 
-In addition and as a special exception to the GNU GPL v3 license, INRIA, UNSA and ActiveEon hereby agree that the GNU GPL v3 shall not apply to those dependencies. The conditions of the GNU GPL v3 shall otherwise apply to any other code contained in or linked with Proactive Parallel Suite and Covered Works resulting from it, as specified in the GNU GPL v3 license.
+In addition and as a special exception to the GNU AGPL v3 license, INRIA, UNSA and ActiveEon hereby agree that the GNU AGPL v3 shall not apply to those dependencies. The conditions of the GNU AGPL v3 shall otherwise apply to any other code contained in or linked with Proactive Parallel Suite and Covered Works resulting from it, as specified in the GNU AGPL v3 license.
