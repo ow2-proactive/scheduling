@@ -196,6 +196,14 @@ do
         else
 			echo -Dproactive.configuration=config/proactive/ProActiveConfiguration.xml >> $NEW_FILE_DIR/$INI_FILE
         fi
+        
+        # add addons directory
+        if [ -d "$ROOT_DIRECTORY/addons" ]
+		then
+			cp -r $ROOT_DIRECTORY/addons $NEW_FILE_DIR/
+		else
+			mkdir -p $NEW_FILE_DIR/addons
+		fi
 
 	fi
 
