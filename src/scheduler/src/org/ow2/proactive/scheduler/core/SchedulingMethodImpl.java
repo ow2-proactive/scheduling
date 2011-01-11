@@ -43,6 +43,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -51,6 +52,7 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
+import org.objectweb.proactive.core.body.exceptions.FutureCreationException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.authentication.crypto.Credentials;
@@ -220,7 +222,7 @@ final class SchedulingMethodImpl implements SchedulingMethod {
                 }
             } catch (ActiveObjectCreationException e1) {
                 //Something goes wrong with the active object creation (createLauncher)
-                logger.warn("", e1);
+                logger.warn("An exception occured while creating the task launcher.", e1);
                 //so try to get back every remaining nodes to the resource manager
                 try {
                     core.rmProxiesManager.getUserRMProxy(currentJob).releaseNodes(nodeSet);
@@ -230,9 +232,20 @@ final class SchedulingMethodImpl implements SchedulingMethod {
                 if (--activeObjectCreationRetryTimeNumber == 0) {
                     return numberOfTaskStarted;
                 }
+            } catch (CancellationException e1) {
+                // timeout occurs on doTask
+                logger.warn("A timeout occured while deploying a task, performances may suffer. "
+                    + "Value of pa.scheduler.core.starttask.timeout should be increased.");
+                logger.debug("Timeout while deploying task", e1);
+                //so try to get back every remaining nodes to the resource manager
+                try {
+                    core.rmProxiesManager.getUserRMProxy(currentJob).releaseNodes(nodeSet);
+                } catch (Exception e2) {
+                    logger_dev.info("Unable to get back the nodeSet to the RM", e2);
+                }
             } catch (Exception e1) {
                 //if we are here, it is that something append while launching the current task.
-                logger.warn("", e1);
+                logger.warn("An exception occured while starting task.", e1);
                 //so try to get back every remaining nodes to the resource manager
                 try {
                     core.rmProxiesManager.getUserRMProxy(currentJob).releaseNodes(nodeSet);
@@ -554,11 +567,13 @@ final class SchedulingMethodImpl implements SchedulingMethod {
                         finalizeStarting(job, task, node, launcher);
                     } else {
                         //if there was a problem, free nodeSet for multi-nodes task (1)
-                        throw new RuntimeException("Free nodes 1");
+                        throw new RuntimeException(
+                            "An exception occured while starting the task. See previous exceptions for details.");
                     }
                 } else {
                     //if there was a problem, free nodeSet for multi-nodes task (2)
-                    throw new RuntimeException("Free nodes 2");
+                    throw new RuntimeException(
+                        "This is an unexpected behavior : task start should be done at this point.");
                 }
 
             } catch (Exception t) {
