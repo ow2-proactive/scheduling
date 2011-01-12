@@ -227,6 +227,13 @@ public final class RuntimeDataMBeanImpl extends StandardMBean implements Runtime
                 break;
             case JOB_REMOVE_FINISHED:
                 jobRemoveFinishedEvent(jobInfo);
+                break;
+            // unknown number of tasks were added, all in the PENDING state
+            case TASK_REPLICATED:
+                // unknown number of tasks were added, all from PENDING to SKIPPED state
+            case TASK_SKIPPED:
+                tasksSkippedOrReplicated(jobInfo);
+                break;
         }
     }
 
@@ -329,6 +336,20 @@ public final class RuntimeDataMBeanImpl extends StandardMBean implements Runtime
         } else {
             this.nodesUsedByJobMap.put(jobId, hostnames.size());
         }
+    }
+
+    /**
+     * An unknown number of tasks has been SKIPPED (PENDING -> SKIPPED) or REPLICATED (new PENDING tasks)
+     * 
+     * @param info contains the right numbers at the time the event was sent
+     */
+    private void tasksSkippedOrReplicated(final JobInfo info) {
+        String id = info.getJobId().value();
+        int before = numberOfPendingTasks.get(id);
+        int now = info.getNumberOfPendingTasks();
+        // the correct number of pending tasks, whatever it was before the event, it contained in the JobInfo
+        numberOfPendingTasks.put(id, now);
+        totalTasksCount += Math.max(0, now - before);
     }
 
     /**
