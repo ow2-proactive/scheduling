@@ -91,7 +91,7 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
     @Configurable(description = "number of tasks per node")
     private int loadFactor = 10;
     @Configurable()
-    private int nodeDeploymentTimeout = 10000;
+    protected int nodeDeploymentTimeout = 10000;
 
     // policy state
     private boolean active = false;
@@ -100,7 +100,7 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
     private int nodesNumberInRM = 0;
     private String nodeSourceName = null;
     // positive when deploying, negative when removing, zero when idle 
-    private long timeStamp = 0;
+    protected long timeStamp = 0;
 
     public SchedulerLoadingPolicy() {
     }
@@ -214,7 +214,7 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
         if (nodesNumberInNodeSource > maxNodes) {
             logger.debug("Node removal request");
             timeStamp = -System.currentTimeMillis();
-            removeNodes(1, false);
+            removeNode();
             return;
         }
 
@@ -231,10 +231,19 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
         if (requiredNodesNumber < nodesNumberInRM && nodesNumberInNodeSource > minNodes) {
             logger.debug("Node removal request");
             timeStamp = -System.currentTimeMillis();
-            removeNodes(1, false);
+            removeNode();
             return;
         }
     }
+    
+    /**
+     * Too many nodes are held by the NodeSource,
+     * remove one node
+     */
+    protected void removeNode() {
+        removeNodes(1, false);
+    }
+    
 
     @Override
     protected SchedulerEvent[] getEventsList() {

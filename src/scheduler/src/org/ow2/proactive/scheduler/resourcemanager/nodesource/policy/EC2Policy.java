@@ -36,498 +36,145 @@
  */
 package org.ow2.proactive.scheduler.resourcemanager.nodesource.policy;
 
-import java.util.Calendar;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.Map;
+import java.util.Map.Entry;
 
-import org.apache.log4j.Logger;
-import org.objectweb.proactive.Body;
-import org.objectweb.proactive.InitActive;
-import org.objectweb.proactive.RunActive;
-import org.objectweb.proactive.Service;
-import org.objectweb.proactive.api.PAActiveObject;
-import org.objectweb.proactive.core.body.exceptions.BodyTerminatedRequestException;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
-import org.objectweb.proactive.core.util.wrapper.IntWrapper;
-import org.ow2.proactive.resourcemanager.common.event.RMEvent;
-import org.ow2.proactive.resourcemanager.common.event.RMEventType;
+import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
-import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
-import org.ow2.proactive.resourcemanager.exception.RMException;
-import org.ow2.proactive.resourcemanager.frontend.RMEventListener;
-import org.ow2.proactive.resourcemanager.frontend.RMMonitoring;
-import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
-import org.ow2.proactive.resourcemanager.nodesource.utils.NamesConvertor;
-import org.ow2.proactive.resourcemanager.utils.RMLoggers;
-import org.ow2.proactive.scheduler.common.NotificationData;
-import org.ow2.proactive.scheduler.common.SchedulerEvent;
-import org.ow2.proactive.scheduler.common.SchedulerEventListener;
-import org.ow2.proactive.scheduler.common.job.JobId;
-import org.ow2.proactive.scheduler.common.job.JobInfo;
-import org.ow2.proactive.scheduler.common.job.JobState;
-import org.ow2.proactive.scheduler.common.task.TaskInfo;
-import org.ow2.proactive.scheduler.common.task.TaskState;
-import org.ow2.proactive.scheduler.common.task.TaskStatus;
-
 
 /**
  * 
  * NodeSource Policy for Amazon EC2
- * 
- * Acquires resources according to the current load of the Scheduler using a
- * {@link SchedulerEventListener} similarly to the {@link SchedulerLoadingPolicy}, releases
- * resources every <code>releaseCycle</code> seconds, where releaseCycle is a dynamic parameter:
- * allows EC2 resources, which are paid by the hour, to be released only after one complete hour,
- * even if it is not needed. Uses {@link RMEventListener} to determine the time at which a node is
- * being acquired on EC2.
+ * <p>
+ * Acquires resources according to the current load of the Scheduler as
+ * specified by {@link SchedulerLoadingPolicy}
+ * <p>
+ * Releases resources only on the last 10 minutes of the last paid hour to
+ * minimize costs
  * 
  * @author The ProActive Team
  * @since ProActive Scheduling 1.0
  * 
  */
 
-public class EC2Policy extends SchedulerAwarePolicy implements InitActive, RunActive, RMEventListener {
+public class EC2Policy extends SchedulerLoadingPolicy {
 
-    /**
-     * 
-     */
-    private static final long serialVersionUID = 30L;
+	{
+		// 40 mn
+		nodeDeploymentTimeout = 40 * 60 * 1000;
+	}
 
-    protected static Logger logger = ProActiveLogger.getLogger(RMLoggers.POLICY);
+	/**
+	 * Paid instance duration in Milliseconds: time after which the instance has
+	 * to be paid again. For AWS EC2, one hour
+	 */
+	private final static int releaseDelay = 60 * 60 * 1000; // 1 hour
 
-    /**
-     * Delay in seconds between each time the policy refreshes its internal state
-     */
-    @Configurable(description = "refresh frequency (s)")
-    private int refreshTime = 5;
-    /**
-     * The policy will try to maintain a number <code>schedulerTasks/loadFactor</code> nodes in the whole RM
-     */
-    @Configurable(description = "tasks per node")
-    private int loadFactor = 10;
-    /**
-     * Time after which a node is considered 'releasable', since the time of its acquisition
-     */
-    @Configurable(description = "delay between each node release (in ms)")
-    private int releaseDelay = 3600;
+	/**
+	 * Nodes can be released if t = [releaseDelay - threshold, releasDelay]
+	 */
+	private final static int threshold = 10 * 60 * 1000; // 10 minutes
 
-    private EC2Policy thisStub;
+	/**
+	 * associates a Node URL with a acquisition time the time (as return by
+	 * System.currentTimeMillis()) is actually when it was registered in the RM,
+	 * not the VM startup in AWS accounting, which probably occurred ~2mn sooner
+	 */
+	private HashMap<String, Long> nodes = null;
 
-    private Map<JobId, Integer> activeTasks;
-    private int activeTask = 0;
+	public EC2Policy() {
+		this.nodes = new HashMap<String, Long>();
+	}
 
-    /**
-     * current number of operational nodes in the NS
-     */
-    private int nodeNumber = 0;
-    /**
-     * Each time a node is requested to the NS, the result of 
-     * <code>System.currentTimeMillis()</code> is added to the head of this structure;
-     * each time a node registers in the NS, an element is removed from the tail. 
-     */
-    private LinkedList<Long> pendingNodes;
+	@Override
+	public BooleanWrapper configure(Object... policyParameters) {
+		super.configure(policyParameters);
+		return new BooleanWrapper(true);
+	}
 
-    private boolean rmShuttingDown = false;
-    private RMMonitoring rmMonitoring;
+	@Override
+	protected void removeNode() {
+		String bestFree = null;
+		String bestBusy = null;
+		String bestDown = null;
 
-    /**
-     * Maps a Node Name to Date for all NS nodes
-     */
-    private HashMap<String, Calendar> nodes;
+		long t = System.currentTimeMillis();
 
-    /**
-     * Empty constructor
-     */
-    public EC2Policy() {
-    }
+		/*
+		 * A Node can be removed only if (minutes_since_acquisisiont % 60 < 10),
+		 * ie. we are in the last 10 minutes of the last paid hour Down nodes
+		 * are removed in priority, then free nodes, then busy nodes
+		 */
 
-    /**
-     * Configures the policy
-     * 
-     * @param params
-     *            <ul>
-     *            <li>params[0..2] : used by super
-     *            <li>params[3]: refresh time: number of seconds before the policy updates its state
-     *            <li>params[4]: loadFactor: number of tasks per node at best, for the whole RM
-     *            <li>params[5]: releaseCycle: number of seconds before a node can be released
-     *            </ul>
-     * @throws IllegalArgumentException
-     *             invalid parameters, policy creation fails
-     */
-    @Override
-    public BooleanWrapper configure(Object... params) {
-        super.configure(params);
-        try {
-            activeTasks = new HashMap<JobId, Integer>();
-            pendingNodes = new LinkedList<Long>();
-            nodes = new HashMap<String, Calendar>();
+		for (Entry<String, Long> node : nodes.entrySet()) {
+			long rt = releaseDelay - ((t - node.getValue()) % releaseDelay);
+			NodeState state = null;
+			try {
+				state = nodeSource.getRMCore().getNodeState(node.getKey());
+			} catch (Throwable exc) {
+				// pending / configuring
+				continue;
+			}
 
-            int index = 4;
-            refreshTime = Integer.parseInt(params[index++].toString());
-            loadFactor = Integer.parseInt(params[index++].toString());
-            releaseDelay = Integer.parseInt(params[index++].toString());
-        } catch (RuntimeException e) {
-            throw new IllegalArgumentException("Unable to parse parameters", e);
-        }
-        return new BooleanWrapper(true);
-    }
+			switch (state) {
+			case BUSY:
+			case CONFIGURING:
+			case DEPLOYING:
+				if (rt < threshold) {
+					bestBusy = node.getKey();
+				}
+				break;
+			case LOST:
+			case DOWN:
+				if (rt < threshold) {
+					bestDown = node.getKey();
+				}
+				break;
+			case FREE:
+				if (rt < threshold) {
+					bestFree = node.getKey();
+				}
+				break;
+			}
+		}
 
-    /**
-     * {@inheritDoc}
-     */
-    public void initActivity(Body body) {
-        PAActiveObject.setImmediateService("getTotalNodeNumber");
-    }
+		if (bestDown != null) {
+			removeNode(bestDown, false);
+			this.nodes.remove(bestDown);
+		} else if (bestFree != null) {
+			removeNode(bestFree, false);
+			this.nodes.remove(bestFree);
+		} else if (bestBusy != null) {
+			removeNode(bestBusy, false);
+			this.nodes.remove(bestBusy);
+		} else {
+			// no node can be removed, cancel request
+			timeStamp = 0;
+		}
 
-    /**
-     * @return the current number of nodes available in the ResourceManager
-     */
-    protected IntWrapper getTotalNodeNumber() {
-        return new IntWrapper(nodeSource.getRMCore().getState().getFreeNodesNumber());
-    }
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    public void runActivity(Body body) {
-        Service service = new Service(body);
+	/*
+	 * Store the time at which EC2 instances register to the RM The actual
+	 * starting time in EC2 accounting might have been a couple minutes sooner
+	 * 
+	 * (non-Javadoc)
+	 * 
+	 * @see org.ow2.proactive.scheduler.resourcemanager.nodesource.policy.
+	 * SchedulerLoadingPolicy
+	 * #nodeEvent(org.ow2.proactive.resourcemanager.common.event.RMNodeEvent)
+	 */
+	@Override
+	public void nodeEvent(RMNodeEvent event) {
+		switch (event.getEventType()) {
+		case NODE_ADDED:
+			this.nodes.put(event.getNodeUrl(), System.currentTimeMillis());
+			break;
+		case NODE_REMOVED:
+			this.nodes.remove(event.getNodeUrl());
+		}
 
-        long t1 = System.currentTimeMillis() / 1000, t2;
-        long dt = 0;
-
-        while (body.isActive()) {
-
-            /*
-             * Request req = service.getOldest(); if (req != null) {
-             * logger.debug(req.getMethodName()); }
-             */
-            service.blockingServeOldest(refreshTime);
-
-            t2 = System.currentTimeMillis() / 1000;
-            dt += t2 - t1;
-            t1 = t2;
-
-            if (dt > refreshTime) {
-                if (nodeSource != null) {
-                    try {
-                        refreshNodes();
-                    } catch (BodyTerminatedRequestException e) {
-                    } catch (Exception e) {
-                        logger.error("", e);
-                    }
-                }
-                dt = 0;
-            }
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public BooleanWrapper activate() {
-        thisStub = (EC2Policy) PAActiveObject.getStubOnThis();
-        BooleanWrapper activationStatus = super.activate();
-        if (!activationStatus.getBooleanValue()) {
-            return activationStatus;
-        }
-
-        for (JobState js : state.getPendingJobs()) {
-            int nodesForThisJob = this.computeRequiredNodesForPendingJob(js);
-            activeTask += nodesForThisJob;
-            activeTasks.put(js.getId(), nodesForThisJob);
-        }
-
-        for (JobState js : state.getRunningJobs()) {
-            int nodesForThisJob = this.computeRequiredNodesForRunningJob(js);
-            activeTask += nodesForThisJob;
-            activeTasks.put(js.getId(), nodesForThisJob);
-        }
-
-        thisStub = (EC2Policy) PAActiveObject.getStubOnThis();
-        PAActiveObject.setImmediateService("getTotalNodeNumber");
-
-        rmMonitoring = nodeSource.getRMCore().getMonitoring();
-        rmMonitoring.addRMEventListener((RMEventListener) thisStub);
-
-        logger.info("Policy activated. Current number of tasks " + activeTask);
-        return new BooleanWrapper(true);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected SchedulerEvent[] getEventsList() {
-        return new SchedulerEvent[] { SchedulerEvent.JOB_RUNNING_TO_FINISHED,
-                SchedulerEvent.JOB_PENDING_TO_FINISHED, SchedulerEvent.JOB_SUBMITTED,
-                SchedulerEvent.TASK_RUNNING_TO_FINISHED };
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected SchedulerEventListener getSchedulerListener() {
-        return thisStub;
-    }
-
-    /**
-     * Updates the current state of the nodesource: according to the current load factor of the
-     * Scheduler, will acquire or release nodes. Releases nodes only when almost
-     * <code>N * releaseCycle</code> seconds have passed since the node acquisition
-     */
-    private void refreshNodes() {
-        int rmNodeNumber = thisStub.getTotalNodeNumber().getIntValue();
-        int nsNodeNumber = nodeSource.getNodesCount();
-
-        if (nsNodeNumber != nodeNumber) {
-            logger.debug("Updated nodes number");
-            nodeNumber = nsNodeNumber;
-        }
-
-        int requiredNodes = activeTask / loadFactor + (activeTask % loadFactor == 0 ? 0 : 1);
-
-        logger.info("Policy state: RM=" + rmNodeNumber + " NS=" + nsNodeNumber + " pending=" +
-            pendingNodes.size() + " required=" + requiredNodes + " tasks=" + activeTask);
-
-        if (requiredNodes < rmNodeNumber && nodeNumber > 0) {
-            int diff = Math.min(nodeNumber, rmNodeNumber - requiredNodes);
-            for (String nodeUrl : nodes.keySet()) {
-                long acq = nodes.get(nodeUrl).getTimeInMillis() / 1000;
-                long now = Calendar.getInstance().getTimeInMillis() / 1000;
-                long dt = now - acq;
-                // 10secs delay at worse should be enough for the terminate request to be sent in time
-                int delay = Math.max(refreshTime, 10);
-                if ((dt + delay) % releaseDelay <= delay) {
-                    nodeSource.getRMCore().removeNode(nodeUrl, false);
-                    diff--;
-                    if (diff == 0) {
-                        break;
-                    }
-                }
-            }
-        } else if (requiredNodes > rmNodeNumber) {
-            if (pendingNodes.size() + rmNodeNumber < requiredNodes) {
-                for (int i = 0; i < requiredNodes - (pendingNodes.size() + rmNodeNumber); i++) {
-                    nodeSource.acquireNode();
-                    pendingNodes.addLast(System.currentTimeMillis());
-                }
-            }
-        }
-
-        for (Iterator<Long> it = pendingNodes.iterator(); it.hasNext();) {
-            Long l = it.next();
-            // waiting more than half the release cycle is considered timeout.
-            // this is *wildly* inaccurate, but as the useful info is kept on IM side,
-            // this provides at least the guarantee that nodes won't stay pending forever,
-            // which is far worse than unexpected nodes poping in the NS without being expected
-            if (System.currentTimeMillis() - l > (this.releaseDelay / 2) * 1000) {
-                it.remove();
-            } else {
-                break;
-            }
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void jobSubmittedEvent(JobState jobState) {
-        int nodesForThisJob = this.computeRequiredNodesForPendingJob(jobState);
-        activeTasks.put(jobState.getId(), nodesForThisJob);
-        activeTask += nodesForThisJob;
-        logger.debug("Job submitted. Current number of tasks " + activeTask);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void jobStateUpdatedEvent(NotificationData<JobInfo> notification) {
-        switch (notification.getEventType()) {
-            case JOB_PENDING_TO_FINISHED:
-            case JOB_RUNNING_TO_FINISHED:
-                int tasksLeft = activeTasks.remove(notification.getData().getJobId());
-                activeTask -= tasksLeft;
-                break;
-            case TASK_REPLICATED:
-            case TASK_SKIPPED:
-                JobId jid = notification.getData().getJobId();
-                //need to get an up to date job view from the scheduler
-                //computing the required number of nodes from 0...
-                JobState jobState = null;
-                try {
-                    jobState = this.scheduler.getJobState(jid);
-                } catch (Exception e) {
-                    logger.error("Cannot update the " + this.getClass().getSimpleName() +
-                        " state as an exception occured", e);
-                    break;
-                }
-                int nodesForThisTask = this.computeRequiredNodesForRunningJob(jobState);
-                int oldActiveTask = activeTasks.get(jid);
-                activeTasks.put(jid, nodesForThisTask);
-                activeTask += (nodesForThisTask - oldActiveTask);
-                logger.debug("Tasks replicated. Current number of tasks " + activeTask);
-                break;
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void taskStateUpdatedEvent(NotificationData<TaskInfo> notification) {
-        switch (notification.getEventType()) {
-            case TASK_RUNNING_TO_FINISHED:
-                JobId id = notification.getData().getJobId();
-                if (activeTasks.containsKey(id)) {
-                    JobState jobState = null;
-                    int nodesForThisTask = 0;
-                    try {
-                        jobState = this.scheduler.getJobState(id);
-                        TaskState taskState = jobState.getHMTasks().get(notification.getData().getTaskId());
-                        if (taskState.isParallel()) {
-                            nodesForThisTask = taskState.getParallelEnvironment().getNodesNumber();
-                        } else {
-                            nodesForThisTask = 1;
-                        }
-                    } catch (Exception e) {
-                        logger.error("Cannot update " + this.getClass().getSimpleName() +
-                            "'s state because of an exception.", e);
-                        break;
-                    }
-                    activeTasks.put(id, activeTasks.get(id) - nodesForThisTask);
-                    activeTask -= nodesForThisTask;
-                    logger.debug("Task finished. Current number of tasks " + activeTask);
-                } else {
-                    logger.error("Unknown job id " + id);
-                }
-                break;
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public BooleanWrapper disactivate() {
-        if (rmShuttingDown) {
-            return new BooleanWrapper(true);
-        }
-
-        try {
-            rmMonitoring.removeRMEventListener();
-        } catch (RMException e) {
-            logger.error("" + e);
-            return new BooleanWrapper(false);
-        }
-        return new BooleanWrapper(true);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void nodeSourceEvent(RMNodeSourceEvent event) {
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void rmEvent(RMEvent event) {
-        switch (event.getEventType()) {
-            case SHUTTING_DOWN:
-                rmShuttingDown = true;
-                break;
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void nodeEvent(RMNodeEvent event) {
-        if (!event.getNodeSource().equals(nodeSource.getName())) {
-            return;
-        }
-
-        if (event.getEventType().equals(RMEventType.NODE_ADDED)) {
-            if (pendingNodes.size() == 0) {
-                logger.warn("Added new node while not awaiting one...");
-            } else {
-                pendingNodes.removeLast();
-            }
-            if (nodes.put(event.getNodeUrl(), Calendar.getInstance()) != null) {
-                logger.warn("New node " + event.getNodeUrl() + " was already in nodeSource " +
-                    event.getNodeSource());
-            }
-            nodeNumber++;
-            logger.debug("New node registered: " + event.getNodeUrl());
-
-        } else if (event.getEventType().equals(RMEventType.NODE_REMOVED)) {
-            if (nodes.remove(event.getNodeUrl()) == null) {
-                logger.warn("Removed node " + event.getNodeUrl() + " was not in nodeSource " +
-                    event.getNodeSource());
-            }
-            nodeNumber--;
-            logger.info("Node removed: " + event.getNodeUrl());
-        }
-    }
-
-    /**
-     * @return compact Policy status
-     */
-    @Override
-    public String toString() {
-        return NamesConvertor.beautifyName(this.getClass().getSimpleName()) + " [release cycle: " +
-            releaseDelay + "s refresh frequency: " + refreshTime + "s load factor: " + loadFactor + "]";
-    }
-
-    /**
-     * @return quick Policy description
-     */
-    @Override
-    public String getDescription() {
-        return "Allocates resources according to the Scheduler loading factor,\n"
-            + "releases resources considering EC2 instances are paid by the hour";
-    }
-
-    /**
-     * Returns the required number of nodes for a pending job
-     * @param jobState
-     * @return Returns the required number of nodes for a pending job
-     */
-    private int computeRequiredNodesForPendingJob(JobState jobState) {
-        int nodesForThisJob = 0;
-        for (TaskState taskState : jobState.getTasks()) {
-            if (taskState.isParallel()) {
-                nodesForThisJob += taskState.getParallelEnvironment().getNodesNumber();
-            } else {
-                nodesForThisJob++;
-            }
-        }
-        return nodesForThisJob;
-    }
-
-    /**
-     * Returns the required number of nodes for a running job
-     * @param jobState
-     * @return the required number of nodes for a running job
-     */
-    private int computeRequiredNodesForRunningJob(JobState jobState) {
-        int nodesForThisJob = 0;
-        for (TaskState taskState : jobState.getTasks()) {
-            if (TaskStatus.PENDING.equals(taskState.getStatus()) ||
-                TaskStatus.RUNNING.equals(taskState.getStatus())) {
-                if (taskState.isParallel()) {
-                    nodesForThisJob += taskState.getParallelEnvironment().getNodesNumber();
-                } else {
-                    nodesForThisJob++;
-                }
-            }
-        }
-        return nodesForThisJob;
-    }
+		super.nodeEvent(event);
+	}
 }
