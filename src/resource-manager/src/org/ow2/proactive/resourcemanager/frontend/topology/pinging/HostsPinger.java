@@ -51,6 +51,8 @@ import org.ow2.proactive.utils.NodeSet;
  */
 public class HostsPinger implements Pinger {
 
+    private static int TIMEOUT = 10 * 1000; // 10 sec
+
     /**
      * Pings remote nodes and returns distances to hosts where these nodes are located.
      *
@@ -89,7 +91,11 @@ public class HostsPinger implements Pinger {
         for (int i = 0; i < ATTEMPS; i++) {
             long start = System.nanoTime();
             try {
-                host.isReachable(60 * 1000);
+                boolean isReachable = host.isReachable(TIMEOUT);
+                if (!isReachable) {
+                    // host is not reachable
+                    return (long) -1;
+                }
             } catch (IOException e) {
                 // cannot reach the node
                 return (long) -1;
@@ -97,8 +103,14 @@ public class HostsPinger implements Pinger {
 
             // microseconds
             long ping = (System.nanoTime() - start) / 1000;
-            if (ping < minPing)
+            if (ping < minPing) {
                 minPing = ping;
+            }
+
+            if (ping >= TIMEOUT) {
+                // timeout occurred while pinging the node
+                return (long) -1;
+            }
         }
 
         return minPing;
