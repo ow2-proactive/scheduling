@@ -15,7 +15,7 @@ echo Replacing \'$PREVIOUS_TAG\' tag with current version for XML files
 for sd in $(ls);
 do
 find ./$sd -type f -exec sed -i "s#urn:proactive:jobdescriptor:$PREVIOUS_TAG#urn:proactive:jobdescriptor:$VERSION#g" {} \;
-find ./$sd -type f -exec sed -i "s#http://proactive.inria.fr/schemas/jobdescriptor/$PREVIOUS_TAG/schedulerjob.xsd#http://proactive.inria.fr/schemas/jobdescriptor/$VERSION/schedulerjob.xsd#g" {} \;
+find ./$sd -type f -exec sed -i "s#http://www.activeeon.com/public_content/schemas/proactive/jobdescriptor/$PREVIOUS_TAG/schedulerjob.xsd#http://www.activeeon.com/public_content/schemas/proactive/jobdescriptor/$VERSION/schedulerjob.xsd#g" {} \;
 #find ./$sd -type f -exec sed -i "s#org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/$PREVIOUS_TAG/schedulerjob.xsd#org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/$VERSION/schedulerjob.xsd#g" {} \;
 #find ./$sd -type f -exec sed -i "s#/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/$PREVIOUS_TAG/schedulerjob#/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/$VERSION/schedulerjob#g" {} \;
 find ./$sd -type f -exec sed -i "s#/common/xml/schemas/jobdescriptor/$PREVIOUS_TAG#/common/xml/schemas/jobdescriptor/$VERSION#g" {} \;
@@ -36,7 +36,9 @@ cd compile
 ./build convertSchemas
 cd ..
 echo Update the website with new schema version
-ssh sea.inria.fr mkdir /net/servers/www-sop/teams/oasis/proactive/schemas/jobdescriptor/$VERSION
-scp src/scheduler/src/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/$VERSION/schedulerjob.xsd $USER@sea.inria.fr:/net/servers/www-sop/teams/oasis/proactive/schemas/jobdescriptor/$VERSION/schedulerjob.xsd
-ssh sea.inria.fr chmod 555 /net/servers/www-sop/teams/oasis/proactive/schemas/jobdescriptor/$VERSION
-ssh sea.inria.fr chmod 444 /net/servers/www-sop/teams/oasis/proactive/schemas/jobdescriptor/$VERSION/schedulerjob.xsd
+#COMACTIVEEON_USER=www
+#COMACTIVEEON_LOCALURI=www/public_content/schemas/proactive/jobdescriptor
+#ssh $COMACTIVEEON_USER@activeeon.com mkdir $COMACTIVEEON_LOCALURI/$VERSION
+#scp src/scheduler/src/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/$VERSION/schedulerjob.xsd $COMACTIVEEON_USER@activeeon.com:$COMACTIVEEON_LOCALURI/$VERSION/schedulerjob.xsd
+#ssh sea.inria.fr chmod 555 $COMACTIVEEON_LOCALURI/$VERSION
+#ssh sea.inria.fr chmod 444 $COMACTIVEEON_LOCALURI/$VERSION/schedulerjob.xsd
