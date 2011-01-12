@@ -655,11 +655,13 @@ public class SchedulerStateRest {
      */
     public SchedulerProxyUserInterface checkAccess(String sessionId, String path) throws NotConnectedException {
         SchedulerProxyUserInterface s = SchedulerSessionMapper.getInstance().getSessionsMap().get(sessionId);
+
         if (s == null) {
             logger.trace("not found a scheduler frontend for sessionId " + sessionId);
             throw new NotConnectedException("you are not connected to the scheduler, you should log on first");
         }
-        logger.trace("found a scheduler frontend for sessionId " + sessionId);
+        logger.trace("found a scheduler frontend for sessionId " + sessionId +
+                ", path =" +path );
         return s;
     }
     
