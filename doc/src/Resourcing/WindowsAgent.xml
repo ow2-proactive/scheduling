@@ -52,9 +52,9 @@
 				<itemizedlist>
 					<listitem>
 						<para>
-							<emphasis role="bold">RMI Registration</emphasis>
+							<emphasis role="bold">Local Registration</emphasis>
 							- The specified java class will create a ProActive local node as
-							a computational resource and register it in a local RMI registry.
+							a computational resource and register it locally.
 						</para>
 					</listitem>
 					<listitem>
@@ -130,7 +130,7 @@
 			</listitem>
 			<listitem>
 				<para>
-					It is configured with the
+					It is configured with the 
 					<emphasis role="bold">RMI registration</emphasis>
 					as selected connection type and "toto" as node name.
 				</para>
@@ -220,42 +220,54 @@ Nb of active objects on the remote node: 1 received message: A message from 2667
 				</figure>
 				<itemizedlist>
 					<listitem>
-						<para>
-							Enter the Java location, usually
-							<emphasis role="bold">C:\Program Files\Java\jdk1.6.0_12</emphasis>.
+						<para>Specify the directory that will contain the configuration file named PAAgent-config.xml, note 
+							that if this file already exists in the specified directory it will be re-used.
 						</para>
 					</listitem>
 					<listitem>
-						<para>Enter the ProActive location. If you want to use only the "Local Registration" connection (see the "Connection" tab description for more information), the path to a ProActive (programming) directory is sufficient but
-							if you want to use also the "Resource Manager" connection, you have to specified a path to a
-							ProActive Scheduler directory.</para>
+						<para>Specify the directory that will contain the log files of the ProActive Agent and the spawned 
+						      runtimes.
+						</para>
+					</listitem>				
+					<listitem>
+						<para>Specify an existing, local account under which the ProActive Runtime(s) will be spawned.
+						      It is highly recommended to specify an account that is not part of the Administrators group
+						      to isolate the ProActive Runtime and reduce security risks.
+						</para>						
+						<para>If the specified account does not exist the installation program will prompt the user to create a non-admin account
+						      with the required privileges.
+						</para>
+						<para>Note that the ProActive Agent service is installed under 
+						      <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://msdn.microsoft.com/en-us/library/ms684190(VS.85).aspx">LocalSystem</link> account
+						      it cannot access remote UNC (Universal Naming Convention) path, the service account can be changed 
+						      using the "services.msc" utility. ("Control Panel->Administrative Tools->Services")
+						</para>
 					</listitem>
 					<listitem>
-						<para>Select the service account, if you want to install the
-							agent under a specific user account enter the domain ("." or
-							hostname is the local domain), user and location.</para>
-						<para>Note that you can change these settings at anytime in the
-							"services.msc" utility. ("Control Panel->Administrative
-							Tools->Services")</para>
-					</listitem>
+						<para>If you want that any non-admin user (except guest accounts) to be able to start/stop the ProActive Agent service check the 
+						 "Allow everyone to start/stop" box. If this option is checked the installer will use the <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://www.microsoft.com/downloads/en/details.aspx?FamilyID=e8ba3e56-d8fe-4a91-93cf-ed6985e3927b">SubInACL</link> tool.
+						 If the tool is not installed in the "Program Files\Windows Resource Kits\Tools" directory the installer will try to download its installer from the 
+						 official Microsoft page.						 						
+						</para>
+					</listitem>					
 				</itemizedlist>
 			</listitem>
 			<listitem>
-				<para>The installer will check whether the selected user account has the log on service right assignment.</para>
-				<para>If not, follow the following steps to add the log on service right assignment:</para>
+				<para>The installer will check whether the selected user account has the required privileges. If not follow the steps to add these privileges:</para>				
 				<itemizedlist>
 					<listitem><para>In the 'Administrative Tools' of the 'Control Panel', open the 'Local Security Policy'.</para></listitem>
 					<listitem><para>In 'Security Settings', select 'Local Policies' then select 'User Rights Assignments'.</para></listitem>
-					<listitem><para>Finally, in the list of policies, open the properties of 'Log on as a service' policy and add the needed user.</para></listitem>
+					<listitem><para>Finally, in the list of policies, open the properties of 'Replace a process-level token' policy and add the needed user. 
+					                Do the same for 'Adjust memory quotas for a process'. For more information about these privileges refer to the official Microsoft <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://msdn.microsoft.com/en-us/library/bb530716(VS.85).aspx">page</link>.
+					                </para></listitem>
 				</itemizedlist>
 			</listitem>
 		</itemizedlist>
-		<para> At the end of the installation, the user can choose to run the
-			ProActive Agent Control utility. This is explained in the next section.
+		<para>At the end of the installation, the ProActive Agent Control utility should be started. This next section explains how to configure it.
 		</para>
 
 		<para>To uninstall the ProActive Windows Agent, simply run
-			"Start/Programs/ProActiveAgent/uninstall".</para>
+			"Start->Programs->ProActiveAgent->Uninstall ProActive Agent".</para>
 	</section>
 	<section xml:id="PWA_Configuration">
 		<info>
@@ -284,7 +296,9 @@ Nb of active objects on the remote node: 1 received message: A message from 2667
 			recommended, you can edit the configuration file by yourself with
 			your favorite text editor.</para>
 		<warning>
-			<para>Configuration files are not compatible from one major release to another.</para>
+			<para>The configuration file format has changed since version 2.2
+      which is backward compatible with previous version files. If the user edits such a configuration 
+      and saves the modifications the file will be overwritten with the new format.</para>
 		</warning>
 		<para>
 			Clicking on "GUI Edit", the following windows appears:
@@ -316,7 +330,7 @@ Nb of active objects on the remote node: 1 received message: A message from 2667
 				<para>The number of Runtimes (the number of spawned JVMs).</para>
 			</listitem>
 			<listitem>
-				<para>The JVM parameters.</para>
+				<para>The JVM options.</para>
 				<para>Note that if the parameter contains <literal>${rank}</literal>, it will be dynamically replaced by the Runtime rank starting from 0.</para>
 			</listitem>
 			<listitem>
@@ -324,15 +338,10 @@ Nb of active objects on the remote node: 1 received message: A message from 2667
 				<para>Note that the script receives as parameter the PID of the Runtime.</para>
 			</listitem>
 			<listitem>
-				<para>The user can enable the memory management (disabled by
-					default) in order to limit the amount of RAM used by the JVM
-					process.</para>
-				<para>By default the limit is set to 96 mbytes. Thus, each time the
-					JVM process requires more memory, it will be killed as well as its child
-					processes.</para>
-				<para>The user can extend this limit by giving more memory for
-					java tasks (executed by the JVM process) or for native tasks (child
-					processes spawned by the JVM process).</para>
+				<para>The user can set a memory limit that will prevent the spawned
+        processes to exceed a specified amount of RAM. If a spawned process or its child process requires more memory, it will be killed
+        as well as its child processes.</para>
+				<para>Note that this limit is disabled by default (0 means no limit) and a ProActive Runtime will require at least 128 MBytes.</para>
 			</listitem>
 			<listitem>
 				<para>It is possible to list all available network interfaces by
@@ -376,8 +385,8 @@ Nb of active objects on the remote node: 1 received message: A message from 2667
 					- creates a local ProActive node and registers it in the specified
 					Resource Manager. The mandatory Resource Manager's url must be like 'protocol://host:port/'. The
 					node name and the node source name are optional. Since the Resource Manager requires an
-					authentication, the user specifies the file that contains the credential or uses the default one
-					usually located in "%USERPROFILE%\.proactive\security" folder.
+					authentication, the user specifies the file that contains the credential. If no file is specified
+          the default one	usually located in "%USERPROFILE%\.proactive\security" folder is used.
 				</para>
 			</listitem>
 			<listitem>
