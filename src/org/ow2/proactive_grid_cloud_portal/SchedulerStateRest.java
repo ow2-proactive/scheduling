@@ -130,10 +130,10 @@ public class SchedulerStateRest {
         Scheduler s = null;
 
         s = checkAccess(sessionId,"/scheduler/jobs");
-
+        renewLeaseForClient(s);
         List<JobState> jobs = new ArrayList<JobState>();
         SchedulerState state = SchedulerStateCaching.getLocalState();
-//        s.getState();
+
         jobs.addAll(state.getPendingJobs());
         jobs.addAll(state.getRunningJobs());
         jobs.addAll(state.getFinishedJobs());
@@ -145,6 +145,18 @@ public class SchedulerStateRest {
 
         return names;
 
+    }
+
+    /**
+     * call a method on the scheduler's frontend in order to renew the lease
+     * the user has on this frontend.
+     * see PORTAL-70
+     * @param sessionId
+     * @throws PermissionException 
+     * @throws NotConnectedException 
+     */
+    private void renewLeaseForClient(Scheduler scheduler) throws NotConnectedException, PermissionException {
+        scheduler.getStatus();  
     }
 
     /**
@@ -164,9 +176,10 @@ public class SchedulerStateRest {
     public List<UserJobInfo> jobsinfo(@HeaderParam("sessionid")
     String sessionId) throws PermissionException, NotConnectedException {
         Scheduler s = checkAccess(sessionId,"/scheduler/jobsinfo");
+        renewLeaseForClient(s);
         List<JobState> jobs = new ArrayList<JobState>();
+        
         SchedulerState state = SchedulerStateCaching.getLocalState();
-//        s.getState();
         jobs.addAll(state.getPendingJobs());
         jobs.addAll(state.getRunningJobs());
         jobs.addAll(state.getFinishedJobs());
@@ -198,13 +211,12 @@ public class SchedulerStateRest {
     String sessionId) throws PermissionException, NotConnectedException {
         Scheduler s = checkAccess(sessionId,"revisionjobsinfo");
         List<JobState> jobs = new ArrayList<JobState>();
-        
+        renewLeaseForClient(s);
         Map<AtomicLong, SchedulerState> stateAndrevision = SchedulerStateCaching.getRevisionAndSchedulerState();
         
         Entry<AtomicLong, SchedulerState> entry = stateAndrevision.entrySet().iterator().next();
         
         SchedulerState state = entry.getValue();
-//        s.getState();
         jobs.addAll(state.getPendingJobs());
         jobs.addAll(state.getRunningJobs());
         jobs.addAll(state.getFinishedJobs());
@@ -233,7 +245,7 @@ public class SchedulerStateRest {
     public SchedulerState schedulerState(@HeaderParam("sessionid")
     String sessionId) throws PermissionException, NotConnectedException {
         Scheduler s = checkAccess(sessionId,"/scheduler/state");
-//        return PAFuture.getFutureValue(s.getState());
+        renewLeaseForClient(s);
         return SchedulerStateCaching.getLocalState();
     }
 
@@ -248,6 +260,7 @@ public class SchedulerStateRest {
     public long schedulerStateRevision(@HeaderParam("sessionid")
     String sessionId) throws PermissionException, NotConnectedException {
         Scheduler s = checkAccess(sessionId,"/scheduler/revision");
+        renewLeaseForClient(s);
         return SchedulerStateCaching.getSchedulerRevision();
     }
     
@@ -263,6 +276,7 @@ public class SchedulerStateRest {
     public Map<AtomicLong, SchedulerState> getSchedulerStateAndRevision(@HeaderParam("sessionid")
     String sessionId) throws PermissionException, NotConnectedException {
         Scheduler s = checkAccess(sessionId,"/scheduler/staterevision");
+        renewLeaseForClient(s);
         return SchedulerStateCaching.getRevisionAndSchedulerState();
     }
     
@@ -655,7 +669,7 @@ public class SchedulerStateRest {
      */
     public SchedulerProxyUserInterface checkAccess(String sessionId, String path) throws NotConnectedException {
         SchedulerProxyUserInterface s = SchedulerSessionMapper.getInstance().getSessionsMap().get(sessionId);
-
+        
         if (s == null) {
             logger.trace("not found a scheduler frontend for sessionId " + sessionId);
             throw new NotConnectedException("you are not connected to the scheduler, you should log on first");
