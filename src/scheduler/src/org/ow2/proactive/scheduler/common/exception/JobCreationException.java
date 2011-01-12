@@ -105,7 +105,7 @@ public class JobCreationException extends SchedulerException {
      * @param cause the cause of this exception
      */
     public JobCreationException(String tag, String attribute, Exception cause) {
-        this(XMLTags.getFromXMLName(tag), attribute, cause);
+        this(tag == null ? null : XMLTags.getFromXMLName(tag), attribute, cause);
     }
 
     /**
