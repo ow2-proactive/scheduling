@@ -833,8 +833,8 @@ public class RMNodeStarter {
         private int addAttempts = -1, addAttemptsDelay = -1;
         private final String[] requiredJARs = { "script-js.jar", "jruby-engine.jar", "jython-engine.jar",
                 "commons-logging-1.1.1.jar", "ProActive_SRM-common.jar", "ProActive_ResourceManager.jar",
-                "ProActive_Scheduler-worker.jar", "commons-httpclient-3.1.jar", "commons-codec-1.3.jar",
-                "ProActive.jar" };
+                "ProActive_Scheduler-worker.jar", "ProActive_Scheduler-matsci.jar",
+                "commons-httpclient-3.1.jar", "commons-codec-1.3.jar", "ProActive.jar" };
         private final String addonsDir = "addons";
 
         private OperatingSystem targetOS = OperatingSystem.UNIX;
