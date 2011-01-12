@@ -430,17 +430,7 @@ public class EC2Deployer implements java.io.Serializable {
             return false;
 
         try {
-            System.out.println("Internal Terminating : " + inst.getInstanceId());
-
-            List<TerminatingInstanceDescription> ret = ec2req.terminateInstances(new String[] { inst
-                    .getInstanceId() });
-
-            System.out.println("res: [" + ret.size() + "] ");
-            for (TerminatingInstanceDescription ted : ret) {
-                System.out.print(ted.getInstanceId() + " " + ted.getShutdownState() + " ");
-            }
-            System.out.println();
-
+            ec2req.terminateInstances(new String[] { inst.getInstanceId() });
             this.currentInstances--;
             return true;
 
