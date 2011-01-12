@@ -24,7 +24,8 @@
 %           func : a handle to a function with only one return value (but
 %               can have several input parameters)
 %
-%           arg1, arg2, ... :
+%           arg1, arg2, ... : argi can either be a single parameter or a cell array of parameters(multiple parameters).
+%           In case the function func accepts one single parameter which is a celle array, then you should give a cell array containing that cell array parameter.
 %
 %
 %       Advanced syntax:
@@ -481,8 +482,12 @@ for i=1:NN
             inVarFP = [pa_dir fs inVarFN];
             outVarFP = [pa_dir fs outVarFN];
             % Creating input parameters mat files
-            for k=1:length(argi)
-                in.(['in' num2str(k)]) = argi{k};
+            if length(argi) == 0
+                in.in1=true;
+            else
+                for k=1:length(argi)
+                    in.(['in' num2str(k)]) = argi{k};
+                end
             end
             if (ischar(opt.TransferMatFileOptions) && length(opt.TransferMatFileOptions) > 0)
                 save(inVarFP,'-struct','in',opt.TransferMatFileOptions);
