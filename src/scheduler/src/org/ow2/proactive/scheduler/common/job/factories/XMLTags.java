@@ -98,12 +98,16 @@ public enum XMLTags {
     /**
      * Get the XMLTags enum corresponding to the given xml tag name.
      * This method ignores the case.
+     * Argument cannot be null.
      *
      * @param xmlName the XML tag name as a string
      * @return the corresponding XML tag.
      * @throws IllegalArgumentException if the tag name does not exist
      */
     public static XMLTags getFromXMLName(String xmlName) {
+        if (xmlName == null) {
+            throw new IllegalArgumentException("xmlName argument cannot be null");
+        }
         String toCheck = xmlName.toUpperCase();
         if (namesToEnum == null) {
             namesToEnum = new HashMap<String, XMLTags>();
