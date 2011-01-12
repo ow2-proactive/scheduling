@@ -27,7 +27,7 @@ offer fault tolerance.The database is configured in the
 
 * You can now submit a job. To do so, use the command-line controller.
 Just start the userScheduler.[sh|bat] script with proper parameters:
-~> scheduler-user[.bat] --submit ../../samples/jobs_descriptors/Job_PI.xml
+~> scheduler-client[.bat] --submit ../../samples/jobs_descriptors/Job_PI.xml
 
 You will be requested for login and password, and then the Job_PI.xml is
 submitted to the scheduler (use for instance demo:demo). You may find many 
@@ -67,6 +67,6 @@ feel free to contact us at proactive@ow2.org
 *** Known bugs and issues:
 
 Details can be found on the ProActive Jira bug-tracking system
-(https://galpage-exp.inria.fr:8181/jira):
+(http://bugs.activeeon.com/):
 
 *** Enjoy ProActive Scheduling !

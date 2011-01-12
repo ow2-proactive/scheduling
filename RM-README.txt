@@ -17,13 +17,13 @@ Once th RM is started the following line will be displayed
 	Resource Manager successfully created on rmi://jily.inria.fr:1099/
 
 In order to check the state of RM, number of nodes available and others or
-to administrate the RM (deploy/remove nodes etc) use rm-admin[.bat] script.
+to administrate the RM (deploy/remove nodes etc) use rm-client[.bat] script.
 After providing a login information you will have an access to javascript
 console which provides different means to manager the RM. Just type "help()"
 there. As an alternative you can specify some parameters to rm-admin[.bat]
-script (run "rm-admin -h" for details). For example to list all nodes in the
+script (run "rm-client -h" for details). For example to list all nodes in the
 RM just run
-~> rm-admin -ln
+~> rm-client -ln
 
 * For further information, please refers to the Resource Manager
 * documentation.
@@ -58,6 +58,6 @@ feel free to contact us at proactive@ow2.org
 *** Known bugs and issues:
 
 Details can be found on the ProActive Jira bug-tracking system
-(https://galpage-exp.inria.fr:8181/jira):
+(http://bugs.activeeon.com):
 
 *** Enjoy The ProActive Resource Manager
