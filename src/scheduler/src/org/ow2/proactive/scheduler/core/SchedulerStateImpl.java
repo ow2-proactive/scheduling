@@ -321,6 +321,8 @@ public final class SchedulerStateImpl implements SchedulerState {
             case JOB_RESUMED:
             case JOB_PENDING_TO_RUNNING:
             case JOB_RUNNING_TO_FINISHED:
+            case TASK_REPLICATED:
+            case TASK_SKIPPED:
                 updateJobInfo((NotificationData<JobInfo>) notification);
                 break;
             case JOB_REMOVE_FINISHED:
@@ -328,9 +330,7 @@ public final class SchedulerStateImpl implements SchedulerState {
                 jobs.remove(((NotificationData<JobInfo>) notification).getData().getJobId());
                 break;
             case TASK_PENDING_TO_RUNNING:
-            case TASK_REPLICATED:
             case TASK_RUNNING_TO_FINISHED:
-            case TASK_SKIPPED:
             case TASK_WAITING_FOR_RESTART:
                 updateTaskInfo((NotificationData<TaskInfo>) notification);
                 break;
