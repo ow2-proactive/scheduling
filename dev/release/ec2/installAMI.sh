@@ -127,8 +127,8 @@ chmod -R 755 /usr/share/ec2-tools/
 
 
 echo "Setting environment..."
-chmod 755 /root/ec2-cred.sh
-source /root/ec2-cred.sh
+chmod 755 /tmp/ec2-cred.sh
+source /tmp/ec2-cred.sh
 export JAVA_HOME=/root/JDK
 echo "export JAVA_HOME=/root/JDK" >> /root/.bashrc
 echo "export PROACTIVE_HOME=/usr/share/ProActive/" >> /root/.bashrc
@@ -183,8 +183,9 @@ fi
 echo "All components were successfully installed."
 
 # cleanup
-rm -Rf /tmp/*bz2 &>/dev/null
 
+rm -f /root/* &>/dev/null || true
+rm -f /root/.bash_history
 
 # some customization
 cat <<EOF > /etc/motd
@@ -220,7 +221,7 @@ AMI_NAME=$(curl http://169.254.169.254/1.0/user-data 2>/dev/null)
 
 echo "Bundling volume... ($ARCH)"
 ec2-bundle-vol -c $EC2_CERT -k $EC2_PRIVATE_KEY -u $EC2_USER \
-    -p $AMI_NAME -d /tmp/ -r $ARCH &>/dev/null
+    -p $AMI_NAME -d /tmp/ -r $ARCH -e /tmp/  &>/dev/null
 
 echo "Uploading bundle..."
 ec2-upload-bundle -b $BUCKET \
@@ -229,8 +230,6 @@ ec2-upload-bundle -b $BUCKET \
 
 echo "Registering new AMI: $AMI_NAME"
 ec2-register $BUCKET/$AMI_NAME.manifest.xml &>/dev/null
-
-rm -f /root/* /tmp/* &>/dev/null || true
 
 echo "All done, exiting"
 
