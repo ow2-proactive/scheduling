@@ -22,6 +22,6 @@ ip = urllib2.urlopen("http://169.254.169.254/2009-04-04/" +
                      "meta-data/public-ipv4").read()
 
 print data +\
-    "-Dproactive.hostname=" + ip
+    " -Dproactive.hostname=" + ip
 
 
