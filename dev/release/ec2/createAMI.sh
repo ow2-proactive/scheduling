@@ -510,9 +510,9 @@ export EC2_HOME=/usr/share/ec2-tools
 export AWS_CALLING_FORMAT="SUBDOMAIN"
 EOF
 echo "export PATH=\$PATH:\$EC2_HOME/bin" >> /tmp/ec2-cred.sh
-echo "export EC2_PRIVATE_KEY=/root/$(basename $EC2_PRIVATE_KEY)"\
+echo "export EC2_PRIVATE_KEY=/tmp/$(basename $EC2_PRIVATE_KEY)"\
  >> /tmp/ec2-cred.sh
-echo "export EC2_CERT=/root/$(basename $EC2_CERT)" >> /tmp/ec2-cred.sh
+echo "export EC2_CERT=/tmp/$(basename $EC2_CERT)" >> /tmp/ec2-cred.sh
 echo "export EC2_KEYPAIR=$EC2_KEYPAIR" >> /tmp/ec2-cred.sh
 echo "export EC2_USER=$EC2_USER" >> /tmp/ec2-cred.sh
 echo "export AWS_AKEY=$AWS_AKEY" >> /tmp/ec2-cred.sh
@@ -545,11 +545,8 @@ scp -i $EC2_SSH -o StrictHostKeyChecking=no \
     $EC2_ARCHIVE $FILES installAMI.sh \
     $SCHEDULER_PATH/scripts/ec2/runNode.sh \
     $SCHEDULER_PATH/scripts/ec2/params.py \
-    root@$INSTANCE_URL:/tmp/
-
-scp -i $EC2_SSH -o StrictHostKeyChecking=no \
     /tmp/ec2-cred.sh $EC2_PRIVATE_KEY $EC2_CERT \
-    root@$INSTANCE_URL:/root/
+    root@$INSTANCE_URL:/tmp/
 
 #
 # execute the install script and pray
