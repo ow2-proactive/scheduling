@@ -177,6 +177,17 @@ public abstract class NodeSourcePolicy implements Serializable {
     }
 
     /**
+     * Removes a node from the node source
+     *
+     * @param url the URL of the node
+     * @param preemtive if true remove nodes immediately without waiting while they will be freed
+     */
+    protected void removeNode(String url, boolean preemptive) {
+        info("Removing node at " + url);
+        nodeSource.getRMCore().removeNode(url, preemptive);
+    }
+    
+    /**
      * Removed all nodes from the node source
      * @param preemptive if true remove nodes immediately without waiting while they will be freed
      */
