@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <job xmlns="urn:proactive:jobdescriptor:3.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="urn:proactive:jobdescriptor:3.0 http://proactive.inria.fr/schemas/jobdescriptor/3.0/schedulerjob.xsd"
+	xsi:schemaLocation="urn:proactive:jobdescriptor:3.0 http://www.activeeon.com/public_content/schemas/proactive/jobdescriptor/3.0/schedulerjob.xsd"
 	name="job_nativ" priority="normal" cancelJobOnError="true"
 	logFile="${EXEC_PATH}/nativTask.log">
 	<description>Will execute 1 native C task with command generation</description>
