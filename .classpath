@@ -82,7 +82,6 @@
 	<classpathentry kind="lib" path="lib/scheduling/batik-util.jar"/>
 	<classpathentry kind="lib" path="lib/scheduling/batik-xml.jar"/>
 	<classpathentry kind="lib" path="lib/scheduling/bcel-5.2.jar"/>
-	<classpathentry kind="lib" path="lib/scheduling/bcprov-jdk15-132.jar"/>
 	<classpathentry kind="lib" path="lib/scheduling/bouncycastle.jar"/>
 	<classpathentry kind="lib" path="lib/scheduling/bundlerepository-1.4.3.jar"/>
 	<classpathentry kind="lib" path="lib/scheduling/cimom.jar"/>
@@ -181,7 +180,6 @@
 	<classpathentry kind="lib" path="lib/scheduling/ProActive_Scheduler-client.jar" sourcepath="/Scheduler"/>
 	<classpathentry kind="lib" path="lib/scheduling/ProActive_Scheduler-core.jar"/>
 	<classpathentry kind="lib" path="lib/scheduling/ProActive_Scheduler-fsm.jar"/>
-	<classpathentry kind="lib" path="lib/scheduling/ProActive_Scheduler-matlab.jar"/>
 	<classpathentry kind="lib" path="lib/scheduling/ProActive_Scheduler-worker.jar"/>
 	<classpathentry kind="lib" path="lib/scheduling/ProActive_SRM-common-client.jar"/>
 	<classpathentry kind="lib" path="lib/scheduling/ProActive_SRM-common.jar"/>
