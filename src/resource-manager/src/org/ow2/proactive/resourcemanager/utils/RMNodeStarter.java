@@ -835,6 +835,7 @@ public class RMNodeStarter {
                 "commons-logging-1.1.1.jar", "ProActive_SRM-common.jar", "ProActive_ResourceManager.jar",
                 "ProActive_Scheduler-worker.jar", "commons-httpclient-3.1.jar", "commons-codec-1.3.jar",
                 "ProActive.jar" };
+        private final String addonsDir = "addons";
 
         private OperatingSystem targetOS = OperatingSystem.UNIX;
 
@@ -1233,6 +1234,10 @@ public class RMNodeStarter {
                 sb.append(libRoot);
                 sb.append(jar);
             }
+
+            // add the content of addons dir on the classpath
+            sb.append(this.targetOS.ps + rmHome + addonsDir + this.targetOS.fs);
+
             if (this.getTargetOS().equals(OperatingSystem.CYGWIN) ||
                 this.getTargetOS().equals(OperatingSystem.WINDOWS)) {
                 sb.append("\"");//especially on cygwin, we need to quote the cp
