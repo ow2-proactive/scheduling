@@ -52,6 +52,7 @@ import com.xerox.amazonws.ec2.InstanceType;
 import com.xerox.amazonws.ec2.Jec2;
 import com.xerox.amazonws.ec2.ReservationDescription;
 import com.xerox.amazonws.ec2.ReservationDescription.Instance;
+import com.xerox.amazonws.ec2.TerminatingInstanceDescription;
 
 
 /**
@@ -418,14 +419,30 @@ public class EC2Deployer implements java.io.Serializable {
      * @return true upon success, or false
      */
     public boolean terminateInstance(Instance inst) {
-        String host = getInstanceHostname(inst.getInstanceId());
-        InetAddress addr = null;
+        Jec2 ec2req = getEC2Wrapper();
+
+        if (ec2req == null)
+            return false;
+
         try {
-            addr = InetAddress.getByName(host);
-        } catch (UnknownHostException e) {
+            System.out.println("Internal Terminating : " + inst.getInstanceId());
+
+            List<TerminatingInstanceDescription> ret = ec2req.terminateInstances(new String[] { inst
+                    .getInstanceId() });
+
+            System.out.println("res: [" + ret.size() + "] ");
+            for (TerminatingInstanceDescription ted : ret) {
+                System.out.print(ted.getInstanceId() + " " + ted.getShutdownState() + " ");
+            }
+            System.out.println();
+
+            this.currentInstances--;
+            return true;
+
+        } catch (EC2Exception e) {
+            logger.error("Failed to terminate instance: " + inst, e);
             return false;
         }
-        return terminateInstanceByAddr(addr);
     }
 
     /**
@@ -450,15 +467,7 @@ public class EC2Deployer implements java.io.Serializable {
             try {
                 InetAddress inetAddr = InetAddress.getByName(i.getDnsName());
                 if (inetAddr.equals(addr)) {
-                    try {
-                        ec2req.terminateInstances(new String[] { i.getInstanceId() });
-                        this.currentInstances--;
-                        return true;
-
-                    } catch (EC2Exception e) {
-                        logger.error("Failed to terminate instance: " + i, e);
-                        return false;
-                    }
+                    terminateInstance(i);
                 }
             } catch (UnknownHostException e1) {
                 logger.error("Unable to resolve instance Inet Address: " + i.getDnsName(), e1);
