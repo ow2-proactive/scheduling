@@ -69,18 +69,28 @@ public class ScilabConfigurationParser extends MatSciConfigurationParser {
     static Element racine;
 
     public static ArrayList<MatSciEngineConfig> getConfigs() throws Exception {
-        File configFile;
+        File configFile = null;
         ArrayList<MatSciEngineConfig> configs = new ArrayList<MatSciEngineConfig>();
 
         String homestr = ProActiveRuntimeImpl.getProActiveRuntime().getProActiveHome();
         File homesched = new File(homestr);
         if (PASchedulerProperties.SCILAB_WORKER_CONFIGURATION_FILE != null &&
             PASchedulerProperties.SCILAB_WORKER_CONFIGURATION_FILE.getValueAsString() != "") {
-            configFile = new File(PASchedulerProperties.SCILAB_WORKER_CONFIGURATION_FILE.getValueAsString());
+            try {
+                configFile = new File(PASchedulerProperties.SCILAB_WORKER_CONFIGURATION_FILE
+                        .getValueAsString());
+            } catch (Exception e) {
+
+            }
         } else if (System.getProperty(PASchedulerProperties.SCILAB_WORKER_CONFIGURATION_FILE.getKey()) != null) {
-            configFile = new File(System.getProperty(PASchedulerProperties.SCILAB_WORKER_CONFIGURATION_FILE
-                    .getKey()));
-        } else {
+            try {
+                configFile = new File(System
+                        .getProperty(PASchedulerProperties.SCILAB_WORKER_CONFIGURATION_FILE.getKey()));
+            } catch (Exception e) {
+
+            }
+        }
+        if (configFile == null) {
             URI configFileURI = homesched.toURI().resolve(configPath);
             configFile = new File(configFileURI);
         }
