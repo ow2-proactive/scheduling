@@ -29,9 +29,16 @@
    <launcher name="ResourceManager">
       <solaris/>
       <win useIco="false">
-         <bmp/>
+         <bmp
+            winSmallHigh="/org.ow2.proactive.resourcemanager/icons/pa_icon_16_32bit.bmp"
+            winSmallLow="/org.ow2.proactive.resourcemanager/icons/pa_icon_16.bmp"
+            winMediumHigh="/org.ow2.proactive.resourcemanager/icons/pa_icon_32_32bit.bmp"
+            winMediumLow="/org.ow2.proactive.resourcemanager/icons/pa_icon_32.bmp"
+            winLargeHigh="/org.ow2.proactive.resourcemanager/icons/pa_icon_48_32bit.bmp"
+            winLargeLow="/org.ow2.proactive.resourcemanager/icons/pa_icon_48.bmp"/>
       </win>
    </launcher>
+
 
    <vm>
    </vm>
