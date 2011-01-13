@@ -177,6 +177,7 @@ public class RMModel implements Serializable {
             parentToRefresh = vm;
             elementToAdd = newNode;
         }
+        // TODO check that here node can be only in configuring state
         switch (nodeEvent.getNodeState()) {
             case FREE:
                 this.freeNodesNumber++;
@@ -196,8 +197,6 @@ public class RMModel implements Serializable {
         this.addToCompactView(elementToAdd);
         this.addTableItem(newNode);
         this.actualizeStatsView();
-        this.addNodeToTopologyView(newNode);
-
     }
 
     public void removeNode(RMNodeEvent nodeEvent) {
@@ -444,13 +443,6 @@ public class RMModel implements Serializable {
     /****************************************************/
     /* view update methods								*/
     /****************************************************/
-    private void addNodeToTopologyView(Node node) {
-        //actualize tree view if exists
-        if (updateViews && ResourcesTopologyView.getTopologyViewer() != null) {
-            ResourcesTopologyView.getTopologyViewer().addNode(node);
-        }
-    }
-
     private void removeNodeFromTopologyView(Node node, String host) {
         //actualize tree view if exists
         if (updateViews && ResourcesTopologyView.getTopologyViewer() != null) {
@@ -462,8 +454,8 @@ public class RMModel implements Serializable {
         // actualize topology view if exists
         if (updateViews && ResourcesTopologyView.getTopologyViewer() != null) {
             NodeState state = node.getState();
-            if ((previousState == NodeState.DOWN || previousState == NodeState.TO_BE_REMOVED) &&
-                (state == NodeState.FREE || state == NodeState.BUSY)) {
+            if (previousState == NodeState.CONFIGURING && state == NodeState.FREE) {
+                // add new free node to the topology view
                 ResourcesTopologyView.getTopologyViewer().addNode(node);
             }
         }
