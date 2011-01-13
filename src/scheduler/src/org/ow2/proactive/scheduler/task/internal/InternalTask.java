@@ -231,8 +231,10 @@ public abstract class InternalTask extends TaskState {
             // some clients use this but not hibernate
         }
 
-        nt.setParallelEnvironment(new ParallelEnvironment(this.parallelEnvironment));
-        
+        if (this.parallelEnvironment != null) {
+            nt.setParallelEnvironment(new ParallelEnvironment(this.parallelEnvironment));
+        }
+
         if (this.executerInformations != null) {
             nt.setExecuterInformations(this.executerInformations);
         }
