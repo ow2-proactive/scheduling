@@ -102,7 +102,8 @@ public enum PASchedulerProperties {
      * until the scheduling loop will block as well.*/
     SCHEDULER_STARTTASK_THREADNUMBER("pa.scheduler.core.starttask.threadnumber", PropertyType.INTEGER),
 
-    /** Maximum number of started task per scheduling loop (0 means no limit) */
+    /** Unused in Scheduling 3.0.0 */
+    /* Maximum number of started task per scheduling loop (0 means no limit) */
     SCHEDULER_STARTTASK_MAXNUMBER_PERLOOP("pa.scheduler.core.starttask.maxnumber", PropertyType.INTEGER),
 
     /** Maximum number of threads used to send events to clients. This property defines the number of clients

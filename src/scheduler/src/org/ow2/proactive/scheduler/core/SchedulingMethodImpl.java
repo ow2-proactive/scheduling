@@ -106,10 +106,9 @@ final class SchedulingMethodImpl implements SchedulingMethod {
     protected static final int DOTASK_ACTION_THREADNUMBER = PASchedulerProperties.SCHEDULER_STARTTASK_THREADNUMBER
             .getValueAsInt();
 
-    /** Maximum number of start task per schedule() call */
-    protected static final int DOTASK_MAX_NUMBER_PER_LOOP = PASchedulerProperties.SCHEDULER_STARTTASK_MAXNUMBER_PERLOOP
-            .getValueAsInt() == 0 ? Integer.MAX_VALUE
-            : PASchedulerProperties.SCHEDULER_STARTTASK_MAXNUMBER_PERLOOP.getValueAsInt();
+    /** Unused in Scheduling 3.0.0 */
+    /* Maximum number of start task per schedule() call */
+    protected static final int DOTASK_MAX_NUMBER_PER_LOOP = 0;
 
     protected int activeObjectCreationRetryTimeNumber;
 
@@ -168,7 +167,7 @@ final class SchedulingMethodImpl implements SchedulingMethod {
 
         logger_dev.info("Number of tasks ready to be scheduled : " + taskRetrivedFromPolicy.size());
 
-        while (!taskRetrivedFromPolicy.isEmpty() && numberOfTaskStarted < DOTASK_MAX_NUMBER_PER_LOOP) {
+        while (!taskRetrivedFromPolicy.isEmpty()) {
             //get rmState and update it in scheduling policy
             RMState rmState = null;
             try {
@@ -187,8 +186,8 @@ final class SchedulingMethodImpl implements SchedulingMethod {
 
             //get the next compatible tasks from the whole returned policy tasks
             LinkedList<EligibleTaskDescriptor> tasksToSchedule = new LinkedList<EligibleTaskDescriptor>();
-            int neededResourcesNumber = getNextcompatibleTasks(taskRetrivedFromPolicy, Math.min(
-                    freeResourcesNb, DOTASK_MAX_NUMBER_PER_LOOP), tasksToSchedule);
+            int neededResourcesNumber = getNextcompatibleTasks(taskRetrivedFromPolicy, freeResourcesNb,
+                    tasksToSchedule);
             logger.debug("Number of nodes to ask for : " + neededResourcesNumber);
             if (neededResourcesNumber == 0) {
                 break;
@@ -215,7 +214,7 @@ final class SchedulingMethodImpl implements SchedulingMethod {
                     createExecution(nodeSet, node, currentJob, internalTask, taskDescriptor);
 
                     //if every task that should be launched have been removed
-                    if (tasksToSchedule.isEmpty() || numberOfTaskStarted >= DOTASK_MAX_NUMBER_PER_LOOP) {
+                    if (tasksToSchedule.isEmpty()) {
                         //get back unused nodes to the RManager
                         if (!nodeSet.isEmpty()) {
                             core.rmProxiesManager.getUserRMProxy(currentJob).releaseNodes(nodeSet);
