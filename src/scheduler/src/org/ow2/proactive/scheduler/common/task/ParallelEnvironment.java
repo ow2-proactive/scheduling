@@ -121,6 +121,18 @@ public class ParallelEnvironment implements Serializable {
     }
 
     /**
+     * Copy constructor
+     * <p>
+     * Does not properly copy the topology descriptor, shares the same reference
+     * 
+     * @param original the original parallel env to copy
+     */
+    public ParallelEnvironment(ParallelEnvironment original) {
+    	this.nodesNumber = original.getNodesNumber();
+    	this.topologyDescriptor = original.topologyDescriptor;
+    }
+    
+    /**
      * Returns the node number of the parallel task.
      * @return the node number of the parallel task.
      */
