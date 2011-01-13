@@ -78,6 +78,7 @@ import org.ow2.proactive.db.annotation.Unloadable;
 import org.ow2.proactive.scheduler.common.exception.ExecutableCreationException;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
+import org.ow2.proactive.scheduler.common.task.ParallelEnvironment;
 import org.ow2.proactive.scheduler.common.task.Task;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
@@ -230,6 +231,8 @@ public abstract class InternalTask extends TaskState {
             // some clients use this but not hibernate
         }
 
+        nt.setParallelEnvironment(new ParallelEnvironment(this.parallelEnvironment));
+        
         if (this.executerInformations != null) {
             nt.setExecuterInformations(this.executerInformations);
         }
