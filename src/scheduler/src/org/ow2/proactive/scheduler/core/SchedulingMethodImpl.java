@@ -106,10 +106,6 @@ final class SchedulingMethodImpl implements SchedulingMethod {
     protected static final int DOTASK_ACTION_THREADNUMBER = PASchedulerProperties.SCHEDULER_STARTTASK_THREADNUMBER
             .getValueAsInt();
 
-    /** Unused in Scheduling 3.0.0 */
-    /* Maximum number of start task per schedule() call */
-    protected static final int DOTASK_MAX_NUMBER_PER_LOOP = 0;
-
     protected int activeObjectCreationRetryTimeNumber;
 
     protected SchedulerCore core = null;
