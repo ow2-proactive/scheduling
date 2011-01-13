@@ -61,9 +61,7 @@
 			</info>
 
 			<para>
-				We'll write a simple Modelica job example. This example
-				will assume that you are familiar with the example in
-				<xref linkend="Scheduler_Matlab_More_Complex"/>
+				We'll write a simple Modelica job example.
 				. This example will solve numerically the Bouncing Ball problem.
                  <programlisting><textobject><textdata fileref="../../../samples/jobs_descriptors/job_modelica/BouncingBall.mo"/></textobject></programlisting>
 			</para>
