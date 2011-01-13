@@ -439,7 +439,7 @@ rmURL maxNodes serviceUrl userName password trustStore trustStorePassword javaPa
 					This name can directly be set by the infrastructure manager filling in a variable contract (name jvmargDefinedByIM) of the xml descriptor file.
 				</para>
 		</section>
-		<section xml:id="SSH"><info><title>SSH infrastructure 2</title></info>
+		<section xml:id="SSH"><info><title>SSH infrastructure</title></info>
 			<para>
 				This infrastructure allows to deploy nodes over ssh. Having a list of hosts the resource manager
 				construct the ssh command to launch remote JVMs. Java path and rm distribution path on remote hosts
@@ -951,5 +951,29 @@ test.example.net 5
 						This policy is available only when using the <emphasis>ProActive Scheduler</emphasis>.
 					</para>
 				</note>
+		</section>
+		<section xml:id="customizaed_inf_policy"><info><title>Custom infrastructure/policy</title></info>
+				<para>
+					The resource manager provides the way to create your own custom policy or infrastructure.
+					In order to do it:
+				</para>
+				<itemizedlist>
+					<listitem>
+						<para>First implement you policy extending from <emphasis role="bold">org.ow2.proactive.resourcemanager.nodesource.policy.NodeSourcePolicy</emphasis>
+						or infrastructure extending from <emphasis role="bold">org.ow2.proactive.resourcemanager.nodesource.infrastructure.InfrastructureManager</emphasis>.
+						To add the parameter which will be visible in GUI/CLI just put <emphasis role="bold">@Configurable</emphasis> annotation to the corresponding field.</para>
+					</listitem>
+					<listitem>
+						<para>Second put you classes into <emphasis role="bold">$RMHOME/addons</emphasis> directory so that the resource manager will find them.</para>
+					</listitem>
+					<listitem>
+						<para>And finally update the configuration file. For newly created policy put the name into
+						<emphasis role="bold">$RMHOME/config/rm/nodesource/policies</emphasis>. For the infrastructure do the same
+						in  <emphasis role="bold">$RMHOME/config/rm/nodesource/infrastructures</emphasis>.</para>
+					</listitem>
+				</itemizedlist>
+				<para>
+					When you start the resource manager your infrastructure/policy will be in the list of supported ones.
+				</para>
 		</section>
 </section>
