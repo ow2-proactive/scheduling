@@ -45,6 +45,7 @@ import java.net.URI;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.extensions.dataspaces.exceptions.DataSpacesException;
 import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
 import org.ow2.proactive.scheduler.common.task.ExecutableInitializer;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
@@ -230,19 +231,40 @@ public class NativeTaskLauncher extends TaskLauncher {
     private void replaceWorkingDirDSTags(ExecutableInitializer execInit) throws Exception {
         String wd = ((NativeExecutableInitializer) execInit).getWorkingDir();
         if (wd != null) {
-            String fullScratchPath = new File(new URI(SCRATCH.getRealURI())).getAbsolutePath();
-            wd = wd.replace(DATASPACE_TAG, fullScratchPath);
+            // check if this replacement is actually needed
+            if (wd.contains(DATASPACE_TAG)) {
+                if (SCRATCH != null) {
+                    String fullScratchPath = new File(new URI(SCRATCH.getRealURI())).getAbsolutePath();
+                    wd = wd.replace(DATASPACE_TAG, fullScratchPath);
+                    ((NativeExecutableInitializer) execInit).setWorkingDir(wd);
+                } else {
+                    throw new DataSpacesException(
+                        "$LOCALSPACE in workingDir cannot be replaced : dataspaces configuration have failed (see task logs).");
+                }
+            }
         }
-        ((NativeExecutableInitializer) execInit).setWorkingDir(wd);
     }
 
     private void replaceCommandDSTags() throws Exception {
-        String[] args = ((NativeExecutable) currentExecutable).getCommand();
-        //I cannot use DataSpace to get the local scratch path
-        if (SCRATCH != null) {
-            String fullScratchPath = new File(new URI(SCRATCH.getRealURI())).getAbsolutePath();
-            for (int i = 0; i < args.length; i++) {
-                args[i] = args[i].replace(DATASPACE_TAG, fullScratchPath);
+        String[] cmdElements = ((NativeExecutable) currentExecutable).getCommand();
+        // check if this replacement is actually needed
+        boolean needed = false;
+        for (int i = 0; i < cmdElements.length; i++) {
+            if (cmdElements[i].contains(DATASPACE_TAG)) {
+                needed = true;
+                break;
+            }
+        }
+        if (needed) {
+            //I cannot use DataSpace to get the local scratch path
+            if (SCRATCH != null) {
+                String fullScratchPath = new File(new URI(SCRATCH.getRealURI())).getAbsolutePath();
+                for (int i = 0; i < cmdElements.length; i++) {
+                    cmdElements[i] = cmdElements[i].replace(DATASPACE_TAG, fullScratchPath);
+                }
+            } else {
+                throw new DataSpacesException(
+                    "$LOCALSPACE in command cannot be replaced : dataspaces configuration have failed (see task logs).");
             }
         }
     }
