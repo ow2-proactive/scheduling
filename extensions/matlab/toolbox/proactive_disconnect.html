@@ -1,0 +1,226 @@
+<!DOCTYPE html
+        PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/1999/REC-html401-19991224/loose.dtd">
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>Disconnected mode:: Getting Started (ProActive Scheduler
+        Toolbox)</title>
+    <link rel="stylesheet" href="docstyle.css" type="text/css">
+    <meta name="generator" content="DocBook XSL Stylesheets V1.52.2">
+    <meta name="description"
+          content="Starting up ProActive Scheduler and connecting to it from Matlab.">
+    <meta http-equiv="Content-Script-Type" content="text/javascript">
+    <script language="JavaScript" src="docscripts.js"></script>
+</head>
+<body><a name="top_of_page"></a>
+
+<p style="font-size:1px;">&nbsp;</p>
+<table class="nav" summary="Navigation aid" border="0" width="100%" cellpadding="0" cellspacing="0">
+    <tr>
+        <td valign="baseline"><b>ProActive Scheduler Toolbox</b></td>
+        <td valign="baseline" align="right"><a href="proactive_solve.html"><img src="b_prev.gif" border="0" align="bottom"
+                                                                        alt="Running Matlab functions remotely"></a>&nbsp;&nbsp;&nbsp;<a
+                href="proactive_options.html"><img src="b_next.gif" border="0" align="bottom" alt="Configuring PAsolve behavior and Debugging"></a></td>
+    </tr>
+</table>
+<table class="feedbacklinktop" border="0" width="100%" cellpadding="0" cellspacing="0">
+    <tr>
+        <td>&nbsp;</td>
+        <td align="right">
+            <script type="text/javascript" language="JavaScript">
+                writeDocFeedbackSurveyLink();
+            </script>
+            &nbsp;
+        </td>
+    </tr>
+</table>
+
+<h2 class="title">Disconnected mode</h2>
+<table border="0" cellpadding="4" cellspacing="0" class="pagenavtable">
+    <tr>
+        <th>On this page&#8230;</th>
+    </tr>
+    <tr>
+        <td><p><a href="proactive_disconnect.html#disconnect-1">Introduction</a></p>
+
+            <p><a href="proactive_disconnect.html#disconnect-2">Exiting Matlab before a job completion</a></p>
+
+            <p><a href="proactive_disconnect.html#disconnect-3">Reconnecting and Retrieving previous job results</a></p>
+
+            </td>
+    </tr>
+</table>
+<a name="disconnect-1"></a>
+
+<h3 class="title">Introduction</h3>
+<p>In the previous chapter we saw how we can run complex matlab code remotely, and wait for the results produced. Sometimes, when tasks are really long and matlab licences scarce, it can be very convenient to close the local matlab session to avoid consuming a token or local processing resources. In this chapter, we will learn how to use the <b>Disconnected Mode</b> feature of <b>ProActive Scheduler Toolbox</b>.</p>
+
+<a name="disconnect-2"></a>
+
+<p class="pagenavlink">
+    <script language="Javascript">updateSectionId("disconnect-2");</script>
+    <script language="Javascript">addTopOfPageButtons();</script>
+    <a href="#top_of_page">Back to Top</a></p>
+<h3 class="title">Exiting Matlab before a job completion</h3>
+
+<p>In this example we will run a long list of factorial tasks and will close the matlab session:</p>
+<pre>>> res=PAsolve(@factorial,1,2,3,4,5,6,7,8,9,10,1,2,3,4,5,6,7,8,9,10)
+Job submitted : 15
+Awaited (J:15)
+Awaited (J:15)
+Awaited (J:15)
+Awaited (J:15)
+Awaited (J:15)
+Awaited (J:15)
+Awaited (J:15)
+Awaited (J:15)
+Awaited (J:15)
+Awaited (J:15)
+Awaited (J:15)
+Awaited (J:15)
+Awaited (J:15)
+Awaited (J:15)
+Awaited (J:15)
+Awaited (J:15)
+Awaited (J:15)
+Awaited (J:15)
+Awaited (J:15)
+Awaited (J:15)
+>> exit</pre>
+<p>At this point a popup window will appear, asking if we want to enable disconnected mode, with the list of jobs unfinished.</p>
+<p><img src="Disconnected.png" alt="Disconnected mode popup"></p>
+<p>We can focus on other works while the job is computed, but with a limitation: we cannot turn off the computer as the local DataSpace is still used by the job to produce input and output files. An alternative exists though, we can use a Custom Dataspace as explained in chapter <a href="proactive_options.html#options-2">The PAoptions.ini file</a> to even allow turning off the computer !</p>
+
+
+
+<a name="disconnect-3"></a>
+
+<p class="pagenavlink">
+    <script language="Javascript">updateSectionId("disconnect-3");</script>
+    <script language="Javascript">addTopOfPageButtons();</script>
+    <a href="#top_of_page">Back to Top</a></p>
+<h3 class="title">Reconnecting and Retrieving previous job results</h3>
+
+<p>When we restart the matlab session, we will need to reconnect to ProActive Scheduler in order to receive the job results. The <b>PAconnect</b> function will display the list of jobs that were unfinished at last session. We will then use the function <b>PAgetResults</b> to receive the results :</p>
+<pre>>> PAconnect('rmi://pendule:1099/')
+Connection successful, please enter login/password
+Login succesful
+Reconnecting to existing dataspace handler, please wait...
+The following jobs were uncomplete before last matlab shutdown :  15
+
+ans =
+
+    '15'
+
+>> res=PAgetResults(15)
+Retrieving results of job 15
+[ Thu Jan 13 02:21:20 CET 2011 ][pendule OUT]
+[ Thu Jan 13 02:21:20 CET 2011 ][pendule OUT]
+[ Thu Jan 13 02:21:20 CET 2011 ][pendule OUT]
+[ Thu Jan 13 02:21:20 CET 2011 ][pendule OUT]
+[ Thu Jan 13 02:21:20 CET 2011 ][pendule OUT]
+[ Thu Jan 13 02:21:20 CET 2011 ][pendule OUT]
+[ Thu Jan 13 02:21:20 CET 2011 ][pendule OUT]
+[ Thu Jan 13 02:21:20 CET 2011 ][pendule OUT]
+[ Thu Jan 13 02:21:20 CET 2011 ][pendule OUT]
+[ Thu Jan 13 02:21:20 CET 2011 ][pendule OUT]
+[ Thu Jan 13 02:21:20 CET 2011 ][pendule OUT]
+[ Thu Jan 13 02:21:20 CET 2011 ][pendule OUT]
+[ Thu Jan 13 02:21:20 CET 2011 ][pendule OUT]
+
+
+res =
+
+     1
+
+[ Thu Jan 13 02:21:14 CET 2011 ][pendule OUT]
+[ Thu Jan 13 02:21:14 CET 2011 ][pendule OUT]
+[ Thu Jan 13 02:21:14 CET 2011 ][pendule OUT]
+[ Thu Jan 13 02:21:14 CET 2011 ][pendule OUT]
+[ Thu Jan 13 02:21:14 CET 2011 ][pendule OUT]
+[ Thu Jan 13 02:21:14 CET 2011 ][pendule OUT]
+[ Thu Jan 13 02:21:14 CET 2011 ][pendule OUT]
+[ Thu Jan 13 02:21:14 CET 2011 ][pendule OUT]
+[ Thu Jan 13 02:21:14 CET 2011 ][pendule OUT]
+[ Thu Jan 13 02:21:14 CET 2011 ][pendule OUT]
+[ Thu Jan 13 02:21:14 CET 2011 ][pendule OUT]
+[ Thu Jan 13 02:21:14 CET 2011 ][pendule OUT]
+[ Thu Jan 13 02:21:14 CET 2011 ][pendule OUT]
+
+
+res =
+
+     2
+...</pre>
+<p>The previous output has been stripped for clarity. Sometimes it can be complicated to remember to which computation is associated the JobID, but it is possible to read the <b>jobid</b> attribute from the <b>PAresult</b> object right after submitting via PAsolve (non-blocking call) :</p>
+<pre>>> res2=PAsolve(@factorial,1,2,3,4,5)
+Job submitted : 16
+Awaited (J:16)
+Awaited (J:16)
+Awaited (J:16)
+Awaited (J:16)
+Awaited (J:16)
+
+>> res2.jobid
+
+ans =
+
+16
+
+
+ans =
+
+16
+
+
+ans =
+
+16
+
+
+ans =
+
+16
+
+
+ans =
+
+16</pre>
+<p>This allows for example to store the job id into a mat file and automate the retrieval of results avec reconnection.</p>
+
+
+<a name="bottom_of_page"></a>
+
+<p class="pagenavlink">
+    <script language="Javascript">updateSectionId("bottom_of_page");</script>
+    <script language="Javascript">addTopOfPageButtons();</script>
+    <a href="#top_of_page">Back to Top</a></p>
+<table class="feedbacklinkbot" border="0" width="100%" cellpadding="0" cellspacing="0">
+    <tr>
+        <td>&nbsp;</td>
+        <td align="right">
+            <script type="text/javascript" language="JavaScript">
+                writeDocFeedbackSurveyLink();
+            </script>
+            &nbsp;
+        </td>
+    </tr>
+</table>
+<p></p>
+<table class="nav" summary="Navigation aid" border="0" width="100%" cellpadding="0" cellspacing="0">
+    <tr valign="top">
+        <td align="left" width="20"><a href="proactive_solve.html"><img src="b_prev.gif" border="0" align="bottom"
+                                                                alt="Running Matlab functions remotely"></a>&nbsp;</td>
+        <td align="left">Running Matlab functions remotely</td>
+        <td>&nbsp;</td>
+        <td align="right">Configuring PAsolve behavior and Debugging</td>
+        <td align="right" width="20"><a href="proactive_options.html"><img src="b_next.gif" border="0" align="bottom"
+                                                                   alt="Configuring PAsolve behavior and Debugging"></a></td>
+    </tr>
+</table>
+<br>
+
+<p class="copy">&copy; Copyright (C) 1997-2011 INRIA/University of Nice-Sophia Antipolis/ActiveEon
+    <tt class="minicdot">&#149;</tt> <a href="license.txt">Terms of Use</a></p>
+<!-- Last updated: Tue Jul 31 19:44:58 EDT 2007--></body>
+</html>

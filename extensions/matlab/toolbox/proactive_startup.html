@@ -1,0 +1,192 @@
+<!DOCTYPE html
+        PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/1999/REC-html401-19991224/loose.dtd">
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>Starting and Connecting:: Getting Started (ProActive Scheduler
+        Toolbox)</title>
+    <link rel="stylesheet" href="docstyle.css" type="text/css">
+    <meta name="generator" content="DocBook XSL Stylesheets V1.52.2">
+    <meta name="description"
+          content="Starting up ProActive Scheduler and connecting to it from Matlab.">
+    <meta http-equiv="Content-Script-Type" content="text/javascript">
+    <script language="JavaScript" src="docscripts.js"></script>
+</head>
+<body><a name="top_of_page"></a>
+
+<p style="font-size:1px;">&nbsp;</p>
+<table class="nav" summary="Navigation aid" border="0" width="100%" cellpadding="0" cellspacing="0">
+    <tr>
+        <td valign="baseline"><b>ProActive Scheduler Toolbox</b></td>
+        <td valign="baseline" align="right"><a href="proactive_installation.html"><img src="b_prev.gif" border="0" align="bottom"
+                                                                        alt="Installation"></a>&nbsp;&nbsp;&nbsp;<a
+                href="proactive_monitoring.html"><img src="b_next.gif" border="0" align="bottom" alt="Monitoring"></a></td>
+    </tr>
+</table>
+<table class="feedbacklinktop" border="0" width="100%" cellpadding="0" cellspacing="0">
+    <tr>
+        <td>&nbsp;</td>
+        <td align="right">
+            <script type="text/javascript" language="JavaScript">
+                writeDocFeedbackSurveyLink();
+            </script>
+            &nbsp;
+        </td>
+    </tr>
+</table>
+
+<h2 class="title">Starting and Connecting</h2>
+<table border="0" cellpadding="4" cellspacing="0" class="pagenavtable">
+    <tr>
+        <th>On this page&#8230;</th>
+    </tr>
+    <tr>
+        <td><p><a href="proactive_startup.html#startup-1">Introduction</a></p>
+
+            <p><a href="proactive_startup.html#startup-2">Starting ProActive Scheduler</a></p>
+
+            <p><a href="proactive_startup.html#startup-3">Connecting to a running ProActive Scheduler from Matlab</a></p>
+
+            </td>
+    </tr>
+</table>
+<a name="startup-1"></a>
+
+<h3 class="title">Introduction</h3>
+<p>ProActive Scheduler is in fact composed of two programs working together:</p>
+
+<ul type="disc">
+    <li><p><b>ProActive Resource Manager</b>: the resource manager is the program in charge of a pool of resources called Nodes. Each node is a Java Virtual Machine running on a worker host. There can be several of these Nodes deployed on a single host, generally when a host has multiple processes or cores. It allows to maximize the processing power available on the network. The Resource Manager needs to be configured according to the network topology in order to deploy Nodes on available machines. Configuration of the Resource Manager for acquiring resources is beyond the scope of this document and is explained on the Resource Manager manual available at <a href="http://proactive.inria.fr/release-doc/Resourcing/multiple_html/index.html">http://proactive.inria.fr/release-doc/Resourcing/multiple_html/index.html</a>.</p></li>
+    <li><p><b>ProActive Scheduler</b>: the scheduler receives jobs to be executed. It will schedule their execution according to its policy and its workload. When a job is ready to be scheduled, the scheduler will contact the resource manager to find the maximum number of resources available to execute the job. Resources will be selected sometimes according to specific policies. In case of ProActive Scheduler Toolbox, only resources which have a valid Matlab configuration will be selected. A lot of extra selection will be done dynamically, for example specific Matlab versions needed by the job, or toolbox tokens availability .</p></li>
+</ul>
+
+
+<a name="startup-2"></a>
+
+<p class="pagenavlink">
+    <script language="Javascript">updateSectionId("startup-2");</script>
+    <script language="Javascript">addTopOfPageButtons();</script>
+    <a href="#top_of_page">Back to Top</a></p>
+<h3 class="title">Starting ProActive Scheduler</h3>
+
+<p>Before starting ProActive Scheduler and Resource Manager, make sure that you:</p>
+<ul type="disc">
+    <li><p>Changed the default Resource Manager settings according to the paragraph <a href="proactive_installation.html#installation-3">Scheduler Configuration For Matlab</a>.</p></li>
+    <li><p>Configured each Matlab worker host according to the paragraph  <a href="proactive_installation.html#installation-4">Configuration of Remote Workers for Matlab</a>.</p></li>
+</ul>
+<p>The commands to start ProActive Scheduler are located in SCHEDULING/bin/unix or SCHEDULING/bin/windows, depending on your Operating System. The following commands are present:</p>
+<ul type="disc">
+    <li><p><b>rm-start.sh(.bat)</b>: To start ProActive Resource Manager.</p></li>
+    <li><p><b>rm-start-clean.sh(.bat)</b>: To start ProActive Resource Manager with a clean database (first startup).</p></li>
+    <li><p><b>rm-start.sh(.bat)</b>: To start ProActive Scheduler.</p></li>
+    <li><p><b>scheduler-start-clean.sh(.bat)</b>: To start ProActive Scheduler with a clean database (first startup).</p></li>
+</ul>
+<p>The following sequence of commands (executed from SCHEDULING/bin/unix) will start a Resource Manager will 4 local Nodes(JVM) and a Scheduler. Although this trivial deployment is not meant to be a practical case, it is still a good way to test the framework and become familiar with ProActive.</p>
+<p>First the Resource Manager:</p>
+<pre> $ rm-start-clean -ln
+Starting Resource Manager, Please wait...
+Resource Manager successfully created on rmi://pendule.inria.fr:1099/</pre>
+
+<p>Then the Scheduler:</p>
+<pre> $ scheduler-start-clean
+Starting Scheduler, Please wait...
+Resource Manager URL was not specified, connection made to the local Resource Manager at rmi://pendule.inria.fr:1099/
+Starting scheduler...
+Scheduler successfully created on rmi://pendule.inria.fr:1099/</pre>
+
+<a name="startup-3"></a>
+
+<p class="pagenavlink">
+    <script language="Javascript">updateSectionId("startup-3");</script>
+    <script language="Javascript">addTopOfPageButtons();</script>
+    <a href="#top_of_page">Back to Top</a></p>
+<h3 class="title">Connecting to a running ProActive Scheduler from Matlab</h3>
+
+<p>From a matlab session, assuming that ProActive Scheduler Toolbox is already in Matlab path, run the following command (where PAconnect's argument is the url you received from the Scheduler starting command):</p>
+
+<pre>>> PAconnect('rmi://pendule.inria.fr:1099/');</pre>
+
+<p>A popup window will appear asking for a username and password. This username/password refers to the username and password of your account on ProActive Scheduler. ProActive Scheduler features a full account management facility along with the possibility to synchronize to existing Windows or Linux accounts via LDAP. More information can be found at <a href="http://proactive.inria.fr/release-doc/Scheduling/multiple_html/admin_manual.html#Scheduler_authentication">Scheduler Manual:Configure users authentication</a>.</p>
+<p>Here for this example we will use the default account with login <b>demo</b> and password <b>demo</b>.</p>
+
+<p>Here is what is displayed when the connection worked successfully:</p>
+<pre>>> PAconnect('rmi://pendule:1099/')
+Connection successful, please enter login/password
+Login succesful
+Creating dataspace handler, please wait...
+Dataspace handler created
+>> </pre>
+
+<p>If the scheduler is unreachable, here is what is displayed :</p>
+<pre>>> PAconnect('rmi://pendule:1099/')
+??? Java exception occurred:
+org.ow2.proactive.scheduler.common.exception.ConnectionException: java.io.IOException: The url
+rmi://pendule:1099/SCHEDULER is not bound to any known object
+	at org.ow2.proactive.scheduler.common.SchedulerConnection.join(SchedulerConnection.java:102)
+	at
+        org.ow2.proactive.scheduler.ext.matsci.client.AOMatSciEnvironment.join(AOMatSciEnvironment.java:209)
+        	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(Unknown Source)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(Unknown Source)
+	at java.lang.reflect.Method.invoke(Unknown Source)
+	at org.objectweb.proactive.core.mop.MethodCall.execute(MethodCall.java:395)
+	at org.objectweb.proactive.core.body.request.RequestImpl.serveInternal(RequestImpl.java:253)
+	at org.objectweb.proactive.core.body.request.RequestImpl.serve(RequestImpl.java:197)
+	at
+        org.objectweb.proactive.core.body.BodyImpl$ActiveLocalBodyStrategy.serveInternal(BodyImpl.java:616)
+        	at
+        org.objectweb.proactive.core.body.BodyImpl$ActiveLocalBodyStrategy.serve(BodyImpl.java:577)
+	at org.objectweb.proactive.core.body.AbstractBody.serve(AbstractBody.java:944)
+	at org.objectweb.proactive.Service.serveOldest(Service.java:214)
+	at
+        org.ow2.proactive.scheduler.ext.matsci.client.AOMatSciEnvironment.runActivity(AOMatSciEnvironment.java:584)
+        	at org.objectweb.proactive.core.body.ActiveBody.run(ActiveBody.java:198)
+	at java.lang.Thread.run(Unknown Source)
+Caused by: java.io.IOException: The url rmi://pendule:1099/SCHEDULER is not bound to any known object
+	at org.objectweb.proactive.api.PAActiveObject.lookupActive(PAActiveObject.java:1524)
+	at org.ow2.proactive.authentication.Connection.lookupAuthentication(Connection.java:94)
+	at org.ow2.proactive.authentication.Connection.connect(Connection.java:105)
+	at org.ow2.proactive.scheduler.common.SchedulerConnection.join(SchedulerConnection.java:100)
+	... 15 more
+
+Error in ==> PAconnect at 83
+    ok = solver.join(url);
+</pre>
+
+
+
+<a name="bottom_of_page"></a>
+
+<p class="pagenavlink">
+    <script language="Javascript">updateSectionId("bottom_of_page");</script>
+    <script language="Javascript">addTopOfPageButtons();</script>
+    <a href="#top_of_page">Back to Top</a></p>
+<table class="feedbacklinkbot" border="0" width="100%" cellpadding="0" cellspacing="0">
+    <tr>
+        <td>&nbsp;</td>
+        <td align="right">
+            <script type="text/javascript" language="JavaScript">
+                writeDocFeedbackSurveyLink();
+            </script>
+            &nbsp;
+        </td>
+    </tr>
+</table>
+<p></p>
+<table class="nav" summary="Navigation aid" border="0" width="100%" cellpadding="0" cellspacing="0">
+    <tr valign="top">
+        <td align="left" width="20"><a href="proactive_installation.html"><img src="b_prev.gif" border="0" align="bottom"
+                                                                alt="Installation"></a>&nbsp;</td>
+        <td align="left">Installation</td>
+        <td>&nbsp;</td>
+        <td align="right">Monitoring</td>
+        <td align="right" width="20"><a href="proactive_monitoring.html"><img src="b_next.gif" border="0" align="bottom"
+                                                                   alt="Monitoring"></a></td>
+    </tr>
+</table>
+<br>
+
+<p class="copy">&copy; Copyright (C) 1997-2011 INRIA/University of Nice-Sophia Antipolis/ActiveEon
+    <tt class="minicdot">&#149;</tt> <a href="license.txt">Terms of Use</a></p>
+<!-- Last updated: Tue Jul 31 19:44:58 EDT 2007--></body>
+</html>
