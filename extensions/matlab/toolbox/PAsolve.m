@@ -349,15 +349,10 @@ envMatName = ['MatlabEnv_' num2str(solveid) '.mat'];
 if opt.TransferEnv
     envFilePath = [pa_dir fs envMatName];
     envZipFilePath = [pa_dir fs envZipName];
-    evalin('caller', ['save(''' envFilePath  ''',''' opt.TransferEnvMatFileOptions ''')']);
-    solve_config.setZipEnvFile(opt.ZipEnvFile);
-    if opt.ZipEnvFile
-        zip(envZipFilePath, envFilePath);
-        solve_config.setEnvZipFileName(envZipName);
-        globalFilesToClean=[globalFilesToClean {envZipFilePath}];
-    else
-        solve_config.setEnvMatFileName(envMatName);
-    end
+    evalin('caller', ['save(''' envFilePath  ''',''' opt.TransferMatFileOptions ''')']);
+        
+    solve_config.setEnvMatFileName(envMatName);
+    
     globalFilesToClean=[globalFilesToClean {envFilePath}];
 end
 
