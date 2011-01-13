@@ -123,10 +123,10 @@ public class ParallelEnvironment implements Serializable {
      * @param original the original parallel env to copy
      */
     public ParallelEnvironment(ParallelEnvironment original) {
-    	this.nodesNumber = original.getNodesNumber();
-    	this.topologyDescriptor = original.topologyDescriptor;
+        this.nodesNumber = original.getNodesNumber();
+        this.topologyDescriptor = original.topologyDescriptor;
     }
-    
+
     /**
      * Returns the node number of the parallel task.
      * @return the node number of the parallel task.

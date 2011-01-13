@@ -230,7 +230,7 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
             return;
         }
     }
-    
+
     /**
      * Too many nodes are held by the NodeSource,
      * remove one node
@@ -238,7 +238,6 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
     protected void removeNode() {
         removeNodes(1, false);
     }
-    
 
     @Override
     protected SchedulerEvent[] getEventsList() {
