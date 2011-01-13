@@ -43,6 +43,7 @@ import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 
+
 /**
  * 
  * NodeSource Policy for Amazon EC2
@@ -60,121 +61,121 @@ import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 
 public class EC2Policy extends SchedulerLoadingPolicy {
 
-	{
-		// 40 mn
-		nodeDeploymentTimeout = 40 * 60 * 1000;
-	}
+    {
+        // 40 mn
+        nodeDeploymentTimeout = 40 * 60 * 1000;
+    }
 
-	/**
-	 * Paid instance duration in Milliseconds: time after which the instance has
-	 * to be paid again. For AWS EC2, one hour
-	 */
-	private final static int releaseDelay = 60 * 60 * 1000; // 1 hour
+    /**
+     * Paid instance duration in Milliseconds: time after which the instance has
+     * to be paid again. For AWS EC2, one hour
+     */
+    private final static int releaseDelay = 60 * 60 * 1000; // 1 hour
 
-	/**
-	 * Nodes can be released if t = [releaseDelay - threshold, releasDelay]
-	 */
-	private final static int threshold = 10 * 60 * 1000; // 10 minutes
+    /**
+     * Nodes can be released if t = [releaseDelay - threshold, releasDelay]
+     */
+    private final static int threshold = 10 * 60 * 1000; // 10 minutes
 
-	/**
-	 * associates a Node URL with a acquisition time the time (as return by
-	 * System.currentTimeMillis()) is actually when it was registered in the RM,
-	 * not the VM startup in AWS accounting, which probably occurred ~2mn sooner
-	 */
-	private HashMap<String, Long> nodes = null;
+    /**
+     * associates a Node URL with a acquisition time the time (as return by
+     * System.currentTimeMillis()) is actually when it was registered in the RM,
+     * not the VM startup in AWS accounting, which probably occurred ~2mn sooner
+     */
+    private HashMap<String, Long> nodes = null;
 
-	public EC2Policy() {
-		this.nodes = new HashMap<String, Long>();
-	}
+    public EC2Policy() {
+        this.nodes = new HashMap<String, Long>();
+    }
 
-	@Override
-	public BooleanWrapper configure(Object... policyParameters) {
-		super.configure(policyParameters);
-		return new BooleanWrapper(true);
-	}
+    @Override
+    public BooleanWrapper configure(Object... policyParameters) {
+        super.configure(policyParameters);
+        return new BooleanWrapper(true);
+    }
 
-	@Override
-	protected void removeNode() {
-		String bestFree = null;
-		String bestBusy = null;
-		String bestDown = null;
+    @Override
+    protected void removeNode() {
+        String bestFree = null;
+        String bestBusy = null;
+        String bestDown = null;
 
-		long t = System.currentTimeMillis();
+        long t = System.currentTimeMillis();
 
-		/*
-		 * A Node can be removed only if (minutes_since_acquisisiont % 60 < 10),
-		 * ie. we are in the last 10 minutes of the last paid hour Down nodes
-		 * are removed in priority, then free nodes, then busy nodes
-		 */
+        /*
+         * A Node can be removed only if (minutes_since_acquisisiont % 60 < 10),
+         * ie. we are in the last 10 minutes of the last paid hour Down nodes
+         * are removed in priority, then free nodes, then busy nodes
+         */
 
-		for (Entry<String, Long> node : nodes.entrySet()) {
-			long rt = releaseDelay - ((t - node.getValue()) % releaseDelay);
-			NodeState state = null;
-			try {
-				state = nodeSource.getRMCore().getNodeState(node.getKey());
-			} catch (Throwable exc) {
-				// pending / configuring
-				continue;
-			}
+        for (Entry<String, Long> node : nodes.entrySet()) {
+            long rt = releaseDelay - ((t - node.getValue()) % releaseDelay);
+            NodeState state = null;
+            try {
+                state = nodeSource.getRMCore().getNodeState(node.getKey());
+            } catch (Throwable exc) {
+                // pending / configuring
+                continue;
+            }
 
-			switch (state) {
-			case BUSY:
-			case CONFIGURING:
-			case DEPLOYING:
-				if (rt < threshold) {
-					bestBusy = node.getKey();
-				}
-				break;
-			case LOST:
-			case DOWN:
-				if (rt < threshold) {
-					bestDown = node.getKey();
-				}
-				break;
-			case FREE:
-				if (rt < threshold) {
-					bestFree = node.getKey();
-				}
-				break;
-			}
-		}
+            switch (state) {
+                case BUSY:
+                case CONFIGURING:
+                case DEPLOYING:
+                    if (rt < threshold) {
+                        bestBusy = node.getKey();
+                    }
+                    break;
+                case LOST:
+                case DOWN:
+                    if (rt < threshold) {
+                        bestDown = node.getKey();
+                    }
+                    break;
+                case FREE:
+                    if (rt < threshold) {
+                        bestFree = node.getKey();
+                    }
+                    break;
+            }
+        }
 
-		if (bestDown != null) {
-			removeNode(bestDown, false);
-			this.nodes.remove(bestDown);
-		} else if (bestFree != null) {
-			removeNode(bestFree, false);
-			this.nodes.remove(bestFree);
-		} else if (bestBusy != null) {
-			removeNode(bestBusy, false);
-			this.nodes.remove(bestBusy);
-		} else {
-			// no node can be removed, cancel request
-			timeStamp = 0;
-		}
+        if (bestDown != null) {
+            removeNode(bestDown, false);
+            this.nodes.remove(bestDown);
+        } else if (bestFree != null) {
+            removeNode(bestFree, false);
+            this.nodes.remove(bestFree);
+        } else if (bestBusy != null) {
+            removeNode(bestBusy, false);
+            this.nodes.remove(bestBusy);
+        } else {
+            // no node can be removed, cancel request
+            timeStamp = 0;
+        }
 
-	}
+    }
 
-	/*
-	 * Store the time at which EC2 instances register to the RM The actual
-	 * starting time in EC2 accounting might have been a couple minutes sooner
-	 * 
-	 * (non-Javadoc)
-	 * 
-	 * @see org.ow2.proactive.scheduler.resourcemanager.nodesource.policy.
-	 * SchedulerLoadingPolicy
-	 * #nodeEvent(org.ow2.proactive.resourcemanager.common.event.RMNodeEvent)
-	 */
-	@Override
-	public void nodeEvent(RMNodeEvent event) {
-		switch (event.getEventType()) {
-		case NODE_ADDED:
-			this.nodes.put(event.getNodeUrl(), System.currentTimeMillis());
-			break;
-		case NODE_REMOVED:
-			this.nodes.remove(event.getNodeUrl());
-		}
+    /*
+     * Store the time at which EC2 instances register to the RM The actual
+     * starting time in EC2 accounting might have been a couple minutes sooner
+     * 
+     * (non-Javadoc)
+     * 
+     * @see org.ow2.proactive.scheduler.resourcemanager.nodesource.policy.
+     * SchedulerLoadingPolicy
+     * #nodeEvent(org.ow2.proactive.resourcemanager.common.event.RMNodeEvent)
+     */
+    @Override
+    public void nodeEvent(RMNodeEvent event) {
+        switch (event.getEventType()) {
+            case NODE_ADDED:
+                this.nodes.put(event.getNodeUrl(), System.currentTimeMillis());
+                break;
+            case NODE_REMOVED:
+                this.nodes.remove(event.getNodeUrl());
+        }
 
-		super.nodeEvent(event);
-	}
+        super.nodeEvent(event);
+    }
 }
