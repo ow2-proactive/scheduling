@@ -1,0 +1,202 @@
+<!DOCTYPE html
+        PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/1999/REC-html401-19991224/loose.dtd">
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>Using ProActive Scheduler Toolbox Simulink GUI:: Getting Started (ProActive Scheduler
+        Toolbox)</title>
+    <link rel="stylesheet" href="docstyle.css" type="text/css">
+    <meta name="generator" content="DocBook XSL Stylesheets V1.52.2">
+    <meta name="description"
+          content="Starting up ProActive Scheduler and connecting to it from Matlab.">
+    <meta http-equiv="Content-Script-Type" content="text/javascript">
+    <script language="JavaScript" src="docscripts.js"></script>
+</head>
+<body><a name="top_of_page"></a>
+
+<p style="font-size:1px;">&nbsp;</p>
+<table class="nav" summary="Navigation aid" border="0" width="100%" cellpadding="0" cellspacing="0">
+    <tr>
+        <td valign="baseline"><b>ProActive Scheduler Toolbox</b></td>
+        <td valign="baseline" align="right"><a href="proactive_options.html"><img src="b_prev.gif" border="0" align="bottom"
+                                                                        alt="Configuring PAsolve behavior and Debugging"></a>&nbsp;&nbsp;&nbsp;</td>
+    </tr>
+</table>
+<table class="feedbacklinktop" border="0" width="100%" cellpadding="0" cellspacing="0">
+    <tr>
+        <td>&nbsp;</td>
+        <td align="right">
+            <script type="text/javascript" language="JavaScript">
+                writeDocFeedbackSurveyLink();
+            </script>
+            &nbsp;
+        </td>
+    </tr>
+</table>
+
+<h2 class="title">Using ProActive Scheduler Toolbox Simulink GUI</h2>
+<table border="0" cellpadding="4" cellspacing="0" class="pagenavtable">
+    <tr>
+        <th>On this page&#8230;</th>
+    </tr>
+    <tr>
+        <td><p><a href="proactive_simulink.html#simulink-1">Introduction</a></p>
+
+            <p><a href="proactive_simulink.html#simulink-2">Starting the GUI</a></p>
+
+            <p><a href="proactive_simulink.html#simulink-3">Defining model and parameters</a></p>
+
+            <p><a href="proactive_simulink.html#simulink-4">Running the model</a></p>
+
+            <p><a href="proactive_simulink.html#simulink-5">Viewing results</a></p>
+
+            <p><a href="proactive_simulink.html#simulink-6">Using Disconnected Mode</a></p>
+
+            </td>
+    </tr>
+</table>
+<a name="simulink-1"></a>
+
+<h3 class="title">Introduction</h3>
+<p>The <b>ProActive Scheduler Toolbox Simulink GUI</b> is a simple GUI which allows to run a Simulink model on a remote engine. It allows to do batch simulations through the use of Matlab script initialization parameters. Thus, the same model can be run multiple times with parameters. The GUI is NOT an interface similar in its complexity to the Simulink interface, it doesn't allow real time display of the simulation. But results from the simulations can be displayed graphically.</p>
+<p> In order to display the results the model MUST save remotely output signals to mat files via the <b>To File</b> block. Usages in the model of <b>Scope</b> or <b>To workspace</b> should be avoided as it would slow down the remote simulation and consume memory.</p>
+
+<a name="simulink-2"></a>
+
+<p class="pagenavlink">
+    <script language="Javascript">updateSectionId("simulink-2");</script>
+    <script language="Javascript">addTopOfPageButtons();</script>
+    <a href="#top_of_page">Back to Top</a></p>
+<h3 class="title">Starting the GUI</h3>
+
+<p>The <b>ProActive Scheduler Toolbox Simulink GUI</b> is located at SCHEDULING/extensions/matlab/toolbox/GUI_Simulink , before opening the GUI, make sure it's available in matlab path. Opening the GUI can be done either by running the function <b>GUI_Simulation_Plot</b>, or via Matlab start button at <b>Start > Toolboxes > ProActive Scheduler > Scheduler Simulink GUI :</b></p>
+<pre>>> addpath('/home/fviale/eclipse_workspace/Scheduling_Clean/extensions/matlab/toolbox/GUI_Simulink/');
+>> GUI_Simulation_Plot</pre>
+<p>At startup, a popup window appears asking if we want to load an existing model, we answer No for now. Here is a view of the GUI:</p>
+<p><img src="SimulinkGUI.png" alt="Simulink GUI"></p>
+
+
+
+<a name="simulink-3"></a>
+
+<p class="pagenavlink">
+    <script language="Javascript">updateSectionId("simulink-3");</script>
+    <script language="Javascript">addTopOfPageButtons();</script>
+    <a href="#top_of_page">Back to Top</a></p>
+<h3 class="title">Defining model and parameters</h3>
+
+<p>We will now create a model to use with the GUI and a set of parameters. We will reuse the Simulink Demo <b>Bouncing Ball Model</b> for this purpose. We edit the bouncing ball demo to fit to our use, doing the following:</p>
+<ul type="disc">
+    <li><p>We remove the two <b>Scope</b> outputs present in the demo and replace it with <b>To file</b> blocks.</p></li>
+    <li><p>We modify the <b>Initial Velocity</b> and <b>Initial Position</b> blocks by changing their initial value from a constant to a user defined variable.</p></li>
+</ul>
+<p>Here is how the model looks like (available at SCHEDULING/extensions/matlab/toolbox/GUI_Simulink/demo):</p>
+<p><img src="BBModel.png" alt="Bouncing Ball Model"></p>
+<p>We will then write 3 matlab scripts which will assign the values of the <b>init_velo</b> and <b>init_pos</b> variables:</p>
+<pre>Param1.m:
+init_velo=15;
+init_pos=10;
+
+Param2.m:
+init_velo=10;
+init_pos=30;
+
+Param3.m:
+init_velo=10;
+init_pos=30;</pre>
+
+
+
+<a name="simulink-4"></a>
+
+<p class="pagenavlink">
+    <script language="Javascript">updateSectionId("simulink-4");</script>
+    <script language="Javascript">addTopOfPageButtons();</script>
+    <a href="#top_of_page">Back to Top</a></p>
+<h3 class="title">Running the model</h3>
+
+<p>We are now ready to run the model. We must make sure beforehand that a connection to the scheduler is established. We will open the GUI and do the following actions:</p>
+<ol>
+    <li><p>We change the <b>Current Directory</b> to the directory where the model and parameter files are (they must be in the same directory, here SCHEDULING/extensions/matlab/toolbox/GUI_Simulink/demo).</p></li>
+    <li><p>We select the model in the <b>Simulation Model</b> field (here sldemo_bounce.mdl).</p></li>
+    <li><p>We set the <b>Simulation End Time</b>, it will be the same for all batches run (here 20).</p></li>
+    <li><p>We add the 3 ParamX.m files that we created in the <b>Parameter Files</b> list.</p></li>
+    <li><p>Finally we press the <b>Start Simulations (remote)</b> button.</p></li>
+</ol>
+<p>Here is how the GUI looks like before pressing start:</p>
+<p><img src="SimulinkBefore.png" alt="Simulink GUI Before Start"></p>
+
+<p>Here is how the GUI looks like after all simulations are executed:</p>
+<p><img src="SimulinkAfter.png" alt="Simulink GUI After End"></p>
+
+<a name="simulink-5"></a>
+
+<p class="pagenavlink">
+    <script language="Javascript">updateSectionId("simulink-5");</script>
+    <script language="Javascript">addTopOfPageButtons();</script>
+    <a href="#top_of_page">Back to Top</a></p>
+<h3 class="title">Viewing results</h3>
+<p>Now that all simulations are executed, we want to visualize the results. This is done via the list box on the right side of the GUI.</p>
+<ol>
+    <li><p>We first need to select on the left list (<b>Parameter Files</b>) the parameter file from which we want to display results. Here we choose <b>Param1</b>.</p></li>
+    <li><p>We will then press the <b>Add</b> button to add signals to be visualized. Here we will choose the two output files <b>bb_v.mat</b> and <b>bb_z.mat</b>.</p></li>
+    <li><p>Finally we press the <b>Go Plot</b> button which will pop up two graphical plot windows displaying the results.</p></li>
+</ol>
+<p>Here is the results of the simulation with Param1:</p>
+<p><img src="SimulinkResults.png" alt="Simulink GUI Results"></p>
+
+<p>We can repeat the previous steps for the other parameter files Param2 nad Param3.</p>
+
+<a name="simulink-6"></a>
+
+<p class="pagenavlink">
+    <script language="Javascript">updateSectionId("simulink-6");</script>
+    <script language="Javascript">addTopOfPageButtons();</script>
+    <a href="#top_of_page">Back to Top</a></p>
+<h3 class="title">Using Disconnected Mode</h3>
+
+<p>It is possible to use the GUI in combination with <b>ProActive Scheduler Toolbox Disconnected Mode</b>. In order to do that:</p>
+
+<ol>
+    <li><p>Submit a simulation.</p></li>
+    <li><p>Hit the button Exit Matlab. Accept the disconnected mode.</p></li>
+    <li><p>At next Matlab Startup reconnect to the scheduler and reopen the GUI.</p></li>
+    <li><p>A popup window will appear saying that an existing running model has been found. Accept to reload it.</p></li>
+    <li><p>The simulation will be updated to its current state and if the simulation is finished results will be accessible.</p></li>
+</ol>
+
+<a name="bottom_of_page"></a>
+
+<p class="pagenavlink">
+    <script language="Javascript">updateSectionId("bottom_of_page");</script>
+    <script language="Javascript">addTopOfPageButtons();</script>
+    <a href="#top_of_page">Back to Top</a></p>
+<table class="feedbacklinkbot" border="0" width="100%" cellpadding="0" cellspacing="0">
+    <tr>
+        <td>&nbsp;</td>
+        <td align="right">
+            <script type="text/javascript" language="JavaScript">
+                writeDocFeedbackSurveyLink();
+            </script>
+            &nbsp;
+        </td>
+    </tr>
+</table>
+<p></p>
+<table class="nav" summary="Navigation aid" border="0" width="100%" cellpadding="0" cellspacing="0">
+    <tr valign="top">
+        <td align="left" width="20"><a href="proactive_options.html"><img src="b_prev.gif" border="0" align="bottom"
+                                                                alt="Configuring PAsolve behavior and Debugging"></a>&nbsp;</td>
+        <td align="left">Configuring PAsolve behavior and Debugging</td>
+        <td>&nbsp;</td>
+        <td align="right" width="20">&nbsp;</td>
+        <td align="right">&nbsp;</td>
+        <td>&nbsp;</td>
+    </tr>
+</table>
+<br>
+
+<p class="copy">&copy; Copyright (C) 1997-2011 INRIA/University of Nice-Sophia Antipolis/ActiveEon
+    <tt class="minicdot">&#149;</tt> <a href="license.txt">Terms of Use</a></p>
+<!-- Last updated: Tue Jul 31 19:44:58 EDT 2007--></body>
+</html>

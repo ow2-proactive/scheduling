@@ -35,20 +35,6 @@
 %
 %       >> results = PAsolve(PATask(1..n,1..k));
 %
-%   Inputs:
-%       func - a handle to a Matlab or user-defined function
-%       args - a one-dimensional cell array of objects holding the parameters. If the cell
-%              contains X elements, then X tasks will be deployed.
-%               Each cell must contain another cell array corresponding to the function multiple parameters.
-%               If the function takes a single parameter, then the nested cell arrays must be of size one each
-%
-%       debug - '-debug' if the computation needs to be run in debug mode
-%
-%   Ouputs:
-%       results - a cell array containing the results. The cell array will be of the same size as the input cell array.
-%
-%   Example: results = PAsolve(@factorial,{1}, {2}, {3}, {4}, {5})
-%           Calls on remote machines factorial(1), factorial(2), etc...
 %
 % /*
 %   * ################################################################
