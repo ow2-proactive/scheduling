@@ -56,12 +56,13 @@
                     <arg value="${rootDirV2}"/>
                 </java>
         		<else>
-                    <java classname="org.objectweb.proactive.ext.util.StubGenerator" fork="true">
+                    <java classname="org.objectweb.proactive.ext.util.StubGenerator" fork="true" failonerror="true">
                         <classpath refid="@{targetedClasspath}" />
                         <arg value="-srcDir"/>
                         <arg value="@{srcDir}"/>
                         <arg value="-class"/>
                         <arg value="@{class}"/>
+                        <arg value="-verbose"/>
                     </java>
         		</else>
         	</if>
