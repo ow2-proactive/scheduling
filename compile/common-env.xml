@@ -68,9 +68,10 @@
 
     <path id="common.libs">
         <fileset dir="${lib.dir}">
-                <include name="ProActive/**/*.jar"/>
-                <include name="common/**/*.jar"/>
-				<include name="hibernate/**/*.jar"/>
+            <include name="ProActive/**/*.jar"/>
+            <include name="common/**/*.jar"/>
+			<include name="hibernate/**/*.jar"/>
+        	<include name="matsci/**/*.jar"/>
         </fileset>
     </path>
 	
@@ -84,6 +85,6 @@
         <include name="hibernate/**/*.jar" />
 	    <include name="ec2/**/*.jar" />
 	    <include name="winhpc/**/*.jar"/>
-	<include name="matsci/**/*.jar"/>
+		<include name="matsci/**/*.jar"/>
     </fileset>
 </project>
