@@ -58,10 +58,15 @@ import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 /**
  * Implementation of the policy according that :
  * <ul>
- * 	<li>FIFO priority order is kept</li>
- * 	<li>Particular number of tasks per loop can be returned</li>
- *  <li>Number of groups of tasks to be returned is limited to a
- *  particular number of tasks computed each time the max number of calls is reached</li>
+ * 	<li>We try to keep FIFO priority order while it's not leading to starvation
+ * 	(if first tasks to be started are finally not started because of bad selection script, we must go on next tasks but
+ *  this situation could lead to run lower priority before normal or high or even mislead FIFO order.)</li>
+ * 	<li>A specified number of tasks can be returned by this policy (NB_TASKS_PER_LOOP setting)</li>
+ *  <li>This policy returns groups of tasks sequentially taken in the whole queue.
+ *  Tasks that have just been returned are not returned by the next call to the policy until a predefined
+ *  number of calls is reached. (for example, if their are X tasks to schedule, the policy returns Y tasks, and there is Z nodes available,
+ *  the policy will return X/Z groups of Y tasks AND THEN restart to get task from beginning of the queue.
+ *  This will avoid starvation.</li>
  * </ul>
  *
  * @author The ProActive Team
@@ -145,6 +150,9 @@ public class DefaultPolicy extends Policy {
         return toReturn;
     }
 
+    /**
+     * Read the configuration file only if it has been modified and number of calls to read has been reached
+     */
     private void readConfigFile() {
         File confFile = new File(CONFIG_FILE_NAME);
         long lastModified = confFile.lastModified();
