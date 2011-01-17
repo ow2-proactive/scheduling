@@ -8,7 +8,7 @@ For a major or minor release (aka x.y.0):
 		- dev/release/release-[rm|all] . x.y.z $JAVA_HOME
 		- release can now be found in /tmp/ProActiveScheduling-x.y.z(.tar.gz)
 	- Build RCPs
-		- replace every 11.22.33 pattern with proper version x.y.z
+		- replace every 11,22,33 pattern in RCP with proper version x.y.z
 		- /!\ DON'T FORGET TO USE THE LAST CHARTIT FROM THE LAST OPTIMIZING VERSION
 
 NB : Do not forget XSD schema export for major release !
