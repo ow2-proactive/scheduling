@@ -107,20 +107,14 @@
                     <include name="**/*.java"/>
             </javac>
  	
-	 		<common_generateorcheck_stubs mode="generate"/>
+			<parallel threadsperprocessor="1" failonany="yes">
+				<generateorcheck_stub_for_class targetedClasspath="common.classpath" srcDir="${cl.common.dir}" class="org/ow2/proactive/scripting/ScriptHandler" mode="generate"/>
+				<generateorcheck_stub_for_class targetedClasspath="common.classpath" srcDir="${cl.common.dir}" class="org/ow2/proactive/jmx/provider/ro/ROServerImpl" mode="generate"/>
+				<generateorcheck_stub_for_class targetedClasspath="common.classpath" srcDir="${cl.common.dir}" class="org/ow2/proactive/utils/NodeSet" mode="generate"/>
+				<generateorcheck_stub_for_class targetedClasspath="common.classpath" srcDir="${cl.common.dir}" class="org/ow2/proactive/scripting/ScriptResult" mode="generate"/>
+			</parallel>
       </target>
 	
-	<macrodef name="common_generateorcheck_stubs">
-		<attribute name="mode"/>
-		<sequential>
-			<generateorcheck_stub_for_class targetedClasspath="common.classpath" srcDir="${cl.common.dir}" class="org/ow2/proactive/scripting/ScriptHandler" mode="@{mode}"/>
-			<generateorcheck_stub_for_class targetedClasspath="common.classpath" srcDir="${cl.common.dir}" class="org/ow2/proactive/jmx/provider/ro/ROServerImpl" mode="@{mode}"/>
-			<generateorcheck_stub_for_class targetedClasspath="common.classpath" srcDir="${cl.common.dir}" class="org/ow2/proactive/utils/NodeSet" mode="@{mode}"/>
-			<generateorcheck_stub_for_class targetedClasspath="common.classpath" srcDir="${cl.common.dir}" class="org/ow2/proactive/scripting/ScriptResult" mode="@{mode}"/>
-		</sequential>
-	</macrodef>
-
-
     <!-- ************
 		Deploy
 	-->
