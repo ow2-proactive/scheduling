@@ -37,6 +37,9 @@
 package org.ow2.proactive_grid_cloud_portal;
 
 import java.io.File;
+import java.util.Iterator;
+import java.util.Map.Entry;
+import java.util.Properties;
 
 import javax.servlet.ServletContextEvent;
 
@@ -45,13 +48,13 @@ import org.apache.log4j.PropertyConfigurator;
 import org.jboss.resteasy.plugins.server.servlet.ResteasyBootstrap;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
 import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.core.config.ProActiveConfiguration;
+import org.objectweb.proactive.core.config.xml.ProActiveConfigurationParser;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.exception.PermissionException;
-import org.ow2.proactive.scheduler.common.util.CachingSchedulerProxyUserInterface;
 import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 import org.ow2.proactive_grid_cloud_portal.exceptions.NotConnectedExceptionMapper;
 
@@ -89,9 +92,24 @@ public class MyResteasyBootstrap extends ResteasyBootstrap {
         // configure the loggers
         PropertyConfigurator.configure(event.getServletContext().getRealPath("WEB-INF/log4j.properties"));
 
-        SchedulerStateCaching.init();
-        SchedulerStateCaching.start();
+        File paproperties = new File(event.getServletContext().getRealPath(
+                "WEB-INF/ProActiveConfiguration.xml"));
+        if (paproperties.exists()) {
+            Properties p = new Properties();
+
+            p = ProActiveConfigurationParser.parse(paproperties.getAbsolutePath(), p);
+
+            Iterator<Entry<Object, Object>> i = p.entrySet().iterator();
+            while (i.hasNext()) {
+                Entry<Object, Object> tmp = i.next();
+                ProActiveConfiguration.getInstance().setProperty("" + tmp.getKey(), "" + tmp.getValue(),
+                        false);
+            }
+        }
         
+        
+        SchedulerStateCaching.init();
+
         // start the session cleaner
         schedulerSessionCleaner = new SessionsCleaner(SchedulerSessionMapper.getInstance());
         new Thread(this.schedulerSessionCleaner, "Scheduler Sessions Cleaner Thread").start();
@@ -106,8 +124,8 @@ public class MyResteasyBootstrap extends ResteasyBootstrap {
 
         // happily terminate sessions
 
-        String[] sessionids = SchedulerSessionMapper.getInstance().getSessionsMap().keySet().toArray(
-                new String[] {});
+        String[] sessionids = SchedulerSessionMapper.getInstance().getSessionsMap().keySet()
+                .toArray(new String[] {});
         int i = 0;
         for (; i < sessionids.length; i++) {
             Scheduler s = SchedulerSessionMapper.getInstance().getSessionsMap().get(sessionids[i]);
@@ -127,9 +145,9 @@ public class MyResteasyBootstrap extends ResteasyBootstrap {
         }
 
         schedulerSessionCleaner.stop();
-        
+
         SchedulerStateCaching.setKill(true);
-        
+
         // force the shutdown of the runtime
         ProActiveRuntimeImpl.getProActiveRuntime().cleanJvmFromPA();
 
