@@ -47,6 +47,8 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.utils.Sleeper;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.common.SchedulerState;
+import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
+import org.ow2.proactive.scheduler.common.exception.PermissionException;
 import org.ow2.proactive.scheduler.common.util.CachingSchedulerProxyUserInterface;
 import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 
@@ -66,9 +68,13 @@ public class SchedulerStateCaching {
     private static long schedulerRevision;
     private static int refreshInterval;
     private static boolean kill = false;
-    private static Thread t;
+    private static Thread cachedSchedulerStateThreadUpdater;
+    private static Thread leaseRenewerThreadUpdater;
 
+    
     protected static Map<AtomicLong, SchedulerState> revisionAndSchedulerState;
+
+    private static int leaseRenewRate;
     
     
     public static CachingSchedulerProxyUserInterface getScheduler() {
@@ -80,7 +86,12 @@ public class SchedulerStateCaching {
     } 
     
     public static void init() {
-        
+        init_();
+        start_();
+    }
+    
+    private static void init_() {
+        leaseRenewRate = Integer.parseInt(PortalConfiguration.getProperties().getProperty(PortalConfiguration.lease_renew_rate));
         refreshInterval = Integer.parseInt(PortalConfiguration.getProperties().getProperty(PortalConfiguration.scheduler_cache_refreshrate));
         String url = PortalConfiguration.getProperties().getProperty(PortalConfiguration.scheduler_url);
         String cred_path = PortalConfiguration.getProperties().getProperty(PortalConfiguration.scheduler_cache_credential);
@@ -122,8 +133,8 @@ public class SchedulerStateCaching {
 
 
     
-    public static void start() {
-        t = new Thread(new Runnable() {
+    private static void start_() {
+        cachedSchedulerStateThreadUpdater = new Thread(new Runnable() {
             public void run() {
                while (!kill) {
   
@@ -142,7 +153,25 @@ public class SchedulerStateCaching {
             }
         },"State Updater Thread");
         
-        t.start();
+        
+        cachedSchedulerStateThreadUpdater.start();
+        
+        leaseRenewerThreadUpdater = new Thread(new Runnable() {
+            public void run() {
+                if ( scheduler != null) {
+                    try {
+                        scheduler.getStatus();
+                    } catch (Exception e) {
+                        logger.info("leaseRenewerThread was not able to call the getStatus method, exception message is " + e.getMessage());
+                        init_();
+                    }
+                }
+                new Sleeper(leaseRenewRate).sleep(); 
+            }
+        });
+        
+        leaseRenewerThreadUpdater.start();
+        
     }
     
     public static SchedulerState getLocalState() {

@@ -53,6 +53,7 @@ public class PortalConfiguration {
     public static String rm_url = "rm.url";
 
     private static Properties properties;
+    public static String lease_renew_rate = "lease.renew.rate";
 
     public static void load(File f) throws FileNotFoundException, IOException {
         properties = new Properties();
