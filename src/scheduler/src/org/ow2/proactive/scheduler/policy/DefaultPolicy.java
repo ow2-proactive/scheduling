@@ -88,6 +88,7 @@ public class DefaultPolicy extends Policy {
     private Set<TaskId> ids = new HashSet<TaskId>();
     private int nbCalls = 0;
     private long lastModifConfFile = 0;
+    private int previousFreeNodeNumber = 0;
 
     /**
      * This method return the tasks using FIFO policy according to the jobs priorities.
@@ -142,10 +143,12 @@ public class DefaultPolicy extends Policy {
 
         //clear ids list in some conditions
         nbCalls++;
-        if (toReturn.size() == 0 || nbCalls == nbLoop || freeNodeNb == 0) {
+        if (toReturn.size() == 0 || freeNodeNb != previousFreeNodeNumber || freeNodeNb == 0) {
             ids.clear();
             nbCalls = 0;
         }
+
+        previousFreeNodeNumber = freeNodeNb;
 
         return toReturn;
     }
