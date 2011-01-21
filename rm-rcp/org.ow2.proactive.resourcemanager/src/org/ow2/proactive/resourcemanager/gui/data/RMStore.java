@@ -47,6 +47,7 @@ import org.eclipse.ui.PlatformUI;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.NodeException;
+import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.Activator;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
@@ -104,8 +105,8 @@ public class RMStore {
             Credentials credentials;
             try {
                 try {
-                    credentials = Credentials.createCredentials(login, password, rmAuthentication
-                            .getPublicKey());
+                    credentials = Credentials.createCredentials(new CredData(CredData.parseLogin(login),
+                        CredData.parseDomain(login), password), rmAuthentication.getPublicKey());
                 } catch (KeyException e) {
                     throw new LoginException("Could not create encrypted credentials: " + e.getMessage());
                 }

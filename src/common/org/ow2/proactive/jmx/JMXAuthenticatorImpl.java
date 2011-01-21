@@ -93,7 +93,8 @@ public final class JMXAuthenticatorImpl implements JMXAuthenticator {
             // If username/password (ex: JConsole)
         } else if (arr[1] instanceof String) {
             try {
-                internalCredentials = Credentials.createCredentials(new CredData(username, (String) arr[1]),
+                internalCredentials = Credentials.createCredentials(new CredData(CredData
+                        .parseLogin(username), CredData.parseDomain(username), (String) arr[1]),
                         authentication.getPublicKey());
             } catch (Exception e) {
                 throw new SecurityException("Invalid credentials", e);

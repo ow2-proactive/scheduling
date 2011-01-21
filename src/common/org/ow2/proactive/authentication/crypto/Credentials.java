@@ -717,7 +717,8 @@ public class Credentials implements Serializable {
             PublicKey pubKey, String cipher) throws KeyException {
 
         CredData cc = new CredData();
-        cc.setLogin(login);
+        cc.setLogin(CredData.parseLogin(login));
+        cc.setDomain(CredData.parseDomain(login));
         cc.setPassword(password);
         cc.setKey(datakey);
 

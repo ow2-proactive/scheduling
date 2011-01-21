@@ -156,7 +156,8 @@ public class AOSchedulerWorker extends AOWorker implements SchedulerEventListene
             auth = SchedulerConnection.join(schedulerUrl);
             Credentials creds = null;
             try {
-                creds = Credentials.createCredentials(new CredData(user, password), auth.getPublicKey());
+                creds = Credentials.createCredentials(new CredData(CredData.parseLogin(user), CredData
+                        .parseDomain(user), password), auth.getPublicKey());
             } catch (KeyException e) {
                 throw new LoginException("" + e);
             } catch (LoginException e) {

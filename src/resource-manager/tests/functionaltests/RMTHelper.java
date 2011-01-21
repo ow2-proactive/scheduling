@@ -482,7 +482,8 @@ public class RMTHelper {
      */
     public static ResourceManager connect(String name, String pass, String propertyFile) throws Exception {
         RMAuthentication authInt = getRMAuth(propertyFile);
-        Credentials cred = Credentials.createCredentials(new CredData(name, pass), authInt.getPublicKey());
+        Credentials cred = Credentials.createCredentials(new CredData(CredData.parseLogin(name), CredData
+                .parseDomain(name), pass), authInt.getPublicKey());
 
         return authInt.login(cred);
     }
@@ -492,7 +493,8 @@ public class RMTHelper {
      */
     public static ResourceManager join(String name, String pass) throws Exception {
         RMAuthentication authInt = getRMAuth();
-        Credentials cred = Credentials.createCredentials(new CredData(name, pass), authInt.getPublicKey());
+        Credentials cred = Credentials.createCredentials(new CredData(CredData.parseLogin(name), CredData
+                .parseDomain(name), pass), authInt.getPublicKey());
 
         while (true) {
             try {

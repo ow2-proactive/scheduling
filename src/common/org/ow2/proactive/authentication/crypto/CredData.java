@@ -52,7 +52,47 @@ import org.objectweb.proactive.annotation.PublicAPI;
 public class CredData implements Serializable {
     private String login = null;
     private String pass = null;
+    // windows domain name, optionnal
+    private String domain = null;
+
     private byte[] key = null;
+
+    /**
+     * Extract the Windows domain name from the full login
+     * parseDomain("domain\\user") returns domain
+	 * parseDomain("user") returns null
+	 * @param fullLogin the login to parse
+	 * @return the domain name, null if no domain is specified
+	 * @since Scheduling 3.0.1
+	 */
+    public static final String parseDomain(String fullLogin) {
+        if (fullLogin.contains("\\")) {
+            String domain = fullLogin.substring(0, fullLogin.indexOf("\\"));
+            if ("".equals(domain.trim())) {
+                return null;
+            }
+            return "".equals(domain.trim()) ? null : domain;
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Extract the user name from the full login
+     * parseDomain("domain\\user") returns user
+	 * parseDomain("user") returns user
+	 * @param fullLogin the login to parse
+	 * @return the user name
+	 * @since Scheduling 3.0.1
+	 */
+    public static final String parseLogin(String fullLogin) {
+        if (fullLogin.contains("\\")) {
+            String login = fullLogin.substring(fullLogin.indexOf("\\") + 1, fullLogin.length());
+            return login;
+        } else {
+            return fullLogin;
+        }
+    }
 
     public CredData() {
     }
@@ -62,10 +102,29 @@ public class CredData implements Serializable {
         this.pass = pass;
     }
 
+    /**
+     * @since Scheduling 3.0.1
+     */
+    public CredData(String login, String domain, String pass) {
+        this.login = login;
+        this.pass = pass;
+        this.domain = domain;
+    }
+
     public CredData(String login, String pass, byte[] key) {
         this.login = login;
         this.pass = pass;
         this.key = key;
+    }
+
+    /**
+     * @since Scheduling 3.0.1
+     */
+    public CredData(String login, String domain, String pass, byte[] key) {
+        this.login = login;
+        this.pass = pass;
+        this.key = key;
+        this.domain = domain;
     }
 
     /**
@@ -120,6 +179,24 @@ public class CredData implements Serializable {
      */
     public void setKey(byte[] key) {
         this.key = key;
+    }
+
+    /**
+     * Return the domain of this user or null if no domain has been specified.
+     * @return the domain of this user or null if no domain has been specified.
+     * @since Scheduling 3.0.1
+     */
+    public String getDomain() {
+        return domain;
+    }
+
+    /**
+     * Set a domain for this user. Domain is optionnal.
+     * @param domain the domain to set
+     * @since Scheduling 3.0.1
+     */
+    public void setDomain(String domain) {
+        this.domain = domain;
     }
 
     /**

@@ -143,15 +143,22 @@ public final class ForkerUtils {
                     throw new IllegalAccessException(
                         "Password not found in Credentials, cannot fork using password");
                 }
-                String[] lp = data.getLoginPassword();
-                return new OSUser(lp[0], lp[1]);
+                OSUser u = new OSUser(data.getLogin(), data.getPassword());
+                if (data.getDomain() != null) {
+                    u.setDomain(data.getDomain());
+                }
+                return u;
             }
             if (ForkMethod.KEY == FORK_METHOD_VALUE) {
                 if (data.getKey() == null) {
                     throw new IllegalAccessException(
                         "SSH key not found in Credentials, cannot fork using ssh Key");
                 }
-                return new OSUser(data.getLogin(), data.getKey());
+                OSUser u = new OSUser(data.getLogin(), data.getKey());
+                if (data.getDomain() != null) {
+                    u.setDomain(data.getDomain());
+                }
+                return u;
             }
             throw new IllegalAccessException("Cannot fork under " + data.getLogin() + ", Property " +
                 FORK_METHOD_KEY + " is not configured.");

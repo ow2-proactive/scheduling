@@ -288,8 +288,8 @@ public class SchedulerTester {
 
             // connect from a different thread (i.e. not in the constructor)
             try {
-                Credentials cred = Credentials.createCredentials(new CredData(login, pswd), authentication
-                        .getPublicKey());
+                Credentials cred = Credentials.createCredentials(new CredData(CredData.parseLogin(login),
+                    CredData.parseDomain(login), pswd), authentication.getPublicKey());
                 this.scheduler = authentication.login(cred);
             } catch (Exception e) {
                 logger.error(e);

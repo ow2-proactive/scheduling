@@ -146,7 +146,8 @@ public abstract class AOMatSciEnvironment<R, RL> implements Serializable, Schedu
         //System.out.println("Trying to connect with "+user+" " +passwd);
         Credentials creds = null;
         try {
-            creds = Credentials.createCredentials(new CredData(user, passwd), auth.getPublicKey());
+            creds = Credentials.createCredentials(new CredData(CredData.parseLogin(user), CredData
+                    .parseDomain(user), passwd), auth.getPublicKey());
         } catch (KeyException e) {
             throw new LoginException("" + e);
         } catch (LoginException e) {
