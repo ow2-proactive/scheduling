@@ -1,3 +1,4 @@
+#! /bin/sh
 # last step of the command launching mechanism
 # will test if a command can or can not be launched by the current user
 # If everything seems OK it will signal the java process builder on stdout and 
