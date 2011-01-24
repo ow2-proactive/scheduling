@@ -178,7 +178,7 @@ public class NodeSource implements InitActive, RunActive {
         this.nodeSourcePolicy = policy;
         this.rmcore = rmcore;
         this.monitoring = monitor;
-        this.description = "Infrastructure:" + im + ", Policy: " + policy;
+        this.description = "Infrastructure: " + im + ", Policy: " + policy;
 
         this.nodes = Collections.synchronizedMap(new HashMap<String, Node>());
         this.downNodes = Collections.synchronizedMap(new HashMap<String, Node>());
