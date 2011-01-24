@@ -42,43 +42,38 @@
 			<include name="**/*.java"/>
 		</javac>
 		
-		<scheduler_generateorcheck_stubs mode="generate"/>
+		<parallel threadsperprocessor="1" failonany="yes">
+			<generateorcheck_stub_for_class targetedClasspath="scheduler.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/common/SchedulerAuthenticationInterface" mode="generate"/>
+			<generateorcheck_stub_for_class targetedClasspath="scheduler.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/common/task/TaskResult" mode="generate"/>
+			<generateorcheck_stub_for_class targetedClasspath="scheduler.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/common/task/TaskLogs" mode="generate"/>
+			<generateorcheck_stub_for_class targetedClasspath="scheduler.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/common/UniversalSchedulerListener" mode="generate"/>
+			<generateorcheck_stub_for_class targetedClasspath="all.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/core/SchedulerFrontend" mode="generate"/>
+			<generateorcheck_stub_for_class targetedClasspath="all.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/core/SchedulerCore" mode="generate"/>
+			<generateorcheck_stub_for_class targetedClasspath="scheduler.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/authentication/SchedulerAuthentication" mode="generate"/>
+			<generateorcheck_stub_for_class targetedClasspath="scheduler.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/examples/Worker" mode="generate"/>
+			<generateorcheck_stub_for_class targetedClasspath="scheduler.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/ext/masterworker/AOSchedulerWorker" mode="generate"/>
+			<generateorcheck_stub_for_class targetedClasspath="scheduler.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/ext/matlab/client/AOMatlabEnvironment" mode="generate"/>
+			<generateorcheck_stub_for_class targetedClasspath="scheduler.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/ext/matlab/worker/AOMatlabWorker" mode="generate"/>
+			<generateorcheck_stub_for_class targetedClasspath="scheduler.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/ext/matlab/worker/AOMatlabSplitter" mode="generate"/>
+			<generateorcheck_stub_for_class targetedClasspath="scheduler.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/ext/matlab/worker/AOMatlabCollector" mode="generate"/>
+			<generateorcheck_stub_for_class targetedClasspath="scheduler.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/ext/scilab/client/AOScilabEnvironment" mode="generate"/>
+			<generateorcheck_stub_for_class targetedClasspath="scheduler.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/ext/scilab/worker/AOScilabWorker" mode="generate"/>
+            <generateorcheck_stub_for_class targetedClasspath="scheduler.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/ext/matsci/client/AODataspaceRegistry" mode="generate"/>
+			<generateorcheck_stub_for_class targetedClasspath="all.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/core/rmproxies/SchedulerRMProxy" mode="generate"/>
+			<generateorcheck_stub_for_class targetedClasspath="all.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/core/rmproxies/UserRMProxy" mode="generate"/>
+			<generateorcheck_stub_for_class targetedClasspath="scheduler.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/task/launcher/ForkedJavaTaskLauncher" mode="generate"/>
+			<generateorcheck_stub_for_class targetedClasspath="scheduler.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/task/launcher/JavaTaskLauncher" mode="generate"/>
+			<generateorcheck_stub_for_class targetedClasspath="scheduler.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/task/launcher/NativeTaskLauncher" mode="generate"/>
+			<generateorcheck_stub_for_class targetedClasspath="scheduler.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/ext/filessplitmerge/event/InternalSchedulerEventListener" mode="generate"/>
+			<generateorcheck_stub_for_class targetedClasspath="scheduler.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/common/util/SchedulerProxyUserInterface" mode="generate"/>
+			<generateorcheck_stub_for_class targetedClasspath="scheduler.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/common/util/CachingSchedulerProxyUserInterface" mode="generate"/>
+			<!--<generateorcheck_stub_for_class targetedClasspath="scheduler.test.classpath" srcDir="${cl.scheduler.tests.dir}" class="functionaltests/MyAO" mode="generate"/>
+			<generateorcheck_stub_for_class targetedClasspath="scheduler.test.classpath" srcDir="${cl.scheduler.tests.dir}" class="functionaltests/SubmitJob" mode="generate"/>
+			<generateorcheck_stub_for_class targetedClasspath="scheduler.test.classpath" srcDir="${cl.scheduler.tests.dir}" class="functionaltests/monitor/MonitorEventReceiver" mode="generate"/>-->
+		</parallel>
 		
 	</target>
 	
-	<macrodef name="scheduler_generateorcheck_stubs">
-		<attribute name="mode"/>
-		<sequential>
-			<generateorcheck_stub_for_class targetedClasspath="scheduler.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/common/SchedulerAuthenticationInterface" mode="@{mode}"/>
-			<generateorcheck_stub_for_class targetedClasspath="scheduler.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/common/task/TaskResult" mode="@{mode}"/>
-			<generateorcheck_stub_for_class targetedClasspath="scheduler.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/common/task/TaskLogs" mode="@{mode}"/>
-			<generateorcheck_stub_for_class targetedClasspath="scheduler.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/common/UniversalSchedulerListener" mode="@{mode}"/>
-			<generateorcheck_stub_for_class targetedClasspath="all.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/core/SchedulerFrontend" mode="@{mode}"/>
-			<generateorcheck_stub_for_class targetedClasspath="all.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/core/SchedulerCore" mode="@{mode}"/>
-			<generateorcheck_stub_for_class targetedClasspath="scheduler.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/authentication/SchedulerAuthentication" mode="@{mode}"/>
-			<generateorcheck_stub_for_class targetedClasspath="scheduler.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/examples/Worker" mode="@{mode}"/>
-			<generateorcheck_stub_for_class targetedClasspath="scheduler.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/ext/masterworker/AOSchedulerWorker" mode="@{mode}"/>
-			<generateorcheck_stub_for_class targetedClasspath="scheduler.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/ext/matlab/client/AOMatlabEnvironment" mode="@{mode}"/>
-			<generateorcheck_stub_for_class targetedClasspath="scheduler.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/ext/matlab/worker/AOMatlabWorker" mode="@{mode}"/>
-			<generateorcheck_stub_for_class targetedClasspath="scheduler.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/ext/matlab/worker/AOMatlabSplitter" mode="@{mode}"/>
-			<generateorcheck_stub_for_class targetedClasspath="scheduler.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/ext/matlab/worker/AOMatlabCollector" mode="@{mode}"/>
-			<generateorcheck_stub_for_class targetedClasspath="scheduler.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/ext/scilab/client/AOScilabEnvironment" mode="@{mode}"/>
-			<generateorcheck_stub_for_class targetedClasspath="scheduler.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/ext/scilab/worker/AOScilabWorker" mode="@{mode}"/>
-            <generateorcheck_stub_for_class targetedClasspath="scheduler.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/ext/matsci/client/AODataspaceRegistry" mode="@{mode}"/>
-			<generateorcheck_stub_for_class targetedClasspath="all.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/core/rmproxies/SchedulerRMProxy" mode="@{mode}"/>
-			<generateorcheck_stub_for_class targetedClasspath="all.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/core/rmproxies/UserRMProxy" mode="@{mode}"/>
-			<generateorcheck_stub_for_class targetedClasspath="scheduler.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/task/launcher/ForkedJavaTaskLauncher" mode="@{mode}"/>
-			<generateorcheck_stub_for_class targetedClasspath="scheduler.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/task/launcher/JavaTaskLauncher" mode="@{mode}"/>
-			<generateorcheck_stub_for_class targetedClasspath="scheduler.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/task/launcher/NativeTaskLauncher" mode="@{mode}"/>
-			<generateorcheck_stub_for_class targetedClasspath="scheduler.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/ext/filessplitmerge/event/InternalSchedulerEventListener" mode="@{mode}"/>
-			<generateorcheck_stub_for_class targetedClasspath="scheduler.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/common/util/SchedulerProxyUserInterface" mode="@{mode}"/>
-			<generateorcheck_stub_for_class targetedClasspath="scheduler.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/common/util/CachingSchedulerProxyUserInterface" mode="@{mode}"/>
-			<!--<generateorcheck_stub_for_class targetedClasspath="scheduler.test.classpath" srcDir="${cl.scheduler.tests.dir}" class="functionaltests/MyAO" mode="@{mode}"/>
-			<generateorcheck_stub_for_class targetedClasspath="scheduler.test.classpath" srcDir="${cl.scheduler.tests.dir}" class="functionaltests/SubmitJob" mode="@{mode}"/>
-			<generateorcheck_stub_for_class targetedClasspath="scheduler.test.classpath" srcDir="${cl.scheduler.tests.dir}" class="functionaltests/monitor/MonitorEventReceiver" mode="@{mode}"/>-->
-		</sequential>
-	</macrodef>
-
     <!-- ************
 		Deploy
 	-->
