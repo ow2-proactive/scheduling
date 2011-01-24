@@ -437,7 +437,8 @@ public class TopologyViewer {
                             rf.add(new InGroupPredicate(CLUSTERS), polyR);
 
                             // decorator which draw latencies of edges
-                            rf.add(new InGroupPredicate(EDGE_DECORATORS), new LabelRenderer("weight"));
+                            rf.add(new InGroupPredicate(EDGE_DECORATORS), new SuffixLabelRenderer("weight",
+                                " µs"));
 
                             // create a new default renderer factory
                             visualization.setRendererFactory(rf);
@@ -1098,3 +1099,18 @@ class LabelLayout extends Layout {
     }
 } // end of inner class LabelLayout
 
+/**
+ * Renders the label and suffix after it
+ */
+class SuffixLabelRenderer extends LabelRenderer {
+    private String suffix = "";
+
+    SuffixLabelRenderer(String label, String suffix) {
+        super(label);
+        this.suffix = suffix;
+    }
+
+    protected String getText(VisualItem item) {
+        return super.getText(item) + suffix;
+    }
+}
