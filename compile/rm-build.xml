@@ -46,21 +46,19 @@
 			<include name="**/*.java"/>
 		</javac>
 		
-		<parallel threadsperprocessor="1" failonany="yes">
-			<generateorcheck_stub_for_class targetedClasspath="rm.classpath" srcDir="${cl.rm.dir}" class="org/ow2/proactive/resourcemanager/common/event/RMInitialState" mode="generate"/>
-			<generateorcheck_stub_for_class targetedClasspath="rm.classpath" srcDir="${cl.rm.dir}" class="org/ow2/proactive/resourcemanager/authentication/RMAuthentication" mode="generate"/>
-			<generateorcheck_stub_for_class targetedClasspath="rm.classpath" srcDir="${cl.rm.dir}" class="org/ow2/proactive/resourcemanager/authentication/RMAuthenticationImpl" mode="generate"/>
-			<generateorcheck_stub_for_class targetedClasspath="rm.classpath" srcDir="${cl.rm.dir}" class="org/ow2/proactive/resourcemanager/frontend/RMMonitoringImpl" mode="generate"/>
-			<generateorcheck_stub_for_class targetedClasspath="rm.classpath" srcDir="${cl.rm.dir}" class="org/ow2/proactive/resourcemanager/selection/statistics/ProbablisticSelectionManager" mode="generate"/>
-			<generateorcheck_stub_for_class targetedClasspath="rm.classpath" srcDir="${cl.rm.dir}" class="org/ow2/proactive/resourcemanager/nodesource/NodeSource" mode="generate"/>
-			<generateorcheck_stub_for_class targetedClasspath="rm.classpath" srcDir="${cl.rm.dir}" class="org/ow2/proactive/resourcemanager/examples/windowsagent/Test" mode="generate"/>
-			<generateorcheck_stub_for_class targetedClasspath="rm.classpath" srcDir="${cl.rm.dir}" class="org/ow2/proactive/resourcemanager/nodesource/dataspace/DataSpaceNodeConfigurationAgent" mode="generate"/>
-			<generateorcheck_stub_for_class targetedClasspath="rm.classpath" srcDir="${cl.rm.dir}" class="org/ow2/proactive/resourcemanager/core/RMCore" mode="generate"/>
-			<generateorcheck_stub_for_class targetedClasspath="rm.classpath" srcDir="${cl.rm.dir}" class="org/ow2/proactive/resourcemanager/common/RMState" mode="generate"/>
-			<generateorcheck_stub_for_class targetedClasspath="rm.classpath" srcDir="${cl.rm.dir}" class="org/ow2/proactive/resourcemanager/nodesource/policy/NodeSourcePolicy" mode="generate"/>
-			<!--<generateorcheck_stub_for_class targetedClasspath="rm.test.classpath" srcDir="${cl.rm.tests.dir}" class="functionaltests/RMLauncherAO" mode="generate"/>
-			<generateorcheck_stub_for_class targetedClasspath="rm.test.classpath" srcDir="${cl.rm.tests.dir}" class="functionaltests/monitor/RMMonitorEventReceiver" mode="generate"/>-->
-		</parallel>
+		<stubGenerator srcDir="${cl.rm.dir}" refclasspath="rm.classpath">
+			<class name="org.ow2.proactive.resourcemanager.common.event.RMInitialState" />
+			<class name="org.ow2.proactive.resourcemanager.authentication.RMAuthentication" />
+			<class name="org.ow2.proactive.resourcemanager.authentication.RMAuthenticationImpl" />
+			<class name="org.ow2.proactive.resourcemanager.frontend.RMMonitoringImpl" />
+			<class name="org.ow2.proactive.resourcemanager.selection.statistics.ProbablisticSelectionManager" />
+			<class name="org.ow2.proactive.resourcemanager.nodesource.NodeSource" />
+			<class name="org.ow2.proactive.resourcemanager.examples.windowsagent.Test" />
+			<class name="org.ow2.proactive.resourcemanager.nodesource.dataspace.DataSpaceNodeConfigurationAgent" />
+			<class name="org.ow2.proactive.resourcemanager.core.RMCore" />
+			<class name="org.ow2.proactive.resourcemanager.common.RMState" />
+			<class name="org.ow2.proactive.resourcemanager.nodesource.policy.NodeSourcePolicy" />
+		</stubGenerator>
 		
 	</target>
 	

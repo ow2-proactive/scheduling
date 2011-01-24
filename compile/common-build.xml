@@ -46,15 +46,15 @@
         		<bool>
         		   <equals arg1="@{mode}" arg2="check"/>
         		</bool>
-        		<java classname="org.objectweb.proactive.ext.util.StubChecker" fork="true">
-                    <classpath path="${proactive.jar}" />
-                    <arg value="-class"/>
-                    <arg value="@{class}"/>
-					<arg value="-rootDirV1"/>
-				    <arg value="${base.dir}"/>
-                    <arg value="-rootDirV2"/>
-                    <arg value="${rootDirV2}"/>
-                </java>
+	        		<java classname="org.objectweb.proactive.ext.util.StubChecker" fork="true">
+	                    <classpath path="${proactive.jar}" />
+	                    <arg value="-class"/>
+	                    <arg value="@{class}"/>
+						<arg value="-rootDirV1"/>
+					    <arg value="${base.dir}"/>
+	                    <arg value="-rootDirV2"/>
+	                    <arg value="${rootDirV2}"/>
+	                </java>
         		<else>
                     <java classname="org.objectweb.proactive.ext.util.StubGenerator" fork="true" failonerror="true">
                         <classpath refid="@{targetedClasspath}" />
@@ -90,29 +90,32 @@
 	-->
 
 	 <target name="compile.common" description="Compile commmon stuffs">
-            <mkdir dir="${cl.common.dir}"/>
+ 		<taskdef name="stubGenerator" classname="ant.AntStubGenerator" classpath="${proactive.utils.jar}" />
+ 		<typedef name="class" classname="ant.AntStubGeneratorClass" classpath="${proactive.utils.jar}" />
+       
+	 	<mkdir dir="${cl.common.dir}"/>
 
-			<copy toDir="${cl.common.dir}">
-					<fileset dir="${src.common}" excludes="**/*.java"/>
-			</copy>
+		<copy toDir="${cl.common.dir}">
+				<fileset dir="${src.common}" excludes="**/*.java"/>
+		</copy>
 
-            <javac
-                    srcdir="${src.common}"
-                    destdir="${cl.common.dir}"
-                    deprecation="on"
-                    source="${source}"
-                    debug="${debug}"  >
+        <javac
+                srcdir="${src.common}"
+                destdir="${cl.common.dir}"
+                deprecation="on"
+                source="${source}"
+                debug="${debug}"  >
 
-                    <classpath refid="common.libs"/>
-                    <include name="**/*.java"/>
-            </javac>
- 	
-			<parallel threadsperprocessor="1" failonany="yes">
-				<generateorcheck_stub_for_class targetedClasspath="common.classpath" srcDir="${cl.common.dir}" class="org/ow2/proactive/scripting/ScriptHandler" mode="generate"/>
-				<generateorcheck_stub_for_class targetedClasspath="common.classpath" srcDir="${cl.common.dir}" class="org/ow2/proactive/jmx/provider/ro/ROServerImpl" mode="generate"/>
-				<generateorcheck_stub_for_class targetedClasspath="common.classpath" srcDir="${cl.common.dir}" class="org/ow2/proactive/utils/NodeSet" mode="generate"/>
-				<generateorcheck_stub_for_class targetedClasspath="common.classpath" srcDir="${cl.common.dir}" class="org/ow2/proactive/scripting/ScriptResult" mode="generate"/>
-			</parallel>
+                <classpath refid="common.libs"/>
+                <include name="**/*.java"/>
+        </javac>
+
+	 	<stubGenerator srcDir="${cl.common.dir}" refclasspath="common.classpath">
+	 		<class name="org.ow2.proactive.scripting.ScriptHandler" />
+	 		<class name="org.ow2.proactive.jmx.provider.ro.ROServerImpl" />
+	 		<class name="org.ow2.proactive.utils.NodeSet" />
+	 		<class name="org.ow2.proactive.scripting.ScriptResult" />
+		</stubGenerator>
       </target>
 	
     <!-- ************

@@ -67,6 +67,9 @@
 	<!--  =============================================================== -->
 
     <path id="common.libs">
+    	<fileset dir="${compile.dir}">
+    		<include name="lib/*.jar"/>
+    	</fileset>
         <fileset dir="${lib.dir}">
             <include name="ProActive/**/*.jar"/>
             <include name="common/**/*.jar"/>
@@ -79,7 +82,7 @@
 		<path refid="common.libs"/>
 		<pathelement location="${cl.common.dir}" />
 	</path>
-
+	
     <fileset id="jar.index.fileset" dir="${lib.dir}">
         <include name="common/**/*.jar" />
         <include name="hibernate/**/*.jar" />
