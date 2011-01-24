@@ -182,8 +182,12 @@ final class SchedulingMethodImpl implements SchedulingMethod {
 
             //get the next compatible tasks from the whole returned policy tasks
             LinkedList<EligibleTaskDescriptor> tasksToSchedule = new LinkedList<EligibleTaskDescriptor>();
-            int neededResourcesNumber = getNextcompatibleTasks(taskRetrivedFromPolicy, freeResourcesNb,
-                    tasksToSchedule);
+            int neededResourcesNumber = 0;
+            while (taskRetrivedFromPolicy.size() > 0 && neededResourcesNumber == 0) {
+                //the loop will search for next compatible task until it find something
+                neededResourcesNumber = getNextcompatibleTasks(taskRetrivedFromPolicy, freeResourcesNb,
+                        tasksToSchedule);
+            }
             logger.debug("Number of nodes to ask for : " + neededResourcesNumber);
             if (neededResourcesNumber == 0) {
                 break;
