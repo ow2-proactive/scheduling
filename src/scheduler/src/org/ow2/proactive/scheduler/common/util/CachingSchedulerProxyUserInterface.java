@@ -131,7 +131,8 @@ public class CachingSchedulerProxyUserInterface extends SchedulerProxyUserInterf
         PublicKey pubKey = auth.getPublicKey();
 
         try {
-            Credentials cred = Credentials.createCredentials(new CredData(user, pwd), pubKey);
+            Credentials cred = Credentials.createCredentials(new CredData(CredData.parseLogin(user), CredData
+                    .parseDomain(user), pwd), pubKey);
             this.uischeduler = auth.login(cred);
         } catch (KeyException e) {
             throw new InternalSchedulerException(e);

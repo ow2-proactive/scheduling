@@ -122,7 +122,8 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
         PublicKey pubKey = auth.getPublicKey();
 
         try {
-            Credentials cred = Credentials.createCredentials(new CredData(user, pwd), pubKey);
+            Credentials cred = Credentials.createCredentials(new CredData(CredData.parseLogin(user), CredData
+                    .parseDomain(user), pwd), pubKey);
             this.uischeduler = auth.login(cred);
             mbeaninfoviewer = new MBeanInfoViewer(auth, user, cred);
         } catch (KeyException e) {

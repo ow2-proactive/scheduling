@@ -460,9 +460,11 @@ public class SchedulerProxy implements Scheduler {
             schedulerURL = dialogResult.getUrl();
             CredData cd;
             if (dialogResult.getSshkey() == null) {
-                cd = new CredData(userName, dialogResult.getPassword());
+                cd = new CredData(CredData.parseLogin(userName), CredData.parseDomain(userName), dialogResult
+                        .getPassword());
             } else {
-                cd = new CredData(userName, dialogResult.getPassword(), dialogResult.getSshkey());
+                cd = new CredData(CredData.parseLogin(userName), CredData.parseDomain(userName), dialogResult
+                        .getPassword(), dialogResult.getSshkey());
             }
 
             sai = SchedulerConnection.join(schedulerURL);

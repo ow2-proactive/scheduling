@@ -237,7 +237,8 @@ public class ResourceManagerController {
                         }
                     }
                     try {
-                        this.credentials = Credentials.createCredentials(new CredData(user, pwd), pubKey);
+                        this.credentials = Credentials.createCredentials(new CredData(CredData
+                                .parseLogin(user), CredData.parseDomain(user), pwd), pubKey);
                     } catch (KeyException e) {
                         logger.error("Could not create credentials... " + e);
                         throw e;

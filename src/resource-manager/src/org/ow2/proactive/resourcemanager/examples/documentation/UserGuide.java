@@ -92,7 +92,8 @@ public class UserGuide {
                     // e.g. by default, "user" and "pwd" are valid
                     // refer to ${rm.home}/config/authentification/login.cfg to see all valid
                     // pairs and to add some others.
-                    Credentials cred = Credentials.createCredentials(new CredData(user, password), pubKey);
+                    Credentials cred = Credentials.createCredentials(new CredData(CredData.parseLogin(user),
+                        CredData.parseDomain(user), password), pubKey);
                     resourceManager = auth.login(cred);
                 }
             } catch (KeyException ex) {

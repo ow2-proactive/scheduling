@@ -301,10 +301,11 @@ public class CreateCredentials {
             CredData credData;
             if (keyfile != null && keyfile.length() > 0) {
                 byte[] keyfileContent = FileToBytesConverter.convertFileToByteArray(new File(keyfile));
-                credData = new CredData(login, pass, keyfileContent);
+                credData = new CredData(CredData.parseLogin(login), CredData.parseDomain(login), pass,
+                    keyfileContent);
             } else {
                 System.out.println("--> Ignoring keyfile, credential does not contain SSH key");
-                credData = new CredData(login, pass);
+                credData = new CredData(CredData.parseLogin(login), CredData.parseDomain(login), pass);
             }
             Credentials cred = Credentials.createCredentials(credData, pubKey, cipher);
             cred.writeToDisk(path);

@@ -139,8 +139,8 @@ public class SchedulerAuthenticationGUIHelper {
             SchedulerAuthenticationInterface schedAuth = auth.getAuth();
             Credentials cred = null;
             try {
-                cred = Credentials.createCredentials(new CredData(auth.getUsername(), auth.getPassword()),
-                        schedAuth.getPublicKey());
+                cred = Credentials.createCredentials(new CredData(CredData.parseLogin(auth.getUsername()),
+                    CredData.parseDomain(auth.getUsername()), auth.getPassword()), schedAuth.getPublicKey());
             } catch (LoginException e) {
                 throw new LoginException("Could not retrieve public key from Scheduler " + schedulerURL +
                     ", contact the administrator" + e);

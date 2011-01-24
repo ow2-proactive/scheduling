@@ -242,10 +242,12 @@ public class SchedulerController {
                         if (cmd.hasOption("key")) {
                             byte[] keyfileContent = FileToBytesConverter.convertFileToByteArray(new File(cmd
                                     .getOptionValue("key")));
-                            this.credentials = Credentials.createCredentials(new CredData(user, pwd,
-                                keyfileContent), pubKey);
+                            this.credentials = Credentials.createCredentials(new CredData(CredData
+                                    .parseLogin(user), CredData.parseDomain(user), pwd, keyfileContent),
+                                    pubKey);
                         } else {
-                            this.credentials = Credentials.createCredentials(new CredData(user, pwd), pubKey);
+                            this.credentials = Credentials.createCredentials(new CredData(CredData
+                                    .parseLogin(user), CredData.parseDomain(user), pwd), pubKey);
                         }
                     } catch (FileNotFoundException fnfe) {
                         logger.error("SSH keyfile not found : '" + cmd.getOptionValue("key") + "'");

@@ -342,8 +342,8 @@ public class SchedulerJobSubmission {
                 jobSubmissionScenario.loadInfrastructure();
                 List<AbstractSchedulerUser<JobId>> schedulerUsers = null;
                 if (singleLogin) {
-                    Credentials credentials = Credentials.createCredentials(new CredData(username, password),
-                            pubKey);
+                    Credentials credentials = Credentials.createCredentials(new CredData(CredData
+                            .parseLogin(username), CredData.parseDomain(username), password), pubKey);
                     schedulerUsers = jobSubmissionScenario.deployConnectedUsers(schedulerUserClazz,
                             schedulerUrl, credentials);
                 } else {
@@ -426,7 +426,8 @@ public class SchedulerJobSubmission {
                     }
                     String user = lineTokens[0];
                     String pwd = lineTokens[1];
-                    Credentials credentials = Credentials.createCredentials(new CredData(user, pwd), pubKey);
+                    Credentials credentials = Credentials.createCredentials(new CredData(CredData
+                            .parseLogin(user), CredData.parseDomain(user), pwd), pubKey);
                     credentialsList.add(credentials);
                 }
             } catch (FileNotFoundException e) {
