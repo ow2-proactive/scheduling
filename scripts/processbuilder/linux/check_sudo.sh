@@ -1,3 +1,4 @@
+#! /bin/sh
 # script to test if we can run as a given user
 # it works both with passwordless and password-enabled user changing
 

@@ -1,3 +1,4 @@
+#! /bin/sh
 # This script will try to proceed with the next step of the launching mechanism, i.e. 
 # it will SUDO the command_step.
 #
