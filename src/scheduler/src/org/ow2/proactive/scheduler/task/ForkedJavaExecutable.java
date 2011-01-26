@@ -212,11 +212,16 @@ public class ForkedJavaExecutable extends JavaExecutable {
             }
 
             if (!isKilled()) {
-                newJavaTaskLauncher.closeNodeConfiguration();
+                // if killed, the dataspace clean has been performed while calling kill()
+                try {
+                    newJavaTaskLauncher.closeNodeConfiguration();
+                } catch (Throwable e) {
+                    logger_dev.warn("Unable to close dataspaces while terminating forked JVM.", e);
+                }
             } else {
                 logger_dev.debug("Task has been killed");
                 FutureMonitoring.removeFuture(((FutureProxy) ((StubObject) result).getProxy()));
-                throw new WalltimeExceededException("Walltime exceeded");
+                throw new WalltimeExceededException("Task killed or walltime exceeded");
             }
             return result;
         } finally {
@@ -678,6 +683,26 @@ public class ForkedJavaExecutable extends JavaExecutable {
         } catch (Exception e) {
             logger_dev.error("", e);
         }
+    }
+
+    /**
+     * Close forked JVM dataspace before killing
+     * See SCHEDULING-1080
+     * @since Scheduling 3.0.1
+     */
+    @Override
+    public void kill() {
+        // close dataspaces before killing
+        // so that we try to clean sctatch dir
+        if (newJavaTaskLauncher != null) {
+            try {
+                newJavaTaskLauncher.closeNodeConfiguration();
+            } catch (Throwable e) {
+                logger_dev.warn("Unable to close dataspaces while killing forked JVM.", e);
+            }
+        }
+        // kill anyway !
+        super.kill();
     }
 
     /**

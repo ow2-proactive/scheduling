@@ -42,6 +42,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.annotation.ImmediateService;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.dataspaces.core.BaseScratchSpaceConfiguration;
@@ -254,12 +255,13 @@ public class JavaTaskLauncher extends TaskLauncher {
      * 
      * @return true if configuration went right
      */
+    @ImmediateService
     public boolean closeNodeConfiguration() {
         try {
             DataSpacesNodes.closeNodeConfig(PAActiveObject
                     .getActiveObjectNode(PAActiveObject.getStubOnThis()));
         } catch (Throwable t) {
-            logger_dev.error("Cannot close dataSpace configuration !", t);
+            logger_dev.error("Cannot close properly DataSpaces.", t);
             return false;
         }
         return true;
