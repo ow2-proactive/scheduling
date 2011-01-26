@@ -74,21 +74,16 @@ public class ScilabConfigurationParser extends MatSciConfigurationParser {
 
         String homestr = ProActiveRuntimeImpl.getProActiveRuntime().getProActiveHome();
         File homesched = new File(homestr);
-        if (PASchedulerProperties.SCILAB_WORKER_CONFIGURATION_FILE != null &&
-            PASchedulerProperties.SCILAB_WORKER_CONFIGURATION_FILE.getValueAsString() != "") {
-            try {
-                configFile = new File(PASchedulerProperties.SCILAB_WORKER_CONFIGURATION_FILE
-                        .getValueAsString());
-            } catch (Exception e) {
+        if (PASchedulerProperties.SCILAB_WORKER_CONFIGURATION_FILE.getValueAsString() != null &&
+            !"".equals(PASchedulerProperties.SCILAB_WORKER_CONFIGURATION_FILE.getValueAsString())) {
 
-            }
+            configFile = new File(PASchedulerProperties.SCILAB_WORKER_CONFIGURATION_FILE.getValueAsString());
+
         } else if (System.getProperty(PASchedulerProperties.SCILAB_WORKER_CONFIGURATION_FILE.getKey()) != null) {
-            try {
-                configFile = new File(System
-                        .getProperty(PASchedulerProperties.SCILAB_WORKER_CONFIGURATION_FILE.getKey()));
-            } catch (Exception e) {
 
-            }
+            configFile = new File(System.getProperty(PASchedulerProperties.SCILAB_WORKER_CONFIGURATION_FILE
+                    .getKey()));
+
         }
         if (configFile == null) {
             URI configFileURI = homesched.toURI().resolve(configPath);
