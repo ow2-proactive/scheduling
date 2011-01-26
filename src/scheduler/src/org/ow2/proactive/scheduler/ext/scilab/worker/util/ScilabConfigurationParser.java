@@ -47,7 +47,6 @@ import org.ow2.proactive.scheduler.ext.matsci.worker.util.MatSciEngineConfig;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -86,8 +85,7 @@ public class ScilabConfigurationParser extends MatSciConfigurationParser {
 
         }
         if (configFile == null) {
-            URI configFileURI = homesched.toURI().resolve(configPath);
-            configFile = new File(configFileURI);
+            configFile = new File(homesched, configPath);
         }
         if (!configFile.exists() || !configFile.canRead()) {
             throw new FileNotFoundException(configFile + " not found, aborting...");
