@@ -17,6 +17,7 @@
                 <tocitem target="proactive_installation.html#installation-2">Downloading and Installing ProActive Scheduler</tocitem>
                 <tocitem target="proactive_installation.html#installation-3">Scheduler Configuration For Matlab</tocitem>
                 <tocitem target="proactive_installation.html#installation-4">Configuration of Remote Workers for Matlab</tocitem>
+                <tocitem target="proactive_installation.html#installation-5">Setting up java.policy file</tocitem>
             </tocitem>
             <tocitem target="proactive_startup.html">Starting And Connecting
                 <tocitem target="proactive_startup.html#startup-1">Introduction</tocitem>
