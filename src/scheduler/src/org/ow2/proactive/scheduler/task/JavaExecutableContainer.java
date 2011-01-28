@@ -162,18 +162,17 @@ public class JavaExecutableContainer extends ExecutableContainer {
                 userExecutable = (JavaExecutable) userExecutableClass.newInstance();
             } catch (ClassNotFoundException e) {
                 throw new ExecutableCreationException("Unable to instanciate JavaExecutable. " +
-                    this.userExecutableClassName + " class cannot be found : " + e);
+                    this.userExecutableClassName + " class cannot be found", e);
             } catch (InstantiationException e) {
                 throw new ExecutableCreationException("Unable to instanciate JavaExecutable. " +
-                    this.userExecutableClassName + " might not define no-args constructor  : " + e);
+                    this.userExecutableClassName + " might not define no-args constructor", e);
             } catch (ClassCastException e) {
                 throw new ExecutableCreationException(
-                    "Unable to instanciate JavaExecutable. " +
-                        this.userExecutableClassName +
-                        " might not inherit from org.ow2.proactive.scheduler.common.task.executable.JavaExecutable : " +
-                        e);
+                    "Unable to instanciate JavaExecutable. " + this.userExecutableClassName +
+                        " might not inherit from org.ow2.proactive.scheduler.common.task.executable.JavaExecutable",
+                    e);
             } catch (Throwable e) {
-                throw new ExecutableCreationException("Unable to instanciate JavaExecutable : " + e);
+                throw new ExecutableCreationException("Unable to instanciate JavaExecutable", e);
             }
         }
         return userExecutable;
