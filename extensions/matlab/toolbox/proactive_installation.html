@@ -50,6 +50,8 @@
             <p><a href="proactive_installation.html#installation-4">Configuration of Remote Workers for Matlab</a>
             </p>
 
+            <p><a href="proactive_installation.html#installation-5">Setting up java.policy file</a></p>
+
             </td>
     </tr>
 </table>
@@ -169,8 +171,53 @@
     <li><p>Have multiple instances of Matlab installed and let ProActive Scheduler run on a Administrator or Power User account (matlab /regserver commands will be run dynamically by ProActive Scheduler Toolbox).</p></li>
 </ul>
 
+<a name="installation-5"></a>
 
+<p class="pagenavlink">
+    <script language="Javascript">updateSectionId("installation-5");</script>
+    <script language="Javascript">addTopOfPageButtons();</script>
+    <a href="#top_of_page">Back to Top</a></p>
+<h3 class="title">Setting up java.policy file</h3>
 
+<p>On each <b>client host</b> that will connect to the Scheduler to submit tasks, it is mandatory to add a specific configuration file for Java called the <b>Java Policy</b> file. This file is meant to define the security settings of a given Java Virtual Machine. This configuration can either be :</p>
+<ul type="disc">
+    <li><p>Specific to a given <b>matlab installation</b> (but common for all users on this machine).</p></li>
+    <li><p>Specific to a <b>given user</b>, but common to all matlab installations of this machine (and also all other Java programs).</p></li>
+</ul>
+<h4><u>Matlab specific configuration</u></h4>
+<p>In order to do the first type of configuration, one needs to have write access to Matlab's installation directory (requires administrator privilege). First a file called <b>matlab.java.policy</b> must be created in the directory <b>MATLAB/bin/ARCH</b> where:</p>
+<ul type="disc">
+    <li><p><b>MATLAB</b> refers to your Matlab installation directory.</p></li>
+    <li><p><b>ARCH</b> refers to the architecture directory : glnax64 for linux 64bits, win32 for Windows 32bits and win64 for Windows 64bits.</p></li>
+</ul>
+<p>The <b>matlab.java.policy</b> file must contain the following:</p>
+<pre>grant {
+  permission java.security.AllPermission;
+};</pre>
+<p>Finally, a second file called <b>java.opts</b> must be created in the same directory with the following content:</p>
+<pre>-Djava.security.manager \
+-Djava.security.policy=C:\Program Files\MATLAB\R2007b\bin\win64\matlab.java.policy</pre>
+<p>Here <b>java.security.policy</b> points to the full path of the <b>matlab.java.policy</b> file, replace this path with yours.</p>
+<p>These two files created, you can start matlab and verify that the configuration has been done correctly, by typing the following command on the matlab prompt:</p>
+<pre>>> java.lang.System.getProperty('java.security.policy')
+
+ans =
+
+C:\Program Files\MATLAB\R2007b\bin\win64\matlab.java.policy
+ </pre>
+<p>You must see the path that you specified in the <b>java.opts</b> file. If you don't see this path, it means there is a syntax error in the java.opts file, try different things, like writing everything on one line, using a backslash to separate lines, etc (as the syntax accepted varies on different Operating Systems).</p>
+<p>If the configuration has not been done properly, a call to PAconnect (see Chapter <a href="proactive_startup.html#startup-3">Connecting to a running ProActive Scheduler from Matlab</a> ) will result in displaying a big error message containing the following Exception:</p>
+<pre>java.security.AccessControlException: access denied (java.util.PropertyPermission org.mortbay.io.nio.JVMBUG_THRESHHOLD read)</pre>
+<p>Again recheck your configuration if this message appear.</p>
+<h4><u>User specific configuration</u></h4>
+<p>The second type of java policy configuration is simpler to do than the first one, but it will apply to every Java program started by this user on your machine, including Java applets. Accordingly, this set up should be done with care.</p>
+<p>In order to do the second configuration, go to the <b>HOME</b> directory of the user that will use the toolbox. The  <b>HOME</b> directory can be found by typing the following command on the matlab prompt:</p>
+<pre>>> java.lang.System.getProperty('user.home')
+
+ans =
+
+/user/fviale/home</pre>
+<p>In this HOME directory, create a file called <b>.java.policy</b> (notice the first dot in the file name), which will contain the same text as the <b>matlab.java.policy</b> file from the first method. That's it! Again, if the configuration is not done properly the same exception will appear when trying to connect to the Scheduler.</p>
 
 <a name="bottom_of_page"></a>
 
