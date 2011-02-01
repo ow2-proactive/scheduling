@@ -131,6 +131,9 @@
             <fileset dir="${lib.dir}/matsci" includes="**/*.so"/>
             <fileset dir="${lib.dir}/matsci" includes="**/*.dll"/>
         </copy>
+		<copy todir="${deploy.lib.dir}" flatten="no">
+            <fileset dir="${lib.dir}/ProActive" includes="*.dll"/>
+        </copy>
         <copy todir="${deploy.dir}/scripts">
 		   <fileset dir="${scripts.dir}"/>
 		</copy>
