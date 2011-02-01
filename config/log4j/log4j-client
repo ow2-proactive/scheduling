@@ -18,6 +18,9 @@ log4j.logger.proactive.scheduler.dev.admin.consol=INFO,CONSOLE
 # define special PROACTIVE logger for deployment
 log4j.logger.proactive.deployment=INFO,CONSOLE
 
+# Router (log4j-client used byy startrouter)
+log4j.logger.proactive.pamr.router=INFO,CONSOLE
+
 # avoid displaying additivity of the inherit loggers
 log4j.additivity.proactive.resourceManager=false
 # define RESOURCE MANAGER loggers
