@@ -113,15 +113,30 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
      * @throws LoginException if the couple username/password is invalid
      */
     public void init(String url, String user, String pwd) throws SchedulerException, LoginException {
+        CredData cred = new CredData(CredData.parseLogin(user), CredData.parseDomain(user), pwd);
+        init(url, cred);
+    }
 
+    /**
+     * initialize the connection the scheduler. 
+     * Must be called only once.
+     * Create the corresponding credential object before sending it
+     * to the scheduler.
+     * @param url the scheduler's url 
+     * @param credData the credential object that contains user-related data
+     * @throws SchedulerException thrown if the scheduler is not available
+     * @throws LoginException if the couple username/password is invalid
+     * @since Scheduling 3.1.0
+     */
+    public void init(String url, CredData credData) throws SchedulerException, LoginException {
         SchedulerAuthenticationInterface auth = SchedulerConnection.join(url);
         PublicKey pubKey = auth.getPublicKey();
 
         try {
-            Credentials cred = Credentials.createCredentials(new CredData(CredData.parseLogin(user), CredData
-                    .parseDomain(user), pwd), pubKey);
+
+            Credentials cred = Credentials.createCredentials(credData, pubKey);
             this.uischeduler = auth.login(cred);
-            mbeaninfoviewer = new MBeanInfoViewer(auth, user, cred);
+            mbeaninfoviewer = new MBeanInfoViewer(auth, credData.getLogin(), cred);
         } catch (KeyException e) {
             throw new InternalSchedulerException(e);
         }
