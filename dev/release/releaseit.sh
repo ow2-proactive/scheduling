@@ -53,8 +53,8 @@ fi
 #ask user if ready 
 echo "*"
 echo "*  Release is now ready to be built"
-echo "*  Please, ensure that RCPs have been produced with this constraint :"
-echo "*     - version pattern 11.22.33 has been replaced with version $VERSION"
+echo "*  Please, ensure that RCPs have been produced with these constraints :"
+echo "*     - version pattern 11,22,33 has been replaced with version $VERSION"
 echo "*     - resource manager product has been built without Scheduling dependences in its required plug-ins dependences."
 echo "*       (org.ow2.proactive.scheduler.lib should not appear in resource_manager.product dependencies)"
 echo "*     - $RCPs_DIRECTORY must contain 'rm' and 'scheduler' directories and each one must contain those directories :"
