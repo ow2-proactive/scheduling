@@ -36,12 +36,15 @@
  */
 package org.ow2.proactive_grid_cloud_portal;
 
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
 import javax.ws.rs.FormParam;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.apache.axis.utils.IOUtils;
 import org.jboss.resteasy.annotations.providers.multipart.PartType;
+import org.objectweb.proactive.core.mop.PAObjectInputStream;
 
 
 /**
@@ -67,6 +70,11 @@ public class LoginForm {
      */
     private String password;
 
+    /**
+     * ssh key for runAsMe
+     */
+    private byte[] sshKey;
+    
     public LoginForm() {
     }
 
@@ -96,6 +104,15 @@ public class LoginForm {
     @FormParam("password")
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public byte[] getSshKey() {
+        return sshKey;
+    }
+    
+    @FormParam("sshkey")
+    public void setSshKey(String sshKeyStream) {
+        this.sshKey = sshKeyStream.getBytes();
     }
 
 }

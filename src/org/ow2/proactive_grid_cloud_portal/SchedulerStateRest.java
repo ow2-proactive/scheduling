@@ -1162,16 +1162,18 @@ public class SchedulerStateRest {
             throws ActiveObjectCreationException, NodeException, KeyException, LoginException,
             SchedulerException, IOException {
 
-        SchedulerProxyUserInterface scheduler = PAActiveObject.newActive(SchedulerProxyUserInterface.class,
-                new Object[] {});
+        MySchedulerProxyUserInterface scheduler = PAActiveObject.newActive(
+                MySchedulerProxyUserInterface.class, new Object[] {});
 
         String url = PortalConfiguration.getProperties().getProperty(PortalConfiguration.scheduler_url);
 
         if (multipart.getCredential() != null) {
-            Credentials cred = Credentials.getCredentials(multipart.getCredential());
-            scheduler.init(url, cred);
+            Credentials credentials = Credentials.getCredentials(multipart.getCredential());
+            scheduler.init(url, credentials);
         } else {
-            scheduler.init(url, multipart.getUsername(), multipart.getPassword());
+            CredData credData = new CredData(CredData.parseLogin(multipart.getUsername()),
+                CredData.parseDomain(multipart.getUsername()), multipart.getPassword(), multipart.getSshKey());
+            scheduler.init(url, credData);
         }
 
         String sessionId = "" + SchedulerSessionMapper.getInstance().add(scheduler);
