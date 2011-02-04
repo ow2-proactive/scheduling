@@ -42,6 +42,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 
 
@@ -49,7 +50,11 @@ import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 public class NotConnectedExceptionMapper implements ExceptionMapper<NotConnectedException> {
 
     public Response toResponse(NotConnectedException exception) {
-        return Response.status(HttpURLConnection.HTTP_UNAUTHORIZED).entity(exception.getMessage()).build();
+        ExceptionToJson js = new ExceptionToJson();
+        js.setErrorMessage(exception.getMessage());
+        js.setHttpErrorCode(HttpURLConnection.HTTP_UNAUTHORIZED);
+        js.setStackTrace(ProActiveLogger.getStackTraceAsString(exception));
+        return Response.status(HttpURLConnection.HTTP_UNAUTHORIZED).entity(js).build();
 
     }
 

@@ -1107,7 +1107,8 @@ public class SchedulerStateRest {
      */
     @POST
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    @Path("login")
+    @Path("login")    
+    @Produces("application/json")
     public String login(@FormParam("username") String username, @FormParam("password") String password)
             throws ActiveObjectCreationException, NodeException, LoginException, SchedulerException,
             KeyException {
@@ -1159,7 +1160,8 @@ public class SchedulerStateRest {
      */
     @POST
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-    @Path("login")
+    @Path("login")       
+    @Produces("application/json")
     public String loginWithCredential(@MultipartForm LoginForm multipart)
             throws ActiveObjectCreationException, NodeException, KeyException, LoginException,
             SchedulerException, IOException {

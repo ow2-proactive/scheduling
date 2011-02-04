@@ -36,18 +36,25 @@
  */
 package org.ow2.proactive_grid_cloud_portal.exceptions;
 
+import java.net.HttpURLConnection;
+
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.scheduler.common.exception.PermissionException;
 
 
 @Provider
 public class PermissionExceptionExceptionMapper implements ExceptionMapper<PermissionException> {
 
-    public Response toResponse(PermissionException permissionException) {
-        return Response.status(403).entity(permissionException.getMessage()).build();
+    public Response toResponse(PermissionException exception) {
+        ExceptionToJson js = new ExceptionToJson();
+        js.setErrorMessage(exception.getMessage());
+        js.setHttpErrorCode(HttpURLConnection.HTTP_FORBIDDEN);
+        js.setStackTrace(ProActiveLogger.getStackTraceAsString(exception));
+        return Response.status(HttpURLConnection.HTTP_FORBIDDEN).entity(js).build();
     }
 
 }

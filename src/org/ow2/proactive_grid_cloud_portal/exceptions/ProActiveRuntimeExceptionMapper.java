@@ -50,7 +50,11 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 public class ProActiveRuntimeExceptionMapper implements ExceptionMapper<ProActiveRuntimeException> {
 
     public Response toResponse(ProActiveRuntimeException exception) {
-        return Response.status(HttpURLConnection.HTTP_NOT_FOUND).entity(exception.getMessage() + "\n" + ProActiveLogger.getStackTraceAsString(exception)).build();
+        ExceptionToJson js = new ExceptionToJson();
+        js.setErrorMessage(exception.getMessage());
+        js.setHttpErrorCode(HttpURLConnection.HTTP_NOT_FOUND);
+        js.setStackTrace(ProActiveLogger.getStackTraceAsString(exception));
+        return Response.status(HttpURLConnection.HTTP_NOT_FOUND).entity(js).build();
     }
 
 }

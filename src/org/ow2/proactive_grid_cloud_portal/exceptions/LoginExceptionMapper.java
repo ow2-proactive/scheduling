@@ -43,12 +43,18 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
+
 
 @Provider
 public class LoginExceptionMapper implements ExceptionMapper<LoginException> {
 
     public Response toResponse(LoginException exception) {
-        return Response.status(HttpURLConnection.HTTP_NOT_FOUND).entity(exception).build();
+        ExceptionToJson js = new ExceptionToJson();
+        js.setErrorMessage(exception.getMessage());
+        js.setHttpErrorCode(HttpURLConnection.HTTP_NOT_FOUND);
+        js.setStackTrace(ProActiveLogger.getStackTraceAsString(exception));
+        return Response.status(HttpURLConnection.HTTP_NOT_FOUND).entity(js).build();
 
     }
 

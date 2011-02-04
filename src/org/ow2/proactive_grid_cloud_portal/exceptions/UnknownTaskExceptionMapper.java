@@ -42,6 +42,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
 
 
@@ -49,7 +50,11 @@ import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
 public class UnknownTaskExceptionMapper implements ExceptionMapper<UnknownTaskException> {
 
     public Response toResponse(UnknownTaskException exception) {
-        return Response.status(HttpURLConnection.HTTP_NOT_FOUND).entity(exception.getMessage()).build();
+        ExceptionToJson js = new ExceptionToJson();
+        js.setErrorMessage(exception.getMessage());
+        js.setHttpErrorCode(HttpURLConnection.HTTP_NOT_FOUND);
+        js.setStackTrace(ProActiveLogger.getStackTraceAsString(exception));
+        return Response.status(HttpURLConnection.HTTP_NOT_FOUND).entity(js).build();
     }
 
 }
