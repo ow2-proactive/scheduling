@@ -102,6 +102,8 @@ import org.ow2.proactive.scheduler.common.util.CachingSchedulerProxyUserInterfac
 import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
+import org.ow2.proactive_grid_cloud_portal.common.LoginForm;
+import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
 
 
 /**
@@ -111,20 +113,16 @@ import org.ow2.proactive.scheduler.task.TaskResultImpl;
  */
 @XmlJavaTypeAdapter(value = PersistentMapConverter.class, type = PersistentMap.class)
 @Path("/scheduler/")
-public class SchedulerStateRest {
+public class SchedulerStateRest implements SchedulerRestInterface {
     /** If the rest api was unable to instantiate the value from byte array representation*/
     public static final String UNKNOWN_VALUE_TYPE = "Unknown value type";
     private Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.PREFIX + ".rest");
     private CachingSchedulerProxyUserInterface cachedState;
     private volatile boolean isCacheEnabled = true;
 
-    /**
-     * Returns the ids of the current jobs under a list of string.
-     * @param sessionId a valid session id
-     * @param index optional, if a sublist has to be returned the index of the sublist
-     * @param range optional, if a sublist has to be returned, the range of the sublist
-     * @return a list of jobs' ids under the form of a list of string
-    */
+    /* (non-Javadoc)
+     * @see org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#jobs(java.lang.String, int, int)
+     */
     @GET
     @Path("jobs")
     @Produces("application/json")
@@ -167,20 +165,10 @@ public class SchedulerStateRest {
         scheduler.getStatus();
     }
 
-    /**
-     * Returns a subset of the scheduler state, including pending, running, finished
-     * jobs (in this particular order).
-     * each jobs is described using
-     *   - its id
-     *   - its owner
-     *   - the JobInfo class
-     * @param index optional, if a sublist has to be returned the index of the sublist
-     * @param range optional, if a sublist has to be returned, the range of the sublist
-     * @param sessionId a valid session id
-     * @return a list of UserJobInfo
+    /* (non-Javadoc)
+     * @see org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#jobsinfo(java.lang.String, int, int)
      */
     @GET
-    @OPTIONS
     @Path("jobsinfo")
     @Produces({ "application/json", "application/xml" })
     public List<UserJobInfo> jobsinfo(@HeaderParam("sessionid") String sessionId,
@@ -208,21 +196,10 @@ public class SchedulerStateRest {
 
     }
 
-    /**
-     * Returns a map containing one entry with the revision id as key and the 
-     * list of UserJobInfo as value.
-     * each jobs is described using
-     *   - its id
-     *   - its owner
-     *   - the JobInfo class
-     * @param sessionId a valid session id
-     * @param index optional, if a sublist has to be returned the index of the sublist
-     * @param range optional, if a sublist has to be returned, the range of the sublist
-     * @return a map containing one entry with the revision id as key and the 
-     * list of UserJobInfo as value.
+    /* (non-Javadoc)
+     * @see org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#revisionAndjobsinfo(java.lang.String, int, int)
      */
     @GET
-    @OPTIONS
     @Path("revisionjobsinfo")
     @Produces({ "application/json", "application/xml" })
     public Map<AtomicLong, List<UserJobInfo>> revisionAndjobsinfo(@HeaderParam("sessionid") String sessionId,
@@ -297,10 +274,8 @@ public class SchedulerStateRest {
         }
     }
 
-    /**
-     * Returns the state of the scheduler
-     * @param sessionId a valid session id.
-     * @return the scheduler state 
+    /* (non-Javadoc)
+     * @see org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#schedulerState(java.lang.String)
      */
     @GET
     @Path("state")
@@ -312,10 +287,8 @@ public class SchedulerStateRest {
         return SchedulerStateCaching.getLocalState();
     }
 
-    /**
-     * Returns the revision number of the scheduler state
-     * @param sessionId a valid session id.
-     * @return the revision of the scheduler state 
+    /* (non-Javadoc)
+     * @see org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#schedulerStateRevision(java.lang.String)
      */
     @GET
     @Path("state/revision")
@@ -327,11 +300,8 @@ public class SchedulerStateRest {
         return SchedulerStateCaching.getSchedulerRevision();
     }
 
-    /**
-     * Returns a map with only one entry containing as key the revision and as content
-     * the scheduler state
-     * @param sessionId a valid session id.
-     * @return a map of one entry containing the revision and the corresponding scheduler state 
+    /* (non-Javadoc)
+     * @see org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#getSchedulerStateAndRevision(java.lang.String)
      */
     @GET
     @Path("revisionandstate")
@@ -343,12 +313,9 @@ public class SchedulerStateRest {
         return SchedulerStateCaching.getRevisionAndSchedulerState();
     }
 
-    /**
-     * returns only the jobs of the current user
-     * @param sessionId a valid session id
-     * @return a scheduler state that contains only the jobs of the user that
-     * owns the session <code>sessionid</code>  
-    */
+    /* (non-Javadoc)
+     * @see org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#getSchedulerStateMyJobsOnly(java.lang.String)
+     */
     @GET
     @Path("state/myjobsonly")
     @Produces({ "application/json", "application/xml" })
@@ -358,10 +325,8 @@ public class SchedulerStateRest {
         return PAFuture.getFutureValue(s.getState(true));
     }
 
-    /**
-     * Returns a JobState of the job identified by the id <code>jobid</code>
-     * @param sessionid a valid session id
-     * @param jobid the id of the job to retrieve
+    /* (non-Javadoc)
+     * @see org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#listJobs(java.lang.String, java.lang.String)
      */
     @GET
     @Path("jobs/{jobid}")
@@ -378,11 +343,8 @@ public class SchedulerStateRest {
         return js;
     }
 
-    /**
-     * Returns the job result associated to the job referenced by the 
-     * id <code>jobid</code>
-     * @param sessionid a valid session id
-     * @result the job result of the corresponding job  
+    /* (non-Javadoc)
+     * @see org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#jobResult(java.lang.String, java.lang.String)
      */
     @GET
     @Path("jobs/{jobid}/result")
@@ -394,15 +356,8 @@ public class SchedulerStateRest {
         return PAFuture.getFutureValue(s.getJobResult(jobId));
     }
 
-    /**
-     * Returns all the task results of this job as a map whose the key is the
-     * name of the task and its task result.<br>
-     * If the result cannot be instantiated, the content is replaced by the 
-     * string 'Unknown value type'. To get the serialized form of a given result,
-     * one has to call the following restful service 
-     * jobs/{jobid}/tasks/{taskname}/result/serializedvalue
-     * @param sessionid a valid session id
-     * @param jobid a job id
+    /* (non-Javadoc)
+     * @see org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#jobResultValue(java.lang.String, java.lang.String)
      */
     @GET
     @Path("jobs/{jobid}/result/value")
@@ -440,13 +395,8 @@ public class SchedulerStateRest {
         return res;
     }
 
-    /**
-     * Delete a job
-     * @param sessionId a valid session id
-     * @param jobId the id of the job to delete
-     * @return true if success, false if the job not yet finished (not removed,
-     * kill the job then remove it) 
-     * 
+    /* (non-Javadoc)
+     * @see org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#removeJob(java.lang.String, java.lang.String)
      */
     @DELETE
     @Path("jobs/{jobid}")
@@ -457,13 +407,9 @@ public class SchedulerStateRest {
         return s.removeJob(jobId);
     }
 
-    /**
-    * Kill the job represented by jobId.<br>
-    *
-    * @param sessionId a valid session id
-    * @param jobId the job to kill.
-    * @return true if success, false if not.
-    */
+    /* (non-Javadoc)
+     * @see org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#killJob(java.lang.String, java.lang.String)
+     */
     @PUT
     @Path("jobs/{jobid}/kill")
     @Produces("application/json")
@@ -474,11 +420,8 @@ public class SchedulerStateRest {
 
     }
 
-    /**
-     * Returns a list of the name of the tasks belonging to job <code>jobId</code>
-     * @param sessionId a valid session id
-     * @param the jobid one wants to list the tasks' name
-     * @return a list of tasks' name 
+    /* (non-Javadoc)
+     * @see org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#getJobTasksIds(java.lang.String, java.lang.String)
      */
     @GET
     @Path("jobs/{jobid}/tasks")
@@ -499,11 +442,8 @@ public class SchedulerStateRest {
 
     }
 
-    /**
-     * Returns a list of taskState 
-     * @param sessionId a valid session id
-     * @param jobId the job id
-     * @return a list of task' states of the job <code>jobId</code>
+    /* (non-Javadoc)
+     * @see org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#getJobTaskStates(java.lang.String, java.lang.String)
      */
     @GET
     @Path("jobs/{jobid}/taskstates")
@@ -525,12 +465,8 @@ public class SchedulerStateRest {
 
     }
 
-    /**
-     * Return the task state of the task <code>taskname</code> of the job <code>jobId</code> 
-     * @param sessionId a valid session id
-     * @param jobId the id of the job
-     * @param taskname the name of the task
-     * @return the task state of the task  <code>taskname</code> of the job <code>jobId</code> 
+    /* (non-Javadoc)
+     * @see org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#jobtasks(java.lang.String, java.lang.String, java.lang.String)
      */
     @GET
     @Path("jobs/{jobid}/tasks/{taskname}")
@@ -552,16 +488,8 @@ public class SchedulerStateRest {
         throw new UnknownTaskException("task " + taskname + "not found");
     }
 
-    /**
-     * Returns the value of the task result of task <code>taskName</code> of the job <code>jobId</code>
-     * <strong>the result is deserialized before sending to the client, if the class is
-     * not found the content is replaced by the string 'Unknown value type' </strong>. To get the serialized form of a given result,
-     * one has to call the following restful service 
-     * jobs/{jobid}/tasks/{taskname}/result/serializedvalue
-     * @param sessionId a valid session id
-     * @param jobId the id of the job
-     * @param taskname the name of the task
-     * @return the value of the task result
+    /* (non-Javadoc)
+     * @see org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#valueOftaskresult(java.lang.String, java.lang.String, java.lang.String)
      */
     @GET
     @Path("jobs/{jobid}/tasks/{taskname}/result/value")
@@ -594,13 +522,8 @@ public class SchedulerStateRest {
         return value;
     }
 
-    /**
-     * Returns the value of the task result of the task <code>taskName</code> of the job <code>jobId</code>
-     * This method returns the result as a byte array whatever the result is.
-     * @param sessionId a valid session id
-     * @param jobId the id of the job
-     * @param taskname the name of the task
-     * @return the value of the task result as a byte array.
+    /* (non-Javadoc)
+     * @see org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#serializedValueOftaskresult(java.lang.String, java.lang.String, java.lang.String)
      */
     @GET
     @Path("jobs/{jobid}/tasks/{taskname}/result/serializedvalue")
@@ -614,13 +537,8 @@ public class SchedulerStateRest {
         return ((TaskResultImpl) tr).getSerializedValue();
     }
 
-    /**
-     * Returns the task result of the task <code>taskName</code> 
-     * of the job <code>jobId</code>
-     * @param sessionId a valid session id
-     * @param jobId the id of the job
-     * @param taskname the name of the task
-     * @return the task result of the task <code>taskName</code> 
+    /* (non-Javadoc)
+     * @see org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#taskresult(java.lang.String, java.lang.String, java.lang.String)
      */
     @GET
     @Path("jobs/{jobid}/tasks/{taskname}/result")
@@ -633,13 +551,9 @@ public class SchedulerStateRest {
         return PAFuture.getFutureValue(tr);
     }
 
-    /**
-     *  Returns all the logs generated by the task (either stdout and stderr)
-     * @param sessionId a valid session id
-     * @param jobId the id of the job
-     * @param taskname the name of the task
-     * @return  all the logs generated by the task (either stdout and stderr) or an empty string if the result is not yet available
-    */
+    /* (non-Javadoc)
+     * @see org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#tasklog(java.lang.String, java.lang.String, java.lang.String)
+     */
     @GET
     @Path("jobs/{jobid}/tasks/{taskname}/result/log/all")
     @Produces("*/*")
@@ -656,13 +570,9 @@ public class SchedulerStateRest {
 
     }
 
-    /**
-     *  Returns the standard error output (stderr) generated by the task
-     * @param sessionId a valid session id
-     * @param jobId the id of the job
-     * @param taskname the name of the task
-     * @return  the stderr generated by the task or an empty string if the result is not yet available 
-    */
+    /* (non-Javadoc)
+     * @see org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#tasklogErr(java.lang.String, java.lang.String, java.lang.String)
+     */
     @GET
     @Path("jobs/{jobid}/tasks/{taskname}/result/log/err")
     @Produces("*/*")
@@ -679,13 +589,9 @@ public class SchedulerStateRest {
 
     }
 
-    /**
-     *  Returns the standard output (stderr) generated by the task
-     * @param sessionId a valid session id
-     * @param jobId the id of the job
-     * @param taskname the name of the task
-     * @return  the stdout generated by the task or an empty string if the result is not yet available
-    */
+    /* (non-Javadoc)
+     * @see org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#tasklogout(java.lang.String, java.lang.String, java.lang.String)
+     */
     @GET
     @Path("jobs/{jobid}/tasks/{taskname}/result/log/out")
     @Produces("*/*")
@@ -776,11 +682,8 @@ public class SchedulerStateRest {
     //                .entity(msg).build());
     //    }
 
-    /**
-     * Pauses the job represented by jobid
-     * @param sessionId a valid session id
-     * @param jobId the id of the job
-     * @return true if success, false if not
+    /* (non-Javadoc)
+     * @see org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#pauseJob(java.lang.String, java.lang.String)
      */
     @POST
     @Path("jobs/{jobid}/pause")
@@ -794,11 +697,8 @@ public class SchedulerStateRest {
 
     }
 
-    /**
-     * Resumes the job represented by jobid
-     * @param sessionId a valid session id
-     * @param jobId the id of the job
-     * @return true if success, false if not
+    /* (non-Javadoc)
+     * @see org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#resumeJob(java.lang.String, java.lang.String)
      */
     @POST
     @Path("jobs/{jobid}/resume")
@@ -811,11 +711,8 @@ public class SchedulerStateRest {
 
     }
 
-    /**
-     * Submits a job to the scheduler 
-     * @param sessionId a valid session id
-     * @param jobId the id of the job
-     * @return the <code>jobid</code> of the newly created job 
+    /* (non-Javadoc)
+     * @see org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#submit(java.lang.String, org.jboss.resteasy.plugins.providers.multipart.MultipartInput)
      */
     @POST
     @Path("submit")
@@ -874,11 +771,8 @@ public class SchedulerStateRest {
      * return "OK"; }
      */
 
-    /**
-     * terminates the session id <code>sessionId</code>
-     * @param sessionId a valid session id
-     * @throws NotConnectedException if the scheduler cannot be contacted
-     * @throws PermissionException if you are not authorized to perform the action
+    /* (non-Javadoc)
+     * @see org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#disconnect(java.lang.String)
      */
     @PUT
     @Path("disconnect")
@@ -897,12 +791,8 @@ public class SchedulerStateRest {
 
     }
 
-    /**
-     * pauses the scheduler 
-     * @param sessionId a valid session id
-     * @return true if success, false otherwise
-     * @throws NotConnectedException
-     * @throws PermissionException
+    /* (non-Javadoc)
+     * @see org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#pauseScheduler(java.lang.String)
      */
     @PUT
     @Path("pause")
@@ -914,12 +804,8 @@ public class SchedulerStateRest {
 
     }
 
-    /**
-     * stops the scheduler 
-     * @param sessionId a valid session id
-     * @return true if success, false otherwise
-     * @throws NotConnectedException
-     * @throws PermissionException
+    /* (non-Javadoc)
+     * @see org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#stopScheduler(java.lang.String)
      */
     @PUT
     @Path("stop")
@@ -930,12 +816,8 @@ public class SchedulerStateRest {
         return s.stop();
     }
 
-    /**
-     * resumes the scheduler 
-     * @param sessionId a valid session id
-     * @return true if success, false otherwise
-     * @throws NotConnectedException
-     * @throws PermissionException
+    /* (non-Javadoc)
+     * @see org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#resumeScheduler(java.lang.String)
      */
     @PUT
     @Path("resume")
@@ -947,15 +829,8 @@ public class SchedulerStateRest {
 
     }
 
-    /**
-     * changes the priority of a job
-     * @param sessionId a valid session id 
-     * @param jobId the job id 
-     * @param priorityName a string representing the name of the priority
-     * @throws NotConnectedException
-     * @throws UnknownJobException
-     * @throws PermissionException
-     * @throws JobAlreadyFinishedException
+    /* (non-Javadoc)
+     * @see org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#schedulerChangeJobPriorityByName(java.lang.String, java.lang.String, java.lang.String)
      */
     @PUT
     @Path("jobs/{jobid}/priority/byname/{name}")
@@ -968,16 +843,8 @@ public class SchedulerStateRest {
 
     }
 
-    /**
-     * changes the priority of a job
-     * @param sessionId a valid session id 
-     * @param jobId the job id 
-     * @param priorityValue a string representing the value of the priority
-     * @throws NumberFormatException
-     * @throws NotConnectedException
-     * @throws UnknownJobException
-     * @throws PermissionException
-     * @throws JobAlreadyFinishedException
+    /* (non-Javadoc)
+     * @see org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#schedulerChangeJobPriorityByValue(java.lang.String, java.lang.String, java.lang.String)
      */
     @PUT
     @Path("jobs/{jobid}/priority/byvalue/{value}")
@@ -990,12 +857,8 @@ public class SchedulerStateRest {
 
     }
 
-    /**
-     * freezes the scheduler 
-     * @param sessionId a valid session id
-     * @return true if success, false otherwise
-     * @throws NotConnectedException
-     * @throws PermissionException
+    /* (non-Javadoc)
+     * @see org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#freezeScheduler(java.lang.String)
      */
     @PUT
     @Path("freeze")
@@ -1007,12 +870,8 @@ public class SchedulerStateRest {
 
     }
 
-    /**
-     * returns the status of the scheduler 
-     * @param sessionId a valid session id
-     * @return the scheduler status
-     * @throws NotConnectedException
-     * @throws PermissionException
+    /* (non-Javadoc)
+     * @see org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#getSchedulerStatus(java.lang.String)
      */
     @GET
     @Path("status")
@@ -1024,12 +883,8 @@ public class SchedulerStateRest {
 
     }
 
-    /**
-     * starts the scheduler 
-     * @param sessionId a valid session id
-     * @return true if success, false otherwise
-     * @throws NotConnectedException
-     * @throws PermissionException
+    /* (non-Javadoc)
+     * @see org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#startScheduler(java.lang.String)
      */
     @PUT
     @Path("start")
@@ -1041,12 +896,8 @@ public class SchedulerStateRest {
 
     }
 
-    /**
-     * kills and shutdowns the scheduler 
-     * @param sessionId a valid session id
-     * @return true if success, false if not
-     * @throws NotConnectedException
-     * @throws PermissionException
+    /* (non-Javadoc)
+     * @see org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#killScheduler(java.lang.String)
      */
     @PUT
     @Path("kill")
@@ -1058,14 +909,8 @@ public class SchedulerStateRest {
 
     }
 
-    /**
-     * Reconnect a new Resource Manager to the scheduler. 
-     * Can be used if the resource manager has crashed.
-     * @param sessionId a valid session id
-     * @param rmURL the url of the resource manager 
-     * @return true if success, false otherwise.
-     * @throws NotConnectedException
-     * @throws PermissionException
+    /* (non-Javadoc)
+     * @see org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#killScheduler(java.lang.String, java.lang.String)
      */
     @POST
     @Path("linkrm")
@@ -1077,12 +922,8 @@ public class SchedulerStateRest {
 
     }
 
-    /**
-     * Tests whether or not the user is connected to the ProActive Scheduler
-     * @param sessionId the session to test
-     * @return true if the user connected to a Scheduler, false otherwise.
-     * @throws NotConnectedException
-     * @throws PermissionException
+    /* (non-Javadoc)
+     * @see org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#isConnected(java.lang.String)
      */
     @PUT
     @Path("isconnected")
@@ -1093,17 +934,8 @@ public class SchedulerStateRest {
         return s.isConnected();
     }
 
-    /**
-     * login to the scheduler using an form containing 2 fields (username & password)
-     *  
-     * @param username username
-     * @param password password 
-     * @return the session id associated to the login
-     * @throws ActiveObjectCreationException
-     * @throws NodeException
-     * @throws LoginException
-     * @throws SchedulerException
-     * @throws KeyException
+    /* (non-Javadoc)
+     * @see org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#login(java.lang.String, java.lang.String)
      */
     @POST
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
@@ -1144,19 +976,8 @@ public class SchedulerStateRest {
 
     }
 
-    /**
-     * login to the scheduler using a multipart form
-     *  can be used either by submitting 
-     *   - 2 fields username & password
-     *   - a credential file with field name 'credential'
-     * @param multipart
-     * @return the session id associated to this new connection
-     * @throws ActiveObjectCreationException
-     * @throws NodeException
-     * @throws KeyException
-     * @throws LoginException
-     * @throws SchedulerException
-     * @throws IOException
+    /* (non-Javadoc)
+     * @see org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#loginWithCredential(org.ow2.proactive_grid_cloud_portal.LoginForm)
      */
     @POST
     @Consumes(MediaType.MULTIPART_FORM_DATA)
@@ -1186,12 +1007,8 @@ public class SchedulerStateRest {
 
     }
 
-    /**
-     * returns statistics about the scheduler
-     * @param sessionId the session id associated to this new connection
-     * @return a string containing the statistics
-     * @throws NotConnectedException
-     * @throws PermissionException
+    /* (non-Javadoc)
+     * @see org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#getStatistics(java.lang.String)
      */
     @GET
     @Path("stats")
@@ -1202,12 +1019,8 @@ public class SchedulerStateRest {
         return s.getInfo("ProActiveScheduler:name=RuntimeData");
     }
 
-    /**
-     * returns a string containing some data regarding the user's account
-     * @param sessionId the session id associated to this new connection
-     * @return a string containing some data regarding the user's account
-     * @throws NotConnectedException
-     * @throws PermissionException
+    /* (non-Javadoc)
+     * @see org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#getStatisticsOnMyAccount(java.lang.String)
      */
     @GET
     @Path("stats/myaccount")
