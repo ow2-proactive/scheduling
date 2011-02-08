@@ -37,6 +37,8 @@
 package org.ow2.proactive_grid_cloud_portal;
 
 import java.net.HttpURLConnection;
+import java.util.Collection;
+import java.util.List;
 
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
@@ -55,6 +57,11 @@ import org.objectweb.proactive.core.node.NodeFactory;
 import org.ow2.proactive.resourcemanager.common.RMState;
 import org.ow2.proactive.resourcemanager.common.event.RMInitialState;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
+import org.ow2.proactive.resourcemanager.frontend.topology.Topology;
+import org.ow2.proactive.resourcemanager.nodesource.common.PluginDescriptor;
+import org.ow2.proactive.scripting.SelectionScript;
+import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
+import org.ow2.proactive.utils.NodeSet;
 
 
 @Path("/rm")
@@ -270,36 +277,51 @@ public class RMRest {
         return rm.shutdown(preempt).getBooleanValue();
     }
 
-    /*
-    public NodeSet getAtMostNodes(int number, TopologyDescriptor descriptor,
+    
+    public NodeSet getAtMostNodes(@HeaderParam("sessionid")
+            String sessionId,int number, TopologyDescriptor descriptor,
             List<SelectionScript> selectionScriptsList, NodeSet exclusion) {
-        return target.getAtMostNodes(number, descriptor, selectionScriptsList, exclusion);
+        ResourceManager rm = checkAccess(sessionId);
+        return rm.getAtMostNodes(number, descriptor, selectionScriptsList, exclusion);
     }
 
-    public Topology getTopology() {
-        return target.getTopology();
+    public Topology getTopology(@HeaderParam("sessionid")
+            String sessionId) { 
+        ResourceManager rm = checkAccess(sessionId);
+        return rm.getTopology();
     }
     
 
 
     public NodeSet getAtMostNodes(@HeaderParam("sessionid") String sessionId,int arg0, SelectionScript arg1) {
-        return target.getAtMostNodes(arg0, arg1);
+        ResourceManager rm = checkAccess(sessionId);
+        return rm.getAtMostNodes(arg0, arg1);
     }
 
-    public NodeSet getAtMostNodes(int arg0, SelectionScript arg1, NodeSet arg2) {
-        return target.getAtMostNodes(arg0, arg1, arg2);
+    public NodeSet getAtMostNodes(@HeaderParam("sessionid")
+            String sessionId,int arg0, SelectionScript arg1, NodeSet arg2) {
+        ResourceManager rm = checkAccess(sessionId);
+        return rm.getAtMostNodes(arg0, arg1, arg2);
     }
 
-    public NodeSet getAtMostNodes(int arg0, List<SelectionScript> arg1, NodeSet arg2) {
-        return target.getAtMostNodes(arg0, arg1, arg2);
+    public NodeSet getAtMostNodes(@HeaderParam("sessionid")
+            String sessionId, int arg0, List<SelectionScript> arg1, NodeSet arg2) {
+        ResourceManager rm = checkAccess(sessionId);
+        return rm.getAtMostNodes(arg0, arg1, arg2);
     }
 
-    public Collection<PluginDescriptor> getSupportedNodeSourceInfrastructures() {
-        return target.getSupportedNodeSourceInfrastructures();
+    public Collection<PluginDescriptor> getSupportedNodeSourceInfrastructures(@HeaderParam("sessionid")
+            String sessionId) {
+        ResourceManager rm = checkAccess(sessionId);
+        return rm.getSupportedNodeSourceInfrastructures();
     }
 
-    public Collection<PluginDescriptor> getSupportedNodeSourcePolicies() {
-        return target.getSupportedNodeSourcePolicies();
+    public Collection<PluginDescriptor> getSupportedNodeSourcePolicies(@HeaderParam("sessionid")
+            String sessionId) {
+        ResourceManager rm = checkAccess(sessionId);
+        return rm.getSupportedNodeSourcePolicies();
     }
-     */
+     
+    
+    
 }
