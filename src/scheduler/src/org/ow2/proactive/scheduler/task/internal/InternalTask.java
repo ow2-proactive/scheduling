@@ -82,6 +82,7 @@ import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.converter.MakeDeepCopy;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.db.annotation.Unloadable;
 import org.ow2.proactive.scheduler.common.exception.ExecutableCreationException;
 import org.ow2.proactive.scheduler.common.job.JobId;
@@ -94,6 +95,7 @@ import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.common.task.flow.FlowAction;
 import org.ow2.proactive.scheduler.common.task.flow.FlowActionType;
 import org.ow2.proactive.scheduler.common.task.flow.FlowBlock;
+import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 import org.ow2.proactive.scheduler.core.annotation.TransientInSerialization;
 import org.ow2.proactive.scheduler.core.db.DatabaseManager;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
@@ -241,6 +243,10 @@ public abstract class InternalTask extends TaskState {
         } catch (NoClassDefFoundError e) {
             // only the scheduler core needs to persist InternalTask in DB
             // clients may need to call this method nonetheless
+        } catch (Throwable t) {
+        	// if this happens on the core, you might want to fix it.
+        	// clients that do not use hibernate can ignore this,
+        	ProActiveLogger.getLogger(SchedulerLoggers.DATABASE).debug("Failed to init DB", t);
         }
 
         InternalTask replicatedTask = null;
@@ -286,7 +292,12 @@ public abstract class InternalTask extends TaskState {
         } catch (NoClassDefFoundError e) {
             // only the scheduler core needs to persist InternalTask in DB
             // clients may need to call this method nonetheless
+        } catch (Throwable t) {
+        	// if this happens on the core, you might want to fix it.
+        	// clients that do not use hibernate can ignore this
+        	ProActiveLogger.getLogger(SchedulerLoggers.DATABASE).debug("Failed to init DB", t);
         }
+        
         return replicatedTask;
     }
 
