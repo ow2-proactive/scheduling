@@ -127,8 +127,15 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher {
             duration = System.currentTimeMillis();
             //launch task : here, result is a taskLauncher if everything terminated without error,
             //result is an integer if forkedJVM has exited abnormally (integer contains the error code)
-            Serializable userResult = currentExecutable.execute(results);
-            duration = System.currentTimeMillis() - duration;
+            Serializable userResult;
+            try {
+                userResult = currentExecutable.execute(results);
+            } catch (Throwable t) {
+                throw t;
+            } finally {
+                //compute duration in any cases (exception or not)
+                duration = System.currentTimeMillis() - duration;
+            }
 
             if (userResult instanceof TaskResult) {
                 TaskResultImpl r = (TaskResultImpl) PAFuture.getFutureValue(userResult);
