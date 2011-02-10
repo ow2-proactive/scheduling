@@ -39,18 +39,25 @@ package org.ow2.proactive.scheduler.task.internal;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.persistence.Column;
 import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.MappedSuperclass;
@@ -74,23 +81,19 @@ import org.hibernate.annotations.Proxy;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.core.util.converter.MakeDeepCopy;
 import org.ow2.proactive.db.annotation.Unloadable;
 import org.ow2.proactive.scheduler.common.exception.ExecutableCreationException;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
-import org.ow2.proactive.scheduler.common.task.ParallelEnvironment;
 import org.ow2.proactive.scheduler.common.task.Task;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
-import org.ow2.proactive.scheduler.common.task.dataspaces.FileSelector;
-import org.ow2.proactive.scheduler.common.task.dataspaces.InputSelector;
-import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
 import org.ow2.proactive.scheduler.common.task.flow.FlowAction;
 import org.ow2.proactive.scheduler.common.task.flow.FlowActionType;
 import org.ow2.proactive.scheduler.common.task.flow.FlowBlock;
-import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
 import org.ow2.proactive.scheduler.core.annotation.TransientInSerialization;
 import org.ow2.proactive.scheduler.core.db.DatabaseManager;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
@@ -103,9 +106,6 @@ import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.proactive.scheduler.task.TaskInfoImpl;
 import org.ow2.proactive.scheduler.task.launcher.TaskLauncher;
 import org.ow2.proactive.scheduler.task.launcher.TaskLauncherInitializer;
-import org.ow2.proactive.scripting.InvalidScriptException;
-import org.ow2.proactive.scripting.SelectionScript;
-import org.ow2.proactive.scripting.SimpleScript;
 import org.ow2.proactive.utils.NodeSet;
 
 
@@ -223,125 +223,151 @@ public abstract class InternalTask extends TaskState {
      */
     @Override
     public TaskState replicate() throws ExecutableCreationException {
-        InternalTask nt = null;
-        try {
-            nt = (InternalTask) this.getClass().newInstance();
-        } catch (Exception e) {
-            throw new ExecutableCreationException("Could not instantiate " + this.getClass(), e);
-        }
+        /* this implementation deep copies everything using serialization.
+         * however the new InternalTask cannot be strictly identical and 
+         * we have to handle the following special cases:
+         * 
+         * - ExecutableContainer is transient and not copied during serialization.
+         * It needs to be manually copied, and added to the InternalTask replica
+         * 
+         * - Using the TaskInfo of _this_ gives us a FINISHED task, need to explicitely
+         * create a new clean one.
+         * 
+         * - InternalTask dependencies need to be nulled as they contain references
+         * to other InternalTasks, and will be rewritten later anyway
+         * 
+         * - Most of the objects down the object graph contain Hibernate @Id fields.
+         * If all those fields are not set to 0 when inserting the object in DB,
+         * insertion will fail. 
+         */
 
         try {
             DatabaseManager.getInstance().load(this);
         } catch (NoClassDefFoundError e) {
-            // some clients use this but not hibernate
+            // only the scheduler core needs to persist InternalTask in DB
+            // clients may need to call this method nonetheless
         }
 
-        if (this.parallelEnvironment != null) {
-            nt.setParallelEnvironment(new ParallelEnvironment(this.parallelEnvironment));
+        InternalTask replicatedTask = null;
+        try {
+            // Deep copy of the InternalTask using serialization
+            replicatedTask = (InternalTask) MakeDeepCopy.WithProActiveObjectStream.makeDeepCopy(this);
+        } catch (Throwable t) {
+            throw new ExecutableCreationException("Failed to serialize task", t);
         }
 
-        if (this.executerInformations != null) {
-            nt.setExecuterInformations(this.executerInformations);
-        }
-        if (this.nodeExclusion != null) {
-            nt.setNodeExclusion(this.nodeExclusion);
-        }
-        if (this.executableContainer != null) {
-            nt.setExecutableContainer(copyContainer(this.executableContainer));
-        }
-        int mx = Math.max(1, this.getMaxNumberOfExecution());
-        nt.setMaxNumberOfExecution(mx);
-        nt.setName(new String(this.getName()));
-        if (this.description != null) {
-            nt.setDescription(new String(this.getDescription()));
-        }
-        nt.setPreciousResult(preciousResult);
-        if (this.getPreScript() != null) {
-            try {
-                nt.setPreScript(new SimpleScript(this.getPreScript()));
-            } catch (InvalidScriptException e) {
-                throw new ExecutableCreationException("Could not copy PreScript", e);
-            }
-        }
-        if (this.getPostScript() != null) {
-            try {
-                nt.setPostScript(new SimpleScript(this.getPostScript()));
-            } catch (InvalidScriptException e) {
-                throw new ExecutableCreationException("Could not copy PostScript", e);
-            }
-        }
-        if (this.getSelectionScripts() != null) {
-            List<SelectionScript> sel = new ArrayList<SelectionScript>();
-            for (SelectionScript script : this.getSelectionScripts()) {
-                try {
-                    sel.add(new SelectionScript(script, script.isDynamic()));
-                } catch (InvalidScriptException e) {
-                    throw new ExecutableCreationException("Could not copy selection script", e);
-                }
-            }
-            nt.setSelectionScripts(sel);
-        }
-        if (this.getFlowScript() != null) {
-            try {
-                nt.setFlowScript(new FlowScript(this.getFlowScript()));
-            } catch (InvalidScriptException e) {
-                throw new ExecutableCreationException("Could not copy FlowScript", e);
-            }
-        }
-        if (this.getCleaningScript() != null) {
-            try {
-                nt.setCleaningScript(new SimpleScript(this.getCleaningScript()));
-            } catch (InvalidScriptException e) {
-                throw new ExecutableCreationException("Could not copy CleaningScript", e);
-            }
-        }
+        // ideps contain references to other InternalTasks, it needs to be removed.
+        // anyway, dependecies for the new task will not be the same as the original
+        replicatedTask.ideps = null;
 
-        nt.setRunAsMe(this.isRunAsMe());
-
-        nt.setIterationIndex(this.getIterationIndex());
-        nt.setReplicationIndex(this.getReplicationIndex());
-        nt.setFlowBlock(this.getFlowBlock());
-        if (this.getMatchingBlock() != null) {
-            nt.setMatchingBlock(new String(this.getMatchingBlock()));
+        // ExecutableContainer is transient and non serializable but only given once at construction
+        // it needs to be explicitely copied
+        ExecutableContainer repCont = null;
+        try {
+            repCont = (ExecutableContainer) MakeDeepCopy.WithProActiveObjectStream
+                    .makeDeepCopy(this.executableContainer);
+        } catch (Throwable t) {
+            throw new ExecutableCreationException("Failed to serialize ExecutableContainer", t);
         }
+        replicatedTask.setExecutableContainer(repCont);
 
-        if (this.getInputFilesList() != null) {
-            for (InputSelector inputSel : this.getInputFilesList()) {
-                nt.addInputFiles(new FileSelector(inputSel.getInputFiles()), inputSel.getMode());
-            }
-        }
+        // the taskinfo needs to be cleaned so that we don't tag this task as finished
+        TaskId repId = replicatedTask.taskInfo.getTaskId();
+        replicatedTask.taskInfo = new TaskInfoImpl();
+        replicatedTask.taskInfo.setTaskId(repId); // we only need this id for the HashSet comparisons...
 
-        if (this.getOutputFilesList() != null) {
-            for (OutputSelector outputSel : this.getOutputFilesList()) {
-                nt.addOutputFiles(new FileSelector(outputSel.getOutputFiles()), outputSel.getMode());
-            }
+        HashSet<Object> acc = new HashSet<Object>();
+        acc.add(replicatedTask);
+        try {
+            // serialization copied everything, including hibernate ids
+            // these ids need to be set to 0 before DB insertion
+            resetIds(replicatedTask, acc);
+        } catch (Throwable e1) {
+            throw new ExecutableCreationException("Failed to reset hibernate ids in replica", e1);
         }
 
         try {
-            DatabaseManager.getInstance().register(nt);
+            DatabaseManager.getInstance().register(replicatedTask);
         } catch (NoClassDefFoundError e) {
-            // some clients use this but not hibernate
+            // only the scheduler core needs to persist InternalTask in DB
+            // clients may need to call this method nonetheless
         }
-        return nt;
+        return replicatedTask;
     }
 
     /**
-     * Return a copy of the provided executable container
+     * Recursively walks the object graph of the parameter
+     * to reset any hibernate id encountered
      * 
-     * @param the original container to copy
-     * @return the new container to return
+     * @param obj the root object to walk, may be null
+     * @param acc the set of all objects walked during the recursive call, to avoid cycles
+     * @throws IllegalArgumentException
+     * @throws IllegalAccessException
      */
-    private static ExecutableContainer copyContainer(ExecutableContainer original)
-            throws ExecutableCreationException {
-        ExecutableContainer copy = null;
-        if (original instanceof ForkedJavaExecutableContainer) {
-            copy = new ForkedJavaExecutableContainer((ForkedJavaExecutableContainer) original);
-        } else if (original instanceof JavaExecutableContainer) {
-            copy = new JavaExecutableContainer((JavaExecutableContainer) original);
-        } else {
-            copy = new NativeExecutableContainer((NativeExecutableContainer) original);
+    void resetIds(Object obj, Set<Object> acc) throws IllegalArgumentException, IllegalAccessException {
+
+        if (obj == null)
+            return;
+
+        Class<?> clazz = obj.getClass();
+
+        LinkedList<Field> fields = new LinkedList<Field>();
+
+        while (clazz != null) {
+            for (Field f : clazz.getDeclaredFields()) {
+                if (!Modifier.isStatic(f.getModifiers())) {
+                    fields.addLast(f);
+                }
+            }
+            clazz = clazz.getSuperclass();
         }
-        return copy;
+
+        fields: for (Field f : fields) {
+
+            boolean accessible = f.isAccessible();
+            f.setAccessible(true);
+
+            Object value = f.get(obj);
+
+            boolean contains = acc.contains(value);
+
+            if (contains) {
+                continue;
+            } else {
+                // this hibernate PersistentMap is nuts: it contains itself twice as a Map 
+                // and Serializable field... this forces me to remove it from the cycle detection
+                if (!(value != null && value.getClass().equals(org.hibernate.collection.PersistentMap.class)))
+                    acc.add(value);
+            }
+
+            for (Annotation a : f.getAnnotations()) {
+
+                // reset identifiers
+                if (Id.class.isAssignableFrom(a.annotationType()) ||
+                    GeneratedValue.class.isAssignableFrom(a.annotationType())) {
+                    f.set(obj, 0);
+                    continue fields;
+                }
+            }
+
+            // arrays do not have regular fields in the java reflect api
+            if (f.getType().isArray() && value != null) {
+                for (int i = 0; i < Array.getLength(value); i++) {
+                    resetIds(Array.get(value, i), acc);
+                }
+            }
+            // plain string cannot contain ids
+            else if (value instanceof java.lang.String) {
+                continue;
+            }
+            // go deeper if not string, array or primitive
+            if (!f.getType().isPrimitive()) {
+                resetIds(f.get(obj), acc);
+            }
+
+            f.setAccessible(accessible);
+
+        }
     }
 
     /**
