@@ -58,7 +58,7 @@ public class CredData implements Serializable {
     private String pass = null;
     // windows domain name, optionnal
     private String domain = null;
-
+    //Optionnal ssh key
     private byte[] key = null;
 
     /**
