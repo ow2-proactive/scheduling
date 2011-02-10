@@ -107,8 +107,11 @@ public class JavaTaskLauncher extends TaskLauncher {
             initDataSpaces();
             replaceDSIterationTag();
 
+            sample = System.currentTimeMillis();
             //copy datas from OUTPUT or INPUT to local scratch
             copyInputDataToScratch();
+            sample = System.currentTimeMillis() - sample;
+            logger_dev.info("Time spent copying INPUT datas to SCRATCH : " + sample + " ms");
 
             // set exported vars
             this.setPropagatedProperties(results);
@@ -147,7 +150,8 @@ public class JavaTaskLauncher extends TaskLauncher {
                 sample = System.currentTimeMillis();
                 //copy output file
                 copyScratchDataToOutput();
-                duration += System.currentTimeMillis() - sample;
+                sample = System.currentTimeMillis() - sample;
+                logger_dev.info("Time spent copying SCRATCH datas to OUTPUT : " + sample + " ms");
             }
 
             if (post != null && !hasBeenKilled) {
