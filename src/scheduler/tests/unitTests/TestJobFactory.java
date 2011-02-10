@@ -325,8 +325,10 @@ public class TestJobFactory {
         Assert.assertEquals(mnJob.getName(), "job_multiNodes");
         Assert.assertEquals(mnJob.getPriority(), JobPriority.LOW);
         Assert.assertEquals(mnJob.getLogFile(), "one/file/to/log");
-        Assert.assertEquals(mnJob.getEnvironment().getJobClasspath()[0], "one/two/");
-        Assert.assertEquals(mnJob.getEnvironment().getJobClasspath()[1], "three");
+        Assert.assertNotSame(mnJob.getEnvironment().getJobClasspath()[0], "one/two/");
+        Assert.assertTrue(mnJob.getEnvironment().getJobClasspath()[0].endsWith("one/two/"));
+        Assert.assertNotSame(mnJob.getEnvironment().getJobClasspath()[1], "three");
+        Assert.assertTrue(mnJob.getEnvironment().getJobClasspath()[1].endsWith("three"));
         Assert.assertEquals(mnJob.isCancelJobOnError(), false);
         Assert.assertEquals(mnJob.getMaxNumberOfExecution(), 1);
         Assert.assertEquals(mnJob.getRestartTaskOnError(), RestartMode.ANYWHERE);

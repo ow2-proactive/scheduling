@@ -263,7 +263,7 @@ public class JobFactory_stax extends JobFactory {
             //replace variables in this attributes after job creation (after variables evaluation)
             job.setName(replace(job.getName()));
             job.setProjectName(replace(job.getProjectName()));
-            job.setLogFile(checkPath(job.getLogFile()));
+            job.setLogFile(replace(job.getLogFile()));
         } catch (JobCreationException jce) {
             if (XMLTags.TASK.matches(current)) {
                 jce.pushTag(XMLTags.TASKFLOW.getXMLName());
