@@ -614,9 +614,8 @@ public class JobFactory_stax extends JobFactory {
                     tmpTask.setName(cursorTask.getAttributeValue(i));
                     taskName = cursorTask.getAttributeValue(i);
                 } else if (XMLAttributes.TASK_NB_NODES.matches(attrName)) {
-                    tmpTask
-                            .setNumberOfNeededNodes(Integer
-                                    .parseInt(replace(cursorTask.getAttributeValue(i))));
+                    int numberOfNodesNeeded = Integer.parseInt(replace(cursorTask.getAttributeValue(i)));
+                    tmpTask.setParallelEnvironment(new ParallelEnvironment(numberOfNodesNeeded));
                 } else if (XMLAttributes.COMMON_CANCELJOBONERROR.matches(attrName)) {
                     tmpTask.setCancelJobOnError(Boolean
                             .parseBoolean(replace(cursorTask.getAttributeValue(i))));
@@ -948,7 +947,7 @@ public class JobFactory_stax extends JobFactory {
             for (int i = 0; i < cursorTask.getAttributeCount(); i++) {
                 String attrName = cursorTask.getAttributeLocalName(i);
                 if (XMLAttributes.TASK_NB_NODES.matches(attrName)) {
-                    String value = cursorTask.getAttributeValue(i);
+                    String value = replace(cursorTask.getAttributeValue(i));
                     nodesNumber = Integer.parseInt(value);
                 }
             }
@@ -989,7 +988,7 @@ public class JobFactory_stax extends JobFactory {
                     for (int i = 0; i < cursorTask.getAttributeCount(); i++) {
                         String attrName = cursorTask.getAttributeLocalName(i);
                         if (XMLAttributes.TOPOLOGY_THRESHOLD.matches(attrName)) {
-                            String value = cursorTask.getAttributeValue(i);
+                            String value = replace(cursorTask.getAttributeValue(i));
                             long threshold = Long.parseLong(value);
                             topologyDescriptor = new ThresholdProximityDescriptor(threshold);
                         }
