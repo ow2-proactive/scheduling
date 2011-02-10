@@ -57,10 +57,7 @@ import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
 import org.objectweb.proactive.utils.OperatingSystem;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
-import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
-import org.ow2.proactive.resourcemanager.frontend.RMConnection;
-import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
@@ -265,22 +262,8 @@ public class SchedulerTHelper {
     /**
      * Kill the forked Scheduler if exists.
      */
-    public static void killScheduler() throws Exception {
+    public static void killScheduler() {
         if (gcmad != null) {
-
-            // shutdown the RM : will empty the GCM NodeSource properly
-            RMAuthentication rmAuth = RMConnection.waitAndJoin(null);
-            ResourceManager rmAdmin = rmAuth.login(Credentials.getCredentials(PAResourceManagerProperties
-                    .getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString())));
-            rmAdmin.shutdown(true);
-
-            try {
-                // wait for the rm shutdown to happen
-                // neater solution would be to wait for RMEvent#SHUTDOWN
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-            }
-
             gcmad.kill();
         }
         schedulerAuth = null;
