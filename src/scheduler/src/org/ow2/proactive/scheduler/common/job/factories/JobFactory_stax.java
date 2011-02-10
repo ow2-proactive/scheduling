@@ -122,6 +122,8 @@ public class JobFactory_stax extends JobFactory {
     private HashMap<String, String> variables = new HashMap<String, String>();
     /** Job instance : to be sent to the user once created. */
     private Job job = null;
+    /** file relative path (relative file path (js and jobClassPath) given in XML will be relative to this path) */
+    private String relativePathRoot = "./";
     /** Instance that will temporary store the dependences between tasks */
     private HashMap<String, ArrayList<String>> dependences = null;
 
@@ -180,6 +182,9 @@ public class JobFactory_stax extends JobFactory {
             }
             //validate content using the proper XML schema
             validate(f);
+            //set relative path
+            relativePathRoot = f.getParentFile().getAbsolutePath();
+            //create and get XML STAX reader
             XMLStreamReader xmlsr = xmlif.createXMLStreamReader(new FileReader(f));
             //Create the job starting at the first cursor position of the XML Stream reader
             createJob(xmlsr);
@@ -258,7 +263,7 @@ public class JobFactory_stax extends JobFactory {
             //replace variables in this attributes after job creation (after variables evaluation)
             job.setName(replace(job.getName()));
             job.setProjectName(replace(job.getProjectName()));
-            job.setLogFile(replace(job.getLogFile()));
+            job.setLogFile(checkPath(job.getLogFile()));
         } catch (JobCreationException jce) {
             if (XMLTags.TASK.matches(current)) {
                 jce.pushTag(XMLTags.TASKFLOW.getXMLName());
@@ -460,7 +465,7 @@ public class JobFactory_stax extends JobFactory {
                 switch (eventType) {
                     case XMLEvent.START_ELEMENT:
                         if (XMLTags.JOB_PATH_ELEMENT.matches(cursorClasspath.getLocalName())) {
-                            pathEntries.add(replace(cursorClasspath.getAttributeValue(0)));
+                            pathEntries.add(checkPath(cursorClasspath.getAttributeValue(0)));
                         }
                         break;
                     case XMLEvent.END_ELEMENT:
@@ -1064,7 +1069,7 @@ public class JobFactory_stax extends JobFactory {
                             if (XMLAttributes.SCRIPT_URL.matches(cursorScript.getAttributeLocalName(0))) {
                                 url = replace(cursorScript.getAttributeValue(0));
                             } else {
-                                path = replace(cursorScript.getAttributeValue(0));
+                                path = checkPath(cursorScript.getAttributeValue(0));
                             }
                             attrtmp = cursorScript.getAttributeLocalName(0);
 
@@ -1528,6 +1533,29 @@ public class JobFactory_stax extends JobFactory {
             }
         }
         return str;
+    }
+
+    /**
+     * Replace the given file path by prepending relative root path if needed.<br/>
+     * This method prepends the relative root path to the given path if it is not considered as an absolute path.
+     *
+     * @param path the path to be evaluated.
+     * @return the same path with ${...} variables replaced and the relative path directory if this path was not absolute.
+     * @throws JobCreationException if a Variable has not been found
+     */
+    private String checkPath(String path) throws JobCreationException {
+        if (path == null || "".equals(path)) {
+            return path;
+        }
+        //make variables replacement
+        path = replace(path);
+        //prepend if file is relative
+        File f = new File(path);
+        if (f.isAbsolute()) {
+            return path;
+        } else {
+            return relativePathRoot + File.separator + path;
+        }
     }
 
     /**
