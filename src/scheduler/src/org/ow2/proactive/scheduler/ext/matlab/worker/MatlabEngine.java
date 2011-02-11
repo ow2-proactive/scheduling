@@ -38,6 +38,8 @@ package org.ow2.proactive.scheduler.ext.matlab.worker;
 
 import org.objectweb.proactive.utils.OperatingSystem;
 import org.ow2.proactive.scheduler.ext.matlab.worker.util.MatlabEngineConfig;
+import ptolemy.data.BooleanToken;
+import ptolemy.data.DoubleToken;
 import ptolemy.data.IntToken;
 import ptolemy.data.Token;
 import ptolemy.kernel.util.IllegalActionException;
@@ -236,15 +238,27 @@ public class MatlabEngine {
         try {
             IntToken test = new IntToken(1);
             put("test", test);
-            Token answer = get("test");
-            if ((answer == null) || !(answer instanceof IntToken)) {
+
+            evalString("testok=exist('test','var');");
+            Token ok = get("testok");
+            boolean okj = false;
+            if (ok != null) {
+                if (ok instanceof BooleanToken) {
+                    okj = ((BooleanToken) ok).booleanValue();
+                } else if (ok instanceof IntToken) {
+                    okj = ((IntToken) ok).intValue() == 1;
+                } else if (ok instanceof DoubleToken) {
+                    okj = ((DoubleToken) ok).intValue() == 1;
+                }
+            }
+
+            if (!okj) {
                 restart();
             }
-            if (((IntToken) answer).intValue() != 1) {
-                restart();
-            }
-            evalString("clear test");
+            evalString("clear test testok");
+
         } catch (IllegalActionException e) {
+            e.printStackTrace();
             restart();
         }
         // ok
