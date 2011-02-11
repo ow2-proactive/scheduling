@@ -39,12 +39,14 @@ package org.ow2.proactive.scheduler.ext.matlab.worker;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.ext.matlab.common.PASolveMatlabGlobalConfig;
 import org.ow2.proactive.scheduler.ext.matlab.common.PASolveMatlabTaskConfig;
-import org.ow2.proactive.scheduler.ext.matsci.common.exception.InvalidNumberOfParametersException;
-import org.ow2.proactive.scheduler.ext.matsci.common.exception.InvalidParameterException;
 import org.ow2.proactive.scheduler.ext.matlab.common.exception.MatlabTaskException;
 import org.ow2.proactive.scheduler.ext.matlab.worker.util.MatlabEngineConfig;
+import org.ow2.proactive.scheduler.ext.matsci.common.exception.InvalidNumberOfParametersException;
+import org.ow2.proactive.scheduler.ext.matsci.common.exception.InvalidParameterException;
 import org.ow2.proactive.scheduler.ext.matsci.worker.MatSciWorker;
 import ptolemy.data.BooleanToken;
+import ptolemy.data.DoubleToken;
+import ptolemy.data.IntToken;
 import ptolemy.data.Token;
 import ptolemy.kernel.util.IllegalActionException;
 
@@ -305,7 +307,7 @@ public class AOMatlabWorker implements Serializable, MatSciWorker {
         }
 
         if (!outputFile.exists()) {
-            throw new MatlabTaskException();
+            throw new MatlabTaskException("Cannot find variable \"out\"");
         }
         Token out = new BooleanToken(true);
         return out;
@@ -329,6 +331,27 @@ public class AOMatlabWorker implements Serializable, MatSciWorker {
             }
 
         }
+    }
+
+    private void testOutput(MatlabEngine.Connection conn) throws Exception {
+        if (paconfig.isDebug()) {
+            System.out.println("Receiving output:");
+            System.out.println("Testing output:");
+        }
+        conn.evalString("outok=exist('out','var');");
+        Token ok = conn.get("outok");
+        boolean okj = false;
+        if (ok instanceof BooleanToken) {
+            okj = ((BooleanToken) ok).booleanValue();
+        } else if (ok instanceof IntToken) {
+            okj = ((IntToken) ok).intValue() == 1;
+        } else if (ok instanceof DoubleToken) {
+            okj = ((DoubleToken) ok).intValue() == 1;
+        }
+        if (!okj) {
+            throw new MatlabTaskException("Cannot find variable \"out\"");
+        }
+
     }
 
     /**
@@ -381,16 +404,14 @@ public class AOMatlabWorker implements Serializable, MatSciWorker {
 
         if (paconfig.isDebug()) {
             System.out.println("Receiving output:");
-            //outDebug.println("Receiving output:");
         }
+
+        testOutput(conn);
+
         if (paconfig.isTransferVariables()) {
             out = transferOutputVariable(conn);
         } else {
-            try {
-                out = conn.get("out");
-            } catch (ptolemy.kernel.util.IllegalActionException e) {
-                throw new MatlabTaskException();
-            }
+            out = conn.get("out");
         }
         if (paconfig.isDebug()) {
             System.out.println(out);
