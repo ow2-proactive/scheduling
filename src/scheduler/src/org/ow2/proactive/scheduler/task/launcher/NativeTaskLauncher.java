@@ -185,7 +185,10 @@ public class NativeTaskLauncher extends TaskLauncher {
 
             if (post != null && !hasBeenKilled) {
                 sample = System.currentTimeMillis();
-                int retCode = Integer.parseInt(userResult.toString());
+                int retCode = -1;//< 0 means exception in the command itself (ie. command not found)
+                if (userResult != null) {
+                    retCode = Integer.parseInt(userResult.toString());
+                }
                 //launch post script
                 this.executePostScript(retCode == 0 && exception == null);
                 duration += System.currentTimeMillis() - sample;
