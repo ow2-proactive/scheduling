@@ -119,8 +119,11 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     private CachingSchedulerProxyUserInterface cachedState;
     private volatile boolean isCacheEnabled = true;
 
-    /* (non-Javadoc)
-     * @see org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#jobs(java.lang.String, int, int)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#jobs(java.lang.String, int,
+     * int)
      */
     @GET
     @Path("jobs")
@@ -164,8 +167,11 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         scheduler.getStatus();
     }
 
-    /* (non-Javadoc)
-     * @see org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#jobsinfo(java.lang.String, int, int)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#jobsinfo(java.lang.String,
+     * int, int)
      */
     @GET
     @Path("jobsinfo")
@@ -179,6 +185,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         List<JobState> jobs = new ArrayList<JobState>();
 
         SchedulerState state = SchedulerStateCaching.getLocalState();
+
         jobs.addAll(state.getPendingJobs());
         jobs.addAll(state.getRunningJobs());
         jobs.addAll(state.getFinishedJobs());
@@ -195,8 +202,12 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
     }
 
-    /* (non-Javadoc)
-     * @see org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#revisionAndjobsinfo(java.lang.String, int, int)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#revisionAndjobsinfo(java.lang.
+     * String, int, int)
      */
     @GET
     @Path("revisionjobsinfo")
@@ -273,8 +284,11 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#schedulerState(java.lang.String)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#schedulerState(java.lang.String)
      */
     @GET
     @Path("state")
@@ -286,8 +300,12 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         return SchedulerStateCaching.getLocalState();
     }
 
-    /* (non-Javadoc)
-     * @see org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#schedulerStateRevision(java.lang.String)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#schedulerStateRevision(java.lang
+     * .String)
      */
     @GET
     @Path("state/revision")
@@ -299,8 +317,12 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         return SchedulerStateCaching.getSchedulerRevision();
     }
 
-    /* (non-Javadoc)
-     * @see org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#getSchedulerStateAndRevision(java.lang.String)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#getSchedulerStateAndRevision(java
+     * .lang.String)
      */
     @GET
     @Path("revisionandstate")
@@ -312,8 +334,12 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         return SchedulerStateCaching.getRevisionAndSchedulerState();
     }
 
-    /* (non-Javadoc)
-     * @see org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#getSchedulerStateMyJobsOnly(java.lang.String)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#getSchedulerStateMyJobsOnly(java
+     * .lang.String)
      */
     @GET
     @Path("state/myjobsonly")
@@ -324,8 +350,11 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         return PAFuture.getFutureValue(s.getState(true));
     }
 
-    /* (non-Javadoc)
-     * @see org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#listJobs(java.lang.String, java.lang.String)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#listJobs(java.lang.String,
+     * java.lang.String)
      */
     @GET
     @Path("jobs/{jobid}")
@@ -342,8 +371,11 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         return js;
     }
 
-    /* (non-Javadoc)
-     * @see org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#jobResult(java.lang.String, java.lang.String)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#jobResult(java.lang.String,
+     * java.lang.String)
      */
     @GET
     @Path("jobs/{jobid}/result")
@@ -355,8 +387,12 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         return PAFuture.getFutureValue(s.getJobResult(jobId));
     }
 
-    /* (non-Javadoc)
-     * @see org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#jobResultValue(java.lang.String, java.lang.String)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#jobResultValue(java.lang.String,
+     * java.lang.String)
      */
     @GET
     @Path("jobs/{jobid}/result/value")
@@ -394,8 +430,11 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         return res;
     }
 
-    /* (non-Javadoc)
-     * @see org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#removeJob(java.lang.String, java.lang.String)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#removeJob(java.lang.String,
+     * java.lang.String)
      */
     @DELETE
     @Path("jobs/{jobid}")
@@ -406,8 +445,11 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         return s.removeJob(jobId);
     }
 
-    /* (non-Javadoc)
-     * @see org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#killJob(java.lang.String, java.lang.String)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#killJob(java.lang.String,
+     * java.lang.String)
      */
     @PUT
     @Path("jobs/{jobid}/kill")
@@ -419,8 +461,12 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
     }
 
-    /* (non-Javadoc)
-     * @see org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#getJobTasksIds(java.lang.String, java.lang.String)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#getJobTasksIds(java.lang.String,
+     * java.lang.String)
      */
     @GET
     @Path("jobs/{jobid}/tasks")
@@ -441,8 +487,12 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
     }
 
-    /* (non-Javadoc)
-     * @see org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#getJobTaskStates(java.lang.String, java.lang.String)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#getJobTaskStates(java.lang.String,
+     * java.lang.String)
      */
     @GET
     @Path("jobs/{jobid}/taskstates")
@@ -464,8 +514,11 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
     }
 
-    /* (non-Javadoc)
-     * @see org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#jobtasks(java.lang.String, java.lang.String, java.lang.String)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#jobtasks(java.lang.String,
+     * java.lang.String, java.lang.String)
      */
     @GET
     @Path("jobs/{jobid}/tasks/{taskname}")
@@ -487,8 +540,12 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         throw new UnknownTaskException("task " + taskname + "not found");
     }
 
-    /* (non-Javadoc)
-     * @see org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#valueOftaskresult(java.lang.String, java.lang.String, java.lang.String)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#valueOftaskresult(java.lang.String
+     * , java.lang.String, java.lang.String)
      */
     @GET
     @Path("jobs/{jobid}/tasks/{taskname}/result/value")
@@ -521,8 +578,12 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         return value;
     }
 
-    /* (non-Javadoc)
-     * @see org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#serializedValueOftaskresult(java.lang.String, java.lang.String, java.lang.String)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#serializedValueOftaskresult(java
+     * .lang.String, java.lang.String, java.lang.String)
      */
     @GET
     @Path("jobs/{jobid}/tasks/{taskname}/result/serializedvalue")
@@ -536,8 +597,11 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         return ((TaskResultImpl) tr).getSerializedValue();
     }
 
-    /* (non-Javadoc)
-     * @see org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#taskresult(java.lang.String, java.lang.String, java.lang.String)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#taskresult(java.lang.String,
+     * java.lang.String, java.lang.String)
      */
     @GET
     @Path("jobs/{jobid}/tasks/{taskname}/result")
@@ -550,8 +614,11 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         return PAFuture.getFutureValue(tr);
     }
 
-    /* (non-Javadoc)
-     * @see org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#tasklog(java.lang.String, java.lang.String, java.lang.String)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#tasklog(java.lang.String,
+     * java.lang.String, java.lang.String)
      */
     @GET
     @Path("jobs/{jobid}/tasks/{taskname}/result/log/all")
@@ -569,8 +636,11 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
     }
 
-    /* (non-Javadoc)
-     * @see org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#tasklogErr(java.lang.String, java.lang.String, java.lang.String)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#tasklogErr(java.lang.String,
+     * java.lang.String, java.lang.String)
      */
     @GET
     @Path("jobs/{jobid}/tasks/{taskname}/result/log/err")
@@ -588,8 +658,11 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
     }
 
-    /* (non-Javadoc)
-     * @see org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#tasklogout(java.lang.String, java.lang.String, java.lang.String)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#tasklogout(java.lang.String,
+     * java.lang.String, java.lang.String)
      */
     @GET
     @Path("jobs/{jobid}/tasks/{taskname}/result/log/out")
@@ -681,8 +754,11 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     //                .entity(msg).build());
     //    }
 
-    /* (non-Javadoc)
-     * @see org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#pauseJob(java.lang.String, java.lang.String)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#pauseJob(java.lang.String,
+     * java.lang.String)
      */
     @POST
     @Path("jobs/{jobid}/pause")
@@ -696,8 +772,11 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
     }
 
-    /* (non-Javadoc)
-     * @see org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#resumeJob(java.lang.String, java.lang.String)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#resumeJob(java.lang.String,
+     * java.lang.String)
      */
     @POST
     @Path("jobs/{jobid}/resume")
@@ -710,8 +789,11 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
     }
 
-    /* (non-Javadoc)
-     * @see org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#submit(java.lang.String, org.jboss.resteasy.plugins.providers.multipart.MultipartInput)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#submit(java.lang.String,
+     * org.jboss.resteasy.plugins.providers.multipart.MultipartInput)
      */
     @POST
     @Path("submit")
@@ -770,7 +852,9 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      * return "OK"; }
      */
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#disconnect(java.lang.String)
      */
     @PUT
@@ -785,13 +869,16 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         } finally {
             SchedulerSessionMapper.getInstance().getSessionsMap().remove(sessionId);
             PAActiveObject.terminateActiveObject(s, true);
-            logger.debug("sessionid " + sessionId + "terminated");
+            logger.debug("sessionid " + sessionId + " terminated");
         }
 
     }
 
-    /* (non-Javadoc)
-     * @see org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#pauseScheduler(java.lang.String)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#pauseScheduler(java.lang.String)
      */
     @PUT
     @Path("pause")
@@ -803,8 +890,11 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
     }
 
-    /* (non-Javadoc)
-     * @see org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#stopScheduler(java.lang.String)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#stopScheduler(java.lang.String)
      */
     @PUT
     @Path("stop")
@@ -815,8 +905,11 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         return s.stop();
     }
 
-    /* (non-Javadoc)
-     * @see org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#resumeScheduler(java.lang.String)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#resumeScheduler(java.lang.String)
      */
     @PUT
     @Path("resume")
@@ -828,8 +921,12 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
     }
 
-    /* (non-Javadoc)
-     * @see org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#schedulerChangeJobPriorityByName(java.lang.String, java.lang.String, java.lang.String)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#schedulerChangeJobPriorityByName
+     * (java.lang.String, java.lang.String, java.lang.String)
      */
     @PUT
     @Path("jobs/{jobid}/priority/byname/{name}")
@@ -842,8 +939,12 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
     }
 
-    /* (non-Javadoc)
-     * @see org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#schedulerChangeJobPriorityByValue(java.lang.String, java.lang.String, java.lang.String)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#schedulerChangeJobPriorityByValue
+     * (java.lang.String, java.lang.String, java.lang.String)
      */
     @PUT
     @Path("jobs/{jobid}/priority/byvalue/{value}")
@@ -856,8 +957,11 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
     }
 
-    /* (non-Javadoc)
-     * @see org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#freezeScheduler(java.lang.String)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#freezeScheduler(java.lang.String)
      */
     @PUT
     @Path("freeze")
@@ -869,8 +973,12 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
     }
 
-    /* (non-Javadoc)
-     * @see org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#getSchedulerStatus(java.lang.String)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#getSchedulerStatus(java.lang.String
+     * )
      */
     @GET
     @Path("status")
@@ -882,8 +990,11 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
     }
 
-    /* (non-Javadoc)
-     * @see org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#startScheduler(java.lang.String)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#startScheduler(java.lang.String)
      */
     @PUT
     @Path("start")
@@ -895,8 +1006,11 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
     }
 
-    /* (non-Javadoc)
-     * @see org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#killScheduler(java.lang.String)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#killScheduler(java.lang.String)
      */
     @PUT
     @Path("kill")
@@ -908,8 +1022,12 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
     }
 
-    /* (non-Javadoc)
-     * @see org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#killScheduler(java.lang.String, java.lang.String)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#killScheduler(java.lang.String,
+     * java.lang.String)
      */
     @POST
     @Path("linkrm")
@@ -921,7 +1039,9 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#isConnected(java.lang.String)
      */
     @PUT
@@ -933,16 +1053,19 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         return s.isConnected();
     }
 
-    /* (non-Javadoc)
-     * @see org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#login(java.lang.String, java.lang.String)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#login(java.lang.String,
+     * java.lang.String)
      */
     @POST
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    @Path("login")    
+    @Path("login")
     @Produces("application/json")
     public String login(@FormParam("username") String username, @FormParam("password") String password)
-            throws ActiveObjectCreationException, NodeException, LoginException, SchedulerException,
-            KeyException {
+            throws LoginException, SchedulerException, KeyException, ActiveObjectCreationException,
+            NodeException {
 
         // activate the cache mechanism at first login
         /*
@@ -962,8 +1085,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
          * ", cache is disabled"); } }
          */
 
-        SchedulerProxyUserInterface scheduler = PAActiveObject.newActive(SchedulerProxyUserInterface.class,
-                new Object[] {});
+        SchedulerProxyUserInterface scheduler;
+        scheduler = PAActiveObject.newActive(SchedulerProxyUserInterface.class, new Object[] {});
 
         String url = PortalConfiguration.getProperties().getProperty(PortalConfiguration.scheduler_url);
 
@@ -972,15 +1095,17 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         String sessionId = "" + SchedulerSessionMapper.getInstance().add(scheduler);
         logger.info("binding user " + username + " to session " + sessionId);
         return sessionId;
-
     }
 
-    /* (non-Javadoc)
-     * @see org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#loginWithCredential(org.ow2.proactive_grid_cloud_portal.LoginForm)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#loginWithCredential(org.ow2.
+     * proactive_grid_cloud_portal.LoginForm)
      */
     @POST
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-    @Path("login")       
+    @Path("login")
     @Produces("application/json")
     public String loginWithCredential(@MultipartForm LoginForm multipart)
             throws ActiveObjectCreationException, NodeException, KeyException, LoginException,
@@ -1006,8 +1131,11 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
     }
 
-    /* (non-Javadoc)
-     * @see org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#getStatistics(java.lang.String)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#getStatistics(java.lang.String)
      */
     @GET
     @Path("stats")
@@ -1018,8 +1146,12 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         return s.getInfo("ProActiveScheduler:name=RuntimeData");
     }
 
-    /* (non-Javadoc)
-     * @see org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#getStatisticsOnMyAccount(java.lang.String)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#getStatisticsOnMyAccount(java.
+     * lang.String)
      */
     @GET
     @Path("stats/myaccount")
