@@ -37,6 +37,7 @@
 package org.ow2.proactive_grid_cloud_portal;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicLong;
@@ -47,10 +48,9 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.utils.Sleeper;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.common.SchedulerState;
-import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
-import org.ow2.proactive.scheduler.common.exception.PermissionException;
 import org.ow2.proactive.scheduler.common.util.CachingSchedulerProxyUserInterface;
 import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
+import org.ow2.proactive.scheduler.core.SchedulerStateImpl;
 
 /**
  * This class keeps a cache of the scheduler state and periodically refresh it.
@@ -72,7 +72,7 @@ public class SchedulerStateCaching {
     private static Thread leaseRenewerThreadUpdater;
 
     
-    protected static Map<AtomicLong, SchedulerState> revisionAndSchedulerState;
+    protected static Map<AtomicLong, SchedulerState> revisionAndSchedulerState ;
 
     private static int leaseRenewRate;
     
@@ -86,6 +86,8 @@ public class SchedulerStateCaching {
     } 
     
     public static void init() {
+        revisionAndSchedulerState = new HashMap<AtomicLong, SchedulerState>();
+        revisionAndSchedulerState.put(new AtomicLong(-1),new SchedulerStateImpl());
         init_();
         start_();
     }
