@@ -37,6 +37,7 @@
 package org.ow2.proactive.scheduler.ext.scilab.worker;
 
 import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.ext.matsci.common.exception.InvalidNumberOfParametersException;
 import org.ow2.proactive.scheduler.ext.matsci.common.exception.InvalidParameterException;
@@ -434,7 +435,7 @@ public class AOScilabWorker implements Serializable, MatSciWorker {
      *
      * @return true for synchronous call
      */
-    public boolean terminate() {
+    public BooleanWrapper terminate() {
         if (javasciv2) {
             engine.close();
             engine = null;
@@ -442,7 +443,7 @@ public class AOScilabWorker implements Serializable, MatSciWorker {
             throw new UnsupportedOperationException("javasci v1 not supported");
         }
         initialized = false;
-        return true;
+        return new BooleanWrapper(true);
     }
 
     private void prepare() {
@@ -624,7 +625,6 @@ public class AOScilabWorker implements Serializable, MatSciWorker {
 
     private void exec(String code) {
         if (javasciv2) {
-
             engine.exec(code);
         } else {
             throw new UnsupportedOperationException("javasci v1 not supported");
