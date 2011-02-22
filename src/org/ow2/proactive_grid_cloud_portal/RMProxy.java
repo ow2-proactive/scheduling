@@ -36,16 +36,25 @@
  */
 package org.ow2.proactive_grid_cloud_portal;
 
+import java.io.IOException;
 import java.security.KeyException;
 import java.util.Collection;
 import java.util.List;
 
+import javax.management.AttributeList;
+import javax.management.InstanceNotFoundException;
+import javax.management.IntrospectionException;
+import javax.management.MBeanInfo;
+import javax.management.ObjectName;
+import javax.management.ReflectionException;
 import javax.security.auth.login.LoginException;
 
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
+import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
+import org.ow2.proactive.jmx.JMXClientHelper;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.common.RMState;
 import org.ow2.proactive.resourcemanager.exception.RMException;
@@ -62,22 +71,30 @@ import org.ow2.proactive.utils.NodeSet;
 public class RMProxy implements ResourceManager {
 
     private ResourceManager target;
+    private JMXClientHelper jmxClient;
+    
 
-    private String rmUrl;
-    private String userName;
-    private String password;
-
-    public boolean init(String url, String user, String pwd) throws RMException, KeyException, LoginException {
-        this.rmUrl = url;
-        this.userName = user;
-        this.password = pwd;
+    public boolean init(String url, CredData credData) throws RMException, KeyException, LoginException {
 
         RMAuthentication rmAuth = RMConnection.join(url);
-        Credentials cred = Credentials.createCredentials(user, pwd, rmAuth.getPublicKey());
-        target = rmAuth.login(cred);
+        Credentials cred = Credentials.createCredentials(credData, rmAuth.getPublicKey());
 
+        return init(url,cred);
+    }
+    
+    public boolean init(String url, Credentials credentials) throws RMException, KeyException, LoginException {
+ 
+        RMAuthentication rmAuth = RMConnection.join(url);
+        this.target = rmAuth.login(credentials);
+
+        // here we log on using an empty login field to ensure that
+        // credentials are used.
+        
+        this.jmxClient = new JMXClientHelper(rmAuth, new Object[] { "", credentials });
+        this.jmxClient.connect();
         return true;
     }
+    
 
     public BooleanWrapper addNode(String arg0) {
         return target.addNode(arg0);
@@ -168,4 +185,11 @@ public class RMProxy implements ResourceManager {
         return target.getTopology();
     }
 
+    public MBeanInfo getMBeanInfo (ObjectName name) throws InstanceNotFoundException, IntrospectionException, ReflectionException, IOException {
+        return this.jmxClient.getConnector().getMBeanServerConnection().getMBeanInfo(name);
+    }
+    
+    public AttributeList getMBeanAttributes (ObjectName name,String[] attributes) throws InstanceNotFoundException, IntrospectionException, ReflectionException, IOException {
+        return this.jmxClient.getConnector().getMBeanServerConnection().getAttributes(name,attributes);
+    }
 }

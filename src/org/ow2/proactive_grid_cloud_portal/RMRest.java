@@ -36,43 +36,59 @@
  */
 package org.ow2.proactive_grid_cloud_portal;
 
+import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.security.KeyException;
 import java.util.Collection;
 import java.util.List;
 
+import javax.management.InstanceNotFoundException;
+import javax.management.IntrospectionException;
+import javax.management.ObjectName;
+import javax.management.ReflectionException;
+import javax.security.auth.login.LoginException;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.jboss.resteasy.spi.UnauthorizedException;
+import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
+import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
+import org.ow2.proactive.authentication.crypto.CredData;
+import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.common.RMState;
 import org.ow2.proactive.resourcemanager.common.event.RMInitialState;
+import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.frontend.topology.Topology;
 import org.ow2.proactive.resourcemanager.nodesource.common.PluginDescriptor;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
 import org.ow2.proactive.utils.NodeSet;
-
+import org.ow2.proactive_grid_cloud_portal.common.LoginForm;
 
 @Path("/rm")
 public class RMRest {
 
-    public ResourceManager checkAccess(String sessionId) throws WebApplicationException {
-        ResourceManager s = RMSessionMapper.getInstance().getSessionsMap().get(sessionId);
+    public RMProxy checkAccess(String sessionId) throws WebApplicationException {
+        RMProxy s = RMSessionMapper.getInstance().getSessionsMap().get(sessionId);
 
         if (s == null) {
-            throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_UNAUTHORIZED).entity(
-                    "you are not connected, try to log in first").build());
+            throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_UNAUTHORIZED)
+                    .entity("you are not connected, try to log in first").build());
         }
 
         return s;
@@ -83,26 +99,61 @@ public class RMRest {
      * @param username
      * @param password
      * @return
+     * @throws RMException 
+     * @throws LoginException 
+     * @throws KeyException 
+     * @throws NodeException 
+     * @throws ActiveObjectCreationException 
      */
     @POST
     @Path("login")
-    public String rmConnect(@FormParam("username")
-    String username, @FormParam("password")
-    String password) {
+    @Produces("application/json")
+    public String rmConnect(@FormParam("username") String username, @FormParam("password") String password) throws KeyException, LoginException, RMException, ActiveObjectCreationException, NodeException {
 
-        try {
 
-            RMProxy rm = PAActiveObject.newActive(RMProxy.class, new Object[] {});
+            RMProxy rm;
+           rm = PAActiveObject.newActive(RMProxy.class, new Object[] {});
+           
+            CredData credData = new CredData(CredData.parseLogin(username), CredData.parseDomain(username),
+                password);
 
-            rm.init(PortalConfiguration.getProperties().getProperty(PortalConfiguration.rm_url), username,
-                    password);
+            rm.init(PortalConfiguration.getProperties().getProperty(PortalConfiguration.rm_url), credData);
 
             return "" + RMSessionMapper.getInstance().add(rm);
 
-        } catch (Throwable e) {
-            e.printStackTrace();
-            throw new UnauthorizedException(e);
+
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#loginWithCredential(org.ow2.
+     * proactive_grid_cloud_portal.LoginForm)
+     */
+    @POST
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Path("login")
+    @Produces("application/json")
+    public String loginWithCredential(@MultipartForm LoginForm multipart)
+            throws ActiveObjectCreationException, NodeException, KeyException, IOException, LoginException,
+            RMException {
+
+        RMProxy rm = PAActiveObject.newActive(RMProxy.class, new Object[] {});
+
+        String url = PortalConfiguration.getProperties().getProperty(PortalConfiguration.rm_url);
+
+        if (multipart.getCredential() != null) {
+            Credentials credentials = Credentials.getCredentials(multipart.getCredential());
+            rm.init(url, credentials);
+        } else {
+            CredData credData = new CredData(CredData.parseLogin(multipart.getUsername()),
+                CredData.parseDomain(multipart.getUsername()), multipart.getPassword(), multipart.getSshKey());
+            rm.init(url, credData);
         }
+
+        String sessionId = "" + RMSessionMapper.getInstance().add(rm);
+        //      logger.info("binding user "+  " to session " + sessionId );
+        return sessionId;
 
     }
 
@@ -113,8 +164,8 @@ public class RMRest {
      */
     @GET
     @Path("state")
-    public RMState getState(@HeaderParam("sessionid")
-    String sessionId) {
+    @Produces("application/json")
+    public RMState getState(@HeaderParam("sessionid") String sessionId) {
         ResourceManager rm = checkAccess(sessionId);
         return PAFuture.getFutureValue(rm.getState());
     }
@@ -126,8 +177,8 @@ public class RMRest {
      */
     @GET
     @Path("monitoring")
-    public RMInitialState getInitialState(@HeaderParam("sessionid")
-    String sessionId) {
+    @Produces("application/json")
+    public RMInitialState getInitialState(@HeaderParam("sessionid") String sessionId) {
         ResourceManager rm = checkAccess(sessionId);
         return PAFuture.getFutureValue(rm.getMonitoring().getState());
     }
@@ -139,8 +190,8 @@ public class RMRest {
      */
     @GET
     @Path("isactive")
-    public boolean isActive(@HeaderParam("sessionid")
-    String sessionId) {
+    @Produces("application/json")
+    public boolean isActive(@HeaderParam("sessionid") String sessionId) {
         ResourceManager rm = checkAccess(sessionId);
         return rm.isActive().getBooleanValue();
     }
@@ -152,10 +203,9 @@ public class RMRest {
      * @return  true if new node is added successfully
      */
     @POST
+    @Produces("application/json")
     @Path("node")
-    public boolean addNode(@HeaderParam("sessionid")
-    String sessionId, @FormParam("nodeurl")
-    String nodeUrl) {
+    public boolean addNode(@HeaderParam("sessionid") String sessionId, @FormParam("nodeurl") String nodeUrl) {
         ResourceManager rm = checkAccess(sessionId);
         return rm.addNode(nodeUrl).getBooleanValue();
     }
@@ -169,10 +219,9 @@ public class RMRest {
      */
     @POST
     @Path("node")
-    public boolean addNode(@HeaderParam("sessionid")
-    String sessionId, @FormParam("nodeurl")
-    String url, @FormParam("nodesource")
-    String nodesource) {
+    @Produces("application/json")
+    public boolean addNode(@HeaderParam("sessionid") String sessionId, @FormParam("nodeurl") String url,
+            @FormParam("nodesource") String nodesource) {
         ResourceManager rm = checkAccess(sessionId);
         return rm.addNode(url, nodesource).getBooleanValue();
     }
@@ -185,9 +234,9 @@ public class RMRest {
      */
     @GET
     @Path("node/isavailable")
-    public boolean nodeIsAvailable(@HeaderParam("sessionid")
-    String sessionId, @FormParam("nodeurl")
-    String url) {
+    @Produces("application/json")
+    public boolean nodeIsAvailable(@HeaderParam("sessionid") String sessionId,
+            @FormParam("nodeurl") String url) {
         ResourceManager rm = checkAccess(sessionId);
         return rm.nodeIsAvailable(url).getBooleanValue();
     }
@@ -199,16 +248,16 @@ public class RMRest {
      */
     @POST
     @Path("disconnect")
-    public boolean disconnect(@HeaderParam("sessionid")
-    String sessionId) {
+    @Produces("application/json")
+    public boolean disconnect(@HeaderParam("sessionid") String sessionId) {
         ResourceManager rm = checkAccess(sessionId);
         RMSessionMapper.getInstance().getSessionsMap().remove(rm);
         return rm.disconnect().getBooleanValue();
     }
 
-    public boolean createNodeSource(@HeaderParam("sessionid")
-    String sessionId, String nodeSourceName, String infrastructureType, Object[] infrastructureParameters,
-            String policyType, Object[] policyParameters) {
+    public boolean createNodeSource(@HeaderParam("sessionid") String sessionId, String nodeSourceName,
+            String infrastructureType, Object[] infrastructureParameters, String policyType,
+            Object[] policyParameters) {
         ResourceManager rm = checkAccess(sessionId);
 
         return rm.createNodeSource(nodeSourceName, infrastructureType, infrastructureParameters, policyType,
@@ -217,9 +266,9 @@ public class RMRest {
 
     @POST
     @Path("nodesource/pingfrequency")
-    public int getNodeSourcePingFrequency(@HeaderParam("sessionid")
-    String sessionId, @FormParam("sourcename")
-    String sourceName) {
+    @Produces("application/json")
+    public int getNodeSourcePingFrequency(@HeaderParam("sessionid") String sessionId,
+            @FormParam("sourcename") String sourceName) {
         ResourceManager rm = checkAccess(sessionId);
         return rm.getNodeSourcePingFrequency(sourceName).getIntValue();
     }
@@ -231,22 +280,20 @@ public class RMRest {
      * @return
      * @throws NodeException 
      */
-    public boolean releaseNode(@HeaderParam("sessionid")
-    String sessionId, String url) throws NodeException {
+    public boolean releaseNode(@HeaderParam("sessionid") String sessionId, String url) throws NodeException {
         ResourceManager rm = checkAccess(sessionId);
         Node n;
         n = NodeFactory.getNode(url);
         return rm.releaseNode(n).getBooleanValue();
     }
 
-    public boolean removeNode(@HeaderParam("sessionid")
-    String sessionId, String nodeUrl, boolean preempt) {
+    public boolean removeNode(@HeaderParam("sessionid") String sessionId, String nodeUrl, boolean preempt) {
         ResourceManager rm = checkAccess(sessionId);
         return rm.removeNode(nodeUrl, preempt).getBooleanValue();
     }
 
-    public boolean removeNodeSource(@HeaderParam("sessionid")
-    String sessionId, String sourceName, boolean preempt) {
+    public boolean removeNodeSource(@HeaderParam("sessionid") String sessionId, String sourceName,
+            boolean preempt) {
         ResourceManager rm = checkAccess(sessionId);
         return rm.removeNodeSource(sourceName, preempt).getBooleanValue();
     }
@@ -258,8 +305,8 @@ public class RMRest {
      * @param arg1
      * @return
      */
-    public boolean setNodeSourcePingFrequency(@HeaderParam("sessionid")
-    String sessionId, int frequency, String sourcename) {
+    public boolean setNodeSourcePingFrequency(@HeaderParam("sessionid") String sessionId, int frequency,
+            String sourcename) {
         ResourceManager rm = checkAccess(sessionId);
         return rm.setNodeSourcePingFrequency(frequency, sourcename).getBooleanValue();
     }
@@ -271,57 +318,74 @@ public class RMRest {
      * @param arg0
      * @return
      */
-    public boolean shutdown(@HeaderParam("sessionid")
-    String sessionId, boolean preempt) {
+    public boolean shutdown(@HeaderParam("sessionid") String sessionId, boolean preempt) {
         ResourceManager rm = checkAccess(sessionId);
         return rm.shutdown(preempt).getBooleanValue();
     }
 
-    
-    public NodeSet getAtMostNodes(@HeaderParam("sessionid")
-            String sessionId,int number, TopologyDescriptor descriptor,
-            List<SelectionScript> selectionScriptsList, NodeSet exclusion) {
+    public NodeSet getAtMostNodes(@HeaderParam("sessionid") String sessionId, int number,
+            TopologyDescriptor descriptor, List<SelectionScript> selectionScriptsList, NodeSet exclusion) {
         ResourceManager rm = checkAccess(sessionId);
         return rm.getAtMostNodes(number, descriptor, selectionScriptsList, exclusion);
     }
 
-    public Topology getTopology(@HeaderParam("sessionid")
-            String sessionId) { 
+    public Topology getTopology(@HeaderParam("sessionid") String sessionId) {
         ResourceManager rm = checkAccess(sessionId);
         return rm.getTopology();
     }
-    
 
-
-    public NodeSet getAtMostNodes(@HeaderParam("sessionid") String sessionId,int arg0, SelectionScript arg1) {
+    public NodeSet getAtMostNodes(@HeaderParam("sessionid") String sessionId, int arg0, SelectionScript arg1) {
         ResourceManager rm = checkAccess(sessionId);
         return rm.getAtMostNodes(arg0, arg1);
     }
 
-    public NodeSet getAtMostNodes(@HeaderParam("sessionid")
-            String sessionId,int arg0, SelectionScript arg1, NodeSet arg2) {
+    public NodeSet getAtMostNodes(@HeaderParam("sessionid") String sessionId, int arg0, SelectionScript arg1,
+            NodeSet arg2) {
         ResourceManager rm = checkAccess(sessionId);
         return rm.getAtMostNodes(arg0, arg1, arg2);
     }
 
-    public NodeSet getAtMostNodes(@HeaderParam("sessionid")
-            String sessionId, int arg0, List<SelectionScript> arg1, NodeSet arg2) {
+    public NodeSet getAtMostNodes(@HeaderParam("sessionid") String sessionId, int arg0,
+            List<SelectionScript> arg1, NodeSet arg2) {
         ResourceManager rm = checkAccess(sessionId);
         return rm.getAtMostNodes(arg0, arg1, arg2);
     }
 
-    public Collection<PluginDescriptor> getSupportedNodeSourceInfrastructures(@HeaderParam("sessionid")
-            String sessionId) {
+    public Collection<PluginDescriptor> getSupportedNodeSourceInfrastructures(
+            @HeaderParam("sessionid") String sessionId) {
         ResourceManager rm = checkAccess(sessionId);
         return rm.getSupportedNodeSourceInfrastructures();
     }
 
-    public Collection<PluginDescriptor> getSupportedNodeSourcePolicies(@HeaderParam("sessionid")
-            String sessionId) {
+    public Collection<PluginDescriptor> getSupportedNodeSourcePolicies(
+            @HeaderParam("sessionid") String sessionId) {
         ResourceManager rm = checkAccess(sessionId);
         return rm.getSupportedNodeSourcePolicies();
     }
-     
-    
+
+    @GET
+    @Path("info/{name}")
+    @Produces("application/json")
+    public Object getMBeanInfo(@HeaderParam("sessionid") String sessionId,
+            @PathParam("name") ObjectName name, @QueryParam("attr") List<String> attrs)
+            throws InstanceNotFoundException, IntrospectionException, ReflectionException, IOException {
+        RMProxy rm = checkAccess(sessionId);
+
+        if ((attrs == null) || (attrs.size() == 0)) {
+            // no attribute is requested, we return
+            // the description of the mbean
+            return rm.getMBeanInfo(name);
+
+        } else {
+            return rm.getMBeanAttributes(name, attrs.toArray(new String[] {}));
+        }
+
+    }
+
+    @GET
+    @Path("version")
+    public String getVersion() {
+        return PortalConfiguration.REST_API_VERSION;
+    }
     
 }

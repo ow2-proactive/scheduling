@@ -47,12 +47,12 @@ import org.ow2.proactive.scheduler.common.Scheduler;
 
 public class RMSessionMapper {
 
-    private Map<String, ResourceManager> sessions;
+    private Map<String, RMProxy> sessions;
     private static RMSessionMapper sessionMapper;
     private long currentSessionid = 0l;
 
     private RMSessionMapper() {
-        sessions = Collections.synchronizedMap(new HashMap<String, ResourceManager>());
+        sessions = Collections.synchronizedMap(new HashMap<String, RMProxy>());
     }
 
     public static synchronized RMSessionMapper getInstance() {
@@ -62,13 +62,13 @@ public class RMSessionMapper {
         return sessionMapper;
     }
 
-    public long add(ResourceManager rm) {
+    public long add(RMProxy rm) {
         long id = ++currentSessionid;
         sessions.put("" + id, rm);
         return id;
     }
 
-    public Map<String, ResourceManager> getSessionsMap() {
+    public Map<String, RMProxy> getSessionsMap() {
         return sessions;
     }
 }
