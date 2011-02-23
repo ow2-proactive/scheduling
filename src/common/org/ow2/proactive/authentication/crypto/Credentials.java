@@ -395,7 +395,6 @@ public class Credentials implements Serializable {
         byte[] data = null;
         byte[] aes = null;
         int size = 0;
-
         byte[] asciiEnc = null;
 
         try {
@@ -408,17 +407,23 @@ public class Credentials implements Serializable {
             DataInputStream in = new DataInputStream(new ByteArrayInputStream(asciiEnc));
             int read, tot = 0;
             while ((read = in.read()) != '\n') {
+            	if (read == -1)
+            		throw new KeyException("Failed to parse malformed credentials");
                 algo += (char) read;
                 tot++;
             }
             tot++;
             while ((read = in.read()) != '\n') {
+            	if (read == -1)
+            		throw new KeyException("Failed to parse malformed credentials");
                 tmp += (char) read;
                 tot++;
             }
             tot++;
             size = Integer.parseInt(tmp);
             while ((read = in.read()) != '\n') {
+            	if (read == -1)
+            		throw new KeyException("Failed to parse malformed credentials");
                 cipher += (char) read;
                 tot++;
             }
