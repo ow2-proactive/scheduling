@@ -1173,10 +1173,10 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      * 
      * return s.getInfo("ProActiveScheduler:name=AllAccounts"); }
      */
-
+    
     @GET
     @Path("version")
     public String getVersion() {
-        return "0.99-3.0.x";
+        return PortalConfiguration.REST_API_VERSION;
     }
 }
