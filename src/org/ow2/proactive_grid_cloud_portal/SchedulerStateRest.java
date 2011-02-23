@@ -1085,10 +1085,16 @@ public class SchedulerStateRest implements SchedulerRestInterface {
          * ", cache is disabled"); } }
          */
 
-        SchedulerProxyUserInterface scheduler;
-        scheduler = PAActiveObject.newActive(SchedulerProxyUserInterface.class, new Object[] {});
+        MySchedulerProxyUserInterface scheduler;
+        scheduler = PAActiveObject.newActive(MySchedulerProxyUserInterface.class, new Object[] {});
 
         String url = PortalConfiguration.getProperties().getProperty(PortalConfiguration.scheduler_url);
+
+        if ((username == null) ||
+                (password == null)  ) {
+            throw new LoginException("empty login/password");
+        }
+
 
         scheduler.init(url, username, password);
 
@@ -1109,7 +1115,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @Produces("application/json")
     public String loginWithCredential(@MultipartForm LoginForm multipart)
             throws ActiveObjectCreationException, NodeException, KeyException, LoginException,
-            SchedulerException, IOException {
+            SchedulerException {
 
         MySchedulerProxyUserInterface scheduler = PAActiveObject.newActive(
                 MySchedulerProxyUserInterface.class, new Object[] {});
@@ -1117,9 +1123,20 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         String url = PortalConfiguration.getProperties().getProperty(PortalConfiguration.scheduler_url);
 
         if (multipart.getCredential() != null) {
-            Credentials credentials = Credentials.getCredentials(multipart.getCredential());
-            scheduler.init(url, credentials);
+            Credentials credentials;
+            try {
+                credentials = Credentials.getCredentials(multipart.getCredential());
+                scheduler.init(url, credentials);
+            } catch (IOException e) {
+                throw new LoginException(e.getMessage());
+            }
         } else {
+            if ((multipart.getUsername() == null) ||
+                    (multipart.getPassword() == null)  ) {
+                throw new LoginException("empty login/password");
+            }
+
+
             CredData credData = new CredData(CredData.parseLogin(multipart.getUsername()),
                 CredData.parseDomain(multipart.getUsername()), multipart.getPassword(), multipart.getSshKey());
             scheduler.init(url, credData);
