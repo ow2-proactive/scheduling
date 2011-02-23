@@ -44,6 +44,7 @@ import javax.ws.rs.core.Application;
 import org.ow2.proactive_grid_cloud_portal.exceptions.IOExceptionMapper;
 import org.ow2.proactive_grid_cloud_portal.exceptions.JobAlreadyFinishedExceptionMapper;
 import org.ow2.proactive_grid_cloud_portal.exceptions.JobCreationExceptionMapper;
+import org.ow2.proactive_grid_cloud_portal.exceptions.KeyExceptionMapper;
 import org.ow2.proactive_grid_cloud_portal.exceptions.LoginExceptionMapper;
 import org.ow2.proactive_grid_cloud_portal.exceptions.NotConnectedExceptionMapper;
 import org.ow2.proactive_grid_cloud_portal.exceptions.PermissionExceptionExceptionMapper;
@@ -70,6 +71,7 @@ public class MyPortalApplication extends Application {
         set.add(JobAlreadyFinishedExceptionMapper.class);
         set.add(JobCreationExceptionMapper.class);
         set.add(LoginExceptionMapper.class);
+        set.add(KeyExceptionMapper.class);
         set.add(NotConnectedExceptionMapper.class);
         set.add(PermissionExceptionExceptionMapper.class);
         set.add(ProActiveRuntimeExceptionMapper.class);
