@@ -79,7 +79,8 @@ public class TestSchedulerEvent {
         Assert.assertEquals(SchedulerEvent.JOB_PENDING_TO_FINISHED.ordinal(), 22);
         Assert.assertEquals(SchedulerEvent.TASK_REPLICATED.ordinal(), 23);
         Assert.assertEquals(SchedulerEvent.TASK_SKIPPED.ordinal(), 24);
-        Assert.assertEquals(25, SchedulerEvent.values().length);
+        Assert.assertEquals(SchedulerEvent.TASK_PROGRESS.ordinal(), 25);
+        Assert.assertEquals(26, SchedulerEvent.values().length);
     }
 
 }

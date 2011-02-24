@@ -925,6 +925,9 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
 
         for (InternalTask td : job.getITasks()) {
             if (td.getStatus() == TaskStatus.RUNNING) {
+                //remove previous read progress
+                previousTaskProgress.remove(td.getId());
+
                 //get the nodes that are used for this descriptor
                 NodeSet nodes = td.getExecuterInformations().getNodes();
 
@@ -966,8 +969,6 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
                     }
                 }
 
-                //remove previous read
-                previousTaskProgress.remove(task.getId());
             }
         }
 
