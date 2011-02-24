@@ -38,6 +38,8 @@ package org.ow2.proactive.scheduler.task;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -425,4 +427,72 @@ public class NativeExecutable extends Executable {
     private static String convertJavaenvNameToSysenvName(String javaPropName) {
         return javaPropName.toUpperCase().replace('.', '_');
     }
+
+    /** System property Key of the get progress native file directory */
+    private static final String GETPROGRESS_DIRECTORY_KEY = "pas.launcher.getprogress.directory";
+    private final static String DEFAULT_PATH;
+    private final static int NB_TRIES_BEFORE_GIVEUP = 10;
+    private int nbTries = 0;
+    private long lastModified = 0;
+
+    static {
+        String dir = System.getProperty(GETPROGRESS_DIRECTORY_KEY);
+        if (dir != null && new File(dir).isDirectory()) {
+            DEFAULT_PATH = dir;
+        } else {
+            DEFAULT_PATH = System.getProperty("java.io.tmpdir") + File.separator + "job_progress" +
+                File.separator;
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int getProgress() {
+        if (nbTries > NB_TRIES_BEFORE_GIVEUP) {
+            //max tries has been reached, always return previous value
+            //means user do not use progress value update
+            return super.getProgress();
+        }
+        //get taskId
+        String tid = System.getProperty(SchedulerVars.JAVAENV_TASK_ID_VARNAME.toString());
+        //get tmp file where to read the progress value
+        File f = new File(DEFAULT_PATH, tid + ".progress");
+        if (!f.exists()) {
+            //f does not exist, increment nbTries and return previous value
+            nbTries++;
+            return super.getProgress();
+        }
+        //f exists
+        long lm = f.lastModified();
+        //check if file has been modified since the last getProgress
+        if (lm > lastModified) {
+            FileReader fr = null;
+            BufferedReader br = null;
+            try {
+                fr = new FileReader(f);
+                br = new BufferedReader(fr);
+                //following line can cause a NPE, means value is not readable
+                //will go to the catch clause and the progress won't be modified
+                String s = br.readLine().trim();
+                super.setProgress(Integer.parseInt(s));
+                lastModified = lm;
+            } catch (FileNotFoundException e) {
+                //should not happen as file exist here
+            } catch (Exception e) {
+                //in any case here, just drop the read and return the previous value
+            } finally {
+                try {
+                    br.close();
+                    fr.close();
+                } catch (Throwable t) {
+                    //save catch
+                }
+            }
+        }
+        //in any case, return the up-to-date progress
+        return super.getProgress();
+    }
+
 }

@@ -82,6 +82,9 @@ public enum PASchedulerProperties {
     /** Scheduler node ping frequency in s. */
     SCHEDULER_NODE_PING_FREQUENCY("pa.scheduler.core.nodepingfrequency", PropertyType.INTEGER),
 
+    /** Number of threads used to getTaskProgress every node ping frequency */
+    SCHEDULER_TASK_PROGRESS_NBTHREAD("pa.scheduler.core.getprogressnbthreads", PropertyType.INTEGER),
+
     /** Name of the JMX MBean for the scheduler */
     SCHEDULER_JMX_CONNECTOR_NAME("pa.scheduler.core.jmx.connectorname", PropertyType.STRING),
 

@@ -93,10 +93,10 @@ public abstract class Executable {
         return this.killed;
     }
 
-    /**
+    /*
      * <B>This method has no effect in Scheduling 2.2.0.</B>
      */
-    /*
+    /**
      * Set the progress value for this Executable. Progress value must be ranged
      * between 0 and 100.
      * @param newValue the new progress value
@@ -104,23 +104,22 @@ public abstract class Executable {
      * @throws IllegalArgumentException if the value is not ranged between 0 and 100.
      */
     protected final int setProgress(int newValue) throws IllegalArgumentException {
-        //if (newValue < 0 || newValue > 100) {
-        //    throw new IllegalArgumentException("Progress value must be ranged between 0 and 100");
-        //}
-        //return this.progress.getAndSet(newValue);
-        return 0;
+        if (newValue < 0 || newValue > 100) {
+            throw new IllegalArgumentException("Progress value must be ranged between 0 and 100");
+        }
+        return this.progress.getAndSet(newValue);
     }
 
-    /**
+    /*
      * <B>This method always returns 0 in Scheduling 2.2.0</B>
      */
-    /*
+    /**
      * Return the current progress value for this executable, ranged between 0 and 100.
+     *
      * @return the current progress value for this executable.
      */
     public int getProgress() {
-        //this.progress.get();
-        return 0;
+        return this.progress.get();
     }
 
 }

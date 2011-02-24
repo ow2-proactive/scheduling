@@ -53,6 +53,7 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.Vector;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -125,6 +126,7 @@ import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.job.InternalJobWrapper;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.job.JobResultImpl;
+import org.ow2.proactive.scheduler.task.TaskInfoImpl;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalNativeTask;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
@@ -163,9 +165,18 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
     /** Max number of terminate request that can be served consecutively */
     private static final int MAX_TERM_SERVICE = 21;
 
-    /** Scheduler node ping frequency in second. */
+    /**
+     * Scheduler node ping frequency in second.
+     * Ping will in fact call a method to the launcher to get the task progress state
+     */
     private static final long SCHEDULER_NODE_PING_FREQUENCY = PASchedulerProperties.SCHEDULER_NODE_PING_FREQUENCY
             .getValueAsInt() * 1000;
+    /**
+     * Scheduler node ping frequency in second.
+     * Ping will in fact call a method to the launcher to get the task progress state
+     */
+    private static final int SCHEDULER_TASK_PROGRESS_NBTHREAD = PASchedulerProperties.SCHEDULER_TASK_PROGRESS_NBTHREAD
+            .getValueAsInt();
 
     /** Delay to wait for between getting a job result and removing the job concerned */
     private static final long SCHEDULER_REMOVED_JOB_DELAY = PASchedulerProperties.SCHEDULER_REMOVED_JOB_DELAY
@@ -206,6 +217,8 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
 
     /** Thread that will ping the running nodes */
     private Thread pinger;
+    /** Thread Pool used to get task progress status */
+    private ExecutorService threadPool;
 
     /** Timer used for remove result method (transient because Timer is not serializable) */
     private Timer removeJobTimer;
@@ -223,7 +236,10 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
     private static final String FILEAPPENDER_SUFFIX = "_FILE";
 
     /** Currently running tasks for a given jobId*/
-    Hashtable<JobId, Hashtable<TaskId, TaskLauncher>> currentlyRunningTasks;
+    ConcurrentHashMap<JobId, Hashtable<TaskId, TaskLauncher>> currentlyRunningTasks;
+
+    /** Currently running task previous progress percent */
+    ConcurrentHashMap<TaskId, Integer> previousTaskProgress;
 
     /** ClassLoading */
     // contains taskCLassServer for currently running jobs
@@ -408,7 +424,8 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
             this.status = SchedulerStatus.STOPPED;
             this.jobsToBeLogged = new Hashtable<JobId, AsyncAppender>();
             this.jobsToBeLoggedinAFile = new Hashtable<JobId, FileAppender>();
-            this.currentlyRunningTasks = new Hashtable<JobId, Hashtable<TaskId, TaskLauncher>>();
+            this.currentlyRunningTasks = new ConcurrentHashMap<JobId, Hashtable<TaskId, TaskLauncher>>();
+            this.previousTaskProgress = new ConcurrentHashMap<TaskId, Integer>();
             this.threadPoolForTerminateTL = Executors.newFixedThreadPool(TERMINATE_THREAD_NUMBER);
             this.frontend = frontend;
             this.currentJobToSubmit = jobSubmitLink;
@@ -459,6 +476,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
      */
     private void createPingThread() {
         logger_dev.debug("Creating nodes pinging thread");
+        threadPool = Executors.newFixedThreadPool(SCHEDULER_TASK_PROGRESS_NBTHREAD);
         pinger = new Thread() {
             @Override
             public void run() {
@@ -743,51 +761,77 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
         logger_dev.info("Search for down nodes !");
 
         for (int i = 0; i < runningJobs.size(); i++) {
-            InternalJob job = runningJobs.get(i);
+            final InternalJob job = runningJobs.get(i);
+            //use thread pool to ping every tasks of a job
+            threadPool.submit(new Runnable() {
+                public void run() {
+                    for (InternalTask td : job.getITasks()) {
+                        if (td != null && (td.getStatus() == TaskStatus.RUNNING)) {
+                            try {
+                                Integer progress = td.getExecuterInformations().getLauncher().getProgress();
+                                //TODO (for major version : 3.1 should be the target one)
+                                //To avoid the following cast, add a method setProgress(p) in internalTask
+                                //that make a call to taskinfo.setProgress(p)
+                                //Version 3.0.x must keep internalTask API unmodified
+                                ((TaskInfoImpl) td.getTaskInfo()).setProgress(progress);//(1)
+                                //get previous if set
+                                Integer previousProgress = previousTaskProgress.get(td.getId());
+                                if (!progress.equals(previousProgress)) {
+                                    //if previousProgress==null or previousProgress != progress -> update
+                                    frontend.taskStateUpdated(job.getOwner(), new NotificationData<TaskInfo>(
+                                        SchedulerEvent.TASK_PROGRESS, td.getTaskInfo()));
+                                }
+                            } catch (IllegalArgumentException iae) {
+                                //thrown by (1)
+                                //avoid setting bad value, no event if bad
+                            } catch (NullPointerException e) {
+                                //do nothing - should not happened, but avoid restart if execInfo or launcher is null
+                            } catch (Throwable t) {
+                                //check if the task has not been terminated while pinging
+                                if (currentlyRunningTasks.get(job.getId()).remove(td.getId()) == null) {
+                                    continue;
+                                }
 
-            for (InternalTask td : job.getITasks()) {
-                if (td != null && (td.getStatus() == TaskStatus.RUNNING) &&
-                    !PAActiveObject.pingActiveObject(td.getExecuterInformations().getLauncher())) {
-                    //check if the task has not been terminated while pinging
-                    synchronized (currentlyRunningTasks) {
-                        if (currentlyRunningTasks.get(job.getId()).remove(td.getId()) == null) {
-                            continue;
+                                logger_dev.info("Node failed on job '" + job.getId() + "', task '" +
+                                    td.getId() + "'");
+
+                                try {
+                                    logger_dev.info("Try to free failed node set");
+                                    //free execution node even if it is dead
+                                    rmProxiesManager.getUserRMProxy(job).releaseNodes(
+                                            td.getExecuterInformations().getNodes());
+                                } catch (Exception e) {
+                                    //just save the rest of the method execution
+                                }
+
+                                //remove previous read
+                                previousTaskProgress.remove(td.getId());
+                                //manage restart
+                                td.decreaseNumberOfExecutionOnFailureLeft();
+                                DatabaseManager.getInstance().synchronize(td.getTaskInfo());
+                                logger_dev.info("Number of retry on Failure left for the task '" +
+                                    td.getId() + "' : " + td.getNumberOfExecutionOnFailureLeft());
+                                if (td.getNumberOfExecutionOnFailureLeft() > 0) {
+                                    td.setStatus(TaskStatus.WAITING_ON_FAILURE);
+                                    job.newWaitingTask();
+                                    frontend.taskStateUpdated(job.getOwner(), new NotificationData<TaskInfo>(
+                                        SchedulerEvent.TASK_WAITING_FOR_RESTART, td.getTaskInfo()));
+                                    job.reStartTask(td);
+                                    logger_dev.info("Task '" + td.getId() + "' is waiting to restart");
+                                } else {
+                                    endJob(
+                                            job,
+                                            td,
+                                            "An error has occurred due to a node failure and the maximum amout of retries property has been reached.",
+                                            JobStatus.FAILED);
+                                    break;
+                                }
+                            }
                         }
-                    }
 
-                    logger_dev.info("Node failed on job '" + job.getId() + "', task '" + td.getId() + "'");
-
-                    try {
-                        logger_dev.info("Try to free failed node set");
-                        //free execution node even if it is dead
-                        rmProxiesManager.getUserRMProxy(job).releaseNodes(
-                                td.getExecuterInformations().getNodes());
-                    } catch (Exception e) {
-                        //just save the rest of the method execution
-                    }
-
-                    td.decreaseNumberOfExecutionOnFailureLeft();
-                    DatabaseManager.getInstance().synchronize(td.getTaskInfo());
-                    logger_dev.info("Number of retry on Failure left for the task '" + td.getId() + "' : " +
-                        td.getNumberOfExecutionOnFailureLeft());
-                    if (td.getNumberOfExecutionOnFailureLeft() > 0) {
-                        td.setStatus(TaskStatus.WAITING_ON_FAILURE);
-                        job.newWaitingTask();
-                        frontend.taskStateUpdated(job.getOwner(), new NotificationData<TaskInfo>(
-                            SchedulerEvent.TASK_WAITING_FOR_RESTART, td.getTaskInfo()));
-                        job.reStartTask(td);
-                        logger_dev.info("Task '" + td.getId() + "' is waiting to restart");
-                    } else {
-                        endJob(
-                                job,
-                                td,
-                                "An error has occurred due to a node failure and the maximum amout of retries property has been reached.",
-                                JobStatus.FAILED);
-                        i--;
-                        break;
                     }
                 }
-            }
+            });
         }
     }
 
@@ -926,6 +970,9 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
                         }
                     }
                 }
+
+                //remove previous read
+                previousTaskProgress.remove(task.getId());
             }
         }
 
@@ -1005,6 +1052,8 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
 
         //get the internal task
         InternalTask descriptor = job.getIHMTasks().get(taskId);
+        //remove previous read
+        previousTaskProgress.remove(descriptor.getId());
 
         final TaskLauncher taskLauncher;
         synchronized (currentlyRunningTasks) {

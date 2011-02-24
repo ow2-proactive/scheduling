@@ -740,6 +740,10 @@ public abstract class InternalTask extends TaskState {
      */
     public void setFinishedTime(long finishedTime) {
         taskInfo.setFinishedTime(finishedTime);
+        //set max progress if task is finished
+        if (finishedTime > 0) {
+            taskInfo.setProgress(100);
+        }
     }
 
     /**

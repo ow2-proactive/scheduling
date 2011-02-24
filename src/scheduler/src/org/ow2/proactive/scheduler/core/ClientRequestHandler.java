@@ -179,12 +179,31 @@ public class ClientRequestHandler {
                 //loop on the list and send events
                 while (!eventCallsToSend.isEmpty()) {
                     ReifiedMethodCall methodCall = eventCallsToSend.removeFirst();
-                    methodCall.getMethod().invoke(client, methodCall.getArguments());
+                    try {
+                        methodCall.getMethod().invoke(client, methodCall.getArguments());
+                    } catch (Throwable t) {
+                        //the following piece of code is used for compatibility with version 3.0.1 and 3.0.0
+                        //-------------------
+                        Throwable tmp = t;
+                        while (tmp.getCause() != null) {
+                            tmp = tmp.getCause();
+                        }
+                        if (tmp.getMessage().contains("TASK_PROGRESS")) {
+                            //in this case, we must continue and do not deconnect client.
+                            //It means enum constant TASK_PROGRESS has been sent and is not recognized by client.
+                        } else {
+                            throw t;
+                        }
+                        //-------------------
+                    }
                 }
                 busy.set(false);
                 //try to empty the events list if no event comes from the core
                 tryStartTask();
             } catch (Throwable t) {
+                if (SchedulerFrontend.logger_dev.isDebugEnabled()) {
+                    SchedulerFrontend.logger_dev.debug("", t);
+                }
                 //remove this client from Frontend (client dead or timed out)
                 frontend.markAsDirty(clientId);
                 //do not set busy here, we don't want to wait N times for the network timeout

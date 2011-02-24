@@ -561,7 +561,12 @@ public abstract class TaskLauncher implements InitActive {
      */
     @ImmediateService
     public int getProgress() {
-        return this.currentExecutable.getProgress();
+        if (this.currentExecutable == null) {
+            //not yet started
+            return 0;
+        } else {
+            return this.currentExecutable.getProgress();
+        }
     }
 
     /**

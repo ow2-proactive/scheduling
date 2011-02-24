@@ -1330,6 +1330,14 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
                 dispatchTaskStateUpdated(owner, notification);
                 this.jmxHelper.getSchedulerRuntimeMBean().taskStateUpdatedEvent(notification);
                 break;
+            case TASK_PROGRESS:
+                //this event can be sent while task is already finished,
+                //as it is not a correct behavior, event is dropped if task is already finished.
+                //so if task is not finished, send event
+                if (notification.getData().getFinishedTime() <= 0) {
+                    dispatchTaskStateUpdated(owner, notification);
+                }
+                break;
             default:
                 logger_dev.warn("**WARNING** - Unconsistent update type received from Scheduler Core : " +
                     notification.getEventType());
