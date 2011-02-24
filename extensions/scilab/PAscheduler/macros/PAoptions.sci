@@ -1,6 +1,6 @@
 function opts = PAoptions(varargin)
 
-    global proactive_pa_options             
+    global ('proactive_pa_options', 'PA_scheduler_dir')             
     if  argn(2) == 0 & ~isempty(proactive_pa_options) then
         opts = proactive_pa_options; 
         return;
@@ -33,16 +33,14 @@ function opts = PAoptions(varargin)
     // Parsing option file
 
 
-    try
-        scheduling_dir = getenv('SCHEDULER_HOME');
-    catch
+    if ~exists('PA_scheduler_dir') 
         error('The environment variable SCHEDULER_HOME must be defined, use setenv to define it in Scilab');
     end
     fs = filesep();
     tmp_dir = system_getproperty('java.io.tmpdir');
     home_dir = system_getproperty('user.home');
     deff ("y=logtrans(x)","if islogical(x), y=x, elseif ischar(x), y=( x == ''on'' | x == ''true''), elseif isnumeric(x), y=(x==1), end","n");
-    deff ("y=variabletrans(x)","y=strsubst(strsubst(strsubst(x, ''$SCHEDULER$'', scheduling_dir),''$TMP$'',tmp_dir), ''$HOME$'', home_dir)","n");
+    deff ("y=variabletrans(x)","y=strsubst(strsubst(strsubst(x, ''$SCHEDULER$'', PA_scheduler_dir),''$TMP$'',tmp_dir), ''$HOME$'', home_dir)","n");
     deff ("y=scripttrans(x)","y=strcat([''file:'', strsubst(variabletrans(x), ''\'', ''/'')])","n");
     deff ("y=conftrans(x)","y=strsubst(variabletrans(x),''/'',filesep())","n");
 
@@ -159,7 +157,10 @@ function opts = PAoptions(varargin)
     if isfile(optionpath) then
         [fid, ferr] = mopen(optionpath, 'r'); 
     else
-        optionpath = strcat([scheduling_dir, fs, 'extensions', fs, 'scilab', fs, 'config', fs, 'toolbox', fs, 'PAoptions.ini']);
+        optionpath = fullfile(PA_scheduler_dir, 'extensions', 'scilab', 'config', 'toolbox', 'PAoptions.ini');
+        if ~isfile(optionpath) then
+            error(strcat(['Can''t locate options file at ""';optionpath;'"" , please make sure that SCHEDULER_HOME refers to the correct directory.']));
+        end
         [fid, ferr] = mopen(optionpath, 'r');
     end    
     try

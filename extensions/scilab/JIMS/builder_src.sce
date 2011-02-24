@@ -42,10 +42,18 @@ if (getos() == "Windows") then
         
     end
 else
-    include='-I""'+here+fs+'include"" -I""'+java_home+fs+'include""'+..
+    if length(fileinfo(java_home+fs+'jre'+fs+'lib'+fs+'i386')) == 0 then
+        include='-I""'+here+fs+'include"" -I""'+java_home+fs+'include""'+..
         ' -I""'+java_home+fs+'include'+fs+'linux""' + ' -I""' + SCI + fs+'modules'+fs+'jvm'+fs+'includes""'+..
 	' -L""'+java_home+fs+'jre'+fs+'lib'+fs+'amd64'+fs+'client'+fs+'""'+..
 	' -L""'+java_home+fs+'jre'+fs+'lib'+fs+'amd64'+fs+'server'+fs+'""';
+    else
+        include='-I""'+here+fs+'include"" -I""'+java_home+fs+'include""'+..
+        ' -I""'+java_home+fs+'include'+fs+'linux""' + ' -I""' + SCI + fs+'modules'+fs+'jvm'+fs+'includes""'+..
+	' -L""'+java_home+fs+'jre'+fs+'lib'+fs+'i386'+fs+'client'+fs+'""'+..
+	' -L""'+java_home+fs+'jre'+fs+'lib'+fs+'i386'+fs+'server'+fs+'""';
+    end
+    
 end
 
 

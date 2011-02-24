@@ -1,32 +1,35 @@
 function [] = PAinit()
 
-    global PA_initialized
+    global ('PA_initialized', 'PA_scheduler_dir')
 
     version = ver();
     if strtod(part(version(1,2),1)) < 5
         error('This toolkit cannot be run on a version of Scilab anterior to version 5');
     end
-
-    try
-        scheduling_dir = getenv('SCHEDULER_HOME');
-    catch
-        error('The environment variable SCHEDULER_HOME must be defined, use setenv to define it in Scilab');
+    if ~exists('PA_scheduler_dir') 
+        error('The environment variable SCHEDULER_HOME must be defined, use setenv to define it in Scilab');        
     end
-
-    if ~isdir(scheduling_dir)
+    // disp(PA_scheduler_dir)
+    if ~isdir(PA_scheduler_dir)
         error(strcat(['The path "',schedulerdir,'" doesn''t exist or is not a directory']));
     end
-
-    schedjar = fullfile(scheduling_dir,'dist','lib','ProActive_Scheduler-client.jar');
-    if length(fileinfo(schedjar)) == 0
+    plugins_dir = fullfile(PA_scheduler_dir,'plugins');
+    if isdir(plugins_dir) then
+        release_dir = listfiles(fullfile(PA_scheduler_dir,'plugins','org.ow2.proactive.scheduler.lib_*'));
+        dist_lib_dir = fullfile(release_dir,'lib')        
+    else
+        dist_lib_dir = fullfile(PA_scheduler_dir,'dist','lib');        
+    end   
+    schedjar=fullfile(dist_lib_dir,'ProActive.jar'); 
+    if length(fileinfo(schedjar)) == 0 
         error(strcat(['Can''t locate the scheduler jar at ""';schedjar;'"" , please make sure that SCHEDULER_HOME refers to the correct directory.']));
-    end
+    end    
     opt=PAoptions();
 
     clzfile = class('java.io.File');
         
     // Log4J file
-    log4jFile = newInstance(clzfile,strcat([scheduling_dir, filesep(), 'config', filesep(), 'log4j', filesep(), 'log4j-client']));
+    log4jFile = newInstance(clzfile,strcat([PA_scheduler_dir, filesep(), 'config', filesep(), 'log4j', filesep(), 'log4j-client']));
     log4jFileUri = invoke(log4jFile,'toURI');
     urlLog4jFile = invoke(log4jFileUri,'toURL');
     finalstring = invoke(urlLog4jFile,'toExternalForm');
@@ -34,10 +37,8 @@ function [] = PAinit()
     system_setproperty('proactive.configuration', opt.ProActiveConfiguration);
 
     // Policy
-    system_setproperty('java.security.policy',strcat([scheduling_dir, filesep(), 'config', filesep(), 'scheduler.java.policy']));
-
-    // Dist libs
-    dist_lib_dir = strcat([scheduling_dir, filesep(), 'dist', filesep(), 'lib']);
+    system_setproperty('java.security.policy',strcat([PA_scheduler_dir, filesep(), 'config', filesep(), 'scheduler.java.policy']));    
+    
 
     sep=pathsep();
 

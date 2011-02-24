@@ -1,6 +1,5 @@
 here=get_absolute_file_path('start.sce');
 macros=here+'macros';
-java_home='/home/fviale/bin/jdk1.6.0_64/';
 exec loader.sce;          
 impjava=lib(macros);
 if isfile('classpath/jlatexmath-0.9.3.jar') then
@@ -10,3 +9,5 @@ else
     javaclasspath([here+'jar/ScilabObjects.jar']);
 end
 
+cd('../PAscheduler')
+exec('builder.sce')
