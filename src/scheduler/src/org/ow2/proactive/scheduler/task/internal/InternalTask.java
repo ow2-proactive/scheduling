@@ -735,6 +735,10 @@ public abstract class InternalTask extends TaskState {
      */
     public void setFinishedTime(long finishedTime) {
         taskInfo.setFinishedTime(finishedTime);
+        //set max progress if task is finished
+        if (finishedTime > 0) {
+            taskInfo.setProgress(100);
+        }
     }
 
     /**
@@ -888,6 +892,15 @@ public abstract class InternalTask extends TaskState {
     @Override
     public int getMaxNumberOfExecutionOnFailure() {
         return maxNumberOfExecutionOnFailure;
+    }
+
+    /**
+     * Set the current progress of the task
+     *
+     * @param progress the current progress of the task
+     */
+    public void setProgress(Integer progress) {
+        taskInfo.setProgress(progress);
     }
 
     /**
@@ -1244,4 +1257,5 @@ public abstract class InternalTask extends TaskState {
             throw new RuntimeException(e);
         }
     }
+
 }

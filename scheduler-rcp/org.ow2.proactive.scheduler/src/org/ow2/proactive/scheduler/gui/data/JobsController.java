@@ -183,6 +183,12 @@ public class JobsController implements SchedulerEventListener {
             listener.runningTaskEvent(info);
     }
 
+    /** call "progressTaskEvent" method on listeners */
+    private void progressTaskEventInternal(TaskInfo info) {
+        for (EventTasksListener listener : eventTasksListeners)
+            listener.progressTaskEvent(info);
+    }
+
     /** call "finishedTaskEvent" method on listeners */
     private void runningToFinishedTaskEventInternal(TaskInfo info) {
         for (EventTasksListener listener : eventTasksListeners)
@@ -373,6 +379,9 @@ public class JobsController implements SchedulerEventListener {
                 break;
             case TASK_WAITING_FOR_RESTART:
                 taskWaitingForRestart(notification.getData());
+                break;
+            case TASK_PROGRESS:
+                taskProgress(notification.getData());
                 break;
         }
     }
@@ -859,6 +868,11 @@ public class JobsController implements SchedulerEventListener {
                 }
             });
         }
+    }
+
+    private void taskProgress(TaskInfo info) {
+        getJobById(info.getJobId()).update(info);
+        progressTaskEventInternal(info);
     }
 
     private void taskSkipped(JobInfo info) {

@@ -103,7 +103,9 @@ public enum SchedulerEvent {
     /** A Control Flow Action led to the replication of a task */
     TASK_REPLICATED("Task replicated"),
     /** A Control Flow Action (branching) led to a task being skipped */
-    TASK_SKIPPED("Task skipped");
+    TASK_SKIPPED("Task skipped"),
+    /** A new task progress value is available */
+    TASK_PROGRESS("Task progress");
 
     /** Name of the method */
     private String methodName;

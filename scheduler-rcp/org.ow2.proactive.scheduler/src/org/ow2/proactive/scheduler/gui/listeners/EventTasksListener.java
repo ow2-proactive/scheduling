@@ -50,14 +50,21 @@ public interface EventTasksListener {
     /**
      * Invoke by jobs controller when a task has just been started
      *
-     * @param info
+     * @param info up to date task information
      */
     public void runningTaskEvent(TaskInfo info);
 
     /**
      * Invoke by jobs controller when a task has just been terminated
      *
-     * @param info
+     * @param info up to date task information
      */
     public void finishedTaskEvent(TaskInfo info);
+
+    /**
+     * Invoke by jobs controller when a task has just received a progress state
+     *
+     * @param info up to date task information
+     */
+    public void progressTaskEvent(TaskInfo info);
 }
