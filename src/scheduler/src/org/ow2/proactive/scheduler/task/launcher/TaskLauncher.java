@@ -255,14 +255,6 @@ public abstract class TaskLauncher implements InitActive {
      * @param body the body of the active object being initialized
      */
     public void initActivity(Body body) {
-        // TODO cdelbe : race condition remains here 
-        // see PROACTIVE-652
-        // see SCHEDULING-263
-        PAActiveObject.setImmediateService("activateLogs");
-        PAActiveObject.setImmediateService("terminate");
-        PAActiveObject.setImmediateService("getLogs");
-        logger_dev.debug("Immediate services : activateLogs, terminate, getLogs");
-
         // plug stdout/err into a socketAppender
         this.initLoggers();
         // set scheduler defined env variables
@@ -473,6 +465,7 @@ public abstract class TaskLauncher implements InitActive {
      * @param logSink the provider for the appender to write in.
      */
     @SuppressWarnings("unchecked")
+    @ImmediateService
     public void activateLogs(AppenderProvider logSink) {
         this.launcherInitialized.await();
         synchronized (this.loggersFinalized) {
@@ -549,6 +542,7 @@ public abstract class TaskLauncher implements InitActive {
      * 
      * @return a TaskLogs object that contains the logs produced by the executed tasks
      */
+    @ImmediateService
     public TaskLogs getLogs() {
         this.flushStreams();
         TaskLogs logs = new Log4JTaskLogs(this.logAppender.getStorage());
@@ -667,6 +661,7 @@ public abstract class TaskLauncher implements InitActive {
      * This method will terminate the task that has been launched.
      * In fact it will terminate the launcher.
      */
+    @ImmediateService
     public void terminate(boolean normalTermination) {
         if (!normalTermination) {
             if (this.currentExecutable != null) {
