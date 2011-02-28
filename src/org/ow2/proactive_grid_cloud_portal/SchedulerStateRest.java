@@ -207,14 +207,15 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      * 
      * @see
      * org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#revisionAndjobsinfo(java.lang.
-     * String, int, int)
+     * String, int, int, boolean)
      */
     @GET
     @Path("revisionjobsinfo")
     @Produces({ "application/json", "application/xml" })
     public Map<AtomicLong, List<UserJobInfo>> revisionAndjobsinfo(@HeaderParam("sessionid") String sessionId,
             @QueryParam("index") @DefaultValue("-1") int index,
-            @QueryParam("range") @DefaultValue("-1") int range) throws PermissionException,
+            @QueryParam("range") @DefaultValue("-1") int range,
+            @QueryParam("myjobs") @DefaultValue("false") boolean myJobs) throws PermissionException,
             NotConnectedException {
         Scheduler s = checkAccess(sessionId, "revisionjobsinfo?index=" + index + "&range=" + range);
         List<JobState> jobs = new ArrayList<JobState>();
@@ -225,6 +226,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         Entry<AtomicLong, SchedulerState> entry = stateAndrevision.entrySet().iterator().next();
 
         SchedulerState state = entry.getValue();
+        if (myJobs)
+        	state = s.getState(true);
         jobs.addAll(state.getPendingJobs());
         jobs.addAll(state.getRunningJobs());
         jobs.addAll(state.getFinishedJobs());

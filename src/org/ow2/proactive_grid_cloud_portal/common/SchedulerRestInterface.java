@@ -131,6 +131,7 @@ public interface SchedulerRestInterface {
      * @param sessionId a valid session id
      * @param index optional, if a sublist has to be returned the index of the sublist
      * @param range optional, if a sublist has to be returned, the range of the sublist
+     * @param myJobs fetch only the jobs owned by the user making the request
      * @return a map containing one entry with the revision id as key and the 
      * list of UserJobInfo as value.
      */
@@ -139,7 +140,8 @@ public interface SchedulerRestInterface {
     @Produces({ "application/json", "application/xml" })
     public abstract Map<AtomicLong, List<UserJobInfo>> revisionAndjobsinfo(
             @HeaderParam("sessionid") String sessionId, @QueryParam("index") @DefaultValue("-1") int index,
-            @QueryParam("range") @DefaultValue("-1") int range) throws PermissionException,
+            @QueryParam("range") @DefaultValue("-1") int range, @QueryParam("myjobs")
+            @DefaultValue("false") boolean myJobs) throws PermissionException,
             NotConnectedException;
 
     /**
