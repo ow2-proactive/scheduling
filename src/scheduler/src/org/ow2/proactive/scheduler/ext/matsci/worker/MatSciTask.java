@@ -513,27 +513,32 @@ public abstract class MatSciTask<W extends MatSciWorker, C extends MatSciEngineC
                 "] Destroying JVM");
         }
         try {
-            jvminfo.getWorker().terminate();
+            if (jvminfo.getWorker() != null) {
+                jvminfo.getWorker().terminate();
+            }
         } catch (Exception e1) {
         }
 
         Process proc = jvminfo.getProcess();
 
-        WinProcess pi = new WinProcess(proc);
+        if (proc != null) {
 
-        try {
-            if (paconfig.isDebug()) {
-                System.out.println("Killing process " + pi.getPid());
-                outDebug.println("Killing process " + pi.getPid());
+            WinProcess pi = new WinProcess(proc);
+
+            try {
+                if (paconfig.isDebug()) {
+                    System.out.println("Killing process " + pi.getPid());
+                    outDebug.println("Killing process " + pi.getPid());
+                }
+                Runtime.getRuntime().exec("taskkill /PID " + pi.getPid() + " /T");
+                Runtime.getRuntime().exec("tskill " + pi.getPid());
+
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-            Runtime.getRuntime().exec("taskkill /PID " + pi.getPid() + " /T");
-            Runtime.getRuntime().exec("tskill " + pi.getPid());
 
-        } catch (IOException e) {
-            e.printStackTrace();
+            killProcessWindowsWithEnv("NODE_NAME", nodeName);
         }
-
-        killProcessWindowsWithEnv("NODE_NAME", nodeName);
 
     }
 
@@ -590,22 +595,26 @@ public abstract class MatSciTask<W extends MatSciWorker, C extends MatSciEngineC
                 "] Destroying JVM");
         }
         try {
-            jvminfo.getWorker().terminate();
+            if (jvminfo.getWorker() != null) {
+                jvminfo.getWorker().terminate();
+            }
         } catch (Exception e1) {
         }
 
         Process proc = jvminfo.getProcess();
+        if (proc != null) {
 
-        Map<String, String> modelEnv = new HashMap<String, String>();
-        modelEnv.put("NODE_NAME", nodeName);
-        if (paconfig.isDebug()) {
-            System.out.println("[" + new java.util.Date() + " " + host + " " +
-                this.getClass().getSimpleName() + "] Destroying processes with NODE_NAME=" + nodeName);
-            outDebug.println("[" + new java.util.Date() + " " + host + " " + this.getClass().getSimpleName() +
-                "] Destroying processes with NODE_NAME=" + nodeName);
+            Map<String, String> modelEnv = new HashMap<String, String>();
+            modelEnv.put("NODE_NAME", nodeName);
+            if (paconfig.isDebug()) {
+                System.out.println("[" + new java.util.Date() + " " + host + " " +
+                    this.getClass().getSimpleName() + "] Destroying processes with NODE_NAME=" + nodeName);
+                outDebug.println("[" + new java.util.Date() + " " + host + " " +
+                    this.getClass().getSimpleName() + "] Destroying processes with NODE_NAME=" + nodeName);
+            }
+
+            ProcessTreeKiller.get().kill(proc, modelEnv);
         }
-
-        ProcessTreeKiller.get().kill(proc, modelEnv);
 
     }
 
@@ -823,7 +832,14 @@ public abstract class MatSciTask<W extends MatSciWorker, C extends MatSciEngineC
                 outDebug.println("[" + new java.util.Date() + " " + host + " " +
                     this.getClass().getSimpleName() + "] waiting for deployment");
             }
-            helper.waitForRegistration();
+
+            try {
+                helper.waitForRegistration();
+            } catch (Throwable e) {
+                // SCHEDULING-1127: if the proactive runtime couldn't start, we need to clean processes
+                destroyProcess(jvminfo);
+                throw e;
+            }
 
             sw = deploy(workerClassName);
 
