@@ -37,6 +37,7 @@
 package org.ow2.proactive.scheduler.ext.matlab.worker;
 
 import org.jvnet.winp.WinProcess;
+import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.utils.OperatingSystem;
 import org.ow2.proactive.scheduler.ext.common.util.IOTools;
 import org.ow2.proactive.scheduler.ext.matlab.common.PASolveMatlabGlobalConfig;
@@ -50,10 +51,7 @@ import org.ow2.proactive.scheduler.ext.matsci.worker.util.MatSciEngineConfig;
 import org.ow2.proactive.scheduler.ext.matsci.worker.util.MatSciJVMInfo;
 import org.ow2.proactive.scheduler.ext.matsci.worker.util.MatSciTaskServerConfig;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.Serializable;
+import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -88,6 +86,8 @@ public class MatlabTask<W extends AOMatlabWorker> extends
      * holds the Matlab environment information on this machine
      */
     protected static MatlabEngineConfig matlabEngineConfig = null;
+
+    public static final String MatSciTaskConfigPath = "extensions/matlab/config/worker/MatSciTask.ini";
 
     /**
      *  the Active Object worker located in the spawned JVM
@@ -151,8 +151,24 @@ public class MatlabTask<W extends AOMatlabWorker> extends
         return "Matlab";
     }
 
-    protected MatSciTaskServerConfig getTaskServerConfig() {
-        return new MatSciTaskServerConfig(false, -1, 30, 2, 30, 3);
+    protected MatSciTaskServerConfig getTaskServerConfig() throws Exception {
+        String homestr = ProActiveRuntimeImpl.getProActiveRuntime().getProActiveHome();
+        File homesched = new File(homestr);
+        File confPath = new File(homesched, MatSciTaskConfigPath);
+        if (confPath.exists() && confPath.canRead()) {
+            if (paconfig.isDebug()) {
+                System.out.println("Loading MatlabTask config " + confPath);
+                outDebug.println("Loading MatlabTask config " + confPath);
+            }
+            return MatSciTaskServerConfig.load(confPath);
+        } else {
+            if (paconfig.isDebug()) {
+                System.out.println("Cannot find MatlabTask config " + confPath +
+                    ", use default configuration");
+                outDebug.println("Cannot find MatlabTask config " + confPath + ", use default configuration");
+            }
+            return new MatSciTaskServerConfig(false, -1, 2, 30, 5);
+        }
     }
 
     protected void initPASolveConfig(Map<String, Serializable> args) {

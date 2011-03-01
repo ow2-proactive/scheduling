@@ -36,6 +36,7 @@
  */
 package org.ow2.proactive.scheduler.ext.scilab.worker;
 
+import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.utils.OperatingSystem;
 import org.ow2.proactive.scheduler.ext.common.util.IOTools;
 import org.ow2.proactive.scheduler.ext.matsci.common.DummyJVMProcess;
@@ -48,6 +49,7 @@ import org.ow2.proactive.scheduler.ext.scilab.common.PASolveScilabTaskConfig;
 import org.ow2.proactive.scheduler.ext.scilab.worker.util.ScilabEngineConfig;
 import org.ow2.proactive.scheduler.ext.scilab.worker.util.ScilabFinder;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.Serializable;
@@ -91,6 +93,8 @@ public class ScilabTask<W extends AOScilabWorker> extends
      * the array of output variable names
      */
     protected String[] out_set = DEFAULT_OUT_VARIABLE_SET;
+
+    public static final String MatSciTaskConfigPath = "extensions/scilab/config/worker/MatSciTask.ini";
 
     /**
      * holds the Scilab environment information
@@ -136,8 +140,24 @@ public class ScilabTask<W extends AOScilabWorker> extends
         return scilabEngineConfig;
     }
 
-    protected MatSciTaskServerConfig getTaskServerConfig() {
-        return new MatSciTaskServerConfig(true, -1, -1, 2, 30, 5);
+    protected MatSciTaskServerConfig getTaskServerConfig() throws Exception {
+        String homestr = ProActiveRuntimeImpl.getProActiveRuntime().getProActiveHome();
+        File homesched = new File(homestr);
+        File confPath = new File(homesched, MatSciTaskConfigPath);
+        if (confPath.exists() && confPath.canRead()) {
+            if (paconfig.isDebug()) {
+                System.out.println("Loading ScilabTask config " + confPath);
+                outDebug.println("Loading ScilabTask config " + confPath);
+            }
+            return MatSciTaskServerConfig.load(confPath);
+        } else {
+            if (paconfig.isDebug()) {
+                System.out.println("Cannot find ScilabTask config " + confPath +
+                    ", use default configuration");
+                outDebug.println("Cannot find ScilabTask config " + confPath + ", use default configuration");
+            }
+            return new MatSciTaskServerConfig(true, -1, 2, 30, 5);
+        }
     }
 
     protected String getExtensionName() {
