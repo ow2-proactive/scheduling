@@ -47,11 +47,13 @@ import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
 public class SchedulerSessionMapper {
 
     private Map<String, SchedulerProxyUserInterface> sessions;
+    private Map<String, String> usernames;
     private static SchedulerSessionMapper sessionMapper;
     private long currentSessionid = 0l;
 
     private SchedulerSessionMapper() {
         sessions = Collections.synchronizedMap(new HashMap<String, SchedulerProxyUserInterface >());
+        usernames = Collections.synchronizedMap(new HashMap<String, String>());
     }
 
     public static synchronized SchedulerSessionMapper getInstance() {
@@ -61,13 +63,18 @@ public class SchedulerSessionMapper {
         return sessionMapper;
     }
 
-    public long add(SchedulerProxyUserInterface s) {
+    public long add(SchedulerProxyUserInterface s, String username) {
         long id = ++currentSessionid;
         sessions.put("" + id, s);
+        usernames.put("" + id, username);
         return id;
     }
 
     public Map<String, SchedulerProxyUserInterface> getSessionsMap() {
         return sessions;
+    }
+    
+    public Map<String, String> getUsernames() {
+    	return usernames;
     }
 }

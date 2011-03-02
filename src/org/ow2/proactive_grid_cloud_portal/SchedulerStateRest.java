@@ -43,6 +43,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.security.KeyException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -226,11 +227,32 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         Entry<AtomicLong, SchedulerState> entry = stateAndrevision.entrySet().iterator().next();
 
         SchedulerState state = entry.getValue();
-        if (myJobs)
-        	state = s.getState(true);
-        jobs.addAll(state.getPendingJobs());
-        jobs.addAll(state.getRunningJobs());
-        jobs.addAll(state.getFinishedJobs());
+
+		String user = SchedulerSessionMapper.getInstance().getUsernames()
+				.get(sessionId);
+		if (myJobs && user != null && user.trim().length() > 0) {
+			for (JobState j : state.getPendingJobs()) {
+				if (j.getOwner().equals(user))
+					jobs.add(j);
+			}
+			for (JobState j : state.getRunningJobs()) {
+				if (j.getOwner().equals(user))
+					jobs.add(j);
+			}
+			for (JobState j : state.getFinishedJobs()) {
+				if (j.getOwner().equals(user))
+					jobs.add(j);
+			}
+		} else {
+			jobs.addAll(state.getPendingJobs());
+			jobs.addAll(state.getRunningJobs());
+			jobs.addAll(state.getFinishedJobs());
+		}
+
+		if (range != -1 && index != -1) {
+			JobState.setSortingOrder(JobState.DESC_ORDER);
+			Collections.sort(jobs);
+		}
 
         //filter the result if needed
         jobs = subList(jobs, index, range);
@@ -1101,7 +1123,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
         scheduler.init(url, username, password);
 
-        String sessionId = "" + SchedulerSessionMapper.getInstance().add(scheduler);
+        String sessionId = "" + SchedulerSessionMapper.getInstance().add(scheduler, username);
         logger.info("binding user " + username + " to session " + sessionId);
         return sessionId;
     }
@@ -1145,7 +1167,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             scheduler.init(url, credData);
         }
 
-        String sessionId = "" + SchedulerSessionMapper.getInstance().add(scheduler);
+        String sessionId = "" + SchedulerSessionMapper.getInstance().add(scheduler, null);
         //      logger.info("binding user "+  " to session " + sessionId );
         return sessionId;
 
