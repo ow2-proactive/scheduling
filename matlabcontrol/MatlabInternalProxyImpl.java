@@ -94,4 +94,8 @@ class MatlabInternalProxyImpl extends UnicastRemoteObject implements MatlabInter
 
     public void checkConnection() throws RemoteException {
     }
+
+    public void waitReady() throws RemoteException {
+        _wrapper.waitReady();
+    }
 }

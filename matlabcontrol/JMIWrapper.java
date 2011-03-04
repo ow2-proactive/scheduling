@@ -30,10 +30,7 @@ package matlabcontrol;
 
 import com.mathworks.jmi.*;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.PrintStream;
+import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -89,6 +86,8 @@ class JMIWrapper {
 
     private static PrintStream out = null;
 
+    private boolean ready;
+
     /**
      * Gets the variable value stored by {@link #setVariable(String, Object)}.
      *
@@ -123,6 +122,23 @@ class JMIWrapper {
      */
     Object getVariable(String variableName) throws MatlabInvocationException {
         return this.returningEval(variableName, 1);
+    }
+
+    void waitReady() {
+        ready = false;
+        Matlab.whenMatlabReady(new Runnable() {
+            public void run() {
+                ready = true;
+            }
+        });
+        while (!ready) {
+            try {
+                Thread.sleep(10);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
     }
 
     /**
@@ -175,7 +191,7 @@ class JMIWrapper {
         if (out == null) {
             try {
                 FileOutputStream fos = new FileOutputStream(logFile);
-                out = new PrintStream(fos);
+                out = new PrintStream(new BufferedOutputStream(fos));
                 System.setErr(out);
                 System.setOut(out);
 
@@ -185,7 +201,7 @@ class JMIWrapper {
         }
 
 
-        instance.evalStreamOutput(command, new CompletionObserver() {
+        instance.evalConsoleOutput(command, new CompletionObserver() {
             public void completed(int i, Object o) {
                 completed = true;
                 answer = o;

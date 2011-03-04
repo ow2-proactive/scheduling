@@ -149,6 +149,18 @@ public final class RemoteMatlabProxy {
         }
     }
 
+    public void waitReady() throws MatlabInvocationException {
+        try {
+            _internalProxy.waitReady();
+        } catch (RemoteException e) {
+            if (this.isConnected()) {
+                throw new MatlabInvocationException(MatlabInvocationException.UNKNOWN_REMOTE_REASON_MSG, e);
+            } else {
+                throw new MatlabInvocationException(MatlabInvocationException.PROXY_NOT_CONNECTED_MSG, e);
+            }
+        }
+    }
+
     /**
      * Evaluates a command in MATLAB. The result of this command will not be
      * returned.

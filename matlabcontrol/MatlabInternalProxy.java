@@ -72,6 +72,8 @@ interface MatlabInternalProxy extends Remote {
 
     public void setEchoEval(boolean echo) throws RemoteException, MatlabInvocationException;
 
+    public void waitReady() throws RemoteException;
+
     /**
      * This method does nothing. It is used internally to check if a connection
      * is still active.
