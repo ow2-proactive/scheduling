@@ -34,46 +34,49 @@ import java.rmi.RemoteException;
 /**
  * Methods that can be called to control MATLAB except for
  * {@link #checkConnection()}.
- * 
+ * <p/>
  * All of these methods throw RemoteException. RemoteException will be thrown
  * if something occurs to disrupt the communication between this JVM and the
  * one MATLAB is running in. For instance, closing MATLAB will terminate its
  * JVM and then all method calls on this proxy will throw exceptions.
- * 
+ * <p/>
  * Additionally, many of these methods throw InterruptedException. This occurs
  * if while waiting for MATLAB to return from a method called on it, the thread
  * waiting is interrupted.
- * 
+ * <p/>
  * For descriptions of what these methods do see the corresponding methods in
  * {@link RemoteMatlabProxy}.
- * 
+ *
  * @author <a href="mailto:jak2@cs.brown.edu">Joshua Kaplan</a>
  */
-interface MatlabInternalProxy extends Remote
-{
-	public void exit() throws RemoteException, MatlabInvocationException;
-	
-	public void setVariable(String variableName, Object value) throws RemoteException, MatlabInvocationException;
+interface MatlabInternalProxy extends Remote {
+    public void exit() throws RemoteException, MatlabInvocationException;
 
-	public Object getVariable(String variableName) throws RemoteException, MatlabInvocationException;
-	
-	public void eval(String command) throws RemoteException, MatlabInvocationException;
-	
-	public void feval(String command, Object[] args) throws RemoteException, MatlabInvocationException;
-	
-	public Object returningFeval(String command, Object[] args) throws RemoteException, MatlabInvocationException;
-	
-	public Object returningFeval(String command, Object[] args, int returnCount) throws RemoteException, MatlabInvocationException;
-	
-	public Object returningEval(String command, int returnCount) throws RemoteException, MatlabInvocationException;
+    public void setVariable(String variableName, Object value) throws RemoteException, MatlabInvocationException;
 
-	public void setEchoEval(boolean echo) throws RemoteException, MatlabInvocationException;
-	
-	/**
-	 * This method does nothing. It is used internally to check if a connection
-	 * is still active.
-	 * 
-	 * @throws RemoteException
-	 */
-	public void checkConnection() throws RemoteException;
+    public Object getVariable(String variableName) throws RemoteException, MatlabInvocationException;
+
+    public void eval(String command) throws RemoteException, MatlabInvocationException;
+
+    public String eval2(String command) throws RemoteException, MatlabInvocationException;
+
+    public Object evalStreamOutput(final String command) throws RemoteException, MatlabInvocationException;
+
+    public void feval(String command, Object[] args) throws RemoteException, MatlabInvocationException;
+
+    public Object returningFeval(String command, Object[] args) throws RemoteException, MatlabInvocationException;
+
+    public Object returningFeval(String command, Object[] args, int returnCount) throws RemoteException, MatlabInvocationException;
+
+    public Object returningEval(String command, int returnCount) throws RemoteException, MatlabInvocationException;
+
+    public void setEchoEval(boolean echo) throws RemoteException, MatlabInvocationException;
+
+    /**
+     * This method does nothing. It is used internally to check if a connection
+     * is still active.
+     *
+     * @throws RemoteException
+     */
+    public void checkConnection() throws RemoteException;
 }

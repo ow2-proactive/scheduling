@@ -32,30 +32,27 @@ package matlabcontrol;
  * Exception that represents a failure to invoke a method on the MATLAB session.
  * This will most likely occur if the MATLAB session being controlled is no
  * longer open, or MATLAB experiences an internal error.
- * 
+ *
  * @author <a href="mailto:jak2@cs.brown.edu">Joshua Kaplan</a>
  */
-public class MatlabInvocationException extends Exception
-{	
-	private static final long serialVersionUID = -1567632755416541619L;
-	
-	//Messages
-	static final String INTERRUPTED_MSG = "Method could not be completed because the thread was interrupted before MATLAB returned",
-						PROXY_NOT_CONNECTED_MSG = "This proxy is no longer connected to MATLAB",
-						CONTROLLER_NO_CONNECTION_MSG = "There is no connection to MATLAB",
-						UNKNOWN_REMOTE_REASON_MSG = "Method could not be invoked for an unknown reason",
-						UNMARSHALLING_MSG = "Object attempting to be returned cannot be sent across Java Virtual Machines",
-						INTERNAL_EXCEPTION_MSG = "Method could not return a value because of an internal MATLAB exception",
-						MAIN_THREAD_MSG = "This method cannot be invoked on the main MATLAB thread",
-						NON_MAIN_THREAD_MSG = "This method must be invoked on the main MATLAB thread";
-				 
-	MatlabInvocationException(String msg)
-	{
-		super(msg);
-	}
-	
-	MatlabInvocationException(String msg, Throwable cause)
-	{
-		super(msg, cause);
-	}
+public class MatlabInvocationException extends Exception {
+    private static final long serialVersionUID = -1567632755416541619L;
+
+    //Messages
+    static final String INTERRUPTED_MSG = "Method could not be completed because the thread was interrupted before MATLAB returned",
+            PROXY_NOT_CONNECTED_MSG = "This proxy is no longer connected to MATLAB",
+            CONTROLLER_NO_CONNECTION_MSG = "There is no connection to MATLAB",
+            UNKNOWN_REMOTE_REASON_MSG = "Method could not be invoked for an unknown reason",
+            UNMARSHALLING_MSG = "Object attempting to be returned cannot be sent across Java Virtual Machines",
+            INTERNAL_EXCEPTION_MSG = "Method could not return a value because of an internal MATLAB exception",
+            MAIN_THREAD_MSG = "This method cannot be invoked on the main MATLAB thread",
+            NON_MAIN_THREAD_MSG = "This method must be invoked on the main MATLAB thread";
+
+    MatlabInvocationException(String msg) {
+        super(msg);
+    }
+
+    MatlabInvocationException(String msg, Throwable cause) {
+        super(msg, cause);
+    }
 }

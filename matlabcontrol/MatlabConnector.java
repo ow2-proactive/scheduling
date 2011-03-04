@@ -34,43 +34,39 @@ import java.rmi.registry.Registry;
 /**
  * This class is used only from inside of the MATLAB JVM. It is responsible for
  * creating proxies and sending them to the receiver over RMI.
- * 
+ *
  * @author <a href="mailto:jak2@cs.brown.edu">Joshua Kaplan</a>
  */
-class MatlabConnector
-{
-	/**
-	 * Private constructor so this class cannot be constructed.
-	 */
-	private MatlabConnector() { }
-	
-	/**
-	 * Called from MATLAB to create a controller, wrap it in a proxy, and then send it over RMI
-	 * to the Java program running in a separate JVM.
-	 * 
-	 * @param receiverID the key that binds the receiver in the registry
-	 * @param proxyID the unique identifier of the proxy being created
-	 * 
-	 * @throws MatlabConnectionException
-	 */
-	public static void connectFromMatlab(String receiverID, String proxyID) throws MatlabConnectionException
-	{
-		//Attempt to connect to external Java program and transmit proxy
-		try
-		{				
-			//Get registry
-			Registry registry = LocateRegistry.getRegistry(Registry.REGISTRY_PORT);
-			
-			//Get the receiver from the registry
-		    MatlabInternalProxyReceiver receiver = (MatlabInternalProxyReceiver) registry.lookup(receiverID);
-		    
-		    //Create the wrapper, then pass the internal proxy over RMI to the Java application in its own JVM
-		    receiver.registerControl(proxyID, new MatlabInternalProxyImpl(new JMIWrapper()));
-		}
-		//If for any reason the attempt fails, throw exception that indicates connection could not be established
-		catch (Exception e)
-		{
-			throw new MatlabConnectionException("Connection to Java application could not be established", e);
-		}
-	}
+class MatlabConnector {
+    /**
+     * Private constructor so this class cannot be constructed.
+     */
+    private MatlabConnector() {
+    }
+
+    /**
+     * Called from MATLAB to create a controller, wrap it in a proxy, and then send it over RMI
+     * to the Java program running in a separate JVM.
+     *
+     * @param receiverID the key that binds the receiver in the registry
+     * @param proxyID    the unique identifier of the proxy being created
+     * @throws MatlabConnectionException
+     */
+    public static void connectFromMatlab(String receiverID, String proxyID) throws MatlabConnectionException {
+        //Attempt to connect to external Java program and transmit proxy
+        try {
+            //Get registry
+            Registry registry = LocateRegistry.getRegistry(Registry.REGISTRY_PORT);
+
+            //Get the receiver from the registry
+            MatlabInternalProxyReceiver receiver = (MatlabInternalProxyReceiver) registry.lookup(receiverID);
+
+            //Create the wrapper, then pass the internal proxy over RMI to the Java application in its own JVM
+            receiver.registerControl(proxyID, new MatlabInternalProxyImpl(new JMIWrapper()));
+        }
+        //If for any reason the attempt fails, throw exception that indicates connection could not be established
+        catch (Exception e) {
+            throw new MatlabConnectionException("Connection to Java application could not be established", e);
+        }
+    }
 }
