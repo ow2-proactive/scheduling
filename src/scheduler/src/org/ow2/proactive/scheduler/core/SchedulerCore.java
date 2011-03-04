@@ -2235,6 +2235,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
 
     /**
      * Make a copy of the given argument with the restriction 'onlyFinished'.
+     * As no task could be running after recover, this method also move task from RUNNING status to PENDING one.
      * Then sort the array according to finished time order.
      *
      * @param tasks the list of internal tasks to copy.
@@ -2258,6 +2259,10 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
                 }
             } else {
                 tasksList.add(task);
+            }
+            //if task was running, put it in pending status
+            if (task.getStatus() == TaskStatus.RUNNING) {
+                task.setStatus(TaskStatus.PENDING);
             }
         }
         //sort the finished task according to their finish time.
