@@ -545,7 +545,7 @@ public abstract class TaskLauncher implements InitActive {
     @ImmediateService
     public TaskLogs getLogs() {
         this.flushStreams();
-        TaskLogs logs = new Log4JTaskLogs(this.logAppender.getStorage());
+        TaskLogs logs = new Log4JTaskLogs(this.logAppender.getStorage(), this.taskId.getJobId().value());
         return logs;
     }
 

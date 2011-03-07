@@ -63,8 +63,8 @@ public final class ObjectByteConverter {
      * @return a byteArray representing the Serialization of the given object.
      * @throws IOException if an I/O exception occurs when writing the output byte array
      */
-    public static final byte[] objectToByteArrayConverter(Object obj) throws IOException {
-        return objectToByteArrayConverter(obj, false);
+    public static final byte[] objectToByteArray(Object obj) throws IOException {
+        return objectToByteArray(obj, false);
     }
 
     /**
@@ -76,7 +76,7 @@ public final class ObjectByteConverter {
      * @return a compressed (or not) byteArray representing the Serialization of the given object.
      * @throws IOException if an I/O exception occurs when writing the output byte array
      */
-    public static final byte[] objectToByteArrayConverter(Object obj, boolean compress) throws IOException {
+    public static final byte[] objectToByteArray(Object obj, boolean compress) throws IOException {
         ByteArrayOutputStream baos = null;
         ObjectOutputStream oos = null;
         try {
@@ -131,8 +131,8 @@ public final class ObjectByteConverter {
      * @throws IOException if an I/O exception occurs when writing the returned object
      * @throws ClassNotFoundException if class represented by given byteArray is not found.
      */
-    public static Object byteArrayToObjectConverter(byte[] input) throws IOException, ClassNotFoundException {
-        return byteArrayToObjectConverter(input, false);
+    public static Object byteArrayToObject(byte[] input) throws IOException, ClassNotFoundException {
+        return byteArrayToObject(input, false);
     }
 
     /**
@@ -145,7 +145,7 @@ public final class ObjectByteConverter {
      * @throws IOException if an I/O exception occurs when writing the returned object
      * @throws ClassNotFoundException if class represented by given byteArray is not found.
      */
-    public static Object byteArrayToObjectConverter(byte[] input, boolean uncompress) throws IOException,
+    public static Object byteArrayToObject(byte[] input, boolean uncompress) throws IOException,
             ClassNotFoundException {
         if (uncompress) {
             // Uncompress the bytes

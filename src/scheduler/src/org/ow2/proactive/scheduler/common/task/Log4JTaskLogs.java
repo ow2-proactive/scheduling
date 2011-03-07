@@ -116,6 +116,9 @@ public class Log4JTaskLogs implements TaskLogs {
     @Lob
     private byte[] serializedAllEvents;
 
+    @Column(name = "LOGGER_NAME")
+    private String loggerName;
+
     /** New line **/
     private static final String nl = System.getProperty("line.separator");
 
@@ -127,8 +130,9 @@ public class Log4JTaskLogs implements TaskLogs {
      * Create a new Log4JTaskLogs log.
      * @param all the buffer of logging events.
      */
-    public Log4JTaskLogs(LinkedList<LoggingEvent> all) {
+    public Log4JTaskLogs(LinkedList<LoggingEvent> all, String jobId) {
         this.allEvents = all;
+        this.loggerName = Log4JTaskLogs.JOB_LOGGER_PREFIX + jobId;
         storeEvents();
     }
 
@@ -150,8 +154,6 @@ public class Log4JTaskLogs implements TaskLogs {
         return logs.toString();
     }
 
-    private static final Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.PREFIX);
-
     /**
      * Restore the compressed byte array in the list of loggingEvent.
      */
@@ -160,12 +162,12 @@ public class Log4JTaskLogs implements TaskLogs {
         if (this.allEvents == null) {
             // restore log4j events
             try {
-                this.allEvents = (LinkedList<LoggingEvent>) ObjectByteConverter.byteArrayToObjectConverter(
+                this.allEvents = (LinkedList<LoggingEvent>) ObjectByteConverter.byteArrayToObject(
                         this.serializedAllEvents, true);
             } catch (Exception e) {
                 //store exception event in logs if we cannot convert
-                LoggingEvent logError = new LoggingEvent("log4j.logger.proactive.scheduler", logger,
-                    Level.INFO, e.getMessage(), e);
+                LoggingEvent logError = new LoggingEvent(loggerName, Logger.getLogger(loggerName),
+                    STDERR_LEVEL, "Cannot restore logging event from byte array : " + e.getMessage(), e);
                 this.allEvents = new LinkedList<LoggingEvent>();
                 this.allEvents.add(logError);
             }
@@ -179,19 +181,18 @@ public class Log4JTaskLogs implements TaskLogs {
     private void storeEvents() {
         if (this.serializedAllEvents == null) {
             try {
-                this.serializedAllEvents = ObjectByteConverter.objectToByteArrayConverter(this.allEvents,
-                        true);
+                this.serializedAllEvents = ObjectByteConverter.objectToByteArray(this.allEvents, true);
             } catch (IOException e) {
                 //create a log4j event with e inside
-                LoggingEvent logError = new LoggingEvent("log4j.logger.proactive.scheduler", logger,
-                    Level.INFO, e.getMessage(), e);
+                LoggingEvent logError = new LoggingEvent(loggerName, Logger.getLogger(loggerName),
+                    STDERR_LEVEL, "Could not convert logging event to byte array : " + e.getMessage(), e);
                 LinkedList<LoggingEvent> errorEvent = new LinkedList<LoggingEvent>();
                 errorEvent.add(logError);
                 try {
-                    this.serializedAllEvents = ObjectByteConverter.objectToByteArrayConverter(this.allEvents,
-                            true);
+                    this.serializedAllEvents = ObjectByteConverter.objectToByteArray(errorEvent, true);
                 } catch (IOException e1) {
-                    logger.warn("Could not convert to serialized events", e1);
+                    ProActiveLogger.getLogger(SchedulerLoggers.PREFIX).error(
+                            "Could not convert to serialized events", e1);
                 }
             }
             this.allEvents = null;
