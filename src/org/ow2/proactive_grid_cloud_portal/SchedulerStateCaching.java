@@ -44,6 +44,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.utils.Sleeper;
 import org.ow2.proactive.authentication.crypto.Credentials;
@@ -143,7 +144,9 @@ public class SchedulerStateCaching {
                 long currentSchedulerStateRevision = scheduler.getSchedulerStateRevision();
                 
                 if (currentSchedulerStateRevision != schedulerRevision) {
-                    revisionAndSchedulerState =   scheduler.getRevisionVersionAndSchedulerState();
+                    Map<AtomicLong, SchedulerState> schedStateTmp =  scheduler.getRevisionVersionAndSchedulerState();
+                    PAFuture.waitFor(schedStateTmp);
+                    revisionAndSchedulerState = schedStateTmp; 
                     Entry<AtomicLong, SchedulerState> tmp = revisionAndSchedulerState.entrySet().iterator().next();
                     localState = tmp.getValue();
                     schedulerRevision = tmp.getKey().longValue();
