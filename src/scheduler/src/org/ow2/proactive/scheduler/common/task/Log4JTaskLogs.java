@@ -36,26 +36,32 @@
  */
 package org.ow2.proactive.scheduler.common.task;
 
+import java.io.IOException;
 import java.util.LinkedList;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Lob;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlTransient;
 
 import org.apache.log4j.Layout;
 import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
 import org.apache.log4j.spi.LoggingEvent;
 import org.hibernate.annotations.AccessType;
-import org.hibernate.annotations.Cascade;
-import org.hibernate.annotations.CascadeType;
 import org.hibernate.annotations.Proxy;
+import org.hibernate.annotations.Type;
 import org.objectweb.proactive.annotation.PublicAPI;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
+import org.ow2.proactive.utils.ObjectByteConverter;
 
 
 /**
@@ -70,6 +76,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
 @Proxy(lazy = false)
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Log4JTaskLogs implements TaskLogs {
+
     @Id
     @GeneratedValue
     @SuppressWarnings("unused")
@@ -101,9 +108,13 @@ public class Log4JTaskLogs implements TaskLogs {
     public static final Level STDERR_LEVEL = Level.ERROR;
 
     /** The logs buffer */
-    @Cascade(CascadeType.ALL)
-    @Column(name = "ALL_EVENTS", columnDefinition = "BLOB")
-    private LinkedList<LoggingEvent> allEvents;
+    @Transient
+    private transient LinkedList<LoggingEvent> allEvents;
+
+    @Column(name = "SERIALIZED_LOG_EVENTS", updatable = false, length = Integer.MAX_VALUE)
+    @Type(type = "org.ow2.proactive.scheduler.core.db.schedulerType.BinaryLargeOBject")
+    @Lob
+    private byte[] serializedAllEvents;
 
     /** New line **/
     private static final String nl = System.getProperty("line.separator");
@@ -118,6 +129,7 @@ public class Log4JTaskLogs implements TaskLogs {
      */
     public Log4JTaskLogs(LinkedList<LoggingEvent> all) {
         this.allEvents = all;
+        storeEvents();
     }
 
     /**
@@ -126,7 +138,8 @@ public class Log4JTaskLogs implements TaskLogs {
      * @see org.ow2.proactive.scheduler.common.task.TaskLogs#getAllLogs(boolean
      *      timeStamp)
      */
-    public String getAllLogs(boolean timeStamp) {
+    public synchronized String getAllLogs(boolean timeStamp) {
+        restoreEvents();
         StringBuffer logs = new StringBuffer(this.allEvents.size());
         Layout l = getTaskLogLayout();
         for (LoggingEvent e : this.allEvents) {
@@ -137,13 +150,60 @@ public class Log4JTaskLogs implements TaskLogs {
         return logs.toString();
     }
 
+    private static final Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.PREFIX);
+
     /**
-     *
-     * 
+     * Restore the compressed byte array in the list of loggingEvent.
+     */
+    @SuppressWarnings("unchecked")
+    private void restoreEvents() {
+        if (this.allEvents == null) {
+            // restore log4j events
+            try {
+                this.allEvents = (LinkedList<LoggingEvent>) ObjectByteConverter.byteArrayToObjectConverter(
+                        this.serializedAllEvents, true);
+            } catch (Exception e) {
+                //store exception event in logs if we cannot convert
+                LoggingEvent logError = new LoggingEvent("log4j.logger.proactive.scheduler", logger,
+                    Level.INFO, e.getMessage(), e);
+                this.allEvents = new LinkedList<LoggingEvent>();
+                this.allEvents.add(logError);
+            }
+            //this.serializedAllEvents = null;
+        }
+    }
+
+    /**
+     * Store the list of loggingEvent in a compressed byte array.
+     */
+    private void storeEvents() {
+        if (this.serializedAllEvents == null) {
+            try {
+                this.serializedAllEvents = ObjectByteConverter.objectToByteArrayConverter(this.allEvents,
+                        true);
+            } catch (IOException e) {
+                //create a log4j event with e inside
+                LoggingEvent logError = new LoggingEvent("log4j.logger.proactive.scheduler", logger,
+                    Level.INFO, e.getMessage(), e);
+                LinkedList<LoggingEvent> errorEvent = new LinkedList<LoggingEvent>();
+                errorEvent.add(logError);
+                try {
+                    this.serializedAllEvents = ObjectByteConverter.objectToByteArrayConverter(this.allEvents,
+                            true);
+                } catch (IOException e1) {
+                    logger.warn("Could not convert to serialized events", e1);
+                }
+            }
+            this.allEvents = null;
+        }
+    }
+
+    /**
      * @see org.ow2.proactive.scheduler.common.task.TaskLogs#getStderrLogs(boolean
      *      timeStamp)
      */
-    public String getStderrLogs(boolean timeStamp) {
+    public synchronized String getStderrLogs(boolean timeStamp) {
+        restoreEvents();
         StringBuffer logs = new StringBuffer();
         Layout l = getTaskLogLayout();
         for (LoggingEvent e : this.allEvents) {
@@ -157,12 +217,11 @@ public class Log4JTaskLogs implements TaskLogs {
     }
 
     /**
-     *
-     * 
      * @see org.ow2.proactive.scheduler.common.task.TaskLogs#getStdoutLogs(boolean
      *      timeStamp)
      */
-    public String getStdoutLogs(boolean timeStamp) {
+    public synchronized String getStdoutLogs(boolean timeStamp) {
+        restoreEvents();
         StringBuffer logs = new StringBuffer();
         Layout l = getTaskLogLayout();
         for (LoggingEvent e : this.allEvents) {
@@ -180,8 +239,14 @@ public class Log4JTaskLogs implements TaskLogs {
      * @return a list containing all the currently logged events
      */
     @SuppressWarnings("unchecked")
-    public LinkedList<LoggingEvent> getAllEvents() {
+    public synchronized LinkedList<LoggingEvent> getAllEvents() {
+        restoreEvents();
         return (LinkedList<LoggingEvent>) allEvents.clone();
+    }
+
+    private void writeObject(java.io.ObjectOutputStream out) throws IOException {
+        storeEvents();
+        out.defaultWriteObject();
     }
 
 }
