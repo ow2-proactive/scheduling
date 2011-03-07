@@ -71,6 +71,7 @@ public class SessionsCleaner implements Runnable {
     public void run() {
         while (!stop) {
             Map<String, SchedulerProxyUserInterface> sessionMap = ssm.getSessionsMap();
+            Map<String, String> usersMap = ssm.getUsernames();
             logger.info("cleaning session started, " + sessionMap.size() + " existing session(s) ");
             int removedSession = 0;
             List<Entry<String, SchedulerProxyUserInterface>> scheduledforRemoval = new ArrayList<Entry<String, SchedulerProxyUserInterface>>();
@@ -104,6 +105,7 @@ public class SessionsCleaner implements Runnable {
                 // effective deletion
                 for (Entry<String, SchedulerProxyUserInterface> entry : scheduledforRemoval) {
                     sessionMap.remove(entry.getKey());
+                    usersMap.remove(entry.getKey());
                 }
                 
             }
