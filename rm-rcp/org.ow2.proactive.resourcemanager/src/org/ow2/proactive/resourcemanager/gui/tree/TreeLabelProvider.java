@@ -110,6 +110,8 @@ public class TreeLabelProvider extends ColumnLabelProvider {
                     return "Node is busy and will be removed at task's end";
                 case DEPLOYING:
                     return "Node deployment has been triggered";
+                case LOCKED:
+                    return "Node is locked";
                 case LOST:
                     return "Node deployment has failed";
             }

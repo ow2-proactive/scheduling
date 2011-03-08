@@ -45,6 +45,8 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.ow2.proactive.resourcemanager.gui.data.RMStore;
 import org.ow2.proactive.resourcemanager.gui.data.model.Node;
 import org.ow2.proactive.resourcemanager.gui.data.model.Selectable;
+import org.ow2.proactive.resourcemanager.gui.handlers.LockNodesHandler;
+import org.ow2.proactive.resourcemanager.gui.handlers.UnlockNodesHandler;
 import org.ow2.proactive.resourcemanager.gui.handlers.RemoveNodesHandler;
 import org.ow2.proactive.resourcemanager.gui.views.NodeInfoView;
 import org.ow2.proactive.resourcemanager.gui.views.ResourceExplorerView;
@@ -63,6 +65,8 @@ public class TableSelectionListener implements ISelectionChangedListener {
             // normally RM is connected if I can select something...
             if (RMStore.isConnected()) {
                 RemoveNodesHandler.getInstance().setSelectedNodes(list);
+                LockNodesHandler.getInstance().setSelectedNodes(list);
+                UnlockNodesHandler.getInstance().setSelectedNodes(list);
             }
 
             if (list.size() > 0) {

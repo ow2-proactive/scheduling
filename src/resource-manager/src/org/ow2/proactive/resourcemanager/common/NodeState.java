@@ -82,9 +82,16 @@ public enum NodeState {
      */
     LOST("Lost"),
     /**
-     * a node thant cannot be provided to a RM user, it is under configuration
+     * a node cannot be provided to a RM user, it is under configuration
      */
-    CONFIGURING("Configuring");
+    CONFIGURING("Configuring"),
+
+    /**
+     * a node state "locked" means that node cannot be used for computations by anyone
+     * and the main difference with busy is that it remains locked after a user disconnects
+     * from the resource manager (busy node becomes free in this case).
+     */
+    LOCKED("Locked");
 
     private String desc;
 
@@ -116,6 +123,8 @@ public enum NodeState {
             return NodeState.LOST;
         else if (value.equals(CONFIGURING.toString()))
             return NodeState.CONFIGURING;
+        else if (value.equals(LOCKED.toString()))
+            return NodeState.LOCKED;
         else
             throw new IllegalArgumentException("'" + value + "' is not a valid NodeState");
     }

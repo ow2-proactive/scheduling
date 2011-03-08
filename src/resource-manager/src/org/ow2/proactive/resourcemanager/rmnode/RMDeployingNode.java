@@ -403,6 +403,20 @@ public final class RMDeployingNode implements RMNode, Serializable {
         throw new UnsupportedOperationException();
     }
 
+    /**
+     * @returns false
+     */
+    public boolean isLocked() {
+        return false;
+    }
+
+    /**
+     * @throws UnsupportedOperationException
+     */
+    public void lock(Client owner) {
+        throw new UnsupportedOperationException();
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -422,6 +436,7 @@ public final class RMDeployingNode implements RMNode, Serializable {
         sb.append("Command : " + this.getCommandLine());
         return sb.toString();
     }
+
 }
 
 /**

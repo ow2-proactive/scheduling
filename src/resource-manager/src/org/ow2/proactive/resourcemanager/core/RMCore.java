@@ -696,24 +696,10 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             RMNode rmnode = this.allNodes.get(nodeUrl);
             logger.debug("Request to remove node " + rmnode);
 
-            NodeSource nodeSource = rmnode.getNodeSource();
-            // in order to remove the node it has to be either
-            // the administrator of the RM (with AllPermissions) or
-            // the administrator of the node source (creator) or
-            // the node provider
-            try {
-                // checking if the caller is an administrator
-                caller.checkPermission(nodeSource.getAdminPermission(), caller +
-                    " is not authorized to remove node " + rmnode.getNodeURL() + " from " +
-                    rmnode.getNodeSourceName());
-            } catch (SecurityException ex) {
-                // the caller is not an administrator, so checking if it is a node provider
-                caller.checkPermission(rmnode.getAdminPermission(), caller +
-                    " is not authorized to remove node " + rmnode.getNodeURL() + " from " +
-                    rmnode.getNodeSourceName());
-            }
+            // checking if the caller is the node administrator
+            isNodeAdministrator(rmnode, caller);
 
-            if (rmnode.isDown() || preempt || rmnode.isFree()) {
+            if (rmnode.isDown() || preempt || rmnode.isFree() || rmnode.isLocked()) {
                 removeNodeFromCoreAndSource(rmnode, caller);
             } else if (rmnode.isBusy() || rmnode.isConfiguring()) {
                 internalSetToRemove(rmnode, caller);
@@ -1447,4 +1433,74 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         }
     }
 
+    /**
+     * Checks if the client is the node admin.
+     *
+     * @param rmnode is a node to be checked
+     * @param client is a client to be checked
+     *
+     * @return true if the client is an admin, SecurityException otherwise
+     */
+    private boolean isNodeAdministrator(RMNode rmnode, Client client) {
+        NodeSource nodeSource = rmnode.getNodeSource();
+        // in order to be the node administrator a client has to be either
+        // an administrator of the RM (with AllPermissions) or
+        // an administrator of the node source (creator) or
+        // a node provider
+        try {
+            // checking if the caller is an administrator
+            caller.checkPermission(nodeSource.getAdminPermission(), caller +
+                " is not authorized to remove node " + rmnode.getNodeURL() + " from " +
+                rmnode.getNodeSourceName());
+        } catch (SecurityException ex) {
+            // the caller is not an administrator, so checking if it is a node provider
+            caller.checkPermission(rmnode.getAdminPermission(), caller +
+                " is not authorized to remove node " + rmnode.getNodeURL() + " from " +
+                rmnode.getNodeSourceName());
+        }
+
+        return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public BooleanWrapper lockNodes(Set<String> urls) {
+        for (String url : urls) {
+            RMNode rmnode = getNodebyUrl(url);
+            if (rmnode.isFree() && isNodeAdministrator(rmnode, caller)) {
+                rmnode.lock(caller);
+                freeNodes.remove(rmnode);
+                this.registerAndEmitNodeEvent(new RMNodeEvent(rmnode, RMEventType.NODE_STATE_CHANGED,
+                    NodeState.FREE, caller.getName()));
+            } else {
+                throw new IllegalArgumentException("Cannot lock the node " + rmnode.getNodeURL() +
+                    " which is not free [ state is " + rmnode.getState() + " ]");
+            }
+        }
+        return new BooleanWrapper(true);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public BooleanWrapper unlockNodes(Set<String> urls) {
+        for (String url : urls) {
+            RMNode rmnode = getNodebyUrl(url);
+            if (rmnode.isLocked() && isNodeAdministrator(rmnode, caller)) {
+                try {
+                    rmnode.setFree();
+                    freeNodes.add(rmnode);
+                } catch (NodeException e) {
+                    throw new RuntimeException(e);
+                }
+                this.registerAndEmitNodeEvent(new RMNodeEvent(rmnode, RMEventType.NODE_STATE_CHANGED,
+                    NodeState.LOCKED, caller.getName()));
+            } else {
+                throw new IllegalArgumentException("Cannot unlock the node " + rmnode.getNodeURL() +
+                    " which is not locked [ state is " + rmnode.getState() + " ]");
+            }
+        }
+        return new BooleanWrapper(true);
+    }
 }

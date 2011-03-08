@@ -41,6 +41,9 @@ import java.io.PrintWriter;
 import java.net.URI;
 import java.security.KeyException;
 import java.security.PublicKey;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
 
 import javax.security.auth.login.LoginException;
 
@@ -335,6 +338,18 @@ public class ResourceManagerController {
         removeNodesOpt.setArgs(Option.UNLIMITED_VALUES);
         actionGroup.addOption(removeNodesOpt);
 
+        Option lockNodesOpt = new Option("locknodes", true, control + "Lock nodes by their URLs");
+        lockNodesOpt.setArgName("node URLs");
+        lockNodesOpt.setRequired(false);
+        lockNodesOpt.setArgs(Option.UNLIMITED_VALUES);
+        actionGroup.addOption(lockNodesOpt);
+
+        Option unlockNodesOpt = new Option("unlocknodes", true, control + "Unlock nodes by their URLs");
+        unlockNodesOpt.setArgName("node URLs");
+        unlockNodesOpt.setRequired(false);
+        unlockNodesOpt.setArgs(Option.UNLIMITED_VALUES);
+        actionGroup.addOption(unlockNodesOpt);
+
         Option createNSOpt = new Option("cn", "createns", true, control + "Create new node sources");
         createNSOpt.setArgName("names");
         createNSOpt.setRequired(false);
@@ -479,6 +494,14 @@ public class ResourceManagerController {
             for (String nUrl : nodesURls) {
                 model.removenode_(nUrl, preempt);
             }
+        } else if (cmd.hasOption("locknodes")) {
+            String[] nodesURls = cmd.getOptionValues("locknodes");
+            List<String> list = Arrays.asList(nodesURls);
+            model.locknodes_(new HashSet<String>(list));
+        } else if (cmd.hasOption("unlocknodes")) {
+            String[] nodesURls = cmd.getOptionValues("unlocknodes");
+            List<String> list = Arrays.asList(nodesURls);
+            model.unlocknodes_(new HashSet<String>(list));
         } else if (cmd.hasOption("createns")) {
 
             String[] nsNames = cmd.getOptionValues("createns");

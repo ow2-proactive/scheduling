@@ -38,6 +38,7 @@ package org.ow2.proactive.resourcemanager.gui.data;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import javax.security.auth.login.LoginException;
 
@@ -162,5 +163,13 @@ public class ResourceManagerProxy implements ResourceManager {
 
     public Topology getTopology() {
         return resourceManager.getTopology();
+    }
+
+    public BooleanWrapper lockNodes(Set<String> nodesUrls) {
+        return resourceManager.lockNodes(nodesUrls);
+    }
+
+    public BooleanWrapper unlockNodes(Set<String> nodesUrls) {
+        return resourceManager.unlockNodes(nodesUrls);
     }
 }

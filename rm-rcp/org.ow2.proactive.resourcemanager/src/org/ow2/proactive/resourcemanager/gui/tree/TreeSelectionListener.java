@@ -49,6 +49,8 @@ import org.ow2.proactive.resourcemanager.gui.data.model.TreeElementType;
 import org.ow2.proactive.resourcemanager.gui.data.model.TreeLeafElement;
 import org.ow2.proactive.resourcemanager.gui.data.model.TreeParentElement;
 import org.ow2.proactive.resourcemanager.gui.handlers.DescribeCommandHandler;
+import org.ow2.proactive.resourcemanager.gui.handlers.LockNodesHandler;
+import org.ow2.proactive.resourcemanager.gui.handlers.UnlockNodesHandler;
 import org.ow2.proactive.resourcemanager.gui.handlers.RemoveNodesHandler;
 import org.ow2.proactive.resourcemanager.gui.views.NodeInfoView;
 import org.ow2.proactive.resourcemanager.gui.views.ResourcesCompactView;
@@ -75,6 +77,8 @@ public class TreeSelectionListener implements ISelectionChangedListener {
         //normally RM is connected if I can select something...
         if (RMStore.isConnected()) {
             RemoveNodesHandler.getInstance().setSelectedNodes(selectionList);
+            LockNodesHandler.getInstance().setSelectedNodes(selectionList);
+            UnlockNodesHandler.getInstance().setSelectedNodes(selectionList);
             DescribeCommandHandler.getInstance().setSelectedNodes(selectionList);
         }
 

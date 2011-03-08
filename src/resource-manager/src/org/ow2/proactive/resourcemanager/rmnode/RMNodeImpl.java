@@ -303,6 +303,19 @@ public class RMNodeImpl implements RMNode, Serializable {
         return this.state == NodeState.CONFIGURING;
     }
 
+    public boolean isLocked() {
+        return this.state == NodeState.LOCKED;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void lock(Client owner) {
+        this.state = NodeState.LOCKED;
+        this.stateChangeTime = System.currentTimeMillis();
+        this.owner = owner;
+    }
+
     /**
      * @return a String showing informations about the node.
      */
@@ -496,4 +509,5 @@ public class RMNodeImpl implements RMNode, Serializable {
     public long getStateChangeTime() {
         return stateChangeTime;
     }
+
 }

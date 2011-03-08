@@ -226,6 +226,11 @@ public interface RMNode extends Comparable<RMNode> {
      */
     public boolean isConfiguring();
 
+    /**
+     * @return true if the node is locked, false otherwise.
+     */
+    public boolean isLocked();
+
     // ---------------------------------------------------------------------//
     // SET
     //----------------------------------------------------------------------//
@@ -258,6 +263,12 @@ public interface RMNode extends Comparable<RMNode> {
      * change the node's status to configuring
      */
     public void setConfiguring(Client owner);
+
+    /**
+     * Changes the node status to locked
+     * @param owner
+     */
+    public void lock(Client owner);
 
     /**
      * Change the {@link NodeSource} from where the node is.

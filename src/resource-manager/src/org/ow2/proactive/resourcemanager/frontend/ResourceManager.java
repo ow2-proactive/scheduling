@@ -38,6 +38,7 @@ package org.ow2.proactive.resourcemanager.frontend;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.node.Node;
@@ -159,6 +160,36 @@ public interface ResourceManager {
      * @return true if the node is removed successfully, false or exception otherwise
      */
     public BooleanWrapper removeNode(String nodeUrl, boolean preempt);
+
+    /**
+     * Locks the set of nodes and makes them not available for others.
+     * The node state "locked" means that node cannot be used for computations by anyone
+     * and the main difference with busy is that it remains locked after a user disconnects
+     * from the resource manager (busy node becomes free in this case).
+     *
+     * Could be called only be node administrator, which is one of the following: rm admin,
+     * node source admin or node provider.
+     *
+     * Only free nodes can be locked.
+     *
+     * @param urls is a set of free nodes
+     * @return true if all the nodes become locked, runtime exception with error otherwise
+     *
+     */
+    public BooleanWrapper lockNodes(Set<String> urls);
+
+    /**
+     * Unlock nodes and makes them free. The specified nodes become
+     * available to other users for computations.
+     *
+     * Could be called only be node administrator, which is one of the following: rm admin,
+     * node source admin or node provider.
+     *
+     * @param urls is a set of nodes to be unlocked
+     *
+     * @return true if all the nodes become free, runtime exception otherwise
+     */
+    public BooleanWrapper unlockNodes(Set<String> urls);
 
     /**
      * Returns true if the node nodeUrl is registered (i.e. known by the RM) and not down.

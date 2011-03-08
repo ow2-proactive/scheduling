@@ -73,6 +73,16 @@ function removens(nodeSourceName,preemptively){
 	return rm_.removens_(nodeSourceName,preemptively);
 }
 
+function locknode(nodeURL){
+    var list = java.util.Collections.singletonList(nodeURL);
+	return rm_.locknodes_(new java.util.HashSet(list));
+}
+
+function unlocknode(nodeURL){
+    var list = java.util.Collections.singletonList(nodeURL);
+	return rm_.unlocknodes_(new java.util.HashSet(list));
+}
+
 function listnodes(){
     return rm_.listnodes_();
 }

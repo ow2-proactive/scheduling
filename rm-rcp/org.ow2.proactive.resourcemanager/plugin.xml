@@ -169,6 +169,20 @@
       </command>
       <command
             categoryId="org.ow2.proactive.resourcemanager.plugin.gui.connectionCategory"
+            defaultHandler="org.ow2.proactive.resourcemanager.gui.handlers.LockNodesHandler"
+            description="Lock nodes command"
+            id="org.ow2.proactive.resourcemanager.plugin.lockNodes"
+            name="Lock nodes">
+      </command>
+      <command
+            categoryId="org.ow2.proactive.resourcemanager.plugin.gui.connectionCategory"
+            defaultHandler="org.ow2.proactive.resourcemanager.gui.handlers.UnlockNodesHandler"
+            description="Release nodes command"
+            id="org.ow2.proactive.resourcemanager.plugin.unlockNodes"
+            name="Unlock nodes">
+      </command>
+      <command
+            categoryId="org.ow2.proactive.resourcemanager.plugin.gui.connectionCategory"
             defaultHandler="org.ow2.proactive.resourcemanager.gui.handlers.DescribeCommandHandler"
             description="Describe node command"
             id="org.ow2.proactive.resourcemanager.plugin.describeCommand"
@@ -223,6 +237,18 @@
                icon="icons/remove_node.png"
                label="Remove nodes"
                tooltip="remove nodes">
+         </command>
+         <command
+               commandId="org.ow2.proactive.resourcemanager.plugin.lockNodes"
+               icon="icons/locked.png"
+               label="Lock nodes"
+               tooltip="Lock nodes">
+         </command>
+         <command
+               commandId="org.ow2.proactive.resourcemanager.plugin.unlockNodes"
+               icon="icons/free.png"
+               label="Unlock nodes"
+               tooltip="Unlock nodes">
          </command>
          <command
                commandId="org.ow2.proactive.resourcemanager.plugin.createNodesource"

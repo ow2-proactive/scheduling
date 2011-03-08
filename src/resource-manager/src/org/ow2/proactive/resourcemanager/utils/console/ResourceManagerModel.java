@@ -45,6 +45,7 @@ import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -123,6 +124,8 @@ public class ResourceManagerModel extends ConsoleModel {
         commands.add(new Command("removens(nsName,preempt)",
             "Remove the given node source (parameter is a string representing the node source name to remove,"
                 + " nodeSource is removed immediately if second parameter is true)"));
+        commands.add(new Command("locknode(nodeURL)", "Locks the node"));
+        commands.add(new Command("unlocknode(nodeURL)", "Unlocks the node"));
         commands.add(new Command("listnodes()", "List every handled nodes"));
         commands.add(new Command("listns()", "List every handled node sources"));
         commands.add(new Command("nodeinfo(nodeURL)", "Displays node informations"));
@@ -693,4 +696,21 @@ public class ResourceManagerModel extends ConsoleModel {
         jmxInfoViewer = info;
     }
 
+    public void locknodes_(HashSet<String> urls) {
+        try {
+            this.rm.lockNodes(urls).getBooleanValue();
+            print("Nodes '" + urls + "' successfully locked");
+        } catch (Exception e) {
+            handleExceptionDisplay("Error while locking nodes", e);
+        }
+    }
+
+    public void unlocknodes_(HashSet<String> urls) {
+        try {
+            this.rm.unlockNodes(urls).getBooleanValue();
+            print("Nodes '" + urls + "' successfully unlocked");
+        } catch (Exception e) {
+            handleExceptionDisplay("Error while unlocking nodes", e);
+        }
+    }
 }

@@ -47,6 +47,8 @@ import org.ow2.proactive.resourcemanager.gui.data.model.Node;
 import org.ow2.proactive.resourcemanager.gui.data.model.Selectable;
 import org.ow2.proactive.resourcemanager.gui.data.model.TreeLeafElement;
 import org.ow2.proactive.resourcemanager.gui.handlers.DescribeCommandHandler;
+import org.ow2.proactive.resourcemanager.gui.handlers.LockNodesHandler;
+import org.ow2.proactive.resourcemanager.gui.handlers.UnlockNodesHandler;
 import org.ow2.proactive.resourcemanager.gui.handlers.RemoveNodesHandler;
 import org.ow2.proactive.resourcemanager.gui.views.NodeInfoView;
 import org.ow2.proactive.resourcemanager.gui.views.ResourceExplorerView;
@@ -217,6 +219,8 @@ public class SelectionManager {
                 }
             }
             RemoveNodesHandler.getInstance().setSelectedNodes(selectedNodes);
+            LockNodesHandler.getInstance().setSelectedNodes(selectedNodes);
+            UnlockNodesHandler.getInstance().setSelectedNodes(selectedNodes);
             DescribeCommandHandler.getInstance().setSelectedNodes(selectedNodes);
         }
     }

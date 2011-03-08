@@ -159,6 +159,7 @@ public class EventsReceiver implements RMEventListener {
                     case DOWN:
                     case TO_BE_REMOVED:
                     case FREE:
+                    case LOCKED:
                         model.changeNodeState(event);
                         break;
                     case DEPLOYING:

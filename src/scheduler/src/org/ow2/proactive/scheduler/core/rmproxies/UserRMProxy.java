@@ -421,4 +421,18 @@ public class UserRMProxy implements ResourceManager, RunActive {
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public BooleanWrapper lockNodes(Set<String> urls) {
+        return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public BooleanWrapper unlockNodes(Set<String> urls) {
+        return null;
+    }
+
 }

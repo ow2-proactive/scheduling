@@ -55,13 +55,15 @@ public class StatsContentProvider implements IStructuredContentProvider {
                     .toString(rmmodel.getConfiguringNodesNumber()));
             StatsItem freeNodesStat = new StatsItem(NodeState.FREE.toString(), Integer.toString(rmmodel
                     .getFreeNodesNumber()));
+            StatsItem lockedNodesStat = new StatsItem(NodeState.LOCKED.toString(), Integer.toString(rmmodel
+                    .getLockedNodesNumber()));
             StatsItem busyNodesStat = new StatsItem(NodeState.BUSY.toString(), Integer.toString(rmmodel
                     .getBusyNodesNumber()));
             StatsItem downNodesStat = new StatsItem(NodeState.DOWN.toString(), Integer.toString(rmmodel
                     .getDownNodesNumber()));
             StatsItem totalNodesStat = new StatsItem("Total", Integer.toString(rmmodel.getTotalNodesNumber()));
             return new StatsItem[] { pendingNodesStat, lostNodesStat, configuringNodesStat, freeNodesStat,
-                    busyNodesStat, downNodesStat, totalNodesStat };
+                    lockedNodesStat, busyNodesStat, downNodesStat, totalNodesStat };
         }
         //should never return this, RMStatsViewer
         return new Object[] {};

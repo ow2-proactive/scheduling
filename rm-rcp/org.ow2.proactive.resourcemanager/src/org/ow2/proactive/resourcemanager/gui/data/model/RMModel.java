@@ -71,6 +71,7 @@ public class RMModel implements Serializable {
     private int freeNodesNumber;
     private int busyNodesNumber;
     private int downNodesNumber;
+    private int lockedNodesNumber;
 
     // For the removing source and add node combo
     private String sourceToRemoveName = "";
@@ -81,6 +82,7 @@ public class RMModel implements Serializable {
         lostNodesNumber = 0;
         configuringNodesNumber = 0;
         freeNodesNumber = 0;
+        lockedNodesNumber = 0;
         busyNodesNumber = 0;
         downNodesNumber = 0;
     }
@@ -97,6 +99,7 @@ public class RMModel implements Serializable {
             switch (nodeEvent.getNodeState()) {
                 //those node states are related to RMNodes
                 case FREE:
+                case LOCKED:
                 case DOWN:
                 case BUSY:
                 case TO_BE_REMOVED:
@@ -189,6 +192,9 @@ public class RMModel implements Serializable {
             case TO_BE_REMOVED:
                 this.busyNodesNumber++;
                 break;
+            case LOCKED:
+                this.lockedNodesNumber++;
+                break;
             case CONFIGURING:
                 this.configuringNodesNumber++;
         }
@@ -207,6 +213,7 @@ public class RMModel implements Serializable {
                 case DOWN:
                 case BUSY:
                 case TO_BE_REMOVED:
+                case LOCKED:
                 case CONFIGURING:
                     this.removeNodeFromModel(nodeEvent);
                     break;
@@ -284,6 +291,9 @@ public class RMModel implements Serializable {
             case DOWN:
                 this.downNodesNumber--;
                 break;
+            case LOCKED:
+                this.lockedNodesNumber--;
+                break;
             case BUSY:
             case TO_BE_REMOVED:
                 this.busyNodesNumber--;
@@ -322,6 +332,9 @@ public class RMModel implements Serializable {
             case FREE:
                 this.freeNodesNumber--;
                 break;
+            case LOCKED:
+                this.lockedNodesNumber--;
+                break;
             case DOWN:
                 this.downNodesNumber--;
                 break;
@@ -336,6 +349,9 @@ public class RMModel implements Serializable {
                 break;
             case FREE:
                 this.freeNodesNumber++;
+                break;
+            case LOCKED:
+                this.lockedNodesNumber++;
                 break;
             case DOWN:
                 this.downNodesNumber++;
@@ -598,6 +614,10 @@ public class RMModel implements Serializable {
         return freeNodesNumber;
     }
 
+    public int getLockedNodesNumber() {
+        return lockedNodesNumber;
+    }
+
     public int getBusyNodesNumber() {
         return busyNodesNumber;
     }
@@ -607,10 +627,11 @@ public class RMModel implements Serializable {
     }
 
     public int getTotalNodesNumber() {
-        return freeNodesNumber + busyNodesNumber + downNodesNumber;
+        return freeNodesNumber + busyNodesNumber + downNodesNumber + lockedNodesNumber;
     }
 
     public void setUpdateViews(boolean updateViews) {
         this.updateViews = updateViews;
     }
+
 }

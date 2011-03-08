@@ -73,6 +73,7 @@ public final class Internal {
     public static final String IMG_FREE = "free.png";
     public static final String IMG_HOST = "host.gif";
     public static final String IMG_DEPLOYING = "deploying.png";
+    public static final String IMG_LOCKED = "locked.png";
     public static final String IMG_LOST = "lost.png";
     public static final String IMG_REMOVENODE = "remove_node.png";
     public static final String IMG_REMOVESOURCE = "remove_source.png";
@@ -105,6 +106,8 @@ public final class Internal {
                 return Activator.getDefault().getImageRegistry().get(Internal.IMG_LOST);
             case DEPLOYING:
                 return Activator.getDefault().getImageRegistry().get(Internal.IMG_DEPLOYING);
+            case LOCKED:
+                return Activator.getDefault().getImageRegistry().get(Internal.IMG_LOCKED);
             default:
                 return Activator.getDefault().getImageRegistry().get(ISharedImages.IMG_OBJS_ERROR_TSK);
         }
