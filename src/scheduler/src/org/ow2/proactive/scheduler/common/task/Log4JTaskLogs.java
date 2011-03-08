@@ -61,6 +61,7 @@ import org.hibernate.annotations.Type;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
+import org.ow2.proactive.utils.Formatter;
 import org.ow2.proactive.utils.ObjectByteConverter;
 
 
@@ -167,7 +168,8 @@ public class Log4JTaskLogs implements TaskLogs {
             } catch (Exception e) {
                 //store exception event in logs if we cannot convert
                 LoggingEvent logError = new LoggingEvent(loggerName, Logger.getLogger(loggerName),
-                    STDERR_LEVEL, "Cannot restore logging event from byte array : " + e.getMessage(), e);
+                    STDERR_LEVEL, "Cannot restore logging event from byte array : " +
+                        Formatter.stackTraceToString(e), e);
                 this.allEvents = new LinkedList<LoggingEvent>();
                 this.allEvents.add(logError);
             }
@@ -185,7 +187,8 @@ public class Log4JTaskLogs implements TaskLogs {
             } catch (IOException e) {
                 //create a log4j event with e inside
                 LoggingEvent logError = new LoggingEvent(loggerName, Logger.getLogger(loggerName),
-                    STDERR_LEVEL, "Could not convert logging event to byte array : " + e.getMessage(), e);
+                    STDERR_LEVEL, "Could not convert logging event to byte array : " +
+                        Formatter.stackTraceToString(e), e);
                 LinkedList<LoggingEvent> errorEvent = new LinkedList<LoggingEvent>();
                 errorEvent.add(logError);
                 try {
