@@ -697,7 +697,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             logger.debug("Request to remove node " + rmnode);
 
             // checking if the caller is the node administrator
-            isNodeAdministrator(rmnode, caller);
+            checkNodeAdminPermission(rmnode, caller);
 
             if (rmnode.isDown() || preempt || rmnode.isFree() || rmnode.isLocked()) {
                 removeNodeFromCoreAndSource(rmnode, caller);
@@ -1441,7 +1441,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      *
      * @return true if the client is an admin, SecurityException otherwise
      */
-    private boolean isNodeAdministrator(RMNode rmnode, Client client) {
+    private boolean checkNodeAdminPermission(RMNode rmnode, Client client) {
         NodeSource nodeSource = rmnode.getNodeSource();
         // in order to be the node administrator a client has to be either
         // an administrator of the RM (with AllPermissions) or
@@ -1468,7 +1468,9 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     public BooleanWrapper lockNodes(Set<String> urls) {
         for (String url : urls) {
             RMNode rmnode = getNodebyUrl(url);
-            if (rmnode.isFree() && isNodeAdministrator(rmnode, caller)) {
+            if (rmnode.isFree()) {
+                // throws a security exception if caller is not an admin
+                checkNodeAdminPermission(rmnode, caller);
                 rmnode.lock(caller);
                 freeNodes.remove(rmnode);
                 this.registerAndEmitNodeEvent(new RMNodeEvent(rmnode, RMEventType.NODE_STATE_CHANGED,
@@ -1487,7 +1489,9 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     public BooleanWrapper unlockNodes(Set<String> urls) {
         for (String url : urls) {
             RMNode rmnode = getNodebyUrl(url);
-            if (rmnode.isLocked() && isNodeAdministrator(rmnode, caller)) {
+            if (rmnode.isLocked()) {
+                // throws a security exception if caller is not an admin
+                checkNodeAdminPermission(rmnode, caller);
                 try {
                     rmnode.setFree();
                     freeNodes.add(rmnode);
