@@ -52,20 +52,24 @@ import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
 
 
 /**
- * 
- * @author acontes
+ * The scheduler disconnects clients that have not performed any operation after
+ * a given period of time.
+ * This class takes care of removing scheduler proxies that have been disconnected
+ * due to a too long inactivity.
  *
  */
-public class SessionsCleaner implements Runnable {
+public class SchedulerSessionsCleaner implements Runnable {
 
     private Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.PREFIX + ".rest.sessioncleaner");
+
+    // run the cleaner every 10 minutes
+    protected int cleanPeriod = 5 * 60 * 1000;
 
     private volatile boolean stop = false;
     private SchedulerSessionMapper ssm;
 
-    public SessionsCleaner(SchedulerSessionMapper ssm) {
+    public SchedulerSessionsCleaner(SchedulerSessionMapper ssm) {
         this.ssm = ssm;
-
     }
 
     public void run() {
@@ -88,7 +92,7 @@ public class SessionsCleaner implements Runnable {
                         connected = s.isConnected();
 
                         // if not connected, removing it from the session map
-                        // to clean 
+                        // to clean
                         if (!connected) {
                             logger.info("session " + entry.getKey() + " is scheduled for deletion, not connected");
                             scheduledforRemoval.add(entry);
@@ -101,17 +105,17 @@ public class SessionsCleaner implements Runnable {
                     }
 
                 }
-                
+
                 // effective deletion
                 for (Entry<String, SchedulerProxyUserInterface> entry : scheduledforRemoval) {
                     sessionMap.remove(entry.getKey());
                     usersMap.remove(entry.getKey());
                 }
-                
+
             }
             // clean every 5 minutes
             logger.info("cleaning session ended, " + removedSession+ " session(s) removed");
-            new Sleeper(5 * 60 * 1000).sleep();
+            new Sleeper(cleanPeriod).sleep();
         }
         logger.info(Thread.currentThread().getName() + " terminated");
     }

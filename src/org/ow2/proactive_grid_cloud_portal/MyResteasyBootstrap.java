@@ -62,7 +62,8 @@ import org.ow2.proactive_grid_cloud_portal.exceptions.NotConnectedExceptionMappe
 public class MyResteasyBootstrap extends ResteasyBootstrap {
 
     private Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.PREFIX + ".rest.webapps");
-    private SessionsCleaner schedulerSessionCleaner;
+    private SchedulerSessionsCleaner schedulerSessionCleaner;
+    private RMSessionsCleaner rmSessionCleaner;
 
     public void contextInitialized(ServletContextEvent event) {
 
@@ -111,9 +112,10 @@ public class MyResteasyBootstrap extends ResteasyBootstrap {
         SchedulerStateCaching.init();
 
         // start the session cleaner
-        schedulerSessionCleaner = new SessionsCleaner(SchedulerSessionMapper.getInstance());
+        schedulerSessionCleaner = new SchedulerSessionsCleaner(SchedulerSessionMapper.getInstance());
         new Thread(this.schedulerSessionCleaner, "Scheduler Sessions Cleaner Thread").start();
-
+        rmSessionCleaner = new RMSessionsCleaner(RMSessionMapper.getInstance());
+        new Thread(this.rmSessionCleaner, "RM Sessions Cleaner Thread").start();
     }
 
     @Override
@@ -145,6 +147,7 @@ public class MyResteasyBootstrap extends ResteasyBootstrap {
         }
 
         schedulerSessionCleaner.stop();
+        rmSessionCleaner.stop();
 
         SchedulerStateCaching.setKill(true);
 

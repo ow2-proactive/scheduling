@@ -83,14 +83,15 @@ import org.ow2.proactive_grid_cloud_portal.common.LoginForm;
 @Path("/rm")
 public class RMRest {
 
-    public RMProxy checkAccess(String sessionId) throws WebApplicationException {
-        RMProxy s = RMSessionMapper.getInstance().getSessionsMap().get(sessionId);
+    public RMCachingProxyInterface checkAccess(String sessionId) throws WebApplicationException {
+        RMCachingProxyInterface s = RMSessionMapper.getInstance().getSessionsMap().get(sessionId);
 
         if (s == null) {
             throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_UNAUTHORIZED)
                     .entity("you are not connected, try to log in first").build());
         }
 
+        RMSessionMapper.getInstance().getSessionsLastAccessToClient().put(sessionId, new Long(System.currentTimeMillis()));
         return s;
     }
 
@@ -111,8 +112,8 @@ public class RMRest {
     public String rmConnect(@FormParam("username") String username, @FormParam("password") String password) throws KeyException, LoginException, RMException, ActiveObjectCreationException, NodeException {
 
 
-            RMProxy rm;
-           rm = PAActiveObject.newActive(RMProxy.class, new Object[] {});
+        RMCachingProxyInterface  rm;
+           rm = PAActiveObject.newActive(RMCachingProxyInterface.class, new Object[] {});
            
             CredData credData = new CredData(CredData.parseLogin(username), CredData.parseDomain(username),
                 password);
@@ -138,7 +139,7 @@ public class RMRest {
             throws ActiveObjectCreationException, NodeException, KeyException, IOException, LoginException,
             RMException {
 
-        RMProxy rm = PAActiveObject.newActive(RMProxy.class, new Object[] {});
+        RMCachingProxyInterface rm = PAActiveObject.newActive(RMCachingProxyInterface.class, new Object[] {});
 
         String url = PortalConfiguration.getProperties().getProperty(PortalConfiguration.rm_url);
 
@@ -179,8 +180,8 @@ public class RMRest {
     @Path("monitoring")
     @Produces("application/json")
     public RMInitialState getInitialState(@HeaderParam("sessionid") String sessionId) {
-        ResourceManager rm = checkAccess(sessionId);
-        return PAFuture.getFutureValue(rm.getMonitoring().getState());
+        RMCachingProxyInterface rm = checkAccess(sessionId);
+        return PAFuture.getFutureValue(rm.getRMInitialState());
     }
 
     /**
@@ -318,6 +319,9 @@ public class RMRest {
      * @param arg0
      * @return
      */
+    @GET
+    @Path("shutdown")
+    @Produces("application/json")
     public boolean shutdown(@HeaderParam("sessionid") String sessionId, boolean preempt) {
         ResourceManager rm = checkAccess(sessionId);
         return rm.shutdown(preempt).getBooleanValue();

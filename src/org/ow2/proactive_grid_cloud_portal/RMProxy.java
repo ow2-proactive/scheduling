@@ -52,6 +52,7 @@ import javax.security.auth.login.LoginException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
+import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.jmx.JMXClientHelper;
@@ -67,11 +68,11 @@ import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
 import org.ow2.proactive.utils.NodeSet;
 
-
+@ActiveObject
 public class RMProxy implements ResourceManager {
 
-    private ResourceManager target;
-    private JMXClientHelper jmxClient;
+    protected ResourceManager target;
+    protected JMXClientHelper jmxClient;
     
 
     public boolean init(String url, CredData credData) throws RMException, KeyException, LoginException {
