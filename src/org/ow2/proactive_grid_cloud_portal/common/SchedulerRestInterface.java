@@ -50,7 +50,6 @@ import javax.ws.rs.DefaultValue;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
-import javax.ws.rs.OPTIONS;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -78,6 +77,7 @@ import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.JobState;
+import org.ow2.proactive.scheduler.common.job.UserIdentification;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive_grid_cloud_portal.PersistentMapConverter;
@@ -638,6 +638,20 @@ public interface SchedulerRestInterface {
             throws ActiveObjectCreationException, NodeException, KeyException, LoginException,
             SchedulerException, IOException;
 
+	/**
+	 * Users currently connected to the scheduler
+	 * 
+	 * @param sessionId the session id associated to this new connection
+	 * @return list of users
+	 * @throws NotConnectedException
+	 * @throws PermissionException
+	 */
+	@GET
+	@Path("users")
+	@Produces("application/json")
+	public List<UserIdentification> getUsers(@HeaderParam("sessionid") final String sessionId)
+			throws NotConnectedException, PermissionException;
+    
     /**
      * returns statistics about the scheduler
      * @param sessionId the session id associated to this new connection
@@ -662,4 +676,6 @@ public interface SchedulerRestInterface {
     public abstract String getStatisticsOnMyAccount(@HeaderParam("sessionid") final String sessionId)
             throws NotConnectedException, PermissionException;
 
+    
+    
 }

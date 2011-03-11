@@ -95,6 +95,7 @@ import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.JobState;
+import org.ow2.proactive.scheduler.common.job.UserIdentification;
 import org.ow2.proactive.scheduler.common.job.factories.JobFactory;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskState;
@@ -1259,6 +1260,38 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         return s.getInfo("ProActiveScheduler:name=MyAccount");
     }
 
+	/**
+	 * Users currently connected to the scheduler
+	 * 
+	 * @param sessionId the session id associated to this new connection\
+	 * @return list of users
+	 * @throws NotConnectedException
+	 * @throws PermissionException
+	 */
+	@GET
+	@Path("users")
+	@Produces("application/json")
+	public List<UserIdentification> getUsers(@HeaderParam("sessionid") final String sessionId)
+			throws NotConnectedException, PermissionException {
+
+		Scheduler s = checkAccess(sessionId, "users");
+		renewLeaseForClient(s);
+		Map<AtomicLong, SchedulerState> stateAndrevision = SchedulerStateCaching
+				.getRevisionAndSchedulerState();
+
+		Entry<AtomicLong, SchedulerState> entry = stateAndrevision.entrySet()
+				.iterator().next();
+		SchedulerState state = entry.getValue();
+
+		ArrayList<UserIdentification> userIds = new ArrayList<UserIdentification>();
+		for (UserIdentification user : state.getUsers().getUsers()) {
+			userIds.add(user);
+		}
+		
+		return userIds;
+	}
+
+    
     /*
      * @GET
      * 
