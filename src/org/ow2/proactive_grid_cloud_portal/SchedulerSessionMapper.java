@@ -77,4 +77,9 @@ public class SchedulerSessionMapper {
     public Map<String, String> getUsernames() {
     	return usernames;
     }
+    
+    public void remove(String key) {
+        sessions.remove(key);
+        usernames.remove(key);
+    }
 }

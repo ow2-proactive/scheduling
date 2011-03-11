@@ -123,8 +123,7 @@ public class RMSessionsCleaner implements Runnable {
 
                 // effective deletion
                 for (Entry<String, RMCachingProxyInterface> entry : scheduledforRemoval) {
-                    sessionMap.remove(entry.getKey());
-                    timestamps.remove(entry.getKey());
+                    rmsm.remove(entry.getKey());
                 }
 
             }

@@ -915,7 +915,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         try {
             s.disconnect();
         } finally {
-            SchedulerSessionMapper.getInstance().getSessionsMap().remove(sessionId);
+            SchedulerSessionMapper.getInstance().remove(sessionId);
             PAActiveObject.terminateActiveObject(s, true);
             logger.debug("sessionid " + sessionId + " terminated");
         }
