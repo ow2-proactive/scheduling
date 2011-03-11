@@ -124,6 +124,20 @@ public class RMRest {
 
 
     }
+    
+    
+    @POST
+    @Path("disconnect")
+    @Produces("application/json")
+    public void rmDisconnect(@HeaderParam("sessionid") String sessionId) {
+        RMCachingProxyInterface rm = checkAccess(sessionId);
+        rm.disconnect();
+        PAActiveObject.terminateActiveObject(rm,true);
+        RMSessionMapper.getInstance().remove(sessionId);
+    }
+
+
+    
 
     /*
      * (non-Javadoc)

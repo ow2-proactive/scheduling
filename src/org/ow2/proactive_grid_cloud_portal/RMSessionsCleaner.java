@@ -78,6 +78,7 @@ public class RMSessionsCleaner implements Runnable {
     public void run() {
         while (!stop) {
             Map<String, RMCachingProxyInterface> sessionMap = rmsm.getSessionsMap();
+            Map<String, Long> timestamps = rmsm.getSessionsLastAccessToClient();
             logger.info("cleaning session started, " + sessionMap.size() + " existing session(s) ");
             int removedSession = 0;
             List<Entry<String, RMCachingProxyInterface>> scheduledforRemoval = new ArrayList<Entry<String, RMCachingProxyInterface>>();
@@ -105,7 +106,8 @@ public class RMSessionsCleaner implements Runnable {
                                 logger.info("RM session " + entry.getKey() +
                                 " is scheduled for deletion, timeout reached");
 
-                                rmproxy.disconnect();
+                                rmproxy.disconnect(); 
+                                
                                 scheduledforRemoval.add(entry);
                                 removedSession++;
                             }
@@ -122,6 +124,7 @@ public class RMSessionsCleaner implements Runnable {
                 // effective deletion
                 for (Entry<String, RMCachingProxyInterface> entry : scheduledforRemoval) {
                     sessionMap.remove(entry.getKey());
+                    timestamps.remove(entry.getKey());
                 }
 
             }

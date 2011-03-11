@@ -67,6 +67,7 @@ public class RMSessionMapper {
     public long add(RMCachingProxyInterface rm) {
         long id = ++currentSessionid;
         sessions.put("" + id, rm);
+        sessionsLastAccessToClient.put("" + id,System.currentTimeMillis());
         return id;
     }
 
@@ -76,5 +77,10 @@ public class RMSessionMapper {
 
     public Map<String, Long> getSessionsLastAccessToClient() {
         return sessionsLastAccessToClient;
+    }
+    
+    public void remove (String key) {
+        sessions.remove(key);
+        sessionsLastAccessToClient.remove(key);
     }
 }

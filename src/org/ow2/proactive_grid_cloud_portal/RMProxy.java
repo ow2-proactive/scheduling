@@ -49,6 +49,7 @@ import javax.management.ObjectName;
 import javax.management.ReflectionException;
 import javax.security.auth.login.LoginException;
 
+import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
@@ -110,7 +111,9 @@ public class RMProxy implements ResourceManager {
     }
 
     public BooleanWrapper disconnect() {
-        return target.disconnect();
+        BooleanWrapper r = target.disconnect();
+        PAActiveObject.terminateActiveObject(true);
+        return r;
     }
 
     public NodeSet getAtMostNodes(int arg0, SelectionScript arg1) {
