@@ -41,7 +41,9 @@ import java.util.Set;
 
 import javax.ws.rs.core.Application;
 
+import org.ow2.proactive_grid_cloud_portal.exceptions.ConnectionExceptionMapper;
 import org.ow2.proactive_grid_cloud_portal.exceptions.IOExceptionMapper;
+import org.ow2.proactive_grid_cloud_portal.exceptions.InternalSchedulerExceptionMapper;
 import org.ow2.proactive_grid_cloud_portal.exceptions.JobAlreadyFinishedExceptionMapper;
 import org.ow2.proactive_grid_cloud_portal.exceptions.JobCreationExceptionMapper;
 import org.ow2.proactive_grid_cloud_portal.exceptions.KeyExceptionMapper;
@@ -68,6 +70,8 @@ public class MyPortalApplication extends Application {
     @Override
     public Set<Class<?>> getClasses() {
         HashSet<Class<?>> set = new HashSet<Class<?>>();
+        set.add(ConnectionExceptionMapper.class);
+        set.add(InternalSchedulerExceptionMapper.class);
         set.add(IOExceptionMapper.class);
         set.add(JobAlreadyFinishedExceptionMapper.class);
         set.add(JobCreationExceptionMapper.class);
