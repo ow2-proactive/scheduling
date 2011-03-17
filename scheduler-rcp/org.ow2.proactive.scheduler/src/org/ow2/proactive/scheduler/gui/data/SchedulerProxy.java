@@ -234,6 +234,41 @@ public class SchedulerProxy implements Scheduler {
         return null;
     }
 
+    public boolean killTask(JobId arg0, String arg1) {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    public boolean preemptTask(JobId arg0, String arg1, int arg2) throws NotConnectedException,
+            UnknownJobException, UnknownTaskException, PermissionException {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    public boolean restartTask(JobId arg0, String arg1, int arg2) throws NotConnectedException,
+            UnknownJobException, UnknownTaskException, PermissionException {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    public boolean killTask(String arg0, String arg1) throws NotConnectedException, UnknownJobException,
+            UnknownTaskException, PermissionException {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    public boolean preemptTask(String arg0, String arg1, int arg2) throws NotConnectedException,
+            UnknownJobException, UnknownTaskException, PermissionException {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    public boolean restartTask(String arg0, String arg1, int arg2) throws NotConnectedException,
+            UnknownJobException, UnknownTaskException, PermissionException {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
     /**
      * {@inheritDoc}
      */

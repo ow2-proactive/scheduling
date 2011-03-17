@@ -169,6 +169,13 @@ public class SchedulerModel extends ConsoleModel {
                 .add(new Command("removejob(id)",
                     "Remove the given job from the Scheduler (parameter is an int or a string representing the jobId)"));
         commands
+                .add(new Command("preempttask(id,taskName[,delay])",
+                    "Stop the given task execution and re-schedules it after the given delay (parameter delay is in second)"));
+        commands
+                .add(new Command("restarttask(id,taskName[,delay])",
+                    "Terminate the given task execution and re-schedules it after the given delay (parameter delay is in second)"));
+        commands.add(new Command("killtask(id,taskName)", "kill the given task"));
+        commands
                 .add(new Command("jobstate(id)",
                     "Get the current state of the given job (parameter is an int or a string representing the jobId)"));
         commands.add(new Command("listjobs()", "Display the list of jobs managed by the scheduler"));
@@ -431,6 +438,70 @@ public class SchedulerModel extends ConsoleModel {
         } catch (Exception e) {
             handleExceptionDisplay("Error on task " + taskName, e);
             return null;
+        }
+    }
+
+    public boolean preemptt_(String jobId, String taskName, String restartDelay) {
+        int rDelay;
+        try {
+            rDelay = Integer.parseInt(restartDelay);
+        } catch (NumberFormatException nfe) {
+            handleExceptionDisplay("Bad value for 3rd argument : 'delay' ", nfe);
+            return false;
+        }
+        try {
+            boolean result = scheduler.preemptTask(jobId, taskName, rDelay);
+
+            if (result) {
+                print("Task " + taskName + " has been stopped, it will be re-scheduled after " +
+                    restartDelay + " sec." + newline);
+            } else {
+                print("Task '" + taskName + "' cannot be stopped, it is probably not running.");
+            }
+            return result;
+        } catch (Exception e) {
+            handleExceptionDisplay("Error on task " + taskName, e);
+            return false;
+        }
+    }
+
+    public boolean restartt_(String jobId, String taskName, String restartDelay) {
+        int rDelay;
+        try {
+            rDelay = Integer.parseInt(restartDelay);
+        } catch (NumberFormatException nfe) {
+            handleExceptionDisplay("Bad value for 3rd argument : 'delay' ", nfe);
+            return false;
+        }
+        try {
+            boolean result = scheduler.restartTask(jobId, taskName, rDelay);
+
+            if (result) {
+                print("Task " + taskName + " has been terminated, it will be re-scheduled after " +
+                    restartDelay + " sec." + newline);
+            } else {
+                print("Task '" + taskName + "' cannot be terminated, it is probably not running.");
+            }
+            return result;
+        } catch (Exception e) {
+            handleExceptionDisplay("Error on task " + taskName, e);
+            return false;
+        }
+    }
+
+    public boolean killt_(String jobId, String taskName) {
+        try {
+            boolean result = scheduler.killTask(jobId, taskName);
+
+            if (result) {
+                print("Task " + taskName + " has been killed." + newline);
+            } else {
+                print("Task '" + taskName + "' cannot be killed, it is probably not running.");
+            }
+            return result;
+        } catch (Exception e) {
+            handleExceptionDisplay("Error on task " + taskName, e);
+            return false;
         }
     }
 

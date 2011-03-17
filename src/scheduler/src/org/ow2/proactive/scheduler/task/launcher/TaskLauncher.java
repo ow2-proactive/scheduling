@@ -518,7 +518,9 @@ public abstract class TaskLauncher implements InitActive {
             this.loggersActivated.set(false);
             //Unhandle loggers
             this.flushStreams();
-            this.logAppender.close();
+            if (this.logAppender != null) {
+                this.logAppender.close();
+            }
             System.setOut(TaskLauncher.SYSTEM_OUT);
             System.setErr(TaskLauncher.SYSTEM_ERR);
             logger_dev.debug("Terminated loggers for task " + this.taskId);

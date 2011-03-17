@@ -1593,6 +1593,30 @@ public abstract class InternalJob extends JobState {
         return jobDataSpaceApplication;
     }
 
+    @Transient
+    private transient Map<String, InternalTask> tasknameITaskMapping = null;
+
+    /**
+     * Return the internal task associated with the given task name for this job.
+     *
+     * @param taskName the task name to find
+     * @return the internal task associated with the given name.
+     * @throws UnknownTaskException if the given taskName does not exist.
+     */
+    public InternalTask getTask(String taskName) throws UnknownTaskException {
+        if (tasknameITaskMapping == null) {
+            tasknameITaskMapping = new HashMap<String, InternalTask>(tasks.size());
+            for (InternalTask it : tasks.values()) {
+                tasknameITaskMapping.put(it.getId().getReadableName(), it);
+            }
+        }
+        if (tasknameITaskMapping.containsKey(taskName)) {
+            return tasknameITaskMapping.get(taskName);
+        } else {
+            throw new UnknownTaskException("'" + taskName + "' does not exist in this job.");
+        }
+    }
+
     //********************************************************************
     //************************* SERIALIZATION ****************************
     //********************************************************************

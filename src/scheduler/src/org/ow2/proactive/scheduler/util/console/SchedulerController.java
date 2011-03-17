@@ -390,6 +390,26 @@ public class SchedulerController {
         opt.setArgs(1);
         actionGroup.addOption(opt);
 
+        opt = new Option("pt", "preempttask", true, control +
+            "Stop the given task and re-schedules it after specified delay.");
+        opt.setArgName("jobId taskName delay");
+        opt.setRequired(false);
+        opt.setArgs(3);
+        actionGroup.addOption(opt);
+
+        opt = new Option("rt", "restarttask", true, control +
+            "Terminate the given task and re-schedules it after specified delay.");
+        opt.setArgName("jobId taskName delay");
+        opt.setRequired(false);
+        opt.setArgs(3);
+        actionGroup.addOption(opt);
+
+        opt = new Option("kt", "killtask", true, control + "Kill the given task.");
+        opt.setArgName("jobId taskName");
+        opt.setRequired(false);
+        opt.setArgs(2);
+        actionGroup.addOption(opt);
+
         opt = new Option("jr", "jobresult", true, control + "Get the result of the given job");
         opt.setArgName("jobId");
         opt.setRequired(false);
@@ -613,6 +633,24 @@ public class SchedulerController {
             model.linkRM_(cmd.getOptionValue("linkrm"));
         } else if (cmd.hasOption("policy")) {
             model.changePolicy_(cmd.getOptionValue("policy"));
+        } else if (cmd.hasOption("preempttask")) {
+            String[] optionValues = cmd.getOptionValues("preempttask");
+            if (optionValues == null || optionValues.length != 3) {
+                model.error("preempttask must have 3 arguments. Start with --help for more informations");
+            }
+            model.preemptt_(optionValues[0], optionValues[1], optionValues[2]);
+        } else if (cmd.hasOption("restarttask")) {
+            String[] optionValues = cmd.getOptionValues("restarttask");
+            if (optionValues == null || optionValues.length != 3) {
+                model.error("restarttask must have 3 arguments. Start with --help for more informations");
+            }
+            model.restartt_(optionValues[0], optionValues[1], optionValues[2]);
+        } else if (cmd.hasOption("killtask")) {
+            String[] optionValues = cmd.getOptionValues("killtask");
+            if (optionValues == null || optionValues.length != 2) {
+                model.error("killtask must have two arguments. Start with --help for more informations");
+            }
+            model.killt_(optionValues[0], optionValues[1]);
         } else {
             return true;
         }

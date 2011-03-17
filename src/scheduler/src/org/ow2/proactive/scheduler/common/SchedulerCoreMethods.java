@@ -86,7 +86,7 @@ public interface SchedulerCoreMethods {
     /**
      * Get the result for the given task name in the given jobId.
      * A user can only get HIS result back.<br>
-     * If the job does not exist, a schedulerException is sent with the proper message.<br>
+     * If the job does not exist, an UnknownJobException is sent with the proper message.<br>
      * So, if you have the right to get the task result that is in the job represented by the given jobId and if the job and task name exist,
      * so you will receive the result. In any other cases a schedulerException will be thrown.<br>
      *
@@ -100,6 +100,76 @@ public interface SchedulerCoreMethods {
      * @throws PermissionException if you can't access to this particular job.
      */
     public TaskResult getTaskResult(JobId jobId, String taskName) throws NotConnectedException,
+            UnknownJobException, UnknownTaskException, PermissionException;
+
+    /**
+     * Try to kill the task with the given task name in the given jobId.
+     * A user can only kill HIS task.<br>
+     * If the job does not exist, an UnknownJobException is sent with the proper message.<br>
+     * So, if you have the right to kill this task and if the job and task name exist and is running,
+     * the task will be killed and this method will return <code>true</code>.<br/>
+     * In any other cases a {@link schedulerException} will be thrown.<br>
+     *
+     * @param jobId the job containing the task to be killed.
+     * @param taskName the name of the task to kill.
+     * @return true if the action to kill the task has succeed,
+     * 			false if the task cannot be killed because it's not running.
+     * @throws NotConnectedException if you are not authenticated.
+     * @throws UnknownJobException if the job does not exist.
+     * @throws UnknownTaskException if this task does not exist in the job.
+     * @throws PermissionException if you can't access to this particular job and task.
+     */
+    public boolean killTask(JobId jobId, String taskName) throws NotConnectedException, UnknownJobException,
+            UnknownTaskException, PermissionException;
+
+    /**
+     * Try to restart the task represented by the given task name in the given jobId.
+     * A user can only restart HIS task.<br>
+     * If the job does not exist, an UnknownJobException is sent with the proper message.<br>
+     * So, if you have the right to restart this task and if the job and task name exist and is running,
+     * the task will be restarted and this method will return <code>true</code>.<br/>
+     * The given delay is the delay between the task termination and it's eligibility to be re-scheduled.
+     * In any other cases a {@link schedulerException} will be thrown.<br><br/>
+     *
+     * After this call, the following situations can occur :
+     * <ul>
+     * 	<li>The task has not yet reached its max number of execution : it will be re-scheduled after delay</li>
+     * 	<li>The task has reached its max number of execution : it becomes faulty</li>
+     * 	<li>The task has reached its max number of execution and is cancelJobOnError : it becomes faulty and the job is terminated</li>
+     * </ul>
+     *
+     * @param jobId the job containing the task to be restarted.
+     * @param taskName the name of the task to restart.
+     * @param restartDelay the delay between the task termination and it's eligibility to be re-scheduled (in sec)
+     * @return true if the action to restart the task has succeed,
+     * 			false if the task cannot be restarted because it's not running.
+     * @throws NotConnectedException if you are not authenticated.
+     * @throws UnknownJobException if the job does not exist.
+     * @throws UnknownTaskException if this task does not exist in the job.
+     * @throws PermissionException if you can't access to this particular job and task.
+     */
+    public boolean restartTask(JobId jobId, String taskName, int restartDelay) throws NotConnectedException,
+            UnknownJobException, UnknownTaskException, PermissionException;
+
+    /**
+     * Try to stop the task execution represented by the given task name in the given jobId.<br/>
+     * If the job does not exist, an UnknownJobException is sent with the proper message.<br>
+     * So, if you have the right to stop this task and if the job and task name exist and is running,
+     * the task will be stopped and restarted later and this method will return <code>true</code>.<br/>
+     * The given delay is the delay between the task termination and it's eligibility to be re-scheduled.
+     * In any other cases a {@link schedulerException} will be thrown.<br><br/>
+     *
+     * @param jobId the job containing the task to be stopped.
+     * @param taskName the name of the task to stop.
+     * @param restartDelay the delay between the task termination and it's eligibility to be re-scheduled (in sec)
+     * @return true if the action to stop the task has succeed,
+     * 			false if the task cannot be stopped because it's not running.
+     * @throws NotConnectedException if you are not authenticated.
+     * @throws UnknownJobException if the job does not exist.
+     * @throws UnknownTaskException if this task does not exist in the job.
+     * @throws PermissionException if you can't access to this particular job and task.
+     */
+    public boolean preemptTask(JobId jobId, String taskName, int restartDelay) throws NotConnectedException,
             UnknownJobException, UnknownTaskException, PermissionException;
 
     /**

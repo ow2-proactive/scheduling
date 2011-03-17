@@ -160,7 +160,7 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
     //@Override
     public void disconnect() throws NotConnectedException, PermissionException {
         if (uischeduler == null)
-            throw new NotConnectedException("Not connected to the schecduler.");
+            throw new NotConnectedException("Not connected to the scheduler.");
 
         uischeduler.disconnect();
 
@@ -185,7 +185,7 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
     //@Override
     public void removeEventListener() throws NotConnectedException, PermissionException {
         if (uischeduler == null) {
-            throw new NotConnectedException("Not connected to the schecduler.");
+            throw new NotConnectedException("Not connected to the scheduler.");
         }
 
         uischeduler.removeEventListener();
@@ -196,7 +196,7 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
     public JobId submit(Job job) throws NotConnectedException, PermissionException,
             SubmissionClosedException, JobCreationException {
         if (uischeduler == null) {
-            throw new NotConnectedException("Not connected to the schecduler.");
+            throw new NotConnectedException("Not connected to the scheduler.");
         }
 
         return uischeduler.submit(job);
@@ -206,7 +206,7 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
     public void changeJobPriority(JobId jobId, JobPriority priority) throws NotConnectedException,
             UnknownJobException, PermissionException, JobAlreadyFinishedException {
         if (uischeduler == null) {
-            throw new NotConnectedException("Not connected to the schecduler.");
+            throw new NotConnectedException("Not connected to the scheduler.");
         }
 
         uischeduler.changeJobPriority(jobId, priority);
@@ -217,7 +217,7 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
     public JobResult getJobResult(String jobId) throws NotConnectedException, PermissionException,
             UnknownJobException {
         if (uischeduler == null) {
-            throw new NotConnectedException("Not connected to the schecduler.");
+            throw new NotConnectedException("Not connected to the scheduler.");
         }
 
         return uischeduler.getJobResult(jobId);
@@ -227,7 +227,7 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
     public JobResult getJobResult(JobId jobId) throws NotConnectedException, PermissionException,
             UnknownJobException {
         if (uischeduler == null) {
-            throw new NotConnectedException("Not connected to the schecduler.");
+            throw new NotConnectedException("Not connected to the scheduler.");
         }
 
         return uischeduler.getJobResult(jobId);
@@ -237,7 +237,7 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
     public TaskResult getTaskResult(String jobId, String taskName) throws NotConnectedException,
             UnknownJobException, UnknownTaskException, PermissionException {
         if (uischeduler == null) {
-            throw new NotConnectedException("Not connected to the schecduler.");
+            throw new NotConnectedException("Not connected to the scheduler.");
         }
 
         return uischeduler.getTaskResult(jobId, taskName);
@@ -247,17 +247,65 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
     public TaskResult getTaskResult(JobId jobId, String taskName) throws NotConnectedException,
             UnknownJobException, UnknownTaskException, PermissionException {
         if (uischeduler == null) {
-            throw new NotConnectedException("Not connected to the schecduler.");
+            throw new NotConnectedException("Not connected to the scheduler.");
         }
 
         return uischeduler.getTaskResult(jobId, taskName);
+    }
+
+    public boolean killTask(JobId jobId, String taskName) throws NotConnectedException, UnknownJobException,
+            UnknownTaskException, PermissionException {
+        if (uischeduler == null) {
+            throw new NotConnectedException("Not connected to the scheduler.");
+        }
+        return uischeduler.killTask(jobId, taskName);
+    }
+
+    public boolean restartTask(JobId jobId, String taskName, int restartDelay) throws NotConnectedException,
+            UnknownJobException, UnknownTaskException, PermissionException {
+        if (uischeduler == null) {
+            throw new NotConnectedException("Not connected to the scheduler.");
+        }
+        return uischeduler.restartTask(jobId, taskName, restartDelay);
+    }
+
+    public boolean preemptTask(JobId jobId, String taskName, int restartDelay) throws NotConnectedException,
+            UnknownJobException, UnknownTaskException, PermissionException {
+        if (uischeduler == null) {
+            throw new NotConnectedException("Not connected to the scheduler.");
+        }
+        return uischeduler.preemptTask(jobId, taskName, restartDelay);
+    }
+
+    public boolean killTask(String jobId, String taskName) throws NotConnectedException, UnknownJobException,
+            UnknownTaskException, PermissionException {
+        if (uischeduler == null) {
+            throw new NotConnectedException("Not connected to the scheduler.");
+        }
+        return uischeduler.killTask(jobId, taskName);
+    }
+
+    public boolean restartTask(String jobId, String taskName, int restartDelay) throws NotConnectedException,
+            UnknownJobException, UnknownTaskException, PermissionException {
+        if (uischeduler == null) {
+            throw new NotConnectedException("Not connected to the scheduler.");
+        }
+        return uischeduler.restartTask(jobId, taskName, restartDelay);
+    }
+
+    public boolean preemptTask(String jobId, String taskName, int restartDelay) throws NotConnectedException,
+            UnknownJobException, UnknownTaskException, PermissionException {
+        if (uischeduler == null) {
+            throw new NotConnectedException("Not connected to the scheduler.");
+        }
+        return uischeduler.preemptTask(jobId, taskName, restartDelay);
     }
 
     //@Override
     public boolean killJob(JobId jobId) throws NotConnectedException, UnknownJobException,
             PermissionException {
         if (uischeduler == null) {
-            throw new NotConnectedException("Not connected to the schecduler.");
+            throw new NotConnectedException("Not connected to the scheduler.");
         }
 
         return uischeduler.killJob(jobId);
@@ -267,7 +315,7 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
     public void listenJobLogs(JobId jobId, AppenderProvider appenderProvider) throws NotConnectedException,
             UnknownJobException, PermissionException {
         if (uischeduler == null) {
-            throw new NotConnectedException("Not connected to the schecduler.");
+            throw new NotConnectedException("Not connected to the scheduler.");
         }
 
         uischeduler.listenJobLogs(jobId, appenderProvider);
@@ -278,7 +326,7 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
     public boolean pauseJob(JobId jobId) throws NotConnectedException, UnknownJobException,
             PermissionException {
         if (uischeduler == null) {
-            throw new NotConnectedException("Not connected to the schecduler.");
+            throw new NotConnectedException("Not connected to the scheduler.");
         }
 
         return uischeduler.pauseJob(jobId);
@@ -289,7 +337,7 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
     public boolean removeJob(JobId jobId) throws NotConnectedException, UnknownJobException,
             PermissionException {
         if (uischeduler == null) {
-            throw new NotConnectedException("Not connected to the schecduler.");
+            throw new NotConnectedException("Not connected to the scheduler.");
         }
 
         return uischeduler.removeJob(jobId);
@@ -425,4 +473,5 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
             return e.getMessage() + ", you are probably not authorized to access to this information.";
         }
     }
+
 }

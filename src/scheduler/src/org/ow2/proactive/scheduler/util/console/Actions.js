@@ -86,6 +86,26 @@ function taskresult(jobId,taskName){
     return s_.tresult_(""+jobId,""+taskName);
 }
 
+function killtask(jobId,taskName){
+    return s_.killt_(""+jobId,""+taskName);
+}
+
+function restarttask(jobId,taskName,delay){
+	if (delay==undefined){
+		println("Default restart delay will be 5 seconds as it is not specified as 3rd argument");
+		delay=5;
+	}
+    return s_.restartt_(""+jobId,""+taskName,""+delay);
+}
+
+function preempttask(jobId,taskName,delay){
+	if (delay==undefined){
+		println("Default restart delay will be 5 seconds as it is not specified as 3rd argument");
+		delay=5;
+	}
+    return s_.preemptt_(""+jobId,""+taskName,""+delay);
+}
+
 function joboutput(jobId){
 	s_.output_(""+jobId);
 }

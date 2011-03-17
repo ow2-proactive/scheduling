@@ -527,6 +527,66 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
     /**
      * {@inheritDoc}
      */
+    @ImmediateService
+    public boolean killTask(JobId jobId, String taskName) throws NotConnectedException, UnknownJobException,
+            UnknownTaskException, PermissionException {
+        //checking permissions
+        checkJobOwner("killTask", jobId, "You do not have permission to kill this task !");
+        return scheduler.killTask(jobId, taskName);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @ImmediateService
+    public boolean killTask(String jobId, String taskName) throws NotConnectedException, UnknownJobException,
+            UnknownTaskException, PermissionException {
+        return killTask(JobIdImpl.makeJobId(jobId), taskName);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @ImmediateService
+    public boolean restartTask(JobId jobId, String taskName, int restartDelay) throws NotConnectedException,
+            UnknownJobException, UnknownTaskException, PermissionException {
+        //checking permissions
+        checkJobOwner("restartTask", jobId, "You do not have permission to restart this task !");
+        return scheduler.restartTask(jobId, taskName, restartDelay);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @ImmediateService
+    public boolean restartTask(String jobId, String taskName, int restartDelay) throws NotConnectedException,
+            UnknownJobException, UnknownTaskException, PermissionException {
+        return restartTask(JobIdImpl.makeJobId(jobId), taskName, restartDelay);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @ImmediateService
+    public boolean preemptTask(JobId jobId, String taskName, int restartDelay) throws NotConnectedException,
+            UnknownJobException, UnknownTaskException, PermissionException {
+        //checking permissions
+        checkJobOwner("preemptTask", jobId, "You do not have permission to preempt this task !");
+        return scheduler.preemptTask(jobId, taskName, restartDelay);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @ImmediateService
+    public boolean preemptTask(String jobId, String taskName, int restartDelay) throws NotConnectedException,
+            UnknownJobException, UnknownTaskException, PermissionException {
+        return preemptTask(JobIdImpl.makeJobId(jobId), taskName, restartDelay);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public boolean removeJob(JobId jobId) throws NotConnectedException, UnknownJobException,
             PermissionException {
 
@@ -1357,4 +1417,5 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
                     notification.getEventType());
         }
     }
+
 }

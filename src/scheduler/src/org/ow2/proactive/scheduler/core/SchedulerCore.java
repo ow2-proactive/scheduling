@@ -91,6 +91,8 @@ import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
 import org.ow2.proactive.scheduler.common.exception.ClassServerException;
 import org.ow2.proactive.scheduler.common.exception.InternalException;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
+import org.ow2.proactive.scheduler.common.exception.TaskAbortedException;
+import org.ow2.proactive.scheduler.common.exception.TaskPreemptedException;
 import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
 import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
 import org.ow2.proactive.scheduler.common.job.JobId;
@@ -1029,10 +1031,26 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
      * This method can be invoke just a little amount of time before the result arrival.
      * That's why it can block the execution but only for short time.
      *
+     * This method is marked as 'internal' because it is called only from node.
+     *
      * @param taskId the identification of the executed task.
      */
     @RunActivityFiltered(id = "internal")
     public void terminate(final TaskId taskId) {
+        terminate(taskId, new TerminateOptions());
+    }
+
+    /**
+     * This method is the generic method to terminate task.<br/>
+     * This method is private and internal access only, must be non-actif call.<br/>
+     *
+     * Can be called through other active object calls and must be called by service thread.
+     * (no immediate service)
+     *
+     * @param taskId the identification of the executed task.
+     * @param terminateOptions the way the task must be terminated
+     */
+    private void terminate(final TaskId taskId, final TerminateOptions terminateOptions) {
         boolean hasBeenReleased = false;
         int nativeIntegerResult = 0;
         JobId jobId = taskId.getJobId();
@@ -1065,7 +1083,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
                     return;
                 }
             } else {
-                logger_dev.error("RunningTasks list was null, This is an abnormal case");
+                logger_dev.warn("RunningTasks list was null, it could be due to a second call to terminate");
                 return;
             }
         }
@@ -1073,23 +1091,37 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
         try {
             //first unload the executable container that we don't need until next execution (if re-execution)
             DatabaseManager.getInstance().unload(descriptor);
-            //The task is terminated but it's possible to have to
-            //wait for the future of the task result (TaskResult).
-            //accessing to the taskResult could block current execution but for a very little time.
-            //it is the time between the end of the task and the arrival of the future from the task.
-            //
-            //check if the task result future has an error due to node death.
-            //if the node has died, a runtimeException is sent instead of the result
-            TaskResult tmp = ((JobResultImpl) job.getJobResult()).getAnyResult(descriptor.getName());
-            //unwrap future
-            TaskResultImpl res = (TaskResultImpl) PAFuture.getFutureValue(tmp);
-            logger_dev.info("Task '" + taskId + "' futur result unwrapped");
-
+            TaskResultImpl res;
+            if (terminateOptions.isNormalTermination()) {
+                //The task is terminated but it's possible to have to
+                //wait for the future of the task result (TaskResult).
+                //accessing to the taskResult could block current execution but for a very little time.
+                //it is the time between the end of the task and the arrival of the future from the task.
+                //
+                //check if the task result future has an error due to node death.
+                //if the node has died, a runtimeException is sent instead of the result
+                TaskResult tmp = ((JobResultImpl) job.getJobResult()).getAnyResult(descriptor.getName());
+                //unwrap future
+                res = (TaskResultImpl) PAFuture.getFutureValue(tmp);
+                logger_dev.info("Task '" + taskId + "' futur result unwrapped");
+            } else {
+                if (terminateOptions.isPreempt()) {
+                    //create fake task result with preempt exception
+                    res = new TaskResultImpl(taskId, new TaskPreemptedException("Preempted by admin"),
+                        new SimpleTaskLogs("", "Preempted by admin"), System.currentTimeMillis() -
+                            descriptor.getStartTime());
+                } else {
+                    //create fake task result with restart exception
+                    res = new TaskResultImpl(taskId, new TaskAbortedException("Aborted by user"),
+                        new SimpleTaskLogs("", "Aborted by user"), System.currentTimeMillis() -
+                            descriptor.getStartTime());
+                }
+            }
             // at this point, the TaskLauncher can be terminated
             threadPoolForTerminateTL.submit(new Runnable() {
                 public void run() {
                     try {
-                        taskLauncher.terminate(true);
+                        taskLauncher.terminate(terminateOptions.isNormalTermination());
                     } catch (Throwable t) {
                         logger_dev.info("Cannot terminate task launcher for task '" + taskId + "'", t);
                     }
@@ -1186,16 +1218,26 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
             if (errorOccurred) {
                 //the task threw an exception OR the result is an error code (1-255)
                 //if the task has to restart
-                descriptor.decreaseNumberOfExecutionLeft();
-                //check the number of execution left and fail the job if it is cancelOnError
-                if (descriptor.getNumberOfExecutionLeft() <= 0 && descriptor.isCancelJobOnError()) {
-                    //if no rerun left, failed the job
-                    endJob(job, descriptor,
-                            "An error occurred in your task and the maximum number of executions has been reached. "
-                                + "You also ask to cancel the job in such a situation !", JobStatus.CANCELED);
-                    return;
+                if (terminateOptions.isNormalRestart()) {
+                    descriptor.decreaseNumberOfExecutionLeft();
                 }
-                if (descriptor.getNumberOfExecutionLeft() > 0) {
+                //check the number of execution left and fail the job if it is cancelOnError
+                if (descriptor.isCancelJobOnError()) {
+                    if (descriptor.getNumberOfExecutionLeft() <= 0) {
+                        //if no rerun left, failed the job
+                        endJob(job, descriptor,
+                                "An error occurred in your task and the maximum number of executions has been reached. "
+                                    + "You also ask to cancel the job in such a situation !",
+                                JobStatus.CANCELED);
+                        return;
+                    } else if (terminateOptions.isKilled()) {
+                        //task is killed, so cancel the job
+                        endJob(job, descriptor, "The task has been manually killed. "
+                            + "You also ask to cancel the job in such a situation !", JobStatus.CANCELED);
+                        return;
+                    }
+                }
+                if (descriptor.getNumberOfExecutionLeft() > 0 && !terminateOptions.isKilled()) {
                     logger_dev.debug("Node Exclusion : restart mode is '" +
                         descriptor.getRestartTaskOnError() + "'");
                     if (descriptor.getRestartTaskOnError().equals(RestartMode.ELSEWHERE)) {
@@ -1211,7 +1253,11 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
                         //cannot get back the node, RM take care about that.
                     }
                     //change status and update GUI
-                    descriptor.setStatus(TaskStatus.WAITING_ON_ERROR);
+                    if (terminateOptions.isPreempt()) {
+                        descriptor.setStatus(TaskStatus.PENDING);
+                    } else {
+                        descriptor.setStatus(TaskStatus.WAITING_ON_ERROR);
+                    }
                     job.newWaitingTask();
 
                     //store this task result in the job result.
@@ -1230,9 +1276,14 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
 
                     //the task is not restarted immediately
                     RestartJobTimerTask jtt = new RestartJobTimerTask(job, descriptor);
-                    restartTaskTimer.schedule(jtt, job.getNextWaitingTime(descriptor
-                            .getMaxNumberOfExecution() -
-                        descriptor.getNumberOfExecutionLeft()));
+                    long nextWaitingTime;
+                    if (terminateOptions.hasDelay()) {
+                        nextWaitingTime = terminateOptions.getDelay() * 1000;
+                    } else {
+                        nextWaitingTime = job.getNextWaitingTime(descriptor.getMaxNumberOfExecution() -
+                            descriptor.getNumberOfExecutionLeft());
+                    }
+                    restartTaskTimer.schedule(jtt, nextWaitingTime);
 
                     return;
                 }
@@ -1657,12 +1708,8 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
      * {@inheritDoc}
      */
     public boolean stop() {
-        if (status == SchedulerStatus.UNLINKED) {
-            return false;
-        }
-
-        if ((status == SchedulerStatus.STOPPED) || (status == SchedulerStatus.SHUTTING_DOWN) ||
-            (status == SchedulerStatus.KILLED)) {
+        if (status == SchedulerStatus.UNLINKED || status == SchedulerStatus.STOPPED ||
+            status == SchedulerStatus.SHUTTING_DOWN || status == SchedulerStatus.KILLED) {
             return false;
         }
 
@@ -1677,11 +1724,8 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
      * {@inheritDoc}
      */
     public boolean pause() {
-        if (status == SchedulerStatus.UNLINKED) {
-            return false;
-        }
-
-        if ((status == SchedulerStatus.SHUTTING_DOWN) || (status == SchedulerStatus.KILLED)) {
+        if (status == SchedulerStatus.UNLINKED || status == SchedulerStatus.SHUTTING_DOWN ||
+            status == SchedulerStatus.KILLED) {
             return false;
         }
 
@@ -1700,11 +1744,8 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
      * {@inheritDoc}
      */
     public boolean freeze() {
-        if (status == SchedulerStatus.UNLINKED) {
-            return false;
-        }
-
-        if ((status == SchedulerStatus.SHUTTING_DOWN) || (status == SchedulerStatus.KILLED)) {
+        if (status == SchedulerStatus.UNLINKED || status == SchedulerStatus.SHUTTING_DOWN ||
+            status == SchedulerStatus.KILLED) {
             return false;
         }
 
@@ -1723,11 +1764,8 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
      * {@inheritDoc}
      */
     public boolean resume() {
-        if (status == SchedulerStatus.UNLINKED) {
-            return false;
-        }
-
-        if ((status == SchedulerStatus.SHUTTING_DOWN) || (status == SchedulerStatus.KILLED)) {
+        if (status == SchedulerStatus.UNLINKED || status == SchedulerStatus.SHUTTING_DOWN ||
+            status == SchedulerStatus.KILLED) {
             return false;
         }
 
@@ -1746,11 +1784,8 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
      * {@inheritDoc}
      */
     public boolean shutdown() {
-        if (status == SchedulerStatus.UNLINKED) {
-            return false;
-        }
-
-        if ((status == SchedulerStatus.KILLED) || (status == SchedulerStatus.SHUTTING_DOWN)) {
+        if (status == SchedulerStatus.UNLINKED || status == SchedulerStatus.KILLED ||
+            status == SchedulerStatus.SHUTTING_DOWN) {
             return false;
         }
 
@@ -1829,11 +1864,8 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
      * {@inheritDoc}
      */
     public boolean pauseJob(JobId jobId) {
-        if (status == SchedulerStatus.UNLINKED) {
-            return false;
-        }
-
-        if ((status == SchedulerStatus.SHUTTING_DOWN) || (status == SchedulerStatus.KILLED)) {
+        if (status == SchedulerStatus.UNLINKED || status == SchedulerStatus.SHUTTING_DOWN ||
+            status == SchedulerStatus.KILLED) {
             return false;
         }
 
@@ -1859,11 +1891,8 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
      * {@inheritDoc}
      */
     public boolean resumeJob(JobId jobId) {
-        if (status == SchedulerStatus.UNLINKED) {
-            return false;
-        }
-
-        if ((status == SchedulerStatus.SHUTTING_DOWN) || (status == SchedulerStatus.KILLED)) {
+        if (status == SchedulerStatus.UNLINKED || status == SchedulerStatus.SHUTTING_DOWN ||
+            status == SchedulerStatus.KILLED) {
             return false;
         }
 
@@ -1889,11 +1918,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
      * {@inheritDoc}
      */
     public synchronized boolean killJob(JobId jobId) {
-        if (status == SchedulerStatus.UNLINKED) {
-            return false;
-        }
-
-        if (status == SchedulerStatus.KILLED) {
+        if (status == SchedulerStatus.UNLINKED || status == SchedulerStatus.KILLED) {
             return false;
         }
 
@@ -1908,6 +1933,61 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
         endJob(job, null, "", JobStatus.KILLED);
 
         return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @RunActivityFiltered(id = "external")
+    public boolean restartTask(JobId jobId, String taskName, int restartDelay) throws UnknownJobException,
+            UnknownTaskException {
+        return killOrRestartTask(jobId, taskName,
+                new TerminateOptions(TerminateOptions.RESTART, restartDelay));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @RunActivityFiltered(id = "external")
+    public boolean preemptTask(JobId jobId, String taskName, int restartDelay) throws UnknownJobException,
+            UnknownTaskException {
+        return killOrRestartTask(jobId, taskName,
+                new TerminateOptions(TerminateOptions.PREEMPT, restartDelay));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @RunActivityFiltered(id = "external")
+    public boolean killTask(JobId jobId, String taskName) throws UnknownJobException, UnknownTaskException {
+        return killOrRestartTask(jobId, taskName, new TerminateOptions(TerminateOptions.KILL));
+    }
+
+    /**
+     * Kill, restart or preempt task factorisation
+     */
+    private boolean killOrRestartTask(JobId jobId, String taskName, TerminateOptions options)
+            throws UnknownJobException, UnknownTaskException {
+        if (status == SchedulerStatus.UNLINKED || status == SchedulerStatus.KILLED) {
+            return false;
+        }
+
+        logger_dev.info("Trying to kill task  '" + taskName + "' for job '" + jobId + "'");
+        InternalJob job = jobs.get(jobId);
+
+        if (job == null) {
+            logger_dev.info("Job '" + jobId + "' does not exist");
+            throw new UnknownJobException(jobId);
+        }
+
+        InternalTask task = job.getTask(taskName);
+
+        if (task.getStatus() == TaskStatus.RUNNING) {
+            this.terminate(task.getId(), options);
+            return true;
+        } else {
+            return false;
+        }
     }
 
     /**
