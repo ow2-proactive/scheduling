@@ -1243,7 +1243,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
         MySchedulerProxyUserInterface scheduler = PAActiveObject.newActive(
                 MySchedulerProxyUserInterface.class, new Object[] {});
-
+        String username = null;
         String url = PortalConfiguration.getProperties().getProperty(PortalConfiguration.scheduler_url);
 
         if (multipart.getCredential() != null) {
@@ -1260,13 +1260,13 @@ public class SchedulerStateRest implements SchedulerRestInterface {
                 throw new LoginException("empty login/password");
             }
 
-
+            username = multipart.getUsername();
             CredData credData = new CredData(CredData.parseLogin(multipart.getUsername()),
                 CredData.parseDomain(multipart.getUsername()), multipart.getPassword(), multipart.getSshKey());
             scheduler.init(url, credData);
         }
 
-        String sessionId = "" + SchedulerSessionMapper.getInstance().add(scheduler, null);
+        String sessionId = "" + SchedulerSessionMapper.getInstance().add(scheduler, username);
         //      logger.info("binding user "+  " to session " + sessionId );
         return sessionId;
 
