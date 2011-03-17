@@ -45,6 +45,7 @@ import java.security.KeyException;
 import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -270,7 +271,46 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
 		if (range != -1 && index != -1) {
 			JobState.setSortingOrder(JobState.DESC_ORDER);
-			Collections.sort(jobs);
+			Collections.sort(jobs, new Comparator<JobState>() {
+				public int compare(JobState o1, JobState o2) {
+					// create 3 sub groups : pending, running, finished, in order
+					// each subgroup is sorted by id
+					int o1i = -1;
+					switch (o1.getStatus()) {
+					case PENDING:
+						o1i = 0;
+						break;
+					case RUNNING:
+					case STALLED:
+						o1i = 1;
+						break;
+					default:
+						o1i = 2;
+						break;
+					}
+
+					int o2i = -1;
+					switch (o2.getStatus()) {
+					case PENDING:
+						o2i = 0;
+						break;
+					case RUNNING:
+					case STALLED:
+						o2i = 1;
+						break;
+					default:
+						o2i = 2;
+						break;
+					}
+
+					if (o1i < o2i)
+						return -1;
+					else if (o2i > o1i)
+						return 1;
+
+					return o1.compareTo(o2);
+				}
+			});
 		}
 
         //filter the result if needed
