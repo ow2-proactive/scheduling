@@ -134,17 +134,24 @@ public interface SchedulerRestInterface {
      * @param index optional, if a sublist has to be returned the index of the sublist
      * @param range optional, if a sublist has to be returned, the range of the sublist
      * @param myJobs fetch only the jobs owned by the user making the request
+     * @param pending fetch pending jobs
+     * @param running fetch running jobs
+     * @param finished fetch finished jobs
      * @return a map containing one entry with the revision id as key and the 
      * list of UserJobInfo as value.
      */
     @GET
     @Path("revisionjobsinfo")
     @Produces({ "application/json", "application/xml" })
-    public abstract Map<AtomicLong, List<UserJobInfo>> revisionAndjobsinfo(
-            @HeaderParam("sessionid") String sessionId, @QueryParam("index") @DefaultValue("-1") int index,
-            @QueryParam("range") @DefaultValue("-1") int range, @QueryParam("myjobs")
-            @DefaultValue("false") boolean myJobs) throws PermissionException,
-            NotConnectedException;
+	public abstract Map<AtomicLong, List<UserJobInfo>> revisionAndjobsinfo(
+			@HeaderParam("sessionid") String sessionId,
+			@QueryParam("index") @DefaultValue("-1") int index,
+			@QueryParam("range") @DefaultValue("-1") int range,
+			@QueryParam("myjobs") @DefaultValue("false") boolean myJobs,
+			@QueryParam("pending") @DefaultValue("true") boolean pending,
+			@QueryParam("running") @DefaultValue("true") boolean running,
+			@QueryParam("finished") @DefaultValue("true") boolean finished)
+			throws PermissionException, NotConnectedException;
 
     /**
      * Returns the state of the scheduler

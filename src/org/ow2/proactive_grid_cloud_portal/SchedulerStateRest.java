@@ -227,17 +227,25 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      * @param sessionId a valid session id
      * @param index optional, if a sublist has to be returned the index of the sublist
      * @param range optional, if a sublist has to be returned, the range of the sublist
+     * @param myJobs fetch only the jobs for the user making the request
+     * @param pending fetch pending jobs
+     * @param running fetch running jobs
+     * @param finished fetch finished jobs
      * @return a map containing one entry with the revision id as key and the
      * list of UserJobInfo as value.
      */
     @GET
     @Path("revisionjobsinfo")
     @Produces({ "application/json", "application/xml" })
-    public Map<AtomicLong, List<UserJobInfo>> revisionAndjobsinfo(@HeaderParam("sessionid") String sessionId,
-            @QueryParam("index") @DefaultValue("-1") int index,
-            @QueryParam("range") @DefaultValue("-1") int range,
-            @QueryParam("myjobs") @DefaultValue("false") boolean myJobs) throws PermissionException,
-            NotConnectedException {
+	public Map<AtomicLong, List<UserJobInfo>> revisionAndjobsinfo(
+			@HeaderParam("sessionid") String sessionId,
+			@QueryParam("index") @DefaultValue("-1") int index,
+			@QueryParam("range") @DefaultValue("-1") int range,
+			@QueryParam("myjobs") @DefaultValue("false") boolean myJobs,
+			@QueryParam("pending") @DefaultValue("true") boolean pending,
+			@QueryParam("running") @DefaultValue("true") boolean running,
+			@QueryParam("finished") @DefaultValue("true") boolean finished)
+			throws PermissionException, NotConnectedException {
         Scheduler s = checkAccess(sessionId, "revisionjobsinfo?index=" + index + "&range=" + range);
         List<JobState> jobs = new ArrayList<JobState>();
         renewLeaseForClient(s);
@@ -251,22 +259,31 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 		String user = SchedulerSessionMapper.getInstance().getUsernames()
 				.get(sessionId);
 		if (myJobs && user != null && user.trim().length() > 0) {
-			for (JobState j : state.getPendingJobs()) {
-				if (j.getOwner().equals(user))
-					jobs.add(j);
+			if (pending) {
+				for (JobState j : state.getPendingJobs()) {
+					if (j.getOwner().equals(user))
+						jobs.add(j);
+				}
 			}
-			for (JobState j : state.getRunningJobs()) {
-				if (j.getOwner().equals(user))
-					jobs.add(j);
+			if (running) {
+				for (JobState j : state.getRunningJobs()) {
+					if (j.getOwner().equals(user))
+						jobs.add(j);
+				}
 			}
-			for (JobState j : state.getFinishedJobs()) {
-				if (j.getOwner().equals(user))
-					jobs.add(j);
+			if (finished) {
+				for (JobState j : state.getFinishedJobs()) {
+					if (j.getOwner().equals(user))
+						jobs.add(j);
+				}
 			}
 		} else {
-			jobs.addAll(state.getPendingJobs());
-			jobs.addAll(state.getRunningJobs());
-			jobs.addAll(state.getFinishedJobs());
+			if (pending)
+				jobs.addAll(state.getPendingJobs());
+			if (running)
+				jobs.addAll(state.getRunningJobs());
+			if (finished)
+				jobs.addAll(state.getFinishedJobs());
 		}
 
 		if (range != -1 && index != -1) {
