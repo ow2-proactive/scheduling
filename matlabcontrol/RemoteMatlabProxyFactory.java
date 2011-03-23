@@ -28,11 +28,15 @@ package matlabcontrol;
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-import java.io.IOException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.UUID;
+import java.util.Vector;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -58,13 +62,9 @@ public class RemoteMatlabProxyFactory {
     private final Vector<MatlabConnectionListener> _listeners = new Vector<MatlabConnectionListener>();
 
     /**
-     * Specified location of MATLAB executable. If none is ever provided then
-     * an OS specific value is used.
+     * The instance of the {@link MatlabProcessCreator} that can spawn the MATLAB process.
      */
-    private final String _matlabLocation;
-
-
-    private final String[] _startupOptions;
+    private final MatlabProcessCreator _matlabCreator;
 
     /**
      * The location of this support code. This location is provided to MATLAB
@@ -113,6 +113,35 @@ public class RemoteMatlabProxyFactory {
     private final ExecutorService _connectionExecutor = Executors.newSingleThreadExecutor();
 
     /**
+     * Constructs this factory with a specified instance of {@link MatlabProcessCreator}.
+     * Typically this will not be necessary and so using the
+     * {@link #RemoteMatlabProxyFactory() the other constructor} will be the
+     * preferred option. If it is invalid then an exception will be thrown
+     * when creating a proxy with {@link #requestProxy()}, {@link #getProxy()},
+     * or {@link #getProxy(long)}.
+     *
+     * @param creator the instance of {@link MatlabProcessCreator} that is in charge 
+     *                of creating the MATLAB process
+     * @throws MatlabConnectionException thrown if the initialization necessary
+     *                                   for connecting to MATLAB cannot be
+     *                                   properly configured
+     */
+    public RemoteMatlabProxyFactory(MatlabProcessCreator creator) throws MatlabConnectionException {
+        
+    	//The matlab process creator
+    	this._matlabCreator = creator;
+    	
+        //Location of where this code is
+        this._supportCodeLocation = Configuration.getSupportCodeLocation();
+
+        //Initialize the registry
+        initRegistry();
+
+        //Bind the receiver to be retrieved from MATLAB
+        this.bindReceiver();
+    }
+    
+    /**
      * Constructs this factory with a specified location or alias for the
      * MATLAB executable. Typically this will not be necessary and so using the
      * {@link #RemoteMatlabProxyFactory() the other constructor} will be the
@@ -123,25 +152,15 @@ public class RemoteMatlabProxyFactory {
      * when creating a proxy with {@link #requestProxy()}, {@link #getProxy()},
      * or {@link #getProxy(long)}.
      *
-     * @param matlabLocation
+     * @param matlabLocation the location of MATLAB
      * @throws MatlabConnectionException thrown if the initialization necessary
      *                                   for connecting to MATLAB cannot be
      *                                   properly configured
      */
     public RemoteMatlabProxyFactory(String matlabLocation) throws MatlabConnectionException {
-        //Store location/alias of the MATLAB executable
-        _matlabLocation = matlabLocation;
-
-        //Location of where this code is
-        _supportCodeLocation = Configuration.getSupportCodeLocation();
-
-        _startupOptions = Configuration.getMatlabStartupOptions();
-
-        //Initialize the registry
-        initRegistry();
-
-        //Bind the receiver to be retrieved from MATLAB
-        this.bindReceiver();
+        
+    	//Use the previous constructor with a default implementation of the MatlabProcessCreator
+    	this( new MatlabProcessCreatorImpl(matlabLocation) );
     }
 
     /**
@@ -243,18 +262,6 @@ public class RemoteMatlabProxyFactory {
     }
 
     /**
-     * Returns the location or alias of the MATLAB program. If no location or
-     * alias was assigned when constructing this factory then the value
-     * returned will be the default which differs depending on the operating
-     * system this code is executing on.
-     *
-     * @return MATLAB location
-     */
-    public String getMatlabLocation() {
-        return _matlabLocation;
-    }
-
-    /**
      * Requests a {@link RemoteMatlabProxy}. When the proxy has been made
      * (there is a possibility it will not be if errors occur), all
      * listeners will be notified. The identifier of the proxy that will be
@@ -269,29 +276,24 @@ public class RemoteMatlabProxyFactory {
      * @see #getProxy(long)
      */
     public String requestProxy() throws MatlabConnectionException {
-        //Unique ID for proxy
-        String proxyID = getRandomValue();
-
+    	//Unique ID for proxy
+    	final String proxyID = getRandomValue();
+    	
         //Argument that MATLAB will run on start.
         //Tells MATLAB to add this code to its classpath, then to call a method which
         //will create a proxy and send it over RMI back to this JVM.
-        String runArg = "javaaddpath '" + _supportCodeLocation + "'; " +
+        final String runArg = "javaaddpath '" + _supportCodeLocation + "'; " +
                 MatlabConnector.class.getName() +
                 ".connectFromMatlab('" + _receiverID + "', '" + proxyID + "');";
-
-        //Attempt to run MATLAB
+    	
+        //Create the MATLAB process that will run the argument
         try {
-            ArrayList<String> commandList = new ArrayList();
-            commandList.add(_matlabLocation);
-            commandList.addAll(Arrays.asList(_startupOptions));
-            commandList.add("-r");
-            commandList.add(runArg);
-
-            String command[] = (String[]) commandList.toArray(new String[commandList.size()]);
-            Runtime.getRuntime().exec(command);
-        } catch (IOException e) {
-            throw new MatlabConnectionException("Could not launch MATLAB. Used location/alias: " + _matlabLocation, e);
-        }
+			this._matlabCreator.createMatlabProcess(runArg);
+		} catch (MatlabConnectionException e) {
+			throw e;
+		} catch (Exception e) {
+			throw new MatlabConnectionException("Unable to create the matlab process",e);
+		}  
 
         return proxyID;
     }
@@ -324,8 +326,9 @@ public class RemoteMatlabProxyFactory {
      * @see #getProxy()
      */
     public RemoteMatlabProxy getProxy(long timeout) throws MatlabConnectionException {
-        String proxyID = this.requestProxy();
 
+    	String proxyID = this.requestProxy();
+    	    	
         //Wait until the controller is received or until timeout
         synchronized (this) {
             try {

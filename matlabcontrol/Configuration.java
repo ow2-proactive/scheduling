@@ -41,10 +41,6 @@ import java.net.URL;
  */
 public class Configuration {
 
-    private static String matlabLocation = null;
-
-    private static String[] startupOptions = null;
-
     private static boolean isOSX() throws MatlabConnectionException {
         return getOperatingSystem().startsWith("Mac OS X");
     }
@@ -79,10 +75,7 @@ public class Configuration {
      *                                   the operating system is not Windows
      *                                   or Linux
      */
-    static String getMatlabLocation() throws MatlabConnectionException {
-
-        if (matlabLocation != null)
-            return matlabLocation;
+    public static String getMatlabLocation() throws MatlabConnectionException {
 
         //Determine the location of MATLAB
         String matlabLoc;
@@ -103,20 +96,6 @@ public class Configuration {
 
         return matlabLoc;
 
-    }
-
-    public static String[] getMatlabStartupOptions() {
-        if (startupOptions != null)
-            return startupOptions;
-        return new String[]{"-desktop"};
-    }
-
-    public static void setMatlabLocation(String path) {
-        matlabLocation = path;
-    }
-
-    public static void setStartupOptions(String[] options) {
-        startupOptions = options;
     }
 
     /**
