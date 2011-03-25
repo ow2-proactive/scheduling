@@ -40,9 +40,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.objectweb.proactive.core.security.crypto.Session;
-import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
-import org.ow2.proactive.scheduler.common.Scheduler;
+import org.objectweb.proactive.api.PAActiveObject;
 
 
 public class RMSessionMapper {
@@ -54,7 +52,7 @@ public class RMSessionMapper {
 
     private RMSessionMapper() {
         sessions = Collections.synchronizedMap(new HashMap<String, RMCachingProxyInterface>());
-        sessionsLastAccessToClient= Collections.synchronizedMap(new HashMap<String, Long>());
+        sessionsLastAccessToClient = Collections.synchronizedMap(new HashMap<String, Long>());
     }
 
     public static synchronized RMSessionMapper getInstance() {
@@ -67,7 +65,7 @@ public class RMSessionMapper {
     public long add(RMCachingProxyInterface rm) {
         long id = ++currentSessionid;
         sessions.put("" + id, rm);
-        sessionsLastAccessToClient.put("" + id,System.currentTimeMillis());
+        sessionsLastAccessToClient.put("" + id, System.currentTimeMillis());
         return id;
     }
 
@@ -79,8 +77,18 @@ public class RMSessionMapper {
         return sessionsLastAccessToClient;
     }
     
-    public void remove (String key) {
-        sessions.remove(key);
+    /**
+     * Remove the proxy associated to the session id <code>key</code>
+     * This method also terminates the active object used as proxy 
+     * @param key the session id
+     */
+    public void remove(String key) {
+        RMCachingProxyInterface proxy = sessions.remove(key);
+        try {
+            PAActiveObject.terminateActiveObject(proxy, true);
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
         sessionsLastAccessToClient.remove(key);
     }
 }

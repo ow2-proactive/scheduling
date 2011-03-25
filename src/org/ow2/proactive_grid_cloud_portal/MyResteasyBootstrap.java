@@ -140,12 +140,26 @@ public class MyResteasyBootstrap extends ResteasyBootstrap {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             } finally {
-                SchedulerSessionMapper.getInstance().getSessionsMap().remove(sessionids[i]);
-                PAActiveObject.terminateActiveObject(s, true);
-                System.out.println("sessionid " + sessionids[i] + "terminated");
+                SchedulerSessionMapper.getInstance().remove(sessionids[i]);
+                System.out.println("Scheduler session id " + sessionids[i] + "terminated");
             }
         }
 
+        sessionids = RMSessionMapper.getInstance().getSessionsMap().keySet()
+        .toArray(new String[] {});
+        for (; i < sessionids.length; i++) {
+            RMCachingProxyInterface s = RMSessionMapper.getInstance().getSessionsMap().get(sessionids[i]);
+            try {
+                s.disconnect();
+            } catch (Throwable e) {
+                e.printStackTrace();
+            } finally {
+                RMSessionMapper.getInstance().remove(sessionids[i]);
+                System.out.println("RM session id " + sessionids[i] + "terminated");
+            }
+        }
+        
+        
         schedulerSessionCleaner.stop();
         rmSessionCleaner.stop();
 

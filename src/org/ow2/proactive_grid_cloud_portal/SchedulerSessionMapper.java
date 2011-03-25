@@ -40,7 +40,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.ow2.proactive.scheduler.common.Scheduler;
+import org.objectweb.proactive.api.PAActiveObject;
 import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
 
 
@@ -78,8 +78,19 @@ public class SchedulerSessionMapper {
     	return usernames;
     }
     
+    /**
+     * Remove the proxy associated to the session id <code>key</code>
+     * This method also terminates the active object used as proxy 
+     * @param key the session id
+     */
     public void remove(String key) {
-        sessions.remove(key);
+        
+        SchedulerProxyUserInterface proxy = sessions.remove(key); 
+        try {
+            PAActiveObject.terminateActiveObject(proxy, true);
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
         usernames.remove(key);
     }
 }
