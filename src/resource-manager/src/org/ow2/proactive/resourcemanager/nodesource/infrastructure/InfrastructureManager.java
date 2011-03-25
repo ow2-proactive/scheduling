@@ -375,8 +375,10 @@ public abstract class InfrastructureManager implements Serializable {
      */
     protected final RMNodeStarter.CommandLineBuilder getDefaultCommandLineBuilder(OperatingSystem targetOS) {
         RMNodeStarter.CommandLineBuilder result = new RMNodeStarter.CommandLineBuilder();
-        result.setJavaPath(System.getenv("JAVA_HOME") != null ? System.getenv("JAVA_HOME") : System
-                .getProperty("java.home"));
+        String javaPath = (System.getenv("JAVA_HOME") != null ? System.getenv("JAVA_HOME") : System
+                .getProperty("java.home")) +
+            targetOS.fs + "bin" + targetOS.fs + "java";
+        result.setJavaPath(javaPath);
         result.setTargetOS(targetOS);
         if (CentralPAPropertyRepository.PA_CONFIGURATION_FILE.isSet()) {
             try {
