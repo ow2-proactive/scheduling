@@ -68,7 +68,7 @@ public class SchedulerStateCaching {
     private static SchedulerState localState;
     private static long schedulerRevision;
     private static int refreshInterval;
-    private static boolean kill = false;
+    private static volatile boolean kill = false;
     private static Thread cachedSchedulerStateThreadUpdater;
     private static Thread leaseRenewerThreadUpdater;
 
@@ -158,12 +158,12 @@ public class SchedulerStateCaching {
             }
         },"State Updater Thread");
         
-        
+        cachedSchedulerStateThreadUpdater.setDaemon(true);
         cachedSchedulerStateThreadUpdater.start();
         
         leaseRenewerThreadUpdater = new Thread(new Runnable() {
             public void run() {
-                if ( scheduler != null) {
+                if (( scheduler != null) && (! kill)) {
                     try {
                         scheduler.getStatus();
                     } catch (Exception e) {
@@ -174,7 +174,7 @@ public class SchedulerStateCaching {
                 new Sleeper(leaseRenewRate).sleep(); 
             }
         });
-        
+        leaseRenewerThreadUpdater.setDaemon(true);
         leaseRenewerThreadUpdater.start();
         
     }
