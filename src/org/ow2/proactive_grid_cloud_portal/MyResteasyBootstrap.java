@@ -113,9 +113,13 @@ public class MyResteasyBootstrap extends ResteasyBootstrap {
 
         // start the session cleaner
         schedulerSessionCleaner = new SchedulerSessionsCleaner(SchedulerSessionMapper.getInstance());
-        new Thread(this.schedulerSessionCleaner, "Scheduler Sessions Cleaner Thread").start();
+        Thread scheduler = new Thread(this.schedulerSessionCleaner, "Scheduler Sessions Cleaner Thread");
+        scheduler.setDaemon(true);
+        scheduler.start();
         rmSessionCleaner = new RMSessionsCleaner(RMSessionMapper.getInstance());
-        new Thread(this.rmSessionCleaner, "RM Sessions Cleaner Thread").start();
+        Thread rm = new Thread(this.rmSessionCleaner, "RM Sessions Cleaner Thread");
+        rm.setDaemon(true);
+        rm.start();
     }
 
     @Override
