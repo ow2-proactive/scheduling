@@ -96,6 +96,15 @@
 				</mediaobject>
 			</figure>
         <para>Please refer to the Matlab Help for a detailed explanation of ProActive Scheduler Toolbox usage.</para>
+        <para>Alternatively you can download the pdf version of this help : <emphasis xlink:href="http://proactive.inria.fr/release-doc/Matlab/ProActiveSchedulerToolbox.pdf">ProActiveSchedulerToolbox.pdf</emphasis></para>
+        <!--<figure xml:id="ProActiveSchedulerToolbox"><info><title>Taskflow job example</title></info>
+				<mediaobject>
+					<textobject>
+						<textdata fileref="files/ProActiveSchedulerToolbox.pdf" />
+					</textobject>
+				</mediaobject>
+			</figure>-->
+
 
     </section>
 
