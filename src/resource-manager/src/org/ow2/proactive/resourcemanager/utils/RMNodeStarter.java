@@ -1200,7 +1200,15 @@ public class RMNodeStarter {
             String libRoot = rmHome + "dist" + this.targetOS.fs + "lib" + this.targetOS.fs;
             StringBuilder sb = new StringBuilder();
             if (this.getJavaPath() != null) {
-                sb.append(this.getJavaPath());
+                String javaPath = this.getJavaPath();
+                if (javaPath.contains(" ")) {
+                    if (this.getTargetOS().equals(OperatingSystem.UNIX)) {
+                        javaPath = javaPath.replace(" ", "\\ ");
+                    } else {
+                        javaPath = "\"" + javaPath + "\"";
+                    }
+                }
+                sb.append(javaPath);
             } else {
                 logger.warn("java path isn't set in RMNodeStarter configuration.");
                 sb.append("java");
