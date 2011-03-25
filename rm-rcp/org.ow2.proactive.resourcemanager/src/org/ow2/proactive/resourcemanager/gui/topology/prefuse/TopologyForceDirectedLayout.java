@@ -38,6 +38,7 @@ package org.ow2.proactive.resourcemanager.gui.topology.prefuse;
 
 import prefuse.action.layout.graph.ForceDirectedLayout;
 import prefuse.util.force.ForceSimulator;
+import prefuse.util.force.SpringForce;
 import prefuse.visual.EdgeItem;
 import prefuse.visual.VisualItem;
 
@@ -121,7 +122,7 @@ public class TopologyForceDirectedLayout extends ForceDirectedLayout {
     protected float getSpringCoefficient(EdgeItem arg0) {
         //		return arg0.getFloat("weight")/10;
         //		forcePanel.get
-        return super.getSpringCoefficient(arg0);
+        return SpringForce.DEFAULT_MIN_SPRING_COEFF;
 
     }
 

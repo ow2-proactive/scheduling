@@ -74,6 +74,7 @@ import javax.swing.event.ChangeListener;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.awt.SWT_AWT;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
@@ -209,7 +210,7 @@ public class TopologyViewer {
      */
     public void init() {
         initComposite();
-        initLayout();
+        //initLayout();
         if (ResourceExplorerView.getTreeViewer() != null) {
             ResourceExplorerView.getTreeViewer().addSelectionChangedListener(new TopologySelectionListener());
         }
@@ -221,14 +222,6 @@ public class TopologyViewer {
     private void initComposite() {
         parent.setLayout(new FillLayout());
         parent.setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_WHITE));
-    }
-
-    /**
-     * Layout initialization. SWT RowLayout is used to automatically control
-     * resizing of the view.
-     */
-    private void initLayout() {
-        loadMatrix();
     }
 
     public void loadMatrix() {
@@ -541,8 +534,8 @@ public class TopologyViewer {
                             // create a new Display that pull from our
                             // Visualization
                             display = new prefuse.Display(visualization);
-                            display.setPreferredSize(new Dimension(parent.getSize().x - 310,
-                                parent.getSize().y));
+                            Rectangle bounds = parent.getBounds();
+                            display.setPreferredSize(new Dimension(bounds.width - 310, bounds.height));
                             display.setHighQuality(true);
                             display.addControlListener(new SelectNodeControl(1)); // select nodes
                             display.addControlListener(new AggregateDragControl()); // drag nodes and clusters
@@ -586,6 +579,7 @@ public class TopologyViewer {
          */
         final JPanel fpanel = new JPanel();
         fpanel.setBackground(Color.WHITE);
+
         fpanel.setLayout(new BoxLayout(fpanel, BoxLayout.Y_AXIS));
         fpanel.setPreferredSize(new Dimension(300, parent.getSize().y));
         fpanel.setMaximumSize(new Dimension(300, parent.getSize().y));
@@ -736,7 +730,6 @@ public class TopologyViewer {
         final JPanel mainPanel = new JPanel(new FlowLayout(FlowLayout.TRAILING));
         mainPanel.add(display);
         mainPanel.add(fpanel);
-
         /*
          * Frame Listeners
          */
@@ -885,6 +878,8 @@ public class TopologyViewer {
     public void setFocus() {
         if (frame != null) {
             frame.requestFocus();
+        } else {
+            loadMatrix();
         }
     }
 
