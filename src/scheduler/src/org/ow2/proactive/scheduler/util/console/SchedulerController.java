@@ -191,7 +191,7 @@ public class SchedulerController {
                 }
 
                 if (cmd.hasOption("credentials")) {
-                    if (cmd.getOptionValues("credentials").length == 1) {
+                    if (cmd.getOptionValue("credentials") != null) {
                         System.setProperty(Credentials.credentialsPathProperty, cmd
                                 .getOptionValue("credentials"));
                     }
