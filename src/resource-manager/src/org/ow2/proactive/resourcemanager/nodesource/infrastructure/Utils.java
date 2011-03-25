@@ -36,8 +36,10 @@
  */
 package org.ow2.proactive.resourcemanager.nodesource.infrastructure;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.InetAddress;
@@ -152,5 +154,63 @@ public class Utils {
         String result = sw.toString();
         pw.close();
         return result;
+    }
+
+    /**
+     * Extracts process errput and returns it
+     * @param p the remote process frow which one errput will be extracted.
+     * @return the remote process' errput
+     */
+    static String extractProcessErrput(Process p) {
+        BufferedReader br = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+        StringBuilder sb = new StringBuilder();
+        String line = null;
+        try {
+            String lf = System.getProperty("line.separator");
+            while (br.ready()) {
+                if ((line = br.readLine()) != null) {
+                    sb.append(line);
+                    sb.append(lf);
+                }
+            }
+        } catch (IOException e) {
+            sb.append("Cannot extract process errput");
+        } finally {
+            try {
+                br.close();
+            } catch (IOException e) {
+                logger.debug("Cannot close process error stream", e);
+            }
+        }
+        return sb.toString();
+    }
+
+    /**
+     * Extracts process output and returns it
+     * @param p the remote process frow which one output will be extracted.
+     * @return the remote process' output
+     */
+    static String extractProcessOutput(Process p) {
+        BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream()));
+        StringBuilder sb = new StringBuilder();
+        String line = null;
+        try {
+            String lf = System.getProperty("line.separator");
+            while (br.ready()) {
+                if ((line = br.readLine()) != null) {
+                    sb.append(line);
+                    sb.append(lf);
+                }
+            }
+        } catch (IOException e) {
+            sb.append("Cannot extract process output");
+        } finally {
+            try {
+                br.close();
+            } catch (IOException e) {
+                logger.debug("Cannot close process output stream", e);
+            }
+        }
+        return sb.toString();
     }
 }

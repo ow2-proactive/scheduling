@@ -40,7 +40,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.security.KeyException;
@@ -333,8 +332,8 @@ public class SSHInfrastructure extends InfrastructureManager {
                 } else {
                     logger.error("Launching node process has exited normally whereas it shouldn't.");
                 }
-                String pOutPut = extractProcessOutput(p);
-                String pErrPut = extractProcessErrput(p);
+                String pOutPut = Utils.extractProcessOutput(p);
+                String pErrPut = Utils.extractProcessErrput(p);
                 final String description = "SSH command failed to launch node on host " + host.getHostName() +
                     lf + "   >Error code: " + exitCode + lf + "   >Errput: " + pErrPut + "   >Output: " +
                     pOutPut;
@@ -510,64 +509,6 @@ public class SSHInfrastructure extends InfrastructureManager {
                 throw new RuntimeException("Unknown host: " + host, ex);
             }
         }
-    }
-
-    /**
-     * Extracts remote process errput and returns it
-     * @param p the remote process frow which one errput will be extracted.
-     * @return the remote process' errput
-     */
-    private String extractProcessErrput(Process p) {
-        BufferedReader br = new BufferedReader(new InputStreamReader(p.getErrorStream()));
-        StringBuilder sb = new StringBuilder();
-        String line = null;
-        try {
-            String lf = System.getProperty("line.separator");
-            while (br.ready()) {
-                if ((line = br.readLine()) != null) {
-                    sb.append(line);
-                    sb.append(lf);
-                }
-            }
-        } catch (IOException e) {
-            sb.append("Cannot extract process errput");
-        } finally {
-            try {
-                br.close();
-            } catch (IOException e) {
-                logger.debug("Cannot close process error stream", e);
-            }
-        }
-        return sb.toString();
-    }
-
-    /**
-     * Extracts remote process output and returns it
-     * @param p the remote process frow which one output will be extracted.
-     * @return the remote process' output
-     */
-    private String extractProcessOutput(Process p) {
-        BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream()));
-        StringBuilder sb = new StringBuilder();
-        String line = null;
-        try {
-            String lf = System.getProperty("line.separator");
-            while (br.ready()) {
-                if ((line = br.readLine()) != null) {
-                    sb.append(line);
-                    sb.append(lf);
-                }
-            }
-        } catch (IOException e) {
-            sb.append("Cannot extract process output");
-        } finally {
-            try {
-                br.close();
-            } catch (IOException e) {
-                logger.debug("Cannot close process output stream", e);
-            }
-        }
-        return sb.toString();
     }
 
     /**
