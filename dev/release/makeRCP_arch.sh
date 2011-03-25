@@ -205,6 +205,9 @@ do
 			mkdir -p $NEW_FILE_DIR/addons
 		fi
 
+		# add extensions directory
+		cp -r $ROOT_DIRECTORY/extensions $NEW_FILE_DIR/
+
 	fi
 
 
