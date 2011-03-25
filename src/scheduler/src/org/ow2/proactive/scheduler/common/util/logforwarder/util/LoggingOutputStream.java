@@ -52,6 +52,11 @@ import org.apache.log4j.Logger;
 public class LoggingOutputStream extends OutputStream {
 
     /**
+     * System dependent line return char(s).
+     */
+    static final byte[] lineSepBytes = System.getProperty("line.separator").getBytes();
+
+    /**
      * The default number of bytes in the buffer. =2048
      */
     public static final int DEFAULT_BUFFER_LENGTH = 2048;
@@ -181,10 +186,18 @@ public class LoggingOutputStream extends OutputStream {
         }
 
         // don't print out blank lines; flushing from PrintStream puts out these
-        if ((count == 1) && (((char) buf[0]) == '\n')) {
-            reset();
-
-            return;
+        if (count == lineSepBytes.length) {
+            boolean isLineSep = true;
+            for (int c = 0; c < lineSepBytes.length; c++) {
+                if (buf[c] != lineSepBytes[c]) {
+                    isLineSep = false;
+                    break;
+                }
+            }
+            if (isLineSep) {
+                reset();
+                return;
+            }
         }
 
         final byte[] theBytes = new byte[count];
