@@ -154,7 +154,7 @@ public abstract class MatSciTask<W extends MatSciWorker, C extends MatSciEngineC
 
     abstract protected String getExtensionName();
 
-    abstract protected MatSciTaskServerConfig getTaskServerConfig();
+    abstract protected MatSciTaskServerConfig getTaskServerConfig() throws Exception;
 
     abstract protected void initPASolveConfig(Map<String, Serializable> args);
 
@@ -445,15 +445,6 @@ public abstract class MatSciTask<W extends MatSciWorker, C extends MatSciEngineC
     protected MatSciJVMInfo firstInit() throws Throwable {
         nodeName = MatSciEngineConfigBase.getNodeName();
 
-        serverConfig = getTaskServerConfig();
-        if (os.equals(OperatingSystem.windows)) {
-            taskCountBeforeJVMRespawn = serverConfig.getTaskCountBeforeJVMRespawnWindows();
-        } else {
-            taskCountBeforeJVMRespawn = serverConfig.getTaskCountBeforeJVMRespawn();
-        }
-
-        MAX_NB_ATTEMPTS = serverConfig.getMaxNbAttempts();
-
         if (paconfig.isDebug()) {
             // system temp dir
             String tmpPath = System.getProperty("java.io.tmpdir");
@@ -470,6 +461,11 @@ public abstract class MatSciTask<W extends MatSciWorker, C extends MatSciEngineC
             }
             outDebug = new PrintStream(new BufferedOutputStream(new FileOutputStream(logFile, true)));
         }
+        serverConfig = getTaskServerConfig();
+
+        MAX_NB_ATTEMPTS = serverConfig.getMaxNbAttempts();
+
+        taskCountBeforeJVMRespawn = serverConfig.getTaskCountBeforeJVMRespawn();
 
         MatSciJVMInfo jvminfo = jvmInfos.get(nodeName);
         if (jvminfo == null) {
@@ -712,8 +708,8 @@ public abstract class MatSciTask<W extends MatSciWorker, C extends MatSciEngineC
             }
 
             // We spawn a new JVM with the library paths
-            helper = new JVMSpawnHelper(paconfig.isDebug(), outDebug, nodeTmpDir, nodeName,
-                getTaskServerConfig().getSemaphoreTimeout(), getTaskServerConfig().getSemaphoreRetryAquire());
+            helper = new JVMSpawnHelper(paconfig.isDebug(), outDebug, nodeTmpDir, nodeName, serverConfig
+                    .getSemaphoreTimeout(), serverConfig.getSemaphoreRetryAquire());
             startingProcess = true;
             Process p = helper.startProcess(getExtensionName(), this, jvminfo);
             jvminfo.setProcess(p);

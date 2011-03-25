@@ -36,7 +36,11 @@
  */
 package org.ow2.proactive.scheduler.ext.matsci.worker.util;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.Serializable;
+import java.util.Properties;
 
 
 /**
@@ -50,22 +54,75 @@ public class MatSciTaskServerConfig implements Serializable {
      * 
      */
     private static final long serialVersionUID = 30L;
+
+    public static String DEPLOY_IO_THREAD = "matsci.deployIOThread";
+
+    public static String TASK_COUNT_JVM_RESPAWN = "matsci.taskcount";
+
+    public static String SEMAPHORE_TIMEOUT = "matsci.semaphore.timeout";
+
+    public static String SEMAPHORE_RETRY = "matsci.semaphore.retry";
+
+    public static String MAX_ATTEMPTS = "matsci.maxattempts";
+
     private boolean deployIoThread;
     private int taskCountBeforeJVMRespawn;
-    private int taskCountBeforeJVMRespawnWindows;
     private long semaphoreTimeout;
     private int semaphoreRetryAquire;
     private int maxNbAttempts;
 
     public MatSciTaskServerConfig(boolean deployIoThread, int taskCountBeforeJVMRespawn,
-            int taskCountBeforeJVMRespawnWindows, long semaphoreTimeout, int semaphoreRetryAquire,
-            int maxNbAttempts) {
+            long semaphoreTimeout, int semaphoreRetryAquire, int maxNbAttempts) {
         this.deployIoThread = deployIoThread;
         this.taskCountBeforeJVMRespawn = taskCountBeforeJVMRespawn;
-        this.taskCountBeforeJVMRespawnWindows = taskCountBeforeJVMRespawnWindows;
         this.semaphoreTimeout = semaphoreTimeout;
         this.semaphoreRetryAquire = semaphoreRetryAquire;
         this.maxNbAttempts = maxNbAttempts;
+    }
+
+    public static MatSciTaskServerConfig load(File filepath) throws IOException {
+        Properties p = new Properties();
+        p.load(new FileInputStream(filepath));
+        boolean deployIoThread;
+        try {
+            deployIoThread = Boolean.parseBoolean(p.getProperty(DEPLOY_IO_THREAD));
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Error while reading property " + DEPLOY_IO_THREAD + " : " +
+                p.getProperty(DEPLOY_IO_THREAD));
+        }
+        int taskCountBeforeJVMRespawn;
+        try {
+            taskCountBeforeJVMRespawn = Integer.parseInt(p.getProperty(TASK_COUNT_JVM_RESPAWN));
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Error while reading property " + TASK_COUNT_JVM_RESPAWN +
+                " : " + p.getProperty(TASK_COUNT_JVM_RESPAWN));
+        }
+        long semaphoreTimeout;
+        try {
+            semaphoreTimeout = Long.parseLong(p.getProperty(SEMAPHORE_TIMEOUT));
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Error while reading property " + SEMAPHORE_TIMEOUT + " : " +
+                p.getProperty(SEMAPHORE_TIMEOUT));
+        }
+        int semaphoreRetryAquire;
+        try {
+            semaphoreRetryAquire = Integer.parseInt(p.getProperty(SEMAPHORE_RETRY));
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Error while reading property " + SEMAPHORE_RETRY + " : " +
+                p.getProperty(SEMAPHORE_RETRY));
+        }
+        int maxNbAttempts;
+        try {
+            maxNbAttempts = Integer.parseInt(p.getProperty(MAX_ATTEMPTS));
+
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Error while reading property " + MAX_ATTEMPTS + " : " +
+                p.getProperty(MAX_ATTEMPTS));
+        }
+
+        return new MatSciTaskServerConfig(deployIoThread, taskCountBeforeJVMRespawn, semaphoreTimeout,
+            semaphoreRetryAquire, maxNbAttempts);
+
     }
 
     public boolean isDeployIoThread() {
@@ -74,10 +131,6 @@ public class MatSciTaskServerConfig implements Serializable {
 
     public int getTaskCountBeforeJVMRespawn() {
         return taskCountBeforeJVMRespawn;
-    }
-
-    public int getTaskCountBeforeJVMRespawnWindows() {
-        return taskCountBeforeJVMRespawnWindows;
     }
 
     public long getSemaphoreTimeout() {
