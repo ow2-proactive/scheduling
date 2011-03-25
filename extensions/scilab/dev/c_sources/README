@@ -1,0 +1,61 @@
+ProActive Scheduler's Scilab extension installing guide.
+
+Before being able to use the extension and run Scilab scripts on the scheduler, please follow these installations steps.
+
+---------------------------------------------  SCILAB --------------------------------------------------
+For every machines that you will be using:
+
+STEP 1:
+
+You have 3 options for installing Scilab and make it work with ProActive, if you are in a 64 bits architecture only the first option will work :
+
+1) BINARY installation from Scilab 4.1.2:
+If you're machine is a 32 bit Linux or Windows, download Scilab 4.1.2 or above BINARY Version
+
+Important : The Scilab Java interface doesn't work properly in 64 bits mode. But you can still use it on a 64 bits-architecture in 32 bits-mode.
+
+	In order to do that use the 4.1.2 BINARY version or compile a source version on a similar 32 bit similar OS distribution.
+
+2) SOURCE installation from Scilab 4.1.2:
+If you want to compile the library from a source version :
+
+	Download Scilab 4.1.2 SOURCE Version.
+
+	make binaries of Scilab (procedure is explained  in SCILAB/Readme_Linux or SCILAB/Readme_Windows)
+
+	After the build, make sure that you find libjavasci.so or javasci.dll in the SCILAB/bin directory
+
+3) SOURCE installation from Scilab 4.1 or Scilab 4.1.1:
+If you can't have access to Scilab 4.1.2 or want to use an earlier version, download Scilab SOURCE version 4.1 or 4.1.1 (lower versions are not supported)
+
+copy javasci_Scilab2.h and javasci_Scilab2.c from folder c_sources to SCILAB/routines/Javasci/
+
+make binaries of Scilab (procedure is explained  in SCILAB/Readme_Linux or SCILAB/Readme_Windows)
+
+After the build, make sure that you find libjavasci.so or javasci.dll in the SCILAB/bin directory
+
+STEP 2:
+After you install Scilab, you need to install it into your PATH.
+
+In Windows systems, this will be done automatically by the Scilab installer.
+
+Under linux, wou will have to run the following command on the Scilab directory after STEP 1:
+
+> make install
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
