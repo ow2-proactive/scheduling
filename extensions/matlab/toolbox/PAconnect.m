@@ -119,7 +119,7 @@ disp('Login succesful');
 opt = PAoptions();
 reconnected = false;
 if exist(opt.DisconnectedModeFile,'file')
-
+    errorreconnecting = false;
     if isnumeric(opt.CustomDataspaceURL) && isempty(opt.CustomDataspaceURL)
         try
             load(opt.DisconnectedModeFile, 'registryurl');
@@ -135,26 +135,33 @@ if exist(opt.DisconnectedModeFile,'file')
             if exist(opt.DisconnectedModeFile,'file')
                 delete(opt.DisconnectedModeFile);
             end
-            return;
+            errorreconnecting = true;
         end
     end
-    reconnected = true;
-    try
-        sched = PAScheduler;
-        sched.PATaskRepository('load');
-        jobs = sched.PATaskRepository('uncomplete');
-        if length(jobs) > 0
-            str='';
-            for i=1:length(jobs)
-                str = [ str ' ' jobs{i}];
+    if errorreconnecting
+        reconnected = false;
+    else
+        reconnected = true;
+    end
+
+    if ~errorreconnecting
+        try
+            sched = PAScheduler;
+            sched.PATaskRepository('load');
+            jobs = sched.PATaskRepository('uncomplete');
+            if length(jobs) > 0
+                str='';
+                for i=1:length(jobs)
+                    str = [ str ' ' jobs{i}];
+                end
+                disp(['The following jobs were uncomplete before last matlab shutdown : ' str ]);
             end
-            disp(['The following jobs were uncomplete before last matlab shutdown : ' str ]);
-        end
-    catch ME
-        disp('There was a problem retrieving previous jobs.');
-        disp(getReport(ME));
-        if exist(opt.DisconnectedModeFile,'file')
-            delete(opt.DisconnectedModeFile);
+        catch ME
+            disp('There was a problem retrieving previous jobs.');
+            disp(getReport(ME));
+            if exist(opt.DisconnectedModeFile,'file')
+                delete(opt.DisconnectedModeFile);
+            end
         end
     end
 
