@@ -46,8 +46,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 import java.util.Map.Entry;
+import java.util.TreeMap;
 
 import javax.persistence.Column;
 import javax.persistence.FetchType;
@@ -512,7 +512,7 @@ public abstract class InternalJob extends JobState {
         logger_dev.debug(" ");
         setNumberOfPendingTasks(getNumberOfPendingTasks() + 1);
         setNumberOfRunningTasks(getNumberOfRunningTasks() - 1);
-        if (getNumberOfRunningTasks() == 0) {
+        if (getNumberOfRunningTasks() == 0 && getStatus() != JobStatus.PAUSED) {
             setStatus(JobStatus.STALLED);
         }
     }
@@ -1246,7 +1246,7 @@ public abstract class InternalJob extends JobState {
 
         for (InternalTask td : tasks.values()) {
             if ((td.getStatus() != TaskStatus.FINISHED) && (td.getStatus() != TaskStatus.RUNNING) &&
-                (td.getStatus() != TaskStatus.SKIPPED)) {
+                (td.getStatus() != TaskStatus.SKIPPED) && (td.getStatus() != TaskStatus.FAULTY)) {
                 td.setStatus(TaskStatus.PAUSED);
             }
 
@@ -1288,7 +1288,7 @@ public abstract class InternalJob extends JobState {
             } else if ((jobInfo.getStatus() == JobStatus.RUNNING) ||
                 (jobInfo.getStatus() == JobStatus.STALLED)) {
                 if ((td.getStatus() != TaskStatus.FINISHED) && (td.getStatus() != TaskStatus.RUNNING) &&
-                    (td.getStatus() != TaskStatus.SKIPPED)) {
+                    (td.getStatus() != TaskStatus.SKIPPED) && (td.getStatus() != TaskStatus.FAULTY)) {
                     td.setStatus(TaskStatus.PENDING);
                 }
             }
