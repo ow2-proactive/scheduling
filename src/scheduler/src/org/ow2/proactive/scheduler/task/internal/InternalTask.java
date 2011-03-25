@@ -45,12 +45,10 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -282,7 +280,7 @@ public abstract class InternalTask extends TaskState {
         replicatedTask.taskInfo = new TaskInfoImpl();
         replicatedTask.taskInfo.setTaskId(repId); // we only need this id for the HashSet comparisons...
 
-        HashSet<Object> acc = new HashSet<Object>();
+        ArrayList<Object> acc = new ArrayList<Object>();
         acc.add(replicatedTask);
         try {
             // serialization copied everything, including hibernate ids
@@ -291,6 +289,15 @@ public abstract class InternalTask extends TaskState {
         } catch (Throwable e1) {
             throw new ExecutableCreationException("Failed to reset hibernate ids in replica", e1);
         }
+
+        /* uncomment this to have a close look at the serialized graph
+         * you will need to add some jars (http://xstream.codehaus.org/) to the classpath
+        XStream x = new XStream();
+        String sx = x.toXML(replicatedTask);
+        System.out.println("----------");
+        System.out.println(sx);
+        System.out.println("----------");
+         */
 
         try {
             DatabaseManager.getInstance().register(replicatedTask);
@@ -315,7 +322,7 @@ public abstract class InternalTask extends TaskState {
      * @throws IllegalArgumentException
      * @throws IllegalAccessException
      */
-    void resetIds(Object obj, Set<Object> acc) throws IllegalArgumentException, IllegalAccessException {
+    void resetIds(Object obj, List<Object> acc) throws IllegalArgumentException, IllegalAccessException {
 
         if (obj == null)
             return;
@@ -340,7 +347,14 @@ public abstract class InternalTask extends TaskState {
 
             Object value = f.get(obj);
 
-            boolean contains = acc.contains(value);
+            //boolean contains = acc.contains(value);
+            boolean contains = false;
+            for (Object o : acc) {
+                if (o == value) {
+                    contains = true;
+                    break;
+                }
+            }
 
             if (contains) {
                 continue;
