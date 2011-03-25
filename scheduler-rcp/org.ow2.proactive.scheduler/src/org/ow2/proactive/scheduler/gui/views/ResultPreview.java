@@ -36,10 +36,21 @@
  */
 package org.ow2.proactive.scheduler.gui.views;
 
+import java.awt.Component;
 import java.awt.Frame;
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.swt.SWT;
@@ -99,7 +110,61 @@ public class ResultPreview extends ViewPart {
         if (tbd != toBeDisplayed) {
             toBeDisplayed = tbd;
             container.removeAll();
+
+            // If the tbd contains a child text area its contents will copied to the clipboard
+            // from right click->"Copy to Clipboard" context menu on the component
+            for (final Component c : tbd.getComponents()) {
+                if (c instanceof JTextArea) {
+                    final String text = ((JTextArea) c).getText();
+                    if ("".equals(text)) {
+                        return;
+                    }
+
+                    // Create the popup menu
+                    final JPopupMenu popup = new JPopupMenu();
+                    final JMenuItem menuItem = new JMenuItem("Copy to Clipboard");
+                    menuItem.addActionListener(new ActionListener() {
+                        public void actionPerformed(final ActionEvent e) {
+                            StringSelection data = new StringSelection(text);
+                            Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+                            clipboard.setContents(data, data);
+                        }
+                    });
+                    popup.add(menuItem);
+
+                    // Add listener to the text area so the popup menu can come up
+                    c.addMouseListener(new MouseListener() {
+                        public void mousePressed(final MouseEvent e) {
+                            maybeShowPopup(e);
+                        }
+
+                        public void mouseReleased(final MouseEvent e) {
+                            maybeShowPopup(e);
+                        }
+
+                        private void maybeShowPopup(final MouseEvent e) {
+                            if (e.isPopupTrigger()) {
+                                popup.show(e.getComponent(), e.getX(), e.getY());
+                            }
+                        }
+
+                        public void mouseExited(MouseEvent e) {
+                        }
+
+                        public void mouseEntered(MouseEvent e) {
+                        }
+
+                        public void mouseClicked(MouseEvent e) {
+                        }
+                    });
+
+                    // exit the loop
+                    break;
+                }
+            }
+
             scrollableContainer = new JScrollPane(toBeDisplayed);
+
             container.add(scrollableContainer);
             toBeDisplayed.revalidate();
         }
