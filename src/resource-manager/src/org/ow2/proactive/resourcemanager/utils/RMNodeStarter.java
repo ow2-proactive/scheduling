@@ -1244,7 +1244,7 @@ public class RMNodeStarter {
             }
 
             // add the content of addons dir on the classpath
-            sb.append(this.targetOS.ps + rmHome + addonsDir + this.targetOS.fs);
+            sb.append(this.targetOS.ps + rmHome + addonsDir);
 
             if (this.getTargetOS().equals(OperatingSystem.CYGWIN) ||
                 this.getTargetOS().equals(OperatingSystem.WINDOWS)) {
