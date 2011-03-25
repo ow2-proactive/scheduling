@@ -204,7 +204,8 @@ class ReserveMatlab
               lastregfile.flock(File::LOCK_EX)
               regCommandArray = Array.new
               regCommandArray << @conf.get_matlab_home() + @sep + @conf.get_matlab_bin_dir + @sep + @conf.get_matlab_command_name
-              regCommandArray << "/regserver"
+              regCommandArray << "-nojvm"
+              regCommandArray << "-regserver"
               regCommandArray << "-r"
               regCommandArray << %q!fid = fopen('!+testF2.getAbsolutePath()+%q!','w');fclose(fid);exit();!
               puts regCommandArray
@@ -234,8 +235,8 @@ class ReserveMatlab
 
 
         commandArray << @conf.get_matlab_home() + @sep + @conf.get_matlab_bin_dir + @sep + @conf.get_matlab_command_name
-        commandArray << "/MLAutomation"
-        commandArray << "-Embedding"
+        commandArray << "-nojvm"
+        commandArray << "-automation"
         commandArray << "-r"
       when :linux
         commandArray << @conf.get_matlab_home() + @sep + @conf.get_matlab_bin_dir + @sep + @conf.get_matlab_command_name
