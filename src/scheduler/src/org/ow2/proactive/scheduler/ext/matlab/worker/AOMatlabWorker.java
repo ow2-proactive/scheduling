@@ -36,6 +36,7 @@
  */
 package org.ow2.proactive.scheduler.ext.matlab.worker;
 
+import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.ext.matlab.common.PASolveMatlabGlobalConfig;
 import org.ow2.proactive.scheduler.ext.matlab.common.PASolveMatlabTaskConfig;
@@ -179,10 +180,10 @@ public class AOMatlabWorker implements Serializable, MatSciWorker {
      *
      * @return true for synchronous call
      */
-    public boolean terminate() {
+    public BooleanWrapper terminate() {
         MatlabEngine.close();
 
-        return true;
+        return new BooleanWrapper(true);
     }
 
     public boolean cleanup() {

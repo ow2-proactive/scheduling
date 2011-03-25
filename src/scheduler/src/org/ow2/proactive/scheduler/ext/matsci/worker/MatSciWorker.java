@@ -36,6 +36,7 @@
  */
 package org.ow2.proactive.scheduler.ext.matsci.worker;
 
+import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 
 import java.io.Serializable;
@@ -50,7 +51,7 @@ public interface MatSciWorker {
 
     Serializable execute(int index, TaskResult... results) throws Throwable;
 
-    boolean terminate();
+    BooleanWrapper terminate();
 
     boolean cleanup();
 }

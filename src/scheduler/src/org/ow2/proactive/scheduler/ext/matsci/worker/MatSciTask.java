@@ -42,6 +42,7 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.exceptions.FutureMonitoringPingFailureException;
+import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.utils.OperatingSystem;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
@@ -308,7 +309,8 @@ public abstract class MatSciTask<W extends MatSciWorker, C extends MatSciEngineC
                         this.getClass().getSimpleName() + "] Terminating " + getExtensionName() + "engine");
                 }
                 try {
-                    boolean ok = sw.terminate();
+                    BooleanWrapper ok = sw.terminate();
+                    PAFuture.waitFor(ok);
                 } catch (Exception e) {
                     e.printStackTrace();
                     if (paconfig.isDebug()) {
@@ -423,6 +425,19 @@ public abstract class MatSciTask<W extends MatSciWorker, C extends MatSciEngineC
         }
 
         return res;
+    }
+
+    public void kill() {
+        MatSciJVMInfo jvminfo = jvmInfos.get(nodeName);
+        if (paconfig.isDebug()) {
+            System.out.println("[" + new java.util.Date() + " " + host + " " +
+                this.getClass().getSimpleName() + "] Task killed.");
+            outDebug.println("[" + new java.util.Date() + " " + host + " " + this.getClass().getSimpleName() +
+                "] Task killed.");
+        }
+        destroyProcess(jvminfo);
+        afterExecute(jvminfo);
+        super.kill();
     }
 
     abstract protected void afterExecute(MatSciJVMInfo jvminfo);
