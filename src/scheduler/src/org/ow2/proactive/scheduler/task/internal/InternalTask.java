@@ -249,9 +249,9 @@ public abstract class InternalTask extends TaskState {
             // only the scheduler core needs to persist InternalTask in DB
             // clients may need to call this method nonetheless
         } catch (Throwable t) {
-        	// if this happens on the core, you might want to fix it.
-        	// clients that do not use hibernate can ignore this,
-        	ProActiveLogger.getLogger(SchedulerLoggers.DATABASE).debug("Failed to init DB", t);
+            // if this happens on the core, you might want to fix it.
+            // clients that do not use hibernate can ignore this,
+            ProActiveLogger.getLogger(SchedulerLoggers.DATABASE).debug("Failed to init DB", t);
         }
 
         InternalTask replicatedTask = null;
@@ -298,11 +298,11 @@ public abstract class InternalTask extends TaskState {
             // only the scheduler core needs to persist InternalTask in DB
             // clients may need to call this method nonetheless
         } catch (Throwable t) {
-        	// if this happens on the core, you might want to fix it.
-        	// clients that do not use hibernate can ignore this
-        	ProActiveLogger.getLogger(SchedulerLoggers.DATABASE).debug("Failed to init DB", t);
+            // if this happens on the core, you might want to fix it.
+            // clients that do not use hibernate can ignore this
+            ProActiveLogger.getLogger(SchedulerLoggers.DATABASE).debug("Failed to init DB", t);
         }
-        
+
         return replicatedTask;
     }
 
