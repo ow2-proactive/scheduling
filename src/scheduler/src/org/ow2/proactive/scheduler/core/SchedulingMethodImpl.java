@@ -271,17 +271,13 @@ final class SchedulingMethodImpl implements SchedulingMethod {
 
         //add running jobs
         for (InternalJob j : core.runningJobs) {
-            if (j.getJobDescriptor().getEligibleTasks().size() > 0) {
-                list.add(j.getJobDescriptor());
-            }
+            list.add(j.getJobDescriptor());
         }
 
         //if scheduler is not paused, add pending jobs
         if (core.status != SchedulerStatus.PAUSED) {
             for (InternalJob j : core.pendingJobs) {
-                if (j.getJobDescriptor().getEligibleTasks().size() > 0) {
-                    list.add(j.getJobDescriptor());
-                }
+                list.add(j.getJobDescriptor());
             }
         }
 
