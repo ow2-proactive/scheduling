@@ -80,6 +80,7 @@ import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 import org.ow2.proactive.scripting.ScriptException;
 import org.ow2.proactive.threading.ExecutorServiceTasksInvocator;
 import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
+import org.ow2.proactive.utils.Formatter;
 import org.ow2.proactive.utils.NodeSet;
 
 import edu.emory.mathcs.backport.java.util.Collections;
@@ -424,7 +425,8 @@ final class SchedulingMethodImpl implements SchedulingMethod {
             logger_dev.info("Selection script throws an exception : " + t);
             logger_dev.debug("", t);
             //simulate jobs starts and cancel it
-            simulateJobStartAndCancelIt(tasksToSchedule, "Selection script has failed : " + t);
+            simulateJobStartAndCancelIt(tasksToSchedule, "Selection script has failed : " +
+                Formatter.stackTraceToString(t));
             //leave the method by ss failure
             return null;
         } catch (RMProxyCreationException e) {
