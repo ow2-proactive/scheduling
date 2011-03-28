@@ -56,6 +56,9 @@ public final class Formatter {
      * @return the stack trace of the given exception in a string.
      */
     public static String stackTraceToString(Throwable e) {
+        if (e == null) {
+            return null;
+        }
         String retValue = null;
         StringWriter sw = null;
         PrintWriter pw = null;
