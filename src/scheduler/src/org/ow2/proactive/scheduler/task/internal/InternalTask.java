@@ -279,6 +279,8 @@ public abstract class InternalTask extends TaskState {
         TaskId repId = replicatedTask.taskInfo.getTaskId();
         replicatedTask.taskInfo = new TaskInfoImpl();
         replicatedTask.taskInfo.setTaskId(repId); // we only need this id for the HashSet comparisons...
+        replicatedTask.taskInfo.setNumberOfExecutionLeft(getMaxNumberOfExecution());
+        replicatedTask.taskInfo.setNumberOfExecutionOnFailureLeft(getMaxNumberOfExecutionOnFailure());
 
         ArrayList<Object> acc = new ArrayList<Object>();
         acc.add(replicatedTask);

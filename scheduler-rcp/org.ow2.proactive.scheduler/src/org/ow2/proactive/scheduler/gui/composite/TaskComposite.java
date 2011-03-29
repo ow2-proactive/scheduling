@@ -695,14 +695,9 @@ public class TaskComposite extends Composite implements Comparator<TaskState> {
             } else if (title.equals(COLUMN_EXEC_DURATION_TITLE)) {
                 item.setText(i, Tools.getFormattedDuration(0, taskState.getExecutionDuration()));
             } else if (title.equals(COLUMN_NODEFAILURE_TITLE)) {
-                if (taskState.getStatus() == TaskStatus.FAILED) {
-                    item.setText(i, taskState.getMaxNumberOfExecutionOnFailure() + "/" +
-                        taskState.getMaxNumberOfExecutionOnFailure());
-                } else {
-                    item.setText(i, (taskState.getMaxNumberOfExecutionOnFailure() - taskState
-                            .getNumberOfExecutionOnFailureLeft()) +
-                        "/" + taskState.getMaxNumberOfExecutionOnFailure());
-                }
+                item.setText(i, (taskState.getMaxNumberOfExecutionOnFailure() - taskState
+                        .getNumberOfExecutionOnFailureLeft()) +
+                    "/" + taskState.getMaxNumberOfExecutionOnFailure());
             } else if (title.equals(COLUMN_HOST_NAME_TITLE)) {
                 String hostName = taskState.getExecutionHostName();
                 if (hostName == null) {
