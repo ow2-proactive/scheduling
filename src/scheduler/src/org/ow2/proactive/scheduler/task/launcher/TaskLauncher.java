@@ -36,6 +36,7 @@
  */
 package org.ow2.proactive.scheduler.task.launcher;
 
+import java.io.IOException;
 import java.io.PrintStream;
 import java.lang.reflect.Method;
 import java.security.KeyException;
@@ -55,6 +56,7 @@ import java.util.StringTokenizer;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.log4j.Appender;
+import org.apache.log4j.FileAppender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.MDC;
 import org.apache.log4j.helpers.LogLog;
@@ -136,6 +138,13 @@ public abstract class TaskLauncher implements InitActive {
     // to define the max line number of a task logs
     // DO NOT USE SCHEDULER PROPERTY FOR THAT (those properties are not available on node side)
     public static final String MAX_LOG_SIZE_PROPERTY = "proactive.scheduler.logs.maxsize";
+
+    // enable the storage of logs in a dedicated file (see LOG_FILE_PREFIX)
+    // just jave to be defined to enable log file
+    public static final String ENABLE_LOGFILE_PROPERTY = "proactive.scheduler.logs.file";
+
+    // the prefix for log file produced in localspace
+    public static final String LOG_FILE_PREFIX = "TaskLogs";
 
     protected DataSpacesFileObject SCRATCH = null;
     protected DataSpacesFileObject INPUT = null;
@@ -376,6 +385,20 @@ public abstract class TaskLauncher implements InitActive {
         this.redirectedStderr = new PrintStream(new LoggingOutputStream(l, Log4JTaskLogs.STDERR_LEVEL), true);
         System.setOut(redirectedStdout);
         System.setErr(redirectedStderr);
+    }
+
+    /**
+     * Create log file in $LOCALSPACE.
+     * @throws IOException if the file cannot be created.
+     */
+    private void initLocalLogsFile() throws IOException {
+        DataSpacesFileObject outlog = SCRATCH.resolveFile(TaskLauncher.LOG_FILE_PREFIX + "-" +
+            this.taskId.getJobId() + "-" + this.taskId.getReadableName() + ".log");
+        outlog.createFile();
+        // fileAppender constructor needs a path and not a URI.
+        FileAppender fap = new FileAppender(Log4JTaskLogs.getTaskLogLayout(), outlog.getRealURI().substring(
+                "file://".length()), false);
+        this.logAppender.addAppender(fap);
     }
 
     /**
@@ -736,6 +759,11 @@ public abstract class TaskLauncher implements InitActive {
                 } catch (Throwable t) {
                     logger_dev_dataspace.warn("GLOBALSPACE is disabled");
                     logger_dev_dataspace.debug("", t);
+                }
+                // create a log file in local space if the node is configured
+                if (System.getProperty(ENABLE_LOGFILE_PROPERTY) != null) {
+                    logger_dev.info("logfile is enabled for task " + taskId);
+                    initLocalLogsFile();
                 }
             } catch (Throwable t) {
                 logger_dev_dataspace.warn(
