@@ -76,6 +76,7 @@ import org.hibernate.annotations.LazyCollectionOption;
 import org.hibernate.annotations.ManyToAny;
 import org.hibernate.annotations.MetaValue;
 import org.hibernate.annotations.Proxy;
+import org.hibernate.collection.AbstractPersistentCollection;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
@@ -239,6 +240,10 @@ public abstract class InternalTask extends TaskState {
          * - Most of the objects down the object graph contain Hibernate @Id fields.
          * If all those fields are not set to 0 when inserting the object in DB,
          * insertion will fail. 
+         * 
+         * - Collections are mapped to specific Hibernate internal collections at runtime,
+         * which contain references to the @Id fields mentionned above. They need to be
+         * reset too.
          */
 
         try {
@@ -299,17 +304,9 @@ public abstract class InternalTask extends TaskState {
         System.out.println("----------");
          */
 
-        try {
-            DatabaseManager.getInstance().register(replicatedTask);
-        } catch (NoClassDefFoundError e) {
-            // only the scheduler core needs to persist InternalTask in DB
-            // clients may need to call this method nonetheless
-        } catch (Throwable t) {
-            // if this happens on the core, you might want to fix it.
-            // clients that do not use hibernate can ignore this
-            ProActiveLogger.getLogger(SchedulerLoggers.DATABASE).debug("Failed to init DB", t);
-        }
-
+        // We cannot register the newly created InternalTask for DB insertion now,
+        // since it only makes sense to hibernate once it's added to the parent InternalJob
+        // The next DB.update(InternalJob) will take care of it
         return replicatedTask;
     }
 
@@ -347,6 +344,28 @@ public abstract class InternalTask extends TaskState {
 
             Object value = f.get(obj);
 
+            for (Annotation a : f.getAnnotations()) {
+                // reset unique Hibernate identifiers
+                if (Id.class.isAssignableFrom(a.annotationType()) ||
+                    GeneratedValue.class.isAssignableFrom(a.annotationType())) {
+                    f.set(obj, 0);
+                    continue fields;
+                }
+            }
+
+            // every persisted Java Collection is translated at runtime as an Hibernate AbstractPersistentCollection. 
+            // This collection references the parent @Id, so we have to zero it too
+            if (AbstractPersistentCollection.class.isAssignableFrom(obj.getClass()) &&
+                f.getName().equals("key")) {
+                // the id is a Long name 'key' declared as Serializable 
+                try {
+                    f.set(obj, new Long(0));
+                } catch (Throwable t) {
+                    ProActiveLogger.getLogger(SchedulerLoggers.DATABASE).debug(
+                            "Failed to reset AbstractPersistentCollection key", t);
+                }
+            }
+
             //boolean contains = acc.contains(value);
             boolean contains = false;
             for (Object o : acc) {
@@ -361,18 +380,8 @@ public abstract class InternalTask extends TaskState {
             } else {
                 // this hibernate PersistentMap is nuts: it contains itself twice as a Map 
                 // and Serializable field... this forces me to remove it from the cycle detection
-                if (!(value != null && value.getClass().equals(org.hibernate.collection.PersistentMap.class)))
+                if (!(value != null && AbstractPersistentCollection.class.isAssignableFrom(value.getClass())))
                     acc.add(value);
-            }
-
-            for (Annotation a : f.getAnnotations()) {
-
-                // reset identifiers
-                if (Id.class.isAssignableFrom(a.annotationType()) ||
-                    GeneratedValue.class.isAssignableFrom(a.annotationType())) {
-                    f.set(obj, 0);
-                    continue fields;
-                }
             }
 
             // arrays do not have regular fields in the java reflect api
