@@ -54,8 +54,8 @@ if [ "$passw" == "" ]; then
     # export >> $tmp;
     
     keyfile=`mktemp`
-    echo "$keycont" > $keyfile
     chmod 400 $keyfile
+    echo "$keycont" > $keyfile
 
     for i in "$@" 
       do
