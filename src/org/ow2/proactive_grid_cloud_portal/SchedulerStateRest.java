@@ -121,10 +121,11 @@ import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
 @Path("/scheduler/")
 public class SchedulerStateRest implements SchedulerRestInterface {
     /** If the rest api was unable to instantiate the value from byte array representation*/
+    
     public static final String UNKNOWN_VALUE_TYPE = "Unknown value type";
+    
     private Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.PREFIX + ".rest");
-    private CachingSchedulerProxyUserInterface cachedState;
-    private volatile boolean isCacheEnabled = true;
+
 
 
     /**
