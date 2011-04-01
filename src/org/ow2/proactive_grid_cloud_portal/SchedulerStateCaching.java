@@ -86,14 +86,22 @@ public class SchedulerStateCaching {
         SchedulerStateCaching.scheduler = scheduler;
     } 
     
-    public static void init() {
-        revisionAndSchedulerState = new HashMap<AtomicLong, SchedulerState>();
-        revisionAndSchedulerState.put(new AtomicLong(-1),new SchedulerStateImpl());
-        init_();
-        start_();
+    public synchronized static void init() {
+        // here we need a thread to free the calling thread
+        // i.e. not locking it when the scheduler is unavailable
+
+        new Thread(new Runnable() {
+            public void run() {
+                revisionAndSchedulerState = new HashMap<AtomicLong, SchedulerState>();
+                revisionAndSchedulerState.put(new AtomicLong(-1),new SchedulerStateImpl());
+
+                init_();
+                start_();
+            }
+        }).start();
     }
     
-    private static void init_() {
+    private synchronized static void init_() {
         leaseRenewRate = Integer.parseInt(PortalConfiguration.getProperties().getProperty(PortalConfiguration.lease_renew_rate));
         refreshInterval = Integer.parseInt(PortalConfiguration.getProperties().getProperty(PortalConfiguration.scheduler_cache_refreshrate));
         String url = PortalConfiguration.getProperties().getProperty(PortalConfiguration.scheduler_url);
