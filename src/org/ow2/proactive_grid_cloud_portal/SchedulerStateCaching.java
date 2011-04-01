@@ -133,7 +133,8 @@ public class SchedulerStateCaching {
             
             }
            } catch (Exception e) {
-               logger.warn("no scheduler found on " + url + "retrying in 8 seconds", e);
+               logger.warn("no scheduler found on " + url + " retrying in 8 seconds", e);
+               PAActiveObject.terminateActiveObject(scheduler, true);
                scheduler = null;
                new Sleeper(8 * 1000).sleep();
                continue;
@@ -150,7 +151,7 @@ public class SchedulerStateCaching {
                while (!kill) {
   
                 long currentSchedulerStateRevision = scheduler.getSchedulerStateRevision();
-                
+                  try {
                 if (currentSchedulerStateRevision != schedulerRevision) {
                     Map<AtomicLong, SchedulerState> schedStateTmp =  scheduler.getRevisionVersionAndSchedulerState();
                     PAFuture.waitFor(schedStateTmp);
@@ -160,7 +161,10 @@ public class SchedulerStateCaching {
                     schedulerRevision = tmp.getKey().longValue();
                     logger.debug("updated scheduler state revision at " + schedulerRevision);
                 }
-
+                  } catch (Throwable t) {
+                      logger.info("exception thrown when updating scheduler caching, cache not updated, connection resetted",t);
+                      init_();
+                  }
                 new Sleeper(refreshInterval).sleep();
                }
             }
