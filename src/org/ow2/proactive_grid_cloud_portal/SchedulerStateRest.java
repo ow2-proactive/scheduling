@@ -121,12 +121,10 @@ import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
 @Path("/scheduler/")
 public class SchedulerStateRest implements SchedulerRestInterface {
     /** If the rest api was unable to instantiate the value from byte array representation*/
-    
+
     public static final String UNKNOWN_VALUE_TYPE = "Unknown value type";
-    
+
     private Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.PREFIX + ".rest");
-
-
 
     /**
      * Returns the ids of the current jobs under a list of string.
@@ -238,15 +236,14 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @GET
     @Path("revisionjobsinfo")
     @Produces({ "application/json", "application/xml" })
-	public Map<AtomicLong, List<UserJobInfo>> revisionAndjobsinfo(
-			@HeaderParam("sessionid") String sessionId,
-			@QueryParam("index") @DefaultValue("-1") int index,
-			@QueryParam("range") @DefaultValue("-1") int range,
-			@QueryParam("myjobs") @DefaultValue("false") boolean myJobs,
-			@QueryParam("pending") @DefaultValue("true") boolean pending,
-			@QueryParam("running") @DefaultValue("true") boolean running,
-			@QueryParam("finished") @DefaultValue("true") boolean finished)
-			throws PermissionException, NotConnectedException {
+    public Map<AtomicLong, List<UserJobInfo>> revisionAndjobsinfo(@HeaderParam("sessionid") String sessionId,
+            @QueryParam("index") @DefaultValue("-1") int index,
+            @QueryParam("range") @DefaultValue("-1") int range,
+            @QueryParam("myjobs") @DefaultValue("false") boolean myJobs,
+            @QueryParam("pending") @DefaultValue("true") boolean pending,
+            @QueryParam("running") @DefaultValue("true") boolean running,
+            @QueryParam("finished") @DefaultValue("true") boolean finished) throws PermissionException,
+            NotConnectedException {
         Scheduler s = checkAccess(sessionId, "revisionjobsinfo?index=" + index + "&range=" + range);
         List<JobState> jobs = new ArrayList<JobState>();
         renewLeaseForClient(s);
@@ -257,79 +254,78 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
         SchedulerState state = entry.getValue();
 
-		String user = SchedulerSessionMapper.getInstance().getUsernames()
-				.get(sessionId);
-		if (myJobs && user != null && user.trim().length() > 0) {
-			if (pending) {
-				for (JobState j : state.getPendingJobs()) {
-					if (j.getOwner().equals(user))
-						jobs.add(j);
-				}
-			}
-			if (running) {
-				for (JobState j : state.getRunningJobs()) {
-					if (j.getOwner().equals(user))
-						jobs.add(j);
-				}
-			}
-			if (finished) {
-				for (JobState j : state.getFinishedJobs()) {
-					if (j.getOwner().equals(user))
-						jobs.add(j);
-				}
-			}
-		} else {
-			if (pending)
-				jobs.addAll(state.getPendingJobs());
-			if (running)
-				jobs.addAll(state.getRunningJobs());
-			if (finished)
-				jobs.addAll(state.getFinishedJobs());
-		}
+        String user = SchedulerSessionMapper.getInstance().getUsernames().get(sessionId);
+        if (myJobs && user != null && user.trim().length() > 0) {
+            if (pending) {
+                for (JobState j : state.getPendingJobs()) {
+                    if (j.getOwner().equals(user))
+                        jobs.add(j);
+                }
+            }
+            if (running) {
+                for (JobState j : state.getRunningJobs()) {
+                    if (j.getOwner().equals(user))
+                        jobs.add(j);
+                }
+            }
+            if (finished) {
+                for (JobState j : state.getFinishedJobs()) {
+                    if (j.getOwner().equals(user))
+                        jobs.add(j);
+                }
+            }
+        } else {
+            if (pending)
+                jobs.addAll(state.getPendingJobs());
+            if (running)
+                jobs.addAll(state.getRunningJobs());
+            if (finished)
+                jobs.addAll(state.getFinishedJobs());
+        }
 
-		if (range != -1 && index != -1) {
-			JobState.setSortingOrder(JobState.DESC_ORDER);
-			Collections.sort(jobs, new Comparator<JobState>() {
-				public int compare(JobState o1, JobState o2) {
-					// create 3 sub groups : pending, running, finished, in order
-					// each subgroup is sorted by id
-					int o1i = -1;
-					switch (o1.getStatus()) {
-					case PENDING:
-						o1i = 0;
-						break;
-					case RUNNING:
-					case STALLED:
-						o1i = 1;
-						break;
-					default:
-						o1i = 2;
-						break;
-					}
+        if (range != -1 && index != -1) {
+            JobState.setSortingOrder(JobState.DESC_ORDER);
+            Collections.sort(jobs, new Comparator<JobState>() {
+                public int compare(JobState o1, JobState o2) {
+                    // create 3 sub groups : pending, running, finished, in order
+                    // each subgroup is sorted by id
+                    int o1i = -1;
+                    switch (o1.getStatus()) {
+                        case PENDING:
+                            o1i = 0;
+                            break;
+                        case RUNNING:
+                        case STALLED:
+                            o1i = 1;
+                            break;
+                        default:
+                            o1i = 2;
+                            break;
+                    }
 
-					int o2i = -1;
-					switch (o2.getStatus()) {
-					case PENDING:
-						o2i = 0;
-						break;
-					case RUNNING:
-					case STALLED:
-						o2i = 1;
-						break;
-					default:
-						o2i = 2;
-						break;
-					}
+                    int o2i = -1;
+                    switch (o2.getStatus()) {
+                        case PENDING:
+                            o2i = 0;
+                            break;
+                        case RUNNING:
+                        case STALLED:
+                            o2i = 1;
+                            break;
+                        default:
+                            o2i = 2;
+                            break;
+                    }
 
-					if (o1i < o2i)
-						return -1;
-					else if (o2i > o1i)
-						return 1;
+                    if (o1i < o2i)
+                        return -1;
+                    else if (o2i > o1i)
+                        return 1;
 
-					return o1.compareTo(o2);
-				}
-			});
-		}
+                    return o1.compareTo(o2);
+                }
+            });
+        }
 
         //filter the result if needed
         jobs = subList(jobs, index, range);
@@ -466,6 +462,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
         return js;
     }
+
     /**
      * Returns the job result associated to the job referenced by the
      * id <code>jobid</code>
@@ -1224,11 +1221,9 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
         String url = PortalConfiguration.getProperties().getProperty(PortalConfiguration.scheduler_url);
 
-        if ((username == null) ||
-                (password == null)  ) {
+        if ((username == null) || (password == null)) {
             throw new LoginException("empty login/password");
         }
-
 
         scheduler.init(url, username, password);
 
@@ -1273,8 +1268,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
                 throw new LoginException(e.getMessage());
             }
         } else {
-            if ((multipart.getUsername() == null) ||
-                    (multipart.getPassword() == null)  ) {
+            if ((multipart.getUsername() == null) || (multipart.getPassword() == null)) {
                 throw new LoginException("empty login/password");
             }
 
@@ -1322,38 +1316,36 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         return s.getInfo("ProActiveScheduler:name=MyAccount");
     }
 
-	/**
-	 * Users currently connected to the scheduler
-	 * 
-	 * @param sessionId the session id associated to this new connection\
-	 * @return list of users
-	 * @throws NotConnectedException
-	 * @throws PermissionException
-	 */
-	@GET
-	@Path("users")
-	@Produces("application/json")
-	public List<UserIdentification> getUsers(@HeaderParam("sessionid") final String sessionId)
-			throws NotConnectedException, PermissionException {
+    /**
+     * Users currently connected to the scheduler
+     * 
+     * @param sessionId the session id associated to this new connection\
+     * @return list of users
+     * @throws NotConnectedException
+     * @throws PermissionException
+     */
+    @GET
+    @Path("users")
+    @Produces("application/json")
+    public List<UserIdentification> getUsers(@HeaderParam("sessionid") final String sessionId)
+            throws NotConnectedException, PermissionException {
 
-		Scheduler s = checkAccess(sessionId, "users");
-		renewLeaseForClient(s);
-		Map<AtomicLong, SchedulerState> stateAndrevision = SchedulerStateCaching
-				.getRevisionAndSchedulerState();
+        Scheduler s = checkAccess(sessionId, "users");
+        renewLeaseForClient(s);
+        Map<AtomicLong, SchedulerState> stateAndrevision = SchedulerStateCaching
+                .getRevisionAndSchedulerState();
 
-		Entry<AtomicLong, SchedulerState> entry = stateAndrevision.entrySet()
-				.iterator().next();
-		SchedulerState state = entry.getValue();
+        Entry<AtomicLong, SchedulerState> entry = stateAndrevision.entrySet().iterator().next();
+        SchedulerState state = entry.getValue();
 
-		ArrayList<UserIdentification> userIds = new ArrayList<UserIdentification>();
-		for (UserIdentification user : state.getUsers().getUsers()) {
-			userIds.add(user);
-		}
-		
-		return userIds;
-	}
+        ArrayList<UserIdentification> userIds = new ArrayList<UserIdentification>();
+        for (UserIdentification user : state.getUsers().getUsers()) {
+            userIds.add(user);
+        }
 
-    
+        return userIds;
+    }
+
     /*
      * @GET
      * 
@@ -1365,7 +1357,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      * 
      * return s.getInfo("ProActiveScheduler:name=AllAccounts"); }
      */
-    
+
     /**
      * returns the version of the rest api
      * @return returns the version of the rest api
@@ -1387,7 +1379,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Path("createcredential")
     @Produces("*/*")
-    public byte[] getCreateCredential(@MultipartForm LoginForm multipart) throws ConnectionException, LoginException, InternalSchedulerException {
+    public byte[] getCreateCredential(@MultipartForm LoginForm multipart) throws ConnectionException,
+            LoginException, InternalSchedulerException {
 
         String url = PortalConfiguration.getProperties().getProperty(PortalConfiguration.scheduler_url);
 
@@ -1395,8 +1388,9 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         PublicKey pubKey = auth.getPublicKey();
 
         try {
-            Credentials cred = Credentials.createCredentials(new CredData(CredData.parseLogin(multipart.getUsername()), CredData
-                    .parseDomain(multipart.getUsername()), multipart.getPassword(),multipart.getSshKey()), pubKey);
+            Credentials cred = Credentials.createCredentials(
+                    new CredData(CredData.parseLogin(multipart.getUsername()), CredData.parseDomain(multipart
+                            .getUsername()), multipart.getPassword(), multipart.getSshKey()), pubKey);
 
             return cred.getBase64();
         } catch (KeyException e) {

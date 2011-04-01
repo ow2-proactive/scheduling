@@ -53,6 +53,7 @@ import org.ow2.proactive.scheduler.common.util.CachingSchedulerProxyUserInterfac
 import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 import org.ow2.proactive.scheduler.core.SchedulerStateImpl;
 
+
 /**
  * This class keeps a cache of the scheduler state and periodically refresh it.
  * This prevents to directly call the active object CachingSchedulerProxyUserInterface and thus
@@ -63,7 +64,7 @@ import org.ow2.proactive.scheduler.core.SchedulerStateImpl;
  */
 public class SchedulerStateCaching {
     private static Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.PREFIX + ".rest.caching");
-    
+
     private static CachingSchedulerProxyUserInterface scheduler;
     private static SchedulerState localState;
     private static long schedulerRevision;
@@ -72,20 +73,18 @@ public class SchedulerStateCaching {
     private static Thread cachedSchedulerStateThreadUpdater;
     private static Thread leaseRenewerThreadUpdater;
 
-    
-    protected static Map<AtomicLong, SchedulerState> revisionAndSchedulerState ;
+    protected static Map<AtomicLong, SchedulerState> revisionAndSchedulerState;
 
     private static int leaseRenewRate;
-    
-    
+
     public static CachingSchedulerProxyUserInterface getScheduler() {
         return scheduler;
     }
 
     public static void setScheduler(CachingSchedulerProxyUserInterface scheduler) {
         SchedulerStateCaching.scheduler = scheduler;
-    } 
-    
+    }
+
     public synchronized static void init() {
         // here we need a thread to free the calling thread
         // i.e. not locking it when the scheduler is unavailable
@@ -93,104 +92,108 @@ public class SchedulerStateCaching {
         new Thread(new Runnable() {
             public void run() {
                 revisionAndSchedulerState = new HashMap<AtomicLong, SchedulerState>();
-                revisionAndSchedulerState.put(new AtomicLong(-1),new SchedulerStateImpl());
+                revisionAndSchedulerState.put(new AtomicLong(-1), new SchedulerStateImpl());
 
                 init_();
                 start_();
             }
         }).start();
     }
-    
-    private synchronized static void init_() {
-        leaseRenewRate = Integer.parseInt(PortalConfiguration.getProperties().getProperty(PortalConfiguration.lease_renew_rate));
-        refreshInterval = Integer.parseInt(PortalConfiguration.getProperties().getProperty(PortalConfiguration.scheduler_cache_refreshrate));
-        String url = PortalConfiguration.getProperties().getProperty(PortalConfiguration.scheduler_url);
-        String cred_path = PortalConfiguration.getProperties().getProperty(PortalConfiguration.scheduler_cache_credential);
-        
-        while (scheduler == null ) {
-        try {
-            
-            if (scheduler == null) {
-            
-            scheduler = PAActiveObject.newActive(
-                         CachingSchedulerProxyUserInterface.class, new Object[] {});
 
-          
-            // check is we use a credential file 
-            
-           
-            File f = new File(cred_path);
-            
-            if (f.exists()) {
-                Credentials credential = Credentials.getCredentials(cred_path);
-                scheduler.init(url, credential);
-            } else {
-                String login =  PortalConfiguration.getProperties().getProperty(PortalConfiguration.scheduler_cache_login);
-                String password =  PortalConfiguration.getProperties().getProperty(PortalConfiguration.scheduler_cache_password);           
-                scheduler.init(url, login, password);
+    private synchronized static void init_() {
+        leaseRenewRate = Integer.parseInt(PortalConfiguration.getProperties().getProperty(
+                PortalConfiguration.lease_renew_rate));
+        refreshInterval = Integer.parseInt(PortalConfiguration.getProperties().getProperty(
+                PortalConfiguration.scheduler_cache_refreshrate));
+        String url = PortalConfiguration.getProperties().getProperty(PortalConfiguration.scheduler_url);
+        String cred_path = PortalConfiguration.getProperties().getProperty(
+                PortalConfiguration.scheduler_cache_credential);
+
+        while (scheduler == null) {
+            try {
+
+                if (scheduler == null) {
+
+                    scheduler = PAActiveObject.newActive(CachingSchedulerProxyUserInterface.class,
+                            new Object[] {});
+
+                    // check is we use a credential file 
+
+                    File f = new File(cred_path);
+
+                    if (f.exists()) {
+                        Credentials credential = Credentials.getCredentials(cred_path);
+                        scheduler.init(url, credential);
+                    } else {
+                        String login = PortalConfiguration.getProperties().getProperty(
+                                PortalConfiguration.scheduler_cache_login);
+                        String password = PortalConfiguration.getProperties().getProperty(
+                                PortalConfiguration.scheduler_cache_password);
+                        scheduler.init(url, login, password);
+                    }
+
+                }
+            } catch (Exception e) {
+                logger.warn("no scheduler found on " + url + " retrying in 8 seconds", e);
+                PAActiveObject.terminateActiveObject(scheduler, true);
+                scheduler = null;
+                new Sleeper(8 * 1000).sleep();
+                continue;
             }
-            
-            
-            }
-           } catch (Exception e) {
-               logger.warn("no scheduler found on " + url + " retrying in 8 seconds", e);
-               PAActiveObject.terminateActiveObject(scheduler, true);
-               scheduler = null;
-               new Sleeper(8 * 1000).sleep();
-               continue;
-           }
         }
-        
+
     }
 
-
-    
     private static void start_() {
         cachedSchedulerStateThreadUpdater = new Thread(new Runnable() {
             public void run() {
-               while (!kill) {
-  
-                long currentSchedulerStateRevision = scheduler.getSchedulerStateRevision();
-                  try {
-                if (currentSchedulerStateRevision != schedulerRevision) {
-                    Map<AtomicLong, SchedulerState> schedStateTmp =  scheduler.getRevisionVersionAndSchedulerState();
-                    PAFuture.waitFor(schedStateTmp);
-                    revisionAndSchedulerState = schedStateTmp; 
-                    Entry<AtomicLong, SchedulerState> tmp = revisionAndSchedulerState.entrySet().iterator().next();
-                    localState = tmp.getValue();
-                    schedulerRevision = tmp.getKey().longValue();
-                    logger.debug("updated scheduler state revision at " + schedulerRevision);
+                while (!kill) {
+
+                    long currentSchedulerStateRevision = scheduler.getSchedulerStateRevision();
+                    try {
+                        if (currentSchedulerStateRevision != schedulerRevision) {
+                            Map<AtomicLong, SchedulerState> schedStateTmp = scheduler.getRevisionVersionAndSchedulerState();
+                            PAFuture.waitFor(schedStateTmp);
+                            revisionAndSchedulerState = schedStateTmp;
+                            Entry<AtomicLong, SchedulerState> tmp = revisionAndSchedulerState.entrySet()
+                                    .iterator().next();
+                            localState = tmp.getValue();
+                            schedulerRevision = tmp.getKey().longValue();
+                            logger.debug("updated scheduler state revision at " + schedulerRevision);
+                        }
+                    } catch (Throwable t) {
+                        logger.info(
+                                "exception thrown when updating scheduler caching, cache not updated, connection resetted",
+                                t);
+                        init_();
+                    }
+                    new Sleeper(refreshInterval).sleep();
                 }
-                  } catch (Throwable t) {
-                      logger.info("exception thrown when updating scheduler caching, cache not updated, connection resetted",t);
-                      init_();
-                  }
-                new Sleeper(refreshInterval).sleep();
-               }
             }
-        },"State Updater Thread");
-        
+        }, "State Updater Thread");
+
         cachedSchedulerStateThreadUpdater.setDaemon(true);
         cachedSchedulerStateThreadUpdater.start();
-        
+
         leaseRenewerThreadUpdater = new Thread(new Runnable() {
             public void run() {
-                if (( scheduler != null) && (! kill)) {
+                if ((scheduler != null) && (!kill)) {
                     try {
                         scheduler.getStatus();
                     } catch (Exception e) {
-                        logger.info("leaseRenewerThread was not able to call the getStatus method, exception message is " + e.getMessage());
+                        logger.info("leaseRenewerThread was not able to call the getStatus method, exception message is " +
+                            e.getMessage());
                         init_();
                     }
                 }
-                new Sleeper(leaseRenewRate).sleep(); 
+                new Sleeper(leaseRenewRate).sleep();
             }
         }, "Lease Renewer Thread");
         leaseRenewerThreadUpdater.setDaemon(true);
         leaseRenewerThreadUpdater.start();
-        
+
     }
-    
+
     public static SchedulerState getLocalState() {
         return localState;
     }
@@ -202,8 +205,6 @@ public class SchedulerStateCaching {
     public static long getSchedulerRevision() {
         return schedulerRevision;
     }
-    
-    
 
     public static void setSchedulerRevision(long schedulerRevision) {
         SchedulerStateCaching.schedulerRevision = schedulerRevision;
@@ -224,7 +225,7 @@ public class SchedulerStateCaching {
     public static void setKill(boolean kill) {
         SchedulerStateCaching.kill = kill;
     }
-    
+
     public static Map<AtomicLong, SchedulerState> getRevisionAndSchedulerState() {
         return revisionAndSchedulerState;
     }
