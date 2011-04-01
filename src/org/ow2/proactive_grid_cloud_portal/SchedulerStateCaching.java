@@ -173,7 +173,7 @@ public class SchedulerStateCaching {
                 }
                 new Sleeper(leaseRenewRate).sleep(); 
             }
-        });
+        }, "Lease Renewer Thread");
         leaseRenewerThreadUpdater.setDaemon(true);
         leaseRenewerThreadUpdater.start();
         
