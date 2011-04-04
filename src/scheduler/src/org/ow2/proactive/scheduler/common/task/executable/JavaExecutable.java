@@ -107,35 +107,39 @@ public abstract class JavaExecutable extends Executable {
         if (args == null) {
             return;
         }
-        for (Entry<String, Serializable> e : args.entrySet()) {
-            try {
-                Field f = this.getClass().getDeclaredField(e.getKey());
-                // if f does not exist -> catch block
-                f.setAccessible(true);
-                Class<?> valueClass = e.getValue().getClass();
-                Class<?> fieldClass = f.getType();
-                if (String.class.equals(valueClass) && !String.class.equals(fieldClass)) {
-                    String valueAsString = (String) e.getValue();
-                    // parameter has been defined as string in XML
-                    // try to convert it automatically
-                    if (fieldClass.equals(Integer.class) || fieldClass.equals(int.class)) {
-                        f.set(this, Integer.parseInt(valueAsString));
-                    } else if (fieldClass.equals(Short.class) || fieldClass.equals(short.class)) {
-                        f.set(this, Short.parseShort(valueAsString));
-                    } else if (fieldClass.equals(Long.class) || fieldClass.equals(long.class)) {
-                        f.set(this, Long.parseLong(valueAsString));
-                    } else if (fieldClass.equals(Byte.class) || fieldClass.equals(byte.class)) {
-                        f.set(this, Byte.parseByte(valueAsString));
-                    } else if (fieldClass.equals(Boolean.class) || fieldClass.equals(boolean.class)) {
-                        f.set(this, Boolean.parseBoolean(valueAsString));
+        Class<?> current = this.getClass();
+        while (JavaExecutable.class.isAssignableFrom(current)) {
+            for (Entry<String, Serializable> e : args.entrySet()) {
+                try {
+                    Field f = current.getDeclaredField(e.getKey());
+                    // if f does not exist -> catch block
+                    f.setAccessible(true);
+                    Class<?> valueClass = e.getValue().getClass();
+                    Class<?> fieldClass = f.getType();
+                    if (String.class.equals(valueClass) && !String.class.equals(fieldClass)) {
+                        String valueAsString = (String) e.getValue();
+                        // parameter has been defined as string in XML
+                        // try to convert it automatically
+                        if (fieldClass.equals(Integer.class) || fieldClass.equals(int.class)) {
+                            f.set(this, Integer.parseInt(valueAsString));
+                        } else if (fieldClass.equals(Short.class) || fieldClass.equals(short.class)) {
+                            f.set(this, Short.parseShort(valueAsString));
+                        } else if (fieldClass.equals(Long.class) || fieldClass.equals(long.class)) {
+                            f.set(this, Long.parseLong(valueAsString));
+                        } else if (fieldClass.equals(Byte.class) || fieldClass.equals(byte.class)) {
+                            f.set(this, Byte.parseByte(valueAsString));
+                        } else if (fieldClass.equals(Boolean.class) || fieldClass.equals(boolean.class)) {
+                            f.set(this, Boolean.parseBoolean(valueAsString));
+                        }
+                    } else if (fieldClass.isAssignableFrom(valueClass)) {
+                        // no conversion for other type than String
+                        f.set(this, e.getValue());
                     }
-                } else if (fieldClass.isAssignableFrom(valueClass)) {
-                    // no conversion for other type than String
-                    f.set(this, e.getValue());
+                } catch (Exception ex) {
+                    // nothing to do, no automatic assignment can be done for this field
                 }
-            } catch (Exception ex) {
-                // nothing to do, no automatic assignment can be done for this field
             }
+            current = current.getSuperclass();
         }
     }
 
