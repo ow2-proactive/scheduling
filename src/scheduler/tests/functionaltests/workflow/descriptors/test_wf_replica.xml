@@ -65,7 +65,7 @@ for (var i=0; i < files.length; i++) {
 	</task>
 
 	<task name="replica" cancelJobOnError="false" restartTaskOnError="elsewhere"
-		  runAsMe="false" maxNumberOfExecution="20" preciousResult="true" walltime="10:00"
+		  runAsMe="false" maxNumberOfExecution="4" preciousResult="true" walltime="10:00"
 		  resultPreviewClass="foo.bar.Baz">
 	  <description>
 		This task will be replicated. We put as much stuff as possible in it
@@ -114,7 +114,7 @@ f.createNewFile();
 		  ]]></code>
 		</script>
 	  </pre>
-	  <javaExecutable class="functionaltests.workflow.ReplicaTestExec" >
+	  <javaExecutable class="functionaltests.executables.ReplicaExec" >
 		<forkEnvironment workingDir="${pa.scheduler.home}" >
 		  <jvmArgs>
 			<jvmArg value="-Dproactive.test=true"/>
