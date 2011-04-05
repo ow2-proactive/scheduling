@@ -60,6 +60,7 @@ import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
+import org.objectweb.proactive.utils.NamedThreadFactory;
 import org.ow2.proactive.authentication.principals.GroupNamePrincipal;
 import org.ow2.proactive.authentication.principals.IdentityPrincipal;
 import org.ow2.proactive.authentication.principals.UserNamePrincipal;
@@ -690,8 +691,10 @@ public class NodeSource implements InitActive, RunActive {
             if (maxThreads < 2) {
                 maxThreads = 2;
             }
-            internalThreadPool = Executors.newFixedThreadPool(maxThreads / 2);
-            externalThreadPool = Executors.newFixedThreadPool(maxThreads / 2);
+            internalThreadPool = Executors.newFixedThreadPool(maxThreads / 2, new NamedThreadFactory(
+                "Node Source internal threadpool"));
+            externalThreadPool = Executors.newFixedThreadPool(maxThreads / 2, new NamedThreadFactory(
+                "Node Source external threadpool"));
         }
     }
 
