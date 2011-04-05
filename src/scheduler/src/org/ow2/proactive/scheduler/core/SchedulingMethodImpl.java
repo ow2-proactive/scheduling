@@ -54,6 +54,7 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.utils.NamedThreadFactory;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.common.RMState;
 import org.ow2.proactive.resourcemanager.frontend.topology.TopologyDisabledException;
@@ -117,7 +118,8 @@ final class SchedulingMethodImpl implements SchedulingMethod {
 
     SchedulingMethodImpl(SchedulerCore core) {
         this.core = core;
-        this.threadPool = Executors.newFixedThreadPool(DOTASK_ACTION_THREADNUMBER);
+        this.threadPool = Executors.newFixedThreadPool(DOTASK_ACTION_THREADNUMBER, new NamedThreadFactory(
+            "DoTask_Action"));
         try {
             this.corePrivateKey = Credentials.getPrivateKey(PASchedulerProperties
                     .getAbsolutePath(PASchedulerProperties.SCHEDULER_AUTH_PRIVKEY_PATH.getValueAsString()));

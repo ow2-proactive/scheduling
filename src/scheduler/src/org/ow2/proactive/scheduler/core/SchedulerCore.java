@@ -79,6 +79,7 @@ import org.objectweb.proactive.core.remoteobject.RemoteObjectHelper;
 import org.objectweb.proactive.core.remoteobject.RemoteRemoteObject;
 import org.objectweb.proactive.core.remoteobject.exception.UnknownProtocolException;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.utils.NamedThreadFactory;
 import org.ow2.proactive.db.Condition;
 import org.ow2.proactive.db.ConditionComparator;
 import org.ow2.proactive.db.DatabaseManagerException;
@@ -427,7 +428,8 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
             this.jobsToBeLoggedinAFile = new Hashtable<JobId, FileAppender>();
             this.currentlyRunningTasks = new ConcurrentHashMap<JobId, Hashtable<TaskId, TaskLauncher>>();
             this.previousTaskProgress = new ConcurrentHashMap<TaskId, Integer>();
-            this.threadPoolForTerminateTL = Executors.newFixedThreadPool(TERMINATE_THREAD_NUMBER);
+            this.threadPoolForTerminateTL = Executors.newFixedThreadPool(TERMINATE_THREAD_NUMBER,
+                    new NamedThreadFactory("TaskLauncher_Terminate"));
             this.frontend = frontend;
             this.currentJobToSubmit = jobSubmitLink;
             //loggers
@@ -477,7 +479,8 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
      */
     private void createPingThread() {
         logger_dev.debug("Creating nodes pinging thread");
-        threadPool = Executors.newFixedThreadPool(SCHEDULER_TASK_PROGRESS_NBTHREAD);
+        threadPool = Executors.newFixedThreadPool(SCHEDULER_TASK_PROGRESS_NBTHREAD, new NamedThreadFactory(
+            "Scheduling_GetTaskProgress"));
         pinger = new Thread() {
             @Override
             public void run() {

@@ -52,6 +52,7 @@ import java.util.concurrent.Executors;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.utils.NamedThreadFactory;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.job.JobId;
@@ -97,7 +98,8 @@ public abstract class JobPostTreatmentManager implements Observer {
      */
     protected InternalSchedulerEventListener goldSchedulerEventListener_localView;
 
-    protected static Executor tpe = Executors.newFixedThreadPool(20);
+    protected static Executor tpe = Executors.newFixedThreadPool(20, new NamedThreadFactory(
+        "JobPostTreatmentManager"));
 
     /**
      * name of the {@link #statusFile}
