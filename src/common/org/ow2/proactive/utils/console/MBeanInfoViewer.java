@@ -37,6 +37,7 @@
 package org.ow2.proactive.utils.console;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import javax.management.Attribute;
 import javax.management.AttributeList;
@@ -67,8 +68,6 @@ public final class MBeanInfoViewer {
     private MBeanServerConnection connection;
     /** The names of the attributes of the MBean */
     private String[] names;
-    /** The padding applied to the output string */
-    private int padding;
 
     /**
      * Creates a new instance of MBeanInfoViewer.
@@ -154,25 +153,27 @@ public final class MBeanInfoViewer {
      * @param mbeanNameAsString the object name of the MBean
      * @return the informations about the MBean as a formatted string
      */
+    @Deprecated
     public String getInfo(final String mbeanNameAsString) {
         // Lazy initial connection
         this.lazyConnect();
         try {
+            int padding = 0;
             // If new name create a new ObjectName and refresh attribute names
             if (this.mbeanName == null || !this.mbeanName.getCanonicalName().equals(mbeanNameAsString)) {
                 this.mbeanName = new ObjectName(mbeanNameAsString);
-                this.padding = 0;
                 final MBeanAttributeInfo[] attrs = this.connection.getMBeanInfo(this.mbeanName)
                         .getAttributes();
+
                 this.names = new String[attrs.length];
                 for (int i = 0; i < attrs.length; i++) {
                     String name = attrs[i].getName();
-                    if (name.length() > this.padding) {
-                        this.padding = name.length();
+                    if (name.length() > padding) {
+                        padding = name.length();
                     }
                     this.names[i] = name;
                 }
-                this.padding += 2;
+                padding += 2;
             }
             // Get the list of attributes in a single JMX call  
             final AttributeList list = this.connection.getAttributes(this.mbeanName, this.names);
@@ -187,9 +188,53 @@ public final class MBeanInfoViewer {
                         break;
                     }
                 }
-                out.append(String.format("  %1$-" + this.padding + "s" + value + "\n", attName));
+                out.append(String.format("  %1$-" + padding + "s" + value + "\n", attName));
             }
             return out.toString();
+        } catch (Exception e) {
+            throw new RuntimeException("Cannot retrieve JMX informations from Selected Bean", e);
+        }
+    }
+
+    /**
+     * Return the informations about the Scheduler MBean as a Map.
+     * The first time this method is called it connects to the JMX connector server.
+     * The default behavior will try to establish a connection using RMI protocol, if it fails 
+     * the RO (Remote Object) protocol is used.
+     *
+     * @param mbeanNameAsString the object name of the MBean
+     * @return the informations about the MBean as a formatted string
+     */
+    public Map<String, String> getMappedInfo(final String mbeanNameAsString) {
+        HashMap<String, String> result = new HashMap<String, String>();
+        // Lazy initial connection
+        this.lazyConnect();
+        try {
+            // If new name create a new ObjectName and refresh attribute names
+            if (this.mbeanName == null || !this.mbeanName.getCanonicalName().equals(mbeanNameAsString)) {
+                this.mbeanName = new ObjectName(mbeanNameAsString);
+                final MBeanAttributeInfo[] attrs = this.connection.getMBeanInfo(this.mbeanName)
+                        .getAttributes();
+                this.names = new String[attrs.length];
+                for (int i = 0; i < attrs.length; i++) {
+                    this.names[i] = attrs[i].getName();
+                }
+            }
+            // Get the list of attributes in a single JMX call  
+            final AttributeList list = this.connection.getAttributes(this.mbeanName, this.names);
+            for (int i = 0; i < this.names.length; i++) {
+                final String attName = this.names[i];
+                Object value = "Unavailable";
+                for (int j = 0; j < list.size(); j++) {
+                    final Attribute a = (Attribute) list.get(j);
+                    if (a.getName().equals(attName)) {
+                        value = a.getValue();
+                        break;
+                    }
+                }
+                result.put(attName, value.toString());
+            }
+            return result;
         } catch (Exception e) {
             throw new RuntimeException("Cannot retrieve JMX informations from Selected Bean", e);
         }

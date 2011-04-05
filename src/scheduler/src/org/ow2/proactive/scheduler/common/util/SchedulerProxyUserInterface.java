@@ -39,6 +39,7 @@ package org.ow2.proactive.scheduler.common.util;
 import java.io.Serializable;
 import java.security.KeyException;
 import java.security.PublicKey;
+import java.util.Map;
 
 import javax.security.auth.login.LoginException;
 
@@ -466,12 +467,28 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
      *
      * @see org.ow2.proactive.utils.console.MBeanInfoViewer#getInfo(String)
      */
+    @Deprecated
     public String getInfo(String mbeanName) {
         try {
             return mbeaninfoviewer.getInfo(mbeanName);
         } catch (RuntimeException e) {
             return e.getMessage() + ", you are probably not authorized to access to this information.";
         }
+    }
+
+    /**
+     * Return the informations about the Scheduler MBean as a Map.
+     * The first time this method is called it connects to the JMX connector server.
+     * The default behavior will try to establish a connection using RMI protocol, if it fails 
+     * the RO (Remote Object) protocol is used.
+     *
+     * @param mbeanNameAsString the object name of the MBean
+     * @return the informations about the MBean as a formatted string
+     * 
+     * @throws RuntimeException if mbean cannot access or connect the service
+     */
+    public Map<String, String> getMappedInfo(final String mbeanNameAsString) throws RuntimeException {
+        return mbeaninfoviewer.getMappedInfo(mbeanNameAsString);
     }
 
 }

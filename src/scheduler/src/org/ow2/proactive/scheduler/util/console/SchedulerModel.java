@@ -698,7 +698,7 @@ public class SchedulerModel extends ConsoleModel {
 
     public void showRuntimeData_() {
         try {
-            print(jmxInfoViewer.getInfo("ProActiveScheduler:name=RuntimeData"));
+            printMap(jmxInfoViewer.getMappedInfo("ProActiveScheduler:name=RuntimeData"));
         } catch (Exception e) {
             handleExceptionDisplay("Error while retrieving JMX informations", e);
         }
@@ -706,7 +706,7 @@ public class SchedulerModel extends ConsoleModel {
 
     public void showMyAccount_() {
         try {
-            print(jmxInfoViewer.getInfo("ProActiveScheduler:name=MyAccount"));
+            printMap(jmxInfoViewer.getMappedInfo("ProActiveScheduler:name=MyAccount"));
         } catch (Exception e) {
             handleExceptionDisplay("Error while retrieving JMX informations", e);
         }
@@ -715,7 +715,7 @@ public class SchedulerModel extends ConsoleModel {
     public void showAccount_(final String username) {
         try {
             jmxInfoViewer.setAttribute("ProActiveScheduler:name=AllAccounts", "Username", username);
-            print(jmxInfoViewer.getInfo("ProActiveScheduler:name=AllAccounts"));
+            printMap(jmxInfoViewer.getMappedInfo("ProActiveScheduler:name=AllAccounts"));
         } catch (Exception e) {
             handleExceptionDisplay("Error while retrieving JMX informations", e);
         }
@@ -1053,6 +1053,31 @@ public class SchedulerModel extends ConsoleModel {
      */
     public void setJMXInfo(MBeanInfoViewer info) {
         jmxInfoViewer = info;
+    }
+
+    /**
+     * Print a map on two column
+     * 
+     * @param map the map to be printed
+     */
+    private void printMap(Map<String, String> map) {
+        ObjectArrayFormatter oaf = new ObjectArrayFormatter();
+        oaf.setMaxColumnLength(80);
+        //space between column
+        oaf.setSpace(2);
+        //fake title line
+        List<String> list = new ArrayList<String>();
+        list.add("");
+        list.add("");
+        oaf.setTitle(list);
+        //lines content
+        for (Entry<String, String> e : map.entrySet()) {
+            list = new ArrayList<String>();
+            list.add(e.getKey());
+            list.add(e.getValue());
+            oaf.addLine(list);
+        }
+        print(Tools.getStringAsArray(oaf));
     }
 
 }

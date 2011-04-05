@@ -48,6 +48,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.security.auth.login.LoginException;
 
@@ -538,7 +539,7 @@ public class ResourceManagerModel extends ConsoleModel {
 
     public void showRuntimeData_() {
         try {
-            print(jmxInfoViewer.getInfo("ProActiveResourceManager:name=RuntimeData"));
+            printMap(jmxInfoViewer.getMappedInfo("ProActiveResourceManager:name=RuntimeData"));
         } catch (Exception e) {
             handleExceptionDisplay("Error while retrieving JMX informations", e);
         }
@@ -546,7 +547,7 @@ public class ResourceManagerModel extends ConsoleModel {
 
     public void showMyAccount_() {
         try {
-            print(jmxInfoViewer.getInfo("ProActiveResourceManager:name=MyAccount"));
+            printMap(jmxInfoViewer.getMappedInfo("ProActiveResourceManager:name=MyAccount"));
         } catch (Exception e) {
             handleExceptionDisplay("Error while retrieving JMX informations", e);
         }
@@ -555,7 +556,7 @@ public class ResourceManagerModel extends ConsoleModel {
     public void showAccount_(final String username) {
         try {
             jmxInfoViewer.setAttribute("ProActiveResourceManager:name=AllAccounts", "Username", username);
-            print(jmxInfoViewer.getInfo("ProActiveResourceManager:name=AllAccounts"));
+            printMap(jmxInfoViewer.getMappedInfo("ProActiveResourceManager:name=AllAccounts"));
         } catch (Exception e) {
             handleExceptionDisplay("Error while retrieving JMX informations", e);
         }
@@ -712,5 +713,30 @@ public class ResourceManagerModel extends ConsoleModel {
         } catch (Exception e) {
             handleExceptionDisplay("Error while unlocking nodes", e);
         }
+    }
+
+    /**
+     * Print a map on two column
+     * 
+     * @param map the map to be printed
+     */
+    private void printMap(Map<String, String> map) {
+        ObjectArrayFormatter oaf = new ObjectArrayFormatter();
+        oaf.setMaxColumnLength(80);
+        //space between column
+        oaf.setSpace(2);
+        //fake title line
+        List<String> list = new ArrayList<String>();
+        list.add("");
+        list.add("");
+        oaf.setTitle(list);
+        //lines content
+        for (Entry<String, String> e : map.entrySet()) {
+            list = new ArrayList<String>();
+            list.add(e.getKey());
+            list.add(e.getValue());
+            oaf.addLine(list);
+        }
+        print(Tools.getStringAsArray(oaf));
     }
 }
