@@ -40,6 +40,8 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
 import java.io.Serializable;
 import java.security.KeyException;
 import java.security.PublicKey;
@@ -107,6 +109,8 @@ import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.util.CachingSchedulerProxyUserInterface;
 import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
+import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingException;
+import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive_grid_cloud_portal.common.LoginForm;
 import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
@@ -173,23 +177,13 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      */
     private void renewLeaseForClient(Scheduler scheduler) throws NotConnectedException, PermissionException {
         /*
-        final Scheduler sched = scheduler;
-        new Thread(new Runnable() {
-
-            public void run() {
-                try {
-                    sched.getStatus();
-                    PAActiveObject.getBodyOnThis().terminate();
-                } catch (NotConnectedException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                } catch (PermissionException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-            }
-        }).start();
-        */
+         * final Scheduler sched = scheduler; new Thread(new Runnable() {
+         * 
+         * public void run() { try { sched.getStatus(); PAActiveObject.getBodyOnThis().terminate();
+         * } catch (NotConnectedException e) { // TODO Auto-generated catch block
+         * e.printStackTrace(); } catch (PermissionException e) { // TODO Auto-generated catch block
+         * e.printStackTrace(); } } }).start();
+         */
     }
 
     /**
@@ -478,6 +472,93 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         js = PAFuture.getFutureValue(js);
 
         return js;
+    }
+
+    /**
+     * Stream the output of job identified by the id <code>jobid</code>
+     * only stream currently available logs, call this method several times
+     * to get the complete output.
+     * @param sessionid a valid session id
+     * @param jobid the id of the job to retrieve
+     * @throws IOException 
+     * @throws LogForwardingException 
+     */
+    @GET
+    @Path("jobs/{jobid}/livelog")
+    @Produces("application/json")
+    public String getLiveLogJob(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId)
+            throws NotConnectedException, UnknownJobException, PermissionException, LogForwardingException,
+            IOException {
+        Scheduler s = checkAccess(sessionId, "/scheduler/jobs/livelog" + jobId);
+
+        JobOutput jo = JobsOutputController.getInstance().getJobOutput(jobId);
+
+        if (jo == null) {
+            JobsOutputController.getInstance().createJobOutput(s, jobId);
+        }
+
+        jo = JobsOutputController.getInstance().getJobOutput(jobId);
+
+        if (jo != null) {
+            PipedInputStream snk = jo.getPipedInputStream();
+            if (snk != null) {
+                int available = snk.available();
+                byte[] b = new byte[available];
+                snk.read(b);
+                return new String(b);
+            }
+        }
+
+        return "";
+    }
+
+    /**
+     * number of available bytes in the stream or -1 if the stream does not exist.
+     * @param sessionid a valid session id
+     * @param jobid the id of the job to retrieve
+     * @throws IOException 
+     * @throws LogForwardingException 
+     */
+    @GET
+    @Path("jobs/{jobid}/livelog/available")
+    @Produces("application/json")
+    public int getLiveLogJobAvailable(@HeaderParam("sessionid") String sessionId,
+            @PathParam("jobid") String jobId) throws NotConnectedException, UnknownJobException,
+            PermissionException, LogForwardingException, IOException {
+        Scheduler s = checkAccess(sessionId, "/scheduler/jobs/livelog/available" + jobId);
+
+        JobOutput jo = JobsOutputController.getInstance().getJobOutput(jobId);
+
+        if (jo != null) {
+            PipedInputStream snk = jo.getPipedInputStream();
+            if (snk != null) {
+                return snk.available();
+            }
+        }
+
+        return -1;
+
+    }
+
+    /**
+     * remove the live log object.
+     * @param sessionid a valid session id
+     * @param jobid the id of the job to retrieve
+     * @throws IOException 
+     * @throws LogForwardingException 
+     */
+    @DELETE
+    @Path("jobs/{jobid}/livelog")
+    @Produces("application/json")
+    public boolean deleteLiveLogJob(@HeaderParam("sessionid") String sessionId,
+            @PathParam("jobid") String jobId) throws NotConnectedException, UnknownJobException,
+            PermissionException, LogForwardingException, IOException {
+        Scheduler s = checkAccess(sessionId, "/scheduler/jobs/" + jobId);
+
+        JobsOutputController.getInstance().removeJobOutput(JobIdImpl.makeJobId(jobId));
+
+        return true;
+
     }
 
     /**

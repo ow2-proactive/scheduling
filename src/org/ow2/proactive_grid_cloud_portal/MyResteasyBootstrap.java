@@ -120,6 +120,9 @@ public class MyResteasyBootstrap extends ResteasyBootstrap {
         Thread rm = new Thread(this.rmSessionCleaner, "RM Sessions Cleaner Thread");
         rm.setDaemon(true);
         rm.start();
+        
+        
+        
     }
 
     @Override
