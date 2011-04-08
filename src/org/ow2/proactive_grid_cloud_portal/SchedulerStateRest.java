@@ -918,30 +918,34 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      * @param sessionId a valid session id
      * @param jobId the id of the job
      * @return the <code>jobid</code> of the newly created job
+     * @throws IOException if the job was not correctly uploaded/stored
      */
     @POST
     @Path("submit")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces("application/json")
     public JobId submit(@HeaderParam("sessionid") String sessionId, MultipartInput multipart)
-            throws IOException, JobCreationException, NotConnectedException, PermissionException,
-            SubmissionClosedException {
+            throws JobCreationException, NotConnectedException, PermissionException,
+            SubmissionClosedException, IOException {
         Scheduler s = checkAccess(sessionId, "submit");
-        File tmp;
+        File tmp = null;
 
-        tmp = File.createTempFile("prefix", "suffix");
-        for (InputPart part : multipart.getParts()) {
-            BufferedWriter outf = new BufferedWriter(new FileWriter(tmp));
-            outf.write(part.getBodyAsString());
-            outf.close();
+        try {
+            tmp = File.createTempFile("prefix", "suffix");
+            for (InputPart part : multipart.getParts()) {
+                BufferedWriter outf = new BufferedWriter(new FileWriter(tmp));
+                outf.write(part.getBodyAsString());
+                outf.close();
+            }
+
+            Job j = JobFactory.getFactory().createJob(tmp.getAbsolutePath());
+            return s.submit(j);
+        } finally {
+            if (tmp != null) {
+                // clean the temporary file
+                tmp.delete();
+            }
         }
-
-        Job j = JobFactory.getFactory().createJob(tmp.getAbsolutePath());
-
-        // clean the temporary file
-        tmp.delete();
-
-        return s.submit(j);
 
     }
 
