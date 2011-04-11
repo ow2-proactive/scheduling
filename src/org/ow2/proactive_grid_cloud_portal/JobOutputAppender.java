@@ -54,16 +54,6 @@ import org.apache.log4j.spi.LoggingEvent;
  */
 public class JobOutputAppender extends AppenderSkeleton {
 
-    /**
-     * Period in ms of the event buffer flushing.
-     */
-    public static final long FLUSH_PERIOD = 1000;
-
-    /**
-     * Size of the event buffer.
-     */
-    public static final int BUFFER_SIZE = 128;
-
     private JobOutput jobOutput = null;
 
     // -------------------------------------------------------------------- //

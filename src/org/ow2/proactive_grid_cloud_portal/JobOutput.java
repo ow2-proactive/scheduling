@@ -57,7 +57,6 @@ import org.ow2.proactive.scheduler.common.SchedulerConstants;
  */
 public class JobOutput {
 
-
     public static class RemoteHint {
         public String appType;
         public String url;
@@ -94,16 +93,15 @@ public class JobOutput {
      * @param name the name.
      */
     public JobOutput(String name) {
-        this.name = name ;
+        this.name = name;
     }
 
-
-    public JobOutput(String name, PipedInputStream snk,PipedOutputStream pos) {
+    public JobOutput(String name, PipedInputStream snk, PipedOutputStream pos) {
         this(name);
         this.pos = pos;
         this.snk = snk;
     }
-    
+
     // -------------------------------------------------------------------- //
     // ----------------------------- private ------------------------------ //
     // -------------------------------------------------------------------- //
@@ -261,11 +259,12 @@ public class JobOutput {
     public Map<String, RemoteHint> getRemoteConnHints() {
         return this.remoteConnHints;
     }
-    
+
     public PipedOutputStream getPipedOutputStream() {
         return pos;
     }
-    public  PipedInputStream getPipedInputStream() {
+
+    public PipedInputStream getPipedInputStream() {
         return this.snk;
     }
 }
