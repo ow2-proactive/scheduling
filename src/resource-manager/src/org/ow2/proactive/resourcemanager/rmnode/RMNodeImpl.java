@@ -331,7 +331,7 @@ public class RMNodeImpl implements RMNode, Serializable {
         sb.append(lf);
         sb.append("Provider : " + provider.getName());
         sb.append(lf);
-        sb.append("Owner : " + (owner == null ? "nobody" : owner.getName()));
+        sb.append("Used by : " + (owner == null ? "nobody" : owner.getName()));
         sb.append(lf);
         sb.append("State : " + state);
         return sb.toString();
