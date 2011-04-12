@@ -127,9 +127,9 @@ public class RemoteMatlabProxyController {
      *
      * @throws MatlabInvocationException
      */
-    public static void exit() throws MatlabInvocationException {
+    public static void exit(boolean immediate) throws MatlabInvocationException {
         if (RemoteMatlabProxyController.isConnected()) {
-            _proxy.exit();
+            _proxy.exit(immediate);
         } else {
             throw new MatlabInvocationException(MatlabInvocationException.CONTROLLER_NO_CONNECTION_MSG);
         }
@@ -145,9 +145,9 @@ public class RemoteMatlabProxyController {
      * @throws MatlabInvocationException
      * @see #returningEval(String, int)
      */
-    public static void eval(String command) throws MatlabInvocationException {
+    public static String eval(String command) throws MatlabInvocationException {
         if (RemoteMatlabProxyController.isConnected()) {
-            _proxy.eval(command);
+            return _proxy.eval(command);
         } else {
             throw new MatlabInvocationException(MatlabInvocationException.CONTROLLER_NO_CONNECTION_MSG);
         }

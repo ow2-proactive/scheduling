@@ -63,7 +63,7 @@ public class MatlabProcessCreatorImpl implements MatlabProcessCreator {
 	public void createMatlabProcess(String runArg) throws MatlabConnectionException {
         //Attempt to run MATLAB
         try {            
-            Runtime.getRuntime().exec(new String[]{_matlabLocation, "-desktop", "-r", runArg});
+            Runtime.getRuntime().exec(new String[]{_matlabLocation, "-nodesktop", "-r", runArg});
         } catch (IOException e) {
             throw new MatlabConnectionException("Could not launch MATLAB. Used location/alias: " + _matlabLocation, e);
         }

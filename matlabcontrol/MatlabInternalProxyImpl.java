@@ -32,19 +32,19 @@ import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 
 /**
- * Passes method calls off to the {@link JMIWrapper}. This proxy is necessary because
- * fields that {@link JMIWrapper} uses cannot be marshalled, as is required by RMI.
+ * Passes method calls off to the {@link JMIWrapperImpl}. This proxy is necessary because
+ * fields that {@link JMIWrapperImpl} uses cannot be marshalled, as is required by RMI.
  * <p/>
- * These methods are documented in {@link JMIWrapper}.
+ * These methods are documented in {@link JMIWrapperImpl}.
  *
  * @author <a href="mailto:jak2@cs.brown.edu">Joshua Kaplan</a>
  */
 class MatlabInternalProxyImpl extends UnicastRemoteObject implements MatlabInternalProxy {
     private static final long serialVersionUID = 1L;
 
-    private final JMIWrapper _wrapper;
+    private final JMIWrapperImpl _wrapper;
 
-    public MatlabInternalProxyImpl(JMIWrapper wrapper) throws RemoteException {
+    public MatlabInternalProxyImpl(JMIWrapperImpl wrapper) throws RemoteException {
         _wrapper = wrapper;
     }
 
@@ -56,8 +56,8 @@ class MatlabInternalProxyImpl extends UnicastRemoteObject implements MatlabInter
         return _wrapper.getVariable(variableName);
     }
 
-    public void exit() throws RemoteException, MatlabInvocationException {
-        _wrapper.exit();
+    public void exit(boolean immediate) throws RemoteException, MatlabInvocationException {
+        _wrapper.exit(immediate);
     }
 
     public Object returningFeval(String command, Object[] args) throws RemoteException, MatlabInvocationException {
@@ -72,17 +72,10 @@ class MatlabInternalProxyImpl extends UnicastRemoteObject implements MatlabInter
         return _wrapper.returningEval(command, returnCount);
     }
 
-    public void eval(String command) throws RemoteException, MatlabInvocationException {
-        _wrapper.eval(command);
+    public String eval(String command) throws RemoteException, MatlabInvocationException {
+        return _wrapper.eval(command);
     }
 
-    public String eval2(String command) throws RemoteException, MatlabInvocationException {
-        return _wrapper.eval2(command);
-    }
-
-    public Object evalStreamOutput(final String command) throws RemoteException, MatlabInvocationException {
-        return _wrapper.evalStreamOutput(command);
-    }
 
     public void feval(String command, Object[] args) throws RemoteException, MatlabInvocationException {
         _wrapper.feval(command, args);

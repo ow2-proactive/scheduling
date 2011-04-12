@@ -50,7 +50,7 @@ public final class LocalMatlabProxy {
     /**
      * The underlying wrapper to JMI.
      */
-    private final static JMIWrapper _wrapper = new JMIWrapper();
+    private final static JMIWrapper _wrapper = new JMIWrapperImpl2();
 
     /**
      * Private constructor so that this class cannot be constructed.
@@ -63,8 +63,8 @@ public final class LocalMatlabProxy {
      *
      * @throws MatlabInvocationException
      */
-    public static void exit() throws MatlabInvocationException {
-        _wrapper.exit();
+    public static void exit(boolean immediate) throws MatlabInvocationException {
+        _wrapper.exit(immediate);
     }
 
     /**
@@ -77,8 +77,8 @@ public final class LocalMatlabProxy {
      * @throws MatlabInvocationException
      * @see #returningEval(String, int)
      */
-    public static void eval(String command) throws MatlabInvocationException {
-        _wrapper.eval(command);
+    public static String eval(String command) throws MatlabInvocationException {
+        return _wrapper.eval(command);
     }
 
     /**

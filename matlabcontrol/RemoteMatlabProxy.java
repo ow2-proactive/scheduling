@@ -137,9 +137,9 @@ public final class RemoteMatlabProxy {
      *
      * @throws MatlabInvocationException
      */
-    public void exit() throws MatlabInvocationException {
+    public void exit(boolean immediate) throws MatlabInvocationException {
         try {
-            _internalProxy.exit();
+            _internalProxy.exit(immediate);
         } catch (RemoteException e) {
             if (this.isConnected()) {
                 throw new MatlabInvocationException(MatlabInvocationException.UNKNOWN_REMOTE_REASON_MSG, e);
@@ -171,9 +171,9 @@ public final class RemoteMatlabProxy {
      * @throws MatlabInvocationException
      * @see #returningEval(String, int)
      */
-    public void eval(String command) throws MatlabInvocationException {
+    public String eval(String command) throws MatlabInvocationException {
         try {
-            _internalProxy.eval(command);
+            return _internalProxy.eval(command);
         } catch (RemoteException e) {
             if (this.isConnected()) {
                 throw new MatlabInvocationException(MatlabInvocationException.UNKNOWN_REMOTE_REASON_MSG, e);
@@ -183,29 +183,6 @@ public final class RemoteMatlabProxy {
         }
     }
 
-    public String eval2(String command) throws MatlabInvocationException {
-        try {
-            return _internalProxy.eval2(command);
-        } catch (RemoteException e) {
-            if (this.isConnected()) {
-                throw new MatlabInvocationException(MatlabInvocationException.UNKNOWN_REMOTE_REASON_MSG, e);
-            } else {
-                throw new MatlabInvocationException(MatlabInvocationException.PROXY_NOT_CONNECTED_MSG, e);
-            }
-        }
-    }
-
-    public Object evalStreamOutput(String command) throws MatlabInvocationException {
-        try {
-            return _internalProxy.evalStreamOutput(command);
-        } catch (RemoteException e) {
-            if (this.isConnected()) {
-                throw new MatlabInvocationException(MatlabInvocationException.UNKNOWN_REMOTE_REASON_MSG, e);
-            } else {
-                throw new MatlabInvocationException(MatlabInvocationException.PROXY_NOT_CONNECTED_MSG, e);
-            }
-        }
-    }
 
     /**
      * Evaluates a command in MATLAB. The result of this command can be

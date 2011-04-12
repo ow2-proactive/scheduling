@@ -62,7 +62,7 @@ class MatlabConnector {
             MatlabInternalProxyReceiver receiver = (MatlabInternalProxyReceiver) registry.lookup(receiverID);
 
             //Create the wrapper, then pass the internal proxy over RMI to the Java application in its own JVM
-            receiver.registerControl(proxyID, new MatlabInternalProxyImpl(new JMIWrapper()));
+            receiver.registerControl(proxyID, new MatlabInternalProxyImpl(new JMIWrapperImpl2()));
         }
         //If for any reason the attempt fails, throw exception that indicates connection could not be established
         catch (Exception e) {

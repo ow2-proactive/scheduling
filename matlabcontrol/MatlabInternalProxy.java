@@ -50,17 +50,13 @@ import java.rmi.RemoteException;
  * @author <a href="mailto:jak2@cs.brown.edu">Joshua Kaplan</a>
  */
 interface MatlabInternalProxy extends Remote {
-    public void exit() throws RemoteException, MatlabInvocationException;
+    public void exit(boolean immediate) throws RemoteException, MatlabInvocationException;
 
     public void setVariable(String variableName, Object value) throws RemoteException, MatlabInvocationException;
 
     public Object getVariable(String variableName) throws RemoteException, MatlabInvocationException;
 
-    public void eval(String command) throws RemoteException, MatlabInvocationException;
-
-    public String eval2(String command) throws RemoteException, MatlabInvocationException;
-
-    public Object evalStreamOutput(final String command) throws RemoteException, MatlabInvocationException;
+    public String eval(String command) throws RemoteException, MatlabInvocationException;
 
     public void feval(String command, Object[] args) throws RemoteException, MatlabInvocationException;
 
