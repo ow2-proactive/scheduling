@@ -489,15 +489,15 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     public String getLiveLogJob(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId)
             throws NotConnectedException, UnknownJobException, PermissionException, LogForwardingException,
             IOException {
-        Scheduler s = checkAccess(sessionId, "/scheduler/jobs/livelog" + jobId);
+        Scheduler s = checkAccess(sessionId, "/scheduler/jobs/" + jobId + "/livelog");
 
-        JobOutput jo = JobsOutputController.getInstance().getJobOutput(jobId);
+        JobOutput jo = JobsOutputController.getInstance().getJobOutput(sessionId, jobId);
 
         if (jo == null) {
-            JobsOutputController.getInstance().createJobOutput(s, jobId);
+            JobsOutputController.getInstance().createJobOutput(s, sessionId, jobId);
         }
 
-        jo = JobsOutputController.getInstance().getJobOutput(jobId);
+        jo = JobsOutputController.getInstance().getJobOutput(sessionId, jobId);
 
         if (jo != null) {
             PipedInputStream snk = jo.getPipedInputStream();
@@ -525,9 +525,9 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     public int getLiveLogJobAvailable(@HeaderParam("sessionid") String sessionId,
             @PathParam("jobid") String jobId) throws NotConnectedException, UnknownJobException,
             PermissionException, LogForwardingException, IOException {
-        Scheduler s = checkAccess(sessionId, "/scheduler/jobs/livelog/available" + jobId);
+        Scheduler s = checkAccess(sessionId, "/scheduler/jobs/" + jobId + "/livelog/available");
 
-        JobOutput jo = JobsOutputController.getInstance().getJobOutput(jobId);
+        JobOutput jo = JobsOutputController.getInstance().getJobOutput(sessionId, jobId);
 
         if (jo != null) {
             PipedInputStream snk = jo.getPipedInputStream();
@@ -553,9 +553,9 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     public boolean deleteLiveLogJob(@HeaderParam("sessionid") String sessionId,
             @PathParam("jobid") String jobId) throws NotConnectedException, UnknownJobException,
             PermissionException, LogForwardingException, IOException {
-        Scheduler s = checkAccess(sessionId, "/scheduler/jobs/" + jobId);
+        Scheduler s = checkAccess(sessionId, "delete /scheduler/jobs/livelog" + jobId);
 
-        JobsOutputController.getInstance().removeJobOutput(JobIdImpl.makeJobId(jobId));
+        JobsOutputController.getInstance().removeJobOutput(sessionId, jobId);
 
         return true;
 

@@ -74,8 +74,7 @@ public class JobsOutputController {
         System.getProperty("line.separator");
 
     protected LogForwardingService lfs;
-    
-    
+
     // The shared instance
     private static JobsOutputController instance = null;
     private Map<String, JobOutputAppender> appenders = null;
@@ -85,7 +84,7 @@ public class JobsOutputController {
     // -------------------------------------------------------------------- //
     private JobsOutputController() {
         appenders = new HashMap<String, JobOutputAppender>();
-        lfs=new LogForwardingService(SocketBasedForwardingProvider.class.getName());
+        lfs = new LogForwardingService(SocketBasedForwardingProvider.class.getName());
         try {
             lfs.initialize();
         } catch (LogForwardingException e) {
@@ -123,8 +122,8 @@ public class JobsOutputController {
      * @return the output of the specified job, or null
      * @see JobsOutputController#createJobOutput(JobId)
      */
-    public JobOutput getJobOutput(String jobId) {
-        JobOutputAppender joa = appenders.get(jobId);
+    public JobOutput getJobOutput(String sessionId, String jobId) {
+        JobOutputAppender joa = appenders.get(sessionId + "-" + jobId);
         if (joa == null) {
             return null;
         } else {
@@ -145,24 +144,23 @@ public class JobsOutputController {
      * @throws IOException 
      * @throws SchedulerException
      */
-    public void createJobOutput(Scheduler s,String jobId) throws NotConnectedException, UnknownJobException, PermissionException, LogForwardingException, IOException { 
- 
-            PipedInputStream snk = new PipedInputStream();
-            PipedOutputStream pos = new PipedOutputStream(snk);
-                JobOutputAppender joa = new JobOutputAppender(new JobOutput(PREFIX_JOB_OUTPUT_TITLE + jobId,
-                    snk,pos));
-                joa.setLayout(Log4JTaskLogs.getTaskLogLayout());
-                Logger log = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX + jobId);
-                log.setAdditivity(false);
-                log.setLevel(Level.ALL);
-                log.removeAllAppenders();
-                log.addAppender(joa);
-                appenders.put(jobId, joa);
-                s.listenJobLogs(jobId, lfs.getAppenderProvider());
-              
-           
-        }
-    
+    public void createJobOutput(Scheduler s, String sessionId, String jobId) throws NotConnectedException,
+            UnknownJobException, PermissionException, LogForwardingException, IOException {
+
+        PipedInputStream snk = new PipedInputStream();
+        PipedOutputStream pos = new PipedOutputStream(snk);
+        JobOutputAppender joa = new JobOutputAppender(
+            new JobOutput(PREFIX_JOB_OUTPUT_TITLE + jobId, snk, pos));
+        joa.setLayout(Log4JTaskLogs.getTaskLogLayout());
+        Logger log = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX + jobId);
+        log.setAdditivity(false);
+        log.setLevel(Level.ALL);
+        //                log.removeAllAppenders();
+        log.addAppender(joa);
+        appenders.put(sessionId + "-" + jobId, joa);
+        s.listenJobLogs(jobId, lfs.getAppenderProvider());
+
+    }
 
     /**
      * To remove an output for a job identified by the given jobId
@@ -170,12 +168,14 @@ public class JobsOutputController {
      * @param jobId
      *            the jobId
      */
-    public void removeJobOutput(JobId jobId) {
-        JobOutputAppender joa = appenders.get(jobId);
+    public void removeJobOutput(String sessionId, String jobId) {
+        JobOutputAppender joa = appenders.get(sessionId + "-" + jobId);
         if (joa != null) {
             joa.close();
         }
-        appenders.remove(jobId);
+        Logger log = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX + jobId);
+        log.removeAppender(joa);
+        appenders.remove(sessionId + "-" + jobId);
     }
 
     /**
