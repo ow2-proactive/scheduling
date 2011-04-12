@@ -83,7 +83,7 @@ public class CreateSourceDialog {
 
         Display display = parent.getDisplay();
 
-        dialog = new Shell(parent.getDisplay(), SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL | SWT.RESIZE);
+        dialog = new Shell(parent.getDisplay(), SWT.DIALOG_TRIM | SWT.RESIZE);
         dialog.setText("Create a node source");
         GridLayout shellLayout = new GridLayout(1, false);
         shellLayout.marginLeft = 0;
