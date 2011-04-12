@@ -45,6 +45,7 @@ import java.util.Map.Entry;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.util.CircularArrayList;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.exception.PermissionException;
@@ -147,10 +148,8 @@ public class JobsOutputController {
     public void createJobOutput(Scheduler s, String sessionId, String jobId) throws NotConnectedException,
             UnknownJobException, PermissionException, LogForwardingException, IOException {
 
-        PipedInputStream snk = new PipedInputStream();
-        PipedOutputStream pos = new PipedOutputStream(snk);
         JobOutputAppender joa = new JobOutputAppender(
-            new JobOutput(PREFIX_JOB_OUTPUT_TITLE + jobId, snk, pos));
+            new JobOutput(PREFIX_JOB_OUTPUT_TITLE + jobId, new CircularArrayList<String>(50)));
         joa.setLayout(Log4JTaskLogs.getTaskLogLayout());
         Logger log = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX + jobId);
         log.setAdditivity(false);

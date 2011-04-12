@@ -90,15 +90,8 @@ public class JobOutputAppender extends AppenderSkeleton {
     @Override
     protected void append(LoggingEvent event) {
         if (!super.closed) {
-            try {
-                jobOutput.getPipedOutputStream().write(
-                        this.layout != null ? this.layout.format(event).getBytes() : event
-                                .getRenderedMessage().getBytes());
-                jobOutput.getPipedOutputStream().flush();
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
+            jobOutput.getCl().add(
+                    this.layout != null ? this.layout.format(event) : event.getRenderedMessage());
         }
     }
 
@@ -108,12 +101,6 @@ public class JobOutputAppender extends AppenderSkeleton {
     @Override
     public void close() {
         super.closed = true;
-        try {
-            jobOutput.getPipedOutputStream().close();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
     }
 
     /**

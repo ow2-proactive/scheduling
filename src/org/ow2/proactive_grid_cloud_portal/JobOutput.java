@@ -37,16 +37,12 @@
 package org.ow2.proactive_grid_cloud_portal;
 
 import java.awt.Color;
-import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
-import java.io.StringReader;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.ow2.proactive.scheduler.common.SchedulerConstants;
+import org.objectweb.proactive.core.util.CircularArrayList;
 
 
 /**
@@ -75,14 +71,9 @@ public class JobOutput {
         }
     }
 
-    /** maps a Task ID to a remote connection hint extracted from the logs */
-    private Map<String, RemoteHint> remoteConnHints = new HashMap<String, RemoteHint>();
-
-    private PipedOutputStream pos;
-
     private String name;
 
-    private PipedInputStream snk;
+    private CircularArrayList<String> cl;
 
     // -------------------------------------------------------------------- //
     // --------------------------- constructor ---------------------------- //
@@ -96,10 +87,9 @@ public class JobOutput {
         this.name = name;
     }
 
-    public JobOutput(String name, PipedInputStream snk, PipedOutputStream pos) {
+    public JobOutput(String name, CircularArrayList<String> cl) {
         this(name);
-        this.pos = pos;
-        this.snk = snk;
+        this.cl = cl;
     }
 
     // -------------------------------------------------------------------- //
@@ -112,58 +102,7 @@ public class JobOutput {
      * @param color the color
      */
     private synchronized void log_(String message) {
-        final String mess = message;
-        try {
-            pos.write(message.getBytes());
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * Search for remote connection hints in this log message
-     * 
-     * @param message log message ; may contain multiple lines
-     */
-    private void findRemoteHint(String message) {
-        if (message.indexOf(SchedulerConstants.REMOTE_CONNECTION_MARKER) != -1) {
-            BufferedReader br = new BufferedReader(new StringReader(message));
-            String line = null;
-            try {
-                while ((line = br.readLine()) != null) {
-                    String[] hint = line.split(SchedulerConstants.REMOTE_CONNECTION_MARKER);
-                    if (hint.length > 1) {
-                        String[] expl = hint[1].split("" + SchedulerConstants.REMOTE_CONNECTION_SEPARATOR);
-
-                        // expl = { '', 'taskid', 'application type', 'url', 'maybe more url' }
-                        String url = expl[3];
-
-                        // some URLs may contain the separator : 'http://foo.com:99/A&amp;B'
-                        // accumulate everything until EOF as the URL
-                        for (int j = 4; j < expl.length; j++)
-                            url += SchedulerConstants.REMOTE_CONNECTION_SEPARATOR + expl[j];
-
-                        String appType = expl[2];
-                        String taskId = expl[1];
-
-                        if (!appType.matches("[a-zA-Z]+")) {
-                            this.remoteConnHints.put(taskId, new RemoteHint(
-                                "Application type needs to contain alphabetical characters only (was '" +
-                                    appType + "')"));
-                            break;
-                        }
-
-                        RemoteHint h = new RemoteHint(appType, url);
-                        this.remoteConnHints.put(taskId, h);
-                        break;
-                    }
-                }
-            } catch (IOException e) {
-                log("Failed to parse Job Output" + ProActiveLogger.getStackTraceAsString(e));
-            }
-        }
-
+        getCl().add(message);
     }
 
     // -------------------------------------------------------------------- //
@@ -252,19 +191,8 @@ public class JobOutput {
     public synchronized void off() {
     }
 
-    /**
-     * @return maps a TaskID value (ie "10001") to a remote connection hint : protocol and url
-     *      all tasks may not have a visualization hint
-     */
-    public Map<String, RemoteHint> getRemoteConnHints() {
-        return this.remoteConnHints;
+    public CircularArrayList<String> getCl() {
+        return cl;
     }
 
-    public PipedOutputStream getPipedOutputStream() {
-        return pos;
-    }
-
-    public PipedInputStream getPipedInputStream() {
-        return this.snk;
-    }
 }

@@ -79,6 +79,7 @@ import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.core.util.CircularArrayList;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
@@ -500,13 +501,14 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         jo = JobsOutputController.getInstance().getJobOutput(sessionId, jobId);
 
         if (jo != null) {
-            PipedInputStream snk = jo.getPipedInputStream();
-            if (snk != null) {
-                int available = snk.available();
-                byte[] b = new byte[available];
-                snk.read(b);
-                return new String(b);
+            CircularArrayList<String> cl = jo.getCl();
+            int size = cl.size();
+            StringBuffer mes = new StringBuffer();
+            for (int i = 0; i < size; i++) {
+                mes.append(cl.remove(0));
             }
+            return mes.toString();
+
         }
 
         return "";
@@ -530,10 +532,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         JobOutput jo = JobsOutputController.getInstance().getJobOutput(sessionId, jobId);
 
         if (jo != null) {
-            PipedInputStream snk = jo.getPipedInputStream();
-            if (snk != null) {
-                return snk.available();
-            }
+            return jo.getCl().size();
         }
 
         return -1;
