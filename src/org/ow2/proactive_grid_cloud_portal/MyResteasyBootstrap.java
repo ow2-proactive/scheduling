@@ -107,7 +107,7 @@ public class MyResteasyBootstrap extends ResteasyBootstrap {
                         false);
             }
         }
-        
+        System.setProperty("scheduler.database.nodb", "true");
         
         SchedulerStateCaching.init();
 
