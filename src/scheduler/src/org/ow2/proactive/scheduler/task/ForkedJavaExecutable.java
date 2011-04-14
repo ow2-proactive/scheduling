@@ -46,13 +46,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.Map.Entry;
-import java.util.concurrent.Semaphore;
-import java.util.concurrent.TimeUnit;
-
-import javax.management.Notification;
-import javax.management.NotificationListener;
+import java.util.Random;
 
 import org.apache.log4j.Appender;
 import org.apache.log4j.AppenderSkeleton;
@@ -64,15 +59,8 @@ import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveTimeoutException;
 import org.objectweb.proactive.core.body.future.FutureMonitoring;
 import org.objectweb.proactive.core.body.future.FutureProxy;
-import org.objectweb.proactive.core.jmx.notification.GCMRuntimeRegistrationNotificationData;
-import org.objectweb.proactive.core.jmx.notification.NotificationType;
-import org.objectweb.proactive.core.jmx.util.JMXNotificationManager;
 import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.core.runtime.ProActiveRuntime;
-import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
-import org.objectweb.proactive.core.runtime.RuntimeFactory;
-import org.objectweb.proactive.core.runtime.StartPARuntime;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.processbuilder.OSProcessBuilder;
 import org.objectweb.proactive.extensions.processbuilder.exception.NotImplementedException;
@@ -105,26 +93,23 @@ import org.ow2.proactive.scripting.ScriptResult;
  * @author The ProActive Team
  *
  */
-public class ForkedJavaExecutable extends JavaExecutable {
+public class ForkedJavaExecutable extends JavaExecutable implements ForkerStarterCallback {
 
     public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.LAUNCHER);
 
-    /** When creating a ProActive node on a dedicated JVM, assign a default name of VN */
-    public static final String DEFAULT_VN_NAME = "ForkedTasksVN";
-
     /** Fork environment script binding name */
     public static final String FORKENV_BINDING_NAME = "forkEnvironment";
+
+    /** Check start timeout : timeout to check if the process has failed */
+    private static final long CHECKSTART_TIMEOUT = 2000;
+    /** Number of times we check the start (total timeout will be RETRY_ACQUIRE*CHECKSTART_TIMEOUT) */
+    private static final int NB_RETRY_CHECKSTART = 10;
 
     /** Size of the log buffer on forked side ; logs are buffered on forker side */
     private static final int FORKED_LOG_BUFFER_SIZE = 0;
 
     /** Forked execution time out checking interval */
     private static final int TIMEOUT = 1000;
-
-    /** For tryAcquire primitive */
-    private static final long SEMAPHORE_TIMEOUT = 2;
-    /** For tryAcquire primitive */
-    private static final int RETRY_ACQUIRE = 10;
 
     /** Java task launcher reference kept to activate logs on it if necessary */
     private JavaTaskLauncher newJavaTaskLauncher;
@@ -133,15 +118,14 @@ public class ForkedJavaExecutable extends JavaExecutable {
     private transient Thread tsout, tserr;
 
     private String forkedNodeName;
-    private long deploymentID;
     private ForkedJavaExecutableInitializer execInitializer;
     private File fpolicy = null;
     private File flog4j = null;
     private File fpaconfig = null;
 
     private Process process = null;
-    private ProActiveRuntime childRuntime = null;
-    private Semaphore semaphore = new Semaphore(0);
+    private Node forkedNode = null;
+    private Boolean processStarted = false;
 
     /** Hibernate default constructor */
     public ForkedJavaExecutable() {
@@ -167,10 +151,8 @@ public class ForkedJavaExecutable extends JavaExecutable {
     @Override
     public Serializable execute(TaskResult... results) throws Throwable {
         try {
-
             // building command for executing java and start process
             OSProcessBuilder ospb = createProcessAndPrepareCommand();
-            createRegistrationListener();
             process = startProcess(ospb);
             this.initStreamReaders();
             waitForRegistration(ospb);
@@ -369,8 +351,8 @@ public class ForkedJavaExecutable extends JavaExecutable {
      */
     private void init() {
         Random random = new Random((new Date()).getTime());
-        deploymentID = random.nextInt(1000000);
-        forkedNodeName = this.getClass().getName() + deploymentID;
+        long deploymentID = random.nextInt(1000000);
+        forkedNodeName = "f" + deploymentID;
     }
 
     /**
@@ -499,27 +481,27 @@ public class ForkedJavaExecutable extends JavaExecutable {
      * @param command the command to be completed
      */
     private void addRuntime(List<String> command) throws ProActiveException {
-        command.add(StartPARuntime.class.getName());
-        command.add("-p");
-        command.add(RuntimeFactory.getDefaultRuntime().getURL());
-        command.add("-c");
-        command.add("1");
-        command.add("-d");
-        command.add("" + deploymentID);
+        command.add(ForkerStarter.class.getName());
+        String url = PAActiveObject.registerByName(PAActiveObject.getStubOnThis(), forkedNodeName, "pnp");
+        command.add(url);
+        command.add(forkedNodeName);
     }
 
     /**
-     * wait until the child runtime registers itself at the current JVM
+     * wait until the child runtime callback at the current JVM
      * in case it fails to register (because of any reason), we don't start the task at all exiting with an exception
      *
      * @param ospb the process builder that will execute the command
      */
-    private void waitForRegistration(OSProcessBuilder ospb) throws SchedulerException, InterruptedException {
+    private synchronized void waitForRegistration(OSProcessBuilder ospb) throws SchedulerException,
+            InterruptedException {
         int numberOfTrials = 0;
-        for (; numberOfTrials < RETRY_ACQUIRE; numberOfTrials++) {
-            boolean permit = semaphore.tryAcquire(SEMAPHORE_TIMEOUT, TimeUnit.SECONDS);
-            if (permit) {
-                break;
+        for (; numberOfTrials < NB_RETRY_CHECKSTART; numberOfTrials++) {
+            this.wait(CHECKSTART_TIMEOUT);
+
+            if (processStarted) {
+                //process is started : OK unlock return to unlock this method
+                return;
             }
 
             try {
@@ -528,24 +510,22 @@ public class ForkedJavaExecutable extends JavaExecutable {
                 throw new StartForkedProcessException(
                     "Unable to create a separate java process. Exit code : " + ec, ospb.command());
             } catch (IllegalThreadStateException e) {
-                logger_dev.debug("Process not terminated, continue Forked VM launching (try number " +
+                //thrown by process.exitValue() if process is not finished
+                logger_dev.debug("Process not terminated, continue launching Forked VM (try number " +
                     numberOfTrials + ")");
             }
         }
-        if (numberOfTrials == RETRY_ACQUIRE) {
-            throw new StartForkedProcessException("Unable to create a separate java process after " +
-                RETRY_ACQUIRE + " tries", ospb.command());
-        }
-
+        throw new StartForkedProcessException("Unable to create a separate java process after " +
+            NB_RETRY_CHECKSTART + " tries", ospb.command());
     }
 
     /**
-     * Creating registration listener for collecting a registration notice from a created JVM
+     * {@inheritDoc}
      */
-    private void createRegistrationListener() {
-        /* creating registration listener for collecting a registration notice from a created JVM */
-        RegistrationListener registrationListener = new RegistrationListener();
-        registrationListener.subscribeJMXRuntimeEvent();
+    public synchronized void callback(Node n) {
+        forkedNode = n;
+        processStarted = true;
+        this.notify();
     }
 
     /**
@@ -639,9 +619,6 @@ public class ForkedJavaExecutable extends JavaExecutable {
      * @throws Exception
      */
     private JavaTaskLauncher createForkedTaskLauncher() throws Exception {
-        /* creating a ProActive node on a newly created JVM */
-        Node forkedNode = childRuntime.createLocalNode(forkedNodeName, true, null, DEFAULT_VN_NAME);
-
         /* JavaTaskLauncher will be an active object created on a newly created ProActive node */
         logger_dev.info("Create java task launcher");
         TaskLauncherInitializer tli = execInitializer.getJavaTaskLauncherInitializer();
@@ -665,15 +642,6 @@ public class ForkedJavaExecutable extends JavaExecutable {
             }
             if (fpaconfig != null) {
                 fpaconfig.delete();
-            }
-            // if the process did not register then childRuntime will be null and/or process will be null
-            if (childRuntime != null) {
-                try {
-                    childRuntime.killAllNodes();
-                    childRuntime.killRT(false);
-                    childRuntime = null;
-                } catch (Exception e) {
-                }
             }
             if (process != null) {
                 process.destroy();
@@ -703,42 +671,6 @@ public class ForkedJavaExecutable extends JavaExecutable {
         }
         // kill anyway !
         super.kill();
-    }
-
-    /**
-     * Registration Listener is responsible for collecting notifications from other JVMs.
-     * We need it specifically for collecting registration from a task dedicated JVM.
-     * This dedicated JVM is recognized by a specific deployment ID.
-     * Once the dedicated JVM registers itself, the semaphore is released and ForkedJavaTaskLauncher can proceed.
-     *
-     * @author ProActive
-     *
-     */
-    class RegistrationListener implements NotificationListener {
-
-        /**  */
-        public void subscribeJMXRuntimeEvent() {
-            ProActiveRuntimeImpl part = ProActiveRuntimeImpl.getProActiveRuntime();
-            JMXNotificationManager.getInstance().subscribe(part.getMBean().getObjectName(), this);
-        }
-
-        /**
-         * @see javax.management.NotificationListener#handleNotification(javax.management.Notification, java.lang.Object)
-         */
-        public void handleNotification(Notification notification, Object handback) {
-            String type = notification.getType();
-
-            if (NotificationType.GCMRuntimeRegistered.equals(type)) {
-                GCMRuntimeRegistrationNotificationData data = (GCMRuntimeRegistrationNotificationData) notification
-                        .getUserData();
-                if (data.getDeploymentId() == deploymentID) {
-                    childRuntime = data.getChildRuntime();
-                    semaphore.release();
-                    return;
-                }
-            }
-        }
-
     }
 
     /**

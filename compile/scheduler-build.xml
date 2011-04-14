@@ -199,6 +199,8 @@
 				<include name="org/ow2/proactive/scheduler/task/ForkedJavaExecutable.java" />
 				<include name="org/ow2/proactive/scheduler/task/ForkedJavaExecutableContainer.java" />
 				<include name="org/ow2/proactive/scheduler/task/ForkedJavaExecutableInitializer.java" />
+				<include name="org/ow2/proactive/scheduler/task/ForkerStarter.java" />
+				<include name="org/ow2/proactive/scheduler/task/ForkerStarterCallback.java" />
 				<include name="org/ow2/proactive/scheduler/task/KillTask.java" />
 				<include name="org/ow2/proactive/scheduler/task/NativeExecutableContainer.java" />
 				<include name="org/ow2/proactive/scheduler/task/NativeExecutableInitializer.java" />

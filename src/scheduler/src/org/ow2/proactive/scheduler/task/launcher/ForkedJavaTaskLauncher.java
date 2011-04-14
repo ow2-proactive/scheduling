@@ -40,7 +40,9 @@ import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.annotation.ImmediateService;
 import org.objectweb.proactive.api.PAFuture;
+import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
 import org.ow2.proactive.scheduler.common.exception.ForkedJavaTaskException;
@@ -51,6 +53,7 @@ import org.ow2.proactive.scheduler.task.ExecutableContainerInitializer;
 import org.ow2.proactive.scheduler.task.ForkedJavaExecutable;
 import org.ow2.proactive.scheduler.task.ForkedJavaExecutableContainer;
 import org.ow2.proactive.scheduler.task.ForkedJavaExecutableInitializer;
+import org.ow2.proactive.scheduler.task.ForkerStarterCallback;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 
@@ -62,7 +65,7 @@ import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
  * 
  * @author The ProActive Team
  */
-public class ForkedJavaTaskLauncher extends JavaTaskLauncher {
+public class ForkedJavaTaskLauncher extends JavaTaskLauncher implements ForkerStarterCallback {
 
     public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.LAUNCHER);
 
@@ -189,6 +192,16 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher {
     protected void unsetEnv() {
         //cancel default behavior defined in taskLauncher
         //it is useless to unset environment in forked tasklauncher
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * This method must be immediate service to get the callback of the new starter forked process
+     */
+    @ImmediateService
+    public void callback(Node n) {
+        ((ForkerStarterCallback) currentExecutable).callback(n);
     }
 
 }
