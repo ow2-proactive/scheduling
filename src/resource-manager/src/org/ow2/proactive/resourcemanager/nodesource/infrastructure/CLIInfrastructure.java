@@ -98,7 +98,7 @@ public class CLIInfrastructure extends InfrastructureManager {
                 // putting .cmd as an extension so that it works on Windows
                 deploymentScript = File.createTempFile("deployment", ".cmd");
                 FileToBytesConverter.convertByteArrayToFile(bytes, deploymentScript);
-                deploymentScript.setExecutable(true);
+                //deploymentScript.setExecutable(true);
             } catch (Exception e) {
                 throw new IllegalArgumentException("Could not read deployment script", e);
             }
@@ -108,7 +108,7 @@ public class CLIInfrastructure extends InfrastructureManager {
                 // putting .cmd as an extension so that it works on Windows
                 removalScript = File.createTempFile("removal", ".cmd");
                 FileToBytesConverter.convertByteArrayToFile(bytes, removalScript);
-                removalScript.setExecutable(true);
+                //removalScript.setExecutable(true);
             } catch (Exception e) {
                 throw new IllegalArgumentException("Could not read removal script file", e);
             }
