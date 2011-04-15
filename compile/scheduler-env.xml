@@ -45,6 +45,7 @@
 			<include name="matsci/**/*.jar"/>
 			<!-- Hibernate libs -->
 			<include name="hibernate/**/*.jar"/>
+			<include name="nodesource/**/*.jar"/>
 		</fileset>
 
 		<pathelement location="${base.dir}/compile/lib/junit-4.3.jar"/>

@@ -91,7 +91,7 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
     // policy state
     private boolean active = false;
     private SchedulerLoadingPolicy thisStub;
-    private int nodesNumberInNodeSource = 0;
+    protected int nodesNumberInNodeSource = 0;
     private int nodesNumberInRM = 0;
     private String nodeSourceName = null;
     // positive when deploying, negative when removing, zero when idle 
@@ -179,7 +179,7 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
         return new BooleanWrapper(true);
     }
 
-    private void updateNumberOfNodes() {
+    protected void updateNumberOfNodes() {
         logger.debug("Refreshing policy state: " + nodesNumberInNodeSource + " nodes in node source, " +
             nodesNumberInRM + " nodes in RM");
 
@@ -271,7 +271,8 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
     @Override
     public String toString() {
         return NamesConvertor.beautifyName(this.getClass().getSimpleName()) + " [Max Nodes: " + maxNodes +
-            " Min Nodes: " + minNodes + " Job Per Node: " + loadFactor + "]";
+            " Min Nodes: " + minNodes + " Job Per Node: " + loadFactor + " Refresh period " + refreshTime +
+            "]";
     }
 
     /**
