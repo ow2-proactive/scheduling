@@ -33,11 +33,7 @@
 		<fileset dir="${lib.dir}">
 			<include name="ProActive/**/*.jar"/>
 			<include name="common/**/*.jar"/>
-			<include name="hibernate/**/*.jar"/>
-			<!-- Amazon EC2 libs -->
-			<include name="ec2/**/*.jar"/>
-			<include name="winhpc/**/*.jar"/>
-		    <include name="nodesource/**/*.jar"/>
+			<include name="nodesource/**/*.jar"/>
 		</fileset>
 		<pathelement location="${cl.common.dir}" />
 		<pathelement location="${base.dir}/compile/lib/junit-4.3.jar"/>
@@ -47,7 +43,6 @@
 		<path refid="common.classpath"/>
 		<fileset dir="${lib.dir}">
 		    <include name="ec2/**/*.jar"/>
-		    <include name="nodesource/**/*.jar"/>
 		</fileset>
 		<pathelement location="${cl.rm.dir}" />
 	</path>
