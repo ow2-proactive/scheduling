@@ -172,5 +172,6 @@
 	<classpathentry kind="lib" path="lib/matsci/ptolemy.jar"/>
 	<classpathentry kind="lib" path="lib/matsci/org.scilab.modules.javasci.jar"/>
 	<classpathentry kind="lib" path="lib/matsci/org.scilab.modules.types.jar"/>
+	<classpathentry kind="lib" path="lib/nodesource/cron/cron4j-rv2.2.3-mod.jar"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>
