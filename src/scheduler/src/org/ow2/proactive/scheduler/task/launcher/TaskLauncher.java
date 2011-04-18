@@ -202,7 +202,7 @@ public abstract class TaskLauncher implements InitActive {
     // not null if an executable is currently executed
     protected Executable currentExecutable;
     // true if the executable has been stopped before its normal termination
-    protected boolean hasBeenKilled;
+    protected volatile boolean hasBeenKilled;
     // true if finalizeLoggers has been called
     private final AtomicBoolean loggersFinalized = new AtomicBoolean(false);
     // true if loggers are currently activated
@@ -282,7 +282,7 @@ public abstract class TaskLauncher implements InitActive {
 
         //terminate the task
         // if currentExecutable has been killed, no call back
-        if (!hasBeenKilled) {
+        if (!hasBeenKilled && core != null) {
             core.terminate(taskId);
         }
         this.currentExecutable = null;
@@ -666,9 +666,9 @@ public abstract class TaskLauncher implements InitActive {
     @ImmediateService
     public void terminate(boolean normalTermination) {
         if (!normalTermination) {
+            this.hasBeenKilled = true;
             if (this.currentExecutable != null) {
                 this.currentExecutable.kill();
-                this.hasBeenKilled = true;
                 this.currentExecutable = null;
             }
 
@@ -683,7 +683,7 @@ public abstract class TaskLauncher implements InitActive {
                 logger_dev.warn("Loggers are not shutdown !", e);
             }
         }
-        PAActiveObject.terminateActiveObject(true);
+        PAActiveObject.terminateActiveObject(normalTermination);
     }
 
     /**

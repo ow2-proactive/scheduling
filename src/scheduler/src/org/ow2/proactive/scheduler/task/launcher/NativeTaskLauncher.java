@@ -122,68 +122,77 @@ public class NativeTaskLauncher extends TaskLauncher {
             initDataSpaces();
             replaceDSIterationTag();
 
+            sample = System.currentTimeMillis();
             //copy datas from OUTPUT or INPUT to local scratch
             copyInputDataToScratch();
+            sample = System.currentTimeMillis() - sample;
+            logger_dev.info("Time spent copying INPUT datas to SCRATCH : " + sample + " ms");
 
-            // set exported vars
-            this.setPropagatedProperties(results);
+            if (!hasBeenKilled) {
+                // set exported vars
+                this.setPropagatedProperties(results);
 
-            //get Executable before schedule timer
-            currentExecutable = executableContainer.getExecutable();
-            //start walltime if needed
-            if (isWallTime()) {
-                scheduleTimer();
+                //get Executable before schedule timer
+                currentExecutable = executableContainer.getExecutable();
+                //start walltime if needed
+                if (isWallTime()) {
+                    scheduleTimer();
+                }
             }
 
-            sample = System.currentTimeMillis();
             //execute pre-script
-            if (pre != null) {
+            if (!hasBeenKilled && pre != null) {
+                sample = System.currentTimeMillis();
                 this.executePreScript();
-            }
-            duration = System.currentTimeMillis() - sample;
-
-            //init task
-            ExecutableInitializer execInit = executableContainer.createExecutableInitializer();
-            replaceWorkingDirDSTags(execInit);
-            replaceIterationTag(((NativeExecutableInitializer) execInit).getGenerationScript());
-            //decrypt credentials if needed
-            if (executableContainer.isRunAsUser()) {
-                decrypter.setCredentials(executableContainer.getCredentials());
-                execInit.setDecrypter(decrypter);
-            }
-            // if an exception occurs in init method, unwrapp the InvocationTargetException
-            // the result of the execution is the user level exception
-            try {
-                callInternalInit(NativeExecutable.class, NativeExecutableInitializer.class, execInit);
-            } catch (InvocationTargetException e) {
-                throw e.getCause() != null ? e.getCause() : e;
+                duration = System.currentTimeMillis() - sample;
             }
 
-            replaceIterationTags(execInit);
-            //replace dataspace tags in command (if needed) by local scratch directory
-            replaceCommandDSTags();
-            // pass the nodesfile as parameter if needed...
-            replaceCommandNodesInfosTags();
+            if (!hasBeenKilled) {
+                //init task
+                ExecutableInitializer execInit = executableContainer.createExecutableInitializer();
+                replaceWorkingDirDSTags(execInit);
+                replaceIterationTag(((NativeExecutableInitializer) execInit).getGenerationScript());
+                //decrypt credentials if needed
+                if (executableContainer.isRunAsUser()) {
+                    decrypter.setCredentials(executableContainer.getCredentials());
+                    execInit.setDecrypter(decrypter);
+                }
+                // if an exception occurs in init method, unwrapp the InvocationTargetException
+                // the result of the execution is the user level exception
+                try {
+                    callInternalInit(NativeExecutable.class, NativeExecutableInitializer.class, execInit);
+                } catch (InvocationTargetException e) {
+                    throw e.getCause() != null ? e.getCause() : e;
+                }
 
-            sample = System.currentTimeMillis();
-            try {
-                //launch task
-                logger_dev.debug("Starting execution of task '" + taskId + "'");
-                userResult = currentExecutable.execute(results);
-            } catch (Throwable t) {
-                exception = t;
+                replaceIterationTags(execInit);
+                //replace dataspace tags in command (if needed) by local scratch directory
+                replaceCommandDSTags();
+                // pass the nodesfile as parameter if needed...
+                replaceCommandNodesInfosTags();
+
+                sample = System.currentTimeMillis();
+                try {
+                    //launch task
+                    logger_dev.debug("Starting execution of task '" + taskId + "'");
+                    userResult = currentExecutable.execute(results);
+                } catch (Throwable t) {
+                    exception = t;
+                }
+                duration += System.currentTimeMillis() - sample;
+
             }
-            duration += System.currentTimeMillis() - sample;
 
             //for the next two steps, task could be killed anywhere
             if (!hasBeenKilled) {
                 sample = System.currentTimeMillis();
                 //copy output file
                 copyScratchDataToOutput();
-                duration += System.currentTimeMillis() - sample;
+                sample = System.currentTimeMillis() - sample;
+                logger_dev.info("Time spent copying SCRATCH datas to OUTPUT : " + sample + " ms");
             }
 
-            if (post != null && !hasBeenKilled) {
+            if (!hasBeenKilled && post != null) {
                 sample = System.currentTimeMillis();
                 int retCode = -1;//< 0 means exception in the command itself (ie. command not found)
                 if (userResult != null) {
@@ -198,30 +207,31 @@ public class NativeTaskLauncher extends TaskLauncher {
             exception = ex;
             userResult = null;
         } finally {
-            // set the result
-            if (exception != null) {
-                res = new TaskResultImpl(taskId, exception, null, duration, null);
-            } else {
-                res = new TaskResultImpl(taskId, userResult, null, duration, null);
-            }
-            try {
-                // logs have to be retrieved after flowscript exec if any
-                if (flow != null) {
-                    // *WARNING* : flow action is set in res UNLESS an exception is thrown !
-                    // see FlowAction.getDefaultAction()
-                    this.executeFlowScript(res);
+            if (!hasBeenKilled) {
+                // set the result
+                if (exception != null) {
+                    res = new TaskResultImpl(taskId, exception, null, duration, null);
+                } else {
+                    res = new TaskResultImpl(taskId, userResult, null, duration, null);
                 }
-            } catch (Throwable e) {
-                // task result is now the exception thrown by flowscript
-                // flowaction is set to default
-                res = new TaskResultImpl(taskId, e, null, duration, null);
-                // action is set to default as the script was not evaluated
-                res.setAction(FlowAction.getDefaultAction(this.flow));
+                try {
+                    // logs have to be retrieved after flowscript exec if any
+                    if (flow != null) {
+                        // *WARNING* : flow action is set in res UNLESS an exception is thrown !
+                        // see FlowAction.getDefaultAction()
+                        this.executeFlowScript(res);
+                    }
+                } catch (Throwable e) {
+                    // task result is now the exception thrown by flowscript
+                    // flowaction is set to default
+                    res = new TaskResultImpl(taskId, e, null, duration, null);
+                    // action is set to default as the script was not evaluated
+                    res.setAction(FlowAction.getDefaultAction(this.flow));
+                }
+                res.setPropagatedProperties(retreivePropagatedProperties());
+                res.setLogs(this.getLogs());
             }
-            res.setPropagatedProperties(retreivePropagatedProperties());
-            res.setLogs(this.getLogs());
-
-            // finalize task
+            // finalize task in any cases (killed or not)
             terminateDataSpace();
             if (isWallTime()) {
                 cancelTimer();
