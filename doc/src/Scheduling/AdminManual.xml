@@ -813,6 +813,75 @@ scheduler.changePolicy(org.ow2.proactive.scheduler.policy.PriorityPolicy.class);
 				</programlisting>
 			</section>
 		</section>
+		<section xml:id="scheduler_nodeconf_admin"><info><title>Special Scheduling configuration for node</title></info>
+			<para>
+				Nodes can also be configured. Here after are described the properties used by the JVM on node side :
+			</para>
+			<para>
+				<itemizedlist>
+					<listitem>
+						<para>
+							<emphasis>pa.scheduler.extraclasspath.dir</emphasis> specifies
+							the path of an extra classpath directory. This can be usefull to add personal
+							classes to the default node classpath.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							<emphasis>proactive.scheduler.logs.maxsize</emphasis> specifies
+							the cached max size of the logs. It is also the max size of the returned logs at the
+							end of the task.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							<emphasis>pas.launcher.getprogress.directory</emphasis> (used by native tasks only)
+							specifies the directory where to find task progress file content. If a native task
+							wants its progress be available by client, the task must write an integer between 0 and 100
+							(both included) defining the current progress of the task in a file named [taskId].progress in this
+							property directory.
+						</para>
+						<para>
+							<emphasis role="italics">For example :</emphasis> if the node has been started with -Dpas.launcher.getprogress.directory=/tmp/progress,
+							and a native task of job 13 wants its progress to be available, the task must write a file named "/tmp/progress/130004.progress"
+							where 130004 is the taskId of the running task (taskId can be get using PAS_TASK_ID system environment variable)
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							<emphasis>pas.launcher.forkas.method</emphasis> (used with runAsMe=true option)
+							specifies the method to be used when JVM is forked :
+							<itemizedlist>
+								<listitem>
+									<para>
+										"none" : no method is used, user cannot execute task under his account
+									</para>
+								</listitem>
+								<listitem>
+									<para>
+										"pwd" : password method is used, user will start the task using his scheduling login and password.
+										On Unix, if sudoer list is used, user will be authenticated using his username only.
+									</para>
+								</listitem>
+								<listitem>
+									<para>
+										"key" : ssh private key is used, user must provide a credentials containing login//password
+										and a private ssh key provided by administrator to allow user to execute process with ssh on localhost.
+									</para>
+								</listitem>
+							</itemizedlist>
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							<emphasis>node.dataspace.scratchdir</emphasis> specifies the root path of the SCRATCH directory
+							used by dataspace. By default, it is the JVM default system temp dir.
+							This property is automatically propagated in the forked JVM if forked task is used.
+						</para>
+					</listitem>
+				</itemizedlist>
+			</para>
+		</section>
 		<section xml:id="scheduler_dataspaces_admin"><info><title>Configuring DataSpaces</title></info>
 			<para>
 				The only things to configure in the DataSpace are the default INPUT and OUTPUT spaces.
