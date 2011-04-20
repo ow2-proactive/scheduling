@@ -135,7 +135,9 @@ public abstract class TaskLauncher implements InitActive {
 
     // to define the max line number of a task logs
     // DO NOT USE SCHEDULER PROPERTY FOR THAT (those properties are not available on node side)
-    public static final String MAX_LOG_SIZE_PROPERTY = "proactive.scheduler.logs.maxsize";
+    @Deprecated
+    public static final String OLD_MAX_LOG_SIZE_PROPERTY = "proactive.scheduler.logs.maxsize";
+    public static final String MAX_LOG_SIZE_PROPERTY = "pas.launcher.logs.maxsize";
 
     protected DataSpacesFileObject SCRATCH = null;
     protected DataSpacesFileObject INPUT = null;
@@ -355,6 +357,9 @@ public abstract class TaskLauncher implements InitActive {
         l.removeAllAppenders();
         // create an async appender for multiplexing (storage plus redirect through socketAppender)
         String logMaxSizeProp = System.getProperty(TaskLauncher.MAX_LOG_SIZE_PROPERTY);
+        if (logMaxSizeProp == null) {
+            logMaxSizeProp = System.getProperty(TaskLauncher.OLD_MAX_LOG_SIZE_PROPERTY);
+        }
         if (logMaxSizeProp == null || "".equals(logMaxSizeProp.trim())) {
             this.logAppender = new AsyncAppenderWithStorage();
         } else {
@@ -364,9 +369,9 @@ public abstract class TaskLauncher implements InitActive {
                 logger_dev.info("Logs are limited to " + logMaxSize + " lines for task " + this.taskId);
             } catch (NumberFormatException e) {
                 logger_dev
-                        .warn(
-                                "proactive.scheduler.logs.maxsize property is not correctly defined. Logs size is not bounded for task " +
-                                    this.taskId, e);
+                        .warn(MAX_LOG_SIZE_PROPERTY +
+                            " property is not correctly defined. Logs size is not bounded for task " +
+                            this.taskId, e);
                 this.logAppender = new AsyncAppenderWithStorage();
             }
         }

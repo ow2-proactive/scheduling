@@ -874,7 +874,7 @@ task2.setGenerationScript(gscript);
 							For further information about this feature, please go to <xref linkend="starting_task_runasme"/>
 						</para>
 						<para>
-							<emphasis role="italic">Important Note :</emphasis> With a runAsMe task, it is not possible to propagate properties
+							<emphasis role="italics">Important Note :</emphasis> With a runAsMe task, it is not possible to propagate properties
 							using the helper class PropertyUtils as explained in the pre/post scripts. Moreover, the nodes file
 							(i.e. the temporary file that contains allocated resources) and the number of allocated nodes are not accessible
 							through <code>PAS_NODESFILE</code> and <code>PAS_NODESNUMBER</code> system environment variables ; those information have to

@@ -63,7 +63,9 @@ public class TaskClassLoader extends ClassLoader {
     /** The directory containing extra classpath */
     private File extClasspathDir;
     /** Name of the property that set the extra classpath directory */
-    public final static String EXT_CLASSPATH_PROPERTY = "pa.scheduler.extraclasspath.dir";
+    @Deprecated
+    public final static String OLD_EXT_CLASSPATH_PROPERTY = "pa.scheduler.extraclasspath.dir";
+    public final static String EXT_CLASSPATH_PROPERTY = "pas.launcher.extraclasspath.directory";
 
     /**
      * Create a new classloader.
@@ -76,6 +78,9 @@ public class TaskClassLoader extends ClassLoader {
         // look for the ext classpath dir if any
         try {
             String ecd = System.getProperty(EXT_CLASSPATH_PROPERTY);
+            if (ecd == null) {
+                ecd = System.getProperty(OLD_EXT_CLASSPATH_PROPERTY);
+            }
             if (ecd != null && !"".equals(ecd)) {
                 logger_dev.debug("Extra classpath directory is set to " + ecd);
                 File extcp = new File(ecd);
