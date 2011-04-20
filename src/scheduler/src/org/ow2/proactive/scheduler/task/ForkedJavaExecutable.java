@@ -370,7 +370,7 @@ public class ForkedJavaExecutable extends JavaExecutable {
     private void init() {
         Random random = new Random((new Date()).getTime());
         deploymentID = random.nextInt(1000000);
-        forkedNodeName = this.getClass().getName() + deploymentID;
+        forkedNodeName = "f" + deploymentID;
     }
 
     /**
