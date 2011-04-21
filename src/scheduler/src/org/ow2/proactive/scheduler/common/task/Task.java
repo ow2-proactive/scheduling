@@ -348,20 +348,6 @@ public abstract class Task extends CommonAttribute {
     }
 
     /**
-     * Defining Control Flow Blocks with pairs of {@link FlowBlock#START} and {@link FlowBlock#END}
-     * is a semantic requirement to be able to create specific control flow constructs.
-     * <p>
-     * Refer to the documentation for detailed instructions.
-     
-     * @param flowBlock the FlowBlock attribute of this task indicating if it is the beginning 
-     *  or the ending of a new block scope
-     * @see FlowBlock#parse(String)
-     */
-    public void setFlowBlock(String flowBlock) {
-        this.flowBlock = flowBlock;
-    }
-
-    /**
      * Defining Control Flow Blocks using {@link FlowBlock#START} and {@link FlowBlock#END}
      * is a semantic requirement to be able to create specific control flow constructs.
      * <p>

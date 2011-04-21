@@ -78,6 +78,7 @@ import org.ow2.proactive.scheduler.common.task.dataspaces.FileSelector;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputAccessMode;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
 import org.ow2.proactive.scheduler.common.task.flow.FlowActionType;
+import org.ow2.proactive.scheduler.common.task.flow.FlowBlock;
 import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
 import org.ow2.proactive.scheduler.common.util.RegexpMatcher;
 import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
@@ -846,7 +847,7 @@ public class JobFactory_stax extends JobFactory {
         for (int i = 0; i < cursorTask.getAttributeCount(); i++) {
             String attrName = cursorTask.getAttributeLocalName(i);
             if (XMLAttributes.FLOW_BLOCK.matches(attrName)) {
-                tmpTask.setFlowBlock(replace(cursorTask.getAttributeValue(i)));
+                tmpTask.setFlowBlock(FlowBlock.parse(replace(cursorTask.getAttributeValue(i))));
             }
         }
 
