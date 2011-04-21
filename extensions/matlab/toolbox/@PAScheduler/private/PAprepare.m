@@ -54,9 +54,6 @@ urlLog4jFile = log4jFile.toURI().toURL();
 java.lang.System.setProperty('log4j.configuration',urlLog4jFile.toExternalForm());
 java.lang.System.setProperty('proactive.configuration', opt.ProActiveConfiguration);
 
-% Policy
-java.lang.System.setProperty('java.security.policy',[scheduling_dir filesep 'config' filesep 'scheduler.java.policy']);
-
 % Dist libs
 fs=filesep();
 dist_lib_dir = [scheduling_dir fs 'dist' fs 'lib'];
