@@ -121,6 +121,10 @@ public abstract class TaskLauncher implements InitActive {
     public static final Logger logger_dev_dataspace = ProActiveLogger
             .getLogger(SchedulerDevLoggers.DATASPACE);
 
+    //Scratch dir property : we cannot take the key property from DataSpaceNodeConfigurationAgent class in RM.
+    //we should not depend from RM package in this class.
+    public static final String NODE_DATASPACE_SCRATCHDIR = "node.dataspace.scratchdir";
+
     // Standard out/err are stored to be restored after execution
     public static final PrintStream SYSTEM_OUT = System.out;
     public static final PrintStream SYSTEM_ERR = System.err;
