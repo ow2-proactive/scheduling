@@ -210,11 +210,15 @@ class ReserveMatlab
               regCommandArray << %q!fid = fopen('!+testF2.getAbsolutePath()+%q!','w');fclose(fid);exit();!
               puts regCommandArray
               proc2 = Runtime.getRuntime().exec(regCommandArray.to_java java.lang.String)
+              is2 = proc2.getInputStream()
               cpt = 0
+              chr=is2.read()
               while (not testF2.exists()) and (cpt < 1000)
+                chr=is2.read()
                 sleep(0.05)
                 cpt = cpt + 1
               end
+              is.close()
               if testF2.exists()
                 f << @conf.getVersion()
                 log("OK");
@@ -269,7 +273,10 @@ class ReserveMatlab
 
     puts 'command executed'
     cpt = 0
+    is = proc.getInputStream()
+    chr = is.read()
     while (not testF.exists()) and (cpt < 1000)
+      chr = is.read()
       sleep(0.05)
       cpt = cpt + 1
     end

@@ -43,6 +43,7 @@ import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.utils.OperatingSystem;
+import org.ow2.proactive.scheduler.ext.common.util.IOTools;
 import org.ow2.proactive.scheduler.ext.matsci.common.DummyJVMProcess;
 import org.ow2.proactive.scheduler.ext.matsci.common.JVMSpawnHelper;
 import org.ow2.proactive.scheduler.ext.matsci.common.ProcessInitializer;
@@ -134,7 +135,27 @@ public class DataspaceHelper implements ProcessInitializer, ProcessListener {
                 helper = new JVMSpawnHelper(debug, outDebug, nodeTmpDir, nodeName, semtimeout, retries);
                 process = helper.startProcess(nodeName, this, this);
 
-                helper.waitForRegistration();
+                IOTools.LoggingThread lt1;
+                IOTools.LoggingThread lt2;
+                if (debug) {
+                    lt1 = new IOTools.LoggingThread(process.getInputStream(), "[DS OUT]", System.out,
+                        outDebug);
+                    lt2 = new IOTools.LoggingThread(process.getErrorStream(), "[DS ERR]", System.err,
+                        outDebug);
+
+                } else {
+                    lt1 = new IOTools.LoggingThread(process.getInputStream());
+                    lt2 = new IOTools.LoggingThread(process.getErrorStream());
+                }
+                Thread t1 = new Thread(lt1, "OUT DS");
+                t1.setDaemon(true);
+                t1.start();
+
+                Thread t2 = new Thread(lt2, "ERR DS");
+                t2.setDaemon(true);
+                t2.start();
+
+                helper.waitForRegistration(process);
 
                 deploy();
 
@@ -215,6 +236,7 @@ public class DataspaceHelper implements ProcessInitializer, ProcessListener {
             }
 
         }
+        outDebug.close();
 
     }
 

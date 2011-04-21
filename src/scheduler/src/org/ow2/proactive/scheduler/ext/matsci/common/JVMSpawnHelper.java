@@ -180,27 +180,44 @@ public class JVMSpawnHelper {
      * wait until the child runtime registers itself at the current JVM
      * in case it fails to register (because of any reason), we don't start the task at all exiting with an exception
      */
-    public void waitForRegistration() throws InterruptedException {
+    public void waitForRegistration(Process process) throws InterruptedException {
         int numberOfTrials = 0;
         for (; numberOfTrials < RETRY_ACQUIRE; numberOfTrials++) {
             boolean permit = semaphore.tryAcquire(SEMAPHORE_TIMEOUT, TimeUnit.SECONDS);
             if (permit) {
                 break;
             }
-
         }
 
         if (numberOfTrials == RETRY_ACQUIRE) {
+            String errmsg = null;
             if (debug) {
-                System.out.println("[" + new java.util.Date() + " " + host + " " +
-                    this.getClass().getSimpleName() + "] Unable to create a separate java process after " +
-                    RETRY_ACQUIRE + " tries");
-                outDebug.println("[" + new java.util.Date() + " " + host + " " +
-                    this.getClass().getSimpleName() + "] Unable to create a separate java process after " +
-                    RETRY_ACQUIRE + " tries");
+                if (process != null) {
+                    try {
+                        errmsg = "Java Process exited with code " + process.exitValue();
+                        System.err.println("[" + new java.util.Date() + " " + host + " " +
+                            this.getClass().getSimpleName() + "] " + errmsg);
+                        outDebug.println("[" + new java.util.Date() + " " + host + " " +
+                            this.getClass().getSimpleName() + "] " + errmsg);
+                    } catch (Exception e) {
+                        errmsg = "Java Process started but couldn't register after " + RETRY_ACQUIRE +
+                            " tries";
+
+                        System.err.println("[" + new java.util.Date() + " " + host + " " +
+                            this.getClass().getSimpleName() + "] " + errmsg);
+                        outDebug.println("[" + new java.util.Date() + " " + host + " " +
+                            this.getClass().getSimpleName() + "] " + errmsg);
+                    }
+                } else {
+                    errmsg = "Unable to create a separate java process after " + RETRY_ACQUIRE + " tries";
+                    System.err.println("[" + new java.util.Date() + " " + host + " " +
+                        this.getClass().getSimpleName() + "] " + errmsg);
+
+                    outDebug.println("[" + new java.util.Date() + " " + host + " " +
+                        this.getClass().getSimpleName() + "] " + errmsg);
+                }
             }
-            throw new IllegalStateException("Unable to create a separate java process after " +
-                RETRY_ACQUIRE + " tries");
+            throw new IllegalStateException(errmsg);
         }
 
     }
