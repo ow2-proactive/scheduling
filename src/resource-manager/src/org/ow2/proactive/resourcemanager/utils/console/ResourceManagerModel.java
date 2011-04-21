@@ -306,7 +306,7 @@ public class ResourceManagerModel extends ConsoleModel {
                 list.add("SINCE");
                 list.add("URL");
                 list.add("PROVIDER");
-                list.add("OWNER");
+                list.add("USED BY");
                 oaf.setTitle(list);
                 //separator
                 oaf.addEmptyLine();

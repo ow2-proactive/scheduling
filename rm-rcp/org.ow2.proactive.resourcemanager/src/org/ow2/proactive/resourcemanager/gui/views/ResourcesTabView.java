@@ -111,7 +111,7 @@ public class ResourcesTabView extends ViewPart {
 
         final TableViewerColumn ownerTableViewerColumn = new TableViewerColumn(tabViewer, SWT.NONE);
         ownerTableViewerColumn.setLabelProvider(new TableLabelProvider(6));
-        ownerTableViewerColumn.getColumn().setText("Owner");
+        ownerTableViewerColumn.getColumn().setText("Used by");
         ownerTableViewerColumn.getColumn().setWidth(100);
 
         table.setSortColumn(table.getColumn(1));

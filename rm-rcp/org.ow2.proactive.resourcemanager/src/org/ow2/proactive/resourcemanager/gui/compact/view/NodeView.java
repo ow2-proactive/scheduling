@@ -86,7 +86,7 @@ public class NodeView extends View {
         tooltip += "Host: " + hostName + "\n";
         tooltip += "Node Source: " + nodeSourceName + "\n";
         tooltip += "Provider: " + provider + "\n";
-        tooltip += "Owner: " + owner;
+        tooltip += "Used by: " + owner;
 
         return tooltip;
     }
