@@ -686,7 +686,16 @@ public abstract class MatSciTask<W extends MatSciWorker, C extends MatSciEngineC
     }
 
     protected void removeShutdownHook() {
-        Runtime.getRuntime().removeShutdownHook(shutdownHook);
+        if (shutdownHook != null) {
+            Runtime.getRuntime().removeShutdownHook(shutdownHook);
+        } else {
+            if (paconfig.isDebug()) {
+                System.out.println("[" + new java.util.Date() + " " + host + " " +
+                    this.getClass().getSimpleName() + "] WARN Shutdowhook not found...");
+                outDebug.println("[" + new java.util.Date() + " " + host + " " +
+                    this.getClass().getSimpleName() + "] WARN Shutdowhook not found...");
+            }
+        }
         shutdownHook = null;
         shutdownhookSet = false;
     }
@@ -830,7 +839,7 @@ public abstract class MatSciTask<W extends MatSciWorker, C extends MatSciEngineC
             }
 
             try {
-                helper.waitForRegistration();
+                helper.waitForRegistration(jvminfo.getProcess());
             } catch (Throwable e) {
                 // SCHEDULING-1127: if the proactive runtime couldn't start, we need to clean processes
                 destroyProcess(jvminfo);
