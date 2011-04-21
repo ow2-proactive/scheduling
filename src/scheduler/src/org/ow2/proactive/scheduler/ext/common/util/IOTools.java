@@ -267,6 +267,12 @@ public class IOTools {
             this.debugStream = ds;
         }
 
+        public LoggingThread(InputStream is) {
+            this.br = new BufferedReader(new InputStreamReader(is));
+            this.out = null;
+            this.appendMessage = null;
+        }
+
         private String getLineOrDie() {
             String answer = null;
             try {
@@ -337,28 +343,38 @@ public class IOTools {
         public void run() {
             String line = null;
             boolean first_line = true;
-            while ((line = getLineOrDie()) != null && goon) {
-                synchronized (out) {
-                    if (first_line && line.trim().length() > 0) {
-                        first_line = false;
-                        out.println("[ " + new java.util.Date() + " ]" + appendMessage + line);
-                        out.flush();
-                        if (debugStream != null) {
-                            debugStream.println("[ " + new java.util.Date() + " ]" + appendMessage + line);
-                            debugStream.flush();
-                        }
-                    } else if (!first_line) {
-                        out.println("[ " + new java.util.Date() + " ]" + appendMessage + line);
-                        out.flush();
-                        if (debugStream != null) {
-                            debugStream.println("[ " + new java.util.Date() + " ]" + appendMessage + line);
-                            debugStream.flush();
+            if (out != null) {
+                while ((line = getLineOrDie()) != null && goon) {
+                    synchronized (out) {
+                        if (first_line && line.trim().length() > 0) {
+                            first_line = false;
+
+                            out.println("[ " + new java.util.Date() + " ]" + appendMessage + line);
+                            out.flush();
+
+                            if (debugStream != null) {
+                                debugStream
+                                        .println("[ " + new java.util.Date() + " ]" + appendMessage + line);
+                                debugStream.flush();
+                            }
+                        } else if (!first_line) {
+
+                            out.println("[ " + new java.util.Date() + " ]" + appendMessage + line);
+                            out.flush();
+
+                            if (debugStream != null) {
+                                debugStream
+                                        .println("[ " + new java.util.Date() + " ]" + appendMessage + line);
+                                debugStream.flush();
+                            }
                         }
                     }
-                }
-            }
 
-            //line = br.readLine();
+                }
+
+            } else
+                while ((line = getLineOrDie()) != null && goon) {
+                }
 
             try {
                 br.close();
