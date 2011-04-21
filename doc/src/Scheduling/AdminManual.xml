@@ -879,6 +879,15 @@ scheduler.changePolicy(org.ow2.proactive.scheduler.policy.PriorityPolicy.class);
 							This property is automatically propagated in the forked JVM if forked task is used.
 						</para>
 					</listitem>
+					<listitem>
+						<para>
+							<emphasis>proactive.scheduler.logs.file</emphasis> specifies if files must be used to store 
+							task logs on this node. This property does not require value. (-Dproactive.scheduler.logs.file is enough)
+							If set, each logs of each task will be written in different file where name follow this pattern :
+							<emphasis role="italics">TaskLogs-[jid]-[taskname].log</emphasis> where [jid] represents the job ID and [taskname]
+							the name of the task which generated the logs.
+						</para>
+					</listitem>
 				</itemizedlist>
 			</para>
 		</section>
