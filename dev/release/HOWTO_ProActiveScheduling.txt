@@ -3,13 +3,14 @@ For a major or minor release (aka x.y.0):
 	- Create a dedicated branch
 		- Set serialVersionUid to xy for all serializable class
 		- Check copyrights
+	- Do not forget XSD schema export for major release !
+
+Then, for a major, minor or maintenance release (aka x.y.z):
+	- Build RCPs
+		- replace every 11[.]22[.]33 pattern in RCP with proper version x.y.z
+		- /!\ DON'T FORGET TO USE THE LAST CHARTIT FROM THE LAST OPTIMIZING VERSION
 	- Build the release
 		- cd SCHEDULER_HOME
-		- dev/release/release-[rm|all] . x.y.z $JAVA_HOME
-		- release can now be found in /tmp/ProActiveScheduling-x.y.z(.tar.gz)
-	- Build RCPs
-		- replace every 11,22,33 pattern in RCP with proper version x.y.z
-		- /!\ DON'T FORGET TO USE THE LAST CHARTIT FROM THE LAST OPTIMIZING VERSION
-
-NB : Do not forget XSD schema export for major release !
+		- dev/release/releaseit.sh . /path/to/generated/RCP x.y.z path/to/store/final/release/archives [$JAVA_HOME]
+		- complete release can now be found in path/to/store/final/release/archives
 
