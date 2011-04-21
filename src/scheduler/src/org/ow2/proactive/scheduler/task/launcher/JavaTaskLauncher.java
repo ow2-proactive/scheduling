@@ -66,7 +66,6 @@ import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 public class JavaTaskLauncher extends TaskLauncher {
 
     public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.LAUNCHER);
-    protected static final String NODE_DATASPACE_SCRATCHDIR = "node.dataspace.scratchdir";
 
     /**
      * ProActive Empty Constructor

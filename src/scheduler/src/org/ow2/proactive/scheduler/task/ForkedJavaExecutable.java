@@ -444,11 +444,10 @@ public class ForkedJavaExecutable extends JavaExecutable {
             !contains(TaskLauncher.MAX_LOG_SIZE_PROPERTY, forkEnvironment.getJVMArguments())) {
             command.add("-D" + TaskLauncher.MAX_LOG_SIZE_PROPERTY + "=" + FORKED_LOG_BUFFER_SIZE);
         }
-        //set scratchdir : we cannot take the key property from DataSpaceNodeConfigurationAgent class in RM.
-        //we should not depend from RM package in this class.
-        String sd = System.getProperty("node.dataspace.scratchdir");
+        //set scratchdir
+        String sd = System.getProperty(TaskLauncher.NODE_DATASPACE_SCRATCHDIR);
         if (sd != null && !"".equals(sd)) {
-            command.add("-D" + "node.dataspace.scratchdir" + "=" + sd);
+            command.add("-D" + TaskLauncher.NODE_DATASPACE_SCRATCHDIR + "=" + sd);
         }
 
         if (forkEnvironment != null && forkEnvironment.getJVMArguments().size() > 0) {

@@ -59,6 +59,11 @@ public class DataSpaceNodeConfigurationAgent implements Serializable {
      */
     private static final long serialVersionUID = 30L;
     private static Logger logger = ProActiveLogger.getLogger(RMLoggers.DATASPACE);
+
+    /**
+     * This property is used by scheduling when configuring node and must be renamed carefully.
+     * It is also defined in TaskLauncher.
+     */
     protected static final String NODE_DATASPACE_SCRATCHDIR = "node.dataspace.scratchdir";
 
     /**
