@@ -37,6 +37,7 @@
 package org.ow2.proactive.resourcemanager.gui.compact.view;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -54,6 +55,8 @@ import org.ow2.proactive.resourcemanager.gui.views.ResourcesCompactView;
  *
  */
 public class View {
+
+    private static HashMap<TreeLeafElement, View> views = new HashMap<TreeLeafElement, View>();
 
     // parent view
     protected View parent;
@@ -74,6 +77,7 @@ public class View {
      */
     public View(TreeLeafElement element) {
         this.element = element;
+        views.put(element, this);
     }
 
     /**
@@ -164,24 +168,14 @@ public class View {
             view.dispose();
         }
         childs.clear();
+        views.remove(element);
     }
 
     /**
      * Finds the view corresponded the specified element.
      */
     public View findView(TreeLeafElement elem) {
-        if (elem == element) {
-            return this;
-        } else {
-
-            for (View child : getChilds()) {
-                View v = child.findView(elem);
-                if (v != null) {
-                    return v;
-                }
-            }
-        }
-        return null;
+        return views.get(elem);
     }
 
     /**
