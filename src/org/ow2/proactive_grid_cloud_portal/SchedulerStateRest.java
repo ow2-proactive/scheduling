@@ -116,7 +116,7 @@ import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive_grid_cloud_portal.common.LoginForm;
 import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
 
-
+ 
 /**
  * 
  * this class exposes the Scheduler as a RESTful service.
