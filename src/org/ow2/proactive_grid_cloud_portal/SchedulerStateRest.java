@@ -682,6 +682,32 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     }
 
     /**
+     * Returns a map corresponding of a jobid
+     * @param sessionId a valid session id
+     * @param jobId the job id
+     * @return a map corresponding of a <code>jobId</code>
+     */
+    @GET
+    @Path("jobs/{jobid}/map")
+    @Produces("application/xml")
+    public String getJobMap(@HeaderParam("sessionid") String sessionId,
+    		@PathParam("jobid") String jobId) {
+    	
+    	String map = "";
+    	InputStream ips=new FileInputStream("map,xml"); 
+		InputStreamReader ipsr=new InputStreamReader(ips);
+		BufferedReader br=new BufferedReader(ipsr);
+		String ligne;
+		while ((ligne=br.readLine())!=null){
+			System.out.println(ligne);
+			map+=ligne+"\n";
+		}
+		br.close(); 
+		
+		return map;
+    }
+    
+    /**
      * Returns a list of taskState
      * @param sessionId a valid session id
      * @param jobId the job id
