@@ -138,7 +138,8 @@ public class ResourceManagerModel extends ConsoleModel {
         commands.add(new Command("stats()", "Display some statistics about the Resource Manager"));
         commands.add(new Command("myaccount()", "Display current user account information"));
         commands.add(new Command("account(username)", "Display account information by username"));
-        commands.add(new Command("reloadpermissions()", "Reload the permission file"));
+        commands.add(new Command("reloadconfig()",
+            "Reload the resource manager config, including permissions and log4j"));
         commands.add(new Command("reconnect()", "Try to reconnect this console to the server"));
         commands
                 .add(new Command("exec(scriptFilePath)",
@@ -581,11 +582,11 @@ public class ResourceManagerModel extends ConsoleModel {
         }
     }
 
-    public void refreshPermissionPolicy_() {
+    public void refreshConfiguration_() {
         try {
-            jmxInfoViewer.invoke("ProActiveResourceManager:name=Management", "refreshPermissionPolicy",
+            jmxInfoViewer.invoke("ProActiveResourceManager:name=Management", "refreshConfiguration",
                     new Object[0]);
-            print("\nThe permission file has been successfully reloaded.");
+            print("\nThe configuration has been successfully reloaded.");
         } catch (Exception e) {
             handleExceptionDisplay("Error while retrieving JMX informations", e);
         }

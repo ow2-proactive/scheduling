@@ -127,8 +127,8 @@ function nodeinfo(nodeURL){
 	rm_.nodeinfo_(nodeURL);
 }
 
-function reloadpermissions(){
-	rm_.refreshPermissionPolicy_();
+function reloadconfig(){
+	rm_.refreshConfiguration_();
 }
 
 function reconnect(rmURL){

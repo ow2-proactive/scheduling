@@ -101,8 +101,6 @@ import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 public class NodeSource implements InitActive, RunActive {
 
     private static Logger logger = ProActiveLogger.getLogger(RMLoggers.NODESOURCE);
-    private static final int NODE_LOOKUP_TIMEOUT = PAResourceManagerProperties.RM_NODELOOKUP_TIMEOUT
-            .getValueAsInt();
     private int pingFrequency = PAResourceManagerProperties.RM_NODE_SOURCE_PING_FREQUENCY.getValueAsInt();
 
     /** Default name */
@@ -274,14 +272,15 @@ public class NodeSource implements InitActive, RunActive {
             " to " + name);
 
         // lookup for a new Node
+        int lookUpTimeout = PAResourceManagerProperties.RM_NODELOOKUP_TIMEOUT.getValueAsInt();
         Node nodeToAdd = null;
         try {
-            logger.info("Looking up the node " + nodeUrl + " with " + NODE_LOOKUP_TIMEOUT + " ms timeout");
-            nodeToAdd = lookupNode(nodeUrl, NODE_LOOKUP_TIMEOUT);
+            logger.info("Looking up the node " + nodeUrl + " with " + lookUpTimeout + " ms timeout");
+            nodeToAdd = lookupNode(nodeUrl, lookUpTimeout);
             logger.info("The node " + nodeUrl + " has been successfully looked up");
         } catch (Exception e) {
-            logger.warn("Cannot look up the node " + nodeUrl + " within " + NODE_LOOKUP_TIMEOUT +
-                " ms due to " + e.getMessage());
+            logger.warn("Cannot look up the node " + nodeUrl + " within " + lookUpTimeout + " ms due to " +
+                e.getMessage());
             logger.debug("Detailled lookup exception :", e);
             throw new AddingNodesException(e);
         }

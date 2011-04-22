@@ -78,10 +78,6 @@ public abstract class SelectionManager {
 
     private final static Logger logger = ProActiveLogger.getLogger(RMLoggers.RMSELECTION);
 
-    /** Timeout for selection script result */
-    private static final int MAX_VERIF_TIMEOUT = PAResourceManagerProperties.RM_SELECT_SCRIPT_TIMEOUT
-            .getValueAsInt();
-
     private RMCore rmcore;
 
     private static final int SELECTION_THEADS_NUMBER = PAResourceManagerProperties.RM_SELECTION_MAX_THREAD_NUMBER
@@ -259,7 +255,8 @@ public abstract class SelectionManager {
         try {
             // launching
             Collection<Future<Node>> matchedNodes = scriptExecutorThreadPool.invokeAll(scriptExecutors,
-                    MAX_VERIF_TIMEOUT, TimeUnit.MILLISECONDS);
+                    PAResourceManagerProperties.RM_SELECT_SCRIPT_TIMEOUT.getValueAsInt(),
+                    TimeUnit.MILLISECONDS);
             int index = 0;
 
             // waiting for the results

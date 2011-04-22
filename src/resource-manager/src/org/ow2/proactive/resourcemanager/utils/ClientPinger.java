@@ -57,7 +57,6 @@ public class ClientPinger implements InitActive {
 
     private static final Logger logger = ProActiveLogger.getLogger(RMLoggers.PINGER);
 
-    private int pingFrequency = PAResourceManagerProperties.RM_CLIENT_PING_FREQUENCY.getValueAsInt();
     private AtomicBoolean active = new AtomicBoolean(true);
     private RMCore rmcore;
 
@@ -76,7 +75,7 @@ public class ClientPinger implements InitActive {
         while (active.get()) {
             synchronized (active) {
                 try {
-                    active.wait(pingFrequency);
+                    active.wait(PAResourceManagerProperties.RM_CLIENT_PING_FREQUENCY.getValueAsInt());
                 } catch (InterruptedException e) {
                 }
             }

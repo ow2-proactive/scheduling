@@ -381,14 +381,15 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     public void runActivity(Body body) {
         Service service = new Service(body);
 
-        int aliveEventFrequency = PAResourceManagerProperties.RM_ALIVE_EVENT_FREQUENCY.getValueAsInt();
         long timeStamp = System.currentTimeMillis();
         long delta = 0;
 
         // recalculating nodes number only once per policy period
         while (body.isActive()) {
 
-            Request request = service.blockingRemoveOldest(aliveEventFrequency);
+            Request request = service
+                    .blockingRemoveOldest(PAResourceManagerProperties.RM_ALIVE_EVENT_FREQUENCY
+                            .getValueAsInt());
             if (request != null) {
                 try {
                     try {
@@ -406,7 +407,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             delta += System.currentTimeMillis() - timeStamp;
             timeStamp = System.currentTimeMillis();
 
-            if (delta > aliveEventFrequency) {
+            if (delta > PAResourceManagerProperties.RM_ALIVE_EVENT_FREQUENCY.getValueAsInt()) {
                 monitoring.rmEvent(new RMEvent(RMEventType.ALIVE));
                 delta = 0;
             }

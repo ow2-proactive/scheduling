@@ -56,7 +56,6 @@ import org.ow2.proactive.scripting.SelectionScript;
 public class ScriptExecutor implements Callable<Node> {
 
     private final static Logger logger = ProActiveLogger.getLogger(RMLoggers.RMSELECTION);
-    private final static int TIMEOUT = PAResourceManagerProperties.RM_SELECT_SCRIPT_TIMEOUT.getValueAsInt();
     private RMNode rmnode;
     private SelectionManager manager;
     private List<SelectionScript> selectionScriptList;
@@ -109,7 +108,8 @@ public class ScriptExecutor implements Callable<Node> {
                 } else {
 
                     try {
-                        PAFuture.waitFor(scriptResult, TIMEOUT);
+                        PAFuture.waitFor(scriptResult, PAResourceManagerProperties.RM_SELECT_SCRIPT_TIMEOUT
+                                .getValueAsInt());
                     } catch (ProActiveTimeoutException e) {
                         // do not produce an exception here
                         nodeMatch = false;

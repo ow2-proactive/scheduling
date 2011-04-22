@@ -418,7 +418,7 @@ public class ResourceManagerController {
         acopt.setArgName("nodeURL");
         actionGroup.addOption(acopt);
 
-        acopt = new Option("rp", "reloadpermissions", false, control + "Reload the permission file");
+        acopt = new Option("rc", "reloadconfig", false, control + "Reload the resource manager configuration");
         acopt.setRequired(false);
         acopt.setArgs(0);
         actionGroup.addOption(acopt);
@@ -553,8 +553,8 @@ public class ResourceManagerController {
             model.showMyAccount_();
         } else if (cmd.hasOption("ua")) {
             model.showAccount_(cmd.getOptionValue("ua"));
-        } else if (cmd.hasOption("rp")) {
-            model.refreshPermissionPolicy_();
+        } else if (cmd.hasOption("rc")) {
+            model.refreshConfiguration_();
         } else if (cmd.hasOption("script")) {
             model.execWithParam_(cmd.getOptionValues("script"));
         } else {

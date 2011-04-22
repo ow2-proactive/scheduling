@@ -73,7 +73,7 @@ public interface ManagementMBean {
     public long getLastRefreshDurationInMilliseconds();
 
     /**
-     * Refreshes the permission policy, reloads permissions from the policy file. 
+     * Reload the resource manager configuration, permissions, and log4j config.
      */
-    public void refreshPermissionPolicy();
+    public void refreshConfiguration();
 }

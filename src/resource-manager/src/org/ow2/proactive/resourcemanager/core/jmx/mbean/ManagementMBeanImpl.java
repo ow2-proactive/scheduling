@@ -36,12 +36,16 @@
  */
 package org.ow2.proactive.resourcemanager.core.jmx.mbean;
 
+import java.net.URL;
 import java.security.Policy;
 
 import javax.management.NotCompliantMBeanException;
 import javax.management.StandardMBean;
 
+import org.apache.log4j.LogManager;
+import org.apache.log4j.PropertyConfigurator;
 import org.ow2.proactive.resourcemanager.core.account.RMAccountsManager;
+import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 
 
 /**
@@ -80,7 +84,22 @@ public final class ManagementMBeanImpl extends StandardMBean implements Manageme
         return this.accountsManager.getLastRefreshDurationInMilliseconds();
     }
 
-    public void refreshPermissionPolicy() {
-        Policy.getPolicy().refresh();
+    public void refreshConfiguration() {
+        try {
+            // reloading permissions
+            Policy.getPolicy().refresh();
+
+            // reloading log4j configuration
+            String configFilename = System.getProperty("log4j.configuration");
+            if (configFilename != null) {
+                LogManager.resetConfiguration();
+                PropertyConfigurator.configure(new URL(configFilename));
+            }
+
+            // reloading the resource manager configuration
+            PAResourceManagerProperties.loadProperties(null);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

@@ -77,12 +77,14 @@ public enum PAResourceManagerProperties {
     RM_NODELOOKUP_TIMEOUT("pa.rm.nodelookup.timeout", PropertyType.INTEGER),
 
     /** GCM application template file path, used to perform GCM deployments */
+    @Deprecated
     RM_GCM_TEMPLATE_APPLICATION_FILE("pa.rm.gcm.template.application.file", PropertyType.STRING),
 
     /**
      * name of a string contained in in the GCM Application (GCMA) XML file, that must mandatory appear
      * as a place of a GCM deployment file.
      */
+    @Deprecated
     RM_GCMD_PATH_PROPERTY_NAME("pa.rm.gcmd.path.property.name", PropertyType.STRING),
 
     /** path to the Amazon EC2 account credentials properties file,
