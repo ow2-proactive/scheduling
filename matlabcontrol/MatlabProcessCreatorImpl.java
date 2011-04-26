@@ -28,6 +28,7 @@ package matlabcontrol;
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+import java.io.File;
 import java.io.IOException;
 
 /**
@@ -43,6 +44,8 @@ public class MatlabProcessCreatorImpl implements MatlabProcessCreator {
      * an OS specific value is used.
      */
     private final String _matlabLocation;
+
+    private File _logFile;
     
     /**
      * Creates a new instance of this class. 
@@ -53,6 +56,7 @@ public class MatlabProcessCreatorImpl implements MatlabProcessCreator {
     public MatlabProcessCreatorImpl(String matlabLocation) {
         //Store location/alias of the MATLAB executable
         _matlabLocation = matlabLocation;
+        _logFile = new File(System.getProperty("java.io.tmpdir","MatlabStart.log"));
     }
 
     /**
@@ -60,10 +64,10 @@ public class MatlabProcessCreatorImpl implements MatlabProcessCreator {
      * 
      * @param runArg the argument to be passed to MATLAB using the -r option 
      */
-	public void createMatlabProcess(String runArg) throws MatlabConnectionException {
+	public Process createMatlabProcess(String runArg) throws MatlabConnectionException {
         //Attempt to run MATLAB
         try {            
-            Runtime.getRuntime().exec(new String[]{_matlabLocation, "-nodesktop", "-r", runArg});
+            return Runtime.getRuntime().exec(new String[]{_matlabLocation, "-nodesktop", "-logFile",_logFile.toString(), "-r", runArg});
         } catch (IOException e) {
             throw new MatlabConnectionException("Could not launch MATLAB. Used location/alias: " + _matlabLocation, e);
         }
@@ -79,5 +83,9 @@ public class MatlabProcessCreatorImpl implements MatlabProcessCreator {
      */
     public String getMatlabLocation() {
         return _matlabLocation;
+    }
+
+    public File getLogFile() {
+        return _logFile;
     }
 }

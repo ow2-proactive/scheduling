@@ -28,6 +28,8 @@ package matlabcontrol;
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+import java.io.File;
+
 /**
  * Implementing classes must create a MATLAB process in the createMatlabProcess() method using 
  * the argument to make the MatlabConnector connect from MATLAB.
@@ -43,5 +45,7 @@ public interface MatlabProcessCreator {
 	 * @param runArg argument that MATLAB will run on start
 	 * @throws Exception when the process cannot be created
 	 */
-	public void createMatlabProcess(String runArg) throws Exception;
+	public Process createMatlabProcess(String runArg) throws Exception;
+
+    public File getLogFile();
 }

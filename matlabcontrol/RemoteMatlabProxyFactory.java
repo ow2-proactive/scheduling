@@ -28,15 +28,13 @@ package matlabcontrol;
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.UUID;
-import java.util.Vector;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -76,7 +74,7 @@ public class RemoteMatlabProxyFactory {
      * Default number of milliseconds to wait for a MatlabInternalProxy to be
      * received.
      */
-    private static final int DEFAULT_TIMEOUT = 60000;
+    private static final int DEFAULT_TIMEOUT = 180000;
 
     /**
      * Map of proxyIDs to {@link RemoteMatlabProxy} instances.
@@ -111,6 +109,8 @@ public class RemoteMatlabProxyFactory {
      * and receiving proxies by holding up the thread.
      */
     private final ExecutorService _connectionExecutor = Executors.newSingleThreadExecutor();
+
+    private Process theMatlabProcess;
 
     /**
      * Constructs this factory with a specified instance of {@link MatlabProcessCreator}.
@@ -189,12 +189,22 @@ public class RemoteMatlabProxyFactory {
         if (_registry == null) {
             //Create a RMI registry
             try {
+                System.out.println("Create New Registry");
+                System.out.flush();
                 _registry = LocateRegistry.createRegistry(Registry.REGISTRY_PORT);
             }
             //If we can't create one, try to retrieve an existing one
             catch (Exception e) {
                 try {
                     _registry = LocateRegistry.getRegistry(Registry.REGISTRY_PORT);
+
+                    String[] list = _registry.list();
+                    System.out.println("Previous registry:");
+                    System.out.println(Arrays.toString(list));
+                    System.out.flush();
+                    for (String key:list) {
+                        _registry.unbind(key);
+                    }
                 } catch (Exception ex) {
                     throw new MatlabConnectionException("Could not create or connect to the RMI registry", ex);
                 }
@@ -288,7 +298,7 @@ public class RemoteMatlabProxyFactory {
     	
         //Create the MATLAB process that will run the argument
         try {
-			this._matlabCreator.createMatlabProcess(runArg);
+			this.theMatlabProcess = this._matlabCreator.createMatlabProcess(runArg);
 		} catch (MatlabConnectionException e) {
 			throw e;
 		} catch (Exception e) {
@@ -340,9 +350,23 @@ public class RemoteMatlabProxyFactory {
 
         //If the proxy has not be received before the timeout
         if (!_proxies.containsKey(proxyID)) {
+            theMatlabProcess.destroy();
+            // Read the log file
+            StringBuilder builder = new StringBuilder();
+            try {
+                BufferedReader in = new BufferedReader(new FileReader(this._matlabCreator.getLogFile()));
+                String str;
+                while ((str = in.readLine()) != null) {
+                    builder.append(str+ System.getProperty("line.separator"));
+                }
+                in.close();
+            } catch (IOException e) {
+            }
+
             throw new MatlabConnectionException("MATLAB proxy could not be created in the specified amount " +
-                    "of time: " + timeout + " milliseconds");
+                    "of time: " + timeout + " milliseconds. The matlab output :"+"\n" + builder );
         }
+
 
         return _proxies.get(proxyID);
     }
