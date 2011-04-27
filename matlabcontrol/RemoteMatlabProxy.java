@@ -64,6 +64,8 @@ public final class RemoteMatlabProxy {
      */
     private final MatlabInternalProxy _internalProxy;
 
+    private RemoteMatlabProxyFactory _factory;
+
     /**
      * Unique identifier for this proxy.
      */
@@ -76,9 +78,11 @@ public final class RemoteMatlabProxy {
      *
      * @param internalProxy
      */
-    RemoteMatlabProxy(MatlabInternalProxy internalProxy, String id) {
+    RemoteMatlabProxy(MatlabInternalProxy internalProxy, String id, RemoteMatlabProxyFactory factory) {
         _internalProxy = internalProxy;
         _id = id;
+        _factory = factory;
+
     }
 
     /**
@@ -176,9 +180,9 @@ public final class RemoteMatlabProxy {
             return _internalProxy.eval(command);
         } catch (RemoteException e) {
             if (this.isConnected()) {
-                throw new MatlabInvocationException(MatlabInvocationException.UNKNOWN_REMOTE_REASON_MSG, e);
+                throw new MatlabInvocationException(MatlabInvocationException.UNKNOWN_REMOTE_REASON_MSG + "\n" + _factory.getLogFileOutput(), e);
             } else {
-                throw new MatlabInvocationException(MatlabInvocationException.PROXY_NOT_CONNECTED_MSG, e);
+                throw new MatlabInvocationException(MatlabInvocationException.PROXY_NOT_CONNECTED_MSG + "\n" + _factory.getLogFileOutput(), e);
             }
         }
     }
@@ -365,5 +369,9 @@ public final class RemoteMatlabProxy {
         } catch (Exception e) {
             return false;
         }
+    }
+
+    public void clean() {
+        _factory.clean();
     }
 }

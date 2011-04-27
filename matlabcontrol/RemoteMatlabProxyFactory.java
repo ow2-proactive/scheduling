@@ -120,17 +120,17 @@ public class RemoteMatlabProxyFactory {
      * when creating a proxy with {@link #requestProxy()}, {@link #getProxy()},
      * or {@link #getProxy(long)}.
      *
-     * @param creator the instance of {@link MatlabProcessCreator} that is in charge 
+     * @param creator the instance of {@link MatlabProcessCreator} that is in charge
      *                of creating the MATLAB process
      * @throws MatlabConnectionException thrown if the initialization necessary
      *                                   for connecting to MATLAB cannot be
      *                                   properly configured
      */
     public RemoteMatlabProxyFactory(MatlabProcessCreator creator) throws MatlabConnectionException {
-        
-    	//The matlab process creator
-    	this._matlabCreator = creator;
-    	
+
+        //The matlab process creator
+        this._matlabCreator = creator;
+
         //Location of where this code is
         this._supportCodeLocation = Configuration.getSupportCodeLocation();
 
@@ -140,7 +140,7 @@ public class RemoteMatlabProxyFactory {
         //Bind the receiver to be retrieved from MATLAB
         this.bindReceiver();
     }
-    
+
     /**
      * Constructs this factory with a specified location or alias for the
      * MATLAB executable. Typically this will not be necessary and so using the
@@ -158,9 +158,9 @@ public class RemoteMatlabProxyFactory {
      *                                   properly configured
      */
     public RemoteMatlabProxyFactory(String matlabLocation) throws MatlabConnectionException {
-        
-    	//Use the previous constructor with a default implementation of the MatlabProcessCreator
-    	this( new MatlabProcessCreatorImpl(matlabLocation) );
+
+        //Use the previous constructor with a default implementation of the MatlabProcessCreator
+        this(new MatlabProcessCreatorImpl(matlabLocation));
     }
 
     /**
@@ -185,8 +185,14 @@ public class RemoteMatlabProxyFactory {
      * @throws MatlabConnectionException
      */
     private static void initRegistry() throws MatlabConnectionException {
+        System.out.println("initRegistry()");
+        System.out.flush();
         //If the registry hasn't been created
         if (_registry == null) {
+            System.out.println("IS NULL _______ initRegistry()");
+            System.out.flush();
+
+
             //Create a RMI registry
             try {
                 System.out.println("Create New Registry");
@@ -202,7 +208,7 @@ public class RemoteMatlabProxyFactory {
                     System.out.println("Previous registry:");
                     System.out.println(Arrays.toString(list));
                     System.out.flush();
-                    for (String key:list) {
+                    for (String key : list) {
                         _registry.unbind(key);
                     }
                 } catch (Exception ex) {
@@ -214,7 +220,23 @@ public class RemoteMatlabProxyFactory {
             //(This is necessary so that paths with spaces work properly)
             System.setProperty("java.rmi.server.codebase", Configuration.getCodebaseLocation());
             System.setProperty("java.rmi.server.useCodebaseOnly", "true");
+        } else {
+
+            System.out.println("IS NOT NULL initRegistry()");
+            System.out.flush();
+            try {
+                String[] list = _registry.list();
+                System.out.println("Previous registry:");
+                System.out.println(Arrays.toString(list));
+                System.out.flush();
+                for (String key : list) {
+                    _registry.unbind(key);
+                }
+            } catch (Exception ex) {
+                throw new MatlabConnectionException("Could not create or connect to the RMI registry", ex);
+            }
         }
+
     }
 
     /**
@@ -248,7 +270,7 @@ public class RemoteMatlabProxyFactory {
          */
         public void registerControl(String proxyID, MatlabInternalProxy internalProxy) {
             //Create proxy, store it
-            RemoteMatlabProxy proxy = new RemoteMatlabProxy(internalProxy, proxyID);
+            RemoteMatlabProxy proxy = new RemoteMatlabProxy(internalProxy, proxyID, RemoteMatlabProxyFactory.this);
             _proxies.put(proxyID, proxy);
 
             //Wake up the thread potentially waiting for the proxy
@@ -286,24 +308,24 @@ public class RemoteMatlabProxyFactory {
      * @see #getProxy(long)
      */
     public String requestProxy() throws MatlabConnectionException {
-    	//Unique ID for proxy
-    	final String proxyID = getRandomValue();
-    	
+        //Unique ID for proxy
+        final String proxyID = getRandomValue();
+
         //Argument that MATLAB will run on start.
         //Tells MATLAB to add this code to its classpath, then to call a method which
         //will create a proxy and send it over RMI back to this JVM.
         final String runArg = "javaaddpath '" + _supportCodeLocation + "'; " +
                 MatlabConnector.class.getName() +
                 ".connectFromMatlab('" + _receiverID + "', '" + proxyID + "');";
-    	
+
         //Create the MATLAB process that will run the argument
         try {
-			this.theMatlabProcess = this._matlabCreator.createMatlabProcess(runArg);
-		} catch (MatlabConnectionException e) {
-			throw e;
-		} catch (Exception e) {
-			throw new MatlabConnectionException("Unable to create the matlab process",e);
-		}  
+            this.theMatlabProcess = this._matlabCreator.createMatlabProcess(runArg);
+        } catch (MatlabConnectionException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new MatlabConnectionException("Unable to create the matlab process", e);
+        }
 
         return proxyID;
     }
@@ -337,8 +359,8 @@ public class RemoteMatlabProxyFactory {
      */
     public RemoteMatlabProxy getProxy(long timeout) throws MatlabConnectionException {
 
-    	String proxyID = this.requestProxy();
-    	    	
+        String proxyID = this.requestProxy();
+
         //Wait until the controller is received or until timeout
         synchronized (this) {
             try {
@@ -352,23 +374,29 @@ public class RemoteMatlabProxyFactory {
         if (!_proxies.containsKey(proxyID)) {
             theMatlabProcess.destroy();
             // Read the log file
-            StringBuilder builder = new StringBuilder();
-            try {
-                BufferedReader in = new BufferedReader(new FileReader(this._matlabCreator.getLogFile()));
-                String str;
-                while ((str = in.readLine()) != null) {
-                    builder.append(str+ System.getProperty("line.separator"));
-                }
-                in.close();
-            } catch (IOException e) {
-            }
+            String output = getLogFileOutput();
 
             throw new MatlabConnectionException("MATLAB proxy could not be created in the specified amount " +
-                    "of time: " + timeout + " milliseconds. The matlab output :"+"\n" + builder );
+                    "of time: " + timeout + " milliseconds. The matlab output :" + "\n" + output);
         }
 
 
         return _proxies.get(proxyID);
+    }
+
+    public String getLogFileOutput() {
+        StringBuilder builder = new StringBuilder();
+        try {
+            BufferedReader in = new BufferedReader(new FileReader(this._matlabCreator.getLogFile()));
+            String str;
+            while ((str = in.readLine()) != null) {
+                builder.append(str + System.getProperty("line.separator"));
+            }
+            in.close();
+
+        } catch (IOException e) {
+        }
+        return builder.toString();
     }
 
     /**
@@ -440,6 +468,16 @@ public class RemoteMatlabProxyFactory {
                 }
             }, 1000, 1000);
         }
+    }
+
+    private void cancelConnnectionTimer() {
+        if (_connectionTimer != null) {
+            _connectionTimer.cancel();
+        }
+    }
+
+    public void clean() {
+        cancelConnnectionTimer();
     }
 
     /**
