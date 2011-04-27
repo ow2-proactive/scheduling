@@ -36,12 +36,28 @@
  */
 package org.ow2.proactive_grid_cloud_portal;
 
-import org.ow2.proactive.scheduler.common.Scheduler;
+import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
 
 
-public class Session<T> {
+public class SchedulerSession {
 
-    protected Thread thread;
-    protected T target;
+    protected SchedulerProxyUserInterface scheduler ;
+    protected String userName;
+
+
+    public SchedulerProxyUserInterface getScheduler() {
+        return scheduler;
+    }
+    public void setScheduler(SchedulerProxyUserInterface scheduler) {
+        this.scheduler = scheduler;
+    }
+    public String getUserName() {
+        return userName;
+    }
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+
 
 }

@@ -74,16 +74,16 @@ public class SchedulerSessionsCleaner implements Runnable {
 
     public void run() {
         while (!stop) {
-            Map<String, SchedulerProxyUserInterface> sessionMap = ssm.getSessionsMap();
+            Map<String, SchedulerSession> sessionMap = ssm.getSessionsMap();
             logger.info("Scheduler sessions cleaning started, " + sessionMap.size() + " existing session(s) ");
             int removedSession = 0;
-            List<Entry<String, SchedulerProxyUserInterface>> scheduledforRemoval = new ArrayList<Entry<String, SchedulerProxyUserInterface>>();
+            List<Entry<String, SchedulerSession>> scheduledforRemoval = new ArrayList<Entry<String, SchedulerSession>>();
             synchronized (sessionMap) {
-                Set<Entry<String, SchedulerProxyUserInterface>> entrySet = sessionMap.entrySet();
-                Iterator<Entry<String, SchedulerProxyUserInterface>> it = entrySet.iterator();
+                Set<Entry<String, SchedulerSession>> entrySet = sessionMap.entrySet();
+                Iterator<Entry<String, SchedulerSession>> it = entrySet.iterator();
                 while (it.hasNext()) {
-                    Entry<String, SchedulerProxyUserInterface> entry = it.next();
-                    Scheduler s = entry.getValue();
+                    Entry<String, SchedulerSession> entry = it.next();
+                    Scheduler s = entry.getValue().getScheduler();
                     try {
 
                         // isConnected does not reset the lease of the stub
@@ -106,7 +106,7 @@ public class SchedulerSessionsCleaner implements Runnable {
                 }
 
                 // effective deletion
-                for (Entry<String, SchedulerProxyUserInterface> entry : scheduledforRemoval) {
+                for (Entry<String, SchedulerSession> entry : scheduledforRemoval) {
                     ssm.remove(entry.getKey());
                 }
 

@@ -266,7 +266,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
         SchedulerState state = entry.getValue();
 
-        String user = SchedulerSessionMapper.getInstance().getUsernames().get(sessionId);
+        String user = SchedulerSessionMapper.getInstance().getSchedulerSession(sessionId).getUserName();
         if (myJobs && user != null && user.trim().length() > 0) {
             if (pending) {
                 for (JobState j : state.getPendingJobs()) {
@@ -921,7 +921,14 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      */
     public SchedulerProxyUserInterface checkAccess(String sessionId, String path)
             throws NotConnectedException {
-        SchedulerProxyUserInterface s = SchedulerSessionMapper.getInstance().getSessionsMap().get(sessionId);
+
+        SchedulerSession ss = SchedulerSessionMapper.getInstance().getSchedulerSession(sessionId);
+        if (ss != null) {
+            logger.trace("not found a scheduler frontend for sessionId " + sessionId);
+            throw new NotConnectedException("you are not connected to the scheduler, you should log on first");
+        }
+
+        SchedulerProxyUserInterface s = ss.getScheduler();
 
         if (s == null) {
             logger.trace("not found a scheduler frontend for sessionId " + sessionId);

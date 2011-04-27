@@ -46,14 +46,12 @@ import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
 
 public class SchedulerSessionMapper {
 
-    private Map<String, SchedulerProxyUserInterface> sessions;
-    private Map<String, String> usernames;
+    private Map<String, SchedulerSession> sessions;
     private static SchedulerSessionMapper sessionMapper;
     private long currentSessionid = 0l;
 
     private SchedulerSessionMapper() {
-        sessions = Collections.synchronizedMap(new HashMap<String, SchedulerProxyUserInterface >());
-        usernames = Collections.synchronizedMap(new HashMap<String, String>());
+        sessions = Collections.synchronizedMap(new HashMap<String, SchedulerSession>());
     }
 
     public static synchronized SchedulerSessionMapper getInstance() {
@@ -65,32 +63,37 @@ public class SchedulerSessionMapper {
 
     public long add(SchedulerProxyUserInterface s, String username) {
         long id = ++currentSessionid;
-        sessions.put("" + id, s);
-        usernames.put("" + id, username);
+        SchedulerSession ss = new SchedulerSession();
+        ss.setScheduler(s);
+        ss.setUserName(username);
+        sessions.put("" + id, ss);
+
         return id;
     }
 
-    public Map<String, SchedulerProxyUserInterface> getSessionsMap() {
+    public Map<String, SchedulerSession> getSessionsMap() {
         return sessions;
     }
-    
-    public Map<String, String> getUsernames() {
-    	return usernames;
+
+    public SchedulerSession getSchedulerSession(String sessionId) {
+        return sessions.get(sessionId);
     }
-    
+
     /**
      * Remove the proxy associated to the session id <code>key</code>
      * This method also terminates the active object used as proxy 
      * @param key the session id
      */
     public void remove(String key) {
-        
-        SchedulerProxyUserInterface proxy = sessions.remove(key); 
-        try {
-            PAActiveObject.terminateActiveObject(proxy, true);
-        } catch (Throwable e) {
-            e.printStackTrace();
+
+        SchedulerSession ss = sessions.remove(key);
+        if (ss != null) {
+            SchedulerProxyUserInterface proxy = ss.getScheduler();
+            try {
+                PAActiveObject.terminateActiveObject(proxy, true);
+            } catch (Throwable e) {
+                e.printStackTrace();
+            }
         }
-        usernames.remove(key);
     }
 }

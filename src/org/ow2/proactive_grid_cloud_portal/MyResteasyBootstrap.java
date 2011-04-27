@@ -137,7 +137,7 @@ public class MyResteasyBootstrap extends ResteasyBootstrap {
                 .toArray(new String[] {});
         int i = 0;
         for (; i < sessionids.length; i++) {
-            Scheduler s = SchedulerSessionMapper.getInstance().getSessionsMap().get(sessionids[i]);
+            Scheduler s = SchedulerSessionMapper.getInstance().getSessionsMap().get(sessionids[i]).getScheduler();
             try {
                 s.disconnect();
             } catch (NotConnectedException e) {
