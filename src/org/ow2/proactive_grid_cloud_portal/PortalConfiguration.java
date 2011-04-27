@@ -50,6 +50,7 @@ public class PortalConfiguration {
     public static String scheduler_cache_password = "scheduler.cache.password";
     public static String scheduler_cache_credential = "scheduler.cache.credential";
     public static String scheduler_cache_refreshrate = "scheduler.cache.refreshrate";
+    public static String scheduler_logforwardingservice_provider = "scheduler.logforwardingservice.provider";
     public static String rm_url = "rm.url";
     public static String REST_API_VERSION = "0.80-3.0.x";
     

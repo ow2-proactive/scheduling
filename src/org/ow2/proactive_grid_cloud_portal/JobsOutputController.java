@@ -85,7 +85,8 @@ public class JobsOutputController {
     // -------------------------------------------------------------------- //
     private JobsOutputController() {
         appenders = new HashMap<String, JobOutputAppender>();
-        lfs = new LogForwardingService(SocketBasedForwardingProvider.class.getName());
+        lfs = new LogForwardingService(PortalConfiguration.getProperties().getProperty(
+                PortalConfiguration.scheduler_logforwardingservice_provider));
         try {
             lfs.initialize();
         } catch (LogForwardingException e) {
