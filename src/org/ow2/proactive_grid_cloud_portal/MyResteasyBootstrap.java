@@ -109,13 +109,16 @@ public class MyResteasyBootstrap extends ResteasyBootstrap {
         }
         System.setProperty("scheduler.database.nodb", "true");
         
+        // initialize the scheduler's state cache
         SchedulerStateCaching.init();
 
-        // start the session cleaner
+        // start the scheduler session cleaner
         schedulerSessionCleaner = new SchedulerSessionsCleaner(SchedulerSessionMapper.getInstance());
         Thread scheduler = new Thread(this.schedulerSessionCleaner, "Scheduler Sessions Cleaner Thread");
         scheduler.setDaemon(true);
         scheduler.start();
+
+        // start the rm session cleaner thread
         rmSessionCleaner = new RMSessionsCleaner(RMSessionMapper.getInstance());
         Thread rm = new Thread(this.rmSessionCleaner, "RM Sessions Cleaner Thread");
         rm.setDaemon(true);
