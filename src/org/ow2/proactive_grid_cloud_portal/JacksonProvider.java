@@ -44,6 +44,11 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.SerializationConfig;
 import org.codehaus.jackson.xc.JaxbAnnotationIntrospector;
 
+/**
+ * Configuration class that allows to specialize the behaviour of
+ * the JSon serialization made by the Jackson Provicer
+ * Loaded by reflection somewhere in RestEasy.
+ */
 
 @Provider
 public class JacksonProvider implements ContextResolver<ObjectMapper> {
