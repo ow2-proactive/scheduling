@@ -36,12 +36,6 @@
  */
 package org.ow2.proactive_grid_cloud_portal;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
-
 import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.spi.LoggingEvent;
 
@@ -101,6 +95,7 @@ public class JobOutputAppender extends AppenderSkeleton {
     @Override
     public void close() {
         super.closed = true;
+        jobOutput = null;
     }
 
     /**
