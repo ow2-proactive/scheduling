@@ -2,6 +2,9 @@ package matlabcontrol;
 
 import com.mathworks.jmi.Matlab;
 
+import java.rmi.NoSuchObjectException;
+import java.rmi.server.UnicastRemoteObject;
+
 /**
  * JMIWrapperImpl2
  *
@@ -65,6 +68,13 @@ public class JMIWrapperImpl2 extends JMIWrapperImpl {
      * @throws MatlabInvocationException
      */
     public void exit(boolean immediate) throws MatlabInvocationException {
+
+        try {
+            UnicastRemoteObject.unexportObject(MatlabConnector.proxy, true);
+        } catch (NoSuchObjectException e) {
+        }
+        System.gc();
+
         if (!immediate) {
             Matlab.whenMatlabReady(new Runnable() {
                 public void run() {

@@ -89,6 +89,8 @@ public class RemoteMatlabProxyFactory {
      */
     private static Registry _registry = null;
 
+    private static int rmiport = Registry.REGISTRY_PORT;
+
     /**
      * Receiver for proxies created and sent over RMI.
      */
@@ -108,7 +110,7 @@ public class RemoteMatlabProxyFactory {
      * received does not interfere with the essential operations of creating
      * and receiving proxies by holding up the thread.
      */
-    private final ExecutorService _connectionExecutor = Executors.newSingleThreadExecutor();
+    private ExecutorService _connectionExecutor = Executors.newSingleThreadExecutor();
 
     private Process theMatlabProcess;
 
@@ -188,33 +190,27 @@ public class RemoteMatlabProxyFactory {
         System.out.println("initRegistry()");
         System.out.flush();
         //If the registry hasn't been created
+
         if (_registry == null) {
             System.out.println("IS NULL _______ initRegistry()");
             System.out.flush();
+            System.out.println("Create New Registry");
+            System.out.flush();
+            Random rnd = new Random();
 
-
-            //Create a RMI registry
-            try {
-                System.out.println("Create New Registry");
-                System.out.flush();
-                _registry = LocateRegistry.createRegistry(Registry.REGISTRY_PORT);
-            }
-            //If we can't create one, try to retrieve an existing one
-            catch (Exception e) {
+            int initialPort = rnd.nextInt(65536 - 1024) + 1024;
+            for (rmiport = (initialPort == 65535) ? 1024 : (initialPort + 1); rmiport != initialPort; rmiport = (rmiport == 65535) ? 1024
+                    : (rmiport + 1)) {
                 try {
-                    _registry = LocateRegistry.getRegistry(Registry.REGISTRY_PORT);
-
-                    String[] list = _registry.list();
-                    System.out.println("Previous registry:");
-                    System.out.println(Arrays.toString(list));
-                    System.out.flush();
-                    for (String key : list) {
-                        _registry.unbind(key);
-                    }
-                } catch (Exception ex) {
-                    throw new MatlabConnectionException("Could not create or connect to the RMI registry", ex);
+                    _registry = LocateRegistry.createRegistry(rmiport);
+                    break;
+                } catch (Exception e) {
+                    // Try another port
                 }
             }
+
+            System.out.println("Registry created on port :" + rmiport);
+            System.out.flush();
 
             //Tell the code base where it is, and just to be safe force it to use it
             //(This is necessary so that paths with spaces work properly)
@@ -231,6 +227,8 @@ public class RemoteMatlabProxyFactory {
                 System.out.flush();
                 for (String key : list) {
                     _registry.unbind(key);
+
+
                 }
             } catch (Exception ex) {
                 throw new MatlabConnectionException("Could not create or connect to the RMI registry", ex);
@@ -316,7 +314,7 @@ public class RemoteMatlabProxyFactory {
         //will create a proxy and send it over RMI back to this JVM.
         final String runArg = "javaaddpath '" + _supportCodeLocation + "'; " +
                 MatlabConnector.class.getName() +
-                ".connectFromMatlab('" + _receiverID + "', '" + proxyID + "');";
+                ".connectFromMatlab('" + _receiverID + "', '" + proxyID + "', " + rmiport + ");";
 
         //Create the MATLAB process that will run the argument
         try {
@@ -477,8 +475,59 @@ public class RemoteMatlabProxyFactory {
     }
 
     public void clean() {
+        try {
+            _registry.unbind(_receiverID);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        try {
+            UnicastRemoteObject.unexportObject(this._receiver, true);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         cancelConnnectionTimer();
+        _connectionExecutor.shutdownNow();
+        _connectionExecutor = null;
+        _proxies.clear();
+
+
+        threadsCleaning();
     }
+
+
+    private static void threadsCleaning() {
+        ThreadGroup tg = Thread.currentThread().getThreadGroup().getParent();
+        Thread[] threads = new Thread[200];
+        int len = tg.enumerate(threads, true);
+        int nbKilled = 0;
+
+        for (int i = 0; i < len; i++) {
+            Thread ct = threads[i];
+
+            if ((ct.getName().indexOf("RMI RenewClean") >= 0) ||
+                    (ct.getName().indexOf("ThreadInThePool") >= 0)) {
+
+                try {
+                    ct.interrupt();
+                } catch (Exception e) {
+                }
+
+
+                nbKilled++;
+                if (ct.isAlive()) {
+                    try {
+                        ct.stop();
+                    } catch (Exception e) {
+                    }
+                }
+
+            }
+        }
+
+        System.err.println(nbKilled + " thread(s) stopped on " + len);
+    }
+
 
     /**
      * Checks the connections to MATLAB. If a connection has died, the
