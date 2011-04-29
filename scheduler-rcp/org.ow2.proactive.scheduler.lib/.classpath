@@ -28,8 +28,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/commons-fileupload-1.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons-httpclient-3.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons-logging-1.1.1.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/commons-vfs-patched-2.0-SNAPSHOTr13526-tests.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/commons-vfs-patched-2.0-SNAPSHOTr13526.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/cxf-2.2.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/dom4j-1.6.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/FastInfoset-1.2.3.jar"/>
@@ -147,5 +145,7 @@
 	<classpathentry exported="true" kind="lib" path="lib/ejb3-persistence.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/hibernate-annotations.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/hibernate-commons-annotations.jar"/>
+	<classpathentry kind="lib" path="lib/commons-vfs-patched-2.0-SNAPSHOTr19199-tests.jar"/>
+	<classpathentry kind="lib" path="lib/commons-vfs-patched-2.0-SNAPSHOTr19199.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

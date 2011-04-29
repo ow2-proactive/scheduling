@@ -81,8 +81,6 @@
 	<classpathentry kind="lib" path="lib/ProActive/commons-httpclient-3.1.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/commons-logging-1.1.1.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/commons-net-1.4.1.jar"/>
-	<classpathentry kind="lib" path="lib/ProActive/commons-vfs-patched-2.0-SNAPSHOTr13526-tests.jar"/>
-	<classpathentry kind="lib" path="lib/ProActive/commons-vfs-patched-2.0-SNAPSHOTr13526.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/cxf-2.2.2.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/FastInfoset-1.2.3.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/geronimo-activation_1.1_spec-1.0.2.jar"/>
@@ -173,5 +171,7 @@
 	<classpathentry kind="lib" path="lib/common/hibernate/annotation/hibernate-commons-annotations.jar"/>
 	<classpathentry kind="lib" path="lib/nodesource/ec2/typica.jar"/>
 	<classpathentry kind="lib" path="lib/nodesource/winhpc/WinHPCWebserviceStubs.jar"/>
+	<classpathentry kind="lib" path="lib/ProActive/commons-vfs-patched-2.0-SNAPSHOTr19199-tests.jar"/>
+	<classpathentry kind="lib" path="lib/ProActive/commons-vfs-patched-2.0-SNAPSHOTr19199.jar"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>
