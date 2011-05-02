@@ -48,4 +48,6 @@ public interface MatlabProcessCreator {
 	public Process createMatlabProcess(String runArg) throws Exception;
 
     public File getLogFile();
+
+    public boolean isDebug();
 }

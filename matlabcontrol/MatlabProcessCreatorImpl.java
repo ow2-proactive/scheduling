@@ -88,4 +88,8 @@ public class MatlabProcessCreatorImpl implements MatlabProcessCreator {
     public File getLogFile() {
         return _logFile;
     }
+
+    public boolean isDebug() {
+        return false;
+    }
 }

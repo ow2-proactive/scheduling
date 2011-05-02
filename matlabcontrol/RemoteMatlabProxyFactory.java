@@ -64,6 +64,8 @@ public class RemoteMatlabProxyFactory {
      */
     private final MatlabProcessCreator _matlabCreator;
 
+    private static boolean debug;
+
     /**
      * The location of this support code. This location is provided to MATLAB
      * so that it can add the location of this code to its classpath.
@@ -80,6 +82,8 @@ public class RemoteMatlabProxyFactory {
      * Map of proxyIDs to {@link RemoteMatlabProxy} instances.
      */
     private final Map<String, RemoteMatlabProxy> _proxies = new HashMap<String, RemoteMatlabProxy>();
+
+    private static HashSet<String> _initialthreads = new HashSet<String>();
 
     /**
      * The RMI registry used to communicate between JVMs. There is only ever
@@ -132,9 +136,12 @@ public class RemoteMatlabProxyFactory {
 
         //The matlab process creator
         this._matlabCreator = creator;
+        this.debug = creator.isDebug();
 
         //Location of where this code is
         this._supportCodeLocation = Configuration.getSupportCodeLocation();
+
+        threadSave();
 
         //Initialize the registry
         initRegistry();
@@ -187,15 +194,18 @@ public class RemoteMatlabProxyFactory {
      * @throws MatlabConnectionException
      */
     private static void initRegistry() throws MatlabConnectionException {
-        System.out.println("initRegistry()");
-        System.out.flush();
+        if (debug) {
+            System.out.println("initRegistry()");
+            System.out.flush();
+        }
         //If the registry hasn't been created
 
         if (_registry == null) {
-            System.out.println("IS NULL _______ initRegistry()");
-            System.out.flush();
-            System.out.println("Create New Registry");
-            System.out.flush();
+            if (debug) {
+
+                System.out.println("Create New Registry");
+                System.out.flush();
+            }
             Random rnd = new Random();
 
             int initialPort = rnd.nextInt(65536 - 1024) + 1024;
@@ -208,9 +218,10 @@ public class RemoteMatlabProxyFactory {
                     // Try another port
                 }
             }
-
-            System.out.println("Registry created on port :" + rmiport);
-            System.out.flush();
+            if (debug) {
+                System.out.println("Registry created on port :" + rmiport);
+                System.out.flush();
+            }
 
             //Tell the code base where it is, and just to be safe force it to use it
             //(This is necessary so that paths with spaces work properly)
@@ -218,13 +229,13 @@ public class RemoteMatlabProxyFactory {
             System.setProperty("java.rmi.server.useCodebaseOnly", "true");
         } else {
 
-            System.out.println("IS NOT NULL initRegistry()");
-            System.out.flush();
             try {
                 String[] list = _registry.list();
-                System.out.println("Previous registry:");
-                System.out.println(Arrays.toString(list));
-                System.out.flush();
+                if (debug) {
+                    System.out.println("Previous registry:");
+                    System.out.println(Arrays.toString(list));
+                    System.out.flush();
+                }
                 for (String key : list) {
                     _registry.unbind(key);
 
@@ -504,28 +515,42 @@ public class RemoteMatlabProxyFactory {
 
         for (int i = 0; i < len; i++) {
             Thread ct = threads[i];
+            if (!_initialthreads.contains(ct.getName())) {
+                if ((ct.getName().indexOf("RMI RenewClean") >= 0) ||
+                        (ct.getName().indexOf("ThreadInThePool") >= 0)) {
 
-            if ((ct.getName().indexOf("RMI RenewClean") >= 0) ||
-                    (ct.getName().indexOf("ThreadInThePool") >= 0)) {
-
-                try {
-                    ct.interrupt();
-                } catch (Exception e) {
-                }
-
-
-                nbKilled++;
-                if (ct.isAlive()) {
                     try {
-                        ct.stop();
+                        ct.interrupt();
                     } catch (Exception e) {
                     }
-                }
 
+
+                    nbKilled++;
+                    if (ct.isAlive()) {
+                        try {
+                            ct.stop();
+                        } catch (Exception e) {
+                        }
+                    }
+
+                }
             }
         }
+        if (debug) {
+            System.out.println(nbKilled + " thread(s) stopped on " + len);
+        }
+    }
 
-        System.err.println(nbKilled + " thread(s) stopped on " + len);
+    private static void threadSave() {
+         ThreadGroup tg = Thread.currentThread().getThreadGroup().getParent();
+        Thread[] threads = new Thread[200];
+        int len = tg.enumerate(threads, true);
+        int nbKilled = 0;
+
+        for (int i = 0; i < len; i++) {
+            Thread ct = threads[i];
+            _initialthreads.add(ct.getName());
+        }
     }
 
 
