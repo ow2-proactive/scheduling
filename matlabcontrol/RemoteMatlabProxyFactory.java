@@ -381,7 +381,9 @@ public class RemoteMatlabProxyFactory {
 
         //If the proxy has not be received before the timeout
         if (!_proxies.containsKey(proxyID)) {
-            theMatlabProcess.destroy();
+			if (theMatlabProcess != null) {
+				theMatlabProcess.destroy();
+			}
             // Read the log file
             String output = getLogFileOutput();
 
