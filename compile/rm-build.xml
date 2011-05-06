@@ -58,6 +58,8 @@
 			<class name="org.ow2.proactive.resourcemanager.core.RMCore" />
 			<class name="org.ow2.proactive.resourcemanager.common.RMState" />
 			<class name="org.ow2.proactive.resourcemanager.nodesource.policy.NodeSourcePolicy" />
+			<class name="org.ow2.proactive.resourcemanager.common.util.RMProxyUserInterface" />
+			<class name="org.ow2.proactive.resourcemanager.common.util.RMCachingProxyUserInterface" />
 		</stubGenerator>
 		
 	</target>
