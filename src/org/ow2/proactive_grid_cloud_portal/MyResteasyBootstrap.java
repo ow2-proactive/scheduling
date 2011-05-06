@@ -47,11 +47,11 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.jboss.resteasy.plugins.server.servlet.ResteasyBootstrap;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
-import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.config.xml.ProActiveConfigurationParser;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.ow2.proactive.resourcemanager.common.util.RMCachingProxyUserInterface;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.exception.PermissionException;
@@ -158,7 +158,7 @@ public class MyResteasyBootstrap extends ResteasyBootstrap {
         sessionids = RMSessionMapper.getInstance().getSessionsMap().keySet()
         .toArray(new String[] {});
         for (; i < sessionids.length; i++) {
-            RMCachingProxyInterface s = RMSessionMapper.getInstance().getSessionsMap().get(sessionids[i]);
+            RMCachingProxyUserInterface s = RMSessionMapper.getInstance().getSessionsMap().get(sessionids[i]);
             try {
                 s.disconnect();
             } catch (Throwable e) {

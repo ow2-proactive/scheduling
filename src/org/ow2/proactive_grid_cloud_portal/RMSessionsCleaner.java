@@ -46,9 +46,9 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.utils.Sleeper;
-import org.ow2.proactive.scheduler.common.Scheduler;
+import org.ow2.proactive.resourcemanager.common.util.RMCachingProxyUserInterface;
+import org.ow2.proactive.resourcemanager.common.util.RMProxyUserInterface;
 import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
-import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
 
 /**
  * The ressource manager does not disconnect clients by itself, there is no session timeout.
@@ -77,20 +77,20 @@ public class RMSessionsCleaner implements Runnable {
 
     public void run() {
         while (!stop) {
-            Map<String, RMCachingProxyInterface> sessionMap = rmsm.getSessionsMap();
+            Map<String, RMCachingProxyUserInterface> sessionMap = rmsm.getSessionsMap();
             Map<String, Long> timestamps = rmsm.getSessionsLastAccessToClient();
             logger.info("cleaning session started, " + sessionMap.size() + " existing session(s) ");
             int removedSession = 0;
-            List<Entry<String, RMCachingProxyInterface>> scheduledforRemoval = new ArrayList<Entry<String, RMCachingProxyInterface>>();
+            List<Entry<String, RMCachingProxyUserInterface>> scheduledforRemoval = new ArrayList<Entry<String, RMCachingProxyUserInterface>>();
             synchronized (sessionMap) {
-                Set<Entry<String, RMCachingProxyInterface>> entrySet = sessionMap.entrySet();
-                Iterator<Entry<String, RMCachingProxyInterface>> it = entrySet.iterator();
+                Set<Entry<String, RMCachingProxyUserInterface>> entrySet = sessionMap.entrySet();
+                Iterator<Entry<String, RMCachingProxyUserInterface>> it = entrySet.iterator();
 
                 long currentTimeStamp = System.currentTimeMillis();
 
                 while (it.hasNext()) {
-                    Entry<String, RMCachingProxyInterface> entry = it.next();
-                    RMProxy rmproxy = entry.getValue();
+                    Entry<String, RMCachingProxyUserInterface> entry = it.next();
+                    RMProxyUserInterface rmproxy = entry.getValue();
                     try {
 
                         // isConnected does not reset the lease of the stub
@@ -122,7 +122,7 @@ public class RMSessionsCleaner implements Runnable {
                 }
 
                 // effective deletion
-                for (Entry<String, RMCachingProxyInterface> entry : scheduledforRemoval) {
+                for (Entry<String, RMCachingProxyUserInterface> entry : scheduledforRemoval) {
                     rmsm.remove(entry.getKey());
                 }
 

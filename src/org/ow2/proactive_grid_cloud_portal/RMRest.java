@@ -71,6 +71,7 @@ import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.common.RMState;
 import org.ow2.proactive.resourcemanager.common.event.RMInitialState;
+import org.ow2.proactive.resourcemanager.common.util.RMCachingProxyUserInterface;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.frontend.topology.Topology;
@@ -83,8 +84,8 @@ import org.ow2.proactive_grid_cloud_portal.common.LoginForm;
 @Path("/rm")
 public class RMRest {
 
-    public RMCachingProxyInterface checkAccess(String sessionId) throws WebApplicationException {
-        RMCachingProxyInterface s = RMSessionMapper.getInstance().getSessionsMap().get(sessionId);
+    public RMCachingProxyUserInterface checkAccess(String sessionId) throws WebApplicationException {
+        RMCachingProxyUserInterface s = RMSessionMapper.getInstance().getSessionsMap().get(sessionId);
 
         if (s == null) {
             throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_UNAUTHORIZED)
@@ -112,8 +113,8 @@ public class RMRest {
     public String rmConnect(@FormParam("username") String username, @FormParam("password") String password) throws KeyException, LoginException, RMException, ActiveObjectCreationException, NodeException {
 
 
-        RMCachingProxyInterface  rm;
-           rm = PAActiveObject.newActive(RMCachingProxyInterface.class, new Object[] {});
+        RMCachingProxyUserInterface  rm;
+           rm = PAActiveObject.newActive(RMCachingProxyUserInterface.class, new Object[] {});
            
             CredData credData = new CredData(CredData.parseLogin(username), CredData.parseDomain(username),
                 password);
@@ -130,7 +131,7 @@ public class RMRest {
     @Path("disconnect")
     @Produces("application/json")
     public void rmDisconnect(@HeaderParam("sessionid") String sessionId) {
-        RMCachingProxyInterface rm = checkAccess(sessionId);
+        RMCachingProxyUserInterface rm = checkAccess(sessionId);
         rm.disconnect();
         PAActiveObject.terminateActiveObject(rm,true);
         RMSessionMapper.getInstance().remove(sessionId);
@@ -153,7 +154,7 @@ public class RMRest {
             throws ActiveObjectCreationException, NodeException, KeyException, IOException, LoginException,
             RMException {
 
-        RMCachingProxyInterface rm = PAActiveObject.newActive(RMCachingProxyInterface.class, new Object[] {});
+        RMCachingProxyUserInterface rm = PAActiveObject.newActive(RMCachingProxyUserInterface.class, new Object[] {});
 
         String url = PortalConfiguration.getProperties().getProperty(PortalConfiguration.rm_url);
 
@@ -194,7 +195,7 @@ public class RMRest {
     @Path("monitoring")
     @Produces("application/json")
     public RMInitialState getInitialState(@HeaderParam("sessionid") String sessionId) {
-        RMCachingProxyInterface rm = checkAccess(sessionId);
+        RMCachingProxyUserInterface rm = checkAccess(sessionId);
         return PAFuture.getFutureValue(rm.getRMInitialState());
     }
 
@@ -387,7 +388,7 @@ public class RMRest {
     public Object getMBeanInfo(@HeaderParam("sessionid") String sessionId,
             @PathParam("name") ObjectName name, @QueryParam("attr") List<String> attrs)
             throws InstanceNotFoundException, IntrospectionException, ReflectionException, IOException {
-        RMProxy rm = checkAccess(sessionId);
+        RMCachingProxyUserInterface rm = checkAccess(sessionId);
 
         if ((attrs == null) || (attrs.size() == 0)) {
             // no attribute is requested, we return

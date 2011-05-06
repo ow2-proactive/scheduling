@@ -98,8 +98,6 @@
 	<classpathentry kind="lib" path="lib/scheduling/commons-httpclient-3.1.jar"/>
 	<classpathentry kind="lib" path="lib/scheduling/commons-logging-1.1.1.jar"/>
 	<classpathentry kind="lib" path="lib/scheduling/commons-net-1.4.1.jar"/>
-	<classpathentry kind="lib" path="lib/scheduling/commons-vfs-patched-2.0-SNAPSHOTr13526-tests.jar"/>
-	<classpathentry kind="lib" path="lib/scheduling/commons-vfs-patched-2.0-SNAPSHOTr13526.jar"/>
 	<classpathentry kind="lib" path="lib/scheduling/concurrent.jar"/>
 	<classpathentry kind="lib" path="lib/scheduling/configadmin-1.2.4.jar"/>
 	<classpathentry kind="lib" path="lib/scheduling/cryptix-asn1.jar"/>
@@ -247,5 +245,12 @@
 	<classpathentry kind="lib" path="lib/scheduling/xsdlib.jar"/>
 	<classpathentry kind="lib" path="lib/scheduling/yajsw-os.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jst.server.core.container/org.eclipse.jst.server.tomcat.runtimeTarget/Apache Tomcat v6.0"/>
+	<classpathentry kind="lib" path="lib/scheduling/commons-vfs-patched-2.0-SNAPSHOTr19199-tests.jar"/>
+	<classpathentry kind="lib" path="lib/scheduling/commons-vfs-patched-2.0-SNAPSHOTr19199.jar"/>
+	<classpathentry kind="lib" path="lib/scheduling/cron4j-rv2.2.3-mod.jar"/>
+	<classpathentry kind="lib" path="lib/scheduling/org.scilab.modules.javasci.jar"/>
+	<classpathentry kind="lib" path="lib/scheduling/org.scilab.modules.types.jar"/>
+	<classpathentry kind="lib" path="lib/scheduling/ProActive_examples.jar"/>
+	<classpathentry kind="lib" path="lib/scheduling/ProActive_Scheduler-matsci.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

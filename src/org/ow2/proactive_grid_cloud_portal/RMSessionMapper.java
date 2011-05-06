@@ -41,17 +41,18 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.objectweb.proactive.api.PAActiveObject;
+import org.ow2.proactive.resourcemanager.common.util.RMCachingProxyUserInterface;
 
 
 public class RMSessionMapper {
 
-    private Map<String, RMCachingProxyInterface> sessions;
+    private Map<String, RMCachingProxyUserInterface> sessions;
     private static RMSessionMapper sessionMapper;
     private Map<String, Long> sessionsLastAccessToClient;
     private long currentSessionid = 0l;
 
     private RMSessionMapper() {
-        sessions = Collections.synchronizedMap(new HashMap<String, RMCachingProxyInterface>());
+        sessions = Collections.synchronizedMap(new HashMap<String, RMCachingProxyUserInterface>());
         sessionsLastAccessToClient = Collections.synchronizedMap(new HashMap<String, Long>());
     }
 
@@ -62,14 +63,14 @@ public class RMSessionMapper {
         return sessionMapper;
     }
 
-    public long add(RMCachingProxyInterface rm) {
+    public long add(RMCachingProxyUserInterface rm) {
         long id = ++currentSessionid;
         sessions.put("" + id, rm);
         sessionsLastAccessToClient.put("" + id, System.currentTimeMillis());
         return id;
     }
 
-    public Map<String, RMCachingProxyInterface> getSessionsMap() {
+    public Map<String, RMCachingProxyUserInterface> getSessionsMap() {
         return sessions;
     }
 
@@ -83,7 +84,7 @@ public class RMSessionMapper {
      * @param key the session id
      */
     public void remove(String key) {
-        RMCachingProxyInterface proxy = sessions.remove(key);
+        RMCachingProxyUserInterface proxy = sessions.remove(key);
         try {
             PAActiveObject.terminateActiveObject(proxy, true);
         } catch (Throwable e) {
