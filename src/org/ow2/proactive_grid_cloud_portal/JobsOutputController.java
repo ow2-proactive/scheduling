@@ -37,11 +37,10 @@
 package org.ow2.proactive_grid_cloud_portal;
 
 import java.io.IOException;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -56,7 +55,6 @@ import org.ow2.proactive.scheduler.common.task.Log4JTaskLogs;
 import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingException;
 import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingService;
 import org.ow2.proactive.scheduler.common.util.logforwarder.providers.SocketBasedForwardingProvider;
-import org.ow2.proactive.virtualizing.virtualbox.api.IConsole;
 
 
 /**
@@ -125,7 +123,7 @@ public class JobsOutputController {
      * @see JobsOutputController#createJobOutput(JobId)
      */
     public JobOutput getJobOutput(String sessionId, String jobId) {
-        JobOutputAppender joa = appenders.get(sessionId + "-" + jobId);
+        JobOutputAppender joa = appenders.get(generateAppendersKey(sessionId, jobId));
         if (joa == null) {
             return null;
         } else {
@@ -146,19 +144,15 @@ public class JobsOutputController {
      * @throws IOException 
      * @throws SchedulerException
      */
-    public void createJobOutput(Scheduler s, String sessionId, String jobId) throws NotConnectedException,
+    public JobOutputAppender createJobOutput(SchedulerSession ss, String jobId) throws NotConnectedException,
             UnknownJobException, PermissionException, LogForwardingException, IOException {
 
-        JobOutputAppender joa = new JobOutputAppender(
-            new JobOutput(PREFIX_JOB_OUTPUT_TITLE + jobId, new CircularArrayList<String>(50)));
-        joa.setLayout(Log4JTaskLogs.getTaskLogLayout());
-        Logger log = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX + jobId);
-        log.setAdditivity(false);
-        log.setLevel(Level.ALL);
-        //                log.removeAllAppenders();
-        log.addAppender(joa);
-        appenders.put(sessionId + "-" + jobId, joa);
-        s.listenJobLogs(jobId, lfs.getAppenderProvider());
+        
+        
+        return new JobOutputAppender(ss,
+                lfs.getAppenderProvider(),
+                new JobOutput(PREFIX_JOB_OUTPUT_TITLE + jobId, new CircularArrayList<String>(50)));
+        
 
     }
 
@@ -168,16 +162,16 @@ public class JobsOutputController {
      * @param jobId
      *            the jobId
      */
-    public void removeJobOutput(String sessionId, String jobId) {
-        JobOutputAppender joa = appenders.get(sessionId + "-" + jobId);
+   /* public void removeJobOutput(String sessionId) {
+        JobOutputAppender joa = 
         if (joa != null) {
             joa.close();
         }
         Logger log = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX + jobId);
         log.removeAppender(joa);
-        appenders.remove(sessionId + "-" + jobId);
+        appenders.remove(generateAppendersKey(sessionId, jobId));
     }
-
+*/
     /**
      * Remove all output ! This method clear the console.
      */
@@ -188,5 +182,14 @@ public class JobsOutputController {
             out.getValue().close();
         }
         appenders.clear();
+    }
+
+    private String generateAppendersKey(String sessionId, String jobId) {
+        return sessionId + "__" + jobId;
+    }
+
+    private String getSessionIdfromAppenderKey(String appenderKey) {
+        int index = appenderKey.indexOf("__");
+        return appenderKey.substring(0, index);
     }
 }

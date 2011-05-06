@@ -491,11 +491,12 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             throws NotConnectedException, UnknownJobException, PermissionException, LogForwardingException,
             IOException {
         Scheduler s = checkAccess(sessionId, "/scheduler/jobs/" + jobId + "/livelog");
-
+        SchedulerSessionMapper.getInstance().getSchedulerSession(sessionId);
+        
         JobOutput jo = JobsOutputController.getInstance().getJobOutput(sessionId, jobId);
 
         if (jo == null) {
-            JobsOutputController.getInstance().createJobOutput(s, sessionId, jobId);
+            JobsOutputController.getInstance().createJobOutput(SchedulerSessionMapper.getInstance().getSchedulerSession(sessionId), jobId);
         }
 
         jo = JobsOutputController.getInstance().getJobOutput(sessionId, jobId);
@@ -553,8 +554,9 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             @PathParam("jobid") String jobId) throws NotConnectedException, UnknownJobException,
             PermissionException, LogForwardingException, IOException {
         Scheduler s = checkAccess(sessionId, "delete /scheduler/jobs/livelog" + jobId);
-
-        JobsOutputController.getInstance().removeJobOutput(sessionId, jobId);
+        SchedulerSession ss = SchedulerSessionMapper.getInstance().getSchedulerSession(sessionId);
+        
+        ss.getJobOutputAppender().terminate();
 
         return true;
 
@@ -895,13 +897,13 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      */
     public SchedulerProxyUserInterface checkAccess(String sessionId, String path)
             throws NotConnectedException {
-
+       
         SchedulerSession ss = SchedulerSessionMapper.getInstance().getSchedulerSession(sessionId);
         if (ss != null) {
             logger.trace("not found a scheduler frontend for sessionId " + sessionId);
             throw new NotConnectedException("you are not connected to the scheduler, you should log on first");
         }
-
+        
         SchedulerProxyUserInterface s = ss.getScheduler();
 
         if (s == null) {

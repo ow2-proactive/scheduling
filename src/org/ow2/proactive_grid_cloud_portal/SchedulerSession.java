@@ -41,10 +41,12 @@ import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
 
 public class SchedulerSession {
 
+    protected String sessionId;
     protected SchedulerProxyUserInterface scheduler ;
     protected String userName;
-
-
+    protected JobOutputAppender jobOutputAppender;
+    
+    
     public SchedulerProxyUserInterface getScheduler() {
         return scheduler;
     }
@@ -57,7 +59,25 @@ public class SchedulerSession {
     public void setUserName(String userName) {
         this.userName = userName;
     }
+    public JobOutputAppender getJobOutputAppender() {
+        return jobOutputAppender;
+    }
 
-
-
+    @Override
+    protected void finalize() throws Throwable {
+        super.finalize();
+        this.jobOutputAppender.terminate();
+    }
+    
+    public String getSessionId() {
+        return sessionId;
+    }
+    public void setSessionId(String sessionId) {
+        this.sessionId = sessionId;
+    }
+    public void setJobOutputAppender(JobOutputAppender joa) {
+        this.jobOutputAppender = joa;
+    }
+    
+    
 }

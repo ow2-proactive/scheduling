@@ -37,7 +37,14 @@
 package org.ow2.proactive_grid_cloud_portal;
 
 import org.apache.log4j.AppenderSkeleton;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.apache.log4j.spi.LoggingEvent;
+import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
+import org.ow2.proactive.scheduler.common.exception.PermissionException;
+import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
+import org.ow2.proactive.scheduler.common.task.Log4JTaskLogs;
+import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
 
 
 /**
@@ -49,6 +56,8 @@ import org.apache.log4j.spi.LoggingEvent;
 public class JobOutputAppender extends AppenderSkeleton {
 
     private JobOutput jobOutput = null;
+    private SchedulerSession ss;
+    private String jobId;
 
     // -------------------------------------------------------------------- //
     // --------------------------- constructor ---------------------------- //
@@ -57,10 +66,24 @@ public class JobOutputAppender extends AppenderSkeleton {
      * The default constructor
      *
      * @param jobOutput the job output
+     * @throws PermissionException 
+     * @throws UnknownJobException 
+     * @throws NotConnectedException 
      */
-    public JobOutputAppender(JobOutput jobOutput) {
+    public JobOutputAppender(SchedulerSession ss, AppenderProvider ap, JobOutput jobOutput) throws NotConnectedException, UnknownJobException, PermissionException {
         this.name = "Appender for job output";
+        this.ss = ss;
         this.jobOutput = jobOutput;
+        this.jobId =  ss.getSessionId();
+        
+        this.setLayout(Log4JTaskLogs.getTaskLogLayout());
+        Logger log = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX + ss.getSessionId());
+        log.setAdditivity(false);
+        log.setLevel(Level.ALL);
+        log.addAppender(this);
+        ss.setJobOutputAppender(this);
+        ss.getScheduler().listenJobLogs(ss.getSessionId(), ap);
+        
     }
 
     // -------------------------------------------------------------------- //
@@ -75,6 +98,12 @@ public class JobOutputAppender extends AppenderSkeleton {
         return jobOutput;
     }
 
+    public void terminate () {
+        close();
+        Logger log = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX + jobId);
+        log.removeAppender(this);
+    }
+    
     // -------------------------------------------------------------------- //
     // -------------------- extends AppenderSkeleton ---------------------- //
     // -------------------------------------------------------------------- //

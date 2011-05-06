@@ -65,6 +65,7 @@ public class SchedulerSessionMapper {
         long id = ++currentSessionid;
         SchedulerSession ss = new SchedulerSession();
         ss.setScheduler(s);
+        ss.setSessionId(""+id);
         ss.setUserName(username);
         sessions.put("" + id, ss);
 
@@ -80,8 +81,8 @@ public class SchedulerSessionMapper {
     }
 
     /**
-     * Remove the proxy associated to the session id <code>key</code>
-     * This method also terminates the active object used as proxy 
+     * Remove the session associated to the session id <code>key</code>
+     * This method also terminates the active object used as proxy to the scheduler
      * @param key the session id
      */
     public void remove(String key) {
