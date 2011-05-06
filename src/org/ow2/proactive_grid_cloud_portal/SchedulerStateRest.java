@@ -899,7 +899,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             throws NotConnectedException {
        
         SchedulerSession ss = SchedulerSessionMapper.getInstance().getSchedulerSession(sessionId);
-        if (ss != null) {
+        if (ss == null) {
             logger.trace("not found a scheduler frontend for sessionId " + sessionId);
             throw new NotConnectedException("you are not connected to the scheduler, you should log on first");
         }
