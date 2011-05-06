@@ -10,6 +10,7 @@
 	<property name="classes.dir" value="${build.dir}/classes" />
 	<property name="lib.dir" value="lib" />
 	<property name="webinf.lib.dir" value="WebContent/WEB-INF/lib" />
+	<property name="webinf.classes.dir" value="WebContent/WEB-INF/classes" />
 	<property name="src.dir" value="src" />
 
 
@@ -24,6 +25,7 @@
 
 	<target name="clean" description="Delete class files">
 		<delete dir="${classes.dir}" />
+		<delete dir="${webinf.classes.dir}" />
 		<delete dir="${webinf.lib.dir}" />
 	</target>
 
