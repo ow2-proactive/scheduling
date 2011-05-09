@@ -382,7 +382,7 @@ public abstract class InternalTask extends TaskState {
             }
 
             // arrays do not have regular fields in the java reflect api
-            if (f.getType().isArray() && value != null) {
+            if (f.getType().isArray() && value != null && !f.getType().getComponentType().isPrimitive()) {
                 for (int i = 0; i < Array.getLength(value); i++) {
                     resetIds(Array.get(value, i), acc);
                 }
