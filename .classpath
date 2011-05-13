@@ -3,11 +3,6 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.web.container"/>
 	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.module.container"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/jdk1.6.0_20">
-		<attributes>
-			<attribute name="owner.project.facets" value="java"/>
-		</attributes>
-	</classpathentry>
 	<classpathentry kind="lib" path="lib/resteasy/activation-1.1.jar"/>
 	<classpathentry kind="lib" path="lib/resteasy/apache-mime4j-0.6.jar"/>
 	<classpathentry kind="lib" path="lib/resteasy/async-http-jbossweb-2.0.0.GA.jar"/>
@@ -252,5 +247,6 @@
 	<classpathentry kind="lib" path="lib/scheduling/org.scilab.modules.types.jar"/>
 	<classpathentry kind="lib" path="lib/scheduling/ProActive_examples.jar"/>
 	<classpathentry kind="lib" path="lib/scheduling/ProActive_Scheduler-matsci.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
