@@ -491,15 +491,17 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             throws NotConnectedException, UnknownJobException, PermissionException, LogForwardingException,
             IOException {
         Scheduler s = checkAccess(sessionId, "/scheduler/jobs/" + jobId + "/livelog");
-        SchedulerSessionMapper.getInstance().getSchedulerSession(sessionId);
-        
-        JobOutput jo = JobsOutputController.getInstance().getJobOutput(sessionId, jobId);
+        SchedulerSession ss = SchedulerSessionMapper.getInstance().getSchedulerSession(sessionId);
 
-        if (jo == null) {
-            JobsOutputController.getInstance().createJobOutput(SchedulerSessionMapper.getInstance().getSchedulerSession(sessionId), jobId);
+
+        JobOutput jo = null;;
+
+        if (ss.getJobOutputAppender() == null) {
+           jo =  JobsOutputController.getInstance().createJobOutput(SchedulerSessionMapper.getInstance().getSchedulerSession(sessionId), jobId).getJobOutput();
+        } else {
+            jo = ss.getJobOutputAppender().getJobOutput();
         }
 
-        jo = JobsOutputController.getInstance().getJobOutput(sessionId, jobId);
 
         if (jo != null) {
             CircularArrayList<String> cl = jo.getCl();
@@ -529,11 +531,12 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             @PathParam("jobid") String jobId) throws NotConnectedException, UnknownJobException,
             PermissionException, LogForwardingException, IOException {
         Scheduler s = checkAccess(sessionId, "/scheduler/jobs/" + jobId + "/livelog/available");
+        SchedulerSession ss = SchedulerSessionMapper.getInstance().getSchedulerSession(sessionId);
+        
+        JobOutputAppender joa = ss.getJobOutputAppender();
 
-        JobOutput jo = JobsOutputController.getInstance().getJobOutput(sessionId, jobId);
-
-        if (jo != null) {
-            return jo.getCl().size();
+        if (joa != null) {
+            return joa.getJobOutput().getCl().size();
         }
 
         return -1;
