@@ -186,8 +186,12 @@ function linkrm(rmURL){
 	return s_.linkRM_(""+rmURL);
 }
 
+function reloadpolicy(){
+	return s_.reloadPolicyConf_();
+}
+
 function changepolicy(newPolicyName){
-	s_.changePolicy_(""+newPolicyName);
+	return s_.changePolicy_(""+newPolicyName);
 }
 
 function reconnect(schedURL){

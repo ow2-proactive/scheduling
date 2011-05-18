@@ -404,9 +404,12 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
         uischeduler.listenJobLogs(jobId, appenderProvider);
     }
 
-    public boolean changePolicy(String newPolicyClassName) throws NotConnectedException,
-            PermissionException {
+    public boolean changePolicy(String newPolicyClassName) throws NotConnectedException, PermissionException {
         return uischeduler.changePolicy(newPolicyClassName);
+    }
+
+    public boolean reloadPolicyConfiguration() throws NotConnectedException, PermissionException {
+        return uischeduler.reloadPolicyConfiguration();
     }
 
     public boolean freeze() throws NotConnectedException, PermissionException {

@@ -1027,8 +1027,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
     /**
      * {@inheritDoc}
      */
-    public boolean changePolicy(String newPolicyClassname) throws NotConnectedException,
-            PermissionException {
+    public boolean changePolicy(String newPolicyClassname) throws NotConnectedException, PermissionException {
         UniqueID id = checkAccess();
 
         UserIdentificationImpl ident = identifications.get(id);
@@ -1064,6 +1063,15 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
             throw ex;
         }
         return scheduler.linkResourceManager(rmURL);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean reloadPolicyConfiguration() throws NotConnectedException, PermissionException {
+        checkPermission("reloadPolicyConfiguration",
+                "You do not have permission to reload policy configuration !");
+        return scheduler.reloadPolicyConfiguration();
     }
 
     /**

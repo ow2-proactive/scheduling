@@ -57,8 +57,8 @@ import org.ow2.proactive.scheduler.task.internal.InternalTask;
  */
 public class EligibleTaskDescriptorImpl implements EligibleTaskDescriptor {
 
-	/** Internal representation of the task */
-	private InternalTask internalTask;
+    /** Internal representation of the task */
+    private InternalTask internalTask;
 
     /** Number of parents remaining (initial value must be 0) */
     private int parentsCount = 0;
@@ -126,8 +126,8 @@ public class EligibleTaskDescriptorImpl implements EligibleTaskDescriptor {
      * {@inheritDoc}
      */
     public InternalTask getInternal() {
-		return internalTask;
-	}
+        return internalTask;
+    }
 
     /**
      * To get the jobId
@@ -177,16 +177,16 @@ public class EligibleTaskDescriptorImpl implements EligibleTaskDescriptor {
     /**
      * Add an attempt to this task
      */
-    public void addAttempt(){
-	attempt ++;
+    public void addAttempt() {
+        attempt++;
     }
 
     /**
      * {@inheritDoc}
      */
     public int getAttempt() {
-		return attempt;
-	}
+        return attempt;
+    }
 
     /**
      * Add a parent to the list of parents dependence.

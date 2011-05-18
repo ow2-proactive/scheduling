@@ -541,6 +541,10 @@ public class SchedulerController {
         opt.setArgs(1);
         actionGroup.addOption(opt);
 
+        opt = new Option("pr", "policyreload", false, control + "Reload the policy configuration");
+        opt.setRequired(false);
+        actionGroup.addOption(opt);
+
         opt = new Option("p", "policy", true, control + "Change the current scheduling policy");
         opt.setArgName("fullName");
         opt.setRequired(false);
@@ -631,6 +635,8 @@ public class SchedulerController {
             model.kill_();
         } else if (cmd.hasOption("linkrm")) {
             model.linkRM_(cmd.getOptionValue("linkrm"));
+        } else if (cmd.hasOption("policyreload")) {
+            model.reloadPolicyConf_();
         } else if (cmd.hasOption("policy")) {
             model.changePolicy_(cmd.getOptionValue("policy"));
         } else if (cmd.hasOption("preempttask")) {

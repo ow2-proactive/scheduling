@@ -161,8 +161,8 @@ final class SchedulingMethodImpl implements SchedulingMethod {
 
         //ask the policy all the tasks to be schedule according to the jobs list.
         //and filter them using internal policy
-        LinkedList<EligibleTaskDescriptor> taskRetrivedFromPolicy = internalPolicy.filter(
-            core.policy.getOrderedTasks(jobDescriptorList));
+        LinkedList<EligibleTaskDescriptor> taskRetrivedFromPolicy = internalPolicy.filter(core.policy
+                .getOrderedTasks(jobDescriptorList));
 
         //if there is no task to scheduled, return
         if (taskRetrivedFromPolicy == null || taskRetrivedFromPolicy.size() == 0) {
@@ -279,13 +279,13 @@ final class SchedulingMethodImpl implements SchedulingMethod {
 
         //add running jobs
         for (InternalJob j : core.runningJobs) {
-		list.add(j.getJobDescriptor());
+            list.add(j.getJobDescriptor());
         }
 
         //if scheduler is not paused, add pending jobs
         if (core.status != SchedulerStatus.PAUSED) {
             for (InternalJob j : core.pendingJobs) {
-		list.add(j.getJobDescriptor());
+                list.add(j.getJobDescriptor());
             }
         }
 
@@ -319,7 +319,7 @@ final class SchedulingMethodImpl implements SchedulingMethod {
         int neededResource = 0;
         if (maxResource > 0 && !bagOfTasks.isEmpty()) {
             EligibleTaskDescriptor etd = bagOfTasks.removeFirst();
-            ((EligibleTaskDescriptorImpl)etd).addAttempt();
+            ((EligibleTaskDescriptorImpl) etd).addAttempt();
             InternalJob currentJob = core.jobs.get(etd.getJobId());
             InternalTask internalTask = currentJob.getIHMTasks().get(etd.getTaskId());
             int neededNodes = internalTask.getNumberOfNodesNeeded();
@@ -332,7 +332,7 @@ final class SchedulingMethodImpl implements SchedulingMethod {
                     //if bagOfTasks is not empty
                     if (!bagOfTasks.isEmpty()) {
                         etd = bagOfTasks.removeFirst();
-                        ((EligibleTaskDescriptorImpl)etd).addAttempt();
+                        ((EligibleTaskDescriptorImpl) etd).addAttempt();
                         currentJob = core.jobs.get(etd.getJobId());
                         internalTask = currentJob.getIHMTasks().get(etd.getTaskId());
                         neededNodes = internalTask.getNumberOfNodesNeeded();

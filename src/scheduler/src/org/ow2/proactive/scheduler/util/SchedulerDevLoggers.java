@@ -73,4 +73,6 @@ public interface SchedulerDevLoggers {
 
     static final public String LAUNCHER = SCHEDULER + ".launcher";
 
+    static final public String POLICY = SCHEDULER + ".policy";
+
 }

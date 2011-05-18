@@ -445,6 +445,9 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
             //starting scheduling policy
             this.policy = (Policy) Class.forName(policyFullName).newInstance();
             this.policy.setCore(this);
+            if (!this.policy.reloadConfig()) {
+                throw new RuntimeException("Scheduling policy cannot be started, see log file for details.");
+            }
             logger_dev.info("Instanciated policy : " + policyFullName);
             logger.info("Scheduler Core ready !");
         } catch (InstantiationException e) {
@@ -2012,23 +2015,31 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
      */
     public boolean changePolicy(String newPolicyClassName) {
         try {
-		//TODO class loading ?
-            policy = (Policy)Class.forName(newPolicyClassName).newInstance();
-            policy.setCore(this);
+            if (status == SchedulerStatus.KILLED || status == SchedulerStatus.SHUTTING_DOWN) {
+                logger.warn("Policy can only be changed when Scheduler is up, current state : " + status);
+                return false;
+            }
+            //TODO class loading ? (for now, class must be in scheduler classpath or addons)
+            Policy newPolicy = (Policy) Class.forName(newPolicyClassName).newInstance();
+            newPolicy.setCore(this);
+            if (!newPolicy.reloadConfig()) {
+                return false;
+            }
+            //if success, change current policy 
+            policy = newPolicy;
             frontend.schedulerStateUpdated(SchedulerEvent.POLICY_CHANGED);
             logger_dev.info("Policy changed ! new policy name : " + newPolicyClassName);
+            return true;
         } catch (InstantiationException e) {
             logger_dev.error("", e);
-            throw new InternalException("Exception occurs while instanciating the policy !",e);
+            throw new InternalException("Exception occurs while instanciating the policy !", e);
         } catch (IllegalAccessException e) {
             logger_dev.error("", e);
-            throw new InternalException("Exception occurs while accessing the policy !",e);
+            throw new InternalException("Exception occurs while accessing the policy !", e);
         } catch (ClassNotFoundException e) {
-		logger_dev.error("", e);
-            throw new InternalException("Exception occurs while loading the policy class !",e);
-		}
-
-        return true;
+            logger_dev.error("", e);
+            throw new InternalException("Exception occurs while loading the policy class !", e);
+        }
     }
 
     /**
@@ -2053,6 +2064,18 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
         } catch (Exception e) {
             throw new InternalException("Error while connecting the new Resource Manager !", e);
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean reloadPolicyConfiguration() {
+        if (status == SchedulerStatus.KILLED || status == SchedulerStatus.SHUTTING_DOWN) {
+            logger.warn("Policy configuration can only be reloaded when Scheduler is up, current state : " +
+                status);
+            return false;
+        }
+        return policy.reloadConfig();
     }
 
     /**

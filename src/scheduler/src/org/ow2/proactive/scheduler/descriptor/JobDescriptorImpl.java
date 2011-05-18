@@ -602,7 +602,7 @@ public class JobDescriptorImpl implements JobDescriptor {
      * {@inheritDoc}
      */
     public JobId getJobId() {
-	return getInternal().getId();
+        return getInternal().getId();
     }
 
     /**
@@ -612,19 +612,19 @@ public class JobDescriptorImpl implements JobDescriptor {
         return internalJob;
     }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public Map<TaskId, TaskDescriptor> getRunningTasks() {
-		return runningTasks;
-	}
+    /**
+     * {@inheritDoc}
+     */
+    public Map<TaskId, TaskDescriptor> getRunningTasks() {
+        return runningTasks;
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public Map<TaskId, TaskDescriptor> getPausedTasks() {
-		return pausedTasks;
-	}
+    /**
+     * {@inheritDoc}
+     */
+    public Map<TaskId, TaskDescriptor> getPausedTasks() {
+        return pausedTasks;
+    }
 
     /**
      * {@inheritDoc}

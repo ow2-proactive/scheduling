@@ -49,6 +49,7 @@ import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
 import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingService;
+import org.ow2.proactive.scheduler.policy.Policy;
 
 
 /**
@@ -260,8 +261,7 @@ public interface SchedulerCoreMethods {
      * @throws NotConnectedException if you are not authenticated.
      * @throws PermissionException if you have not enough permission to access this method.
      */
-    public boolean changePolicy(String policyClassName) throws NotConnectedException,
-            PermissionException;
+    public boolean changePolicy(String policyClassName) throws NotConnectedException, PermissionException;
 
     /**
      * For administrator only, Start the scheduler.
@@ -342,5 +342,18 @@ public interface SchedulerCoreMethods {
      * @throws PermissionException if you have not enough permission to access this method.
      */
     public boolean linkResourceManager(String rmURL) throws NotConnectedException, PermissionException;
+
+    /**
+     * For administrator only, order a reload to the policy.<br/>
+     * The default behavior reload the configuration file and update the properties available in policy.
+     *
+     * This will cause the {@link Policy#reloadConfig()} method to be called.
+     * This last method can be overridden in the policy to perform a custom behavior on reload.
+     *
+     * @return true if success, false otherwise.
+     * @throws NotConnectedException if you are not authenticated.
+     * @throws PermissionException if you have not enough permission to access this method.
+     */
+    public boolean reloadPolicyConfiguration() throws NotConnectedException, PermissionException;
 
 }

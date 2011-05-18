@@ -72,4 +72,6 @@ public interface SchedulerLoggers {
 
     static final public String RMPROXY = SCHEDULER + ".RMproxy";
 
+    static final public String POLICY = SCHEDULER + ".policy";
+
 }

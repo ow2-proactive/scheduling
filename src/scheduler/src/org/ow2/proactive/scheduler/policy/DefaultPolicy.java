@@ -37,18 +37,11 @@
 package org.ow2.proactive.scheduler.policy;
 
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.Vector;
 
-import org.ow2.proactive.scheduler.common.job.JobPriority;
-import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptor;
 import org.ow2.proactive.scheduler.descriptor.JobDescriptor;
-import org.ow2.proactive.scheduler.descriptor.TaskDescriptor;
-import org.ow2.proactive.scripting.InvalidScriptException;
-import org.ow2.proactive.scripting.SelectionScript;
 
 
 /**
@@ -62,8 +55,15 @@ import org.ow2.proactive.scripting.SelectionScript;
  */
 public class DefaultPolicy extends Policy {
 
-	private Set<TaskId> sel = new HashSet<TaskId>();
-	private boolean preempt = false;
+    /**
+     * {@inheritDoc}
+     * Override reload to avoid reading config file
+     * Attempting to read a non-existing file will fail policy changes or renewal.
+     */
+    @Override
+    public boolean reloadConfig() {
+        return true;
+    }
 
     /**
      * This method return the tasks using FIFO policy according to the jobs priorities.
@@ -72,80 +72,16 @@ public class DefaultPolicy extends Policy {
      */
     @Override
     public Vector<EligibleTaskDescriptor> getOrderedTasks(List<JobDescriptor> jobs) {
-	Vector<EligibleTaskDescriptor> toReturn = new Vector<EligibleTaskDescriptor>();
+        Vector<EligibleTaskDescriptor> toReturn = new Vector<EligibleTaskDescriptor>();
         //sort jobs by priority
         Collections.sort(jobs);
 
-        /*for (JobDescriptor jd : jobs) {
+        //add all sorted tasks to list of tasks
+        for (JobDescriptor jd : jobs) {
             toReturn.addAll(jd.getEligibleTasks());
-        }*/
-
-        /*enclosing:for (JobDescriptor jd : jobs) {
-		for (EligibleTaskDescriptor etd : jd.getEligibleTasks()){
-			if (etd.getAttempt() > 40){
-				toReturn.clear();
-				toReturn.add(etd);
-				break enclosing;
-			}
-			toReturn.add(etd);
-		}
-        }*/
-
-        if (preempt){
-
-
-
-	        enclosing:for (JobDescriptor jd : jobs) {
-			for (EligibleTaskDescriptor etd : jd.getEligibleTasks()){
-				if (jd.getInternal().getPriority() == JobPriority.HIGHEST || etd.getAttempt() > 10 && etd.getInternal().getNumberOfNodesNeeded() <= RMState.getTotalAliveNodesNumber()){
-					toReturn.clear();
-					toReturn.add(etd);
-					//try to preempt if highest only
-					if (jd.getInternal().getPriority() == JobPriority.HIGHEST && etd.getInternal().getNumberOfNodesNeeded() > RMState.getFreeNodesNumber()){
-						try {
-							//preempt one task
-							for (JobDescriptor jdd : jobs){
-								for (TaskDescriptor td : jdd.getRunningTasks().values()){
-									//we dont preempt highest... obviously... hum
-									if (jdd.getInternal().getPriority() != JobPriority.HIGHEST){
-										core.preemptTask(jdd.getJobId(),td.getTaskId().getReadableName(),10);
-										break enclosing;
-									}
-								}
-							}
-						} catch (Exception e){e.printStackTrace();}
-					}
-					break enclosing;
-				}
-				toReturn.add(etd);
-			}
-	        }
-
-
-
-        } else {
-
-
-
-	        for (JobDescriptor jd : jobs) {
-			if (jd.getInternal().getProjectName().equals("switch")){
-				preempt = true;
-			}
-			for (EligibleTaskDescriptor etd : jd.getEligibleTasks()){
-				if (!sel.contains(etd.getTaskId()) && etd.getTaskId().value().matches(".*00[12]$")){
-					try {
-						etd.getInternal().addSelectionScript(
-								new SelectionScript("selected=java.net.InetAddress.getLocalHost().getHostName().matches(\".*jily.*\");","js"));
-						sel.add(etd.getTaskId());
-					} catch(InvalidScriptException e){e.printStackTrace();}
-				}
-				toReturn.add(etd);
-			}
-	        }
-
-
-
         }
+
+        //return sorted list of tasks
         return toReturn;
     }
 

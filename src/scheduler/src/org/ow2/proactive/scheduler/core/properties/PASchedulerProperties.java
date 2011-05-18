@@ -61,8 +61,11 @@ public enum PASchedulerProperties {
     /* ********************** SCHEDULER PROPERTIES ********************* */
     /* ***************************************************************** */
 
-    /** Scheduler default policy full name.  */
+    /** Scheduler default policy full name. */
     SCHEDULER_DEFAULT_POLICY("pa.scheduler.policy", PropertyType.STRING),
+
+    /** Defines the maximum number of tasks to be scheduled in each scheduling loop. */
+    SCHEDULER_POLICY_NBTASKPERLOOP("pa.scheduler.policy.nbtaskperloop", PropertyType.INTEGER),
 
     /** Forked java task default policy path */
     SCHEDULER_DEFAULT_FJT_SECURITY_POLICY("pa.scheduler.forkedtask.security.policy", PropertyType.STRING),

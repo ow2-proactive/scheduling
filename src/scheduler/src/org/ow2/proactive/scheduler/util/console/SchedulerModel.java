@@ -196,6 +196,7 @@ public class SchedulerModel extends ConsoleModel {
         commands.add(new Command("kill()", "Kill every tasks and jobs and shutdown Scheduler"));
         commands.add(new Command("linkrm(rmURL)",
             "Reconnect a Resource Manager (parameter is a string representing the new rmURL)"));
+        commands.add(new Command("reloadpolicy()", "Reload the configuration of the policy"));
         commands.add(new Command("changepolicy(fullName)",
             "Change the current scheduling policy, (argument is the new policy full name)"));
         commands.add(new Command("reconnect()", "Try to reconnect this console to the server"));
@@ -952,6 +953,21 @@ public class SchedulerModel extends ConsoleModel {
         return success;
     }
 
+    public boolean reloadPolicyConf_() {
+        boolean success = false;
+        try {
+            success = scheduler.reloadPolicyConfiguration();
+            if (success) {
+                print("The policy configuration has been reloaded.");
+            } else {
+                error("An error occured while reloading the policy. (see log file for details)");
+            }
+        } catch (Exception e) {
+            handleExceptionDisplay("*ERROR*", e);
+        }
+        return success;
+    }
+
     public void reconnect_() {
         try {
             connectScheduler(authentication, credentials);
@@ -971,7 +987,6 @@ public class SchedulerModel extends ConsoleModel {
         }
     }
 
-    @SuppressWarnings("unchecked")
     public void changePolicy_(String newPolicyFullName) {
         boolean success = false;
         try {
@@ -979,7 +994,7 @@ public class SchedulerModel extends ConsoleModel {
             if (success) {
                 print("Policy successfully changed !");
             } else {
-                error("Policy was not changed !");
+                error("Policy was not changed ! (see log file for details)");
             }
         } catch (Exception e) {
             handleExceptionDisplay("*ERROR*", e);

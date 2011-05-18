@@ -68,13 +68,13 @@ public class WaitAndPrint extends JavaExecutable {
 
             message = "Task " + number;
             int st = 0;
-            while(st < sleepTime){
-		Thread.sleep(1000);
-		try {
-			setProgress((st++)*100/sleepTime);
-		} catch (IllegalArgumentException iae){
-			setProgress(100);
-		}
+            while (st < sleepTime) {
+                Thread.sleep(1000);
+                try {
+                    setProgress((st++) * 100 / sleepTime);
+                } catch (IllegalArgumentException iae) {
+                    setProgress(100);
+                }
             }
 
         } catch (Exception e) {

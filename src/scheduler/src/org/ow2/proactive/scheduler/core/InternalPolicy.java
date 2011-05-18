@@ -36,21 +36,16 @@
  */
 package org.ow2.proactive.scheduler.core;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.util.HashSet;
 import java.util.LinkedList;
-import java.util.Properties;
 import java.util.Set;
 import java.util.Vector;
 
-import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.resourcemanager.common.RMState;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptor;
-import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
+
 
 /**
  * Implementation of the policy according that :
@@ -71,18 +66,10 @@ import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
  */
 class InternalPolicy {
 
-	private static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.SCHEDULE);
-    /** Configuration file name used to change current configuration */
-    private String CONFIG_FILE_NAME = PASchedulerProperties
-            .getAbsolutePath("config/scheduler/DefaultPolicy.conf");
-    /** Number of loop to wait until the next read of configuration file */
-    private int READ_ARGUMENT_LOOP_FREQUENCY = 0;
     /** Maximum number of tasks returned by the policy in each loop */
-    private int NB_TASKS_PER_LOOP = Integer.MAX_VALUE;
+    private int NB_TASKS_PER_LOOP = PASchedulerProperties.SCHEDULER_POLICY_NBTASKPERLOOP.getValueAsInt();
 
-    private int globalNbCalls = 0;
     private Set<TaskId> ids = new HashSet<TaskId>();
-    private long lastModifConfFile = 0;
     private int previousFreeNodeNumber = 0;
     RMState RMState = null;
 
@@ -94,16 +81,9 @@ class InternalPolicy {
      * @return a filtered and splited list of task to be scheduled
      */
     public LinkedList<EligibleTaskDescriptor> filter(Vector<EligibleTaskDescriptor> orderedTasks) {
-	//safety branch
-	if (orderedTasks == null || orderedTasks.size() == 0){
-		return null;
-	}
-
-        //read configuration file
-        //if this.lastModifConfFile==0, it is the first read
-        if (this.lastModifConfFile == 0 ||
-            (READ_ARGUMENT_LOOP_FREQUENCY != 0 && ++globalNbCalls % READ_ARGUMENT_LOOP_FREQUENCY == 0)) {
-            readConfigFile();
+        //safety branch
+        if (orderedTasks == null || orderedTasks.size() == 0) {
+            return null;
         }
 
         //check number of free nodes
@@ -139,43 +119,4 @@ class InternalPolicy {
         return toReturn;
     }
 
-    /**
-     * Read the configuration file only if it has been modified and number of calls to read has been reached
-     */
-    private void readConfigFile() {
-        File confFile = new File(CONFIG_FILE_NAME);
-        long lastModified = confFile.lastModified();
-        if (lastModified == 0) {
-            logger_dev.warn("Error while accessing the lastModified field of " + CONFIG_FILE_NAME);
-            return;
-        }
-        if (!confFile.exists() || this.lastModifConfFile == lastModified) {
-            return;
-        }
-        try {
-            Properties prop = new Properties();
-            FileInputStream fis = new FileInputStream(confFile);
-            fis.getFD().sync();
-            prop.load(fis);
-            fis.close();
-            if (prop.containsKey("CONFIG_FILE_NAME")) {
-                CONFIG_FILE_NAME = PASchedulerProperties.getAbsolutePath(prop.get("CONFIG_FILE_NAME")
-                        .toString());
-            }
-            if (prop.containsKey("READ_ARGUMENT_LOOP_FREQUENCY")) {
-                READ_ARGUMENT_LOOP_FREQUENCY = Integer.parseInt(prop.get("READ_ARGUMENT_LOOP_FREQUENCY")
-                        .toString());
-            }
-            if (prop.containsKey("NB_TASKS_PER_LOOP")) {
-                NB_TASKS_PER_LOOP = Integer.parseInt(prop.get("NB_TASKS_PER_LOOP").toString());
-                if (NB_TASKS_PER_LOOP == 0) {
-                    NB_TASKS_PER_LOOP = Integer.MAX_VALUE;
-                }
-            }
-            this.lastModifConfFile = lastModified;
-        } catch (Exception e) {
-            //file not read due to exception while reading conf file
-            logger_dev.warn("Exception while reading Policy configuration file", e);
-        }
-    }
 }

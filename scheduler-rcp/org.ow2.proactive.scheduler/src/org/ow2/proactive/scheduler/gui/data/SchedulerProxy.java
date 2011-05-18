@@ -268,6 +268,11 @@ public class SchedulerProxy implements Scheduler {
         return false;
     }
 
+    public boolean reloadPolicyConfiguration() throws NotConnectedException, PermissionException {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
     /**
      * {@inheritDoc}
      */

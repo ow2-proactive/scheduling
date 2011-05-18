@@ -36,14 +36,23 @@
  */
 package org.ow2.proactive.scheduler.policy;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.List;
+import java.util.Properties;
 import java.util.Vector;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.annotation.PublicAPI;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.resourcemanager.common.RMState;
+import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.SchedulerCoreMethods;
+import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 import org.ow2.proactive.scheduler.core.SchedulerCore;
+import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptor;
 import org.ow2.proactive.scheduler.descriptor.JobDescriptor;
 
@@ -58,6 +67,8 @@ import org.ow2.proactive.scheduler.descriptor.JobDescriptor;
 @PublicAPI
 public abstract class Policy implements Serializable {
 
+    protected static final Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.POLICY);
+
     /**
      * Resources manager state. Can be used in an inherit policy to be aware
      * of resources informations like total nodes number, used nodes, etc.
@@ -68,22 +79,21 @@ public abstract class Policy implements Serializable {
     /** Scheduler core link */
     protected SchedulerCoreMethods core = null;
 
-    /**
-     * Set the core
-     *
-     * @param core
-     */
-    public void setCore(SchedulerCore core){
-	this.core = core;
-    }
+    /** Config properties */
+    protected Properties configProperties = null;
 
     /**
-     * Set the RM state
-     *
-     * @param RM state
+     * Create a new instance of Policy. (must be public)
+     * Called by class.forname when instantiating the policy.
+     *<br/><br/>
+     * The {@link #reloadConfig()} method is called by the scheduler after the creation of this policy instance
+     * This empty constructor remains mandatory to enable the core to instantiate the policy but SchedulerCore
+     * does not wait for any special or mandatory behavior inside.
+     * <br/><br/>
+     * This constructor can/should be empty.
      */
-    public void setRMState(RMState state){
-	this.RMState = state;
+    public Policy() {
+        //reloadConfig();
     }
 
     /**
@@ -95,4 +105,94 @@ public abstract class Policy implements Serializable {
      * @return a vector of every tasks that are ready to be schedule.
      */
     public abstract Vector<EligibleTaskDescriptor> getOrderedTasks(List<JobDescriptor> jobs);
+
+    /**
+     * Set the core
+     *
+     * @param core
+     */
+    public final void setCore(SchedulerCore core) {
+        this.core = core;
+    }
+
+    /**
+     * Set the RM state
+     *
+     * @param RM state
+     */
+    public final void setRMState(RMState state) {
+        this.RMState = state;
+    }
+
+    /**
+     * Return the configuration as properties (key->value) read in the policy config file.
+     * The returned value can be null or empty if no property has been loaded.
+     *
+     * @return the configuration read in the policy config file.
+     */
+    protected final Properties getConfigurationProperties() {
+        return configProperties;
+    }
+
+    /**
+     * Return the value of the given property key.
+     * The returned value can be null if property does not exist.
+     *
+     * @return the value of the given property key or null if not found.
+     */
+    protected final String getProperty(final String name) {
+        if (configProperties == null) {
+            return null;
+        }
+        return configProperties.getProperty(name);
+    }
+
+    /**
+     * Reload the configuration file of the corresponding policy.<br/>
+     * This method is called each time a reload action is performed for the policy
+     * (ie. {@link Scheduler#reloadPolicyConfiguration()} method is called from client side)<br/>
+     * <br/>
+     * This method just call {@link #getConfigFile()} method and then, load the content of the returned file
+     * in this policy properties.<br/>
+     * <br/>
+     * Override this method to have a fully custom reload, override only the {@link #getConfigFile()} method to
+     * change the properties file location.
+     * <br/>
+     * This method will reload the whole content of the properties. Every old properties will be erased and new one from file
+     * will be set.
+     * <br/>
+     * <br/>
+     * Note : this method is also called once at Scheduler startup.
+     *
+     * @return true if the configuration has been successfully reload, false otherwise.
+     *
+     * @see Properties#load(java.io.InputStream) Properties.load(java.io.InputStream) for more details
+     * 		about the structure and content of property file
+     */
+    public boolean reloadConfig() {
+        configProperties = new Properties();
+        try {
+            FileInputStream fis = new FileInputStream(getConfigFile());
+            configProperties.load(fis);
+            fis.close();
+            return true;
+        } catch (IOException ioe) {
+            logger.warn("Cannot read policy configuration file", ioe);
+            return false;
+        }
+    }
+
+    /**
+     * Return the configuration file for this policy.<br/>
+     * Default configuration file is config/policy/[SimpleClassName].conf.<br/>
+     * <br/>
+     * In the default behavior, this method is called by {@link #reloadConfig()} method each time a policy reload is performed.<br/>
+     * <br/>
+     * Override this method to change the default path where to find the configuration file.
+     */
+    protected File getConfigFile() {
+        String relPath = "config/scheduler/policy/" + getClass().getSimpleName() + ".conf";
+        return new File(PASchedulerProperties.getAbsolutePath(relPath));
+    }
+
 }
