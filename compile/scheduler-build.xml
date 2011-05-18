@@ -298,6 +298,7 @@
 				<include name="org/ow2/proactive/scheduler/common/task/dataspaces/OutputSelector.java" />
 				<include name="org/ow2/proactive/scheduler/common/util/Tools.java" />
 				<include name="org/ow2/proactive/scheduler/common/util/SchedulerLoggers.java" />
+				<include name="org/ow2/proactive/scheduler/common/util/ZipUtils.java" />
 				<include name="org/ow2/proactive/scheduler/common/util/JarUtils.java" />
 				<include name="org/ow2/proactive/scheduler/common/util/SimpleLoggerServer.java" />
 				<include name="org/ow2/proactive/scheduler/common/util/RegexpMatcher.java" />

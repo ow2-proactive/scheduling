@@ -11,19 +11,24 @@
         INFO :  To change the database provider, change the driver (connection.driver_class)
 			the URL (connection.url), and don't forget the dialect (<property name="dialect">) -->
 
-		<!-- JAVA EMBEDDED DATABASE : DERBY -->
+		<!-- JAVA EMBEDDED DATABASE : DERBY 
 
         <property name="connection.driver_class">org.apache.derby.jdbc.EmbeddedDriver</property>
         <property name="connection.url">jdbc:derby:../../SCHEDULER_DB;create=true</property>
         <property name="dialect">org.hibernate.dialect.DerbyDialect</property>
 
 
-        <!-- MYSQL -->
-		<!--
+         -->
         <property name="connection.driver_class">org.gjt.mm.mysql.Driver</property>
-        <property name="connection.url">jdbc:mysql://localhost:3306/SCHEDULER_DB?autoReconnect=true</property>
+        <property name="connection.url">jdbc:mysql://jilette:3306/SCHEDULER_DB?autoReconnect=true</property>
         <property name="dialect">org.hibernate.dialect.MySQLDialect</property>
-		-->
+        
+        
+        <!-- optional query to validate pooled connections:-->
+		<property name="hibernate.dbcp.validationQuery">select 1</property>
+		<property name="hibernate.dbcp.testOnBorrow">true</property>
+		<property name="hibernate.dbcp.testOnReturn">true</property> 
+
 
         <!-- Username and password -->
         <property name="connection.username">scheduler</property>
