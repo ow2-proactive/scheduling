@@ -34,7 +34,7 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.ow2.proactive.scheduler.job;
+package org.ow2.proactive.scheduler.descriptor;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -52,19 +52,15 @@ import javax.xml.bind.annotation.XmlTransient;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.ow2.proactive.scheduler.common.job.JobDescriptor;
 import org.ow2.proactive.scheduler.common.job.JobId;
-import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobType;
-import org.ow2.proactive.scheduler.common.task.EligibleTaskDescriptor;
 import org.ow2.proactive.scheduler.common.task.Task;
-import org.ow2.proactive.scheduler.common.task.TaskDescriptor;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.common.task.flow.FlowActionType;
 import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
-import org.ow2.proactive.scheduler.task.EligibleTaskDescriptorImpl;
+import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 
@@ -81,23 +77,7 @@ public class JobDescriptorImpl implements JobDescriptor {
 
     public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.CORE);
 
-    /** Job id */
-    private JobId id;
-
-    /** Job priority */
-    private JobPriority priority;
-
-    /** Job type */
-    private JobType type;
-
-    /** Total number of tasks. */
-    private int numberOfTasks;
-
-    /** Project name for this job */
-    protected String projectName = "";
-
-    /** Job user informations */
-    private Map<String, String> genericInformations;
+    private InternalJob internalJob;
 
     /** List that knows which task has children and which have not */
     private Set<TaskId> hasChildren = new HashSet<TaskId>();
@@ -126,14 +106,9 @@ public class JobDescriptorImpl implements JobDescriptor {
      */
     public JobDescriptorImpl(InternalJob job) {
         logger_dev.debug("job = " + job.getId());
-        id = job.getId();
-        priority = job.getPriority();
-        type = job.getType();
-        numberOfTasks = job.getTasks().size();
-        genericInformations = job.getGenericInformations();
-        projectName = job.getProjectName();
+        internalJob = job;
 
-        if (type == JobType.TASKSFLOW) {
+        if (job.getType() == JobType.TASKSFLOW) {
             //build dependence tree
             makeTree(job);
         } else {
@@ -182,7 +157,7 @@ public class JobDescriptorImpl implements JobDescriptor {
 
                 for (TaskDescriptor lt : taskDescriptor.getParents()) {
                     ((EligibleTaskDescriptorImpl) lt).addChild(taskDescriptor);
-                    hasChildren.add(lt.getId());
+                    hasChildren.add(lt.getTaskId());
                 }
             }
         }
@@ -191,7 +166,7 @@ public class JobDescriptorImpl implements JobDescriptor {
     /**
      * Tags all startable tasks as entry point
      * a startable task : has no dependency, and is not target of an if control flow action
-     * 
+     *
      * @param t a Task
      * @param otherTasks the other tasks contained in the job containing task t
      * @return true if t is an entry point among all tasks in otherTasks, or false
@@ -266,7 +241,7 @@ public class JobDescriptorImpl implements JobDescriptor {
 
     /**
      * Complete LOOP action on JobDescriptor side
-     * 
+     *
      * @param initiator Task initiating the LOOP action
      * @param tree InternalTask tree of replicated tasks
      * @param target Target task of the LOOP action
@@ -280,7 +255,6 @@ public class JobDescriptorImpl implements JobDescriptor {
             TaskId itId = it.getValue().getId();
             EligibleTaskDescriptorImpl td = new EligibleTaskDescriptorImpl(it.getValue());
             acc.put(itId, td);
-            this.numberOfTasks++;
         }
 
         EligibleTaskDescriptorImpl oldEnd = (EligibleTaskDescriptorImpl) runningTasks.get(initiator);
@@ -332,7 +306,7 @@ public class JobDescriptorImpl implements JobDescriptor {
                         case 2:
                             // 'weak' dependencies from FlowAction#IF are not
                             // represented in TaskDescriptor
-                            branchTasks.put(down.getId(), down);
+                            branchTasks.put(down.getTaskId(), down);
                             break;
                     }
 
@@ -349,7 +323,7 @@ public class JobDescriptorImpl implements JobDescriptor {
 
     /**
      * Complete IF action on JobDescriptor side
-     * 
+     *
      * @param initiator Task initiating the IF action
      * @param branchStart START task of the IF branch
      * @param branchEnd END task of the IF branch
@@ -377,12 +351,12 @@ public class JobDescriptorImpl implements JobDescriptor {
                 LinkedList<EligibleTaskDescriptorImpl> q = new LinkedList<EligibleTaskDescriptorImpl>();
                 q.offer((EligibleTaskDescriptorImpl) td);
 
-                // find the matching end block task 
+                // find the matching end block task
                 do {
                     EligibleTaskDescriptorImpl ptr = q.poll();
 
                     // if (ptr.getChildren() == null || ptr.getChildren().size() == 0) {
-                    if (ptr.getId().equals(branchEnd)) {
+                    if (ptr.getTaskId().equals(branchEnd)) {
                         end = ptr;
                         break;
                     } else {
@@ -428,7 +402,7 @@ public class JobDescriptorImpl implements JobDescriptor {
 
     /**
      * Complete REPLICATE action on JobDescriptor side
-     * 
+     *
      * @param initiator Task initiating the REPLICATE action
      * @param tree InternalTask tree of replicated tasks
      * @param target Target task of the REPLICATE action: first task of the block
@@ -444,8 +418,6 @@ public class JobDescriptorImpl implements JobDescriptor {
             TaskId itId = it.getValue().getTaskInfo().getTaskId();
             EligibleTaskDescriptorImpl td = new EligibleTaskDescriptorImpl(it.getValue());
             acc.put(itId, td);
-
-            this.numberOfTasks++;
         }
 
         // recreate the dependencies
@@ -480,7 +452,7 @@ public class JobDescriptorImpl implements JobDescriptor {
                             break;
                         case 1:
                         case 2:
-                            branchTasks.put(down.getId(), down);
+                            branchTasks.put(down.getTaskId(), down);
                             break;
                     }
                 }
@@ -517,18 +489,18 @@ public class JobDescriptorImpl implements JobDescriptor {
 
     /**
      * Find a task given a parent task
-     * 
+     *
      * @param haystack task from which the child subtree will be walked
-     * @param needle task to find in <code>haystack's</code> subtree 
-     * @return the TaskDescriptor corresponding <code>needle</code> if it is 
+     * @param needle task to find in <code>haystack's</code> subtree
+     * @return the TaskDescriptor corresponding <code>needle</code> if it is
      *  a child of <code>haystack's</code>, or null
      */
     private TaskDescriptor findTask(TaskDescriptor haystack, TaskId needle) {
-        if (needle.equals(haystack.getId())) {
+        if (needle.equals(haystack.getTaskId())) {
             return haystack;
         }
         for (TaskDescriptor td : haystack.getChildren()) {
-            if (needle.equals(td.getId())) {
+            if (needle.equals(td.getTaskId())) {
                 return td;
             }
             TaskDescriptor ttd = findTask(td, needle);
@@ -548,7 +520,7 @@ public class JobDescriptorImpl implements JobDescriptor {
      */
     public void terminate(TaskId taskId) {
         logger_dev.debug("task = " + taskId);
-        if (type == JobType.TASKSFLOW) {
+        if (getInternal().getType() == JobType.TASKSFLOW) {
             TaskDescriptor lt = runningTasks.get(taskId);
 
             if (lt != null) {
@@ -557,7 +529,7 @@ public class JobDescriptorImpl implements JobDescriptor {
                             .getCount() - 1);
 
                     if (((EligibleTaskDescriptorImpl) task).getCount() == 0) {
-                        eligibleTasks.put(task.getId(), (EligibleTaskDescriptor) task);
+                        eligibleTasks.put(task.getTaskId(), (EligibleTaskDescriptor) task);
                     }
                 }
 
@@ -617,33 +589,6 @@ public class JobDescriptorImpl implements JobDescriptor {
     }
 
     /**
-     * Set the priority of this job descriptor.
-     *
-     * @param priority the new priority.
-     */
-    public void setPriority(JobPriority priority) {
-        this.priority = priority;
-    }
-
-    /**
-     * To get the id
-     *
-     * @return the id
-     */
-    public JobId getId() {
-        return id;
-    }
-
-    /**
-     * To get the priority
-     *
-     * @return the priority
-     */
-    public JobPriority getPriority() {
-        return priority;
-    }
-
-    /**
      * To get the tasks.
      *
      * @return the tasks.
@@ -654,40 +599,40 @@ public class JobDescriptorImpl implements JobDescriptor {
     }
 
     /**
-     * To get the type
-     *
-     * @return the type
+     * {@inheritDoc}
      */
-    public JobType getType() {
-        return type;
+    public JobId getJobId() {
+	return getInternal().getId();
     }
 
     /**
-     * Returns the number Of Tasks.
-     *
-     * @return the number Of Tasks.
+     * {@inheritDoc}
      */
-    public int getNumberOfTasks() {
-        return numberOfTasks;
+    public InternalJob getInternal() {
+        return internalJob;
     }
 
-    /**
-     * Return the generic informations has a Map.
-     *
-     * @return the generic informations has a Map.
-     */
-    public Map<String, String> getGenericInformations() {
-        return genericInformations;
-    }
+	/**
+	 * {@inheritDoc}
+	 */
+	public Map<TaskId, TaskDescriptor> getRunningTasks() {
+		return runningTasks;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public Map<TaskId, TaskDescriptor> getPausedTasks() {
+		return pausedTasks;
+	}
 
     /**
-     * @see java.lang.Comparable#compareTo(java.lang.Object)
-     * @param job the job to be compared.
-     * @return  a negative integer, zero, or a positive integer as this object
-     *		is less than, equal to, or greater than the specified object.
+     * {@inheritDoc}
+     *
+     * Compare jobs on Priority
      */
     public int compareTo(JobDescriptor job) {
-        return job.getPriority().compareTo(priority);
+        return job.getInternal().getPriority().compareTo(getInternal().getPriority());
     }
 
     /**
@@ -695,14 +640,7 @@ public class JobDescriptorImpl implements JobDescriptor {
      */
     @Override
     public String toString() {
-        return "JobDescriptor(" + getId() + ")";
+        return "JobDescriptor(" + getJobId() + ")";
     }
 
-    /**
-     * Returns the projectName.
-     * @return the projectName.
-     */
-    public String getProjectName() {
-        return projectName;
-    }
 }

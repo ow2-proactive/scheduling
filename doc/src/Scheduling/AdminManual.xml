@@ -1210,7 +1210,7 @@ scheduler.changePolicy(org.ow2.proactive.scheduler.policy.PriorityPolicy.class);
 				<para>
 					Create and add a new scheduling policy remains a very simple work. You just have to implements the
 					<emphasis>
-						org.ow2.proactive.scheduler.common.policy.Policy
+						org.ow2.proactive.scheduler.policy.Policy
 					</emphasis>
 					interface and start a new Scheduler with this new policy as argument, or dynamically change it
 					if the scheduler is already running.

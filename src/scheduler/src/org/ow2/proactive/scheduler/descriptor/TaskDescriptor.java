@@ -34,42 +34,73 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.ow2.proactive.scheduler.common.policy;
+package org.ow2.proactive.scheduler.descriptor;
 
 import java.io.Serializable;
-import java.util.List;
 import java.util.Vector;
 
 import org.objectweb.proactive.annotation.PublicAPI;
-import org.ow2.proactive.resourcemanager.common.RMState;
-import org.ow2.proactive.scheduler.common.job.JobDescriptor;
-import org.ow2.proactive.scheduler.common.task.EligibleTaskDescriptor;
+import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.scheduler.common.task.TaskId;
+import org.ow2.proactive.scheduler.task.internal.InternalTask;
 
 
 /**
- * Policy interface for the scheduler.
- * Must be implemented in order to be used as a policy in the scheduler core.
+ * This class represents a task for the policy.
  *
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9
  */
-@PublicAPI
-public abstract class Policy implements Serializable {
+public interface TaskDescriptor extends Serializable {
 
     /**
-     * Resources manager state. Can be used in an inherit policy to be aware
-     * of resources informations like total nodes number, used nodes, etc.
-     * Can be null the first time the {@link #getOrderedTasks(List)} method is called.
-     */
-    public RMState RMState = null;
-
-    /**
-     * Return the tasks that have to be scheduled.
-     * The tasks must be in the desired scheduling order.
-     * The first task to be schedule must be the first in the returned Vector.
+     * To get the children
      *
-     * @param jobs the list of pending or running job descriptors.
-     * @return a vector of every tasks that are ready to be schedule.
+     * @return the children
      */
-    public abstract Vector<EligibleTaskDescriptor> getOrderedTasks(List<JobDescriptor> jobs);
+    public Vector<TaskDescriptor> getChildren();
+
+    /**
+     * Return the internal representation of the task.
+     * To be used carefully.
+     *
+     * @return the internal representation of the task.
+     */
+    public InternalTask getInternal();
+
+    /**
+     * To get the id of the corresponding task
+     *
+     * @return the id of the corresponding task
+     */
+    public TaskId getTaskId();
+
+    /**
+     * To get the parents
+     *
+     * @return the parents
+     */
+    public Vector<TaskDescriptor> getParents();
+
+    /**
+     * To get the jobId
+     *
+     * @return the jobId
+     */
+    public JobId getJobId();
+
+    /**
+     * Return the number of children remaining.
+     *
+     * @return the number of children remaining.
+     */
+    public int getChildrenCount();
+
+    /**
+     * Get the number of attempt the core has made to start this task.
+     *
+     * @return the number of attempt the core has made to start this task.
+     */
+    public int getAttempt();
+
 }

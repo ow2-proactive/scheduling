@@ -40,9 +40,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Vector;
 
-import org.ow2.proactive.scheduler.common.job.JobDescriptor;
-import org.ow2.proactive.scheduler.common.policy.Policy;
-import org.ow2.proactive.scheduler.common.task.EligibleTaskDescriptor;
+import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptor;
+import org.ow2.proactive.scheduler.descriptor.JobDescriptor;
 
 
 /**
@@ -56,7 +55,7 @@ public class PriorityPolicy extends Policy {
     /**
      * This method return the tasks using FIFO policy according to the jobs priorities.
      *
-     * @see org.ow2.proactive.scheduler.common.policy.Policy#getOrderedTasks(java.util.List)
+     * @see org.ow2.proactive.scheduler.policy.Policy#getOrderedTasks(java.util.List)
      */
     @Override
     public Vector<EligibleTaskDescriptor> getOrderedTasks(List<JobDescriptor> jobs) {

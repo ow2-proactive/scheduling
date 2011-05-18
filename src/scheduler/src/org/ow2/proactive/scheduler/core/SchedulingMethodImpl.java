@@ -61,17 +61,18 @@ import org.ow2.proactive.resourcemanager.frontend.topology.TopologyDisabledExcep
 import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SchedulerStatus;
-import org.ow2.proactive.scheduler.common.job.JobDescriptor;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.job.JobType;
-import org.ow2.proactive.scheduler.common.task.EligibleTaskDescriptor;
-import org.ow2.proactive.scheduler.common.task.TaskDescriptor;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 import org.ow2.proactive.scheduler.core.db.DatabaseManager;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.core.rmproxies.RMProxyCreationException;
+import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptor;
+import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptorImpl;
+import org.ow2.proactive.scheduler.descriptor.JobDescriptor;
+import org.ow2.proactive.scheduler.descriptor.TaskDescriptor;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.job.JobResultImpl;
 import org.ow2.proactive.scheduler.task.ExecutableContainerInitializer;
@@ -179,7 +180,7 @@ final class SchedulingMethodImpl implements SchedulingMethod {
                 logger_dev.error("", rmpce);
                 break;
             }
-            core.policy.RMState = rmState;
+            core.policy.setRMState(rmState);
             internalPolicy.RMState = rmState;
             int freeResourcesNb = rmState.getFreeNodesNumber();
             logger_dev.info("Number of free resources : " + freeResourcesNb);
@@ -201,7 +202,6 @@ final class SchedulingMethodImpl implements SchedulingMethod {
                 break;
             }
 
-            //ask nodes to the RM, fail tasks and jobs if selection script fails (tasks could never be started)
             NodeSet nodeSet = getRMNodes(neededResourcesNumber, tasksToSchedule);
 
             //start selected tasks
@@ -211,7 +211,7 @@ final class SchedulingMethodImpl implements SchedulingMethod {
                 while (nodeSet != null && !nodeSet.isEmpty()) {
                     EligibleTaskDescriptor taskDescriptor = tasksToSchedule.removeFirst();
                     currentJob = core.jobs.get(taskDescriptor.getJobId());
-                    InternalTask internalTask = currentJob.getIHMTasks().get(taskDescriptor.getId());
+                    InternalTask internalTask = currentJob.getIHMTasks().get(taskDescriptor.getTaskId());
 
                     // load and Initialize the executable container
                     loadAndInit(currentJob, internalTask);
@@ -279,17 +279,13 @@ final class SchedulingMethodImpl implements SchedulingMethod {
 
         //add running jobs
         for (InternalJob j : core.runningJobs) {
-            if (j.getJobDescriptor().getEligibleTasks().size() > 0) {
-                list.add(j.getJobDescriptor());
-            }
+		list.add(j.getJobDescriptor());
         }
 
         //if scheduler is not paused, add pending jobs
         if (core.status != SchedulerStatus.PAUSED) {
             for (InternalJob j : core.pendingJobs) {
-                if (j.getJobDescriptor().getEligibleTasks().size() > 0) {
-                    list.add(j.getJobDescriptor());
-                }
+		list.add(j.getJobDescriptor());
             }
         }
 
@@ -323,8 +319,9 @@ final class SchedulingMethodImpl implements SchedulingMethod {
         int neededResource = 0;
         if (maxResource > 0 && !bagOfTasks.isEmpty()) {
             EligibleTaskDescriptor etd = bagOfTasks.removeFirst();
+            ((EligibleTaskDescriptorImpl)etd).addAttempt();
             InternalJob currentJob = core.jobs.get(etd.getJobId());
-            InternalTask internalTask = currentJob.getIHMTasks().get(etd.getId());
+            InternalTask internalTask = currentJob.getIHMTasks().get(etd.getTaskId());
             int neededNodes = internalTask.getNumberOfNodesNeeded();
             SchedulingTaskComparator referent = new SchedulingTaskComparator(internalTask, currentJob
                     .getOwner());
@@ -335,8 +332,9 @@ final class SchedulingMethodImpl implements SchedulingMethod {
                     //if bagOfTasks is not empty
                     if (!bagOfTasks.isEmpty()) {
                         etd = bagOfTasks.removeFirst();
+                        ((EligibleTaskDescriptorImpl)etd).addAttempt();
                         currentJob = core.jobs.get(etd.getJobId());
-                        internalTask = currentJob.getIHMTasks().get(etd.getId());
+                        internalTask = currentJob.getIHMTasks().get(etd.getTaskId());
                         neededNodes = internalTask.getNumberOfNodesNeeded();
                     }
                 } else {
@@ -386,7 +384,7 @@ final class SchedulingMethodImpl implements SchedulingMethod {
 
         EligibleTaskDescriptor etd = tasksToSchedule.getFirst();
         InternalJob currentJob = core.jobs.get(etd.getJobId());
-        InternalTask internalTask = currentJob.getIHMTasks().get(etd.getId());
+        InternalTask internalTask = currentJob.getIHMTasks().get(etd.getTaskId());
 
         if (logger.isDebugEnabled()) {
             SchedulingTaskComparator referent = new SchedulingTaskComparator(internalTask, currentJob
@@ -456,7 +454,7 @@ final class SchedulingMethodImpl implements SchedulingMethod {
         Set<InternalJob> alreadyDone = new HashSet<InternalJob>();
         for (EligibleTaskDescriptor eltd : tasksToSchedule) {
             InternalJob ij = core.jobs.get(eltd.getJobId());
-            InternalTask it = ij.getIHMTasks().get(eltd.getId());
+            InternalTask it = ij.getIHMTasks().get(eltd.getTaskId());
             if (alreadyDone.contains(ij)) {
                 continue;
             } else {
@@ -544,7 +542,7 @@ final class SchedulingMethodImpl implements SchedulingMethod {
                     for (int i = 0; i < resultSize; i++) {
                         //get parent task number i
                         InternalTask parentTask = job.getIHMTasks().get(
-                                taskDescriptor.getParents().get(i).getId());
+                                taskDescriptor.getParents().get(i).getTaskId());
                         //set the task result in the arguments array.
                         params[i] = job.getJobResult().getResult(parentTask.getName());
                         //if this result has been unloaded, (extremely rare but possible)

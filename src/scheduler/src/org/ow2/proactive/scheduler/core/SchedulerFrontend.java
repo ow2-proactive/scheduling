@@ -82,7 +82,6 @@ import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.UserIdentification;
-import org.ow2.proactive.scheduler.common.policy.Policy;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputAccessMode;
@@ -94,11 +93,11 @@ import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
 import org.ow2.proactive.scheduler.core.account.SchedulerAccountsManager;
 import org.ow2.proactive.scheduler.core.jmx.SchedulerJMXHelper;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
+import org.ow2.proactive.scheduler.descriptor.JobDescriptorImpl;
 import org.ow2.proactive.scheduler.job.IdentifiedJob;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.job.InternalJobFactory;
 import org.ow2.proactive.scheduler.job.InternalJobWrapper;
-import org.ow2.proactive.scheduler.job.JobDescriptorImpl;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.job.UserIdentificationImpl;
 import org.ow2.proactive.scheduler.permissions.ChangePolicyPermission;
@@ -1028,7 +1027,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
     /**
      * {@inheritDoc}
      */
-    public boolean changePolicy(Class<? extends Policy> newPolicyFile) throws NotConnectedException,
+    public boolean changePolicy(String newPolicyClassname) throws NotConnectedException,
             PermissionException {
         UniqueID id = checkAccess();
 
@@ -1043,8 +1042,8 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
             logger_dev.info(ex.getMessage());
             throw ex;
         }
-        policyFullName = newPolicyFile.getClass().getName();
-        return scheduler.changePolicy(newPolicyFile);
+        policyFullName = newPolicyClassname;
+        return scheduler.changePolicy(newPolicyClassname);
     }
 
     /**

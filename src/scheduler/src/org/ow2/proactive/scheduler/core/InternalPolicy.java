@@ -47,9 +47,9 @@ import java.util.Vector;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.resourcemanager.common.RMState;
-import org.ow2.proactive.scheduler.common.task.EligibleTaskDescriptor;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
+import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptor;
 import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 
 /**
@@ -94,6 +94,11 @@ class InternalPolicy {
      * @return a filtered and splited list of task to be scheduled
      */
     public LinkedList<EligibleTaskDescriptor> filter(Vector<EligibleTaskDescriptor> orderedTasks) {
+	//safety branch
+	if (orderedTasks == null || orderedTasks.size() == 0){
+		return null;
+	}
+
         //read configuration file
         //if this.lastModifConfFile==0, it is the first read
         if (this.lastModifConfFile == 0 ||
@@ -115,9 +120,9 @@ class InternalPolicy {
         //max number of returned tasks will be the number of tasks per loop
         int i = 0;
         for (EligibleTaskDescriptor etd : orderedTasks) {
-            if (!ids.contains(etd.getId())) {
+            if (!ids.contains(etd.getTaskId())) {
                 toReturn.add(etd);
-                ids.add(etd.getId());
+                ids.add(etd.getTaskId());
                 if (++i == NB_TASKS_PER_LOOP) {
                     break;
                 }

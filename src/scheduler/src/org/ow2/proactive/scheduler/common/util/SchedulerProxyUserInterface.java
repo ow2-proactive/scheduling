@@ -67,7 +67,6 @@ import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.JobState;
-import org.ow2.proactive.scheduler.common.policy.Policy;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
 import org.ow2.proactive.scheduler.ext.filessplitmerge.logging.LoggerManager;
@@ -405,9 +404,9 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
         uischeduler.listenJobLogs(jobId, appenderProvider);
     }
 
-    public boolean changePolicy(Class<? extends Policy> newPolicyFile) throws NotConnectedException,
+    public boolean changePolicy(String newPolicyClassName) throws NotConnectedException,
             PermissionException {
-        return uischeduler.changePolicy(newPolicyFile);
+        return uischeduler.changePolicy(newPolicyClassName);
     }
 
     public boolean freeze() throws NotConnectedException, PermissionException {

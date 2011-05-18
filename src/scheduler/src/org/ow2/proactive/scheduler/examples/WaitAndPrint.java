@@ -67,8 +67,15 @@ public class WaitAndPrint extends JavaExecutable {
             System.out.println("Task " + number + " : Test STDOUT");
 
             message = "Task " + number;
-
-            Thread.sleep(sleepTime * 1000);
+            int st = 0;
+            while(st < sleepTime){
+		Thread.sleep(1000);
+		try {
+			setProgress((st++)*100/sleepTime);
+		} catch (IllegalArgumentException iae){
+			setProgress(100);
+		}
+            }
 
         } catch (Exception e) {
             message = "crashed";

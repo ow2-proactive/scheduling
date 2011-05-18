@@ -34,16 +34,13 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.ow2.proactive.scheduler.task;
+package org.ow2.proactive.scheduler.descriptor;
 
-import java.util.Map;
 import java.util.Vector;
 
 import javax.xml.bind.annotation.XmlTransient;
 
 import org.ow2.proactive.scheduler.common.job.JobId;
-import org.ow2.proactive.scheduler.common.task.EligibleTaskDescriptor;
-import org.ow2.proactive.scheduler.common.task.TaskDescriptor;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 
@@ -53,15 +50,15 @@ import org.ow2.proactive.scheduler.task.internal.InternalTask;
  * It is a sort of tag class that will avoid user from giving non-eligible task to the scheduler.
  * In fact policy will handle TaskDescriptor and EligibleTaskDescriptor but
  * will only be allowed to send EligibleTaskDescriptor to the scheduler
- * @see org.ow2.proactive.scheduler.common.task.TaskDescriptor
+ * @see org.ow2.proactive.scheduler.descriptor.TaskDescriptor
  *
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9.1
  */
 public class EligibleTaskDescriptorImpl implements EligibleTaskDescriptor {
 
-    /** Task id */
-    private TaskId id;
+	/** Internal representation of the task */
+	private InternalTask internalTask;
 
     /** Number of parents remaining (initial value must be 0) */
     private int parentsCount = 0;
@@ -69,11 +66,8 @@ public class EligibleTaskDescriptorImpl implements EligibleTaskDescriptor {
     /** Number of children remaining (initial value must be 0) */
     private int childrenCount = 0;
 
-    /** Number of nodes that are used by this task */
-    private int numberOfUsedNodes;
-
-    /** Task user informations */
-    private Map<String, String> genericInformations;
+    /** Number of attempt to start the task (number of rm.getAtMostNode() called for this task) */
+    private int attempt = 0;
 
     /** list of parent tasks for this task (null if jobType!=TASK_FLOW) */
     @XmlTransient
@@ -90,9 +84,7 @@ public class EligibleTaskDescriptorImpl implements EligibleTaskDescriptor {
      * @param td the taskDescriptor to shrink.
      */
     public EligibleTaskDescriptorImpl(InternalTask td) {
-        this.id = td.getId();
-        this.numberOfUsedNodes = td.getNumberOfNodesNeeded();
-        this.genericInformations = td.getGenericInformations();
+        this.internalTask = td;
     }
 
     /**
@@ -110,12 +102,10 @@ public class EligibleTaskDescriptorImpl implements EligibleTaskDescriptor {
     }
 
     /**
-     * To get the id
-     *
-     * @return the id
+     * {@inheritDoc}
      */
-    public TaskId getId() {
-        return id;
+    public TaskId getTaskId() {
+        return getInternal().getId();
     }
 
     /**
@@ -133,12 +123,19 @@ public class EligibleTaskDescriptorImpl implements EligibleTaskDescriptor {
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public InternalTask getInternal() {
+		return internalTask;
+	}
+
+    /**
      * To get the jobId
      *
      * @return the jobId
      */
     public JobId getJobId() {
-        return this.id.getJobId();
+        return getInternal().getId().getJobId();
     }
 
     /**
@@ -160,15 +157,6 @@ public class EligibleTaskDescriptorImpl implements EligibleTaskDescriptor {
     }
 
     /**
-     * Returns the number Of nodes used by this task.
-     *
-     * @return the number Of nodes used by this task.
-     */
-    public int getNumberOfUsedNodes() {
-        return numberOfUsedNodes;
-    }
-
-    /**
      * Set the number of parents remaining.
      *
      * @param count the number of parents remaining.
@@ -185,6 +173,20 @@ public class EligibleTaskDescriptorImpl implements EligibleTaskDescriptor {
     public void setChildrenCount(int count) {
         this.childrenCount = count;
     }
+
+    /**
+     * Add an attempt to this task
+     */
+    public void addAttempt(){
+	attempt ++;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public int getAttempt() {
+		return attempt;
+	}
 
     /**
      * Add a parent to the list of parents dependence.
@@ -215,21 +217,12 @@ public class EligibleTaskDescriptorImpl implements EligibleTaskDescriptor {
     }
 
     /**
-     * Return the generic informations has a Map.
-     *
-     * @return the generic informations has a Map.
-     */
-    public Map<String, String> getGenericInformations() {
-        return genericInformations;
-    }
-
-    /**
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof TaskDescriptor) {
-            return ((TaskDescriptor) obj).getId().equals(id);
+            return ((TaskDescriptor) obj).getTaskId().equals(getTaskId());
         }
 
         return false;
@@ -240,7 +233,7 @@ public class EligibleTaskDescriptorImpl implements EligibleTaskDescriptor {
      */
     @Override
     public int hashCode() {
-        return id.hashCode();
+        return getTaskId().hashCode();
     }
 
     /**
@@ -248,10 +241,10 @@ public class EligibleTaskDescriptorImpl implements EligibleTaskDescriptor {
      */
     @Override
     public String toString() {
-        return "TaskDescriptor(" + getId() + ")";
+        return "TaskDescriptor(" + getTaskId() + ")";
     }
 
-    /** 
+    /**
      * Removes all children dependences
      */
     public void clearChildren() {

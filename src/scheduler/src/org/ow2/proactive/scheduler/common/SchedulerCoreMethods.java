@@ -46,7 +46,6 @@ import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobResult;
-import org.ow2.proactive.scheduler.common.policy.Policy;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
 import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingService;
@@ -252,16 +251,16 @@ public interface SchedulerCoreMethods {
             UnknownJobException, PermissionException, JobAlreadyFinishedException;
 
     /**
-     * For administrator only, Change the policy of the scheduler.<br>
+     * For administrator only, change the policy of the scheduler.<br>
      * This method will immediately change the policy and so the whole scheduling process.
      *
-     * @param newPolicyFile the new policy file as a class.
+     * @param policyClassName the new policy full class name.
      * @return true if the policy has been correctly change, false if not.
      * @throws SchedulerException if an exception occurs while serving the request.
      * @throws NotConnectedException if you are not authenticated.
      * @throws PermissionException if you have not enough permission to access this method.
      */
-    public boolean changePolicy(Class<? extends Policy> newPolicyFile) throws NotConnectedException,
+    public boolean changePolicy(String policyClassName) throws NotConnectedException,
             PermissionException;
 
     /**

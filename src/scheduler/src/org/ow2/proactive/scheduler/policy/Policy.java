@@ -34,79 +34,65 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.ow2.proactive.scheduler.common.job;
+package org.ow2.proactive.scheduler.policy;
 
-import java.util.Collection;
-import java.util.Map;
+import java.io.Serializable;
+import java.util.List;
+import java.util.Vector;
 
 import org.objectweb.proactive.annotation.PublicAPI;
-import org.ow2.proactive.scheduler.common.task.EligibleTaskDescriptor;
-import org.ow2.proactive.scheduler.common.task.TaskId;
+import org.ow2.proactive.resourcemanager.common.RMState;
+import org.ow2.proactive.scheduler.common.SchedulerCoreMethods;
+import org.ow2.proactive.scheduler.core.SchedulerCore;
+import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptor;
+import org.ow2.proactive.scheduler.descriptor.JobDescriptor;
 
 
 /**
- * This class represents a job for the policy.
+ * Policy interface for the scheduler.
+ * Must be implemented in order to be used as a policy in the scheduler core.
  *
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9
  */
 @PublicAPI
-public interface JobDescriptor extends Comparable<JobDescriptor> {
+public abstract class Policy implements Serializable {
 
     /**
-     * Return true if the task represented by the given taskId has children, false if not.
-     *
-     * @param taskId the id representing the real task.
-     * @return true if the task represented by the given taskId has children, false if not.
+     * Resources manager state. Can be used in an inherit policy to be aware
+     * of resources informations like total nodes number, used nodes, etc.
+     * Can be null the first time the {@link #getOrderedTasks(List)} method is called.
      */
-    public boolean hasChildren(TaskId taskId);
+    protected RMState RMState = null;
+
+    /** Scheduler core link */
+    protected SchedulerCoreMethods core = null;
 
     /**
-     * To get the id
+     * Set the core
      *
-     * @return the id
+     * @param core
      */
-    public JobId getId();
+    public void setCore(SchedulerCore core){
+	this.core = core;
+    }
 
     /**
-     * To get the priority
+     * Set the RM state
      *
-     * @return the priority
+     * @param RM state
      */
-    public JobPriority getPriority();
+    public void setRMState(RMState state){
+	this.RMState = state;
+    }
 
     /**
-     * To get the tasks.
+     * Return the tasks that have to be scheduled.
+     * The tasks must be in the desired scheduling order.
+     * The first task to be schedule must be the first in the returned Vector.
      *
-     * @return the tasks.
+     * @param jobs the list of pending or running job descriptors.
+     * @return a vector of every tasks that are ready to be schedule.
      */
-    public Collection<EligibleTaskDescriptor> getEligibleTasks();
-
-    /**
-     * To get the type
-     *
-     * @return the type
-     */
-    public JobType getType();
-
-    /**
-     * Returns the number Of Tasks.
-     *
-     * @return the number Of Tasks.
-     */
-    public int getNumberOfTasks();
-
-    /**
-     * Return the generic informations has a Map.
-     *
-     * @return the generic informations has a Map.
-     */
-    public Map<String, String> getGenericInformations();
-
-    /**
-     * Returns the projectName.
-     *
-     * @return the projectName.
-     */
-    public String getProjectName();
+    public abstract Vector<EligibleTaskDescriptor> getOrderedTasks(List<JobDescriptor> jobs);
 }

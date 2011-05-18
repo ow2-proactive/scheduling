@@ -70,7 +70,6 @@ import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.JobState;
-import org.ow2.proactive.scheduler.common.policy.Policy;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
 import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingException;
@@ -455,9 +454,9 @@ public class SchedulerProxy implements Scheduler {
     /**
      * {@inheritDoc}
      */
-    public boolean changePolicy(Class<? extends Policy> newPolicyFile) {
+    public boolean changePolicy(String newPolicyClassName) {
         try {
-            return scheduler.changePolicy(newPolicyFile);
+            return scheduler.changePolicy(newPolicyClassName);
         } catch (SchedulerException e) {
             Activator.log(IStatus.ERROR, "- Scheduler Proxy: Error on change Policy action", e);
             displayError(e.getMessage());

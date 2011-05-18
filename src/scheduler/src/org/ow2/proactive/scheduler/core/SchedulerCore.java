@@ -102,11 +102,9 @@ import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
-import org.ow2.proactive.scheduler.common.policy.Policy;
 import org.ow2.proactive.scheduler.common.task.Log4JTaskLogs;
 import org.ow2.proactive.scheduler.common.task.RestartMode;
 import org.ow2.proactive.scheduler.common.task.SimpleTaskLogs;
-import org.ow2.proactive.scheduler.common.task.TaskDescriptor;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskLogs;
@@ -123,12 +121,14 @@ import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.core.rmproxies.RMProxiesManager;
 import org.ow2.proactive.scheduler.core.rmproxies.RMProxyCreationException;
 import org.ow2.proactive.scheduler.core.rmproxies.UserRMProxy;
+import org.ow2.proactive.scheduler.descriptor.TaskDescriptor;
 import org.ow2.proactive.scheduler.exception.RunningProcessException;
 import org.ow2.proactive.scheduler.exception.StartProcessException;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.job.InternalJobWrapper;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.job.JobResultImpl;
+import org.ow2.proactive.scheduler.policy.Policy;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalNativeTask;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
@@ -444,6 +444,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
             }
             //starting scheduling policy
             this.policy = (Policy) Class.forName(policyFullName).newInstance();
+            this.policy.setCore(this);
             logger_dev.info("Instanciated policy : " + policyFullName);
             logger.info("Scheduler Core ready !");
         } catch (InstantiationException e) {
@@ -1321,7 +1322,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
                     if (td.getChildrenCount() == 0) {
                         try {
                             DatabaseManager.getInstance().unload(
-                                    job.getJobResult().getResult(td.getId().getReadableName()));
+                                    job.getJobResult().getResult(td.getTaskId().getReadableName()));
                         } catch (RuntimeException e) {
                             //should never append
                             logger_dev.error("", e);
@@ -2009,18 +2010,23 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
     /**
      * {@inheritDoc}
      */
-    public boolean changePolicy(Class<? extends Policy> newPolicyFile) {
+    public boolean changePolicy(String newPolicyClassName) {
         try {
-            policy = newPolicyFile.newInstance();
+		//TODO class loading ?
+            policy = (Policy)Class.forName(newPolicyClassName).newInstance();
+            policy.setCore(this);
             frontend.schedulerStateUpdated(SchedulerEvent.POLICY_CHANGED);
-            logger_dev.info("Policy changed ! new policy name : " + newPolicyFile.getName());
+            logger_dev.info("Policy changed ! new policy name : " + newPolicyClassName);
         } catch (InstantiationException e) {
             logger_dev.error("", e);
-            throw new InternalException("Exception occurs while instanciating the policy !");
+            throw new InternalException("Exception occurs while instanciating the policy !",e);
         } catch (IllegalAccessException e) {
             logger_dev.error("", e);
-            throw new InternalException("Exception occurs while accessing the policy !");
-        }
+            throw new InternalException("Exception occurs while accessing the policy !",e);
+        } catch (ClassNotFoundException e) {
+		logger_dev.error("", e);
+            throw new InternalException("Exception occurs while loading the policy class !",e);
+		}
 
         return true;
     }

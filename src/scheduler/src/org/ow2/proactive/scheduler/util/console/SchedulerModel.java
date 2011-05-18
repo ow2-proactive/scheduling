@@ -69,7 +69,6 @@ import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.factories.FlatJobFactory;
 import org.ow2.proactive.scheduler.common.job.factories.JobFactory;
-import org.ow2.proactive.scheduler.common.policy.Policy;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.utils.ObjectArrayFormatter;
@@ -976,8 +975,7 @@ public class SchedulerModel extends ConsoleModel {
     public void changePolicy_(String newPolicyFullName) {
         boolean success = false;
         try {
-            Class<? extends Policy> klass = (Class<? extends Policy>) Class.forName(newPolicyFullName);
-            success = scheduler.changePolicy(klass);
+            success = scheduler.changePolicy(newPolicyFullName);
             if (success) {
                 print("Policy successfully changed !");
             } else {

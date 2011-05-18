@@ -34,19 +34,18 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.ow2.proactive.scheduler.common;
+package org.ow2.proactive.scheduler.descriptor;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 
 
 /**
- * Scheduler interface for someone connected to the scheduler as administrator.<br>
- * This interface represents what a scheduler administrator should do.
+ * This class represents an eligible task for the policy.
  *
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9
  */
 @PublicAPI
-@Deprecated
-public interface AdminSchedulerInterface extends UserSchedulerInterface, AdminMethodsInterface {
+public interface EligibleTaskDescriptor extends TaskDescriptor {
+
 }

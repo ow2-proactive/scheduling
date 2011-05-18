@@ -251,7 +251,6 @@
 				<include name="org/ow2/proactive/scheduler/common/exception/UnknownTaskException.java" />
 				<include name="org/ow2/proactive/scheduler/common/SchedulerConstants.java" />
 				<include name="org/ow2/proactive/scheduler/common/task/RestartMode.java" />
-				<include name="org/ow2/proactive/scheduler/common/task/TaskDescriptor.java" />
 				<include name="org/ow2/proactive/scheduler/common/task/JavaTask.java" />
 				<include name="org/ow2/proactive/scheduler/common/task/ParallelEnvironment.java" />
 				<include name="org/ow2/proactive/scheduler/common/task/ExecutableInitializer.java" />
