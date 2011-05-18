@@ -116,10 +116,13 @@ final class SchedulingMethodImpl implements SchedulingMethod {
 
     protected PrivateKey corePrivateKey;
 
+    private InternalPolicy internalPolicy;
+
     SchedulingMethodImpl(SchedulerCore core) {
         this.core = core;
         this.threadPool = Executors.newFixedThreadPool(DOTASK_ACTION_THREADNUMBER, new NamedThreadFactory(
             "DoTask_Action"));
+        this.internalPolicy = new InternalPolicy();
         try {
             this.corePrivateKey = Credentials.getPrivateKey(PASchedulerProperties
                     .getAbsolutePath(PASchedulerProperties.SCHEDULER_AUTH_PRIVKEY_PATH.getValueAsString()));
@@ -156,7 +159,8 @@ final class SchedulingMethodImpl implements SchedulingMethod {
         ArrayList<JobDescriptor> jobDescriptorList = createJobDescriptorList();
 
         //ask the policy all the tasks to be schedule according to the jobs list.
-        LinkedList<EligibleTaskDescriptor> taskRetrivedFromPolicy = new LinkedList<EligibleTaskDescriptor>(
+        //and filter them using internal policy
+        LinkedList<EligibleTaskDescriptor> taskRetrivedFromPolicy = internalPolicy.filter(
             core.policy.getOrderedTasks(jobDescriptorList));
 
         //if there is no task to scheduled, return
@@ -176,6 +180,7 @@ final class SchedulingMethodImpl implements SchedulingMethod {
                 break;
             }
             core.policy.RMState = rmState;
+            internalPolicy.RMState = rmState;
             int freeResourcesNb = rmState.getFreeNodesNumber();
             logger_dev.info("Number of free resources : " + freeResourcesNb);
             //if there is no free resources, stop it right now
