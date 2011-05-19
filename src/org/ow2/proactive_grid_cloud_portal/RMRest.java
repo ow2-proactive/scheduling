@@ -271,13 +271,19 @@ public class RMRest {
         return rm.disconnect().getBooleanValue();
     }
 
-    public boolean createNodeSource(@HeaderParam("sessionid") String sessionId, String nodeSourceName,
-            String infrastructureType, Object[] infrastructureParameters, String policyType,
-            Object[] policyParameters) {
+    @POST
+    @Path("nodesource/create")
+    @Produces("application/json")
+	public boolean createNodeSource(@HeaderParam("sessionid") String sessionId,
+			@FormParam("nodeSourceName") String nodeSourceName,
+			@FormParam("infrastructureType") String infrastructureType,
+			@FormParam("infrastructureParameters") List<String> infrastructureParameters,
+			@FormParam("policyType") String policyType,
+			@FormParam("policyParameters") List<String> policyParameters) {
         ResourceManager rm = checkAccess(sessionId);
 
-        return rm.createNodeSource(nodeSourceName, infrastructureType, infrastructureParameters, policyType,
-                policyParameters).getBooleanValue();
+        return rm.createNodeSource(nodeSourceName, infrastructureType, infrastructureParameters.toArray(), policyType,
+                policyParameters.toArray()).getBooleanValue();
     }
 
     @POST
@@ -370,12 +376,18 @@ public class RMRest {
         return rm.getAtMostNodes(arg0, arg1, arg2);
     }
 
+    @GET
+    @Path("infrastructures")
+    @Produces("application/json")
     public Collection<PluginDescriptor> getSupportedNodeSourceInfrastructures(
             @HeaderParam("sessionid") String sessionId) {
         ResourceManager rm = checkAccess(sessionId);
         return rm.getSupportedNodeSourceInfrastructures();
     }
 
+    @GET
+    @Path("policies")
+    @Produces("application/json")
     public Collection<PluginDescriptor> getSupportedNodeSourcePolicies(
             @HeaderParam("sessionid") String sessionId) {
         ResourceManager rm = checkAccess(sessionId);
