@@ -62,7 +62,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
  * @since ProActive Scheduling 3.0
  */
 @PublicAPI
-public class ZipUtils {
+public class ZipUtils extends FileUtils {
 
     /**
      * Compression level of the file.
