@@ -46,7 +46,23 @@ function help(){
 }
 
 function submit(xmlDescriptor){
+	if (xmlDescriptor == undefined){
+		println("Please, specify the xml descriptor file");
+		return;
+	}
     return s_.submit_(""+xmlDescriptor);
+}
+function submitArchive(archive,xmlFile){
+	if (archive == undefined){
+		println("Please, specify the job archive");
+		return;
+	}
+	if (xmlFile == undefined){
+		xmlFile = null;
+	} else {
+		xmlFile = ""+xmlFile
+	}
+    return s_.submit_(""+archive, xmlFile);
 }
 
 function submitCmd(commandFilePath, jobName, output, selectscript) {

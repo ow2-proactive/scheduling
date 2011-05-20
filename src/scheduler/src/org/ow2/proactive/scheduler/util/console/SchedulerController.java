@@ -335,6 +335,13 @@ public class SchedulerController {
         opt.setArgs(Option.UNLIMITED_VALUES);
         actionGroup.addOption(opt);
 
+        opt = new Option("sa", "submitarchive", true, control +
+            "Submit the given job archive (Default xmlfile is 'job.xml')");
+        opt.setArgName("jobarchive [xmlfile]");
+        opt.setRequired(false);
+        opt.setArgs(2);
+        actionGroup.addOption(opt);
+
         opt = new Option("cmd", "command", false, control +
             "If mentionned, -submit argument becomes a command line, ie: -submit command args...");
         opt.setRequired(false);
@@ -580,6 +587,13 @@ public class SchedulerController {
             } else {
                 model.submit_(cmd.getOptionValue("submit"));
             }
+        } else if (cmd.hasOption("submitarchive")) {
+            String[] optionValues = cmd.getOptionValues("submitarchive");
+            if (optionValues == null || optionValues.length < 1) {
+                model
+                        .error("submitarchive must have one or two arguments. Start with --help for more informations");
+            }
+            model.submit_(optionValues[0], optionValues.length >= 2 ? optionValues[1] : null);
         } else if (cmd.hasOption("jobresult")) {
             model.result_(cmd.getOptionValue("jobresult"));
         } else if (cmd.hasOption("taskresult")) {

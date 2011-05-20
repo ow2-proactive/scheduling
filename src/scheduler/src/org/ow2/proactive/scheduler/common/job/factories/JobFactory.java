@@ -60,6 +60,10 @@ public abstract class JobFactory {
 
     public static Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.FACTORY);
 
+    /** Temp dir to store temporary archive content */
+    public static final String JOBFACTORY_TMPDIR_PROPERTY = "pas.jobfactory.tmpdir";
+
+    /** List of job factory implementation */
     private static final String[] CURRENT_IMPL = new String[] { "org.ow2.proactive.scheduler.common.job.factories.JobFactory_stax" };
 
     /**
@@ -120,12 +124,24 @@ public abstract class JobFactory {
     public abstract Job createJob(String filePath) throws JobCreationException;
 
     /**
-     * Creates a job using the given job descriptor.
-     *
-     * @param filePath the path to an XML job descriptor as an URI.
+     * @see #createJob(String)
+     */
+    public abstract Job createJob(URI filePath) throws JobCreationException;
+
+    /**
+     * Creates a job using the given job archive. The job archive must contain at list an xml file.<br/>
+     * The archive can also contains every files, scripts and classes needed by the job.<br/>
+     * In the xml file, those files must be referenced through path relative to the xml file.<br/>
+     * <br/>
+     * Note : By default, every path in the xml file are relative to the xml file itself.
+     * 
+     * @param archivePath the path to a job archive, job archive must at least contain an xml file.
+     * @param xmlJobRelativePath the relative path to the xml file from the root of the archive
+     * 						 	This is a required entry point to create the job.
+     * 						 	If null, "job.xml" will be used as default XML file relative path.
      * @return a Job instance created with the given XML file.
      * @throws JobCreationException if an exception occurred during job creation.
      */
-    public abstract Job createJob(URI filePath) throws JobCreationException;
+    public abstract Job createJob(String archivePath, String xmlJobRelativePath) throws JobCreationException;
 
 }

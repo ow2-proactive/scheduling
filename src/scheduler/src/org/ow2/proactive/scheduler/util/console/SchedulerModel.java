@@ -135,6 +135,8 @@ public class SchedulerModel extends ConsoleModel {
         this.allowExitCommand = allowExitCommand;
         commands.add(new Command("submit(XMLdescriptor)",
             "Submit a new job (parameter is a string representing the job XML descriptor URL)"));
+        commands.add(new Command("submitArchive(archive,xmlFile)",
+            "Submit a new job (parameter is a job archive and the xml descriptor entry point)"));
         commands
                 .add(new Command("submitCmd(CommandFilePath,jobName,output,selectionScript)",
                     "Submit a new job where each task is a line in the commandFile path. Other arguments are optional."));
@@ -312,6 +314,18 @@ public class SchedulerModel extends ConsoleModel {
             return id.value();
         } catch (Exception e) {
             handleExceptionDisplay("Error on job Submission (path=" + xmlDescriptor + ")", e);
+        }
+        return "";
+    }
+
+    public String submit_(String archive, String xmlFile) {
+        try {
+            Job job = JobFactory.getFactory().createJob(archive, xmlFile);
+            JobId id = scheduler.submit(job);
+            print("Job archive '" + archive + "' successfully submitted ! (id=" + id.value() + ")");
+            return id.value();
+        } catch (Exception e) {
+            handleExceptionDisplay("Error on job Submission (path=" + archive + ")", e);
         }
         return "";
     }

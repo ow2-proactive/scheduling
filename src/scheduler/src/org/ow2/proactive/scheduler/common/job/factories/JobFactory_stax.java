@@ -49,6 +49,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.zip.ZipFile;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
@@ -82,6 +83,7 @@ import org.ow2.proactive.scheduler.common.task.flow.FlowBlock;
 import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
 import org.ow2.proactive.scheduler.common.util.RegexpMatcher;
 import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
+import org.ow2.proactive.scheduler.common.util.ZipUtils;
 import org.ow2.proactive.scripting.GenerationScript;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.SelectionScript;
@@ -142,7 +144,7 @@ public class JobFactory_stax extends JobFactory {
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.job.factories.JobFactory#createJob(java.lang.String)
+     * {@inheritDoc}
      */
     @Override
     public Job createJob(String filePath) throws JobCreationException {
@@ -159,7 +161,7 @@ public class JobFactory_stax extends JobFactory {
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.job.factories.JobFactory#createJob(java.net.URI)
+     * {@inheritDoc}
      */
     @Override
     public Job createJob(URI filePath) throws JobCreationException {
@@ -171,6 +173,49 @@ public class JobFactory_stax extends JobFactory {
         } catch (JobCreationException jce) {
             throw jce;
         } catch (Exception e) {
+            throw new JobCreationException(e);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Job createJob(String archivePath, String xmlJobRelativePath) throws JobCreationException {
+        clean();
+        try {
+            if (xmlJobRelativePath == null) {
+                xmlJobRelativePath = "job.xml";
+            }
+            //we intend to receive a zip/jar file, try to create it
+            ZipFile zip = new ZipFile(archivePath);
+            //get temporary directory
+            String strDest = System.getProperty(JOBFACTORY_TMPDIR_PROPERTY);
+            if (strDest == null || "".equals(strDest)) {
+                strDest = System.getProperty("java.io.tmpdir");
+            }
+            //check if temporary dir exist
+            File dest = new File(strDest);
+            if (!dest.exists()) {
+                throw new JobCreationException(
+                    "Temporary targeted path to extract the archive does not exist : '" + strDest + "'");
+            }
+            //create random directory inside to store job archive content : random avoid conflicts with previous one
+            dest = ZipUtils.createTempDirectory("jobarch", null, dest);
+            //unzip archive in the newly created destination
+            ZipUtils.unzip(zip, dest);
+            //append the xml job relative path, job must contain xml job descriptor
+            File fjob = new File(dest, xmlJobRelativePath);
+            try {
+                //create the job and return it
+                return createJob(fjob);//can throw JobCreationException
+            } finally {
+                //remove temporary created directory : dest
+                ZipUtils.removeDir(dest);
+            }
+        } catch (JobCreationException jce) {
+            throw jce;
+        } catch (IOException e) {
             throw new JobCreationException(e);
         }
     }
