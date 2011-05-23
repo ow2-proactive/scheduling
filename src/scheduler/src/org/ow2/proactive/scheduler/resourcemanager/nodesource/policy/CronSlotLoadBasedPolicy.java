@@ -40,6 +40,7 @@ import it.sauronsoftware.cron4j.Scheduler;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
@@ -47,18 +48,16 @@ import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
 
 /**
  *
- * Police triggers new nodes acquisition when scheduler is overloaded within a time slot defined in crontab syntax.
+ * Police keeps all nodes up and running within specified time slot and acquires node on demand when scheduler is overloaded at another time.
  *
  */
-public class CronLoadBasedPolicy extends SchedulerLoadingPolicy {
-    /**
-     * Initial time for nodes acquisition
-     */
-    @Configurable(description = "Time since the nodes acquisition is allowed (crontab format)")
-    private String acquisionAllowed = "* * * * *";
+public class CronSlotLoadBasedPolicy extends SchedulerLoadingPolicy {
 
-    @Configurable(description = "Time since the nodes acquisition is forbiden (crontab format)")
-    private String acquisionForbidden = "* * * * *";
+    @Configurable(description = "Time when all nodes are deployed (crontab format)")
+    private String deployAllAt = "* * * * *";
+
+    @Configurable(description = "Time when all nodes are removed and the police starts watching the scheduler loading")
+    private String undeployAllAt = "* * * * *";
 
     /**
      * The way of nodes removing
@@ -66,12 +65,17 @@ public class CronLoadBasedPolicy extends SchedulerLoadingPolicy {
     @Configurable(description = "the mode how nodes are removed")
     private boolean preemptive = false;
 
-    @Configurable(description = "If true acquisition will be immediately allowed")
-    private boolean allowed = false;
+    @Configurable(description = "If true the police will acquire all nodes immediately")
+    private boolean acquireNow = false;
 
-    private AtomicBoolean isAcquisitionAllowed = new AtomicBoolean(false);
+    private AtomicBoolean holdingAllNodes = new AtomicBoolean(false);
 
     private Scheduler cronScheduler;
+
+    /**
+     * Active object stub
+     */
+    private CronSlotLoadBasedPolicy thisStub;
 
     /**
      * Configure a policy with given parameters.
@@ -84,11 +88,11 @@ public class CronLoadBasedPolicy extends SchedulerLoadingPolicy {
         cronScheduler = new Scheduler();
         try {
             int index = 9;
-            acquisionAllowed = policyParameters[index++].toString();
-            acquisionForbidden = policyParameters[index++].toString();
+            deployAllAt = policyParameters[index++].toString();
+            undeployAllAt = policyParameters[index++].toString();
             preemptive = Boolean.parseBoolean(policyParameters[index++].toString());
-            allowed = Boolean.parseBoolean(policyParameters[index++].toString());
-            isAcquisitionAllowed.set(allowed);
+            acquireNow = Boolean.parseBoolean(policyParameters[index++].toString());
+            holdingAllNodes.set(acquireNow);
         } catch (RuntimeException e) {
             throw new IllegalArgumentException(e);
         }
@@ -97,21 +101,36 @@ public class CronLoadBasedPolicy extends SchedulerLoadingPolicy {
 
     @Override
     public BooleanWrapper activate() {
+
+        thisStub = (CronSlotLoadBasedPolicy) PAActiveObject.getStubOnThis();
+
         BooleanWrapper activationStatus = super.activate();
         if (!activationStatus.getBooleanValue()) {
             return activationStatus;
         }
 
-        cronScheduler.schedule(acquisionAllowed, new Runnable() {
+        // when acquireNow is set
+        if (holdingAllNodes.get()) {
+            logger.info("Deploying all nodes");
+            acquireAllNodes();
+        }
+
+        cronScheduler.schedule(deployAllAt, new Runnable() {
             public void run() {
-                logger.info("Allowing nodes acquisition");
-                isAcquisitionAllowed.set(true);
+                if (!holdingAllNodes.get()) {
+                    logger.info("Deploying all nodes");
+                    holdingAllNodes.set(true);
+                    thisStub.acquireAllNodes();
+                }
             }
         });
-        cronScheduler.schedule(acquisionForbidden, new Runnable() {
+        cronScheduler.schedule(undeployAllAt, new Runnable() {
             public void run() {
-                logger.info("Forbidding nodes acquisition");
-                isAcquisitionAllowed.set(false);
+                if (holdingAllNodes.get()) {
+                    logger.info("Removing all nodes");
+                    holdingAllNodes.set(false);
+                    thisStub.removeAllNodes(preemptive);
+                }
             }
         });
         cronScheduler.start();
@@ -119,15 +138,8 @@ public class CronLoadBasedPolicy extends SchedulerLoadingPolicy {
     }
 
     protected void updateNumberOfNodes() {
-        if (nodesNumberInNodeSource > 0 && !isAcquisitionAllowed.get()) {
-            logger.debug("Policy triggers all nodes removal");
-            removeAllNodes(preemptive);
-        }
-        if (isAcquisitionAllowed.get()) {
-            logger.debug("Node acquision allowed");
+        if (!holdingAllNodes.get()) {
             super.updateNumberOfNodes();
-        } else {
-            logger.debug("Node acquision forbidden");
         }
     }
 
@@ -139,13 +151,12 @@ public class CronLoadBasedPolicy extends SchedulerLoadingPolicy {
 
     @Override
     public String toString() {
-        return super.toString() + ", acquisiotion allowed at [" + acquisionAllowed + "]" +
-            ", acquisiotion forbidden at [" + acquisionForbidden + "], preemptive: " + preemptive +
-            ", allowed initialy: " + allowed;
+        return super.toString() + ", acquire all at [" + deployAllAt + "]" + ", remove all at [" +
+            undeployAllAt + "], preemptive: " + preemptive + ", acquired now: " + acquireNow;
     }
 
     @Override
     public String getDescription() {
-        return "Police triggers new nodes acquisition when scheduler is overloaded within a time slot defined in crontab syntax.";
+        return "Police keeps all nodes up and running within specified time slot and acquires node on demand when scheduler is overloaded at another time.";
     }
 }

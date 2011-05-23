@@ -26,3 +26,6 @@ org.ow2.proactive.resourcemanager.nodesource.infrastructure.VirtualInfrastructur
 org.ow2.proactive.resourcemanager.nodesource.infrastructure.WinHPCInfrastructure
 
 org.ow2.proactive.resourcemanager.nodesource.infrastructure.LocalInfrastructure
+
+# An infrastructure manager that operates custom scripts in order to deploy/remove nodes
+org.ow2.proactive.resourcemanager.nodesource.infrastructure.CLIInfrastructure
