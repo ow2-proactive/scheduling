@@ -45,7 +45,6 @@ import javax.management.StandardMBean;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.PropertyConfigurator;
 import org.ow2.proactive.resourcemanager.core.account.RMAccountsManager;
-import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 
 
 /**
@@ -95,9 +94,6 @@ public final class ManagementMBeanImpl extends StandardMBean implements Manageme
                 LogManager.resetConfiguration();
                 PropertyConfigurator.configure(new URL(configFilename));
             }
-
-            // reloading the resource manager configuration
-            PAResourceManagerProperties.loadProperties(null);
         } catch (Exception e) {
             e.printStackTrace();
         }
