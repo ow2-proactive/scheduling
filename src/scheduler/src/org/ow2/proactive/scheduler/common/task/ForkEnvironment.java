@@ -120,6 +120,7 @@ public class ForkEnvironment implements Serializable {
     @OneToMany(targetEntity = PropertyModifier.class)
     @LazyCollection(value = LazyCollectionOption.FALSE)
     @Cascade(CascadeType.ALL)
+    @JoinColumn(name = "SYSENV")
     private List<PropertyModifier> systemEnvironment = null;
 
     /**

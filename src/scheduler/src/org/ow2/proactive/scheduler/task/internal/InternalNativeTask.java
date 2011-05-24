@@ -71,7 +71,7 @@ import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
  * @since ProActive Scheduling 0.9
  */
 @Entity
-@Table(name = "INTERNAL_NTV_TASK")
+@Table(name = "I_NTVTASK")
 @MappedSuperclass
 @AccessType("field")
 @Proxy(lazy = false)

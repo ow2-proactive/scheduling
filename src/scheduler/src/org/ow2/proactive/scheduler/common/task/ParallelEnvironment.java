@@ -64,7 +64,7 @@ import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
  */
 @PublicAPI
 @Entity
-@Table(name = "PARALLEL_ENVIRONMENT")
+@Table(name = "PARALLEL_ENV")
 @AccessType("field")
 @Proxy(lazy = false)
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -73,7 +73,7 @@ public class ParallelEnvironment implements Serializable {
     @Id
     @GeneratedValue
     @SuppressWarnings("unused")
-    private long hibernateId;
+    private long hId;
 
     /** Number of nodes asked by the user. */
     @Column(name = "NODES_NUMBER")

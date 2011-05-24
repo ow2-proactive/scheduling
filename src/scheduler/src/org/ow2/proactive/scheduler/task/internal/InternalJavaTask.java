@@ -67,7 +67,7 @@ import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
  * @since ProActive Scheduling 0.9
  */
 @Entity
-@Table(name = "INTERNAL_JAVA_TASK")
+@Table(name = "I_JAVATASK")
 @MappedSuperclass
 @AccessType("field")
 @Proxy(lazy = false)

@@ -36,20 +36,16 @@
  */
 package org.ow2.proactive.scheduler.core.db.schedulerType;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.io.Serializable;
-import java.sql.Blob;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 
-import javax.sql.rowset.serial.SerialBlob;
-
 import org.apache.log4j.Logger;
 import org.hibernate.HibernateException;
 import org.hibernate.usertype.UserType;
+import org.objectweb.proactive.core.util.converter.ByteToObjectConverter;
 import org.objectweb.proactive.core.util.converter.ObjectToByteConverter;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
@@ -93,8 +89,15 @@ public class BinaryLargeOBject implements UserType {
      */
     public Object nullSafeGet(ResultSet rs, String[] names, Object owner) throws HibernateException,
             SQLException {
-        Blob blob = rs.getBlob(names[0]);
-        return deserialize(blob);
+        /*Blob blob = rs.getBlob(names[0]);
+        return deserialize(blob);*/
+        byte[] bytes = rs.getBytes(names[0]);
+        try {
+            return ByteToObjectConverter.ObjectStream.convert(bytes);
+        } catch (Exception e) {
+            throw new HibernateException("Cannot get byteArray", e);
+        }
+
     }
 
     /**
@@ -102,7 +105,12 @@ public class BinaryLargeOBject implements UserType {
      */
     public void nullSafeSet(PreparedStatement st, Object value, int index) throws HibernateException,
             SQLException {
-        st.setBlob(index, serialize(value));
+        try {
+            st.setBytes(index, ObjectToByteConverter.ObjectStream.convert(value));
+        } catch (Exception e) {
+            throw new HibernateException("Cannot set byteArray", e);
+        }
+        //st.setBlob(index, serialize(value));
     }
 
     /**
@@ -158,7 +166,7 @@ public class BinaryLargeOBject implements UserType {
         return null;
     }
 
-    private Blob serialize(Object o) {
+    /*private Blob serialize(Object o) {
         try {
             return new SerialBlob(ObjectToByteConverter.ObjectStream.convert(o));
         } catch (Exception e) {
@@ -185,6 +193,6 @@ public class BinaryLargeOBject implements UserType {
                 }
             }
         }
-    }
+    }*/
 
 }

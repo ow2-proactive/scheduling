@@ -70,7 +70,7 @@ import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
  * @since ProActive Scheduling 1.1
  */
 @Entity
-@Table(name = "INTERNAL_FORKED_TASK")
+@Table(name = "I_FORKED_TASK")
 @MappedSuperclass
 @AccessType("field")
 @Proxy(lazy = false)
