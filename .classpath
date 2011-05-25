@@ -173,6 +173,5 @@
 	<classpathentry kind="lib" path="lib/nodesource/winhpc/WinHPCWebserviceStubs.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/commons-vfs-patched-2.0-SNAPSHOTr19199-tests.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/commons-vfs-patched-2.0-SNAPSHOTr19199.jar"/>
-	<classpathentry kind="lib" path="lib/common/ojdbc5.jar"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>
