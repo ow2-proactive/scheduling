@@ -54,15 +54,10 @@ function submit(xmlDescriptor){
 }
 function submitArchive(archive,xmlFile){
 	if (archive == undefined){
-		println("Please, specify the job archive");
+		println("Please, specify the job archive path");
 		return;
 	}
-	if (xmlFile == undefined){
-		xmlFile = null;
-	} else {
-		xmlFile = ""+xmlFile
-	}
-    return s_.submit_(""+archive, xmlFile);
+    return s_.submitArchive_(""+archive);
 }
 
 function submitCmd(commandFilePath, jobName, output, selectscript) {

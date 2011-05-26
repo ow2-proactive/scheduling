@@ -66,6 +66,12 @@ public abstract class JobFactory {
     /** List of job factory implementation */
     private static final String[] CURRENT_IMPL = new String[] { "org.ow2.proactive.scheduler.common.job.factories.JobFactory_stax" };
 
+    /** Archive special manifest directory, file, property */
+    public static final String ARCHIVE_DEFAULT_XMLFILE = "job.xml";
+    public static final String ARCHIVE_MANIFEST_DIRECTORY = "JOB-INF";
+    public static final String ARCHIVE_MANIFEST_FILE = "manifest.mf";
+    public static final String ARCHIVE_MANIFEST_PROPERTY_XMLFILE = "job-xml";
+
     /**
      * Try to instantiate the known factories.
      * Return the created instance of the jobFactory.
@@ -133,15 +139,26 @@ public abstract class JobFactory {
      * The archive can also contains every files, scripts and classes needed by the job.<br/>
      * In the xml file, those files must be referenced through path relative to the xml file.<br/>
      * <br/>
-     * Note : By default, every path in the xml file are relative to the xml file itself.
+     * Note : By default, every path in the xml file are relative to the xml file itself.<br/>
+     * <br/>
+     * The mandatory xml entry point file will be found in the archive following one of these rules :
      * 
-     * @param archivePath the path to a job archive, job archive must at least contain an xml file.
-     * @param xmlJobRelativePath the relative path to the xml file from the root of the archive
-     * 						 	This is a required entry point to create the job.
-     * 						 	If null, "job.xml" will be used as default XML file relative path.
-     * @return a Job instance created with the given XML file.
-     * @throws JobCreationException if an exception occurred during job creation.
+     * <ul>
+     * 	<li>There is a {@value #ARCHIVE_MANIFEST_DIRECTORY}/{@value #ARCHIVE_MANIFEST_FILE} 
+     *  file containing a property {@value #ARCHIVE_MANIFEST_PROPERTY_XMLFILE}=path/to/my/job.xml.
+     * 	The specified path must be relative to the root of the archive.<br/>
+     *  <i>The key</i> {@value #ARCHIVE_MANIFEST_PROPERTY_XMLFILE} must have this name.<br/>
+     *  <i>The value</i> must be a relative path from the root of the archive.</li>
+     * 	<li>If no {@value #ARCHIVE_MANIFEST_DIRECTORY}, {@value #ARCHIVE_MANIFEST_FILE}, 
+     *  and {@value #ARCHIVE_MANIFEST_PROPERTY_XMLFILE} property is found, the xml entry point
+     *  will be a file named {@value #ARCHIVE_DEFAULT_XMLFILE} at the root of the archive.</li>
+     * </ul>
+     * 
+     * @param archivePath the path to a job archive, job archive must at least contain an xml file 
+     * 			(specified as explained above).
+     * @return a Job instance created with the given job archive.
+     * @throws JobCreationException if the archive is not valide, or if an exception occurred during job creation.
      */
-    public abstract Job createJob(String archivePath, String xmlJobRelativePath) throws JobCreationException;
+    public abstract Job createJobFromArchive(String archivePath) throws JobCreationException;
 
 }

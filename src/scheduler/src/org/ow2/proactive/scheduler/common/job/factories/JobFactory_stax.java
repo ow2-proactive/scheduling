@@ -37,6 +37,7 @@
 package org.ow2.proactive.scheduler.common.job.factories;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
@@ -49,6 +50,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Properties;
 import java.util.zip.ZipFile;
 
 import javax.xml.stream.XMLInputFactory;
@@ -181,12 +183,9 @@ public class JobFactory_stax extends JobFactory {
      * {@inheritDoc}
      */
     @Override
-    public Job createJob(String archivePath, String xmlJobRelativePath) throws JobCreationException {
+    public Job createJobFromArchive(String archivePath) throws JobCreationException {
         clean();
         try {
-            if (xmlJobRelativePath == null) {
-                xmlJobRelativePath = "job.xml";
-            }
             //we intend to receive a zip/jar file, try to create it
             ZipFile zip = new ZipFile(archivePath);
             //get temporary directory
@@ -204,8 +203,42 @@ public class JobFactory_stax extends JobFactory {
             dest = ZipUtils.createTempDirectory("jobarch", null, dest);
             //unzip archive in the newly created destination
             ZipUtils.unzip(zip, dest);
+            //search if there is a manifest to find the xml relative path
+            String xmlJobRelativePath;
+            File manifest = new File(dest, ARCHIVE_MANIFEST_DIRECTORY + File.separator +
+                ARCHIVE_MANIFEST_FILE);
+            if (manifest.exists() && manifest.isFile()) {
+                //manifest found, try to get the property
+                Properties manifestProp = new Properties();
+                try {
+                    FileInputStream fis = new FileInputStream(manifest);
+                    manifestProp.load(fis);
+                    fis.close();
+                } catch (IOException ioe) {
+                    throw new JobCreationException("Cannot read archive manifest file", ioe);
+                }
+                xmlJobRelativePath = manifestProp.getProperty(ARCHIVE_MANIFEST_PROPERTY_XMLFILE);
+                if (xmlJobRelativePath == null) {
+                    //property not found
+                    throw new JobCreationException("Cannot find property '" +
+                        ARCHIVE_MANIFEST_PROPERTY_XMLFILE + "' in archive manifest file.");
+                }
+            } else {
+                xmlJobRelativePath = ARCHIVE_DEFAULT_XMLFILE;
+            }
             //append the xml job relative path, job must contain xml job descriptor
             File fjob = new File(dest, xmlJobRelativePath);
+            //error message if needed
+            if (!fjob.exists() || !fjob.isFile()) {
+                if (ARCHIVE_DEFAULT_XMLFILE.equals(xmlJobRelativePath)) {
+                    throw new JobCreationException(
+                        "Manifest file not found in this archive OR default XML file '" +
+                            ARCHIVE_DEFAULT_XMLFILE + "' not found (at the root of the archive).");
+                } else {
+                    throw new JobCreationException(
+                        "XML file not found (relative to the root of the archive) : " + xmlJobRelativePath);
+                }
+            }
             try {
                 //create the job and return it
                 return createJob(fjob);//can throw JobCreationException
