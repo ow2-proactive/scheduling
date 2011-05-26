@@ -94,7 +94,8 @@ public abstract class JavaExecutable extends Executable {
      * and the fields contained in your executable.<br>
      * If the field type and the argument type are different and if the argument type is String
      * (i.e. for all jobs defined with XML descriptors), then a automatic mapping is tried.
-     * Managed types are byte, short, int, long, boolean and the corresponding classes.<br><br>
+     * Managed types are byte, short, int, long, boolean and the corresponding classes, other type
+     * must be handle by user by overriding this method.<br><br>
      * For example, if you set as argument the key="var", value="12" in the XML descriptor<br>
      * just add an int (or Integer, long, Long) field named "var" in your executable.
      * The default {@link #init(Map)} method will store your arguments into the integer class field.
@@ -114,8 +115,16 @@ public abstract class JavaExecutable extends Executable {
                     Field f = current.getDeclaredField(e.getKey());
                     // if f does not exist -> catch block
                     f.setAccessible(true);
-                    Class<?> valueClass = e.getValue().getClass();
                     Class<?> fieldClass = f.getType();
+                    Class<?> valueClass = e.getValue().getClass();
+                    // unbox manually as it is not done automatically
+                    // ie : int is not assignable from Integer
+                    if (valueClass.equals(Integer.class) || valueClass.equals(Short.class) ||
+                        valueClass.equals(Long.class) || valueClass.equals(Byte.class) ||
+                        valueClass.equals(Boolean.class)) {
+                        e.setValue(e.getValue().toString());
+                        valueClass = String.class;
+                    }
                     if (String.class.equals(valueClass) && !String.class.equals(fieldClass)) {
                         String valueAsString = (String) e.getValue();
                         // parameter has been defined as string in XML
@@ -132,7 +141,7 @@ public abstract class JavaExecutable extends Executable {
                             f.set(this, Boolean.parseBoolean(valueAsString));
                         }
                     } else if (fieldClass.isAssignableFrom(valueClass)) {
-                        // no conversion for other type than String
+                        // no conversion for other type than String and primitive
                         f.set(this, e.getValue());
                     }
                 } catch (Exception ex) {
