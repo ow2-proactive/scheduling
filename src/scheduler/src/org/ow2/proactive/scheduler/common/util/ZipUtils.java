@@ -70,6 +70,69 @@ public class ZipUtils extends FileUtils {
     protected static final int COMP_LEVEL = 9;
 
     /**
+     * Create a zip file on the given directoriesAndFiles argument and
+     * store the create content in a file denoted by the path in the given dest argument
+     * 
+     * @param directoriesAndFiles the directories and files to zip (recursively)
+     * @param dest the zip destination file that will contains the zipped version of the first argument.
+     * @throws IOException if the zip file cannot be created.
+     */
+    public static void zip(String[] directoriesAndFiles, File dest) throws IOException {
+        byte[] zipped = ZipUtils.zipDirectoriesAndFiles(directoriesAndFiles);
+        BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(dest));
+        bos.write(zipped);
+        bos.close();
+    }
+
+    /**
+     * Create a zip file that contains all the directory listed in directories parameter.
+     * @param directoriesAndFiles the list of directories and files to be zipped.
+     * @throws IOException if the zip file cannot be created.
+     * @return the zip file as a byte[].
+     */
+    public static byte[] zipDirectoriesAndFiles(String[] directoriesAndFiles) throws IOException {
+
+        // Fill in a byte array
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+        // Create zip stream
+        ZipOutputStream zos = new ZipOutputStream(baos);
+        zos.setLevel(COMP_LEVEL);
+
+        // zip file is ready
+        zipIt(zos, directoriesAndFiles);
+
+        // Close the file output streams
+        zos.flush();
+        zos.close();
+        baos.flush();
+        baos.close();
+        return baos.toByteArray();
+    }
+
+    /**
+     * Zip directory content in the given output stream
+     * 
+     * @param zos the output stream in which to store the zipped directory
+     * @param directoriesAndFiles a list of directories and files to be zipped
+     * @throws IOException if a zip entry cannot be created.
+     */
+    protected static void zipIt(ZipOutputStream zos, String[] directoriesAndFiles) throws IOException {
+        for (String pathElement : directoriesAndFiles) {
+            pathElement = removeConsecutiveFileSeparator(pathElement);
+            File fileElement = new File(pathElement);
+            int length = pathElement.lastIndexOf(File.separator) + 1;
+            if (fileElement.isFile()) {
+                // add zip files at the root of the global jar file !
+                zipFile(pathElement, length, zos);
+            } else if (fileElement.isDirectory()) {
+                // get only last directory
+                zipDirectory(pathElement, length, zos);
+            }
+        }
+    }
+
+    /**
      * Add the given directory into the zipStream.
      * 
      * @param directoryName the directory to be added in the zip.
@@ -124,73 +187,6 @@ public class ZipUtils extends FileUtils {
         } catch (ZipException e) {
             // TODO Other exceptions ?
             // Duplicate entry : ignore it.
-        }
-    }
-
-    /**
-     * Create a zip file on the given directoriesAndFiles argument and
-     * store the create content in a file denoted by the path in the given dest argument
-     * 
-     * @param directoriesAndFiles the directories and files to zip (recursively)
-     * @param dest the zip destination file that will contains the zipped version of the first argument.
-     * @throws IOException if the zip file cannot be created.
-     */
-    public static void zip(String[] directoriesAndFiles, File dest) throws IOException {
-        byte[] zipped = ZipUtils.zipDirectoriesAndFiles(directoriesAndFiles);
-        BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(dest));
-        bos.write(zipped);
-        bos.close();
-    }
-
-    /**
-     * Create a zip file that contains all the directory listed in directories parameter.
-     * @param directoriesAndFiles the list of directories and files to be zipped.
-     * @throws IOException if the zip file cannot be created.
-     * @return the zip file as a byte[].
-     */
-    public static byte[] zipDirectoriesAndFiles(String[] directoriesAndFiles) throws IOException {
-
-        // Fill in a byte array
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-
-        // Create zip stream
-        ZipOutputStream zos = new ZipOutputStream(baos);
-        int iBaseFolderLength = 0;
-        zos.setLevel(COMP_LEVEL);
-
-        // zip file is ready
-        zipIt(zos, directoriesAndFiles, iBaseFolderLength);
-
-        // Close the file output streams
-        zos.flush();
-        zos.close();
-        baos.flush();
-        baos.close();
-        return baos.toByteArray();
-    }
-
-    /**
-     * Zip directory content in the given output stream
-     * 
-     * @param zos the output stream in which to store the zipped directory
-     * @param directoriesAndFiles a list of directories and files to be zipped
-     * @param iBaseFolderLength the depth inside directory hierarchy
-     * @throws IOException if a zip entry cannot be created.
-     */
-    protected static void zipIt(ZipOutputStream zos, String[] directoriesAndFiles, int iBaseFolderLength)
-            throws IOException {
-        for (String pathElement : directoriesAndFiles) {
-            pathElement = removeConsecutiveFileSeparator(pathElement);
-            File fileElement = new File(pathElement);
-            if (fileElement.isFile()) {
-                // add zip files at the root of the global jar file !
-                zipFile(pathElement, pathElement.lastIndexOf(File.separator), zos);
-            } else if (fileElement.isDirectory()) {
-                String strBaseFolder = pathElement.endsWith(File.separator) ? pathElement : pathElement +
-                    File.separator;
-                iBaseFolderLength = strBaseFolder.length();
-                zipDirectory(pathElement, iBaseFolderLength, zos);
-            }
         }
     }
 

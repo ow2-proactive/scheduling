@@ -45,6 +45,7 @@ import java.util.jar.Attributes;
 import java.util.jar.JarFile;
 import java.util.jar.JarOutputStream;
 import java.util.jar.Manifest;
+import java.util.zip.ZipOutputStream;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 
@@ -74,11 +75,10 @@ public class JarUtils extends ZipUtils {
         // Create jar stream
         JarOutputStream jos = new JarOutputStream(baos, JarUtils.createManifest(manifestVerion, mainClass,
                 jarInternalClasspath));
-        int iBaseFolderLength = 0;
         jos.setLevel(COMP_LEVEL);
 
         // Jar file is ready
-        zipIt(jos, directoriesAndFiles, iBaseFolderLength);
+        jarIt(jos, directoriesAndFiles);
 
         // Close the file output streams
         jos.flush();
@@ -87,6 +87,32 @@ public class JarUtils extends ZipUtils {
         baos.close();
         return baos.toByteArray();
 
+    }
+
+    /**
+     * Jar directory content in the given output stream
+     * 
+     * @param zos the output stream in which to store the jarred directory
+     * @param directoriesAndFiles a list of directories and files to be jarred
+     * @throws IOException if a jar entry cannot be created.
+     */
+    protected static void jarIt(ZipOutputStream zos, String[] directoriesAndFiles) throws IOException {
+        for (String pathElement : directoriesAndFiles) {
+            pathElement = removeConsecutiveFileSeparator(pathElement);
+            File fileElement = new File(pathElement);
+            if (fileElement.isFile()) {
+                // add zip files at the root of the global jar file !
+                int length = pathElement.lastIndexOf(File.separator);
+                if (length == -1) {
+                    length = 0;
+                }
+                zipFile(pathElement, length, zos);
+            } else if (fileElement.isDirectory()) {
+                String strBaseFolder = pathElement.endsWith(File.separator) ? pathElement : pathElement +
+                    File.separator;
+                zipDirectory(pathElement, strBaseFolder.length(), zos);
+            }
+        }
     }
 
     private static Manifest createManifest(String manifestVerion, String mainClass,
