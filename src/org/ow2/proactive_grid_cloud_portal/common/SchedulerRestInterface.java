@@ -61,7 +61,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import org.hibernate.collection.PersistentMap;
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
+import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.core.node.NodeException;
 import org.ow2.proactive.scheduler.common.SchedulerState;
@@ -435,7 +435,7 @@ public interface SchedulerRestInterface {
     @Path("submit")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces("application/json")
-    public abstract JobId submit(@HeaderParam("sessionid") String sessionId, MultipartInput multipart)
+    public abstract JobId submit(@HeaderParam("sessionid") String sessionId, MultipartFormDataInput multipart)
             throws IOException, JobCreationException, NotConnectedException, PermissionException,
             SubmissionClosedException;
 

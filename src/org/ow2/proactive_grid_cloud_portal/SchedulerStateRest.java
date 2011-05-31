@@ -36,12 +36,11 @@
  */
 package org.ow2.proactive_grid_cloud_portal;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.Serializable;
 import java.security.KeyException;
 import java.security.PublicKey;
@@ -74,7 +73,8 @@ import org.apache.log4j.Logger;
 import org.hibernate.collection.PersistentMap;
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
+import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
+import org.jboss.resteasy.util.GenericType;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
@@ -107,11 +107,9 @@ import org.ow2.proactive.scheduler.common.job.UserIdentification;
 import org.ow2.proactive.scheduler.common.job.factories.JobFactory;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskState;
-import org.ow2.proactive.scheduler.common.util.CachingSchedulerProxyUserInterface;
 import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
 import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingException;
-import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive_grid_cloud_portal.common.LoginForm;
 import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
@@ -493,15 +491,17 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         Scheduler s = checkAccess(sessionId, "/scheduler/jobs/" + jobId + "/livelog");
         SchedulerSession ss = SchedulerSessionMapper.getInstance().getSchedulerSession(sessionId);
 
-
-        JobOutput jo = null;;
+        JobOutput jo = null;
+        ;
 
         if (ss.getJobOutputAppender() == null) {
-           jo =  JobsOutputController.getInstance().createJobOutput(SchedulerSessionMapper.getInstance().getSchedulerSession(sessionId), jobId).getJobOutput();
+            jo = JobsOutputController
+                    .getInstance()
+                    .createJobOutput(SchedulerSessionMapper.getInstance().getSchedulerSession(sessionId),
+                            jobId).getJobOutput();
         } else {
             jo = ss.getJobOutputAppender().getJobOutput();
         }
-
 
         if (jo != null) {
             CircularArrayList<String> cl = jo.getCl();
@@ -532,7 +532,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             PermissionException, LogForwardingException, IOException {
         Scheduler s = checkAccess(sessionId, "/scheduler/jobs/" + jobId + "/livelog/available");
         SchedulerSession ss = SchedulerSessionMapper.getInstance().getSchedulerSession(sessionId);
-        
+
         JobOutputAppender joa = ss.getJobOutputAppender();
 
         if (joa != null) {
@@ -558,7 +558,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             PermissionException, LogForwardingException, IOException {
         Scheduler s = checkAccess(sessionId, "delete /scheduler/jobs/livelog" + jobId);
         SchedulerSession ss = SchedulerSessionMapper.getInstance().getSchedulerSession(sessionId);
-        
+
         ss.getJobOutputAppender().terminate();
 
         return true;
@@ -900,13 +900,13 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      */
     public SchedulerProxyUserInterface checkAccess(String sessionId, String path)
             throws NotConnectedException {
-       
+
         SchedulerSession ss = SchedulerSessionMapper.getInstance().getSchedulerSession(sessionId);
         if (ss == null) {
             logger.trace("not found a scheduler frontend for sessionId " + sessionId);
             throw new NotConnectedException("you are not connected to the scheduler, you should log on first");
         }
-        
+
         SchedulerProxyUserInterface s = ss.getScheduler();
 
         if (s == null) {
@@ -1016,21 +1016,43 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @Path("submit")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces("application/json")
-    public JobId submit(@HeaderParam("sessionid") String sessionId, MultipartInput multipart)
+    public JobId submit(@HeaderParam("sessionid") String sessionId, MultipartFormDataInput multipart)
             throws JobCreationException, NotConnectedException, PermissionException,
             SubmissionClosedException, IOException {
         Scheduler s = checkAccess(sessionId, "submit");
-        File tmp = null;
 
+        Map<String, List<InputPart>> formDataMap = multipart.getFormDataMap();
+
+        String name = formDataMap.keySet().iterator().next();
+        File tmp = null;
         try {
-            tmp = File.createTempFile("prefix", "suffix");
-            for (InputPart part : multipart.getParts()) {
-                BufferedWriter outf = new BufferedWriter(new FileWriter(tmp));
-                outf.write(part.getBodyAsString());
-                outf.close();
+
+            InputPart part1 = multipart.getFormDataMap().get(name).get(0); // "file" is the name of the browser's input field
+            InputStream is = part1.getBody(new GenericType<InputStream>() {
+            });
+            tmp = File.createTempFile("job", "d");
+
+            try {
+                OutputStream os = new FileOutputStream(tmp);
+                try {
+                    byte[] buffer = new byte[4096];
+                    for (int n; (n = is.read(buffer)) != -1;)
+                        os.write(buffer, 0, n);
+                } finally {
+                    os.close();
+                }
+            } finally {
+                is.close();
             }
 
-            Job j = JobFactory.getFactory().createJob(tmp.getAbsolutePath());
+            Job j = null;
+            if (MediaType.APPLICATION_XML.equalsIgnoreCase(part1.getMediaType().toString())) {
+                // the job sent is the xml file
+                j = JobFactory.getFactory().createJob(tmp.getAbsolutePath());
+            } else {
+                // it is a job archive
+                j = JobFactory.getFactory().createJobFromArchive(tmp.getAbsolutePath());
+            }
             return s.submit(j);
         } finally {
             if (tmp != null) {
