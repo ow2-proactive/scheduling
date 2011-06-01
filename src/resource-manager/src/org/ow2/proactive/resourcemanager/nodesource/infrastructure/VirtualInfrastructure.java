@@ -776,7 +776,7 @@ public class VirtualInfrastructure extends InfrastructureManager {
                 howMany = (howMany <= VirtualInfrastructure.this.hostCapacity ? howMany
                         : VirtualInfrastructure.this.hostCapacity);
                 for (int i = 0; i < howMany; i++) {
-                    String pendingNodeName = vmName + DEPLOYING_NODE_NAME_FRAGMENT + (i + 1);
+                    String pendingNodeName = "VIRT-" + vmName + DEPLOYING_NODE_NAME_FRAGMENT + (i + 1);
                     String tmpURL = addDeployingNode(pendingNodeName, "daemon command", description,
                             VirtualInfrastructure.NODE_URL_ACQUISITION_TIMEOUT);
                     pendings[i] = tmpURL;

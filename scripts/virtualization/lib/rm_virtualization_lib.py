@@ -99,7 +99,7 @@ class Abstract_Runtime :
             command.append(classpath)
             command.append(NODE_STARTER_REGISTER)
             command.append("-n")
-            command.append(holdingVM + "_node_" + repr(i))
+            command.append("VIRT-" + holdingVM + "_node_" + repr(i))
             command.append("-v")
             command.append(creds)
             command.append("-r")
