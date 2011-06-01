@@ -272,7 +272,7 @@ public class EC2Infrastructure extends InfrastructureManager {
         result.setPaProperties(properties);
         String nodeSourceName = this.nodeSource.getName();
         result.setSourceName(nodeSourceName);
-        String nodeName = "EC2-" + nodeSourceName + "-node-" + ProActiveCounter.getUniqID();
+        String nodeName = "VIRT-EC2-" + nodeSourceName + "-node-" + ProActiveCounter.getUniqID();
         result.setNodeName(nodeName);
         return result;
     }

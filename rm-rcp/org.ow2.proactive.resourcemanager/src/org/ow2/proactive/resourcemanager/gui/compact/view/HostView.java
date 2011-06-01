@@ -43,6 +43,7 @@ import org.ow2.proactive.resourcemanager.gui.Internal;
 import org.ow2.proactive.resourcemanager.gui.compact.Filter;
 import org.ow2.proactive.resourcemanager.gui.compact.LabelMouseListener;
 import org.ow2.proactive.resourcemanager.gui.data.model.TreeLeafElement;
+import org.ow2.proactive.resourcemanager.gui.data.model.TreeParentElement;
 import org.ow2.proactive.resourcemanager.gui.views.ResourcesCompactView;
 
 
@@ -60,9 +61,17 @@ public class HostView extends View {
             label = new Label(ResourcesCompactView.getCompactViewer().getComposite(), SWT.SHADOW_NONE);
             label.setBackground(ResourcesCompactView.getCompactViewer().getComposite().getBackground());
 
-            // check is any node
-            String nsName = element.getParent().getName();
-            if (nsName.toLowerCase().startsWith(Internal.VIRT_PREFIX)) {
+            boolean virtualHost = false;
+            // checking if the first node of this host has "virt-" in its url
+            TreeLeafElement[] vms = ((TreeParentElement) element).getChildren();
+            if (vms != null && vms.length > 0) {
+                TreeLeafElement[] nodes = ((TreeParentElement) vms[0]).getChildren();
+                if (nodes != null && nodes.length > 0 &&
+                    nodes[0].getName().toLowerCase().contains(Internal.VIRT_PREFIX)) {
+                    virtualHost = true;
+                }
+            }
+            if (virtualHost) {
                 label.setImage(Activator.getDefault().getImageRegistry().get(Internal.IMG_HOST_VIRT));
             } else {
                 label.setImage(Activator.getDefault().getImageRegistry().get(Internal.IMG_HOST));
