@@ -328,6 +328,13 @@ public class ForkedJavaExecutable extends JavaExecutable implements ForkerStarte
             logger_dev.info("Executing env-script");
             ScriptHandler handler = ScriptLoader.createLocalHandler();
             handler.addBinding(FORKENV_BINDING_NAME, fe);
+
+            // add dataspaces binding
+            handler.addBinding(TaskLauncher.DS_SCRATCH_BINDING_NAME, this.execInitializer.getLocal());
+            handler.addBinding(TaskLauncher.DS_INPUT_BINDING_NAME, this.execInitializer.getInput());
+            handler.addBinding(TaskLauncher.DS_OUTPUT_BINDING_NAME, this.execInitializer.getOutput());
+            handler.addBinding(TaskLauncher.DS_GLOBAL_BINDING_NAME, this.execInitializer.getGlobal());
+
             ScriptResult<String> res = handler.handle(fe.getEnvScript());
             //result
             if (res.errorOccured()) {

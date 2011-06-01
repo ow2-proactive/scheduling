@@ -99,6 +99,7 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher implements ForkerSt
             TaskResult... results) {
         long duration = -1;
         try {
+
             // create the executable (will set the context class loader to the taskclassserver)
             currentExecutable = executableContainer.getExecutable();
 
@@ -112,6 +113,12 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher implements ForkerSt
                 decrypter.setCredentials(executableContainer.getCredentials());
                 fjei.setDecrypter(decrypter);
             }
+
+            // dataspaces can be used in envScript...
+            // but no automatic transfer is requiered
+            this.initDataSpaces();
+            fjei.setDataspaces(SCRATCH, INPUT, OUTPUT, GLOBAL);
+
             //create initializer
             ExecutableContainerInitializer eci = new ExecutableContainerInitializer();
             eci.setClassServer(((ForkedJavaExecutableContainer) executableContainer).getClassServer());
@@ -163,6 +170,8 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher implements ForkerSt
                 return new TaskResultImpl(taskId, ex, this.getLogs(), duration, null);
             }
         } finally {
+            // finalize doTask
+            terminateDataSpace();
             cancelTimer();
             finalizeTask(core);
         }

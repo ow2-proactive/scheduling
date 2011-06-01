@@ -36,6 +36,7 @@
  */
 package org.ow2.proactive.scheduler.task;
 
+import org.objectweb.proactive.extensions.dataspaces.api.DataSpacesFileObject;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.JavaExecutableInitializer;
 import org.ow2.proactive.scheduler.task.launcher.TaskLauncherInitializer;
@@ -61,6 +62,9 @@ public class ForkedJavaExecutableInitializer extends JavaExecutableInitializer {
 
     /** Decrypter from launcher */
     private OneShotDecrypter decrypter = null;
+
+    /** Dataspaces on forking JVM side */
+    private DataSpacesFileObject local, input, output, global;
 
     /**
      * Create a new instance of ForkedJavaExecutableInitializer
@@ -140,4 +144,51 @@ public class ForkedJavaExecutableInitializer extends JavaExecutableInitializer {
         this.decrypter = decrypter;
     }
 
+    /**
+     * Set the dataspace accesses of the forking JVM.
+     * Used to transfer data in the envScript
+     * @param l the localspace
+     * @param i the inputspace
+     * @param o the outputspace
+     * @param g the globalspace
+     */
+    public void setDataspaces(DataSpacesFileObject l, DataSpacesFileObject i, DataSpacesFileObject o,
+            DataSpacesFileObject g) {
+        this.local = l;
+        this.input = i;
+        this.output = o;
+        this.global = g;
+    }
+
+    /**
+     * Return the localspace of the forking JVM.
+     * Can be null if no space is defined.
+     */
+    public DataSpacesFileObject getLocal() {
+        return this.local;
+    }
+
+    /**
+     * Return the inputspace.
+     * Can be null if no space is defined.
+     */
+    public DataSpacesFileObject getInput() {
+        return this.input;
+    }
+
+    /**
+     * Return the outputspace
+     * Can be null if no space is defined.
+     */
+    public DataSpacesFileObject getOutput() {
+        return this.output;
+    }
+
+    /**
+     * Return the globalspace.
+     * Can be null if no space is defined.
+     */
+    public DataSpacesFileObject getGlobal() {
+        return this.global;
+    }
 }
