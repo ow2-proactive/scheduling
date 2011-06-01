@@ -85,6 +85,7 @@
         <mapping class="org.ow2.proactive.scheduler.common.task.util.IntegerWrapper"/>
         <mapping class="org.ow2.proactive.db.types.BigString"/>
         <mapping class="org.ow2.proactive.scheduler.common.task.util.ByteArrayWrapper"/>
+        <mapping class="org.ow2.proactive.scheduler.util.classloading.JobClasspathManager$JobClasspathEntry"/>
         <!-- TOPOLOGY -->
 		<mapping class="org.ow2.proactive.scheduler.common.task.ParallelEnvironment"/>
 		<mapping class="org.ow2.proactive.topology.descriptor.TopologyDescriptor"/>
