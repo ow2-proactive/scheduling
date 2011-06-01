@@ -47,6 +47,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Enumeration;
 import java.util.StringTokenizer;
+import java.util.zip.CRC32;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
@@ -75,10 +76,11 @@ public class ZipUtils extends FileUtils {
      * 
      * @param directoriesAndFiles the directories and files to zip (recursively)
      * @param dest the zip destination file that will contains the zipped version of the first argument.
+     * @param crc the CRC32 of all zipentries. Can be null if no crc is needed.
      * @throws IOException if the zip file cannot be created.
      */
-    public static void zip(String[] directoriesAndFiles, File dest) throws IOException {
-        byte[] zipped = ZipUtils.zipDirectoriesAndFiles(directoriesAndFiles);
+    public static void zip(String[] directoriesAndFiles, File dest, CRC32 crc) throws IOException {
+        byte[] zipped = ZipUtils.zipDirectoriesAndFiles(directoriesAndFiles, crc);
         BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(dest));
         bos.write(zipped);
         bos.close();
@@ -87,10 +89,11 @@ public class ZipUtils extends FileUtils {
     /**
      * Create a zip file that contains all the directory listed in directories parameter.
      * @param directoriesAndFiles the list of directories and files to be zipped.
+     * @param crc the CRC32 of all zipentries. Can be null if no crc is needed.
      * @throws IOException if the zip file cannot be created.
      * @return the zip file as a byte[].
      */
-    public static byte[] zipDirectoriesAndFiles(String[] directoriesAndFiles) throws IOException {
+    public static byte[] zipDirectoriesAndFiles(String[] directoriesAndFiles, CRC32 crc) throws IOException {
 
         // Fill in a byte array
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -100,7 +103,7 @@ public class ZipUtils extends FileUtils {
         zos.setLevel(COMP_LEVEL);
 
         // zip file is ready
-        zipIt(zos, directoriesAndFiles);
+        zipIt(zos, directoriesAndFiles, crc);
 
         // Close the file output streams
         zos.flush();
@@ -117,17 +120,18 @@ public class ZipUtils extends FileUtils {
      * @param directoriesAndFiles a list of directories and files to be zipped
      * @throws IOException if a zip entry cannot be created.
      */
-    protected static void zipIt(ZipOutputStream zos, String[] directoriesAndFiles) throws IOException {
+    protected static void zipIt(ZipOutputStream zos, String[] directoriesAndFiles, CRC32 crc)
+            throws IOException {
         for (String pathElement : directoriesAndFiles) {
             pathElement = removeConsecutiveFileSeparator(pathElement);
             File fileElement = new File(pathElement);
             int length = pathElement.lastIndexOf(File.separator) + 1;
             if (fileElement.isFile()) {
                 // add zip files at the root of the global jar file !
-                zipFile(pathElement, length, zos);
+                zipFile(pathElement, length, zos, crc);
             } else if (fileElement.isDirectory()) {
                 // get only last directory
-                zipDirectory(pathElement, length, zos);
+                zipDirectory(pathElement, length, zos, crc);
             }
         }
     }
@@ -138,10 +142,11 @@ public class ZipUtils extends FileUtils {
      * @param directoryName the directory to be added in the zip.
      * @param iBaseFolderLength the index in the directoryName from which starts the actual zip entry name.
      * @param zos the stream to write into.
+     * @param crc the CRC32 of all zipentries. Can be null if no crc is needed.
      * @throws IOException if the zip file cannot be written.
      */
-    protected static void zipDirectory(String directoryName, int iBaseFolderLength, ZipOutputStream zos)
-            throws IOException {
+    protected static void zipDirectory(String directoryName, int iBaseFolderLength, ZipOutputStream zos,
+            CRC32 crc) throws IOException {
         File dirobject = new File(directoryName);
         if (dirobject.exists()) {
             if (dirobject.isDirectory()) {
@@ -149,9 +154,9 @@ public class ZipUtils extends FileUtils {
                 // Loop through the files
                 for (int i = 0; i < fileList.length; i++) {
                     if (fileList[i].isDirectory()) {
-                        zipDirectory(fileList[i].getPath(), iBaseFolderLength, zos);
+                        zipDirectory(fileList[i].getPath(), iBaseFolderLength, zos, crc);
                     } else if (fileList[i].isFile()) {
-                        zipFile(fileList[i].getPath(), iBaseFolderLength, zos);
+                        zipFile(fileList[i].getPath(), iBaseFolderLength, zos, crc);
                     }
                 }
             } else {
@@ -167,9 +172,10 @@ public class ZipUtils extends FileUtils {
      * @param filePath the file to be added in the zip.
      * @param iBaseFolderLength the index in the directoryName from which starts the actual zip entry name.
      * @param jos the stream to write into.
+     * @param crc the CRC32 of all zipentries. Can be null if no crc is needed.
      * @throws IOException if the zip file cannot be written.
      */
-    protected static void zipFile(String filePath, int iBaseFolderLength, ZipOutputStream jos)
+    protected static void zipFile(String filePath, int iBaseFolderLength, ZipOutputStream jos, CRC32 crc)
             throws IOException {
         try {
             FileInputStream fis = new FileInputStream(filePath);
@@ -180,6 +186,9 @@ public class ZipUtils extends FileUtils {
             byte[] data = new byte[1024];
             int byteCount;
             while ((byteCount = bis.read(data, 0, 1024)) > -1) {
+                if (crc != null) {
+                    crc.update(data);
+                }
                 jos.write(data, 0, byteCount);
             }
             jos.closeEntry();

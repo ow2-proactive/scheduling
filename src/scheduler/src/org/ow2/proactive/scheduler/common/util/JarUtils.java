@@ -45,6 +45,7 @@ import java.util.jar.Attributes;
 import java.util.jar.JarFile;
 import java.util.jar.JarOutputStream;
 import java.util.jar.Manifest;
+import java.util.zip.CRC32;
 import java.util.zip.ZipOutputStream;
 
 import org.objectweb.proactive.annotation.PublicAPI;
@@ -63,11 +64,12 @@ public class JarUtils extends ZipUtils {
      * @param manifestVerion the version of the jar manifest (can be null).
      * @param mainClass the main class of the jar (can be null).
      * @param jarInternalClasspath the class-path of the jar (can be null).
+     * @param crc the CRC32 of all jar entries. Can be null if no crc is needed.
      * @throws IOException if the jar file cannot be created.
      * @return the jar file as a byte[].
      */
     public static byte[] jarDirectoriesAndFiles(String[] directoriesAndFiles, String manifestVerion,
-            String mainClass, String jarInternalClasspath) throws IOException {
+            String mainClass, String jarInternalClasspath, CRC32 crc) throws IOException {
 
         // Fill in a byte array
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -78,7 +80,7 @@ public class JarUtils extends ZipUtils {
         jos.setLevel(COMP_LEVEL);
 
         // Jar file is ready
-        jarIt(jos, directoriesAndFiles);
+        jarIt(jos, directoriesAndFiles, crc);
 
         // Close the file output streams
         jos.flush();
@@ -96,7 +98,8 @@ public class JarUtils extends ZipUtils {
      * @param directoriesAndFiles a list of directories and files to be jarred
      * @throws IOException if a jar entry cannot be created.
      */
-    protected static void jarIt(ZipOutputStream zos, String[] directoriesAndFiles) throws IOException {
+    protected static void jarIt(ZipOutputStream zos, String[] directoriesAndFiles, CRC32 crc)
+            throws IOException {
         for (String pathElement : directoriesAndFiles) {
             pathElement = removeConsecutiveFileSeparator(pathElement);
             File fileElement = new File(pathElement);
@@ -106,11 +109,11 @@ public class JarUtils extends ZipUtils {
                 if (length == -1) {
                     length = 0;
                 }
-                zipFile(pathElement, length, zos);
+                zipFile(pathElement, length, zos, crc);
             } else if (fileElement.isDirectory()) {
                 String strBaseFolder = pathElement.endsWith(File.separator) ? pathElement : pathElement +
                     File.separator;
-                zipDirectory(pathElement, strBaseFolder.length(), zos);
+                zipDirectory(pathElement, strBaseFolder.length(), zos, crc);
             }
         }
     }
@@ -142,12 +145,13 @@ public class JarUtils extends ZipUtils {
      * @param manifestVerion the version of the jar manifest (can be null).
      * @param mainClass the main class of the jar (can be null).
      * @param jarInternalClasspath the class-path of the jar (can be null).
+     * @param crc the CRC32 of all ajr entries. Can be null if no crc is needed.
      * @throws IOException if the zip file cannot be created.
      */
     public static void jar(String[] directoriesAndFiles, File dest, String manifestVerion, String mainClass,
-            String jarInternalClasspath) throws IOException {
+            String jarInternalClasspath, CRC32 crc) throws IOException {
         byte[] jarred = jarDirectoriesAndFiles(directoriesAndFiles, manifestVerion, mainClass,
-                jarInternalClasspath);
+                jarInternalClasspath, crc);
         BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(dest));
         bos.write(jarred);
         bos.close();
@@ -163,5 +167,4 @@ public class JarUtils extends ZipUtils {
     public static void unjar(JarFile jarFile, File dest) throws IOException {
         unzip(jarFile, dest);
     }
-
 }

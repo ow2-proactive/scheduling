@@ -50,6 +50,7 @@ import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.core.RecoverCallback;
 import org.ow2.proactive.scheduler.job.InternalJob;
+import org.ow2.proactive.scheduler.util.classloading.JobClasspathManager.JobClasspathEntry;
 
 
 /**
@@ -63,12 +64,14 @@ import org.ow2.proactive.scheduler.job.InternalJob;
 public class SchedulerEmptyDatabaseManager extends EmptyDatabaseManager implements SchedulerDatabaseManager {
 
     private Map<JobId, InternalJob> jobs;
+    private Map<Long, JobClasspathEntry> jobClasspathEntries;
 
     /**
      * Create a new instance of EmptyDatabaseManager
      */
     public SchedulerEmptyDatabaseManager() {
         jobs = new HashMap<JobId, InternalJob>();
+        jobClasspathEntries = new HashMap<Long, JobClasspathEntry>();
     }
 
     /**
@@ -78,8 +81,13 @@ public class SchedulerEmptyDatabaseManager extends EmptyDatabaseManager implemen
      */
     @Override
     public void register(Object o) {
-        InternalJob job = (InternalJob) o;
-        jobs.put(job.getId(), job);
+        if (!(o instanceof JobClasspathEntry)) {
+            InternalJob job = (InternalJob) o;
+            jobs.put(job.getId(), job);
+        } else {
+            JobClasspathEntry jce = (JobClasspathEntry) o;
+            jobClasspathEntries.put(new Long(jce.crc), jce);
+        }
     }
 
     /**
@@ -104,6 +112,13 @@ public class SchedulerEmptyDatabaseManager extends EmptyDatabaseManager implemen
                 res.add((T) jobs.get(id.getJobId()).getJobResult().getResult(id.getReadableName()));
             } catch (UnknownTaskException ute) {
                 //should never happen : taskName is unknown
+            }
+            return res;
+        } else if (JobClasspathEntry.class.isAssignableFrom(egClass)) {
+            ArrayList<T> res = new ArrayList<T>();
+            T rec = (T) jobClasspathEntries.get(conditions[0].getValue());
+            if (rec != null) {
+                res.add(rec);
             }
             return res;
         } else {

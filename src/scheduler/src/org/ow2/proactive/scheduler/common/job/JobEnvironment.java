@@ -38,6 +38,7 @@ package org.ow2.proactive.scheduler.common.job;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.zip.CRC32;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -45,6 +46,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlTransient;
@@ -53,7 +55,6 @@ import org.hibernate.annotations.AccessType;
 import org.hibernate.annotations.Proxy;
 import org.hibernate.annotations.Type;
 import org.objectweb.proactive.annotation.PublicAPI;
-import org.ow2.proactive.db.annotation.Unloadable;
 import org.ow2.proactive.scheduler.common.util.JarUtils;
 
 
@@ -83,15 +84,17 @@ public class JobEnvironment implements Serializable {
     private String[] jobClasspath;
 
     // jar file containing the job classpath
-    @Unloadable
-    @Column(name = "CLASSPATH_CONTENT", length = Integer.MAX_VALUE)
-    @Type(type = "org.ow2.proactive.scheduler.core.db.schedulerType.BinaryLargeOBject")
-    @Lob
+    // handle manually in the core
+    // @see JobClasspathManager
+    @Transient
     private byte[] jobClasspathContent;
 
     // true if the classpath contains jar files
     @Column(name = "CONTAINS_JAR")
     private boolean containsJarFile;
+
+    // CRC32 of the classpath content
+    private long crc;
 
     /**
      * Return the byte[] representation of the jar file containing the job classpath.
@@ -100,6 +103,16 @@ public class JobEnvironment implements Serializable {
      */
     public byte[] getJobClasspathContent() {
         return jobClasspathContent;
+    }
+
+    /**
+     * Return and delete the jobclasspath content. Used for memory saving.
+     * @return the jobclasspath content.
+     */
+    public byte[] clearJobClasspathContent() {
+        byte[] jcpc = this.jobClasspathContent;
+        this.jobClasspathContent = null;
+        return jcpc;
     }
 
     /**
@@ -112,10 +125,19 @@ public class JobEnvironment implements Serializable {
     }
 
     /**
+     * Return the CRC of the jobclasspath content
+     *
+     * @return the CRC of the jobclasspath content
+     */
+    public long getJobClasspathCRC() {
+        return this.crc;
+    }
+
+    /**
      * Add the classPath of your task to the job. Every needed classes used in your executable must
      * be in this classPath.
      *
-     * @param jobClasspath the jobClasspath to set
+     * @param jobClasspath the jobClasspath to set.
      * @throws IOException if the classpath cannot be built
      */
     public void setJobClasspath(String[] jobClasspath) throws IOException {
@@ -126,8 +148,11 @@ public class JobEnvironment implements Serializable {
                 break;
             }
         }
+        final CRC32 crc32 = new CRC32();
         // TODO cdelbe : define version and cp of the jar classpath ?
-        this.jobClasspathContent = JarUtils.jarDirectoriesAndFiles(jobClasspath, "1.0", null, null);
+        this.jobClasspathContent = JarUtils.jarDirectoriesAndFiles(jobClasspath, "1.0", null, null, crc32);
+        this.crc = crc32.getValue();
+
     }
 
     /**

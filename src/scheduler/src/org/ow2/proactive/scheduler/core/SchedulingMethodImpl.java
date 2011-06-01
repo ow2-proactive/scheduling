@@ -61,6 +61,8 @@ import org.ow2.proactive.resourcemanager.frontend.topology.TopologyDisabledExcep
 import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SchedulerStatus;
+import org.ow2.proactive.scheduler.common.exception.ClassServerException;
+import org.ow2.proactive.scheduler.common.exception.InternalException;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.job.JobType;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
@@ -79,6 +81,7 @@ import org.ow2.proactive.scheduler.task.ExecutableContainerInitializer;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.task.launcher.TaskLauncher;
 import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
+import org.ow2.proactive.scheduler.util.classloading.JobClasspathManager.JobClasspathEntry;
 import org.ow2.proactive.scripting.ScriptException;
 import org.ow2.proactive.threading.ExecutorServiceTasksInvocator;
 import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
@@ -485,7 +488,7 @@ final class SchedulingMethodImpl implements SchedulingMethod {
         DatabaseManager.getInstance().load(task);
         ExecutableContainerInitializer eci = new ExecutableContainerInitializer();
         // TCS can be null for non-java task
-        eci.setClassServer(SchedulerCore.getTaskClassServer(job.getId()));
+        eci.setClassServer(core.getTaskClassServer(job.getId()));
         task.getExecutableContainer().init(eci);
     }
 

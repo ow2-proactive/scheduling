@@ -134,7 +134,9 @@ import org.ow2.proactive.scheduler.task.internal.InternalNativeTask;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.task.launcher.TaskLauncher;
 import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
+import org.ow2.proactive.scheduler.util.classloading.JobClasspathManager;
 import org.ow2.proactive.scheduler.util.classloading.TaskClassServer;
+import org.ow2.proactive.scheduler.util.classloading.JobClasspathManager.JobClasspathEntry;
 import org.ow2.proactive.utils.NodeSet;
 
 
@@ -245,8 +247,10 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
 
     /** ClassLoading */
     // contains taskCLassServer for currently running jobs
-    private static Hashtable<JobId, TaskClassServer> classServers = new Hashtable<JobId, TaskClassServer>();
-    private static Hashtable<JobId, RemoteObjectExposer<TaskClassServer>> remoteClassServers = new Hashtable<JobId, RemoteObjectExposer<TaskClassServer>>();
+    protected Hashtable<JobId, TaskClassServer> classServers;
+    protected Hashtable<JobId, RemoteObjectExposer<TaskClassServer>> remoteClassServers;
+    // handle job classpathes in DB
+    protected JobClasspathManager jobClasspathManager;
 
     /** Dataspaces Naming service */
     DataSpaceServiceStarter dataSpaceNSStarter;
@@ -258,7 +262,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
      * @param jid the job id 
      * @return the task classserver for the job jid
      */
-    public static TaskClassServer getTaskClassServer(JobId jid) {
+    public TaskClassServer getTaskClassServer(JobId jid) {
         return classServers.get(jid);
     }
 
@@ -269,7 +273,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
      * @param deflateJar if true, the jar file is deflated in the tmpJarFilesDir
      * @throws ClassServerException if something goes wrong during task class server creation
      */
-    private static void addTaskClassServer(JobId jid, byte[] userClasspathJarFile, boolean deflateJar)
+    protected void addTaskClassServer(JobId jid, byte[] userClasspathJarFile, boolean deflateJar)
             throws ClassServerException {
         if (getTaskClassServer(jid) != null) {
             throw new ClassServerException("ClassServer already exists for job " + jid);
@@ -312,7 +316,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
      * Delete the classpath associated in SchedulerCore.tmpJarFilesDir.
      * @return true if a taskClassServer has been removed, false otherwise.
      */
-    private static boolean removeTaskClassServer(JobId jid) {
+    protected boolean removeTaskClassServer(JobId jid) {
         logger_dev.info("Removing TaskClassServer for Job '" + jid + "'");
         // desactivate tcs
         TaskClassServer tcs = classServers.remove(jid);
@@ -413,6 +417,11 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
     public SchedulerCore(URI rmURL, SchedulerFrontend frontend, String policyFullName,
             InternalJobWrapper jobSubmitLink) {
         try {
+            // create classloading tools
+            this.classServers = new Hashtable<JobId, TaskClassServer>();
+            this.remoteClassServers = new Hashtable<JobId, RemoteObjectExposer<TaskClassServer>>();
+            this.jobClasspathManager = new JobClasspathManager();
+
             //try connect to RM with Scheduler user
             this.rmProxiesManager = RMProxiesManager.getRMProxiesManager(rmURL);
             this.rmProxiesManager.getSchedulerRMProxy();//-> used to connect RM
@@ -859,18 +868,20 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
     public boolean submit() {
         InternalJob job = currentJobToSubmit.getJob();
         logger_dev.info("Trying to submit new Job '" + job.getId() + "'");
-        // TODO cdelbe : create classserver only when job is running ?
-        // create taskClassLoader for this job
+
+        // store jobclasspath content if it is set and unknown
         if (job.getEnvironment().getJobClasspath() != null) {
-            try {
-                SchedulerCore.addTaskClassServer(job.getId(), job.getEnvironment().getJobClasspathContent(),
-                        job.getEnvironment().containsJarFile());
-                // if the classserver creation fails, the submit is aborted
-            } catch (ClassServerException cse) {
-                logger_dev.info("", cse);
-                throw new InternalException(cse);
+            // store jobclasspath in db if unknown
+            final long crc = job.getEnvironment().getJobClasspathCRC();
+            if (!jobClasspathManager.contains(crc)) {
+                jobClasspathManager.put(crc, job.getEnvironment().clearJobClasspathContent(), job
+                        .getEnvironment().containsJarFile());
             }
         }
+
+        // TODO cdelbe : create classserver only when job is running ?
+        // create taskClassLoader for this job
+        createTaskClassServer(job);
 
         job.submitAction();
 
@@ -1561,6 +1572,26 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
     }
 
     /**
+     * Create a taskclassserver for this job if a jobclasspath is set
+     */
+    private void createTaskClassServer(InternalJob job) {
+        // restart classserver if needed
+        try {
+            if (job.getEnvironment().getJobClasspath() != null) {
+                JobClasspathEntry jce = jobClasspathManager.get(job.getEnvironment().getJobClasspathCRC());
+                if (jce == null) {
+                    throw new ClassServerException("No classpath content is available for job " +
+                        job.getJobInfo().getJobId());
+                }
+                this.addTaskClassServer(job.getId(), jce.classpathContent, jce.containsJarFiles);
+            }
+        } catch (ClassServerException e) {
+            throw new IllegalStateException("Cannot create TaskClassServer for job " +
+                job.getJobInfo().getJobId(), e);
+        }
+    }
+
+    /**
      * {@inheritDoc}
      */
     @ImmediateService
@@ -2150,15 +2181,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
                     // create appender for this job if required
                     createFileAppender(job, true);
                     // restart classserver if needed
-                    if (job.getEnvironment().getJobClasspath() != null) {
-                        try {
-                            SchedulerCore.addTaskClassServer(job.getId(), job.getEnvironment()
-                                    .getJobClasspathContent(), job.getEnvironment().containsJarFile());
-                        } catch (ClassServerException e) {
-                            // TODO cdelbe : exception handling ?
-                            logger_dev.error("", e);
-                        }
-                    }
+                    createTaskClassServer(job);
                     break;
                 case STALLED:
                 case RUNNING:
@@ -2184,15 +2207,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
                     // create appender for this job if required
                     createFileAppender(job, true);
                     // restart classServer if needed
-                    if (job.getEnvironment().getJobClasspath() != null) {
-                        try {
-                            SchedulerCore.addTaskClassServer(job.getId(), job.getEnvironment()
-                                    .getJobClasspathContent(), job.getEnvironment().containsJarFile());
-                        } catch (SchedulerException e) {
-                            // TODO cdelbe : exception handling ?
-                            logger_dev.error("", e);
-                        }
-                    }
+                    createTaskClassServer(job);
 
                     break;
                 case FINISHED:
@@ -2218,15 +2233,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
                     // create appender for this job if required
                     createFileAppender(job, true);
                     // restart classserver if needed
-                    if (job.getEnvironment().getJobClasspath() != null) {
-                        try {
-                            SchedulerCore.addTaskClassServer(job.getId(), job.getEnvironment()
-                                    .getJobClasspathContent(), job.getEnvironment().containsJarFile());
-                        } catch (SchedulerException e) {
-                            // TODO cdelbe : exception handling ?
-                            logger_dev.error("", e);
-                        }
-                    }
+                    createTaskClassServer(job);
             }
             //unload job environment once handled
             DatabaseManager.getInstance().unload(job.getEnvironment());
