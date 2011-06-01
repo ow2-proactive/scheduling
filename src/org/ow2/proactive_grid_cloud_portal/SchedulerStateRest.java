@@ -495,11 +495,13 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         ;
 
         if (ss.getJobOutputAppender() == null) {
-            jo = JobsOutputController
-                    .getInstance()
-                    .createJobOutput(SchedulerSessionMapper.getInstance().getSchedulerSession(sessionId),
-                            jobId).getJobOutput();
+           jo =  JobsOutputController.getInstance().createJobOutput(ss, jobId).getJobOutput();
         } else {
+            if (! jobId.equalsIgnoreCase(ss.getJobOutputAppender().getJobId())) {
+                ss.getJobOutputAppender().terminate();
+                ss.setJobOutputAppender(null);
+                JobsOutputController.getInstance().createJobOutput(ss, jobId);
+            }
             jo = ss.getJobOutputAppender().getJobOutput();
         }
 
@@ -558,9 +560,11 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             PermissionException, LogForwardingException, IOException {
         Scheduler s = checkAccess(sessionId, "delete /scheduler/jobs/livelog" + jobId);
         SchedulerSession ss = SchedulerSessionMapper.getInstance().getSchedulerSession(sessionId);
-
-        ss.getJobOutputAppender().terminate();
-
+        
+        if ( ss.getJobOutputAppender() != null) {
+            ss.getJobOutputAppender().terminate();
+            ss.setJobOutputAppender(null);
+        }
         return true;
 
     }

@@ -70,19 +70,19 @@ public class JobOutputAppender extends AppenderSkeleton {
      * @throws UnknownJobException 
      * @throws NotConnectedException 
      */
-    public JobOutputAppender(SchedulerSession ss, AppenderProvider ap, JobOutput jobOutput) throws NotConnectedException, UnknownJobException, PermissionException {
+    public JobOutputAppender(SchedulerSession ss, String jobId, AppenderProvider ap, JobOutput jobOutput) throws NotConnectedException, UnknownJobException, PermissionException {
         this.name = "Appender for job output";
         this.ss = ss;
         this.jobOutput = jobOutput;
-        this.jobId =  ss.getSessionId();
+        this.jobId =  jobId;
         
         this.setLayout(Log4JTaskLogs.getTaskLogLayout());
-        Logger log = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX + ss.getSessionId());
+        Logger log = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX + this.jobId);
         log.setAdditivity(false);
         log.setLevel(Level.ALL);
         log.addAppender(this);
         ss.setJobOutputAppender(this);
-        ss.getScheduler().listenJobLogs(ss.getSessionId(), ap);
+        ss.getScheduler().listenJobLogs(jobId, ap);
         
     }
 
@@ -133,5 +133,9 @@ public class JobOutputAppender extends AppenderSkeleton {
     @Override
     public boolean requiresLayout() {
         return false;
+    }
+
+    public String getJobId() {
+        return jobId;
     }
 }

@@ -40,21 +40,15 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.CircularArrayList;
-import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.exception.PermissionException;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
 import org.ow2.proactive.scheduler.common.job.JobId;
-import org.ow2.proactive.scheduler.common.task.Log4JTaskLogs;
 import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingException;
 import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingService;
-import org.ow2.proactive.scheduler.common.util.logforwarder.providers.SocketBasedForwardingProvider;
 
 
 /**
@@ -122,14 +116,14 @@ public class JobsOutputController {
      * @return the output of the specified job, or null
      * @see JobsOutputController#createJobOutput(JobId)
      */
-    public JobOutput getJobOutput(String sessionId, String jobId) {
+  /*  public JobOutput getJobOutput(String sessionId, String jobId) {
         JobOutputAppender joa = appenders.get(generateAppendersKey(sessionId, jobId));
         if (joa == null) {
             return null;
         } else {
             return joa.getJobOutput();
         }
-    }
+    }*/
 
     /**
      * Create an output for a job identified by the given jobId
@@ -150,6 +144,7 @@ public class JobsOutputController {
         
         
         return new JobOutputAppender(ss,
+                jobId,
                 lfs.getAppenderProvider(),
                 new JobOutput(PREFIX_JOB_OUTPUT_TITLE + jobId, new CircularArrayList<String>(50)));
         
