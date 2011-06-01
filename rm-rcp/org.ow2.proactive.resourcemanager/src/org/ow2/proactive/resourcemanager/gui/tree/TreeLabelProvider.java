@@ -55,7 +55,12 @@ public class TreeLabelProvider extends ColumnLabelProvider {
     public Image getImage(Object obj) {
         switch (((TreeLeafElement) obj).getType()) {
             case HOST:
-                return Activator.getDefault().getImageRegistry().get(Internal.IMG_HOST);
+                if (((TreeLeafElement) obj).getParent().getName().toLowerCase().startsWith(
+                        Internal.VIRT_PREFIX)) {
+                    return Activator.getDefault().getImageRegistry().get(Internal.IMG_HOST_VIRT);
+                } else {
+                    return Activator.getDefault().getImageRegistry().get(Internal.IMG_HOST);
+                }
             case NODE:
                 return Internal.getImageByNodeState(((Node) obj).getState());
             case PENDING_NODE:

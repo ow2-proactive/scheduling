@@ -60,7 +60,13 @@ public class HostView extends View {
             label = new Label(ResourcesCompactView.getCompactViewer().getComposite(), SWT.SHADOW_NONE);
             label.setBackground(ResourcesCompactView.getCompactViewer().getComposite().getBackground());
 
-            label.setImage(Activator.getDefault().getImageRegistry().get(Internal.IMG_HOST));
+            // check is any node
+            String nsName = element.getParent().getName();
+            if (nsName.toLowerCase().startsWith(Internal.VIRT_PREFIX)) {
+                label.setImage(Activator.getDefault().getImageRegistry().get(Internal.IMG_HOST_VIRT));
+            } else {
+                label.setImage(Activator.getDefault().getImageRegistry().get(Internal.IMG_HOST));
+            }
             label.setToolTipText(toString());
             label.addMouseListener(new LabelMouseListener(this));
         }

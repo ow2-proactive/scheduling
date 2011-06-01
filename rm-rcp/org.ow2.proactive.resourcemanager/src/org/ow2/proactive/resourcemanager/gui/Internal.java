@@ -62,6 +62,7 @@ public final class Internal {
      * Each icon image is represented by a unique ID that can be used to find the corresponding 
      * image from the registry.
      */
+
     public static final String IMG_ADDNODE = "add_node.png";
     public static final String IMG_BUSY = "busy.png";
     public static final String IMG_COLLAPSEALL = "collapseall.gif";
@@ -72,6 +73,7 @@ public final class Internal {
     public static final String IMG_EXPANDALL = "expandall.gif";
     public static final String IMG_FREE = "free.png";
     public static final String IMG_HOST = "host.gif";
+    public static final String IMG_HOST_VIRT = "host_virt.gif";
     public static final String IMG_DEPLOYING = "deploying.png";
     public static final String IMG_LOCKED = "locked.png";
     public static final String IMG_LOST = "lost.png";
@@ -82,6 +84,7 @@ public final class Internal {
     public static final String IMG_TORELEASE = "to_release.png";
     public static final String IMG_CONFIGURING = "configuring.png";
     public static final String IMG_EXIT = "exit.png";
+    public static final String VIRT_PREFIX = "virt-";
 
     /**
      * Given a node state returns the corresponding image taken from the registry of this plugin.
