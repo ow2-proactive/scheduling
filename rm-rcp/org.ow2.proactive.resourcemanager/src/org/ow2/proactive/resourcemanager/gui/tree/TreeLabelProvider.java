@@ -79,8 +79,6 @@ public class TreeLabelProvider extends ColumnLabelProvider {
                 return Internal.getImageByNodeState(((DeployingNode) obj).getState());
             case SOURCE:
                 return Activator.getDefault().getImageRegistry().get(Internal.IMG_SOURCE);
-            case VIRTUAL_MACHINE:
-                return PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJ_ELEMENT);
         }
         return null;
     }

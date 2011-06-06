@@ -36,9 +36,14 @@
  */
 package org.ow2.proactive.resourcemanager.gui.tree;
 
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
+import org.ow2.proactive.resourcemanager.gui.data.model.TreeElementType;
 import org.ow2.proactive.resourcemanager.gui.data.model.TreeLeafElement;
 import org.ow2.proactive.resourcemanager.gui.data.model.TreeParentElement;
 
@@ -54,7 +59,11 @@ public class TreeContentProvider implements IStructuredContentProvider, ITreeCon
      */
     public Object getParent(Object child) {
         if (child instanceof TreeLeafElement) {
-            return ((TreeLeafElement) child).getParent();
+            TreeLeafElement treeElement = (TreeLeafElement) child;
+            if (treeElement.getType() == TreeElementType.NODE) {
+                treeElement = treeElement.getParent();
+            }
+            return treeElement.getParent();
         }
         return null;
     }
@@ -64,7 +73,21 @@ public class TreeContentProvider implements IStructuredContentProvider, ITreeCon
      */
     public Object[] getChildren(Object parent) {
         if (parent instanceof TreeParentElement) {
-            return ((TreeParentElement) parent).getChildren();
+            TreeParentElement treeElement = (TreeParentElement) parent;
+            TreeLeafElement[] children = treeElement.getChildren();
+
+            if (treeElement.getType() == TreeElementType.HOST) {
+                List<TreeLeafElement> nodes = new LinkedList<TreeLeafElement>();
+                for (TreeLeafElement elem : children) {
+                    nodes.addAll(Arrays.asList(((TreeParentElement) elem).getChildren()));
+                }
+                return nodes.toArray();
+            }
+
+            if (treeElement.getType() == TreeElementType.VIRTUAL_MACHINE) {
+                return ((TreeParentElement) treeElement).getChildren();
+            }
+            return children;
         }
         return new Object[0];
     }
