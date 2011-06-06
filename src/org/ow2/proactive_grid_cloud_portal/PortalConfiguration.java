@@ -53,7 +53,7 @@ public class PortalConfiguration {
     public static String scheduler_logforwardingservice_provider = "scheduler.logforwardingservice.provider";
     public static String rm_url = "rm.url";
     public static String REST_API_VERSION = "0.80-3.0.x";
-    
+
     private static Properties properties;
     public static String lease_renew_rate = "lease.renew.rate";
 
@@ -65,4 +65,14 @@ public class PortalConfiguration {
     public static Properties getProperties() {
         return properties;
     }
+
+    /**
+     * convert a job id to the location where the archive has been stored
+     * @param jobId the job id
+     * @return a string representing the path to the archive file
+     */
+    public static String jobIdToPath(String jobId) {
+        return System.getProperty("java.io.tmpdir") + File.separator + "job_" + jobId + ".zip";
+    }
+
 }

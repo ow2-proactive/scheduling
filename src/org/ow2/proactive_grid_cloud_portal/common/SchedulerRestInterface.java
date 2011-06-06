@@ -284,6 +284,30 @@ public interface SchedulerRestInterface {
             PermissionException;
 
     /**
+     * Returns a map corresponding of a jobid
+     * @param sessionId a valid session id
+     * @param jobId the job id
+     * @return a map corresponding of a <code>jobId</code>
+     * @throws IOException when the job archive is not found 
+     */
+    @GET
+    @Path("jobs/{jobid}/map")
+    @Produces("application/xml")
+    public String getJobMap(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId) throws IOException;
+
+    /**
+     * Returns an image corresponding of a jobid
+     * @param sessionId a valid session id
+     * @param jobId the job id
+     * @return a map corresponding of a <code>jobId</code>
+     * @throws IOException when it is not possible to access to the archive
+     */
+    @GET
+    @Path("jobs/{jobid}/image")
+    @Produces("application/json")
+    public String getJobImage(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId) throws IOException;
+
+    /**
      * Returns a list of taskState 
      * @param sessionId a valid session id
      * @param jobId the job id

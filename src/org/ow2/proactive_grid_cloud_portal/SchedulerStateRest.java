@@ -36,10 +36,15 @@
  */
 package org.ow2.proactive_grid_cloud_portal;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.Serializable;
 import java.security.KeyException;
@@ -52,6 +57,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 import javax.security.auth.login.LoginException;
 import javax.ws.rs.Consumes;
@@ -495,9 +502,9 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         ;
 
         if (ss.getJobOutputAppender() == null) {
-           jo =  JobsOutputController.getInstance().createJobOutput(ss, jobId).getJobOutput();
+            jo = JobsOutputController.getInstance().createJobOutput(ss, jobId).getJobOutput();
         } else {
-            if (! jobId.equalsIgnoreCase(ss.getJobOutputAppender().getJobId())) {
+            if (!jobId.equalsIgnoreCase(ss.getJobOutputAppender().getJobId())) {
                 ss.getJobOutputAppender().terminate();
                 ss.setJobOutputAppender(null);
                 JobsOutputController.getInstance().createJobOutput(ss, jobId);
@@ -560,8 +567,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             PermissionException, LogForwardingException, IOException {
         Scheduler s = checkAccess(sessionId, "delete /scheduler/jobs/livelog" + jobId);
         SchedulerSession ss = SchedulerSessionMapper.getInstance().getSchedulerSession(sessionId);
-        
-        if ( ss.getJobOutputAppender() != null) {
+
+        if (ss.getJobOutputAppender() != null) {
             ss.getJobOutputAppender().terminate();
             ss.setJobOutputAppender(null);
         }
@@ -688,6 +695,66 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
         return tasksName;
 
+    }
+
+    /** 
+     * Returns a base64 encoded png image corresponding to the jobid
+     * @param sessionId a valid session id
+     * @param jobId the job id
+     * @return Returns a base64 encoded png image corresponding to the jobid
+     * @throws IOException when it is not possible to access to the archive
+     */
+    @GET
+    @Path("jobs/{jobid}/image")
+    @Produces("application/json")
+    public String getJobImage(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId)
+            throws IOException {
+
+        String image = "";
+        InputStream ips = null;
+        String enc = null;
+        ZipFile jobArchive = new ZipFile(PortalConfiguration.jobIdToPath(jobId));
+        ZipEntry imageEntry = jobArchive.getEntry("JOB-INF/image.png");
+        ips = new BufferedInputStream(jobArchive.getInputStream(imageEntry));
+        int octet;
+        while ((octet = ips.read()) != -1) {
+            image += (char) octet;
+        }
+        ips.close();
+
+        // Encode in Base64 
+        enc = new String(org.apache.commons.codec.binary.Base64.encodeBase64(image.getBytes()));
+
+        return enc;
+    }
+
+    /**
+     * @throws IOException when the job archive is not found 
+     * Returns the map of the corresponding job id.
+     * @param sessionId a valid session id
+     * @param jobId the job id
+     * @return the map corresponding to the <code>jobId</code> 
+     */
+    @GET
+    @Path("jobs/{jobid}/map")
+    @Produces("application/xml")
+    public String getJobMap(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId)
+            throws IOException {
+        String map = "";
+        InputStream ips;
+
+        ZipFile jobArchive = new ZipFile(PortalConfiguration.jobIdToPath(jobId));
+        ZipEntry imageEntry = jobArchive.getEntry("JOB-INF/map.xml");
+        ips = new BufferedInputStream(jobArchive.getInputStream(imageEntry));
+        InputStreamReader ipsr = new InputStreamReader(ips);
+        BufferedReader br = new BufferedReader(ipsr);
+        String ligne;
+        while ((ligne = br.readLine()) != null) {
+            map += ligne + "\n";
+        }
+        br.close();
+
+        return map;
     }
 
     /**
@@ -1050,14 +1117,24 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             }
 
             Job j = null;
+            boolean isAnArchive = false;
             if (MediaType.APPLICATION_XML.equalsIgnoreCase(part1.getMediaType().toString())) {
                 // the job sent is the xml file
                 j = JobFactory.getFactory().createJob(tmp.getAbsolutePath());
             } else {
                 // it is a job archive
                 j = JobFactory.getFactory().createJobFromArchive(tmp.getAbsolutePath());
+                isAnArchive = true;
             }
-            return s.submit(j);
+            JobId jobid = s.submit(j);
+
+            if (isAnArchive) {
+                File archiveToStore = new File(PortalConfiguration.jobIdToPath(jobid.value()));
+                System.out.println("saving archive to " + archiveToStore.getAbsolutePath());
+                tmp.renameTo(archiveToStore);
+            }
+
+            return jobid;
         } finally {
             if (tmp != null) {
                 // clean the temporary file
