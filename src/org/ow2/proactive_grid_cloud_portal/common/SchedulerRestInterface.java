@@ -143,15 +143,14 @@ public interface SchedulerRestInterface {
     @GET
     @Path("revisionjobsinfo")
     @Produces({ "application/json", "application/xml" })
-	public abstract Map<AtomicLong, List<UserJobInfo>> revisionAndjobsinfo(
-			@HeaderParam("sessionid") String sessionId,
-			@QueryParam("index") @DefaultValue("-1") int index,
-			@QueryParam("range") @DefaultValue("-1") int range,
-			@QueryParam("myjobs") @DefaultValue("false") boolean myJobs,
-			@QueryParam("pending") @DefaultValue("true") boolean pending,
-			@QueryParam("running") @DefaultValue("true") boolean running,
-			@QueryParam("finished") @DefaultValue("true") boolean finished)
-			throws PermissionException, NotConnectedException;
+    public abstract Map<AtomicLong, List<UserJobInfo>> revisionAndjobsinfo(
+            @HeaderParam("sessionid") String sessionId, @QueryParam("index") @DefaultValue("-1") int index,
+            @QueryParam("range") @DefaultValue("-1") int range,
+            @QueryParam("myjobs") @DefaultValue("false") boolean myJobs,
+            @QueryParam("pending") @DefaultValue("true") boolean pending,
+            @QueryParam("running") @DefaultValue("true") boolean running,
+            @QueryParam("finished") @DefaultValue("true") boolean finished) throws PermissionException,
+            NotConnectedException;
 
     /**
      * Returns the state of the scheduler
@@ -647,20 +646,20 @@ public interface SchedulerRestInterface {
             throws ActiveObjectCreationException, NodeException, KeyException, LoginException,
             SchedulerException, IOException;
 
-	/**
-	 * Users currently connected to the scheduler
-	 * 
-	 * @param sessionId the session id associated to this new connection
-	 * @return list of users
-	 * @throws NotConnectedException
-	 * @throws PermissionException
-	 */
-	@GET
-	@Path("users")
-	@Produces("application/json")
-	public List<UserIdentification> getUsers(@HeaderParam("sessionid") final String sessionId)
-			throws NotConnectedException, PermissionException;
-    
+    /**
+     * Users currently connected to the scheduler
+     * 
+     * @param sessionId the session id associated to this new connection
+     * @return list of users
+     * @throws NotConnectedException
+     * @throws PermissionException
+     */
+    @GET
+    @Path("users")
+    @Produces("application/json")
+    public List<UserIdentification> getUsers(@HeaderParam("sessionid") final String sessionId)
+            throws NotConnectedException, PermissionException;
+
     /**
      * returns statistics about the scheduler
      * @param sessionId the session id associated to this new connection
@@ -696,7 +695,7 @@ public interface SchedulerRestInterface {
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Path("createcredential")
     @Produces("*/*")
-    public byte[] getCreateCredential(@MultipartForm LoginForm multipart) throws ConnectionException, LoginException, InternalSchedulerException;
-    
-    
+    public byte[] getCreateCredential(@MultipartForm LoginForm multipart) throws ConnectionException,
+            LoginException, InternalSchedulerException;
+
 }
