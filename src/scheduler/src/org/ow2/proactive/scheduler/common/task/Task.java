@@ -189,6 +189,10 @@ public abstract class Task extends CommonAttribute {
     @Column(name = "PRECIOUS_RESULT")
     protected boolean preciousResult;
 
+    /** If true, the stdout/err of this tasks are stored in a file in LOCALSPACE */
+    @Column(name = "PRECIOUS_LOGS")
+    protected boolean preciousLogs;
+
     @Column(name = "RUN_AS_ME")
     protected boolean runAsMe;
 
@@ -287,6 +291,24 @@ public abstract class Task extends CommonAttribute {
      */
     public void setPreciousResult(boolean preciousResult) {
         this.preciousResult = preciousResult;
+    }
+
+    /**
+     * To know if the logs of this task are precious.
+     *
+     * @return true if the logs are precious, false if not.
+     */
+    public boolean isPreciousLogs() {
+        return preciousLogs;
+    }
+
+    /**
+     * Set if the logs of this task are precious.
+     *
+     * @param preciousLogs true if the logs of this task are precious, false if not.
+     */
+    public void setPreciousLogs(boolean preciousLogs) {
+        this.preciousLogs = preciousLogs;
     }
 
     /**

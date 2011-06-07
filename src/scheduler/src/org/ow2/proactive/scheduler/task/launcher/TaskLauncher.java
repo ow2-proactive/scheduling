@@ -36,6 +36,7 @@
  */
 package org.ow2.proactive.scheduler.task.launcher;
 
+import java.io.IOException;
 import java.io.PrintStream;
 import java.lang.reflect.Method;
 import java.security.KeyException;
@@ -55,6 +56,7 @@ import java.util.StringTokenizer;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.log4j.Appender;
+import org.apache.log4j.FileAppender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.MDC;
 import org.apache.log4j.helpers.LogLog;
@@ -84,7 +86,9 @@ import org.ow2.proactive.scheduler.common.task.Log4JTaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.common.task.dataspaces.FileSelector;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputSelector;
+import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
 import org.ow2.proactive.scheduler.common.task.executable.Executable;
 import org.ow2.proactive.scheduler.common.task.flow.FlowAction;
@@ -142,6 +146,13 @@ public abstract class TaskLauncher implements InitActive {
     @Deprecated
     public static final String OLD_MAX_LOG_SIZE_PROPERTY = "proactive.scheduler.logs.maxsize";
     public static final String MAX_LOG_SIZE_PROPERTY = "pas.launcher.logs.maxsize";
+
+    // default log size, counted in number of log events
+    // 125 based on JL's statistics :)
+    public static final int DEFAULT_LOG_MAX_SIZE = 125;
+
+    // the prefix for log file produced in localspace
+    public static final String LOG_FILE_PREFIX = "TaskLogs";
 
     protected DataSpacesFileObject SCRATCH = null;
     protected DataSpacesFileObject INPUT = null;
@@ -204,6 +215,8 @@ public abstract class TaskLauncher implements InitActive {
 
     // default appender for log storage
     protected transient AsyncAppenderWithStorage logAppender;
+    // if true, store logs in a file in LOCALSPACE
+    protected boolean storeLogs;
 
     // not null if an executable is currently executed
     protected Executable currentExecutable;
@@ -254,6 +267,7 @@ public abstract class TaskLauncher implements InitActive {
         this.namingServiceUrl = initializer.getNamingServiceUrl();
         this.replicationIndex = initializer.getReplicationIndex();
         this.iterationIndex = initializer.getIterationIndex();
+        this.storeLogs = initializer.isPreciousLogs();
     }
 
     /**
@@ -365,18 +379,17 @@ public abstract class TaskLauncher implements InitActive {
             logMaxSizeProp = System.getProperty(TaskLauncher.OLD_MAX_LOG_SIZE_PROPERTY);
         }
         if (logMaxSizeProp == null || "".equals(logMaxSizeProp.trim())) {
-            this.logAppender = new AsyncAppenderWithStorage();
+            this.logAppender = new AsyncAppenderWithStorage(TaskLauncher.DEFAULT_LOG_MAX_SIZE);
         } else {
             try {
                 int logMaxSize = Integer.parseInt(logMaxSizeProp);
                 this.logAppender = new AsyncAppenderWithStorage(logMaxSize);
                 logger_dev.info("Logs are limited to " + logMaxSize + " lines for task " + this.taskId);
             } catch (NumberFormatException e) {
-                logger_dev
-                        .warn(MAX_LOG_SIZE_PROPERTY +
-                            " property is not correctly defined. Logs size is not bounded for task " +
-                            this.taskId, e);
-                this.logAppender = new AsyncAppenderWithStorage();
+                logger_dev.warn(MAX_LOG_SIZE_PROPERTY +
+                    " property is not correctly defined. Logs size is bounded to default value " +
+                    TaskLauncher.DEFAULT_LOG_MAX_SIZE + " for task " + this.taskId, e);
+                this.logAppender = new AsyncAppenderWithStorage(TaskLauncher.DEFAULT_LOG_MAX_SIZE);
             }
         }
         l.addAppender(this.logAppender);
@@ -385,6 +398,20 @@ public abstract class TaskLauncher implements InitActive {
         this.redirectedStderr = new PrintStream(new LoggingOutputStream(l, Log4JTaskLogs.STDERR_LEVEL), true);
         System.setOut(redirectedStdout);
         System.setErr(redirectedStderr);
+    }
+
+    /**
+     * Create log file in $LOCALSPACE.
+     * @throws IOException if the file cannot be created.
+     */
+    private void initLocalLogsFile() throws IOException {
+        DataSpacesFileObject outlog = SCRATCH.resolveFile(TaskLauncher.LOG_FILE_PREFIX + "-" +
+            this.taskId.getJobId() + "-" + this.taskId.getReadableName() + ".log");
+        outlog.createFile();
+        // fileAppender constructor needs a path and not a URI.
+        FileAppender fap = new FileAppender(Log4JTaskLogs.getTaskLogLayout(), outlog.getRealURI().substring(
+                "file://".length()), false);
+        this.logAppender.addAppender(fap);
     }
 
     /**
@@ -748,6 +775,12 @@ public abstract class TaskLauncher implements InitActive {
                     logger_dev_dataspace.warn("GLOBALSPACE is disabled");
                     logger_dev_dataspace.debug("", t);
                 }
+                // create a log file in local space if the node is configured
+                if (this.storeLogs) {
+                    logger_dev.info("logfile is enabled for task " + taskId);
+                    initLocalLogsFile();
+                }
+
             } catch (Throwable t) {
                 logger_dev_dataspace.warn(
                         "There was a problem while initializing dataSpaces, they won't be activated", t);
@@ -894,6 +927,18 @@ public abstract class TaskLauncher implements InitActive {
 
     protected void copyScratchDataToOutput() throws FileSystemException {
         if (isDataspaceAware()) {
+
+            // if logs are precisous, they are treated like output files
+            if (this.storeLogs) {
+                // add log files as output
+                OutputSelector logFiles = new OutputSelector(new FileSelector(TaskLauncher.LOG_FILE_PREFIX +
+                    "*"), OutputAccessMode.TransferToOutputSpace);
+                if (this.outputFiles == null) {
+                    this.outputFiles = new ArrayList<OutputSelector>();
+                }
+                this.outputFiles.add(logFiles);
+            }
+
             if (outputFiles == null) {
                 logger_dev_dataspace.debug("Output selector is empty, no file to copy");
                 return;
@@ -906,6 +951,7 @@ public abstract class TaskLauncher implements InitActive {
 
             ArrayList<DataSpacesFileObject> results = new ArrayList<DataSpacesFileObject>();
             FileSystemException toBeThrown = null;
+
             for (OutputSelector os : outputFiles) {
                 //fill fast file selector
                 FastFileSelector fast = new FastFileSelector();

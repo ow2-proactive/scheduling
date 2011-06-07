@@ -530,8 +530,7 @@ final class SchedulingMethodImpl implements SchedulingMethod {
                 }
 
                 // activate loggers for this task if needed
-                if (core.jobsToBeLogged.containsKey(job.getId()) ||
-                    core.jobsToBeLoggedinAFile.containsKey(job.getId())) {
+                if (core.jobsToBeLogged.containsKey(job.getId())) {
                     launcher.activateLogs(core.lfs.getAppenderProvider());
                 }
 

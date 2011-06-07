@@ -64,14 +64,6 @@
 					</listitem>
 					<listitem>
 						<para>
-							<emphasis>logFile</emphasis> (optional) - path of a log file.
-							Set it if you want to save the job generated logs (STDOUT and STDERR) in a file.
-							<emphasis>As this file is created and filled by the scheduler server, the path must be
-							also reachable from the scheduler server (not only from the client).</emphasis>
-						</para>
-					</listitem>
-					<listitem>
-						<para>
 							<emphasis>variables</emphasis> (optional) - variables which can be reused throughout the descriptor file.
 							Inside this tag, each variable can be reused (even in another following variable definition)
 							by using the syntax ${name_of_variable}.
@@ -748,6 +740,17 @@ task2.setGenerationScript(gscript);
 							For example, in a job result, you could have to retrieve only some task results that are
 							important for you. By setting the precious result option to 'true', you will be able
 							to retrieve them easily.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							<emphasis>preciousLogs</emphasis> (optional - false by default) -
+							defines whether the logs (ouput/errput) of a task is important and have to be stored in a file.
+							<emphasis>Dataspaces must be properly configured to use this option !</emphasis>
+							If this option is set to true, the logs produced by the task are stored in a file in the localspace
+							during execution. This file is automatically transfered in outputspace, as if it is specified in outputFiles.
+							(see <xref linkend="Dataspace"/> for more details).
+							The naming convention is the following : <code>TaskLogs-[jobid]-[taskname].log</code>
 						</para>
 					</listitem>
 					<listitem>

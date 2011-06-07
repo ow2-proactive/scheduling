@@ -329,10 +329,10 @@ public class SchedulerModel extends ConsoleModel {
         return "";
     }
 
-    public String submitCmd_(String commandFilePath, String jobName, String output, String selectscript) {
+    public String submitCmd_(String commandFilePath, String jobName, String selectscript) {
         try {
             Job job = FlatJobFactory.getFactory().createNativeJobFromCommandsFile(commandFilePath, jobName,
-                    selectscript, output, selectscript);
+                    selectscript, selectscript);
             JobId id = scheduler.submit(job);
             print("Job '" + commandFilePath + "' successfully submitted ! (id=" + id.value() + ")");
             return id.value();

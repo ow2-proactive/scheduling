@@ -60,17 +60,14 @@ function submitArchive(archive,xmlFile){
     return s_.submitArchive_(""+archive);
 }
 
-function submitCmd(commandFilePath, jobName, output, selectscript) {
+function submitCmd(commandFilePath, jobName, selectscript) {
 	if (jobName == undefined){
 		jobName = null;
-	}
-	if (output == undefined){
-		output = null;
 	}
 	if (selectscript == undefined){
 		selectscript = null;
 	}
-	return s_.submitCmd_(commandFilePath, jobName, output, selectscript);
+	return s_.submitCmd_(commandFilePath, jobName, selectscript);
 }
 
 function pausejob(jobId){

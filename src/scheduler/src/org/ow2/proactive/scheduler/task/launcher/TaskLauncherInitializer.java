@@ -83,6 +83,7 @@ public class TaskLauncherInitializer implements Serializable {
     private List<OutputSelector> taskOutputFiles = null;
     private String namingServiceUrl;
     private String owner;
+    private boolean preciousLogs;
 
     /**
      * Get the taskId
@@ -326,5 +327,19 @@ public class TaskLauncherInitializer implements Serializable {
      */
     public int getReplicationIndex() {
         return this.replicationIndex;
+    }
+
+    /**
+     * @return the preciousLogs
+     */
+    public boolean isPreciousLogs() {
+        return preciousLogs;
+    }
+
+    /**
+     * @param preciousLogs the preciousLogs to set
+     */
+    public void setPreciousLogs(boolean preciousLogs) {
+        this.preciousLogs = preciousLogs;
     }
 }

@@ -132,16 +132,13 @@ public class FlatJobFactory {
      * @throws JobCreationException with a relevant error message if an error occurs.
      */
     public Job createNativeJobFromCommandsFile(String commandFilePath, String jobName,
-            String selectionScriptPath, String outputFile, String userName) throws JobCreationException {
+            String selectionScriptPath, String userName) throws JobCreationException {
 
         if (jobName == null) {
             jobName = JOB_DEFAULT_NAME_PREFIX + userName;
         }
         Job nativeJob = new TaskFlowJob();
         nativeJob.setName(jobName);
-        if (outputFile != null) {
-            nativeJob.setLogFile(outputFile);
-        }
 
         logger.debug("Job : " + nativeJob.getName());
 
@@ -196,14 +193,13 @@ public class FlatJobFactory {
      * {link FlatJobFactory#JOB_DEFAULT_NAME_PREFIX} + userName parameter.
      * @param selectionScriptPath A Path to a file containing a selection script, or null if
      * no script is needed.
-     * @param outputFile a path to file that will contain log of STDOUT and STDERR of the task's execution
      * @param userName name of connected user that asked job creation, null otherwise. This parameter
      * is just used for default job's name creation.
      * @return a job object representing created job and ready-to-schedule job.
      * @throws JobCreationException with a relevant error message if an error occurs.
      */
     public Job createNativeJobFromCommand(String command, String jobName, String selectionScriptPath,
-            String outputFile, String userName) throws JobCreationException {
+            String userName) throws JobCreationException {
         if (command == null || "".equalsIgnoreCase(command)) {
             throw new JobCreationException("Error, command cannot be null");
         }
@@ -213,10 +209,6 @@ public class FlatJobFactory {
         }
         Job nativeJob = new TaskFlowJob();
         nativeJob.setName(jobName);
-        if (outputFile != null) {
-            nativeJob.setLogFile(outputFile);
-        }
-
         logger.debug("Job : " + nativeJob.getName());
         try {
             NativeTask t = createNativeTaskFromCommandString(command, "task1", selectionScriptPath);

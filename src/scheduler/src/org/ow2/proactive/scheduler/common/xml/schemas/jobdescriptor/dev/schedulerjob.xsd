@@ -52,14 +52,6 @@
           <xs:documentation>Name of the project related to this job. It is also used in the policy to group some jobs together</xs:documentation>
         </xs:annotation>
       </xs:attribute>
-      <xs:attribute name="logFile">
-        <xs:annotation>
-          <xs:documentation>The path to a file where the logs of this job will be written </xs:documentation>
-        </xs:annotation>
-        <xs:simpleType>
-          <xs:union memberTypes="xs:anyURI jd:variableRefType"/>
-        </xs:simpleType>
-      </xs:attribute>
       
     </xs:complexType>
   </xs:element>
@@ -142,16 +134,6 @@
       </xs:annotation>
       <xs:simpleType>
         <xs:union memberTypes="xs:nonNegativeInteger jd:variableRefType"/>
-      </xs:simpleType>
-    </xs:attribute>
-  </xs:attributeGroup>
-  <xs:attributeGroup name="logFile">
-    <xs:attribute name="logFile" use="required">
-      <xs:annotation>
-        <xs:documentation>The path to a file where the logs of this job will be written </xs:documentation>
-      </xs:annotation>
-      <xs:simpleType>
-        <xs:union memberTypes="xs:anyURI jd:variableRefType"/>
       </xs:simpleType>
     </xs:attribute>
   </xs:attributeGroup>
@@ -306,6 +288,14 @@
               <xs:union memberTypes="xs:boolean jd:variableRefType"/>
             </xs:simpleType>
           </xs:attribute>
+          <xs:attribute name="preciousLogs">
+            <xs:annotation>
+              <xs:documentation>Do we keep the logs as file on LOCALSPACE  </xs:documentation>
+            </xs:annotation>
+            <xs:simpleType>
+              <xs:union memberTypes="xs:boolean jd:variableRefType"/>
+            </xs:simpleType>
+          </xs:attribute>
           <xs:attribute name="resultPreviewClass">
             <xs:annotation>
               <xs:documentation>A class implementing the ResultPreview interface which can be used to display the result of this task</xs:documentation>
@@ -385,6 +375,16 @@
     <xs:attribute name="preciousResult" use="required">
       <xs:annotation>
         <xs:documentation>Do we keep the result among the job results  </xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:union memberTypes="xs:boolean jd:variableRefType"/>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="preciousLogs">
+    <xs:attribute name="preciousLogs" use="required">
+      <xs:annotation>
+        <xs:documentation>Do we keep the logs as file on LOCALSPACE  </xs:documentation>
       </xs:annotation>
       <xs:simpleType>
         <xs:union memberTypes="xs:boolean jd:variableRefType"/>

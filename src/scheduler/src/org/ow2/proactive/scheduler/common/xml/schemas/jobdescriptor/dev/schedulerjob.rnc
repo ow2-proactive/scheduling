@@ -6,7 +6,7 @@ start = job
 
 
 job = ## Definition of a job for the scheduler 
-    element job { variables?, jobDescription?, jobClasspath?, jobName , priority?, cancelJobOnError_j?, restartTaskOnError_j?, numberOfExecution_j?, genericInformation?, inputSpace? ,outputSpace? ,projectName?, logFile?, attribute xsi:schemaLocation {xsd:anyURI}?, ( taskFlow ) }
+    element job { variables?, jobDescription?, jobClasspath?, jobName , priority?, cancelJobOnError_j?, restartTaskOnError_j?, numberOfExecution_j?, genericInformation?, inputSpace? ,outputSpace? ,projectName?, attribute xsi:schemaLocation {xsd:anyURI}?, ( taskFlow ) }
 
 jobName = ## Identification of this job
     attribute name { xsd:string }
@@ -26,8 +26,6 @@ restartTaskOnError_j = ## For each task, where does the task restart if an error
     attribute restartTaskOnError {restartTaskType | variableRefType}
 numberOfExecution_j = ## Maximum number of execution for each task (default=1)
     attribute maxNumberOfExecution {xsd:nonNegativeInteger | variableRefType}
-logFile = ## The path to a file where the logs of this job will be written 
-    attribute logFile {xsd:anyURI | variableRefType}
 jobClasspath = ## The classPath where to find the dependences of your job. It must contain path element
 	element jobClasspath {pathElement+}
 pathElement = ## Path element (one pathElement for each classpath entry)
@@ -50,7 +48,7 @@ taskFlow = ## A job composed of a flow of tasks with or without dependencies
 
 # +++++++++++++ task
 task = ## A task is the smallest computation unit for the scheduler 
-    element task { taskName, nodesNumber_t?, cancelJobOnError_t?, restartTaskOnError_t?, numberOfExecution_t?, runAsMe? ,walltime?, preciousResult?, resultPreviewClass?, taskDescription?, genericInformation?, depends?, inputFiles?, parallel?, selection?, pre?, executable, flow?, post?, cleaning?, outputFiles?}
+    element task { taskName, nodesNumber_t?, cancelJobOnError_t?, restartTaskOnError_t?, numberOfExecution_t?, runAsMe? ,walltime?, preciousResult?, preciousLogs?, resultPreviewClass?, taskDescription?, genericInformation?, depends?, inputFiles?, parallel?, selection?, pre?, executable, flow?, post?, cleaning?, outputFiles?}
 taskName = ## Identification of this task (identifier) 
     attribute name { xsd:ID }
 nodesNumber_t = ## number of cores needed for the task (identifier)
@@ -67,6 +65,8 @@ numberOfExecution_t = ## Maximum number of execution for this task
     attribute maxNumberOfExecution {xsd:nonNegativeInteger | variableRefType}
 preciousResult = ## Do we keep the result among the job results  
     attribute preciousResult { xsd:boolean | variableRefType}
+preciousLogs = ## Do we keep the logs as file on LOCALSPACE
+    attribute preciousLogs { xsd:boolean | variableRefType}
 resultPreviewClass = ## A class implementing the ResultPreview interface which can be used to display the result of this task
     attribute resultPreviewClass { classPattern | variableRefType}
 depends = ## A list of dependencies for this task 

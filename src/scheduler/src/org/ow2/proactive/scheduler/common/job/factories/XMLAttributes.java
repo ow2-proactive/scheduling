@@ -49,13 +49,13 @@ import java.util.Map;
 public enum XMLAttributes {
 
     //JOBS
-    JOB_PRIORITY("priority"), JOB_PROJECTNAME("projectName"), JOB_LOGFILE("logFile"),
+    JOB_PRIORITY("priority"), JOB_PROJECTNAME("projectName"),
     //COMMON
     COMMON_CANCELJOBONERROR("cancelJobOnError"), COMMON_RESTARTTASKONERROR("restartTaskOnError"), COMMON_MAXNUMBEROFEXECUTION(
             "maxNumberOfExecution"), COMMON_NAME("name"), COMMON_VALUE("value"),
     //TASKS
-    TASK_RESULTPREVIEW("resultPreviewClass"), TASK_PRECIOUSRESULT("preciousResult"), TASK_CLASSNAME("class"), TASK_WALLTIME(
-            "walltime"), TASK_RUNASME("runAsMe"),
+    TASK_RESULTPREVIEW("resultPreviewClass"), TASK_PRECIOUSRESULT("preciousResult"), TASK_PRECIOUSLOGS(
+            "preciousLogs"), TASK_CLASSNAME("class"), TASK_WALLTIME("walltime"), TASK_RUNASME("runAsMe"),
     //NATIVE TASK ATTRIBUTES
     TASK_NB_NODES("numberOfNodes"), TASK_COMMAND_VALUE("value"), TASK_WORKDING_DIR("workingDir"),
     //TOPOLOGY

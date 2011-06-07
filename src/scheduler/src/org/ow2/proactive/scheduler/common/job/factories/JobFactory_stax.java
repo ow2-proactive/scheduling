@@ -342,7 +342,6 @@ public class JobFactory_stax extends JobFactory {
             //replace variables in this attributes after job creation (after variables evaluation)
             job.setName(replace(job.getName()));
             job.setProjectName(replace(job.getProjectName()));
-            job.setLogFile(replace(job.getLogFile()));
         } catch (JobCreationException jce) {
             if (XMLTags.TASK.matches(current)) {
                 jce.pushTag(XMLTags.TASKFLOW.getXMLName());
@@ -385,9 +384,6 @@ public class JobFactory_stax extends JobFactory {
                 jtmp.setPriority(JobPriority.findPriority(replace(cursorJob.getAttributeValue(i))));
             } else if (XMLAttributes.COMMON_CANCELJOBONERROR.matches(attrName)) {
                 jtmp.setCancelJobOnError(Boolean.parseBoolean(replace(cursorJob.getAttributeValue(i))));
-            } else if (XMLAttributes.JOB_LOGFILE.matches(attrName)) {
-                //don't replace() here it is done at the end of the job
-                jtmp.setLogFile(cursorJob.getAttributeValue(i));
             } else if (XMLAttributes.COMMON_RESTARTTASKONERROR.matches(attrName)) {
                 jtmp.setRestartTaskOnError(RestartMode.getMode(replace(cursorJob.getAttributeValue(i))));
             } else if (XMLAttributes.COMMON_MAXNUMBEROFEXECUTION.matches(attrName)) {
@@ -428,7 +424,6 @@ public class JobFactory_stax extends JobFactory {
             //if this point is reached, fill the real job using the temporary one
             job.setDescription(jtmp.getDescription());
             job.setEnvironment(jtmp.getEnvironment());
-            job.setLogFile(jtmp.getLogFile());
             job.setName(jtmp.getName());
             job.setPriority(jtmp.getPriority());
             job.setProjectName(jtmp.getProjectName());
@@ -713,6 +708,8 @@ public class JobFactory_stax extends JobFactory {
                     tmpTask.setResultPreview(replace(cursorTask.getAttributeValue(i)));
                 } else if (XMLAttributes.TASK_PRECIOUSRESULT.matches(attrName)) {
                     tmpTask.setPreciousResult(Boolean.parseBoolean(replace(cursorTask.getAttributeValue(i))));
+                } else if (XMLAttributes.TASK_PRECIOUSLOGS.matches(attrName)) {
+                    tmpTask.setPreciousLogs(Boolean.parseBoolean(replace(cursorTask.getAttributeValue(i))));
                 } else if (XMLAttributes.TASK_WALLTIME.matches(attrName)) {
                     tmpTask.setWallTime(Tools.formatDate(replace(cursorTask.getAttributeValue(i))));
                 } else if (XMLAttributes.TASK_RUNASME.matches(attrName)) {
@@ -1693,7 +1690,6 @@ public class JobFactory_stax extends JobFactory {
             logger.debug("desc : " + job.getDescription());
             logger.debug("proj : " + job.getProjectName());
             logger.debug("prio : " + job.getPriority());
-            logger.debug("logf : " + job.getLogFile());
             logger.debug("cjoe : " + job.isCancelJobOnError());
             logger.debug("rtoe : " + job.getRestartTaskOnError());
             logger.debug("mnoe : " + job.getMaxNumberOfExecution());
@@ -1723,6 +1719,7 @@ public class JobFactory_stax extends JobFactory {
                         .getParallelEnvironment().getNodesNumber());
                 logger.debug("cjoe  : " + t.isCancelJobOnError());
                 logger.debug("res   : " + t.isPreciousResult());
+                logger.debug("logs  : " + t.isPreciousLogs());
                 logger.debug("rtoe  : " + t.getRestartTaskOnError());
                 logger.debug("mnoe  : " + t.getMaxNumberOfExecution());
                 logger.debug("wall  : " + t.getWallTime());

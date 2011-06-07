@@ -95,9 +95,6 @@ public abstract class JobCreator {
      * @param priority
      * @param cancelJobOnTaskError
      *            if set to true, the job will be canceled if a task fails
-     * @param logsFilePath
-     *            -the file where the logs for this job (i.e. the stdout for the
-     *            remote processes is to be stored)
      * @param jobConfiguration -
      *            an object containing the configuration for this job. This
      *            object will be passed in parameter, when the job finishes, to
@@ -111,14 +108,13 @@ public abstract class JobCreator {
      * @throws NotInitializedException
      */
     public void submitJob(String jobName, String jobDescription, JobPriority priority,
-            boolean cancelJobOnTaskError, String logsFilePath, JobConfiguration jobConfiguration)
-            throws SchedulerException, IOException, InvalidScriptException, InvalidInputDataException,
-            NotInitializedException {
+            boolean cancelJobOnTaskError, JobConfiguration jobConfiguration) throws SchedulerException,
+            IOException, InvalidScriptException, InvalidInputDataException, NotInitializedException {
         String schedulerURL = EmbarrasinglyParrallelApplication.instance().getScheduelrURL();
         String username = EmbarrasinglyParrallelApplication.instance().getUserName();
         String password = EmbarrasinglyParrallelApplication.instance().getSchedulerPassword();
         this.submitJob(jobName, jobDescription, schedulerURL, username, password, priority,
-                cancelJobOnTaskError, logsFilePath, jobConfiguration);
+                cancelJobOnTaskError, jobConfiguration);
     }
 
     /**
@@ -139,9 +135,6 @@ public abstract class JobCreator {
      * @param priority
      * @param cancelJobOnTaskError
      *            if set to true, the job will be canceled if a task fails
-     * @param logsFilePath
-     *            -the file where the logs for this job (i.e. the stdout for the
-     *            remote processes is to be stored)
      * @param jobConfiguration -
      *            an object containing the configuration for this job. This
      *            object will be passed in parameter, when the job finishes, to
@@ -155,7 +148,7 @@ public abstract class JobCreator {
      * @throws NotInitializedException
      */
     public void submitJob(String jobName, String jobDescription, String schedulerURL, String username,
-            String password, JobPriority priority, boolean cancelJobOnTaskError, String logsFilePath,
+            String password, JobPriority priority, boolean cancelJobOnTaskError,
             JobConfiguration jobConfiguration) throws SchedulerException, IOException,
             InvalidScriptException, InvalidInputDataException, NotInitializedException {
 
@@ -183,9 +176,6 @@ public abstract class JobCreator {
                 e2.printStackTrace();
             }
         }
-
-        if ((logsFilePath != null) && (!logsFilePath.trim().equals("")))
-            job.setLogFile(logsFilePath);
 
         attachGenericInformationtoJob(jobConfiguration, job);
         setJobClasPath(job);

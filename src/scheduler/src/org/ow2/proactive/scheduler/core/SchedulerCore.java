@@ -234,10 +234,6 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
 
     /** Jobs that must be logged into the corresponding appenders */
     Hashtable<JobId, AsyncAppender> jobsToBeLogged;
-    /** jobs that must be logged into a file */
-    //TODO cdelbe : file are logged on core side...
-    Hashtable<JobId, FileAppender> jobsToBeLoggedinAFile;
-    private static final String FILEAPPENDER_SUFFIX = "_FILE";
 
     /** Currently running tasks for a given jobId*/
     ConcurrentHashMap<JobId, Hashtable<TaskId, TaskLauncher>> currentlyRunningTasks;
@@ -375,10 +371,6 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
             Logger l = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX + jid);
             l.removeAllAppenders();
             this.jobsToBeLogged.remove(jid);
-            this.jobsToBeLoggedinAFile.remove(jid);
-            // remove current running tasks
-            // TODO cdelbe : When a job can be removed on failure ??
-            // Other tasks' logs should remain available...
             this.currentlyRunningTasks.remove(jid);
             removeTaskClassServer(jid);
             //auto remove
@@ -434,7 +426,6 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
             this.restartTaskTimer = new Timer("RestartTaskTimer");
             this.status = SchedulerStatus.STOPPED;
             this.jobsToBeLogged = new Hashtable<JobId, AsyncAppender>();
-            this.jobsToBeLoggedinAFile = new Hashtable<JobId, FileAppender>();
             this.currentlyRunningTasks = new ConcurrentHashMap<JobId, Hashtable<TaskId, TaskLauncher>>();
             this.previousTaskProgress = new ConcurrentHashMap<TaskId, Integer>();
             this.threadPoolForTerminateTL = Executors.newFixedThreadPool(TERMINATE_THREAD_NUMBER,
@@ -900,9 +891,6 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
 
         // create a running task table for this job
         this.currentlyRunningTasks.put(job.getId(), new Hashtable<TaskId, TaskLauncher>());
-
-        // create appender for this job if required
-        createFileAppender(job, false);
 
         //unload job environment that potentially contains classpath as byte[]
         DatabaseManager.getInstance().unload(job.getEnvironment());
@@ -1548,30 +1536,6 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
     }
 
     /**
-     * This method creates an file appender for a job if required, i.e. if logfile property is set.
-     * @param job the job to create the appender for.
-     * @param append whether to append or truncate the job's log file.
-     */
-    private void createFileAppender(InternalJob job, boolean append) {
-        if (job.getLogFile() != null) {
-            logger_dev.info("Create logger for job '" + job.getId() + "'");
-            Logger l = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX + job.getId());
-            l.setAdditivity(false);
-            if (l.getAppender(Log4JTaskLogs.JOB_APPENDER_NAME + FILEAPPENDER_SUFFIX) == null) {
-                try {
-                    FileAppender fa = new FileAppender(Log4JTaskLogs.getTaskLogLayout(), job.getLogFile(),
-                        append);
-                    fa.setName(Log4JTaskLogs.JOB_APPENDER_NAME + FILEAPPENDER_SUFFIX);
-                    l.addAppender(fa);
-                    this.jobsToBeLoggedinAFile.put(job.getId(), fa);
-                } catch (IOException e) {
-                    logger.warn("Cannot open log file " + job.getLogFile() + " : " + e.getMessage());
-                }
-            }
-        }
-    }
-
-    /**
      * Create a taskclassserver for this job if a jobclasspath is set
      */
     private void createTaskClassServer(InternalJob job) {
@@ -1701,10 +1665,6 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
             AsyncAppender jobLog = this.jobsToBeLogged.remove(jobId);
             if (jobLog != null) {
                 jobLog.close();
-            }
-            FileAppender jobFile = this.jobsToBeLoggedinAFile.remove(jobId);
-            if (jobFile != null) {
-                jobFile.close();
             }
             //remove from DataBase
             boolean rfdb = PASchedulerProperties.JOB_REMOVE_FROM_DB.getValueAsBoolean();
@@ -1879,7 +1839,6 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
         runningJobs.clear();
         finishedJobs.clear();
         jobsToBeLogged.clear();
-        jobsToBeLoggedinAFile.clear();
         currentlyRunningTasks.clear();
         logger_dev.info("Terminating logging service...");
         if (this.lfs != null) {
@@ -2178,8 +2137,6 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
                 case PENDING:
                     pendingJobs.add(job);
                     currentlyRunningTasks.put(job.getId(), new Hashtable<TaskId, TaskLauncher>());
-                    // create appender for this job if required
-                    createFileAppender(job, true);
                     // restart classserver if needed
                     createTaskClassServer(job);
                     break;
@@ -2204,8 +2161,6 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
                             job.reStartTask(task);
                         }
                     }
-                    // create appender for this job if required
-                    createFileAppender(job, true);
                     // restart classServer if needed
                     createTaskClassServer(job);
 
@@ -2230,8 +2185,6 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
                             job.update(task.getTaskInfo());
                         }
                     }
-                    // create appender for this job if required
-                    createFileAppender(job, true);
                     // restart classserver if needed
                     createTaskClassServer(job);
             }

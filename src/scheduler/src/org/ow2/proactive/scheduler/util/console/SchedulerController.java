@@ -350,13 +350,6 @@ public class SchedulerController {
         opt.setRequired(false);
         options.addOption(opt);
 
-        opt = new Option("o", "output", true, control +
-            "Used with submit action, specify a log file path to store job output");
-        opt.setArgName("logFile");
-        opt.setRequired(false);
-        opt.setArgs(1);
-        options.addOption(opt);
-
         opt = new Option("ss", "selectscript", true, control +
             "Used with -cmd or -cmdf, specify a selection script");
         opt.setArgName("selectScript");
@@ -675,13 +668,9 @@ public class SchedulerController {
         try {
             Job job;
             String jobGivenName = null;
-            String jobGivenOutput = null;
             String givenSelScript = null;
             if (cmd.hasOption("jobname")) {
                 jobGivenName = cmd.getOptionValue("jobname");
-            }
-            if (cmd.hasOption("output")) {
-                jobGivenOutput = cmd.getOptionValue("output");
             }
             if (cmd.hasOption("selectscript")) {
                 givenSelScript = cmd.getOptionValue("selectscript");
@@ -697,11 +686,11 @@ public class SchedulerController {
                 }
                 jobCommand = jobCommand.trim();
                 job = FlatJobFactory.getFactory().createNativeJobFromCommand(jobCommand, jobGivenName,
-                        givenSelScript, jobGivenOutput, user);
+                        givenSelScript, user);
             } else {
                 String commandFilePath = cmd.getOptionValue("submit");
                 job = FlatJobFactory.getFactory().createNativeJobFromCommandsFile(commandFilePath,
-                        jobGivenName, givenSelScript, jobGivenOutput, user);
+                        jobGivenName, givenSelScript, user);
             }
             JobId id = model.getScheduler().submit(job);
             model.print("Job successfully submitted ! (id=" + id.value() + ")");

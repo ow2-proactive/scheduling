@@ -572,15 +572,6 @@ public class HelloTask extends JavaExecutable{
 		but the two other levels (high and highest) can only be setted by the administrator of the scheduler.
 				</para>
 			</listitem>
-			<listitem>
-				<para>
-				<emphasis>logFile</emphasis> - path of the log file.
-				</para>
-				<para>
-				Standard and error outputs of all launched native programs are written in this file.
-				You can notice the use of the ${EXE_PATH} variable. That will be explained later.
-				</para>
-			</listitem>
 		</itemizedlist>
 		</para>
 		<para>

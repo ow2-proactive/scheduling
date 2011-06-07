@@ -1221,6 +1221,7 @@ public abstract class InternalTask extends TaskState {
         if (isWallTimeSet()) {
             tli.setWalltime(wallTime);
         }
+        tli.setPreciousLogs(isPreciousLogs());
         return tli;
     }
 

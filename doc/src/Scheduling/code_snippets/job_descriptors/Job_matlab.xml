@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <job xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="urn:proactive:jobdescriptor:dev http://www.activeeon.com/public_content/schemas/proactive/jobdescriptor/dev/schedulerjob.xsd"
-    xmlns="urn:proactive:jobdescriptor:dev" id="Matlab_job" priority="normal" logFile="matlab_job.log" >
+    xmlns="urn:proactive:jobdescriptor:dev" id="Matlab_job" priority="normal">
     <description>A simple Matlab taskflow, which computes the sum of a randomly-generated array</description>
     <!-- @snippet-start SCHEDULER_MATLAB_JOB_MATLAB_VARIABLE -->
     <variables>

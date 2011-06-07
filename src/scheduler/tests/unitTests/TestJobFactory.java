@@ -91,7 +91,6 @@ public class TestJobFactory {
         Assert.assertEquals(tfJob.getRestartTaskOnError(), RestartMode.ELSEWHERE);
         Assert.assertEquals(tfJob.getType(), JobType.TASKSFLOW);
         Assert.assertEquals(tfJob.getTasks().size(), 4);
-        Assert.assertEquals(tfJob.getLogFile(), URLbegin + ".logs/" + System.getProperty("jobName") + ".log");
         Assert.assertEquals("input/space", tfJob.getInputSpace());
         Assert.assertEquals("output/space", tfJob.getOutputSpace());
         //Check task 1 properties
@@ -324,7 +323,6 @@ public class TestJobFactory {
         Assert.assertEquals(mnJob.getDescription(), "No description");
         Assert.assertEquals(mnJob.getName(), "job_multiNodes");
         Assert.assertEquals(mnJob.getPriority(), JobPriority.LOW);
-        Assert.assertEquals(mnJob.getLogFile(), "one/file/to/log");
         Assert.assertNotSame(mnJob.getEnvironment().getJobClasspath()[0], "one/two/");
         Assert.assertTrue(mnJob.getEnvironment().getJobClasspath()[0].endsWith("one/two/"));
         Assert.assertNotSame(mnJob.getEnvironment().getJobClasspath()[1], "three");

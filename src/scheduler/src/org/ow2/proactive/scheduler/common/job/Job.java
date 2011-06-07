@@ -86,10 +86,6 @@ public abstract class Job extends CommonAttribute {
     @OneToOne(fetch = FetchType.EAGER, targetEntity = JobEnvironment.class)
     protected JobEnvironment environment = new JobEnvironment();
 
-    /** logs are written in logFile if not null */
-    @Column(name = "LOG_FILE")
-    protected String logFile = null;
-
     /** Short description of this job */
     @Column(name = "DESCRIPTION", length = Integer.MAX_VALUE)
     @Lob
@@ -178,28 +174,6 @@ public abstract class Job extends CommonAttribute {
      */
     public void setPriority(JobPriority priority) {
         this.priority = priority;
-    }
-
-    /**
-     * set a log file for this job.
-     * 
-     * @param filePath the path of the log file.
-     */
-    public void setLogFile(String filePath) {
-        if (filePath != null && filePath.length() > 255) {
-            throw new IllegalArgumentException("File path is too long, it must have 255 chars length max : " +
-                filePath);
-        }
-        this.logFile = filePath;
-    }
-
-    /**
-     * Return the path to the log file, or null if not logged.
-     * 
-     * @return the path to the log file, or null if not logged.
-     */
-    public String getLogFile() {
-        return this.logFile;
     }
 
     /**
