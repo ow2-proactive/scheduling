@@ -132,4 +132,11 @@ public class InputSelector implements Serializable {
         this.mode = mode;
     }
 
+    /**
+     * Return a string representation of this selector.
+     */
+    public String toString() {
+        return "(" + this.mode + "-" + this.inputFiles + ")";
+    }
+
 }

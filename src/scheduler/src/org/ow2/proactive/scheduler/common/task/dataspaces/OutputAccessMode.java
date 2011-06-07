@@ -72,4 +72,8 @@ public enum OutputAccessMode {
             throw new IllegalArgumentException("Unknow Output access mode : " + accessMode);
         }
     }
+
+    public String toString() {
+        return this.title;
+    }
 }

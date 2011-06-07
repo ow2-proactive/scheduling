@@ -163,6 +163,9 @@ public abstract class TaskLauncher implements InitActive {
     protected List<InputSelector> inputFiles;
     protected List<OutputSelector> outputFiles;
 
+    // buffered string to store datapspaces error/warn messages
+    private StringBuffer dataspacesStatus;
+
     protected OneShotDecrypter decrypter = null;
 
     /**
@@ -268,6 +271,7 @@ public abstract class TaskLauncher implements InitActive {
         this.replicationIndex = initializer.getReplicationIndex();
         this.iterationIndex = initializer.getIterationIndex();
         this.storeLogs = initializer.isPreciousLogs();
+        this.dataspacesStatus = new StringBuffer();
     }
 
     /**
@@ -783,11 +787,11 @@ public abstract class TaskLauncher implements InitActive {
 
             } catch (Throwable t) {
                 logger_dev_dataspace.warn(
-                        "There was a problem while initializing dataSpaces, they won't be activated", t);
-                //print for user task
-                System.err
-                        .println("There was a problem while initializing dataSpaces, they won't be activated : \n" +
-                            Formatter.stackTraceToString(t));
+                        "There was a problem while initializing dataSpaces, they are not activated", t);
+                this.logDataspacesStatus(
+                        "There was a problem while initializing dataSpaces, they are not activated",
+                        DataspacesStatusLevel.ERROR);
+                this.logDataspacesStatus(Formatter.stackTraceToString(t), DataspacesStatusLevel.ERROR);
             }
         }
     }
@@ -801,7 +805,9 @@ public abstract class TaskLauncher implements InitActive {
                             .getActiveObjectNode(PAActiveObject.getStubOnThis()));
                 }
             } catch (Exception e) {
-                //dwooooo !
+                logger_dev_dataspace
+                        .warn("There was a problem while terminating dataSpaces. Dataspaces on this node might not work anymore.");
+                // cannot add this message to dataspaces status as it is called in finally block
             }
         }
     }
@@ -815,6 +821,11 @@ public abstract class TaskLauncher implements InitActive {
             //check first the OUTPUT and then the INPUT, take care if not set
             if (INPUT == null && OUTPUT == null) {
                 logger_dev_dataspace.debug("Job INPUT/OUTPUT spaces are not defined, cannot copy file.");
+                this.logDataspacesStatus("Job inputspace and outputspace are not defined or not properly"
+                    + " configured while intput files are specified : ", DataspacesStatusLevel.ERROR);
+                for (InputSelector is : inputFiles) {
+                    this.logDataspacesStatus("--> " + is, DataspacesStatusLevel.ERROR);
+                }
                 return;
             }
 
@@ -833,35 +844,66 @@ public abstract class TaskLauncher implements InitActive {
                     case TransferFromInputSpace:
                         //search in INPUT
                         try {
+                            int s = inResults.size();
                             FastSelector.findFiles(INPUT, fast, true, inResults);
+                            if (s == inResults.size()) {
+                                this.logDataspacesStatus(
+                                        "No file is transferred from inputspace for selector " + is,
+                                        DataspacesStatusLevel.WARNING);
+                            }
                         } catch (FileSystemException fse) {
                             logger_dev_dataspace.info("", fse);
                             toBeThrown = new FileSystemException(
                                 "Could not contact INPUT space. Check that INPUT space is still reachable !");
+                            this.logDataspacesStatus("An error occured while resolving selector " + is,
+                                    DataspacesStatusLevel.ERROR);
+                            this.logDataspacesStatus(Formatter.stackTraceToString(fse),
+                                    DataspacesStatusLevel.ERROR);
                         } catch (NullPointerException npe) {
-                            //do nothing
+                            // nothing to do
                         }
                         break;
                     case TransferFromOutputSpace:
                         //search in OUTPUT
                         try {
+                            int s = outResults.size();
                             FastSelector.findFiles(OUTPUT, fast, true, outResults);
+                            if (s == outResults.size()) {
+                                this.logDataspacesStatus(
+                                        "No file is transferred from outputspace for selector " + is,
+                                        DataspacesStatusLevel.WARNING);
+                            }
                         } catch (FileSystemException fse) {
                             logger_dev_dataspace.info("", fse);
                             toBeThrown = new FileSystemException(
                                 "Could not contact OUTPUT space. Check that OUTPUT space is still reachable !");
+                            this.logDataspacesStatus("An error occured while resolving selector " + is,
+                                    DataspacesStatusLevel.ERROR);
+                            this.logDataspacesStatus(Formatter.stackTraceToString(fse),
+                                    DataspacesStatusLevel.ERROR);
                         } catch (NullPointerException npe) {
-                            //do nothing
+                            // nothing to do
                         }
                         break;
                     case TransferFromGlobalSpace:
                         try {
+                            int s = globResults.size();
                             FastSelector.findFiles(GLOBAL, fast, true, globResults);
+                            if (s == globResults.size()) {
+                                this.logDataspacesStatus(
+                                        "No file is transferred from globalspace for selector " + is,
+                                        DataspacesStatusLevel.WARNING);
+                            }
                         } catch (FileSystemException fse) {
                             logger_dev_dataspace.info("", fse);
                             toBeThrown = new FileSystemException(
                                 "Could not contact GLOBAL space. Check that GLOBAL space is still reachable !");
+                            this.logDataspacesStatus("An error occured while resolving selector " + is,
+                                    DataspacesStatusLevel.ERROR);
+                            this.logDataspacesStatus(Formatter.stackTraceToString(fse),
+                                    DataspacesStatusLevel.ERROR);
                         } catch (NullPointerException npe) {
+                            // nothing to do
                         }
                         break;
                     case none:
@@ -884,18 +926,6 @@ public abstract class TaskLauncher implements InitActive {
             results.addAll(inResults);
             results.addAll(outResults);
             results.addAll(globResults);
-
-            //debug ---
-            if (!logger_dev_dataspace.isDebugEnabled()) {
-                if (results == null || results.size() == 0) {
-                    logger_dev_dataspace
-                            .debug("No file found to copy from INPUT or OUTPUT space to LOCAL space");
-                } else {
-                    logger_dev_dataspace
-                            .debug("Files that will be copied from INPUT or OUTPUT space to LOCAL space :");
-                }
-            }
-            //debug ---
 
             for (DataSpacesFileObject dsfo : results) {
                 try {
@@ -927,62 +957,94 @@ public abstract class TaskLauncher implements InitActive {
 
     protected void copyScratchDataToOutput() throws FileSystemException {
         if (isDataspaceAware()) {
-
-            // if logs are precisous, they are treated like output files
-            if (this.storeLogs) {
-                // add log files as output
-                OutputSelector logFiles = new OutputSelector(new FileSelector(TaskLauncher.LOG_FILE_PREFIX +
-                    "*"), OutputAccessMode.TransferToOutputSpace);
-                if (this.outputFiles == null) {
-                    this.outputFiles = new ArrayList<OutputSelector>();
+            try {
+                // if logs are precisous, they are treated like output files
+                if (this.storeLogs) {
+                    // add log files as output
+                    OutputSelector logFiles = new OutputSelector(new FileSelector(
+                        TaskLauncher.LOG_FILE_PREFIX + "*"), OutputAccessMode.TransferToOutputSpace);
+                    if (this.outputFiles == null) {
+                        this.outputFiles = new ArrayList<OutputSelector>();
+                    }
+                    this.outputFiles.add(logFiles);
                 }
-                this.outputFiles.add(logFiles);
-            }
 
-            if (outputFiles == null) {
-                logger_dev_dataspace.debug("Output selector is empty, no file to copy");
-                return;
-            }
-            //check first the OUTPUT and then the INPUT, take care if not set
-            if (OUTPUT == null) {
-                logger_dev_dataspace.debug("Job OUTPUT space is not defined, cannot copy file.");
-                return;
-            }
-
-            ArrayList<DataSpacesFileObject> results = new ArrayList<DataSpacesFileObject>();
-            FileSystemException toBeThrown = null;
-
-            for (OutputSelector os : outputFiles) {
-                //fill fast file selector
-                FastFileSelector fast = new FastFileSelector();
-                fast.setIncludes(os.getOutputFiles().getIncludes());
-                fast.setExcludes(os.getOutputFiles().getExcludes());
-                fast.setCaseSensitive(os.getOutputFiles().isCaseSensitive());
-                switch (os.getMode()) {
-                    case TransferToOutputSpace:
-                        try {
-                            handleOutput(OUTPUT, fast, results);
-                        } catch (FileSystemException fse) {
-                            logger_dev_dataspace.warn("", fse);
-                            toBeThrown = fse;
-                        }
-                        break;
-                    case TransferToGlobalSpace:
-                        try {
-                            handleOutput(GLOBAL, fast, results);
-                        } catch (FileSystemException fse) {
-                            logger_dev_dataspace.warn("", fse);
-                            toBeThrown = fse;
-                        }
-                        break;
-                    case none:
-                        break;
+                if (outputFiles == null) {
+                    logger_dev_dataspace.debug("Output selector is empty, no file to copy");
+                    return;
                 }
-                results.clear();
-            }
+                //check first the OUTPUT and then the INPUT, take care if not set
+                if (OUTPUT == null) {
+                    logger_dev_dataspace.debug("Job OUTPUT space is not defined, cannot copy file.");
+                    this.logDataspacesStatus("Job outputspace is not defined or not properly"
+                        + " configured while output files are specified : ", DataspacesStatusLevel.ERROR);
+                    for (OutputSelector os : outputFiles) {
+                        this.logDataspacesStatus("--> " + os, DataspacesStatusLevel.ERROR);
+                    }
+                    return;
+                }
 
-            if (toBeThrown != null) {
-                throw toBeThrown;
+                ArrayList<DataSpacesFileObject> results = new ArrayList<DataSpacesFileObject>();
+                FileSystemException toBeThrown = null;
+
+                for (OutputSelector os : outputFiles) {
+                    //fill fast file selector
+                    FastFileSelector fast = new FastFileSelector();
+                    fast.setIncludes(os.getOutputFiles().getIncludes());
+                    fast.setExcludes(os.getOutputFiles().getExcludes());
+                    fast.setCaseSensitive(os.getOutputFiles().isCaseSensitive());
+                    switch (os.getMode()) {
+                        case TransferToOutputSpace:
+                            try {
+                                int s = results.size();
+                                handleOutput(OUTPUT, fast, results);
+                                if (results.size() == s) {
+                                    this.logDataspacesStatus(
+                                            "No file is transferred to outputspace for selector " + os,
+                                            DataspacesStatusLevel.WARNING);
+                                }
+                            } catch (FileSystemException fse) {
+                                logger_dev_dataspace.warn("", fse);
+                                toBeThrown = fse;
+                                this.logDataspacesStatus(
+                                        "Error while transferring to outputspace for selector " + os,
+                                        DataspacesStatusLevel.ERROR);
+                                this.logDataspacesStatus(Formatter.stackTraceToString(fse),
+                                        DataspacesStatusLevel.ERROR);
+                            }
+                            break;
+                        case TransferToGlobalSpace:
+                            try {
+                                int s = results.size();
+                                handleOutput(GLOBAL, fast, results);
+                                if (results.size() == s) {
+                                    this.logDataspacesStatus(
+                                            "No file is transferred to globalspace for selector " + os,
+                                            DataspacesStatusLevel.WARNING);
+                                }
+                            } catch (FileSystemException fse) {
+                                logger_dev_dataspace.warn("", fse);
+                                toBeThrown = fse;
+                                this.logDataspacesStatus(
+                                        "Error while transferring to outputspace for selector " + os,
+                                        DataspacesStatusLevel.ERROR);
+                                this.logDataspacesStatus(Formatter.stackTraceToString(fse),
+                                        DataspacesStatusLevel.ERROR);
+                            }
+                            break;
+                        case none:
+                            break;
+                    }
+                    results.clear();
+                }
+
+                if (toBeThrown != null) {
+                    throw toBeThrown;
+                }
+
+            } finally {
+                // display dataspaces error and warns if any
+                this.displayDataspacesStatus();
             }
         }
     }
@@ -1158,4 +1220,41 @@ public abstract class TaskLauncher implements InitActive {
             return decrypt(this.credentials);
         }
     }
+
+    /**
+     * Add a message to the dataspaces status buffer. This buffer is displayed at the end 
+     * of the task if non empty.
+     * @param message 
+     * @param level
+     */
+    protected void logDataspacesStatus(String message, DataspacesStatusLevel level) {
+        final String eol = System.getProperty("line.separator");
+        final boolean hasEol = message.endsWith(eol);
+        if (level == DataspacesStatusLevel.ERROR) {
+            this.dataspacesStatus.append("[DATASPACES-ERROR] " + message + (hasEol ? "" : eol));
+        } else if (level == DataspacesStatusLevel.WARNING) {
+            this.dataspacesStatus.append("[DATASPACES-WARNING] " + message + (hasEol ? "" : eol));
+        } else if (level == DataspacesStatusLevel.INFO) {
+            this.dataspacesStatus.append("[DATASPACES-INFO] " + message + (hasEol ? "" : eol));
+        }
+    }
+
+    /**
+     * Log level for dataspaces messages.
+     */
+    protected enum DataspacesStatusLevel {
+        ERROR, WARNING, INFO;
+    }
+
+    /**
+     * Display the content of the dataspaces status buffer on stderr if non empty.
+     */
+    protected void displayDataspacesStatus() {
+        if (this.dataspacesStatus.length() != 0) {
+            System.err.println("");
+            System.err.println(this.dataspacesStatus);
+            this.dataspacesStatus = new StringBuffer();
+        }
+    }
+
 }

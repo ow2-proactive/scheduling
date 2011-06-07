@@ -258,4 +258,26 @@ public class FileSelector implements Serializable {
         this.caseSensitive = caseSensitive;
     }
 
+    /**
+     * Return a string representation of this selector.
+     * All selection regexp are displayed. 
+     */
+    public String toString() {
+        StringBuffer sb = new StringBuffer();
+        sb.append("INCLUDES{");
+        if (this.includes != null) {
+            for (int i = 0; i < includes.length; i++) {
+                sb.append(includes[i] + (i == includes.length - 1 ? "" : ";"));
+            }
+        }
+        sb.append("}-EXCLUDES{");
+        if (this.excludes != null) {
+            for (int i = 0; i < excludes.length; i++) {
+                sb.append(excludes[i] + (i == excludes.length - 1 ? "" : ";"));
+            }
+        }
+        sb.append("}");
+        return sb.toString();
+    }
+
 }
