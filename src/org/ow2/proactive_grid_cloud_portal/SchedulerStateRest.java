@@ -1118,7 +1118,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
             Job j = null;
             boolean isAnArchive = false;
-            if (MediaType.APPLICATION_XML.equalsIgnoreCase(part1.getMediaType().toString())) {
+			if (part1.getMediaType().toString().toLowerCase()
+					.indexOf(MediaType.APPLICATION_XML.toLowerCase()) > -1) {
                 // the job sent is the xml file
                 j = JobFactory.getFactory().createJob(tmp.getAbsolutePath());
             } else {
