@@ -36,11 +36,6 @@
  */
 package org.ow2.proactive.resourcemanager.common.event;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Lob;
-import javax.persistence.Table;
-
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.db.types.BigString;
 import org.ow2.proactive.resourcemanager.common.RMConstants;
@@ -67,20 +62,14 @@ import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
  *
  */
 @PublicAPI
-@Entity
-@Table(name = "RMNodeSourceEvent")
 public class RMNodeSourceEvent extends RMEvent {
 
     /** name of the source concerned by the event. */
-    @Column(name = "nodeSourceName")
     private String nodeSourceName = null;
 
     /** description of the source concerned by the event. */
-    @Column(name = "nodeSourceDescription", length = Integer.MAX_VALUE)
-    @Lob
     private BigString nodeSourceDescription = null;
 
-    @Column(name = "nodeSourceAdmin")
     private String nodeSourceAdmin = null;
 
     /**

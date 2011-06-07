@@ -97,7 +97,7 @@ public interface RMLoggers {
 
     static final public String CLEANER = RESOURCEMANAGER + ".cleaner";
 
-    static final public String DATABASE = ".DATABASE";
+    static final public String DATABASE = RESOURCEMANAGER + ".database";
 
     public static final String TOPOLOGY = RESOURCEMANAGER + ".topology";
 }

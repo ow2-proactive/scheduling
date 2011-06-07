@@ -53,6 +53,7 @@ import javax.persistence.Table;
 import org.apache.log4j.Logger;
 import org.hibernate.Query;
 import org.hibernate.SessionFactory;
+import org.hibernate.StatelessSession;
 import org.hibernate.annotations.Any;
 import org.hibernate.annotations.AnyMetaDef;
 import org.hibernate.annotations.MetaValue;
@@ -585,7 +586,21 @@ public abstract class HibernateDatabaseManager implements DatabaseManager {
             throw new IllegalArgumentException(
                 "Native Query string must be a read request, ie:start with 'SELECT'");
         }
+        getDevLogger().debug("Executing query '" + nativeQuery + "'");
         return getSessionFactory().openStatelessSession().createSQLQuery(nativeQuery).list();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public int sqlUpdateQuery(String nativeQuery) {
+        getDevLogger().debug("Executing query '" + nativeQuery + "'");
+        StatelessSession session = getSessionFactory().openStatelessSession();
+        session.beginTransaction();
+        int result = session.createSQLQuery(nativeQuery).executeUpdate();
+        session.getTransaction().commit();
+
+        return result;
     }
 
     /**

@@ -84,6 +84,8 @@ import org.ow2.proactive.resourcemanager.common.event.RMInitialState;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.core.account.RMAccountsManager;
+import org.ow2.proactive.resourcemanager.core.history.Alive;
+import org.ow2.proactive.resourcemanager.core.history.History;
 import org.ow2.proactive.resourcemanager.core.jmx.RMJMXHelper;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.db.DatabaseManager;
@@ -214,6 +216,9 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     /** utility ao used to configure nodes (compute topology, configure dataspaces...) */
     private RMNodeConfigurator nodeConfigurator;
 
+    /** the last time when RMCore seemed to be alive */
+    private Alive alive;
+
     /**
      * ProActive Empty constructor
      */
@@ -280,6 +285,32 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             }
             DatabaseManager.getInstance().build();
             logger.info("Hibernate successfully started !");
+
+            if (!drop) {
+
+                List<Alive> selected = DatabaseManager.getInstance().recover(Alive.class);
+                if (selected.size() == 1) {
+                    alive = selected.get(0);
+
+                    // to keep the data base consistency updating all nodes history with
+                    // the last alive time stamp
+                    History.recover(alive);
+
+                    // updating alive time stamp
+                    alive.setTime(System.currentTimeMillis());
+                    alive.update();
+
+                } else if (selected.size() > 1) {
+                    logger
+                            .error("Inconsistency in the data base (Alive table). Cannot be more than one record.");
+                }
+            }
+
+            if (alive == null) {
+                alive = new Alive();
+                alive.setTime(System.currentTimeMillis());
+                alive.save();
+            }
 
             if (logger.isDebugEnabled()) {
                 logger.debug("Creating RMAuthentication active object");
@@ -408,7 +439,9 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             timeStamp = System.currentTimeMillis();
 
             if (delta > PAResourceManagerProperties.RM_ALIVE_EVENT_FREQUENCY.getValueAsInt()) {
-                monitoring.rmEvent(new RMEvent(RMEventType.ALIVE));
+                alive.setTime(timeStamp);
+                alive.update();
+
                 delta = 0;
             }
         }
@@ -1178,7 +1211,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     }
 
     private void registerAndEmitNodeEvent(final RMNodeEvent event) {
-        DatabaseManager.getInstance().register(event);
+        new History(event).save();
         this.monitoring.nodeEvent(event);
     }
 
@@ -1309,6 +1342,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             // when the disconnected client still uses nodes.
             // In the future we may clean nodes for any release request
             nodesCleaner.cleanAndRelease(nodesToRelease);
+            accountsManager.remove(client.getName());
             logger.info(client + " disconnected");
         } else {
             logger.warn("Trying to disconnect unknown client with id " + clientId);

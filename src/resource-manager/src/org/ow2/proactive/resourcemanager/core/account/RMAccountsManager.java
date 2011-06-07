@@ -37,11 +37,16 @@
 package org.ow2.proactive.resourcemanager.core.account;
 
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import javax.persistence.Column;
+import javax.persistence.Table;
+
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.account.AbstractAccountsManager;
+import org.ow2.proactive.resourcemanager.core.history.History;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.db.DatabaseManager;
 import org.ow2.proactive.resourcemanager.utils.RMLoggers;
@@ -58,23 +63,14 @@ public final class RMAccountsManager extends AbstractAccountsManager<RMAccount> 
     /** Scheduler database manager used to submit SQL requests */
     private final org.ow2.proactive.db.DatabaseManager dbmanager;
 
-    //private final String totalUsedNodeTimeSQL;
-
-    //private final String totalProvidedNodeTimeAndNodeCountSQL;
-
     /**
      * Create a new instance of this class.
      */
     public RMAccountsManager() {
         super(new HashMap<String, RMAccount>(), "Resource Manager Accounts Refresher", ProActiveLogger
                 .getLogger(RMLoggers.MONITORING));
-
         // Get the database manager
         this.dbmanager = DatabaseManager.getInstance();
-
-        // Create the requests
-        //this.totalUsedNodeTimeSQL = RMAccountsManager.totalUsedNodeTimeSQL();
-        //this.totalProvidedNodeTimeAndNodeCountSQL = RMAccountsManager.totalProvidedNodeTimeAndNodeCountSQL();
     }
 
     /**
@@ -90,152 +86,117 @@ public final class RMAccountsManager extends AbstractAccountsManager<RMAccount> 
      * Reads database and fills accounts.
      */
     protected void internalRefresh(final Map<String, RMAccount> map) {
-        // Get totalUsedNodeTime per node owner
-        final List<?> usedRes = this.dbmanager.sqlQuery(RMAccountsManager.totalUsedNodeTimeSQL());
-
-        // The result of the query is the tuple <NODEOWNER, DURATION>
-        for (int i = 0; i < usedRes.size(); i++) {
-            final Object[] tuple = (Object[]) usedRes.get(i);
-            final String nodeOwner = (String) tuple[0];
-
-            RMAccount acc = map.get(nodeOwner);
-            if (acc == null) {
-                acc = new RMAccount();
-                map.put(nodeOwner, acc);
+        synchronized (accountsMap) {
+            List<String> users = new LinkedList<String>(accountsMap.keySet());
+            accountsMap.clear();
+            for (String user : users) {
+                map.put(user, getAccount(user));
             }
-
-            acc.usedNodeTime = ((Number) tuple[1]).longValue();
-        }
-
-        // Get totalProvidedNodeTime and node count per node provider
-        final List<?> providedRes = this.dbmanager.sqlQuery(totalProvidedNodeTimeAndNodeCountSQL());
-
-        // The result of the query is a tuple
-        for (int i = 0; i < providedRes.size(); i++) {
-            final Object[] tuple = (Object[]) providedRes.get(i);
-            final String nodeProvider = (String) tuple[0];
-
-            RMAccount acc = map.get(nodeProvider);
-            if (acc == null) {
-                acc = new RMAccount();
-                map.put(nodeProvider, acc);
-            }
-
-            acc.providedNodeTime = ((Number) tuple[1]).longValue();
-            acc.providedNodesCount = ((Number) tuple[2]).intValue();
         }
     }
 
-    // Returned tuple: <NODEPROVIDER, DURATION>
-    private static String totalUsedNodeTimeSQL() {
-        final StringBuilder builder = new StringBuilder("SELECT tab.np, SUM(tab.duration) FROM ");
-        builder.append("(SELECT t1.NODEPROVIDER as np, sum(t2.TIMESTAMP - t1.TIMESTAMP) as duration ");
-        builder.append("FROM RMNODEEVENT t1 JOIN RMNODEEVENT t2 ON ");
-        builder.append("t2.PREVIOUSEVENTID = t1.ID AND ");
-        builder.append("t2.TYPE = 6 AND t2.NODESTATE=0 AND ");
-        builder.append("t2.PREVIOUSNODESTATE=1 AND t1.TYPE = 6 AND t1.NODESTATE=1 ");
-        builder.append("GROUP BY t1.NODEPROVIDER ");
-        builder.append("UNION ");
-        builder.append("SELECT t1.NODEPROVIDER as np, sum(t2.TIMESTAMP - t1.TIMESTAMP) as duration ");
-        builder.append("FROM RMNODEEVENT t1 JOIN RMNODEEVENT t2 ON ");
-        builder.append("(t2.PREVIOUSEVENTID = t1.ID AND ");
-        builder.append("t2.TYPE = 7 AND t1.TYPE = 6 AND t1.NODESTATE=1) OR ");
-        builder.append("(t2.PREVIOUSEVENTID = t1.ID AND ");
-        builder.append("t2.TYPE = 6 AND t2.NODESTATE=2 AND t1.TYPE = 6 AND t1.NODESTATE=1) ");
-        builder.append("GROUP BY t1.NODEPROVIDER ");
-        builder.append("UNION ");
-        builder.append("select t1.NODEPROVIDER as np, sum(" + System.currentTimeMillis() +
-            " - t1.TIMESTAMP) as duration ");
-        builder.append("from RMNODEEVENT t1 WHERE ");
-        builder.append("t1.TYPE = 6 AND t1.NODESTATE=1 AND ");
-        builder.append("t1.TIMESTAMP > (SELECT MAX(TIMESTAMP) FROM RMEVENT WHERE type=2) AND ");
-        builder
-                .append("(NOT EXISTS (select * from RMNODEEVENT WHERE PREVIOUSEVENTID=t1.ID AND PREVIOUSNODESTATE=1)) ");
-        builder.append("GROUP BY t1.NODEPROVIDER ");
-        builder.append(") tab GROUP BY tab.np");
-        return builder.toString();
+    /**
+     * 
+     * Computes user account data by scanning the data base.
+     * 
+     */
+    public RMAccount getAccount(final String user) {
+        synchronized (accountsMap) {
+            if (accountsMap.containsKey(user)) {
+                return accountsMap.get(user);
+            }
+        }
+
+        try {
+
+            RMAccount account = new RMAccount();
+            account.username = user;
+
+            String history = History.class.getAnnotation(Table.class).name();
+            String endTime = History.class.getDeclaredField("endTime").getAnnotation(Column.class).name();
+            String startTime = History.class.getDeclaredField("startTime").getAnnotation(Column.class).name();
+            String nodeState = History.class.getDeclaredField("nodeState").getAnnotation(Column.class).name();
+            String userName = History.class.getDeclaredField("userName").getAnnotation(Column.class).name();
+            String providerName = History.class.getDeclaredField("providerName").getAnnotation(Column.class)
+                    .name();
+            String nodeUrl = History.class.getDeclaredField("nodeUrl").getAnnotation(Column.class).name();
+
+            // counting the time of finished actions 
+            // select SUM(endTime-startTime) from History where endTime <> 0 and nodeState = 1 and userName='NAME'
+            String wereBusy = "SELECT SUM(" + endTime + "-" + startTime + ") " + "FROM " + history +
+                " WHERE " + userName + "='" + user + "' AND " + endTime + " <> 0 AND " + nodeState + " = 1";
+
+            // counting the time of unfinished actions
+            // select SUM(CURRENT_TIME-startTime) from History where endTime = 0 and nodeState = 1 and userName='NAME'
+            String areBusy = "SELECT SUM(" + System.currentTimeMillis() + "-" + startTime + ") " + "FROM " +
+                history + " WHERE " + userName + "='" + user + "' AND " + endTime + " = 0 AND " + nodeState +
+                " = 1";
+            List<?> rows = dbmanager.sqlQuery(wereBusy + " UNION " + areBusy);
+
+            for (Object row : rows) {
+                try {
+                    if (row != null) {
+                        // result could be empty or null
+                        account.usedNodeTime += Long.parseLong(row.toString());
+                    }
+                } catch (RuntimeException e) {
+                    logger.warn(e.getMessage(), e);
+                    account.usedNodeTime = 0;
+                }
+            }
+
+            // select SUM(endTime-startTime), COUNT(DISTINCT nodeUrl) from History where endTime <> 0 and nodeState in (0,1,3,6,7) and providerName='rm'
+            String wereProvided = "SELECT COUNT(DISTINCT " + nodeUrl + "), SUM(" + endTime + "-" + startTime +
+                ") " + "FROM " + history + " WHERE " + providerName + "='" + user + "' AND " + endTime +
+                " <> 0 AND " + nodeState + " in (0,1,3,6,7)";
+            // select SUM(CURRNET_TIME-startTime), COUNT(DISTINCT nodeUrl) from History where endTime = 0 and nodeState in (0,1,3,6,7) and providerName='rm'
+            String areProvided = "SELECT 0, SUM(" + System.currentTimeMillis() + "-" + startTime + ") " +
+                "FROM " + history + " WHERE " + providerName + "='" + user + "' AND " + endTime +
+                " = 0 AND " + nodeState + " in (0,1,3,6,7)";
+            rows = dbmanager.sqlQuery(wereProvided + " UNION " + areProvided);
+
+            for (Object row : rows) {
+                Object[] columns = (Object[]) row;
+                if (columns.length > 0 && columns[0] != null) {
+                    try {
+                        // result could be empty or null
+                        account.providedNodesCount += Integer.parseInt(columns[0].toString());
+                    } catch (RuntimeException e) {
+                        logger.warn(e.getMessage(), e);
+                        account.providedNodesCount = 0;
+                    }
+                }
+                if (columns.length > 1 && columns[1] != null) {
+                    try {
+                        // result could be empty or null
+                        account.providedNodeTime += Long.parseLong(columns[1].toString());
+                    } catch (RuntimeException e) {
+                        logger.warn(e.getMessage(), e);
+                        account.providedNodeTime = 0;
+                    }
+                }
+            }
+
+            synchronized (accountsMap) {
+                accountsMap.put(user, account);
+            }
+
+            return account;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    // FULL SQL REQUEST :
-
-    //SELECT tab.np, SUM(tab.duration) FROM
-    //(
-    //-- Consistent GET duration from get->release
-    //SELECT t1.NODEPROVIDER as np, sum(t2.TIMESTAMP - t1.TIMESTAMP) as duration
-    //FROM RMNODEEVENT t1 JOIN RMNODEEVENT t2 ON
-    //t2.PREVIOUSEVENTID = t1.ID AND
-    //t2.TYPE = 6 AND t2.NODESTATE=0 AND
-    //t2.PREVIOUSNODESTATE=1 AND t1.TYPE = 6 AND t1.NODESTATE=1
-    //GROUP BY t1.NODEPROVIDER
-    //UNION
-    //-- Inconsistent GET duration from get->remove or get->down
-    //SELECT t1.NODEPROVIDER as np, sum(t2.TIMESTAMP - t1.TIMESTAMP) as duration
-    //FROM RMNODEEVENT t1 JOIN RMNODEEVENT t2 ON
-    // -- remove
-    //(t2.PREVIOUSEVENTID = t1.ID AND
-    //t2.TYPE = 7 AND t1.TYPE = 6 AND t1.NODESTATE=1)
-    //OR
-    //-- down
-    //(t2.PREVIOUSEVENTID = t1.ID AND
-    //t2.TYPE = 6 AND t2.NODESTATE=2 AND t1.TYPE = 6 AND t1.NODESTATE=1)
-    //GROUP BY t1.NODEPROVIDER
-    //UNION
-    // -- Inconsistent GET that are after the last restart (currently used nodes) must be SUM(System.currentTimeMillis() - t1.TIMESTAMP)
-    //select t1.NODEPROVIDER as np, sum(t1.TIMESTAMP) as duration
-    //from RMNODEEVENT t1
-    //WHERE
-    //-- Node GET event
-    //t1.TYPE = 6 AND t1.NODESTATE=1
-    //AND
-    // -- From the last start
-    //t1.TIMESTAMP > (SELECT MAX(TIMESTAMP) FROM RMEVENT WHERE type=2)
-    //-- Inconsistent means not stopped and not removed
-    //AND
-    //(NOT EXISTS
-    //   (select * from RMNODEEVENT WHERE PREVIOUSEVENTID = t1.ID AND PREVIOUSNODESTATE=1))
-    //GROUP BY t1.NODEPROVIDER    
-    //) tab
-    //GROUP BY tab.np
-
-    // Returned tuple: <NODEPROVIDER, DURATION, NODESCOUNT>
-    private static String totalProvidedNodeTimeAndNodeCountSQL() {
-        final StringBuilder builder = new StringBuilder("SELECT ");
-        builder.append("tab.np, SUM(tab.d), COUNT(DISTINCT tab.nc) FROM ");
-        // Compute all inconsistent adds before last start (the duration is computed using the heartbeat)
-        builder
-                .append("(select t1.NODEPROVIDER as np,  SUM(h1.TIMESTAMP - t1.TIMESTAMP) as d, t1.NODEURL as nc ");
-        builder.append("from RMNODEEVENT t1 JOIN RMEVENT h1 ON ");
-        builder.append("t1.TIMESTAMP < h1.TIMESTAMP WHERE ");
-        builder.append("t1.TYPE=5 AND ");
-        builder.append("h1.TIMESTAMP = (select MAX(TIMESTAMP) from RMEVENT h where ");
-        builder.append("h.type = 8 AND ");
-        builder
-                .append("h.timestamp < (select MIN(TIMESTAMP) from RMEVENT where type = 2 AND timestamp > t1.timestamp)) ");
-        builder
-                .append("AND (NOT EXISTS (select * from RMNODEEVENT WHERE ADDEVENTID = t1.ID AND (TYPE=7 OR (TYPE=6 AND NODESTATE=2)))) ");
-        builder.append("GROUP BY t1.NODEPROVIDER, t1.NODEURL ");
-        builder.append("UNION ");
-        // Same for current adds not followed by stop or remove
-        builder.append("select t1.NODEPROVIDER as np, SUM(" + System.currentTimeMillis() +
-            " - t1.TIMESTAMP) as d, t1.NODEURL as nc from RMNODEEVENT t1 ");
-        builder.append("WHERE t1.TYPE=5 AND ");
-        builder.append("(t1.TIMESTAMP > (SELECT MAX(TIMESTAMP) FROM RMEVENT WHERE type=2)) AND ");
-        builder.append("(NOT EXISTS ");
-        builder
-                .append("(select * from RMNODEEVENT WHERE ADDEVENTID = t1.ID AND (TYPE=7 OR (TYPE=6 AND NODESTATE=2)))) ");
-        builder.append("GROUP BY t1.NODEPROVIDER, t1.NODEURL ");
-        builder.append("UNION ");
-        builder
-                .append("select t1.NODEPROVIDER as np, SUM(t2.TIMESTAMP - t1.TIMESTAMP) as d, t1.NODEURL as nc from RMNODEEVENT t1 ");
-        builder.append("JOIN RMNODEEVENT t2 ON ");
-        // Consistent adds are followed by stop
-        builder.append("(t1.ID = t2.ADDEVENTID AND t1.TYPE = 5 AND (t2.TYPE = 6 AND t2.NODESTATE = 2)) OR ");
-        // Or  followed by remove (without stop)
-        builder
-                .append("(t1.ID = t2.ADDEVENTID AND t1.TYPE = 5 AND t2.TYPE = 7 AND t2.PREVIOUSNODESTATE <> 2) ");
-        builder.append("GROUP BY t1.NODEPROVIDER, t1.NODEURL ");
-        builder.append(") tab GROUP BY tab.np");
-        return builder.toString();
+    /**
+     * 
+     * Removes a user account when user is disconnected.
+     * We will not refresh it for such user anymore.
+     * 
+     */
+    public void remove(final String username) {
+        synchronized (accountsMap) {
+            accountsMap.remove(username);
+        }
     }
 
     public static void main(String[] args) {
@@ -243,58 +204,3 @@ public final class RMAccountsManager extends AbstractAccountsManager<RMAccount> 
         System.out.println("RMAccountsManager.main()---> " + (Long.MAX_VALUE >> 1));
     }
 }
-
-// FULL SQL REQUEST :
-
-//SELECT tab.np, SUM(tab.d), COUNT(DISTINCT tab.nc) FROM
-//(
-//-- All inconsistent adds before the last restart
-//select t1.NODEPROVIDER as np,  SUM(h1.TIMESTAMP - t1.TIMESTAMP) as d, t1.NODEURL as nc
-//from RMNODEEVENT t1
-//JOIN RMEVENT h1
-//ON
-//    t1.TIMESTAMP < h1.TIMESTAMP
-//WHERE
-//    -- Node added event
-//    t1.TYPE=5 AND
-//    -- Before the last start
-//--            (t1.TIMESTAMP <
-//--                (SELECT MAX(TIMESTAMP) FROM RMEVENT WHERE type=2)) AND
-//    -- The next heartbeat before the next start 
-//    h1.TIMESTAMP = (select MAX(TIMESTAMP) from RMEVENT h where
-//                     h.type = 8 AND
-//                     h.timestamp < (select MIN(TIMESTAMP) from RMEVENT where type = 2 AND timestamp > t1.timestamp))
-//    -- Inconsistent means not stopped and not removed
-//    AND
-//    (NOT EXISTS
-//        (select * from RMNODEEVENT WHERE ADDEVENTID = t1.ID AND (TYPE=7 OR (TYPE=6 AND NODESTATE=2))))
-// GROUP BY t1.NODEPROVIDER, t1.NODEURL
-// UNION
-//-- All inconsistent adds after the last restart (currently provided nodes) must be SUM(System.currentTimeMillis() - t1.TIMESTAMP)
-//select t1.NODEPROVIDER as np, SUM(t1.TIMESTAMP) as d, t1.NODEURL as nc
-//from RMNODEEVENT t1
-//WHERE
-//    -- Node added event
-//    t1.TYPE=5
-//    AND
-//    -- From the last start
-//    (t1.TIMESTAMP >
-//        (SELECT MAX(TIMESTAMP) FROM RMEVENT WHERE type=2))
-//    -- Inconsistent means not stopped and not removed
-//    AND
-//    (NOT EXISTS
-//        (select * from RMNODEEVENT WHERE ADDEVENTID = t1.ID AND (TYPE=7 OR (TYPE=6 AND NODESTATE=2))))
-//    GROUP BY t1.NODEPROVIDER, t1.NODEURL
-//UNION
-//-- All consistent adds
-//select t1.NODEPROVIDER as np, SUM(t2.TIMESTAMP - t1.TIMESTAMP) as d, t1.NODEURL as nc from RMNODEEVENT t1
-//JOIN RMNODEEVENT t2 ON
-//(
-//    t1.ID = t2.ADDEVENTID AND
-//    t1.TYPE = 5 AND
-//    (t2.TYPE = 6 AND t2.NODESTATE = 2)
-//) OR
-//(t1.ID = t2.ADDEVENTID AND t1.TYPE = 5 AND t2.TYPE = 7 AND t2.PREVIOUSNODESTATE <> 2)
-//GROUP BY t1.NODEPROVIDER, t1.NODEURL
-//) tab
-//GROUP BY tab.np

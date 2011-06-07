@@ -36,11 +36,6 @@
  */
 package org.ow2.proactive.resourcemanager.common.event;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Lob;
-import javax.persistence.Table;
-
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
@@ -70,59 +65,37 @@ import org.ow2.proactive.resourcemanager.rmnode.RMNode;
  * @since ProActive Scheduling 0.9
  */
 @PublicAPI
-@Entity
-@Table(name = "RMNodeEvent")
 public final class RMNodeEvent extends RMEvent {
 
     /** URL of the related node */
-    @Column(name = "nodeUrl")
     private final String nodeUrl;
 
     /** {@link NodeSource} name of the node */
-    @Column(name = "nodeSource")
     private final String nodeSource;
 
     /** {@link ProActiveDescriptor} name of the node */
-    @Column(name = "PADName")
     private final String PADName;
 
     /** {@link VirtualNode} name of the node */
-    @Column(name = "VnName")
     private final String VnName;
 
     /** Host name of the node */
-    @Column(name = "hostName")
     private final String hostName;
 
     /** Java virtual machine name of the node */
-    @Column(name = "VMName")
     private final String VMName;
 
     /** The state of the associated node */
-    @Column(name = "nodeState")
     private final NodeState nodeState;
 
     /** The previous state of the associated node */
-    @Column(name = "previousNodeState")
     private final NodeState previousNodeState;
 
-    @Column(name = "nodeProvider")
     private final String nodeProvider;
 
-    @Column(name = "nodeOwner")
     private final String nodeOwner;
 
-    /** The id of the previous event */
-    @Column(name = "previousEventId")
-    private long previousEventId;
-
-    /** The id of the add event */
-    @Column(name = "addEventId")
-    private long addEventId;
-
     /** The description of the node */
-    @Column(name = "nodeInfo", length = Integer.MAX_VALUE)
-    @Lob
     private String description;
 
     /**
@@ -139,8 +112,6 @@ public final class RMNodeEvent extends RMEvent {
         this.previousNodeState = null;
         this.nodeProvider = null;
         this.nodeOwner = null;
-        this.previousEventId = 0l;
-        this.addEventId = 0l;
         this.description = null;
     }
 
@@ -184,19 +155,11 @@ public final class RMNodeEvent extends RMEvent {
         this.nodeProvider = rmNode.getProvider() == null ? null : rmNode.getProvider().getName();
         this.nodeOwner = rmNode.getOwner() == null ? null : rmNode.getOwner().getName();
         // The rm node always keeps track on its last event, this is needed for rm node events logic
-        if (eventType == null) {
-            this.previousEventId = 0l;
-            this.addEventId = 0l;
-        } else {
+        if (eventType != null) {
             switch (eventType) {
                 case NODE_ADDED:
                     rmNode.setAddEvent(this);
-                    this.previousEventId = 0l;
-                    this.addEventId = 0l;
                     break;
-                default:
-                    this.previousEventId = rmNode.getLastEvent() == null ? 0l : rmNode.getLastEvent().id;
-                    this.addEventId = rmNode.getAddEvent() == null ? 0l : rmNode.getAddEvent().id;
             }
             rmNode.setLastEvent(this);
         }

@@ -40,13 +40,6 @@ import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.MappedSuperclass;
-import javax.persistence.Table;
-
 import org.objectweb.proactive.annotation.PublicAPI;
 
 
@@ -57,24 +50,13 @@ import org.objectweb.proactive.annotation.PublicAPI;
  * @since ProActive Scheduling 0.9
  */
 @PublicAPI
-@MappedSuperclass
-@Entity
-@Table(name = "RMEvent")
 public class RMEvent implements Serializable {
 
-    @Id
-    @GeneratedValue
-    @SuppressWarnings("unused")
-    protected long id;
     /** Resource manager URL */
-    @Column(name = "rmurl")
     private String RMUrl = null;
-    @Column(name = "type")
     protected RMEventType type;
     /** the resource manager client which initiates the event */
-    @Column(name = "initiator")
     protected String initiator;
-    @Column(name = "timeStamp")
     protected long timeStamp;
 
     /**

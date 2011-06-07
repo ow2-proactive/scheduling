@@ -172,4 +172,12 @@ public interface DatabaseManager {
      */
     @SuppressWarnings("rawtypes")
     public List sqlQuery(String nativeQuery);
+
+    /**
+     * Execute an update SQL query.
+     * 
+     * @param nativeQuery the query to be executed, could be INSERT/UPDATE or DELETE query.
+     * @return number of raws affected
+     */
+    public int sqlUpdateQuery(String nativeQuery);
 }

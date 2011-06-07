@@ -301,6 +301,7 @@ public class ResourceManagerController {
             System.exit(5);
         }
 
+        model.exit_();
         // if execution reaches this point this means it must exit
         System.exit(0);
     }

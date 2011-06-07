@@ -58,7 +58,7 @@ public abstract class AbstractAccountsManager<E extends Account> {
     /** The logger provided by sub-classes */
     protected final Logger logger;
     /** The map that contains all statistics */
-    private volatile Map<String, E> accountsMap;
+    protected volatile Map<String, E> accountsMap;
     /** Refresh delay changeable by the user */
     private volatile int refreshRateInSeconds;
     /** Last refresh duration */

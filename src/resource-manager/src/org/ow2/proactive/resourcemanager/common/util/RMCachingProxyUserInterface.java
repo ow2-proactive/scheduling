@@ -93,9 +93,6 @@ public class RMCachingProxyUserInterface extends RMProxyUserInterface implements
      */
     public void rmEvent(RMEvent event) {
         switch (event.getEventType()) {
-            case ALIVE:
-                RMstate = RMEventType.ALIVE;
-                break;
             case SHUTTING_DOWN:
                 RMstate = RMEventType.SHUTTING_DOWN;
                 break;

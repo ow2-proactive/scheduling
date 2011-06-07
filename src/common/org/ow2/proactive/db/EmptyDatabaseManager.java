@@ -152,4 +152,8 @@ public class EmptyDatabaseManager implements DatabaseManager {
         return new ArrayList<Object>();
     }
 
+    @Override
+    public int sqlUpdateQuery(String nativeQuery) {
+        return 0;
+    }
 }
