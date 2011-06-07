@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <job xmlns="urn:proactive:jobdescriptor:dev" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="urn:proactive:jobdescriptor:dev ../../../src/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/dev/schedulerjob.xsd"
-	name="${jobName}" cancelJobOnError="true" maxNumberOfExecution="2" projectName="${PROJECT}" restartTaskOnError="elsewhere" logFile="${pa.scheduler.home}/.logs/${jobName}.log">
+	name="${jobName}" cancelJobOnError="true" maxNumberOfExecution="2" projectName="${PROJECT}" restartTaskOnError="elsewhere">
 	<!-- ${jobName} is set as JVM parameter in the TestJobFactory -->
 	<variables>
 		<!-- Relative path is from Scheduler root directory for the tests -->
