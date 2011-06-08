@@ -36,6 +36,8 @@
  */
 package org.ow2.proactive.resourcemanager.core.history;
 
+import java.util.List;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -46,6 +48,8 @@ import javax.persistence.Transient;
 import org.apache.log4j.Logger;
 import org.hibernate.annotations.Index;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.ow2.proactive.db.Condition;
+import org.ow2.proactive.db.ConditionComparator;
 import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
@@ -102,6 +106,12 @@ public class History {
     private boolean createNewRecord;
 
     /**
+     * Default constructor for Hibernate
+     */
+    public History() {
+    }
+
+    /**
      * Constructs new history record.
      */
     public History(RMNodeEvent event) {
@@ -145,21 +155,16 @@ public class History {
      * Updates the previous history record, namely sets the end time of the previous node state
      */
     private void updatePreviousItem() {
-        String sql = "UPDATE " + this.getClass().getAnnotation(Table.class).name() + " SET ";
-        try {
-            String endTimeColumnName = this.getClass().getDeclaredField("endTime")
-                    .getAnnotation(Column.class).name();
-            String nodeUrlColumnName = this.getClass().getDeclaredField("nodeUrl")
-                    .getAnnotation(Column.class).name();
+        List<History> previousRecords = DatabaseManager.getInstance().recover(History.class,
+                new Condition("nodeUrl", ConditionComparator.EQUALS_TO, this.nodeUrl),
+                new Condition("endTime", ConditionComparator.EQUALS_TO, new Long(0)));
 
-            sql += endTimeColumnName + " = " + startTime + " ";
-            sql += "WHERE " + nodeUrlColumnName + " = '" + nodeUrl + "' and " + endTimeColumnName + " = 0";
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        for (History prev : previousRecords) {
+            prev.endTime = startTime;
+            DatabaseManager.getInstance().update(prev);
         }
 
-        int result = DatabaseManager.getInstance().sqlUpdateQuery(sql);
-        logger.debug("Updating previous item for node " + nodeUrl + ": " + result + " raws affected");
+        logger.debug("Updating previous item for node " + nodeUrl);
     }
 
     /**
@@ -168,45 +173,23 @@ public class History {
      */
     public static void recover(Alive alive) {
 
-        String historyTableName = History.class.getAnnotation(Table.class).name();
+        List<History> records = DatabaseManager.getInstance().recover(History.class,
+                new Condition("endTime", ConditionComparator.EQUALS_TO, new Long(0)));
 
-        // first updating the end time of each record with the last up time of the resource manager
-        // where it's bigger than start time
-        String sql = "UPDATE " + historyTableName + " SET ";
-        try {
-            String endTimeColumnName = History.class.getDeclaredField("endTime").getAnnotation(Column.class)
-                    .name();
-            String startTimeColumnName = History.class.getDeclaredField("startTime").getAnnotation(
-                    Column.class).name();
-
-            sql += endTimeColumnName + " = " + alive.getTime() + " ";
-            sql += "WHERE " + startTimeColumnName + " < " + alive.getTime() + " AND " + endTimeColumnName +
-                " = 0";
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        for (History record : records) {
+            if (record.startTime < alive.getTime()) {
+                // alive time bigger than start time of the history record
+                // marking the end of this record as last RM alive time
+                record.endTime = alive.getTime();
+            } else {
+                // the event happened after last RM alive time update
+                // just put endTime = startTime
+                record.endTime = record.startTime;
+            }
+            DatabaseManager.getInstance().update(record);
         }
 
-        int result = DatabaseManager.getInstance().sqlUpdateQuery(sql);
-        logger
-                .debug("Restoring the node history: " + result +
-                    " raws updated with the time from Alive table");
+        logger.debug("Restoring the node history: " + records.size() + " raws updated");
 
-        // now put start time into endTime for other history records with 0 end time
-        sql = "UPDATE " + historyTableName + " SET ";
-        try {
-            String endTimeColumnName = History.class.getDeclaredField("endTime").getAnnotation(Column.class)
-                    .name();
-            String startTimeColumnName = History.class.getDeclaredField("startTime").getAnnotation(
-                    Column.class).name();
-
-            sql += endTimeColumnName + " = " + startTimeColumnName + " ";
-            sql += "WHERE " + endTimeColumnName + " = 0";
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-
-        result = DatabaseManager.getInstance().sqlUpdateQuery(sql);
-        logger.debug("Restoring the node history: " + result +
-            " raws updated putting the start time into the end time");
     }
 }

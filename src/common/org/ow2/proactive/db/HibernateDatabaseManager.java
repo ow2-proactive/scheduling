@@ -591,19 +591,6 @@ public abstract class HibernateDatabaseManager implements DatabaseManager {
     }
 
     /**
-     * {@inheritDoc}
-     */
-    public int sqlUpdateQuery(String nativeQuery) {
-        getDevLogger().debug("Executing query '" + nativeQuery + "'");
-        StatelessSession session = getSessionFactory().openStatelessSession();
-        session.beginTransaction();
-        int result = session.createSQLQuery(nativeQuery).executeUpdate();
-        session.getTransaction().commit();
-
-        return result;
-    }
-
-    /**
      * Get every fields contained in the given class and in the inheritance if needed.
      *
      * @param clazz the class where to find the fields.
