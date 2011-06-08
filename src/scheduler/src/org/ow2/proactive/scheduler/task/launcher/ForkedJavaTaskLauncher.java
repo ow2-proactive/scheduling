@@ -181,8 +181,23 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher implements ForkerSt
      * @see org.ow2.proactive.scheduler.task.launcher.TaskLauncher#getProgress()
      */
     @Override
+    @ImmediateService
     public int getProgress() {
-        return ((ForkedJavaExecutable) currentExecutable).getProgress();
+        if (currentExecutable == null) {
+            return 0;
+        } else {
+            int progress = currentExecutable.getProgress();
+            if (progress < 0) {
+                logger_dev.warn("Returned progress (" + progress + ") is negative, return 0 instead.");
+                return 0;
+            } else if (progress > 100) {
+                logger_dev.warn("Returned progress (" + progress +
+                    ") is greater than 100, return 100 instead.");
+                return 100;
+            } else {
+                return progress;
+            }
+        }
     }
 
     /**

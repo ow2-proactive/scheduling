@@ -521,7 +521,7 @@ public abstract class InternalJob extends JobState {
     public void reStartTask(InternalTask task) {
         logger_dev.debug(" ");
         getJobDescriptor().reStart(task.getId());
-
+        task.setProgress(0);
         if (getStatus() == JobStatus.PAUSED) {
             task.setStatus(TaskStatus.PAUSED);
             HashMap<TaskId, TaskStatus> hts = new HashMap<TaskId, TaskStatus>();

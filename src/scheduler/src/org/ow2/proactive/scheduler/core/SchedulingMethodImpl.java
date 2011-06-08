@@ -635,6 +635,6 @@ final class SchedulingMethodImpl implements SchedulingMethod {
         core.frontend.taskStateUpdated(job.getOwner(), new NotificationData<TaskInfo>(
             SchedulerEvent.TASK_PENDING_TO_RUNNING, task.getTaskInfo()));
         //fill previous task progress with 0, means task has started
-        core.previousTaskProgress.put(task.getId(), 0);
+        task.setProgress(0);
     }
 }

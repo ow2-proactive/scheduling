@@ -91,7 +91,6 @@ import org.ow2.proactive.scheduler.common.SchedulerStatus;
 import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
 import org.ow2.proactive.scheduler.common.exception.ClassServerException;
 import org.ow2.proactive.scheduler.common.exception.InternalException;
-import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.exception.TaskAbortedException;
 import org.ow2.proactive.scheduler.common.exception.TaskPreemptedException;
 import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
@@ -135,8 +134,8 @@ import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.task.launcher.TaskLauncher;
 import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 import org.ow2.proactive.scheduler.util.classloading.JobClasspathManager;
-import org.ow2.proactive.scheduler.util.classloading.TaskClassServer;
 import org.ow2.proactive.scheduler.util.classloading.JobClasspathManager.JobClasspathEntry;
+import org.ow2.proactive.scheduler.util.classloading.TaskClassServer;
 import org.ow2.proactive.utils.NodeSet;
 
 
@@ -237,9 +236,6 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
 
     /** Currently running tasks for a given jobId*/
     ConcurrentHashMap<JobId, Hashtable<TaskId, TaskLauncher>> currentlyRunningTasks;
-
-    /** Currently running task previous progress percent */
-    ConcurrentHashMap<TaskId, Integer> previousTaskProgress;
 
     /** ClassLoading */
     // contains taskCLassServer for currently running jobs
@@ -427,7 +423,6 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
             this.status = SchedulerStatus.STOPPED;
             this.jobsToBeLogged = new Hashtable<JobId, AsyncAppender>();
             this.currentlyRunningTasks = new ConcurrentHashMap<JobId, Hashtable<TaskId, TaskLauncher>>();
-            this.previousTaskProgress = new ConcurrentHashMap<TaskId, Integer>();
             this.threadPoolForTerminateTL = Executors.newFixedThreadPool(TERMINATE_THREAD_NUMBER,
                     new NamedThreadFactory("TaskLauncher_Terminate"));
             this.frontend = frontend;
@@ -776,12 +771,11 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
                     for (InternalTask td : job.getITasks()) {
                         if (td != null && (td.getStatus() == TaskStatus.RUNNING)) {
                             try {
-                                Integer progress = td.getExecuterInformations().getLauncher().getProgress();
-                                td.setProgress(progress);//(1)
-                                //get previous if set
-                                Integer previousProgress = previousTaskProgress.get(td.getId());
-                                if (!progress.equals(previousProgress)) {
-                                    //if previousProgress==null or previousProgress != progress -> update
+                                int progress = td.getExecuterInformations().getLauncher().getProgress();
+                                //get previous inside td
+                                if (progress != td.getProgress()) {
+                                    td.setProgress(progress);//(1)
+                                    //if progress != previously set progress (0 by default) -> update
                                     frontend.taskStateUpdated(job.getOwner(), new NotificationData<TaskInfo>(
                                         SchedulerEvent.TASK_PROGRESS, td.getTaskInfo()));
                                 }
@@ -808,8 +802,8 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
                                     //just save the rest of the method execution
                                 }
 
-                                //remove previous read
-                                previousTaskProgress.remove(td.getId());
+                                //re-init progress as it is failed
+                                td.setProgress(0);
                                 //manage restart
                                 td.decreaseNumberOfExecutionOnFailureLeft();
                                 DatabaseManager.getInstance().synchronize(td.getTaskInfo());
@@ -934,7 +928,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
         for (InternalTask td : job.getITasks()) {
             if (td.getStatus() == TaskStatus.RUNNING) {
                 //remove previous read progress
-                previousTaskProgress.remove(td.getId());
+                td.setProgress(0);
 
                 //get the nodes that are used for this descriptor
                 NodeSet nodes = td.getExecuterInformations().getNodes();
@@ -1072,8 +1066,6 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
 
         //get the internal task
         InternalTask descriptor = job.getIHMTasks().get(taskId);
-        //remove previous read
-        previousTaskProgress.remove(descriptor.getId());
 
         final TaskLauncher taskLauncher;
         synchronized (currentlyRunningTasks) {
