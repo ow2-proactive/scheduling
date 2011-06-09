@@ -36,10 +36,6 @@
  */
 package org.ow2.proactive.scheduler.core.jmx.mbean;
 
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.Map;
-
 import javax.management.NotCompliantMBeanException;
 
 import org.ow2.proactive.scheduler.core.account.SchedulerAccount;
@@ -74,31 +70,4 @@ public final class AllAccountsMBeanImpl extends MyAccountMBeanImpl implements Al
         return super.accountsManager.getAccount(this.targetUsername); // can be null
     }
 
-    public String[] getJobDurationRanks() {
-        final Map<String, SchedulerAccount> map = super.accountsManager.getAllAccounts();
-        final Comparator<String> comparator = new Comparator<String>() {
-            public final int compare(final String username1, final String username2) {
-                final long v1 = map.get(username1).getTotalJobDuration();
-                final long v2 = map.get(username2).getTotalJobDuration();
-                return (v1 < v2 ? -1 : (v1 == v2 ? 0 : 1));
-            }
-        };
-        final String[] res = new String[map.size()];
-        Arrays.sort(map.keySet().toArray(res), comparator);
-        return res;
-    }
-
-    public String[] getTaskDurationRanks() {
-        final Map<String, SchedulerAccount> map = super.accountsManager.getAllAccounts();
-        final Comparator<String> comparator = new Comparator<String>() {
-            public final int compare(final String username1, final String username2) {
-                final long v1 = map.get(username1).getTotalTaskDuration();
-                final long v2 = map.get(username2).getTotalTaskDuration();
-                return (v1 < v2 ? -1 : (v1 == v2 ? 0 : 1));
-            }
-        };
-        final String[] res = new String[map.size()];
-        Arrays.sort(map.keySet().toArray(res), comparator);
-        return res;
-    }
 }

@@ -69,8 +69,7 @@ public final class RMAccountsManager extends AbstractAccountsManager<RMAccount> 
      * Create a new instance of this class.
      */
     public RMAccountsManager() {
-        super(new HashMap<String, RMAccount>(), "Resource Manager Accounts Refresher", ProActiveLogger
-                .getLogger(RMLoggers.MONITORING));
+        super("Resource Manager Accounts Refresher", ProActiveLogger.getLogger(RMLoggers.MONITORING));
         // Get the database manager
         this.dbmanager = DatabaseManager.getInstance();
     }
@@ -85,34 +84,11 @@ public final class RMAccountsManager extends AbstractAccountsManager<RMAccount> 
     }
 
     /**
-     * Reads database and fills accounts.
-     */
-    protected void internalRefresh(final Map<String, RMAccount> map) {
-
-        List<Client> clients = new LinkedList<Client>();
-        synchronized (RMCore.clients) {
-            clients.addAll(RMCore.clients.values());
-        }
-
-        for (Client client : clients) {
-            synchronized (accountsMap) {
-                accountsMap.remove(client.getName());
-            }
-            map.put(client.getName(), getAccount(client.getName()));
-        }
-    }
-
-    /**
      * 
      * Computes user account data by scanning the data base.
      * 
      */
-    public RMAccount getAccount(final String user) {
-        synchronized (accountsMap) {
-            if (accountsMap.containsKey(user)) {
-                return accountsMap.get(user);
-            }
-        }
+    public RMAccount readAccount(final String user) {
 
         try {
 
@@ -182,10 +158,6 @@ public final class RMAccountsManager extends AbstractAccountsManager<RMAccount> 
                         account.providedNodeTime = 0;
                     }
                 }
-            }
-
-            synchronized (accountsMap) {
-                accountsMap.put(user, account);
             }
 
             return account;

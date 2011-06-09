@@ -47,8 +47,4 @@ public interface AllAccountsMBean extends MyAccountMBean {
     public void setUsername(String username);
 
     public String getUsername();
-
-    public String[] getJobDurationRanks();
-
-    public String[] getTaskDurationRanks();
 }

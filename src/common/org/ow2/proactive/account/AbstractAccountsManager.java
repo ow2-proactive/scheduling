@@ -70,9 +70,8 @@ public abstract class AbstractAccountsManager<E extends Account> {
     /** The refresh future */
     private volatile ScheduledFuture<?> refreshFuture;
 
-    protected AbstractAccountsManager(final Map<String, E> accountsMap, final String refreshThreadName,
-            final Logger logger) {
-        this.accountsMap = accountsMap;
+    protected AbstractAccountsManager(final String refreshThreadName, final Logger logger) {
+        this.accountsMap = new HashMap<String, E>();
         this.refreshRateInSeconds = this.getDefaultRefreshRateInSeconds();
         // Create the single thread executor that creates min priority daemon
         // thread
@@ -91,47 +90,42 @@ public abstract class AbstractAccountsManager<E extends Account> {
     }
 
     private void internalRefresh() {
-        // Create new map
-        final HashMap<String, E> newMap = new HashMap<String, E>(this.accountsMap.size());
-        this.internalRefresh(newMap);
-        this.accountsMap = newMap;
+        // reseting the map contained all the records
+        // it will provoke the data base access next time the client request 
+        // an accounting information
+        this.accountsMap = new HashMap<String, E>();
     }
 
     /**
-     * Reads database and fills accounts.
+     * Reads account information from the data base
+     * @param username the name of the user for which account is read
+     * @return account
      */
-    protected abstract void internalRefresh(final Map<String, E> map);
+    protected abstract E readAccount(final String username);
 
     /**
      * Returns the accounts for the user specified by its username
      *
      * @param username the name of the user
-     * @return The accounts of the user, can be null if the user is unknown (has
-     *         never submitted jobs and is not connected)
+     * @return The accounts of the user, can be null if the user is unknown
+     * 
      */
     public E getAccount(final String username) {
-        return this.accountsMap.get(username);
-    }
+        synchronized (accountsMap) {
+            if (accountsMap.containsKey(username)) {
+                return accountsMap.get(username);
+            }
+        }
 
-    /**
-     * This methods returns all performs a full refresh from database so it can take some
-     * time and return accounts for all users. Only one such method can be executed
-     * at a time.
-     *
-     * @return a map of fresh user accounts from the database
-     */
-    public Map<String, E> getAllAccounts() {
-        //        // If it is scheduled and not running
-        //        if (this.refreshFuture.getDelay(TimeUnit.SECONDS) > 0) {
-        //            // schedule it to run immediately
-        //            this.internalSchedule(true);
-        //        }
-        //        try {
-        //            this.refreshFuture.get();
-        //        } catch (Exception e) {
-        //            logger_dev.error("Unable to wait for the end of the refresh", e);
-        //        }
-        return this.accountsMap;
+        E account = readAccount(username);
+
+        if (account != null) {
+            synchronized (accountsMap) {
+                accountsMap.put(username, account);
+            }
+        }
+
+        return account;
     }
 
     /**

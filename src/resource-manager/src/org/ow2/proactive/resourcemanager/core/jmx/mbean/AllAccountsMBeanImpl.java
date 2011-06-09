@@ -68,32 +68,4 @@ public final class AllAccountsMBeanImpl extends MyAccountMBeanImpl implements Al
     protected RMAccount internalGetAccount() {
         return super.accountsManager.getAccount(this.targetUsername); // can be null
     }
-
-    //    public String[] getJobDurationRanks() {
-    //        final Map<String, RMAccount> map = super.accountsManager.getAllAccounts();
-    //        final Comparator<String> comparator = new Comparator<String>() {
-    //            public final int compare(final String username1, final String username2) {
-    //                final RMAccount a1 = map.get(username1);
-    //                final RMAccount a2 = map.get(username2);
-    //                return a1.getJobDurationRank() - a2.getJobDurationRank();
-    //            }
-    //        };
-    //        final String[] res = new String[map.size()];
-    //        Arrays.sort(map.keySet().toArray(res), comparator);
-    //        return res;
-    //    }
-    //
-    //    public String[] getTaskDurationRanks() {
-    //        final Map<String, RMAccount> map = super.accountsManager.getAllAccounts();
-    //        final Comparator<String> comparator = new Comparator<String>() {
-    //            public final int compare(final String username1, final String username2) {
-    //                final RMAccount a1 = map.get(username1);
-    //                final RMAccount a2 = map.get(username2);
-    //                return a1.getTaskDurationRank() - a2.getTaskDurationRank();
-    //            }
-    //        };
-    //        final String[] res = new String[map.size()];
-    //        Arrays.sort(map.keySet().toArray(res), comparator);
-    //        return res;
-    //    }
 }

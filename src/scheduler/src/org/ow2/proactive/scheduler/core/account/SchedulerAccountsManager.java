@@ -75,79 +75,43 @@ public final class SchedulerAccountsManager extends AbstractAccountsManager<Sche
      * Create a new instance of this class.
      */
     public SchedulerAccountsManager() {
-        super(new HashMap<String, SchedulerAccount>(), "Scheduler Accounts Manager Refresher",
-                ProActiveLogger.getLogger(SchedulerDevLoggers.DATABASE));
+        super("Scheduler Accounts Manager Refresher", ProActiveLogger.getLogger(SchedulerDevLoggers.DATABASE));
 
         // Get the database manager
         this.dbmanager = DatabaseManager.getInstance();
     }
 
     /**
-     * Reads database and fills accounts.
+     * Reads database and fills accounts for specified user.
      */
-    protected void internalRefresh(final Map<String, SchedulerAccount> map) {
-        // Task stats
-        final String taskStatsQuery = SchedulerAccountsManager.taskStatsSQL();
+    protected SchedulerAccount readAccount(String username) {
+        final String taskStatsQuery = SchedulerAccountsManager.taskStatsSQL(username);
         if (super.logger.isDebugEnabled()) {
             super.logger.debug(taskStatsQuery);
         }
 
+        SchedulerAccount account = new SchedulerAccount();
+        account.username = username;
+
         final List<?> taskStats = this.dbmanager.sqlQuery(taskStatsQuery);
-        // The result of the query is sorted by task duration (Descending order)
-        for (int i = 0; i < taskStats.size(); i++) {
-            final Object[] tuple = (Object[]) taskStats.get(i);
-            final String username = (String) tuple[0];
-            SchedulerAccount account = map.get(username);
-            // The user may be unknown
-            if (account == null) {
-                account = new SchedulerAccount();
-                account.username = username;
-                map.put(username, account);
-            }
-            // Fill task related stats
-            account.totalTaskCount = ((Number) tuple[1]).intValue();
-            account.totalTaskDuration = ((Number) tuple[2]).longValue();
+        if (taskStats.size() > 0) {
+            final Object[] tuple = (Object[]) taskStats.get(0);
+            account.totalTaskCount = ((Number) tuple[0]).intValue();
+            account.totalTaskDuration = ((Number) tuple[1]).longValue();
         }
 
-        // Create job accounts query, submit it to the database and fill user stats
-        final String jobStatsQuery = SchedulerAccountsManager.jobStatsSQL();
+        final String jobStatsQuery = SchedulerAccountsManager.jobStatsSQL(username);
         if (super.logger.isDebugEnabled()) {
             super.logger.debug(jobStatsQuery);
         }
-        // The result of the query is sorted by job duration (Descending order)
         final List<?> jobStats = this.dbmanager.sqlQuery(jobStatsQuery);
-        for (int i = 0; i < jobStats.size(); i++) {
-            final Object[] tuple = (Object[]) jobStats.get(i);
-            final String username = (String) tuple[0];
-            SchedulerAccount account = map.get(username);
-            // The user may be unknown
-            if (account == null) {
-                account = new SchedulerAccount();
-                account.username = username;
-                map.put(username, account);
-            }
-            // Fill stats
-            account.totalJobCount = ((Number) tuple[1]).intValue();
-            account.totalJobDuration = ((Number) tuple[2]).longValue();
+        if (jobStats.size() > 0) {
+            final Object[] tuple = (Object[]) jobStats.get(0);
+            account.totalJobCount = ((Number) tuple[0]).intValue();
+            account.totalJobDuration = ((Number) tuple[1]).longValue();
         }
 
-        // Add all connected users info
-        //        for (final UserIdentification userIdent : this.connectedUsers.getUsers()) {
-        //            final String username = userIdent.getUsername();
-        //            SchedulerAccount account = map.get(username);
-        //            // Maybe there are some cases where a user is connected and is not
-        //            // in the db
-        //            if (account == null) {
-        //                account = new SchedulerAccount();
-        //                account.username = username;
-        //                map.put(username, account);
-        //            }
-        //            // If the user is in database and has never been connected
-        //            // or has reconnected
-        //            if (account.ref == null || account.ref.get() == null) {
-        //                account.ref = new WeakReference<UserIdentification>(userIdent);
-        //            }
-        //        }
+        return account;
     }
 
     /**
@@ -160,9 +124,8 @@ public final class SchedulerAccountsManager extends AbstractAccountsManager<Sche
 
     // For the two requests, it does not take into account the following
     // tables : Internal_NTV_TASK, INTERNAL_FORKED_TASK
-    private static String taskStatsSQL() {
+    private static String taskStatsSQL(String userName) {
         final StringBuilder builder = new StringBuilder("SELECT ");
-        builder.append("d." + fn.get("InternalJob_owner") + ",");
         builder.append("count(*),");
         builder.append("sum(" + fn.get("finishedTime") + " - " + fn.get("startTime") + ") s ");
         builder.append("FROM ");
@@ -175,14 +138,13 @@ public final class SchedulerAccountsManager extends AbstractAccountsManager<Sche
         builder.append("b." + fn.get("InternalJavaTask_HID") + "=c." + fn.get("InternalJob_tasksDep") +
             " AND ");
         builder.append("c." + fn.get("InternalJob_ITasksId") + "=d." + fn.get("InternalTFJob_HID") + " AND ");
-        builder.append("a." + fn.get("finishedTime") + ">0 ");
-        builder.append("GROUP BY d." + fn.get("InternalJob_owner"));
+        builder.append("a." + fn.get("finishedTime") + ">0 AND ");
+        builder.append("d." + fn.get("InternalJob_owner") + "='" + userName + "'");
         return builder.toString();
     }
 
-    private static String jobStatsSQL() {
+    private static String jobStatsSQL(String userName) {
         final StringBuilder builder = new StringBuilder("SELECT ");
-        builder.append("a." + fn.get("InternalJob_owner") + ",");
         builder.append("count(*), ");
         builder.append("sum(" + fn.get("finishedTime") + " - " + fn.get("startTime") + ") s ");
         builder.append("FROM ");
@@ -190,8 +152,8 @@ public final class SchedulerAccountsManager extends AbstractAccountsManager<Sche
         builder.append(fn.get("JobInfoImpl") + " b ");
         builder.append("WHERE ");
         builder.append("a." + fn.get("JobInfo_REF") + "=b." + fn.get("JobInfo_HID") + " AND ");
-        builder.append("b." + fn.get("JobInfo_finishedTime") + ">0 ");
-        builder.append("GROUP BY a." + fn.get("InternalJob_owner"));
+        builder.append("b." + fn.get("JobInfo_finishedTime") + ">0 AND ");
+        builder.append("a." + fn.get("InternalJob_owner") + "='" + userName + "'");
         return builder.toString();
     }
 
@@ -240,17 +202,4 @@ public final class SchedulerAccountsManager extends AbstractAccountsManager<Sche
         }
     }
 
-    public static void main(String[] args) {
-        SchedulerAccountsManager m = new SchedulerAccountsManager();
-        m.startAccountsRefresher();
-        while (true) {
-            try {
-                Thread.sleep(5000);
-                System.out.println("UsersStatisticsManager.main() --> " + m.getAllAccounts());
-            } catch (InterruptedException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-        }
-    }
 }
