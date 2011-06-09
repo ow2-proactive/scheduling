@@ -116,18 +116,6 @@ public final class AddGetReleaseRemoveTest extends FunctionalTest {
         // Ensure that no refreshes was done and all account values are correctly initialized        
         AttributeList atts = conn.getAttributes(myAccountMBeanName, new String[] { "UsedNodeTime",
                 "ProvidedNodeTime", "ProvidedNodesCount" });
-        long usedNodeTime = (Long) ((Attribute) atts.get(0)).getValue();
-        long providedNodeTime = (Long) ((Attribute) atts.get(1)).getValue();
-        int providedNodesCount = (Integer) ((Attribute) atts.get(2)).getValue();
-
-        Assert
-                .assertTrue(
-                        "The accounts must not be refreshed automatically therefore the LastRefreshDurationInMilliseconds must be 0",
-                        (Long) conn.getAttribute(managementMBeanName, "LastRefreshDurationInMilliseconds") == 0l);
-        Assert.assertTrue("The usedNodeTime attribute must be 0", usedNodeTime == 0);
-        Assert.assertTrue("The providedNodeTime attribute must be 0", providedNodeTime == 0);
-        Assert.assertTrue("The providedNodesCount attribute must be 0", providedNodesCount == 0);
-
         // ADD, GET, RELEASE, REMOVE
         // 1) ADD
         final long beforeAddTime = System.currentTimeMillis();
@@ -156,20 +144,12 @@ public final class AddGetReleaseRemoveTest extends FunctionalTest {
         // Refresh the account manager
         conn.invoke(managementMBeanName, "refreshAllAccounts", null, null);
 
-        // Wait until the refresh is done
-        long refreshDuration;
-        do {
-            Thread.sleep(500);
-            refreshDuration = (Long) conn.getAttribute(managementMBeanName,
-                    "LastRefreshDurationInMilliseconds");
-        } while (refreshDuration <= 0);
-
         // Check account values validity                      
         atts = conn.getAttributes(myAccountMBeanName, new String[] { "UsedNodeTime", "ProvidedNodeTime",
                 "ProvidedNodesCount" });
-        usedNodeTime = (Long) ((Attribute) atts.get(0)).getValue();
-        providedNodeTime = (Long) ((Attribute) atts.get(1)).getValue();
-        providedNodesCount = (Integer) ((Attribute) atts.get(2)).getValue();
+        long usedNodeTime = (Long) ((Attribute) atts.get(0)).getValue();
+        long providedNodeTime = (Long) ((Attribute) atts.get(1)).getValue();
+        int providedNodesCount = (Integer) ((Attribute) atts.get(2)).getValue();
 
         Assert.assertTrue("Invalid value of the usedNodeTime attribute", (usedNodeTime >= GR_DURATION) &&
             (usedNodeTime <= getReleaseMaxDuration));

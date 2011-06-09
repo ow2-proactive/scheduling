@@ -150,14 +150,6 @@ public final class AddGetTest extends FunctionalTest {
         // Refresh the account manager
         conn.invoke(managementMBeanName, "refreshAllAccounts", null, null);
 
-        // Wait until the refresh is done
-        long refreshDuration;
-        do {
-            Thread.sleep(500);
-            refreshDuration = (Long) conn.getAttribute(managementMBeanName,
-                    "LastRefreshDurationInMilliseconds");
-        } while (refreshDuration <= 0);
-
         final long currentTime = System.currentTimeMillis();
         final long addRefreshMaxDuration = currentTime - beforeAddTime;
         final long getRefreshMaxDuration = currentTime - beforeGetTime;

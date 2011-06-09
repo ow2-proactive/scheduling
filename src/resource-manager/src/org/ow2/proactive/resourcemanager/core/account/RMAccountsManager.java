@@ -36,18 +36,13 @@
  */
 package org.ow2.proactive.resourcemanager.core.account;
 
-import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import javax.persistence.Column;
 import javax.persistence.Table;
 
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.account.AbstractAccountsManager;
-import org.ow2.proactive.resourcemanager.authentication.Client;
-import org.ow2.proactive.resourcemanager.core.RMCore;
 import org.ow2.proactive.resourcemanager.core.history.History;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.db.DatabaseManager;

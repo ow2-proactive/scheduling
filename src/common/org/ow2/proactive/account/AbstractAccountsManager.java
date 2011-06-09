@@ -117,7 +117,9 @@ public abstract class AbstractAccountsManager<E extends Account> {
             }
         }
 
+        final long refreshStartTime = System.currentTimeMillis();
         E account = readAccount(username);
+        lastRefreshDurationInMilliseconds = System.currentTimeMillis() - refreshStartTime;
 
         if (account != null) {
             synchronized (accountsMap) {
@@ -210,14 +212,12 @@ public abstract class AbstractAccountsManager<E extends Account> {
      */
     private final class AccountsRefresher implements Runnable {
         public void run() {
-            final long refreshStartTime = System.currentTimeMillis();
             try {
                 internalRefresh();
             } catch (Exception e) {
                 logger.error("Exception when refreshing accounts", e);
             } finally {
                 internalSchedule(false);
-                lastRefreshDurationInMilliseconds = System.currentTimeMillis() - refreshStartTime;
             }
         }
     }

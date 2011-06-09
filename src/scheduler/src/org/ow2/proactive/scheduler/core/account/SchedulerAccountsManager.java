@@ -97,7 +97,10 @@ public final class SchedulerAccountsManager extends AbstractAccountsManager<Sche
         if (taskStats.size() > 0) {
             final Object[] tuple = (Object[]) taskStats.get(0);
             account.totalTaskCount = ((Number) tuple[0]).intValue();
-            account.totalTaskDuration = ((Number) tuple[1]).longValue();
+            if (tuple[1] != null) {
+                // sum could be null
+                account.totalTaskDuration = ((Number) tuple[1]).longValue();
+            }
         }
 
         final String jobStatsQuery = SchedulerAccountsManager.jobStatsSQL(username);
@@ -108,7 +111,10 @@ public final class SchedulerAccountsManager extends AbstractAccountsManager<Sche
         if (jobStats.size() > 0) {
             final Object[] tuple = (Object[]) jobStats.get(0);
             account.totalJobCount = ((Number) tuple[0]).intValue();
-            account.totalJobDuration = ((Number) tuple[1]).longValue();
+            if (tuple[1] != null) {
+                // sum could be null
+                account.totalJobDuration = ((Number) tuple[1]).longValue();
+            }
         }
 
         return account;
