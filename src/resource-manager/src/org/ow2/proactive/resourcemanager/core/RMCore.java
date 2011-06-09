@@ -1342,7 +1342,6 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             // when the disconnected client still uses nodes.
             // In the future we may clean nodes for any release request
             nodesCleaner.cleanAndRelease(nodesToRelease);
-            accountsManager.remove(client.getName());
             logger.info(client + " disconnected");
         } else {
             logger.warn("Trying to disconnect unknown client with id " + clientId);

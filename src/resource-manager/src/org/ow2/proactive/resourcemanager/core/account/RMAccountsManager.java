@@ -46,6 +46,8 @@ import javax.persistence.Table;
 
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.account.AbstractAccountsManager;
+import org.ow2.proactive.resourcemanager.authentication.Client;
+import org.ow2.proactive.resourcemanager.core.RMCore;
 import org.ow2.proactive.resourcemanager.core.history.History;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.db.DatabaseManager;
@@ -86,12 +88,17 @@ public final class RMAccountsManager extends AbstractAccountsManager<RMAccount> 
      * Reads database and fills accounts.
      */
     protected void internalRefresh(final Map<String, RMAccount> map) {
-        synchronized (accountsMap) {
-            List<String> users = new LinkedList<String>(accountsMap.keySet());
-            accountsMap.clear();
-            for (String user : users) {
-                map.put(user, getAccount(user));
+
+        List<Client> clients = new LinkedList<Client>();
+        synchronized (RMCore.clients) {
+            clients.addAll(RMCore.clients.values());
+        }
+
+        for (Client client : clients) {
+            synchronized (accountsMap) {
+                accountsMap.remove(client.getName());
             }
+            map.put(client.getName(), getAccount(client.getName()));
         }
     }
 
@@ -184,18 +191,6 @@ public final class RMAccountsManager extends AbstractAccountsManager<RMAccount> 
             return account;
         } catch (Exception e) {
             throw new RuntimeException(e);
-        }
-    }
-
-    /**
-     * 
-     * Removes a user account when user is disconnected.
-     * We will not refresh it for such user anymore.
-     * 
-     */
-    public void remove(final String username) {
-        synchronized (accountsMap) {
-            accountsMap.remove(username);
         }
     }
 
