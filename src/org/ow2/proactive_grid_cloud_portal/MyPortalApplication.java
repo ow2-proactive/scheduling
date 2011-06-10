@@ -54,6 +54,7 @@ import org.ow2.proactive_grid_cloud_portal.exceptions.ProActiveRuntimeExceptionM
 import org.ow2.proactive_grid_cloud_portal.exceptions.RuntimeExceptionMapper;
 import org.ow2.proactive_grid_cloud_portal.exceptions.SchedulerExceptionMapper;
 import org.ow2.proactive_grid_cloud_portal.exceptions.SubmissionClosedExceptionMapper;
+import org.ow2.proactive_grid_cloud_portal.exceptions.ThrowableMapper;
 import org.ow2.proactive_grid_cloud_portal.exceptions.UnknownJobExceptionMapper;
 import org.ow2.proactive_grid_cloud_portal.exceptions.UnknownTaskExceptionMapper;
 
@@ -87,7 +88,7 @@ public class MyPortalApplication extends Application {
         set.add(UnknownTaskExceptionMapper.class);
         set.add(UpdatablePropertiesConverter.class);
         set.add(LoggingExecutionInterceptor.class);   
-        
+        set.add(ThrowableMapper.class);   
         return set;
     }
 
