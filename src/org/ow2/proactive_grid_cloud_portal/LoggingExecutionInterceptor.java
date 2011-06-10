@@ -74,7 +74,7 @@ public class LoggingExecutionInterceptor implements MessageBodyReaderInterceptor
           stopWatch.stop();
           String contentLength = (String) response.getMetadata().getFirst(
                   HttpHeaderNames.CONTENT_LENGTH);
-          logger.info(String.format("Read url %s in %d ms size %s.", uri,
+          logger.debug(String.format("Read url %s in %d ms size %s.", uri,
                   stopWatch.getTime(), contentLength));
           return response;
        }
@@ -90,13 +90,12 @@ public class LoggingExecutionInterceptor implements MessageBodyReaderInterceptor
             return ctx.proceed();
         } finally {
             stopWatch.stop();
-            logger.info(String.format("Read mediaType %s as %s in %d ms.", ctx.getMediaType().toString(), ctx
+            logger.debug(String.format("Read mediaType %s as %s in %d ms.", ctx.getMediaType().toString(), ctx
                     .getType().getName(), stopWatch.getTime()));
         }
     }
 
     public boolean accept(Class declaring, Method method) {
-        System.out.println("should I accept ?");
         return true;
     }
 }

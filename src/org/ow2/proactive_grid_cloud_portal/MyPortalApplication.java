@@ -88,7 +88,8 @@ public class MyPortalApplication extends Application {
         set.add(UnknownTaskExceptionMapper.class);
         set.add(UpdatablePropertiesConverter.class);
         set.add(LoggingExecutionInterceptor.class);   
-        set.add(ThrowableMapper.class);   
+        set.add(ThrowableMapper.class);
+        set.add(LoggingInterceptor.class);
         return set;
     }
 

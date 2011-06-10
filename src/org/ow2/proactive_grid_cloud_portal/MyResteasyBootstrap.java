@@ -37,6 +37,9 @@
 package org.ow2.proactive_grid_cloud_portal;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.Properties;
@@ -84,14 +87,26 @@ public class MyResteasyBootstrap extends ResteasyBootstrap {
         dispatcher.addStringConverter(UpdatablePropertiesConverter.class);
 
         try {
-            PortalConfiguration.load(new File(event.getServletContext().getRealPath(
-                    "WEB-INF/portal.properties")));
+            File f = new File(event.getServletContext().getRealPath("WEB-INF/portal.properties"));
+            PortalConfiguration.load(f);
         } catch (Exception e) {
             throw new IllegalStateException("configuration file ('WEB-INF/portal.properties') not found", e);
         }
 
         // configure the loggers
-        PropertyConfigurator.configure(event.getServletContext().getRealPath("WEB-INF/log4j.properties"));
+        String path = null;
+        try {
+
+            path = event.getServletContext().getRealPath("WEB-INF/log4j.properties");
+            File f = new File(path);
+            InputStream in = new FileInputStream(f);
+            Properties p = new Properties();
+            p.load(in);
+            PropertyConfigurator.configure(p);
+
+        } catch (Exception e1) {
+            System.err.println("Failed to read the portal's log4j file: " + path);
+        }
 
         File paproperties = new File(event.getServletContext().getRealPath(
                 "WEB-INF/ProActiveConfiguration.xml"));
@@ -107,8 +122,9 @@ public class MyResteasyBootstrap extends ResteasyBootstrap {
                         false);
             }
         }
-        System.setProperty("scheduler.database.nodb", "true");
         
+        System.setProperty("scheduler.database.nodb", "true");
+
         // initialize the scheduler's state cache
         SchedulerStateCaching.init();
 
@@ -123,9 +139,7 @@ public class MyResteasyBootstrap extends ResteasyBootstrap {
         Thread rm = new Thread(this.rmSessionCleaner, "RM Sessions Cleaner Thread");
         rm.setDaemon(true);
         rm.start();
-        
-        
-        
+
     }
 
     @Override
@@ -140,7 +154,8 @@ public class MyResteasyBootstrap extends ResteasyBootstrap {
                 .toArray(new String[] {});
         int i = 0;
         for (; i < sessionids.length; i++) {
-            Scheduler s = SchedulerSessionMapper.getInstance().getSessionsMap().get(sessionids[i]).getScheduler();
+            Scheduler s = SchedulerSessionMapper.getInstance().getSessionsMap().get(sessionids[i])
+                    .getScheduler();
             try {
                 s.disconnect();
             } catch (NotConnectedException e) {
@@ -155,8 +170,7 @@ public class MyResteasyBootstrap extends ResteasyBootstrap {
             }
         }
 
-        sessionids = RMSessionMapper.getInstance().getSessionsMap().keySet()
-        .toArray(new String[] {});
+        sessionids = RMSessionMapper.getInstance().getSessionsMap().keySet().toArray(new String[] {});
         for (; i < sessionids.length; i++) {
             RMCachingProxyUserInterface s = RMSessionMapper.getInstance().getSessionsMap().get(sessionids[i]);
             try {
@@ -168,8 +182,7 @@ public class MyResteasyBootstrap extends ResteasyBootstrap {
                 System.out.println("RM session id " + sessionids[i] + "terminated");
             }
         }
-        
-        
+
         schedulerSessionCleaner.stop();
         rmSessionCleaner.stop();
 

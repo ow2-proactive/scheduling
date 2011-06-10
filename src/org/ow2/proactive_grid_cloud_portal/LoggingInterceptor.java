@@ -1,0 +1,91 @@
+package org.ow2.proactive_grid_cloud_portal;
+
+import java.net.HttpURLConnection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map.Entry;
+
+import javax.servlet.ServletContext;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.ext.Provider;
+
+import org.jboss.resteasy.annotations.interception.SecurityPrecedence;
+import org.jboss.resteasy.annotations.interception.ServerInterceptor;
+import org.jboss.resteasy.core.ResourceMethod;
+import org.jboss.resteasy.core.ServerResponse;
+import org.jboss.resteasy.spi.Failure;
+import org.jboss.resteasy.spi.HttpRequest;
+import org.jboss.resteasy.spi.interception.PostProcessInterceptor;
+import org.jboss.resteasy.spi.interception.PreProcessInterceptor;
+import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+
+/**
+ * RESTeasy interceptor for logging
+ */
+@Provider
+@SecurityPrecedence
+@ServerInterceptor
+public class LoggingInterceptor implements PreProcessInterceptor, PostProcessInterceptor {
+
+    @Context
+    ServletContext servletContext;
+    @Context
+    HttpHeaders httpHeaders;
+    @Context
+    UriInfo ui;
+
+    private static final Logger logger = LoggerFactory.getLogger(SchedulerLoggers.PREFIX + ".rest");
+
+    public ServerResponse preProcess(HttpRequest request, ResourceMethod method) throws Failure,
+            WebApplicationException {
+        if (logger.isDebugEnabled()) {
+
+            String httpMethod = request.getHttpMethod();
+            String uriPath = request.getUri().getPath();
+
+            String sessionid = null;
+            List<String> headerSessionId = request.getHttpHeaders().getRequestHeader("sessionid");
+            if (headerSessionId != null) {
+                sessionid = headerSessionId.get(0);
+            }
+            logger.debug(sessionid + "|" + httpMethod + "|" + uriPath);
+        }
+        return null;
+    }
+
+
+
+    public void postProcess(ServerResponse response) {
+
+        Iterator<Entry<String, List<String>>> it = httpHeaders.getRequestHeaders().entrySet().iterator();
+
+        // get sessionid from headers
+
+        String sessionid = "[NOTSET]";
+        List<String> headerSessionId = httpHeaders.getRequestHeaders().get("sessionid");
+
+        if (headerSessionId != null) {
+            sessionid = headerSessionId.get(0);
+        }
+
+        String uriPath = ui.getPath();
+
+        if (logger.isDebugEnabled()) {
+            logger.info(sessionid + "|" + uriPath + "|" + response.getStatus() + "|" +
+                response.getEntity().toString());
+        } else {
+            // log errors even in info mode
+            if ((response.getStatus() != HttpURLConnection.HTTP_OK) && (response.getStatus() >= 400)) {
+                logger.info(sessionid + "|" + uriPath + "|" + response.getStatus() + "|" +
+                    response.getEntity().toString());
+            }
+        }
+    }
+
+}

@@ -21,6 +21,9 @@
 	<target name="prepare" description="Create dir for class files">
 		<mkdir dir="${classes.dir}" />
 		<mkdir dir="${webinf.lib.dir}" />
+		<copy todir="WebContent/WEB-INF/classes">
+			<fileset dir="WebContent/WEB-INF"><include name="log4j.properties" /></fileset>
+		</copy>
 	</target>
 
 	<target name="clean" description="Delete class files">

@@ -39,8 +39,6 @@ package org.ow2.proactive_grid_cloud_portal;
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -974,17 +972,17 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
         SchedulerSession ss = SchedulerSessionMapper.getInstance().getSchedulerSession(sessionId);
         if (ss == null) {
-            logger.trace("not found a scheduler frontend for sessionId " + sessionId);
+//            logger.trace("not found a scheduler frontend for sessionId " + sessionId);
             throw new NotConnectedException("you are not connected to the scheduler, you should log on first");
         }
 
         SchedulerProxyUserInterface s = ss.getScheduler();
 
         if (s == null) {
-            logger.trace("not found a scheduler frontend for sessionId " + sessionId);
+//            logger.trace("not found a scheduler frontend for sessionId " + sessionId);
             throw new NotConnectedException("you are not connected to the scheduler, you should log on first");
         }
-        logger.trace("found a scheduler frontend for sessionId " + sessionId + ", path =" + path);
+//        logger.trace("found a scheduler frontend for sessionId " + sessionId + ", path =" + path);
         return s;
     }
 
