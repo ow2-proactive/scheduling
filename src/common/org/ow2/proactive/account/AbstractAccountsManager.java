@@ -38,11 +38,6 @@ package org.ow2.proactive.account;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 
@@ -59,41 +54,17 @@ public abstract class AbstractAccountsManager<E extends Account> {
     protected final Logger logger;
     /** The map that contains all statistics */
     protected volatile Map<String, E> accountsMap;
-    /** Refresh delay changeable by the user */
-    private volatile int refreshRateInSeconds;
+    /** Cache valid time in seconds */
+    private volatile int cacheValidTimeInSeconds;
+    /** Last refresh duration */
+    private volatile long lastCacheClearTimeStamp;
     /** Last refresh duration */
     private volatile long lastRefreshDurationInMilliseconds;
-    /** The single thread executor */
-    private final ScheduledExecutorService executor;
-    /** The accounts refresher runnable that resubmits itself to the executor */
-    private final AccountsRefresher accountsRefresher;
-    /** The refresh future */
-    private volatile ScheduledFuture<?> refreshFuture;
 
     protected AbstractAccountsManager(final String refreshThreadName, final Logger logger) {
         this.accountsMap = new HashMap<String, E>();
-        this.refreshRateInSeconds = this.getDefaultRefreshRateInSeconds();
-        // Create the single thread executor that creates min priority daemon
-        // thread
-        this.executor = Executors.newSingleThreadScheduledExecutor(new ThreadFactory() {
-            public Thread newThread(final Runnable r) {
-                final Thread t = new Thread(r, refreshThreadName);
-                t.setDaemon(true);
-                t.setPriority(Thread.MIN_PRIORITY);
-                return t;
-            }
-        });
+        this.cacheValidTimeInSeconds = this.getDefaultCacheValidityTimeInSeconds();
         this.logger = logger;
-
-        // Create the cache refresher and start it
-        this.accountsRefresher = new AccountsRefresher();
-    }
-
-    private void internalRefresh() {
-        // reseting the map contained all the records
-        // it will provoke the data base access next time the client request 
-        // an accounting information
-        this.accountsMap = new HashMap<String, E>();
     }
 
     /**
@@ -111,8 +82,16 @@ public abstract class AbstractAccountsManager<E extends Account> {
      * 
      */
     public E getAccount(final String username) {
+
+        if (cacheValidTimeInSeconds == 0) {
+            // the mean to disable the accounting
+            throw new RuntimeException("The accounting is disabled.");
+        }
+
         synchronized (accountsMap) {
-            if (accountsMap.containsKey(username)) {
+            if (System.currentTimeMillis() - lastCacheClearTimeStamp > cacheValidTimeInSeconds * 1000) {
+                clearCache();
+            } else if (accountsMap.containsKey(username)) {
                 return accountsMap.get(username);
             }
         }
@@ -133,39 +112,14 @@ public abstract class AbstractAccountsManager<E extends Account> {
     /**
      * This methods performs a full refresh from database.
      */
-    public synchronized void refreshAllAccounts() {
-        // If it is already running just return
-        if (this.refreshFuture != null && this.refreshFuture.getDelay(TimeUnit.SECONDS) == 0) {
-            return;
+    public synchronized void clearCache() {
+        synchronized (accountsMap) {
+            // clearing the map contained all the records
+            // it will provoke the data base access next time the client request 
+            // an accounting information
+            this.accountsMap.clear();
+            lastCacheClearTimeStamp = System.currentTimeMillis();
         }
-        // schedule it to run immediately
-        this.internalSchedule(true);
-    }
-
-    /**
-     * If the accounts refresher is not running, starts a new thread that
-     * refreshes the user statistics from the data base.
-     */
-    public void startAccountsRefresher() {
-        this.internalSchedule(false);
-    }
-
-    private void internalSchedule(final boolean immediate) {
-        long refreshRate = this.refreshRateInSeconds;
-        if (immediate) {
-            if (this.refreshFuture != null) {
-                this.refreshFuture.cancel(true);
-            }
-            // The refresh rate is set to 0 to comply with the executor schedule() method semantic
-            // that represents the delay (0 delay means immediate)
-            refreshRate = 0;
-        } else {
-            // The refresh rate can be set to 0 by the user to disable the accounts refresh  
-            if (refreshRate == 0) {
-                return;
-            }
-        }
-        this.refreshFuture = this.executor.schedule(this.accountsRefresher, refreshRate, TimeUnit.SECONDS);
     }
 
     /**
@@ -173,13 +127,8 @@ public abstract class AbstractAccountsManager<E extends Account> {
      *
      * @param refreshRateInSeconds the refresh rate
      */
-    public void setRefreshRateInSeconds(final int refreshRateInSeconds) {
-        final int oldValue = this.refreshRateInSeconds;
-        this.refreshRateInSeconds = refreshRateInSeconds;
-        // Reschedule if the account refresher is currently disabled (=0)  
-        if (oldValue == 0 && refreshRateInSeconds > 0) {
-            this.internalSchedule(false);
-        }
+    public void setCacheValidityTimeInSeconds(final int cacheValidTimeInSeconds) {
+        this.cacheValidTimeInSeconds = cacheValidTimeInSeconds;
     }
 
     /**
@@ -187,8 +136,8 @@ public abstract class AbstractAccountsManager<E extends Account> {
      *
      * @return the current value of the refresh rate in seconds
      */
-    public int getRefreshRateInSeconds() {
-        return this.refreshRateInSeconds;
+    public int getCacheValidityTimeInSeconds() {
+        return this.cacheValidTimeInSeconds;
     }
 
     /**
@@ -196,7 +145,7 @@ public abstract class AbstractAccountsManager<E extends Account> {
      *
      * @return the default value of the refresh rate in seconds
      */
-    public abstract int getDefaultRefreshRateInSeconds();
+    public abstract int getDefaultCacheValidityTimeInSeconds();
 
     /**
      * Returns the duration of the last refresh performed by the account refresher.
@@ -205,20 +154,5 @@ public abstract class AbstractAccountsManager<E extends Account> {
      */
     public long getLastRefreshDurationInMilliseconds() {
         return this.lastRefreshDurationInMilliseconds;
-    }
-
-    /**
-     * Refreshes all accounts periodically from the database.
-     */
-    private final class AccountsRefresher implements Runnable {
-        public void run() {
-            try {
-                internalRefresh();
-            } catch (Exception e) {
-                logger.error("Exception when refreshing accounts", e);
-            } finally {
-                internalSchedule(false);
-            }
-        }
     }
 }

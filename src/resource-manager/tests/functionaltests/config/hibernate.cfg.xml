@@ -36,7 +36,8 @@
         Each Hibernate entity class must be referenced here. -->
 
         <!-- Events -->
-        <mapping class="org.ow2.proactive.resourcemanager.core.history.History"/>
+        <mapping class="org.ow2.proactive.resourcemanager.core.history.NodeHistory"/>
+        <mapping class="org.ow2.proactive.resourcemanager.core.history.UserHistory"/>
         <mapping class="org.ow2.proactive.resourcemanager.core.history.Alive"/>
 
     </session-factory>

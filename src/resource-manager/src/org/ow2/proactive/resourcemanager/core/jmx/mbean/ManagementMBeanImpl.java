@@ -62,21 +62,21 @@ public final class ManagementMBeanImpl extends StandardMBean implements Manageme
         this.accountsManager = accountsManager;
     }
 
-    public int getAccountingRefreshRateInSeconds() {
-        return this.accountsManager.getRefreshRateInSeconds();
+    public int getAccountingCacheValidityTimeInSeconds() {
+        return this.accountsManager.getCacheValidityTimeInSeconds();
     }
 
-    public void setAccountingRefreshRateInSeconds(int refreshRateInSeconds) {
-        this.accountsManager.setRefreshRateInSeconds(refreshRateInSeconds);
+    public void setAccountingCacheValidityTimeInSeconds(int refreshRateInSeconds) {
+        this.accountsManager.setCacheValidityTimeInSeconds(refreshRateInSeconds);
     }
 
-    public void setDefaultAccountingRefreshRateInSeconds() {
-        final int defaultValue = this.accountsManager.getDefaultRefreshRateInSeconds();
-        this.accountsManager.setRefreshRateInSeconds(defaultValue);
+    public void setDefaultAccountingCacheValidityTimeInSeconds() {
+        final int defaultValue = this.accountsManager.getDefaultCacheValidityTimeInSeconds();
+        this.accountsManager.setCacheValidityTimeInSeconds(defaultValue);
     }
 
-    public void refreshAllAccounts() {
-        this.accountsManager.refreshAllAccounts();
+    public void clearAccoutingCache() {
+        this.accountsManager.clearCache();
     }
 
     public long getLastRefreshDurationInMilliseconds() {

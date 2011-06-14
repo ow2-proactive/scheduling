@@ -288,8 +288,6 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
 
         // rebuild JMX object
         this.jmxHelper.getSchedulerRuntimeMBean().recover(jobStates);
-        // Start the stats refresher
-        this.accountsManager.startAccountsRefresher();
         //once recovered, activate scheduler communication
         authentication.setActivated(true);
     }

@@ -85,7 +85,8 @@ import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.core.account.RMAccountsManager;
 import org.ow2.proactive.resourcemanager.core.history.Alive;
-import org.ow2.proactive.resourcemanager.core.history.History;
+import org.ow2.proactive.resourcemanager.core.history.NodeHistory;
+import org.ow2.proactive.resourcemanager.core.history.UserHistory;
 import org.ow2.proactive.resourcemanager.core.jmx.RMJMXHelper;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.db.DatabaseManager;
@@ -294,7 +295,9 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
                     // to keep the data base consistency updating all nodes history with
                     // the last alive time stamp
-                    History.recover(alive);
+                    NodeHistory.recover(alive);
+                    // updating end times of user connections 
+                    UserHistory.recover(alive);
 
                     // updating alive time stamp
                     alive.setTime(System.currentTimeMillis());
@@ -325,9 +328,6 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
             // Boot the JMX infrastructure
             this.jmxHelper.boot(authentication);
-
-            // Start the accounts refresher
-            this.accountsManager.startAccountsRefresher();
 
             monitoring = (RMMonitoringImpl) PAActiveObject.newActive(RMMonitoringImpl.class.getName(),
                     new Object[] { PAActiveObject.getStubOnThis() }, nodeRM);
@@ -1211,7 +1211,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     }
 
     private void registerAndEmitNodeEvent(final RMNodeEvent event) {
-        new History(event).save();
+        new NodeHistory(event).save();
         this.monitoring.nodeEvent(event);
     }
 
@@ -1342,6 +1342,10 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             // when the disconnected client still uses nodes.
             // In the future we may clean nodes for any release request
             nodesCleaner.cleanAndRelease(nodesToRelease);
+            // update the connection info in the DB
+            if (client.getHistory() != null) {
+                client.getHistory().update();
+            }
             logger.info(client + " disconnected");
         } else {
             logger.warn("Trying to disconnect unknown client with id " + clientId);

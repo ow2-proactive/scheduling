@@ -50,6 +50,8 @@ import org.objectweb.proactive.core.body.proxy.BodyProxy;
 import org.objectweb.proactive.core.mop.Proxy;
 import org.objectweb.proactive.core.mop.StubObject;
 import org.ow2.proactive.authentication.principals.UserNamePrincipal;
+import org.ow2.proactive.resourcemanager.core.history.Alive;
+import org.ow2.proactive.resourcemanager.core.history.UserHistory;
 
 
 /**
@@ -81,6 +83,9 @@ public class Client implements Serializable {
 
     /** Body of the sender of request */
     private transient UniversalBody body;
+
+    /** User connection history stored in the data base*/
+    private transient UserHistory history;
 
     public Client() {
     }
@@ -229,4 +234,21 @@ public class Client implements Serializable {
 
         return true;
     }
+
+    /**
+     * Sets the history DB object associated to the current user connection.
+     * @param history is an object to set
+     */
+    public void setHistory(UserHistory history) {
+        this.history = history;
+    }
+
+    /**
+     * Returns the connection history object linked to the data base
+     * @return the connection history object linked to the data base
+     */
+    public UserHistory getHistory() {
+        return history;
+    }
+
 }

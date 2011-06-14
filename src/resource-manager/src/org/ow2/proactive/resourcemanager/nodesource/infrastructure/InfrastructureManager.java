@@ -55,7 +55,7 @@ import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
-import org.ow2.proactive.resourcemanager.core.history.History;
+import org.ow2.proactive.resourcemanager.core.history.NodeHistory;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
@@ -548,7 +548,7 @@ public abstract class InfrastructureManager implements Serializable {
     private void emitEvent(final RMNodeEvent event) {
         NodeSource nsStub = this.nodeSource.getStub();
         nsStub.internalEmitDeployingNodeEvent(event);
-        new History(event).save();
+        new NodeHistory(event).save();
     }
 
     private void timeout(String pnURL, long timeout) {

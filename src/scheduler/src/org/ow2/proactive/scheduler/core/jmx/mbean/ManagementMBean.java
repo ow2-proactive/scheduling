@@ -45,35 +45,35 @@ package org.ow2.proactive.scheduler.core.jmx.mbean;
 public interface ManagementMBean {
 
     /**
-     * Returns the accounts refresh rate in seconds.
+     * Returns the accounting cache valid time in seconds.
      * @return refresh rate in seconds 
      */
-    public int getAccountingRefreshRateInSeconds();
+    public int getAccountingCacheValidityTimeInSeconds();
 
     /**
-     * Sets a new refresh rate in seconds.  
-     * @param refreshRateInSeconds the new refresh rate in seconds
+     * Sets a new accounting cache valid time in seconds.  
+     * @param timeInSeconds the new cache refresh rate in seconds
      */
-    public void setAccountingRefreshRateInSeconds(int refreshRateInSeconds);
+    public void setAccountingCacheValidityTimeInSeconds(int timeInSeconds);
 
     /**
-     * Sets the refresh rate to the  one defined in the configuration file.
+     * Sets the cache refresh rate to the one defined in the configuration file.
      */
-    public void setDefaultAccountingRefreshRateInSeconds();
+    public void setDefaultAccountingCacheValidityTimeInSeconds();
 
     /**
-     * Refreshes all accounts.
+     * Clears the cache (all precomputed accounts)
      */
-    public void refreshAllAccounts();
+    public void clearAccoutingCache();
 
     /**
-     * Returns the last duration in milliseconds of all accounts refresh.
+     * Returns the last duration in milliseconds of account refresh.
      * @return the last refresh duration in milliseconds
      */
     public long getLastRefreshDurationInMilliseconds();
 
     /**
-     * Refreshes the permission policy, reloads permissions from the policy file. 
+     * Reload the resource manager configuration, permissions, and log4j config.
      */
-    public void refreshPermissionPolicy();
+    public void refreshConfiguration();
 }

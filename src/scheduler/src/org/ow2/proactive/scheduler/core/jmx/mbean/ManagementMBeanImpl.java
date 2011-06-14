@@ -36,11 +36,14 @@
  */
 package org.ow2.proactive.scheduler.core.jmx.mbean;
 
+import java.net.URL;
 import java.security.Policy;
 
 import javax.management.NotCompliantMBeanException;
 import javax.management.StandardMBean;
 
+import org.apache.log4j.LogManager;
+import org.apache.log4j.PropertyConfigurator;
 import org.ow2.proactive.scheduler.core.account.SchedulerAccountsManager;
 
 
@@ -60,28 +63,40 @@ public final class ManagementMBeanImpl extends StandardMBean implements Manageme
         this.accountsManager = accountsManager;
     }
 
-    public int getAccountingRefreshRateInSeconds() {
-        return this.accountsManager.getRefreshRateInSeconds();
+    public int getAccountingCacheValidityTimeInSeconds() {
+        return this.accountsManager.getCacheValidityTimeInSeconds();
     }
 
-    public void setAccountingRefreshRateInSeconds(int refreshRateInSeconds) {
-        this.accountsManager.setRefreshRateInSeconds(refreshRateInSeconds);
+    public void setAccountingCacheValidityTimeInSeconds(int refreshRateInSeconds) {
+        this.accountsManager.setCacheValidityTimeInSeconds(refreshRateInSeconds);
     }
 
-    public void setDefaultAccountingRefreshRateInSeconds() {
-        final int defaultValue = this.accountsManager.getDefaultRefreshRateInSeconds();
-        this.accountsManager.setRefreshRateInSeconds(defaultValue);
+    public void setDefaultAccountingCacheValidityTimeInSeconds() {
+        final int defaultValue = this.accountsManager.getDefaultCacheValidityTimeInSeconds();
+        this.accountsManager.setCacheValidityTimeInSeconds(defaultValue);
     }
 
-    public void refreshAllAccounts() {
-        this.accountsManager.refreshAllAccounts();
+    public void clearAccoutingCache() {
+        this.accountsManager.clearCache();
     }
 
     public long getLastRefreshDurationInMilliseconds() {
         return this.accountsManager.getLastRefreshDurationInMilliseconds();
     }
 
-    public void refreshPermissionPolicy() {
-        Policy.getPolicy().refresh();
+    public void refreshConfiguration() {
+        try {
+            // reloading permissions
+            Policy.getPolicy().refresh();
+
+            // reloading log4j configuration
+            String configFilename = System.getProperty("log4j.configuration");
+            if (configFilename != null) {
+                LogManager.resetConfiguration();
+                PropertyConfigurator.configure(new URL(configFilename));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

@@ -43,7 +43,7 @@ import javax.persistence.Table;
 
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.account.AbstractAccountsManager;
-import org.ow2.proactive.resourcemanager.core.history.History;
+import org.ow2.proactive.resourcemanager.core.history.NodeHistory;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.db.DatabaseManager;
 import org.ow2.proactive.resourcemanager.utils.RMLoggers;
@@ -73,7 +73,7 @@ public final class RMAccountsManager extends AbstractAccountsManager<RMAccount> 
      * {@inheritDoc}
      */
     @Override
-    public int getDefaultRefreshRateInSeconds() {
+    public int getDefaultCacheValidityTimeInSeconds() {
         int value = PAResourceManagerProperties.RM_ACCOUNT_REFRESH_RATE.getValueAsInt();
         return value;
     }
@@ -90,14 +90,17 @@ public final class RMAccountsManager extends AbstractAccountsManager<RMAccount> 
             RMAccount account = new RMAccount();
             account.username = user;
 
-            String history = History.class.getAnnotation(Table.class).name();
-            String endTime = History.class.getDeclaredField("endTime").getAnnotation(Column.class).name();
-            String startTime = History.class.getDeclaredField("startTime").getAnnotation(Column.class).name();
-            String nodeState = History.class.getDeclaredField("nodeState").getAnnotation(Column.class).name();
-            String userName = History.class.getDeclaredField("userName").getAnnotation(Column.class).name();
-            String providerName = History.class.getDeclaredField("providerName").getAnnotation(Column.class)
+            String history = NodeHistory.class.getAnnotation(Table.class).name();
+            String endTime = NodeHistory.class.getDeclaredField("endTime").getAnnotation(Column.class).name();
+            String startTime = NodeHistory.class.getDeclaredField("startTime").getAnnotation(Column.class)
                     .name();
-            String nodeUrl = History.class.getDeclaredField("nodeUrl").getAnnotation(Column.class).name();
+            String nodeState = NodeHistory.class.getDeclaredField("nodeState").getAnnotation(Column.class)
+                    .name();
+            String userName = NodeHistory.class.getDeclaredField("userName").getAnnotation(Column.class)
+                    .name();
+            String providerName = NodeHistory.class.getDeclaredField("providerName").getAnnotation(
+                    Column.class).name();
+            String nodeUrl = NodeHistory.class.getDeclaredField("nodeUrl").getAnnotation(Column.class).name();
 
             // counting the time of finished actions 
             // select SUM(endTime-startTime) from History where endTime <> 0 and nodeState = 1 and userName='NAME'
@@ -159,10 +162,5 @@ public final class RMAccountsManager extends AbstractAccountsManager<RMAccount> 
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-    }
-
-    public static void main(String[] args) {
-        System.out.println("RMAccountsManager.main()---> " + Long.MAX_VALUE);
-        System.out.println("RMAccountsManager.main()---> " + (Long.MAX_VALUE >> 1));
     }
 }

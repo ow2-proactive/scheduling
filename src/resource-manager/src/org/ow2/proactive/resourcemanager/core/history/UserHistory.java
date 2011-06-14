@@ -50,6 +50,7 @@ import org.hibernate.annotations.Index;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.db.Condition;
 import org.ow2.proactive.db.ConditionComparator;
+import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
@@ -59,13 +60,12 @@ import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 
 /**
  * 
- * This class represents the node history event stored in the data base.
- * Basically for each node we store all state transitions and start/end time of each transition.
+ * This class represents the users connection history.
  *
  */
 @Entity
-@Table(name = "History")
-public class History {
+@Table(name = "UserHistory")
+public class UserHistory {
 
     public static final Logger logger = ProActiveLogger.getLogger(RMLoggers.DATABASE);
 
@@ -74,26 +74,9 @@ public class History {
     @SuppressWarnings("unused")
     protected long id;
 
-    @Column(name = "nodeUrl")
-    @Index(name = "urlIndex")
-    private String nodeUrl;
-
-    @Column(name = "host")
-    private String host;
-
-    @Column(name = "nodeSource")
-    private String nodeSource;
-
     @Column(name = "userName")
-    @Index(name = "userIndex")
+    @Index(name = "userNameIndex")
     private String userName;
-
-    @Column(name = "providerName")
-    @Index(name = "providerIndex")
-    private String providerName;
-
-    @Column(name = "nodeState")
-    private NodeState nodeState;
 
     @Column(name = "startTime")
     protected long startTime;
@@ -101,82 +84,46 @@ public class History {
     @Column(name = "endTime")
     protected long endTime;
 
-    // indicates that new record in the data base will be created for this event
-    @Transient
-    private boolean createNewRecord;
-
     /**
      * Default constructor for Hibernate
      */
-    public History() {
+    public UserHistory() {
     }
 
     /**
      * Constructs new history record.
      */
-    public History(RMNodeEvent event) {
-
-        this.nodeUrl = event.getNodeUrl();
-        this.host = event.getHostName();
-        this.nodeSource = event.getNodeSource();
-
-        this.userName = event.getNodeOwner();
-        this.providerName = event.getNodeProvider();
-        this.nodeState = event.getNodeState();
-        this.startTime = event.getTimeStamp();
-
-        createNewRecord = true;
-        // do not store TO_BE REMOVED record as it reflects nothing
-        //
-        // when the node is removed do not create a new record - 
-        // just updating the end time of the last state.
-        if (NodeState.TO_BE_REMOVED == event.getNodeState() ||
-            RMEventType.NODE_REMOVED == event.getEventType()) {
-            // new node history event
-            createNewRecord = false;
-            logger.debug("Creating new line in the data base for " + event);
-        }
+    public UserHistory(Client client) {
+        this.userName = client.getName();
+        this.startTime = System.currentTimeMillis();
     }
 
     /**
-     * Updates the previous history record and creates a new one if necessary
+     * Saves user connection information
      */
     public void save() {
-        // updating the previous history record
-        updatePreviousItem();
-
-        if (createNewRecord) {
-            // registering the new history record		
-            DatabaseManager.getInstance().register(this);
-        }
+        // registering the new history record		
+        DatabaseManager.getInstance().register(this);
     }
 
     /**
-     * Updates the previous history record, namely sets the end time of the previous node state
+     * Updates the time when user disconnects
      */
-    private void updatePreviousItem() {
-        List<History> previousRecords = DatabaseManager.getInstance().recover(History.class,
-                new Condition("nodeUrl", ConditionComparator.EQUALS_TO, this.nodeUrl),
-                new Condition("endTime", ConditionComparator.EQUALS_TO, new Long(0)));
-
-        for (History prev : previousRecords) {
-            prev.endTime = startTime;
-            DatabaseManager.getInstance().update(prev);
-        }
-
-        logger.debug("Updating previous item for node " + nodeUrl);
+    public void update() {
+        this.endTime = System.currentTimeMillis();
+        DatabaseManager.getInstance().update(this);
     }
 
     /**
-     * After the resource manager is terminated some history records may not have end time stamp.
+     * After the resource manager is terminated some history records may not have the end time stamp.
      * We set it at the moment of next RM start taking the time from Alive table.
      */
     public static void recover(Alive alive) {
 
-        List<History> records = DatabaseManager.getInstance().recover(History.class,
+        List<UserHistory> records = DatabaseManager.getInstance().recover(UserHistory.class,
                 new Condition("endTime", ConditionComparator.EQUALS_TO, new Long(0)));
 
-        for (History record : records) {
+        for (UserHistory record : records) {
             if (record.startTime < alive.getTime()) {
                 // alive time bigger than start time of the history record
                 // marking the end of this record as last RM alive time
@@ -189,7 +136,6 @@ public class History {
             DatabaseManager.getInstance().update(record);
         }
 
-        logger.debug("Restoring the node history: " + records.size() + " raws updated");
-
+        logger.debug("Restoring the user history: " + records.size() + " raws updated");
     }
 }

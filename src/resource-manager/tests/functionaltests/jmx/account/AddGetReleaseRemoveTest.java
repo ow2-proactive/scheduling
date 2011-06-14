@@ -71,7 +71,7 @@ import functionaltests.RMTHelper;
  * This test requires the following prerequisites :
  *  - The value of the {@link PAResourceManagerProperties.RM_ACCOUNT_REFRESH_RATE} property must be 
  *  big enough to not let the {@link RMAccountsManager} refresh accounts automatically. This test 
- *  will refresh accounts manually by invoking the {@link ManagementMBean#refreshAllAccounts()}.
+ *  will refresh accounts manually by invoking the {@link ManagementMBean#clearAccoutingCache()}.
  *  - Only one single node must be added
  *  
  * @author The ProActive Team 
@@ -142,7 +142,7 @@ public final class AddGetReleaseRemoveTest extends FunctionalTest {
         final long addRemoveMaxDuration = System.currentTimeMillis() - beforeAddTime;
 
         // Refresh the account manager
-        conn.invoke(managementMBeanName, "refreshAllAccounts", null, null);
+        conn.invoke(managementMBeanName, "clearAccoutingCache", null, null);
 
         // Check account values validity                      
         atts = conn.getAttributes(myAccountMBeanName, new String[] { "UsedNodeTime", "ProvidedNodeTime",

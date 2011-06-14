@@ -124,7 +124,7 @@ public final class SchedulerAccountsManager extends AbstractAccountsManager<Sche
      * {@inheritDoc}
      */
     @Override
-    public int getDefaultRefreshRateInSeconds() {
+    public int getDefaultCacheValidityTimeInSeconds() {
         return PASchedulerProperties.SCHEDULER_ACCOUNT_REFRESH_RATE.getValueAsInt();
     }
 
