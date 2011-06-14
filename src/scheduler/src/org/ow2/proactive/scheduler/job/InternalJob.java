@@ -100,6 +100,7 @@ import org.ow2.proactive.scheduler.core.db.DatabaseManager;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.job.JobInfoImpl.ReplicatedTask;
 import org.ow2.proactive.scheduler.task.TaskIdImpl;
+import org.ow2.proactive.scheduler.task.TaskInfoImpl;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalForkedJavaTask;
 import org.ow2.proactive.scheduler.task.internal.InternalJavaTask;
@@ -525,7 +526,7 @@ public abstract class InternalJob extends JobState {
     public void reStartTask(InternalTask task) {
         logger_dev.debug(" ");
         getJobDescriptor().reStart(task.getId());
-
+        ((TaskInfoImpl) task.getTaskInfo()).setProgress(0);
         if (getStatus() == JobStatus.PAUSED) {
             task.setStatus(TaskStatus.PAUSED);
             HashMap<TaskId, TaskStatus> hts = new HashMap<TaskId, TaskStatus>();

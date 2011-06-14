@@ -577,7 +577,9 @@ public abstract class TaskLauncher implements InitActive {
     }
 
     /**
-     * Return the latest progress value set by the launched executable.
+     * Return the latest progress value set by the launched executable.<br/>
+     * If the value returned by user is not in [0:100], the closest bound (0 or 100) is returned.
+     *
      * @return the latest progress value set by the launched executable.
      */
     @ImmediateService
@@ -586,7 +588,17 @@ public abstract class TaskLauncher implements InitActive {
             //not yet started
             return 0;
         } else {
-            return this.currentExecutable.getProgress();
+            int progress = currentExecutable.getProgress();
+            if (progress < 0) {
+                logger_dev.warn("Returned progress (" + progress + ") is negative, return 0 instead.");
+                return 0;
+            } else if (progress > 100) {
+                logger_dev.warn("Returned progress (" + progress +
+                    ") is greater than 100, return 100 instead.");
+                return 100;
+            } else {
+                return progress;
+            }
         }
     }
 

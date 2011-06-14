@@ -74,6 +74,7 @@ import org.ow2.proactive.scheduler.core.rmproxies.RMProxyCreationException;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.job.JobResultImpl;
 import org.ow2.proactive.scheduler.task.ExecutableContainerInitializer;
+import org.ow2.proactive.scheduler.task.TaskInfoImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.task.launcher.TaskLauncher;
 import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
@@ -624,6 +625,6 @@ final class SchedulingMethodImpl implements SchedulingMethod {
         core.frontend.taskStateUpdated(job.getOwner(), new NotificationData<TaskInfo>(
             SchedulerEvent.TASK_PENDING_TO_RUNNING, task.getTaskInfo()));
         //fill previous task progress with 0, means task has started
-        core.previousTaskProgress.put(task.getId(), 0);
+        ((TaskInfoImpl) task.getTaskInfo()).setProgress(0);
     }
 }
