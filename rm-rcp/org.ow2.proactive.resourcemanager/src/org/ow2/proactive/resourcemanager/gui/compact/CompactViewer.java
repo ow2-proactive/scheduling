@@ -367,6 +367,7 @@ public class CompactViewer implements ISelectionProvider {
         Point prefSize = composite.computeSize(x, y);
         scroll.setMinSize(prefSize);
         composite.setSize(prefSize);
+        composite.layout();
 
         if (packScroll)
             scroll.pack();
