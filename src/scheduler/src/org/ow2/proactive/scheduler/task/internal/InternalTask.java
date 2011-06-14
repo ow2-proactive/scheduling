@@ -140,6 +140,7 @@ public abstract class InternalTask extends TaskState {
     @JoinTable(joinColumns = @JoinColumn(name = "ITASK_ID"), inverseJoinColumns = @JoinColumn(name = "DEPEND_ID"))
     @LazyCollection(value = LazyCollectionOption.FALSE)
     @Cascade(CascadeType.ALL)
+    @XmlTransient
     private List<InternalTask> ideps = null;
 
     /** Informations about the launcher and node */
