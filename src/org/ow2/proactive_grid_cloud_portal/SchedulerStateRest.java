@@ -735,7 +735,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      */
     @GET
     @Path("jobs/{jobid}/map")
-    @Produces("application/xml")
+    @Produces({ "application/json", "application/xml" })
     public String getJobMap(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId)
             throws IOException {
         String map = "";
