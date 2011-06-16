@@ -53,9 +53,6 @@ public class CachingRMEventListener implements RMEventListener {
 
     public void rmEvent(RMEvent event) {
         switch (event.getEventType()) {
-            case ALIVE:
-                RMstate = RMEventType.ALIVE;
-                break;
             case SHUTTING_DOWN:
                 RMstate = RMEventType.SHUTTING_DOWN;
                 break;

@@ -245,7 +245,6 @@
 	<classpathentry kind="lib" path="lib/scheduling/cron4j-rv2.2.3-mod.jar"/>
 	<classpathentry kind="lib" path="lib/scheduling/org.scilab.modules.javasci.jar"/>
 	<classpathentry kind="lib" path="lib/scheduling/org.scilab.modules.types.jar"/>
-	<classpathentry kind="lib" path="lib/scheduling/ProActive_examples.jar"/>
 	<classpathentry kind="lib" path="lib/scheduling/ProActive_Scheduler-matsci.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="output" path="build/classes"/>
