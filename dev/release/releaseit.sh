@@ -25,6 +25,10 @@ then
 	echo "    Generated plugins directories must be :"
 	echo "       'RCPs_directory/rm'          for RM"
     	echo "       'RCPs_directory/scheduler'   for Scheduler"
+	echo
+	echo
+	echo "    Note : To have a special archive name that is not only the version number to release, just set the sysenv var PAS_RELEASE_NAME"
+	echo "           with the name which will replace version number is the archive name"
 	exit
 fi
 
@@ -65,6 +69,9 @@ echo "*         - macosx.carbon.x86"
 echo "*         - win32.win32.x86"
 echo "*         - win32.win32.x86_64"
 echo "*"
+echo "*   Note : To have a special archive name that is not only the version number to release, just export the sysenv var 'PAS_RELEASE_NAME'"
+echo "*          with the name which will replace version number is the archive name"
+echo "*"
 echo "*  Read $ROOT_DIRECTORY/dev/release/HOWTO_ProActiveScheduling.txt for more details about the release process."
 echo "*  Read it now ? (y/n)."
 read answer
@@ -96,25 +103,30 @@ echo "---------------> 2. Release-all"
 dev/release/release-all . $VERSION $JAVA_HOME_u
 #move create archive in destination dir
 echo "---------------> 3. Move rm and scheduler server archive to '$OUTPUT_DIRECTORY'"
-mv /tmp/ProActiveResourcing-${VERSION}_server.tar.gz $OUTPUT_DIRECTORY
-mv /tmp/ProActiveResourcing-${VERSION}_server.zip $OUTPUT_DIRECTORY
-mv /tmp/ProActiveScheduling-${VERSION}_server.tar.gz $OUTPUT_DIRECTORY
-mv /tmp/ProActiveScheduling-${VERSION}_server.zip $OUTPUT_DIRECTORY
+SPECIAL_NAME=$VERSION
+if [ "$PAS_RELEASE_NAME" != "" ]
+then
+	SPECIAL_NAME=$PAS_RELEASE_NAME
+fi
+mv /tmp/ProActiveResourcing-${SPECIAL_NAME}_server.tar.gz $OUTPUT_DIRECTORY
+mv /tmp/ProActiveResourcing-${SPECIAL_NAME}_server.zip $OUTPUT_DIRECTORY
+mv /tmp/ProActiveScheduling-${SPECIAL_NAME}_server.tar.gz $OUTPUT_DIRECTORY
+mv /tmp/ProActiveScheduling-${SPECIAL_NAME}_server.zip $OUTPUT_DIRECTORY
 #change dir to dev/release
 echo "---------------> 4. Change directory to dev/release"
 cd dev/release;
 #update RCPs content (add scripts, update launcher init, etc...)
 echo "---------------> 5. Update RCPs content"
-makeRCP_arch.sh /tmp/ProActiveScheduling-${VERSION}_server $RCPs_DIRECTORY ${VERSION} $OUTPUT_DIRECTORY
+makeRCP_arch.sh /tmp/ProActiveScheduling-${SPECIAL_NAME}_server $RCPs_DIRECTORY ${VERSION} $OUTPUT_DIRECTORY
 #remove remaining temporary server directories
 echo "---------------> 6. Remove remaining temporary server directories ? y/n"
-echo "                       /tmp/ProActiveResourcing-${VERSION}_server"
-echo "                       /tmp/ProActiveScheduling-${VERSION}_server"
+echo "                       /tmp/ProActiveResourcing-${SPECIAL_NAME}_server"
+echo "                       /tmp/ProActiveScheduling-${SPECIAL_NAME}_server"
 read answer
 #check answer, if 'y' -> remove
 if [ "$answer" == "y" ]
 then 
-    rm -rf /tmp/ProActiveScheduling-${VERSION}_server /tmp/ProActiveResourcing-${VERSION}_server
+    rm -rf /tmp/ProActiveScheduling-${SPECIAL_NAME}_server /tmp/ProActiveResourcing-${SPECIAL_NAME}_server
 fi
 echo "---------------> 7. End of release process"
 

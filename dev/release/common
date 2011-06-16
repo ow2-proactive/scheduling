@@ -146,6 +146,13 @@ function replace_version() {
 function build_archive() {
 	echo "********************** Building archive ************************"
 	cd ${TMP} || warn_and_exit "Cannot move in ${TMP}"
-	tar cvfz $RELEASE_BASENAME-${VERSION}_${SERVER_NAME}.tar.gz $RELEASE_BASENAME-${VERSION}_${SERVER_NAME}
-	zip -r   $RELEASE_BASENAME-${VERSION}_${SERVER_NAME}.zip    $RELEASE_BASENAME-${VERSION}_${SERVER_NAME}
+
+	SPECIAL_NAME=$VERSION
+	if [ "$PAS_RELEASE_NAME" != "" ]
+	then
+		SPECIAL_NAME=$PAS_RELEASE_NAME
+		mv $RELEASE_BASENAME-${VERSION}_${SERVER_NAME} $RELEASE_BASENAME-${SPECIAL_NAME}_${SERVER_NAME}
+	fi
+	tar cvfz $RELEASE_BASENAME-${SPECIAL_NAME}_${SERVER_NAME}.tar.gz $RELEASE_BASENAME-${SPECIAL_NAME}_${SERVER_NAME}
+	zip -r   $RELEASE_BASENAME-${SPECIAL_NAME}_${SERVER_NAME}.zip    $RELEASE_BASENAME-${SPECIAL_NAME}_${SERVER_NAME}
 }
