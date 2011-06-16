@@ -389,7 +389,16 @@ ans =
 [ Tue Jan 11 14:27:33 CET 2011 ][pendule OUT]
 </pre>
 
-<p>But running the factorial function is not interesting practically, in the next chapter <a href="solve-3">Parametric sweep with user code</a>, we will described a more useful scenario.</p>
+<p>Note that the PAsolve call PAsolve(function, param1, param2, ...) is not very practical when there are a lot of parameters. Matlab itself provides a way to assign parameters to a function call with cell arrays.
+For example, the factorial call used before:</p>
+<pre>>> res=PAsolve(@factorial,1,2,3,4,5)</pre>
+<p>Can be replaced by the following lines:</p>
+<pre>>> cl=num2cell(1:5) # cell creation (converted from a numeric vector)
+>> res=PAsolve(@factorial,cl{:}) # cell expansion, converted to function parameters
+</pre>
+<p>The first line creates a cell containing the parameters 1,2,3,4,5 and the second line applies this cell to the PAsolve call.</p>
+
+<p>We've been through a few examples of how to use PAsolve with the matlab function factorial, but in general, matlab functions are very fast and rarely need to be run remotely. Complex user-defined functions, on the other hand, can really benefit from parallel computing. We will explain in the next chapter <a href="solve-3">Parametric sweep with user code</a>, how to run user functions remotely.</p>
 
 <a name="solve-3"></a>
 
@@ -398,7 +407,7 @@ ans =
     <script language="Javascript">addTopOfPageButtons();</script>
     <a href="#top_of_page">Back to Top</a></p>
 <h3 class="title">Parametric sweep with user code</h3>
-<p>In this chapter, we will create user-defined matlab scripts that we will try to run remotely. Here are the two functions that we will write:</p>
+<p>In this chapter, we will create user-defined matlab functions that we will try to run remotely. Here are the two functions that we will write:</p>
 <ul type="disc">
     <li><p>A function called <b>helloworld</b> which will not compute anything but will try to display remotely the message "Hello World!".</p></li>
     <li><p>A function called <b>makeerror</b> which will produce a matlab error remotely.</p></li>
@@ -475,7 +484,7 @@ res =
 res =
 
      1</pre>
-<p>You see in this example how the HelloWorld string is displayed on the remote engines and appears in the job logs. Note as well the syntax of the call PAsolve(@helloworld,{},{},{}), which says that we call helloworld with no parameter (an empty cell array). If helloworld had more than one parameter, we would as well use a cell array to hold the parameters such as PAsolve(@multparam,{param_1_1,param_1_2,..param_1_k},...,{param_n_1,param_n_2,..param_n_k}). This would call the k-parameter function "multparam" n-times. In the rare case when the function requires a single parameter which is a cell, the following syntax should be used : PAsolve(@onecellfunc,{cellparam_1}, ..., {cellparam_n} , where cellparam_1..n are cells.</p>
+<p>You see in this example how the HelloWorld string is displayed on the remote engines and appears in the job logs. Please note that we didn't do anything particular to transfer the definition of the helloworld function to the remote matlab engine. In reality, this is done seamlessly by the ProActive toolbox: the toolbox automatically transfers the source code of the function used and all other dependant ones to the remote Matlab engine. Note as well the syntax of the call PAsolve(@helloworld,{},{},{}), which says that we call helloworld with no parameter (an empty cell array). If helloworld had more than one parameter, we would as well use a cell array to hold the parameters such as PAsolve(@multparam,{param_1_1,param_1_2,..param_1_k},...,{param_n_1,param_n_2,..param_n_k}). This would call the k-parameter function "multparam" n-times. In the rare case when the function requires a single parameter which is a cell, the following syntax should be used : PAsolve(@onecellfunc,{cellparam_1}, ..., {cellparam_n} , where cellparam_1..n are cells.</p>
 
 <p>Here is how the <b>makeerror.m</b> file is defined :</p>
 <pre>function ok=makeerror()
