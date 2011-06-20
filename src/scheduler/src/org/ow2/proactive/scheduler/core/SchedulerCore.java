@@ -794,7 +794,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
                     for (InternalTask td : job.getITasks()) {
                         if (td != null && (td.getStatus() == TaskStatus.RUNNING)) {
                             try {
-                                int progress = td.getExecuterInformations().getLauncher().getProgress();
+                                int progress = td.getExecuterInformations().getLauncher().getProgress();//(2)
                                 //get previous inside td
                                 if (progress != td.getProgress()) {
                                     ((TaskInfoImpl) td.getTaskInfo()).setProgress(progress);//(1)
@@ -805,6 +805,14 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
                             } catch (IllegalArgumentException iae) {
                                 //thrown by (1)
                                 //avoid setting bad value, no event if bad
+                            } catch (IllegalStateException ise) {
+                                //thrown by (2)
+                                //happens when user has overridden getProgress method and the method throw an exception
+                                //nothing to do
+                            } catch (ProcessException pe) {
+                                //thrown by (2)
+                                //happens if JVM forked process is dead
+                                //nothing to do
                             } catch (NullPointerException e) {
                                 //do nothing - should not happened, but avoid restart if execInfo or launcher is null
                             } catch (Throwable t) {

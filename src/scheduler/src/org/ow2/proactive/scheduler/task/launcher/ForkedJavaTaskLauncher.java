@@ -47,6 +47,7 @@ import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
 import org.ow2.proactive.scheduler.common.exception.ForkedJavaTaskException;
 import org.ow2.proactive.scheduler.common.task.SimpleTaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.exception.ProcessException;
 import org.ow2.proactive.scheduler.task.ExecutableContainer;
 import org.ow2.proactive.scheduler.task.ExecutableContainerInitializer;
 import org.ow2.proactive.scheduler.task.ForkedJavaExecutable;
@@ -175,16 +176,25 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher {
         if (currentExecutable == null) {
             return 0;
         } else {
-            int progress = currentExecutable.getProgress();
-            if (progress < 0) {
-                logger_dev.warn("Returned progress (" + progress + ") is negative, return 0 instead.");
-                return 0;
-            } else if (progress > 100) {
-                logger_dev.warn("Returned progress (" + progress +
-                    ") is greater than 100, return 100 instead.");
-                return 100;
-            } else {
-                return progress;
+            try {
+                int progress = currentExecutable.getProgress();
+                if (progress < 0) {
+                    logger_dev.warn("Returned progress (" + progress + ") is negative, return 0 instead.");
+                    return 0;
+                } else if (progress > 100) {
+                    logger_dev.warn("Returned progress (" + progress +
+                        ") is greater than 100, return 100 instead.");
+                    return 100;
+                } else {
+                    return progress;
+                }
+            } catch (IllegalStateException ise) {
+                //handle user bad use of getProgress
+                //exception comes from javaTaskLauncher.getProgress()
+                throw ise;
+            } catch (Throwable t) {
+                //communication error to the forked JVM (probably dead VM)
+                throw new ProcessException("Forked JVM seems to be dead.");
             }
         }
     }

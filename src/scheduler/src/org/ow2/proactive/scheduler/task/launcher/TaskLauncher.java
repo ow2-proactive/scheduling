@@ -588,16 +588,21 @@ public abstract class TaskLauncher implements InitActive {
             //not yet started
             return 0;
         } else {
-            int progress = currentExecutable.getProgress();
-            if (progress < 0) {
-                logger_dev.warn("Returned progress (" + progress + ") is negative, return 0 instead.");
-                return 0;
-            } else if (progress > 100) {
-                logger_dev.warn("Returned progress (" + progress +
-                    ") is greater than 100, return 100 instead.");
-                return 100;
-            } else {
-                return progress;
+            try {
+                int progress = currentExecutable.getProgress();
+                if (progress < 0) {
+                    logger_dev.warn("Returned progress (" + progress + ") is negative, return 0 instead.");
+                    return 0;
+                } else if (progress > 100) {
+                    logger_dev.warn("Returned progress (" + progress +
+                        ") is greater than 100, return 100 instead.");
+                    return 100;
+                } else {
+                    return progress;
+                }
+            } catch (Throwable t) {
+                //protect call to user getProgress() if overridden
+                throw new IllegalStateException("getProgress has thrown an exception", t);
             }
         }
     }
