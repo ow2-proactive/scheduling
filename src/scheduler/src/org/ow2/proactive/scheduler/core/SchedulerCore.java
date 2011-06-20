@@ -56,6 +56,7 @@ import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.log4j.Appender;
 import org.apache.log4j.AsyncAppender;
@@ -121,6 +122,7 @@ import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.core.rmproxies.RMProxiesManager;
 import org.ow2.proactive.scheduler.core.rmproxies.RMProxyCreationException;
 import org.ow2.proactive.scheduler.core.rmproxies.UserRMProxy;
+import org.ow2.proactive.scheduler.exception.ProcessException;
 import org.ow2.proactive.scheduler.exception.RunningProcessException;
 import org.ow2.proactive.scheduler.exception.StartProcessException;
 import org.ow2.proactive.scheduler.job.InternalJob;
@@ -220,6 +222,12 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
     private Thread pinger;
     /** Thread Pool used to get task progress status */
     private ExecutorService threadPool;
+    /**
+     * This lock is used only in version 3.0.x to synchronized endjob() request coming from
+     * pinger threads and schedule() method.
+     * This lock ensures that schedule() and endjob() cannot be performed at the same time.
+     */
+    private ReentrantLock pingerMutex;
 
     /** Timer used for remove result method (transient because Timer is not serializable) */
     private Timer removeJobTimer;
@@ -427,6 +435,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
                     new NamedThreadFactory("TaskLauncher_Terminate"));
             this.frontend = frontend;
             this.currentJobToSubmit = jobSubmitLink;
+            this.pingerMutex = new ReentrantLock(true);
             //loggers
             String providerClassname = PASchedulerProperties.LOGS_FORWARDING_PROVIDER.getValueAsString();
             if (providerClassname == null || providerClassname.equals("")) {
@@ -594,6 +603,9 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
                 while ((status == SchedulerStatus.STARTED) || (status == SchedulerStatus.PAUSED) ||
                     (status == SchedulerStatus.STOPPED)) {
                     try {
+                        //lock semaphore here
+                        pingerMutex.lock();
+
                         // block the loop until a method is invoked and serve it
                         // while some task are started loop as faster as possible
                         service.blockingServeOldest(numberOfTaskStarted != 0 ? 1 : SCHEDULER_TIME_OUT);
@@ -670,6 +682,13 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
                         freeze();
                         //scheduler functionality are reduced until now
                         status = SchedulerStatus.UNLINKED;
+                    } finally {
+                        //unlock semaphore here
+                        try {
+                            pingerMutex.unlock();
+                        } catch (IllegalMonitorStateException e) {
+                            logger_dev.error("Mutex should have been locked, this is an abnormal case", e);
+                        }
                     }
                 }
 
@@ -698,6 +717,8 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
             int numberOfTaskStarted = 1;
             while ((runningJobs.size() + pendingJobs.size()) > 0) {
                 try {
+                    //lock semaphore here
+                    pingerMutex.lock();
                     // same loop as main loop
                     service.blockingServeOldest(numberOfTaskStarted != 0 ? 1 : SCHEDULER_TIME_OUT);
                     service.serveAll(incomingRequestsFilter);
@@ -717,6 +738,13 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
                     }
                 } catch (Exception e) {
                     logger_dev.error("", e);
+                } finally {
+                    //unlock semaphore here
+                    try {
+                        pingerMutex.unlock();
+                    } catch (IllegalMonitorStateException e) {
+                        logger_dev.error("Mutex should have been locked, this is an abnormal case", e);
+                    }
                 }
             }
 
@@ -812,11 +840,22 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
                                     job.reStartTask(td);
                                     logger_dev.info("Task '" + td.getId() + "' is waiting to restart");
                                 } else {
-                                    endJob(
-                                            job,
-                                            td,
-                                            "An error has occurred due to a node failure and the maximum amout of retries property has been reached.",
-                                            JobStatus.FAILED);
+                                    //the next call must be sequential with the core active object to avoid
+                                    //schedule() method and endjob() method to be called at the same time
+                                    try {
+                                        //aquire lock here
+                                        pingerMutex.lock();
+                                        endJob(
+                                                job,
+                                                td,
+                                                "An error has occurred due to a node failure and the maximum amout of retries property has been reached.",
+                                                JobStatus.FAILED);
+                                    } catch (Throwable t1) {
+                                        //protect lock in any case
+                                    } finally {
+                                        //release lock here
+                                        pingerMutex.unlock();
+                                    }
                                     break;
                                 }
                             }
@@ -902,7 +941,6 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
      * @param jobStatus the type of the end for this job. (failed/canceled/killed)
      */
     void endJob(InternalJob job, InternalTask task, String errorMsg, JobStatus jobStatus) {
-
         // job can be already ended (SCHEDULING-700)
         JobStatus currentStatus = job.getStatus();
         if (currentStatus == JobStatus.CANCELED || currentStatus == JobStatus.FAILED ||
