@@ -85,7 +85,10 @@ import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive_grid_cloud_portal.PersistentMapConverter;
 import org.ow2.proactive_grid_cloud_portal.UserJobInfo;
 
-
+/**
+ * fdsfsd
+ */
+@Path("/scheduler/")
 public interface SchedulerRestInterface {
 
     /**
@@ -693,7 +696,8 @@ public interface SchedulerRestInterface {
      */
     @GET
     @Path("stats")
-    public abstract String getStatistics(@HeaderParam("sessionid") final String sessionId)
+    @Produces("application/json")
+    public abstract Map<String, String> getStatistics(@HeaderParam("sessionid") final String sessionId)
             throws NotConnectedException, PermissionException;
 
     /**
@@ -705,7 +709,8 @@ public interface SchedulerRestInterface {
      */
     @GET
     @Path("stats/myaccount")
-    public abstract String getStatisticsOnMyAccount(@HeaderParam("sessionid") final String sessionId)
+    @Produces("application/json")
+    public abstract Map<String, String> getStatisticsOnMyAccount(@HeaderParam("sessionid") final String sessionId)
             throws NotConnectedException, PermissionException;
 
     /**

@@ -121,9 +121,7 @@ import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
 
 
 /**
- * 
  * this class exposes the Scheduler as a RESTful service.
- *
  */
 @XmlJavaTypeAdapter(value = PersistentMapConverter.class, type = PersistentMap.class)
 @Path("/scheduler/")
@@ -1508,11 +1506,12 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      */
     @GET
     @Path("stats")
-    public String getStatistics(@HeaderParam("sessionid") final String sessionId)
+    @Produces("application/json")
+    public Map<String,String> getStatistics(@HeaderParam("sessionid") final String sessionId)
             throws NotConnectedException, PermissionException {
         final SchedulerProxyUserInterface s = checkAccess(sessionId, "stats");
 
-        return s.getInfo("ProActiveScheduler:name=RuntimeData");
+        return s.getMappedInfo("ProActiveScheduler:name=RuntimeData");
     }
 
     /**
@@ -1524,11 +1523,12 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      */
     @GET
     @Path("stats/myaccount")
-    public String getStatisticsOnMyAccount(@HeaderParam("sessionid") final String sessionId)
+    @Produces("application/json")
+    public Map<String,String> getStatisticsOnMyAccount(@HeaderParam("sessionid") final String sessionId)
             throws NotConnectedException, PermissionException {
         final SchedulerProxyUserInterface s = checkAccess(sessionId, "stats/myaccount");
 
-        return s.getInfo("ProActiveScheduler:name=MyAccount");
+        return s.getMappedInfo("ProActiveScheduler:name=MyAccount");
     }
 
     /**

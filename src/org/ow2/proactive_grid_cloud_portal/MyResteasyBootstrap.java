@@ -38,7 +38,6 @@ package org.ow2.proactive_grid_cloud_portal;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.Iterator;
 import java.util.Map.Entry;
@@ -76,9 +75,10 @@ public class MyResteasyBootstrap extends ResteasyBootstrap {
         //        RuntimeDelegate.setInstance(dispatcher);
         //        RegisterBuiltin.register(dispatcher);
 
-        //        ResteasyProviderFactory dispatcher = new ResteasyProviderFactory();
+//        ResteasyProviderFactory dispatcher = new ResteasyProviderFactory();
+//        RuntimeDelegate.setInstance(dispatcher);
+//        RegisterBuiltin.register(dispatcher);
 
-        //        ResteasyProviderFactory.getInstance().addContextResolver(provider)
         dispatcher.addStringConverter(RestartModeConverter.class);
         dispatcher.addStringConverter(IntWrapperConverter.class);
         dispatcher.registerProvider(PersistentMapConverter.class);

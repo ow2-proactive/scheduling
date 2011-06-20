@@ -9,8 +9,10 @@
 	<property name="build.dir" value="build" />
 	<property name="classes.dir" value="${build.dir}/classes" />
 	<property name="lib.dir" value="lib" />
+	<property name="war.root" value="WebContent" />
 	<property name="webinf.lib.dir" value="WebContent/WEB-INF/lib" />
 	<property name="webinf.classes.dir" value="WebContent/WEB-INF/classes" />
+	<property name="webinf.lib.doc" value="WebContent/WEB-INF/doc" />
 	<property name="src.dir" value="src" />
 
 
@@ -21,8 +23,11 @@
 	<target name="prepare" description="Create dir for class files">
 		<mkdir dir="${classes.dir}" />
 		<mkdir dir="${webinf.lib.dir}" />
+		<mkdir dir="${war.root}/doc" />
 		<copy todir="WebContent/WEB-INF/classes">
-			<fileset dir="WebContent/WEB-INF"><include name="log4j.properties" /></fileset>
+			<fileset dir="WebContent/WEB-INF">
+				<include name="log4j.properties" />
+			</fileset>
 		</copy>
 	</target>
 
@@ -30,6 +35,7 @@
 		<delete dir="${classes.dir}" />
 		<delete dir="${webinf.classes.dir}" />
 		<delete dir="${webinf.lib.dir}" />
+		<delete dir="${war.root}/doc" />
 	</target>
 
 	<path id="src.classpath">
@@ -49,7 +55,7 @@
 	</target>
 
 
-	<target name="war" depends="compile" description="Generate the war file">
+	<target name="war" depends="compile,doc" description="Generate the war file">
 		<!-- copy classes -->
 
 		<copy todir="WebContent/WEB-INF/classes">
@@ -57,7 +63,7 @@
 				<include name="**" />
 			</fileset>
 		</copy>
-		
+
 		<!-- copy jars -->
 		<copy todir="${webinf.lib.dir}" flatten="true">
 			<fileset dir="${lib.dir}/scheduling">
@@ -67,23 +73,42 @@
 				<include name="**/*.jar" />
 			</fileset>
 		</copy>
-		
+
+		<!-- copy doc content -->
+		<copy todir="${war.root}/doc">
+			<fileset dir="${build.dir}/jaxrsdocs/">
+				<include name="**/*" />
+			</fileset>
+		</copy>
+		<copy todir="${war.root}/doc">
+			<fileset dir="${build.dir}/">
+				<include name="jaxbdocs/" />
+			</fileset>
+		</copy>
+
 		<war destfile="proactive_grid_cloud_portal.war" webxml="WebContent/WEB-INF/web.xml" basedir="WebContent">
 		</war>
 	</target>
 
+	<target name="doc" depends="doc-jaxrs">
+
+	</target>
+
+
 	<target name="doc-jaxrs" depends="doc-jaxb" description="Generate JAX-RS documentation">
-		<javadoc classpathref="src.classpath" sourcepath="${src.dir}" destdir="${build.dir}/jaxrsdocs/" extdirs="${lib.dir}" doclet="com.lunatech.doclets.jax.jaxrs.JAXRSDoclet" docletpathref="src.classpath">
+		<javadoc classpathref="src.classpath" sourcepath="${src.dir}" destdir="${build.dir}/jaxrsdocs/" extdirs="${lib.dir}" doclet="com.lunatech.doclets.jax.jaxrs.JAXRSDoclet" docletpathref="src.classpath" footer="Copyright 2007-2011 Activeeon All Rights Reserved. ">
 			<package name="org.ow2.proactive_grid_cloud_portal.*" />
-			<link href="../jaxbdocs/" />
+			<link href="jaxbdocs/" />
 		</javadoc>
 	</target>
 
 
 	<target name="doc-jaxb" description="Generate JAXB documentation">
-		<javadoc classpathref="src.classpath" sourcepath="${src.dir}" destdir="${build.dir}/jaxbdocs/" extdirs="${lib.dir}" doclet="com.lunatech.doclets.jax.jaxb.JAXBDoclet" docletpathref="src.classpath">
+		<javadoc classpathref="src.classpath" sourcepath="${src.dir}" destdir="${build.dir}/jaxbdocs/" extdirs="${lib.dir}" doclet="com.lunatech.doclets.jax.jaxb.JAXBDoclet" docletpathref="src.classpath" footer="Copyright 2007-2011 Activeeon All Rights Reserved. ">
 			<package name="org.ow2.proactive_grid_cloud_portal.*" />
 		</javadoc>
 	</target>
+
+
 
 </project>
