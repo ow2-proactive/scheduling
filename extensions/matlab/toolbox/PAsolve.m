@@ -534,6 +534,7 @@ end
 % send the task list to the scheduler
 
 solve_config.setDebug(opt.Debug);
+solve_config.setLogin(sched.PAgetlogin());
 solve_config.setTimeStamp(opt.TimeStamp);
 solve_config.setPriority(opt.Priority);
 solve_config.setTransferEnv(opt.TransferEnv);

@@ -51,6 +51,8 @@ public class PASolveMatSciGlobalConfig implements Serializable {
     /** Debug Mode */
     protected boolean debug = false;
 
+    protected String login;
+
     /** Keep remote matlab engine between tasks */
     protected boolean keepEngine = false;
 
@@ -145,6 +147,14 @@ public class PASolveMatSciGlobalConfig implements Serializable {
 
     public void setPriority(String priority) {
         this.priority = priority;
+    }
+
+    public String getLogin() {
+        return login;
+    }
+
+    public void setLogin(String login) {
+        this.login = login;
     }
 
     public boolean isDebug() {

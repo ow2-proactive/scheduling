@@ -55,6 +55,7 @@ import org.ow2.proactive.scripting.SelectionScript;
 
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.TreeSet;
 
 
@@ -315,16 +316,21 @@ public class AOMatlabEnvironment extends AOMatSciEnvironment<Boolean, MatlabResu
                 URL url3 = new URL(config.getCheckLicenceScriptUrl());
                 if (checkScript(url3)) {
                     SelectionScript sscript = null;
+                    String[] scriptParams;
+                    ArrayList<String> paramsList = new ArrayList<String>();
+                    paramsList.add(config.getLogin());
+                    if (taskConfigs[i][j].getCheckLicenceScriptParams() != null) {
+                        paramsList.addAll(Arrays.asList(taskConfigs[i][j].getCheckLicenceScriptParams()));
+                    } else {
+                        paramsList.addAll(Arrays.asList(config.getScriptParams()));
+                    }
+                    scriptParams = paramsList.toArray(new String[paramsList.size()]);
                     try {
-                        if (taskConfigs[i][j].getCheckLicenceScriptParams() != null) {
-                            sscript = new SelectionScript(url3, taskConfigs[i][j]
-                                    .getCheckLicenceScriptParams());
-                        } else {
-                            sscript = new SelectionScript(url3, config.getScriptParams());
-                        }
+                        sscript = new SelectionScript(url3, scriptParams);
                     } catch (InvalidScriptException e1) {
                         throw new RuntimeException(e1);
                     }
+
                     schedulerTask.addSelectionScript(sscript);
                 }
 

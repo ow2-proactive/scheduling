@@ -64,11 +64,10 @@ public class MatlabEngineConfig extends MatSciEngineConfigBase {
      */
     private String matlabCommandName = null;
 
-
     private static final String nl = System.getProperty("line.separator");
 
-    public MatlabEngineConfig(String matlabHome, String matlabVersion,
-            String matlabBinDir, String matlabCommandName) {
+    public MatlabEngineConfig(String matlabHome, String matlabVersion, String matlabBinDir,
+            String matlabCommandName) {
         this.matlabHome = matlabHome.replaceAll("" + '\u0000', "");
         this.matlabVersion = matlabVersion.replaceAll("" + '\u0000', "");
         this.matlabBinDir = matlabBinDir.replaceAll("" + '\u0000', "");
@@ -85,11 +84,9 @@ public class MatlabEngineConfig extends MatSciEngineConfigBase {
         return matlabHome;
     }
 
-
     public String getMatlabBinDir() {
         return matlabBinDir;
     }
-
 
     /**
      * Returns the current matlab version.
@@ -116,8 +113,8 @@ public class MatlabEngineConfig extends MatSciEngineConfigBase {
     @Override
     public String toString() {
         return "Matlab home : " + matlabHome + nl + "Matlab version : " + matlabVersion + nl +
-             "Matlab bin directory  : " +
-            matlabBinDir + nl + "Matlab command name : " + matlabCommandName + nl;
+            "Matlab bin directory  : " + matlabBinDir + nl + "Matlab command name : " + matlabCommandName +
+            nl;
     }
 
     @Override

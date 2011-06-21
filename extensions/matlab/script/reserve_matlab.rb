@@ -162,7 +162,13 @@ class ReserveMatlab
 
     log(Date.new().to_string()+" : Executing toolbox checking script on " + @host)
     if (defined? $args) && ($args.size > 0)
-
+      login = $args[0]
+      if $args.size > 1
+        $args[1..$args.size-1].each do |a|
+          tcode = toolbox_code(a)
+          # use the code and login to contact the proxy server for each Matlab feature
+        end
+      end
     end
     return true;
   end

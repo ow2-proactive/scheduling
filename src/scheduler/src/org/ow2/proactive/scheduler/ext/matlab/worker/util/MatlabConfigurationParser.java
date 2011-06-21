@@ -174,7 +174,6 @@ public class MatlabConfigurationParser extends MatSciConfigurationParser {
             File filecommand = new File(filebin, command);
             checkFile(filecommand, configFile, true);
 
-
             configs.add(new MatlabEngineConfig(home, version, bindir, command));
         }
 
