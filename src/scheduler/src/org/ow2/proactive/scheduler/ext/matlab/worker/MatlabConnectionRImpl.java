@@ -85,7 +85,13 @@ public class MatlabConnectionRImpl implements MatlabConnection {
     }
 
     public void release() {
+          if (process != null) {
+              try {
+                process.destroy();
+              } catch (Exception e) {
 
+              }
+          }
     }
 
     public void evalString(String command) throws MatlabTaskException {
