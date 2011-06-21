@@ -1,5 +1,9 @@
 package org.ow2.proactive.scheduler.ext.matlab.worker;
 
+import matlabcontrol.*;
+import org.objectweb.proactive.utils.OperatingSystem;
+import org.ow2.proactive.scheduler.ext.matlab.worker.util.MatlabEngineConfig;
+
 import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -8,16 +12,6 @@ import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
-
-import matlabcontrol.MatlabConnectionException;
-import matlabcontrol.MatlabInvocationException;
-import matlabcontrol.MatlabProcessCreator;
-import matlabcontrol.RemoteMatlabProxy;
-import matlabcontrol.RemoteMatlabProxyFactory;
-
-import org.objectweb.proactive.utils.OperatingSystem;
-import org.ow2.proactive.scheduler.ext.matlab.worker.util.MatlabEngineConfig;
-
 
 /**
  * MatlabControlEngine
@@ -391,7 +385,7 @@ public class MatlabControlEngine {
             this.matlabLocation = matlabLocation;
         }
 
-        public void createMatlabProcess(String runArg) throws Exception {
+        public Process createMatlabProcess(String runArg) throws Exception {
             ProcessBuilder b = new ProcessBuilder();
 
             //b.directory(this.workingDirectory);
@@ -417,6 +411,12 @@ public class MatlabControlEngine {
             } catch (IllegalThreadStateException e) {
                 // This is normal behavior, it means the process is still running
             }
+            return p;
         }
+
+        public File getLogFile() {
+            return null;
+        }
+
     }
 }

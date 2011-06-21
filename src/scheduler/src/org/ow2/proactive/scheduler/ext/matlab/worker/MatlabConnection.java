@@ -72,10 +72,10 @@ public class MatlabConnection {
      */
     public static MatlabConnection acquire(final String matlabExecutablePath, final File workingDir)
             throws MatlabInitException {
+        RemoteMatlabProxyFactory proxyFactory;
 
         // If a user is specified create the proxy factory with a specific
         // MATLAB process as user creator
-        RemoteMatlabProxyFactory proxyFactory;
         try {
             MatlabProcessCreator prCreator = new CustomMatlabProcessCreator(matlabExecutablePath, // "C:\\Program Files\\MATLAB\\R2010b\\bin\\win32\\MATLAB.exe"
                 workingDir);
@@ -137,6 +137,9 @@ public class MatlabConnection {
         } catch (Exception e) {
             // Here maybe we should kill the process it self ... need more tests
         }
+        // Clean threads used by the proxy
+        this.proxy.clean();
+
         this.proxy = null;
         // Remove the shutdown hook
         try {
@@ -231,7 +234,6 @@ public class MatlabConnection {
 
         private String nodeName;
 
-
         private String[] startUpOptions;
         private final String matlabLocation;
         private final File workingDirectory;
@@ -246,8 +248,9 @@ public class MatlabConnection {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            logFile = new File(tmpDir, "MatlabStart"+nodeName+".log");
-            startUpOptions = new String[] { "-nosplash", "-nodesktop", "-nodisplay","-logfile", logFile.toString() };
+            logFile = new File(tmpDir, "MatlabStart" + nodeName + ".log");
+            startUpOptions = new String[] { "-nosplash", "-nodesktop", "-nodisplay", "-logfile",
+                    logFile.toString() };
         }
 
         public Process createMatlabProcess(String runArg) throws Exception {
@@ -280,7 +283,7 @@ public class MatlabConnection {
         }
 
         public File getLogFile() {
-             return logFile;
+            return logFile;
         }
     }
 }

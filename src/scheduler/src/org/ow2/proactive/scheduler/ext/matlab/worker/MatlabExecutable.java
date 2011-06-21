@@ -206,7 +206,6 @@ public class MatlabExecutable extends JavaExecutable {
             result = this.executeScript();
         } finally {
             this.printLog("Closing MATLAB...");
-
             this.matlabConnection.release();
         }
 
@@ -522,7 +521,7 @@ public class MatlabExecutable extends JavaExecutable {
         // system temp dir (not using java.io.tmpdir since in runasme it can be
         // inaccesible and the scratchdir property can inherited from parent jvm)
         if (this.paconfig.isRunAsMe()) {
-		tmpPath = System.getProperty("node.dataspace.scratchdir");
+            tmpPath = System.getProperty("node.dataspace.scratchdir");
         }
 
         // log file writer used for debugging

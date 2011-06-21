@@ -361,6 +361,6 @@ public abstract class JavaExecutable extends Executable {
 
     /** This method can be called only once */
     public OSUser getUser() throws Exception {
-	return ForkerUtils.checkConfigAndGetUser(this.execInitializer.getDecrypter());
+        return ForkerUtils.checkConfigAndGetUser(this.execInitializer.getDecrypter());
     }
 }
