@@ -1,5 +1,6 @@
 package org.ow2.proactive.scheduler.ext.matlab.worker;
 
+import org.objectweb.proactive.utils.OperatingSystem;
 import org.ow2.proactive.scheduler.ext.common.util.IOTools;
 import org.ow2.proactive.scheduler.ext.matlab.common.exception.MatlabInitException;
 import org.ow2.proactive.scheduler.ext.matlab.common.exception.MatlabTaskException;
@@ -37,6 +38,8 @@ public class MatlabConnectionRImpl implements MatlabConnection {
     protected File mainFuncFile;
 
     protected Process process;
+
+    protected OperatingSystem os = OperatingSystem.getOperatingSystem();
 
     private static final String startPattern = "---- MATLAB START ----";
 
@@ -174,6 +177,10 @@ public class MatlabConnectionRImpl implements MatlabConnection {
         commandList.addAll(Arrays.asList(this.startUpOptions));
         commandList.add("-logfile");
         commandList.add(logFile.toString());
+        if (os == OperatingSystem.windows) {
+           commandList.add("-sd");
+           commandList.add(this.workingDirectory.toString());
+        }
         commandList.add("-r");
         commandList.add(runArg);
 
