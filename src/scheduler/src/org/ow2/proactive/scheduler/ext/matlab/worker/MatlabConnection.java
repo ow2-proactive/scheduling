@@ -36,14 +36,21 @@
  */
 package org.ow2.proactive.scheduler.ext.matlab.worker;
 
-import matlabcontrol.*;
-import org.ow2.proactive.scheduler.ext.matlab.common.exception.MatlabInitException;
-import org.ow2.proactive.scheduler.ext.matlab.common.exception.MatlabTaskException;
-import org.ow2.proactive.scheduler.ext.matsci.worker.util.MatSciEngineConfigBase;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+
+import matlabcontrol.MatlabConnectionException;
+import matlabcontrol.MatlabInvocationException;
+import matlabcontrol.MatlabProcessCreator;
+import matlabcontrol.RemoteMatlabProxy;
+import matlabcontrol.RemoteMatlabProxyFactory;
+
+import org.ow2.proactive.scheduler.ext.matlab.common.exception.MatlabInitException;
+import org.ow2.proactive.scheduler.ext.matlab.common.exception.MatlabTaskException;
+import org.ow2.proactive.scheduler.ext.matsci.worker.util.MatSciEngineConfigBase;
+import org.rzo.yajsw.os.ms.win.w32.WindowsProcess;
 
 
 /**
@@ -59,7 +66,7 @@ public class MatlabConnection {
     /** The thread executed on shutdown that releases this connection */
     private Thread shutdownHook;
 
-    private Process matlabProcess;
+    private CustomMatlabProcessCreator processCreator;
 
     private MatlabConnection() {
     }
@@ -81,9 +88,12 @@ public class MatlabConnection {
         // If a user is specified create the proxy factory with a specific
         // MATLAB process as user creator
         try {
-            MatlabProcessCreator prCreator = new CustomMatlabProcessCreator(matlabExecutablePath, workingDir,
-                conn, startupOptions, debug);
-            proxyFactory = new RemoteMatlabProxyFactory(prCreator);
+            if (File.pathSeparatorChar == ';') {
+		conn.processCreator = new WindowsMatlabProcessCreator(matlabExecutablePath, workingDir, startupOptions, debug);
+            } else {
+		conn.processCreator = new CustomMatlabProcessCreator(matlabExecutablePath, workingDir, startupOptions, debug);
+            }
+            proxyFactory = new RemoteMatlabProxyFactory(conn.processCreator);
         } catch (MatlabConnectionException e) {
             // Possible cause: registry problem or receiver is not bind
             e.printStackTrace();
@@ -111,7 +121,10 @@ public class MatlabConnection {
 
             // clean factory
             proxyFactory.clean();
-            // destroy process
+
+            // destroy process that can be spawned
+            // even if we didn't managed to get the proxy
+            conn.processCreator.killProcess();
 
             throw me;
         }
@@ -146,14 +159,12 @@ public class MatlabConnection {
         } catch (Exception e) {
             // Here maybe we should kill the process it self ... need more tests
         }
-        //                     try{
-        //                         this.matlabProcess.destroy();
-        //                     }catch(Exception e) {
-        //
-        //                     }
 
         // Clean threads used by the proxy
         this.proxy.clean();
+
+        // Kill the MATLAB process
+        this.processCreator.killProcess();
 
         this.proxy = null;
         // Remove the shutdown hook
@@ -211,45 +222,93 @@ public class MatlabConnection {
 
     /*********** PRIVATE INTERNAL CLASS ***********/
 
+	/**
+	 * This class is used to create a MATLAB process under a specific user
+	 */
+	private static class CustomMatlabProcessCreator implements
+			MatlabProcessCreator {
+
+		protected final String tmpDir = System.getProperty("java.io.tmpdir");
+
+		protected String nodeName;
+
+		protected String[] startUpOptions;
+		protected final String matlabLocation;
+		protected final File workingDirectory;
+
+		protected File logFile;
+		protected boolean debug;
+
+		private Process process;
+
+		public CustomMatlabProcessCreator(final String matlabLocation,
+				final File workingDirectory,
+				String[] startUpOptions, boolean debug) {
+			this.matlabLocation = matlabLocation;
+			this.workingDirectory = workingDirectory;
+			this.debug = debug;
+			this.startUpOptions = startUpOptions;
+			try {
+				this.nodeName = MatSciEngineConfigBase.getNodeName();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			logFile = new File(tmpDir, "MatlabStart" + nodeName + ".log");
+		}
+
+		public Process createMatlabProcess(String runArg) throws Exception {
+			// Attempt to run MATLAB
+			final ArrayList<String> commandList = new ArrayList<String>();
+			commandList.add(this.matlabLocation);
+			commandList.addAll(Arrays.asList(this.startUpOptions));
+			commandList.add("-logfile");
+			commandList.add(logFile.toString());
+			commandList.add("-r");
+			commandList.add(runArg);
+
+			String[] command = (String[]) commandList
+					.toArray(new String[commandList.size()]);
+
+			ProcessBuilder b = new ProcessBuilder();
+			b.directory(this.workingDirectory);
+			b.command(command);
+
+			process = b.start();
+
+			return process;
+
+		}
+
+		public File getLogFile() {
+			return logFile;
+		}
+
+		public boolean isDebug() {
+			return debug;
+		}
+
+		public void killProcess() {
+			try {
+				process.destroy();
+			} catch (Exception e) {}
+		}
+	}
+
     /**
      * This class is used to create a MATLAB process under a
      * specific user
      */
-    private static class CustomMatlabProcessCreator implements MatlabProcessCreator {
+    private static class WindowsMatlabProcessCreator extends CustomMatlabProcessCreator {
 
-        private final String tmpDir = System.getProperty("java.io.tmpdir");
+	private WindowsProcess process;
 
-        private String nodeName;
+        public WindowsMatlabProcessCreator(String matlabLocation,
+				File workingDirectory,
+				String[] startUpOptions, boolean debug) {
+			super(matlabLocation, workingDirectory, startUpOptions, debug);
+		}
 
-        private String[] startUpOptions;
-        private final String matlabLocation;
-        private final File workingDirectory;
-
-        private File logFile;
-        private boolean debug;
-
-        private MatlabConnection conn;
-
-        public CustomMatlabProcessCreator(final String matlabLocation, final File workingDirectory,
-                MatlabConnection conn, String[] startUpOptions, boolean debug) {
-            this.matlabLocation = matlabLocation;
-            this.workingDirectory = workingDirectory;
-            this.conn = conn;
-            this.debug = debug;
-            this.startUpOptions = startUpOptions;
-            try {
-                this.nodeName = MatSciEngineConfigBase.getNodeName();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            logFile = new File(tmpDir, "MatlabStart" + nodeName + ".log");
-        }
-
-        public Process createMatlabProcess(String runArg) throws Exception {
-            ProcessBuilder b = new ProcessBuilder();
-
-            b.directory(this.workingDirectory);
-
+		public Process createMatlabProcess(String runArg) throws Exception {
             // Attempt to run MATLAB
             final ArrayList<String> commandList = new ArrayList<String>();
             commandList.add(this.matlabLocation);
@@ -257,33 +316,49 @@ public class MatlabConnection {
             commandList.add("-logfile");
             commandList.add(logFile.toString());
             commandList.add("-r");
-            commandList.add(runArg);
+            commandList.add("\"" + runArg + "\"");
 
             String[] command = (String[]) commandList.toArray(new String[commandList.size()]);
-            b.command(command);
 
-            final Process p = b.start();
-            conn.matlabProcess = p;
+            process = new WindowsProcess();
+            process.setWorkingDir(this.workingDirectory.getAbsolutePath());
+            process.setCommand(command);
+            process.setVisible(false);
 
-            // Sometimes the MATLAB process starts but dies very fast with exit code 1
-            // this must be considered as an error
-            try {
-                int exitValue = p.exitValue();
-                throw new Exception("The MATLAB process has exited abnormally with exit value " + exitValue +
-                    ", this can caused by a missing privilege of the user " + System.getenv("user.name"));
-            } catch (IllegalThreadStateException e) {
-                // This is normal behavior, it means the process is still running
+            if (!process.start()) {
+		throw new IllegalStateException("Unable to start MATLAB process " + command + " errorCode: " + WindowsProcess.getLastError());
             }
-            return p;
+
+			// Sometimes the MATLAB process starts but dies very fast with exit
+			// code 1
+			// this must be considered as an error
+//			try {
+//				int exitValue = process.exitValue();
+//				throw new Exception(
+//						"The MATLAB process has exited abnormally with exit value "
+//								+ exitValue
+//								+ ", this can caused by a missing privilege of the user "
+//								+ System.getenv("user.name"));
+//			} catch (IllegalThreadStateException e) {
+//				// This is normal behavior, it means the process is still
+//				// running
+//			}
+
+
+            return null;
         }
 
-        public File getLogFile() {
-            return logFile;
-        }
-
-        public boolean isDebug() {
-            return debug;
-        }
-
+		public void killProcess() {
+			final List<Integer> pids = WindowsProcess.getProcessTree(process.getPid());
+			for (final Integer i : pids) {
+				if (! WindowsProcess.kill(i, 1)) {
+					try {
+						Runtime.getRuntime().exec("TASKKILL /F /T /PID " + i);
+					} catch(Exception e) {
+						// Maybe here kill using tree kill
+					}
+				}
+			}
+		}
     }
 }
