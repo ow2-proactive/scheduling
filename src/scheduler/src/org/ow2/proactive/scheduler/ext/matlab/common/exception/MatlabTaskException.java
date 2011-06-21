@@ -50,4 +50,8 @@ public class MatlabTaskException extends RuntimeException {
     public MatlabTaskException(String message) {
         super(message);
     }
+
+    public MatlabTaskException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }

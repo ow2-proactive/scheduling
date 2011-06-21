@@ -76,13 +76,13 @@ public class MatlabControlEngine {
                     System.out.println("Starting a new Matlab engine:");
                     System.out.println(configuration);
                 }
-                Configuration.setMatlabLocation(configuration.getMatlabHome() + os.fileSeparator() +
-                        configuration.getMatlabBinDir() + os.fileSeparator() +
-                        configuration.getMatlabCommandName());
-                Configuration.setStartupOptions(new String[]{"-nosplash", "-nodesktop", "-wait"});
+                String loc = configuration.getMatlabHome() + os.fileSeparator() +
+                    configuration.getMatlabBinDir() + os.fileSeparator() +
+                    configuration.getMatlabCommandName();
+                //Configuration.setStartupOptions(new String[] { "-nosplash", "-nodesktop", "-wait" });
 
                 //Create a factory
-                factory = new RemoteMatlabProxyFactory();
+                factory = new RemoteMatlabProxyFactory(loc);
 
                 proxy = factory.getProxy();
 
