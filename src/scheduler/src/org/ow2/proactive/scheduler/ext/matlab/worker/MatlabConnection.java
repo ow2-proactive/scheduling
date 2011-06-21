@@ -59,6 +59,8 @@ public class MatlabConnection {
     /** The thread executed on shutdown that releases this connection */
     private Thread shutdownHook;
 
+    private Process matlabProcess;
+
     private MatlabConnection() {
     }
 
@@ -74,11 +76,14 @@ public class MatlabConnection {
             throws MatlabInitException {
         RemoteMatlabProxyFactory proxyFactory;
 
+
+        final MatlabConnection conn = new MatlabConnection();
         // If a user is specified create the proxy factory with a specific
         // MATLAB process as user creator
         try {
-            MatlabProcessCreator prCreator = new CustomMatlabProcessCreator(matlabExecutablePath, // "C:\\Program Files\\MATLAB\\R2010b\\bin\\win32\\MATLAB.exe"
-                workingDir);
+            MatlabProcessCreator prCreator = new CustomMatlabProcessCreator(
+                matlabExecutablePath, // "C:\\Program Files\\MATLAB\\R2010b\\bin\\win32\\MATLAB.exe"
+                workingDir, conn);
             proxyFactory = new RemoteMatlabProxyFactory(prCreator);
         } catch (MatlabConnectionException e) {
             // Possible cause: registry problem or receiver is not bind
@@ -106,7 +111,7 @@ public class MatlabConnection {
             throw me;
         }
 
-        final MatlabConnection conn = new MatlabConnection();
+
         conn.proxy = proxy;
 
         // Add shutdown hook to release the connection on jvm exit
@@ -137,6 +142,12 @@ public class MatlabConnection {
         } catch (Exception e) {
             // Here maybe we should kill the process it self ... need more tests
         }
+//                     try{
+//                         this.matlabProcess.destroy();
+//                     }catch(Exception e) {
+//
+//                     }
+
         // Clean threads used by the proxy
         this.proxy.clean();
 
@@ -146,6 +157,7 @@ public class MatlabConnection {
             Runtime.getRuntime().removeShutdownHook(this.shutdownHook);
         } catch (Exception e) {
         }
+        System.gc();
     }
 
     //    public void testEngineInitOrRestart() {
@@ -240,9 +252,12 @@ public class MatlabConnection {
 
         private File logFile;
 
-        public CustomMatlabProcessCreator(final String matlabLocation, final File workingDirectory) {
+        private MatlabConnection conn;
+
+        public CustomMatlabProcessCreator(final String matlabLocation, final File workingDirectory, MatlabConnection conn) {
             this.matlabLocation = matlabLocation;
             this.workingDirectory = workingDirectory;
+           this.conn = conn;
             try {
                 this.nodeName = MatSciEngineConfigBase.getNodeName();
             } catch (Exception e) {
@@ -269,6 +284,7 @@ public class MatlabConnection {
             b.command(command);
 
             final Process p = b.start();
+            conn.matlabProcess = p;
 
             // Sometimes the MATLAB process starts but dies very fast with exit code 1
             // this must be considered as an error
