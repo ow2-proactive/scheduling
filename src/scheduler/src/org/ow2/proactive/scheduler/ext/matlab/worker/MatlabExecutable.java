@@ -375,22 +375,26 @@ public class MatlabExecutable extends JavaExecutable {
 
     private void execKeepAlive() throws Exception {
         printLog("Executing Keep-Alive timer");
-
+        StringBuilder checktoolboxesCommand = new StringBuilder(paconfig.getChecktoolboxesFunctionName() +
+            "( {");
         StringBuilder keepAliveCommand = new StringBuilder(
             "t = timer('Period', 300,'ExecutionMode','fixedRate');t.TimerFcn = { @" +
-                paconfig.getCallbackFunctionName() + ", {");
+                paconfig.getKeepaliveCallbackFunctionName() + ", {");
         String[] used = taskconfig.getToolboxesUsed();
         for (int i = 0; i < used.length; i++) {
             if (i < used.length - 1) {
                 keepAliveCommand.append("'" + used[i] + "',");
+                checktoolboxesCommand.append("'" + used[i] + "',");
             } else {
                 keepAliveCommand.append("'" + used[i] + "'");
+                checktoolboxesCommand.append("'" + used[i] + "'");
             }
         }
         keepAliveCommand.append("}};start(t);");
-
+        checktoolboxesCommand.append("},'" + localSpaceRootDir.toString() + "');");
+        printLog(checktoolboxesCommand.toString());
         printLog(keepAliveCommand.toString());
-
+        matlabConnection.evalString(checktoolboxesCommand.toString());
         matlabConnection.evalString(keepAliveCommand.toString());
     }
 

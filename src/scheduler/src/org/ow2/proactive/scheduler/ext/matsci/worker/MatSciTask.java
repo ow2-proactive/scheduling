@@ -755,9 +755,9 @@ public abstract class MatSciTask<W extends MatSciWorker, C extends MatSciEngineC
 
             } else {
                 lt1 = new IOTools.LoggingThread(jvminfo.getProcess().getInputStream(), "[" + host + " OUT]",
-                    System.out);// new PrintStream(new File("D:\\test_out.txt")));//System.out);
+                    System.out, null, null);// new PrintStream(new File("D:\\test_out.txt")));//System.out);
                 lt2 = new IOTools.LoggingThread(jvminfo.getProcess().getErrorStream(), "[" + host + " ERR]",
-                    System.err);// new PrintStream(new File("D:\\test_err.txt")));//System.err);
+                    System.err, null, null);// new PrintStream(new File("D:\\test_err.txt")));//System.err);
             }
 
             jvminfo.setLogger(lt1);

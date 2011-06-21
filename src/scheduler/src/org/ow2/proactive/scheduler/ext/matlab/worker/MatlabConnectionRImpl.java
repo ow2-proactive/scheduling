@@ -3,6 +3,7 @@ package org.ow2.proactive.scheduler.ext.matlab.worker;
 import org.ow2.proactive.scheduler.ext.common.util.IOTools;
 import org.ow2.proactive.scheduler.ext.matlab.common.exception.MatlabInitException;
 import org.ow2.proactive.scheduler.ext.matlab.common.exception.MatlabTaskException;
+import org.ow2.proactive.scheduler.ext.matlab.common.exception.UnsufficientLicencesException;
 import org.ow2.proactive.scheduler.ext.matsci.worker.util.MatSciEngineConfigBase;
 
 import java.io.*;
@@ -28,6 +29,8 @@ public class MatlabConnectionRImpl implements MatlabConnection {
     protected String matlabLocation;
     protected File workingDirectory;
 
+    protected static final int TIMEOUT_START = 6000;
+
     protected File logFile;
     protected boolean debug;
 
@@ -38,6 +41,10 @@ public class MatlabConnectionRImpl implements MatlabConnection {
     private static final String startPattern = "---- MATLAB START ----";
 
     private PrintStream outDebug;
+
+    public MatlabConnectionRImpl() {
+
+    }
 
     public void acquire(String matlabExecutablePath, File workingDir, boolean debug, String[] startupOptions)
             throws MatlabInitException {
@@ -72,7 +79,6 @@ public class MatlabConnectionRImpl implements MatlabConnection {
         fullcommand.append("function PAmain()" + nl);
         fullcommand.append("disp('" + startPattern + "');");
         fullcommand.append("try" + nl);
-
     }
 
     public void release() {
@@ -125,6 +131,32 @@ public class MatlabConnectionRImpl implements MatlabConnection {
         Thread t2 = new Thread(lt2, "ERR DS");
         t2.setDaemon(true);
         t2.start();
+
+        File ackFile = new File(workingDirectory, "matlab.ack");
+        File nackFile = new File(workingDirectory, "matlab.nack");
+        int cpt = 0;
+        while (!ackFile.exists() && !nackFile.exists() && (cpt < TIMEOUT_START)) {
+            try {
+                int exitValue = process.exitValue();
+                throw new MatlabInitException("Matlab process exited with code : " + exitValue);
+            } catch (Exception e) {
+                // ok process still exists
+            }
+            Thread.sleep(10);
+        }
+        if (ackFile.exists()) {
+            ackFile.delete();
+        }
+        // TODO do the callback to the proxy server
+        if (nackFile.exists()) {
+
+            nackFile.delete();
+
+            throw new UnsufficientLicencesException();
+        }
+        if (cpt >= TIMEOUT_START) {
+            throw new MatlabInitException("Timeout occured while starting Matlab");
+        }
 
         int exitValue = process.waitFor();
         lt1.goon = false;

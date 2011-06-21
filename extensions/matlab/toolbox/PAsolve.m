@@ -257,7 +257,9 @@ else
 end
 
 keepaliveFunctionName = 'keepalive_callback_fcn';
-solve_config.setCallbackFunctionName(keepaliveFunctionName);
+solve_config.setKeepaliveCallbackFunctionName(keepaliveFunctionName);
+checktoolboxesFunctionName = 'checktoolboxes_start';
+solve_config.setChecktoolboxesFunctionName(checktoolboxesFunctionName);
 
 
 % Transfering source files
@@ -283,7 +285,8 @@ sourceZipBaseName = ['MatlabPAsolveSrc_' num2str(solveid)];
         [pasolvepath, pasolvename, pasolveext] = fileparts(mfilename('fullpath'));
         fs=filesep();
         keepalive_cb_path = [pasolvepath, fs, 'Utils', fs, keepaliveFunctionName, '.m'];
-        z=union(z, {keepalive_cb_path});
+        checktoolboxes_fn_path = [pasolvepath, fs, 'Utils', fs, checktoolboxesFunctionName, '.m'];
+        z=union(z, {keepalive_cb_path,checktoolboxes_fn_path});
         zFN = [sourceZipBaseName indToFile(ind) '.zip'];
         if length(z) > 0
             zFP = [pa_dir fs zFN];

@@ -56,7 +56,9 @@ public class PASolveMatlabGlobalConfig extends PASolveMatSciGlobalConfig {
 
     private String licenseServerUrl = null;
 
-    private String callbackFunctionName = null;
+    private String keepaliveCallbackFunctionName = null;
+
+    private String checktoolboxesFunctionName = null;
 
     public PASolveMatlabGlobalConfig() {
         transferSource = true;
@@ -119,12 +121,19 @@ public class PASolveMatlabGlobalConfig extends PASolveMatSciGlobalConfig {
         this.licenseServerUrl = licenseServerUrl;
     }
 
-    public String getCallbackFunctionName() {
-        return callbackFunctionName;
+    public String getKeepaliveCallbackFunctionName() {
+        return keepaliveCallbackFunctionName;
     }
 
-    public void setCallbackFunctionName(String callbackFunctionName) {
-        this.callbackFunctionName = callbackFunctionName;
+    public void setKeepaliveCallbackFunctionName(String keepaliveCallbackFunctionName) {
+        this.keepaliveCallbackFunctionName = keepaliveCallbackFunctionName;
     }
 
+    public String getChecktoolboxesFunctionName() {
+        return checktoolboxesFunctionName;
+    }
+
+    public void setChecktoolboxesFunctionName(String checktoolboxesFunctionName) {
+        this.checktoolboxesFunctionName = checktoolboxesFunctionName;
+    }
 }
