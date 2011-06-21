@@ -166,11 +166,11 @@ public class MatlabEngineConfig extends MatSciEngineConfigBase {
     }
 
     public String getFullCommand() {
-        if (os.equals(OperatingSystem.windows)) {
+        //if (os.equals(OperatingSystem.windows)) {
             return matlabHome + os.fileSeparator() + matlabBinDir + os.fileSeparator() + matlabCommandName;
-        } else {
-            return matlabCommandName;
-        }
+        //} else {
+        //    return matlabCommandName;
+        //}
     }
 
     /**

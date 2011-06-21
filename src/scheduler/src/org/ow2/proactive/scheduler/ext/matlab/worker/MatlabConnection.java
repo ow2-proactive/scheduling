@@ -36,18 +36,14 @@
  */
 package org.ow2.proactive.scheduler.ext.matlab.worker;
 
+import matlabcontrol.*;
+import org.ow2.proactive.scheduler.ext.matlab.common.exception.MatlabInitException;
+import org.ow2.proactive.scheduler.ext.matlab.common.exception.MatlabTaskException;
+import org.ow2.proactive.scheduler.ext.matsci.worker.util.MatSciEngineConfigBase;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
-
-import matlabcontrol.MatlabConnectionException;
-import matlabcontrol.MatlabInvocationException;
-import matlabcontrol.MatlabProcessCreator;
-import matlabcontrol.RemoteMatlabProxy;
-import matlabcontrol.RemoteMatlabProxyFactory;
-
-import org.ow2.proactive.scheduler.ext.matlab.common.exception.MatlabInitException;
-import org.ow2.proactive.scheduler.ext.matlab.common.exception.MatlabTaskException;
 
 
 /**
@@ -231,16 +227,30 @@ public class MatlabConnection {
      */
     private static class CustomMatlabProcessCreator implements MatlabProcessCreator {
 
-        private final String[] startUpOptions = new String[] { "-nosplash", "-nodesktop", "-wait" };
+        private final String tmpDir = System.getProperty("java.io.tmpdir");
+
+        private String nodeName;
+
+
+        private String[] startUpOptions;
         private final String matlabLocation;
         private final File workingDirectory;
+
+        private File logFile;
 
         public CustomMatlabProcessCreator(final String matlabLocation, final File workingDirectory) {
             this.matlabLocation = matlabLocation;
             this.workingDirectory = workingDirectory;
+            try {
+                this.nodeName = MatSciEngineConfigBase.getNodeName();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            logFile = new File(tmpDir, "MatlabStart"+nodeName+".log");
+            startUpOptions = new String[] { "-nosplash", "-nodesktop", "-nodisplay","-logfile", logFile.toString() };
         }
 
-        public void createMatlabProcess(String runArg) throws Exception {
+        public Process createMatlabProcess(String runArg) throws Exception {
             ProcessBuilder b = new ProcessBuilder();
 
             b.directory(this.workingDirectory);
@@ -250,7 +260,7 @@ public class MatlabConnection {
             commandList.add(this.matlabLocation);
             commandList.addAll(Arrays.asList(this.startUpOptions));
             commandList.add("-r");
-            commandList.add("\"" + runArg + "\"");
+            commandList.add(runArg);
 
             String[] command = (String[]) commandList.toArray(new String[commandList.size()]);
             b.command(command);
@@ -266,6 +276,11 @@ public class MatlabConnection {
             } catch (IllegalThreadStateException e) {
                 // This is normal behavior, it means the process is still running
             }
+            return p;
+        }
+
+        public File getLogFile() {
+             return logFile;
         }
     }
 }

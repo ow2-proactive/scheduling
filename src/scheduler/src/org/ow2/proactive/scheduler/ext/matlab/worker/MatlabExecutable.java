@@ -36,17 +36,6 @@
  */
 package org.ow2.proactive.scheduler.ext.matlab.worker;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.Serializable;
-import java.net.URI;
-import java.net.UnknownHostException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Map;
-
 import org.objectweb.proactive.extensions.dataspaces.api.DataSpacesFileObject;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
@@ -60,6 +49,13 @@ import org.ow2.proactive.scheduler.ext.matsci.common.exception.InvalidNumberOfPa
 import org.ow2.proactive.scheduler.ext.matsci.common.exception.InvalidParameterException;
 import org.ow2.proactive.scheduler.ext.matsci.worker.util.MatSciEngineConfig;
 import org.ow2.proactive.scheduler.ext.matsci.worker.util.MatSciEngineConfigBase;
+
+import java.io.*;
+import java.net.URI;
+import java.net.UnknownHostException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Map;
 
 
 /**
@@ -507,10 +503,12 @@ public class MatlabExecutable extends JavaExecutable {
         final Date d = new Date();
         final String log = "[" + ISO8601FORMAT.format(d) + " " + HOSTNAME + "] " + message;
         System.out.println(log);
+        System.out.flush();
         if (this.outDebugWriter != null) {
             this.outDebugWriter.println(log);
             this.outDebugWriter.flush();
         }
+
     }
 
     /** Creates a log file in the java.io.tmpdir if debug is enabled */
