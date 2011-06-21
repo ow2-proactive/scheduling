@@ -480,6 +480,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
         logger_dev.debug("Creating nodes pinging thread");
         threadPool = Executors.newFixedThreadPool(SCHEDULER_TASK_PROGRESS_NBTHREAD, new NamedThreadFactory(
             "Scheduling_GetTaskProgress"));
+        final SchedulerCore schedulerStub = (SchedulerCore) PAActiveObject.getStubOnThis();
         pinger = new Thread() {
             @Override
             public void run() {
@@ -490,7 +491,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
                         if (runningJobs.size() > 0) {
                             logger_dev.info("Ping deployed nodes (Number of running jobs : " +
                                 runningJobs.size() + ")");
-                            pingDeployedNodes();
+                            pingDeployedNodes(schedulerStub);
                         }
                     } catch (InterruptedException e) {
                         //miam -> shutdown scheduler
@@ -760,7 +761,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
     /**
      * Ping every nodes on which a task is currently running and repair the task if need.
      */
-    private void pingDeployedNodes() {
+    private void pingDeployedNodes(final SchedulerCore schedulerStub) {
         logger_dev.info("Search for down nodes !");
 
         for (int i = 0; i < runningJobs.size(); i++) {
@@ -817,11 +818,14 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
                                     job.reStartTask(td);
                                     logger_dev.info("Task '" + td.getId() + "' is waiting to restart");
                                 } else {
-                                    endJob(
-                                            job,
-                                            td,
-                                            "An error has occurred due to a node failure and the maximum amout of retries property has been reached.",
-                                            JobStatus.FAILED);
+                                    //this call must be sequential with the core active object to avoid
+                                    //schedule() method and endjob() method to be called at the same time
+                                    schedulerStub
+                                            .endJob(
+                                                    job.getId(),
+                                                    td.getId(),
+                                                    "An error has occurred due to a node failure and the maximum amout of retries property has been reached.",
+                                                    JobStatus.FAILED);
                                     break;
                                 }
                             }
@@ -899,6 +903,23 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
 
     /**
      * End the given job due to the given task failure.
+     * NOTE : this method must be called when using the corestub
+     *
+     * @param jobId the jobid to end.
+     * @param taskId the taskid who has been the caused of failure. **This argument can be null only if jobStatus is killed**
+     * @param errorMsg the error message to send in the task result.
+     * @param jobStatus the type of the end for this job. (failed/canceled/killed)
+     *
+     */
+    protected void endJob(JobId jobId, TaskId taskId, String errorMsg, JobStatus jobStatus) {
+        InternalJob job = jobs.get(jobId);
+        InternalTask task = job.getIHMTasks().get(taskId);
+        endJob(job, task, errorMsg, jobStatus);
+    }
+
+    /**
+     * End the given job due to the given task failure.
+     * WARNING : this method must not be called through the corestub
      *
      * @param job the job to end.
      * @param task the task who has been the caused of failing. **This argument can be null only if jobStatus is killed**
@@ -906,7 +927,6 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
      * @param jobStatus the type of the end for this job. (failed/canceled/killed)
      */
     void endJob(InternalJob job, InternalTask task, String errorMsg, JobStatus jobStatus) {
-
         // job can be already ended (SCHEDULING-700)
         JobStatus currentStatus = job.getStatus();
         if (currentStatus == JobStatus.CANCELED || currentStatus == JobStatus.FAILED ||
