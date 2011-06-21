@@ -54,6 +54,8 @@ public class PASolveMatlabGlobalConfig extends PASolveMatSciGlobalConfig {
 
     private String[] linuxStartupOptions = null;
 
+    private String licenseServerUrl = null;
+
     public PASolveMatlabGlobalConfig() {
         transferSource = true;
         transferVariables = true;
@@ -105,6 +107,14 @@ public class PASolveMatlabGlobalConfig extends PASolveMatSciGlobalConfig {
             windowsStartupOptions = options.split("[ ,;]+");
 
         }
+    }
+
+    public String getLicenseServerUrl() {
+        return licenseServerUrl;
+    }
+
+    public void setLicenseServerUrl(String licenseServerUrl) {
+        this.licenseServerUrl = licenseServerUrl;
     }
 
 }
