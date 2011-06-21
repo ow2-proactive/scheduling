@@ -183,6 +183,9 @@
 				<include name="org/ow2/proactive/scheduler/exception/DataBaseNotFoundException.java" />
 				<include name="org/ow2/proactive/scheduler/exception/ProcessException.java" />
 				<include name="org/ow2/proactive/scheduler/exception/AdminException.java" />
+				<include name="org/ow2/proactive/scheduler/exception/ForkedProcessException.java" />
+				<include name="org/ow2/proactive/scheduler/exception/IllegalProgressException.java" />
+				<include name="org/ow2/proactive/scheduler/exception/ProgressPingerException.java" />
 				<include name="org/ow2/proactive/scheduler/task/TaskResultImpl.java" />
 				<include name="org/ow2/proactive/scheduler/task/TaskIdImpl.java" />
 				<include name="org/ow2/proactive/scheduler/task/NativeExecutable.java" />

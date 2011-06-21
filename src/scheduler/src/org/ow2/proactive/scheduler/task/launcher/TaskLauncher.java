@@ -97,6 +97,8 @@ import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
 import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingException;
 import org.ow2.proactive.scheduler.common.util.logforwarder.appenders.AsyncAppenderWithStorage;
 import org.ow2.proactive.scheduler.common.util.logforwarder.util.LoggingOutputStream;
+import org.ow2.proactive.scheduler.exception.IllegalProgressException;
+import org.ow2.proactive.scheduler.exception.ProgressPingerException;
 import org.ow2.proactive.scheduler.task.ExecutableContainer;
 import org.ow2.proactive.scheduler.task.KillTask;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
@@ -596,23 +598,30 @@ public abstract class TaskLauncher implements InitActive {
      * If the value returned by user is not in [0:100], the closest bound (0 or 100) is returned.
      *
      * @return the latest progress value set by the launched executable.
+     * @throws IllegalProgressException if the userExecutable.getProgress() method throws an exception
      */
     @ImmediateService
-    public int getProgress() {
+    public int getProgress() throws ProgressPingerException {
         if (this.currentExecutable == null) {
             //not yet started
             return 0;
         } else {
-            int progress = currentExecutable.getProgress();
-            if (progress < 0) {
-                logger_dev.warn("Returned progress (" + progress + ") is negative, return 0 instead.");
-                return 0;
-            } else if (progress > 100) {
-                logger_dev.warn("Returned progress (" + progress +
-                    ") is greater than 100, return 100 instead.");
-                return 100;
-            } else {
-                return progress;
+            try {
+                int progress = currentExecutable.getProgress();
+                if (progress < 0) {
+                    logger_dev.warn("Returned progress (" + progress + ") is negative, return 0 instead.");
+                    return 0;
+                } else if (progress > 100) {
+                    logger_dev.warn("Returned progress (" + progress +
+                        ") is greater than 100, return 100 instead.");
+                    return 100;
+                } else {
+                    return progress;
+                }
+            } catch (Throwable t) {
+                //protect call to user getProgress() if overridden
+                throw new IllegalProgressException("executable.getProgress() method has thrown an exception",
+                    t);
             }
         }
     }

@@ -59,7 +59,6 @@ import java.util.concurrent.Executors;
 
 import org.apache.log4j.Appender;
 import org.apache.log4j.AsyncAppender;
-import org.apache.log4j.FileAppender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.spi.LoggingEvent;
 import org.objectweb.proactive.Body;
@@ -121,6 +120,7 @@ import org.ow2.proactive.scheduler.core.rmproxies.RMProxiesManager;
 import org.ow2.proactive.scheduler.core.rmproxies.RMProxyCreationException;
 import org.ow2.proactive.scheduler.core.rmproxies.UserRMProxy;
 import org.ow2.proactive.scheduler.descriptor.TaskDescriptor;
+import org.ow2.proactive.scheduler.exception.ProgressPingerException;
 import org.ow2.proactive.scheduler.exception.RunningProcessException;
 import org.ow2.proactive.scheduler.exception.StartProcessException;
 import org.ow2.proactive.scheduler.job.InternalJob;
@@ -772,7 +772,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
                     for (InternalTask td : job.getITasks()) {
                         if (td != null && (td.getStatus() == TaskStatus.RUNNING)) {
                             try {
-                                int progress = td.getExecuterInformations().getLauncher().getProgress();
+                                int progress = td.getExecuterInformations().getLauncher().getProgress();//(2)
                                 //get previous inside td
                                 if (progress != td.getProgress()) {
                                     td.setProgress(progress);//(1)
@@ -780,11 +780,17 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
                                     frontend.taskStateUpdated(job.getOwner(), new NotificationData<TaskInfo>(
                                         SchedulerEvent.TASK_PROGRESS, td.getTaskInfo()));
                                 }
+                            } catch (NullPointerException e) {
+                                //should not happened, but avoid restart if execInfo or launcher is null
+                                //nothing to do
                             } catch (IllegalArgumentException iae) {
                                 //thrown by (1)
                                 //avoid setting bad value, no event if bad
-                            } catch (NullPointerException e) {
-                                //do nothing - should not happened, but avoid restart if execInfo or launcher is null
+                            } catch (ProgressPingerException ppe) {
+                                //thrown by (2) in one of this two cases :
+                                // * when user has overridden getProgress method and the method throws an exception
+                                // * if forked JVM process is dead
+                                //nothing to do in any case
                             } catch (Throwable t) {
                                 //check if the task has not been terminated while pinging
                                 if (currentlyRunningTasks.get(job.getId()).remove(td.getId()) == null) {

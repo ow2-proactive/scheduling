@@ -48,6 +48,9 @@ import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
 import org.ow2.proactive.scheduler.common.exception.ForkedJavaTaskException;
 import org.ow2.proactive.scheduler.common.task.SimpleTaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.exception.ForkedJVMProcessException;
+import org.ow2.proactive.scheduler.exception.IllegalProgressException;
+import org.ow2.proactive.scheduler.exception.ProgressPingerException;
 import org.ow2.proactive.scheduler.task.ExecutableContainer;
 import org.ow2.proactive.scheduler.task.ExecutableContainerInitializer;
 import org.ow2.proactive.scheduler.task.ForkedJavaExecutable;
@@ -198,6 +201,42 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher implements ForkerSt
     /**
      * {@inheritDoc}
      * 
+     * @throws IllegalProgressException if the userExecutable.getProgress() method throws an exception
+     * @throws ForkedJVMProcessException if the forked JVM is dead
+     */
+    @Override
+    @ImmediateService
+    public int getProgress() throws ProgressPingerException {
+        if (this.currentExecutable == null) {
+            //not yet started
+            return 0;
+        } else {
+            try {
+                int progress = currentExecutable.getProgress();//(1)
+                if (progress < 0) {
+                    logger_dev.warn("Returned progress (" + progress + ") is negative, return 0 instead.");
+                    return 0;
+                } else if (progress > 100) {
+                    logger_dev.warn("Returned progress (" + progress +
+                        ") is greater than 100, return 100 instead.");
+                    return 100;
+                } else {
+                    return progress;
+                }
+            } catch (IllegalProgressException ipe) {
+                //can be thrown by (1) if userExecutable.getProgress() method threw an exception
+                //exception comes from javaTaskLauncher.getProgress()
+                throw ipe;
+            } catch (Throwable t) {
+                //communication error with the forked JVM (probably dead VM)
+                throw new ForkedJVMProcessException("Forded JVM seems to be dead", t);
+            }
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     *
      * This method must be immediate service to get the callback of the new starter forked process
      */
     @ImmediateService
