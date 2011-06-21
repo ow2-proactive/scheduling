@@ -130,13 +130,6 @@ public class JavaTaskLauncher extends TaskLauncher {
             //init task
             ExecutableInitializer initializer = executableContainer.createExecutableInitializer();
             replaceIterationTags(initializer);
-
-            //decrypt credentials if needed
-            if (executableContainer.isRunAsUser()) {
-                decrypter.setCredentials(executableContainer.getCredentials());
-                initializer.setDecrypter(decrypter);
-            }
-
             // if an exception occurs in init method, unwrapp the InvocationTargetException
             // the result of the execution is the user level exception
             try {
