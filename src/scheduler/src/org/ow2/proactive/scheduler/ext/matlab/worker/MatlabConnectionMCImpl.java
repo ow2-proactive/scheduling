@@ -36,9 +36,15 @@
  */
 package org.ow2.proactive.scheduler.ext.matlab.worker;
 
+import com.activeeon.licensing.remote.LicensingClient;
 import matlabcontrol.*;
+import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.utils.OperatingSystem;
+import org.ow2.proactive.scheduler.ext.matlab.common.PASolveMatlabGlobalConfig;
+import org.ow2.proactive.scheduler.ext.matlab.common.PASolveMatlabTaskConfig;
 import org.ow2.proactive.scheduler.ext.matlab.common.exception.MatlabInitException;
 import org.ow2.proactive.scheduler.ext.matlab.common.exception.MatlabTaskException;
+import org.ow2.proactive.scheduler.ext.matlab.common.exception.UnsufficientLicencesException;
 import org.ow2.proactive.scheduler.ext.matsci.worker.util.MatSciEngineConfigBase;
 
 import java.io.File;
@@ -61,6 +67,19 @@ public class MatlabConnectionMCImpl implements MatlabConnection {
 
     private CustomMatlabProcessCreator processCreator;
 
+    protected static final int TIMEOUT_START = 6000;
+
+    protected OperatingSystem os = OperatingSystem.getOperatingSystem();
+
+    protected File workingDirectory;
+
+    private PASolveMatlabGlobalConfig paconfig;
+    private PASolveMatlabTaskConfig tconfig;
+
+    private LicensingClient lclient;
+
+    protected String[] startUpOptions;
+
     public MatlabConnectionMCImpl() {
     }
 
@@ -72,16 +91,33 @@ public class MatlabConnectionMCImpl implements MatlabConnection {
      * @param workingDir the directory where to start MATLAB
      * @throws org.ow2.proactive.scheduler.ext.matlab.common.exception.MatlabInitException if MATLAB could not be initialized
      */
-    public void acquire(final String matlabExecutablePath, final File workingDir, final boolean debug,
-            final String[] startupOptions) throws MatlabInitException {
+    public void acquire(String matlabExecutablePath, File workingDir, PASolveMatlabGlobalConfig paconfig,
+            PASolveMatlabTaskConfig tconfig) throws MatlabInitException {
         RemoteMatlabProxyFactory proxyFactory;
+        this.paconfig = paconfig;
+        this.tconfig = tconfig;
+        this.workingDirectory = workingDir;
+
+        if (paconfig.getLicenseServerUrl() != null) {
+            try {
+                this.lclient = new LicensingClient(paconfig.getLicenseServerUrl());
+            } catch (ProActiveException e) {
+                e.printStackTrace();
+            }
+        }
+
+        if (os == OperatingSystem.windows) {
+            this.startUpOptions = paconfig.getWindowsStartupOptions();
+        } else {
+            this.startUpOptions = paconfig.getLinuxStartupOptions();
+        }
 
         // If a user is specified create the proxy factory with a specific
         // MATLAB process as user creator
         try {
 
-            processCreator = new CustomMatlabProcessCreator(matlabExecutablePath, workingDir, startupOptions,
-                debug);
+            processCreator = new CustomMatlabProcessCreator(matlabExecutablePath, workingDir,
+                this.startUpOptions, paconfig.isDebug());
 
             proxyFactory = new RemoteMatlabProxyFactory(processCreator);
         } catch (MatlabConnectionException e) {
@@ -115,9 +151,14 @@ public class MatlabConnectionMCImpl implements MatlabConnection {
             // even if we didn't managed to get the proxy
             processCreator.killProcess();
 
+            if (lclient != null) {
+                lclient.notifyLicenseStatus(tconfig.getRid(), false);
+            }
+
             throw me;
         }
 
+        // Return a new MATLAB connection
         // Add shutdown hook to release the connection on jvm exit
         shutdownHook = new Thread(new Runnable() {
             public final void run() {
@@ -126,12 +167,9 @@ public class MatlabConnectionMCImpl implements MatlabConnection {
         });
         Runtime.getRuntime().addShutdownHook(shutdownHook);
 
-        // Return a new MATLAB connection
-
     }
 
     public void init() {
-
     }
 
     /**
@@ -210,6 +248,48 @@ public class MatlabConnectionMCImpl implements MatlabConnection {
     }
 
     public void launch() {
+
+    }
+
+    public void execCheckToolboxes(String command) {
+        evalString(command);
+
+        // wait for ack or nack files to make sure all toolbox licences are available
+        File ackFile = new File(workingDirectory, "matlab.ack");
+        File nackFile = new File(workingDirectory, "matlab.nack");
+        int cpt = 0;
+        try {
+
+            while (!ackFile.exists() && !nackFile.exists() && (cpt < TIMEOUT_START)) {
+                Thread.sleep(10);
+                cpt++;
+            }
+        } catch (InterruptedException e) {
+            release();
+            throw new MatlabInitException(e);
+        }
+        if (ackFile.exists()) {
+            if (lclient != null) {
+                lclient.notifyLicenseStatus(tconfig.getRid(), true);
+            }
+            ackFile.delete();
+        }
+
+        if (nackFile.exists()) {
+            nackFile.delete();
+            if (lclient != null) {
+                lclient.notifyLicenseStatus(tconfig.getRid(), false);
+            }
+            release();
+            throw new UnsufficientLicencesException();
+        }
+        if (cpt >= TIMEOUT_START) {
+            if (lclient != null) {
+                lclient.notifyLicenseStatus(tconfig.getRid(), false);
+            }
+            release();
+            throw new MatlabInitException("Timeout occured while waiting for ack file");
+        }
 
     }
 

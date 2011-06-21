@@ -287,7 +287,7 @@ public class IOTools {
                 }
                 answer = readLine();
                 if (patternToFind != null) {
-                    if (answer.contains(patternToFind)) {
+                    if (answer != null && answer.contains(patternToFind)) {
                         patternFound = true;
                     }
                 }

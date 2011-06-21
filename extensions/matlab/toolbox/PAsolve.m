@@ -258,7 +258,7 @@ end
 
 keepaliveFunctionName = 'keepalive_callback_fcn';
 solve_config.setKeepaliveCallbackFunctionName(keepaliveFunctionName);
-checktoolboxesFunctionName = 'checktoolboxes_start';
+checktoolboxesFunctionName = 'checktoolboxes_start_and_hide_desktop';
 solve_config.setChecktoolboxesFunctionName(checktoolboxesFunctionName);
 
 
@@ -585,6 +585,7 @@ end
 solve_config.setZipInputFiles(opt.ZipInputFiles);
 solve_config.setZipOutputFiles(opt.ZipOutputFiles);
 solve_config.setZipSourceFiles(true);
+solve_config.setUseMatlabControl(opt.UseMatlabControl);
 
 pairinfolist = solver.solve(solve_config, task_config);
 

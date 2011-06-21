@@ -293,6 +293,12 @@ inputs(j).name = 'DisconnectedModeFile';
 inputs(j).default = ['$HOME$' filesep '.PAsolveTmp.mat'];
 inputs(j).check = @ischar;
 inputs(j).trans = conftrans;
+j=j+1;
+inputs(j).name = 'UseMatlabControl';
+inputs(j).default = false;
+inputs(j).check = logcheck;
+inputs(j).trans = logtrans;
+
 
 
 userdir = char(java.lang.System.getProperty('user.home'));

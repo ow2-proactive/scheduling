@@ -60,6 +60,8 @@ public class PASolveMatlabGlobalConfig extends PASolveMatSciGlobalConfig {
 
     private String checktoolboxesFunctionName = null;
 
+    private boolean useMatlabControl = false;
+
     public PASolveMatlabGlobalConfig() {
         transferSource = true;
         transferVariables = true;
@@ -135,5 +137,13 @@ public class PASolveMatlabGlobalConfig extends PASolveMatSciGlobalConfig {
 
     public void setChecktoolboxesFunctionName(String checktoolboxesFunctionName) {
         this.checktoolboxesFunctionName = checktoolboxesFunctionName;
+    }
+
+    public boolean isUseMatlabControl() {
+        return useMatlabControl;
+    }
+
+    public void setUseMatlabControl(boolean useMatlabControl) {
+        this.useMatlabControl = useMatlabControl;
     }
 }

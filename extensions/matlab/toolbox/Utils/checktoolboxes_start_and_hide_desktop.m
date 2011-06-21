@@ -1,4 +1,10 @@
-function checktoolboxes_start(used_toolboxes, dir)
+function checktoolboxes_start_and_hide_desktop(used_toolboxes, dir)
+
+frames = java.awt.Frame.getFrames;
+try
+    awtinvoke(frames(1),'setVisible',0);
+catch
+end
 
 all_toolboxes = {'simulink', 'control', 'curvefit', 'images', 'compiler', 'nnet', 'optim', 'pde', 'robust', 'signal', 'slcontrol', 'spline', 'stats', 'symbolic', 'ident','toto'};
 toolboxes_code = {'simulink', 'control_toolbox','curve_fitting_toolbox', 'image_toolbox','compiler', 'neural_network_toolbox', 'optimization_toolbox', 'pde_toolbox', 'robust_toolbox', 'signal_toolbox', 'simulink_control_design','spline_toolbox', 'statistics_toolbox', 'symbolic_toolbox', 'identification_toolbox','toto'};

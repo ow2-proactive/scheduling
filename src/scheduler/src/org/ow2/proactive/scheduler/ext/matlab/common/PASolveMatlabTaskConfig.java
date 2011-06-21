@@ -48,6 +48,8 @@ public class PASolveMatlabTaskConfig extends PASolveMatSciTaskConfig {
 
     private String[] toolboxesUsed;
 
+    private String rid;
+
     public PASolveMatlabTaskConfig() {
 
     }
@@ -58,5 +60,13 @@ public class PASolveMatlabTaskConfig extends PASolveMatSciTaskConfig {
 
     public void setToolboxesUsed(String[] toolboxesUsed) {
         this.toolboxesUsed = toolboxesUsed;
+    }
+
+    public String getRid() {
+        return rid;
+    }
+
+    public void setRid(String rid) {
+        this.rid = rid;
     }
 }

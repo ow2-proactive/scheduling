@@ -167,14 +167,12 @@ public class MatlabExecutable extends JavaExecutable {
         this.printLog("Acquiring MATLAB connection using " + matlabCmd);
 
         // Acquire a connection to MATLAB
-        this.matlabConnection = new MatlabConnectionRImpl();
-        if (os == OperatingSystem.unix) {
-            matlabConnection.acquire(matlabCmd, // MATLAB exe path
-                    this.localSpaceRootDir, paconfig.isDebug(), paconfig.getLinuxStartupOptions());
+        if (paconfig.isUseMatlabControl()) {
+            this.matlabConnection = new MatlabConnectionMCImpl();
         } else {
-            matlabConnection.acquire(matlabCmd, // MATLAB exe path
-                    this.localSpaceRootDir, paconfig.isDebug(), paconfig.getWindowsStartupOptions());
+            this.matlabConnection = new MatlabConnectionRImpl();
         }
+        matlabConnection.acquire(matlabCmd, this.localSpaceRootDir, this.paconfig, this.taskconfig);
 
         Serializable result = null;
 
@@ -214,6 +212,7 @@ public class MatlabExecutable extends JavaExecutable {
         matlabConnection.init();
 
         this.addSources();
+        this.execCheckToolboxes();
         this.execKeepAlive();
         this.loadWorkspace();
         this.loadInputVariables();
@@ -373,10 +372,25 @@ public class MatlabExecutable extends JavaExecutable {
         }
     }
 
-    private void execKeepAlive() throws Exception {
-        printLog("Executing Keep-Alive timer");
+    private void execCheckToolboxes() {
         StringBuilder checktoolboxesCommand = new StringBuilder(paconfig.getChecktoolboxesFunctionName() +
             "( {");
+        String[] used = taskconfig.getToolboxesUsed();
+        for (int i = 0; i < used.length; i++) {
+            if (i < used.length - 1) {
+                checktoolboxesCommand.append("'" + used[i] + "',");
+            } else {
+                checktoolboxesCommand.append("'" + used[i] + "'");
+            }
+        }
+        checktoolboxesCommand.append("},'" + localSpaceRootDir.toString() + "');");
+        printLog(checktoolboxesCommand.toString());
+        matlabConnection.execCheckToolboxes(checktoolboxesCommand.toString());
+    }
+
+    private void execKeepAlive() throws Exception {
+        printLog("Executing Keep-Alive timer");
+
         StringBuilder keepAliveCommand = new StringBuilder(
             "t = timer('Period', 300,'ExecutionMode','fixedRate');t.TimerFcn = { @" +
                 paconfig.getKeepaliveCallbackFunctionName() + ", {");
@@ -384,17 +398,13 @@ public class MatlabExecutable extends JavaExecutable {
         for (int i = 0; i < used.length; i++) {
             if (i < used.length - 1) {
                 keepAliveCommand.append("'" + used[i] + "',");
-                checktoolboxesCommand.append("'" + used[i] + "',");
             } else {
                 keepAliveCommand.append("'" + used[i] + "'");
-                checktoolboxesCommand.append("'" + used[i] + "'");
             }
         }
         keepAliveCommand.append("}};start(t);");
-        checktoolboxesCommand.append("},'" + localSpaceRootDir.toString() + "');");
-        printLog(checktoolboxesCommand.toString());
+
         printLog(keepAliveCommand.toString());
-        matlabConnection.evalString(checktoolboxesCommand.toString());
         matlabConnection.evalString(keepAliveCommand.toString());
     }
 

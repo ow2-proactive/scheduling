@@ -36,6 +36,8 @@
  */
 package org.ow2.proactive.scheduler.ext.matlab.worker;
 
+import org.ow2.proactive.scheduler.ext.matlab.common.PASolveMatlabGlobalConfig;
+import org.ow2.proactive.scheduler.ext.matlab.common.PASolveMatlabTaskConfig;
 import org.ow2.proactive.scheduler.ext.matlab.common.exception.MatlabInitException;
 import org.ow2.proactive.scheduler.ext.matlab.common.exception.MatlabTaskException;
 
@@ -57,8 +59,8 @@ public interface MatlabConnection {
      * @param workingDir the directory where to start MATLAB
      * @throws MatlabInitException if MATLAB could not be initialized
      */
-    public void acquire(final String matlabExecutablePath, final File workingDir, final boolean debug,
-            final String[] startupOptions) throws MatlabInitException;
+    public void acquire(String matlabExecutablePath, File workingDir, PASolveMatlabGlobalConfig paconfig,
+            PASolveMatlabTaskConfig tconfig) throws MatlabInitException;
 
     /**
      * Used to send initialization matlab commands to the connection (in case of command grouping)
@@ -102,4 +104,5 @@ public interface MatlabConnection {
      */
     public void launch() throws Exception;
 
+    void execCheckToolboxes(String command);
 }

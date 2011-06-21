@@ -13,6 +13,7 @@ import java.net.InetAddress
 import java.util.Date
 import java.lang.Runtime
 import java.lang.ProcessBuilder
+import java.util.HashSet
 
 class ReserveMatlab
 
@@ -158,10 +159,10 @@ class ReserveMatlab
   end
 
   def checkFeature(client, rid, login, feature)
-    if client.isLicensed(feature)
+    if client.areLicensed(feature)
       # TODO login with runAsMe
-      request = DefaultLicenseRequest.new(rid, login)
-      tf = client.hasLicense(request, feature, 60000);
+      request = LicenseRequest.new(rid, login, feature)
+      tf = client.hasLicense(request);
       log(tf)
       return tf;
     else
@@ -177,7 +178,7 @@ class ReserveMatlab
     log(Date.new().to_string()+" : Executing toolbox checking script on " + @host)
     begin
       import com.activeeon.licensing.remote.LicensingClient
-      import com.activeeon.licensing.DefaultLicenseRequest
+      import com.activeeon.licensing.LicenseRequest
     rescue Exception => e
       log("Warning : Licensing proxy classes not found, license checking disabled")
       return true
@@ -201,14 +202,17 @@ class ReserveMatlab
         return true
       end
       if $args.length > 3
-        tf = true
+        feat_set = HashSet.new();
+
         $args[3..$args.length].each do |a|
           tcode = toolbox_code(a)
           log(tcode)
-          tf = tf && checkFeature(client, rid, login, tcode)
+          feat_set.add(tcode)
 
-          # use the code and login to contact the proxy server for each Matlab feature
         end
+        tf = checkFeature(client, rid, login, feat_set)
+
+        # use the code and login to contact the proxy server for each Matlab feature
         return tf;
       else
          tcode = toolbox_code("matlab")

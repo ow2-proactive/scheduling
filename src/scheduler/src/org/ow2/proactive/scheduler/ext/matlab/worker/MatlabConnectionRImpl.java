@@ -1,7 +1,11 @@
 package org.ow2.proactive.scheduler.ext.matlab.worker;
 
+import com.activeeon.licensing.remote.LicensingClient;
+import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.utils.OperatingSystem;
 import org.ow2.proactive.scheduler.ext.common.util.IOTools;
+import org.ow2.proactive.scheduler.ext.matlab.common.PASolveMatlabGlobalConfig;
+import org.ow2.proactive.scheduler.ext.matlab.common.PASolveMatlabTaskConfig;
 import org.ow2.proactive.scheduler.ext.matlab.common.exception.MatlabInitException;
 import org.ow2.proactive.scheduler.ext.matlab.common.exception.MatlabTaskException;
 import org.ow2.proactive.scheduler.ext.matlab.common.exception.UnsufficientLicencesException;
@@ -45,16 +49,29 @@ public class MatlabConnectionRImpl implements MatlabConnection {
 
     private PrintStream outDebug;
 
+    PASolveMatlabGlobalConfig paconfig;
+
+    PASolveMatlabTaskConfig tconfig;
+
+    private LicensingClient lclient;
+
     public MatlabConnectionRImpl() {
 
     }
 
-    public void acquire(String matlabExecutablePath, File workingDir, boolean debug, String[] startupOptions)
-            throws MatlabInitException {
+    public void acquire(String matlabExecutablePath, File workingDir, PASolveMatlabGlobalConfig paconfig,
+            PASolveMatlabTaskConfig tconfig) throws MatlabInitException {
         this.matlabLocation = matlabExecutablePath;
         this.workingDirectory = workingDir;
-        this.debug = debug;
-        this.startUpOptions = startupOptions;
+        this.debug = paconfig.isDebug();
+        this.paconfig = paconfig;
+        this.tconfig = tconfig;
+        if (os == OperatingSystem.windows) {
+            this.startUpOptions = paconfig.getWindowsStartupOptions();
+        } else {
+            this.startUpOptions = paconfig.getLinuxStartupOptions();
+        }
+
         try {
             this.nodeName = MatSciEngineConfigBase.getNodeName();
         } catch (Exception e) {
@@ -75,6 +92,13 @@ public class MatlabConnectionRImpl implements MatlabConnection {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        if (paconfig.getLicenseServerUrl() != null) {
+            try {
+                this.lclient = new LicensingClient(paconfig.getLicenseServerUrl());
+            } catch (ProActiveException e) {
+                e.printStackTrace();
+            }
+        }
 
     }
 
@@ -92,6 +116,11 @@ public class MatlabConnectionRImpl implements MatlabConnection {
 
             }
         }
+    }
+
+    public void execCheckToolboxes(String command) {
+
+        fullcommand.append(command);
     }
 
     public void evalString(String command) throws MatlabTaskException {
@@ -150,6 +179,9 @@ public class MatlabConnectionRImpl implements MatlabConnection {
                 !lt2.patternFound) {
                 try {
                     int exitValue = process.exitValue();
+                    if (lclient != null) {
+                        lclient.notifyLicenseStatus(tconfig.getRid(), false);
+                    }
                     throw new MatlabInitException("Matlab process exited with code : " + exitValue);
                 } catch (Exception e) {
                     // ok process still exists
@@ -163,21 +195,31 @@ public class MatlabConnectionRImpl implements MatlabConnection {
             // TODO do the callback to the proxy server
             if (nackFile.exists()) {
                 nackFile.delete();
+                if (lclient != null) {
+                    lclient.notifyLicenseStatus(tconfig.getRid(), false);
+                }
                 throw new UnsufficientLicencesException();
             }
             if (lt1.patternFound || lt2.patternFound) {
                 process.destroy();
                 process = null;
+                if (lclient != null) {
+                    lclient.notifyLicenseStatus(tconfig.getRid(), false);
+                }
                 throw new UnsufficientLicencesException();
             }
             if (cpt >= TIMEOUT_START) {
                 process.destroy();
                 process = null;
-
+                if (lclient != null) {
+                    lclient.notifyLicenseStatus(tconfig.getRid(), false);
+                }
                 throw new MatlabInitException("Timeout occured while starting Matlab");
 
             }
-
+            if (lclient != null) {
+                lclient.notifyLicenseStatus(tconfig.getRid(), true);
+            }
             int exitValue = process.waitFor();
             if (exitValue != 0) {
                 throw new MatlabInitException("Matlab process exited with code : " + exitValue);
