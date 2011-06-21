@@ -89,9 +89,11 @@ public class MatlabConnection {
         // MATLAB process as user creator
         try {
             if (File.pathSeparatorChar == ';') {
-		conn.processCreator = new WindowsMatlabProcessCreator(matlabExecutablePath, workingDir, startupOptions, debug);
+                conn.processCreator = new WindowsMatlabProcessCreator(matlabExecutablePath, workingDir,
+                    startupOptions, debug);
             } else {
-		conn.processCreator = new CustomMatlabProcessCreator(matlabExecutablePath, workingDir, startupOptions, debug);
+                conn.processCreator = new CustomMatlabProcessCreator(matlabExecutablePath, workingDir,
+                    startupOptions, debug);
             }
             proxyFactory = new RemoteMatlabProxyFactory(conn.processCreator);
         } catch (MatlabConnectionException e) {
@@ -222,77 +224,75 @@ public class MatlabConnection {
 
     /*********** PRIVATE INTERNAL CLASS ***********/
 
-	/**
-	 * This class is used to create a MATLAB process under a specific user
-	 */
-	private static class CustomMatlabProcessCreator implements
-			MatlabProcessCreator {
+    /**
+     * This class is used to create a MATLAB process under a specific user
+     */
+    private static class CustomMatlabProcessCreator implements MatlabProcessCreator {
 
-		protected final String tmpDir = System.getProperty("java.io.tmpdir");
+        protected final String tmpDir = System.getProperty("java.io.tmpdir");
 
-		protected String nodeName;
+        protected String nodeName;
 
-		protected String[] startUpOptions;
-		protected final String matlabLocation;
-		protected final File workingDirectory;
+        protected String[] startUpOptions;
+        protected final String matlabLocation;
+        protected final File workingDirectory;
 
-		protected File logFile;
-		protected boolean debug;
+        protected File logFile;
+        protected boolean debug;
 
-		private Process process;
+        private Process process;
 
-		public CustomMatlabProcessCreator(final String matlabLocation,
-				final File workingDirectory,
-				String[] startUpOptions, boolean debug) {
-			this.matlabLocation = matlabLocation;
-			this.workingDirectory = workingDirectory;
-			this.debug = debug;
-			this.startUpOptions = startUpOptions;
-			try {
-				this.nodeName = MatSciEngineConfigBase.getNodeName();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			logFile = new File(tmpDir, "MatlabStart" + nodeName + ".log");
-		}
+        public CustomMatlabProcessCreator(final String matlabLocation, final File workingDirectory,
+                String[] startUpOptions, boolean debug) {
+            this.matlabLocation = matlabLocation;
+            this.workingDirectory = workingDirectory;
+            this.debug = debug;
+            this.startUpOptions = startUpOptions;
+            try {
+                this.nodeName = MatSciEngineConfigBase.getNodeName();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            logFile = new File(tmpDir, "MatlabStart" + nodeName + ".log");
+        }
 
-		public Process createMatlabProcess(String runArg) throws Exception {
-			// Attempt to run MATLAB
-			final ArrayList<String> commandList = new ArrayList<String>();
-			commandList.add(this.matlabLocation);
-			commandList.addAll(Arrays.asList(this.startUpOptions));
-			commandList.add("-logfile");
-			commandList.add(logFile.toString());
-			commandList.add("-r");
-			commandList.add(runArg);
+        public Process createMatlabProcess(String runArg) throws Exception {
+            // Attempt to run MATLAB
+            final ArrayList<String> commandList = new ArrayList<String>();
+            commandList.add(this.matlabLocation);
+            commandList.addAll(Arrays.asList(this.startUpOptions));
+            commandList.add("-logfile");
+            commandList.add(logFile.toString());
+            commandList.add("-r");
+            commandList.add(runArg);
 
-			String[] command = (String[]) commandList
-					.toArray(new String[commandList.size()]);
+            String[] command = (String[]) commandList.toArray(new String[commandList.size()]);
 
-			ProcessBuilder b = new ProcessBuilder();
-			b.directory(this.workingDirectory);
-			b.command(command);
+            ProcessBuilder b = new ProcessBuilder();
+            b.directory(this.workingDirectory);
+            b.command(command);
 
-			process = b.start();
+            process = b.start();
 
-			return process;
+            return process;
 
-		}
+        }
 
-		public File getLogFile() {
-			return logFile;
-		}
+        public File getLogFile() {
+            return logFile;
+        }
 
-		public boolean isDebug() {
-			return debug;
-		}
+        public boolean isDebug() {
+            return debug;
+        }
 
-		public void killProcess() {
-			try {
-				process.destroy();
-			} catch (Exception e) {}
-		}
-	}
+        public void killProcess() {
+            try {
+                process.destroy();
+            } catch (Exception e) {
+            }
+        }
+    }
 
     /**
      * This class is used to create a MATLAB process under a
@@ -300,15 +300,14 @@ public class MatlabConnection {
      */
     private static class WindowsMatlabProcessCreator extends CustomMatlabProcessCreator {
 
-	private WindowsProcess process;
+        private WindowsProcess process;
 
-        public WindowsMatlabProcessCreator(String matlabLocation,
-				File workingDirectory,
-				String[] startUpOptions, boolean debug) {
-			super(matlabLocation, workingDirectory, startUpOptions, debug);
-		}
+        public WindowsMatlabProcessCreator(String matlabLocation, File workingDirectory,
+                String[] startUpOptions, boolean debug) {
+            super(matlabLocation, workingDirectory, startUpOptions, debug);
+        }
 
-		public Process createMatlabProcess(String runArg) throws Exception {
+        public Process createMatlabProcess(String runArg) throws Exception {
             // Attempt to run MATLAB
             final ArrayList<String> commandList = new ArrayList<String>();
             commandList.add(this.matlabLocation);
@@ -326,39 +325,39 @@ public class MatlabConnection {
             process.setVisible(false);
 
             if (!process.start()) {
-		throw new IllegalStateException("Unable to start MATLAB process " + command + " errorCode: " + WindowsProcess.getLastError());
+                throw new IllegalStateException("Unable to start MATLAB process " + command + " errorCode: " +
+                    WindowsProcess.getLastError());
             }
 
-			// Sometimes the MATLAB process starts but dies very fast with exit
-			// code 1
-			// this must be considered as an error
-//			try {
-//				int exitValue = process.exitValue();
-//				throw new Exception(
-//						"The MATLAB process has exited abnormally with exit value "
-//								+ exitValue
-//								+ ", this can caused by a missing privilege of the user "
-//								+ System.getenv("user.name"));
-//			} catch (IllegalThreadStateException e) {
-//				// This is normal behavior, it means the process is still
-//				// running
-//			}
-
+            // Sometimes the MATLAB process starts but dies very fast with exit
+            // code 1
+            // this must be considered as an error
+            //			try {
+            //				int exitValue = process.exitValue();
+            //				throw new Exception(
+            //						"The MATLAB process has exited abnormally with exit value "
+            //								+ exitValue
+            //								+ ", this can caused by a missing privilege of the user "
+            //								+ System.getenv("user.name"));
+            //			} catch (IllegalThreadStateException e) {
+            //				// This is normal behavior, it means the process is still
+            //				// running
+            //			}
 
             return null;
         }
 
-		public void killProcess() {
-			final List<Integer> pids = WindowsProcess.getProcessTree(process.getPid());
-			for (final Integer i : pids) {
-				if (! WindowsProcess.kill(i, 1)) {
-					try {
-						Runtime.getRuntime().exec("TASKKILL /F /T /PID " + i);
-					} catch(Exception e) {
-						// Maybe here kill using tree kill
-					}
-				}
-			}
-		}
+        public void killProcess() {
+            final List<Integer> pids = WindowsProcess.getProcessTree(process.getPid());
+            for (final Integer i : pids) {
+                if (!WindowsProcess.kill(i, 1)) {
+                    try {
+                        Runtime.getRuntime().exec("TASKKILL /F /T /PID " + i);
+                    } catch (Exception e) {
+                        // Maybe here kill using tree kill
+                    }
+                }
+            }
+        }
     }
 }

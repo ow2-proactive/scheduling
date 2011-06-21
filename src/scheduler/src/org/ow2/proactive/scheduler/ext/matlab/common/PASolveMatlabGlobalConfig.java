@@ -56,6 +56,8 @@ public class PASolveMatlabGlobalConfig extends PASolveMatSciGlobalConfig {
 
     private String licenseServerUrl = null;
 
+    private String callbackFunctionName = null;
+
     public PASolveMatlabGlobalConfig() {
         transferSource = true;
         transferVariables = true;
@@ -115,6 +117,14 @@ public class PASolveMatlabGlobalConfig extends PASolveMatSciGlobalConfig {
 
     public void setLicenseServerUrl(String licenseServerUrl) {
         this.licenseServerUrl = licenseServerUrl;
+    }
+
+    public String getCallbackFunctionName() {
+        return callbackFunctionName;
+    }
+
+    public void setCallbackFunctionName(String callbackFunctionName) {
+        this.callbackFunctionName = callbackFunctionName;
     }
 
 }

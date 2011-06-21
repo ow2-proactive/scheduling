@@ -211,6 +211,7 @@ public class MatlabExecutable extends JavaExecutable {
 
         // Add sources, load workspace and input variables
         this.addSources();
+        this.execKeepAlive();
         this.loadWorkspace();
         this.loadInputVariables();
 
@@ -369,6 +370,27 @@ public class MatlabExecutable extends JavaExecutable {
             // Add unzipped source files to the MATALAB path
             matlabConnection.evalString("addpath('" + tempSubDir + "');");
         }
+    }
+
+    private void execKeepAlive() throws Exception {
+        printLog("Executing Keep-Alive timer");
+
+        StringBuilder keepAliveCommand = new StringBuilder(
+            "t = timer('Period', 300,'ExecutionMode','fixedRate');t.TimerFcn = { @" +
+                paconfig.getCallbackFunctionName() + ", {");
+        String[] used = taskconfig.getToolboxesUsed();
+        for (int i = 0; i < used.length; i++) {
+            if (i < used.length - 1) {
+                keepAliveCommand.append("'" + used[i] + "',");
+            } else {
+                keepAliveCommand.append("'" + used[i] + "'");
+            }
+        }
+        keepAliveCommand.append("}};start(t);");
+
+        printLog(keepAliveCommand.toString());
+
+        matlabConnection.evalString(keepAliveCommand.toString());
     }
 
     private void loadWorkspace() throws Exception {

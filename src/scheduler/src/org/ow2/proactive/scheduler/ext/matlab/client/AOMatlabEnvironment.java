@@ -320,8 +320,8 @@ public class AOMatlabEnvironment extends AOMatSciEnvironment<Boolean, MatlabResu
                     ArrayList<String> paramsList = new ArrayList<String>();
                     paramsList.add(config.getLogin());
                     paramsList.add(config.getLicenseServerUrl());
-                    if (taskConfigs[i][j].getCheckLicenceScriptParams() != null) {
-                        paramsList.addAll(Arrays.asList(taskConfigs[i][j].getCheckLicenceScriptParams()));
+                    if (taskConfigs[i][j].getToolboxesUsed() != null) {
+                        paramsList.addAll(Arrays.asList(taskConfigs[i][j].getToolboxesUsed()));
                     } else {
                         paramsList.addAll(Arrays.asList(config.getScriptParams()));
                     }

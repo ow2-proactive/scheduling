@@ -199,7 +199,7 @@ for i=1:NN
             allfuncs(i,j).s = convertFunc(Tasks(j,i).Func);
             % find the list of toolboxes used by the user function and give it as parameter to the script
             sp = findScriptParams(allfuncs(i,j).f,allfuncs(i,j).s);
-            task_config(i,j).setCheckLicenceScriptParams(sp);
+            task_config(i,j).setToolboxesUsed(sp);
         else
             error(['Parameter ' num2str(i) ',' num2str(j)  ' has no function definition.']);
         end
@@ -255,6 +255,8 @@ else
     solve_config.setInputSpaceURL(opt.CustomDataspaceURL);
 end
 
+keepaliveFunctionName = 'keepalive_callback_fcn';
+solve_config.setCallbackFunctionName(keepaliveFunctionName);
 
 
 % Transfering source files
@@ -271,10 +273,16 @@ sourceZipBaseName = ['MatlabPAsolveSrc_' num2str(solveid)];
     end
 
     function  [zFN zFP h]=buildZiplist(strfoo,ind,envziplist,paramziplist)
+
         [mfiles classdirs] = sched.findDependency(strfoo(2:end));
+
         z = union(mfiles, classdirs);
         z=union(z,envziplist);
         z=union(z,paramziplist);
+        [pasolvepath, pasolvename, pasolveext] = fileparts(mfilename('fullpath'));
+        fs=filesep();
+        keepalive_cb_path = [pasolvepath, fs, 'Utils', fs, keepaliveFunctionName, '.m'];
+        z=union(z, {keepalive_cb_path});
         zFN = [sourceZipBaseName indToFile(ind) '.zip'];
         if length(z) > 0
             zFP = [pa_dir fs zFN];
@@ -539,6 +547,7 @@ solve_config.setTimeStamp(opt.TimeStamp);
 solve_config.setPriority(opt.Priority);
 solve_config.setTransferEnv(opt.TransferEnv);
 solve_config.setMatFileOptions(opt.TransferMatFileOptions);
+solve_config.setLicenseServerUrl(opt.LicenseServerURL);
 solve_config.setFork(opt.Fork);
 solve_config.setRunAsMe(opt.RunAsMe);
 solve_config.setWindowsStartupOptionsAsString(opt.WindowsStartupOptions);

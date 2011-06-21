@@ -49,6 +49,9 @@
 %   RunAsMe     true | false | 'on' | 'off'
 %               Runs the tasks under the account of the current user, default to 'off'
 %
+%   LicenceServerURL  char
+%               URL of the FlexNet proxy server. If empty, no license check will be done
+%
 %   VersionPref       char
 %               Determines the matlab version preferred to use by the worker, e.g. 7.5
 %
@@ -181,6 +184,11 @@ inputs(j).default = false;
 inputs(j).check = logcheck;
 inputs(j).trans = logtrans;
 j=j+1;
+inputs(j).name = 'LicenseServerURL';
+inputs(j).default = [];
+inputs(j).check = urlcheck;
+inputs(j).trans = id;
+j=j+1;
 inputs(j).name = 'Fork';
 inputs(j).default = false;
 inputs(j).check = logcheck;
@@ -262,7 +270,7 @@ inputs(j).check = logcheck;
 inputs(j).trans = logtrans;
 j=j+1;
 inputs(j).name = 'WindowsStartupOptions';
-inputs(j).default = '-automation -nodesktop -nosplash -nodisplay';
+inputs(j).default = '-automation -nodesktop -nosplash -nodisplay -wait';
 inputs(j).check = @ischar;
 inputs(j).trans = id;
 j=j+1;

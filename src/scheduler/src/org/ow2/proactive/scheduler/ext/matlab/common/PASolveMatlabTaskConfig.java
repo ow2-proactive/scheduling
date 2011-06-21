@@ -46,17 +46,17 @@ import org.ow2.proactive.scheduler.ext.matsci.common.PASolveMatSciTaskConfig;
  */
 public class PASolveMatlabTaskConfig extends PASolveMatSciTaskConfig {
 
-    private String[] checkLicenceScriptParams;
+    private String[] toolboxesUsed;
 
     public PASolveMatlabTaskConfig() {
 
     }
 
-    public String[] getCheckLicenceScriptParams() {
-        return checkLicenceScriptParams;
+    public String[] getToolboxesUsed() {
+        return toolboxesUsed;
     }
 
-    public void setCheckLicenceScriptParams(String[] checkLicenceScriptParams) {
-        this.checkLicenceScriptParams = checkLicenceScriptParams;
+    public void setToolboxesUsed(String[] toolboxesUsed) {
+        this.toolboxesUsed = toolboxesUsed;
     }
 }
