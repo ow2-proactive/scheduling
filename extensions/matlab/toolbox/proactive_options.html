@@ -86,7 +86,8 @@
     <li><p><b>VersionMin</b> and <b>VersionMax</b>: is the minimum/maximum version to use. It is set by default to the minimum/maximum version supported.</p></li>
     <li><p><b>VersionRej</b>: is a list of versions to be rejected. It is set by default to the versions for which the ptolemy java2matlab interface has not been compiled (and thus are not supported). These versions are all "a" releases matlab2007a, matlab2008a, etc...</p></li>
     <li><p><b>TransferMatFileOptions</b>: this is the options used by the toolbox when generating mat files (in TransferEnv or TransferVariables). By default, it is set to '-v7'</p></li>
-    <li><p><b>KeepEngine</b>: this option is set by default to on. It means that remote matlab engines are kept/reused between the executions of matlab tasks. Turning this option to off might cause some slowing down and some instability, especially on Windows.</p></li>
+    <li><p><b>Fork</b>: this option is set by default to off. It means the tasks will be executed (on remote hosts) in a separate JVM process.</p></li>
+    <li><p><b>RunAsMe</b>: this option is set by default to off. It means the tasks will be executed (on remote hosts) under the account of the currently logged user.</p></li>
     <li><p><b>Priority</b>: this option is the priority of jobs created inside the ProActive Scheduler by PAsolve calls. Default to "Normal"</p></li>
     <li><p><b>ZipInputFiles</b> and <b>ZipOutputFiles</b>: this option tells if PATasks InputFiles/OutputFiles should be zipped before being sent. It is set by default to off. Turning the options on is not recommended due to some instability observed in maltab zip command.</p></li>
     <li><p><b>FindMatlabScript</b>: this option sets the script used to find matlab on the remote host. Changing the script means modifying the toolbox internal behavior and is therefore not recommended.</p></li>

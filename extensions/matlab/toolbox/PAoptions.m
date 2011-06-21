@@ -53,16 +53,12 @@
 %               If TranferEnv or TransferVariables is set to on, tells which options are used to save the local environment
 %               See the "save" command for more information. Default to
 %               '-v7'
-%           
 %
-%   KeepEngine       true | false | 'on' | 'off'  
-%               Determines wether the remote matlab engines should be
-%               destroyed after each task. 'on' provides a faster response,
-%               but keeps matlab token in use, therefore 'off' is the default behavior.
-%               Additionally on linux system, clearing variables doesn't
-%               remove memory usage by the matlab process. KeepEngine set
-%               to 'on' can though lead to OutOfMemory errors.
-%            
+%   Fork        true | false | 'on' | 'off'
+%               Runs the tasks in a separate JVM process
+%
+%   RunAsMe     true | false | 'on' | 'off'
+%               Runs the tasks under the account of the current user, default to 'off'
 %
 %   VersionPref       char
 %               Determines the matlab version preferred to use by the worker, e.g. 7.5
@@ -201,7 +197,12 @@ inputs(j).default = true;
 inputs(j).check = logcheck;
 inputs(j).trans = logtrans;
 j=j+1;
-inputs(j).name = 'KeepEngine';
+inputs(j).name = 'Fork';
+inputs(j).default = false;
+inputs(j).check = logcheck;
+inputs(j).trans = logtrans;
+j=j+1;
+inputs(j).name = 'RunAsMe';
 inputs(j).default = false;
 inputs(j).check = logcheck;
 inputs(j).trans = logtrans;

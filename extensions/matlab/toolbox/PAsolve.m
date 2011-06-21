@@ -550,7 +550,8 @@ solve_config.setTransferSource(opt.TransferSource);
 solve_config.setTransferEnv(opt.TransferEnv);
 solve_config.setTransferVariables(opt.TransferVariables);
 solve_config.setMatFileOptions(opt.TransferMatFileOptions);
-solve_config.setKeepEngine(opt.KeepEngine);
+solve_config.setFork(opt.Fork);
+solve_config.setRunAsMe(opt.RunAsMe);
 
 solve_config.setInputSpaceName('MatlabInputSpace');
 solve_config.setOutputSpaceName('MatlabOutputSpace');
