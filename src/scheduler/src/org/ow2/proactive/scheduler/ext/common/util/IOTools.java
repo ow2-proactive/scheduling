@@ -201,11 +201,14 @@ public class IOTools {
         private String appendMessage;
         /**  */
         public Boolean goon = true;
+
+        public Boolean patternFound = false;
         private PrintStream out;
         private BufferedReader br;
 
         private String startpattern;
         private String stoppattern;
+        private String patternToFind;
 
         /**  */
         public ArrayList<String> output = new ArrayList<String>();
@@ -243,18 +246,19 @@ public class IOTools {
          * @param out
          */
         public LoggingThread(InputStream is, String appendMessage, PrintStream out, String startpattern,
-                String stoppattern) {
-            this(is, appendMessage, out, null, startpattern, stoppattern);
+                String stoppattern, String patternToFind) {
+            this(is, appendMessage, out, null, startpattern, stoppattern, patternToFind);
         }
 
         public LoggingThread(InputStream is, String appendMessage, PrintStream out, PrintStream ds,
-                String startpattern, String stoppattern) {
+                String startpattern, String stoppattern, String patternToFind) {
             this.br = new BufferedReader(new InputStreamReader(is));
             this.appendMessage = appendMessage;
             this.out = out;
             this.debugStream = ds;
             this.startpattern = startpattern;
             this.stoppattern = stoppattern;
+            this.patternToFind = patternToFind;
         }
 
         /**
@@ -265,7 +269,7 @@ public class IOTools {
         * @param out
         */
         public LoggingThread(InputStream is, String appendMessage, PrintStream out, PrintStream ds) {
-            this(is, appendMessage, out, ds, null, null);
+            this(is, appendMessage, out, ds, null, null, null);
         }
 
         public LoggingThread(InputStream is) {
@@ -282,6 +286,11 @@ public class IOTools {
                     Thread.sleep(10);
                 }
                 answer = readLine();
+                if (patternToFind != null) {
+                    if (answer.contains(patternToFind)) {
+                        patternFound = true;
+                    }
+                }
 
             } catch (IOException e) {
 

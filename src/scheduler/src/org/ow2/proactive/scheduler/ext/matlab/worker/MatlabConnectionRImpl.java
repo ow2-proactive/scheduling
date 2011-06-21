@@ -85,13 +85,13 @@ public class MatlabConnectionRImpl implements MatlabConnection {
     }
 
     public void release() {
-          if (process != null) {
-              try {
+        if (process != null) {
+            try {
                 process.destroy();
-              } catch (Exception e) {
+            } catch (Exception e) {
 
-              }
-          }
+            }
+        }
     }
 
     public void evalString(String command) throws MatlabTaskException {
@@ -119,19 +119,21 @@ public class MatlabConnectionRImpl implements MatlabConnection {
         out.flush();
         out.close();
 
-        process = createMatlabProcess("cd('"+this.workingDirectory+"');PAMain();");
+        process = createMatlabProcess("cd('" + this.workingDirectory + "');PAMain();");
 
         IOTools.LoggingThread lt1;
         IOTools.LoggingThread lt2;
         if (debug) {
-            lt1 = new IOTools.LoggingThread(process.getInputStream(), "[MATLAB OUT]", System.out, outDebug);
-            lt2 = new IOTools.LoggingThread(process.getErrorStream(), "[MATLAB ERR]", System.err, outDebug);
+            lt1 = new IOTools.LoggingThread(process.getInputStream(), "[MATLAB OUT]", System.out, outDebug,
+                null, null, "License checkout failed");
+            lt2 = new IOTools.LoggingThread(process.getErrorStream(), "[MATLAB ERR]", System.err, outDebug,
+                null, null, "License checkout failed");
 
         } else {
             lt1 = new IOTools.LoggingThread(process.getInputStream(), "[MATLAB OUT]", System.out,
-                startPattern, null);
+                startPattern, null, "License checkout failed");
             lt2 = new IOTools.LoggingThread(process.getErrorStream(), "[MATLAB ERR]", System.err,
-                startPattern, null);
+                startPattern, null, "License checkout failed");
         }
         Thread t1 = new Thread(lt1, "OUT DS");
         t1.setDaemon(true);
@@ -140,39 +142,49 @@ public class MatlabConnectionRImpl implements MatlabConnection {
         Thread t2 = new Thread(lt2, "ERR DS");
         t2.setDaemon(true);
         t2.start();
-
-        File ackFile = new File(workingDirectory, "matlab.ack");
-        File nackFile = new File(workingDirectory, "matlab.nack");
-        int cpt = 0;
-        while (!ackFile.exists() && !nackFile.exists() && (cpt < TIMEOUT_START)) {
-            try {
-                int exitValue = process.exitValue();
-                throw new MatlabInitException("Matlab process exited with code : " + exitValue);
-            } catch (Exception e) {
-                // ok process still exists
+        try {
+            File ackFile = new File(workingDirectory, "matlab.ack");
+            File nackFile = new File(workingDirectory, "matlab.nack");
+            int cpt = 0;
+            while (!ackFile.exists() && !nackFile.exists() && (cpt < TIMEOUT_START) && !lt1.patternFound &&
+                !lt2.patternFound) {
+                try {
+                    int exitValue = process.exitValue();
+                    throw new MatlabInitException("Matlab process exited with code : " + exitValue);
+                } catch (Exception e) {
+                    // ok process still exists
+                }
+                Thread.sleep(10);
+                cpt++;
             }
-            Thread.sleep(10);
-            cpt++;
-        }
-        if (ackFile.exists()) {
-            ackFile.delete();
-        }
-        // TODO do the callback to the proxy server
-        if (nackFile.exists()) {
+            if (ackFile.exists()) {
+                ackFile.delete();
+            }
+            // TODO do the callback to the proxy server
+            if (nackFile.exists()) {
+                nackFile.delete();
+                throw new UnsufficientLicencesException();
+            }
+            if (lt1.patternFound || lt2.patternFound) {
+                process.destroy();
+                process = null;
+                throw new UnsufficientLicencesException();
+            }
+            if (cpt >= TIMEOUT_START) {
+                process.destroy();
+                process = null;
 
-            nackFile.delete();
+                throw new MatlabInitException("Timeout occured while starting Matlab");
 
-            throw new UnsufficientLicencesException();
-        }
-        if (cpt >= TIMEOUT_START) {
-            throw new MatlabInitException("Timeout occured while starting Matlab");
-        }
+            }
 
-        int exitValue = process.waitFor();
-        lt1.goon = false;
-        lt2.goon = false;
-        if (exitValue != 0) {
-            throw new MatlabInitException("Matlab process exited with code : " + exitValue);
+            int exitValue = process.waitFor();
+            if (exitValue != 0) {
+                throw new MatlabInitException("Matlab process exited with code : " + exitValue);
+            }
+        } finally {
+            lt1.goon = false;
+            lt2.goon = false;
         }
 
     }

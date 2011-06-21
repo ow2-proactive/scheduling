@@ -190,6 +190,10 @@ class ReserveMatlab
       $args.each do |a|
         log(a)
       end
+      if serverurl == nil
+         log("Warning : Licensing proxy not specified, license checking disabled")
+         return true
+      end
       begin
         client = LicensingClient.new(serverurl)
       rescue Exception => e
