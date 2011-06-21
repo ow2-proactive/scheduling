@@ -4,10 +4,7 @@
     <installation>
         <version>7.9</version> <!-- matlab version in numeric format -->
         <home>/usr/local/matlab2009b</home> <!-- Matlab home directory -->
-        <libdir>bin/glnxa64</libdir>  <!-- relative path to native libraries-->
-        <extdir>sys/os/glnxa64</extdir>  <!-- relative path to native external libraries (valid only on linux, must be ommited on windows) -->
         <bindir>bin</bindir> <!-- relative path to bin directory which contains the matlab executable -->
         <command>matlab</command> <!-- matlab command name (could be matlab or matlab.exe -->
-        <ptolemydir>dist/lib/7.9/bin/glnxa64</ptolemydir>  <!-- path to ptolemy lib directory for the given matlab version and os -->
     </installation>
 </MatlabInstallations>

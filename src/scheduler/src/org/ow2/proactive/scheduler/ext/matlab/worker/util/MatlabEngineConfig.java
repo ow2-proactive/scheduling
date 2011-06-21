@@ -42,23 +42,12 @@ import org.ow2.proactive.scheduler.ext.matsci.worker.util.MatSciEngineConfigBase
 
 public class MatlabEngineConfig extends MatSciEngineConfigBase {
 
-    protected transient static Process selectionScriptProcess = null;
     private static OperatingSystem os = OperatingSystem.getOperatingSystem();
 
     /**
      * The home dir of Matlab on this machine
      */
     private String matlabHome = null;
-
-    /**
-     * The name of the arch dir to find native libraries (can be win32, glnx86, ...)
-     */
-    private String matlabLibDirName = null;
-
-    /**
-     * The path to matlab external libraries
-     */
-    private String matlabExtDir = null;
 
     /**
      * The path to matlab bin dir
@@ -75,46 +64,16 @@ public class MatlabEngineConfig extends MatSciEngineConfigBase {
      */
     private String matlabCommandName = null;
 
-    private boolean hasManyConfigs;
-
-    /**
-     * Path to the ptolemy library dir.
-     */
-    private String ptolemyPath;
 
     private static final String nl = System.getProperty("line.separator");
 
-    public MatlabEngineConfig(String matlabHome, String matlabVersion, String matlabLibDirName,
-            String matlabBinDir, String matlabExtDirName, String matlabCommandName, boolean hasManyConfigs) {
+    public MatlabEngineConfig(String matlabHome, String matlabVersion,
+            String matlabBinDir, String matlabCommandName) {
         this.matlabHome = matlabHome.replaceAll("" + '\u0000', "");
         this.matlabVersion = matlabVersion.replaceAll("" + '\u0000', "");
-        this.matlabLibDirName = matlabLibDirName.replaceAll("" + '\u0000', "");
         this.matlabBinDir = matlabBinDir.replaceAll("" + '\u0000', "");
-        if (matlabExtDirName != null) {
-            this.matlabExtDir = matlabExtDirName.replaceAll("" + '\u0000', "");
-        }
         this.matlabCommandName = matlabCommandName.replaceAll("" + '\u0000', "");
-        this.hasManyConfigs = hasManyConfigs;
-    }
 
-    public MatlabEngineConfig(String matlabHome, String matlabVersion, String matlabLibDirName,
-            String matlabBinDir, String matlabExtDirName, String matlabCommandName, boolean hasManyConfigs,
-            String ptolemyPath) {
-        this(matlabHome, matlabVersion, matlabLibDirName, matlabBinDir, matlabExtDirName, matlabCommandName,
-                hasManyConfigs);
-        this.ptolemyPath = ptolemyPath.replaceAll("" + '\u0000', "");
-    }
-
-    public static void setSelectionScriptProcess(Process p) {
-        selectionScriptProcess = p;
-    }
-
-    public static Process getSelectionScriptProcess() {
-        return selectionScriptProcess;
-    }
-
-    public void setPtolemyPath(String ptolemyPath) {
-        this.ptolemyPath = ptolemyPath.replaceAll("" + '\u0000', "");
     }
 
     /**
@@ -126,35 +85,11 @@ public class MatlabEngineConfig extends MatSciEngineConfigBase {
         return matlabHome;
     }
 
-    /**
-     * returns the relative path of the lib directory on this matlab install
-     *
-     * @return lib dir name
-     */
-    public String getMatlabLibDirName() {
-        return matlabLibDirName;
-    }
 
     public String getMatlabBinDir() {
         return matlabBinDir;
     }
 
-    public String getMatlabExtDir() {
-        return matlabExtDir;
-    }
-
-    /**
-     * returns the path to the ptolemy library directory
-     *
-     * @return ptolemy lib dir
-     */
-    public String getPtolemyPath() {
-        return ptolemyPath;
-    }
-
-    public boolean hasManyConfig() {
-        return hasManyConfigs;
-    }
 
     /**
      * Returns the current matlab version.
@@ -166,11 +101,7 @@ public class MatlabEngineConfig extends MatSciEngineConfigBase {
     }
 
     public String getFullCommand() {
-        //if (os.equals(OperatingSystem.windows)) {
         return matlabHome + os.fileSeparator() + matlabBinDir + os.fileSeparator() + matlabCommandName;
-        //} else {
-        //    return matlabCommandName;
-        //}
     }
 
     /**
@@ -185,9 +116,8 @@ public class MatlabEngineConfig extends MatSciEngineConfigBase {
     @Override
     public String toString() {
         return "Matlab home : " + matlabHome + nl + "Matlab version : " + matlabVersion + nl +
-            "Matlab lib directory name : " + matlabLibDirName + nl + "Matlab bin directory  : " +
-            matlabBinDir + nl + "Matlab command name : " + matlabCommandName + nl + "Ptolemy lib dir : " +
-            ptolemyPath;
+             "Matlab bin directory  : " +
+            matlabBinDir + nl + "Matlab command name : " + matlabCommandName + nl;
     }
 
     @Override
@@ -206,12 +136,8 @@ public class MatlabEngineConfig extends MatSciEngineConfigBase {
             return false;
         if (matlabHome != null ? !matlabHome.equals(that.matlabHome) : that.matlabHome != null)
             return false;
-        if (matlabLibDirName != null ? !matlabLibDirName.equals(that.matlabLibDirName)
-                : that.matlabLibDirName != null)
-            return false;
+
         if (matlabVersion != null ? !matlabVersion.equals(that.matlabVersion) : that.matlabVersion != null)
-            return false;
-        if (ptolemyPath != null ? !ptolemyPath.equals(that.ptolemyPath) : that.ptolemyPath != null)
             return false;
 
         return true;
@@ -220,11 +146,9 @@ public class MatlabEngineConfig extends MatSciEngineConfigBase {
     @Override
     public int hashCode() {
         int result = matlabHome != null ? matlabHome.hashCode() : 0;
-        result = 31 * result + (matlabLibDirName != null ? matlabLibDirName.hashCode() : 0);
         result = 31 * result + (matlabBinDir != null ? matlabBinDir.hashCode() : 0);
         result = 31 * result + (matlabVersion != null ? matlabVersion.hashCode() : 0);
         result = 31 * result + (matlabCommandName != null ? matlabCommandName.hashCode() : 0);
-        result = 31 * result + (ptolemyPath != null ? ptolemyPath.hashCode() : 0);
         return result;
     }
 }

@@ -50,6 +50,4 @@ public interface MatSciEngineConfig extends Serializable {
 
     String getFullCommand();
 
-    boolean hasManyConfig();
-
 }

@@ -36,13 +36,6 @@
  */
 package org.ow2.proactive.scheduler.ext.matlab.worker.util;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.regex.Matcher;
-
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.input.SAXBuilder;
@@ -50,6 +43,13 @@ import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.ext.matsci.worker.util.MatSciConfigurationParser;
 import org.ow2.proactive.scheduler.ext.matsci.worker.util.MatSciEngineConfig;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.regex.Matcher;
 
 
 /**
@@ -158,21 +158,6 @@ public class MatlabConfigurationParser extends MatSciConfigurationParser {
             File filehome = new File(home);
             checkDir(filehome, configFile);
 
-            String libdir = courant.getChild("libdir").getText();
-            if ((libdir == null) || (libdir.trim().length() == 0)) {
-                throw new IllegalArgumentException("In " + configFile + ", libdir element must not be empty");
-            }
-            libdir = libdir.trim().replaceAll("/", Matcher.quoteReplacement(File.separator));
-            File filelib = new File(filehome, libdir);
-            checkDir(filelib, configFile);
-
-            // extdir can be null
-            String extdir = null;
-            Element extel = courant.getChild("extdir");
-            if (extel != null) {
-                extdir = courant.getChild("extdir").getText();
-            }
-
             String bindir = courant.getChild("bindir").getText();
             if ((bindir == null) || (bindir.trim().length() == 0)) {
                 throw new IllegalArgumentException("In " + configFile + ", bindir element must not be empty");
@@ -189,21 +174,8 @@ public class MatlabConfigurationParser extends MatSciConfigurationParser {
             File filecommand = new File(filebin, command);
             checkFile(filecommand, configFile, true);
 
-            String ptolemydir = courant.getChild("ptolemydir").getText();
-            if ((ptolemydir == null) || (ptolemydir.trim().length() == 0)) {
-                throw new IllegalArgumentException("In " + configFile +
-                    ", ptolemydir element must not be empty");
-            }
-            ptolemydir = ptolemydir.trim().replaceAll("/", Matcher.quoteReplacement(File.separator));
 
-            File ptolemydirfile = new File(ptolemydir);
-            if (!ptolemydirfile.isAbsolute()) {
-                ptolemydirfile = new File(homesched, ptolemydir); // TODO: NO MORE NEEDED
-            }
-            checkDir(ptolemydirfile, configFile);
-
-            configs.add(new MatlabEngineConfig(home, version, libdir, bindir, extdir, command,
-                hasManyConfigs, ptolemydirfile.toString()));
+            configs.add(new MatlabEngineConfig(home, version, bindir, command));
         }
 
         return configs;
