@@ -42,9 +42,9 @@ if ~exist('timeout', 'var')
         timeout =800000;
     end
 end
-opt = PAoptions;
-oldval = opt.KeepEngine;
-PAoptions('KeepEngine',true);
+%opt = PAoptions;
+%oldval = opt.KeepEngine;
+%PAoptions('KeepEngine',true);
 disp('.................................. Testing PAsolve with big array and Keep Engine');
 disp('............................First create a out of memory error on distant engines');
 resl = PAsolve(@makeBigArray,{100000},{100000},{100000},{100000});
@@ -66,7 +66,7 @@ for i=1:8
         end        
     end
     disp(['...........................' num2str(i) ' ......OK']);
-    PAoptions('KeepEngine',oldval);
+    %PAoptions('KeepEngine',oldval);
     ok=true;
     msg=[];
 end

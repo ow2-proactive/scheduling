@@ -72,7 +72,7 @@ public class MatlabConnection {
      * @param workingDir the directory where to start MATLAB
      * @throws MatlabInitException if MATLAB could not be initialized
      */
-    public static MatlabConnection acquire(final String matlabExecutablePath, final File workingDir)
+    public static MatlabConnection acquire(final String matlabExecutablePath, final File workingDir, final boolean debug)
             throws MatlabInitException {
         RemoteMatlabProxyFactory proxyFactory;
 
@@ -83,7 +83,7 @@ public class MatlabConnection {
         try {
             MatlabProcessCreator prCreator = new CustomMatlabProcessCreator(
                 matlabExecutablePath, // "C:\\Program Files\\MATLAB\\R2010b\\bin\\win32\\MATLAB.exe"
-                workingDir, conn);
+                workingDir, conn, debug);
             proxyFactory = new RemoteMatlabProxyFactory(prCreator);
         } catch (MatlabConnectionException e) {
             // Possible cause: registry problem or receiver is not bind
@@ -251,21 +251,23 @@ public class MatlabConnection {
         private final File workingDirectory;
 
         private File logFile;
+        private boolean debug;
 
         private MatlabConnection conn;
 
-        public CustomMatlabProcessCreator(final String matlabLocation, final File workingDirectory, MatlabConnection conn) {
+        public CustomMatlabProcessCreator(final String matlabLocation, final File workingDirectory, MatlabConnection conn, boolean debug) {
             this.matlabLocation = matlabLocation;
             this.workingDirectory = workingDirectory;
-           this.conn = conn;
+            this.conn = conn;
+            this.debug = debug;
             try {
                 this.nodeName = MatSciEngineConfigBase.getNodeName();
             } catch (Exception e) {
                 e.printStackTrace();
             }
             logFile = new File(tmpDir, "MatlabStart" + nodeName + ".log");
-            startUpOptions = new String[] { "-nosplash", "-nodesktop", "-nodisplay", "-logfile",
-                    logFile.toString() };
+            startUpOptions = new String[]{"-nosplash", "-nodesktop", "-nodisplay", "-logfile",
+                    logFile.toString()};
         }
 
         public Process createMatlabProcess(String runArg) throws Exception {
@@ -291,7 +293,7 @@ public class MatlabConnection {
             try {
                 int exitValue = p.exitValue();
                 throw new Exception("The MATLAB process has exited abnormally with exit value " + exitValue +
-                    ", this can caused by a missing privilege of the user " + System.getenv("user.name"));
+                        ", this can caused by a missing privilege of the user " + System.getenv("user.name"));
             } catch (IllegalThreadStateException e) {
                 // This is normal behavior, it means the process is still running
             }
@@ -301,5 +303,11 @@ public class MatlabConnection {
         public File getLogFile() {
             return logFile;
         }
+
+        public boolean isDebug() {
+            return debug;
+        }
+
+
     }
 }

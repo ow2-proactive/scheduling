@@ -168,7 +168,7 @@ public class MatlabExecutable extends JavaExecutable {
 
         // Acquire a connection to MATLAB
         this.matlabConnection = MatlabConnection.acquire(matlabCmd, // MATLAB exe path
-                this.localSpaceRootDir); // working dir
+                this.localSpaceRootDir, paconfig.isDebug()); // working dir
 
         Serializable result = null;
 
@@ -520,9 +520,9 @@ public class MatlabExecutable extends JavaExecutable {
         String tmpPath = System.getProperty("java.io.tmpdir");
         // system temp dir (not using java.io.tmpdir since in runasme it can be
         // inaccesible and the scratchdir property can inherited from parent jvm)
-        if (this.paconfig.isRunAsMe()) {
-            tmpPath = System.getProperty("node.dataspace.scratchdir");
-        }
+//        if (this.paconfig.isRunAsMe()) {
+//            tmpPath = System.getProperty("node.dataspace.scratchdir");
+//        }
 
         // log file writer used for debugging
         File tmpDirFile = new File(tmpPath);
