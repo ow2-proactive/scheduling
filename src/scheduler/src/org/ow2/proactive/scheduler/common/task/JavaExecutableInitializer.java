@@ -62,9 +62,6 @@ public class JavaExecutableInitializer implements ExecutableInitializer {
     /** Arguments of the java task */
     protected Map<String, byte[]> serializedArguments;
 
-    /** Decrypter from launcher */
-    private OneShotDecrypter decrypter = null;
-
     /**
      * Get the nodes list
      *
@@ -143,16 +140,14 @@ public class JavaExecutableInitializer implements ExecutableInitializer {
      * {@inheritDoc}
      */
     public OneShotDecrypter getDecrypter() {
-        //throw new RuntimeException("Should not be called in this context");
-        return decrypter;
+        throw new RuntimeException("Should not be called in this context");
     }
 
     /**
      * {@inheritDoc}
      */
     public void setDecrypter(OneShotDecrypter decrypter) {
-        //throw new RuntimeException("Should not be called in this context");
-        this.decrypter = decrypter;
+        throw new RuntimeException("Should not be called in this context");
     }
 
 }

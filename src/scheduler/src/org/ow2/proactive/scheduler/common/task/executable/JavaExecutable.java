@@ -49,12 +49,10 @@ import org.objectweb.proactive.extensions.dataspaces.exceptions.ConfigurationExc
 import org.objectweb.proactive.extensions.dataspaces.exceptions.FileSystemException;
 import org.objectweb.proactive.extensions.dataspaces.exceptions.NotConfiguredException;
 import org.objectweb.proactive.extensions.dataspaces.exceptions.SpaceNotFoundException;
-import org.objectweb.proactive.extensions.processbuilder.OSUser;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.task.JavaExecutableInitializer;
 import org.ow2.proactive.scheduler.common.task.flow.FlowActionType;
 import org.ow2.proactive.scheduler.task.launcher.TaskLauncher;
-import org.ow2.proactive.scheduler.task.launcher.utils.ForkerUtils;
 import org.ow2.proactive.utils.NodeSet;
 
 
@@ -357,10 +355,5 @@ public abstract class JavaExecutable extends Executable {
     public final int getReplicationIndex() {
         return Integer.parseInt(System.getProperty(TaskLauncher.SchedulerVars.JAVAENV_TASK_REPLICATION
                 .toString(), "0"));
-    }
-
-    /** This method can be called only once */
-    public OSUser getUser() throws Exception {
-        return ForkerUtils.checkConfigAndGetUser(this.execInitializer.getDecrypter());
     }
 }

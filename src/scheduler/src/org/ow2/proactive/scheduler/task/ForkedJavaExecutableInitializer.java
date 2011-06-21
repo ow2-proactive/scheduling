@@ -63,6 +63,9 @@ public class ForkedJavaExecutableInitializer extends JavaExecutableInitializer {
     /** Decrypter from launcher */
     private OneShotDecrypter decrypter = null;
 
+    /** Dataspaces on forking JVM side */
+    private DataSpacesFileObject local, input, output, global;
+
     /**
      * Create a new instance of ForkedJavaExecutableInitializer
      *

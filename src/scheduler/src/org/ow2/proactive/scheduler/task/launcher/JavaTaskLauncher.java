@@ -127,22 +127,25 @@ public class JavaTaskLauncher extends TaskLauncher {
                 duration += System.currentTimeMillis() - sample;
             }
 
-            //init task
-            ExecutableInitializer initializer = executableContainer.createExecutableInitializer();
-            replaceIterationTags(initializer);
-            // if an exception occurs in init method, unwrapp the InvocationTargetException
-            // the result of the execution is the user level exception
-            try {
-                callInternalInit(JavaExecutable.class, JavaExecutableInitializer.class, initializer);
-            } catch (InvocationTargetException e) {
-                throw e.getCause() != null ? e.getCause() : e;
-            }
-            sample = System.currentTimeMillis();
-            try {
-                //launch task
-                userResult = currentExecutable.execute(results);
-            } catch (Throwable t) {
-                exception = t;
+            if (!hasBeenKilled) {
+                //init task
+                ExecutableInitializer initializer = executableContainer.createExecutableInitializer();
+                replaceIterationTags(initializer);
+                // if an exception occurs in init method, unwrapp the InvocationTargetException
+                // the result of the execution is the user level exception
+                try {
+                    callInternalInit(JavaExecutable.class, JavaExecutableInitializer.class, initializer);
+                } catch (InvocationTargetException e) {
+                    throw e.getCause() != null ? e.getCause() : e;
+                }
+                sample = System.currentTimeMillis();
+                try {
+                    //launch task
+                    userResult = currentExecutable.execute(results);
+                } catch (Throwable t) {
+                    exception = t;
+                }
+                duration += System.currentTimeMillis() - sample;
             }
 
             //for the next two steps, task could be killed anywhere
