@@ -1382,7 +1382,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      * @throws NotConnectedException
      * @throws PermissionException
      */
-    @PUT
+    @GET
     @Path("isconnected")
     @Produces("application/json")
     public boolean isConnected(@HeaderParam("sessionid") final String sessionId)
