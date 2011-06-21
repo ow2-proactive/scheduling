@@ -1,6 +1,8 @@
 package org.ow2.proactive_grid_cloud_portal;
 
 import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
@@ -47,8 +49,17 @@ public class LoggingInterceptor implements PreProcessInterceptor, PostProcessInt
         if (logger.isDebugEnabled()) {
 
             String httpMethod = request.getHttpMethod();
-            String uriPath = request.getUri().getPath();
-
+            
+            URI uri = ui.getRequestUri(); 
+            
+            String uriPath = uri.getPath();
+            if (uri.getQuery() != null) {
+                uriPath += "?" + uri.getQuery();
+            }
+            if (uri.getFragment() != null) {
+                uriPath += "#" + uri.getFragment();
+            }
+            
             String sessionid = null;
             List<String> headerSessionId = request.getHttpHeaders().getRequestHeader("sessionid");
             if (headerSessionId != null) {
@@ -75,8 +86,15 @@ public class LoggingInterceptor implements PreProcessInterceptor, PostProcessInt
             sessionid = headerSessionId.get(0);
         }
 
-        String uriPath = ui.getPath();
-
+        URI uri = ui.getRequestUri();
+        String uriPath = uri.getPath();
+        if (uri.getQuery() != null) {
+            uriPath += "?" + uri.getQuery();
+        }
+        if (uri.getFragment() != null) {
+            uriPath += "#" + uri.getFragment();
+        }
+        
         if (logger.isDebugEnabled()) {
             // in debug mode log anything
             logger.info(sessionid + "|" + uriPath + "|" + response.getStatus() + "|" +
