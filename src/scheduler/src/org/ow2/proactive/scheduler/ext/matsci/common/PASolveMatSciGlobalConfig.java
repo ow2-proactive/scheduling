@@ -39,6 +39,7 @@ package org.ow2.proactive.scheduler.ext.matsci.common;
 import java.io.Serializable;
 import java.net.URI;
 import java.util.HashSet;
+import java.util.Map;
 
 
 /**
@@ -48,29 +49,25 @@ import java.util.HashSet;
  */
 public class PASolveMatSciGlobalConfig implements Serializable {
 
-    /**
-     * Debug Mode
-     */
+    /** Debug Mode */
     private boolean debug = false;
 
-    /**
-     * Keep remote matlab engine between tasks
-     */
+    /** Keep remote matlab engine between tasks */
     private boolean keepEngine = false;
 
-    /**
-     * Preferred Version to use
-     */
+    /** The tasks are in a separate JVM process */
+    private boolean fork = false;
+
+    /** The tasks are executed under the account of the current user */
+    private boolean runAsMe = false;
+
+    /** Preferred Version to use */
     private String versionPref = null;
 
-    /**
-     * Versions forbidden to use
-     */
+    /** Versions forbidden to use */
     private HashSet<String> versionRej = new HashSet<String>();
 
-    /**
-     * Minimum version to use
-     */
+    /** Minimum version to use */
     private String versionMin = null;
 
     /**
@@ -271,6 +268,22 @@ public class PASolveMatSciGlobalConfig implements Serializable {
         this.keepEngine = keepEngine;
     }
 
+    public boolean isFork() {
+        return this.fork;
+    }
+
+    public void setFork(boolean fork) {
+        this.fork = fork;
+    }
+
+    public boolean isRunAsMe() {
+        return this.runAsMe;
+    }
+
+    public void setRunAsMe(boolean runAsMe) {
+        this.runAsMe = runAsMe;
+    }
+
     public String getEnvMatFileName() {
         return envMatFileName;
     }
@@ -399,4 +412,67 @@ public class PASolveMatSciGlobalConfig implements Serializable {
         this.sourceZipHash = sourceZipHash;
     }
 
+    public void updateFromMap(Map<String, Serializable> map) {
+        Object obj;
+
+        obj = map.get("debug");
+        if (obj != null) {
+            this.debug = Boolean.parseBoolean((String) obj); // no need to check for null
+        }
+
+        obj = map.get("keepEngine");
+        if (obj != null) {
+            this.keepEngine = Boolean.parseBoolean((String) obj);
+        }
+
+        obj = map.get("runAsMe");
+        if (obj != null) {
+            this.runAsMe = Boolean.parseBoolean((String) obj);
+        }
+
+        obj = map.get("versionPref");
+        if (obj != null) {
+            this.versionPref = (String) obj;
+        }
+
+        obj = map.get("versionMin");
+        if (obj != null) {
+            this.versionMin = (String) obj;
+        }
+
+        obj = map.get("versionMax");
+        if (obj != null) {
+            this.versionMax = (String) obj;
+        }
+
+        obj = map.get("versionRej");
+        if (obj != null) {
+            this.setVersionRejAsString((String) obj);
+        }
+
+        obj = map.get("transferSource");
+        if (obj != null) {
+            this.transferSource = Boolean.parseBoolean((String) obj);
+        }
+
+        obj = map.get("sourceZipFileName");
+        if (obj != null) {
+            this.sourceZipFileName = (String) obj;
+        }
+
+        obj = map.get("zipFileHash");
+        if (obj != null) {
+            this.sourceZipHash = (String) obj;
+        }
+
+        obj = map.get("transferEnv");
+        if (obj != null) {
+            this.transferEnv = Boolean.parseBoolean((String) obj);
+        }
+
+        obj = map.get("envZipFileName");
+        if (obj != null) {
+            this.envZipFileName = (String) obj;
+        }
+    }
 }
