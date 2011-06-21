@@ -279,10 +279,7 @@ public class InternalJobFactory {
                 throw new Error("Internal error : implementation must be revised.", e);
             }
 
-            // HACK (see vbodnart): this is to bypass the fork but keep runAsMe
-            final boolean fork = task.isFork() && args.containsKey("nofork");
-
-            if (fork) {
+            if (task.isFork()) {
                 ForkedJavaExecutableContainer fjec = new ForkedJavaExecutableContainer(task
                         .getExecutableClassName(), args);
                 fjec.setForkEnvironment(task.getForkEnvironment());
