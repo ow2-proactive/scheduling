@@ -54,12 +54,13 @@ public class LoggingInterceptor implements PreProcessInterceptor, PostProcessInt
             if (headerSessionId != null) {
                 sessionid = headerSessionId.get(0);
             }
-            logger.debug(sessionid + "|" + httpMethod + "|" + uriPath);
+            if (logger.isDebugEnabled()) {
+                // log only in debug mode
+                logger.debug(sessionid + "|" + httpMethod + "|" + uriPath);
+            }
         }
         return null;
     }
-
-
 
     public void postProcess(ServerResponse response) {
 
@@ -77,11 +78,12 @@ public class LoggingInterceptor implements PreProcessInterceptor, PostProcessInt
         String uriPath = ui.getPath();
 
         if (logger.isDebugEnabled()) {
+            // in debug mode log anything
             logger.info(sessionid + "|" + uriPath + "|" + response.getStatus() + "|" +
                 response.getEntity().toString());
         } else {
             // log errors even in info mode
-            if ((response.getStatus() != HttpURLConnection.HTTP_OK) && (response.getStatus() >= 400)) {
+            if ((logger.isInfoEnabled()) && (response.getStatus() >= 300)) {
                 logger.info(sessionid + "|" + uriPath + "|" + response.getStatus() + "|" +
                     response.getEntity().toString());
             }
