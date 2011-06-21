@@ -61,7 +61,7 @@ public class ForkedJavaExecutableInitializer extends JavaExecutableInitializer {
     private JavaExecutableContainer javaExecutableContainer;
 
     /** Decrypter from launcher */
-    private OneShotDecrypter decrypter = null;
+    //private OneShotDecrypter decrypter = null;
 
     /** Dataspaces on forking JVM side */
     private DataSpacesFileObject local, input, output, global;
@@ -130,19 +130,19 @@ public class ForkedJavaExecutableInitializer extends JavaExecutableInitializer {
         this.javaExecutableContainer = javaExecutableContainer;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public OneShotDecrypter getDecrypter() {
-        return decrypter;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void setDecrypter(OneShotDecrypter decrypter) {
-        this.decrypter = decrypter;
-    }
+//    /**
+//     * {@inheritDoc}
+//     */
+//    public OneShotDecrypter getDecrypter() {
+//        return decrypter;
+//    }
+//
+//    /**
+//     * {@inheritDoc}
+//     */
+//    public void setDecrypter(OneShotDecrypter decrypter) {
+//        this.decrypter = decrypter;
+//    }
 
     /**
      * Set the dataspace accesses of the forking JVM.
