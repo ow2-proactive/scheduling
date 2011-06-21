@@ -113,7 +113,7 @@ public class MatlabConnectionRImpl implements MatlabConnection {
         out.flush();
         out.close();
 
-        process = createMatlabProcess("PAMain();");
+        process = createMatlabProcess("cd('"+this.workingDirectory+"');PAMain();");
 
         IOTools.LoggingThread lt1;
         IOTools.LoggingThread lt2;
@@ -146,6 +146,7 @@ public class MatlabConnectionRImpl implements MatlabConnection {
                 // ok process still exists
             }
             Thread.sleep(10);
+            cpt++;
         }
         if (ackFile.exists()) {
             ackFile.delete();
@@ -177,16 +178,13 @@ public class MatlabConnectionRImpl implements MatlabConnection {
         commandList.addAll(Arrays.asList(this.startUpOptions));
         commandList.add("-logfile");
         commandList.add(logFile.toString());
-        if (os == OperatingSystem.windows) {
-           commandList.add("-sd");
-           commandList.add(this.workingDirectory.toString());
-        }
         commandList.add("-r");
         commandList.add(runArg);
 
         String[] command = (String[]) commandList.toArray(new String[commandList.size()]);
 
         ProcessBuilder b = new ProcessBuilder();
+        // invalid on windows, it affects the starter only
         b.directory(this.workingDirectory);
         b.command(command);
 
