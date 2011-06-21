@@ -1,53 +1,17 @@
-/*
- * ################################################################
- *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
- *
- * Copyright (C) 1997-2011 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
- * the License.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
- *
- * If needed, contact us to obtain a release under GPL Version 2 or 3
- * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ActiveEon Team
- *                        http://www.activeeon.com/
- *  Contributor(s):
- *
- * ################################################################
- * $$ACTIVEEON_INITIAL_DEV$$
- */
-package org.ow2.proactive.scheduler.ext.matlab.worker;
+package org.ow2.proactive.scheduler.ext.scilab.worker;
 
 import org.objectweb.proactive.extensions.dataspaces.api.DataSpacesFileObject;
 import org.objectweb.proactive.utils.OperatingSystem;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
-import org.ow2.proactive.scheduler.ext.matlab.common.PASolveMatlabGlobalConfig;
-import org.ow2.proactive.scheduler.ext.matlab.common.PASolveMatlabTaskConfig;
-import org.ow2.proactive.scheduler.ext.matlab.common.exception.MatlabTaskException;
 import org.ow2.proactive.scheduler.ext.common.util.FileUtils;
-import org.ow2.proactive.scheduler.ext.matlab.worker.util.MatlabEngineConfig;
-import org.ow2.proactive.scheduler.ext.matlab.worker.util.MatlabFinder;
 import org.ow2.proactive.scheduler.ext.matsci.worker.util.MatSciEngineConfig;
 import org.ow2.proactive.scheduler.ext.matsci.worker.util.MatSciEngineConfigBase;
+import org.ow2.proactive.scheduler.ext.scilab.common.PASolveScilabGlobalConfig;
+import org.ow2.proactive.scheduler.ext.scilab.common.PASolveScilabTaskConfig;
+import org.ow2.proactive.scheduler.ext.scilab.common.exception.ScilabTaskException;
+import org.ow2.proactive.scheduler.ext.scilab.worker.util.ScilabEngineConfig;
+import org.ow2.proactive.scheduler.ext.scilab.worker.util.ScilabFinder;
 
 import java.io.*;
 import java.net.URI;
@@ -58,22 +22,11 @@ import java.util.Map;
 
 
 /**
- * This class represents the executable of a MATLAB task. It's configuration is
- * composed of :
- * <ul>
- * <li>An instance of {@link PASolveMatlabGlobalConfig}: The global configuration.
- * <li>An instance of {@link PASolveMatlabTaskConfig}: The task configuration.
- * <li>An instance of {@link MatlabEngineConfig}: The task configuration.
- * </ul>
- * The incoming calls order are: the {@link MatlabExecutable#MatlabExecutable()},
- * the {@link MatlabExecutable#init(Map)} method is called, then the {@link MatlabExecutable#execute(TaskResult...)} method.
- * The {@link MatlabExecutable#init(Map)} initializes configuration and file transfer logic, then
- * once all checks are done the execute method create a connection with MATLAB.
+ * ScilabExecutable
  *
  * @author The ProActive Team
  */
-public class MatlabExecutable extends JavaExecutable {
-
+public class ScilabExecutable extends JavaExecutable {
     /** The ISO8601 for debug format of the date that precedes the log message */
     private static final SimpleDateFormat ISO8601FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:sss");
 
@@ -81,38 +34,41 @@ public class MatlabExecutable extends JavaExecutable {
 
     private static OperatingSystem os;
 
+    private static char fs;
+
     static {
         try {
             HOSTNAME = java.net.InetAddress.getLocalHost().getHostName();
             os = OperatingSystem.getOperatingSystem();
+            fs = os.fileSeparator();
         } catch (UnknownHostException e) {
         }
     }
 
-    /** For debug purpose see {@link MatlabExecutable#createLogFileOnDebug()} */
+    /** For debug purpose see {@link ScilabExecutable#createLogFileOnDebug()} */
     private PrintWriter outDebugWriter;
 
     /** The global configuration */
-    private PASolveMatlabGlobalConfig paconfig;
+    private PASolveScilabGlobalConfig paconfig;
 
     /** The task configuration */
-    private PASolveMatlabTaskConfig taskconfig;
+    private PASolveScilabTaskConfig taskconfig;
 
-    /** The MATLAB configuration */
-    private MatlabEngineConfig matlabEngineConfig;
+    /** The SCILAB configuration */
+    private ScilabEngineConfig scilabEngineConfig;
 
     /** The root of the local space and a temporary dir inside */
     private File localSpaceRootDir, tempSubDir;
 
-    /** The connection to MATLAB from matlabcontrol API */
-    private MatlabConnection matlabConnection;
+    /** The connection to SCILAB from scilabcontrol API */
+    private ScilabConnection scilabConnection;
 
-    /** The MATLAB script to execute */
+    /** The SCILAB script to execute */
     private String script;
 
-    public MatlabExecutable() {
-        this.paconfig = new PASolveMatlabGlobalConfig();
-        this.taskconfig = new PASolveMatlabTaskConfig();
+    public ScilabExecutable() {
+        this.paconfig = new PASolveScilabGlobalConfig();
+        this.taskconfig = new PASolveScilabTaskConfig();
     }
 
     @Override
@@ -122,7 +78,7 @@ public class MatlabExecutable extends JavaExecutable {
         // Read global configuration
         obj = args.get("global_config");
         if (obj != null) {
-            this.paconfig = (PASolveMatlabGlobalConfig) obj;
+            this.paconfig = (PASolveScilabGlobalConfig) obj;
         }
 
         // Create a log file if debug is enabled
@@ -131,7 +87,7 @@ public class MatlabExecutable extends JavaExecutable {
         // Read task configuration
         obj = args.get("task_config");
         if (obj != null) {
-            this.taskconfig = (PASolveMatlabTaskConfig) obj;
+            this.taskconfig = (PASolveScilabTaskConfig) obj;
         }
 
         // Read the main script to execute
@@ -140,8 +96,8 @@ public class MatlabExecutable extends JavaExecutable {
             throw new java.lang.IllegalArgumentException("Unable to execute task, no script specified");
         }
 
-        // Initialize MATLAB location
-        this.initMatlabConfig();
+        // Initialize SCILAB location
+        this.initScilabConfig();
 
         // Initialize LOCAL SPACE
         this.initLocalSpace();
@@ -163,25 +119,23 @@ public class MatlabExecutable extends JavaExecutable {
             }
         }
 
-        final String matlabCmd = this.matlabEngineConfig.getFullCommand();
-        this.printLog("Acquiring MATLAB connection using " + matlabCmd);
+        final String scilabCmd = this.scilabEngineConfig.getFullCommand();
+        this.printLog("Acquiring SCILAB connection using " + scilabCmd);
 
-        // Acquire a connection to MATLAB
-        if (paconfig.isUseMatlabControl()) {
-            this.matlabConnection = new MatlabConnectionMCImpl();
-        } else {
-            this.matlabConnection = new MatlabConnectionRImpl();
-        }
-        matlabConnection.acquire(matlabCmd, this.localSpaceRootDir, this.paconfig, this.taskconfig);
+        // Acquire a connection to SCILAB
+
+        this.scilabConnection = new ScilabConnectionRImpl();
+
+        scilabConnection.acquire(scilabCmd, this.localSpaceRootDir, this.paconfig, this.taskconfig);
 
         Serializable result = null;
 
         try {
-            // Execute the MATLAB script and receive the result
+            // Execute the SCILAB script and receive the result
             result = this.executeScript();
         } finally {
-            this.printLog("Closing MATLAB...");
-            this.matlabConnection.release();
+            this.printLog("Closing SCILAB...");
+            this.scilabConnection.release();
         }
 
         printLog("Task completed successfully");
@@ -191,10 +145,10 @@ public class MatlabExecutable extends JavaExecutable {
 
     @Override
     public void kill() {
-        if (this.matlabConnection != null) {
+        if (this.scilabConnection != null) {
             // Release the connection
-            this.matlabConnection.release();
-            this.matlabConnection = null;
+            this.scilabConnection.release();
+            this.scilabConnection = null;
         }
 
         // The upper-class method will set this executable as killed
@@ -209,30 +163,24 @@ public class MatlabExecutable extends JavaExecutable {
     protected final Serializable executeScript() throws Throwable {
 
         // Add sources, load workspace and input variables
-        matlabConnection.init();
+        scilabConnection.init();
 
         this.addSources();
-        this.execCheckToolboxes();
-        this.execKeepAlive();
         this.loadWorkspace();
         this.loadInputVariables();
 
-        if (paconfig.isDebug()) {
-            matlabConnection.evalString("who");
-        }
+        printLog("Running SCILAB command: " + this.script);
 
-        printLog("Running MATLAB command: " + this.script);
+        scilabConnection.evalString(this.script);
 
-        matlabConnection.evalString(this.script);
-
-        printLog("MATLAB command completed successfully, receiving output... ");
+        printLog("SCILAB command completed successfully, receiving output... ");
 
         storeOutputVariable();
 
         // outputFiles
         transferOutputFiles();
 
-        matlabConnection.launch();
+        scilabConnection.launch();
 
         testOutput();
 
@@ -241,18 +189,18 @@ public class MatlabExecutable extends JavaExecutable {
 
     /*********** PRIVATE METHODS ***********/
 
-    protected MatSciEngineConfig initMatlabConfig() throws Exception {
-        MatlabEngineConfig conf = (MatlabEngineConfig) MatlabEngineConfig.getCurrentConfiguration();
+    protected MatSciEngineConfig initScilabConfig() throws Exception {
+        ScilabEngineConfig conf = (ScilabEngineConfig) ScilabEngineConfig.getCurrentConfiguration();
         if (conf == null) {
-            conf = (MatlabEngineConfig) MatlabFinder.getInstance().findMatSci(paconfig.getVersionPref(),
+            conf = (ScilabEngineConfig) ScilabFinder.getInstance().findMatSci(paconfig.getVersionPref(),
                     paconfig.getVersionRej(), paconfig.getVersionMin(), paconfig.getVersionMax());
             if (conf == null) {
-                throw new IllegalStateException("No valid Matlab configuration found, aborting...");
+                throw new IllegalStateException("No valid Scilab configuration found, aborting...");
             }
 
         }
-        matlabEngineConfig = conf;
-        return matlabEngineConfig;
+        scilabEngineConfig = conf;
+        return scilabEngineConfig;
     }
 
     private void initLocalSpace() throws Exception {
@@ -281,27 +229,28 @@ public class MatlabExecutable extends JavaExecutable {
     }
 
     private void initTransferSource() throws Exception {
-        // The sources are ALWAYS transfered and zipped
-        String sourceZipFileName = taskconfig.getSourceZipFileName();
-        if (sourceZipFileName == null) {
-            sourceZipFileName = paconfig.getSourceZipFileName();
-        }
-        taskconfig.setSourceZipFileURI(new URI(getLocalFile(
-                paconfig.getTempSubDirName() + "/" + sourceZipFileName).getRealURI()));
+        if (paconfig.isZipSourceFiles()) {
+            String sourceZipFileName = taskconfig.getSourceZipFileName();
+            if (sourceZipFileName == null) {
+                sourceZipFileName = paconfig.getSourceZipFileName();
+            }
+            taskconfig.setSourceZipFileURI(new URI(getLocalFile(
+                    paconfig.getTempSubDirName() + "/" + sourceZipFileName).getRealURI()));
 
-        File sourceZip = new File(taskconfig.getSourceZipFileURI());
+            File sourceZip = new File(taskconfig.getSourceZipFileURI());
 
-        printLog("Unzipping source files from " + sourceZip);
+            printLog("Unzipping source files from " + sourceZip);
 
-        if (!sourceZip.exists() || !sourceZip.canRead()) {
-            System.err.println("Error, source zip file cannot be accessed at " + sourceZip);
-            throw new IllegalStateException("Error, source zip file cannot be accessed at " + sourceZip);
-        }
+            if (!sourceZip.exists() || !sourceZip.canRead()) {
+                System.err.println("Error, source zip file cannot be accessed at " + sourceZip);
+                throw new IllegalStateException("Error, source zip file cannot be accessed at " + sourceZip);
+            }
 
-        // Uncompress the source files into the temp dir
-        if (!FileUtils.unzip(sourceZip, tempSubDir)) {
-            System.err.println("Unable to unzip source file " + sourceZip);
-            throw new IllegalStateException("Unable to unzip source file " + sourceZip);
+            // Uncompress the source files into the temp dir
+            if (!FileUtils.unzip(sourceZip, tempSubDir)) {
+                System.err.println("Unable to unzip source file " + sourceZip);
+                throw new IllegalStateException("Unable to unzip source file " + sourceZip);
+            }
         }
 
         if (paconfig.isDebug()) {
@@ -366,54 +315,23 @@ public class MatlabExecutable extends JavaExecutable {
 
     private void addSources() throws Exception {
         if (tempSubDir != null) {
-            printLog("Adding to matlabpath sources from " + tempSubDir);
+            printLog("Adding to scilabpath sources from " + tempSubDir);
             // Add unzipped source files to the MATALAB path
-            matlabConnection.evalString("addpath('" + tempSubDir + "');");
-        }
-    }
-
-    private void execCheckToolboxes() throws Exception {
-        StringBuilder checktoolboxesCommand = new StringBuilder(paconfig.getChecktoolboxesFunctionName() +
-            "( {");
-        String[] used = taskconfig.getToolboxesUsed();
-        for (int i = 0; i < used.length; i++) {
-            if (i < used.length - 1) {
-                checktoolboxesCommand.append("'" + used[i] + "',");
-            } else {
-                checktoolboxesCommand.append("'" + used[i] + "'");
+            scilabConnection.evalString("try;getd('" + tempSubDir + "');catch; end;");
+            if (taskconfig.getFunctionVarFiles() != null) {
+                for (String fileName : taskconfig.getFunctionVarFiles()) {
+                    scilabConnection.evalString("load('" + this.tempSubDir + fs + fileName + "');");
+                }
             }
         }
-        checktoolboxesCommand.append("},'" + localSpaceRootDir.toString() + "');");
-        printLog(checktoolboxesCommand.toString());
-        matlabConnection.execCheckToolboxes(checktoolboxesCommand.toString());
-    }
-
-    private void execKeepAlive() throws Exception {
-        printLog("Executing Keep-Alive timer");
-
-        StringBuilder keepAliveCommand = new StringBuilder(
-            "t = timer('Period', 300,'ExecutionMode','fixedRate');t.TimerFcn = { @" +
-                paconfig.getKeepaliveCallbackFunctionName() + ", {");
-        String[] used = taskconfig.getToolboxesUsed();
-        for (int i = 0; i < used.length; i++) {
-            if (i < used.length - 1) {
-                keepAliveCommand.append("'" + used[i] + "',");
-            } else {
-                keepAliveCommand.append("'" + used[i] + "'");
-            }
-        }
-        keepAliveCommand.append("}};start(t);");
-
-        printLog(keepAliveCommand.toString());
-        matlabConnection.evalString(keepAliveCommand.toString());
     }
 
     private void loadWorkspace() throws Exception {
         if (paconfig.isTransferEnv()) {
             File envMat = new File(taskconfig.getEnvMatFileURI());
             printLog("Loading workspace from " + envMat);
-            // Load workspace using MATLAB command
-            matlabConnection.evalString("load('" + envMat + "');");
+            // Load workspace using SCILAB command
+            scilabConnection.evalString("load('" + envMat + "');");
         }
     }
 
@@ -423,10 +341,10 @@ public class MatlabExecutable extends JavaExecutable {
 
         printLog("Loading input variables from " + inMat);
 
-        matlabConnection.evalString("load('" + inMat + "');");
+        scilabConnection.evalString("load('" + inMat + "');");
         if (taskconfig.getComposedInputVariablesFileURI() != null) {
             File compinMat = new File(taskconfig.getComposedInputVariablesFileURI());
-            matlabConnection.evalString("load('" + compinMat + "');in=out;clear out;");
+            scilabConnection.evalString("load('" + compinMat + "');in=out;clear out;");
         }
 
     }
@@ -436,15 +354,10 @@ public class MatlabExecutable extends JavaExecutable {
 
         printLog("Storing 'out' variable into " + outputFile);
 
-        if (paconfig.getMatFileOptions() != null) {
-            matlabConnection.evalString("save('" + outputFile + "','out','" + paconfig.getMatFileOptions() +
-                "');");
-        } else {
-            matlabConnection.evalString("save('" + outputFile + "','out');");
-        }
+        scilabConnection.evalString("save('" + outputFile + "',out);");
 
         //if (!outputFile.exists()) {
-        //    throw new MatlabTaskException("Unable to store 'out' variable, the output file does not exist");
+        //    throw new ScilabTaskException("Unable to store 'out' variable, the output file does not exist");
         //}
     }
 
@@ -463,8 +376,9 @@ public class MatlabExecutable extends JavaExecutable {
                 String updatedFile = outputFiles[i].replaceAll("/", File.separator);
                 //conn.evalString("ProActiveOutputFiles{"+(i+1)+"}='"+updatedFile+"';");
                 //}
-                matlabConnection.evalString("zip('" + outputZip + "',{'" + updatedFile + "'});");
+                FileUtils.zip(outputZip, new File[] { new File(updatedFile) });
             }
+
         }
     }
 
@@ -474,7 +388,7 @@ public class MatlabExecutable extends JavaExecutable {
         File outputFile = new File(tempSubDir, taskconfig.getOutputVariablesFileName());
 
         if (!outputFile.exists()) {
-            throw new MatlabTaskException("Cannot find output variable file.");
+            throw new ScilabTaskException("Cannot find output variable file.");
         }
 
     }
@@ -514,7 +428,7 @@ public class MatlabExecutable extends JavaExecutable {
         if (!nodeTmpDir.exists()) {
             nodeTmpDir.mkdirs();
         }
-        File logFile = new File(tmpPath, "MatlabExecutable_" + nodeName + ".log");
+        File logFile = new File(tmpPath, "ScilabExecutable_" + nodeName + ".log");
         if (!logFile.exists()) {
             logFile.createNewFile();
         }

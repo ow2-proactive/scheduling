@@ -43,9 +43,11 @@ import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.exceptions.FutureMonitoringPingFailureException;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
+import org.objectweb.proactive.extensions.dataspaces.api.DataSpacesFileObject;
 import org.objectweb.proactive.utils.OperatingSystem;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
+import org.ow2.proactive.scheduler.ext.common.util.FileUtils;
 import org.ow2.proactive.scheduler.ext.common.util.IOTools;
 import org.ow2.proactive.scheduler.ext.matsci.common.JVMSpawnHelper;
 import org.ow2.proactive.scheduler.ext.matsci.common.PASolveMatSciGlobalConfig;
@@ -220,6 +222,12 @@ public abstract class MatSciTask<W extends MatSciWorker, C extends MatSciEngineC
 
         }
 
+        DataSpacesFileObject dsLocalSpace = this.getLocalSpace();
+        String dsURI = dsLocalSpace.getRealURI();
+
+        File localSpaceRootDir = new File(new URI(dsURI));
+        File tempSubDir = new File(localSpaceRootDir, this.paconfig.getTempSubDirName());
+
         if (paconfig.isTransferSource()) {
             if (paconfig.isZipSourceFiles()) {
                 if (taskconfig.getSourceZipFileName() != null) {
@@ -230,6 +238,27 @@ public abstract class MatSciTask<W extends MatSciWorker, C extends MatSciEngineC
                     taskconfig.setSourceZipFileURI(new URI(getLocalFile(
                             paconfig.getTempSubDirName() + "/" + paconfig.getSourceZipFileName())
                             .getRealURI()));
+                }
+
+                File sourceZip = new File(taskconfig.getSourceZipFileURI());
+
+                if (paconfig.isDebug()) {
+                    System.out.println("[" + new java.util.Date() + " " + host + " " +
+                        this.getClass().getSimpleName() + "] Unzipping source files from " + sourceZip);
+                    outDebug.println("[" + new java.util.Date() + " " + host + " " +
+                        this.getClass().getSimpleName() + "] Unzipping source files from " + sourceZip);
+                }
+
+                if (!sourceZip.exists() || !sourceZip.canRead()) {
+                    System.err.println("Error, source zip file cannot be accessed at " + sourceZip);
+                    throw new IllegalStateException("Error, source zip file cannot be accessed at " +
+                        sourceZip);
+                }
+
+                // Uncompress the source files into the temp dir
+                if (!FileUtils.unzip(sourceZip, tempSubDir)) {
+                    System.err.println("Unable to unzip source file " + sourceZip);
+                    throw new IllegalStateException("Unable to unzip source file " + sourceZip);
                 }
             } else {
                 if (taskconfig.getSourceNames() != null) {
@@ -746,22 +775,16 @@ public abstract class MatSciTask<W extends MatSciWorker, C extends MatSciEngineC
             }
             // We define the loggers which will write on standard output what comes from the java process
             IOTools.LoggingThread lt1;
-            IOTools.LoggingThread lt2;
             if (paconfig.isDebug()) {
-                lt1 = new IOTools.LoggingThread(jvminfo.getProcess().getInputStream(), "[" + host + " OUT]",
-                    System.out, outDebug);// new PrintStream(new File("D:\\test_out.txt")));//System.out);
-                lt2 = new IOTools.LoggingThread(jvminfo.getProcess().getErrorStream(), "[" + host + " ERR]",
-                    System.err, outDebug);// new PrintStream(new File("D:\\test_err.txt")));//System.err);
+                lt1 = new IOTools.LoggingThread(jvminfo.getProcess(), "[ " + host + " ]", System.out,
+                    System.err, outDebug);
 
             } else {
-                lt1 = new IOTools.LoggingThread(jvminfo.getProcess().getInputStream(), "[" + host + " OUT]",
-                    System.out, null, null, null);// new PrintStream(new File("D:\\test_out.txt")));//System.out);
-                lt2 = new IOTools.LoggingThread(jvminfo.getProcess().getErrorStream(), "[" + host + " ERR]",
-                    System.err, null, null, null);// new PrintStream(new File("D:\\test_err.txt")));//System.err);
+                lt1 = new IOTools.LoggingThread(jvminfo.getProcess(), "[" + host + " OUT]", System.out,
+                    System.err, null, null, null);
             }
 
             jvminfo.setLogger(lt1);
-            jvminfo.setEsLogger(lt2);
 
             IOTools.RedirectionThread rt1 = null;
             if (serverConfig.isDeployIoThread()) {
@@ -774,10 +797,6 @@ public abstract class MatSciTask<W extends MatSciWorker, C extends MatSciEngineC
             Thread t1 = new Thread(lt1, "OUT " + getExtensionName());
             t1.setDaemon(true);
             t1.start();
-
-            Thread t2 = new Thread(lt2, "ERR " + getExtensionName());
-            t2.setDaemon(true);
-            t2.start();
 
             if (serverConfig.isDeployIoThread()) {
                 Thread t3 = new Thread(rt1, "Redirecting I/O Scilab");
@@ -800,29 +819,25 @@ public abstract class MatSciTask<W extends MatSciWorker, C extends MatSciEngineC
                     this.getClass().getSimpleName() + "] Connecting process out to threads");
             }
 
-            jvminfo.getLogger().setInputStream(jvminfo.getProcess().getInputStream());
-            jvminfo.getEsLogger().setInputStream(jvminfo.getProcess().getErrorStream());
+            jvminfo.getLogger().setProcess(jvminfo.getProcess());
+
             if (serverConfig.isDeployIoThread()) {
                 jvminfo.getIoThread().setOutputStream(jvminfo.getProcess().getOutputStream());
             }
 
             if (!redeploying) {
                 if (paconfig.isDebug()) {
-                    jvminfo.getLogger().setStream(System.out, outDebug);
-                    jvminfo.getEsLogger().setStream(System.err, outDebug);
+                    jvminfo.getLogger().setOutStream(System.out, System.err, outDebug);
                 } else {
-                    jvminfo.getLogger().setStream(System.out);
-                    jvminfo.getEsLogger().setStream(System.err);
+                    jvminfo.getLogger().setOutStream(System.out, System.err);
                 }
             }
             startingProcess = false;
         } else {
             if (paconfig.isDebug()) {
-                jvminfo.getLogger().setStream(System.out, outDebug);
-                jvminfo.getEsLogger().setStream(System.err, outDebug);
+                jvminfo.getLogger().setOutStream(System.out, System.err, outDebug);
             } else {
-                jvminfo.getLogger().setStream(System.out);
-                jvminfo.getEsLogger().setStream(System.err);
+                jvminfo.getLogger().setOutStream(System.out, System.err);
             }
         }
 

@@ -74,11 +74,6 @@ public class ScilabTask<W extends AOScilabWorker> extends
     protected String inputScript = null;
 
     /**
-     * Definition of user functions
-     */
-    protected String functionsDefinition = null;
-
-    /**
      * Scilab Function name
      */
 
@@ -226,11 +221,6 @@ public class ScilabTask<W extends AOScilabWorker> extends
             inputScript = input;
         }
 
-        String functionsDef = (String) args.get("functionsDefinition");
-        if (functionsDef != null) {
-            functionsDefinition = functionsDef;
-        }
-
         String funcn = (String) args.get("functionName");
         if (funcn != null) {
             functionName = funcn;
@@ -254,7 +244,6 @@ public class ScilabTask<W extends AOScilabWorker> extends
         }
         if (jvminfo.getLogger() != null) {
             jvminfo.getLogger().closeStream();
-            jvminfo.getEsLogger().closeStream();
         }
 
     }
@@ -265,8 +254,7 @@ public class ScilabTask<W extends AOScilabWorker> extends
     }
 
     protected void initWorker(W worker) throws Throwable {
-        worker.init(inputScript, functionName, functionsDefinition, scriptLines, out_set, paconfig,
-                taskconfig, scilabEngineConfig);
+        worker.init(inputScript, functionName, scriptLines, paconfig, taskconfig, scilabEngineConfig);
     }
 
     public void initProcess(DummyJVMProcess javaCommandBuilder, Map<String, String> env) throws Throwable {

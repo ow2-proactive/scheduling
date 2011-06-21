@@ -34,13 +34,15 @@
  * ################################################################
  * $$ACTIVEEON_INITIAL_DEV$$
  */
-package org.ow2.proactive.scheduler.ext.matlab.worker.util;
+package org.ow2.proactive.scheduler.ext.common.util;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+import java.util.zip.ZipOutputStream;
 
 
 /**
@@ -92,5 +94,82 @@ public final class FileUtils {
             return false;
         }
         return true;
+    }
+
+    /**
+     * Uncompresses the zip archive into the specified directory.
+     *
+     * @param zipFile contains the archive to unzip
+     * @param destDir the destination directory that will contain unzipped files
+     * @return Returns true if the unzip was successful, false otherwise
+     */
+    public static boolean unzip(final String zipFile, final String destDir) {
+        return unzip(new File(zipFile), new File(destDir));
+    }
+
+    /**
+     * compresses the specified files into a zip archive
+     *
+     * @param zipFile contains the zip archive name
+     * @param files files to put in the archive
+     * @return Returns true if the zip was successful, false otherwise
+     */
+    public static boolean zip(final File zipFile, final File[] files) {
+        ZipOutputStream out = null;
+        try {
+            byte[] buffer = new byte[4096]; // Create a buffer for copying
+            int bytesRead;
+
+            out = new ZipOutputStream(new FileOutputStream(zipFile));
+
+            for (File f : files) {
+                FileInputStream in = null;
+                try {
+                    if (f.isDirectory())
+                        continue;//Ignore directory
+                    in = new FileInputStream(f); // Stream to read file
+                    ZipEntry entry = new ZipEntry(f.getPath()); // Make a ZipEntry
+                    out.putNextEntry(entry); // Store entry
+                    while ((bytesRead = in.read(buffer)) != -1)
+                        out.write(buffer, 0, bytesRead);
+                    in.close();
+                } finally {
+                    if (in != null) {
+                        try {
+                            in.close();
+                        } catch (IOException e) {
+
+                        }
+                    }
+                }
+            }
+            out.close();
+        } catch (Exception e) {
+            return false;
+        } finally {
+            if (out != null) {
+                try {
+                    out.close();
+                } catch (IOException e) {
+
+                }
+            }
+        }
+        return true;
+    }
+
+    /**
+     * compresses the specified files into a zip archive
+     *
+     * @param zipFile contains the zip archive name
+     * @param files files to put in the archive
+     * @return Returns true if the zip was successful, false otherwise
+     */
+    public static boolean zip(final String zipFile, final String[] files) {
+        File[] ffiles = new File[files.length];
+        for (int i = 0; i < files.length; i++) {
+            ffiles[i] = new File(files[i]);
+        }
+        return zip(new File(zipFile), ffiles);
     }
 }

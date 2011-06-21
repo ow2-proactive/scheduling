@@ -2,6 +2,8 @@ function [] = PAinit()
 
     global ('PA_initialized', 'PA_scheduler_dir')
 
+    jautoUnwrap(%t);
+
     version = ver();
     if strtod(part(version(1,2),1)) < 5
         error('This toolkit cannot be run on a version of Scilab anterior to version 5');
@@ -26,19 +28,19 @@ function [] = PAinit()
     end    
     opt=PAoptions();
 
-    clzfile = class('java.io.File');
+    jimport java.io.File;
         
     // Log4J file
-    log4jFile = newInstance(clzfile,strcat([PA_scheduler_dir, filesep(), 'config', filesep(), 'log4j', filesep(), 'log4j-client']));
-    log4jFileUri = invoke(log4jFile,'toURI');
-    urlLog4jFile = invoke(log4jFileUri,'toURL');
-    finalstring = invoke(urlLog4jFile,'toExternalForm');
-    system_setproperty('log4j.configuration',unwrap(finalstring));
+    log4jFile = File.new(strcat([PA_scheduler_dir, filesep(), 'config', filesep(), 'log4j', filesep(), 'log4j-client']));
+    log4jFileUri = jinvoke(log4jFile,'toURI');
+    urlLog4jFile = jinvoke(log4jFileUri,'toURL');
+    finalstring = jinvoke(urlLog4jFile,'toExternalForm');
+    system_setproperty('log4j.configuration',finalstring);
     system_setproperty('proactive.configuration', opt.ProActiveConfiguration);
 
     // Policy
-    system_setproperty('java.security.policy',strcat([PA_scheduler_dir, filesep(), 'config', filesep(), 'scheduler.java.policy']));    
-    
+    system_setproperty('java.security.policy',strcat([PA_scheduler_dir, filesep(), 'config', filesep(), 'security.java.policy-client']));
+    jremove(log4jFile);
 
     sep=pathsep();
 

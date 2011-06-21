@@ -93,7 +93,7 @@ public class ScilabSolver {
         return result.toString();
     }
 
-    public static String createConnection(String url) {
+    public static String createConnection(String url) throws Exception {
         try {
             if (scilabSolver == null) {
 

@@ -36,7 +36,7 @@
  */
 package org.ow2.proactive.scheduler.ext.matlab.worker;
 
-import com.activeeon.licensing.remote.LicensingClient;
+import com.activeeon.proactive.license_saver.client.LicenseSaverClient;
 import matlabcontrol.*;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.utils.OperatingSystem;
@@ -44,6 +44,7 @@ import org.ow2.proactive.scheduler.ext.matlab.common.PASolveMatlabGlobalConfig;
 import org.ow2.proactive.scheduler.ext.matlab.common.PASolveMatlabTaskConfig;
 import org.ow2.proactive.scheduler.ext.matlab.common.exception.MatlabInitException;
 import org.ow2.proactive.scheduler.ext.matlab.common.exception.MatlabTaskException;
+import org.ow2.proactive.scheduler.ext.matlab.common.exception.UnreachableLicenseProxyException;
 import org.ow2.proactive.scheduler.ext.matlab.common.exception.UnsufficientLicencesException;
 import org.ow2.proactive.scheduler.ext.matsci.worker.util.MatSciEngineConfigBase;
 
@@ -76,7 +77,7 @@ public class MatlabConnectionMCImpl implements MatlabConnection {
     private PASolveMatlabGlobalConfig paconfig;
     private PASolveMatlabTaskConfig tconfig;
 
-    private LicensingClient lclient;
+    private LicenseSaverClient lclient;
 
     protected String[] startUpOptions;
 
@@ -100,9 +101,11 @@ public class MatlabConnectionMCImpl implements MatlabConnection {
 
         if (paconfig.getLicenseServerUrl() != null) {
             try {
-                this.lclient = new LicensingClient(paconfig.getLicenseServerUrl());
+                this.lclient = new LicenseSaverClient(paconfig.getLicenseServerUrl());
             } catch (ProActiveException e) {
-                e.printStackTrace();
+                throw new MatlabInitException(new UnreachableLicenseProxyException(
+                    "License Proxy Server at url " + paconfig.getLicenseServerUrl() +
+                        " could not be contacted.", e));
             }
         }
 
@@ -129,6 +132,13 @@ public class MatlabConnectionMCImpl implements MatlabConnection {
                 "Unable to create the MATLAB proxy factory. Possible causes: registry cannot be created or the receiver cannot be bind");
             me.initCause(e);
 
+            try {
+                sendAck(false);
+            } catch (Exception e1) {
+                // We print the exception though ignore it (general failure case)
+                e1.printStackTrace();
+            }
+
             throw me;
         }
 
@@ -151,8 +161,11 @@ public class MatlabConnectionMCImpl implements MatlabConnection {
             // even if we didn't managed to get the proxy
             processCreator.killProcess();
 
-            if (lclient != null) {
-                lclient.notifyLicenseStatus(tconfig.getRid(), false);
+            try {
+                sendAck(false);
+            } catch (Exception e1) {
+                // We print the exception though ignore it (general failure case)
+                e1.printStackTrace();
             }
 
             throw me;
@@ -251,7 +264,7 @@ public class MatlabConnectionMCImpl implements MatlabConnection {
 
     }
 
-    public void execCheckToolboxes(String command) {
+    public void execCheckToolboxes(String command) throws Exception {
         evalString(command);
 
         // wait for ack or nack files to make sure all toolbox licences are available
@@ -269,24 +282,18 @@ public class MatlabConnectionMCImpl implements MatlabConnection {
             throw new MatlabInitException(e);
         }
         if (ackFile.exists()) {
-            if (lclient != null) {
-                lclient.notifyLicenseStatus(tconfig.getRid(), true);
-            }
             ackFile.delete();
+            sendAck(true);
         }
 
         if (nackFile.exists()) {
             nackFile.delete();
-            if (lclient != null) {
-                lclient.notifyLicenseStatus(tconfig.getRid(), false);
-            }
+            sendAck(false);
             release();
             throw new UnsufficientLicencesException();
         }
         if (cpt >= TIMEOUT_START) {
-            if (lclient != null) {
-                lclient.notifyLicenseStatus(tconfig.getRid(), false);
-            }
+            sendAck(false);
             release();
             throw new MatlabInitException("Timeout occured while waiting for ack file");
         }
@@ -294,6 +301,23 @@ public class MatlabConnectionMCImpl implements MatlabConnection {
     }
 
     /*********** PRIVATE INTERNAL CLASS ***********/
+
+    /**
+     * Send Ack to the LicenseSaverClient
+     * @param ack
+     * @throws Exception
+     */
+    protected void sendAck(boolean ack) throws Exception {
+        if (lclient != null) {
+            try {
+                lclient.notifyLicenseStatus(tconfig.getRid(), ack);
+            } catch (Exception e) {
+                throw new UnreachableLicenseProxyException(
+                    "Error while sending ack to License Proxy Server at url " +
+                        paconfig.getLicenseServerUrl(), e);
+            }
+        }
+    }
 
     /**
      * This class is used to create a MATLAB process under a specific user

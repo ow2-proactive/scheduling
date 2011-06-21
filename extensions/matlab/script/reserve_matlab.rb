@@ -177,8 +177,8 @@ class ReserveMatlab
 
     log(Date.new().to_string()+" : Executing toolbox checking script on " + @host)
     begin
-      import com.activeeon.licensing.remote.LicensingClient
-      import com.activeeon.licensing.LicenseRequest
+      import com.activeeon.proactive.license_saver.client.LicenseSaverClient
+      import com.activeeon.proactive.license_saver.LicenseRequest
     rescue Exception => e
       log("Warning : Licensing proxy classes not found, license checking disabled")
       return true
@@ -196,10 +196,10 @@ class ReserveMatlab
          return true
       end
       begin
-        client = LicensingClient.new(serverurl)
+        client = LicenseSaverClient.new(serverurl)
       rescue Exception => e
-        log("Warning : Licensing proxy cannot be found at url : "+serverurl +" , license checking disabled")
-        return true
+        log("Error : Licensing proxy cannot be found at url : "+serverurl +" , host not selected")
+        return false
       end
       if $args.length > 3
         feat_set = HashSet.new();

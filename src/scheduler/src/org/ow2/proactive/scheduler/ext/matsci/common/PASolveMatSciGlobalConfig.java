@@ -97,6 +97,10 @@ public class PASolveMatSciGlobalConfig implements Serializable {
 
     protected URI localSpace;
 
+    private String[] windowsStartupOptions = null;
+
+    private String[] linuxStartupOptions = null;
+
     /**
      * Name of source zip file
      */
@@ -383,6 +387,38 @@ public class PASolveMatSciGlobalConfig implements Serializable {
 
     public void setSourceZipFileName(String sourceZipFileName) {
         this.sourceZipFileName = sourceZipFileName;
+    }
+
+    public String[] getWindowsStartupOptions() {
+        return windowsStartupOptions;
+    }
+
+    public void setWindowsStartupOptions(String[] windowsStartupOptions) {
+        this.windowsStartupOptions = windowsStartupOptions;
+    }
+
+    public String[] getLinuxStartupOptions() {
+        return linuxStartupOptions;
+    }
+
+    public void setLinuxStartupOptions(String[] linuxStartupOptions) {
+        this.linuxStartupOptions = linuxStartupOptions;
+    }
+
+    public void setLinuxStartupOptionsAsString(String options) {
+        if ((options != null) && (options.length() > 0)) {
+            options = options.trim();
+            linuxStartupOptions = options.split("[ ,;]+");
+
+        }
+    }
+
+    public void setWindowsStartupOptionsAsString(String options) {
+        if ((options != null) && (options.length() > 0)) {
+            options = options.trim();
+            windowsStartupOptions = options.split("[ ,;]+");
+
+        }
     }
 
 }

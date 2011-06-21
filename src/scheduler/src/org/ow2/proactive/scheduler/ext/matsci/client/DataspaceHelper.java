@@ -136,24 +136,15 @@ public class DataspaceHelper implements ProcessInitializer, ProcessListener {
                 process = helper.startProcess(nodeName, this, this);
 
                 IOTools.LoggingThread lt1;
-                IOTools.LoggingThread lt2;
                 if (debug) {
-                    lt1 = new IOTools.LoggingThread(process.getInputStream(), "[DS OUT]", System.out,
-                        outDebug);
-                    lt2 = new IOTools.LoggingThread(process.getErrorStream(), "[DS ERR]", System.err,
-                        outDebug);
+                    lt1 = new IOTools.LoggingThread(process, "[DS]", System.out, System.err, outDebug);
 
                 } else {
-                    lt1 = new IOTools.LoggingThread(process.getInputStream());
-                    lt2 = new IOTools.LoggingThread(process.getErrorStream());
+                    lt1 = new IOTools.LoggingThread(process);
                 }
                 Thread t1 = new Thread(lt1, "OUT DS");
                 t1.setDaemon(true);
                 t1.start();
-
-                Thread t2 = new Thread(lt2, "ERR DS");
-                t2.setDaemon(true);
-                t2.start();
 
                 helper.waitForRegistration(process);
 

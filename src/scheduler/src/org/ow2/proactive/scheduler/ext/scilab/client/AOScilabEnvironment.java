@@ -54,6 +54,7 @@ import org.ow2.proactive.scheduler.ext.matsci.client.*;
 import org.ow2.proactive.scheduler.ext.scilab.common.PASolveScilabGlobalConfig;
 import org.ow2.proactive.scheduler.ext.scilab.common.PASolveScilabTaskConfig;
 import org.ow2.proactive.scheduler.ext.scilab.common.exception.ScilabTaskException;
+import org.ow2.proactive.scheduler.ext.scilab.worker.ScilabExecutable;
 import org.ow2.proactive.scheduler.ext.scilab.worker.ScilabTask;
 import org.ow2.proactive.scripting.InvalidScriptException;
 import org.ow2.proactive.scripting.SelectionScript;
@@ -198,7 +199,6 @@ public class AOScilabEnvironment extends AOMatSciEnvironment<ScilabType, ScilabR
                 schedulerTask.addArgument("input", taskConfigs[i][j].getInputScript());
                 schedulerTask.addArgument("script", taskConfigs[i][j].getMainScript());
                 schedulerTask.addArgument("functionName", taskConfigs[i][j].getFunctionName());
-                schedulerTask.addArgument("functionsDefinition", taskConfigs[i][j].getFunctionDefinition());
                 schedulerTask.addArgument("outputs", taskConfigs[i][j].getOutputs());
                 if (oldTask != null) {
                     schedulerTask.addDependence(oldTask);
@@ -264,7 +264,11 @@ public class AOScilabEnvironment extends AOMatSciEnvironment<ScilabType, ScilabR
                     schedulerTask.setDescription(taskConfigs[i][j].getMainScript());
                 }
 
-                schedulerTask.setExecutableClassName(ScilabTask.class.getName());
+                if (config.isKeepEngine()) {
+                    schedulerTask.setExecutableClassName(ScilabTask.class.getName());
+                } else {
+                    schedulerTask.setExecutableClassName(ScilabExecutable.class.getName());
+                }
 
                 if (taskConfigs[i][j].getCustomScriptUrl() != null) {
                     URL url = new URL(taskConfigs[i][j].getCustomScriptUrl());

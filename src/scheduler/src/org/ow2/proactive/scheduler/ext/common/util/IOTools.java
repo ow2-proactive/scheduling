@@ -37,6 +37,7 @@
 package org.ow2.proactive.scheduler.ext.common.util;
 
 import java.io.*;
+import java.net.UnknownHostException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -204,11 +205,27 @@ public class IOTools {
 
         public Boolean patternFound = false;
         private PrintStream out;
-        private BufferedReader br;
+        private PrintStream err;
+
+        private Process p;
+
+        private BufferedReader brout;
+        private BufferedReader brerr;
+
+        private boolean lastline_err = false;
 
         private String startpattern;
         private String stoppattern;
         private String patternToFind;
+
+        private static String HOSTNAME;
+
+        static {
+            try {
+                HOSTNAME = java.net.InetAddress.getLocalHost().getHostName();
+            } catch (UnknownHostException e) {
+            }
+        }
 
         /**  */
         public ArrayList<String> output = new ArrayList<String>();
@@ -224,131 +241,100 @@ public class IOTools {
         /**
          * Create a new instance of LoggingThread.
          *
-         * @param is
+         * @param p
          * @param appendMessage
-         * @param err
+         * @param out
          */
-        public LoggingThread(InputStream is, String appendMessage, boolean err) {
-            this.br = new BufferedReader(new InputStreamReader(is));
+        public LoggingThread(Process p, String appendMessage, PrintStream out, PrintStream err,
+                String startpattern, String stoppattern, String patternToFind) {
+            this(p, appendMessage, out, err, null, startpattern, stoppattern, patternToFind);
+        }
+
+        public LoggingThread(Process p, String appendMessage, PrintStream out, PrintStream err,
+                PrintStream ds, String startpattern, String stoppattern, String patternToFind) {
+            this.brout = new BufferedReader(new InputStreamReader(p.getInputStream()));
+            this.brerr = new BufferedReader(new InputStreamReader(p.getErrorStream()));
             this.appendMessage = appendMessage;
-            if (err) {
-                this.out = System.err;
-            } else {
-                this.out = System.out;
-            }
+            this.out = out;
+            this.err = err;
+            this.debugStream = ds;
+            this.startpattern = startpattern;
+            this.stoppattern = stoppattern;
+            this.patternToFind = patternToFind;
+            this.p = p;
         }
 
         /**
          * Create a new instance of LoggingThread.
          *
-         * @param is
+         * @param p
          * @param appendMessage
          * @param out
          */
-        public LoggingThread(InputStream is, String appendMessage, PrintStream out, String startpattern,
-                String stoppattern, String patternToFind) {
-            this(is, appendMessage, out, null, startpattern, stoppattern, patternToFind);
+        public LoggingThread(Process p, String appendMessage, PrintStream out, PrintStream err, PrintStream ds) {
+            this(p, appendMessage, out, err, ds, null, null, null);
         }
 
-        public LoggingThread(InputStream is, String appendMessage, PrintStream out, PrintStream ds,
-                String startpattern, String stoppattern, String patternToFind) {
-            this.br = new BufferedReader(new InputStreamReader(is));
-            this.appendMessage = appendMessage;
-            this.out = out;
-            this.debugStream = ds;
-            this.startpattern = startpattern;
-            this.stoppattern = stoppattern;
-            this.patternToFind = patternToFind;
-        }
-
-        /**
-        * Create a new instance of LoggingThread.
-        *
-        * @param is
-        * @param appendMessage
-        * @param out
-        */
-        public LoggingThread(InputStream is, String appendMessage, PrintStream out, PrintStream ds) {
-            this(is, appendMessage, out, ds, null, null, null);
-        }
-
-        public LoggingThread(InputStream is) {
-            this.br = new BufferedReader(new InputStreamReader(is));
+        public LoggingThread(Process p) {
+            this.brout = new BufferedReader(new InputStreamReader(p.getInputStream()));
+            this.brerr = new BufferedReader(new InputStreamReader(p.getErrorStream()));
             this.out = null;
+            this.err = null;
             this.appendMessage = null;
+            this.p = p;
         }
 
         private String getLineOrDie() {
             String answer = null;
             try {
 
-                while (!ready() && goon) {
-                    Thread.sleep(10);
+                while (goon) {
+                    if (readyout()) {
+                        answer = brout.readLine();
+                        lastline_err = false;
+                        return answer;
+                    } else if (readyerr()) {
+                        answer = brerr.readLine();
+                        lastline_err = true;
+                        return answer;
+                    } else {
+                        try {
+                            p.exitValue();
+                            return null;
+                        } catch (IllegalThreadStateException ex) {
+                            //Expected behaviour
+                        }
+                    }
+
+                    try {
+                        Thread.sleep(1);
+                    } catch (InterruptedException e) {
+                        goon = false;
+                    }
                 }
-                answer = readLine();
+            } catch (IOException e) {
+                return null;
+            } finally {
                 if (patternToFind != null) {
                     if (answer != null && answer.contains(patternToFind)) {
                         patternFound = true;
                     }
                 }
-
-            } catch (IOException e) {
-
-            } catch (InterruptedException e) {
-                goon = false;
-            }
-            return answer;
-        }
-
-        private boolean ready() throws IOException {
-            synchronized (br) {
-                return br.ready();
-            }
-        }
-
-        private String readLine() throws IOException {
-            StringBuilder line = new StringBuilder(200);
-            int chr;
-            boolean r = false;
-
-            while (goon) {
-                while (!ready() && goon) {
-                    try {
-                        Thread.sleep(10);
-                    } catch (InterruptedException e) {
-                        goon = false;
-                    }
-                }
-                if (!goon) {
-                    return null;
-                }
-
-                synchronized (br) {
-                    chr = br.read();
-                }
-                if (chr < 0) {
-                    return line.toString();
-                } else if (chr == '\n') {
-                    return line.toString();
-                } else if (chr == '\r') {
-                    if (r) {
-                        br.reset();
-                        return line.toString();
-                    } else {
-                        r = true;
-                        br.mark(3);
-                    }
-                } else {
-                    if (r) {
-                        br.reset();
-                        return line.toString();
-                    } else {
-                        line.append((char) chr);
-                    }
-                }
             }
             return null;
+        }
 
+        private boolean readyout() throws IOException {
+            synchronized (brout) {
+                return brout.ready();
+            }
+        }
+
+        private boolean readyerr() throws IOException {
+            // We use only brout in locks
+            synchronized (brout) {
+                return brerr.ready();
+            }
         }
 
         /**
@@ -372,29 +358,15 @@ public class IOTools {
                                 continue;
                             }
                             first_line = false;
+                            printLine(line);
 
-                            out.println("[ " + new java.util.Date() + " ]" + appendMessage + line);
-                            out.flush();
-
-                            if (debugStream != null) {
-                                debugStream
-                                        .println("[ " + new java.util.Date() + " ]" + appendMessage + line);
-                                debugStream.flush();
-
-                            }
                         } else if (!first_line) {
                             if ((stoppattern != null) && (line.contains(stoppattern))) {
                                 // at the stoppattern, we exit
                                 goon = false;
                             } else {
-                                out.println("[ " + new java.util.Date() + " ]" + appendMessage + line);
-                                out.flush();
+                                printLine(line);
 
-                                if (debugStream != null) {
-                                    debugStream.println("[ " + new java.util.Date() + " ]" + appendMessage +
-                                        line);
-                                    debugStream.flush();
-                                }
                             }
                         }
                     }
@@ -406,9 +378,32 @@ public class IOTools {
                 }
 
             try {
-                br.close();
+                brout.close();
+                brerr.close();
             } catch (IOException e) {
                 e.printStackTrace();
+            }
+        }
+
+        private void printLine(String line) {
+            if (debugStream == null) {
+                if (lastline_err) {
+                    err.println("[ " + HOSTNAME + " ] " + line);
+                    err.flush();
+                } else {
+                    out.println("[ " + HOSTNAME + " ] " + line);
+                    out.flush();
+                }
+            } else {
+                if (lastline_err) {
+                    err.println("[ " + HOSTNAME + " " + new java.util.Date() + " ]" + appendMessage + line);
+                    err.flush();
+                } else {
+                    out.println("[ " + HOSTNAME + " " + new java.util.Date() + " ]" + appendMessage + line);
+                    out.flush();
+                }
+                debugStream.println("[ " + new java.util.Date() + " ]" + appendMessage + line);
+                debugStream.flush();
             }
         }
 
@@ -416,38 +411,42 @@ public class IOTools {
             synchronized (out) {
                 try {
                     out.close();
+                    err.close();
                 } catch (Exception e) {
 
                 }
             }
         }
 
-        public void setStream(PrintStream st, PrintStream ds) {
-            synchronized (out) {
+        public void setOutStream(PrintStream out, PrintStream err, PrintStream ds) {
+            synchronized (this.out) {
                 try {
-                    out.close();
+                    this.out.close();
+                    this.err.close();
                 } catch (Exception e) {
 
                 }
-                if (debugStream != null) {
+                if (this.debugStream != null) {
                     try {
-                        debugStream.close();
+                        this.debugStream.close();
                     } catch (Exception e) {
 
                     }
                 }
-                out = st;
-                debugStream = ds;
+                this.out = out;
+                this.err = err;
+                this.debugStream = ds;
             }
         }
 
-        public void setStream(PrintStream st) {
-            setStream(st, null);
+        public void setOutStream(PrintStream out, PrintStream err) {
+            setOutStream(out, err, null);
         }
 
-        public void setInputStream(InputStream is) {
-            synchronized (br) {
-                br = new BufferedReader(new InputStreamReader(is));
+        public void setProcess(Process p) {
+            synchronized (brout) {
+                this.brout = new BufferedReader(new InputStreamReader(p.getInputStream()));
+                this.brerr = new BufferedReader(new InputStreamReader(p.getErrorStream()));
             }
         }
     }

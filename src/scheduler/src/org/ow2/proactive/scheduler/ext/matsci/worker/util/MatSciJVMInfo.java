@@ -48,7 +48,6 @@ import org.ow2.proactive.scheduler.ext.matsci.worker.MatSciWorker;
  */
 public class MatSciJVMInfo<W extends MatSciWorker, C extends MatSciEngineConfig> implements
         org.ow2.proactive.scheduler.ext.matsci.common.ProcessListener {
-    IOTools.LoggingThread esLogger = null;
     IOTools.LoggingThread isLogger = null;
     IOTools.RedirectionThread ioThread = null;
     Node node = null;
@@ -65,15 +64,6 @@ public class MatSciJVMInfo<W extends MatSciWorker, C extends MatSciEngineConfig>
     }
 
     C config;
-
-    public IOTools.LoggingThread getEsLogger() {
-
-        return esLogger;
-    }
-
-    public void setEsLogger(IOTools.LoggingThread esLogger) {
-        this.esLogger = esLogger;
-    }
 
     public IOTools.LoggingThread getLogger() {
         return isLogger;

@@ -104,5 +104,9 @@ public interface MatlabConnection {
      */
     public void launch() throws Exception;
 
-    void execCheckToolboxes(String command);
+    /**
+     * Checks if toolboxes used by this task are available. Throws exceptions otherwise
+     * @param command command which checks the toolboxes
+     */
+    void execCheckToolboxes(String command) throws Exception;
 }

@@ -42,4 +42,16 @@ package org.ow2.proactive.scheduler.ext.scilab.common.exception;
  * @author The ProActive Team
  */
 public class ScilabTaskException extends Exception {
+    public ScilabTaskException() {
+        super();
+    }
+
+    public ScilabTaskException(String message) {
+        super(message);
+    }
+
+    public ScilabTaskException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
 }

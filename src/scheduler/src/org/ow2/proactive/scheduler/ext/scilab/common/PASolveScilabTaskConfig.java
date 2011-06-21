@@ -50,6 +50,8 @@ public class PASolveScilabTaskConfig extends PASolveMatSciTaskConfig {
 
     private String functionDefinition;
 
+    private String[] functionVarFiles;
+
     public String getOutputs() {
         return outputs;
     }
@@ -74,6 +76,14 @@ public class PASolveScilabTaskConfig extends PASolveMatSciTaskConfig {
 
     public void setFunctionDefinition(String functionDefinition) {
         this.functionDefinition = functionDefinition;
+    }
+
+    public String[] getFunctionVarFiles() {
+        return functionVarFiles;
+    }
+
+    public void setFunctionVarFiles(String[] functionVarFiles) {
+        this.functionVarFiles = functionVarFiles;
     }
 
     public PASolveScilabTaskConfig() {

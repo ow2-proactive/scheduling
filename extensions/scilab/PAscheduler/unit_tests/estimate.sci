@@ -1,6 +1,7 @@
 function resf = estimate(i)
   load('input.dat');
   lambda = lambdas(i);
+  disp('Calculating estimate for lambda = '+string(lambda));
   rand("normal");      // Use normal distribution
   n = 60; m = 50;      // Size of dataset
   b_true = ones(m, 1); // The true coefficients
@@ -21,9 +22,10 @@ function resf = estimate(i)
     b_sum = b_sum + b(1);
     b_sumsquares = b_sumsquares + b(1)^2;
   end
-  
   bias = abs(b_sum/ntimes - b_true(1));
   var  = sqrt(b_sumsquares/ntimes - (b_sum/ntimes)^2);
+  disp('Calculated bias = '+string(bias));
+  disp('Calculated var = '+string(var));
   res = list(bias,var);
   save(strcat(['output', string(i), '.dat']), res);
   resf=%t;
