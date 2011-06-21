@@ -47,7 +47,7 @@ import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
 import org.ow2.proactive.scheduler.ext.matlab.common.PASolveMatlabGlobalConfig;
 import org.ow2.proactive.scheduler.ext.matlab.common.PASolveMatlabTaskConfig;
 import org.ow2.proactive.scheduler.ext.matlab.common.exception.MatlabTaskException;
-import org.ow2.proactive.scheduler.ext.matlab.worker.MatlabTask;
+import org.ow2.proactive.scheduler.ext.matlab.worker.MatlabControlTask;
 import org.ow2.proactive.scheduler.ext.matsci.client.*;
 import org.ow2.proactive.scripting.InvalidScriptException;
 import org.ow2.proactive.scripting.SelectionScript;
@@ -258,7 +258,9 @@ public class AOMatlabEnvironment extends AOMatSciEnvironment<Token, MatlabResult
                     schedulerTask.setDescription(taskConfigs[i][j].getMainScript());
                 }
 
-                schedulerTask.setExecutableClassName(MatlabTask.class.getName());
+                //schedulerTask.setExecutableClassName(MatlabTask.class.getName());
+
+                schedulerTask.setExecutableClassName(MatlabControlTask.class.getName());
 
                 if (taskConfigs[i][j].getCustomScriptUrl() != null) {
                     URL url = new URL(taskConfigs[i][j].getCustomScriptUrl());

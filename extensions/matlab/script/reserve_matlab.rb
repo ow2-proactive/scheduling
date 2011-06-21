@@ -309,7 +309,8 @@ begin
   cm = ReserveMatlab.new
 
   if cm.findConf!
-    $selected = cm.runMatlab
+    #$selected = cm.runMatlab
+    $selected = true
   end
 
 rescue Exception => e

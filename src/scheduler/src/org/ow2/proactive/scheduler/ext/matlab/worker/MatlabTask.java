@@ -280,24 +280,26 @@ public class MatlabTask<W extends AOMatlabWorker> extends
                 "] Killing selection process...");
         }
         Process p = matlabEngineConfig.getSelectionScriptProcess();
-        if (os.equals(OperatingSystem.windows)) {
-            WinProcess pi = new WinProcess(p);
-            try {
-                if (paconfig.isDebug()) {
-                    System.out.println("Killing process " + pi.getPid());
-                    outDebug.println("Killing process " + pi.getPid());
-                }
-                Runtime.getRuntime().exec("taskkill /PID " + pi.getPid() + " /T");
-                Runtime.getRuntime().exec("tskill " + pi.getPid());
-                killProcessWindowsWithEnv("SELECTION_SCRIPT", nodeName);
+        if (p != null) {
+            if (os.equals(OperatingSystem.windows)) {
+                WinProcess pi = new WinProcess(p);
+                try {
+                    if (paconfig.isDebug()) {
+                        System.out.println("Killing process " + pi.getPid());
+                        outDebug.println("Killing process " + pi.getPid());
+                    }
+                    Runtime.getRuntime().exec("taskkill /PID " + pi.getPid() + " /T");
+                    Runtime.getRuntime().exec("tskill " + pi.getPid());
+                    killProcessWindowsWithEnv("SELECTION_SCRIPT", nodeName);
 
-            } catch (IOException e) {
-                e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                p.destroy();
             }
-        } else {
-            p.destroy();
         }
-        matlabEngineConfig.setSelectionScriptProcess(p);
+        matlabEngineConfig.setSelectionScriptProcess(null);
     }
 
     protected void initWorker(W worker) throws Throwable {
