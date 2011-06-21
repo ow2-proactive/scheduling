@@ -36,21 +36,14 @@
  */
 package org.ow2.proactive.scheduler.ext.matlab.worker;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import matlabcontrol.MatlabConnectionException;
-import matlabcontrol.MatlabInvocationException;
-import matlabcontrol.MatlabProcessCreator;
-import matlabcontrol.RemoteMatlabProxy;
-import matlabcontrol.RemoteMatlabProxyFactory;
-
+import matlabcontrol.*;
 import org.ow2.proactive.scheduler.ext.matlab.common.exception.MatlabInitException;
 import org.ow2.proactive.scheduler.ext.matlab.common.exception.MatlabTaskException;
 import org.ow2.proactive.scheduler.ext.matsci.worker.util.MatSciEngineConfigBase;
-import org.rzo.yajsw.os.ms.win.w32.WindowsProcess;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 
 /**
@@ -88,13 +81,10 @@ public class MatlabConnection {
         // If a user is specified create the proxy factory with a specific
         // MATLAB process as user creator
         try {
-            if (File.pathSeparatorChar == ';') {
-                conn.processCreator = new WindowsMatlabProcessCreator(matlabExecutablePath, workingDir,
-                    startupOptions, debug);
-            } else {
-                conn.processCreator = new CustomMatlabProcessCreator(matlabExecutablePath, workingDir,
-                    startupOptions, debug);
-            }
+
+            conn.processCreator = new CustomMatlabProcessCreator(matlabExecutablePath, workingDir,
+                startupOptions, debug);
+
             proxyFactory = new RemoteMatlabProxyFactory(conn.processCreator);
         } catch (MatlabConnectionException e) {
             // Possible cause: registry problem or receiver is not bind
@@ -290,73 +280,6 @@ public class MatlabConnection {
             try {
                 process.destroy();
             } catch (Exception e) {
-            }
-        }
-    }
-
-    /**
-     * This class is used to create a MATLAB process under a
-     * specific user
-     */
-    private static class WindowsMatlabProcessCreator extends CustomMatlabProcessCreator {
-
-        private WindowsProcess process;
-
-        public WindowsMatlabProcessCreator(String matlabLocation, File workingDirectory,
-                String[] startUpOptions, boolean debug) {
-            super(matlabLocation, workingDirectory, startUpOptions, debug);
-        }
-
-        public Process createMatlabProcess(String runArg) throws Exception {
-            // Attempt to run MATLAB
-            final ArrayList<String> commandList = new ArrayList<String>();
-            commandList.add(this.matlabLocation);
-            commandList.addAll(Arrays.asList(this.startUpOptions));
-            commandList.add("-logfile");
-            commandList.add(logFile.toString());
-            commandList.add("-r");
-            commandList.add("\"" + runArg + "\"");
-
-            String[] command = (String[]) commandList.toArray(new String[commandList.size()]);
-
-            process = new WindowsProcess();
-            process.setWorkingDir(this.workingDirectory.getAbsolutePath());
-            process.setCommand(command);
-            process.setVisible(false);
-
-            if (!process.start()) {
-                throw new IllegalStateException("Unable to start MATLAB process " + command + " errorCode: " +
-                    WindowsProcess.getLastError());
-            }
-
-            // Sometimes the MATLAB process starts but dies very fast with exit
-            // code 1
-            // this must be considered as an error
-            //			try {
-            //				int exitValue = process.exitValue();
-            //				throw new Exception(
-            //						"The MATLAB process has exited abnormally with exit value "
-            //								+ exitValue
-            //								+ ", this can caused by a missing privilege of the user "
-            //								+ System.getenv("user.name"));
-            //			} catch (IllegalThreadStateException e) {
-            //				// This is normal behavior, it means the process is still
-            //				// running
-            //			}
-
-            return null;
-        }
-
-        public void killProcess() {
-            final List<Integer> pids = WindowsProcess.getProcessTree(process.getPid());
-            for (final Integer i : pids) {
-                if (!WindowsProcess.kill(i, 1)) {
-                    try {
-                        Runtime.getRuntime().exec("TASKKILL /F /T /PID " + i);
-                    } catch (Exception e) {
-                        // Maybe here kill using tree kill
-                    }
-                }
             }
         }
     }
