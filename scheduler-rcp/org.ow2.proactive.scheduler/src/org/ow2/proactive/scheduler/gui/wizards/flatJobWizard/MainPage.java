@@ -63,7 +63,6 @@ public class MainPage extends WizardPage implements ModifyListener {
     private Text jobNameText = null;
     private Text commandPathText = null;
     private Text sScriptPathText = null;
-    private Text logOutputPathText = null;
     private Composite parent = null;
 
     public MainPage() {
@@ -149,19 +148,6 @@ public class MainPage extends WizardPage implements ModifyListener {
         choosesScriptButtonFormData.left = new FormAttachment(sScriptPathText, 5, SWT.RIGHT);
         choosesScriptButton.setLayoutData(choosesScriptButtonFormData);
 
-        //output log file
-        Label logOutputPathLabel = new Label(composite, SWT.NONE);
-        logOutputPathLabel.setText("path for log file (log STDOUT and STDERR) :");
-        FormData logOutputLabelFormData = new FormData();
-        logOutputLabelFormData.top = new FormAttachment(sScriptPathText, 20, SWT.BOTTOM);
-        logOutputPathLabel.setLayoutData(logOutputLabelFormData);
-
-        logOutputPathText = new Text(composite, SWT.SINGLE | SWT.BORDER);
-        FormData logOutputPathTextFormData = new FormData();
-        logOutputPathTextFormData.top = new FormAttachment(logOutputPathLabel, 0, SWT.BOTTOM);
-        logOutputPathTextFormData.width = 450;
-        logOutputPathText.setLayoutData(logOutputPathTextFormData);
-
         choosesScriptButton.addListener(SWT.Selection, new Listener() {
             public void handleEvent(Event event) {
                 FileDialog fileDialog = new FileDialog(shell, SWT.OPEN);
@@ -176,7 +162,7 @@ public class MainPage extends WizardPage implements ModifyListener {
         Button cancelOnExceptionButton = new Button(composite, SWT.CHECK);
         cancelOnExceptionButton.setText("Cancel whole job if one of the commands fails");
         FormData cancelButtonFormData = new FormData();
-        cancelButtonFormData.top = new FormAttachment(logOutputPathText, 20, SWT.BOTTOM);
+        cancelButtonFormData.top = new FormAttachment(sScriptPathText, 20, SWT.BOTTOM);
         cancelOnExceptionButton.setLayoutData(cancelButtonFormData);
 
         //add listeners
@@ -207,18 +193,13 @@ public class MainPage extends WizardPage implements ModifyListener {
 
         String commandFilePath = commandPathText.getText();
         String jobName = jobNameText.getText();
-        String logFilePath = null;
         if (!"".equals(sScriptPathText.getText())) {
             selectionScriptPath = sScriptPathText.getText();
         }
-        if (!"".equals(logOutputPathText.getText())) {
-            logFilePath = logOutputPathText.getText();
-        }
 
-        Job j;
         try {
-            j = FlatJobFactory.getFactory().createNativeJobFromCommandsFile(commandFilePath, jobName,
-                    selectionScriptPath, logFilePath, jobName);
+            Job j = FlatJobFactory.getFactory().createNativeJobFromCommandsFile(commandFilePath, jobName,
+                    selectionScriptPath, jobName);
             ((FlatFileJobWizard) getWizard()).setCreatedJob(j);
             SummaryPage page = ((FlatFileJobWizard) getWizard()).getSummaryPage();
             ((FlatFileJobWizard) getWizard()).setCreatedJob(j);
