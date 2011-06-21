@@ -1,8 +1,10 @@
 function checktoolboxes_start_and_hide_desktop(used_toolboxes, dir)
 
-frames = java.awt.Frame.getFrames;
 try
-    awtinvoke(frames(1),'setVisible',0);
+    if usejava('jvm')
+        frames = java.awt.Frame.getFrames;
+        awtinvoke(frames(1),'setVisible',0);
+    end
 catch
 end
 
