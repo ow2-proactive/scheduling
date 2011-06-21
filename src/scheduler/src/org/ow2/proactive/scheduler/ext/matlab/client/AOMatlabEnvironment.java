@@ -36,26 +36,33 @@
  */
 package org.ow2.proactive.scheduler.ext.matlab.client;
 
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.TreeSet;
+
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.exception.UserException;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
+import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputAccessMode;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
 import org.ow2.proactive.scheduler.ext.matlab.common.PASolveMatlabGlobalConfig;
 import org.ow2.proactive.scheduler.ext.matlab.common.PASolveMatlabTaskConfig;
 import org.ow2.proactive.scheduler.ext.matlab.common.exception.MatlabTaskException;
-import org.ow2.proactive.scheduler.ext.matlab.worker.MatlabControlTask;
-import org.ow2.proactive.scheduler.ext.matsci.client.*;
+import org.ow2.proactive.scheduler.ext.matlab.worker.MatlabExecutable;
+import org.ow2.proactive.scheduler.ext.matsci.client.AOMatSciEnvironment;
+import org.ow2.proactive.scheduler.ext.matsci.client.MatSciJobPermanentInfo;
+import org.ow2.proactive.scheduler.ext.matsci.client.MatSciJobVolatileInfo;
+import org.ow2.proactive.scheduler.ext.matsci.client.MatSciTaskStatus;
+import org.ow2.proactive.scheduler.ext.matsci.client.PASolveException;
+import org.ow2.proactive.scheduler.ext.matsci.client.Pair;
 import org.ow2.proactive.scripting.InvalidScriptException;
 import org.ow2.proactive.scripting.SelectionScript;
-import ptolemy.data.Token;
 
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.TreeSet;
+import ptolemy.data.Token;
 
 
 /**
@@ -63,7 +70,7 @@ import java.util.TreeSet;
  *
  * @author The ProActive Team
  */
-public class AOMatlabEnvironment extends AOMatSciEnvironment<Token, MatlabResultsAndLogs> {
+public class AOMatlabEnvironment extends AOMatSciEnvironment<Boolean, MatlabResultsAndLogs> {
 
     /**
      * Constructs the environment AO
@@ -74,7 +81,7 @@ public class AOMatlabEnvironment extends AOMatSciEnvironment<Token, MatlabResult
 
     protected MatlabResultsAndLogs waitResultOfTask(String jid, String tname) {
         MatlabResultsAndLogs answer = new MatlabResultsAndLogs();
-        MatSciJobVolatileInfo<Token> jinfo = currentJobs.get(jid);
+        MatSciJobVolatileInfo<Boolean> jinfo = currentJobs.get(jid);
 
         if (jinfo.isDebugCurrentJob()) {
 
@@ -176,7 +183,22 @@ public class AOMatlabEnvironment extends AOMatSciEnvironment<Token, MatlabResult
         for (int i = 0; i < nbResults; i++) {
             JavaTask oldTask = null;
             for (int j = 0; j < depth; j++) {
+
                 JavaTask schedulerTask = new JavaTask();
+
+                if (config.isFork()) {
+                    schedulerTask.setForkEnvironment(new ForkEnvironment());
+                }
+
+                // Being fixed in the scheduler trunk
+                if (config.isRunAsMe()) {
+                    schedulerTask.setRunAsMe(true);
+
+                    // TODO: Fix for Windows since RunAsMe on windows cannot access java.io.tmpdir
+                    ForkEnvironment f = new ForkEnvironment();
+                    f.addJVMArgument("-Dnode.dataspace.scratchdir=c:\\Temp\\tata");
+                    schedulerTask.setForkEnvironment(f);
+                }
 
                 String tname = "" + i + "_" + j;
 
@@ -258,9 +280,7 @@ public class AOMatlabEnvironment extends AOMatSciEnvironment<Token, MatlabResult
                     schedulerTask.setDescription(taskConfigs[i][j].getMainScript());
                 }
 
-                //schedulerTask.setExecutableClassName(MatlabTask.class.getName());
-
-                schedulerTask.setExecutableClassName(MatlabControlTask.class.getName());
+                schedulerTask.setExecutableClassName(MatlabExecutable.class.getName());
 
                 if (taskConfigs[i][j].getCustomScriptUrl() != null) {
                     URL url = new URL(taskConfigs[i][j].getCustomScriptUrl());

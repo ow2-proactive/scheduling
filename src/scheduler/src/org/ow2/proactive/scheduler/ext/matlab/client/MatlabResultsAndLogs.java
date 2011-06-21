@@ -47,13 +47,13 @@ import org.ow2.proactive.scheduler.ext.matsci.client.ResultsAndLogs;
 import ptolemy.data.Token;
 
 
-public class MatlabResultsAndLogs extends ResultsAndLogs<Token> {
+public class MatlabResultsAndLogs extends ResultsAndLogs<Boolean> {
 
     public MatlabResultsAndLogs() {
         super();
     }
 
-    public MatlabResultsAndLogs(Token result, String logs, Throwable exception, MatSciTaskStatus status) {
+    public MatlabResultsAndLogs(Boolean result, String logs, Throwable exception, MatSciTaskStatus status) {
         super(result, logs, exception, status);
     }
 }

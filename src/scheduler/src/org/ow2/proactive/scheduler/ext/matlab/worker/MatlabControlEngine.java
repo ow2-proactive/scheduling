@@ -1,14 +1,22 @@
 package org.ow2.proactive.scheduler.ext.matlab.worker;
 
-import matlabcontrol.*;
-import org.objectweb.proactive.utils.OperatingSystem;
-import org.ow2.proactive.scheduler.ext.matlab.worker.util.MatlabEngineConfig;
-
+import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
+
+import matlabcontrol.MatlabConnectionException;
+import matlabcontrol.MatlabInvocationException;
+import matlabcontrol.MatlabProcessCreator;
+import matlabcontrol.RemoteMatlabProxy;
+import matlabcontrol.RemoteMatlabProxyFactory;
+
+import org.objectweb.proactive.utils.OperatingSystem;
+import org.ow2.proactive.scheduler.ext.matlab.worker.util.MatlabEngineConfig;
 
 
 /**
@@ -76,13 +84,14 @@ public class MatlabControlEngine {
                     System.out.println("Starting a new Matlab engine:");
                     System.out.println(configuration);
                 }
-                String loc = configuration.getMatlabHome() + os.fileSeparator() +
-                    configuration.getMatlabBinDir() + os.fileSeparator() +
-                    configuration.getMatlabCommandName();
+                //                String loc = configuration.getMatlabHome() + os.fileSeparator() +
+                //                configuration.getMatlabBinDir() + os.fileSeparator() +
+                //                configuration.getMatlabCommandName();
                 //Configuration.setStartupOptions(new String[] { "-nosplash", "-nodesktop", "-wait" });
 
                 //Create a factory
-                factory = new RemoteMatlabProxyFactory(loc);
+                factory = new RemoteMatlabProxyFactory(new CustomMatlabProcessCreator(configuration
+                        .getFullCommand()));
 
                 proxy = factory.getProxy();
 
@@ -105,7 +114,7 @@ public class MatlabControlEngine {
                     public void run() {
                         if (proxy != null) {
                             try {
-                                proxy.exit();
+                                proxy.exit(true);
                             } catch (MatlabInvocationException e) {
                                 e.printStackTrace();
                             }
@@ -249,7 +258,7 @@ public class MatlabControlEngine {
 
         init();
         //System.out.println(command);
-        String out = proxy.eval2(command);
+        String out = proxy.eval(command);
         System.out.println(out);
     }
 
@@ -284,7 +293,7 @@ public class MatlabControlEngine {
         lock.lock();
         if (proxy != null) {
             try {
-                proxy.exit();
+                proxy.exit(true);
             } catch (Exception e) {
 
             }
@@ -366,6 +375,48 @@ public class MatlabControlEngine {
         @Override
         protected void finalize() throws Throwable {
             release();
+        }
+    }
+
+    /**
+     * This class is used to create a MATLAB process under a
+     * specific user
+     */
+    private static final class CustomMatlabProcessCreator implements MatlabProcessCreator {
+
+        private final String[] startUpOptions = new String[] { "-nosplash", "-nodesktop", "-wait" };
+        private final String matlabLocation;
+
+        public CustomMatlabProcessCreator(final String matlabLocation) {
+            this.matlabLocation = matlabLocation;
+        }
+
+        public void createMatlabProcess(String runArg) throws Exception {
+            ProcessBuilder b = new ProcessBuilder();
+
+            //b.directory(this.workingDirectory);
+
+            // Attempt to run MATLAB
+            final ArrayList<String> commandList = new ArrayList<String>();
+            commandList.add(this.matlabLocation);
+            commandList.addAll(Arrays.asList(this.startUpOptions));
+            commandList.add("-r");
+            commandList.add("\"" + runArg + "\"");
+
+            String[] command = (String[]) commandList.toArray(new String[commandList.size()]);
+            b.command(command);
+
+            final Process p = b.start();
+
+            // Sometimes the MATLAB process starts but dies very fast with exit code 1
+            // this must be considered as an error
+            try {
+                int exitValue = p.exitValue();
+                throw new Exception("The MATLAB process has exited abnormally with exit value " + exitValue +
+                    ", this can caused by a missing privilege of the user " + System.getenv("user.name"));
+            } catch (IllegalThreadStateException e) {
+                // This is normal behavior, it means the process is still running
+            }
         }
     }
 }

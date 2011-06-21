@@ -1,3 +1,39 @@
+/*
+ * ################################################################
+ *
+ * ProActive Parallel Suite(TM): The Java(TM) library for
+ *    Parallel, Distributed, Multi-Core Computing for
+ *    Enterprise Grids & Clouds
+ *
+ * Copyright (C) 1997-2011 INRIA/University of
+ *                 Nice-Sophia Antipolis/ActiveEon
+ * Contact: proactive@ow2.org or contact@activeeon.com
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License
+ * as published by the Free Software Foundation; version 3 of
+ * the License.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ * If needed, contact us to obtain a release under GPL Version 2 or 3
+ * or a different license than the AGPL.
+ *
+ *  Initial developer(s):               The ActiveEon Team
+ *                        http://www.activeeon.com/
+ *  Contributor(s):
+ *
+ * ################################################################
+ * $$ACTIVEEON_INITIAL_DEV$$
+ */
 package org.ow2.proactive.scheduler.ext.matlab.worker;
 
 import java.io.File;
@@ -10,88 +46,44 @@ import matlabcontrol.MatlabProcessCreator;
 import matlabcontrol.RemoteMatlabProxy;
 import matlabcontrol.RemoteMatlabProxyFactory;
 
-import org.objectweb.proactive.extensions.processbuilder.OSProcessBuilder;
-import org.objectweb.proactive.extensions.processbuilder.OSProcessBuilderFactory;
-import org.objectweb.proactive.extensions.processbuilder.OSUser;
-import org.objectweb.proactive.extensions.processbuilder.PAOSProcessBuilderFactory;
 import org.ow2.proactive.scheduler.ext.matlab.common.exception.MatlabInitException;
 import org.ow2.proactive.scheduler.ext.matlab.common.exception.MatlabTaskException;
 
 
 /**
- * This class uses the Matlabcontrol API to establish a connection with MATLAB for
+ * This class uses the matlabcontrol API to establish a connection with MATLAB for
  * MATLAB tasks executions. There can be only one instance at a time.
- * If the instance is created using an anonymous {@link MatlabExecutable} not under
- * a {@link OSUser} it can be saved for later (if keepEngine=true).
- * If the instance is created with an identity it must be stopped at the end of the task.
  * Be careful this class is not thread safe.
  */
 public class MatlabConnection {
 
-    /** The reference on the previous anonymous connection */
-    private static MatlabConnection previousAnonymousConnection;
-
     /** The proxy to the remote MATLAB */
     private RemoteMatlabProxy proxy;
 
-    /** The hash code of configuration related to MATLAB */
-    private final int configHashCode;
+    /** The thread executed on shutdown that releases this connection */
+    private Thread shutdownHook;
 
-    /**
-     * Depending on the given executable will return an instance of a
-     * MatlabConnection.
-     *
-     * @throws MatlabInitException if MATLAB could not be initialized
-     */
-    public static MatlabConnection acquire(final MatlabExecutable executable) throws MatlabInitException {
-
-        final OSUser user = executable.getUser();
-        MatlabConnection connection;
-
-        final boolean previousConn = MatlabConnection.previousAnonymousConnection != null;
-        final boolean noUser = user == null;
-        final boolean keep = executable.paconfig.isKeepEngine();
-        final boolean sameConfig = previousConn &&
-            (MatlabConnection.previousAnonymousConnection.configHashCode == executable.matlabEngineConfig
-                    .hashCode());
-
-        if (previousConn && noUser && keep && sameConfig) {
-            connection = MatlabConnection.previousAnonymousConnection;
-        } else {
-            // Cannot reuse the connection then release it
-            if (previousConn) {
-                MatlabConnection.previousAnonymousConnection.release();
-                MatlabConnection.previousAnonymousConnection = null;
-            }
-
-            // Create the connection, may throw a MatlabInitException
-            connection = createInternal(executable, user);
-
-            // Save the connection as previous only if anonymous context and "keep" asked
-            if (noUser && keep) {
-                MatlabConnection.previousAnonymousConnection = connection;
-            }
-        }
-
-        return connection;
+    private MatlabConnection() {
     }
 
-    private static MatlabConnection createInternal(final MatlabExecutable executable, final OSUser user)
+    /**
+     * Each time this method is called creates a new MATLAB process using
+     * the matlabcontrol API.
+     *
+     * @param matlabExecutablePath The full path to the MATLAB executable
+     * @param workingDir the directory where to start MATLAB
+     * @throws MatlabInitException if MATLAB could not be initialized
+     */
+    public static MatlabConnection acquire(final String matlabExecutablePath, final File workingDir)
             throws MatlabInitException {
-        // String matlabLocation = executable.matlabEngineConfig.getFullCommand();
-        String matlabLocation = "C:\\Program Files\\MATLAB\\R2010b\\bin\\matlab.exe"; // TODO: REMOVE ME
 
         // If a user is specified create the proxy factory with a specific
         // MATLAB process as user creator
         RemoteMatlabProxyFactory proxyFactory;
         try {
-            if (user != null) {
-                MatlabProcessCreator prCreator = new MatlabProcessAsUserCreator(user, matlabLocation,
-                    executable.localSpace);
-                proxyFactory = new RemoteMatlabProxyFactory(prCreator);
-            } else {
-                proxyFactory = new RemoteMatlabProxyFactory(matlabLocation);
-            }
+            MatlabProcessCreator prCreator = new CustomMatlabProcessCreator(matlabExecutablePath, // "C:\\Program Files\\MATLAB\\R2010b\\bin\\win32\\MATLAB.exe"
+                workingDir);
+            proxyFactory = new RemoteMatlabProxyFactory(prCreator);
         } catch (MatlabConnectionException e) {
             // Possible cause: registry problem or receiver is not bind
             e.printStackTrace();
@@ -118,13 +110,19 @@ public class MatlabConnection {
             throw me;
         }
 
-        // Return a new MATLAB connection
-        return new MatlabConnection(proxy, executable.matlabEngineConfig.hashCode());
-    }
+        final MatlabConnection conn = new MatlabConnection();
+        conn.proxy = proxy;
 
-    private MatlabConnection(final RemoteMatlabProxy proxy, final int configHashCode) {
-        this.proxy = proxy;
-        this.configHashCode = configHashCode;
+        // Add shutdown hook to release the connection on jvm exit
+        conn.shutdownHook = new Thread(new Runnable() {
+            public final void run() {
+                conn.release();
+            }
+        });
+        Runtime.getRuntime().addShutdownHook(conn.shutdownHook);
+
+        // Return a new MATLAB connection
+        return conn;
     }
 
     /*********** PUBLIC METHODS ***********/
@@ -137,15 +135,16 @@ public class MatlabConnection {
         if (this.proxy == null) {
             return;
         }
-
+        // Stop MATLAB use true for immediate
         try {
-            this.proxy.exit();
+            this.proxy.exit(true);
         } catch (Exception e) {
+            // Here maybe we should kill the process it self ... need more tests
         }
-
         this.proxy = null;
+        // Remove the shutdown hook
         try {
-            // Runtime.getRuntime().removeShutdownHook(hook);
+            Runtime.getRuntime().removeShutdownHook(this.shutdownHook);
         } catch (Exception e) {
         }
     }
@@ -180,19 +179,6 @@ public class MatlabConnection {
     //    }
 
     /**
-     * Clears the engine's workspace.
-     *
-     * @throws MatlabTaskException If unable to clear the workspace
-     */
-    public void clear() throws MatlabTaskException {
-        try {
-            this.proxy.eval("clear all;");
-        } catch (MatlabInvocationException e) {
-            throw new MatlabTaskException("Unable to clear MATLAB", e);
-        }
-    }
-
-    /**
      * Evaluate the given string in the workspace.
      *
      * @param command the command to evaluate
@@ -200,7 +186,7 @@ public class MatlabConnection {
      */
     public void evalString(final String command) throws MatlabTaskException {
         try {
-            String out = this.proxy.eval2(command);
+            String out = this.proxy.eval(command);
             System.out.println(out);
         } catch (MatlabInvocationException e) {
             throw new MatlabTaskException("Unable to eval command " + command, e);
@@ -212,7 +198,7 @@ public class MatlabConnection {
      *
      * @param variableName name of the variable
      * @return value of the variable
-     * @throws MatlabTaskException if unablet o get the variable
+     * @throws MatlabTaskException if unable to get the variable
      */
     public Object get(String variableName) throws MatlabTaskException {
         try {
@@ -243,26 +229,24 @@ public class MatlabConnection {
      * This class is used to create a MATLAB process under a
      * specific user
      */
-    private static final class MatlabProcessAsUserCreator implements MatlabProcessCreator {
+    private static class CustomMatlabProcessCreator implements MatlabProcessCreator {
 
         private final String[] startUpOptions = new String[] { "-nosplash", "-nodesktop", "-wait" };
-        private final OSUser user;
         private final String matlabLocation;
         private final File workingDirectory;
 
-        public MatlabProcessAsUserCreator(final OSUser user, final String matlabLocation,
-                final File workingDirectory) {
-            this.user = user;
+        public CustomMatlabProcessCreator(final String matlabLocation, final File workingDirectory) {
             this.matlabLocation = matlabLocation;
             this.workingDirectory = workingDirectory;
         }
 
         public void createMatlabProcess(String runArg) throws Exception {
-            OSProcessBuilderFactory factory = new PAOSProcessBuilderFactory();
-            OSProcessBuilder b = factory.getBuilder(this.user);
+            ProcessBuilder b = new ProcessBuilder();
+
+            b.directory(this.workingDirectory);
 
             // Attempt to run MATLAB
-            ArrayList<String> commandList = new ArrayList<String>();
+            final ArrayList<String> commandList = new ArrayList<String>();
             commandList.add(this.matlabLocation);
             commandList.addAll(Arrays.asList(this.startUpOptions));
             commandList.add("-r");
@@ -270,8 +254,18 @@ public class MatlabConnection {
 
             String[] command = (String[]) commandList.toArray(new String[commandList.size()]);
             b.command(command);
-            b.directory(this.workingDirectory);
-            b.start();
+
+            final Process p = b.start();
+
+            // Sometimes the MATLAB process starts but dies very fast with exit code 1
+            // this must be considered as an error
+            try {
+                int exitValue = p.exitValue();
+                throw new Exception("The MATLAB process has exited abnormally with exit value " + exitValue +
+                    ", this can caused by a missing privilege of the user " + System.getenv("user.name"));
+            } catch (IllegalThreadStateException e) {
+                // This is normal behavior, it means the process is still running
+            }
         }
     }
 }
