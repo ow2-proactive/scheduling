@@ -72,18 +72,17 @@ public class MatlabConnection {
      * @param workingDir the directory where to start MATLAB
      * @throws MatlabInitException if MATLAB could not be initialized
      */
-    public static MatlabConnection acquire(final String matlabExecutablePath, final File workingDir, final boolean debug)
-            throws MatlabInitException {
+    public static MatlabConnection acquire(final String matlabExecutablePath, final File workingDir,
+            final boolean debug, final String[] startupOptions) throws MatlabInitException {
         RemoteMatlabProxyFactory proxyFactory;
 
-
         final MatlabConnection conn = new MatlabConnection();
+
         // If a user is specified create the proxy factory with a specific
         // MATLAB process as user creator
         try {
-            MatlabProcessCreator prCreator = new CustomMatlabProcessCreator(
-                matlabExecutablePath, // "C:\\Program Files\\MATLAB\\R2010b\\bin\\win32\\MATLAB.exe"
-                workingDir, conn, debug);
+            MatlabProcessCreator prCreator = new CustomMatlabProcessCreator(matlabExecutablePath, workingDir,
+                conn, startupOptions, debug);
             proxyFactory = new RemoteMatlabProxyFactory(prCreator);
         } catch (MatlabConnectionException e) {
             // Possible cause: registry problem or receiver is not bind
@@ -93,6 +92,7 @@ public class MatlabConnection {
             MatlabInitException me = new MatlabInitException(
                 "Unable to create the MATLAB proxy factory. Possible causes: registry cannot be created or the receiver cannot be bind");
             me.initCause(e);
+
             throw me;
         }
 
@@ -108,9 +108,13 @@ public class MatlabConnection {
             MatlabInitException me = new MatlabInitException(
                 "Unable to create the MATLAB proxy factory. Possible causes: registry cannot be created or the receiver cannot be bind");
             me.initCause(e);
+
+            // clean factory
+            proxyFactory.clean();
+            // destroy process
+
             throw me;
         }
-
 
         conn.proxy = proxy;
 
@@ -142,11 +146,11 @@ public class MatlabConnection {
         } catch (Exception e) {
             // Here maybe we should kill the process it self ... need more tests
         }
-//                     try{
-//                         this.matlabProcess.destroy();
-//                     }catch(Exception e) {
-//
-//                     }
+        //                     try{
+        //                         this.matlabProcess.destroy();
+        //                     }catch(Exception e) {
+        //
+        //                     }
 
         // Clean threads used by the proxy
         this.proxy.clean();
@@ -159,35 +163,6 @@ public class MatlabConnection {
         }
         System.gc();
     }
-
-    //    public void testEngineInitOrRestart() {
-    //        try {
-    //            this.proxy.waitReady();
-    //
-    //            Double test = new Double(1);
-    //            put("test", test);
-    //
-    //            evalString("testok=exist('test','var');");
-    //            Object ok = get("testok");
-    //            boolean okj = false;
-    //            if (ok != null) {
-    //                if (ok instanceof double[]) {
-    //                    okj = (((double[]) ok)[0] == 1.0);
-    //                }
-    //            }
-    //
-    //            if (!okj) {
-    //                restart();
-    //            } else {
-    //                evalString("clear test testok");
-    //            }
-    //
-    //        } catch (Exception e) {
-    //            e.printStackTrace();
-    //            restart();
-    //        }
-    //        // ok
-    //    }
 
     /**
      * Evaluate the given string in the workspace.
@@ -255,19 +230,19 @@ public class MatlabConnection {
 
         private MatlabConnection conn;
 
-        public CustomMatlabProcessCreator(final String matlabLocation, final File workingDirectory, MatlabConnection conn, boolean debug) {
+        public CustomMatlabProcessCreator(final String matlabLocation, final File workingDirectory,
+                MatlabConnection conn, String[] startUpOptions, boolean debug) {
             this.matlabLocation = matlabLocation;
             this.workingDirectory = workingDirectory;
             this.conn = conn;
             this.debug = debug;
+            this.startUpOptions = startUpOptions;
             try {
                 this.nodeName = MatSciEngineConfigBase.getNodeName();
             } catch (Exception e) {
                 e.printStackTrace();
             }
             logFile = new File(tmpDir, "MatlabStart" + nodeName + ".log");
-            startUpOptions = new String[]{"-nosplash", "-nodesktop", "-nodisplay", "-logfile",
-                    logFile.toString()};
         }
 
         public Process createMatlabProcess(String runArg) throws Exception {
@@ -279,6 +254,8 @@ public class MatlabConnection {
             final ArrayList<String> commandList = new ArrayList<String>();
             commandList.add(this.matlabLocation);
             commandList.addAll(Arrays.asList(this.startUpOptions));
+            commandList.add("-logfile");
+            commandList.add(logFile.toString());
             commandList.add("-r");
             commandList.add(runArg);
 
@@ -293,7 +270,7 @@ public class MatlabConnection {
             try {
                 int exitValue = p.exitValue();
                 throw new Exception("The MATLAB process has exited abnormally with exit value " + exitValue +
-                        ", this can caused by a missing privilege of the user " + System.getenv("user.name"));
+                    ", this can caused by a missing privilege of the user " + System.getenv("user.name"));
             } catch (IllegalThreadStateException e) {
                 // This is normal behavior, it means the process is still running
             }
@@ -307,7 +284,6 @@ public class MatlabConnection {
         public boolean isDebug() {
             return debug;
         }
-
 
     }
 }

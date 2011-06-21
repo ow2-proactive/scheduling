@@ -54,7 +54,7 @@ for i=1:s(1)
                 R.logsPrinted.set(true);
                 java.lang.System.out.println(logs);
             end            
-            if R.transferVariables
+
                if R.resultSet.get()
                   A{i,j} = R.resultAcc();
                else
@@ -63,10 +63,7 @@ for i=1:s(1)
                    R.resultAcc(out);
                    R.resultSet.set(true);
                end
-            else
-                K=RaL.getResult();
-                A{i,j} = parse_token_output(K);
-            end
+
         elseif RaL.isMatSciError();
             if ~R.logsPrinted.get()
                 logs = RaL.getLogs();

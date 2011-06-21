@@ -42,7 +42,6 @@ if nargin > 0
     taskinfo = varargin{2};
     this.cleanFileSet = taskinfo.cleanFileSet;
     this.cleanDirSet = taskinfo.cleanDirSet;
-    this.transferVariables = taskinfo.transferVariables;
     this.outFile = taskinfo.outFile;
     this.jobid = taskinfo.jobid;
     this.taskid = taskinfo.taskid;
@@ -59,7 +58,6 @@ else
     this.future = [];    
     this.cleanFileSet = [];
     this.cleanDirSet = [];
-    this.transferVariables = true;
     this.outFile = [];
     this.jobid = 0;
     this.taskid = [];

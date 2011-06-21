@@ -53,9 +53,6 @@
 			<class name="org.ow2.proactive.scheduler.examples.Worker" />
 			<class name="org.ow2.proactive.scheduler.ext.masterworker.AOSchedulerWorker" />
 			<class name="org.ow2.proactive.scheduler.ext.matlab.client.AOMatlabEnvironment" />
-			<class name="org.ow2.proactive.scheduler.ext.matlab.worker.AOMatlabWorker" />
-			<class name="org.ow2.proactive.scheduler.ext.matlab.worker.AOMatlabSplitter" />
-			<class name="org.ow2.proactive.scheduler.ext.matlab.worker.AOMatlabCollector" />
 			<class name="org.ow2.proactive.scheduler.ext.scilab.client.AOScilabEnvironment" />
 			<class name="org.ow2.proactive.scheduler.ext.scilab.worker.AOScilabWorker" />
             <class name="org.ow2.proactive.scheduler.ext.matsci.client.AODataspaceRegistry" />

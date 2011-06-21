@@ -39,7 +39,6 @@ package org.ow2.proactive.scheduler.ext.matsci.common;
 import java.io.Serializable;
 import java.net.URI;
 import java.util.HashSet;
-import java.util.Map;
 
 
 /**
@@ -50,95 +49,83 @@ import java.util.Map;
 public class PASolveMatSciGlobalConfig implements Serializable {
 
     /** Debug Mode */
-    private boolean debug = false;
+    protected boolean debug = false;
 
     /** Keep remote matlab engine between tasks */
-    private boolean keepEngine = false;
+    protected boolean keepEngine = false;
 
     /** The tasks are in a separate JVM process */
-    private boolean fork = false;
+    protected boolean fork = false;
 
     /** The tasks are executed under the account of the current user */
-    private boolean runAsMe = false;
+    protected boolean runAsMe = false;
 
     /** Preferred Version to use */
-    private String versionPref = null;
+    protected String versionPref = null;
 
     /** Versions forbidden to use */
-    private HashSet<String> versionRej = new HashSet<String>();
+    protected HashSet<String> versionRej = new HashSet<String>();
 
     /** Minimum version to use */
-    private String versionMin = null;
+    protected String versionMin = null;
 
     /**
      * Maximum version to use
      */
-    private String versionMax = null;
+    protected String versionMax = null;
 
     /**
      * Transfers source to the remote engine
      */
-    private boolean transferEnv = false;
+    protected boolean transferEnv = false;
 
     /**
      * Transfers variables to the remote engine
      */
-    private boolean transferVariables = false;
+    protected boolean transferVariables = false;
 
     /**
      * Transfers environment to the remote engine
      */
-    private boolean transferSource = false;
+    protected boolean transferSource = false;
 
-    private String checkMatSciUrl = null;
+    protected String checkMatSciUrl = null;
 
-    private String customScriptUrl = null;
+    protected String customScriptUrl = null;
 
-    private URI localSpace;
+    protected URI localSpace;
 
     /**
      * Name of source zip file
      */
-    private String sourceZipFileName = null;
+    protected String sourceZipFileName = null;
 
-    /**
-     * hash of zip file
-     */
-    private String sourceZipHash = null;
-
-    /**
-     * Name of env zip file
-     */
-    private String envZipFileName = null;
-
-    private String[] scriptParams;
+    protected String[] scriptParams;
 
     /**
      * Name of env mat file
      */
-    private String envMatFileName = null;
+    protected String envMatFileName = null;
 
-    private boolean zipEnvFile;
+    protected boolean zipSourceFiles;
 
-    private boolean zipSourceFiles;
+    protected String inputSpaceName = null;
 
-    private String inputSpaceName = null;
+    protected String outputSpaceName = null;
 
-    private String outputSpaceName = null;
+    protected String priority = null;
 
-    private String priority = null;
+    protected boolean timeStamp = false;
 
-    private boolean timeStamp = false;
+    protected boolean zipInputFiles = false;
 
-    private boolean zipInputFiles = false;
+    protected boolean zipOutputFiles = false;
 
-    private boolean zipOutputFiles = false;
+    protected String tempSubDirName;
 
-    private String tempSubDirName;
+    protected String inputSpaceURL = null;
 
-    private String inputSpaceURL = null;
-
-    private String outputSpaceURL = null;
+    protected String outputSpaceURL = null;
 
     public PASolveMatSciGlobalConfig() {
 
@@ -324,14 +311,6 @@ public class PASolveMatSciGlobalConfig implements Serializable {
         return this.localSpace;
     }
 
-    public boolean isZipEnvFile() {
-        return zipEnvFile;
-    }
-
-    public void setZipEnvFile(boolean zipEnvFile) {
-        this.zipEnvFile = zipEnvFile;
-    }
-
     public boolean isTransferSource() {
         return transferSource;
     }
@@ -362,14 +341,6 @@ public class PASolveMatSciGlobalConfig implements Serializable {
 
     public void setTransferVariables(boolean transferVariables) {
         this.transferVariables = transferVariables;
-    }
-
-    public String getEnvZipFileName() {
-        return envZipFileName;
-    }
-
-    public void setEnvZipFileName(String envZipFileName) {
-        this.envZipFileName = envZipFileName;
     }
 
     public boolean isZipInputFiles() {
@@ -404,75 +375,4 @@ public class PASolveMatSciGlobalConfig implements Serializable {
         this.sourceZipFileName = sourceZipFileName;
     }
 
-    public String getSourceZipHash() {
-        return sourceZipHash;
-    }
-
-    public void setSourceZipHash(String sourceZipHash) {
-        this.sourceZipHash = sourceZipHash;
-    }
-
-    public void updateFromMap(Map<String, Serializable> map) {
-        Object obj;
-
-        obj = map.get("debug");
-        if (obj != null) {
-            this.debug = Boolean.parseBoolean((String) obj); // no need to check for null
-        }
-
-        obj = map.get("keepEngine");
-        if (obj != null) {
-            this.keepEngine = Boolean.parseBoolean((String) obj);
-        }
-
-        obj = map.get("runAsMe");
-        if (obj != null) {
-            this.runAsMe = Boolean.parseBoolean((String) obj);
-        }
-
-        obj = map.get("versionPref");
-        if (obj != null) {
-            this.versionPref = (String) obj;
-        }
-
-        obj = map.get("versionMin");
-        if (obj != null) {
-            this.versionMin = (String) obj;
-        }
-
-        obj = map.get("versionMax");
-        if (obj != null) {
-            this.versionMax = (String) obj;
-        }
-
-        obj = map.get("versionRej");
-        if (obj != null) {
-            this.setVersionRejAsString((String) obj);
-        }
-
-        obj = map.get("transferSource");
-        if (obj != null) {
-            this.transferSource = Boolean.parseBoolean((String) obj);
-        }
-
-        obj = map.get("sourceZipFileName");
-        if (obj != null) {
-            this.sourceZipFileName = (String) obj;
-        }
-
-        obj = map.get("zipFileHash");
-        if (obj != null) {
-            this.sourceZipHash = (String) obj;
-        }
-
-        obj = map.get("transferEnv");
-        if (obj != null) {
-            this.transferEnv = Boolean.parseBoolean((String) obj);
-        }
-
-        obj = map.get("envZipFileName");
-        if (obj != null) {
-            this.envZipFileName = (String) obj;
-        }
-    }
 }

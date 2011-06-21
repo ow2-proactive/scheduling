@@ -37,6 +37,7 @@
 package org.ow2.proactive.scheduler.ext.matlab.worker;
 
 import org.objectweb.proactive.extensions.dataspaces.api.DataSpacesFileObject;
+import org.objectweb.proactive.utils.OperatingSystem;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import org.ow2.proactive.scheduler.ext.matlab.common.PASolveMatlabGlobalConfig;
@@ -45,8 +46,6 @@ import org.ow2.proactive.scheduler.ext.matlab.common.exception.MatlabTaskExcepti
 import org.ow2.proactive.scheduler.ext.matlab.worker.util.FileUtils;
 import org.ow2.proactive.scheduler.ext.matlab.worker.util.MatlabEngineConfig;
 import org.ow2.proactive.scheduler.ext.matlab.worker.util.MatlabFinder;
-import org.ow2.proactive.scheduler.ext.matsci.common.exception.InvalidNumberOfParametersException;
-import org.ow2.proactive.scheduler.ext.matsci.common.exception.InvalidParameterException;
 import org.ow2.proactive.scheduler.ext.matsci.worker.util.MatSciEngineConfig;
 import org.ow2.proactive.scheduler.ext.matsci.worker.util.MatSciEngineConfigBase;
 
@@ -80,17 +79,18 @@ public class MatlabExecutable extends JavaExecutable {
 
     private static String HOSTNAME;
 
+    private static OperatingSystem os;
+
     static {
         try {
             HOSTNAME = java.net.InetAddress.getLocalHost().getHostName();
+            os = OperatingSystem.getOperatingSystem();
         } catch (UnknownHostException e) {
         }
     }
 
     /** For debug purpose see {@link MatlabExecutable#createLogFileOnDebug()} */
     private PrintWriter outDebugWriter;
-
-    private int index = -1;
 
     /** The global configuration */
     private PASolveMatlabGlobalConfig paconfig;
@@ -167,41 +167,17 @@ public class MatlabExecutable extends JavaExecutable {
         this.printLog("Acquiring MATLAB connection using " + matlabCmd);
 
         // Acquire a connection to MATLAB
-        this.matlabConnection = MatlabConnection.acquire(matlabCmd, // MATLAB exe path
-                this.localSpaceRootDir, paconfig.isDebug()); // working dir
+        if (os == OperatingSystem.unix) {
+            this.matlabConnection = MatlabConnection.acquire(matlabCmd, // MATLAB exe path
+                    this.localSpaceRootDir, paconfig.isDebug(), paconfig.getLinuxStartupOptions());
+        } else {
+            this.matlabConnection = MatlabConnection.acquire(matlabCmd, // MATLAB exe path
+                    this.localSpaceRootDir, paconfig.isDebug(), paconfig.getWindowsStartupOptions());
+        }
 
         Serializable result = null;
 
         try {
-            // We execute the task on the worker
-            if (!paconfig.isTransferVariables()) {
-                if (results != null) {
-                    if (results.length > 1) {
-                        throw new InvalidNumberOfParametersException(results.length);
-                    }
-
-                    if (results.length == 1) {
-                        TaskResult res = results[0];
-
-                        if (index != -1) {
-                            if (!(res.value() instanceof SplittedResult)) {
-                                throw new InvalidParameterException(res.value().getClass());
-                            }
-
-                            SplittedResult sr = (SplittedResult) res.value();
-                            Object tok = sr.getResult(index);
-                            this.matlabConnection.put("in", tok);
-                        } else {
-                            if (!(res.value() instanceof Object)) {
-                                throw new InvalidParameterException(res.value().getClass());
-                            }
-
-                            Object in = (Object) res.value();
-                            this.matlabConnection.put("in", in);
-                        }
-                    }
-                }
-            }
             // Execute the MATLAB script and receive the result
             result = this.executeScript();
         } finally {
@@ -252,11 +228,7 @@ public class MatlabExecutable extends JavaExecutable {
 
         Object out = null;
 
-        if (paconfig.isTransferVariables()) {
-            out = storeOutputVariable();
-        } else {
-            out = matlabConnection.get("out");
-        }
+        out = storeOutputVariable();
 
         printLog(out.toString());
 
@@ -343,27 +315,10 @@ public class MatlabExecutable extends JavaExecutable {
         if (!paconfig.isTransferEnv()) {
             return;
         }
-        if (paconfig.isZipEnvFile()) {
-            taskconfig.setEnvZipFileURI(new URI(getLocalFile(
-                    paconfig.getTempSubDirName() + "/" + paconfig.getEnvZipFileName()).getRealURI()));
 
-            printLog("Unzipping workspace file...");
+        taskconfig.setEnvMatFileURI(new URI(getLocalFile(
+                paconfig.getTempSubDirName() + "/" + paconfig.getEnvMatFileName()).getRealURI()));
 
-            File envZip = new File(taskconfig.getEnvZipFileURI());
-            if (!envZip.exists()) {
-                System.err.println("Error, workspace zip file cannot be accessed at " + envZip);
-                throw new IllegalStateException("Error, workspace zip file cannot be accessed at " + envZip);
-            }
-            File envZipFolder = envZip.getParentFile();
-            // Uncompress the workspace
-            if (!FileUtils.unzip(envZip, envZipFolder)) {
-                System.err.println("Unable to unzip the workspace file " + envZip);
-                throw new IllegalStateException("Unable to the workspace file " + envZip);
-            }
-        } else {
-            taskconfig.setEnvMatFileURI(new URI(getLocalFile(
-                    paconfig.getTempSubDirName() + "/" + paconfig.getEnvMatFileName()).getRealURI()));
-        }
     }
 
     private void initTransferInputFiles() throws Exception {
@@ -396,23 +351,20 @@ public class MatlabExecutable extends JavaExecutable {
     }
 
     private void initTransferVariables() throws Exception {
-        if (paconfig.isTransferVariables()) {
-            taskconfig
-                    .setInputVariablesFileURI(new URI(getLocalFile(
-                            paconfig.getTempSubDirName() + "/" + taskconfig.getInputVariablesFileName())
-                            .getRealURI()));
 
-            // TODO: Remove the following ??... see fviale
-            if (taskconfig.getComposedInputVariablesFileName() != null) {
-                taskconfig.setComposedInputVariablesFileURI(new URI(getLocalFile(
-                        paconfig.getTempSubDirName() + "/" + taskconfig.getComposedInputVariablesFileName())
-                        .getRealURI()));
-            }
+        taskconfig.setInputVariablesFileURI(new URI(getLocalFile(
+                paconfig.getTempSubDirName() + "/" + taskconfig.getInputVariablesFileName()).getRealURI()));
+
+        if (taskconfig.getComposedInputVariablesFileName() != null) {
+            taskconfig.setComposedInputVariablesFileURI(new URI(getLocalFile(
+                    paconfig.getTempSubDirName() + "/" + taskconfig.getComposedInputVariablesFileName())
+                    .getRealURI()));
         }
+
     }
 
     private void addSources() throws Exception {
-        if (paconfig.isTransferSource() && tempSubDir != null) {
+        if (tempSubDir != null) {
             printLog("Adding to matlabpath sources from " + tempSubDir);
             // Add unzipped source files to the MATALAB path
             matlabConnection.evalString("addpath('" + tempSubDir + "');");
@@ -429,17 +381,17 @@ public class MatlabExecutable extends JavaExecutable {
     }
 
     private void loadInputVariables() throws Exception {
-        if (paconfig.isTransferVariables()) {
-            File inMat = new File(taskconfig.getInputVariablesFileURI());
 
-            printLog("Loading input variables from " + inMat);
+        File inMat = new File(taskconfig.getInputVariablesFileURI());
 
-            matlabConnection.evalString("load('" + inMat + "');");
-            if (taskconfig.getComposedInputVariablesFileURI() != null) {
-                File compinMat = new File(taskconfig.getComposedInputVariablesFileURI());
-                matlabConnection.evalString("load('" + compinMat + "');in=out;clear out;");
-            }
+        printLog("Loading input variables from " + inMat);
+
+        matlabConnection.evalString("load('" + inMat + "');");
+        if (taskconfig.getComposedInputVariablesFileURI() != null) {
+            File compinMat = new File(taskconfig.getComposedInputVariablesFileURI());
+            matlabConnection.evalString("load('" + compinMat + "');in=out;clear out;");
         }
+
     }
 
     private Serializable storeOutputVariable() throws Exception {
@@ -520,9 +472,9 @@ public class MatlabExecutable extends JavaExecutable {
         String tmpPath = System.getProperty("java.io.tmpdir");
         // system temp dir (not using java.io.tmpdir since in runasme it can be
         // inaccesible and the scratchdir property can inherited from parent jvm)
-//        if (this.paconfig.isRunAsMe()) {
-//            tmpPath = System.getProperty("node.dataspace.scratchdir");
-//        }
+        //        if (this.paconfig.isRunAsMe()) {
+        //            tmpPath = System.getProperty("node.dataspace.scratchdir");
+        //        }
 
         // log file writer used for debugging
         File tmpDirFile = new File(tmpPath);

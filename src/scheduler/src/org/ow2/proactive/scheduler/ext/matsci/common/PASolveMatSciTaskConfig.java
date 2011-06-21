@@ -74,11 +74,6 @@ public class PASolveMatSciTaskConfig implements Serializable {
 
     private String customScriptUrl = null;
 
-    /**
-    * hash of zip file
-    */
-    private String sourceZipHash = null;
-
     private String description = null;
 
     private String[] outputFilesZipList;
@@ -297,14 +292,6 @@ public class PASolveMatSciTaskConfig implements Serializable {
 
     public String[] getSourceNames() {
         return sourceNames;
-    }
-
-    public String getSourceZipHash() {
-        return sourceZipHash;
-    }
-
-    public void setSourceZipHash(String sourceZipHash) {
-        this.sourceZipHash = sourceZipHash;
     }
 
 }

@@ -212,45 +212,38 @@ public class AOMatlabEnvironment extends AOMatSciEnvironment<Boolean, MatlabResu
                 }
                 oldTask = schedulerTask;
 
-                if (config.isTransferSource()) {
-                    if (config.isZipSourceFiles() && taskConfigs[i][j].getSourceZipFileName() != null) {
-                        schedulerTask.addInputFiles(config.getTempSubDirName() + "/" +
-                            taskConfigs[i][j].getSourceZipFileName(), InputAccessMode.TransferFromInputSpace);
-                    }
-                    if (!config.isZipSourceFiles() && taskConfigs[i][j].getSourceNames() != null) {
-                        for (String name : taskConfigs[i][j].getSourceNames()) {
-                            schedulerTask.addInputFiles(config.getTempSubDirName() + "/" + name,
-                                    InputAccessMode.TransferFromInputSpace);
-                        }
-                    }
-                    if (config.isZipSourceFiles() && config.getSourceZipFileName() != null) {
-                        schedulerTask.addInputFiles(config.getTempSubDirName() + "/" +
-                            config.getSourceZipFileName(), InputAccessMode.TransferFromInputSpace);
-                    }
+                if (config.isZipSourceFiles() && taskConfigs[i][j].getSourceZipFileName() != null) {
+                    schedulerTask.addInputFiles(config.getTempSubDirName() + "/" +
+                        taskConfigs[i][j].getSourceZipFileName(), InputAccessMode.TransferFromInputSpace);
                 }
-                if (config.isTransferEnv()) {
-                    if (config.isZipEnvFile()) {
-                        schedulerTask.addInputFiles(config.getTempSubDirName() + "/" +
-                            config.getEnvZipFileName(), InputAccessMode.TransferFromInputSpace);
-                    } else {
-                        schedulerTask.addInputFiles(config.getTempSubDirName() + "/" +
-                            config.getEnvMatFileName(), InputAccessMode.TransferFromInputSpace);
-                    }
-                }
-                if (config.isTransferVariables()) {
-                    schedulerTask
-                            .addInputFiles(config.getTempSubDirName() + "/" +
-                                taskConfigs[i][j].getInputVariablesFileName(),
-                                    InputAccessMode.TransferFromInputSpace);
-                    if (taskConfigs[i][j].getComposedInputVariablesFileName() != null) {
-                        schedulerTask.addInputFiles(config.getTempSubDirName() + "/" +
-                            taskConfigs[i][j].getComposedInputVariablesFileName(),
+                if (!config.isZipSourceFiles() && taskConfigs[i][j].getSourceNames() != null) {
+                    for (String name : taskConfigs[i][j].getSourceNames()) {
+                        schedulerTask.addInputFiles(config.getTempSubDirName() + "/" + name,
                                 InputAccessMode.TransferFromInputSpace);
                     }
-                    schedulerTask.addOutputFiles(config.getTempSubDirName() + "/" +
-                        taskConfigs[i][j].getOutputVariablesFileName(),
-                            OutputAccessMode.TransferToOutputSpace);
                 }
+                if (config.isZipSourceFiles() && config.getSourceZipFileName() != null) {
+                    schedulerTask.addInputFiles(config.getTempSubDirName() + "/" +
+                        config.getSourceZipFileName(), InputAccessMode.TransferFromInputSpace);
+                }
+
+                if (config.isTransferEnv()) {
+
+                    schedulerTask.addInputFiles(
+                            config.getTempSubDirName() + "/" + config.getEnvMatFileName(),
+                            InputAccessMode.TransferFromInputSpace);
+
+                }
+
+                schedulerTask.addInputFiles(config.getTempSubDirName() + "/" +
+                    taskConfigs[i][j].getInputVariablesFileName(), InputAccessMode.TransferFromInputSpace);
+                if (taskConfigs[i][j].getComposedInputVariablesFileName() != null) {
+                    schedulerTask.addInputFiles(config.getTempSubDirName() + "/" +
+                        taskConfigs[i][j].getComposedInputVariablesFileName(),
+                            InputAccessMode.TransferFromInputSpace);
+                }
+                schedulerTask.addOutputFiles(config.getTempSubDirName() + "/" +
+                    taskConfigs[i][j].getOutputVariablesFileName(), OutputAccessMode.TransferToOutputSpace);
 
                 String[] inputFiles = taskConfigs[i][j].getInputFiles();
                 if (inputFiles != null && inputFiles.length > 0) {

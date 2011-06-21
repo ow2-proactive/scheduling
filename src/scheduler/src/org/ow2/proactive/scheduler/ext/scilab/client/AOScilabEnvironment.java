@@ -222,13 +222,11 @@ public class AOScilabEnvironment extends AOMatSciEnvironment<ScilabType, ScilabR
                     }
                 }
                 if (config.isTransferEnv()) {
-                    if (config.isZipEnvFile()) {
-                        schedulerTask.addInputFiles(config.getTempSubDirName() + "/" +
-                            config.getEnvZipFileName(), InputAccessMode.TransferFromInputSpace);
-                    } else {
-                        schedulerTask.addInputFiles(config.getTempSubDirName() + "/" +
-                            config.getEnvMatFileName(), InputAccessMode.TransferFromInputSpace);
-                    }
+
+                    schedulerTask.addInputFiles(
+                            config.getTempSubDirName() + "/" + config.getEnvMatFileName(),
+                            InputAccessMode.TransferFromInputSpace);
+
                 }
                 if (config.isTransferVariables()) {
                     schedulerTask

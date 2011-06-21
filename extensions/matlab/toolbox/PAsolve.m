@@ -289,7 +289,7 @@ sourceZipBaseName = ['MatlabPAsolveSrc_' num2str(solveid)];
     end
 
 
-if opt.TransferSource
+
     stdclasses = {'logical','char','int8','uint8','int16','uint16','int32','uint32','int64','uint64','single','double','cell','struct','function_handle'};
     envziplist={};
     if opt.TransferEnv
@@ -308,7 +308,7 @@ if opt.TransferSource
     for i=1:NN
         for j=1:MM
             paramziplist={};
-            if opt.TransferVariables
+
                 argi = Tasks(j,i).Params;
                 for k=1:length(argi)
                     c=class(argi{k});
@@ -318,16 +318,14 @@ if opt.TransferSource
                         paramziplist = union(parammfiles, paramclassdirs);
                     end
                 end
-            end
             [zFN zFP h]=buildZiplist(allfuncs(i,j).s,[i j],envziplist,paramziplist);
 
-            task_config(i,j).setSourceZipHash(h);
             task_config(i,j).setSourceZipFileName(zFN);
             taskFilesToClean{i}=[taskFilesToClean{i} {zFP}];
 
         end
     end
-end
+
 
 % Transfering the environment
 envZipName = ['MatlabPAsolveEnv_' num2str(solveid) '.zip'];
@@ -445,12 +443,9 @@ end
 
 % Creating the tasks
 
-if opt.TransferSource
-    % to optimize with Hash
+
     input = 'i=0;';
-else
-    input = strcat('restoredefaultpath;addpath(''',getUserPath,''');');
-end
+
 
 variableInFileBaseName = ['MatlabPAsolveVarIn_' num2str(solveid)];
 variableOutFileBaseName = ['MatlabPAsolveVarOut_' num2str(solveid)];
@@ -463,7 +458,7 @@ for i=1:NN
         % to an evaluatable string)
         argi = Tasks(j,i).Params;
         main ='';
-        if opt.TransferVariables
+
             inVarFN = [variableInFileBaseName indToFile([i j]) '.mat'];
             outVarFN = [variableOutFileBaseName indToFile([i j]) '.mat'];
             inVarFP = [pa_dir fs inVarFN];
@@ -498,11 +493,6 @@ for i=1:NN
                 outVarFiles{i} = outVarFP;
             end
 
-        else
-            for k=1:length(argi)
-                main = [main 'in' num2str(k) ' = ' sched.serialize(argi{k}) ';'];
-            end
-        end
 
         % Creating the rest of the command (evaluation of the user function)
 
@@ -546,12 +536,12 @@ end
 solve_config.setDebug(opt.Debug);
 solve_config.setTimeStamp(opt.TimeStamp);
 solve_config.setPriority(opt.Priority);
-solve_config.setTransferSource(opt.TransferSource);
 solve_config.setTransferEnv(opt.TransferEnv);
-solve_config.setTransferVariables(opt.TransferVariables);
 solve_config.setMatFileOptions(opt.TransferMatFileOptions);
 solve_config.setFork(opt.Fork);
 solve_config.setRunAsMe(opt.RunAsMe);
+solve_config.setWindowsStartupOptionsAsString(opt.WindowsStartupOptions);
+solve_config.setLinuxStartupOptionsAsString(opt.LinuxStartupOptions);
 
 solve_config.setInputSpaceName('MatlabInputSpace');
 solve_config.setOutputSpaceName('MatlabOutputSpace');
@@ -580,7 +570,6 @@ end
 solve_config.setZipInputFiles(opt.ZipInputFiles);
 solve_config.setZipOutputFiles(opt.ZipOutputFiles);
 solve_config.setZipSourceFiles(true);
-solve_config.setZipEnvFile(false);
 
 pairinfolist = solver.solve(solve_config, task_config);
 
@@ -597,7 +586,6 @@ tnit = ftn.iterator();
 for i=1:NN
     taskinfo.cleanFileSet = taskFilesToClean{i};
     taskinfo.cleanDirSet = {pa_dir};
-    taskinfo.transferVariables = opt.TransferVariables;
     taskinfo.outFile = outVarFiles{i};
     taskinfo.jobid = jid;
     taskinfo.taskid = char(tnit.next());

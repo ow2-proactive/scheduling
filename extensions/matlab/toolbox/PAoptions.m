@@ -14,11 +14,6 @@
 %   
 %               TimeStamp mode in outputs, default to 'off'
 %
-%   TransferSource       true | false | 'on' | 'off'      
-%               
-%               Transfers source code used by the called function (all
-%               dependant matlab user functions to remote matlab engine,
-%               default to 'on'
 %
 %   TransferEnv       true | false | 'on' | 'off'      
 %               
@@ -27,12 +22,6 @@
 %               environment need to be accessed inside the batch function,
 %               they should be done using the evalin('caller', ...) syntax
 %               default to 'off'
-%   TransferVariables       true | false | 'on' | 'off'      
-%               
-%               Transfers the input and return parameters of matlab
-%               functions as a file rather than using the Ptolemy Matlab/Java interface
-%               default to 'on' as their might be rounding errors betwen
-%               matlab and java
 %
 %   CustomDataspaceURL        char
 %               URL of the dataspace (both input and output) to expose, if
@@ -192,11 +181,6 @@ inputs(j).default = false;
 inputs(j).check = logcheck;
 inputs(j).trans = logtrans;
 j=j+1;
-inputs(j).name = 'TransferSource';
-inputs(j).default = true;
-inputs(j).check = logcheck;
-inputs(j).trans = logtrans;
-j=j+1;
 inputs(j).name = 'Fork';
 inputs(j).default = false;
 inputs(j).check = logcheck;
@@ -209,11 +193,6 @@ inputs(j).trans = logtrans;
 j=j+1;
 inputs(j).name = 'TransferEnv';
 inputs(j).default = false;
-inputs(j).check = logcheck;
-inputs(j).trans = logtrans;
-j=j+1;
-inputs(j).name = 'TransferVariables';
-inputs(j).default = true;
 inputs(j).check = logcheck;
 inputs(j).trans = logtrans;
 j=j+1;
@@ -281,6 +260,16 @@ inputs(j).name = 'ZipOutputFiles';
 inputs(j).default = false;
 inputs(j).check = logcheck;
 inputs(j).trans = logtrans;
+j=j+1;
+inputs(j).name = 'WindowsStartupOptions';
+inputs(j).default = '-automation -nodesktop -nosplash -nodisplay';
+inputs(j).check = @ischar;
+inputs(j).trans = id;
+j=j+1;
+inputs(j).name = 'LinuxStartupOptions';
+inputs(j).default = '-nodesktop -nosplash -nodisplay';
+inputs(j).check = @ischar;
+inputs(j).trans = id;
 j=j+1;
 inputs(j).name = 'ProActiveJars';
 inputs(j).default = 'jruby.jar,jruby-engine.jar,jython.jar,jython-engine.jar,ProActive.jar,ProActive_Scheduler-client.jar,ProActive_SRM-common-client.jar,ProActive_Scheduler-matsci.jar';

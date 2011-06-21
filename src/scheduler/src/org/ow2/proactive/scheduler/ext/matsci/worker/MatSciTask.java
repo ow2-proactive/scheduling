@@ -244,13 +244,10 @@ public abstract class MatSciTask<W extends MatSciWorker, C extends MatSciEngineC
             }
         }
         if (paconfig.isTransferEnv()) {
-            if (paconfig.isZipEnvFile()) {
-                taskconfig.setEnvZipFileURI(new URI(getLocalFile(
-                        paconfig.getTempSubDirName() + "/" + paconfig.getEnvZipFileName()).getRealURI()));
-            } else {
-                taskconfig.setEnvMatFileURI(new URI(getLocalFile(
-                        paconfig.getTempSubDirName() + "/" + paconfig.getEnvMatFileName()).getRealURI()));
-            }
+
+            taskconfig.setEnvMatFileURI(new URI(getLocalFile(
+                    paconfig.getTempSubDirName() + "/" + paconfig.getEnvMatFileName()).getRealURI()));
+
         }
         if (paconfig.isTransferVariables()) {
             taskconfig
