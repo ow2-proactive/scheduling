@@ -83,6 +83,8 @@ public abstract class AOMatSciEnvironment<R, RL> implements Serializable, Schedu
      */
     protected long lastGenJobId = 0;
 
+    protected String aoid;
+
     /**
      * URL to the scheduler
      */
@@ -197,7 +199,7 @@ public abstract class AOMatSciEnvironment<R, RL> implements Serializable, Schedu
     @SuppressWarnings("unchecked")
     public void initActivity(Body body) {
         stubOnThis = (AOMatSciEnvironment) PAActiveObject.getStubOnThis();
-
+        aoid = PAActiveObject.getBodyOnThis().getID().getVMID().toString();
     }
 
     /**

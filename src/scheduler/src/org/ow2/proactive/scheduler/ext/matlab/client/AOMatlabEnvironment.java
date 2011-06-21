@@ -318,6 +318,7 @@ public class AOMatlabEnvironment extends AOMatSciEnvironment<Boolean, MatlabResu
                     SelectionScript sscript = null;
                     String[] scriptParams;
                     ArrayList<String> paramsList = new ArrayList<String>();
+                    paramsList.add(aoid + "" + lastGenJobId + "_" + tname);
                     paramsList.add(config.getLogin());
                     paramsList.add(config.getLicenseServerUrl());
                     if (taskConfigs[i][j].getToolboxesUsed() != null) {

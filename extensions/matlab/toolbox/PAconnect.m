@@ -57,7 +57,7 @@
 function jobs = PAconnect(varargin)
 
 if nargin ~= 1 || ~ischar(varargin{1})
-    error('PAconnect accepts only one argument (the url to the scheduler)');
+    error('PAconnect::PAconnect accepts only one argument (the url to the scheduler)');
 end
 url = varargin{1};
 
@@ -88,7 +88,7 @@ else
 
     ok = solver.join(url);
     if ~ok
-        error('Error while connecting');
+        error('PAconnect::Error while connecting');
     end
     % Recording the solver inside the session, each further call to PAgetsolver
     % will retrieve it
@@ -111,6 +111,9 @@ while ~loggedin && attempts <= 3
         attempts = attempts+1;
         msg = ['Incorrect Login/Password, try ' num2str(attempts)];
     end
+end
+if attempts > 3
+    error('PAconnect::Authentication error');
 end
 sched.PAgetlogin(login);
 

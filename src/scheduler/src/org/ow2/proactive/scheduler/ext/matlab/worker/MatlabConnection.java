@@ -36,14 +36,10 @@
  */
 package org.ow2.proactive.scheduler.ext.matlab.worker;
 
-import matlabcontrol.*;
 import org.ow2.proactive.scheduler.ext.matlab.common.exception.MatlabInitException;
 import org.ow2.proactive.scheduler.ext.matlab.common.exception.MatlabTaskException;
-import org.ow2.proactive.scheduler.ext.matsci.worker.util.MatSciEngineConfigBase;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
 
 
 /**
@@ -51,18 +47,7 @@ import java.util.Arrays;
  * MATLAB tasks executions. There can be only one instance at a time.
  * Be careful this class is not thread safe.
  */
-public class MatlabConnection {
-
-    /** The proxy to the remote MATLAB */
-    private RemoteMatlabProxy proxy;
-
-    /** The thread executed on shutdown that releases this connection */
-    private Thread shutdownHook;
-
-    private CustomMatlabProcessCreator processCreator;
-
-    private MatlabConnection() {
-    }
+public interface MatlabConnection {
 
     /**
      * Each time this method is called creates a new MATLAB process using
@@ -72,100 +57,19 @@ public class MatlabConnection {
      * @param workingDir the directory where to start MATLAB
      * @throws MatlabInitException if MATLAB could not be initialized
      */
-    public static MatlabConnection acquire(final String matlabExecutablePath, final File workingDir,
-            final boolean debug, final String[] startupOptions) throws MatlabInitException {
-        RemoteMatlabProxyFactory proxyFactory;
+    public void acquire(final String matlabExecutablePath, final File workingDir, final boolean debug,
+            final String[] startupOptions) throws MatlabInitException;
 
-        final MatlabConnection conn = new MatlabConnection();
-
-        // If a user is specified create the proxy factory with a specific
-        // MATLAB process as user creator
-        try {
-
-            conn.processCreator = new CustomMatlabProcessCreator(matlabExecutablePath, workingDir,
-                startupOptions, debug);
-
-            proxyFactory = new RemoteMatlabProxyFactory(conn.processCreator);
-        } catch (MatlabConnectionException e) {
-            // Possible cause: registry problem or receiver is not bind
-            e.printStackTrace();
-
-            // Nothing can be done maybe a retry ... check this later
-            MatlabInitException me = new MatlabInitException(
-                "Unable to create the MATLAB proxy factory. Possible causes: registry cannot be created or the receiver cannot be bind");
-            me.initCause(e);
-
-            throw me;
-        }
-
-        // This will start a MATLAB process, wait until the JVM inside MATLAB
-        RemoteMatlabProxy proxy;
-        try {
-            proxy = proxyFactory.getProxy();
-        } catch (MatlabConnectionException e) {
-            // Possible cause: timeout
-            e.printStackTrace();
-
-            // Nothing can be done maybe a retry ... check this later
-            MatlabInitException me = new MatlabInitException(
-                "Unable to create the MATLAB proxy factory. Possible causes: registry cannot be created or the receiver cannot be bind");
-            me.initCause(e);
-
-            // clean factory
-            proxyFactory.clean();
-
-            // destroy process that can be spawned
-            // even if we didn't managed to get the proxy
-            conn.processCreator.killProcess();
-
-            throw me;
-        }
-
-        conn.proxy = proxy;
-
-        // Add shutdown hook to release the connection on jvm exit
-        conn.shutdownHook = new Thread(new Runnable() {
-            public final void run() {
-                conn.release();
-            }
-        });
-        Runtime.getRuntime().addShutdownHook(conn.shutdownHook);
-
-        // Return a new MATLAB connection
-        return conn;
-    }
-
-    /*********** PUBLIC METHODS ***********/
+    /**
+     * Used to send initialization matlab commands to the connection (in case of command grouping)
+     */
+    public void init();
 
     /**
      * Releases the connection, after a call to this method
      * the connection becomes unusable !
      */
-    public void release() {
-        if (this.proxy == null) {
-            return;
-        }
-        // Stop MATLAB use true for immediate
-        try {
-            this.proxy.exit(true);
-        } catch (Exception e) {
-            // Here maybe we should kill the process it self ... need more tests
-        }
-
-        // Clean threads used by the proxy
-        this.proxy.clean();
-
-        // Kill the MATLAB process
-        this.processCreator.killProcess();
-
-        this.proxy = null;
-        // Remove the shutdown hook
-        try {
-            Runtime.getRuntime().removeShutdownHook(this.shutdownHook);
-        } catch (Exception e) {
-        }
-        System.gc();
-    }
+    public void release();
 
     /**
      * Evaluate the given string in the workspace.
@@ -173,14 +77,7 @@ public class MatlabConnection {
      * @param command the command to evaluate
      * @throws MatlabTaskException If unable to evaluate the command
      */
-    public void evalString(final String command) throws MatlabTaskException {
-        try {
-            String out = this.proxy.eval(command);
-            System.out.println(out);
-        } catch (MatlabInvocationException e) {
-            throw new MatlabTaskException("Unable to eval command " + command, e);
-        }
-    }
+    public void evalString(final String command) throws MatlabTaskException;
 
     /**
      * Extract a variable from the workspace.
@@ -189,13 +86,7 @@ public class MatlabConnection {
      * @return value of the variable
      * @throws MatlabTaskException if unable to get the variable
      */
-    public Object get(String variableName) throws MatlabTaskException {
-        try {
-            return this.proxy.getVariable(variableName);
-        } catch (MatlabInvocationException e) {
-            throw new MatlabTaskException("Unable to get get the variable " + variableName, e);
-        }
-    }
+    public Object get(String variableName) throws MatlabTaskException;
 
     /**
      * Push a variable in to the workspace.
@@ -204,83 +95,11 @@ public class MatlabConnection {
      * @param value the value of the variable
      * @throws MatlabTaskException if unable to set a variable
      */
-    public void put(final String variableName, final Object value) throws MatlabTaskException {
-        try {
-            this.proxy.setVariable(variableName, value);
-        } catch (MatlabInvocationException e) {
-            throw new MatlabTaskException("Unable to set the variable " + variableName, e);
-        }
-    }
-
-    /*********** PRIVATE INTERNAL CLASS ***********/
+    public void put(final String variableName, final Object value) throws MatlabTaskException;
 
     /**
-     * This class is used to create a MATLAB process under a specific user
+     * Used to send finalization matlab commands to the connection and launch the command buffer (in case of command grouping)
      */
-    private static class CustomMatlabProcessCreator implements MatlabProcessCreator {
+    public void launch() throws Exception;
 
-        protected final String tmpDir = System.getProperty("java.io.tmpdir");
-
-        protected String nodeName;
-
-        protected String[] startUpOptions;
-        protected final String matlabLocation;
-        protected final File workingDirectory;
-
-        protected File logFile;
-        protected boolean debug;
-
-        private Process process;
-
-        public CustomMatlabProcessCreator(final String matlabLocation, final File workingDirectory,
-                String[] startUpOptions, boolean debug) {
-            this.matlabLocation = matlabLocation;
-            this.workingDirectory = workingDirectory;
-            this.debug = debug;
-            this.startUpOptions = startUpOptions;
-            try {
-                this.nodeName = MatSciEngineConfigBase.getNodeName();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            logFile = new File(tmpDir, "MatlabStart" + nodeName + ".log");
-        }
-
-        public Process createMatlabProcess(String runArg) throws Exception {
-            // Attempt to run MATLAB
-            final ArrayList<String> commandList = new ArrayList<String>();
-            commandList.add(this.matlabLocation);
-            commandList.addAll(Arrays.asList(this.startUpOptions));
-            commandList.add("-logfile");
-            commandList.add(logFile.toString());
-            commandList.add("-r");
-            commandList.add(runArg);
-
-            String[] command = (String[]) commandList.toArray(new String[commandList.size()]);
-
-            ProcessBuilder b = new ProcessBuilder();
-            b.directory(this.workingDirectory);
-            b.command(command);
-
-            process = b.start();
-
-            return process;
-
-        }
-
-        public File getLogFile() {
-            return logFile;
-        }
-
-        public boolean isDebug() {
-            return debug;
-        }
-
-        public void killProcess() {
-            try {
-                process.destroy();
-            } catch (Exception e) {
-            }
-        }
-    }
 }

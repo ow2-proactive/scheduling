@@ -167,11 +167,12 @@ public class MatlabExecutable extends JavaExecutable {
         this.printLog("Acquiring MATLAB connection using " + matlabCmd);
 
         // Acquire a connection to MATLAB
+        this.matlabConnection = new MatlabConnectionRImpl();
         if (os == OperatingSystem.unix) {
-            this.matlabConnection = MatlabConnection.acquire(matlabCmd, // MATLAB exe path
+            matlabConnection.acquire(matlabCmd, // MATLAB exe path
                     this.localSpaceRootDir, paconfig.isDebug(), paconfig.getLinuxStartupOptions());
         } else {
-            this.matlabConnection = MatlabConnection.acquire(matlabCmd, // MATLAB exe path
+            matlabConnection.acquire(matlabCmd, // MATLAB exe path
                     this.localSpaceRootDir, paconfig.isDebug(), paconfig.getWindowsStartupOptions());
         }
 
@@ -210,6 +211,8 @@ public class MatlabExecutable extends JavaExecutable {
     protected final Serializable executeScript() throws Throwable {
 
         // Add sources, load workspace and input variables
+        matlabConnection.init();
+
         this.addSources();
         this.execKeepAlive();
         this.loadWorkspace();
@@ -225,18 +228,16 @@ public class MatlabExecutable extends JavaExecutable {
 
         printLog("MATLAB command completed successfully, receiving output... ");
 
-        testOutput();
-
-        Object out = null;
-
-        out = storeOutputVariable();
-
-        printLog(out.toString());
+        storeOutputVariable();
 
         // outputFiles
         transferOutputFiles();
 
-        return (Serializable) out;
+        matlabConnection.launch();
+
+        testOutput();
+
+        return new Boolean(true);
     }
 
     /*********** PRIVATE METHODS ***********/
@@ -416,7 +417,7 @@ public class MatlabExecutable extends JavaExecutable {
 
     }
 
-    private Serializable storeOutputVariable() throws Exception {
+    private void storeOutputVariable() throws Exception {
         File outputFile = new File(tempSubDir, taskconfig.getOutputVariablesFileName());
 
         printLog("Storing 'out' variable into " + outputFile);
@@ -428,11 +429,9 @@ public class MatlabExecutable extends JavaExecutable {
             matlabConnection.evalString("save('" + outputFile + "','out');");
         }
 
-        if (!outputFile.exists()) {
-            throw new MatlabTaskException("Unable to store 'out' variable, the output file does not exist");
-        }
-        Boolean out = new Boolean(true);
-        return out;
+        //if (!outputFile.exists()) {
+        //    throw new MatlabTaskException("Unable to store 'out' variable, the output file does not exist");
+        //}
     }
 
     private void transferOutputFiles() throws Exception {
@@ -458,15 +457,12 @@ public class MatlabExecutable extends JavaExecutable {
     private void testOutput() throws Exception {
         printLog("Receiving and testing output...");
 
-        matlabConnection.evalString("outok=exist('out','var');");
-        Object ok = matlabConnection.get("outok");
-        boolean okj = false;
-        if (ok instanceof double[]) {
-            okj = (((double[]) ok)[0] == 1.0);
+        File outputFile = new File(tempSubDir, taskconfig.getOutputVariablesFileName());
+
+        if (!outputFile.exists()) {
+            throw new MatlabTaskException("Cannot find output variable file.");
         }
-        if (!okj) {
-            throw new MatlabTaskException("Cannot find variable 'out'");
-        }
+
     }
 
     private void printLog(final String message) {

@@ -3,6 +3,7 @@ include Java
 import org.ow2.proactive.scheduler.ext.matlab.worker.util.MatlabEngineConfig
 import org.ow2.proactive.scheduler.ext.matlab.worker.util.MatlabFinder
 
+
 import java.lang.System
 
 module JavaIO
@@ -51,7 +52,6 @@ class ReserveMatlab
         "symbolic" => %q!Symbolic_Toolbox!,
         # System Identification
         "ident" => %q!Identification_Toolbox!
-
     }
     begin
       @nodeName = MatlabEngineConfig.getNodeName()
@@ -157,21 +157,61 @@ class ReserveMatlab
     end
   end
 
+  def checkFeature(client, rid, login, feature)
+    if client.isLicensed(feature)
+      # TODO login with runAsMe
+      request = DefaultLicenseRequest.new(rid, login)
+      tf = client.hasLicense(request, feature, 60000);
+      log(tf)
+      return tf;
+    else
+      log("unlicensed")
+    end
+    return false
+
+  end
+
 
   def checkMatlab
 
     log(Date.new().to_string()+" : Executing toolbox checking script on " + @host)
-    if (defined? $args) && ($args.size >= 2)
-      login = $args[0]
-      serverurl = $args[1]
-      if $args.size > 2
-        $args[2..$args.size-1].each do |a|
+    begin
+      import com.activeeon.licensing.remote.LicensingClient
+      import com.activeeon.licensing.DefaultLicenseRequest
+    rescue Exception => e
+      log("Warning : Licensing proxy classes not found, license checking disabled")
+      return true
+    end
+
+    if (defined? $args) && ($args.size >= 3)
+      rid = $args[0]
+      login = $args[1]
+      serverurl = $args[2]
+      $args.each do |a|
+        log(a)
+      end
+      begin
+        client = LicensingClient.new(serverurl)
+      rescue Exception => e
+        log("Warning : Licensing proxy cannot be found at url : "+serverurl +" , license checking disabled")
+        return true
+      end
+      if $args.length > 3
+        tf = true
+        $args[3..$args.length].each do |a|
           tcode = toolbox_code(a)
+          log(tcode)
+          tf = tf && checkFeature(client, rid, login, tcode)
+
           # use the code and login to contact the proxy server for each Matlab feature
         end
+        return tf;
+      else
+         tcode = toolbox_code("matlab")
+         return checkFeature(client, rid, login, tcode)
       end
     end
-    return true;
+    return false;
   end
 end
 
@@ -181,6 +221,7 @@ begin
   cm = ReserveMatlab.new
 
   if cm.findConf!
+    #$selected = true
     $selected = cm.checkMatlab
   end
 

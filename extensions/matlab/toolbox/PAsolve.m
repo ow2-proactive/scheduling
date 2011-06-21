@@ -175,6 +175,7 @@ vmin = str2num(vmin);
         % find the list of toolboxes used by the user function and give it as parameter to the script
         if foostr(2) ~= '('
             tblist = sched.findUsedToolboxes(func2str(foo));
+            tblist = union({'matlab'},tblist);
         else
             % if func is an anonymous function, we can't find dependencies
             tblist = {'matlab'}
@@ -542,7 +543,8 @@ end
 % send the task list to the scheduler
 
 solve_config.setDebug(opt.Debug);
-solve_config.setLogin(sched.PAgetlogin());
+lgin = sched.PAgetlogin();
+solve_config.setLogin(lgin);
 solve_config.setTimeStamp(opt.TimeStamp);
 solve_config.setPriority(opt.Priority);
 solve_config.setTransferEnv(opt.TransferEnv);

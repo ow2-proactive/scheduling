@@ -204,6 +204,9 @@ public class IOTools {
         private PrintStream out;
         private BufferedReader br;
 
+        private String startpattern;
+        private String stoppattern;
+
         /**  */
         public ArrayList<String> output = new ArrayList<String>();
         private PrintStream debugStream;
@@ -239,10 +242,19 @@ public class IOTools {
          * @param appendMessage
          * @param out
          */
-        public LoggingThread(InputStream is, String appendMessage, PrintStream out) {
+        public LoggingThread(InputStream is, String appendMessage, PrintStream out, String startpattern,
+                String stoppattern) {
+            this(is, appendMessage, out, null, startpattern, stoppattern);
+        }
+
+        public LoggingThread(InputStream is, String appendMessage, PrintStream out, PrintStream ds,
+                String startpattern, String stoppattern) {
             this.br = new BufferedReader(new InputStreamReader(is));
             this.appendMessage = appendMessage;
             this.out = out;
+            this.debugStream = ds;
+            this.startpattern = startpattern;
+            this.stoppattern = stoppattern;
         }
 
         /**
@@ -253,10 +265,7 @@ public class IOTools {
         * @param out
         */
         public LoggingThread(InputStream is, String appendMessage, PrintStream out, PrintStream ds) {
-            this.br = new BufferedReader(new InputStreamReader(is));
-            this.appendMessage = appendMessage;
-            this.out = out;
-            this.debugStream = ds;
+            this(is, appendMessage, out, ds, null, null);
         }
 
         public LoggingThread(InputStream is) {
@@ -269,7 +278,7 @@ public class IOTools {
             String answer = null;
             try {
 
-                while (!ready()) {
+                while (!ready() && goon) {
                     Thread.sleep(10);
                 }
                 answer = readLine();
@@ -277,7 +286,7 @@ public class IOTools {
             } catch (IOException e) {
 
             } catch (InterruptedException e) {
-
+                goon = false;
             }
             return answer;
         }
@@ -293,12 +302,16 @@ public class IOTools {
             int chr;
             boolean r = false;
 
-            while (true) {
-                while (!ready()) {
+            while (goon) {
+                while (!ready() && goon) {
                     try {
                         Thread.sleep(10);
                     } catch (InterruptedException e) {
+                        goon = false;
                     }
+                }
+                if (!goon) {
+                    return null;
                 }
 
                 synchronized (br) {
@@ -324,8 +337,8 @@ public class IOTools {
                         line.append((char) chr);
                     }
                 }
-
             }
+            return null;
 
         }
 
@@ -335,10 +348,20 @@ public class IOTools {
         public void run() {
             String line = null;
             boolean first_line = true;
+            boolean last_line = false;
             if (out != null) {
                 while ((line = getLineOrDie()) != null && goon) {
                     synchronized (out) {
+
                         if (first_line && line.trim().length() > 0) {
+
+                            if ((startpattern != null) && (line.contains(startpattern))) {
+                                // we eat everything until the startpattern, if provided
+                                startpattern = null;
+                                continue;
+                            } else if (startpattern != null) {
+                                continue;
+                            }
                             first_line = false;
 
                             out.println("[ " + new java.util.Date() + " ]" + appendMessage + line);
@@ -348,16 +371,21 @@ public class IOTools {
                                 debugStream
                                         .println("[ " + new java.util.Date() + " ]" + appendMessage + line);
                                 debugStream.flush();
+
                             }
                         } else if (!first_line) {
+                            if ((stoppattern != null) && (line.contains(stoppattern))) {
+                                // at the stoppattern, we exit
+                                goon = false;
+                            } else {
+                                out.println("[ " + new java.util.Date() + " ]" + appendMessage + line);
+                                out.flush();
 
-                            out.println("[ " + new java.util.Date() + " ]" + appendMessage + line);
-                            out.flush();
-
-                            if (debugStream != null) {
-                                debugStream
-                                        .println("[ " + new java.util.Date() + " ]" + appendMessage + line);
-                                debugStream.flush();
+                                if (debugStream != null) {
+                                    debugStream.println("[ " + new java.util.Date() + " ]" + appendMessage +
+                                        line);
+                                    debugStream.flush();
+                                }
                             }
                         }
                     }
