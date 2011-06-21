@@ -418,5 +418,9 @@ public class MatlabControlEngine {
             return null;
         }
 
+        public boolean isDebug() {
+            return false;
+        }
+
     }
 }
