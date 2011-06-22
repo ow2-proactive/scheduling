@@ -173,5 +173,7 @@
 	<classpathentry kind="lib" path="lib/nodesource/winhpc/WinHPCWebserviceStubs.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/commons-vfs-patched-2.0-SNAPSHOTr19199-tests.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/commons-vfs-patched-2.0-SNAPSHOTr19199.jar"/>
+	<classpathentry kind="lib" path="lib/matsci/matlabcontrol-3.1.0.jar"/>
+	<classpathentry kind="lib" path="lib/matsci/ProActive_LicenseSaver-0.0.3-rc4-api.jar"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>
