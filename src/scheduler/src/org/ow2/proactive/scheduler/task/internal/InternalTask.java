@@ -127,6 +127,7 @@ import org.ow2.proactive.utils.NodeSet;
 public abstract class InternalTask extends TaskState {
 
     /** Parents list : null if no dependences */
+    // WARNING  #writeObject() refers to this field's name as a String 
     @ManyToAny(metaColumn = @Column(name = "ITASK_TYPE", length = 5))
     @AnyMetaDef(idType = "long", metaType = "string", metaValues = {
             @MetaValue(targetEntity = InternalJavaTask.class, value = "IJT"),
@@ -215,6 +216,15 @@ public abstract class InternalTask extends TaskState {
     @XmlTransient
     private InternalTask ifBranch = null;
 
+    /** If unsure, always leave this to false
+     * when true, {@link #ideps} should not be included in the serialization of this object.
+     * setting this flag just before serialization prevents large object graphs from being
+     * serialized when dependencies are not wanted.
+     */
+    @TransientInSerialization
+    @XmlTransient
+    private boolean skipIdepsInSerialization = false;
+
     /**
      * {@inheritDoc}
      */
@@ -255,10 +265,13 @@ public abstract class InternalTask extends TaskState {
 
         InternalTask replicatedTask = null;
         try {
+            this.skipIdepsInSerialization = true;
             // Deep copy of the InternalTask using serialization
             replicatedTask = (InternalTask) MakeDeepCopy.WithProActiveObjectStream.makeDeepCopy(this);
         } catch (Throwable t) {
             throw new ExecutableCreationException("Failed to serialize task", t);
+        } finally {
+            this.skipIdepsInSerialization = false;
         }
 
         // ideps contain references to other InternalTasks, it needs to be removed.
@@ -1255,6 +1268,9 @@ public abstract class InternalTask extends TaskState {
      * These fields are annotated with @TransientInSerialization.
      * The @TransientInSerialization describe the fields that won't be serialized by java since the two following
      * methods describe the serialization process.
+     * <p>
+     * If {@link #skipIdepsInSerialization} is true when this method is called, {@link #ideps} will
+     * not be included in the serialized object.
      */
 
     private void writeObject(ObjectOutputStream out) throws IOException {
@@ -1262,8 +1278,10 @@ public abstract class InternalTask extends TaskState {
             Map<String, Object> toSerialize = new HashMap<String, Object>();
             Field[] fields = InternalTask.class.getDeclaredFields();
             for (Field f : fields) {
+                boolean excludeIdeps = this.skipIdepsInSerialization &&
+                    f.equals(InternalTask.class.getDeclaredField("ideps"));
                 if (!f.isAnnotationPresent(TransientInSerialization.class) &&
-                    !Modifier.isStatic(f.getModifiers())) {
+                    !Modifier.isStatic(f.getModifiers()) && !excludeIdeps) {
                     toSerialize.put(f.getName(), f.get(this));
                 }
             }
