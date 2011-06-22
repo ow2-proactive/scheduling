@@ -970,17 +970,17 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
         SchedulerSession ss = SchedulerSessionMapper.getInstance().getSchedulerSession(sessionId);
         if (ss == null) {
-//            logger.trace("not found a scheduler frontend for sessionId " + sessionId);
+            //            logger.trace("not found a scheduler frontend for sessionId " + sessionId);
             throw new NotConnectedException("you are not connected to the scheduler, you should log on first");
         }
 
         SchedulerProxyUserInterface s = ss.getScheduler();
 
         if (s == null) {
-//            logger.trace("not found a scheduler frontend for sessionId " + sessionId);
+            //            logger.trace("not found a scheduler frontend for sessionId " + sessionId);
             throw new NotConnectedException("you are not connected to the scheduler, you should log on first");
         }
-//        logger.trace("found a scheduler frontend for sessionId " + sessionId + ", path =" + path);
+        //        logger.trace("found a scheduler frontend for sessionId " + sessionId + ", path =" + path);
         return s;
     }
 
@@ -1114,8 +1114,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
             Job j = null;
             boolean isAnArchive = false;
-			if (part1.getMediaType().toString().toLowerCase()
-					.indexOf(MediaType.APPLICATION_XML.toLowerCase()) > -1) {
+            if (part1.getMediaType().toString().toLowerCase()
+                    .indexOf(MediaType.APPLICATION_XML.toLowerCase()) > -1) {
                 // the job sent is the xml file
                 j = JobFactory.getFactory().createJob(tmp.getAbsolutePath());
             } else {
@@ -1125,10 +1125,19 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             }
             JobId jobid = s.submit(j);
 
+            File archiveToStore = new File(PortalConfiguration.jobIdToPath(jobid.value()));
             if (isAnArchive) {
-                File archiveToStore = new File(PortalConfiguration.jobIdToPath(jobid.value()));
-                System.out.println("saving archive to " + archiveToStore.getAbsolutePath());
+                logger.debug("saving archive to " + archiveToStore.getAbsolutePath());
                 tmp.renameTo(archiveToStore);
+            } else {
+                // the job is not an archive, however an archive file can 
+                // exist for this new job (due to an old submission)
+                // In that case, we remove the existing file preventing erronous access
+                // to this previously submitted archive.
+
+                if (archiveToStore.exists()) {
+                    archiveToStore.delete();
+                }
             }
 
             return jobid;
@@ -1507,7 +1516,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @GET
     @Path("stats")
     @Produces("application/json")
-    public Map<String,String> getStatistics(@HeaderParam("sessionid") final String sessionId)
+    public Map<String, String> getStatistics(@HeaderParam("sessionid") final String sessionId)
             throws NotConnectedException, PermissionException {
         final SchedulerProxyUserInterface s = checkAccess(sessionId, "stats");
 
@@ -1524,7 +1533,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @GET
     @Path("stats/myaccount")
     @Produces("application/json")
-    public Map<String,String> getStatisticsOnMyAccount(@HeaderParam("sessionid") final String sessionId)
+    public Map<String, String> getStatisticsOnMyAccount(@HeaderParam("sessionid") final String sessionId)
             throws NotConnectedException, PermissionException {
         final SchedulerProxyUserInterface s = checkAccess(sessionId, "stats/myaccount");
 
