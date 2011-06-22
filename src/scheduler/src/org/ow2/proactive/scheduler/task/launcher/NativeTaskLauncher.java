@@ -120,7 +120,7 @@ public class NativeTaskLauncher extends TaskLauncher {
         try {
             //init dataspace
             initDataSpaces();
-            replaceDSIterationTag();
+            replaceTagsInDataspaces();
 
             sample = System.currentTimeMillis();
             //copy datas from OUTPUT or INPUT to local scratch
@@ -151,7 +151,7 @@ public class NativeTaskLauncher extends TaskLauncher {
                 //init task
                 ExecutableInitializer execInit = executableContainer.createExecutableInitializer();
                 replaceWorkingDirDSTags(execInit);
-                replaceIterationTag(((NativeExecutableInitializer) execInit).getGenerationScript());
+                replaceTagsInScript(((NativeExecutableInitializer) execInit).getGenerationScript());
                 //decrypt credentials if needed
                 if (executableContainer.isRunAsUser()) {
                     decrypter.setCredentials(executableContainer.getCredentials());

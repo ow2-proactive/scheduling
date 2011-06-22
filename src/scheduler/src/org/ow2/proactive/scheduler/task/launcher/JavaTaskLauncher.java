@@ -104,7 +104,7 @@ public class JavaTaskLauncher extends TaskLauncher {
         try {
             //init dataspace
             initDataSpaces();
-            replaceDSIterationTag();
+            replaceTagsInDataspaces();
 
             sample = System.currentTimeMillis();
             //copy datas from OUTPUT or INPUT to local scratch

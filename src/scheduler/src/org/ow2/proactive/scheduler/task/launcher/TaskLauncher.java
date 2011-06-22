@@ -246,6 +246,9 @@ public abstract class TaskLauncher implements InitActive {
     /** Will be replaced in file paths by the task's replication index */
     protected static final String REPLICATION_INDEX_TAG = "$REP";
 
+    /** Will be replaced in file paths by the job id */
+    protected static final String JOBID_INDEX_TAG = "$JID";
+
     /**
      * ProActive empty constructor.
      */
@@ -635,7 +638,7 @@ public abstract class TaskLauncher implements InitActive {
      */
     @SuppressWarnings("unchecked")
     protected void executePreScript() throws ActiveObjectCreationException, NodeException, UserException {
-        replaceIterationTag(pre);
+        replaceTagsInScript(pre);
         logger_dev.info("Executing pre-script");
         ScriptHandler handler = ScriptLoader.createLocalHandler();
         this.addDataspaceBinding(handler);
@@ -661,7 +664,7 @@ public abstract class TaskLauncher implements InitActive {
     @SuppressWarnings("unchecked")
     protected void executePostScript(boolean executionSucceed) throws ActiveObjectCreationException,
             NodeException, UserException {
-        replaceIterationTag(post);
+        replaceTagsInScript(post);
         logger_dev.info("Executing post-script");
         ScriptHandler handler = ScriptLoader.createLocalHandler();
         this.addDataspaceBinding(handler);
@@ -686,7 +689,7 @@ public abstract class TaskLauncher implements InitActive {
      */
     @SuppressWarnings("unchecked")
     protected void executeFlowScript(TaskResult res) throws Throwable {
-        replaceIterationTag(flow);
+        replaceTagsInScript(flow);
         logger_dev.info("Executing flow-script");
         ScriptHandler handler = ScriptLoader.createLocalHandler();
         this.addDataspaceBinding(handler);
@@ -1101,7 +1104,7 @@ public abstract class TaskLauncher implements InitActive {
     /**
      * Replace iteration and replication helper tags in the dataspace's input and output descriptions
      */
-    protected void replaceDSIterationTag() {
+    protected void replaceTagsInDataspaces() {
         if (isDataspaceAware()) {
             if (inputFiles != null) {
                 for (InputSelector is : inputFiles) {
@@ -1110,14 +1113,12 @@ public abstract class TaskLauncher implements InitActive {
 
                     if (inc != null) {
                         for (int i = 0; i < inc.length; i++) {
-                            inc[i] = inc[i].replace(ITERATION_INDEX_TAG, "" + this.iterationIndex);
-                            inc[i] = inc[i].replace(REPLICATION_INDEX_TAG, "" + this.replicationIndex);
+                            inc[i] = replaceAllTags(inc[i]);
                         }
                     }
                     if (exc != null) {
                         for (int i = 0; i < exc.length; i++) {
-                            exc[i] = exc[i].replace(ITERATION_INDEX_TAG, "" + this.iterationIndex);
-                            exc[i] = exc[i].replace(REPLICATION_INDEX_TAG, "" + this.replicationIndex);
+                            exc[i] = replaceAllTags(exc[i]);
                         }
                     }
 
@@ -1132,14 +1133,12 @@ public abstract class TaskLauncher implements InitActive {
 
                     if (inc != null) {
                         for (int i = 0; i < inc.length; i++) {
-                            inc[i] = inc[i].replace(ITERATION_INDEX_TAG, "" + this.iterationIndex);
-                            inc[i] = inc[i].replace(REPLICATION_INDEX_TAG, "" + this.replicationIndex);
+                            inc[i] = replaceAllTags(inc[i]);
                         }
                     }
                     if (exc != null) {
                         for (int i = 0; i < exc.length; i++) {
-                            exc[i] = exc[i].replace(ITERATION_INDEX_TAG, "" + this.iterationIndex);
-                            exc[i] = exc[i].replace(REPLICATION_INDEX_TAG, "" + this.replicationIndex);
+                            exc[i] = replaceAllTags(exc[i]);
                         }
                     }
 
@@ -1155,23 +1154,32 @@ public abstract class TaskLauncher implements InitActive {
      * 
      * @param script the script where tags should be replaced
      */
-    protected void replaceIterationTag(Script<?> script) {
+    protected void replaceTagsInScript(Script<?> script) {
         if (script == null) {
             return;
         }
         String code = script.getScript();
         String[] args = script.getParameters();
 
-        code = code.replace(ITERATION_INDEX_TAG, "" + this.iterationIndex);
-        code = code.replace(REPLICATION_INDEX_TAG, "" + this.replicationIndex);
+        code = replaceAllTags(code);
         if (args != null) {
             for (int i = 0; i < args.length; i++) {
-                args[i] = args[i].replace(ITERATION_INDEX_TAG, "" + this.iterationIndex);
-                args[i] = args[i].replace(REPLICATION_INDEX_TAG, "" + this.replicationIndex);
+                args[i] = replaceAllTags(args[i]);
             }
         }
 
         script.setScript(code);
+    }
+
+    /**
+     * Replace all tags ($IT, $REP and $JID) in s by the current value.
+     * @return the string with all tags replaced.
+     */
+    private String replaceAllTags(String s) {
+        s = s.replace(ITERATION_INDEX_TAG, "" + this.iterationIndex);
+        s = s.replace(REPLICATION_INDEX_TAG, "" + this.replicationIndex);
+        s = s.replace(JOBID_INDEX_TAG, this.taskId.getJobId().value());
+        return s;
     }
 
     /**

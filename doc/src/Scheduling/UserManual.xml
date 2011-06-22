@@ -719,7 +719,8 @@ task2.setGenerationScript(gscript);
 							INPUT or OUTPUT space to the worker side. Files can be selected one by one or
 							through regular expressions. For each selected files, an access mode specify
 							if the files has to be transfered from INPUT, OUTPUT space or if transfer is
-							not needed. (see <xref linkend="Dataspace"/> for more details).
+							not needed.
+							(see <xref linkend="Dataspace"/> for more details).
 						</para>
 					</listitem>
 					<listitem>
@@ -730,7 +731,9 @@ task2.setGenerationScript(gscript);
 							the worker side to the OUTPUT space of the job. Files can be selected one by one or
 							through regular expressions. For each selected files, an access mode specify
 							if the files has to be transfered to OUTPUT space or if no transfer is
-							needed. (see <xref linkend="Dataspace"/> for more details).
+							needed (see <xref linkend="Dataspace"/> for more details).
+							If needed, the value of the Job ID can be refered as <emphasis>$JID</emphasis> in
+							the output files; it allows to separate produced file per job.
 						</para>
 					</listitem>
 					<listitem>
