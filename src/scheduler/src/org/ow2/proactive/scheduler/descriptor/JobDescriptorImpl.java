@@ -464,11 +464,12 @@ public class JobDescriptorImpl implements JobDescriptor {
         if (oldTask == null) {
             oldTask = (EligibleTaskDescriptorImpl) eligibleTasks.get(initiator);
         }
-        EligibleTaskDescriptorImpl endTask = (EligibleTaskDescriptorImpl) findTask(oldTask, oldEnd);
+        HashSet<TaskId> excl = new HashSet<TaskId>();
+        EligibleTaskDescriptorImpl endTask = (EligibleTaskDescriptorImpl) findTask(oldTask, oldEnd, excl);
         if (endTask == null) {
             // findTask cannot walk weak dependencies (IF/ELSE) down, lets walk these branches ourselves
             for (TaskDescriptor branch : branchTasks.values()) {
-                endTask = (EligibleTaskDescriptorImpl) findTask(branch, oldEnd);
+                endTask = (EligibleTaskDescriptorImpl) findTask(branch, oldEnd, excl);
                 if (endTask != null) {
                     break;
                 }
@@ -495,7 +496,12 @@ public class JobDescriptorImpl implements JobDescriptor {
      * @return the TaskDescriptor corresponding <code>needle</code> if it is
      *  a child of <code>haystack's</code>, or null
      */
-    private TaskDescriptor findTask(TaskDescriptor haystack, TaskId needle) {
+    private TaskDescriptor findTask(TaskDescriptor haystack, TaskId needle, HashSet<TaskId> excl) {
+        if (excl.contains(haystack.getTaskId()))
+            return null;
+
+        excl.add(haystack.getTaskId());
+
         if (needle.equals(haystack.getTaskId())) {
             return haystack;
         }
@@ -503,7 +509,7 @@ public class JobDescriptorImpl implements JobDescriptor {
             if (needle.equals(td.getTaskId())) {
                 return td;
             }
-            TaskDescriptor ttd = findTask(td, needle);
+            TaskDescriptor ttd = findTask(td, needle, excl);
             if (ttd != null) {
                 return ttd;
             }
