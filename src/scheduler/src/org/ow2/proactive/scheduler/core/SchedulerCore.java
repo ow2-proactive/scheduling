@@ -81,6 +81,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.utils.NamedThreadFactory;
 import org.ow2.proactive.db.Condition;
 import org.ow2.proactive.db.ConditionComparator;
+import org.ow2.proactive.db.DatabaseManager.FilteredExceptionCallback;
 import org.ow2.proactive.db.DatabaseManagerException;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.scheduler.common.NotificationData;
@@ -148,7 +149,8 @@ import org.ow2.proactive.utils.NodeSet;
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9
  */
-public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotification, RunActive {
+public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotification, RunActive,
+        FilteredExceptionCallback {
 
     /** Scheduler logger */
     public static final Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.CORE);
@@ -556,18 +558,19 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
             } catch (ProActiveRuntimeException pare) {
             }
             //exit
-            PALifeCycle.exitSuccess();
+            PALifeCycle.exitFailure();
             return;
         }
-        //Start DB and rebuild the scheduler if needed.
+        //Start DB, connect callback and rebuild the scheduler if needed.
         try {
-            recover();
+            DatabaseManager.getInstance().setCallback(this);
+            recover(PASchedulerProperties.SCHEDULER_DB_HIBERNATE_DROPDB.getValueAsBoolean());
         } catch (Throwable e) {
             ProActiveLogger.getLogger(SchedulerLoggers.CONSOLE).info("Cannot start Scheduler :", e);
             kill();
         }
 
-        if (status != SchedulerStatus.KILLED) {
+        if (!status.isKilled()) {
 
             Service service = new Service(body);
             // immediate services are set with @ImmediateService annotation
@@ -682,7 +685,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
                 // allows frozen->other state transition
                 service.blockingServeOldest(SCHEDULER_TIME_OUT);
 
-            } while ((status != SchedulerStatus.SHUTTING_DOWN) && (status != SchedulerStatus.KILLED));
+            } while (!status.isShuttingDown());
 
             logger.info("Scheduler is shutting down...");
 
@@ -755,7 +758,12 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
         }
         logger.info("Scheduler is now shutdown !");
         //exit
-        PALifeCycle.exitSuccess();
+        if (status.equals(SchedulerStatus.SHUTTING_DOWN)) {
+            PALifeCycle.exitSuccess();
+        } else {
+            //TODO use new PALifeCycle.exitFailure(...) method (see PROACTIVE-1049)
+            System.exit(status.ordinal());
+        }
     }
 
     /**
@@ -850,7 +858,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
      */
     @ImmediateService
     public boolean isSubmitPossible() {
-        return !((status == SchedulerStatus.SHUTTING_DOWN) || (status == SchedulerStatus.STOPPED));
+        return status.isSubmittable();
     }
 
     /**
@@ -1705,11 +1713,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
      * {@inheritDoc}
      */
     public boolean start() {
-        if (status == SchedulerStatus.UNLINKED) {
-            return false;
-        }
-
-        if (status != SchedulerStatus.STOPPED) {
+        if (!status.isStartable()) {
             return false;
         }
 
@@ -1724,8 +1728,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
      * {@inheritDoc}
      */
     public boolean stop() {
-        if (status == SchedulerStatus.UNLINKED || status == SchedulerStatus.STOPPED ||
-            status == SchedulerStatus.SHUTTING_DOWN || status == SchedulerStatus.KILLED) {
+        if (!status.isStoppable()) {
             return false;
         }
 
@@ -1740,19 +1743,13 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
      * {@inheritDoc}
      */
     public boolean pause() {
-        if (status == SchedulerStatus.UNLINKED || status == SchedulerStatus.SHUTTING_DOWN ||
-            status == SchedulerStatus.KILLED) {
-            return false;
-        }
-
-        if ((status != SchedulerStatus.FROZEN) && (status != SchedulerStatus.STARTED)) {
+        if (!status.isPausable()) {
             return false;
         }
 
         status = SchedulerStatus.PAUSED;
         logger.info("Scheduler has just been paused !");
         frontend.schedulerStateUpdated(SchedulerEvent.PAUSED);
-
         return true;
     }
 
@@ -1760,19 +1757,13 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
      * {@inheritDoc}
      */
     public boolean freeze() {
-        if (status == SchedulerStatus.UNLINKED || status == SchedulerStatus.SHUTTING_DOWN ||
-            status == SchedulerStatus.KILLED) {
-            return false;
-        }
-
-        if ((status != SchedulerStatus.PAUSED) && (status != SchedulerStatus.STARTED)) {
+        if (!status.isFreezable()) {
             return false;
         }
 
         status = SchedulerStatus.FROZEN;
         logger.info("Scheduler has just been frozen !");
         frontend.schedulerStateUpdated(SchedulerEvent.FROZEN);
-
         return true;
     }
 
@@ -1780,19 +1771,13 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
      * {@inheritDoc}
      */
     public boolean resume() {
-        if (status == SchedulerStatus.UNLINKED || status == SchedulerStatus.SHUTTING_DOWN ||
-            status == SchedulerStatus.KILLED) {
-            return false;
-        }
-
-        if ((status != SchedulerStatus.PAUSED) && (status != SchedulerStatus.FROZEN)) {
+        if (!status.isResumable()) {
             return false;
         }
 
         status = SchedulerStatus.STARTED;
         logger.info("Scheduler has just been resumed !");
         frontend.schedulerStateUpdated(SchedulerEvent.RESUMED);
-
         return true;
     }
 
@@ -1800,15 +1785,13 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
      * {@inheritDoc}
      */
     public boolean shutdown() {
-        if (status == SchedulerStatus.UNLINKED || status == SchedulerStatus.KILLED ||
-            status == SchedulerStatus.SHUTTING_DOWN) {
+        if (status.isDown()) {
             return false;
         }
 
         status = SchedulerStatus.SHUTTING_DOWN;
         logger.info("Scheduler is shutting down, this make take time to finish every jobs !");
         frontend.schedulerStateUpdated(SchedulerEvent.SHUTTING_DOWN);
-
         return true;
     }
 
@@ -1816,12 +1799,25 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
      * {@inheritDoc}
      */
     public synchronized boolean kill() {
-        if (status == SchedulerStatus.KILLED) {
+        return kill(null);
+    }
+
+    /**
+     * @see {@link #kill()}
+     *
+     * @param status the termination status of the kill method
+     */
+    private boolean kill(SchedulerStatus exitStatus) {
+        if (status.isKilled()) {
             return false;
         }
 
-        logger_dev.info("Killing all running task processes...");
+        if (exitStatus == null) {
+            exitStatus = SchedulerStatus.KILLED;
+        }
+
         //destroying running active object launcher
+        logger_dev.info("Killing all running task processes...");
         for (InternalJob j : runningJobs) {
             for (InternalTask td : j.getITasks()) {
                 if (td.getStatus() == TaskStatus.RUNNING) {
@@ -1868,7 +1864,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
             }
         }
         //finally : shutdown
-        status = SchedulerStatus.KILLED;
+        status = exitStatus;
         logger.info("Scheduler has just been killed !");
         frontend.schedulerStateUpdated(SchedulerEvent.KILLED);
 
@@ -1879,8 +1875,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
      * {@inheritDoc}
      */
     public boolean pauseJob(JobId jobId) {
-        if (status == SchedulerStatus.UNLINKED || status == SchedulerStatus.SHUTTING_DOWN ||
-            status == SchedulerStatus.KILLED) {
+        if (status.isDown()) {
             return false;
         }
 
@@ -1906,8 +1901,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
      * {@inheritDoc}
      */
     public boolean resumeJob(JobId jobId) {
-        if (status == SchedulerStatus.UNLINKED || status == SchedulerStatus.SHUTTING_DOWN ||
-            status == SchedulerStatus.KILLED) {
+        if (status.isDown()) {
             return false;
         }
 
@@ -1933,7 +1927,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
      * {@inheritDoc}
      */
     public synchronized boolean killJob(JobId jobId) {
-        if (status == SchedulerStatus.UNLINKED || status == SchedulerStatus.KILLED) {
+        if (status.isUnusable()) {
             return false;
         }
 
@@ -1983,7 +1977,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
      */
     private boolean killOrRestartTask(JobId jobId, String taskName, TerminateOptions options)
             throws UnknownJobException, UnknownTaskException {
-        if (status == SchedulerStatus.UNLINKED || status == SchedulerStatus.KILLED) {
+        if (status.isUnusable()) {
             return false;
         }
 
@@ -2023,7 +2017,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
      */
     public boolean changePolicy(String newPolicyClassName) {
         try {
-            if (status == SchedulerStatus.KILLED || status == SchedulerStatus.SHUTTING_DOWN) {
+            if (status.isShuttingDown()) {
                 logger.warn("Policy can only be changed when Scheduler is up, current state : " + status);
                 return false;
             }
@@ -2078,7 +2072,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
      * {@inheritDoc}
      */
     public boolean reloadPolicyConfiguration() {
-        if (status == SchedulerStatus.KILLED || status == SchedulerStatus.SHUTTING_DOWN) {
+        if (status.isShuttingDown()) {
             logger.warn("Policy configuration can only be reloaded when Scheduler is up, current state : " +
                 status);
             return false;
@@ -2090,16 +2084,16 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
      * Rebuild the scheduler after a crash.
      * Get data base instance, connect it and ask if a rebuild is needed.
      * The steps to recover the core are visible below.
+     *
+     * @param drop true if the db should be clean, false otherwise.
      */
-    private void recover() {
+    private void recover(boolean drop) {
         //Start Hibernate
         logger.info("Starting Hibernate...");
-        boolean drop = PASchedulerProperties.SCHEDULER_DB_HIBERNATE_DROPDB.getValueAsBoolean();
         logger.info("Drop DB : " + drop);
         if (drop) {
             DatabaseManager.getInstance().setProperty("hibernate.hbm2ddl.auto", "create");
         }
-        DatabaseManager.getInstance().build();
         logger.info("Hibernate successfully started !");
 
         //create condition of recovering : recover only non-removed job
@@ -2321,6 +2315,15 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
             jobs2.add(j);
         }
         return jobs2;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void notify(DatabaseManagerException dme) {
+        logger.info("Scheduler has lost the connection to database, and will be killed");
+        frontend.schedulerStateUpdated(SchedulerEvent.DB_DOWN);
+        kill(SchedulerStatus.DB_DOWN);
     }
 
     /**

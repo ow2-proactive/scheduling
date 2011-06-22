@@ -97,7 +97,12 @@ public enum SchedulerStatus implements java.io.Serializable {
      * The scheduler has been killed, nothing can be done anymore.
      * (Similar to Ctrl-C)
      */
-    KILLED("Killed");
+    KILLED("Killed"),
+    /**
+     * The scheduler has been killed due to a db disconnection, nothing can be done anymore.
+     */
+    DB_DOWN("Killed (DB down)");
+
     /** The textual definition of the status */
     private String definition;
 
@@ -116,4 +121,96 @@ public enum SchedulerStatus implements java.io.Serializable {
     public String toString() {
         return definition;
     }
+
+    /**
+     * Return true if the scheduler is killed
+     *
+     * @return true if the scheduler is killed
+     */
+    public boolean isKilled() {
+        return this == KILLED || this == DB_DOWN;
+    }
+
+    /**
+     * Return true if the scheduler is currently shutting down
+     *
+     * @return true if the scheduler is currently shutting down
+     */
+    public boolean isShuttingDown() {
+        return isKilled() || this == SHUTTING_DOWN;
+    }
+
+    /**
+     * Return true if the scheduler is NOT usable in its current state
+     *
+     * @return true if the scheduler is NOT usable in its current state
+     */
+    public boolean isUnusable() {
+        return this == UNLINKED || isKilled();
+    }
+
+    /**
+     * Return true if the scheduler is not currently UP
+     *
+     * @return true if the scheduler is not currently UP
+     */
+    public boolean isDown() {
+        return this == UNLINKED || isShuttingDown();
+    }
+
+    /**
+     * Return true if the scheduler can be stopped in its current state.
+     *
+     * @return true if the scheduler can be stopped in its current state.
+     */
+    public boolean isStoppable() {
+        return !isDown() && this != STOPPED;
+    }
+
+    /**
+     * Return true if the scheduler is startable
+     *
+     * @return true if the scheduler is startable
+     */
+    public boolean isStartable() {
+        return !isDown() && this == STOPPED;
+    }
+
+    /**
+     * Return true if the scheduler is freezable in its current state
+     *
+     * @return true if the scheduler is freezable in its current state
+     */
+    public boolean isFreezable() {
+        return !isDown() && (this == PAUSED || this == STARTED);
+    }
+
+    /**
+     * Return true if the scheduler is pausable in its current state
+     *
+     * @return true if the scheduler is pausable in its current state
+     */
+    public boolean isPausable() {
+        return !isDown() && (this == FROZEN || this == STARTED);
+
+    }
+
+    /**
+     * Return true if the scheduler is resumable in its current state
+     *
+     * @return true if the scheduler is resumable in its current state
+     */
+    public boolean isResumable() {
+        return !isDown() && (this == PAUSED || this == FROZEN);
+    }
+
+    /**
+     * Return true if a job can be submitted to scheduler
+     *
+     * @return true if a job can be submitted to scheduler
+     */
+    public boolean isSubmittable() {
+        return !isDown() && this != STOPPED;
+    }
+
 }

@@ -224,6 +224,7 @@ public class InternalSchedulerEventListener extends Observable implements Schedu
                 schedulerTerminatedEvent("SHUT DOWN");
                 break;
             case KILLED:
+            case DB_DOWN:
                 schedulerTerminatedEvent("KILLED");
                 break;
 

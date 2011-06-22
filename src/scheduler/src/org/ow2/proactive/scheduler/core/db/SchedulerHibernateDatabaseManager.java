@@ -159,13 +159,17 @@ public class SchedulerHibernateDatabaseManager extends HibernateDatabaseManager 
             return jobs;
         } catch (Exception e) {
             logger_dev.error("", e);
-            throw new DatabaseManagerException("Unable to recover a job !", e);
+            this.exceptionHandler.handle("Unable to recover a job !", e);
+            return null;//should not be reached as the previous line will throw an exception
         } finally {
-            session.close();
+            closeSession(session);
             logger_dev.debug("Session closed");
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getConfigFile() {
         return PASchedulerProperties.getAbsolutePath(PASchedulerProperties.SCHEDULER_DB_HIBERNATE_CONFIG
@@ -174,11 +178,12 @@ public class SchedulerHibernateDatabaseManager extends HibernateDatabaseManager 
 
     @Override
     public Logger getDevLogger() {
-        return logger;
+        return logger_dev;
     }
 
     @Override
     public Logger getLogger() {
-        return logger_dev;
+        return logger;
     }
+
 }

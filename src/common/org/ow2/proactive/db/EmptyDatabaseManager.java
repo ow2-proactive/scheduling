@@ -151,4 +151,11 @@ public class EmptyDatabaseManager implements DatabaseManager {
     public List sqlQuery(String nativeQuery) {
         return new ArrayList<Object>();
     }
+
+    /**
+     * Do nothing
+     */
+    public void setCallback(FilteredExceptionCallback callback) {
+    }
+
 }

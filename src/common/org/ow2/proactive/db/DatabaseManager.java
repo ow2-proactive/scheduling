@@ -172,4 +172,32 @@ public interface DatabaseManager {
      */
     @SuppressWarnings("rawtypes")
     public List sqlQuery(String nativeQuery);
+
+    /**
+     * Set the callback value to the given callback value<br/>
+     * call back system can be used to be notified when the database has encountered a disconnection
+     *
+     * @param callback the callback to set
+     */
+    public void setCallback(FilteredExceptionCallback callback);
+
+    /**
+     * FilteredExceptionCallback is used to notify the implementation
+     * that a filtered exception has been raised.
+     *
+     * @author The ProActive Team
+     * @since ProActive Scheduling 3.1
+     */
+    public interface FilteredExceptionCallback {
+        /**
+         * Notify the listener when a filtered exception is detected.<br/>
+         * In such a case, this method is called on the listener. Argument is the exception that
+         * caused this call wrapped in a DatabaseManagerException.<br/>
+         * <br/>
+         * Note : To get the real exception, just get the cause of the given exception.
+         *
+         * @param dme the DatabaseManagerException containing the cause.
+         */
+        public void notify(DatabaseManagerException dme);
+    }
 }

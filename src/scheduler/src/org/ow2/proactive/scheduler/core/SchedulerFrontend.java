@@ -1308,6 +1308,9 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
             case KILLED:
                 sState.setState(SchedulerStatus.KILLED);
                 break;
+            case DB_DOWN:
+                sState.setState(SchedulerStatus.DB_DOWN);
+                break;
             case RM_DOWN:
             case RM_UP:
             case POLICY_CHANGED:

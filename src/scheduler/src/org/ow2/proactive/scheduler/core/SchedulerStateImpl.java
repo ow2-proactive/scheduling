@@ -250,9 +250,11 @@ public final class SchedulerStateImpl implements SchedulerState {
             case RM_DOWN:
                 status = SchedulerStatus.UNLINKED;
                 break;
+            case DB_DOWN:
+                status = SchedulerStatus.DB_DOWN;
+                break;
             case RM_UP:
                 break;
-
         }
     }
 

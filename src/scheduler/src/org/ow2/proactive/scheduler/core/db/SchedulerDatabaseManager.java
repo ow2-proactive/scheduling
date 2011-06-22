@@ -74,4 +74,5 @@ public interface SchedulerDatabaseManager extends DatabaseManager {
      * @return The list of unloaded job entities.
      */
     public abstract List<InternalJob> recoverAllJobs(RecoverCallback callback);
+
 }

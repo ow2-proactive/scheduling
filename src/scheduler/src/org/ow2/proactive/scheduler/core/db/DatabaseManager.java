@@ -44,14 +44,23 @@ package org.ow2.proactive.scheduler.core.db;
  */
 public class DatabaseManager {
 
+    /** Java property to be used if an "in memory" database should be used. */
+    public static final String JAVA_PROPERTYNAME_NODB = "scheduler.database.nodb";
+
+    /** Scheduler database manager singleton */
     private static SchedulerDatabaseManager dbManager;
 
+    /**
+     * Get the created scheduler database manager instance.<br/>
+     *
+     * @return the scheduler database manager instance
+     */
     public static SchedulerDatabaseManager getInstance() {
         if (dbManager == null) {
-            if (System.getProperty("scheduler.database.nodb") != null) {
-                dbManager = new SchedulerEmptyDatabaseManager();
+            if (System.getProperty(JAVA_PROPERTYNAME_NODB) != null) {
+                dbManager = new SchedulerDatabaseManagerSelector(new SchedulerEmptyDatabaseManager());
             } else {
-                dbManager = new SchedulerHibernateDatabaseManager();
+                dbManager = new SchedulerDatabaseManagerSelector(new SchedulerHibernateDatabaseManager());
             }
         }
         return dbManager;

@@ -139,4 +139,5 @@ public class SchedulerEmptyDatabaseManager extends EmptyDatabaseManager implemen
     public List<InternalJob> recoverAllJobs(RecoverCallback callback) {
         return new ArrayList<InternalJob>();
     }
+
 }

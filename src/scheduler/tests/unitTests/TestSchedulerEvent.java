@@ -80,7 +80,8 @@ public class TestSchedulerEvent {
         Assert.assertEquals(SchedulerEvent.TASK_REPLICATED.ordinal(), 23);
         Assert.assertEquals(SchedulerEvent.TASK_SKIPPED.ordinal(), 24);
         Assert.assertEquals(SchedulerEvent.TASK_PROGRESS.ordinal(), 25);
-        Assert.assertEquals(26, SchedulerEvent.values().length);
+        Assert.assertEquals(SchedulerEvent.DB_DOWN.ordinal(), 26);
+        Assert.assertEquals(27, SchedulerEvent.values().length);
     }
 
 }

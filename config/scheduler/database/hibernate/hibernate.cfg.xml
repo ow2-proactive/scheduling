@@ -21,14 +21,14 @@
         <!-- MYSQL -->
 <!--
         <property name="connection.driver_class">org.gjt.mm.mysql.Driver</property>
-        <property name="connection.url">jdbc:mysql://host:3306/SCHEDULER_DB?autoReconnect=true</property>
+        <property name="connection.url">jdbc:mysql://localhost:3306/SCHEDULER_DB?autoReconnect=true</property>
         <property name="dialect">org.hibernate.dialect.MySQLDialect</property>
 -->
 
 
-		<!-- ORACLE -->
+		<!-- ORACLE : do not forget to add your own jdbc driver in addons directory -->
 <!--
-	<property name="connection.driver_class">oracle.jdbc.driver.OracleDriver</property>
+		<property name="connection.driver_class">oracle.jdbc.driver.OracleDriver</property>
         <property name="connection.url">jdbc:oracle:thin:@localhost:1521:XE</property>
         <property name="dialect">org.hibernate.dialect.Oracle10gDialect</property>
 -->

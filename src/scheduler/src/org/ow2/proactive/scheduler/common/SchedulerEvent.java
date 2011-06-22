@@ -105,7 +105,9 @@ public enum SchedulerEvent {
     /** A Control Flow Action (branching) led to a task being skipped */
     TASK_SKIPPED("Task skipped"),
     /** A new task progress value is available */
-    TASK_PROGRESS("Task progress");
+    TASK_PROGRESS("Task progress"),
+    /** The database is no more available. */
+    DB_DOWN("DB down");
 
     /** Name of the method */
     private String methodName;

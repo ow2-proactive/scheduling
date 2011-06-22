@@ -53,13 +53,14 @@ import javax.persistence.Table;
 import org.apache.log4j.Logger;
 import org.hibernate.Query;
 import org.hibernate.SessionFactory;
-import org.hibernate.StatelessSession;
 import org.hibernate.annotations.Any;
 import org.hibernate.annotations.AnyMetaDef;
 import org.hibernate.annotations.MetaValue;
 import org.hibernate.cfg.AnnotationConfiguration;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.classic.Session;
+import org.ow2.proactive.db.DatabaseManager.FilteredExceptionCallback;
+import org.ow2.proactive.db.DatabaseManagerExceptionHandler.DBMEHandler;
 import org.ow2.proactive.db.annotation.Alterable;
 import org.ow2.proactive.db.annotation.Unloadable;
 
@@ -73,16 +74,16 @@ import org.ow2.proactive.db.annotation.Unloadable;
  * @author The ProActive Team
  * @since ProActive Scheduling 1.0
  */
-public abstract class HibernateDatabaseManager implements DatabaseManager {
+public abstract class HibernateDatabaseManager implements DatabaseManager, FilteredExceptionCallback {
 
     //Alterable field name pattern for HQL request
     private static final String ALTERABLE_REQUEST_FIELD = "alterable";
     //ObjectID field name for HQL request
     private static final String OBJECTID_REQUEST_FIELD = "objectId";
     //locks
-    private Object sessionlock = new Object();
+    private Object sessionlock;
     //Memory for id field name by class
-    private Map<Class<?>, Field> idFields = new HashMap<Class<?>, Field>();
+    private Map<Class<?>, Field> idFields;
     //Hibernate Session factory
     private SessionFactory sessionFactory;
     //Hibernate configuration
@@ -90,13 +91,29 @@ public abstract class HibernateDatabaseManager implements DatabaseManager {
     //Next variable is used to start a session manually outside of this class.
     //It can be used to make more than one action in a single transaction.
     //this object will store transaction by thread.
-    private ThreadLocal<Session> globalSession = new ThreadLocal<Session>();
+    private ThreadLocal<Session> globalSession;
+    //exception handler used to replace "throw new ... " when doing stuff that will connect to database
+    //allow this class to handle every exception that can be due to database disconnection.
+    protected DatabaseManagerExceptionHandler exceptionHandler;
+    //callback object to be notified of exception filtered if needed, can be null
+    protected FilteredExceptionCallback callback = null;
 
+    /**
+     * Create a new instance of HibernateDatabaseManager
+     */
+    @SuppressWarnings("unchecked")
     public HibernateDatabaseManager() {
         //Create configuration from hibernate.cfg.xml using XML file for mapping
         //configuration = new Configuration().configure(new File(configurationFile));
         //Create configuration from hibernate.cfg.xml using Hibernate annotation
-        configuration = new AnnotationConfiguration().configure(new File(getConfigFile()));
+        this.configuration = new AnnotationConfiguration().configure(new File(getConfigFile()));
+        this.sessionlock = new Object();
+        this.idFields = new HashMap<Class<?>, Field>();
+        this.globalSession = new ThreadLocal<Session>();
+        this.exceptionHandler = new DatabaseManagerExceptionHandler(
+            new Class[] { org.hibernate.exception.JDBCConnectionException.class }, DBMEHandler.FILTER_ALL,
+            this);
+        this.sessionFactory = null;
     }
 
     /**
@@ -185,9 +202,14 @@ public abstract class HibernateDatabaseManager implements DatabaseManager {
         synchronized (sessionlock) {
             Session s = globalSession.get();
             if (s == null) {
-                s = getSessionFactory().openSession();
-                s.beginTransaction();
-                globalSession.set(s);
+                try {
+                    s = getSessionFactory().openSession();
+                    s.beginTransaction();
+                    globalSession.set(s);
+                } catch (Exception e) {
+                    getDevLogger().error("Error while starting transaction", e);
+                    this.exceptionHandler.handle("Error while starting transaction", e);
+                }
             }
         }
     }
@@ -205,6 +227,9 @@ public abstract class HibernateDatabaseManager implements DatabaseManager {
             try {
                 s.getTransaction().commit();
                 s.close();
+            } catch (Exception e) {
+                getDevLogger().error("Error while committing transaction", e);
+                this.exceptionHandler.handle("Error while committing transaction", e);
             } finally {
                 globalSession.set(null);
             }
@@ -224,9 +249,26 @@ public abstract class HibernateDatabaseManager implements DatabaseManager {
             try {
                 s.getTransaction().rollback();
                 s.close();
+            } catch (Exception e) {
+                getDevLogger().error("Error while rollbacking", e);
+                this.exceptionHandler.handle("Error while rollbacking", e);
             } finally {
                 globalSession.set(null);
             }
+        }
+    }
+
+    /**
+     * Close the given session
+     *
+     * @param session the session to be closed
+     */
+    protected void closeSession(Session session) {
+        try {
+            session.close();
+        } catch (Exception e) {
+            getDevLogger().error("Error while closing session", e);
+            this.exceptionHandler.handle("Error while closing session", e);
         }
     }
 
@@ -266,6 +308,7 @@ public abstract class HibernateDatabaseManager implements DatabaseManager {
 
     /**
      * Rollback and close the given session.
+     * A call to this method is a safe operation (ie : no exception, even Runtime will be thrown)
      *
      * @param session the session to be rolledback.
      */
@@ -274,9 +317,13 @@ public abstract class HibernateDatabaseManager implements DatabaseManager {
         if (globalSession.get() != null) {
             return;
         }
-        session.getTransaction().rollback();
-        session.close();
-        getDevLogger().debug("Transaction rolledback and closed");
+        try {
+            session.getTransaction().rollback();
+            closeSession(session);
+            getDevLogger().debug("Transaction rolledback and closed");
+        } catch (Exception e) {
+            getDevLogger().error("Error while rollback", e);
+        }
     }
 
     /**
@@ -295,7 +342,7 @@ public abstract class HibernateDatabaseManager implements DatabaseManager {
         } catch (Exception e) {
             getDevLogger().error("", e);
             rollbackTransaction(session);
-            throw new DatabaseManagerException("Unable to store the given object !", e);
+            this.exceptionHandler.handle("Unable to store the given object !", e);
         }
     }
 
@@ -315,7 +362,7 @@ public abstract class HibernateDatabaseManager implements DatabaseManager {
         } catch (Exception e) {
             getDevLogger().error("", e);
             rollbackTransaction(session);
-            throw new DatabaseManagerException("Unable to delete the given object !", e);
+            this.exceptionHandler.handle("Unable to delete the given object !", e);
         }
     }
 
@@ -336,7 +383,7 @@ public abstract class HibernateDatabaseManager implements DatabaseManager {
         } catch (Exception e) {
             getDevLogger().error("", e);
             rollbackTransaction(session);
-            throw new DatabaseManagerException("Unable to update the given object !", e);
+            this.exceptionHandler.handle("Unable to update the given object !", e);
         }
     }
 
@@ -391,9 +438,10 @@ public abstract class HibernateDatabaseManager implements DatabaseManager {
             throw LockAcq;
         } catch (Exception e) {
             getDevLogger().error("", e);
-            throw new DatabaseManagerException("Unable to recover the objects !", e);
+            this.exceptionHandler.handle("Unable to recover the objects !", e);
+            return null;//should not be reached as the previous line will throw an exception
         } finally {
-            session.close();
+            closeSession(session);
             getDevLogger().debug("Session closed");
         }
     }
@@ -455,7 +503,7 @@ public abstract class HibernateDatabaseManager implements DatabaseManager {
         } catch (Exception e) {
             getDevLogger().error("", e);
             rollbackTransaction(session);
-            throw new DatabaseManagerException("Unable to synchronize this object !", e);
+            this.exceptionHandler.handle("Unable to synchronize this object !", e);
         }
     }
 
@@ -544,9 +592,9 @@ public abstract class HibernateDatabaseManager implements DatabaseManager {
             }
         } catch (Exception e) {
             getDevLogger().error("", e);
-            throw new DatabaseManagerException("Unable to load this object [" + o + "]", e);
+            this.exceptionHandler.handle("Unable to load this object [" + o + "]", e);
         } finally {
-            session.close();
+            closeSession(session);
             getDevLogger().debug("Session closed");
         }
     }
@@ -573,7 +621,7 @@ public abstract class HibernateDatabaseManager implements DatabaseManager {
             }
         } catch (Exception e) {
             getDevLogger().error("", e);
-            throw new DatabaseManagerException("Unable to unload one or more fields !", e);
+            this.exceptionHandler.handle("Unable to unload one or more fields !", e);
         }
     }
 
@@ -586,8 +634,16 @@ public abstract class HibernateDatabaseManager implements DatabaseManager {
             throw new IllegalArgumentException(
                 "Native Query string must be a read request, ie:start with 'SELECT'");
         }
-        getDevLogger().debug("Executing query '" + nativeQuery + "'");
-        return getSessionFactory().openStatelessSession().createSQLQuery(nativeQuery).list();
+        try {
+            getDevLogger().debug("Executing query '" + nativeQuery + "'");
+            return getSessionFactory().openStatelessSession().createSQLQuery(nativeQuery).list();
+        } catch (Exception e) {
+            getDevLogger().error("", e);
+            //this exception will not be handled by exception manager as it is read only and not error prone
+            //as it is in a separate thread
+            //we let exceptionhandler handle only exception coming from core request
+            throw new DatabaseManagerException("Unable to execute sqlQuery !", e);
+        }
     }
 
     /**
@@ -677,4 +733,24 @@ public abstract class HibernateDatabaseManager implements DatabaseManager {
      * @return logger for debug purposes
      */
     public abstract Logger getDevLogger();
+
+    /**
+     * {@inheritDoc}
+     *
+     * Default behavior is to notify the callback if there is one, and throw the given exception.
+     */
+    public void notify(DatabaseManagerException dme) {
+        if (this.callback != null) {
+            this.callback.notify(dme);
+        }
+        throw dme;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setCallback(FilteredExceptionCallback callback) {
+        this.callback = callback;
+    }
+
 }
