@@ -36,12 +36,12 @@
  */
 package org.ow2.proactive.scheduler.core.properties;
 
-import org.objectweb.proactive.annotation.PublicAPI;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
+
+import org.objectweb.proactive.annotation.PublicAPI;
 
 
 /**
@@ -93,6 +93,12 @@ public enum PASchedulerProperties {
 
     /** Port of the JMX service. Random if not set */
     SCHEDULER_JMX_PORT("pa.scheduler.core.jmx.port", PropertyType.INTEGER),
+
+    /** RRD data base with statistic history */
+    SCHEDULER_RRD_DATABASE_NAME("pa.scheduler.jmx.rrd.name", PropertyType.STRING),
+
+    /** RRD data base step in seconds */
+    SCHEDULER_RRD_STEP("pa.scheduler.jmx.rrd.step", PropertyType.INTEGER),
 
     /** Accounting refresh rate from the database in seconds */
     SCHEDULER_ACCOUNT_REFRESH_RATE("pa.scheduler.account.refreshrate", PropertyType.INTEGER),

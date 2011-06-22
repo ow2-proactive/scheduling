@@ -38,10 +38,12 @@ package org.ow2.proactive.resourcemanager.core.jmx;
 
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
+import javax.management.StandardMBean;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.jmx.AbstractJMXHelper;
+import org.ow2.proactive.jmx.RRDDataStore;
 import org.ow2.proactive.resourcemanager.core.account.RMAccountsManager;
 import org.ow2.proactive.resourcemanager.core.jmx.mbean.AllAccountsMBeanImpl;
 import org.ow2.proactive.resourcemanager.core.jmx.mbean.ManagementMBeanImpl;
@@ -109,6 +111,14 @@ public final class RMJMXHelper extends AbstractJMXHelper {
             // Uniquely identify the MBean and register it to the MBeanServer
             final ObjectName name = new ObjectName(RUNTIMEDATA_MBEAN_NAME);
             mbs.registerMBean(anonymMBean, name);
+
+            String dataBaseName = PAResourceManagerProperties.RM_HOME.getValueAsString() +
+                System.getProperty("file.separator") +
+                PAResourceManagerProperties.RM_RRD_DATABASE_NAME.getValueAsString();
+
+            setDataStore(new RRDDataStore((StandardMBean) anonymMBean, dataBaseName,
+                PAResourceManagerProperties.RM_RRD_STEP.getValueAsInt(), ProActiveLogger
+                        .getLogger(RMLoggers.STATISTICS)));
         } catch (Exception e) {
             LOGGER.error("Unable to register the ResourceManagerRuntimeMBean", e);
         }

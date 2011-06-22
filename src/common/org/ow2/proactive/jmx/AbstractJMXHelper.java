@@ -93,6 +93,8 @@ public abstract class AbstractJMXHelper {
     private String jmxRmiFailureReason;
     /** The reason of the failure in case on unsuccessful boot sequence of the JMX RO */
     private String jmxRoFailureReason;
+    /** RRD data base dumper */
+    private RRDDataStore dataStore;
 
     /** Can be called only by sub-classes */
     protected AbstractJMXHelper() {
@@ -289,6 +291,10 @@ public abstract class AbstractJMXHelper {
                 logger.debug("Unable to stop the JMX-RO connector server", t);
             }
         }
+
+        if (dataStore != null) {
+            dataStore.terminate();
+        }
     }
 
     /**
@@ -328,5 +334,21 @@ public abstract class AbstractJMXHelper {
             default:
                 throw new JMException("Uknown JMX transport protocol: " + protocol);
         }
+    }
+
+    /**
+     * Sets the rrd data store.
+     * @param dataStore
+     */
+    public void setDataStore(RRDDataStore rrdDataStore) {
+        this.dataStore = rrdDataStore;
+    }
+
+    /**
+     * Gets the RRD data base with statistics.
+     * @return RRD data base with statistics.
+     */
+    public RRDDataStore getDataStore() {
+        return dataStore;
     }
 }

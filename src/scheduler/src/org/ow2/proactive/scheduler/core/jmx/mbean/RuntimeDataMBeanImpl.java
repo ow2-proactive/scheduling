@@ -36,6 +36,7 @@
  */
 package org.ow2.proactive.scheduler.core.jmx.mbean;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -46,6 +47,7 @@ import java.util.Set;
 import javax.management.NotCompliantMBeanException;
 import javax.management.StandardMBean;
 
+import org.ow2.proactive.jmx.Chronological;
 import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SchedulerUsers;
@@ -53,6 +55,7 @@ import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.UserIdentification;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
+import org.ow2.proactive.scheduler.core.jmx.SchedulerJMXHelper;
 import org.ow2.proactive.utils.Tools;
 
 
@@ -427,6 +430,7 @@ public final class RuntimeDataMBeanImpl extends StandardMBean implements Runtime
      * Returns the connected clients count
      * @return current number of connected users
      */
+    @Chronological
     public int getConnectedUsersCount() {
         return this.schedulerClients.getUsers().size();
     }
@@ -434,6 +438,7 @@ public final class RuntimeDataMBeanImpl extends StandardMBean implements Runtime
     /**
      * @return current number of finished jobs
      */
+    @Chronological
     public int getFinishedJobsCount() {
         return this.finishedJobsCount;
     }
@@ -597,6 +602,7 @@ public final class RuntimeDataMBeanImpl extends StandardMBean implements Runtime
      *
      * @return current mean job pending time as integer
      */
+    @Chronological
     public int getMeanJobPendingTime() {
         return (int) this.meanJobPendingTime;
     }
@@ -604,6 +610,7 @@ public final class RuntimeDataMBeanImpl extends StandardMBean implements Runtime
     /**
      * @return current mean job execution time as integer
      */
+    @Chronological
     public int getMeanJobExecutionTime() {
         return (int) this.meanJobExecutionTime;
     }
@@ -611,6 +618,7 @@ public final class RuntimeDataMBeanImpl extends StandardMBean implements Runtime
     /**
      * @return current mean job submitting period as integer
      */
+    @Chronological
     public int getJobSubmittingPeriod() {
         return (int) this.jobSubmittingPeriod;
     }
@@ -770,5 +778,15 @@ public final class RuntimeDataMBeanImpl extends StandardMBean implements Runtime
             throw new RuntimeException("Unknown jobId: " + jobId);
         }
         return Tools.getFormattedDuration(0, res);
+    }
+
+    /**
+     * Sends the statistics accumulated in the RRD data base
+     *
+     * @return data base file converted to bytes
+     * @throws IOException when data base cannot be read
+     */
+    public byte[] getStatisticHistory() throws IOException {
+        return SchedulerJMXHelper.getInstance().getDataStore().getBytes();
     }
 }

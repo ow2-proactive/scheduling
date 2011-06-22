@@ -36,6 +36,7 @@
  */
 package org.ow2.proactive.policy;
 
+import java.io.FilePermission;
 import java.lang.reflect.Constructor;
 import java.security.CodeSource;
 import java.security.Permission;
@@ -73,7 +74,7 @@ public class ClientsPolicy extends Policy {
      * possible to grant to IdentityPrincipals in the java policy file
      */
     private static final Class<?>[] ALLOWED_PERMISSION_TYPES = new Class<?>[] { ClientPermission.class,
-            MBeanPermission.class, AuthPermission.class };
+            MBeanPermission.class, AuthPermission.class, FilePermission.class };
 
     private static ClientsPolicy instance;
     // WARNING debug trace should be done only to system.out (instead of log4j)

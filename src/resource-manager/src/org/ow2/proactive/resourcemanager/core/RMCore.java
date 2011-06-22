@@ -36,6 +36,7 @@
  */
 package org.ow2.proactive.resourcemanager.core;
 
+import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.Permission;
@@ -283,6 +284,14 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             logger.info("Drop DB : " + drop);
             if (drop) {
                 DatabaseManager.getInstance().setProperty("hibernate.hbm2ddl.auto", "create");
+                // dropping RRD data base as well
+                File ddrDB = new File(PAResourceManagerProperties.RM_HOME.getValueAsString() +
+                    System.getProperty("file.separator") +
+                    PAResourceManagerProperties.RM_RRD_DATABASE_NAME.getValueAsString());
+                if (ddrDB.exists()) {
+                    ddrDB.delete();
+                }
+
             }
             DatabaseManager.getInstance().build();
             logger.info("Hibernate successfully started !");
@@ -296,7 +305,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                     // to keep the data base consistency updating all nodes history with
                     // the last alive time stamp
                     NodeHistory.recover(alive);
-                    // updating end times of user connections 
+                    // updating end times of user connections
                     UserHistory.recover(alive);
 
                     // updating alive time stamp

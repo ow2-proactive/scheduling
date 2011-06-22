@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?> 
-<java version="1.5.0_21" class="java.beans.XMLDecoder"> 
- <int>9</int> 
+<java version="1.5.0_21" class="java.beans.XMLDecoder">
+  <string>StatisticHistory</string> 
+  <int>10</int>
  <object class="org.objectweb.proactive.ic2d.chartit.data.ChartModel"> 
   <void property="chartType"> 
    <object id="ChartType0" class="org.objectweb.proactive.ic2d.chartit.data.ChartType" method="valueOf"> 
@@ -139,7 +140,7 @@
      <string>BusyNodesCount</string> 
     </void> 
    </array> 
-  </void> 
+  </void>
  </object> 
  <array class="org.objectweb.proactive.ic2d.chartit.data.ChartDataElement" length="1"> 
   <void index="0"> 
@@ -486,5 +487,43 @@
     </void> 
    </object> 
   </void> 
- </array> 
+ </array>
+ <object class="org.objectweb.proactive.ic2d.chartit.data.ChartModel">
+  <void property="chartType">
+   <object id="ChartType1" class="org.objectweb.proactive.ic2d.chartit.data.ChartType" method="valueOf">
+    <class>org.objectweb.proactive.ic2d.chartit.data.ChartType</class>
+    <string>TIME_SERIES</string>
+   </object>
+  </void>
+  <void property="name">
+   <string>Connected Users History</string>
+  </void>
+  <void property="runtimeNames">
+   <array class="java.lang.String" length="1">
+    <void index="0">
+     <string>ConnectedUsersCount</string>
+    </void>
+   </array>
+  </void>
+ </object>
+ <array class="org.objectweb.proactive.ic2d.chartit.data.ChartDataElement" length="1">
+  <void index="0">
+   <object class="org.objectweb.proactive.ic2d.chartit.data.ChartDataElement">
+    <void property="label">
+     <string>Connected Users</string>
+    </void>
+    <void property="rgb">
+     <void index="0">
+      <int>156</int>
+     </void>
+     <void index="1">
+      <int>156</int>
+     </void>
+     <void index="2">
+      <int>156</int>
+     </void>
+    </void>
+   </object>
+  </void>
+ </array>
 </java> 

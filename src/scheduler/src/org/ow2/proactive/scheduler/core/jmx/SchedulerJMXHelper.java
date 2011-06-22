@@ -36,12 +36,17 @@
  */
 package org.ow2.proactive.scheduler.core.jmx;
 
+import java.io.File;
+
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
+import javax.management.StandardMBean;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.jmx.AbstractJMXHelper;
+import org.ow2.proactive.jmx.RRDDataStore;
+import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 import org.ow2.proactive.scheduler.core.account.SchedulerAccountsManager;
 import org.ow2.proactive.scheduler.core.jmx.mbean.AllAccountsMBeanImpl;
 import org.ow2.proactive.scheduler.core.jmx.mbean.ManagementMBeanImpl;
@@ -108,6 +113,23 @@ public class SchedulerJMXHelper extends AbstractJMXHelper {
             this.schedulerRuntimeMBean = new RuntimeDataMBeanImpl();
             final ObjectName name = new ObjectName(RUNTIMEDATA_MBEAN_NAME);
             mbs.registerMBean(this.schedulerRuntimeMBean, name);
+
+            String dataBasePath = PASchedulerProperties.SCHEDULER_HOME.getValueAsString() +
+                System.getProperty("file.separator") +
+                PASchedulerProperties.SCHEDULER_RRD_DATABASE_NAME.getValueAsString();
+
+            if (PASchedulerProperties.SCHEDULER_DB_HIBERNATE_DROPDB.getValueAsBoolean()) {
+                // dropping the RDD data base
+                File rrdDataBase = new File(dataBasePath);
+                if (rrdDataBase.exists()) {
+                    rrdDataBase.delete();
+                }
+            }
+
+            setDataStore(new RRDDataStore((StandardMBean) schedulerRuntimeMBean, dataBasePath,
+                PASchedulerProperties.SCHEDULER_RRD_STEP.getValueAsInt(), ProActiveLogger
+                        .getLogger(SchedulerLoggers.STATISTICS)));
+
         } catch (Exception e) {
             LOGGER.error("Unable to register the RuntimeDataMBean", e);
         }

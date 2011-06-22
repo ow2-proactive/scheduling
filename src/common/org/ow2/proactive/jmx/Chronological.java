@@ -34,45 +34,21 @@
  * ################################################################
  * $$ACTIVEEON_CONTRIBUTOR$$
  */
-package org.ow2.proactive.scheduler.common.util;
+package org.ow2.proactive.jmx;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
 
 /**
- * SchedulerLoggers is used for administrator and user loggers only.
- * See SchedulerDevLoggers developer loggers.
+ * This annotation marks the fields of mbean for those we have a history in rrd data base.
  *
- * @author The ProActive Team
+ * Must be used only with methods return numerical primitive values, like int, long, double etc.
+ *
  */
-public interface SchedulerLoggers {
-
-    static final public String PREFIX = "proactive.scheduler.dev";
-
-    static final public String SCHEDULER = PREFIX + ".admin";
-
-    static final public String CONSOLE = SCHEDULER + ".consol";
-
-    static final public String CORE = SCHEDULER + ".core";
-
-    static final public String SCHEDULE = CORE + ".schedule";
-
-    static final public String DATABASE = SCHEDULER + ".database";
-
-    static final public String FRONTEND = SCHEDULER + ".frontend";
-
-    static final public String CONNECTION = SCHEDULER + ".connection";
-
-    static final public String FACTORY = SCHEDULER + ".factory";
-
-    static final public String MATLAB = SCHEDULER + ".matlab";
-
-    static final public String SCILAB = SCHEDULER + ".scilab";
-
-    static final public String MATSCI = SCHEDULER + ".matsci";
-
-    static final public String UTIL = SCHEDULER + ".util";
-
-    static final public String RMPROXY = SCHEDULER + ".RMproxy";
-
-    static final public String POLICY = SCHEDULER + ".policy";
-
-    static final public String STATISTICS = SCHEDULER + ".statistics";
+@Retention(RetentionPolicy.RUNTIME)
+@Target( { ElementType.METHOD })
+public @interface Chronological {
 }

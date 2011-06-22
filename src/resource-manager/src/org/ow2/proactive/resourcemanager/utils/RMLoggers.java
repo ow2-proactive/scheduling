@@ -100,4 +100,6 @@ public interface RMLoggers {
     static final public String DATABASE = RESOURCEMANAGER + ".database";
 
     public static final String TOPOLOGY = RESOURCEMANAGER + ".topology";
+
+    public static final String STATISTICS = RESOURCEMANAGER + ".statistics";
 }

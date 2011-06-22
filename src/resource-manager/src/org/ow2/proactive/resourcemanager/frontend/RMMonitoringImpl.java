@@ -60,6 +60,7 @@ import org.ow2.proactive.resourcemanager.common.event.RMInitialState;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.core.RMCore;
+import org.ow2.proactive.resourcemanager.core.jmx.RMJMXHelper;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.db.DatabaseManager;
 import org.ow2.proactive.resourcemanager.exception.RMException;
@@ -327,6 +328,7 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
         rmEvent(new RMEvent(RMEventType.SHUTDOWN));
         PAActiveObject.terminateActiveObject(false);
 
+        RMJMXHelper.getInstance().shutdown();
         // initiating shutdown
         eventDispatcherThreadPool.shutdown();
         try {

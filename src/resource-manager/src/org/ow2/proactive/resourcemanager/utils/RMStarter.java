@@ -174,6 +174,7 @@ public class RMStarter {
                     nodeSourceName = NodeSource.GCM_LOCAL + counter;
                     counter++;
                 }
+                resourceManager.disconnect();
             }
 
         } catch (ParseException e1) {

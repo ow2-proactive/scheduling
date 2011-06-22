@@ -125,6 +125,12 @@ public enum PAResourceManagerProperties {
     /** Port of the JMX service. Random if not set */
     RM_JMX_PORT("pa.rm.jmx.port", PropertyType.INTEGER),
 
+    /** RRD data base with statistic history */
+    RM_RRD_DATABASE_NAME("pa.rm.jmx.rrd.name", PropertyType.STRING),
+
+    /** RRD data base step in seconds */
+    RM_RRD_STEP("pa.rm.jmx.rrd.step", PropertyType.INTEGER),
+
     /** Resource Manager node source infrastructures file*/
     RM_NODESOURCE_INFRASTRUCTURE_FILE("pa.rm.nodesource.infrastructures", PropertyType.STRING),
 

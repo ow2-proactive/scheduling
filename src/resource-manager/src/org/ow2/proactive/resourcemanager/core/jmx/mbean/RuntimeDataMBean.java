@@ -36,6 +36,8 @@
  */
 package org.ow2.proactive.resourcemanager.core.jmx.mbean;
 
+import java.io.IOException;
+
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.resourcemanager.common.NodeState;
 
@@ -181,5 +183,19 @@ public interface RuntimeDataMBean {
      * @return the average inactivity percentage
      */
     public double getAverageInactivity();
+
+    /**
+     * Returns the connected clients count
+     * @return current number of connected users
+     */
+    public int getConnectedUsersCount();
+
+    /**
+     * Sends the statistics accumulated in the RRD data base
+     *
+     * @return data base file converted to bytes
+     * @throws IOException when data base cannot be read
+     */
+    public byte[] getStatisticHistory() throws IOException;
 
 }

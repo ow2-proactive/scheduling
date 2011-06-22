@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?> 
-<java version="1.5.0_21" class="java.beans.XMLDecoder"> 
- <int>9</int> 
+<java version="1.5.0_21" class="java.beans.XMLDecoder">
+ <string>StatisticHistory</string> 
+ <int>9</int>
  <object class="org.objectweb.proactive.ic2d.chartit.data.ChartModel"> 
   <void property="name"> 
    <string>Pending and Running Jobs</string> 

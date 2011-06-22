@@ -36,10 +36,16 @@
  */
 package org.ow2.proactive.resourcemanager.core.jmx.mbean;
 
+import java.io.IOException;
+
 import javax.management.NotCompliantMBeanException;
 import javax.management.StandardMBean;
 
 import org.objectweb.proactive.annotation.PublicAPI;
+import org.ow2.proactive.jmx.Chronological;
+import org.ow2.proactive.resourcemanager.authentication.Client;
+import org.ow2.proactive.resourcemanager.core.RMCore;
+import org.ow2.proactive.resourcemanager.core.jmx.RMJMXHelper;
 import org.ow2.proactive.resourcemanager.utils.AtomicRMStatisticsHolder;
 
 
@@ -59,6 +65,8 @@ public class RuntimeDataMBeanImpl extends StandardMBean implements RuntimeDataMB
      * The reference on the statistics holder.
      */
     protected final AtomicRMStatisticsHolder rmStatisticsHolder;
+
+    protected int internalClientsCount = 0;
 
     /**
      * Creates a new instance of this class.
@@ -84,6 +92,7 @@ public class RuntimeDataMBeanImpl extends StandardMBean implements RuntimeDataMB
     /**
      * @see org.ow2.proactive.resourcemanager.core.jmx.mbean.RuntimeDataMBean#getAvailableNodesCount()
      */
+    @Chronological
     public int getAvailableNodesCount() {
         return this.rmStatisticsHolder.getStatistics().getAvailableNodesCount();
     }
@@ -112,6 +121,7 @@ public class RuntimeDataMBeanImpl extends StandardMBean implements RuntimeDataMB
     /**
      * @see org.ow2.proactive.resourcemanager.core.jmx.mbean.RuntimeDataMBean#getFreeNodesCount()
      */
+    @Chronological
     public int getFreeNodesCount() {
         return this.rmStatisticsHolder.getStatistics().getFreeNodesCount();
     }
@@ -119,6 +129,7 @@ public class RuntimeDataMBeanImpl extends StandardMBean implements RuntimeDataMB
     /**
      * @see org.ow2.proactive.resourcemanager.core.jmx.mbean.RuntimeDataMBean#getBusyNodesCount()
      */
+    @Chronological
     public int getBusyNodesCount() {
         return this.rmStatisticsHolder.getStatistics().getBusyNodesCount();
     }
@@ -126,6 +137,7 @@ public class RuntimeDataMBeanImpl extends StandardMBean implements RuntimeDataMB
     /**
      * @see org.ow2.proactive.resourcemanager.core.jmx.mbean.RuntimeDataMBean#getToBeReleasedNodesCount()
      */
+    @Chronological
     public int getToBeReleasedNodesCount() {
         return this.rmStatisticsHolder.getStatistics().getToBeRemovedNodesCount();
     }
@@ -133,6 +145,7 @@ public class RuntimeDataMBeanImpl extends StandardMBean implements RuntimeDataMB
     /**
      * @see org.ow2.proactive.resourcemanager.core.jmx.mbean.RuntimeDataMBean#getDownNodesCount()
      */
+    @Chronological
     public int getDownNodesCount() {
         return this.rmStatisticsHolder.getStatistics().getDownNodesCount();
     }
@@ -161,6 +174,7 @@ public class RuntimeDataMBeanImpl extends StandardMBean implements RuntimeDataMB
     /**
      * @see org.ow2.proactive.resourcemanager.core.jmx.mbean.RuntimeDataMBean#getMaxFreeNodes()
      */
+    @Chronological
     public int getMaxFreeNodes() {
         return this.rmStatisticsHolder.getStatistics().getMaxFreeNodes();
     }
@@ -189,6 +203,7 @@ public class RuntimeDataMBeanImpl extends StandardMBean implements RuntimeDataMB
     /**
      * @see org.ow2.proactive.resourcemanager.core.jmx.mbean.RuntimeDataMBean#getAverageActivity()
      */
+    @Chronological
     public double getAverageActivity() {
         return this.rmStatisticsHolder.getStatistics().getActivityTimePercentage();
     }
@@ -196,7 +211,35 @@ public class RuntimeDataMBeanImpl extends StandardMBean implements RuntimeDataMB
     /**
      * @see org.ow2.proactive.resourcemanager.core.jmx.mbean.RuntimeDataMBean#getAverageInactivity()
      */
+    @Chronological
     public double getAverageInactivity() {
         return this.rmStatisticsHolder.getStatistics().getInactivityTimePercentage();
     }
+
+    /**
+     * @see org.ow2.proactive.resourcemanager.core.jmx.mbean.RuntimeDataMBean#getStatisticHistory()
+     */
+    public byte[] getStatisticHistory() throws IOException {
+        return RMJMXHelper.getInstance().getDataStore().getBytes();
+    }
+
+    /**
+     * Returns the connected clients count
+     * @return current number of connected users
+     */
+    @Chronological
+    public int getConnectedUsersCount() {
+
+        if (internalClientsCount == 0) {
+            synchronized (RMCore.clients) {
+                for (Client c : RMCore.clients.values()) {
+                    if (!c.isPingable()) {
+                        internalClientsCount++;
+                    }
+                }
+            }
+        }
+        return RMCore.clients.size() - internalClientsCount;
+    }
+
 }

@@ -116,6 +116,7 @@ import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingExcepti
 import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingService;
 import org.ow2.proactive.scheduler.core.annotation.RunActivityFiltered;
 import org.ow2.proactive.scheduler.core.db.DatabaseManager;
+import org.ow2.proactive.scheduler.core.jmx.SchedulerJMXHelper;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.core.rmproxies.RMProxiesManager;
 import org.ow2.proactive.scheduler.core.rmproxies.RMProxyCreationException;
@@ -135,8 +136,8 @@ import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.task.launcher.TaskLauncher;
 import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 import org.ow2.proactive.scheduler.util.classloading.JobClasspathManager;
-import org.ow2.proactive.scheduler.util.classloading.JobClasspathManager.JobClasspathEntry;
 import org.ow2.proactive.scheduler.util.classloading.TaskClassServer;
+import org.ow2.proactive.scheduler.util.classloading.JobClasspathManager.JobClasspathEntry;
 import org.ow2.proactive.utils.NodeSet;
 
 
@@ -751,6 +752,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
         //stop dataspace
         dataSpaceNSStarter.terminateNamingService();
         threadPoolForTerminateTL.shutdownNow();
+        SchedulerJMXHelper.getInstance().shutdown();
         //terminate this active object
         try {
             PAActiveObject.terminateActiveObject(false);

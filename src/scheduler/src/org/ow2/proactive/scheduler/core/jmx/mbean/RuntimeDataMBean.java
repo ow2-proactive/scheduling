@@ -36,6 +36,9 @@
  */
 package org.ow2.proactive.scheduler.core.jmx.mbean;
 
+import java.io.IOException;
+
+
 /**
  * MBean interface representing the attributes of the ProActive Scheduling Runtime
  * and some Key Performance Indicators values to monitor the ProActive Scheduler.
@@ -244,4 +247,12 @@ public interface RuntimeDataMBean {
      *         time for the given job.
      */
     public String getFormattedMeanTaskRunningTime(String jobId);
+
+    /**
+     * Sends the statistics accumulated in the RRD data base
+     *
+     * @return data base file converted to bytes
+     * @throws IOException when data base cannot be read
+     */
+    public byte[] getStatisticHistory() throws IOException;
 }
