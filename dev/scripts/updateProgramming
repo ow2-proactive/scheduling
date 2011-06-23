@@ -3,7 +3,6 @@
 
 workingDir=`dirname $0`
 
-
 function warn_print_usage_and_exit {
         echo "$1" 1>&2
         echo "" 1>&2
@@ -11,16 +10,103 @@ function warn_print_usage_and_exit {
         exit 1
 }
 
+input(){
+    read -n 1
+    echo $REPLY | tr '[[:upper:]]' '[[:lower:]]'
+}
+
 
 if [ -d $1 ] ; then
 
-echo "Copying jar files ..."
-cp -v $1/dist/lib/ProActive.jar $workingDir/../../lib/ProActive/
-cp -v $1/dist/lib/ProActive_utils.jar $workingDir/../../lib/ProActive/
-cp -v $1/dist/lib/ProActive_tests.jar $workingDir/../../lib/ProActive/  
+echo
+echo "================== Diff libs ==================="
+diff $1/dist/lib $workingDir/../../lib/ProActive/ | grep jar
+echo "================================================"
+echo
+for f in $(diff $1/dist/lib  $workingDir/../../lib/ProActive/ | grep differ | cut -f 3 -d ' ')
+do
+echo "%% Copy $f from Programming ? [y|n] :"
+REP=`input`
+echo
+if [ "$REP" = "y" ];
+then
+cp -v $f  $workingDir/../../lib/ProActive/
+fi
+done
 
-echo "Copying OSProcessBuilder scripts ... "
-cp -v -r $1/dist/scripts/processbuilder/* $workingDir/../../scripts/processbuilder/
+for f in $(diff $1/dist/lib  $workingDir/../../lib/ProActive/ | grep Only | cut -f 4 -d ' ')
+do
+echo "%% Copy $f from Programming ? [y|n] :"
+REP=`input`
+echo
+if [ "$REP" = "y" ];
+then
+cp -v $f  $workingDir/../../lib/ProActive/
+fi
+done
+
+
+
+
+echo
+echo "============= Diff process builder ============="
+diff $1/dist/scripts/processbuilder/* $workingDir/../../scripts/processbuilder/*
+echo "================================================"
+echo
+
+for f in $(diff $1/dist/scripts/processbuilder/linux/  $workingDir/../../scripts/processbuilder/linux/ | grep Only | cut -f 4 -d ' ')
+do
+echo "%% Copy $f from Programming ? [y|n] :"
+REP=`input`
+echo
+if [ "$REP" = "y" ];
+then
+cp -v $f  $workingDir/../../scripts/processbuilder/linux/
+fi
+done
+
+for f in $(diff $1/dist/scripts/processbuilder/linux/  $workingDir/../../scripts/processbuilder/linux/ | grep differ | cut -f 3 -d ' ')
+do
+echo "%% Copy $f from Programming ? [y|n] :"
+REP=`input`
+echo
+if [ "$REP" = "y" ];
+then
+cp -v $f  $workingDir/../../scripts/processbuilder/linux/
+fi
+done
+
+
+
+# echo
+# echo "============= Diff bin scripts ================"
+
+# progUnixBins="env pa-dataserver pa-dataserver-gui startRouter"
+# progWinBins="init.bat pa-dataserver.bat pa-dataserver-gui.bat startRouter.bat"
+# for f in $progUnixBins
+# do
+# diff $1/bin/$f.sh  $workingDir/../../bin/unix/$f
+# echo "%% Copy $1/bin/$f.sh from Programming ? [y|n] :"
+# REP=`input`
+# echo
+# if [ "$REP" = "y" ];
+# then
+# cp -v $1/bin/$f.sh  $workingDir/../../bin/unix/
+# mv $workingDir/../../bin/unix/$f.sh $workingDir/../../bin/unix/$f
+# fi
+# done
+
+# for f in $progWinBins
+# do
+# diff $1/bin/$f.sh  $workingDir/../../bin/unix/$f
+# echo "%% Copy $1/bin/$f from Programming ? [y|n] :"
+# REP=`input`
+# echo
+# if [ "$REP" = "y" ];
+# then
+# cp -v $1/bin/$f.sh  $workingDir/../../bin/win/
+# fi
+# done
 
 else
 
