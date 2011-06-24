@@ -1333,15 +1333,11 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
             descriptor = job.terminateTask(errorOccurred, taskId, frontend, res.getAction());
 
             //and update database
-            try {
-                DatabaseManager.getInstance().startTransaction();
-                DatabaseManager.getInstance().synchronize(job.getJobInfo());
-                DatabaseManager.getInstance().synchronize(descriptor.getTaskInfo());
-                DatabaseManager.getInstance().update(job.getJobResult());
-                DatabaseManager.getInstance().commitTransaction();
-            } catch (DatabaseManagerException e) {
-
-            }
+            DatabaseManager.getInstance().startTransaction();
+            DatabaseManager.getInstance().synchronize(job.getJobInfo());
+            DatabaseManager.getInstance().synchronize(descriptor.getTaskInfo());
+            DatabaseManager.getInstance().update(job.getJobResult());
+            //commit transaction is lower in the code
 
             //clean the result to improve memory usage
             if (!job.getJobDescriptor().hasChildren(descriptor.getId())) {
@@ -1386,6 +1382,8 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
                 frontend.jobStateUpdated(job.getOwner(), new NotificationData<JobInfo>(
                     SchedulerEvent.JOB_RUNNING_TO_FINISHED, job.getJobInfo()));
             }
+            //commit transaction is here to take into account the end of the job if job is terminated
+            DatabaseManager.getInstance().commitTransaction();
             //free every execution nodes in the finally
         } catch (UnknownTaskException ute) {
             //should never happen : taskName is unknown
