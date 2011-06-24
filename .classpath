@@ -158,7 +158,6 @@
 	<classpathentry kind="lib" path="lib/ProActive/virtualization-hyperv-wmi.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/wbem.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/wiseman-tools.jar"/>
-	<classpathentry kind="lib" path="lib/matsci/ptolemy.jar"/>
 	<classpathentry kind="lib" path="lib/matsci/org.scilab.modules.javasci.jar"/>
 	<classpathentry kind="lib" path="lib/matsci/org.scilab.modules.types.jar"/>
 	<classpathentry kind="lib" path="lib/nodesource/cron/cron4j-rv2.2.3-mod.jar"/>
@@ -174,7 +173,7 @@
 	<classpathentry kind="lib" path="lib/ProActive/commons-vfs-patched-2.0-SNAPSHOTr19199-tests.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/commons-vfs-patched-2.0-SNAPSHOTr19199.jar"/>
 	<classpathentry kind="lib" path="lib/matsci/matlabcontrol-3.1.0.jar"/>
-	<classpathentry kind="lib" path="lib/matsci/ProActive_LicenseSaver-0.0.3-rc4-api.jar"/>
+	<classpathentry kind="lib" path="lib/matsci/ProActive_LicenseSaver-0.0.3-rc6-api.jar"/>
 	<classpathentry kind="lib" path="lib/common/rrd4j-2.0.6.jar"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>
