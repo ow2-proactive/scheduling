@@ -123,7 +123,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/moduleloader.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/msv.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/osgi.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/ptolemy.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/puretls.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/relaxngDatatype.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/rngpack-1.1a.jar"/>
