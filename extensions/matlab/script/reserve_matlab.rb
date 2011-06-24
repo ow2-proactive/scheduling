@@ -198,6 +198,7 @@ class ReserveMatlab
       begin
         client = LicenseSaverClient.new(serverurl)
       rescue Exception => e
+        log(e.message + "\n" + e.backtrace.join("\n"))
         log("Error : Licensing proxy cannot be found at url : "+serverurl +" , host not selected")
         return false
       end

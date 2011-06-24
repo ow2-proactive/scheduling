@@ -424,9 +424,6 @@ public abstract class MatSciTask<W extends MatSciWorker, C extends MatSciEngineC
                     redeployOrLeave(e, jvminfo, "Scilab Engine initialization hanged");
                 } catch (FutureMonitoringPingFailureException e) {
                     redeployOrLeave(e, jvminfo, "Spawned JVM crashed");
-                } catch (ptolemy.kernel.util.IllegalActionException e) {
-                    redeployOrLeave(e, jvminfo, "Unable to initialize Matlab Engine, or engine error");
-
                 } catch (java.lang.OutOfMemoryError e) {
                     leave(e, jvminfo, "Out of memory error in spawned JVM");
                 } catch (Throwable e) {

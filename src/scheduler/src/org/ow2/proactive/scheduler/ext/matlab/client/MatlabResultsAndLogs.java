@@ -44,7 +44,6 @@ package org.ow2.proactive.scheduler.ext.matlab.client;
 
 import org.ow2.proactive.scheduler.ext.matsci.client.MatSciTaskStatus;
 import org.ow2.proactive.scheduler.ext.matsci.client.ResultsAndLogs;
-import ptolemy.data.Token;
 
 
 public class MatlabResultsAndLogs extends ResultsAndLogs<Boolean> {

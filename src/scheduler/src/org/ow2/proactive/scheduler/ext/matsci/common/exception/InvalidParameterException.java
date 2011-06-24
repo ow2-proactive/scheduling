@@ -36,15 +36,9 @@
  */
 package org.ow2.proactive.scheduler.ext.matsci.common.exception;
 
-import ptolemy.data.type.Type;
-
-
 public class InvalidParameterException extends Exception {
     public InvalidParameterException(Class<?> class1) {
         super(class1.getCanonicalName());
     }
 
-    public InvalidParameterException(Type type, Type type2) {
-        super("Type received " + type + " ... expected " + type2);
-    }
 }
