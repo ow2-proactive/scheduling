@@ -2349,7 +2349,9 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
                     case FAILED:
                     case FINISHED:
                     case FAULTY:
-                    case SKIPPED:
+                        // SKIPPED is not included :
+                        // such task should never be eligible because no dependency 
+                        // points to it and it will never be executed
                         tasksList.add(task);
                 }
             } else {
