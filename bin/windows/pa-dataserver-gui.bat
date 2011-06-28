@@ -3,7 +3,7 @@ echo.
 
 rem I did not use init.bat because it does not work, and I have no idea why
 
-set PROACTIVE=%~dp0\..
+set PROACTIVE=%~dp0\..\..
 
 if NOT DEFINED JAVA_HOME goto javahome
 if "%JAVA_HOME%" == "" goto javahome
@@ -15,7 +15,8 @@ IF DEFINED CLASSPATHEXT (
 )
 
 SET CLASSPATH=%CLASSPATH%;%PROACTIVE%\dist\lib\ProActive.jar;%PROACTIVE%\dist\lib\ProActive_examples.jar;%PROACTIVE%\dist\lib\ProActive_utils.jar
-set JAVA_CMD="%JAVA_HOME%\bin\java.exe" -Dproactive.home="%PROACTIVE%"  -Djava.security.manager -Djava.security.policy="%PROACTIVE%\examples\proactive.java.policy"
+
+set JAVA_CMD="%JAVA_HOME%\bin\java.exe" -Dproactive.home="%PROACTIVE%"  -Djava.security.manager -Djava.security.policy="%PROACTIVE%\config\security.java.policy-client"
 %JAVA_CMD% org.objectweb.proactive.extensions.vfsprovider.gui.ServerBrowser
 
 goto end
