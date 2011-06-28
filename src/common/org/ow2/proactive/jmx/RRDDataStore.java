@@ -39,7 +39,6 @@ package org.ow2.proactive.jmx;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.zip.ZipInputStream;
 
 import javax.management.MBeanAttributeInfo;
 import javax.management.StandardMBean;
@@ -62,7 +61,7 @@ public class RRDDataStore extends Thread {
     private int step = 4; //secs
     private String dataBaseFile;
     private HashMap<String, String> dataSources = new HashMap<String, String>();
-    private boolean terminate = false;
+    private volatile boolean terminate = false;
     private Logger logger;
 
     /**
@@ -138,6 +137,7 @@ public class RRDDataStore extends Thread {
             logger.info("Using existing RRD database: " + new File(dataBaseFilePath).getAbsolutePath());
         }
 
+        setName("RRD4J Data Store " + new File(dataBaseFilePath).getName());
         setDaemon(true);
         start();
     }
@@ -179,7 +179,7 @@ public class RRDDataStore extends Thread {
             }
             dataBase.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
         }
     }
 
