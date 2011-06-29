@@ -306,6 +306,16 @@ public class SelectionScript extends Script<Boolean> {
         return new String(id_).hashCode();
     }
 
+    /**
+     * Get MD5 hash value
+     * 
+     * @return MD5 hash value
+     * @throws NoSuchAlgorithmException
+     */
+    public byte[] digest() throws NoSuchAlgorithmException {
+        return MessageDigest.getInstance("MD5").digest(id_);
+    }
+
     /** Compare two arrays of bytes
      * @param array1 first array to compare
      * @param array2 second array to compare

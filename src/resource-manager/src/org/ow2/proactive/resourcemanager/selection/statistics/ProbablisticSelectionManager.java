@@ -36,14 +36,17 @@
  */
 package org.ow2.proactive.resourcemanager.selection.statistics;
 
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.resourcemanager.core.RMCore;
+import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.rmnode.RMNode;
 import org.ow2.proactive.resourcemanager.selection.SelectionManager;
 import org.ow2.proactive.resourcemanager.utils.RMLoggers;
@@ -72,14 +75,24 @@ public class ProbablisticSelectionManager extends SelectionManager {
     private final static Logger logger = ProActiveLogger.getLogger(RMLoggers.RMSELECTION);
 
     // contains an information about already executed scripts
-    private HashMap<SelectionScript, HashMap<RMNode, Probability>> probabilities;
+    // script digest => node => probability
+    private HashMap<String, HashMap<RMNode, Probability>> probabilities;
+
+    // in order to avoid OOM when the number of scripts exceeds the limit
+    // we could :
+    // 1. Reset all the probabilities for all scripts (simple but long to recover performance)
+    // 2. Remove the oldest script execution results (too expensive and complicated)
+    //	  need to store the time, update it each time, then sort when removing
+    //    the system will be too CPU consuming working on the limit
+    // 3. Removed the oldest added script. For this we have this queue. 
+    private LinkedList<String> digestQueue = new LinkedList<String>();
 
     public ProbablisticSelectionManager() {
     }
 
     public ProbablisticSelectionManager(RMCore rmcore) {
         super(rmcore);
-        this.probabilities = new HashMap<SelectionScript, HashMap<RMNode, Probability>>();
+        this.probabilities = new HashMap<String, HashMap<RMNode, Probability>>();
     }
 
     /**
@@ -114,49 +127,54 @@ public class ProbablisticSelectionManager extends SelectionManager {
             }
         }
 
-        // finding intersection
-        HashMap<RMNode, Probability> intersectionMap = new HashMap<RMNode, Probability>();
-        for (RMNode rmnode : nodes) {
-            boolean intersection = true;
-            double intersectionProbability = 1;
-            for (SelectionScript script : scripts) {
-                if (probabilities.containsKey(script) && probabilities.get(script).containsKey(rmnode)) {
-                    double probability = probabilities.get(script).get(rmnode).value();
-                    if (probability == 0) {
-                        intersection = false;
-                        break;
+        try {
+            // finding intersection
+            HashMap<RMNode, Probability> intersectionMap = new HashMap<RMNode, Probability>();
+            for (RMNode rmnode : nodes) {
+                boolean intersection = true;
+                double intersectionProbability = 1;
+                for (SelectionScript script : scripts) {
+                    String digest = new String(script.digest());
+                    if (probabilities.containsKey(digest) && probabilities.get(digest).containsKey(rmnode)) {
+                        double probability = probabilities.get(digest).get(rmnode).value();
+                        if (probability == 0) {
+                            intersection = false;
+                            break;
+                        } else {
+                            intersectionProbability *= probability;
+                        }
                     } else {
-                        intersectionProbability *= probability;
+                        intersectionProbability *= Probability.defaultValue();
+                    }
+                }
+
+                if (intersection) {
+                    intersectionMap.put(rmnode, new Probability(intersectionProbability));
+                }
+            }
+
+            // sorting results based on calculated probability
+            List<RMNode> res = new ArrayList<RMNode>();
+            res.addAll(intersectionMap.keySet());
+            Collections.sort(res, new NodeProbabilityComparator(intersectionMap));
+
+            if (logger.isDebugEnabled()) {
+                logger.debug("The following nodes are selected for scripts execution (time is " +
+                    (System.currentTimeMillis() - startTime) + " ms) :");
+                if (res.size() > 0) {
+                    for (RMNode rmnode : res) {
+                        logger.debug("Node url: " + rmnode.getNodeURL() + ", probability: " +
+                            intersectionMap.get(rmnode));
                     }
                 } else {
-                    intersectionProbability *= Probability.defaultValue();
+                    logger.debug("None");
                 }
             }
-
-            if (intersection) {
-                intersectionMap.put(rmnode, new Probability(intersectionProbability));
-            }
+            return res;
+        } catch (NoSuchAlgorithmException e) {
+            logger.error(e.getMessage(), e);
+            return new ArrayList<RMNode>();
         }
-
-        // sorting results based on calculated probability
-        List<RMNode> res = new ArrayList<RMNode>();
-        res.addAll(intersectionMap.keySet());
-        Collections.sort(res, new NodeProbabilityComparator(intersectionMap));
-
-        if (logger.isDebugEnabled()) {
-            logger.debug("The following nodes are selected for scripts execution (time is " +
-                (System.currentTimeMillis() - startTime) + " ms) :");
-            if (res.size() > 0) {
-                for (RMNode rmnode : res) {
-                    logger.debug("Node url: " + rmnode.getNodeURL() + ", probability: " +
-                        intersectionMap.get(rmnode));
-                }
-            } else {
-                logger.debug("None");
-            }
-        }
-
-        return res;
     }
 
     /**
@@ -169,14 +187,21 @@ public class ProbablisticSelectionManager extends SelectionManager {
      */
     @Override
     public synchronized boolean isPassed(SelectionScript script, RMNode rmnode) {
-        if (probabilities.containsKey(script) && probabilities.get(script).containsKey(rmnode)) {
-            Probability p = probabilities.get(script).get(rmnode);
-            String scriptType = script.isDynamic() ? "dynamic" : "static";
-            if (logger.isDebugEnabled())
-                logger.debug("Known " + scriptType + " script " + script.hashCode() + " for node " +
-                    rmnode.getNodeURL());
-            return p.value() == 1;
+        String digest;
+        try {
+            digest = new String(script.digest());
+            if (probabilities.containsKey(digest) && probabilities.get(digest).containsKey(rmnode)) {
+                Probability p = probabilities.get(digest).get(rmnode);
+                String scriptType = script.isDynamic() ? "dynamic" : "static";
+                if (logger.isDebugEnabled())
+                    logger.debug("Known " + scriptType + " script " + script.hashCode() + " for node " +
+                        rmnode.getNodeURL());
+                return p.value() == 1;
+            }
+        } catch (NoSuchAlgorithmException e) {
+            logger.error(e.getMessage(), e);
         }
+
         if (logger.isDebugEnabled())
             logger.debug("Unknown script " + script.hashCode() + " for node " + rmnode.getNodeURL());
         return false;
@@ -197,41 +222,61 @@ public class ProbablisticSelectionManager extends SelectionManager {
 
         boolean result = false;
 
-        Probability probability = new Probability(Probability.defaultValue());
-        if (probabilities.containsKey(script) && probabilities.get(script).containsKey(rmnode)) {
-            probability = probabilities.get(script).get(rmnode);
-            assert (probability.value() >= 0 && probability.value() <= 1);
-        }
-
-        if (scriptResult == null || scriptResult != null && scriptResult.errorOccured()) {
-            // error during script execution
-        } else if (!scriptResult.getResult()) {
-            // script failed
-            if (script.isDynamic()) {
-                probability.decrease();
-            } else {
-                probability = new Probability(0);
+        try {
+            String digest = new String(script.digest());
+            Probability probability = new Probability(Probability.defaultValue());
+            if (probabilities.containsKey(digest) && probabilities.get(digest).containsKey(rmnode)) {
+                probability = probabilities.get(digest).get(rmnode);
+                assert (probability.value() >= 0 && probability.value() <= 1);
             }
-        } else {
-            // script passed
-            result = true;
-            if (script.isDynamic()) {
-                probability.increase();
+
+            if (scriptResult == null || scriptResult != null && scriptResult.errorOccured()) {
+                // error during script execution
+            } else if (!scriptResult.getResult()) {
+                // script failed
+                if (script.isDynamic()) {
+                    probability.decrease();
+                } else {
+                    probability = new Probability(0);
+                }
             } else {
-                probability = new Probability(1);
+                // script passed
+                result = true;
+                if (script.isDynamic()) {
+                    probability.increase();
+                } else {
+                    probability = new Probability(1);
+                }
             }
+
+            if (!probabilities.containsKey(digest)) {
+                // checking if the number of selection script does not exceeded the maximum
+                if (probabilities.size() >= PAResourceManagerProperties.RM_SELECT_SCRIPT_CACHE_SIZE
+                        .getValueAsInt()) {
+                    String oldest = digestQueue.poll();
+                    probabilities.remove(oldest);
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("Removing the script: " + script.hashCode() +
+                            " from the data base because the limit is reached");
+                    }
+                }
+                // adding a new script record
+                probabilities.put(digest, new HashMap<RMNode, Probability>());
+                logger.debug("Scripts cache size " + probabilities.size());
+                digestQueue.offer(digest);
+            }
+
+            if (logger.isDebugEnabled()) {
+                logger.debug("Adding data to knowledge base - script: " + script.hashCode() + ", node: " +
+                    rmnode.getNodeURL() + ", probability: " + probability);
+            }
+
+            probabilities.get(digest).put(rmnode, probability);
+
+        } catch (NoSuchAlgorithmException e) {
+            logger.error(e.getMessage(), e);
         }
 
-        if (!probabilities.containsKey(script)) {
-            probabilities.put(script, new HashMap<RMNode, Probability>());
-        }
-
-        if (logger.isDebugEnabled()) {
-            logger.debug("Adding data to knowledge base - script: " + script.hashCode() + ", node: " +
-                rmnode.getNodeURL() + ", probability: " + probability);
-        }
-
-        probabilities.get(script).put(rmnode, probability);
         return result;
     }
 

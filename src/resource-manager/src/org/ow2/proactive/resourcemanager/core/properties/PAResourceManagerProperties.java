@@ -73,6 +73,9 @@ public enum PAResourceManagerProperties {
     /**  Timeout in ms for selection script execution */
     RM_SELECT_SCRIPT_TIMEOUT("pa.rm.select.script.timeout", PropertyType.INTEGER),
 
+    /**  The number of selection script digests stored in the cache to predict the execution results */
+    RM_SELECT_SCRIPT_CACHE_SIZE("pa.rm.select.script.cache", PropertyType.INTEGER),
+
     /**  Timeout in ms for node lookup */
     RM_NODELOOKUP_TIMEOUT("pa.rm.nodelookup.timeout", PropertyType.INTEGER),
 
