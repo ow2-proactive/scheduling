@@ -42,6 +42,7 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.ow2.proactive.resourcemanager.core.RMCore;
 import org.ow2.proactive.resourcemanager.nodesource.dataspace.DataSpaceNodeConfigurationAgent;
 import org.ow2.proactive.resourcemanager.rmnode.RMNode;
@@ -51,6 +52,7 @@ import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 /**
  * This class is responsible for the node configuration
  */
+@ActiveObject
 public class RMNodeConfigurator {
     /** class' logger */
     private static final Logger logger = ProActiveLogger.getLogger(RMLoggers.NODESOURCE);

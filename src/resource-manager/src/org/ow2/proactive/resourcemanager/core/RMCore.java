@@ -68,6 +68,7 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
+import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.ow2.proactive.authentication.principals.IdentityPrincipal;
 import org.ow2.proactive.authentication.principals.UserNamePrincipal;
 import org.ow2.proactive.permissions.MethodCallPermission;
@@ -159,6 +160,7 @@ import org.ow2.proactive.utils.NodeSet;
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9
  */
+@ActiveObject
 public class RMCore implements ResourceManager, InitActive, RunActive {
 
     /** Log4J logger name for RMCore */

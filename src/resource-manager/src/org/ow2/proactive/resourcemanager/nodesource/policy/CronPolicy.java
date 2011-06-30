@@ -44,6 +44,7 @@ import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
+import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
 import org.ow2.proactive.resourcemanager.nodesource.utils.NamesConvertor;
@@ -60,6 +61,7 @@ import org.ow2.proactive.resourcemanager.utils.RMLoggers;
  * to nodes all acquisition. Period have to be enough to release all nodes.
  *
  */
+@ActiveObject
 public class CronPolicy extends NodeSourcePolicy implements InitActive {
     protected static Logger logger = ProActiveLogger.getLogger(RMLoggers.POLICY);
 

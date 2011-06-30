@@ -41,6 +41,7 @@ import java.io.File;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
+import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
@@ -59,6 +60,7 @@ import org.ow2.proactive.scheduler.common.job.UserIdentification;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 
 
+@ActiveObject
 public abstract class SchedulerAwarePolicy extends NodeSourcePolicy implements SchedulerEventListener {
 
     protected static Logger logger = ProActiveLogger.getLogger(RMLoggers.POLICY);

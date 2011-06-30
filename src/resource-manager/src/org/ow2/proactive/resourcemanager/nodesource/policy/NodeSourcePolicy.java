@@ -42,6 +42,7 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
+import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
@@ -63,6 +64,7 @@ import org.ow2.proactive.resourcemanager.utils.RMLoggers;
  * - add the name of new policy class to the resource manager configuration file (config/rm/nodesource/policies).
  *
  */
+@ActiveObject
 public abstract class NodeSourcePolicy implements Serializable {
 
     /** logger */

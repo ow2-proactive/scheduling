@@ -60,6 +60,7 @@ import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
+import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.objectweb.proactive.utils.NamedThreadFactory;
 import org.ow2.proactive.authentication.principals.GroupNamePrincipal;
 import org.ow2.proactive.authentication.principals.IdentityPrincipal;
@@ -98,6 +99,7 @@ import org.ow2.proactive.resourcemanager.utils.RMLoggers;
  * into account different external factors such as time, scheduling state, etc.
  *
  */
+@ActiveObject
 public class NodeSource implements InitActive, RunActive {
 
     private static Logger logger = ProActiveLogger.getLogger(RMLoggers.NODESOURCE);

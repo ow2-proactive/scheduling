@@ -36,6 +36,7 @@
  */
 package functionaltests;
 
+import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.ow2.proactive.resourcemanager.RMFactory;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
@@ -48,6 +49,7 @@ import org.ow2.proactive.resourcemanager.frontend.RMConnection;
  * @author ProActive team
  *
  */
+@ActiveObject
 public class RMLauncherAO {
 
     /**

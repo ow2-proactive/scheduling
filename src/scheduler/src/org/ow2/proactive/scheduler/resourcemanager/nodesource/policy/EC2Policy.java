@@ -40,6 +40,7 @@ import java.util.HashMap;
 import java.util.Map.Entry;
 
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
+import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 
@@ -58,7 +59,7 @@ import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
  * @since ProActive Scheduling 1.0
  * 
  */
-
+@ActiveObject
 public class EC2Policy extends SchedulerLoadingPolicy {
 
     {

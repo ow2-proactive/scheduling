@@ -45,6 +45,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.ow2.proactive.resourcemanager.core.RMCore;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.rmnode.RMNode;
@@ -69,7 +70,7 @@ import org.ow2.proactive.scripting.SelectionScript;
  * are calculated for each nodes.
  *
  */
-
+@ActiveObject
 public class ProbablisticSelectionManager extends SelectionManager {
 
     private final static Logger logger = ProActiveLogger.getLogger(RMLoggers.RMSELECTION);

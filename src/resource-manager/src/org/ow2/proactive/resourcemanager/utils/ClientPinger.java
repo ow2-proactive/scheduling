@@ -45,6 +45,7 @@ import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.core.RMCore;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
@@ -53,6 +54,7 @@ import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProper
 /**
  * Periodically pings connected clients of the resource manager
  */
+@ActiveObject
 public class ClientPinger implements InitActive {
 
     private static final Logger logger = ProActiveLogger.getLogger(RMLoggers.PINGER);

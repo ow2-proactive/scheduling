@@ -37,6 +37,7 @@
 package functionaltests.monitor;
 
 import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
@@ -50,6 +51,7 @@ import org.ow2.proactive.resourcemanager.frontend.RMMonitoring;
 import functionaltests.RMTHelper;
 
 
+@ActiveObject
 public class RMMonitorEventReceiver implements RMEventListener {
 
     private RMMonitorsHandler monitorsHandler;

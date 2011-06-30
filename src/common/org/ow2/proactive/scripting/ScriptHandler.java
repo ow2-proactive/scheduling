@@ -41,6 +41,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.objectweb.proactive.annotation.PublicAPI;
+import org.objectweb.proactive.extensions.annotation.ActiveObject;
 
 
 /**
@@ -49,6 +50,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
  * @author ProActive team
  *
  */
+@ActiveObject
 @PublicAPI
 public class ScriptHandler implements Serializable {
 

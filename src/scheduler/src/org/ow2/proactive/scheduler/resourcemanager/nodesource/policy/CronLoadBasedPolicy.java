@@ -41,6 +41,7 @@ import it.sauronsoftware.cron4j.Scheduler;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
+import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
 
@@ -50,6 +51,7 @@ import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
  * Police triggers new nodes acquisition when scheduler is overloaded within a time slot defined in crontab syntax.
  *
  */
+@ActiveObject
 public class CronLoadBasedPolicy extends SchedulerLoadingPolicy {
     /**
      * Initial time for nodes acquisition

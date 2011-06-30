@@ -38,6 +38,7 @@ package org.ow2.proactive.resourcemanager.nodesource.policy;
 
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
+import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.common.event.RMEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMInitialState;
@@ -55,6 +56,7 @@ import org.ow2.proactive.resourcemanager.frontend.RMMonitoring;
  * RmMonitoring.
  *
  */
+@ActiveObject
 public abstract class RMAwareNodeSourcePolicy extends NodeSourcePolicy implements RMEventListener {
 
     private boolean rmShuttingDown = false;

@@ -48,6 +48,7 @@ import java.util.concurrent.Future;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
+import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.ow2.proactive.resourcemanager.core.RMCore;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.rmnode.RMNode;
@@ -58,6 +59,7 @@ import org.ow2.proactive.resourcemanager.utils.RMLoggers;
  * This class is responsible for the node cleaning.
  * It does it in parallel in a dedicated thread pool.
  */
+@ActiveObject
 public class NodesCleaner {
     /** class' logger */
     private static final Logger logger = ProActiveLogger.getLogger(RMLoggers.CLEANER);

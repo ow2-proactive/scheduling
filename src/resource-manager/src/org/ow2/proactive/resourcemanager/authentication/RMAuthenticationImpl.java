@@ -47,6 +47,7 @@ import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.ow2.proactive.authentication.AuthenticationImpl;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.jmx.naming.JMXTransportProtocol;
@@ -65,6 +66,7 @@ import org.ow2.proactive.resourcemanager.utils.RMLoggers;
  * @author The ProActive Team
  * @since ProActive Scheduling 1.0
  */
+@ActiveObject
 public class RMAuthenticationImpl extends AuthenticationImpl implements RMAuthentication, InitActive {
 
     private static final String ERROR_ALREADY_CONNECTED = "This active object is already connected to the resource manager. Disconnect first.";

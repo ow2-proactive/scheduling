@@ -37,6 +37,7 @@
 package org.ow2.proactive.resourcemanager.nodesource.policy;
 
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
+import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.nodesource.utils.NamesConvertor;
 
@@ -46,6 +47,7 @@ import org.ow2.proactive.resourcemanager.nodesource.utils.NamesConvertor;
  * A policy defined static nodes acquisition.
  *
  */
+@ActiveObject
 public class StaticPolicy extends NodeSourcePolicy {
 
     /**

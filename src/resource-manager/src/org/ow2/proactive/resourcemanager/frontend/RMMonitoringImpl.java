@@ -53,6 +53,7 @@ import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
+import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.ow2.proactive.resourcemanager.common.RMConstants;
 import org.ow2.proactive.resourcemanager.common.event.RMEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
@@ -62,7 +63,6 @@ import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.core.RMCore;
 import org.ow2.proactive.resourcemanager.core.jmx.RMJMXHelper;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
-import org.ow2.proactive.resourcemanager.db.DatabaseManager;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.utils.AtomicRMStatisticsHolder;
 import org.ow2.proactive.resourcemanager.utils.RMLoggers;
@@ -81,6 +81,7 @@ import org.ow2.proactive.resourcemanager.utils.RMLoggers;
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9
  */
+@ActiveObject
 public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActive {
     private static final Logger logger = ProActiveLogger.getLogger(RMLoggers.MONITORING);
 

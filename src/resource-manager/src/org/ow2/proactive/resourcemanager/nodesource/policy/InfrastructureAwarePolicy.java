@@ -36,11 +36,15 @@
  */
 package org.ow2.proactive.resourcemanager.nodesource.policy;
 
+import org.objectweb.proactive.extensions.annotation.ActiveObject;
+
+
 /**
  *
  * Node source policy taking into account underlying infrastructure state
  *
  * TODO add implementation
  */
+@ActiveObject
 public abstract class InfrastructureAwarePolicy extends NodeSourcePolicy {
 }

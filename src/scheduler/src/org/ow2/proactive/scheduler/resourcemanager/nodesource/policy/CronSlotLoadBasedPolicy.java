@@ -42,6 +42,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
+import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
 
@@ -51,6 +52,7 @@ import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
  * Police keeps all nodes up and running within specified time slot and acquires node on demand when scheduler is overloaded at another time.
  *
  */
+@ActiveObject
 public class CronSlotLoadBasedPolicy extends SchedulerLoadingPolicy {
 
     @Configurable(description = "Time when all nodes are deployed (crontab format)")

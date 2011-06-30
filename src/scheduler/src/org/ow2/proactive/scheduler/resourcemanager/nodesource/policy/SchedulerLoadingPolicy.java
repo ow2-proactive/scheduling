@@ -48,6 +48,7 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.body.exceptions.BodyTerminatedRequestException;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
+import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.common.event.RMEvent;
@@ -69,6 +70,7 @@ import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 
 
+@ActiveObject
 public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements InitActive, RunActive,
         RMEventListener {
 
