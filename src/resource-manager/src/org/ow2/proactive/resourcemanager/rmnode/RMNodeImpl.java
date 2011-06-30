@@ -244,7 +244,6 @@ public class RMNodeImpl implements RMNode, Serializable {
         if (!this.isDown()) {
             this.state = NodeState.CONFIGURING;
             this.stateChangeTime = System.currentTimeMillis();
-            this.owner = owner;
         }
     }
 
