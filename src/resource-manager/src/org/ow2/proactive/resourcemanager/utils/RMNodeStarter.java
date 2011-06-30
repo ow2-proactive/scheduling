@@ -141,7 +141,7 @@ public class RMNodeStarter {
     /** Name of the java property to set the delay between two attempts performed to add a node to the resource manager */
     protected final static String ADD_NODE_ATTEMPTS_DELAY_PROP_NAME = "proactive.node.add.delay";
     /** Name of the java property to set the node source name */
-    protected final static String NODESOURCE_PROP_NAME = "proactive.agent.nodesource";
+    protected final static String NODESOURCE_PROP_NAME = "proactive.node.nodesource";
 
     // The url of the created node
     protected String nodeURL = "Not defined";
