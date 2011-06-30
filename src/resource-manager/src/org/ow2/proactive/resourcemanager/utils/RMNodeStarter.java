@@ -63,6 +63,7 @@ import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.Parser;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
+import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.config.xml.ProActiveConfigurationParser;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeFactory;
@@ -139,6 +140,8 @@ public class RMNodeStarter {
     protected static boolean ADD_NODE_ATTEMPTS_DELAY_IN_MS_USER_SUPPLIED = false;
     /** Name of the java property to set the delay between two attempts performed to add a node to the resource manager */
     protected final static String ADD_NODE_ATTEMPTS_DELAY_PROP_NAME = "proactive.node.add.delay";
+    /** Name of the java property to set the node source name */
+    protected final static String NODESOURCE_PROP_NAME = "proactive.agent.nodesource";
 
     // The url of the created node
     protected String nodeURL = "Not defined";
@@ -277,6 +280,11 @@ public class RMNodeStarter {
         Node node = this.createLocalNode(nodeName);
         this.nodeURL = node.getNodeInformation().getURL();
         System.out.println(this.nodeURL);
+
+        if (nodeSourceName != null && nodeSourceName.length() > 0) {
+            // setting system the property with node source name 
+            System.setProperty(NODESOURCE_PROP_NAME, nodeSourceName);
+        }
 
         if (rmURL != null) {
             ResourceManager rm = this.registerInRM(credentials, rmURL, nodeName, nodeSourceName);
