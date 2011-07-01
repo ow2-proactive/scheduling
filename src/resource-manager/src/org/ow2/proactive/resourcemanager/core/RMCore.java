@@ -487,13 +487,17 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         final NodeState previousNodeState = rmNode.getState();
         try {
             logger.debug("The node " + rmNode.getNodeURL() + " owned by " + rmNode.getOwner() + " is free");
-            Client owner = rmNode.getOwner();
+            Client client = rmNode.getOwner();
+            if (client == null) {
+                // node has been just configured, so the user initiated this action is the node provider
+                client = rmNode.getProvider();
+            }
             // reseting owner here
             rmNode.setFree();
             this.freeNodes.add(rmNode);
             // create the event
             this.registerAndEmitNodeEvent(new RMNodeEvent(rmNode, RMEventType.NODE_STATE_CHANGED,
-                previousNodeState, owner.getName()));
+                previousNodeState, client.getName()));
         } catch (NodeException e) {
             // the node is down
             logger.debug("", e);
