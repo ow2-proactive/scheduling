@@ -78,6 +78,7 @@ import org.objectweb.proactive.core.remoteobject.RemoteObjectHelper;
 import org.objectweb.proactive.core.remoteobject.RemoteRemoteObject;
 import org.objectweb.proactive.core.remoteobject.exception.UnknownProtocolException;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.objectweb.proactive.utils.NamedThreadFactory;
 import org.ow2.proactive.db.Condition;
 import org.ow2.proactive.db.ConditionComparator;
@@ -150,6 +151,7 @@ import org.ow2.proactive.utils.NodeSet;
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9
  */
+@ActiveObject
 public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotification, RunActive,
         FilteredExceptionCallback {
 

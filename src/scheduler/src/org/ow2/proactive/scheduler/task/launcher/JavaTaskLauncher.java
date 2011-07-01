@@ -45,6 +45,7 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.annotation.ImmediateService;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.objectweb.proactive.extensions.dataspaces.core.BaseScratchSpaceConfiguration;
 import org.objectweb.proactive.extensions.dataspaces.core.DataSpacesNodes;
 import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
@@ -63,6 +64,7 @@ import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
  *
  * @author The ProActive Team
  */
+@ActiveObject
 public class JavaTaskLauncher extends TaskLauncher {
 
     public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.LAUNCHER);

@@ -45,6 +45,7 @@ import java.net.URI;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.objectweb.proactive.extensions.dataspaces.exceptions.DataSpacesException;
 import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
 import org.ow2.proactive.scheduler.common.task.ExecutableInitializer;
@@ -63,6 +64,7 @@ import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9
  */
+@ActiveObject
 public class NativeTaskLauncher extends TaskLauncher {
 
     public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.LAUNCHER);

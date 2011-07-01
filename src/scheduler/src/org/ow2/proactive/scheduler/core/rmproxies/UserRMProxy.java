@@ -61,6 +61,7 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
+import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.common.RMState;
@@ -86,6 +87,7 @@ import org.ow2.proactive.utils.NodeSet;
  * @author The ProActive Team
  * @since ProActive Scheduling 2.2
  */
+@ActiveObject
 public class UserRMProxy implements ResourceManager, RunActive {
 
     protected static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.RMPROXY);

@@ -40,6 +40,7 @@ import java.util.Set;
 
 import org.objectweb.proactive.annotation.ImmediateService;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
+import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.ow2.proactive.resourcemanager.common.RMState;
 
 
@@ -50,6 +51,7 @@ import org.ow2.proactive.resourcemanager.common.RMState;
  * @author The ProActive Team
  * @since ProActive Scheduling 2.2
  */
+@ActiveObject
 public class SchedulerRMProxy extends UserRMProxy {
 
     /**

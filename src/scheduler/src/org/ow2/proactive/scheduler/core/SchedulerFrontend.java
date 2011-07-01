@@ -53,6 +53,7 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.mop.MOP;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.permissions.MethodCallPermission;
 import org.ow2.proactive.policy.ClientsPolicy;
@@ -117,6 +118,7 @@ import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9
  */
+@ActiveObject
 public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Scheduler {
 
     /** Scheduler logger */

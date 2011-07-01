@@ -43,6 +43,7 @@ import javax.security.auth.login.LoginException;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.ow2.proactive.authentication.AuthenticationImpl;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.authentication.principals.UserNamePrincipal;
@@ -69,6 +70,7 @@ import org.ow2.proactive.utils.Tools;
  * @since ProActive Scheduling 0.9
  *
  */
+@ActiveObject
 public class SchedulerAuthentication extends AuthenticationImpl implements SchedulerAuthenticationInterface {
 
     /** Scheduler logger */
