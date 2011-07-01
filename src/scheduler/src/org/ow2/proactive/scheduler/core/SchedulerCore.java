@@ -136,8 +136,8 @@ import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.task.launcher.TaskLauncher;
 import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 import org.ow2.proactive.scheduler.util.classloading.JobClasspathManager;
-import org.ow2.proactive.scheduler.util.classloading.TaskClassServer;
 import org.ow2.proactive.scheduler.util.classloading.JobClasspathManager.JobClasspathEntry;
+import org.ow2.proactive.scheduler.util.classloading.TaskClassServer;
 import org.ow2.proactive.utils.NodeSet;
 
 
@@ -1332,17 +1332,28 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
             TaskDescriptor currentTD = job.getRunningTaskDescriptor(taskId);
             descriptor = job.terminateTask(errorOccurred, taskId, frontend, res.getAction());
 
-            //and update database
+            //update job info if it is terminated
+            if (job.isFinished()) {
+                //terminating job
+                job.terminate();
+                runningJobs.remove(job);
+                finishedJobs.add(job);
+                logger.info("Job '" + jobId + "' terminated");
+                terminateJobHandling(job.getId());
+            }
+
+            //Update database
             DatabaseManager.getInstance().startTransaction();
             DatabaseManager.getInstance().synchronize(job.getJobInfo());
             DatabaseManager.getInstance().synchronize(descriptor.getTaskInfo());
             DatabaseManager.getInstance().update(job.getJobResult());
             DatabaseManager.getInstance().commitTransaction();
 
-            //clean the result to improve memory usage
+            //clean the current result to improve memory usage
             if (!job.getJobDescriptor().hasChildren(descriptor.getId())) {
                 DatabaseManager.getInstance().unload(res);
             }
+            //clean results for task that do not have child
             if (currentTD != null) {
                 for (TaskDescriptor td : currentTD.getParents()) {
                     if (td.getChildrenCount() == 0) {
@@ -1356,28 +1367,20 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
                     }
                 }
             }
+            //clean every task result if job is finished
+            if (job.isFinished()) {
+                for (TaskResult tr : job.getJobResult().getAllResults().values()) {
+                    DatabaseManager.getInstance().unload(tr);
+                }
+            }
+
             //send event
             frontend.taskStateUpdated(job.getOwner(), new NotificationData<TaskInfo>(
                 SchedulerEvent.TASK_RUNNING_TO_FINISHED, descriptor.getTaskInfo()));
-
             //if this job is finished (every task have finished)
             logger_dev.info("Number of finished tasks : " + job.getNumberOfFinishedTasks() +
                 " - Number of tasks : " + job.getTotalNumberOfTasks());
             if (job.isFinished()) {
-                //terminating job
-                job.terminate();
-                runningJobs.remove(job);
-                finishedJobs.add(job);
-                logger.info("Job '" + jobId + "' terminated");
-
-                terminateJobHandling(job.getId());
-
-                //and to data base
-                DatabaseManager.getInstance().synchronize(job.getJobInfo());
-                //clean every task result
-                for (TaskResult tr : job.getJobResult().getAllResults().values()) {
-                    DatabaseManager.getInstance().unload(tr);
-                }
                 //send event to client
                 frontend.jobStateUpdated(job.getOwner(), new NotificationData<JobInfo>(
                     SchedulerEvent.JOB_RUNNING_TO_FINISHED, job.getJobInfo()));
