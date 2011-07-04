@@ -74,10 +74,14 @@ public class DisconnectAction extends SchedulerGUIAction {
             e.printStackTrace();
         }
 
-        // Disconnect the JMX client of ChartIt
-        JMXActionsManager.getInstance().disconnectJMXClient();
-        SchedulerProxy.getInstance().disconnect();
-        PAActiveObject.terminateActiveObject(SchedulerProxy.getInstance(), false);
+        try {
+            // Disconnect the JMX client of ChartIt
+            JMXActionsManager.getInstance().disconnectJMXClient();
+            SchedulerProxy.getInstance().disconnect();
+            PAActiveObject.terminateActiveObject(SchedulerProxy.getInstance(), false);
+        } catch (Throwable th) {
+            th.printStackTrace();
+        }
         SchedulerProxy.clearInstance();
 
         SeparatedJobView.clearOnDisconnection();

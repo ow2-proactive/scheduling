@@ -47,6 +47,8 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
 import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.api.PAFuture;
+import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.Activator;
@@ -90,6 +92,7 @@ import org.ow2.proactive.scheduler.gui.views.SeparatedJobView;
 public class SchedulerProxy implements Scheduler {
 
     private static final long SCHEDULER_SERVER_PING_FREQUENCY = 5000;
+    private static final long SCHEDULER_CONNECTION_TIMEOUT = 30000; // 30 secs
     public static final int CONNECTED = 1;
     public static final int LOGIN_OR_PASSWORD_WRONG = 2;
     private static SchedulerProxy instance = null;
@@ -489,6 +492,13 @@ public class SchedulerProxy implements Scheduler {
         return scheduler.isConnected();
     }
 
+    /**
+     * Asynchronous method to check if the client can reach the scheduler
+     */
+    public BooleanWrapper isAlive() {
+        return new BooleanWrapper(scheduler.isConnected());
+    }
+
     // -------------------------------------------------------------------- //
     // ------------------------------ public ------------------------------ //
     // -------------------------------------------------------------------- //
@@ -557,7 +567,11 @@ public class SchedulerProxy implements Scheduler {
                         ping = false;
                         //try to ping Scheduler server
                         try {
-                            ping = this.stubOnSchedulerProxy.isConnected();
+                            // isAlive is an asynchronous call, so we have a control over
+                            // the timeout
+                            BooleanWrapper alive = this.stubOnSchedulerProxy.isAlive();
+                            PAFuture.waitFor(alive, SCHEDULER_CONNECTION_TIMEOUT);
+                            ping = alive.getBooleanValue();
                         } catch (Throwable t) {
                             SchedulerProxy.disconnectionReason = "Scheduler  '" + schedulerURL +
                                 "'  seems to be down. Now disconnecting.";

@@ -38,6 +38,8 @@ package org.ow2.proactive.resourcemanager.gui.data;
 
 import org.eclipse.swt.widgets.Display;
 import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.api.PAFuture;
+import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.resourcemanager.common.event.RMEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMInitialState;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
@@ -56,6 +58,7 @@ import org.ow2.proactive.resourcemanager.gui.views.StatisticsView;
 public class EventsReceiver implements RMEventListener {
 
     private static final long RM_SERVER_PING_FREQUENCY = 5000;
+    private static final long RM_CONNECTION_TIMEOUT = 20000;
     private RMModel model = null;
     private RMMonitoring monitor = null;
     private Thread pinger;
@@ -120,10 +123,12 @@ public class EventsReceiver implements RMEventListener {
                     try {
                         try {
                             //try to ping RM server
-                            if (!PAActiveObject.pingActiveObject(RMStore.getInstance().getResourceManager())) {
+                            BooleanWrapper alive = RMStore.getInstance().getResourceManager().isActive();
+                            PAFuture.waitFor(alive, RM_CONNECTION_TIMEOUT);
+                            if (!alive.getBooleanValue()) {
                                 throw new RMException("RM seems to be down");
                             }
-                        } catch (RMException e) {
+                        } catch (Exception e) {
                             //if exception, considered RM as down
                             rmShutDownEvent(true);
                             break;
@@ -135,6 +140,7 @@ public class EventsReceiver implements RMEventListener {
                 }
             }
         };
+        pinger.setName("Pinger");
         pinger.start();
     }
 
