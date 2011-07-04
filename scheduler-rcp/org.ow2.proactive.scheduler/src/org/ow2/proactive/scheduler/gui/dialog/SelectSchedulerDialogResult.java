@@ -44,6 +44,7 @@ import java.io.Serializable;
  */
 @SuppressWarnings("serial")
 public class SelectSchedulerDialogResult implements Serializable {
+    private final boolean canceled;
     private final String url;
     private final String login;
     private final String password;
@@ -57,12 +58,18 @@ public class SelectSchedulerDialogResult implements Serializable {
      * @param cred cred file path or null if login is provided
      * @param sshkey ssh private key or null
      */
-    public SelectSchedulerDialogResult(String url, String login, String password, byte[] cred, byte[] sshkey) {
+    public SelectSchedulerDialogResult(boolean canceled, String url, String login, String password,
+            byte[] cred, byte[] sshkey) {
+        this.canceled = canceled;
         this.url = url;
         this.login = login;
         this.password = password;
         this.cred = cred;
         this.sshkey = sshkey;
+    }
+
+    public boolean isCanceled() {
+        return this.canceled;
     }
 
     public String getUrl() {

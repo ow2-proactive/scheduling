@@ -101,7 +101,13 @@ public class ConnectHandler extends AbstractHandler implements IHandler {
         this.isDialogOpen = true;
         final SelectResourceManagerDialogResult dialogResult = SelectResourceManagerDialog.showDialog(parent);
 
-        if (dialogResult != null && !dialogResult.isCanceled()) {
+        if (dialogResult == null) {
+            parent.getDisplay().syncExec(new Runnable() {
+                public void run() {
+                    ConnectHandler.getHandler().execute(parent);
+                }
+            });
+        } else if (!dialogResult.isCanceled()) {
             // Create a temporary shell with a progress bar during the downloading of the RM state
             final Shell waitShell = new Shell(parent.getDisplay(), SWT.APPLICATION_MODAL);
             // Disable the escape key
@@ -180,6 +186,11 @@ public class ConnectHandler extends AbstractHandler implements IHandler {
                                     RMStore.getInstance().getResourceManager().disconnect();
                                 } catch (Throwable thr) {
                                 }
+                            }
+                        });
+                        parent.getDisplay().syncExec(new Runnable() {
+                            public void run() {
+                                ConnectHandler.getHandler().execute(parent);
                             }
                         });
                     }

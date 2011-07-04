@@ -100,7 +100,13 @@ public class ConnectAction extends SchedulerGUIAction {
                 .getShell());
         connDialogUp = false;
 
-        if (dialogResult != null) {
+        if (dialogResult == null) {
+            getParent().getDisplay().asyncExec(new Runnable() {
+                public void run() {
+                    connection();
+                }
+            });
+        } else if (!dialogResult.isCanceled()) {
 
             // Create a temporary shell with a progress bar during the downloading of the RM state
             final Shell waitShell = new Shell(getParent().getShell(), SWT.APPLICATION_MODAL);
@@ -155,7 +161,13 @@ public class ConnectAction extends SchedulerGUIAction {
                         res = 0;
                         res = SchedulerProxy.getInstance().connectToScheduler(dialogResult);
                     } catch (Throwable t) {
+
                         errorConnect(t, dialogResult);
+                        getParent().getDisplay().asyncExec(new Runnable() {
+                            public void run() {
+                                connection();
+                            }
+                        });
                     }
 
                     if (res == 0/*init val*/) {
@@ -177,6 +189,11 @@ public class ConnectAction extends SchedulerGUIAction {
                                 }
                                 MessageDialog.openError(getParent().getShell(), "Could not connect",
                                         "Incorrect username or password !");
+                            }
+                        });
+                        getParent().getDisplay().asyncExec(new Runnable() {
+                            public void run() {
+                                connection();
                             }
                         });
                         return;
@@ -219,6 +236,11 @@ public class ConnectAction extends SchedulerGUIAction {
 
                                 } catch (LogForwardingException e) {
                                     errorConnect(e, dialogResult);
+                                    getParent().getDisplay().asyncExec(new Runnable() {
+                                        public void run() {
+                                            connection();
+                                        }
+                                    });
                                 }
                             }
                         });
@@ -234,6 +256,11 @@ public class ConnectAction extends SchedulerGUIAction {
                                         "Incorrect username or password !");
                             }
                         });
+                        getParent().getDisplay().asyncExec(new Runnable() {
+                            public void run() {
+                                connection();
+                            }
+                        });
                         return;
                     }
                 }
@@ -245,7 +272,7 @@ public class ConnectAction extends SchedulerGUIAction {
         e.printStackTrace();
         Activator.log(IStatus.ERROR, "Could not connect to the scheduler based on:" + dialogResult.getUrl(),
                 e);
-        getParent().getDisplay().asyncExec(new Runnable() {
+        getParent().getDisplay().syncExec(new Runnable() {
             public void run() {
                 MessageDialog.openError(getParent().getShell(), "Couldn't connect",
                         "Could not connect to the scheduler based on : " + dialogResult.getUrl() +

@@ -653,40 +653,40 @@ public class SelectSchedulerDialog {
      */
     public static SelectSchedulerDialogResult showDialog(Shell parent) {
         new SelectSchedulerDialog(parent);
-        if (validate) {
-            if ((url == null) || url.trim().equals("")) {
-                MessageDialog.openError(parent, "Error", "The url is empty !");
+        if (!validate)
+            return new SelectSchedulerDialogResult(true, null, null, null, null, null);
+
+        if ((url == null) || url.trim().equals("")) {
+            MessageDialog.openError(parent, "Error", "The url is empty !");
+            return null;
+        }
+
+        byte[] cred = null;
+        if (useCred) {
+            try {
+                cred = FileToBytesConverter.convertFileToByteArray(new File(credPath));
+            } catch (IOException e) {
+                MessageDialog.openError(parent, "Error", "Credentials file not found : " + credPath);
                 return null;
             }
-
-            byte[] cred = null;
-            if (useCred) {
-                try {
-                    cred = FileToBytesConverter.convertFileToByteArray(new File(credPath));
-                } catch (IOException e) {
-                    MessageDialog.openError(parent, "Error", "Credentials file not found : " + credPath);
-                    return null;
-                }
-            } else {
-                if ((login == null) || login.trim().equals("")) {
-                    MessageDialog.openError(parent, "Error", "The login is empty !");
-                    return null;
-                }
+        } else {
+            if ((login == null) || login.trim().equals("")) {
+                MessageDialog.openError(parent, "Error", "The login is empty !");
+                return null;
             }
-
-            url = url.trim();
-            byte[] keyfileContent = null;
-            if (useSSH) {
-                try {
-                    keyfileContent = FileToBytesConverter.convertFileToByteArray(new File(SSHkeyPath));
-                } catch (Exception e) {
-                    MessageDialog.openError(parent, "Error", "SSh key file not found : " + SSHkeyPath);
-                    return null;
-                }
-            }
-            return new SelectSchedulerDialogResult(url, login, pwd, cred, keyfileContent);
         }
-        return null;
+
+        url = url.trim();
+        byte[] keyfileContent = null;
+        if (useSSH) {
+            try {
+                keyfileContent = FileToBytesConverter.convertFileToByteArray(new File(SSHkeyPath));
+            } catch (Exception e) {
+                MessageDialog.openError(parent, "Error", "SSh key file not found : " + SSHkeyPath);
+                return null;
+            }
+        }
+        return new SelectSchedulerDialogResult(!validate, url, login, pwd, cred, keyfileContent);
     }
 
     /**
