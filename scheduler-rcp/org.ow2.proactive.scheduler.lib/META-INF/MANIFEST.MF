@@ -122,8 +122,11 @@ Bundle-ClassPath: lib/activation.jar,
  lib/shell-1.4.2.jar,
  lib/shelltui-1.4.2.jar,
  lib/netty-3.2.0.ALPHA2.jar,
- lib/commons-vfs-patched-2.0-SNAPSHOTr19199.jar
-Export-Package: org.apache.commons.vfs,
+ lib/commons-vfs-patched-2.0-SNAPSHOTr19199.jar,
+ lib/commons-codec-1.3.jar
+Export-Package: org.apache.commons.codec,
+ org.apache.commons.codec.binary,
+ org.apache.commons.vfs,
  org.apache.commons.vfs.auth,
  org.apache.commons.vfs.cache,
  org.apache.commons.vfs.events,

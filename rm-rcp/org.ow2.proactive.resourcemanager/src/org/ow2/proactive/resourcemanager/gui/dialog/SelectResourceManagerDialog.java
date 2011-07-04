@@ -51,7 +51,10 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
@@ -59,6 +62,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
@@ -66,6 +70,7 @@ import org.eclipse.swt.widgets.Text;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.util.URIBuilder;
 import org.ow2.proactive.resourcemanager.Activator;
+import org.ow2.proactive.utils.FileToBytesConverter;
 
 
 /**
@@ -95,7 +100,8 @@ public class SelectResourceManagerDialog {
     private static String serverURLProperty = null;
     private static String login = null;
     private static String pwd = null;
-    private static Boolean logAsAdmin = null;
+    private static String credPath = null;
+    private static boolean useCred = false;
     private static Boolean hasBeenCanceled = null;
     private static Combo urlCombo = null;
     private static Combo loginCombo = null;
@@ -109,6 +115,7 @@ public class SelectResourceManagerDialog {
     private SelectResourceManagerDialog(Shell parent) {
         // Load the proactive default configuration
         ProActiveConfiguration.load();
+        useCred = false;
 
         // Init the display
         Display display = parent.getDisplay();
@@ -124,23 +131,29 @@ public class SelectResourceManagerDialog {
         // creation
         Label urlLabel = new Label(shell, SWT.NONE);
         urlCombo = new Combo(shell, SWT.BORDER);
-        Label loginLabel = new Label(shell, SWT.NONE);
+        final Label loginLabel = new Label(shell, SWT.NONE);
         loginCombo = new Combo(shell, SWT.BORDER);
-        Label pwdLabel = new Label(shell, SWT.NONE);
+        final Label pwdLabel = new Label(shell, SWT.NONE);
         final Text pwdText = new Text(shell, SWT.SINGLE | SWT.PASSWORD | SWT.BORDER);
         okButton = new Button(shell, SWT.NONE);
         cancelButton = new Button(shell, SWT.NONE);
+        final Label authLabel = new Label(shell, SWT.NONE);
+        final Combo authType = new Combo(shell, SWT.BORDER | SWT.READ_ONLY);
+        final Label credLabel = new Label(shell, SWT.NONE);
+        final Text credText = new Text(shell, SWT.SINGLE | SWT.BORDER);
+        final Button credButton = new Button(shell, SWT.NONE);
 
         // label url
-        urlLabel.setText("Url :");
+        urlLabel.setText("Url");
         FormData urlLabelFormData = new FormData();
         urlLabelFormData.top = new FormAttachment(urlCombo, 0, SWT.CENTER);
+        urlLabelFormData.right = new FormAttachment(urlCombo, -5);
         urlLabel.setLayoutData(urlLabelFormData);
 
         // combo url
         FormData urlFormData = new FormData();
         urlFormData.top = new FormAttachment(0, -1);
-        urlFormData.left = new FormAttachment(urlLabel, 5);
+        urlFormData.left = new FormAttachment(credLabel, 5);
         urlFormData.right = new FormAttachment(100, -5);
         urlFormData.width = 320;
         urlCombo.setLayoutData(urlFormData);
@@ -153,33 +166,100 @@ public class SelectResourceManagerDialog {
             urlCombo.setEnabled(false);
         }
 
+        // auth type : credentials or plain login/pwd
+        authLabel.setText("Authentication");
+        FormData authLFD = new FormData();
+        authLFD.top = new FormAttachment(authType, 5, SWT.CENTER);
+        authLFD.left = new FormAttachment(0, 5);
+        authLabel.setLayoutData(authLFD);
+
+        authType.setItems(new String[] { "Basic", "Credentials" });
+        authType.setText("Basic");
+        FormData authFD = new FormData();
+        authFD.top = new FormAttachment(urlCombo, 5);
+        authFD.left = new FormAttachment(authLabel, 10);
+        authType.setLayoutData(authFD);
+        authType.addSelectionListener(new SelectionListener() {
+            public void widgetSelected(SelectionEvent e) {
+                useCred = authType.getText().equals("Credentials");
+
+                credLabel.setVisible(useCred);
+                credText.setVisible(useCred);
+                credButton.setVisible(useCred);
+                pwdLabel.setVisible(!useCred);
+                pwdText.setVisible(!useCred);
+                loginLabel.setVisible(!useCred);
+                loginCombo.setVisible(!useCred);
+            }
+
+            public void widgetDefaultSelected(SelectionEvent e) {
+            }
+        });
+
         // label login
-        loginLabel.setText("login :");
+        loginLabel.setText("Login");
         FormData loginLabelFormData = new FormData();
         loginLabelFormData.top = new FormAttachment(loginCombo, 0, SWT.CENTER);
+        loginLabelFormData.right = new FormAttachment(loginCombo, -5);
         loginLabel.setLayoutData(loginLabelFormData);
 
         // text login
         FormData loginFormData = new FormData();
-        loginFormData.top = new FormAttachment(urlCombo, 5);
-        loginFormData.left = new FormAttachment(loginLabel, 5);
-        loginFormData.right = new FormAttachment(40, 5);
+        loginFormData.top = new FormAttachment(authType, 5);
+        loginFormData.left = new FormAttachment(credLabel, 5);
+        loginFormData.right = new FormAttachment(100, -60);
         loginCombo.setLayoutData(loginFormData);
         loadLogins();
 
         // label password
-        pwdLabel.setText("password :");
+        pwdLabel.setText("Password");
         FormData pwdLabelFormData = new FormData();
         pwdLabelFormData.top = new FormAttachment(pwdText, 0, SWT.CENTER);
-        pwdLabelFormData.left = new FormAttachment(loginCombo, 5);
+        pwdLabelFormData.right = new FormAttachment(pwdText, -5);
         pwdLabel.setLayoutData(pwdLabelFormData);
 
         // text password
         FormData pwdFormData = new FormData();
-        pwdFormData.top = new FormAttachment(urlCombo, 5);
-        pwdFormData.left = new FormAttachment(pwdLabel, 5);
-        pwdFormData.right = new FormAttachment(100, -5);
+        pwdFormData.top = new FormAttachment(loginCombo, 5);
+        pwdFormData.left = new FormAttachment(credLabel, 5);
+        pwdFormData.right = new FormAttachment(100, -60);
         pwdText.setLayoutData(pwdFormData);
+
+        // credendials file selection
+        FormData credLD = new FormData();
+        credLabel.setText("Credentials");
+        credLD.top = new FormAttachment(credText, 0, SWT.CENTER);
+        credLD.right = new FormAttachment(credText, -5);
+        credLabel.setLayoutData(credLD);
+
+        FormData credTD = new FormData();
+        credTD.top = new FormAttachment(loginCombo, 5);
+        credTD.left = new FormAttachment(credLabel, 5);
+        credTD.right = new FormAttachment(80, -5);
+        credText.setLayoutData(credTD);
+
+        credButton.setText("Browse");
+        FormData credBD = new FormData();
+        credBD.top = new FormAttachment(loginCombo, 5);
+        credBD.left = new FormAttachment(credText, 5);
+        credBD.right = new FormAttachment(100, -5);
+        credButton.setLayoutData(credBD);
+        credButton.addListener(SWT.Selection, new Listener() {
+            public void handleEvent(Event event) {
+                FileDialog fileDialog = new FileDialog(shell, SWT.OPEN);
+                if (credText.getText() != null && credText.getText().length() > 0) {
+                    fileDialog.setFileName(credText.getText());
+                }
+                String fileName = fileDialog.open();
+                if (fileName != null) {
+                    credText.setText(fileName);
+                }
+            }
+        });
+
+        credLabel.setVisible(false);
+        credText.setVisible(false);
+        credButton.setVisible(false);
 
         // button "OK"
         okButton.setText("OK");
@@ -189,12 +269,13 @@ public class SelectResourceManagerDialog {
                 url = urlCombo.getText();
                 login = loginCombo.getText();
                 pwd = pwdText.getText();
+                credPath = credText.getText();
                 shell.close();
             }
         });
 
         FormData okFormData = new FormData();
-        okFormData.top = new FormAttachment(loginCombo, 5);
+        okFormData.top = new FormAttachment(pwdText, 15);
         okFormData.left = new FormAttachment(25, 20);
         okFormData.right = new FormAttachment(50, -10);
         okButton.setLayoutData(okFormData);
@@ -210,7 +291,7 @@ public class SelectResourceManagerDialog {
         });
 
         FormData cancelFormData = new FormData();
-        cancelFormData.top = new FormAttachment(loginCombo, 5);
+        cancelFormData.top = new FormAttachment(pwdText, 15);
         cancelFormData.left = new FormAttachment(50, 10);
         cancelFormData.right = new FormAttachment(75, -20);
         cancelButton.setLayoutData(cancelFormData);
@@ -397,7 +478,9 @@ public class SelectResourceManagerDialog {
             }
             // Record the last Login used at the end of the file
             // in order to find it easily for the next time
-            pw.println(login);
+            if (login != null && login.trim().length() > 0) {
+                pw.println(login);
+            }
         } catch (IOException e) {
             Activator.log(IStatus.ERROR, "Error when recording logins. ", e);
             e.printStackTrace();
@@ -433,9 +516,20 @@ public class SelectResourceManagerDialog {
         if (url == null) {
             return null;
         }
+
+        byte[] cred = null;
+        if (useCred) {
+            try {
+                cred = FileToBytesConverter.convertFileToByteArray(new File(credPath));
+            } catch (IOException e) {
+                MessageDialog.openError(parent, "Error", "Credentials file not found : " + credPath);
+                return null;
+            }
+        }
+
         url = url.trim();
         SelectResourceManagerDialogResult res = new SelectResourceManagerDialogResult(hasBeenCanceled, url,
-            login, pwd, logAsAdmin);
+            login, pwd, cred);
         pwd = null;
         return res;
     }

@@ -152,7 +152,7 @@ public class ConnectHandler extends AbstractHandler implements IHandler {
                     //perform connection in a new thread, non graphic
                     try {
                         RMStore.newInstance(dialogResult.getUrl(), dialogResult.getLogin(), dialogResult
-                                .getPassword());
+                                .getPassword(), dialogResult.getCredentials());
                         parent.getDisplay().syncExec(new Runnable() {
                             public void run() {
                                 if (!waitShell.isDisposed()) {

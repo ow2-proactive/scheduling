@@ -496,19 +496,24 @@ public class SchedulerProxy implements Scheduler {
     public int connectToScheduler(SelectSchedulerDialogResult dialogResult) throws Throwable {
         try {
             userName = dialogResult.getLogin();
+            byte[] cred = dialogResult.getCred();
             schedulerURL = dialogResult.getUrl();
-            CredData cd;
-            if (dialogResult.getSshkey() == null) {
-                cd = new CredData(CredData.parseLogin(userName), CredData.parseDomain(userName), dialogResult
-                        .getPassword());
-            } else {
-                cd = new CredData(CredData.parseLogin(userName), CredData.parseDomain(userName), dialogResult
-                        .getPassword(), dialogResult.getSshkey());
-            }
-
+            Credentials credentials = null;
             sai = SchedulerConnection.join(schedulerURL);
 
-            Credentials credentials = Credentials.createCredentials(cd, sai.getPublicKey());
+            if (cred == null) {
+                CredData cd;
+                if (dialogResult.getSshkey() == null) {
+                    cd = new CredData(CredData.parseLogin(userName), CredData.parseDomain(userName),
+                        dialogResult.getPassword());
+                } else {
+                    cd = new CredData(CredData.parseLogin(userName), CredData.parseDomain(userName),
+                        dialogResult.getPassword(), dialogResult.getSshkey());
+                }
+                credentials = Credentials.createCredentials(cd, sai.getPublicKey());
+            } else {
+                credentials = Credentials.getCredentialsBase64(cred);
+            }
 
             if (scheduler == null || !scheduler.isConnected()) {
                 scheduler = sai.login(credentials);

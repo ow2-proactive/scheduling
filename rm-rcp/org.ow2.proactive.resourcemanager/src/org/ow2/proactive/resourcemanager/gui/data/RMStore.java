@@ -84,7 +84,7 @@ public class RMStore {
     private RMModel model = null;
     private String baseURL;
 
-    private RMStore(String url, String login, String password) throws RMException {
+    private RMStore(String url, String login, String password, byte[] cred) throws RMException {
         try {
             resourceManagerAO = PAActiveObject.newActive(ResourceManagerProxy.class, new Object[] {});
             baseURL = url;
@@ -104,11 +104,20 @@ public class RMStore {
 
             Credentials credentials;
             try {
-                try {
-                    credentials = Credentials.createCredentials(new CredData(CredData.parseLogin(login),
-                        CredData.parseDomain(login), password), rmAuthentication.getPublicKey());
-                } catch (KeyException e) {
-                    throw new LoginException("Could not create encrypted credentials: " + e.getMessage());
+                if (cred != null) {
+                    try {
+                        credentials = Credentials.getCredentialsBase64(cred);
+                    } catch (KeyException e) {
+                        Activator.log(IStatus.INFO, "Failed to read credentials", e);
+                        throw new RMException("Failed to read credentials", e);
+                    }
+                } else {
+                    try {
+                        credentials = Credentials.createCredentials(new CredData(CredData.parseLogin(login),
+                            CredData.parseDomain(login), password), rmAuthentication.getPublicKey());
+                    } catch (KeyException e) {
+                        throw new LoginException("Could not create encrypted credentials: " + e.getMessage());
+                    }
                 }
                 resourceManagerAO.connect(rmAuthentication, credentials);
                 //resourceManager = auth.login(creds);
@@ -143,9 +152,9 @@ public class RMStore {
         }
     }
 
-    public static void newInstance(String url, String login, String password) throws RMException,
-            SecurityException {
-        instance = new RMStore(url, login, password);
+    public static void newInstance(String url, String login, String password, byte[] cred)
+            throws RMException, SecurityException {
+        instance = new RMStore(url, login, password, cred);
     }
 
     public static RMStore getInstance() {

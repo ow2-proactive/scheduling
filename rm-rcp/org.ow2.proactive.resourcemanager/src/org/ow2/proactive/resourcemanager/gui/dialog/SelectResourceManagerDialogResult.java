@@ -45,15 +45,21 @@ public class SelectResourceManagerDialogResult {
     private String login = null;
     private String password = null;
     private Boolean canceled = false;
+    private byte[] cred = null;
 
     public SelectResourceManagerDialogResult(Boolean isCanceled, String url, String login, String password,
-            Boolean logAsAdmin) {
+            byte[] cred) {
         this.canceled = isCanceled;
         if (!isCanceled) {
             this.url = url;
             this.login = login;
             this.password = password;
+            this.cred = cred;
         }
+    }
+
+    public byte[] getCredentials() {
+        return cred;
     }
 
     public String getUrl() {
