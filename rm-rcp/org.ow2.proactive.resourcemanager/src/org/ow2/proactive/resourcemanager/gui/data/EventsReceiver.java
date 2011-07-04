@@ -122,10 +122,13 @@ public class EventsReceiver implements RMEventListener {
                 while (!pinger.isInterrupted()) {
                     try {
                         try {
+                            if (!RMStore.isConnected()) {
+                                break;
+                            }
                             //try to ping RM server
                             BooleanWrapper alive = RMStore.getInstance().getResourceManager().isActive();
                             PAFuture.waitFor(alive, RM_CONNECTION_TIMEOUT);
-                            if (!alive.getBooleanValue()) {
+                            if (!pinger.isInterrupted() && !alive.getBooleanValue()) {
                                 throw new RMException("RM seems to be down");
                             }
                         } catch (Exception e) {
