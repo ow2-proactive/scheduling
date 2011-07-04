@@ -1405,6 +1405,9 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
                 } catch (RMProxyCreationException e) {
                     logger_dev.debug("", e);
                     //we did our best > should not be thrown
+                } catch (Throwable t) {
+                    //should not happen, but save terminateUserProxy next method
+                    logger_dev.error("", t);
                 }
             }
             if (job.isFinished()) {
