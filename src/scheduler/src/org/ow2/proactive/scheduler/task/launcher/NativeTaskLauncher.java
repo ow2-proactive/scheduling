@@ -43,7 +43,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.objectweb.proactive.extensions.dataspaces.exceptions.DataSpacesException;
@@ -91,14 +90,6 @@ public class NativeTaskLauncher extends TaskLauncher {
      */
     public NativeTaskLauncher(TaskLauncherInitializer initializer) {
         super(initializer);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void initActivity(Body body) {
-        super.initActivity(body);
     }
 
     /**

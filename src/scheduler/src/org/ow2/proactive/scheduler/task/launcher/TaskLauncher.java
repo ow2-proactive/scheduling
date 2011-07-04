@@ -62,8 +62,6 @@ import org.apache.log4j.MDC;
 import org.apache.log4j.helpers.LogLog;
 import org.apache.log4j.spi.LoggingEvent;
 import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.Body;
-import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.annotation.ImmediateService;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.NodeException;
@@ -74,7 +72,6 @@ import org.objectweb.proactive.extensions.dataspaces.core.DataSpacesNodes;
 import org.objectweb.proactive.extensions.dataspaces.exceptions.FileSystemException;
 import org.objectweb.proactive.extensions.dataspaces.vfs.selector.fast.FastFileSelector;
 import org.objectweb.proactive.extensions.dataspaces.vfs.selector.fast.FastSelector;
-import org.objectweb.proactive.utils.SweetCountDownLatch;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.db.types.BigString;
@@ -121,7 +118,7 @@ import org.ow2.proactive.utils.Formatter;
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9
  */
-public abstract class TaskLauncher implements InitActive {
+public abstract class TaskLauncher {
 
     public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.LAUNCHER);
     public static final Logger logger_dev_dataspace = ProActiveLogger
@@ -231,8 +228,6 @@ public abstract class TaskLauncher implements InitActive {
     private final AtomicBoolean loggersFinalized = new AtomicBoolean(false);
     // true if loggers are currently activated
     private final AtomicBoolean loggersActivated = new AtomicBoolean(false);
-    // 0 if the launcher (loggers and env) have been initialized
-    private final SweetCountDownLatch launcherInitialized = new SweetCountDownLatch(1);
 
     /** Maximum execution time of the task (in milliseconds), the variable is only valid if isWallTime is true */
     protected long wallTime = 0;
@@ -277,19 +272,17 @@ public abstract class TaskLauncher implements InitActive {
         this.iterationIndex = initializer.getIterationIndex();
         this.storeLogs = initializer.isPreciousLogs();
         this.dataspacesStatus = new StringBuffer();
+        this.init();
     }
 
     /**
-     * Initializes the activity of the active object.
-     * @param body the body of the active object being initialized
+     * Initialization
      */
-    public void initActivity(Body body) {
+    private void init() {
         // plug stdout/err into a socketAppender
         this.initLoggers();
         // set scheduler defined env variables
         this.initEnv();
-        // set the launcher as initialized
-        this.launcherInitialized.countDown();
         logger_dev.debug("TaskLauncher initialized");
     }
 
@@ -512,7 +505,6 @@ public abstract class TaskLauncher implements InitActive {
     @SuppressWarnings("unchecked")
     @ImmediateService
     public void activateLogs(AppenderProvider logSink) {
-        this.launcherInitialized.await();
         synchronized (this.loggersFinalized) {
             logger_dev.info("Activating logs for task " + this.taskId);
             if (this.loggersActivated.get()) {
