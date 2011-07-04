@@ -37,13 +37,17 @@
 package org.ow2.proactive.scheduler.gui.actions;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Properties;
+import java.util.zip.ZipFile;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -87,6 +91,7 @@ import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.factories.JobFactory;
 import org.ow2.proactive.scheduler.common.job.factories.XMLAttributes;
 import org.ow2.proactive.scheduler.common.job.factories.XMLTags;
+import org.ow2.proactive.scheduler.common.util.ZipUtils;
 import org.ow2.proactive.scheduler.gui.Internal;
 import org.ow2.proactive.scheduler.gui.data.DataServers;
 import org.ow2.proactive.scheduler.gui.data.DataServers.Server;
@@ -116,10 +121,12 @@ public class SubmitJobAction extends SchedulerGUIAction {
         this.editVariables = editVariables;
         if (editVariables) {
             this.setText("Submit with &edition of variables");
-            this.setToolTipText("Submit job from an XML file and edit the variables definitions");
+            this
+                    .setToolTipText("Submit job from an XML file or an Archive and edit the variables definitions");
         } else {
-            this.setText("&Submit an XML job file");
-            this.setToolTipText("Submit job from an XML file containing a job description");
+            this.setText("&Submit an XML job or a Job Archive");
+            this
+                    .setToolTipText("Submit job using an XML job descriptor or a Job Archive containing dependencies");
         }
         this.setImageDescriptor(Activator.getDefault().getImageRegistry().getDescriptor(
                 Internal.IMG_JOBSUBMIT));
@@ -156,7 +163,7 @@ public class SubmitJobAction extends SchedulerGUIAction {
      * this descriptor.
      * 
      */
-    private List<VarMap> editDescriptorVariables(final String[] files) {
+    private List<VarMap> editDescriptorVariables(final String[] files) throws JobCreationException {
 
         final List<VarMap> variables = new ArrayList<VarMap>();
 
@@ -168,8 +175,12 @@ public class SubmitJobAction extends SchedulerGUIAction {
                 DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
                 doc = docBuilder.parse(file);
             } catch (Exception e) {
-                String msg = "Failed to parse descriptor " + file + ":\n" + e.getMessage();
-                MessageDialog.openError(getParent().getShell(), "Edit Variables", msg);
+                final String msg = "Failed to parse descriptor " + file + ":\n" + e.getMessage();
+                getParent().getDisplay().asyncExec(new Runnable() {
+                    public void run() {
+                        MessageDialog.openError(getParent().getShell(), "Edit Variables", msg);
+                    }
+                });
                 Activator.log(IStatus.ERROR, msg, e);
                 return null;
             }
@@ -208,8 +219,12 @@ public class SubmitJobAction extends SchedulerGUIAction {
                     }
                 }
             } catch (Exception e) {
-                String msg = "Error while reading variables in '" + file + "':\n" + e.getMessage();
-                MessageDialog.openError(getParent().getShell(), "Edit Variables", msg);
+                final String msg = "Error while reading variables in '" + file + "':\n" + e.getMessage();
+                getParent().getDisplay().asyncExec(new Runnable() {
+                    public void run() {
+                        MessageDialog.openError(getParent().getShell(), "Edit Variables", msg);
+                    }
+                });
                 Activator.log(IStatus.ERROR, msg, e);
                 return null;
             }
@@ -255,9 +270,13 @@ public class SubmitJobAction extends SchedulerGUIAction {
                     }
                 }
             } catch (Exception e) {
-                String msg = "Error while writing variables for '" + varMap.originalFile + "':\n" +
+                final String msg = "Error while writing variables for '" + varMap.originalFile + "':\n" +
                     e.getMessage();
-                MessageDialog.openError(getParent().getShell(), "Edit Variables", msg);
+                getParent().getDisplay().asyncExec(new Runnable() {
+                    public void run() {
+                        MessageDialog.openError(getParent().getShell(), "Edit Variables", msg);
+                    }
+                });
                 Activator.log(IStatus.ERROR, msg, e);
                 return null;
             }
@@ -274,9 +293,13 @@ public class SubmitJobAction extends SchedulerGUIAction {
                 transformer.transform(source, result);
 
             } catch (Exception e) {
-                String msg = "Error while writing descriptor to '" + varMap.out.getAbsolutePath() + "':\n" +
-                    e.getMessage();
-                MessageDialog.openError(getParent().getShell(), "Edit Variables", msg);
+                final String msg = "Error while writing descriptor to '" + varMap.out.getAbsolutePath() +
+                    "':\n" + e.getMessage();
+                getParent().getDisplay().asyncExec(new Runnable() {
+                    public void run() {
+                        MessageDialog.openError(getParent().getShell(), "Edit Variables", msg);
+                    }
+                });
                 Activator.log(IStatus.ERROR, msg, e);
                 return null;
             }
@@ -479,7 +502,8 @@ public class SubmitJobAction extends SchedulerGUIAction {
     @Override
     public void run() {
         FileDialog fileDialog = new FileDialog(getParent().getShell(), SWT.OPEN | SWT.MULTI);
-        fileDialog.setFilterExtensions(new String[] { "*.xml" });
+        fileDialog.setText("Open a job descriptor or a job archive");
+        fileDialog.setFilterExtensions(new String[] { "*.xml;*.zip;*.jar;*jobarch" });
         if (lastDirectory != null) {
             fileDialog.setFilterPath(lastDirectory);
         }
@@ -492,14 +516,78 @@ public class SubmitJobAction extends SchedulerGUIAction {
         lastDirectory = directoryPath;
 
         for (int i = 0; i < fileNames.length; i++) {
-            fileNames[i] = directoryPath + File.separator + fileNames[i];
+            String file = directoryPath + File.separator + fileNames[i];
+
+            /* in case of archive, unpack it in /tmp and simply change the file name */
+            try {
+                ZipFile zip = new ZipFile(file);
+                File tmp = File.createTempFile("sched-edit-", "-archive");
+                tmp.delete();
+                tmp.mkdir();
+                tmp.deleteOnExit();
+                ZipUtils.unzip(zip, tmp);
+
+                String xmlJobRelativePath;
+                File manifest = new File(tmp, JobFactory.ARCHIVE_MANIFEST_DIRECTORY + File.separator +
+                    JobFactory.ARCHIVE_MANIFEST_FILE);
+                if (manifest.exists() && manifest.isFile()) {
+                    //manifest found, try to get the property
+                    Properties manifestProp = new Properties();
+                    try {
+                        FileInputStream fis = new FileInputStream(manifest);
+                        manifestProp.load(fis);
+                        fis.close();
+                    } catch (IOException ioe) {
+                        final String ffile = file;
+                        getParent().getDisplay().asyncExec(new Runnable() {
+                            public void run() {
+                                MessageDialog.openError(getParent().getShell(), "Job submission error",
+                                        "Cannot read archive manifest file for archive: " + ffile);
+                            }
+                        });
+                    }
+                    xmlJobRelativePath = manifestProp
+                            .getProperty(JobFactory.ARCHIVE_MANIFEST_PROPERTY_XMLFILE);
+                    if (xmlJobRelativePath == null) {
+                        //property not found
+                        final String ffile = file;
+                        getParent().getDisplay().asyncExec(new Runnable() {
+                            public void run() {
+                                MessageDialog.openError(getParent().getShell(), "Job submission error",
+                                        "Cannot find property '" +
+                                            JobFactory.ARCHIVE_MANIFEST_PROPERTY_XMLFILE +
+                                            "' in archive manifest file: " + ffile);
+                            }
+                        });
+                    }
+                } else {
+                    xmlJobRelativePath = JobFactory.ARCHIVE_DEFAULT_XMLFILE;
+                }
+                String extractedPath = tmp.getAbsolutePath() + File.separator + xmlJobRelativePath;
+                System.out.println("unpacked archive in " + extractedPath);
+                file = extractedPath;
+            } catch (IOException e1) {
+                // not a zip, maybe an xml
+            }
+
+            fileNames[i] = file;
         }
 
         //create jobs in a worker thread : not GUI.
         Thread worker = new Thread(new Runnable() {
             public void run() {
                 if (editVariables) {
-                    List<VarMap> varMap = editDescriptorVariables(fileNames);
+                    List<VarMap> varMap = null;
+                    try {
+                        varMap = editDescriptorVariables(fileNames);
+                    } catch (final JobCreationException e) {
+                        getParent().getDisplay().asyncExec(new Runnable() {
+                            public void run() {
+                                MessageDialog.openError(getParent().getShell(), "Archive submission failed",
+                                        e.getMessage());
+                            }
+                        });
+                    }
                     if (varMap == null) {
                         // this means the editoDescriptorVariables() dialog was cancelled
                         return;
