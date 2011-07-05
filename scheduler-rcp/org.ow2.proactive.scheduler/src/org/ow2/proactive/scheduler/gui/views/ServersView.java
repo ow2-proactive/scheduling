@@ -350,7 +350,7 @@ public class ServersView extends ViewPart {
              * Pops up a new 'Add a Data Server dialog'
              */
             public void run() {
-                final Shell dialog = new Shell(parent.getDisplay(), SWT.RESIZE | SWT.APPLICATION_MODAL);
+                final Shell dialog = new Shell(parent.getDisplay(),  SWT.DIALOG_TRIM | SWT.RESIZE | SWT.APPLICATION_MODAL);
                 dialog.setText("New Data Server");
 
                 GridLayout l = new GridLayout(1, false);

@@ -60,7 +60,6 @@ import org.ow2.proactive.scheduler.gui.actions.ChangeMaximizeListAction;
 import org.ow2.proactive.scheduler.gui.actions.ChangePriorityJobAction;
 import org.ow2.proactive.scheduler.gui.actions.ChangeViewModeAction;
 import org.ow2.proactive.scheduler.gui.actions.ConnectAction;
-import org.ow2.proactive.scheduler.gui.actions.JMXActionsManager;
 import org.ow2.proactive.scheduler.gui.actions.KillRemoveJobAction;
 import org.ow2.proactive.scheduler.gui.actions.MaximizeListAction;
 import org.ow2.proactive.scheduler.gui.actions.ObtainJobOutputAction;
