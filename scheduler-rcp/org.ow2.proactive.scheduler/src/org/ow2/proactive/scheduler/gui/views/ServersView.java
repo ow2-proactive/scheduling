@@ -227,7 +227,7 @@ public class ServersView extends ViewPart {
      */
     @Override
     public void createPartControl(Composite parent) {
-        table = new Table(parent, SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL);
+        table = new Table(parent, SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION);
         table.setHeaderVisible(true);
         table.setLinesVisible(true);
 
@@ -238,7 +238,7 @@ public class ServersView extends ViewPart {
         TableColumn column11 = new TableColumn(table, SWT.LEFT);
         column11.setText("Protocol");
         column11.setWidth(70);
-
+        
         TableColumn column2 = new TableColumn(table, SWT.LEFT);
         column2.setText("Name");
         column2.setWidth(100);
