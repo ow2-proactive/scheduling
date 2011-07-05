@@ -65,6 +65,8 @@ import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.annotation.ImmediateService;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.core.util.ProActiveInet;
+import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.dataspaces.api.DataSpacesFileObject;
 import org.objectweb.proactive.extensions.dataspaces.api.PADataSpaces;
@@ -368,12 +370,7 @@ public abstract class TaskLauncher {
         Logger l = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX + this.taskId.getJobId());
         l.setAdditivity(false);
         MDC.getContext().put(Log4JTaskLogs.MDC_TASK_ID, this.taskId.getReadableName());
-        try {
-            MDC.getContext().put(Log4JTaskLogs.MDC_HOST,
-                    PAActiveObject.getNode().getNodeInformation().getVMInformation().getHostName());
-        } catch (NodeException e) {
-            MDC.getContext().put(Log4JTaskLogs.MDC_HOST, "Unknown host");
-        }
+        MDC.getContext().put(Log4JTaskLogs.MDC_HOST, getHostname());
         l.removeAllAppenders();
         // create an async appender for multiplexing (storage plus redirect through socketAppender)
         String logMaxSizeProp = System.getProperty(TaskLauncher.MAX_LOG_SIZE_PROPERTY);
@@ -1276,6 +1273,19 @@ public abstract class TaskLauncher {
             System.err.println(this.dataspacesStatus);
             this.dataspacesStatus = new StringBuffer();
         }
+    }
+
+    /**
+     * Use ProActive API to get the hostname of this JVM.
+     * Avoid using ActiveObject API which can be not started at initialization time.<br/>
+     * <br/>
+     * This method don't need the activeObject to exist to be called.
+     * 
+     * @return the hostname of the local JVM
+     */
+    private String getHostname() {
+        //return PAActiveObject.getNode().getNodeInformation().getVMInformation().getHostName();
+        return URIBuilder.getHostNameorIP(ProActiveInet.getInstance().getInetAddress());
     }
 
 }
