@@ -963,7 +963,5 @@ public class ServersView extends ViewPart {
     @Override
     public void dispose() {
         super.dispose();
-
-        DataServers.cleanup();
     }
 }
