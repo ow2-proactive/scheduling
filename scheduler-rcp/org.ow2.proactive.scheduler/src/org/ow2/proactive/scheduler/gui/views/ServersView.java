@@ -238,7 +238,7 @@ public class ServersView extends ViewPart {
         TableColumn column11 = new TableColumn(table, SWT.LEFT);
         column11.setText("Protocol");
         column11.setWidth(70);
-        
+
         TableColumn column2 = new TableColumn(table, SWT.LEFT);
         column2.setText("Name");
         column2.setWidth(100);
@@ -350,7 +350,8 @@ public class ServersView extends ViewPart {
              * Pops up a new 'Add a Data Server dialog'
              */
             public void run() {
-                final Shell dialog = new Shell(parent.getDisplay(),  SWT.DIALOG_TRIM | SWT.RESIZE | SWT.APPLICATION_MODAL);
+                final Shell dialog = new Shell(parent.getDisplay(), SWT.DIALOG_TRIM | SWT.RESIZE |
+                    SWT.APPLICATION_MODAL);
                 dialog.setText("New Data Server");
 
                 GridLayout l = new GridLayout(1, false);

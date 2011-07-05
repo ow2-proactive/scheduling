@@ -65,6 +65,7 @@ import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.annotation.ImmediateService;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.core.remoteobject.AbstractRemoteObjectFactory;
 import org.objectweb.proactive.core.util.ProActiveInet;
 import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -1285,7 +1286,8 @@ public abstract class TaskLauncher {
      */
     private String getHostname() {
         //return PAActiveObject.getNode().getNodeInformation().getVMInformation().getHostName();
-        return URIBuilder.getHostNameorIP(ProActiveInet.getInstance().getInetAddress());
+        return ProActiveInet.getInstance().getInetAddress().getHostName();
+        // return URIBuilder.getHostNameorIP(ProActiveInet.getInstance().getInetAddress());
     }
 
 }
