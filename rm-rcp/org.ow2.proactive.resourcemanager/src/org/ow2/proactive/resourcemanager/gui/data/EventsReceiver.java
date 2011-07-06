@@ -104,7 +104,7 @@ public class EventsReceiver implements RMEventListener {
                         ResourcesTopologyView.getTopologyViewer().loadMatrix();
                     }
                     //init stats view if stats panel is displayed
-                    if (StatisticsView.getStatsViewer() != null) {
+                    if (StatisticsView.getNodesStatsViewer() != null) {
                         StatisticsView.init();
                     }
                 }

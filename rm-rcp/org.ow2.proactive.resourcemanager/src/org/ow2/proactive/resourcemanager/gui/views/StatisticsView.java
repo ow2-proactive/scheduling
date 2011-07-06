@@ -38,12 +38,14 @@ package org.ow2.proactive.resourcemanager.gui.views;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.ui.part.ViewPart;
 import org.ow2.proactive.resourcemanager.gui.data.RMStore;
-import org.ow2.proactive.resourcemanager.gui.stats.RMStatsViewer;
+import org.ow2.proactive.resourcemanager.gui.stats.RMHostsStatsViewer;
+import org.ow2.proactive.resourcemanager.gui.stats.RMNodesStatsViewer;
 
 
 /**
@@ -55,10 +57,12 @@ public class StatisticsView extends ViewPart {
      * view part id
      */
     public static final String ID = "org.ow2.proactive.resourcemanager.gui.views.StatisticsView";
-    private static RMStatsViewer statsViewer = null;
+    private static RMNodesStatsViewer nodesStatsViewer = null;
+    private static RMHostsStatsViewer hostsStatsViewer = null;
 
     public static void init() {
-        statsViewer.init();
+        nodesStatsViewer.init();
+        hostsStatsViewer.init();
     }
 
     /* (non-Javadoc)
@@ -66,8 +70,9 @@ public class StatisticsView extends ViewPart {
      */
     @Override
     public void createPartControl(Composite parent) {
-        statsViewer = new RMStatsViewer(parent);
-        Table table = statsViewer.getTable();
+        parent.setLayout(new GridLayout(1, true));
+        nodesStatsViewer = new RMNodesStatsViewer(parent);
+        Table table = nodesStatsViewer.getTable();
         table.setLayoutData(new GridData(GridData.FILL_BOTH));
         table.setHeaderVisible(true);
         table.setLinesVisible(true);
@@ -85,9 +90,32 @@ public class StatisticsView extends ViewPart {
         tc1.setMoveable(false);
         tc2.setMoveable(false);
 
+        hostsStatsViewer = new RMHostsStatsViewer(parent);
+        table = hostsStatsViewer.getTable();
+        table.setLayoutData(new GridData(GridData.FILL_BOTH));
+        table.setHeaderVisible(true);
+        table.setLinesVisible(true);
+        tc0 = new TableColumn(table, SWT.LEFT);
+        tc1 = new TableColumn(table, SWT.LEFT);
+        tc2 = new TableColumn(table, SWT.LEFT);
+        tc0.setText("");
+        tc1.setText("Host Status");
+        tc2.setText("Count");
+        tc0.setWidth(30);
+        tc1.setWidth(120);
+        tc2.setWidth(150);
+        tc0.setMoveable(false);
+        tc0.setResizable(false);
+        tc1.setMoveable(false);
+        tc2.setMoveable(false);
+
         if (RMStore.isConnected()) {
-            statsViewer.init();
+            nodesStatsViewer.init();
+            hostsStatsViewer.init();
         }
+
+        parent.pack();
+        parent.layout();
     }
 
     /**
@@ -108,14 +136,23 @@ public class StatisticsView extends ViewPart {
     @Override
     public void dispose() {
         super.dispose();
-        statsViewer = null;
+        nodesStatsViewer = null;
+        hostsStatsViewer = null;
     }
 
     /**
      * @return statsViewer if view is activated,
      * null otherwise
      */
-    public static RMStatsViewer getStatsViewer() {
-        return statsViewer;
+    public static RMNodesStatsViewer getNodesStatsViewer() {
+        return nodesStatsViewer;
+    }
+
+    /**
+     * @return statsViewer if view is activated,
+     * null otherwise
+     */
+    public static RMHostsStatsViewer getHostsStatsViewer() {
+        return hostsStatsViewer;
     }
 }

@@ -41,6 +41,7 @@ import org.eclipse.swt.widgets.Label;
 import org.ow2.proactive.resourcemanager.gui.Internal;
 import org.ow2.proactive.resourcemanager.gui.compact.Filter;
 import org.ow2.proactive.resourcemanager.gui.compact.LabelMouseListener;
+import org.ow2.proactive.resourcemanager.gui.data.model.Host;
 import org.ow2.proactive.resourcemanager.gui.data.model.Node;
 import org.ow2.proactive.resourcemanager.gui.data.model.TreeLeafElement;
 import org.ow2.proactive.resourcemanager.gui.views.ResourcesCompactView;
@@ -77,15 +78,14 @@ public class NodeView extends View {
         String provider = ((Node) element).getProvider() == null ? "" : ((Node) element).getProvider();
         String owner = ((Node) element).getOwner() == null ? "" : ((Node) element).getOwner();
         String vmName = element.getParent().getName();
-        String hostName = element.getParent().getParent().getName();
+        Host host = (Host) element.getParent().getParent();
+        String hostName = host.getName();
         String nodeSourceName = element.getParent().getParent().getParent().getName();
-
-        boolean virtualHost = nodeName.toLowerCase().contains(Internal.VIRT_PREFIX);
 
         String tooltip = "Node: " + nodeName + "\n";
         tooltip += since + "\n";
         tooltip += "JVM: " + vmName + "\n";
-        tooltip += (virtualHost ? "VM: " : "Host: ") + hostName + "\n";
+        tooltip += (host.isVirtual() ? "VM: " : "Host: ") + hostName + "\n";
         tooltip += "Node Source: " + nodeSourceName + "\n";
         tooltip += "Provider: " + provider + "\n";
         tooltip += "Used by: " + owner;

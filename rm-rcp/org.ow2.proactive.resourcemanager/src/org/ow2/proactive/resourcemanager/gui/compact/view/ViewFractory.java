@@ -64,7 +64,7 @@ public class ViewFractory {
         } else if (element instanceof VirtualMachine) {
             view = new JVMView(element, filter);
         } else if (element instanceof Host) {
-            view = new HostView(element, filter);
+            view = new HostView((Host) element, filter);
         } else if (element instanceof Source) {
             view = new SourceView(element, filter);
         } else {

@@ -42,7 +42,7 @@ import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.gui.data.model.RMModel;
 
 
-public class StatsContentProvider implements IStructuredContentProvider {
+public class NodesStatsContentProvider implements IStructuredContentProvider {
 
     public Object[] getElements(Object model) {
         if (model instanceof RMModel) {

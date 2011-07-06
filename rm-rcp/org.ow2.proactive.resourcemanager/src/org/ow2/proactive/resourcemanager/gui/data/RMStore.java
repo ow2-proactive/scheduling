@@ -241,8 +241,9 @@ public class RMStore {
             ResourcesCompactView.getCompactViewer().clear();
         }
         //clear stats view if stats panel is displayed
-        if (StatisticsView.getStatsViewer() != null) {
-            StatisticsView.getStatsViewer().setInput(null);
+        if (StatisticsView.getNodesStatsViewer() != null) {
+            StatisticsView.getNodesStatsViewer().setInput(null);
+            StatisticsView.getHostsStatsViewer().setInput(null);
         }
         //clear topology view if topology panel is displayed
         if (ResourcesTopologyView.getTopologyViewer() != null) {

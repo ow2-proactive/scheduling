@@ -43,21 +43,23 @@ import org.eclipse.swt.widgets.TableItem;
 import org.ow2.proactive.resourcemanager.gui.data.RMStore;
 
 
-public class RMStatsViewer extends TableViewer {
+public class RMHostsStatsViewer extends TableViewer {
 
-    TableItem freeNodesItem;
-    TableItem busyNodesItem;
-    TableItem downNodesItem;
-    TableItem totalNodesItem;
+    TableItem physicalItem;
+    TableItem virtualItem;
 
-    public RMStatsViewer(Composite parent) {
+    Composite parent;
+
+    public RMHostsStatsViewer(Composite parent) {
         super(parent);
-        this.setContentProvider(new StatsContentProvider());
-        this.setLabelProvider(new StatsLabelProvider());
+        this.parent = parent;
+        this.setContentProvider(new HostsStatsContentProvider());
+        this.setLabelProvider(new HostsStatsLabelProvider());
     }
 
     public void init() {
         setInput(RMStore.getInstance().getModel());
+        parent.layout();
     }
 
     public void actualize() {

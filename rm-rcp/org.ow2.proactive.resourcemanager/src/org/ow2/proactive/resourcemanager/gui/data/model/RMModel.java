@@ -45,6 +45,7 @@ import org.eclipse.swt.widgets.Display;
 import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
+import org.ow2.proactive.resourcemanager.gui.Internal;
 import org.ow2.proactive.resourcemanager.gui.handlers.RemoveNodeSourceHandler;
 import org.ow2.proactive.resourcemanager.gui.views.ResourceExplorerView;
 import org.ow2.proactive.resourcemanager.gui.views.ResourcesCompactView;
@@ -72,6 +73,8 @@ public class RMModel implements Serializable {
     private int busyNodesNumber;
     private int downNodesNumber;
     private int lockedNodesNumber;
+    private int physicalHostsNumber;
+    private int virtualHostsNumber;
 
     // For the removing source and add node combo
     private String sourceToRemoveName = "";
@@ -85,6 +88,8 @@ public class RMModel implements Serializable {
         lockedNodesNumber = 0;
         busyNodesNumber = 0;
         downNodesNumber = 0;
+        physicalHostsNumber = 0;
+        virtualHostsNumber = 0;
     }
 
     public TreeParentElement getRoot() {
@@ -156,7 +161,13 @@ public class RMModel implements Serializable {
         // the source cannot be null
         TreeParentElement host = (TreeParentElement) find(source, nodeEvent.getHostName());
         if (host == null) { // if the host is null, then add it
-            host = new Host(nodeEvent.getHostName());
+            boolean virtual = nodeEvent.getNodeUrl().toLowerCase().contains(Internal.VIRT_PREFIX);
+            if (virtual) {
+                virtualHostsNumber++;
+            } else {
+                physicalHostsNumber++;
+            }
+            host = new Host(nodeEvent.getHostName(), virtual);
             source.addChild(host);
             if (parentToRefresh == null) {
                 parentToRefresh = source;
@@ -266,7 +277,7 @@ public class RMModel implements Serializable {
         String hostname;
 
         TreeParentElement source = (TreeParentElement) find(root, nodeEvent.getNodeSource());
-        TreeParentElement host = (TreeParentElement) find(source, nodeEvent.getHostName());
+        Host host = (Host) find(source, nodeEvent.getHostName());
         TreeParentElement vm = (TreeParentElement) find(host, nodeEvent.getVMName());
         node = (Node) find(vm, nodeEvent.getNodeUrl());
         hostname = host.getName();
@@ -281,6 +292,11 @@ public class RMModel implements Serializable {
             if (host.getChildren().length == 0) {
                 elementToRemove = remove(source, nodeEvent.getHostName());
                 parentToRefresh = source;
+                if (host.isVirtual()) {
+                    virtualHostsNumber--;
+                } else {
+                    physicalHostsNumber--;
+                }
             }
         }
 
@@ -510,8 +526,9 @@ public class RMModel implements Serializable {
 
     private void actualizeStatsView() {
         //actualize stats view if exists
-        if (updateViews && StatisticsView.getStatsViewer() != null) {
-            StatisticsView.getStatsViewer().actualize();
+        if (updateViews && StatisticsView.getNodesStatsViewer() != null) {
+            StatisticsView.getNodesStatsViewer().actualize();
+            StatisticsView.getHostsStatsViewer().actualize();
         }
     }
 
@@ -634,4 +651,11 @@ public class RMModel implements Serializable {
         this.updateViews = updateViews;
     }
 
+    public int getPhysicalHostsNumber() {
+        return physicalHostsNumber;
+    }
+
+    public int getVirtualHostsNumber() {
+        return virtualHostsNumber;
+    }
 }

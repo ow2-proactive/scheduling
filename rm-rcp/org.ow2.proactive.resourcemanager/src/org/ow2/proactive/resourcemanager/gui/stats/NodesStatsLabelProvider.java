@@ -34,22 +34,56 @@
  * ################################################################
  * $$ACTIVEEON_CONTRIBUTOR$$
  */
-package org.ow2.proactive.resourcemanager.gui.data.model;
+package org.ow2.proactive.resourcemanager.gui.stats;
 
-/**
- * @author The ProActive Team
- *
- */
-public class Host extends TreeParentElement {
+import org.eclipse.jface.viewers.ILabelProviderListener;
+import org.eclipse.jface.viewers.ITableLabelProvider;
+import org.eclipse.swt.graphics.Image;
+import org.ow2.proactive.resourcemanager.common.NodeState;
+import org.ow2.proactive.resourcemanager.gui.Internal;
 
-    private boolean virtual = false;
 
-    public Host(String name, boolean virtual) {
-        super(name, TreeElementType.HOST);
-        this.virtual = virtual;
+public class NodesStatsLabelProvider implements ITableLabelProvider {
+
+    public Image getColumnImage(Object element, int columnIndex) {
+        if (columnIndex == 0) {
+            StatsItem o = (StatsItem) element;
+            NodeState ns;
+            try {
+                ns = NodeState.parse(o.getAggregate());
+            } catch (IllegalArgumentException e) {
+                return null;
+            }
+
+            return Internal.getImageByNodeState(ns);
+        } else {
+            return null;
+        }
     }
 
-    public boolean isVirtual() {
-        return virtual;
+    public String getColumnText(Object element, int columnIndex) {
+        switch (columnIndex) {
+            case 0:
+                return "";
+            case 1:
+                return ((StatsItem) element).getAggregate();
+            case 2:
+                return ((StatsItem) element).getValue();
+        }
+        return null;
     }
+
+    public void addListener(ILabelProviderListener listener) {
+    }
+
+    public void dispose() {
+    }
+
+    public boolean isLabelProperty(Object element, String property) {
+        return false;
+    }
+
+    public void removeListener(ILabelProviderListener listener) {
+    }
+
 }

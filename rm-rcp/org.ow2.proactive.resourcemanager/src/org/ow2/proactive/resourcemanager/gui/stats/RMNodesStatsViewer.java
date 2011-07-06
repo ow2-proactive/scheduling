@@ -34,22 +34,41 @@
  * ################################################################
  * $$ACTIVEEON_CONTRIBUTOR$$
  */
-package org.ow2.proactive.resourcemanager.gui.data.model;
+package org.ow2.proactive.resourcemanager.gui.stats;
 
-/**
- * @author The ProActive Team
- *
- */
-public class Host extends TreeParentElement {
+import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.TableItem;
+import org.ow2.proactive.resourcemanager.gui.data.RMStore;
 
-    private boolean virtual = false;
 
-    public Host(String name, boolean virtual) {
-        super(name, TreeElementType.HOST);
-        this.virtual = virtual;
+public class RMNodesStatsViewer extends TableViewer {
+
+    TableItem freeNodesItem;
+    TableItem busyNodesItem;
+    TableItem downNodesItem;
+    TableItem totalNodesItem;
+
+    Composite parent;
+
+    public RMNodesStatsViewer(Composite parent) {
+        super(parent);
+        this.parent = parent;
+        this.setContentProvider(new NodesStatsContentProvider());
+        this.setLabelProvider(new NodesStatsLabelProvider());
     }
 
-    public boolean isVirtual() {
-        return virtual;
+    public void init() {
+        setInput(RMStore.getInstance().getModel());
+        parent.layout();
+    }
+
+    public void actualize() {
+        Display.getDefault().asyncExec(new Runnable() {
+            public void run() {
+                refresh();
+            }
+        });
     }
 }

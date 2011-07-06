@@ -39,15 +39,13 @@ package org.ow2.proactive.resourcemanager.gui.tree;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
-import org.eclipse.ui.ISharedImages;
-import org.eclipse.ui.PlatformUI;
 import org.ow2.proactive.resourcemanager.Activator;
 import org.ow2.proactive.resourcemanager.gui.Internal;
-import org.ow2.proactive.resourcemanager.gui.data.model.Node;
 import org.ow2.proactive.resourcemanager.gui.data.model.DeployingNode;
+import org.ow2.proactive.resourcemanager.gui.data.model.Host;
+import org.ow2.proactive.resourcemanager.gui.data.model.Node;
 import org.ow2.proactive.resourcemanager.gui.data.model.TreeElementType;
 import org.ow2.proactive.resourcemanager.gui.data.model.TreeLeafElement;
-import org.ow2.proactive.resourcemanager.gui.data.model.TreeParentElement;
 
 
 public class TreeLabelProvider extends ColumnLabelProvider {
@@ -56,19 +54,7 @@ public class TreeLabelProvider extends ColumnLabelProvider {
     public Image getImage(Object obj) {
         switch (((TreeLeafElement) obj).getType()) {
             case HOST:
-
-                boolean virtualHost = false;
-                // checking if the first node of this host has "virt-" in its url
-                TreeLeafElement[] vms = ((TreeParentElement) obj).getChildren();
-                if (vms != null && vms.length > 0) {
-                    TreeLeafElement[] nodes = ((TreeParentElement) vms[0]).getChildren();
-                    if (nodes != null && nodes.length > 0 &&
-                        nodes[0].getName().toLowerCase().contains(Internal.VIRT_PREFIX)) {
-                        virtualHost = true;
-                    }
-                }
-
-                if (virtualHost) {
+                if (((Host) obj).isVirtual()) {
                     return Activator.getDefault().getImageRegistry().get(Internal.IMG_HOST_VIRT);
                 } else {
                     return Activator.getDefault().getImageRegistry().get(Internal.IMG_HOST);

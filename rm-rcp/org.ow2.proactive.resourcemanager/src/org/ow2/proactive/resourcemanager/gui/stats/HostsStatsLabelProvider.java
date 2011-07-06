@@ -39,23 +39,20 @@ package org.ow2.proactive.resourcemanager.gui.stats;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.swt.graphics.Image;
-import org.ow2.proactive.resourcemanager.common.NodeState;
+import org.ow2.proactive.resourcemanager.Activator;
 import org.ow2.proactive.resourcemanager.gui.Internal;
 
 
-public class StatsLabelProvider implements ITableLabelProvider {
+public class HostsStatsLabelProvider implements ITableLabelProvider {
 
     public Image getColumnImage(Object element, int columnIndex) {
         if (columnIndex == 0) {
             StatsItem o = (StatsItem) element;
-            NodeState ns;
-            try {
-                ns = NodeState.parse(o.getAggregate());
-            } catch (IllegalArgumentException e) {
-                return null;
+            if (o.getAggregate().equals(HostsStatsContentProvider.VIRTUAL)) {
+                return Activator.getDefault().getImageRegistry().get(Internal.IMG_HOST_VIRT);
+            } else {
+                return Activator.getDefault().getImageRegistry().get(Internal.IMG_HOST);
             }
-
-            return Internal.getImageByNodeState(ns);
         } else {
             return null;
         }

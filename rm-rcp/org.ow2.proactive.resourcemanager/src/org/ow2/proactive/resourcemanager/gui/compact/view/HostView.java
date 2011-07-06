@@ -42,8 +42,7 @@ import org.ow2.proactive.resourcemanager.Activator;
 import org.ow2.proactive.resourcemanager.gui.Internal;
 import org.ow2.proactive.resourcemanager.gui.compact.Filter;
 import org.ow2.proactive.resourcemanager.gui.compact.LabelMouseListener;
-import org.ow2.proactive.resourcemanager.gui.data.model.TreeLeafElement;
-import org.ow2.proactive.resourcemanager.gui.data.model.TreeParentElement;
+import org.ow2.proactive.resourcemanager.gui.data.model.Host;
 import org.ow2.proactive.resourcemanager.gui.views.ResourcesCompactView;
 
 
@@ -54,25 +53,14 @@ import org.ow2.proactive.resourcemanager.gui.views.ResourcesCompactView;
  */
 public class HostView extends View {
 
-    private boolean virtualHost = false;
-
-    public HostView(TreeLeafElement element, Filter filter) {
-        super(element);
+    public HostView(Host host, Filter filter) {
+        super(host);
 
         if (filter.showHosts) {
             label = new Label(ResourcesCompactView.getCompactViewer().getComposite(), SWT.SHADOW_NONE);
             label.setBackground(ResourcesCompactView.getCompactViewer().getComposite().getBackground());
 
-            // checking if the first node of this host has "virt-" in its url
-            TreeLeafElement[] vms = ((TreeParentElement) element).getChildren();
-            if (vms != null && vms.length > 0) {
-                TreeLeafElement[] nodes = ((TreeParentElement) vms[0]).getChildren();
-                if (nodes != null && nodes.length > 0 &&
-                    nodes[0].getName().toLowerCase().contains(Internal.VIRT_PREFIX)) {
-                    virtualHost = true;
-                }
-            }
-            if (virtualHost) {
+            if (host.isVirtual()) {
                 label.setImage(Activator.getDefault().getImageRegistry().get(Internal.IMG_HOST_VIRT));
             } else {
                 label.setImage(Activator.getDefault().getImageRegistry().get(Internal.IMG_HOST));
@@ -84,6 +72,6 @@ public class HostView extends View {
 
     @Override
     public String toString() {
-        return (virtualHost ? "VM: " : "Host: ") + element.getName();
+        return (((Host) element).isVirtual() ? "VM: " : "Host: ") + element.getName();
     }
 }

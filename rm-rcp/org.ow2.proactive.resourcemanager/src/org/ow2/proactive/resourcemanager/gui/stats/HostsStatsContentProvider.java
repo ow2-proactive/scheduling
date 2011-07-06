@@ -34,22 +34,35 @@
  * ################################################################
  * $$ACTIVEEON_CONTRIBUTOR$$
  */
-package org.ow2.proactive.resourcemanager.gui.data.model;
+package org.ow2.proactive.resourcemanager.gui.stats;
 
-/**
- * @author The ProActive Team
- *
- */
-public class Host extends TreeParentElement {
+import org.eclipse.jface.viewers.IStructuredContentProvider;
+import org.eclipse.jface.viewers.Viewer;
+import org.ow2.proactive.resourcemanager.gui.data.model.RMModel;
 
-    private boolean virtual = false;
 
-    public Host(String name, boolean virtual) {
-        super(name, TreeElementType.HOST);
-        this.virtual = virtual;
+public class HostsStatsContentProvider implements IStructuredContentProvider {
+
+    public static String VIRTUAL = "Virtual";
+    public static String PHYSICAL = "Physical";
+
+    public Object[] getElements(Object model) {
+        if (model instanceof RMModel) {
+            RMModel rmmodel = (RMModel) model;
+            StatsItem physicalHostsStat = new StatsItem(PHYSICAL, Integer.toString(rmmodel
+                    .getPhysicalHostsNumber()));
+            StatsItem virtualHostsStat = new StatsItem(VIRTUAL, Integer.toString(rmmodel
+                    .getVirtualHostsNumber()));
+            return new StatsItem[] { physicalHostsStat, virtualHostsStat };
+        }
+        //should never return this, RMStatsViewer
+        return new Object[] {};
     }
 
-    public boolean isVirtual() {
-        return virtual;
+    public void dispose() {
     }
+
+    public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+    }
+
 }
