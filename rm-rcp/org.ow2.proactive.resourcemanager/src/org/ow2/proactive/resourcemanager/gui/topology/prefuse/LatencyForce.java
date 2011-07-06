@@ -56,7 +56,7 @@ public class LatencyForce extends AbstractForce {
     public static final float DEFAULT_MIN_SPRING_COEFF = 1E-5f;
     public static final float DEFAULT_SPRING_LENGTH = 80;
     public static final float DEFAULT_MIN_SPRING_LENGTH = 0;
-    public static final float DEFAULT_MAX_SPRING_LENGTH = 400;
+    public static final float DEFAULT_MAX_SPRING_LENGTH = 2000;
     public static final int SPRING_COEFF = 0;
     public static final int SPRING_LENGTH = 1;
 

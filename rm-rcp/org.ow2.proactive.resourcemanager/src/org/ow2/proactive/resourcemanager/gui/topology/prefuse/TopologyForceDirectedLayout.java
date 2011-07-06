@@ -46,7 +46,7 @@ import prefuse.visual.VisualItem;
 public class TopologyForceDirectedLayout extends ForceDirectedLayout {
 
     public final static float COEFF_MIN = 0;
-    public final static float COEFF_MAX = 400;
+    public final static float COEFF_MAX = 2000;
     private float coeff = 80;
 
     /**
