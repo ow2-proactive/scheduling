@@ -345,10 +345,7 @@ public class SeparatedJobView extends ViewPart {
         runningJobComposite = new RunningJobComposite(sashForm, JobsController.getLocalView());
         finishedJobComposite = new FinishedJobComposite(sashForm, JobsController.getLocalView());
 
-        GridData gridData = new GridData();
-        gridData.horizontalAlignment = GridData.FILL;
-
-        StatusLabel.newInstance(theParent, gridData, JobsController.getLocalView());
+        StatusLabel.newInstance(theParent, JobsController.getLocalView());
 
         // I must turn active the jobsController after create
         // pendingJobComposite, runningJobComposite, finishedJobComposite

@@ -624,6 +624,10 @@ public class SchedulerProxy implements Scheduler {
         return instance;
     }
 
+    public String getUsername() {
+        return this.userName;
+    }
+
     public boolean isProxyConnected() {
         return connected;
     }

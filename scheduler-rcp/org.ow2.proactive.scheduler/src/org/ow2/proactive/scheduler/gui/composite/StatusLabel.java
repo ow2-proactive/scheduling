@@ -40,11 +40,13 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.ow2.proactive.scheduler.gui.Colors;
 import org.ow2.proactive.scheduler.gui.data.JobsController;
+import org.ow2.proactive.scheduler.gui.data.SchedulerProxy;
 import org.ow2.proactive.scheduler.gui.listeners.EventSchedulerListener;
 
 
@@ -54,7 +56,7 @@ import org.ow2.proactive.scheduler.gui.listeners.EventSchedulerListener;
 public class StatusLabel implements EventSchedulerListener {
     public static final int FONT_SIZE = 10;
     public static final int FONT_STYLE = SWT.BOLD;
-    public static final String INITIAL_TEXT = "right click -> connect to Scheduler...";
+    public static final String INITIAL_TEXT = "DISCONNECTED";
     public static final Color INITIAL_COLOR = Colors.BLACK;
     public static final String STARTED_TEXT = "";
     public static final Color STARTED_COLOR = Colors.BLACK;
@@ -75,19 +77,34 @@ public class StatusLabel implements EventSchedulerListener {
     public static final String DISCONNECTED_TEXT = "DISCONNECTED";
     public static final Color DISCONNECTED_COLOR = Colors.BLACK;
     private static StatusLabel instance = null;
-    private Label label = null;
 
-    private StatusLabel(Composite parent, GridData gridData, JobsController jobsController) {
-        label = new Label(parent, SWT.CENTER | SWT.BORDER);
+    private Composite content = null;
+    private Label label = null;
+    private Label user = null;
+
+    private StatusLabel(Composite parent, JobsController jobsController) {
+
+        GridData gridData = new GridData();
+        gridData.horizontalAlignment = GridData.FILL;
+
+        content = new Composite(parent, SWT.NONE);
+        content.setLayout(new GridLayout(2, false));
+        content.setLayoutData(gridData);
+
+        label = new Label(content, SWT.NONE);
         label.setText(INITIAL_TEXT);
         label.setForeground(INITIAL_COLOR);
         label.setFont(new Font(Display.getDefault(), "", FONT_SIZE, FONT_STYLE));
-        label.setLayoutData(gridData);
+        label.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, true, false));
+
+        user = new Label(content, SWT.NONE);
+        user.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false));
+
         jobsController.addEventSchedulerListener(this);
     }
 
-    public static void newInstance(Composite parent, GridData gridData, JobsController jobsController) {
-        instance = new StatusLabel(parent, gridData, jobsController);
+    public static void newInstance(Composite parent, JobsController jobsController) {
+        instance = new StatusLabel(parent, jobsController);
     }
 
     public static StatusLabel getInstance() {
@@ -140,6 +157,13 @@ public class StatusLabel implements EventSchedulerListener {
                         label.setForeground(color);
                         label.setText(text);
                     }
+                    String username = SchedulerProxy.getInstance().getUsername();
+                    if (username != null && username.trim().length() > 0) {
+                        user.setText("logged as " + username);
+                    } else {
+                        user.setText("");
+                    }
+                    content.layout();
                 }
             });
         }
