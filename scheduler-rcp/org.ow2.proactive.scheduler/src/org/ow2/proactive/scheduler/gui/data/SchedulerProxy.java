@@ -236,39 +236,49 @@ public class SchedulerProxy implements Scheduler {
         return null;
     }
 
-    public boolean killTask(JobId arg0, String arg1) {
-        // TODO Auto-generated method stub
-        return false;
+    public boolean killTask(JobId jobId, String taskName) {
+        return killTask(jobId.value(), taskName);
     }
 
-    public boolean preemptTask(JobId arg0, String arg1, int arg2) throws NotConnectedException,
-            UnknownJobException, UnknownTaskException, PermissionException {
-        // TODO Auto-generated method stub
-        return false;
+    public boolean preemptTask(JobId jobId, String taskName, int restartDelay) {
+        return preemptTask(jobId.value(), taskName, restartDelay);
     }
 
-    public boolean restartTask(JobId arg0, String arg1, int arg2) throws NotConnectedException,
-            UnknownJobException, UnknownTaskException, PermissionException {
-        // TODO Auto-generated method stub
-        return false;
+    public boolean restartTask(JobId jobId, String taskName, int restartDelay) {
+        return restartTask(jobId.value(), taskName, restartDelay);
     }
 
-    public boolean killTask(String arg0, String arg1) throws NotConnectedException, UnknownJobException,
-            UnknownTaskException, PermissionException {
-        // TODO Auto-generated method stub
-        return false;
+    public boolean killTask(String jobId, String taskName) {
+        boolean res = false;
+        try {
+            res = scheduler.killTask(jobId, taskName);
+        } catch (Exception e) {
+            Activator.log(IStatus.ERROR, "- Scheduler Proxy: Failed to kill task", e);
+            displayError(e.getMessage());
+        }
+        return res;
     }
 
-    public boolean preemptTask(String arg0, String arg1, int arg2) throws NotConnectedException,
-            UnknownJobException, UnknownTaskException, PermissionException {
-        // TODO Auto-generated method stub
-        return false;
+    public boolean preemptTask(String jobId, String taskName, int restartDelay) {
+        boolean res = false;
+        try {
+            res = scheduler.preemptTask(jobId, taskName, restartDelay);
+        } catch (Exception e) {
+            Activator.log(IStatus.ERROR, "- Scheduler Proxy: Failed to preempt task", e);
+            displayError(e.getMessage());
+        }
+        return res;
     }
 
-    public boolean restartTask(String arg0, String arg1, int arg2) throws NotConnectedException,
-            UnknownJobException, UnknownTaskException, PermissionException {
-        // TODO Auto-generated method stub
-        return false;
+    public boolean restartTask(String jobId, String taskName, int restartDelay) {
+        boolean res = false;
+        try {
+            res = scheduler.restartTask(jobId, taskName, restartDelay);
+        } catch (Exception e) {
+            Activator.log(IStatus.ERROR, "- Scheduler Proxy: Failed to restart task", e);
+            displayError(e.getMessage());
+        }
+        return res;
     }
 
     public boolean reloadPolicyConfiguration() throws NotConnectedException, PermissionException {

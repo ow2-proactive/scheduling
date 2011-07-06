@@ -49,6 +49,7 @@ import javax.swing.JPanel;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
@@ -152,6 +153,9 @@ public class TaskComposite extends Composite implements Comparator<TaskState> {
     private int lastSorting = TaskState.SORT_BY_ID;
 
     private Action remoteAction;
+    private Action killAction;
+    private Action preemptAction;
+    private Action restartAction;
     private TaskId selectedId = null;
 
     /**
@@ -176,10 +180,16 @@ public class TaskComposite extends Composite implements Comparator<TaskState> {
     }
 
     private void createTaskBar(final Composite parent, final TaskView view) {
-        ImageDescriptor imgDesc = Activator.getDefault().getImageRegistry().getDescriptor(
+        ImageDescriptor imgRemote = Activator.getDefault().getImageRegistry().getDescriptor(
                 Internal.IMG_REMOTE_CONNECTION);
+        ImageDescriptor imgRestart = Activator.getDefault().getImageRegistry().getDescriptor(
+                Internal.IMG_REFRESH);
+        ImageDescriptor imgKill = Activator.getDefault().getImageRegistry().getDescriptor(
+                Internal.IMG_SCHEDULERKILL);
+        ImageDescriptor imgPreempt = Activator.getDefault().getImageRegistry().getDescriptor(
+                Internal.IMG_SCHEDULERSTOP);
 
-        remoteAction = new Action("Remote connection", imgDesc) {
+        remoteAction = new Action("Remote connection", imgRemote) {
             @Override
             public void run() {
                 if (selectedId == null) {
@@ -207,8 +217,45 @@ public class TaskComposite extends Composite implements Comparator<TaskState> {
 
             }
         };
+        killAction = new Action("Kill", imgKill) {
+            @Override
+            public void run() {
+                if (selectedId == null) {
+                    return;
+                }
+                SchedulerProxy.getInstance().killTask(selectedId.getJobId(), selectedId.getReadableName());
+            }
+        };
+        preemptAction = new Action("Preempt", imgPreempt) {
+            @Override
+            public void run() {
+                if (selectedId == null) {
+                    return;
+                }
+                SchedulerProxy.getInstance().preemptTask(selectedId.getJobId(), selectedId.getReadableName(),
+                        0);
+            }
+        };
+        restartAction = new Action("Restart", imgRestart) {
+            @Override
+            public void run() {
+                if (selectedId == null) {
+                    return;
+                }
+                SchedulerProxy.getInstance().restartTask(selectedId.getJobId(), selectedId.getReadableName(),
+                        0);
+            }
+        };
+
+        killAction.setEnabled(false);
         remoteAction.setEnabled(false);
+        preemptAction.setEnabled(false);
+        restartAction.setEnabled(false);
+
         view.getViewSite().getActionBars().getToolBarManager().add(remoteAction);
+        view.getViewSite().getActionBars().getToolBarManager().add(restartAction);
+        view.getViewSite().getActionBars().getToolBarManager().add(preemptAction);
+        view.getViewSite().getActionBars().getToolBarManager().add(killAction);
     }
 
     private Table createTable(final Composite parent) {
@@ -334,6 +381,9 @@ public class TaskComposite extends Composite implements Comparator<TaskState> {
                     updateResultPreview(id, false);
                     selectedId = id;
                     remoteAction.setEnabled(true);
+                    killAction.setEnabled(true);
+                    preemptAction.setEnabled(true);
+                    restartAction.setEnabled(true);
                 }
             }
         });
@@ -356,6 +406,10 @@ public class TaskComposite extends Composite implements Comparator<TaskState> {
 
         MenuManager menuMgr = new MenuManager();
         menuMgr.add(remoteAction);
+        menuMgr.add(new Separator());
+        menuMgr.add(restartAction);
+        menuMgr.add(preemptAction);
+        menuMgr.add(killAction);
         table.setMenu(menuMgr.createContextMenu(this));
 
         return table;
@@ -595,7 +649,10 @@ public class TaskComposite extends Composite implements Comparator<TaskState> {
         // We remove all the table entries
         this.table.removeAll();
 
+        this.killAction.setEnabled(false);
         this.remoteAction.setEnabled(false);
+        this.preemptAction.setEnabled(false);
+        this.restartAction.setEnabled(false);
 
         // then add the entries
         for (final TaskState taskState : this.tasks) {

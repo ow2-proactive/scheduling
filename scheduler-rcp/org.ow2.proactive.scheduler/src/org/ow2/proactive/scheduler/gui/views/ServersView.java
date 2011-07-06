@@ -841,8 +841,7 @@ public class ServersView extends ViewPart {
         stopServer.setEnabled(false);
         stopServer.setToolTipText("Stop a running Data Server");
 
-        ImageDescriptor desc6 = Activator.getDefault().getImageRegistry().getDescriptor(
-                Internal.IMG_SERVER_REBIND);
+        ImageDescriptor desc6 = Activator.getDefault().getImageRegistry().getDescriptor(Internal.IMG_REFRESH);
         rebindServer = new Action("Rebind", desc6) {
             public void run() {
                 Thread th = new Thread(new Runnable() {

@@ -74,7 +74,7 @@ public final class Internal {
     public static final String IMG_SERVER_ADD = "server_add.png";
     public static final String IMG_SERVER_REMOVE = "server_remove.png";
     public static final String IMG_SERVER_STARTED = "server_started.png";
-    public static final String IMG_SERVER_REBIND = "refresh.png";
+    public static final String IMG_REFRESH = "refresh.png";
     public static final String IMG_SERVER_STOPPED = "server_stopped.png";
     public static final String IMG_DATA = "data.png";
     public static final String IMG_EXIT = "exit.png";
