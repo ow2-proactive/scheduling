@@ -54,6 +54,8 @@ import org.ow2.proactive.resourcemanager.gui.views.ResourcesCompactView;
  */
 public class HostView extends View {
 
+    private boolean virtualHost = false;
+
     public HostView(TreeLeafElement element, Filter filter) {
         super(element);
 
@@ -61,7 +63,6 @@ public class HostView extends View {
             label = new Label(ResourcesCompactView.getCompactViewer().getComposite(), SWT.SHADOW_NONE);
             label.setBackground(ResourcesCompactView.getCompactViewer().getComposite().getBackground());
 
-            boolean virtualHost = false;
             // checking if the first node of this host has "virt-" in its url
             TreeLeafElement[] vms = ((TreeParentElement) element).getChildren();
             if (vms != null && vms.length > 0) {
@@ -83,6 +84,6 @@ public class HostView extends View {
 
     @Override
     public String toString() {
-        return "Host: " + element.getName();
+        return (virtualHost ? "VM: " : "Host: ") + element.getName();
     }
 }

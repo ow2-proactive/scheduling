@@ -80,10 +80,12 @@ public class NodeView extends View {
         String hostName = element.getParent().getParent().getName();
         String nodeSourceName = element.getParent().getParent().getParent().getName();
 
+        boolean virtualHost = nodeName.toLowerCase().contains(Internal.VIRT_PREFIX);
+
         String tooltip = "Node: " + nodeName + "\n";
         tooltip += since + "\n";
-        tooltip += "VM: " + vmName + "\n";
-        tooltip += "Host: " + hostName + "\n";
+        tooltip += "JVM: " + vmName + "\n";
+        tooltip += (virtualHost ? "VM: " : "Host: ") + hostName + "\n";
         tooltip += "Node Source: " + nodeSourceName + "\n";
         tooltip += "Provider: " + provider + "\n";
         tooltip += "Used by: " + owner;
