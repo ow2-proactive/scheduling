@@ -22,12 +22,12 @@
 
 	<task name="processing_2_a">
 	  <javaExecutable class="/path/to/class/Processing_1" />
-	  <controlFlow block="start" />
+	  <controlFlow />
 	</task>
 
 	<task name="processing_2_b">
 	  <javaExecutable class="/path/to/class/Processing_1" />
-	  <controlFlow block="start" />
+	  <controlFlow />
 	</task>
 
 	<task name="processing_3">
@@ -36,7 +36,7 @@
 		<loop target="processing_1">
           <script><file path="/path/to/script/loop.js" /></script>
 		</loop>
-	  </flow>
+	  </controlFlow>
 	</task>
 
 	<task name="join">
