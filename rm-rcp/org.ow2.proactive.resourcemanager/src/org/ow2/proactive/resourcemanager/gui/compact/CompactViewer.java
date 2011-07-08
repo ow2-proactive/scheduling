@@ -50,6 +50,7 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.objectweb.proactive.core.util.MutableInteger;
 import org.ow2.proactive.resourcemanager.gui.compact.view.NodeView;
@@ -58,6 +59,7 @@ import org.ow2.proactive.resourcemanager.gui.compact.view.ViewFractory;
 import org.ow2.proactive.resourcemanager.gui.data.RMStore;
 import org.ow2.proactive.resourcemanager.gui.data.model.TreeLeafElement;
 import org.ow2.proactive.resourcemanager.gui.data.model.TreeParentElement;
+import org.ow2.proactive.resourcemanager.gui.views.ResourcesCompactView;
 
 
 /**
@@ -161,21 +163,23 @@ public class CompactViewer implements ISelectionProvider {
      * Recursively creates graphical representation of the element and all its child.
      */
     private View createView(TreeLeafElement element) {
-        View view = ViewFractory.createView(element, filter);
-        view.setPosition(currentPosition);
+        synchronized (reloadRequests) {
+            View view = ViewFractory.createView(element, filter);
+            view.setPosition(currentPosition);
 
-        if (element instanceof TreeParentElement) {
-            for (TreeLeafElement elem : ((TreeParentElement) element).getChildren()) {
-                View v = createView(elem);
-                v.setParent(view);
-                view.getChilds().add(v);
+            if (element instanceof TreeParentElement) {
+                for (TreeLeafElement elem : ((TreeParentElement) element).getChildren()) {
+                    View v = createView(elem);
+                    v.setParent(view);
+                    view.getChilds().add(v);
+                }
+            } else {
+                // updating position only for NodeView
+                currentPosition++;
             }
-        } else {
-            // updating position only for NodeView
-            currentPosition++;
-        }
 
-        return view;
+            return view;
+        }
     }
 
     /**
@@ -252,9 +256,11 @@ public class CompactViewer implements ISelectionProvider {
                     }
                     Display.getDefault().syncExec(new Runnable() {
                         public void run() {
-                            clear();
-                            loadMatrix();
-                            layoutComposite(false);
+                            synchronized (reloadRequests) {
+                                clear();
+                                loadMatrix();
+                                layoutComposite(false);
+                            }
                         }
                     });
                     // sleeping for a while after full reloading
@@ -306,22 +312,24 @@ public class CompactViewer implements ISelectionProvider {
     public void removeView(final TreeLeafElement element) {
         Display.getDefault().syncExec(new Runnable() {
             public void run() {
-                selectionManager.deselectAll();
+                synchronized (reloadRequests) {
+                    selectionManager.deselectAll();
 
-                View view = rootView.findView(element);
-                if (view != null) {
-                    view.dispose();
+                    View view = rootView.findView(element);
+                    if (view != null) {
+                        view.dispose();
 
-                    view.getParent().getChilds().remove(view);
+                        view.getParent().getChilds().remove(view);
 
-                    View root = view;
-                    while (root.getParent() != null) {
-                        root = root.getParent();
+                        View root = view;
+                        while (root.getParent() != null) {
+                            root = root.getParent();
+                        }
+                        currentPosition = 0;
+                        updatePositions(root);
                     }
-                    currentPosition = 0;
-                    updatePositions(root);
+                    layoutComposite(false);
                 }
-                layoutComposite(false);
             }
         });
     }
@@ -346,15 +354,17 @@ public class CompactViewer implements ISelectionProvider {
     public void updateView(final TreeLeafElement element) {
         Display.getDefault().syncExec(new Runnable() {
             public void run() {
-                try {
-                    View view = rootView.findView(element);
-                    if (view != null) {
-                        view.update();
-                    }
-                    layoutComposite(false);
+                synchronized (reloadRequests) {
+                    try {
+                        View view = rootView.findView(element);
+                        if (view != null) {
+                            view.update();
+                        }
+                        layoutComposite(false);
 
-                } catch (Throwable t) {
-                    t.printStackTrace();
+                    } catch (Throwable t) {
+                        t.printStackTrace();
+                    }
                 }
             }
         });
@@ -389,8 +399,13 @@ public class CompactViewer implements ISelectionProvider {
      */
     public void clear() {
         selectionManager.deselectAll();
-        rootView.dispose();
+        rootView.disposeAll();
         currentPosition = 0;
+        if (ResourcesCompactView.getCompactViewer().getComposite().getChildren().length > 0) {
+            for (Control control : ResourcesCompactView.getCompactViewer().getComposite().getChildren()) {
+                control.dispose();
+            }
+        }
     }
 
     public View getRootView() {

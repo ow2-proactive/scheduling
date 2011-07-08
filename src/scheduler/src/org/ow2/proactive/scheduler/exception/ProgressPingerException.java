@@ -36,8 +36,6 @@
  */
 package org.ow2.proactive.scheduler.exception;
 
-
-
 /**
  * ProgressPingerException is used to report error when calling getProgress() methods chain
  *

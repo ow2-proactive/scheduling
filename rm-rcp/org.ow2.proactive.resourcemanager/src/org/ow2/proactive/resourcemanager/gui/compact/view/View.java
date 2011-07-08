@@ -37,9 +37,9 @@
 package org.ow2.proactive.resourcemanager.gui.compact.view;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Label;
@@ -56,7 +56,7 @@ import org.ow2.proactive.resourcemanager.gui.views.ResourcesCompactView;
  */
 public class View {
 
-    private static HashMap<TreeLeafElement, View> views = new HashMap<TreeLeafElement, View>();
+    private static ConcurrentHashMap<TreeLeafElement, View> views = new ConcurrentHashMap<TreeLeafElement, View>();
 
     // parent view
     protected View parent;
@@ -169,6 +169,20 @@ public class View {
         }
         childs.clear();
         views.remove(element);
+    }
+
+    /**
+     * Disposes all the views.
+     */
+    public void disposeAll() {
+        synchronized (views) {
+            for (View view : views.values()) {
+                if (view.label != null) {
+                    view.label.dispose();
+                }
+            }
+            views.clear();
+        }
     }
 
     /**
