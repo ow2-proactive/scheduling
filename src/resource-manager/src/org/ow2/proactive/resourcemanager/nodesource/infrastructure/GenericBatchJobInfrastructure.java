@@ -43,7 +43,6 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.StringTokenizer;
 
-import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
 import org.ow2.proactive.utils.FileToBytesConverter;
 

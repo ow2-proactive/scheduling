@@ -37,9 +37,10 @@
 package org.ow2.proactive.scheduler.common.task;
 
 import java.io.Serializable;
+
 import org.objectweb.proactive.annotation.PublicAPI;
-import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.scheduler.common.job.JobInfo;
 
 
 /**

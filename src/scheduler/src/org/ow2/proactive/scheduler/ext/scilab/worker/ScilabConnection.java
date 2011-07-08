@@ -1,11 +1,11 @@
 package org.ow2.proactive.scheduler.ext.scilab.worker;
 
+import java.io.File;
+
 import org.ow2.proactive.scheduler.ext.scilab.common.PASolveScilabGlobalConfig;
 import org.ow2.proactive.scheduler.ext.scilab.common.PASolveScilabTaskConfig;
 import org.ow2.proactive.scheduler.ext.scilab.common.exception.ScilabInitException;
 import org.ow2.proactive.scheduler.ext.scilab.common.exception.ScilabTaskException;
-
-import java.io.File;
 
 
 /**

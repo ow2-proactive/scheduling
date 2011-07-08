@@ -39,8 +39,8 @@ package org.ow2.proactive.scheduler.core.rmproxies;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAActiveObject;

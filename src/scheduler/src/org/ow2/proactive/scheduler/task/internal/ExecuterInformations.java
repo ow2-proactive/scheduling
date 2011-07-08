@@ -37,7 +37,6 @@
 package org.ow2.proactive.scheduler.task.internal;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.LinkedList;
 
 import org.objectweb.proactive.core.node.Node;

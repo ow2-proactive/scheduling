@@ -42,7 +42,6 @@ import java.util.Collection;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.nodesource.utils.NamesConvertor;
 import org.ow2.proactive.resourcemanager.utils.RMLoggers;

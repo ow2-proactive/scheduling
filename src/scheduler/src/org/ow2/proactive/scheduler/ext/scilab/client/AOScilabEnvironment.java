@@ -36,6 +36,12 @@
  */
 package org.ow2.proactive.scheduler.ext.scilab.client;
 
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.TreeSet;
+
+import javax.security.auth.login.LoginException;
+
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
@@ -50,7 +56,12 @@ import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputAccessMode;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
 import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
-import org.ow2.proactive.scheduler.ext.matsci.client.*;
+import org.ow2.proactive.scheduler.ext.matsci.client.AOMatSciEnvironment;
+import org.ow2.proactive.scheduler.ext.matsci.client.MatSciJobPermanentInfo;
+import org.ow2.proactive.scheduler.ext.matsci.client.MatSciJobVolatileInfo;
+import org.ow2.proactive.scheduler.ext.matsci.client.MatSciTaskStatus;
+import org.ow2.proactive.scheduler.ext.matsci.client.PASolveException;
+import org.ow2.proactive.scheduler.ext.matsci.client.Pair;
 import org.ow2.proactive.scheduler.ext.scilab.common.PASolveScilabGlobalConfig;
 import org.ow2.proactive.scheduler.ext.scilab.common.PASolveScilabTaskConfig;
 import org.ow2.proactive.scheduler.ext.scilab.common.exception.ScilabTaskException;
@@ -59,11 +70,6 @@ import org.ow2.proactive.scheduler.ext.scilab.worker.ScilabTask;
 import org.ow2.proactive.scripting.InvalidScriptException;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.scilab.modules.types.ScilabType;
-
-import javax.security.auth.login.LoginException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.TreeSet;
 
 
 /**

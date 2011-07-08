@@ -37,6 +37,7 @@
 package org.ow2.proactive.scheduler.common.job;
 
 import java.net.MalformedURLException;
+
 import javax.persistence.Column;
 import javax.persistence.FetchType;
 import javax.persistence.Lob;

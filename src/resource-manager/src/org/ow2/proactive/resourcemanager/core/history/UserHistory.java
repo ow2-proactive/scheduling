@@ -43,7 +43,6 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 
 import org.apache.log4j.Logger;
 import org.hibernate.annotations.Index;
@@ -51,9 +50,6 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.db.Condition;
 import org.ow2.proactive.db.ConditionComparator;
 import org.ow2.proactive.resourcemanager.authentication.Client;
-import org.ow2.proactive.resourcemanager.common.NodeState;
-import org.ow2.proactive.resourcemanager.common.event.RMEventType;
-import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.db.DatabaseManager;
 import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 

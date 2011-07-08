@@ -36,8 +36,8 @@
  */
 package org.ow2.proactive.scripting.helper.filetransfer;
 
-import org.ow2.proactive.scripting.helper.filetransfer.driver.*;
-import org.ow2.proactive.scripting.helper.filetransfer.initializer.*;
+import org.ow2.proactive.scripting.helper.filetransfer.driver.FileTransfertDriver;
+import org.ow2.proactive.scripting.helper.filetransfer.initializer.FileTransfertInitializer;
 
 
 /**

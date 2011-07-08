@@ -36,6 +36,15 @@
  */
 package org.ow2.proactive.scheduler.ext.scilab.worker;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.io.Serializable;
+import java.net.URI;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Map;
+
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.utils.OperatingSystem;
 import org.ow2.proactive.scheduler.ext.common.util.IOTools;
@@ -48,15 +57,6 @@ import org.ow2.proactive.scheduler.ext.scilab.common.PASolveScilabGlobalConfig;
 import org.ow2.proactive.scheduler.ext.scilab.common.PASolveScilabTaskConfig;
 import org.ow2.proactive.scheduler.ext.scilab.worker.util.ScilabEngineConfig;
 import org.ow2.proactive.scheduler.ext.scilab.worker.util.ScilabFinder;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.io.Serializable;
-import java.net.URI;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Map;
 
 
 /**

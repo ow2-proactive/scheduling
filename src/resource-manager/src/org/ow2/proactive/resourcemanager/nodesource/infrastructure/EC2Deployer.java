@@ -52,7 +52,6 @@ import com.xerox.amazonws.ec2.InstanceType;
 import com.xerox.amazonws.ec2.Jec2;
 import com.xerox.amazonws.ec2.ReservationDescription;
 import com.xerox.amazonws.ec2.ReservationDescription.Instance;
-import com.xerox.amazonws.ec2.TerminatingInstanceDescription;
 
 
 /**

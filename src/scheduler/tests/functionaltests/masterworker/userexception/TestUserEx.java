@@ -36,18 +36,19 @@
  */
 package functionaltests.masterworker.userexception;
 
-import functionaltests.*;
-import functionalTests.FunctionalTest;
-import functionaltests.masterworker.A;
 import static junit.framework.Assert.assertTrue;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.extensions.masterworker.ProActiveMaster;
 import org.objectweb.proactive.extensions.masterworker.TaskException;
 import org.objectweb.proactive.extensions.masterworker.interfaces.Master;
 
-import java.util.ArrayList;
-import java.util.List;
+import functionalTests.FunctionalTest;
+import functionaltests.SchedulerTHelper;
+import functionaltests.masterworker.A;
 
 
 /**

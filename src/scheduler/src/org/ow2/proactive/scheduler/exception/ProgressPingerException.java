@@ -36,7 +36,6 @@
  */
 package org.ow2.proactive.scheduler.exception;
 
-import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 
 
 /**

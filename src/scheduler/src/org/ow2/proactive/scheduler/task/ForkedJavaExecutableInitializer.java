@@ -39,8 +39,8 @@ package org.ow2.proactive.scheduler.task;
 import org.objectweb.proactive.extensions.dataspaces.api.DataSpacesFileObject;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.JavaExecutableInitializer;
-import org.ow2.proactive.scheduler.task.launcher.TaskLauncherInitializer;
 import org.ow2.proactive.scheduler.task.launcher.TaskLauncher.OneShotDecrypter;
+import org.ow2.proactive.scheduler.task.launcher.TaskLauncherInitializer;
 
 
 /**

@@ -37,6 +37,7 @@
 package org.ow2.proactive.topology.descriptor;
 
 import java.io.Serializable;
+
 import org.objectweb.proactive.annotation.PublicAPI;
 
 

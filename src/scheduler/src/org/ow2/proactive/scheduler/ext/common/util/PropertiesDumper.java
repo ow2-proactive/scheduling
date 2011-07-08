@@ -36,6 +36,13 @@
  */
 package org.ow2.proactive.scheduler.ext.common.util;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+
 import org.jdom.Attribute;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -43,13 +50,6 @@ import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.config.PAProperty;
-
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
 
 
 /**

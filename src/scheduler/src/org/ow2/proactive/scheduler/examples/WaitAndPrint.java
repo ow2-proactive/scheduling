@@ -37,6 +37,7 @@
 package org.ow2.proactive.scheduler.examples;
 
 import java.io.Serializable;
+
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 

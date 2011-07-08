@@ -39,7 +39,6 @@ package org.ow2.proactive.scheduler.descriptor;
 import java.io.Serializable;
 import java.util.Vector;
 
-import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;

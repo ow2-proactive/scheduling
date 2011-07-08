@@ -36,6 +36,13 @@
  */
 package org.ow2.proactive.scheduler.ext.scilab.worker.util;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.regex.Matcher;
+
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.input.SAXBuilder;
@@ -44,13 +51,6 @@ import org.objectweb.proactive.utils.OperatingSystem;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.ext.matsci.worker.util.MatSciConfigurationParser;
 import org.ow2.proactive.scheduler.ext.matsci.worker.util.MatSciEngineConfig;
-
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.regex.Matcher;
 
 
 /**

@@ -36,6 +36,11 @@
  */
 package org.ow2.proactive.scheduler.ext.matlab.client;
 
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.TreeSet;
+
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.exception.UserException;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
@@ -49,14 +54,14 @@ import org.ow2.proactive.scheduler.ext.matlab.common.PASolveMatlabGlobalConfig;
 import org.ow2.proactive.scheduler.ext.matlab.common.PASolveMatlabTaskConfig;
 import org.ow2.proactive.scheduler.ext.matlab.common.exception.MatlabTaskException;
 import org.ow2.proactive.scheduler.ext.matlab.worker.MatlabExecutable;
-import org.ow2.proactive.scheduler.ext.matsci.client.*;
+import org.ow2.proactive.scheduler.ext.matsci.client.AOMatSciEnvironment;
+import org.ow2.proactive.scheduler.ext.matsci.client.MatSciJobPermanentInfo;
+import org.ow2.proactive.scheduler.ext.matsci.client.MatSciJobVolatileInfo;
+import org.ow2.proactive.scheduler.ext.matsci.client.MatSciTaskStatus;
+import org.ow2.proactive.scheduler.ext.matsci.client.PASolveException;
+import org.ow2.proactive.scheduler.ext.matsci.client.Pair;
 import org.ow2.proactive.scripting.InvalidScriptException;
 import org.ow2.proactive.scripting.SelectionScript;
-
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.TreeSet;
 
 
 /**

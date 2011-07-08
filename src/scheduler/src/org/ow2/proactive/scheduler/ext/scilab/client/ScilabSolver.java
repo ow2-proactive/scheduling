@@ -36,6 +36,11 @@
  */
 package org.ow2.proactive.scheduler.ext.scilab.client;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.io.Writer;
+import java.util.ArrayList;
+
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
@@ -45,11 +50,6 @@ import org.ow2.proactive.scheduler.ext.matsci.client.MatSciJobPermanentInfo;
 import org.ow2.proactive.scheduler.ext.matsci.client.Pair;
 import org.ow2.proactive.scheduler.ext.scilab.common.PASolveScilabGlobalConfig;
 import org.ow2.proactive.scheduler.ext.scilab.common.PASolveScilabTaskConfig;
-
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.io.Writer;
-import java.util.ArrayList;
 
 
 /**

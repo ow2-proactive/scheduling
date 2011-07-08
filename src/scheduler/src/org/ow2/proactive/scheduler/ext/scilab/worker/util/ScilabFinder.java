@@ -36,11 +36,11 @@
  */
 package org.ow2.proactive.scheduler.ext.scilab.worker.util;
 
-import org.ow2.proactive.scheduler.ext.matsci.worker.util.MatSciEngineConfig;
-import org.ow2.proactive.scheduler.ext.matsci.worker.util.MatSciFinder;
-
 import java.util.ArrayList;
 import java.util.HashSet;
+
+import org.ow2.proactive.scheduler.ext.matsci.worker.util.MatSciEngineConfig;
+import org.ow2.proactive.scheduler.ext.matsci.worker.util.MatSciFinder;
 
 
 public class ScilabFinder extends MatSciFinder {

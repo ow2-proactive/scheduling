@@ -39,8 +39,8 @@ package functionaltests.monitor;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Vector;
 import java.util.Map.Entry;
+import java.util.Vector;
 
 import org.objectweb.proactive.core.ProActiveTimeoutException;
 import org.objectweb.proactive.utils.TimeoutAccounter;

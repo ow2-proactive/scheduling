@@ -36,6 +36,13 @@
  */
 package org.ow2.proactive.scheduler.ext.matsci.client;
 
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.util.Map;
+
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
@@ -48,9 +55,6 @@ import org.ow2.proactive.scheduler.ext.matsci.common.DummyJVMProcess;
 import org.ow2.proactive.scheduler.ext.matsci.common.JVMSpawnHelper;
 import org.ow2.proactive.scheduler.ext.matsci.common.ProcessInitializer;
 import org.ow2.proactive.scheduler.ext.matsci.common.ProcessListener;
-
-import java.io.*;
-import java.util.Map;
 
 
 /**

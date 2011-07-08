@@ -50,7 +50,6 @@ import org.objectweb.proactive.core.body.proxy.BodyProxy;
 import org.objectweb.proactive.core.mop.Proxy;
 import org.objectweb.proactive.core.mop.StubObject;
 import org.ow2.proactive.authentication.principals.UserNamePrincipal;
-import org.ow2.proactive.resourcemanager.core.history.Alive;
 import org.ow2.proactive.resourcemanager.core.history.UserHistory;
 
 

@@ -42,7 +42,6 @@ import javax.security.auth.login.LoginException;
 
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
-import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.jmx.JMXClientHelper;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;

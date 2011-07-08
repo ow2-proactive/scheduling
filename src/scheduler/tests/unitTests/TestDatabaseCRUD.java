@@ -61,7 +61,6 @@ import org.ow2.proactive.scheduler.common.task.RestartMode;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
-import org.ow2.proactive.scheduler.common.task.flow.FlowAction;
 import org.ow2.proactive.scheduler.common.task.util.BooleanWrapper;
 import org.ow2.proactive.scheduler.common.task.util.ByteArrayWrapper;
 import org.ow2.proactive.scheduler.common.task.util.IntegerWrapper;

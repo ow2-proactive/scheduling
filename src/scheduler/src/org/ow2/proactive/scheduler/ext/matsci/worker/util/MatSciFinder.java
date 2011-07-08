@@ -36,12 +36,12 @@
  */
 package org.ow2.proactive.scheduler.ext.matsci.worker.util;
 
-import org.objectweb.proactive.utils.OperatingSystem;
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import org.objectweb.proactive.utils.OperatingSystem;
 
 
 /**

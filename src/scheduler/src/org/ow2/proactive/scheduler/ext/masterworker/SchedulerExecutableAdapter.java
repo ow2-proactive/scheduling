@@ -40,8 +40,8 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.objectweb.proactive.extensions.masterworker.interfaces.WorkerMemory;
 import org.objectweb.proactive.extensions.masterworker.interfaces.DivisibleTask;
+import org.objectweb.proactive.extensions.masterworker.interfaces.WorkerMemory;
 import org.objectweb.proactive.extensions.masterworker.interfaces.internal.TaskIntern;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;

@@ -46,7 +46,6 @@ import org.hibernate.classic.Session;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.db.Condition;
 import org.ow2.proactive.db.ConditionComparator;
-import org.ow2.proactive.db.DatabaseManagerException;
 import org.ow2.proactive.db.HibernateDatabaseManager;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;

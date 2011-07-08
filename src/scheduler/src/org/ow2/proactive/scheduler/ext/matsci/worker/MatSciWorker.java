@@ -36,10 +36,10 @@
  */
 package org.ow2.proactive.scheduler.ext.matsci.worker;
 
+import java.io.Serializable;
+
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
-
-import java.io.Serializable;
 
 
 /**

@@ -36,12 +36,12 @@
  */
 package org.ow2.proactive.scheduler.ext.matsci.common;
 
-import org.objectweb.proactive.core.process.JVMProcessImpl;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
+
+import org.objectweb.proactive.core.process.JVMProcessImpl;
 
 
 /**

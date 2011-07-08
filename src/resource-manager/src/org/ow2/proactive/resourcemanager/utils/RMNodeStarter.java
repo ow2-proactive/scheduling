@@ -63,7 +63,6 @@ import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.Parser;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
-import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.config.xml.ProActiveConfigurationParser;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeFactory;

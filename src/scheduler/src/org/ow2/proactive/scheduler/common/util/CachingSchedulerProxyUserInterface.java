@@ -36,7 +36,6 @@
  */
 package org.ow2.proactive.scheduler.common.util;
 
-import java.io.Serializable;
 import java.security.KeyException;
 import java.security.PublicKey;
 import java.util.HashMap;

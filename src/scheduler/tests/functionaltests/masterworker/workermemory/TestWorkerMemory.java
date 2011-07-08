@@ -36,20 +36,20 @@
  */
 package functionaltests.masterworker.workermemory;
 
-import functionaltests.*;
-
-import functionalTests.FunctionalTest;
 import static junit.framework.Assert.assertTrue;
-
-import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
-import org.objectweb.proactive.extensions.masterworker.ProActiveMaster;
-import org.objectweb.proactive.extensions.masterworker.ConstantMemoryFactory;
-import org.objectweb.proactive.extensions.masterworker.interfaces.Master;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
+import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
+import org.objectweb.proactive.extensions.masterworker.ConstantMemoryFactory;
+import org.objectweb.proactive.extensions.masterworker.ProActiveMaster;
+import org.objectweb.proactive.extensions.masterworker.interfaces.Master;
+
+import functionalTests.FunctionalTest;
+import functionaltests.SchedulerTHelper;
 
 
 /**

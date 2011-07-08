@@ -36,6 +36,20 @@
  */
 package org.ow2.proactive.scheduler.ext.matsci.client;
 
+import java.io.File;
+import java.io.Serializable;
+import java.net.URL;
+import java.net.UnknownHostException;
+import java.security.KeyException;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.TreeSet;
+
+import javax.security.auth.login.LoginException;
+import javax.swing.SwingUtilities;
+
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
@@ -47,20 +61,25 @@ import org.objectweb.proactive.core.body.request.RequestFilter;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
-import org.ow2.proactive.scheduler.common.*;
-import org.ow2.proactive.scheduler.common.exception.*;
-import org.ow2.proactive.scheduler.common.job.*;
+import org.ow2.proactive.scheduler.common.NotificationData;
+import org.ow2.proactive.scheduler.common.Scheduler;
+import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
+import org.ow2.proactive.scheduler.common.SchedulerConnection;
+import org.ow2.proactive.scheduler.common.SchedulerEvent;
+import org.ow2.proactive.scheduler.common.SchedulerEventListener;
+import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
+import org.ow2.proactive.scheduler.common.exception.PermissionException;
+import org.ow2.proactive.scheduler.common.exception.SchedulerException;
+import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
+import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
+import org.ow2.proactive.scheduler.common.job.JobInfo;
+import org.ow2.proactive.scheduler.common.job.JobResult;
+import org.ow2.proactive.scheduler.common.job.JobState;
+import org.ow2.proactive.scheduler.common.job.JobStatus;
+import org.ow2.proactive.scheduler.common.job.UserIdentification;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
-
-import javax.security.auth.login.LoginException;
-import javax.swing.*;
-import java.io.*;
-import java.net.URL;
-import java.net.UnknownHostException;
-import java.security.KeyException;
-import java.util.*;
 
 
 /**

@@ -36,13 +36,13 @@
  */
 package org.ow2.proactive.scheduler.ext.matsci.client;
 
-import org.objectweb.proactive.core.body.request.Request;
-import org.ow2.proactive.scheduler.common.job.JobStatus;
-
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.TreeSet;
+
+import org.objectweb.proactive.core.body.request.Request;
+import org.ow2.proactive.scheduler.common.job.JobStatus;
 
 
 /**

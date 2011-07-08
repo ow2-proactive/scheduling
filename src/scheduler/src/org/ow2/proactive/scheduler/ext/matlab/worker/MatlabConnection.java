@@ -36,12 +36,12 @@
  */
 package org.ow2.proactive.scheduler.ext.matlab.worker;
 
+import java.io.File;
+
 import org.ow2.proactive.scheduler.ext.matlab.common.PASolveMatlabGlobalConfig;
 import org.ow2.proactive.scheduler.ext.matlab.common.PASolveMatlabTaskConfig;
 import org.ow2.proactive.scheduler.ext.matlab.common.exception.MatlabInitException;
 import org.ow2.proactive.scheduler.ext.matlab.common.exception.MatlabTaskException;
-
-import java.io.File;
 
 
 /**

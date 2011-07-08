@@ -44,8 +44,6 @@ import java.util.Set;
 import junit.framework.Assert;
 
 import org.objectweb.proactive.api.PAFuture;
-import org.objectweb.proactive.core.ProActiveTimeoutException;
-import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
