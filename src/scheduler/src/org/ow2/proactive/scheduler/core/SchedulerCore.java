@@ -883,6 +883,9 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
             if (!jobClasspathManager.contains(crc)) {
                 jobClasspathManager.put(crc, job.getEnvironment().clearJobClasspathContent(), job
                         .getEnvironment().containsJarFile());
+            } else {
+                // clear classpath content anyway, it will be retreived through DB
+                job.getEnvironment().clearJobClasspathContent();
             }
         }
 
