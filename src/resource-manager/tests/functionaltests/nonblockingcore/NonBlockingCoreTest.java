@@ -39,6 +39,7 @@ package functionaltests.nonblockingcore;
 import static junit.framework.Assert.assertTrue;
 
 import java.io.File;
+import java.net.URL;
 
 import javax.security.auth.login.LoginException;
 
@@ -73,8 +74,8 @@ import functionaltests.selectionscript.SelectionScriptTimeOutTest;
  */
 public class NonBlockingCoreTest extends FunctionalTest {
 
-    private String selectionScriptWithtimeOutPath = SelectionScriptTimeOutTest.class.getResource(
-            "selectionScriptWithtimeOut.js").getPath();
+    private URL selectionScriptWithtimeOutPath = SelectionScriptTimeOutTest.class
+            .getResource("selectionScriptWithtimeOut.js");
 
     private NodeSet nodes;
 
@@ -104,7 +105,7 @@ public class NonBlockingCoreTest extends FunctionalTest {
         RMTHelper.log("Selecting node with timeout script");
 
         //create the static selection script object
-        final SelectionScript sScript = new SelectionScript(new File(selectionScriptWithtimeOutPath),
+        final SelectionScript sScript = new SelectionScript(new File(selectionScriptWithtimeOutPath.toURI()),
             new String[] { Integer.toString(scriptSleepingTime) }, false);
 
         //mandatory to use RMUser AO, otherwise, getAtMostNode we be send in RMAdmin request queue
@@ -154,7 +155,7 @@ public class NonBlockingCoreTest extends FunctionalTest {
         String nsName = "myNS";
         RMTHelper.log("Creating GCM node source " + nsName);
         byte[] GCMDeploymentData = FileToBytesConverter.convertFileToByteArray((new File(
-            RMTHelper.defaultDescriptor)));
+            RMTHelper.defaultDescriptor.toURI())));
         //first im parameter is default rm url
         resourceManager.createNodeSource(nsName, GCMInfrastructure.class.getName(), new Object[] { "",
                 GCMDeploymentData }, StaticPolicy.class.getName(), null);

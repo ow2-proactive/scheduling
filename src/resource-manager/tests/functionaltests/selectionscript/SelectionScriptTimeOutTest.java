@@ -37,6 +37,7 @@
 package functionaltests.selectionscript;
 
 import java.io.File;
+import java.net.URL;
 import java.util.HashMap;
 
 import org.junit.Assert;
@@ -67,8 +68,7 @@ import functionaltests.RMTHelper;
  */
 public class SelectionScriptTimeOutTest extends FunctionalTest {
 
-    private String selectionScriptWithtimeOutPath = this.getClass().getResource(
-            "selectionScriptWithtimeOut.js").getPath();
+    private URL selectionScriptWithtimeOutPath = this.getClass().getResource("selectionScriptWithtimeOut.js");
 
     /** Actions to be Perform by this test.
      * The method is called automatically by Junit framework.
@@ -94,7 +94,7 @@ public class SelectionScriptTimeOutTest extends FunctionalTest {
         RMTHelper.log("Test 1 - selecting nodes with timeout script");
 
         //create the static selection script object
-        SelectionScript script = new SelectionScript(new File(selectionScriptWithtimeOutPath),
+        SelectionScript script = new SelectionScript(new File(selectionScriptWithtimeOutPath.toURI()),
             new String[] { Integer.toString(scriptSleepingTime) }, false);
 
         NodeSet nodes = resourceManager.getAtMostNodes(2, script);
@@ -123,7 +123,7 @@ public class SelectionScriptTimeOutTest extends FunctionalTest {
         RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
 
         // now we have RMTHelper.defaultNodesNumber + 1 nodes
-        script = new SelectionScript(new File(selectionScriptWithtimeOutPath), new String[] {
+        script = new SelectionScript(new File(selectionScriptWithtimeOutPath.toURI()), new String[] {
                 Integer.toString(scriptSleepingTime), nodeName }, false);
 
         // selecting all nodes

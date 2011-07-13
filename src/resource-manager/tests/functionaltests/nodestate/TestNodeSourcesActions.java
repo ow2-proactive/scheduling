@@ -85,7 +85,7 @@ public class TestNodeSourcesActions extends FunctionalTest {
         ResourceManager resourceManager = RMTHelper.getResourceManager();
 
         byte[] GCMDeploymentData = FileToBytesConverter.convertFileToByteArray((new File(
-            RMTHelper.defaultDescriptor)));
+            RMTHelper.defaultDescriptor.toURI())));
         //first im parameter is default rm url
         resourceManager.createNodeSource(nodeSourceName, GCMInfrastructure.class.getName(), new Object[] {
                 "", GCMDeploymentData }, StaticPolicy.class.getName(), null);

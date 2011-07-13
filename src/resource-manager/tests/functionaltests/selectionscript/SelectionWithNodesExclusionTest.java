@@ -39,6 +39,7 @@ package functionaltests.selectionscript;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -85,11 +86,9 @@ import functionaltests.RMTHelper;
  */
 public class SelectionWithNodesExclusionTest extends FunctionalTest {
 
-    private String vmPropSelectionScriptpath = this.getClass().getResource("vmPropertySelectionScript.js")
-            .getPath();
+    private URL vmPropSelectionScriptpath = this.getClass().getResource("vmPropertySelectionScript.js");
 
-    private String dummySelectionScriptPath = this.getClass().getResource("dummySelectionScript.js")
-            .getPath();
+    private URL dummySelectionScriptPath = this.getClass().getResource("dummySelectionScript.js");
 
     private String vmPropKey = "myProperty";
     private String vmPropValue = "myValue";
@@ -165,7 +164,7 @@ public class SelectionWithNodesExclusionTest extends FunctionalTest {
         RMTHelper.log("Test 2");
 
         //create the dynamic selection script object
-        SelectionScript dummyDynamicScript = new SelectionScript(new File(dummySelectionScriptPath),
+        SelectionScript dummyDynamicScript = new SelectionScript(new File(dummySelectionScriptPath.toURI()),
             new String[] {}, true);
 
         //get nodes with the previous node excluded
@@ -199,7 +198,7 @@ public class SelectionWithNodesExclusionTest extends FunctionalTest {
         RMTHelper.log("Test 3");
 
         //create the static selection script object
-        SelectionScript dummyStaticScript = new SelectionScript(new File(dummySelectionScriptPath),
+        SelectionScript dummyStaticScript = new SelectionScript(new File(dummySelectionScriptPath.toURI()),
             new String[] {}, false);
 
         //get nodes with the previous node excluded
@@ -255,8 +254,8 @@ public class SelectionWithNodesExclusionTest extends FunctionalTest {
         assertTrue(resourceManager.getState().getFreeNodesNumber() == RMTHelper.defaultNodesNumber + 2);
 
         //create the dynamic selection script object
-        SelectionScript checkPropDynamicSScript = new SelectionScript(new File(vmPropSelectionScriptpath),
-            new String[] { this.vmPropKey, this.vmPropValue }, true);
+        SelectionScript checkPropDynamicSScript = new SelectionScript(new File(vmPropSelectionScriptpath
+                .toURI()), new String[] { this.vmPropKey, this.vmPropValue }, true);
         Node node1ToExclude = NodeFactory.getNode(node1URL);
 
         nodeSetWithNodeToExclude = new NodeSet();
@@ -291,8 +290,8 @@ public class SelectionWithNodesExclusionTest extends FunctionalTest {
         RMTHelper.log("Test 5");
 
         //create the static selection script object
-        SelectionScript checkPropStaticSScript = new SelectionScript(new File(vmPropSelectionScriptpath),
-            new String[] { this.vmPropKey, this.vmPropValue }, false);
+        SelectionScript checkPropStaticSScript = new SelectionScript(new File(vmPropSelectionScriptpath
+                .toURI()), new String[] { this.vmPropKey, this.vmPropValue }, false);
 
         Node node2ToExclude = NodeFactory.getNode(node2URL);
 

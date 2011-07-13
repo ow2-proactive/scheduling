@@ -39,6 +39,7 @@ package functionaltests.nodesource;
 import static junit.framework.Assert.assertTrue;
 
 import java.io.File;
+import java.net.URL;
 
 import org.objectweb.proactive.core.node.Node;
 import org.ow2.proactive.resourcemanager.common.RMState;
@@ -64,8 +65,8 @@ public class TestGCMInfrastructureStaticPolicy extends FunctionalTest {
     protected byte[] emptyGCMD;
     protected byte[] GCMDeploymentData;
 
-    protected static String defaultDescriptor = TestGCMInfrastructureStaticPolicy.class.getResource(
-            "/functionaltests/nodesource/3nodes.xml").getPath();
+    protected static URL defaultDescriptor = TestGCMInfrastructureStaticPolicy.class
+            .getResource("/functionaltests/nodesource/3nodes.xml");
     protected int defaultDescriptorNodesNb = 3;
 
     protected void createEmptyNodeSource(String sourceName) throws Exception {
@@ -106,10 +107,11 @@ public class TestGCMInfrastructureStaticPolicy extends FunctionalTest {
     }
 
     protected void init() throws Exception {
-        GCMDeploymentData = FileToBytesConverter.convertFileToByteArray((new File(defaultDescriptor)));
-        String emptyNodeDescriptor = TestGCMInfrastructureTimeSlotPolicy.class.getResource(
-                "/functionaltests/nodesource/empty_gcmd.xml").getPath();
-        emptyGCMD = FileToBytesConverter.convertFileToByteArray((new File(emptyNodeDescriptor)));
+        GCMDeploymentData = FileToBytesConverter
+                .convertFileToByteArray((new File(defaultDescriptor.toURI())));
+        URL emptyNodeDescriptor = TestGCMInfrastructureTimeSlotPolicy.class
+                .getResource("/functionaltests/nodesource/empty_gcmd.xml");
+        emptyGCMD = FileToBytesConverter.convertFileToByteArray((new File(emptyNodeDescriptor.toURI())));
     }
 
     /** Actions to be Perform by this test.

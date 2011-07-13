@@ -67,11 +67,11 @@ public class TestGCMInfrastructureTimeSlotPolicy extends FunctionalTest {
     }
 
     protected void init() throws Exception {
-        String oneNodeescriptor = TestGCMInfrastructureTimeSlotPolicy.class.getResource(
-                "/functionaltests/nodesource/1node.xml").getPath();
+        String oneNodeescriptor = new File(TestGCMInfrastructureTimeSlotPolicy.class.getResource(
+                "/functionaltests/nodesource/1node.xml").toURI()).getAbsolutePath();
         GCMDeploymentData = FileToBytesConverter.convertFileToByteArray((new File(oneNodeescriptor)));
-        String emptyNodeDescriptor = TestGCMInfrastructureTimeSlotPolicy.class.getResource(
-                "/functionaltests/nodesource/empty_gcmd.xml").getPath();
+        String emptyNodeDescriptor = new File(TestGCMInfrastructureTimeSlotPolicy.class.getResource(
+                "/functionaltests/nodesource/empty_gcmd.xml").toURI()).getAbsolutePath();
         emptyGCMD = FileToBytesConverter.convertFileToByteArray((new File(emptyNodeDescriptor)));
     }
 

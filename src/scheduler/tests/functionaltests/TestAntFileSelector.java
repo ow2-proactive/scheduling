@@ -38,6 +38,7 @@ package functionaltests;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -65,15 +66,18 @@ import org.objectweb.proactive.extensions.vfsprovider.FileSystemServerDeployer;
 
 public class TestAntFileSelector {
 
-    private static String DSroot = TestAntFileSelector.class.getResource(
-            "/functionaltests/" + TestAntFileSelector.class.getSimpleName() + ".class").getPath();
+    private static URL DSroot = TestAntFileSelector.class.getResource("/functionaltests/" +
+        TestAntFileSelector.class.getSimpleName() + ".class");
+
+    private static String DSrootString;
 
     @Test
     public void run() throws Throwable {
-        DSroot = new File(DSroot).getParent();
-        log(DSroot);
+        DSroot = new File(DSroot.toURI()).getParentFile().toURL();
+        DSrootString = new File(DSroot.toURI()).getAbsolutePath();
+        log(DSrootString);
         //start DS server
-        FileSystemServerDeployer deployer = new FileSystemServerDeployer(DSroot, true);
+        FileSystemServerDeployer deployer = new FileSystemServerDeployer(DSrootString, true);
         final String URL = deployer.getVFSRootURL();
         //start DS naming service
         NamingServiceDeployer namingServiceDeployer = new NamingServiceDeployer(true);
@@ -97,7 +101,7 @@ public class TestAntFileSelector {
         int nbFound = 0;
 
         log("check include 1");
-        File rootFile = new File(DSroot);
+        File rootFile = new File(DSrootString);
         String[] checkReg = rootFile.list(new FilenameFilter() {
             public boolean accept(File dir, String name) {
                 return name.matches("T.*[.]class");
@@ -121,7 +125,7 @@ public class TestAntFileSelector {
         }
 
         log("check include 3");
-        rootFile = new File(DSroot);
+        rootFile = new File(DSrootString);
         checkReg = recursiveList(rootFile, new FilenameFilter() {
             public boolean accept(File dir, String name) {
                 return name.matches(".*[.]ini");

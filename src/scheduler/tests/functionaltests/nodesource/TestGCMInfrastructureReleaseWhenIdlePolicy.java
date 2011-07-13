@@ -39,6 +39,8 @@ package functionaltests.nodesource;
 import static junit.framework.Assert.assertTrue;
 
 import java.io.File;
+import java.net.URISyntaxException;
+import java.net.URL;
 
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
@@ -68,8 +70,8 @@ public class TestGCMInfrastructureReleaseWhenIdlePolicy extends FunctionalTest {
     protected byte[] GCMDeploymentData;
 
     protected int defaultDescriptorNodesNb = 5;
-    protected static String jobDescriptor = TestGCMInfrastructureReleaseWhenIdlePolicy.class.getResource(
-            "/functionaltests/descriptors/Job_PI.xml").getPath();
+    protected static URL jobDescriptor = TestGCMInfrastructureReleaseWhenIdlePolicy.class
+            .getResource("/functionaltests/descriptors/Job_PI.xml");
 
     protected Object[] getPolicyParams() throws Exception {
         SchedulerAuthenticationInterface auth = SchedulerConnection
@@ -79,9 +81,9 @@ public class TestGCMInfrastructureReleaseWhenIdlePolicy extends FunctionalTest {
         return new Object[] { "ALL", "ME", SchedulerTHelper.schedulerDefaultURL, creds.getBase64(), "30000" };
     }
 
-    protected String getDescriptor() {
-        return TestGCMInfrastructureReleaseWhenIdlePolicy.class.getResource(
-                "/functionaltests/nodesource/5nodes.xml").getPath();
+    protected String getDescriptor() throws URISyntaxException {
+        return new File(TestGCMInfrastructureReleaseWhenIdlePolicy.class.getResource(
+                "/functionaltests/nodesource/5nodes.xml").toURI()).getAbsolutePath();
     }
 
     protected void createDefaultNodeSource(String sourceName) throws Exception {
@@ -128,7 +130,7 @@ public class TestGCMInfrastructureReleaseWhenIdlePolicy extends FunctionalTest {
         assertTrue(resourceManager.getState().getFreeNodesNumber() == 0);
 
         System.out.println("TestGCMInfrastructureReleaseWhenIdlePolicy.action() Submit job ");
-        JobId jobId = SchedulerTHelper.submitJob(jobDescriptor);
+        JobId jobId = SchedulerTHelper.submitJob(new File(jobDescriptor.toURI()).getAbsolutePath());
         System.out.println("TestGCMInfrastructureReleaseWhenIdlePolicy.action() job submitted ");
 
         SchedulerTHelper.waitForEventJobSubmitted(jobId);

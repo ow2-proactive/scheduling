@@ -126,17 +126,17 @@ import functionaltests.monitor.SchedulerMonitorsHandler;
  */
 public class SchedulerTHelper {
 
-    protected static String defaultDescriptor = SchedulerTHelper.class.getResource(
-            "config/GCMNodeSourceDeployment.xml").getPath();
+    protected static URL defaultDescriptor = SchedulerTHelper.class
+            .getResource("config/GCMNodeSourceDeployment.xml");
 
     protected static URL startForkedSchedulerApplication = SchedulerTHelper.class
             .getResource("/functionaltests/config/StartForkedSchedulerApplication.xml");
 
-    protected static String functionalTestRMProperties = SchedulerTHelper.class.getResource(
-            "config/functionalTRMProperties.ini").getPath();
+    protected static URL functionalTestRMProperties = SchedulerTHelper.class
+            .getResource("config/functionalTRMProperties.ini");
 
-    protected static String functionalTestSchedulerProperties = SchedulerTHelper.class.getResource(
-            "config/functionalTSchedulerProperties.ini").getPath();
+    protected static URL functionalTestSchedulerProperties = SchedulerTHelper.class
+            .getResource("config/functionalTSchedulerProperties.ini");
 
     public static String schedulerDefaultURL = "//Localhost/" + SchedulerConstants.SCHEDULER_DEFAULT_NAME;
 
@@ -176,7 +176,7 @@ public class SchedulerTHelper {
      * @throws Exception if an error occurs.
      */
     public static void startScheduler(String configuration) throws Exception {
-        startScheduler(defaultDescriptor, configuration);
+        startScheduler(new File(defaultDescriptor.toURI()).getAbsolutePath(), configuration);
     }
 
     /**
@@ -220,10 +220,10 @@ public class SchedulerTHelper {
     public static void startScheduler(String GCMDPath, String schedPropertiesFilePath,
             String rmPropertiesFilePath) throws Exception {
         if (schedPropertiesFilePath == null) {
-            schedPropertiesFilePath = functionalTestSchedulerProperties;
+            schedPropertiesFilePath = new File(functionalTestSchedulerProperties.toURI()).getAbsolutePath();
         }
         if (rmPropertiesFilePath == null) {
-            rmPropertiesFilePath = functionalTestRMProperties;
+            rmPropertiesFilePath = new File(functionalTestRMProperties.toURI()).getAbsolutePath();
         }
         cleanTMP();
         deploySchedulerGCMA();
@@ -810,16 +810,16 @@ public class SchedulerTHelper {
         vContract.setVariableFromProgram(VAR_OS, OperatingSystem.getOperatingSystem().name(),
                 VariableContractType.DescriptorDefaultVariable);
         StringBuilder properties = new StringBuilder("-Djava.security.manager");
-        properties.append(" " + CentralPAPropertyRepository.PA_HOME.getCmdLine() +
-            CentralPAPropertyRepository.PA_HOME.getValue());
-        properties.append(" " + CentralPAPropertyRepository.JAVA_SECURITY_POLICY.getCmdLine() +
-            CentralPAPropertyRepository.JAVA_SECURITY_POLICY.getValue());
-        properties.append(" " + CentralPAPropertyRepository.LOG4J.getCmdLine() +
-            CentralPAPropertyRepository.LOG4J.getValue());
-        properties.append(" " + PASchedulerProperties.SCHEDULER_HOME.getCmdLine() +
-            PASchedulerProperties.SCHEDULER_HOME.getValueAsString());
-        properties.append(" " + PAResourceManagerProperties.RM_HOME.getCmdLine() +
-            PAResourceManagerProperties.RM_HOME.getValueAsString());
+        properties.append(" " + CentralPAPropertyRepository.PA_HOME.getCmdLine() + "\"" +
+            CentralPAPropertyRepository.PA_HOME.getValue() + "\"");
+        properties.append(" " + CentralPAPropertyRepository.JAVA_SECURITY_POLICY.getCmdLine() + "\"" +
+            CentralPAPropertyRepository.JAVA_SECURITY_POLICY.getValue() + "\"");
+        properties.append(" " + CentralPAPropertyRepository.LOG4J.getCmdLine() + "\"" +
+            CentralPAPropertyRepository.LOG4J.getValue() + "\"");
+        properties.append(" " + PASchedulerProperties.SCHEDULER_HOME.getCmdLine() + "\"" +
+            PASchedulerProperties.SCHEDULER_HOME.getValueAsString() + "\"");
+        properties.append(" " + PAResourceManagerProperties.RM_HOME.getCmdLine() + "\"" +
+            PAResourceManagerProperties.RM_HOME.getValueAsString() + "\"");
         vContract.setVariableFromProgram("jvmargDefinedByTest", properties.toString(),
                 VariableContractType.DescriptorDefaultVariable);
         gcmad = PAGCMDeployment.loadApplicationDescriptor(startForkedSchedulerApplication, vContract);

@@ -14,7 +14,7 @@
 		<proactive base="root" relpath="${proactive.home}">
 			<configuration>
 				<java base="root" relpath="${java.home}/bin/java" />
-				<jvmarg value="-Dclover.initstring=${proactive.home}/compile/ProActiveCoverage.db" />
+				<jvmarg value="-Dclover.initstring=&quot;${proactive.home}/compile/ProActiveCoverage.db&quot;" />
 				<jvmarg value="-Dproactive.test=true" />
 				<jvmarg value="${jvmargDefinedByTest}" />
 				<applicationClasspath>

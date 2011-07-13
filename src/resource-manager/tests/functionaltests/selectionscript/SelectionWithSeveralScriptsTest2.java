@@ -39,6 +39,7 @@ package functionaltests.selectionscript;
 import static junit.framework.Assert.assertTrue;
 
 import java.io.File;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -75,8 +76,7 @@ import functionaltests.RMTHelper;
  */
 public class SelectionWithSeveralScriptsTest2 extends FunctionalTest {
 
-    private String vmPropSelectionScriptpath = this.getClass().getResource("vmPropertySelectionScript.js")
-            .getPath();
+    private URL vmPropSelectionScriptpath = this.getClass().getResource("vmPropertySelectionScript.js");
 
     private String vmPropKey1 = "myProperty1";
     private String vmPropValue1 = "myValue1";
@@ -138,12 +138,12 @@ public class SelectionWithSeveralScriptsTest2 extends FunctionalTest {
         RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
 
         //create the static selection script object that check vm prop1
-        SelectionScript sScript1 = new SelectionScript(new File(vmPropSelectionScriptpath), new String[] {
-                this.vmPropKey1, this.vmPropValue1 }, true);
+        SelectionScript sScript1 = new SelectionScript(new File(vmPropSelectionScriptpath.toURI()),
+            new String[] { this.vmPropKey1, this.vmPropValue1 }, true);
 
         //create the static selection script object prop2
-        SelectionScript sScript2 = new SelectionScript(new File(vmPropSelectionScriptpath), new String[] {
-                this.vmPropKey2, this.vmPropValue2 }, false);
+        SelectionScript sScript2 = new SelectionScript(new File(vmPropSelectionScriptpath.toURI()),
+            new String[] { this.vmPropKey2, this.vmPropValue2 }, false);
 
         RMTHelper.log("Test 1");
 

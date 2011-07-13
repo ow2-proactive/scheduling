@@ -38,7 +38,9 @@ package functionaltests.nodesource;
 
 import static junit.framework.Assert.assertTrue;
 
+import java.io.File;
 import java.net.InetAddress;
+import java.net.URISyntaxException;
 
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
@@ -79,9 +81,9 @@ public class TestGCMCustomizedInfrastructureSchedulerLoadingPolicy extends
     }
 
     @Override
-    protected String getDescriptor() {
-        return TestGCMInfrastructureReleaseWhenIdlePolicy.class.getResource(
-                "/functionaltests/nodesource/1node.xml").getPath();
+    protected String getDescriptor() throws URISyntaxException {
+        return new File(TestGCMInfrastructureReleaseWhenIdlePolicy.class.getResource(
+                "/functionaltests/nodesource/1node.xml").toURI()).getAbsolutePath();
     }
 
     @Override
@@ -113,7 +115,7 @@ public class TestGCMCustomizedInfrastructureSchedulerLoadingPolicy extends
         assertTrue(resourceManager.getState().getTotalNodesNumber() == 0);
         assertTrue(resourceManager.getState().getFreeNodesNumber() == 0);
 
-        JobId jobId = SchedulerTHelper.testJobSubmission(jobDescriptor);
+        JobId jobId = SchedulerTHelper.testJobSubmission(new File(jobDescriptor.toURI()).getAbsolutePath());
 
         // waiting for acquiring nodes
         RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);

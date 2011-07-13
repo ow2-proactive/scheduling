@@ -101,16 +101,16 @@ public class RMTHelper {
     /**
      * A default deployment descriptor
      */
-    public static String defaultDescriptor = RMTHelper.class.getResource(
-            "/functionaltests/config/GCMNodeSourceDeployment.xml").getPath();
+    public static URL defaultDescriptor = RMTHelper.class
+            .getResource("/functionaltests/config/GCMNodeSourceDeployment.xml");
 
     /**
      * Number of nodes deployed with default deployment descriptor
      */
     public static int defaultNodesNumber = 5;
 
-    private static String functionalTestRMProperties = RMTHelper.class.getResource(
-            "/functionaltests/config/functionalTRMProperties.ini").getPath();
+    private static URL functionalTestRMProperties = RMTHelper.class
+            .getResource("/functionaltests/config/functionalTRMProperties.ini");
 
     protected static RMMonitorsHandler monitorsHandler;
 
@@ -155,7 +155,8 @@ public class RMTHelper {
 
     public static void createGCMLocalNodeSource() throws Exception {
         RMFactory.setOsJavaProperty();
-        byte[] GCMDeploymentData = FileToBytesConverter.convertFileToByteArray((new File(defaultDescriptor)));
+        byte[] GCMDeploymentData = FileToBytesConverter.convertFileToByteArray((new File(defaultDescriptor
+                .toURI())));
         ResourceManager rm = getResourceManager();
         //first emtpy im parameter is default rm url
         rm.createNodeSource(NodeSource.GCM_LOCAL, GCMInfrastructure.class.getName(), new Object[] { "",
@@ -247,7 +248,7 @@ public class RMTHelper {
      */
     public static void startRM(String configurationFile) throws Exception {
         if (configurationFile == null) {
-            configurationFile = functionalTestRMProperties;
+            configurationFile = new File(functionalTestRMProperties.toURI()).getAbsolutePath();
         }
         PAResourceManagerProperties.updateProperties(configurationFile);
         deployRMGCMA();
@@ -441,15 +442,15 @@ public class RMTHelper {
         vContract.setVariableFromProgram(VAR_OS, OperatingSystem.getOperatingSystem().name(),
                 VariableContractType.DescriptorDefaultVariable);
         StringBuilder properties = new StringBuilder("-Djava.security.manager");
-        properties.append(" " + CentralPAPropertyRepository.PA_HOME.getCmdLine() +
-            CentralPAPropertyRepository.PA_HOME.getValue());
-        properties.append(" " + CentralPAPropertyRepository.JAVA_SECURITY_POLICY.getCmdLine() +
-            CentralPAPropertyRepository.JAVA_SECURITY_POLICY.getValue());
-        properties.append(" " + CentralPAPropertyRepository.LOG4J.getCmdLine() +
-            CentralPAPropertyRepository.LOG4J.getValue());
+        properties.append(" " + CentralPAPropertyRepository.PA_HOME.getCmdLine() + "\"" +
+            CentralPAPropertyRepository.PA_HOME.getValue() + "\"");
+        properties.append(" " + CentralPAPropertyRepository.JAVA_SECURITY_POLICY.getCmdLine() + "\"" +
+            CentralPAPropertyRepository.JAVA_SECURITY_POLICY.getValue() + "\"");
+        properties.append(" " + CentralPAPropertyRepository.LOG4J.getCmdLine() + "\"" +
+            CentralPAPropertyRepository.LOG4J.getValue() + "\"");
 
-        properties.append(" " + PAResourceManagerProperties.RM_HOME.getCmdLine() +
-            PAResourceManagerProperties.RM_HOME.getValueAsString());
+        properties.append(" " + PAResourceManagerProperties.RM_HOME.getCmdLine() + "\"" +
+            PAResourceManagerProperties.RM_HOME.getValueAsString() + "\"");
         vContract.setVariableFromProgram("jvmargDefinedByTest", properties.toString(),
                 VariableContractType.DescriptorDefaultVariable);
         gcmad = PAGCMDeployment.loadApplicationDescriptor(startForkedRMApplication, vContract);

@@ -193,7 +193,7 @@ public class TestGlobalSpace extends FunctionalTest {
         File tmpProps = File.createTempFile("tmp", ".props");
         PrintWriter pw = new PrintWriter(new OutputStreamWriter(new FileOutputStream(tmpProps)));
         BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(new File(
-            SchedulerTHelper.functionalTestSchedulerProperties))));
+            SchedulerTHelper.functionalTestSchedulerProperties.toURI()))));
         String line;
         while ((line = br.readLine()) != null) {
             pw.println(line);

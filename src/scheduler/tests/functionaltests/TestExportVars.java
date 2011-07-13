@@ -36,6 +36,8 @@
  */
 package functionaltests;
 
+import java.io.File;
+import java.net.URL;
 import java.util.Map;
 
 import org.junit.Assert;
@@ -48,8 +50,8 @@ import functionalTests.FunctionalTest;
 
 public class TestExportVars extends FunctionalTest {
 
-    private static String jobDescriptor = TestJobPrePostSubmission.class.getResource(
-            "/functionaltests/descriptors/Job_exportVars.xml").getPath();
+    private static URL jobDescriptor = TestJobPrePostSubmission.class
+            .getResource("/functionaltests/descriptors/Job_exportVars.xml");
 
     /**
      * Tests start here.
@@ -58,7 +60,7 @@ public class TestExportVars extends FunctionalTest {
      */
     @org.junit.Test
     public void run() throws Throwable {
-        JobId id = SchedulerTHelper.submitJob(jobDescriptor);
+        JobId id = SchedulerTHelper.submitJob(new File(jobDescriptor.toURI()).getAbsolutePath());
         SchedulerTHelper.waitForEventJobFinished(id);
         JobResult res = SchedulerTHelper.getJobResult(id);
 

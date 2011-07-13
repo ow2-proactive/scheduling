@@ -39,6 +39,7 @@ package functionaltests.selectionscript;
 import static junit.framework.Assert.assertTrue;
 
 import java.io.File;
+import java.net.URL;
 import java.util.HashMap;
 
 import org.junit.Assert;
@@ -80,13 +81,11 @@ import functionaltests.RMTHelper;
  */
 public class dynamicSelectionScriptTest extends FunctionalTest {
 
-    private String vmPropSelectionScriptpath = this.getClass().getResource("vmPropertySelectionScript.js")
-            .getPath();
+    private URL vmPropSelectionScriptpath = this.getClass().getResource("vmPropertySelectionScript.js");
 
-    private String badSelectionScriptpath = this.getClass().getResource("badSelectionScript.js").getPath();
+    private URL badSelectionScriptpath = this.getClass().getResource("badSelectionScript.js");
 
-    private String withoutSelectedSelectionScriptpath = this.getClass().getResource(
-            "withoutSelectedSScript.js").getPath();
+    private URL withoutSelectedSelectionScriptpath = this.getClass().getResource("withoutSelectedSScript.js");
 
     private String vmPropKey = "myProperty";
     private String vmPropValue = "myValue";
@@ -126,8 +125,8 @@ public class dynamicSelectionScriptTest extends FunctionalTest {
         RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
 
         //create the dynamic selection script object
-        SelectionScript sScript = new SelectionScript(new File(vmPropSelectionScriptpath), new String[] {
-                this.vmPropKey, this.vmPropValue }, true);
+        SelectionScript sScript = new SelectionScript(new File(vmPropSelectionScriptpath.toURI()),
+            new String[] { this.vmPropKey, this.vmPropValue }, true);
 
         RMTHelper.log("Test 1");
 
@@ -224,8 +223,8 @@ public class dynamicSelectionScriptTest extends FunctionalTest {
         RMTHelper.log("Test 5");
 
         //create the bad dynamic selection script object
-        SelectionScript badScript = new SelectionScript(new File(badSelectionScriptpath), new String[] {},
-            true);
+        SelectionScript badScript = new SelectionScript(new File(badSelectionScriptpath.toURI()),
+            new String[] {}, true);
 
         nodes = resourceManager.getAtMostNodes(3, badScript);
 
@@ -241,8 +240,8 @@ public class dynamicSelectionScriptTest extends FunctionalTest {
         RMTHelper.log("Test 6");
 
         //create the dynamic selection script object that doesn't define 'selected'
-        SelectionScript noSelectedScript = new SelectionScript(new File(withoutSelectedSelectionScriptpath),
-            new String[] {}, true);
+        SelectionScript noSelectedScript = new SelectionScript(new File(withoutSelectedSelectionScriptpath
+                .toURI()), new String[] {}, true);
 
         nodes = resourceManager.getAtMostNodes(3, noSelectedScript);
 

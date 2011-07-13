@@ -37,6 +37,7 @@
 package functionaltests.nodesource;
 
 import java.io.File;
+import java.net.URISyntaxException;
 
 import org.ow2.proactive.resourcemanager.RMFactory;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
@@ -65,9 +66,9 @@ public class TestGCMCustomizedInfrastructureReleaseWhenIdlePolicy extends
     protected static final int TIMEOUT = 60 * 1000;
 
     @Override
-    protected String getDescriptor() {
-        return TestGCMInfrastructureReleaseWhenIdlePolicy.class.getResource(
-                "/functionaltests/nodesource/1node.xml").getPath();
+    protected String getDescriptor() throws URISyntaxException {
+        return new File(TestGCMInfrastructureReleaseWhenIdlePolicy.class.getResource(
+                "/functionaltests/nodesource/1node.xml").toURI()).getAbsolutePath();
     }
 
     @Override
@@ -90,8 +91,8 @@ public class TestGCMCustomizedInfrastructureReleaseWhenIdlePolicy extends
         RMFactory.setOsJavaProperty();
         GCMDeploymentData = FileToBytesConverter.convertFileToByteArray((new File(getDescriptor())));
         //we override the gcm application file
-        SchedulerTHelper.startSchedulerWithEmptyResourceManager(SchedulerTHelper.class.getResource(
-                "config/functionalTRMPropertiesForCustomisedIM.ini").getPath());
+        SchedulerTHelper.startSchedulerWithEmptyResourceManager(new File(SchedulerTHelper.class.getResource(
+                "config/functionalTRMPropertiesForCustomisedIM.ini").toURI()).getAbsolutePath());
         RMTHelper.connectToExistingRM();
     }
 }

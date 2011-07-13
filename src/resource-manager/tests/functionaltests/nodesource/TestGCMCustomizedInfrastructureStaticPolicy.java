@@ -65,20 +65,22 @@ public class TestGCMCustomizedInfrastructureStaticPolicy extends TestGCMInfrastr
     @Override
     protected void init() throws Exception {
         // overriding gcma file
-        RMTHelper.getResourceManager(RMTHelper.class.getResource(
-                "/functionaltests/config/functionalTRMPropertiesForCustomisedIM.ini").getPath());
+        RMTHelper.getResourceManager(new File(RMTHelper.class.getResource(
+                "/functionaltests/config/functionalTRMPropertiesForCustomisedIM.ini").toURI())
+                .getAbsolutePath());
         // using localhost deployment for customized infrastructure
-        String oneNodeescriptor = RMTHelper.class.getResource("/functionaltests/nodesource/1node.xml")
-                .getPath();
+        String oneNodeescriptor = new File(RMTHelper.class.getResource(
+                "/functionaltests/nodesource/1node.xml").toURI()).getAbsolutePath();
         GCMDeploymentData = FileToBytesConverter.convertFileToByteArray((new File(oneNodeescriptor)));
-        String hostListEmpty = RMTHelper.class.getResource("/functionaltests/nodesource/emptyhostlist")
-                .getPath();
-        String hostList = RMTHelper.class.getResource("/functionaltests/nodesource/hostslist").getPath();
+        String hostListEmpty = new File(RMTHelper.class.getResource(
+                "/functionaltests/nodesource/emptyhostlist").toURI()).getAbsolutePath();
+        String hostList = new File(RMTHelper.class.getResource("/functionaltests/nodesource/hostslist")
+                .toURI()).getAbsolutePath();
         hostsListData = FileToBytesConverter.convertFileToByteArray((new File(hostList)));
         emptyhostsListData = FileToBytesConverter.convertFileToByteArray((new File(hostListEmpty)));
 
-        String emptyNodeDescriptor = TestGCMInfrastructureTimeSlotPolicy.class.getResource(
-                "/functionaltests/nodesource/empty_gcmd.xml").getPath();
+        String emptyNodeDescriptor = new File(TestGCMInfrastructureTimeSlotPolicy.class.getResource(
+                "/functionaltests/nodesource/empty_gcmd.xml").toURI()).getAbsolutePath();
         emptyGCMD = FileToBytesConverter.convertFileToByteArray((new File(emptyNodeDescriptor)));
     }
 
