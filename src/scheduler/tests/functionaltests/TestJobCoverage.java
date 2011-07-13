@@ -112,7 +112,7 @@ public class TestJobCoverage extends FunctionalTest {
         //job submission
         SchedulerTHelper.log("Submitting job...");
         JobId id = SchedulerTHelper.submitJob(new File(jobDescriptor.toURI()).getAbsolutePath());
-       
+
         //waiting for job termination
         SchedulerTHelper.log("Waiting for job to finish...");
         jinfo = SchedulerTHelper.waitForEventJobFinished(id);
