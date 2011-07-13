@@ -37,6 +37,7 @@
 package functionaltests;
 
 import java.io.File;
+import java.net.URL;
 
 import javassist.ClassPool;
 import javassist.CtClass;
@@ -74,8 +75,8 @@ import functionalTests.FunctionalTest;
  */
 public class TestJobClasspath extends FunctionalTest {
 
-    private static String jobDescriptor = TestJobClasspath.class.getResource(
-            "/functionaltests/descriptors/Job_Test_CP.xml").getPath();
+    private static URL jobDescriptor = TestJobClasspath.class
+            .getResource("/functionaltests/descriptors/Job_Test_CP.xml");
     private static Integer firstValueToTest = 1;
     private static Integer SecondValueToTest = 2;
 
@@ -93,7 +94,7 @@ public class TestJobClasspath extends FunctionalTest {
         {
             SchedulerTHelper.log("Test 1 : Without classpath...");
 
-            JobId id = SchedulerTHelper.submitJob(jobDescriptor);
+            JobId id = SchedulerTHelper.submitJob(new File(jobDescriptor.toURI()).getAbsolutePath());
 
             //this task should be faulty
             TaskInfo tInfo = SchedulerTHelper.waitForEventTaskFinished(id, taskName);
@@ -112,7 +113,8 @@ public class TestJobClasspath extends FunctionalTest {
         {
             SchedulerTHelper.log("Test 2 : With classpath 1...");
             //job creation
-            Job submittedJob = JobFactory.getFactory().createJob(jobDescriptor);
+            Job submittedJob = JobFactory.getFactory().createJob(
+                    new File(jobDescriptor.toURI()).getAbsolutePath());
             JobEnvironment env = new JobEnvironment();
             env.setJobClasspath(new String[] { classPathes[0] });
             submittedJob.setEnvironment(env);
@@ -130,7 +132,8 @@ public class TestJobClasspath extends FunctionalTest {
         {
             SchedulerTHelper.log("Test 3 : With classpath 2...");
             //job creation
-            Job submittedJob = JobFactory.getFactory().createJob(jobDescriptor);
+            Job submittedJob = JobFactory.getFactory().createJob(
+                    new File(jobDescriptor.toURI()).getAbsolutePath());
             JobEnvironment env = new JobEnvironment();
             env.setJobClasspath(new String[] { classPathes[1] });
             submittedJob.setEnvironment(env);
