@@ -101,8 +101,9 @@ public class JarUtils extends ZipUtils {
     protected static void jarIt(ZipOutputStream zos, String[] directoriesAndFiles, CRC32 crc)
             throws IOException {
         for (String pathElement : directoriesAndFiles) {
-            pathElement = removeConsecutiveFileSeparator(pathElement);
             File fileElement = new File(pathElement);
+            //normalize path (also remove consecutive file separator)
+            pathElement = fileElement.getPath();
             if (fileElement.isFile()) {
                 // add zip files at the root of the global jar file !
                 int length = pathElement.lastIndexOf(File.separator);

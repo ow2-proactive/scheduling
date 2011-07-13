@@ -123,8 +123,9 @@ public class ZipUtils extends FileUtils {
     protected static void zipIt(ZipOutputStream zos, String[] directoriesAndFiles, CRC32 crc)
             throws IOException {
         for (String pathElement : directoriesAndFiles) {
-            pathElement = removeConsecutiveFileSeparator(pathElement);
             File fileElement = new File(pathElement);
+            //normalize path (also remove consecutive file separator)
+            pathElement = fileElement.getPath();
             int length = pathElement.lastIndexOf(File.separator) + 1;
             if (fileElement.isFile()) {
                 // add zip files at the root of the global jar file !
@@ -197,30 +198,6 @@ public class ZipUtils extends FileUtils {
             // TODO Other exceptions ?
             // Duplicate entry : ignore it.
         }
-    }
-
-    /**
-     * Remove consecutive occurrences of file separator character in s
-     * 
-     * @param s the string to parse.
-     * @return s without consecutive occurrences of file separator character
-     */
-    protected static String removeConsecutiveFileSeparator(String s) {
-        StringBuffer res = new StringBuffer();
-        boolean previousWasFileSep = false;
-        for (int i = 0; i < s.length(); i++) {
-            char c = s.charAt(i);
-            if (c == File.separatorChar) {
-                if (!previousWasFileSep) {
-                    res.append(c);
-                    previousWasFileSep = true;
-                }
-            } else {
-                previousWasFileSep = false;
-                res.append(c);
-            }
-        }
-        return res.toString();
     }
 
     /**
