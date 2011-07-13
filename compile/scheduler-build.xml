@@ -26,6 +26,7 @@
 			<classpath refid="scheduler.libs"/>
 			<classpath path="${cl.rm.dir}"/>
 			<include name="**/*.java"/>
+			<exclude name="**/ext/mapreduce/**/*.java"/>
 		</javac>
 
 		<javac
@@ -67,7 +68,23 @@
 		</stubGenerator>
 		
 	</target>
-	
+
+	<target name="compile.scheduler.mapreduce" depends="compile.scheduler" description="Compile Scheduler's MapReduce extension">
+
+		<javac
+			srcdir="${src.scheduler.dir}"
+			destdir="${cl.scheduler.dir}"
+			deprecation="on"
+			source="${source}"
+			debug="${debug}"  >
+
+			<classpath refid="scheduler.libs"/>
+			<classpath path="${cl.rm.dir}"/>
+			<include name="**/ext/mapreduce/**/*.java"/>
+		</javac>
+
+	</target>
+
     <!-- ************
 		Deploy
 	-->
@@ -110,7 +127,7 @@
 
 
 <!-- start of the ant target to create the ProActive_Scheduler-mapreduce.jar -->
-	<target name="deploy.scheduler.mapreduce" depends="-deployCopy, compile.scheduler, deploy.common.client" description="Creates scheduler mapreduce jar">
+	<target name="deploy.scheduler.mapreduce" depends="-deployCopy, compile.scheduler.mapreduce, deploy.common.client" description="Creates scheduler mapreduce jar">
 			<jar destfile="${deploy.lib.dir}/${scheduler.mapreduce.jar}" manifest="${basedir}/scheduler-Manifest-base.mf">
 				<fileset dir="${cl.scheduler.dir}" includes="org/ow2/proactive/scheduler/ext/mapreduce/**" excludes="org/ow2/proactive/scheduler/ext/mapreduce/examples/**" />
 				<fileset dir="${base.dir}/samples/jobs_descriptors/Workflow/mapreduce/" includes="replicateMapperPATask.js" />
