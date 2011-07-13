@@ -1715,8 +1715,8 @@ public class JobFactory_stax extends JobFactory {
                 logger.debug("name  : " + t.getName());
                 logger.debug("desc  : " + t.getDescription());
                 logger.debug("paral : " + t.isParallel());
-                logger.debug("node  : " + t.getParallelEnvironment() == null ? "1" : t
-                        .getParallelEnvironment().getNodesNumber());
+                logger.debug("node  : " +
+                    (t.getParallelEnvironment() == null ? "1" : t.getParallelEnvironment().getNodesNumber()));
                 logger.debug("cjoe  : " + t.isCancelJobOnError());
                 logger.debug("res   : " + t.isPreciousResult());
                 logger.debug("logs  : " + t.isPreciousLogs());

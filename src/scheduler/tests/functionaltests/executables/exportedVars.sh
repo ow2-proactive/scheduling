@@ -1,6 +1,6 @@
 #!/bin/sh
 
-echo User var 122 is $USER_VAR_1
+echo User var 1 is $USER_VAR_1
 if [[ $USER_VAR_1 != ".User Value 1." ]]
 then
 exit 1;

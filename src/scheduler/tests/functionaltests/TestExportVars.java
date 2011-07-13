@@ -41,8 +41,13 @@ import java.net.URL;
 import java.util.Map;
 
 import org.junit.Assert;
+import org.objectweb.proactive.utils.OperatingSystem;
+import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobResult;
+import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
+import org.ow2.proactive.scheduler.common.job.factories.JobFactory_stax;
+import org.ow2.proactive.scheduler.common.task.NativeTask;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 
 import functionalTests.FunctionalTest;
@@ -60,7 +65,19 @@ public class TestExportVars extends FunctionalTest {
      */
     @org.junit.Test
     public void run() throws Throwable {
-        JobId id = SchedulerTHelper.submitJob(new File(jobDescriptor.toURI()).getAbsolutePath());
+        TaskFlowJob job = (TaskFlowJob) JobFactory_stax.getFactory().createJob(
+                new File(jobDescriptor.toURI()).getAbsolutePath());
+        if (OperatingSystem.getOperatingSystem().name().equals("windows")) {
+            ((NativeTask) job.getTask("task2")).setCommandLine("cmd", "/C", "date", "/t");
+            String[] pathTable = ((NativeTask) job.getTask("task5")).getCommandLine();
+            String path = "";
+            for (String peace : pathTable) {
+                path += peace + " ";
+            }
+            path = path.substring(0, path.length() - 4) + ".bat";
+            ((NativeTask) job.getTask("task5")).setCommandLine(path);
+        }
+        JobId id = SchedulerTHelper.submitJob(job);
         SchedulerTHelper.waitForEventJobFinished(id);
         JobResult res = SchedulerTHelper.getJobResult(id);
 
