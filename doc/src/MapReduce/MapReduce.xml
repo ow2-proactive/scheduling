@@ -5,1106 +5,1227 @@
         <title>ProActive MapReduce</title>
     </info>
 
-      <section xml:id="MapReduce_Introduction">
+    <section xml:id="MapReduce_Introduction">
         <info>
             <title>Introduction to MapReduce</title>
         </info>
 
         <para>
-            MapReduce is a kind of parallel programming model that derives from the map and reduce combinators
-            present in functional languages like Lisp. In Lisp, the map takes as input a function and a sequence of values.
-            It then applies the function to each value in the sequence. The reduce combines all the elements of a sequence
-            using a binary operation. For example, it can use a function that implements the sum function to add up all the
-            elements in the sequence. MapReduce is inspired by these concepts.
+            MapReduce is a parallel programming model that derives from the <emphasis>map</emphasis>
+            and <emphasis>reduce</emphasis> combinators present in functional languages like
+            Lisp. In Lisp, the <emphasis>map</emphasis> takes as input a function and a sequence of
+            values.  It then applies the function to each value in the sequence. The
+            <emphasis>reduce</emphasis> combines all the elements of a sequence using a binary
+            operation. For example, it can use the sum function to add up all the elements in a
+            sequence. MapReduce is inspired by these concepts.
         </para>
         <para>
-		MapReduce was firstly introduced by <trademark class="registered">Google</trademark> that aims for processing large amounts of raw data, for example, crawled
-		documents or web request logs using clusters of commodity hardware. The data to elaborate are so large, they must
-		be distributed across thousands of machines in order to be processed in a reasonable time. The distribution implies
-		parallel computing since the same computations are performed on each CPU, but with a different dataset.
+            MapReduce was first introduced by <trademark class="registered">Google</trademark> as a
+            framework for processing large amounts of raw data, for example, web pages collected by
+            a web crawler or web request logs, using clusters of commodity hardware. The amount of
+            data is so large that it must be distributed across thousands of machines in order to be
+            processed in a reasonable time. The distribution implies parallel computing since the
+            same computations are performed on each CPU, but with a different dataset.
         </para>
         <para>
-		MapReduce is an abstraction that allows Google engineers to perform simple computations while hiding the details
-		of parallelization, data distribution, load balancing and fault tolerance. In fact, MapReduce programs are
-		automatically parallelized and executed on a large cluster of commodity machines. The run-time system takes care
-		of the details of splitting the input data, scheduling the program’s execution across the set of machines, handling
-		machines failures and managing the required inter-machine communication. This allows programmers without any
-		experience in parallel and distributed systems to easily utilize the resources of a large distributed system.
-		The only requirements are: the programmer assure that the application he wants parallelize is data parallel
-		and he must define two functions: <emphasis>map</emphasis> and <emphasis>reduce</emphasis>. Each function has
-		key-value pairs as input and output. The type of the key and/or value can be defined by the user. Input data can
-		be in any format as far as they can be loaded into key-value pairs by a user defined function. The map function
-		takes the input key-value pairs and produces a bag of intermediate key-value pairs. The MapReduce library groups
-			together all intermediate values associated with the same intermediate key and passes them to the reduce function.
-			The reduce function, also written by the programmer, accepts an intermediate key and the bag of values for that
-			key and it merges together the values sharing the same key.
-		</para>
-		<para>
-			The <xref linkend="google_mapreduce_execution"/> shows the execution of the Google MapReduce application.
-		</para>
-
-		<figure xml:id="google_mapreduce_execution">
-			<info>
-				<title><trademark class="registered">Hadoop</trademark> MapReduce execution</title>
-			</info>
-			<mediaobject>
-				<imageobject>
-					<imagedata scalefit="1" width="55%" contentdepth="55%"
-						fileref="images/png/google_mapreduce_2374_1572.png" format="PNG" />
-				</imageobject>
-			</mediaobject>
-		</figure>
-
-		<para>
-			The user must notice that the reduce phase can begin only after all the map tasks are done and intermediate files
-			are produced. However, this is the only needed synchronization point and the only inter-process communication.
+            MapReduce is an abstraction that allows Google engineers to perform simple computations
+            while hiding the details of parallelization, data distribution, load balancing and fault
+            tolerance. MapReduce programs are automatically distributed and executed on a large
+            cluster of commodity machines. The run-time system takes care of the details of
+            splitting the input data, scheduling the program execution across the set of machines,
+            handling machine failures and managing the required inter-machine communication. This
+            allows programmers without any experience in parallel and distributed systems to easily
+            utilize the resources of a large distributed system.  The only requirement is that the
+            application should be data parallel in nature.  To utilize the MapReduce framework, a
+            programmer must define 2 functions: <emphasis>map</emphasis> and
+            <emphasis>reduce</emphasis>. Each function has key-value pairs as its input and
+            output. The type of the key and value can be defined by the user. Input data can be in
+            any format as long as it can be loaded into key-value pairs by a user defined
+            function. The map function takes the input key-value pairs and produces a bag of
+            intermediate key-value pairs. The MapReduce library groups together all intermediate
+            values associated with the same intermediate key and passes them to the reduce function.
+            The reduce function, also written by the programmer, accepts an intermediate key and the
+            list of values for that key and processes the values sharing the same key.
         </para>
-		<para>
-			The most important features of the MapReduce parallel programming model are: fault tolerance and data locality.
-			The target architecture of the Google MapReduce is a cluster of thousand of commodity machines (e.g., 2-4 GB of
-			main memory while networking hardware bandwith is 100 megabits/second). This means machine failures are common,
-			re-execution of map and/or reduce tasks is the primary mechanism for fault tolerance.
-			The data to elaborate that are stored on the disks are managed by a distributed file system, <trademark class="registered">GFS</trademark> (Google File System),
-			that uses replication to provide availability and reliability on top of unreliable hardware. Moreover, the bandwidth
-			is conserved because GFS file blocks are stored on the local disks of the machines that make up the Google cluster.
-			The elaboration is data local because each user defined map function elaborates the data replica stored on the
-			same machine it executes on (or the map function elaborates the data replica stored on the nearest machine).
-		</para>
-		<para>
-			Google MapReduce is a C++ library, but some Java and open source implementation also exist: <trademark class="registered">Apache</trademark> Hadoop MapReduce.
-			Hadoop MapReduce follows the same approach taken by Google, so that the system takes in charge the communication
-			between the machines. The user must only implement the <emphasis>map</emphasis> and <emphasis>reduce</emphasis>
-			functions and run the job specifying the input data and the output directory where he expects to find results.
-			Moreover, Hadoop uses a distributed file system, <trademark class="registered">HDFS</trademark> (Hadoop Distributed File System), like Google.
-		</para>
-		<para>
-			The architecture and the execution of Hadoop MapReduce job is presented in the <xref linkend="hadoop_mapreduce_execution"/>.
-		</para>
+        <para>
+            The <xref linkend="google_mapreduce_execution"/> shows the execution of the Google
+            MapReduce application.
+        </para>
 
-		<figure xml:id="hadoop_mapreduce_execution">
-			<info>
-				<title>Hadoop MapReduce execution</title>
-			</info>
-			<mediaobject>
-				<imageobject>
-					<imagedata scalefit="1" width="55%" contentdepth="55%"
-						fileref="images/png/hadoop_run_mapreduce_1957_1426.png" format="PNG" />
-				</imageobject>
-			</mediaobject>
-		</figure>
+        <figure xml:id="google_mapreduce_execution">
+            <info>
+                <title><trademark class="registered">Hadoop</trademark> MapReduce execution</title>
+            </info>
+            <mediaobject>
+                <imageobject>
+                    <imagedata scalefit="1" width="55%" contentdepth="55%"
+                               fileref="images/png/google_mapreduce_2374_1572.png" format="PNG" />
+                </imageobject>
+            </mediaobject>
+        </figure>
 
-		<para>
-			At the highest level there are four independent entities:
-		</para>
-		<itemizedlist>
-			<listitem>
-				<para>
-					The <emphasis>client</emphasis> which submits the MapReduce job;
-				</para>
-			</listitem>
-			<listitem>
-				<para>
-					The <emphasis>jobTracker</emphasis>, a Java daemon running on a particular Hadoop cluster node. It coordinates
-					the job execution;
-				</para>
-			</listitem>
-			<listitem>
-				<para>
-					The <emphasis>taskTracker</emphasis>, a java daemon running on each Hadoop cluster node. It runs the tasks
-					(map and/or reduce) the MapReduce job is composed of;
-				</para>
-			</listitem>
-			<listitem>
-				<para>
-					The shared file system, usually <emphasis>HDFS</emphasis> (Hadoop Distributed File System) which is used for sharing
-					job files between jobtracker and taskTracker entities.
-				</para>
-			</listitem>
-		</itemizedlist>
-		<para>
-			The architecture shown in the  <xref linkend="hadoop_mapreduce_execution"/> is quite similar to the one used by the ProActive
-			Scheduler to execute ProActive workflows: the job is submitted to the ProActive Scheduler, the ProActive Scheduler and the
-			ProActive Resource Manager coordinate the execution of the ProActive workflow, the ProActive node runs the tasks belonging to
-			the ProActive workflow. A difference remains: in ProActive does not use distributed file system (i.e., HDFS used by Hadoop MapReduce).
-			We implemented the ProActive MapReduce Hadoop-like API that allows the user to execute the Hadoop MapReduce job using the
-			ProActive Scheduler - ProActive Resource Manager architecture.
-		</para>
-	</section>
+        <para>
+            Notice that the reduce phase can begin only after all the map tasks are done and
+            intermediate files are produced. However, this is the only needed synchronization point
+            and the only inter-process communication.
+        </para>
+        <para>
+            The most important features of the MapReduce parallel programming model are: fault
+            tolerance and data locality.  The target architecture of the Google MapReduce is a
+            cluster of thousands of commodity machines (e.g., 2-4 GB of main memory while networking
+            hardware bandwidth is 100 Mbit/s). This means that machine failures are common and
+            re-execution of map and/or reduce tasks is the primary mechanism for fault tolerance.
+            The data to process that is stored on the disks is managed by a distributed file system,
+            <trademark class="registered">GFS</trademark> (Google File System), that uses
+            replication to provide availability and reliability on top of unreliable
+            hardware. Moreover, the bandwidth is conserved because GFS file blocks are stored on the
+            local disks of the machines that make up the Google cluster.  The processing is data
+            local because each user defined map function reads the data from the replica stored
+            locally on the same machine.
+        </para>
+        <para>
+            Google MapReduce is a C++ library, but an open source implementation in Java also
+            exists: <trademark class="registered">Apache</trademark> Hadoop MapReduce.  Hadoop
+            MapReduce follows the same approach taken by Google: the system is in charge of the
+            communication between machines. The user must only implement the
+            <emphasis>map</emphasis> and <emphasis>reduce</emphasis> functions and run the job
+            specifying the input data and the output directory for the results.  Like Google, Hadoop
+            uses its own distributed file system, <trademark class="registered">HDFS</trademark>
+            (Hadoop Distributed File System).
+        </para>
+        <para>
+            The architecture and the execution of Hadoop MapReduce job is presented in the <xref
+            linkend="hadoop_mapreduce_execution"/>.
+        </para>
 
-	<section>
-		<info>
-			<title>ProActive MapReduce</title>
-		</info>
-		<para>
-			The ProActive MapReduce is an <emphasis>Hadoop-like</emphasis>. That means
-			the user can define the ProActive MapReduce workflow as in Hadoop  but, internally, the ProActive MapReduce builds a ProActive job.
-			To do that the ProActive MapReduce requires the user specifies additional configuration parameters. Moreover, considering that
-			"$SCHEDULER_HOME" represents the home (or root) folder of the deployed ProActive Scheduler, the user must add the following jars
-			to the classpath of the ProActive MapReduce job.
-		</para>
-		<itemizedlist>
-			<listitem>
-				<para>
-					$SCHEDULER_HOME/lib/bouncycastle.jar
-				</para>
-			</listitem>
-			<listitem>
-				<para>
-					$SCHEDULER_HOME/lib/commons-codec-1.3.jar
-				</para>
-			</listitem>
-			<listitem>
-				<para>
-					$SCHEDULER_HOME/lib/commons-logging-1.1.1.jar
-				</para>
-			</listitem>
-			<listitem>
-				<para>
-					$SCHEDULER_HOME/lib/hadoop/hadoop-0.20.2-core.jar
-				</para>
-			</listitem>
-			<listitem>
-				<para>
-					$SCHEDULER_HOME/lib/http-2.0.4.jar
-				</para>
-			</listitem>
-			<listitem>
-				<para>
-					$SCHEDULER_HOME/lib/javassist.jar
-				</para>
-			</listitem>
-			<listitem>
-				<para>
-					$SCHEDULER_HOME/lib/common/script/js.jar
-				</para>
-			</listitem>
-			<listitem>
-				<para>
-					$SCHEDULER_HOME/lib/log4j.jar
-				</para>
-			</listitem>
-			<listitem>
-				<para>
-					$SCHEDULER_HOME/lib/netty-3.2.0.ALPHA2.jar
-				</para>
-			</listitem>
-			<listitem>
-				<para>
-					$SCHEDULER_HOME/dist/lib/ProActive_ResourceManager.jar
-				</para>
-			</listitem>
-			<listitem>
-				<para>
-					$SCHEDULER_HOME/dist/lib/ProActive_ResourceManager-client.jar
-				</para>
-			</listitem>
-			<listitem>
-				<para>
-					$SCHEDULER_HOME/dist/lib/ProActive_Scheduler-client.jar
-				</para>
-			</listitem>
-			<listitem>
-				<para>
-					$SCHEDULER_HOME/dist/lib/ProActive_Scheduler-core.jar
-				</para>
-			</listitem>
-			<listitem>
-				<para>
-					$SCHEDULER_HOME/dist/lib/ProActive_Scheduler-fsm.jar
-				</para>
-			</listitem>
-			<listitem>
-				<para>
-					$SCHEDULER_HOME/dist/lib/ProActive_Scheduler-mapreduce.jar
-				</para>
-			</listitem>
-			<listitem>
-				<para>
-					$SCHEDULER_HOME/dist/lib/ProActive_Scheduler-worker.jar
-				</para>
-			</listitem>
-			<listitem>
-				<para>
-					$SCHEDULER_HOME/dist/lib/ProActive_SRM-common.jar
-				</para>
-			</listitem>
-			<listitem>
-				<para>
-					$SCHEDULER_HOME/dist/lib/ProActive_SRM-common-client.jar
-				</para>
-			</listitem>
-			<listitem>
-				<para>
-					$SCHEDULER_HOME/dist/lib/ProActive_utils.jar
-				</para>
-			</listitem>
-			<listitem>
-				<para>
-					$SCHEDULER_HOME/dist/lib/ProActive.jar
-				</para>
-			</listitem>
-			<listitem>
-				<para>
-					$SCHEDULER_HOME/lib/script-js.jar
-				</para>
-			</listitem>
-		</itemizedlist>
-		<para>
-			To build the ProActive MapReduce job the user must specify the Hadoop MapReduce job and the additional configuration parameters
-			as an instance of the <emphasis>org.ow2.proactive.scheduler.ext.mapreduce.PAMapReduceJobConfiguration</emphasis> class. In this
-			way the ProActive MapReduce job can be built as follow:
-		</para>
-		<programlisting language="java">
-			import org.apache.hadoop.conf.Configuration;
-			import org.apache.hadoop.mapreduce.Job;
-			import org.ow2.proactive.scheduler.ext.mapreduce.PAMapReduceJob;
-			import org.ow2.proactive.scheduler.ext.mapreduce.PAMapReduceJobConfiguration;
+        <figure xml:id="hadoop_mapreduce_execution">
+            <info>
+                <title>Hadoop MapReduce execution</title>
+            </info>
+            <mediaobject>
+                <imageobject>
+                    <imagedata scalefit="1" width="55%" contentdepth="55%"
+                               fileref="images/png/hadoop_run_mapreduce_1957_1426.png" format="PNG" />
+                </imageobject>
+            </mediaobject>
+        </figure>
 
-			...
+        <para>
+            At the highest level there are four independent entities:
+        </para>
+        <itemizedlist>
+            <listitem>
+                <para>
+                    The <emphasis>client</emphasis> which submits the MapReduce job;
+                </para>
+            </listitem>
+            <listitem>
+                <para>
+                    The <emphasis>JobTracker</emphasis>, a Java daemon running on a particular
+                    Hadoop cluster node. It coordinates the job execution;
+                </para>
+            </listitem>
+            <listitem>
+                <para>
+                    The <emphasis>TaskTracker</emphasis>, a java daemon running on each Hadoop
+                    cluster node. It runs the tasks (map and/or reduce) the MapReduce job is
+                    composed of;
+                </para>
+            </listitem>
+            <listitem>
+                <para>
+                    The shared file system, usually <emphasis>HDFS</emphasis> (Hadoop Distributed
+                    File System) which is used to store input and output files.
+                </para>
+            </listitem>
+        </itemizedlist>
+        <para>
+            The architecture shown in the <xref linkend="hadoop_mapreduce_execution"/> is quite
+            similar to the one used by the ProActive Scheduler to execute ProActive workflows: the
+            job is submitted to the ProActive Scheduler, the ProActive Scheduler and the ProActive
+            Resource Manager coordinate the execution of the ProActive workflow, the ProActive node
+            runs the tasks belonging to the ProActive workflow. This similarity made the
+            implementation of ProActive MapReduce possible.
+        </para>
+        <section>
+            <info><title>ProActive MapReduce</title></info>
+            <para>
+                ProActive MapReduce is a framework for execution of MapReduce jobs using the
+                infrastructure provided by ProActive Scheduler and ProActive Resource Manager. The
+                scheduler and resource manager provide fault tolerance, easy deployment and advanced
+                scheduling capabilities not found in Hadoop. There is no distributed file system in
+                ProActive though, so the <emphasis>DataSpaces</emphasis> mechanism is used for
+                accessing input and writing output data.
+            </para>
+            <para>
+                ProActive MapReduce API is <emphasis>Hadoop-like</emphasis>. The user can define the
+                ProActive MapReduce workflow as in Hadoop, but, internally, the ProActive MapReduce
+                builds a ProActive job and submits it to ProActive Scheduler. Adapting existing
+                Hadoop jobs to execute them using ProActive MapReduce framework is easy. No changes
+                are required to the Mapper and Reducer classes; and only minimal amount of
+                additional configuration is needed.
+            </para>
+        </section>
+    </section>
 
-			Job job = new Job( new Configuration(), "WordCount");
-			job.setMapperClass( ... );
-			...
+    <section xml:id="proactive_mapreduce_tutorial">
+        <info><title>Tutorial: running Hadoop job using ProActive MapReduce</title></info>
+        <para>
+            This tutorial describes the steps necessary to port existing Hadoop job to Proactive
+            MapReduce.
+        </para>
+        <section>
+            <info><title>Hadoop example</title></info>
+            <para>
+                Let's start with a working Hadoop example (taken from <link
+                xlink:href="http://wiki.apache.org/hadoop/WordCount">Hadoop wiki</link>):
+            </para>
+            <programlisting language="java">import java.io.*;
+import java.util.*;
 
-			FileInputFormat.addInputPath( job, new Path( "path/to/input/fileOrFolder" ) );
-			FileOutputFormat.setOutputPath(job, new Path( "path/to/output/folder" ));
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.conf.*;
+import org.apache.hadoop.io.*;
+import org.apache.hadoop.mapreduce.*;
+import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
+import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
+import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 
-			...
+public class WordCount {
 
-			PAMapReduceJobConfiguration pamrjc = null;
-			File paMapReduceJobConfigurationFile = new File( "path/to/configuration/file" );
-			pamrjc = new PAMapReduceJobConfiguration( paMapReduceJobConfigurationFile );
+ public static class Map extends Mapper&lt;LongWritable, Text, Text, IntWritable&gt; {
+    private final static IntWritable one = new IntWritable(1);
+    private Text word = new Text();
 
-			// We build the ProActive MapReduce job
-			PAMapReduceJob pamrj = new PAMapReduceJob( hadoopJob, pamrjc );
+    public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
+        String line = value.toString();
+        StringTokenizer tokenizer = new StringTokenizer(line);
+        while (tokenizer.hasMoreTokens()) {
+            word.set(tokenizer.nextToken());
+            context.write(word, one);
+        }
+    }
+ }
 
-			// We run the ProActive MapReduce Job
-			if ( pamrj != null ) {
-				if ( pamrj.run() ) {
-					System.out.println( "The ProActive MapReduce job is correctly submitted!" );
-				} else {
-					System.out.println( "The ProActive MapReduce job is NOT submitted." );
-				}
-			}
-		</programlisting>
-		<para>
-			In the previous code statement the PAMapReduceJobConfiguration instance is created from a configuration file (actually a property file).
-			Then the ProActive MapReduce job (the instance of the PAMapReduceJob class) is created using the Hadoop MapReduce job and the additional
-			configuration, PAMapReduceJobConfiguration, as parameters.
-		</para>
-		<para>
-			The ProActive MapReduce, when the user creates the ProActive MapReduce job and before that job is submitted to the ProActive
-			Scheduler, internally builds a ProActive workflow made up of five tasks as the <xref linkend="proactive_mapreduce_workflow"/> shows:
-			<emphasis>SplitterPATask</emphasis>, <emphasis>MapperPATask</emphasis>, <emphasis>MapperJoinPATask</emphasis>, <emphasis>ReducerPATask</emphasis>
-			and <emphasis>ReducerJoinPATask</emphasis>. The execution order of those tasks and their behavior is the following:  the
-			<emphasis>SplitterPATask</emphasis> creates the input splits from the input file. Each <emphasis>MapperPATask</emphasis> elaborates one and
-			only one input split. This means that a replication occurs for the MapperPATask and that the replication factor is equal to the number of
-			created input splits. The <emphasis> MapperJoinPATask</emphasis> implements the join of the execution of the MapperPATask replicas. This means
-			that the <emphasis>ReducerPATask </emphasis> starts its execution only after the MapperJoinPATask (and so all the MapperPATask replicas) ends.
-			The ReducerPATask is replicated too. The number of replicas of the ReducerPATask is defined by the user. If the user does not define it, only
-			one ReducerPATask is executed. The last executed task is the <emphasis>ReducerJoinPATask</emphasis> that implements the join of the ReducerPATask
-			replicas.
-		</para>
+ public static class Reduce extends Reducer&lt;Text, IntWritable, Text, IntWritable&gt; {
 
-		<figure xml:id="proactive_mapreduce_workflow">
-			<info>
-				<title>ProActive MapReduce workflow</title>
-			</info>
-			<mediaobject>
-				<imageobject>
-					<imagedata scalefit="1" width="55%" contentdepth="55%"
-						fileref="images/png/proactive_mapreduce_workflow_1673_1825.png" format="PNG" />
-				</imageobject>
-			</mediaobject>
-		</figure>
+    public void reduce(Text key, Iterable&lt;IntWritable&gt; values, Context context)
+      throws IOException, InterruptedException {
+        int sum = 0;
+        for (IntWritable val : values) {
+            sum += val.get();
+        }
+        context.write(key, new IntWritable(sum));
+    }
+ }
 
-		<section xml:id="proactive_mapreduce_configuration">
-			<title>ProActive MapReduce configuration</title>
-			<para>
-				The ProActive MapReduce job is actually a ProActive workflow. That means the additional configuration parameters the user must specify
-				are directly related to the ProActive workflow and to the tasks belonging to it. E.g., the user must specify the "cancelJobOnError" attribute
-				of a task, the input files of a task etc... . Moreover, there are also some parameters the user must specify to overcome the existing
-				differences between the Hadoop and ProActive MapReduce Hadoop-like APIs.
-			</para>
-			<para>
-				The user must notice that the ProActive MapReduce Hadoop-like API defines default values for many of the parameters he can specify
-				(e.g., most of the ProActive task attributes have the corresponding default value), while the user is forced to define explicitly some
-				other parameters (e.g., above all the input space and the output space of the ProActive MapReduce workflow).
-			</para>
-			<para>
-				The ProActive MapReduce requires that the user specifies the following parameters:
-			</para>
-			<itemizedlist>
-				<listitem>
-					<para>
-						<emphasis>org.ow2.proactive.scheduler.ext.mapreduce.schedulerUrl</emphasis>: the URL of the ProActive Scheduler;
-					</para>
-				</listitem>
-				<listitem>
-					<para>
-						<emphasis>org.ow2.proactive.scheduler.ext.mapreduce.username</emphasis>: the username to use to establish the connection to the
-							ProActive Scheduler;
-					</para>
-				</listitem>
-				<listitem>
-					<para>
-						<emphasis>org.ow2.proactive.scheduler.ext.mapreduce.password</emphasis>: the password to use to establish the connection to the
-							ProActive Scheduler;
-					</para>
-				</listitem>
-				<listitem>
-					<para>
-						<emphasis>org.ow2.proactive.scheduler.ext.mapreduce.workflow.inputSpace</emphasis>: the INPUT space of the job. The user must
-							notice that the input files are in the root of that specified INPUT space or in a sub-folder of it.
-					</para>
-				</listitem>
-				<listitem>
-					<para>
-						<emphasis>org.ow2.proactive.scheduler.ext.mapreduce.workflow.outputSpace</emphasis>: the OUTPUT space of the job. The user
-							must notice that the output files will be stored in a sub-folder of the OUTPUT space and that they cannot be stored
-							in the root of the OUTPUT space.
-					</para>
-				</listitem>
-			</itemizedlist>
-			<para>
-				All the other configuration parameters are optional as the ProActive MapReduce provides default values for them. Those
-				parameters are the following:
-			</para>
-			<itemizedlist>
-				<listitem>
-					<para>
-						<emphasis>org.ow2.proactive.scheduler.ext.mapreduce.workflow.cancelJobOnError</emphasis>: the "cancelJobOnError" attribute of
-						the ProActive MapReduce workflow;
-					</para>
-				</listitem>
-				<listitem>
-					<para>
-						<emphasis>org.ow2.proactive.scheduler.ext.mapreduce.workflow.classpath</emphasis>: the classpath of the ProActive MapReduce
-							workflow. This classpath contains the user implementations of the Hadoop Mapper, Reducer, InputFormat etc...;
-					</para>
-				</listitem>
-				<listitem>
-					<para>
-						<emphasis>org.ow2.proactive.scheduler.ext.mapreduce.workflow.description</emphasis>: the "description" attribute of the
-							ProActive MapReduce workflow;
-					</para>
-				</listitem>
-				<listitem>
-					<para>
-						<emphasis>org.ow2.proactive.scheduler.ext.mapreduce.workflow.logFilePath</emphasis>: the path to the file into which the
-							log messages produced during the execution of the ProActive MapReduce workflow must be stored;
-					</para>
-				</listitem>
+ public static void main(String[] args) throws Exception {
 
-				<listitem>
-					<para>
-						<emphasis>org.ow2.proactive.scheduler.ext.mapreduce.workflow.maxNumberOfExecutions</emphasis>: the "maxNumberOfExecutions"
-							attribute of the ProActive MapReduce workflow;
-					</para>
-				</listitem>
-				<listitem>
-					<para>
-						<emphasis>org.ow2.proactive.scheduler.ext.mapreduce.workflow.projectName</emphasis>: the "projectName" attribute of the
-							ProActive MapReduce workflow;
-					</para>
-				</listitem>
-				<listitem>
-					<para>
-						<emphasis>org.ow2.proactive.scheduler.ext.mapreduce.workflow.restartTaskOnError</emphasis>: the "restartTaskOnError"
-							attribute of the ProActive MapReduce workflow;
-					</para>
-				</listitem>
-			</itemizedlist>
-			<para>
-				The tasks specific attributes are optional too:
-			</para>
-			<itemizedlist>
-				<listitem>
-					<para>
-						<emphasis>org.ow2.proactive.scheduler.ext.mapreduce.workflow.[splitter|mapper|mapperJoin|reducer|reducerJoin]PATask.cancelJobOnError</emphasis>:
-							the "cancelJobOnError" attribute for the corresponding task;
-					</para>
-				</listitem>
-				<listitem>
-					<para>
-						<emphasis>org.ow2.proactive.scheduler.ext.mapreduce.workflow.[splitter|mapper|mapperJoin|reducer|reducerJoin]PATask.description</emphasis>:
-							the "description" attribute for the corresponding task;
-					</para>
-				</listitem>
-				<listitem>
-					<para>
-						<emphasis>org.ow2.proactive.scheduler.ext.mapreduce.workflow.[splitter|mapper|mapperJoin|reducer|reducerJoin]PATask.maxNumberOfExecutions</emphasis>:
-							the "maxNumberOfExecutions" attribute for the corresponding task;
-					</para>
-				</listitem>
-				<listitem>
-					<para>
-						<emphasis>org.ow2.proactive.scheduler.ext.mapreduce.workflow.[splitter|mapper|mapperJoin|reducer|reducerJoin]PATask.name</emphasis>:
-							the "name" attribute for the corresponding task;
-					</para>
-				</listitem>
-				<listitem>
-					<para>
-						<emphasis>org.ow2.proactive.scheduler.ext.mapreduce.workflow.[splitter|mapper|mapperJoin|reducer|reducerJoin]PATask.restartTaskOnError</emphasis>:
-							the "restartTaskOnError" attribute for the corresponding task.
-					</para>
-				</listitem>
-			</itemizedlist>
-			<para>
-				Some other attributes are also optional but they are very important:
-			</para>
-			<itemizedlist>
-				<listitem>
-					<para>
-						<emphasis>org.ow2.proactive.scheduler.ext.mapreduce.workflow.splitterPATask.inputSplitSize</emphasis>: it defines the size, in bytes,
-							of the input split (fragment of the input data)  each mapper must elaborate. This configuration parameter is optional but
-							no default value is defined by the ProActive MapReduce. When the user does not specify
-							the size of the input split then the default value is given by the user implemented (or used) Hadoop InputFormat. This
-							means that the ProActive MapReduce uses the user specified Hadoop InputFormat class to create input splits
-							and that the size of those input split is equal to a default value computed by the user specified Hadoop InputFormat class.
-							We must also notice that when the user defines a value of 0 (zero) bytes for the size of the input split, then input splits
-							with a size equal to the minimum possible value forecast by the Hadoop InputFormat class used are created. While when the user
-							defines a size greater than the size of the input file then only one input split is created and the size of that input split
-							is equal to the size of the input file.
-					</para>
-				</listitem>
-				<listitem>
-					<para>
-						<emphasis>org.ow2.proactive.scheduler.ext.mapreduce.workflow.splitterPATask.readMode</emphasis>: it defines the read mode of the
-						SplitterPATask. The two possible values are: "fullLocalRead" and "remoteRead". The former means that the input file is transferred
-						on the node the SplitterPATask executes on before input splits are created. The latter means that the input file is
-						left out into the ProActive MapReduce workflow INPUT space so that data used to create input splits are read directly from
-						the ProActive MapReduce workflow INPUT space. The default value is "remoteRead";
-					</para>
-				</listitem>
-				<listitem>
-					<para>
-						<emphasis>org.ow2.proactive.scheduler.ext.mapreduce.workflow.mapperPATask.readMode</emphasis>: it defines the read mode of the
-						MapperPATask. There are three possible values:
-					</para>
-					<itemizedlist>
-						<listitem>
-							<para>
-								<emphasis>fullLocalRead</emphasis>: the input file of the ProActive MapReduce workflow is transferred entirely on the
-									node the MapperPATask executes on and then the MapperPATask reads from it and elaborate only the data of its own
-									input split;
-							</para>
-						</listitem>
-						<listitem>
-							<para>
-								<emphasis>partialLocalRead</emphasis>: only the data the MapperPATask must elaborate are copied from the input file
-									and transferred on the node the MapperPATask executes on;
-							</para>
-						</listitem>
-						<listitem>
-							<para>
-								<emphasis>remoteRead</emphasis>: the data the MappperPATask must elaborate are read, remotely, from the input file that
-									is left out into the ProActive MapReduce workflow INPUT space.
-							</para>
-						</listitem>
-					</itemizedlist>
-					<para>
-						The default value is "remoteRead" but if the input file is not randomly accessible then "partialLocalRead" is used.
-					</para>
-				</listitem>
-				<listitem>
-					<para>
-						<emphasis>org.ow2.proactive.scheduler.ext.mapreduce.workflow.mapperPATask.writeMode</emphasis>: it defines the write mode of the
-						MapperPATask. The two possible values are: "localWrite" and "remoteWrite". The former implies that the output data of the
-						MapperPATask are first stored on the node it executes on and then the ProActive DataSpaces mechanism transfers them to the
-						user defined OUTPUT space. While the latter indicates that the output data are stored directly in the user defined OUTPUT
-						space. The default value is "localWrite";
-					</para>
-				</listitem>
-				<listitem>
-					<para>
-						<emphasis>org.ow2.proactive.scheduler.ext.mapreduce.workflow.reducerPATask.outputFileNamePrefix</emphasis>: it defines the prefix the
-						ProActive MapReduce framework/API must use to build the name of the output file. The number of output files of the ProActive
-						MapReduce job is equal to the number of executed ReducerPATask and each file has a name compliant to the following format:
-						&lt;outputFileNamePrefix&gt;_&lt;reducerPATaskId&gt;;
-					</para>
-				</listitem>
-				<listitem>
-					<para>
-						<emphasis>org.ow2.proactive.scheduler.ext.mapreduce.workflow.reducerPATask.readMode</emphasis>: it defines the read mode of the
-						ReducerPATask. The two possible values are: "fullLocalRead" and "remoteRead". The first means that the intermediate data (the
-						MapperPATask output data) are transferred from the OUTPUT space to the node the ReducerPATask will execute on while "remoteRead"
-						means that the intermediate data are left in the OUTPUT space so that they are read remotely by the ReducerPATask. The default
-						value is "remoteRead";
-					</para>
-				</listitem>
-				<listitem>
-					<para>
-						<emphasis>org.ow2.proactive.scheduler.ext.mapreduce.workflow.reducerPATask.writeMode</emphasis>: it defines the write mode of the
-						ReducerPATask. The two possible values are: "localWrite" and "remoteWrite". The former implies that the output data of the
-						ReducerPATask are first stored on the node it executed on and then the ProActive DataSpaces mechanism transfers them to the
-						user defined OUTPUT space. While the latter indicates that the output data are stored directly in the user defined OUTPUT
-						space. The default value is "localWrite".
-					</para>
-				</listitem>
-			</itemizedlist>
-			<para>
-				Lastly, the user has to notice that, in addition to specify the additional configuration parameters to build the ProActive MapReduce job
-				using a property file, he can also specify those parameters using the methods of the PAMapReduceJobConfiguration class.
-			</para>
-		</section>
+    // 1. instantiate Configuration and Job classes
+    Configuration conf = new Configuration();
+    Job job = new Job(conf, "wordcount");
 
-	</section>
+    // 2. set the types of output keys and values produced by reducer
+    job.setOutputKeyClass(Text.class);
+    job.setOutputValueClass(IntWritable.class);
 
-	<section>
-		<info>
-			<title>ProActive MapReduce API restrictions</title>
-		</info>
-		<para>
-			There are two main restrictions related to the ProActive MapReduce: it needs the Java 6 and it provides the support only
-			for the <emphasis>Hadoop MapReduce 0.20.2</emphasis> release and only for the <emphasis role="italics">Hadoop new MapReduce API</emphasis>
-			(this means that the Hadoop MapReduce job must be built using the classes defined in the package <emphasis>org.apache.hadoop.mapreduce</emphasis>).
-			Moreover, the ProActive MapReduce Hadoop-like API implementation does not support the Hadoop data compression mechanism. That means if the
-			user specifies the compression/decompression algorithm to use in Hadoop that algorithm is ignored when the ProActive MapReduce job is built using
-			the ProActive MapReduce Hadoop-like API.
-		</para>
-	</section>
+    // 3. tell the job to use the previously defined Map and Reduce classes
+    job.setMapperClass(Map.class);
+    job.setReducerClass(Reduce.class);
 
-	<section>
-		<info>
-			<title>ProActive and Hadoop MapReduce performance comparison</title>
-		</info>
-		<para>
-			To perform the tests we use the same group of hosts for Hadoop and ProActive MapReduce implementations. The execution environment in which
-			the tests are performed is a cluster of 18 machines. The machines are homogeneous and their characteristics are the following:
-		</para>
-		<itemizedlist>
-			<listitem>
-				<para>
-					bi-processor <trademark class="registered">Intel</trademark> Xeon E5335 2.00GHz quad core;
-				</para>
-			</listitem>
-			<listitem>
-				<para>
-					16475500 KB 667MHz FBD of available main memory;
-				</para>
-			</listitem>
-			<listitem>
-				<para>
-					30 GB per node of disk space;
-				</para>
-			</listitem>
-			<listitem>
-				<para>
-					operative system is GNU/Linux <trademark class="registered">Fedora</trademark> Core 7 whose kernel version is 2.6.23.17-88;
-				</para>
-			</listitem>
-			<listitem>
-				<para>
-					network connection between the cluster nodes is the Gigabit Ethernet<footnote><para>The user must notice that even if the inter-connection
-					has not the best performances concerning the network latency, we have to notice that both Hadoop and ProActive MapReduce implementations
-					are based on the Java programming language. Hence, the major contribution to the latency does not come from the physical network but
-					from the Java Plataform.</para></footnote>.
-				</para>
-			</listitem>
-		</itemizedlist>
-		<para>
-			The Java distribution is the same for both ProActive and Hadoop MapReduce and it is JDK 1.6.0 14.
-		</para>
-		<para>
-			On each machine 6 ProActive nodes are deployed for the executions of the ProActive MapReduce workflow while in the Hadoop case we configure each
-			TaskTracker<footnote><para>In the Hadoop cluster there is a TaskTracker for each machine</para></footnote> to run at most 6 map tasks during
-			the map phase and 6 reduce tasks during the reduce phase. Lastly, we configure ProActive and Hadoop MapReduce environment in such a way that
-			each MapperPATask (in the case of ProActive) and each map task (in the case of Hadoop) can use at most 512 MB of main memory.
-		</para>
-		<para>
-			The tests whose benchmarks are computed and presented in this document consist in running a MapReduce application to count
-			the occurrences of the words contained in a text file. The input text file is generated by the <emphasis role="italics"><trademark class="registered">TPC-H</trademark> Population
-			Generator (Version 1.3.0)</emphasis>, that contains <emphasis role="italics">DBGEN</emphasis>, a database population program that generates
-			files to be loaded in database tables<footnote><para>see <emphasis>http://www.tpc.org/tpch/</emphasis> to get more details.</para></footnote>.
-			In our case we generate moderately to very large files and we process them directly as simple flat files. We do not use a database system.
-			Moreover we use only the file called "lineitem.tbl" which represents a list of order items having the following structure:
-		</para>
-		<para>
-			<emphasis role="italics">
-			1|155190|7706|1|17|21168.23|0.04|0.02|N|O|1996-03-13|1996-02-12|1996-03-22|DELIVER IN PERSON|TRUCK|blithely regular ideas caj|1|67310|7311|
-			2|36|45983.16|0.09|0.06|N|O|1996-04-12|1996-02-28|1996-04-20|TAKE BACK RETURN|MAIL|slyly bold pinto beans detect s|1|63700|3701|3|8|13309.60|
-			0.10|0.02|N|O|1996-01-29|1996-03-05|1996-01-31|TAKE BACK RETURN|REG AIR|deposits wake furiously dogged,|1|2132|4633|4|28|28955.64|0.09|0.06|
-			N|O|1996-04-21|1996-03-30|1996-05-16|NONE|AIR|even ideashaggle. even, bold reque|1|24027|1534|5|24|22824.48|0.10|0.04|N|O|1996-03-30|
-			1996-03-14|1996-04-01|NONE|FOB|carefully final gr|
-			</emphasis>
-		</para>
-		<para>
-			Using DBGEN files whose size are 7 MB, 71 MB, 724 MB, 4.3 GB, 7 GB are generated and the tests consist in counting the occurrences of words in
-			each of those files.
-		</para>
-		<para>
-			The ProActive Resource Manager and the ProActive Scheduler runs on the same machine but that machine does not belong
-			to the set of machines on which the ProActive nodes are deployed on. The database used by the ProActive Scheduler is <trademark class="registered">MySql</trademark> and it runs on a machine
-			different from the machine on which the ProActive Resource Manager and ProActive Scheduler run on. The machine MySql runs on not even belongs to the set
-			of machines on which the ProActive nodes are deployed on. The main configuration parameters of the ProActive MapReduce job are the following:
-		</para>
-		<itemizedlist>
-			<listitem>
-				<para>
-					the INPUT space is a directory in NFS<footnote><para>Network File System</para></footnote>.
-				</para>
-			</listitem>
-			<listitem>
-				<para>
-					the OUTPUT space is a directory in the NFS.
-				</para>
-			</listitem>
-			<listitem>
-				<para>
-					the input split size as the number of bytes that let us to obtain 108 mapper tasks executed for each input file;
-				</para>
-			</listitem>
-			<listitem>
-				<para>
-					the number of reducer tasks to execute is 54, the half of the number of mapper tasks;
-				</para>
-			</listitem>
-			<listitem>
-				<para>
-					the read mode of the SplitterPATask is <emphasis role="italics">remoteRead</emphasis>
-				</para>
-			</listitem>
-			<listitem>
-				<para>
-					the read mode of the MapperPATask is <emphasis role="italics">remoteRead</emphasis>
-				</para>
-			</listitem>
-			<listitem>
-				<para>
-					the write mode of the MapperPATask is <emphasis role="italics">localWrite</emphasis>
-				</para>
-			</listitem>
-			<listitem>
-				<para>
-					the read mode of the ReducerPATask is <emphasis role="italics">remoteRead</emphasis>
-				</para>
-			</listitem>
-			<listitem>
-				<para>
-					the write mode of the ReducerPATask is <emphasis role="italics">localWrite</emphasis>
-				</para>
-			</listitem>
-		</itemizedlist>
-		<para>
-			In the case of the Hadoop MapReduce, the commands to run the MapReduce job are executed on a machine
-			that does not belong to the set of machine on which the Hadoop TaskTracker (and/or HDFS DataNode) are
-			running on. The only two configuration parameters of the Hadoop MapReduce job are:
-		</para>
-		<itemizedlist>
-			<listitem>
-				<para>
-					the size of the input split is specified through the invocation of the methods of the
-					Hadoop <emphasis role="italics">FileInputFormat</emphasis> class: <emphasis role="italics">
-					setMinInputSplitSize(Job, long)</emphasis> and <emphasis role="italics">setMaxInputSplitSize(Job, long)</emphasis>.
-					The size defined for the input split let us to force Hadoop to execute exactly 108 map tasks
-					(as in the ProActive MapReduce workflow) for each input file.
-				</para>
-			</listitem>
-			<listitem>
-				<para>
-					the number of reducer tasks to execute is specified through the invocation of the method
-					of the Hadoop <emphasis role="italics">Job</emphasis> class <emphasis role="italics">setNumReduceTasks(int)</emphasis>.
-					The number of reduce task to execute in the Hadoop MapReduce job is 54 (as in the ProActive MapReduce workflow).
-				</para>
-			</listitem>
-		</itemizedlist>
-		<para>
-			The result of the execution of the test varying the size of the input file and the size of the input
-			split so that the number of MapperPATask (or map) tasks and ReducerPATask (or reduce) tasks is constant,
-			and equal respectively to 108 and 54 tasks, with the combiner phase enabled and setting a replication factor
-			for HDFS are reported in the table  <xref linkend="proActiveHadoopComparisonTableCombinerReplicationFactorThree"/>:
-		</para>
-		<table xml:id="proActiveHadoopComparisonTableCombinerReplicationFactorThree" frame="all">
-			<title>ProActive and Hadoop MapReduce (combiner and replication factor equal to 3)</title>
-			<tgroup cols="5" align="left" colsep="1" rowsep="1">
-				<colspec colname="fileSize"></colspec>
-				<colspec colname="emptyColumn" colwidth="10pt"></colspec>
-				<colspec colname="proActiveExecutionTime"></colspec>
-				<colspec colname="hadoopExecutionTime"></colspec>
-				<colspec colname="proActiveHadoopRatio"></colspec>
-				<thead>
-					<row>
-						<entry>File Size</entry>
-						<entry></entry>
-						<entry>ProActive MapReduce</entry>
-						<entry>Hadoop MapReduce (Replication = 3)</entry>
-						<entry>ProActive/Hadoop</entry>
-					</row>
-				</thead>
-				<tbody>
-					<row>
-						<?dbhtml bgcolor="#EEEEEE" ?><?dbfo bgcolor="#EEEEEE" ?>
-						<entry>7 MB</entry>
-						<entry></entry>
-						<entry>1m 43s 470ms</entry>
-						<entry>24s 250ms</entry>
-						<entry>4.267</entry>
-					</row>
-					<row>
-						<?dbhtml bgcolor="#DDDDDD" ?><?dbfo bgcolor="#DDDDDD" ?>
-						<entry>71 MB</entry>
-						<entry></entry>
-						<entry>1m 48s 981ms</entry>
-						<entry>35s 125ms</entry>
-						<entry>3.103</entry>
-					</row>
-					<row>
-						<?dbhtml bgcolor="#EEEEEE" ?><?dbfo bgcolor="#EEEEEE" ?>
-						<entry>724 MB</entry>
-						<entry></entry>
-						<entry>1m 54s 478ms</entry>
-						<entry>44s</entry>
-						<entry>2.602</entry>
-					</row>
-					<row>
-						<?dbhtml bgcolor="#DDDDDD" ?><?dbfo bgcolor="#DDDDDD" ?>
-						<entry>4.3 GB</entry>
-						<entry></entry>
-						<entry>3m 44s 719ms</entry>
-						<entry>2m 27s 250ms</entry>
-						<entry>1.526</entry>
-					</row>
-					<row>
-						<?dbhtml bgcolor="#EEEEEE" ?><?dbfo bgcolor="#EEEEEE" ?>
-						<entry>7 GB</entry>
-						<entry></entry>
-						<entry>4m 44s 205ms</entry>
-						<entry>5m 17s</entry>
-						<entry>0.897</entry>
-					</row>
-				</tbody>
-			</tgroup>
-		</table>
-<!-- 		<table xml:id="proActiveHadoopComparisonTable" frame="all"> -->
-<!-- 			<title>ProActive and Hadoop MapReduce comparison with replication factor equal to 1</title> -->
-<!-- 			<tgroup cols="5" align="left" colsep="1" rowsep="1"> -->
-<!-- 				<colspec colname="fileSize"></colspec> -->
-<!-- 				<colspec colname="emptyColumn" colwidth="10pt"></colspec> -->
-<!-- 				<colspec colname="proActiveExecutionTime"></colspec> -->
-<!-- 				<colspec colname="hadoopExecutionTime"></colspec> -->
-<!-- 				<colspec colname="proActiveHadoopRatio"></colspec> -->
-<!-- 				<thead> -->
-<!-- 					<row> -->
-<!-- 						<entry>File Size</entry> -->
-<!-- 						<entry></entry> -->
-<!-- 						<entry>ProActive MapReduce</entry> -->
-<!-- 						<entry>Hadoop MapReduce (Replication = 1)</entry>						 -->
-<!-- 						<entry>ProActive/Hadoop</entry> -->
-<!-- 					</row> -->
-<!-- 				</thead> -->
-<!-- 				<tbody> -->
-<!-- 					<row> -->
-<!-- 						<?dbhtml bgcolor="#EEEEEE" ?><?dbfo bgcolor="#EEEEEE" ?> -->
-<!-- 						<entry>7 MB</entry> -->
-<!-- 						<entry></entry> -->
-<!-- 						<entry>3m 12s 760ms</entry> -->
-<!-- 						<entry>27s</entry> -->
-<!-- 						<entry>7.112</entry> -->
-<!-- 					</row> -->
-<!-- 					<row> -->
-<!-- 						<?dbhtml bgcolor="#DDDDDD" ?><?dbfo bgcolor="#DDDDDD" ?> -->
-<!-- 						<entry>71 MB</entry> -->
-<!-- 						<entry></entry> -->
-<!-- 						<entry>3m 15s 657ms</entry> -->
-<!-- 						<entry>33s</entry> -->
-<!-- 						<entry>5.909</entry> -->
-<!-- 					</row> -->
-<!-- 					<row> -->
-<!-- 						<?dbhtml bgcolor="#EEEEEE" ?><?dbfo bgcolor="#EEEEEE" ?> -->
-<!-- 						<entry>724 MB</entry> -->
-<!-- 						<entry></entry> -->
-<!-- 						<entry>4m 2s 756ms</entry> -->
-<!-- 						<entry>1m 27s</entry> -->
-<!-- 						<entry>2.782</entry> -->
-<!-- 					</row> -->
-<!-- 					<row> -->
-<!-- 						<?dbhtml bgcolor="#DDDDDD" ?><?dbfo bgcolor="#DDDDDD" ?> -->
-<!-- 						<entry>4.3 GB</entry> -->
-<!-- 						<entry></entry> -->
-<!-- 						<entry>9m 33s 105ms</entry> -->
-<!-- 						<entry>3m 28s</entry> -->
-<!-- 						<entry>2.755</entry> -->
-<!-- 					</row> -->
-<!-- 					<row> -->
-<!-- 						<?dbhtml bgcolor="#EEEEEE" ?><?dbfo bgcolor="#EEEEEE" ?> -->
-<!-- 						<entry>7 GB</entry> -->
-<!-- 						<entry></entry> -->
-<!-- 						<entry>14m 53s 416ms</entry> -->
-<!-- 						<entry>N.A.<footnote><para>The value is not reported because during the tests some tasks fail due to the lack of free -->
-<!-- 							space on the disk of the machine they were executing on.</para></footnote> -->
-<!-- 						</entry> -->
-<!-- 						<entry>N.A.</entry> -->
-<!-- 					</row> -->
-<!-- 				</tbody> -->
-<!-- 			</tgroup> -->
-<!-- 		</table> -->
-<!-- 		<para> -->
-<!-- 			The user must notice that in the table above the Hadoop execution times include the time to upload, on HDFS, the file -->
-<!-- 			to which the MapReduce operation must be applied too and that the replication factor of HDFS is 1. -->
-<!-- 		</para> -->
-<!-- 		<para> -->
-<!-- 			The comparison showed in the table <xref linkend="proActiveHadoopComparisonTableReplicationThree"/> are related to the -->
-<!-- 			execution of the Hadoop MapReduce job when the replication factor is equal to 3 and the combiner is not defined. -->
-<!-- 		</para> -->
-<!-- 		<table xml:id="proActiveHadoopComparisonTableReplicationThree" frame="all"> -->
-<!-- 			<title>ProActive and Hadoop MapReduce comparison with replication factor equal to 3</title> -->
-<!-- 			<tgroup cols="5" align="left" colsep="1" rowsep="1"> -->
-<!-- 				<colspec colname="fileSize"></colspec> -->
-<!-- 				<colspec colname="emptyColumn" colwidth="10pt"></colspec> -->
-<!-- 				<colspec colname="proActiveExecutionTime"></colspec> -->
-<!-- 				<colspec colname="hadoopExecutionTime"></colspec> -->
-<!-- 				<colspec colname="proActiveHadoopRatio"></colspec> -->
-<!-- 				<thead> -->
-<!-- 					<row> -->
-<!-- 						<entry>File Size</entry> -->
-<!-- 						<entry></entry> -->
-<!-- 						<entry>ProActive MapReduce</entry> -->
-<!-- 						<entry>Hadoop MapReduce (Replication = 3)</entry> -->
-<!-- 						<entry>ProActive/Hadoop</entry> -->
-<!-- 					</row> -->
-<!-- 				</thead> -->
-<!-- 				<tbody> -->
-<!-- 					<row> -->
-<!-- 						<?dbhtml bgcolor="#EEEEEE" ?><?dbfo bgcolor="#EEEEEE" ?> -->
-<!-- 						<entry>7 MB</entry> -->
-<!-- 						<entry></entry> -->
-<!-- 						<entry>3m 12s 760ms</entry> -->
-<!-- 						<entry>27s</entry> -->
-<!-- 						<entry></entry> -->
-<!-- 					</row> -->
-<!-- 					<row> -->
-<!-- 						<?dbhtml bgcolor="#DDDDDD" ?><?dbfo bgcolor="#DDDDDD" ?> -->
-<!-- 						<entry>71 MB</entry> -->
-<!-- 						<entry></entry> -->
-<!-- 						<entry>3m 15s 657ms</entry> -->
-<!-- 						<entry>36s</entry> -->
-<!-- 						<entry></entry> -->
-<!-- 					</row> -->
-<!-- 					<row> -->
-<!-- 						<?dbhtml bgcolor="#EEEEEE" ?><?dbfo bgcolor="#EEEEEE" ?> -->
-<!-- 						<entry>724 MB</entry> -->
-<!-- 						<entry></entry> -->
-<!-- 						<entry>4m 2s 756ms</entry> -->
-<!-- 						<entry>1m 8s</entry> -->
-<!-- 						<entry></entry> -->
-<!-- 					</row> -->
-<!-- 					<row> -->
-<!-- 						<?dbhtml bgcolor="#DDDDDD" ?><?dbfo bgcolor="#DDDDDD" ?> -->
-<!-- 						<entry>4.3 GB</entry> -->
-<!-- 						<entry></entry> -->
-<!-- 						<entry>9m 33s 105ms</entry> -->
-<!-- 						<entry>3m 25s</entry> -->
-<!-- 						<entry>2.796</entry> -->
-<!-- 					</row> -->
-<!-- 					<row> -->
-<!-- 						<?dbhtml bgcolor="#EEEEEE" ?><?dbfo bgcolor="#EEEEEE" ?> -->
-<!-- 						<entry>7 GB</entry> -->
-<!-- 						<entry></entry> -->
-<!-- 						<entry>14m 53s 416ms</entry> -->
-<!-- 						<entry>N.A.<footnote><para>The value is not reported because during the tests some tasks fail due to the lack of free -->
-<!-- 							space on the disk of the machine they were executing on.</para></footnote> -->
-<!-- 						</entry> -->
-<!-- 						<entry>N.A.</entry> -->
-<!-- 					</row> -->
-<!-- 				</tbody> -->
-<!-- 			</tgroup> -->
-<!-- 		</table> -->
-<!-- 		<para> -->
-<!-- 			The result shown in the table  <xref linkend="proActiveHadoopCombinerComparisonTable"/> are related to the case in which the -->
-<!-- 			combiner phase in both the ProActive and Hadoop MapReduce is enabled. -->
-<!-- 		</para> -->
-<!-- 		<table xml:id="proActiveHadoopCombinerComparisonTable" frame="all"> -->
-<!-- 			<title>ProActive and Hadoop MapReduce comparison (combiner phase enabled)</title> -->
-<!-- 			<tgroup cols="5" align="left" colsep="1" rowsep="1"> -->
-<!-- 				<colspec colname="fileSize"></colspec> -->
-<!-- 				<colspec colname="emptyColumn" colwidth="10pt"></colspec> -->
-<!-- 				<colspec colname="proActiveExecutionTime"></colspec> -->
-<!-- 				<colspec colname="hadoopExecutionTime"></colspec> -->
-<!-- 				<colspec colname="proActiveHadoopRatio"></colspec> -->
-<!-- 				<thead> -->
-<!-- 					<row> -->
-<!-- 						<entry>File Size</entry> -->
-<!-- 						<entry></entry> -->
-<!-- 						<entry>ProActive MapReduce</entry> -->
-<!-- 						<entry>Hadoop MapReduce</entry>						 -->
-<!-- 						<entry>ProActive/Hadoop</entry> -->
-<!-- 					</row> -->
-<!-- 				</thead> -->
-<!-- 				<tbody> -->
-<!-- 					<row> -->
-<!-- 						<?dbhtml bgcolor="#EEEEEE" ?><?dbfo bgcolor="#EEEEEE" ?> -->
-<!-- 						<entry>7 MB</entry> -->
-<!-- 						<entry></entry> -->
-<!-- 						<entry>3m 4s 217ms</entry> -->
-<!-- 						<entry>27s</entry> -->
-<!-- 						<entry>6.815</entry> -->
-<!-- 					</row> -->
-<!-- 					<row> -->
-<!-- 						<?dbhtml bgcolor="#DDDDDD" ?><?dbfo bgcolor="#DDDDDD" ?> -->
-<!-- 						<entry>71 MB</entry> -->
-<!-- 						<entry></entry> -->
-<!-- 						<entry>3m 7s 897ms</entry> -->
-<!-- 						<entry>29s</entry> -->
-<!-- 						<entry>6.448</entry> -->
-<!-- 					</row> -->
-<!-- 					<row> -->
-<!-- 						<?dbhtml bgcolor="#EEEEEE" ?><?dbfo bgcolor="#EEEEEE" ?> -->
-<!-- 						<entry>724 MB</entry> -->
-<!-- 						<entry></entry> -->
-<!-- 						<entry>3m 16s 354ms</entry> -->
-<!-- 						<entry>44s</entry> -->
-<!-- 						<entry>4.455</entry> -->
-<!-- 					</row> -->
-<!-- 					<row> -->
-<!-- 						<?dbhtml bgcolor="#DDDDDD" ?><?dbfo bgcolor="#DDDDDD" ?> -->
-<!-- 						<entry>4.3 GB</entry> -->
-<!-- 						<entry></entry> -->
-<!-- 						<entry>5m 30s 716ms</entry> -->
-<!-- 						<entry>2m 22s</entry> -->
-<!-- 						<entry>2.324</entry> -->
-<!-- 					</row> -->
-<!-- 					<row> -->
-<!-- 						<?dbhtml bgcolor="#EEEEEE" ?><?dbfo bgcolor="#EEEEEE" ?> -->
-<!-- 						<entry>7 GB</entry> -->
-<!-- 						<entry></entry> -->
-<!-- 						<entry>9m 1s</entry> -->
-<!-- 						<entry>4m 56s</entry> -->
-<!-- 						<entry>1.828</entry> -->
-<!-- 					</row> -->
-<!-- 				</tbody> -->
-<!-- 			</tgroup> -->
-<!-- 		</table> -->
-		<para>
-			The user must notice again that in the table above the Hadoop execution times include the time to upload, on HDFS, the file
-			to which the MapReduce operation must be applied too and that the replication factor of HDFS is 1. To have an idea of the
-			time required to upload a file on HDFS the user can look at the table <xref linkend="hadoopUploadTimeTable"/>:
-		</para>
-		<table xml:id="hadoopUploadTimeTable" frame="all">
-			<title>HDFS upload file time</title>
-			<tgroup cols="4" align="left" colsep="1" rowsep="1">
-				<colspec colname="fileSize"></colspec>
-				<colspec colname="emptyColumn" colwidth="10pt"></colspec>
-				<colspec colname="hadoopUploadTimeReplicationOne"></colspec>
-				<colspec colname="hadoopUploadTimeReplicationThree"></colspec>
-				<thead>
-					<row>
-						<entry>File Size</entry>
-						<entry></entry>
-						<entry>Hadoop Upload Time Replication=1</entry>
-						<entry>Hadoop Upload Time Replication=3</entry>
-					</row>
-				</thead>
-				<tbody>
-					<row>
-						<?dbhtml bgcolor="#EEEEEE" ?><?dbfo bgcolor="#EEEEEE" ?>
-						<entry>7 MB</entry>
-						<entry></entry>
-						<entry>1s</entry>
-						<entry>1s</entry>
-					</row>
-					<row>
-						<?dbhtml bgcolor="#DDDDDD" ?><?dbfo bgcolor="#DDDDDD" ?>
-						<entry>71 MB</entry>
-						<entry></entry>
-						<entry>4s</entry>
-						<entry>2s</entry>
-					</row>
-					<row>
-						<?dbhtml bgcolor="#EEEEEE" ?><?dbfo bgcolor="#EEEEEE" ?>
-						<entry>724 MB</entry>
-						<entry></entry>
-						<entry>45s</entry>
-						<entry>12s</entry>
-					</row>
-					<row>
-						<?dbhtml bgcolor="#DDDDDD" ?><?dbfo bgcolor="#DDDDDD" ?>
-						<entry>4.3 GB</entry>
-						<entry></entry>
-						<entry>57s</entry>
-						<entry>1m 25s</entry>
-					</row>
-					<row>
-						<?dbhtml bgcolor="#EEEEEE" ?><?dbfo bgcolor="#EEEEEE" ?>
-						<entry>7 GB</entry>
-						<entry></entry>
-						<entry>3m 39s<footnote><para>Maybe this value is negatively altered by the fact that the available free space on the disks of the
-							cluster machines was less than 7 GB</para></footnote></entry>
-						<entry>3m 58s<footnote><para>Maybe this value is negatively altered by the fact that the available free space on the disks of the
-							cluster machines was less than 7 GB</para></footnote></entry>
-					</row>
-				</tbody>
-			</tgroup>
-		</table>
+    // 4. specify the formats of job input and output files
+    job.setInputFormatClass(TextInputFormat.class);
+    job.setOutputFormatClass(TextOutputFormat.class);
 
-		<para>
-			The result of the execution of the test varying the size of the input file and the size of the input
-			split so that the number of MapperPATask (or map) tasks and ReducerPATask (or reduce) tasks is constant,
-			and equal respectively to 108 and 54 tasks, with the combiner phase enabled and setting a replication factor
-			for HDFS are reported in the table  <xref linkend="proActiveEonPacaGridComparisonTableCombiner"/>:
-		</para>
-		<table xml:id="proActiveEonPacaGridComparisonTableCombiner" frame="all">
-			<title>ProActive MapReduce Eon and ProActive MapReduce Paca Grid (combiner phase enabled)</title>
-			<tgroup cols="5" align="left" colsep="1" rowsep="1">
-				<colspec colname="fileSize"></colspec>
-				<colspec colname="emptyColumn" colwidth="10pt"></colspec>
-				<colspec colname="proActiveEonExecutionTime"></colspec>
-				<colspec colname="proActivePacaGrid"></colspec>
-<!-- 				<colspec colname="proActiveHadoopRatio"></colspec> -->
-				<thead>
-					<row>
-						<entry>File Size</entry>
-						<entry></entry>
-						<entry>ProActive MapReduce Eon</entry>
-						<entry>ProActive MapReduce Paca Grid</entry>
-<!-- 						<entry>ProActive/Hadoop</entry> -->
-					</row>
-				</thead>
-				<tbody>
-					<row>
-						<?dbhtml bgcolor="#EEEEEE" ?><?dbfo bgcolor="#EEEEEE" ?>
-						<entry>7 MB</entry>
-						<entry></entry>
-						<entry>1m 43s 470ms</entry>
-						<entry>2m 00s 743ms</entry>
-<!-- 						<entry>4.267</entry> -->
-					</row>
-					<row>
-						<?dbhtml bgcolor="#DDDDDD" ?><?dbfo bgcolor="#DDDDDD" ?>
-						<entry>71 MB</entry>
-						<entry></entry>
-						<entry>1m 48s 981ms</entry>
-						<entry>2m 11s 455ms</entry>
-<!-- 						<entry>3.103</entry> -->
-					</row>
-					<row>
-						<?dbhtml bgcolor="#EEEEEE" ?><?dbfo bgcolor="#EEEEEE" ?>
-						<entry>724 MB</entry>
-						<entry></entry>
-						<entry>1m 54s 478ms</entry>
-						<entry>2m 27s 650ms</entry>
-<!-- 						<entry>2.602</entry> -->
-					</row>
-					<row>
-						<?dbhtml bgcolor="#DDDDDD" ?><?dbfo bgcolor="#DDDDDD" ?>
-						<entry>4.3 GB</entry>
-						<entry></entry>
-						<entry>3m 44s 719ms</entry>
-						<entry>2m 51s 391ms</entry>
-<!-- 						<entry>1.526</entry> -->
-					</row>
-					<row>
-						<?dbhtml bgcolor="#EEEEEE" ?><?dbfo bgcolor="#EEEEEE" ?>
-						<entry>7 GB</entry>
-						<entry></entry>
-						<entry>4m 44s 205ms</entry>
-						<entry>3m 40s 630ms</entry>
-<!-- 						<entry>0.897</entry> -->
-					</row>
-				</tbody>
-			</tgroup>
-		</table>
+    // 5. specify the paths to input file and output directory; the
+    // paths here are absolute HDFS paths
+    FileInputFormat.addInputPath(job, new Path("/data/input/input_file"));
+    FileOutputFormat.setOutputPath(job, new Path("/data/output/output_dir"));
 
-	</section>
+    // 6. submit the job and wait for completion
+    job.waitForCompletion(true);
+ }
+
+}</programlisting>
+            <para>
+                At the beginning of the WordCount class above, the <emphasis>Map</emphasis> and
+                <emphasis>Reduce</emphasis> classes are defined, with <emphasis>map</emphasis> and
+                <emphasis>reduce</emphasis> methods that do the actual work.  The
+                <emphasis>main</emphasis> method contains job creation, configuration and submission
+                code.
+            </para>
+        </section>
+        <section>
+            <info><title>Paths used in this tutorial</title></info>
+            <para>
+                In the following it is assumed that the environment variables
+                <literal>SCHEDULER_HOME</literal> and <literal>EXAMPLE_DIR</literal> are
+                set. <literal>$SCHEDULER_HOME</literal> should point to the directory where the
+                scheduler is installed, and <literal>$EXAMPLE_DIR</literal> will be used for the
+                code of the example, as well as job input and output files. The assumed values for
+                those variables are listed below, feel free to adjust them to match your setup:
+            </para>
+            <programlisting language="sh">SCHEDULER_HOME=/home/user/proactive/scheduler
+EXAMPLE_DIR=/home/user/mapreduce_example</programlisting>
+            <para>
+                We'll use variable reverences in the shell commands, and the corresponding values in
+                java code and configuration files. We'll also use
+                <literal>$EXAMPLE_DIR/data/input/input_file</literal> as an input path, and
+                <literal>$EXAMPLE_DIR/data/output/output_dir</literal> as an output directory.
+            </para>
+        </section>
+        <section>
+            <info><title>Modifications to the Hadoop example</title></info>
+            <para>
+                Here are the modifications necessary to be able to execute the above example in
+                Proactive MapReduce:
+                <itemizedlist>
+                    <listitem>
+                        <para>
+                            The <emphasis>Map</emphasis> and <emphasis>Reduce</emphasis> classes
+                            require no modification.
+                        </para>
+                    </listitem>
+                    <listitem>
+                        <para>
+                            Steps 1-4 of job creation and configuration from the listing above also
+                            require no modification.
+                        </para>
+                    </listitem>
+                    <listitem>
+                        <para>
+                            Step 5 requires the following modification: input and output paths
+                            should be <emphasis>relative to the input and output
+                            dataspaces</emphasis>. Assuming we would like to use
+                            <literal>$EXAMPLE_DIR/data/input</literal> as an input dataspace, and
+                            <literal>$EXAMPLE_DIR/data/output</literal> as an output dataspace
+                            (we'll configure the dataspaces in a minute), the input and output paths
+                            should look like this:
+
+                            <programlisting language="java">FileInputFormat.addInputPath(job, new Path("input_file");
+FileOutputFormat.setOutputPath(job, new Path("output_dir"));</programlisting>
+                        </para>
+                    </listitem>
+                    <listitem>
+                        <para>
+                            Apart from that, some ProActive MapReduce-specific configuration is
+                            necessary. First, we need to have a configuration file. An example of a
+                            configuration file with all possible configuration properties can be
+                            found in
+                            <literal>$SCHEDULER_HOME/src/scheduler/src/org/ow2/proactive/scheduler/ext/mapreduce/examples/paMapReduceConfigurationProperties.property</literal>. Here
+                            we'll use a minimal configuration file sufficient to run the example:
+
+                            <programlisting language="sh"># filename: $MAPREDUCE_EXAMPLE/paMapReduceConfigurationProperties.property
+
+# scheduler home and URL
+org.ow2.proactive.scheduler.ext.mapreduce.schedulerUrl=rmi://localhost:55855/
+org.ow2.proactive.scheduler.ext.mapreduce.schedulerHome=/home/user/proactive/scheduler/
+
+# credentials to use when submitting the job
+org.ow2.proactive.scheduler.ext.mapreduce.username=admin
+org.ow2.proactive.scheduler.ext.mapreduce.password=admin
+
+# dataspaces configuration
+org.ow2.proactive.scheduler.ext.mapreduce.workflow.inputSpace=file:///home/user/mapreduce_example/data/input
+org.ow2.proactive.scheduler.ext.mapreduce.workflow.outputSpace=file:///home/user/mapreduce_example/data/output
+
+# input split size: the size in bytes of the chunk of data that each
+# mapper will get as its input
+org.ow2.proactive.scheduler.ext.mapreduce.workflow.splitterPATask.inputSplitSize=10
+
+# additional classpath: here it contains the path to the directory
+# where the class files of this example will be put
+org.ow2.proactive.scheduler.ext.mapreduce.workflow.classpath=/home/user/mapreduce_example/classes</programlisting>
+                        </para>
+                        <para>
+                            The settings for inputSpace and outputSpace should contain the URIs
+                            supported by the DataSpaces mechanism and accessible from all nodes
+                            that the job will execute on. In this example, all nodes will be
+                            started locally, so we are using the <literal>file://</literal>
+                            protocol and the local paths.
+                        </para>
+                        <para>
+                            The inputSplitSize setting determines the size in bytes of the input
+                            chunk that each mapper will process, and thus it also determines the
+                            total number of mapper tasks. In Hadoop, setting this parameter is
+                            usually unnecessary, because by default the split size is equal to
+                            the size of an HDFS block, and there is usually no reason to change
+                            it. In ProActive MapReduce, any value can be used. Here we set it to
+                            a small value, because the size of an input file in this example is
+                            going to be small.
+                        </para>
+                        <para>
+                            Setting the number of reducer tasks is done in exactly the same way
+                            as it is done in Hadoop: by calling the setNumReduceTasks(int)
+                            method of the Hadoop Job class. In this example the number of
+                            reducers is not defined, so the default value is used: the number of
+                            reducer tasks is one.
+                        </para>
+                        <para>
+                            Note: most of the Proactive MapReduce configuration options can be
+                            specified using the Java API instead of configuration files.
+                        </para>
+                    </listitem>
+                    <listitem>
+                        <para>
+                            In the Java code, an instance of
+                            org.ow2.proactive.scheduler.ext.mapreduce.PAMapReduceJobConfiguration
+                            must be created, using the above file as an argument:
+
+                            <programlisting language="java">File f = new File("/home/user/mapreduce_example/paMapReduceConfigurationProperties.property");
+PAMapReduceJobConfiguration pamrjc = new PAMapReduceJobConfiguration(f);</programlisting>
+                        </para>
+                    </listitem>
+                    <listitem>
+                        <para>
+                            The next step (performed instead of the step 6 in the original example)
+                            is the creation and submission of a PAMapReduceJob. Hadoop Job instance
+                            and PAMapReduceJobConfiguration instance are passed as arguments to the
+                            constructor:
+
+                            <programlisting language="java">PAMapReduceJob pamrj = null;
+try {
+    pamrj = new PAMapReduceJob(job, pamrjc);
+} catch (PAJobConfigurationException e) {
+    e.printStackTrace();
+}
+
+if (pamrj.run())
+    System.out.println("Submitted " + pamrj.getJobId());
+else
+    System.out.println("Not submitted");</programlisting>
+                        </para>
+                    </listitem>
+                </itemizedlist>
+            </para>
+            <para>
+                Here is the full result of the modifications described above:
+
+                <programlisting language="java">// filename: $MAPREDUCE_EXAMPLE/WordCount.java
+
+import java.io.*;
+import java.util.*;
+
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.conf.*;
+import org.apache.hadoop.io.*;
+import org.apache.hadoop.mapreduce.*;
+import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
+import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
+import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
+
+import org.ow2.proactive.scheduler.ext.mapreduce.PAMapReduceJob;
+import org.ow2.proactive.scheduler.ext.mapreduce.PAMapReduceJobConfiguration;
+import org.ow2.proactive.scheduler.ext.mapreduce.exception.PAJobConfigurationException;
+
+public class WordCount {
+
+    public static class Map extends Mapper&lt;LongWritable, Text, Text, IntWritable&gt; {
+        private final static IntWritable one = new IntWritable(1);
+        private Text word = new Text();
+
+        public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
+            String line = value.toString();
+            StringTokenizer tokenizer = new StringTokenizer(line);
+            while (tokenizer.hasMoreTokens()) {
+                word.set(tokenizer.nextToken());
+                context.write(word, one);
+            }
+        }
+    }
+
+    public static class Reduce extends Reducer&lt;Text, IntWritable, Text, IntWritable&gt; {
+
+        public void reduce(Text key, Iterable&lt;IntWritable&gt; values, Context context)
+            throws IOException, InterruptedException {
+            int sum = 0;
+            for (IntWritable val : values) {
+                sum += val.get();
+            }
+            context.write(key, new IntWritable(sum));
+        }
+    }
+
+    public static void main(String[] args) throws Exception {
+
+        // 1. instantiate Configuration and Job classes
+        Configuration conf = new Configuration();
+        Job job = new Job(conf, "wordcount");
+
+        // 2. set the types of output keys and values produced by reducer
+        job.setOutputKeyClass(Text.class);
+        job.setOutputValueClass(IntWritable.class);
+
+        // 3. tell the job to use the previously defined Map and Reduce classes
+        job.setMapperClass(Map.class);
+        job.setReducerClass(Reduce.class);
+
+        // 4. specify the formats of job input and output files
+        job.setInputFormatClass(TextInputFormat.class);
+        job.setOutputFormatClass(TextOutputFormat.class);
+
+        // 5. specify the paths to input file and output directory;
+        // the paths here are relative to the dataspaces declared in a
+        // configuration file below
+        FileInputFormat.addInputPath(job, new Path("input_file"));
+        FileOutputFormat.setOutputPath(job, new Path("output_dir"));
+
+        // 6. Instantiate PAMapReduceJobConfiguration using a path to
+        // the configuration file
+        File f = new File("/home/user/mapreduce_example/paMapReduceConfigurationProperties.property");
+        PAMapReduceJobConfiguration pamrjc = new PAMapReduceJobConfiguration(f);
+
+        // 7. Instantiate PAMapReduceJob using instances of Job and
+        // PAMapReduceJobConfiguration as arguments
+        PAMapReduceJob pamrj = null;
+        try {
+            pamrj = new PAMapReduceJob(job, pamrjc);
+        } catch (PAJobConfigurationException e) {
+            e.printStackTrace();
+            System.exit(1);
+        }
+
+        // 8. submit the job to the scheduler
+        if (pamrj.run())
+            System.out.println("Submitted " + pamrj.getJobId());
+        else
+
+            System.out.println("Not submitted");
+    }
+
+}</programlisting>
+            </para>
+        </section>
+        <section>
+            <info><title>Running the exmaple</title></info>
+            <para>
+                To compile and run the example, take the following steps:
+            </para>
+            <itemizedlist>
+                <listitem>
+                    <para>
+                        Check that the path to configuration file is specified correctly in the
+                        code of example, and that the setting
+                        org.ow2.proactive.scheduler.ext.mapreduce.workflow.classpath in the
+                        configuration file points to <literal>$EXAMPLE_DIR/classes</literal>.
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        Compile:
+                    </para>
+                    <programlisting language="sh"># for compilation, we need 3 jars: Hadoop core, ProActive core and ProActive MapReduce addon
+$ COMPILE_CLASSPATH=$SCHEDULER_HOME/lib/mapreduce/hadoop-0.20.2-core.jar:$SCHEDULER_HOME/dist/lib/ProActive_Scheduler-core.jar:$SCHEDULER_HOME/addons/ProActive_Scheduler-mapreduce.jar
+
+$ mkdir $EXAMPLE_DIR/classes
+$ javac -cp $COMPILE_CLASSPATH -d $EXAMPLE_DIR/classes $EXAMPLE_DIR/WordCount.java</programlisting>
+                </listitem>
+                <listitem>
+                    <para>
+                        Create an input file:
+                    </para>
+                    <programlisting>$ mkdir -p $EXAMPLE_DIR/data/input
+$ mkdir -p $EXAMPLE_DIR/data/output
+$ cat &gt; $EXAMPLE_DIR/data/input/input_file &lt;&lt; EOF
+this is a test
+of word count example
+test
+EOF</programlisting>
+                </listitem>
+                <listitem>
+                    <para>
+                        In a separate terminal, start the scheduler in default configuration
+                        (this also starts the Resource Manager and 4 local nodes):
+                    </para>
+                    <programlisting language="sh">$ cd $SCHEDULER_HOME
+$ ./bin/unix/scheduler-start-clean
+Starting Scheduler, Please wait...
+Resource Manager doesn't exist on the local host
+Trying to start a local Resource Manager
+Resource Manager created on rmi://deepthought.inria.fr:55855/
+Starting scheduler...
+Scheduler successfully created on rmi://deepthought.inria.fr:55855/</programlisting>
+                    <para>
+                        Make sure that the value of
+                        org.ow2.proactive.scheduler.ext.mapreduce.schedulerUrl property in the
+                        configuration file matches the URL in the output of the command.
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>Run:</para>
+                    <programlisting language="sh"># to run, we need the same 3 jars as for the compilation plus the jars from dist/lib directory
+java -cp $COMPILE_CLASSPATH:$SCHEDULER_HOME/dist/lib/*:$EXAMPLE_DIR/classes WordCount</programlisting>
+                </listitem>
+                <listitem>
+                    <para>
+                        Check job status with scheduler-client. Once the job is finished, the output
+                        should look like this:
+                    </para>
+                    <programlisting language="sh">$ $SCHEDULER_HOME/bin/unix/scheduler-client -lj
+     ID     NAME          OWNER     PRIORITY     PROJECT                STATUS       START AT               DURATION
+
+     1      wordcount     admin     Normal       ProActiveMapReduce     Finished     20:16:41  07/05/11     29s 235ms </programlisting>
+                    <para>
+                        Refer to the scheduler documentation for mor information about the usage of
+                        scheduler-client.
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        The output of the reducer tasks is inside the
+                        <literal>$EXAMPLE_DIR/data/output/output_dir/</literal> directory. There
+                        should be one file per each reducer task, named <literal>reduced_&lt;reducer
+                        task id&gt;</literal>. Since in this example we have only one reducer, there
+                        should be only one file. Verify its contents:
+                    </para>
+                    <programlisting>$ cat $EXAMPLE_DIR/data/output/output_dir/reduced_100*
+a   1
+count   1
+example 1
+is  1
+of  1
+test    2
+this    1
+word    1</programlisting>
+                </listitem>
+            </itemizedlist>
+        </section>
+    </section>
+    <section xml:id="proactive_mapreduce_reference">
+        <info>
+            <title>
+                ProActive MapReduce Reference
+            </title>
+        </info>
+        <section>
+            <title>Internal structure of a ProActive MapReduce job</title>
+            <para>
+                The ProActive MapReduce, when the user creates the ProActive MapReduce job and
+                before that job is submitted to the ProActive Scheduler, internally builds a
+                ProActive workflow made up of five tasks as the <xref
+                linkend="proactive_mapreduce_workflow"/> shows: <emphasis>SplitterPATask</emphasis>,
+                <emphasis>MapperPATask</emphasis>, <emphasis>MapperJoinPATask</emphasis>,
+                <emphasis>ReducerPATask</emphasis> and <emphasis>ReducerJoinPATask</emphasis>. The
+                execution order of those tasks and their behavior is the following: the
+                <emphasis>SplitterPATask</emphasis> creates the input splits from the input
+                file. Each <emphasis>MapperPATask</emphasis> processes one and only one input
+                split. To achieve that, MapperPATask is replicated with the replication factor equal
+                to the number of created input splits. The <emphasis> MapperJoinPATask</emphasis>
+                implements the join of the execution of the MapperPATask
+                replicas. <emphasis>ReducerPATask</emphasis> starts its execution only after the
+                MapperJoinPATask (and so all the MapperPATask replicas) ends.  The ReducerPATask is
+                replicated too. The number of replicas of the ReducerPATask is defined by the
+                user. If the user does not define it, only one ReducerPATask is executed. The last
+                executed task is the <emphasis>ReducerJoinPATask</emphasis> that implements the join
+                of the ReducerPATask replicas.
+            </para>
+
+            <figure xml:id="proactive_mapreduce_workflow">
+                <info>
+                    <title>ProActive MapReduce workflow</title>
+                </info>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata scalefit="1" width="55%" contentdepth="55%"
+                                   fileref="images/png/proactive_mapreduce_workflow_1673_1825.png" format="PNG" />
+                    </imageobject>
+                </mediaobject>
+            </figure>
+        </section>
+        <section xml:id="proactive_mapreduce_configuration">
+            <title>ProActive MapReduce configuration</title>
+            <para>
+                As was already mentioned in the <xref linkend="proactive_mapreduce_tutorial"/>,
+                ProActive MapReduce configuration consists of 2 major steps:
+                <itemizedlist>
+                    <listitem>
+                        <para>
+                            Hadoop-compatible configuration: done in the same way as the
+                            configuration of a real Hadoop job.
+                        </para>
+                    </listitem>
+                    <listitem>
+                        <para>
+                            ProActive MapReduce-specific configuration: done by creating a property
+                            file and passing it as as an argument to PAMapReduceJobConfiguration
+                            constructor.
+                        </para>
+                        <para>
+                            As an alternative to using the property file, most of the properties can
+                            be set by calling the methods of the PAMapReduceJobConfiguration class.
+                        </para>
+                        <para>
+                            The full list of supported configuration properties, together with the
+                            corresponding PAMapReduceJobConfiguration methods and default values is
+                            given in this section.
+                        </para>
+                    </listitem>
+                </itemizedlist>
+            </para>
+            <para>
+                Note: the ProActive MapReduce job is actually a ProActive workflow. Thus, many of
+                its configuration properties are directly related to the ProActive workflow and to
+                the tasks belonging to it, for instance, the <emphasis>cancelJobOnError</emphasis>
+                attribute of a task.
+            </para>
+            <section xml:id="proactive_mapreduce_required_paramaters">
+                <info>
+                    <title>
+                        Required configuration properties
+                    </title>
+                </info>
+                <para>
+                    The ProActive MapReduce requires that the user specifies the following properties:
+                </para>
+                <itemizedlist>
+                    <listitem>
+                        <para>
+                            <emphasis>org.ow2.proactive.scheduler.ext.mapreduce.schedulerUrl</emphasis>:
+                            the URL of the ProActive Scheduler.
+                        </para>
+                    </listitem>
+                    <listitem>
+                        <para>
+                            <emphasis>org.ow2.proactive.scheduler.ext.mapreduce.username</emphasis>: the
+                            username to use to establish the connection to the ProActive Scheduler.
+                        </para>
+                    </listitem>
+                    <listitem>
+                        <para>
+                            <emphasis>org.ow2.proactive.scheduler.ext.mapreduce.password</emphasis>: the
+                            password to use to establish the connection to the ProActive Scheduler.
+                        </para>
+                    </listitem>
+                    <listitem>
+                        <para>
+                            <emphasis>org.ow2.proactive.scheduler.ext.mapreduce.workflow.inputSpace</emphasis>:
+                            the INPUT space of the job. The input files should reside in the root of
+                            that specified INPUT space or in a sub-folder of it. Corresponding
+                            PAMapReduceJobConfiguration method: <emphasis>setInputSpace()</emphasis>.
+                        </para>
+                    </listitem>
+                    <listitem>
+                        <para>
+                            <emphasis>org.ow2.proactive.scheduler.ext.mapreduce.workflow.outputSpace</emphasis>:
+                            the OUTPUT space of the job. The output files will be stored in a sub-folder
+                            of the OUTPUT space; they cannot be stored in the root of the OUTPUT
+                            space. Corresponding PAMapReduceJobConfiguration method: <emphasis>setOutputSpace()</emphasis>.
+                        </para>
+                    </listitem>
+                </itemizedlist>
+            </section>
+            <section xml:id="proactive_mapreduce_optional_paramaters">
+                <info>
+                    <title>
+                        Optional configuration properties
+                    </title>
+                </info>
+                <para>
+                    All the other configuration properties are optional as the ProActive MapReduce
+                    provides default values for them.
+                </para>
+                <itemizedlist>
+                    <listitem>
+                        <para>
+                            <emphasis>org.ow2.proactive.scheduler.ext.mapreduce.workflow.projectName</emphasis>:
+                            the "projectName" attribute of the ProActive MapReduce workflow. Default:
+                            <emphasis>"ProActiveMapReduce"</emphasis>. Corresponding
+                            PAMapReduceJobConfiguration method: <emphasis>setProjectName()</emphasis>.
+                        </para>
+                    </listitem>
+                    <listitem>
+                        <para>
+                            <emphasis>org.ow2.proactive.scheduler.ext.mapreduce.workflow.description</emphasis>:
+                            the "description" attribute of the ProActive MapReduce workflow. Default:
+                            <emphasis>"ProActive MapReduce"</emphasis>. Corresponding PAMapReduceJobConfiguration method:
+                            <emphasis>setDescription()</emphasis>.
+                        </para>
+                    </listitem>
+                    <listitem>
+                        <para>
+                            <emphasis>org.ow2.proactive.scheduler.ext.mapreduce.workflow.maxNumberOfExecutions</emphasis>:
+                            in case if a task fails, an attempt to restart it will be made until the
+                            total number of executions reaches the value of this property. Default:
+                            <emphasis>1</emphasis>, which means that no restart attempts will be
+                            made. Corresponding PAMapReduceJobConfiguration method:
+                            <emphasis>setMaxNumberOfExecutions()</emphasis>.
+                        </para>
+                    </listitem>
+                    <listitem>
+                        <para>
+                            <emphasis>org.ow2.proactive.scheduler.ext.mapreduce.workflow.restartTaskOnError</emphasis>:
+                            determines <emphasis>where</emphasis> the restart of a failed task will be
+                            performed, the possible values for this property are
+                            org.ow2.proactive.scheduler.ext.mapreduce.workflow.restartAnywhere (restart
+                            on any node) and
+                            org.ow2.proactive.scheduler.ext.mapreduce.workflow.restartElsewhere (restart
+                            on any node except the one where the task failed). Default:
+                            <emphasis>"org.ow2.proactive.scheduler.ext.mapreduce.workflow.restartAnywhere"</emphasis>. Corresponding
+                            PAMapReduceJobConfiguration method:
+                            <emphasis>setRestartTaskOnError()</emphasis>.
+                        </para>
+                    </listitem>
+                    <listitem>
+                        <para>
+                            <emphasis>org.ow2.proactive.scheduler.ext.mapreduce.workflow.cancelJobOnError</emphasis>:
+                            whether to cancel the job in the event of one of the tasks reaching its
+                            maxNumberOfExecutions without a successful result. Default:
+                            <emphasis>true</emphasis>. Corresponding PAMapReduceJobConfiguration method:
+                            <emphasis>setJobCancelJobOnError()</emphasis>.
+                        </para>
+                    </listitem>
+                </itemizedlist>
+                <para>
+                    The above properties also have task-specific counterparts, which, if specified, take
+                    precedence for a particular type of task over the general ones:
+                </para>
+                <itemizedlist>
+                    <listitem>
+                        <para>
+                            <emphasis>org.ow2.proactive.scheduler.ext.mapreduce.workflow.[splitter|mapper|mapperJoin|reducer|reducerJoin]PATask.name</emphasis>:
+                            the "name" attribute for the corresponding task;
+                        </para>
+                    </listitem>
+                    <listitem>
+                        <para>
+                            <emphasis>org.ow2.proactive.scheduler.ext.mapreduce.workflow.[splitter|mapper|mapperJoin|reducer|reducerJoin]PATask.description</emphasis>:
+                            the "description" attribute for the corresponding task;
+                        </para>
+                    </listitem>
+                    <listitem>
+                        <para>
+                            <emphasis>org.ow2.proactive.scheduler.ext.mapreduce.workflow.[splitter|mapper|mapperJoin|reducer|reducerJoin]PATask.maxNumberOfExecutions</emphasis>:
+                            the "maxNumberOfExecutions" attribute for the corresponding task;
+                        </para>
+                    </listitem>
+                    <listitem>
+                        <para>
+                            <emphasis>org.ow2.proactive.scheduler.ext.mapreduce.workflow.[splitter|mapper|mapperJoin|reducer|reducerJoin]PATask.restartTaskOnError</emphasis>:
+                            the "restartTaskOnError" attribute for the corresponding task.
+                        </para>
+                    </listitem>
+                    <listitem>
+                        <para>
+                            <emphasis>org.ow2.proactive.scheduler.ext.mapreduce.workflow.[splitter|mapper|mapperJoin|reducer|reducerJoin]PATask.cancelJobOnError</emphasis>:
+                            the "cancelJobOnError" attribute for the corresponding task.
+                        </para>
+                    </listitem>
+                </itemizedlist>
+                <para>
+                    The following properties, while optional, are still very important:
+                </para>
+                <itemizedlist>
+                    <listitem>
+                        <para>
+                            <emphasis>org.ow2.proactive.scheduler.ext.mapreduce.workflow.classpath</emphasis>:
+                            a comma-separated list of the additional classpath entries for the ProActive
+                            MapReduce tasks. This classpath is meant to point to the user
+                            implementations of the Hadoop Mapper, Reducer, InputFormat etc... Default:
+                            <emphasis>empty</emphasis>. Corresponding PAMapReduceJobConfiguration
+                            method: <emphasis>setClasspath()</emphasis>.
+                        </para>
+                    </listitem>
+                    <listitem>
+                        <para>
+                            <emphasis>org.ow2.proactive.scheduler.ext.mapreduce.workflow.splitterPATask.inputSplitSize</emphasis>:
+                            it defines the size, in bytes, of the input split (fragment of the input
+                            data) each mapper will get as an input. This configuration property is
+                            optional but no default value is defined by the ProActive MapReduce. When
+                            the user does not specify the size of the input split then the default value
+                            is given by the user-provided Hadoop InputFormat. ProActive MapReduce uses
+                            the user specified Hadoop InputFormat class to create input splits and that
+                            the size of those input split is equal to a default value computed by the
+                            user specified Hadoop InputFormat class.  When the user defines a value of 0
+                            (zero) bytes for the size of the input split, then input splits with a size
+                            equal to the minimum possible value forecast by the Hadoop InputFormat class
+                            used are created. On the other hand, when the user defines a size greater
+                            than the size of the input file then only one input split is created and the
+                            size of that input split is equal to the size of the input
+                            file. Corresponding PAMapReduceJobConfiguration method:
+                            <emphasis>setInputSplitSize()</emphasis>.
+                        </para>
+                    </listitem>
+                    <listitem>
+                        <para>
+                            <emphasis>org.ow2.proactive.scheduler.ext.mapreduce.workflow.splitterPATask.readMode</emphasis>:
+                            it defines the read mode of the SplitterPATask. The two possible values are:
+                            "fullLocalRead" and "remoteRead". The former means that the input file is
+                            transferred to the node the SplitterPATask executes on before input splits
+                            are created. The latter means that the input file is left in the ProActive
+                            MapReduce workflow INPUT space so that data used to create input splits are
+                            read directly from there. Default: <emphasis>"remoteRead"</emphasis>.
+                        </para>
+                    </listitem>
+                    <listitem>
+                        <para>
+                            <emphasis>org.ow2.proactive.scheduler.ext.mapreduce.workflow.mapperPATask.readMode</emphasis>:
+                            it defines the read mode of the MapperPATask. There are three possible
+                            values:
+                        </para>
+                        <itemizedlist>
+                            <listitem>
+                                <para>
+                                    <emphasis>fullLocalRead</emphasis>: the input file of the ProActive
+                                    MapReduce workflow is transferred entirely to the node the
+                                    MapperPATask executes on and then the MapperPATask reads from it and
+                                    processes only the data of its own input split;
+                                </para>
+                            </listitem>
+                            <listitem>
+                                <para>
+                                    <emphasis>partialLocalRead</emphasis>: only the data the
+                                    MapperPATask must process are copied from the input file and
+                                    transferred to the node the MapperPATask executes on;
+                                </para>
+                            </listitem>
+                            <listitem>
+                                <para>
+                                    <emphasis>remoteRead</emphasis>: the data the MappperPATask must
+                                    process are read remotely from the ProActive MapReduce workflow
+                                    INPUT space.
+                                </para>
+                            </listitem>
+                        </itemizedlist>
+                        <para>
+                            The default value is <emphasis>"remoteRead"</emphasis> but if the input
+                            file is not randomly accessible then
+                            <emphasis>"fullLocalRead"</emphasis> is used.
+                        </para>
+                    </listitem>
+                    <listitem>
+                        <para>
+                            <emphasis>org.ow2.proactive.scheduler.ext.mapreduce.workflow.mapperPATask.writeMode</emphasis>:
+                            it defines the write mode of the MapperPATask. The two possible values
+                            are: "localWrite" and "remoteWrite". The former implies that the output
+                            data of the MapperPATask are first stored on the node it executes on and
+                            then the ProActive DataSpaces mechanism transfers them to the user
+                            defined OUTPUT space. The latter indicates that the output data are
+                            stored directly in the user defined OUTPUT space. Default:
+                            <emphasis>"localWrite"</emphasis>.
+                        </para>
+                    </listitem>
+                    <listitem>
+                        <para>
+                            <emphasis>org.ow2.proactive.scheduler.ext.mapreduce.workflow.reducerPATask.readMode</emphasis>:
+                            it defines the read mode of the ReducerPATask. The two possible values
+                            are: "fullLocalRead" and "remoteRead". The former means that the
+                            intermediate data (the MapperPATask output data) are transferred from
+                            the OUTPUT space to the node the ReducerPATask will execute on while
+                            "remoteRead" means that the intermediate data are left in the OUTPUT
+                            space so that they are read remotely by the ReducerPATask. Default:
+                            <emphasis>"remoteRead"</emphasis>.
+                        </para>
+                    </listitem>
+                    <listitem>
+                        <para>
+                            <emphasis>org.ow2.proactive.scheduler.ext.mapreduce.workflow.reducerPATask.writeMode</emphasis>:
+                            it defines the write mode of the ReducerPATask. The two possible values
+                            are: "localWrite" and "remoteWrite". The former implies that the output
+                            data of the ReducerPATask are first stored on the node it executed on
+                            and then the ProActive DataSpaces mechanism transfers them to the user
+                            defined OUTPUT space. While the latter indicates that the output data
+                            are stored directly in the user defined OUTPUT space. Default:
+                            <emphasis>"localWrite"</emphasis>.
+                        </para>
+                    </listitem>
+                    <listitem>
+                        <para>
+                            <emphasis>org.ow2.proactive.scheduler.ext.mapreduce.workflow.reducerPATask.outputFileNamePrefix</emphasis>:
+                            it defines the prefix the ProActive MapReduce framework/API must use to
+                            build the name of the output file. The number of output files of the
+                            ProActive MapReduce job is equal to the number of executed ReducerPATask
+                            and each file has a name compliant to the following format:
+                            &lt;outputFileNamePrefix&gt;_&lt;reducerPATaskId&gt;. Default:
+                            <emphasis>"reduced"</emphasis>. Corresponding
+                            PAMapReduceJobConfiguration method:
+                            <emphasis>setReducerOutputFileNamePrefix()</emphasis>.
+                        </para>
+                    </listitem>
+                </itemizedlist>
+            </section>
+        </section>
+        <section>
+            <info>
+                <title>API limitations</title>
+            </info>
+            <para>
+                There are two main restrictions related to the ProActive MapReduce: it requires Java
+                6 and it provides the support only for the <emphasis>Hadoop MapReduce
+                0.20.2</emphasis> release and only for the <emphasis role="italics">Hadoop new
+                MapReduce API</emphasis> (i.e., the Hadoop MapReduce job must be built using the
+                classes defined in the package <emphasis>org.apache.hadoop.mapreduce</emphasis>, not
+                <emphasis>org.apache.hadoop.mapred</emphasis>).
+            </para>
+            <para>
+                Moreover, the ProActive MapReduce Hadoop-like API implementation does not support
+                many of the advanced Hadoop features, such as reporters, counters, compression,
+                distributed cache, debug scripts and speculative execution. Those features, if
+                specified during the configuration step, are ignored by the ProActive MapReduce.
+            </para>
+        </section>
+    </section>
+    <section>
+        <info>
+            <title>ProActive MapReduce performance</title>
+        </info>
+        <section>
+            <info>
+                <title>
+                    Execution environment
+                </title>
+            </info>
+            <para>
+                To perform the tests we used the same group of hosts to run both Hadoop and
+                ProActive MapReduce. The execution environment in which the benchamarks were
+                performed is a cluster of 20 machines. The machines are identical and their
+                characteristics are the following:
+                <itemizedlist>
+                    <listitem>
+                        <para>
+                            Bi-processor <trademark class="registered">Intel</trademark> Xeon E5335
+                            2.00GHz quad core;
+                        </para>
+                    </listitem>
+                    <listitem>
+                        <para>
+                            16 GB of RAM;
+                        </para>
+                    </listitem>
+                    <listitem>
+                        <para>
+                            30 GB per node of disk space;
+                        </para>
+                    </listitem>
+                    <listitem>
+                        <para>
+                            <trademark class="registered">Fedora</trademark> Core 7 with 2.6.23.17-88
+                            kernel;
+                        </para>
+                    </listitem>
+                    <listitem>
+                        <para>
+                            Network connection between the cluster nodes is Gigabit Ethernet.
+                        </para>
+                    </listitem>
+                </itemizedlist>
+                2 machines were reserved for running Hadoop JobTracker, HDFS NameNode, ProActive
+                Scheduler and ProActive Resource Manager; the remaining 18 were used for dataNodes
+                of the HDFS and execution of map and reduce tasks.
+            </para>
+            <para>
+                The version of JDK used for benchmarks is JDK 6 update 14.
+            </para>
+        </section>
+        <section>
+            <info>
+                <title>
+                    Input data
+                </title>
+            </info>
+            <para>
+                Input files were generated using <link xlink:href="http://www.tpc.org/tpch/">TPC-H
+                dbgen utility</link>, a database population program that generates files to be
+                loaded into database tables. They consist of lines containing strings separated by
+                "|" symbols. Of the several files generated by dbgen, we used only the file
+                "lineitem.tbl".
+            </para>
+        </section>
+        <section>
+            <info>
+                <title>
+                    ProActive MapReduce configuration
+                </title>
+            </info>
+            <para>
+                On each of 18 machines 2 ProActive nodes were deployed for the executions of the
+                ProActive MapReduce workflow. The main configuration parameters of the job were set
+                as follows:
+            </para>
+            <itemizedlist>
+                <listitem>
+                    <para>
+                        the INPUT and OUTPUT spaces are directories on an NFS server NFS; the link
+                        to the NFS server is Gigabit Ethernet;
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        the input split size is chosen so that the number of mappers is 36, equal to the
+                        number of available nodes;
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        the number of reducer tasks is 36, equal to the number of mappers;
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        the read mode of the SplitterPATask is <emphasis
+                        role="italics">remoteRead</emphasis>;
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        the read mode of the MapperPATask is <emphasis
+                        role="italics">remoteRead</emphasis>;
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        the write mode of the MapperPATask is <emphasis
+                        role="italics">localWrite</emphasis>;
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        the read mode of the ReducerPATask is <emphasis
+                        role="italics">remoteRead</emphasis>;
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        the write mode of the ReducerPATask is <emphasis
+                        role="italics">localWrite</emphasis>.
+                    </para>
+                </listitem>
+            </itemizedlist>
+        </section>
+        <section>
+            <info>
+                <title>
+                    Hadoop configuration
+                </title>
+            </info>
+            <para>
+                Each TaskTracker <footnote><para>In the Hadoop cluster there is a TaskTracker for
+                each machine</para></footnote> was configured to run at most 6 map tasks during the
+                map phase and 6 reduce tasks during the reduce phase. The size of input split was
+                not configured and thus was chosen by Hadoop based on the HDFS block size (64
+                MB). The number of reducers was set to 54. Input files were uploaded to the HDFS
+                with a replication factor of 3. We decided to include into the total execution time
+                the time to upload the file to the HDFS to account for the fact that, unlike NFS
+                used in ProActive MapReduce, HDFS is not a general purpose file system and thus a
+                separate upload step is often required.
+            </para>
+        </section>
+        <section>
+            <info>
+                <title>
+                    Results
+                </title>
+            </info>
+            <para>
+                The results of the benchmark are given in the table below:
+            </para>
+            <table xml:id="sequentialVSparallel" frame="all">
+                <title>ProActive MapReduce performance</title>
+                <tgroup cols="5" align="left" colsep="1" rowsep="1">
+                    <colspec colname="emptyColumn" align="right"></colspec>
+                    <colspec colname="emptyColumn" align="right"></colspec>
+                    <colspec colname="emptyColumn" align="right"></colspec>
+                    <colspec colname="emptyColumn" align="right"></colspec>
+                    <colspec colname="emptyColumn" align="right"></colspec>
+                    <thead>
+                        <row>
+                            <entry>File Size</entry>
+                            <entry>Sequential</entry>
+                            <entry>Hadoop + upload</entry>
+                            <entry>PA MapReduce</entry>
+                            <entry>Speedup</entry>
+                        </row>
+                    </thead>
+                    <tbody>
+                        <row>
+                            <?dbhtml bgcolor="#EEEEEE" ?><?dbfo bgcolor="#EEEEEE" ?>
+                            <entry><code>0.7 GB</code></entry>
+                            <entry><code>5m 04s</code></entry>
+                            <entry><code>1m 17s</code></entry>
+                            <entry><code>1m 05s</code></entry>
+                            <entry><code>4.6</code></entry>
+                        </row>
+                        <row>
+                            <?dbhtml bgcolor="#DDDDDD" ?><?dbfo bgcolor="#DDDDDD" ?>
+                            <entry><code>4.3 GB</code></entry>
+                            <entry><code>25m 31s</code></entry>
+                            <entry><code>2m 30s</code></entry>
+                            <entry><code>2m 20s</code></entry>
+                            <entry><code>10.9</code></entry>
+                        </row>
+                        <row>
+                            <?dbhtml bgcolor="#EEEEEE" ?><?dbfo bgcolor="#EEEEEE" ?>
+                            <entry><code>7.3 GB</code></entry>
+                            <entry><code>46m 00s</code></entry>
+                            <entry><code>3m 31s</code></entry>
+                            <entry><code>3m 30s</code></entry>
+                            <entry><code>13.1</code></entry>
+                        </row>
+                        <row>
+                            <?dbhtml bgcolor="#DDDDDD" ?><?dbfo bgcolor="#DDDDDD" ?>
+                            <entry><code>20 GB</code></entry>
+                            <entry><code>2h 07m 00s</code></entry>
+                            <entry><code>8m 30s</code></entry>
+                            <entry><code>7m 09s</code></entry>
+                            <entry><code>17.8</code></entry>
+                        </row>
+                        <row>
+                            <?dbhtml bgcolor="#EEEEEE" ?><?dbfo bgcolor="#EEEEEE" ?>
+                            <entry><code>50 GB</code></entry>
+                            <entry><code>5h 19m 00s</code></entry>
+                            <entry><code>21m 05s</code></entry>
+                            <entry><code>25m 11s</code></entry>
+                            <entry><code>12.7</code></entry>
+                        </row>
+                        <row>
+                            <?dbhtml bgcolor="#DDDDDD" ?><?dbfo bgcolor="#DDDDDD" ?>
+                            <entry><code>100 GB</code></entry>
+                            <entry><code>10h 38m 00s</code></entry>
+                            <entry><code>43m 23s</code></entry>
+                            <entry><code>1h 07m 00s</code></entry>
+                            <entry><code>9.4</code></entry>
+                        </row>
+
+                    </tbody>
+                </tgroup>
+            </table>
+            <para>
+                Legend:
+                <itemizedlist>
+                    <listitem>
+                        <para>
+                            <emphasis>File Size</emphasis>: size of the input file.
+                        </para>
+                    </listitem>
+                    <listitem>
+                        <para>
+                            <emphasis>Sequential</emphasis>: average total execution time of PA
+                            MapReduce job configured to use one Mapper and one Reducer, input and output
+                            files stored on the local disk.
+                        </para>
+                    </listitem>
+                    <listitem>
+                        <para>
+                            <emphasis>Hadoop + upload</emphasis>: average execution time of a Hadoop job
+                            plus the upload time of the input file to the HDFS with the replication
+                            factor 3.
+                        </para>
+                    </listitem>
+                    <listitem>
+                        <para>
+                            <emphasis>PA MapReduce</emphasis>: avarage total execution time of parallel
+                            PA MapReduce job.
+                        </para>
+                    </listitem>
+                    <listitem>
+                        <para>
+                            <emphasis>Speedup</emphasis>: the ratio Sequential / PA MapReduce.
+                        </para>
+                    </listitem>
+                </itemizedlist>
+            </para>
+        </section>
+    </section>
 
 </chapter>
