@@ -5,7 +5,7 @@
 	<classpathentry kind="src" output="classes/resource-manager" path="src/resource-manager/src"/>
 	<classpathentry kind="src" output="classes/scheduler" path="src/scheduler/src"/>
 	<classpathentry kind="src" output="classes/schedulerTests" path="src/scheduler/tests"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="compile/lib/ant.jar"/>
 	<classpathentry kind="lib" path="compile/lib/AntelopeTasks_3.2.19.jar"/>
 	<classpathentry kind="lib" path="compile/lib/ant-junit.jar"/>
@@ -175,5 +175,6 @@
 	<classpathentry kind="lib" path="lib/matsci/matlabcontrol-3.1.0.jar"/>
 	<classpathentry kind="lib" path="lib/matsci/ProActive_LicenseSaver-0.0.3-rc6-api.jar"/>
 	<classpathentry kind="lib" path="lib/common/rrd4j-2.0.6.jar"/>
+	<classpathentry kind="lib" path="lib/mapreduce/hadoop-0.20.2-core.jar"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>
