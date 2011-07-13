@@ -122,6 +122,7 @@
 				</indexjars>
 		    </jar>
 			<copy file="${deploy.lib.dir}/${scheduler.mapreduce.jar}" toDir="${addons.dir}" />
+			<copy file="${deploy.lib.dir}/hadoop-0.20.2-core.jar" toDir="${addons.dir}" />
 		</target>
 <!-- end of the ant target to create the ProActive_Scheduler-mapreduce.jar -->
 
