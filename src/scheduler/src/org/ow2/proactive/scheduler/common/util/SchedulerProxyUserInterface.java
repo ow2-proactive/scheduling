@@ -183,6 +183,14 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
     }
 
     //@Override
+    public void renewSession() throws NotConnectedException {
+        if (uischeduler == null) {
+            throw new NotConnectedException("Not connected to the scheduler.");
+        }
+        uischeduler.renewSession();
+    }
+
+    //@Override
     public void removeEventListener() throws NotConnectedException, PermissionException {
         if (uischeduler == null) {
             throw new NotConnectedException("Not connected to the scheduler.");

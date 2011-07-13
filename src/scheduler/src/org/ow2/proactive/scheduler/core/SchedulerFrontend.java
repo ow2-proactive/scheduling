@@ -879,6 +879,17 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @ImmediateService
+    public void renewSession() throws NotConnectedException {
+        UniqueID id = checkAccess();
+        UserIdentificationImpl ident = identifications.get(id);
+        //renew session for this user
+        renewUserSession(id, ident);
+    }
+
+    /**
      * Factoring of exception management for the 5 next jobs order.
      *
      * @param methodName the name of the method to be checked

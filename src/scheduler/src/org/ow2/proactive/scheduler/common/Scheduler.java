@@ -427,4 +427,11 @@ public interface Scheduler extends SchedulerCoreMethods {
      * @return true if the user connected to a Scheduler, false otherwise.
      */
     public boolean isConnected();
+
+    /**
+     * This method renew the connection lease without other side effect.
+     * @throws NotConnectedException if you are not authenticated.
+     */
+    public void renewSession() throws NotConnectedException;
+
 }
