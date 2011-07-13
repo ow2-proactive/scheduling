@@ -31,6 +31,7 @@
 	<property name="scheduler.client.jar"        value="ProActive_Scheduler-client.jar" />
 	<property name="scheduler.worker.jar"        value="ProActive_Scheduler-worker.jar" />
 	<property name="scheduler.matsci.jar"        value="ProActive_Scheduler-matsci.jar" />
+	<property name="scheduler.mapreduce.jar"     value="ProActive_Scheduler-mapreduce.jar" />
 	<property name="scheduler.fsm.jar"    		 value="ProActive_Scheduler-fsm.jar" />
 
 
@@ -45,6 +46,7 @@
 			<include name="matsci/**/*.jar"/>
 			<!-- Hibernate libs -->
 			<include name="nodesource/**/*.jar"/>
+			<include name="mapreduce/*.jar" />
 		</fileset>
 
 		<pathelement location="${base.dir}/compile/lib/junit-4.3.jar"/>

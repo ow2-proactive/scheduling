@@ -1,0 +1,313 @@
+#cambiare il nome del file ( abbreviarlo )
+
+# utility string to build a pattern to use in matching mapper output file name (intermediate_\d{0,}_<reducerId>)
+#org.ow2.proactive.scheduler.regex.zeroOrMoreDigits=\\d{0,}
+
+# needed when the file system try to get the file locations. We simulated a distributed file system answering the file is always on the localhost
+org.ow2.proactive.scheduler.ext.mapreduce.localhost.name=localhost
+
+# define the class that implements the default file system based on the ProActive DataSpaces
+org.ow2.proactive.scheduler.ext.mapreduce.workflow.fsDefaultName=pads:///
+org.ow2.proactive.scheduler.ext.mapreduce.workflow.fsDefaultImplementation=org.ow2.proactive.scheduler.ext.mapreduce.fs.PADataSpacesFileSystem
+#org.ow2.proactive.scheduler.ext.mapreduce.workflow.fsDataSpacePropertyName=org.ow2.proactive.scheduler.ext.mapreduce.workflow.fsDataSpace
+
+# define the name of the property that hadoop uses to select the default name of the file system
+org.ow2.proactive.scheduler.ext.mapreduce.workflow.hadoopFsDefaultNamePropertyName=fs.default.name
+
+# define the name of the Hadoop property that will be used to select the class representing the implementation of the file system to use
+# fs.<uri.getScheme>.impl. E.g.: fs.file.impl, fs.ftp.impl etc...
+# Hence "pads" gives "fs.pads.impl" and we have to specify another property whose value is "fs.pads.impl"
+org.ow2.proactive.scheduler.ext.mapreduce.workflow.fsImplementationScheme=pads
+org.ow2.proactive.scheduler.ext.mapreduce.workflow.hadoopFsImplementationPropertyName=fs.pads.impl
+
+# define the name of the Hadoop property to use to enable or disable the file system cache (notice the name of this property contain the file system scheme name "pads")
+# and the property that follows it define its value
+org.ow2.proactive.scheduler.ext.mapreduce.workflow.hadoopFsDisableCachePropertyName=fs.pads.impl.disable.cache
+org.ow2.proactive.scheduler.ext.mapreduce.workflow.fsDisableCache=true
+
+# define the name of the Hadoop property that is used to retrieve the list of input files (comma separated)
+org.ow2.proactive.scheduler.ext.mapreduce.workflow.hadoopInputDirectoryPropertyName=mapred.input.dir
+
+# define the name of the Hadoop property that is used to retrieve the output directory
+org.ow2.proactive.scheduler.ext.mapreduce.workflow.hadoopOutputDirectoryPropertyName=mapred.output.dir
+
+# define the name of the files that represent the script to do the replication of the MapperPATask and of the ReducerPATask tasks
+# We must notice that the name does not contain the path because the script files are added to the root folder of the mapreduce jar
+org.ow2.proactive.scheduler.ext.mapreduce.workflow.mapperPATask.replicationScript.fileName=replicateMapperPATask.js
+org.ow2.proactive.scheduler.ext.mapreduce.workflow.reducerPATask.replicationScript.fileName=replicateReducerPATask.js
+org.ow2.proactive.scheduler.ext.mapreduce.reducerPATask.outputFileTransferPostScript.fileName=reducerPATaskOutputFileTransfer.js
+
+# path to the folder containing additional jars to add to the classpath when creating the fork environment
+org.ow2.proactive.scheduler.ext.mapreduce.schedulerAdditionalClasspathFolder=addons/
+
+# framework script engine name
+org.ow2.proactive.scheduler.ext.mapreduce.workflow.scriptEngineName=javascript
+
+# framework logging level
+org.ow2.proactive.scheduler.ext.mapreduce.workflow.logging.debug=true
+
+# framework profiling level
+org.ow2.proactive.scheduler.ext.mapreduce.workflow.logging.profile=true
+
+# intermediate buffer size (128 * 1024) represents the size, in bytes, of the buffer to use in serialization and deserialization processes (see org.ow2.proactive.scheduler.ext.hadoopmapreduce.PAIntermediateFileReader)
+#org.ow2.proactive.scheduler.ext.mapreduce.workflow.intermediateBufferSize=131072
+
+# framework forked JVM arguments
+org.ow2.proactive.scheduler.ext.mapreduce.workflow.forkedJVM.arguments=-Xms128m, -Xmx512m
+
+
+
+################################## start of: ProActive MapReduce executable classes for tasks #####################################
+# define the executable class that contains the code the SplitterPATask must run
+org.ow2.proactive.scheduler.ext.mapreduce.workflow.splitterPATask.executableClass=org.ow2.proactive.scheduler.ext.mapreduce.SplitterPATask
+
+# define the executable class that contains the code the MapperPATask must run
+org.ow2.proactive.scheduler.ext.mapreduce.workflow.mapperPATask.executableClass=org.ow2.proactive.scheduler.ext.mapreduce.MapperPATask
+
+# define the executable class that contains the code the MapperJoinPATask must run
+org.ow2.proactive.scheduler.ext.mapreduce.workflow.mapperJoinPATask.executableClass=org.ow2.proactive.scheduler.ext.mapreduce.MapperJoinPATask
+
+# define the executable class that contains the code the ReducerPATask must run
+org.ow2.proactive.scheduler.ext.mapreduce.workflow.reducerPATask.executableClass=org.ow2.proactive.scheduler.ext.mapreduce.ReducerPATask
+
+# define the executable class that contains the code the ReducerJoinPATask must run
+org.ow2.proactive.scheduler.ext.mapreduce.workflow.reducerJoinPATask.executableClass=org.ow2.proactive.scheduler.ext.mapreduce.ReducerJoinPATask
+################################## end of: ProActive MapReduce executable classes for tasks ########################################
+
+
+
+################################## start of: Definition of the default values of the ProActive MapReduce Job and Tasks ############################
+
+### start of: ProActive MapReduce Job global properties default values ###
+# define whether the job must continue if a user exception or an error occurs during this process. (This must be a ProActive Framework MapReduce defined property)
+# True means that the job will immediately stops every remaining task if an error occurs in this task.
+org.ow2.proactive.scheduler.ext.mapreduce.workflow.cancelJobOnError.default=true
+
+# define the text that will be shown in the description attribute of this job when the user choose to show the job informations
+org.ow2.proactive.scheduler.ext.mapreduce.workflow.description.default=ProActive MapReduce
+
+# define how many times a task will run if it ends with an exception or an error code (this value could be overwritten at task level)
+org.ow2.proactive.scheduler.ext.mapreduce.workflow.maxNumberOfExecutions.default=1
+
+# define the text that will be shown as the project name attribute when the user choose the show the informations of the job
+org.ow2.proactive.scheduler.ext.mapreduce.workflow.projectName.default=ProActiveMapReduce
+
+# define how the task must read its input data. There are three different values:
+# - fullLocalRead: all the input data (file) are transferred on the node the task will execute on and then the task will read the slice of data it needs
+# - partialLocalRead: only the slice of data the task needs will be transferred on the node the tsak will execute on
+# - remoteRead: no data will be transferred on the node the task will execute on, the task read remotely the slice of data it needs but only the first and the third can be set for the SplitterPATask
+#org.ow2.proactive.scheduler.ext.mapreduce.workflow.splitterPATask.readMode.default=fullLocalRead
+org.ow2.proactive.scheduler.ext.mapreduce.workflow.splitterPATask.readMode.default=remoteRead
+
+# define whether this task must be started on another resource when it fails. There are two possible values:
+# - org.ow2.proactive.scheduler.ext.mapreduce.workflow.restartAnywhere: the task will be restarted on any available resource
+# - org.ow2.proactive.scheduler.ext.mapreduce.workflow.restartElsewhere: the task will be restarted on a different resource
+org.ow2.proactive.scheduler.ext.mapreduce.workflow.restartTaskOnError.default=org.ow2.proactive.scheduler.ext.mapreduce.workflow.restartAnywhere
+### end of: ProActive MapReduce Job global properties default values ###
+
+
+### start of: SplitterPATask properties default values ###
+# define whether the job must continue if a user exception or an error occurs during this process. (This must be a ProActive Framework MapReduce defined property)
+# True means that the job will immediately stops every remaining task if an error occurs in this task.
+org.ow2.proactive.scheduler.ext.mapreduce.workflow.splitterPATask.cancelJobOnError.default=true
+
+# define the text that appears as description attribute when the user choose to show the job informations
+org.ow2.proactive.scheduler.ext.mapreduce.workflow.splitterPATask.description.default=The SplitterPATask task defines InputSplits for MapperPATask tasks
+
+# define how many times a task will run if it ends with an exception or an error code
+org.ow2.proactive.scheduler.ext.mapreduce.workflow.splitterPATask.maxNumberOfExecutions.default=1
+
+# define the name of the task, that will appear when the user choose to show the task informations
+org.ow2.proactive.scheduler.ext.mapreduce.workflow.splitterPATask.name.default=SplitterPATask
+
+# define whether this task must be started on another resource when it fails. There are two possible values:
+# - org.ow2.proactive.scheduler.ext.mapreduce.workflow.restartAnywhere: the task will be restarted on any available resource
+# - org.ow2.proactive.scheduler.ext.mapreduce.workflow.restartElsewhere: the task will be restarted on a different resource
+org.ow2.proactive.scheduler.ext.mapreduce.workflow.splitterPATask.restartTaskOnError.default=org.ow2.proactive.scheduler.ext.mapreduce.workflow.restartAnywhere
+### end of: SplitterPATask properties default values ###
+
+
+### start of: MapperPATask properties default values ###
+# define whether the job must continue if a user exception or an error occurs during this process. (This must be a ProActive Framework MapReduce defined property)
+# True means that the job will immediately stops every remaining task if an error occurs in this task.
+org.ow2.proactive.scheduler.ext.mapreduce.workflow.mapperPATask.cancelJobOnError.default=false
+
+# define the text that appears as description attribute when the user choose to show the job informations
+org.ow2.proactive.scheduler.ext.mapreduce.workflow.mapperPATask.description.default=MapperPATask reads the InputSplits, applies the map function, generates partitions
+
+# define how many times a task will run if it ends with an exception or an error code
+org.ow2.proactive.scheduler.ext.mapreduce.workflow.mapperPATask.maxNumberOfExecutions.default=1
+
+# define the name of the task, that will appear when the user choose to show the task informations
+org.ow2.proactive.scheduler.ext.mapreduce.workflow.mapperPATask.name=MapperPATask
+
+# define how the task must read its input data. There are three different values:
+# - fullLocalRead: all the input data (file) are transferred on the node the task will execute on and then the task will read the slice of data it needs
+# - partialLocalRead: only the slice of data the task needs will be transferred on the node the tsak will execute on
+# - remoteRead: no data will be transferred on the node the task will execute on, the task read remotely the slice of data it needs
+#org.ow2.proactive.scheduler.ext.mapreduce.workflow.mapperPATask.readMode.default=fullLocalRead
+#org.ow2.proactive.scheduler.ext.mapreduce.workflow.mapperPATask.readMode.default=partialLocalRead
+org.ow2.proactive.scheduler.ext.mapreduce.workflow.mapperPATask.readMode.default=remoteRead
+
+# define whether this task must be started on another resource when it fails. There are two possible values:
+# - org.ow2.proactive.scheduler.ext.mapreduce.workflow.restartAnywhere: the task will be restarted on any available resource
+# - org.ow2.proactive.scheduler.ext.mapreduce.workflow.restartElsewhere: the task will be restarted on a different resource
+org.ow2.proactive.scheduler.ext.mapreduce.workflow.mapperPATask.restartTaskOnError.default=org.ow2.proactive.scheduler.ext.mapreduce.workflow.restartAnywhere
+
+# define how the task must write its output data. There are two different values:
+# - localWrite: output data are written into the local space and then, probably, they are transferred into the output space of the task
+# - remoteWrite: output data are written directly into the output space of the task
+org.ow2.proactive.scheduler.ext.mapreduce.workflow.mapperPATask.writeMode.default=localWrite
+#org.ow2.proactive.scheduler.ext.mapreduce.workflow.mapperPATask.writeMode.default=remoteWrite
+### end of: MapperPATask properties default values ###
+
+
+### start of: MapperJoinPATask properties default values ###
+# define whether the job must continue if a user exception or an error occurs during this process. (This must be a ProActive Framework MapReduce defined property)
+# True means that the job will immediately stops every remaining task if an error occurs in this task.
+org.ow2.proactive.scheduler.ext.mapreduce.workflow.mapperJoinPATask.cancelJobOnError.default=false
+
+# define the text that appears as description attribute when the user choose to show the job informations
+org.ow2.proactive.scheduler.ext.mapreduce.workflow.mapperJoinPATask.description.default=MapperJoinPATask task simply represents the join of "replicated" MapperPATask tasks
+
+# define how many times a task will run if it ends with an exception or an error code
+org.ow2.proactive.scheduler.ext.mapreduce.workflow.mapperJoinPATask.maxNumberOfExecutions.default=1
+
+# define the name of the task, that will appear when the user choose to show the task informations
+org.ow2.proactive.scheduler.ext.mapreduce.workflow.mapperJoinPATask.name.default=MapperJoinPATask
+
+# define whether this task must be started on another resource when it fails. There are two possible values:
+# - org.ow2.proactive.scheduler.ext.mapreduce.workflow.restartAnywhere: the task will be restarted on any available resource
+# - org.ow2.proactive.scheduler.ext.mapreduce.workflow.restartElsewhere: the task will be restarted on a different resource
+org.ow2.proactive.scheduler.ext.mapreduce.workflow.mapperJoinPATask.restartTaskOnError.default=org.ow2.proactive.scheduler.ext.mapreduce.workflow.restartAnywhere
+### end of: MapperJoinPATask properties default values ###
+
+
+### start of: ReducerPATask properties default values ###
+# define whether the job must continue if a user exception or an error occurs during this process. (This must be a ProActive Framework MapReduce defined property)
+# True means that the job will immediately stops every remaining task if an error occurs in this task.
+org.ow2.proactive.scheduler.ext.mapreduce.workflow.reducerPATask.cancelJobOnError.default=false
+
+# define the text that appears as description attribute when the user choose to show the job informations
+org.ow2.proactive.scheduler.ext.mapreduce.workflow.reducerPATask.description.default=ReducerPATask applies the reduce function to a given input partition
+
+# define how many times a task will run if it ends with an exception or an error code
+org.ow2.proactive.scheduler.ext.mapreduce.workflow.reducerPATask.maxNumberOfExecutions.default=1
+
+# define the name of the task, that will appear when the user choose to show the task informations
+org.ow2.proactive.scheduler.ext.mapreduce.workflow.reducerPATask.name.default=ReducerPATask
+
+# define the prefix of the output file to create (e.g., the full name of the file will contain also the replication id of the task)
+org.ow2.proactive.scheduler.ext.mapreduce.workflow.reducerPATask.outputFileNamePrefix.default=reduced
+
+# define how the task must read its input data. There are three different values:
+# - fullLocalRead: all the input data (file) are transferred on the node the task will execute on and then the task will read the slice of data it needs
+# - partialLocalRead: only the slice of data the task needs will be transferred on the node the task will execute on
+# - remoteRead: no data will be transferred on the node the task will execute on, the task read remotely the slice of data it needs
+# but only two (first and third) are applicable for the reducerPATask
+#org.ow2.proactive.scheduler.ext.mapreduce.workflow.reducerPATask.readMode.default=fullLocalRead
+org.ow2.proactive.scheduler.ext.mapreduce.workflow.reducerPATask.readMode.default=remoteRead
+
+# define whether this task must be started on another resource when it fails. There are two possible values:
+# - org.ow2.proactive.scheduler.ext.mapreduce.workflow.restartAnywhere: the task will be restarted on any available resource
+# - org.ow2.proactive.scheduler.ext.mapreduce.workflow.restartElsewhere: the task will be restarted on a different resource
+org.ow2.proactive.scheduler.ext.mapreduce.workflow.reducerPATask.restartTaskOnError.default=org.ow2.proactive.scheduler.ext.mapreduce.workflow.restartAnywhere
+
+# define how the task must write its output data. There are two different values:
+# - localWrite: output data are written into the local space and then, probably, they are transferred into the output space of the task
+# - remoteWrite: output data are written directly into the output space of the task
+org.ow2.proactive.scheduler.ext.mapreduce.workflow.reducerPATask.writeMode.default=localWrite
+#org.ow2.proactive.scheduler.ext.mapreduce.workflow.reducerPATask.writeMode.default=remoteWrite
+### end of: ReducerPATask properties default values ###
+
+
+### start of: ReducerJoinPATask properties default values ###
+# define whether the job must continue if a user exception or an error occurs during this process. (This must be a ProActive Framework MapReduce defined property)
+# True means that the job will immediately stops every remaining task if an error occurs in this task.
+org.ow2.proactive.scheduler.ext.mapreduce.workflow.reducerJoinPATask.cancelJobOnError.default=false
+
+# define the text that appears as description attribute when the user choose to show the job informations
+org.ow2.proactive.scheduler.ext.mapreduce.workflow.reducerJoinPATask.description.default=ReducerJoinPATask task represents the join of "replicated" ReducerPATask tasks
+
+# define how many times a task will run if it ends with an exception or an error code
+org.ow2.proactive.scheduler.ext.mapreduce.workflow.reducerJoinPATask.maxNumberOfExecutions.default=1
+
+# define the name of the task, that will appear when the user choose to show the task informations
+org.ow2.proactive.scheduler.ext.mapreduce.workflow.reducerJoinPATask.name.default=ReducerJoinPATask
+
+# define whether this task must be started on another resource when it fails. There are two possible values:
+# - org.ow2.proactive.scheduler.ext.mapreduce.workflow.restartAnywhere: the task will be restarted on any available resource
+# - org.ow2.proactive.scheduler.ext.mapreduce.workflow.restartElsewhere: the task will be restarted on a different resource
+org.ow2.proactive.scheduler.ext.mapreduce.workflow.reducerJoinPATask.restartTaskOnError.default=org.ow2.proactive.scheduler.ext.mapreduce.workflow.restartAnywhere
+### end of: ReducerJoinPATask properties default values ###
+
+################################## end of: Definition of the default values of the ProActive MapReduce Job and Tasks ############################
+
+
+
+
+### start of: general ProActive MapReduce framework default properties ###
+# define the default string to use to create full name of files that store mapreduce job data
+org.ow2.proactive.scheduler.ext.mapreduce.workflow.fileName.linkingString=_
+
+# define the string that allows the selection of all the entities in a selection process
+org.ow2.proactive.scheduler.ext.mapreduce.workflow.fileName.all=*
+
+# define the prefix to use to create the name of the temporary files that store partially sorted data
+org.ow2.proactive.scheduler.ext.mapreduce.workflow.fileName.temporaryFileName=temporary
+
+# define the name of the counter of the input keys
+org.ow2.proactive.scheduler.ext.mapreduce.workflow.inputKeyCounterName=inputKeyCounter
+
+# define the name of the counter of the input keys to display when required by the users
+org.ow2.proactive.scheduler.ext.mapreduce.workflow.inputKeyCounterDisplayName=inputKeyCounterDisplay
+
+# define the name of the counter of the input values
+org.ow2.proactive.scheduler.ext.mapreduce.workflow.inputValueCounterName=inputValueCounter
+
+# define the name of the counter of the input keys to display when required by the users
+org.ow2.proactive.scheduler.ext.mapreduce.workflow.inputValueCounterDisplayName=inputValueCounterDisplay
+### end of: general ProActive MapReduce framework default properties ###
+
+
+### start of: names, values and default values of some Hadoop properties ###
+##  we must notice we must not change the name of the default properties  ##
+org.ow2.proactive.scheduler.ext.mapreduce.hadoop.combinerClass.propertyName=mapreduce.combine.class
+org.ow2.proactive.scheduler.ext.mapreduce.hadoop.inputFormat.propertyName=mapreduce.inputformat.class
+org.ow2.proactive.scheduler.ext.mapreduce.hadoop.io.sort.factor.defaultValue=100
+org.ow2.proactive.scheduler.ext.mapreduce.hadoop.io.sort.factorPropertyName=io.sort.factor
+org.ow2.proactive.scheduler.ext.mapreduce.hadoop.io.sort.mapSortClassPropertyName=map.sort.class
+org.ow2.proactive.scheduler.ext.mapreduce.hadoop.io.sort.mbPropertyName=io.sort.mb
+org.ow2.proactive.scheduler.ext.mapreduce.hadoop.io.sort.recordPercentPropertyName=io.sort.record.percent
+org.ow2.proactive.scheduler.ext.mapreduce.hadoop.io.sort.spillPercentPropertyName=io.sort.spill.percent
+org.ow2.proactive.scheduler.ext.mapreduce.hadoop.mapper.propertyName=mapreduce.map.class
+org.ow2.proactive.scheduler.ext.mapreduce.hadoop.mapper.outputKeyClassPropertyName=mapred.mapoutput.key.class
+org.ow2.proactive.scheduler.ext.mapreduce.hadoop.mapper.outputValueClassPropertyName=mapred.mapoutput.value.class
+org.ow2.proactive.scheduler.ext.mapreduce.hadoop.max.split.size.propertyName=mapred.max.split.size
+mapred.max.split.size.default=9223372036854775807
+org.ow2.proactive.scheduler.ext.mapreduce.hadoop.min.split.size.propertyName=mapred.min.split.size
+mapred.min.split.size.default=0
+org.ow2.proactive.scheduler.ext.mapreduce.hadoop.outputFormat.propertyName=mapreduce.outputformat.class
+org.ow2.proactive.scheduler.ext.mapreduce.hadoop.outputKeyClass.propertyName=mapred.output.key.class
+org.ow2.proactive.scheduler.ext.mapreduce.hadoop.outputValueClass.propertyName=mapred.output.value.class
+org.ow2.proactive.scheduler.ext.mapreduce.hadoop.minimumNumberOfSpillForCombinePropertyName=min.num.spills.for.combine
+org.ow2.proactive.scheduler.ext.mapreduce.hadoop.output.keyComparatorClassPropertyName=mapred.output.key.comparator.class
+org.ow2.proactive.scheduler.ext.mapreduce.hadoop.numberOfReducersPropertyName=mapred.reduce.tasks
+org.ow2.proactive.scheduler.ext.mapreduce.hadoop.reducer.propertyName=mapreduce.reduce.class
+org.apache.hadoop.fs.local.block.size=fs.local.block.size
+org.apache.hadoop.io.file.buffer.size=io.file.buffer.size
+org.ow2.proactive.scheduler.ext.mapreduce.hadoop.numberOfReducerTasks.propertyName=mapred.reduce.tasks
+org.apache.hadoop.job.lineRecordReaderMaxLength=mapred.linerecordreader.maxlength
+org.apache.hadoop.job.mapOutput.keyClass=mapred.mapoutput.key.class
+org.apache.hadoop.job.mapOutput.valueClass=mapred.mapoutput.value.class
+org.apache.hadoop.job.outputValueGroupingComparator=mapred.output.value.groupfn.class
+org.apache.hadoop.job.outputKeyComparatorClass=mapred.output.key.comparator.class
+org.apache.hadoop.job.priority=mapred.job.priority
+org.apache.hadoop.job.textOutputFormat.keyValueSeparator=mapred.textoutputformat.separator
+org.apache.hadoop.job.textOutputFormat.defaultKeyValueSeparator=\t
+### end of: names and values of some Hadoop properties ###
+
+
+# default values for the Hadoop properties
+org.ow2.proactive.scheduler.ext.mapreduce.hadoop.fs.local.block.size.defaultValue=33554432
+org.ow2.proactive.scheduler.ext.mapreduce.hadoop.io.file.buffer.size.defaultValue=4096

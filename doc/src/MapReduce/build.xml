@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+
+	<!-- ================================================================ -->
+	<!--            Create docs, which is the javadoc + manual            -->
+	<!--  =============================================================== -->
+	<target name="doc.MapReduce.docs" depends="doc.MapReduce.javadoc.all, doc.MapReduce.manual, doc.MapReduce.doc.zips" description="Generate the MapReduce Programming javadoc, manual, and zip archives" />
+
+	<!-- ================================================================ -->
+	<!--            Create docs, which is the javadoc + manual            -->
+	<!--  =============================================================== -->
+	<target name="doc.MapReduce.doc.zips" depends="doc.MapReduce.manualSingleHtmlZip, doc.MapReduce.manualHtmlZip, doc.MapReduce.javadoc.publishedZip, doc.MapReduce.javadoc.completeZip" description="Generate the MapReduce Programming javadoc and manual zip archives" />
+
+
+	<!-- ================================================================ -->
+	<!--                     Create javadoc                               -->
+	<!-- ================================================================ -->
+
+	<target name="doc.MapReduce.javadoc.all" depends="doc.MapReduce.javadoc.published,doc.MapReduce.javadoc.complete"/>
+
+	<!-- ==================================================================== -->
+	<!--          Make just the html files for the manual                     -->
+	<!-- ==================================================================== -->
+	<target name="doc.MapReduce.manualHtml" description="Generate the MapReduce Programming HTML manual">
+		<var name="doc.relative.name"		value="MapReduce" />
+		<var name="docs.output.name"		value="ProActiveMapReduceManual" />
+		<subant target="manualHtml" 			inheritall="true">
+			<fileset dir="${docs.toolchain.dir}" 	includes="doc.xml"/>
+		</subant>
+	</target>
+	<!-- ==================================================================== -->
+	<!--   Make an archive from the files for the multiple html manual        -->
+	<!-- ==================================================================== -->
+	<target name="doc.MapReduce.manualHtmlZip" description="Generate the MapReduce Programming HTML manual zip" depends="doc.MapReduce.manualHtml" >
+		<var name="doc.relative.name"		value="MapReduce" />
+		<var name="docs.output.name"		value="ProActiveMapReduceManual" />
+		<subant target="manualHtmlZip" inheritall="true">
+			<fileset dir="${docs.toolchain.dir}" 	includes="doc.xml"/>
+		</subant>
+	</target>
+
+	<!-- ==================================================================== -->
+	<!--               Make just the pdf files for the manual                 -->
+	<!-- ==================================================================== -->
+	<target name="doc.MapReduce.manualPdf" description="Generate the MapReduce Programming PDF manual">
+		<var name="doc.relative.name"		value="MapReduce" />
+		<var name="docs.output.name"		value="ProActiveMapReduceManual" />
+		<subant target="manualPdf" inheritall="true">
+			<fileset dir="${docs.toolchain.dir}" 	includes="doc.xml"/>
+		</subant>
+	</target>
+	<!-- ==================================================================== -->
+	<!--           Make only one huge html-file from the doc                  -->
+	<!-- ==================================================================== -->
+	<target name="doc.MapReduce.manualSingleHtml" description="Generate the MapReduce Programming single HTML manual">
+		<var name="doc.relative.name"		value="MapReduce" />
+		<var name="docs.output.name"		value="ProActiveMapReduceManual" />
+		<subant target="manualSingleHtml" inheritall="true">
+			<fileset dir="${docs.toolchain.dir}" 	includes="doc.xml"/>
+		</subant>
+	</target>
+
+	<!-- ==================================================================== -->
+	<!--      Make an archive from the files for the single html manual       -->
+	<!-- ==================================================================== -->
+	<target name="doc.MapReduce.manualSingleHtmlZip" description="Generate the MapReduce Programming single HTML manual zip" depends="doc.MapReduce.manualSingleHtml" >
+		<var name="doc.relative.name"		value="MapReduce" />
+		<var name="docs.output.name"		value="ProActiveMapReduceManual" />
+		<subant target="manualSingleHtmlZip" inheritall="true">
+			<fileset dir="${docs.toolchain.dir}" 	includes="doc.xml"/>
+		</subant>
+	</target>
+
+	<!-- ==================================================================== -->
+	<!--      Make an archive from the published javadoc       -->
+	<!-- ==================================================================== -->
+	<target name="doc.MapReduce.javadoc.publishedZip" description="Generate the MapReduce Programming published javadoc zip" depends="doc.MapReduce.javadoc.published">
+		<var name="doc.relative.name"		value="MapReduce" />
+		<var name="docs.output.name"		value="ProActiveMapReduce" />
+		<subant target="javadoc.publishedZip" inheritall="true">
+			<fileset dir="${docs.toolchain.dir}" 	includes="doc.xml"/>
+		</subant>
+	</target>
+
+	<!-- ==================================================================== -->
+	<!--      Make an archive from the complete javadoc       -->
+	<!-- ==================================================================== -->
+	<target name="doc.MapReduce.javadoc.completeZip" description="Generate the MapReduce Programming complete javadoc zip" depends="doc.MapReduce.javadoc.complete">
+		<var name="doc.relative.name"		value="MapReduce" />
+		<var name="docs.output.name"		value="ProActiveMapReduce" />
+		<subant target="javadoc.completeZip" inheritall="true">
+			<fileset dir="${docs.toolchain.dir}" 	includes="doc.xml"/>
+		</subant>
+	</target>
+
+
+	<!-- ==================================================================== -->
+	<!-- Construct the manual from the XML files in {docs.src}                -->
+	<!-- ==================================================================== -->
+	<target name="doc.MapReduce.manual" description="Generate the MapReduce Programming manuals  (html, single html, pdf)" depends="doc.MapReduce.manualSingleHtml,doc.MapReduce.manualHtml,doc.MapReduce.manualPdf" />
+
+	<!-- javadoc paths are not include through subant-->
+	<path id="docs.utils.classpath.javadoc">
+		<fileset dir="../doc/toolchain/lib">
+			<include name="**/*.jar"/>
+		</fileset>
+	</path>
+
+	<target name="doc.MapReduce.javadoc.complete"  depends="compile.all" description="Generate the MapReduce complete javadoc">
+		<var name="doc.relative.name"		value="MapReduce" />
+		<var name="docs.output.name"		value="ProActiveMapReduce" />
+		<setProperties />
+		<javadoc
+            destdir="${docs.built.dir}/api_complete"
+            author="true"
+            version="true"
+            source="${source}"
+            use="true"
+            windowtitle="Scheduler, Resource Manager and MapReduce Complete API"
+            breakiterator="yes"
+            additionalparam="-docfilessubdirs -excludedocfilessubdir CVS:test_documentation">
+
+			<classpath>
+				<path refid="scheduler.libs"/>
+				<path refid="rm.libs"/>
+				<!-- <path refid="mapreduce.libs" /> -->
+				<pathelement path="${cl.scheduler.dir}"/>
+				<pathelement path="${cl.rm.dir}"/>
+				<!-- <pathelement path="${cl.mapreduce.dir}" /> -->
+			</classpath>
+
+			<packageset dir="${src.scheduler.dir}" />
+			<packageset dir="${src.rm.dir}" />
+			<!-- <packageset dir="${src.mapreduce.dir}" /> -->
+
+
+			<link href="http://proactive.inria.fr/release-doc/pa/api_complete/"/>
+			<link href="http://fractal.objectweb.org/current/doc/javadoc/fractal/" />
+			<link href="http://java.sun.com/j2se/1.5.0/docs/api/"/>
+			<doctitle>
+				<![CDATA[MapReduce ${version}<br>
+				<a href='../multiple_html/index.html'>(documentation is here)</a>
+				<br>]]></doctitle>
+				<bottom>
+					<![CDATA[<i>Copyright 1997-2009 INRIA All Rights Reserved.</i>]]></bottom>
+
+			<group title="Scheduler">
+				<package name="org.ow2.proactive.scheduler*" />
+			</group>
+
+			<group title="Resource Manager">
+				<package name="org.ow2.proactive.resourcemanager*" />
+			</group>
+
+			<group title="MapReduce">
+				<package name="org.ow2.proactive.scheduler.ext.mapreduce*" />
+			</group>
+		</javadoc>
+	</target>
+
+	<target name="doc.MapReduce.javadoc.published" depends="compile.all" description="Generate the MapReduce published javadoc">
+		<var name="doc.relative.name"		value="MapReduce" />
+		<var name="docs.output.name"		value="ProActiveMapReduce" />
+		<setProperties />
+		<mkdir dir="${docs.tmp.dir}" />
+		<javadoc source="${source}"	classpathref="scheduler.libs">
+			<doclet name="doc.PublishedAPIDoclet">
+				<path refid="docs.utils.classpath.javadoc"/>
+				<param name="-file" value="${docs.tmp.dir}/publishedCoreClasses"/>
+			</doclet>
+			<packageset dir="${src.scheduler.dir}"/>
+			<packageset dir="${src.rm.dir}" />
+			<!-- <packageset dir="${src.mapreduce.dir}" /> -->
+		</javadoc>
+
+
+		<javadoc
+            destdir="${docs.built.dir}/api_published"
+            author="true"
+            version="true"
+            source="${source}"
+            use="true"
+            windowtitle="MapReduce and Resource Manager User API"
+            breakiterator="yes"
+            additionalparam="-docfilessubdirs -excludedocfilessubdir CVS:test_documentation">
+
+			<classpath>
+				<path refid="scheduler.libs"/>
+				<path refid="rm.libs"/>
+				<!-- <path refid="mapreduce.libs" /> -->
+				<pathelement path="${cl.scheduler.dir}"/>
+				<pathelement path="${cl.rm.dir}"/>
+				<!-- <pathelement path="${cl.mapreduce.dir}" /> -->
+			</classpath>
+
+			<!-- <fileset dir="${src.mapreduce.dir}" includesfile="${docs.tmp.dir}/publishedCoreClasses"/> -->
+			<fileset dir="${src.rm.dir}" includesfile="${docs.tmp.dir}/publishedCoreClasses"/>
+			<fileset dir="${src.scheduler.dir}" includesfile="${docs.tmp.dir}/publishedCoreClasses"/>
+			<link href="http://fractal.objectweb.org/current/doc/javadoc/fractal/" />
+			<link href="http://java.sun.com/j2se/1.5.0/docs/api/"/>
+			<doctitle>
+				<![CDATA[MapReduce ${version}<br>
+				<a href='../multiple_html/index.html'>(documentation is here)</a>
+				<br>]]></doctitle>
+				<bottom>
+					<![CDATA[<i>Copyright 1997-2009 INRIA All Rights Reserved.</i>]]></bottom>
+
+			<group title="Scheduler">
+				<package name="org.ow2.proactive.scheduler*" />
+			</group>
+
+			<group title="Resource Manager">
+				<package name="org.ow2.proactive.resourcemanager*" />
+			</group>
+
+			<group title="MapReduce">
+				<package name="org.ow2.proactive.scheduler.ext.mapreduce*" />
+			</group>
+
+		</javadoc>
+		<delete dir="${docs.tmp.dir}"/>
+	</target>
+</project>

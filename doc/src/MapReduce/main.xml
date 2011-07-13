@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Converted by db4-upgrade version 1.0
+	!DOCTYPE book PUBLIC "-//INRIA//DTD DocBook V5.0-Based Subset V0.1//EN"-->
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V5.0//EN"
+                "docbook.dtd" [
+	<!-- WARNING: Please do not edit with XXE -->
+	<!-- This file is only meant as a concatenation of the other xml files -->
+<!-- 	<!ENTITY BookInfo			SYSTEM "BookInfo.xml"> -->
+<!-- 	<!ENTITY Contributors		SYSTEM "Contributors.xml"> -->
+
+<!-- 	<!ENTITY Overview			SYSTEM "Overview.xml"> -->
+<!-- 	<!ENTITY UserManual			SYSTEM "UserManual.xml"> -->
+<!-- 	<!ENTITY AdminManual		SYSTEM "AdminManual.xml"> -->
+<!-- 	<!ENTITY Tutorial			SYSTEM "Tutorial.xml"> -->
+<!-- 	<!ENTITY Plugin				SYSTEM "Plugin.xml"> -->
+
+<!-- 	<!ENTITY Matlab				SYSTEM "Matlab.xml"> -->
+<!-- 	<!ENTITY Scilab				SYSTEM "Scilab.xml"> -->
+<!-- 	<!ENTITY Modelica			SYSTEM "Modelica.xml"> -->
+
+<!-- 	<!ENTITY FilesSplitMerge	SYSTEM "FilesSplitMerge.xml"> -->
+
+	<!ENTITY MapReduce			SYSTEM "MapReduce.xml">
+
+<!-- 	<!ENTITY XSDJobSchema			SYSTEM "Appendix_XSDJobSchema.xml"> -->
+]>
+
+<book xmlns="http://docbook.org/ns/docbook" version="5.0">
+<!-- 	&BookInfo; -->
+<!-- 	&Contributors; -->
+
+	<part xml:id="ProActiveMapReduce">
+		<info>
+			<title>ProActive MapReduce</title>
+		</info>
+<!-- 		&Overview; -->
+<!-- 		&UserManual; -->
+<!-- 		&AdminManual; -->
+<!-- 		&Tutorial; -->
+<!-- 		&Plugin; -->
+			&MapReduce;
+	</part>
+
+<!-- 	<part xml:id="Appendice"><info><title xml:id="Appendice_title">Appendice</title></info> -->
+<!-- 		&XSDJobSchema; -->
+<!-- 	</part> -->
+</book>

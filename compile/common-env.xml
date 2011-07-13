@@ -21,6 +21,8 @@
 	<property name="deploy.dir"          value="${base.dir}/dist" />
 	<property name="deploy.lib.dir"      value="${deploy.dir}/lib" />
 
+	<property name="addons.dir"          value="${base.dir}/addons" />
+
 	<!-- ================================================================ -->
 	<!--                   		Source paths                              -->
 	<!--  =============================================================== -->

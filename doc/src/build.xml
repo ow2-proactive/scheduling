@@ -4,6 +4,7 @@
 	<import file="../toolchain/doc_macros.xml" />
 	<import file="Resourcing/build.xml" />
 	<import file="Scheduling/build.xml" />
+	<import file="MapReduce/build.xml" />
 
 	<property name="doc.root.name" value="" />
 	<property name="snippets.start" value="${docs.dir}/../src:${docs.dir}/../samples" />

@@ -1,0 +1,14 @@
+#!/bin/bash
+#build file for Unix system
+mapreduceDir=$(cd `dirname $0` && /bin/pwd)
+compileDir="$mapreduceDir/../../compile"
+if [ $# -lt 1 ]
+then
+  args="-projecthelp"
+else
+  args=$@
+fi
+# Go inside the ProActive directory
+cd "$mapreduceDir/../.."
+#trap "echo $args | grep -c junit > /dev/null && dev/scripts/killTests" SIGINT SIGTERM
+ANT_HOME="$mapreduceDir" "$JAVA_HOME"/bin/java  -Dant.home="$mapreduceDir" -Dant.library.dir="$compileDir/lib" -Xmx512000000 -classpath "$compileDir"/lib/ant-launcher.jar org.apache.tools.ant.launch.Launcher -buildfile  "$mapreduceDir"/mapreduce.xml $args

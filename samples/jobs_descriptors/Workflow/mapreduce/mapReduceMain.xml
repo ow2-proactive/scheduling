@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job cancelJobOnError="false" restartTaskOnError="anywhere"
+        maxNumberOfExecution="1"
+        logFile=""
+        name="PAMapReduce Submitter" priority="normal" projectName="ProActive MapReduce"
+        xmlns="urn:proactive:jobdescriptor:3.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="urn:proactive:jobdescriptor:3.0 urn:proactive:jobdescriptor:3.0">
+        <!--<job cancelJobOnError="false" restartTaskOnError="anywhere" maxNumberOfExecution="2"
+                logFile="/auto/sop-nas2a/u/sop-nas2a/vol/home_oasis/eborelli/home/eclipse_galileo_workspace/LONG_Scheduling_Workflows_XML_Job/logs/file.log"
+                name="mapreduce taskflow job" priority="normal" projectName="mapreduce" xmlns="urn:proactive:jobdescriptor:21"
+                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:proactive:jobdescriptor:21
+                urn:proactive:jobdescriptor:21 "> -->
+        <variables>
+                <!-- start of the task variables definition -->
+                <variable name="baseDirectory"
+                        value="/store/workspaces/eborrell/paca_grid" />
+
+                <variable name="numberOfMappers" value="108" />
+                <variable name="numberOfReducers" value="54" />
+                <variable name="inputFilePath"
+                        value="lineitem_7MB.tbl" />
+                <variable name="outputFolderPath" value="output" />
+
+                <variable name="submittedJobName" value="Hadoop Job" />
+
+                <variable name="addonsFolder"
+                        value="${baseDirectory}/addons" />
+                <variable name="configurationFilePath"
+                        value="${baseDirectory}/resources/paMapReduceConfigurationProperties.property" />
+                <!-- end of the task variables definition -->
+        </variables>
+        <description>PAMapReduce Submitter</description>
+
+        <!-- We must notice we don't need a job classpath because the classpath is defined in the fork environment -->
+ <!--   <jobClasspath> -->
+<!--            <pathElement path="${addonsFolder}" /> -->
+<!--            <pathElement path="${workingDirectory}/jars/ProActive_Scheduler-mapreduce.jar" -->
+<!--    </jobClasspath> -->
+
+        <!--
+		We must notice that when we let the user set the number of mappers we must access
+		the input file to retrieve the size and calculate the size the input split must have
+		to execute as many mappers as the user defined. This mean we need only the INPUT
+		space.
+         -->
+   <inputSpace url="${baseDirectory}/data/input" />
+<!--    <outputSpace url="${dataspace}/output" /> -->
+
+        <taskFlow>
+                <!-- We must notice that the only task that belongs to this task flow does
+                        not use data spaces and the configuration of the data spaces of the ProActive
+                        MapReduce job this task creates is stored inside the configuration file the
+                        user specifies -->
+                <task name="PAMapReduceSubmitter" cancelJobOnError="true"
+                        restartTaskOnError="anywhere" maxNumberOfExecution="1">
+                        <description>PAMapReduceSubmitter submits a ProActive MapReduce job
+                                to the ProActive Scheduler</description>
+                        <javaExecutable
+                                class="org.ow2.proactive.scheduler.ext.mapreduce.examples.PAMapReduceJobMainJavaExecutable">
+                                <forkEnvironment>
+                                        <jvmArgs>
+                                                <jvmArg value="-Xms128m" />
+                                                <jvmArg value="-Xmx512m" />
+                                        </jvmArgs>
+                                        <additionalClasspath>
+                                                <!--
+                                                        We must notice that the fork class path must contain the class that contain the code
+                                                        that is executed when this task is executed, and all the jars needed to execute the
+                                                        ProActive MapReduce job (hadoop-0.20.2-core.jar, hadoop-0.20.2-examples.jar
+                                                        and ProActive_Scheduler-mapreduce.jar)
+                                                -->
+                                                <pathElement path="${addonsFolder}" />
+                                                <!--
+                                                    IMPORTANT when this job is submitted on PACA Grid we must copy the "ProActive_Scheduler-core.jar"
+                                                    of of the current version of the ProActive Scheduler running on PACA Grid in the ${addonsFolder}.
+                                                    Otherwise we will have some problems. The problem is not the execution of the job (with only one task)
+                                                    that creates the ProActive MapReduce job that will be submitted to the ProActive Scheduler, but is
+                                                    in the way the different jars are added to the fork environment used by the tasks that belongs to
+                                                    the ProActive MapReduce job. During the build of the ProActive MapReduce job those jar are expected
+                                                    to be in the directory "$SCHEDULER_HOME/addons/". Where the value of the "$SCHEDULER_HOME/addons/"
+                                                    is read from the user configuration file of the ProActive MapReduce job
+                                                    "/store/workspaces/eborrell/paca_grid/resources/paMapReduceConfigurationProperties.property".
+                                                    Changing the value of the property in the configuration file that defines the "$SCHEDULER_HOME"
+                                                    in the way it point to a directory in our workspace on PACA Grid we can create a subdirectory "addons"
+                                                    of that directory and put all the jars we need inside that "addons" directory. E.g., we
+                                                    can put every needed jar inside the directory "/store/workspaces/eborrell/paca_grid/addons" if the
+                                                    value of the property that defines the "$SCHEDULER_HOME" variable is "/store/workspaces/eborrell/paca_grid".
+                                                -->
+<!--                                            <pathElement path="/home/cperUser/tools/ProActiveScheduling-3.0.0_server/dist/lib/ProActive_Scheduler-core.jar" /> -->
+                                                <pathElement path="${addonsFolder}/ProActive_Scheduler-core.jar" />
+                                                <pathElement path="${addonsFolder}/hadoop-0.20.2-core.jar" />
+                                                <pathElement path="${addonsFolder}/MapReduce-examples.jar" />
+                                                <pathElement path="${addonsFolder}/ProActive_Scheduler-mapreduce.jar" />
+                                        </additionalClasspath>
+                                </forkEnvironment>
+                                <parameters>
+						<parameter name="submittedJobName" value="${submittedJobName}" />
+                                        <parameter name="configurationFilePath" value="${configurationFilePath}" />
+                                        <parameter name="numberOfMappers" value="${numberOfMappers}" />
+                                        <parameter name="numberOfReducers" value="${numberOfReducers}" />
+                                        <parameter name="inputFilePath" value="${inputFilePath}" />
+                                        <parameter name="outputFolderPath" value="${outputFolderPath}" />
+                                </parameters>
+                        </javaExecutable>
+                </task>
+        </taskFlow>
+</job>
