@@ -81,7 +81,7 @@ public class TestGlobalSpace extends FunctionalTest {
 
     private static final String[][] inFiles = { { "A", "Content of A" }, { "B", "not much" },
             { "_1234", "!@#%$@%54vc54\b\t\\\\\nasd123!@#", "res1", "one of the output files" },
-            { "res2", "second\noutput\nfile" }, { "__.res_3?", "third\toutput\nfile\t&^%$$#@!\n" } };
+            { "res2", "second\noutput\nfile" }, { "__.res_3", "third\toutput\nfile\t&^%$$#@!\n" } };
 
     private static String inFileArr = "";
     static {
