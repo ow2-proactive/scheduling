@@ -36,15 +36,24 @@
  */
 package functionaltests;
 
+import java.io.File;
+import java.net.URL;
+
 import junit.framework.Assert;
 
+import org.objectweb.proactive.utils.OperatingSystem;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
+import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
+import org.ow2.proactive.scheduler.common.job.factories.JobFactory_stax;
+import org.ow2.proactive.scheduler.common.task.JavaExecutableInitializer;
+import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
+import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 
 import functionalTests.FunctionalTest;
 
@@ -87,8 +96,8 @@ import functionalTests.FunctionalTest;
  */
 public class TestJobCoverage extends FunctionalTest {
 
-    private static String jobDescriptor = TestJobAborted.class.getResource(
-            "/functionaltests/descriptors/Job_Coverage.xml").getPath();
+    private static URL jobDescriptor = TestJobAborted.class
+            .getResource("/functionaltests/descriptors/Job_Coverage.xml");
 
     /**
      * Tests start here.
@@ -102,8 +111,8 @@ public class TestJobCoverage extends FunctionalTest {
         JobInfo jinfo;
         //job submission
         SchedulerTHelper.log("Submitting job...");
-        JobId id = SchedulerTHelper.submitJob(jobDescriptor);
-
+        JobId id = SchedulerTHelper.submitJob(new File(jobDescriptor.toURI()).getAbsolutePath());
+       
         //waiting for job termination
         SchedulerTHelper.log("Waiting for job to finish...");
         jinfo = SchedulerTHelper.waitForEventJobFinished(id);

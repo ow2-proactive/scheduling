@@ -39,17 +39,35 @@
 		</task>
 		<task name="task6" preciousResult="true">
 			<nativeExecutable>
-				<staticCommand value="${javaCmd} -cp ${classPath} ${executables}.ExitNormally" />
+				<staticCommand value="${javaCmd}" >
+					<arguments>
+						<argument value="-cp"/>
+						<argument value="${classPath}"/>
+						<argument value="${executables}.ExitNormally"/>			
+					</arguments>
+				</staticCommand>
 			</nativeExecutable>
 		</task>
 		<task name="task7">
 			<nativeExecutable>
-				<staticCommand value="${javaCmd} -cp ${classPath} ${executables}.ExitWithErrorCode" />
+				<staticCommand value="${javaCmd}" >
+					<arguments>
+							<argument value="-cp"/>
+							<argument value="${classPath}"/>
+							<argument value="${executables}.ExitWithErrorCode"/>
+					</arguments>
+				</staticCommand>
 			</nativeExecutable>
 		</task>
 		<task name="task8" maxNumberOfExecution="2">
 			<nativeExecutable>
-				<staticCommand value="${javaCmd} -cp ${classPath} ${executables}.ExitWithErrorCode" />
+				<staticCommand value="${javaCmd}" >
+					<arguments>
+							<argument value="-cp"/>
+							<argument value="${classPath}"/>
+							<argument value="${executables}.ExitWithErrorCode"/>
+					</arguments>
+				</staticCommand>
 			</nativeExecutable>
 		</task>
 		<task name="task9">
