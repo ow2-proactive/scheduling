@@ -2,6 +2,7 @@ package org.ow2.proactive.scheduler.ext.mapreduce;
 
 import org.apache.hadoop.mapreduce.Counter;
 
+
 /**
  * The {@link FakeHadoopCounter} class act as a {@link Counter} class. We need
  * this class because we cannot directly create an instance of the
@@ -13,11 +14,11 @@ import org.apache.hadoop.mapreduce.Counter;
  */
 public class FakeHadoopCounter extends Counter {
 
-	public FakeHadoopCounter() {
-		super();
-	}
+    public FakeHadoopCounter() {
+        super();
+    }
 
-	public FakeHadoopCounter(String name, String displayName) {
-		super(name, displayName);
-	}
+    public FakeHadoopCounter(String name, String displayName) {
+        super(name, displayName);
+    }
 }

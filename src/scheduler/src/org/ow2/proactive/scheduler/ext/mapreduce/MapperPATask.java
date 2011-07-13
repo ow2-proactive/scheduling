@@ -29,6 +29,7 @@ import org.ow2.proactive.scheduler.ext.mapreduce.util.StreamUtils;
 import org.ow2.proactive.scheduler.task.launcher.TaskLauncher;
 import org.ow2.proactive.scheduler.task.launcher.TaskLauncher.SchedulerVars;
 
+
 /**
  * MapperPATask is the Java Task the ProActive MapReduce framework executes
  * during the MapReduce ProActive Workflow execution. When implementing the
@@ -105,408 +106,379 @@ import org.ow2.proactive.scheduler.task.launcher.TaskLauncher.SchedulerVars;
  */
 public class MapperPATask extends JavaExecutable {
 
-	protected static Logger logger = DefaultLogger.getInstance();
-	protected ClassLoader classLoader = null;
-	protected Mapper<WritableComparable, WritableComparable, WritableComparable, WritableComparable> hadoopMapper = null;
-	protected InputFormat<WritableComparable, WritableComparable> hadoopInputFormat = null;
-	protected Mapper.Context hadoopMapperContext = null;
-	protected Configuration hadoopJobConfiguration = null;
+    protected static Logger logger = DefaultLogger.getInstance();
+    protected ClassLoader classLoader = null;
+    protected Mapper<WritableComparable, WritableComparable, WritableComparable, WritableComparable> hadoopMapper = null;
+    protected InputFormat<WritableComparable, WritableComparable> hadoopInputFormat = null;
+    protected Mapper.Context hadoopMapperContext = null;
+    protected Configuration hadoopJobConfiguration = null;
 
-	protected ReadMode readMode = null;
-	protected DataSpacesFileObject inputDataSpace = null;
-	protected DataSpacesFileObject outputDataSpace = null;
+    protected ReadMode readMode = null;
+    protected DataSpacesFileObject inputDataSpace = null;
+    protected DataSpacesFileObject outputDataSpace = null;
 
-	@Override
-	public void init(Map<String, Serializable> args) throws Exception {
-		super.init(args);
+    @Override
+    public void init(Map<String, Serializable> args) throws Exception {
+        super.init(args);
 
-		// initilize the class loader
-		classLoader = Thread.currentThread().getContextClassLoader();
+        // initilize the class loader
+        classLoader = Thread.currentThread().getContextClassLoader();
 
-		// initialize the logger
-		boolean debugLogLevel = Boolean
-				.parseBoolean((String) (args
-						.get(PAMapReduceFrameworkProperties.WORKFLOW_JAVA_TASK_LOGGING_DEBUG
-								.getKey())));
-		logger.setDebugLogLevel(debugLogLevel);
-		boolean profileLogLevel = Boolean
-				.parseBoolean((String) (args
-						.get(PAMapReduceFrameworkProperties.WORKFLOW_JAVA_TASK_LOGGING_PROFILE
-								.getKey())));
-		logger.setProfileLogLevel(profileLogLevel);
+        // initialize the logger
+        boolean debugLogLevel = Boolean.parseBoolean((String) (args
+                .get(PAMapReduceFrameworkProperties.WORKFLOW_JAVA_TASK_LOGGING_DEBUG.getKey())));
+        logger.setDebugLogLevel(debugLogLevel);
+        boolean profileLogLevel = Boolean.parseBoolean((String) (args
+                .get(PAMapReduceFrameworkProperties.WORKFLOW_JAVA_TASK_LOGGING_PROFILE.getKey())));
+        logger.setProfileLogLevel(profileLogLevel);
 
-		// org.apache.hadoop.conf.Configuration, it is received as parameter
-		hadoopJobConfiguration = (PAHadoopJobConfiguration) args
-				.get(PAMapReduceFrameworkProperties.HADOOP_JOB_CONFIGURATION
-						.getKey());
-		if (hadoopJobConfiguration != null) {
-			logger.debug("The Hadoop Job Configuration IS NOT null");
-		} else {
-			logger.debug("The Hadoop Job Configuration IS null");
-		}
+        // org.apache.hadoop.conf.Configuration, it is received as parameter
+        hadoopJobConfiguration = (PAHadoopJobConfiguration) args
+                .get(PAMapReduceFrameworkProperties.HADOOP_JOB_CONFIGURATION.getKey());
+        if (hadoopJobConfiguration != null) {
+            logger.debug("The Hadoop Job Configuration IS NOT null");
+        } else {
+            logger.debug("The Hadoop Job Configuration IS null");
+        }
 
-		// identifies the input data space
-		String inputDataSpaceString = (String) args
-				.get(PAMapReduceFrameworkProperties.WORKFLOW_MAPPER_PA_TASK_INPUT_DATASPACE
-						.getKey());
-		logger.debug("The string that identifies the input space the MapperPATask must use is: "
-				+ inputDataSpaceString);
-		if ((inputDataSpaceString != null)
-				&& (!(inputDataSpaceString.equalsIgnoreCase("")))) {
-			if (inputDataSpaceString
-					.equalsIgnoreCase(PAMapReduceFrameworkProperties.WORKFLOW_JAVA_TASK_INPUT_DATASPACE
-							.getKey())) {
-				inputDataSpace = getInputSpace();
-				logger.debug("The input dataspace the MapperPATask must use is the INPUT dataspace");
-			} else if (inputDataSpaceString
-					.equalsIgnoreCase(PAMapReduceFrameworkProperties.WORKFLOW_JAVA_TASK_OUTPUT_DATASPACE
-							.getKey())) {
-				inputDataSpace = getOutputSpace();
-				logger.debug("The input dataspace the MapperPATask must use is the OUTPUT dataspace");
-			} else {
-				inputDataSpace = getLocalSpace();
-				logger.debug("The input dataspace the MapperPATask must use is the LOCAL dataspace");
-			}
-		} else {
-			logger.debug("The user has not defined a valid input dataspace the MapperPATask can use");
-		}
+        // identifies the input data space
+        String inputDataSpaceString = (String) args
+                .get(PAMapReduceFrameworkProperties.WORKFLOW_MAPPER_PA_TASK_INPUT_DATASPACE.getKey());
+        logger.debug("The string that identifies the input space the MapperPATask must use is: " +
+            inputDataSpaceString);
+        if ((inputDataSpaceString != null) && (!(inputDataSpaceString.equalsIgnoreCase("")))) {
+            if (inputDataSpaceString
+                    .equalsIgnoreCase(PAMapReduceFrameworkProperties.WORKFLOW_JAVA_TASK_INPUT_DATASPACE
+                            .getKey())) {
+                inputDataSpace = getInputSpace();
+                logger.debug("The input dataspace the MapperPATask must use is the INPUT dataspace");
+            } else if (inputDataSpaceString
+                    .equalsIgnoreCase(PAMapReduceFrameworkProperties.WORKFLOW_JAVA_TASK_OUTPUT_DATASPACE
+                            .getKey())) {
+                inputDataSpace = getOutputSpace();
+                logger.debug("The input dataspace the MapperPATask must use is the OUTPUT dataspace");
+            } else {
+                inputDataSpace = getLocalSpace();
+                logger.debug("The input dataspace the MapperPATask must use is the LOCAL dataspace");
+            }
+        } else {
+            logger.debug("The user has not defined a valid input dataspace the MapperPATask can use");
+        }
 
-		// identifies the read mode
-		readMode = ReadMode
-				.valueOf((String) args
-						.get(PAMapReduceFrameworkProperties.WORKFLOW_MAPPER_PA_TASK_READ_MODE
-								.getKey()));
-		logger.debug("The input mode is: " + readMode);
+        // identifies the read mode
+        readMode = ReadMode.valueOf((String) args
+                .get(PAMapReduceFrameworkProperties.WORKFLOW_MAPPER_PA_TASK_READ_MODE.getKey()));
+        logger.debug("The input mode is: " + readMode);
 
-		// identifies the output dataspace
-		String outputDataSpaceString = (String) args
-				.get(PAMapReduceFrameworkProperties.WORKFLOW_MAPPER_PA_TASK_OUTPUT_DATASPACE
-						.getKey());
-		logger.debug("The string that identifies the output space the MapperPATask must use is: "
-				+ outputDataSpaceString);
-		if ((outputDataSpaceString != null)
-				&& (!outputDataSpaceString.trim().equalsIgnoreCase(""))) {
-			if (outputDataSpaceString
-					.equalsIgnoreCase(PAMapReduceFrameworkProperties.WORKFLOW_JAVA_TASK_OUTPUT_DATASPACE
-							.getKey())) {
-				outputDataSpace = getOutputSpace();
-				logger.debug("The output dataspace the MapperPATask must use is the OUTPUT dataspace");
-			} else {
-				outputDataSpace = getLocalSpace();
-				logger.debug("The output dataspace the MapperPATask must use is the LOCAL dataspace");
-			}
-		}
+        // identifies the output dataspace
+        String outputDataSpaceString = (String) args
+                .get(PAMapReduceFrameworkProperties.WORKFLOW_MAPPER_PA_TASK_OUTPUT_DATASPACE.getKey());
+        logger.debug("The string that identifies the output space the MapperPATask must use is: " +
+            outputDataSpaceString);
+        if ((outputDataSpaceString != null) && (!outputDataSpaceString.trim().equalsIgnoreCase(""))) {
+            if (outputDataSpaceString
+                    .equalsIgnoreCase(PAMapReduceFrameworkProperties.WORKFLOW_JAVA_TASK_OUTPUT_DATASPACE
+                            .getKey())) {
+                outputDataSpace = getOutputSpace();
+                logger.debug("The output dataspace the MapperPATask must use is the OUTPUT dataspace");
+            } else {
+                outputDataSpace = getLocalSpace();
+                logger.debug("The output dataspace the MapperPATask must use is the LOCAL dataspace");
+            }
+        }
 
-		// instantiate the org.apache.hadoop.mapreduce.Mapper object
-		hadoopMapper = (Mapper<WritableComparable, WritableComparable, WritableComparable, WritableComparable>) classLoader
-				.loadClass(
-						(String) ((PAHadoopJobConfiguration) hadoopJobConfiguration)
-								.getMapperClassName()).getConstructor()
-				.newInstance();
+        // instantiate the org.apache.hadoop.mapreduce.Mapper object
+        hadoopMapper = (Mapper<WritableComparable, WritableComparable, WritableComparable, WritableComparable>) classLoader
+                .loadClass((String) ((PAHadoopJobConfiguration) hadoopJobConfiguration).getMapperClassName())
+                .getConstructor().newInstance();
 
-		if (hadoopMapper != null) {
-			logger.debug("The class of the Mapper to use inside the MapperPATask is: "
-					+ hadoopMapper.getClass().getName());
-		} else {
-			logger.debug("The Mapper to use inside MapperPATask is null.");
-		}
+        if (hadoopMapper != null) {
+            logger.debug("The class of the Mapper to use inside the MapperPATask is: " +
+                hadoopMapper.getClass().getName());
+        } else {
+            logger.debug("The Mapper to use inside MapperPATask is null.");
+        }
 
-		/*
-		 * We add the data space this MapperPATask must read from to the
-		 * FakeHadoopConfiguration instance to be able to instantiate the
-		 * PADataSpacesFileSystem instance
-		 */
-		((PAHadoopJobConfiguration) hadoopJobConfiguration)
-				.setDataSpacesFileObject(inputDataSpace);
+        /*
+         * We add the data space this MapperPATask must read from to the
+         * FakeHadoopConfiguration instance to be able to instantiate the
+         * PADataSpacesFileSystem instance
+         */
+        ((PAHadoopJobConfiguration) hadoopJobConfiguration).setDataSpacesFileObject(inputDataSpace);
 
-		/*
-		 * instantiate the org.apache.hadoop.mapreduce.InputFormat object We
-		 * must notice that we retrieve the name of the class the ProActive
-		 * MapReduce job has to use as the InputFormat from the Hadoop
-		 * Configuration (that in the case of the ProAtive is, actually, an
-		 * instance of the PAHadoopConfiguration class).
-		 */
-		hadoopInputFormat = (InputFormat<WritableComparable, WritableComparable>) classLoader
-				.loadClass(
-						(String) ((PAHadoopJobConfiguration) hadoopJobConfiguration)
-								.getInputFormatClassName()).getConstructor()
-				.newInstance();
+        /*
+         * instantiate the org.apache.hadoop.mapreduce.InputFormat object We
+         * must notice that we retrieve the name of the class the ProActive
+         * MapReduce job has to use as the InputFormat from the Hadoop
+         * Configuration (that in the case of the ProAtive is, actually, an
+         * instance of the PAHadoopConfiguration class).
+         */
+        hadoopInputFormat = (InputFormat<WritableComparable, WritableComparable>) classLoader.loadClass(
+                (String) ((PAHadoopJobConfiguration) hadoopJobConfiguration).getInputFormatClassName())
+                .getConstructor().newInstance();
 
-		if (hadoopInputFormat != null) {
-			logger.debug("The class of the InputFormat to use inside the MapperPATask is: "
-					+ hadoopInputFormat.getClass().getName());
-		} else {
-			logger.debug("The InputFormat to use inside MapperPATask is null.");
-		}
-	}
+        if (hadoopInputFormat != null) {
+            logger.debug("The class of the InputFormat to use inside the MapperPATask is: " +
+                hadoopInputFormat.getClass().getName());
+        } else {
+            logger.debug("The InputFormat to use inside MapperPATask is null.");
+        }
+    }
 
-	@Override
-	/**
-	 * The variable number of TaskResult in the MapperPATask consists in a java.util.List<org.apache.hadoop.mapreduce.InputSplit>.
-	 *  The MapperPATask is replicated. Each replica is identified by an identifier that can be
-	 *  accessed via the property "System.getProperty(SchedulerVars.JAVAENV_TASK_REPLICATION.toString())".
-	 *  Each replica choose the InputSplit it must elaborate using its own replication index.
-	 */
-	public Serializable execute(TaskResult... taskResults) throws Throwable {
-		/*
-		 * instantiate all the object we need to create an instance of the
-		 * Hadoop Mapper.Context. This means we have to retrieve/create the
-		 * following classes or instances that replace them: -
-		 * org.apache.hadoop.conf.Configuration, that represents the
-		 * configuration of the Hadoop MapReduce Job -
-		 * org.apache.hadoop.mapreduce.TaskAttemptID -
-		 * org.apache.hadoop.mapreduce.RecordReader -
-		 * org.apache.hadoop.mapreduce.RecordWriter -
-		 * org.apache.hadoop.mapreduce.OutputCommitter -
-		 * org.apache.hadoop.mapreduce.InputSplit while the
-		 * org.hadoop.mapreduce.StatusReporter could be null (see the
-		 * org.ow2.proactive
-		 * .scheduler.ext.hadoopMapReduce.FakeHadoopMapperContext class)
-		 */
+    @Override
+    /**
+     * The variable number of TaskResult in the MapperPATask consists in a java.util.List<org.apache.hadoop.mapreduce.InputSplit>.
+     *  The MapperPATask is replicated. Each replica is identified by an identifier that can be
+     *  accessed via the property "System.getProperty(SchedulerVars.JAVAENV_TASK_REPLICATION.toString())".
+     *  Each replica choose the InputSplit it must elaborate using its own replication index.
+     */
+    public Serializable execute(TaskResult... taskResults) throws Throwable {
+        /*
+         * instantiate all the object we need to create an instance of the
+         * Hadoop Mapper.Context. This means we have to retrieve/create the
+         * following classes or instances that replace them: -
+         * org.apache.hadoop.conf.Configuration, that represents the
+         * configuration of the Hadoop MapReduce Job -
+         * org.apache.hadoop.mapreduce.TaskAttemptID -
+         * org.apache.hadoop.mapreduce.RecordReader -
+         * org.apache.hadoop.mapreduce.RecordWriter -
+         * org.apache.hadoop.mapreduce.OutputCommitter -
+         * org.apache.hadoop.mapreduce.InputSplit while the
+         * org.hadoop.mapreduce.StatusReporter could be null (see the
+         * org.ow2.proactive
+         * .scheduler.ext.hadoopMapReduce.FakeHadoopMapperContext class)
+         */
 
-		// org.apache.hadoop.mapreduce.TaskAttemptID
-		int taskId = 0;
-		int jobId = 0;
-		String taskIdString = System
-				.getProperty(TaskLauncher.SchedulerVars.JAVAENV_TASK_ID_VARNAME
-						.toString());
-		if ((taskIdString != null) && (!(taskIdString.equalsIgnoreCase("")))) {
-			taskId = Integer.parseInt(taskIdString);
-			logger.debug("The taskId of the MapperPATask is: " + taskId);
-		} else {
-			logger.debug("The taskId string is null or empty");
-		}
-		String jobIdString = System
-				.getProperty(TaskLauncher.SchedulerVars.JAVAENV_JOB_ID_VARNAME
-						.toString());
-		if ((jobIdString != null) && (!(jobIdString.equalsIgnoreCase("")))) {
-			jobId = Integer.parseInt(jobIdString);
-			logger.debug("The jobId of the MapperPATask is: " + jobId);
-		} else {
-			logger.debug("The jobId string is null or empty");
-		}
-		String jtIdentifier = "";
-		JobID hadoopJobId = new JobID(jtIdentifier, jobId);
-		boolean isMap = false;
-		TaskID hadoopTaskId = new TaskID(hadoopJobId, isMap, taskId);
-		int taskAttemptId = 0;
-		TaskAttemptID hadoopTaskAttemptId = new TaskAttemptID(
-				hadoopTaskId, taskAttemptId);
+        // org.apache.hadoop.mapreduce.TaskAttemptID
+        int taskId = 0;
+        int jobId = 0;
+        String taskIdString = System.getProperty(TaskLauncher.SchedulerVars.JAVAENV_TASK_ID_VARNAME
+                .toString());
+        if ((taskIdString != null) && (!(taskIdString.equalsIgnoreCase("")))) {
+            taskId = Integer.parseInt(taskIdString);
+            logger.debug("The taskId of the MapperPATask is: " + taskId);
+        } else {
+            logger.debug("The taskId string is null or empty");
+        }
+        String jobIdString = System.getProperty(TaskLauncher.SchedulerVars.JAVAENV_JOB_ID_VARNAME.toString());
+        if ((jobIdString != null) && (!(jobIdString.equalsIgnoreCase("")))) {
+            jobId = Integer.parseInt(jobIdString);
+            logger.debug("The jobId of the MapperPATask is: " + jobId);
+        } else {
+            logger.debug("The jobId string is null or empty");
+        }
+        String jtIdentifier = "";
+        JobID hadoopJobId = new JobID(jtIdentifier, jobId);
+        boolean isMap = false;
+        TaskID hadoopTaskId = new TaskID(hadoopJobId, isMap, taskId);
+        int taskAttemptId = 0;
+        TaskAttemptID hadoopTaskAttemptId = new TaskAttemptID(hadoopTaskId, taskAttemptId);
 
-		/*
-		 * We store the replication index of the MapperPATask in the Hadoop
-		 * Configuration because that value is used to build the name of the
-		 * MapperPATask output file. The name of that file is compliant to the
-		 * following format: "intermediate_<replicationIndex>". The choice of
-		 * the replication index let us to use the string "intermediate_$REP"
-		 * when we must define the file selector for the MapperPATask output
-		 * files in the PAMapReduceJob (this means when we define which
-		 * MapperPATask output files must be transferred to the workflow OUTPUT
-		 * space). We can use the "$REP" because that string will be replaced by
-		 * the MapperPATask replication index when the path of the MapperPATask
-		 * output file must be resolved (see TaskLauncher.SchedulerVars). We
-		 * cannot use the "taskId" (that stores the value of the id of the
-		 * ProActive task) because we have not a string (equivalent to $REP)
-		 * that tells to the ProActive runtime to substitute it with the
-		 * MapperPATask id when the path of the MapperPATask output file must be
-		 * resolved.
-		 */
-		int replicationIndex = Integer
-				.parseInt(System
-						.getProperty(SchedulerVars.JAVAENV_TASK_REPLICATION
-								.toString()));
-		hadoopJobConfiguration.set(
-				PAMapReduceFrameworkProperties.PA_MAPREDUCE_TASK_IDENTIFIER
-						.getKey(), "" + replicationIndex);
+        /*
+         * We store the replication index of the MapperPATask in the Hadoop
+         * Configuration because that value is used to build the name of the
+         * MapperPATask output file. The name of that file is compliant to the
+         * following format: "intermediate_<replicationIndex>". The choice of
+         * the replication index let us to use the string "intermediate_$REP"
+         * when we must define the file selector for the MapperPATask output
+         * files in the PAMapReduceJob (this means when we define which
+         * MapperPATask output files must be transferred to the workflow OUTPUT
+         * space). We can use the "$REP" because that string will be replaced by
+         * the MapperPATask replication index when the path of the MapperPATask
+         * output file must be resolved (see TaskLauncher.SchedulerVars). We
+         * cannot use the "taskId" (that stores the value of the id of the
+         * ProActive task) because we have not a string (equivalent to $REP)
+         * that tells to the ProActive runtime to substitute it with the
+         * MapperPATask id when the path of the MapperPATask output file must be
+         * resolved.
+         */
+        int replicationIndex = Integer.parseInt(System.getProperty(SchedulerVars.JAVAENV_TASK_REPLICATION
+                .toString()));
+        hadoopJobConfiguration.set(PAMapReduceFrameworkProperties.PA_MAPREDUCE_TASK_IDENTIFIER.getKey(), "" +
+            replicationIndex);
 
-		// org.apache.hadoop.mapreduce.InputSplit
-		InputSplit inputSplit = null;
-		inputSplit = ((SerializableHadoopInputSplit) ((List<InputSplit>) taskResults[0]
-				.value()).get(replicationIndex)).getAdaptee();
-		logger.debug("The MapperPATask selected InputSplit is TaskResult["
-				+ replicationIndex + "]: " + inputSplit.toString());
-		logger.debug("The class of the InputSplit the MapperPATask must elaborate is: "
-				+ inputSplit.getClass().getName());
-		if (inputSplit instanceof FileSplit) {
-			logger.debug("The name of the file the MapperPATask must elaborate is: "
-					+ ((FileSplit) inputSplit).getPath().toUri().toString());
+        // org.apache.hadoop.mapreduce.InputSplit
+        InputSplit inputSplit = null;
+        inputSplit = ((SerializableHadoopInputSplit) ((List<InputSplit>) taskResults[0].value())
+                .get(replicationIndex)).getAdaptee();
+        logger.debug("The MapperPATask selected InputSplit is TaskResult[" + replicationIndex + "]: " +
+            inputSplit.toString());
+        logger.debug("The class of the InputSplit the MapperPATask must elaborate is: " +
+            inputSplit.getClass().getName());
+        if (inputSplit instanceof FileSplit) {
+            logger.debug("The name of the file the MapperPATask must elaborate is: " +
+                ((FileSplit) inputSplit).getPath().toUri().toString());
 
+            /*
+             * TODO the transfer of input data to the local node has to work
+             * also with non FileSplit input splits, but for now it works only
+             * for FileSplit input splits
+             */
+            if (readMode.equals(ReadMode.partialLocalRead)) {
 
+                /** @START_PROFILE */
+                //logger.profile("Beginning of the [MAPPER_PARTIAL_FILE_TRANSFER_PHASE]");
+                long partialLocalReadStartTime = System.currentTimeMillis();
+                /** @END_PROFILE */
 
-			/*
-			 * TODO the transfer of input data to the local node has to work
-			 * also with non FileSplit input splits, but for now it works only
-			 * for FileSplit input splits
-			 */
-			if (readMode.equals(ReadMode.partialLocalRead)) {
+                /*
+                 * We have to transfer only the part of the file referenced by
+                 * the input split on the node on which this task is executing.
+                 * The name of the transferred part is the same as the name of
+                 * the input file to elaborate.
+                 */
+                DataSpacesFileObject inputFile = getInputFile(((FileSplit) inputSplit).getPath().toUri()
+                        .toString());
+                if ((inputFile.isReadable())) {
+                    DataSpacesFileObject localFile = getLocalFile(((FileSplit) inputSplit).getPath().toUri()
+                            .toString());
+                    localFile.createFile();
 
-				/** @START_PROFILE */
-				//logger.profile("Beginning of the [MAPPER_PARTIAL_FILE_TRANSFER_PHASE]");
-				long partialLocalReadStartTime = System.currentTimeMillis();
-				/** @END_PROFILE */
+                    logger.debug("The real URI of the local file to which the part of the " +
+                        "input data corresponding to the InputSplit the MapperPATask" + "must elaborate is " +
+                        localFile.getRealURI());
+                    logger.debug("The virtual URI of the local file to which the part of the " +
+                        "input data corresponding to the InputSplit the MapperPATask " +
+                        "must elaborate is " + localFile.getVirtualURI());
 
-				/*
-				 * We have to transfer only the part of the file referenced by
-				 * the input split on the node on which this task is executing.
-				 * The name of the transferred part is the same as the name of
-				 * the input file to elaborate.
-				 */
-				DataSpacesFileObject inputFile = getInputFile(((FileSplit) inputSplit)
-						.getPath().toUri().toString());
-				if ((inputFile.isReadable())) {
-					DataSpacesFileObject localFile = getLocalFile(((FileSplit) inputSplit)
-							.getPath().toUri().toString());
-					localFile.createFile();
+                    InputStream is = inputFile.getContent().getInputStream();
 
-					logger.debug("The real URI of the local file to which the part of the "
-							+ "input data corresponding to the InputSplit the MapperPATask"
-							+ "must elaborate is " + localFile.getRealURI());
-					logger.debug("The virtual URI of the local file to which the part of the "
-							+ "input data corresponding to the InputSplit the MapperPATask "
-							+ "must elaborate is " + localFile.getVirtualURI());
+                    /*
+                     * The "InputStream.skip(...)" method called on a stream
+                     * created from a DataSpacesFileObject living in the
+                     * HTTP DataSpace. Hence it is better if we read the
+                     * bytes of the InputStream to be skipped using the
+                     * "InputStream.read(...)" method.
+                     */
+                    long bytesToSkip = ((FileSplit) inputSplit).getStart();
+                    int bufferSize = 4096;
+                    byte[] buffer = new byte[bufferSize];
+                    long numberOfIterations = bytesToSkip / bufferSize;
+                    long totalBytesRead = 0;
+                    for (int i = 0; i < numberOfIterations; i++) {
+                        totalBytesRead += is.read(buffer, 0, bufferSize);
+                    }
+                    totalBytesRead += is.read(buffer, 0, ((int) (bytesToSkip - totalBytesRead)));
 
-					InputStream is = inputFile.getContent().getInputStream();
+                    // at this point we have skipped all the bytes to skip
+                    logger.debug("The number of skipped bytes is: " + totalBytesRead);
 
-					/*
-					 * The "InputStream.skip(...)" method called on a stream
-					 * created from a DataSpacesFileObject living in the
-					 * HTTP DataSpace. Hence it is better if we read the
-					 * bytes of the InputStream to be skipped using the
-					 * "InputStream.read(...)" method.
-					 */
-					long bytesToSkip = ((FileSplit) inputSplit).getStart();
-					int bufferSize = 4096;
-					byte[] buffer = new byte[ bufferSize ];
-					long numberOfIterations = bytesToSkip / bufferSize;
-					long totalBytesRead = 0;
-					for ( int i = 0; i < numberOfIterations; i++ ) {
-						totalBytesRead += is.read(buffer, 0, bufferSize);
-					}
-					totalBytesRead += is.read(buffer, 0, ( (int) (bytesToSkip - totalBytesRead)));
+                    OutputStream os = localFile.getContent().getOutputStream();
+                    long numberOfCopiedBytes = StreamUtils.copy(is, os, inputSplit.getLength());
+                    /*
+                     * We have to set the offset, of the input split respect to
+                     * the beginning of the new, "local", input file to zero
+                     * because we will read bytes from a file located in the
+                     * local data space of this task. The file has exactly the
+                     * same size as the input split. The problem is that the
+                     * Hadoop FileSplit class has no set methods. This means
+                     * that the only way we have to change the values of its
+                     * attribute is to create another instance of FileSplit.
+                     */
+                    inputSplit = new FileSplit(((FileSplit) inputSplit).getPath(), 0, numberOfCopiedBytes,
+                        ((FileSplit) inputSplit).getLocations());
+                    is.close();
+                    os.close();
+                    inputFile.close();
+                    localFile.close();
 
-					// at this point we have skipped all the bytes to skip
-					logger.debug("The number of skipped bytes is: " + totalBytesRead);
+                    logger
+                            .debug("The number of bytes transferred from the inputDataSpace." +
+                                ((FileSplit) inputSplit).getPath().toUri().toString() + " is: " +
+                                numberOfCopiedBytes);
+                    logger.debug("The size of the input split is: " + inputSplit.getLength());
+                    logger.debug("The size of the local file that is created is " +
+                        localFile.getContent().getSize());
 
-					OutputStream os = localFile.getContent().getOutputStream();
-					long numberOfCopiedBytes = StreamUtils.copy(is, os,
-							inputSplit.getLength());
-					/*
-					 * We have to set the offset, of the input split respect to
-					 * the beginning of the new, "local", input file to zero
-					 * because we will read bytes from a file located in the
-					 * local data space of this task. The file has exactly the
-					 * same size as the input split. The problem is that the
-					 * Hadoop FileSplit class has no set methods. This means
-					 * that the only way we have to change the values of its
-					 * attribute is to create another instance of FileSplit.
-					 */
-					inputSplit = new FileSplit(
-							((FileSplit) inputSplit).getPath(), 0,
-							numberOfCopiedBytes,
-							((FileSplit) inputSplit).getLocations());
-					is.close();
-					os.close();
-					inputFile.close();
-					localFile.close();
+                    /*
+                     * We must notice that we have to change the
+                     * DataSpacesFileObject the FileSystem, the Hadoop
+                     * InputFormat will use, is built on.
+                     */
+                    inputDataSpace = getLocalSpace();
+                    ((PAHadoopJobConfiguration) hadoopJobConfiguration)
+                            .setDataSpacesFileObject(inputDataSpace);
 
-					logger.debug("The number of bytes transferred from the inputDataSpace."
-							+ ((FileSplit) inputSplit).getPath().toUri()
-									.toString() + " is: " + numberOfCopiedBytes);
-					logger.debug("The size of the input split is: "
-							+ inputSplit.getLength());
-					logger.debug("The size of the local file that is created is "
-							+ localFile.getContent().getSize());
+                    logger.debug("The real URI of the local data space wrapped by the file " + "system is " +
+                        inputDataSpace.getRealURI());
+                    logger.debug("The virtual URI of the local data space wrapped by the " +
+                        "file system is " + inputDataSpace.getVirtualURI());
+                }
 
-					/*
-					 * We must notice that we have to change the
-					 * DataSpacesFileObject the FileSystem, the Hadoop
-					 * InputFormat will use, is built on.
-					 */
-					inputDataSpace = getLocalSpace();
-					((PAHadoopJobConfiguration) hadoopJobConfiguration)
-							.setDataSpacesFileObject(inputDataSpace);
+                /** @START_PROFILE */
+                long partialLocalReadEndTime = System.currentTimeMillis();
+                logger.profile("End of [MAPPER_PARTIAL_FILE_TRANSFER_PHASE]. It takes '" +
+                    (partialLocalReadEndTime - partialLocalReadStartTime) + "' milliseconds");
+                /** @END_PROFILE */
+            }
+        }
 
-					logger.debug("The real URI of the local data space wrapped by the file "
-							+ "system is " + inputDataSpace.getRealURI());
-					logger.debug("The virtual URI of the local data space wrapped by the "
-							+ "file system is "
-							+ inputDataSpace.getVirtualURI());
-				}
+        // org.apache.hadoop.mapreduce.OutputCommitter
+        OutputCommitter outputCommitter = new FakeHadoopOutputCommitter();
 
-				/** @START_PROFILE */
-				long partialLocalReadEndTime = System.currentTimeMillis();
-				logger.profile("End of [MAPPER_PARTIAL_FILE_TRANSFER_PHASE]. It takes '" + (partialLocalReadEndTime - partialLocalReadStartTime) + "' milliseconds");
-				/** @END_PROFILE */
-			}
-		}
+        /*
+         * We must notice that we have
+         * to create an instance of the FakeHadoopTaskAttemptContext because in
+         * the RecordReader.initialize(InputSplit, TaskAttemptContext) we need a
+         * Configuration instance to instantiate the FileSystem (while the
+         * Hadoop TaskAttemptContext return a JobConf instance)
+         */
+        TaskAttemptContext taskAttemptContext = new FakeHadoopTaskAttemptContext(hadoopJobConfiguration,
+            hadoopTaskAttemptId);
+        logger
+                .debug("The number of Reducer tasks retrieved using the \"FakeHadoopJobContext.getNumReduceTasks()\" method is: " +
+                    taskAttemptContext.getNumReduceTasks());
 
-		// org.apache.hadoop.mapreduce.OutputCommitter
-		OutputCommitter outputCommitter = new FakeHadoopOutputCommitter();
+        /*
+         * org.apache.hadoop.mapreduce.RecordWriter Creating a RecordWriter that
+         * will use the Hadoop-like logic in creating the intermediate files
+         * (i.e., the MapperPATask output files)
+         */
+        FileSystem fileSystem = PAMapReduceFramework.getFileSystem(outputDataSpace);
+        RecordWriter recordWriter = new MapperRecordWriter(taskAttemptContext, fileSystem);
 
-		/*
-		 * We must notice that we have
-		 * to create an instance of the FakeHadoopTaskAttemptContext because in
-		 * the RecordReader.initialize(InputSplit, TaskAttemptContext) we need a
-		 * Configuration instance to instantiate the FileSystem (while the
-		 * Hadoop TaskAttemptContext return a JobConf instance)
-		 */
-		TaskAttemptContext taskAttemptContext = new FakeHadoopTaskAttemptContext(
-				hadoopJobConfiguration, hadoopTaskAttemptId);
-		logger.debug("The number of Reducer tasks retrieved using the \"FakeHadoopJobContext.getNumReduceTasks()\" method is: "
-				+ taskAttemptContext.getNumReduceTasks());
+        /*
+         * org.apache.hadoop.mapreduce.RecordReader
+         */
+        RecordReader<?, ?> recordReader = hadoopInputFormat
+                .createRecordReader(inputSplit, taskAttemptContext);
+        recordReader.initialize(inputSplit, taskAttemptContext);
+        logger
+                .debug("The max length parameter is: " +
+                    taskAttemptContext
+                            .getConfiguration()
+                            .getInt(
+                                    PAMapReduceFrameworkProperties
+                                            .getPropertyAsString(PAMapReduceFrameworkProperties.HADOOP_JOB_LINE_RECORD_READER_MAX_LENGTH
+                                                    .getKey()), Integer.MAX_VALUE));
 
-		/*
-		 * org.apache.hadoop.mapreduce.RecordWriter Creating a RecordWriter that
-		 * will use the Hadoop-like logic in creating the intermediate files
-		 * (i.e., the MapperPATask output files)
-		 */
-		FileSystem fileSystem = PAMapReduceFramework
-				.getFileSystem( outputDataSpace );
-		RecordWriter recordWriter = new MapperRecordWriter(
-				taskAttemptContext, fileSystem);
+        logger.debug("The class to use as the type of the output key for the mapper is: " +
+            taskAttemptContext.getMapOutputKeyClass());
+        logger.debug("The class to use as the type of the output value for the mapper is: " +
+            taskAttemptContext.getMapOutputValueClass());
 
-		/*
-		 * org.apache.hadoop.mapreduce.RecordReader
-		 */
-		RecordReader<?, ?> recordReader = hadoopInputFormat.createRecordReader(
-				inputSplit, taskAttemptContext);
-		recordReader.initialize(inputSplit, taskAttemptContext);
-		logger.debug("The max length parameter is: "
-				+ taskAttemptContext
-						.getConfiguration()
-						.getInt(PAMapReduceFrameworkProperties
-								.getPropertyAsString(PAMapReduceFrameworkProperties.HADOOP_JOB_LINE_RECORD_READER_MAX_LENGTH
-										.getKey()), Integer.MAX_VALUE));
+        // now we have all the instances of the classes we need to create the
+        // Hadoop Mapper.Context instance
+        hadoopMapperContext = new FakeHadoopMapperContext(hadoopMapper, hadoopJobConfiguration,
+            hadoopTaskAttemptId, recordReader, recordWriter, outputCommitter, inputSplit);
 
-		logger.debug("The class to use as the type of the output key for the mapper is: "
-				+ taskAttemptContext.getMapOutputKeyClass());
-		logger.debug("The class to use as the type of the output value for the mapper is: "
-				+ taskAttemptContext.getMapOutputValueClass());
+        /** @START_PROFILE */
+        //logger.profile("Start of the [MAPPER_HADOOP_PHASE]");
+        long hadoopMapperStartTime = System.currentTimeMillis();
+        /** @END_PROFILE */
 
-		// now we have all the instances of the classes we need to create the
-		// Hadoop Mapper.Context instance
-		hadoopMapperContext = new FakeHadoopMapperContext(hadoopMapper,
-				hadoopJobConfiguration, hadoopTaskAttemptId, recordReader,
-				recordWriter, outputCommitter, inputSplit);
+        hadoopMapper.run(hadoopMapperContext);
 
+        /** @START_PROFILE */
+        long hadoopMapperEndTime = System.currentTimeMillis();
+        logger.profile("End of the [MAPPER_HADOOP_PHASE]. It takes '" +
+            (hadoopMapperEndTime - hadoopMapperStartTime) + "' milliseconds");
+        /** @END_PROFILE */
 
-		/** @START_PROFILE */
-		//logger.profile("Start of the [MAPPER_HADOOP_PHASE]");
-		long hadoopMapperStartTime = System.currentTimeMillis();
-		/** @END_PROFILE */
+        logger.debug("End of the execution of the Hadoop Mapper.");
 
-		hadoopMapper.run(hadoopMapperContext);
-
-		/** @START_PROFILE */
-		long hadoopMapperEndTime = System.currentTimeMillis();
-		logger.profile("End of the [MAPPER_HADOOP_PHASE]. It takes '" + (hadoopMapperEndTime - hadoopMapperStartTime) + "' milliseconds");
-		/** @END_PROFILE */
-
-
-		logger.debug("End of the execution of the Hadoop Mapper.");
-
-		recordReader.close();
-		recordWriter.close(taskAttemptContext);
-		return null;
-	}
+        recordReader.close();
+        recordWriter.close(taskAttemptContext);
+        return null;
+    }
 }

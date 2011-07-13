@@ -6,6 +6,7 @@ import org.apache.hadoop.mapreduce.JobContext;
 import org.apache.hadoop.mapreduce.JobID;
 import org.ow2.proactive.scheduler.ext.mapreduce.fs.PADataSpacesFileSystem;
 
+
 /**
  * The {@link FakeHadoopJobContext} customize the behavior of the
  * {@link JobContext#getConfiguration()} method to return the true
@@ -24,15 +25,15 @@ import org.ow2.proactive.scheduler.ext.mapreduce.fs.PADataSpacesFileSystem;
  */
 public class FakeHadoopJobContext extends JobContext {
 
-	protected Configuration configuration = null;
+    protected Configuration configuration = null;
 
-	public FakeHadoopJobContext(Configuration conf, JobID jobId) {
-		super(conf, jobId);
-		this.configuration = conf;
-	}
+    public FakeHadoopJobContext(Configuration conf, JobID jobId) {
+        super(conf, jobId);
+        this.configuration = conf;
+    }
 
-	@Override
-	public Configuration getConfiguration() {
-		return configuration;
-	}
+    @Override
+    public Configuration getConfiguration() {
+        return configuration;
+    }
 }
