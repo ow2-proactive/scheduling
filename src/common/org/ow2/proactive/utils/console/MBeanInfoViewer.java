@@ -36,7 +36,9 @@
  */
 package org.ow2.proactive.utils.console;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.management.Attribute;
@@ -215,10 +217,14 @@ public final class MBeanInfoViewer {
                 this.mbeanName = new ObjectName(mbeanNameAsString);
                 final MBeanAttributeInfo[] attrs = this.connection.getMBeanInfo(this.mbeanName)
                         .getAttributes();
-                this.names = new String[attrs.length];
+                List<String> attrNames = new ArrayList<String>(attrs.length - 1);
                 for (int i = 0; i < attrs.length; i++) {
-                    this.names[i] = attrs[i].getName();
+                    // reading only primitive or string-type attributes
+                    if (isPrimitive(attrs[i].getType()) || String.class.getName().equals(attrs[i].getType())) {
+                        attrNames.add(attrs[i].getName());
+                    }
                 }
+                this.names = attrNames.toArray(new String[] {});
             }
             // Get the list of attributes in a single JMX call  
             final AttributeList list = this.connection.getAttributes(this.mbeanName, this.names);
@@ -238,5 +244,21 @@ public final class MBeanInfoViewer {
         } catch (Exception e) {
             throw new RuntimeException("Cannot retrieve JMX informations from Selected Bean", e);
         }
+    }
+
+    /**
+     * Detects if the type is primitive.
+     */
+    private boolean isPrimitive(String type) {
+        if (type == null)
+            return false;
+
+        if (type.equals("boolean") || type.equals("byte") || type.equals("character") ||
+            type.equals("short") || type.equals("int") || type.equals("integer") || type.equals("long") ||
+            type.equals("float") || type.equals("double")) {
+            return true;
+        }
+
+        return false;
     }
 }
