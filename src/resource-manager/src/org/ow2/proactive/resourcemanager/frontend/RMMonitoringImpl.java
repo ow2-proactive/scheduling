@@ -130,26 +130,24 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
 
     private class EventDispatcher implements Runnable {
 
-        protected UniqueID listenerId;
-        protected ReentrantLock lock = new ReentrantLock();
+        private UniqueID listenerId;
+        private ReentrantLock lock = new ReentrantLock();
 
         public EventDispatcher(UniqueID listenerId) {
             this.listenerId = listenerId;
         }
 
         public void run() {
-            synchronized (lock) {
-                if (lock.isLocked()) {
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("Communication to the client " + listenerId.shortString() +
-                            " is in progress in one thread of the thread pool. " +
-                            "Either events come too quick or the client is slow. " +
-                            "Do not initiate connection from another thread.");
-                    }
-                    return;
+            if (lock.isLocked()) {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Communication to the client " + listenerId.shortString() +
+                        " is in progress in one thread of the thread pool. " +
+                        "Either events come too quick or the client is slow. " +
+                        "Do not initiate connection from another thread.");
                 }
-                lock.lock();
+                return;
             }
+            lock.lock();
 
             int numberOfEventDelivered = 0;
             long timeStamp = System.currentTimeMillis();
@@ -244,104 +242,6 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
         }
     }
 
-    private class GroupEventDispatcher extends EventDispatcher {
-
-        public GroupEventDispatcher(UniqueID listenerId) {
-            super(listenerId);
-        }
-
-        public void run() {
-            synchronized (lock) {
-                if (lock.isLocked()) {
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("Communication to the client " + listenerId.shortString() +
-                            " is in progress in one thread of the thread pool. " +
-                            "Either events come too quick or the client is slow. " +
-                            "Do not initiate connection from another thread.");
-                    }
-                    return;
-                }
-                lock.lock();
-            }
-
-            int numberOfEventDelivered = 0;
-            long timeStamp = System.currentTimeMillis();
-            if (logger.isDebugEnabled()) {
-                logger.debug("Initializing " + Thread.currentThread() + " for events delivery to client '" +
-                    listenerId.shortString() + "'");
-            }
-
-            LinkedList<RMEvent> events = pendingEvents.get(this);
-            synchronized (events) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug(events.size() + " pending events for the client '" +
-                        listenerId.shortString() + "'");
-                }
-
-                if (events.size() > 0) {
-                    if (deliverEvents(events)) {
-                        numberOfEventDelivered = events.size();
-                        events.clear();
-                    }
-                }
-            }
-
-            lock.unlock();
-
-            if (logger.isDebugEnabled()) {
-                logger.debug("Finnishing delivery in " + Thread.currentThread() + " to client '" +
-                    listenerId.shortString() + "'. " + numberOfEventDelivered + " events were delivered in " +
-                    (System.currentTimeMillis() - timeStamp) + " ms");
-            }
-        }
-
-        private boolean deliverEvents(Collection<RMEvent> events) {
-            RMGroupEventListener listener = null;
-
-            synchronized (listeners) {
-                listener = (RMGroupEventListener) listeners.get(listenerId);
-            }
-
-            if (listener == null) {
-                return false;
-            }
-
-            //dispatch event
-            long timeStamp = System.currentTimeMillis();
-
-            if (logger.isDebugEnabled()) {
-                for (RMEvent event : events) {
-                    logger.debug("Dispatching events '" + event.toString() + "' to client " +
-                        listenerId.shortString());
-                }
-            }
-            try {
-                listener.notify(events);
-
-                long time = System.currentTimeMillis() - timeStamp;
-                if (logger.isDebugEnabled()) {
-                    logger.debug("Events has been delivered to client " + listenerId.shortString() + " in " +
-                        time + " ms");
-                }
-
-            } catch (Exception e) {
-                // probably listener was removed or became down
-                RMEventListener l = null;
-                synchronized (listeners) {
-                    l = listeners.remove(listenerId);
-                    pendingEvents.remove(this);
-                }
-                if (l != null) {
-                    logger.debug("", e);
-                    logger.info("User known as '" + listenerId.shortString() +
-                        "' has been removed from listeners");
-                }
-                return false;
-            }
-            return true;
-        }
-    }
-
     /** Register a new Resource manager listener.
      * Way to a monitor object to ask at RMMonitoring to throw
      * RM events to it.
@@ -355,11 +255,7 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
 
         synchronized (listeners) {
             this.listeners.put(id, listener);
-            if (listener instanceof RMGroupEventListener) {
-                this.pendingEvents.put(new GroupEventDispatcher(id), new LinkedList<RMEvent>());
-            } else {
-                this.pendingEvents.put(new EventDispatcher(id), new LinkedList<RMEvent>());
-            }
+            this.pendingEvents.put(new EventDispatcher(id), new LinkedList<RMEvent>());
         }
         return rmcore.getRMInitialState();
     }

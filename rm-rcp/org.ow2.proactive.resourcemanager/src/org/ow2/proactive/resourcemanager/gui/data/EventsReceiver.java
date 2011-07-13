@@ -46,7 +46,6 @@ import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.frontend.RMEventListener;
-import org.ow2.proactive.resourcemanager.frontend.RMGroupEventListener;
 import org.ow2.proactive.resourcemanager.frontend.RMMonitoring;
 import org.ow2.proactive.resourcemanager.gui.data.model.RMModel;
 import org.ow2.proactive.resourcemanager.gui.views.ResourceExplorerView;
@@ -56,7 +55,7 @@ import org.ow2.proactive.resourcemanager.gui.views.ResourcesTopologyView;
 import org.ow2.proactive.resourcemanager.gui.views.StatisticsView;
 
 
-public class EventsReceiver extends RMGroupEventListener {
+public class EventsReceiver implements RMEventListener {
 
     private static final long RM_SERVER_PING_FREQUENCY = 5000;
     private static final long RM_CONNECTION_TIMEOUT = 20000;
