@@ -36,6 +36,8 @@
  */
 package functionaltests;
 
+import java.io.File;
+import java.net.URL;
 import java.util.Map;
 
 import org.junit.Assert;
@@ -64,8 +66,8 @@ import functionalTests.FunctionalTest;
  */
 public class TestJobAborted extends FunctionalTest {
 
-    private static String jobDescriptor = TestJobAborted.class.getResource(
-            "/functionaltests/descriptors/Job_Aborted.xml").getPath();
+    private static URL jobDescriptor = TestJobAborted.class
+            .getResource("/functionaltests/descriptors/Job_Aborted.xml");
 
     /**
      * Tests start here.
@@ -81,7 +83,7 @@ public class TestJobAborted extends FunctionalTest {
         SchedulerTHelper.log("Test 1 : Submitting job...");
 
         //job submission
-        JobId id = SchedulerTHelper.submitJob(jobDescriptor);
+        JobId id = SchedulerTHelper.submitJob(new File(jobDescriptor.toURI()).getAbsolutePath());
 
         //check events reception
         SchedulerTHelper.log("Job submitted, id " + id.toString());
