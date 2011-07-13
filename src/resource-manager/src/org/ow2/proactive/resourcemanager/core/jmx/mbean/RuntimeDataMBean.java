@@ -185,12 +185,6 @@ public interface RuntimeDataMBean {
     public double getAverageInactivity();
 
     /**
-     * Returns the connected clients count
-     * @return current number of connected users
-     */
-    public int getConnectedUsersCount();
-
-    /**
      * Sends the statistics accumulated in the RRD data base
      *
      * @return data base file converted to bytes

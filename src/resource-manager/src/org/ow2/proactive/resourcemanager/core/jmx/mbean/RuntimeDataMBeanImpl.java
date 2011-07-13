@@ -222,24 +222,4 @@ public class RuntimeDataMBeanImpl extends StandardMBean implements RuntimeDataMB
     public byte[] getStatisticHistory() throws IOException {
         return RMJMXHelper.getInstance().getDataStore().getBytes();
     }
-
-    /**
-     * Returns the connected clients count
-     * @return current number of connected users
-     */
-    @Chronological
-    public int getConnectedUsersCount() {
-
-        if (internalClientsCount == 0) {
-            synchronized (RMCore.clients) {
-                for (Client c : RMCore.clients.values()) {
-                    if (!c.isPingable()) {
-                        internalClientsCount++;
-                    }
-                }
-            }
-        }
-        return RMCore.clients.size() - internalClientsCount;
-    }
-
 }
