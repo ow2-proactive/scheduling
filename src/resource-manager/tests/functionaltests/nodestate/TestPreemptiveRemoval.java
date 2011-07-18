@@ -84,12 +84,16 @@ public class TestPreemptiveRemoval extends FunctionalTest {
 
         ResourceManager resourceManager = RMTHelper.getResourceManager();
 
-        RMTHelper.createGCMLocalNodeSource();
-        RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, NodeSource.GCM_LOCAL);
+        RMTHelper.createLocalNodeSource();
+        RMTHelper
+                .waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, NodeSource.LOCAL_INFRASTRUCTURE_NAME);
 
         for (int i = 0; i < RMTHelper.defaultNodesNumber; i++) {
+            //for deploying nodes
             RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
+            RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
             //wait for nodes to be in free state
+            RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
             RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
         }
 

@@ -99,8 +99,8 @@ public class SelectionWithSeveralScriptsTest extends FunctionalTest {
     public void action() throws Exception {
 
         RMTHelper.log("Deployment");
-        RMTHelper.createGCMLocalNodeSource();
-        RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, NodeSource.GCM_LOCAL);
+        RMTHelper.createDefaultNodeSource();
+        RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, NodeSource.DEFAULT);
 
         ResourceManager resourceManager = RMTHelper.getResourceManager();
 
@@ -122,7 +122,7 @@ public class SelectionWithSeveralScriptsTest extends FunctionalTest {
         vmTwoProperties.put(this.vmPropKey2, this.vmPropValue2);
 
         String node1URL = RMTHelper.createNode(node1Name, vmTwoProperties).getNodeInformation().getURL();
-        resourceManager.addNode(node1URL, NodeSource.GCM_LOCAL);
+        resourceManager.addNode(node1URL);
 
         //wait node adding event
         RMTHelper.waitForNodeEvent(RMEventType.NODE_ADDED, node1URL);
@@ -137,7 +137,7 @@ public class SelectionWithSeveralScriptsTest extends FunctionalTest {
         vmProp1.put(this.vmPropKey1, this.vmPropValue1);
 
         String node2URL = RMTHelper.createNode(node2Name, vmProp1).getNodeInformation().getURL();
-        resourceManager.addNode(node2URL, NodeSource.GCM_LOCAL);
+        resourceManager.addNode(node2URL);
 
         //wait node adding event
         RMTHelper.waitForNodeEvent(RMEventType.NODE_ADDED, node2URL);
@@ -152,7 +152,7 @@ public class SelectionWithSeveralScriptsTest extends FunctionalTest {
         vmProp1.put(this.vmPropKey2, this.vmPropValue2);
 
         String node3URL = RMTHelper.createNode(node3Name, vmProp2).getNodeInformation().getURL();
-        resourceManager.addNode(node3URL, NodeSource.GCM_LOCAL);
+        resourceManager.addNode(node3URL);
 
         //wait node adding event
         RMTHelper.waitForNodeEvent(RMEventType.NODE_ADDED, node3URL);

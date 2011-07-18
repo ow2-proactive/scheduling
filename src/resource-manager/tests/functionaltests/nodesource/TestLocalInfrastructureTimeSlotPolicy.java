@@ -39,7 +39,8 @@ package functionaltests.nodesource;
 import java.io.File;
 
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
-import org.ow2.proactive.resourcemanager.nodesource.infrastructure.GCMInfrastructure;
+import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
+import org.ow2.proactive.resourcemanager.nodesource.infrastructure.LocalInfrastructure;
 import org.ow2.proactive.resourcemanager.nodesource.policy.TimeSlotPolicy;
 import org.ow2.proactive.utils.FileToBytesConverter;
 
@@ -55,10 +56,8 @@ import functionaltests.RMTHelper;
  * This test may failed by timeout if the machine is too slow, so gcm deployment takes more than 15 secs
  *
  */
-public class TestGCMInfrastructureTimeSlotPolicy extends FunctionalTest {
+public class TestLocalInfrastructureTimeSlotPolicy extends FunctionalTest {
 
-    protected byte[] emptyGCMD;
-    protected byte[] GCMDeploymentData;
     protected int descriptorNodeNumber = 1;
 
     protected Object[] getPolicyParams() {
@@ -66,28 +65,25 @@ public class TestGCMInfrastructureTimeSlotPolicy extends FunctionalTest {
                 TimeSlotPolicy.dateFormat.format(System.currentTimeMillis() + 15000), "0", "true" };
     }
 
-    protected void init() throws Exception {
-        String oneNodeescriptor = new File(TestGCMInfrastructureTimeSlotPolicy.class.getResource(
-                "/functionaltests/nodesource/1node.xml").toURI()).getAbsolutePath();
-        GCMDeploymentData = FileToBytesConverter.convertFileToByteArray((new File(oneNodeescriptor)));
-        String emptyNodeDescriptor = new File(TestGCMInfrastructureTimeSlotPolicy.class.getResource(
-                "/functionaltests/nodesource/empty_gcmd.xml").toURI()).getAbsolutePath();
-        emptyGCMD = FileToBytesConverter.convertFileToByteArray((new File(emptyNodeDescriptor)));
-    }
-
     protected void createEmptyNodeSource(String sourceName) throws Exception {
-        RMTHelper.getResourceManager().createNodeSource(sourceName, GCMInfrastructure.class.getName(),
+        byte[] creds = FileToBytesConverter.convertFileToByteArray(new File(PAResourceManagerProperties
+                .getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString())));
         //first null parameter is the rm url
-                new Object[] { "", emptyGCMD }, TimeSlotPolicy.class.getName(), getPolicyParams());
+        RMTHelper.getResourceManager().createNodeSource(sourceName, LocalInfrastructure.class.getName(),
+                new Object[] { "", creds, 0, RMTHelper.defaultNodesTimeout, "" },
+                TimeSlotPolicy.class.getName(), getPolicyParams());
 
         RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, sourceName);
     }
 
     protected void createDefaultNodeSource(String sourceName) throws Exception {
         // creating node source
-        RMTHelper.getResourceManager().createNodeSource(sourceName, GCMInfrastructure.class.getName(),
-        //first parameter is empty rm url
-                new Object[] { "", GCMDeploymentData }, TimeSlotPolicy.class.getName(), getPolicyParams());
+        byte[] creds = FileToBytesConverter.convertFileToByteArray(new File(PAResourceManagerProperties
+                .getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString())));
+        RMTHelper.getResourceManager().createNodeSource(sourceName, LocalInfrastructure.class.getName(),
+                new Object[] { "", creds, descriptorNodeNumber, RMTHelper.defaultNodesTimeout, "" },
+                //first parameter is empty rm url
+                TimeSlotPolicy.class.getName(), getPolicyParams());
         RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, sourceName);
 
         for (int i = 0; i < descriptorNodeNumber; i++) {
@@ -105,6 +101,9 @@ public class TestGCMInfrastructureTimeSlotPolicy extends FunctionalTest {
         RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, sourceName);
     }
 
+    protected void init() throws Exception {
+    }
+
     /** Actions to be Perform by this test.
      * The method is called automatically by Junit framework.
      * @throws Exception If the test fails.
@@ -113,7 +112,6 @@ public class TestGCMInfrastructureTimeSlotPolicy extends FunctionalTest {
     public void action() throws Exception {
 
         init();
-
         String source1 = "Node_source_1";
 
         RMTHelper.log("Test 1 - creation/removal of empty node source");

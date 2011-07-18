@@ -54,10 +54,7 @@ import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProper
 import org.ow2.proactive.resourcemanager.frontend.RMConnection;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
-import org.ow2.proactive.resourcemanager.nodesource.infrastructure.GCMInfrastructure;
-import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.ow2.proactive.scripting.SelectionScript;
-import org.ow2.proactive.utils.FileToBytesConverter;
 import org.ow2.proactive.utils.NodeSet;
 
 import functionalTests.FunctionalTest;
@@ -90,8 +87,8 @@ public class NonBlockingCoreTest extends FunctionalTest {
 
         RMTHelper.log("Deployment");
 
-        RMTHelper.createGCMLocalNodeSource();
-        RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, NodeSource.GCM_LOCAL);
+        RMTHelper.createDefaultNodeSource();
+        RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, NodeSource.DEFAULT);
 
         for (int i = 0; i < RMTHelper.defaultNodesNumber; i++) {
             RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
@@ -134,7 +131,7 @@ public class NonBlockingCoreTest extends FunctionalTest {
         RMTHelper.createNode(node1Name);
 
         RMTHelper.log("Adding node " + node1URL);
-        resourceManager.addNode(node1URL, NodeSource.GCM_LOCAL);
+        resourceManager.addNode(node1URL);
 
         RMTHelper.waitForNodeEvent(RMEventType.NODE_ADDED, node1URL);
         //waiting for node to be in free state, it is in configuring state when added...
@@ -152,27 +149,25 @@ public class NonBlockingCoreTest extends FunctionalTest {
         assertTrue(resourceManager.getState().getTotalNodesNumber() == RMTHelper.defaultNodesNumber);
         assertTrue(resourceManager.getState().getFreeNodesNumber() == RMTHelper.defaultNodesNumber);
 
-        String nsName = "myNS";
-        RMTHelper.log("Creating GCM node source " + nsName);
-        byte[] GCMDeploymentData = FileToBytesConverter.convertFileToByteArray((new File(
-            RMTHelper.defaultDescriptor.toURI())));
-        //first im parameter is default rm url
-        resourceManager.createNodeSource(nsName, GCMInfrastructure.class.getName(), new Object[] { "",
-                GCMDeploymentData }, StaticPolicy.class.getName(), null);
+        RMTHelper.log("Creating Local node source " + NodeSource.LOCAL_INFRASTRUCTURE_NAME);
+        RMTHelper.createLocalNodeSource();
 
         //wait for creation of GCM Node Source event, and deployment of its nodes
-        RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, nsName);
+        RMTHelper
+                .waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, NodeSource.LOCAL_INFRASTRUCTURE_NAME);
         for (int i = 0; i < RMTHelper.defaultNodesNumber; i++) {
             RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
+            RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
             //waiting for the node to be in free state
+            RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
             RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
         }
 
         assertTrue(resourceManager.getState().getTotalNodesNumber() == RMTHelper.defaultNodesNumber * 2);
         assertTrue(resourceManager.getState().getFreeNodesNumber() == RMTHelper.defaultNodesNumber * 2);
 
-        RMTHelper.log("Removing node source " + nsName);
-        resourceManager.removeNodeSource(nsName, true);
+        RMTHelper.log("Removing node source " + NodeSource.LOCAL_INFRASTRUCTURE_NAME);
+        resourceManager.removeNodeSource(NodeSource.LOCAL_INFRASTRUCTURE_NAME, true);
 
         boolean selectionInProgress = PAFuture.isAwaited(nodes);
 

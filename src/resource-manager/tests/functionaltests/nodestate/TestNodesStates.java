@@ -81,8 +81,9 @@ public class TestNodesStates extends FunctionalTest {
 
         ResourceManager resourceManager = RMTHelper.getResourceManager();
 
-        RMTHelper.createGCMLocalNodeSource();
-        RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, NodeSource.GCM_LOCAL);
+        RMTHelper.createLocalNodeSource();
+        RMTHelper
+                .waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, NodeSource.LOCAL_INFRASTRUCTURE_NAME);
 
         for (int i = 0; i < RMTHelper.defaultNodesNumber; i++) {
             RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);

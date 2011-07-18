@@ -46,8 +46,9 @@ import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.RMFactory;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
+import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
-import org.ow2.proactive.resourcemanager.nodesource.infrastructure.GCMInfrastructure;
+import org.ow2.proactive.resourcemanager.nodesource.infrastructure.LocalInfrastructure;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.common.SchedulerConnection;
 import org.ow2.proactive.scheduler.common.job.JobId;
@@ -88,10 +89,11 @@ public class TestGCMInfrastructureReleaseWhenIdlePolicy extends FunctionalTest {
 
     protected void createDefaultNodeSource(String sourceName) throws Exception {
         // creating node source
-        // first im parameter is default rm url
-        RMTHelper.getResourceManager().createNodeSource(sourceName, GCMInfrastructure.class.getName(),
-                new Object[] { "", GCMDeploymentData }, ReleaseResourcesWhenSchedulerIdle.class.getName(),
-                getPolicyParams());
+        byte[] creds = FileToBytesConverter.convertFileToByteArray(new File(PAResourceManagerProperties
+                .getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString())));
+        RMTHelper.getResourceManager().createNodeSource(sourceName, LocalInfrastructure.class.getName(),
+                new Object[] { "", creds, defaultDescriptorNodesNb, RMTHelper.defaultNodesTimeout, "" },
+                ReleaseResourcesWhenSchedulerIdle.class.getName(), getPolicyParams());
 
         RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, sourceName);
     }

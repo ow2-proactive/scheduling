@@ -62,7 +62,7 @@ import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
-import org.ow2.proactive.resourcemanager.nodesource.infrastructure.GCMInfrastructure;
+import org.ow2.proactive.resourcemanager.nodesource.infrastructure.LocalInfrastructure;
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.ow2.proactive.scheduler.SchedulerFactory;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
@@ -91,8 +91,8 @@ public class SchedulerStarter {
 
     public static final String defaultPolicy = PASchedulerProperties.SCHEDULER_DEFAULT_POLICY
             .getValueAsString();
-    public static final String deploymentFile = PAResourceManagerProperties.RM_HOME.getValueAsString() +
-        File.separator + "config/rm/deployment/Local4JVMDeployment.xml";
+    public static final int defaulNodesNumber = 4;
+    public static final int defaultNodesTimemout = 30 * 1000;
 
     /**
      * Start the scheduler creation process.
@@ -187,12 +187,15 @@ public class SchedulerStarter {
                                     .getCredentials(PAResourceManagerProperties
                                             .getAbsolutePath(PAResourceManagerProperties.RM_CREDS
                                                     .getValueAsString())));
-                            byte[] GCMDeploymentData = FileToBytesConverter.convertFileToByteArray(new File(
-                                deploymentFile));
                             //first im parameter is default rm url
-                            rman.createNodeSource(NodeSource.GCM_LOCAL, GCMInfrastructure.class.getName(),
-                                    new Object[] { "", GCMDeploymentData }, StaticPolicy.class.getName(),
-                                    null);
+                            byte[] creds = FileToBytesConverter.convertFileToByteArray(new File(
+                                PAResourceManagerProperties
+                                        .getAbsolutePath(PAResourceManagerProperties.RM_CREDS
+                                                .getValueAsString())));
+                            rman.createNodeSource(NodeSource.LOCAL_INFRASTRUCTURE_NAME,
+                                    LocalInfrastructure.class.getName(), new Object[] { "", creds,
+                                            defaulNodesNumber, defaultNodesTimemout, "" }, StaticPolicy.class
+                                            .getName(), null);
 
                             logger.info("Resource Manager created on " + rmAuth.getHostURL());
                         } catch (AlreadyBoundException abe) {

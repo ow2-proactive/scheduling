@@ -47,8 +47,9 @@ import org.objectweb.proactive.core.node.Node;
 import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
+import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
-import org.ow2.proactive.resourcemanager.nodesource.infrastructure.GCMInfrastructure;
+import org.ow2.proactive.resourcemanager.nodesource.infrastructure.LocalInfrastructure;
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.ow2.proactive.utils.FileToBytesConverter;
 import org.ow2.proactive.utils.NodeSet;
@@ -80,15 +81,16 @@ public class TestNodeSourcesActions extends FunctionalTest {
     @org.junit.Test
     public void action() throws Exception {
 
-        String nodeSourceName = "GCM_Node_source_test1";
+        String nodeSourceName = "Node_source_test1";
 
         ResourceManager resourceManager = RMTHelper.getResourceManager();
 
-        byte[] GCMDeploymentData = FileToBytesConverter.convertFileToByteArray((new File(
-            RMTHelper.defaultDescriptor.toURI())));
         //first im parameter is default rm url
-        resourceManager.createNodeSource(nodeSourceName, GCMInfrastructure.class.getName(), new Object[] {
-                "", GCMDeploymentData }, StaticPolicy.class.getName(), null);
+        byte[] creds = FileToBytesConverter.convertFileToByteArray(new File(PAResourceManagerProperties
+                .getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString())));
+        resourceManager.createNodeSource(nodeSourceName, LocalInfrastructure.class.getName(), new Object[] {
+                "", creds, RMTHelper.defaultNodesNumber, RMTHelper.defaultNodesTimeout, "" },
+                StaticPolicy.class.getName(), null);
 
         int pingFrequency = 5000;
         resourceManager.setNodeSourcePingFrequency(pingFrequency, nodeSourceName);
@@ -156,8 +158,9 @@ public class TestNodeSourcesActions extends FunctionalTest {
 
         String nodeSourceName2 = "GCM_Node_source_test2";
         //first im parameter is default rm url
-        resourceManager.createNodeSource(nodeSourceName2, GCMInfrastructure.class.getName(), new Object[] {
-                "", GCMDeploymentData }, StaticPolicy.class.getName(), null);
+        resourceManager.createNodeSource(nodeSourceName2, LocalInfrastructure.class.getName(), new Object[] {
+                "", creds, RMTHelper.defaultNodesNumber, RMTHelper.defaultNodesTimeout, "" },
+                StaticPolicy.class.getName(), null);
 
         resourceManager.setNodeSourcePingFrequency(pingFrequency, nodeSourceName2);
 

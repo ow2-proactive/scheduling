@@ -37,8 +37,6 @@
 package org.ow2.proactive.resourcemanager.utils;
 
 import java.io.File;
-import java.util.Collection;
-import java.util.LinkedList;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.GnuParser;
@@ -55,7 +53,7 @@ import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
-import org.ow2.proactive.resourcemanager.nodesource.infrastructure.GCMInfrastructure;
+import org.ow2.proactive.resourcemanager.nodesource.infrastructure.LocalInfrastructure;
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.ow2.proactive.utils.FileToBytesConverter;
 import org.ow2.proactive.utils.console.JVMPropertiesPreloader;
@@ -75,23 +73,28 @@ public class RMStarter {
 
     private static Options options = new Options();
 
+    private static final int DEFAULT_NUMBER_OF_NODES = 4;
+    private static final int DEFAULT_NODE_TIMEOUT = 30 * 1000;
+    private static int nodeTimeout = DEFAULT_NODE_TIMEOUT;
+
     private static void initOptions() {
         Option help = new Option("h", "help", false, "to display this help");
         help.setArgName("help");
         help.setRequired(false);
         options.addOption(help);
 
-        Option deploy = new Option("d", "deploy", true, "list of GCM deployment descriptors files");
-        deploy.setArgName("deploy");
-        deploy.setRequired(false);
-        deploy.setArgs(Option.UNLIMITED_VALUES);
-        options.addOption(deploy);
-
-        Option noDeploy = new Option("ln", "localNodes", false,
-            "start Resource Manager deploying default 4 local nodes");
+        Option noDeploy = new Option("ln", "localNodes", false, "start Resource Manager deploying default " +
+            DEFAULT_NUMBER_OF_NODES + " local nodes");
         noDeploy.setArgName("localNodes");
         noDeploy.setRequired(false);
         options.addOption(noDeploy);
+
+        Option nodeTimeout = new Option("t", "timeout", true,
+            "Timeout used to start the nodes (only usefull with local nodes, defaul: " +
+                DEFAULT_NODE_TIMEOUT + "ms)");
+        nodeTimeout.setArgName("timeout");
+        nodeTimeout.setRequired(false);
+        options.addOption(nodeTimeout);
     }
 
     private static void displayHelp() {
@@ -117,38 +120,25 @@ public class RMStarter {
         Parser parser = new GnuParser();
         CommandLine cmd;
 
-        String[] gcmdList = null;
-
         try {
             cmd = parser.parse(options, args);
             if (cmd.hasOption("h")) {
                 displayHelp();
-            } else if (cmd.hasOption("d") && cmd.hasOption("localNodes")) {
-                logger
-                        .warn("\nYou cannot specify a deployment (-d|--deploy) and ask to deploy nothing (-n|--nodeply) !\n");
-                displayHelp();
-            } else if (cmd.hasOption("d")) {
-                // checking that all specified files are exist 
-                gcmdList = cmd.getOptionValues("d");
-                for (String gcmdPath : gcmdList) {
-                    if (!(new File(gcmdPath)).exists()) {
-                        logger.error("Cannot find GCM deployment file " + gcmdPath);
-                        System.exit(2);
-                    }
-                }
             }
 
             logger.info("Starting Resource Manager, Please wait...");
             RMFactory.setOsJavaProperty();
 
-            Collection<String> deploymentDescriptors = new LinkedList<String>();
+            boolean localNodes = false;
             if (cmd.hasOption("localNodes")) {
-                String gcmDeployFile = PAResourceManagerProperties.RM_HOME.getValueAsString() +
-                    File.separator + "config/rm/deployment/Local4JVMDeployment.xml";
-                deploymentDescriptors.add(gcmDeployFile);
-            } else if (cmd.hasOption("d")) {
-                for (String desc : gcmdList) {
-                    deploymentDescriptors.add(desc);
+                localNodes = true;
+                if (cmd.hasOption("timeout")) {
+                    String timeout = cmd.getOptionValue("t");
+                    try {
+                        nodeTimeout = Integer.parseInt(timeout);
+                    } catch (Exception e) {
+                        logger.error("Wrong value for timeout option: " + timeout, e);
+                    }
                 }
             }
 
@@ -156,24 +146,19 @@ public class RMStarter {
             RMAuthentication auth = RMFactory.startLocal();
             logger.info("Resource Manager successfully created on " + auth.getHostURL());
 
-            if (deploymentDescriptors.size() > 0) {
+            if (localNodes) {
                 ResourceManager resourceManager = auth.login(Credentials
                         .getCredentials(PAResourceManagerProperties
                                 .getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString())));
-                String nodeSourceName = NodeSource.GCM_LOCAL;
-                int counter = 2;
+                String nodeSourceName = NodeSource.LOCAL_INFRASTRUCTURE_NAME;
 
-                for (String deploymentDescriptor : deploymentDescriptors) {
-                    byte[] GCMDeploymentData = FileToBytesConverter.convertFileToByteArray(new File(
-                        deploymentDescriptor));
-
-                    //first im parameter is default rm url
-                    resourceManager.createNodeSource(nodeSourceName, GCMInfrastructure.class.getName(),
-                            new Object[] { "", GCMDeploymentData }, StaticPolicy.class.getName(), null);
-
-                    nodeSourceName = NodeSource.GCM_LOCAL + counter;
-                    counter++;
-                }
+                //first im parameter is default rm url
+                byte[] creds = FileToBytesConverter.convertFileToByteArray(new File(
+                    PAResourceManagerProperties.getAbsolutePath(PAResourceManagerProperties.RM_CREDS
+                            .getValueAsString())));
+                resourceManager.createNodeSource(nodeSourceName, LocalInfrastructure.class.getName(),
+                        new Object[] { "", creds, DEFAULT_NUMBER_OF_NODES, nodeTimeout, "" },
+                        StaticPolicy.class.getName(), null);
                 resourceManager.disconnect();
             }
 

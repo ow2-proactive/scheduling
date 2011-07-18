@@ -140,8 +140,8 @@ public class SelectionTest extends FunctionalTest {
         }
 
         // adding default nodes
-        RMTHelper.createGCMLocalNodeSource();
-        RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, NodeSource.GCM_LOCAL);
+        RMTHelper.createDefaultNodeSource();
+        RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, NodeSource.DEFAULT);
 
         // creating the selection script object
         SelectionScript script = new SelectionScript(new File(vmPropSelectionScriptpath), new String[] {
@@ -164,7 +164,7 @@ public class SelectionTest extends FunctionalTest {
         vmProperties.put(this.vmPropKey1, this.vmPropValue1);
 
         String node1URL = RMTHelper.createNode(node1, vmProperties).getNodeInformation().getURL();
-        resourceManager.addNode(node1URL, NodeSource.GCM_LOCAL);
+        resourceManager.addNode(node1URL, NodeSource.DEFAULT);
 
         //wait node adding event
         RMTHelper.waitForNodeEvent(RMEventType.NODE_ADDED, node1URL);

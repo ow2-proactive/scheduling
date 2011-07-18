@@ -36,11 +36,13 @@
  */
 package functionaltests.nodesource;
 
+import java.io.File;
 import java.net.InetAddress;
 
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.GCMCustomisedInfrastructure;
 import org.ow2.proactive.resourcemanager.nodesource.policy.TimeSlotPolicy;
+import org.ow2.proactive.utils.FileToBytesConverter;
 
 import functionaltests.RMTHelper;
 
@@ -57,15 +59,22 @@ import functionaltests.RMTHelper;
  * in this test it's not required.
  *
  */
-public class TestGCMCustomizedInfrastructureTimeSlotPolicy extends TestGCMInfrastructureTimeSlotPolicy {
+public class TestGCMCustomizedInfrastructureTimeSlotPolicy extends TestLocalInfrastructureTimeSlotPolicy {
 
+    protected byte[] emptyGCMD;
+    protected byte[] GCMDeploymentData;
     protected byte[] hostsListData;
     /** timeout for node acquisition */
     private static final int TIMEOUT = 60 * 1000;
 
     @Override
     protected void init() throws Exception {
-        super.init();
+        String oneNodeescriptor = TestGCMCustomizedInfrastructureTimeSlotPolicy.class.getResource(
+                "/functionaltests/nodesource/1node.xml").getPath();
+        GCMDeploymentData = FileToBytesConverter.convertFileToByteArray((new File(oneNodeescriptor)));
+        String emptyNodeDescriptor = TestGCMCustomizedInfrastructureTimeSlotPolicy.class.getResource(
+                "/functionaltests/nodesource/empty_gcmd.xml").getPath();
+        emptyGCMD = FileToBytesConverter.convertFileToByteArray((new File(emptyNodeDescriptor)));
         // overriding gcma file
         RMTHelper.getResourceManager(RMTHelper.class.getResource(
                 "/functionaltests/config/functionalTRMPropertiesForCustomisedIM.ini").getPath());
@@ -80,7 +89,6 @@ public class TestGCMCustomizedInfrastructureTimeSlotPolicy extends TestGCMInfras
                 GCMCustomisedInfrastructure.class.getName(),
                 new Object[] { "", emptyGCMD, hostsListData, TIMEOUT }, TimeSlotPolicy.class.getName(),
                 getPolicyParams());
-
         RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, sourceName);
     }
 

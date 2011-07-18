@@ -71,7 +71,7 @@ import org.ow2.proactive.resourcemanager.frontend.RMConnection;
 import org.ow2.proactive.resourcemanager.frontend.RMMonitoring;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
-import org.ow2.proactive.resourcemanager.nodesource.infrastructure.GCMInfrastructure;
+import org.ow2.proactive.resourcemanager.nodesource.infrastructure.LocalInfrastructure;
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.ow2.proactive.utils.FileToBytesConverter;
 
@@ -108,6 +108,10 @@ public class RMTHelper {
      * Number of nodes deployed with default deployment descriptor
      */
     public static int defaultNodesNumber = 5;
+    /**
+     * Timeout for local infrastructure
+     */
+    public static int defaultNodesTimeout = 20 * 1000;//20s
 
     private static URL functionalTestRMProperties = RMTHelper.class
             .getResource("/functionaltests/config/functionalTRMProperties.ini");
@@ -153,14 +157,33 @@ public class RMTHelper {
         return createNode(nodeName, null);
     }
 
-    public static void createGCMLocalNodeSource() throws Exception {
+    /**
+     * Creates a Default Infrastructure Manager with defaultNodesNumber nodes
+     * @throws Exception
+     */
+    public static void createDefaultNodeSource() throws Exception {
         RMFactory.setOsJavaProperty();
-        byte[] GCMDeploymentData = FileToBytesConverter.convertFileToByteArray((new File(defaultDescriptor
-                .toURI())));
+        ResourceManager rm = getResourceManager();
+        for (int i = 0; i < RMTHelper.defaultNodesNumber; i++) {
+            String nodeName = "default_nodermt_" + System.currentTimeMillis();
+            Node node = createNode(nodeName);
+            rm.addNode(node.getNodeInformation().getURL());
+        }
+    }
+
+    /**
+     * Creates a Local Infrastructure Manager with defaultNodesNumber nodes
+     * @throws Exception
+     */
+    public static void createLocalNodeSource() throws Exception {
+        RMFactory.setOsJavaProperty();
         ResourceManager rm = getResourceManager();
         //first emtpy im parameter is default rm url
-        rm.createNodeSource(NodeSource.GCM_LOCAL, GCMInfrastructure.class.getName(), new Object[] { "",
-                GCMDeploymentData }, StaticPolicy.class.getName(), null);
+        byte[] creds = FileToBytesConverter.convertFileToByteArray(new File(PAResourceManagerProperties
+                .getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString())));
+        rm.createNodeSource(NodeSource.LOCAL_INFRASTRUCTURE_NAME, LocalInfrastructure.class.getName(),
+                new Object[] { "", creds, RMTHelper.defaultNodesNumber, RMTHelper.defaultNodesTimeout,
+                        FunctionalTest.getJvmParameters() }, StaticPolicy.class.getName(), null);
     }
 
     /**

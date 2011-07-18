@@ -39,22 +39,21 @@ package functionaltests;
 import java.io.File;
 import java.io.Serializable;
 import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
+import org.objectweb.proactive.core.node.Node;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.RMFactory;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.RMConnection;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
-import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
-import org.ow2.proactive.resourcemanager.nodesource.infrastructure.GCMInfrastructure;
-import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.ow2.proactive.scheduler.SchedulerFactory;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.common.SchedulerConnection;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
-import org.ow2.proactive.utils.FileToBytesConverter;
 
 
 /**
@@ -80,13 +79,13 @@ public class MyAO implements Serializable {
     /**
      * Start a Scheduler and Resource Manager in Active's Object's JVM
      *
-     * @param GCMDPath path to a GCMDeployment file, to deploy at RM's startup.
+     * @param localnodes true if the RM started with the scheduler has to start some nodes
      * @param schedPropPath path to a scheduler Properties file, or null if not needed
      * @param RMPropPath  path to a RM Properties file, or null if not needed
      * @return SchedulerAuthenticationInteface of created Scheduler
      * @throws Exception if any error occurs.
      */
-    public SchedulerAuthenticationInterface createAndJoinForkedScheduler(String GCMDPath,
+    public SchedulerAuthenticationInterface createAndJoinForkedScheduler(boolean localnodes,
             String schedPropPath, String RMPropPath) throws Exception {
 
         SchedulerAuthenticationInterface schedulerAuth = null;
@@ -111,13 +110,22 @@ public class MyAO implements Serializable {
                 PASchedulerProperties.SCHEDULER_DEFAULT_POLICY.getValueAsString());
 
         schedulerAuth = SchedulerConnection.waitAndJoin(schedulerDefaultURL);
-        if (GCMDPath != null && GCMDPath.length() > 0) {
+        if (localnodes) {
             ResourceManager rmAdmin = rmAuth.login(Credentials.getCredentials(PAResourceManagerProperties
                     .getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString())));
-            byte[] GCMDeploymentData = FileToBytesConverter.convertFileToByteArray(new File(GCMDPath));
-            //first empty im parameter is default rm url
-            rmAdmin.createNodeSource(NodeSource.GCM_LOCAL, GCMInfrastructure.class.getName(), new Object[] {
-                    "", GCMDeploymentData }, StaticPolicy.class.getName(), null);
+            Map<String, String> params = new HashMap<String, String>();
+            params.put(CentralPAPropertyRepository.PA_HTTP_JETTY_XML.getName(),
+                    PAResourceManagerProperties.RM_HOME.getValueAsString() + File.separator + "config" +
+                        File.separator + "rm" + File.separator + "deployment" + File.separator + "jetty.xml");
+            Node[] nodes = new Node[RMTHelper.defaultNodesNumber];
+            for (int i = 0; i < RMTHelper.defaultNodesNumber; i++) {
+                String nodeName = "default_nodemyao_" + System.currentTimeMillis();
+                Node node = RMTHelper.createNode(nodeName, params);
+                nodes[i] = node;
+            }
+            for (int i = 0; i < RMTHelper.defaultNodesNumber; i++) {
+                rmAdmin.addNode(nodes[i].getNodeInformation().getURL());
+            }
         }
         System.out.println("Scheduler successfully created !");
         return schedulerAuth;

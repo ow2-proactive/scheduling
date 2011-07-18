@@ -80,8 +80,8 @@ public class SelectionScriptTimeOutTest extends FunctionalTest {
         RMTHelper.log("Deployment");
 
         ResourceManager resourceManager = RMTHelper.getResourceManager();
-        RMTHelper.createGCMLocalNodeSource();
-        RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, NodeSource.GCM_LOCAL);
+        RMTHelper.createDefaultNodeSource();
+        RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, NodeSource.DEFAULT);
 
         for (int i = 0; i < RMTHelper.defaultNodesNumber; i++) {
             RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
@@ -117,7 +117,7 @@ public class SelectionScriptTimeOutTest extends FunctionalTest {
         vmProperties.put(nodeName, "dummy");
 
         String nodeURL = RMTHelper.createNode(nodeName, vmProperties).getNodeInformation().getURL();
-        resourceManager.addNode(nodeURL, NodeSource.GCM_LOCAL);
+        resourceManager.addNode(nodeURL);
         RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
         //wait for the nodes to be in free state
         RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);

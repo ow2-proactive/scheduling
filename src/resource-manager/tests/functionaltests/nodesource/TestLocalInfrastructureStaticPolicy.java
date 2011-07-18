@@ -44,8 +44,9 @@ import java.net.URL;
 import org.objectweb.proactive.core.node.Node;
 import org.ow2.proactive.resourcemanager.common.RMState;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
+import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
-import org.ow2.proactive.resourcemanager.nodesource.infrastructure.GCMInfrastructure;
+import org.ow2.proactive.resourcemanager.nodesource.infrastructure.LocalInfrastructure;
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.ow2.proactive.utils.FileToBytesConverter;
 import org.ow2.proactive.utils.NodeSet;
@@ -56,23 +57,21 @@ import functionaltests.RMTHelper;
 
 /**
  *
- * Test checks the correct behavior of node source consisted of GCM infrastructure manager
+ * Test checks the correct behavior of node source consisted of Local infrastructure manager
  * and static acquisition policy.
  *
  */
-public class TestGCMInfrastructureStaticPolicy extends FunctionalTest {
+public class TestLocalInfrastructureStaticPolicy extends FunctionalTest {
 
-    protected byte[] emptyGCMD;
-    protected byte[] GCMDeploymentData;
-
-    protected static URL defaultDescriptor = TestGCMInfrastructureStaticPolicy.class
-            .getResource("/functionaltests/nodesource/3nodes.xml");
     protected int defaultDescriptorNodesNb = 3;
 
     protected void createEmptyNodeSource(String sourceName) throws Exception {
         //first parameter of im is empty default rm url
-        RMTHelper.getResourceManager().createNodeSource(sourceName, GCMInfrastructure.class.getName(),
-                new Object[] { "", emptyGCMD }, StaticPolicy.class.getName(), null);
+        byte[] creds = FileToBytesConverter.convertFileToByteArray(new File(PAResourceManagerProperties
+                .getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString())));
+        RMTHelper.getResourceManager().createNodeSource(sourceName, LocalInfrastructure.class.getName(),
+                new Object[] { "", creds, 0, RMTHelper.defaultNodesTimeout, "" },
+                StaticPolicy.class.getName(), null);
 
         RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, sourceName);
     }
@@ -80,8 +79,11 @@ public class TestGCMInfrastructureStaticPolicy extends FunctionalTest {
     protected void createNodeSourceWithNodes(String sourceName) throws Exception {
         // creating node source
         // first parameter of im is empty default rm url
-        RMTHelper.getResourceManager().createNodeSource(sourceName, GCMInfrastructure.class.getName(),
-                new Object[] { "", GCMDeploymentData }, StaticPolicy.class.getName(), null);
+        byte[] creds = FileToBytesConverter.convertFileToByteArray(new File(PAResourceManagerProperties
+                .getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString())));
+        RMTHelper.getResourceManager().createNodeSource(sourceName, LocalInfrastructure.class.getName(),
+                new Object[] { "", creds, defaultDescriptorNodesNb, RMTHelper.defaultNodesTimeout, "" },
+                StaticPolicy.class.getName(), null);
 
         RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, sourceName);
         for (int i = 0; i < defaultDescriptorNodesNb; i++) {
@@ -107,11 +109,6 @@ public class TestGCMInfrastructureStaticPolicy extends FunctionalTest {
     }
 
     protected void init() throws Exception {
-        GCMDeploymentData = FileToBytesConverter
-                .convertFileToByteArray((new File(defaultDescriptor.toURI())));
-        URL emptyNodeDescriptor = TestGCMInfrastructureTimeSlotPolicy.class
-                .getResource("/functionaltests/nodesource/empty_gcmd.xml");
-        emptyGCMD = FileToBytesConverter.convertFileToByteArray((new File(emptyNodeDescriptor.toURI())));
     }
 
     /** Actions to be Perform by this test.

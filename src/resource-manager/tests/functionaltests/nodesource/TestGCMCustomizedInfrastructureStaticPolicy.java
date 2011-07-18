@@ -55,8 +55,10 @@ import functionaltests.RMTHelper;
  * to deploy several nodes so it wont be able to remove them correctly one by one. But for the scenario
  * in this test it's not required.
  */
-public class TestGCMCustomizedInfrastructureStaticPolicy extends TestGCMInfrastructureStaticPolicy {
+public class TestGCMCustomizedInfrastructureStaticPolicy extends TestLocalInfrastructureStaticPolicy {
 
+    protected byte[] emptyGCMD;
+    protected byte[] GCMDeploymentData;
     protected byte[] emptyhostsListData;
     protected byte[] hostsListData;
     /** timeout for node acquisition */
@@ -79,7 +81,7 @@ public class TestGCMCustomizedInfrastructureStaticPolicy extends TestGCMInfrastr
         hostsListData = FileToBytesConverter.convertFileToByteArray((new File(hostList)));
         emptyhostsListData = FileToBytesConverter.convertFileToByteArray((new File(hostListEmpty)));
 
-        String emptyNodeDescriptor = new File(TestGCMInfrastructureTimeSlotPolicy.class.getResource(
+        String emptyNodeDescriptor = new File(TestLocalInfrastructureTimeSlotPolicy.class.getResource(
                 "/functionaltests/nodesource/empty_gcmd.xml").toURI()).getAbsolutePath();
         emptyGCMD = FileToBytesConverter.convertFileToByteArray((new File(emptyNodeDescriptor)));
     }

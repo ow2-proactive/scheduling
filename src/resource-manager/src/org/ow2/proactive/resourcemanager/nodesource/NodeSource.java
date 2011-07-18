@@ -106,7 +106,7 @@ public class NodeSource implements InitActive, RunActive {
     private int pingFrequency = PAResourceManagerProperties.RM_NODE_SOURCE_PING_FREQUENCY.getValueAsInt();
 
     /** Default name */
-    public static final String GCM_LOCAL = "GCMLocalNodes";
+    public static final String LOCAL_INFRASTRUCTURE_NAME = "LocalNodes";
     public static final String DEFAULT = "Default";
 
     /** unique name of the source */

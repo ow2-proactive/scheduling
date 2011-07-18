@@ -77,15 +77,16 @@ public class TestLockNodes extends FunctionalTest {
 
         ResourceManager resourceManager = RMTHelper.getResourceManager();
 
-        RMTHelper.createGCMLocalNodeSource();
-        RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, NodeSource.GCM_LOCAL);
+        RMTHelper.createLocalNodeSource();
+        RMTHelper
+                .waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, NodeSource.LOCAL_INFRASTRUCTURE_NAME);
 
         Set<String> nodesUrls = new HashSet<String>();
         for (int i = 0; i < RMTHelper.defaultNodesNumber; i++) {
-            RMNodeEvent nodeEvent = RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
-            nodesUrls.add(nodeEvent.getNodeUrl());
+            RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
             //wait for the nodes to be in free state
-            RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+            RMNodeEvent nodeEvent = RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+            nodesUrls.add(nodeEvent.getNodeUrl());
         }
 
         RMTHelper.log("Test 1 - locking");

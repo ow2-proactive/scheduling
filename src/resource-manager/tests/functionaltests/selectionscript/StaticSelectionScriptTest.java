@@ -58,7 +58,7 @@ import functionaltests.RMTHelper;
 
 /**
  *
- * This class tests RM's mechanism of resource selection with dynamic
+ * This class tests RM's mechanism of resource selection with static
  * scripts.
  *
  * -launch nodes with a specified JVM environment variable => verify script
@@ -79,7 +79,7 @@ import functionaltests.RMTHelper;
  * @author ProActive team
  *
  */
-public class dynamicSelectionScriptTest extends FunctionalTest {
+public class StaticSelectionScriptTest extends FunctionalTest {
 
     private URL vmPropSelectionScriptpath = this.getClass().getResource("vmPropertySelectionScript.js");
 
@@ -97,19 +97,18 @@ public class dynamicSelectionScriptTest extends FunctionalTest {
     @org.junit.Test
     public void action() throws Exception {
 
+        ResourceManager resourceManager = RMTHelper.getResourceManager();
+
         RMTHelper.log("Deployment");
-        RMTHelper.createGCMLocalNodeSource();
-        RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, NodeSource.GCM_LOCAL);
+        RMTHelper.createDefaultNodeSource();
+        RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, NodeSource.DEFAULT);
 
         for (int i = 0; i < RMTHelper.defaultNodesNumber; i++) {
             RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
-            //waiting for the nodes to be in free state
+            //wait for the nodes to be in free state
             RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
         }
 
-        ResourceManager resourceManager = RMTHelper.getResourceManager();
-
-        //String hostName = ProActiveInet.getInstance().getHostname();
         String node1Name = "node1";
         String node2Name = "node2";
 
@@ -117,16 +116,16 @@ public class dynamicSelectionScriptTest extends FunctionalTest {
         vmProperties.put(this.vmPropKey, this.vmPropValue);
 
         String node1URL = RMTHelper.createNode(node1Name, vmProperties).getNodeInformation().getURL();
-        resourceManager.addNode(node1URL, NodeSource.GCM_LOCAL);
+        resourceManager.addNode(node1URL);
 
         //wait node adding event
         RMTHelper.waitForNodeEvent(RMEventType.NODE_ADDED, node1URL);
-        //wait for the node to be in free state
+        //wait for the nodes to be in free state
         RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
 
-        //create the dynamic selection script object
+        //create the static selection script object
         SelectionScript sScript = new SelectionScript(new File(vmPropSelectionScriptpath.toURI()),
-            new String[] { this.vmPropKey, this.vmPropValue }, true);
+            new String[] { this.vmPropKey, this.vmPropValue }, false);
 
         RMTHelper.log("Test 1");
 
@@ -139,6 +138,7 @@ public class dynamicSelectionScriptTest extends FunctionalTest {
         assertTrue(resourceManager.getState().getFreeNodesNumber() == RMTHelper.defaultNodesNumber);
         assertTrue(nodes.get(0).getNodeInformation().getURL().equals(node1URL));
 
+        //wait for node busy event
         RMNodeEvent evt = RMTHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node1URL);
         Assert.assertEquals(evt.getNodeState(), NodeState.BUSY);
 
@@ -172,15 +172,14 @@ public class dynamicSelectionScriptTest extends FunctionalTest {
         RMTHelper.log("Test 3");
 
         //add a second with JVM env var
-
         String node2URL = RMTHelper.createNode(node2Name, vmProperties).getNodeInformation().getURL();
-        resourceManager.addNode(node2URL, NodeSource.GCM_LOCAL);
+        resourceManager.addNode(node2URL);
 
         //wait node adding event
-        RMTHelper.waitForNodeEvent(RMEventType.NODE_ADDED, node2URL);
-        //wait for the node to be in free state
-        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
 
+        RMTHelper.waitForNodeEvent(RMEventType.NODE_ADDED, node2URL);
+        //wait for the nodes to be in free state
+        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
         nodes = resourceManager.getAtMostNodes(3, sScript);
 
         //wait node selection
@@ -189,7 +188,7 @@ public class dynamicSelectionScriptTest extends FunctionalTest {
         assertTrue(nodes.size() == 2);
         assertTrue(resourceManager.getState().getFreeNodesNumber() == RMTHelper.defaultNodesNumber);
 
-        //wait for nodes busy event
+        //wait for node busy event
         evt = RMTHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node1URL);
         Assert.assertEquals(evt.getNodeState(), NodeState.BUSY);
         evt = RMTHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node2URL);
@@ -197,7 +196,7 @@ public class dynamicSelectionScriptTest extends FunctionalTest {
 
         resourceManager.releaseNodes(nodes);
 
-        //wait for node free event
+        //wait for nodes free event
         evt = RMTHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node1URL);
         Assert.assertEquals(evt.getNodeState(), NodeState.FREE);
         evt = RMTHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node2URL);
@@ -209,8 +208,8 @@ public class dynamicSelectionScriptTest extends FunctionalTest {
         resourceManager.removeNode(node2URL, true);
 
         //wait for node removed event
-        RMTHelper.waitForNodeEvent(RMEventType.NODE_REMOVED, node2URL);
         RMTHelper.waitForNodeEvent(RMEventType.NODE_REMOVED, node1URL);
+        RMTHelper.waitForNodeEvent(RMEventType.NODE_REMOVED, node2URL);
 
         nodes = resourceManager.getAtMostNodes(3, sScript);
 
@@ -222,9 +221,9 @@ public class dynamicSelectionScriptTest extends FunctionalTest {
 
         RMTHelper.log("Test 5");
 
-        //create the bad dynamic selection script object
+        //create the bad static selection script object
         SelectionScript badScript = new SelectionScript(new File(badSelectionScriptpath.toURI()),
-            new String[] {}, true);
+            new String[] {}, false);
 
         nodes = resourceManager.getAtMostNodes(3, badScript);
 
@@ -235,13 +234,14 @@ public class dynamicSelectionScriptTest extends FunctionalTest {
             Assert.assertTrue(false);
         } catch (RuntimeException e) {
         }
+
         assertTrue(resourceManager.getState().getFreeNodesNumber() == RMTHelper.defaultNodesNumber);
 
         RMTHelper.log("Test 6");
 
-        //create the dynamic selection script object that doesn't define 'selected'
+        //create the static selection script object that doesn't define 'selected'
         SelectionScript noSelectedScript = new SelectionScript(new File(withoutSelectedSelectionScriptpath
-                .toURI()), new String[] {}, true);
+                .toURI()), new String[] {}, false);
 
         nodes = resourceManager.getAtMostNodes(3, noSelectedScript);
 

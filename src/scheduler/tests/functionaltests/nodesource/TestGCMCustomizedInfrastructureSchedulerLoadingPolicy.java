@@ -45,13 +45,15 @@ import java.net.URISyntaxException;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
+import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.GCMCustomisedInfrastructure;
-import org.ow2.proactive.resourcemanager.nodesource.infrastructure.GCMInfrastructure;
+import org.ow2.proactive.resourcemanager.nodesource.infrastructure.LocalInfrastructure;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.common.SchedulerConnection;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.resourcemanager.nodesource.policy.SchedulerLoadingPolicy;
+import org.ow2.proactive.utils.FileToBytesConverter;
 
 import functionaltests.RMTHelper;
 import functionaltests.SchedulerTHelper;
@@ -128,10 +130,13 @@ public class TestGCMCustomizedInfrastructureSchedulerLoadingPolicy extends
         SchedulerTHelper.log("Test 2");
         try {
             // incorrect infrastructure for the policy
-            // first im parameter is default rm url
-            resourceManager.createNodeSource(source1, GCMInfrastructure.class.getName(),
-                    new Object[] { "", GCMDeploymentData }, SchedulerLoadingPolicy.class.getName(),
-                    getPolicyParams()).getBooleanValue();
+            // this was previously done with GCM Infrastructure to test incompatibility between IM & Policy.
+            // This should be removed
+            byte[] creds = FileToBytesConverter.convertFileToByteArray(new File(PAResourceManagerProperties
+                    .getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString())));
+            resourceManager.createNodeSource(source1, LocalInfrastructure.class.getName(),
+                    new Object[] { "", creds, defaultDescriptorNodesNb, RMTHelper.defaultNodesTimeout, "" },
+                    SchedulerLoadingPolicy.class.getName(), getPolicyParams()).getBooleanValue();
             assertTrue(false);
         } catch (Exception e) {
         }

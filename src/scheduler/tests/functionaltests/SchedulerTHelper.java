@@ -126,9 +126,6 @@ import functionaltests.monitor.SchedulerMonitorsHandler;
  */
 public class SchedulerTHelper {
 
-    protected static URL defaultDescriptor = SchedulerTHelper.class
-            .getResource("config/GCMNodeSourceDeployment.xml");
-
     protected static URL startForkedSchedulerApplication = SchedulerTHelper.class
             .getResource("/functionaltests/config/StartForkedSchedulerApplication.xml");
 
@@ -176,7 +173,7 @@ public class SchedulerTHelper {
      * @throws Exception if an error occurs.
      */
     public static void startScheduler(String configuration) throws Exception {
-        startScheduler(new File(defaultDescriptor.toURI()).getAbsolutePath(), configuration);
+        startScheduler(true, configuration);
     }
 
     /**
@@ -188,7 +185,7 @@ public class SchedulerTHelper {
      * @throws Exception if an error occurs.
      */
     public static void startSchedulerWithEmptyResourceManager() throws Exception {
-        startScheduler(null, null);
+        startScheduler(false, null);
     }
 
     /**
@@ -197,27 +194,27 @@ public class SchedulerTHelper {
      * @throws Exception if an error occurs.
      */
     public static void startSchedulerWithEmptyResourceManager(String rmPropertyFilePath) throws Exception {
-        startScheduler(null, null, rmPropertyFilePath);
+        startScheduler(false, null, rmPropertyFilePath);
     }
 
     /**
      * Starts Scheduler with a specific GCM deployment descriptor and scheduler properties file,
-     * @param GCMDPath path to a GCMD deployment file
+     * @param localnodes true if the RM has to start some nodes
      * @param configuration the Scheduler configuration file to use (default is functionalTSchedulerProperties.ini)
      * 			null to use the default one.
      * @throws Exception
      */
-    public static void startScheduler(String GCMDPath, String schedPropertiesFilePath) throws Exception {
-        startScheduler(GCMDPath, schedPropertiesFilePath, null);
+    public static void startScheduler(boolean localnodes, String schedPropertiesFilePath) throws Exception {
+        startScheduler(localnodes, schedPropertiesFilePath, null);
     }
 
     /**
      * Same as startScheduler but allows to specify a file holding rm properties
-     * @param GCMDPath
+     * @param localnodes
      * @param schedPropertiesFilePath
      * @throws Exception
      */
-    public static void startScheduler(String GCMDPath, String schedPropertiesFilePath,
+    public static void startScheduler(boolean localnodes, String schedPropertiesFilePath,
             String rmPropertiesFilePath) throws Exception {
         if (schedPropertiesFilePath == null) {
             schedPropertiesFilePath = new File(functionalTestSchedulerProperties.toURI()).getAbsolutePath();
@@ -230,7 +227,7 @@ public class SchedulerTHelper {
         GCMVirtualNode vn = gcmad.getVirtualNode("VN");
         Node node = vn.getANode();
         MyAO myAO = (MyAO) PAActiveObject.newActive(MyAO.class.getName(), null, node);
-        schedulerAuth = myAO.createAndJoinForkedScheduler(GCMDPath, schedPropertiesFilePath,
+        schedulerAuth = myAO.createAndJoinForkedScheduler(localnodes, schedPropertiesFilePath,
                 rmPropertiesFilePath);
     }
 
@@ -820,6 +817,9 @@ public class SchedulerTHelper {
             PASchedulerProperties.SCHEDULER_HOME.getValueAsString() + "\"");
         properties.append(" " + PAResourceManagerProperties.RM_HOME.getCmdLine() + "\"" +
             PAResourceManagerProperties.RM_HOME.getValueAsString() + "\"");
+        properties.append(" -D" + CentralPAPropertyRepository.PA_HTTP_JETTY_XML.getName() + "=" +
+            PAResourceManagerProperties.RM_HOME.getValueAsString() + File.separator + "config" +
+            File.separator + "rm" + File.separator + "deployment" + File.separator + "jetty.xml");
         vContract.setVariableFromProgram("jvmargDefinedByTest", properties.toString(),
                 VariableContractType.DescriptorDefaultVariable);
         gcmad = PAGCMDeployment.loadApplicationDescriptor(startForkedSchedulerApplication, vContract);
