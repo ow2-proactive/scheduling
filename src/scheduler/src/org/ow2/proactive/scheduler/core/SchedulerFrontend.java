@@ -503,15 +503,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
     @ImmediateService
     public TaskResult getTaskResult(JobId jobId, String taskName) throws NotConnectedException,
             UnknownJobException, UnknownTaskException, PermissionException {
-
-        //checking permissions
-        checkJobOwner("getTaskResult", jobId,
-                "You do not have permission to get the task result of this job !");
-
-        //asking the scheduler for the result
-        TaskResult result = scheduler.getTaskResult(jobId, taskName);
-
-        return result;
+        return this.getTaskResultFromIncarnation(jobId, taskName, 0);
     }
 
     /**
@@ -521,6 +513,36 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
     public TaskResult getTaskResult(String jobId, String taskName) throws NotConnectedException,
             UnknownJobException, UnknownTaskException, PermissionException {
         return this.getTaskResult(JobIdImpl.makeJobId(jobId), taskName);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @ImmediateService
+    public TaskResult getTaskResultFromIncarnation(String jobId, String taskName, int inc)
+            throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
+        return this.getTaskResultFromIncarnation(JobIdImpl.makeJobId(jobId), taskName, inc);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @ImmediateService
+    public TaskResult getTaskResultFromIncarnation(JobId jobId, String taskName, int inc)
+            throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
+
+        //checking permissions
+        checkJobOwner("getTaskResultFromIncarnation", jobId,
+                "You do not have permission to get the task result of this job !");
+
+        if (inc < 0) {
+            throw new IllegalArgumentException("Incarnation must be 0 or greater.");
+        }
+
+        //asking the scheduler for the result
+        TaskResult result = scheduler.getTaskResultFromIncarnation(jobId, taskName, inc);
+
+        return result;
     }
 
     /**

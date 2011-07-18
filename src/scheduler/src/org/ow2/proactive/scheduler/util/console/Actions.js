@@ -90,8 +90,11 @@ function jobresult(jobId){
     return s_.result_(""+jobId);
 }
 
-function taskresult(jobId,taskName){
-    return s_.tresult_(""+jobId,""+taskName);
+function taskresult(jobId,taskName, inc){
+	if (inc == undefined){
+		inc = 0;
+	}
+    return s_.tresult_(""+jobId,""+taskName,""+inc);
 }
 
 function killtask(jobId,taskName){

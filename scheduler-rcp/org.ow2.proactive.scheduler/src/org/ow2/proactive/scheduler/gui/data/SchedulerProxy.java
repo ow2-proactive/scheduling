@@ -236,6 +236,17 @@ public class SchedulerProxy implements Scheduler {
         return null;
     }
 
+    public TaskResult getTaskResultFromIncarnation(JobId jobId, String taskName, int inc)
+            throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
+        try {
+            return scheduler.getTaskResultFromIncarnation(jobId, taskName, inc);
+        } catch (SchedulerException e) {
+            Activator.log(IStatus.ERROR, "- Scheduler Proxy: Error when getting task result", e);
+            displayError(e.getMessage());
+        }
+        return null;
+    }
+
     public boolean killTask(JobId jobId, String taskName) {
         return killTask(jobId.value(), taskName);
     }
@@ -688,6 +699,11 @@ public class SchedulerProxy implements Scheduler {
     public TaskResult getTaskResult(String jobId, String taskName) throws NotConnectedException,
             UnknownJobException, UnknownTaskException, PermissionException {
         return scheduler.getTaskResult(jobId, taskName);
+    }
+
+    public TaskResult getTaskResultFromIncarnation(String jobId, String taskName, int inc)
+            throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
+        return scheduler.getTaskResultFromIncarnation(jobId, taskName, inc);
     }
 
     /**

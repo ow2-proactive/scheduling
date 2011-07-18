@@ -57,7 +57,7 @@ import javax.script.ScriptException;
 public abstract class ConsoleModel {
 
     protected static String newline = System.getProperty("line.separator");
-    protected static int cmdHelpMaxCharLength = 24;
+    protected static int cmdHelpMaxCharLength = 28;
 
     protected boolean initialized = false;
     protected boolean terminated = false;

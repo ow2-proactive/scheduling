@@ -416,9 +416,10 @@ public class SchedulerController {
         actionGroup.addOption(opt);
 
         opt = new Option("tr", "taskresult", true, control + "Get the result of the given task");
-        opt.setArgName("jobId taskName");
+        opt.setArgName("jobId taskName [inc]");
         opt.setRequired(false);
-        opt.setArgs(2);
+        opt.setArgs(3);
+        opt.setOptionalArg(true);
         actionGroup.addOption(opt);
 
         opt = new Option("jo", "joboutput", true, control + "Get the output of the given job");
@@ -585,10 +586,15 @@ public class SchedulerController {
             model.result_(cmd.getOptionValue("jobresult"));
         } else if (cmd.hasOption("taskresult")) {
             String[] optionValues = cmd.getOptionValues("taskresult");
-            if (optionValues == null || optionValues.length != 2) {
-                model.error("taskresult must have two arguments. Start with --help for more informations");
+            if (optionValues == null || optionValues.length < 2 || optionValues.length > 3) {
+                model
+                        .error("taskresult must have two or three arguments. Start with --help for more informations");
             }
-            model.tresult_(optionValues[0], optionValues[1]);
+            String incarnation = "0";
+            if (optionValues.length == 3) {
+                incarnation = optionValues[2];
+            }
+            model.tresult_(optionValues[0], optionValues[1], incarnation);
         } else if (cmd.hasOption("joboutput")) {
             model.output_(cmd.getOptionValue("joboutput"));
         } else if (cmd.hasOption("taskoutput")) {

@@ -84,23 +84,27 @@ public interface SchedulerCoreMethods {
             UnknownJobException;
 
     /**
-     * Get the result for the given task name in the given jobId.
+     * Get the result for the given task name and the given incarnation in the given jobId. <br >
      * A user can only get HIS result back.<br>
-     * If the job does not exist, an UnknownJobException is sent with the proper message.<br>
+     * The incarnation argument represents the task result to get. If the task has failed 3 times and then has worked,
+     * then 0 represents the last result, 1 the previous, ..., and 3 represents the result of the first execution.<br/><br/>
+     * If the job does not exist, a schedulerException is sent with the proper message.<br>
      * So, if you have the right to get the task result that is in the job represented by the given jobId and if the job and task name exist,
      * so you will receive the result. In any other cases a schedulerException will be thrown.<br>
      *
      * @param jobId the job in which the task result is.
      * @param taskName the name of the task in which the result is.
+     * @param inc id of incarnation (0 is the last one, 1 the previous, and so on...)
      * @return a job Result containing information about the result.
-     * 		If the task result is not yet available, null is returned.
+     * 		If null is returned, this task is not yet terminated or not available.
      * @throws NotConnectedException if you are not authenticated.
      * @throws UnknownJobException if the job does not exist.
      * @throws UnknownTaskException if this task does not exist in the job.
      * @throws PermissionException if you can't access to this particular job.
+     * @throws IllegalArgumentException if the incarnation argument is lower than 0 or greater than the number of terminated execution.
      */
-    public TaskResult getTaskResult(JobId jobId, String taskName) throws NotConnectedException,
-            UnknownJobException, UnknownTaskException, PermissionException;
+    public TaskResult getTaskResultFromIncarnation(JobId jobId, String taskName, int inc)
+            throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException;
 
     /**
      * Try to kill the task with the given task name in the given jobId.

@@ -157,7 +157,7 @@ public class SchedulerModel extends ConsoleModel {
             "Get the result of the given job (parameter is an int or a string representing the jobId)"));
         commands
                 .add(new Command(
-                    "taskresult(id,taskName)",
+                    "taskresult(id,taskName[,inc])",
                     "Get the result of the given task (parameter is an int or a string representing the jobId, and the task name)"));
         commands.add(new Command("joboutput(id)",
             "Get the output of the given job (parameter is an int or a string representing the jobId)"));
@@ -432,9 +432,16 @@ public class SchedulerModel extends ConsoleModel {
         }
     }
 
-    public TaskResult tresult_(String jobId, String taskName) {
+    public TaskResult tresult_(String jobId, String taskName, String inc) {
+        int rInc;
         try {
-            TaskResult result = scheduler.getTaskResult(jobId, taskName);
+            rInc = Integer.parseInt(inc);
+        } catch (NumberFormatException nfe) {
+            handleExceptionDisplay("Bad value for 3rd argument : 'incarnation' ", nfe);
+            return null;
+        }
+        try {
+            TaskResult result = scheduler.getTaskResultFromIncarnation(jobId, taskName, rInc);
 
             if (result != null) {
                 print("Task " + taskName + " result => " + newline);

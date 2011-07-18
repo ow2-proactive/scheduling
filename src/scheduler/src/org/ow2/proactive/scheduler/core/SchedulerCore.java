@@ -1648,9 +1648,15 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
     /**
      * {@inheritDoc}
      */
-    public TaskResult getTaskResult(JobId jobId, String taskName) throws UnknownJobException,
-            UnknownTaskException {
-        logger_dev.info("Trying to get TaskResult of task '" + taskName + "' for job '" + jobId + "'");
+    public TaskResult getTaskResultFromIncarnation(JobId jobId, String taskName, int inc)
+            throws UnknownJobException, UnknownTaskException {
+        logger_dev.info("Trying to get TaskResult of task '" + taskName + "' for job '" + jobId +
+            "' - incarnation : " + inc);
+
+        if (inc < 0) {
+            throw new IllegalArgumentException("Incarnation must be 0 or greater.");
+        }
+
         InternalJob job = jobs.get(jobId);
 
         if (job == null) {
@@ -1673,7 +1679,14 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
         //So get the result of the task is getting the last one.
         List<? extends TaskResult> results = DatabaseManager.getInstance().recover(result.getClass(),
                 new Condition("id", ConditionComparator.EQUALS_TO, result.getTaskId()));
-        result = results.get(results.size() - 1);
+
+        int expectedMax = results.size() - 1;
+        if (inc > expectedMax) {
+            throw new IllegalArgumentException("Incarnation " + inc + " does not exist for this task.");
+        }
+
+        //get the proper incarnation : 0 is the last result
+        result = results.get(expectedMax - inc);
 
         if ((result != null)) {
             logger_dev.info("Get '" + taskName + "' task result for job '" + jobId + "'");
