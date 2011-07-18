@@ -48,7 +48,7 @@ import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
 
 /**
  *
- * Police triggers new nodes acquisition when scheduler is overloaded within a time slot defined in crontab syntax.
+ * The policy that triggers new nodes acquisition when scheduler is overloaded within a time slot defined in crontab syntax.
  *
  */
 @ActiveObject
@@ -148,6 +148,6 @@ public class CronLoadBasedPolicy extends SchedulerLoadingPolicy {
 
     @Override
     public String getDescription() {
-        return "Police triggers new nodes acquisition when scheduler is overloaded within a time slot defined in crontab syntax.";
+        return "Triggers new nodes acquisition when scheduler is overloaded within a time slot defined in crontab syntax.";
     }
 }

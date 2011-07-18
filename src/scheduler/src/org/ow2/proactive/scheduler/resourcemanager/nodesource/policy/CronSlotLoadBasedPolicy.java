@@ -49,7 +49,7 @@ import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
 
 /**
  *
- * Police keeps all nodes up and running within specified time slot and acquires node on demand when scheduler is overloaded at another time.
+ * The policy that keeps all nodes up and running within specified time slot and acquires node on demand when scheduler is overloaded at another time.
  *
  */
 @ActiveObject
@@ -58,7 +58,7 @@ public class CronSlotLoadBasedPolicy extends SchedulerLoadingPolicy {
     @Configurable(description = "Time when all nodes are deployed (crontab format)")
     private String deployAllAt = "* * * * *";
 
-    @Configurable(description = "Time when all nodes are removed and the police starts watching the scheduler loading")
+    @Configurable(description = "Time when all nodes are removed and the policy starts watching the scheduler loading")
     private String undeployAllAt = "* * * * *";
 
     /**
@@ -67,7 +67,7 @@ public class CronSlotLoadBasedPolicy extends SchedulerLoadingPolicy {
     @Configurable(description = "the mode how nodes are removed")
     private boolean preemptive = false;
 
-    @Configurable(description = "If true the police will acquire all nodes immediately")
+    @Configurable(description = "If true the policy will acquire all nodes immediately")
     private boolean acquireNow = false;
 
     private AtomicBoolean holdingAllNodes = new AtomicBoolean(false);
@@ -159,6 +159,6 @@ public class CronSlotLoadBasedPolicy extends SchedulerLoadingPolicy {
 
     @Override
     public String getDescription() {
-        return "Police keeps all nodes up and running within specified time slot and acquires node on demand when scheduler is overloaded at another time.";
+        return "Keeps all nodes up and running within specified time slot and acquires node on demand when scheduler is overloaded at another time.";
     }
 }
