@@ -283,7 +283,6 @@ public class SchedulerModel extends ConsoleModel {
             }
             print("");
         }
-        console.stop();
     }
 
     @Override
@@ -811,6 +810,7 @@ public class SchedulerModel extends ConsoleModel {
             } catch (Exception e) {
             }
             terminated = true;
+            console.stop();
         } else {
             console.print("Exit command has been disabled !");
         }
