@@ -778,4 +778,11 @@ public class SchedulerProxy implements Scheduler {
         return scheduler.getState(arg0);
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.ow2.proactive.scheduler.common.Scheduler#renewSession()
+     */
+    public void renewSession() throws NotConnectedException {
+    }
+
 }
