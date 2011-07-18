@@ -173,8 +173,8 @@
 	<classpathentry kind="lib" path="lib/ProActive/commons-vfs-patched-2.0-SNAPSHOTr19199-tests.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/commons-vfs-patched-2.0-SNAPSHOTr19199.jar"/>
 	<classpathentry kind="lib" path="lib/matsci/matlabcontrol-3.1.0.jar"/>
-	<classpathentry kind="lib" path="lib/matsci/ProActive_LicenseSaver-0.0.3-rc6-api.jar"/>
 	<classpathentry kind="lib" path="lib/common/rrd4j-2.0.6.jar"/>
 	<classpathentry kind="lib" path="lib/mapreduce/hadoop-0.20.2-core.jar"/>
+	<classpathentry kind="lib" path="lib/matsci/ProActive_LicenseSaver-1.0.0-api.jar"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>
