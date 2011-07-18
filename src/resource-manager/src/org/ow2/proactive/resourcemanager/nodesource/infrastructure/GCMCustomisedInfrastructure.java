@@ -61,6 +61,7 @@ import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
  * NOTE: the infrastructure manager has a limitation "one node per host".
  *
  */
+@Deprecated
 public class GCMCustomisedInfrastructure extends GCMInfrastructure {
 
     /** hosts list */
@@ -246,7 +247,7 @@ public class GCMCustomisedInfrastructure extends GCMInfrastructure {
      */
     @Override
     public String getDescription() {
-        return "Handles hosts from the list using specified gcm deployment descriptor\n"
+        return "[DEPRECATED] Handles hosts from the list using specified gcm deployment descriptor\n"
             + "template with HOST java variable contract (see proactive documentation)";
     }
 }

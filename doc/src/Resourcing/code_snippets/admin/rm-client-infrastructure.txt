@@ -1,15 +1,30 @@
 $RM_HOME/bin/unix$ rm-client -l admin -cn myns -infrastructure
 
 Available node source infrastructures:
+Name: Local Infrastructure
+Description: Deploys nodes on Resource Manager's machine
+Class name: org.ow2.proactive.resourcemanager.nodesource.infrastructure.LocalInfrastructure
+Parameters: <class name> rmUrl[rmi://slave1:2007/] credentials maxNodes[4] nodeTimeout[5000] paProperties
+
+Name: CLI Infrastructure
+Description: Creates remote runtimes using custom scripts
+Class name: org.ow2.proactive.resourcemanager.nodesource.infrastructure.CLIInfrastructure
+Parameters: <class name> rmUrl[rmi://slave1:2007/] interpreter[bash] deploymentScript removalScript hostsList nodeTimeOut[60000] maxDeploymentFailure[5]
+
 Name: Default Infrastructure Manager
 Description: Default infrastructure
 Class name: org.ow2.proactive.resourcemanager.nodesource.infrastructure.DefaultInfrastructureManager
 Parameters: <class name> rmUrl[rmi://slave1:2007/]
 
+Name: SSH Infrastructure
+Description: Creates remote runtimes using SSH
+Class name: org.ow2.proactive.resourcemanager.nodesource.infrastructure.SSHInfrastructure
+Parameters: <class name> rmUrl[rmi://slave1:2007/] sshOptions javaPath[jdk/bin/java] schedulingPath[SCHEDULER_HOME] nodeTimeOut[60000] maxDeploymentFailure[5] targetOs[Linux] javaOptions rmCredentialsPath hostsList
+
 Name: Generic Batch Job Infrastructure
 Description: Acquires nodes from a GENERIC resource manager.
 Class name: org.ow2.proactive.resourcemanager.nodesource.infrastructure.GenericBatchJobInfrastructure
-Parameters: <class name> rmUrl[rmi://slave1:2007/] javaPath[/user/jmguilla/home/bin/jdk1.5.0_22/bin/java] sshOptions schedulingPath[/user/jmguilla/home/workspace-git/Scheduler] javaOptions maxNodes[1] nodeTimeOut[300000] serverName rmCredentialsPath submitJobOpt implementationClassname implementationFile
+Parameters: <class name> rmUrl[rmi://slave1:2007/] javaPath[jdk/bin/java] sshOptions schedulingPath[SCHEDULER_HOME] javaOptions maxNodes[1] nodeTimeOut[300000] serverName rmCredentialsPath submitJobOpt implementationClassname implementationFile
 
 Name: GCM Infrastructure
 Description: [DEPRECATED] Infrastructure described in GCM deployment descriptor
@@ -17,7 +32,7 @@ Class name: org.ow2.proactive.resourcemanager.nodesource.infrastructure.GCMInfra
 Parameters: <class name> rmUrl[rmi://slave1:2007/] descriptor
 
 Name: GCM Customised Infrastructure
-Description: Handles hosts from the list using specified gcm deployment descriptor
+Description: [DEPRECATED] Handles hosts from the list using specified gcm deployment descriptor
 template with HOST java variable contract (see proactive documentation)
 Class name: org.ow2.proactive.resourcemanager.nodesource.infrastructure.GCMCustomisedInfrastructure
 Parameters: <class name> rmUrl[rmi://slave1:2007/] descriptor hostsList timeout[60000]
@@ -25,7 +40,7 @@ Parameters: <class name> rmUrl[rmi://slave1:2007/] descriptor hostsList timeout[
 Name: LSF Infrastructure
 Description: Acquires nodes from a LSF resource manager.
 Class name: org.ow2.proactive.resourcemanager.nodesource.infrastructure.LSFInfrastructure
-Parameters: <class name> rmUrl[rmi://slave1:2007/] javaPath[/user/jmguilla/home/bin/jdk1.5.0_22/bin/java] sshOptions schedulingPath[/user/jmguilla/home/workspace-git/Scheduler] javaOptions maxNodes[1] nodeTimeOut[300000] serverName rmCredentialsPath submitJobOpt
+Parameters: <class name> rmUrl[rmi://slave1:2007/] javaPath[/jdk/bin/java] sshOptions schedulingPath[SCHEDULER_HOME] javaOptions maxNodes[1] nodeTimeOut[300000] serverName rmCredentialsPath submitJobOpt
 
 Name: Virtual Infrastructure
 Description: Virtualized Infrastructure node acquisition
@@ -35,12 +50,7 @@ Parameters: <class name> rmUrl[rmi://slave1:2007/] infrastructure VMMUrl VMMUser
 Name: PBS Infrastructure
 Description: Acquires nodes from a PBS resource manager.
 Class name: org.ow2.proactive.resourcemanager.nodesource.infrastructure.PBSInfrastructure
-Parameters: <class name> rmUrl[rmi://slave1:2007/] javaPath[/user/jmguilla/home/bin/jdk1.5.0_22/bin/java] sshOptions schedulingPath[/user/jmguilla/home/workspace-git/Scheduler] javaOptions maxNodes[1] nodeTimeOut[300000] serverName rmCredentialsPath submitJobOpt[-l "nodes=1:ppn=1"]
-
-Name: SSH Infrastructure
-Description: Creates remote runtimes using SSH
-Class name: org.ow2.proactive.resourcemanager.nodesource.infrastructure.SSHInfrastructure
-Parameters: <class name> rmUrl[rmi://slave1:2007/] sshOptions javaPath[/user/jmguilla/home/bin/jdk1.5.0_22/bin/java] schedulingPath[/user/jmguilla/home/workspace-git/Scheduler] nodeTimeOut[60000] attempt[5] targetOs[Linux] javaOptions rmCredentialsPath hostsList
+Parameters: <class name> rmUrl[rmi://slave1:2007/] javaPath[jdk/bin/java] sshOptions schedulingPath[SCHEDULER_HOME] javaOptions maxNodes[1] nodeTimeOut[300000] serverName rmCredentialsPath submitJobOpt[-l "nodes=1:ppn=1"]
 
 Name: EC2 Infrastructure
 Description: Handles nodes from the Amazon Elastic Compute Cloud Service.
@@ -50,4 +60,4 @@ Parameters: <class name> rmUrl[rmi://slave1:2007/] configurationFile RMCredentia
 Name: WinHPC Infrastructure
 Description: Windows HPC infrasturcure
 Class name: org.ow2.proactive.resourcemanager.nodesource.infrastructure.WinHPCInfrastructure
-Parameters: <class name> rmUrl[rmi://slave1:2007/] maxNodes[1] serviceUrl[https://<computerName>/HPCBasicProfile] userName password trustStore trustStorePassword javaPath[/home/jmguilla/bin/jdk1.5.0_22/jre/bin/java] rmPath[/user/jmguilla/home/workspace-git/Scheduler] RMCredentialsPath javaOptions extraClassPath timeout[60000]
+Parameters: <class name> rmUrl[rmi://slave1:2007/] maxNodes[1] serviceUrl[https://<computerName>/HPCBasicProfile] userName password trustStore trustStorePassword javaPath[jre/bin/java] rmPath[SCHEDULER_HOME] RMCredentialsPath javaOptions extraClassPath timeout[60000]

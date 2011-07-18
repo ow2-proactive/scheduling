@@ -504,6 +504,59 @@ test.example.net 5
 				</listitem>
 			</itemizedlist>
 		</section>
+		<section xml:id="CLI"><info><title>Command Line infrastructure</title></info>
+			<para>
+				This generic infrastructure allows to deploy nodes using deployment script written in arbitrary language.
+				The infrastructure just launches this script and waits until the ProActive node is registered in the resource manager.
+				Command line infrastructure could be used when you prefer to describe the deployment process using shell scripts
+				instead of Java. Script examples could be found in RM_HOME/samples/scripts/deployment.
+				The deployment script has 4 parameters: HOST_NAME, NODE_NAME, NODE_SOURCE_NAME, RM_URL.
+				The removal script has 2 parameters: HOST_NAME and NODE_NAME.
+			</para>
+			<para>This infrastructure needs 7 arguments, described hereafter:</para>
+			<itemizedlist>
+				<listitem>
+					<para>
+						<emphasis role="bold">Rm Url</emphasis> - The resource manager's url that will be used by the deployed nodes to register by themself.
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						<emphasis role="bold">Interpreter</emphasis> - Path to the script interpreter (bash by default).
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						<emphasis role="bold">Deployment Script</emphasis> - A script that launches a ProActive node and register it to the RM.
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						<emphasis role="bold">Removal Script</emphasis> - A script that removes the node from the resource manager.
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						<emphasis role="bold">Hosts List</emphasis> - Path to a file containing the hosts on which resources should be acquired.
+						This file should contain one host per line, described as a host name or a public IP address, optionally followed by a positive
+						integer describing the number of runtimes to start on the related host (default to 1 if not specified). Example:
+						<screen><![CDATA[rm.example.com
+test.example.net 5
+192.168.9.10 2]]></screen>
+					</para>
+				</listitem>
+			    <listitem>
+				    <para>
+				      <emphasis role="bold">Node Time Out</emphasis> - The length in ms after which one a node is not expected anymore.
+			        </para>
+		        </listitem>
+				<listitem>
+					<para>
+						<emphasis role="bold">Max Deployment Failure</emphasis> - the number of times the resource manager tries to relaunch the deployment script in case of failure.
+					</para>
+				</listitem>
+			</itemizedlist>
+		</section>
 		<section xml:id="Win_HPC"><info><title>Windows HPC infrastructure</title></info>
 				<para>
 					The deployment through Windows HPC scheduler. In order to make it functional,
@@ -720,6 +773,66 @@ test.example.net 5
 				</itemizedlist>
 
 		</section>
+		<section xml:id="cron"><info><title>Cron policy</title></info>
+				<para>
+					<emphasis>Cron policy</emphasis> is aimed to acquire and remove nodes at specific time defined in the cron syntax.
+				</para>
+				<para>For using this policy, you have to precise the following parameters:</para>
+				<itemizedlist>
+					<listitem>
+						<para><emphasis role="bold">nodeUsers</emphasis> - utilization permission defined who can get nodes
+						for computations from this node source. It has to take one of the following values:
+							<itemizedlist>
+								<listitem>
+									<para><emphasis role="bold">"ME"</emphasis> - Only the node source creator </para>
+								</listitem>
+								<listitem>
+									<para><emphasis role="bold">"MY_GROUPS"</emphasis> - Only groups in which the node source creator belongs to</para>
+								</listitem>
+								<listitem>
+									<para><emphasis role="bold">"PROVIDER"</emphasis> - Only the node provider who added the node. Provider can use only its nodes</para>
+								</listitem>
+								<listitem>
+									<para><emphasis role="bold">"PROVIDER_GROUPS"</emphasis> - Only groups in which the node provider belongs to. Users from this groups can user only nodes of this provider</para>
+								</listitem>
+								<listitem>
+									<para><emphasis role="bold">"ALL"</emphasis> - Everybody</para>
+								</listitem>
+							</itemizedlist>
+						</para>
+					</listitem>
+					<listitem>
+						<para><emphasis role="bold">nodeProviders</emphasis> - Provider permission defines who can add nodes to this node source.
+						It should take one of the following values:
+							<itemizedlist>
+								<listitem>
+									<para><emphasis role="bold">"ME"</emphasis> - Only the node source creator </para>
+								</listitem>
+								<listitem>
+									<para><emphasis role="bold">"MY_GROUPS"</emphasis> - Only the group in which the node source creator belongs to</para>
+								</listitem>
+								<listitem>
+									<para><emphasis role="bold">"ALL"</emphasis> - Everybody</para>
+								</listitem>
+							</itemizedlist>
+						</para>
+					</listitem>
+					<listitem>
+						<para><emphasis role="bold">nodeAcquision</emphasis> - The time policy will trigger the deployment of all nodes (e.g. "0 12 * * *" every day at 12.00).</para>
+					</listitem>
+					<listitem>
+						<para><emphasis role="bold">nodeRemoval</emphasis> - The time policy will trigger the removal of all nodes (e.g. "0 13 * * *" every day at 13.00).</para>
+					</listitem>
+					<listitem>
+						<para><emphasis role="bold">preemptive</emphasis> - Preemptive parameter indicates the way of releasing nodes. If it is true, nodes will be released
+						without waiting the end of jobs running on (default is false).</para>
+					</listitem>
+					<listitem>
+						<para><emphasis role="bold">forceDeployment</emphasis> - If for the example above (the deployment starts every day at 12.00 and the removal starts at 13.00) you are creating the node
+						source at 12.30 the next deployment will take place the next day. If you'd like to force the immediate deployment set this parameter to true.</para>
+					</listitem>
+				</itemizedlist>
+		</section>
 		<section xml:id="scheduler_idle"><info><title>"Remove nodes when scheduler is idle" policy</title></info>
 				<para>
 					<emphasis>"Remove nodes when scheduler is idle" policy</emphasis> removes all nodes from the infrastructure
@@ -859,11 +972,189 @@ test.example.net 5
 						an other node will be removed at the next calculation time, and so on and so forth... </para>
 					</listitem>
 					<listitem>
-						<para><emphasis role="bold">releaseDelay</emphasis> - Delay between each node release. This time is useful since the deploying time is important.
-						Let us assume that a node has to be removed. If this releaseDelay did not exist (or if it was set to 0),
-						this node would be removed instantaneously. Let us assume assume that right after this
-						removal, another task is scheduled, requiring a new node. In that case, we would lose a lot of time removing the previous node and deploying another one
-						whereas the task could have been scheduled on the same node. This releaseDelay therefore represents the time to wait before effectively removing a node.</para>
+						<para><emphasis role="bold">nodeDeploymentTimeout</emphasis> - The node deployment timeout.</para>
+					</listitem>
+				</itemizedlist>
+				<note>
+					<para>
+						This policy is available only when using the <emphasis>ProActive Scheduler</emphasis>.
+					</para>
+				</note>
+		</section>
+		<section xml:id="cron_load_based"><info><title>"Cron load based" policy</title></info>
+				<para>
+					The <emphasis>"Cron load based" policy</emphasis> triggers new nodes acquisition when scheduler is overloaded (exactly like with <emphasis>"Scheduler loading" policy</emphasis>) only within a time slot defined using crontab syntax.
+					All other time the nodes are removed from the resource manager.
+				</para>
+				<para>For using this policy, you have to precise the following parameters:</para>
+				<itemizedlist>
+					<listitem>
+						<para><emphasis role="bold">nodeUsers</emphasis> - utilization permission defined who can get nodes
+						for computations from this node source. It has to take one of the following values:
+							<itemizedlist>
+								<listitem>
+									<para><emphasis role="bold">"ME"</emphasis> - Only the node source creator </para>
+								</listitem>
+								<listitem>
+									<para><emphasis role="bold">"MY_GROUPS"</emphasis> - Only groups in which the node source creator belongs to</para>
+								</listitem>
+								<listitem>
+									<para><emphasis role="bold">"PROVIDER"</emphasis> - Only the node provider who added the node. Provider can use only its nodes</para>
+								</listitem>
+								<listitem>
+									<para><emphasis role="bold">"PROVIDER_GROUPS"</emphasis> - Only groups in which the node provider belongs to. Users from this groups can user only nodes of this provider</para>
+								</listitem>
+								<listitem>
+									<para><emphasis role="bold">"ALL"</emphasis> - Everybody</para>
+								</listitem>
+							</itemizedlist>
+						</para>
+					</listitem>
+					<listitem>
+						<para><emphasis role="bold">nodeProviders</emphasis> - Provider permission defines who can add nodes to this node source.
+						It should take one of the following values:
+							<itemizedlist>
+								<listitem>
+									<para><emphasis role="bold">"ME"</emphasis> - Only the node source creator </para>
+								</listitem>
+								<listitem>
+									<para><emphasis role="bold">"MY_GROUPS"</emphasis> - Only the group in which the node source creator belongs to</para>
+								</listitem>
+								<listitem>
+									<para><emphasis role="bold">"ALL"</emphasis> - Everybody</para>
+								</listitem>
+							</itemizedlist>
+						</para>
+					</listitem>
+					<listitem>
+						<para><emphasis role="bold">schedulerUrl</emphasis> - Url of the Scheduler</para>
+					</listitem>
+					<listitem>
+						<para><emphasis role="bold">schedulerCredentialsPath</emphasis> - Path to the credentials used for scheduler authentification.</para>
+					</listitem>
+					<listitem>
+						<para><emphasis role="bold">refreshTime</emphasis> - time between each calculation of the number of needed nodes.</para>
+					</listitem>
+					<listitem>
+						<para><emphasis role="bold">minNodes</emphasis> - Minimum number of nodes to deploy</para>
+					</listitem>
+					<listitem>
+						<para><emphasis role="bold">maxNodes</emphasis> - Maximum number of nodes to deploy</para>
+					</listitem>
+					<listitem>
+						<para><emphasis role="bold">loadFactor</emphasis> - number of tasks per node. Actually, if this number is <emphasis role="italics">N</emphasis>,
+						it does not means that there will be exactly <emphasis role="italics">N</emphasis> tasks
+						executed on each node. This factor is just used to compute the total number of nodes. For instance, let us assume that this factor is 3 and that we schedule 100
+						tasks. In that case, we will have 34 (= upper bound of 100/3) started nodes. Once one task finished and the refresh time passed,
+						one node will be removed since 99 divided by 3 is 33. When there will remain 96 tasks (asuming that no other tasks are scheduled meanwhile),
+						an other node will be removed at the next calculation time, and so on and so forth... </para>
+					</listitem>
+					<listitem>
+						<para><emphasis role="bold">nodeDeploymentTimeout</emphasis> - The node deployment timeout.</para>
+					</listitem>
+					<listitem>
+						<para><emphasis role="bold">acquisionAllowed</emphasis> - The time when the policy starts to work as the <emphasis>"scheduler loading" policy</emphasis> (e.g. "0 12 * * *" every day at 12.00).</para>
+					</listitem>
+					<listitem>
+						<para><emphasis role="bold">acquisionForbidden</emphasis> - The time policy removes all the nodes  from the resource manager (e.g. "0 13 * * *" every day at 13.00).</para>
+					</listitem>
+					<listitem>
+						<para><emphasis role="bold">preemptive</emphasis> - Preemptive parameter indicates the way of releasing nodes. If it is true, nodes will be released
+						without waiting the end of jobs running on (default is false).</para>
+					</listitem>
+					<listitem>
+						<para><emphasis role="bold">allowed</emphasis> - If true acquisition will be immediately allowed.</para>
+					</listitem>
+				</itemizedlist>
+				<note>
+					<para>
+						This policy is available only when using the <emphasis>ProActive Scheduler</emphasis>.
+					</para>
+				</note>
+		</section>
+		<section xml:id="cron_slot_load_based"><info><title>"Cron slot load based" policy</title></info>
+				<para>
+					The <emphasis>"Cron slot load based" policy</emphasis> triggers new nodes acquisition when scheduler is overloaded (exactly like with <emphasis>"Scheduler loading" policy</emphasis>) only within a time slot defined using crontab syntax.
+					The other time it holds all the available nodes.
+				</para>
+				<para>For using this policy, you have to precise the following parameters:</para>
+				<itemizedlist>
+					<listitem>
+						<para><emphasis role="bold">nodeUsers</emphasis> - utilization permission defined who can get nodes
+						for computations from this node source. It has to take one of the following values:
+							<itemizedlist>
+								<listitem>
+									<para><emphasis role="bold">"ME"</emphasis> - Only the node source creator </para>
+								</listitem>
+								<listitem>
+									<para><emphasis role="bold">"MY_GROUPS"</emphasis> - Only groups in which the node source creator belongs to</para>
+								</listitem>
+								<listitem>
+									<para><emphasis role="bold">"PROVIDER"</emphasis> - Only the node provider who added the node. Provider can use only its nodes</para>
+								</listitem>
+								<listitem>
+									<para><emphasis role="bold">"PROVIDER_GROUPS"</emphasis> - Only groups in which the node provider belongs to. Users from this groups can user only nodes of this provider</para>
+								</listitem>
+								<listitem>
+									<para><emphasis role="bold">"ALL"</emphasis> - Everybody</para>
+								</listitem>
+							</itemizedlist>
+						</para>
+					</listitem>
+					<listitem>
+						<para><emphasis role="bold">nodeProviders</emphasis> - Provider permission defines who can add nodes to this node source.
+						It should take one of the following values:
+							<itemizedlist>
+								<listitem>
+									<para><emphasis role="bold">"ME"</emphasis> - Only the node source creator </para>
+								</listitem>
+								<listitem>
+									<para><emphasis role="bold">"MY_GROUPS"</emphasis> - Only the group in which the node source creator belongs to</para>
+								</listitem>
+								<listitem>
+									<para><emphasis role="bold">"ALL"</emphasis> - Everybody</para>
+								</listitem>
+							</itemizedlist>
+						</para>
+					</listitem>
+					<listitem>
+						<para><emphasis role="bold">schedulerUrl</emphasis> - Url of the Scheduler</para>
+					</listitem>
+					<listitem>
+						<para><emphasis role="bold">schedulerCredentialsPath</emphasis> - Path to the credentials used for scheduler authentification.</para>
+					</listitem>
+					<listitem>
+						<para><emphasis role="bold">refreshTime</emphasis> - time between each calculation of the number of needed nodes.</para>
+					</listitem>
+					<listitem>
+						<para><emphasis role="bold">minNodes</emphasis> - Minimum number of nodes to deploy</para>
+					</listitem>
+					<listitem>
+						<para><emphasis role="bold">maxNodes</emphasis> - Maximum number of nodes to deploy</para>
+					</listitem>
+					<listitem>
+						<para><emphasis role="bold">loadFactor</emphasis> - number of tasks per node. Actually, if this number is <emphasis role="italics">N</emphasis>,
+						it does not means that there will be exactly <emphasis role="italics">N</emphasis> tasks
+						executed on each node. This factor is just used to compute the total number of nodes. For instance, let us assume that this factor is 3 and that we schedule 100
+						tasks. In that case, we will have 34 (= upper bound of 100/3) started nodes. Once one task finished and the refresh time passed,
+						one node will be removed since 99 divided by 3 is 33. When there will remain 96 tasks (asuming that no other tasks are scheduled meanwhile),
+						an other node will be removed at the next calculation time, and so on and so forth... </para>
+					</listitem>
+					<listitem>
+						<para><emphasis role="bold">nodeDeploymentTimeout</emphasis> - The node deployment timeout.</para>
+					</listitem>
+					<listitem>
+						<para><emphasis role="bold">acquisionAllowed</emphasis> - The time when the policy starts to work as the <emphasis>"scheduler loading" policy</emphasis> (e.g. "0 12 * * *" every day at 12.00).</para>
+					</listitem>
+					<listitem>
+						<para><emphasis role="bold">acquisionForbidden</emphasis> - The time policy removes all the nodes  from the resource manager (e.g. "0 13 * * *" every day at 13.00).</para>
+					</listitem>
+					<listitem>
+						<para><emphasis role="bold">preemptive</emphasis> - Preemptive parameter indicates the way of releasing nodes. If it is true, nodes will be released
+						without waiting the end of jobs running on (default is false).</para>
+					</listitem>
+					<listitem>
+						<para><emphasis role="bold">allowed</emphasis> - If true acquisition will be immediately allowed.</para>
 					</listitem>
 				</itemizedlist>
 				<note>
