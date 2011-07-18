@@ -40,6 +40,15 @@
 			lots of job XML descriptors and scripts examples (see <xref linkend="user_manual"/> to know what a job descriptor is).
 			More folders are available but these are the ones which are needed to start.
 		</para>
+		<para>
+			ProActive is written in Java and requires Java 1.6 (or higher). It is
+			strongly recommended to use <link xlink:href="http://java.sun.com/javase/downloads/index.jsp">Java from Oracle</link> as all the testing is done with it.
+			Once Java intalled on your system, it is required to define <emphasis>JAVA_HOME</emphasis>
+			environment variable.
+			<warning><para>
+			If you need a Java 1.5 version, please contact ActiveEon at contact@activeeon.com.
+			</para></warning>
+		</para>
 		<itemizedlist>
 			<listitem><para>
 				First of all, start a command shell and go into the <emphasis>bin/[os]</emphasis> directory
@@ -76,18 +85,18 @@
 				</para>
 			</listitem>
 		</itemizedlist>
-	<warning><para> Some features of ProActive Scheduling rely on Java Scripting API (JSR 223), which is bugged under MacOSX/Java 1.5.0_16:
-	some JSR 223 specific classes contained in the AppleScriptEngine.jar (loaded from the boot classpath) are compiled under Java 1.6. As a consequence, using
-	default Java 1.5.0_16 for starting any part of ProActive Scheduling (including graphical clients and worker nodes) can lead to the following exception (if
-	scripts capabilities are used):</para>
-	<para>
-	<code>
-	java.lang.UnsupportedClassVersionError: Bad version number in .class file
-	</code>
-	</para>
-	<para>
-	To fix this issue, you must remove or rename the AppleScriptEngine.jar from /System/Library/Java/Extensions directory.
-	</para></warning>
+<!--	<warning><para> Some features of ProActive Scheduling rely on Java Scripting API (JSR 223), which is bugged under MacOSX/Java 1.5.0_16:-->
+<!--	some JSR 223 specific classes contained in the AppleScriptEngine.jar (loaded from the boot classpath) are compiled under Java 1.6. As a consequence, using-->
+<!--	default Java 1.5.0_16 for starting any part of ProActive Scheduling (including graphical clients and worker nodes) can lead to the following exception (if-->
+<!--	scripts capabilities are used):</para>-->
+<!--	<para>-->
+<!--	<code>-->
+<!--	java.lang.UnsupportedClassVersionError: Bad version number in .class file-->
+<!--	</code>-->
+<!--	</para>-->
+<!--	<para>-->
+<!--	To fix this issue, you must remove or rename the AppleScriptEngine.jar from /System/Library/Java/Extensions directory.-->
+<!--	</para></warning>-->
 	</section>
 	<section xml:id="scheduler_concept"><info><title>Scheduler Basics</title></info>
 

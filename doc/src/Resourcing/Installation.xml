@@ -36,10 +36,13 @@
 			be represented and where it will be executed.
 		</para>
 		<para>
-			ProActive is written in Java and requires Java 1.5 (or higher). It is
+			ProActive is written in Java and requires Java 1.6 (or higher). It is
 			strongly recommended to use <link xlink:href="http://java.sun.com/javase/downloads/index.jsp">Java from Oracle</link> as all the testing is done with it.
 			Once Java intalled on your system, it is required to define <emphasis>JAVA_HOME</emphasis>
 			environment variable.
+			<warning><para>
+			If you need a Java 1.5 version, please contact ActiveEon at contact@activeeon.com.
+			</para></warning>
 		</para>
 		<para>
 			Depending on your network topology, firewall configuration and your needs, it may be required

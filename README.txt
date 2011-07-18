@@ -10,8 +10,9 @@ Javadoc and updated documentation are available online: http://proactive.inria.f
 
 *** Quick start :
 
-* Set JAVA_HOME environment variable to the directory where java 1.5 or
-greater is located.
+* Set JAVA_HOME environment variable to the directory where java 1.6 or
+greater is located (if you need a java 1.5 version, please contact
+ActiveEon at contact@activeeon.com).
 
 * Start a command shell and go into the bin/[os] directory of your installed 
 scheduler home path. You can start the scheduler by launching the 
