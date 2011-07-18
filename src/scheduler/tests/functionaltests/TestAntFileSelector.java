@@ -73,8 +73,9 @@ public class TestAntFileSelector {
 
     @Test
     public void run() throws Throwable {
-        DSroot = new File(DSroot.toURI()).getParentFile().toURL();
-        DSrootString = new File(DSroot.toURI()).getAbsolutePath();
+        File parent = new File(DSroot.toURI()).getParentFile();
+        DSrootString = parent.getAbsolutePath();
+
         log(DSrootString);
         //start DS server
         FileSystemServerDeployer deployer = new FileSystemServerDeployer(DSrootString, true);
@@ -113,7 +114,7 @@ public class TestAntFileSelector {
         }
 
         log("check include 2");
-        rootFile = new File(DSroot + "/nodesource");
+        rootFile = new File(DSrootString + "/nodesource");
         checkReg = rootFile.list(new FilenameFilter() {
             public boolean accept(File dir, String name) {
                 return name.matches(".*[.]xml");
@@ -137,7 +138,7 @@ public class TestAntFileSelector {
         }
 
         log("check include 4");
-        rootFile = new File(DSroot + "/executables");
+        rootFile = new File(DSrootString + "/executables");
         checkReg = rootFile.list(new FilenameFilter() {
             public boolean accept(File dir, String name) {
                 return name.matches(".*[.]sh");
