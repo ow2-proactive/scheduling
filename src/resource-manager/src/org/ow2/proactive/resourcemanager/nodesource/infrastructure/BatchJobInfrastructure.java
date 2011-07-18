@@ -427,6 +427,9 @@ public abstract class BatchJobInfrastructure extends InfrastructureManager {
     @Override
     public void configure(Object... parameters) {
         if (parameters != null && parameters.length >= 9) {
+            //checks that the name of the batch job system doesn't contain any spaces
+            checkJBSName();
+
             int index = 0;
             this.javaPath = parameters[index++].toString();
             if (this.javaPath == null || this.javaPath.equals("")) {
@@ -462,6 +465,21 @@ public abstract class BatchJobInfrastructure extends InfrastructureManager {
             throw new IllegalArgumentException("Invalid parameters for IM creation");
         }
 
+    }
+
+    /**
+     * Checks that the string returned by the method {@link #getBatchinJobSystemName()}
+     * doesn't contain any forbidden characters. If so throws an {@link IllegalArgumentException}
+     */
+    private void checkJBSName() {
+        String jbsName = this.getBatchinJobSystemName();
+        if (jbsName == null) {
+            throw new IllegalArgumentException("Batching Job System Name cannot be null");
+        }
+        if (jbsName.contains(" ")) {
+            throw new IllegalArgumentException("Batching Job System Name cannot contain white spaces: \"" +
+                jbsName + "\"");
+        }
     }
 
     /**

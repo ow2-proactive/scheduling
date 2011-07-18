@@ -573,12 +573,13 @@ public abstract class InfrastructureManager implements Serializable {
 
     private void checkName(String name) {
         if (name.contains(" ")) {
-            throw new IllegalArgumentException("Deploying node name cannot contain white spaces");
+            throw new IllegalArgumentException("Deploying node name cannot contain white spaces: \"" + name +
+                "\" is forbidden");
         }
         String pnURL = this.buildDeployingNodeURL(name);
         if (this.deployingNodes.containsKey(pnURL) || this.lostNodes.containsKey(pnURL)) {
             throw new IllegalArgumentException(RMDeployingNode.class.getSimpleName() +
-                " with the same name has already been created");
+                " with the same name (\"" + name + "\") has already been created");
         }
     }
 
