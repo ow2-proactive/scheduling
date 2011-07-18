@@ -61,6 +61,7 @@ import org.objectweb.proactive.core.body.future.FutureMonitoring;
 import org.objectweb.proactive.core.body.future.FutureProxy;
 import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.processbuilder.OSProcessBuilder;
 import org.objectweb.proactive.extensions.processbuilder.exception.NotImplementedException;
@@ -99,6 +100,9 @@ public class ForkedJavaExecutable extends JavaExecutable implements ForkerStarte
 
     /** Fork environment script binding name */
     public static final String FORKENV_BINDING_NAME = "forkEnvironment";
+
+    /** Forked JVM logs directory property name */
+    public static final String FORKED_LOGS_HOME = "pa.logs.home";
 
     /** Check start timeout : timeout to check if the process has failed */
     private static final long CHECKSTART_TIMEOUT = 2000;
@@ -401,6 +405,19 @@ public class ForkedJavaExecutable extends JavaExecutable implements ForkerStarte
                 logger_dev.debug("", e);
             }
         }
+        //set logHome than can be used in log4j file
+        String logHome;
+        try {
+            logHome = ProActiveRuntimeImpl.getProActiveRuntime().getProActiveHome() + File.separator +
+                ".logs";
+            File tmp = new File(logHome);
+            if (!tmp.exists()) {
+                tmp.mkdir();
+            }
+        } catch (ProActiveException pae) {
+            logHome = System.getProperty("java.io.tmpdir");
+        }
+        command.add("-D" + FORKED_LOGS_HOME + "=" + logHome);
         //set mandatory log4j file
         if (forkEnvironment == null || !contains("log4j.configuration", forkEnvironment.getJVMArguments())) {
             try {
@@ -428,7 +445,7 @@ public class ForkedJavaExecutable extends JavaExecutable implements ForkerStarte
                 logger_dev.debug("", e);
             }
         }
-        // set log size to minmum value as log are handled on forker side
+        // set log size to minimum value as log are handled on forker side
         if (forkEnvironment == null ||
             !contains(TaskLauncher.MAX_LOG_SIZE_PROPERTY, forkEnvironment.getJVMArguments())) {
             command.add("-D" + TaskLauncher.MAX_LOG_SIZE_PROPERTY + "=" + FORKED_LOG_BUFFER_SIZE);
