@@ -36,18 +36,10 @@
  */
 package org.ow2.proactive.resourcemanager.nodesource.infrastructure;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.security.KeyException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
@@ -63,7 +55,6 @@ import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 import org.ow2.proactive.resourcemanager.utils.RMNodeStarter;
 import org.ow2.proactive.resourcemanager.utils.RMNodeStarter.CommandLineBuilder;
 import org.ow2.proactive.resourcemanager.utils.RMNodeStarter.OperatingSystem;
-import org.ow2.proactive.utils.FileToBytesConverter;
 
 
 /**
@@ -85,7 +76,7 @@ import org.ow2.proactive.utils.FileToBytesConverter;
  * @since ProActive Scheduling 2.0
  *
  */
-public class SSHInfrastructure extends InfrastructureManager {
+public class SSHInfrastructure extends HostsFileBasedInfrastructureManager {
 
     /**
      * class' logger
@@ -119,13 +110,6 @@ public class SSHInfrastructure extends InfrastructureManager {
     @Configurable(description = "Absolute path of the Resource Manager (or Scheduler)\nroot directory on the remote hosts")
     protected String schedulingPath = PAResourceManagerProperties.RM_HOME.getValueAsString();
     /**
-     * Node acquisition timeout
-     */
-    @Configurable(description = "in ms. After this timeout expired\nthe node is considered to be lost")
-    protected int nodeTimeOut = 60 * 1000;
-    @Configurable(description = "Maximum number of failed attempt to deploy on \na host before discarding it")
-    protected int maxDeploymentFailure = 5;
-    /**
      * The type of the OS on the remote machine, 'Linux', 'Windows' or 'Cygwin'
      */
     @Configurable(description = "Linux, Cygwin or Windows depending on\nthe operating system of the remote hosts")
@@ -146,90 +130,6 @@ public class SSHInfrastructure extends InfrastructureManager {
      * Shutdown flag
      */
     protected boolean shutdown = false;
-    /**
-     * The list of the remote machines to use
-     */
-    @Configurable(fileBrowser = true, description = "Absolute path of the file containing\nthe list of remote hosts")
-    protected File hostsList;
-
-    /**
-     * list of free hosts; if host AA has a capacity of 2 runtimes, the initial state
-     * of this list will contain twice host AA.
-     */
-    private List<InetAddress> freeHosts = Collections.synchronizedList(new ArrayList<InetAddress>());
-    /** Maintains tresholds per hosts to be able to know if the deployment fails and to retry a given number of time */
-    private Hashtable<InetAddress, Integer> hostsThresholds = new Hashtable<InetAddress, Integer>();
-
-    /**
-     * The set of nodes for which one the registerAcquiredNode has been run.
-     */
-    private Hashtable<String, InetAddress> registeredNodes = new Hashtable<String, InetAddress>();
-
-    /**
-     * To notify the control loop of the deploying node timeout
-     */
-    private ConcurrentHashMap<String, Boolean> pnTimeout = new ConcurrentHashMap<String, Boolean>();
-
-    /**
-     * Acquire one node per available host
-     */
-    @Override
-    public void acquireAllNodes() {
-        synchronized (freeHosts) {
-            while (freeHosts.size() > 0) {
-                acquireNode();
-            }
-        }
-    }
-
-    /**
-     * Acquire one node on an available host
-     */
-    @Override
-    public void acquireNode() {
-        InetAddress tmpHost = null;
-        synchronized (freeHosts) {
-            if (freeHosts.size() == 0) {
-                logger.warn("Attempting to acquire nodes while all hosts are already deployed.");
-                return;
-            }
-            tmpHost = freeHosts.remove(0);
-            logger.debug("Acquiring a new SSH Node. #freeHosts:" + freeHosts.size() + " #registered: " +
-                registeredNodes.size());
-        }
-        final InetAddress host = tmpHost;
-        this.nodeSource.executeInParallel(new Runnable() {
-            public void run() {
-                try {
-                    startRemoteNode(host);
-                    logger.debug("Node acquisition ended. #freeHosts:" + freeHosts.size() + " #registered: " +
-                        registeredNodes.size());
-                    //node acquisition went well for host so we update the threshold
-                    //node acquisition went well for host so we update the threshold
-                    synchronized (freeHosts) {
-                        hostsThresholds.put(host, maxDeploymentFailure);
-                    }
-                } catch (Exception e) {
-                    synchronized (freeHosts) {
-                        Integer tries = hostsThresholds.get(host);
-                        tries--;
-                        if (tries > 0) {
-                            hostsThresholds.put(host, tries);
-                            freeHosts.add(host);
-                        } else {
-                            logger.debug("Tries threshold reached for host " + host +
-                                ". This host is not part of the deployment process anymore.");
-                        }
-                    }
-                    String description = "Could not acquire SSH Node on host " + host.toString() +
-                        ". NS's state refreshed regarding last checked excpetion: #freeHosts:" +
-                        freeHosts.size() + " #registered: " + registeredNodes.size();
-                    logger.error(description, e);
-                    return;
-                }
-            }
-        });
-    }
 
     /**
      * Internal node acquisition method
@@ -240,7 +140,7 @@ public class SSHInfrastructure extends InfrastructureManager {
      * @param host hostname of the node on which a node should be started
      * @throws RMException acquisition failed
      */
-    private void startRemoteNode(InetAddress host) throws RMException {
+    protected void startNodeImpl(InetAddress host) throws RMException {
         String fs = this.targetOSObj.fs;
         CommandLineBuilder clb = super.getDefaultCommandLineBuilder(this.targetOSObj);
         //we take care of spaces in java path
@@ -380,44 +280,28 @@ public class SSHInfrastructure extends InfrastructureManager {
      * Configures the Infrastructure
      *
      * @param parameters
-     *			  parameters[0]   : ssh Options, see {@link SSHClient}
-     *			  parameters[1]   : java path on the remote machines
-     *			  parameters[2]   : Scheduling path on remote machines
-     *			  parameters[3]   : acq timeout
-     *			  parameters[4]	  : number of attempt to deploy a node
-     *			  parameters[5]   : target OS' type (Linux, Windows or Cygwin)
-     *            parameters[6]   : extra java options
-     *            parameters[7]   : rm cred
-     *            parameters[8]   : host list file
+     *			  parameters[3]   : ssh Options, see {@link SSHClient}
+     *			  parameters[4]   : java path on the remote machines
+     *			  parameters[5]   : Scheduling path on remote machines
+     *			  parameters[6]   : target OS' type (Linux, Windows or Cygwin)
+     *            parameters[7]   : extra java options
+     *            parameters[8]   : rm cred
      * @throws IllegalArgumentException configuration failed
      */
     @Override
     public void configure(Object... parameters) {
+        super.configure(parameters);
+        int index = 3;
         if (parameters != null && parameters.length >= 9) {
-            this.sshOptions = parameters[0].toString();
-            this.javaPath = parameters[1].toString();
+            this.sshOptions = parameters[index++].toString();
+            this.javaPath = parameters[index++].toString();
             if (this.javaPath == null || this.javaPath.equals("")) {
                 throw new IllegalArgumentException("A valid Java path must be supplied.");
             }
-            this.schedulingPath = parameters[2].toString();
-            try {
-                this.nodeTimeOut = Integer.parseInt(parameters[3].toString());
-            } catch (NumberFormatException e) {
-                logger
-                        .warn("Number format exception occurred at ns configuration, default acq timeout value set: 60000ms");
-                this.nodeTimeOut = 60 * 1000;
-            }
-
-            try {
-                this.maxDeploymentFailure = Integer.parseInt(parameters[4].toString());
-            } catch (NumberFormatException e) {
-                logger
-                        .warn("Number format exception occurred at ns configuration, default attemp value set: 5");
-                this.maxDeploymentFailure = 5;
-            }
+            this.schedulingPath = parameters[index++].toString();
             //target OS
-            if (parameters[5] != null) {
-                this.targetOSObj = OperatingSystem.getOperatingSystem(parameters[5].toString());
+            if (parameters[index] != null) {
+                this.targetOSObj = OperatingSystem.getOperatingSystem(parameters[index++].toString());
                 if (this.targetOSObj == null) {
                     throw new IllegalArgumentException(
                         "Only 'Linux', 'Windows' and 'Cygwin' are valid values for Target OS Property.");
@@ -426,134 +310,34 @@ public class SSHInfrastructure extends InfrastructureManager {
                 throw new IllegalArgumentException("Target OS parameter cannot be null");
             }
 
-            this.javaOptions = parameters[6].toString();
+            this.javaOptions = parameters[index++].toString();
 
             //credentials
-            if (parameters[7] == null) {
+            if (parameters[index] == null) {
                 throw new IllegalArgumentException("Credentials must be specified");
             }
             try {
-                this.credentials = Credentials.getCredentialsBase64((byte[]) parameters[7]);
+                this.credentials = Credentials.getCredentialsBase64((byte[]) parameters[index++]);
             } catch (KeyException e) {
                 throw new IllegalArgumentException("Could not retrieve base64 credentials", e);
-            }
-
-            //host list
-            if (parameters[8] == null) {
-                throw new IllegalArgumentException("Host file must be specified");
-            }
-            try {
-                byte[] hosts = (byte[]) parameters[8];
-                File f = File.createTempFile("hosts", "list");
-                FileToBytesConverter.convertByteArrayToFile(hosts, f);
-                readHosts(f);
-                f.delete();
-            } catch (Exception e) {
-                throw new IllegalArgumentException("Could not read hosts file", e);
             }
         } else {
             throw new IllegalArgumentException("Invalid parameters for infrastructure creation");
         }
     }
 
-    /**
-     * Internal host file parser
-     * <p>
-     * File format:
-     * one host per line, optionally followed by a space and an integer describing the maximum
-     * number of runtimes (1 if not specified). Example:
-     * <pre>
-     * example.com
-     * example.org 5
-     * example.net 3
-     * </pre>
-     * @param f the file from which hosts names are to be extracted
-     * @throws IOException parsing failed
-     */
-    private void readHosts(File f) throws IOException {
-        BufferedReader in = new BufferedReader(new FileReader(f));
-        String line = "";
-
-        while ((line = in.readLine()) != null) {
-            if (line == "" || line.trim().length() == 0)
-                continue;
-
-            String[] elts = line.split(" ");
-            int num = 1;
-            if (elts.length > 1) {
+    @Override
+    protected void killNodeImpl(Node node, InetAddress host) {
+        final Node n = node;
+        this.nodeSource.executeInParallel(new Runnable() {
+            public void run() {
                 try {
-                    num = Integer.parseInt(elts[1]);
-                    if (num < 1) {
-                        throw new IllegalArgumentException("Cannot launch less than one runtime per host.");
-                    }
+                    n.getProActiveRuntime().killRT(false);
                 } catch (Exception e) {
-                    logger.warn("Error while parsing hosts file: " + e.getMessage());
-                    num = 1;
+                    logger.trace("An exception occurred during node removal", e);
                 }
             }
-            String host = elts[0];
-            try {
-                InetAddress addr = InetAddress.getByName(host);
-                synchronized (this.freeHosts) {
-                    for (int i = 0; i < num; i++) {
-                        this.freeHosts.add(addr);
-                    }
-                }
-                hostsThresholds.put(addr, maxDeploymentFailure);
-            } catch (UnknownHostException ex) {
-                throw new RuntimeException("Unknown host: " + host, ex);
-            }
-        }
-    }
-
-    /**
-     * This method is called by Infrastructure Manager in case of a deploying node removal.
-     * We take advantage of it to specify to the remote process control loop of the removal.
-     * This one will then exit.
-     */
-    @Override
-    protected void notifyDeployingNodeLost(String pnURL) {
-        this.pnTimeout.put(pnURL, new Boolean(true));
-    }
-
-    /**
-     * Parent IM notifies about a new node registration
-     */
-    @Override
-    protected void notifyAcquiredNode(Node node) throws RMException {
-        String nodeName = node.getNodeInformation().getName();
-        registeredNodes.put(nodeName, node.getVMInformation().getInetAddress());
-        if (logger.isDebugEnabled()) {
-            logger.debug("New expected node registered: #freeHosts:" + freeHosts.size() + " #registered: " +
-                registeredNodes.size());
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void removeNode(Node node) {
-        InetAddress host = null;
-        String nodeName = node.getNodeInformation().getName();
-        if ((host = registeredNodes.remove(nodeName)) != null) {
-            freeHosts.add(host);
-            logger.debug("Node " + nodeName + " removed. #freeHosts:" + freeHosts.size() + " #registered: " +
-                registeredNodes.size());
-            final Node n = node;
-            this.nodeSource.executeInParallel(new Runnable() {
-                public void run() {
-                    try {
-                        n.getProActiveRuntime().killRT(false);
-                    } catch (Exception e) {
-                        logger.trace("An exception occurred during node removal", e);
-                    }
-                }
-            });
-        } else {
-            logger.error("Node " + nodeName + " is not known as a Node belonging to this " +
-                this.getClass().getSimpleName());
-        }
+        });
     }
 
     /**
@@ -568,7 +352,7 @@ public class SSHInfrastructure extends InfrastructureManager {
      */
     @Override
     public String toString() {
-        return "SSH Infrastructure 2";
+        return "SSH Infrastructure";
     }
 
     @Override
