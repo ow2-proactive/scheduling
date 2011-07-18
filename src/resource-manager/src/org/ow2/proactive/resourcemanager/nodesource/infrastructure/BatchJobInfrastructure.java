@@ -274,9 +274,6 @@ public abstract class BatchJobInfrastructure extends InfrastructureManager {
         int b = -1;
         try {
             while ((b = in.read()) > -1) {
-                if (b == '\n') {
-                    break;
-                }
                 id += (char) b;
             }
         } catch (IOException e) {
