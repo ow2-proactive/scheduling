@@ -12,6 +12,7 @@ function build() {
 	./build -Dversion="${VERSION}" deploy.all
 	./build -Dversion="${VERSION}" doc.Scheduler.manualPdf
 	./build -Dversion="${VERSION}" doc.rm.manualPdf
+	./build -Dversion="${VERSION}" doc.MapReduce.manualPdf
 
 	generate_credential
 }
@@ -22,3 +23,49 @@ build_and_clean
 clean_repository
 replace_version
 build_archive
+
+
+
+###### + scheduling API release ########
+for p in {"client-API","client-API-matsci","client-API-mapreduce"}
+do
+	SERVER_NAME=$p
+	copy_to_tmp
+	build_and_clean
+	
+	###### minimal client release : remove matsci and mapreduce according to the release name
+	cd ${TMP_DIR}
+	rm -rf compile lib rm-rcp scheduler-rcp scripts src
+	rm RM-README.txt
+	rm -rf samples/scripts/deployment
+	rm -rf doc/src doc/toolchain doc/built/Resourcing
+	rm bin/windows/rm* bin/windows/*start* bin/unix/rm* bin/unix/*start*
+	rm -rf config/authentication/*.cfg config/authentication/jaas.config config/authentication/keys
+	rm config/log4j/log4j-defaultNode config/log4j/*server
+	rm -rf config/rm config/scheduler
+	rm config/security.java.policy-server
+	rm dist/lib/*ResourceManager* dist/lib/ProActive_Scheduler-fsm.jar dist/lib/ProActive_SRM-common.jar
+	rm dist/lib/derby* dist/lib/hibernate-core.jar dist/lib/mysql-connector-java-5.1.16-bin.jar dist/lib/virtual* dist/lib/j-interop*.jar dist/lib/xenserver-5.0.0-3.jar
+	
+	if [ "$SERVER_NAME" != "client-API-matsci" ]
+	then
+		rm -rf extensions/matlab extensions/scilab
+		rm -rf samples/jobs_descriptors/job_scilab
+		rm samples/scripts/selection/*lab.xml
+		rm dist/lib/*matlab* dist/lib/*scilab* dist/lib/ProActive_LicenseSaver*.jar
+		rm dist/lib/ProActive_Scheduler-matsci.jar
+	fi
+	
+	if [ "$SERVER_NAME" != "client-API-mapreduce" ]
+	then
+		rm -rf extensions/mapreduce
+		rm -rf samples/jobs_descriptors/Workflow/mapreduce
+		rm -rf doc/built/MapReduce
+		rm dist/lib/hadoop*
+		rm dist/lib/ProActive_Scheduler-mapreduce.jar
+	fi
+	
+	clean_repository
+	replace_version
+	build_archive
+done

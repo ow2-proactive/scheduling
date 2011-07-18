@@ -102,7 +102,7 @@
 		<jar destfile="${deploy.lib.dir}/${scheduler.client.jar}" manifest="${basedir}/scheduler-Manifest-base.mf" index="true">
 			<fileset dir="${cl.scheduler.dir}" includes="org/ow2/proactive/scheduler/common/**" />
 			<fileset dir="${cl.scheduler.dir}" includes="org/ow2/proactive/scheduler/resourcemanager/nodesource/policy/**" />
-			<fileset dir="${cl.scheduler.dir}" includes="org/ow2/proactive/scheduler/util/adminconsole/*" />
+			<fileset dir="${cl.scheduler.dir}" includes="org/ow2/proactive/scheduler/util/**" />
             <fileset dir="${cl.scheduler.dir}" includes="org/ow2/proactive/scheduler/ext/masterworker/**" />
 			<fileset dir="${cl.rm.dir}" includes="org/ow2/proactive/resourcemanager/common/*" />
 			<indexjars>
@@ -128,19 +128,17 @@
 
 <!-- start of the ant target to create the ProActive_Scheduler-mapreduce.jar -->
 	<target name="deploy.scheduler.mapreduce" depends="-deployCopy, compile.scheduler.mapreduce, deploy.common.client" description="Creates scheduler mapreduce jar">
-			<jar destfile="${deploy.lib.dir}/${scheduler.mapreduce.jar}" manifest="${basedir}/scheduler-Manifest-base.mf">
-				<fileset dir="${cl.scheduler.dir}" includes="org/ow2/proactive/scheduler/ext/mapreduce/**" excludes="org/ow2/proactive/scheduler/ext/mapreduce/examples/**" />
-				<fileset dir="${base.dir}/samples/jobs_descriptors/Workflow/mapreduce/" includes="replicateMapperPATask.js" />
-				<fileset dir="${base.dir}/samples/jobs_descriptors/Workflow/mapreduce/" includes="replicateReducerPATask.js" />
-				<fileset dir="${base.dir}/samples/jobs_descriptors/Workflow/mapreduce/" includes="reducerPATaskOutputFileTransfer.js" />
-				<fileset dir="${base.dir}/extensions/mapreduce/" includes="proactive.mapreduce.framework.configuration" />
-				<indexjars>
-					<fileset refid="jar.index.fileset" />
-				</indexjars>
-		    </jar>
-			<copy file="${deploy.lib.dir}/${scheduler.mapreduce.jar}" toDir="${addons.dir}" />
-			<copy file="${deploy.lib.dir}/hadoop-0.20.2-core.jar" toDir="${addons.dir}" />
-		</target>
+		<jar destfile="${deploy.lib.dir}/${scheduler.mapreduce.jar}" manifest="${basedir}/scheduler-Manifest-base.mf">
+			<fileset dir="${cl.scheduler.dir}" includes="org/ow2/proactive/scheduler/ext/mapreduce/**" excludes="org/ow2/proactive/scheduler/ext/mapreduce/examples/**" />
+			<fileset dir="${base.dir}/samples/jobs_descriptors/Workflow/mapreduce/" includes="replicateMapperPATask.js" />
+			<fileset dir="${base.dir}/samples/jobs_descriptors/Workflow/mapreduce/" includes="replicateReducerPATask.js" />
+			<fileset dir="${base.dir}/samples/jobs_descriptors/Workflow/mapreduce/" includes="reducerPATaskOutputFileTransfer.js" />
+			<fileset dir="${base.dir}/extensions/mapreduce/" includes="proactive.mapreduce.framework.configuration" />
+			<indexjars>
+				<fileset refid="jar.index.fileset" />
+			</indexjars>
+	    </jar>
+	</target>
 <!-- end of the ant target to create the ProActive_Scheduler-mapreduce.jar -->
 
 

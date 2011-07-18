@@ -14,7 +14,7 @@
 	<!-- ************
 		Deploy
 	-->
-	<target name="deploy.all" depends="deploy.common, deploy.common.client, deploy.scheduler, deploy.rm, deploy.rm.client, deploy.scheduler.client, deploy.scheduler.worker, deploy.scheduler.splitmerge, deploy.scheduler.matsci" description="Populate Scheduler and Resource Manager dist/ with all needed files (same as deploy.scheduler)"/>
+	<target name="deploy.all" depends="deploy.common, deploy.common.client, deploy.scheduler, deploy.rm, deploy.rm.client, deploy.scheduler.client, deploy.scheduler.worker, deploy.scheduler.splitmerge, deploy.scheduler.matsci, deploy.scheduler.mapreduce" description="Populate Scheduler and Resource Manager dist/ with all needed files (same as deploy.scheduler)"/>
 
 
 	<!-- ************

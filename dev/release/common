@@ -26,7 +26,7 @@ function init_env() {
 	RELEASE_BASENAME=$1
 	shift
 
-	SCHEDULER_DIR=$1
+	SCHEDULER_DIR=`readlink -f $1`
 	VERSION=$2
 	JAVA_HOME=$3
 	if [ ! -z "$4" ] ; then
