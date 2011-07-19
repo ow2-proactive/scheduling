@@ -35,6 +35,10 @@ public class LocalInfrastructure extends InfrastructureManager {
     /** Notifies the acquisition loop that the node has been acquired and that it can exit the loop */
     private Hashtable<String, Boolean> isNodeAcquired;
 
+    /** The shell interpret and its "command" argument */
+    private static final String SHELL_INTERPRET = "/bin/sh";
+    private static final String SHELL_COMMAND_OPTION = "-c";
+
     public LocalInfrastructure() {
     }
 
@@ -88,17 +92,43 @@ public class LocalInfrastructure extends InfrastructureManager {
         CommandLineBuilder clb = this.getDefaultCommandLineBuilder(osObj);
         //RM_Home set in bin/unix/env script
         clb.setRmHome(rmHome);
+        boolean containsSpace = false;
+        if (rmHome.contains(" ")) {
+            containsSpace = true;
+        }
         if (!this.paProperties.contains(CentralPAPropertyRepository.JAVA_SECURITY_POLICY.getName())) {
-            this.paProperties += " " + CentralPAPropertyRepository.JAVA_SECURITY_POLICY.getCmdLine() +
-                rmHome + "config" + osObj.fs + "security.java.policy-client";
+            this.paProperties += " " + CentralPAPropertyRepository.JAVA_SECURITY_POLICY.getCmdLine();
+            if (containsSpace) {
+                this.paProperties += "\"";
+            }
+            this.paProperties += rmHome + "config" + osObj.fs + "security.java.policy-client";
+            if (containsSpace) {
+                this.paProperties += "\"";
+            }
         }
         if (!this.paProperties.contains(CentralPAPropertyRepository.LOG4J.getName())) {
-            this.paProperties += " " + CentralPAPropertyRepository.LOG4J.getCmdLine() + rmHome + "config" +
+            this.paProperties += " " + CentralPAPropertyRepository.LOG4J.getCmdLine();
+            if (containsSpace) {
+                this.paProperties += "\"";
+            }
             //often needs this specific log4j config on windows... because of tty problems??
-                osObj.fs + "log4j" + osObj.fs + "rm-log4j-server";
+            this.paProperties += rmHome + "config" + osObj.fs + "log4j" + osObj.fs + "rm-log4j-server";
+            if (containsSpace) {
+                this.paProperties += "\"";
+            }
         }
         if (!this.paProperties.contains(PAResourceManagerProperties.RM_HOME.getKey())) {
-            this.paProperties += " " + PAResourceManagerProperties.RM_HOME.getCmdLine() + rmHome;
+            this.paProperties += " " + PAResourceManagerProperties.RM_HOME.getCmdLine();
+            if (containsSpace) {
+                this.paProperties += "\"";
+            }
+            this.paProperties += rmHome;
+            if (containsSpace) {
+                if (rmHome.endsWith("\\")) {
+                    this.paProperties += "\\";
+                }
+                this.paProperties += "\"";
+            }
         }
         clb.setPaProperties(this.paProperties);
         clb.setNodeName(nodeName);
@@ -121,13 +151,25 @@ public class LocalInfrastructure extends InfrastructureManager {
         } catch (IOException e) {
             logger.warn("Cannot build obfuscated command line");
         }
-        String depNodeURL = this.addDeployingNode(nodeName, obfuscatedCmd, "Node launched locally",
-                this.nodeTimeout);
-        this.isDeployingNodeLost.put(depNodeURL, false);
+        String depNodeURL = null;
         Process proc = null;
         try {
             this.isNodeAcquired.put(nodeName, false);
-            proc = Runtime.getRuntime().exec(cmdLine);
+            if (osObj.equals(OperatingSystem.UNIX) && containsSpace) {
+                depNodeURL = this.addDeployingNode(nodeName, SHELL_INTERPRET + " " + SHELL_COMMAND_OPTION +
+                    " " + obfuscatedCmd, "Node launched locally", this.nodeTimeout);
+                this.isDeployingNodeLost.put(depNodeURL, false);
+                logger
+                        .debug("LocalIM detected the libRoot variable contains whitespaces. Running the escaped command prepended with \"" +
+                            SHELL_INTERPRET + " " + SHELL_COMMAND_OPTION + "\".");
+                proc = Runtime.getRuntime().exec(
+                        new String[] { SHELL_INTERPRET, SHELL_COMMAND_OPTION, cmdLine });
+            } else {
+                depNodeURL = this.addDeployingNode(nodeName, obfuscatedCmd, "Node launched locally",
+                        this.nodeTimeout);
+                this.isDeployingNodeLost.put(depNodeURL, false);
+                proc = Runtime.getRuntime().exec(cmdLine);
+            }
             this.nodeNameToProcess.put(nodeName, proc);
         } catch (IOException e) {
             String lf = System.getProperty("line.separator");

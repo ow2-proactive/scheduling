@@ -1242,6 +1242,8 @@ public class RMNodeStarter {
             if (this.getTargetOS().equals(OperatingSystem.CYGWIN) ||
                 this.getTargetOS().equals(OperatingSystem.WINDOWS)) {
                 sb.append("\"");//especially on cygwin, we need to quote the cp
+            } else if (this.getTargetOS().equals(OperatingSystem.UNIX) && libRoot.trim().contains(" ")) {
+                sb.append("\"");
             }
             sb.append(".");
             for (String jar : this.requiredJARs) {
@@ -1256,7 +1258,10 @@ public class RMNodeStarter {
             if (this.getTargetOS().equals(OperatingSystem.CYGWIN) ||
                 this.getTargetOS().equals(OperatingSystem.WINDOWS)) {
                 sb.append("\"");//especially on cygwin, we need to quote the cp
+            } else if (this.getTargetOS().equals(OperatingSystem.UNIX) && libRoot.trim().contains(" ")) {
+                sb.append("\"");
             }
+
             sb.append(" ");
             sb.append(RMNodeStarter.class.getName());
 
