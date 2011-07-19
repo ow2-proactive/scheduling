@@ -725,8 +725,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     }
 
     /**
-     * @throws IOException when the job archive is not found 
      * Returns the map of the corresponding job id.
+     * @throws IOException when the job archive is not found 
      * @param sessionId a valid session id
      * @param jobId the job id
      * @return the map corresponding to the <code>jobId</code> 

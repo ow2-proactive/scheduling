@@ -97,10 +97,10 @@ public class RMRest {
     }
 
     /**
-     * 
+     * log into the resource manager using an form containing 2 fields 
      * @param username
      * @param password
-     * @return
+     * @return the sessionid of the user if succeed
      * @throws RMException 
      * @throws LoginException 
      * @throws KeyException 
@@ -271,6 +271,16 @@ public class RMRest {
         return rm.disconnect().getBooleanValue();
     }
 
+    /**
+     * Create a NodeSource 
+     * @param sessionId
+     * @param nodeSourceName
+     * @param infrastructureType
+     * @param infrastructureParameters
+     * @param policyType
+     * @param policyParameters
+     * @return true if a node source has been created
+     */
     @POST
     @Path("nodesource/create")
     @Produces("application/json")
@@ -286,6 +296,13 @@ public class RMRest {
                 policyParameters.toArray()).getBooleanValue();
     }
 
+    /**
+     * Returns the ping frequency of a node source 
+     * @param sessionId
+     * @param sourceName
+     * @return the ping frequency 
+     */
+    
     @POST
     @Path("nodesource/pingfrequency")
     @Produces("application/json")
@@ -296,10 +313,10 @@ public class RMRest {
     }
 
     /**
-     * 
+     * Release a node
      * @param sessionId
      * @param url
-     * @return
+     * @return true of the node has been released
      * @throws NodeException 
      */
     public boolean releaseNode(@HeaderParam("sessionid") String sessionId, String url) throws NodeException {
@@ -376,6 +393,11 @@ public class RMRest {
         return rm.getAtMostNodes(arg0, arg1, arg2);
     }
 
+    /**
+     * Returns the list of supported node source infrastructures descriptors.
+     * @param sessionId
+     * @return the list of supported node source infrastructures descriptors
+     */
     @GET
     @Path("infrastructures")
     @Produces("application/json")
@@ -385,6 +407,11 @@ public class RMRest {
         return rm.getSupportedNodeSourceInfrastructures();
     }
 
+    /**
+     * Returns the list of supported node source policies descriptors.
+     * @param sessionId
+     * @return the list of supported node source policies descriptors
+     */
     @GET
     @Path("policies")
     @Produces("application/json")
@@ -394,6 +421,18 @@ public class RMRest {
         return rm.getSupportedNodeSourcePolicies();
     }
 
+    /**
+     * Returns the attributes <code>attr</code> of the mbean
+     * registered as <code>name<code>
+     * @param sessionId
+     * @param name mbean's object name
+     * @param attr attributes to enumerate
+     * @return returns the attributes of the mbean 
+     * @throws InstanceNotFoundException
+     * @throws IntrospectionException
+     * @throws ReflectionException
+     * @throws IOException
+     */
     @GET
     @Path("info/{name}")
     @Produces("application/json")
@@ -413,6 +452,10 @@ public class RMRest {
 
     }
 
+    /**
+     * Returns the version of the rest api
+     * @return returns the version of the rest api
+     */
     @GET
     @Path("version")
     public String getVersion() {
