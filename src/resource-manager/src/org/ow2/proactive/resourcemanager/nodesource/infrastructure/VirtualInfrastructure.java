@@ -86,6 +86,8 @@ import org.xml.sax.SAXException;
 /** This class provides a way to manager Virtualized Infrastructure. */
 public class VirtualInfrastructure extends InfrastructureManager {
 
+    /**  */
+    private static final long serialVersionUID = 31L;
     @Configurable(description = "Virtual Infrastructure Type:\nxenserver, virtualbox, vmware, hyperv-winrm or hyperv-wmi")
     protected String infrastructure;
     /** The hypervisor's url */
@@ -681,6 +683,8 @@ public class VirtualInfrastructure extends InfrastructureManager {
      *---------------------------------------*/
 
     private class VMDeploymentMonitor implements Serializable, Runnable {
+        /**  */
+        private static final long serialVersionUID = 31L;
         private volatile boolean run = false;
         private static final String DEPLOYING_NODE_NAME_FRAGMENT = "_node_";
         private Hashtable<String, VMGuestStatus> status = new Hashtable<String, VMGuestStatus>();
@@ -865,6 +869,8 @@ public class VirtualInfrastructure extends InfrastructureManager {
      * implementing {@link Serializable}
      */
     private class VirtualMachineManagerHolder implements Serializable {
+        /**  */
+        private static final long serialVersionUID = 31L;
         /** The kind of infrastructure to manage */
         protected final InfrastructureType infrastructureType;
         /** The hypervisor's url and authentication credentials */
@@ -903,6 +909,8 @@ public class VirtualInfrastructure extends InfrastructureManager {
 
     /** This class allows to cache registered nodes. */
     private class VMNodeCache implements Serializable {
+        /**  */
+        private static final long serialVersionUID = 31L;
         private final HashMap<String, ArrayList<String>> vmNodeCache = new HashMap<String, ArrayList<String>>();
 
         private void addNode(String holdingVM, String node) {

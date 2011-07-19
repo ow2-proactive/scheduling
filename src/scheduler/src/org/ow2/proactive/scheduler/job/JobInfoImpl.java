@@ -83,6 +83,9 @@ import org.ow2.proactive.scheduler.common.task.TaskStatus;
 @Proxy(lazy = false)
 @XmlAccessorType(XmlAccessType.FIELD)
 public class JobInfoImpl implements JobInfo {
+    /**  */
+    private static final long serialVersionUID = 31L;
+
     @Id
     @GeneratedValue
     @SuppressWarnings("unused")
@@ -167,6 +170,8 @@ public class JobInfoImpl implements JobInfo {
      * as well as ids of the dependencies of the replicated task
      */
     public static class ReplicatedTask implements Serializable {
+        /**  */
+        private static final long serialVersionUID = 31L;
         public TaskId originalId = null;
         public TaskId replicatedId = null;
         public List<TaskId> deps = null;

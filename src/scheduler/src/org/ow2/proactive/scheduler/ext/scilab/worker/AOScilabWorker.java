@@ -78,6 +78,9 @@ import org.scilab.modules.types.ScilabType;
  */
 public class AOScilabWorker implements Serializable, MatSciWorker {
 
+    /**  */
+    private static final long serialVersionUID = 31L;
+
     /** The ISO8601 for debug format of the date that precedes the log message */
     private static final SimpleDateFormat ISO8601FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:sss");
 

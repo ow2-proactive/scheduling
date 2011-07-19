@@ -6,8 +6,6 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import java.util.ArrayList;
-
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.io.LongWritable;
@@ -79,6 +77,8 @@ import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
  */
 public class PAHadoopJobConfiguration extends Configuration implements Serializable {
 
+    /**  */
+    private static final long serialVersionUID = 31L;
     /**
      * Further configuration parameter that can be used to store the
      * DataSpacesFileObject a {@link JavaExecutable} or a {@link FileSystem}

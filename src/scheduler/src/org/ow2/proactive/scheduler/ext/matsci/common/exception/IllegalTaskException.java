@@ -40,6 +40,9 @@ import org.ow2.proactive.scheduler.common.task.Task;
 
 
 public class IllegalTaskException extends Exception {
+    /**  */
+    private static final long serialVersionUID = 31L;
+
     public IllegalTaskException(Class<? extends Task> class1) {
         super(class1.getCanonicalName());
     }

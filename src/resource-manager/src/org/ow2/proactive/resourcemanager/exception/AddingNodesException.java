@@ -53,6 +53,9 @@ import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
  */
 public class AddingNodesException extends RuntimeException {
 
+    /**  */
+    private static final long serialVersionUID = 31L;
+
     /**
      * Attaches a message to the Exception
      * @param msg message attached

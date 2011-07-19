@@ -63,6 +63,8 @@ import org.ow2.proactive.scheduler.common.exception.SchedulerException;
  */
 public class LoginFrame<E extends AOMatSciEnvironment> extends JDialog {
 
+    /**  */
+    private static final long serialVersionUID = 31L;
     private JTextField username;
     private JPasswordField password;
     private E aose;

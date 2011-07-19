@@ -67,6 +67,9 @@ import org.objectweb.proactive.annotation.PublicAPI;
 @Proxy(lazy = false)
 @XmlAccessorType(XmlAccessType.FIELD)
 public class BooleanWrapper implements Serializable {
+    /**  */
+    private static final long serialVersionUID = 31L;
+
     @Id
     @GeneratedValue
     @Column(name = "ID")

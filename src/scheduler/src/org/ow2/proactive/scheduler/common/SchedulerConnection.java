@@ -55,6 +55,8 @@ import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 @PublicAPI
 public class SchedulerConnection extends Connection<SchedulerAuthenticationInterface> {
 
+    /**  */
+    private static final long serialVersionUID = 31L;
     /** Instance of the connection */
     private static SchedulerConnection instance;
 

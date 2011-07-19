@@ -39,8 +39,6 @@ package functionaltests.nodesource;
 import static junit.framework.Assert.assertTrue;
 
 import java.io.File;
-import java.net.URL;
-
 import org.objectweb.proactive.core.node.Node;
 import org.ow2.proactive.resourcemanager.common.RMState;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;

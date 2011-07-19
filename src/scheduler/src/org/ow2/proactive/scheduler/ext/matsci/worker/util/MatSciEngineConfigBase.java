@@ -46,6 +46,8 @@ import org.objectweb.proactive.core.UniqueID;
  */
 public abstract class MatSciEngineConfigBase implements MatSciEngineConfig {
 
+    /**  */
+    private static final long serialVersionUID = 31L;
     protected static MatSciEngineConfigBase currentConf = null;
     protected static MatSciEngineConfigBase lastConf = null;
 

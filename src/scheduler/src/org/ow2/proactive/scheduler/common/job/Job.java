@@ -78,6 +78,9 @@ import org.ow2.proactive.scheduler.common.task.CommonAttribute;
 @Proxy(lazy = false)
 public abstract class Job extends CommonAttribute {
 
+    /**  */
+    private static final long serialVersionUID = 31L;
+
     /** Name of the job */
     @Column(name = "NAME")
     protected String name = SchedulerConstants.JOB_DEFAULT_NAME;

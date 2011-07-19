@@ -42,6 +42,9 @@ package org.ow2.proactive.resourcemanager.exception;
  */
 public class NotConnectedException extends SecurityException {
 
+    /**  */
+    private static final long serialVersionUID = 31L;
+
     public NotConnectedException(String msg) {
         super(msg);
     }

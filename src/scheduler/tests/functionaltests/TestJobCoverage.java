@@ -41,20 +41,13 @@ import java.net.URL;
 
 import junit.framework.Assert;
 
-import org.objectweb.proactive.utils.OperatingSystem;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
-import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
-import org.ow2.proactive.scheduler.common.job.factories.JobFactory_stax;
-import org.ow2.proactive.scheduler.common.task.JavaExecutableInitializer;
-import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
-import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
-
 import functionalTests.FunctionalTest;
 
 

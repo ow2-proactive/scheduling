@@ -48,6 +48,9 @@ import org.scilab.modules.types.ScilabType;
  */
 public class ScilabResultsAndLogs extends ResultsAndLogs<ScilabType> {
 
+    /**  */
+    private static final long serialVersionUID = 31L;
+
     public ScilabResultsAndLogs() {
         super();
     }

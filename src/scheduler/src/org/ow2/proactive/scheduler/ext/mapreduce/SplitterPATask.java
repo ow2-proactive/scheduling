@@ -16,7 +16,6 @@ import org.apache.hadoop.mapreduce.InputSplit;
 import org.apache.hadoop.mapreduce.JobContext;
 import org.apache.hadoop.mapreduce.JobID;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
-import org.apache.hadoop.mapreduce.lib.input.FileSplit;
 import org.apache.hadoop.util.StringUtils;
 import org.objectweb.proactive.extensions.dataspaces.api.DataSpacesFileObject;
 import org.objectweb.proactive.extensions.dataspaces.exceptions.FileSystemException;

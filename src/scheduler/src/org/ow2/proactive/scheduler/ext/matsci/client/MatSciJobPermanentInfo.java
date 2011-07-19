@@ -48,6 +48,9 @@ import org.ow2.proactive.scheduler.ext.matsci.common.PASolveMatSciGlobalConfig;
  */
 public class MatSciJobPermanentInfo implements java.io.Serializable, Cloneable {
 
+    /**  */
+    private static final long serialVersionUID = 31L;
+
     String jobId;
 
     TreeSet<String> tnames;

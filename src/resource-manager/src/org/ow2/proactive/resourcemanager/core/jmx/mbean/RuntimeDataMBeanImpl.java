@@ -43,8 +43,6 @@ import javax.management.StandardMBean;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.jmx.Chronological;
-import org.ow2.proactive.resourcemanager.authentication.Client;
-import org.ow2.proactive.resourcemanager.core.RMCore;
 import org.ow2.proactive.resourcemanager.core.jmx.RMJMXHelper;
 import org.ow2.proactive.resourcemanager.utils.AtomicRMStatisticsHolder;
 

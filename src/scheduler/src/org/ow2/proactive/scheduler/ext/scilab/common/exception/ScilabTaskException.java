@@ -42,6 +42,9 @@ package org.ow2.proactive.scheduler.ext.scilab.common.exception;
  * @author The ProActive Team
  */
 public class ScilabTaskException extends Exception {
+    /**  */
+    private static final long serialVersionUID = 31L;
+
     public ScilabTaskException() {
         super();
     }

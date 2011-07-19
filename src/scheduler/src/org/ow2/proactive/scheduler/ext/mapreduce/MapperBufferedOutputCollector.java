@@ -1126,6 +1126,9 @@ public class MapperBufferedOutputCollector<K, V> implements MapperOutputCollecto
      *
      */
     protected static class MapBufferTooSmallException extends IOException {
+        /**  */
+        private static final long serialVersionUID = 31L;
+
         public MapBufferTooSmallException(String s) {
             super(s);
         }

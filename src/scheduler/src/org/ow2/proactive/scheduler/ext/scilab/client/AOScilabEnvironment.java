@@ -79,6 +79,8 @@ import org.scilab.modules.types.ScilabType;
  */
 public class AOScilabEnvironment extends AOMatSciEnvironment<ScilabType, ScilabResultsAndLogs> {
 
+    /**  */
+    private static final long serialVersionUID = 31L;
     /**
      * log4j logger
      */

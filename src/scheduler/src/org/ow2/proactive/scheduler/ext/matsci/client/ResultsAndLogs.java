@@ -45,6 +45,8 @@ import java.io.Serializable;
  * @author The ProActive Team
  */
 public class ResultsAndLogs<R> implements Serializable {
+    /**  */
+    private static final long serialVersionUID = 31L;
     protected R result;
     protected String logs;
     protected Throwable exception;

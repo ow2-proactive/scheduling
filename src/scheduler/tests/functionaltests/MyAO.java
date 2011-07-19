@@ -65,6 +65,8 @@ import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
  */
 public class MyAO implements Serializable {
 
+    /**  */
+    private static final long serialVersionUID = 31L;
     protected String rmUsername = "demo";
     protected String rmPassword = "demo";
 

@@ -42,7 +42,6 @@ import java.util.Map;
 
 import org.junit.Assert;
 import org.objectweb.proactive.utils.OperatingSystem;
-import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;

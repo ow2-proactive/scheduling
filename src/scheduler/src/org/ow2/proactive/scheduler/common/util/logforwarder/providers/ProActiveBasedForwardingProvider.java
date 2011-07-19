@@ -110,6 +110,9 @@ public class ProActiveBasedForwardingProvider implements LogForwardingProvider {
 
     public static class ProActiveAppenderProvider implements AppenderProvider {
 
+        /**  */
+        private static final long serialVersionUID = 31L;
+
         /**
          * Default flusing period of the ProActive appender.
          * Can be overridden by org.objectweb.proactive.core.util.log.remote.ThrottlingProvider.period ProActive Property.

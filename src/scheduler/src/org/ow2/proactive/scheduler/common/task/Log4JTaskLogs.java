@@ -78,6 +78,9 @@ import org.ow2.proactive.utils.ObjectByteConverter;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Log4JTaskLogs implements TaskLogs {
 
+    /**  */
+    private static final long serialVersionUID = 31L;
+
     @Id
     @GeneratedValue
     @SuppressWarnings("unused")

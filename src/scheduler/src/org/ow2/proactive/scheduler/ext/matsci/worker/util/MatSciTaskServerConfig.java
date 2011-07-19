@@ -50,6 +50,9 @@ import java.util.Properties;
  */
 public class MatSciTaskServerConfig implements Serializable {
 
+    /**  */
+    private static final long serialVersionUID = 31L;
+
     public static String DEPLOY_IO_THREAD = "matsci.deployIOThread";
 
     public static String TASK_COUNT_JVM_RESPAWN = "matsci.taskcount";

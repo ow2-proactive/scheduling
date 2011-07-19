@@ -78,6 +78,9 @@ import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 @XmlRootElement(name = "task")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class InternalNativeTask extends InternalTask {
+    /**  */
+    private static final long serialVersionUID = 31L;
+
     public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.CORE);
 
     @Id

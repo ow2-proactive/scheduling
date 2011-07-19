@@ -126,6 +126,9 @@ import org.ow2.proactive.utils.NodeSet;
 @XmlAccessorType(XmlAccessType.FIELD)
 public abstract class InternalTask extends TaskState {
 
+    /**  */
+    private static final long serialVersionUID = 31L;
+
     /** Parents list : null if no dependences */
     // WARNING  #writeObject() refers to this field's name as a String 
     @ManyToAny(metaColumn = @Column(name = "ITASK_TYPE", length = 5))

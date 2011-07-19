@@ -43,4 +43,7 @@ import org.ow2.proactive.permissions.ClientPermission;
  * This permission allows to change a policy of the scheduler
  */
 public class ChangePolicyPermission extends ClientPermission {
+
+    /**  */
+    private static final long serialVersionUID = 31L;
 }

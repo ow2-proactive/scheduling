@@ -51,6 +51,9 @@ import org.objectweb.proactive.core.process.JVMProcessImpl;
  */
 public class DummyJVMProcess extends JVMProcessImpl implements Serializable {
 
+    /**  */
+    private static final long serialVersionUID = 31L;
+
     public DummyJVMProcess() {
         super();
     }

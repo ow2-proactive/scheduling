@@ -48,6 +48,9 @@ import java.util.HashSet;
  */
 public class PASolveMatSciGlobalConfig implements Serializable {
 
+    /**  */
+    private static final long serialVersionUID = 31L;
+
     /** Debug Mode */
     protected boolean debug = false;
 

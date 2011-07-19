@@ -104,6 +104,9 @@ import org.ow2.proactive.scripting.SimpleScript;
 @XmlRootElement(name = "task")
 public abstract class Task extends CommonAttribute {
 
+    /**  */
+    private static final long serialVersionUID = 31L;
+
     /** Name of the task. */
     @Column(name = "NAME")
     protected String name = SchedulerConstants.TASK_DEFAULT_NAME;

@@ -78,6 +78,9 @@ import org.ow2.proactive.resourcemanager.utils.RMNodeStarter.OperatingSystem;
  */
 public class SSHInfrastructure extends HostsFileBasedInfrastructureManager {
 
+    /**  */
+    private static final long serialVersionUID = 31L;
+
     /**
      * class' logger
      */

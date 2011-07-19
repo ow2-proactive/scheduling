@@ -18,6 +18,8 @@ import org.ow2.proactive.resourcemanager.utils.RMNodeStarter.OperatingSystem;
 
 public class LocalInfrastructure extends InfrastructureManager {
 
+    /**  */
+    private static final long serialVersionUID = 31L;
     @Configurable(description = "Absolute path to credentials file\nused to add the node to the Resource Manager", credential = true)
     private Credentials credentials;
     @Configurable(description = "Maximum number of nodes to\nbe deployed on Resource Manager machine")

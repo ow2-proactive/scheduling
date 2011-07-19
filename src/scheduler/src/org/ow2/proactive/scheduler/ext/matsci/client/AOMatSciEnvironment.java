@@ -90,6 +90,9 @@ import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 public abstract class AOMatSciEnvironment<R, RL> implements Serializable, SchedulerEventListener, InitActive,
         RunActive {
 
+    /**  */
+    private static final long serialVersionUID = 31L;
+
     /**
      * Connection to the scheduler
      */
@@ -689,6 +692,9 @@ public abstract class AOMatSciEnvironment<R, RL> implements Serializable, Schedu
      */
     protected class FindNotWaitFilter implements RequestFilter {
 
+        /**  */
+        private static final long serialVersionUID = 31L;
+
         /**
          * Creates the filter
          */
@@ -711,6 +717,9 @@ public abstract class AOMatSciEnvironment<R, RL> implements Serializable, Schedu
     }
 
     protected class IntStrComparator implements Comparator<String>, Serializable {
+
+        /**  */
+        private static final long serialVersionUID = 31L;
 
         public IntStrComparator() {
 
@@ -735,6 +744,9 @@ public abstract class AOMatSciEnvironment<R, RL> implements Serializable, Schedu
     }
 
     public static class TaskNameComparator implements Comparator<String>, Serializable {
+
+        /**  */
+        private static final long serialVersionUID = 31L;
 
         public TaskNameComparator() {
 

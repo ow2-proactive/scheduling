@@ -50,6 +50,9 @@ import org.ow2.proactive.resourcemanager.nodesource.utils.NamesConvertor;
 @ActiveObject
 public class StaticPolicy extends NodeSourcePolicy {
 
+    /**  */
+    private static final long serialVersionUID = 31L;
+
     /**
      * Configure a policy with given parameters.
      * @param policyParameters parameters defined by user

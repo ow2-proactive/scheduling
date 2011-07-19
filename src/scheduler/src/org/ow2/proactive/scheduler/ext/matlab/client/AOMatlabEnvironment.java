@@ -71,6 +71,9 @@ import org.ow2.proactive.scripting.SelectionScript;
  */
 public class AOMatlabEnvironment extends AOMatSciEnvironment<Boolean, MatlabResultsAndLogs> {
 
+    /**  */
+    private static final long serialVersionUID = 31L;
+
     /**
      * Constructs the environment AO
      */

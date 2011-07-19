@@ -65,6 +65,9 @@ import org.objectweb.proactive.annotation.PublicAPI;
 @AccessType("field")
 @Proxy(lazy = false)
 public class ByteArrayWrapper implements Serializable {
+    /**  */
+    private static final long serialVersionUID = 31L;
+
     @Id
     @GeneratedValue
     @Column(name = "ID")

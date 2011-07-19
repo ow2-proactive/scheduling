@@ -5,7 +5,6 @@ import java.io.Serializable;
 import java.util.Map;
 
 import org.objectweb.proactive.extensions.dataspaces.api.DataSpacesFileObject;
-import org.objectweb.proactive.extensions.dataspaces.api.FileSelector;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import org.ow2.proactive.scheduler.ext.mapreduce.logging.DefaultLogger;

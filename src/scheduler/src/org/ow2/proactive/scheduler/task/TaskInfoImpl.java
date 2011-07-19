@@ -78,6 +78,9 @@ import org.ow2.proactive.scheduler.job.JobInfoImpl;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class TaskInfoImpl implements TaskInfo {
 
+    /**  */
+    private static final long serialVersionUID = 31L;
+
     private static final String HOSTNAME_SEPARATOR = ",";
 
     @Id

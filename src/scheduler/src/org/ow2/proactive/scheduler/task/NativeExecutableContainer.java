@@ -78,6 +78,9 @@ import org.ow2.proactive.scripting.InvalidScriptException;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class NativeExecutableContainer extends ExecutableContainer {
 
+    /**  */
+    private static final long serialVersionUID = 31L;
+
     public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.CORE);
 
     @Id

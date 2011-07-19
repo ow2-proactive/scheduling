@@ -48,6 +48,8 @@ import java.util.List;
  */
 public class StartForkedProcessException extends StartProcessException {
 
+    /**  */
+    private static final long serialVersionUID = 31L;
     private List<String> command;
 
     /**

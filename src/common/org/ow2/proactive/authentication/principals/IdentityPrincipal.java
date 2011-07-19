@@ -42,6 +42,8 @@ import java.security.Principal;
 
 public class IdentityPrincipal implements Principal, Serializable {
 
+    /**  */
+    private static final long serialVersionUID = 31L;
     private String name;
 
     public IdentityPrincipal(String name) {

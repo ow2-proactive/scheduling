@@ -52,6 +52,9 @@ import org.ow2.proactive.scheduler.common.job.JobStatus;
  */
 public class MatSciJobVolatileInfo<R> implements Serializable {
 
+    /**  */
+    private static final long serialVersionUID = 31L;
+
     protected JobStatus status;
 
     protected Request pendingWaitAllRequest;
