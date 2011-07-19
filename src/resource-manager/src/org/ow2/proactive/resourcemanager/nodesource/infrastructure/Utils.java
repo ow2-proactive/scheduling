@@ -101,13 +101,21 @@ public class Utils {
         }
         //building classpath
         sb.append(" -cp ");
-        sb.append(PAResourceManagerProperties.RM_HOME.getValueAsString());
+        final String rmHome = PAResourceManagerProperties.RM_HOME.getValueAsString().trim();
+        final boolean containsSpace = rmHome.contains(" ");
+        if (containsSpace) {
+            sb.append("\"");
+        }
+        sb.append(rmHome);
         sb.append(File.separator);
         sb.append("dist");
         sb.append(File.separator);
         sb.append("lib");
         sb.append(File.separator);
         sb.append("ProActive.jar");
+        if (containsSpace) {
+            sb.append("\"");
+        }
         sb.append(" ");
         //mandatory property
         //exe's name

@@ -149,24 +149,42 @@ public class SSHInfrastructure extends HostsFileBasedInfrastructureManager {
         clb.setRmHome(schedulingPath);
         //we set the java security policy file
         StringBuilder sb = new StringBuilder();
-        sb.append(CentralPAPropertyRepository.JAVA_SECURITY_POLICY.getCmdLine());
-        sb.append(schedulingPath);
-        sb.append(fs);
-        sb.append("config");
-        sb.append(fs);
-        sb.append("security.java.policy-client ");
+        final boolean containsSpace = schedulingPath.contains(" ");
+        String securitycmd = CentralPAPropertyRepository.JAVA_SECURITY_POLICY.getCmdLine();
+        if (!this.javaOptions.contains(securitycmd)) {
+            sb.append(securitycmd);
+            if (containsSpace) {
+                sb.append("\"");
+            }
+            sb.append(schedulingPath);
+            sb.append(fs);
+            sb.append("config");
+            sb.append(fs);
+            sb.append("security.java.policy-client");
+            if (containsSpace) {
+                sb.append("\"");
+            }
+            sb.append(" ");
+        }
         //we set the log4j configuration file
         String log4jcmd = CentralPAPropertyRepository.LOG4J.getCmdLine();
         if (!this.javaOptions.contains(log4jcmd) && targetOSObj.equals(OperatingSystem.CYGWIN)) {
             //especially on cygwin, there is an issue if no log4j configuration is provided
             sb.append(log4jcmd);
+            if (containsSpace) {
+                sb.append("\"");
+            }
             sb.append(schedulingPath);
             sb.append(fs);
             sb.append("config");
             sb.append(fs);
             sb.append("log4j");
             sb.append(fs);
-            sb.append("log4j-defaultNode ");
+            sb.append("log4j-defaultNode");
+            if (containsSpace) {
+                sb.append("\"");
+            }
+            sb.append(" ");
         }
         //we add extra java/PA configuration
         sb.append(this.javaOptions);
