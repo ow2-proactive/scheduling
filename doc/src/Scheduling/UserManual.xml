@@ -183,6 +183,8 @@ job.setEnv(je);
 #
 # One rule to know:
 # command paths must be absolute paths
+# Note : If you have whitespaces in your command or argument, just escape them using '%' char
+#        if you need a '%' char in your argument, just escape it with another '%' char
 
 /path/to/my/exec/myCmd.sh 1
 /path/to/my/exec/myCmd.sh 2

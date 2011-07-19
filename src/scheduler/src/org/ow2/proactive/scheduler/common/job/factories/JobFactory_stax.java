@@ -1320,11 +1320,7 @@ public class JobFactory_stax extends JobFactory {
                         String attrName = cursorExec.getAttributeLocalName(i);
                         attr_ = attrName;
                         if (XMLAttributes.TASK_COMMAND_VALUE.matches(attrName)) {
-                            String[] parsedCommandLine = Tools.parseCommandLine(replace(cursorExec
-                                    .getAttributeValue(i)));
-                            for (String pce : parsedCommandLine) {
-                                command.add(pce);
-                            }
+                            command.add(replace(cursorExec.getAttributeValue(i)));
                         }
                         if (XMLAttributes.TASK_WORKDING_DIR.matches(attrName)) {
                             nativeTask.setWorkingDir(replace(cursorExec.getAttributeValue(i)));

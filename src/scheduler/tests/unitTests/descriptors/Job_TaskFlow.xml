@@ -122,8 +122,10 @@
 				<files includes="tata*" accessMode="none"/>
 			</inputFiles>
 			<nativeExecutable>
-				<staticCommand value="${WORK_DIR2}/nativTask 1 2% 2" workingDir="task3workingDir">
+				<staticCommand value="${WORK_DIR2}/nativTask" workingDir="task3workingDir">
 					<arguments>
+						<argument value="1"/>
+						<argument value="2 2"/>
 						<argument value="3"/>
 						<argument value="12"/>
 					</arguments>
