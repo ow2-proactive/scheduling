@@ -224,7 +224,9 @@ public class JavaTaskLauncher extends TaskLauncher {
                     jinit.setArgument(arg.getKey(), str);
                 }
             }
-        } catch (Exception e) {
+        } catch (Throwable e) {
+            // a no classDefFoundError can occurs with forked java task and user-type args.
+            // see SCHEDULING-1288
         }
     }
 
