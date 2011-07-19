@@ -27,7 +27,7 @@ build_archive
 
 
 ###### + scheduling API release ########
-for p in {"client-API","client-API-matsci","client-API-mapreduce"}
+for p in {"client-API","client-API-all","client-API-matsci","client-API-mapreduce"}
 do
 	SERVER_NAME=$p
 	copy_to_tmp
@@ -44,10 +44,10 @@ do
 	rm config/log4j/log4j-defaultNode config/log4j/*server
 	rm -rf config/rm config/scheduler
 	rm config/security.java.policy-server
-	rm dist/lib/*ResourceManager* dist/lib/ProActive_Scheduler-fsm.jar dist/lib/ProActive_SRM-common.jar
+	rm dist/lib/*ResourceManager* dist/lib/ProActive_Scheduler-fsm.jar
 	rm dist/lib/derby* dist/lib/hibernate-core.jar dist/lib/mysql-connector-java-5.1.16-bin.jar dist/lib/virtual* dist/lib/j-interop*.jar dist/lib/xenserver-5.0.0-3.jar
 	
-	if [ "$SERVER_NAME" != "client-API-matsci" ]
+	if [ "$SERVER_NAME" != "client-API-matsci" -a "$SERVER_NAME" != "client-API-all" ]
 	then
 		rm -rf extensions/matlab extensions/scilab
 		rm -rf samples/jobs_descriptors/job_scilab
@@ -56,7 +56,7 @@ do
 		rm dist/lib/ProActive_Scheduler-matsci.jar
 	fi
 	
-	if [ "$SERVER_NAME" != "client-API-mapreduce" ]
+	if [ "$SERVER_NAME" != "client-API-mapreduce" -a "$SERVER_NAME" != "client-API-all" ]
 	then
 		rm -rf extensions/mapreduce
 		rm -rf samples/jobs_descriptors/Workflow/mapreduce

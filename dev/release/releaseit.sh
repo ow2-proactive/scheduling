@@ -112,6 +112,8 @@ mv /tmp/ProActiveResourcing-${SPECIAL_NAME}_server.tar.gz $OUTPUT_DIRECTORY
 mv /tmp/ProActiveResourcing-${SPECIAL_NAME}_server.zip $OUTPUT_DIRECTORY
 mv /tmp/ProActiveScheduling-${SPECIAL_NAME}_server.tar.gz $OUTPUT_DIRECTORY
 mv /tmp/ProActiveScheduling-${SPECIAL_NAME}_server.zip $OUTPUT_DIRECTORY
+mv /tmp/ProActiveScheduling-${SPECIAL_NAME}_client-API*.tar.gz $OUTPUT_DIRECTORY                                                                                      (jlscheef@jily:/tmp)
+mv /tmp/ProActiveScheduling-${SPECIAL_NAME}_client-API*.zip $OUTPUT_DIRECTORY                                                                                      (jlscheef@jily:/tmp)
 #change dir to dev/release
 echo "---------------> 4. Change directory to dev/release"
 cd dev/release;
