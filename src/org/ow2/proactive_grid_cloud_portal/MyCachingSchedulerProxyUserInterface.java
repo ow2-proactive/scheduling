@@ -34,7 +34,6 @@
  * ################################################################
  * $$ACTIVEEON_INITIAL_DEV$$
  */
-
 package org.ow2.proactive_grid_cloud_portal;
 
 import java.security.KeyException;
