@@ -70,7 +70,16 @@ public class SchedulerStateCaching {
     private static long schedulerRevision;
     private static int refreshInterval;
     private static volatile boolean kill = false;
+
+    /*
+     * thread that updates the scheduler state
+     */
     private static Thread cachedSchedulerStateThreadUpdater;
+
+    /*
+     * thread that renews the lease of the object that caches the scheduler state
+     * as by default it does not perform any action.
+     */
     private static Thread leaseRenewerThreadUpdater;
 
     protected static Map<AtomicLong, SchedulerState> revisionAndSchedulerState;
@@ -179,9 +188,9 @@ public class SchedulerStateCaching {
             public void run() {
                 if ((scheduler != null) && (!kill)) {
                     try {
-                        scheduler.getStatus();
+                        scheduler.renewSession();
                     } catch (Exception e) {
-                        logger.info("leaseRenewerThread was not able to call the getStatus method, exception message is " +
+                        logger.info("leaseRenewerThread was not able to call the renewSession method, exception message is " +
                             e.getMessage());
                         init_();
                     }
