@@ -91,8 +91,8 @@
 								<para>
 									<person>
 										<personname>
-											<surname>Bratu</surname>
-											<firstname>Florin-Alexandru</firstname>
+											<firstname>Borelli</firstname>
+											<surname>Elvio</surname>
 										</personname>
 									</person>
 								</para>
@@ -111,6 +111,16 @@
 								<para>
 									<person>
 										<personname>
+											<firstname>Doglov</firstname>
+											<surname>Sergei</surname>
+										</personname>
+									</person>
+								</para>
+							</listitem>
+							<listitem>
+								<para>
+									<person>
+										<personname>
 											<surname>Pellegrino</surname>
 											<firstname>Laurent</firstname>
 										</personname>
@@ -121,38 +131,8 @@
 								<para>
 									<person>
 										<personname>
-											<surname>Doan</surname>
-											<firstname>Viet Dung</firstname>
-										</personname>
-									</person>
-								</para>
-							</listitem>
-							<listitem>
-								<para>
-									<person>
-										<personname>
 											<surname>Feng</surname>
 											<firstname>Yu</firstname>
-										</personname>
-									</person>
-								</para>
-							</listitem>
-							<listitem>
-								<para>
-									<person>
-										<personname>
-											<surname>Filali</surname>
-											<firstname>Imen</firstname>
-										</personname>
-									</person>
-								</para>
-							</listitem>
-							<listitem>
-								<para>
-									<person>
-										<personname>
-											<surname>Fontenoy</surname>
-											<firstname>Fabrice</firstname>
 										</personname>
 									</person>
 								</para>
@@ -181,48 +161,8 @@
 								<para>
 									<person>
 										<personname>
-											<surname>Isnard</surname>
-											<firstname>Elaine</firstname>
-										</personname>
-									</person>
-								</para>
-							</listitem>
-							<listitem>
-								<para>
-									<person>
-										<personname>
-											<surname>Jureschi</surname>
-											<firstname>Vasile</firstname>
-										</personname>
-									</person>
-								</para>
-							</listitem>
-							<listitem>
-								<para>
-									<person>
-										<personname>
 											<surname>Madelaine</surname>
 											<firstname>Eric</firstname>
-										</personname>
-									</person>
-								</para>
-							</listitem>
-							<listitem>
-								<para>
-									<person>
-										<personname>
-											<surname>Mathias</surname>
-											<firstname>Elton</firstname>
-										</personname>
-									</person>
-								</para>
-							</listitem>
-							<listitem>
-								<para>
-									<person>
-										<personname>
-											<surname>Naoumenko</surname>
-											<firstname>Paul</firstname>
 										</personname>
 									</person>
 								</para>
@@ -281,6 +221,16 @@
 								<para>
 									<person>
 										<personname>
+											<firstname>Mathieu</firstname>
+											<surname>Schnoor</surname>
+										</personname>
+									</person>
+								</para>
+							</listitem>
+							<listitem>
+								<para>
+									<person>
+										<personname>
 											<surname>Smirnov</surname>
 											<firstname>Oleg</firstname>
 										</personname>
@@ -296,14 +246,6 @@
 										</personname>
 									</person>
 								</para>
-							</listitem>
-							<listitem>
-							  <para>
-								<person><personname>
-								  <firstname>Muhammad</firstname>
-								  <surname>Khan</surname>
-								</personname></person>
-							  </para>
 							</listitem>
 							<listitem>
 								<para>
@@ -396,48 +338,8 @@
 								<para>
 									<person>
 										<personname>
-											<firstname>Olivier</firstname>
-											<surname>Helin</surname>
-										</personname>
-									</person>
-								</para>
-							</listitem>
-							<listitem>
-								<para>
-									<person>
-										<personname>
-											<firstname>Maxime</firstname>
-											<surname>Menant</surname>
-										</personname>
-									</person>
-								</para>
-							</listitem>
-							<listitem>
-								<para>
-									<person>
-										<personname>
 											<firstname>Jean-Michel</firstname>
 											<surname>Guillaume</surname>
-										</personname>
-									</person>
-								</para>
-							</listitem>
-							<listitem>
-								<para>
-									<person>
-										<personname>
-											<firstname>Mathieu</firstname>
-											<surname>Schnoor</surname>
-										</personname>
-									</person>
-								</para>
-							</listitem>
-							<listitem>
-								<para>
-									<person>
-										<personname>
-											<firstname>Arnaud</firstname>
-											<surname>Gastinel</surname>
 										</personname>
 									</person>
 								</para>
