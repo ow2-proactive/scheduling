@@ -53,8 +53,10 @@ if [ "$passw" == "" ]; then
     # Note that tmp is still used fo return value
     # export >> $tmp;
     
+    OLD_UMASK=`umask`
+    umask 0177
     keyfile=`mktemp`
-    chmod 400 $keyfile
+    umask $OLD_UMASK
     echo "$keycont" > $keyfile
 
     for i in "$@" 
