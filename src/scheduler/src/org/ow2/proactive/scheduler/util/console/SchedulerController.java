@@ -471,7 +471,8 @@ public class SchedulerController {
         opt.setArgName("username");
         actionGroup.addOption(opt);
 
-        opt = new Option("rp", "reloadpermissions", false, control + "Reloads the permission file");
+        opt = new Option("rc", "reloadconfig", false, control +
+            "Reloads the scheduler permission policy and log4j config");
         opt.setRequired(false);
         opt.setArgs(0);
         actionGroup.addOption(opt);
@@ -620,8 +621,8 @@ public class SchedulerController {
             model.showMyAccount_();
         } else if (cmd.hasOption("ua")) {
             model.showAccount_(cmd.getOptionValue("ua"));
-        } else if (cmd.hasOption("rp")) {
-            model.refreshPermissionPolicy_();
+        } else if (cmd.hasOption("rc")) {
+            model.reloadConfig_();
         } else if (cmd.hasOption("script")) {
             model.execWithParam_(cmd.getOptionValues("script"));
         } else if (cmd.hasOption("test")) {
