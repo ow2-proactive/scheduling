@@ -52,10 +52,7 @@ rmURL maxNodes serviceUrl userName password trustStore trustStorePassword javaPa
 			<emphasis>Infrastructure manager</emphasis> is responsible for communicating with an infrastructure.
 			When a new node has to be deployed, an infrastructure manager will launch new JVM or just
 			request an already existing nodes running somewhere. All these details are specific to the
-			infrastructure manager implementation. ProActive library already has its own mechanism for
-			deployment called <link xlink:href="http://proactive.inria.fr/trunk/Programming/ReferenceManual/multiple_html/GCMDeployment.html">
-			ProActive Grid Component Model Deployment</link> and the resource manager reuses this framework
-			adding another flexible mechanism to perform deployment.
+			infrastructure manager implementation.
 		</para>
 
 		<warning><para>
@@ -162,247 +159,29 @@ rmURL maxNodes serviceUrl userName password trustStore trustStorePassword javaPa
 				</listitem>
 			</itemizedlist>
 		</section>
-		<section xml:id="RM_GCM"><info><title>GCM infrastructure</title></info>
-			<para>
-				<emphasis>GCM infrastructure manager</emphasis> is able to deploy nodes on the
-				infrastructure described in GCM deployment descriptor.
-				It supports only "deploy all" / "remove all" operations
-				and cannot deploy a single node (due to GCMD limitations)
-				and as a consequence cannot be used with some policies. Here is an example of such a node source
-				creation:
-			</para>
-			<screen>$RM_HOME>./bin/unix/rm-client --createns gcmdns -infrastructure org.ow2.proactive.resourcemanager.nodesource.infrastructure.GCMInfrastructure rmURL config/rm/deployment/Local4JVMDeployment.xml</screen>
-
-			<para>The 2 arguments that have to be provided to this infrastructure are the following:</para>
-			<itemizedlist>
-				<listitem>
-					<para><emphasis role="bold">rmURL</emphasis> - the URL of the resource manager.</para>
-				</listitem>
-				<listitem>
-					<para><emphasis role="bold">descriptor</emphasis> - path to a GCM Deployment descriptor file.</para>
-				</listitem>
-			</itemizedlist>
-
-			<para>
-			    ProActive Resource Manager relies on GCM Deployment standard to deploy computing nodes.
-				GCM standard implies that an application could be deployed anywhere without changing the source code.
-				For instance, You can use various protocols such as rsh, ssh, Globus, LSF, etc. for the creation
-				of the JVMs needed by the application. 
-			    This section presents the main concepts of the GCM deployment mechanism, namely, how to write GCM Deployment descriptors
-			    and how to use it with Resource Manager. If you want more details about the GCM Deployment, please refer to
-				<link xlink:href="http://proactive.inria.fr/trunk/Programming/ReferenceManual/multiple_html/GCMDeployment.html">Chapter 14: ProActive grid Component Model Deployment</link>
-				of the ProActive Programming manual.
-			</para>
-
-				<section xml:id="RM_GCM_concepts"><info><title>Main concepts</title></info>
-					<section xml:id="RM_GCMA_GCMD"><info><title>GCM Application descriptor and GCM Deployment descriptor</title></info>
-						<para>
-							GCM Deployment procedure is described in two XML files:
-								<itemizedlist>
-									<listitem>
-									<para>
-										<emphasis>GCM Application Descriptor</emphasis> (GCMA) - defines the application to deploy. It
-										 can be, for example, a native C/C++ application or a Java application. Any batch application can also be deployed with GCM.
-										</para>
-									</listitem>
-									<listitem>
-									<para>
-										<emphasis> GCM Deployment Descriptor</emphasis> (GCMD) - describes where and how the application will be launched (deployed).
-										This part defines host names that will run the application, the way (protocol) to access to these computers (ssh, rsh...),
-										protocol-specific parameters to access to the host, file path to access to specified libraries regarding the host, etc.
-										</para>
-									</listitem>
-								</itemizedlist>
-						</para>
-						<para>
-						In the case of Resource Manager, GCMA always defines deployments of Proactive nodes. The only part an administrator has to define is
-						the GCM deployment descriptor which contains a description of computers infrastructure.
-						</para>
-					</section>
-					<section xml:id="RM_virtual_nodes"><info><title>Virtual Node</title></info>
-						<para>
-						GCM deployment and ProActve are built around the concept of virtual nodes which is
-						an application level abstraction. At runtime, a virtual node will be mapped into one or several real nodes
-						but an application does not really need to know that. The mapping is performed according to GCM deployment descriptor.
-						</para>
-					</section>
-				</section>
-				<section xml:id="RM_GCMA"><info><title>Use default GCM Application descriptor</title></info>
-					<para>
-					As said before, the application deployed by Resource Manager on remote computers is a ProActive node,
-					i.e. a Java virtual machine with a ProActive Node (a ProActive node is a kind of container for ProActive applications),
-					that will be provided to an application to be deployed on it or a scheduler to deploy tasks on it.
-					So, a GCM Application descriptor is always the same and there is no need to change it. It is not mandatory to explore deeply the GCMA definition
-					for using GCM deployment with ProActive Resource manager.
-					The following GCMA is defined in the <emphasis>GCMNodeSourceApplication.xml</emphasis> file,
-					stored in <emphasis>config/rm/deployment</emphasis> directory.
-					</para>
-					<programlisting language="xml"><textobject><textdata fileref="code_snippets/deployment/gcma.xml"/></textobject></programlisting>
-					<para>
-					Let us explain the different tags:
-					</para>
-					<itemizedlist>
-						<listitem>
-							<para><emphasis>environment tag</emphasis> - defines variables.
-							This is a way to define variables that can be reused throughout the descriptor.
-							Inside this tag, each variable can be reused (even in another following variable definition)
-							by using the syntax ${name_of_variable}. The previous GCMA uses a <emphasis>JavaPropertyVariable</emphasis> variable named proactive.home.
-							This kind of variable is therefore a Java Property variable, so not directly defined in the descriptor, but defined by
-							the ProActive application that will use this file. The Java property proactive.home corresponds to the home directory of the ProActive application
-							using this descriptor. Every ProActive application has this Java property variable defined.
-							In this case, ProActive home directory corresponds to the home directory of Resource Manager Application
-							(path in your file system where Resource Manager is stored). When Resource Manager performs parsing
-							of this GCMApplication file, it replaces ${proactive.home} strings by Resource Manager home directory.
-							If you want more information concerning definitions of variables in descriptors, see in ProActive Manual
-							<link xlink:href="http://proactive.inria.fr/trunk/Programming/ReferenceManual/multiple_html/VariableContract.html">Chapter 18: Variable Contracts for Descriptors</link>.</para>
-						</listitem>
-						<listitem>
-							<para><emphasis>application</emphasis> - the main tag in a GCMApplication descriptor, it describes the application to deploy.</para>
-						</listitem>
-						<listitem>
-							<para><emphasis>proactive</emphasis> - the application to deploy is then a ProActive application. The attributes <emphasis>base</emphasis>
-							and <emphasis>relpath</emphasis> define the ProActive home directory of the ProActive application that will be launched on a remote host, i.e.
-							path in the file system to the remote host where ProActive is stored.
-							Here, the path of application to launch is built from the root of the file system and the path corresponds
-							to the environment variable ${proactive.home} defined above. So, ProActive home directory of the application to launch on remote hosts
-							is the same as the Resource Manager path (this path can be overridden in GCMDeployment file).</para>
-						</listitem>
-						<listitem>
-							<para><emphasis>configuration</emphasis> - defines configuration of ProActive application to launch. Here,
-								the Java classpath of the JVM, that will be launched on a remote host, is defined. In the tag <emphasis>applicationClassPath</emphasis>,
-								for each tag <emphasis>pathElement</emphasis> that defines the path to a jar file, this path will be added to the classpath.
-								Thus, the paths to <emphasis role="italics">ProActive_Scheduler-worker.jar</emphasis> and <emphasis role="italics">ProActive_resourcemanager.jar</emphasis> will be added to the classpath of the JVM to deploy.
-								These two paths are built from the <emphasis>base</emphasis> attribute set to 'proactive', that corresponds
-								to the ProActive home directory of the deployed application in a remote host (not the ProActive home directory of the Resource Manager that performs
-								the deployment), suffixed with the attribute <emphasis>relpath</emphasis> that points towards the <literal>dist/lib</literal> directory.
-							</para>
-							<note>
-								<para>
-									It is not necessary to add the <emphasis role="italics">ProActive_Scheduler-worker.jar</emphasis> file when you do not want to use the ProActive Scheduler on top of
-									the Resource Manager. However, including this jar allows you to always have the same GCMA descriptor which is quite convenient.
-								</para>
-							</note>
-						</listitem>
-						<listitem><para><emphasis>virtualNode</emphasis> - this tag is used both by Resource Manager that performs deployment and deployed nodes.
-						It defines a virtual node, with an id, that represents a set of nodes to deploy.
-						For this virtual node, a <emphasis>nodeProvider</emphasis>, doing the association with a GCM Deployment descriptor, is defined. Basically,
-						Resource Manager deploys all virtual nodes defined in this GCMA.</para>
-						</listitem>
-						<listitem><para><emphasis>resources</emphasis> - defines resources that must be acquired, i.e. defines association between a node Provider and a GCMDeployment file.
-						You can see that the file path of the nodeProvider 'worker' does not look like a valid file path. The variable <emphasis>gcmd.file</emphasis>
-						is automatically replaced by a path of a GCM Deployment descriptor that Administrator has asked to deploy. This line has not to be modified.</para>
-						</listitem>
-					</itemizedlist>
-					<para>
-					To sum up, this GCM application descriptor defines a ProActive application to deploy where there is one virtual node defined, called workers,
-					and this virtual node will be mapped to real nodes, according to a GCM Deployment files that an administrator has defined and asked to deploy.
-					</para>
-				</section>
-				<section xml:id="RM_GCMD"><info><title>Define GCM deployment descriptors</title></info>
-					<para>
-					Defining the GCM deployment files is the most important part of the Resource Manager administration since it is the way to aggregate
-					all the computing resources of your infrastructure and to add them to Resource Manager. This part presents the deployment made
-					by default, on the local machine. Then, you will see how to deploy nodes using <emphasis>ssh</emphasis> protocol.
-					This chapter is not an exhaustive presentation of GCM Deployment descriptors.  It is recommended to refer to the
-					<link xlink:href="http://proactive.inria.fr/trunk/Programming/ReferenceManual/multiple_html/GCMDeployment.html">Chapter 14: ProActive grid Component Model Deployment</link>
-					of the ProActive manual.
-					</para>
-					<section xml:id="RM_GCMD_default"><info><title>Deployment of nodes on a local machine</title></info>
-						<para>
-						If you use the <literal>-ln</literal> options, Resource Manager deploys 4 ProActive nodes on the local machine. This deployment is performed by the GCM deployment descriptor
-						<emphasis>Local4JVMDeployment[os].xml</emphasis>, stored in <emphasis>config/rm/deployment</emphasis> directory:
-						</para>
-						<programlisting language="xml"><textobject><textdata fileref="code_snippets/deployment/gcmdLocal.xml"/></textobject></programlisting>
-						<para>
-							<itemizedlist>
-								<listitem><para><emphasis>environment</emphasis> - in the same way as in the GCMA, this tag defines variables that can be
-								reused in the GCMD. A Java Property variable is defined, which is called 'user.home', that will be used later.</para>
-								</listitem>
-								<listitem><para><emphasis>resources</emphasis> - describes the hierarchical structure of the available grid resources,
-								targets of deployment, and 'network route' to reach them.
-								This can be seen as the topology of the grid: which hosts are part of a group? Which group is behind a bridge? ...
-								Here, a host is defined directly in resource tag (without including it in a bridge or a group). Thus, this host
-								is the local host.
-								In this GCMD, one host is defined and it refers to the id <emphasis role="italics">'hLocalhost'</emphasis>. This reference Id points to a host definition in
-								the infrastructure part.</para>
-								</listitem>
-								<listitem><para><emphasis>infrastructure</emphasis> - lists the grid resources on which the deployment can take place,
-								in no particular order. Its purpose is to describe how these resources are deployed (i.e. through which protocols).
-								In the case of a local deployment, only one resource is defined, i.e. one host. Inside the tag <emphasis>hosts</emphasis>,
-								a <emphasis>host</emphasis> with an id (that is used by the resource part defined above) is inserted.
-								For this host, <emphasis>os</emphasis> attribute defines its os type, <emphasis>hostCapacity</emphasis> attribute defines the number of
-								JVMs that can be deployed on it and <emphasis>VMCapacity</emphasis> defines the number of ProActive nodes to be created per JVM.
-								Here the host capacity is four and VM capacity is one, so we deploy 4 Java virtual machines, with one computing Node in each one.
-								As for <emphasis>homeDirectory</emphasis>, it defines the path in remote host from where the program will be launched. In this case,
-								the JVM  will be launched from the ${user.home} variable, that corresponds to resource Manager's user.home Java property.</para>
-								</listitem>
-							</itemizedlist>
-						</para>
-					</section>
-					<section xml:id="RM_GCMD_ssh"><info><title>Deployment of nodes with ssh</title></info>
-						<para>
-						This section presents a way to deploy computing nodes on remote hosts, thanks to the ssh protocol. You can use this
-						kind of deployment if you can perform connection through ssh between different hosts of your infrastructure.
-						For using ssh with GCM, it is mandatory that your ssh connections do not need any password typing or key passphrase typing
-						for authentication.
-						</para>
-						<para>
-						You can use as a template, the file <emphasis>deployment_ssh_host_list.xml</emphasis> in the <emphasis>config/rm/deployment</emphasis> directory:
-						</para>
-						<programlisting language="xml"><textobject><textdata fileref="code_snippets/deployment/gcmd_ssh.xml"/></textobject></programlisting>
-						<para>
-							<itemizedlist>
-							<listitem><para>
-							First, a descriptor variable named <emphasis>HOSTS</emphasis> that contains a list of host names
-							(targets of the deployment) is defined. Replace 'host1 host2 host3' by a list of hosts in your
-							infrastructure that can be reached through ssh (separated by spaces).</para>
-							</listitem>
-							<listitem><para>
-							In the <emphasis>resources</emphasis> tag, the group of machines reachable by ssh, that refers to ID
-							'remoteThroughSSH', is defined. This group is more deeply described into the infrastructure tag. It contains hosts that have the
-							ID 'host' (this kind of host is defined in infrastructure part too).</para>
-							</listitem>
-							<listitem><para>
-							In the <emphasis>infrastructure</emphasis> tag, the host for the ID 'host' is defined.
-							it is a unix host with a capacity of one (only one application can be run on it), and the JVM (effective application)
-							of this node can handle one ProActive node. The application is started from the 'user.dir' descriptor environment variable.
-							The 'remoteThroughSSH' group is then described.
-							The <emphasis>sshGroup</emphasis> indicates that hosts contained in the host list <emphasis>${HOSTS}</emphasis> (variable defined into the <emphasis>environment</emphasis> tag) are reachable through the ssh protocol.
-							</para>
-							</listitem>
-							</itemizedlist>
-						</para>
-					</section>
-					<section xml:id="RM_launch_with_gcmd"><info><title>Launch Resource Manager with your specific deployment descriptor</title></info>
-						<para>
-						To start the Resource Manager with your own GCM deployment descriptor, run the <emphasis>rm-start[.bat]</emphasis>
-						script in <literal>'bin/[os]/'</literal> directory and put in paramter the path of your GCM Deployment file. If you want to deploy Resource Manager
-						with the <literal>deployment_ssh_host_list.xml</literal> file defined above, type in the <literal>'bin/[os]/'</literal>1 directory:
-						<screen>rm-start -d ../../config/rm/deployment/deployment_ssh_host_list.xml</screen>
-						</para>
-						<para>
-						Resource Manager starts and deploys computing nodes on hosts defined in the GCM deployment file. You can put in parameters of this
-						command several deployment descriptors. Resource Manager automatically associates GCMD files in parameters with the GCMA
-						<emphasis>GCMNodeSourceApplication.xml</emphasis>, stored in <emphasis>config/rm/deployment</emphasis> directory.
-						</para>
-					</section>
-					<section xml:id="RM_launch_with_gcmd_custom_path"><info><title>Customize in GCMD resource Manager Path and Java path of your
-					remote hosts</title></info>
-						<para>
-						In the previous example, we assumed that Java command on remote hosts is automatically reachable (i.e. is in the $PATH),
-						and that ProActive libraries on remote hosts are stored in the same path in file system than for Resource Manager. However, it is not always the case.
-						To face this problem, you can define these
-						paths specifically for each computing resource. These paths can be different from resource manager, and even be different between hosts
-						on which you want to perform the deployment.
-						</para>
-						<para>
-						To illustrate this aspect, a new GCM Deployment file that deploys two computing nodes on hosts named
-						'computer1' and 'computer2', where Java executable is not installed in the same paths for the two hosts, is defined. Look at the
-						<emphasis>deployment_ssh.xml</emphasis> descriptor in the <emphasis>config/rm/deployment</emphasis> directory:
-						</para>
-						<programlisting language="xml"><textobject><textdata fileref="code_snippets/deployment/gcmd_custom.xml"/></textobject></programlisting>
-					</section>
-				</section>
+		<section xml:id="LOCAL_im"><info><title>Local infrastructure</title></info>
+				<para>
+					<emphasis>Local Infrastructure Manager</emphasis> can be used to start nodes locally, i.e,
+					on the host running the Resource Manager. In order to create a node source with this infrastructure, run the following command:
+					<screen>$RM_HOME>./bin/unix/rm-client --createns localns -infrastructure org.ow2.proactive.resourcemanager.nodesource.infrastructure.LocalInfrastructure RMUrl credentialsPath numberOfNodes timeout javaProperties </screen>
+				</para>
+				<itemizedlist>
+					<listitem>
+						<para><emphasis>RMUrl</emphasis> - Url of the resource manager server (can leave it empty to use default value, i.e, the url of the resource manager you connect to)</para>
+					</listitem>
+					<listitem>
+						<para><emphasis>credentialsPath</emphasis> - The absolute path of the credentials file used to set the provider of the nodes.</para>
+					</listitem>
+					<listitem>
+						<para><emphasis>numberOfNodes</emphasis> - The number of nodes to deploy.</para>
+					</listitem>
+					<listitem>
+						<para><emphasis>timeout</emphasis> - The length in ms after which one a node is not expected anymore.</para>
+					</listitem>
+					<listitem>
+						<para><emphasis>javaProperties</emphasis> - The java properties to setup the ProActive environment for the nodes</para>
+					</listitem>
+				</itemizedlist>
 		</section>
 		<section xml:id="GCM_customized"><info><title>GCM customized infrastructure</title></info>
 				<para>
@@ -615,11 +394,61 @@ test.example.net 5
 		<!-- AMAZON EC2 section -->
 		&EC2;
 
+		<section xml:id="LSF"><info><title>Load Sharing Facility (LSF) infrastructure</title></info>
+				<para>
+				This infrastructure knows how to acquire nodes from LSF by submitting a corresponding job.
+				It will be submitted through SSH from the RM to the LSF server. As an alternative, you may consider
+				using <link linkend="GCM_customized">the GCM Customized infrastructure</link> instead,
+				which provides more control over the deployment, but requires more configuration.
+				</para>
+				<screen>$RM_HOME>./bin/unix/rm-client --createns lsf -infrastructure org.ow2.proactive.resourcemanager.nodesource.infrastructure.LSFInfrastructure rmURL javaPath sshOptions schedulingPath javaOptions maxNodes nodeTimeout LSFServer RMCredentialsPath bsubOptions</screen>
+				<para>where:</para>
+			    <itemizedlist>
+			      <listitem><para>
+				  <emphasis role="bold">RMUrl</emphasis> - URL of the Resource Manager from the LSF nodes point of view -
+				  this is the URL the nodes will try to lookup when attempting to register to the RM after their creation.
+			      </para></listitem>
+			      <listitem><para>
+				  <emphasis role="bold">javaPath</emphasis> - path to the java executable on the remote hosts (ie the LSF slaves).
+			      </para></listitem>
+				  <listitem><para>
+				  <emphasis role="bold">SSH Options</emphasis> - Options you can pass to the SSHClient executable ( -l inria to specify the user for instance )
+				  </para></listitem>
+			      <listitem><para>
+				  <emphasis role="bold">schedulingPath</emphasis> - path to the Scheduling/RM installation directory on the remote hosts.
+			      </para></listitem>
+			      <listitem><para>
+				  <emphasis role="bold">javaOptions</emphasis> - Java options appended to the command used to start the node
+				  on the remote host.
+			      </para></listitem>
+			      <listitem><para>
+				  <emphasis role="bold">maxNodes</emphasis> - maximum number of nodes this infrastructure can simultaneously hold from the LSF server.
+				  That is useful considering that LSF does not provide a mechanism to evaluate the number of currently available or idle cores on the cluster.
+				  This can result to asking more resources than physically available, and waiting for the resources to come up for a very long time
+				  as the request would be queued until satisfiable.
+			      </para></listitem>
+				  <listitem><para>
+				  <emphasis role="bold">Node Time Out</emphasis> - The length in ms after which one a node is not expected anymore.
+				  </para></listitem>
+			      <listitem><para>
+				  <emphasis role="bold">Server Name</emphasis> - URL of the LSF server, which is responsible for acquiring LSF nodes.
+				  This server will be contacted by the Resource Manager through an SSH connection.
+			      </para></listitem>
+			      <listitem><para>
+				  <emphasis role="bold">RM Credentials Path</emphasis> - Encrypted credentials file, as created by the create-cred[.bat] utility.
+				  These credentials will be used by the nodes to authenticate on the Resource Manager.
+			      </para></listitem>
+			      <listitem><para>
+				  <emphasis role="bold">Submit Job Opt</emphasis> - Options for the bsub command client when acquiring nodes on the LSF master.
+				  Default value should be enough in most cases, if not, refer to the documentation of the LSF cluster.
+			      </para></listitem>
+			    </itemizedlist>
+		</section>
 		<section xml:id="PBS"><info><title>Portable Batch System (PBS) infrastructure</title></info>
 				<para>
 				This infrastructure knows how to acquire nodes from PBS (i.e. Torque) by submitting
 				a corresponding job. It will be submitted through SSH from the RM to the PBS server.
-				As an alternative, you may consider using <link linkend="RM_GCM">the GCM infrastructure</link>
+				As an alternative, you may consider using <link linkend="GCM_customized">the GCM Customized infrastructure</link>
 				instead, which provides more control over the deployment, but requires more configuration.
 				</para>
 				<screen>$RM_HOME>./bin/unix/rm-client --createns pbs -infrastructure org.ow2.proactive.resourcemanager.nodesource.infrastructure.PBSInfrastructure rmURL javaPath sshOptions schedulingPath javaOptions maxNodes nodeTimeout PBSServer RMCredentialsPath qsubOptions</screen>
@@ -662,6 +491,57 @@ test.example.net 5
 			      <listitem><para>
 				  <emphasis role="bold">Submit Job Opt</emphasis> - Options for the qsub command client when acquiring nodes on the PBS master.
 				  Default value should be enough in most cases, if not, refer to the documentation of the PBS cluster.
+			      </para></listitem>
+			    </itemizedlist>
+		</section>
+		<section xml:id="GENERIC_IM"><info><title>Generic Batch Job infrastructure</title></info>
+				<para>
+					<emphasis>Generic Batch Job infrastructure</emphasis> provides users with the capability to add the support of new batch job scheduler by providing a class extending
+					org.ow2.proactive.resourcemanager.nodesource.infrastructure.BatchJobInfrastructure. Once you have written that implementation, you can create a node source which makes usage
+					of this infrastructure by running the following command:
+				</para>
+				<screen>$RM_HOME>./bin/unix/rm-client --createns pbs -infrastructure org.ow2.proactive.resourcemanager.nodesource.infrastructure.GenericBatchJobInfrastructure rmURL javaPath sshOptions schedulingPath javaOptions maxNodes nodeTimeout BatchJobServer RMCredentialsPath subOptions implementationName implementationPath</screen>
+				<para>where:</para>
+			    <itemizedlist>
+			      <listitem><para>
+				  <emphasis role="bold">RMUrl</emphasis> - URL of the Resource Manager from the batch job scheduler nodes point of view -
+				  this is the URL the nodes will try to lookup when attempting to register to the RM after their creation.
+			      </para></listitem>
+			      <listitem><para>
+				  <emphasis role="bold">javaPath</emphasis> - path to the java executable on the remote hosts (ie the slaves of the batch job scheduler).
+			      </para></listitem>
+				  <listitem><para>
+				  <emphasis role="bold">SSH Options</emphasis> - Options you can pass to the SSHClient executable ( -l inria to specify the user for instance )
+				  </para></listitem>
+			      <listitem><para>
+				  <emphasis role="bold">schedulingPath</emphasis> - path to the Scheduling/RM installation directory on the remote hosts.
+			      </para></listitem>
+			      <listitem><para>
+				  <emphasis role="bold">javaOptions</emphasis> - Java options appended to the command used to start the node on the remote host.
+			      </para></listitem>
+			      <listitem><para>
+				  <emphasis role="bold">maxNodes</emphasis> - maximum number of nodes this infrastructure can simultaneously hold from the batch job scheduler server.
+			      </para></listitem>
+				  <listitem><para>
+				  <emphasis role="bold">Node Time Out</emphasis> - The length in ms after which one a node is not expected anymore.
+				  </para></listitem>
+			      <listitem><para>
+				  <emphasis role="bold">Server Name</emphasis> - URL of the batch job scheduler server, which is responsible for acquiring nodes.
+				  This server will be contacted by the Resource Manager through an SSH connection.
+			      </para></listitem>
+			      <listitem><para>
+				  <emphasis role="bold">RM Credentials Path</emphasis> - Encrypted credentials file, as created by the create-cred[.bat] utility.
+				  These credentials will be used by the nodes to authenticate on the Resource Manager.
+			      </para></listitem>
+			      <listitem><para>
+				  <emphasis role="bold">Submit Job Opt</emphasis> - Options for the submit command client when acquiring nodes on the batch job scheduler master.
+			      </para></listitem>
+			      <listitem><para>
+				  <emphasis role="bold">implementationName</emphasis> - Fully qualified name of the implementation of org.ow2.proactive.resourcemanager.nodesource.infrastructure.BatchJobInfrastructure
+				  provided by the end user.
+			      </para></listitem>
+			      <listitem><para>
+				  <emphasis role="bold">implementationPath</emphasis> - The absolute path of the implementation of org.ow2.proactive.resourcemanager.nodesource.infrastructure.BatchJobInfrastructure.
 			      </para></listitem>
 			    </itemizedlist>
 		</section>

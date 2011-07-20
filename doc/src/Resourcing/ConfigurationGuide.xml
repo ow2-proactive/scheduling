@@ -62,7 +62,7 @@
 				path of default GCM Application descriptor, used for nodes deployments in GCM based node sources.
 				If this file path is a relative, path is evaluated from the resource manager directory
 				(variable <emphasis role="italics">pa.rm.home</emphasis>), otherwise path is directly interpreted.
-				See <xref linkend="RM_GCM"/> part.
+				See <xref linkend="GCM_customized"/> part.
 				Default is <emphasis role="italics">config/rm/deployment/GCMNodeSourceApplication.xml</emphasis>.
 			</para>
 		</listitem>
@@ -70,7 +70,7 @@
 			<para>
 				<emphasis>pa.rm.gcmd.path.property.name</emphasis>:
 				string in the default GCM application that will be replaced by a path to a GCM deployment descriptor.
-				See <xref linkend="RM_GCM"/> part.
+				See <xref linkend="GCM_customized"/> part.
 				Default is <emphasis role="italics">gcmd.file</emphasis>.
 			</para>
 		</listitem>
