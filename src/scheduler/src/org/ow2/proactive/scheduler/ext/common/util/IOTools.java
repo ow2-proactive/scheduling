@@ -394,9 +394,13 @@ public class IOTools {
 
             try {
                 brout.close();
+
+            } catch (IOException e) {
+                // SCHEDULING-1296 not necessary to print the Exception but we need two try catch blocks
+            }
+            try {
                 brerr.close();
             } catch (IOException e) {
-                e.printStackTrace();
             }
         }
 
