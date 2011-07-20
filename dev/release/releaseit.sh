@@ -112,8 +112,8 @@ mv /tmp/ProActiveResourcing-${SPECIAL_NAME}_server.tar.gz $OUTPUT_DIRECTORY
 mv /tmp/ProActiveResourcing-${SPECIAL_NAME}_server.zip $OUTPUT_DIRECTORY
 mv /tmp/ProActiveScheduling-${SPECIAL_NAME}_server.tar.gz $OUTPUT_DIRECTORY
 mv /tmp/ProActiveScheduling-${SPECIAL_NAME}_server.zip $OUTPUT_DIRECTORY
-mv /tmp/ProActiveScheduling-${SPECIAL_NAME}_client-API*.tar.gz $OUTPUT_DIRECTORY                                                                                      (jlscheef@jily:/tmp)
-mv /tmp/ProActiveScheduling-${SPECIAL_NAME}_client-API*.zip $OUTPUT_DIRECTORY                                                                                      (jlscheef@jily:/tmp)
+mv /tmp/ProActiveScheduling-${SPECIAL_NAME}_client-API*.tar.gz $OUTPUT_DIRECTORY
+mv /tmp/ProActiveScheduling-${SPECIAL_NAME}_client-API*.zip $OUTPUT_DIRECTORY
 #change dir to dev/release
 echo "---------------> 4. Change directory to dev/release"
 cd dev/release;
@@ -121,14 +121,15 @@ cd dev/release;
 echo "---------------> 5. Update RCPs content"
 makeRCP_arch.sh /tmp/ProActiveScheduling-${SPECIAL_NAME}_server $RCPs_DIRECTORY ${VERSION} $OUTPUT_DIRECTORY
 #remove remaining temporary server directories
-echo "---------------> 6. Remove remaining temporary server directories ? y/n"
+echo "---------------> 6. Remove remaining temporary directories ? y/n"
 echo "                       /tmp/ProActiveResourcing-${SPECIAL_NAME}_server"
 echo "                       /tmp/ProActiveScheduling-${SPECIAL_NAME}_server"
+echo "                       /tmp/ProActiveScheduling-${SPECIAL_NAME}_client*"
 read answer
 #check answer, if 'y' -> remove
 if [ "$answer" == "y" ]
 then 
-    rm -rf /tmp/ProActiveScheduling-${SPECIAL_NAME}_server /tmp/ProActiveResourcing-${SPECIAL_NAME}_server
+    rm -rf /tmp/ProActiveScheduling-${SPECIAL_NAME}_server /tmp/ProActiveResourcing-${SPECIAL_NAME}_server /tmp/ProActiveScheduling-${SPECIAL_NAME}_client*
 fi
 echo "---------------> 7. End of release process"
 
