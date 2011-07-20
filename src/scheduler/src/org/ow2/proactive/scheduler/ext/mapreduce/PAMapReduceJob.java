@@ -162,25 +162,30 @@ public class PAMapReduceJob {
                 logger.debug("The path of the additional classpath folder is '" +
                     schedulerAdditionalClasspathFolder + "'");
 
-                File file = new File(schedulerAdditionalClasspathFolder);
-                String[] fileNameList = file.list(new FilenameFilter() {
-                    protected File file = null;
-
-                    @Override
-                    public boolean accept(File dir, String name) {
-                        file = new File(dir.getPath() + File.separator + name);
-                        if (file.isHidden()) {
-                            return false;
-                        }
-                        return true;
-                    }
-                });
                 ForkEnvironment forkEnvironment = new ForkEnvironment();
-                if ((fileNameList != null) && (fileNameList.length > 0)) {
-                    for (String fileName : fileNameList) {
-                        forkEnvironment.addAdditionalClasspath(schedulerAdditionalClasspathFolder + fileName);
+                /*
+                 * We must explicitly add the list of the jars the ProActive MapReduce API needs
+                 * and only them (not all the files that we may find inside the "$SCHEDULER_HOME/addons/" or
+                 * "$SCHEDULER_HOME/dist/lib/" folders)
+                 */
+                String jarNameListString = PAMapReduceFrameworkProperties
+                        .getPropertyAsString(PAMapReduceFrameworkProperties.MAP_REDUCE_JARS.key);
+                if (jarNameListString != null) {
+                    String[] jarNameList = jarNameListString.replaceAll("\\s+", " ").replaceAll("[,\\s]+",
+                            ",").split(",", 0);
+                    if (jarNameList.length > 0) {
+                        for (String jarName : jarNameList) {
+                            forkEnvironment.addAdditionalClasspath(schedulerAdditionalClasspathFolder +
+                                jarName);
+                            logger.debug("Adding the following jar to the classpath '" +
+                                schedulerAdditionalClasspathFolder + jarName + "'");
+                        }
                     }
                 }
+
+                /*
+                 * Specify the parameter for the forked environment
+                 */
                 String[] jvmArgumentArray = paMapReduceJobConfiguration.getJVMArguments();
                 if (jvmArgumentArray != null) {
                     for (int i = 0; i < jvmArgumentArray.length; i++) {
