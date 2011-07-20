@@ -89,5 +89,6 @@
         <include name="common/**/*.jar" />
         <include name="nodesource/**/*.jar" />
 		<include name="matsci/**/*.jar"/>
+		<include name="mapreduce/**/*.jar"/>
     </fileset>
 </project>

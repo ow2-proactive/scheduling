@@ -118,7 +118,6 @@
             <fileset dir="${cl.scheduler.dir}" includes="org/ow2/proactive/scheduler/ext/matsci/**" />
 			<fileset dir="${cl.scheduler.dir}" includes="org/ow2/proactive/scheduler/ext/matlab/**" />
 			<fileset dir="${cl.scheduler.dir}" includes="org/ow2/proactive/scheduler/ext/scilab/**" />
-
 			<indexjars>
 				<fileset refid="jar.index.fileset" />
 			</indexjars>
@@ -128,7 +127,7 @@
 
 <!-- start of the ant target to create the ProActive_Scheduler-mapreduce.jar -->
 	<target name="deploy.scheduler.mapreduce" depends="-deployCopy, compile.scheduler.mapreduce, deploy.common.client" description="Creates scheduler mapreduce jar">
-		<jar destfile="${deploy.lib.dir}/${scheduler.mapreduce.jar}" manifest="${basedir}/scheduler-Manifest-base.mf">
+		<jar destfile="${deploy.lib.dir}/${scheduler.mapreduce.jar}" manifest="${basedir}/scheduler-Manifest-base.mf" index="true">
 			<fileset dir="${cl.scheduler.dir}" includes="org/ow2/proactive/scheduler/ext/mapreduce/**" excludes="org/ow2/proactive/scheduler/ext/mapreduce/examples/**" />
 			<fileset dir="${base.dir}/samples/jobs_descriptors/Workflow/mapreduce/" includes="replicateMapperPATask.js" />
 			<fileset dir="${base.dir}/samples/jobs_descriptors/Workflow/mapreduce/" includes="replicateReducerPATask.js" />
@@ -143,7 +142,7 @@
 
 
 	<target name="deploy.scheduler.splitmerge" depends="-deployCopy, compile.scheduler, deploy.common.client" description="Creates scheduler file split/merge jar">
-		<jar destfile="${deploy.lib.dir}/${scheduler.fsm.jar}" manifest="${basedir}/scheduler-Manifest-base.mf">
+		<jar destfile="${deploy.lib.dir}/${scheduler.fsm.jar}" manifest="${basedir}/scheduler-Manifest-base.mf" index="true">
 			<fileset dir="${cl.scheduler.dir}" includes="org/ow2/proactive/scheduler/common/Main.class" />
 			<fileset dir="${cl.scheduler.dir}" includes="org/ow2/proactive/scheduler/ext/filessplitmerge/**" />
 			<indexjars>
