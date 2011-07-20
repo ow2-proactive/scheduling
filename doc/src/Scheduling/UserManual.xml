@@ -157,7 +157,6 @@ TaskFlowJob job = new TaskFlowJob();
 job.setName("job name");
 job.setPriority(JobPriority.NORMAL);
 job.setCancelJobOnError(false);
-job.setLogFile("path/to/a/log/file.log");
 job.setDescription("Job description");
 job.addGenericInformation("var1","val1");
 job.addGenericInformation("var2","val2");
@@ -1021,18 +1020,6 @@ task2.setGenerationScript(gscript);
 							</literal>,
 							such as automatic display of an image file, or automatic translation between
 							windows and unix path.
-						</para>
-					</listitem>
-					<listitem>
-						<para>
-							<emphasis>runAsMe</emphasis> (optional, default is false) -
-							specifify if your task must be executed under your user account or not.
-							If this property is set to 'true', the node on which it will be executed must be configured
-							to accept the fact you can executre a task in your own process. Ask your administrator
-							for more details about the behavior of the nodes.
-							This property also implies you have a valid system account on the execution targeted node machine and you have made your connection
-							to the scheduler using your system password and/or your ssh key if required by the node configuration.
-							See <xref linkend="Submit_a_job_java"/> for more details about job submission.
 						</para>
 					</listitem>
 					<listitem>
