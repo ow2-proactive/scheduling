@@ -213,6 +213,7 @@ public class ResourceManagerModel extends ConsoleModel {
             }
             print("");
         }
+        console.stop();
     }
 
     @Override
@@ -634,7 +635,6 @@ public class ResourceManagerModel extends ConsoleModel {
             } catch (Exception e) {
             }
             terminated = true;
-            console.stop();
         } else {
             console.print("Exit command has been disabled !");
         }
