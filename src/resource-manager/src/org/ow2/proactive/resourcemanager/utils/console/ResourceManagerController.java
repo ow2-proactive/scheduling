@@ -418,7 +418,8 @@ public class ResourceManagerController {
         acopt.setArgName("nodeURL");
         actionGroup.addOption(acopt);
 
-        acopt = new Option("rc", "reloadconfig", false, control + "Reload the resource manager configuration");
+        acopt = new Option("rc", "reloadconfig", false, control +
+            "Reloads the resource manager permission policy and log4j config");
         acopt.setRequired(false);
         acopt.setArgs(0);
         actionGroup.addOption(acopt);

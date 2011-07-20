@@ -153,8 +153,8 @@ function account(username){
 	s_.showAccount_(username);
 }
 
-function reloadpermissions(){
-	s_.refreshPermissionPolicy_();
+function reloadconfig(){
+	s_.reloadConfig_();
 }
 
 function test(){
