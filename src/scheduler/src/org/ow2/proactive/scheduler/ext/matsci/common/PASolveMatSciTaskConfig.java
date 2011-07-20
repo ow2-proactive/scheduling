@@ -38,6 +38,7 @@ package org.ow2.proactive.scheduler.ext.matsci.common;
 
 import java.io.Serializable;
 import java.net.URI;
+import java.util.ArrayList;
 
 
 /**
@@ -55,12 +56,12 @@ public class PASolveMatSciTaskConfig implements Serializable {
 
     private String[] outputFilesZipNames;
 
+    private ArrayList<String> sourceFileNames = new ArrayList<String>();
+
     /**
      * Name of source zip file
      */
     private String sourceZipFileName = null;
-
-    private String[] sourceNames;
 
     private String inputVariablesFileName = null;
 
@@ -286,12 +287,12 @@ public class PASolveMatSciTaskConfig implements Serializable {
         this.sourceZipFileName = sourceZipFileName;
     }
 
-    public void setSourceNames(String[] sourcesNames) {
-        this.sourceNames = sourcesNames;
+    public ArrayList<String> getSourceFileNames() {
+        return sourceFileNames;
     }
 
-    public String[] getSourceNames() {
-        return sourceNames;
+    public void addSourceFile(String src) {
+        sourceFileNames.add(src);
     }
 
 }
