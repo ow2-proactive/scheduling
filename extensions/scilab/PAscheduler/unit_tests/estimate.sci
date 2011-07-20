@@ -1,6 +1,4 @@
-function resf = estimate(i)
-  load('input.dat');
-  lambda = lambdas(i);
+function [bias,var] = estimate(lambda)  
   disp('Calculating estimate for lambda = '+string(lambda));
   rand("normal");      // Use normal distribution
   n = 60; m = 50;      // Size of dataset
@@ -26,10 +24,7 @@ function resf = estimate(i)
   var  = sqrt(b_sumsquares/ntimes - (b_sum/ntimes)^2);
   disp('Calculated bias = '+string(bias));
   disp('Calculated var = '+string(var));
-  res = list(bias,var);
-  save(strcat(['output', string(i), '.dat']), res);
-  resf=%t;
-  
+    
   //res(1) = bias;
   //res(2) = var;
 endfunction

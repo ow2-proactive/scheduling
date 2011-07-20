@@ -71,19 +71,19 @@ public class ScilabSolver {
 
     }
 
-    public static ArrayList<ScilabResultsAndLogs> solve(PASolveScilabGlobalConfig config,
-            PASolveScilabTaskConfig[][] taskConfigs) throws Throwable {
+    public static Pair<MatSciJobPermanentInfo, ArrayList<ScilabResultsAndLogs>> solve(
+            PASolveScilabGlobalConfig config, PASolveScilabTaskConfig[][] taskConfigs) throws Throwable {
         Pair<MatSciJobPermanentInfo, ArrayList<ScilabResultsAndLogs>> results = scilabSolver.solve(config,
                 taskConfigs);
         results = (Pair<MatSciJobPermanentInfo, ArrayList<ScilabResultsAndLogs>>) PAFuture
                 .getFutureValue(results);
-        ArrayList<ScilabResultsAndLogs> flist = results.getY();
-        ArrayList<ScilabResultsAndLogs> answer = new ArrayList<ScilabResultsAndLogs>();
-        for (ScilabResultsAndLogs resf : flist) {
-            ScilabResultsAndLogs res = PAFuture.getFutureValue(resf);
-            answer.add(res);
-        }
-        return answer;
+        //        ArrayList<ScilabResultsAndLogs> flist = results.getY();
+        //        ArrayList<ScilabResultsAndLogs> answer = new ArrayList<ScilabResultsAndLogs>();
+        //        for (ScilabResultsAndLogs resf : flist) {
+        //            ScilabResultsAndLogs res = PAFuture.getFutureValue(resf);
+        //            answer.add(res);
+        //        }
+        return results;
     }
 
     public static String getStackTrace(Throwable aThrowable) {

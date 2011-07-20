@@ -265,16 +265,6 @@ public abstract class MatSciTask<W extends MatSciWorker, C extends MatSciEngineC
                     System.err.println("Unable to unzip source file " + sourceZip);
                     throw new IllegalStateException("Unable to unzip source file " + sourceZip);
                 }
-            } else {
-                if (taskconfig.getSourceNames() != null) {
-                    String[] names = taskconfig.getSourceNames();
-                    URI[] sourceURIs = new URI[names.length];
-                    for (int i = 0; i < names.length; i++) {
-                        sourceURIs[i] = new URI(getLocalFile(paconfig.getTempSubDirName() + "/" + names[i])
-                                .getRealURI());
-                    }
-                    taskconfig.setSourcesFilesURIs(sourceURIs);
-                }
             }
         }
         if (paconfig.isTransferEnv()) {

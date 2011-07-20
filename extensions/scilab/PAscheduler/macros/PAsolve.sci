@@ -18,13 +18,18 @@ function outputs = PAsolve(varargin)
     deff ("y=ischar(x)","y=type(x)==10","n");
     if ischar(varargin(1)) then
         Func = varargin(1);
-        NN=length(varargin)-1;        
+        NN=length(varargin)-1; 
+        Tasks = PATask(1,NN);       
         Tasks(1,1:NN).Func = Func;
-        for i=1:NN            
-            Tasks(1,i).Params = varargin(i+1);
+        for i=1:NN      
+            if typeof(varargin(i+1)) == 'list'      
+                Tasks(1,i).Params =varargin(i+1);
+            else
+                Tasks(1,i).Params =list(varargin(i+1));
+            end
         end
         MM = 1;
-    elseif isstruct(varargin(1))
+    elseif typeof(varargin(1)) == 'PATask'
         if length(varargin) == 1
             Tasks = varargin(1);
             NN = size(Tasks,2);
@@ -33,19 +38,20 @@ function outputs = PAsolve(varargin)
             NN=nargin;
             MM = -1;
             for i=1:NN
-                if isstruct(varargin(i))
+                if typeof(varargin(i)) == 'PATask'
                     if (size(varargin(i),2) ~= 1)
                         error(strcat(['parameter ', string(i), ' should be a column vector.']));
                     end
                     sz = size(varargin(i),1);
                     if MM == -1
                         MM = sz;
+                        Tasks=PATask(MM,NN);
                     elseif MM ~= sz
                         error(strcat(['parameter ', string(i), ' should be a column vector of the same length than other parameters.']));
                     end
                     Tasks(1:sz,i) = varargin(i);
                 else
-                    error(strcat(['parameter ', num2str(i), ' is a ', typeof(varargin(i)), ', expected struct instead.']));
+                    error(strcat(['parameter ', num2str(i), ' is a ', typeof(varargin(i)), ', expected PATask instead.']));
                 end
             end
 
@@ -154,21 +160,23 @@ function outputs = PAsolve(varargin)
     variableInFileBaseName = ['ScilabPAsolveVarIn_' string(SOLVEid)];
     variableOutFileBaseName = ['ScilabPAsolveVarOut_' string(SOLVEid)];
     outVarFiles = list(NN);
-    tmpFiles = list();
+    //tmpFiles = list();
+    taskFilesToClean = list();
 
     task_configs = jarray('org.ow2.proactive.scheduler.ext.scilab.common.PASolveScilabTaskConfig', NN,MM);
     for i=1:NN
+        taskFilesToClean($+1)=list();
         for j=1:MM
             t_conf = jnewInstance(PASolveScilabTaskConfig);
             task_configs(i-1,j-1) = t_conf;
-            if isfield(Tasks(j,i), 'Description') then
+            if ~isempty(Tasks(j,i).Description) then
                 t_conf.setDescription(Tasks(j,i).Description);
             end
 
 
             // Input Files
-            if isfield(Tasks(j,i), 'InputFiles') then
-                ilen = size(Tasks(j,i).InputFiles,1);
+            if ~isempty(Tasks(j,i).InputFiles) then
+                ilen = length(Tasks(j,i).InputFiles);
                 if ilen > 0 then
                     inputFiles = jarray('java.lang.String', ilen);
                     filelist = Tasks(j,i).InputFiles;
@@ -183,9 +191,9 @@ function outputs = PAsolve(varargin)
             end
 
             // Output Files
-            if isfield(Tasks(j,i), 'OutputFiles') then
+            if ~isempty(Tasks(j,i).OutputFiles) then
                 filelist = Tasks(j,i).OutputFiles;
-                ilen = size(filelist,1);
+                ilen = length(filelist);
                 if ilen > 0 then
                     outputFiles = jarray('java.lang.String', ilen);
                     for k=1:ilen
@@ -199,7 +207,7 @@ function outputs = PAsolve(varargin)
             end
 
             // Custom Script
-            if isfield(Tasks(j,i), 'SelectionScript') then
+            if ~isempty(Tasks(j,i).SelectionScript) then
                 selects = Tasks(j,i).SelectionScript;                
                 try
                     url = URL.new(selects);
@@ -220,18 +228,14 @@ function outputs = PAsolve(varargin)
             // Function
             Func = Tasks(j,i).Func;
             execstr(strcat(['functype = type(';Func;');']));
-            if (functype <> 13) & (functype <> 11) then
-                error(strcat(['invalid function type:', Func, ', it cannot be a C or Fortran built-in function)']));
+            if (functype <> 13) & (functype <> 11)  then
+                error('invalid function type for function ""' + Func + '"". Consider calling this function with a macro instead.');
             end
 
             // Source Files
 
-            if isfield(Tasks(j,i), 'Sources') then
-                srcs = Tasks(j,i).Sources;
-                if type(srcs) ~= 15 then
-                    srcs=list(srcs);
-                end
-                sourceNames = jarray('java.lang.String', length(srcs));
+            if ~isempty(Tasks(j,i).Sources) then
+                srcs = Tasks(j,i).Sources;                                
                 for k=1:length(srcs)
                     srcPath = srcs(k);
                     if isfile(srcPath) then
@@ -242,29 +246,34 @@ function outputs = PAsolve(varargin)
                                 disp(strcat(['Copying file ', srcPath, ' to ',pa_dir]));
                             end
                             copyfile(srcPath,pa_dir);
-                            tmpFiles($+1)=strcat([pa_dir,fs,fname,extension]);
+                            // TODO find a cleaning mechanisme
+                            //taskFilesToClean(i)=lstcat(taskFilesToClean(i), list(pa_dir+fs+fname+extension));
+                            //tmpFiles($+1)=strcat([pa_dir,fs,fname,extension]);
                         end
+                        strName = String.new(srcName);
+                        t_conf.addSourceFile(strName);
                     else
                         error(strcat(['Source file ', srcPath, ' cannot be found']));
                     end
-                    strName = String.new(srcName);
-                    sourceNames(k-1) = strName;
+
                 end
 
-                t_conf.setSourceNames(sourceNames);
 
-                code=[];
-            else
-                sourceNames = jarray('java.lang.String', 1);
-                execstr('save(pa_dir+fs+''PAsolve.bin'','+Func+');');
-                strName = String.new('PAsolve.bin');
-                sourceNames(0) = strName;
-                t_conf.setFunctionVarFiles(sourceNames);
-                t_conf.setSourceNames(sourceNames);
-                code=[];
             end
 
+            // Saving main function name (with or without Sources attribute)
+            sourceNames = jarray('java.lang.String', 1);
+            sFN = 'PAsolve_src'+indToFile([i j])+'.bin';
+            execstr('save(pa_dir+fs+sFN,'+Func+');');
+            strName = String.new(sFN);
+            sourceNames(0) = strName;
+            t_conf.setFunctionVarFiles(sourceNames);                
+            code=[];
+            taskFilesToClean(i)=lstcat(taskFilesToClean(i), list(pa_dir+fs+sFN));
+
+
             t_conf.setFunctionName(Func);
+            t_conf.addSourceFile(sFN);
 
             // Params
             argi = Tasks(j,i).Params;
@@ -274,16 +283,32 @@ function outputs = PAsolve(varargin)
                 inVarFP = strcat([pa_dir, fs, inVarFN]);
                 outVarFP = strcat([pa_dir, fs, outVarFN]);
                 // Creating input parameters mat files
-                in=argi;
-                save(inVarFP,in);
+                fd=mopen(inVarFP,'wb'); 
+                inl = argi;
+                if length(inl) == 0
+                    inl=list(%t);
+                end
+                for k=1:length(inl)
+                    execstr('in'+string(k)+'=inl(k);');
+                    execstr('save(fd,in'+string(k)+')');
+                end
+                mclose(fd);
+
                 jinvoke(t_conf,'setInputVariablesFileName',inVarFN);
                 jinvoke(t_conf,'setOutputVariablesFileName',outVarFN);
                 if j > 1 & Tasks(j,i).Compose
-                    jinvoke(t_conf,'setComposedInputVariablesFileName',strcat([variableOutFileBaseName, indToFile([i j-1]), '.mat']));
+                    cinVarFN = strcat([variableOutFileBaseName,indToFile([i j-1]),'.dat']);
+                    cinVarFP = pa_dir+fs+cinVarFN;                    
+                    jinvoke(t_conf,'setComposedInputVariablesFileName',cinVarFN);                    
                 end
                 outVarFiles(i) = outVarFP;
-                tmpFiles($+1)=inVarFP;
-                tmpFiles($+1)=outVarFP;
+                taskFilesToClean(i)=lstcat(taskFilesToClean(i), list(inVarFP));
+                //if j < MM
+                // because of disconnected mode, the final out is handled
+                //differently
+                taskFilesToClean(i)=lstcat(taskFilesToClean(i), list(outVarFP));
+                //end
+
                 inputscript = 'i=0';
             else
                 inputscript = createInputScript(argi);
@@ -291,7 +316,21 @@ function outputs = PAsolve(varargin)
 
             t_conf.setInputScript(inputscript);
 
-            mainScript = createMainScript(Func, opt);
+            //mainScript = createMainScript(Func, opt);
+            mainScript = 'out = '+Tasks(j,i).Func+'(';
+            if j > 1 & Tasks(j,i).Compose
+                mainScript = mainScript + 'in';
+                if length(argi) > 0 then
+                    mainScript = mainScript + ',';
+                end
+            end
+            if length(argi) > 0
+                for k=1:length(argi)-1
+                    mainScript = mainScript + 'in'+string(k)+',';
+                end
+                mainScript = mainScript + ('in'+string(length(argi)));
+            end
+            mainScript = mainScript + ');';
             t_conf.setMainScript(mainScript);
 
             t_conf.setOutputs('out');
@@ -302,79 +341,29 @@ function outputs = PAsolve(varargin)
     jimport org.objectweb.proactive.api.PAFuture;
     solver = jnewInstance(ScilabSolver);
 
-    futureList = solver.solve(solve_config, task_configs);
+    pairinfolist = solver.solve(solve_config, task_configs);
 
-    answerListObj = PAFuture.getFutureValue(futureList);
+    jobinfo = jinvoke(pairinfolist,'getX');
+    resfutureList =  jinvoke(pairinfolist,'getY');
+    jid = string(jinvoke(jobinfo,'getJobId'));
+    disp('Job submitted : '+ jid);    
 
-    outputs=list(NN);
-    ispaerror = %f;
-    errormsg = '';
-    for i=0:NN-1
-        answerList = jcast(answerListObj, 'java.util.ArrayList');
-        ralObj = answerList.get(i);
-        ral = jcast(ralObj,'org.ow2.proactive.scheduler.ext.scilab.client.ScilabResultsAndLogs');
-        if jinvoke(ral,'isOK') then
-            if opt.TransferVariables then
-                logs = jinvoke(ral,'getLogs');
-                printf('%s',logs);
-                if isfile(outVarFiles(i+1)) then
-                    load(outVarFiles(i+1));
-                    outputs(i+1)=out;
-                else
-                    errormsg = strcat(['Error while receiving output n°',string(i+1), ', cannot find file ',outVarFiles(i+1)]);
-                    ispaerror = %t;
-                end
+    ftn = jinvoke(jobinfo,'getFinalTasksNamesAsList');
 
-            else
-                logs = jinvoke(ral,'getLogs');
-                printf('%s',logs);
-                st = jinvoke(ral,'getResult');
+    taskinfo = struct('cleanFileSet',[],'cleanDirSet',[], 'outFile',[], 'jobid',[], 'taskid',[] );
+    results=list(NN);
+    for i=1:NN
+        taskinfo.cleanFileSet = taskFilesToClean(i);
+        taskinfo.cleanDirSet = list(pa_dir);
+        taskinfo.outFile = outVarFiles(i);
+        taskinfo.jobid = jid;
+        taskinfo.taskid = jinvoke(ftn,'get',i-1);
 
-                execstr(strcat(['output=',jinvoke(st,'toString')]));
-                if exists(output) then
-                    outputs(i+1)= output;
-                    clear('output');
-                else                    
-                    errormsg = strcat(['Error while receiving output n°',string(i+1)]);
-                    ispaerror = %t;
-                end
+        results(i)=PAResult(jinvoke(resfutureList,'get',i-1), taskinfo);
 
-
-            end
-
-        elseif jinvoke(ral,'isMatSciError') then
-            logs = jinvoke(ral,'getLogs');
-            if ~isempty(logs) then
-                printf('%s',logs);
-            end
-            ispaerror = %t; 
-        else
-            logs = jinvoke(ral,'getLogs');
-            if ~isempty(logs) then
-                printf('%s',logs);
-            end
-
-            ex = jinvoke(ral,'getException');
-
-            exstr = solver.getStackTrace(ex);
-            disp(exstr);  
-            ispaerror = %t;          
-        end
-        printf('\n');
     end
+    outputs = PAResL(results);
 
-    rmdir(pa_dir,'s')
-
-
-    jremove(task_configs,solve_config,solver);
-
-    if (ispaerror) then
-        if isempty(errormsg) then
-            error('Error while reading PAsolve results'); 
-        else
-            error(errormsg);
-        end       
-    end
 
 endfunction
 

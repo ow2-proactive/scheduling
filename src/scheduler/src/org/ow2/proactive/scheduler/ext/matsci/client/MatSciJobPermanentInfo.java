@@ -36,6 +36,7 @@
  */
 package org.ow2.proactive.scheduler.ext.matsci.client;
 
+import java.util.ArrayList;
 import java.util.TreeSet;
 
 import org.ow2.proactive.scheduler.ext.matsci.common.PASolveMatSciGlobalConfig;
@@ -95,6 +96,12 @@ public class MatSciJobPermanentInfo implements java.io.Serializable, Cloneable {
 
     public TreeSet<String> getFinalTaskNames() {
         return finaltnames;
+    }
+
+    public ArrayList<String> getFinalTasksNamesAsList() {
+        ArrayList<String> lst = new ArrayList<String>();
+        lst.addAll(finaltnames);
+        return lst;
     }
 
     @Override
