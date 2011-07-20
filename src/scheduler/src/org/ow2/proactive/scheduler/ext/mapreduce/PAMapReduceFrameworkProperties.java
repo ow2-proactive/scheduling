@@ -18,14 +18,20 @@ import org.ow2.proactive.scheduler.common.task.dataspaces.InputAccessMode;
  * {@link PAMapReduceFrameworkProperties} contains all the ProActive MapReduce
  * Framework properties. Those properties can be used to pass arguments to the
  * XxxxxPATask that compose the ProActive MapReduce workflow
- *
+ * 
  * @author The ProActive Team
- *
+ * 
  *         TODO maybe we have to change all the name of the properties from
  *         WORKFLOW_xxxx into PA_MAPREDUCE_xxxx
- *
+ * 
  */
 public enum PAMapReduceFrameworkProperties {
+
+    /**
+     * This property lists the name of the jars needed by the ProActive
+     * MapReduce API
+     */
+    MAP_REDUCE_JARS("org.ow2.proactive.scheduler.ext.mapreduce.jars", PropertyType.STRING),
 
     WORKFLOW_FILE_SYSTEM_LOCALHOST_NAME("org.ow2.proactive.scheduler.ext.mapreduce.localhost.name",
             PropertyType.STRING),
@@ -584,7 +590,7 @@ public enum PAMapReduceFrameworkProperties {
 
     /**
      * Create a new instance of {@link PAMapReduceFrameworkProperties}
-     *
+     * 
      * @param key
      *            the key of the instance
      * @param propertyType
@@ -597,7 +603,7 @@ public enum PAMapReduceFrameworkProperties {
 
     /**
      * Retrieve the properties from the default configuration file
-     *
+     * 
      * @return the properties
      */
     public static Properties getProperties() {
@@ -647,7 +653,7 @@ public enum PAMapReduceFrameworkProperties {
 
     /**
      * Return the key of the specific instance
-     *
+     * 
      * @return the key of the specific instance
      */
     public String getKey() {
@@ -656,7 +662,7 @@ public enum PAMapReduceFrameworkProperties {
 
     /**
      * Return the type of the specific instance
-     *
+     * 
      * @return the type of the specific instance
      */
     public PropertyType getType() {
@@ -665,7 +671,7 @@ public enum PAMapReduceFrameworkProperties {
 
     /**
      * Retrieve the value of the specified property as a {@link String}
-     *
+     * 
      * @param propertyName
      *            name of the property whose value must be retrieved
      * @return the {@link String} that represents the value of the property
@@ -676,7 +682,7 @@ public enum PAMapReduceFrameworkProperties {
 
     /**
      * Retrieve the value of the specified property as a boolean
-     *
+     * 
      * @param propertyName
      *            the name of the property whose value must be retrieved
      * @return the boolean that represents the value of the property, false if
@@ -692,7 +698,7 @@ public enum PAMapReduceFrameworkProperties {
 
     /**
      * Retrieve the value of the specified property as an int
-     *
+     * 
      * @param propertyName
      *            the name of the property whose value must be retrieved
      * @return the int that represents the value of the property, "-1" if no
