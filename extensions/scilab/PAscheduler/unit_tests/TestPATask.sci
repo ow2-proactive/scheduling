@@ -50,7 +50,7 @@ end
 
     val = PAwaitFor(resl,timeout);
     for i=1:length(val) // For each lambda
-        load( 'output'+ string(i)+ '.dat');
+        load( 'output_'+ string(i)+ '.dat');
         b_bias($+1) = res(1);
         b_variance($+1) = res(2);
     end
