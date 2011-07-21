@@ -113,6 +113,7 @@
 	 	<stubGenerator srcDir="${cl.common.dir}" refclasspath="common.classpath">
 	 		<class name="org.ow2.proactive.scripting.ScriptHandler" />
 	 		<class name="org.ow2.proactive.jmx.provider.ro.ROServerImpl" />
+			<class name="org.ow2.proactive.jmx.provider.ro.ROConnection" />
 	 		<class name="org.ow2.proactive.utils.NodeSet" />
 	 		<class name="org.ow2.proactive.scripting.ScriptResult" />
 		</stubGenerator>
