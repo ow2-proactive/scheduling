@@ -350,6 +350,15 @@ Nb of active objects on the remote node: 1 received message: A message from 2667
 					by clicking on "Use" button. See the ProActive documentation for
 					further information.</para>
 			</listitem>
+			<listitem>
+				<para>The user can specify the protocol (rmi or http) to be used by the Runtime for incoming communications.</para>
+				<para>
+					To ensure that a unique port is used by a Runtime, the initial port value will be incremented
+					for each Runtime and given as value of the "-Dproactive.SELECTED_PROTOCOL.port" JVM property.
+					If the port chosen for a runtime is already used, it is incremented until
+					an available port number is found.
+				</para>
+			</listitem>		
 		</itemizedlist>
 		<para>
 			Clicking on the "Connection" tab, the windows will look like this:
@@ -398,15 +407,6 @@ Nb of active objects on the remote node: 1 received message: A message from 2667
 				</para>
 			</listitem>
 		</itemizedlist>
-		<para>
-		The user can specify the protocol (rmi or http) to be used by the Runtime for incoming communications.
-		</para>
-		<para>
-		To ensure that a unique port is used by a Runtime, the initial port value will be incremented
-		for each Runtime and given as value of the "-Dproactive.SELECTED_PROTOCOL.port" JVM property.
-		If the port chosen for a runtime is already used, it is incremented until
-		an available port number is found.
-		</para>
 		<para>
 			Finally, clicking on the "Planning" tab, the windows will look like this:
 		</para>
