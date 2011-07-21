@@ -2,7 +2,7 @@
 # $1 number of booked cores
 
 function check_node_file {
-HOST_IP=`hostname | grep 'has address' | cut -d ' ' -f4`
+HOST_IP=`hostname -f`
 for i in `cat $PAS_NODEFILE`
 do
 	NODE_IP=`hostname | grep 'has address' | cut -d ' ' -f4`
