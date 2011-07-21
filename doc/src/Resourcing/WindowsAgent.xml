@@ -235,16 +235,13 @@ Nb of active objects on the remote node: 1 received message: A message from 2667
 						      to isolate the ProActive Runtime and reduce security risks.
 						</para>
 						<para>The password is encrypted using <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://msdn.microsoft.com/en-us/library/aa386979%28v=vs.85%29.aspx">Microsoft AES Cryptographic Provider</link> and 
-						      only Administrators have access permissions to the keyfile (restrict.dat) this is done using the <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://www.microsoft.com/download/en/details.aspx?displaylang=en&id=23510">SubInACL</link>tool.
-						      The 
+						      only Administrators have access permissions to the keyfile (restrict.dat) this is done using the <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://www.microsoft.com/downloads/en/details.aspx?FamilyID=e8ba3e56-d8fe-4a91-93cf-ed6985e3927b">SubInACL</link>tool.						      
 						</para>						
 						<para>If the specified account does not exist the installation program will prompt the user to create a non-admin account
 						      with the required privileges.
 						</para>
-						<para>Note that the ProActive Agent service is installed under 
-						      <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://msdn.microsoft.com/en-us/library/ms684190(VS.85).aspx">LocalSystem</link> account
-						      it cannot access remote UNC (Universal Naming Convention) path, the service account can be changed 
-						      using the "services.msc" utility. ("Control Panel->Administrative Tools->Services")
+						<para>Note that the ProActive Agent service is installed under <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://msdn.microsoft.com/en-us/library/ms684190(VS.85).aspx">LocalSystem</link> account, this should 
+						      not be changed, however it can be using the "services.msc" utility. ("Control Panel->Administrative Tools->Services")
 						</para>
 					</listitem>
 					<listitem>
