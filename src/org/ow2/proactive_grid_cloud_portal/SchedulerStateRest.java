@@ -711,6 +711,9 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         String enc = null;
         ZipFile jobArchive = new ZipFile(PortalConfiguration.jobIdToPath(jobId));
         ZipEntry imageEntry = jobArchive.getEntry("JOB-INF/image.png");
+        if (imageEntry == null) {
+            throw new IOException("the file JOB-INF/image.png was not found in the job archive");
+        }
         ips = new BufferedInputStream(jobArchive.getInputStream(imageEntry));
         int octet;
         while ((octet = ips.read()) != -1) {
@@ -741,6 +744,9 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
         ZipFile jobArchive = new ZipFile(PortalConfiguration.jobIdToPath(jobId));
         ZipEntry imageEntry = jobArchive.getEntry("JOB-INF/map.xml");
+        if (imageEntry == null) {
+            throw new IOException("the file JOB-INF/map.xml was not found in the job archive");
+        }
         ips = new BufferedInputStream(jobArchive.getInputStream(imageEntry));
         InputStreamReader ipsr = new InputStreamReader(ips);
         BufferedReader br = new BufferedReader(ipsr);
