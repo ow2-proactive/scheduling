@@ -60,6 +60,12 @@
 			<class name="org.ow2.proactive.resourcemanager.nodesource.policy.NodeSourcePolicy" />
 			<class name="org.ow2.proactive.resourcemanager.common.util.RMProxyUserInterface" />
 			<class name="org.ow2.proactive.resourcemanager.common.util.RMCachingProxyUserInterface" />
+			<class name="org.ow2.proactive.resourcemanager.nodesource.RMNodeConfigurator" />
+			<class name="org.ow2.proactive.resourcemanager.utils.ClientPinger" />
+			<class name="org.ow2.proactive.resourcemanager.cleaning.NodesCleaner" />
+			<class name="org.ow2.proactive.resourcemanager.frontend.topology.pinging.HostsPinger" />
+			<class name="org.ow2.proactive.resourcemanager.frontend.topology.pinging.NodesPinger" />
+			<class name="org.ow2.proactive.resourcemanager.frontend.topology.pinging.Pinger" />
 		</stubGenerator>
 		
 	</target>
