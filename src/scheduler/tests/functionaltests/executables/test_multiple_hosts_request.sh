@@ -5,7 +5,7 @@ function check_node_file {
 HOST_IP=`hostname -f`
 for i in `cat $PAS_NODEFILE`
 do
-	NODE_IP=`hostname | grep 'has address' | cut -d ' ' -f4`
+	NODE_IP=$i
 	if [ "$NODE_IP" != "$HOST_IP" ]
 	then
 		echo "Error booked host ip is invalid : $NODE_IP, awaited : $HOST_IP"
