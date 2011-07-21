@@ -3,7 +3,7 @@ For a major or minor release (aka x.y.0):
 	- Create a dedicated branch
 		- Set serialVersionUid to xy for all serializable class
 		- Check copyrights
-	- Do not forget XSD schema export for major release !
+	- Do not forget XSD schema export for major release (execute 'set_xsd_urls.sh SCHEDULER_HOME x.y' and copy schema to website)
 		
 Then, for a major, minor or maintenance release (aka x.y.z):
 	- Build RCPs
