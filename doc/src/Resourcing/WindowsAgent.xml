@@ -233,6 +233,10 @@ Nb of active objects on the remote node: 1 received message: A message from 2667
 						<para>Specify an existing, local account under which the ProActive Runtime(s) will be spawned.
 						      It is highly recommended to specify an account that is not part of the Administrators group
 						      to isolate the ProActive Runtime and reduce security risks.
+						</para>
+						<para>The password is encrypted using <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://msdn.microsoft.com/en-us/library/aa386979%28v=vs.85%29.aspx">Microsoft AES Cryptographic Provider</link> and 
+						      only Administrators have access permissions to the keyfile (restrict.dat) this is done using the <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://www.microsoft.com/download/en/details.aspx?displaylang=en&id=23510">SubInACL</link>tool.
+						      The 
 						</para>						
 						<para>If the specified account does not exist the installation program will prompt the user to create a non-admin account
 						      with the required privileges.
@@ -290,11 +294,12 @@ Nb of active objects on the remote node: 1 received message: A message from 2667
 				</mediaobject>
 			</figure>
 		</para>
-		<para> From the ProActive Agent Control window, the user can load a
+		<para>From the ProActive Agent Control window, the user can load a
 			configuration file, edit it, start/stop the service and view logs. A
 			GUI for editing is provided (explained below). Even if it is not
-			recommended, you can edit the configuration file by yourself with
+			recommended, the user can edit the configuration file by yourself with
 			your favorite text editor.</para>
+		<para>It is also possible to change the ProActive Runtime Account using the "Change Account" button.</para>						
 		<warning>
 			<para>The configuration file format has changed since version 2.2
       which is backward compatible with previous version files. If the user edits such a configuration 
