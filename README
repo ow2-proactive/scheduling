@@ -22,6 +22,9 @@ Updating the version of scheduling or resteasy
   these jar files are copied to WebContent/WEB-INF before compiling
   the project or creating the war file.
 
+Generation of a release
+  By default, the version of the rest api is set to the current timestamp.
+  To specify a version, edit the build.properties file and set the rest_api.version variable
 	 
 The Scheduler and the resource manager login mechanism are separate processes.
 One must log on on each subsystem to be able to query REST commands.
