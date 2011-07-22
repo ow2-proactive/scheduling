@@ -127,8 +127,8 @@
 				<attribute name="Implementation-Vendor" value="ActiveEon" />
 				<attribute name="Implementation-Title" value="Scheduling Rest Common" />
 				<!-- -->
-				<attribute name="Implementation-Version" value="1.0.0" />
-				<attribute name="Specification-Version" value="3.1.0" />
+				<attribute name="Implementation-Version" value="${rest_api.version}" />
+				<attribute name="Specification-Version" value="${scheduler.version}" />
 			</manifest>
 		</jar>
 	</target>
@@ -147,8 +147,9 @@
 				<attribute name="Implementation-Vendor" value="ActiveEon" />
 				<attribute name="Implementation-Title" value="Scheduling Rest Resource Manager" />
 				<!-- -->
-				<attribute name="Implementation-Version" value="1.0.0" />
-				<attribute name="Specification-Version" value="3.1.0" />
+				<attribute name="Implementation-Version" value="${rest_api.version}" />
+				<attribute name="Specification-Version" value="${scheduler.version}" />
+
 			</manifest>
 		</jar>
 	</target>
@@ -165,8 +166,8 @@
 				<attribute name="Implementation-Vendor" value="ActiveEon" />
 				<attribute name="Implementation-Title" value="Scheduling Rest Scheduler" />
 				<!-- -->
-				<attribute name="Implementation-Version" value="1.0.0" />
-				<attribute name="Specification-Version" value="3.1.0" />
+				<attribute name="Implementation-Version" value="${rest_api.version}" />
+				<attribute name="Specification-Version" value="${scheduler.version}" />
 			</manifest>
 		</jar>
 	</target>
