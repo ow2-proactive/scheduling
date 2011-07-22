@@ -1597,7 +1597,12 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @GET
     @Path("version")
     public String getVersion() {
-        return PortalConfiguration.REST_API_VERSION;
+        return "{ " +
+        		"\"scheduler\" : \"" + SchedulerStateRest.class.getPackage().getSpecificationVersion() + 
+                "\", " +
+                "\"rest\" : " +  SchedulerStateRest.class.getPackage().getImplementationVersion() + 
+                "\"" +
+                "}";
     }
 
     /**
