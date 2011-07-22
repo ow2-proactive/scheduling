@@ -47,7 +47,7 @@
 
 	<!-- NB: all the source files are the project source files -->
 
-	<target name="compile" depends="clean,prepare" description="Compiles the Java source code">
+	<target name="compile" depends="prepare" description="Compiles the Java source code">
 		<echo message="Compiling src files" />
 		<javac srcdir="${src.dir}" destdir="${classes.dir}" deprecation="false" failonerror="true" debug="true">
 			<classpath refid="src.classpath" />
@@ -55,15 +55,15 @@
 	</target>
 
 
-	<target name="war" depends="compile,doc" description="Generate the war file">
+	<target name="war" depends="compile,doc,schedulingrest-common-jar,schedulingrest-scheduler-jar,schedulingrest-rm-jar" description="Generate the war file">
 		<!-- copy classes -->
-
+		<!--
 		<copy todir="WebContent/WEB-INF/classes">
 			<fileset dir="build/classes">
 				<include name="**" />
 			</fileset>
 		</copy>
-
+	    -->
 		<!-- copy jars -->
 		<copy todir="${webinf.lib.dir}" flatten="true">
 			<fileset dir="${lib.dir}/scheduling">
@@ -109,6 +109,66 @@
 		</javadoc>
 	</target>
 
+	<target name="schedulingrest-common-jar" depends="compile" description="create the jar containing the common files of scheduling rest">
+		<jar jarfile="${webinf.lib.dir}/schedulingrest-common.jar">
+			<fileset dir="build/classes">
+				<include name="org/ow2/proactive_grid_cloud_portal/common/**" />
+			</fileset>
+			<fileset dir="build/classes">
+				<include name="org/ow2/proactive_grid_cloud_portal/webapp/**" />
+			</fileset>
+			<fileset dir="build/classes">
+				<include name="org/ow2/proactive_grid_cloud_portal/test/**" />
+			</fileset>
+			<manifest>
+				<!-- Who is building this jar? -->
+				<attribute name="Built-By" value="${user.name}" />
+				<!-- Information about the program itself -->
+				<attribute name="Implementation-Vendor" value="ActiveEon" />
+				<attribute name="Implementation-Title" value="Scheduling Rest Common" />
+				<!-- -->
+				<attribute name="Implementation-Version" value="1.0.0" />
+				<attribute name="Specification-Version" value="3.1.0" />
+			</manifest>
+		</jar>
+	</target>
 
+	<target name="schedulingrest-rm-jar" depends="compile" description="create the jar containing the rm files of scheduling rest">
+		<jar jarfile="${webinf.lib.dir}/schedulingrest-rm.jar">
+			<fileset dir="build/classes">
+				<include name="org/ow2/proactive_grid_cloud_portal/rm/**" />
+			</fileset>
+
+
+			<manifest>
+				<!-- Who is building this jar? -->
+				<attribute name="Built-By" value="${user.name}" />
+				<!-- Information about the program itself -->
+				<attribute name="Implementation-Vendor" value="ActiveEon" />
+				<attribute name="Implementation-Title" value="Scheduling Rest Resource Manager" />
+				<!-- -->
+				<attribute name="Implementation-Version" value="1.0.0" />
+				<attribute name="Specification-Version" value="3.1.0" />
+			</manifest>
+		</jar>
+	</target>
+
+	<target name="schedulingrest-scheduler-jar" depends="compile" description="create the jar containing the scheduler files of scheduling rest">
+		<jar jarfile="${webinf.lib.dir}/schedulingrest-scheduler.jar">
+			<fileset dir="build/classes">
+				<include name="org/ow2/proactive_grid_cloud_portal/scheduler/**" />
+			</fileset>
+			<manifest>
+				<!-- Who is building this jar? -->
+				<attribute name="Built-By" value="${user.name}" />
+				<!-- Information about the program itself -->
+				<attribute name="Implementation-Vendor" value="ActiveEon" />
+				<attribute name="Implementation-Title" value="Scheduling Rest Scheduler" />
+				<!-- -->
+				<attribute name="Implementation-Version" value="1.0.0" />
+				<attribute name="Specification-Version" value="3.1.0" />
+			</manifest>
+		</jar>
+	</target>
 
 </project>

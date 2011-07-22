@@ -52,7 +52,7 @@ import org.ow2.proactive.scheduler.common.SchedulerState;
 import org.ow2.proactive.scheduler.common.util.CachingSchedulerProxyUserInterface;
 import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 import org.ow2.proactive.scheduler.core.SchedulerStateImpl;
-import org.ow2.proactive_grid_cloud_portal.PortalConfiguration;
+import org.ow2.proactive_grid_cloud_portal.webapp.PortalConfiguration;
 
 
 /**

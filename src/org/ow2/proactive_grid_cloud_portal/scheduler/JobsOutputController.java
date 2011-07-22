@@ -49,7 +49,7 @@ import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingException;
 import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingService;
-import org.ow2.proactive_grid_cloud_portal.PortalConfiguration;
+import org.ow2.proactive_grid_cloud_portal.webapp.PortalConfiguration;
 
 
 /**

@@ -34,7 +34,7 @@
  * ################################################################
  * $$ACTIVEEON_INITIAL_DEV$$
  */
-package org.ow2.proactive_grid_cloud_portal;
+package org.ow2.proactive_grid_cloud_portal.webapp;
 
 import java.net.HttpURLConnection;
 import java.net.URI;

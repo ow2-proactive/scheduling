@@ -34,38 +34,29 @@
  * ################################################################
  * $$ACTIVEEON_INITIAL_DEV$$
  */
-package org.ow2.proactive_grid_cloud_portal;
+package org.ow2.proactive_grid_cloud_portal.webapp;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Type;
+import java.util.HashMap;
+import java.util.Map;
 
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
+import javax.xml.bind.annotation.adapters.XmlAdapter;
 
-import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
+import org.hibernate.collection.PersistentMap;
 
 
 @Provider
-public class NotConnectedExceptionWriter implements MessageBodyWriter<NotConnectedException> {
+public class PersistentMapConverter extends XmlAdapter<Map, PersistentMap> {
 
-    public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
-        return NotConnectedException.class.isAssignableFrom(type);
+    @Override
+    public PersistentMap unmarshal(Map arg0) throws Exception {
+        return null;
     }
 
-    public void writeTo(NotConnectedException formRestEasyException, Class<?> type, Type genericType,
-            Annotation[] annotations, MediaType mediaType, MultivaluedMap<String, Object> headers,
-            OutputStream out) throws IOException {
-        out.write("<ns1:exception xmlns:ns1='http://scrs.forms.resteasy.service/'>".getBytes());
-        out.write("</ns1:exception>".getBytes());
-    }
+    @Override
+    public HashMap marshal(PersistentMap arg0) throws Exception {
+        // TODO Auto-generated method stub
+        return new HashMap(arg0);
 
-    public long getSize(NotConnectedException formRestEasyException, java.lang.Class<?> type,
-            java.lang.reflect.Type genericType, java.lang.annotation.Annotation[] annotations,
-            MediaType mediaType) {
-        return -1;
     }
 }

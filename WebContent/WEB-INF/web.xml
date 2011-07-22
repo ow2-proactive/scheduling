@@ -31,7 +31,7 @@
 		<param-value>true</param-value> </context-param> -->
 
 	<listener>
-		<listener-class>org.ow2.proactive_grid_cloud_portal.MyResteasyBootstrap</listener-class>
+		<listener-class>org.ow2.proactive_grid_cloud_portal.webapp.MyResteasyBootstrap</listener-class>
 	</listener>
 
 
@@ -45,7 +45,7 @@
 		<servlet-class>org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher</servlet-class>
 		<init-param>
 			<param-name>javax.ws.rs.Application</param-name>
-			<param-value>org.ow2.proactive_grid_cloud_portal.MyPortalApplication</param-value>
+			<param-value>org.ow2.proactive_grid_cloud_portal.webapp.MyPortalApplication</param-value>
 		</init-param>
 	</servlet>
 	<servlet-mapping>

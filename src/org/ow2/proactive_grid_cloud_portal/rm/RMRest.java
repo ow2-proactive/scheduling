@@ -79,8 +79,8 @@ import org.ow2.proactive.resourcemanager.nodesource.common.PluginDescriptor;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
 import org.ow2.proactive.utils.NodeSet;
-import org.ow2.proactive_grid_cloud_portal.PortalConfiguration;
 import org.ow2.proactive_grid_cloud_portal.common.LoginForm;
+import org.ow2.proactive_grid_cloud_portal.webapp.PortalConfiguration;
 
 @Path("/rm")
 public class RMRest {

@@ -34,7 +34,7 @@
  * ################################################################
  * $$ACTIVEEON_INITIAL_DEV$$
  */
-package org.ow2.proactive_grid_cloud_portal;
+package org.ow2.proactive_grid_cloud_portal.webapp;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -90,9 +90,7 @@ public class MyResteasyBootstrap extends ResteasyBootstrap {
         dispatcher.addStringConverter(RestartModeConverter.class);
         dispatcher.addStringConverter(IntWrapperConverter.class);
         dispatcher.registerProvider(PersistentMapConverter.class);
-        dispatcher.registerProvider(NotConnectedExceptionMapper.class);
         dispatcher.registerProvider(JacksonProvider.class);
-        dispatcher.addStringConverter(UpdatablePropertiesConverter.class);
 
         try {
             File f = new File(event.getServletContext().getRealPath("WEB-INF/portal.properties"));

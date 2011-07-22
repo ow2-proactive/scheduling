@@ -116,10 +116,10 @@ import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
 import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingException;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
-import org.ow2.proactive_grid_cloud_portal.PersistentMapConverter;
-import org.ow2.proactive_grid_cloud_portal.PortalConfiguration;
 import org.ow2.proactive_grid_cloud_portal.common.LoginForm;
 import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
+import org.ow2.proactive_grid_cloud_portal.webapp.PersistentMapConverter;
+import org.ow2.proactive_grid_cloud_portal.webapp.PortalConfiguration;
 
 
 /**
