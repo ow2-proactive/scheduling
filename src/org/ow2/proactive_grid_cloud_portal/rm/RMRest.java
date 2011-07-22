@@ -460,7 +460,12 @@ public class RMRest {
     @GET
     @Path("version")
     public String getVersion() {
-        return PortalConfiguration.REST_API_VERSION;
+        return "{ " +
+                "\"rm\" : \"" + RMRest.class.getPackage().getSpecificationVersion() + 
+                "\", " +
+                "\"rest\" : " +  RMRest.class.getPackage().getImplementationVersion() + 
+                "\"" +
+                "}";
     }
     
 }
