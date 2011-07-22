@@ -52,7 +52,6 @@ public class PortalConfiguration {
     public static String scheduler_cache_refreshrate = "scheduler.cache.refreshrate";
     public static String scheduler_logforwardingservice_provider = "scheduler.logforwardingservice.provider";
     public static String rm_url = "rm.url";
-    public static String REST_API_VERSION = "0.80-3.0.x";
 
     private static Properties properties;
     public static String lease_renew_rate = "lease.renew.rate";
