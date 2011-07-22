@@ -97,6 +97,16 @@
 		</copy>
 
 		<war destfile="proactive_grid_cloud_portal.war" webxml="${webinf}/web.xml" basedir="${war.root}">
+			<manifest>
+				<!-- Who is building this jar? -->
+				<attribute name="Built-By" value="${user.name}" />
+				<!-- Information about the program itself -->
+				<attribute name="Implementation-Vendor" value="ActiveEon" />
+				<attribute name="Implementation-Title" value="Scheduling Rest Api" />
+				<!-- -->
+				<attribute name="Implementation-Version" value="${rest_api.version}" />
+				<attribute name="Specification-Version" value="${scheduler.version}" />
+			</manifest>
 		</war>
 	</target>
 
