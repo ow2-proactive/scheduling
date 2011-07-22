@@ -10,7 +10,7 @@
 	<property name="classes.dir" value="${build.dir}/classes" />
 	<property name="lib.dir" value="lib" />
 	<property name="war.root" value="WebContent" />
-	<property name="webinf" value="${war.root}/WEB-INF"/>
+	<property name="webinf" value="${war.root}/WEB-INF" />
 	<property name="webinf.lib.dir" value="${war.root}/WEB-INF/lib" />
 	<property name="webinf.classes.dir" value="${war.root}/WEB-INF/classes" />
 	<property name="webinf.lib.doc" value="${war.root}/WEB-INF/doc" />
