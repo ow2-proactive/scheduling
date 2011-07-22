@@ -63,6 +63,7 @@ import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.extensions.pamr.PAMRConfig;
 import org.objectweb.proactive.extensions.processbuilder.OSProcessBuilder;
 import org.objectweb.proactive.extensions.processbuilder.exception.NotImplementedException;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
@@ -461,6 +462,19 @@ public class ForkedJavaExecutable extends JavaExecutable implements ForkerStarte
                 command.add(s);
             }
         }
+
+        //TODO SCHEDULING-1302 : WORK AROUND
+        //automaticaly propagate PAMR props to the forked JVM if defined on the forker.
+        if (PAMRConfig.PA_NET_ROUTER_ADDRESS.isSet()) {
+            command.add(PAMRConfig.PA_NET_ROUTER_ADDRESS.getCmdLine() +
+                PAMRConfig.PA_NET_ROUTER_ADDRESS.getValue());
+        }
+        if (PAMRConfig.PA_NET_ROUTER_PORT.isSet()) {
+            command
+                    .add(PAMRConfig.PA_NET_ROUTER_PORT.getCmdLine() +
+                        PAMRConfig.PA_NET_ROUTER_PORT.getValue());
+        }
+
     }
 
     /**
