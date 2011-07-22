@@ -10,9 +10,10 @@
 	<property name="classes.dir" value="${build.dir}/classes" />
 	<property name="lib.dir" value="lib" />
 	<property name="war.root" value="WebContent" />
-	<property name="webinf.lib.dir" value="WebContent/WEB-INF/lib" />
-	<property name="webinf.classes.dir" value="WebContent/WEB-INF/classes" />
-	<property name="webinf.lib.doc" value="WebContent/WEB-INF/doc" />
+	<property name="webinf" value="${war.root}/WEB-INF"/>
+	<property name="webinf.lib.dir" value="${war.root}/WEB-INF/lib" />
+	<property name="webinf.classes.dir" value="${war.root}/WEB-INF/classes" />
+	<property name="webinf.lib.doc" value="${war.root}/WEB-INF/doc" />
 	<property name="src.dir" value="src" />
 
 
@@ -24,8 +25,8 @@
 		<mkdir dir="${classes.dir}" />
 		<mkdir dir="${webinf.lib.dir}" />
 		<mkdir dir="${war.root}/doc" />
-		<copy todir="WebContent/WEB-INF/classes">
-			<fileset dir="WebContent/WEB-INF">
+		<copy todir="${webinf.classes.dir}">
+			<fileset dir="${webinf}">
 				<include name="log4j.properties" />
 			</fileset>
 		</copy>
@@ -86,7 +87,7 @@
 			</fileset>
 		</copy>
 
-		<war destfile="proactive_grid_cloud_portal.war" webxml="WebContent/WEB-INF/web.xml" basedir="WebContent">
+		<war destfile="proactive_grid_cloud_portal.war" webxml="${webinf}/web.xml" basedir="${war.root}">
 		</war>
 	</target>
 
@@ -111,13 +112,13 @@
 
 	<target name="schedulingrest-common-jar" depends="compile" description="create the jar containing the common files of scheduling rest">
 		<jar jarfile="${webinf.lib.dir}/schedulingrest-common.jar">
-			<fileset dir="build/classes">
+			<fileset dir="${classes.dir}">
 				<include name="org/ow2/proactive_grid_cloud_portal/common/**" />
 			</fileset>
-			<fileset dir="build/classes">
+			<fileset dir="${classes.dir}">
 				<include name="org/ow2/proactive_grid_cloud_portal/webapp/**" />
 			</fileset>
-			<fileset dir="build/classes">
+			<fileset dir="${classes.dir}">
 				<include name="org/ow2/proactive_grid_cloud_portal/test/**" />
 			</fileset>
 			<manifest>
@@ -135,7 +136,7 @@
 
 	<target name="schedulingrest-rm-jar" depends="compile" description="create the jar containing the rm files of scheduling rest">
 		<jar jarfile="${webinf.lib.dir}/schedulingrest-rm.jar">
-			<fileset dir="build/classes">
+			<fileset dir="${classes.dir}">
 				<include name="org/ow2/proactive_grid_cloud_portal/rm/**" />
 			</fileset>
 
@@ -156,7 +157,7 @@
 
 	<target name="schedulingrest-scheduler-jar" depends="compile" description="create the jar containing the scheduler files of scheduling rest">
 		<jar jarfile="${webinf.lib.dir}/schedulingrest-scheduler.jar">
-			<fileset dir="build/classes">
+			<fileset dir="${classes.dir}">
 				<include name="org/ow2/proactive_grid_cloud_portal/scheduler/**" />
 			</fileset>
 			<manifest>
