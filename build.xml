@@ -4,7 +4,16 @@
 
 	<property name="project-name" value="ProActive Grid Cloud Portal" />
 
+
 	<property file="./build.properties" />
+
+	<!-- to generate a release uncomment the variable rest_api.version -->
+	<!-- in the build.properties file, then launch the generation of the war file -->
+
+	<tstamp>
+		<format property="rest_api.version" pattern="yyyyMMddHHmm" locale="en,UK" />
+	</tstamp>
+
 
 	<property name="build.dir" value="build" />
 	<property name="classes.dir" value="${build.dir}/classes" />
@@ -111,7 +120,7 @@
 	</target>
 
 	<target name="schedulingrest-common-jar" depends="compile" description="create the jar containing the common files of scheduling rest">
-		<jar jarfile="${webinf.lib.dir}/schedulingrest-common.jar">
+		<jar jarfile="${webinf.lib.dir}/schedulingrest-common-${rest_api.version}.jar">
 			<fileset dir="${classes.dir}">
 				<include name="org/ow2/proactive_grid_cloud_portal/common/**" />
 			</fileset>
@@ -135,7 +144,7 @@
 	</target>
 
 	<target name="schedulingrest-rm-jar" depends="compile" description="create the jar containing the rm files of scheduling rest">
-		<jar jarfile="${webinf.lib.dir}/schedulingrest-rm.jar">
+		<jar jarfile="${webinf.lib.dir}/schedulingrest-rm-${rest_api.version}.jar">
 			<fileset dir="${classes.dir}">
 				<include name="org/ow2/proactive_grid_cloud_portal/rm/**" />
 			</fileset>
@@ -156,7 +165,7 @@
 	</target>
 
 	<target name="schedulingrest-scheduler-jar" depends="compile" description="create the jar containing the scheduler files of scheduling rest">
-		<jar jarfile="${webinf.lib.dir}/schedulingrest-scheduler.jar">
+		<jar jarfile="${webinf.lib.dir}/schedulingrest-scheduler-${rest_api.version}.jar">
 			<fileset dir="${classes.dir}">
 				<include name="org/ow2/proactive_grid_cloud_portal/scheduler/**" />
 			</fileset>
