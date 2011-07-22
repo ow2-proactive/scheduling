@@ -41,22 +41,23 @@ import java.util.Set;
 
 import javax.ws.rs.core.Application;
 
-import org.ow2.proactive_grid_cloud_portal.exceptions.ConnectionExceptionMapper;
-import org.ow2.proactive_grid_cloud_portal.exceptions.IOExceptionMapper;
-import org.ow2.proactive_grid_cloud_portal.exceptions.InternalSchedulerExceptionMapper;
-import org.ow2.proactive_grid_cloud_portal.exceptions.JobAlreadyFinishedExceptionMapper;
-import org.ow2.proactive_grid_cloud_portal.exceptions.JobCreationExceptionMapper;
-import org.ow2.proactive_grid_cloud_portal.exceptions.KeyExceptionMapper;
-import org.ow2.proactive_grid_cloud_portal.exceptions.LoginExceptionMapper;
-import org.ow2.proactive_grid_cloud_portal.exceptions.NotConnectedExceptionMapper;
-import org.ow2.proactive_grid_cloud_portal.exceptions.PermissionExceptionExceptionMapper;
-import org.ow2.proactive_grid_cloud_portal.exceptions.ProActiveRuntimeExceptionMapper;
-import org.ow2.proactive_grid_cloud_portal.exceptions.RuntimeExceptionMapper;
-import org.ow2.proactive_grid_cloud_portal.exceptions.SchedulerExceptionMapper;
-import org.ow2.proactive_grid_cloud_portal.exceptions.SubmissionClosedExceptionMapper;
-import org.ow2.proactive_grid_cloud_portal.exceptions.ThrowableMapper;
-import org.ow2.proactive_grid_cloud_portal.exceptions.UnknownJobExceptionMapper;
-import org.ow2.proactive_grid_cloud_portal.exceptions.UnknownTaskExceptionMapper;
+import org.ow2.proactive_grid_cloud_portal.common.exceptionmapper.ConnectionExceptionMapper;
+import org.ow2.proactive_grid_cloud_portal.common.exceptionmapper.IOExceptionMapper;
+import org.ow2.proactive_grid_cloud_portal.common.exceptionmapper.InternalSchedulerExceptionMapper;
+import org.ow2.proactive_grid_cloud_portal.common.exceptionmapper.JobAlreadyFinishedExceptionMapper;
+import org.ow2.proactive_grid_cloud_portal.common.exceptionmapper.JobCreationExceptionMapper;
+import org.ow2.proactive_grid_cloud_portal.common.exceptionmapper.KeyExceptionMapper;
+import org.ow2.proactive_grid_cloud_portal.common.exceptionmapper.LoginExceptionMapper;
+import org.ow2.proactive_grid_cloud_portal.common.exceptionmapper.NotConnectedExceptionMapper;
+import org.ow2.proactive_grid_cloud_portal.common.exceptionmapper.PermissionExceptionExceptionMapper;
+import org.ow2.proactive_grid_cloud_portal.common.exceptionmapper.ProActiveRuntimeExceptionMapper;
+import org.ow2.proactive_grid_cloud_portal.common.exceptionmapper.RuntimeExceptionMapper;
+import org.ow2.proactive_grid_cloud_portal.common.exceptionmapper.SchedulerExceptionMapper;
+import org.ow2.proactive_grid_cloud_portal.common.exceptionmapper.SubmissionClosedExceptionMapper;
+import org.ow2.proactive_grid_cloud_portal.common.exceptionmapper.ThrowableMapper;
+import org.ow2.proactive_grid_cloud_portal.common.exceptionmapper.UnknownJobExceptionMapper;
+import org.ow2.proactive_grid_cloud_portal.common.exceptionmapper.UnknownTaskExceptionMapper;
+import org.ow2.proactive_grid_cloud_portal.scheduler.UpdatablePropertiesConverter;
 
 
 public class MyPortalApplication extends Application {

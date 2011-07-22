@@ -58,7 +58,15 @@ import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.exception.PermissionException;
 import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
-import org.ow2.proactive_grid_cloud_portal.exceptions.NotConnectedExceptionMapper;
+import org.ow2.proactive_grid_cloud_portal.common.exceptionmapper.NotConnectedExceptionMapper;
+import org.ow2.proactive_grid_cloud_portal.rm.RMSessionMapper;
+import org.ow2.proactive_grid_cloud_portal.rm.RMSessionsCleaner;
+import org.ow2.proactive_grid_cloud_portal.scheduler.IntWrapperConverter;
+import org.ow2.proactive_grid_cloud_portal.scheduler.RestartModeConverter;
+import org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerSessionMapper;
+import org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerSessionsCleaner;
+import org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateCaching;
+import org.ow2.proactive_grid_cloud_portal.scheduler.UpdatablePropertiesConverter;
 
 
 public class MyResteasyBootstrap extends ResteasyBootstrap {

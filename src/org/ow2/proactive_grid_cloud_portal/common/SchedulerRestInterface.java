@@ -83,7 +83,7 @@ import org.ow2.proactive.scheduler.common.job.UserIdentification;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive_grid_cloud_portal.PersistentMapConverter;
-import org.ow2.proactive_grid_cloud_portal.UserJobInfo;
+import org.ow2.proactive_grid_cloud_portal.scheduler.UserJobInfo;
 
 /**
  * fdsfsd
