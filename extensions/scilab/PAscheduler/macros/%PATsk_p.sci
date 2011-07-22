@@ -1,6 +1,7 @@
 function %PATsk_p(l)
     printf('Func: '+l.Func+'\n');
-    printf('Params: '+l.Params+'\n');
+    printf('Params:\n');
+    disp(l.Params);
     if ~isempty(l.Description) then
         printf('Description: '+l.Description+'\n');
     end
