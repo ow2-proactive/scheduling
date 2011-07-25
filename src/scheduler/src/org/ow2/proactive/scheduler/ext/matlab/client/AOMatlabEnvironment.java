@@ -36,6 +36,11 @@
  */
 package org.ow2.proactive.scheduler.ext.matlab.client;
 
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.TreeSet;
+
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.exception.UserException;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
@@ -49,14 +54,15 @@ import org.ow2.proactive.scheduler.ext.matlab.common.PASolveMatlabGlobalConfig;
 import org.ow2.proactive.scheduler.ext.matlab.common.PASolveMatlabTaskConfig;
 import org.ow2.proactive.scheduler.ext.matlab.common.exception.MatlabTaskException;
 import org.ow2.proactive.scheduler.ext.matlab.worker.MatlabExecutable;
-import org.ow2.proactive.scheduler.ext.matsci.client.*;
+import org.ow2.proactive.scheduler.ext.matsci.client.AOMatSciEnvironment;
+import org.ow2.proactive.scheduler.ext.matsci.client.MatSciJobPermanentInfo;
+import org.ow2.proactive.scheduler.ext.matsci.client.MatSciJobVolatileInfo;
+import org.ow2.proactive.scheduler.ext.matsci.client.MatSciTaskStatus;
+import org.ow2.proactive.scheduler.ext.matsci.client.PASolveException;
+import org.ow2.proactive.scheduler.ext.matsci.client.Pair;
 import org.ow2.proactive.scripting.InvalidScriptException;
 import org.ow2.proactive.scripting.SelectionScript;
-
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.TreeSet;
+import org.ow2.proactive.scripting.SimpleScript;
 
 
 /**
@@ -188,14 +194,24 @@ public class AOMatlabEnvironment extends AOMatSciEnvironment<Boolean, MatlabResu
                 if (config.isRunAsMe()) {
                     schedulerTask.setRunAsMe(true);
 
-                    // TODO: Fix for Windows since RunAsMe on windows cannot access java.io.tmpdir
-                    ForkEnvironment f = new ForkEnvironment();
-                    //f.addJVMArgument("-Dnode.dataspace.scratchdir=c:\\Temp\\tata");
+                    // Fix for SCHEDULING-1308: With RunAsMe on windows the forked jvm can have a non-writable java.io.tmpdir
+                    // With the following js script the forked jvm will inherit the scratchdir property or if undefined the java.io.tmpdir of the node jvm  
+                    final StringBuilder sb = new StringBuilder(368);
+                    sb.append("importClass(java.lang.System);");
+                    sb.append("importClass(org.ow2.proactive.scheduler.task.launcher.TaskLauncher);");
+                    sb.append("var scratchDir=System.getProperty(TaskLauncher.NODE_DATASPACE_SCRATCHDIR);");
+                    sb.append("if (scratchDir == null) {");
+                    sb.append("forkEnvironment.addJVMArgument(\"-Djava.io.tmpdir=\"");
+                    sb.append("+ System.getProperty(\"java.io.tmpdir\"));");
+                    sb.append("} else {");
+                    sb.append("forkEnvironment.addJVMArgument(\"-Djava.io.tmpdir=\" + scratchDir);}");
+
+                    final ForkEnvironment f = new ForkEnvironment();
+                    f.setEnvScript(new SimpleScript(sb.toString(), "js"));
                     schedulerTask.setForkEnvironment(f);
                 }
 
                 String tname = "" + i + "_" + j;
-
                 tnames.add(tname);
 
                 if (j == depth - 1) {
