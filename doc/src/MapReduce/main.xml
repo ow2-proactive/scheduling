@@ -5,8 +5,8 @@
                 "docbook.dtd" [
 	<!-- WARNING: Please do not edit with XXE -->
 	<!-- This file is only meant as a concatenation of the other xml files -->
-<!-- 	<!ENTITY BookInfo			SYSTEM "BookInfo.xml"> -->
-<!-- 	<!ENTITY Contributors		SYSTEM "Contributors.xml"> -->
+	<!ENTITY BookInfo			SYSTEM "BookInfo.xml">
+	<!ENTITY Contributors		SYSTEM "Contributors.xml">
 
 <!-- 	<!ENTITY Overview			SYSTEM "Overview.xml"> -->
 <!-- 	<!ENTITY UserManual			SYSTEM "UserManual.xml"> -->
@@ -26,20 +26,20 @@
 ]>
 
 <book xmlns="http://docbook.org/ns/docbook" version="5.0">
-<!-- 	&BookInfo; -->
-<!-- 	&Contributors; -->
+	&BookInfo;
+	&Contributors;
 
-	<part xml:id="ProActiveMapReduce">
-		<info>
-			<title>ProActive MapReduce</title>
-		</info>
+	<!-- <part xml:id="ProActiveMapReduce"> -->
+	<!-- 	<info> -->
+	<!-- 		<title>ProActive MapReduce</title> -->
+	<!-- 	</info> -->
 <!-- 		&Overview; -->
 <!-- 		&UserManual; -->
 <!-- 		&AdminManual; -->
 <!-- 		&Tutorial; -->
 <!-- 		&Plugin; -->
 			&MapReduce;
-	</part>
+	<!-- </part> -->
 
 <!-- 	<part xml:id="Appendice"><info><title xml:id="Appendice_title">Appendice</title></info> -->
 <!-- 		&XSDJobSchema; -->
