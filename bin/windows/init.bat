@@ -52,6 +52,7 @@ IF EXIST "%PA_SCHEDULER%\classes\scheduler" (
 	SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\ProActive_ResourceManager.jar
 	SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\ProActive_Scheduler-core.jar
 	SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\ProActive_Scheduler-matsci.jar
+	SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\ProActive_Scheduler-mapreduce.jar
 	FOR %%j IN ("%PA_SCHEDULER%\addons\*.jar") DO SET JARS=!JARS!;%%j
 )
 
