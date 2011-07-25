@@ -378,10 +378,6 @@ public class TopologyViewer {
                                 }
                             }
 
-                            visualization.run("latencyFilter");
-                            visualization.run("unique");
-                            visualization.run("dynamicColor");
-                            visualization.run("layout");
                         } finally {
                             lock.unlock();
                         }
@@ -596,80 +592,6 @@ public class TopologyViewer {
                 visualization.run("layout");
             }
         });
-
-        //	TODO: add clustering information to the topology view
-        //        // Slider to select number of clusters
-        //        final JValueSlider clustersSlider = new JValueSlider("Clusters", 0, 6, 0);
-        //        clustersSlider.setBackground(Color.WHITE);
-        //        clustersSlider.setPreferredSize(new Dimension(300, 22));
-        //        clustersSlider.setMaximumSize(new Dimension(300, 22));
-        //        clustersSlider.addChangeListener(new ChangeListener() {
-        //            public void stateChanged(ChangeEvent e) {
-        //                int nb = clustersSlider.getValue().intValue();
-        //                if (nb != nbClusters) {
-        //                    nbClusters = nb;
-        //                    clusterize();
-        //                }
-        //            }
-        //        });
-        //
-        //        JRadioButton max = new JRadioButton("MAX");
-        //        max.setSelected(true);
-        //        JRadioButton avg = new JRadioButton("AVG");
-        //        JRadioButton min = new JRadioButton("MIN");
-        //
-        //        clusteringMode.add(max);
-        //        clusteringMode.add(avg);
-        //        clusteringMode.add(min);
-        //
-        //        max.addActionListener(new ActionListener() {
-        //			public void actionPerformed(ActionEvent e) {
-        //				String clusteringModeStr = clusteringMode.getSelection().toString();
-        //				if (nbClusters <= 0 ) {
-        //					return;
-        //				}
-        //		        List<Cluster<String>> clusters = topology.clusterize(nbClusters, BestProximityDescriptor.MAX);
-        //		        clusterize(clusters);
-        //			}
-        //		});
-        //        avg.addActionListener(new ActionListener() {
-        //			public void actionPerformed(ActionEvent e) {
-        //				if (nbClusters <= 0 ) {
-        //					return;
-        //				}
-        //		        List<Cluster<String>> clusters = topology.clusterize(nbClusters, BestProximityDescriptor.AVG);
-        //		        clusterize(clusters);
-        //			}
-        //		});
-        //        min.addActionListener(new ActionListener() {
-        //			public void actionPerformed(ActionEvent e) {
-        //				if (nbClusters <= 0 ) {
-        //					return;
-        //				}
-        //		        List<Cluster<String>> clusters = topology.clusterize(nbClusters, BestProximityDescriptor.MIN);
-        //		        clusterize(clusters);
-        //			}
-        //		});
-        //
-        //        // box of 'clusterAlgo' combobox + label
-        //        Box clusterAlgoBox = new Box(BoxLayout.X_AXIS);
-        //        clusterAlgoBox.setPreferredSize(new Dimension(300, 20));
-        //        clusterAlgoBox.setMaximumSize(new Dimension(300, 20));
-        //        clusterAlgoBox.add(Box.createVerticalGlue());
-        //        JLabel lab = new JLabel("Mode");
-        //        lab.setToolTipText("Set clustering selection mode");
-        //        clusterAlgoBox.add(lab);
-        //        clusterAlgoBox.add(Box.createRigidArea(new Dimension(70, 20)));
-        //        clusterAlgoBox.add(max);
-        //        clusterAlgoBox.add(avg);
-        //        clusterAlgoBox.add(min);
-        //
-        //        // Box containing ClusersSlider and
-        //        Box ClusterBox = new Box(BoxLayout.Y_AXIS);
-        //        ClusterBox.setPreferredSize(new Dimension(300, 44));
-        //        ClusterBox.setMaximumSize(new Dimension(300, 44));
-        //        ClusterBox.add(clustersSlider);
-        //        ClusterBox.add(clusterAlgoBox);
 
         // max latency slider, set the latency threshold
         latencySlider = new JValueSlider("Threshold", 0, maxLatency > 0 ? maxLatency : 1, maxLatency);
