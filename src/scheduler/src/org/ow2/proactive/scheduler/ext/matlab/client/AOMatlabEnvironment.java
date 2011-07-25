@@ -324,28 +324,32 @@ public class AOMatlabEnvironment extends AOMatSciEnvironment<Boolean, MatlabResu
                     schedulerTask.addSelectionScript(sscript);
                 }
 
-                URL url3 = new URL(config.getCheckLicenceScriptUrl());
-                if (checkScript(url3)) {
-                    SelectionScript sscript = null;
-                    String[] scriptParams;
-                    ArrayList<String> paramsList = new ArrayList<String>();
-                    taskConfigs[i][j].setRid(aoid + "_" + lastGenJobId + "_" + tname);
-                    paramsList.add(taskConfigs[i][j].getRid());
-                    paramsList.add(config.getLogin());
-                    paramsList.add(config.getLicenseServerUrl());
-                    if (taskConfigs[i][j].getToolboxesUsed() != null) {
-                        paramsList.addAll(Arrays.asList(taskConfigs[i][j].getToolboxesUsed()));
-                    } else {
-                        paramsList.addAll(Arrays.asList(config.getScriptParams()));
-                    }
-                    scriptParams = paramsList.toArray(new String[paramsList.size()]);
-                    try {
-                        sscript = new SelectionScript(url3, scriptParams);
-                    } catch (InvalidScriptException e1) {
-                        throw new RuntimeException(e1);
-                    }
+                // The selection script that checks for MATLAB license and toolboxes 
+                // if a license server is specified
+                if (config.getLicenseServerUrl() != null) {
+                    URL url3 = new URL(config.getCheckLicenceScriptUrl());
+                    if (checkScript(url3)) {
+                        SelectionScript sscript = null;
+                        String[] scriptParams;
+                        ArrayList<String> paramsList = new ArrayList<String>();
+                        taskConfigs[i][j].setRid(aoid + "_" + lastGenJobId + "_" + tname);
+                        paramsList.add(taskConfigs[i][j].getRid());
+                        paramsList.add(config.getLogin());
+                        paramsList.add(config.getLicenseServerUrl());
+                        if (taskConfigs[i][j].getToolboxesUsed() != null) {
+                            paramsList.addAll(Arrays.asList(taskConfigs[i][j].getToolboxesUsed()));
+                        } else {
+                            paramsList.addAll(Arrays.asList(config.getScriptParams()));
+                        }
+                        scriptParams = paramsList.toArray(new String[paramsList.size()]);
+                        try {
+                            sscript = new SelectionScript(url3, scriptParams);
+                        } catch (InvalidScriptException e1) {
+                            throw new RuntimeException(e1);
+                        }
 
-                    schedulerTask.addSelectionScript(sscript);
+                        schedulerTask.addSelectionScript(sscript);
+                    }
                 }
 
                 schedulerTask.addArgument("global_config", config);
