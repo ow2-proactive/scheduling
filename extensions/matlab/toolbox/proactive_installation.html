@@ -64,11 +64,14 @@
     <li><p>The local Matlab session will connect to the ProActive Scheduler.</p></li>
     <li><p>The local user will submit a function <b>foo</b> to call with a set of parameters.</p></li>
     <li><p>The Scheduler will select among all its resources, those suited to the job.</p></li>
+    <li><p>Eventually a License Server Proxy called <i>ProActive License Saver</i>, will ensure that desired license tokens are available on each machine.</p></li>
     <li><p>A Matlab engine will be started on each selected resource</p></li>
     <li><p>Each <b>foo(k)</b> will be executed on remote engines</p></li>
     <li><p>Results will be forwarded back to the user</p></li>
 </ul>
 
+<p><b><i>ProActive License Saver</i></b> is distributed separately from ProActive Scheduler, please contact <a href="http://www.activeeon.com">http://www.activeeon.com</a> for more information.</p>
+<p>The License Saver address must be specified as an option while running remote tasks. See <a href="proactive_options.html"></a> for more details.</p>
 
 </p>
 <a name="installation-2"></a>
@@ -92,8 +95,6 @@
     <li><p>Each <b>client host</b> which will connect to the Scheduler to submit matlab functions.</p></li>
 </ol>
 <p>The prerequisite for using ProActive is a <b>Java Virtual Machine</b>. On the above list, machines of group 1 and 2 must have a Java Virtual Machine installed and available on the Path of either cmd.exe for Windows or sh for linux. For many ProActive features it is also necessary to define the environment variable JAVA_HOME to the installation directory of the Java Virtual Machine.</p>
-
-<p>If a worker host is running on Windows 64bits, a patch must be installed on top of ProActive installation, refer to <a href="https://bugs.activeeon.com/browse/SCHEDULING-1025">SCHEDULING-1025</a> for details.</p>
 
 <p>Complete configuration and installation of ProActive Scheduler is beyond the scope of this help, for more information, refer to:</p>
 
@@ -132,11 +133,8 @@
     &lt;installation&gt;
         &lt;version&gt;7.9&lt;/version&gt;
         &lt;home&gt;C:\Program Files\MATLAB\R2009b&lt;/home&gt;
-        &lt;libdir&gt;bin\win32&lt;/libdir&gt;
-        &lt;extdir&gt;&lt;/extdir&gt;
         &lt;bindir&gt;bin&lt;/bindir&gt;
         &lt;command&gt;matlab.exe&lt;/command&gt;
-        &lt;ptolemydir&gt;dist/lib/7.9/bin/win32&lt;/ptolemydir&gt;
     &lt;/installation&gt;
 &lt;/MatlabInstallations&gt;</pre>
 
@@ -144,32 +142,10 @@
 <ul type="disc">
     <li><p><b>version:</b> The matlab version installed in numeric format.</p></li>
     <li><p><b>home:</b> Full path to matlab home directory.</p></li>
-    <li><p><b>libdir:</b> relative path (from homedir) to matlab dlls (bin\win32 for Windows 32, bin\win64 for Windows64.</p></li>
-    <li><p><b>extdir:</b> not used on Windows see contents of MatlabConfigurationTemplateLinux.xml for Linux hosts.</p></li>
-    <li><p><b>bindir:</b> relative path to the directory where to find the matlab executable.</p></li>
+    <li><p><b>bindir:</b> relative path to the directory where to find the matlab executable. On windows, it is mandatory to use the matlab executable under bin/win32 (bin/win64) and not the executable directly in the bin directory. On linux systems on the other hand, it's mandatory to use the executable in the bin directory.</p></li>
     <li><p><b>command:</b> matlab executable name.</p></li>
-    <li><p><b>ptolemydir:</b> relative path (from ProActive Scheduler installation directory), where to find the native libraries for this Operating System and this Matlab version. The relative path is always dist/lib/$version/bin/$os, where:</p>
-        <ul type="circle">
-            <li><p>$version is matlab version numeric version</p></li>
-            <li><p>$os is one of the following:</p>
-                <ul type="circle">
-                    <li><p>win32 for Windows 32bits</p></li>
-                    <li><p>win64 for Windows 64bits</p></li>
-                    <li><p>glnxa64 for Linux 64bits</p></li>
-                </ul>
-            </li>
-
-        </ul>
-
-    </li>
 </ul>
-<p>The file supports multiple matlab configurations on the same Host (i.e. multiple matlab versions), and ProActive Scheduler Toolbox allows to select specific matlab versions for a given job dynamically. There is although an important limitation on Windows: Matlab engine on windows works as a registered COM service. The registration as a COM service works for only one installation instance(version) of Matlab. If other matlab engines that the one registered try to start, it will fail. There exists a workaround to this issue, it is possible to run the command "matlab /regserver" to register a specific version of Matlab as the current matlab engine, but Administrators or Super Users only can run the command. In case of multiple Matlab configurations specified on Windows, ProActive Scheduler Toolbox will try to run the "matlab /regserver", but the scheduler will have to be a Super User account for this to work.</p>
-<p>To resume the problem on Windows, you can either:</p>
-<ul type="disc">
-    <li><p>Have one single instance of Matlab installed on a given host.</p></li>
-    <li><p>Have multiple instances of Matlab installed. Run "matlab /regserver" from an Administrator account on a specific matlab version and configure that version in MatlabConfiguration.xml.</p></li>
-    <li><p>Have multiple instances of Matlab installed and let ProActive Scheduler run on a Administrator or Power User account (matlab /regserver commands will be run dynamically by ProActive Scheduler Toolbox).</p></li>
-</ul>
+<p>The file supports multiple matlab configurations on the same Host (i.e. multiple matlab versions), and ProActive Scheduler Toolbox allows to select specific matlab versions for a given job dynamically.</p>
 
 <a name="installation-5"></a>
 
@@ -185,25 +161,27 @@
     <li><p>Specific to a <b>given user</b>, but common to all matlab installations of this machine (and also all other Java programs).</p></li>
 </ul>
 <h4><u>Matlab specific configuration</u></h4>
-<p>In order to do the first type of configuration, one needs to have write access to Matlab's installation directory (requires administrator privilege). First a file called <b>matlab.java.policy</b> must be created in the directory <b>MATLAB/bin/ARCH</b> where:</p>
-<ul type="disc">
-    <li><p><b>MATLAB</b> refers to your Matlab installation directory.</p></li>
-    <li><p><b>ARCH</b> refers to the architecture directory : glnax64 for linux 64bits, win32 for Windows 32bits and win64 for Windows 64bits.</p></li>
-</ul>
+<p>In order to do the first type of configuration, one needs to have write access to Matlab's installation directory (requires administrator privilege). First a file called <b>matlab.java.policy</b> must be created at any path which doesn't contain spaces, for example<b>d:\path\without\spaces\matlab.java.policy</b>.</p>
+
 <p>The <b>matlab.java.policy</b> file must contain the following:</p>
 <pre>grant {
   permission java.security.AllPermission;
 };</pre>
-<p>Finally, a second file called <b>java.opts</b> must be created in the same directory with the following content:</p>
+<p>Finally, a second file called <b>java.opts</b> must be created in the directory <b>MATLAB/bin/ARCH</b> where:</p>
+<ul type="disc">
+    <li><p><b>MATLAB</b> refers to your Matlab installation directory.</p></li>
+    <li><p><b>ARCH</b> refers to the architecture directory : glnax64 for linux 64bits, win32 for Windows 32bits and win64 for Windows 64bits.</p></li>
+</ul>
+<p>The java.opts file must have the following content:</p>
 <pre>-Djava.security.manager \
--Djava.security.policy=C:\Program Files\MATLAB\R2007b\bin\win64\matlab.java.policy</pre>
+-Djava.security.policy=d:\path\without\spaces\matlab.java.policy</pre>
 <p>Here <b>java.security.policy</b> points to the full path of the <b>matlab.java.policy</b> file, replace this path with yours.</p>
 <p>These two files created, you can start matlab and verify that the configuration has been done correctly, by typing the following command on the matlab prompt:</p>
 <pre>>> java.lang.System.getProperty('java.security.policy')
 
 ans =
 
-C:\Program Files\MATLAB\R2007b\bin\win64\matlab.java.policy
+d:\path\without\spaces\matlab.java.policy
  </pre>
 <p>You must see the path that you specified in the <b>java.opts</b> file. If you don't see this path, it means there is a syntax error in the java.opts file, try different things, like writing everything on one line, using a backslash to separate lines, etc (as the syntax accepted varies on different Operating Systems).</p>
 <p>If the configuration has not been done properly, a call to PAconnect (see Chapter <a href="proactive_startup.html#startup-3">Connecting to a running ProActive Scheduler from Matlab</a> ) will result in displaying a big error message containing the following Exception:</p>
