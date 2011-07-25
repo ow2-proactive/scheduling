@@ -81,4 +81,5 @@ ensure
   System.setOut(orig_jstdout);
   System.setErr(orig_jstderr);
   logout.close();
+  fos.close();
 end
