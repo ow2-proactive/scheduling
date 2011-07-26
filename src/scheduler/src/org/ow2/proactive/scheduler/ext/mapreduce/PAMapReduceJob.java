@@ -988,6 +988,17 @@ public class PAMapReduceJob {
     }
 
     /**
+     * Return the {@link TaskFlowJob} built by this PAMapReduceJob. The result
+     * may be used to submit the MapReduce job to the ProActive Scheduler if the
+     * desired mode of submission is not covered by the {@link #run} method.
+     *
+     * @return the TaskFlowJob built by this PAMapReduceJob
+     */
+    public TaskFlowJob getMapReduceWorkflow() {
+        return mapReduceWorkflow;
+    }
+
+    /**
      * Check if the ProActive MapReduce Workflow is already initialized
      *
      * @return true if the ProActive MapReduce Workflow is already initialized,
