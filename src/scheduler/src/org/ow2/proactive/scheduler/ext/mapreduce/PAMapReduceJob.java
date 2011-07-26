@@ -22,6 +22,7 @@ import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.util.StringUtils;
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.common.Scheduler;
@@ -75,6 +76,7 @@ import org.ow2.proactive.scripting.SimpleScript;
  * @author The ProActive Team
  *
  */
+@PublicAPI
 public class PAMapReduceJob {
 
     protected static final Logger logger = DefaultLogger.getInstance();
