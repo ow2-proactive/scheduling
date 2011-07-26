@@ -63,7 +63,7 @@ public class TreeContentProvider implements IStructuredContentProvider, ITreeCon
             if (treeElement.getType() == TreeElementType.NODE) {
                 treeElement = treeElement.getParent();
             }
-            return treeElement.getParent();
+            return treeElement == null ? null : treeElement.getParent();
         }
         return null;
     }
