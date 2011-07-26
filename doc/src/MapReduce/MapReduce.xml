@@ -312,9 +312,8 @@ FileOutputFormat.setOutputPath(job, new Path("output_dir"));</programlisting>
 
                             <programlisting language="sh"># filename: $MAPREDUCE_EXAMPLE/paMapReduceConfigurationProperties.property
 
-# scheduler home and URL
+# scheduler URL
 org.ow2.proactive.scheduler.ext.mapreduce.schedulerUrl=rmi://localhost:55855/
-org.ow2.proactive.scheduler.ext.mapreduce.schedulerHome=/home/user/proactive/scheduler/
 
 # credentials to use when submitting the job
 org.ow2.proactive.scheduler.ext.mapreduce.username=admin

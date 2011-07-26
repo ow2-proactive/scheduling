@@ -5,8 +5,6 @@ org.ow2.proactive.scheduler.ext.mapreduce.schedulerUrl=rmi://eon1.inria.fr:55855
 # REQUIRED: credentials to use to do the authentication to the ProActive Scheduler when submitting the MapReduce job
 org.ow2.proactive.scheduler.ext.mapreduce.username=admin
 org.ow2.proactive.scheduler.ext.mapreduce.password=admin
-#org.ow2.proactive.scheduler.ext.mapreduce.schedulerHome=/auto/sop-nas2a/u/sop-nas2a/vol/home_oasis/eborelli/workspace/scheduling_branches_SHORT_MapReduce/
-org.ow2.proactive.scheduler.ext.mapreduce.schedulerHome=/user/eborelli/home/workspace/scheduling_branches_SHORT_MapReduce/
 
 
 ### start of: ProActive MapReduce Job global properties ###

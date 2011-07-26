@@ -1,6 +1,3 @@
-# this property lists the jars needed by the ProActive MapReduce framework
-org.ow2.proactive.scheduler.ext.mapreduce.jars=ProActive_Scheduler-mapreduce.jar, hadoop-0.20.2-core.jar
-
 # utility string to build a pattern to use in matching mapper output file name (intermediate_\d{0,}_<reducerId>)
 #org.ow2.proactive.scheduler.regex.zeroOrMoreDigits=\\d{0,}
 
@@ -37,11 +34,6 @@ org.ow2.proactive.scheduler.ext.mapreduce.workflow.hadoopOutputDirectoryProperty
 org.ow2.proactive.scheduler.ext.mapreduce.workflow.mapperPATask.replicationScript.fileName=replicateMapperPATask.js
 org.ow2.proactive.scheduler.ext.mapreduce.workflow.reducerPATask.replicationScript.fileName=replicateReducerPATask.js
 org.ow2.proactive.scheduler.ext.mapreduce.reducerPATask.outputFileTransferPostScript.fileName=reducerPATaskOutputFileTransfer.js
-
-# path to the folder containing additional jars to add to the classpath when creating the fork environment.
-# This path will be resolved against the $SCHEDULER_HOME
-#org.ow2.proactive.scheduler.ext.mapreduce.schedulerAdditionalClasspathFolder=addons/
-org.ow2.proactive.scheduler.ext.mapreduce.schedulerAdditionalClasspathFolder=dist/lib/
 
 # framework script engine name
 org.ow2.proactive.scheduler.ext.mapreduce.workflow.scriptEngineName=javascript
