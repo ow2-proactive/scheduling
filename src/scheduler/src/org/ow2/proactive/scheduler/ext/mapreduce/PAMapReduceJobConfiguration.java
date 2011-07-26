@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.scheduler.common.task.RestartMode;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputAccessMode;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
@@ -30,6 +31,7 @@ import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
  * @author The ProActive Team
  *
  */
+@PublicAPI
 public class PAMapReduceJobConfiguration {
 
     /**
