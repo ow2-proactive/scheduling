@@ -2,6 +2,9 @@ mode(-1);
 lines(0);
 global PA_scheduler_dir
 
+TOOLBOX_NAME = 'toolbox_proactive';
+TOOLBOX_TITLE = 'Toolbox ProActive';
+
 // Version Check
 try
     version = getversion('scilab');
@@ -39,4 +42,13 @@ macros=root_tlbx+'macros';
 
 //ilib_build('importjava',sci_gtw,[cpp c jni gateway],[],'','-ljvm',include);
 
-genlib('toolbox_pascheduler',macros);
+tbx_builder_macros(root_tlbx);
+tbx_builder_help(root_tlbx);
+tbx_build_loader(TOOLBOX_NAME, root_tlbx);
+tbx_build_cleaner(TOOLBOX_NAME, root_tlbx);
+
+
+//genlib('toolbox_pascheduler',macros);
+
+clear root_tlbx TOOLBOX_NAME TOOLBOX_TITLE;
+

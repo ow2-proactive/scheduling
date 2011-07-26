@@ -17,7 +17,7 @@
 				(including GNU/Linux) and Windows (9X/2000/XP).
 			</para>
 			<para>
-                The interface with Scilab inside ProActive comes as a Scilab Toolbox that can be directly accessed from the Scilab environment (ProActive Scheduler Toolbox). The objectives of <emphasis>ProActive Scheduler Toolbox</emphasis> are to provide you with tools that:
+                The interface with Scilab inside ProActive comes as a Scilab Toolbox that can be directly accessed from the Scilab environment (ProActive Toolbox). The objectives of <emphasis>ProActive Toolbox</emphasis> are to provide you with tools that:
             </para>
             <itemizedlist>
                 <listitem>
@@ -27,7 +27,7 @@
                 </listitem>
                 <listitem>
                     <para>
-                        Do not block the local Scilab session while remote results are being produced (being developped).
+                        Do not block the local Scilab session while remote results are being produced.
                     </para>
                 </listitem>
                 <listitem>
@@ -52,156 +52,64 @@
         <info>
             <title>Installation for Scilab</title>
         </info>
-         <para>The toolbox is currently under Alpha version. Therefore we provide only help to install the toolbox but not of its usage. Next releases of ProActive Scheduler will feature a fully functional and documented toolbox.
-
-         </para>
-
         <para>
-            The toolbox works only with Scilab version <emphasis>5.3</emphasis>.
-            The toolbox can be found at <emphasis>SCHEDULING/extensions/scilab/PAscheduler</emphasis>. To install it inside Scilab, the toolbox must be built and loaded inside Scilab via the standard Scilab toolboxes installation scheme. The toolbox depends on another toolbox called <emphasis>JIMS</emphasis> which can be found at <emphasis>SCHEDULING/extensions/scilab/JIMS</emphasis>.
-            Below is the sequence of instructions from the scilab prompt to install both toolboxes.
+            The toolbox works only with Scilab version <emphasis>5.3</emphasis> and higher. The toolbox depends on another toolbox called <emphasis>JIMS</emphasis> which must be downloaded and installed from <emphasis>ATOMS</emphasis> before installing the ProActive Toolbox.
         </para>
-         <para>Installation of JIMS:</para>
-        <screen>-->cd('/home/fviale/eclipse_workspace/Scheduling_Clean/extensions/scilab/JIMS')
+        <para>
+            The toolbox can be found at <emphasis>SCHEDULING/extensions/scilab/PAscheduler</emphasis>. To install it inside Scilab, the toolbox must be built and loaded inside Scilab via the standard Scilab toolboxes installation scheme.
+            Below is the sequence of instructions from the scilab prompt to install it.
+        </para>
+        <para>At Scilab prompt, you first need to move to the toolbox root directory. Then you need to run "exec builder.sce", and "exec loader.sce" as shown underneath:</para>
+      <screen><![CDATA[-->cd /home/fviale/release_3.1.0_RC3/ProActiveScheduling-3.1.0_client-API-matsci/extensions/scilab/PAscheduler
  ans  =
 
- /home/fviale/eclipse_workspace/Scheduling_Clean/extensions/scilab/JIMS
-
--->exec builder_src.sce
-
--->mode(-1);
-   Génère un fichier gateway
-   Génère un fichier loader
-   Génère un Makefile
-   ilib_gen_Make : Copie les fichiers de compilation (Makefile*, libtool...) vers TMPDIR
-   ilib_gen_Make : Copie unwrapshort.cpp vers TMPDIR
-   ilib_gen_Make : Copie getmethods.cpp vers TMPDIR
-   ilib_gen_Make : Copie unwrapstring.cpp vers TMPDIR
-   ilib_gen_Make : Copie unwrapboolean.cpp vers TMPDIR
-   ilib_gen_Make : Copie GiwsException.cpp vers TMPDIR
-   ilib_gen_Make : Copie ScilabObjects.cpp vers TMPDIR
-   ilib_gen_Make : Copie unwrapdouble.cpp vers TMPDIR
-   ilib_gen_Make : Copie unwrapfloat.cpp vers TMPDIR
-   ilib_gen_Make : Copie unwrapint.cpp vers TMPDIR
-   ilib_gen_Make : Copie ScilabJavaClass.cpp vers TMPDIR
-   ilib_gen_Make : Copie unwraplong.cpp vers TMPDIR
-   ilib_gen_Make : Copie unwrapchar.cpp vers TMPDIR
-   ilib_gen_Make : Copie ScilabJavaObject.cpp vers TMPDIR
-   ilib_gen_Make : Copie unwrapbyte.cpp vers TMPDIR
-   ilib_gen_Make : Copie ScilabJavaArray.cpp vers TMPDIR
-   ilib_gen_Make : Copie ScilabJavaObject2.cpp vers TMPDIR
-   ilib_gen_Make : Copie ScilabClassLoader.cpp vers TMPDIR
-   ilib_gen_Make : Copie getfields.cpp vers TMPDIR
-   ilib_gen_Make : Copie ScilabObjectsk.c vers TMPDIR
-   ilib_gen_Make : Copie getSciArgs.c vers TMPDIR
-   ilib_gen_Make : Copie sci_convMatrixMethod.c vers TMPDIR
-   ilib_gen_Make : Copie sci_displayJObj.c vers TMPDIR
-   ilib_gen_Make : Copie sci_getFields.c vers TMPDIR
-   ilib_gen_Make : Copie sci_getMethods.c vers TMPDIR
-   ilib_gen_Make : Copie sci_getRep.c vers TMPDIR
-   ilib_gen_Make : Copie sci_getfield.c vers TMPDIR
-   ilib_gen_Make : Copie sci_getfield_l.c vers TMPDIR
-   ilib_gen_Make : Copie sci_getfield_lu.c vers TMPDIR
-   ilib_gen_Make : Copie sci_getfield_u.c vers TMPDIR
-   ilib_gen_Make : Copie sci_import.c vers TMPDIR
-   ilib_gen_Make : Copie sci_import_u.c vers TMPDIR
-   ilib_gen_Make : Copie sci_invoke.c vers TMPDIR
-   ilib_gen_Make : Copie sci_invoke_l.c vers TMPDIR
-   ilib_gen_Make : Copie sci_invoke_lu.c vers TMPDIR
-   ilib_gen_Make : Copie sci_invoke_u.c vers TMPDIR
-   ilib_gen_Make : Copie sci_javaArray.c vers TMPDIR
-   ilib_gen_Make : Copie sci_javaCast.c vers TMPDIR
-   ilib_gen_Make : Copie sci_javadeff.c vers TMPDIR
-   ilib_gen_Make : Copie sci_loadClass.c vers TMPDIR
-   ilib_gen_Make : Copie sci_newInstance.c vers TMPDIR
-   ilib_gen_Make : Copie sci_newInstance_l.c vers TMPDIR
-   ilib_gen_Make : Copie sci_remove.c vers TMPDIR
-   ilib_gen_Make : Copie sci_setfield.c vers TMPDIR
-   ilib_gen_Make : Copie sci_setfield_l.c vers TMPDIR
-   ilib_gen_Make : Copie sci_unwrap.c vers TMPDIR
-   ilib_gen_Make : Copie sci_wrap.c vers TMPDIR
-   ilib_gen_Make : Copie sci_wrapinchar.c vers TMPDIR
-   ilib_gen_Make : Copie sci_wrapinfloat.c vers TMPDIR
-   ilib_gen_Make : Copie sci_wrapvar.c vers TMPDIR
-   ilib_gen_Make : Copie libimportjava.c vers TMPDIR
-   ilib_gen_Make : configure : Génère le Makefile.
-   ilib_gen_Make : Modification du Makefile dans TMPDIR.
-   Exécute le makefile
-   Génère un fichier cleaner
-
--->exec start.sce
-
--->here=get_absolute_file_path('start.sce');
-
--->macros=here+'macros';
-
--->java_home='/home/fviale/bin/jdk1.6.0_64/';
-
--->exec loader.sce;
-Bibliothèque partagée chargée.
-Edition de liens effectuée.
-
--->impjava=lib(macros);
-
--->if isfile('classpath/jlatexmath-0.9.3.jar') then
--->    javaclasspath([here+'jar/ScilabObjects.jar' here+'classpath' 'classpath/jlatexmath-0.9.3.jar' here+'classpath/scilatex.jar']);
--->else
--->    disp('Warning, cannot use latex library, in order to use it, download it at http://forge.scilab.org/index.php/p/jlatexmath/downloads/130/ and put the jar file into the classpath subfolder');
-
- Warning, cannot use latex library, in order to use it, download it at http://forge.scilab.org/index.php/p/jlatexmath/downloads/130/ and put the jar file into the c
-      lasspath subfolder
--->    javaclasspath([here+'jar/ScilabObjects.jar']);
--->end</screen>
-      <para>Installation of PAScheduler:</para>
-      <screen>-->cd ../PAscheduler/
- ans  =
-
- /home/fviale/eclipse_workspace/Scheduling_Clean/extensions/scilab/PAscheduler
+ /home/fviale/release_3.1.0_RC3/ProActiveScheduling-3.1.0_client-API-matsci/extensions/scilab/PAscheduler
 
 -->exec builder.sce
 
 -->mode(-1);
 
+ Start ProActive
+Building macros...
+
+ Building macros  in /home/fviale/eclipse_workspace/Scheduling_Clean/extensions/scilab/PAscheduler/macros/
+-- Création de [PAschedulerlib] (Macros) --
+Attention:
+L'identifiant : PASolveScilabGlobalConfig
+ a été tronqué en : PASolveScilabGlobalConfi.
+
+Building help...
+
+Construit le document maître:
+	/home/fviale/eclipse_workspace/Scheduling_Clean/extensions/scilab/PAscheduler/help
+
+Building the manual file [javaHelp] in /home/fviale/eclipse_workspace/Scheduling_Clean/extensions/scilab/PAscheduler/help.
+Generating loader.sce...
+Generating cleaner.sce...
+
 -->exec loader.sce
 
--->// ====================================================================
+-->// This file is released under the 3-clause BSD license. See COPYING-BSD.
 
--->// generated by builder.sce
+-->// Generated by builder.sce: Please, do not edit this file
 
--->// Copyright INRIA 2008
-
--->// ====================================================================
 
 -->try
---> getversion('scilab');
+--> getversion("scilab");
 -->catch
---> warning('Scilab 5.0 or more is required.');
---> return;
+--> error("Scilab 5.0 or more is required.");
 -->end;
 
--->// ====================================================================
 
--->root_tlbx = get_absolute_file_path('loader.sce');
+-->exec(get_absolute_file_path("loader.sce")+"etc/"+"toolbox_proactive.start");
+Start Toolbox ProActive
+	Load macros
+	Load help
 
--->exec(root_tlbx+'etc\'+'toolbox_pascheduler.start');
-
- Start Toolbox PAScheduler
-
- Load macros
-
- Load gateways
-
- Load help
-
--->// ====================================================================
-
--->clear root_tlbx;
-
--->// ====================================================================
- </screen>
+  ]]></screen>
 
         <para>
-            If those steps were done successfully the toolbox will be available to use on Scilab
+            If those steps were done successfully the toolbox will be available to use on Scilab. The detailed toolbox guide will also be loaded inside Scilab help at section "PAScheduler"
         </para>
 
 

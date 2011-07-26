@@ -1,0 +1,54 @@
+// Copyright (C) 2008 - INRIA
+// Copyright (C) 2009 - DIGITEO
+
+
+function toolbox_proactivelib = startModule()
+
+  mprintf("Start Toolbox ProActive\n");
+
+  if isdef("toolbox_proactivelib") then
+    warning("Toolbox ProActive library is already loaded");
+    //return;
+  end
+
+  etc_tlbx  = get_absolute_file_path("toolbox_proactive.start");
+  etc_tlbx  = getshortpathname(etc_tlbx);
+  root_tlbx = strncpy( etc_tlbx, length(etc_tlbx)-length("\etc\") );
+
+//Load  functions library
+// =============================================================================
+  mprintf("\tLoad macros\n");
+  pathmacros = pathconvert( root_tlbx ) + "macros" + filesep();
+  toolbox_proactivelib = lib(pathmacros);
+
+// load gateways
+// =============================================================================
+//  mprintf("\tLoad gateways\n");
+//  verboseMode = ilib_verbose();
+//  ilib_verbose(0);
+//  exec(pathconvert(root_tlbx+"/sci_gateway/loader_gateway.sce",%f));
+//  ilib_verbose(verboseMode);
+
+// Load and add help chapter
+// =============================================================================
+  if or(getscilabmode() == ["NW";"STD"]) then
+    mprintf("\tLoad help\n");
+    path_addchapter = pathconvert(root_tlbx+"/help");
+    if ( isdir(path_addchapter) <> [] ) then
+      add_help_chapter("Toolbox ProActive", path_addchapter, %F);
+    end
+  end
+
+// Load demos
+// =============================================================================
+//  if or(getscilabmode() == ["NW";"STD"]) then
+//    mprintf("\tLoad demos\n");
+//    pathdemos = pathconvert(root_tlbx+"/demos/toolbox_skeleton.dem.gateway.sce", %F, %T);
+//    add_demo("Toolbox skeleton", pathdemos);
+//  end
+
+endfunction
+
+toolbox_proactivelib = startModule();
+clear startModule; // remove startModule on stack
+
