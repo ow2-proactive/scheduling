@@ -301,7 +301,7 @@ inputs(j).trans = logtrans;
 
 
 % Parsing option file
-if ~exist('pa_options','var') == 1
+if ~exist('pa_options','var') == 1 || ~isstruct(pa_options)
     userdir = char(java.lang.System.getProperty('user.home'));
     optionpath = [userdir filesep '.matlab' filesep 'PAoptions.ini'];
     if exist(optionpath, 'file');
@@ -321,7 +321,7 @@ if ~exist('pa_options','var') == 1
                         error(['Parse error when loading option file ' optionpath ', option ' C{1}{i} ' doesn''t satisfy check ' func2str(chk) ]);
                     end
                     trans = inputs(j).trans;
-                    inputs(j).default = trans(C{2}{i});
+                    pa_options = setfield(pa_options, inputs(j).name, trans(C{2}{i}));                    
                 end
             end
         end
@@ -351,7 +351,7 @@ for i = 1:length(inputs)
             Parameter = trans(value);
         end
     end
-    if (~default || ~isfield(pa_options,inputs(i).name))
+    if ~default || ~(isstruct(pa_options) && isfield(pa_options,inputs(i).name))
         pa_options = setfield(pa_options, inputs(i).name, Parameter);
     end
 end

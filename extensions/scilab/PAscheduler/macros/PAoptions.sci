@@ -188,7 +188,7 @@ function opts = PAoptions(varargin)
                         end
                         transfunc = inputs(j).trans;
                         def = evstr(strcat([transfunc, '(value)']))
-                        inputs(j).default = def;                    
+                        proactive_pa_options(inputs(j).name) =  def;                   
                     end
                 end
                 [n,key, value] = getline(fid);
@@ -221,9 +221,7 @@ function opts = PAoptions(varargin)
         end
 
         if ~default | ~(isstruct(proactive_pa_options) & isfield(proactive_pa_options,inputs(i).name)) then      
-            proactive_pa_options(inputs(i).name) =  Parameter;
-        else
-
+            proactive_pa_options(inputs(i).name) =  Parameter;        
         end
     end
 
