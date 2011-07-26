@@ -163,24 +163,21 @@ public class PAMapReduceJob {
                     schedulerAdditionalClasspathFolder + "'");
 
                 ForkEnvironment forkEnvironment = new ForkEnvironment();
+
                 /*
-                 * We must explicitly add the list of the jars the ProActive MapReduce API needs
-                 * and only them (not all the files that we may find inside the "$SCHEDULER_HOME/addons/" or
-                 * "$SCHEDULER_HOME/dist/lib/" folders)
+                 * A workaround for SCHEDULING-1307: some classes from the
+                 * scheduler core are required by MapReduce on the node side, so
+                 * use envScript to add ProActive_Scheduler-core.jar to the
+                 * classpath of the forkEnvironment
                  */
-                String jarNameListString = PAMapReduceFrameworkProperties
-                        .getPropertyAsString(PAMapReduceFrameworkProperties.MAP_REDUCE_JARS.key);
-                if (jarNameListString != null) {
-                    String[] jarNameList = jarNameListString.replaceAll("\\s+", " ").replaceAll("[,\\s]+",
-                            ",").split(",", 0);
-                    if (jarNameList.length > 0) {
-                        for (String jarName : jarNameList) {
-                            forkEnvironment.addAdditionalClasspath(schedulerAdditionalClasspathFolder +
-                                jarName);
-                            logger.debug("Adding the following jar to the classpath '" +
-                                schedulerAdditionalClasspathFolder + jarName + "'");
-                        }
-                    }
+                String envScript = "home = org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl.getProActiveRuntime().getProActiveHome();\n"
+                    + "forkEnvironment.addAdditionalClasspath(home + \"/dist/lib/ProActive_Scheduler-core.jar\");";
+                logger.debug("Setting envScript");
+                try {
+                    forkEnvironment.setEnvScript(new SimpleScript(envScript, "javascript"));
+                } catch (InvalidScriptException e) {
+                    logger.warning("Failed to set envScript");
+                    e.printStackTrace();
                 }
 
                 /*
