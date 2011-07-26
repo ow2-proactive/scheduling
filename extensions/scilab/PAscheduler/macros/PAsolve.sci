@@ -263,7 +263,7 @@ function outputs = PAsolve(varargin)
 
             // Saving main function name (with or without Sources attribute)
             sourceNames = jarray('java.lang.String', 1);
-            sFN = 'PAsolve_src'+indToFile([i j])+'.bin';
+            sFN = 'ScilabPAsolve_src'+string(SOLVEid)+indToFile([i j])+'.bin';
             execstr('save(pa_dir+fs+sFN,'+Func+');');
             strName = String.new(sFN);
             sourceNames(0) = strName;
