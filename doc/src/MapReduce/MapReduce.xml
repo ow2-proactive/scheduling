@@ -1,11 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<chapter xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" version="5.0" xml:id="ProActive_Scheduler_MapReduce">
-    <info>
-        <title>ProActive MapReduce</title>
-    </info>
-
-    <section xml:id="MapReduce_Introduction">
+<chapter xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" version="5.0" xml:id="MapReduce_Introduction">
         <info>
             <title>Introduction to MapReduce</title>
         </info>
@@ -54,12 +49,12 @@
 
         <figure xml:id="google_mapreduce_execution">
             <info>
-                <title><trademark class="registered">Hadoop</trademark> MapReduce execution</title>
+                <title>MapReduce execution</title>
             </info>
             <mediaobject>
                 <imageobject>
-                    <imagedata scalefit="1" width="55%" contentdepth="55%"
-                               fileref="images/png/google_mapreduce_2374_1572.png" format="PNG" />
+                    <imagedata width="70%" align="center"
+                               fileref="images/png/google_mapreduce.png" format="PNG" />
                 </imageobject>
             </mediaobject>
         </figure>
@@ -85,13 +80,13 @@
         </para>
         <para>
             Google MapReduce is a C++ library, but an open source implementation in Java also
-            exists: <trademark class="registered">Apache</trademark> Hadoop MapReduce.  Hadoop
-            MapReduce follows the same approach taken by Google: the system is in charge of the
-            communication between machines. The user must only implement the
-            <emphasis>map</emphasis> and <emphasis>reduce</emphasis> functions and run the job
-            specifying the input data and the output directory for the results.  Like Google, Hadoop
-            uses its own distributed file system, <trademark class="registered">HDFS</trademark>
-            (Hadoop Distributed File System).
+            exists: <trademark class="registered">Apache</trademark> <trademark
+            class="registered">Hadoop</trademark> MapReduce.  Hadoop MapReduce follows the same
+            approach taken by Google: the system is in charge of the communication between
+            machines. The user must only implement the <emphasis>map</emphasis> and
+            <emphasis>reduce</emphasis> functions and run the job specifying the input data and the
+            output directory for the results.  Like Google, Hadoop uses its own distributed file
+            system, <trademark class="registered">HDFS</trademark> (Hadoop Distributed File System).
         </para>
         <para>
             The architecture and the execution of Hadoop MapReduce job is presented in the <xref
@@ -100,12 +95,12 @@
 
         <figure xml:id="hadoop_mapreduce_execution">
             <info>
-                <title>Hadoop MapReduce execution</title>
+                <title><trademark class="registered">Hadoop</trademark> MapReduce execution</title>
             </info>
             <mediaobject>
                 <imageobject>
-                    <imagedata scalefit="1" width="55%" contentdepth="55%"
-                               fileref="images/png/hadoop_run_mapreduce_1957_1426.png" format="PNG" />
+                    <imagedata width="70%" align="center"
+                               fileref="images/png/hadoop_run_mapreduce.png" format="PNG" />
                 </imageobject>
             </mediaobject>
         </figure>
@@ -166,9 +161,8 @@
                 additional configuration is needed.
             </para>
         </section>
-    </section>
-
-    <section xml:id="proactive_mapreduce_tutorial">
+    </chapter>
+    <chapter xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" version="5.0" xml:id="proactive_mapreduce_tutorial">
         <info><title>Tutorial: running Hadoop job using ProActive MapReduce</title></info>
         <para>
             This tutorial describes the steps necessary to port existing Hadoop job to Proactive
@@ -517,7 +511,7 @@ public class WordCount {
                         Compile:
                     </para>
                     <programlisting language="sh"># for compilation, we need 3 jars: Hadoop core, ProActive core and ProActive MapReduce addon
-$ COMPILE_CLASSPATH=$SCHEDULER_HOME/lib/mapreduce/hadoop-0.20.2-core.jar:$SCHEDULER_HOME/dist/lib/ProActive_Scheduler-core.jar:$SCHEDULER_HOME/addons/ProActive_Scheduler-mapreduce.jar
+$ COMPILE_CLASSPATH=$SCHEDULER_HOME/dist/lib/mapreduce/hadoop-0.20.2-core.jar:$SCHEDULER_HOME/dist/lib/ProActive_Scheduler-core.jar:$SCHEDULER_HOME/dist/lib/ProActive_Scheduler-mapreduce.jar
 
 $ mkdir $EXAMPLE_DIR/classes
 $ javac -cp $COMPILE_CLASSPATH -d $EXAMPLE_DIR/classes $EXAMPLE_DIR/WordCount.java</programlisting>
@@ -555,8 +549,7 @@ Scheduler successfully created on rmi://deepthought.inria.fr:55855/</programlist
                 </listitem>
                 <listitem>
                     <para>Run:</para>
-                    <programlisting language="sh"># to run, we need the same 3 jars as for the compilation plus the jars from dist/lib directory
-java -cp $COMPILE_CLASSPATH:$SCHEDULER_HOME/dist/lib/*:$EXAMPLE_DIR/classes WordCount</programlisting>
+                    <programlisting language="sh">java -cp $SCHEDULER_HOME/dist/lib/*:$EXAMPLE_DIR/classes WordCount</programlisting>
                 </listitem>
                 <listitem>
                     <para>
@@ -592,8 +585,8 @@ word    1</programlisting>
                 </listitem>
             </itemizedlist>
         </section>
-    </section>
-    <section xml:id="proactive_mapreduce_reference">
+    </chapter>
+    <chapter xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" version="5.0" xml:id="proactive_mapreduce_reference">
         <info>
             <title>
                 ProActive MapReduce Reference
@@ -628,8 +621,8 @@ word    1</programlisting>
                 </info>
                 <mediaobject>
                     <imageobject>
-                        <imagedata scalefit="1" width="55%" contentdepth="55%"
-                                   fileref="images/png/proactive_mapreduce_workflow_1673_1825.png" format="PNG" />
+                        <imagedata width="70%" align="center"
+                                   fileref="images/png/proactive_mapreduce_workflow.png" format="PNG" />
                     </imageobject>
                 </mediaobject>
             </figure>
@@ -965,8 +958,8 @@ word    1</programlisting>
                 specified during the configuration step, are ignored by the ProActive MapReduce.
             </para>
         </section>
-    </section>
-    <section>
+    </chapter>
+    <chapter xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" version="5.0" xml:id="ProActive_MapReduce_performance">
         <info>
             <title>ProActive MapReduce performance</title>
         </info>
@@ -1226,6 +1219,4 @@ word    1</programlisting>
                 </itemizedlist>
             </para>
         </section>
-    </section>
-
-</chapter>
+    </chapter>
