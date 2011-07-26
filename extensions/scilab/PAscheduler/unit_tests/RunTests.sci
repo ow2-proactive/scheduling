@@ -22,5 +22,12 @@ for i=1:nbiter
         [ok,msg] = TestPATask();
     end
     if ~ok disp(msg),return; end
+    
+    if exists('timeout')
+        [ok,msg] = TestMultipleSubmit(timeout);
+    else
+        [ok,msg] = TestMultipleSubmit();
+    end
+    if ~ok disp(msg),return; end
 end
 endfunction
