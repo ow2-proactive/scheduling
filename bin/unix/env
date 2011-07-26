@@ -58,6 +58,7 @@ else
     CLASSPATH=$CLASSPATH:"$PA_SCHEDULER/dist/lib/ProActive_ResourceManager.jar"
     CLASSPATH=$CLASSPATH:"$PA_SCHEDULER/dist/lib/ProActive_Scheduler-core.jar"
     CLASSPATH=$CLASSPATH:"$PA_SCHEDULER/dist/lib/ProActive_Scheduler-matsci.jar"
+    CLASSPATH=$CLASSPATH:"$PA_SCHEDULER/dist/lib/ProActive_Scheduler-mapreduce.jar"
     CP=`print_jars "$PA_SCHEDULER/addons/"`
     CLASSPATH=$CLASSPATH:$PA_SCHEDULER/addons/:$CP
 fi
