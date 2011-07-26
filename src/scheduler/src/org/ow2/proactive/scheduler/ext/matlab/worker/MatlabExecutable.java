@@ -38,17 +38,14 @@ package org.ow2.proactive.scheduler.ext.matlab.worker;
 
 import java.io.File;
 import java.io.FileWriter;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.net.URI;
-import java.net.UnknownHostException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
 
 import org.objectweb.proactive.extensions.dataspaces.api.DataSpacesFileObject;
-import org.objectweb.proactive.utils.OperatingSystem;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import org.ow2.proactive.scheduler.ext.common.util.FileUtils;
@@ -81,15 +78,17 @@ public class MatlabExecutable extends JavaExecutable {
     /** The ISO8601 for debug format of the date that precedes the log message */
     private static final SimpleDateFormat ISO8601FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:sss");
 
-    private static String HOSTNAME;
+    /** The value of the java.io.tmpdir property */
+    private static final String TMPDIR = System.getProperty("java.io.tmpdir");
 
-    private static OperatingSystem os;
+    private static String HOSTNAME;
+    private static String NODENAME;
 
     static {
         try {
             HOSTNAME = java.net.InetAddress.getLocalHost().getHostName();
-            os = OperatingSystem.getOperatingSystem();
-        } catch (UnknownHostException e) {
+            NODENAME = MatSciEngineConfigBase.getNodeName();
+        } catch (Exception e) {
         }
     }
 
@@ -121,10 +120,14 @@ public class MatlabExecutable extends JavaExecutable {
 
     @Override
     public void init(final Map<String, Serializable> args) throws Exception {
-        Object obj;
+
+        // Fix for SCHEDULING-1308: With RunAsMe on windows the forked jvm can have a non-writable java.io.tmpdir
+        if (!new File(MatlabExecutable.TMPDIR).canWrite()) {
+            throw new RuntimeException("Unable to execute task, no script specified");
+        }
 
         // Read global configuration
-        obj = args.get("global_config");
+        Object obj = args.get("global_config");
         if (obj != null) {
             this.paconfig = (PASolveMatlabGlobalConfig) obj;
         }
@@ -503,33 +506,14 @@ public class MatlabExecutable extends JavaExecutable {
         if (!this.paconfig.isDebug()) {
             return;
         }
-        String nodeName = MatSciEngineConfigBase.getNodeName();
 
-        String tmpPath = System.getProperty("java.io.tmpdir");
-        // system temp dir (not using java.io.tmpdir since in runasme it can be
-        // inaccesible and the scratchdir property can inherited from parent jvm)
-        //        if (this.paconfig.isRunAsMe()) {
-        //            tmpPath = System.getProperty("node.dataspace.scratchdir");
-        //        }
-
-        // log file writer used for debugging
-        File tmpDirFile = new File(tmpPath);
-        File nodeTmpDir = new File(tmpDirFile, nodeName);
-        if (!nodeTmpDir.exists()) {
-            nodeTmpDir.mkdirs();
-        }
-        File logFile = new File(tmpPath, "MatlabExecutable_" + nodeName + ".log");
+        final File logFile = new File(MatlabExecutable.TMPDIR, "MatlabExecutable_" + NODENAME + ".log");
         if (!logFile.exists()) {
             logFile.createNewFile();
         }
 
-        try {
-            FileWriter outFile = new FileWriter(logFile);
-            PrintWriter out = new PrintWriter(outFile);
-
-            outDebugWriter = out;
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        final FileWriter outFile = new FileWriter(logFile);
+        final PrintWriter out = new PrintWriter(outFile);
+        outDebugWriter = out;
     }
 }
