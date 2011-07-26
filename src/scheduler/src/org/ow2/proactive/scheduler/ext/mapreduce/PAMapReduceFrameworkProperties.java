@@ -31,8 +31,6 @@ public enum PAMapReduceFrameworkProperties {
      * This property lists the name of the jars needed by the ProActive
      * MapReduce API
      */
-    MAP_REDUCE_JARS("org.ow2.proactive.scheduler.ext.mapreduce.jars", PropertyType.STRING),
-
     WORKFLOW_FILE_SYSTEM_LOCALHOST_NAME("org.ow2.proactive.scheduler.ext.mapreduce.localhost.name",
             PropertyType.STRING),
 
@@ -41,12 +39,6 @@ public enum PAMapReduceFrameworkProperties {
     SCHEDULER_USERNAME("org.ow2.proactive.scheduler.ext.mapreduce.username", PropertyType.STRING),
 
     SCHEDULER_PASSWORD("org.ow2.proactive.scheduler.ext.mapreduce.password", PropertyType.STRING),
-
-    SCHEDULER_HOME("org.ow2.proactive.scheduler.ext.mapreduce.schedulerHome", PropertyType.STRING),
-
-    SCHEDULER_ADDITIONAL_CLASSPATH_FOLDER(
-            "org.ow2.proactive.scheduler.ext.mapreduce.schedulerAdditionalClasspathFolder",
-            PropertyType.STRING),
 
     WORKFLOW_CANCEL_JOB_ON_ERROR("org.ow2.proactive.scheduler.ext.mapreduce.workflow.cancelJobOnError",
             PropertyType.BOOLEAN),

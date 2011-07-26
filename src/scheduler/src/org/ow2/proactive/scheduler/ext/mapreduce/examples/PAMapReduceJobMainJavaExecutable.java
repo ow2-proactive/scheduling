@@ -159,13 +159,6 @@ public class PAMapReduceJobMainJavaExecutable extends JavaExecutable {
         long inputSplitSize = (long) (dsfoSize / Long.parseLong(numberOfMappers));
         pamrjc.setInputSplitSize(inputSplitSize);
 
-        System.out.println("The scheduler home is: " +
-            pamrjc.getPropertyAsString(PAMapReduceFrameworkProperties.SCHEDULER_HOME.getKey()));
-        System.out.println("The addons directory is: " +
-            PAMapReduceFrameworkProperties
-                    .getPropertyAsString(PAMapReduceFrameworkProperties.SCHEDULER_ADDITIONAL_CLASSPATH_FOLDER
-                            .getKey()));
-
         /*
          * We build the ProActive MapReduce job
          */

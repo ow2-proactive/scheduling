@@ -123,44 +123,14 @@ public class PAMapReduceJob {
 
                 /*
                  * Define the fork environment the tasks must tasks must use.
-                 * TODO NOTICE 1: we cannot use the
-                 * PASchedulerProperties.SCHEDULER_HOME property to retrieve the
-                 * value of the ProActive Scheduler home because it will be null
-                 * (because the HadoopMapReduceApplication is executed on the
-                 * client side, when the user main class is executed. This means
-                 * if the HadoopMapReduceApplication try to get ProActive
-                 * Scheduler properties, those properties are null). So we force
-                 * the user specify the ProActive Scheduler home folder. The
-                 * user must not specify the folder to use to retrieve jars to
-                 * add as additional classpaths to the ForkEnvironment (in fact
-                 * that folder, "addons/", is directly related to the ProActive
-                 * MapReduce Framework and is defined by the developer only once
-                 * and cannot be changed). It will be better if in some way we
-                 * retrieve the value of the ProActive Scheduler home from the
-                 * Scheduler to which the mapreduce job will be submitted (...
-                 * but it seams we cannot do that) TODO NOTICE 2: the additional
-                 * classpaths added to the ForkEnvironment are extended with all
-                 * the files (not only jars) contained in the
-                 * "$SCHEDULER_HOME/addons/" folder. Hidden files are left out.
                  *
-                 * Lastly, we must notice that by default the max size of the
+                 * Notice that by default the max size of the
                  * jvm heap depends on various factor such as the available
                  * memory on the host, the architecture of the host (32 bit, 64
                  * bit, ...) etc... In the case of the Eon cluster, the default
                  * heap size seams to be 1 GB and anyways it is sure it is more
                  * than 512MB
                  */
-                String schedulerHomeString = paMapReduceJobConfiguration
-                        .getPropertyAsString(PAMapReduceFrameworkProperties.SCHEDULER_HOME.key);
-
-                logger.debug("The ProActive Scheduler home is '" + schedulerHomeString + "'");
-
-                String schedulerAdditionalClasspathFolder = schedulerHomeString +
-                    PAMapReduceFrameworkProperties
-                            .getPropertyAsString(PAMapReduceFrameworkProperties.SCHEDULER_ADDITIONAL_CLASSPATH_FOLDER.key);
-
-                logger.debug("The path of the additional classpath folder is '" +
-                    schedulerAdditionalClasspathFolder + "'");
 
                 ForkEnvironment forkEnvironment = new ForkEnvironment();
 
@@ -1613,13 +1583,6 @@ public class PAMapReduceJob {
      */
     protected List<String> initRequiredConfigurationProperties() {
         List<String> requiredConfigurationPropertyList = new ArrayList<String>();
-        /*
-         * The property that stores the ProActive Scheduler home is required
-         * because the ProActive MapReduce API/framework configuration would use
-         * that information to add the "/addons" directory to the
-         * ForkEnvironment a task must use
-         */
-        requiredConfigurationPropertyList.add(PAMapReduceFrameworkProperties.SCHEDULER_HOME.getKey());
 
         /*
          * The property that stores the value of the input space the ProActive
