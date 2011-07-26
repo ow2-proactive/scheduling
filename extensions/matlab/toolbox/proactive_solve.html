@@ -88,28 +88,8 @@ Awaited (J:1)</pre>
 <p>PAsolve is being called with a function handle to the matlab function "factorial". A list of parameters from 1 to 5 is being given. This means that remotely factorial(1), factorial(2),..., factorial(5) will be executed. The PAsolve call returns immediately, giving the ID of the job created (1) inside ProActive Scheduler and returning in the res variable an array of PAresult objects which display themselves as <i>Awaited</i> objects from job ID 1.</p>
 <p>After a while, factorial results will be produced. It is possible to force Matlab to wait(block) for these results using a specific function call (explained in next chapter: <a href="solve-3">Receiving results</a>). But here, we will simply evaluate the variable <b>res</b> until it displays itself as received :</p>
 <pre>>> res
-[ Tue Jan 11 14:27:29 CET 2011 ][pendule OUT][INFO ] [StartPARuntime] Starting a ProActiveRuntime on pendule.inria.fr
-[ Tue Jan 11 14:27:29 CET 2011 ][pendule OUT][INFO ] [Slf4jLog] Logging to org.slf4j.impl.Log4jLoggerAdapter(org.mortbay.log) via org.mortbay.log.Slf4jLog
-[ Tue Jan 11 14:27:29 CET 2011 ][pendule OUT][INFO ] [Slf4jLog] jetty-6.1.x
-[ Tue Jan 11 14:27:29 CET 2011 ][pendule OUT][INFO ] [Slf4jLog] Started SelectChannelConnector@0.0.0.0:53099
-[ Tue Jan 11 14:27:29 CET 2011 ][pendule OUT][INFO ] [RemoteObjectProtocolFactoryRegistry] Remote Object Factory provider &lt;pamr, class org.objectweb.proactive.extensions.pamr.remoteobject.PAMRRemoteObjectFactory> found
-[ Tue Jan 11 14:27:29 CET 2011 ][pendule OUT][INFO ] [RemoteObjectProtocolFactoryRegistry] Remote Object Factory provider &lt;pnp, class org.objectweb.proactive.extensions.pnp.PNPRemoteObjectFactory> found
-[ Tue Jan 11 14:27:29 CET 2011 ][pendule OUT][INFO ] [RemoteObjectProtocolFactoryRegistry] Remote Object Factory provider &lt;pnps, class org.objectweb.proactive.extensions.pnpssl.PNPSslRemoteObjectFactory> found
-[ Tue Jan 11 14:27:29 CET 2011 ][pendule OUT][INFO ] [RemoteObjectProtocolFactoryRegistry] Remote Object Factory provider &lt;rmissl, class org.objectweb.proactive.extra.rmissl.RmiSslRemoteObjectFactory> found
-[ Tue Jan 11 14:27:30 CET 2011 ][pendule OUT][INFO ] [RegistryHelper] Detected an existing RMI Registry on port 6608
-[ Tue Jan 11 14:27:30 CET 2011 ][pendule OUT][INFO ] [ProActiveRuntimeImpl] unable to activate RTBroadcast, reason is broadcast discovery is disabled for this runtime
-[ Tue Jan 11 14:27:31 CET 2011 ][pendule OUT]
-[ Tue Jan 11 14:27:31 CET 2011 ][pendule OUT]
-[ Tue Jan 11 14:27:32 CET 2011 ][pendule OUT]
-[ Tue Jan 11 14:27:32 CET 2011 ][pendule OUT]
-[ Tue Jan 11 14:27:32 CET 2011 ][pendule OUT]
-[ Tue Jan 11 14:27:32 CET 2011 ][pendule OUT]
-[ Tue Jan 11 14:27:32 CET 2011 ][pendule OUT]
-[ Tue Jan 11 14:27:32 CET 2011 ][pendule OUT]
-[ Tue Jan 11 14:27:32 CET 2011 ][pendule OUT]
-[ Tue Jan 11 14:27:32 CET 2011 ][pendule OUT]
-[ Tue Jan 11 14:27:32 CET 2011 ][pendule OUT]
-[ Tue Jan 11 14:27:32 CET 2011 ][pendule OUT]
+
+
 [ Tue Jan 11 14:27:32 CET 2011 ][pendule OUT]
 [ Tue Jan 11 14:27:32 CET 2011 ][pendule OUT]
 
@@ -118,27 +98,7 @@ res =
 
      1
 
-[ Tue Jan 11 14:27:30 CET 2011 ][pendule OUT][INFO ] [StartPARuntime] Starting a ProActiveRuntime on pendule.inria.fr
-[ Tue Jan 11 14:27:31 CET 2011 ][pendule OUT][INFO ] [Slf4jLog] Logging to org.slf4j.impl.Log4jLoggerAdapter(org.mortbay.log) via org.mortbay.log.Slf4jLog
-[ Tue Jan 11 14:27:31 CET 2011 ][pendule OUT][INFO ] [Slf4jLog] jetty-6.1.x
-[ Tue Jan 11 14:27:31 CET 2011 ][pendule OUT][INFO ] [Slf4jLog] Started SelectChannelConnector@0.0.0.0:52033
-[ Tue Jan 11 14:27:31 CET 2011 ][pendule OUT][INFO ] [RemoteObjectProtocolFactoryRegistry] Remote Object Factory provider &lt;pamr, class org.objectweb.proactive.extensions.pamr.remoteobject.PAMRRemoteObjectFactory> found
-[ Tue Jan 11 14:27:31 CET 2011 ][pendule OUT][INFO ] [RemoteObjectProtocolFactoryRegistry] Remote Object Factory provider &lt;pnp, class org.objectweb.proactive.extensions.pnp.PNPRemoteObjectFactory> found
-[ Tue Jan 11 14:27:31 CET 2011 ][pendule OUT][INFO ] [RemoteObjectProtocolFactoryRegistry] Remote Object Factory provider &lt;pnps, class org.objectweb.proactive.extensions.pnpssl.PNPSslRemoteObjectFactory> found
-[ Tue Jan 11 14:27:31 CET 2011 ][pendule OUT][INFO ] [RemoteObjectProtocolFactoryRegistry] Remote Object Factory provider &lt;rmissl, class org.objectweb.proactive.extra.rmissl.RmiSslRemoteObjectFactory> found
-[ Tue Jan 11 14:27:31 CET 2011 ][pendule OUT][INFO ] [RegistryHelper] Detected an existing RMI Registry on port 6608
-[ Tue Jan 11 14:27:31 CET 2011 ][pendule OUT][INFO ] [ProActiveRuntimeImpl] unable to activate RTBroadcast, reason is broadcast discovery is disabled for this runtime
-[ Tue Jan 11 14:27:33 CET 2011 ][pendule OUT]
-[ Tue Jan 11 14:27:33 CET 2011 ][pendule OUT]
-[ Tue Jan 11 14:27:33 CET 2011 ][pendule OUT]
-[ Tue Jan 11 14:27:33 CET 2011 ][pendule OUT]
-[ Tue Jan 11 14:27:33 CET 2011 ][pendule OUT]
-[ Tue Jan 11 14:27:33 CET 2011 ][pendule OUT]
-[ Tue Jan 11 14:27:33 CET 2011 ][pendule OUT]
-[ Tue Jan 11 14:27:33 CET 2011 ][pendule OUT]
-[ Tue Jan 11 14:27:33 CET 2011 ][pendule OUT]
-[ Tue Jan 11 14:27:33 CET 2011 ][pendule OUT]
-[ Tue Jan 11 14:27:33 CET 2011 ][pendule OUT]
+
 [ Tue Jan 11 14:27:33 CET 2011 ][pendule OUT]
 [ Tue Jan 11 14:27:33 CET 2011 ][pendule OUT]
 
@@ -147,18 +107,7 @@ res =
 
      2
 
-[ Tue Jan 11 14:27:34 CET 2011 ][pendule OUT]
-[ Tue Jan 11 14:27:34 CET 2011 ][pendule OUT]
-[ Tue Jan 11 14:27:35 CET 2011 ][pendule OUT]
-[ Tue Jan 11 14:27:35 CET 2011 ][pendule OUT]
-[ Tue Jan 11 14:27:35 CET 2011 ][pendule OUT]
-[ Tue Jan 11 14:27:35 CET 2011 ][pendule OUT]
-[ Tue Jan 11 14:27:35 CET 2011 ][pendule OUT]
-[ Tue Jan 11 14:27:35 CET 2011 ][pendule OUT]
-[ Tue Jan 11 14:27:35 CET 2011 ][pendule OUT]
-[ Tue Jan 11 14:27:35 CET 2011 ][pendule OUT]
-[ Tue Jan 11 14:27:35 CET 2011 ][pendule OUT]
-[ Tue Jan 11 14:27:35 CET 2011 ][pendule OUT]
+
 [ Tue Jan 11 14:27:35 CET 2011 ][pendule OUT]
 [ Tue Jan 11 14:27:35 CET 2011 ][pendule OUT]
 
@@ -167,27 +116,7 @@ res =
 
      6
 
-[ Tue Jan 11 14:27:30 CET 2011 ][pendule OUT][INFO ] [StartPARuntime] Starting a ProActiveRuntime on pendule.inria.fr
-[ Tue Jan 11 14:27:30 CET 2011 ][pendule OUT][INFO ] [Slf4jLog] Logging to org.slf4j.impl.Log4jLoggerAdapter(org.mortbay.log) via org.mortbay.log.Slf4jLog
-[ Tue Jan 11 14:27:30 CET 2011 ][pendule OUT][INFO ] [Slf4jLog] jetty-6.1.x
-[ Tue Jan 11 14:27:30 CET 2011 ][pendule OUT][INFO ] [Slf4jLog] Started SelectChannelConnector@0.0.0.0:51385
-[ Tue Jan 11 14:27:30 CET 2011 ][pendule OUT][INFO ] [RemoteObjectProtocolFactoryRegistry] Remote Object Factory provider &lt;pamr, class org.objectweb.proactive.extensions.pamr.remoteobject.PAMRRemoteObjectFactory> found
-[ Tue Jan 11 14:27:30 CET 2011 ][pendule OUT][INFO ] [RemoteObjectProtocolFactoryRegistry] Remote Object Factory provider &lt;pnp, class org.objectweb.proactive.extensions.pnp.PNPRemoteObjectFactory> found
-[ Tue Jan 11 14:27:30 CET 2011 ][pendule OUT][INFO ] [RemoteObjectProtocolFactoryRegistry] Remote Object Factory provider &lt;pnps, class org.objectweb.proactive.extensions.pnpssl.PNPSslRemoteObjectFactory> found
-[ Tue Jan 11 14:27:30 CET 2011 ][pendule OUT][INFO ] [RemoteObjectProtocolFactoryRegistry] Remote Object Factory provider &lt;rmissl, class org.objectweb.proactive.extra.rmissl.RmiSslRemoteObjectFactory> found
-[ Tue Jan 11 14:27:30 CET 2011 ][pendule OUT][INFO ] [RegistryHelper] Detected an existing RMI Registry on port 6608
-[ Tue Jan 11 14:27:31 CET 2011 ][pendule OUT][INFO ] [ProActiveRuntimeImpl] unable to activate RTBroadcast, reason is broadcast discovery is disabled for this runtime
-[ Tue Jan 11 14:27:32 CET 2011 ][pendule OUT]
-[ Tue Jan 11 14:27:32 CET 2011 ][pendule OUT]
-[ Tue Jan 11 14:27:33 CET 2011 ][pendule OUT]
-[ Tue Jan 11 14:27:33 CET 2011 ][pendule OUT]
-[ Tue Jan 11 14:27:33 CET 2011 ][pendule OUT]
-[ Tue Jan 11 14:27:33 CET 2011 ][pendule OUT]
-[ Tue Jan 11 14:27:33 CET 2011 ][pendule OUT]
-[ Tue Jan 11 14:27:33 CET 2011 ][pendule OUT]
-[ Tue Jan 11 14:27:33 CET 2011 ][pendule OUT]
-[ Tue Jan 11 14:27:33 CET 2011 ][pendule OUT]
-[ Tue Jan 11 14:27:33 CET 2011 ][pendule OUT]
+
 [ Tue Jan 11 14:27:33 CET 2011 ][pendule OUT]
 [ Tue Jan 11 14:27:33 CET 2011 ][pendule OUT]
 
@@ -196,28 +125,7 @@ res =
 
     24
 
-[ Tue Jan 11 14:27:30 CET 2011 ][pendule OUT][INFO ] [StartPARuntime] Starting a ProActiveRuntime on pendule.inria.fr
-[ Tue Jan 11 14:27:30 CET 2011 ][pendule OUT][INFO ] [Slf4jLog] Logging to org.slf4j.impl.Log4jLoggerAdapter(org.mortbay.log) via org.mortbay.log.Slf4jLog
-[ Tue Jan 11 14:27:30 CET 2011 ][pendule OUT][INFO ] [Slf4jLog] jetty-6.1.x
-[ Tue Jan 11 14:27:30 CET 2011 ][pendule OUT][INFO ] [Slf4jLog] Started SelectChannelConnector@0.0.0.0:52608
-[ Tue Jan 11 14:27:30 CET 2011 ][pendule OUT][INFO ] [RemoteObjectProtocolFactoryRegistry] Remote Object Factory provider &lt;pamr, class org.objectweb.proactive.extensions.pamr.remoteobject.PAMRRemoteObjectFactory> found
-[ Tue Jan 11 14:27:30 CET 2011 ][pendule OUT][INFO ] [RemoteObjectProtocolFactoryRegistry] Remote Object Factory provider &lt;pnp, class org.objectweb.proactive.extensions.pnp.PNPRemoteObjectFactory> found
-[ Tue Jan 11 14:27:30 CET 2011 ][pendule OUT][INFO ] [RemoteObjectProtocolFactoryRegistry] Remote Object Factory provider &lt;pnps, class org.objectweb.proactive.extensions.pnpssl.PNPSslRemoteObjectFactory> found
-[ Tue Jan 11 14:27:30 CET 2011 ][pendule OUT][INFO ] [RemoteObjectProtocolFactoryRegistry] Remote Object Factory provider &lt;rmissl, class org.objectweb.proactive.extra.rmissl.RmiSslRemoteObjectFactory> found
-[ Tue Jan 11 14:27:30 CET 2011 ][pendule OUT][INFO ] [RegistryHelper] Detected an existing RMI Registry on port 6608
-[ Tue Jan 11 14:27:30 CET 2011 ][pendule OUT][INFO ] [ProActiveRuntimeImpl] unable to activate RTBroadcast, reason is broadcast discovery is disabled for this runtime
-[ Tue Jan 11 14:27:32 CET 2011 ][pendule OUT]
-[ Tue Jan 11 14:27:32 CET 2011 ][pendule OUT]
-[ Tue Jan 11 14:27:32 CET 2011 ][pendule OUT]
-[ Tue Jan 11 14:27:32 CET 2011 ][pendule OUT]
-[ Tue Jan 11 14:27:33 CET 2011 ][pendule OUT]
-[ Tue Jan 11 14:27:33 CET 2011 ][pendule OUT]
-[ Tue Jan 11 14:27:33 CET 2011 ][pendule OUT]
-[ Tue Jan 11 14:27:33 CET 2011 ][pendule OUT]
-[ Tue Jan 11 14:27:33 CET 2011 ][pendule OUT]
-[ Tue Jan 11 14:27:33 CET 2011 ][pendule OUT]
-[ Tue Jan 11 14:27:33 CET 2011 ][pendule OUT]
-[ Tue Jan 11 14:27:33 CET 2011 ][pendule OUT]
+
 [ Tue Jan 11 14:27:33 CET 2011 ][pendule OUT]
 [ Tue Jan 11 14:27:33 CET 2011 ][pendule OUT]
 
@@ -226,7 +134,7 @@ res =
 
    12
 </pre>
-<p>This output shows the remote outputs of the five executions factorial(1..5). The beginning is an output message related to ProActive internal behavior which basically says that ProActive was successfully started on this remote Resource (and the associated Matlab Engine). This output message only appears at the beginning of a ProActive with Matlab deployment, when a remote Node is first used for a Matlab Task. The rest doesn't show any matlab output, as the factorial function doesn't show any.</p>
+<p>This output shows the remote outputs of the five executions factorial(1..5). Actually, this output is shown here for the example, in the real case, as the factorial function prints no output, there will be nothing displayed.</p>
 <p>The remote outputs are displayed only once. They can be accessed later using the <b>logs</b> attribute of the PAResult task:</p>
 <pre>>> res
 
@@ -259,28 +167,7 @@ res =
 
 ans =
 
-[ Tue Jan 11 14:27:29 CET 2011 ][pendule OUT][INFO ] [StartPARuntime] Starting a ProActiveRuntime on pendule.inria.fr
-[ Tue Jan 11 14:27:29 CET 2011 ][pendule OUT][INFO ] [Slf4jLog] Logging to org.slf4j.impl.Log4jLoggerAdapter(org.mortbay.log) via org.mortbay.log.Slf4jLog
-[ Tue Jan 11 14:27:29 CET 2011 ][pendule OUT][INFO ] [Slf4jLog] jetty-6.1.x
-[ Tue Jan 11 14:27:29 CET 2011 ][pendule OUT][INFO ] [Slf4jLog] Started SelectChannelConnector@0.0.0.0:53099
-[ Tue Jan 11 14:27:29 CET 2011 ][pendule OUT][INFO ] [RemoteObjectProtocolFactoryRegistry] Remote Object Factory provider &lt;pamr, class org.objectweb.proactive.extensions.pamr.remoteobject.PAMRRemoteObjectFactory> found
-[ Tue Jan 11 14:27:29 CET 2011 ][pendule OUT][INFO ] [RemoteObjectProtocolFactoryRegistry] Remote Object Factory provider &lt;pnp, class org.objectweb.proactive.extensions.pnp.PNPRemoteObjectFactory> found
-[ Tue Jan 11 14:27:29 CET 2011 ][pendule OUT][INFO ] [RemoteObjectProtocolFactoryRegistry] Remote Object Factory provider &lt;pnps, class org.objectweb.proactive.extensions.pnpssl.PNPSslRemoteObjectFactory> found
-[ Tue Jan 11 14:27:29 CET 2011 ][pendule OUT][INFO ] [RemoteObjectProtocolFactoryRegistry] Remote Object Factory provider &lt;rmissl, class org.objectweb.proactive.extra.rmissl.RmiSslRemoteObjectFactory> found
-[ Tue Jan 11 14:27:30 CET 2011 ][pendule OUT][INFO ] [RegistryHelper] Detected an existing RMI Registry on port 6608
-[ Tue Jan 11 14:27:30 CET 2011 ][pendule OUT][INFO ] [ProActiveRuntimeImpl] unable to activate RTBroadcast, reason is broadcast discovery is disabled for this runtime
-[ Tue Jan 11 14:27:31 CET 2011 ][pendule OUT]
-[ Tue Jan 11 14:27:31 CET 2011 ][pendule OUT]
-[ Tue Jan 11 14:27:32 CET 2011 ][pendule OUT]
-[ Tue Jan 11 14:27:32 CET 2011 ][pendule OUT]
-[ Tue Jan 11 14:27:32 CET 2011 ][pendule OUT]
-[ Tue Jan 11 14:27:32 CET 2011 ][pendule OUT]
-[ Tue Jan 11 14:27:32 CET 2011 ][pendule OUT]
-[ Tue Jan 11 14:27:32 CET 2011 ][pendule OUT]
-[ Tue Jan 11 14:27:32 CET 2011 ][pendule OUT]
-[ Tue Jan 11 14:27:32 CET 2011 ][pendule OUT]
-[ Tue Jan 11 14:27:32 CET 2011 ][pendule OUT]
-[ Tue Jan 11 14:27:32 CET 2011 ][pendule OUT]
+
 [ Tue Jan 11 14:27:32 CET 2011 ][pendule OUT]
 [ Tue Jan 11 14:27:32 CET 2011 ][pendule OUT]
 
@@ -288,27 +175,7 @@ ans =
 
 ans =
 
-[ Tue Jan 11 14:27:30 CET 2011 ][pendule OUT][INFO ] [StartPARuntime] Starting a ProActiveRuntime on pendule.inria.fr
-[ Tue Jan 11 14:27:31 CET 2011 ][pendule OUT][INFO ] [Slf4jLog] Logging to org.slf4j.impl.Log4jLoggerAdapter(org.mortbay.log) via org.mortbay.log.Slf4jLog
-[ Tue Jan 11 14:27:31 CET 2011 ][pendule OUT][INFO ] [Slf4jLog] jetty-6.1.x
-[ Tue Jan 11 14:27:31 CET 2011 ][pendule OUT][INFO ] [Slf4jLog] Started SelectChannelConnector@0.0.0.0:52033
-[ Tue Jan 11 14:27:31 CET 2011 ][pendule OUT][INFO ] [RemoteObjectProtocolFactoryRegistry] Remote Object Factory provider &lt;pamr, class org.objectweb.proactive.extensions.pamr.remoteobject.PAMRRemoteObjectFactory> found
-[ Tue Jan 11 14:27:31 CET 2011 ][pendule OUT][INFO ] [RemoteObjectProtocolFactoryRegistry] Remote Object Factory provider &lt;pnp, class org.objectweb.proactive.extensions.pnp.PNPRemoteObjectFactory> found
-[ Tue Jan 11 14:27:31 CET 2011 ][pendule OUT][INFO ] [RemoteObjectProtocolFactoryRegistry] Remote Object Factory provider &lt;pnps, class org.objectweb.proactive.extensions.pnpssl.PNPSslRemoteObjectFactory> found
-[ Tue Jan 11 14:27:31 CET 2011 ][pendule OUT][INFO ] [RemoteObjectProtocolFactoryRegistry] Remote Object Factory provider &lt;rmissl, class org.objectweb.proactive.extra.rmissl.RmiSslRemoteObjectFactory> found
-[ Tue Jan 11 14:27:31 CET 2011 ][pendule OUT][INFO ] [RegistryHelper] Detected an existing RMI Registry on port 6608
-[ Tue Jan 11 14:27:31 CET 2011 ][pendule OUT][INFO ] [ProActiveRuntimeImpl] unable to activate RTBroadcast, reason is broadcast discovery is disabled for this runtime
-[ Tue Jan 11 14:27:33 CET 2011 ][pendule OUT]
-[ Tue Jan 11 14:27:33 CET 2011 ][pendule OUT]
-[ Tue Jan 11 14:27:33 CET 2011 ][pendule OUT]
-[ Tue Jan 11 14:27:33 CET 2011 ][pendule OUT]
-[ Tue Jan 11 14:27:33 CET 2011 ][pendule OUT]
-[ Tue Jan 11 14:27:33 CET 2011 ][pendule OUT]
-[ Tue Jan 11 14:27:33 CET 2011 ][pendule OUT]
-[ Tue Jan 11 14:27:33 CET 2011 ][pendule OUT]
-[ Tue Jan 11 14:27:33 CET 2011 ][pendule OUT]
-[ Tue Jan 11 14:27:33 CET 2011 ][pendule OUT]
-[ Tue Jan 11 14:27:33 CET 2011 ][pendule OUT]
+
 [ Tue Jan 11 14:27:33 CET 2011 ][pendule OUT]
 [ Tue Jan 11 14:27:33 CET 2011 ][pendule OUT]
 
@@ -316,18 +183,7 @@ ans =
 
 ans =
 
-[ Tue Jan 11 14:27:34 CET 2011 ][pendule OUT]
-[ Tue Jan 11 14:27:34 CET 2011 ][pendule OUT]
-[ Tue Jan 11 14:27:35 CET 2011 ][pendule OUT]
-[ Tue Jan 11 14:27:35 CET 2011 ][pendule OUT]
-[ Tue Jan 11 14:27:35 CET 2011 ][pendule OUT]
-[ Tue Jan 11 14:27:35 CET 2011 ][pendule OUT]
-[ Tue Jan 11 14:27:35 CET 2011 ][pendule OUT]
-[ Tue Jan 11 14:27:35 CET 2011 ][pendule OUT]
-[ Tue Jan 11 14:27:35 CET 2011 ][pendule OUT]
-[ Tue Jan 11 14:27:35 CET 2011 ][pendule OUT]
-[ Tue Jan 11 14:27:35 CET 2011 ][pendule OUT]
-[ Tue Jan 11 14:27:35 CET 2011 ][pendule OUT]
+
 [ Tue Jan 11 14:27:35 CET 2011 ][pendule OUT]
 [ Tue Jan 11 14:27:35 CET 2011 ][pendule OUT]
 
@@ -335,27 +191,7 @@ ans =
 
 ans =
 
-[ Tue Jan 11 14:27:30 CET 2011 ][pendule OUT][INFO ] [StartPARuntime] Starting a ProActiveRuntime on pendule.inria.fr
-[ Tue Jan 11 14:27:30 CET 2011 ][pendule OUT][INFO ] [Slf4jLog] Logging to org.slf4j.impl.Log4jLoggerAdapter(org.mortbay.log) via org.mortbay.log.Slf4jLog
-[ Tue Jan 11 14:27:30 CET 2011 ][pendule OUT][INFO ] [Slf4jLog] jetty-6.1.x
-[ Tue Jan 11 14:27:30 CET 2011 ][pendule OUT][INFO ] [Slf4jLog] Started SelectChannelConnector@0.0.0.0:51385
-[ Tue Jan 11 14:27:30 CET 2011 ][pendule OUT][INFO ] [RemoteObjectProtocolFactoryRegistry] Remote Object Factory provider &lt;pamr, class org.objectweb.proactive.extensions.pamr.remoteobject.PAMRRemoteObjectFactory> found
-[ Tue Jan 11 14:27:30 CET 2011 ][pendule OUT][INFO ] [RemoteObjectProtocolFactoryRegistry] Remote Object Factory provider &lt;pnp, class org.objectweb.proactive.extensions.pnp.PNPRemoteObjectFactory> found
-[ Tue Jan 11 14:27:30 CET 2011 ][pendule OUT][INFO ] [RemoteObjectProtocolFactoryRegistry] Remote Object Factory provider &lt;pnps, class org.objectweb.proactive.extensions.pnpssl.PNPSslRemoteObjectFactory> found
-[ Tue Jan 11 14:27:30 CET 2011 ][pendule OUT][INFO ] [RemoteObjectProtocolFactoryRegistry] Remote Object Factory provider &lt;rmissl, class org.objectweb.proactive.extra.rmissl.RmiSslRemoteObjectFactory> found
-[ Tue Jan 11 14:27:30 CET 2011 ][pendule OUT][INFO ] [RegistryHelper] Detected an existing RMI Registry on port 6608
-[ Tue Jan 11 14:27:31 CET 2011 ][pendule OUT][INFO ] [ProActiveRuntimeImpl] unable to activate RTBroadcast, reason is broadcast discovery is disabled for this runtime
-[ Tue Jan 11 14:27:32 CET 2011 ][pendule OUT]
-[ Tue Jan 11 14:27:32 CET 2011 ][pendule OUT]
-[ Tue Jan 11 14:27:33 CET 2011 ][pendule OUT]
-[ Tue Jan 11 14:27:33 CET 2011 ][pendule OUT]
-[ Tue Jan 11 14:27:33 CET 2011 ][pendule OUT]
-[ Tue Jan 11 14:27:33 CET 2011 ][pendule OUT]
-[ Tue Jan 11 14:27:33 CET 2011 ][pendule OUT]
-[ Tue Jan 11 14:27:33 CET 2011 ][pendule OUT]
-[ Tue Jan 11 14:27:33 CET 2011 ][pendule OUT]
-[ Tue Jan 11 14:27:33 CET 2011 ][pendule OUT]
-[ Tue Jan 11 14:27:33 CET 2011 ][pendule OUT]
+
 [ Tue Jan 11 14:27:33 CET 2011 ][pendule OUT]
 [ Tue Jan 11 14:27:33 CET 2011 ][pendule OUT]
 
@@ -363,28 +199,7 @@ ans =
 
 ans =
 
-[ Tue Jan 11 14:27:30 CET 2011 ][pendule OUT][INFO ] [StartPARuntime] Starting a ProActiveRuntime on pendule.inria.fr
-[ Tue Jan 11 14:27:30 CET 2011 ][pendule OUT][INFO ] [Slf4jLog] Logging to org.slf4j.impl.Log4jLoggerAdapter(org.mortbay.log) via org.mortbay.log.Slf4jLog
-[ Tue Jan 11 14:27:30 CET 2011 ][pendule OUT][INFO ] [Slf4jLog] jetty-6.1.x
-[ Tue Jan 11 14:27:30 CET 2011 ][pendule OUT][INFO ] [Slf4jLog] Started SelectChannelConnector@0.0.0.0:52608
-[ Tue Jan 11 14:27:30 CET 2011 ][pendule OUT][INFO ] [RemoteObjectProtocolFactoryRegistry] Remote Object Factory provider &lt;pamr, class org.objectweb.proactive.extensions.pamr.remoteobject.PAMRRemoteObjectFactory> found
-[ Tue Jan 11 14:27:30 CET 2011 ][pendule OUT][INFO ] [RemoteObjectProtocolFactoryRegistry] Remote Object Factory provider &lt;pnp, class org.objectweb.proactive.extensions.pnp.PNPRemoteObjectFactory> found
-[ Tue Jan 11 14:27:30 CET 2011 ][pendule OUT][INFO ] [RemoteObjectProtocolFactoryRegistry] Remote Object Factory provider &lt;pnps, class org.objectweb.proactive.extensions.pnpssl.PNPSslRemoteObjectFactory> found
-[ Tue Jan 11 14:27:30 CET 2011 ][pendule OUT][INFO ] [RemoteObjectProtocolFactoryRegistry] Remote Object Factory provider &lt;rmissl, class org.objectweb.proactive.extra.rmissl.RmiSslRemoteObjectFactory> found
-[ Tue Jan 11 14:27:30 CET 2011 ][pendule OUT][INFO ] [RegistryHelper] Detected an existing RMI Registry on port 6608
-[ Tue Jan 11 14:27:30 CET 2011 ][pendule OUT][INFO ] [ProActiveRuntimeImpl] unable to activate RTBroadcast, reason is broadcast discovery is disabled for this runtime
-[ Tue Jan 11 14:27:32 CET 2011 ][pendule OUT]
-[ Tue Jan 11 14:27:32 CET 2011 ][pendule OUT]
-[ Tue Jan 11 14:27:32 CET 2011 ][pendule OUT]
-[ Tue Jan 11 14:27:32 CET 2011 ][pendule OUT]
-[ Tue Jan 11 14:27:33 CET 2011 ][pendule OUT]
-[ Tue Jan 11 14:27:33 CET 2011 ][pendule OUT]
-[ Tue Jan 11 14:27:33 CET 2011 ][pendule OUT]
-[ Tue Jan 11 14:27:33 CET 2011 ][pendule OUT]
-[ Tue Jan 11 14:27:33 CET 2011 ][pendule OUT]
-[ Tue Jan 11 14:27:33 CET 2011 ][pendule OUT]
-[ Tue Jan 11 14:27:33 CET 2011 ][pendule OUT]
-[ Tue Jan 11 14:27:33 CET 2011 ][pendule OUT]
+
 [ Tue Jan 11 14:27:33 CET 2011 ][pendule OUT]
 [ Tue Jan 11 14:27:33 CET 2011 ][pendule OUT]
 </pre>
@@ -424,61 +239,33 @@ Awaited (J:2)
 Awaited (J:2)
 Awaited (J:2)
 >> res
-[ Tue Jan 11 16:30:02 CET 2011 ][pendule OUT]
-[ Tue Jan 11 16:30:02 CET 2011 ][pendule OUT]
-[ Tue Jan 11 16:30:03 CET 2011 ][pendule OUT]
-[ Tue Jan 11 16:30:03 CET 2011 ][pendule OUT]
-[ Tue Jan 11 16:30:03 CET 2011 ][pendule OUT]
-[ Tue Jan 11 16:30:03 CET 2011 ][pendule OUT]
+
 [ Tue Jan 11 16:30:03 CET 2011 ][pendule OUT]
 [ Tue Jan 11 16:30:03 CET 2011 ][pendule OUT]>> HelloWorld
 [ Tue Jan 11 16:30:03 CET 2011 ][pendule OUT]
-[ Tue Jan 11 16:30:03 CET 2011 ][pendule OUT]
-[ Tue Jan 11 16:30:03 CET 2011 ][pendule OUT]
-[ Tue Jan 11 16:30:03 CET 2011 ][pendule OUT]
-[ Tue Jan 11 16:30:03 CET 2011 ][pendule OUT]
-[ Tue Jan 11 16:30:03 CET 2011 ][pendule OUT]
+
 
 
 res =
 
      1
 
-[ Tue Jan 11 16:30:02 CET 2011 ][pendule OUT]
-[ Tue Jan 11 16:30:02 CET 2011 ][pendule OUT]
-[ Tue Jan 11 16:30:03 CET 2011 ][pendule OUT]
-[ Tue Jan 11 16:30:03 CET 2011 ][pendule OUT]
-[ Tue Jan 11 16:30:03 CET 2011 ][pendule OUT]
-[ Tue Jan 11 16:30:03 CET 2011 ][pendule OUT]
+
 [ Tue Jan 11 16:30:03 CET 2011 ][pendule OUT]
 [ Tue Jan 11 16:30:03 CET 2011 ][pendule OUT]>> HelloWorld
 [ Tue Jan 11 16:30:03 CET 2011 ][pendule OUT]
-[ Tue Jan 11 16:30:03 CET 2011 ][pendule OUT]
-[ Tue Jan 11 16:30:03 CET 2011 ][pendule OUT]
-[ Tue Jan 11 16:30:03 CET 2011 ][pendule OUT]
-[ Tue Jan 11 16:30:03 CET 2011 ][pendule OUT]
-[ Tue Jan 11 16:30:03 CET 2011 ][pendule OUT]
+
 
 
 res =
 
      1
 
-[ Tue Jan 11 16:30:02 CET 2011 ][pendule OUT]
-[ Tue Jan 11 16:30:02 CET 2011 ][pendule OUT]
-[ Tue Jan 11 16:30:02 CET 2011 ][pendule OUT]
-[ Tue Jan 11 16:30:02 CET 2011 ][pendule OUT]
-[ Tue Jan 11 16:30:02 CET 2011 ][pendule OUT]
-[ Tue Jan 11 16:30:02 CET 2011 ][pendule OUT]
+
 [ Tue Jan 11 16:30:02 CET 2011 ][pendule OUT]
 [ Tue Jan 11 16:30:02 CET 2011 ][pendule OUT]>> HelloWorld
 [ Tue Jan 11 16:30:02 CET 2011 ][pendule OUT]
-[ Tue Jan 11 16:30:02 CET 2011 ][pendule OUT]
-[ Tue Jan 11 16:30:03 CET 2011 ][pendule OUT]
-[ Tue Jan 11 16:30:03 CET 2011 ][pendule OUT]
-[ Tue Jan 11 16:30:03 CET 2011 ][pendule OUT]
-[ Tue Jan 11 16:30:03 CET 2011 ][pendule OUT]
-[ Tue Jan 11 16:30:03 CET 2011 ][pendule OUT]
+
 
 
 res =
@@ -499,9 +286,7 @@ Awaited (J:4)
 Awaited (J:4)
 Awaited (J:4)
 >> res
-<font color="red">[ Tue Jan 11 18:30:45 CET 2011 ][pendule OUT]
-[ Tue Jan 11 18:30:45 CET 2011 ][pendule OUT]
-[ Tue Jan 11 18:30:45 CET 2011 ][pendule OUT]
+<font color="red">
 [ Tue Jan 11 18:30:45 CET 2011 ][pendule OUT]
 [ Tue Jan 11 18:30:45 CET 2011 ][pendule ERR]??? Undefined function or variable 'b'.
 [ Tue Jan 11 18:30:45 CET 2011 ][pendule ERR]
@@ -515,12 +300,7 @@ Awaited (J:4)
 [ Tue Jan 11 18:30:45 CET 2011 ][pendule OUT]
 [ Tue Jan 11 18:30:45 CET 2011 ][pendule ERR]
 [ Tue Jan 11 18:30:45 CET 2011 ][pendule OUT]
-[ Tue Jan 11 18:30:45 CET 2011 ][pendule OUT]
-[ Tue Jan 11 18:30:45 CET 2011 ][pendule OUT]
-[ Tue Jan 11 18:30:45 CET 2011 ][pendule OUT]
-[ Tue Jan 11 18:30:45 CET 2011 ][pendule OUT]
-[ Tue Jan 11 18:30:45 CET 2011 ][pendule OUT]
-[ Tue Jan 11 18:30:46 CET 2011 ][pendule OUT]
+
 </font>
 
 Error using ==> PAResult.PAwaitFor at 99
@@ -529,11 +309,7 @@ Error during remote script execution
 Error in ==> PAResult.display at 49
             dp(PAwaitFor(RR), inputname(1))
 
-<font color="red">[ Tue Jan 11 18:30:45 CET 2011 ][pendule OUT]
-[ Tue Jan 11 18:30:45 CET 2011 ][pendule OUT]
-[ Tue Jan 11 18:30:45 CET 2011 ][pendule OUT]
-[ Tue Jan 11 18:30:45 CET 2011 ][pendule OUT]
-[ Tue Jan 11 18:30:45 CET 2011 ][pendule OUT]
+<font color="red">
 [ Tue Jan 11 18:30:45 CET 2011 ][pendule OUT]
 [ Tue Jan 11 18:30:45 CET 2011 ][pendule ERR]??? Undefined function or variable 'b'.
 [ Tue Jan 11 18:30:45 CET 2011 ][pendule ERR]
@@ -543,13 +319,6 @@ Error in ==> PAResult.display at 49
 [ Tue Jan 11 18:30:45 CET 2011 ][pendule ERR]??? Error using ==> save
 [ Tue Jan 11 18:30:45 CET 2011 ][pendule ERR]Variable 'out' not found.
 [ Tue Jan 11 18:30:45 CET 2011 ][pendule ERR]
-[ Tue Jan 11 18:30:45 CET 2011 ][pendule OUT]
-[ Tue Jan 11 18:30:45 CET 2011 ][pendule OUT]
-[ Tue Jan 11 18:30:45 CET 2011 ][pendule OUT]
-[ Tue Jan 11 18:30:45 CET 2011 ][pendule OUT]
-[ Tue Jan 11 18:30:45 CET 2011 ][pendule OUT]
-[ Tue Jan 11 18:30:45 CET 2011 ][pendule OUT]
-[ Tue Jan 11 18:30:45 CET 2011 ][pendule OUT]
 [ Tue Jan 11 18:30:45 CET 2011 ][pendule OUT]
 </font>
 
@@ -559,9 +328,7 @@ Error during remote script execution
 Error in ==> PAResult.display at 49
             dp(PAwaitFor(RR), inputname(1))
 
-<font color="red">[ Tue Jan 11 18:30:45 CET 2011 ][pendule OUT]
-[ Tue Jan 11 18:30:45 CET 2011 ][pendule OUT]
-[ Tue Jan 11 18:30:45 CET 2011 ][pendule OUT]
+<font color="red">
 [ Tue Jan 11 18:30:45 CET 2011 ][pendule OUT]
 [ Tue Jan 11 18:30:45 CET 2011 ][pendule ERR]??? Undefined function or variable 'b'.
 [ Tue Jan 11 18:30:45 CET 2011 ][pendule ERR]
@@ -574,12 +341,6 @@ Error in ==> PAResult.display at 49
 [ Tue Jan 11 18:30:45 CET 2011 ][pendule OUT]
 [ Tue Jan 11 18:30:45 CET 2011 ][pendule ERR]
 [ Tue Jan 11 18:30:45 CET 2011 ][pendule OUT]
-[ Tue Jan 11 18:30:45 CET 2011 ][pendule OUT]
-[ Tue Jan 11 18:30:45 CET 2011 ][pendule OUT]
-[ Tue Jan 11 18:30:45 CET 2011 ][pendule OUT]
-[ Tue Jan 11 18:30:45 CET 2011 ][pendule OUT]
-[ Tue Jan 11 18:30:45 CET 2011 ][pendule OUT]
-[ Tue Jan 11 18:30:46 CET 2011 ][pendule OUT]
 </font>
 
 Error using ==> PAResult.PAwaitFor at 99
@@ -615,74 +376,19 @@ Awaited (J:2)
 Awaited (J:2)
 Awaited (J:2)
 >> val=PAwaitAll(res)
-[ Tue Jan 11 20:19:08 CET 2011 ][pendule OUT]
-[ Tue Jan 11 20:19:08 CET 2011 ][pendule OUT]
-[ Tue Jan 11 20:19:09 CET 2011 ][pendule OUT]
-[ Tue Jan 11 20:19:09 CET 2011 ][pendule OUT]
-[ Tue Jan 11 20:19:09 CET 2011 ][pendule OUT]
-[ Tue Jan 11 20:19:09 CET 2011 ][pendule OUT]
-[ Tue Jan 11 20:19:09 CET 2011 ][pendule OUT]
-[ Tue Jan 11 20:19:09 CET 2011 ][pendule OUT]
-[ Tue Jan 11 20:19:09 CET 2011 ][pendule OUT]
-[ Tue Jan 11 20:19:09 CET 2011 ][pendule OUT]
-[ Tue Jan 11 20:19:09 CET 2011 ][pendule OUT]
+
 [ Tue Jan 11 20:19:09 CET 2011 ][pendule OUT]
 [ Tue Jan 11 20:19:09 CET 2011 ][pendule OUT]
 
-[ Tue Jan 11 20:19:06 CET 2011 ][pendule OUT]
-[ Tue Jan 11 20:19:06 CET 2011 ][pendule OUT]
-[ Tue Jan 11 20:19:06 CET 2011 ][pendule OUT]
-[ Tue Jan 11 20:19:06 CET 2011 ][pendule OUT]
-[ Tue Jan 11 20:19:07 CET 2011 ][pendule OUT]
-[ Tue Jan 11 20:19:07 CET 2011 ][pendule OUT]
-[ Tue Jan 11 20:19:07 CET 2011 ][pendule OUT]
-[ Tue Jan 11 20:19:07 CET 2011 ][pendule OUT]
-[ Tue Jan 11 20:19:07 CET 2011 ][pendule OUT]
-[ Tue Jan 11 20:19:07 CET 2011 ][pendule OUT]
-[ Tue Jan 11 20:19:07 CET 2011 ][pendule OUT]
 [ Tue Jan 11 20:19:07 CET 2011 ][pendule OUT]
 [ Tue Jan 11 20:19:07 CET 2011 ][pendule OUT]
 
-[ Tue Jan 11 20:19:06 CET 2011 ][pendule OUT]
-[ Tue Jan 11 20:19:06 CET 2011 ][pendule OUT]
-[ Tue Jan 11 20:19:07 CET 2011 ][pendule OUT]
-[ Tue Jan 11 20:19:07 CET 2011 ][pendule OUT]
-[ Tue Jan 11 20:19:07 CET 2011 ][pendule OUT]
-[ Tue Jan 11 20:19:07 CET 2011 ][pendule OUT]
-[ Tue Jan 11 20:19:07 CET 2011 ][pendule OUT]
-[ Tue Jan 11 20:19:07 CET 2011 ][pendule OUT]
-[ Tue Jan 11 20:19:07 CET 2011 ][pendule OUT]
-[ Tue Jan 11 20:19:07 CET 2011 ][pendule OUT]
-[ Tue Jan 11 20:19:07 CET 2011 ][pendule OUT]
-[ Tue Jan 11 20:19:07 CET 2011 ][pendule OUT]
 [ Tue Jan 11 20:19:07 CET 2011 ][pendule OUT]
 [ Tue Jan 11 20:19:07 CET 2011 ][pendule OUT]
 
-[ Tue Jan 11 20:19:06 CET 2011 ][pendule OUT]
-[ Tue Jan 11 20:19:06 CET 2011 ][pendule OUT]
-[ Tue Jan 11 20:19:07 CET 2011 ][pendule OUT]
-[ Tue Jan 11 20:19:07 CET 2011 ][pendule OUT]
-[ Tue Jan 11 20:19:07 CET 2011 ][pendule OUT]
-[ Tue Jan 11 20:19:07 CET 2011 ][pendule OUT]
-[ Tue Jan 11 20:19:07 CET 2011 ][pendule OUT]
-[ Tue Jan 11 20:19:07 CET 2011 ][pendule OUT]
-[ Tue Jan 11 20:19:07 CET 2011 ][pendule OUT]
-[ Tue Jan 11 20:19:07 CET 2011 ][pendule OUT]
-[ Tue Jan 11 20:19:07 CET 2011 ][pendule OUT]
 [ Tue Jan 11 20:19:07 CET 2011 ][pendule OUT]
 [ Tue Jan 11 20:19:07 CET 2011 ][pendule OUT]
 
-[ Tue Jan 11 20:19:06 CET 2011 ][pendule OUT]
-[ Tue Jan 11 20:19:06 CET 2011 ][pendule OUT]
-[ Tue Jan 11 20:19:07 CET 2011 ][pendule OUT]
-[ Tue Jan 11 20:19:07 CET 2011 ][pendule OUT]
-[ Tue Jan 11 20:19:07 CET 2011 ][pendule OUT]
-[ Tue Jan 11 20:19:07 CET 2011 ][pendule OUT]
-[ Tue Jan 11 20:19:07 CET 2011 ][pendule OUT]
-[ Tue Jan 11 20:19:07 CET 2011 ][pendule OUT]
-[ Tue Jan 11 20:19:07 CET 2011 ][pendule OUT]
-[ Tue Jan 11 20:19:07 CET 2011 ][pendule OUT]
-[ Tue Jan 11 20:19:07 CET 2011 ][pendule OUT]
 [ Tue Jan 11 20:19:07 CET 2011 ][pendule OUT]
 [ Tue Jan 11 20:19:07 CET 2011 ][pendule OUT]
 
@@ -719,18 +425,7 @@ Awaited (J:3)
 Awaited (J:3)
 Awaited (J:3)
 >> val1=PAwaitAny(res)
-[ Tue Jan 11 20:24:07 CET 2011 ][pendule OUT]
-[ Tue Jan 11 20:24:07 CET 2011 ][pendule OUT]
-[ Tue Jan 11 20:24:07 CET 2011 ][pendule OUT]
-[ Tue Jan 11 20:24:07 CET 2011 ][pendule OUT]
-[ Tue Jan 11 20:24:07 CET 2011 ][pendule OUT]
-[ Tue Jan 11 20:24:07 CET 2011 ][pendule OUT]
-[ Tue Jan 11 20:24:07 CET 2011 ][pendule OUT]
-[ Tue Jan 11 20:24:07 CET 2011 ][pendule OUT]
-[ Tue Jan 11 20:24:07 CET 2011 ][pendule OUT]
-[ Tue Jan 11 20:24:08 CET 2011 ][pendule OUT]
-[ Tue Jan 11 20:24:08 CET 2011 ][pendule OUT]
-[ Tue Jan 11 20:24:08 CET 2011 ][pendule OUT]
+
 [ Tue Jan 11 20:24:08 CET 2011 ][pendule OUT]
 [ Tue Jan 11 20:24:08 CET 2011 ][pendule OUT]
 
@@ -740,17 +435,7 @@ val1 =
      1
 
 >> val2=PAwaitAny(res)
-[ Tue Jan 11 20:24:07 CET 2011 ][pendule OUT]
-[ Tue Jan 11 20:24:07 CET 2011 ][pendule OUT]
-[ Tue Jan 11 20:24:08 CET 2011 ][pendule OUT]
-[ Tue Jan 11 20:24:08 CET 2011 ][pendule OUT]
-[ Tue Jan 11 20:24:08 CET 2011 ][pendule OUT]
-[ Tue Jan 11 20:24:08 CET 2011 ][pendule OUT]
-[ Tue Jan 11 20:24:08 CET 2011 ][pendule OUT]
-[ Tue Jan 11 20:24:08 CET 2011 ][pendule OUT]
-[ Tue Jan 11 20:24:08 CET 2011 ][pendule OUT]
-[ Tue Jan 11 20:24:08 CET 2011 ][pendule OUT]
-[ Tue Jan 11 20:24:08 CET 2011 ][pendule OUT]
+
 [ Tue Jan 11 20:24:08 CET 2011 ][pendule OUT]
 [ Tue Jan 11 20:24:08 CET 2011 ][pendule OUT]
 
@@ -760,17 +445,7 @@ val2 =
      2
 
 >> val3=PAwaitAny(res)
-[ Tue Jan 11 20:24:07 CET 2011 ][pendule OUT]
-[ Tue Jan 11 20:24:07 CET 2011 ][pendule OUT]
-[ Tue Jan 11 20:24:08 CET 2011 ][pendule OUT]
-[ Tue Jan 11 20:24:08 CET 2011 ][pendule OUT]
-[ Tue Jan 11 20:24:08 CET 2011 ][pendule OUT]
-[ Tue Jan 11 20:24:08 CET 2011 ][pendule OUT]
-[ Tue Jan 11 20:24:08 CET 2011 ][pendule OUT]
-[ Tue Jan 11 20:24:08 CET 2011 ][pendule OUT]
-[ Tue Jan 11 20:24:08 CET 2011 ][pendule OUT]
-[ Tue Jan 11 20:24:08 CET 2011 ][pendule OUT]
-[ Tue Jan 11 20:24:08 CET 2011 ][pendule OUT]
+
 [ Tue Jan 11 20:24:08 CET 2011 ][pendule OUT]
 [ Tue Jan 11 20:24:08 CET 2011 ][pendule OUT]
 
@@ -780,17 +455,7 @@ val3 =
      6
 
 >> val4=PAwaitAny(res)
-[ Tue Jan 11 20:24:09 CET 2011 ][pendule OUT]
-[ Tue Jan 11 20:24:09 CET 2011 ][pendule OUT]
-[ Tue Jan 11 20:24:09 CET 2011 ][pendule OUT]
-[ Tue Jan 11 20:24:09 CET 2011 ][pendule OUT]
-[ Tue Jan 11 20:24:09 CET 2011 ][pendule OUT]
-[ Tue Jan 11 20:24:09 CET 2011 ][pendule OUT]
-[ Tue Jan 11 20:24:09 CET 2011 ][pendule OUT]
-[ Tue Jan 11 20:24:09 CET 2011 ][pendule OUT]
-[ Tue Jan 11 20:24:09 CET 2011 ][pendule OUT]
-[ Tue Jan 11 20:24:09 CET 2011 ][pendule OUT]
-[ Tue Jan 11 20:24:09 CET 2011 ][pendule OUT]
+
 [ Tue Jan 11 20:24:09 CET 2011 ][pendule OUT]
 [ Tue Jan 11 20:24:09 CET 2011 ][pendule OUT]
 
@@ -800,17 +465,7 @@ val4 =
     24
 
 >> val5=PAwaitAny(res)
-[ Tue Jan 11 20:24:07 CET 2011 ][pendule OUT]
-[ Tue Jan 11 20:24:07 CET 2011 ][pendule OUT]
-[ Tue Jan 11 20:24:08 CET 2011 ][pendule OUT]
-[ Tue Jan 11 20:24:08 CET 2011 ][pendule OUT]
-[ Tue Jan 11 20:24:08 CET 2011 ][pendule OUT]
-[ Tue Jan 11 20:24:08 CET 2011 ][pendule OUT]
-[ Tue Jan 11 20:24:08 CET 2011 ][pendule OUT]
-[ Tue Jan 11 20:24:08 CET 2011 ][pendule OUT]
-[ Tue Jan 11 20:24:08 CET 2011 ][pendule OUT]
-[ Tue Jan 11 20:24:08 CET 2011 ][pendule OUT]
-[ Tue Jan 11 20:24:08 CET 2011 ][pendule OUT]
+
 [ Tue Jan 11 20:24:08 CET 2011 ][pendule OUT]
 [ Tue Jan 11 20:24:08 CET 2011 ][pendule OUT]
 
@@ -873,32 +528,10 @@ Awaited (J:1)
 Awaited (J:1)
 >> res(1:2).val
 
-[ Wed Jan 12 18:33:58 CET 2011 ][pendule OUT]
-[ Wed Jan 12 18:33:58 CET 2011 ][pendule OUT]
-[ Wed Jan 12 18:33:58 CET 2011 ][pendule OUT]
-[ Wed Jan 12 18:33:58 CET 2011 ][pendule OUT]
-[ Wed Jan 12 18:33:58 CET 2011 ][pendule OUT]
-[ Wed Jan 12 18:33:58 CET 2011 ][pendule OUT]
-[ Wed Jan 12 18:33:58 CET 2011 ][pendule OUT]
-[ Wed Jan 12 18:33:58 CET 2011 ][pendule OUT]
-[ Wed Jan 12 18:33:58 CET 2011 ][pendule OUT]
-[ Wed Jan 12 18:33:59 CET 2011 ][pendule OUT]
-[ Wed Jan 12 18:33:59 CET 2011 ][pendule OUT]
 [ Wed Jan 12 18:33:59 CET 2011 ][pendule OUT]
 [ Wed Jan 12 18:33:59 CET 2011 ][pendule OUT]
 
 
-[ Wed Jan 12 18:33:58 CET 2011 ][pendule OUT]
-[ Wed Jan 12 18:33:58 CET 2011 ][pendule OUT]
-[ Wed Jan 12 18:33:59 CET 2011 ][pendule OUT]
-[ Wed Jan 12 18:33:59 CET 2011 ][pendule OUT]
-[ Wed Jan 12 18:33:59 CET 2011 ][pendule OUT]
-[ Wed Jan 12 18:33:59 CET 2011 ][pendule OUT]
-[ Wed Jan 12 18:33:59 CET 2011 ][pendule OUT]
-[ Wed Jan 12 18:33:59 CET 2011 ][pendule OUT]
-[ Wed Jan 12 18:33:59 CET 2011 ][pendule OUT]
-[ Wed Jan 12 18:33:59 CET 2011 ][pendule OUT]
-[ Wed Jan 12 18:33:59 CET 2011 ][pendule OUT]
 [ Wed Jan 12 18:33:59 CET 2011 ][pendule OUT]
 [ Wed Jan 12 18:33:59 CET 2011 ][pendule OUT]
 
@@ -908,17 +541,7 @@ ans =
     [1]    [2]
 
 >> res(3).val
-[ Wed Jan 12 18:34:01 CET 2011 ][pendule OUT]
-[ Wed Jan 12 18:34:01 CET 2011 ][pendule OUT]
-[ Wed Jan 12 18:34:01 CET 2011 ][pendule OUT]
-[ Wed Jan 12 18:34:01 CET 2011 ][pendule OUT]
-[ Wed Jan 12 18:34:01 CET 2011 ][pendule OUT]
-[ Wed Jan 12 18:34:01 CET 2011 ][pendule OUT]
-[ Wed Jan 12 18:34:01 CET 2011 ][pendule OUT]
-[ Wed Jan 12 18:34:01 CET 2011 ][pendule OUT]
-[ Wed Jan 12 18:34:01 CET 2011 ][pendule OUT]
-[ Wed Jan 12 18:34:01 CET 2011 ][pendule OUT]
-[ Wed Jan 12 18:34:01 CET 2011 ][pendule OUT]
+
 [ Wed Jan 12 18:34:01 CET 2011 ][pendule OUT]
 [ Wed Jan 12 18:34:01 CET 2011 ][pendule OUT]
 
@@ -929,34 +552,10 @@ ans =
 
 >> res(4:5).val
 
-[ Wed Jan 12 18:33:59 CET 2011 ][pendule OUT]
-[ Wed Jan 12 18:33:59 CET 2011 ][pendule OUT]
-[ Wed Jan 12 18:33:59 CET 2011 ][pendule OUT]
-[ Wed Jan 12 18:33:59 CET 2011 ][pendule OUT]
-[ Wed Jan 12 18:33:59 CET 2011 ][pendule OUT]
-[ Wed Jan 12 18:33:59 CET 2011 ][pendule OUT]
-[ Wed Jan 12 18:33:59 CET 2011 ][pendule OUT]
-[ Wed Jan 12 18:33:59 CET 2011 ][pendule OUT]
-[ Wed Jan 12 18:33:59 CET 2011 ][pendule OUT]
-[ Wed Jan 12 18:33:59 CET 2011 ][pendule OUT]
-[ Wed Jan 12 18:33:59 CET 2011 ][pendule OUT]
-[ Wed Jan 12 18:33:59 CET 2011 ][pendule OUT]
 [ Wed Jan 12 18:34:00 CET 2011 ][pendule OUT]
 [ Wed Jan 12 18:34:00 CET 2011 ][pendule OUT]
 
 
-[ Wed Jan 12 18:33:59 CET 2011 ][pendule OUT]
-[ Wed Jan 12 18:33:59 CET 2011 ][pendule OUT]
-[ Wed Jan 12 18:33:59 CET 2011 ][pendule OUT]
-[ Wed Jan 12 18:33:59 CET 2011 ][pendule OUT]
-[ Wed Jan 12 18:33:59 CET 2011 ][pendule OUT]
-[ Wed Jan 12 18:33:59 CET 2011 ][pendule OUT]
-[ Wed Jan 12 18:33:59 CET 2011 ][pendule OUT]
-[ Wed Jan 12 18:33:59 CET 2011 ][pendule OUT]
-[ Wed Jan 12 18:33:59 CET 2011 ][pendule OUT]
-[ Wed Jan 12 18:33:59 CET 2011 ][pendule OUT]
-[ Wed Jan 12 18:33:59 CET 2011 ][pendule OUT]
-[ Wed Jan 12 18:33:59 CET 2011 ][pendule OUT]
 [ Wed Jan 12 18:33:59 CET 2011 ][pendule OUT]
 [ Wed Jan 12 18:33:59 CET 2011 ][pendule OUT]
 
@@ -983,6 +582,7 @@ ans =
     <li><p><b>InputFiles</b>: the input files, given as a cell array of strings. Paths to the input files must be given relatively to the current directory and it is not allowed to refer to a file which is outside the current directory hierarchy (i.e. no '..').</p></li>
     <li><p><b>OutputFiles</b>: the output files, given as a cell array of strings. Similarly the paths must be relative to the base directory of the remote matlab engine (which will be a subdirectory of the TEMP directory). The matlab function will have to create those files and all subdirectories relative to the base one.</p></li>
     <li><p><b>Description</b>: a char array representing the task.</p></li>
+    <li><p><b>SelectionScript</b>: a char array which defines an additional Selection Script to select resources (see ProActive Scheduler Manual).</p></li>
     <li><p><b>Compose</b>: true or false. When composing tasks, is the result of the previous task given as first parameter of this one (see next chapter <a href="solve-6">Chaining Remote Tasks</a>) ?</p></li>
 </ul>
 <p>To illustrate the usage of <b>PATask</b>, we will define a simple Matlab function <b>factfile</b> which will read an integer from a mat file and will output the factorial of this integer to a second mat file</p>
@@ -1011,17 +611,7 @@ t(1,1) =
 Job submitted : 7
 Awaited (J:7)
 >> r.val
-[ Wed Jan 12 20:57:46 CET 2011 ][pendule OUT]
-[ Wed Jan 12 20:57:46 CET 2011 ][pendule OUT]
-[ Wed Jan 12 20:57:47 CET 2011 ][pendule OUT]
-[ Wed Jan 12 20:57:47 CET 2011 ][pendule OUT]
-[ Wed Jan 12 20:57:47 CET 2011 ][pendule OUT]
-[ Wed Jan 12 20:57:47 CET 2011 ][pendule OUT]
-[ Wed Jan 12 20:57:47 CET 2011 ][pendule OUT]
-[ Wed Jan 12 20:57:47 CET 2011 ][pendule OUT]
-[ Wed Jan 12 20:57:47 CET 2011 ][pendule OUT]
-[ Wed Jan 12 20:57:47 CET 2011 ][pendule OUT]
-[ Wed Jan 12 20:57:47 CET 2011 ][pendule OUT]
+
 [ Wed Jan 12 20:57:47 CET 2011 ][pendule OUT]
 [ Wed Jan 12 20:57:47 CET 2011 ][pendule OUT]
 
@@ -1078,18 +668,6 @@ t(3,1) =
 Job submitted : 8
 Awaited (J:8)
 >> r.val
-[ Wed Jan 12 23:07:13 CET 2011 ][pendule OUT]
-[ Wed Jan 12 23:07:13 CET 2011 ][pendule OUT]
-[ Wed Jan 12 23:07:14 CET 2011 ][pendule OUT]
-[ Wed Jan 12 23:07:14 CET 2011 ][pendule OUT]
-[ Wed Jan 12 23:07:14 CET 2011 ][pendule OUT]
-[ Wed Jan 12 23:07:14 CET 2011 ][pendule OUT]
-[ Wed Jan 12 23:07:14 CET 2011 ][pendule OUT]
-[ Wed Jan 12 23:07:14 CET 2011 ][pendule OUT]
-[ Wed Jan 12 23:07:14 CET 2011 ][pendule OUT]
-[ Wed Jan 12 23:07:14 CET 2011 ][pendule OUT]
-[ Wed Jan 12 23:07:14 CET 2011 ][pendule OUT]
-[ Wed Jan 12 23:07:14 CET 2011 ][pendule OUT]
 [ Wed Jan 12 23:07:14 CET 2011 ][pendule OUT]
 [ Wed Jan 12 23:07:14 CET 2011 ][pendule OUT]
 

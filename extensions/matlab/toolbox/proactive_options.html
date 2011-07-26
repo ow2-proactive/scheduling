@@ -77,9 +77,8 @@
 <ul type="disc">
     <li><p><b>Debug</b>: activate this option if any problem occurs and you want ProActive Scheduler Toolbox to run in debug mode (with verbose output)</p></li>
     <li><p><b>TimeStamp</b>: activate this option in addition to Debug if you want that every debug line contains as well a Timestamp indicating the current system time.</p></li>
-    <li><p><b>TransferSource</b>: this option is by default set to on. It allows the automatic transfer of local source files used by matlab functions given to PAsolve to remote matlab engines. Turning this option to off is not recommended.</p></li>
     <li><p><b>TransferEnv</b>: this option is by default set to off. It allows the workspace where the PAsolve call is done to be automatically transfered to the remote matlab engines. Global variables or variables existing in workspaces higher than the current one will not be transferred though.</p></li>
-    <li><p><b>TransferVariables</b>: this option is by default set to on. It allows the automatic transfer of parameters and return values via a mat file. Turning this option to off will let the transfer be done by the ptolemy java2matlab interface which faces numerical truncature issues. Turning this option to off is therefore not recommended.</p></li>
+    <li><p><b>LicenseServerURL</b>: this very important option is the address of the proxy server which, if installed, acts as a proxy to the FlexNET server. The proxy server ensures that Matlab or toolboxes license tokens are available before any remote Matlab tasks starts. The scheduling of the task will be delayed until the tokens are available. The License Saver Proxy is not distributed with ProActive Toolbox and must be downloaded separately. See <a href="http://www.activeeon.com">http://www.activeeon.com</a> for availablity and download. </p></li>
     <li><p><b>CustomDataspaceURL</b> and <b>CustomDataspacePath</b>: by default these options are not set. Dataspaces are a ProActive internal mechanism allowing a shared file system between hosts. The mechanism allows the automatic transfer of files between the local matlab session and the remote engines. <b>ProActive Scheduler Toolbox</b> has an internal automatic Dataspace creation. But sometimes, one would like to rely on an external Dataspace such as a ftp server. This Dataspace MUST be accessible from the local file system in order to work with <b>ProActive Scheduler Toolbox</b>.The <b>CustomDataspaceURL</b> option gives the Universally accessible URL of this dataspace and the <b>CustomDataspacePath</b> gives the path to access this dataspace from the local file system. </p></li>
     <li><p><b>VersionPref</b>, <b>VersionMin</b>, <b>VersionMax</b> and <b>VersionRej</b>: these options allow the user to define which version of Matlab should/should not be used. In an heterogeneous environment, several versions of matlab can be available simultaneously on the network. These options ensures that the submitted matlab code will meet the correct matlab version. It is the responsibility of the user to find which versions are/are not compatible with the code.</p></li>
     <li><p><b>VersionPref</b>: is the preferred version to use. It won't prevent another version to be used if the preferred version is not available.It is set automatically to the version of the local matlab session, but can be as well user defined via this option.</p></li>
@@ -232,10 +231,9 @@ Version : 7.5
 ... preferred
 Matlab home : /usr/local/matlab2007b
 Matlab version : 7.5
-Matlab lib directory name : bin/glnxa64
 Matlab bin directory  : bin
 Matlab command name : matlab
-Ptolemy lib dir : /home/fviale/eclipse_workspace/Scheduling_Clean/dist/lib/7.5/bin/glnxa64</pre>
+</pre>
 <p>Similarly the <b>ReserveMatlab</b> log files are the output of ReserveMatlab selection scripts which reserve matlab tokens for computations. Here is an example of those files:</p>
 <pre>ReserveMatlab0a3e377deae6f182_2396e9a2_12d7b483856__8000.log:
     Wed Jan 12 18:33:44 CET 2011 : Executing toolbox checking script on pendule
