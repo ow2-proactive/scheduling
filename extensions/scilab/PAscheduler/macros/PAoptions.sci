@@ -7,7 +7,7 @@ function opts = PAoptions(varargin)
     elseif pmodulo(argn(2),2) ~= 0
         error(strcat(['Wrong number of arguments : ' string(nargin)]));
     end
-    
+
     deff ("y=isnumeric(x)","y=or(type(x)==[1,5,8])","n");
     deff ("y=islogical(x)","y=or(type(x)==[4,6])","n");
     deff ("y=ischar(x)","y=type(x)==10","n");
@@ -27,11 +27,7 @@ function opts = PAoptions(varargin)
     v = strsubst(v,'scilab-','');
     majt = strtok(v,'.');
     mint = strtok('.');
-    maint = strtok('.');
-
-
-    // Parsing option file
-
+    maint = strtok('.');  
 
     if ~exists('PA_scheduler_dir') 
         error('The environment variable SCHEDULER_HOME must be defined, use setenv to define it in Scilab');
@@ -71,11 +67,11 @@ function opts = PAoptions(varargin)
     inputs(j).check = 'logcheck';
     inputs(j).trans = 'logtrans';
     j=j+1;
-//    inputs(j).name = 'TransferEnv';
-//    inputs(j).default = %f;
-//    inputs(j).check = 'logcheck';
-//    inputs(j).trans = 'logtrans';
-//    j=j+1;
+    //    inputs(j).name = 'TransferEnv';
+    //    inputs(j).default = %f;
+    //    inputs(j).check = 'logcheck';
+    //    inputs(j).trans = 'logtrans';
+    //    j=j+1;
     inputs(j).name = 'TransferVariables';
     inputs(j).default = %t;
     inputs(j).check = 'logcheck';
@@ -136,16 +132,16 @@ function opts = PAoptions(varargin)
     inputs(j).check = 'ischarornull';
     inputs(j).trans = 'id';
     j=j+1;
-//    inputs(j).name = 'ZipInputFiles';
-//    inputs(j).default = %f;
-//    inputs(j).check = 'logcheck';
-//    inputs(j).trans = 'logtrans';
-//    j=j+1;
-//    inputs(j).name = 'ZipOutputFiles';
-//    inputs(j).default = %f;
-//    inputs(j).check = 'logcheck';
-//    inputs(j).trans = 'logtrans';
-//    j=j+1;
+    //    inputs(j).name = 'ZipInputFiles';
+    //    inputs(j).default = %f;
+    //    inputs(j).check = 'logcheck';
+    //    inputs(j).trans = 'logtrans';
+    //    j=j+1;
+    //    inputs(j).name = 'ZipOutputFiles';
+    //    inputs(j).default = %f;
+    //    inputs(j).check = 'logcheck';
+    //    inputs(j).trans = 'logtrans';
+    //    j=j+1;
     inputs(j).name = 'ProActiveJars';
     inputs(j).default = 'jruby.jar,jruby-engine.jar,jython.jar,jython-engine.jar,ProActive.jar,ProActive_Scheduler-client.jar,ProActive_SRM-common-client.jar,ProActive_Scheduler-matsci.jar';
     inputs(j).check = 'jarlistcheck';
@@ -155,86 +151,91 @@ function opts = PAoptions(varargin)
     inputs(j).default = strcat(['$SCHEDULER$', fs, 'config', fs, 'proactive', fs, 'ProActiveConfiguration.xml']);
     inputs(j).check = 'ischar';
     inputs(j).trans = 'conftrans';
-//    j=j+1;
-//    inputs(j).name = 'DisconnectedModeFile';
-//    inputs(j).default = strcat(['$HOME$', fs, '.PAsolveTmp.dat']);
-//    inputs(j).check = 'ischarornull';
-//    inputs(j).trans = 'conftrans';
+    //    j=j+1;
+    //    inputs(j).name = 'DisconnectedModeFile';
+    //    inputs(j).default = strcat(['$HOME$', fs, '.PAsolveTmp.dat']);
+    //    inputs(j).check = 'ischarornull';
+    //    inputs(j).trans = 'conftrans';
 
     inlength = j; 
-    userdir = home_dir;
-    optionpath = strcat([userdir, fs, '.scilab', fs, 'PAoptions.ini']); 
-    if isfile(optionpath) then
-        [fid, ferr] = mopen(optionpath, 'r'); 
-    else
-        optionpath = fullfile(PA_scheduler_dir, 'extensions', 'scilab', 'config', 'toolbox', 'PAoptions.ini');
-        if ~isfile(optionpath) then
-            error(strcat(['Can''t locate options file at ""';optionpath;'"" , please make sure that SCHEDULER_HOME refers to the correct directory.']));
-        end
-        [fid, ferr] = mopen(optionpath, 'r');
-    end    
-    try
 
-        [n,key, value] = getline(fid);
-
-        //C = textscan(fid, '%s = %[^\n]', 'CommentStyle', '%');
-        while n~=-1
-            deblanked = stripblanks(key(1), %t);                                
-            for j=1:inlength                          
-                if strcmp(deblanked,inputs(j).name) == 0 then
-                    chk = inputs(j).check; 
-                    tf = evstr(strcat([chk, '(value)']));                               
-                    if ~tf then
-                        error(strcat(['Parse error when loading option file ', optionpath, ', option ', deblanked, ' doesn''t satisfy check ', chk ]));
-                    end
-                    transfunc = inputs(j).trans;
-                    def = evstr(strcat([transfunc, '(value)']))
-                    inputs(j).default = def;                    
-                end
+    // Parsing option file
+    if isempty(proactive_pa_options) then 
+        userdir = home_dir;
+        optionpath = strcat([userdir, fs, '.scilab', fs, 'PAoptions.ini']); 
+        if isfile(optionpath) then
+            [fid, ferr] = mopen(optionpath, 'r'); 
+        else
+            optionpath = fullfile(PA_scheduler_dir, 'extensions', 'scilab', 'config', 'toolbox', 'PAoptions.ini');
+            if ~isfile(optionpath) then
+                error(strcat(['Can''t locate options file at ""';optionpath;'"" , please make sure that SCHEDULER_HOME refers to the correct directory.']));
             end
+            [fid, ferr] = mopen(optionpath, 'r');
+        end    
+        try
+
             [n,key, value] = getline(fid);
-        end        
 
-        for i = 1:inlength
-            default = %t;
-            transfunc = inputs(i).trans;
-            Parameter = inputs(i).default;
-            for j= 1:argn(2)/2
-                optionName = varargin(2*(j-1)+1);
-                value = varargin(2*j);
-                
-                if inputs(i).name == optionName then
-                    chk = inputs(i).check;
-                    tf = evstr(strcat([chk, '(value)']));
-                    if ~tf then
-                        error(strcat(['Argument ', optionName, ' doesn''t satisfy check ', chk ]));
+            //C = textscan(fid, '%s = %[^\n]', 'CommentStyle', '%');
+            while n~=-1
+                deblanked = stripblanks(key(1), %t);                                
+                for j=1:inlength                          
+                    if strcmp(deblanked,inputs(j).name) == 0 then
+                        chk = inputs(j).check; 
+                        tf = evstr(strcat([chk, '(value)']));                               
+                        if ~tf then
+                            error(strcat(['Parse error when loading option file ', optionpath, ', option ', deblanked, ' doesn''t satisfy check ', chk ]));
+                        end
+                        transfunc = inputs(j).trans;
+                        def = evstr(strcat([transfunc, '(value)']))
+                        inputs(j).default = def;                    
                     end
-                    default = %f;                    
-                    Parameter = evstr(strcat([transfunc, '(value)']));                                       
                 end
+                [n,key, value] = getline(fid);
             end
-            
-            if ~default | ~(isstruct(proactive_pa_options) & isfield(proactive_pa_options,inputs(i).name)) then      
-                proactive_pa_options(inputs(i).name) =  Parameter;
-            else
-                
+        catch 
+            mclose(fid);
+            [str2,n2,line2,func2]=lasterror(%t);printf('!-- error %i %s at line %i of function %s',n2,str2,line2,func2);        
+            error('Error while reading configuration file');
+        end  
+        mclose(fid);
+    end    
+
+    for i = 1:inlength
+        default = %t;
+        transfunc = inputs(i).trans;
+        Parameter = inputs(i).default;
+        for j= 1:argn(2)/2
+            optionName = varargin(2*(j-1)+1);
+            value = varargin(2*j);
+
+            if inputs(i).name == optionName then
+                chk = inputs(i).check;
+                tf = evstr(strcat([chk, '(value)']));
+                if ~tf then
+                    error(strcat(['Argument ', optionName, ' doesn''t satisfy check ', chk ]));
+                end
+                default = %f;                    
+                Parameter = evstr(strcat([transfunc, '(value)']));                                       
             end
         end
 
+        if ~default | ~(isstruct(proactive_pa_options) & isfield(proactive_pa_options,inputs(i).name)) then      
+            proactive_pa_options(inputs(i).name) =  Parameter;
+        else
 
-        opts = proactive_pa_options;
-        mclose(fid);
-    catch 
-        mclose(fid);
-        [str2,n2,line2,func2]=lasterror(%t);printf('!-- error %i %s at line %i of function %s',n2,str2,line2,func2);        
-        error('Error while reading configuration file');
+        end
     end
+
+
+    opts = proactive_pa_options;    
+
 endfunction
 
 function [n,key,value]=getline(fid)
     [n,key, value] = mfscanf(fid, '%%%[^\n]')
     while n > 0
-       [n,key, value] = mfscanf(fid, '%%%[^\n]') 
+        [n,key, value] = mfscanf(fid, '%%%[^\n]') 
     end    
     [n,key, value] = mfscanf(fid, '%s = %[^\n]')
 endfunction

@@ -5,18 +5,18 @@
 %       >> PAoptions(param,value, ...);
 %
 %   Parameters:
-%       
-%   Debug               true | false | 'on' | 'off'      
-%   
+%
+%   Debug               true | false | 'on' | 'off'
+%
 %               Debug mode, default to 'off'
 %
-%   TimeStamp           true | false | 'on' | 'off'      
-%   
+%   TimeStamp           true | false | 'on' | 'off'
+%
 %               TimeStamp mode in outputs, default to 'off'
 %
 %
-%   TransferEnv       true | false | 'on' | 'off'      
-%               
+%   TransferEnv       true | false | 'on' | 'off'
+%
 %               Transfers the environment in which the PAsolve/PAeval function is called
 %               to every remote calls. If variables from this "caller"
 %               environment need to be accessed inside the batch function,
@@ -64,7 +64,7 @@
 %   VersionMax        char
 %               A maximum matlab version that can be used
 %
-%   Priority          'Idle' | 'Lowest' | 'Low' | 'Normal' | 'High' | 'Highest' 
+%   Priority          'Idle' | 'Lowest' | 'Low' | 'Normal' | 'High' | 'Highest'
 %               Priority used by default for jobs submitted with PAsolve,
 %               default to 'Normal'
 %
@@ -134,7 +134,7 @@ mlock
 persistent pa_options
 
 if  nargin == 0 && exist('pa_options','var') == 1 && ~isempty(pa_options)
-    opts = pa_options; 
+    opts = pa_options;
     return;
 elseif mod(nargin,2) ~= 0
     error(['Wrong number of arguments : ' num2str(nargin)]);
@@ -157,7 +157,7 @@ v = version;
 [min,v] = strtok(v,'.');
 
 
-% Parsing option file
+
 [pathstr, name, ext] = fileparts(mfilename('fullpath'));
 javafile = java.io.File(pathstr);
 scheduling_dir = char(javafile.getParentFile().getParentFile().getParent().toString());
@@ -300,30 +300,38 @@ inputs(j).check = logcheck;
 inputs(j).trans = logtrans;
 
 
-
-userdir = char(java.lang.System.getProperty('user.home'));
-optionpath = [userdir filesep '.matlab' filesep 'PAoptions.ini'];
-if exist(optionpath, 'file');    
-    fid = fopen(optionpath, 'r'); 
-else
-    optionpath = [scheduling_dir filesep 'extensions' filesep 'matlab' filesep 'config', filesep, 'toolbox', filesep, 'PAoptions.ini'];
-    fid = fopen(optionpath, 'r');
-end
-try
-C = textscan(fid, '%s = %[^\n]', 'CommentStyle', '%');
-for i=1:length(C{1})
-    for j=1:length(inputs)
-        if strcmp(C{1}{i},inputs(j).name)
-            chk = inputs(j).check;            
-            tf = chk(C{2}{i});
-            if ~tf
-                error(['Parse error when loading option file ' optionpath ', option ' C{1}{i} ' doesn''t satisfy check ' func2str(chk) ]);
-            end
-            trans = inputs(j).trans;
-            inputs(j).default = trans(C{2}{i});
-        end
+% Parsing option file
+if ~exist('pa_options','var') == 1
+    userdir = char(java.lang.System.getProperty('user.home'));
+    optionpath = [userdir filesep '.matlab' filesep 'PAoptions.ini'];
+    if exist(optionpath, 'file');
+        fid = fopen(optionpath, 'r');
+    else
+        optionpath = [scheduling_dir filesep 'extensions' filesep 'matlab' filesep 'config', filesep, 'toolbox', filesep, 'PAoptions.ini'];
+        fid = fopen(optionpath, 'r');
     end
+    try
+        C = textscan(fid, '%s = %[^\n]', 'CommentStyle', '%');
+        for i=1:length(C{1})
+            for j=1:length(inputs)
+                if strcmp(C{1}{i},inputs(j).name)
+                    chk = inputs(j).check;
+                    tf = chk(C{2}{i});
+                    if ~tf
+                        error(['Parse error when loading option file ' optionpath ', option ' C{1}{i} ' doesn''t satisfy check ' func2str(chk) ]);
+                    end
+                    trans = inputs(j).trans;
+                    inputs(j).default = trans(C{2}{i});
+                end
+            end
+        end
+    catch ME
+        fclose(fid);
+        throw(ME);
+    end
+    fclose(fid);
 end
+
 
 for i = 1:length(inputs)
     default = true;
@@ -332,28 +340,23 @@ for i = 1:length(inputs)
     for j= 1:nargin/2
         optionName = varargin{2*(j-1)+1};
         value = varargin{2*j};
-          
+
         if strcmp(inputs(i).name, optionName)
             chk = inputs(i).check;
             tf = chk(value);
             if ~tf
                 error(['Argument ' optionName ' doesn''t satisfy check ' func2str(chk) ]);
             end
-            default = false;                    
+            default = false;
             Parameter = trans(value);
         end
     end
-    if (~default || ~isfield(pa_options,inputs(i).name))       
+    if (~default || ~isfield(pa_options,inputs(i).name))
         pa_options = setfield(pa_options, inputs(i).name, Parameter);
     end
 end
 
 opts = pa_options;
-fclose(fid);
-catch ME
-    fclose(fid);
-    throw(ME);
-end
 
 end
 
@@ -366,9 +369,9 @@ if iscell(x)
     return;
 end
 goon=true;
-while goon    
-    [str, remain] = strtok(remain, ',; ');       
-    if isempty(str) || length(str) == 0 
+while goon
+    [str, remain] = strtok(remain, ',; ');
+    if isempty(str) || length(str) == 0
         goon=false;
     else
         cl{i}=str;
