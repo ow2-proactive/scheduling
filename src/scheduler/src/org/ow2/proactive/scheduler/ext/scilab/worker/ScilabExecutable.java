@@ -1,16 +1,5 @@
 package org.ow2.proactive.scheduler.ext.scilab.worker;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.Serializable;
-import java.net.URI;
-import java.net.UnknownHostException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Map;
-
 import org.objectweb.proactive.extensions.dataspaces.api.DataSpacesFileObject;
 import org.objectweb.proactive.utils.OperatingSystem;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
@@ -24,6 +13,12 @@ import org.ow2.proactive.scheduler.ext.scilab.common.exception.ScilabTaskExcepti
 import org.ow2.proactive.scheduler.ext.scilab.worker.util.ScilabEngineConfig;
 import org.ow2.proactive.scheduler.ext.scilab.worker.util.ScilabFinder;
 
+import java.io.*;
+import java.net.URI;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Map;
+
 
 /**
  * ScilabExecutable
@@ -34,7 +29,10 @@ public class ScilabExecutable extends JavaExecutable {
     /** The ISO8601 for debug format of the date that precedes the log message */
     private static final SimpleDateFormat ISO8601FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:sss");
 
+    private static final String TMPDIR = System.getProperty("java.io.tmpdir");
+
     private static String HOSTNAME;
+    private static String NODENAME;
 
     private static OperatingSystem os;
 
@@ -43,14 +41,16 @@ public class ScilabExecutable extends JavaExecutable {
     static {
         try {
             HOSTNAME = java.net.InetAddress.getLocalHost().getHostName();
+            NODENAME = MatSciEngineConfigBase.getNodeName();
             os = OperatingSystem.getOperatingSystem();
             fs = os.fileSeparator();
-        } catch (UnknownHostException e) {
+        } catch (Exception e) {
         }
     }
 
     /** For debug purpose see {@link ScilabExecutable#createLogFileOnDebug()} */
     private PrintWriter outDebugWriter;
+    private FileWriter outFile;
 
     /** The global configuration */
     private PASolveScilabGlobalConfig paconfig;
@@ -77,6 +77,11 @@ public class ScilabExecutable extends JavaExecutable {
 
     @Override
     public void init(final Map<String, Serializable> args) throws Exception {
+
+        if (!new File(TMPDIR).canWrite()) {
+            throw new RuntimeException("Unable to execute task, TMPDIR : " + TMPDIR + " is not writable.");
+        }
+
         Object obj;
 
         // Read global configuration
@@ -143,6 +148,8 @@ public class ScilabExecutable extends JavaExecutable {
         }
 
         printLog("Task completed successfully");
+
+        this.closeLogFileOnDebug();
 
         return result;
     }
@@ -417,33 +424,25 @@ public class ScilabExecutable extends JavaExecutable {
         if (!this.paconfig.isDebug()) {
             return;
         }
-        String nodeName = MatSciEngineConfigBase.getNodeName();
 
-        String tmpPath = System.getProperty("java.io.tmpdir");
-        // system temp dir (not using java.io.tmpdir since in runasme it can be
-        // inaccesible and the scratchdir property can inherited from parent jvm)
-        //        if (this.paconfig.isRunAsMe()) {
-        //            tmpPath = System.getProperty("node.dataspace.scratchdir");
-        //        }
-
-        // log file writer used for debugging
-        File tmpDirFile = new File(tmpPath);
-        File nodeTmpDir = new File(tmpDirFile, nodeName);
-        if (!nodeTmpDir.exists()) {
-            nodeTmpDir.mkdirs();
-        }
-        File logFile = new File(tmpPath, "ScilabExecutable_" + nodeName + ".log");
+        final File logFile = new File(ScilabExecutable.TMPDIR, "ScilabExecutable_" + NODENAME + ".log");
         if (!logFile.exists()) {
             logFile.createNewFile();
         }
 
-        try {
-            FileWriter outFile = new FileWriter(logFile);
-            PrintWriter out = new PrintWriter(outFile);
+        outFile = new FileWriter(logFile, false);
+        outDebugWriter = new PrintWriter(outFile);
+    }
 
-            outDebugWriter = out;
-        } catch (IOException e) {
-            e.printStackTrace();
+    private void closeLogFileOnDebug() {
+        if (!this.paconfig.isDebug()) {
+            return;
+        }
+        try {
+            outDebugWriter.close();
+            outFile.close();
+        } catch (Exception e) {
+
         }
     }
 }
