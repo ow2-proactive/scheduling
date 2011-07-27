@@ -163,10 +163,12 @@ public class TopologyManager {
 
             HashMap<InetAddress, Long> hostsTopology = pingNode(node, toPing);
             synchronized (topology) {
-                topology.addHostTopology(node.getVMInformation().getHostName(), host, hostsTopology);
-                List<Node> nodesList = new LinkedList<Node>();
-                nodesList.add(node);
-                nodesOnHost.put(node.getVMInformation().getInetAddress(), nodesList);
+                if (hostsTopology != null) {
+                    topology.addHostTopology(node.getVMInformation().getHostName(), host, hostsTopology);
+                    List<Node> nodesList = new LinkedList<Node>();
+                    nodesList.add(node);
+                    nodesOnHost.put(node.getVMInformation().getInetAddress(), nodesList);
+                }
             }
         }
     }
