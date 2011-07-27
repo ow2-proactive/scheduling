@@ -396,7 +396,7 @@ public class ForkedJavaExecutable extends JavaExecutable implements ForkerStarte
         //set mandatory security policy
         if (forkEnvironment == null || !contains("java.security.policy", forkEnvironment.getJVMArguments())) {
             try {
-                fpolicy = File.createTempFile("forked_jts", null);
+                fpolicy = createTempFile("forked_jts");
                 PrintStream out = new PrintStream(fpolicy);
                 out.print(execInitializer.getJavaTaskLauncherInitializer().getPolicyContent());
                 out.close();
@@ -422,7 +422,7 @@ public class ForkedJavaExecutable extends JavaExecutable implements ForkerStarte
         //set mandatory log4j file
         if (forkEnvironment == null || !contains("log4j.configuration", forkEnvironment.getJVMArguments())) {
             try {
-                flog4j = File.createTempFile("forked_jtl", null);
+                flog4j = createTempFile("forked_jtl");
                 PrintStream out = new PrintStream(flog4j);
                 out.print(execInitializer.getJavaTaskLauncherInitializer().getLog4JContent());
                 out.close();
@@ -436,7 +436,7 @@ public class ForkedJavaExecutable extends JavaExecutable implements ForkerStarte
         if (forkEnvironment == null ||
             !contains("proactive.configuration", forkEnvironment.getJVMArguments())) {
             try {
-                fpaconfig = File.createTempFile("forked_jtp", null);
+                fpaconfig = createTempFile("forked_jtp");
                 PrintStream out = new PrintStream(fpaconfig);
                 out.print(execInitializer.getJavaTaskLauncherInitializer().getPaConfigContent());
                 out.close();
@@ -693,6 +693,33 @@ public class ForkedJavaExecutable extends JavaExecutable implements ForkerStarte
             terminateStreamReaders();
         } catch (Exception e) {
             logger_dev.error("", e);
+        }
+    }
+
+    /**
+     * Create temp file in java.io.tmpdir if SCRATCHDIR is not set, 
+     * otherwise, create temp file in SCRATCHDIR
+     * 
+     * @param prefix the prefix for the temp file
+     * @return the newly created file
+     * @throws IOException if the temp file could not be created,
+     * 					   if SCRATCH DIR does not exist or is not a directory
+     */
+    private File createTempFile(String prefix) throws IOException {
+        String sd = System.getProperty(TaskLauncher.NODE_DATASPACE_SCRATCHDIR);
+        if (sd == null || "".equals(sd)) {
+            //create file in java.io.tmpdir
+            return File.createTempFile(prefix, null);
+        } else {
+            File f = new File(System.getProperty(TaskLauncher.NODE_DATASPACE_SCRATCHDIR));
+            //check if scratch dir exists and is a directory
+            if (!f.exists()) {
+                throw new IOException(f.getAbsolutePath() + " SCRATCH DIR not found");
+            } else if (!f.isDirectory()) {
+                throw new IOException(f.getAbsolutePath() + " SCRATCH DIR is not a directory");
+            } else {
+                return File.createTempFile(prefix, null, f);
+            }
         }
     }
 
