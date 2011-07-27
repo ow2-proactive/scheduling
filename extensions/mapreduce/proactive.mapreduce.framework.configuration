@@ -134,7 +134,7 @@ org.ow2.proactive.scheduler.ext.mapreduce.workflow.mapperPATask.description.defa
 org.ow2.proactive.scheduler.ext.mapreduce.workflow.mapperPATask.maxNumberOfExecutions.default=1
 
 # define the name of the task, that will appear when the user choose to show the task informations
-org.ow2.proactive.scheduler.ext.mapreduce.workflow.mapperPATask.name=MapperPATask
+org.ow2.proactive.scheduler.ext.mapreduce.workflow.mapperPATask.name.default=MapperPATask
 
 # define how the task must read its input data. There are three different values:
 # - fullLocalRead: all the input data (file) are transferred on the node the task will execute on and then the task will read the slice of data it needs
