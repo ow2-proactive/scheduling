@@ -36,11 +36,13 @@
  */
 package org.ow2.proactive.scheduler.ext.matlab.client;
 
+import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.TreeSet;
 
+import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.exception.UserException;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
@@ -171,11 +173,9 @@ public class AOMatlabEnvironment extends AOMatSciEnvironment<Boolean, MatlabResu
         job.setCancelJobOnError(false);
         job.setDescription("Set of parallel matlab tasks");
 
-        //if (config.isTransferSource() || config.isTransferEnv() || config.isTransferVariables()) {
         job.setInputSpace(config.getInputSpaceURL());
-
         job.setOutputSpace(config.getOutputSpaceURL());
-        //}
+
         TreeSet<String> tnames = new TreeSet<String>(new TaskNameComparator());
         TreeSet<String> finaltnames = new TreeSet<String>(new TaskNameComparator());
         int nbResults = taskConfigs.length;
@@ -190,25 +190,29 @@ public class AOMatlabEnvironment extends AOMatSciEnvironment<Boolean, MatlabResu
                     schedulerTask.setForkEnvironment(new ForkEnvironment());
                 }
 
-                // Being fixed in the scheduler trunk
                 if (config.isRunAsMe()) {
                     schedulerTask.setRunAsMe(true);
 
-                    // Fix for SCHEDULING-1308: With RunAsMe on windows the forked jvm can have a non-writable java.io.tmpdir
-                    // With the following js script the forked jvm will inherit the scratchdir property or if undefined the java.io.tmpdir of the node jvm  
-                    final StringBuilder sb = new StringBuilder(368);
-                    sb.append("importClass(java.lang.System);");
-                    sb.append("importClass(org.ow2.proactive.scheduler.task.launcher.TaskLauncher);");
-                    sb.append("var scratchDir=System.getProperty(TaskLauncher.NODE_DATASPACE_SCRATCHDIR);");
-                    sb.append("if (scratchDir == null) {");
-                    sb.append("forkEnvironment.addJVMArgument(\"-Djava.io.tmpdir=\"");
-                    sb.append("+ System.getProperty(\"java.io.tmpdir\"));");
-                    sb.append("} else {");
-                    sb.append("forkEnvironment.addJVMArgument(\"-Djava.io.tmpdir=\" + scratchDir);}");
+                    // Get the SCHEDULER_HOME/extensions/matlab/script/ directory
+                    final StringBuilder scriptsDir = new StringBuilder();
+                    scriptsDir.append(ProActiveRuntimeImpl.getProActiveRuntime().getProActiveHome());
+                    scriptsDir.append(File.separator);
+                    scriptsDir.append("extensions");
+                    scriptsDir.append(File.separator);
+                    scriptsDir.append("matlab");
+                    scriptsDir.append(File.separator);
+                    scriptsDir.append("script");
+                    scriptsDir.append(File.separator);
 
-                    final ForkEnvironment f = new ForkEnvironment();
-                    f.setEnvScript(new SimpleScript(sb.toString(), "js"));
-                    schedulerTask.setForkEnvironment(f);
+                    // Fix for SCHEDULING-1308: With RunAsMe on windows the forked jvm can have a non-writable java.io.tmpdir
+                    final ForkEnvironment fe = new ForkEnvironment();
+                    final File forkenvFile = new File(scriptsDir + "forkenv.js");
+                    fe.setEnvScript(new SimpleScript(forkenvFile, new String[0]));
+                    schedulerTask.setForkEnvironment(fe);
+
+                    // Fix for SCHEDULING-1332: The MATLAB task with RunAsMe requires a js prescript
+                    final File preFile = new File(scriptsDir + "pre.js");
+                    schedulerTask.setPreScript(new SimpleScript(preFile, new String[0]));
                 }
 
                 String tname = "" + i + "_" + j;

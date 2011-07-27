@@ -46,7 +46,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.utils.OperatingSystem;
 import org.ow2.proactive.scheduler.ext.common.util.IOTools;
 import org.ow2.proactive.scheduler.ext.matlab.common.PASolveMatlabGlobalConfig;
 import org.ow2.proactive.scheduler.ext.matlab.common.PASolveMatlabTaskConfig;
@@ -54,7 +53,6 @@ import org.ow2.proactive.scheduler.ext.matlab.common.exception.MatlabInitExcepti
 import org.ow2.proactive.scheduler.ext.matlab.common.exception.MatlabTaskException;
 import org.ow2.proactive.scheduler.ext.matlab.common.exception.UnreachableLicenseProxyException;
 import org.ow2.proactive.scheduler.ext.matlab.common.exception.UnsufficientLicencesException;
-import org.ow2.proactive.scheduler.ext.matsci.worker.util.MatSciEngineConfigBase;
 
 import com.activeeon.proactive.license_saver.client.LicenseSaverClient;
 
@@ -66,94 +64,64 @@ import com.activeeon.proactive.license_saver.client.LicenseSaverClient;
  */
 public class MatlabConnectionRImpl implements MatlabConnection {
 
-    /**
-     * Full Matlab code which will be executed by the Matlab process
-     */
-    protected StringBuilder fullcommand = new StringBuilder();
+    /** System-dependent line separator */
+    public static final String nl = System.getProperty("line.separator");
 
-    /**
-     * File used to store matlab code to be executed
-     */
-    protected File mainFuncFile;
-
-    /**
-     * Internals
-     */
-    protected String nl = System.getProperty("line.separator");
-
-    protected final String tmpDir = System.getProperty("java.io.tmpdir");
-
-    protected String nodeName;
-
-    protected OperatingSystem os = OperatingSystem.getOperatingSystem();
-
-    /**
-     * Startup Options of the Matlab process
-     */
-    protected String[] startUpOptions;
-
-    /**
-     * Location of the Matlab process
-     */
-    protected String matlabLocation;
-
-    /**
-     * Directory where the matlab process should start (Localspace)
-     */
-    protected File workingDirectory;
-
-    /**
-     * Timeout for the matlab process startup x 10 ms
-     */
-    protected static final int TIMEOUT_START = 6000;
-
-    /**
-     * File used to capture matlab process output (in addition to Threads)
-     */
-    protected File logFile;
-
-    /**
-     * Debug mode
-     */
-    protected boolean debug;
-
-    /**
-     * Matlab Process
-     */
-    protected Process process;
-
-    /**
-     * lock used to prevent process destroy while starting up
-     */
-    protected Boolean running = false;
-
-    /**
-     * Pattern used to remove Matlab startup message from logs
-     */
+    /** Pattern used to remove Matlab startup message from logs */
     private static final String startPattern = "---- MATLAB START ----";
 
-    /**
-     * Stream used to
-     */
-    private PrintStream outDebug;
+    /** Startup Options of the Matlab process */
+    protected String[] startUpOptions;
 
-    /**
-     * Matlab configuration of the current job
-     */
-    PASolveMatlabGlobalConfig paconfig;
+    /** Location of the Matlab process */
+    protected String matlabLocation;
 
-    /**
-     * Matlab configuration of the current task
-     */
-    PASolveMatlabTaskConfig tconfig;
+    /** Full Matlab code which will be executed by the Matlab process */
+    protected StringBuilder fullcommand = new StringBuilder();
 
-    /**
-     * Licensing Proxy Server Client
-     */
+    /** File used to store MATLAB code to be executed */
+    protected File mainFuncFile;
+
+    /** Directory where the MATLAB process should start (Localspace) */
+    protected File workingDirectory;
+
+    /** File used to capture MATLAB process output (in addition to Threads) */
+    protected File logFile;
+
+    /** Stream used for debug output */
+    private final PrintStream outDebug;
+
+    /** The temp directory */
+    private final String tmpDir;
+
+    /** The ProActive node name */
+    private final String nodeName;
+
+    /** Timeout for the matlab process startup x 10 ms */
+    protected static final int TIMEOUT_START = 6000;
+
+    /** Debug mode */
+    protected boolean debug;
+
+    /** MATLAB Process */
+    protected Process process;
+
+    /** Lock used to prevent process destroy while starting up */
+    protected Boolean running = false;
+
+    /** Licensing Proxy Server Client */
     private LicenseSaverClient lclient;
 
-    public MatlabConnectionRImpl() {
+    /** Matlab configuration of the current job */
+    PASolveMatlabGlobalConfig paconfig;
 
+    /** Matlab configuration of the current task */
+    PASolveMatlabTaskConfig tconfig;
+
+    public MatlabConnectionRImpl(final String tmpDir, final PrintStream outDebug, final String nodeName) {
+        this.tmpDir = tmpDir;
+        this.outDebug = outDebug;
+        this.nodeName = nodeName;
     }
 
     public void acquire(String matlabExecutablePath, File workingDir, PASolveMatlabGlobalConfig paconfig,
@@ -163,19 +131,10 @@ public class MatlabConnectionRImpl implements MatlabConnection {
         this.debug = paconfig.isDebug();
         this.paconfig = paconfig;
         this.tconfig = tconfig;
-        if (os == OperatingSystem.windows) {
-            this.startUpOptions = paconfig.getWindowsStartupOptions();
-        } else {
-            this.startUpOptions = paconfig.getLinuxStartupOptions();
-        }
+        this.startUpOptions = paconfig.getStartupOptions();
 
-        try {
-            this.nodeName = MatSciEngineConfigBase.getNodeName();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        logFile = new File(tmpDir, "MatlabStart" + nodeName + ".log");
-        mainFuncFile = new File(workingDir, "PAMain.m");
+        this.logFile = new File(tmpDir, "MatlabStart" + nodeName + ".log");
+        this.mainFuncFile = new File(workingDir, "PAMain.m");
         if (!mainFuncFile.exists()) {
             try {
                 mainFuncFile.createNewFile();
@@ -184,11 +143,6 @@ public class MatlabConnectionRImpl implements MatlabConnection {
             }
         }
 
-        try {
-            createLogFileOnDebug();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
         if (paconfig.getLicenseServerUrl() != null) {
             try {
                 this.lclient = new LicenseSaverClient(paconfig.getLicenseServerUrl());
@@ -359,38 +313,6 @@ public class MatlabConnectionRImpl implements MatlabConnection {
         b.directory(this.workingDirectory);
         b.command(command);
 
-        Process p = b.start();
-
-        return p;
-
-    }
-
-    private void createLogFileOnDebug() throws Exception {
-        if (!this.debug) {
-            return;
-        }
-        String nodeName = MatSciEngineConfigBase.getNodeName();
-
-        String tmpPath = System.getProperty("java.io.tmpdir");
-
-        // log file writer used for debugging
-        File tmpDirFile = new File(tmpPath);
-        File nodeTmpDir = new File(tmpDirFile, nodeName);
-        if (!nodeTmpDir.exists()) {
-            nodeTmpDir.mkdirs();
-        }
-        File logFile = new File(tmpPath, "MatlabExecutable_" + nodeName + ".log");
-        if (!logFile.exists()) {
-            logFile.createNewFile();
-        }
-
-        try {
-            FileOutputStream outFile = new FileOutputStream(logFile);
-            PrintStream out = new PrintStream(outFile);
-
-            outDebug = out;
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        return b.start();
     }
 }

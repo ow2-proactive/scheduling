@@ -36,6 +36,16 @@
  */
 package org.ow2.proactive.scheduler.ext.matlab.worker;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.io.Serializable;
+import java.net.URI;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Map;
+
 import org.objectweb.proactive.extensions.dataspaces.api.DataSpacesFileObject;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
@@ -47,15 +57,6 @@ import org.ow2.proactive.scheduler.ext.matlab.worker.util.MatlabEngineConfig;
 import org.ow2.proactive.scheduler.ext.matlab.worker.util.MatlabFinder;
 import org.ow2.proactive.scheduler.ext.matsci.worker.util.MatSciEngineConfig;
 import org.ow2.proactive.scheduler.ext.matsci.worker.util.MatSciEngineConfigBase;
-
-import java.io.File;
-import java.io.FileWriter;
-import java.io.PrintWriter;
-import java.io.Serializable;
-import java.net.URI;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Map;
 
 
 /**
@@ -75,11 +76,14 @@ import java.util.Map;
  */
 public class MatlabExecutable extends JavaExecutable {
 
+    /** The name of the property that defines tmp directory */
+    public static final String MATLAB_TASK_TMPDIR = "matlab.task.tmpdir";
+
+    /** The name of the property that defines MATLAB preferences directory */
+    public static final String MATLAB_PREFDIR = "matlab.prefdir";
+
     /** The ISO8601 for debug format of the date that precedes the log message */
     private static final SimpleDateFormat ISO8601FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:sss");
-
-    /** The value of the java.io.tmpdir property */
-    private static final String TMPDIR = System.getProperty("java.io.tmpdir");
 
     private static String HOSTNAME;
     private static String NODENAME;
@@ -93,8 +97,8 @@ public class MatlabExecutable extends JavaExecutable {
     }
 
     /** For debug purpose see {@link MatlabExecutable#createLogFileOnDebug()} */
-    private PrintWriter outDebugWriter;
-    private FileWriter outFile;
+    private FileOutputStream debugfos;
+    private PrintStream outDebug;
 
     /** The global configuration */
     private PASolveMatlabGlobalConfig paconfig;
@@ -105,7 +109,10 @@ public class MatlabExecutable extends JavaExecutable {
     /** The MATLAB configuration */
     private MatlabEngineConfig matlabEngineConfig;
 
-    /** The root of the local space and a temporary dir inside */
+    /** The temp dir where all temp files are stores it doesn't include files received from dataspaces */
+    protected String tmpDir;
+
+    /** The root of the local space and a temporary dir */
     private File localSpaceRootDir, tempSubDir;
 
     /** The connection to MATLAB from matlabcontrol API */
@@ -122,10 +129,13 @@ public class MatlabExecutable extends JavaExecutable {
     @Override
     public void init(final Map<String, Serializable> args) throws Exception {
 
+        // The tmp dir is matlab.task.tmpdir if defined otherwise it is java.io.tmpdir
+        this.tmpDir = System.getProperty(MATLAB_TASK_TMPDIR) == null ? System.getProperty("java.io.tmpdir")
+                : System.getProperty(MATLAB_TASK_TMPDIR);
+
         // Fix for SCHEDULING-1308: With RunAsMe on windows the forked jvm can have a non-writable java.io.tmpdir
-        if (!new File(MatlabExecutable.TMPDIR).canWrite()) {
-            throw new RuntimeException("Unable to execute task, TMPDIR : " + MatlabExecutable.TMPDIR +
-                " is not writable.");
+        if (!new File(this.tmpDir).canWrite()) {
+            throw new RuntimeException("Unable to execute task, TMPDIR: " + this.tmpDir + " is not writable.");
         }
 
         // Read global configuration
@@ -179,7 +189,7 @@ public class MatlabExecutable extends JavaExecutable {
         if (paconfig.isUseMatlabControl()) {
             this.matlabConnection = new MatlabConnectionMCImpl();
         } else {
-            this.matlabConnection = new MatlabConnectionRImpl();
+            this.matlabConnection = new MatlabConnectionRImpl(this.tmpDir, this.outDebug, NODENAME);
         }
         matlabConnection.acquire(matlabCmd, this.localSpaceRootDir, this.paconfig, this.taskconfig);
 
@@ -498,9 +508,9 @@ public class MatlabExecutable extends JavaExecutable {
         final String log = "[" + ISO8601FORMAT.format(d) + " " + HOSTNAME + "] " + message;
         System.out.println(log);
         System.out.flush();
-        if (this.outDebugWriter != null) {
-            this.outDebugWriter.println(log);
-            this.outDebugWriter.flush();
+        if (this.outDebug != null) {
+            this.outDebug.println(log);
+            this.outDebug.flush();
         }
 
     }
@@ -511,13 +521,17 @@ public class MatlabExecutable extends JavaExecutable {
             return;
         }
 
-        final File logFile = new File(MatlabExecutable.TMPDIR, "MatlabExecutable_" + NODENAME + ".log");
+        final File logFile = new File(this.tmpDir, "MatlabExecutable_" + NODENAME + ".log");
         if (!logFile.exists()) {
             logFile.createNewFile();
         }
 
-        outFile = new FileWriter(logFile, true);
-        outDebugWriter = new PrintWriter(outFile);
+        try {
+            this.debugfos = new FileOutputStream(logFile);
+            this.outDebug = new PrintStream(this.debugfos);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private void closeLogFileOnDebug() {
@@ -525,10 +539,13 @@ public class MatlabExecutable extends JavaExecutable {
             return;
         }
         try {
-            outDebugWriter.close();
-            outFile.close();
+            if (this.outDebug != null) {
+                this.outDebug.close();
+            }
+            if (this.debugfos != null) {
+                this.debugfos.close();
+            }
         } catch (Exception e) {
-
         }
     }
 }
