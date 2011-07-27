@@ -457,11 +457,11 @@ public class NodeSource implements InitActive, RunActive {
         if (this.nodes.containsKey(nodeUrl)) {
             logger.info("[" + name + "] removing node : " + nodeUrl);
             Node node = nodes.remove(nodeUrl);
+            RMCore.topologyManager.removeNode(node);
             try {
                 // TODO this method call breaks parallel node removal - fix it
                 closeDataSpaceConfiguration(node);
                 infrastructureManager.internalRemoveNode(node);
-                RMCore.topologyManager.removeNode(node);
             } catch (RMException e) {
                 logger.error(e.getCause().getMessage());
             }
