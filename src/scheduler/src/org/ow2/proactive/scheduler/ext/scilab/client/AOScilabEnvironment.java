@@ -46,6 +46,7 @@ import org.ow2.proactive.scheduler.common.exception.UserException;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
+import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputAccessMode;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
@@ -58,6 +59,7 @@ import org.ow2.proactive.scheduler.ext.scilab.worker.ScilabExecutable;
 import org.ow2.proactive.scheduler.ext.scilab.worker.ScilabTask;
 import org.ow2.proactive.scripting.InvalidScriptException;
 import org.ow2.proactive.scripting.SelectionScript;
+import org.ow2.proactive.scripting.SimpleScript;
 import org.scilab.modules.types.ScilabType;
 
 import javax.security.auth.login.LoginException;
@@ -186,6 +188,31 @@ public class AOScilabEnvironment extends AOMatSciEnvironment<ScilabType, ScilabR
             for (int j = 0; j < depth; j++) {
                 JavaTask schedulerTask = new JavaTask();
 
+                if (config.isFork()) {
+                    schedulerTask.setForkEnvironment(new ForkEnvironment());
+                }
+
+                // Being fixed in the scheduler trunk
+                if (config.isRunAsMe()) {
+                    schedulerTask.setRunAsMe(true);
+
+                    // Fix for SCHEDULING-1308: With RunAsMe on windows the forked jvm can have a non-writable java.io.tmpdir
+                    // With the following js script the forked jvm will inherit the scratchdir property or if undefined the java.io.tmpdir of the node jvm
+                    final StringBuilder sb = new StringBuilder(368);
+                    sb.append("importClass(java.lang.System);");
+                    sb.append("importClass(org.ow2.proactive.scheduler.task.launcher.TaskLauncher);");
+                    sb.append("var scratchDir=System.getProperty(TaskLauncher.NODE_DATASPACE_SCRATCHDIR);");
+                    sb.append("if (scratchDir == null) {");
+                    sb.append("forkEnvironment.addJVMArgument(\"-Djava.io.tmpdir=\"");
+                    sb.append("+ System.getProperty(\"java.io.tmpdir\"));");
+                    sb.append("} else {");
+                    sb.append("forkEnvironment.addJVMArgument(\"-Djava.io.tmpdir=\" + scratchDir);}");
+
+                    final ForkEnvironment f = new ForkEnvironment();
+                    f.setEnvScript(new SimpleScript(sb.toString(), "js"));
+                    schedulerTask.setForkEnvironment(f);
+                }
+
                 String tname = "" + i + "_" + j;
 
                 tnames.add(tname);
@@ -307,10 +334,6 @@ public class AOScilabEnvironment extends AOMatSciEnvironment<ScilabType, ScilabR
                 if (checkScript(url1)) {
                     SelectionScript sscript = null;
                     try {
-                        System.out.println(config.getVersionMax());
-                        if (config.getVersionMax() != null) {
-                            System.out.println(config.getVersionMax().getClass());
-                        }
                         sscript = new SelectionScript(url1, new String[] { "versionPref",
                                 config.getVersionPref(), "versionRej", config.getVersionRejAsString(),
                                 "versionMin", config.getVersionMin(), "versionMax", config.getVersionMax() });
