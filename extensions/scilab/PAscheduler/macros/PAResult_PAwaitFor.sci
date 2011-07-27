@@ -60,7 +60,7 @@ function val=PAResult_PAwaitFor(R,timeout)
         end
         e = jinvoke(RaL,'getException');
         jimport org.ow2.proactive.scheduler.ext.scilab.client.ScilabSolver;
-        exstr = ScilabSolver.getStackTrace(ex);
+        exstr = ScilabSolver.getStackTrace(e);
         printf('%s',exstr);
         //err = java.lang.System.err;
         //jinvoke(e.printStackTrace(err);
