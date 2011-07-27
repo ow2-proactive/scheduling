@@ -36,15 +36,6 @@
  */
 package org.ow2.proactive.scheduler.ext.matlab.worker;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.PrintWriter;
-import java.io.Serializable;
-import java.net.URI;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Map;
-
 import org.objectweb.proactive.extensions.dataspaces.api.DataSpacesFileObject;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
@@ -56,6 +47,15 @@ import org.ow2.proactive.scheduler.ext.matlab.worker.util.MatlabEngineConfig;
 import org.ow2.proactive.scheduler.ext.matlab.worker.util.MatlabFinder;
 import org.ow2.proactive.scheduler.ext.matsci.worker.util.MatSciEngineConfig;
 import org.ow2.proactive.scheduler.ext.matsci.worker.util.MatSciEngineConfigBase;
+
+import java.io.File;
+import java.io.FileWriter;
+import java.io.PrintWriter;
+import java.io.Serializable;
+import java.net.URI;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Map;
 
 
 /**
@@ -94,6 +94,7 @@ public class MatlabExecutable extends JavaExecutable {
 
     /** For debug purpose see {@link MatlabExecutable#createLogFileOnDebug()} */
     private PrintWriter outDebugWriter;
+    private FileWriter outFile;
 
     /** The global configuration */
     private PASolveMatlabGlobalConfig paconfig;
@@ -123,7 +124,8 @@ public class MatlabExecutable extends JavaExecutable {
 
         // Fix for SCHEDULING-1308: With RunAsMe on windows the forked jvm can have a non-writable java.io.tmpdir
         if (!new File(MatlabExecutable.TMPDIR).canWrite()) {
-            throw new RuntimeException("Unable to execute task, no script specified");
+            throw new RuntimeException("Unable to execute task, TMPDIR : " + MatlabExecutable.TMPDIR +
+                " is not writable.");
         }
 
         // Read global configuration
@@ -192,6 +194,8 @@ public class MatlabExecutable extends JavaExecutable {
         }
 
         printLog("Task completed successfully");
+
+        this.closeLogFileOnDebug();
 
         return result;
     }
@@ -512,8 +516,19 @@ public class MatlabExecutable extends JavaExecutable {
             logFile.createNewFile();
         }
 
-        final FileWriter outFile = new FileWriter(logFile);
-        final PrintWriter out = new PrintWriter(outFile);
-        outDebugWriter = out;
+        outFile = new FileWriter(logFile, true);
+        outDebugWriter = new PrintWriter(outFile);
+    }
+
+    private void closeLogFileOnDebug() {
+        if (!this.paconfig.isDebug()) {
+            return;
+        }
+        try {
+            outDebugWriter.close();
+            outFile.close();
+        } catch (Exception e) {
+
+        }
     }
 }
