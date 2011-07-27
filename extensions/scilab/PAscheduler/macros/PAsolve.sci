@@ -70,6 +70,8 @@ function outputs = PAsolve(varargin)
 
     solve_config.setDebug(opt.Debug);
     solve_config.setTimeStamp(opt.TimeStamp);
+    solve_config.setFork(opt.Fork);
+    solve_config.setRunAsMe(opt.RunAsMe);
     solve_config.setPriority(opt.Priority);
     solve_config.setTransferSource(opt.TransferSource);
     //solve_config.setTransferEnv(opt.TransferEnv);
