@@ -153,17 +153,17 @@ public class StatusLabel implements EventSchedulerListener {
         if (!label.isDisposed()) {
             Display.getDefault().asyncExec(new Runnable() {
                 public void run() {
-                    if (!label.isDisposed()) { // might have changed since last call
+                    if (!label.isDisposed() && !user.isDisposed()) { // might have changed since last call
                         label.setForeground(color);
                         label.setText(text);
+                        String username = SchedulerProxy.getInstance().getUsername();
+                        if (username != null && username.trim().length() > 0) {
+                            user.setText("logged as " + username);
+                        } else {
+                            user.setText("");
+                        }
+                        content.layout();
                     }
-                    String username = SchedulerProxy.getInstance().getUsername();
-                    if (username != null && username.trim().length() > 0) {
-                        user.setText("logged as " + username);
-                    } else {
-                        user.setText("");
-                    }
-                    content.layout();
                 }
             });
         }
