@@ -1271,6 +1271,9 @@ public class PAMapReduceJobConfiguration {
                  * LOCAL space (see the comment on the MapperPATask case to get more
                  * details).
                  */
+                properties.setProperty(PAMapReduceFrameworkProperties.WORKFLOW_SPLITTER_PA_TASK_READ_MODE.key,
+                        readMode.getKey());
+
                 if (readMode.equals(ReadMode.remoteRead)) {
                     properties.setProperty(
                             PAMapReduceFrameworkProperties.WORKFLOW_SPLITTER_PA_TASK_INPUT_ACCESS_MODE.key,
