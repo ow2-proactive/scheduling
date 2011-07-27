@@ -7,7 +7,6 @@
 	<property name="src.mapreduce.dir" value="${base.dir}/src/scheduler/src/org/ow2/proactive/scheduler/ext/mapreduce" />
 	<property name="lib.dir" value="${base.dir}/lib" />
 	<property name="dist.lib.dir" value="${base.dir}/dist/lib" />
-	<property name="addons.dir" value="${base.dir}/addons" />
 	<property name="jar.mapreduce.name" value="MapReduce-examples" />
 
 	<!-- before running the MapReduce example, we must be sure we defined configuration parameters in the file that follows -->
@@ -42,9 +41,6 @@
 			<include name="ProActive_SRM-common-client.jar" />
 			<include name="ProActive_utils.jar" />
 			<include name="ProActive.jar" />
-		</fileset>
-
-		<fileset dir="${addons.dir}">
 			<include name="ProActive_Scheduler-mapreduce.jar" />
 		</fileset>
 	</path>
@@ -70,7 +66,6 @@
                 <attribute name="Main-Class" value="org.ow2.proactive.scheduler.ext.mapreduce.examples.PAMapReduceJobMain"/>
             </manifest>
         </jar>
-        <copy file="${jar.mapreduce.dir}/${jar.mapreduce.name}.jar" toDir="${addons.dir}" />
     </target>
 
    <target name="run.mapreduce.examples" depends="jar.mapreduce.examples" description="Run the MapReduce examples">
@@ -94,6 +89,5 @@
     <target name="clean.mapreduce.examples" description="Clean the MapReduce examples generated files">
 	<delete dir="${classes.mapreduce.dir}" />
 	<delete dir="${jar.mapreduce.dir}/*.jar" />
-	<delete file="${addons.dir}/${jar.mapreduce.name}.jar" />
     </target>
 </project>
