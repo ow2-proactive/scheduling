@@ -44,6 +44,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Map;
 
 import org.objectweb.proactive.core.ProActiveException;
 import org.ow2.proactive.scheduler.ext.common.util.IOTools;
@@ -312,6 +313,28 @@ public class MatlabConnectionRImpl implements MatlabConnection {
         // invalid on windows, it affects the starter only
         b.directory(this.workingDirectory);
         b.command(command);
+
+        // Fix for SCHEDULING-1309: If MATLAB client uses RunAsMe option the MATLAB
+        // worker jvm can crash if the client user has never started any MATLAB
+        // session on the worker host
+
+        // Since the user profile can be missing on Windows with RunAsMe, by setting
+        // the MATLAB_PREFDIR variable to a writable dir (can be non-writable on Windows with RunAsMe) 
+        // the MATLAB doesn't crash no more
+
+        Map<String, String> env = b.environment();
+
+        // Transmit the prefdir as env variable
+        String matlabPrefdir = System.getProperty(MatlabExecutable.MATLAB_PREFDIR);
+        if (matlabPrefdir != null) {
+            env.put("MATLAB_PREFDIR", matlabPrefdir);
+        }
+        // Transmit the tmpdir as env variable
+        String matlabTmpvar = System.getProperty(MatlabExecutable.MATLAB_TASK_TMPDIR);
+        if (matlabTmpvar != null) {
+            env.put("TEMP", matlabTmpvar);
+            env.put("TMP", matlabTmpvar);
+        }
 
         return b.start();
     }
