@@ -89,7 +89,6 @@ public class NodeHistory {
     private String userName;
 
     @Column(name = "providerName")
-    @Index(name = "providerIndex")
     private String providerName;
 
     @Column(name = "nodeState")
@@ -99,6 +98,7 @@ public class NodeHistory {
     protected long startTime;
 
     @Column(name = "endTime")
+    @Index(name = "endTimeIndex")
     protected long endTime;
 
     // indicates that new record in the data base will be created for this event
