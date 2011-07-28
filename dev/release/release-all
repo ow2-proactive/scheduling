@@ -17,16 +17,6 @@ function build() {
 	generate_credential
 }
 
-
-function del_dist(){
-	rm -rf dist
-}
-
-function del_src(){
-	rm -rf compile lib rm-rcp scheduler-rcp scripts src
-	rm -rf doc/src doc/toolchain doc/tmp
-}
-
 function del_client(){
 	rm -rf compile lib rm-rcp scheduler-rcp scripts src
 	rm -rf doc/src doc/toolchain
@@ -76,6 +66,16 @@ RELEASE_CLIENT_API_MAPREDUCE=client-API-mapreduce
 for p in {"$RELEASE_SRC","$RELEASE_SERVER","$RELEASE_WORKER","$RELEASE_CLIENT_API","$RELEASE_CLIENT_API_FULL","$RELEASE_CLIENT_API_MATSCI","$RELEASE_CLIENT_API_MAPREDUCE"}
 do
 	SERVER_NAME=$p # $SERVER_NAME is the variable used in release functions to built the archive name
+	
+	
+	#special name for src release
+	if [ "$SERVER_NAME" == "$RELEASE_SRC" ]
+	then
+		RELEASE_BASENAME_BEFORE=$RELEASE_BASENAME
+		RELEASE_BASENAME=ProActiveSchedulingResourcing
+	fi
+	
+	
 	copy_to_tmp
 	build_and_clean
 	
@@ -85,7 +85,7 @@ do
 	if [ "$SERVER_NAME" == "$RELEASE_SRC" ]
 	then
 		del_dist
-	fi 
+	fi
 	
 	
 	####### server #######
@@ -148,4 +148,15 @@ do
 	clean_repository
 	replace_version
 	build_archive
+	
+	
+	
+	#back to previous release basename for src release
+	if [ "$SERVER_NAME" == "$RELEASE_SRC" ]
+	then
+		RELEASE_BASENAME=$RELEASE_BASENAME_BEFORE
+	fi
+	
+	
+	
 done

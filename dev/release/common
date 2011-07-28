@@ -156,3 +156,12 @@ function build_archive() {
 	tar cvfz $RELEASE_BASENAME-${SPECIAL_NAME}_${SERVER_NAME}.tar.gz $RELEASE_BASENAME-${SPECIAL_NAME}_${SERVER_NAME}
 	zip -r   $RELEASE_BASENAME-${SPECIAL_NAME}_${SERVER_NAME}.zip    $RELEASE_BASENAME-${SPECIAL_NAME}_${SERVER_NAME}
 }
+
+function del_dist(){
+	rm -rf dist
+}
+
+function del_src(){
+	rm -rf compile lib rm-rcp scheduler-rcp scripts src
+	rm -rf doc/src doc/toolchain doc/tmp
+}
