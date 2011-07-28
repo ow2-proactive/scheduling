@@ -115,11 +115,7 @@ public class MatlabConnectionMCImpl implements MatlabConnection {
             }
         }
 
-        if (os == OperatingSystem.windows) {
-            this.startUpOptions = paconfig.getWindowsStartupOptions();
-        } else {
-            this.startUpOptions = paconfig.getLinuxStartupOptions();
-        }
+        this.startUpOptions = paconfig.getStartupOptions();
 
         // If a user is specified create the proxy factory with a specific
         // MATLAB process as user creator

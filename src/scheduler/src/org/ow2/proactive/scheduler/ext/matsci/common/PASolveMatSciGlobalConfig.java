@@ -40,6 +40,8 @@ import java.io.Serializable;
 import java.net.URI;
 import java.util.HashSet;
 
+import org.objectweb.proactive.utils.OperatingSystem;
+
 
 /**
  * PASolveMatSciGlobalConfig
@@ -390,6 +392,14 @@ public class PASolveMatSciGlobalConfig implements Serializable {
 
     public void setSourceZipFileName(String sourceZipFileName) {
         this.sourceZipFileName = sourceZipFileName;
+    }
+
+    public String[] getStartupOptions() {
+        if (OperatingSystem.getOperatingSystem() == OperatingSystem.windows) {
+            return this.getWindowsStartupOptions();
+        } else {
+            return this.getLinuxStartupOptions();
+        }
     }
 
     public String[] getWindowsStartupOptions() {
