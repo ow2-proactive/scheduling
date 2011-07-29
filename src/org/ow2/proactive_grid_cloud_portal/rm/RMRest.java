@@ -48,6 +48,7 @@ import javax.management.ObjectName;
 import javax.management.ReflectionException;
 import javax.security.auth.login.LoginException;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
@@ -320,20 +321,47 @@ public class RMRest {
      * @return true of the node has been released
      * @throws NodeException 
      */
-    public boolean releaseNode(@HeaderParam("sessionid") String sessionId, String url) throws NodeException {
+    @POST
+    @Path("node/release")
+    @Produces("application/json")
+	public boolean releaseNode(@HeaderParam("sessionid") String sessionId,
+			@FormParam("url") String url) throws NodeException {
         ResourceManager rm = checkAccess(sessionId);
         Node n;
         n = NodeFactory.getNode(url);
         return rm.releaseNode(n).getBooleanValue();
     }
 
-    public boolean removeNode(@HeaderParam("sessionid") String sessionId, String nodeUrl, boolean preempt) {
+
+    /**
+     * Delete a node
+     * @param sessionId
+     * @param nodeUrl
+     * @param preempt
+     * @return
+     */
+    @POST
+    @Path("node/remove")
+    @Produces("application/json")
+	public boolean removeNode(@HeaderParam("sessionid") String sessionId,
+			@FormParam("url") String nodeUrl, @FormParam("preempt") boolean preempt) {
         ResourceManager rm = checkAccess(sessionId);
         return rm.removeNode(nodeUrl, preempt).getBooleanValue();
     }
 
-    public boolean removeNodeSource(@HeaderParam("sessionid") String sessionId, String sourceName,
-            boolean preempt) {
+    /**
+     * Delete a nodesource
+     * @param sessionId
+     * @param sourceName
+     * @param preempt
+     * @return
+     */
+    @POST
+    @Path("nodesource/remove")
+    @Produces("application/json")
+	public boolean removeNodeSource(@HeaderParam("sessionid") String sessionId,
+			@FormParam("name") String sourceName,
+			@FormParam("preempt") boolean preempt) {
         ResourceManager rm = checkAccess(sessionId);
         return rm.removeNodeSource(sourceName, preempt).getBooleanValue();
     }
