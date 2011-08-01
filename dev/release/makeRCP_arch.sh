@@ -88,9 +88,9 @@ do
     then
             SUFFIX=win32-64
     fi
-    if [ "$FILENAME" = "macosx.carbon.x86" ]
+    if [ "$FILENAME" = "macosx.cocoa.x86_64" ]
     then
-            SUFFIX=macx86
+            SUFFIX=macosx.cocoa.x86_64
     fi
     if [ "$FILENAME" = "macosx.carbon.ppc" ]
     then
@@ -196,7 +196,7 @@ do
 		then
 			INI_FILE=ResourceManager.ini
 		fi
-		if [ "$FILENAME" = "macosx.carbon.x86" ] || [ "$FILENAME" = "macosx.carbon.ppc" ]
+		if [ "$FILENAME" = "macosx.cocoa.x86_64" ] || [ "$FILENAME" = "macosx.carbon.ppc" ]
         then
 			echo -Dproactive.configuration=../../../config/proactive/ProActiveConfiguration.xml >> $NEW_FILE_DIR/$PRODUCT_NAME.app/Contents/MacOS/$INI_FILE
         else
