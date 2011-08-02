@@ -41,6 +41,7 @@ import java.net.HttpURLConnection;
 import java.security.KeyException;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import javax.management.InstanceNotFoundException;
 import javax.management.IntrospectionException;
@@ -364,6 +365,36 @@ public class RMRest {
         ResourceManager rm = checkAccess(sessionId);
         return rm.removeNodeSource(sourceName, preempt).getBooleanValue();
     }
+
+	/**
+	 * prevent other users from using a set of locked nodes
+	 * @param sessionId current session
+	 * @param nodeUrls set of node urls to lock
+	 * @return true when all nodes were free and have been locked
+	 */
+	@POST
+	@Path("node/lock")
+	@Produces("application/json")
+	public boolean lockNodes(@HeaderParam("sessionid") String sessionId,
+			@FormParam("nodeurls") Set<String> nodeUrls) {
+		ResourceManager rm = checkAccess(sessionId);
+		return rm.lockNodes(nodeUrls).getBooleanValue();
+	}
+
+	/**
+	 * allow other users to use a set of previously locked nodes
+	 * @param sessionId current session
+	 * @param nodeUrls set of node urls to unlock
+	 * @return true when all nodes were locked and have been unlocked
+	 */
+	@POST
+	@Path("node/unlock")
+	@Produces("application/json")
+	public boolean unlockNodes(@HeaderParam("sessionid") String sessionId,
+			@FormParam("nodeurls") Set<String> nodeUrls) {
+		ResourceManager rm = checkAccess(sessionId);
+		return rm.unlockNodes(nodeUrls).getBooleanValue();
+	}
 
     /**
      * Each node source scan its nodes periodically to check their states. 
