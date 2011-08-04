@@ -12,7 +12,6 @@
 	<application>
 		<proactive base="root" relpath="${pa.rm.home}">
 			<configuration>
-				<jvmarg value='-Dproactive.http.jetty.xml="${pa.rm.home}/config/rm/deployment/jetty.xml"'/>
 				<jvmarg value='${jvmargDefinedByIM}'/>
 				<!--  <jvmarg value='-Dproactive.scheduler.logs.maxsize=50'/>-->
 				<applicationClasspath>

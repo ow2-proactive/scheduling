@@ -817,9 +817,6 @@ public class SchedulerTHelper {
             PASchedulerProperties.SCHEDULER_HOME.getValueAsString() + "\"");
         properties.append(" " + PAResourceManagerProperties.RM_HOME.getCmdLine() + "\"" +
             PAResourceManagerProperties.RM_HOME.getValueAsString() + "\"");
-        properties.append(" -D" + CentralPAPropertyRepository.PA_HTTP_JETTY_XML.getName() + "=" +
-            PAResourceManagerProperties.RM_HOME.getValueAsString() + File.separator + "config" +
-            File.separator + "rm" + File.separator + "deployment" + File.separator + "jetty.xml");
         vContract.setVariableFromProgram("jvmargDefinedByTest", properties.toString(),
                 VariableContractType.DescriptorDefaultVariable);
         gcmad = PAGCMDeployment.loadApplicationDescriptor(startForkedSchedulerApplication, vContract);

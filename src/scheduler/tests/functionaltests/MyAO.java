@@ -114,9 +114,6 @@ public class MyAO implements Serializable {
             ResourceManager rmAdmin = rmAuth.login(Credentials.getCredentials(PAResourceManagerProperties
                     .getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString())));
             Map<String, String> params = new HashMap<String, String>();
-            params.put(CentralPAPropertyRepository.PA_HTTP_JETTY_XML.getName(),
-                    PAResourceManagerProperties.RM_HOME.getValueAsString() + File.separator + "config" +
-                        File.separator + "rm" + File.separator + "deployment" + File.separator + "jetty.xml");
             Node[] nodes = new Node[RMTHelper.defaultNodesNumber];
             for (int i = 0; i < RMTHelper.defaultNodesNumber; i++) {
                 String nodeName = "default_nodemyao_" + System.currentTimeMillis();
