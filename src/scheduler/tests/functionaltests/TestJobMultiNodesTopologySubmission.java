@@ -36,6 +36,8 @@
  */
 package functionaltests;
 
+import java.io.File;
+import java.net.URL;
 import java.util.Map.Entry;
 
 import org.junit.Assert;
@@ -68,8 +70,8 @@ import functionalTests.FunctionalTest;
  */
 public class TestJobMultiNodesTopologySubmission extends FunctionalTest {
 
-    private static String jobDescriptor = TestJobMultiNodesTopologySubmission.class.getResource(
-            "/functionaltests/descriptors/Job_MultiNodes_topology.xml").getPath();
+    private static URL jobDescriptor = TestJobMultiNodesTopologySubmission.class
+            .getResource("/functionaltests/descriptors/Job_MultiNodes_topology.xml");
 
     /**
      * Tests start here.
@@ -78,7 +80,7 @@ public class TestJobMultiNodesTopologySubmission extends FunctionalTest {
      */
     @org.junit.Test
     public void run() throws Throwable {
-        JobId id = SchedulerTHelper.testJobSubmission(jobDescriptor);
+        JobId id = SchedulerTHelper.testJobSubmission(new File(jobDescriptor.toURI()).getAbsolutePath());
 
         // check result are not null
         JobResult res = SchedulerTHelper.getJobResult(id);
