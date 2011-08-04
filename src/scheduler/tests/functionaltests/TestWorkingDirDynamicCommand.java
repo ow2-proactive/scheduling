@@ -36,7 +36,11 @@
  */
 package functionaltests;
 
+import java.io.File;
+import java.net.URL;
+
 import org.junit.Assert;
+import org.objectweb.proactive.utils.OperatingSystem;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobResult;
@@ -57,18 +61,23 @@ import functionalTests.FunctionalTest;
  */
 public class TestWorkingDirDynamicCommand extends FunctionalTest {
 
-    private static String jobDescriptor = TestWorkingDirStaticCommand.class.getResource(
-            "/functionaltests/descriptors/Job_test_workingDir_dynamic_Command.xml").getPath();
+    private static URL jobDescriptor = TestWorkingDirDynamicCommand.class
+            .getResource("/functionaltests/descriptors/Job_test_workingDir_dynamic_Command.xml");
 
     private static String executablePathPropertyName = "EXEC_PATH";
 
-    private static String executablePath = TestWorkingDirStaticCommand.class.getResource(
-            "/functionaltests/executables/test_working_dir.sh").getPath();
+    private static String beginCommand = "WCOM";
+
+    private static URL executablePath = TestWorkingDirDynamicCommand.class
+            .getResource("/functionaltests/executables/test_working_dir.sh");
+
+    private static URL executablePathWindows = TestWorkingDirDynamicCommand.class
+            .getResource("/functionaltests/executables/test_working_dir.bat");
 
     private static String WorkingDirPropertyName = "WDIR";
 
-    private static String workingDirPath = TestWorkingDirStaticCommand.class.getResource(
-            "/functionaltests/executables").getPath();
+    private static URL workingDirPath = TestWorkingDirDynamicCommand.class
+            .getResource("/functionaltests/executables");
 
     /**
      * Tests start here.
@@ -77,17 +86,32 @@ public class TestWorkingDirDynamicCommand extends FunctionalTest {
      */
     @org.junit.Test
     public void run() throws Throwable {
-
         String task1Name = "task1";
-
+        boolean onWindows = OperatingSystem.getOperatingSystem().name().equals("windows");
         //set system Property for executable path
-        System.setProperty(executablePathPropertyName, executablePath);
-        System.setProperty(WorkingDirPropertyName, workingDirPath);
-
-        SchedulerTHelper.setExecutable(executablePath);
+        switch (OperatingSystem.getOperatingSystem()) {
+            case windows:
+                System.setProperty(executablePathPropertyName, new File(executablePathWindows.toURI())
+                        .getAbsolutePath().replace("\\", "\\\\"));
+                System.setProperty(beginCommand, "cmd /C");
+                System.setProperty(WorkingDirPropertyName, new File(workingDirPath.toURI()).getAbsolutePath()
+                        .replace("\\", "\\\\"));
+                break;
+            case unix:
+                System.setProperty(executablePathPropertyName, new File(executablePath.toURI())
+                        .getAbsolutePath());
+                System.setProperty(beginCommand, "");
+                SchedulerTHelper.setExecutable(new File(executablePath.toURI()).getAbsolutePath());
+                System
+                        .setProperty(WorkingDirPropertyName, new File(workingDirPath.toURI())
+                                .getAbsolutePath());
+                break;
+            default:
+                throw new IllegalStateException("Unsupported operating system");
+        }
 
         //test submission and event reception
-        JobId id = SchedulerTHelper.submitJob(jobDescriptor);
+        JobId id = SchedulerTHelper.submitJob(new File(jobDescriptor.toURI()).getAbsolutePath());
 
         SchedulerTHelper.log("Job submitted, id " + id.toString());
 

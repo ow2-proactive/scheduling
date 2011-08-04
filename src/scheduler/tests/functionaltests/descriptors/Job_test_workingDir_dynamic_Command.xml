@@ -9,8 +9,10 @@
 			<nativeExecutable>
 				<dynamicCommand workingDir="${WDIR}">
 					<generation>
-						<script> <code language="javascript">
-						command="${EXEC_PATH} ${WDIR}"
+						<script> <code language="javascript">					
+						if(org.objectweb.proactive.utils.OperatingSystem.getOperatingSystem() == org.objectweb.proactive.utils.OperatingSystem.windows){
+							command="${WCOM} \"\"${EXEC_PATH}\" \"${WDIR}\"\"";
+						}else {command="${EXEC_PATH} ${WDIR}";}	
 						</code>
 						</script>
 					</generation>
