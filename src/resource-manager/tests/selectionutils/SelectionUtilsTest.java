@@ -55,24 +55,21 @@ public class SelectionUtilsTest {
     @Test
     public void run() throws Throwable {
         String scriptPath;
-        String propertyPath = new File(getClass().getResource("scripts/SampleCheckProperties").getFile())
+        String propertyPath = new File(getClass().getResource("scripts/SampleCheckProperties").toURI())
                 .getAbsolutePath();
 
         log("Test javaScript evaluation");
-        scriptPath = new File(getClass().getResource("scripts/checkProperties.js").getFile())
-                .getAbsolutePath();
+        scriptPath = new File(getClass().getResource("scripts/checkProperties.js").toURI()).getAbsolutePath();
         Assert.assertEquals("selected=true", EngineScript.EvalScript(scriptPath,
                 EngineScript.Language.javascript, propertyPath));
 
         log("Test python evaluation");
-        scriptPath = new File(getClass().getResource("scripts/checkProperties.py").getFile())
-                .getAbsolutePath();
+        scriptPath = new File(getClass().getResource("scripts/checkProperties.py").toURI()).getAbsolutePath();
         Assert.assertEquals("selected=1", EngineScript.EvalScript(scriptPath, EngineScript.Language.python,
                 propertyPath));
 
         log("Test ruby evaluation");
-        scriptPath = new File(getClass().getResource("scripts/checkProperties.rb").getFile())
-                .getAbsolutePath();
+        scriptPath = new File(getClass().getResource("scripts/checkProperties.rb").toURI()).getAbsolutePath();
         Assert.assertEquals("selected=true", EngineScript.EvalScript(scriptPath, EngineScript.Language.ruby,
                 propertyPath));
 
