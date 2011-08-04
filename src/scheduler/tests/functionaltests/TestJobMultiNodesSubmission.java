@@ -36,6 +36,8 @@
  */
 package functionaltests;
 
+import java.io.File;
+import java.net.URL;
 import java.util.Map.Entry;
 
 import org.junit.Assert;
@@ -74,8 +76,8 @@ import functionalTests.FunctionalTest;
  */
 public class TestJobMultiNodesSubmission extends FunctionalTest {
 
-    private static String jobDescriptor = TestJobMultiNodesSubmission.class.getResource(
-            "/functionaltests/descriptors/Job_MultiNodes.xml").getPath();
+    private static URL jobDescriptor = TestJobMultiNodesSubmission.class
+            .getResource("/functionaltests/descriptors/Job_MultiNodes.xml");
 
     /**
      * Tests start here.
@@ -85,7 +87,7 @@ public class TestJobMultiNodesSubmission extends FunctionalTest {
     @org.junit.Test
     public void run() throws Throwable {
         //submit job
-        JobId id = SchedulerTHelper.submitJob(jobDescriptor);
+        JobId id = SchedulerTHelper.submitJob(new File(jobDescriptor.toURI()).getAbsolutePath());
         //connect to RM
         RMAuthentication rmAuth = RMConnection.waitAndJoin(null);
         ResourceManager rmAdmin = rmAuth.login(Credentials.getCredentials(PAResourceManagerProperties
