@@ -36,6 +36,9 @@
  */
 package functionaltests;
 
+import java.io.File;
+import java.net.URL;
+
 import org.junit.Assert;
 import org.ow2.proactive.scheduler.common.exception.TaskAbortedException;
 import org.ow2.proactive.scheduler.common.exception.TaskPreemptedException;
@@ -74,8 +77,8 @@ import functionalTests.FunctionalTest;
  */
 public class TestPreemptRestartKillTask extends FunctionalTest {
 
-    private static String jobDescriptor = TestPreemptRestartKillTask.class.getResource(
-            "/functionaltests/descriptors/Job_preempt_restart_kill.xml").getPath();
+    private static URL jobDescriptor = TestPreemptRestartKillTask.class
+            .getResource("/functionaltests/descriptors/Job_preempt_restart_kill.xml");
 
     /**
     * Tests start here.
@@ -86,7 +89,7 @@ public class TestPreemptRestartKillTask extends FunctionalTest {
     public void run() throws Throwable {
 
         SchedulerTHelper.log("Submitting job");
-        JobId id = SchedulerTHelper.submitJob(jobDescriptor);
+        JobId id = SchedulerTHelper.submitJob(new File(jobDescriptor.toURI()).getAbsolutePath());
         SchedulerTHelper.log("Wait for event job submitted");
         SchedulerTHelper.waitForEventJobSubmitted(id);
         SchedulerTHelper.log("Wait for event t1 running");
