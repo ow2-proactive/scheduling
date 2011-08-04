@@ -36,12 +36,19 @@
  */
 package functionaltests;
 
+import java.io.File;
+import java.net.URL;
+
 import org.junit.Assert;
+import org.objectweb.proactive.utils.OperatingSystem;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
+import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
+import org.ow2.proactive.scheduler.common.job.factories.JobFactory_stax;
+import org.ow2.proactive.scheduler.common.task.NativeTask;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 
@@ -70,8 +77,8 @@ import functionalTests.FunctionalTest;
  */
 public class TestJobNativeSubmission extends FunctionalTest {
 
-    private static String jobDescriptor = TestJobNativeSubmission.class.getResource(
-            "/functionaltests/descriptors/Job_nativ.xml").getPath();
+    private static URL jobDescriptor = TestJobNativeSubmission.class
+            .getResource("/functionaltests/descriptors/Job_nativ.xml");
 
     /**
      * Tests start here.
@@ -85,7 +92,13 @@ public class TestJobNativeSubmission extends FunctionalTest {
         String task2Name = "task2";
 
         //test submission and event reception
-        JobId id = SchedulerTHelper.submitJob(jobDescriptor);
+        TaskFlowJob job = (TaskFlowJob) JobFactory_stax.getFactory().createJob(
+                new File(jobDescriptor.toURI()).getAbsolutePath());
+        if (OperatingSystem.getOperatingSystem().name().equals("windows")) {
+            ((NativeTask) job.getTask(task1Name)).setCommandLine("cmd", "/C", "ping", "127.0.0.1", "-n",
+                    "10", ">", "NUL");
+        }
+        JobId id = SchedulerTHelper.submitJob(job);
 
         SchedulerTHelper.log("Job submitted, id " + id.toString());
 
