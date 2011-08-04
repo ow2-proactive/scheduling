@@ -48,7 +48,6 @@
 	<classpathentry kind="lib" path="lib/ProActive/mail.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/moduleloader.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/osgi.jar"/>
-	<classpathentry kind="lib" path="lib/ProActive/ProActive_tests.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/puretls.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/servlet.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/servlet-api.jar"/>
