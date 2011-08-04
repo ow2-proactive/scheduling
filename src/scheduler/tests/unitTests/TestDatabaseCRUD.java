@@ -36,7 +36,9 @@
  */
 package unitTests;
 
+import java.io.File;
 import java.lang.reflect.Field;
+import java.net.URL;
 import java.util.List;
 import java.util.Map;
 
@@ -94,21 +96,23 @@ import functionaltests.SchedulerTHelper;
  */
 public class TestDatabaseCRUD {
 
-    private static String functionalTestSchedulerProperties = SchedulerTHelper.class.getResource(
-            "config/functionalTSchedulerProperties.ini").getPath();
-    private static String jobTaskFlowDescriptor = TestJobFactory.class.getResource(
-            "/unitTests/descriptors/Job_TaskFlow.xml").getPath();
+    private static URL functionalTestSchedulerProperties = SchedulerTHelper.class
+            .getResource("config/functionalTSchedulerProperties.ini");
+    private static URL jobTaskFlowDescriptor = TestJobFactory.class
+            .getResource("/unitTests/descriptors/Job_TaskFlow.xml");
     private static TaskFlowJob tfJob;
     private static InternalTaskFlowJob itfJob;
 
     @Before
     public void before() throws Exception {
-        PASchedulerProperties.updateProperties(functionalTestSchedulerProperties);
+        PASchedulerProperties.updateProperties(new File(functionalTestSchedulerProperties.toURI())
+                .getAbsolutePath());
         //build hibernate session
         DatabaseManager.getInstance().build();
         //create a job
         System.setProperty("jobName", "Job_TaskFlow");
-        tfJob = (TaskFlowJob) JobFactory.getFactory().createJob(jobTaskFlowDescriptor);
+        tfJob = (TaskFlowJob) JobFactory.getFactory().createJob(
+                new File(jobTaskFlowDescriptor.toURI()).getAbsolutePath());
     }
 
     @SuppressWarnings("unchecked")
