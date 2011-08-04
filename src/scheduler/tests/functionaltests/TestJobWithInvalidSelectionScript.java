@@ -36,6 +36,8 @@
  */
 package functionaltests;
 
+import java.io.File;
+import java.net.URL;
 import java.util.Map;
 
 import org.junit.Assert;
@@ -62,8 +64,8 @@ import functionalTests.FunctionalTest;
  */
 public class TestJobWithInvalidSelectionScript extends FunctionalTest {
 
-    private static String jobDescriptor = TestJobWithInvalidSelectionScript.class.getResource(
-            "/functionaltests/descriptors/Job_invalidSS.xml").getPath();
+    private static URL jobDescriptor = TestJobWithInvalidSelectionScript.class
+            .getResource("/functionaltests/descriptors/Job_invalidSS.xml");
 
     /**
      * Tests start here.
@@ -79,7 +81,7 @@ public class TestJobWithInvalidSelectionScript extends FunctionalTest {
         //cannot use SchedulerTHelper.testJobsubmission because
         //task 3 is never executed so no event can received
         //regarding this task.
-        JobId id = SchedulerTHelper.submitJob(jobDescriptor);
+        JobId id = SchedulerTHelper.submitJob(new File(jobDescriptor.toURI()).getAbsolutePath());
         //check events reception
         SchedulerTHelper.log("Job submitted, id " + id.toString());
         SchedulerTHelper.log("Waiting for jobSubmitted");
