@@ -36,6 +36,9 @@
  */
 package functionaltests.workflow;
 
+import java.io.File;
+import java.net.URL;
+
 import org.junit.Assert;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.job.JobId;
@@ -54,8 +57,8 @@ import functionaltests.SchedulerTHelper;
  */
 public class TestWorkflowSubmission extends FunctionalTest {
 
-    private static final String jobs_path = TestWorkflowSubmission.class.getResource(
-            "/functionaltests/workflow/descriptors/").getPath();
+    private static final URL jobs_path = TestWorkflowSubmission.class
+            .getResource("/functionaltests/workflow/descriptors/");
 
     private static final int jobs_valid = 17;
 
@@ -77,7 +80,8 @@ public class TestWorkflowSubmission extends FunctionalTest {
         Scheduler userInt = SchedulerTHelper.getSchedulerInterface();
 
         for (int i = 0; i < jobs_fail; i++) {
-            String job_path = jobs_path + "flow_fail_" + (i + 1) + ".xml";
+            String job_path = new File(jobs_path.toURI()).getAbsolutePath() + "/flow_fail_" + (i + 1) +
+                ".xml";
 
             Exception exc = null;
             JobId job = null;
@@ -104,7 +108,8 @@ public class TestWorkflowSubmission extends FunctionalTest {
         Scheduler userInt = SchedulerTHelper.getSchedulerInterface();
 
         for (int i = 0; i < jobs_valid; i++) {
-            String job_path = jobs_path + "flow_valid_" + (i + 1) + ".xml";
+            String job_path = new File(jobs_path.toURI()).getAbsolutePath() + "/flow_valid_" + (i + 1) +
+                ".xml";
 
             Exception exc = null;
             JobId job = null;
