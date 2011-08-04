@@ -36,6 +36,7 @@
  */
 package functionaltests.workflow;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -75,8 +76,8 @@ public class TestWorkflowRecoveryFinished extends FunctionalTest {
 
         Map<Integer, JobId> jobs = new HashMap<Integer, JobId>();
         for (int i = 0; i < jobs_1.length; i++) {
-            String job = TestWorkflowRecoveryFinished.class.getResource(job_prefix + (i + 1) + ".xml")
-                    .getPath();
+            String job = new File(TestWorkflowRecoveryFinished.class.getResource(
+                    job_prefix + (i + 1) + ".xml").toURI()).getAbsolutePath();
             JobId id = SchedulerTHelper.submitJob(job);
             SchedulerTHelper.log("Submitted job " + job);
             jobs.put(i, id);
@@ -88,8 +89,8 @@ public class TestWorkflowRecoveryFinished extends FunctionalTest {
         }
 
         SchedulerTHelper.log("Crashing Scheduler...");
-        SchedulerTHelper.killAndRestartScheduler(SchedulerTHelper.class.getResource(
-                "config/functionalTSchedulerProperties-updateDB.ini").getPath());
+        SchedulerTHelper.killAndRestartScheduler(new File(SchedulerTHelper.class.getResource(
+                "config/functionalTSchedulerProperties-updateDB.ini").toURI()).getAbsolutePath());
         SchedulerTHelper.getSchedulerInterface();
 
         for (Entry<Integer, JobId> job : jobs.entrySet()) {
