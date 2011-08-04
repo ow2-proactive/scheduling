@@ -40,11 +40,15 @@ import java.io.File;
 import java.net.URL;
 
 import org.junit.Assert;
+import org.objectweb.proactive.utils.OperatingSystem;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
+import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
+import org.ow2.proactive.scheduler.common.job.factories.JobFactory_stax;
+import org.ow2.proactive.scheduler.common.task.NativeTask;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 
@@ -79,8 +83,15 @@ public class TestJobFork extends FunctionalTest {
 
         String taskForked1Name = "Fork1";
         String taskForked2Name = "Fork2";
-
-        JobId id = SchedulerTHelper.submitJob(new File(jobDescriptor.toURI()).getAbsolutePath());
+        TaskFlowJob job = (TaskFlowJob) JobFactory_stax.getFactory().createJob(
+                new File(jobDescriptor.toURI()).getAbsolutePath());
+        if (OperatingSystem.getOperatingSystem().name().equals("windows")) {
+            ((NativeTask) job.getTask(task1Name)).setCommandLine("cmd", "/C", "ping", "127.0.0.1", "-n",
+                    "20", ">", "NUL");
+            ((NativeTask) job.getTask(taskForked1Name)).setCommandLine("cmd", "/C", "ping", "127.0.0.1",
+                    "-n", "20", ">", "NUL");
+        }
+        JobId id = SchedulerTHelper.submitJob(job);
 
         SchedulerTHelper.log("Job submitted, id " + id.toString());
 
