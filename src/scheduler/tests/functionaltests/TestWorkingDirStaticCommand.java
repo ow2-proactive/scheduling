@@ -36,12 +36,21 @@
  */
 package functionaltests;
 
+import java.io.File;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.junit.Assert;
+import org.objectweb.proactive.utils.OperatingSystem;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
+import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
+import org.ow2.proactive.scheduler.common.job.factories.JobFactory_stax;
+import org.ow2.proactive.scheduler.common.task.NativeTask;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 
@@ -57,18 +66,21 @@ import functionalTests.FunctionalTest;
  */
 public class TestWorkingDirStaticCommand extends FunctionalTest {
 
-    private static String jobDescriptor = TestWorkingDirStaticCommand.class.getResource(
-            "/functionaltests/descriptors/Job_test_workingDir_static_command.xml").getPath();
+    private static URL jobDescriptor = TestWorkingDirStaticCommand.class
+            .getResource("/functionaltests/descriptors/Job_test_workingDir_static_command.xml");
 
     private static String executablePathPropertyName = "EXEC_PATH";
 
-    private static String executablePath = TestWorkingDirStaticCommand.class.getResource(
-            "/functionaltests/executables/test_working_dir.sh").getPath();
+    private static URL executablePath = TestWorkingDirStaticCommand.class
+            .getResource("/functionaltests/executables/test_working_dir.sh");
+
+    private static URL executablePathWindows = TestWorkingDirStaticCommand.class
+            .getResource("/functionaltests/executables/test_working_dir.bat");
 
     private static String WorkingDirPropertyName = "WDIR";
 
-    private static String workingDirPath = TestWorkingDirStaticCommand.class.getResource(
-            "/functionaltests/executables").getPath();
+    private static URL workingDirPath = TestWorkingDirStaticCommand.class
+            .getResource("/functionaltests/executables");
 
     /**
      * Tests start here.
@@ -79,15 +91,49 @@ public class TestWorkingDirStaticCommand extends FunctionalTest {
     public void run() throws Throwable {
 
         String task1Name = "task1";
-
+        boolean onWindows = OperatingSystem.getOperatingSystem().name().equals("windows");
+        JobId id = null;
         //set system Property for executable path
-        System.setProperty(executablePathPropertyName, executablePath);
-        System.setProperty(WorkingDirPropertyName, workingDirPath);
+        switch (OperatingSystem.getOperatingSystem()) {
+            case windows:
+                System.setProperty(executablePathPropertyName, new File(executablePathWindows.toURI())
+                        .getAbsolutePath());
+                System
+                        .setProperty(WorkingDirPropertyName, new File(workingDirPath.toURI())
+                                .getAbsolutePath());
+                //test submission and event reception
+                TaskFlowJob job = (TaskFlowJob) JobFactory_stax.getFactory().createJob(
+                        new File(jobDescriptor.toURI()).getAbsolutePath());
+                List<String> command = new ArrayList<String>();
+                command.add("cmd");
+                command.add("/C");
+                String[] tabCommand = ((NativeTask) job.getTask("task1")).getCommandLine();
+                for (int i = 0; i < tabCommand.length; i++) {
+                    if (i == 0)
+                        command.add("\"\"" + tabCommand[i] + "\"");
+                    else if (i == tabCommand.length - 1)
+                        command.add("\"" + tabCommand[i] + "\"\"");
+                    else
+                        command.add("\"" + tabCommand[i] + "\"");
+                }
 
-        SchedulerTHelper.setExecutable(executablePath);
-
-        //test submission and event reception
-        JobId id = SchedulerTHelper.submitJob(jobDescriptor);
+                ((NativeTask) job.getTask("task1")).setCommandLine(command
+                        .toArray(new String[command.size()]));
+                id = SchedulerTHelper.submitJob(job);
+                break;
+            case unix:
+                System.setProperty(executablePathPropertyName, new File(executablePath.toURI())
+                        .getAbsolutePath());
+                System
+                        .setProperty(WorkingDirPropertyName, new File(workingDirPath.toURI())
+                                .getAbsolutePath());
+                SchedulerTHelper.setExecutable(new File(executablePath.toURI()).getAbsolutePath());
+                //test submission and event reception
+                id = SchedulerTHelper.submitJob(new File(jobDescriptor.toURI()).getAbsolutePath());
+                break;
+            default:
+                throw new IllegalStateException("Unsupported operating system");
+        }
 
         SchedulerTHelper.log("Job submitted, id " + id.toString());
 
