@@ -42,7 +42,7 @@ import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SchedulerStatus;
 
-import functionalTests.FunctionalTest;
+import org.ow2.tests.FunctionalTest;
 
 
 /**

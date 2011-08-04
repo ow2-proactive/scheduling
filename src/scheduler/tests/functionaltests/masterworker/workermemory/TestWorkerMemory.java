@@ -48,7 +48,7 @@ import org.objectweb.proactive.extensions.masterworker.ConstantMemoryFactory;
 import org.objectweb.proactive.extensions.masterworker.ProActiveMaster;
 import org.objectweb.proactive.extensions.masterworker.interfaces.Master;
 
-import functionalTests.FunctionalTest;
+import org.ow2.tests.FunctionalTest;
 import functionaltests.SchedulerTHelper;
 
 
