@@ -88,7 +88,7 @@ runs = 2;
 importPackage(java.io);
 var ID   = 7 + "_" + $REP;
 var RUNS = 3;
-var f = new File(".test_flow_lock_" + ID);
+var f = new File("test_flow_lock_" + ID);
 var it = 0;
 if (f.exists()) {
 var input = new BufferedReader(new FileReader(f));
@@ -194,7 +194,7 @@ runs = 3;
 importPackage(java.io);
 var ID   = 13 + "_" + $REP;
 var RUNS = 3;
-var f = new File(".test_flow_lock_" + ID);
+var f = new File("test_flow_lock_" + ID);
 var it = 0;
 if (f.exists()) {
 var input = new BufferedReader(new FileReader(f));
@@ -259,7 +259,7 @@ loop = false;
 importPackage(java.io);
 var ID   = 9 + "_" + $REP;
 var RUNS = 3;
-var f = new File(".test_flow_lock_" + ID);
+var f = new File("test_flow_lock_" + ID);
 var it = 0;
 if (f.exists()) {
 var input = new BufferedReader(new FileReader(f));
@@ -298,7 +298,7 @@ loop = false;
 importPackage(java.io);
 var ID   = 1 + "_" + $REP;
 var RUNS = 0;
-var f = new File(".test_flow_lock_" + ID);
+var f = new File("test_flow_lock_" + ID);
 var it = 0;
 if (f.exists()) {
 var input = new BufferedReader(new FileReader(f));

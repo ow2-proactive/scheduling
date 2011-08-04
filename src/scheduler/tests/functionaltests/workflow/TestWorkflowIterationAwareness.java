@@ -37,21 +37,30 @@
 package functionaltests.workflow;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map.Entry;
 
 import org.junit.Assert;
+import org.objectweb.proactive.utils.OperatingSystem;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
+import org.ow2.proactive.scheduler.common.job.factories.JobFactory_stax;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
+import org.ow2.proactive.scheduler.common.task.NativeTask;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.flow.FlowActionType;
 import org.ow2.proactive.scheduler.common.task.flow.FlowBlock;
 import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
+import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.SimpleScript;
 
 import functionalTests.FunctionalTest;
@@ -67,10 +76,11 @@ import functionaltests.SchedulerTHelper;
  */
 public class TestWorkflowIterationAwareness extends FunctionalTest {
 
-    private static final String java_job = TestWorkflowIterationAwareness.class.getResource(
-            "/functionaltests/workflow/descriptors/flow_it_1.xml").getPath();
-    private static final String native_job = TestWorkflowIterationAwareness.class.getResource(
-            "/functionaltests/workflow/descriptors/flow_it_2.xml").getPath();
+    private static final URL java_job = TestWorkflowIterationAwareness.class
+            .getResource("/functionaltests/workflow/descriptors/flow_it_1.xml");
+
+    private static final URL native_job = TestWorkflowIterationAwareness.class
+            .getResource("/functionaltests/workflow/descriptors/flow_it_2.xml");
 
     private static final String preScript = //
     "importPackage(java.io); \n" //
@@ -80,11 +90,28 @@ public class TestWorkflowIterationAwareness extends FunctionalTest {
         "/PRE_$IT_$REP\"); \n" + //
         "f.createNewFile(); \n";
 
+    private static final String preScriptWindows = //
+    "importPackage(java.io); \n" //
+        +
+        "var f = new File(\"" +
+        PASchedulerProperties.SCHEDULER_HOME.getValueAsString().replace("\\", "\\\\") +
+        "\\\\PRE_$IT_$REP\"); \n" + //
+        "f.createNewFile(); \n";
+
     private static final String postScript = //
     "importPackage(java.io); \n" //
         +
         "var f = new File(\"" //
         + PASchedulerProperties.SCHEDULER_HOME.getValueAsString() + "/POST_$IT_$REP\"); \n" //
+        + "f.createNewFile(); \n";
+
+    private static final String postScriptWindows = //
+    "importPackage(java.io); \n" //
+        +
+        "var f = new File(\"" //
+        +
+        PASchedulerProperties.SCHEDULER_HOME.getValueAsString().replace("\\", "\\\\") +
+        "\\\\POST_$IT_$REP\"); \n" //
         + "f.createNewFile(); \n";
 
     private static final String dupScript = "enabled = true; \n" + "runs = 2; \n";
@@ -93,7 +120,7 @@ public class TestWorkflowIterationAwareness extends FunctionalTest {
     "importPackage(java.io); \n" //
         + "var ID   = 3; \n" //
         + "var RUNS = 2; \n" //
-        + "var f = new File(\".test_flow_lock_\" + ID); \n" //
+        + "var f = new File(\"test_flow_lock_\" + ID); \n" //
         + "var it = 0; \n" //
         + "if (f.exists()) { \n" //
         + "var input = new BufferedReader(new FileReader(f)); \n" //
@@ -130,7 +157,16 @@ public class TestWorkflowIterationAwareness extends FunctionalTest {
      */
     private static void testJavaJob() throws Throwable {
 
-        JobId id = TWorkflowJobs.testJobSubmission(java_job, null);
+        TaskFlowJob job = (TaskFlowJob) JobFactory_stax.getFactory().createJob(
+                new File(java_job.toURI()).getAbsolutePath());
+        if (OperatingSystem.getOperatingSystem().name().equals("windows")) {
+            ((JavaTask) job.getTask("T1")).setPreScript(new SimpleScript(preScriptWindows, "js"));
+            ((JavaTask) job.getTask("T1")).setPostScript(new SimpleScript(postScriptWindows, "js"));
+        } else {
+            ((JavaTask) job.getTask("T1")).setPreScript(new SimpleScript(preScript, "js"));
+            ((JavaTask) job.getTask("T1")).setPostScript(new SimpleScript(postScript, "js"));
+        }
+        JobId id = TWorkflowJobs.testJobSubmission(job, null);
         JobResult res = SchedulerTHelper.getJobResult(id);
         Assert.assertFalse(SchedulerTHelper.getJobResult(id).hadException());
 
@@ -159,8 +195,20 @@ public class TestWorkflowIterationAwareness extends FunctionalTest {
      * native task through xml
      */
     private static void testNativeJob() throws Throwable {
+        TaskFlowJob job = (TaskFlowJob) JobFactory_stax.getFactory().createJob(
+                new File(native_job.toURI()).getAbsolutePath());
+        if (OperatingSystem.getOperatingSystem().name().equals("windows")) {
+            ((NativeTask) job.getTask("T1")).setPreScript(new SimpleScript(preScriptWindows, "js"));
+            ((NativeTask) job.getTask("T1")).setPostScript(new SimpleScript(postScriptWindows, "js"));
+            String[] tab = ((NativeTask) job.getTask("T1")).getCommandLine();
+            tab[0] = tab[0].replace("it.sh", "it.bat");
+            ((NativeTask) job.getTask("T1")).setCommandLine(tab);
+        } else {
+            ((NativeTask) job.getTask("T1")).setPreScript(new SimpleScript(preScript, "js"));
+            ((NativeTask) job.getTask("T1")).setPostScript(new SimpleScript(postScript, "js"));
+        }
+        JobId id = TWorkflowJobs.testJobSubmission(job, null);
 
-        JobId id = TWorkflowJobs.testJobSubmission(native_job, null);
         JobResult res = SchedulerTHelper.getJobResult(id);
         Assert.assertFalse(SchedulerTHelper.getJobResult(id).hadException());
 
@@ -227,8 +275,13 @@ public class TestWorkflowIterationAwareness extends FunctionalTest {
         t1.setForkEnvironment(new ForkEnvironment());
         t1.setMaxNumberOfExecution(4);
         t1.addDependence(t);
-        t1.setPreScript(new SimpleScript(preScript, "javascript"));
-        t1.setPostScript(new SimpleScript(postScript, "javascript"));
+        if (OperatingSystem.getOperatingSystem().name().equals("windows")) {
+            t1.setPreScript(new SimpleScript(preScriptWindows, "javascript"));
+            t1.setPostScript(new SimpleScript(postScriptWindows, "javascript"));
+        } else {
+            t1.setPreScript(new SimpleScript(preScript, "javascript"));
+            t1.setPostScript(new SimpleScript(postScript, "javascript"));
+        }
         job.addTask(t1);
 
         JavaTask t2 = new JavaTask();
