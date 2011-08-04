@@ -7,10 +7,12 @@
 		<javaPropertyVariable name="proactive.home" />
 		<javaPropertyVariable name="user.dir" />
 		<javaPropertyVariable name="gcmd.file" />
+		<javaPropertyVariable name="java.home" />
 	</environment>
 	<application>
 		<proactive base="root" relpath="${proactive.home}">
 	<configuration>
+		<java base="root" relpath="${java.home}/bin/java"/> 
 		<jvmarg value="-Dproactive.test=true"/>
 		<jvmarg value="-Dproactive.http.jetty.xml=&quot;${proactive.home}/config/rm/deployment/jetty.xml&quot;"/>
 		<applicationClasspath>
