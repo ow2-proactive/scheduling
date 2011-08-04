@@ -82,16 +82,20 @@ public class TestMultipleHostsRequest extends FunctionalTest {
 
         String task1Name = "task1";
 
-        if (!OperatingSystem.getOperatingSystem().name().equals("windows")) {
-            SchedulerTHelper.setExecutable(new File(executablePath.toURI()).getAbsolutePath());
-            //set system Property for executable path
-            System
-                    .setProperty(executablePathPropertyName, new File(executablePath.toURI())
-                            .getAbsolutePath());
-        } else {
-            //set system Property for executable path
-            System.setProperty(executablePathPropertyName, new File(executablePathWindows.toURI())
-                    .getAbsolutePath());
+        switch (OperatingSystem.getOperatingSystem()) {
+            case windows:
+                //set system Property for executable path
+                System.setProperty(executablePathPropertyName, new File(executablePathWindows.toURI())
+                        .getAbsolutePath());
+                break;
+            case unix:
+                SchedulerTHelper.setExecutable(new File(executablePath.toURI()).getAbsolutePath());
+                //set system Property for executable path
+                System.setProperty(executablePathPropertyName, new File(executablePath.toURI())
+                        .getAbsolutePath());
+                break;
+            default:
+                throw new IllegalStateException("Unsupported operating system");
         }
 
         //set system Property for executable path

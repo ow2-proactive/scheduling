@@ -159,13 +159,19 @@ public class TestWorkflowIterationAwareness extends FunctionalTest {
 
         TaskFlowJob job = (TaskFlowJob) JobFactory_stax.getFactory().createJob(
                 new File(java_job.toURI()).getAbsolutePath());
-        if (OperatingSystem.getOperatingSystem().name().equals("windows")) {
-            ((JavaTask) job.getTask("T1")).setPreScript(new SimpleScript(preScriptWindows, "js"));
-            ((JavaTask) job.getTask("T1")).setPostScript(new SimpleScript(postScriptWindows, "js"));
-        } else {
-            ((JavaTask) job.getTask("T1")).setPreScript(new SimpleScript(preScript, "js"));
-            ((JavaTask) job.getTask("T1")).setPostScript(new SimpleScript(postScript, "js"));
+        switch (OperatingSystem.getOperatingSystem()) {
+            case windows:
+                ((JavaTask) job.getTask("T1")).setPreScript(new SimpleScript(preScriptWindows, "js"));
+                ((JavaTask) job.getTask("T1")).setPostScript(new SimpleScript(postScriptWindows, "js"));
+                break;
+            case unix:
+                ((JavaTask) job.getTask("T1")).setPreScript(new SimpleScript(preScript, "js"));
+                ((JavaTask) job.getTask("T1")).setPostScript(new SimpleScript(postScript, "js"));
+                break;
+            default:
+                throw new IllegalStateException("Unsupported operating system");
         }
+
         JobId id = TWorkflowJobs.testJobSubmission(job, null);
         JobResult res = SchedulerTHelper.getJobResult(id);
         Assert.assertFalse(SchedulerTHelper.getJobResult(id).hadException());
@@ -197,16 +203,22 @@ public class TestWorkflowIterationAwareness extends FunctionalTest {
     private static void testNativeJob() throws Throwable {
         TaskFlowJob job = (TaskFlowJob) JobFactory_stax.getFactory().createJob(
                 new File(native_job.toURI()).getAbsolutePath());
-        if (OperatingSystem.getOperatingSystem().name().equals("windows")) {
-            ((NativeTask) job.getTask("T1")).setPreScript(new SimpleScript(preScriptWindows, "js"));
-            ((NativeTask) job.getTask("T1")).setPostScript(new SimpleScript(postScriptWindows, "js"));
-            String[] tab = ((NativeTask) job.getTask("T1")).getCommandLine();
-            tab[0] = tab[0].replace("it.sh", "it.bat");
-            ((NativeTask) job.getTask("T1")).setCommandLine(tab);
-        } else {
-            ((NativeTask) job.getTask("T1")).setPreScript(new SimpleScript(preScript, "js"));
-            ((NativeTask) job.getTask("T1")).setPostScript(new SimpleScript(postScript, "js"));
+        switch (OperatingSystem.getOperatingSystem()) {
+            case windows:
+                ((NativeTask) job.getTask("T1")).setPreScript(new SimpleScript(preScriptWindows, "js"));
+                ((NativeTask) job.getTask("T1")).setPostScript(new SimpleScript(postScriptWindows, "js"));
+                String[] tab = ((NativeTask) job.getTask("T1")).getCommandLine();
+                tab[0] = tab[0].replace("it.sh", "it.bat");
+                ((NativeTask) job.getTask("T1")).setCommandLine(tab);
+                break;
+            case unix:
+                ((NativeTask) job.getTask("T1")).setPreScript(new SimpleScript(preScript, "js"));
+                ((NativeTask) job.getTask("T1")).setPostScript(new SimpleScript(postScript, "js"));
+                break;
+            default:
+                throw new IllegalStateException("Unsupported operating system");
         }
+
         JobId id = TWorkflowJobs.testJobSubmission(job, null);
 
         JobResult res = SchedulerTHelper.getJobResult(id);
@@ -275,13 +287,19 @@ public class TestWorkflowIterationAwareness extends FunctionalTest {
         t1.setForkEnvironment(new ForkEnvironment());
         t1.setMaxNumberOfExecution(4);
         t1.addDependence(t);
-        if (OperatingSystem.getOperatingSystem().name().equals("windows")) {
-            t1.setPreScript(new SimpleScript(preScriptWindows, "javascript"));
-            t1.setPostScript(new SimpleScript(postScriptWindows, "javascript"));
-        } else {
-            t1.setPreScript(new SimpleScript(preScript, "javascript"));
-            t1.setPostScript(new SimpleScript(postScript, "javascript"));
+        switch (OperatingSystem.getOperatingSystem()) {
+            case windows:
+                t1.setPreScript(new SimpleScript(preScriptWindows, "javascript"));
+                t1.setPostScript(new SimpleScript(postScriptWindows, "javascript"));
+                break;
+            case unix:
+                t1.setPreScript(new SimpleScript(preScript, "javascript"));
+                t1.setPostScript(new SimpleScript(postScript, "javascript"));
+                break;
+            default:
+                throw new IllegalStateException("Unsupported operating system");
         }
+
         job.addTask(t1);
 
         JavaTask t2 = new JavaTask();

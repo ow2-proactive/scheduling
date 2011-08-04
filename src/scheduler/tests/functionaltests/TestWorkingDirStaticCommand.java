@@ -91,7 +91,7 @@ public class TestWorkingDirStaticCommand extends FunctionalTest {
     public void run() throws Throwable {
 
         String task1Name = "task1";
-        boolean onWindows = OperatingSystem.getOperatingSystem().name().equals("windows");
+
         JobId id = null;
         //set system Property for executable path
         switch (OperatingSystem.getOperatingSystem()) {

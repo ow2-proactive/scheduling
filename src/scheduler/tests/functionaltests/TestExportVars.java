@@ -67,7 +67,7 @@ public class TestExportVars extends FunctionalTest {
     public void run() throws Throwable {
         TaskFlowJob job = (TaskFlowJob) JobFactory_stax.getFactory().createJob(
                 new File(jobDescriptor.toURI()).getAbsolutePath());
-        if (OperatingSystem.getOperatingSystem().name().equals("windows")) {
+        if (OperatingSystem.getOperatingSystem() == OperatingSystem.windows) {
             ((NativeTask) job.getTask("task2")).setCommandLine("cmd", "/C", "date", "/t");
             String[] pathTable = ((NativeTask) job.getTask("task5")).getCommandLine();
             String path = "";
