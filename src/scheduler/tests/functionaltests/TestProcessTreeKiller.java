@@ -205,6 +205,7 @@ public class TestProcessTreeKiller extends FunctionalTest {
         switch (OperatingSystem.getOperatingSystem()) {
             case windows:
                 Runtime.getRuntime().exec("TASKKILL /F /IM ping.exe");
+                Runtime.getRuntime().exec("TASKKILL /F /IM PING.EXE");
                 break;
             case unix:
                 //get PIDs of processName
