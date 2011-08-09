@@ -88,8 +88,11 @@ public class TestProcessTreeKiller extends FunctionalTest {
 
         // SCHEDULING-864 
         // The test doesn't work on Windows 64 Bits and is disabled in this case
-        if (!(OperatingSystem.getOperatingSystem() == OperatingSystem.windows && System
-                .getProperty("os.arch").contains("64"))) {
+        if ((OperatingSystem.getOperatingSystem() == OperatingSystem.windows && System.getProperty("os.arch")
+                .contains("64"))) {
+            System.out.println("This test doesn't work on Windows 64 Bits");
+            System.out.println("Skipping test...");
+        } else {
 
             killAll(unixPTKProcessName);
             String[] nativeExecLauncher;
