@@ -58,6 +58,7 @@ import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.NativeTask;
 import org.ow2.proactive.scheduler.common.task.Task;
 import org.ow2.proactive.scheduler.common.task.flow.FlowActionType;
+import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.task.ForkedJavaExecutableContainer;
 import org.ow2.proactive.scheduler.task.JavaExecutableContainer;
 import org.ow2.proactive.scheduler.task.NativeExecutableContainer;
@@ -127,6 +128,13 @@ public class InternalJobFactory {
         if (userJob.getTasks().size() == 0) {
             logger_dev.info("Job '" + userJob.getName() + "' must contain tasks !");
             throw new JobCreationException("This job must contains tasks !");
+        }
+
+        int maxTask = PASchedulerProperties.JOB_FACTOR.getValueAsInt();
+        if (userJob.getTasks().size() > maxTask) {
+            logger_dev.info("Job '" + userJob.getName() + "' cannot contain more than " + maxTask +
+                " tasks !");
+            throw new JobCreationException("Job cannot contain more than " + maxTask + " tasks !");
         }
 
         // validate taskflow
