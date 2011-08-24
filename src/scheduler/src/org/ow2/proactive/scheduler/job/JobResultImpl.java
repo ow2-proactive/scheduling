@@ -199,6 +199,15 @@ public class JobResultImpl implements JobResult {
     }
 
     /**
+     * Add this new (from replication) task result to the list of known tasks.
+     * 
+     * @param taskName the name of the new task to add
+     */
+    public void addToAllResults(String taskName) {
+        allResults.put(taskName, null);
+    }
+
+    /**
      * @see org.ow2.proactive.scheduler.common.job.JobResult#getAllResults()
      */
     public Map<String, TaskResult> getAllResults() {
