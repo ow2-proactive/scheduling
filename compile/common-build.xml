@@ -344,4 +344,20 @@
 		<rm_generateorcheck_stubs mode="check"/>
 		<scheduler_generateorcheck_stubs mode="check"/>
 	</target>
+
+	<target name="rcp.libCopy.scheduling.common" depends="deploy.all" description="Copy all required libraries to scheduler plugins">
+		<copy todir="${rcp.scheduler.dir}/${scheduling.plugin.common.lib}/lib" flatten="true" includeemptydirs="yes">
+			<fileset dir="${lib.dir}/common" excludes="wstx-lgpl-3.9.2.jar" />
+		</copy>
+		<copy todir="${rcp.scheduler.dir}/${scheduling.plugin.common.lib}/lib" includeemptydirs="yes">
+			<fileset dir="${deploy.lib.dir}" includes="${srm.common.jar}, ${srm.common.client.jar}" />
+		</copy>
+	</target>
+
+
+	<target name="rcp.libClean.scheduling.common">
+		<delete failonerror="false" includeemptydirs="true">
+		  <fileset dir="${rcp.scheduler.dir}/${scheduling.plugin.common.lib}/lib" includes="**/*" />
+		</delete>
+	</target>
 </project>

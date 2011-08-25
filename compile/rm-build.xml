@@ -117,7 +117,7 @@
 		-->
 
 	<target name="rcp.libClean.rm" description="Clean all required libraries for rm RCP">
-		<delete failonerror="false" includeemptydirs="true">
+		<delete includeemptydirs="true">
 			<fileset dir="${rcp.rm.dir}/${rcp.rm.lib}/lib" includes="**/*" />
 		</delete>
 	</target>
@@ -126,10 +126,10 @@
 		<copy todir="${rcp.rm.dir}/${rcp.rm.lib}/lib" includeemptydirs="no">
 			<fileset dir="${deploy.lib.dir}" includes="${rm.jar}, ${rm.client.jar}" />
 		</copy>
-		<copy todir="${rcp.rm.dir}/${rcp.rm.lib}/lib" includeemptydirs="yes">
+		<copy todir="${rcp.rm.dir}/${rcp.rm.lib}/lib" flatten="true" includeemptydirs="yes">
 			<fileset dir="${lib.dir}/" includes="nodesource/**" />
 		</copy>
-		<copy todir="${rcp.rm.dir}/${rcp.rm.lib}/lib" includeemptydirs="no">
+		<copy todir="${rcp.rm.dir}/${rcp.rm.lib}/lib" flatten="true" includeemptydirs="no">
 			<fileset dir="${rcp.rm.dir}/${rcp.rm.lib}/local/lib" />
 		</copy>
 	</target>

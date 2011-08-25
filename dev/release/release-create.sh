@@ -117,8 +117,8 @@ function cp_r_full(){
 }
 
 function create_archive(){
-	tar cvfz $1.tar.gz $1
-	zip -r   $1.zip    $1
+	tar cfz $1.tar.gz $1
+	zip -qr   $1.zip    $1
 	rm -rf $1
 }
 
@@ -267,9 +267,9 @@ do
 		# uncompress current archive
 		if [[ $i == *.zip ]]
 		then
-			unzip $i
+			unzip -q $i
 		else
-			tar xzvf $i
+			tar xzf $i
 		fi
 		# remove old compressed archive
 		rm $i
@@ -294,38 +294,50 @@ do
 
 		# bin (copy only needed file + change classpath in env/init.bat)
 		mkdir ${OUTPUT_DIRECTORY}/bin
+
+                export IC2D_LIB=$(find $OUTPUT_DIRECTORY -name org.objectweb.proactive.ic2d.lib\* -type d -printf '%P')
 		if [ "${RCP_TYPE}" = "win32.win32.x86" ] || [ "${RCP_TYPE}" = "win32.win32.x86_64" ]
 		then
 			mkdir ${OUTPUT_DIRECTORY}/bin/windows
 			cp ${SCHEDULING_FULL_NAME}/bin/windows/*.bat ${OUTPUT_DIRECTORY}/bin/windows/
 			rm ${OUTPUT_DIRECTORY}/bin/windows/start-router.bat
 			rm ${OUTPUT_DIRECTORY}/bin/windows/key-gen.bat
+                        IC2D_LIB=$(echo $IC2D_LIB | sed 's#/#\\#g')
+			sed -i "s#dist\\\\lib\\\\\(ProActive.jar\)#$IC2D_LIB\\\\lib\\\\\1#g" ${OUTPUT_DIRECTORY}/bin/windows/init.bat
+			sed -i "s#dist\\\\lib\\\\\(ProActive_SRM-common.jar\)#plugins\\\\org.ow2.proactive.scheduling.common.lib_${VERSION}\\\\lib\\\\\1#g" ${OUTPUT_DIRECTORY}/bin/windows/init.bat
+			sed -i "s#dist\\\\lib\\\\\(ProActive_ResourceManager.jar\)#plugins\\\\org.ow2.proactive.resourcemanager.lib_${VERSION}\\\\lib\\\\\1#g" ${OUTPUT_DIRECTORY}/bin/windows/init.bat
+			sed -i "s#dist\\\\lib\\\\\(ProActive_Scheduler.*\)#plugins\\\\org.ow2.proactive.scheduler.lib_${VERSION}\\\\lib\\\\\1#g" ${OUTPUT_DIRECTORY}/bin/windows/init.bat
+                        sed -i "s#dist\\\\lib#plugins\\\\org.ow2.proactive.scheduling.common.lib_$VERSION\\\\lib#g" ${OUTPUT_DIRECTORY}/bin/windows/init.bat
+
 			if [[ $i == Scheduling* ]]
 			then
 				rm ${OUTPUT_DIRECTORY}/bin/windows/rm*
 				rm ${OUTPUT_DIRECTORY}/bin/windows/scheduler-start*
-				sed -i "s#dist\\\\lib#plugins\\\\org.ow2.proactive.scheduler.lib_${VERSION}\\\\lib#g" ${OUTPUT_DIRECTORY}/bin/windows/init.bat
 			else
 				rm ${OUTPUT_DIRECTORY}/bin/windows/scheduler*
 				rm ${OUTPUT_DIRECTORY}/bin/windows/rm-start.bat
 				rm ${OUTPUT_DIRECTORY}/bin/windows/rm-start-clean.bat
-				sed -i "s#dist\\\\lib#plugins\\\\org.ow2.proactive.resourcemanager.lib_${VERSION}\\\\lib#g" ${OUTPUT_DIRECTORY}/bin/windows/init.bat
 			fi
 		else
 			mkdir ${OUTPUT_DIRECTORY}/bin/unix
 			cp ${SCHEDULING_FULL_NAME}/bin/unix/* ${OUTPUT_DIRECTORY}/bin/unix/
 			rm ${OUTPUT_DIRECTORY}/bin/unix/start-router
 			rm ${OUTPUT_DIRECTORY}/bin/unix/key-gen
+
+			sed -i "s#dist/lib/\(ProActive.jar\)#$IC2D_LIB/lib/\1#g" ${OUTPUT_DIRECTORY}/bin/unix/env
+			sed -i "s#dist/lib/\(ProActive_SRM-common.jar\)#plugins/org.ow2.proactive.scheduling.common.lib_$VERSION/lib/\1#g" ${OUTPUT_DIRECTORY}/bin/unix/env
+			sed -i "s#dist/lib/\(ProActive_ResourceManager.jar\)#plugins/org.ow2.proactive.resourcemanager.lib_$VERSION/lib/\1#g" ${OUTPUT_DIRECTORY}/bin/unix/env
+			sed -i "s#dist/lib/\(ProActive_Scheduler-*\)#plugins/org.ow2.proactive.scheduler.lib_$VERSION/lib/\1#g" ${OUTPUT_DIRECTORY}/bin/unix/env
+                        sed -i "s#dist/lib#plugins/org.ow2.proactive.scheduling.common.lib_$VERSION/lib#g" ${OUTPUT_DIRECTORY}/bin/unix/env
+
 			if [[ $i == Scheduling* ]]
 			then
 				rm ${OUTPUT_DIRECTORY}/bin/unix/rm*
 				rm ${OUTPUT_DIRECTORY}/bin/unix/scheduler-start*
-				sed -i "s#dist/lib#plugins/org.ow2.proactive.scheduler.lib_$VERSION/lib#g" ${OUTPUT_DIRECTORY}/bin/unix/env
 			else
 				rm ${OUTPUT_DIRECTORY}/bin/unix/scheduler*
 				rm ${OUTPUT_DIRECTORY}/bin/unix/rm-start
 				rm ${OUTPUT_DIRECTORY}/bin/unix/rm-start-clean
-				sed -i "s#dist/lib#plugins/org.ow2.proactive.resourcemanager.lib_$VERSION/lib#g" ${OUTPUT_DIRECTORY}/bin/unix/env
 			fi
 		fi
 
@@ -388,10 +400,10 @@ do
 		if [[ $i == *.zip ]]
 		then
 			# zip created directory
-			zip -r ${OUTPUT_DIRECTORY}.zip ${OUTPUT_DIRECTORY}
+			zip -qr ${OUTPUT_DIRECTORY}.zip ${OUTPUT_DIRECTORY}
 		else
 			# tar created directory
-			tar zcvf ${OUTPUT_DIRECTORY}.tar.gz ${OUTPUT_DIRECTORY}
+			tar zcf ${OUTPUT_DIRECTORY}.tar.gz ${OUTPUT_DIRECTORY}
 		fi
 
 		# clean output directory
