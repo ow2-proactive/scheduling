@@ -350,6 +350,19 @@ public class SchedulerTHelper {
     }
 
     /**
+     * Creates a job from an XML job descriptor, submit it, and return immediately.
+     * connect as user if needed (if not yet connected as user).
+     * @param jobDescPath
+     * @param forkedMode true if forked mode 
+     * @return JobId the job's identifier corresponding to submission.
+     * @throws Exception if an error occurs at job creation/submission.
+     */
+    public static JobId submitJob(String jobDescPath, boolean forkedMode) throws Exception {
+        Job jobToSubmit = JobFactory.getFactory().createJob(jobDescPath);
+        return submitJob(jobToSubmit, forkedMode);
+    }
+
+    /**
      * Submit a job, and return immediately.
      * Connect as user if needed (if not yet connected as user).
      * @param jobToSubmit job object to schedule.
@@ -410,6 +423,31 @@ public class SchedulerTHelper {
     public static JobId testJobSubmission(String jobDescPath) throws Exception {
         Job jobToTest = JobFactory.getFactory().createJob(jobDescPath);
         return testJobSubmission(jobToTest);
+    }
+
+    /**
+     * Creates and submit a job from an XML job descriptor, and check
+     * event related to this job submission :
+     * 1/ job submitted event
+     * 2/ job passing from pending to running (with state set to running).
+     * 3/ every task passing from pending to running (with state set to running).
+     * 4/ every task passing from running to finished (with state set to finished).
+     * 5/ and finally job passing from running to finished (with state set to finished).
+     * Then returns.
+     *
+     * This is the simplest events sequence of a job submission. If you need to test
+     * specific event or task states (failure, rescheduling etc, you must not use this
+     * helper and check events sequence with waitForEvent**() functions.
+     *
+     * @param jobDescPath path to an XML job descriptor to submit
+     * @param forkedMode true if forked mode 
+     * @return JobId, the job's identifier.
+     * @throws Exception if an error occurs at job creation/submission, or during
+     * verification of events sequence.
+     */
+    public static JobId testJobSubmission(String jobDescPath, boolean forkedMode) throws Exception {
+        Job jobToTest = JobFactory.getFactory().createJob(jobDescPath);
+        return testJobSubmission(jobToTest, forkedMode);
     }
 
     /**
