@@ -21,9 +21,9 @@
 		<ant antfile="${eclipse.pdebuild.scripts}/productBuild/productBuild.xml" />
 
 
-		<mkdir dir="${basedir}/../../dist" />
+		<mkdir dir="${basedir}/../../dist/rm-rcp" />
 
-		<move todir="${basedir}/../../dist">
+		<move todir="${basedir}/../../dist/rm-rcp">
 			<fileset dir="${buildDirectory}/${buildLabel}" includes="*.zip,*.tar.gz" />
 		</move>
 
