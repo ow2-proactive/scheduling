@@ -368,7 +368,7 @@
 		-->
 
 	<target name="rcp.libClean.scheduler" description="Clean all required libraries for scheduler RCP">
-		<delete includeemptydirs="true">
+		<delete failonerror="false" includeemptydirs="true">
 			<fileset dir="${rcp.scheduler.dir}/${rcp.scheduler.lib}/lib" includes="**/*" />
 		</delete>
 

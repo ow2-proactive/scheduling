@@ -117,7 +117,7 @@
 		-->
 
 	<target name="rcp.libClean.rm" description="Clean all required libraries for rm RCP">
-		<delete includeemptydirs="true">
+		<delete failonerror="false" includeemptydirs="true">
 			<fileset dir="${rcp.rm.dir}/${rcp.rm.lib}/lib" includes="**/*" />
 		</delete>
 	</target>
