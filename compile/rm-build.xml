@@ -124,7 +124,7 @@
 
 	<target name="rcp.libCopy.rm" depends="rcp.libCopy.scheduling.common, deploy.rm, deploy.rm.client" description="Copy all required libraries to RM plugins">
 		<copy todir="${rcp.rm.dir}/${rcp.rm.lib}/lib" includeemptydirs="no">
-			<fileset dir="${deploy.lib.dir}" includes="ProActive_ResourceManager-client.jar" />
+			<fileset dir="${deploy.lib.dir}" includes="ProActive_ResourceManager-client.jar, ProActive_ResourceManager.jar" />
 		</copy>
 		<copy todir="${rcp.rm.dir}/${rcp.rm.lib}/lib" includeemptydirs="yes">
 			<fileset dir="${lib.dir}/" includes="nodesource/**" />

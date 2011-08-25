@@ -2,7 +2,7 @@
 <feature
       id="org.ow2.proactive.scheduler.feature"
       label="ProActive Scheduler Feature"
-      version="1.0.0.qualifier">
+      version="1.0.0">
 
    <description url="http://www.example.com/description">
       [Enter Feature Description here.]
@@ -17,19 +17,11 @@
    </license>
 
    <includes
-         id="org.eclipse.birt"
-         version="0.0.0"/>
-
-   <includes
          id="org.eclipse.rcp"
          version="0.0.0"/>
 
    <includes
-         id="org.eclipse.gef"
-         version="0.0.0"/>
-
-   <includes
-         id="org.objectweb.proactive.ic2d.feature"
+         id="org.eclipse.birt"
          version="0.0.0"/>
 
    <requires>
@@ -81,7 +73,6 @@
       <import plugin="org.eclipse.ui.ide" version="3.3.0" match="compatible"/>
       <import plugin="org.eclipse.ui.editors" version="3.5.0" match="compatible"/>
       <import plugin="org.eclipse.ui.forms" version="3.2.0" match="compatible"/>
-      <import plugin="org.eclipse.gef"/>
       <import plugin="org.eclipse.swt" version="3.5.0" match="compatible"/>
       <import plugin="org.eclipse.ui.workbench" version="3.5.0" match="compatible"/>
       <import plugin="org.eclipse.ui" version="3.2.0" match="compatible"/>
@@ -99,6 +90,32 @@
       <import plugin="org.eclipse.core.databinding.property" version="1.2.0" match="compatible"/>
       <import plugin="org.eclipse.core.databinding.observable" version="1.2.0" match="compatible"/>
       <import plugin="org.objectweb.proactive.ic2d.lib" version="4.3.0" match="greaterOrEqual"/>
+      <import plugin="org.mozilla.javascript" version="1.6.0" match="compatible"/>
+      <import plugin="org.eclipse.gef" version="3.2.0" match="compatible"/>
+      <import plugin="org.eclipse.birt.core" version="2.1.0"/>
+      <import plugin="org.eclipse.birt.report.model" version="2.1.0"/>
+      <import plugin="org.apache.batik.transcoder" version="1.6.0" match="compatible"/>
+      <import plugin="org.eclipse.core.resources" version="3.2.0" match="compatible"/>
+      <import plugin="org.eclipse.ui.workbench.texteditor" version="3.2.0" match="compatible"/>
+      <import plugin="org.eclipse.jface.text" version="3.2.0" match="compatible"/>
+      <import plugin="org.eclipse.birt.data" version="2.1.0"/>
+      <import plugin="org.eclipse.birt.report.engine" version="2.1.0"/>
+      <import plugin="org.eclipse.birt.report.data.adapter" version="2.1.0"/>
+      <import plugin="org.eclipse.birt.report.designer.core" version="2.1.0"/>
+      <import plugin="org.eclipse.gef" version="3.2.1" match="compatible"/>
+      <import plugin="org.eclipse.jface.text" version="3.2.1" match="compatible"/>
+      <import plugin="org.eclipse.ui" version="3.2.1" match="compatible"/>
+      <import plugin="org.eclipse.ui.editors" version="3.2.0" match="compatible"/>
+      <import plugin="org.eclipse.birt.report.designer.ui" version="2.3.0"/>
+      <import plugin="org.eclipse.birt.report.designer.ui.editors" version="2.1.0"/>
+      <import plugin="org.eclipse.birt.report.designer.ui.editors.schematic" version="2.1.0"/>
+      <import plugin="org.w3c.css.sac" version="1.3.0" match="compatible"/>
+      <import plugin="org.eclipse.datatools.connectivity.oda" version="3.0.2" match="compatible"/>
+      <import plugin="org.apache.commons.codec" version="1.3.0" match="compatible"/>
+      <import plugin="org.w3c.sac" version="1.3.0" match="compatible"/>
+      <import plugin="org.eclipse.birt.chart.ui.extension"/>
+      <import plugin="org.eclipse.birt.chart.device.swt"/>
+      <import plugin="org.eclipse.birt.chart.engine.extension"/>
    </requires>
 
    <plugin
@@ -228,13 +245,6 @@
          unpack="false"/>
 
    <plugin
-         id="org.objectweb.proactive.ic2d.chartit"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
          id="org.ow2.proactive.scheduler"
          download-size="0"
          install-size="0"
@@ -321,6 +331,62 @@
          download-size="0"
          install-size="0"
          version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.birt.core"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.birt.report.designer.core"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.birt.report.designer.ui"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.birt.report.designer.ui.editor.script"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.birt.report.model"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.birt.core.ui"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.objectweb.proactive.ic2d.lib"
+         download-size="0"
+         install-size="0"
+         version="4.3.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.objectweb.proactive.ic2d.chartit"
+         download-size="0"
+         install-size="0"
+         version="1.0.0"
          unpack="false"/>
 
 </feature>
