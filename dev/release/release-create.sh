@@ -103,9 +103,9 @@ function del_scheduler() {
 function warn_print_usage_and_exit {
 	echo "$1" 1>&2
 	echo "" 1>&2
-	echo "Usage: $0 TMP_DIR VERSION" 1>&2
-	echo "       TMP_DIR : directory containing scheduling-full and RCP archives" 1>&2
+	echo "Usage: $0 VERSION TMP_DIR" 1>&2
 	echo "       VERSION : current version to be released" 1>&2
+	echo "       TMP_DIR : directory containing scheduling-full and RCP archives" 1>&2
 	exit 1
 }
 
