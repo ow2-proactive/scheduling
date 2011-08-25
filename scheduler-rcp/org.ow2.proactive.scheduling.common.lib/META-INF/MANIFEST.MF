@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Scheduling Common Lib
 Bundle-SymbolicName: org.ow2.proactive.scheduling.common.lib
-Bundle-Version: 1.0.0.qualifier
+Bundle-Version: 11.22.33
 Bundle-Activator: org.ow2.proactive.scheduling.common.lib.Activator
 Bundle-Vendor: ActiveEon
 Eclipse-BuddyPolicy: registered
