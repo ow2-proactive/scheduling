@@ -73,6 +73,8 @@ import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.job.factories.JobFactory;
+import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
+import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.Task;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
@@ -355,7 +357,26 @@ public class SchedulerTHelper {
      * @throws Exception if an error occurs at job submission.
      */
     public static JobId submitJob(Job jobToSubmit) throws Exception {
+        boolean forked = false;
+        if (System.getProperty("proactive.test.fork").equals("true")) {
+            forked = true;
+        }
+        return submitJob(jobToSubmit, forked);
+    }
+
+    /**
+     * Submit a job, and return immediately.
+     * Connect as user if needed (if not yet connected as user).
+     * @param jobToSubmit job object to schedule.
+     * @param forkedMode true if the mode is forked, false if normal mode
+     * @return JobId the job's identifier corresponding to submission.
+     * @throws Exception if an error occurs at job submission.
+     */
+    public static JobId submitJob(Job jobToSubmit, boolean forkedMode) throws Exception {
         Scheduler userInt = getSchedulerInterface();
+        if (forkedMode == true) {
+            setForked(jobToSubmit);
+        }
         return userInt.submit(jobToSubmit);
     }
 
@@ -414,7 +435,39 @@ public class SchedulerTHelper {
      * verification of events sequence.
      */
     public static JobId testJobSubmission(Job jobToSubmit) throws Exception {
+        boolean forked = false;
+        if (System.getProperty("proactive.test.fork").equals("true")) {
+            forked = true;
+        }
+        return testJobSubmission(jobToSubmit, forked);
+    }
+
+    /**
+     * Creates and submit a job from an XML job descriptor, and check, with assertions,
+     * event related to this job submission :
+     * 1/ job submitted event
+     * 2/ job passing from pending to running (with state set to running).
+     * 3/ every task passing from pending to running (with state set to running).
+     * 4/ every task finish without error ; passing from running to finished (with state set to finished).
+     * 5/ and finally job passing from running to finished (with state set to finished).
+     * Then returns.
+     *
+     * This is the simplest events sequence of a job submission. If you need to test
+     * specific events or task states (failures, rescheduling etc, you must not use this
+     * helper and check events sequence with waitForEvent**() functions.
+     *
+     * @param jobToSubmit job object to schedule.
+     * @param forkedMode true if the mode is forked, false if normal mode
+     * @return JobId, the job's identifier.
+     * @throws Exception if an error occurs at job submission, or during
+     * verification of events sequence.
+     */
+    public static JobId testJobSubmission(Job jobToSubmit, boolean forkedMode) throws Exception {
         Scheduler userInt = getSchedulerInterface();
+
+        if (forkedMode == true) {
+            setForked(jobToSubmit);
+        }
 
         JobId id = userInt.submit(jobToSubmit);
 
@@ -844,6 +897,20 @@ public class SchedulerTHelper {
 
     public static void setExecutable(String filesList) throws IOException {
         Runtime.getRuntime().exec("chmod u+x " + filesList);
+    }
+
+    public static void setForked(Job job) {
+        if (job.getClass() == TaskFlowJob.class) {
+            for (Task task : ((TaskFlowJob) job).getTasks()) {
+                if (task.getClass() == JavaTask.class) {
+                    if (!((JavaTask) task).isFork()) {
+                        ForkEnvironment forkedEnv = new ForkEnvironment();
+                        forkedEnv.addJVMArgument("-Dproactive.test=true");
+                        ((JavaTask) task).setForkEnvironment(forkedEnv);
+                    }
+                }
+            }
+        }
     }
 
 }
