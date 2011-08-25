@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="org.ow2.proactive.resourcemanager.feature" default="build.update.jar" basedir=".">
+
+	<target name="init">
+		<property name="feature.temp.folder" value="${basedir}/feature.temp.folder"/>
+		<property name="feature.destination" value="${basedir}"/>
+		<property name="p2.build.repo" value="file:${buildDirectory}/buildRepo"/>
+		<condition property="p2.publish.parts" value="true"		>
+			<istrue value="${p2.gathering}"/>
+		</condition>
+	</target>
+
+	<target name="all.plugins" depends="init">
+		<ant antfile="build.xml" dir="../../../optimizing.git/src/org.objectweb.proactive.ic2d.lib" target="${target}">
+			<property name="arch" value="x86_64"/>
+			<property name="ws" value="gtk"/>
+			<property name="os" value="linux"/>
+		</ant>
+		<ant antfile="build.xml" dir="../../scheduler-rcp/org.ow2.proactive.scheduling.common.lib" target="${target}">
+			<property name="arch" value="x86_64"/>
+			<property name="ws" value="gtk"/>
+			<property name="os" value="linux"/>
+		</ant>
+		<ant antfile="build.xml" dir="../../../optimizing.git/src/org.objectweb.proactive.ic2d.chartit" target="${target}">
+			<property name="arch" value="x86_64"/>
+			<property name="ws" value="gtk"/>
+			<property name="os" value="linux"/>
+		</ant>
+		<ant antfile="build.xml" dir="../org.ow2.proactive.resourcemanager.lib" target="${target}">
+			<property name="arch" value="x86_64"/>
+			<property name="ws" value="gtk"/>
+			<property name="os" value="linux"/>
+		</ant>
+		<ant antfile="build.xml" dir="../org.ow2.proactive.resourcemanager" target="${target}">
+			<property name="arch" value="x86_64"/>
+			<property name="ws" value="gtk"/>
+			<property name="os" value="linux"/>
+		</ant>
+	</target>
+	<target name="all.features" depends="init">
+	</target>
+	<target name="update.feature" depends="init">
+	</target>
+
+	<target name="all.children" depends="init,all.features,all.plugins,update.feature">
+	</target>
+
+	<target name="children" if="include.children">
+		<antcall target="all.children"/>
+	</target>
+
+	<target name="build.jars" depends="init" description="Build all the jars for the feature: org.ow2.proactive.resourcemanager.feature.">
+		<antcall target="all.children">
+			<param name="target" value="build.jars"/>
+		</antcall>
+	</target>
+
+	<target name="build.sources" depends="init">
+		<antcall target="all.children">
+			<param name="target" value="build.sources"/>
+		</antcall>
+	</target>
+
+	<target name="build.zips" depends="init">
+		<antcall target="all.children">
+			<param name="target" value="build.zips"/>
+		</antcall>
+	</target>
+
+	<target name="build.update.jar" depends="init" description="Build the feature jar of: org.ow2.proactive.resourcemanager.feature for an update site.">
+		<antcall target="all.children">
+			<param name="target" value="build.update.jar"/>
+		</antcall>
+		<property name="feature.base" value="${feature.temp.folder}"/>
+		<delete dir="${feature.temp.folder}"/>
+		<mkdir dir="${feature.temp.folder}"/>
+		<mkdir dir="${feature.temp.folder}/features/org.ow2.proactive.resourcemanager.feature_1.0.0"/>
+		<antcall target="gather.bin.parts" inheritAll="false">
+			<param name="os" value="*"/>
+			<param name="feature.base" value="${feature.temp.folder}"/>
+			<param name="updateJar.omitRootfiles" value="true"/>
+			<param name="ws" value="*"/>
+			<param name="arch" value="*"/>
+			<param name="nl" value="*"/>
+		</antcall>
+		<jar destfile="${feature.destination}/org.ow2.proactive.resourcemanager.feature_1.0.0.jar" basedir="${feature.temp.folder}/features/org.ow2.proactive.resourcemanager.feature_1.0.0"/>
+		<delete dir="${feature.temp.folder}"/>
+	</target>
+
+	<target name="publish.bin.parts" depends="init" if="p2.publish.parts">
+		<mkdir dir="${feature.temp.folder}/features/org.ow2.proactive.resourcemanager.feature_1.0.0"/>
+		<copy todir="${feature.temp.folder}/features/org.ow2.proactive.resourcemanager.feature_1.0.0" failonerror="true" overwrite="true">
+			<fileset dir="${basedir}">
+				<include name="feature.xml"/>
+			</fileset>
+		</copy>
+		<eclipse.idReplacer featureFilePath="${feature.temp.folder}/features/org.ow2.proactive.resourcemanager.feature_1.0.0/feature.xml"  selfVersion="1.0.0" featureIds="org.eclipse.rcp:0.0.0,3.7.0.v20110216-9DB5Fm1FpBGy_AaVz-mFamgY,org.eclipse.birt:0.0.0,3.7.0.v20110603-BDF9E7AGTzuHfngz-8A08WvWDv8v,org.eclipse.pde:0.0.0,3.6.1.r361_v20100727-7b7mFL-FET3dhESDgE5_bkJ,org.eclipse.gef:0.0.0,3.7.0.v20110425-2050-777D-81B2Bz0685C3A6E34272,org.eclipse.draw2d:0.0.0,3.7.0.v20110425-2050-46-7w3122153603161,org.eclipse.datatools.enablement.oda.designer.feature:0.0.0,1.8.1.v20100618-3328s73533G4A5B63," pluginIds="org.objectweb.proactive.ic2d.lib:0.0.0,4.3.0,org.eclipse.ui.views:0.0.0,3.6.0.I20110412-0800,org.eclipse.rcp:0.0.0,3.7.0.v201106131736,org.eclipse.ui.forms:0.0.0,3.5.100.v20110425,org.eclipse.datatools.connectivity.oda:0.0.0,3.3.2.v201105200920,org.eclipse.datatools.connectivity.oda.consumer:0.0.0,3.2.4.v201105200848,org.eclipse.datatools.connectivity.console.profile:0.0.0,1.0.0.v200906020553,org.eclipse.datatools.connectivity.oda.design:0.0.0,3.3.1.v201008171206,org.eclipse.datatools.connectivity.oda.profile:0.0.0,3.2.4.v201007150318,org.eclipse.datatools.connectivity:0.0.0,1.2.1.v201007142147,org.eclipse.core.resources:0.0.0,3.7.100.v20110510-0712,org.eclipse.core.runtime:0.0.0,3.7.0.v20110110,org.eclipse.core.runtime.compatibility.auth:0.0.0,3.2.200.v20110110,org.eclipse.core.runtime.compatibility.registry:0.0.0,3.5.0.v20110505,org.eclipse.core.variables:0.0.0,3.2.500.v20110511,org.eclipse.core.filesystem:0.0.0,1.3.100.v20110423-0524,org.eclipse.ui.console:0.0.0,3.5.100.v20110511,org.eclipse.jface:0.0.0,3.7.0.I20110522-1430,org.eclipse.jface.databinding:0.0.0,1.5.0.I20100907-0800,org.eclipse.jface.text:0.0.0,3.7.0.v20110505-0800,org.eclipse.text:0.0.0,3.5.100.v20110505-0800,org.eclipse.ui.workbench.texteditor:0.0.0,3.7.0.v20110505-0800,org.eclipse.compare:0.0.0,3.5.200.I20110525-0800,org.eclipse.compare.core:0.0.0,3.5.200.I20110208-0800,org.eclipse.rcp:0.0.0,3.7.0.v201106131736,org.eclipse.core.resources:0.0.0,3.7.100.v20110510-0712,org.eclipse.core.runtime:0.0.0,3.7.0.v20110110,org.eclipse.core.runtime.compatibility.auth:0.0.0,3.2.200.v20110110,org.eclipse.core.runtime.compatibility.registry:0.0.0,3.5.0.v20110505,org.eclipse.core.variables:0.0.0,3.2.500.v20110511,org.eclipse.core.filesystem:0.0.0,1.3.100.v20110423-0524,org.eclipse.ui.console:0.0.0,3.5.100.v20110511,org.eclipse.jface:0.0.0,3.7.0.I20110522-1430,org.eclipse.jface.databinding:0.0.0,1.5.0.I20100907-0800,org.eclipse.jface.text:0.0.0,3.7.0.v20110505-0800,org.eclipse.text:0.0.0,3.5.100.v20110505-0800,org.eclipse.ui.workbench.texteditor:0.0.0,3.7.0.v20110505-0800,org.eclipse.compare:0.0.0,3.5.200.I20110525-0800,org.eclipse.compare.core:0.0.0,3.5.200.I20110208-0800,org.ow2.proactive.resourcemanager:0.0.0,11.22.33,org.ow2.proactive.resourcemanager.lib:0.0.0,11.22.33,org.eclipse.ui:0.0.0,3.7.0.I20110602-0100,org.eclipse.birt.chart.ui:0.0.0,3.7.0.v20110331,org.eclipse.birt.report.engine:0.0.0,3.7.0.v20110603,org.eclipse.ui.console:0.0.0,3.5.100.v20110511,org.eclipse.ui.views.properties.tabbed:0.0.0,3.5.200.I20110201-0800,org.eclipse.jface:0.0.0,3.7.0.I20110522-1430,org.eclipse.jface.text:0.0.0,3.7.0.v20110505-0800,org.eclipse.ui.workbench:0.0.0,3.7.0.I20110519-0100,org.eclipse.core.runtime:0.0.0,3.7.0.v20110110,org.eclipse.equinox.common:0.0.0,3.6.0.v20110523,org.ow2.proactive.scheduling.common.lib:0.0.0,1.0.0.201108091506,org.eclipse.birt.core:0.0.0,3.7.0.v20110608,org.eclipse.birt.report.designer.core:0.0.0,3.7.0.v20110602,org.eclipse.birt.report.designer.ui:0.0.0,3.7.0.v20110602,org.eclipse.birt.report.designer.ui.editor.script:0.0.0,3.7.0.v20110602,org.eclipse.birt.report.model:0.0.0,3.7.0.v20110603,org.eclipse.birt.core.ui:0.0.0,3.7.0.v20110407,org.objectweb.proactive.ic2d.chartit:0.0.0,1.0.0,org.apache.commons.logging:0.0.0,1.0.4.v201101211617,org.apache.ant:0.0.0,1.8.2.v20110505-1300,org.eclipse.ant.core:0.0.0,3.2.300.v20110511,org.apache.xerces:0.0.0,2.9.0.v201101211617,org.eclipse.birt.chart.engine:0.0.0,3.7.0.v20110519,org.eclipse.birt.chart.ui.extension:0.0.0,3.7.0.v20110414,org.eclipse.birt.chart.device.extension:0.0.0,3.7.0.v20110414,org.eclipse.birt.report.data.oda.hive:0.0.0,3.7.0.v20110602,org.eclipse.birt.report.data.oda.hive.ui:0.0.0,3.7.0.v20110602,org.eclipse.birt.report.data.oda.jdbc.ui:0.0.0,3.7.0.v20110602,org.eclipse.birt.report.data.oda.sampledb:0.0.0,3.7.0.v20110608,org.eclipse.birt.report.designer.ui.data:0.0.0,3.7.0.v20110602,org.eclipse.birt.report.designer.ui.ide:0.0.0,3.7.0.v20110603,org.eclipse.birt.report.designer.ui.lib:0.0.0,3.7.0.v20110602,org.eclipse.birt.report.designer.ui.preview.web:0.0.0,3.7.0.v20110602,org.eclipse.birt.report.designer.ui.views:0.0.0,3.7.0.v20110602,org.eclipse.datatools.connectivity.apache.derby:0.0.0,1.0.100.v200906020900,org.eclipse.datatools.connectivity.apache.derby.ui:0.0.0,1.0.3.v201007080903,org.eclipse.datatools.connectivity.oda.design.ui:0.0.0,3.2.4.v201007150318,org.eclipse.datatools.connectivity.sqm.core:0.0.0,1.2.1.v201008120113,org.eclipse.datatools.enablement.finfo:0.0.0,1.5.1.v200906161800,org.eclipse.datatools.enablement.oda.ws:0.0.0,1.2.2.v201001131420,org.eclipse.datatools.enablement.oda.ws.ui:0.0.0,1.2.2.v201007141330,org.eclipse.datatools.enablement.oda.xml:0.0.0,1.2.1.v201001151620,org.eclipse.datatools.enablement.oda.xml.ui:0.0.0,1.2.1.v201006031500,org.eclipse.ui.navigator:0.0.0,3.5.100.I20110524-0800,org.eclipse.ui.navigator.resources:0.0.0,3.4.300.I20110421-1800,org.eclipse.pde.core:0.0.0,3.6.1.v20100902_r361,org.eclipse.mylyn.pde.ui:0.0.0,3.4.0.v20100608-0100-e3x,org.eclipse.pde.ds.core:0.0.0,1.0.100.v20100601,org.eclipse.pde.launching:0.0.0,3.6.0.v20100601,org.eclipse.ui.cheatsheets:0.0.0,3.4.100.v20110425,org.eclipse.ui.editors:0.0.0,3.7.0.v20110517-0800,org.eclipse.ui.ide:0.0.0,3.7.0.I20110519-0100,org.eclipse.ui.intro:0.0.0,3.4.100.v20110425,org.eclipse.core.filebuffers:0.0.0,3.5.200.v20110505-0800,org.eclipse.core.runtime.compatibility:0.0.0,3.2.100.v20100505,org.eclipse.birt.chart.engine.extension:0.0.0,3.7.0.v20110421,org.eclipse.birt.chart.device.svg:0.0.0,3.7.0.v20110421,org.eclipse.birt.chart.device.swt:0.0.0,3.7.0.v20110303,org.eclipse.birt.chart.reportitem:0.0.0,3.7.0.v20110512,org.eclipse.birt.chart.reportitem.ui:0.0.0,3.7.0.v20110512,org.eclipse.birt.report.data.oda.jdbc:0.0.0,3.7.0.v20110602,org.eclipse.birt.report.data.bidi.utils:0.0.0,3.7.0.v20110602,org.eclipse.birt.report.data.bidi.utils.ui:0.0.0,3.7.0.v20110602,org.eclipse.equinox.p2.repository:0.0.0,2.1.0.v20110601,org.eclipse.equinox.p2.metadata:0.0.0,2.1.0.v20110510,org.eclipse.equinox.p2.core:0.0.0,2.1.0.v20110502-1955,org.w3c.dom.svg:0.0.0,1.1.0.v201011041433,org.junit:0.0.0,4.8.2.v4_8_2_v20110321-1705,org.eclipse.pde.ui:0.0.0,3.6.1.v20100810_r361,org.hamcrest.core:0.0.0,1.1.0.v20090501071000,org.eclipse.ltk.core.refactoring:0.0.0,3.5.200.v20110505-0800,org.eclipse.pde.ui.templates:0.0.0,3.4.200.v20100601,org.eclipse.equinox.p2.ui:0.0.0,2.1.0.v20110601,org.eclipse.birt.report.model.adapter.oda:0.0.0,3.7.0.v20110526,org.eclipse.birt.core.script.function:0.0.0,3.7.0.v20110602,org.eclipse.birt.data:0.0.0,3.7.0.v20110603,org.eclipse.update.core:0.0.0,3.2.500.v20110330,org.eclipse.wst.sse.ui:0.0.0,1.3.0.v201105101529,org.eclipse.birt.report.data.oda.jdbc.dbprofile:0.0.0,3.7.0.v20110603,org.eclipse.birt.report.data.oda.jdbc.dbprofile.sampledb:0.0.0,3.7.0.v20110602,org.eclipse.birt.report.data.oda.jdbc.dbprofile.ui:0.0.0,3.7.0.v20110603,org.eclipse.birt.report.data.oda.xml:0.0.0,3.7.0.v20110602,org.eclipse.birt.report.data.oda.xml.ui:0.0.0,3.7.0.v20110602,org.apache.batik.bridge:0.0.0,1.6.0.v201011041432,org.apache.batik.ext.awt:0.0.0,1.6.0.v201011041432,org.apache.batik.util:0.0.0,1.6.0.v201011041432,org.apache.batik.xml:0.0.0,1.6.0.v201011041432,org.w3c.dom.smil:0.0.0,1.0.0.v200806040011,org.eclipse.jdt.launching:0.0.0,3.6.0.v20110509,org.eclipse.ui.ide.application:0.0.0,1.0.300.I20110306-2000,org.eclipse.wst.sse.ui.infopop:0.0.0,1.0.300.v201004150328,org.apache.batik.util.gui:0.0.0,1.6.0.v201011041432,org.apache.batik.css:0.0.0,1.6.0.v201011041432,org.w3c.css.sac:0.0.0,1.3.0.v200805290154,org.apache.batik.dom:0.0.0,1.6.0.v201011041432,org.apache.batik.dom.svg:0.0.0,1.6.0.v201011041432,org.apache.batik.parser:0.0.0,1.6.0.v201011041432,org.apache.batik.pdf:0.0.0,1.6.0.v201105071520,org.apache.batik.svggen:0.0.0,1.6.0.v201011041432,org.apache.batik.transcoder:0.0.0,1.6.0.v201011041432,org.eclipse.birt.report.item.crosstab.core:0.0.0,3.7.0.v20110602,org.eclipse.birt.report.item.crosstab.ui:0.0.0,3.7.0.v20110602,org.eclipse.birt.report.designer.ui.cubebuilder:0.0.0,3.7.0.v20110602,org.eclipse.birt.report.designer.ui.editors:0.0.0,3.7.0.v20110603,org.eclipse.birt.report.designer.ui.editors.schematic:0.0.0,3.7.0.v20110602,org.eclipse.birt.report.designer.ui.lib.explorer:0.0.0,3.7.0.v20110602,org.eclipse.emf.edit:0.0.0,2.7.0.v20110606-0949,org.eclipse.emf.edit.ui:0.0.0,2.7.0.v20110606-0949,org.eclipse.equinox.http.jetty:0.0.0,2.0.100.v20110502,javax.servlet:0.0.0,2.5.0.v201103041518,javax.servlet.jsp:0.0.0,2.0.0.v201101211617,javax.xml:0.0.0,1.3.4.v201005080400,javax.xml.bind:0.0.0,2.1.9.v201005080401,com.lowagie.text:0.0.0,2.1.7.v201004222200,javax.transaction:0.0.0,1.1.1.v201105210645,org.apache.commons.codec:0.0.0,1.3.0.v201101211617,org.apache.xml.resolver:0.0.0,1.2.0.v201005080400,org.apache.xml.serializer:0.0.0,2.7.1.v201005080400,org.eclipse.birt.data.aggregation:0.0.0,3.7.0.v20110602,org.eclipse.birt.report.data.adapter:0.0.0,3.7.0.v20110602,org.eclipse.core.commands:0.0.0,3.6.0.I20110111-0800,org.eclipse.core.contenttype:0.0.0,3.4.100.v20110423-0524,org.eclipse.core.databinding:0.0.0,1.4.0.I20110111-0800,org.eclipse.core.databinding.observable:0.0.0,1.4.0.I20110222-0800,org.eclipse.core.databinding.property:0.0.0,1.4.0.I20110222-0800,org.eclipse.core.expressions:0.0.0,3.4.300.v20110228,org.eclipse.core.jobs:0.0.0,3.5.100.v20110404,org.eclipse.draw2d:0.0.0,3.7.0.v20110425-2050,org.eclipse.emf.common:0.0.0,2.7.0.v20110605-0747,org.eclipse.emf.ecore:0.0.0,2.7.0.v20110605-0747,org.eclipse.emf.ecore.xmi:0.0.0,2.7.0.v20110520-1406,org.eclipse.equinox.app:0.0.0,1.3.100.v20110321,org.eclipse.equinox.preferences:0.0.0,3.4.0.v20110502,org.eclipse.equinox.registry:0.0.0,3.5.100.v20110502,org.eclipse.gef:0.0.0,3.7.0.v20110407-2050,org.eclipse.help:0.0.0,3.5.100.v20110426,"/>
+		<eclipse.gatherFeature
+		   metadataRepository="${p2.build.repo}"
+		   artifactRepository="${p2.build.repo}"
+		   buildResultFolder="${feature.temp.folder}/features/org.ow2.proactive.resourcemanager.feature_1.0.0"
+		   baseDirectory="${basedir}"
+		/>
+	</target>
+
+	<target name="gather.bin.parts" depends="init" if="feature.base">
+		<mkdir dir="${feature.base}/features/org.ow2.proactive.resourcemanager.feature_1.0.0"/>
+		<antcall target="children">
+			<param name="target" value="gather.bin.parts"/>
+			<param name="destination.temp.folder" value="${feature.base}/plugins"/>
+		</antcall>
+		<copy todir="${feature.base}/features/org.ow2.proactive.resourcemanager.feature_1.0.0" failonerror="true" overwrite="false">
+			<fileset dir="${basedir}">
+				<include name="feature.xml"/>
+			</fileset>
+		</copy>
+		<eclipse.idReplacer featureFilePath="${feature.base}/features/org.ow2.proactive.resourcemanager.feature_1.0.0/feature.xml"  selfVersion="1.0.0" featureIds="org.eclipse.rcp:0.0.0,3.7.0.v20110216-9DB5Fm1FpBGy_AaVz-mFamgY,org.eclipse.birt:0.0.0,3.7.0.v20110603-BDF9E7AGTzuHfngz-8A08WvWDv8v,org.eclipse.pde:0.0.0,3.6.1.r361_v20100727-7b7mFL-FET3dhESDgE5_bkJ,org.eclipse.gef:0.0.0,3.7.0.v20110425-2050-777D-81B2Bz0685C3A6E34272,org.eclipse.draw2d:0.0.0,3.7.0.v20110425-2050-46-7w3122153603161,org.eclipse.datatools.enablement.oda.designer.feature:0.0.0,1.8.1.v20100618-3328s73533G4A5B63," pluginIds="org.objectweb.proactive.ic2d.lib:0.0.0,4.3.0,org.eclipse.ui.views:0.0.0,3.6.0.I20110412-0800,org.eclipse.rcp:0.0.0,3.7.0.v201106131736,org.eclipse.ui.forms:0.0.0,3.5.100.v20110425,org.eclipse.datatools.connectivity.oda:0.0.0,3.3.2.v201105200920,org.eclipse.datatools.connectivity.oda.consumer:0.0.0,3.2.4.v201105200848,org.eclipse.datatools.connectivity.console.profile:0.0.0,1.0.0.v200906020553,org.eclipse.datatools.connectivity.oda.design:0.0.0,3.3.1.v201008171206,org.eclipse.datatools.connectivity.oda.profile:0.0.0,3.2.4.v201007150318,org.eclipse.datatools.connectivity:0.0.0,1.2.1.v201007142147,org.eclipse.core.resources:0.0.0,3.7.100.v20110510-0712,org.eclipse.core.runtime:0.0.0,3.7.0.v20110110,org.eclipse.core.runtime.compatibility.auth:0.0.0,3.2.200.v20110110,org.eclipse.core.runtime.compatibility.registry:0.0.0,3.5.0.v20110505,org.eclipse.core.variables:0.0.0,3.2.500.v20110511,org.eclipse.core.filesystem:0.0.0,1.3.100.v20110423-0524,org.eclipse.ui.console:0.0.0,3.5.100.v20110511,org.eclipse.jface:0.0.0,3.7.0.I20110522-1430,org.eclipse.jface.databinding:0.0.0,1.5.0.I20100907-0800,org.eclipse.jface.text:0.0.0,3.7.0.v20110505-0800,org.eclipse.text:0.0.0,3.5.100.v20110505-0800,org.eclipse.ui.workbench.texteditor:0.0.0,3.7.0.v20110505-0800,org.eclipse.compare:0.0.0,3.5.200.I20110525-0800,org.eclipse.compare.core:0.0.0,3.5.200.I20110208-0800,org.eclipse.rcp:0.0.0,3.7.0.v201106131736,org.eclipse.core.resources:0.0.0,3.7.100.v20110510-0712,org.eclipse.core.runtime:0.0.0,3.7.0.v20110110,org.eclipse.core.runtime.compatibility.auth:0.0.0,3.2.200.v20110110,org.eclipse.core.runtime.compatibility.registry:0.0.0,3.5.0.v20110505,org.eclipse.core.variables:0.0.0,3.2.500.v20110511,org.eclipse.core.filesystem:0.0.0,1.3.100.v20110423-0524,org.eclipse.ui.console:0.0.0,3.5.100.v20110511,org.eclipse.jface:0.0.0,3.7.0.I20110522-1430,org.eclipse.jface.databinding:0.0.0,1.5.0.I20100907-0800,org.eclipse.jface.text:0.0.0,3.7.0.v20110505-0800,org.eclipse.text:0.0.0,3.5.100.v20110505-0800,org.eclipse.ui.workbench.texteditor:0.0.0,3.7.0.v20110505-0800,org.eclipse.compare:0.0.0,3.5.200.I20110525-0800,org.eclipse.compare.core:0.0.0,3.5.200.I20110208-0800,org.ow2.proactive.resourcemanager:0.0.0,11.22.33,org.ow2.proactive.resourcemanager.lib:0.0.0,11.22.33,org.eclipse.ui:0.0.0,3.7.0.I20110602-0100,org.eclipse.birt.chart.ui:0.0.0,3.7.0.v20110331,org.eclipse.birt.report.engine:0.0.0,3.7.0.v20110603,org.eclipse.ui.console:0.0.0,3.5.100.v20110511,org.eclipse.ui.views.properties.tabbed:0.0.0,3.5.200.I20110201-0800,org.eclipse.jface:0.0.0,3.7.0.I20110522-1430,org.eclipse.jface.text:0.0.0,3.7.0.v20110505-0800,org.eclipse.ui.workbench:0.0.0,3.7.0.I20110519-0100,org.eclipse.core.runtime:0.0.0,3.7.0.v20110110,org.eclipse.equinox.common:0.0.0,3.6.0.v20110523,org.ow2.proactive.scheduling.common.lib:0.0.0,1.0.0.201108091506,org.eclipse.birt.core:0.0.0,3.7.0.v20110608,org.eclipse.birt.report.designer.core:0.0.0,3.7.0.v20110602,org.eclipse.birt.report.designer.ui:0.0.0,3.7.0.v20110602,org.eclipse.birt.report.designer.ui.editor.script:0.0.0,3.7.0.v20110602,org.eclipse.birt.report.model:0.0.0,3.7.0.v20110603,org.eclipse.birt.core.ui:0.0.0,3.7.0.v20110407,org.objectweb.proactive.ic2d.chartit:0.0.0,1.0.0,org.apache.commons.logging:0.0.0,1.0.4.v201101211617,org.apache.ant:0.0.0,1.8.2.v20110505-1300,org.eclipse.ant.core:0.0.0,3.2.300.v20110511,org.apache.xerces:0.0.0,2.9.0.v201101211617,org.eclipse.birt.chart.engine:0.0.0,3.7.0.v20110519,org.eclipse.birt.chart.ui.extension:0.0.0,3.7.0.v20110414,org.eclipse.birt.chart.device.extension:0.0.0,3.7.0.v20110414,org.eclipse.birt.report.data.oda.hive:0.0.0,3.7.0.v20110602,org.eclipse.birt.report.data.oda.hive.ui:0.0.0,3.7.0.v20110602,org.eclipse.birt.report.data.oda.jdbc.ui:0.0.0,3.7.0.v20110602,org.eclipse.birt.report.data.oda.sampledb:0.0.0,3.7.0.v20110608,org.eclipse.birt.report.designer.ui.data:0.0.0,3.7.0.v20110602,org.eclipse.birt.report.designer.ui.ide:0.0.0,3.7.0.v20110603,org.eclipse.birt.report.designer.ui.lib:0.0.0,3.7.0.v20110602,org.eclipse.birt.report.designer.ui.preview.web:0.0.0,3.7.0.v20110602,org.eclipse.birt.report.designer.ui.views:0.0.0,3.7.0.v20110602,org.eclipse.datatools.connectivity.apache.derby:0.0.0,1.0.100.v200906020900,org.eclipse.datatools.connectivity.apache.derby.ui:0.0.0,1.0.3.v201007080903,org.eclipse.datatools.connectivity.oda.design.ui:0.0.0,3.2.4.v201007150318,org.eclipse.datatools.connectivity.sqm.core:0.0.0,1.2.1.v201008120113,org.eclipse.datatools.enablement.finfo:0.0.0,1.5.1.v200906161800,org.eclipse.datatools.enablement.oda.ws:0.0.0,1.2.2.v201001131420,org.eclipse.datatools.enablement.oda.ws.ui:0.0.0,1.2.2.v201007141330,org.eclipse.datatools.enablement.oda.xml:0.0.0,1.2.1.v201001151620,org.eclipse.datatools.enablement.oda.xml.ui:0.0.0,1.2.1.v201006031500,org.eclipse.ui.navigator:0.0.0,3.5.100.I20110524-0800,org.eclipse.ui.navigator.resources:0.0.0,3.4.300.I20110421-1800,org.eclipse.pde.core:0.0.0,3.6.1.v20100902_r361,org.eclipse.mylyn.pde.ui:0.0.0,3.4.0.v20100608-0100-e3x,org.eclipse.pde.ds.core:0.0.0,1.0.100.v20100601,org.eclipse.pde.launching:0.0.0,3.6.0.v20100601,org.eclipse.ui.cheatsheets:0.0.0,3.4.100.v20110425,org.eclipse.ui.editors:0.0.0,3.7.0.v20110517-0800,org.eclipse.ui.ide:0.0.0,3.7.0.I20110519-0100,org.eclipse.ui.intro:0.0.0,3.4.100.v20110425,org.eclipse.core.filebuffers:0.0.0,3.5.200.v20110505-0800,org.eclipse.core.runtime.compatibility:0.0.0,3.2.100.v20100505,org.eclipse.birt.chart.engine.extension:0.0.0,3.7.0.v20110421,org.eclipse.birt.chart.device.svg:0.0.0,3.7.0.v20110421,org.eclipse.birt.chart.device.swt:0.0.0,3.7.0.v20110303,org.eclipse.birt.chart.reportitem:0.0.0,3.7.0.v20110512,org.eclipse.birt.chart.reportitem.ui:0.0.0,3.7.0.v20110512,org.eclipse.birt.report.data.oda.jdbc:0.0.0,3.7.0.v20110602,org.eclipse.birt.report.data.bidi.utils:0.0.0,3.7.0.v20110602,org.eclipse.birt.report.data.bidi.utils.ui:0.0.0,3.7.0.v20110602,org.eclipse.equinox.p2.repository:0.0.0,2.1.0.v20110601,org.eclipse.equinox.p2.metadata:0.0.0,2.1.0.v20110510,org.eclipse.equinox.p2.core:0.0.0,2.1.0.v20110502-1955,org.w3c.dom.svg:0.0.0,1.1.0.v201011041433,org.junit:0.0.0,4.8.2.v4_8_2_v20110321-1705,org.eclipse.pde.ui:0.0.0,3.6.1.v20100810_r361,org.hamcrest.core:0.0.0,1.1.0.v20090501071000,org.eclipse.ltk.core.refactoring:0.0.0,3.5.200.v20110505-0800,org.eclipse.pde.ui.templates:0.0.0,3.4.200.v20100601,org.eclipse.equinox.p2.ui:0.0.0,2.1.0.v20110601,org.eclipse.birt.report.model.adapter.oda:0.0.0,3.7.0.v20110526,org.eclipse.birt.core.script.function:0.0.0,3.7.0.v20110602,org.eclipse.birt.data:0.0.0,3.7.0.v20110603,org.eclipse.update.core:0.0.0,3.2.500.v20110330,org.eclipse.wst.sse.ui:0.0.0,1.3.0.v201105101529,org.eclipse.birt.report.data.oda.jdbc.dbprofile:0.0.0,3.7.0.v20110603,org.eclipse.birt.report.data.oda.jdbc.dbprofile.sampledb:0.0.0,3.7.0.v20110602,org.eclipse.birt.report.data.oda.jdbc.dbprofile.ui:0.0.0,3.7.0.v20110603,org.eclipse.birt.report.data.oda.xml:0.0.0,3.7.0.v20110602,org.eclipse.birt.report.data.oda.xml.ui:0.0.0,3.7.0.v20110602,org.apache.batik.bridge:0.0.0,1.6.0.v201011041432,org.apache.batik.ext.awt:0.0.0,1.6.0.v201011041432,org.apache.batik.util:0.0.0,1.6.0.v201011041432,org.apache.batik.xml:0.0.0,1.6.0.v201011041432,org.w3c.dom.smil:0.0.0,1.0.0.v200806040011,org.eclipse.jdt.launching:0.0.0,3.6.0.v20110509,org.eclipse.ui.ide.application:0.0.0,1.0.300.I20110306-2000,org.eclipse.wst.sse.ui.infopop:0.0.0,1.0.300.v201004150328,org.apache.batik.util.gui:0.0.0,1.6.0.v201011041432,org.apache.batik.css:0.0.0,1.6.0.v201011041432,org.w3c.css.sac:0.0.0,1.3.0.v200805290154,org.apache.batik.dom:0.0.0,1.6.0.v201011041432,org.apache.batik.dom.svg:0.0.0,1.6.0.v201011041432,org.apache.batik.parser:0.0.0,1.6.0.v201011041432,org.apache.batik.pdf:0.0.0,1.6.0.v201105071520,org.apache.batik.svggen:0.0.0,1.6.0.v201011041432,org.apache.batik.transcoder:0.0.0,1.6.0.v201011041432,org.eclipse.birt.report.item.crosstab.core:0.0.0,3.7.0.v20110602,org.eclipse.birt.report.item.crosstab.ui:0.0.0,3.7.0.v20110602,org.eclipse.birt.report.designer.ui.cubebuilder:0.0.0,3.7.0.v20110602,org.eclipse.birt.report.designer.ui.editors:0.0.0,3.7.0.v20110603,org.eclipse.birt.report.designer.ui.editors.schematic:0.0.0,3.7.0.v20110602,org.eclipse.birt.report.designer.ui.lib.explorer:0.0.0,3.7.0.v20110602,org.eclipse.emf.edit:0.0.0,2.7.0.v20110606-0949,org.eclipse.emf.edit.ui:0.0.0,2.7.0.v20110606-0949,org.eclipse.equinox.http.jetty:0.0.0,2.0.100.v20110502,javax.servlet:0.0.0,2.5.0.v201103041518,javax.servlet.jsp:0.0.0,2.0.0.v201101211617,javax.xml:0.0.0,1.3.4.v201005080400,javax.xml.bind:0.0.0,2.1.9.v201005080401,com.lowagie.text:0.0.0,2.1.7.v201004222200,javax.transaction:0.0.0,1.1.1.v201105210645,org.apache.commons.codec:0.0.0,1.3.0.v201101211617,org.apache.xml.resolver:0.0.0,1.2.0.v201005080400,org.apache.xml.serializer:0.0.0,2.7.1.v201005080400,org.eclipse.birt.data.aggregation:0.0.0,3.7.0.v20110602,org.eclipse.birt.report.data.adapter:0.0.0,3.7.0.v20110602,org.eclipse.core.commands:0.0.0,3.6.0.I20110111-0800,org.eclipse.core.contenttype:0.0.0,3.4.100.v20110423-0524,org.eclipse.core.databinding:0.0.0,1.4.0.I20110111-0800,org.eclipse.core.databinding.observable:0.0.0,1.4.0.I20110222-0800,org.eclipse.core.databinding.property:0.0.0,1.4.0.I20110222-0800,org.eclipse.core.expressions:0.0.0,3.4.300.v20110228,org.eclipse.core.jobs:0.0.0,3.5.100.v20110404,org.eclipse.draw2d:0.0.0,3.7.0.v20110425-2050,org.eclipse.emf.common:0.0.0,2.7.0.v20110605-0747,org.eclipse.emf.ecore:0.0.0,2.7.0.v20110605-0747,org.eclipse.emf.ecore.xmi:0.0.0,2.7.0.v20110520-1406,org.eclipse.equinox.app:0.0.0,1.3.100.v20110321,org.eclipse.equinox.preferences:0.0.0,3.4.0.v20110502,org.eclipse.equinox.registry:0.0.0,3.5.100.v20110502,org.eclipse.gef:0.0.0,3.7.0.v20110407-2050,org.eclipse.help:0.0.0,3.5.100.v20110426,"/>
+		<antcall target="rootFiles">
+			<param name="rootTarget" value="rootFiles${os}_${ws}_${arch}"/>
+		</antcall>
+	</target>
+	<target name="rootFiles" unless="updateJar.omitRootfiles">
+		<antcall target="${rootTarget}"/>
+	</target>
+
+	<target name="rootFileslinux_gtk_x86_64">
+	</target>
+	<target name="rootFilesgroup_group_group">
+		<antcall target="rootFileslinux_gtk_x86_64"/>
+	</target>
+
+	<target name="zip.distribution" depends="init" description="Create a zip containing all the plug-ins and features for the feature: org.ow2.proactive.resourcemanager.feature.">
+		<delete dir="${feature.temp.folder}"/>
+		<mkdir dir="${feature.temp.folder}"/>
+		<antcall target="gather.bin.parts">
+			<param name="feature.base" value="${feature.temp.folder}"/>
+			<param name="os" value="*"/>
+			<param name="arch" value="*"/>
+			<param name="ws" value="*"/>
+			<param name="nl" value="*"/>
+			<param name="include.children" value="true"/>
+		</antcall>
+		<zip destfile="${feature.destination}/org.ow2.proactive.resourcemanager.feature_1.0.0.bin.dist.zip" basedir="${feature.temp.folder}" filesonly="false" whenempty="skip" update="false"/>
+		<delete dir="${feature.temp.folder}"/>
+	</target>
+
+	<target name="zip.sources" depends="init">
+		<delete dir="${feature.temp.folder}"/>
+		<mkdir dir="${feature.temp.folder}"/>
+		<antcall target="all.children">
+			<param name="target" value="gather.sources"/>
+			<param name="destination.temp.folder" value="${feature.temp.folder}/plugins/org.ow2.proactive.resourcemanager.feature.source_1.0.0/src"/>
+			<param name="include.children" value="true"/>
+		</antcall>
+		<zip destfile="${feature.destination}/org.ow2.proactive.resourcemanager.feature_1.0.0.src.zip" basedir="${feature.temp.folder}" filesonly="true" whenempty="skip" update="false"/>
+		<delete dir="${feature.temp.folder}"/>
+	</target>
+
+	<target name="zip.logs" depends="init">
+		<delete dir="${feature.temp.folder}"/>
+		<mkdir dir="${feature.temp.folder}"/>
+		<condition property="logExtension.param" value="logExtension" else="logExtension.param"		>
+			<isset property="logExtension"/>
+		</condition>
+		<antcall target="all.children" inheritAll="false">
+			<param name="target" value="gather.logs"/>
+			<param name="destination.temp.folder" value="${feature.temp.folder}/plugins"/>
+			<param name="include.children" value="true"/>
+			<param name="${logExtension.param}" value="${logExtension}"/>
+		</antcall>
+		<zip destfile="${feature.destination}/org.ow2.proactive.resourcemanager.feature_1.0.0.log.zip" basedir="${feature.temp.folder}" filesonly="true" whenempty="skip" update="false"/>
+		<delete dir="${feature.temp.folder}"/>
+	</target>
+
+	<target name="clean" depends="init" description="Clean the feature: org.ow2.proactive.resourcemanager.feature of all the zips, jars and logs created.">
+		<delete file="${feature.destination}/org.ow2.proactive.resourcemanager.feature_1.0.0.jar"/>
+		<delete file="${feature.destination}/org.ow2.proactive.resourcemanager.feature_1.0.0.bin.dist.zip"/>
+		<delete file="${feature.destination}/org.ow2.proactive.resourcemanager.feature_1.0.0.log.zip"/>
+		<delete file="${feature.destination}/org.ow2.proactive.resourcemanager.feature_1.0.0.src.zip"/>
+		<delete dir="${feature.temp.folder}"/>
+		<antcall target="all.children">
+			<param name="target" value="clean"/>
+		</antcall>
+	</target>
+
+	<target name="refresh" depends="init" if="eclipse.running" description="Refresh this folder.">
+		<eclipse.convertPath fileSystemPath="/home/acontes/ws_git/scheduling.git/rm-rcp/org.ow2.proactive.resourcemanager.feature/" property="resourcePath"/>
+		<eclipse.refreshLocal resource="${resourcePath}" depth="infinite"/>
+		<antcall target="all.children">
+			<param name="target" value="refresh"/>
+		</antcall>
+	</target>
+	<target name="gather.sources">
+		<antcall target="children">
+			<param name="target" value="gather.sources"/>
+			<param name="destination.temp.folder" value="${feature.temp.folder}/plugins/org.ow2.proactive.resourcemanager.feature.source_1.0.0/src"/>
+		</antcall>
+	</target>
+
+	<target name="gather.logs" depends="init">
+		<mkdir dir="${feature.temp.folder}/plugins"/>
+		<property name="destination.temp.folder" value="${feature.temp.folder}/plugins"/>
+		<condition property="logExtension.param" value="logExtension" else="logExtension.param"		>
+			<isset property="logExtension"/>
+		</condition>
+		<antcall target="all.children" inheritAll="false">
+			<param name="target" value="gather.logs"/>
+			<param name="${logExtension.param}" value="${logExtension}"/>
+			<param name="destination.temp.folder" value="${feature.temp.folder}/plugins"/>
+		</antcall>
+	</target>
+
+</project>
