@@ -84,7 +84,9 @@ public abstract class JobFactory {
         JobFactory factory = null;
         for (String factoryInstance : CURRENT_IMPL) {
             try {
-                factory = (JobFactory) Class.forName(factoryInstance).newInstance();
+                ClassLoader cl = JobFactory.class.getClassLoader();
+                Class c = cl.loadClass(factoryInstance);
+                factory = (JobFactory) c.newInstance();
                 break;
             } catch (ClassNotFoundException e) {
                 logger.warn("Cannot instanciate this factory : " + factoryInstance, e);
