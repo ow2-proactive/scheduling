@@ -150,7 +150,7 @@
 
    <features>
       <feature id="org.eclipse.rcp"/>
-      <feature id="org.ow2.proactive.resourcemanager.feature" version="1.0.0"/>
+      <feature id="org.ow2.proactive.resourcemanager.feature"/>
    </features>
 
 
