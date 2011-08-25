@@ -302,7 +302,7 @@ do
 			cp ${SCHEDULING_FULL_NAME}/bin/windows/*.bat ${OUTPUT_DIRECTORY}/bin/windows/
 			rm ${OUTPUT_DIRECTORY}/bin/windows/start-router.bat
 			rm ${OUTPUT_DIRECTORY}/bin/windows/key-gen.bat
-                        IC2D_LIB=$(echo $IC2D_LIB | sed 's#/#\\#g')
+                        IC2D_LIB=$(echo $IC2D_LIB | sed 's#/#\\\\#g')
 			sed -i "s#dist\\\\lib\\\\\(ProActive.jar\)#$IC2D_LIB\\\\lib\\\\\1#g" ${OUTPUT_DIRECTORY}/bin/windows/init.bat
 			sed -i "s#dist\\\\lib\\\\\(ProActive_SRM-common.jar\)#plugins\\\\org.ow2.proactive.scheduling.common.lib_${VERSION}\\\\lib\\\\\1#g" ${OUTPUT_DIRECTORY}/bin/windows/init.bat
 			sed -i "s#dist\\\\lib\\\\\(ProActive_ResourceManager.jar\)#plugins\\\\org.ow2.proactive.resourcemanager.lib_${VERSION}\\\\lib\\\\\1#g" ${OUTPUT_DIRECTORY}/bin/windows/init.bat
