@@ -111,7 +111,9 @@ public class TestJobCoverage extends FunctionalTest {
         JobInfo jinfo;
         //job submission
         SchedulerTHelper.log("Submitting job...");
-        JobId id = SchedulerTHelper.submitJob(new File(jobDescriptor.toURI()).getAbsolutePath());
+        TaskFlowJob job = (TaskFlowJob) JobFactory_stax.getFactory().createJob(
+                new File(jobDescriptor.toURI()).getAbsolutePath());
+        JobId id = SchedulerTHelper.submitJob(job);
 
         //waiting for job termination
         SchedulerTHelper.log("Waiting for job to finish...");
@@ -135,7 +137,7 @@ public class TestJobCoverage extends FunctionalTest {
         Assert.assertEquals(0, result.getPreciousResults().get("task6").value());
         Assert.assertEquals(12, result.getResult("task7").value());
         Assert.assertEquals(12, result.getResult("task8").value());
-        Assert.assertEquals(result.getResult("task9").getException().getClass(), Exception.class);
+        Assert.assertNotNull(result.getResult("task9").getException());
 
         //checking all processes
         SchedulerTHelper.log("Checking all received events :");
@@ -282,17 +284,23 @@ public class TestJobCoverage extends FunctionalTest {
         jstate.update(tinfo);
         Assert.assertEquals(TaskStatus.RUNNING, tinfo.getStatus());
 
-        tinfo = SchedulerTHelper.waitForEventTaskWaitingForRestart(id, "task9");
-        jstate.update(tinfo);
-        Assert.assertEquals(TaskStatus.WAITING_ON_FAILURE, tinfo.getStatus());
+        if (!((JavaTask) job.getTask("task9")).isFork()) {
+            tinfo = SchedulerTHelper.waitForEventTaskWaitingForRestart(id, "task9");
+            jstate.update(tinfo);
+            Assert.assertEquals(TaskStatus.WAITING_ON_FAILURE, tinfo.getStatus());
 
-        tinfo = SchedulerTHelper.waitForEventTaskRunning(id, "task9");
-        jstate.update(tinfo);
-        Assert.assertEquals(TaskStatus.RUNNING, tinfo.getStatus());
+            tinfo = SchedulerTHelper.waitForEventTaskRunning(id, "task9");
+            jstate.update(tinfo);
+            Assert.assertEquals(TaskStatus.RUNNING, tinfo.getStatus());
 
-        tinfo = SchedulerTHelper.waitForEventTaskFinished(id, "task9");
-        jstate.update(tinfo);
-        Assert.assertEquals(TaskStatus.FAILED, tinfo.getStatus());
+            tinfo = SchedulerTHelper.waitForEventTaskFinished(id, "task9");
+            jstate.update(tinfo);
+            Assert.assertEquals(TaskStatus.FAILED, tinfo.getStatus());
+        } else {
+            tinfo = SchedulerTHelper.waitForEventTaskFinished(id, "task9");
+            jstate.update(tinfo);
+            Assert.assertEquals(TaskStatus.FAULTY, tinfo.getStatus());
+        }
 
         //checking end of the job...
         jstate.update(jinfo);
@@ -300,13 +308,21 @@ public class TestJobCoverage extends FunctionalTest {
         Assert.assertEquals(0, jinfo.getNumberOfRunningTasks());
         Assert.assertEquals(9, jinfo.getNumberOfFinishedTasks());
         Assert.assertEquals(9, jinfo.getTotalNumberOfTasks());
-        Assert.assertEquals(JobStatus.FAILED, jinfo.getStatus());
+        if (!((JavaTask) job.getTask("task9")).isFork()) {
+            Assert.assertEquals(JobStatus.FAILED, jinfo.getStatus());
+        } else {
+            Assert.assertEquals(JobStatus.FINISHED, jinfo.getStatus());
+        }
 
         Assert.assertEquals(0, jstate.getNumberOfPendingTasks());
         Assert.assertEquals(0, jstate.getNumberOfRunningTasks());
         Assert.assertEquals(9, jstate.getNumberOfFinishedTasks());
         Assert.assertEquals(9, jstate.getTotalNumberOfTasks());
-        Assert.assertEquals(JobStatus.FAILED, jstate.getStatus());
+        if (!((JavaTask) job.getTask("task9")).isFork()) {
+            Assert.assertEquals(JobStatus.FAILED, jstate.getStatus());
+        } else {
+            Assert.assertEquals(JobStatus.FINISHED, jstate.getStatus());
+        }
 
     }
 
