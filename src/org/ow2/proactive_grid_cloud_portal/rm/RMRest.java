@@ -76,6 +76,7 @@ import org.ow2.proactive.resourcemanager.common.util.RMCachingProxyUserInterface
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.frontend.topology.Topology;
+import org.ow2.proactive.resourcemanager.nodesource.common.ConfigurableField;
 import org.ow2.proactive.resourcemanager.nodesource.common.PluginDescriptor;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
@@ -273,30 +274,84 @@ public class RMRest {
         return rm.disconnect().getBooleanValue();
     }
 
-    /**
-     * Create a NodeSource 
-     * @param sessionId
-     * @param nodeSourceName
-     * @param infrastructureType
-     * @param infrastructureParameters
-     * @param policyType
-     * @param policyParameters
-     * @return true if a node source has been created
-     */
-    @POST
-    @Path("nodesource/create")
-    @Produces("application/json")
-	public boolean createNodeSource(@HeaderParam("sessionid") String sessionId,
+	/**
+	 * Create a NodeSource 
+	 * <p>
+	 *  
+	 *  
+	 * @param sessionId current session id
+	 * @param nodeSourceName name of the node source to create
+	 * @param infrastructureType fully qualified class name of the infrastructure to create
+	 * @param infrastructureParameters String parameters of the infrastructure, without the parameters
+	 * 	containing files or credentials
+	 * @param infrastructureFileParameters File or credential parameters
+	 * @param policyType fully qualified class name of the policy to create
+	 * @param policyParameters String parameters of the policy, without the parameters containing
+	 * 	files or credentials
+	 * @param policyFileParameters File or credential parameters
+	 * @return true if a node source has been created
+	 */
+	@POST
+	@Path("nodesource/create")
+	@Produces("application/json")
+	public boolean createNodeSource(
+			@HeaderParam("sessionid") String sessionId,
 			@FormParam("nodeSourceName") String nodeSourceName,
 			@FormParam("infrastructureType") String infrastructureType,
-			@FormParam("infrastructureParameters") List<String> infrastructureParameters,
+			@FormParam("infrastructureParameters") String[] infrastructureParameters,
+			@FormParam("infrastructureFileParameters") String[] infrastructureFileParameters,
 			@FormParam("policyType") String policyType,
-			@FormParam("policyParameters") List<String> policyParameters) {
-        ResourceManager rm = checkAccess(sessionId);
+			@FormParam("policyParameters") String[] policyParameters,
+			@FormParam("policyFileParameters") String[] policyFileParameters) {
+		ResourceManager rm = checkAccess(sessionId);
+		Object[] infraParams = new Object[infrastructureParameters.length
+				+ infrastructureFileParameters.length];
+		Object[] policyParams = new Object[policyParameters.length
+				+ policyFileParameters.length];
 
-        return rm.createNodeSource(nodeSourceName, infrastructureType, infrastructureParameters.toArray(), policyType,
-                policyParameters.toArray()).getBooleanValue();
-    }
+		/* we need to merge both infrastructureParameters and infrastructureFileParameters into one
+		 * to do so we need the infrastructure parameter order from the RM */
+		for (PluginDescriptor infra : rm
+				.getSupportedNodeSourceInfrastructures()) {
+			if (infra.getPluginName().equals(infrastructureType)) {
+				int i = 0, j = 0, k = 0;
+				for (ConfigurableField field : infra.getConfigurableFields()) {
+					if (field.getMeta().credential()
+							|| field.getMeta().fileBrowser()) {
+						// file parameter : insert from the other array, convert to byte[]
+						infraParams[i] = infrastructureFileParameters[k]
+								.getBytes();
+						k++;
+					} else {
+						infraParams[i] = infrastructureParameters[j];
+						j++;
+					}
+					i++;
+				}
+			}
+		}
+		for (PluginDescriptor pol : rm.getSupportedNodeSourcePolicies()) {
+			if (pol.getPluginName().equals(policyType)) {
+				int i = 0, j = 0, k = 0;
+				for (ConfigurableField
+
+				field : pol.getConfigurableFields()) {
+					if (field.getMeta().credential()
+							|| field.getMeta().password()) {
+						// file parameter : insert from the other array, convert to byte[]
+						policyParams[i] = policyFileParameters[k].getBytes();
+						k++;
+					} else {
+						policyParams[i] = policyParameters[j];
+						j++;
+					}
+					i++;
+				}
+			}
+		}
+		return rm.createNodeSource(nodeSourceName, infrastructureType,
+				infraParams, policyType, policyParams).getBooleanValue();
+	}
 
     /**
      * Returns the ping frequency of a node source 
