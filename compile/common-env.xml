@@ -110,7 +110,7 @@
 
 
 	<target name="rcp.libClean.scheduling.common">
-		<delete includeemptydirs="true">
+		<delete failonerror="false" includeemptydirs="true">
 		  <fileset dir="${rcp.scheduler.dir}/${scheduling.plugin.common.lib}/lib" includes="**/*" />
 		</delete>
 	</target>
