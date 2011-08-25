@@ -1,0 +1,47 @@
+<project name="allElements Delegator overrides">
+	<property name="defaultAssemblyEnabled" value="true" />
+	<taskdef name="if" classname="ise.antelope.tasks.IfTask" classpath="${builder}/../../compile/lib/AntelopeTasks_3.2.19.jar"/>
+
+	<!-- =====================================================================      -->
+    <!-- Run a given ${target} on all elements being built                          -->
+    <!-- By default ${topLevelElementType} and ${topLevelElementId} should be       -->
+    <!-- defined in the builder's build.properties file.  You can customize by      -->
+    <!-- setting the type/id values directly here.                                  -->
+    <!-- You can add additional calls to ${genericTargets} to build more top        -->
+    <!-- level elements.                                                            -->
+    <!--                                                                            -->
+    <!-- The top level must exist in the ${buildDirectory}, ${baseLocation} or      -->
+    <!-- ${pluginPath} locations.                                                   -->
+    <!-- =====================================================================      -->
+    <target name="allElementsDelegator">
+        <ant antfile="${genericTargets}" target="${target}">
+            <property name="type" value="feature" />
+            <property name="id" value="org.eclipse.pde.build.container.feature" />
+        </ant>
+    </target>
+
+
+	<!-- ====================================================================== -->
+	<!--  The default assemble target, this will be called to assemble each		-->
+	<!--  config if a custom assemble target is not defined.					-->
+	<!-- The following properties will be defined:								-->
+	<!-- 		config : The configuration being assembled eg "win32.win32.x86"	-->
+	<!-- 		element: The element being assembled eg "org.eclipse.sdk"		-->
+	<!-- 		assembleScriptName: The assemble script to be called			-->
+	<!-- ====================================================================== -->
+	<target name="defaultAssemble">
+		<if>
+		<bool>
+			<contains string="${config}" substring="win32" casesensitive="false"/>
+		</bool>
+			<property name="config.extension" value="zip"/>
+			<else>
+				<property name="config.extension" value="tar.gz"/>
+			</else>
+		</if>
+		<ant antfile="${assembleScriptName}" dir="${buildDirectory}">
+			<property name="archiveName" value="${buildId}-${config}.${config.extension}"/>
+		</ant>
+	</target>
+
+</project>

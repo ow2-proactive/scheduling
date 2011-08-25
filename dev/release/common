@@ -137,8 +137,8 @@ function replace_version() {
 	echo "********************** Replacing version ************************"
 	cd ${TMP_DIR} || warn_and_exit "Cannot move in ${TMP_DIR}"
 	# Replace RCP version pattern with current version
-	find scheduler-rcp -type f -name "*" -exec sed -i "s/11\.22\.33/$VERSION/" {} \;
-	find rm-rcp -type f -name "*" -exec sed -i "s/11\.22\.33/$VERSION/" {} \;
+	find scheduler-rcp -type f -name "*" -exec sed -i "s/11\.22\.33/${VERSION}/" {} \;
+	find rm-rcp -type f -name "*" -exec sed -i "s/11\.22\.33/${VERSION}/" {} \;
 
 	sed -i "s/{version}/$VERSION/" README.txt
 }
