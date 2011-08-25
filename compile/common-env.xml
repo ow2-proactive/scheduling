@@ -101,15 +101,17 @@
 
 	<target name="rcp.libCopy.scheduling.common" depends="deploy.all" description="Copy all required libraries to scheduler plugins">
 		<copy todir="${rcp.scheduler.dir}/${scheduling.plugin.common.lib}/lib" includeemptydirs="yes">
-			<fileset dir="${lib.dir}/common/**" excludes="wstx-lgpl-3.9.2.jar" />
+			<fileset dir="${lib.dir}/common" excludes="wstx-lgpl-3.9.2.jar" />
 		</copy>
-		<copy todir="${rcp.scheduler.dir}/${rcp.scheduler.lib}/lib" includeemptydirs="yes">
+		<copy todir="${rcp.scheduler.dir}/${scheduling.plugin.common.lib}/lib" includeemptydirs="yes">
 			<fileset dir="${deploy.lib.dir}" includes="ProActive_SRM-common-client.jar" />
 		</copy>
 	</target>
 
-	
+
 	<target name="rcp.libClean.scheduling.common">
-		<delete dir="${rcp.scheduler.dir}/${scheduling.plugin.common.lib}/lib/**" />
+		<delete includeemptydirs="true">
+		  <fileset dir="${rcp.scheduler.dir}/${scheduling.plugin.common.lib}/lib" includes="**/*" />
+		</delete>
 	</target>
 </project>
