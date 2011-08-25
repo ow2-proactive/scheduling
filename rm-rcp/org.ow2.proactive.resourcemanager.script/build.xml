@@ -14,8 +14,8 @@
 
 
 		<property name="builder" value="${basedir}" />
-		<property name="buildDirectory" value="${basedir}/buildDirectory" />
-		<property name="pluginPath" value="${rcp.pluginPath}${path.separator}${basedir}/..${path.separator}${deltapack}" />
+		<property name="buildDirectory" value="${basedir}/buildDirectory"/>
+		<property name="pluginPath" value="${rcp.pluginPath}${path.separator}${basedir}/..${path.separator}${basedir}/../../scheduler-rcp${path.separator}${deltapack}" />
 		<property name="buildTempFolder" value="${buildDirectory}" />
 
 		<ant antfile="${eclipse.pdebuild.scripts}/productBuild/productBuild.xml" />
