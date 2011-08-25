@@ -15,9 +15,7 @@
 
    <launcherArgs>
       <programArgs>-data @noDefault
--console
--consoleLog
--clean</programArgs>
+-consoleLog</programArgs>
       <vmArgs>-Xmx512M -Xms512M
 -Dproactive.net.nolocal=true
 -Dpa.scheduler.logs.provider=org.ow2.proactive.scheduler.common.util.logforwarder.providers.ProActiveBasedForwardingProvider</vmArgs>
