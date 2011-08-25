@@ -86,6 +86,7 @@
 	<target name="deploy.scheduler.client" depends="-deployCopy, compile.scheduler, deploy.common.client" description="Creates scheduler client jar">
 		<jar destfile="${deploy.lib.dir}/${scheduler.client.jar}" manifest="${basedir}/scheduler-Manifest-base.mf" index="true">
 			<fileset dir="${cl.scheduler.dir}" includes="**/org/ow2/proactive/scheduler/common/**" />
+			<fileset dir="${cl.scheduler.dir}" includes="pa/stub/**" />
 			<fileset dir="${cl.scheduler.dir}" includes="**/org/ow2/proactive/scheduler/resourcemanager/nodesource/policy/**" />
 			<fileset dir="${cl.scheduler.dir}" includes="**/org/ow2/proactive/scheduler/util/**" />
 			<fileset dir="${cl.scheduler.dir}" includes="**/org/ow2/proactive/scheduler/ext/masterworker/**" />
@@ -366,7 +367,7 @@
 			RCP
 		-->
 
-	<target name="rcp.libClean.scheduler" description="Clean all required libraries for scheduler RCP">
+	<target name="rcp.libClean.scheduler"  description="Clean all required libraries for scheduler RCP">
 		<delete includeemptydirs="true">
 			<fileset dir="${rcp.scheduler.dir}/${rcp.scheduler.lib}/lib" includes="**/*" />
 		</delete>
