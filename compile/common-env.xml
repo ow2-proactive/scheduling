@@ -1,47 +1,47 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project basedir="compile">
-	<taskdef name="if" classname="ise.antelope.tasks.IfTask"/>
+	<taskdef name="if" classname="ise.antelope.tasks.IfTask" />
 
 	<property environment="env" />
 
 	<!-- junit properties -->
-	<property name="junit.showoutput" value="true"/>
+	<property name="junit.showoutput" value="true" />
 
-	<property name="base.dir"            value="${basedir}/.." />
-	<property name="lib.dir"             value="${base.dir}/lib" />
-	<property name="proactive.jar"       value="${lib.dir}/ProActive/ProActive.jar" />
-	<property name="proactive.utils.jar"       value="${lib.dir}/ProActive/ProActive_utils.jar" />
+	<property name="base.dir" value="${basedir}/.." />
+	<property name="lib.dir" value="${base.dir}/lib" />
+	<property name="proactive.jar" value="${lib.dir}/ProActive/ProActive.jar" />
+	<property name="proactive.utils.jar" value="${lib.dir}/ProActive/ProActive_utils.jar" />
 
-	<property name="compile.dir"         value="${base.dir}/compile" />
-	<property name="dev.dir"             value="${base.dir}/dev" />
-	<property name="classes.dir"         value="${base.dir}/classes" />
-	<property name="junit.dir"           value="${base.dir}/junitReports" />
-	<property name="scripts.dir"          value="${base.dir}/scripts" />
+	<property name="compile.dir" value="${base.dir}/compile" />
+	<property name="dev.dir" value="${base.dir}/dev" />
+	<property name="classes.dir" value="${base.dir}/classes" />
+	<property name="junit.dir" value="${base.dir}/junitReports" />
+	<property name="scripts.dir" value="${base.dir}/scripts" />
 
-	<property name="deploy.dir"          value="${base.dir}/dist" />
-	<property name="deploy.lib.dir"      value="${deploy.dir}/lib" />
+	<property name="deploy.dir" value="${base.dir}/dist" />
+	<property name="deploy.lib.dir" value="${deploy.dir}/lib" />
 
-	<property name="addons.dir"          value="${base.dir}/addons" />
+	<property name="addons.dir" value="${base.dir}/addons" />
 
 	<!-- ================================================================ -->
 	<!--                   		Source paths                              -->
 	<!--  =============================================================== -->
 
-	<property name="src.dir"             value="${base.dir}/src" />
-	<property name="src.common"             value="${src.dir}/common" />
+	<property name="src.dir" value="${base.dir}/src" />
+	<property name="src.common" value="${src.dir}/common" />
 
 	<!-- ================================================================ -->
 	<!--                   		Class  paths                              -->
 	<!--  =============================================================== -->
 
-	<property name="cl.common.dir"    value="${classes.dir}/common" />
+	<property name="cl.common.dir" value="${classes.dir}/common" />
 
-	<property name="rcp.scheduler.dir"     value="${base.dir}/scheduler-rcp/" />
-	<property name="rcp.scheduler.lib"     value="org.ow2.proactive.scheduler.lib" />
-	<property name="rcp.rm.dir"     value="${base.dir}/rm-rcp/" />
-	<property name="rcp.rm.lib"     value="org.ow2.proactive.resourcemanager.lib" />
+	<property name="rcp.scheduler.dir" value="${base.dir}/scheduler-rcp/" />
+	<property name="rcp.scheduler.lib" value="org.ow2.proactive.scheduler.lib" />
+	<property name="rcp.rm.dir" value="${base.dir}/rm-rcp/" />
+	<property name="rcp.rm.lib" value="org.ow2.proactive.resourcemanager.lib" />
 
-	<property name="proactive.path" 	value="org/ow2/proactive" />
+	<property name="proactive.path" value="org/ow2/proactive" />
 
 	<property name="proactive.core.path" value="${proactive.path}/core" />
 	<property name="proactive.ext.path" value="${proactive.path}/ext" />
@@ -51,44 +51,65 @@
 	<property name="source" value="1.5" />
 
 	<!-- Clover -->
-	<property name="clover.report.dir"        value="${base.dir}/clover" />
+	<property name="clover.report.dir" value="${base.dir}/clover" />
 	<property name="clover.historyreport.dir" value="${base.dir}/clover_history" />
-	<property name="clover.historypoint.dir"  value="${base.dir}/clover_db" />
+	<property name="clover.historypoint.dir" value="${base.dir}/clover_db" />
 
 	<property name="stubgenerator.class" value="org.objectweb.proactive.ext.util.StubGenerator" />
 
 	<!-- ================================================================ -->
-    <!--                    		jar  names                            -->
+	<!--                    		jar  names                            -->
 	<!--  =============================================================== -->
 
-	<property name="srm.common.jar"        value="ProActive_SRM-common.jar" />
+	<property name="srm.common.jar" value="ProActive_SRM-common.jar" />
 	<property name="srm.common.client.jar" value="ProActive_SRM-common-client.jar" />
+
+	<!-- ================================================================ -->
+	<!--                    	common rcp names                          -->
+	<!--  =============================================================== -->
+
+	<property name="scheduling.plugin.common.lib" value="org.ow2.proactive.scheduling.common.lib" />
+
 
 	<!-- ================================================================ -->
 	<!--                   define the different classpaths                -->
 	<!--  =============================================================== -->
 
-    <path id="common.libs">
-    	<fileset dir="${compile.dir}">
-    		<include name="lib/*.jar"/>
-    	</fileset>
-        <fileset dir="${lib.dir}">
-            <include name="ProActive/**/*.jar"/>
-            <include name="common/**/*.jar"/>
-        	<include name="matsci/**/*.jar"/>
+	<path id="common.libs">
+		<fileset dir="${compile.dir}">
+			<include name="lib/*.jar" />
+		</fileset>
+		<fileset dir="${lib.dir}">
+			<include name="ProActive/**/*.jar" />
+			<include name="common/**/*.jar" />
+			<include name="matsci/**/*.jar" />
 			<include name="nodesource/**/*.jar" />
-        </fileset>
-    </path>
-	
+		</fileset>
+	</path>
+
 	<path id="common.classpath">
-		<path refid="common.libs"/>
+		<path refid="common.libs" />
 		<pathelement location="${cl.common.dir}" />
 	</path>
+
+	<fileset id="jar.index.fileset" dir="${lib.dir}">
+		<include name="common/**/*.jar" />
+		<include name="nodesource/**/*.jar" />
+		<include name="matsci/**/*.jar" />
+		<include name="mapreduce/**/*.jar" />
+	</fileset>
+
+	<target name="rcp.libCopy.scheduling.common" depends="deploy.all" description="Copy all required libraries to scheduler plugins">
+		<copy todir="${rcp.scheduler.dir}/${scheduling.plugin.common.lib}/lib" includeemptydirs="yes">
+			<fileset dir="${lib.dir}/common/**" excludes="wstx-lgpl-3.9.2.jar" />
+		</copy>
+		<copy todir="${rcp.scheduler.dir}/${rcp.scheduler.lib}/lib" includeemptydirs="yes">
+			<fileset dir="${deploy.lib.dir}" includes="ProActive_SRM-common-client.jar" />
+		</copy>
+	</target>
+
 	
-    <fileset id="jar.index.fileset" dir="${lib.dir}">
-        <include name="common/**/*.jar" />
-        <include name="nodesource/**/*.jar" />
-		<include name="matsci/**/*.jar"/>
-		<include name="mapreduce/**/*.jar"/>
-    </fileset>
+	<target name="rcp.libClean.scheduling.common">
+		<delete dir="${rcp.scheduler.dir}/${scheduling.plugin.common.lib}/lib/**" />
+	</target>
 </project>

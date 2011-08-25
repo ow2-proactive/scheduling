@@ -101,6 +101,7 @@
 				<include name="org/ow2/proactive/resourcemanager/frontend/topology/**" />
 				<!-- RMNode is needed because it is used in RMNodeEvent-->
 				<include name="org/ow2/proactive/resourcemanager/rmnode/RMNode.class" />
+				<include name="pa/stub/**"/>
 			</fileset>
 			<indexjars>
 				<fileset refid="jar.index.fileset" />

@@ -171,6 +171,7 @@
 					<include name="org/ow2/proactive/permissions/**" />
 					<include name="org/ow2/proactive/account/**" />
 					<include name="org/ow2/proactive/utils/**" />
+					<include name="pa/stub/**" />
 				</fileset>
 				<indexjars>
 					<fileset refid="jar.index.fileset" />

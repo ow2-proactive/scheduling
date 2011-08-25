@@ -100,11 +100,11 @@
 
 	<target name="deploy.scheduler.client" depends="-deployCopy, compile.scheduler, deploy.common.client" description="Creates scheduler client jar">
 		<jar destfile="${deploy.lib.dir}/${scheduler.client.jar}" manifest="${basedir}/scheduler-Manifest-base.mf" index="true">
-			<fileset dir="${cl.scheduler.dir}" includes="org/ow2/proactive/scheduler/common/**" />
-			<fileset dir="${cl.scheduler.dir}" includes="org/ow2/proactive/scheduler/resourcemanager/nodesource/policy/**" />
-			<fileset dir="${cl.scheduler.dir}" includes="org/ow2/proactive/scheduler/util/**" />
-            <fileset dir="${cl.scheduler.dir}" includes="org/ow2/proactive/scheduler/ext/masterworker/**" />
-			<fileset dir="${cl.rm.dir}" includes="org/ow2/proactive/resourcemanager/common/*" />
+			<fileset dir="${cl.scheduler.dir}" includes="**/org/ow2/proactive/scheduler/common/**" />
+			<fileset dir="${cl.scheduler.dir}" includes="**/org/ow2/proactive/scheduler/resourcemanager/nodesource/policy/**" />
+			<fileset dir="${cl.scheduler.dir}" includes="**/org/ow2/proactive/scheduler/util/**" />
+            <fileset dir="${cl.scheduler.dir}" includes="**/org/ow2/proactive/scheduler/ext/masterworker/**" />
+			<fileset dir="${cl.rm.dir}" includes="**/org/ow2/proactive/resourcemanager/common/*" />
 			<indexjars>
 				<fileset refid="jar.index.fileset" />
 			</indexjars>
@@ -114,10 +114,10 @@
 	<target name="deploy.scheduler.matsci" depends="-deployCopy, compile.scheduler, deploy.common.client" description="Creates scheduler matlab/scilab jar">
 		<jar destfile="${deploy.lib.dir}/${scheduler.matsci.jar}" manifest="${basedir}/scheduler-Manifest-base.mf" index="true">
 			<fileset dir="${cl.scheduler.dir}" includes="org/ow2/proactive/scheduler/common/Main.class" />
-			<fileset dir="${cl.scheduler.dir}" includes="org/ow2/proactive/scheduler/ext/common/**" />
-            <fileset dir="${cl.scheduler.dir}" includes="org/ow2/proactive/scheduler/ext/matsci/**" />
-			<fileset dir="${cl.scheduler.dir}" includes="org/ow2/proactive/scheduler/ext/matlab/**" />
-			<fileset dir="${cl.scheduler.dir}" includes="org/ow2/proactive/scheduler/ext/scilab/**" />
+			<fileset dir="${cl.scheduler.dir}" includes="**/org/ow2/proactive/scheduler/ext/common/**" />
+            <fileset dir="${cl.scheduler.dir}" includes="**/org/ow2/proactive/scheduler/ext/matsci/**" />
+			<fileset dir="${cl.scheduler.dir}" includes="**/org/ow2/proactive/scheduler/ext/matlab/**" />
+			<fileset dir="${cl.scheduler.dir}" includes="**/org/ow2/proactive/scheduler/ext/scilab/**" />
 			<indexjars>
 				<fileset refid="jar.index.fileset" />
 			</indexjars>
@@ -128,7 +128,7 @@
 <!-- start of the ant target to create the ProActive_Scheduler-mapreduce.jar -->
 	<target name="deploy.scheduler.mapreduce" depends="-deployCopy, compile.scheduler.mapreduce, deploy.common.client" description="Creates scheduler mapreduce jar">
 		<jar destfile="${deploy.lib.dir}/${scheduler.mapreduce.jar}" manifest="${basedir}/scheduler-Manifest-base.mf" index="true">
-			<fileset dir="${cl.scheduler.dir}" includes="org/ow2/proactive/scheduler/ext/mapreduce/**" excludes="org/ow2/proactive/scheduler/ext/mapreduce/examples/**" />
+			<fileset dir="${cl.scheduler.dir}" includes="**/org/ow2/proactive/scheduler/ext/mapreduce/**" excludes="org/ow2/proactive/scheduler/ext/mapreduce/examples/**" />
 			<fileset dir="${base.dir}/samples/jobs_descriptors/Workflow/mapreduce/" includes="replicateMapperPATask.js" />
 			<fileset dir="${base.dir}/samples/jobs_descriptors/Workflow/mapreduce/" includes="replicateReducerPATask.js" />
 			<fileset dir="${base.dir}/samples/jobs_descriptors/Workflow/mapreduce/" includes="reducerPATaskOutputFileTransfer.js" />
@@ -144,7 +144,7 @@
 	<target name="deploy.scheduler.splitmerge" depends="-deployCopy, compile.scheduler, deploy.common.client" description="Creates scheduler file split/merge jar">
 		<jar destfile="${deploy.lib.dir}/${scheduler.fsm.jar}" manifest="${basedir}/scheduler-Manifest-base.mf" index="true">
 			<fileset dir="${cl.scheduler.dir}" includes="org/ow2/proactive/scheduler/common/Main.class" />
-			<fileset dir="${cl.scheduler.dir}" includes="org/ow2/proactive/scheduler/ext/filessplitmerge/**" />
+			<fileset dir="${cl.scheduler.dir}" includes="**/org/ow2/proactive/scheduler/ext/filessplitmerge/**" />
 			<indexjars>
 				<fileset refid="jar.index.fileset" />
 			</indexjars>
@@ -394,7 +394,10 @@
 		<delete dir="${rcp.scheduler.dir}/${rcp.scheduler.lib}/lib" />
 	</target>
 
-	<target name="rcp.libCopy.scheduler" depends="rcp.libClean.scheduler, deploy.all" description="Copy all required libraries to scheduler plugins">
+	<target name="rcp.libCopy.scheduler" depends="rcp.libCopy.scheduling.common, deploy.all" description="Copy all required libraries to scheduler plugins">
+		<copy todir="${rcp.scheduler.dir}/${scheduling.plugin.common.lib}/lib" includeemptydirs="yes">
+			<fileset dir="${lib.dir}/common" excludes="wstx-lgpl-3.9.2.jar"/>
+		</copy>
 		<copy todir="${rcp.scheduler.dir}/${rcp.scheduler.lib}/lib" includeemptydirs="no">
 			<fileset dir="${deploy.lib.dir}" excludes="ProActive_tests.jar, ${rm.client.jar}, ${scheduler.client.jar}, ${scheduler.worker.jar}, ${srm.common.client.jar}"/>
 		</copy>
