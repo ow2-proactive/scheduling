@@ -146,7 +146,6 @@
 			<arg value="org.eclipse.ant.core.antRunner" />
 			<arg value="-buildfile" />
 			<arg value="../rm-rcp/org.ow2.proactive.resourcemanager.script/build.xml" />
-			<arg value="-debug" />
 			<jvmarg value="-Dbasews=${ws}" />
 			<jvmarg value="-Dbaseos=${os}" />
 			<jvmarg value="-Dbasearch=${arch}" />
