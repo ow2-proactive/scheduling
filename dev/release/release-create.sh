@@ -39,21 +39,25 @@ SUFFIX_CLIENT_RCPs=_client-RCP-
 #############################################################################
 
 function del_dist(){
+	echo "Removing all file related to dist"
 	rm -rf dist
 }
 
 function del_src(){
+	echo "Removing all file related to sources"
 	rm -rf compile lib rm-rcp scheduler-rcp scripts src
 	rm -rf doc/src doc/toolchain doc/tmp
 }
 
 function del_client(){
+	echo "Removing all file related to client"
 	rm -rf compile lib rm-rcp scheduler-rcp scripts src
 	rm -rf doc/src doc/toolchain
 	rm -rf doc/built/Resourcing
 	rm -rf samples/scripts/deployment
 	rm RM-README.txt
-	rm bin/**/rm* bin/**/*start*
+	rm bin/**/rm* 
+	rm bin/**/*start*
 	rm -rf config/authentication/*.cfg config/authentication/jaas.config config/authentication/keys
 	rm config/log4j/log4j-defaultNode config/log4j/*server
 	rm -rf config/rm config/scheduler
@@ -63,14 +67,16 @@ function del_client(){
 }
 
 function del_matsci() {
+	echo "Removing all file related to matci"
 	rm -rf extensions/matlab extensions/scilab
 	rm -rf samples/jobs_descriptors/job_scilab
-	rm samples/scripts/selection/*lab.xml
+	rm samples/scripts/selection/*lab.*
 	rm dist/lib/*matlab* dist/lib/*scilab* dist/lib/ProActive_LicenseSaver*.jar
 	rm dist/lib/ProActive_Scheduler-matsci.jar
 }
 
 function del_mapreduce() {
+	echo "Removing all file related to map reduce"
 	rm -rf extensions/mapreduce
 	rm -rf samples/jobs_descriptors/Workflow/mapreduce
 	rm -rf doc/built/MapReduce
@@ -79,7 +85,7 @@ function del_mapreduce() {
 }
 
 function del_scheduler() {
-	#removing all files related to the scheduler
+	echo "Removing all file related to scheduling"
 	rm -rf .project
 	rm -rf .classpath
 	rm -rf README.txt
@@ -113,12 +119,21 @@ function cp_r_full(){
 	echo "Change dir to : $TMP_DIR"
 	cd $TMP_DIR
 	echo "Current location : $TMP_DIR"
+	echo "Creating $1 from ${SCHEDULING_FULL_NAME}"
 	cp -r ${SCHEDULING_FULL_NAME} $1 || exit 4
+	echo "Change dir to : $1"
+	cd $1
+	echo "Current location : $1"
 }
 
 function create_archive(){
+	echo "Change dir to : $TMP_DIR"
+	cd $TMP_DIR
+	echo "Current location : $TMP_DIR"
+	echo "Create archives $1.tar.gz, $1.zip"
 	tar cfz $1.tar.gz $1
-	zip -qr   $1.zip    $1
+	zip -qr $1.zip    $1
+	echo "remove archive base directory : $1"
 	rm -rf $1
 }
 
@@ -141,9 +156,7 @@ echo "---------------> Building API archives..."
 echo "---------------> Creating SchedulingResourcing SRC..."
 ARCHIVE_NAME=${PREFIX_SRC}${VERSION}${SUFFIX_SRC}
 cp_r_full ${ARCHIVE_NAME}
-cd ${ARCHIVE_NAME}
 del_dist
-cd ..
 create_archive ${ARCHIVE_NAME}
 
 
@@ -151,9 +164,7 @@ create_archive ${ARCHIVE_NAME}
 echo "---------------> Creating Resourcing SERVER..."
 ARCHIVE_NAME=${PREFIX_API_RM}${VERSION}${SUFFIX_SERVER}
 cp_r_full ${ARCHIVE_NAME}
-cd ${ARCHIVE_NAME}
 del_scheduler
-cd ..
 create_archive ${ARCHIVE_NAME}
 
 
@@ -161,9 +172,7 @@ create_archive ${ARCHIVE_NAME}
 echo "---------------> Creating Scheduling SERVER..."
 ARCHIVE_NAME=${PREFIX_API_SC}${VERSION}${SUFFIX_SERVER}
 cp_r_full ${ARCHIVE_NAME}
-cd ${ARCHIVE_NAME}
 del_src
-cd ..
 create_archive ${ARCHIVE_NAME}
 
 
@@ -171,7 +180,6 @@ create_archive ${ARCHIVE_NAME}
 echo "---------------> Creating Scheduling WORKER..."
 ARCHIVE_NAME=${PREFIX_API_SC}${VERSION}${SUFFIX_WORKER}
 cp_r_full ${ARCHIVE_NAME}
-cd ${ARCHIVE_NAME}
 del_src
 rm -rf samples
 rm -rf extensions
@@ -184,7 +192,6 @@ rm -rf config/rm config/scheduler
 rm config/security.java.policy-server
 del_matsci
 del_mapreduce
-cd ..
 create_archive ${ARCHIVE_NAME}
 
 
@@ -192,11 +199,9 @@ create_archive ${ARCHIVE_NAME}
 echo "---------------> Creating Scheduling client API..."
 ARCHIVE_NAME=${PREFIX_API_SC}${VERSION}${SUFFIX_CLIENT_API}
 cp_r_full ${ARCHIVE_NAME}
-cd ${ARCHIVE_NAME}
 del_client
 del_matsci
 del_mapreduce
-cd ..
 create_archive ${ARCHIVE_NAME}
 
 
@@ -204,9 +209,7 @@ create_archive ${ARCHIVE_NAME}
 echo "---------------> Creating Scheduling client API full..."
 ARCHIVE_NAME=${PREFIX_API_SC}${VERSION}${SUFFIX_CLIENT_API_FULL}
 cp_r_full ${ARCHIVE_NAME}
-cd ${ARCHIVE_NAME}
 del_client
-cd ..
 create_archive ${ARCHIVE_NAME}
 
 
@@ -214,10 +217,8 @@ create_archive ${ARCHIVE_NAME}
 echo "---------------> Creating Scheduling client API matsci..."
 ARCHIVE_NAME=${PREFIX_API_SC}${VERSION}${SUFFIX_CLIENT_API_MATSCI}
 cp_r_full ${ARCHIVE_NAME}
-cd ${ARCHIVE_NAME}
 del_client
 del_mapreduce
-cd ..
 create_archive ${ARCHIVE_NAME}
 
 
@@ -225,10 +226,8 @@ create_archive ${ARCHIVE_NAME}
 echo "---------------> Creating Scheduling client API mapreduce..."
 ARCHIVE_NAME=${PREFIX_API_SC}${VERSION}${SUFFIX_CLIENT_API_MAPREDUCE}
 cp_r_full ${ARCHIVE_NAME}
-cd ${ARCHIVE_NAME}
 del_client
 del_matsci
-cd ..
 create_archive ${ARCHIVE_NAME}
 
 
@@ -373,15 +372,15 @@ do
 		# add ProActive configuration reference in product.ini
 		if [[ $i == Scheduling* ]]
 		then
-			INI_FILE=Scheduler.ini
+			PRODUCT_NAME=Scheduler
 		else
-			INI_FILE=ResourceManager.ini
+			PRODUCT_NAME=ResourceManager
 		fi
 		if [ "${RCP_TYPE}" = "macosx.cocoa.x86_64" ] || [ "${RCP_TYPE}" = "macosx.carbon.ppc" ]
 	    then
-			echo "-Dproactive.configuration=../../../config/proactive/ProActiveConfiguration.xml" >> ${OUTPUT_DIRECTORY}/$PRODUCT_NAME.app/Contents/MacOS/$INI_FILE
+			echo "-Dproactive.configuration=../../../config/proactive/ProActiveConfiguration.xml" >> ${OUTPUT_DIRECTORY}/$PRODUCT_NAME.app/Contents/MacOS/${PRODUCT_NAME}.ini
 	    else
-			echo "-Dproactive.configuration=config/proactive/ProActiveConfiguration.xml" >> ${OUTPUT_DIRECTORY}/$INI_FILE
+			echo "-Dproactive.configuration=config/proactive/ProActiveConfiguration.xml" >> ${OUTPUT_DIRECTORY}/${PRODUCT_NAME}.ini
 	    fi
 
 	    # add addons directory
