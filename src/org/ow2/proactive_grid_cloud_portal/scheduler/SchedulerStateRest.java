@@ -904,7 +904,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     */
     @GET
     @Path("jobs/{jobid}/tasks/{taskname}/result/log/all")
-    @Produces("*/*")
+    @Produces("application/json")
     public String tasklog(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId,
             @PathParam("taskname") String taskname) throws NotConnectedException, UnknownJobException,
             UnknownTaskException, PermissionException {
@@ -927,7 +927,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     */
     @GET
     @Path("jobs/{jobid}/tasks/{taskname}/result/log/err")
-    @Produces("*/*")
+    @Produces("application/json")
     public String tasklogErr(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId,
             @PathParam("taskname") String taskname) throws NotConnectedException, UnknownJobException,
             UnknownTaskException, PermissionException {
@@ -950,7 +950,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     */
     @GET
     @Path("jobs/{jobid}/tasks/{taskname}/result/log/out")
-    @Produces("*/*")
+    @Produces("application/json")
     public String tasklogout(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId,
             @PathParam("taskname") String taskname) throws NotConnectedException, UnknownJobException,
             UnknownTaskException, PermissionException {
