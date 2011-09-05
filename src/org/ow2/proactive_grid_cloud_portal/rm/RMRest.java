@@ -61,6 +61,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.jboss.resteasy.annotations.GZIP;
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
@@ -195,6 +196,7 @@ public class RMRest {
      * @return the initial state of the resource manager 
      */
     @GET
+	@GZIP
     @Path("monitoring")
     @Produces("application/json")
     public RMInitialState getInitialState(@HeaderParam("sessionid") String sessionId) {
@@ -513,6 +515,7 @@ public class RMRest {
      * @return the list of supported node source infrastructures descriptors
      */
     @GET
+	@GZIP
     @Path("infrastructures")
     @Produces("application/json")
     public Collection<PluginDescriptor> getSupportedNodeSourceInfrastructures(
@@ -527,6 +530,7 @@ public class RMRest {
      * @return the list of supported node source policies descriptors
      */
     @GET
+	@GZIP
     @Path("policies")
     @Produces("application/json")
     public Collection<PluginDescriptor> getSupportedNodeSourcePolicies(
