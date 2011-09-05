@@ -234,6 +234,8 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
                 throw new RuntimeException("Unknown host: " + host, ex);
             }
         }
+
+        Collections.shuffle(freeHosts);
     }
 
     /**
