@@ -1614,7 +1614,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         return "{ " +
         		"\"scheduler\" : \"" + SchedulerStateRest.class.getPackage().getSpecificationVersion() + 
                 "\", " +
-                "\"rest\" : " +  SchedulerStateRest.class.getPackage().getImplementationVersion() + 
+                "\"rest\" : \"" +  SchedulerStateRest.class.getPackage().getImplementationVersion() + 
                 "\"" +
                 "}";
     }

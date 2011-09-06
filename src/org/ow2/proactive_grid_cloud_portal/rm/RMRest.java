@@ -580,7 +580,7 @@ public class RMRest {
         return "{ " +
                 "\"rm\" : \"" + RMRest.class.getPackage().getSpecificationVersion() + 
                 "\", " +
-                "\"rest\" : " +  RMRest.class.getPackage().getImplementationVersion() + 
+                "\"rest\" : \"" +  RMRest.class.getPackage().getImplementationVersion() + 
                 "\"" +
                 "}";
     }
