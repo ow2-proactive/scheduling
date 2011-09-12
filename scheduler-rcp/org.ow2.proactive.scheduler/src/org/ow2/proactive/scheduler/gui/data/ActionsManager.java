@@ -39,11 +39,18 @@ package org.ow2.proactive.scheduler.gui.data;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.handlers.HandlerUtil;
+import org.eclipse.ui.services.ISourceProviderService;
 import org.ow2.proactive.scheduler.common.SchedulerStatus;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.gui.actions.SchedulerGUIAction;
+import org.ow2.proactive.scheduler.gui.handlers.SchedulerGUIAbstractHandler;
+import org.ow2.proactive.scheduler.gui.handlers.SchedulerStatusSourceProvider;
 
 
 /**
@@ -55,11 +62,14 @@ public class ActionsManager {
 
     private static ActionsManager instance = null;
     private List<SchedulerGUIAction> actions = null;
+    private List<SchedulerGUIAbstractHandler> handlers = null;
+    
     private SchedulerStatus schedulerStatus = null;
     private boolean connected = false;
 
     private ActionsManager() {
         actions = new ArrayList<SchedulerGUIAction>();
+        handlers = new ArrayList<SchedulerGUIAbstractHandler>();
         schedulerStatus = SchedulerStatus.KILLED;
     }
 
@@ -79,6 +89,12 @@ public class ActionsManager {
         return this.actions.add(action);
     }
 
+    public boolean addHandler(SchedulerGUIAbstractHandler handler) {
+        return this.handlers.add(handler);
+    }
+    
+    
+    
     public void update() {
         boolean jobSelected = false;
         boolean owner = false;
@@ -106,6 +122,48 @@ public class ActionsManager {
             action.setEnabled(connected, schedulerStatus, /*SchedulerProxy.getInstance().isAnAdmin()*/true,
                     jobSelected, owner, jobInFinishQueue);
         }
+ 
+        for (SchedulerGUIAbstractHandler handler : handlers) {
+        	handler.setEnabled(connected, schedulerStatus, /*SchedulerProxy.getInstance().isAnAdmin()*/true,
+                    jobSelected, owner, jobInFinishQueue);
+        }
+        
+        
+        
+        //Update Source Providers
+        PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable() {
+			@Override
+			public void run() {
+				IWorkbenchWindow window =	PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+				if (window==null)
+					return;
+				ISourceProviderService sourceProviderService = (ISourceProviderService) window.getService(ISourceProviderService.class);
+				//SchedulerStatusSourceProvider provides YES/NO values for: 
+				// org.ow2.proactive.scheduler.gui.handlers.canstart
+				// org.ow2.proactive.scheduler.gui.handlers.canstop 
+				SchedulerStatusSourceProvider schedSourceProvider = (SchedulerStatusSourceProvider) sourceProviderService
+				.getSourceProvider(SchedulerStatusSourceProvider.CAN_START_SCHEDULER);
+		        
+				boolean admin = true;
+				boolean can_start  = (connected && admin && (schedulerStatus == SchedulerStatus.STOPPED)); 
+				schedSourceProvider.setCanStart(can_start);
+
+				boolean can_stop = (connected && admin && (schedulerStatus != SchedulerStatus.KILLED) &&
+			            (schedulerStatus != SchedulerStatus.UNLINKED) &&
+			            (schedulerStatus != SchedulerStatus.SHUTTING_DOWN) && (schedulerStatus != SchedulerStatus.STOPPED));
+				schedSourceProvider.setCanStop(can_stop);
+			}
+		});
+        
+        
+        
+        
+        
+        
+        
+       
+			
+		
     }
 
     public static ActionsManager getInstance() {

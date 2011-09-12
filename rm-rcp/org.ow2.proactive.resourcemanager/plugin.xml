@@ -264,8 +264,9 @@
          </command>
       </menuContribution>
       <menuContribution
-            locationURI="menu:org.eclipse.ui.main.menu">
+            locationURI="menu:org.eclipse.ui.main.menu?before=window">
          <menu
+               id="ResourceManager"
                label="ResourceManager"
                mnemonic="R">
             <command
@@ -286,16 +287,6 @@
                   name="org.ow2.proactive.resourcemanager.separator1"
                   visible="true">
             </separator>
-            <command
-                  commandId="org.ow2.proactive.resourcemanager.ExitCommand"
-                  icon="icons/exit.png"
-                  label="E&amp;xit"
-                  style="push">
-            </command>
-         </menu>
-         <menu
-               id="ActionsMenu"
-               label="&amp;Admin">
             <command
                   commandId="org.ow2.proactive.resourcemanager.plugin.addNodes"
                   icon="icons/add_node.png"
@@ -334,8 +325,181 @@
                   label="Shutdown"
                   tooltip="Shutdown connected Resource Manager">
             </command>
+            <separator
+                  name="org.ow2.proactive.resourcemanager.separator8">
+            </separator>
+            <command
+                  commandId="org.ow2.proactive.resourcemanager.ExitCommand"
+                  icon="icons/exit.png"
+                  label="E&amp;xit"
+                  style="push">
+            </command>
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="org.ow2.proactive.resourcemanager.ShowActions">
+                  <equals
+                        value="showRMActions">
+                  </equals>
+               </with>
+            </visibleWhen>
          </menu>
+      </menuContribution>
+      <menuContribution
+            locationURI="toolbar:org.eclipse.ui.main.toolbar">
+         <toolbar
+               id="toolbar">
+            <command
+                  commandId="org.ow2.proactive.resourcemanager.plugin.gui.connectCommand"
+                  icon="icons/connect.gif"
+                  id="org.ow2.proactive.resourcemanager.plugin.gui.connectCommand"
+                  label="Connect"
+                  style="push"
+                  tooltip="connect to a Resource Manager">
+            <visibleWhen
+                     checkEnabled="false">
+                  <with
+                        variable="org.ow2.proactive.resourcemanager.ShowActions">
+                     <equals
+                           value="showRMActions">
+                     </equals>
+                  </with>
+               </visibleWhen>
+            </command>
+            <command
+                  commandId="org.ow2.proactive.resourcemanager.plugin.gui.disconnectCommand"
+                  icon="icons/disconnect.gif"
+                  id="org.ow2.proactive.resourcemanager.plugin.gui.disconnectCommand"
+                  label="Disconnect"
+                  tooltip="disconnect from a Resource Manager">
+             <visibleWhen
+                     checkEnabled="false">
+                  <with
+                        variable="org.ow2.proactive.resourcemanager.ShowActions">
+                     <equals
+                           value="showRMActions">
+                     </equals>
+                  </with>
+               </visibleWhen>
+            </command>
+            <separator
+                  name="separator1"
+                  visible="true">
+            </separator>
+            <command
+                  commandId="org.ow2.proactive.resourcemanager.plugin.addNodes"
+                  icon="icons/add_node.png"
+                  label="Add node"
+                  tooltip="Add node by URL">
+               <visibleWhen
+                     checkEnabled="false">
+                  <with
+                        variable="org.ow2.proactive.resourcemanager.ShowActions">
+                     <equals
+                           value="showRMActions">
+                     </equals>
+                  </with>
+               </visibleWhen>
+            </command>
+            <command
+                  commandId="org.ow2.proactive.resourcemanager.plugin.removeNodes"
+                  icon="icons/remove_node.png"
+                  label="Remove nodes"
+                  tooltip="remove nodes">
+             <visibleWhen
+                     checkEnabled="false">
+                  <with
+                        variable="org.ow2.proactive.resourcemanager.ShowActions">
+                     <equals
+                           value="showRMActions">
+                     </equals>
+                  </with>
+               </visibleWhen>
+            </command>
+            <command
+                  commandId="org.ow2.proactive.resourcemanager.plugin.createNodesource"
+                  icon="icons/create_source.png"
+                  label="Create node source"
+                  tooltip="Create a new node source on Resource Manager">
+            <visibleWhen
+                     checkEnabled="false">
+                  <with
+                        variable="org.ow2.proactive.resourcemanager.ShowActions">
+                     <equals
+                           value="showRMActions">
+                     </equals>
+                  </with>
+               </visibleWhen>
+            </command>
+            <command
+                  commandId="org.ow2.proactive.resourcemanager.plugin.removeNodesource"
+                  icon="icons/remove_source.png"
+                  label="Remove node source"
+                  tooltip="Remove an existing node source with all its nodes">
+             <visibleWhen
+                     checkEnabled="false">
+                  <with
+                        variable="org.ow2.proactive.resourcemanager.ShowActions">
+                     <equals
+                           value="showRMActions">
+                     </equals>
+                  </with>
+               </visibleWhen>
+            </command>
+            <command
+                  commandId="org.ow2.proactive.resourcemanager.plugin.shutdown"
+                  icon="icons/rm_shutdown.gif"
+                  label="Shutdown"
+                  tooltip="Shutdown connected Resource Manager">
+             <visibleWhen
+                     checkEnabled="false">
+                  <with
+                        variable="org.ow2.proactive.resourcemanager.ShowActions">
+                     <equals
+                           value="showRMActions">
+                     </equals>
+                  </with>
+               </visibleWhen>
+            </command>
+            <command
+                  commandId="org.ow2.proactive.resourcemanager.command.ShowAccount"
+                  icon="icons/user.png"
+                  label="Show My Account"
+                  style="push"
+                  tooltip="Shows accounting information">
+               <visibleWhen
+                     checkEnabled="false">
+                  <with
+                        variable="org.ow2.proactive.resourcemanager.ShowActions">
+                     <equals
+                           value="showRMActions">
+                     </equals>
+                  </with>
+               </visibleWhen>
+            </command>
+            <command
+                  commandId="org.ow2.proactive.resourcemanager.command.ShowRuntimeData"
+                  icon="icons/areacharticon.gif"
+                  label="Show Runtime Monitoring"
+                  style="push"
+                  tooltip="Show Runtime Data">
+               <visibleWhen
+                     checkEnabled="false">
+                  <with
+                        variable="org.ow2.proactive.resourcemanager.ShowActions">
+                     <equals
+                           value="showRMActions">
+                     </equals>
+                  </with>
+               </visibleWhen>
+            </command>
+         </toolbar>
+      </menuContribution>
+      <menuContribution
+            allPopups="false"
+            locationURI="menu:org.eclipse.ui.main.menu?after=ResourceManager">
          <menu
+               id="window"
                label="&amp;Window">
             <command
                   commandId="org.eclipse.ui.views.showView"
@@ -365,9 +529,22 @@
                   style="push"
                   tooltip="Shows accounting information">
             </command>
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="org.ow2.proactive.resourcemanager.ShowActions">
+                  <equals
+                        value="showRMActions">
+                  </equals>
+               </with>
+            </visibleWhen>
          </menu>
+      </menuContribution>
+      <menuContribution
+            allPopups="false"
+            locationURI="menu:org.eclipse.ui.main.menu?after=window">
          <menu
-               id="HelpMenu"
+               id="help"
                label="&amp;Help">
             <command
                   commandId="org.eclipse.ui.help.aboutAction"
@@ -376,61 +553,6 @@
                   tooltip="About ProActive Resource Manager">
             </command>
          </menu>
-      </menuContribution>
-      <menuContribution
-            locationURI="toolbar:org.eclipse.ui.main.toolbar">
-         <toolbar
-               id="toolbar">
-            <command
-                  commandId="org.ow2.proactive.resourcemanager.plugin.gui.connectCommand"
-                  icon="icons/connect.gif"
-                  id="org.ow2.proactive.resourcemanager.plugin.gui.connectCommand"
-                  label="Connect"
-                  style="push"
-                  tooltip="connect to a Resource Manager">
-            </command>
-            <command
-                  commandId="org.ow2.proactive.resourcemanager.plugin.gui.disconnectCommand"
-                  icon="icons/disconnect.gif"
-                  id="org.ow2.proactive.resourcemanager.plugin.gui.disconnectCommand"
-                  label="Disconnect"
-                  tooltip="disconnect from a Resource Manager">
-            </command>
-            <separator
-                  name="separator1"
-                  visible="true">
-            </separator>
-            <command
-                  commandId="org.ow2.proactive.resourcemanager.plugin.addNodes"
-                  icon="icons/add_node.png"
-                  label="Add node"
-                  tooltip="Add node by URL">
-            </command>
-            <command
-                  commandId="org.ow2.proactive.resourcemanager.plugin.removeNodes"
-                  icon="icons/remove_node.png"
-                  label="Remove nodes"
-                  tooltip="remove nodes">
-            </command>
-            <command
-                  commandId="org.ow2.proactive.resourcemanager.plugin.createNodesource"
-                  icon="icons/create_source.png"
-                  label="Create node source"
-                  tooltip="Create a new node source on Resource Manager">
-            </command>
-            <command
-                  commandId="org.ow2.proactive.resourcemanager.plugin.removeNodesource"
-                  icon="icons/remove_source.png"
-                  label="Remove node source"
-                  tooltip="Remove an existing node source with all its nodes">
-            </command>
-            <command
-                  commandId="org.ow2.proactive.resourcemanager.plugin.shutdown"
-                  icon="icons/rm_shutdown.gif"
-                  label="Shutdown"
-                  tooltip="Shutdown connected Resource Manager">
-            </command>
-         </toolbar>
       </menuContribution>
    </extension>
    <extension
@@ -484,30 +606,14 @@
       </key>
    </extension>
    <extension
-         point="org.eclipse.ui.actionSets">
-      <actionSet
-            id="org.ow2.proactive.resourcemanager.jmxActionSet"
-            label="JMX ChartIt"
-            visible="true">
-         <action
-               class="org.ow2.proactive.resourcemanager.gui.actions.ShowMyAccountActionDelegate"
-               icon="icons/user.png"
-               id="org.ow2.proactive.resourcemanager.showMyAccount"
-               label="Show My Account"
-               style="push"
-               toolbarPath="toolbar:org.eclipse.ui.main.toolbar"
-               tooltip="Shows accounting information">
-         </action>
-         <action
-               class="org.ow2.proactive.resourcemanager.gui.actions.ShowRuntimeDataActionDelegate"
-               icon="icons/areacharticon.gif"
-               id="org.ow2.proactive.resourcemanager.showRuntimeData"
-               label="Show Runtime Monitoring"
-               style="push"
-               toolbarPath="toolbar:org.eclipse.ui.main.toolbar"
-               tooltip="Shows some runtime information about the Resource Manager">
-         </action>
-      </actionSet>
+         point="org.eclipse.ui.services">
+      <sourceProvider
+            provider="org.ow2.proactive.resourcemanager.integration.RMPerspectiveSourceProvider">
+         <variable
+               name="org.ow2.proactive.resourcemanager.ShowActions"
+               priorityLevel="workbench">
+         </variable>
+      </sourceProvider>
    </extension>
 
 </plugin>

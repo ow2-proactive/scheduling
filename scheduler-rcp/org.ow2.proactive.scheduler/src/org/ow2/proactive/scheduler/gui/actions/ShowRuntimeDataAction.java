@@ -59,15 +59,10 @@ import org.ow2.proactive.scheduler.Activator;
  *  
  * @author The ProActive Team 
  */
-public final class ShowRuntimeDataAction extends Action {
+public final class ShowRuntimeDataAction extends JMXAbstractAction {
 
     public static final String NAME = "Runtime Monitoring";
 
-    /** The actions manager */
-    private final JMXActionsManager manager;
-
-    /** The name of the runtime data MBean */
-    private final ObjectName mBeanName;
 
     /** The URL of the configuration file */
     private final URL configFileURL;
@@ -75,7 +70,7 @@ public final class ShowRuntimeDataAction extends Action {
     /**
      * Creates a new instance of this class.
      */
-    ShowRuntimeDataAction(final JMXActionsManager manager) throws Exception {
+    public ShowRuntimeDataAction() throws Exception {
         // Set a descriptive icon
         super.setImageDescriptor(ImageDescriptor.createFromURL(FileLocator.find(
                 org.objectweb.proactive.ic2d.chartit.Activator.getDefault().getBundle(), new Path(
@@ -85,7 +80,6 @@ public final class ShowRuntimeDataAction extends Action {
         super.setText("Show " + NAME);
         super.setToolTipText("Show " + NAME);
 
-        this.manager = manager;
         this.mBeanName = new ObjectName("ProActiveScheduler:name=RuntimeData");
         this.configFileURL = FileLocator.find(Activator.getDefault().getBundle(), new Path(
             "config/RuntimeDataChartItConf.xml"), null);
@@ -110,14 +104,14 @@ public final class ShowRuntimeDataAction extends Action {
     @Override
     public void run() {
         // Try to connect the JMX client    	
-        if (!this.manager.getJMXClientHelper().isConnected()) {
+        if (!JMXActionsManager.getInstance().getJMXClientHelper().isConnected()) {
             return;
         }
         try {
             // true for activate
             if (!JMXActionsManager.activateIfFound(NAME, true)) {
                 // Acquire the connection
-                final MBeanServerConnection con = this.manager.getJMXClientHelper().getConnector()
+                final MBeanServerConnection con = JMXActionsManager.getInstance().getJMXClientHelper().getConnector()
                         .getMBeanServerConnection();
                 // Open new editor based on the descriptor
                 ChartItDataEditor
@@ -149,7 +143,7 @@ public final class ShowRuntimeDataAction extends Action {
         }
 
         public String getHostUrlServer() {
-            return ShowRuntimeDataAction.this.manager.getJMXClientHelper().getConnector().toString();
+            return JMXActionsManager.getInstance().getJMXClientHelper().getConnector().toString();
         }
 
         public MBeanServerConnection getMBeanServerConnection() {

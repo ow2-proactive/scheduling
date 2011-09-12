@@ -34,49 +34,60 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.ow2.proactive.scheduler;
+package org.ow2.proactive.scheduler.gui.handlers;
 
-import org.eclipse.jface.action.ICoolBarManager;
-import org.eclipse.jface.action.IMenuManager;
-import org.eclipse.jface.action.MenuManager;
-import org.eclipse.ui.IWorkbenchActionConstants;
-import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.actions.ActionFactory;
-import org.eclipse.ui.actions.ActionFactory.IWorkbenchAction;
-import org.eclipse.ui.application.ActionBarAdvisor;
-import org.eclipse.ui.application.IActionBarConfigurer;
+import org.eclipse.core.commands.AbstractHandler;
+import org.eclipse.core.commands.ExecutionEvent;
+import org.eclipse.core.commands.ExecutionException;
+import org.ow2.proactive.scheduler.common.SchedulerStatus;
+import org.ow2.proactive.scheduler.gui.actions.SchedulerGUIAction;
+import org.ow2.proactive.scheduler.gui.data.ActionsManager;
 
 
-public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
-	// help
-    private IWorkbenchAction aboutAction;
+public abstract class SchedulerGUIAbstractHandler extends AbstractHandler {
 
-    
-    public ApplicationActionBarAdvisor(IActionBarConfigurer configurer) {
-        super(configurer);
-    }
-
-    @Override
-    protected void makeActions(IWorkbenchWindow window) {
-        // HELP
-        aboutAction = ActionFactory.ABOUT.create(window);
-        register(aboutAction);
-    }
-
-    @Override
-    protected void fillMenuBar(IMenuManager menuBar) {
-        // WINDOW
-        MenuManager windowMenu = new MenuManager("&Window", IWorkbenchActionConstants.M_WINDOW);
-        MenuManager helpMenu = new MenuManager("&Help", IWorkbenchActionConstants.M_HELP);
-        helpMenu.add(aboutAction);
-
-        menuBar.add(windowMenu);
-        menuBar.add(helpMenu);
-    }
-
-    @Override
-	protected void fillCoolBar(ICoolBarManager coolBar) {
-
+	private SchedulerGUIAction action;
+	
+	public SchedulerGUIAbstractHandler()
+	{
+	    ActionsManager.getInstance().addHandler(this);
 	}
+	
+	
+	@Override
+	public Object execute(ExecutionEvent event) throws ExecutionException {
+		getAction().run();
+		//fireHandlerChanged(new HandlerEvent(this, true, false));
+		return null;
+	}
+
+	
+	@Override
+	public void setEnabled(Object context)
+	{
+		setBaseEnabled(getAction().isEnabled());
+	}
+
+	protected SchedulerGUIAction getAction()
+	{
+		if (action == null)
+		{
+			action=createAction();
+		}
+		return action;
+	}
+	
+	
+	 public  void setEnabled(boolean connected, SchedulerStatus schedulerStatus, boolean admin,
+	            boolean jobSelected, boolean owner, boolean jobInFinishQueue)
+	 {
+		getAction().setEnabled( connected,  schedulerStatus,  admin,
+	             jobSelected,  owner,  jobInFinishQueue);
+		setBaseEnabled(getAction().isEnabled());
+	 }
+
+	
+	
+	protected abstract SchedulerGUIAction createAction();
 }

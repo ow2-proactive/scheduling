@@ -38,7 +38,10 @@ package org.ow2.proactive.scheduler.gui.actions;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.List;
 
+import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
@@ -77,8 +80,10 @@ public class JMXActionsManager {
     private JMXClientHelper jmxClient;
 
     /** All managed actions */
-    private Action[] actions;
+    private List<Action> actions;
 
+    private List<AbstractHandler> handlers;
+    
     /**
      * Returns the single instance of this class
      * @return The single instance of this class
@@ -91,22 +96,25 @@ public class JMXActionsManager {
     }
 
     private JMXActionsManager() {
-        this.actions = new Action[2];
-
-        try {
-            this.actions[0] = new ShowRuntimeDataAction(this);
-        } catch (Exception e) {
-            MessageDialog.openError(Display.getDefault().getActiveShell(), "Unable to create the action " +
-                ShowRuntimeDataAction.NAME, e.getMessage());
-        }
-
-        try {
-            this.actions[1] = new ShowMyAccountAction(this);
-        } catch (Exception e) {
-            MessageDialog.openError(Display.getDefault().getActiveShell(), "Unable to create the action " +
-                ShowMyAccountAction.NAME, e.getMessage());
-            e.printStackTrace();
-        }
+    	this.actions = new ArrayList<Action>();
+    	this.handlers = new ArrayList<AbstractHandler>();
+    	
+//        this.actions = new Action[2];
+//
+//        try {
+//            this.actions[0] = new ShowRuntimeDataAction(this);
+//        } catch (Exception e) {
+//            MessageDialog.openError(Display.getDefault().getActiveShell(), "Unable to create the action " +
+//                ShowRuntimeDataAction.NAME, e.getMessage());
+//        }
+//
+//        try {
+//            this.actions[1] = new ShowMyAccountAction(this);
+//        } catch (Exception e) {
+//            MessageDialog.openError(Display.getDefault().getActiveShell(), "Unable to create the action " +
+//                ShowMyAccountAction.NAME, e.getMessage());
+//            e.printStackTrace();
+//        }
     }
 
     /**
@@ -139,6 +147,9 @@ public class JMXActionsManager {
             for (final Action a : this.actions) {
                 a.setEnabled(true);
             }
+            for (final AbstractHandler h : this.handlers) {
+                h.setEnabled(true);
+            }
         } else {
             for (final Action a : this.actions) {
                 // Show a tool tip text in case of connection failure
@@ -158,14 +169,28 @@ public class JMXActionsManager {
         for (final Action a : this.actions) {
             a.setEnabled(false);
         }
+        
+        for (final AbstractHandler h : this.handlers) {
+            h.setEnabled(new Boolean(false));
+        }
     }
 
     public JMXClientHelper getJMXClientHelper() {
         return this.jmxClient;
     }
 
+    public void addAction(Action a)
+    {
+    	this.actions.add(a);
+    }
+    
+    public void addHandler(AbstractHandler h)
+    {
+    	this.handlers.add(h);
+    }
+    
     public Action[] getActions() {
-        return this.actions;
+    	return this.actions.toArray(new Action[actions.size()]);
     }
 
     /**

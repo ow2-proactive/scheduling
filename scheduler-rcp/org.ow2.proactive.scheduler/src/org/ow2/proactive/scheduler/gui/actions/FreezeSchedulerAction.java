@@ -36,10 +36,14 @@
  */
 package org.ow2.proactive.scheduler.gui.actions;
 
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
 import org.ow2.proactive.scheduler.Activator;
 import org.ow2.proactive.scheduler.common.SchedulerStatus;
 import org.ow2.proactive.scheduler.gui.Internal;
 import org.ow2.proactive.scheduler.gui.data.SchedulerProxy;
+import org.ow2.proactive.scheduler.gui.views.SeparatedJobView;
 
 
 /**
@@ -58,6 +62,14 @@ public class FreezeSchedulerAction extends SchedulerGUIAction {
     @Override
     public void run() {
         SchedulerProxy.getInstance().freeze();
+     // poor design led to the connection being impossible if the JobView is not visible...
+        try {
+            PlatformUI.getWorkbench().getActiveWorkbenchWindow().getPages()[0].showView(SeparatedJobView.ID,
+                    null, IWorkbenchPage.VIEW_ACTIVATE);
+        } catch (PartInitException e1) {
+            e1.printStackTrace();
+            return;
+        }
     }
 
     @Override
