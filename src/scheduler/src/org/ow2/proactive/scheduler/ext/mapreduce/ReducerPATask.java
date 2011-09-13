@@ -396,7 +396,7 @@ public class ReducerPATask extends org.ow2.proactive.scheduler.common.task.execu
          * input file system root directory
          */
         PathFilter indexFilePathFilter = new IndexFilePathFilter(indexFileNameRegex);
-        FileStatus[] fileStatusArray = inputFileSystem.listStatus(new Path(File.separator),
+        FileStatus[] fileStatusArray = localFileSystem.listStatus(new Path(File.separator),
                 indexFilePathFilter);
         logger.debug("The number of files selected by the IndexFilePathFilter is '" + fileStatusArray.length +
             "'");
