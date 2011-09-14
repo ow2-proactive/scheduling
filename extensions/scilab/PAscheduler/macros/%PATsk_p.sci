@@ -1,7 +1,9 @@
 function %PATsk_p(l)
     printf('Func: '+l.Func+'\n');
     printf('Params:\n');
-    disp(l.Params);
+    for i=1:length(l.Params)
+        disp(l.Params(i));
+    end
     if ~isempty(l.Description) then
         printf('Description: '+l.Description+'\n');
     end
@@ -34,5 +36,6 @@ function %PATsk_p(l)
     else
         printf('Compose: false\n');
     end
+    printf('\n');
 
 endfunction

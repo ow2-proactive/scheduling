@@ -37,8 +37,8 @@
 function display(P)
 
 s = size(P);
-for i = 1:s(1)
-    for j = 1:s(2)
+for j = 1:s(2)
+    for i = 1:s(1)
         dp(P(i,j), inputname(1), i, j)
     end
 end
