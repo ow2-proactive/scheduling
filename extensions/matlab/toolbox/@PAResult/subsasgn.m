@@ -87,7 +87,6 @@ if length(S) == 1
                         'arrays with more than 2 dimensions not supported')
                 end
                 out=this;
-                %out(S.subs{:})=PATask(A.Func,A.Params,A.Description,A.InputFiles,A.OutputFiles);
             else
                 error('PAResult:subsasgn',...
                     'Not a supported subscripted assignment')

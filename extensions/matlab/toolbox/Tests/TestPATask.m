@@ -52,18 +52,18 @@ fileNames = {dirOutput.name}';
 numFrames = numel(fileNames);
 delete([fileFolder '/' 'New*.pgm']);
 
-T(1:numFrames) = PATask;
+T = PATask(1,numFrames);
 for p = 1:numFrames
 
-    T(p).Compose = false;
-    T(p).Params = {['images_low' '/' fileNames{p}]};
-    T(p).Func = @mytransform;
-    T(p).InputFiles = {['images_low' '/' fileNames{p}]};
+    T(1,p).Compose = false;
+    T(1,p).Params = {['images_low' '/' fileNames{p}]};
+    T(1,p).Func = @mytransform;
+    T(1,p).InputFiles = {['images_low' '/' fileNames{p}]};
     [pathstr, name, ext] = fileparts(fileNames{p});
-    T(p).OutputFiles = {['images_low' '/' 'New_' name '.pgm']};
-    T(p).Description = ['Image recogition' num2str(p)];
+    T(1,p).OutputFiles = {['images_low' '/' 'New_' name '.pgm']};
+    T(1,p).Description = ['Image recogition' num2str(p)];
     [pathstr, name, ext] = fileparts(mfilename('fullpath'));
-    T(p).SelectionScript = [pathstr filesep 'script' filesep 'rand_script.rb' ];
+    T(1,p).SelectionScript = [pathstr filesep 'script' filesep 'rand_script.rb' ];
 end
 % Prepare
 

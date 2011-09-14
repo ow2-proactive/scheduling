@@ -43,17 +43,17 @@ if ~exist('timeout', 'var')
     end
 end
 format long
-t(1:5) = PATask;
-t(1:5).Func = @mysqrt;
-t(1).Params = 1;
-t(2).Params = 2;
-t(3).Params = 3;
-t(4).Params = 4;
-t(5).Params = 5;
-t(2,1:5) = t(1:5);
+t = PATask(3,5);
+t(1,1:5).Func = @mysqrt;
+t(1,1).Params = 1;
+t(1,2).Params = 2;
+t(1,3).Params = 3;
+t(1,4).Params = 4;
+t(1,5).Params = 5;
+t(2,1:5) = t(1,1:5);
 t(2,1:5).Params = {};
 t(2,1:5).Compose = true;
-t(3,1:5) = t(1:5);
+t(3,1:5) = t(1,1:5);
 t(3,1:5).Params = {};
 t(3,1:5).Compose = true;
 t
