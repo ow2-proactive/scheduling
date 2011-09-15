@@ -42,10 +42,13 @@ import java.util.Set;
 
 import javax.security.auth.login.LoginException;
 
+import org.eclipse.core.runtime.IStatus;
+import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.ow2.proactive.authentication.crypto.Credentials;
+import org.ow2.proactive.resourcemanager.Activator;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.common.RMState;
 import org.ow2.proactive.resourcemanager.exception.RMException;
@@ -67,7 +70,32 @@ import org.ow2.proactive.utils.NodeSet;
  */
 public class ResourceManagerProxy implements ResourceManager {
 
-    private ResourceManager resourceManager = null;
+
+	private static ResourceManagerProxy activeInstance;
+	
+	
+	private static ResourceManagerProxy getActiveInstancewithException()throws Throwable {
+        if (activeInstance == null) {
+        	activeInstance = (ResourceManagerProxy) PAActiveObject.newActive(ResourceManagerProxy.class.getName(), null);
+        }
+        return activeInstance;
+    }
+
+	public static ResourceManagerProxy getActiveInstance() {
+        if (activeInstance == null) {
+            try {
+            	activeInstance = getActiveInstancewithException();
+            } catch (Throwable t) {
+                Activator.log(IStatus.ERROR, "- Resource Manager Proxy: Error on get instance ", t);
+                //t.printStackTrace();
+            }
+        }
+        return activeInstance;
+    }
+
+	
+	
+	private ResourceManager resourceManager = null;
 
     public ResourceManagerProxy() {
     }
