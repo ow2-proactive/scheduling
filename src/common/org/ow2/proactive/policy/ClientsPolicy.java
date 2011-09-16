@@ -36,8 +36,8 @@
  */
 package org.ow2.proactive.policy;
 
-import java.io.FilePermission;
 import java.lang.reflect.Constructor;
+import java.security.AllPermission;
 import java.security.CodeSource;
 import java.security.Permission;
 import java.security.PermissionCollection;
@@ -68,13 +68,6 @@ import org.ow2.proactive.permissions.PrincipalPermission;
  * request to the original one.
  */
 public class ClientsPolicy extends Policy {
-
-    /**
-     * These are the list of permission super classes which are
-     * possible to grant to IdentityPrincipals in the java policy file
-     */
-    private static final Class<?>[] ALLOWED_PERMISSION_TYPES = new Class<?>[] { ClientPermission.class,
-            MBeanPermission.class, AuthPermission.class, FilePermission.class };
 
     private static ClientsPolicy instance;
     // WARNING debug trace should be done only to system.out (instead of log4j)
@@ -138,17 +131,16 @@ public class ClientsPolicy extends Policy {
                                     continue;
                             }
 
-                            // checking is the permission we're going to add to the principal
-                            // is among allowed permissions
-                            for (Class<?> permType : ALLOWED_PERMISSION_TYPES) {
-                                if (permType.isAssignableFrom(permission.getClass())) {
-                                    if (debug) {
-                                        // WARNING cannot use log4j as it may lead to recursive permission check
-                                        System.out.println(principal + " has " + permission);
-                                    }
-                                    permissions.add(permission);
-                                    break;
+                            // we grant java.security.AllPermissions to everyone in the security.java.policy
+                            // here we exclude it from IdentityPrincipal
+                            //
+                            // For IdentityPrincipal org.ow2.proactive.permissions.AllPermissions must be used
+                            if (!permission.getClass().isAssignableFrom(AllPermission.class)) {
+                                if (debug) {
+                                    // WARNING cannot use log4j as it may lead to recursive permission check
+                                    System.out.println(principal + " has " + permission);
                                 }
+                                permissions.add(permission);
                             }
                         }
                     }
