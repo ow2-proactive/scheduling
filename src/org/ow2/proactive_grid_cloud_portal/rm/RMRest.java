@@ -552,6 +552,7 @@ public class RMRest {
      * @throws IOException
      */
     @GET
+    @GZIP
     @Path("info/{name}")
     @Produces("application/json")
     public Object getMBeanInfo(@HeaderParam("sessionid") String sessionId,
