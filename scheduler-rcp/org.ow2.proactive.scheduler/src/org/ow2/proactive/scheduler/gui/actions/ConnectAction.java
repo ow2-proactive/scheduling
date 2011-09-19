@@ -36,23 +36,16 @@
  */
 package org.ow2.proactive.scheduler.gui.actions;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.IJobChangeEvent;
+import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.ProgressBar;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.progress.UIJob;
 import org.ow2.proactive.scheduler.Activator;
 import org.ow2.proactive.scheduler.common.SchedulerStatus;
 import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingException;
@@ -107,171 +100,98 @@ public class ConnectAction extends SchedulerGUIAction {
                 }
             });
         } else if (!dialogResult.isCanceled()) {
+        	
+        	UIJob job = new UIJob(getParent().getDisplay(), "Connecting to Scheduler, please wait..."){
+        		@Override
+        		public IStatus runInUIThread(IProgressMonitor monitor) {
+        			try {
+        				// Connection to the scheduler
+        				res = 0;
+        				res = SchedulerProxy.getInstance().connectToScheduler(dialogResult);
+        				return Status.OK_STATUS;
 
-            // Create a temporary shell with a progress bar during the downloading of the RM state
-            final Shell waitShell = new Shell(getParent().getShell(), SWT.APPLICATION_MODAL);
-            // Disable the escape key
-            waitShell.addListener(SWT.Traverse, new Listener() {
-                public void handleEvent(Event e) {
-                    if (e.detail == SWT.TRAVERSE_ESCAPE) {
-                        e.doit = false;
-                    }
-                }
-            });
+        			} catch (Throwable t) {
+        				errorConnect(t, dialogResult);
+        				// Status.WARNING used (instead of Status.ERROR) to avoid the appearance of an eclipse's error dialog
+        				return new Status(Status.WARNING, "scheduler.rcp", "Could not connect to the Scheduler ", t);
+        			}
+        		}
 
-            GridLayout layout = new GridLayout();
-            int marginWidth = 50;
-            layout.marginHeight = 30;
-            layout.marginWidth = marginWidth;
-            layout.verticalSpacing = 15;
-            waitShell.setLayout(layout);
-            final Label jobNameLabel = new Label(waitShell, SWT.NONE);
-            jobNameLabel.setText("Downloading Scheduler state, please wait...");
+        		@Override
+        		protected void canceling() {
+        			if (res == SchedulerProxy.CONNECTED) {
+        				//SchedulerProxy.getInstance().disconnect();                                    
+        			}
+        		}
+        	};
 
-            // Progress bar showing to the user that the application still running
-            final ProgressBar bar = new ProgressBar(waitShell, SWT.INDETERMINATE);
+        	job.addJobChangeListener(new JobChangeAdapter() {
+        		@Override
+        		public void done(IJobChangeEvent event) {
+        			switch (res) {
+        			case 0 : // init val
+        				return;
 
-            final Button cancelButton = new Button(waitShell, SWT.PUSH);
-            cancelButton.setText("Cancel");
-            cancelButton.setToolTipText("Cancel the downloading and exit");
-            cancelButton.setLayoutData(new GridData(SWT.CENTER, SWT.END, false, true));
-            cancelButton.addSelectionListener(new SelectionAdapter() {
-                public void widgetSelected(SelectionEvent e) {
-                    System.exit(0);
-                }
-            });
-            waitShell.setDefaultButton(cancelButton);
+        			case SchedulerProxy.LOGIN_OR_PASSWORD_WRONG :
+        				MessageDialog.openError(getParent().getShell(), "Could not connect", "Incorrect username or password !");
+        				return;
 
-            // Useless without the escape key use
-            //Label connectionCancel = new Label(waitShell, SWT.NONE);
-            //connectionCancel.setText("Press Escape to cancel");
-            waitShell.pack();
-            Rectangle parentBounds = getParent().getShell().getBounds();
-            int x = parentBounds.x + parentBounds.width / 2;
-            int y = parentBounds.y + parentBounds.height / 2;
-            waitShell.setLocation(x - waitShell.getSize().x / 2, y - waitShell.getSize().y / 2);
-            bar.setSize((waitShell.getSize().x) - marginWidth * 2, 20);
-            waitShell.open();
+        			case SchedulerProxy.CONNECTED :
+        				// wait result for synchronous call
+        				JobsController.getActiveView().init();
 
-            new Thread() {
-                public void run() {
+        				// Get graphical thread for the progress bar
+        				UIJob jobState = new UIJob(getParent().getDisplay(), "Downloading Scheduler state, please wait...") {
+        					@Override
+							public IStatus runInUIThread(IProgressMonitor monitor) {
+        						//synchronous call ; wait futur
 
-                    try {
-                        // Connection to the scheduler
-                        res = 0;
-                        res = SchedulerProxy.getInstance().connectToScheduler(dialogResult);
-                    } catch (Throwable t) {
+        						// the call "JobsController.getActiveView().init();"
+        						// must be terminated here, before starting other call.
+        						SeparatedJobView.getPendingJobComposite().initTable();
+        						SeparatedJobView.getRunningJobComposite().initTable();
+        						SeparatedJobView.getFinishedJobComposite().initTable();
 
-                        errorConnect(t, dialogResult);
-                        getParent().getDisplay().asyncExec(new Runnable() {
-                            public void run() {
-                                connection();
-                            }
-                        });
-                    }
+        						ActionsManager.getInstance().setConnected(true);
+        						SelectSchedulerDialog.saveInformations();
 
-                    if (res == 0/*init val*/) {
-                        getParent().getDisplay().syncExec(new Runnable() {
-                            public void run() {
-                                if (!waitShell.isDisposed()) {
-                                    bar.dispose();
-                                    waitShell.dispose();
-                                }
-                            }
-                        });
-                        return;
-                    } else if (res == SchedulerProxy.LOGIN_OR_PASSWORD_WRONG) {
-                        getParent().getDisplay().syncExec(new Runnable() {
-                            public void run() {
-                                if (!waitShell.isDisposed()) {
-                                    bar.dispose();
-                                    waitShell.dispose();
-                                }
-                                MessageDialog.openError(getParent().getShell(), "Could not connect",
-                                        "Incorrect username or password !");
-                            }
-                        });
-                        getParent().getDisplay().asyncExec(new Runnable() {
-                            public void run() {
-                                connection();
-                            }
-                        });
-                        return;
-                    } else if (res == SchedulerProxy.CONNECTED) {
-                        // wait result for synchronous call
-                        final boolean futurRes = JobsController.getActiveView().init();
+        						try {
+        							// start log server
+        							Activator.startLoggerServer();
 
-                        // If the escape key was pressed, terminate thread
-                        if (waitShell.isDisposed()) {
-                            //SchedulerProxy.getInstance().disconnect();                                    
-                            return;
-                        }
+        							ActionsManager.getInstance().update();
 
-                        // Get graphical thread for the progress bar
-                        getParent().getDisplay().syncExec(new Runnable() {
+        							SeparatedJobView.setVisible(true);
+        							
+        							return Status.OK_STATUS;
 
-                            public void run() {
-                                //synchronous call ; wait futur
-                                if (futurRes) {
-                                    bar.dispose();
-                                    waitShell.close();
-                                }
+        						} catch (LogForwardingException e) {
+        							errorConnect(e, dialogResult);
+        	        				return new Status(Status.WARNING, "scheduler.rcp", "Unable to download Scheduler state", e);
+        						}
+        					}
+        					
+        					@Override
+        					protected void canceling() {
+                              //SchedulerProxy.getInstance().disconnect();                                    
+        					}
+        				};
+        				
+        				jobState.setUser(true);
+        				jobState.schedule();
+        			}
+        		}
+        	});
 
-                                // the call "JobsController.getActiveView().init();"
-                                // must be terminated here, before starting other call.
-                                SeparatedJobView.getPendingJobComposite().initTable();
-                                SeparatedJobView.getRunningJobComposite().initTable();
-                                SeparatedJobView.getFinishedJobComposite().initTable();
-
-                                ActionsManager.getInstance().setConnected(true);
-                                SelectSchedulerDialog.saveInformations();
-
-                                try {
-                                    // start log server
-                                    Activator.startLoggerServer();
-
-                                    ActionsManager.getInstance().update();
-
-                                    SeparatedJobView.setVisible(true);
-
-                                } catch (LogForwardingException e) {
-                                    errorConnect(e, dialogResult);
-                                    getParent().getDisplay().asyncExec(new Runnable() {
-                                        public void run() {
-                                            connection();
-                                        }
-                                    });
-                                }
-                            }
-                        });
-
-                    } else if (res == SchedulerProxy.LOGIN_OR_PASSWORD_WRONG) {
-                        getParent().getDisplay().syncExec(new Runnable() {
-                            public void run() {
-                                if (!waitShell.isDisposed()) {
-                                    bar.dispose();
-                                    waitShell.dispose();
-                                }
-                                MessageDialog.openError(getParent().getShell(), "Could not connect",
-                                        "Incorrect username or password !");
-                            }
-                        });
-                        getParent().getDisplay().asyncExec(new Runnable() {
-                            public void run() {
-                                connection();
-                            }
-                        });
-                        return;
-                    }
-                }
-            }.start();
+        	job.setUser(true);
+        	job.schedule();
         }
     }
 
+
     private void errorConnect(final Throwable e, final SelectSchedulerDialogResult dialogResult) {
         e.printStackTrace();
-        Activator.log(IStatus.ERROR, "Could not connect to the scheduler based on:" + dialogResult.getUrl(),
-                e);
+        Activator.log(IStatus.ERROR, "Could not connect to the scheduler based on:" + dialogResult.getUrl(), e);
         getParent().getDisplay().syncExec(new Runnable() {
             public void run() {
                 MessageDialog.openError(getParent().getShell(), "Couldn't connect",
