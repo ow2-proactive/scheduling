@@ -1,3 +1,38 @@
+% PAResult/PAwaitAny blocks matlab execution until any result is available in a
+% given array of PAResult object
+%
+% Syntax
+%       >> val=PAwaitAny(r)
+% 
+% Inputs
+%
+%   r - an array of PAResult objects received by a call to PAsolve
+%
+% Outputs
+%   
+%   val - contains the real result of the computation.
+%
+% Description
+%
+%   PAResult/PAwaitAny will block matlab execution while waiting for a given set of
+%   results. PAResult/PAwaitAny differs from PAResult/PAwaitFor in that it will wait for the
+%   first result available and returns this result, allowing
+%   post-processing treatments to be executed immediately without having to
+%   wait for a large set of results. Further calls to PAwaitAny will return
+%   the remaining results until all results have been computed.
+%
+% Example
+%
+%   >> r=PAsolve(@factorial, 1, 2, 3, 4);
+%   >> val = PAwaitAny(r)  % Blocks Matlab execution until either factorial(1), ..
+%   , or factorial(4) has been computed remotely and returns the result as
+%   val = factorial(i)
+%   >> val2 = PAwaitAny(r) % Blocks for the second result, etc ...
+%
+% See Also
+%   PAsolve, PAResult/PAwaitFor, PAResult/PAisAwaited
+%
+
 % /*
 %   * ################################################################
 %   *

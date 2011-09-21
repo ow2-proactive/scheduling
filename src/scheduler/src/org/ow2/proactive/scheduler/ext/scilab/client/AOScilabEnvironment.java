@@ -41,6 +41,7 @@ import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.exception.UserException;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
@@ -96,7 +97,7 @@ public class AOScilabEnvironment extends AOMatSciEnvironment<ScilabType, ScilabR
         }
 
         Throwable t = null;
-        if (schedulerStopped) {
+        if (schedulerStopped || schedulerKilled) {
             answer.setStatus(MatSciTaskStatus.GLOBAL_ERROR);
             answer.setException(new PASolveException("[AOScilabEnvironment] The scheduler has been stopped"));
         } else if (jinfo.getStatus() == JobStatus.KILLED) {
@@ -133,7 +134,8 @@ public class AOScilabEnvironment extends AOMatSciEnvironment<ScilabType, ScilabR
         return answer;
     }
 
-    public ArrayList<ScilabResultsAndLogs> retrieve(MatSciJobPermanentInfo jpinfo) {
+    public ArrayList<ScilabResultsAndLogs> retrieve(MatSciJobPermanentInfo jpinfo)
+            throws NotConnectedException {
 
         syncRetrieve(jpinfo);
         ArrayList<ScilabResultsAndLogs> answers = new ArrayList<ScilabResultsAndLogs>(jpinfo.getNbres());
@@ -152,9 +154,11 @@ public class AOScilabEnvironment extends AOMatSciEnvironment<ScilabType, ScilabR
     public Pair<MatSciJobPermanentInfo, ArrayList<ScilabResultsAndLogs>> solve(
             PASolveScilabGlobalConfig config, PASolveScilabTaskConfig[][] taskConfigs) throws Throwable {
 
-        if (schedulerStopped) {
+        if (schedulerStopped || schedulerKilled) {
             throw new RuntimeException("[AOScilabEnvironment] the Scheduler is stopped");
         }
+        ensureConnection();
+
         // We store the script selecting the nodes to use it later at termination.
         debug = config.isDebug();
 

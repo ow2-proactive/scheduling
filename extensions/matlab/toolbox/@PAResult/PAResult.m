@@ -1,5 +1,35 @@
-%   PAresult() - constructor of PAresult object
+% PAResult constructor of PAResult objects
 %
+% Properties
+%
+%       jobid - id of the Scheduler job submitted when calling PAsolve and
+%       receiving this PAResult object.
+%
+%       val - contains the result of the computation, if the result is not
+%       yet available, calling the val property will result in blocking
+%       Matlab execution until the result is computed.
+%
+%       logs - the textual log associated with this PAResult object (similarly 
+%       to the val property, it can block matlab execution).
+%       
+%       isError - a boolean value indicating wether this result has
+%       triggered an error in the remote execution or not.
+%
+%
+% Methods
+%
+%       PAwaitFor - waits for the computation of the given PAResult array
+%
+%       PAwaitAny - waits until any result has been computed in the given
+%       array of PAResult objects.
+%
+%       PAisAwaited - tells which results among the given array of PAResult
+%       objects is available.
+%
+% See also
+%       PAsolve, PAResult/PAwaitFor, PAResult/PAwaitAny, PAResult/PAisAwaited
+
+
 % /*
 %   * ################################################################
 %   *

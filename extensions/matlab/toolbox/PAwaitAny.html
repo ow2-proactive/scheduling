@@ -1,0 +1,50 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+      <link rel="stylesheet" href="file:////usr/local/matlab2009b/toolbox/matlab/helptools/private/helpwin.css">
+      <title>M-File Help: PAResult/PAwaitAny</title>
+   </head>
+   <body>
+      <!--Single-page help-->
+      <table border="0" cellspacing="0" width="100%">
+         <tr class="subheader">
+            <td class="headertitle">M-File Help: PAResult/PAwaitAny</td>
+            <td class="subheader-left"><a href="matlab:open @PAResult/PAwaitAny.m">View code for PAResult/PAwaitAny</a></td>
+            <td class="subheader-right"><a href="matlab:helpwin">Default Topics</a></td>
+         </tr>
+      </table>
+      <div class="title">PAResult/PAwaitAny</div>
+      <div class="helptext"><pre><!--helptext -->  <span class="helptopic">PAResult/PAwaitAny</span> blocks matlab execution until any result is available in a
+  given array of PAResult object
+ 
+  Syntax
+        &gt;&gt; val=PAwaitAny(r)
+  
+  Inputs
+ 
+    r - an array of PAResult objects received by a call to PAsolve
+ 
+  Outputs
+    
+    val - contains the real result of the computation.
+ 
+  Description
+ 
+    <span class="helptopic">PAResult/PAwaitAny</span> will block matlab execution while waiting for a given set of
+    results. <span class="helptopic">PAResult/PAwaitAny</span> differs from PAResult/PAwaitFor in that it will wait for the
+    first result available and returns this result, allowing
+    post-processing treatments to be executed immediately without having to
+    wait for a large set of results. Further calls to PAwaitAny will return
+    the remaining results until all results have been computed.
+ 
+  Example
+ 
+    &gt;&gt; r=PAsolve(@factorial, 1, 2, 3, 4);
+    &gt;&gt; val = PAwaitAny(r)  % Blocks Matlab execution until either factorial(1), ..
+    , or factorial(4) has been computed remotely and returns the result as
+    val = factorial(i)
+    &gt;&gt; val2 = PAwaitAny(r) % Blocks for the second result, etc ...</pre></div><!--after help --><!--seeAlso--><div class="footerlinktitle">See Also</div><div class="footerlink">
+    <a href="matlab:doc PAsolve">PAsolve</a>, <a href="matlab:doc PAResult/PAwaitFor">PAResult/PAwaitFor</a>, <a href="matlab:doc PAResult/PAisAwaited">PAResult/PAisAwaited</a></div>
+   </body>
+</html>

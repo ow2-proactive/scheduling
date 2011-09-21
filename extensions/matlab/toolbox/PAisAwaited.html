@@ -1,0 +1,38 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+      <link rel="stylesheet" href="file:////usr/local/matlab2009b/toolbox/matlab/helptools/private/helpwin.css">
+      <title>M-File Help: PAResult/PAisAwaited</title>
+   </head>
+   <body>
+      <!--Single-page help-->
+      <table border="0" cellspacing="0" width="100%">
+         <tr class="subheader">
+            <td class="headertitle">M-File Help: PAResult/PAisAwaited</td>
+            <td class="subheader-left"><a href="matlab:open @PAResult/PAisAwaited.m">View code for PAResult/PAisAwaited</a></td>
+            <td class="subheader-right"><a href="matlab:helpwin">Default Topics</a></td>
+         </tr>
+      </table>
+      <div class="title">PAResult/PAisAwaited</div>
+      <div class="helptext"><pre><!--helptext -->  <span class="helptopic">PAResult/PAisAwaited</span> checks if results among an array of PAResult objects are
+  available or not
+ 
+  Syntax
+        &gt;&gt; tf=PAisAwaited(r)
+  
+  Inputs
+ 
+    r - an array of PAResult objects received by a call to PAsolve
+ 
+  Outputs
+    
+    tf - an array of boolean values, telling for each indice if the result is awaited (true) or available(false).
+ 
+  Example
+ 
+    &gt;&gt; r=PAsolve(@factorial, 1, 2, 3, 4);
+    &gt;&gt; tf = PAisAwaited(r)  % Non-blocking call</pre></div><!--after help --><!--seeAlso--><div class="footerlinktitle">See Also</div><div class="footerlink">
+    <a href="matlab:doc PAsolve">PAsolve</a>, <a href="matlab:doc PAResult/PAwaitAny">PAResult/PAwaitAny</a>, <a href="matlab:doc PAResult/PAwaitFor">PAResult/PAwaitFor</a></div>
+   </body>
+</html>

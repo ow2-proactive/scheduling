@@ -9,12 +9,14 @@ TOOLBOX_TITLE = 'Toolbox ProActive';
 try
     version = getversion('scilab');
     if version(1) < 5
-        error(gettext('Scilab 5.3 or more is required.'));
+        error(gettext('Scilab 5.3.3 or more is required.'));
     elseif version(1) == 5 & version(2) < 3
-        error(gettext('Scilab 5.3 or more is required.'));
+        error(gettext('Scilab 5.3.3 or more is required.'));
+    elseif version(1) == 5 & version(2) == 3 & version(3) < 3
+        error(gettext('Scilab 5.3.3 or more is required.'));
     end
 catch
-    error(gettext('Scilab 5.3 or more is required.'));
+    error(gettext('Scilab 5.3.3 or more is required.'));
 end;
 
 // JIMS install check

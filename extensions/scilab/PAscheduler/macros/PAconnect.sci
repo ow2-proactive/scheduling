@@ -8,6 +8,12 @@ function [] = PAconnect(uri)
     if ~exists('PA_connected') | PA_connected ~= 1  
         jimport org.ow2.proactive.scheduler.ext.scilab.client.ScilabSolver;
         jimport java.lang.String;
+        jimport java.lang.System;
+        jimport org.scilab.modules.gui.utils.ScilabPrintStream;
+        if jinvoke(ScilabPrintStream,'isAvailable') then
+           jinvoke(System, 'setOut',jinvoke(ScilabPrintStream,'getInstance'));
+           jinvoke(ScilabPrintStream,'setRedirect',[]);
+        end
         uristring = String.new(uri);
         solver = jnewInstance(ScilabSolver);
         ex = solver.createConnection(uristring);

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<refentry version="5.0-subset Scilab" xml:id="PAresumeJob" xml:lang="en"
+          xmlns="http://docbook.org/ns/docbook"
+          xmlns:xlink="http://www.w3.org/1999/xlink"
+          xmlns:svg="http://www.w3.org/2000/svg"
+          xmlns:ns3="http://www.w3.org/1999/xhtml"
+          xmlns:mml="http://www.w3.org/1998/Math/MathML"
+          xmlns:db="http://docbook.org/ns/docbook">
+  <info>
+    <pubdate>$LastChangedDate: 2011-09-21 18:41:39 +0100$</pubdate>
+  </info>
+
+  <refnamediv>
+    <refname>PAresumeJob</refname>
+
+    <refpurpose>Resume the given Scheduler job</refpurpose>
+  </refnamediv>
+
+  <refsynopsisdiv>
+    <title>Calling Sequence</title>
+
+    <synopsis>PAresumeJob(jobid)</synopsis>
+  </refsynopsisdiv>
+
+  <refsection>
+    <title>Description</title>
+
+
+    <para><emphasis>PAresumeJob</emphasis> resume the given Scheduler job, previously paused by PApauseJob.</para>
+  </refsection>
+
+  <refsection>
+        <title>Parameters</title>
+        <variablelist>
+            <varlistentry>
+                <term>jobid</term>
+                <listitem>
+                    <para>
+                        the id of the job (string or numeric)
+                    </para>
+                </listitem>
+            </varlistentry>
+        </variablelist>
+    </refsection>
+
+    <refsection>
+        <title>See Also</title>
+        <simplelist type="inline">
+            <member>
+                <link linkend="PAstate">PAstate</link>
+            </member>
+            <member>
+                <link linkend="PAkillJob">PAkillJob</link>
+            </member>
+            <member>
+                <link linkend="PApauseJob">PApauseJob</link>
+            </member>
+            <member>
+                <link linkend="PAkillTask">PAkillTask</link>
+            </member>
+             <member>
+                <link linkend="Installation">Installation of ProActive Toolbox</link>
+            </member>
+        </simplelist>
+    </refsection>
+
+  <refsection>
+    <title>Authors</title>
+
+    <simplelist type="vert">
+      <member>The ProActive Team, Fabien Viale</member>
+    </simplelist>
+  </refsection>
+</refentry>

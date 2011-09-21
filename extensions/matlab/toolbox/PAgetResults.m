@@ -1,18 +1,33 @@
-%   PAgetResults() - results from a job
+% PAgetResults results from a job
 %
-%   Usage:
+% Syntax
+%
 %       >> res = PAgetResults(jobid);
-%       >> res = PAgetResults('1')
 %
-%
-%   Inputs:
+% Inputs
 %       
-%       jobid - id of the job
+%       jobid - the id of the job (string or numeric)
 %
-%   Ouputs: 
+% Ouputs
 %
 %       res - an array of PAresult objects
+% 
+% Description
 %
+%       PAgetResults is used to retrieve results of a PAsolve call from a
+%       previous Matlab session (Disconnected mode).
+%       The array of objects returned is the same returned by
+%       the initial call to PAsolve during the previous session. Calls to
+%       PAwaitFor or PAwaitAny can be done on this array if some results
+%       are not available yet.
+%
+% Example
+%        >> res = PAgetResults('1')
+%
+% See also
+%
+%       PAsolve, PAResult/PAwaitFor, PAResult/PAwaitAny
+
 % /*
 %   * ################################################################
 %   *

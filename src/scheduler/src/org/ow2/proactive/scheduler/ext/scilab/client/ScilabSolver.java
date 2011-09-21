@@ -36,11 +36,6 @@
  */
 package org.ow2.proactive.scheduler.ext.scilab.client;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.io.Writer;
-import java.util.ArrayList;
-
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
@@ -50,6 +45,11 @@ import org.ow2.proactive.scheduler.ext.matsci.client.MatSciJobPermanentInfo;
 import org.ow2.proactive.scheduler.ext.matsci.client.Pair;
 import org.ow2.proactive.scheduler.ext.scilab.common.PASolveScilabGlobalConfig;
 import org.ow2.proactive.scheduler.ext.scilab.common.PASolveScilabTaskConfig;
+
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.io.Writer;
+import java.util.ArrayList;
 
 
 /**
@@ -61,10 +61,10 @@ public class ScilabSolver {
 
     protected static Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.SCILAB);
 
-    private static AOScilabEnvironment scilabSolver;
+    private static AOScilabEnvironment scilabEnv;
 
     static {
-        scilabSolver = null;
+        scilabEnv = null;
     }
 
     public ScilabSolver() {
@@ -73,16 +73,10 @@ public class ScilabSolver {
 
     public static Pair<MatSciJobPermanentInfo, ArrayList<ScilabResultsAndLogs>> solve(
             PASolveScilabGlobalConfig config, PASolveScilabTaskConfig[][] taskConfigs) throws Throwable {
-        Pair<MatSciJobPermanentInfo, ArrayList<ScilabResultsAndLogs>> results = scilabSolver.solve(config,
+        Pair<MatSciJobPermanentInfo, ArrayList<ScilabResultsAndLogs>> results = scilabEnv.solve(config,
                 taskConfigs);
         results = (Pair<MatSciJobPermanentInfo, ArrayList<ScilabResultsAndLogs>>) PAFuture
                 .getFutureValue(results);
-        //        ArrayList<ScilabResultsAndLogs> flist = results.getY();
-        //        ArrayList<ScilabResultsAndLogs> answer = new ArrayList<ScilabResultsAndLogs>();
-        //        for (ScilabResultsAndLogs resf : flist) {
-        //            ScilabResultsAndLogs res = PAFuture.getFutureValue(resf);
-        //            answer.add(res);
-        //        }
         return results;
     }
 
@@ -93,24 +87,28 @@ public class ScilabSolver {
         return result.toString();
     }
 
+    public static AOScilabEnvironment getEnvironment() {
+        return scilabEnv;
+    }
+
     public static String createConnection(String url) throws Exception {
         try {
-            if (scilabSolver == null) {
+            if (scilabEnv == null) {
 
-                scilabSolver = (AOScilabEnvironment) PAActiveObject.newActive(AOScilabEnvironment.class
+                scilabEnv = (AOScilabEnvironment) PAActiveObject.newActive(AOScilabEnvironment.class
                         .getName(), new Object[] {});
 
             }
 
-            if (!scilabSolver.isJoined()) {
-                scilabSolver.join(url);
+            if (!scilabEnv.isJoined()) {
+                scilabEnv.join(url);
             }
 
-            if (!scilabSolver.isLoggedIn()) {
-                scilabSolver.startLogin();
+            if (!scilabEnv.isLoggedIn()) {
+                scilabEnv.startLogin();
             }
 
-            while (!scilabSolver.isLoggedIn()) {
+            while (!scilabEnv.isLoggedIn()) {
                 try {
                     Thread.sleep(100);
                 } catch (InterruptedException e) {

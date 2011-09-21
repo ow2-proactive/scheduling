@@ -1,23 +1,44 @@
-%   PAconnect() - connects to the ProActive scheduler
+function jobs = PAconnect(varargin)
+% PAconnect connects to the ProActive scheduler
 %
-%   Usage:
-%       >> PAconnect(url);
-%       >> jobs = PAconnect(url);
+% Syntax
 %
-%   Example :
+%       PAconnect(url);
+%       jobs = PAconnect(url);
 %
-%       >> jobs = PAconnect('rmi://scheduler:1099')
-%
-%
-%   Inputs:
+% Inputs
 %
 %       url - url of the scheduler
 %
-%   Ouputs:
+% Ouputs
 %
 %       jobs - id of jobs that were not terminated at matlab's previous
 %       shutdown
 %
+% Description
+%
+%       PAconnect connects to a running ProActive Scheduler by specifying its
+%       url. If the scheduler could be reached a popup window will appear, asking
+%       for login and password. ProActive Scheduler features a full account 
+%       management facility along with the possibility to synchronize to existing 
+%       Windows or Linux accounts via LDAP. 
+%       More information can be found inside Scheduler's manual chapter "Configure 
+%       users authentication". If you haven't configured any account in the 
+%       scheduler use, the default account login "demo", password "demo".
+%
+%       PAconnect can also return the ids of PAsolve jobs that
+%       were still running at the end of the last Matlab session (Disconnected
+%       Mode). Results of these jobs can then be retrieved using
+%       PAgetResults.
+%
+% Example
+%
+%   jobs = PAconnect('rmi://scheduler:1099')
+%
+% See also
+%   PAsolve, PAgetResults
+%
+
 % /*
 %   * ################################################################
 %   *
@@ -54,8 +75,6 @@
 %   * ################################################################
 %   * $$PROACTIVE_INITIAL_DEV$$
 %   */
-function jobs = PAconnect(varargin)
-
 if nargin ~= 1 || ~ischar(varargin{1})
     error('PAconnect::PAconnect accepts only one argument (the url to the scheduler)');
 end
@@ -77,8 +96,23 @@ end
 
 tmpsolver = sched.PAgetsolver();
 if ~strcmp(class(tmpsolver), 'double')
-    if tmpsolver.isLoggedIn()
-        error('This session is already connected to a scheduler, only one connection can be issued at a time');
+    tst = false;
+    try 
+        tst = tmpsolver.isConnected();
+    catch ME
+        % We renew everything as the scheduler was completely disconnected.
+        tmpsolver.terminate();
+        disp('before new active')
+        tmpsolver = org.objectweb.proactive.api.PAActiveObject.newActive('org.ow2.proactive.scheduler.ext.matlab.client.AOMatlabEnvironment',[] );
+        disp('after new active')
+        sched.PAgetsolver(tmpsolver);
+        ok = tmpsolver.join(url);
+        if ~ok
+            error('PAconnect::Error while connecting');
+        end                           
+    end    
+    if tst && tmpsolver.isLoggedIn()
+        error('This session is already connected to a scheduler.');
     end
     solver = tmpsolver;
 else

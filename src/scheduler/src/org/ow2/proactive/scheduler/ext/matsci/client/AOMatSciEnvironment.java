@@ -36,20 +36,6 @@
  */
 package org.ow2.proactive.scheduler.ext.matsci.client;
 
-import java.io.File;
-import java.io.Serializable;
-import java.net.URL;
-import java.net.UnknownHostException;
-import java.security.KeyException;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.TreeMap;
-import java.util.TreeSet;
-
-import javax.security.auth.login.LoginException;
-import javax.swing.SwingUtilities;
-
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
@@ -61,25 +47,22 @@ import org.objectweb.proactive.core.body.request.RequestFilter;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
-import org.ow2.proactive.scheduler.common.NotificationData;
-import org.ow2.proactive.scheduler.common.Scheduler;
-import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
-import org.ow2.proactive.scheduler.common.SchedulerConnection;
-import org.ow2.proactive.scheduler.common.SchedulerEvent;
-import org.ow2.proactive.scheduler.common.SchedulerEventListener;
-import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
-import org.ow2.proactive.scheduler.common.exception.PermissionException;
-import org.ow2.proactive.scheduler.common.exception.SchedulerException;
-import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
-import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
-import org.ow2.proactive.scheduler.common.job.JobInfo;
-import org.ow2.proactive.scheduler.common.job.JobResult;
-import org.ow2.proactive.scheduler.common.job.JobState;
-import org.ow2.proactive.scheduler.common.job.JobStatus;
-import org.ow2.proactive.scheduler.common.job.UserIdentification;
+import org.ow2.proactive.scheduler.common.*;
+import org.ow2.proactive.scheduler.common.exception.*;
+import org.ow2.proactive.scheduler.common.job.*;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
+import org.ow2.proactive.scheduler.util.console.SchedulerModel;
+import org.ow2.proactive.utils.console.StdOutConsole;
+
+import javax.security.auth.login.LoginException;
+import javax.swing.*;
+import java.io.Serializable;
+import java.net.URL;
+import java.net.UnknownHostException;
+import java.security.KeyException;
+import java.util.*;
 
 
 /**
@@ -95,19 +78,20 @@ public abstract class AOMatSciEnvironment<R, RL> implements Serializable, Schedu
      */
     protected Scheduler scheduler;
 
-    protected String waitAllResultsJobID;
+    /**
+     * Connection to the scheduler console
+     */
+    protected SchedulerModel model;
 
     /**
      * Internal job id for job description only
      */
     protected long lastGenJobId = 0;
 
-    protected String aoid;
-
     /**
-     * URL to the scheduler
+     * Id of this active object
      */
-    private String schedulerUrl;
+    protected String aoid;
 
     /**
      * Id of the current jobs running
@@ -118,10 +102,8 @@ public abstract class AOMatSciEnvironment<R, RL> implements Serializable, Schedu
     protected static boolean debug = logger.isDebugEnabled();
 
     /**
-     * Access to object output stream to save current jobs
+     * host name
      */
-    protected File jobLogFile;
-
     protected static String host = null;
 
     static {
@@ -144,16 +126,36 @@ public abstract class AOMatSciEnvironment<R, RL> implements Serializable, Schedu
      */
     protected boolean terminated;
 
+    /**
+     * The scheduler has been stopped
+     */
     protected boolean schedulerStopped = false;
 
-    protected boolean loggedin;
-
-    protected boolean joined;
-
-    protected SchedulerAuthenticationInterface auth;
+    /**
+     * The scheduler has been killed
+     */
+    protected boolean schedulerKilled = false;
 
     /**
-     * Trys to log into the scheduler, using the provided user and password
+     * Is the current session logged into the scheduler
+     */
+    protected boolean loggedin;
+
+    /**
+     * Has the current session successfully joined a scheduler
+     */
+    protected boolean joined;
+
+    /**
+     * joined interface to the scheduler, before authentication
+     */
+    protected SchedulerAuthenticationInterface auth;
+
+    /**********************************************************************************************************/
+    /*************************************** LOGIN AND CONNECTION *********************************************/
+
+    /**
+     * Tries to log into the scheduler, using the provided user and password
      *
      * @param user   username
      * @param passwd password
@@ -182,10 +184,30 @@ public abstract class AOMatSciEnvironment<R, RL> implements Serializable, Schedu
         // myEventsOnly doesn't work with the disconnected mode, so we disable it
         this.scheduler.addEventListener(stubOnThis, false, SchedulerEvent.JOB_RUNNING_TO_FINISHED,
                 SchedulerEvent.JOB_PENDING_TO_FINISHED, SchedulerEvent.KILLED, SchedulerEvent.SHUTDOWN,
-                SchedulerEvent.SHUTTING_DOWN, SchedulerEvent.TASK_RUNNING_TO_FINISHED);
+                SchedulerEvent.SHUTTING_DOWN, SchedulerEvent.STOPPED, SchedulerEvent.RESUMED,
+                SchedulerEvent.TASK_RUNNING_TO_FINISHED);
+
+        this.model = SchedulerModel.getModel(false);
+        model.connectConsole(new StdOutConsole());
+        model.connectScheduler(this.scheduler);
+
+        Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
+
+            @Override
+            public void run() {
+                try {
+                    scheduler.disconnect();
+                } catch (NotConnectedException e) {
+                } catch (PermissionException e) {
+                }
+            }
+        }));
 
     }
 
+    /**
+     * Starts a swing GUI to enter login and password
+     */
     public void startLogin() {
         loggedin = false;
         SwingUtilities.invokeLater(new Runnable() {
@@ -196,8 +218,13 @@ public abstract class AOMatSciEnvironment<R, RL> implements Serializable, Schedu
         });
     }
 
+    /**
+     * Tells if this session is logged into the scheduler
+     * @return
+     */
     public boolean isLoggedIn() {
-        return loggedin;
+
+        return loggedin && isConnected();
     }
 
     /**
@@ -206,7 +233,17 @@ public abstract class AOMatSciEnvironment<R, RL> implements Serializable, Schedu
      * @return answer
      */
     public boolean isConnected() {
-        return this.scheduler != null;
+        return this.scheduler.isConnected();
+    }
+
+    /**
+     * Keep alive the scheduler connection, if necessary
+     * @throws NotConnectedException
+     */
+    public void ensureConnection() throws NotConnectedException {
+        if (!isLoggedIn()) {
+            this.scheduler.renewSession();
+        }
     }
 
     /*
@@ -229,22 +266,98 @@ public abstract class AOMatSciEnvironment<R, RL> implements Serializable, Schedu
      */
     public boolean join(String url) throws SchedulerException {
         auth = SchedulerConnection.join(url);
-        this.schedulerUrl = url;
+        this.loggedin = false;
         joined = true;
         return true;
     }
 
+    /**
+     * Tells if the join operation has succeeded.
+     * @return
+     */
     public boolean isJoined() {
         return joined;
     }
 
-    /**
-     * Returns all the results in an array or throw a RuntimeException in case of error
-     *
-     * @return array of ptolemy tokens
-     */
+    /**********************************************************************************************************/
+    /************************************* JOB STATES AND COMMANDS ********************************************/
 
-    protected void syncRetrieve(MatSciJobPermanentInfo jpinfo) {
+    /**
+     * Prints the list of job states that describe every jobs in the Scheduler.
+     * The SchedulerState contains 3 list of jobs, pending, running, and finished.
+     * @return
+     * @throws NotConnectedException
+     * @throws PermissionException
+     */
+    public boolean schedulerState() throws NotConnectedException, PermissionException {
+        ensureConnection();
+        model.schedulerState_();
+        return true;
+    }
+
+    public boolean jobState(String jid) throws NotConnectedException, PermissionException {
+        ensureConnection();
+        model.jobState_(jid);
+        return true;
+    }
+
+    public boolean jobOutput(String jid) throws NotConnectedException, PermissionException {
+        ensureConnection();
+        model.output_(jid);
+        return true;
+    }
+
+    public boolean jobResult(String jid) throws NotConnectedException, PermissionException {
+        ensureConnection();
+        model.result_(jid);
+        return true;
+    }
+
+    public boolean pauseJob(String jid) throws NotConnectedException, PermissionException {
+        ensureConnection();
+        model.pause_(jid);
+        return true;
+    }
+
+    public boolean resumeJob(String jid) throws NotConnectedException, PermissionException {
+        ensureConnection();
+        model.resume_(jid);
+        return true;
+    }
+
+    public boolean killJob(String jid) throws NotConnectedException, PermissionException {
+        ensureConnection();
+        model.kill_(jid);
+        return true;
+    }
+
+    public boolean taskOutput(String jid, String tname) throws NotConnectedException, PermissionException {
+        ensureConnection();
+        model.toutput_(jid, tname);
+        return true;
+    }
+
+    public boolean taskResult(String jid, String tname) throws NotConnectedException, PermissionException {
+        ensureConnection();
+        model.tresult_(jid, tname, "0");
+        return true;
+    }
+
+    public boolean killTask(String jid, String tname) throws NotConnectedException, PermissionException {
+        ensureConnection();
+        model.killt_(jid, tname);
+        return true;
+    }
+
+    /**********************************************************************************************************/
+    /*********************************************** EVENTS  **************************************************/
+
+    /**
+     * Updates synchronously the list of results from the given job
+     *
+     */
+    protected void syncRetrieve(MatSciJobPermanentInfo jpinfo) throws NotConnectedException {
+        ensureConnection();
         String jid = jpinfo.getJobId();
         MatSciJobVolatileInfo jinfo = new MatSciJobVolatileInfo(jpinfo);
         if (currentJobs.get(jid) != null) {
@@ -282,6 +395,12 @@ public abstract class AOMatSciEnvironment<R, RL> implements Serializable, Schedu
 
     }
 
+    /**
+     * updates the result of the given job, using the information received from the scheduler
+     * @param jid
+     * @param jResult
+     * @param status
+     */
     protected void updateJobResult(String jid, JobResult jResult, JobStatus status) {
         // Getting the Job result from the Scheduler
         MatSciJobVolatileInfo jinfo = currentJobs.get(jid);
@@ -293,13 +412,13 @@ public abstract class AOMatSciEnvironment<R, RL> implements Serializable, Schedu
         jinfo.setJobFinished(true);
 
         Throwable mainException = null;
-        if (schedulerStopped) {
+        if (schedulerStopped || schedulerKilled) {
             mainException = new IllegalStateException("The Scheduler has been killed.");
         } else if (jinfo.getStatus() == JobStatus.KILLED) {
             mainException = new IllegalStateException("The Job " + jid + " has been killed.");
         }
 
-        if (schedulerStopped || jinfo.getStatus() == JobStatus.KILLED ||
+        if (schedulerStopped || schedulerKilled || jinfo.getStatus() == JobStatus.KILLED ||
             jinfo.getStatus() == JobStatus.CANCELED) {
 
             int depth = jinfo.getDepth();
@@ -335,8 +454,13 @@ public abstract class AOMatSciEnvironment<R, RL> implements Serializable, Schedu
         }
     }
 
-    //abstract protected void handleResult(Throwable mainException, TaskResult res, String jid, int tid, int d);
-
+    /**
+     * Updates the result of a task, using the information retrived from the scheduler
+     * @param mainException if an exception occurred globally, such as a job killed
+     * @param res result object received from the scheduler
+     * @param jid job id
+     * @param tname name of the task
+     */
     protected void updateTaskResult(Throwable mainException, TaskResult res, String jid, String tname) {
         MatSciJobVolatileInfo jinfo = currentJobs.get(jid);
 
@@ -402,6 +526,12 @@ public abstract class AOMatSciEnvironment<R, RL> implements Serializable, Schedu
 
     }
 
+    /**
+     * checks that the given URL is reachable (abandoned behaviour)
+     * @param script
+     * @return
+     * @throws Exception
+     */
     protected boolean checkScript(URL script) throws Exception {
         // We verify that the scripts are available (otherwise we just ignore it)
         boolean answer = true;
@@ -427,7 +557,7 @@ public abstract class AOMatSciEnvironment<R, RL> implements Serializable, Schedu
     }
 
     /**
-     * User-side waiting for the results of one task
+     * User-side waiting method for the results of one task
      * @param jid
      * @param tname
      * @return
@@ -435,7 +565,7 @@ public abstract class AOMatSciEnvironment<R, RL> implements Serializable, Schedu
     protected abstract RL waitResultOfTask(String jid, String tname);
 
     /**
-     * terminate
+     * terminates the current AO
      */
     public void terminate() {
         this.terminated = true;
@@ -449,14 +579,28 @@ public abstract class AOMatSciEnvironment<R, RL> implements Serializable, Schedu
             case KILLED:
             case SHUTDOWN:
             case SHUTTING_DOWN:
+                if (debug) {
+                    logger.debug("[AOMatSciEnvironment] Received " + eventType.toString() + " event");
+                }
+                schedulerKilled = true;
+                for (String jid : currentJobs.keySet()) {
+                    updateJobResult(jid, null, JobStatus.KILLED);
+                }
+                break;
             case STOPPED:
                 if (debug) {
                     logger.debug("[AOMatSciEnvironment] Received " + eventType.toString() + " event");
                 }
-                schedulerStopped = true;
                 for (String jid : currentJobs.keySet()) {
                     updateJobResult(jid, null, JobStatus.KILLED);
                 }
+                schedulerStopped = true;
+                break;
+            case RESUMED:
+                if (debug) {
+                    logger.debug("[AOMatSciEnvironment] Received " + eventType.toString() + " event");
+                }
+                schedulerStopped = false;
                 break;
         }
 
@@ -633,13 +777,13 @@ public abstract class AOMatSciEnvironment<R, RL> implements Serializable, Schedu
             for (Map.Entry<String, MatSciJobVolatileInfo<R>> entry : clonedJobIds.entrySet()) {
                 MatSciJobVolatileInfo<R> jinfo = entry.getValue();
                 String jid = entry.getKey();
-                if (jinfo.isJobFinished() || schedulerStopped) {
+                if (jinfo.isJobFinished() || schedulerStopped || schedulerKilled) {
 
                     servePendingWaitAll(service, jid, jinfo);
                 }
                 for (String tname : jinfo.getFinalTasksNames()) {
-                    if (jinfo.isJobFinished() || schedulerStopped || jinfo.getResult(tname) != null ||
-                        jinfo.getException(tname) != null) {
+                    if (jinfo.isJobFinished() || schedulerStopped || schedulerKilled ||
+                        jinfo.getResult(tname) != null || jinfo.getException(tname) != null) {
 
                         servePending(service, jid, jinfo, tname);
                     }
@@ -660,7 +804,6 @@ public abstract class AOMatSciEnvironment<R, RL> implements Serializable, Schedu
             if (debug) {
                 System.out.println("[AOMatSciEnvironment] serving waitAllResults for job " + jid);
             }
-            waitAllResultsJobID = jid;
             jinfo.setPendingWaitAllRequest(null);
             service.serve(req);
         }
@@ -677,7 +820,6 @@ public abstract class AOMatSciEnvironment<R, RL> implements Serializable, Schedu
             if (debug) {
                 System.out.println("[AOMatSciEnvironment] serving waitResult " + tname + " for job " + jid);
             }
-            waitAllResultsJobID = jid;
             jinfo.setPendingRequest(tname, null);
             service.serve(req);
         }

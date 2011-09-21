@@ -43,6 +43,7 @@ import java.util.Arrays;
 import java.util.TreeSet;
 
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
+import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.exception.UserException;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
@@ -56,12 +57,7 @@ import org.ow2.proactive.scheduler.ext.matlab.common.PASolveMatlabGlobalConfig;
 import org.ow2.proactive.scheduler.ext.matlab.common.PASolveMatlabTaskConfig;
 import org.ow2.proactive.scheduler.ext.matlab.common.exception.MatlabTaskException;
 import org.ow2.proactive.scheduler.ext.matlab.worker.MatlabExecutable;
-import org.ow2.proactive.scheduler.ext.matsci.client.AOMatSciEnvironment;
-import org.ow2.proactive.scheduler.ext.matsci.client.MatSciJobPermanentInfo;
-import org.ow2.proactive.scheduler.ext.matsci.client.MatSciJobVolatileInfo;
-import org.ow2.proactive.scheduler.ext.matsci.client.MatSciTaskStatus;
-import org.ow2.proactive.scheduler.ext.matsci.client.PASolveException;
-import org.ow2.proactive.scheduler.ext.matsci.client.Pair;
+import org.ow2.proactive.scheduler.ext.matsci.client.*;
 import org.ow2.proactive.scripting.InvalidScriptException;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.scripting.SimpleScript;
@@ -93,7 +89,7 @@ public class AOMatlabEnvironment extends AOMatSciEnvironment<Boolean, MatlabResu
         }
 
         Throwable t = null;
-        if (schedulerStopped) {
+        if (schedulerStopped || schedulerKilled) {
             answer.setStatus(MatSciTaskStatus.GLOBAL_ERROR);
             answer.setException(new PASolveException("[AOMatlabEnvironment] The scheduler has been stopped"));
         } else if (jinfo.getStatus() == JobStatus.KILLED) {
@@ -134,7 +130,8 @@ public class AOMatlabEnvironment extends AOMatSciEnvironment<Boolean, MatlabResu
         return waitResultOfTask(jid, tname);
     }
 
-    public ArrayList<MatlabResultsAndLogs> retrieve(MatSciJobPermanentInfo jpinfo) {
+    public ArrayList<MatlabResultsAndLogs> retrieve(MatSciJobPermanentInfo jpinfo)
+            throws NotConnectedException {
 
         syncRetrieve(jpinfo);
         ArrayList<MatlabResultsAndLogs> answers = new ArrayList<MatlabResultsAndLogs>(jpinfo.getNbres());
@@ -153,9 +150,11 @@ public class AOMatlabEnvironment extends AOMatSciEnvironment<Boolean, MatlabResu
     public Pair<MatSciJobPermanentInfo, ArrayList<MatlabResultsAndLogs>> solve(
             PASolveMatlabGlobalConfig config, PASolveMatlabTaskConfig[][] taskConfigs) throws Throwable {
 
-        if (schedulerStopped) {
+        if (schedulerStopped || schedulerKilled) {
             throw new RuntimeException("[AOMatlabEnvironment] the Scheduler is stopped");
         }
+        ensureConnection();
+
         // We store the script selecting the nodes to use it later at termination.
         debug = config.isDebug();
 

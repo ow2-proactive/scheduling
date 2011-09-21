@@ -1,0 +1,48 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+      <link rel="stylesheet" href="file:////usr/local/matlab2009b/toolbox/matlab/helptools/private/helpwin.css">
+      <title>M-File Help: PAgetResults</title>
+   </head>
+   <body>
+      <!--Single-page help-->
+      <table border="0" cellspacing="0" width="100%">
+         <tr class="subheader">
+            <td class="headertitle">M-File Help: PAgetResults</td>
+            <td class="subheader-left"><a href="matlab:open PAgetResults">View code for PAgetResults</a></td>
+            <td class="subheader-right"><a href="matlab:helpwin">Default Topics</a></td>
+         </tr>
+      </table>
+      <div class="title">PAgetResults</div>
+      <div class="helptext"><pre><!--helptext -->  <span class="helptopic">PAgetResults</span> results from a job
+ 
+  Syntax
+ 
+        &gt;&gt; res = <span class="helptopic">PAgetResults</span>(jobid);
+ 
+  Inputs
+        
+        jobid - the id of the job (string or numeric)
+ 
+  Ouputs
+ 
+        res - an array of PAresult objects
+  
+  Description
+ 
+        <span class="helptopic">PAgetResults</span> is used to retrieve results of a PAsolve call from a
+        previous Matlab session (Disconnected mode).
+        The array of objects returned is the same returned by
+        the initial call to PAsolve during the previous session. Calls to
+        PAwaitFor or PAwaitAny can be done on this array if some results
+        are not available yet.
+ 
+  Example
+         &gt;&gt; res = <span class="helptopic">PAgetResults</span>('1')
+ 
+  
+ 
+        PAsolve, PAResult/PAwaitFor, PAResult/PAwaitAny</pre></div><!--after help --><!--seeAlso--><div class="footerlinktitle">See also</div><div class="footerlink"></div>
+   </body>
+</html>
