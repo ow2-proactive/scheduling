@@ -63,6 +63,8 @@ import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.Parser;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
+import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.config.xml.ProActiveConfigurationParser;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeFactory;
@@ -74,6 +76,7 @@ import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProper
 import org.ow2.proactive.resourcemanager.exception.AddingNodesException;
 import org.ow2.proactive.resourcemanager.frontend.RMConnection;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
+import org.ow2.proactive.resourcemanager.nodesource.dataspace.DataSpaceNodeConfigurationAgent;
 import org.ow2.proactive.utils.console.JVMPropertiesPreloader;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -104,6 +107,9 @@ public class RMNodeStarter {
 
     /** Name of the java property to set the rank */
     protected final static String RANK_PROP_NAME = "proactive.agent.rank";
+
+    /** Name of the java property to set the data spaces configuration status */
+    public final static String DATASPACES_STATUS_PROP_NAME = "proactive.dataspaces.status";
 
     /**
      * The starter will try to connect to the Resource Manager before killing
@@ -280,6 +286,7 @@ public class RMNodeStarter {
         this.nodeURL = node.getNodeInformation().getURL();
         System.out.println(this.nodeURL);
 
+        configureForDataSpace(node);
         if (nodeSourceName != null && nodeSourceName.length() > 0) {
             // setting system the property with node source name 
             System.setProperty(NODESOURCE_PROP_NAME, nodeSourceName);
@@ -323,6 +330,28 @@ public class RMNodeStarter {
                 // Force system exit to bypass daemon threads
                 System.err.println(ExitStatus.RMNODE_EXIT_FORCED.description);
                 System.exit(ExitStatus.RMNODE_EXIT_FORCED.exitCode);
+            }
+        }
+    }
+
+    /**
+     * Configure node for dataSpaces
+     *
+     * @param node the node to be configured
+     */
+    private void configureForDataSpace(Node node) {
+
+        try {
+            DataSpaceNodeConfigurationAgent conf = (DataSpaceNodeConfigurationAgent) PAActiveObject
+                    .newActive(DataSpaceNodeConfigurationAgent.class.getName(), null, node);
+            conf.configureNode();
+            node.setProperty(DATASPACES_STATUS_PROP_NAME, Boolean.TRUE.toString());
+        } catch (Throwable t) {
+            logger.error("Cannot configure dataSpace", t);
+            try {
+                node.setProperty(DATASPACES_STATUS_PROP_NAME, t.getMessage());
+            } catch (ProActiveException e) {
+                logger.error("Cannot contact the node", e);
             }
         }
     }

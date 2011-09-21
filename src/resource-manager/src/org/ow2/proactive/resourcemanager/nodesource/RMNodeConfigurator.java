@@ -47,6 +47,7 @@ import org.ow2.proactive.resourcemanager.core.RMCore;
 import org.ow2.proactive.resourcemanager.nodesource.dataspace.DataSpaceNodeConfigurationAgent;
 import org.ow2.proactive.resourcemanager.rmnode.RMNode;
 import org.ow2.proactive.resourcemanager.utils.RMLoggers;
+import org.ow2.proactive.resourcemanager.utils.RMNodeStarter;
 
 
 /**
@@ -76,7 +77,20 @@ public class RMNodeConfigurator {
         String nodeURL = rmnodeToAdd.getNodeURL();
         try {
             Node nodeToAdd = rmnodeToAdd.getNode();
-            configureForDataSpace(nodeToAdd);
+
+            String dataSpaceStatus = nodeToAdd.getProperty(RMNodeStarter.DATASPACES_STATUS_PROP_NAME);
+            if (dataSpaceStatus == null) {
+                // no data space configured on the node
+                logger.debug("Configuring data spaces for node " + nodeToAdd.getNodeInformation().getURL());
+                configureForDataSpace(nodeToAdd);
+            } else if (!dataSpaceStatus.equals(Boolean.TRUE.toString())) {
+                // there was a problem of data space configuring
+                logger.error("Cannot configure data spaces : " + dataSpaceStatus);
+            } else {
+                // data space is configured
+                logger.debug("Data spaces is already configured for node " +
+                    nodeToAdd.getNodeInformation().getURL());
+            }
             // blocking call involving running ping process on the node
             RMCore.topologyManager.addNode(nodeToAdd);
             rmcore.internalAddNodeToCore(nodeURL);
