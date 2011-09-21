@@ -35,7 +35,7 @@ function outputs = PAsolve(varargin)
             NN = size(Tasks,2);
             MM = size(Tasks,1);
         else
-            NN=nargin;
+            NN=argn(2);
             MM = -1;
             for i=1:NN
                 if typeof(varargin(i)) == 'PATask'
@@ -365,7 +365,7 @@ function outputs = PAsolve(varargin)
 
     end
     outputs = PAResL(results);
-
+    jremove(solver, solve_config, task_configs);
 
 endfunction
 
