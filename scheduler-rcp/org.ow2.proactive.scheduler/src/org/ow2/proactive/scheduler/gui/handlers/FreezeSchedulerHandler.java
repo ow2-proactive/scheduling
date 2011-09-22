@@ -39,12 +39,13 @@ package org.ow2.proactive.scheduler.gui.handlers;
 import org.ow2.proactive.scheduler.gui.actions.FreezeSchedulerAction;
 import org.ow2.proactive.scheduler.gui.actions.SchedulerGUIAction;
 
+
 public class FreezeSchedulerHandler extends SchedulerGUIAbstractHandler {
-	
-	@Override
-	protected SchedulerGUIAction createAction() {
-		FreezeSchedulerAction action = new FreezeSchedulerAction();
-		action.setEnabled(false);
-		return action;
-	}
+
+    @Override
+    protected SchedulerGUIAction createAction() {
+        FreezeSchedulerAction action = new FreezeSchedulerAction();
+        action.setEnabled(false);
+        return action;
+    }
 }

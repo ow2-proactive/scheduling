@@ -43,6 +43,7 @@ import org.eclipse.ui.AbstractSourceProvider;
 import org.eclipse.ui.ISources;
 import org.eclipse.ui.PlatformUI;
 
+
 /**
  * Provides a key and a value: the key is
  * org.ow2.proactive.resourcemanager.ShowActionsl;  the value is: showRMActions
@@ -57,43 +58,41 @@ import org.eclipse.ui.PlatformUI;
  */
 public class RMPerspectiveSourceProvider extends AbstractSourceProvider {
 
-	public final static String rmPerspectiveKey = "org.ow2.proactive.resourcemanager.ShowActions";
-	private final static String rmPerspective = "showRMActions";
-	private final static String otherPerspective = "hideRMActions";
+    public final static String rmPerspectiveKey = "org.ow2.proactive.resourcemanager.ShowActions";
+    private final static String rmPerspective = "showRMActions";
+    private final static String otherPerspective = "hideRMActions";
 
-	/**
-	 * true if the current perspective is the Resource Manager Perspective
-	 */
-	private boolean isRmPerspective = true;
+    /**
+     * true if the current perspective is the Resource Manager Perspective
+     */
+    private boolean isRmPerspective = true;
 
-	@Override
-	public void dispose() {
-		// TODO Auto-generated method stub
+    @Override
+    public void dispose() {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	@Override
-	public Map getCurrentState() {
-		Map<String, String> currentState = new HashMap<String, String>(1);
-		String currentState1 = isRmPerspective ? rmPerspective
-				: otherPerspective;
-		currentState.put(rmPerspectiveKey, currentState1);
-		return currentState;
-	}
+    @Override
+    public Map getCurrentState() {
+        Map<String, String> currentState = new HashMap<String, String>(1);
+        String currentState1 = isRmPerspective ? rmPerspective : otherPerspective;
+        currentState.put(rmPerspectiveKey, currentState1);
+        return currentState;
+    }
 
-	@Override
-	public String[] getProvidedSourceNames() {
-		return new String[] { rmPerspectiveKey };
-	}
+    @Override
+    public String[] getProvidedSourceNames() {
+        return new String[] { rmPerspectiveKey };
+    }
 
-	public void perspectiveChanged(boolean isRMPerspective) {
-		if (this.isRmPerspective == isRMPerspective)
-			return; // no change
+    public void perspectiveChanged(boolean isRMPerspective) {
+        if (this.isRmPerspective == isRMPerspective)
+            return; // no change
 
-		this.isRmPerspective = isRMPerspective;
-		String currentState = isRmPerspective ? rmPerspective
-				: otherPerspective;
-		fireSourceChanged(ISources.WORKBENCH, rmPerspectiveKey, currentState);
-	}
+        this.isRmPerspective = isRMPerspective;
+        String currentState = isRmPerspective ? rmPerspective : otherPerspective;
+        fireSourceChanged(ISources.WORKBENCH, rmPerspectiveKey, currentState);
+    }
 
 }

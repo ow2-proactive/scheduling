@@ -62,7 +62,7 @@ public class FreezeSchedulerAction extends SchedulerGUIAction {
     @Override
     public void run() {
         SchedulerProxy.getInstance().freeze();
-     // poor design led to the connection being impossible if the JobView is not visible...
+        // poor design led to the connection being impossible if the JobView is not visible...
         try {
             PlatformUI.getWorkbench().getActiveWorkbenchWindow().getPages()[0].showView(SeparatedJobView.ID,
                     null, IWorkbenchPage.VIEW_ACTIVATE);

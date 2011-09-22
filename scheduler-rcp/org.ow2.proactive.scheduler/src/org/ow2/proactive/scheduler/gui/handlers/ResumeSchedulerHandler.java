@@ -39,12 +39,13 @@ package org.ow2.proactive.scheduler.gui.handlers;
 import org.ow2.proactive.scheduler.gui.actions.ResumeSchedulerAction;
 import org.ow2.proactive.scheduler.gui.actions.SchedulerGUIAction;
 
+
 public class ResumeSchedulerHandler extends SchedulerGUIAbstractHandler {
-	
-	@Override
-	protected SchedulerGUIAction createAction() {
-		ResumeSchedulerAction action = new ResumeSchedulerAction();
-		action.setEnabled(false);
-		return action;
-	}
+
+    @Override
+    protected SchedulerGUIAction createAction() {
+        ResumeSchedulerAction action = new ResumeSchedulerAction();
+        action.setEnabled(false);
+        return action;
+    }
 }

@@ -39,15 +39,14 @@ package org.ow2.proactive.scheduler.gui.handlers;
 import org.eclipse.jface.action.Action;
 import org.ow2.proactive.scheduler.gui.actions.ShowRuntimeDataAction;
 
-public class ShowRuntimeDataHandler extends  JMXAbstractHandler {
-	
 
-	@Override
-	protected Action createAction() throws Exception {
-		Action  a = new ShowRuntimeDataAction();
-		a.setEnabled(false);
-		return a;
-	}
+public class ShowRuntimeDataHandler extends JMXAbstractHandler {
 
-	
+    @Override
+    protected Action createAction() throws Exception {
+        Action a = new ShowRuntimeDataAction();
+        a.setEnabled(false);
+        return a;
+    }
+
 }

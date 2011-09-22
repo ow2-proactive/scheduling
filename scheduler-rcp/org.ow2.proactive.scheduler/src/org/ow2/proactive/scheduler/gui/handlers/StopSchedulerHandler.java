@@ -42,27 +42,26 @@ import org.eclipse.core.commands.HandlerEvent;
 import org.ow2.proactive.scheduler.gui.actions.SchedulerGUIAction;
 import org.ow2.proactive.scheduler.gui.actions.StopSchedulerAction;
 
+
 public class StopSchedulerHandler extends SchedulerGUIAbstractHandler {
-	@Override
-	protected SchedulerGUIAction createAction() {
-		StopSchedulerAction action = new StopSchedulerAction();
-		action.setEnabled(false);
-		return action;
-	}
+    @Override
+    protected SchedulerGUIAction createAction() {
+        StopSchedulerAction action = new StopSchedulerAction();
+        action.setEnabled(false);
+        return action;
+    }
 
-	@Override
-	public Object execute(ExecutionEvent event) throws ExecutionException {
-		getAction().run();
-		this.setBaseEnabled(false);
-		fireHandlerChanged(new HandlerEvent(this, true, false));
-		return null;
-	}
+    @Override
+    public Object execute(ExecutionEvent event) throws ExecutionException {
+        getAction().run();
+        this.setBaseEnabled(false);
+        fireHandlerChanged(new HandlerEvent(this, true, false));
+        return null;
+    }
 
-	
-	@Override
-	public void setEnabled(Object context)
-	{
-		setBaseEnabled(getAction().isEnabled());
-	}
-	
+    @Override
+    public void setEnabled(Object context) {
+        setBaseEnabled(getAction().isEnabled());
+    }
+
 }

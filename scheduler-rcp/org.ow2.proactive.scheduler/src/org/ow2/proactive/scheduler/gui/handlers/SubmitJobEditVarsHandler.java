@@ -39,11 +39,12 @@ package org.ow2.proactive.scheduler.gui.handlers;
 import org.ow2.proactive.scheduler.gui.actions.SchedulerGUIAction;
 import org.ow2.proactive.scheduler.gui.actions.SubmitJobAction;
 
+
 public class SubmitJobEditVarsHandler extends SchedulerGUIAbstractHandler {
-	@Override
-	protected SchedulerGUIAction createAction() {
-		SubmitJobAction action = new SubmitJobAction(true);
-		action.setEnabled(true);
-		return action;
-	}
+    @Override
+    protected SchedulerGUIAction createAction() {
+        SubmitJobAction action = new SubmitJobAction(true);
+        action.setEnabled(true);
+        return action;
+    }
 }

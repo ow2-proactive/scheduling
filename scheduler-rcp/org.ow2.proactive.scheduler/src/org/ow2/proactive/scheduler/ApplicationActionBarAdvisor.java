@@ -49,10 +49,9 @@ import org.eclipse.ui.application.IActionBarConfigurer;
 
 public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
-	// help
+    // help
     private IWorkbenchAction aboutAction;
 
-    
     public ApplicationActionBarAdvisor(IActionBarConfigurer configurer) {
         super(configurer);
     }
@@ -76,7 +75,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
     }
 
     @Override
-	protected void fillCoolBar(ICoolBarManager coolBar) {
+    protected void fillCoolBar(ICoolBarManager coolBar) {
 
-	}
+    }
 }

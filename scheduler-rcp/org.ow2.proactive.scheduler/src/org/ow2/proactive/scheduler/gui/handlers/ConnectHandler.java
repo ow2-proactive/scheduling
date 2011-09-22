@@ -39,9 +39,10 @@ package org.ow2.proactive.scheduler.gui.handlers;
 import org.ow2.proactive.scheduler.gui.actions.ConnectAction;
 import org.ow2.proactive.scheduler.gui.actions.SchedulerGUIAction;
 
+
 public class ConnectHandler extends SchedulerGUIAbstractHandler {
-	@Override
-	protected SchedulerGUIAction createAction() {
-		return new ConnectAction(); 
-	}
+    @Override
+    protected SchedulerGUIAction createAction() {
+        return new ConnectAction();
+    }
 }

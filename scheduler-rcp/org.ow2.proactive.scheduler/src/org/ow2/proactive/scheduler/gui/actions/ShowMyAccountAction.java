@@ -65,7 +65,6 @@ public final class ShowMyAccountAction extends JMXAbstractAction {
 
     public static final String NAME = "My Account";
 
-    
     /** The URL of the configuration file */
     private final URL configFileURL;
 
@@ -113,8 +112,8 @@ public final class ShowMyAccountAction extends JMXAbstractAction {
             // true for activate
             if (!JMXActionsManager.activateIfFound(NAME, true)) {
                 // Acquire the connection
-                final MBeanServerConnection con = JMXActionsManager.getInstance().getJMXClientHelper().getConnector()
-                        .getMBeanServerConnection();
+                final MBeanServerConnection con = JMXActionsManager.getInstance().getJMXClientHelper()
+                        .getConnector().getMBeanServerConnection();
                 // Open new editor based on the descriptor
                 ChartItDataEditor
                         .openNewFromResourceDescriptor((IResourceDescriptor) new MyAccountResourceDescriptor(

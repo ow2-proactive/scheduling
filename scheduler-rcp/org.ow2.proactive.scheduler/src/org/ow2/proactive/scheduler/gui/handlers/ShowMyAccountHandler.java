@@ -39,15 +39,14 @@ package org.ow2.proactive.scheduler.gui.handlers;
 import org.eclipse.jface.action.Action;
 import org.ow2.proactive.scheduler.gui.actions.ShowMyAccountAction;
 
-public class ShowMyAccountHandler extends  JMXAbstractHandler {
-	
 
-	@Override
-	protected Action createAction() throws Exception {
-		Action  a = new ShowMyAccountAction();
-		a.setEnabled(false);
-		return a;
-	}
+public class ShowMyAccountHandler extends JMXAbstractHandler {
 
-	
+    @Override
+    protected Action createAction() throws Exception {
+        Action a = new ShowMyAccountAction();
+        a.setEnabled(false);
+        return a;
+    }
+
 }

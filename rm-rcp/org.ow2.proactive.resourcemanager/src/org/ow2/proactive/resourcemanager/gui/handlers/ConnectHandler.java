@@ -102,58 +102,61 @@ public class ConnectHandler extends AbstractHandler implements IHandler {
                 }
             });
         } else if (!dialogResult.isCanceled()) {
-        	//perform connection in a new thread, non graphic
-        	Job job = new Job("Downloading RM state, please wait...") {
+            //perform connection in a new thread, non graphic
+            Job job = new Job("Downloading RM state, please wait...") {
 
-        		@Override
-        		protected IStatus run(IProgressMonitor monitor) {
-        			try {
-        				RMStore.newInstance(dialogResult.getUrl(), dialogResult.getLogin(), 
-        						dialogResult.getPassword(), dialogResult.getCredentials());
+                @Override
+                protected IStatus run(IProgressMonitor monitor) {
+                    try {
+                        RMStore.newInstance(dialogResult.getUrl(), dialogResult.getLogin(), dialogResult
+                                .getPassword(), dialogResult.getCredentials());
 
-        				RMStatusBarItem.getInstance().setText("connected");
+                        RMStatusBarItem.getInstance().setText("connected");
 
-        				return Status.OK_STATUS;
+                        return Status.OK_STATUS;
 
-        			} catch (final Throwable t) {
-        				
-        				// Status.WARNING used (instead of Status.ERROR) to avoid the appearance of an eclipse's error dialog
-        				return new Status(Status.WARNING, "rm.rcp", "Could not connect to the Resource Manager ", t);
-        			}
-        		}
-        		
-        		@Override
-        		protected void canceling() {
-        			// canceling connection
-        		}
-        	};
-        	
-        	job.addJobChangeListener(new JobChangeAdapter() {
-        		@Override
-        		public void done(IJobChangeEvent event) {
-        			Job job = event.getJob();
-        			
-        			if (job.getResult().isOK()) return;
-        			
-        			RMStatusBarItem.getInstance().setText("disconnected");
+                    } catch (final Throwable t) {
 
-        			Throwable t = job.getResult().getException();
-        			MessageDialog.openError(Display.getDefault().getActiveShell(), "Couldn't connect to resource manager", t.getMessage());
-    				if (t != null) {
-	    				Activator.log(IStatus.ERROR, "Could not connect to the Resource Manager ", t);
-	    				t.printStackTrace();
-    				}
-    				
-    				try {
-    					// trying to disconnect in any case
-    					RMStore.getInstance().getResourceManager().disconnect();
-    				} catch (Throwable thr) {
-    				}
-        		}
-        	});
-        	
-        	job.setUser(true);
-        	job.schedule();
+                        // Status.WARNING used (instead of Status.ERROR) to avoid the appearance of an eclipse's error dialog
+                        return new Status(Status.WARNING, "rm.rcp",
+                            "Could not connect to the Resource Manager ", t);
+                    }
+                }
+
+                @Override
+                protected void canceling() {
+                    // canceling connection
+                }
+            };
+
+            job.addJobChangeListener(new JobChangeAdapter() {
+                @Override
+                public void done(IJobChangeEvent event) {
+                    Job job = event.getJob();
+
+                    if (job.getResult().isOK())
+                        return;
+
+                    RMStatusBarItem.getInstance().setText("disconnected");
+
+                    Throwable t = job.getResult().getException();
+                    MessageDialog.openError(Display.getDefault().getActiveShell(),
+                            "Couldn't connect to resource manager", t.getMessage());
+                    if (t != null) {
+                        Activator.log(IStatus.ERROR, "Could not connect to the Resource Manager ", t);
+                        t.printStackTrace();
+                    }
+
+                    try {
+                        // trying to disconnect in any case
+                        RMStore.getInstance().getResourceManager().disconnect();
+                    } catch (Throwable thr) {
+                    }
+                }
+            });
+
+            job.setUser(true);
+            job.schedule();
         }
 
         fireHandlerChanged(new HandlerEvent(this, true, false));

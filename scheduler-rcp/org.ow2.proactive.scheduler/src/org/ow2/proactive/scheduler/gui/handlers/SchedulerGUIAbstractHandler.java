@@ -44,50 +44,38 @@ import org.ow2.proactive.scheduler.gui.actions.SchedulerGUIAction;
 import org.ow2.proactive.scheduler.gui.data.ActionsManager;
 
 
-
 public abstract class SchedulerGUIAbstractHandler extends AbstractHandler {
 
-	private SchedulerGUIAction action;
-	
-	public SchedulerGUIAbstractHandler()
-	{
-	    ActionsManager.getInstance().addHandler(this);
-	}
-	
-	
-	@Override
-	public Object execute(ExecutionEvent event) throws ExecutionException {
-		getAction().run();
-		//fireHandlerChanged(new HandlerEvent(this, true, false));
-		return null;
-	}
+    private SchedulerGUIAction action;
 
-	
-	@Override
-	public void setEnabled(Object context)
-	{
-		setBaseEnabled(getAction().isEnabled());
-	}
+    public SchedulerGUIAbstractHandler() {
+        ActionsManager.getInstance().addHandler(this);
+    }
 
-	protected SchedulerGUIAction getAction()
-	{
-		if (action == null)
-		{
-			action=createAction();
-		}
-		return action;
-	}
-	
-	
-	 public  void setEnabled(boolean connected, SchedulerStatus schedulerStatus, boolean admin,
-	            boolean jobSelected, boolean owner, boolean jobInFinishQueue)
-	 {
-		getAction().setEnabled( connected,  schedulerStatus,  admin,
-	             jobSelected,  owner,  jobInFinishQueue);
-		setBaseEnabled(getAction().isEnabled());
-	 }
+    @Override
+    public Object execute(ExecutionEvent event) throws ExecutionException {
+        getAction().run();
+        //fireHandlerChanged(new HandlerEvent(this, true, false));
+        return null;
+    }
 
-	
-	
-	protected abstract SchedulerGUIAction createAction();
+    @Override
+    public void setEnabled(Object context) {
+        setBaseEnabled(getAction().isEnabled());
+    }
+
+    protected SchedulerGUIAction getAction() {
+        if (action == null) {
+            action = createAction();
+        }
+        return action;
+    }
+
+    public void setEnabled(boolean connected, SchedulerStatus schedulerStatus, boolean admin,
+            boolean jobSelected, boolean owner, boolean jobInFinishQueue) {
+        getAction().setEnabled(connected, schedulerStatus, admin, jobSelected, owner, jobInFinishQueue);
+        setBaseEnabled(getAction().isEnabled());
+    }
+
+    protected abstract SchedulerGUIAction createAction();
 }

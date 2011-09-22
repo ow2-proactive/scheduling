@@ -39,12 +39,13 @@ package org.ow2.proactive.scheduler.gui.handlers;
 import org.ow2.proactive.scheduler.gui.actions.SchedulerGUIAction;
 import org.ow2.proactive.scheduler.gui.actions.ShutdownSchedulerAction;
 
+
 public class ShutdownSchedulerHandler extends SchedulerGUIAbstractHandler {
-	
-	@Override
-	protected SchedulerGUIAction createAction() {
-		ShutdownSchedulerAction action = new ShutdownSchedulerAction();
-		action.setEnabled(false);
-		return action;
-	}
+
+    @Override
+    protected SchedulerGUIAction createAction() {
+        ShutdownSchedulerAction action = new ShutdownSchedulerAction();
+        action.setEnabled(false);
+        return action;
+    }
 }
