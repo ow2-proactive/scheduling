@@ -213,9 +213,9 @@ function outputs = PAsolve(varargin)
                 selects = Tasks(j,i).SelectionScript;                
                 try
                     url = URL.new(selects);
-                    ok = true;
+                    ok = %t;
                 catch 
-                    ok = false;
+                    ok = %f;
                 end
                 jremove(url);
 
