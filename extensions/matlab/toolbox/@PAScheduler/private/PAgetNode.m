@@ -34,22 +34,13 @@
 %   * ################################################################
 %   * $$PROACTIVE_INITIAL_DEV$$
 %   */
-function this = PAScheduler(varargin)
 
-this.PAgetsolver = @PAgetsolver;
-this.PAgetNode = @PAgetNode;
-this.PAgetlogin = @PAgetlogin;
-this.findUsedToolboxes = @findUsedToolboxes;
-this.findDependency = @findDependency;
-this.PAaddDirToClean = @PAaddDirToClean;
-this.PAaddFileToClean = @PAaddFileToClean;
-this.PAgetInputDeployer = @PAgetInputDeployer;
-this.PAgetOutputDeployer = @PAgetOutputDeployer;
-this.PAprepare=@PAprepare;
-this.serialize=@serialize;
-this.PAJobInfo = @PAJobInfo;
-this.PATaskRepository = @PATaskRepository;
-this.logindlg=@logindlg;
-this.dumpState=@dumpState;
-
-this = class(this, 'PAScheduler');
+function res = PAgetNode(varargin)
+mlock
+persistent node
+if nargin == 1
+    node = varargin{1};
+elseif nargin ~= 0
+        error('two many arguments');    
+end
+res = node;

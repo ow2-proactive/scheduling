@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ProActiveUserProperties>
+    <properties>
+		<prop key="proactive.net.nolocal" value="true"/>
+        <prop key="proactive.rmi.port" value="1110"/>
+		<!--<prop key="proactive.rmi.port" value="1234"/>-->
+    </properties>
+    <javaProperties>
+    </javaProperties>
+</ProActiveUserProperties>

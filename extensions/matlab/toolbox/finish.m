@@ -56,15 +56,8 @@ try
         msg = [msg 'Do you want to enable disconnected mode ?'];
         button = questdlg(msg,'Disconnect','Yes','No','Yes');
         if strcmp(button, 'Yes')
-            if isnumeric(opt.CustomDataspaceURL) && isempty(opt.CustomDataspaceURL)
-                helper = org.ow2.proactive.scheduler.ext.matsci.client.DataspaceHelper.getInstance();
-                registryurl = helper.getUrl();
-            else
-                registryurl = [];
-            end
-            sched.PATaskRepository('save');
-            save(opt.DisconnectedModeFile, 'registryurl', '-append');
-            return;
+            sched.dumpState();
+            return;        
         end
     end
 

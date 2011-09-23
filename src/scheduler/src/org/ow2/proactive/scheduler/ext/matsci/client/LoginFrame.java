@@ -36,24 +36,15 @@
  */
 package org.ow2.proactive.scheduler.ext.matsci.client;
 
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 
 import javax.security.auth.login.LoginException;
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JPasswordField;
-import javax.swing.JTextField;
+import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-
-import org.ow2.proactive.scheduler.common.exception.SchedulerException;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.security.KeyException;
 
 
 /**
@@ -69,6 +60,8 @@ public class LoginFrame<E extends AOMatSciEnvironment> extends JDialog {
     private JButton login;
     private boolean loginSuccessful = false;
     private boolean recordListener = false;
+    private int nb_attempts = 0;
+    public static final int MAX_NB_ATTEMPTS = 3;
 
     /**
      * Creates a new LoginFrame
@@ -133,6 +126,7 @@ public class LoginFrame<E extends AOMatSciEnvironment> extends JDialog {
     }
 
     public boolean checkLogin() {
+        nb_attempts++;
         String name = username.getText();
         String pwd = new String(password.getPassword());
 
@@ -140,15 +134,26 @@ public class LoginFrame<E extends AOMatSciEnvironment> extends JDialog {
             aose.login(name, pwd);
             dispose();
             return true;
+        } catch (KeyException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(LoginFrame.this, "Incorrect Credential Key.", "Login Error",
+                    JOptionPane.ERROR_MESSAGE);
         } catch (LoginException ex) {
             JOptionPane.showMessageDialog(LoginFrame.this, "Incorrect username/password combination.",
                     "Login Error", JOptionPane.ERROR_MESSAGE);
         } catch (SchedulerException ex2) {
+            ex2.printStackTrace();
             JOptionPane.showMessageDialog(LoginFrame.this, ex2.getMessage(), "Login Error",
                     JOptionPane.ERROR_MESSAGE);
         }
-
+        if (nb_attempts > MAX_NB_ATTEMPTS) {
+            dispose();
+        }
         return false;
+    }
+
+    public int getNbAttempts() {
+        return nb_attempts;
     }
 
     private GridBagConstraints getConstraints(int x, int y, int width, int height) {
