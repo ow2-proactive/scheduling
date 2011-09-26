@@ -37,9 +37,6 @@
 package org.ow2.proactive.scheduler.ext.scilab.client;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.api.PAActiveObject;
-import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
@@ -63,7 +60,6 @@ import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.scripting.SimpleScript;
 import org.scilab.modules.types.ScilabType;
 
-import javax.security.auth.login.LoginException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.TreeSet;
@@ -394,18 +390,6 @@ public class AOScilabEnvironment extends AOMatSciEnvironment<ScilabType, ScilabR
 
     public ScilabResultsAndLogs waitResult(String jid, String tname) {
         return waitResultOfTask(jid, tname);
-    }
-
-    public static void main(String[] args) throws ActiveObjectCreationException, NodeException,
-            LoginException, SchedulerException {
-
-        AOScilabEnvironment aose = (AOScilabEnvironment) PAActiveObject.newActive(AOScilabEnvironment.class
-                .getName(), new Object[] {});
-        aose.join("//localhost");
-        aose.login("demo", "demo");
-        //ArrayList<ResultsAndLogs> ret = aose.solve(new String[] { "in=2" }, "out=in*in;", null, null,
-        //        JobPriority.NORMAL, true);
-        //System.out.println(ret);
     }
 
 }
