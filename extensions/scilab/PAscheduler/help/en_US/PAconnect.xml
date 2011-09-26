@@ -55,6 +55,12 @@ PAconnect('rmi://localhost:1099');
         <title>See Also</title>
         <simplelist type="inline">
             <member>
+                <link linkend="PAisConnected">PAisConnected</link>
+            </member>
+            <member>
+                <link linkend="PAdisconnect">PAdisconnect</link>
+            </member>
+            <member>
                 <link linkend="PAsolve">PAsolve</link>
             </member>
              <member>

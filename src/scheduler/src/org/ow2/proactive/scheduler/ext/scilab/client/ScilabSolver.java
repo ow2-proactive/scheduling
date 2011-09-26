@@ -109,6 +109,13 @@ public class ScilabSolver {
         }
     }
 
+    public static void disconnect() {
+        if (scilabEnv == null) {
+            throw new IllegalStateException("This session is not connected to a Scheduler.");
+        }
+        scilabEnv.disconnect();
+    }
+
     public static boolean isLoggedIn() {
         return isConnected() && scilabEnv.isLoggedIn();
     }

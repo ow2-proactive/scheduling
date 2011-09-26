@@ -45,7 +45,7 @@ function toolbox_proactivelib = startModule()
     // =============================================================================
     if or(getscilabmode() == ["NW";"STD"]) then
         mprintf("\tLoad help\n");
-        path_addchapter = pathconvert(root_tlbx+"/help");
+        path_addchapter = pathconvert(root_tlbx+"/jar");
         if ( isdir(path_addchapter) <> [] ) then
             add_help_chapter("Toolbox ProActive", path_addchapter, %F);
         end

@@ -188,6 +188,9 @@ public abstract class AOMatSciEnvironment<R, RL> implements Serializable, Schedu
                 SchedulerEvent.JOB_PENDING_TO_FINISHED, SchedulerEvent.KILLED, SchedulerEvent.SHUTDOWN,
                 SchedulerEvent.SHUTTING_DOWN, SchedulerEvent.STOPPED, SchedulerEvent.RESUMED,
                 SchedulerEvent.TASK_RUNNING_TO_FINISHED);
+        SchedulerStatus status = scheduler.getState().getStatus();
+        schedulerStopped = (status == SchedulerStatus.STOPPED);
+        schedulerKilled = (status == SchedulerStatus.KILLED);
 
         this.model = SchedulerModel.getModel(false);
         model.connectConsole(new StdOutConsole());
@@ -233,6 +236,24 @@ public abstract class AOMatSciEnvironment<R, RL> implements Serializable, Schedu
         if (lf != null)
             return lf.getNbAttempts();
         return 0;
+    }
+
+    public boolean disconnect() {
+        try {
+            this.scheduler.disconnect();
+        } catch (NotConnectedException e) {
+            e.printStackTrace();
+        } catch (PermissionException e) {
+            e.printStackTrace();
+        }
+        this.scheduler = null;
+        this.model = null;
+        this.auth = null;
+        loggedin = false;
+        joined = false;
+        schedulerKilled = false;
+        schedulerStopped = false;
+        return true;
     }
 
     /**

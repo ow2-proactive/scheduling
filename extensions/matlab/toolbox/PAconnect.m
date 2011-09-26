@@ -1,4 +1,4 @@
-function jobs = PAconnect(varargin)
+function jobs = PAconnect(url)
 % PAconnect connects to the ProActive scheduler
 %
 % Syntax
@@ -75,10 +75,6 @@ function jobs = PAconnect(varargin)
 %   * ################################################################
 %   * $$PROACTIVE_INITIAL_DEV$$
 %   */
-if nargin ~= 1 || ~ischar(varargin{1})
-    error('PAconnect::PAconnect accepts only one argument (the url to the scheduler)');
-end
-url = varargin{1};
 
 sched = PAScheduler;
 
