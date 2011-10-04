@@ -5,7 +5,7 @@
      name="Job" priority="low" projectName="myProject" cancelJobOnError="true">
 
   <variables>
-    <variable name="bin" value="${pa.scheduler.home}/classes/schedulerTests/functionaltests/workflow/" />
+    <variable name="bin" value="${pa.scheduler.home}/classes/schedulerTests/functionaltests/workflow" />
   </variables>
 
   <taskFlow>
@@ -34,17 +34,6 @@ runs=2;
       <depends>
         <task ref ="T" />
       </depends>
-	  <pre>
-		<script>
-		  <code language="javascript">
-// <![CDATA[
-importPackage(java.io);
-var f = new File("${pa.scheduler.home}/PRE_$IT_$REP");
-f.createNewFile();
-// ]]>
-		  </code>
-		</script>
-	  </pre>
 	  <nativeExecutable>
         <staticCommand value="${bin}/it.sh">
 		  <arguments>
@@ -54,17 +43,6 @@ f.createNewFile();
 		  </arguments>
 		</staticCommand>
 	  </nativeExecutable>
-	  <post>
-		<script>
-		  <code language="javascript">
-// <![CDATA[
-importPackage(java.io);
-var f = new File("${pa.scheduler.home}/POST_$IT_$REP");
-f.createNewFile();
-// ]]>
-		  </code>
-		</script>
-	  </post>
     </task>
     <task name="T2" maxNumberOfExecution="4">
       <description> // <![CDATA[
@@ -83,7 +61,7 @@ f.createNewFile();
 importPackage(java.io);
 var ID   = 3;
 var RUNS = 2;
-var f = new File(".test_flow_lock_" + ID);
+var f = new File("test_flow_lock_" + ID);
 var it = 0;
 if (f.exists()) {
 var input = new BufferedReader(new FileReader(f));
