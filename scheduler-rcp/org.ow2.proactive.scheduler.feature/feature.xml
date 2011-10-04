@@ -24,17 +24,53 @@
          id="org.eclipse.birt"
          version="0.0.0"/>
 
+   <includes
+         id="org.eclipse.pde"
+         version="0.0.0"/>
+
+   <includes
+         id="org.eclipse.gef"
+         version="0.0.0"/>
+
+   <includes
+         id="org.eclipse.draw2d"
+         version="0.0.0"/>
+
+   <includes
+         id="org.eclipse.datatools.enablement.oda.designer.feature"
+         version="0.0.0"/>
+
+   <includes
+         id="org.eclipse.equinox.p2.core.feature"
+         version="0.0.0"/>
+
+   <includes
+         id="org.eclipse.equinox.p2.discovery.feature"
+         version="0.0.0"/>
+
+   <includes
+         id="org.eclipse.pde"
+         version="0.0.0"/>
+
    <requires>
       <import plugin="org.eclipse.core.runtime" version="3.2.0" match="compatible"/>
       <import plugin="org.eclipse.help" version="3.2.0" match="compatible"/>
       <import plugin="org.eclipse.ui" version="3.5.0" match="compatible"/>
-      <import plugin="org.eclipse.ui.forms" version="3.3.0" match="compatible"/>
-      <import plugin="org.eclipse.ui.views" version="3.2.0" match="compatible"/>
-      <import plugin="org.eclipse.ui" version="3.3.0" match="compatible"/>
-      <import plugin="com.ibm.icu"/>
       <import plugin="org.eclipse.core.runtime" version="3.6.0" match="compatible"/>
       <import plugin="org.eclipse.jface" version="3.6.0" match="compatible"/>
       <import plugin="org.eclipse.osgi"/>
+      <import plugin="org.eclipse.core.runtime" version="3.3.0" match="compatible"/>
+      <import plugin="com.ibm.icu" version="3.4.4"/>
+      <import plugin="org.eclipse.datatools.connectivity.oda" version="3.2.0" match="compatible"/>
+      <import plugin="org.eclipse.datatools.connectivity" version="1.1.0" match="compatible"/>
+      <import plugin="org.eclipse.datatools.connectivity.oda" version="3.1.2" match="compatible"/>
+      <import plugin="org.eclipse.core.runtime" version="3.4.0" match="compatible"/>
+      <import plugin="org.eclipse.emf.ecore" version="2.4.0" match="compatible"/>
+      <import plugin="org.eclipse.emf.ecore.xmi" version="2.4.0" match="compatible"/>
+      <import plugin="org.eclipse.datatools.connectivity" version="1.1.3" match="compatible"/>
+      <import plugin="org.eclipse.datatools.connectivity.oda.consumer" version="3.2.3" match="compatible"/>
+      <import plugin="org.eclipse.core.resources" version="3.2.0" match="compatible"/>
+      <import plugin="com.ibm.icu" version="3.4.0"/>
       <import plugin="org.eclipse.core.expressions" version="3.2.0" match="compatible"/>
       <import plugin="org.eclipse.core.filesystem" version="1.1.0" match="compatible"/>
       <import plugin="org.eclipse.osgi" version="3.5.0" match="compatible"/>
@@ -46,7 +82,6 @@
       <import plugin="org.eclipse.equinox.app" version="1.0.0" match="compatible"/>
       <import plugin="org.eclipse.equinox.common" version="3.2.0" match="compatible"/>
       <import plugin="org.eclipse.equinox.registry" version="3.5.0" match="equivalent"/>
-      <import plugin="org.eclipse.core.runtime" version="3.3.0" match="compatible"/>
       <import plugin="org.eclipse.equinox.registry" version="3.2.0" match="compatible"/>
       <import plugin="org.eclipse.osgi" version="3.2.0" match="compatible"/>
       <import plugin="org.eclipse.jface.text" version="3.5.0" match="compatible"/>
@@ -71,6 +106,7 @@
       <import plugin="org.eclipse.core.resources" version="3.4.0" match="compatible"/>
       <import plugin="org.eclipse.jface.text" version="3.3.0" match="compatible"/>
       <import plugin="org.eclipse.ui.ide" version="3.3.0" match="compatible"/>
+      <import plugin="org.eclipse.ui.views" version="3.2.0" match="compatible"/>
       <import plugin="org.eclipse.ui.editors" version="3.5.0" match="compatible"/>
       <import plugin="org.eclipse.ui.forms" version="3.2.0" match="compatible"/>
       <import plugin="org.eclipse.swt" version="3.5.0" match="compatible"/>
@@ -78,14 +114,11 @@
       <import plugin="org.eclipse.ui" version="3.2.0" match="compatible"/>
       <import plugin="org.eclipse.birt.core.ui" version="2.1.0" match="compatible"/>
       <import plugin="org.eclipse.birt.chart.engine" version="2.1.0" match="compatible"/>
-      <import plugin="org.w3c.css.sac"/>
       <import plugin="org.eclipse.birt.core" version="2.1.0" match="compatible"/>
       <import plugin="org.eclipse.birt.report.model" version="2.1.0" match="compatible"/>
       <import plugin="org.eclipse.birt.data" version="2.1.0" match="compatible"/>
-      <import plugin="org.eclipse.birt.report.data.adapter"/>
-      <import plugin="org.apache.batik.transcoder"/>
-      <import plugin="org.apache.batik.css"/>
-      <import plugin="org.apache.batik.util"/>
+      <import plugin="org.eclipse.ui.forms" version="3.3.0" match="compatible"/>
+      <import plugin="org.eclipse.ui" version="3.3.0" match="compatible"/>
       <import plugin="org.eclipse.jface.databinding" version="1.3.0" match="compatible"/>
       <import plugin="org.eclipse.core.databinding.property" version="1.2.0" match="compatible"/>
       <import plugin="org.eclipse.core.databinding.observable" version="1.2.0" match="compatible"/>
@@ -95,7 +128,6 @@
       <import plugin="org.eclipse.birt.core" version="2.1.0"/>
       <import plugin="org.eclipse.birt.report.model" version="2.1.0"/>
       <import plugin="org.apache.batik.transcoder" version="1.6.0" match="compatible"/>
-      <import plugin="org.eclipse.core.resources" version="3.2.0" match="compatible"/>
       <import plugin="org.eclipse.ui.workbench.texteditor" version="3.2.0" match="compatible"/>
       <import plugin="org.eclipse.jface.text" version="3.2.0" match="compatible"/>
       <import plugin="org.eclipse.birt.data" version="2.1.0"/>
@@ -113,10 +145,250 @@
       <import plugin="org.eclipse.datatools.connectivity.oda" version="3.0.2" match="compatible"/>
       <import plugin="org.apache.commons.codec" version="1.3.0" match="compatible"/>
       <import plugin="org.w3c.sac" version="1.3.0" match="compatible"/>
-      <import plugin="org.eclipse.birt.chart.ui.extension"/>
-      <import plugin="org.eclipse.birt.chart.device.swt"/>
-      <import plugin="org.eclipse.birt.chart.engine.extension"/>
+      <import plugin="org.eclipse.core.variables" version="3.1.0" match="compatible"/>
+      <import plugin="javax.xml" version="1.3.4" match="compatible"/>
+      <import plugin="org.apache.xml.resolver" version="1.2.0" match="compatible"/>
+      <import plugin="org.apache.xml.serializer" version="2.7.1" match="compatible"/>
+      <import plugin="org.eclipse.emf.ecore" version="2.2.0" match="compatible"/>
+      <import plugin="org.eclipse.emf.ecore.xmi" version="2.2.0" match="compatible"/>
+      <import plugin="org.eclipse.birt.chart.ui" version="2.1.0"/>
+      <import plugin="org.eclipse.birt.chart.engine" version="2.1.0"/>
+      <import plugin="org.eclipse.datatools.connectivity.oda" version="3.1.0" match="compatible"/>
+      <import plugin="org.eclipse.birt.report.data.oda.jdbc" version="2.2.0"/>
+      <import plugin="org.eclipse.birt.report.data.oda.jdbc.ui" version="3.7.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.datatools.connectivity.oda.design.ui" version="3.0.4" match="compatible"/>
+      <import plugin="org.eclipse.birt.report.data.bidi.utils" version="2.5.1"/>
+      <import plugin="org.eclipse.birt.core" version="2.5.0"/>
+      <import plugin="org.eclipse.birt.report.data.bidi.utils.ui" version="2.5.1"/>
+      <import plugin="org.eclipse.birt.report.data.oda.jdbc" version="2.2.0" match="compatible"/>
+      <import plugin="org.apache.derby.core" version="10.1.2" match="compatible"/>
+      <import plugin="org.eclipse.ui.ide" version="3.2.0" match="compatible"/>
+      <import plugin="org.eclipse.jdt.core" version="3.2.0" match="compatible"/>
+      <import plugin="org.eclipse.jdt.ui" version="3.2.0" match="compatible"/>
+      <import plugin="org.eclipse.birt.report.designer.core" version="2.1.0" match="compatible"/>
+      <import plugin="org.eclipse.birt.report.designer.ui" version="2.1.0" match="compatible"/>
+      <import plugin="org.eclipse.birt.report.designer.ui.lib" version="2.1.0" match="compatible"/>
+      <import plugin="org.eclipse.birt.report.designer.ui.lib.explorer" version="2.1.0" match="compatible"/>
+      <import plugin="org.eclipse.birt.report.designer.ui.editors" version="2.1.0" match="compatible"/>
+      <import plugin="org.eclipse.birt.report.designer.ui.editors.schematic" version="2.1.0" match="compatible"/>
+      <import plugin="org.eclipse.jdt.launching" version="3.2.0" match="compatible"/>
+      <import plugin="org.eclipse.ui.cheatsheets" version="3.2.0" match="compatible"/>
+      <import plugin="org.eclipse.birt.report.designer.ui.views" version="2.2.0" match="compatible"/>
+      <import plugin="org.eclipse.pde.ui" version="3.2.0" match="compatible"/>
+      <import plugin="org.eclipse.core.filesystem" version="1.2.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.core.variables" version="3.2.100" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.birt.report.designer.ui" version="2.1.0"/>
+      <import plugin="org.eclipse.birt.report.designer.ui.views" version="2.2.0"/>
+      <import plugin="org.eclipse.birt.report.viewer" version="2.1.0"/>
+      <import plugin="org.eclipse.birt.report.engine.emitter.config" version="2.6.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.birt.report.engine" version="2.1.0" match="compatible"/>
+      <import plugin="org.eclipse.birt.report.data.adapter" version="2.5.1" match="compatible"/>
+      <import plugin="org.eclipse.datatools.modelbase.dbdefinition" version="0.9.0" match="compatible"/>
+      <import plugin="org.eclipse.datatools.modelbase.sql" version="0.9.0" match="compatible"/>
+      <import plugin="org.eclipse.datatools.connectivity.sqm.core" version="0.9.1" match="compatible"/>
+      <import plugin="org.eclipse.datatools.modelbase.derby" version="0.9.0" match="compatible"/>
+      <import plugin="org.eclipse.datatools.connectivity" version="0.9.1" match="compatible"/>
+      <import plugin="org.eclipse.emf.common" version="2.2.0" match="compatible"/>
+      <import plugin="org.eclipse.ui.navigator" version="3.2.0" match="compatible"/>
+      <import plugin="org.eclipse.datatools.connectivity.sqm.core.ui" version="0.9.1" match="compatible"/>
+      <import plugin="org.eclipse.datatools.connectivity.sqm.server.ui" version="0.9.1" match="compatible"/>
+      <import plugin="org.eclipse.datatools.connectivity.apache.derby" version="0.9.1" match="compatible"/>
+      <import plugin="org.eclipse.datatools.connectivity.ui" version="0.9.1" match="compatible"/>
+      <import plugin="org.eclipse.datatools.connectivity.ui" version="1.1.6" match="compatible"/>
+      <import plugin="org.eclipse.datatools.connectivity.oda.profile" version="3.2.2" match="compatible"/>
+      <import plugin="org.eclipse.datatools.connectivity.oda.design" version="3.2.0" match="compatible"/>
+      <import plugin="org.eclipse.datatools.connectivity.oda.consumer" version="3.2.0" match="compatible"/>
+      <import plugin="org.eclipse.ui.navigator" version="3.3.0" match="compatible"/>
+      <import plugin="org.eclipse.datatools.help" version="1.5.0" match="compatible"/>
+      <import plugin="org.eclipse.emf.ecore.change" version="2.2.0" match="compatible"/>
+      <import plugin="org.eclipse.datatools.enablement.oda.xml" version="1.2.0" match="compatible"/>
+      <import plugin="javax.wsdl" version="1.5.0" match="equivalent"/>
+      <import plugin="org.eclipse.datatools.connectivity.oda.design.ui" version="3.2.2" match="compatible"/>
+      <import plugin="org.eclipse.datatools.enablement.oda.ws" version="1.2.1" match="compatible"/>
+      <import plugin="org.eclipse.datatools.enablement.oda.xml.ui" version="1.2.0" match="compatible"/>
+      <import plugin="org.apache.xerces" version="2.8.0" match="compatible"/>
+      <import plugin="org.eclipse.datatools.connectivity.oda.design.ui" version="3.0.6" match="compatible"/>
+      <import plugin="org.eclipse.datatools.enablement.oda.xml" version="1.1.0" match="compatible"/>
+      <import plugin="org.eclipse.ui" version="3.6.0" match="compatible"/>
+      <import plugin="org.eclipse.ui.ide" version="3.6.0" match="compatible"/>
+      <import plugin="org.eclipse.core.resources" version="3.6.0" match="compatible"/>
+      <import plugin="org.eclipse.ui.navigator" version="3.5.0" match="compatible"/>
+      <import plugin="org.eclipse.ui.views.properties.tabbed" version="3.5.0" match="compatible"/>
+      <import plugin="org.eclipse.ui.workbench.texteditor" version="3.6.0" match="compatible"/>
+      <import plugin="org.eclipse.ltk.core.refactoring" version="3.5.0" match="compatible"/>
+      <import plugin="org.eclipse.ltk.ui.refactoring" version="3.5.0" match="compatible"/>
+      <import plugin="org.eclipse.core.runtime" version="3.1.0" match="compatible"/>
+      <import plugin="org.eclipse.team.core" version="3.2.0" match="compatible"/>
+      <import plugin="org.eclipse.update.configurator" version="3.1.0" match="compatible"/>
+      <import plugin="org.eclipse.text" version="3.1.0" match="compatible"/>
+      <import plugin="org.eclipse.core.filebuffers" version="3.2.0" match="compatible"/>
+      <import plugin="org.eclipse.pde.build" version="3.2.0" match="compatible"/>
+      <import plugin="org.eclipse.ant.core" version="3.1.0" match="compatible"/>
+      <import plugin="org.eclipse.equinox.simpleconfigurator.manipulator" version="2.0.0" match="compatible"/>
+      <import plugin="org.eclipse.equinox.frameworkadmin" version="2.0.0" match="compatible"/>
+      <import plugin="org.eclipse.debug.core" version="3.5.0" match="compatible"/>
+      <import plugin="org.eclipse.equinox.p2.engine" version="2.0.0" match="compatible"/>
+      <import plugin="org.eclipse.equinox.p2.core" version="2.0.0" match="compatible"/>
+      <import plugin="org.eclipse.equinox.p2.metadata" version="2.0.0" match="compatible"/>
+      <import plugin="org.eclipse.equinox.p2.director" version="2.0.0" match="compatible"/>
+      <import plugin="org.eclipse.equinox.p2.artifact.repository" version="1.0.100" match="compatible"/>
+      <import plugin="org.eclipse.equinox.p2.repository" version="2.0.0"/>
+      <import plugin="org.eclipse.equinox.p2.metadata.repository" version="1.0.100" match="compatible"/>
+      <import plugin="org.eclipse.equinox.p2.garbagecollector" version="1.0.100" match="compatible"/>
+      <import plugin="org.eclipse.equinox.p2.touchpoint.eclipse" version="2.0.0" match="compatible"/>
+      <import plugin="org.eclipse.pde.ui" version="3.4.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.pde.api.tools.ui"/>
+      <import plugin="org.eclipse.debug.ui"/>
+      <import plugin="org.eclipse.search"/>
+      <import plugin="org.eclipse.mylyn.java.ui"/>
+      <import plugin="org.eclipse.jdt.junit"/>
+      <import plugin="org.eclipse.jdt.debug.ui"/>
+      <import plugin="org.eclipse.mylyn.context.core" version="3.0.0" match="compatible"/>
+      <import plugin="org.eclipse.mylyn.context.ui" version="3.0.0" match="compatible"/>
+      <import plugin="org.eclipse.mylyn.ide.ui" version="3.0.0" match="compatible"/>
+      <import plugin="org.eclipse.mylyn.java.ui" version="3.0.0" match="compatible"/>
+      <import plugin="org.eclipse.mylyn.commons.core" version="3.0.0" match="compatible"/>
+      <import plugin="org.eclipse.mylyn.monitor.ui" version="3.0.0" match="compatible"/>
+      <import plugin="org.eclipse.mylyn.resources.ui" version="3.0.0" match="compatible"/>
+      <import plugin="org.eclipse.mylyn.monitor.core" version="3.0.0" match="compatible"/>
+      <import plugin="org.eclipse.core.filebuffers" version="3.3.0" match="compatible"/>
+      <import plugin="org.eclipse.core.resources" version="3.3.0" match="compatible"/>
+      <import plugin="org.eclipse.pde.core" version="3.3.0" match="compatible"/>
+      <import plugin="org.eclipse.text" version="3.3.0" match="compatible"/>
+      <import plugin="org.eclipse.jdt.core" version="3.4.0" match="compatible"/>
+      <import plugin="org.eclipse.jdt.junit.core" version="3.6.0" match="compatible"/>
+      <import plugin="org.eclipse.debug.core" version="3.2.0" match="compatible"/>
+      <import plugin="org.eclipse.pde.core" version="3.2.0" match="compatible"/>
+      <import plugin="org.eclipse.jdt.debug" version="3.2.0" match="compatible"/>
+      <import plugin="org.eclipse.core.filesystem" version="1.0.0" match="compatible"/>
+      <import plugin="org.eclipse.ui.forms" version="3.5.0" match="compatible"/>
+      <import plugin="org.eclipse.help" version="3.5.0" match="compatible"/>
+      <import plugin="org.eclipse.core.expressions" version="3.4.200" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.core.runtime" version="3.7.0" match="compatible"/>
+      <import plugin="org.eclipse.ui.ide" version="3.5.0" match="compatible"/>
+      <import plugin="org.eclipse.ui.workbench.texteditor" version="3.7.0" match="compatible"/>
+      <import plugin="org.eclipse.core.filebuffers" version="3.5.0" match="compatible"/>
+      <import plugin="org.eclipse.core.resources" version="3.5.0" match="compatible"/>
+      <import plugin="org.eclipse.core.filesystem" version="1.2.0" match="compatible"/>
+      <import plugin="org.eclipse.ui.workbench" version="3.7.0" match="compatible"/>
+      <import plugin="org.eclipse.update.configurator" version="3.1.100" match="compatible"/>
+      <import plugin="org.eclipse.birt.chart.device.extension" version="2.1.0"/>
+      <import plugin="org.eclipse.birt.report.item.crosstab.core" version="2.2.0" match="compatible"/>
+      <import plugin="org.eclipse.birt.data.aggregation" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.draw2d" version="3.2.0" match="compatible"/>
+      <import plugin="org.eclipse.ui.workbench" version="3.2.0" match="compatible"/>
+      <import plugin="org.eclipse.birt.chart.ui" version="2.1.0" match="compatible"/>
+      <import plugin="org.eclipse.birt.chart.ui.extension" version="2.5.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.birt.chart.reportitem" version="2.1.0" match="compatible"/>
+      <import plugin="org.eclipse.birt.report.data.adapter" version="2.1.0" match="compatible"/>
+      <import plugin="org.eclipse.birt.report.item.crosstab.ui" version="2.2.0" match="compatible"/>
+      <import plugin="org.eclipse.birt.report.designer.ui.cubebuilder" version="2.3.0" match="greaterOrEqual"/>
+      <import plugin="org.apache.xerces" version="2.9.0" match="compatible"/>
+      <import plugin="org.eclipse.birt.report.data.bidi.utils" version="2.5.1" match="compatible"/>
+      <import plugin="org.eclipse.birt.core" version="2.3.0" match="compatible"/>
+      <import plugin="org.eclipse.ecf.filetransfer"/>
+      <import plugin="org.eclipse.ecf"/>
+      <import plugin="org.eclipse.equinox.registry" version="3.3.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.ecf.provider.filetransfer" version="3.0.1" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.equinox.security"/>
+      <import plugin="org.hamcrest.core" version="1.1.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.pde.core" version="3.6.0" match="compatible"/>
+      <import plugin="org.eclipse.debug.ui" version="3.2.0" match="compatible"/>
+      <import plugin="org.eclipse.jdt.debug.ui" version="3.2.0" match="compatible"/>
+      <import plugin="org.eclipse.search" version="3.1.0" match="compatible"/>
+      <import plugin="org.eclipse.ant.ui" version="3.1.0" match="compatible"/>
+      <import plugin="org.eclipse.jdt.junit" version="3.2.0" match="compatible"/>
+      <import plugin="org.eclipse.ui.intro" version="3.2.0" match="compatible"/>
+      <import plugin="org.eclipse.ui.views.log" version="1.0.0" match="compatible"/>
+      <import plugin="org.eclipse.ltk.core.refactoring" version="3.2.0" match="compatible"/>
+      <import plugin="org.eclipse.compare" version="3.2.0" match="compatible"/>
+      <import plugin="org.eclipse.ltk.ui.refactoring" version="3.2.0" match="compatible"/>
+      <import plugin="org.eclipse.ui.navigator.resources" version="3.3.100" match="compatible"/>
+      <import plugin="org.eclipse.equinox.p2.ui" version="2.0.0" match="compatible"/>
+      <import plugin="org.eclipse.equinox.p2.operations" version="2.0.0" match="compatible"/>
+      <import plugin="org.eclipse.equinox.p2.repository" version="2.0.0" match="compatible"/>
+      <import plugin="org.eclipse.equinox.frameworkadmin.equinox" version="1.0.100" match="compatible"/>
+      <import plugin="org.eclipse.pde.launching" version="3.6.0" match="compatible"/>
+      <import plugin="org.eclipse.ui.console" version="3.5.0" match="compatible"/>
+      <import plugin="org.eclipse.equinox.simpleconfigurator" version="1.0.200" match="compatible"/>
+      <import plugin="org.eclipse.pde.ui" version="3.3.0" match="compatible"/>
+      <import plugin="org.eclipse.ui" version="3.6.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.equinox.security.ui" version="1.0.0" match="compatible"/>
+      <import plugin="org.eclipse.datatools.connectivity.oda.design" version="3.0.2" match="compatible"/>
+      <import plugin="org.eclipse.datatools.connectivity.oda.consumer" version="3.2.4" match="compatible"/>
+      <import plugin="org.eclipse.datatools.connectivity.oda.profile" version="3.2.0" match="compatible"/>
+      <import plugin="org.eclipse.core.net" version="1.0.0" match="compatible"/>
+      <import plugin="org.eclipse.jface.text" version="3.6.0" match="compatible"/>
+      <import plugin="org.eclipse.debug.ui" version="3.5.0" match="compatible"/>
+      <import plugin="org.eclipse.search" version="3.5.0" match="compatible"/>
+      <import plugin="org.eclipse.ui.forms" version="3.4.0" match="compatible"/>
+      <import plugin="org.eclipse.ui.views" version="3.4.0" match="compatible"/>
+      <import plugin="org.eclipse.wst.sse.core" version="1.1.500" match="equivalent"/>
+      <import plugin="org.eclipse.wst.validation" version="1.2.100" match="equivalent"/>
+      <import plugin="org.eclipse.emf.common" version="2.4.0" match="compatible"/>
+      <import plugin="org.eclipse.birt.report.data.oda.jdbc" version="2.3.0" match="compatible"/>
+      <import plugin="org.eclipse.datatools.modelbase.sql.query" version="1.0.1" match="compatible"/>
+      <import plugin="org.eclipse.datatools.connectivity.sqm.core" version="1.2.0" match="compatible"/>
+      <import plugin="org.eclipse.core.runtime" version="3.3.0"/>
+      <import plugin="org.eclipse.birt.report.data.oda.sampledb" version="2.3.0"/>
+      <import plugin="org.eclipse.datatools.connectivity.apache.derby" version="1.0.100" match="compatible"/>
+      <import plugin="org.eclipse.birt.report.data.oda.jdbc.dbprofile" version="2.5.2"/>
+      <import plugin="org.eclipse.datatools.sqltools.sqlbuilder" version="1.0.0" match="compatible"/>
+      <import plugin="org.eclipse.datatools.sqltools.common.ui" version="1.0.0" match="compatible"/>
+      <import plugin="org.eclipse.datatools.connectivity.oda.consumer" version="3.2.2" match="compatible"/>
+      <import plugin="org.eclipse.datatools.connectivity.oda" version="3.0.1" match="compatible"/>
+      <import plugin="org.eclipse.datatools.enablement.oda.xml" version="1.0.0" match="compatible"/>
+      <import plugin="org.eclipse.datatools.connectivity.oda.design.ui" version="3.0.1" match="compatible"/>
+      <import plugin="org.eclipse.datatools.connectivity.oda.design" version="3.0.0" match="compatible"/>
+      <import plugin="org.eclipse.datatools.enablement.oda.xml.ui" version="1.0.0" match="compatible"/>
+      <import plugin="org.apache.batik.util" version="1.6.0" match="equivalent"/>
+      <import plugin="org.apache.batik.util.gui" version="1.6.0" match="equivalent"/>
+      <import plugin="org.eclipse.jdt.core" version="3.5.0" match="compatible"/>
+      <import plugin="org.eclipse.jdt.debug" version="3.5.0" match="compatible"/>
+      <import plugin="org.eclipse.core.filesystem" version="1.3.0" match="greaterOrEqual"/>
+      <import plugin="org.w3c.css.sac" version="1.3.0" match="equivalent"/>
+      <import plugin="org.w3c.dom.svg" version="1.1.0"/>
+      <import plugin="org.apache.batik.css" version="1.6.0" match="equivalent"/>
+      <import plugin="org.apache.batik.xml" version="1.6.0" match="equivalent"/>
+      <import plugin="org.apache.batik.dom" version="1.6.0" match="equivalent"/>
+      <import plugin="org.apache.batik.parser" version="1.6.0" match="equivalent"/>
+      <import plugin="org.w3c.dom.smil" version="1.0.0" match="equivalent"/>
+      <import plugin="org.apache.batik.ext.awt" version="1.6.0" match="equivalent"/>
+      <import plugin="org.apache.batik.bridge" version="1.6.0" match="equivalent"/>
+      <import plugin="org.apache.batik.dom.svg" version="1.6.0" match="equivalent"/>
+      <import plugin="org.apache.batik.svggen" version="1.6.0" match="equivalent"/>
+      <import plugin="org.eclipse.birt.report.model" version="2.2.0"/>
+      <import plugin="org.eclipse.birt.core" version="2.2.0"/>
+      <import plugin="org.eclipse.birt.report.designer.core" version="2.2.0"/>
+      <import plugin="org.eclipse.birt.report.designer.ui" version="2.2.0"/>
+      <import plugin="org.eclipse.birt.report.designer.ui.views" version="2.1.0" match="compatible"/>
+      <import plugin="org.eclipse.birt.report.engine" version="2.3.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.birt.report.designer.ui.editors" version="2.3.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.emf.common" version="2.6.0" match="compatible"/>
+      <import plugin="org.eclipse.emf.ecore" version="2.6.0" match="compatible"/>
+      <import plugin="org.eclipse.ui.views" version="3.5.0" match="compatible"/>
+      <import plugin="org.eclipse.ui.workbench" version="3.6.0" match="compatible"/>
+      <import plugin="org.eclipse.emf.edit" version="2.6.0" match="compatible"/>
+      <import plugin="org.eclipse.emf.common.ui" version="2.6.0" match="compatible"/>
+      <import plugin="org.eclipse.equinox.http.servlet"/>
+      <import plugin="org.mortbay.jetty.util"/>
+      <import plugin="org.mortbay.jetty.server"/>
+      <import plugin="org.eclipse.osgi.services"/>
+      <import plugin="javax.activation"/>
+      <import plugin="javax.xml.stream"/>
+      <import plugin="org.eclipse.birt.data" version="2.3.0" match="compatible"/>
+      <import plugin="org.eclipse.birt.data.aggregation" version="1.0.0"/>
+      <import plugin="org.eclipse.equinox.preferences" version="3.2.0" match="compatible"/>
+      <import plugin="org.eclipse.draw2d" version="3.7.0" match="compatible"/>
+      <import plugin="org.eclipse.core.expressions" version="3.4.200" match="compatible"/>
    </requires>
+
+   <plugin
+         id="org.objectweb.proactive.ic2d.lib"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
 
    <plugin
          id="org.eclipse.ui.views"
@@ -133,14 +405,154 @@
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.ui.views.properties.tabbed"
+         id="org.eclipse.ui.forms"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.ui.forms"
+         id="org.eclipse.datatools.connectivity.oda"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.datatools.connectivity.oda.consumer"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.datatools.connectivity.console.profile"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.datatools.connectivity.oda.design"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.datatools.connectivity.oda.profile"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.datatools.connectivity"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.core.resources"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.core.runtime"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.core.runtime.compatibility.auth"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.core.runtime.compatibility.registry"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         fragment="true"/>
+
+   <plugin
+         id="org.eclipse.core.variables"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.core.filesystem"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.ui.console"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.jface"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.jface.databinding"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.jface.text"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.text"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.ui.workbench.texteditor"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.compare"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.compare.core"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.rcp"
          download-size="0"
          install-size="0"
          version="0.0.0"
@@ -376,17 +788,840 @@
          unpack="false"/>
 
    <plugin
-         id="org.objectweb.proactive.ic2d.lib"
-         download-size="0"
-         install-size="0"
-         version="4.3.0"
-         unpack="false"/>
-
-   <plugin
          id="org.objectweb.proactive.ic2d.chartit"
          download-size="0"
          install-size="0"
-         version="1.0.0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.apache.commons.logging"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.apache.ant"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"/>
+
+   <plugin
+         id="org.eclipse.ant.core"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.apache.xerces"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.birt.chart.engine"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.birt.chart.ui.extension"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.birt.chart.device.extension"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.birt.report.data.oda.hive"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.birt.report.data.oda.hive.ui"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.birt.report.data.oda.jdbc.ui"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.birt.report.data.oda.sampledb"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"/>
+
+   <plugin
+         id="org.eclipse.birt.report.designer.ui.data"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.birt.report.designer.ui.ide"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.birt.report.designer.ui.lib"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.birt.report.designer.ui.preview.web"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.birt.report.designer.ui.views"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.datatools.connectivity.apache.derby"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.datatools.connectivity.apache.derby.ui"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.datatools.connectivity.oda.design.ui"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.datatools.connectivity.sqm.core"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.datatools.enablement.finfo"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.datatools.enablement.oda.ws"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.datatools.enablement.oda.ws.ui"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.datatools.enablement.oda.xml"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.datatools.enablement.oda.xml.ui"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.ui.navigator"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.ui.navigator.resources"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.pde.core"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.mylyn.pde.ui"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.pde.ds.core"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.pde.launching"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.ui.cheatsheets"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.ui.editors"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.ui.ide"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.ui.intro"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.core.filebuffers"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.core.runtime.compatibility"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.birt.chart.engine.extension"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.birt.chart.device.svg"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.birt.chart.device.swt"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.birt.chart.reportitem"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.birt.chart.reportitem.ui"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.birt.report.data.oda.jdbc"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"/>
+
+   <plugin
+         id="org.eclipse.birt.report.data.bidi.utils"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.birt.report.data.bidi.utils.ui"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.equinox.p2.repository"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.equinox.p2.metadata"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.equinox.p2.core"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.w3c.dom.svg"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.junit"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"/>
+
+   <plugin
+         id="org.eclipse.pde.ui"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.hamcrest.core"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.ltk.core.refactoring"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.pde.ui.templates"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.equinox.p2.ui"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.birt.report.model.adapter.oda"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.birt.core.script.function"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.birt.data"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.update.core"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.wst.sse.ui"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.birt.report.data.oda.jdbc.dbprofile"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.birt.report.data.oda.jdbc.dbprofile.sampledb"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.birt.report.data.oda.jdbc.dbprofile.ui"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.birt.report.data.oda.xml"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.birt.report.data.oda.xml.ui"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.apache.batik.bridge"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.apache.batik.ext.awt"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.apache.batik.util"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.apache.batik.xml"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.w3c.dom.smil"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.jdt.launching"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.ui.ide.application"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.wst.sse.ui.infopop"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.apache.batik.util.gui"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.apache.batik.css"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.w3c.css.sac"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.apache.batik.dom"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.apache.batik.dom.svg"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.apache.batik.parser"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.apache.batik.pdf"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.apache.batik.svggen"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.apache.batik.transcoder"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.birt.report.item.crosstab.core"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.birt.report.item.crosstab.ui"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.birt.report.designer.ui.cubebuilder"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.birt.report.designer.ui.editors"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.birt.report.designer.ui.editors.schematic"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.birt.report.designer.ui.lib.explorer"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.emf.edit"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.emf.edit.ui"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.equinox.http.jetty"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="javax.servlet"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="javax.servlet.jsp"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="javax.xml"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="javax.xml.bind"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="com.ibm.icu"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="com.lowagie.text"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="javax.transaction"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         fragment="true"
+         unpack="false"/>
+
+   <plugin
+         id="org.apache.commons.codec"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.apache.xml.resolver"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.apache.xml.serializer"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.birt.data.aggregation"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.birt.report.data.adapter"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.core.commands"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.core.contenttype"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.core.databinding"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.core.databinding.observable"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.core.databinding.property"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.core.expressions"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.core.jobs"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.draw2d"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.emf.common"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.emf.ecore"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.emf.ecore.xmi"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.equinox.app"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.equinox.preferences"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.equinox.registry"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.gef"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.help"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
          unpack="false"/>
 
 </feature>
