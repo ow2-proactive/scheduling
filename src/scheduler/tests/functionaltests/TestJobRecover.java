@@ -36,6 +36,9 @@
  */
 package functionaltests;
 
+import java.io.File;
+import java.net.URL;
+
 import junit.framework.Assert;
 
 import org.ow2.proactive.scheduler.common.job.JobId;
@@ -62,8 +65,8 @@ import functionalTests.FunctionalTest;
  */
 public class TestJobRecover extends FunctionalTest {
 
-    private static String jobDescriptor = TestJobRecover.class.getResource(
-            "/functionaltests/descriptors/Job_PI_recover.xml").getPath();
+    private static URL jobDescriptor = TestJobRecover.class
+            .getResource("/functionaltests/descriptors/Job_PI_recover.xml");
 
     /**
      * Tests start here.
@@ -73,9 +76,9 @@ public class TestJobRecover extends FunctionalTest {
     @org.junit.Test
     public void run() throws Throwable {
 
-        JobId idJ1 = SchedulerTHelper.submitJob(jobDescriptor);
-        JobId idJ2 = SchedulerTHelper.submitJob(jobDescriptor);
-        JobId idJ3 = SchedulerTHelper.submitJob(jobDescriptor);
+        JobId idJ1 = SchedulerTHelper.submitJob(new File(jobDescriptor.toURI()).getAbsolutePath());
+        JobId idJ2 = SchedulerTHelper.submitJob(new File(jobDescriptor.toURI()).getAbsolutePath());
+        JobId idJ3 = SchedulerTHelper.submitJob(new File(jobDescriptor.toURI()).getAbsolutePath());
 
         SchedulerTHelper.waitForEventJobRunning(idJ1);
 
@@ -83,8 +86,8 @@ public class TestJobRecover extends FunctionalTest {
         SchedulerTHelper.waitForFinishedJob(idJ1);
 
         SchedulerTHelper.log("Kill Scheduler");
-        SchedulerTHelper.killAndRestartScheduler(SchedulerTHelper.class.getResource(
-                "config/functionalTSchedulerProperties-updateDB.ini").getPath());
+        SchedulerTHelper.killAndRestartScheduler(new File(SchedulerTHelper.class.getResource(
+                "config/functionalTSchedulerProperties-updateDB.ini").toURI()).getAbsolutePath());
 
         SchedulerTHelper.getSchedulerInterface();
 
