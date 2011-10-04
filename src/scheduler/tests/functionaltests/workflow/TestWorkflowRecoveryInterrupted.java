@@ -36,6 +36,7 @@
  */
 package functionaltests.workflow;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -73,14 +74,15 @@ public class TestWorkflowRecoveryInterrupted extends FunctionalTest {
     public void run() throws Throwable {
 
         /*** job 1 **/
-        String path = TestWorkflowRecoveryInterrupted.class.getResource(job_prefix + "1.xml").getPath();
+        String path = new File(TestWorkflowRecoveryInterrupted.class.getResource(job_prefix + "1.xml")
+                .toURI()).getAbsolutePath();
         JobId id = SchedulerTHelper.submitJob(path);
         SchedulerTHelper.log("Submitted job " + path);
         SchedulerTHelper.waitForEventTaskFinished(id, "T1#1");
 
         SchedulerTHelper.log("Task T1#1 finished, crashing scheduler...");
-        SchedulerTHelper.killAndRestartScheduler(SchedulerTHelper.class.getResource(
-                "config/functionalTSchedulerProperties-updateDB.ini").getPath());
+        SchedulerTHelper.killAndRestartScheduler(new File(SchedulerTHelper.class.getResource(
+                "config/functionalTSchedulerProperties-updateDB.ini").toURI()).getAbsolutePath());
         SchedulerTHelper.getSchedulerInterface();
 
         SchedulerTHelper.getSchedulerInterface().getJobState(id);
@@ -108,14 +110,15 @@ public class TestWorkflowRecoveryInterrupted extends FunctionalTest {
         SchedulerTHelper.log("Job " + path + " checked");
 
         /*** job 2 **/
-        path = TestWorkflowRecoveryInterrupted.class.getResource(job_prefix + "2.xml").getPath();
+        path = new File(TestWorkflowRecoveryInterrupted.class.getResource(job_prefix + "2.xml").toURI())
+                .getAbsolutePath();
         id = SchedulerTHelper.submitJob(path);
         SchedulerTHelper.log("Submitted job " + path);
         SchedulerTHelper.waitForEventTaskFinished(id, "T1#1");
 
         SchedulerTHelper.log("Task T1#1 finished, crashing scheduler...");
-        SchedulerTHelper.killAndRestartScheduler(SchedulerTHelper.class.getResource(
-                "config/functionalTSchedulerProperties-updateDB.ini").getPath());
+        SchedulerTHelper.killAndRestartScheduler(new File(SchedulerTHelper.class.getResource(
+                "config/functionalTSchedulerProperties-updateDB.ini").toURI()).getAbsolutePath());
         SchedulerTHelper.getSchedulerInterface();
 
         SchedulerTHelper.getSchedulerInterface().getJobState(id);
