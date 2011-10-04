@@ -37,11 +37,14 @@
 package functionaltests;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.URL;
 
 import junit.framework.Assert;
 
+import org.objectweb.proactive.utils.OperatingSystem;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
@@ -60,13 +63,16 @@ import functionalTests.FunctionalTest;
  */
 public class TestProcessTreeKiller extends FunctionalTest {
 
-    private static String nativeLinuxExecLauncher = TestProcessTreeKiller.class.getResource(
-            "/functionaltests/executables/PTK_launcher.sh").getPath();
+    private static URL nativeLinuxExecLauncher = TestProcessTreeKiller.class
+            .getResource("/functionaltests/executables/PTK_launcher.sh");
+
+    private static URL nativeWindowsExecLauncher = TestProcessTreeKiller.class
+            .getResource("/functionaltests/executables/PTK_launcher.bat");
 
     private static String unixPTKProcessName = "PTK_process.sh";
 
-    private static String nativeLinuxDetachedProcess = TestProcessTreeKiller.class.getResource(
-            "/functionaltests/executables/" + unixPTKProcessName).getPath();
+    private static URL nativeLinuxDetachedProcess = TestProcessTreeKiller.class
+            .getResource("/functionaltests/executables/" + unixPTKProcessName);
 
     private static int detachedProcNumber = 4;
 
@@ -80,7 +86,14 @@ public class TestProcessTreeKiller extends FunctionalTest {
     @org.junit.Test
     public void run() throws Throwable {
         killAll(unixPTKProcessName);
-
+        String[] nativeExecLauncher;
+        boolean onWindows = OperatingSystem.getOperatingSystem().name().equals("windows");
+        if (onWindows) {
+            nativeExecLauncher = new String[] { "cmd", "/C",
+                    "\"" + new File(nativeWindowsExecLauncher.toURI()).getAbsolutePath() + "\"" };
+        } else {
+            nativeExecLauncher = new String[] { new File(nativeLinuxExecLauncher.toURI()).getAbsolutePath() };
+        }
         SchedulerTHelper.log("Test 1 : Creating jobs...");
 
         //create job 1
@@ -91,7 +104,7 @@ public class TestProcessTreeKiller extends FunctionalTest {
         NativeTask task1 = new NativeTask();
         String task1Name = "TestPTK1";
         task1.setName(task1Name);
-        task1.setCommandLine(new String[] { nativeLinuxExecLauncher });
+        task1.setCommandLine(nativeExecLauncher);
         job1.addTask(task1);
 
         //create job 2
@@ -102,10 +115,13 @@ public class TestProcessTreeKiller extends FunctionalTest {
         NativeTask task2 = new NativeTask();
         String task2Name = "TestPTK2";
         task2.setName(task2Name);
-        task2.setCommandLine(new String[] { nativeLinuxExecLauncher });
+        task2.setCommandLine(nativeExecLauncher);
         job2.addTask(task2);
 
-        SchedulerTHelper.setExecutable(nativeLinuxExecLauncher + " " + nativeLinuxDetachedProcess);
+        if (!onWindows) {
+            SchedulerTHelper.setExecutable(nativeExecLauncher + " " +
+                new File(nativeLinuxDetachedProcess.toURI()).getAbsolutePath());
+        }
 
         //submit two jobs
         JobId id1 = SchedulerTHelper.submitJob(job1);
@@ -114,8 +130,12 @@ public class TestProcessTreeKiller extends FunctionalTest {
         SchedulerTHelper.waitForEventTaskRunning(id2, task2Name);
 
         Thread.sleep(wait_time);
-
-        int runningDetachedProcNumber = getProcessNumber(unixPTKProcessName);
+        int runningDetachedProcNumber;
+        if (onWindows) {
+            runningDetachedProcNumber = getProcessNumberWindows("ping.exe");
+        } else {
+            runningDetachedProcNumber = getProcessNumber(unixPTKProcessName);
+        }
 
         //we should have 2 times (2 jobs) number of detached processes
         SchedulerTHelper.log("number of processes : " + runningDetachedProcNumber);
@@ -126,7 +146,11 @@ public class TestProcessTreeKiller extends FunctionalTest {
         SchedulerTHelper.waitForEventJobFinished(id1);
 
         //we should have 1 time number of detached processes
-        runningDetachedProcNumber = getProcessNumber(unixPTKProcessName);
+        if (onWindows) {
+            runningDetachedProcNumber = getProcessNumberWindows("ping.exe");
+        } else {
+            runningDetachedProcNumber = getProcessNumber(unixPTKProcessName);
+        }
         SchedulerTHelper.log("number of processes : " + runningDetachedProcNumber);
         Assert.assertEquals(detachedProcNumber, runningDetachedProcNumber);
 
@@ -135,7 +159,11 @@ public class TestProcessTreeKiller extends FunctionalTest {
         SchedulerTHelper.waitForEventJobFinished(id2);
 
         //we should have 0 detached processes
-        runningDetachedProcNumber = getProcessNumber(unixPTKProcessName);
+        if (onWindows) {
+            runningDetachedProcNumber = getProcessNumberWindows("ping.exe");
+        } else {
+            runningDetachedProcNumber = getProcessNumber(unixPTKProcessName);
+        }
         SchedulerTHelper.log("number of processes : " + runningDetachedProcNumber);
         Assert.assertEquals(0, runningDetachedProcNumber);
 
@@ -148,15 +176,21 @@ public class TestProcessTreeKiller extends FunctionalTest {
 
     private void killAll(String processName) throws Throwable {
         byte[] out = new byte[1024];
-        //get PIDs of processName
-        Process p = Runtime.getRuntime().exec("pidof " + processName);
-        int n = p.getInputStream().read(out);
-        //contains PIDs separated with spaces
-        if (n > 0) {
-            String pids = new String(out, 0, n);
-            if (pids != null && pids.length() > 1) {
-                //kill this processes
-                Runtime.getRuntime().exec("kill " + pids);
+
+        if (OperatingSystem.getOperatingSystem().name().equals("windows")) {
+            Runtime.getRuntime().exec("TASKKILL /F /IM ping.exe");
+        } else {
+            //get PIDs of processName
+            Process p = Runtime.getRuntime().exec("pidof " + processName);
+
+            int n = p.getInputStream().read(out);
+            //contains PIDs separated with spaces
+            if (n > 0) {
+                String pids = new String(out, 0, n);
+                if (pids != null && pids.length() > 1) {
+                    //kill this processes
+                    Runtime.getRuntime().exec("kill " + pids);
+                }
             }
         }
     }
@@ -165,6 +199,20 @@ public class TestProcessTreeKiller extends FunctionalTest {
         int toReturn = 0;
         String line;
         Process p = Runtime.getRuntime().exec("ps -e");
+        BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream()));
+        while ((line = input.readLine()) != null) {
+            if (line.contains(executableName)) {
+                toReturn++;
+            }
+        }
+        input.close();
+        return toReturn;
+    }
+
+    private int getProcessNumberWindows(String executableName) throws IOException {
+        int toReturn = 0;
+        String line;
+        Process p = Runtime.getRuntime().exec("tasklist");
         BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream()));
         while ((line = input.readLine()) != null) {
             if (line.contains(executableName)) {
