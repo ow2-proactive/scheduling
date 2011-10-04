@@ -36,6 +36,9 @@
  */
 package functionaltests;
 
+import java.io.File;
+import java.net.URL;
+
 import org.junit.Assert;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobId;
@@ -60,8 +63,8 @@ import functionalTests.FunctionalTest;
  */
 public class TestJobFork extends FunctionalTest {
 
-    private static String jobDescriptor = TestJobFork.class.getResource(
-            "/functionaltests/descriptors/Job_fork.xml").getPath();
+    private static URL jobDescriptor = TestJobFork.class
+            .getResource("/functionaltests/descriptors/Job_fork.xml");
 
     /**
      * Tests start here.
@@ -77,7 +80,7 @@ public class TestJobFork extends FunctionalTest {
         String taskForked1Name = "Fork1";
         String taskForked2Name = "Fork2";
 
-        JobId id = SchedulerTHelper.submitJob(jobDescriptor);
+        JobId id = SchedulerTHelper.submitJob(new File(jobDescriptor.toURI()).getAbsolutePath());
 
         SchedulerTHelper.log("Job submitted, id " + id.toString());
 
