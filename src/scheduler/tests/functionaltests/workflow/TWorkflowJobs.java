@@ -36,6 +36,7 @@
  */
 package functionaltests.workflow;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -112,7 +113,8 @@ public abstract class TWorkflowJobs extends FunctionalTest {
                     t.printStackTrace();
                 }
             }
-            String path = TWorkflowJobs.class.getResource(getJobPrefix() + (i + 1) + jobSuffix).getPath();
+            String path = new File(TWorkflowJobs.class.getResource(getJobPrefix() + (i + 1) + jobSuffix)
+                    .toURI()).getAbsolutePath();
             SchedulerTHelper.log("Testing job: " + path);
             testJob(path, tasks);
         }
