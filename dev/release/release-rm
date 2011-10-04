@@ -7,7 +7,6 @@ function build() {
 
 	echo "********************** Building the resource manager ************************"
 	cd compile || warn_and_exit "Cannot move in compile"
-	mv rm-build.xml build.xml
 	./build clean
 	./build -Dversion="${VERSION}" deploy.rm deploy.rm.client
 	./build -Dversion="${VERSION}" doc.rm.manualPdf
@@ -29,6 +28,8 @@ function separate_rm() {
 	find . -name "matlab*" -exec rm -rf {} \;
 	find . -name "scilab*" -exec rm -rf {} \;
 	mv RM-README.txt README.txt
+	#removing src and lib
+	del_src
 };
 
 init_env ProActiveResourcing $*
