@@ -73,12 +73,13 @@ else
 	LOG4J_FILE=file:${PA_SCHEDULER}/config/log4j/$1
 fi
 
-#if log4j file is client, use standard ProActive java.security.policy file
-if [ "$1" = "log4j-client" ]
+#if log4j file is server, use server security manager
+#otherwise, use standard ProActive java.security.policy file
+if [ "$1" = "scheduler-log4j-server" -o "$1" = "rm-log4j-server" ]
 then
-	JAVA_POLICY=$PA_SCHEDULER/config/security.java.policy-client
-else
 	JAVA_POLICY=$PA_SCHEDULER/config/security.java.policy-server
+else
+	JAVA_POLICY=$PA_SCHEDULER/config/security.java.policy-client
 fi
 
 #Enabling full security debug (extremely verbose, prints all stack traces when any permission is checked)

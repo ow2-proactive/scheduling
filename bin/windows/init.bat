@@ -65,12 +65,19 @@ IF "%1"=="" (
 	set LOG4J_FILE=file:%PA_SCHEDULER%/config/log4j/%1
 )
 
-rem if log4j file is client, use standard ProActive java.security.policy file
-IF "%1"=="log4j-client" (
-	set JAVA_POLICY=file:%PA_SCHEDULER%/config/security.java.policy-client
-) ELSE (
-	set JAVA_POLICY=file:%PA_SCHEDULER%/config/security.java.policy-server
+rem if log4j file is server, use server security manager
+rem otherwise, use standard ProActive java.security.policy file
+IF "%1"=="scheduler-log4j-server" (
+	GOTO sjps
 )
+IF "%1"=="rm-log4j-server" (
+	:sjps
+	set JAVA_POLICY=file:%PA_SCHEDULER%/config/security.java.policy-server
+	GOTO sjps_
+) ELSE (
+	set JAVA_POLICY=file:%PA_SCHEDULER%/config/security.java.policy-client
+)
+:sjps_
 
 set JAVA_CMD="%JAVA_HOME%\bin\java.exe" -Dproactive.home="%PA_SCHEDULER%" -Dproactive.configuration="file:%PA_SCHEDULER%\config\proactive\ProActiveConfiguration.xml" -Dpa.scheduler.home="%PA_SCHEDULER%" -Dpa.rm.home="%PA_SCHEDULER%" -Djava.security.manager -Djava.security.policy="%JAVA_POLICY%" -Dlog4j.configuration="%LOG4J_FILE%"
 
