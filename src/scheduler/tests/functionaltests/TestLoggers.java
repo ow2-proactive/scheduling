@@ -36,6 +36,9 @@
  */
 package functionaltests;
 
+import java.io.File;
+import java.net.URL;
+
 import junit.framework.Assert;
 
 import org.apache.log4j.AppenderSkeleton;
@@ -55,8 +58,8 @@ import functionaltests.executables.Logging;
  */
 public class TestLoggers extends FunctionalTest {
 
-    private static String jobDescriptor = TestLoggers.class.getResource(
-            "/functionaltests/descriptors/Job_Test_Loggers.xml").getPath();
+    private static URL jobDescriptor = TestLoggers.class
+            .getResource("/functionaltests/descriptors/Job_Test_Loggers.xml");
 
     private final static int TEST_TIMEOUT = 10000;
 
@@ -76,8 +79,8 @@ public class TestLoggers extends FunctionalTest {
             "org.ow2.proactive.scheduler.common.util.logforwarder.providers.SocketBasedForwardingProvider");
         lfsSocket.initialize();
 
-        JobId id1 = SchedulerTHelper.submitJob(jobDescriptor);
-        JobId id2 = SchedulerTHelper.submitJob(jobDescriptor);
+        JobId id1 = SchedulerTHelper.submitJob(new File(jobDescriptor.toURI()).getAbsolutePath());
+        JobId id2 = SchedulerTHelper.submitJob(new File(jobDescriptor.toURI()).getAbsolutePath());
         //JobId id3 = SchedulerTHelper.submitJob(jobDescriptor);
         Logger l1 = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX + id1);
         Logger l2 = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX + id2);
