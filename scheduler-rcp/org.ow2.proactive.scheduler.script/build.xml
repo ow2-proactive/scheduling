@@ -1,19 +1,5 @@
 <project default="main">
 	<property file="build.properties"/>
-
-	   <import file="${eclipse.pdebuild.templates}/headless-build/customTargets.xml" />
-
-	 <target name="preProcessRepos">
-	                <p2.mirror source="${eclipsePlatformRepo}" destination="${repoBaseLocation}/launchers">
-	                        <iu id="org.eclipse.equinox.executable.feature.group" version=""/>
-	                        <iu id="org.eclipse.rcp.feature.group" version="" />
-	                </p2.mirror>
-	        </target>
-
-	        <target name="postFetch">
-	                <replace file="${buildDirectory}/pluginVersions.properties" token="HEAD" value="${timestamp}" />
-	        </target>
-
 	<target name="main">
 		<property name="baseLocation" value="${eclipse.home}"/>
 		<!-- by default, check for deltapack co-located with eclipse -->
@@ -25,7 +11,7 @@
 
 		<property name="builder" value="${basedir}" />
 		<property name="buildDirectory" value="${basedir}/buildDirectory"/>
-		<property name="pluginPath" value="${basedir}/..${path.separator}${deltapack}" />
+		<property name="pluginPath" value="/home/acontes/ws_git/optimizing.git/src:/home/acontes/ws_git/scheduling.git/scheduler-rcp:${basedir}/..${path.separator}${deltapack}" />
 		<property name="buildTempFolder" value="${buildDirectory}" />
 
 		<ant antfile="${eclipse.pdebuild.scripts}/productBuild/productBuild.xml" />

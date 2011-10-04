@@ -7,16 +7,16 @@ Bundle-Activator: org.ow2.proactive.scheduler.Activator
 Bundle-Vendor: ProActive Team
 Bundle-Localization: plugin
 Bundle-ActivationPolicy: lazy
-Eclipse-RegisterBuddy: org.ow2.proactive.scheduler.lib, org.ow2.proactive.scheduling.common.lib, org.objectweb.proactive.ic2d.lib
+Eclipse-RegisterBuddy: org.ow2.proactive.scheduler,org.ow2.proactive.scheduler.lib, org.ow2.proactive.scheduling.common.lib, org.objectweb.proactive.ic2d.lib
 Bundle-ClassPath: bin/
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Require-Bundle: org.eclipse.ui;visibility:=reexport,
  org.eclipse.ui.console;visibility:=reexport,
  org.eclipse.core.runtime;resolution:=optional,
- org.objectweb.proactive.ic2d.chartit;visibility:=reexport,
- org.objectweb.proactive.ic2d.lib,
- org.ow2.proactive.scheduling.common.lib;bundle-version="1.0.0",
- org.ow2.proactive.scheduler.lib;bundle-version="11.22.33"
+ org.ow2.proactive.scheduling.common.lib,
+ org.ow2.proactive.scheduler.lib,
+ org.objectweb.proactive.ic2d.chartit,
+ org.objectweb.proactive.ic2d.lib
 Export-Package: org.ow2.proactive.scheduler;
   uses:="org.eclipse.jface.resource,
    org.eclipse.ui.application,

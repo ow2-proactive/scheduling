@@ -381,7 +381,7 @@
 			<fileset dir="${lib.dir}/mapreduce" includes="*/**" />
 		</copy>
 		<copy todir="${rcp.scheduler.dir}/${rcp.scheduler.lib}/lib" includeemptydirs="yes">
-			<fileset dir="${deploy.lib.dir}" includes="ProActive_Scheduler-client.jar,ProActive_Scheduler-fsm.jar,ProActive_Scheduler-matsci.jar,ProActive_Scheduler-mapreduce.jar" />
+			<fileset dir="${deploy.lib.dir}" includes="ProActive_Scheduler-client.jar,ProActive_Scheduler-core.jar,ProActive_Scheduler-fsm.jar,ProActive_Scheduler-matsci.jar,ProActive_Scheduler-mapreduce.jar" />
 		</copy>
 
 	</target>

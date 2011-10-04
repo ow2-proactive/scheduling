@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry exported="true" kind="lib" path="lib/mysql-connector-java-5.1.16-bin.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/ProActive_SRM-common-client.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/ProActive_SRM-common-client.jar" sourcepath="/Scheduler"/>
 	<classpathentry exported="true" kind="lib" path="lib/hibernate/annotation/ejb3-persistence.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/hibernate/annotation/hibernate-annotations.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/hibernate/annotation/hibernate-commons-annotations.jar"/>

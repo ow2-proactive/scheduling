@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?pde version="3.5"?>
 
-<product name="ProActive Scheduler Client" uid="org.ow2.proactive.scheduler.product" id="org.ow2.proactive.scheduler.scheduler" application="org.ow2.proactive.scheduler.application" version="1.0.0" useFeatures="false" includeLaunchers="true">
+<product name="ProActive Scheduler Client" uid="org.ow2.proactive.scheduler.product" id="org.ow2.proactive.scheduler.product" application="org.ow2.proactive.scheduler.application" version="1.0.0" useFeatures="true" includeLaunchers="true">
 
    <aboutInfo>
       <image path="/org.ow2.proactive.scheduler/icons/alt_about.gif"/>
@@ -20,7 +20,8 @@
 -clean</programArgs>
       <vmArgs>-Xmx512M -Xms512M
 -Dproactive.net.nolocal=true
--Dpa.scheduler.logs.provider=org.ow2.proactive.scheduler.common.util.logforwarder.providers.ProActiveBasedForwardingProvider</vmArgs>
+-Dpa.scheduler.logs.provider=org.ow2.proactive.scheduler.common.util.logforwarder.providers.ProActiveBasedForwardingProvider
+-Dlog4j.configuration=file:/home/acontes/.proactive/ProActiveLoggers.properties</vmArgs>
    </launcherArgs>
 
    <windowImages i16="/org.ow2.proactive.scheduler/icons/alt_window_16.gif" i32="/org.ow2.proactive.scheduler/icons/alt_window_32.gif"/>
@@ -47,6 +48,7 @@
    <vm>
    </vm>
 
+
    <plugins>
       <plugin id="com.ibm.icu"/>
       <plugin id="com.lowagie.text"/>
@@ -69,8 +71,11 @@
       <plugin id="org.apache.xml.resolver"/>
       <plugin id="org.apache.xml.serializer"/>
       <plugin id="org.eclipse.ant.core"/>
+      <plugin id="org.eclipse.birt.chart.device.swt"/>
       <plugin id="org.eclipse.birt.chart.engine"/>
+      <plugin id="org.eclipse.birt.chart.engine.extension"/>
       <plugin id="org.eclipse.birt.chart.ui"/>
+      <plugin id="org.eclipse.birt.chart.ui.extension"/>
       <plugin id="org.eclipse.birt.core"/>
       <plugin id="org.eclipse.birt.core.ui"/>
       <plugin id="org.eclipse.birt.data"/>
@@ -169,7 +174,7 @@
 
    <features>
       <feature id="org.eclipse.rcp"/>
-      <feature id="org.ow2.proactive.scheduler.feature" version="1.0.0.qualifier"/>
+      <feature id="org.ow2.proactive.scheduler.feature"/>
    </features>
 
 
