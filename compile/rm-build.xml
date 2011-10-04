@@ -134,4 +134,20 @@
 		</copy>
 	</target>
 
+	<target name="rcp.build.rm" depends="rcp.libCopy.rm" description="build the rm's rcp products using the eclipse's headless build mechanism">
+			<available type="file" file="${equinoxjar}" property="equinoxjar.exists" />
+
+			<fail message="Could not find the org.eclipse.equinox.launcher jar. Please set the variable 'equinoxjar' with the path of your current equinox eclipse installation i.e. .../eclipse/plugins/org.eclipse.equinox.launcher_x.x.x.jar" unless="equinoxjar.exists" />
+
+			<java jar="${equinoxjar}" fork="true">
+				<arg value="-application" />
+				<arg value="org.eclipse.ant.core.antRunner" />
+				<arg value="-buildfile" />
+				<arg value="../rm-rcp/org.ow2.proactive.resourcemanager.script/build.xml" />
+				<jvmarg value="-Dbasews=${ws}" />
+				<jvmarg value="-Dbaseos=${os}" />
+				<jvmarg value="-Dbasearch=${arch}" />
+			</java>
+		</target>
+
 </project>
