@@ -190,8 +190,7 @@ public class TestDatabaseCRUD {
                 Assert.assertEquals((String) f.get(it.getExecutableContainer()),
                         "org.ow2.proactive.scheduler.examples.WaitAndPrint");
                 Assert.assertTrue(it.getExecutableContainer() instanceof ForkedJavaExecutableContainer);
-                Assert.assertNull(((ForkedJavaExecutableContainer) it.getExecutableContainer())
-                        .getForkEnvironment());
+
             } else if (it.getName().equals("task2")) {
                 //Check task 2 properties
                 Assert.assertEquals(it.getName(), "task2");
