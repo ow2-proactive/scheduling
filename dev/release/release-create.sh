@@ -110,8 +110,10 @@ function warn_print_usage_and_exit {
 }
 
 function cp_r_full(){
+	echo "Change dir to : $TMP_DIR"
 	cd $TMP_DIR
-	cp -r ${SCHEDULING_FULL_NAME} $1
+	echo "Current location : $TMP_DIR"
+	cp -r ${SCHEDULING_FULL_NAME} $1 || exit 4
 }
 
 function create_archive(){
