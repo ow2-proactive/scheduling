@@ -131,9 +131,7 @@ public abstract class TWorkflowJobs extends FunctionalTest {
      * @throws Exception
      */
     public static JobId testJobSubmission(Job jobToSubmit, List<String> skip) throws Exception {
-        Scheduler userInt = SchedulerTHelper.getSchedulerInterface();
-
-        JobId id = userInt.submit(jobToSubmit);
+        JobId id = SchedulerTHelper.submitJob(jobToSubmit);
 
         SchedulerTHelper.log("Job submitted, id " + id.toString());
 
