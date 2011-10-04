@@ -53,7 +53,7 @@
             <title>Installation for Scilab</title>
         </info>
         <para>
-            The toolbox works only with Scilab version <emphasis>5.3</emphasis> and higher. The toolbox depends on another toolbox called <emphasis>JIMS</emphasis> which must be downloaded and installed from <emphasis>ATOMS</emphasis> before installing the ProActive Toolbox.
+            The toolbox works only with Scilab version <emphasis>5.3</emphasis> and higher. The toolbox depends on another toolbox called <emphasis>Java Interaction Mechanism in Scilab</emphasis>(JIMS) which must be downloaded and installed from <emphasis>ATOMS</emphasis> before installing the ProActive Toolbox.
         </para>
         <para>
             The toolbox can be found at <emphasis>SCHEDULING/extensions/scilab/PAscheduler</emphasis>. To install it inside Scilab, the toolbox must be built and loaded inside Scilab via the standard Scilab toolboxes installation scheme.
