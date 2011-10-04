@@ -510,7 +510,9 @@ public class SchedulerProxy implements Scheduler {
      * {@inheritDoc}
      */
     public boolean isConnected() {
-        return scheduler.isConnected();
+        if (scheduler==null)
+        	return false;
+    	return scheduler.isConnected();
     }
 
     /**

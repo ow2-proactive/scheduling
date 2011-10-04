@@ -71,15 +71,24 @@ public class TreeSelectionListener implements ISelectionChangedListener {
                     getSubTreeNodesList((TreeLeafElement) leaf, selectionList);
                     tlf.add((Selectable) leaf);
                 }
-
             }
         }
+
         //normally RM is connected if I can select something...
         if (RMStore.isConnected()) {
-            RemoveNodesHandler.getInstance().setSelectedNodes(selectionList);
-            LockNodesHandler.getInstance().setSelectedNodes(selectionList);
-            UnlockNodesHandler.getInstance().setSelectedNodes(selectionList);
-            DescribeCommandHandler.getInstance().setSelectedNodes(selectionList);
+           // if the handlers have not yet been created the  getInstance() returns null
+        	
+        	if (RemoveNodesHandler.getInstance()!=null)
+        		RemoveNodesHandler.getInstance().setSelectedNodes(selectionList);
+
+        	if (LockNodesHandler.getInstance()!=null)
+        		LockNodesHandler.getInstance().setSelectedNodes(selectionList);
+            
+        	if (UnlockNodesHandler.getInstance()!=null)
+        		UnlockNodesHandler.getInstance().setSelectedNodes(selectionList);
+        	
+        	if ( DescribeCommandHandler.getInstance()!=null)
+        		DescribeCommandHandler.getInstance().setSelectedNodes(selectionList);
         }
 
         if (selectionList.size() > 0) {

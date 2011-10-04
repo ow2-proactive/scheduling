@@ -34,49 +34,53 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.ow2.proactive.scheduler;
+package org.ow2.proactive.scheduler.gui.handlers;
 
-import org.eclipse.jface.action.ICoolBarManager;
-import org.eclipse.jface.action.IMenuManager;
-import org.eclipse.jface.action.MenuManager;
-import org.eclipse.ui.IWorkbenchActionConstants;
-import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.actions.ActionFactory;
-import org.eclipse.ui.actions.ActionFactory.IWorkbenchAction;
-import org.eclipse.ui.application.ActionBarAdvisor;
-import org.eclipse.ui.application.IActionBarConfigurer;
+import org.eclipse.core.commands.AbstractHandler;
+import org.eclipse.core.commands.ExecutionEvent;
+import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.swt.widgets.Display;
+import org.ow2.proactive.scheduler.gui.actions.JMXActionsManager;
+import org.ow2.proactive.scheduler.gui.actions.ShowRuntimeDataAction;
 
+public abstract class JMXAbstractHandler extends AbstractHandler {
+	
+	private Action action; 
 
-public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
-
-	// help
-    private IWorkbenchAction aboutAction;
-
-    
-    public ApplicationActionBarAdvisor(IActionBarConfigurer configurer) {
-        super(configurer);
-    }
-
-    @Override
-    protected void makeActions(IWorkbenchWindow window) {
-        // HELP
-        aboutAction = ActionFactory.ABOUT.create(window);
-        register(aboutAction);
-    }
-
-    @Override
-    protected void fillMenuBar(IMenuManager menuBar) {
-        // WINDOW
-        MenuManager windowMenu = new MenuManager("&Window", IWorkbenchActionConstants.M_WINDOW);
-        MenuManager helpMenu = new MenuManager("&Help", IWorkbenchActionConstants.M_HELP);
-        helpMenu.add(aboutAction);
-
-        menuBar.add(windowMenu);
-        menuBar.add(helpMenu);
-    }
-
-    @Override
-	protected void fillCoolBar(ICoolBarManager coolBar) {
-
+	public JMXAbstractHandler()
+	{
+		JMXActionsManager.getInstance().addHandler(this);
+		this.setBaseEnabled(false);
 	}
+	
+	
+	@Override
+	public void setEnabled(Object context)
+	{
+		if (context instanceof Boolean)
+			this.setBaseEnabled(((Boolean)context).booleanValue());
+	}
+	
+	
+	@Override
+	public Object execute(ExecutionEvent event) throws ExecutionException {
+		if (action == null)
+		{
+			try {
+				action = createAction();
+			} catch (Exception e) {
+				e.printStackTrace();
+	            MessageDialog.openError(Display.getDefault().getActiveShell(), "Unable to create the action " +
+              ShowRuntimeDataAction.NAME, e.getMessage());
+	          return null;
+			}
+		}
+		action.run();
+		return null;
+	}
+	
+	
+	protected abstract Action createAction() throws Exception;
 }
