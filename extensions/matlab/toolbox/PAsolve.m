@@ -160,7 +160,15 @@ sched = PAScheduler;
 % Get the solver from memory
 solver = sched.PAgetsolver();
 if strcmp(class(solver),'double')
-    error('connexion to the scheduler is not established');
+    error('This Matlab session is not connected to a Scheduler.');
+end
+try 
+    tst = solver.isConnected();
+catch ME
+    error('This Matlab session is not connected to a Scheduler.');
+end
+if ~tst
+    error('This Matlab session is not connected to a Scheduler.');
 end
 
 opt = PAoptions;

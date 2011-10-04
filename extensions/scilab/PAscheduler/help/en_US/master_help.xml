@@ -5,8 +5,10 @@
 <!ENTITY a91d6333a09da0ffafa06f2e271e04177 SYSTEM "/home/fviale/eclipse_workspace/Scheduling_Clean/extensions/scilab/PAscheduler/help/en_US/Introduction.xml">
 <!ENTITY a8bfc8d345435902ab70195a74ac472e0 SYSTEM "/home/fviale/eclipse_workspace/Scheduling_Clean/extensions/scilab/PAscheduler/help/en_US/PATask.xml">
 <!ENTITY a8b00a52bbecb11255eac4c9e50411255 SYSTEM "/home/fviale/eclipse_workspace/Scheduling_Clean/extensions/scilab/PAscheduler/help/en_US/PAconnect.xml">
+<!ENTITY ae20bc09a12cc1b5fd26946259983edd3 SYSTEM "/home/fviale/eclipse_workspace/Scheduling_Clean/extensions/scilab/PAscheduler/help/en_US/PAdisconnect.xml">
 <!ENTITY a0ef692ccf5a97824e56ed8310fb35cff SYSTEM "/home/fviale/eclipse_workspace/Scheduling_Clean/extensions/scilab/PAscheduler/help/en_US/PAgetLogs.xml">
 <!ENTITY a675e00682845277858d55375ddb34741 SYSTEM "/home/fviale/eclipse_workspace/Scheduling_Clean/extensions/scilab/PAscheduler/help/en_US/PAisAwaited.xml">
+<!ENTITY a0ba461e51c4bf2a8172712cb47823b15 SYSTEM "/home/fviale/eclipse_workspace/Scheduling_Clean/extensions/scilab/PAscheduler/help/en_US/PAisConnected.xml">
 <!ENTITY a28ddb558f23edb65b2152498c0435fd3 SYSTEM "/home/fviale/eclipse_workspace/Scheduling_Clean/extensions/scilab/PAscheduler/help/en_US/PAjobOutput.xml">
 <!ENTITY af2956253af6dd78c12ce0c948736682c SYSTEM "/home/fviale/eclipse_workspace/Scheduling_Clean/extensions/scilab/PAscheduler/help/en_US/PAjobResult.xml">
 <!ENTITY a6caae9105b9c72fce31bbeb218b082c9 SYSTEM "/home/fviale/eclipse_workspace/Scheduling_Clean/extensions/scilab/PAscheduler/help/en_US/PAjobState.xml">
@@ -41,8 +43,10 @@
 &a91d6333a09da0ffafa06f2e271e04177;
 &a8bfc8d345435902ab70195a74ac472e0;
 &a8b00a52bbecb11255eac4c9e50411255;
+&ae20bc09a12cc1b5fd26946259983edd3;
 &a0ef692ccf5a97824e56ed8310fb35cff;
 &a675e00682845277858d55375ddb34741;
+&a0ba461e51c4bf2a8172712cb47823b15;
 &a28ddb558f23edb65b2152498c0435fd3;
 &af2956253af6dd78c12ce0c948736682c;
 &a6caae9105b9c72fce31bbeb218b082c9;

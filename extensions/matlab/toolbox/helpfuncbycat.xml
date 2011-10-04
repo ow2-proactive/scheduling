@@ -1,7 +1,9 @@
 <toc version="2.0"> 
 <tocitem target="PAScheduler_function_list.html">Functions 
   <tocitem target="PAScheduler_function_list.html#connection">Connection and Status
-	<tocitem target="PAconnect.html"><name>PAconnect</name><purpose>Connects to the ProActive Scheduler</purpose></tocitem> 
+	<tocitem target="PAconnect.html"><name>PAconnect</name><purpose>Connects to the ProActive Scheduler</purpose></tocitem>
+    <tocitem target="PAisConnected.html"><name>PAisConnected</name><purpose>tells if this Matlab session is connected to a ProActive Scheduler</purpose></tocitem>
+    <tocitem target="PAdisconnect.html"><name>PAdisconnect</name><purpose>disconnects Matlab from the ProActive Scheduler</purpose></tocitem>
 	<tocitem target="PAstate.html"><name>PAstate</name><purpose>State of ProActive Scheduler</purpose></tocitem> 
 	<tocitem target="PAjobState.html"><name>PAjobState</name><purpose>State of the given job</purpose></tocitem> 
 	<tocitem target="PAjobOutput.html"><name>PAjobOutput</name><purpose>Textual log of the given job</purpose></tocitem> 
