@@ -16,7 +16,6 @@
 		<java base="root" relpath="${java.home}/bin/java"/> 
 		<jvmarg value="-Dproactive.test=true"/>
 		<jvmarg value='${jvmargDefinedByIM}'/>
-		<jvmarg value="-Dproactive.http.jetty.xml=&quot;${proactive.home}/config/rm/deployment/jetty.xml&quot;"/>
 		<applicationClasspath>
 				<pathElement base="proactive" relpath="/dist/lib/script-js.jar"/>
 				<pathElement base="proactive" relpath="/dist/lib/jruby-engine.jar"/>

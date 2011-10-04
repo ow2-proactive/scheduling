@@ -14,7 +14,6 @@
 	<configuration>
 		<java base="root" relpath="${java.home}/bin/java"/> 
 		<jvmarg value="-Dproactive.test=true"/>
-		<jvmarg value="-Dproactive.http.jetty.xml=&quot;${proactive.home}/config/rm/deployment/jetty.xml&quot;"/>
 		<applicationClasspath>
 			<!-- Commented dependencies are referenced through the Jar-Index of Scheduler jars -->
 			<!-- Script engines must be explicitly in application classpath -->

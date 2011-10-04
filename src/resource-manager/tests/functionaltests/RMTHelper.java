@@ -76,6 +76,7 @@ import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.ow2.proactive.utils.FileToBytesConverter;
 
 import functionalTests.FunctionalTest;
+import functionalTests.ProActiveSetup;
 import functionaltests.monitor.RMMonitorEventReceiver;
 import functionaltests.monitor.RMMonitorsHandler;
 
@@ -124,6 +125,8 @@ public class RMTHelper {
 
     protected static RMMonitoring monitor;
     protected static RMAuthentication auth;
+
+    final protected static ProActiveSetup setup = new ProActiveSetup();
 
     /**
      * Default user name for RM's connection
@@ -183,7 +186,7 @@ public class RMTHelper {
                 .getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString())));
         rm.createNodeSource(NodeSource.LOCAL_INFRASTRUCTURE_NAME, LocalInfrastructure.class.getName(),
                 new Object[] { "", creds, RMTHelper.defaultNodesNumber, RMTHelper.defaultNodesTimeout,
-                        FunctionalTest.getJvmParameters() }, StaticPolicy.class.getName(), null);
+                        setup.getJvmParameters() }, StaticPolicy.class.getName(), null);
     }
 
     /**
@@ -214,7 +217,7 @@ public class RMTHelper {
             }
         }
 
-        jvmParameters += " " + FunctionalTest.getJvmParameters();
+        jvmParameters += " " + setup.getJvmParameters();
         nodeProcess.setJvmOptions(jvmParameters);
         nodeProcess.setParameters(nodeName);
         nodeProcess.startProcess();
