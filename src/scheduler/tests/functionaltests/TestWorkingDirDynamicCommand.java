@@ -87,7 +87,6 @@ public class TestWorkingDirDynamicCommand extends FunctionalTest {
     @org.junit.Test
     public void run() throws Throwable {
         String task1Name = "task1";
-        boolean onWindows = OperatingSystem.getOperatingSystem().name().equals("windows");
         //set system Property for executable path
         switch (OperatingSystem.getOperatingSystem()) {
             case windows:

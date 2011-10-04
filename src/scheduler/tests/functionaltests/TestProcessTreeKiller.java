@@ -87,12 +87,18 @@ public class TestProcessTreeKiller extends FunctionalTest {
     public void run() throws Throwable {
         killAll(unixPTKProcessName);
         String[] nativeExecLauncher;
-        boolean onWindows = OperatingSystem.getOperatingSystem().name().equals("windows");
-        if (onWindows) {
-            nativeExecLauncher = new String[] { "cmd", "/C",
-                    "\"" + new File(nativeWindowsExecLauncher.toURI()).getAbsolutePath() + "\"" };
-        } else {
-            nativeExecLauncher = new String[] { new File(nativeLinuxExecLauncher.toURI()).getAbsolutePath() };
+
+        switch (OperatingSystem.getOperatingSystem()) {
+            case windows:
+                nativeExecLauncher = new String[] { "cmd", "/C",
+                        "\"" + new File(nativeWindowsExecLauncher.toURI()).getAbsolutePath() + "\"" };
+                break;
+            case unix:
+                nativeExecLauncher = new String[] { new File(nativeLinuxExecLauncher.toURI())
+                        .getAbsolutePath() };
+                break;
+            default:
+                throw new IllegalStateException("Unsupported operating system");
         }
         SchedulerTHelper.log("Test 1 : Creating jobs...");
 
@@ -118,7 +124,7 @@ public class TestProcessTreeKiller extends FunctionalTest {
         task2.setCommandLine(nativeExecLauncher);
         job2.addTask(task2);
 
-        if (!onWindows) {
+        if (OperatingSystem.getOperatingSystem() == OperatingSystem.unix) {
             SchedulerTHelper.setExecutable(nativeExecLauncher + " " +
                 new File(nativeLinuxDetachedProcess.toURI()).getAbsolutePath());
         }
@@ -131,10 +137,15 @@ public class TestProcessTreeKiller extends FunctionalTest {
 
         Thread.sleep(wait_time);
         int runningDetachedProcNumber;
-        if (onWindows) {
-            runningDetachedProcNumber = getProcessNumberWindows("ping.exe");
-        } else {
-            runningDetachedProcNumber = getProcessNumber(unixPTKProcessName);
+        switch (OperatingSystem.getOperatingSystem()) {
+            case windows:
+                runningDetachedProcNumber = getProcessNumberWindows("ping.exe");
+                break;
+            case unix:
+                runningDetachedProcNumber = getProcessNumber(unixPTKProcessName);
+                break;
+            default:
+                throw new IllegalStateException("Unsupported operating system");
         }
 
         //we should have 2 times (2 jobs) number of detached processes
@@ -146,10 +157,15 @@ public class TestProcessTreeKiller extends FunctionalTest {
         SchedulerTHelper.waitForEventJobFinished(id1);
 
         //we should have 1 time number of detached processes
-        if (onWindows) {
-            runningDetachedProcNumber = getProcessNumberWindows("ping.exe");
-        } else {
-            runningDetachedProcNumber = getProcessNumber(unixPTKProcessName);
+        switch (OperatingSystem.getOperatingSystem()) {
+            case windows:
+                runningDetachedProcNumber = getProcessNumberWindows("ping.exe");
+                break;
+            case unix:
+                runningDetachedProcNumber = getProcessNumber(unixPTKProcessName);
+                break;
+            default:
+                throw new IllegalStateException("Unsupported operating system");
         }
         SchedulerTHelper.log("number of processes : " + runningDetachedProcNumber);
         Assert.assertEquals(detachedProcNumber, runningDetachedProcNumber);
@@ -159,10 +175,15 @@ public class TestProcessTreeKiller extends FunctionalTest {
         SchedulerTHelper.waitForEventJobFinished(id2);
 
         //we should have 0 detached processes
-        if (onWindows) {
-            runningDetachedProcNumber = getProcessNumberWindows("ping.exe");
-        } else {
-            runningDetachedProcNumber = getProcessNumber(unixPTKProcessName);
+        switch (OperatingSystem.getOperatingSystem()) {
+            case windows:
+                runningDetachedProcNumber = getProcessNumberWindows("ping.exe");
+                break;
+            case unix:
+                runningDetachedProcNumber = getProcessNumber(unixPTKProcessName);
+                break;
+            default:
+                throw new IllegalStateException("Unsupported operating system");
         }
         SchedulerTHelper.log("number of processes : " + runningDetachedProcNumber);
         Assert.assertEquals(0, runningDetachedProcNumber);
@@ -177,21 +198,26 @@ public class TestProcessTreeKiller extends FunctionalTest {
     private void killAll(String processName) throws Throwable {
         byte[] out = new byte[1024];
 
-        if (OperatingSystem.getOperatingSystem().name().equals("windows")) {
-            Runtime.getRuntime().exec("TASKKILL /F /IM ping.exe");
-        } else {
-            //get PIDs of processName
-            Process p = Runtime.getRuntime().exec("pidof " + processName);
+        switch (OperatingSystem.getOperatingSystem()) {
+            case windows:
+                Runtime.getRuntime().exec("TASKKILL /F /IM ping.exe");
+                break;
+            case unix:
+                //get PIDs of processName
+                Process p = Runtime.getRuntime().exec("pidof " + processName);
 
-            int n = p.getInputStream().read(out);
-            //contains PIDs separated with spaces
-            if (n > 0) {
-                String pids = new String(out, 0, n);
-                if (pids != null && pids.length() > 1) {
-                    //kill this processes
-                    Runtime.getRuntime().exec("kill " + pids);
+                int n = p.getInputStream().read(out);
+                //contains PIDs separated with spaces
+                if (n > 0) {
+                    String pids = new String(out, 0, n);
+                    if (pids != null && pids.length() > 1) {
+                        //kill this processes
+                        Runtime.getRuntime().exec("kill " + pids);
+                    }
                 }
-            }
+                break;
+            default:
+                throw new IllegalStateException("Unsupported operating system");
         }
     }
 

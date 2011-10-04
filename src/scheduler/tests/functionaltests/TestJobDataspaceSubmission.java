@@ -106,7 +106,6 @@ public class TestJobDataspaceSubmission extends FunctionalTest {
     @org.junit.Test
     public void run() throws Throwable {
 
-        String opSystem = OperatingSystem.getOperatingSystem().name();
         //create initial directories and files
         setup();
 
@@ -123,12 +122,17 @@ public class TestJobDataspaceSubmission extends FunctionalTest {
         t.addInputFiles(in1, InputAccessMode.TransferFromInputSpace);
         t.addOutputFiles(out1, OutputAccessMode.TransferToOutputSpace);
         t.setName("native_java1");
-        if (opSystem.equals("windows")) {
-            t.setCommandLine(new String[] { "cmd", "/C",
-                    "type $LOCALSPACE\\" + in1 + " > $LOCALSPACE\\" + out1 });
-        } else {
-            t.setCommandLine(new String[] { "/bin/bash", "-c",
-                    "cat $LOCALSPACE/" + in1 + " > $LOCALSPACE/" + out1 });
+        switch (OperatingSystem.getOperatingSystem()) {
+            case windows:
+                t.setCommandLine(new String[] { "cmd", "/C",
+                        "type $LOCALSPACE\\" + in1 + " > $LOCALSPACE\\" + out1 });
+                break;
+            case unix:
+                t.setCommandLine(new String[] { "/bin/bash", "-c",
+                        "cat $LOCALSPACE/" + in1 + " > $LOCALSPACE/" + out1 });
+                break;
+            default:
+                throw new IllegalStateException("Unsupported operating system");
         }
 
         job.addTask(t);
@@ -137,12 +141,17 @@ public class TestJobDataspaceSubmission extends FunctionalTest {
         t.addInputFiles(in2, InputAccessMode.TransferFromOutputSpace);
         t.addOutputFiles(out2, OutputAccessMode.TransferToOutputSpace);
         t.setName("native_java2");
-        if (opSystem.equals("windows")) {
-            t.setCommandLine(new String[] { "cmd", "/C",
-                    "type $LOCALSPACE\\" + in2 + " > $LOCALSPACE\\" + out2 });
-        } else {
-            t.setCommandLine(new String[] { "/bin/bash", "-c",
-                    "cat $LOCALSPACE/" + in2 + " > $LOCALSPACE/" + out2 });
+        switch (OperatingSystem.getOperatingSystem()) {
+            case windows:
+                t.setCommandLine(new String[] { "cmd", "/C",
+                        "type $LOCALSPACE\\" + in2 + " > $LOCALSPACE\\" + out2 });
+                break;
+            case unix:
+                t.setCommandLine(new String[] { "/bin/bash", "-c",
+                        "cat $LOCALSPACE/" + in2 + " > $LOCALSPACE/" + out2 });
+                break;
+            default:
+                throw new IllegalStateException("Unsupported operating system");
         }
         job.addTask(t);
 
@@ -153,12 +162,17 @@ public class TestJobDataspaceSubmission extends FunctionalTest {
                 InputAccessMode.TransferFromOutputSpace);
         t1.addOutputFiles("*c.txt", OutputAccessMode.TransferToOutputSpace);
         t1.setName("native_java3");
-        if (opSystem.equals("windows")) {
-            t1.setCommandLine(new String[] { "cmd", "/C",
-                    "type $LOCALSPACE\\" + in1 + " $LOCALSPACE\\" + out2 + " > $LOCALSPACE\\" + out3 });
-        } else {
-            t1.setCommandLine(new String[] { "/bin/bash", "-c",
-                    "cat $LOCALSPACE/" + in1 + " $LOCALSPACE/" + out2 + " > $LOCALSPACE/" + out3 });
+        switch (OperatingSystem.getOperatingSystem()) {
+            case windows:
+                t1.setCommandLine(new String[] { "cmd", "/C",
+                        "type $LOCALSPACE\\" + in1 + " $LOCALSPACE\\" + out2 + " > $LOCALSPACE\\" + out3 });
+                break;
+            case unix:
+                t1.setCommandLine(new String[] { "/bin/bash", "-c",
+                        "cat $LOCALSPACE/" + in1 + " $LOCALSPACE/" + out2 + " > $LOCALSPACE/" + out3 });
+                break;
+            default:
+                throw new IllegalStateException("Unsupported operating system");
         }
         job.addTask(t1);
 

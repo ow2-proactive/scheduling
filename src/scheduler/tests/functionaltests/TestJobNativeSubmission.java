@@ -94,7 +94,7 @@ public class TestJobNativeSubmission extends FunctionalTest {
         //test submission and event reception
         TaskFlowJob job = (TaskFlowJob) JobFactory_stax.getFactory().createJob(
                 new File(jobDescriptor.toURI()).getAbsolutePath());
-        if (OperatingSystem.getOperatingSystem().name().equals("windows")) {
+        if (OperatingSystem.getOperatingSystem() == OperatingSystem.windows) {
             ((NativeTask) job.getTask(task1Name)).setCommandLine("cmd", "/C", "ping", "127.0.0.1", "-n",
                     "10", ">", "NUL");
         }

@@ -85,7 +85,7 @@ public class TestJobFork extends FunctionalTest {
         String taskForked2Name = "Fork2";
         TaskFlowJob job = (TaskFlowJob) JobFactory_stax.getFactory().createJob(
                 new File(jobDescriptor.toURI()).getAbsolutePath());
-        if (OperatingSystem.getOperatingSystem().name().equals("windows")) {
+        if (OperatingSystem.getOperatingSystem() == OperatingSystem.windows) {
             ((NativeTask) job.getTask(task1Name)).setCommandLine("cmd", "/C", "ping", "127.0.0.1", "-n",
                     "20", ">", "NUL");
             ((NativeTask) job.getTask(taskForked1Name)).setCommandLine("cmd", "/C", "ping", "127.0.0.1",
