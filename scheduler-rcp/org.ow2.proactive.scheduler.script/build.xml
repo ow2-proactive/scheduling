@@ -20,9 +20,9 @@
 
 		<ant antfile="${eclipse.pdebuild.scripts}/productBuild/productBuild.xml" />
 
-		<mkdir dir="${basedir}/../../dist" />
+		<mkdir dir="${basedir}/../../dist/scheduler-rcp" />
 
-		<move todir="${basedir}/../../dist">
+		<move todir="${basedir}/../../dist/scheduler-rcp">
 			<fileset dir="${buildDirectory}/${buildLabel}" includes="*.zip,*.tar.gz" />
 		</move>
 		<!-- refresh the workspace -->

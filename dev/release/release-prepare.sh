@@ -150,8 +150,8 @@ function generate_credential() {
 
 function moveRCPs(){
 	echo "***************** Move RM and Scheduler RCPs ********************"
-	mv ${TMP_DIR}/rm-rcp/org.ow2.proactive.resourcemanager.script/{*.zip,*.tar.gz} ${TMP_DIR}/..
-	mv ${TMP_DIR}/scheduler-rcp/org.ow2.proactive.scheduler.script/{*.zip,*.tar.gz} ${TMP_DIR}/..
+	mv ${TMP_DIR}/dist/rm-rcp/{*.zip,*.tar.gz} ${TMP_DIR}/..
+	mv ${TMP_DIR}/dist/scheduler-rcp/{*.zip,*.tar.gz} ${TMP_DIR}/..
 }
 
 
