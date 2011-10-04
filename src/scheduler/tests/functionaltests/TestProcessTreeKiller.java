@@ -125,8 +125,12 @@ public class TestProcessTreeKiller extends FunctionalTest {
         job2.addTask(task2);
 
         if (OperatingSystem.getOperatingSystem() == OperatingSystem.unix) {
-            SchedulerTHelper.setExecutable(nativeExecLauncher + " " +
-                new File(nativeLinuxDetachedProcess.toURI()).getAbsolutePath());
+            String list = "";
+            for (String str : nativeExecLauncher) {
+                list += str + " ";
+            }
+            list += new File(nativeLinuxDetachedProcess.toURI()).getAbsolutePath();
+            SchedulerTHelper.setExecutable(list);
         }
 
         //submit two jobs
