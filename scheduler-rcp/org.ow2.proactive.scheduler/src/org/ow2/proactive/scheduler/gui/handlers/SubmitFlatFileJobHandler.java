@@ -39,11 +39,12 @@ package org.ow2.proactive.scheduler.gui.handlers;
 import org.ow2.proactive.scheduler.gui.actions.SchedulerGUIAction;
 import org.ow2.proactive.scheduler.gui.actions.SubmitFlatFileJobAction;
 
+
 public class SubmitFlatFileJobHandler extends SchedulerGUIAbstractHandler {
-	@Override
-	protected SchedulerGUIAction createAction() {
-		SubmitFlatFileJobAction action = new SubmitFlatFileJobAction();
-		action.setEnabled(true);
-		return action;
-	}
+    @Override
+    protected SchedulerGUIAction createAction() {
+        SubmitFlatFileJobAction action = new SubmitFlatFileJobAction();
+        action.setEnabled(true);
+        return action;
+    }
 }

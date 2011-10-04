@@ -101,21 +101,20 @@ public class Activator extends AbstractUIPlugin {
         // Customize the platform instance location 
         final Location instanceLoc = Platform.getInstanceLocation();
         // FIX "Could not set location once it is set"   
-        if (!instanceLoc.isSet())
-        {
-	        URL customLocURL = null;
-	        try {
-	            customLocURL = new URL("file:" + System.getProperty("user.home") +
-	                "/.ProActive_Scheduler/workspace/");
-	            instanceLoc.set(customLocURL, false);
-	        } catch (Exception e) {
-	            if (e instanceof IllegalStateException) {
-	                System.err.println("Unable to set the platform instance location to " + customLocURL);
-	                System.err.println("The current location is " + instanceLoc.getURL());
-	                System.err.println("Be sure that the program arguments contains -data @noDefault");
-	            }
-	            e.printStackTrace();
-	        }
+        if (!instanceLoc.isSet()) {
+            URL customLocURL = null;
+            try {
+                customLocURL = new URL("file:" + System.getProperty("user.home") +
+                    "/.ProActive_Scheduler/workspace/");
+                instanceLoc.set(customLocURL, false);
+            } catch (Exception e) {
+                if (e instanceof IllegalStateException) {
+                    System.err.println("Unable to set the platform instance location to " + customLocURL);
+                    System.err.println("The current location is " + instanceLoc.getURL());
+                    System.err.println("Be sure that the program arguments contains -data @noDefault");
+                }
+                e.printStackTrace();
+            }
         }
         // Get the bundle (this real location of this plugin)
         final Bundle bundle = context.getBundle();
@@ -152,43 +151,38 @@ public class Activator extends AbstractUIPlugin {
         String serviceClass = URLStreamHandlerService.class.getName();
         context.registerService(serviceClass, new IC2DHandler(), properties);
 
-    
         // Add a listener to the workbench to listen for perspective change and
-		// perform custom actions
-		// Add the listener once the workbenchh is fully started
-		Display.getDefault().asyncExec(new Runnable() {
-			@Override
-			public void run() {
-				// wait until the workbench has been initialized
-				// if the workbench is still starting, reschedule the execution
-				// of this runnable
-				if (PlatformUI.getWorkbench().isStarting()) {
-					Display.getDefault().timerExec(1000, this);
-				} else { 
-					// the workbench finished the initialization process 
-					IWorkbenchWindow workbenchWindow = PlatformUI
-							.getWorkbench().getActiveWorkbenchWindow();
-					SchedulerPerspectiveAdapter schedPerspectiveListener = new SchedulerPerspectiveAdapter();
-					workbenchWindow
-							.addPerspectiveListener(schedPerspectiveListener);
+        // perform custom actions
+        // Add the listener once the workbenchh is fully started
+        Display.getDefault().asyncExec(new Runnable() {
+            @Override
+            public void run() {
+                // wait until the workbench has been initialized
+                // if the workbench is still starting, reschedule the execution
+                // of this runnable
+                if (PlatformUI.getWorkbench().isStarting()) {
+                    Display.getDefault().timerExec(1000, this);
+                } else {
+                    // the workbench finished the initialization process 
+                    IWorkbenchWindow workbenchWindow = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+                    SchedulerPerspectiveAdapter schedPerspectiveListener = new SchedulerPerspectiveAdapter();
+                    workbenchWindow.addPerspectiveListener(schedPerspectiveListener);
 
-					// update rmPerspectiveListener with the current perspective
-					// we need to perform this update by hand as no event is
-					// sent by the platform at
-					// platform initialization and we need to have the current
-					// perspective set
-					schedPerspectiveListener.perspectiveActivated(PlatformUI
-							.getWorkbench().getActiveWorkbenchWindow()
-							.getActivePage(), PlatformUI.getWorkbench()
-							.getActiveWorkbenchWindow().getActivePage()
-							.getPerspective());
-				}
-			}// else - isStarting()
-		});
+                    // update rmPerspectiveListener with the current perspective
+                    // we need to perform this update by hand as no event is
+                    // sent by the platform at
+                    // platform initialization and we need to have the current
+                    // perspective set
+                    schedPerspectiveListener.perspectiveActivated(PlatformUI.getWorkbench()
+                            .getActiveWorkbenchWindow().getActivePage(), PlatformUI.getWorkbench()
+                            .getActiveWorkbenchWindow().getActivePage().getPerspective());
+                }
+            }// else - isStarting()
+        });
 
-		//Create AOs here, at platform launch time in order to  minimise the time for the first user connection
-		JobsController.turnActive();
-		SchedulerProxy.getInstance();
+        //Create AOs here, at platform launch time in order to  minimise the time for the first user connection
+        JobsController.turnActive();
+        SchedulerProxy.getInstance();
 
     }
 

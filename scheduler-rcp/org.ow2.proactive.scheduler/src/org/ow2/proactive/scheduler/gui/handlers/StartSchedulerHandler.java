@@ -41,29 +41,25 @@ import org.eclipse.core.commands.ExecutionException;
 import org.ow2.proactive.scheduler.gui.actions.SchedulerGUIAction;
 import org.ow2.proactive.scheduler.gui.actions.StartSchedulerAction;
 
+
 public class StartSchedulerHandler extends SchedulerGUIAbstractHandler {
-	
-	 
-	@Override
-	protected SchedulerGUIAction createAction() {
-		StartSchedulerAction action = new StartSchedulerAction();
-		action.setEnabled(false);
-		return action;
-	}
-	
-	@Override
-	public Object execute(ExecutionEvent event) throws ExecutionException {
-		getAction().run();
-		return null;
-	}
-	
-	
-	@Override
-	public void setEnabled(Object context)
-	{
-		setBaseEnabled(getAction().isEnabled());
-	}
-	 
-	 
-	
+
+    @Override
+    protected SchedulerGUIAction createAction() {
+        StartSchedulerAction action = new StartSchedulerAction();
+        action.setEnabled(false);
+        return action;
+    }
+
+    @Override
+    public Object execute(ExecutionEvent event) throws ExecutionException {
+        getAction().run();
+        return null;
+    }
+
+    @Override
+    public void setEnabled(Object context) {
+        setBaseEnabled(getAction().isEnabled());
+    }
+
 }

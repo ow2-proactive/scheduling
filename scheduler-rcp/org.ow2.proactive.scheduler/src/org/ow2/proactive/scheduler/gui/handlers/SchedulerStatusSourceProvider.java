@@ -42,6 +42,7 @@ import java.util.Map;
 import org.eclipse.ui.AbstractSourceProvider;
 import org.eclipse.ui.ISources;
 
+
 /**
  * A source provider which give information on the Scheduler Current Status. It
  * provides "YES"/"NO" values for the variables CAN_START_SCHEDULER and
@@ -58,68 +59,59 @@ import org.eclipse.ui.ISources;
  */
 public class SchedulerStatusSourceProvider extends AbstractSourceProvider {
 
-	public final static String CAN_START_SCHEDULER = "org.ow2.proactive.scheduler.gui.handlers.canstart";
-	public final static String CAN_STOP_SCHEDULER = "org.ow2.proactive.scheduler.gui.handlers.canstop";
+    public final static String CAN_START_SCHEDULER = "org.ow2.proactive.scheduler.gui.handlers.canstart";
+    public final static String CAN_STOP_SCHEDULER = "org.ow2.proactive.scheduler.gui.handlers.canstop";
 
-	public final static String YES = "YES";
-	public final static String NO = "NO";
+    public final static String YES = "YES";
+    public final static String NO = "NO";
 
-	
-	private boolean isSchedPerspective=false; 
-	private boolean canStart = false;
-	private boolean canStop = false;
+    private boolean isSchedPerspective = false;
+    private boolean canStart = false;
+    private boolean canStop = false;
 
-	@Override
-	public void dispose() {
-		// TODO Auto-generated method stub
+    @Override
+    public void dispose() {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	@Override
-	public Map getCurrentState() {
-		Map<String, String> map = new HashMap<String, String>(1);
-		String value = canStart&&isSchedPerspective ? YES : NO;
-		map.put(CAN_START_SCHEDULER, value);
-		
-		String value1 = canStop&&isSchedPerspective ? YES : NO;
-		map.put(CAN_STOP_SCHEDULER, value);
-		map.put(CAN_STOP_SCHEDULER, value1);
-		
-		
-		
-		return map;
-	}
+    @Override
+    public Map getCurrentState() {
+        Map<String, String> map = new HashMap<String, String>(1);
+        String value = canStart && isSchedPerspective ? YES : NO;
+        map.put(CAN_START_SCHEDULER, value);
 
-	@Override
-	public String[] getProvidedSourceNames() {
-		return new String[] { CAN_START_SCHEDULER, CAN_STOP_SCHEDULER };
-	}
+        String value1 = canStop && isSchedPerspective ? YES : NO;
+        map.put(CAN_STOP_SCHEDULER, value);
+        map.put(CAN_STOP_SCHEDULER, value1);
 
-	public void setCanStart(boolean can_start) {
-		if (this.canStart == can_start)
-			return;
+        return map;
+    }
 
-		this.canStart = can_start;
-		fireSourceChanged(ISources.WORKBENCH, CAN_START_SCHEDULER,
-				canStart&&isSchedPerspective ? YES : NO);
-	}
+    @Override
+    public String[] getProvidedSourceNames() {
+        return new String[] { CAN_START_SCHEDULER, CAN_STOP_SCHEDULER };
+    }
 
-	public void setCanStop(boolean can_stop) {
-		if (this.canStop == can_stop)
-			return;
+    public void setCanStart(boolean can_start) {
+        if (this.canStart == can_start)
+            return;
 
-		this.canStop = can_stop;
-		fireSourceChanged(ISources.WORKBENCH, CAN_STOP_SCHEDULER, canStop&&isSchedPerspective ? YES
-				: NO);
-	}
+        this.canStart = can_start;
+        fireSourceChanged(ISources.WORKBENCH, CAN_START_SCHEDULER, canStart && isSchedPerspective ? YES : NO);
+    }
 
-	
-	public void perspectiveChanged(boolean isSchedulerPerspective)
-	{
-		this.isSchedPerspective = isSchedulerPerspective;
-		fireSourceChanged(ISources.WORKBENCH, CAN_STOP_SCHEDULER, canStop&&isSchedPerspective ? YES
-				: NO);
-		fireSourceChanged(ISources.WORKBENCH, CAN_STOP_SCHEDULER, canStop&&isSchedPerspective ? YES
-				: NO);
-	}
+    public void setCanStop(boolean can_stop) {
+        if (this.canStop == can_stop)
+            return;
+
+        this.canStop = can_stop;
+        fireSourceChanged(ISources.WORKBENCH, CAN_STOP_SCHEDULER, canStop && isSchedPerspective ? YES : NO);
+    }
+
+    public void perspectiveChanged(boolean isSchedulerPerspective) {
+        this.isSchedPerspective = isSchedulerPerspective;
+        fireSourceChanged(ISources.WORKBENCH, CAN_STOP_SCHEDULER, canStop && isSchedPerspective ? YES : NO);
+        fireSourceChanged(ISources.WORKBENCH, CAN_STOP_SCHEDULER, canStop && isSchedPerspective ? YES : NO);
+    }
 }

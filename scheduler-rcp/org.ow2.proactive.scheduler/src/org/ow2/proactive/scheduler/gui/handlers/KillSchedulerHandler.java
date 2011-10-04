@@ -39,12 +39,13 @@ package org.ow2.proactive.scheduler.gui.handlers;
 import org.ow2.proactive.scheduler.gui.actions.KillSchedulerAction;
 import org.ow2.proactive.scheduler.gui.actions.SchedulerGUIAction;
 
+
 public class KillSchedulerHandler extends SchedulerGUIAbstractHandler {
-	
-	@Override
-	protected SchedulerGUIAction createAction() {
-		KillSchedulerAction action = new KillSchedulerAction();
-		action.setEnabled(false);
-		return action;
-	}
+
+    @Override
+    protected SchedulerGUIAction createAction() {
+        KillSchedulerAction action = new KillSchedulerAction();
+        action.setEnabled(false);
+        return action;
+    }
 }

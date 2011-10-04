@@ -45,42 +45,37 @@ import org.eclipse.swt.widgets.Display;
 import org.ow2.proactive.scheduler.gui.actions.JMXActionsManager;
 import org.ow2.proactive.scheduler.gui.actions.ShowRuntimeDataAction;
 
-public abstract class JMXAbstractHandler extends AbstractHandler {
-	
-	private Action action; 
 
-	public JMXAbstractHandler()
-	{
-		JMXActionsManager.getInstance().addHandler(this);
-		this.setBaseEnabled(false);
-	}
-	
-	
-	@Override
-	public void setEnabled(Object context)
-	{
-		if (context instanceof Boolean)
-			this.setBaseEnabled(((Boolean)context).booleanValue());
-	}
-	
-	
-	@Override
-	public Object execute(ExecutionEvent event) throws ExecutionException {
-		if (action == null)
-		{
-			try {
-				action = createAction();
-			} catch (Exception e) {
-				e.printStackTrace();
-	            MessageDialog.openError(Display.getDefault().getActiveShell(), "Unable to create the action " +
-              ShowRuntimeDataAction.NAME, e.getMessage());
-	          return null;
-			}
-		}
-		action.run();
-		return null;
-	}
-	
-	
-	protected abstract Action createAction() throws Exception;
+public abstract class JMXAbstractHandler extends AbstractHandler {
+
+    private Action action;
+
+    public JMXAbstractHandler() {
+        JMXActionsManager.getInstance().addHandler(this);
+        this.setBaseEnabled(false);
+    }
+
+    @Override
+    public void setEnabled(Object context) {
+        if (context instanceof Boolean)
+            this.setBaseEnabled(((Boolean) context).booleanValue());
+    }
+
+    @Override
+    public Object execute(ExecutionEvent event) throws ExecutionException {
+        if (action == null) {
+            try {
+                action = createAction();
+            } catch (Exception e) {
+                e.printStackTrace();
+                MessageDialog.openError(Display.getDefault().getActiveShell(),
+                        "Unable to create the action " + ShowRuntimeDataAction.NAME, e.getMessage());
+                return null;
+            }
+        }
+        action.run();
+        return null;
+    }
+
+    protected abstract Action createAction() throws Exception;
 }

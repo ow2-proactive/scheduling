@@ -41,24 +41,23 @@ import org.ow2.proactive.scheduler.gui.actions.SubmitFlatFileJobAction;
 import org.ow2.proactive.scheduler.gui.actions.SubmitJobAction;
 import org.ow2.proactive.scheduler.gui.actions.SubmitListAction;
 
+
 public class SubmitListHandler extends SchedulerGUIAbstractHandler {
 
-	@Override
-	protected SchedulerGUIAction createAction() {
-		SubmitListAction action =  new SubmitListAction();
-		
-//		SubmitJobAction submitJob = new SubmitJobAction(false);
-//		SubmitJobAction submitJobEditVars = new SubmitJobAction(true);
-//		SubmitFlatFileJobAction submitFlatJob = new SubmitFlatFileJobAction();
-//		action.add(submitJob);
-//		action.add(submitJobEditVars);
-//		action.add(submitFlatJob);
-//		
-//
-//		action.setEnabled(false);
-		return action;
-	}
+    @Override
+    protected SchedulerGUIAction createAction() {
+        SubmitListAction action = new SubmitListAction();
 
-	
-	
+        //		SubmitJobAction submitJob = new SubmitJobAction(false);
+        //		SubmitJobAction submitJobEditVars = new SubmitJobAction(true);
+        //		SubmitFlatFileJobAction submitFlatJob = new SubmitFlatFileJobAction();
+        //		action.add(submitJob);
+        //		action.add(submitJobEditVars);
+        //		action.add(submitFlatJob);
+        //		
+        //
+        //		action.setEnabled(false);
+        return action;
+    }
+
 }

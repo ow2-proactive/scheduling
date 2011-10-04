@@ -63,7 +63,7 @@ public class ActionsManager {
     private static ActionsManager instance = null;
     private List<SchedulerGUIAction> actions = null;
     private List<SchedulerGUIAbstractHandler> handlers = null;
-    
+
     private SchedulerStatus schedulerStatus = null;
     private boolean connected = false;
 
@@ -92,9 +92,7 @@ public class ActionsManager {
     public boolean addHandler(SchedulerGUIAbstractHandler handler) {
         return this.handlers.add(handler);
     }
-    
-    
-    
+
     public void update() {
         boolean jobSelected = false;
         boolean owner = false;
@@ -122,48 +120,38 @@ public class ActionsManager {
             action.setEnabled(connected, schedulerStatus, /*SchedulerProxy.getInstance().isAnAdmin()*/true,
                     jobSelected, owner, jobInFinishQueue);
         }
- 
+
         for (SchedulerGUIAbstractHandler handler : handlers) {
-        	handler.setEnabled(connected, schedulerStatus, /*SchedulerProxy.getInstance().isAnAdmin()*/true,
+            handler.setEnabled(connected, schedulerStatus, /*SchedulerProxy.getInstance().isAnAdmin()*/true,
                     jobSelected, owner, jobInFinishQueue);
         }
-        
-        
-        
+
         //Update Source Providers
         PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable() {
-			@Override
-			public void run() {
-				IWorkbenchWindow window =	PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-				if (window==null)
-					return;
-				ISourceProviderService sourceProviderService = (ISourceProviderService) window.getService(ISourceProviderService.class);
-				//SchedulerStatusSourceProvider provides YES/NO values for: 
-				// org.ow2.proactive.scheduler.gui.handlers.canstart
-				// org.ow2.proactive.scheduler.gui.handlers.canstop 
-				SchedulerStatusSourceProvider schedSourceProvider = (SchedulerStatusSourceProvider) sourceProviderService
-				.getSourceProvider(SchedulerStatusSourceProvider.CAN_START_SCHEDULER);
-		        
-				boolean admin = true;
-				boolean can_start  = (connected && admin && (schedulerStatus == SchedulerStatus.STOPPED)); 
-				schedSourceProvider.setCanStart(can_start);
+            @Override
+            public void run() {
+                IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+                if (window == null)
+                    return;
+                ISourceProviderService sourceProviderService = (ISourceProviderService) window
+                        .getService(ISourceProviderService.class);
+                //SchedulerStatusSourceProvider provides YES/NO values for: 
+                // org.ow2.proactive.scheduler.gui.handlers.canstart
+                // org.ow2.proactive.scheduler.gui.handlers.canstop 
+                SchedulerStatusSourceProvider schedSourceProvider = (SchedulerStatusSourceProvider) sourceProviderService
+                        .getSourceProvider(SchedulerStatusSourceProvider.CAN_START_SCHEDULER);
 
-				boolean can_stop = (connected && admin && (schedulerStatus != SchedulerStatus.KILLED) &&
-			            (schedulerStatus != SchedulerStatus.UNLINKED) &&
-			            (schedulerStatus != SchedulerStatus.SHUTTING_DOWN) && (schedulerStatus != SchedulerStatus.STOPPED));
-				schedSourceProvider.setCanStop(can_stop);
-			}
-		});
-        
-        
-        
-        
-        
-        
-        
-       
-			
-		
+                boolean admin = true;
+                boolean can_start = (connected && admin && (schedulerStatus == SchedulerStatus.STOPPED));
+                schedSourceProvider.setCanStart(can_start);
+
+                boolean can_stop = (connected && admin && (schedulerStatus != SchedulerStatus.KILLED) &&
+                    (schedulerStatus != SchedulerStatus.UNLINKED) &&
+                    (schedulerStatus != SchedulerStatus.SHUTTING_DOWN) && (schedulerStatus != SchedulerStatus.STOPPED));
+                schedSourceProvider.setCanStop(can_stop);
+            }
+        });
+
     }
 
     public static ActionsManager getInstance() {

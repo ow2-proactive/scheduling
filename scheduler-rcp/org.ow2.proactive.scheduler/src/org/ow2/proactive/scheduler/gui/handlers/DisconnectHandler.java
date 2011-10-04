@@ -39,11 +39,12 @@ package org.ow2.proactive.scheduler.gui.handlers;
 import org.ow2.proactive.scheduler.gui.actions.DisconnectAction;
 import org.ow2.proactive.scheduler.gui.actions.SchedulerGUIAction;
 
+
 public class DisconnectHandler extends SchedulerGUIAbstractHandler {
-	@Override
-	protected SchedulerGUIAction createAction() {
-		DisconnectAction action = new DisconnectAction(); 
-		action.setEnabled(false);
-		return action; 
-	}
+    @Override
+    protected SchedulerGUIAction createAction() {
+        DisconnectAction action = new DisconnectAction();
+        action.setEnabled(false);
+        return action;
+    }
 }

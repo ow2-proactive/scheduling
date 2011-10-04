@@ -39,12 +39,13 @@ package org.ow2.proactive.scheduler.gui.handlers;
 import org.ow2.proactive.scheduler.gui.actions.PauseSchedulerAction;
 import org.ow2.proactive.scheduler.gui.actions.SchedulerGUIAction;
 
+
 public class PauseSchedulerHandler extends SchedulerGUIAbstractHandler {
-	
-	@Override
-	protected SchedulerGUIAction createAction() {
-		PauseSchedulerAction action = new PauseSchedulerAction();
-		action.setEnabled(false);
-		return action;
-	}
+
+    @Override
+    protected SchedulerGUIAction createAction() {
+        PauseSchedulerAction action = new PauseSchedulerAction();
+        action.setEnabled(false);
+        return action;
+    }
 }

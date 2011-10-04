@@ -42,6 +42,7 @@ import java.util.Map;
 import org.eclipse.ui.AbstractSourceProvider;
 import org.eclipse.ui.ISources;
 
+
 /**
  * Provides a key and a value: the key is
  * org.ow2.proactive.scheduler.ShowActions; the value is: YES (if the current
@@ -56,42 +57,41 @@ import org.eclipse.ui.ISources;
  */
 public class SchedulerPerspectiveSourceProvider extends AbstractSourceProvider {
 
-	public final static String schedulerPerspectiveKey = "org.ow2.proactive.scheduler.ShowActions";
-	private final static String YES = "YES";
-	private final static String NO = "NO";
+    public final static String schedulerPerspectiveKey = "org.ow2.proactive.scheduler.ShowActions";
+    private final static String YES = "YES";
+    private final static String NO = "NO";
 
-	/**
-	 * true if the current perspective is the Resource Manager Perspective
-	 */
-	private boolean isSchedulerPerspective = true;
+    /**
+     * true if the current perspective is the Resource Manager Perspective
+     */
+    private boolean isSchedulerPerspective = true;
 
-	@Override
-	public void dispose() {
-		// TODO Auto-generated method stub
+    @Override
+    public void dispose() {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	@Override
-	public Map getCurrentState() {
-		Map<String, String> currentState = new HashMap<String, String>(1);
-		String currentState1 = isSchedulerPerspective ? YES : NO;
-		currentState.put(schedulerPerspectiveKey, currentState1);
-		return currentState;
-	}
+    @Override
+    public Map getCurrentState() {
+        Map<String, String> currentState = new HashMap<String, String>(1);
+        String currentState1 = isSchedulerPerspective ? YES : NO;
+        currentState.put(schedulerPerspectiveKey, currentState1);
+        return currentState;
+    }
 
-	@Override
-	public String[] getProvidedSourceNames() {
-		return new String[] { schedulerPerspectiveKey };
-	}
+    @Override
+    public String[] getProvidedSourceNames() {
+        return new String[] { schedulerPerspectiveKey };
+    }
 
-	public void perspectiveChanged(boolean isSchedPerspective) {
-		if (this.isSchedulerPerspective == isSchedPerspective)
-			return; // no change
+    public void perspectiveChanged(boolean isSchedPerspective) {
+        if (this.isSchedulerPerspective == isSchedPerspective)
+            return; // no change
 
-		this.isSchedulerPerspective = isSchedPerspective;
-		String currentState = isSchedulerPerspective ? YES : NO;
-		fireSourceChanged(ISources.WORKBENCH, schedulerPerspectiveKey,
-				currentState);
-	}
+        this.isSchedulerPerspective = isSchedPerspective;
+        String currentState = isSchedulerPerspective ? YES : NO;
+        fireSourceChanged(ISources.WORKBENCH, schedulerPerspectiveKey, currentState);
+    }
 
 }

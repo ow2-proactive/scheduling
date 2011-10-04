@@ -70,21 +70,20 @@ import org.ow2.proactive.utils.NodeSet;
  */
 public class ResourceManagerProxy implements ResourceManager {
 
+    private static ResourceManagerProxy activeInstance;
 
-	private static ResourceManagerProxy activeInstance;
-	
-	
-	private static ResourceManagerProxy getActiveInstancewithException()throws Throwable {
+    private static ResourceManagerProxy getActiveInstancewithException() throws Throwable {
         if (activeInstance == null) {
-        	activeInstance = (ResourceManagerProxy) PAActiveObject.newActive(ResourceManagerProxy.class.getName(), null);
+            activeInstance = (ResourceManagerProxy) PAActiveObject.newActive(ResourceManagerProxy.class
+                    .getName(), null);
         }
         return activeInstance;
     }
 
-	public static ResourceManagerProxy getActiveInstance() {
+    public static ResourceManagerProxy getActiveInstance() {
         if (activeInstance == null) {
             try {
-            	activeInstance = getActiveInstancewithException();
+                activeInstance = getActiveInstancewithException();
             } catch (Throwable t) {
                 Activator.log(IStatus.ERROR, "- Resource Manager Proxy: Error on get instance ", t);
                 //t.printStackTrace();
@@ -93,9 +92,7 @@ public class ResourceManagerProxy implements ResourceManager {
         return activeInstance;
     }
 
-	
-	
-	private ResourceManager resourceManager = null;
+    private ResourceManager resourceManager = null;
 
     public ResourceManagerProxy() {
     }

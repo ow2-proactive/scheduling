@@ -87,7 +87,7 @@ public class RMStore {
     private RMStore(String url, String login, String password, byte[] cred) throws RMException {
         try {
             //resourceManagerAO = PAActiveObject.newActive(ResourceManagerProxy.class, new Object[] {});
-        	resourceManagerAO = ResourceManagerProxy.getActiveInstance();
+            resourceManagerAO = ResourceManagerProxy.getActiveInstance();
             baseURL = url;
 
             if (url != null && !url.endsWith("/")) {

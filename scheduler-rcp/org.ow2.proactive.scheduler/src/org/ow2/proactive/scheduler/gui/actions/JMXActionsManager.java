@@ -83,7 +83,7 @@ public class JMXActionsManager {
     private List<Action> actions;
 
     private List<AbstractHandler> handlers;
-    
+
     /**
      * Returns the single instance of this class
      * @return The single instance of this class
@@ -96,25 +96,25 @@ public class JMXActionsManager {
     }
 
     private JMXActionsManager() {
-    	this.actions = new ArrayList<Action>();
-    	this.handlers = new ArrayList<AbstractHandler>();
-    	
-//        this.actions = new Action[2];
-//
-//        try {
-//            this.actions[0] = new ShowRuntimeDataAction(this);
-//        } catch (Exception e) {
-//            MessageDialog.openError(Display.getDefault().getActiveShell(), "Unable to create the action " +
-//                ShowRuntimeDataAction.NAME, e.getMessage());
-//        }
-//
-//        try {
-//            this.actions[1] = new ShowMyAccountAction(this);
-//        } catch (Exception e) {
-//            MessageDialog.openError(Display.getDefault().getActiveShell(), "Unable to create the action " +
-//                ShowMyAccountAction.NAME, e.getMessage());
-//            e.printStackTrace();
-//        }
+        this.actions = new ArrayList<Action>();
+        this.handlers = new ArrayList<AbstractHandler>();
+
+        //        this.actions = new Action[2];
+        //
+        //        try {
+        //            this.actions[0] = new ShowRuntimeDataAction(this);
+        //        } catch (Exception e) {
+        //            MessageDialog.openError(Display.getDefault().getActiveShell(), "Unable to create the action " +
+        //                ShowRuntimeDataAction.NAME, e.getMessage());
+        //        }
+        //
+        //        try {
+        //            this.actions[1] = new ShowMyAccountAction(this);
+        //        } catch (Exception e) {
+        //            MessageDialog.openError(Display.getDefault().getActiveShell(), "Unable to create the action " +
+        //                ShowMyAccountAction.NAME, e.getMessage());
+        //            e.printStackTrace();
+        //        }
     }
 
     /**
@@ -169,7 +169,7 @@ public class JMXActionsManager {
         for (final Action a : this.actions) {
             a.setEnabled(false);
         }
-        
+
         for (final AbstractHandler h : this.handlers) {
             h.setEnabled(new Boolean(false));
         }
@@ -179,18 +179,16 @@ public class JMXActionsManager {
         return this.jmxClient;
     }
 
-    public void addAction(Action a)
-    {
-    	this.actions.add(a);
+    public void addAction(Action a) {
+        this.actions.add(a);
     }
-    
-    public void addHandler(AbstractHandler h)
-    {
-    	this.handlers.add(h);
+
+    public void addHandler(AbstractHandler h) {
+        this.handlers.add(h);
     }
-    
+
     public Action[] getActions() {
-    	return this.actions.toArray(new Action[actions.size()]);
+        return this.actions.toArray(new Action[actions.size()]);
     }
 
     /**

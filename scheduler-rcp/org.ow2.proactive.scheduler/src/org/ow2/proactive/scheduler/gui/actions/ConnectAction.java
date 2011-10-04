@@ -100,98 +100,102 @@ public class ConnectAction extends SchedulerGUIAction {
                 }
             });
         } else if (!dialogResult.isCanceled()) {
-        	
-        	UIJob job = new UIJob(getParent().getDisplay(), "Connecting to Scheduler, please wait..."){
-        		@Override
-        		public IStatus runInUIThread(IProgressMonitor monitor) {
-        			try {
-        				// Connection to the scheduler
-        				res = 0;
-        				res = SchedulerProxy.getInstance().connectToScheduler(dialogResult);
-        				return Status.OK_STATUS;
 
-        			} catch (Throwable t) {
-        				errorConnect(t, dialogResult);
-        				// Status.WARNING used (instead of Status.ERROR) to avoid the appearance of an eclipse's error dialog
-        				return new Status(Status.WARNING, "scheduler.rcp", "Could not connect to the Scheduler ", t);
-        			}
-        		}
+            UIJob job = new UIJob(getParent().getDisplay(), "Connecting to Scheduler, please wait...") {
+                @Override
+                public IStatus runInUIThread(IProgressMonitor monitor) {
+                    try {
+                        // Connection to the scheduler
+                        res = 0;
+                        res = SchedulerProxy.getInstance().connectToScheduler(dialogResult);
+                        return Status.OK_STATUS;
 
-        		@Override
-        		protected void canceling() {
-        			if (res == SchedulerProxy.CONNECTED) {
-        				//SchedulerProxy.getInstance().disconnect();                                    
-        			}
-        		}
-        	};
+                    } catch (Throwable t) {
+                        errorConnect(t, dialogResult);
+                        // Status.WARNING used (instead of Status.ERROR) to avoid the appearance of an eclipse's error dialog
+                        return new Status(Status.WARNING, "scheduler.rcp",
+                            "Could not connect to the Scheduler ", t);
+                    }
+                }
 
-        	job.addJobChangeListener(new JobChangeAdapter() {
-        		@Override
-        		public void done(IJobChangeEvent event) {
-        			switch (res) {
-        			case 0 : // init val
-        				return;
+                @Override
+                protected void canceling() {
+                    if (res == SchedulerProxy.CONNECTED) {
+                        //SchedulerProxy.getInstance().disconnect();                                    
+                    }
+                }
+            };
 
-        			case SchedulerProxy.LOGIN_OR_PASSWORD_WRONG :
-        				MessageDialog.openError(getParent().getShell(), "Could not connect", "Incorrect username or password !");
-        				return;
+            job.addJobChangeListener(new JobChangeAdapter() {
+                @Override
+                public void done(IJobChangeEvent event) {
+                    switch (res) {
+                        case 0: // init val
+                            return;
 
-        			case SchedulerProxy.CONNECTED :
-        				// wait result for synchronous call
-        				JobsController.getActiveView().init();
+                        case SchedulerProxy.LOGIN_OR_PASSWORD_WRONG:
+                            MessageDialog.openError(getParent().getShell(), "Could not connect",
+                                    "Incorrect username or password !");
+                            return;
 
-        				// Get graphical thread for the progress bar
-        				UIJob jobState = new UIJob(getParent().getDisplay(), "Downloading Scheduler state, please wait...") {
-        					@Override
-							public IStatus runInUIThread(IProgressMonitor monitor) {
-        						//synchronous call ; wait futur
+                        case SchedulerProxy.CONNECTED:
+                            // wait result for synchronous call
+                            JobsController.getActiveView().init();
 
-        						// the call "JobsController.getActiveView().init();"
-        						// must be terminated here, before starting other call.
-        						SeparatedJobView.getPendingJobComposite().initTable();
-        						SeparatedJobView.getRunningJobComposite().initTable();
-        						SeparatedJobView.getFinishedJobComposite().initTable();
+                            // Get graphical thread for the progress bar
+                            UIJob jobState = new UIJob(getParent().getDisplay(),
+                                    "Downloading Scheduler state, please wait...") {
+                                @Override
+                                public IStatus runInUIThread(IProgressMonitor monitor) {
+                                    //synchronous call ; wait futur
 
-        						ActionsManager.getInstance().setConnected(true);
-        						SelectSchedulerDialog.saveInformations();
+                                    // the call "JobsController.getActiveView().init();"
+                                    // must be terminated here, before starting other call.
+                                    SeparatedJobView.getPendingJobComposite().initTable();
+                                    SeparatedJobView.getRunningJobComposite().initTable();
+                                    SeparatedJobView.getFinishedJobComposite().initTable();
 
-        						try {
-        							// start log server
-        							Activator.startLoggerServer();
+                                    ActionsManager.getInstance().setConnected(true);
+                                    SelectSchedulerDialog.saveInformations();
 
-        							ActionsManager.getInstance().update();
+                                    try {
+                                        // start log server
+                                        Activator.startLoggerServer();
 
-        							SeparatedJobView.setVisible(true);
-        							
-        							return Status.OK_STATUS;
+                                        ActionsManager.getInstance().update();
 
-        						} catch (LogForwardingException e) {
-        							errorConnect(e, dialogResult);
-        	        				return new Status(Status.WARNING, "scheduler.rcp", "Unable to download Scheduler state", e);
-        						}
-        					}
-        					
-        					@Override
-        					protected void canceling() {
-                              //SchedulerProxy.getInstance().disconnect();                                    
-        					}
-        				};
-        				
-        				jobState.setUser(true);
-        				jobState.schedule();
-        			}
-        		}
-        	});
+                                        SeparatedJobView.setVisible(true);
 
-        	job.setUser(true);
-        	job.schedule();
+                                        return Status.OK_STATUS;
+
+                                    } catch (LogForwardingException e) {
+                                        errorConnect(e, dialogResult);
+                                        return new Status(Status.WARNING, "scheduler.rcp",
+                                            "Unable to download Scheduler state", e);
+                                    }
+                                }
+
+                                @Override
+                                protected void canceling() {
+                                    //SchedulerProxy.getInstance().disconnect();                                    
+                                }
+                            };
+
+                            jobState.setUser(true);
+                            jobState.schedule();
+                    }
+                }
+            });
+
+            job.setUser(true);
+            job.schedule();
         }
     }
 
-
     private void errorConnect(final Throwable e, final SelectSchedulerDialogResult dialogResult) {
         e.printStackTrace();
-        Activator.log(IStatus.ERROR, "Could not connect to the scheduler based on:" + dialogResult.getUrl(), e);
+        Activator.log(IStatus.ERROR, "Could not connect to the scheduler based on:" + dialogResult.getUrl(),
+                e);
         getParent().getDisplay().syncExec(new Runnable() {
             public void run() {
                 MessageDialog.openError(getParent().getShell(), "Couldn't connect",

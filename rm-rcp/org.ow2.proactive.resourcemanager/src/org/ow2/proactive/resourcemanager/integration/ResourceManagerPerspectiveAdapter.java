@@ -43,6 +43,7 @@ import org.eclipse.ui.PerspectiveAdapter;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.services.ISourceProviderService;
 
+
 /**
  * Listens for perspective change Event and Updates the RMPerspectiveSourceProvider 
  * @author esalagea
@@ -50,28 +51,27 @@ import org.eclipse.ui.services.ISourceProviderService;
  */
 public class ResourceManagerPerspectiveAdapter extends PerspectiveAdapter {
 
-	@Override
-	public void perspectiveActivated(IWorkbenchPage page,
-			IPerspectiveDescriptor perspectiveDescriptor) {
-		super.perspectiveActivated(page, perspectiveDescriptor);
-		boolean rmPerspective = false;
-		if (perspectiveDescriptor
-				.getId()
-				.equals("org.ow2.proactive.resourcemanager.gui.ResourceManagerPerspective")) {
-			rmPerspective = true;
-		}
+    @Override
+    public void perspectiveActivated(IWorkbenchPage page, IPerspectiveDescriptor perspectiveDescriptor) {
+        super.perspectiveActivated(page, perspectiveDescriptor);
+        boolean rmPerspective = false;
+        if (perspectiveDescriptor.getId().equals(
+                "org.ow2.proactive.resourcemanager.gui.ResourceManagerPerspective")) {
+            rmPerspective = true;
+        }
 
-		IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow(); 
-		ISourceProviderService service = (ISourceProviderService) window.getService(ISourceProviderService.class); 
-		RMPerspectiveSourceProvider sourceProvider = (RMPerspectiveSourceProvider) service.getSourceProvider(RMPerspectiveSourceProvider.rmPerspectiveKey); 
-		if (rmPerspective)
-			sourceProvider.perspectiveChanged(true);
-		else
-			sourceProvider.perspectiveChanged(false);
-	}
-	
-	public void perspectiveDeactivated(IWorkbenchPage page,
-			IPerspectiveDescriptor perspective) {
-	}
+        IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+        ISourceProviderService service = (ISourceProviderService) window
+                .getService(ISourceProviderService.class);
+        RMPerspectiveSourceProvider sourceProvider = (RMPerspectiveSourceProvider) service
+                .getSourceProvider(RMPerspectiveSourceProvider.rmPerspectiveKey);
+        if (rmPerspective)
+            sourceProvider.perspectiveChanged(true);
+        else
+            sourceProvider.perspectiveChanged(false);
+    }
+
+    public void perspectiveDeactivated(IWorkbenchPage page, IPerspectiveDescriptor perspective) {
+    }
 
 }
