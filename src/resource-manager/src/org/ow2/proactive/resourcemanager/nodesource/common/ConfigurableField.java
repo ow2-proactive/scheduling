@@ -38,17 +38,23 @@ package org.ow2.proactive.resourcemanager.nodesource.common;
 
 import java.io.Serializable;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+
 
 /**
  *
  * Encapsulation of field name, value and its meta data.
  *
  */
+@XmlAccessorType(XmlAccessType.FIELD)
 public class ConfigurableField implements Serializable {
     /**  */
     private static final long serialVersionUID = 31L;
     private String name;
     private String value;
+    @XmlJavaTypeAdapter(ConfigurableAdapter.class)
     private Configurable meta;
 
     public ConfigurableField(String name, String value, Configurable configurable) {
