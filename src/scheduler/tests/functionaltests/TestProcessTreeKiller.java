@@ -143,7 +143,7 @@ public class TestProcessTreeKiller extends FunctionalTest {
         int runningDetachedProcNumber;
         switch (OperatingSystem.getOperatingSystem()) {
             case windows:
-                runningDetachedProcNumber = getProcessNumberWindows("ping.exe");
+                runningDetachedProcNumber = getProcessNumberWindows("TestSleep.exe");
                 break;
             case unix:
                 runningDetachedProcNumber = getProcessNumber(unixPTKProcessName);
@@ -151,6 +151,9 @@ public class TestProcessTreeKiller extends FunctionalTest {
             default:
                 throw new IllegalStateException("Unsupported operating system");
         }
+
+        System.out.println(SchedulerTHelper.getJobResult(id1).getResult("TestPTK1").getOutput().getAllLogs(
+                true));
 
         //we should have 2 times (2 jobs) number of detached processes
         SchedulerTHelper.log("number of processes : " + runningDetachedProcNumber);
@@ -163,7 +166,7 @@ public class TestProcessTreeKiller extends FunctionalTest {
         //we should have 1 time number of detached processes
         switch (OperatingSystem.getOperatingSystem()) {
             case windows:
-                runningDetachedProcNumber = getProcessNumberWindows("ping.exe");
+                runningDetachedProcNumber = getProcessNumberWindows("TestSleep.exe");
                 break;
             case unix:
                 runningDetachedProcNumber = getProcessNumber(unixPTKProcessName);
@@ -181,7 +184,7 @@ public class TestProcessTreeKiller extends FunctionalTest {
         //we should have 0 detached processes
         switch (OperatingSystem.getOperatingSystem()) {
             case windows:
-                runningDetachedProcNumber = getProcessNumberWindows("ping.exe");
+                runningDetachedProcNumber = getProcessNumberWindows("TestSleep.exe");
                 break;
             case unix:
                 runningDetachedProcNumber = getProcessNumber(unixPTKProcessName);
@@ -204,8 +207,7 @@ public class TestProcessTreeKiller extends FunctionalTest {
 
         switch (OperatingSystem.getOperatingSystem()) {
             case windows:
-                Runtime.getRuntime().exec("TASKKILL /F /IM ping.exe");
-                Runtime.getRuntime().exec("TASKKILL /F /IM PING.EXE");
+                Runtime.getRuntime().exec("TASKKILL /F /IM TestSleep.exe");
                 break;
             case unix:
                 //get PIDs of processName
