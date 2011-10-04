@@ -367,7 +367,7 @@
 			RCP
 		-->
 
-	<target name="rcp.libClean.scheduler"  description="Clean all required libraries for scheduler RCP">
+	<target name="rcp.libClean.scheduler" description="Clean all required libraries for scheduler RCP">
 		<delete includeemptydirs="true">
 			<fileset dir="${rcp.scheduler.dir}/${rcp.scheduler.lib}/lib" includes="**/*" />
 		</delete>
@@ -383,7 +383,21 @@
 		<copy todir="${rcp.scheduler.dir}/${rcp.scheduler.lib}/lib" includeemptydirs="yes">
 			<fileset dir="${deploy.lib.dir}" includes="${scheduler.client.jar},${scheduler.core.jar},${scheduler.fsm.jar},${scheduler.matsci.jar},${scheduler.mapreduce.jar}" />
 		</copy>
-
 	</target>
 
+	<target name="rcp.build.scheduler" depends="rcp.libCopy.scheduler" description="build the scheduler's rcp product using the eclipse's headless build mechanism">
+		<available type="file" file="${equinoxjar}" property="equinoxjar.exists" />
+
+		<fail message="Could not find the org.eclipse.equinox.launcher jar. Please set the variable 'equinoxjar' with the path of your current equinox eclipse installation i.e. .../eclipse/plugins/org.eclipse.equinox.launcher_x.x.x.jar" unless="equinoxjar.exists" />
+
+		<java jar="${equinoxjar}" fork="true">
+			<arg value="-application" />
+			<arg value="org.eclipse.ant.core.antRunner" />
+			<arg value="-buildfile" />
+			<arg value="../scheduler-rcp/org.ow2.proactive.scheduler.script/build.xml" />
+			<jvmarg value="-Dbasews=${ws}" />
+			<jvmarg value="-Dbaseos=${os}" />
+			<jvmarg value="-Dbasearch=${arch}" />
+		</java>
+	</target>
 </project>
