@@ -242,13 +242,23 @@ public class TestProcessTreeKiller extends FunctionalTest {
     private int getProcessNumberWindows(String executableName) throws IOException {
         int toReturn = 0;
         String line;
+        //Test without and with "cmd /C" for comparison and detection of ping.exe process on Windows
         Process p = Runtime.getRuntime().exec("tasklist");
         BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream()));
+        System.out.println("Standard output without cmd /C :");
         while ((line = input.readLine()) != null) {
+            System.out.println(line);
             if (line.contains(executableName)) {
                 toReturn++;
             }
         }
+        System.out.println("Standard output with cmd /C :");
+        Process p2 = Runtime.getRuntime().exec(new String[] { "cmd", "/C", "tasklist" });
+        BufferedReader input2 = new BufferedReader(new InputStreamReader(p2.getInputStream()));
+        while ((line = input2.readLine()) != null) {
+            System.out.println(line);
+        }
+        input2.close();
         input.close();
         return toReturn;
     }
