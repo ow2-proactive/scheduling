@@ -1,17 +1,23 @@
 #!/bin/sh
 
-#argument 1 is the temp directory where Scheduling_full directory and RCPs archives must be
-TMP_DIR=`readlink -f $1`
-#argument 2 is the current version being released
-VERSION=$2
+#argument 1 is the current version being released
+VERSION=$1
+#argument 2 is the temp directory where Scheduling_full directory and RCPs archives must be (/tmp)
+TMP_DIR=/tmp
+if [ ! -z "$2" ] ; then
+	TMP_DIR=`readlink -f $2`
+fi
 
 #############################################################################
 
-# name of the directory that contains the full scheduling content
+# name of the directory that contains the full scheduling content  (also set in release-prepare.sh)
 SCHEDULING_FULL_NAME=Scheduling-${VERSION}_full
+# name of the uncompressed directory coming from compressed RCP archive
+SCHEDULING_CONTENT_DIR_NAME=Scheduling-${VERSION}-RCP
+RESOURCING_CONTENT_DIR_NAME=Resourcing-${VERSION}-RCP
 
 # releases names will be : ${PREFIX}${VERSION}$[SUFFIX}.ext
-# and for RCPs :           ${PREFIX}${VERSION}$[SUFFIX}os.type.arch.ext
+# and for RCPs :           ${PREFIX}${VERSION}$[SUFFIX}[os.type.arch].ext
 
 PREFIX_API_SC=ProActiveScheduling-
 PREFIX_API_RM=ProActiveResourcing-
@@ -98,8 +104,8 @@ function warn_print_usage_and_exit {
 	echo "$1" 1>&2
 	echo "" 1>&2
 	echo "Usage: $0 TMP_DIR VERSION" 1>&2
-	echo "       TMP_DIR : directory containing scheduling-full and RCP archives
-	echo "       VERSION : current version to be released
+	echo "       TMP_DIR : directory containing scheduling-full and RCP archives" 1>&2
+	echo "       VERSION : current version to be released" 1>&2
 	exit 1
 }
 
@@ -232,10 +238,10 @@ echo "---------------> Building RCP archives..."
 
 cd $TMP_DIR
 
-for i in {Scheduling,Resourcing}*{.tar.gz,zip}
+for i in {Scheduling,Resourcing}*${VERSION}*{.tar.gz,zip}
 do
 
-	if [ -f $i ] # avoid having bad file as Scheduling*.zip, Scheduling*.tar.gz
+	if [ -f $i ] # avoid having bad file as Scheduling*VERSION*.zip, Scheduling*VERSION*.tar.gz
 	then
 
 		# get RCP type of archive
@@ -270,10 +276,10 @@ do
 		if [[ $i == Scheduling* ]]
 		then
 			OUTPUT_DIRECTORY=${PREFIX_RCP_SC}${VERSION}${SUFFIX_CLIENT_RCPs}${RCP_TYPE}
-			mv Scheduling-${VERSION}-RCP ${OUTPUT_DIRECTORY}
+			mv ${SCHEDULING_CONTENT_DIR_NAME} ${OUTPUT_DIRECTORY}
 		else
 			OUTPUT_DIRECTORY=${PREFIX_RCP_RM}${VERSION}${SUFFIX_CLIENT_RCPs}${RCP_TYPE}
-			mv Resourcing-${VERSION}-RCP ${OUTPUT_DIRECTORY}
+			mv ${RESOURCING_CONTENT_DIR_NAME} ${OUTPUT_DIRECTORY}
 		fi
 
 		# FROM -> ${SCHEDULING_FULL_NAME}

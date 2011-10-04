@@ -1,8 +1,5 @@
 #!/bin/sh
 
-ECLIPSE_JAR_LAUNCHER=/user/jlscheef/home/bin/eclipse-3.7-jee/plugins/org.eclipse.equinox.launcher_1.2.0.v20110502.jar
-SERVER_NAME=server
-
 function warn_and_exit {
 	echo "$1" 1>&2
 	exit 1
@@ -23,9 +20,6 @@ function init_env() {
 	if [ -w "/mnt/scratch" ] ; then
 		TMP=/mnt/scratch
 	fi
-
-	RELEASE_BASENAME=$1
-	shift
 
 	SCHEDULER_DIR=`readlink -f $1`
 	VERSION=$2
@@ -54,11 +48,14 @@ function init_env() {
 	fi
 
 	export JAVA_HOME=${JAVA_HOME}
+
+	# name of the directory that contains the full scheduling content  (also set in release-create.sh)
+	SCHEDULING_FULL_NAME=Scheduling-${VERSION}_full
 }
 
 function copy_to_tmp() {
 	echo "********************** Copying the product to tmp dir ************************"
-	TMP_DIR="${TMP}/$RELEASE_BASENAME-${VERSION}_${SERVER_NAME}"
+	TMP_DIR="${TMP}/${SCHEDULING_FULL_NAME}"
 	output=$(mkdir ${TMP_DIR} 2>&1)
 	if [ "$?" -ne 0 ] ; then
 		if [ -e ${TMP_DIR} ] ; then
@@ -77,6 +74,16 @@ function copy_to_tmp() {
 	cp -Rf ${SCHEDULER_DIR}/* ${TMP_DIR}
 	cp -Rf ${SCHEDULER_DIR}/.classpath ${TMP_DIR}
 	cp -Rf ${SCHEDULER_DIR}/.project ${TMP_DIR}
+}
+
+function replace_version() {
+	echo "********************** Replacing version ************************"
+	cd ${TMP_DIR} || warn_and_exit "Cannot move in ${TMP_DIR}"
+	# Replace RCP version pattern with current version
+	find scheduler-rcp -type f -name "*" -exec sed -i "s/11\.22\.33/${VERSION}/" {} \;
+	find rm-rcp -type f -name "*" -exec sed -i "s/11\.22\.33/${VERSION}/" {} \;
+
+	sed -i "s/{version}/$VERSION/" README.txt
 }
 
 function build_and_clean() {
@@ -107,20 +114,14 @@ function build_and_clean() {
 
 	cd compile || warn_and_exit "Cannot move in compile"
 	./build clean
-	./build -Dversion="${VERSION}" deploy.all
-	./build -Dversion="${VERSION}" doc.Scheduler.manualPdf
-	./build -Dversion="${VERSION}" doc.rm.manualPdf
-	./build -Dversion="${VERSION}" doc.MapReduce.manualPdf
+	./build -Dversion="${VERSION}" deploy.all rcp.build.rm rcp.build.scheduler
+	./build -Dversion="${VERSION}" doc.Scheduler.manualPdf doc.rm.manualPdf doc.MapReduce.manualPdf
 
 	echo "********************** Building the product ***********************"
 	generate_credential
 
 	cd ${TMP_DIR} || warn_and_exit "Cannot move in ${TMP_DIR}"
 	echo " [i] Clean"
-
-	# Clean RCP plugins
-	find ./*-rcp/ -name "*.jar" -exec rm -rf {} \;
-	find ./*-rcp/ -name "*.class" -exec rm -rf {} \;
 
 	# Git
 	rm -rf .git
@@ -147,32 +148,15 @@ function generate_credential() {
 	../bin/unix/create-cred -F ../config/authentication/keys/pub.key -l scheduler -p scheduler_pwd -o ../config/authentication/scheduler.cred
 }
 
-function replace_version() {
-	echo "********************** Replacing version ************************"
-	cd ${TMP_DIR} || warn_and_exit "Cannot move in ${TMP_DIR}"
-	# Replace RCP version pattern with current version
-	find scheduler-rcp -type f -name "*" -exec sed -i "s/11\.22\.33/${VERSION}/" {} \;
-	find rm-rcp -type f -name "*" -exec sed -i "s/11\.22\.33/${VERSION}/" {} \;
-
-	sed -i "s/{version}/$VERSION/" README.txt
-}
-
-function buildRCPs(){
-	echo "********************** Building RM RCPs ************************"
-	cd ${TMP_DIR}/rm-rcp/org.ow2.proactive.resourcemanager.script
-	"$JAVA_HOME"/bin/java -jar /user/jlscheef/home/bin/eclipse-3.7-jee/plugins/org.eclipse.equinox.launcher_1.2.0.v20110502.jar -application org.eclipse.ant.core.antRunner
-	mv *.zip *.tar.gz ${TMP_DIR}/..
-	echo "******************* Building Scheduler RCPs ********************"
-	cd ${TMP_DIR}/scheduler-rcp/org.ow2.proactive.scheduler.script
-	"$JAVA_HOME"/bin/java -jar /user/jlscheef/home/bin/eclipse-3.7-jee/plugins/org.eclipse.equinox.launcher_1.2.0.v20110502.jar -application org.eclipse.ant.core.antRunner
-	mv *.zip *.tar.gz ${TMP_DIR}/..
+function moveRCPs(){
+	echo "***************** Move RM and Scheduler RCPs ********************"
+	mv ${TMP_DIR}/rm-rcp/org.ow2.proactive.resourcemanager.script/{*.zip,*.tar.gz} ${TMP_DIR}/..
+	mv ${TMP_DIR}/scheduler-rcp/org.ow2.proactive.scheduler.script/{*.zip,*.tar.gz} ${TMP_DIR}/..
 }
 
 
-
-init_env Scheduling $*
-SERVER_NAME=full
+init_env $*
 copy_to_tmp
-build_and_clean
 replace_version
-buildRCPs
+build_and_clean
+moveRCPs

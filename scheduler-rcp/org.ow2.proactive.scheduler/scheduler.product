@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?pde version="3.5"?>
 
-<product name="ProActive Scheduler Client" uid="org.ow2.proactive.scheduler.product" id="org.ow2.proactive.scheduler.product" application="org.ow2.proactive.scheduler.application" version="1.0.0" useFeatures="true" includeLaunchers="true">
+<product name="ProActive Scheduler Client" uid="org.ow2.proactive.scheduler.product" id="org.ow2.proactive.scheduler.product" application="org.ow2.proactive.scheduler.application" version="11.22.33" useFeatures="true" includeLaunchers="true">
 
    <aboutInfo>
       <image path="/org.ow2.proactive.scheduler/icons/alt_about.gif"/>
