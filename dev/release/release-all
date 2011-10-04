@@ -145,7 +145,6 @@ do
 	fi
 	
 	
-	clean_repository
 	replace_version
 	build_archive
 	

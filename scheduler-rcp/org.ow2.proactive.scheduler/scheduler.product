@@ -20,8 +20,7 @@
 -clean</programArgs>
       <vmArgs>-Xmx512M -Xms512M
 -Dproactive.net.nolocal=true
--Dpa.scheduler.logs.provider=org.ow2.proactive.scheduler.common.util.logforwarder.providers.ProActiveBasedForwardingProvider
--Dlog4j.configuration=file:/home/acontes/.proactive/ProActiveLoggers.properties</vmArgs>
+-Dpa.scheduler.logs.provider=org.ow2.proactive.scheduler.common.util.logforwarder.providers.ProActiveBasedForwardingProvider</vmArgs>
    </launcherArgs>
 
    <windowImages i16="/org.ow2.proactive.scheduler/icons/alt_window_16.gif" i32="/org.ow2.proactive.scheduler/icons/alt_window_32.gif"/>
@@ -44,10 +43,8 @@
       </win>
    </launcher>
 
-
    <vm>
    </vm>
-
 
    <plugins>
       <plugin id="com.ibm.icu"/>
