@@ -243,15 +243,15 @@ function outputs = PAsolve(varargin)
                     if isfile(srcPath) then
                         [ppath,fname,extension]=fileparts(srcPath);
                         srcName = strcat(strcat([fname,extension]));
-                        if ~isfile(strcat([pa_dir,fs,fname,extension])) then
-                            if opt.Debug then
-                                disp(strcat(['Copying file ', srcPath, ' to ',pa_dir]));
-                            end
-                            copyfile(srcPath,pa_dir);
-                            // TODO find a cleaning mechanisme
-                            //taskFilesToClean(i)=lstcat(taskFilesToClean(i), list(pa_dir+fs+fname+extension));
-                            //tmpFiles($+1)=strcat([pa_dir,fs,fname,extension]);
+                        
+                        if opt.Debug then
+                            disp(strcat(['Copying file ', srcPath, ' to ',pa_dir]));
                         end
+                        copyfile(srcPath,pa_dir);
+                        // TODO find a cleaning mechanisme
+                        //taskFilesToClean(i)=lstcat(taskFilesToClean(i), list(pa_dir+fs+fname+extension));
+                        //tmpFiles($+1)=strcat([pa_dir,fs,fname,extension]);
+                        
                         strName = String.new(srcName);
                         t_conf.addSourceFile(strName);
                     else
