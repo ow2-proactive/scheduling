@@ -81,6 +81,6 @@
 		RCP plugins
 	-->
 
-	<target name="rcp.libClean.all" depends="rcp.libClean.scheduler, rcp.libClean.rm"  description="Clean RCPs lib directories"/>
+	<target name="rcp.libClean.all" depends="rcp.libClean.scheduler, rcp.libClean.rm, rcp.libCopy.scheduling.common"  description="Clean RCPs lib directories"/>
 	<target name="rcp.libCopy.all" depends="rcp.libCopy.rm, rcp.libCopy.scheduler"  description="Copy needed libraries to RCPs lib directories"/>
 </project>

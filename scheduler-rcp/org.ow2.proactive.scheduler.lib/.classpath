@@ -1,8 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry exported="true" kind="lib" path="lib/ProActive_Scheduler-core.jar" sourcepath="/Scheduler"/>
+	<classpathentry exported="true" kind="lib" path="lib/hadoop-0.20.2-core.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/matlabcontrol-3.1.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/org.scilab.modules.javasci.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/org.scilab.modules.types.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/ProActive_LicenseSaver-1.0.0-api.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/ProActive_Scheduler-client.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/ProActive_Scheduler-mapreduce.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/ProActive_Scheduler-fsm.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/ProActive_SRM-common.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry kind="lib" path="lib/ProActive_Scheduler-matsci.jar"/>
