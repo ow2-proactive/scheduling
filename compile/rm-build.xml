@@ -150,7 +150,6 @@
 			<jvmarg value="-Dbaseos=${os}" />
 			<jvmarg value="-Dbasearch=${arch}" />
 			<jvmarg value="-DbaseLocation=${eclipse.baseLocation}" />
-			<jvmarg value="-DpluginPath=${eclipse.pluginPath}" />
 		</java>
 	</target>
 
