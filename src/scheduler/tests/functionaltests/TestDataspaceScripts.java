@@ -53,7 +53,7 @@ import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
 import org.ow2.proactive.scheduler.task.launcher.TaskLauncher;
 import org.ow2.proactive.scripting.SimpleScript;
 
-import functionalTests.FunctionalTest;
+import org.ow2.tests.FunctionalTest;
 
 
 /**

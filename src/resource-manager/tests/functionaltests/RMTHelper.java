@@ -75,8 +75,8 @@ import org.ow2.proactive.resourcemanager.nodesource.infrastructure.LocalInfrastr
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.ow2.proactive.utils.FileToBytesConverter;
 
-import functionalTests.FunctionalTest;
-import functionalTests.ProActiveSetup;
+import org.ow2.tests.FunctionalTest;
+import org.ow2.tests.ProActiveSetup;
 import functionaltests.monitor.RMMonitorEventReceiver;
 import functionaltests.monitor.RMMonitorsHandler;
 

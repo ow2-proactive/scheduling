@@ -44,7 +44,7 @@ import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.DefaultInfrastructureManager;
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 
-import functionalTests.FunctionalTest;
+import org.ow2.tests.FunctionalTest;
 import functionaltests.RMTHelper;
 
 

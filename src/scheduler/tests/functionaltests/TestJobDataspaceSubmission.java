@@ -57,7 +57,7 @@ import org.ow2.proactive.scheduler.common.task.dataspaces.FileSelector;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputAccessMode;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
 
-import functionalTests.FunctionalTest;
+import org.ow2.tests.FunctionalTest;
 import functionaltests.executables.DSWorker;
 
 

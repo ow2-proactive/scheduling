@@ -63,7 +63,7 @@ import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.SimpleScript;
 
-import functionalTests.FunctionalTest;
+import org.ow2.tests.FunctionalTest;
 import functionaltests.SchedulerTHelper;
 
 

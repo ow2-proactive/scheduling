@@ -58,7 +58,7 @@ import org.ow2.proactive.resourcemanager.core.jmx.mbean.ManagementMBean;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 
-import functionalTests.FunctionalTest;
+import org.ow2.tests.FunctionalTest;
 import functionaltests.RMTHelper;
 
 

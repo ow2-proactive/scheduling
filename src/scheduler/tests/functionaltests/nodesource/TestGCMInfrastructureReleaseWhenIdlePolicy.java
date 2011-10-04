@@ -55,7 +55,7 @@ import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.resourcemanager.nodesource.policy.ReleaseResourcesWhenSchedulerIdle;
 import org.ow2.proactive.utils.FileToBytesConverter;
 
-import functionalTests.FunctionalTest;
+import org.ow2.tests.FunctionalTest;
 import functionaltests.RMTHelper;
 import functionaltests.SchedulerTHelper;
 

@@ -48,7 +48,9 @@ import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
-import functionalTests.FunctionalTest;
+import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
+
+import org.ow2.tests.FunctionalTest;
 
 
 /**

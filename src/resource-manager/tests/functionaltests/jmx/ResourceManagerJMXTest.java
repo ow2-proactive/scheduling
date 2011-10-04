@@ -61,7 +61,7 @@ import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.core.jmx.RMJMXHelper;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 
-import functionalTests.FunctionalTest;
+import org.ow2.tests.FunctionalTest;
 import functionaltests.RMTHelper;
 
 

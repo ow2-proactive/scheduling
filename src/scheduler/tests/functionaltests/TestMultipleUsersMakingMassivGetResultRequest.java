@@ -46,7 +46,7 @@ import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.examples.WaitAndPrint;
 
-import functionalTests.FunctionalTest;
+import org.ow2.tests.FunctionalTest;
 
 
 /**

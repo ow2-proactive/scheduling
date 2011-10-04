@@ -52,7 +52,7 @@ import org.ow2.proactive.topology.descriptor.BestProximityDescriptor;
 import org.ow2.proactive.topology.descriptor.DistanceFunction;
 
 import edu.emory.mathcs.backport.java.util.Collections;
-import functionalTests.FunctionalTest;
+import org.ow2.tests.FunctionalTest;
 import functionaltests.RMTHelper;
 
 

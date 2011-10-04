@@ -44,7 +44,7 @@ import org.ow2.proactive.resourcemanager.nodesource.infrastructure.LocalInfrastr
 import org.ow2.proactive.resourcemanager.nodesource.policy.TimeSlotPolicy;
 import org.ow2.proactive.utils.FileToBytesConverter;
 
-import functionalTests.FunctionalTest;
+import org.ow2.tests.FunctionalTest;
 import functionaltests.RMTHelper;
 
 

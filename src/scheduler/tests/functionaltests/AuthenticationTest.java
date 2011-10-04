@@ -45,7 +45,7 @@ import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
 
-import functionalTests.FunctionalTest;
+import org.ow2.tests.FunctionalTest;
 
 
 /**
