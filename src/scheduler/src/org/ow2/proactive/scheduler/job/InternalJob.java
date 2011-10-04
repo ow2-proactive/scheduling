@@ -636,6 +636,8 @@ public abstract class InternalJob extends JobState {
                             }
                             nt.setJobInfo(getJobInfo());
                             this.addTask(nt);
+                            //add entry to job result
+                            ((JobResultImpl) this.getJobResult()).addToAllResults(nt.getName());
                         }
 
                         // connect replicated tree
@@ -923,6 +925,8 @@ public abstract class InternalJob extends JobState {
                                 this.addTask(nt);
                                 int dupIndex = initiator.getReplicationIndex() * runs + i;
                                 nt.setReplicationIndex(dupIndex);
+                                //add entry to job result
+                                ((JobResultImpl) this.getJobResult()).addToAllResults(nt.getName());
                             }
 
                             // find the beginning and the ending of the replicated block
