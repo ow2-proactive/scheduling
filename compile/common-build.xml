@@ -196,6 +196,7 @@
 				<jvmarg value="-Dproactive.home=${base.dir}" />
 				<jvmarg value="-Dpa.scheduler.home=${base.dir}" />
 				<jvmarg value="-Dpa.rm.home=${base.dir}" />
+				<jvmarg value="-Dproactive.test.timeout=300000" /> 
 				<classpath>
 					<additionalClasspath />
 					<path refid="@{testclasspath}" />
