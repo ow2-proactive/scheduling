@@ -36,6 +36,8 @@
  */
 package functionaltests;
 
+import java.io.File;
+import java.net.URL;
 import java.util.Map;
 
 import org.junit.Assert;
@@ -61,8 +63,8 @@ import functionalTests.FunctionalTest;
  */
 public class TestJobKilled extends FunctionalTest {
 
-    private static String jobDescriptor = TestJobKilled.class.getResource(
-            "/functionaltests/descriptors/Job_Killed.xml").getPath();
+    private static URL jobDescriptor = TestJobKilled.class
+            .getResource("/functionaltests/descriptors/Job_Killed.xml");
 
     /**
      * Tests start here.
@@ -78,7 +80,7 @@ public class TestJobKilled extends FunctionalTest {
         //cannot use SchedulerTHelper.testJobsubmission because
         //task 3 is never executed so no event can received
         //regarding this task.
-        JobId id = SchedulerTHelper.submitJob(jobDescriptor);
+        JobId id = SchedulerTHelper.submitJob(new File(jobDescriptor.toURI()).getAbsolutePath());
         //check events reception
         SchedulerTHelper.log("Job submitted, id " + id.toString());
         SchedulerTHelper.log("Waiting for jobSubmitted");
