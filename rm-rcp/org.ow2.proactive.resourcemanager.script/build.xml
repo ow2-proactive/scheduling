@@ -21,7 +21,7 @@
 		</move>
 
 		<!-- refresh the workspace -->
-		<eclipse.convertPath fileSystemPath="${basedir}" property="resourcePath"/>
-		<eclipse.refreshLocal resource="${resourcePath}" depth="infinite"/>
+		<!--<eclipse.convertPath fileSystemPath="${basedir}" property="resourcePath"/>
+		<eclipse.refreshLocal resource="${resourcePath}" depth="infinite"/> -->
 	</target>
 </project>
