@@ -5,25 +5,24 @@ Bundle-SymbolicName: org.ow2.proactive.resourcemanager.lib
 Bundle-Version: 11.22.33
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ui,
- org.objectweb.proactive.ic2d.chartit;bundle-version="1.0.0",
- org.ow2.proactive.scheduling.common.lib;bundle-version="1.0.0"
+ org.objectweb.proactive.ic2d.chartit,
+ org.ow2.proactive.scheduling.common.lib
 Eclipse-BuddyPolicy: registered
 Bundle-Vendor: ProActive
-Bundle-ClassPath: lib/nodesource/cron/cron4j-rv2.2.3-mod.jar,
- lib/nodesource/ec2/typica.jar,
- lib/nodesource/winhpc/axis2-1.4/lib/axiom-dom-1.2.7.jar,
- lib/nodesource/winhpc/axis2-1.4/lib/axis2-codegen-1.4.jar,
- lib/nodesource/winhpc/rampart-1.3/lib/opensaml-1.1.jar,
- lib/nodesource/winhpc/rampart-1.3/lib/rampart-core-1.3.jar,
- lib/nodesource/winhpc/rampart-1.3/lib/rampart-policy-1.3.jar,
- lib/nodesource/winhpc/rampart-1.3/lib/rampart-trust-1.3.jar,
- lib/nodesource/winhpc/rampart-1.3/lib/wss4j-1.5.3.jar,
- lib/nodesource/winhpc/rampart-1.3/lib/xmlsec-1.4.0.jar,
- lib/nodesource/winhpc/WinHPCWebserviceStubs.jar,
+Bundle-ClassPath: lib/axiom-dom-1.2.7.jar,
+ lib/axis2-codegen-1.4.jar,
+ lib/cron4j-rv2.2.3-mod.jar,
+ lib/opensaml-1.1.jar,
+ lib/prefuse.jar,
  lib/ProActive_ResourceManager-client.jar,
  lib/ProActive_ResourceManager.jar,
- lib/prefuse.jar,
- lib/nodesource/winhpc/axis2-1.4/lib/
+ lib/rampart-core-1.3.jar,
+ lib/rampart-policy-1.3.jar,
+ lib/rampart-trust-1.3.jar,
+ lib/typica.jar,
+ lib/WinHPCWebserviceStubs.jar,
+ lib/wss4j-1.5.3.jar,
+ lib/xmlsec-1.4.0.jar
 Export-Package: com.xerox.amazonws.common,
  com.xerox.amazonws.devpay,
  com.xerox.amazonws.ec2,

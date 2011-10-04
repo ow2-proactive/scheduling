@@ -375,7 +375,7 @@
 	</target>
 
 	<target name="rcp.libCopy.scheduler" depends="rcp.libCopy.scheduling.common, deploy.all" description="Copy all required libraries to scheduler plugins">
-		<copy todir="${rcp.scheduler.dir}/${rcp.scheduler.lib}/lib" includeemptydirs="yes">
+		<copy todir="${rcp.scheduler.dir}/${rcp.scheduler.lib}/lib" flatten="true" includeemptydirs="yes">
 			<fileset dir="${lib.dir}/common" includes="wstx-lgpl-3.9.2.jar" />
 			<fileset dir="${lib.dir}/matsci" includes="*/**" />
 			<fileset dir="${lib.dir}/mapreduce" includes="*/**" />
