@@ -38,6 +38,7 @@ package functionaltests.nodesource;
 
 import java.io.File;
 import java.net.InetAddress;
+import java.net.URL;
 
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.GCMCustomisedInfrastructure;
@@ -69,15 +70,16 @@ public class TestGCMCustomizedInfrastructureTimeSlotPolicy extends TestLocalInfr
 
     @Override
     protected void init() throws Exception {
-        String oneNodeescriptor = TestGCMCustomizedInfrastructureTimeSlotPolicy.class.getResource(
-                "/functionaltests/nodesource/1node.xml").getPath();
-        GCMDeploymentData = FileToBytesConverter.convertFileToByteArray((new File(oneNodeescriptor)));
-        String emptyNodeDescriptor = TestGCMCustomizedInfrastructureTimeSlotPolicy.class.getResource(
-                "/functionaltests/nodesource/empty_gcmd.xml").getPath();
-        emptyGCMD = FileToBytesConverter.convertFileToByteArray((new File(emptyNodeDescriptor)));
+        URL oneNodeescriptor = TestGCMCustomizedInfrastructureTimeSlotPolicy.class
+                .getResource("/functionaltests/nodesource/1node.xml");
+        GCMDeploymentData = FileToBytesConverter.convertFileToByteArray((new File(oneNodeescriptor.toURI())));
+        URL emptyNodeDescriptor = TestGCMCustomizedInfrastructureTimeSlotPolicy.class
+                .getResource("/functionaltests/nodesource/empty_gcmd.xml");
+        emptyGCMD = FileToBytesConverter.convertFileToByteArray((new File(emptyNodeDescriptor.toURI())));
         // overriding gcma file
-        RMTHelper.getResourceManager(RMTHelper.class.getResource(
-                "/functionaltests/config/functionalTRMPropertiesForCustomisedIM.ini").getPath());
+        RMTHelper.getResourceManager(new File(RMTHelper.class.getResource(
+                "/functionaltests/config/functionalTRMPropertiesForCustomisedIM.ini").toURI())
+                .getAbsolutePath());
         hostsListData = InetAddress.getLocalHost().getHostName().getBytes();
     }
 
