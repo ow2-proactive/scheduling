@@ -182,15 +182,21 @@
 	<!-- ************
 		ing
 	-->
-
+	<if name="proactive.test.fork">
+		<property name="fork_mode" value="-Dproactive.test.fork"/>
+		<else>
+			<property name="fork_mode" value="-Dproactive.test.nofork"/>
+		</else>
+	</if>
+	
 	<macrodef name="junitMacro">
 		<attribute name="testsuite"/>
 		<attribute name="testclasspath"/>
 		<attribute name="log4jconfig"/>
 		<element name="jvmargs" optional="yes" />
 		<element name="additionalClasspath" optional="yes" />
-		<sequential>
 
+		<sequential>
 			<delete dir="${base.dir}/SCHEDULER_DB" />
 			<mkdir dir="${junit.dir}" />
 			<junit printsummary="yes" forkmode="perTest" showoutput="${junit.showoutput}" timeout="1920000">
@@ -198,6 +204,7 @@
 				<jvmarg value="-Dpa.scheduler.home=${base.dir}" />
 				<jvmarg value="-Dpa.rm.home=${base.dir}" />
 				<jvmarg value="-Dproactive.test.timeout=1800000" /> 
+				<jvmarg value="${fork_mode}" />
 				<classpath>
 					<additionalClasspath />
 					<path refid="@{testclasspath}" />
