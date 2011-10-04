@@ -45,6 +45,7 @@ import java.util.Map.Entry;
 
 import org.junit.Assert;
 import org.objectweb.proactive.extensions.vfsprovider.FileSystemServerDeployer;
+import org.objectweb.proactive.utils.OperatingSystem;
 import org.ow2.proactive.scheduler.common.job.JobEnvironment;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobResult;
@@ -105,6 +106,7 @@ public class TestJobDataspaceSubmission extends FunctionalTest {
     @org.junit.Test
     public void run() throws Throwable {
 
+        String opSystem = OperatingSystem.getOperatingSystem().name();
         //create initial directories and files
         setup();
 
@@ -121,16 +123,27 @@ public class TestJobDataspaceSubmission extends FunctionalTest {
         t.addInputFiles(in1, InputAccessMode.TransferFromInputSpace);
         t.addOutputFiles(out1, OutputAccessMode.TransferToOutputSpace);
         t.setName("native_java1");
-        t.setCommandLine(new String[] { "/bin/bash", "-c",
-                "cat $LOCALSPACE/" + in1 + " > $LOCALSPACE/" + out1 });
+        if (opSystem.equals("windows")) {
+            t.setCommandLine(new String[] { "cmd", "/C",
+                    "type $LOCALSPACE\\" + in1 + " > $LOCALSPACE\\" + out1 });
+        } else {
+            t.setCommandLine(new String[] { "/bin/bash", "-c",
+                    "cat $LOCALSPACE/" + in1 + " > $LOCALSPACE/" + out1 });
+        }
+
         job.addTask(t);
 
         t = new NativeTask();
         t.addInputFiles(in2, InputAccessMode.TransferFromOutputSpace);
         t.addOutputFiles(out2, OutputAccessMode.TransferToOutputSpace);
         t.setName("native_java2");
-        t.setCommandLine(new String[] { "/bin/bash", "-c",
-                "cat $LOCALSPACE/" + in2 + " > $LOCALSPACE/" + out2 });
+        if (opSystem.equals("windows")) {
+            t.setCommandLine(new String[] { "cmd", "/C",
+                    "type $LOCALSPACE\\" + in2 + " > $LOCALSPACE\\" + out2 });
+        } else {
+            t.setCommandLine(new String[] { "/bin/bash", "-c",
+                    "cat $LOCALSPACE/" + in2 + " > $LOCALSPACE/" + out2 });
+        }
         job.addTask(t);
 
         NativeTask t1 = new NativeTask();
@@ -140,8 +153,13 @@ public class TestJobDataspaceSubmission extends FunctionalTest {
                 InputAccessMode.TransferFromOutputSpace);
         t1.addOutputFiles("*c.txt", OutputAccessMode.TransferToOutputSpace);
         t1.setName("native_java3");
-        t1.setCommandLine(new String[] { "/bin/bash", "-c",
-                "cat $LOCALSPACE/" + in1 + " $LOCALSPACE/" + out2 + " > $LOCALSPACE/" + out3 });
+        if (opSystem.equals("windows")) {
+            t1.setCommandLine(new String[] { "cmd", "/C",
+                    "type $LOCALSPACE\\" + in1 + " $LOCALSPACE\\" + out2 + " > $LOCALSPACE\\" + out3 });
+        } else {
+            t1.setCommandLine(new String[] { "/bin/bash", "-c",
+                    "cat $LOCALSPACE/" + in1 + " $LOCALSPACE/" + out2 + " > $LOCALSPACE/" + out3 });
+        }
         job.addTask(t1);
 
         JavaTask jt = new JavaTask();
