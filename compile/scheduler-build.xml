@@ -5,44 +5,34 @@
 	<import file="rm-build.xml" />
 
 	<target name="compile.scheduler" depends="compile.rm" description="Compile all Scheduler's stuffs">
-		<mkdir dir="${cl.scheduler.dir}"/>
-		<mkdir dir="${cl.scheduler.tests.dir}"/>
+		<mkdir dir="${cl.scheduler.dir}" />
+		<mkdir dir="${cl.scheduler.tests.dir}" />
 
 		<copy toDir="${cl.scheduler.dir}">
-			<fileset dir="${src.scheduler.dir}" excludes="**/*.java"/>
+			<fileset dir="${src.scheduler.dir}" excludes="**/*.java" />
 		</copy>
 		<copy toDir="${cl.scheduler.tests.dir}">
-				<fileset dir="${src.scheduler.tests.dir}" excludes="**/*.java"/>
+			<fileset dir="${src.scheduler.tests.dir}" excludes="**/*.java" />
 		</copy>
-		<chmod file="${cl.scheduler.tests.dir}/functionaltests/executables/exportedVars.sh" perm="ugo+x"/>
-		<chmod file="${cl.scheduler.tests.dir}/functionaltests/workflow/it.sh" perm="ugo+x"/>
-		<javac
-			srcdir="${src.scheduler.dir}"
-			destdir="${cl.scheduler.dir}"
-			deprecation="on"
-			source="${source}"
-			debug="${debug}"  >
+		<chmod file="${cl.scheduler.tests.dir}/functionaltests/executables/exportedVars.sh" perm="ugo+x" />
+		<chmod file="${cl.scheduler.tests.dir}/functionaltests/workflow/it.sh" perm="ugo+x" />
+		<javac srcdir="${src.scheduler.dir}" destdir="${cl.scheduler.dir}" deprecation="on" source="${source}" debug="${debug}">
 
-			<classpath refid="scheduler.libs"/>
-			<classpath path="${cl.rm.dir}"/>
-			<include name="**/*.java"/>
-			<exclude name="**/ext/mapreduce/**/*.java"/>
+			<classpath refid="scheduler.libs" />
+			<classpath path="${cl.rm.dir}" />
+			<include name="**/*.java" />
+			<exclude name="**/ext/mapreduce/**/*.java" />
 		</javac>
 
-		<javac
-			srcdir="${src.scheduler.tests.dir}"
-			destdir="${cl.scheduler.tests.dir}"
-			deprecation="on"
-			source="${source}"
-			debug="${debug}"  >
+		<javac srcdir="${src.scheduler.tests.dir}" destdir="${cl.scheduler.tests.dir}" deprecation="on" source="${source}" debug="${debug}">
 
-			<classpath refid="scheduler.libs"/>
-			<classpath path="${cl.rm.dir}"/>
-			<classpath path="${cl.rm.tests.dir}"/>
-			<classpath path="${cl.scheduler.dir}"/>
-			<include name="**/*.java"/>
+			<classpath refid="scheduler.libs" />
+			<classpath path="${cl.rm.dir}" />
+			<classpath path="${cl.rm.tests.dir}" />
+			<classpath path="${cl.scheduler.dir}" />
+			<include name="**/*.java" />
 		</javac>
-		
+
 		<stubGenerator srcDir="${cl.scheduler.dir}" refclasspath="all.classpath">
 			<class name="org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface" />
 			<class name="org.ow2.proactive.scheduler.common.task.TaskResult" />
@@ -56,7 +46,7 @@
 			<class name="org.ow2.proactive.scheduler.ext.matlab.client.AOMatlabEnvironment" />
 			<class name="org.ow2.proactive.scheduler.ext.scilab.client.AOScilabEnvironment" />
 			<class name="org.ow2.proactive.scheduler.ext.scilab.worker.AOScilabWorker" />
-            <class name="org.ow2.proactive.scheduler.ext.matsci.client.AODataspaceRegistry" />
+			<class name="org.ow2.proactive.scheduler.ext.matsci.client.AODataspaceRegistry" />
 			<class name="org.ow2.proactive.scheduler.core.rmproxies.SchedulerRMProxy" />
 			<class name="org.ow2.proactive.scheduler.core.rmproxies.UserRMProxy" />
 			<class name="org.ow2.proactive.scheduler.task.launcher.ForkedJavaTaskLauncher" />
@@ -66,36 +56,31 @@
 			<class name="org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface" />
 			<class name="org.ow2.proactive.scheduler.common.util.CachingSchedulerProxyUserInterface" />
 		</stubGenerator>
-		
+
 	</target>
 
 	<target name="compile.scheduler.mapreduce" depends="compile.scheduler" description="Compile Scheduler's MapReduce extension">
 
-		<javac
-			srcdir="${src.scheduler.dir}"
-			destdir="${cl.scheduler.dir}"
-			deprecation="on"
-			source="${source}"
-			debug="${debug}"  >
+		<javac srcdir="${src.scheduler.dir}" destdir="${cl.scheduler.dir}" deprecation="on" source="${source}" debug="${debug}">
 
-			<classpath refid="scheduler.libs"/>
-			<classpath path="${cl.rm.dir}"/>
-			<include name="**/ext/mapreduce/**/*.java"/>
+			<classpath refid="scheduler.libs" />
+			<classpath path="${cl.rm.dir}" />
+			<include name="**/ext/mapreduce/**/*.java" />
 		</javac>
 
 	</target>
 
-    <!-- ************
+	<!-- ************
 		Deploy
 	-->
 
-	<target name="deploy.scheduler" depends="-deployCopy, compile.scheduler, deploy.common, deploy.rm"  description="Creates scheduler core jar">
+	<target name="deploy.scheduler" depends="-deployCopy, compile.scheduler, deploy.common, deploy.rm" description="Creates scheduler core jar">
 		<jar destfile="${deploy.lib.dir}/${scheduler.core.jar}" manifest="${basedir}/scheduler-Manifest-base.mf" index="true">
 			<fileset dir="${cl.scheduler.dir}" includes="**" />
 			<indexjars>
 				<fileset refid="jar.index.fileset" />
 			</indexjars>
-        </jar>
+		</jar>
 	</target>
 
 	<target name="deploy.scheduler.client" depends="-deployCopy, compile.scheduler, deploy.common.client" description="Creates scheduler client jar">
@@ -103,29 +88,29 @@
 			<fileset dir="${cl.scheduler.dir}" includes="**/org/ow2/proactive/scheduler/common/**" />
 			<fileset dir="${cl.scheduler.dir}" includes="**/org/ow2/proactive/scheduler/resourcemanager/nodesource/policy/**" />
 			<fileset dir="${cl.scheduler.dir}" includes="**/org/ow2/proactive/scheduler/util/**" />
-            <fileset dir="${cl.scheduler.dir}" includes="**/org/ow2/proactive/scheduler/ext/masterworker/**" />
+			<fileset dir="${cl.scheduler.dir}" includes="**/org/ow2/proactive/scheduler/ext/masterworker/**" />
 			<fileset dir="${cl.rm.dir}" includes="**/org/ow2/proactive/resourcemanager/common/*" />
 			<indexjars>
 				<fileset refid="jar.index.fileset" />
 			</indexjars>
-	    </jar>
+		</jar>
 	</target>
 
 	<target name="deploy.scheduler.matsci" depends="-deployCopy, compile.scheduler, deploy.common.client" description="Creates scheduler matlab/scilab jar">
 		<jar destfile="${deploy.lib.dir}/${scheduler.matsci.jar}" manifest="${basedir}/scheduler-Manifest-base.mf" index="true">
 			<fileset dir="${cl.scheduler.dir}" includes="org/ow2/proactive/scheduler/common/Main.class" />
 			<fileset dir="${cl.scheduler.dir}" includes="**/org/ow2/proactive/scheduler/ext/common/**" />
-            <fileset dir="${cl.scheduler.dir}" includes="**/org/ow2/proactive/scheduler/ext/matsci/**" />
+			<fileset dir="${cl.scheduler.dir}" includes="**/org/ow2/proactive/scheduler/ext/matsci/**" />
 			<fileset dir="${cl.scheduler.dir}" includes="**/org/ow2/proactive/scheduler/ext/matlab/**" />
 			<fileset dir="${cl.scheduler.dir}" includes="**/org/ow2/proactive/scheduler/ext/scilab/**" />
 			<indexjars>
 				<fileset refid="jar.index.fileset" />
 			</indexjars>
-	    </jar>
+		</jar>
 	</target>
 
 
-<!-- start of the ant target to create the ProActive_Scheduler-mapreduce.jar -->
+	<!-- start of the ant target to create the ProActive_Scheduler-mapreduce.jar -->
 	<target name="deploy.scheduler.mapreduce" depends="-deployCopy, compile.scheduler.mapreduce, deploy.common.client" description="Creates scheduler mapreduce jar">
 		<jar destfile="${deploy.lib.dir}/${scheduler.mapreduce.jar}" manifest="${basedir}/scheduler-Manifest-base.mf" index="true">
 			<fileset dir="${cl.scheduler.dir}" includes="**/org/ow2/proactive/scheduler/ext/mapreduce/**" excludes="org/ow2/proactive/scheduler/ext/mapreduce/examples/**" />
@@ -136,9 +121,9 @@
 			<indexjars>
 				<fileset refid="jar.index.fileset" />
 			</indexjars>
-	    </jar>
+		</jar>
 	</target>
-<!-- end of the ant target to create the ProActive_Scheduler-mapreduce.jar -->
+	<!-- end of the ant target to create the ProActive_Scheduler-mapreduce.jar -->
 
 
 	<target name="deploy.scheduler.splitmerge" depends="-deployCopy, compile.scheduler, deploy.common.client" description="Creates scheduler file split/merge jar">
@@ -148,7 +133,7 @@
 			<indexjars>
 				<fileset refid="jar.index.fileset" />
 			</indexjars>
-	    </jar>
+		</jar>
 	</target>
 
 	<!-- ************
@@ -156,11 +141,7 @@
 	-->
 
 	<target name="junit.scheduler" depends="deploy.scheduler, deploy.scheduler.worker" description="Run scheduler's tests">
-		<junitMacro
-			testsuite="scheduler.testsuite"
-			testclasspath="scheduler.test.classpath"
-			log4jconfig="-Dlog4j.configuration=file:${base.dir}/compile/scheduler-log4j"
-		/>
+		<junitMacro testsuite="scheduler.testsuite" testclasspath="scheduler.test.classpath" log4jconfig="-Dlog4j.configuration=file:${base.dir}/compile/scheduler-log4j" />
 
 	</target>
 
@@ -196,13 +177,13 @@
 
 	<!-- last scheduler target for worker library -->
 	<target name="deploy.scheduler.worker" depends="deploy.scheduler" description="Generate a worker side Scheduler library">
-		<mkdir dir="${cl.scheduler.worker.dir}"/>
+		<mkdir dir="${cl.scheduler.worker.dir}" />
 
 		<!-- create TMP dir to put worker classes in -->
 		<property name="worker.dir.tmp" value="${cl.scheduler.dir}/tmpworkersrc" />
-		<mkdir dir="${worker.dir.tmp}"/>
+		<mkdir dir="${worker.dir.tmp}" />
 		<!-- copy worker file in this dir -->
-        <copy toDir="${worker.dir.tmp}">
+		<copy toDir="${worker.dir.tmp}">
 			<fileset dir="${src.scheduler.dir}">
 				<!-- Use to point every classes that have to be in the worker side library -->
 				<include name="org/ow2/proactive/scheduler/job/JobIdImpl.java" />
@@ -248,9 +229,9 @@
 				<include name="org/ow2/proactive/scheduler/common/util/logforwarder/appenders/AsyncAppenderWithStorage.java" />
 				<include name="org/ow2/proactive/scheduler/common/util/logforwarder/appenders/EmptyAppender.java" />
 				<include name="org/ow2/proactive/scheduler/common/util/logforwarder/appenders/SocketAppenderWithSSHTunneling.java" />
-				<include name="org/ow2/proactive/scheduler/common/util/logforwarder/providers/ProActiveBasedForwardingProvider.java"/>
-				<include name="org/ow2/proactive/scheduler/common/util/logforwarder/providers/SocketBasedForwardingProvider.java"/>
-				<include name="org/ow2/proactive/scheduler/common/util/logforwarder/providers/SocketWithSSHTunnelBasedForwardingProvider.java"/>
+				<include name="org/ow2/proactive/scheduler/common/util/logforwarder/providers/ProActiveBasedForwardingProvider.java" />
+				<include name="org/ow2/proactive/scheduler/common/util/logforwarder/providers/SocketBasedForwardingProvider.java" />
+				<include name="org/ow2/proactive/scheduler/common/util/logforwarder/providers/SocketWithSSHTunnelBasedForwardingProvider.java" />
 				<include name="org/ow2/proactive/scheduler/common/util/logforwarder/util/LoggingOutputStream.java" />
 				<include name="org/ow2/proactive/scheduler/common/util/logforwarder/util/SimpleLoggerServer.java" />
 				<include name="org/ow2/proactive/scheduler/common/util/logforwarder/AppenderProvider.java" />
@@ -351,36 +332,31 @@
 				<include name="org/ow2/proactive/scheduler/examples/Worker.java" />
 				<include name="org/ow2/proactive/scheduler/examples/IncrementJob.java" />
 				<include name="org/ow2/proactive/scheduler/examples/IterationAwareJob.java" />
-	            <include name="org/ow2/proactive/scheduler/util/Shell.java"/>
-	            <include name="org/ow2/proactive/scheduler/util/LinuxShellExecuter.java"/>
-	            <include name="org/ow2/proactive/scheduler/ext/common/util/*.java"/>
-                <include name="org/ow2/proactive/scheduler/ext/masterworker/SchedulerExecutableAdapter.java"/>
-				<include name="org/ow2/proactive/scheduler/ext/**/*.sh"/>
-                <include name="org/ow2/proactive/scheduler/ext/**/*.bat"/>
+				<include name="org/ow2/proactive/scheduler/util/Shell.java" />
+				<include name="org/ow2/proactive/scheduler/util/LinuxShellExecuter.java" />
+				<include name="org/ow2/proactive/scheduler/ext/common/util/*.java" />
+				<include name="org/ow2/proactive/scheduler/ext/masterworker/SchedulerExecutableAdapter.java" />
+				<include name="org/ow2/proactive/scheduler/ext/**/*.sh" />
+				<include name="org/ow2/proactive/scheduler/ext/**/*.bat" />
 			</fileset>
 		</copy>
 
-		<javac  srcdir="${worker.dir.tmp}"
-						destdir="${cl.scheduler.worker.dir}"
-						deprecation="on"
-						source="${source}"
-						debug="${debug}"
-						classpathref="scheduler.libs.worker" >
+		<javac srcdir="${worker.dir.tmp}" destdir="${cl.scheduler.worker.dir}" deprecation="on" source="${source}" debug="${debug}" classpathref="scheduler.libs.worker">
 		</javac>
 
-        <copy toDir="${cl.scheduler.worker.dir}">
+		<copy toDir="${cl.scheduler.worker.dir}">
 			<fileset dir="${worker.dir.tmp}">
-				<include name="org/ow2/proactive/scheduler/ext/**/*.sh"/>
-                <include name="org/ow2/proactive/scheduler/ext/**/*.bat"/>
+				<include name="org/ow2/proactive/scheduler/ext/**/*.sh" />
+				<include name="org/ow2/proactive/scheduler/ext/**/*.bat" />
 			</fileset>
 		</copy>
 
-		<jar destfile="${deploy.lib.dir}/${scheduler.worker.jar}"  manifest="${basedir}/scheduler-Manifest-base.mf" index="true">
-			<fileset dir="${cl.scheduler.worker.dir}" includes="**"/>
-            <indexjars>
+		<jar destfile="${deploy.lib.dir}/${scheduler.worker.jar}" manifest="${basedir}/scheduler-Manifest-base.mf" index="true">
+			<fileset dir="${cl.scheduler.worker.dir}" includes="**" />
+			<indexjars>
 				<fileset refid="jar.index.fileset" />
 			</indexjars>
-        </jar>
+		</jar>
 
 		<delete dir="${worker.dir.tmp}" />
 		<delete dir="${cl.scheduler.worker.dir}" />
@@ -391,17 +367,21 @@
 		-->
 
 	<target name="rcp.libClean.scheduler" description="Clean all required libraries for scheduler RCP">
-		<delete dir="${rcp.scheduler.dir}/${rcp.scheduler.lib}/lib" />
+		<delete includeemptydirs="true">
+			<fileset dir="${rcp.scheduler.dir}/${rcp.scheduler.lib}/lib" includes="**/*" />
+		</delete>
+
 	</target>
 
 	<target name="rcp.libCopy.scheduler" depends="rcp.libCopy.scheduling.common, deploy.all" description="Copy all required libraries to scheduler plugins">
 		<copy todir="${rcp.scheduler.dir}/${rcp.scheduler.lib}/lib" includeemptydirs="yes">
-			<fileset dir="${lib.dir}/common/wstx-lgpl-3.9.2.jar"/>
-			<fileset dir="${lib.dir}/matsci/**" />
+			<fileset dir="${lib.dir}/common" includes="wstx-lgpl-3.9.2.jar" />
+			<fileset dir="${lib.dir}/matsci" includes="*/**" />
+			<fileset dir="${lib.dir}/mapreduce" includes="*/**" />
 		</copy>
 		<copy todir="${rcp.scheduler.dir}/${rcp.scheduler.lib}/lib" includeemptydirs="yes">
-					<fileset dir="${deploy.lib.dir}" includes="ProActive_Scheduler-client.jar,ProActive_Scheduler-fsm.jar"/>
-				</copy>
+			<fileset dir="${deploy.lib.dir}" includes="ProActive_Scheduler-client.jar,ProActive_Scheduler-fsm.jar,ProActive_Scheduler-matsci.jar,ProActive_Scheduler-mapreduce.jar" />
+		</copy>
 
 	</target>
 
