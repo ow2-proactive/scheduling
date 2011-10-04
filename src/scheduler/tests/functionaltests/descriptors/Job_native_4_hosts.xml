@@ -10,7 +10,7 @@
 	<!-- description also test that description can contain more than 255 char -->
 	<description>functional tests : a native job that tests multiple hosts reservation</description>
 	<taskFlow>
-		<task name="task1" numberOfNodes="4">
+		<task name="task1" numberOfNodes="${BOOKED_HOSTS_NB}">
 			<!-- Task human description -->
 			<description>Will display 10 dots every 1s</description>
 			<nativeExecutable>

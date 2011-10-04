@@ -36,7 +36,11 @@
  */
 package functionaltests;
 
+import java.io.File;
+import java.net.URL;
+
 import org.junit.Assert;
+import org.objectweb.proactive.utils.OperatingSystem;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobResult;
@@ -57,13 +61,16 @@ import functionalTests.FunctionalTest;
  */
 public class TestMultipleHostsRequest extends FunctionalTest {
 
-    private static String jobDescriptor = TestMultipleHostsRequest.class.getResource(
-            "/functionaltests/descriptors/Job_native_4_hosts.xml").getPath();
+    private static URL jobDescriptor = TestMultipleHostsRequest.class
+            .getResource("/functionaltests/descriptors/Job_native_4_hosts.xml");
 
     private static String executablePathPropertyName = "EXEC_PATH";
 
-    private static String executablePath = TestMultipleHostsRequest.class.getResource(
-            "/functionaltests/executables/test_multiple_hosts_request.sh").getPath();
+    private static URL executablePath = TestMultipleHostsRequest.class
+            .getResource("/functionaltests/executables/test_multiple_hosts_request.sh");
+
+    private static URL executablePathWindows = TestMultipleHostsRequest.class
+            .getResource("/functionaltests/executables/test_multiple_hosts_request.bat");
 
     /**
      * Tests start here.
@@ -75,13 +82,23 @@ public class TestMultipleHostsRequest extends FunctionalTest {
 
         String task1Name = "task1";
 
-        //set system Property for executable path
-        System.setProperty(executablePathPropertyName, executablePath);
+        if (!OperatingSystem.getOperatingSystem().name().equals("windows")) {
+            SchedulerTHelper.setExecutable(new File(executablePath.toURI()).getAbsolutePath());
+            //set system Property for executable path
+            System
+                    .setProperty(executablePathPropertyName, new File(executablePath.toURI())
+                            .getAbsolutePath());
+        } else {
+            //set system Property for executable path
+            System.setProperty(executablePathPropertyName, new File(executablePathWindows.toURI())
+                    .getAbsolutePath());
+        }
 
-        SchedulerTHelper.setExecutable(executablePath);
+        //set system Property for executable path
+        //System.setProperty(executablePathPropertyName, new File(executablePath.toURI()).getAbsolutePath());
 
         //test submission and event reception
-        JobId id = SchedulerTHelper.submitJob(jobDescriptor);
+        JobId id = SchedulerTHelper.submitJob(new File(jobDescriptor.toURI()).getAbsolutePath());
 
         SchedulerTHelper.log("Job submitted, id " + id.toString());
 
