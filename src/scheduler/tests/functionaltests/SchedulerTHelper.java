@@ -357,10 +357,7 @@ public class SchedulerTHelper {
      * @throws Exception if an error occurs at job submission.
      */
     public static JobId submitJob(Job jobToSubmit) throws Exception {
-        boolean forked = false;
-        if (System.getProperty("proactive.test.fork").equals("true")) {
-            forked = true;
-        }
+        boolean forked = isForkedModeSet();
         return submitJob(jobToSubmit, forked);
     }
 
@@ -435,10 +432,7 @@ public class SchedulerTHelper {
      * verification of events sequence.
      */
     public static JobId testJobSubmission(Job jobToSubmit) throws Exception {
-        boolean forked = false;
-        if (System.getProperty("proactive.test.fork").equals("true")) {
-            forked = true;
-        }
+        boolean forked = isForkedModeSet();
         return testJobSubmission(jobToSubmit, forked);
     }
 
@@ -900,9 +894,9 @@ public class SchedulerTHelper {
     }
 
     public static void setForked(Job job) {
-        if (job.getClass() == TaskFlowJob.class) {
+        if (TaskFlowJob.class.isAssignableFrom(job.getClass())) {
             for (Task task : ((TaskFlowJob) job).getTasks()) {
-                if (task.getClass() == JavaTask.class) {
+                if (JavaTask.class.isAssignableFrom(task.getClass())) {
                     if (!((JavaTask) task).isFork()) {
                         ForkEnvironment forkedEnv = new ForkEnvironment();
                         forkedEnv.addJVMArgument("-Dproactive.test=true");
@@ -910,6 +904,14 @@ public class SchedulerTHelper {
                     }
                 }
             }
+        }
+    }
+
+    public static boolean isForkedModeSet() {
+        if (System.getProperty("proactive.test.fork") != null) {
+            return true;
+        } else {
+            return false;
         }
     }
 
