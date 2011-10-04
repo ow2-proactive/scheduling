@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<refentry version="5.0-subset Scilab" xml:id="PAkillTask" xml:lang="en"
+          xmlns="http://docbook.org/ns/docbook"
+          xmlns:xlink="http://www.w3.org/1999/xlink"
+          xmlns:svg="http://www.w3.org/2000/svg"
+          xmlns:ns3="http://www.w3.org/1999/xhtml"
+          xmlns:mml="http://www.w3.org/1998/Math/MathML"
+          xmlns:db="http://docbook.org/ns/docbook">
+  <info>
+    <pubdate>$LastChangedDate: 2011-09-21 18:41:39 +0100$</pubdate>
+  </info>
+
+  <refnamediv>
+    <refname>PAkillTask</refname>
+
+    <refpurpose>Kills the given Scheduler task</refpurpose>
+  </refnamediv>
+
+  <refsynopsisdiv>
+    <title>Calling Sequence</title>
+
+    <synopsis>PAkillTask(jobid, taskname)</synopsis>
+  </refsynopsisdiv>
+
+  <refsection>
+    <title>Description</title>
+    <para><emphasis>PAkillTask</emphasis> kills the given Scheduler task of the given Scheduler job.</para>
+  </refsection>
+
+  <refsection>
+        <title>Parameters</title>
+        <variablelist>
+            <varlistentry>
+                <term>jobid</term>
+                <listitem>
+                    <para>
+                        the id of the job (string or numeric)
+                    </para>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>taskname</term>
+                <listitem>
+                    <para>
+                        the name of the task (string)
+                    </para>
+                </listitem>
+            </varlistentry>
+        </variablelist>
+    </refsection>
+
+    <refsection>
+        <title>Examples</title>
+        <programlisting role="example"><![CDATA[
+function out=mysleep(in)
+    sleep(in)
+    out=%t
+endfunction
+
+-->r=PAsolve('mysleep',100000)
+
+ Job submitted : 11
+ r  =
+
+(1):
+Awaited (J:11)
+
+-->PAjobState(11)
+
+   Job '11'    name:Scilab Environment Job 8    owner:demo    status:Running    #tasks:1
+
+	 ID       NAME   ITER   DUP   STATUS    HOSTNAME                         EXEC DURATION   TOT DURATION   #NODES USED   #EXECUTIONS   #NODES KILLED
+
+	 110001   0_0                 Running   pendule.inria.fr (local-Lo...    Not yet         Not yet        1             1/1           0/2
+
+
+-->PAkillTask(11,'0_0')
+Task 0_0 has been killed.
+
+
+-->r
+ r  =
+
+(1):
+Aborted by userorg.ow2.proactive.scheduler.ext.matsci.client.PASolveException: org.ow2.proactive.scheduler.common.exception.TaskAbortedException: Aborted by user
+	at org.ow2.proactive.scheduler.ext.scilab.client.AOScilabEnvironment.waitResultOfTask(AOScilabEnvironment.java:115)
+	at org.ow2.proactive.scheduler.ext.scilab.client.AOScilabEnvironment.waitResult(AOScilabEnvironment.java:395)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(Unknown Source)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(Unknown Source)
+	at java.lang.reflect.Method.invoke(Unknown Source)
+	at org.objectweb.proactive.core.mop.MethodCall.execute(MethodCall.java:399)
+	at org.objectweb.proactive.core.body.request.RequestImpl.serveInternal(RequestImpl.java:257)
+	at org.objectweb.proactive.core.body.request.RequestImpl.serve(RequestImpl.java:201)
+	at org.objectweb.proactive.core.body.BodyImpl$ActiveLocalBodyStrategy.serveInternal(BodyImpl.java:626)
+	at org.objectweb.proactive.core.body.BodyImpl$ActiveLocalBodyStrategy.serve(BodyImpl.java:587)
+	at org.objectweb.proactive.core.body.AbstractBody.serve(AbstractBody.java:949)
+	at org.objectweb.proactive.Service.serve(Service.java:121)
+	at org.ow2.proactive.scheduler.ext.matsci.client.AOMatSciEnvironment.servePending(AOMatSciEnvironment.java:830)
+	at org.ow2.proactive.scheduler.ext.matsci.client.AOMatSciEnvironment.maybeServePending(AOMatSciEnvironment.java:794)
+	at org.ow2.proactive.scheduler.ext.matsci.client.AOMatSciEnvironment.runActivity(AOMatSciEnvironment.java:760)
+	at org.objectweb.proactive.core.body.ActiveBody.run(ActiveBody.java:203)
+	at java.lang.Thread.run(Unknown Source)
+Caused by: org.ow2.proactive.scheduler.common.exception.TaskAbortedException: Aborted by user
+	at org.ow2.proactive.scheduler.core.SchedulerCore.terminate(SchedulerCore.java:1154)
+	at org.ow2.proactive.scheduler.core.SchedulerCore.killOrRestartTask(SchedulerCore.java:2017)
+	at org.ow2.proactive.scheduler.core.SchedulerCore.killTask(SchedulerCore.java:1994)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:39)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:25)
+	at java.lang.reflect.Method.invoke(Method.java:597)
+	at org.objectweb.proactive.core.mop.MethodCall.execute(MethodCall.java:399)
+	at org.objectweb.proactive.core.body.request.RequestImpl.serveInternal(RequestImpl.java:257)
+	at org.objectweb.proactive.core.body.request.RequestImpl.serve(RequestImpl.java:201)
+	at org.objectweb.proactive.core.body.BodyImpl$ActiveLocalBodyStrategy.serveInternal(BodyImpl.java:626)
+	at org.objectweb.proactive.core.body.BodyImpl$ActiveLocalBodyStrategy.serve(BodyImpl.java:587)
+	at org.objectweb.proactive.core.body.AbstractBody.serve(AbstractBody.java:949)
+	at org.objectweb.proactive.Service.blockingServeOldest(Service.java:180)
+	at org.objectweb.proactive.Service.blockingServeOldest(Service.java:166)
+	at org.ow2.proactive.scheduler.core.SchedulerCore.runActivity(SchedulerCore.java:611)
+	at org.objectweb.proactive.core.body.ActiveBody.run(ActiveBody.java:203)
+	at java.lang.Thread.run(Thread.java:619)
+ !--error 10000
+PAResult:PAwaitFor Internal Error
+at line      73 of function PAResult_PAwaitFor called by :
+at line       8 of function %PAResult_p called by :
+at line       9 of function %PAResL_p called by :
+r
+
+ ]]></programlisting>
+    </refsection>
+
+    <refsection>
+        <title>See Also</title>
+        <simplelist type="inline">
+            <member>
+                <link linkend="PAjobState">PAjobState</link>
+            </member>
+            <member>
+                <link linkend="PAkillJob">PAkillJob</link>
+            </member>
+            <member>
+                <link linkend="PApauseJob">PApauseJob</link>
+            </member>
+            <member>
+                <link linkend="PAresumeJob">PAresumeJob</link>
+            </member>
+
+             <member>
+                <link linkend="Installation">Installation of ProActive Toolbox</link>
+            </member>
+        </simplelist>
+    </refsection>
+
+  <refsection>
+    <title>Authors</title>
+
+    <simplelist type="vert">
+      <member>The ProActive Team, Fabien Viale</member>
+    </simplelist>
+  </refsection>
+</refentry>

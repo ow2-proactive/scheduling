@@ -1,3 +1,26 @@
+% PAResult/PAisAwaited checks if results among an array of PAResult objects are
+% available or not
+%
+% Syntax
+%       >> tf=PAisAwaited(r)
+% 
+% Inputs
+%
+%   r - an array of PAResult objects received by a call to PAsolve
+%
+% Outputs
+%   
+%   tf - an array of boolean values, telling for each indice if the result is awaited (true) or available(false).
+%
+% Example
+%
+%   >> r=PAsolve(@factorial, 1, 2, 3, 4);
+%   >> tf = PAisAwaited(r)  % Non-blocking call
+%
+% See Also
+%   PAsolve, PAResult/PAwaitAny, PAResult/PAwaitFor
+%
+
 % /*
 %   * ################################################################
 %   *

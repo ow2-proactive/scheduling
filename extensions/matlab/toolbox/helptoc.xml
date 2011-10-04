@@ -58,6 +58,7 @@
             </tocitem>
 
         </tocitem>
+        <tocreference target="helpfuncbycat.xml"></tocreference>
 
 
         <tocitem target="http://proactive.inria.fr" image="$toolbox/matlab/icons/webicon.gif">ProActive Web Site

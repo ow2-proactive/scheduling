@@ -1,41 +1,65 @@
-%   PAsolve() - run matlab functions remotely
+% PAsolve run matlab functions remotely
 %
-%   The call to PAsolve is synchronous until the scheduler has received the
-%   information necessary to run the tasks. PAsolve returns right
-%   afterwards and doesn't block matlab until the tasks have been scheduled
-%   and completed.
+% Syntax
 %
-%   PAsolve is based on the principle of parametric sweep, i.e. one
-%   task/many parameters (see Basic syntax).
+%       Basic:
+%       >> results = PAsolve(func, arg_1, arg_2, ..., arg_n);
 %
-%   In addition, it allows to define and run simplified "column" workflows
-%   (see Advanced syntax).
+%       Advanced:
+%       >> results = PAsolve(patask_1(1..k), patask_2(1..k), ... ,
+%       PATask_n(1..k));
+%       >> results = PAsolve(patask(1..n,1..k));
 %
+% Inputs
 %
+%       func - a matlab function handle
 %
+%       arg_k - a parameter to the "func" function if func takes only one
+%       parameter as input OR a cell-array containing the list of
+%       parameters to func.
 %
-%   Usage:
+%       patask_k - a vector of PATask objects
 %
-%       Basic syntax:
-%       >> results = PAsolve(func, arg1, arg2, ...);
+%       patask - a matrix of PATask objects
+%       
 %
-%       where :
+% Description
 %
-%           func : a handle to a function with only one return value (but
-%               can have several input parameters)
+%       The call to PAsolve is synchronous until the scheduler has received the 
+%       information necessary to run the tasks. PAsolve returns right
+%       afterwards and doesn't block matlab until the tasks have been scheduled
+%       and completed.
 %
-%           arg1, arg2, ... : argi can either be a single parameter or a cell array of parameters(multiple parameters).
-%           In case the function func accepts one single parameter which is a celle array, then you should give a cell array containing that cell array parameter.
+%       PAsolve returns an array of objects of type PAResult. Its size matches 
+%       the number of argk or pataskk given or the number of columns in the 
+%       patask matrix. 
 %
+%       Blocking wait functions can be called on this PAResult array or on
+%       a portion of this array (see PAwaitFor, PAwaitAny). Non-blocking
+%       functions can also be called to know if a result is available
+%       (PAisAwaited)
 %
-%       Advanced syntax:
-%       >> results = PAsolve(PATask1(1..k), PATask2(1..k), ... , PATaskn(1..k));
+%       PAsolve is based on the principle of parametric sweep, i.e. one
+%       task/many parameters (see Basic syntax). 
 %
-%       or
+%       PAsolve can either be called by giving a function handle and a list
+%       of parameters (Basic Syntax), or by providing arrays of PATask objects which
+%       allows more advanced parametrization of the execution (see PATask).
 %
-%       >> results = PAsolve(PATask(1..n,1..k));
+%       The semantic of execution for PATask matrices is that each column
+%       will be executed separately, and within each column each line will
+%       be execute sequentially and thus will depend on the execution of
+%       the previous line.
 %
+%       PAsolve behaviour can be configured using the PAoptions function.
+%   
 %
+% See also
+%       PAconnect, PAoptions, PAgetResults, PATask, PAResult, PAResult/PAwaitFor,
+%       PAResult/PAwaitAny, PAResult/PAisAwaited
+%
+
+
 % /*
 %   * ################################################################
 %   *

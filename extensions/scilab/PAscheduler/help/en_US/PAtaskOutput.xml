@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<refentry version="5.0-subset Scilab" xml:id="PAtaskOutput" xml:lang="en"
+          xmlns="http://docbook.org/ns/docbook"
+          xmlns:xlink="http://www.w3.org/1999/xlink"
+          xmlns:svg="http://www.w3.org/2000/svg"
+          xmlns:ns3="http://www.w3.org/1999/xhtml"
+          xmlns:mml="http://www.w3.org/1998/Math/MathML"
+          xmlns:db="http://docbook.org/ns/docbook">
+  <info>
+    <pubdate>$LastChangedDate: 2011-09-21 18:41:39 +0100$</pubdate>
+  </info>
+
+  <refnamediv>
+    <refname>PAtaskOutput</refname>
+
+    <refpurpose>Text output(log) of the given Scheduler task</refpurpose>
+  </refnamediv>
+
+  <refsynopsisdiv>
+    <title>Calling Sequence</title>
+
+    <synopsis>PAtaskOutput(jobid, taskname)</synopsis>
+  </refsynopsisdiv>
+
+  <refsection>
+    <title>Description</title>
+
+
+    <para><emphasis>PAtaskOutput</emphasis> prints the textual output of the given Scheduler task
+        of the given Scheduler job.</para>
+  </refsection>
+
+  <refsection>
+        <title>Parameters</title>
+        <variablelist>
+            <varlistentry>
+                <term>jobid</term>
+                <listitem>
+                    <para>
+                        the id of the job (string or numeric)
+                    </para>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>taskname</term>
+                <listitem>
+                    <para>
+                        the name of the task (string)
+                    </para>
+                </listitem>
+            </varlistentry>
+        </variablelist>
+    </refsection>
+
+    <refsection>
+        <title>Examples</title>
+        <programlisting role="example"><![CDATA[
+function out=hello(in)
+    disp('hello '+in)
+    out=%t
+endfunction
+
+-->r=PAsolve('hello','world')
+
+ Job submitted : 12
+ r  =
+
+(1):
+Awaited (J:12)
+
+-->PAjobState(12)
+
+   Job '12'    name:Scilab Environment Job 9    owner:demo    status:Finished    #tasks:1
+
+	 ID       NAME   ITER   DUP   STATUS     HOSTNAME                         EXEC DURATION   TOT DURATION   #NODES USED   #EXECUTIONS   #NODES KILLED
+
+	 120001   0_0                 Finished   pendule.inria.fr (local-Lo...    106ms           177ms          1             1/1           0/2
+
+-->PAtaskOutput(12,'0_0')
+0_0 output :
+[ pendule ]  hello world
+
+
+]]></programlisting>
+    </refsection>
+
+    <refsection>
+        <title>See Also</title>
+        <simplelist type="inline">
+            <member>
+                <link linkend="PAjobOutput">PAjobOutput</link>
+            </member>
+            <member>
+                <link linkend="PAjobResult">PAjobResult</link>
+            </member>
+            <member>
+                <link linkend="PAtaskResult">PAtaskResult</link>
+            </member>
+             <member>
+                <link linkend="Installation">Installation of ProActive Toolbox</link>
+            </member>
+        </simplelist>
+    </refsection>
+
+  <refsection>
+    <title>Authors</title>
+
+    <simplelist type="vert">
+      <member>The ProActive Team, Fabien Viale</member>
+    </simplelist>
+  </refsection>
+</refentry>

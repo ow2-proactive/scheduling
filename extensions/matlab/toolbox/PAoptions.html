@@ -1,0 +1,133 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+      <link rel="stylesheet" href="file:////usr/local/matlab2009b/toolbox/matlab/helptools/private/helpwin.css">
+      <title>M-File Help: PAoptions</title>
+   </head>
+   <body>
+      <!--Single-page help-->
+      <table border="0" cellspacing="0" width="100%">
+         <tr class="subheader">
+            <td class="headertitle">M-File Help: PAoptions</td>
+            <td class="subheader-left"><a href="matlab:open PAoptions">View code for PAoptions</a></td>
+            <td class="subheader-right"><a href="matlab:helpwin">Default Topics</a></td>
+         </tr>
+      </table>
+      <div class="title">PAoptions</div>
+      <div class="helptext"><pre><!--helptext -->  <span class="helptopic">PAoptions</span> sets or returns the current options for the PAsolve execution
+ 
+  Syntax
+ 
+        &gt;&gt; options = <span class="helptopic">PAoptions</span>();
+        &gt;&gt; <span class="helptopic">PAoptions</span>(param,value, ...);
+ 
+  Inputs
+ 
+        param - a string containing the parameter name
+        value - the new value of this parameter
+ 
+  Outputs
+ 
+        options - a structure with fields corresponding to parameters
+        names, containing all options values.
+ 
+  Description
+        
+        <span class="helptopic">PAoptions</span> sets options used by the next PAsolve call. A structure
+        containing the current options can be retrieved by calling
+        <span class="helptopic">PAoptions</span> with no parameter.
+ 
+  Example
+ 
+        &gt;&gt; <span class="helptopic">PAoptions</span>('Debug', true);
+        &gt;&gt; r = PAsolve(@factorial, 1, 2, 3, 4)  % Runs PAsolve in "Debug"
+        mode.
+ 
+  Parameters
+ 
+    Debug               true | false | 'on' | 'off'
+ 
+                Debug mode, default to 'off'
+ 
+    TimeStamp           true | false | 'on' | 'off'
+ 
+                TimeStamp mode in outputs, default to 'off'
+ 
+ 
+    TransferEnv       true | false | 'on' | 'off'
+ 
+                Transfers the environment in which the PAsolve/PAeval function is called
+                to every remote calls. If variables from this "caller"
+                environment need to be accessed inside the batch function,
+                they should be done using the evalin('caller', ...) syntax
+                default to 'off'
+ 
+    CustomDataspaceURL        char
+                URL of the dataspace (both input and output) to expose, if
+                you don't want to rely on ProActive's automatic transfer
+                protocol. The dataspace server must of course be started
+                and configure manually in that case. e.g
+                <a href="ftp://myserver/rootpath">ftp://myserver/rootpath</a>
+ 
+    CustomDataspacePath       char
+                Path to the root of the Custom Dataspace provided by
+                CustomDataspaceURL. For example if <a href="ftp://myserver/rootpath">ftp://myserver/rootpath</a>
+                is the URL of the Dataspace and the rootpath directory
+                corresponds on the file system to /user/myserver/.../root
+                then this path must be specified in CustomDataspacePath.
+ 
+ 
+    TransferMatFileOptions    char
+                If TranferEnv or TransferVariables is set to on, tells which options are used to save the local environment
+                See the "save" command for more information. Default to
+                '-v7'
+ 
+    Fork        true | false | 'on' | 'off'
+                Runs the tasks in a separate JVM process
+ 
+    RunAsMe     true | false | 'on' | 'off'
+                Runs the tasks under the account of the current user, default to 'off'
+ 
+    LicenceServerURL  char
+                URL of the FlexNet proxy server. If empty, no license check will be done
+ 
+    VersionPref       char
+                Determines the matlab version preferred to use by the worker, e.g. 7.5
+ 
+    VersionRej        char
+                A string containing a list of matlab versions that must not be used, delimiters can be spaces or commas : 7.5, 7.7
+ 
+    VersionMin        char
+                A minimum matlab version that can be used
+ 
+    VersionMax        char
+                A maximum matlab version that can be used
+ 
+    Priority          'Idle' | 'Lowest' | 'Low' | 'Normal' | 'High' | 'Highest'
+                Priority used by default for jobs submitted with PAsolve,
+                default to 'Normal'
+ 
+    CustomScript
+                url or path of a user-defined selection script used in
+                addition to (before) FindMatlabScript and MatlabReservationScript
+ 
+    FindMatlabScript
+                url or path of selection script used to find matlab
+                (internal)
+ 
+    MatlabReservationScript
+                url or path of selection script used to reserve matlab
+                tokens (internal)
+ 
+    ProActiveJars
+                Comma separated list of jar files used by ProActive
+                (internal)
+ 
+    ProActiveConfiguration
+                path to ProActive configuration file (internal)
+ 
+    DisconnectedModeFile
+                path to disconnected mode temporary file (internal)</pre></div><!--after help -->
+   </body>
+</html>

@@ -6,28 +6,30 @@
           xmlns:ns3="http://www.w3.org/1999/xhtml"
           xmlns:mml="http://www.w3.org/1998/Math/MathML"
           xmlns:db="http://docbook.org/ns/docbook">
-  <info>
-    <pubdate>$LastChangedDate: 2011-07-20 18:41:39 +0100 (mer., 20 july 2011)$</pubdate>
-  </info>
+    <info>
+        <pubdate>$LastChangedDate: 2011-07-20 18:41:39 +0100 (mer., 20 july 2011)$</pubdate>
+    </info>
 
-  <refnamediv>
-    <refname>PATask</refname>
+    <refnamediv>
+        <refname>PATask</refname>
 
-    <refpurpose>Creates a complex Task which can be used in PAsolve</refpurpose>
-  </refnamediv>
+        <refpurpose>Creates a complex Task which can be used in PAsolve</refpurpose>
+    </refnamediv>
 
-  <refsynopsisdiv>
-    <title>Calling Sequence</title>
+    <refsynopsisdiv>
+        <title>Calling Sequence</title>
 
-    <synopsis>PATask(lin, col)</synopsis>
-  </refsynopsisdiv>
+        <synopsis>PATask(lin, col)</synopsis>
+    </refsynopsisdiv>
 
-  <refsection>
-    <title>Description</title>
+    <refsection>
+        <title>Description</title>
 
 
-    <para>The PATask object gives you more functionality when you call PAsolve than the basic function+parameters syntax. It allows you to:</para>
-      <itemizedlist>
+        <para>The PATask object gives you more functionality when you call PAsolve than the basic function+parameters
+            syntax. It allows you to:
+        </para>
+        <itemizedlist>
             <listitem>
                 <para>chain executions of tasks, each task being dependant of the previous one inside the chain.
                 </para>
@@ -37,7 +39,8 @@
                 </para>
             </listitem>
             <listitem>
-                <para>use custom source files which can contain the definition of library functions used by the main one.
+                <para>use custom source files which can contain the definition of library functions used by the main
+                    one.
                 </para>
             </listitem>
             <listitem>
@@ -49,9 +52,19 @@
                 </para>
             </listitem>
         </itemizedlist>
-  </refsection>
+        <para>PATask objects are in fact matrices. The number of columns of PATask matrices define how many parallel
+            tasks will be executed by the scheduler when calling PAsolve. Inside each column, every line defines a task
+            which will be executed only after the task defined on the previous line was successfully run (chain
+            execution).
+        </para>
+        <para>For example, if we define a PATask matrix of 3 lines and 1 column (a vertical vector), the 3 tasks defined
+            will be executed sequentially, one after the other. If we define a PATask matrix of 1 line and 4 columns
+            (horizontal vector), the 4 tasks will be executed in parallel. Finally, if we define a 3x4 matrix (3 lines,
+            4 columns), then 4 series of 3 sequential tasks will be executed in parallel.
+        </para>
+    </refsection>
 
-  <refsection>
+    <refsection>
         <title>Parameters</title>
         <variablelist>
             <varlistentry>
@@ -92,7 +105,7 @@
                     </para>
                 </listitem>
             </varlistentry>
-             <varlistentry>
+            <varlistentry>
                 <term>Description</term>
                 <listitem>
                     <para>
@@ -112,7 +125,9 @@
                 <term>InputFiles</term>
                 <listitem>
                     <para>
-                        A list containing the relative path (relative to this directory) of any input file used by the function Func. The files must be either located in the current directory or in a sub-directory, it is not possible to use files from a parent of sibling directory.
+                        A list containing the relative path (relative to this directory) of any input file used by the
+                        function Func. The files must be either located in the current directory or in a sub-directory,
+                        it is not possible to use files from a parent of sibling directory.
                     </para>
                 </listitem>
             </varlistentry>
@@ -120,7 +135,9 @@
                 <term>OutputFiles</term>
                 <listitem>
                     <para>
-                        A list containing the relative path (relative to each distant Scilab session working directory) of any output file that will be created by the function Func. After the task is complete, the files will be transferred to the current directory accordingly to its relative path.
+                        A list containing the relative path (relative to each distant Scilab session working directory)
+                        of any output file that will be created by the function Func. After the task is complete, the
+                        files will be transferred to the current directory accordingly to its relative path.
                     </para>
                 </listitem>
             </varlistentry>
@@ -128,7 +145,10 @@
                 <term>SelectionScript</term>
                 <listitem>
                     <para>
-                        A string containing the path to a Selection Script which can be used to select nodes, in addition to the internal selection script which only selects machines which have been configured for Scilab use (see <link linkend="Installation">Installation</link>). Refer to the Scheduler manual for a detailed explanation on how to write selection scripts.
+                        A string containing the path to a Selection Script which can be used to select nodes, in
+                        addition to the internal selection script which only selects machines which have been configured
+                        for Scilab use (see<link linkend="Installation">Installation</link>). Refer to the Scheduler
+                        manual for a detailed explanation on how to write selection scripts.
                     </para>
                 </listitem>
             </varlistentry>
@@ -136,7 +156,11 @@
                 <term>Compose</term>
                 <listitem>
                     <para>
-                         A boolean which, if set to %t, tells that the first argument of the function Func will use the output of the previous PATask in the chain (previous line in the same column). The other parameters will be assigned by the "Params" list. For example, a function out=foo(a,b,c), called with Compose=%t and Params=list(1,2) will be evaluated foo(out_i,1,2) where out_i is the result of the previous PATask;
+                        A boolean which, if set to %t, tells that the first argument of the function Func will use the
+                        output of the previous PATask in the chain (previous line in the same column). The other
+                        parameters will be assigned by the "Params" list. For example, a function out=foo(a,b,c), called
+                        with Compose=%t and Params=list(1,2) will be evaluated foo(out_i,1,2) where out_i is the result
+                        of the previous PATask;
                     </para>
                 </listitem>
             </varlistentry>
@@ -247,11 +271,11 @@ Awaited (J:15)
         </simplelist>
     </refsection>
 
-  <refsection>
-    <title>Authors</title>
+    <refsection>
+        <title>Authors</title>
 
-    <simplelist type="vert">
-      <member>The ProActive Team, Fabien Viale</member>
-    </simplelist>
-  </refsection>
+        <simplelist type="vert">
+            <member>The ProActive Team, Fabien Viale</member>
+        </simplelist>
+    </refsection>
 </refentry>

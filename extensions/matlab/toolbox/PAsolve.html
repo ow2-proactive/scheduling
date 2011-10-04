@@ -1,0 +1,75 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+      <link rel="stylesheet" href="file:////usr/local/matlab2009b/toolbox/matlab/helptools/private/helpwin.css">
+      <title>M-File Help: PAsolve</title>
+   </head>
+   <body>
+      <!--Single-page help-->
+      <table border="0" cellspacing="0" width="100%">
+         <tr class="subheader">
+            <td class="headertitle">M-File Help: PAsolve</td>
+            <td class="subheader-left"><a href="matlab:open PAsolve">View code for PAsolve</a></td>
+            <td class="subheader-right"><a href="matlab:helpwin">Default Topics</a></td>
+         </tr>
+      </table>
+      <div class="title">PAsolve</div>
+      <div class="helptext"><pre><!--helptext -->  <span class="helptopic">PAsolve</span> run matlab functions remotely
+ 
+  Syntax
+ 
+        Basic:
+        &gt;&gt; results = <span class="helptopic">PAsolve</span>(func, arg_1, arg_2, ..., arg_n);
+ 
+        Advanced:
+        &gt;&gt; results = <span class="helptopic">PAsolve</span>(patask_1(1..k), patask_2(1..k), ... ,
+        PATask_n(1..k));
+        &gt;&gt; results = <span class="helptopic">PAsolve</span>(patask(1..n,1..k));
+ 
+  Inputs
+ 
+        func - a matlab function handle
+ 
+        arg_k - a parameter to the "func" function if func takes only one
+        parameter as input OR a cell-array containing the list of
+        parameters to func.
+ 
+        patask_k - a vector of PATask objects
+ 
+        patask - a matrix of PATask objects
+        
+ 
+  Description
+ 
+        The call to <span class="helptopic">PAsolve</span> is synchronous until the scheduler has received the 
+        information necessary to run the tasks. <span class="helptopic">PAsolve</span> returns right
+        afterwards and doesn't block matlab until the tasks have been scheduled
+        and completed.
+ 
+        <span class="helptopic">PAsolve</span> returns an array of objects of type PAResult. Its size matches 
+        the number of argk or pataskk given or the number of columns in the 
+        patask matrix. 
+ 
+        Blocking wait functions can be called on this PAResult array or on
+        a portion of this array (see PAwaitFor, PAwaitAny). Non-blocking
+        functions can also be called to know if a result is available
+        (PAisAwaited)
+ 
+        <span class="helptopic">PAsolve</span> is based on the principle of parametric sweep, i.e. one
+        task/many parameters (see Basic syntax). 
+ 
+        <span class="helptopic">PAsolve</span> can either be called by giving a function handle and a list
+        of parameters (Basic Syntax), or by providing arrays of PATask objects which
+        allows more advanced parametrization of the execution (see PATask).
+ 
+        The semantic of execution for PATask matrices is that each column
+        will be executed separately, and within each column each line will
+        be execute sequentially and thus will depend on the execution of
+        the previous line.
+ 
+        <span class="helptopic">PAsolve</span> behaviour can be configured using the PAoptions function.</pre></div><!--after help --><!--seeAlso--><div class="footerlinktitle">See also</div><div class="footerlink">
+        <a href="matlab:doc PAconnect">PAconnect</a>, <a href="matlab:doc PAoptions">PAoptions</a>, <a href="matlab:doc PAgetResults">PAgetResults</a>, <a href="matlab:doc PATask">PATask</a>, <a href="matlab:doc PAResult">PAResult</a>, <a href="matlab:doc PAResult/PAwaitFor">PAResult/PAwaitFor</a>,
+        <a href="matlab:doc PAResult/PAwaitAny">PAResult/PAwaitAny</a>, <a href="matlab:doc PAResult/PAisAwaited">PAResult/PAisAwaited</a></div>
+   </body>
+</html>

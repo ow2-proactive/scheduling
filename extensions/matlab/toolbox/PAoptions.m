@@ -1,10 +1,33 @@
-%   PAoptions() - sets or returns the current options for the PAsolve/PAeval execution
+% PAoptions sets or returns the current options for the PAsolve execution
 %
-%   Usage:
+% Syntax
+%
 %       >> options = PAoptions();
 %       >> PAoptions(param,value, ...);
 %
-%   Parameters:
+% Inputs
+%
+%       param - a string containing the parameter name
+%       value - the new value of this parameter
+%
+% Outputs
+%
+%       options - a structure with fields corresponding to parameters
+%       names, containing all options values.
+%
+% Description
+%       
+%       PAoptions sets options used by the next PAsolve call. A structure
+%       containing the current options can be retrieved by calling
+%       PAoptions with no parameter.
+%
+% Example
+%
+%       >> PAoptions('Debug', true);
+%       >> r = PAsolve(@factorial, 1, 2, 3, 4)  % Runs PAsolve in "Debug"
+%       mode.
+%
+% Parameters
 %
 %   Debug               true | false | 'on' | 'off'
 %
@@ -90,7 +113,7 @@
 %   DisconnectedModeFile
 %               path to disconnected mode temporary file (internal)
 %
-%
+
 %
 % /*
 %   * ################################################################

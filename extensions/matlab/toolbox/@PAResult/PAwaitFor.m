@@ -1,3 +1,34 @@
+% PAResult/PAwaitFor blocks matlab execution until a set of results are available
+%
+% Syntax
+%       >> val=PAwaitFor(r)
+% 
+% Inputs
+%
+%   r - an array of PAResult objects received by a call to PAsolve
+%
+% Outputs
+%   
+%   val - if r is a scalar, val contains the real result of the
+%       computation. If r is a vector, then val will contain a cell array containing the real results.
+%
+% Description
+%
+%   PAResult/PAwaitFor will block matlab execution while waiting for a given set of
+%   results. PAResult/PAwaitFor will wait until every results of the given
+%   set have been computed.
+%
+% Example
+%
+%   >> r=PAsolve(@factorial, 1, 2, 3, 4);
+%   >> val = PAwaitFor(r)  % Blocks Matlab execution until factorial(1), ..
+%   , factorial(4) have been computed remotely and returns the results as
+%   val = {factorial(1), .. , factorial(4)}
+%
+% See Also
+%   PAsolve, PAResult/PAwaitAny, PAResult/PAisAwaited
+%
+
 % /*
 %   * ################################################################
 %   *
