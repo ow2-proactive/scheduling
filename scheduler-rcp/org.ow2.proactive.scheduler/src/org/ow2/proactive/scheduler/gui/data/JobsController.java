@@ -1183,7 +1183,11 @@ public class JobsController implements SchedulerEventListener {
     }
 
     public static JobsController turnActive() {
-        try {
+    	//if it has already been turned active, we return the active reference
+
+    	if (activeView!=null)
+    		return activeView;
+    	try {
             activeView = (JobsController) PAActiveObject.turnActive(getLocalView());
             return activeView;
         } catch (NodeException e) {

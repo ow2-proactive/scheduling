@@ -65,6 +65,8 @@ import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingExcepti
 import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingService;
 import org.ow2.proactive.scheduler.gui.Internal;
 import org.ow2.proactive.scheduler.gui.data.DataServers;
+import org.ow2.proactive.scheduler.gui.data.JobsController;
+import org.ow2.proactive.scheduler.gui.data.SchedulerProxy;
 import org.ow2.proactive.scheduler.gui.perspective.SchedulerPerspectiveAdapter;
 
 
@@ -183,6 +185,11 @@ public class Activator extends AbstractUIPlugin {
 				}
 			}// else - isStarting()
 		});
+
+		//Create AOs here, at platform launch time in order to  minimise the time for the first user connection
+		JobsController.turnActive();
+		SchedulerProxy.getInstance();
+
     }
 
     /**

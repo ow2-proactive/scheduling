@@ -62,6 +62,7 @@ import org.osgi.service.url.URLConstants;
 import org.osgi.service.url.URLStreamHandlerService;
 import org.osgi.service.url.URLStreamHandlerSetter;
 import org.ow2.proactive.resourcemanager.gui.Internal;
+import org.ow2.proactive.resourcemanager.gui.data.ResourceManagerProxy;
 import org.ow2.proactive.resourcemanager.integration.ResourceManagerPerspectiveAdapter;
 
 
@@ -181,6 +182,10 @@ public final class Activator extends AbstractUIPlugin {
 				}
 			}// else - isStarting()
 		});
+   
+	//Create AOs here, at platform launch time in order to  minimise the time for the first user connection
+    ResourceManagerProxy.getActiveInstance();
+    
     }
 
     /**
