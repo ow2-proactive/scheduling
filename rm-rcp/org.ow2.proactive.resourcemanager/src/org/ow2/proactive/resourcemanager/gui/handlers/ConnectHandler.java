@@ -41,20 +41,14 @@ import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.HandlerEvent;
 import org.eclipse.core.commands.IHandler;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.IJobChangeEvent;
+import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.handlers.HandlerUtil;
 import org.ow2.proactive.resourcemanager.Activator;
@@ -108,96 +102,60 @@ public class ConnectHandler extends AbstractHandler implements IHandler {
                 }
             });
         } else if (!dialogResult.isCanceled()) {
-            // Create a temporary shell with a progress bar during the downloading of the RM state
-            final Shell waitShell = new Shell(parent.getDisplay(), SWT.APPLICATION_MODAL);
-            // Disable the escape key
-            waitShell.addListener(SWT.Traverse, new Listener() {
-                public void handleEvent(Event e) {
-                    if (e.detail == SWT.TRAVERSE_ESCAPE) {
-                        e.doit = false;
-                    }
-                }
-            });
+        	//perform connection in a new thread, non graphic
+        	Job job = new Job("Downloading RM state, please wait...") {
 
-            final GridLayout layout = new GridLayout();
-            final int marginWidth = 50;
-            layout.marginHeight = 30;
-            layout.verticalSpacing = 15;
-            layout.marginWidth = marginWidth;
-            waitShell.setLayout(layout);
-            final Label jobNameLabel = new Label(waitShell, SWT.NONE);
-            jobNameLabel.setText("Downloading RM state, please wait...");
+        		@Override
+        		protected IStatus run(IProgressMonitor monitor) {
+        			try {
+        				RMStore.newInstance(dialogResult.getUrl(), dialogResult.getLogin(), 
+        						dialogResult.getPassword(), dialogResult.getCredentials());
 
-            // Progress bar showing to the user that the application still running
-            final ProgressBar bar = new ProgressBar(waitShell, SWT.INDETERMINATE);
+        				RMStatusBarItem.getInstance().setText("connected");
 
-            final Button cancelButton = new Button(waitShell, SWT.PUSH);
-            cancelButton.setText("Cancel");
-            cancelButton.setToolTipText("Cancel the downloading and exit");
-            cancelButton.setLayoutData(new GridData(SWT.CENTER, SWT.END, false, true));
-            cancelButton.addSelectionListener(new SelectionAdapter() {
-                public void widgetSelected(SelectionEvent e) {
-                    System.exit(0);
-                }
-            });
-            waitShell.setDefaultButton(cancelButton);
+        				return Status.OK_STATUS;
 
-            // Useless without the escape key use
-            //Label connectionCancel = new Label(waitShell, SWT.NONE);
-            //connectionCancel.setText("Press Escape to cancel");
-            waitShell.pack();
-            Rectangle parentBounds = parent.getShell().getBounds();
-            int x = parentBounds.x + parentBounds.width / 2;
-            int y = parentBounds.y + parentBounds.height / 2;
-            waitShell.setLocation(x - waitShell.getSize().x / 2, y - waitShell.getSize().y / 2);
-            bar.setSize((waitShell.getSize().x) - marginWidth * 2, 20);
-            waitShell.open();
+        			} catch (final Throwable t) {
+        				
+        				// Status.WARNING used (instead of Status.ERROR) to avoid the appearance of an eclipse's error dialog
+        				return new Status(Status.WARNING, "rm.rcp", "Could not connect to the Resource Manager ", t);
+        			}
+        		}
+        		
+        		@Override
+        		protected void canceling() {
+        			// canceling connection
+        		}
+        	};
+        	
+        	job.addJobChangeListener(new JobChangeAdapter() {
+        		@Override
+        		public void done(IJobChangeEvent event) {
+        			Job job = event.getJob();
+        			
+        			if (job.getResult().isOK()) return;
+        			
+        			RMStatusBarItem.getInstance().setText("disconnected");
 
-            new Thread() {
-                public void run() {
-                    //perform connection in a new thread, non graphic
-                    try {
-                        RMStore.newInstance(dialogResult.getUrl(), dialogResult.getLogin(), dialogResult
-                                .getPassword(), dialogResult.getCredentials());
-                        parent.getDisplay().syncExec(new Runnable() {
-                            public void run() {
-                                if (!waitShell.isDisposed()) {
-                                    bar.dispose();
-                                    waitShell.dispose();
-                                }
-                                RMStatusBarItem.getInstance().setText("connected");
-                            }
-                        });
-                    } catch (final Throwable t) {
-                        parent.getDisplay().syncExec(new Runnable() {
-                            public void run() {
-                                if (!waitShell.isDisposed()) {
-                                    bar.dispose();
-                                    waitShell.dispose();
-                                }
-                                RMStatusBarItem.getInstance().setText("disconnected");
-                                MessageDialog.openError(Display.getDefault().getActiveShell(),
-                                        "Couldn't connect to resource manager", t.getMessage());
-                                Activator.log(IStatus.ERROR, "Could not connect to the Resource Manager ", t);
-                                t.printStackTrace();
-
-                                try {
-                                    // trying to disconnect in any case
-                                    RMStore.getInstance().getResourceManager().disconnect();
-                                } catch (Throwable thr) {
-                                }
-                            }
-                        });
-                        parent.getDisplay().syncExec(new Runnable() {
-                            public void run() {
-                                ConnectHandler.getHandler().execute(parent);
-                            }
-                        });
-                    }
-                }
-            }.start();
-
+        			Throwable t = job.getResult().getException();
+        			MessageDialog.openError(Display.getDefault().getActiveShell(), "Couldn't connect to resource manager", t.getMessage());
+    				if (t != null) {
+	    				Activator.log(IStatus.ERROR, "Could not connect to the Resource Manager ", t);
+	    				t.printStackTrace();
+    				}
+    				
+    				try {
+    					// trying to disconnect in any case
+    					RMStore.getInstance().getResourceManager().disconnect();
+    				} catch (Throwable thr) {
+    				}
+        		}
+        	});
+        	
+        	job.setUser(true);
+        	job.schedule();
         }
+
         fireHandlerChanged(new HandlerEvent(this, true, false));
         this.isDialogOpen = false;
         return null;
