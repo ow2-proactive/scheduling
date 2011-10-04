@@ -395,12 +395,14 @@
 	</target>
 
 	<target name="rcp.libCopy.scheduler" depends="rcp.libCopy.scheduling.common, deploy.all" description="Copy all required libraries to scheduler plugins">
-		<copy todir="${rcp.scheduler.dir}/${scheduling.plugin.common.lib}/lib" includeemptydirs="yes">
-			<fileset dir="${lib.dir}/common" excludes="wstx-lgpl-3.9.2.jar"/>
+		<copy todir="${rcp.scheduler.dir}/${rcp.scheduler.lib}/lib" includeemptydirs="yes">
+			<fileset dir="${lib.dir}/common/wstx-lgpl-3.9.2.jar"/>
+			<fileset dir="${lib.dir}/matsci/**" />
 		</copy>
-		<copy todir="${rcp.scheduler.dir}/${rcp.scheduler.lib}/lib" includeemptydirs="no">
-			<fileset dir="${deploy.lib.dir}" excludes="ProActive_tests.jar, ${rm.client.jar}, ${scheduler.client.jar}, ${scheduler.worker.jar}, ${srm.common.client.jar}"/>
-		</copy>
+		<copy todir="${rcp.scheduler.dir}/${rcp.scheduler.lib}/lib" includeemptydirs="yes">
+					<fileset dir="${deploy.lib.dir}" includes="ProActive_Scheduler-client.jar,ProActive_Scheduler-fsm.jar"/>
+				</copy>
+
 	</target>
 
 </project>
