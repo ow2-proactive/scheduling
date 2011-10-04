@@ -36,6 +36,18 @@
  */
 package org.ow2.proactive.scheduler.ext.matsci.common;
 
+import org.objectweb.proactive.core.jmx.notification.GCMRuntimeRegistrationNotificationData;
+import org.objectweb.proactive.core.jmx.notification.NotificationType;
+import org.objectweb.proactive.core.jmx.util.JMXNotificationManager;
+import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.runtime.ProActiveRuntime;
+import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
+import org.objectweb.proactive.core.runtime.RuntimeFactory;
+import org.objectweb.proactive.core.runtime.StartPARuntime;
+import org.ow2.proactive.scheduler.ext.common.util.PropertiesDumper;
+
+import javax.management.Notification;
+import javax.management.NotificationListener;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -47,19 +59,6 @@ import java.security.SecureRandom;
 import java.util.Map;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
-
-import javax.management.Notification;
-import javax.management.NotificationListener;
-
-import org.objectweb.proactive.core.jmx.notification.GCMRuntimeRegistrationNotificationData;
-import org.objectweb.proactive.core.jmx.notification.NotificationType;
-import org.objectweb.proactive.core.jmx.util.JMXNotificationManager;
-import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.core.runtime.ProActiveRuntime;
-import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
-import org.objectweb.proactive.core.runtime.RuntimeFactory;
-import org.objectweb.proactive.core.runtime.StartPARuntime;
-import org.ow2.proactive.scheduler.ext.common.util.PropertiesDumper;
 
 
 /**
@@ -320,9 +319,11 @@ public class JVMSpawnHelper {
                     nodeCount++;
                     if (debug) {
                         System.out.println("[" + new java.util.Date() + " " + host + " " +
-                            this.getClass().getSimpleName() + "] Node Created : " + scilabNode);
+                            this.getClass().getSimpleName() + "] Node Created : " +
+                            scilabNode.getNodeInformation().getURL());
                         outDebug.println("[" + new java.util.Date() + " " + host + " " +
-                            this.getClass().getSimpleName() + "] Node Created :" + scilabNode);
+                            this.getClass().getSimpleName() + "] Node Created :" +
+                            scilabNode.getNodeInformation().getURL());
                     }
                     listener.setNode(scilabNode);
 

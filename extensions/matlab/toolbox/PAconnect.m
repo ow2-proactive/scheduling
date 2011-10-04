@@ -93,18 +93,30 @@ end
 if cptoadd == 1
     sched.PAprepare();
 end
+reconnected = false;
 
+% Test that the session is not already connected to a Scheduler, or that
+% the connection to it is failing
 tmpsolver = sched.PAgetsolver();
 if ~strcmp(class(tmpsolver), 'double')
     tst = false;
     try 
         tst = tmpsolver.isConnected();
     catch ME
-        % We renew everything as the scheduler was completely disconnected.
+        % Renewing a broken connection        
         tmpsolver.terminate();
-        disp('before new active')
-        tmpsolver = org.objectweb.proactive.api.PAActiveObject.newActive('org.ow2.proactive.scheduler.ext.matlab.client.AOMatlabEnvironment',[] );
-        disp('after new active')
+        pause(1);
+        node=sched.PAgetNode();        
+        nodei = node.getNodeInformation();
+        nodeurl = nodei.getURL();
+        try
+            org.objectweb.proactive.core.node.NodeFactory.killNode(nodeurl);
+        catch
+        end
+        node=org.objectweb.proactive.core.node.NodeFactory.createLocalNode('MatlabNode', true, [], []);
+        sched.PAgetNode(node);        
+        tmpsolver = org.objectweb.proactive.api.PAActiveObject.newActive('org.ow2.proactive.scheduler.ext.matlab.client.AOMatlabEnvironment',[],node );
+        
         sched.PAgetsolver(tmpsolver);
         ok = tmpsolver.join(url);
         if ~ok
@@ -116,9 +128,10 @@ if ~strcmp(class(tmpsolver), 'double')
     end
     solver = tmpsolver;
 else
-    % Creating the connection
-
-    solver = org.objectweb.proactive.api.PAActiveObject.newActive('org.ow2.proactive.scheduler.ext.matlab.client.AOMatlabEnvironment',[] );
+    % Creating a new connection
+    node=org.objectweb.proactive.core.node.NodeFactory.createLocalNode('MatlabNode', true, [], []);
+    sched.PAgetNode(node);
+    solver = org.objectweb.proactive.api.PAActiveObject.newActive('org.ow2.proactive.scheduler.ext.matlab.client.AOMatlabEnvironment',[], node );
 
     ok = solver.join(url);
     if ~ok
@@ -130,8 +143,7 @@ else
 end
 
 
-% create the frame
-
+% Logging in
 disp('Connection successful, please enter login/password');
 loggedin = false;
 msg = 'Connect to the Scheduler';
@@ -142,6 +154,7 @@ while ~loggedin && attempts <= 3
         solver.login(login,pwd);
         loggedin = true;
     catch ME
+        disp(getReport(ME));
         attempts = attempts+1;
         msg = ['Incorrect Login/Password, try ' num2str(attempts)];
     end
@@ -152,10 +165,11 @@ end
 sched.PAgetlogin(login);
 
 disp('Login succesful');
-%PAoptions('Debug',true);
+
+% Dataspace Handler
 opt = PAoptions();
-reconnected = false;
-if exist(opt.DisconnectedModeFile,'file')
+dsconnected = org.ow2.proactive.scheduler.ext.matsci.client.DataspaceHelper.isConnected();
+if ~dsconnected && isnumeric(opt.CustomDataspaceURL) && isempty(opt.CustomDataspaceURL) && exist(opt.DisconnectedModeFile,'file')
     errorreconnecting = false;
     if isnumeric(opt.CustomDataspaceURL) && isempty(opt.CustomDataspaceURL)
         try
@@ -168,42 +182,40 @@ if exist(opt.DisconnectedModeFile,'file')
                 disp(getReport(ME));
             elseif isa(ME, 'java.lang.Throwable')
                 ME.printStackTrace();
-            end
-            if exist(opt.DisconnectedModeFile,'file')
-                delete(opt.DisconnectedModeFile);
-            end
+            end            
             errorreconnecting = true;            
         end
-    end  
-    if errorreconnecting
-        reconnected = false;
-    else
-        reconnected = true;
+    end      
+    
+    % We load the job database, wether there was a problem with
+    % reconnecting to the Dataspace handler or not
+    try
+        sched = PAScheduler;
+        sched.PATaskRepository('load');
+        jobs = sched.PATaskRepository('uncomplete');
+        if length(jobs) > 0
+            str='';
+            for i=1:length(jobs)
+                str = [ str ' ' jobs{i}];
+            end
+            disp(['The following jobs were uncomplete before last matlab shutdown : ' str ]);
+        end
+    catch ME
+        disp('There was a problem retrieving previous jobs.');
+        disp(getReport(ME));
+        if exist(opt.DisconnectedModeFile,'file')
+            delete(opt.DisconnectedModeFile);
+        end
     end
     
-    if ~errorreconnecting
-        try
-            sched = PAScheduler;
-            sched.PATaskRepository('load');
-            jobs = sched.PATaskRepository('uncomplete');
-            if length(jobs) > 0
-                str='';
-                for i=1:length(jobs)
-                    str = [ str ' ' jobs{i}];
-                end
-                disp(['The following jobs were uncomplete before last matlab shutdown : ' str ]);
-            end
-        catch ME
-            disp('There was a problem retrieving previous jobs.');
-            disp(getReport(ME));
-            if exist(opt.DisconnectedModeFile,'file')
-                delete(opt.DisconnectedModeFile);
-            end
-        end
+    if errorreconnecting
+        dsconnected = false;    
+    else 
+        dsconnected = true;
     end
 
 end
-if ~reconnected && isnumeric(opt.CustomDataspaceURL) && isempty(opt.CustomDataspaceURL)
+if ~dsconnected && isnumeric(opt.CustomDataspaceURL) && isempty(opt.CustomDataspaceURL)
     disp('Creating dataspace handler, please wait...');
     org.ow2.proactive.scheduler.ext.matsci.client.DataspaceHelper.init([],'MatlabInputSpace', 'MatlabOutputSpace', opt.Debug);
     disp('Dataspace handler created');

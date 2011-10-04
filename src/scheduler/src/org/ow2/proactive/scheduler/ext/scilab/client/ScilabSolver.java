@@ -39,9 +39,13 @@ package org.ow2.proactive.scheduler.ext.scilab.client;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
+import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
+import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 import org.ow2.proactive.scheduler.ext.matsci.client.MatSciJobPermanentInfo;
+import org.ow2.proactive.scheduler.ext.matsci.client.LoginFrame;
 import org.ow2.proactive.scheduler.ext.matsci.client.Pair;
 import org.ow2.proactive.scheduler.ext.scilab.common.PASolveScilabGlobalConfig;
 import org.ow2.proactive.scheduler.ext.scilab.common.PASolveScilabTaskConfig;
@@ -49,6 +53,7 @@ import org.ow2.proactive.scheduler.ext.scilab.common.PASolveScilabTaskConfig;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.rmi.registry.LocateRegistry;
 import java.util.ArrayList;
 
 
@@ -62,6 +67,8 @@ public class ScilabSolver {
     protected static Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.SCILAB);
 
     private static AOScilabEnvironment scilabEnv;
+
+    private static Node node;
 
     static {
         scilabEnv = null;
@@ -91,13 +98,47 @@ public class ScilabSolver {
         return scilabEnv;
     }
 
+    public static boolean isConnected() {
+        if (scilabEnv == null) {
+            return false;
+        }
+        try {
+            return scilabEnv.isConnected();
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public static boolean isLoggedIn() {
+        return isConnected() && scilabEnv.isLoggedIn();
+    }
+
     public static String createConnection(String url) throws Exception {
         try {
             if (scilabEnv == null) {
-
+                if (CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL.getValue().equals("rmi")) {
+                    int rmiport = CentralPAPropertyRepository.PA_RMI_PORT.getValue();
+                    try {
+                        LocateRegistry.createRegistry(rmiport);
+                    } catch (Exception e) {
+                        System.out
+                                .println("WARNING: could not create a RMI registry at port " +
+                                    rmiport +
+                                    ", maybe the registry is hosted by another Java process, this can lead to unexpected error. Try to change the " +
+                                    CentralPAPropertyRepository.PA_RMI_PORT.getName() + " property.");
+                    }
+                }
+                node = NodeFactory.createLocalNode("ScilabNode", true, null, null);
                 scilabEnv = (AOScilabEnvironment) PAActiveObject.newActive(AOScilabEnvironment.class
-                        .getName(), new Object[] {});
+                        .getName(), new Object[] {}, node);
 
+            } else if (!isConnected()) {
+                scilabEnv.terminate();
+                Thread.sleep(1000);
+                NodeFactory.killNode(node.getNodeInformation().getURL());
+                node = NodeFactory.createLocalNode("ScilabNode", true, null, null);
+                scilabEnv = (AOScilabEnvironment) PAActiveObject.newActive(AOScilabEnvironment.class
+                        .getName(), new Object[] {}, node);
             }
 
             if (!scilabEnv.isJoined()) {
@@ -108,12 +149,15 @@ public class ScilabSolver {
                 scilabEnv.startLogin();
             }
 
-            while (!scilabEnv.isLoggedIn()) {
+            while (!scilabEnv.isLoggedIn() && scilabEnv.getNbAttempts() <= LoginFrame.MAX_NB_ATTEMPTS) {
                 try {
                     Thread.sleep(100);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
+            }
+            if (scilabEnv.getNbAttempts() > LoginFrame.MAX_NB_ATTEMPTS) {
+                throw new Exception("Maximum number of Login attempts reached.");
             }
             return null;
 

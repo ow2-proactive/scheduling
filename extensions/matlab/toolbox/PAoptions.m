@@ -45,6 +45,14 @@
 %               environment need to be accessed inside the batch function,
 %               they should be done using the evalin('caller', ...) syntax
 %               default to 'off'
+%   AutomaticDump     true | false | 'on' | 'off'
+%               If this option is set to true, the current state of the
+%               PAsolve job database will be systematically saved at each
+%               PAsolve call. At a price of a slight slowing down of PAsolve
+%               calls, it allows to keep the database information in case
+%               the local Matlab session crashes. Thus, after restarting
+%               Matlab, all the previous session jobs results can be
+%               retrieved via PAgetResults.
 %
 %   CustomDataspaceURL        char
 %               URL of the dataspace (both input and output) to expose, if
@@ -223,6 +231,11 @@ inputs(j).check = logcheck;
 inputs(j).trans = logtrans;
 j=j+1;
 inputs(j).name = 'TransferEnv';
+inputs(j).default = false;
+inputs(j).check = logcheck;
+inputs(j).trans = logtrans;
+j=j+1;
+inputs(j).name = 'AutomaticDump';
 inputs(j).default = false;
 inputs(j).check = logcheck;
 inputs(j).trans = logtrans;

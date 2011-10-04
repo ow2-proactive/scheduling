@@ -149,6 +149,8 @@ public abstract class AOMatSciEnvironment<R, RL> implements Serializable, Schedu
      */
     protected boolean joined;
 
+    protected LoginFrame lf;
+
     /**
      * joined interface to the scheduler, before authentication
      */
@@ -167,7 +169,7 @@ public abstract class AOMatSciEnvironment<R, RL> implements Serializable, Schedu
      * @throws org.ow2.proactive.scheduler.common.exception.SchedulerException
      *          if an other error occurs
      */
-    public void login(String user, String passwd) throws LoginException, SchedulerException {
+    public void login(String user, String passwd) throws KeyException, LoginException, SchedulerException {
 
         //System.out.println("Trying to connect with "+user+" " +passwd);
         Credentials creds = null;
@@ -175,7 +177,7 @@ public abstract class AOMatSciEnvironment<R, RL> implements Serializable, Schedu
             creds = Credentials.createCredentials(new CredData(CredData.parseLogin(user), CredData
                     .parseDomain(user), passwd), auth.getPublicKey());
         } catch (KeyException e) {
-            throw new LoginException("" + e);
+            throw e;
         } catch (LoginException e) {
             throw new LoginException("Could not retrieve public key, contact the Scheduler admininistrator" +
                 e);
@@ -215,7 +217,7 @@ public abstract class AOMatSciEnvironment<R, RL> implements Serializable, Schedu
         loggedin = false;
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                LoginFrame lf = new LoginFrame(stubOnThis, true);
+                lf = new LoginFrame(stubOnThis, true);
                 lf.start();
             }
         });
@@ -228,6 +230,12 @@ public abstract class AOMatSciEnvironment<R, RL> implements Serializable, Schedu
     public boolean isLoggedIn() {
 
         return loggedin && isConnected();
+    }
+
+    public int getNbAttempts() {
+        if (lf != null)
+            return lf.getNbAttempts();
+        return 0;
     }
 
     /**
@@ -570,8 +578,9 @@ public abstract class AOMatSciEnvironment<R, RL> implements Serializable, Schedu
     /**
      * terminates the current AO
      */
-    public void terminate() {
+    public boolean terminate() {
         this.terminated = true;
+        return true;
     }
 
     /**

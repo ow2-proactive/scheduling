@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ProActiveUserProperties>
+    <properties>
+		<prop key="proactive.net.nolocal" value="true"/>
+        <!-- We specify the pnp protocol as the standard protocol for communication with the spawned JVM process which will handle Data Spaces -->
+        <prop key="proactive.communication.protocol" value="pnp"/>
+		<!--<prop key="proactive.rmi.port" value="1234"/>-->
+    </properties>
+    <javaProperties>
+    </javaProperties>
+</ProActiveUserProperties>

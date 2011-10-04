@@ -36,13 +36,6 @@
  */
 package org.ow2.proactive.scheduler.ext.matsci.client;
 
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.PrintStream;
-import java.util.Map;
-
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
@@ -55,6 +48,9 @@ import org.ow2.proactive.scheduler.ext.matsci.common.DummyJVMProcess;
 import org.ow2.proactive.scheduler.ext.matsci.common.JVMSpawnHelper;
 import org.ow2.proactive.scheduler.ext.matsci.common.ProcessInitializer;
 import org.ow2.proactive.scheduler.ext.matsci.common.ProcessListener;
+
+import java.io.*;
+import java.util.Map;
 
 
 /**
@@ -164,6 +160,33 @@ public class DataspaceHelper implements ProcessInitializer, ProcessListener {
 
     }
 
+    /**
+     * Tells if this DataspaceHelper object is properly connected to a running AODataspaceRegistry active object
+     * @return
+     */
+    public static boolean isConnected() {
+        if (instance == null) {
+            return false;
+        }
+        if (instance.registry == null) {
+            return false;
+        }
+        try {
+            instance.registry.getPID();
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    /**
+     * Initialize this DataspaceHelper
+     * @param url if url is provided, it tries to reconnect to an existing running AODataspaceRegistry, if not it will spawn a new JVM to store a new AODataspaceRegistry active object
+     * @param inbasename Input Space Base Name which will be prepended to any created DataSpace
+     * @param outbasename Output Space Base Name which will be prepended to any created DataSpace
+     * @param debug debug mode will print a lot of debugging information to standard output
+     * @throws Throwable
+     */
     public static void init(String url, String inbasename, String outbasename, boolean debug)
             throws Throwable {
         if (instance == null) {
@@ -178,6 +201,10 @@ public class DataspaceHelper implements ProcessInitializer, ProcessListener {
         return instance;
     }
 
+    /**
+     * Returns the URL of the remote AODataspaceRegistry active object
+     * @return
+     */
     public String getUrl() {
         if (instance == null) {
             throw new IllegalStateException();
@@ -185,12 +212,20 @@ public class DataspaceHelper implements ProcessInitializer, ProcessListener {
         return PAActiveObject.getUrl(registry);
     }
 
+    /**
+     * Asks the remote AODataspaceRegistry to create a DataSpace on the given path. If a dataspace already exists for this path, it will reuse it.
+     * @param path path to create a new dataspace
+     * @return
+     */
     public Pair<String, String> createDataSpace(String path) {
         Pair<String, String> answer = registry.createDataSpace(path);
         answer = PAFuture.getFutureValue(answer);
         return answer;
     }
 
+    /**
+     * Shuts down the spawned JVM and remote AODataspaceRegistry
+     */
     public void shutdown() {
         if (debug) {
             System.out.println("[" + new java.util.Date() + " " + this.getClass().getSimpleName() +

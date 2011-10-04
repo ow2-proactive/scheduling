@@ -636,6 +636,9 @@ for i=1:NN
     end
 end
 
+if opt.AutomaticDump
+    sched.dumpState();
+end
 %sched.PAJobInfo(jid, taskinfos);
 
 end
