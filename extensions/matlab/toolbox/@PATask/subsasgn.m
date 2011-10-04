@@ -41,7 +41,14 @@ if isempty(this)
     this = PATask;
 end
 if isempty(S) && strcmp(class(A),'PATask')
-    this = PATask(A.Func,A.Params,A.Description,A.InputFiles,A.OutputFiles,A.Compose,A.SelectionScript);
+    this = PATask();
+    this=assign(this,'Func', A.Func);
+    this=assign(this,'Params',A.Params);
+    this=assign(this,'Description',A.Description);
+    this=assign(this,'InputFiles', A.InputFiles);
+    this=assign(this,'OutputFiles',A.OutputFiles);
+    this=assign(this,'Compose',A.Compose);
+    this=assign(this,'SelectionScript', A.SelectionScript);
 end
 
 if length(S) == 1
@@ -56,11 +63,27 @@ if length(S) == 1
                     if isscalar(A)
                         
                         for i=1:length(S.subs{1})
-                            this(il(i))=PATask(A.Func,A.Params,A.Description,A.InputFiles,A.OutputFiles,A.Compose,A.SelectionScript);
+                            tsk = PATask();
+                            tsk=assign(tsk,'Func', A.Func); 
+                            tsk=assign(tsk,'Params', A.Params);
+                            tsk=assign(tsk,'Description', A.Description);
+                            tsk=assign(tsk,'InputFiles', A.InputFiles);
+                            tsk=assign(tsk,'OutputFiles', A.OutputFiles);
+                            tsk=assign(tsk,'Compose', A.Compose);
+                            tsk=assign(tsk,'SelectionScript', A.SelectionScript);                            
+                            this(il(i))=tsk;
                         end
                     else
                         for i=1:length(S.subs{1})
-                            this(il(i))=PATask(A(i).Func,A(i).Params,A(i).Description,A(i).InputFiles,A(i).OutputFiles,A(i).Compose,A(i).SelectionScript);
+                            tsk = PATask();
+                            tsk=assign(tsk,'Func', A(i).Func); 
+                            tsk=assign(tsk,'Params', A(i).Params);
+                            tsk=assign(tsk,'Description', A(i).Description);
+                            tsk=assign(tsk,'InputFiles', A(i).InputFiles);
+                            tsk=assign(tsk,'OutputFiles', A(i).OutputFiles);
+                            tsk=assign(tsk,'Compose', A(i).Compose);
+                            tsk=assign(tsk,'SelectionScript', A(i).SelectionScript);                            
+                            this(il(i))=tsk;
                         end
                     end
                 elseif length(S.subs) == 2
@@ -69,13 +92,29 @@ if length(S) == 1
                     if size(A,1) == 1 && size(A,2) == 1
                         for i=1:length(il)
                             for j=1:length(jl)
-                                this(il(i),jl(j))=PATask(A.Func,A.Params,A.Description,A.InputFiles,A.OutputFiles,A.Compose,A.SelectionScript);
+                                tsk = PATask();
+                                 tsk=assign(tsk,'Func', A.Func); 
+                                 tsk=assign(tsk,'Params', A.Params);
+                                tsk=assign(tsk,'Description', A.Description);
+                                tsk=assign(tsk,'InputFiles', A.InputFiles);
+                                tsk=assign(tsk,'OutputFiles', A.OutputFiles);
+                                tsk=assign(tsk,'Compose', A.Compose);
+                                tsk=assign(tsk,'SelectionScript', A.SelectionScript);  
+                                this(il(i),jl(j))=tsk;
                             end
                         end
                     else                        
                         for i=1:length(il)
-                            for j=1:length(jl)                              
-                                this(il(i),jl(j))=PATask(A(i,j).Func,A(i,j).Params,A(i,j).Description,A(i,j).InputFiles,A(i,j).OutputFiles,A(i,j).Compose,A(i,j).SelectionScript);
+                            for j=1:length(jl)
+                                tsk = PATask();
+                                tsk=assign(tsk,'Func', A(i,j).Func); 
+                                tsk=assign(tsk,'Params', A(i,j).Params);
+                                tsk=assign(tsk,'Description', A(i,j).Description);
+                                tsk=assign(tsk,'InputFiles', A(i,j).InputFiles);
+                                tsk=assign(tsk,'OutputFiles', A(i,j).OutputFiles);
+                                tsk=assign(tsk,'Compose', A(i,j).Compose);
+                                tsk=assign(tsk,'SelectionScript', A(i,j).SelectionScript);  
+                                this(il(i),jl(j))=tsk;
                             end
                         end
                     end
@@ -84,7 +123,7 @@ if length(S) == 1
                         'arrays with more than 2 dimensions not supported')
                 end
                 out=this;
-                %out(S.subs{:})=PATask(A.Func,A.Params,A.Description,A.InputFiles,A.OutputFiles);
+
             else
                 error('PATask:subsasgn',...
                     'Not a supported subscripted assignment')
