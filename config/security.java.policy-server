@@ -69,6 +69,14 @@ grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.scheduler.core.SchedulerFrontend.resumeJob";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.scheduler.core.SchedulerFrontend.killJob";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.scheduler.core.SchedulerFrontend.changeJobPriority";
+
+    // Example of granting users the administrative rights (e.g. to reload configuration of the resource manager or scheduler)
+    //permission javax.management.MBeanPermission "org.ow2.proactive.resourcemanager.core.jmx.mbean.ManagementMBeanImpl#*[*:*]","*";
+    //permission javax.management.MBeanPermission "org.ow2.proactive.scheduler.core.jmx.mbean.ManagementMBeanImpl#*[*:*]","*";
+    //permission java.security.SecurityPermission "*";
+    //permission java.util.PropertyPermission "*", "read";
+    //permission java.io.FilePermission "<<ALL FILES>>", "write";
+
 };
 
 // Resource providers have the same permissions as users + an ability to add remove node

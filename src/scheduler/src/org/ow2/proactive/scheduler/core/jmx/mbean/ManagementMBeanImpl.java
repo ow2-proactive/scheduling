@@ -36,6 +36,7 @@
  */
 package org.ow2.proactive.scheduler.core.jmx.mbean;
 
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.Policy;
 
@@ -95,8 +96,8 @@ public final class ManagementMBeanImpl extends StandardMBean implements Manageme
                 LogManager.resetConfiguration();
                 PropertyConfigurator.configure(new URL(configFilename));
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (MalformedURLException e) {
+            throw new RuntimeException(e);
         }
     }
 }

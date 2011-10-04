@@ -36,6 +36,7 @@
  */
 package org.ow2.proactive.resourcemanager.core.jmx.mbean;
 
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.Policy;
 
@@ -84,18 +85,18 @@ public final class ManagementMBeanImpl extends StandardMBean implements Manageme
     }
 
     public void refreshConfiguration() {
-        try {
-            // reloading permissions
-            Policy.getPolicy().refresh();
+        // reloading permissions
+        Policy.getPolicy().refresh();
 
-            // reloading log4j configuration
-            String configFilename = System.getProperty("log4j.configuration");
-            if (configFilename != null) {
-                LogManager.resetConfiguration();
+        // reloading log4j configuration
+        String configFilename = System.getProperty("log4j.configuration");
+        if (configFilename != null) {
+            LogManager.resetConfiguration();
+            try {
                 PropertyConfigurator.configure(new URL(configFilename));
+            } catch (MalformedURLException e) {
+                throw new RuntimeException(e);
             }
-        } catch (Exception e) {
-            e.printStackTrace();
         }
     }
 }
