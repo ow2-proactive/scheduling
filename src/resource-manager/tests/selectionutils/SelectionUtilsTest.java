@@ -96,7 +96,8 @@ public class SelectionUtilsTest {
         Assert.assertFalse(SelectionUtils.checkJavaProperty(null, "bar"));
         Assert.assertFalse(SelectionUtils.checkJavaProperty("foo", "bar"));
         Assert.assertFalse(SelectionUtils.checkJavaProperty("java.home", "bar"));
-        Assert.assertTrue(SelectionUtils.checkJavaProperty("java.home", System.getProperty("java.home")));
+        Assert.assertTrue(SelectionUtils.checkJavaProperty("java.vm.version", System
+                .getProperty("java.vm.version")));
         Assert.assertTrue(SelectionUtils.checkJavaProperty("java.home", ".*"));
 
         log("checkFreeMemory");
