@@ -36,6 +36,8 @@
  */
 package unitTests;
 
+import java.io.File;
+import java.net.URL;
 import java.util.List;
 import java.util.Map;
 
@@ -64,10 +66,10 @@ import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
  */
 public class TestJobFactory {
 
-    private static String jobTaskFlowDescriptor = TestJobFactory.class.getResource(
-            "/unitTests/descriptors/Job_TaskFlow.xml").getPath();
-    private static String jobMultiNodesDescriptor = TestJobFactory.class.getResource(
-            "/unitTests/descriptors/Job_MultiNodes.xml").getPath();
+    private static URL jobTaskFlowDescriptor = TestJobFactory.class
+            .getResource("/unitTests/descriptors/Job_TaskFlow.xml");
+    private static URL jobMultiNodesDescriptor = TestJobFactory.class
+            .getResource("/unitTests/descriptors/Job_MultiNodes.xml");
 
     @Test
     public void run() throws Throwable {
@@ -80,7 +82,8 @@ public class TestJobFactory {
         String URLbegin = System.getProperty("pa.scheduler.home") + "/";
         System.setProperty("jobName", "Job_TaskFlow");
         log("Test Job TASKFLOW");
-        TaskFlowJob tfJob = (TaskFlowJob) JobFactory.getFactory(impl).createJob(jobTaskFlowDescriptor);
+        TaskFlowJob tfJob = (TaskFlowJob) JobFactory.getFactory(impl).createJob(
+                new File(jobTaskFlowDescriptor.toURI()).getAbsolutePath());
         //Check job properties
         Assert.assertEquals(tfJob.getDescription(), "No paquit in its HostName.");
         Assert.assertEquals(tfJob.getName(), "Job_TaskFlow");
@@ -318,7 +321,8 @@ public class TestJobFactory {
                     "samples/jobs_descriptors/job_native_linux/nativTask 12");
 
         log("Test Job MULTI_NODES");
-        TaskFlowJob mnJob = (TaskFlowJob) JobFactory.getFactory().createJob(jobMultiNodesDescriptor);
+        TaskFlowJob mnJob = (TaskFlowJob) JobFactory.getFactory().createJob(
+                new File(jobMultiNodesDescriptor.toURI()).getAbsolutePath());
         //Check job properties
         Assert.assertEquals(mnJob.getDescription(), "No description");
         Assert.assertEquals(mnJob.getName(), "job_multiNodes");
