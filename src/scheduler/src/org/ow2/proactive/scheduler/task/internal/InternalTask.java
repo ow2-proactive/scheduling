@@ -277,6 +277,10 @@ public abstract class InternalTask extends TaskState {
             this.skipIdepsInSerialization = false;
         }
 
+        // ExecutableContainer is transient and non serializable but only given once at construction
+        // it needs to be explicitely added
+        replicatedTask.setExecutableContainer(this.executableContainer);
+
         // ideps contain references to other InternalTasks, it needs to be removed.
         // anyway, dependecies for the new task will not be the same as the original
         replicatedTask.ideps = null;
@@ -297,10 +301,6 @@ public abstract class InternalTask extends TaskState {
         } catch (Throwable e1) {
             throw new ExecutableCreationException("Failed to reset hibernate ids in replica", e1);
         }
-
-        // ExecutableContainer is transient and non serializable but only given once at construction
-        // it needs to be explicitely added
-        replicatedTask.setExecutableContainer(this.executableContainer);
 
         /* uncomment this to have a close look at the serialized graph
          * you will need to add some jars (http://xstream.codehaus.org/) to the classpath
