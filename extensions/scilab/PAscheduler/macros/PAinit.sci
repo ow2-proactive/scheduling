@@ -67,6 +67,5 @@ function [] = PAinit()
     //initEmbedded();
 
     PA_initialized = 1;
-    predef(1);
 
 endfunction
