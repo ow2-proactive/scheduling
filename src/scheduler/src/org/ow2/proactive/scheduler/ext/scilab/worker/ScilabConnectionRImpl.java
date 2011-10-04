@@ -1,14 +1,5 @@
 package org.ow2.proactive.scheduler.ext.scilab.worker;
 
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-
 import org.objectweb.proactive.utils.OperatingSystem;
 import org.ow2.proactive.scheduler.ext.common.util.IOTools;
 import org.ow2.proactive.scheduler.ext.matsci.worker.util.MatSciEngineConfigBase;
@@ -16,6 +7,10 @@ import org.ow2.proactive.scheduler.ext.scilab.common.PASolveScilabGlobalConfig;
 import org.ow2.proactive.scheduler.ext.scilab.common.PASolveScilabTaskConfig;
 import org.ow2.proactive.scheduler.ext.scilab.common.exception.ScilabInitException;
 import org.ow2.proactive.scheduler.ext.scilab.common.exception.ScilabTaskException;
+
+import java.io.*;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 
 /**
@@ -97,6 +92,7 @@ public class ScilabConnectionRImpl implements ScilabConnection {
     public void init() {
         fullcommand.append("disp('" + startPattern + "');" + nl);
         fullcommand.append("try" + nl);
+        fullcommand.append("lines(0);" + nl);
     }
 
     public void release() {
