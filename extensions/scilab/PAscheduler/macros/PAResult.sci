@@ -1,6 +1,6 @@
 function res=PAResult(future,taskinfo)
     global ('PAResult_DB');
-    if ~exists('PAResult_DB')
+    if typeof(PAResult_DB) ~= 'list'
         PAResult_DB = list();
     end
     PAResult_DB($+1) = %f;
