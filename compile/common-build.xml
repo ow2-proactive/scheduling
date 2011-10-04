@@ -193,11 +193,11 @@
 
 			<delete dir="${base.dir}/SCHEDULER_DB" />
 			<mkdir dir="${junit.dir}" />
-			<junit printsummary="yes" forkmode="perTest" showoutput="${junit.showoutput}">
+			<junit printsummary="yes" forkmode="perTest" showoutput="${junit.showoutput}" timeout="1920000">
 				<jvmarg value="-Dproactive.home=${base.dir}" />
 				<jvmarg value="-Dpa.scheduler.home=${base.dir}" />
 				<jvmarg value="-Dpa.rm.home=${base.dir}" />
-				<jvmarg value="-Dproactive.test.timeout=300000" /> 
+				<jvmarg value="-Dproactive.test.timeout=1800000" /> 
 				<classpath>
 					<additionalClasspath />
 					<path refid="@{testclasspath}" />
