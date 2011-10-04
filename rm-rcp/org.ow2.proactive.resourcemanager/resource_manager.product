@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?pde version="3.5"?>
 
-<product name="ProActive Resource Manager Client" uid="org.ow2.proactive.resourcemanager.resourcemanager" id="org.ow2.proactive.resourcemanager.resourcemanager" application="org.ow2.proactive.resourcemanager.application" version="11.22.33" useFeatures="false" includeLaunchers="true">
+<product name="ProActive Resource Manager Client" uid="org.ow2.proactive.resourcemanager.resourcemanager" id="org.ow2.proactive.resourcemanager.resourcemanager" application="org.ow2.proactive.resourcemanager.application" version="11.22.33" useFeatures="true" includeLaunchers="true">
 
    <aboutInfo>
       <image path="/org.ow2.proactive.resourcemanager/icons/alt_about.gif"/>
@@ -147,6 +147,11 @@
       <plugin id="org.w3c.dom.svg"/>
       <plugin id="org.w3c.sac"/>
    </plugins>
+
+   <features>
+      <feature id="org.eclipse.rcp"/>
+      <feature id="org.ow2.proactive.resourcemanager.feature" version="1.0.0"/>
+   </features>
 
 
 </product>
