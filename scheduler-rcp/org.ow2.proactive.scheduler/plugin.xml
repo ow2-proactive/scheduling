@@ -149,5 +149,45 @@
             class="org.ow2.proactive.scheduler.gui.preferences.PreferenceInitializer">
       </initializer>
    </extension>
+   <extension
+         id="product"
+         point="org.eclipse.core.runtime.products">
+      <product
+            application="org.ow2.proactive.scheduler.application"
+            name="ProActive Scheduler Client">
+         <property
+               name="windowImages"
+               value="icons/alt_window_16.gif,icons/alt_window_32.gif">
+         </property>
+         <property
+               name="aboutText"
+               value="%About.text">
+         </property>
+         <property
+               name="aboutImage"
+               value="icons/alt_about.gif">
+         </property>
+         <property
+               name="startupForegroundColor"
+               value="EB791F">
+         </property>
+         <property
+               name="startupProgressRect"
+               value="10,10,435,15">
+         </property>
+         <property
+               name="startupMessageRect"
+               value="10,30,435,20">
+         </property>
+         <property
+               name="appName"
+               value="ProActive Scheduler Client">
+         </property>
+         <property
+               name="preferenceCustomization"
+               value="plugin_customization.ini">
+         </property>
+      </product>
+   </extension>
 
 </plugin>

@@ -16,7 +16,7 @@
 			</genericInformation>
 			<javaExecutable class="org.ow2.proactive.scheduler.examples.WaitAndPrint">
 				<parameters>
-					<parameter name="sleepTime" value="3"/>
+					<parameter name="sleepTime" value="180"/>
 					<parameter name="number" value="1"/>
 				</parameters>
 			</javaExecutable>

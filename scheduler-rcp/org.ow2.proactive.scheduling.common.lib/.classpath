@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry exported="true" kind="lib" path="lib/ProActive_SRM-common-client.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/hibernate/annotation/ejb3-persistence.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/hibernate/annotation/hibernate-annotations.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/hibernate/annotation/hibernate-commons-annotations.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/hibernate/core/antlr-2.7.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/hibernate/core/dom4j-1.6.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/hibernate/core/geronimo-spec-jta-1.0.1B-rc4.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/hibernate/core/hibernate-core.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/hibernate/core/slf4j-api-1.5.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/hibernate/core/slf4j-log4j12-1.5.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/script/jruby-engine.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/script/jruby.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/script/js.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/script/jsch-0.1.38.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/script/jython-engine.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/script/jython.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/script/script-api.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/script/script-js.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/commons-codec-1.3.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/commons-collections-3.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/derby.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/derbytools.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/isorelax.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/msv.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/mysql-connector-java-5.1.7-bin.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/relaxngDatatype.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/rngpack-1.1a.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/rrd4j-2.0.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/xsdlib.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
+	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

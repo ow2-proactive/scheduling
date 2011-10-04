@@ -8,10 +8,12 @@ Bundle-Vendor: ProActive Team
 Bundle-Localization: plugin
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime;bundle-version="3.4.0",
+ org.objectweb.proactive.ic2d.chartit;bundle-version="1.0.0",
+ org.ow2.proactive.scheduling.common.lib;bundle-version="1.0.0",
  org.ow2.proactive.resourcemanager.lib;bundle-version="11.22.33",
- org.objectweb.proactive.ic2d.chartit;bundle-version="1.0.0"
+ org.objectweb.proactive.ic2d.lib;bundle-version="4.3.0"
 Bundle-ActivationPolicy: lazy
-Eclipse-RegisterBuddy: org.ow2.proactive.resourcemanager.lib
+Eclipse-RegisterBuddy: org.ow2.proactive.resourcemanager.lib, org.objectweb.proactive.ic2d.lib, org.ow2.proactive.scheduling.common.lib
 Bundle-ClassPath: bin/,
  lib/
 Import-Package: org.objectweb.proactive.core.ssh.httpssh
