@@ -1,30 +1,15 @@
-<html>
-   <head>
-      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-   
-      <link rel="stylesheet" href="file:////usr/local/matlab2009b/toolbox/matlab/helptools/private/helpwin.css">
-      <title>M-File Help: PAconnect</title>
-   </head>
-   <body>
-      <!--Single-page help-->
-      <table border="0" cellspacing="0" width="100%">
-         <tr class="subheader">
-            <td class="headertitle">M-File Help: PAconnect</td>
-            <td class="subheader-left"><a href="matlab:open PAconnect">View code for PAconnect</a></td>
-            <td class="subheader-right"><a href="matlab:helpwin">Default Topics</a></td>
-         </tr>
-      </table>
-      <div class="title">PAconnect</div>
-      <div class="helptext"><pre><!--helptext -->  <span class="helptopic">PAconnect</span> connects to the ProActive scheduler
+<html><title>M-File Help: PAconnect</title><body><table width="100%" border=0 cellspacing=0 bgcolor=d0d0f0><tr><td>&nbsp;<a href="matlab:open 'PAconnect.m'"><b>View code for PAconnect</b></a></td><td valign="left"></td><td align=right><a href="matlab:helpwin"><b>Default Topics</b></a>&nbsp;</td></tr></table><br> <br>
+<code><pre>  <b>PAconnect</b> connects to the ProActive scheduler
  
   Syntax
  
-        <span class="helptopic">PAconnect</span>(url);
-        jobs = <span class="helptopic">PAconnect</span>(url);
+        <b>PAconnect</b>(url [,credpath]);
+        jobs = <b>PAconnect</b>(url [,credpath]);
  
   Inputs
  
         url - url of the scheduler
+        credpath - path to the login credential file
  
   Ouputs
  
@@ -33,21 +18,28 @@
  
   Description
  
-        <span class="helptopic">PAconnect</span> connects to a running ProActive Scheduler by specifying its
+        <b>PAconnect</b> connects to a running ProActive Scheduler by specifying its
         url. If the scheduler could be reached a popup window will appear, asking
-        for login and password. ProActive Scheduler features a full account management facility 
-        along with the possibility to synchronize to existing Windows or Linux accounts via LDAP. 
-        More information can be found inside Scheduler's manual chapter "Configure users authentication". 
-        If you haven't configured any account in the scheduler use, the default account login "demo", password "demo".
-        <span class="helptopic">PAconnect</span> can also return the ids of PAsolve jobs that
+        for login and password. ProActive Scheduler features a full account
+        management facility along with the possibility to synchronize to existing
+        Windows or Linux accounts via LDAP.
+        More information can be found inside Scheduler's manual chapter "Configure
+        users authentication". If you haven't configured any account in the
+        scheduler use, the default account login "demo", password "demo".
+        You can as well encrypt credentials using the command line tool "create-cred" to automate the connection.
+ 
+        <b>PAconnect</b> can also return the ids of PAsolve jobs that
         were still running at the end of the last Matlab session (Disconnected
-        Mode).
+        Mode). Results of these jobs can then be retrieved using
+        PAgetResults.
  
   Example
  
-    jobs = <span class="helptopic">PAconnect</span>('rmi://scheduler:1099')</pre></div><!--after help --><!--seeAlso--><div class="footerlinktitle">See also</div><div class="footerlink">
-    <a href="matlab:doc PAsolve">PAsolve</a></div><!--demo--><div class="footerlinktitle">Published output in the Help browser</div><div class="footerlink">
-       <a href="matlab:showdemo PAconnect">showdemo PAconnect</a>
-</div>
-   </body>
-</html>
+    jobs = <b>PAconnect</b>('rmi://scheduler:1099')
+ 
+  See also
+    <a href="matlab:helpwin PAsolve">PAsolve</a>, <a href="matlab:helpwin PAgetResults">PAgetResults</a>
+ 
+</pre>
+
+</code></body></html>

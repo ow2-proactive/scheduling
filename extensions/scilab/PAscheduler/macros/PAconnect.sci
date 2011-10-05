@@ -1,4 +1,4 @@
-function [] = PAconnect(uri)
+function [] = PAconnect(uri,credpath)
 
     global ('PA_initialized', 'PA_connected')
 
@@ -14,18 +14,22 @@ function [] = PAconnect(uri)
         if jinvoke(ScilabPrintStream,'isAvailable') then
            jinvoke(System, 'setOut',jinvoke(ScilabPrintStream,'getInstance'));
            jinvoke(ScilabPrintStream,'setRedirect',[]);
-        end
-        uristring = String.new(uri);        
-        ex = solver.createConnection(uristring);
+        end        
+        if argn(2) == 2
+            ex = jinvoke(solver, 'createConnection',uri, credpath);
+        else       
+            ex = jinvoke(solver, 'createConnection',uri, []);
+        end        
         if type(ex) == 10 then            
             disp(ex); 
+            jremove(solver);
+            error('PAconnect::Error while connecting');
         else
             PA_connected = 1;
             disp(strcat(['Connection successful to ', uri]));
-        end        
-        jremove(uristring,solver);
+        end                
     else
         disp('Already connected');
     end
-
+    jremove(solver);
 endfunction

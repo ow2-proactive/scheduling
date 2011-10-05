@@ -1,14 +1,15 @@
-function jobs = PAconnect(url)
+function jobs = PAconnect(url, credpath)
 % PAconnect connects to the ProActive scheduler
 %
 % Syntax
 %
-%       PAconnect(url);
-%       jobs = PAconnect(url);
+%       PAconnect(url [,credpath]);
+%       jobs = PAconnect(url [,credpath]);
 %
 % Inputs
 %
 %       url - url of the scheduler
+%       credpath - path to the login credential file
 %
 % Ouputs
 %
@@ -19,12 +20,13 @@ function jobs = PAconnect(url)
 %
 %       PAconnect connects to a running ProActive Scheduler by specifying its
 %       url. If the scheduler could be reached a popup window will appear, asking
-%       for login and password. ProActive Scheduler features a full account 
-%       management facility along with the possibility to synchronize to existing 
-%       Windows or Linux accounts via LDAP. 
-%       More information can be found inside Scheduler's manual chapter "Configure 
-%       users authentication". If you haven't configured any account in the 
+%       for login and password. ProActive Scheduler features a full account
+%       management facility along with the possibility to synchronize to existing
+%       Windows or Linux accounts via LDAP.
+%       More information can be found inside Scheduler's manual chapter "Configure
+%       users authentication". If you haven't configured any account in the
 %       scheduler use, the default account login "demo", password "demo".
+%       You can as well encrypt credentials using the command line tool "create-cred" to automate the connection.
 %
 %       PAconnect can also return the ids of PAsolve jobs that
 %       were still running at the end of the last Matlab session (Disconnected
@@ -96,13 +98,13 @@ reconnected = false;
 tmpsolver = sched.PAgetsolver();
 if ~strcmp(class(tmpsolver), 'double')
     tst = false;
-    try 
+    try
         tst = tmpsolver.isConnected();
     catch ME
-        % Renewing a broken connection        
+        % Renewing a broken connection
         tmpsolver.terminate();
         pause(1);
-        node=sched.PAgetNode();        
+        node=sched.PAgetNode();
         nodei = node.getNodeInformation();
         nodeurl = nodei.getURL();
         try
@@ -110,15 +112,15 @@ if ~strcmp(class(tmpsolver), 'double')
         catch
         end
         node=org.objectweb.proactive.core.node.NodeFactory.createLocalNode('MatlabNode', true, [], []);
-        sched.PAgetNode(node);        
+        sched.PAgetNode(node);
         tmpsolver = org.objectweb.proactive.api.PAActiveObject.newActive('org.ow2.proactive.scheduler.ext.matlab.client.AOMatlabEnvironment',[],node );
         
         sched.PAgetsolver(tmpsolver);
         ok = tmpsolver.join(url);
         if ~ok
             error('PAconnect::Error while connecting');
-        end                           
-    end    
+        end
+    end
     if tst && tmpsolver.isLoggedIn()
         error('This session is already connected to a scheduler.');
     end
@@ -128,7 +130,7 @@ else
     node=org.objectweb.proactive.core.node.NodeFactory.createLocalNode('MatlabNode', true, [], []);
     sched.PAgetNode(node);
     solver = org.objectweb.proactive.api.PAActiveObject.newActive('org.ow2.proactive.scheduler.ext.matlab.client.AOMatlabEnvironment',[], node );
-
+    
     ok = solver.join(url);
     if ~ok
         error('PAconnect::Error while connecting');
@@ -140,26 +142,35 @@ end
 
 
 % Logging in
-disp('Connection successful, please enter login/password');
-loggedin = false;
-msg = 'Connect to the Scheduler';
-attempts = 1;
-while ~loggedin && attempts <= 3
-    [login,pwd]=sched.logindlg('Title',msg);
+if exist('credpath', 'var')
     try
-        solver.login(login,pwd);
-        loggedin = true;
+        solver.login(credpath);
     catch ME
         disp(getReport(ME));
-        attempts = attempts+1;
-        msg = ['Incorrect Login/Password, try ' num2str(attempts)];
+        error('PAconnect::Authentication error');
     end
+else
+    disp('Connection successful, please enter login/password');
+    loggedin = false;
+    msg = 'Connect to the Scheduler';
+    attempts = 1;
+    while ~loggedin && attempts <= 3
+        [login,pwd]=sched.logindlg('Title',msg);
+        try
+            solver.login(login,pwd);
+            loggedin = true;
+        catch ME
+            disp(getReport(ME));
+            attempts = attempts+1;
+            msg = ['Incorrect Login/Password, try ' num2str(attempts)];
+        end
+    end
+    if attempts > 3
+        error('PAconnect::Authentication error');
+    end
+    sched.PAgetlogin(login);
+    
 end
-if attempts > 3
-    error('PAconnect::Authentication error');
-end
-sched.PAgetlogin(login);
-
 disp('Login succesful');
 
 % Dataspace Handler
@@ -178,10 +189,10 @@ if ~dsconnected && isnumeric(opt.CustomDataspaceURL) && isempty(opt.CustomDatasp
                 disp(getReport(ME));
             elseif isa(ME, 'java.lang.Throwable')
                 ME.printStackTrace();
-            end            
-            errorreconnecting = true;            
+            end
+            errorreconnecting = true;
         end
-    end      
+    end
     
     % We load the job database, wether there was a problem with
     % reconnecting to the Dataspace handler or not
@@ -205,11 +216,11 @@ if ~dsconnected && isnumeric(opt.CustomDataspaceURL) && isempty(opt.CustomDatasp
     end
     
     if errorreconnecting
-        dsconnected = false;    
-    else 
+        dsconnected = false;
+    else
         dsconnected = true;
     end
-
+    
 end
 if ~dsconnected && isnumeric(opt.CustomDataspaceURL) && isempty(opt.CustomDataspaceURL)
     disp('Creating dataspace handler, please wait...');
