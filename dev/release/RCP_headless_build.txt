@@ -1,0 +1,92 @@
+Building RCP using the headless way
+-----------------------------------
+
+Each RCP has two plugins dedicated to the headless build (script and
+headless).
+The feature plugin lists the dependencies of the RCP in terms of
+features and plugins and provides a feature representing the RCP
+itself.
+
+The outputs of a compilation are the archives of the RCP for all the
+platforms listed in the xxx.script/build.properties
+
+Before any compilation be sure to have all the
+mandatory features/plugins available within your eclipse.
+
+The archive produced at the end of the build are put in the
+dist/scheduler-rcp and/or dist/rm-rcp directories.
+
+Prerequisites:
+-------------
+
+The deltapack is required. The default search location is
+eclipse/deltapack.
+Override this location by setting the variable 'deltapack' to the
+correct location
+
+Mandatory variables :
+
+eclipse.baseLocation : set the path to eclipse's installation
+directory.
+
+
+Preparing the headless compilation
+----------------------------------
+
+Before any compilation of the RCPs, some files have to be copied in
+several locations in the plugins. This step is handled by two ant
+targets rcp.libCopy.all and rcp.libClean.all.
+
+# cd compile
+# ./build rcp.libClean.all rcp.libCopy.all
+
+The scheduler and RM RCPs rely on some plugins IC2D
+(org.objectweb.proactive.ic2d.lib and
+org.objectweb.proactive.ic2d.chartit).
+
+------------------- WARNING ----------
+Be sure that the version of ProActive provided by
+org.objectweb.proactive.ic2d.lib is the same that the one that comes
+with the scheduler.
+--------------------------------------
+
+
+Compilation of the RCPs
+-----------------------
+
+By default, the headless build looks for the plugins in the parent directory that
+contains the plugin script. To extend the search path, one can use the
+rcp.pluginPath variable.
+
+for instance, under a unix system, the variable could be
+rcp.pluginPath=/home/xxx/workspace/optimizing/src:/home/xxx/workspace/scheduling/scheduler-rcp:/home/xxx/workspace/scheduling/rm-rcp
+
+
+   Command-line compilation
+   ------------------------
+Go under the (scheduler|rm) script plugin and launch the command
+
+# java -jar
+/path/to/eclipse/plugins/org.eclipse.equinox.launcher_x.y.z.jar
+-application org.eclipse.ant.core.antRunner
+
+
+   Ant-based compilation
+   ---------------------
+
+the ant-base d compilation also supports building RCPs in headless
+mode. Several variables have to be filled in before the launching the
+compilation:
+
+- equinoxjar : this variable references the
+org.eclipse.equinox.launcher_xxx.jar file located within the plugin
+directory of your eclipse's installation
+
+- eclipse.baseLocation : the location of eclipse
+
+- rcp.pluginPath : the locations of optimizing's source file and scheduler
+and resource manager rcps' source.
+
+
+# ./build -Dequinoxjar=... -Declipse.baseLocation=...\
+  -Drcp.pluginPath=... rcp.build.rm rcp.build.scheduler
