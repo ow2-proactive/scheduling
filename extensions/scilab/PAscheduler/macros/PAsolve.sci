@@ -65,8 +65,18 @@ function outputs = PAsolve(varargin)
     jimport java.lang.String;
     jimport java.net.URL;
     jimport java.io.File;
+    
+    initJavaStack();
+    addJavaObj(PASolveScilabGlobalConfig);
+    addJavaObj(PASolveScilabTaskConfig); 
+    addJavaObj(FileUtils);
+    addJavaObj(AODataspaceRegistry);
+    addJavaObj(String);
+    addJavaObj(URL);
+    addJavaObj(File);
 
     solve_config = jnewInstance(PASolveScilabGlobalConfig);
+    addJavaObj(solve_config);
 
     solve_config.setDebug(opt.Debug);
     solve_config.setTimeStamp(opt.TimeStamp);
@@ -91,14 +101,14 @@ function outputs = PAsolve(varargin)
     if ischar(opt.CustomScript)
         selects = opt.CustomScript
         try
-            url=URL.new(selects);
+            url=URL.new(selects);            
             ok = true;
         catch 
             ok = false;
         end
         jremove(url);
 
-        if ~ok
+        if ~ok            
             solve_config.setCustomScriptUrl(strcat(['file:', selects]));
         else
             solve_config.setCustomScriptUrl(selects);
@@ -110,12 +120,11 @@ function outputs = PAsolve(varargin)
     curr_dir = pwd();
     fs=filesep();
     curr_dir_java = File.new(curr_dir);
+    addJavaObj(curr_dir_java);
     if ~jinvoke(curr_dir_java,'canWrite')
-        jremove(curr_dir_java);
+        clearJavaStack();       
         error('Current Directory should have write access rights');
-    end
-    jremove(curr_dir_java);
-
+    end    
     // PAScheduler sub directory init
 
     subdir = '.PAScheduler';
@@ -128,6 +137,7 @@ function outputs = PAsolve(varargin)
         pa_dir = strcat([curr_dir, fs, subdir]);
     else
         if isempty(opt.CustomDataspacePath)
+            clearJavaStack();    
             error('if CustomDataspaceURL is specified, CustomDataspacePath must be specified also');
         end
         if ~isdir(strcat([opt.CustomDataspacePath, fs, subdir]))
@@ -142,10 +152,15 @@ function outputs = PAsolve(varargin)
             DataRegistryInit = 1;
         end
         pair = DataRegistry.createDataSpace(curr_dir);
+        addJavaObj(pair);
         px=jinvoke(pair,'getX');
         py=jinvoke(pair,'getY');
+        addJavaObj(px);
+        addJavaObj(py);
         pxs = jcast(px,'java.lang.String');
         pys = jcast(py,'java.lang.String');
+        addJavaObj(pxs);
+        addJavaObj(pys);
         solve_config.setInputSpaceURL(pxs);
         solve_config.setOutputSpaceURL(pys);
         if opt.Debug then
@@ -157,7 +172,7 @@ function outputs = PAsolve(varargin)
         solve_config.setOutputSpaceURL(opt.CustomDataspaceURL);
         solve_config.setInputSpaceURL(opt.CustomDataspaceURL);
     end
-
+    
 
     variableInFileBaseName = ['ScilabPAsolveVarIn_' string(SOLVEid)];
     variableOutFileBaseName = ['ScilabPAsolveVarOut_' string(SOLVEid)];
@@ -166,10 +181,12 @@ function outputs = PAsolve(varargin)
     taskFilesToClean = list();
 
     task_configs = jarray('org.ow2.proactive.scheduler.ext.scilab.common.PASolveScilabTaskConfig', NN,MM);
+    addJavaObj(task_configs);
     for i=1:NN
         taskFilesToClean($+1)=list();
         for j=1:MM
             t_conf = jnewInstance(PASolveScilabTaskConfig);
+            addJavaObj(t_conf);
             task_configs(i-1,j-1) = t_conf;
             if ~isempty(Tasks(j,i).Description) then
                 t_conf.setDescription(Tasks(j,i).Description);
@@ -181,10 +198,13 @@ function outputs = PAsolve(varargin)
                 ilen = length(Tasks(j,i).InputFiles);
                 if ilen > 0 then
                     inputFiles = jarray('java.lang.String', ilen);
+                    addJavaObj(inputFiles);
                     filelist = Tasks(j,i).InputFiles;
                     for k=1:ilen
                         filename = filelist(k);
-                        inputFiles(k-1)=String.new(strsubst(filename,'\','/'));
+                        ifstr = String.new(strsubst(filename,'\','/'));
+                        addJavaObj(ifstr);
+                        inputFiles(k-1)=ifstr;
                     end
 
                     t_conf.setInputFiles(inputFiles);
@@ -198,9 +218,12 @@ function outputs = PAsolve(varargin)
                 ilen = length(filelist);
                 if ilen > 0 then
                     outputFiles = jarray('java.lang.String', ilen);
+                    addJavaObj(outputFiles);
                     for k=1:ilen
                         filename = filelist(k);
-                        outputFiles(k-1)=String.new(strsubst(filename,'\','/'));
+                        ofstr = String.new(strsubst(filename,'\','/'));
+                        addJavaObj(ofstr);
+                        outputFiles(k-1)=ofstr;
                     end
 
                     t_conf.setOutputFiles(outputFiles);
@@ -231,6 +254,7 @@ function outputs = PAsolve(varargin)
             Func = Tasks(j,i).Func;
             execstr(strcat(['functype = type(';Func;');']));
             if (functype <> 13) & (functype <> 11)  then
+                clearJavaStack();
                 error('invalid function type for function ""' + Func + '"". Consider calling this function with a macro instead.');
             end
 
@@ -253,8 +277,10 @@ function outputs = PAsolve(varargin)
                         //tmpFiles($+1)=strcat([pa_dir,fs,fname,extension]);
                         
                         strName = String.new(srcName);
+                        addJavaObj(strName);
                         t_conf.addSourceFile(strName);
                     else
+                        clearJavaStack();
                         error(strcat(['Source file ', srcPath, ' cannot be found']));
                     end
 
@@ -265,9 +291,11 @@ function outputs = PAsolve(varargin)
 
             // Saving main function name (with or without Sources attribute)
             sourceNames = jarray('java.lang.String', 1);
+            addJavaObj(sourceNames);
             sFN = 'ScilabPAsolve_src'+string(SOLVEid)+indToFile([i j])+'.bin';
             execstr('save(pa_dir+fs+sFN,'+Func+');');
             strName = String.new(sFN);
+            addJavaObj(strName);
             sourceNames(0) = strName;
             t_conf.setFunctionVarFiles(sourceNames);                
             code=[];
@@ -341,17 +369,25 @@ function outputs = PAsolve(varargin)
     end
     jimport org.ow2.proactive.scheduler.ext.scilab.client.ScilabSolver;
     jimport org.objectweb.proactive.api.PAFuture;
+    addJavaObj(ScilabSolver);
+    addJavaObj(PAFuture);
+    
     solver = jnewInstance(ScilabSolver);
+    addJavaObj(solver);
 
     pairinfolist = solver.solve(solve_config, task_configs);
-
+    addJavaObj(pairinfolist);
     jobinfo = jinvoke(pairinfolist,'getX');
+    addJavaObj(jobinfo);
     resfutureList =  jinvoke(pairinfolist,'getY');
-    jid = string(jinvoke(jobinfo,'getJobId'));
+    addJavaObj(resfutureList);
+    jidjava = jinvoke(jobinfo,'getJobId');
+    addJavaObj(jidjava);
+    jid = string(jidjava);
     disp('Job submitted : '+ jid);    
 
     ftn = jinvoke(jobinfo,'getFinalTasksNamesAsList');
-
+    addJavaObj(ftn);
     taskinfo = struct('cleanFileSet',[],'cleanDirSet',[], 'outFile',[], 'jobid',[], 'taskid',[] );
     results=list(NN);
     for i=1:NN
@@ -359,13 +395,16 @@ function outputs = PAsolve(varargin)
         taskinfo.cleanDirSet = list(pa_dir);
         taskinfo.outFile = outVarFiles(i);
         taskinfo.jobid = jid;
-        taskinfo.taskid = jinvoke(ftn,'get',i-1);
+        tidjava = jinvoke(ftn,'get',i-1);
+        addJavaObj(tidjava);
+        taskinfo.taskid = string(tidjava);
+        future = jinvoke(resfutureList,'get',i-1);
 
-        results(i)=PAResult(jinvoke(resfutureList,'get',i-1), taskinfo);
+        results(i)=PAResult(future, taskinfo);
 
     end
     outputs = PAResL(results);
-    jremove(solver, solve_config, task_configs);
+    clearJavaStack();
 
 endfunction
 
@@ -407,6 +446,28 @@ function mainScript = createMainScript(funcName, opt)
         //mainScript = strcat(['out=';funcName;'(in);';ascii(31);ascii(30);'output = sci2exp(output,''''output'''',0);']);
         mainScript = strcat(['out=';funcName;'(in);']);
     end
+endfunction
+
+function initJavaStack()
+    js=list();
+    JAVA_STACK=resume(js);
+endfunction
+
+function addJavaObj(obj)
+    js=JAVA_STACK;
+    js($+1)=obj;
+    JAVA_STACK=resume(js); 
+endfunction
+
+function clearJavaStack()
+    js=JAVA_STACK;
+    for i=length(js):-1:1
+        try
+            jremove(js(i));
+        catch
+        end
+    end
+    JAVA_STACK=resume(js); 
 endfunction
 
 

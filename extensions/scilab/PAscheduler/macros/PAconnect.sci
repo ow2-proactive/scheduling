@@ -7,14 +7,16 @@ function [] = PAconnect(uri,credpath)
     end
     jimport org.ow2.proactive.scheduler.ext.scilab.client.ScilabSolver;
     solver = jnewInstance(ScilabSolver);
-    if ~exists('PA_connected') | PA_connected ~= 1 | ~jinvoke(solver,'isLoggedIn')          
-        jimport java.lang.String;
+    if ~exists('PA_connected') | PA_connected ~= 1 | ~jinvoke(solver,'isLoggedIn')                  
         jimport java.lang.System;
         jimport org.scilab.modules.gui.utils.ScilabPrintStream;
         if jinvoke(ScilabPrintStream,'isAvailable') then
-           jinvoke(System, 'setOut',jinvoke(ScilabPrintStream,'getInstance'));
+           inst = jinvoke(ScilabPrintStream,'getInstance');
+           jinvoke(System, 'setOut',inst);
            jinvoke(ScilabPrintStream,'setRedirect',[]);
-        end        
+           jremove(inst);
+        end   
+        jremove(ScilabPrintStream, System);     
         if argn(2) == 2
             ex = jinvoke(solver, 'createConnection',uri, credpath);
         else       
@@ -22,14 +24,14 @@ function [] = PAconnect(uri,credpath)
         end        
         if type(ex) == 10 then            
             disp(ex); 
-            jremove(solver);
+            jremove(solver, ex, ScilabSolver);
             error('PAconnect::Error while connecting');
-        else
+        else            
             PA_connected = 1;
             disp(strcat(['Connection successful to ', uri]));
         end                
     else
         disp('Already connected');
     end
-    jremove(solver);
+    jremove(solver,ScilabSolver);
 endfunction

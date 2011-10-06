@@ -9,6 +9,7 @@ function res=PAResult(future,taskinfo)
     jautoUnwrap(%t);             
     jimport java.lang.StringBuilder;
     res = tlist(['PAResult','future','cleanFileSet','cleanDirSet', 'outFile','jobid','taskid', 'cleaned', 'logsPrinted','logs','waited','iserror','resultSet','rid'],future, taskinfo.cleanFileSet, taskinfo.cleanDirSet, taskinfo.outFile, taskinfo.jobid, taskinfo.taskid, jnewInstance(AtomicBoolean,%f), jnewInstance(AtomicBoolean,%f), jnewInstance(StringBuilder), jnewInstance(AtomicBoolean,%f), jnewInstance(AtomicBoolean,%f),jnewInstance(AtomicBoolean,%f), rid);
+    jremove(AtomicBoolean, StringBuilder);
     
 endfunction
 

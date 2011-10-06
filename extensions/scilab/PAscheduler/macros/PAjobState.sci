@@ -10,5 +10,5 @@ function PAjobState(jobid)
     solver = jnewInstance(ScilabSolver);            
     env = jinvoke(solver,'getEnvironment');
     jinvoke(env,'jobState',jobid);
-    jremove(solver);
+    jremove(solver,env,ScilabSolver);
 endfunction

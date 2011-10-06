@@ -40,7 +40,7 @@ function [] = PAinit()
 
     // Policy
     system_setproperty('java.security.policy',strcat([PA_scheduler_dir, filesep(), 'config', filesep(), 'security.java.policy-client']));
-    jremove(log4jFile);
+    jremove(log4jFile, log4jFileUri, urlLog4jFile, finalstring, File);
 
     sep=pathsep();
 

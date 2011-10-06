@@ -10,5 +10,5 @@ function PAkillJob(jobid)
     solver = jnewInstance(ScilabSolver);            
     env = jinvoke(solver,'getEnvironment');
     jinvoke(env,'killJob',jobid);
-    jremove(solver);
+    jremove(solver,env,ScilabSolver);
 endfunction

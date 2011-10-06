@@ -10,5 +10,5 @@ function PApauseJob(jobid)
     solver = jnewInstance(ScilabSolver);            
     env = jinvoke(solver,'getEnvironment');
     jinvoke(env,'pauseJob',jobid);
-    jremove(solver);
+    jremove(solver,env,ScilabSolver);
 endfunction

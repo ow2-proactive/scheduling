@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<refentry version="5.0-subset Scilab" xml:id="PAwaitAny" xml:lang="en"
+<refentry version="5.0-subset Scilab" xml:id="PAclearResults" xml:lang="en"
           xmlns="http://docbook.org/ns/docbook"
           xmlns:xlink="http://www.w3.org/1999/xlink"
           xmlns:svg="http://www.w3.org/2000/svg"
@@ -11,23 +11,22 @@
   </info>
 
   <refnamediv>
-    <refname>PAwaitAny</refname>
+    <refname>PAclearResults</refname>
 
-    <refpurpose>explicitely wait for the first result available in a given list of results</refpurpose>
+    <refpurpose>clears PAResult objects from memory.</refpurpose>
   </refnamediv>
 
   <refsynopsisdiv>
     <title>Calling Sequence</title>
 
-    <synopsis>PAwaitAny(resl)</synopsis>
-     <synopsis>PAwaitAny(resl,timeout)</synopsis>
+    <synopsis>PAclearResults(resl)</synopsis>
   </refsynopsisdiv>
 
   <refsection>
     <title>Description</title>
 
 
-    <para>The PAwaitAny function can be called on objects of type <emphasis>PAResl</emphasis> returned by a <link linkend="PAsolve">PAsolve</link> call. It allows to explicitely block the scilab execution until the first result among the list specified is available. If all results have already been retrieved via PAwaitAny, an error message will appear.</para>
+    <para>A call to this function cleans up Java Objects (JIMS) references used by this PAResult object. The PAResult object cannot be used anymore after calling PAclearResults.</para>
   </refsection>
 
   <refsection>
@@ -41,60 +40,55 @@
                     </para>
                 </listitem>
             </varlistentry>
-            <varlistentry>
-                <term>timeout</term>
-                <listitem>
-                    <para>
-                        an optional timeout (in ms), the PAwaitFor call will block until the results are available or the timeout expires.
-                    </para>
-                </listitem>
-            </varlistentry>
         </variablelist>
     </refsection>
 
     <refsection>
         <title>Examples</title>
-        <programlisting role="example"><![CDATA[-->r=PAsolve('cosh',1,2,3,4)
+        <programlisting role="example"><![CDATA[
+-->r=PAsolve('cosh',1,2,3,4)
 
- Job submitted : 19
+ Job submitted : 22
  r  =
 
 (1):
-Awaited (J:19)
+Awaited (J:22)
 (2):
-Awaited (J:19)
+Awaited (J:22)
 (3):
-Awaited (J:19)
+Awaited (J:22)
 (4):
-Awaited (J:19)
+Awaited (J:22)
 
+-->r
+ r  =
 
--->val=PAwaitAny(r)
- val  =
+(1):
 
     1.5430806
-
--->val=PAwaitAny(r)
- val  =
+(2):
 
     3.7621957
-
--->val=PAwaitAny(r)
- val  =
+(3):
 
     10.067662
-
--->val=PAwaitAny(r)
- val  =
+(4):
 
     27.308233
 
--->val=PAwaitAny(r)
- !--error 10000
-All results have already been accessed
-at line      16 of function PAwaitAny called by :
-val=PAwaitAny(r)
+-->PAclearResults(r)
 
+-->r
+ r  =
+
+(1):
+Result Cleared
+(2):
+Result Cleared
+(3):
+Result Cleared
+(4):
+Result Cleared
  ]]></programlisting>
     </refsection>
 
@@ -102,13 +96,10 @@ val=PAwaitAny(r)
         <title>See Also</title>
         <simplelist type="inline">
             <member>
-                <link linkend="PAsolve">PAsolve</link>
-            </member>
-            <member>
                 <link linkend="PAResult">PAResult</link>
             </member>
             <member>
-                <link linkend="PAwaitFor">PAwaitFor</link>
+                <link linkend="PAsolve">PAsolve</link>
             </member>
         </simplelist>
     </refsection>

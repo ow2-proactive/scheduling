@@ -1,25 +1,20 @@
 function val=PAResult_PAwaitFor(R,timeout)
     global ('PAResult_DB');
-    //disp('PAResult_PAwaitFor : init')
-    jimport org.objectweb.proactive.api.PAFuture;
+    //disp('PAResult_PAwaitFor : init')    
     errormessage=[];
-    ff = R.future;
+    if ~jexists(R.future) then
+        error('PAResult::object cleared');        
+    end
+    jimport org.objectweb.proactive.api.PAFuture;
+    ff = R.future;    
     if argn(2) == 2
-        
         RaL = PAFuture.getFutureValue(ff,timeout);
     else
         RaL = PAFuture.getFutureValue(ff);
     end
     if jinvoke(RaL,'isOK')
-        //disp('PAResult_PAwaitFor : isOK')
-        if ~jinvoke(R.logsPrinted,'get')
-            logs = jinvoke(RaL,'getLogs');
-            jinvoke(R.logs,'append',logs);
-            jinvoke(R.logsPrinted,'set',%t);
-            if ~isempty(logs) then
-                printf('%s',logs);
-            end
-        end
+        //disp('PAResult_PAwaitFor : isOK')        
+        printLogs(R,RaL);
 
         if jinvoke(R.resultSet,'get')
             //disp('PAResult_PAwaitFor : Result get')
@@ -36,40 +31,48 @@ function val=PAResult_PAwaitFor(R,timeout)
 
     elseif jinvoke(RaL,'isMatSciError');
         //disp('PAResult_PAwaitFor : isMatSciError')
-        if ~jinvoke(R.logsPrinted,'get')
-            logs = jinvoke(RaL,'getLogs');
-            jinvoke(R.logs,'append',logs);
-            jinvoke(R.logsPrinted,'set',%t);
-            if ~isempty(logs) then
-                printf('%s',logs);
-            end
-            //System.err.println(logs);
-        end
+        
+        printLogs(R,RaL);
         jinvoke(R.iserror,'set',%t);
         errormessage = 'PAResult:PAwaitFor Error during remote script execution';
     else
         //disp('PAResult_PAwaitFor : internalError')
-        if ~jinvoke(R.logsPrinted,'get')
-            logs = jinvoke(RaL,'getLogs');
-            if ~isempty(logs) then
-                jinvoke(R.logs,'append',logs);
-                jinvoke(R.logsPrinted,'set',%t);
-                printf('%s',logs);
-            end
-
-        end
+        printLogs(R,RaL);
         e = jinvoke(RaL,'getException');
         jimport org.ow2.proactive.scheduler.ext.scilab.client.ScilabSolver;
         exstr = ScilabSolver.getStackTrace(e);
         printf('%s',exstr);
-        //err = java.lang.System.err;
-        //jinvoke(e.printStackTrace(err);
+        try
+            jremove(e,ScilabSolver);
+            jremove(exstr);
+        catch 
+        end        
         jinvoke(R.iserror,'set',%t);
         errormessage = 'PAResult:PAwaitFor Internal Error';
     end
+    jremove(RaL,PAFuture);
+
     PAResult_clean(R);
     if errormessage ~= [] then
         val = [];
         error(errormessage)
     end
+endfunction
+
+function printLogs(R,RaL)
+    if ~jexists(R.logsPrinted) then
+            error('PAResult::object cleared');
+        end
+    if ~jinvoke(R.logsPrinted,'get')
+        logs = jinvoke(RaL,'getLogs');
+        dummy = jinvoke(R.logs,'append',logs);
+        jremove(dummy); // append returns a StringBuilder object that must be freed
+        logstr = jinvoke(R.logs,'toString');
+        if ~isempty(logstr) then
+            printf('%s',logstr);
+        end
+        jinvoke(R.logsPrinted,'set',%t);
+        jremove(logs,logstr);
+
+    end    
 endfunction

@@ -26,7 +26,8 @@ function jobs = PAconnect(url, credpath)
 %       More information can be found inside Scheduler's manual chapter "Configure
 %       users authentication". If you haven't configured any account in the
 %       scheduler use, the default account login "demo", password "demo".
-%       You can as well encrypt credentials using the command line tool "create-cred" to automate the connection.
+%       You can as well encrypt credentials using the command line tool
+%       "create-cred" to automate the connection.
 %
 %       PAconnect can also return the ids of PAsolve jobs that
 %       were still running at the end of the last Matlab session (Disconnected

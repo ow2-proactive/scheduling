@@ -10,5 +10,5 @@ function PAresumeJob(jobid)
     solver = jnewInstance(ScilabSolver);            
     env = jinvoke(solver,'getEnvironment');
     jinvoke(env,'resumeJob',jobid);
-    jremove(solver);
+    jremove(solver,env,ScilabSolver);
 endfunction
