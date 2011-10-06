@@ -10,5 +10,5 @@ function PAtaskOutput(jobid,taskname)
     solver = jnewInstance(ScilabSolver);            
     env = jinvoke(solver,'getEnvironment');
     jinvoke(env,'taskOutput',jobid,taskname);
-    jremove(solver);
+    jremove(solver,env,ScilabSolver);
 endfunction

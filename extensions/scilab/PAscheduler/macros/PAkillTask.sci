@@ -10,5 +10,5 @@ function PAkillTask(jobid,taskname)
     solver = jnewInstance(ScilabSolver);            
     env = jinvoke(solver,'getEnvironment');
     jinvoke(env,'killTask',jobid,taskname);
-    jremove(solver);
+    jremove(solver,env,ScilabSolver);
 endfunction

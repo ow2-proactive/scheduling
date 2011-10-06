@@ -6,7 +6,6 @@ function [] = PAstate()
     jimport org.ow2.proactive.scheduler.ext.scilab.client.ScilabSolver;
     solver = jnewInstance(ScilabSolver);        
     env = jinvoke(solver,'getEnvironment');
-    jinvoke(env, 'schedulerState');
-    
-    jremove(solver);
+    jinvoke(env, 'schedulerState');    
+    jremove(solver,env,ScilabSolver);
 endfunction

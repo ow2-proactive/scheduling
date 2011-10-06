@@ -1,6 +1,10 @@
 function %PAResult_p(R)
     //disp('PAResult_p : '+typeof(l))
-    if typeof(R) == 'PAResult' then
+    if typeof(R) == 'PAResult' then        
+        if ~jexists(R.waited)
+            printf('Result Cleared\n');
+            return;
+        end
         if PAResult_PAisAwaited(R)
             printf('Awaited (J:'+ string(R.jobid)+ ')\n')
         else

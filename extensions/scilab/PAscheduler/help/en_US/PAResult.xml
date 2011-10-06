@@ -27,6 +27,7 @@
 
 
         <para>The PAResult objects are returned when calling <link linkend="PAsolve">PAsolve</link>. The object can be manipulated using functions like <link linkend="PAwaitFor">PAwaitFor</link>, <link linkend="PAwaitAny">PAwaitAny</link> or by using the attributes <emphasis>val</emphasis>,<emphasis>logs</emphasis>,<emphasis>jobid</emphasis>,<emphasis>iserror</emphasis>.
+            PAResult objects should be cleared from memory if they are not needed anymore. This is to ensure that unnecessary JIMS Java object references are not held. To clean PAResult objects from memory, use function <link linkend="PAclearResults">PAclearResults</link>.
         </para>
 
     </refsection>
@@ -183,6 +184,9 @@ Awaited (J:8)
             </member>
             <member>
                 <link linkend="PAisAwaited">PAisAwaited</link>
+            </member>
+            <member>
+                <link linkend="PAclearResults">PAclearResults</link>
             </member>
         </simplelist>
     </refsection>

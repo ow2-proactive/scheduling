@@ -4,9 +4,18 @@ function b=%PAResult_e(i1, R)
     case 'val'
         b = PAResult_PAwaitFor(R);
     case 'logs'
-        b = jinvoke(R.logs,'toString');
+        if (jexists(R.logs)) then
+           b = jinvoke(R.logs,'toString');
+        else
+            error('PAResult::object cleared');
+        end
+        
     case 'iserror'
-        b = jinvoke(R.iserror, 'get');
+        if (jexists(R.iserror)) then
+            b = jinvoke(R.iserror, 'get');
+        else
+            error('PAResult::object cleared');
+        end
     case 'jobid'
         b = R.jobid;
          

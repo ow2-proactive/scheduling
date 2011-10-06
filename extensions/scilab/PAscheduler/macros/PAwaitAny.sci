@@ -2,11 +2,15 @@ function val=PAwaitAny(l,timeout)
     if typeof(l) == 'PAResL' then 
         jimport org.objectweb.proactive.api.PAFuture;
         jimport java.util.ArrayList;
+        
         arrayList = jnewInstance(ArrayList);
         indList=list();    
         m = size(l.matrix,2);
         for i=1:m
             pares=l.matrix(i).entries;
+            if ~jexists(pares.waited) then
+                error('PAResult::object cleared');
+            end
             if ~jinvoke(pares.waited,'get')
                 jinvoke(arrayList,'add',pares.future);
                 indList($+1)=i;           
@@ -26,6 +30,7 @@ function val=PAwaitAny(l,timeout)
         else
             ind = PAFuture.waitForAny(arrayList);
         end
+        jremove(arrayList,ArrayList,PAFuture);
         j=indList(ind+1);
         pares=l.matrix(j).entries;
         jinvoke(pares.waited,'set',%t);

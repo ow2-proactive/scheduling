@@ -95,6 +95,9 @@
                 <link linkend="PAsolve">PAsolve</link>
             </member>
             <member>
+                <link linkend="PAResult">PAResult</link>
+            </member>
+            <member>
                 <link linkend="PAwaitAny">PAwaitAny</link>
             </member>
         </simplelist>

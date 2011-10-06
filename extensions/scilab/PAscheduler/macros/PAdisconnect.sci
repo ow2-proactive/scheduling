@@ -8,6 +8,7 @@ function PAdisconnect()
     jimport org.ow2.proactive.scheduler.ext.scilab.client.ScilabSolver;
     solver = jnewInstance(ScilabSolver);
     if ~exists('PA_connected') | PA_connected ~= 1 | ~jinvoke(solver,'isLoggedIn') 
+        jremove(solver,ScilabSolver);
         error('This Matlab session is not connected to a Scheduler');
     end
     try
@@ -15,4 +16,5 @@ function PAdisconnect()
        PA_connected = %f;
     catch                 
     end        
+    jremove(solver,ScilabSolver);
 endfunction
