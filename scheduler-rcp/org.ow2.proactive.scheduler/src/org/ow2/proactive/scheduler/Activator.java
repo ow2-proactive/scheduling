@@ -181,8 +181,8 @@ public class Activator extends AbstractUIPlugin {
         });
 
         //Create AOs here, at platform launch time in order to  minimise the time for the first user connection
-        JobsController.turnActive();
-        SchedulerProxy.getInstance();
+        //JobsController.turnActive();
+        //SchedulerProxy.getInstance();
 
     }
 
