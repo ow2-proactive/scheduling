@@ -120,7 +120,7 @@ public class ScilabSolver {
         return isConnected() && scilabEnv.isLoggedIn();
     }
 
-    public static String createConnection(String url) throws Exception {
+    public static String createConnection(String url, String credPath) throws Exception {
         try {
             if (scilabEnv == null) {
                 if (CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL.getValue().equals("rmi")) {
@@ -153,7 +153,11 @@ public class ScilabSolver {
             }
 
             if (!scilabEnv.isLoggedIn()) {
-                scilabEnv.startLogin();
+                if (credPath == null) {
+                    scilabEnv.startLoginGUI();
+                } else {
+                    scilabEnv.login(credPath);
+                }
             }
 
             while (!scilabEnv.isLoggedIn() && scilabEnv.getNbAttempts() <= LoginFrame.MAX_NB_ATTEMPTS) {

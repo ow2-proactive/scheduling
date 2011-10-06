@@ -182,6 +182,12 @@ public abstract class AOMatSciEnvironment<R, RL> implements Serializable, Schedu
             throw new LoginException("Could not retrieve public key, contact the Scheduler admininistrator" +
                 e);
         }
+        initLogin(creds);
+
+    }
+
+    protected void initLogin(Credentials creds) throws PermissionException, NotConnectedException,
+            AlreadyConnectedException, LoginException {
         this.scheduler = auth.login(creds);
 
         loggedin = true;
@@ -214,9 +220,31 @@ public abstract class AOMatSciEnvironment<R, RL> implements Serializable, Schedu
     }
 
     /**
+     * Tries to log into the scheduler, using the provided credential file
+     *
+     * @param credPath   path to the credentials file
+     * @throws javax.security.auth.login.LoginException
+     *          if the login fails
+     * @throws org.ow2.proactive.scheduler.common.exception.SchedulerException
+     *          if an other error occurs
+     */
+    public void login(String credPath) throws KeyException, LoginException, SchedulerException {
+
+        //System.out.println("Trying to connect with "+user+" " +passwd);
+        Credentials creds = null;
+        try {
+            creds = Credentials.getCredentials(credPath);
+        } catch (KeyException e) {
+            throw e;
+        }
+        initLogin(creds);
+
+    }
+
+    /**
      * Starts a swing GUI to enter login and password
      */
-    public void startLogin() {
+    public void startLoginGUI() {
         loggedin = false;
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
