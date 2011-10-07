@@ -36,15 +36,22 @@
  */
 package org.ow2.proactive_grid_cloud_portal.rm;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.security.KeyException;
+import java.text.DecimalFormat;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+import javax.management.Attribute;
+import javax.management.AttributeList;
 import javax.management.InstanceNotFoundException;
 import javax.management.IntrospectionException;
+import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 import javax.management.ReflectionException;
 import javax.security.auth.login.LoginException;
@@ -74,6 +81,7 @@ import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.common.RMState;
 import org.ow2.proactive.resourcemanager.common.event.RMInitialState;
 import org.ow2.proactive.resourcemanager.common.util.RMCachingProxyUserInterface;
+import org.ow2.proactive.resourcemanager.core.jmx.RMJMXHelper;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.frontend.topology.Topology;
@@ -83,7 +91,13 @@ import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
 import org.ow2.proactive.utils.NodeSet;
 import org.ow2.proactive_grid_cloud_portal.common.LoginForm;
+import org.ow2.proactive_grid_cloud_portal.common.StatHistoryCaching;
+import org.ow2.proactive_grid_cloud_portal.common.StatHistoryCaching.StatHistoryCacheEntry;
 import org.ow2.proactive_grid_cloud_portal.webapp.PortalConfiguration;
+import org.rrd4j.ConsolFun;
+import org.rrd4j.core.FetchData;
+import org.rrd4j.core.FetchRequest;
+import org.rrd4j.core.RrdDb;
 
 @Path("/rm")
 public class RMRest {
@@ -178,7 +192,7 @@ public class RMRest {
     }
 
     /**
-     * Returns the state of the scheduler
+     * Returns the state of the Resource Manager
      * @param sessionId a valid session id
      * @return Returns the state of the scheduler
      */
@@ -568,8 +582,165 @@ public class RMRest {
         } else {
             return rm.getMBeanAttributes(name, attrs.toArray(new String[] {}));
         }
-
     }
+    
+    /**
+     * Return the statistic history contained in the RM's RRD database,
+     * without redundancy, in a friendly JSON format.
+     * 
+     * The following sources will be queried from the RRD DB :<pre>
+	 * 	{ "BusyNodesCount",
+	 *    "FreeNodesCount",
+	 *    "DownNodesCount",
+     *    "AvailableNodesCount",
+     *    "AverageActivity" }</pre>
+     * 
+     * 
+     * @param sessionId
+     * @param range a String of 5 chars, one for each stat history source, indicating the time range to fetch
+	 *      for each source. Each char can be:<ul>
+	 *            <li>'a' 1 minute
+	 *            <li>'m' 10 minutes
+	 *            <li>'h' 1 hour
+	 *            <li>'H' 8 hours
+	 *            <li>'d' 1 day
+	 *            <li>'w' 1 week
+	 *            <li>'M' 1 month
+	 *            <li>'y' 1 year</ul>
+     * @return a JSON object containing a key for each source
+     * @throws InstanceNotFoundException
+     * @throws IntrospectionException
+     * @throws ReflectionException
+     * @throws IOException
+     * @throws MalformedObjectNameException
+     * @throws NullPointerException
+     * @throws InterruptedException
+     */
+    @GET
+    @GZIP
+    @Path("stathistory")
+    @Produces("application/json")
+	public String getStatHistory(@HeaderParam("sessionid") String sessionId, @QueryParam("range") String range)
+			throws InstanceNotFoundException, IntrospectionException,
+			ReflectionException, IOException, MalformedObjectNameException,
+			NullPointerException, InterruptedException {
+
+    	long l1 = System.currentTimeMillis();
+    	RMCachingProxyUserInterface rm = checkAccess(sessionId);
+
+		
+		String[] dataSources = { //
+				// "AverageInactivity", // redundant with AverageActivity
+				// "ToBeReleasedNodesCo", // useless info
+				"BusyNodesCount", //
+				"FreeNodesCount", //
+				"DownNodesCount", //
+				"AvailableNodesCount", //
+				"AverageActivity", //
+				// "MaxFreeNodes" // redundant with AvailableNodesCount
+		};
+		// if range String is too large, shorten it
+		// to make it recognizable by StatHistoryCaching
+		if (range.length() > dataSources.length) {
+			range = range.substring(0, dataSources.length);
+		}
+		// complete range if too short
+		while (range.length() < dataSources.length) {
+			range += 'a';
+		}
+		
+    	StatHistoryCacheEntry cache = StatHistoryCaching.getInstance().getEntry(range);
+    	// found unexpired cache entry matching the parameters: return it immediately
+    	if (cache != null) {
+    		return cache.getValue();
+    	}
+    	
+		ObjectName on = new ObjectName(RMJMXHelper.RUNTIMEDATA_MBEAN_NAME);
+		AttributeList attrs = rm.getMBeanAttributes(on, new String[] { "StatisticHistory" });
+		Attribute attr = (Attribute) attrs.get(0);
+		// content of the RRD4J database backing file
+		byte [] rrd4j = (byte[]) attr.getValue();
+
+		File rrd4jDb = File.createTempFile("database", "rr4dj");
+		rrd4jDb.deleteOnExit();
+		
+		OutputStream out = new FileOutputStream(rrd4jDb);
+		out.write(rrd4j);
+		out.close();
+
+		// create RRD4J DB, should be identical to the one held by the RM
+		RrdDb db = new RrdDb(rrd4jDb.getAbsolutePath(), true);
+
+		long timeEnd = db.getLastUpdateTime();
+		// formatting will greatly reduce response size
+		DecimalFormat formatter = new DecimalFormat("###.###");
+		
+		// construct the JSON response directly in a String
+		StringBuffer result = new StringBuffer();
+		result.append("{");
+		
+		for (int i=0; i < dataSources.length; i++) {
+			String dataSource = dataSources[i];
+			char zone = range.charAt(i);
+			long timeStart;
+			
+			switch (zone) {
+			default:
+			case 'a': // 1 minute
+				timeStart = timeEnd - 60;
+				break;
+			case 'm': // 10 minute
+				timeStart = timeEnd - 60*10;
+				break;
+			case 'h': // 1 hours
+				timeStart = timeEnd - 60*60;
+				break;
+			case 'H': // 8 hours
+				timeStart = timeEnd - 60*60*8;
+				break;
+			case 'd': // 1 day
+				timeStart = timeEnd - 60*60*24;
+				break;
+			case 'w': // 1 week
+				timeStart = timeEnd - 60*60*24*7;
+				break;
+			case 'M': // 1 month
+				timeStart = timeEnd - 60*60*24*28;
+				break;
+			case 'y': // 1 year
+				timeStart = timeEnd - 60*60*24*365;
+				break;
+			}
+			
+			FetchRequest req = db.createFetchRequest(ConsolFun.AVERAGE, timeStart, timeEnd);
+			req.setFilter(dataSource);
+			FetchData fetchData = req.fetchData();
+			result.append("\""+dataSource+"\":[");
+			
+			double [] values = fetchData.getValues(dataSource);
+			for (int j=0; j < values.length; j++) {
+				if (Double.compare(Double.NaN, values[j]) == 0) {
+					result.append("null");
+				} else {
+					result.append(formatter.format(values[j]));
+				}
+				if (j < values.length - 1)
+					result.append(',');
+			}
+			result.append(']');
+			if (i < dataSources.length - 1)
+				result.append(',');
+		}
+		result.append("}");
+		
+		db.close();
+		rrd4jDb.delete();
+		
+		String ret = result.toString();
+		StatHistoryCaching.getInstance().addEntry(range, l1, ret);
+		
+		return ret;
+	}
 
     /**
      * Returns the version of the rest api
