@@ -190,7 +190,7 @@ public abstract class AOMatSciEnvironment<R, RL> implements Serializable, Schedu
         loggedin = true;
 
         // myEventsOnly doesn't work with the disconnected mode, so we disable it
-        this.scheduler.addEventListener(stubOnThis, false, SchedulerEvent.JOB_RUNNING_TO_FINISHED,
+        this.scheduler.addEventListener(stubOnThis, true, SchedulerEvent.JOB_RUNNING_TO_FINISHED,
                 SchedulerEvent.JOB_PENDING_TO_FINISHED, SchedulerEvent.KILLED, SchedulerEvent.SHUTDOWN,
                 SchedulerEvent.SHUTTING_DOWN, SchedulerEvent.STOPPED, SchedulerEvent.RESUMED,
                 SchedulerEvent.TASK_RUNNING_TO_FINISHED);
