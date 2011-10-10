@@ -64,9 +64,14 @@ public class TableSelectionListener implements ISelectionChangedListener {
             }
             // normally RM is connected if I can select something...
             if (RMStore.isConnected()) {
-                RemoveNodesHandler.getInstance().setSelectedNodes(list);
-                LockNodesHandler.getInstance().setSelectedNodes(list);
-                UnlockNodesHandler.getInstance().setSelectedNodes(list);
+                //check for null in order to fix SCHEDULING-1383
+            	//FIXME: Ugly design. getInstance() method should never return null
+            	if (RemoveNodesHandler.getInstance()!=null)
+            		RemoveNodesHandler.getInstance().setSelectedNodes(list);
+            	if (LockNodesHandler.getInstance()!=null)
+            		LockNodesHandler.getInstance().setSelectedNodes(list);
+            	if (RemoveNodesHandler.getInstance()!=null)
+            		RemoveNodesHandler.getInstance().setSelectedNodes(list);
             }
 
             if (list.size() > 0) {
