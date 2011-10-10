@@ -110,7 +110,21 @@ public class ConnectAction extends SchedulerGUIAction {
 			JobsController.turnActive();
 			res = 0;
                         res = SchedulerProxy.getInstance().connectToScheduler(dialogResult);
-                        return Status.OK_STATUS;
+                        this.setName("Connected to Scheduler Server. Downloading state ...");
+				switch (res) {
+                        case 0: // init val
+				return Status.OK_STATUS;
+
+                        case SchedulerProxy.LOGIN_OR_PASSWORD_WRONG:
+                           errorConnect(new Exception("Authentication failed: invalid username or password "), dialogResult.getUrl());
+                            return Status.OK_STATUS;
+
+                        case SchedulerProxy.CONNECTED:
+				postConnect(dialogResult.getUrl());
+				default:
+					return Status.OK_STATUS;
+				}
+
                     } catch (Throwable t) {
 			errorConnect(t, dialogResult.getUrl());
                         // Status.WARNING used (instead of Status.ERROR) to avoid the appearance of an eclipse's error dialog
@@ -127,36 +141,6 @@ public class ConnectAction extends SchedulerGUIAction {
                 }
             };
 
-            job.addJobChangeListener(new JobChangeAdapter() {
-                @Override
-                public void done(IJobChangeEvent event) {
-                	 UIJob connectToSchedJob = new UIJob(getParent().getDisplay(),
-                             "Downloading Scheduler state, please wait...") {
-						
-						@Override
-						public IStatus runInUIThread(IProgressMonitor monitor) {
-		                	switch (res) {
-	                        case 0: // init val
-	                        	return Status.OK_STATUS;
-
-	                        case SchedulerProxy.LOGIN_OR_PASSWORD_WRONG:
-	                            MessageDialog.openError(getParent().getShell(), "Could not connect",
-	                                    "Incorrect username or password !");
-	                            return Status.OK_STATUS;
-
-	                        case SchedulerProxy.CONNECTED:
-					postConnect(dialogResult.getUrl());
-		                	default:
-		                		return Status.OK_STATUS;
-		                	
-		                	}
-						}
-					};
-					
-					connectToSchedJob.setUser(true);
-					connectToSchedJob.schedule();
-                }
-            });
             job.setUser(true);
             job.schedule();
         }
@@ -210,12 +194,14 @@ public class ConnectAction extends SchedulerGUIAction {
 
 		        getParent().getDisplay().syncExec(new Runnable() {
 		            public void run() {
+				String cause =  "";
+				if (e.getMessage()!=null)
+					cause+="\n\nCause\n : "+e.getMessage();
 		                MessageDialog.openError(getParent().getShell(), "Couldn't connect",
 		                        "Could not connect to the scheduler based on : " + schedURL +
-		                            "\n\nCause\n : " + e.getMessage());
+		                           cause);
 		            }
 		        });
-
 		        return Status.OK_STATUS;
 			}
 		};
