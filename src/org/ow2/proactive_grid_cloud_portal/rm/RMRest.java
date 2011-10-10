@@ -139,7 +139,7 @@ public class RMRest {
 
             rm.init(PortalConfiguration.getProperties().getProperty(PortalConfiguration.rm_url), credData);
 
-            return "" + RMSessionMapper.getInstance().add(rm);
+            return RMSessionMapper.getInstance().add(rm);
 
 
     }
@@ -185,7 +185,7 @@ public class RMRest {
             rm.init(url, credData);
         }
 
-        String sessionId = "" + RMSessionMapper.getInstance().add(rm);
+        String sessionId = RMSessionMapper.getInstance().add(rm);
         //      logger.info("binding user "+  " to session " + sessionId );
         return sessionId;
 
@@ -211,100 +211,127 @@ public class RMRest {
      */
     @GET
 	@GZIP
-    @Path("monitoring")
-    @Produces("application/json")
-    public RMInitialState getInitialState(@HeaderParam("sessionid") String sessionId) {
-        RMCachingProxyUserInterface rm = checkAccess(sessionId);
-        return PAFuture.getFutureValue(rm.getRMInitialState());
-    }
-
-    /**
-     * Returns true if the resource manager is operational.
-     * @param sessionId a valid session id
-     * @return true if the resource manager is operational.
-     */
-    @GET
-    @Path("isactive")
-    @Produces("application/json")
-    public boolean isActive(@HeaderParam("sessionid") String sessionId) {
-        ResourceManager rm = checkAccess(sessionId);
-        return rm.isActive().getBooleanValue();
-    }
-
-    /**
-     * Adds an existing node to the default node source of the resource manager.
-     * @param sessionId
-     * @param nodeUrl the url of the node
-     * @return  true if new node is added successfully
-     */
-    @POST
-    @Produces("application/json")
-    @Path("node")
-    public boolean addNode(@HeaderParam("sessionid") String sessionId, @FormParam("nodeurl") String nodeUrl) {
-        ResourceManager rm = checkAccess(sessionId);
-        return rm.addNode(nodeUrl).getBooleanValue();
-    }
-
-    /**
-     * Adds an existing node to the particular node source.
-     * @param sessionId a valid session id 
-     * @param url the url of the node 
-     * @param nodesource the node source 
-     * @return  true if new node is added successfully, runtime exception otherwise
-     */
-    @POST
-    @Path("node")
-    @Produces("application/json")
-    public boolean addNode(@HeaderParam("sessionid") String sessionId, @FormParam("nodeurl") String url,
-            @FormParam("nodesource") String nodesource) {
-        ResourceManager rm = checkAccess(sessionId);
-        return rm.addNode(url, nodesource).getBooleanValue();
-    }
-
-    /**
-     * Returns true if the node nodeUrl is registered (i.e. known by the RM) and not down.
-     * @param sessionId a valid session id 
-     * @param url the url of the node 
-     * @return  true if the node nodeUrl is registered and not down
-     */
-    @GET
-    @Path("node/isavailable")
-    @Produces("application/json")
-    public boolean nodeIsAvailable(@HeaderParam("sessionid") String sessionId,
-            @FormParam("nodeurl") String url) {
-        ResourceManager rm = checkAccess(sessionId);
-        return rm.nodeIsAvailable(url).getBooleanValue();
-    }
-
-    /**
-     * Disconnects from resource manager and releases all the nodes taken by user for computations.
-     * @param sessionId a valid session id 
-     * @return true if successfully disconnected
-     */
-    @POST
-    @Path("disconnect")
-    @Produces("application/json")
-    public boolean disconnect(@HeaderParam("sessionid") String sessionId) {
-        ResourceManager rm = checkAccess(sessionId);
-        RMSessionMapper.getInstance().getSessionsMap().remove(rm);
-        return rm.disconnect().getBooleanValue();
-    }
+	@Path("monitoring")
+	@Produces("application/json")
+	public RMInitialState getInitialState(
+			@HeaderParam("sessionid") String sessionId) {
+		RMCachingProxyUserInterface rm = checkAccess(sessionId);
+		return PAFuture.getFutureValue(rm.getRMInitialState());
+	}
 
 	/**
-	 * Create a NodeSource 
+	 * Returns true if the resource manager is operational.
+	 *
+	 * @param sessionId
+	 *            a valid session id
+	 * @return true if the resource manager is operational.
+	 */
+	@GET
+	@Path("isactive")
+	@Produces("application/json")
+	public boolean isActive(@HeaderParam("sessionid") String sessionId) {
+		ResourceManager rm = checkAccess(sessionId);
+		return rm.isActive().getBooleanValue();
+	}
+
+	/**
+	 * Adds an existing node to the default node source of the resource manager.
+	 *
+	 * @param sessionId
+	 * @param nodeUrl
+	 *            the url of the node
+	 * @return true if new node is added successfully
+	 */
+	@POST
+	@Produces("application/json")
+	@Path("node")
+	public boolean addNode(@HeaderParam("sessionid") String sessionId,
+			@FormParam("nodeurl") String nodeUrl) {
+		ResourceManager rm = checkAccess(sessionId);
+		return rm.addNode(nodeUrl).getBooleanValue();
+	}
+
+	/**
+	 * Adds an existing node to the particular node source.
+	 *
+	 * @param sessionId
+	 *            a valid session id
+	 * @param url
+	 *            the url of the node
+	 * @param nodesource
+	 *            the node source
+	 * @return true if new node is added successfully, runtime exception
+	 *         otherwise
+	 */
+	@POST
+	@Path("node")
+	@Produces("application/json")
+	public boolean addNode(@HeaderParam("sessionid") String sessionId,
+			@FormParam("nodeurl") String url,
+			@FormParam("nodesource") String nodesource) {
+		ResourceManager rm = checkAccess(sessionId);
+		return rm.addNode(url, nodesource).getBooleanValue();
+	}
+
+	/**
+	 * Returns true if the node nodeUrl is registered (i.e. known by the RM) and
+	 * not down.
+	 *
+	 * @param sessionId
+	 *            a valid session id
+	 * @param url
+	 *            the url of the node
+	 * @return true if the node nodeUrl is registered and not down
+	 */
+	@GET
+	@Path("node/isavailable")
+	@Produces("application/json")
+	public boolean nodeIsAvailable(@HeaderParam("sessionid") String sessionId,
+			@FormParam("nodeurl") String url) {
+		ResourceManager rm = checkAccess(sessionId);
+		return rm.nodeIsAvailable(url).getBooleanValue();
+	}
+
+	/**
+	 * Disconnects from resource manager and releases all the nodes taken by
+	 * user for computations.
+	 *
+	 * @param sessionId
+	 *            a valid session id
+	 * @return true if successfully disconnected
+	 */
+	@POST
+	@Path("disconnect")
+	@Produces("application/json")
+	public boolean disconnect(@HeaderParam("sessionid") String sessionId) {
+		ResourceManager rm = checkAccess(sessionId);
+		RMSessionMapper.getInstance().getSessionsMap().remove(rm);
+		return rm.disconnect().getBooleanValue();
+	}
+
+	/**
+	 * Create a NodeSource
 	 * <p>
-	 *  
-	 *  
-	 * @param sessionId current session id
-	 * @param nodeSourceName name of the node source to create
-	 * @param infrastructureType fully qualified class name of the infrastructure to create
-	 * @param infrastructureParameters String parameters of the infrastructure, without the parameters
-	 * 	containing files or credentials
-	 * @param infrastructureFileParameters File or credential parameters
-	 * @param policyType fully qualified class name of the policy to create
-	 * @param policyParameters String parameters of the policy, without the parameters containing
-	 * 	files or credentials
-	 * @param policyFileParameters File or credential parameters
+	 *
+	 *
+	 * @param sessionId
+	 *            current session id
+	 * @param nodeSourceName
+	 *            name of the node source to create
+	 * @param infrastructureType
+	 *            fully qualified class name of the infrastructure to create
+	 * @param infrastructureParameters
+	 *            String parameters of the infrastructure, without the
+	 *            parameters containing files or credentials
+	 * @param infrastructureFileParameters
+	 *            File or credential parameters
+	 * @param policyType
+	 *            fully qualified class name of the policy to create
+	 * @param policyParameters
+	 *            String parameters of the policy, without the parameters
+	 *            containing files or credentials
+	 * @param policyFileParameters
+	 *            File or credential parameters
 	 * @return true if a node source has been created
 	 */
 	@POST
@@ -325,8 +352,11 @@ public class RMRest {
 		Object[] policyParams = new Object[policyParameters.length
 				+ policyFileParameters.length];
 
-		/* we need to merge both infrastructureParameters and infrastructureFileParameters into one
-		 * to do so we need the infrastructure parameter order from the RM */
+		/*
+		 * we need to merge both infrastructureParameters and
+		 * infrastructureFileParameters into one to do so we need the
+		 * infrastructure parameter order from the RM
+		 */
 		for (PluginDescriptor infra : rm
 				.getSupportedNodeSourceInfrastructures()) {
 			if (infra.getPluginName().equals(infrastructureType)) {
@@ -334,7 +364,8 @@ public class RMRest {
 				for (ConfigurableField field : infra.getConfigurableFields()) {
 					if (field.getMeta().credential()
 							|| field.getMeta().fileBrowser()) {
-						// file parameter : insert from the other array, convert to byte[]
+						// file parameter : insert from the other array, convert
+						// to byte[]
 						infraParams[i] = infrastructureFileParameters[k]
 								.getBytes();
 						k++;
@@ -354,7 +385,8 @@ public class RMRest {
 				field : pol.getConfigurableFields()) {
 					if (field.getMeta().credential()
 							|| field.getMeta().password()) {
-						// file parameter : insert from the other array, convert to byte[]
+						// file parameter : insert from the other array, convert
+						// to byte[]
 						policyParams[i] = policyFileParameters[k].getBytes();
 						k++;
 					} else {
@@ -369,78 +401,86 @@ public class RMRest {
 				infraParams, policyType, policyParams).getBooleanValue();
 	}
 
-    /**
-     * Returns the ping frequency of a node source 
-     * @param sessionId
-     * @param sourceName
-     * @return the ping frequency 
-     */
-    
-    @POST
-    @Path("nodesource/pingfrequency")
-    @Produces("application/json")
-    public int getNodeSourcePingFrequency(@HeaderParam("sessionid") String sessionId,
-            @FormParam("sourcename") String sourceName) {
-        ResourceManager rm = checkAccess(sessionId);
-        return rm.getNodeSourcePingFrequency(sourceName).getIntValue();
-    }
+	/**
+	 * Returns the ping frequency of a node source
+	 *
+	 * @param sessionId
+	 * @param sourceName
+	 * @return the ping frequency
+	 */
 
-    /**
-     * Release a node
-     * @param sessionId
-     * @param url
-     * @return true of the node has been released
-     * @throws NodeException 
-     */
-    @POST
-    @Path("node/release")
-    @Produces("application/json")
+	@POST
+	@Path("nodesource/pingfrequency")
+	@Produces("application/json")
+	public int getNodeSourcePingFrequency(
+			@HeaderParam("sessionid") String sessionId,
+			@FormParam("sourcename") String sourceName) {
+		ResourceManager rm = checkAccess(sessionId);
+		return rm.getNodeSourcePingFrequency(sourceName).getIntValue();
+	}
+
+	/**
+	 * Release a node
+	 *
+	 * @param sessionId
+	 * @param url
+	 * @return true of the node has been released
+	 * @throws NodeException
+	 */
+	@POST
+	@Path("node/release")
+	@Produces("application/json")
 	public boolean releaseNode(@HeaderParam("sessionid") String sessionId,
 			@FormParam("url") String url) throws NodeException {
-        ResourceManager rm = checkAccess(sessionId);
-        Node n;
-        n = NodeFactory.getNode(url);
-        return rm.releaseNode(n).getBooleanValue();
-    }
+		ResourceManager rm = checkAccess(sessionId);
+		Node n;
+		n = NodeFactory.getNode(url);
+		return rm.releaseNode(n).getBooleanValue();
+	}
 
-
-    /**
-     * Delete a node
-     * @param sessionId
-     * @param nodeUrl
-     * @param preempt
-     * @return
-     */
-    @POST
-    @Path("node/remove")
-    @Produces("application/json")
+	/**
+	 * Delete a node
+	 *
+	 * @param sessionId
+	 * @param nodeUrl
+	 * @param preempt
+	 * @return
+	 */
+	@POST
+	@Path("node/remove")
+	@Produces("application/json")
 	public boolean removeNode(@HeaderParam("sessionid") String sessionId,
-			@FormParam("url") String nodeUrl, @FormParam("preempt") boolean preempt) {
-        ResourceManager rm = checkAccess(sessionId);
-        return rm.removeNode(nodeUrl, preempt).getBooleanValue();
-    }
+			@FormParam("url") String nodeUrl,
+			@FormParam("preempt") boolean preempt) {
+		ResourceManager rm = checkAccess(sessionId);
+		return rm.removeNode(nodeUrl, preempt).getBooleanValue();
+	}
 
-    /**
-     * Delete a nodesource
-     * @param sessionId
-     * @param sourceName
-     * @param preempt
-     * @return
-     */
-    @POST
-    @Path("nodesource/remove")
-    @Produces("application/json")
+	/**
+	 * Delete a nodesource
+	 *
+	 * @param sessionId
+	 * @param sourceName
+	 * @param preempt
+	 * @return
+	 */
+	@POST
+	@Path("nodesource/remove")
+	@Produces("application/json")
 	public boolean removeNodeSource(@HeaderParam("sessionid") String sessionId,
 			@FormParam("name") String sourceName,
 			@FormParam("preempt") boolean preempt) {
-        ResourceManager rm = checkAccess(sessionId);
-        return rm.removeNodeSource(sourceName, preempt).getBooleanValue();
-    }
+		ResourceManager rm = checkAccess(sessionId);
+		return rm.removeNodeSource(sourceName, preempt).getBooleanValue();
+	}
 
 	/**
 	 * prevent other users from using a set of locked nodes
-	 * @param sessionId current session
-	 * @param nodeUrls set of node urls to lock
+	 *
+	 * @param sessionId
+	 *            current session
+	 * @param nodeUrls
+	 *            set of node urls to lock
 	 * @return true when all nodes were free and have been locked
 	 */
 	@POST
@@ -454,8 +494,11 @@ public class RMRest {
 
 	/**
 	 * allow other users to use a set of previously locked nodes
-	 * @param sessionId current session
-	 * @param nodeUrls set of node urls to unlock
+	 *
+	 * @param sessionId
+	 *            current session
+	 * @param nodeUrls
+	 *            set of node urls to unlock
 	 * @return true when all nodes were locked and have been unlocked
 	 */
 	@POST
@@ -467,83 +510,94 @@ public class RMRest {
 		return rm.unlockNodes(nodeUrls).getBooleanValue();
 	}
 
-    /**
-     * Each node source scan its nodes periodically to check their states. 
-     * This method changes the period of nodes scanning.
-     * @param arg0
-     * @param arg1
-     * @return
-     */
-    public boolean setNodeSourcePingFrequency(@HeaderParam("sessionid") String sessionId, int frequency,
-            String sourcename) {
-        ResourceManager rm = checkAccess(sessionId);
-        return rm.setNodeSourcePingFrequency(frequency, sourcename).getBooleanValue();
-    }
+	/**
+	 * Each node source scan its nodes periodically to check their states. This
+	 * method changes the period of nodes scanning.
+	 *
+	 * @param arg0
+	 * @param arg1
+	 * @return
+	 */
+	public boolean setNodeSourcePingFrequency(
+			@HeaderParam("sessionid") String sessionId, int frequency,
+			String sourcename) {
+		ResourceManager rm = checkAccess(sessionId);
+		return rm.setNodeSourcePingFrequency(frequency, sourcename)
+				.getBooleanValue();
+	}
 
-    /**
-     * Initiate the shutdowns the resource manager. During the shutdown resource manager removed all the 
-     * nodes and kills them if necessary. RMEvent(SHUTDOWN) will be send when the shutdown is finished.
-     * @param sessionId
-     * @param arg0
-     * @return
-     */
-    @GET
-    @Path("shutdown")
-    @Produces("application/json")
-    public boolean shutdown(@HeaderParam("sessionid") String sessionId, boolean preempt) {
-        ResourceManager rm = checkAccess(sessionId);
-        return rm.shutdown(preempt).getBooleanValue();
-    }
+	/**
+	 * Initiate the shutdowns the resource manager. During the shutdown resource
+	 * manager removed all the nodes and kills them if necessary.
+	 * RMEvent(SHUTDOWN) will be send when the shutdown is finished.
+	 *
+	 * @param sessionId
+	 * @param arg0
+	 * @return
+	 */
+	@GET
+	@Path("shutdown")
+	@Produces("application/json")
+	public boolean shutdown(@HeaderParam("sessionid") String sessionId,
+			boolean preempt) {
+		ResourceManager rm = checkAccess(sessionId);
+		return rm.shutdown(preempt).getBooleanValue();
+	}
 
-    public NodeSet getAtMostNodes(@HeaderParam("sessionid") String sessionId, int number,
-            TopologyDescriptor descriptor, List<SelectionScript> selectionScriptsList, NodeSet exclusion) {
-        ResourceManager rm = checkAccess(sessionId);
-        return rm.getAtMostNodes(number, descriptor, selectionScriptsList, exclusion);
-    }
+	public NodeSet getAtMostNodes(@HeaderParam("sessionid") String sessionId,
+			int number, TopologyDescriptor descriptor,
+			List<SelectionScript> selectionScriptsList, NodeSet exclusion) {
+		ResourceManager rm = checkAccess(sessionId);
+		return rm.getAtMostNodes(number, descriptor, selectionScriptsList,
+				exclusion);
+	}
 
-    public Topology getTopology(@HeaderParam("sessionid") String sessionId) {
-        ResourceManager rm = checkAccess(sessionId);
-        return rm.getTopology();
-    }
+	public Topology getTopology(@HeaderParam("sessionid") String sessionId) {
+		ResourceManager rm = checkAccess(sessionId);
+		return rm.getTopology();
+	}
 
-    public NodeSet getAtMostNodes(@HeaderParam("sessionid") String sessionId, int arg0, SelectionScript arg1) {
-        ResourceManager rm = checkAccess(sessionId);
-        return rm.getAtMostNodes(arg0, arg1);
-    }
+	public NodeSet getAtMostNodes(@HeaderParam("sessionid") String sessionId,
+			int arg0, SelectionScript arg1) {
+		ResourceManager rm = checkAccess(sessionId);
+		return rm.getAtMostNodes(arg0, arg1);
+	}
 
-    public NodeSet getAtMostNodes(@HeaderParam("sessionid") String sessionId, int arg0, SelectionScript arg1,
-            NodeSet arg2) {
-        ResourceManager rm = checkAccess(sessionId);
-        return rm.getAtMostNodes(arg0, arg1, arg2);
-    }
+	public NodeSet getAtMostNodes(@HeaderParam("sessionid") String sessionId,
+			int arg0, SelectionScript arg1, NodeSet arg2) {
+		ResourceManager rm = checkAccess(sessionId);
+		return rm.getAtMostNodes(arg0, arg1, arg2);
+	}
 
-    public NodeSet getAtMostNodes(@HeaderParam("sessionid") String sessionId, int arg0,
-            List<SelectionScript> arg1, NodeSet arg2) {
-        ResourceManager rm = checkAccess(sessionId);
-        return rm.getAtMostNodes(arg0, arg1, arg2);
-    }
+	public NodeSet getAtMostNodes(@HeaderParam("sessionid") String sessionId,
+			int arg0, List<SelectionScript> arg1, NodeSet arg2) {
+		ResourceManager rm = checkAccess(sessionId);
+		return rm.getAtMostNodes(arg0, arg1, arg2);
+	}
 
-    /**
-     * Returns the list of supported node source infrastructures descriptors.
-     * @param sessionId
-     * @return the list of supported node source infrastructures descriptors
-     */
-    @GET
+	/**
+	 * Returns the list of supported node source infrastructures descriptors.
+	 *
+	 * @param sessionId
+	 * @return the list of supported node source infrastructures descriptors
+	 */
+	@GET
 	@GZIP
-    @Path("infrastructures")
-    @Produces("application/json")
-    public Collection<PluginDescriptor> getSupportedNodeSourceInfrastructures(
-            @HeaderParam("sessionid") String sessionId) {
-        ResourceManager rm = checkAccess(sessionId);
-        return rm.getSupportedNodeSourceInfrastructures();
-    }
+	@Path("infrastructures")
+	@Produces("application/json")
+	public Collection<PluginDescriptor> getSupportedNodeSourceInfrastructures(
+			@HeaderParam("sessionid") String sessionId) {
+		ResourceManager rm = checkAccess(sessionId);
+		return rm.getSupportedNodeSourceInfrastructures();
+	}
 
-    /**
-     * Returns the list of supported node source policies descriptors.
-     * @param sessionId
-     * @return the list of supported node source policies descriptors
-     */
-    @GET
+	/**
+	 * Returns the list of supported node source policies descriptors.
+	 *
+	 * @param sessionId
+	 * @return the list of supported node source policies descriptors
+	 */
+	@GET
 	@GZIP
     @Path("policies")
     @Produces("application/json")

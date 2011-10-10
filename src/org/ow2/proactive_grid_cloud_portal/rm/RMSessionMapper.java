@@ -42,6 +42,7 @@ import java.util.Map;
 
 import org.objectweb.proactive.api.PAActiveObject;
 import org.ow2.proactive.resourcemanager.common.util.RMCachingProxyUserInterface;
+import org.ow2.proactive_grid_cloud_portal.common.SessionIdGenerator;
 
 
 public class RMSessionMapper {
@@ -49,7 +50,6 @@ public class RMSessionMapper {
     private Map<String, RMCachingProxyUserInterface> sessions;
     private static RMSessionMapper sessionMapper;
     private Map<String, Long> sessionsLastAccessToClient;
-    private long currentSessionid = 0l;
 
     private RMSessionMapper() {
         sessions = Collections.synchronizedMap(new HashMap<String, RMCachingProxyUserInterface>());
@@ -63,10 +63,10 @@ public class RMSessionMapper {
         return sessionMapper;
     }
 
-    public long add(RMCachingProxyUserInterface rm) {
-        long id = ++currentSessionid;
-        sessions.put("" + id, rm);
-        sessionsLastAccessToClient.put("" + id, System.currentTimeMillis());
+    public String add(RMCachingProxyUserInterface rm) {
+        String id = SessionIdGenerator.newSessionId();
+        sessions.put(id, rm);
+        sessionsLastAccessToClient.put(id, System.currentTimeMillis());
         return id;
     }
 
