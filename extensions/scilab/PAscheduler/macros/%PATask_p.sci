@@ -4,7 +4,7 @@ function %PATask_p(l)
         m = size(l.matrix,2);
         //disp(m)
         for j=1:m
-            for i=1:m
+            for i=1:n
                 patsk=l.matrix(i,j).entries;
                 printf('('+string(i)+','+string(j)+'):\n');
                 %PATsk_p(patsk);
