@@ -1,5 +1,7 @@
 function b=%PAResult_e(i1, R)
-    //disp('PAResult_p : '+typeof(l))
+    //disp('PAResult_e : '+typeof(l))
+    //disp('PAResult_e : ');
+    //disp(i1)
     select i1
     case 'val'
         b = PAResult_PAwaitFor(R);
