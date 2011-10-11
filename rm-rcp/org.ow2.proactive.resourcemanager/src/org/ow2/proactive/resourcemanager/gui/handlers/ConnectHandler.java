@@ -51,6 +51,7 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.handlers.HandlerUtil;
+import org.eclipse.ui.progress.UIJob;
 import org.ow2.proactive.resourcemanager.Activator;
 import org.ow2.proactive.resourcemanager.gui.data.RMStatusBarItem;
 import org.ow2.proactive.resourcemanager.gui.data.RMStore;
@@ -103,7 +104,7 @@ public class ConnectHandler extends AbstractHandler implements IHandler {
             });
         } else if (!dialogResult.isCanceled()) {
             //perform connection in a new thread, non graphic
-            Job job = new Job("Downloading RM state, please wait...") {
+            Job job = new Job("Connecting to the Resource Manager Server, please wait...") {
 
                 @Override
                 protected IStatus run(IProgressMonitor monitor) {
@@ -118,7 +119,8 @@ public class ConnectHandler extends AbstractHandler implements IHandler {
                     } catch (final Throwable t) {
 
                         // Status.WARNING used (instead of Status.ERROR) to avoid the appearance of an eclipse's error dialog
-                        return new Status(Status.WARNING, "rm.rcp",
+			errorConnect(t, dialogResult.getUrl());
+			return new Status(Status.WARNING, "rm.rcp",
                             "Could not connect to the Resource Manager ", t);
                     }
                 }
@@ -129,32 +131,6 @@ public class ConnectHandler extends AbstractHandler implements IHandler {
                 }
             };
 
-            job.addJobChangeListener(new JobChangeAdapter() {
-                @Override
-                public void done(IJobChangeEvent event) {
-                    Job job = event.getJob();
-
-                    if (job.getResult().isOK())
-                        return;
-
-                    RMStatusBarItem.getInstance().setText("disconnected");
-
-                    Throwable t = job.getResult().getException();
-                    MessageDialog.openError(Display.getDefault().getActiveShell(),
-                            "Couldn't connect to resource manager", t.getMessage());
-                    if (t != null) {
-                        Activator.log(IStatus.ERROR, "Could not connect to the Resource Manager ", t);
-                        t.printStackTrace();
-                    }
-
-                    try {
-                        // trying to disconnect in any case
-                        RMStore.getInstance().getResourceManager().disconnect();
-                    } catch (Throwable thr) {
-                    }
-                }
-            });
-
             job.setUser(true);
             job.schedule();
         }
@@ -163,4 +139,29 @@ public class ConnectHandler extends AbstractHandler implements IHandler {
         this.isDialogOpen = false;
         return null;
     }
+
+    private void errorConnect(final Throwable t, final String rmUrl)
+    {
+	UIJob uiJob = new UIJob(Display.getDefault(),"Display connect error message") {
+		@Override
+		public IStatus runInUIThread(IProgressMonitor monitor) {
+		RMStatusBarItem.getInstance().setText("disconnected");
+		        MessageDialog.openError(Display.getDefault().getActiveShell(),
+		                "Couldn't connect to resource manager at "+rmUrl, t.getMessage());
+		        if (t != null) {
+		            Activator.log(IStatus.ERROR, "Could not connect to the Resource Manager ", t);
+		            t.printStackTrace();
+		        }
+			        try {
+			            // trying to disconnect in any case
+			            RMStore.getInstance().getResourceManager().disconnect();
+			        } catch (Throwable thr) {
+		        }
+		return Status.OK_STATUS;
+		}
+	};
+	    uiJob.setUser(false);
+	    uiJob.schedule();
+    }
+
 }

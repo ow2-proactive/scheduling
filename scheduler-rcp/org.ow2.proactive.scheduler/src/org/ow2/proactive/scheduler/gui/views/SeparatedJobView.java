@@ -350,7 +350,7 @@ public class SeparatedJobView extends ViewPart {
         // I must turn active the jobsController after create
         // pendingJobComposite, runningJobComposite, finishedJobComposite
         // and before call newInstance on StatusLabel.
-        JobsController.turnActive();
+        //JobsController.turnActive();
 
         makeActions();
         hookContextMenu(parent);
