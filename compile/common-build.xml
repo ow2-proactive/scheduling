@@ -361,14 +361,13 @@
 		</copy>
 	</target>
 
-	
 	<path id="rcps.classpath">
 		<path refid="common.classpath"/>
 		<pathelement path="${rcp.scheduler.dir}/org.ow2.proactive.scheduler/bin" />
 		<pathelement path="${rcp.rm.dir}/org.ow2.proactive.resourcemanager/bin" />
 		<pathelement path="${classes.dir}/scheduler"/>
-		<pathelement path="/home/esalagea/ActiveEon/ProActiveTrunkProjects/Scheduler/scheduling.git/classes/scheduler"/>
-		<pathelement path="/home/esalagea/ActiveEon/ProActiveTrunkProjects/Scheduler/scheduling.git/classes/resource-manager"/>
+		<pathelement path="${classes.dir}/scheduler"/>
+		<pathelement path="${classes.dir}/resource-manager"/>
 	</path>
 	
 	<target name="rcp.generateStubs" description="Generate Stubs for the RCP products, for better performance">
