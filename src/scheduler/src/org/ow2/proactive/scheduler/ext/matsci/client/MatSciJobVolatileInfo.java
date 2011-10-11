@@ -36,13 +36,13 @@
  */
 package org.ow2.proactive.scheduler.ext.matsci.client;
 
+import org.objectweb.proactive.core.body.request.Request;
+import org.ow2.proactive.scheduler.common.job.JobStatus;
+
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.TreeSet;
-
-import org.objectweb.proactive.core.body.request.Request;
-import org.ow2.proactive.scheduler.common.job.JobStatus;
 
 
 /**
@@ -127,12 +127,22 @@ public class MatSciJobVolatileInfo<R> implements Serializable {
     }
 
     public void addLogs(String tname, String log) {
-        String logs = this.logs.get(tname);
-        if (logs == null) {
-            logs = "";
-        }
-        logs += log;
-        this.logs.put(tname, logs);
+
+        Pair<Integer, Integer> idpair = computeIdsFromTName(tname);
+        int i = idpair.getX();
+        int j = idpair.getY();
+        String tname_t;
+        // We add logs to each succeeding task (this way, we ensure that if a task fails, the logs from all previous tasks will appear).
+        do {
+            tname_t = "" + i + "_" + j;
+            String logs = this.logs.get(tname_t);
+            if (logs == null) {
+                logs = "";
+            }
+            logs += log;
+            this.logs.put(tname_t, logs);
+            j = j + 1;
+        } while (!info.getFinalTaskNames().contains(tname_t));
     }
 
     public String getLogs(String tname) {
@@ -191,6 +201,11 @@ public class MatSciJobVolatileInfo<R> implements Serializable {
         TreeSet<String> allTasks = (TreeSet<String>) info.getFinalTaskNames().clone();
         allTasks.removeAll(receivedTasks);
         return allTasks;
+    }
+
+    private Pair<Integer, Integer> computeIdsFromTName(String tname) {
+        String[] ids = tname.split("_");
+        return new Pair<Integer, Integer>(Integer.parseInt(ids[0]), Integer.parseInt(ids[1]));
     }
 
 }
