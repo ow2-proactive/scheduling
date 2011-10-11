@@ -129,64 +129,49 @@ public class ConnectAction extends SchedulerGUIAction {
             job.addJobChangeListener(new JobChangeAdapter() {
                 @Override
                 public void done(IJobChangeEvent event) {
-                    switch (res) {
-                        case 0: // init val
-                            return;
+                	 UIJob connectToSchedJob = new UIJob(getParent().getDisplay(),
+                             "Downloading Scheduler state, please wait...") {
+						
+						@Override
+						public IStatus runInUIThread(IProgressMonitor monitor) {
+		                	switch (res) {
+	                        case 0: // init val
+	                        	return Status.OK_STATUS;
 
-                        case SchedulerProxy.LOGIN_OR_PASSWORD_WRONG:
-                            MessageDialog.openError(getParent().getShell(), "Could not connect",
-                                    "Incorrect username or password !");
-                            return;
+	                        case SchedulerProxy.LOGIN_OR_PASSWORD_WRONG:
+	                            MessageDialog.openError(getParent().getShell(), "Could not connect",
+	                                    "Incorrect username or password !");
+	                            return Status.OK_STATUS;
 
-                        case SchedulerProxy.CONNECTED:
-                            // wait result for synchronous call
-                            JobsController.getActiveView().init();
-
-                            // Get graphical thread for the progress bar
-                            UIJob jobState = new UIJob(getParent().getDisplay(),
-                                    "Downloading Scheduler state, please wait...") {
-                                @Override
-                                public IStatus runInUIThread(IProgressMonitor monitor) {
-                                    //synchronous call ; wait futur
-
-                                    // the call "JobsController.getActiveView().init();"
-                                    // must be terminated here, before starting other call.
-                                    SeparatedJobView.getPendingJobComposite().initTable();
-                                    SeparatedJobView.getRunningJobComposite().initTable();
-                                    SeparatedJobView.getFinishedJobComposite().initTable();
-
-                                    ActionsManager.getInstance().setConnected(true);
-                                    SelectSchedulerDialog.saveInformations();
-
-                                    try {
-                                        // start log server
-                                        Activator.startLoggerServer();
-
-                                        ActionsManager.getInstance().update();
-
-                                        SeparatedJobView.setVisible(true);
-
-                                        return Status.OK_STATUS;
-
-                                    } catch (LogForwardingException e) {
-                                        errorConnect(e, dialogResult);
-                                        return new Status(Status.WARNING, "scheduler.rcp",
-                                            "Unable to download Scheduler state", e);
-                                    }
-                                }
-
-                                @Override
-                                protected void canceling() {
-                                    //SchedulerProxy.getInstance().disconnect();                                    
-                                }
-                            };
-
-                            jobState.setUser(true);
-                            jobState.schedule();
-                    }
+	                        case SchedulerProxy.CONNECTED:
+	                        	JobsController.getActiveView().init();
+	                          SeparatedJobView.getPendingJobComposite().initTable();
+	                          SeparatedJobView.getRunningJobComposite().initTable();
+	                          SeparatedJobView.getFinishedJobComposite().initTable();
+	                          ActionsManager.getInstance().setConnected(true);
+	                          SelectSchedulerDialog.saveInformations();
+	                          try {
+	                              // start log server
+	                              Activator.startLoggerServer();
+	                              ActionsManager.getInstance().update();
+	                              SeparatedJobView.setVisible(true);
+	                              return Status.OK_STATUS;
+	                          } catch (LogForwardingException e) {
+	                              errorConnect(e, dialogResult);
+	                              return new Status(Status.WARNING, "scheduler.rcp",
+	                                  "Unable to download Scheduler state", e);
+	                          }
+		                	default:
+		                		return Status.OK_STATUS;
+		                	
+		                	}
+						}
+					};
+					
+					connectToSchedJob.setUser(true);
+					connectToSchedJob.schedule();
                 }
             });
-
             job.setUser(true);
             job.schedule();
         }

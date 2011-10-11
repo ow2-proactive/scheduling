@@ -38,6 +38,7 @@
 			<class name="org.ow2.proactive.scheduler.common.task.TaskResult" />
 			<class name="org.ow2.proactive.scheduler.common.task.TaskLogs" />
 			<class name="org.ow2.proactive.scheduler.common.UniversalSchedulerListener" />
+			<class name="org.ow2.proactive.scheduler.common.SchedulerState" />
 			<class name="org.ow2.proactive.scheduler.core.SchedulerFrontend" />
 			<class name="org.ow2.proactive.scheduler.core.SchedulerCore" />
 			<class name="org.ow2.proactive.scheduler.authentication.SchedulerAuthentication" />

@@ -40,6 +40,7 @@
 			<class name="org.ow2.proactive.resourcemanager.common.event.RMInitialState" />
 			<class name="org.ow2.proactive.resourcemanager.authentication.RMAuthentication" />
 			<class name="org.ow2.proactive.resourcemanager.authentication.RMAuthenticationImpl" />
+			<class name="org.ow2.proactive.resourcemanager.frontend.RMMonitoring" />
 			<class name="org.ow2.proactive.resourcemanager.frontend.RMMonitoringImpl" />
 			<class name="org.ow2.proactive.resourcemanager.selection.statistics.ProbablisticSelectionManager" />
 			<class name="org.ow2.proactive.resourcemanager.nodesource.NodeSource" />
