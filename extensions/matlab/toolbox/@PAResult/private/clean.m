@@ -36,20 +36,25 @@
 %   */
 function clean(R)
 if ~R.cleaned.get()
-    warning('off')
-    setf = R.cleanFileSet;
-    for i=1:length(setf)
-        delete(setf{i});
-    end   
-    setd = R.cleanDirSet;
-    for i=1:length(setd)
-        d=dir(setd{i});
-        if length(d) == 2
-            rmdir(setd{i});
-        end
-    end    
     sched = PAScheduler;
-    sched.PATaskRepository(R.jobid, R.taskid, 'received');      
+    warning('off');    
+    setf = R.cleanFileSet;
+     
+    %for i=1:length(setf)
+    %    delete(setf{i});
+    %end   
+    setd = R.cleanDirSet;
+    sched.PATaskRepository(R.jobid, R.taskid, 'received'); 
+    tsks = sched.PATaskRepository(R.jobid, 'toreceive');
+    if length(tsks) == 0
+    for i=1:length(setd)
+        try
+           rmdir(setd{i},'s');
+        catch
+        end        
+    end    
+    end
+             
     R.cleaned.set(1);
-    warning('on')
+    warning('on');    
 end

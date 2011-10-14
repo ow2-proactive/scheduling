@@ -36,16 +36,6 @@
  */
 package org.ow2.proactive.scheduler.ext.matlab.worker;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.PrintStream;
-import java.io.Serializable;
-import java.net.URI;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Map;
-
 import org.objectweb.proactive.extensions.dataspaces.api.DataSpacesFileObject;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
@@ -57,6 +47,12 @@ import org.ow2.proactive.scheduler.ext.matlab.worker.util.MatlabEngineConfig;
 import org.ow2.proactive.scheduler.ext.matlab.worker.util.MatlabFinder;
 import org.ow2.proactive.scheduler.ext.matsci.worker.util.MatSciEngineConfig;
 import org.ow2.proactive.scheduler.ext.matsci.worker.util.MatSciEngineConfigBase;
+
+import java.io.*;
+import java.net.URI;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Map;
 
 
 /**
@@ -114,6 +110,7 @@ public class MatlabExecutable extends JavaExecutable {
 
     /** The root of the local space and a temporary dir */
     private File localSpaceRootDir, tempSubDir;
+    private String tempSubDirRel;
 
     /** The connection to MATLAB from matlabcontrol API */
     private MatlabConnection matlabConnection;
@@ -295,7 +292,15 @@ public class MatlabExecutable extends JavaExecutable {
 
         // Create a temp dir in the root dir of the local space
         this.localSpaceRootDir = new File(new URI(dsURI));
-        this.tempSubDir = new File(this.localSpaceRootDir, this.paconfig.getTempSubDirName());
+        String[] subDirs = this.paconfig.getTempSubDirNames();
+        this.tempSubDir = this.localSpaceRootDir;
+        this.tempSubDirRel = "";
+        int i = 0;
+        while (i < subDirs.length) {
+            this.tempSubDir = new File(this.tempSubDir, subDirs[i]);
+            tempSubDirRel += subDirs[i] + "/";
+            i++;
+        }
 
         // Set the local space of the global configuration
         this.paconfig.setLocalSpace(new URI(dsURI));
@@ -307,8 +312,7 @@ public class MatlabExecutable extends JavaExecutable {
         if (sourceZipFileName == null) {
             sourceZipFileName = paconfig.getSourceZipFileName();
         }
-        taskconfig.setSourceZipFileURI(new URI(getLocalFile(
-                paconfig.getTempSubDirName() + "/" + sourceZipFileName).getRealURI()));
+        taskconfig.setSourceZipFileURI(new URI(getLocalFile(tempSubDirRel + sourceZipFileName).getRealURI()));
 
         File sourceZip = new File(taskconfig.getSourceZipFileURI());
 
@@ -338,8 +342,8 @@ public class MatlabExecutable extends JavaExecutable {
             return;
         }
 
-        taskconfig.setEnvMatFileURI(new URI(getLocalFile(
-                paconfig.getTempSubDirName() + "/" + paconfig.getEnvMatFileName()).getRealURI()));
+        taskconfig.setEnvMatFileURI(new URI(getLocalFile(tempSubDirRel + paconfig.getEnvMatFileName())
+                .getRealURI()));
 
     }
 
@@ -348,8 +352,7 @@ public class MatlabExecutable extends JavaExecutable {
             int n = taskconfig.getInputFilesZipNames().length;
             URI[] uris = new URI[n];
             for (int i = 0; i < n; i++) {
-                uris[i] = new URI(getLocalFile(
-                        paconfig.getTempSubDirName() + "/" + taskconfig.getInputFilesZipNames()[i])
+                uris[i] = new URI(getLocalFile(tempSubDirRel + taskconfig.getInputFilesZipNames()[i])
                         .getRealURI());
             }
             taskconfig.setInputZipFilesURI(uris);
@@ -375,12 +378,11 @@ public class MatlabExecutable extends JavaExecutable {
     private void initTransferVariables() throws Exception {
 
         taskconfig.setInputVariablesFileURI(new URI(getLocalFile(
-                paconfig.getTempSubDirName() + "/" + taskconfig.getInputVariablesFileName()).getRealURI()));
+                tempSubDirRel + taskconfig.getInputVariablesFileName()).getRealURI()));
 
         if (taskconfig.getComposedInputVariablesFileName() != null) {
             taskconfig.setComposedInputVariablesFileURI(new URI(getLocalFile(
-                    paconfig.getTempSubDirName() + "/" + taskconfig.getComposedInputVariablesFileName())
-                    .getRealURI()));
+                    tempSubDirRel + taskconfig.getComposedInputVariablesFileName()).getRealURI()));
         }
 
     }

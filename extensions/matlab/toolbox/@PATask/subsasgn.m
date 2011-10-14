@@ -42,13 +42,7 @@ if isempty(this)
 end
 if isempty(S) && strcmp(class(A),'PATask')
     this = PATask();
-    this=assign(this,'Func', A.Func);
-    this=assign(this,'Params',A.Params);
-    this=assign(this,'Description',A.Description);
-    this=assign(this,'InputFiles', A.InputFiles);
-    this=assign(this,'OutputFiles',A.OutputFiles);
-    this=assign(this,'Compose',A.Compose);
-    this=assign(this,'SelectionScript', A.SelectionScript);
+    this=assign(this,A);
 end
 
 if length(S) == 1
@@ -61,28 +55,17 @@ if length(S) == 1
                 if length(S.subs) == 1
                     il = S.subs{1};
                     if isscalar(A)
-                        
+                        %this(il)=arrayfun(@(x)A,this(il));
                         for i=1:length(S.subs{1})
                             tsk = PATask();
-                            tsk=assign(tsk,'Func', A.Func); 
-                            tsk=assign(tsk,'Params', A.Params);
-                            tsk=assign(tsk,'Description', A.Description);
-                            tsk=assign(tsk,'InputFiles', A.InputFiles);
-                            tsk=assign(tsk,'OutputFiles', A.OutputFiles);
-                            tsk=assign(tsk,'Compose', A.Compose);
-                            tsk=assign(tsk,'SelectionScript', A.SelectionScript);                            
+                            tsk=assign(tsk,A);                          
                             this(il(i))=tsk;
                         end
                     else
+                        %this(il)=arrayfun(@(x,B)A,this(il),A);
                         for i=1:length(S.subs{1})
                             tsk = PATask();
-                            tsk=assign(tsk,'Func', A(i).Func); 
-                            tsk=assign(tsk,'Params', A(i).Params);
-                            tsk=assign(tsk,'Description', A(i).Description);
-                            tsk=assign(tsk,'InputFiles', A(i).InputFiles);
-                            tsk=assign(tsk,'OutputFiles', A(i).OutputFiles);
-                            tsk=assign(tsk,'Compose', A(i).Compose);
-                            tsk=assign(tsk,'SelectionScript', A(i).SelectionScript);                            
+                            tsk=assign(tsk, A(i));                         
                             this(il(i))=tsk;
                         end
                     end
@@ -93,13 +76,7 @@ if length(S) == 1
                         for i=1:length(il)
                             for j=1:length(jl)
                                 tsk = PATask();
-                                 tsk=assign(tsk,'Func', A.Func); 
-                                 tsk=assign(tsk,'Params', A.Params);
-                                tsk=assign(tsk,'Description', A.Description);
-                                tsk=assign(tsk,'InputFiles', A.InputFiles);
-                                tsk=assign(tsk,'OutputFiles', A.OutputFiles);
-                                tsk=assign(tsk,'Compose', A.Compose);
-                                tsk=assign(tsk,'SelectionScript', A.SelectionScript);  
+                                tsk=assign(tsk,A); 
                                 this(il(i),jl(j))=tsk;
                             end
                         end
@@ -107,13 +84,7 @@ if length(S) == 1
                         for i=1:length(il)
                             for j=1:length(jl)
                                 tsk = PATask();
-                                tsk=assign(tsk,'Func', A(i,j).Func); 
-                                tsk=assign(tsk,'Params', A(i,j).Params);
-                                tsk=assign(tsk,'Description', A(i,j).Description);
-                                tsk=assign(tsk,'InputFiles', A(i,j).InputFiles);
-                                tsk=assign(tsk,'OutputFiles', A(i,j).OutputFiles);
-                                tsk=assign(tsk,'Compose', A(i,j).Compose);
-                                tsk=assign(tsk,'SelectionScript', A(i,j).SelectionScript);  
+                                tsk=assign(tsk,A(i,j));  
                                 this(il(i),jl(j))=tsk;
                             end
                         end

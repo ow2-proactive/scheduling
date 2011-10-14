@@ -36,12 +36,6 @@
  */
 package org.ow2.proactive.scheduler.ext.matlab.client;
 
-import java.io.File;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.TreeSet;
-
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
@@ -61,6 +55,12 @@ import org.ow2.proactive.scheduler.ext.matsci.client.*;
 import org.ow2.proactive.scripting.InvalidScriptException;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.scripting.SimpleScript;
+
+import java.io.File;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.TreeSet;
 
 
 /**
@@ -182,6 +182,13 @@ public class AOMatlabEnvironment extends AOMatSciEnvironment<Boolean, MatlabResu
         TreeSet<String> finaltnames = new TreeSet<String>(new TaskNameComparator());
         int nbResults = taskConfigs.length;
         int depth = taskConfigs[0].length;
+
+        String subDir = "";
+        String[] subDirNames = config.getTempSubDirNames();
+        for (int k = 0; k < subDirNames.length; k++) {
+            subDir += subDirNames[k] + "/";
+        }
+
         for (int i = 0; i < nbResults; i++) {
             JavaTask oldTask = null;
             for (int j = 0; j < depth; j++) {
@@ -236,32 +243,31 @@ public class AOMatlabEnvironment extends AOMatSciEnvironment<Boolean, MatlabResu
                 oldTask = schedulerTask;
 
                 if (config.isZipSourceFiles() && taskConfigs[i][j].getSourceZipFileName() != null) {
-                    schedulerTask.addInputFiles(config.getTempSubDirName() + "/" +
-                        taskConfigs[i][j].getSourceZipFileName(), InputAccessMode.TransferFromInputSpace);
+                    schedulerTask.addInputFiles(subDir + taskConfigs[i][j].getSourceZipFileName(),
+                            InputAccessMode.TransferFromInputSpace);
                 }
 
                 if (config.isZipSourceFiles() && config.getSourceZipFileName() != null) {
-                    schedulerTask.addInputFiles(config.getTempSubDirName() + "/" +
-                        config.getSourceZipFileName(), InputAccessMode.TransferFromInputSpace);
+                    schedulerTask.addInputFiles(subDir + config.getSourceZipFileName(),
+                            InputAccessMode.TransferFromInputSpace);
                 }
 
                 if (config.isTransferEnv()) {
 
-                    schedulerTask.addInputFiles(
-                            config.getTempSubDirName() + "/" + config.getEnvMatFileName(),
+                    schedulerTask.addInputFiles(subDir + config.getEnvMatFileName(),
                             InputAccessMode.TransferFromInputSpace);
 
                 }
 
-                schedulerTask.addInputFiles(config.getTempSubDirName() + "/" +
-                    taskConfigs[i][j].getInputVariablesFileName(), InputAccessMode.TransferFromInputSpace);
+                schedulerTask.addInputFiles(subDir + taskConfigs[i][j].getInputVariablesFileName(),
+                        InputAccessMode.TransferFromInputSpace);
                 if (taskConfigs[i][j].getComposedInputVariablesFileName() != null) {
-                    schedulerTask.addInputFiles(config.getTempSubDirName() + "/" +
+                    schedulerTask.addInputFiles(subDir +
                         taskConfigs[i][j].getComposedInputVariablesFileName(),
                             InputAccessMode.TransferFromInputSpace);
                 }
-                schedulerTask.addOutputFiles(config.getTempSubDirName() + "/" +
-                    taskConfigs[i][j].getOutputVariablesFileName(), OutputAccessMode.TransferToOutputSpace);
+                schedulerTask.addOutputFiles(subDir + taskConfigs[i][j].getOutputVariablesFileName(),
+                        OutputAccessMode.TransferToOutputSpace);
 
                 String[] inputFiles = taskConfigs[i][j].getInputFiles();
                 if (inputFiles != null && inputFiles.length > 0) {

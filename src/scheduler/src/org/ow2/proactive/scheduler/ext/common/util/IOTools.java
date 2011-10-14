@@ -36,19 +36,11 @@
  */
 package org.ow2.proactive.scheduler.ext.common.util;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.PrintStream;
-import java.io.Serializable;
+import java.io.*;
 import java.net.UnknownHostException;
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
+import java.nio.charset.Charset;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -100,9 +92,8 @@ public class IOTools {
         return new ProcessResult(retValue, out_lines.toArray(new String[0]), err_lines.toArray(new String[0]));
     }
 
-    public static String generateHash(String pathname) throws NoSuchAlgorithmException,
-            FileNotFoundException, IOException {
-        File file = new File(pathname);
+    public static String generateHash(File file) throws NoSuchAlgorithmException, FileNotFoundException,
+            IOException {
         if (!file.exists() || !file.canRead()) {
             throw new IOException("File doesn't exist : " + file);
         }
@@ -127,6 +118,43 @@ public class IOTools {
         }
 
         return hash;
+    }
+
+    public static String generateHash(String bigString) throws NoSuchAlgorithmException,
+            FileNotFoundException, IOException {
+
+        MessageDigest md = MessageDigest.getInstance("SHA"); // SHA or MD5
+        String hash = "";
+
+        char[] data = new char[bigString.length()];
+        StringReader fis = new StringReader(bigString);
+        fis.read(data);
+        fis.close();
+
+        byte[] input = toByteArray(data);
+        md.update(input); // Reads it all at one go. Might be better to chunk it.
+
+        byte[] digest = md.digest();
+
+        for (int i = 0; i < digest.length; i++) {
+            String hex = Integer.toHexString(digest[i]);
+            if (hex.length() == 1)
+                hex = "0" + hex;
+            hex = hex.substring(hex.length() - 2);
+            hash += hex;
+        }
+
+        return hash;
+    }
+
+    public static byte[] toByteArray(char[] array) {
+        return toByteArray(array, Charset.defaultCharset());
+    }
+
+    public static byte[] toByteArray(char[] array, Charset charset) {
+        CharBuffer cbuf = CharBuffer.wrap(array);
+        ByteBuffer bbuf = charset.encode(cbuf);
+        return bbuf.array();
     }
 
     /**
