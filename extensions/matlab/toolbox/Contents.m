@@ -1,4 +1,5 @@
 % PASchedulerToolbox
+% Version 3.1.1
 %
 % Files
 %   PAconnect    - PAconnect connects to the ProActive scheduler
@@ -15,3 +16,6 @@
 %   PAstate      - PAstate prints the current state of the Scheduler
 %   PAtaskOutput - PAtaskOutput text output of the given Scheduler task
 %   PAtaskResult - PAtaskResult returns or prints the textual representation of the result of the given
+%   PAarrayfun    - PAarrayfun apply a remote function call to each element of an array.
+%   PAdisconnect  - PAdisconnect disconnects Matlab from the ProActive Scheduler.
+%   PAisConnected - PAisConnected tells if this Matlab session is connected to a ProActive
