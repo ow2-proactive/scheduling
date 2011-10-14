@@ -2,7 +2,8 @@
 % given array of PAResult object
 %
 % Syntax
-%       >> val=PAwaitAny(r)
+%       >> val = PAwaitAny(r)
+%       >> [val, index] = PAwaitAny(r)
 % 
 % Inputs
 %
@@ -11,6 +12,7 @@
 % Outputs
 %   
 %   val - contains the real result of the computation.
+%   index - contains the index of the result computed in the r array.
 %
 % Description
 %
@@ -28,6 +30,29 @@
 %   , or factorial(4) has been computed remotely and returns the result as
 %   val = factorial(i)
 %   >> val2 = PAwaitAny(r) % Blocks for the second result, etc ...
+%
+%   r=PAsolve(@factorial, 1, 2, 3, 4);
+%   Job submitted : 24
+%   [val, index] = PAwaitAny(r)
+%   val =
+%      1
+%   index =
+%      1     1
+%   [val, index] = PAwaitAny(r)
+%   val =
+%      2
+%   index =
+%      1     2
+%   [val, index] = PAwaitAny(r)
+%   val =
+%      6
+%   index =
+%      1     3
+%   [val, index] = PAwaitAny(r)
+%   val =
+%     24
+%   index =
+%      1     4
 %
 % See Also
 %   PAsolve, PAResult/PAwaitFor, PAResult/PAisAwaited
@@ -69,7 +94,7 @@
 %   * ################################################################
 %   * $$PROACTIVE_INITIAL_DEV$$
 %   */
-function A = PAwaitAny(this,timeout)
+function varargout = PAwaitAny(this,timeout)
 s=size(this);
 arrayList = java.util.ArrayList();
 indList={};
@@ -98,5 +123,9 @@ l=indList{ind+1};
 R=this(l(1),l(2));
 R.waited.set(true);
 A = PAwaitFor(R);
+varargout{1} = A;
+if nargout == 2
+    varargout{2} = l;
+end
 
 
