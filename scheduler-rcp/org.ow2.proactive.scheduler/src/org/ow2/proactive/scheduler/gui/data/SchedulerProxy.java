@@ -92,7 +92,7 @@ import org.ow2.proactive.scheduler.gui.views.SeparatedJobView;
 public class SchedulerProxy implements Scheduler {
 
     private static final long SCHEDULER_SERVER_PING_FREQUENCY = 5000;
-    private static final long SCHEDULER_CONNECTION_TIMEOUT = 30000; // 30 secs
+    private static final long SCHEDULER_CONNECTION_TIMEOUT = 180000; // 180 secs
     public static final int CONNECTED = 1;
     public static final int LOGIN_OR_PASSWORD_WRONG = 2;
     private static SchedulerProxy instance = null;
