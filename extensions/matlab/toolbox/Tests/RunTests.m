@@ -60,6 +60,12 @@ for i=1:nbiter
         [ok,msg] = TestObjectArguments();
     end
     if ~ok disp(msg),return; end
+    if exist('timeout', 'var')
+        [ok,msg] = TestTransferEnv(timeout);
+    else
+        [ok,msg] = TestTransferEnv();
+    end
+    if ~ok disp(msg),return; end
     if runbigarray
         if exist('timeout', 'var')
             [ok,msg] = TestBigArrayAndKeepEngine(timeout);
