@@ -267,10 +267,15 @@ public abstract class InternalTask extends TaskState {
         }
 
         InternalTask replicatedTask = null;
+        // SCHEDULING-1373 remains, but not replicating the container make the core hangs,
+        // while replicating it "only" loses tasks args in db...
+        ExecutableContainer replicatedContainer = null;
         try {
             this.skipIdepsInSerialization = true;
             // Deep copy of the InternalTask using serialization
             replicatedTask = (InternalTask) MakeDeepCopy.WithProActiveObjectStream.makeDeepCopy(this);
+            replicatedContainer = (ExecutableContainer) MakeDeepCopy.WithProActiveObjectStream
+                    .makeDeepCopy(this.executableContainer);
         } catch (Throwable t) {
             throw new ExecutableCreationException("Failed to serialize task", t);
         } finally {
@@ -279,7 +284,7 @@ public abstract class InternalTask extends TaskState {
 
         // ExecutableContainer is transient and non serializable but only given once at construction
         // it needs to be explicitely added
-        replicatedTask.setExecutableContainer(this.executableContainer);
+        replicatedTask.setExecutableContainer(replicatedContainer);
 
         // ideps contain references to other InternalTasks, it needs to be removed.
         // anyway, dependecies for the new task will not be the same as the original
