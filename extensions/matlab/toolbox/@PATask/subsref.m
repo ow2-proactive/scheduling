@@ -47,18 +47,9 @@ for i=1:length(S)
                     Z=val{i}(l,m);
                     switch s.subs
                         case 'Func'
-
                             val{i+1}{(l-1)*sz(2)+m} = Z.Func;
                         case 'Params'
-                            val{i+1}{(l-1)*sz(2)+m} = Z.Params;
-                            %                 l=S.subs{1};
-                            %                 j=1;
-                            %                 for i=l
-                            %                     K.type='()';
-                            %                     K.subs={i};
-                            %                     PP = builtin('subsref', P, K);
-                            %                     varargout{j} = PP.param;
-                            %                 end
+                            val{i+1}{(l-1)*sz(2)+m} = Z.Params;                           
                         case 'InputFiles'
                             val{i+1}{(l-1)*sz(2)+m} = Z.InputFiles;
                         case 'OutputFiles'

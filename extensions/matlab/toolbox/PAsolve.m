@@ -106,9 +106,114 @@ else
     solveid = int32(0);
 end
 
+% Checking the parameters
+[Tasks, NN, MM]=parseParams(varargin{:});
+
+
+
+sched = PAScheduler;
+% Get the solver from memory
+solver = sched.PAgetsolver();
+if strcmp(class(solver),'double')
+    error('This Matlab session is not connected to a Scheduler.');
+end
+try 
+    tst = solver.isConnected();
+catch ME
+    error('This Matlab session is not connected to a Scheduler.');
+end
+if ~tst
+    error('This Matlab session is not connected to a Scheduler.');
+end
+
+opt = PAoptions;
+solve_config = org.ow2.proactive.scheduler.ext.matlab.common.PASolveMatlabGlobalConfig();
+task_config = javaArray('org.ow2.proactive.scheduler.ext.matlab.common.PASolveMatlabTaskConfig', NN,MM);
+for i=1:NN
+    for j=1:MM
+        task_config(i,j)= org.ow2.proactive.scheduler.ext.matlab.common.PASolveMatlabTaskConfig();
+    end
+end
+
+% Checking all functions
+[funcDatabase,allfuncs] = initFunctions(Tasks,task_config, NN, MM,sched);
+
+
+% Temp directories
+[globalFilesToClean,taskFilesToClean,pa_dir,curr_dir,fs,subdir] = initDirectories(opt,solve_config,NN,solveid);
+
+% Initializing data spaces
+[keepaliveFunctionName,checktoolboxesFunctionName] = initDS(opt,solve_config,curr_dir);
+
+
+
+% Transfering source files
+[funcDatabase,taskFilesToClean] = initTransferSource(opt,fs,solveid,funcDatabase,sched,allfuncs,...
+    NN,MM,Tasks,keepaliveFunctionName,checktoolboxesFunctionName,taskFilesToClean,task_config,pa_dir);
+
+
+% Transfering the environment
+envZipName = ['MatlabPAsolveEnv_' num2str(solveid) '.zip'];
+envMatName = ['MatlabEnv_' num2str(solveid) '.mat'];
+if opt.TransferEnv
+    envFilePath = [pa_dir fs envMatName];
+    envZipFilePath = [pa_dir fs envZipName];
+    evalin('caller', ['save(''' envFilePath  ''',''' opt.TransferMatFileOptions ''')']);
+        
+    solve_config.setEnvMatFileName(envMatName);
+    
+    globalFilesToClean=[globalFilesToClean {envFilePath}];
+end
+
+% Init Input Files
+[taskFilesToClean] = initInputFiles(NN,MM,Tasks,opt,fs,taskFilesToClean,task_config,subdir,pa_dir);
+
+% Init Output Files
+[taskFilesToClean] = initOutputFiles(NN,MM,Tasks,opt,subdir,pa_dir,taskFilesToClean,task_config);
+
+% Init Parameters
+[input,main,taskFilesToClean,outVarFiles]=initParameters(solveid,NN,MM,Tasks,opt,taskFilesToClean,task_config,allfuncs,pa_dir,fs);
+
+% Init Solve Config
+initSolveConfig(solve_config,opt,sched);
+
+% Send the task list to the scheduler
+
+pairinfolist = solver.solve(solve_config, task_config);
+
+jobinfo = pairinfolist.getX();
+resfutureList = pairinfolist.getY();
+jid = char(jobinfo.getJobId());
+disp(['Job submitted : ' jid]);
+
+sched.PAaddDirToClean(jid, pa_dir);
+
+ftn = jobinfo.getFinalTaskNames();
+sched.PATaskRepository(jid, jobinfo);
+tnit = ftn.iterator();
+for i=1:NN
+    taskinfo.cleanFileSet = taskFilesToClean{i};
+    taskinfo.cleanDirSet = {pa_dir};
+    taskinfo.outFile = outVarFiles{i};
+    taskinfo.jobid = jid;
+    taskinfo.taskid = char(tnit.next());
+    sched.PATaskRepository(jid, taskinfo.taskid, taskinfo);
+    results(i)=PAResult(resfutureList.get(i-1), taskinfo);
+    for j=1:length(taskFilesToClean{i})
+        sched.PAaddFileToClean(jid, taskFilesToClean{i}{j});
+    end
+end
+
+if opt.AutomaticDump
+    sched.dumpState();
+end
+
+end
+
+function [Tasks, NN, MM]=parseParams(varargin)
 if isa(varargin{1}, 'function_handle')
     Func = varargin{1};
-    NN=nargin-1;
+    NN=length(varargin)-1;
     Tasks(1:NN) = PATask;
     Tasks(1:NN).Func = Func;
     for i=1:NN
@@ -119,12 +224,12 @@ if isa(varargin{1}, 'function_handle')
     end
     MM = 1;
 elseif isa(varargin{1}, 'PATask')
-    if nargin == 1
+    if length(varargin) == 1
         Tasks = varargin{1};
         NN = size(Tasks,2);
         MM = size(Tasks,1);
     else
-        NN=nargin;
+        NN=length(varargin);
         MM = -1;
         for i=1:NN
             if isa(varargin{i}, 'PATask')
@@ -150,40 +255,16 @@ else
     error(['Unsupported argument of class ' class(varargin{1})]);
 end
 
-
-
-% Checking arguments
-% if ~isa(solver, 'pa.stub.org.ow2.proactive.scheduler.ext.matlab.embedded._StubAOMatlabEnvironment')
-%     error('solver parameter should be a connection to the proactive scheduler obtained from the PAconnect function');
-% end
-sched = PAScheduler;
-% Get the solver from memory
-solver = sched.PAgetsolver();
-if strcmp(class(solver),'double')
-    error('This Matlab session is not connected to a Scheduler.');
-end
-try 
-    tst = solver.isConnected();
-catch ME
-    error('This Matlab session is not connected to a Scheduler.');
-end
-if ~tst
-    error('This Matlab session is not connected to a Scheduler.');
 end
 
-opt = PAoptions;
-solve_config = org.ow2.proactive.scheduler.ext.matlab.common.PASolveMatlabGlobalConfig();
-task_config = javaArray('org.ow2.proactive.scheduler.ext.matlab.common.PASolveMatlabTaskConfig', NN,MM);
-for i=1:NN
-    for j=1:MM
-        task_config(i,j)= org.ow2.proactive.scheduler.ext.matlab.common.PASolveMatlabTaskConfig();
-    end
-end
+
+function [funcDatabase,allfuncs] = initFunctions(Tasks,task_config, NN, MM,sched)
 v=version;
 [vmaj rem] = strtok(v, '.');
 vmaj = str2num(vmaj);
 vmin = strtok(rem, '.');
 vmin = str2num(vmin);
+funcDatabase = [];
 
     function strf=convertFunc(foo)
         if vmaj > 7 || vmin > 2
@@ -219,19 +300,19 @@ vmin = str2num(vmin);
 
     end
 
-%if exist('Func','var') == 1 && isa(Func,'function_handle')
-%    globalFuncExists=true;
-%    StrFunc = convertFunc(Func);
-%    sp = findScriptParams(Func,StrFunc);
-%    solve_config.setScriptParams(sp);
-%end
 for i=1:NN
     for j=1:MM
         if isa(Tasks(j,i).Func,'function_handle')
+            strfunc = convertFunc(Tasks(j,i).Func);
             allfuncs(i,j).f = Tasks(j,i).Func;
-            allfuncs(i,j).s = convertFunc(Tasks(j,i).Func);
-            % find the list of toolboxes used by the user function and give it as parameter to the script
-            sp = findScriptParams(allfuncs(i,j).f,allfuncs(i,j).s);
+            allfuncs(i,j).s = strfunc;
+            if ~isfield(funcDatabase, strfunc(2:end))
+                % find the list of toolboxes used by the user function and give it as parameter to the script
+                sp = findScriptParams(allfuncs(i,j).f,allfuncs(i,j).s);
+                funcDatabase.(strfunc(2:end)).sp = sp;
+            else
+                sp = funcDatabase.(strfunc(2:end)).sp;
+            end
             task_config(i,j).setToolboxesUsed(sp);
         else
             error(['Parameter ' num2str(i) ',' num2str(j)  ' has no function definition.']);
@@ -239,9 +320,10 @@ for i=1:NN
         task_config(i,j).setDescription(Tasks(j,i).Description);
     end
 end
+end
 
+function [globalFilesToClean,taskFilesToClean,pa_dir,curr_dir,fs,subdir] = initDirectories(opt,solve_config,NN,solveid)
 
-% Temp directories
 fs = filesep;
 
 curr_dir = pwd;
@@ -256,7 +338,10 @@ if isnumeric(opt.CustomDataspaceURL) && isempty(opt.CustomDataspaceURL)
     if (~exist([curr_dir fs subdir],'dir'))
         mkdir(curr_dir,subdir);
     end
-    pa_dir = [curr_dir fs subdir];
+    if (~exist([curr_dir fs subdir fs num2str(solveid)],'dir'))
+        mkdir([curr_dir fs subdir],num2str(solveid));
+    end
+    pa_dir = [curr_dir fs subdir fs num2str(solveid)];
 else
     if isnumeric(opt.CustomDataspacePath) && isempty(opt.CustomDataspacePath)
         error('if CustomDataspaceURL is specified, CustomDataspacePath must be specified also');
@@ -264,10 +349,17 @@ else
     if (~exist([opt.CustomDataspacePath fs subdir],'dir'))
         mkdir(opt.CustomDataspacePath,subdir);
     end
-    pa_dir = [opt.CustomDataspacePath fs subdir];
+    if (~exist([opt.CustomDataspacePath fs subdir fs num2str(solveid)],'dir'))
+        mkdir([opt.CustomDataspacePath fs subdir],num2str(solveid));
+    end
+    pa_dir = [opt.CustomDataspacePath fs subdir fs num2str(solveid)];
 end
 
-solve_config.setTempSubDirName(subdir);
+subDirNames = javaArray('java.lang.String', 2);
+subDirNames(1) = java.lang.String(subdir);
+subDirNames(2) = java.lang.String(num2str(solveid));
+
+solve_config.setTempSubDirNames(subDirNames);
 
 globalFilesToClean = {};
 taskFilesToClean=cell(1,NN);
@@ -275,7 +367,10 @@ for i=1:NN
     taskFilesToClean{i}={};
 end
 
-% Initializing data spaces
+subdir = [subdir '/' num2str(solveid)];
+end
+
+function [keepaliveFunctionName,checktoolboxesFunctionName]= initDS(opt,solve_config,curr_dir)
 
 if isnumeric(opt.CustomDataspaceURL) && isempty(opt.CustomDataspaceURL)
     helper = org.ow2.proactive.scheduler.ext.matsci.client.DataspaceHelper.getInstance();
@@ -292,102 +387,110 @@ keepaliveFunctionName = 'keepalive_callback_fcn';
 solve_config.setKeepaliveCallbackFunctionName(keepaliveFunctionName);
 checktoolboxesFunctionName = 'checktoolboxes_start_and_hide_desktop';
 solve_config.setChecktoolboxesFunctionName(checktoolboxesFunctionName);
+end
 
-
-% Transfering source files
+function [funcDatabase,taskFilesToClean] = initTransferSource(opt, fs, solveid,funcDatabase,sched,allfuncs, NN, MM,Tasks,keepaliveFunctionName,checktoolboxesFunctionName,taskFilesToClean,task_config,pa_dir)
 sourceZipBaseName = ['MatlabPAsolveSrc_' num2str(solveid)];
 
-    function nm=indToFile(ind)
-        nm='';
-        if ind==-1
-            return;
-        end
-        for JJ=ind
-            nm=[nm '_' num2str(JJ)];
-        end
-    end
 
-    function  [zFN zFP h]=buildZiplist(strfoo,ind,envziplist,paramziplist)
+    function  [zFN zFP]=buildZiplist(strfoo,ind,envziplist,paramziplist)
+        if ~isfield(funcDatabase, strfoo(2:end)) || ~isfield(funcDatabase.(strfoo(2:end)),'dep')
+            [mfiles classdirs] = sched.findDependency(strfoo(2:end));
+            funcDatabase.(strfoo(2:end)).dep.mfiles = mfiles;
+            funcDatabase.(strfoo(2:end)).dep.classdirs = classdirs;
 
-        [mfiles classdirs] = sched.findDependency(strfoo(2:end));
+        else
+            mfiles = funcDatabase.(strfoo(2:end)).dep.mfiles;
+            classdirs = funcDatabase.(strfoo(2:end)).dep.classdirs;
+        end
 
         z = union(mfiles, classdirs);
         z=union(z,envziplist);
         z=union(z,paramziplist);
         [pasolvepath, pasolvename, pasolveext] = fileparts(mfilename('fullpath'));
-        fs=filesep();
+
         keepalive_cb_path = [pasolvepath, fs, 'Utils', fs, keepaliveFunctionName, '.m'];
         checktoolboxes_fn_path = [pasolvepath, fs, 'Utils', fs, checktoolboxesFunctionName, '.m'];
         z=union(z, {keepalive_cb_path,checktoolboxes_fn_path});
-        zFN = [sourceZipBaseName indToFile(ind) '.zip'];
-        if length(z) > 0
-            zFP = [pa_dir fs zFN];
-            zip(zFP, z);
-            h = char(org.ow2.proactive.scheduler.ext.common.util.IOTools.generateHash(zFP));
-        else
-            % Dummy code in case there is no file to zip
-            zFP = [pa_dir fs zFN];
-            zip(zFP, {[mfilename('fullpath') '.m']});
-            h = char(org.ow2.proactive.scheduler.ext.common.util.IOTools.generateHash(zFP));
+        bigstr = '';
+        for kk = 1:length(z)
+            bigstr = [bigstr z{kk}];
         end
+        hashsource = char(org.ow2.proactive.scheduler.ext.common.util.IOTools.generateHash(bigstr));
+        zFN = [sourceZipBaseName '_' hashsource '.zip'];
+        zFP = [pa_dir fs zFN];
+        if ~exist(zFP, 'file')
+            zip(zFP, z);                    
+        end
+%         if length(z) > 0
+                        
+%         else
+%             % Dummy code in case there is no file to zip
+%             zFP = [pa_dir fs zFN];
+%             zip(zFP, {[mfilename('fullpath') '.m']});
+%             h = char(org.ow2.proactive.scheduler.ext.common.util.IOTools.generateHash(zFP));
+%         end
     end
 
 
 
-    stdclasses = {'logical','char','int8','uint8','int16','uint16','int32','uint32','int64','uint64','single','double','cell','struct','function_handle'};
-    envziplist={};
-    if opt.TransferEnv
-        sp=evalin('caller', 'whos');
-
-        for i=1:length(sp)
-            c=sp(i).class;
-            if ismember(c, stdclasses) || evalin('caller', ['iscom(' sp(i).name ')']) || evalin('caller', ['isjava(' sp(i).name ')']) || evalin('caller', ['isinterface(' sp(i).name ')'])
-            else
-                [envmfiles envclassdirs] = sched.findDependency(c);
-                envziplist = union(envmfiles, envclassdirs);
-            end
-        end
-    end
-
-    for i=1:NN
-        for j=1:MM
-            paramziplist={};
-
-                argi = Tasks(j,i).Params;
-                for k=1:length(argi)
-                    c=class(argi{k});
-                    if ismember(c, stdclasses) || iscom(argi{k}) || isjava(argi{k}) || isinterface(argi{k})
-                    else
-                        [parammfiles paramclassdirs] = sched.findDependency(c);
-                        paramziplist = union(parammfiles, paramclassdirs);
-                    end
-                end
-            [zFN zFP h]=buildZiplist(allfuncs(i,j).s,[i j],envziplist,paramziplist);
-
-            task_config(i,j).setSourceZipFileName(zFN);
-            taskFilesToClean{i}=[taskFilesToClean{i} {zFP}];
-
-        end
-    end
-
-
-% Transfering the environment
-envZipName = ['MatlabPAsolveEnv_' num2str(solveid) '.zip'];
-envMatName = ['MatlabEnv_' num2str(solveid) '.mat'];
+stdclasses = {'logical','char','int8','uint8','int16','uint16','int32','uint32','int64','uint64','single','double','cell','struct','function_handle'};
+envziplist={};
 if opt.TransferEnv
-    envFilePath = [pa_dir fs envMatName];
-    envZipFilePath = [pa_dir fs envZipName];
-    evalin('caller', ['save(''' envFilePath  ''',''' opt.TransferMatFileOptions ''')']);
-        
-    solve_config.setEnvMatFileName(envMatName);
-    
-    globalFilesToClean=[globalFilesToClean {envFilePath}];
+    sp=evalin('caller', 'whos');
+
+    for i=1:length(sp)
+        c=sp(i).class;
+        if ismember(c, stdclasses) || evalin('caller', ['iscom(' sp(i).name ')']) || evalin('caller', ['isjava(' sp(i).name ')']) || evalin('caller', ['isinterface(' sp(i).name ')'])
+        else
+            if ~isfield(funcDatabase, c) || ~isfield(funcDatabase.(c),'dep')
+                [envmfiles envclassdirs] = sched.findDependency(c);
+                funcDatabase.(c).dep.mfiles = envmfiles;
+                funcDatabase.(c).dep.classdirs = envclassdirs;
+
+            else
+                envmfiles = funcDatabase.(c).dep.mfiles;
+                envclassdirs = funcDatabase.(c).dep.classdirs;
+            end
+            envziplist = union(envziplist,envmfiles);
+            envziplist = union(envziplist,envclassdirs);
+        end
+    end
 end
 
-% Building Input/Output Matrix
+for i=1:NN
+    for j=1:MM
+        paramziplist={};
 
+        argi = Tasks(j,i).Params;
+        for k=1:length(argi)
+            c=class(argi{k});
+            if ismember(c, stdclasses) || iscom(argi{k}) || isjava(argi{k}) || isinterface(argi{k})
+            else
+                if ~isfield(funcDatabase, c) || ~isfield(funcDatabase.(c),'dep')
+                    [parammfiles paramclassdirs] = sched.findDependency(c);
+                    funcDatabase.(c).dep.mfiles = parammfiles;
+                    funcDatabase.(c).dep.classdirs = paramclassdirs;
 
+                else
+                    parammfiles = funcDatabase.(c).dep.mfiles;
+                    paramclassdirs = funcDatabase.(c).dep.classdirs;
+                end
 
+                paramziplist = union(paramziplist, parammfiles);
+                paramziplist = union(paramziplist, paramclassdirs);
+            end
+        end
+        [zFN zFP]=buildZiplist(allfuncs(i,j).s,[i j],envziplist,paramziplist);
+
+        task_config(i,j).setSourceZipFileName(zFN);
+        taskFilesToClean{i}=[taskFilesToClean{i} {zFP}];
+
+    end
+end
+end
+
+function [taskFilesToClean] = initInputFiles(NN,MM,Tasks,opt,fs,taskFilesToClean,task_config,subdir,pa_dir)
 for i=1:NN
     for j=1:MM
         ilen = length(Tasks(j,i).InputFiles);
@@ -428,16 +531,11 @@ for i=1:NN
     end
 
 end
-%end
+end
 
-% Output Files
+function [taskFilesToClean] = initOutputFiles(NN,MM,Tasks,opt,subdir,pa_dir,taskFilesToClean,task_config)
 outputFilesLists = [];
 outputFiles = [];
-%if length(p.Results.OutputFiles) > 0
-%    if length(p.Results.OutputFiles) ~= NN
-%        error('length of args and OutputFiles cells should match');
-%    end
-%outputZipBaseName = ['MatlabOutputFiles_' num2str(solveid)];
 
 for i=1:NN
     for j=1:MM
@@ -480,16 +578,11 @@ for i=1:NN
         end
     end
 end
-%end
+end
 
-% scattering the parameter matrix
+function [input,main,taskFilesToClean,outVarFiles]=initParameters(solveid,NN,MM,Tasks,opt,taskFilesToClean,task_config,allfuncs,pa_dir,fs)
 
-
-% Creating the tasks
-
-
-    input = 'i=0;';
-
+input = 'i=0;';
 
 variableInFileBaseName = ['MatlabPAsolveVarIn_' num2str(solveid)];
 variableOutFileBaseName = ['MatlabPAsolveVarOut_' num2str(solveid)];
@@ -521,8 +614,8 @@ for i=1:NN
                 save(inVarFP,'-struct','in');
             end
             taskFilesToClean{i}=union(taskFilesToClean{i}, {inVarFP});
-            %% because of disconnected mode, the final out is handled
-            %% differently
+            % because of disconnected mode, the final out is handled
+            % differently
             if j < MM
                 taskFilesToClean{i}=union(taskFilesToClean{i}, {outVarFP});
             end
@@ -573,10 +666,9 @@ for i=1:NN
         end
     end
 end
+end
 
-
-% send the task list to the scheduler
-
+function initSolveConfig(solve_config,opt,sched)
 solve_config.setDebug(opt.Debug);
 lgin = sched.PAgetlogin();
 solve_config.setLogin(lgin);
@@ -618,37 +710,17 @@ solve_config.setZipInputFiles(opt.ZipInputFiles);
 solve_config.setZipOutputFiles(opt.ZipOutputFiles);
 solve_config.setZipSourceFiles(true);
 solve_config.setUseMatlabControl(opt.UseMatlabControl);
-
-pairinfolist = solver.solve(solve_config, task_config);
-
-jobinfo = pairinfolist.getX();
-resfutureList = pairinfolist.getY();
-jid = char(jobinfo.getJobId());
-disp(['Job submitted : ' jid]);
-%sched.PAJobInfo(jobinfo.getJobId(), jobinfo);
-sched.PAaddDirToClean(jid, pa_dir);
-%taskinfos = {};
-ftn = jobinfo.getFinalTaskNames();
-sched.PATaskRepository(jid, jobinfo);
-tnit = ftn.iterator();
-for i=1:NN
-    taskinfo.cleanFileSet = taskFilesToClean{i};
-    taskinfo.cleanDirSet = {pa_dir};
-    taskinfo.outFile = outVarFiles{i};
-    taskinfo.jobid = jid;
-    taskinfo.taskid = char(tnit.next());
-    sched.PATaskRepository(jid, taskinfo.taskid, taskinfo);
-    results(i)=PAResult(resfutureList.get(i-1), taskinfo);
-    for j=1:length(taskFilesToClean{i})
-        sched.PAaddFileToClean(jid, taskFilesToClean{i}{j});
-    end
 end
 
-if opt.AutomaticDump
-    sched.dumpState();
-end
-%sched.PAJobInfo(jid, taskinfos);
 
+function nm=indToFile(ind)
+nm='';
+if ind==-1
+    return;
+end
+for JJ=ind
+    nm=[nm '_' num2str(JJ)];
+end
 end
 
 function ok=isAbsolute(file)

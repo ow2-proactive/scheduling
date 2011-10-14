@@ -36,11 +36,11 @@
  */
 package org.ow2.proactive.scheduler.ext.matsci.common;
 
+import org.objectweb.proactive.utils.OperatingSystem;
+
 import java.io.Serializable;
 import java.net.URI;
 import java.util.HashSet;
-
-import org.objectweb.proactive.utils.OperatingSystem;
 
 
 /**
@@ -129,7 +129,7 @@ public class PASolveMatSciGlobalConfig implements Serializable {
 
     protected boolean zipOutputFiles = false;
 
-    protected String tempSubDirName;
+    protected String[] tempSubDirNames;
 
     protected String inputSpaceURL = null;
 
@@ -376,11 +376,19 @@ public class PASolveMatSciGlobalConfig implements Serializable {
     }
 
     public String getTempSubDirName() {
-        return tempSubDirName;
+        return tempSubDirNames[0];
+    }
+
+    public String[] getTempSubDirNames() {
+        return tempSubDirNames;
     }
 
     public void setTempSubDirName(String tempSubDirName) {
-        this.tempSubDirName = tempSubDirName;
+        this.tempSubDirNames = new String[] { tempSubDirName };
+    }
+
+    public void setTempSubDirNames(String[] tempSubDirNames) {
+        this.tempSubDirNames = tempSubDirNames;
     }
 
     public String getSourceZipFileName() {
