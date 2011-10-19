@@ -367,14 +367,22 @@ public abstract class InternalTask extends TaskState {
 
             // every persisted Java Collection is translated at runtime as an Hibernate AbstractPersistentCollection. 
             // This collection references the parent @Id, so we have to zero it too
-            if (AbstractPersistentCollection.class.isAssignableFrom(obj.getClass()) &&
-                f.getName().equals("key")) {
-                // the id is a Long name 'key' declared as Serializable 
-                try {
-                    f.set(obj, new Long(0));
-                } catch (Throwable t) {
-                    ProActiveLogger.getLogger(SchedulerLoggers.DATABASE).debug(
-                            "Failed to reset AbstractPersistentCollection key", t);
+            if (AbstractPersistentCollection.class.isAssignableFrom(obj.getClass())) {
+                if (f.getName().equals("key")) {
+                    // the id is a Long name 'key' declared as Serializable 
+                    try {
+                        f.set(obj, new Long(0));
+                    } catch (Throwable t) {
+                        ProActiveLogger.getLogger(SchedulerLoggers.DATABASE).debug(
+                                "Failed to reset AbstractPersistentCollection key", t);
+                    }
+                } else if (f.getName().equals("role")) {
+                    try {
+                        f.set(obj, null);
+                    } catch (Throwable t) {
+                        ProActiveLogger.getLogger(SchedulerLoggers.DATABASE).debug(
+                                "Failed to reset AbstractPersistentCollection role", t);
+                    }
                 }
             }
 
