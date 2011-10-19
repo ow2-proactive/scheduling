@@ -107,26 +107,28 @@ public class ConnectAction extends SchedulerGUIAction {
                 public IStatus run(IProgressMonitor monitor) {
                     try {
                         // Connection to the scheduler
-			JobsController.turnActive();
-			res = 0;
+                        JobsController.turnActive();
+                        res = 0;
                         res = SchedulerProxy.getInstance().connectToScheduler(dialogResult);
                         this.setName("Connected to Scheduler Server. Downloading state ...");
-				switch (res) {
-                        case 0: // init val
-				return Status.OK_STATUS;
+                        switch (res) {
+                            case 0: // init val
+                                return Status.OK_STATUS;
 
-                        case SchedulerProxy.LOGIN_OR_PASSWORD_WRONG:
-                           errorConnect(new Exception("Authentication failed: invalid username or password "), dialogResult.getUrl());
-                            return Status.OK_STATUS;
+                            case SchedulerProxy.LOGIN_OR_PASSWORD_WRONG:
+                                errorConnect(new Exception(
+                                    "Authentication failed: invalid username or password "), dialogResult
+                                        .getUrl());
+                                return Status.OK_STATUS;
 
-                        case SchedulerProxy.CONNECTED:
-				postConnect(dialogResult.getUrl());
-				default:
-					return Status.OK_STATUS;
-				}
+                            case SchedulerProxy.CONNECTED:
+                                postConnect(dialogResult.getUrl());
+                            default:
+                                return Status.OK_STATUS;
+                        }
 
                     } catch (Throwable t) {
-			errorConnect(t, dialogResult.getUrl());
+                        errorConnect(t, dialogResult.getUrl());
                         // Status.WARNING used (instead of Status.ERROR) to avoid the appearance of an eclipse's error dialog
                         return new Status(Status.WARNING, "scheduler.rcp",
                             "Could not connect to the Scheduler ", t);
@@ -152,13 +154,12 @@ public class ConnectAction extends SchedulerGUIAction {
      *
      * @param schedulerURL the URL of the scheduler we are connected to. May be used for displaying messages
      */
-    private void postConnect(final String schedulerURL)
-    {
+    private void postConnect(final String schedulerURL) {
 
-	UIJob uiJob = new UIJob(getParent().getDisplay(), "Scheduler post connect job") {
-			@Override
-			public IStatus runInUIThread(IProgressMonitor monitor) {
-				JobsController.getActiveView().init();
+        UIJob uiJob = new UIJob(getParent().getDisplay(), "Scheduler post connect job") {
+            @Override
+            public IStatus runInUIThread(IProgressMonitor monitor) {
+                JobsController.getActiveView().init();
                 SeparatedJobView.getPendingJobComposite().initTable();
                 SeparatedJobView.getRunningJobComposite().initTable();
                 SeparatedJobView.getFinishedJobComposite().initTable();
@@ -172,48 +173,40 @@ public class ConnectAction extends SchedulerGUIAction {
                     return Status.OK_STATUS;
                 } catch (LogForwardingException e) {
                     errorConnect(e, schedulerURL);
-                    return new Status(Status.WARNING, "scheduler.rcp",
-                        "Unable to download Scheduler state", e);
+                    return new Status(Status.WARNING, "scheduler.rcp", "Unable to download Scheduler state",
+                        e);
                 }
-			}
-		};
+            }
+        };
 
-		uiJob.setUser(false);
-		uiJob.schedule();
+        uiJob.setUser(false);
+        uiJob.schedule();
 
     }
-
 
     private void errorConnect(final Throwable e, final String schedURL) {
         e.printStackTrace();
-        Activator.log(IStatus.ERROR, "Could not connect to the scheduler based on:" + schedURL,
-                e);
+        Activator.log(IStatus.ERROR, "Could not connect to the scheduler based on:" + schedURL, e);
         UIJob uiJob = new UIJob(getParent().getDisplay(), "Display connect error message ") {
-			@Override
-			public IStatus runInUIThread(IProgressMonitor monitor) {
+            @Override
+            public IStatus runInUIThread(IProgressMonitor monitor) {
 
-		        getParent().getDisplay().syncExec(new Runnable() {
-		            public void run() {
-				String cause =  "";
-				if (e.getMessage()!=null)
-					cause+="\n\nCause\n : "+e.getMessage();
-		                MessageDialog.openError(getParent().getShell(), "Couldn't connect",
-		                        "Could not connect to the scheduler based on : " + schedURL +
-		                           cause);
-		            }
-		        });
-		        return Status.OK_STATUS;
-			}
-		};
+                getParent().getDisplay().syncExec(new Runnable() {
+                    public void run() {
+                        String cause = "";
+                        if (e.getMessage() != null)
+                            cause += "\n\nCause\n : " + e.getMessage();
+                        MessageDialog.openError(getParent().getShell(), "Couldn't connect",
+                                "Could not connect to the scheduler based on : " + schedURL + cause);
+                    }
+                });
+                return Status.OK_STATUS;
+            }
+        };
 
-		uiJob.setUser(false);
-		uiJob.schedule();
+        uiJob.setUser(false);
+        uiJob.schedule();
     }
-
-
-
-
-
 
     @Override
     public void setEnabled(boolean connected, SchedulerStatus chedulerStatus, boolean admin,

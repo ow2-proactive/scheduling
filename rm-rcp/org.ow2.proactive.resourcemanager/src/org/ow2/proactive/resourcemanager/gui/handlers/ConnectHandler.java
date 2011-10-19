@@ -119,8 +119,8 @@ public class ConnectHandler extends AbstractHandler implements IHandler {
                     } catch (final Throwable t) {
 
                         // Status.WARNING used (instead of Status.ERROR) to avoid the appearance of an eclipse's error dialog
-			errorConnect(t, dialogResult.getUrl());
-			return new Status(Status.WARNING, "rm.rcp",
+                        errorConnect(t, dialogResult.getUrl());
+                        return new Status(Status.WARNING, "rm.rcp",
                             "Could not connect to the Resource Manager ", t);
                     }
                 }
@@ -140,28 +140,27 @@ public class ConnectHandler extends AbstractHandler implements IHandler {
         return null;
     }
 
-    private void errorConnect(final Throwable t, final String rmUrl)
-    {
-	UIJob uiJob = new UIJob(Display.getDefault(),"Display connect error message") {
-		@Override
-		public IStatus runInUIThread(IProgressMonitor monitor) {
-		RMStatusBarItem.getInstance().setText("disconnected");
-		        MessageDialog.openError(Display.getDefault().getActiveShell(),
-		                "Couldn't connect to resource manager at "+rmUrl, t.getMessage());
-		        if (t != null) {
-		            Activator.log(IStatus.ERROR, "Could not connect to the Resource Manager ", t);
-		            t.printStackTrace();
-		        }
-			        try {
-			            // trying to disconnect in any case
-			            RMStore.getInstance().getResourceManager().disconnect();
-			        } catch (Throwable thr) {
-		        }
-		return Status.OK_STATUS;
-		}
-	};
-	    uiJob.setUser(false);
-	    uiJob.schedule();
+    private void errorConnect(final Throwable t, final String rmUrl) {
+        UIJob uiJob = new UIJob(Display.getDefault(), "Display connect error message") {
+            @Override
+            public IStatus runInUIThread(IProgressMonitor monitor) {
+                RMStatusBarItem.getInstance().setText("disconnected");
+                MessageDialog.openError(Display.getDefault().getActiveShell(),
+                        "Couldn't connect to resource manager at " + rmUrl, t.getMessage());
+                if (t != null) {
+                    Activator.log(IStatus.ERROR, "Could not connect to the Resource Manager ", t);
+                    t.printStackTrace();
+                }
+                try {
+                    // trying to disconnect in any case
+                    RMStore.getInstance().getResourceManager().disconnect();
+                } catch (Throwable thr) {
+                }
+                return Status.OK_STATUS;
+            }
+        };
+        uiJob.setUser(false);
+        uiJob.schedule();
     }
 
 }
