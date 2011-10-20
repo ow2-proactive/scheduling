@@ -62,9 +62,11 @@ elseif nargin == 1
         dirs = dirsperjob.(key);
         warning('off')
         for i=1:length(dirs)
-            try
-                rmdir(dirs{i});
-            catch
+            if exist(dirs{i},'dir')
+                try
+                    rmdir(dirs{i},'s');
+                catch
+                end
             end
         end
         warning('on')

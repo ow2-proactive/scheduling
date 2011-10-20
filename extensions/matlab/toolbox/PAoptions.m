@@ -121,6 +121,14 @@
 %   DisconnectedModeFile
 %               path to disconnected mode temporary file (internal)
 %
+%   UseMatlabControl
+%               Internal : do we use the MatlabControl framework
+%
+%   CleanAllTempFilesDirectly
+%               do we clean the temporary files after all results of a PAsolve 
+%               call are received (default), or do we wait until Matlab terminates 
+%               to allow PAgetResults calls for this job. (internal)
+%
 
 %
 % /*
@@ -332,6 +340,11 @@ inputs(j).trans = conftrans;
 j=j+1;
 inputs(j).name = 'UseMatlabControl';
 inputs(j).default = false;
+inputs(j).check = logcheck;
+inputs(j).trans = logtrans;
+j=j+1;
+inputs(j).name = 'CleanAllTempFilesDirectly';
+inputs(j).default = true;
 inputs(j).check = logcheck;
 inputs(j).trans = logtrans;
 

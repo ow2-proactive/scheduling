@@ -44,6 +44,8 @@ if ~exist('timeout', 'var')
 end
 
 opt = PAoptions;
+old = opt.CleanAllTempFilesDirectly;
+PAoptions('CleanAllTempFilesDirectly', false);
 
 disp('................ Testing a simulated disconnected mode');
 
@@ -109,6 +111,18 @@ end
 val1=PAwaitAll(syncres1,timeout)
 val2=PAwaitAll(syncres2,timeout)
 
+[ok,msg]=checkValuesFact(val1);
+if ~ok disp(msg),return; end
+[ok,msg]=checkValuesFact(val2);
+if ~ok disp(msg),return; end
+
+if old
+    PAoptions('CleanAllTempFilesDirectly', true);
+    % re-clean the jobs to clear temp files
+    val1=PAwaitAll(syncres1,timeout);
+    val2=PAwaitAll(syncres2,timeout);
+end
+
 
 
 function [ok,msg]=checkValuesFact(val)
@@ -123,7 +137,7 @@ else
         if iscell(val)
             if val{i} ~= right{i}
                 ok = false;
-                msg = ['TestMultipleSubmit::Wrong value of ' name '(' num2str(i) '), received ' num2str(val{i}) ', expected ' num2str(right{i})];
+                msg = ['TestDummyDisconnected::Wrong value of ' name '(' num2str(i) '), received ' num2str(val{i}) ', expected ' num2str(right{i})];
             else
                 ok = true;
                 msg = [];
@@ -131,7 +145,7 @@ else
         else
             if val(i) ~= right{i}
                 ok = false;
-                msg = ['TestMultipleSubmit::Wrong value of ' name '(' num2str(i) '), received ' num2str(val(i)) ', expected ' num2str(right{i})];
+                msg = ['TestDummyDisconnected::Wrong value of ' name '(' num2str(i) '), received ' num2str(val(i)) ', expected ' num2str(right{i})];
             else
                 ok = true;
                 msg = [];

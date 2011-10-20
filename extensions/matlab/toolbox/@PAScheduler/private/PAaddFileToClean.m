@@ -62,9 +62,11 @@ elseif nargin == 1
         files = filesperjob.(key);
         warning('off')
         for i=1:length(files)
-            try
-                delete(files{i});
-            catch
+            if exist(files{i},'file')
+                try
+                    delete(files{i});
+                catch
+                end
             end
         end
         warning('on')

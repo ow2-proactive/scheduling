@@ -53,6 +53,39 @@
         column. If Compose is set to true, then the FIRST parameter of the
         Func function will be taken from the result of the previous task,
         subsequent parameters will be taken from the "Params" list.
+ 
+        NbNodes - an integer value which indicates the number of Scheduler
+        Nodes necessary to run this task. This parameter is interesting in
+        case the Matlab engine is running in multithreaded mode to specify
+        the number of processors necessary or if an external program is
+        called from the task, and this programs requires multiple
+        processors and/or machines. 
+    
+        Topology - a string parameter which affects how nodes will be chosen to meet
+        the NbNodes required. The values possible are : 'arbitrary',
+        'bestProximity', 'thresholdProximity', 'singleHost', 'singleHostExclusive',
+        'multipleHostsExclusive', 'differentHostsExclusive'
+        Please refer to ProActive Scheduler manual for more information on
+        these values.
+ 
+        ThresholdProximity - an integer value which indicates the threshold
+        in case the 'thresholdProximity' is set on the Topology attribute. Please 
+        refer to ProActive Scheduler manual for more information on this setting.
+        
+        In case the topology parameters are used, the remote matlab engines
+        can access the hostnames list of the Nodes used to run the task.
+        This hostnames list can then be used to run parallel code on those
+        machines. As multiple ProActive Nodes can be deployed on the same
+        host, the list may contain several times the same hostname. This
+        list will be assigned to the variable NODE_LIST in the workspace
+        calling the Func function. So, in order to retrieve this list,
+        you'll need to add the following code to your Matlab function:
+        nl = evalin('caller','NODE_LIST'); 
+        "nl" will be affected a cell array of strings. The first element of this list is always the Node where the
+        function Func is executed.
+        The TestTopology function in the Tests folder provides an example
+        of topology usage.           
+ 
         
   Examples
  

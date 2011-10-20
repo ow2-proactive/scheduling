@@ -102,4 +102,10 @@ for i=1:nbiter
         [ok,msg] = TestDummyDisconnected();
     end
     if ~ok disp(msg),return; end
+    if exist('timeout', 'var')
+        [ok,msg] = TestTopology(timeout);
+    else
+        [ok,msg] = TestTopology();
+    end
+    if ~ok disp(msg),return; end
 end

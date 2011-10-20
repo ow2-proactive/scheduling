@@ -1,5 +1,7 @@
 package org.ow2.proactive.scheduler.ext.scilab.worker;
 
+import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.extensions.dataspaces.api.DataSpacesFileObject;
 import org.objectweb.proactive.utils.OperatingSystem;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
@@ -179,6 +181,7 @@ public class ScilabExecutable extends JavaExecutable {
         this.addSources();
         this.loadWorkspace();
         this.loadInputVariables();
+        this.loadTopologyNodeNames();
 
         printLog("Running SCILAB command: " + this.script);
 
@@ -358,6 +361,23 @@ public class ScilabExecutable extends JavaExecutable {
             scilabConnection.evalString("load('" + compinMat + "');in=out;clear out;");
         }
 
+    }
+
+    private void loadTopologyNodeNames() throws Exception {
+        String hostlist = "NODE_LIST = list( ";
+        String urllist = "NODE_URL_LIST = list( ";
+        hostlist += "'" + PAActiveObject.getNode().getVMInformation().getHostName() + "',";
+        urllist += "'" + PAActiveObject.getNode().getNodeInformation().getURL() + "',";
+        for (Node node : this.getNodes()) {
+            hostlist += "'" + node.getVMInformation().getHostName() + "',";
+            urllist += "'" + node.getNodeInformation().getURL() + "',";
+        }
+        hostlist = hostlist.substring(0, hostlist.length() - 1);
+        urllist = urllist.substring(0, urllist.length() - 1);
+        hostlist += " );";
+        urllist += " );";
+        scilabConnection.evalString(hostlist);
+        scilabConnection.evalString(urllist);
     }
 
     private void storeOutputVariable() throws Exception {

@@ -164,7 +164,46 @@
                     </para>
                 </listitem>
             </varlistentry>
+            <varlistentry>
+                <term>NbNodes</term>
+                <listitem>
+                    <para>an integer value which indicates the number of Scheduler Nodes necessary to run this task. This
+                        parameter is interesting in case the Scilab engine is running in multithreaded mode to specify the number
+                        of processors necessary or if an external program is called from the task, and this programs requires
+                        multiple processors and/or machines.
+                    </para>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>Topology</term>
+                <listitem>
+                    <para>a string parameter which affects how nodes will be chosen to meet the NbNodes required. The values
+                        possible are : 'arbitrary', 'bestProximity', 'thresholdProximity', 'singleHost', 'singleHostExclusive',
+        'multipleHostsExclusive', 'differentHostsExclusive'. Please refer to ProActive Scheduler manual for more information on
+        these values.
+                    </para>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>ThresholdProximity</term>
+                <listitem>
+                    <para>an integer value which indicates the threshold in case the 'thresholdProximity' is set on the Topology attribute. Please
+        refer to ProActive Scheduler manual for more information on this setting.
+                    </para>
+                </listitem>
+            </varlistentry>
         </variablelist>
+        <para>In case the topology parameters are used, the remote Scilab engines can access the hostnames list of the Nodes
+            used to run the task. This hostnames list can then be used to run parallel code on those machines. As multiple
+            ProActive Nodes can be deployed on the same host, the list may contain several times the same hostname. This
+            list will be assigned to the variable NODE_LIST in the workspace calling the Func function. So, in order to
+            retrieve this list, you'll need to add the following code to your Scilab function:</para>
+        <screen>
+        nl = NODE_LIST; // retrieves the NODE_LIST variable from the caller workspace
+        </screen>
+        <para>
+            The first element of this list is always the Node where the function Func is executed. The TestTopology function in the unit_tests folder provides an example
+        of topology usage. </para>
     </refsection>
 
     <refsection>

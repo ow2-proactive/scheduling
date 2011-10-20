@@ -45,24 +45,7 @@ for i=1:length(S)
             for l=1:sz(1)
                 for m=1:sz(2)
                     Z=val{i}(l,m);
-                    switch s.subs
-                        case 'Func'
-                            val{i+1}{(l-1)*sz(2)+m} = Z.Func;
-                        case 'Params'
-                            val{i+1}{(l-1)*sz(2)+m} = Z.Params;                           
-                        case 'InputFiles'
-                            val{i+1}{(l-1)*sz(2)+m} = Z.InputFiles;
-                        case 'OutputFiles'
-                            val{i+1}{(l-1)*sz(2)+m} = Z.OutputFiles;
-                        case 'Description'
-                            val{i+1}{(l-1)*sz(2)+m} = Z.Description;
-                        case 'Compose'
-                            val{i+1}{(l-1)*sz(2)+m} = Z.Compose;
-                        case 'SelectionScript'
-                            val{i+1}{(l-1)*sz(2)+m} = Z.SelectionScript;
-                        otherwise
-                            error([s.subs ,' is not a valid property'])
-                    end
+                    val{i+1}{(l-1)*sz(2)+m} = builtin('subsref', Z, s);                    
                 end
             end
         case '()'
