@@ -58,7 +58,7 @@ import org.ow2.proactive.resourcemanager.gui.views.StatisticsView;
 public class EventsReceiver implements RMEventListener {
 
     private static final long RM_SERVER_PING_FREQUENCY = 5000;
-    private static final long RM_CONNECTION_TIMEOUT = 20000;
+    private static final long RM_CONNECTION_TIMEOUT = 300000;
     private RMModel model = null;
     private RMMonitoring monitor = null;
     private Thread pinger;
