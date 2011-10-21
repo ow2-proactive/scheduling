@@ -50,7 +50,7 @@
       <perspective
             class="org.ow2.proactive.scheduler.gui.perspective.SchedulerPerspective"
             id="org.ow2.proactive.scheduler.gui.perspective.SchedulerPerspective"
-            name="Scheduler">
+            name="Orchestration &amp;&amp; Scheduling">
       </perspective>
    </extension>
    <extension
