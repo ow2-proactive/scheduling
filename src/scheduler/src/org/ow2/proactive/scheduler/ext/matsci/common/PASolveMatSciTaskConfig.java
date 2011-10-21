@@ -36,6 +36,9 @@
  */
 package org.ow2.proactive.scheduler.ext.matsci.common;
 
+import org.ow2.proactive.topology.descriptor.ThresholdProximityDescriptor;
+import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
+
 import java.io.Serializable;
 import java.net.URI;
 import java.util.ArrayList;
@@ -101,6 +104,12 @@ public class PASolveMatSciTaskConfig implements Serializable {
     private String inputScript = null;
 
     private String mainScript = null;
+
+    private TopologyDescriptor topology = null;
+
+    private int nbNodes = 1;
+
+    private long thresholdProximity = 0;
 
     public PASolveMatSciTaskConfig() {
 
@@ -298,4 +307,48 @@ public class PASolveMatSciTaskConfig implements Serializable {
         sourceFileNames.add(src);
     }
 
+    public TopologyDescriptor getTopology() {
+        return topology;
+    }
+
+    public void setTopology(TopologyDescriptor topology) {
+        this.topology = topology;
+    }
+
+    public void setTopology(String topology) {
+        if (topology.equalsIgnoreCase("arbitrary")) {
+            this.topology = TopologyDescriptor.ARBITRARY;
+        } else if (topology.equalsIgnoreCase("bestProximity")) {
+            this.topology = TopologyDescriptor.BEST_PROXIMITY;
+        } else if (topology.equalsIgnoreCase("singleHost")) {
+            this.topology = TopologyDescriptor.SINGLE_HOST;
+        } else if (topology.equalsIgnoreCase("singleHostExclusive")) {
+            this.topology = TopologyDescriptor.SINGLE_HOST_EXCLUSIVE;
+        } else if (topology.equalsIgnoreCase("multipleHostsExclusive")) {
+            this.topology = TopologyDescriptor.MULTIPLE_HOSTS_EXCLUSIVE;
+        } else if (topology.equalsIgnoreCase("differentHostsExclusive")) {
+            this.topology = TopologyDescriptor.DIFFERENT_HOSTS_EXCLUSIVE;
+        } else if (topology.equalsIgnoreCase("thresholdProximity")) {
+            this.topology = new ThresholdProximityDescriptor(this.thresholdProximity);
+        }
+    }
+
+    public int getNbNodes() {
+        return nbNodes;
+    }
+
+    public void setNbNodes(double nbNodes) {
+        this.nbNodes = (int) Math.round(nbNodes);
+    }
+
+    public long getThresholdProximity() {
+        return thresholdProximity;
+    }
+
+    public void setThresholdProximity(double thresholdProximity) {
+        this.thresholdProximity = Math.round(thresholdProximity);
+        if (this.topology instanceof ThresholdProximityDescriptor) {
+            this.topology = new ThresholdProximityDescriptor(this.thresholdProximity);
+        }
+    }
 }

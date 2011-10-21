@@ -45,6 +45,7 @@ import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
+import org.ow2.proactive.scheduler.common.task.ParallelEnvironment;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputAccessMode;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
 import org.ow2.proactive.scheduler.ext.matlab.common.PASolveMatlabGlobalConfig;
@@ -288,6 +289,12 @@ public class AOMatlabEnvironment extends AOMatSciEnvironment<Boolean, MatlabResu
                     schedulerTask.setDescription(taskConfigs[i][j].getDescription());
                 } else {
                     schedulerTask.setDescription(taskConfigs[i][j].getMainScript());
+                }
+
+                // Topology
+                if (taskConfigs[i][j].getNbNodes() > 1) {
+                    schedulerTask.setParallelEnvironment(new ParallelEnvironment(taskConfigs[i][j]
+                            .getNbNodes(), taskConfigs[i][j].getTopology()));
                 }
 
                 schedulerTask.setExecutableClassName(MatlabExecutable.class.getName());

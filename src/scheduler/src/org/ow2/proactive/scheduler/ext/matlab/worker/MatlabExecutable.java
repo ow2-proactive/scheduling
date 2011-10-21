@@ -36,6 +36,8 @@
  */
 package org.ow2.proactive.scheduler.ext.matlab.worker;
 
+import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.extensions.dataspaces.api.DataSpacesFileObject;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
@@ -234,6 +236,7 @@ public class MatlabExecutable extends JavaExecutable {
         this.execKeepAlive();
         this.loadWorkspace();
         this.loadInputVariables();
+        this.loadTopologyNodeNames();
 
         if (paconfig.isDebug()) {
             matlabConnection.evalString("who");
@@ -452,6 +455,21 @@ public class MatlabExecutable extends JavaExecutable {
             matlabConnection.evalString("load('" + compinMat + "');in=out;clear out;");
         }
 
+    }
+
+    private void loadTopologyNodeNames() throws Exception {
+        String hostlist = "NODE_LIST = { ";
+        String urllist = "NODE_URL_LIST = { ";
+        hostlist += "'" + PAActiveObject.getNode().getVMInformation().getHostName() + "' ";
+        urllist += "'" + PAActiveObject.getNode().getNodeInformation().getURL() + "' ";
+        for (Node node : this.getNodes()) {
+            hostlist += "'" + node.getVMInformation().getHostName() + "' ";
+            urllist += "'" + node.getNodeInformation().getURL() + "' ";
+        }
+        hostlist += " };";
+        urllist += " };";
+        matlabConnection.evalString(hostlist);
+        matlabConnection.evalString(urllist);
     }
 
     private void storeOutputVariable() throws Exception {

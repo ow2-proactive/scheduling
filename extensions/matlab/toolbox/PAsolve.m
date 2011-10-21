@@ -171,6 +171,9 @@ end
 % Init Output Files
 [taskFilesToClean] = initOutputFiles(NN,MM,Tasks,opt,subdir,pa_dir,taskFilesToClean,task_config);
 
+% Init Other attributes
+initOtherTCAttributes(NN,MM, task_config, Tasks);
+
 % Init Parameters
 [input,main,taskFilesToClean,outVarFiles]=initParameters(solveid,NN,MM,Tasks,opt,taskFilesToClean,task_config,allfuncs,pa_dir,fs);
 
@@ -317,7 +320,38 @@ for i=1:NN
         else
             error(['Parameter ' num2str(i) ',' num2str(j)  ' has no function definition.']);
         end
+        
+    end
+end
+end
+
+function initOtherTCAttributes(NN,MM, task_config, Tasks)
+for i=1:NN
+    for j=1:MM
         task_config(i,j).setDescription(Tasks(j,i).Description);
+        if ischar(Tasks(j,i).SelectionScript)
+            select = Tasks(j,i).SelectionScript;
+            try
+                java.net.URL(select);
+                ok = true;
+            catch ME
+                ok = false;
+            end
+            
+            if ~ok
+                task_config(i,j).setCustomScriptUrl(['file:' select]);
+            else
+                task_config(i,j).setCustomScriptUrl(select);
+            end
+        end
+        if Tasks(j,i).NbNodes > 1
+            if ~ischar(Tasks(j,i).Topology)
+                error(['PAsolve::Topology is not defined in Task ' num2str(j) ',' num2str(i) ' with NbNodes > 1.']);
+            end
+            task_config(i,j).setNbNodes(Tasks(j,i).NbNodes);
+            task_config(i,j).setTopology(Tasks(j,i).Topology);
+            task_config(i,j).setThresholdProximity(Tasks(j,i).ThresholdProximity);
+        end
     end
 end
 end
@@ -649,21 +683,7 @@ for i=1:NN
         main = [main ');'];
         task_config(i,j).setInputScript(input);
         task_config(i,j).setMainScript(main);
-        if ischar(Tasks(j,i).SelectionScript)
-            select = Tasks(j,i).SelectionScript;
-            try
-                java.net.URL(select);
-                ok = true;
-            catch ME
-                ok = false;
-            end
-
-            if ~ok
-                task_config(i,j).setCustomScriptUrl(['file:' select]);
-            else
-                task_config(i,j).setCustomScriptUrl(select);
-            end
-        end
+        
     end
 end
 end

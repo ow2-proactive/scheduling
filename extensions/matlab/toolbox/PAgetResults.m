@@ -80,7 +80,15 @@ jinfo = sched.PATaskRepository(jobid, 'jobinfo');
 if isnumeric(jinfo) && isempty(jinfo)
     error(['PAgetResults::Unknown job : ' jobid]);
 end
+
 disp(['Retrieving results of job ' jobid]);
+opt = PAoptions();
+if opt.CleanAllTempFilesDirectly
+    tsks = sched.PATaskRepository(jobid, 'toreceive');
+    if length(tsks) == 0
+        error(['Results of job ' num2str(jobid) ' not available, please set CleanAllTempFilesDirectly to false in order to retrieve the results of a job from the current matlab session.']); 
+    end
+end
 alltasks = sched.PATaskRepository(jobid, 'alltasks');
 solver = sched.PAgetsolver();
 resfutureList = solver.retrieve(jinfo);

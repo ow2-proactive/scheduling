@@ -36,25 +36,35 @@
 %   */
 function clean(R)
 if ~R.cleaned.get()
-    sched = PAScheduler;
-    warning('off');    
-    setf = R.cleanFileSet;
-     
-    %for i=1:length(setf)
-    %    delete(setf{i});
-    %end   
-    setd = R.cleanDirSet;
-    sched.PATaskRepository(R.jobid, R.taskid, 'received'); 
-    tsks = sched.PATaskRepository(R.jobid, 'toreceive');
-    if length(tsks) == 0
-    for i=1:length(setd)
-        try
-           rmdir(setd{i},'s');
-        catch
+    opt = PAoptions();
+    if opt.CleanAllTempFilesDirectly
+        sched = PAScheduler;
+        warning('off');
+        setd = R.cleanDirSet;
+        tsks = sched.PATaskRepository(R.jobid, 'toreceive');
+        if length(tsks) == 0
+            for i=1:length(setd)
+                if exist(setd{i},'dir')
+                    try
+                        rmdir(setd{i},'s');
+                    catch
+                    end
+                end
+            end
         end        
-    end    
+        R.cleaned.set(1);
+        warning('on');
+    else
+        sched = PAScheduler;
+        warning('off');
+        setf = R.cleanFileSet;
+        for i=1:length(setf)
+            if exist(setf{i},'file')
+                delete(setf{i});
+            end
+        end
+        warning('on');
+        R.cleaned.set(1);
+        
     end
-             
-    R.cleaned.set(1);
-    warning('on');    
 end

@@ -29,5 +29,12 @@ for i=1:nbiter
         [ok,msg] = TestMultipleSubmit();
     end
     if ~ok disp(msg),return; end
+    
+    if exists('timeout')
+        [ok,msg] = TestTopology(timeout);
+    else
+        [ok,msg] = TestTopology();
+    end
+    if ~ok disp(msg),return; end
 end
 endfunction

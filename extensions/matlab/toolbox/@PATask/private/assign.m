@@ -21,7 +21,7 @@ for i=1:length(fn)
     value = input.(fn{i});    
     switch attrib
         case 'Func'
-            %% Code to check input arguments of given function
+            % Code to check input arguments of given function
             %         if isa(value, 'function_handle')
             %             try
             %                 arginins = signature(value);
@@ -70,6 +70,12 @@ for i=1:length(fn)
             this.Description = value;
         case 'Compose'
             this.Compose = value;
+        case 'NbNodes'
+            this.NbNodes = value;
+        case 'Topology'
+            this.Topology = value;  
+        case 'ThresholdProximity'
+            this.ThresholdProximity = value; 
         case 'id'
             this.id = value;
         otherwise

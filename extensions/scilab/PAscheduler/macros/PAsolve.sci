@@ -248,6 +248,16 @@ function outputs = PAsolve(varargin)
                     t_conf.setCustomScriptUrl(selects);
                 end
             end   
+            
+            // Topology
+            if Tasks(j,i).NbNodes > 1 then
+                if ~(type(Tasks(j,i).Topology) == 10)
+                    error('PAsolve::Topology is not defined in Task '+string(j)+','+string(i)+' with NbNodes > 1.');
+                end
+                t_conf.setNbNodes(Tasks(j,i).NbNodes);
+                t_conf.setTopology(Tasks(j,i).Topology);
+                t_conf.setThresholdProximity(Tasks(j,i).ThresholdProximity);
+            end   
 
 
             // Function

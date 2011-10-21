@@ -62,11 +62,12 @@ try
     end
 
     alljobs = sched.PATaskRepository('alljobs');
-    for i = 1:length(alljobs)
-        sched.PAaddFileToClean(alljobs{i});
-    end
+    % it might be faster to clean dirs before files
     for i = 1:length(alljobs)
         sched.PAaddDirToClean(alljobs{i});
+    end
+    for i = 1:length(alljobs)
+        sched.PAaddFileToClean(alljobs{i});
     end
     if isnumeric(opt.CustomDataspaceURL) && isempty(opt.CustomDataspaceURL)
         helper = org.ow2.proactive.scheduler.ext.matsci.client.DataspaceHelper.getInstance();

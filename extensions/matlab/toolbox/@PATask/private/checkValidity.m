@@ -60,4 +60,17 @@ switch attrib
         if ~(ischar(val) || (isnumeric(val) && isempty(val)))
             error('SelectionScript must be a string');
         end
+    case 'NbNodes'
+        if ~isnumeric(val) || ~isscalar(val) || val <= 1 || round(val) ~= val 
+            error('NbNodes must be a positive integer');
+        end
+    case 'Topology'
+        values = {'arbitrary', 'bestProximity', 'thresholdProximity', 'singleHost', 'singleHostExclusive', 'multipleHostsExclusive', 'differentHostsExclusive' };
+        if ~((ischar(val) && ismember(val, values)) || (isnumeric(val) && isempty(val)))
+            error('Wrong Topology value');
+        end
+    case 'ThresholdProximity'
+        if ~isnumeric(val) || ~isscalar(val) || val <= 0 || round(val) ~= val
+            error('ThresholdProximity must be a positive integer');
+        end
 end
