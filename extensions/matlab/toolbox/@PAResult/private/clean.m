@@ -42,7 +42,7 @@ if ~R.cleaned.get()
         warning('off');
         setd = R.cleanDirSet;
         tsks = sched.PATaskRepository(R.jobid, 'toreceive');
-        if length(tsks) == 0
+        if isempty(tsks)
             for i=1:length(setd)
                 if exist(setd{i},'dir')
                     try
@@ -64,7 +64,12 @@ if ~R.cleaned.get()
             end
         end
         warning('on');
-        R.cleaned.set(1);
+        R.cleaned.set(1);        
+    end
+    setd = R.cleanDirSet;
+    tsks = sched.PATaskRepository(R.jobid, 'toreceive');
         
+    if opt.RemoveJobAfterRetrieve && isempty(tsks)
+        PAjobRemove(R.jobid);
     end
 end

@@ -80,6 +80,12 @@
 %   RunAsMe     true | false | 'on' | 'off'
 %               Runs the tasks under the account of the current user, default to 'off'
 %
+%   RemoveJobAfterRetrieve     true | false | 'on' | 'off'
+%               Removes the job automatically after all results have been
+%               retrieved. If not the job is removed at the end of the
+%               matlab session, or manually via PAjobRemove. default to
+%               'on'
+%
 %   LicenceServerURL  char
 %               URL of the FlexNet proxy server. If empty, no license check will be done
 %
@@ -234,6 +240,11 @@ inputs(j).check = logcheck;
 inputs(j).trans = logtrans;
 j=j+1;
 inputs(j).name = 'RunAsMe';
+inputs(j).default = false;
+inputs(j).check = logcheck;
+inputs(j).trans = logtrans;
+j=j+1;
+inputs(j).name = 'RemoveJobAfterRetrieve';
 inputs(j).default = false;
 inputs(j).check = logcheck;
 inputs(j).trans = logtrans;

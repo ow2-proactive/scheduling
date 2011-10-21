@@ -1,5 +1,5 @@
 function outputs = PAsolve(varargin)
-    global ('PA_connected','DataRegistry', 'DataRegistryInit', 'SOLVEid')
+    global ('PA_connected','DataRegistry', 'DataRegistryInit', 'SOLVEid', 'PAResult_TasksDB')
 
     if ~exists('PA_connected') | PA_connected ~= 1
         error('A connection to the ProActive scheduler must be established in order to use PAsolve, see PAconnect');
@@ -8,10 +8,12 @@ function outputs = PAsolve(varargin)
     if exists('SOLVEid') & type(SOLVEid) == 8
         SOLVEid = SOLVEid + 1;
     else
-        SOLVEid = int32(0);
+        SOLVEid = int32(1);
     end
-
-
+    
+    if typeof(PAResult_TasksDB) ~= 'list'
+        PAResult_TasksDB = list();
+    end
 
     opt=PAoptions();
 
@@ -396,23 +398,28 @@ function outputs = PAsolve(varargin)
     jid = string(jidjava);
     disp('Job submitted : '+ jid);    
 
-    ftn = jinvoke(jobinfo,'getFinalTasksNamesAsList');
-    addJavaObj(ftn);
+    ftnjava = jinvoke(jobinfo,'getFinalTasksNamesAsList');
+    ftn = list();
+    
+    addJavaObj(ftnjava);
     taskinfo = struct('cleanFileSet',[],'cleanDirSet',[], 'outFile',[], 'jobid',[], 'taskid',[] );
     results=list(NN);
     for i=1:NN
+        tidjava = jinvoke(ftnjava,'get',i-1);
+        addJavaObj(tidjava);
+        ftn(i) = string(tidjava);
         taskinfo.cleanFileSet = taskFilesToClean(i);
         taskinfo.cleanDirSet = list(pa_dir);
         taskinfo.outFile = outVarFiles(i);
         taskinfo.jobid = jid;
-        tidjava = jinvoke(ftn,'get',i-1);
-        addJavaObj(tidjava);
-        taskinfo.taskid = string(tidjava);
+        
+        taskinfo.taskid = ftn(i);
+        taskinfo.sid = SOLVEid;
         future = jinvoke(resfutureList,'get',i-1);
 
         results(i)=PAResult(future, taskinfo);
-
-    end
+    end    
+    PAResult_TasksDB(SOLVEid) = ftn;
     outputs = PAResL(results);
     clearJavaStack();
 

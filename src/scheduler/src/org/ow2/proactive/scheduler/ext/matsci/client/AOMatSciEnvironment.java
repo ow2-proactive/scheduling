@@ -370,6 +370,12 @@ public abstract class AOMatSciEnvironment<R, RL> implements Serializable, Schedu
         return true;
     }
 
+    public boolean jobRemove(String jid) throws NotConnectedException, PermissionException {
+        ensureConnection();
+        model.remove_(jid);
+        return true;
+    }
+
     public boolean pauseJob(String jid) throws NotConnectedException, PermissionException {
         ensureConnection();
         model.pause_(jid);

@@ -2,14 +2,16 @@ function [ok, msg]=TestPATask(timeout)
     mode(-1);
     funcprot(0);
     rand("seed", 1);
-    
+
     if ~exists('timeout')
-    if (getos() == "Windows")
-        timeout = 500000;
-    else
-        timeout = 200000;
+        if (getos() == "Windows")
+            timeout = 500000;
+        else
+            timeout = 200000;
+        end
     end
-end
+    
+    disp('...... Testing PAsolve with PATasks');
 
     // Evaluate bias and variance for these lambdas 
     //lambdas=[0.1:0.1:0.5 1:10 100:100:1000 1000:1000:10000];
@@ -56,10 +58,13 @@ end
     end
 
     printf("\n Time: %f\n", toc());
-    
+
 
     [ok,msg]=checkValuesEst(b_bias,b_variance);    
-    if ~ok error(msg); end   
+    if ~ok error(msg); end 
+    if ok then
+        disp('................................OK');
+    end  
 
 endfunction
 

@@ -23,6 +23,7 @@ t(3,1:5) = t(2,1:5);
  disp('..........................1 PAwaitFor');
  resl = PAsolve(t);
  val=PAwaitFor(resl,timeout)
+ disp(val);
  [ok,msg]=checkValuesSq(val);
 if ~ok error(msg),return; end
  disp('..........................1 ......OK');
@@ -33,6 +34,7 @@ resl = PAsolve(t);
 for i=1:5
     val(i)=PAwaitAny(resl,timeout)
 end
+disp(val);
 val=gsort(val,"g","i");
 [ok,msg]=checkValuesSq(val);
 if ~ok error(msg),return; end

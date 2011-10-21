@@ -5,7 +5,8 @@
     <tocitem target="PAisConnected.html"><name>PAisConnected</name><purpose>tells if this Matlab session is connected to a ProActive Scheduler</purpose></tocitem>
     <tocitem target="PAdisconnect.html"><name>PAdisconnect</name><purpose>disconnects Matlab from the ProActive Scheduler</purpose></tocitem>
 	<tocitem target="PAstate.html"><name>PAstate</name><purpose>State of ProActive Scheduler</purpose></tocitem> 
-	<tocitem target="PAjobState.html"><name>PAjobState</name><purpose>State of the given job</purpose></tocitem> 
+	<tocitem target="PAjobState.html"><name>PAjobState</name><purpose>State of the given job</purpose></tocitem>
+    <tocitem target="PAjobRemove.html"><name>PAjobRemove</name><purpose>removes the given job from the scheduler</purpose></tocitem>
 	<tocitem target="PAjobOutput.html"><name>PAjobOutput</name><purpose>Textual log of the given job</purpose></tocitem> 
 	<tocitem target="PAjobResult.html"><name>PAjobResult</name><purpose>Textual result of the given job</purpose></tocitem> 
 	<tocitem target="PAkillJob.html"><name>PAkillJob</name><purpose>Kills the given job</purpose></tocitem> 

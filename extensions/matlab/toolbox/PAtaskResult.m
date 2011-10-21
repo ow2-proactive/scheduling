@@ -64,6 +64,9 @@
 %   */
 function PAtaskResult(jobid, tname)
     sched = PAScheduler;
+    if ~PAisConnected()
+        error('A connection to the ProActive scheduler is not established, see PAconnect');
+    end
     solver = sched.PAgetsolver();
     solver.taskResult(jobid, tname);
 end

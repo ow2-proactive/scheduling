@@ -86,7 +86,7 @@ opt = PAoptions();
 if opt.CleanAllTempFilesDirectly
     tsks = sched.PATaskRepository(jobid, 'toreceive');
     if length(tsks) == 0
-        error(['Results of job ' num2str(jobid) ' not available, please set CleanAllTempFilesDirectly to false in order to retrieve the results of a job from the current matlab session.']); 
+        error(['Results of job ' num2str(jobid) ' not available, please set CleanAllTempFilesDirectly and RemoveJobAfterRetrieve to false in order to retrieve the results of a job from the current matlab session.']); 
     end
 end
 alltasks = sched.PATaskRepository(jobid, 'alltasks');

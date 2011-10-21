@@ -63,6 +63,9 @@ function PAjobState(jobid)
     if isnumeric(jobid)
         jobid = num2str(jobid);
     end
+    if ~PAisConnected()
+        error('A connection to the ProActive scheduler is not established, see PAconnect');
+    end
     sched = PAScheduler;
     solver = sched.PAgetsolver();
     if nargout == 1        

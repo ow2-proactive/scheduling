@@ -44,8 +44,11 @@ if ~exist('timeout', 'var')
 end
 
 opt = PAoptions;
-old = opt.CleanAllTempFilesDirectly;
+old1 = opt.CleanAllTempFilesDirectly;
 PAoptions('CleanAllTempFilesDirectly', false);
+
+old2 = opt.RemoveJobAfterRetrieve;
+PAoptions('RemoveJobAfterRetrieve', false);
 
 disp('................ Testing a simulated disconnected mode');
 
@@ -116,11 +119,18 @@ if ~ok disp(msg),return; end
 [ok,msg]=checkValuesFact(val2);
 if ~ok disp(msg),return; end
 
-if old
+if old1
     PAoptions('CleanAllTempFilesDirectly', true);
     % re-clean the jobs to clear temp files
     val1=PAwaitAll(syncres1,timeout);
     val2=PAwaitAll(syncres2,timeout);
+end
+
+if old2
+    % remove the test jobs from the scheduler
+    PAjobRemove(jobs{1});
+    PAjobRemove(jobs{2});
+    PAoptions('RemoveJobAfterRetrieve', true);
 end
 
 
