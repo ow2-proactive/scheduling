@@ -102,7 +102,7 @@ public class ConnectAction extends SchedulerGUIAction {
             });
         } else if (!dialogResult.isCanceled()) {
 
-            Job job = new Job("Connecting to Scheduler, please wait...") {
+            Job job = new Job("Downloading the Scheduler Server state, this might take a few moments.") {
                 @Override
                 public IStatus run(IProgressMonitor monitor) {
                     try {
@@ -110,23 +110,23 @@ public class ConnectAction extends SchedulerGUIAction {
                         JobsController.turnActive();
                         res = 0;
                         res = SchedulerProxy.getInstance().connectToScheduler(dialogResult);
-                        this.setName("Connected to Scheduler Server. Downloading state ...");
+                        setName("Downloading the Scheduler Server state, this might take a few moments.");
+                        //getting the scheduler state here, in this job (non UI).
+                        JobsController.getActiveView().init();
+
                         switch (res) {
-                            case 0: // init val
-                                return Status.OK_STATUS;
+                        case 0: // init val
+				return Status.OK_STATUS;
 
-                            case SchedulerProxy.LOGIN_OR_PASSWORD_WRONG:
-                                errorConnect(new Exception(
-                                    "Authentication failed: invalid username or password "), dialogResult
-                                        .getUrl());
-                                return Status.OK_STATUS;
+                        case SchedulerProxy.LOGIN_OR_PASSWORD_WRONG:
+                           errorConnect(new Exception("Authentication failed: invalid username or password "), dialogResult.getUrl());
+                            return Status.OK_STATUS;
 
-                            case SchedulerProxy.CONNECTED:
-                                postConnect(dialogResult.getUrl());
-                            default:
-                                return Status.OK_STATUS;
-                        }
-
+                        case SchedulerProxy.CONNECTED:
+				postConnect(dialogResult.getUrl());
+				default:
+					return Status.OK_STATUS;
+				}
                     } catch (Throwable t) {
                         errorConnect(t, dialogResult.getUrl());
                         // Status.WARNING used (instead of Status.ERROR) to avoid the appearance of an eclipse's error dialog
@@ -156,10 +156,9 @@ public class ConnectAction extends SchedulerGUIAction {
      */
     private void postConnect(final String schedulerURL) {
 
-        UIJob uiJob = new UIJob(getParent().getDisplay(), "Scheduler post connect job") {
-            @Override
-            public IStatus runInUIThread(IProgressMonitor monitor) {
-                JobsController.getActiveView().init();
+	UIJob uiJob = new UIJob(getParent().getDisplay(), "Scheduler post connect job") {
+			@Override
+			public IStatus runInUIThread(IProgressMonitor monitor) {
                 SeparatedJobView.getPendingJobComposite().initTable();
                 SeparatedJobView.getRunningJobComposite().initTable();
                 SeparatedJobView.getFinishedJobComposite().initTable();

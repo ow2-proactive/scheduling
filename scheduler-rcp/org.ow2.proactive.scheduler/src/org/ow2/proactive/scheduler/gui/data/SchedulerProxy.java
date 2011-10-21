@@ -92,7 +92,7 @@ import org.ow2.proactive.scheduler.gui.views.SeparatedJobView;
 public class SchedulerProxy implements Scheduler {
 
     private static final long SCHEDULER_SERVER_PING_FREQUENCY = 5000;
-    private static final long SCHEDULER_CONNECTION_TIMEOUT = 180000; // 180 secs
+    private static final long SCHEDULER_CONNECTION_TIMEOUT = 600000; // 600 secs
     public static final int CONNECTED = 1;
     public static final int LOGIN_OR_PASSWORD_WRONG = 2;
     private static SchedulerProxy instance = null;
@@ -142,13 +142,16 @@ public class SchedulerProxy implements Scheduler {
      */
     public SchedulerState addEventListener(SchedulerEventListener listener, boolean myEventsOnly,
             boolean getSchedulerState, SchedulerEvent... events) {
-        try {
-            return (SchedulerState) scheduler.addEventListener(listener, myEventsOnly, getSchedulerState,
+	SchedulerState schedState=null;
+	try {
+
+		 schedState = (SchedulerState) scheduler.addEventListener(listener, myEventsOnly, getSchedulerState,
                     events);
+
         } catch (PermissionException pe) {
             Activator.log(IStatus.ERROR, "Error getting full state : " + pe.getMessage(), pe);
             try {
-                return (SchedulerState) scheduler.addEventListener(listener, true, getSchedulerState, events);
+		schedState= (SchedulerState) scheduler.addEventListener(listener, true, getSchedulerState, events);
             } catch (SchedulerException e) {
                 Activator.log(IStatus.ERROR, "Error in Scheduler Proxy ", e);
                 displayError(e.getMessage());
@@ -157,7 +160,14 @@ public class SchedulerProxy implements Scheduler {
             Activator.log(IStatus.ERROR, "Error in Scheduler Proxy ", e);
             displayError(e.getMessage());
         }
-        return null;
+
+	if (schedState!=null)
+	{
+		//SCHEDULING-1434 -
+		//Note: the pinger will only be started once, see condition in startPinger()
+		startPinger();
+	}
+	return schedState;
     }
 
     /**
@@ -191,6 +201,7 @@ public class SchedulerProxy implements Scheduler {
 
     public void serverDown() {
         pinger.interrupt();
+
         Display.getDefault().asyncExec(new Runnable() {
             public void run() {
                 MessageDialog.openInformation(SeparatedJobView.getSchedulerShell(), "Disconnection",
@@ -553,8 +564,8 @@ public class SchedulerProxy implements Scheduler {
             }
 
             sendConnectionCreatedEvent(dialogResult.getUrl(), userName, dialogResult.getPassword());
-
-            startPinger();
+            // SCHEDULING-1434 - should start the pinger after the first call to addEventListener
+            //startPinger();
             connected = true;
 
             JMXActionsManager.getInstance().initJMXClient(schedulerURL, sai,
@@ -573,7 +584,9 @@ public class SchedulerProxy implements Scheduler {
     }
 
     private void startPinger() {
-
+	if ((pinger!=null) && (!pinger.isInterrupted()))
+			return;
+	System.out.println("SchedulerProxy.startPinger() - starting pinger .... ");
         class Pinger extends Thread {
             private SchedulerProxy stubOnSchedulerProxy;
 
