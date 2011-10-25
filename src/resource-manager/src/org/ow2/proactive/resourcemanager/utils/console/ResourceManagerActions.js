@@ -83,8 +83,11 @@ function unlocknode(nodeURL){
 	return rm_.unlocknodes_(new java.util.HashSet(list));
 }
 
-function listnodes(){
-    return rm_.listnodes_();
+function listnodes(nodeSourceName){
+	if (nodeSourceName == undefined) {
+		nodeSourceName = null;
+	}
+    return rm_.listnodes_(nodeSourceName);
 }
 
 function topology(){
