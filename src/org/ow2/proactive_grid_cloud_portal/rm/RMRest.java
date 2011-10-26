@@ -102,6 +102,18 @@ import org.rrd4j.core.RrdDb;
 @Path("/rm")
 public class RMRest {
 
+	protected static final String[] dataSources = { //
+			// "AverageInactivity", // redundant with AverageActivity
+			// "ToBeReleasedNodesCo", // useless info
+			"BusyNodesCount", //
+			"FreeNodesCount", //
+			"DownNodesCount", //
+			"AvailableNodesCount", //
+			"AverageActivity", //
+			// "MaxFreeNodes" // redundant with AvailableNodesCount
+	};
+	
+	
     public RMCachingProxyUserInterface checkAccess(String sessionId) throws WebApplicationException {
         RMCachingProxyUserInterface s = RMSessionMapper.getInstance().getSessionsMap().get(sessionId);
 
@@ -683,16 +695,7 @@ public class RMRest {
     	RMCachingProxyUserInterface rm = checkAccess(sessionId);
 
 		
-		String[] dataSources = { //
-				// "AverageInactivity", // redundant with AverageActivity
-				// "ToBeReleasedNodesCo", // useless info
-				"BusyNodesCount", //
-				"FreeNodesCount", //
-				"DownNodesCount", //
-				"AvailableNodesCount", //
-				"AverageActivity", //
-				// "MaxFreeNodes" // redundant with AvailableNodesCount
-		};
+
 		// if range String is too large, shorten it
 		// to make it recognizable by StatHistoryCaching
 		if (range.length() > dataSources.length) {
