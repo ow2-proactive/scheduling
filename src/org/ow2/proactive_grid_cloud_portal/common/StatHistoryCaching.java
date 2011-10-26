@@ -89,7 +89,7 @@ public class StatHistoryCaching {
 		this.statHistoryCache = new HashMap<String, StatHistoryCacheEntry>();
 	}
 
-	public static StatHistoryCaching getInstance() {
+	public static synchronized StatHistoryCaching getInstance() {
 		if (instance == null)
 			instance = new StatHistoryCaching();
 		return instance;
