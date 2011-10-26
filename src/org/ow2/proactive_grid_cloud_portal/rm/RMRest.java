@@ -691,10 +691,7 @@ public class RMRest {
 			ReflectionException, IOException, MalformedObjectNameException,
 			NullPointerException, InterruptedException {
 
-    	long l1 = System.currentTimeMillis();
     	RMCachingProxyUserInterface rm = checkAccess(sessionId);
-
-		
 
 		// if range String is too large, shorten it
 		// to make it recognizable by StatHistoryCaching
@@ -711,6 +708,8 @@ public class RMRest {
     	if (cache != null) {
     		return cache.getValue();
     	}
+    	
+    	long l1 = System.currentTimeMillis();
     	
 		ObjectName on = new ObjectName(RMJMXHelper.RUNTIMEDATA_MBEAN_NAME);
 		AttributeList attrs = rm.getMBeanAttributes(on, new String[] { "StatisticHistory" });
@@ -794,6 +793,7 @@ public class RMRest {
 		rrd4jDb.delete();
 		
 		String ret = result.toString();
+		
 		StatHistoryCaching.getInstance().addEntry(range, l1, ret);
 		
 		return ret;
