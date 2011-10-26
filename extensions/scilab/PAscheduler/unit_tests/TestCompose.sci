@@ -40,6 +40,43 @@ val=gsort(val,"g","i");
 if ~ok error(msg),return; end
 disp('..........................2 ......OK');
 clear val;
+
+disp('...... Testing PAsolve with sqrt(sqrt(sqrt(x))) and an error');
+t(1,3).Params = list('a');
+ disp('..........................1 PAwaitFor');
+ resl = PAsolve(t);
+ val1=PAwaitFor(resl(1:2),timeout);
+ val2=PAwaitFor(resl(4:5),timeout);
+ ok=%f;
+ msg = 'Error not received';
+ try 
+     problem = PAwaitFor(resl(3),timeout);
+ catch
+     disp('Error occured');
+     ok=%t;
+ end
+ 
+ 
+if ~ok error(msg),return; end
+ disp('..........................1 ......OK');
+ clear val;
+ 
+ disp('..........................2 PAwaitAny');
+resl = PAsolve(t);
+ok=%f;
+msg = 'Error not received';
+for i=1:5
+    try
+        vl=PAwaitAny(resl,timeout)
+    catch
+         disp('Error occured');
+         ok=%t;
+    end
+end
+
+if ~ok error(msg),return; end
+disp('..........................2 ......OK');
+clear val;
 endfunction
 
 function [out]=mySqrt(in)    

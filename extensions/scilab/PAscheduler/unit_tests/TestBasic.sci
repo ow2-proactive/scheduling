@@ -37,6 +37,7 @@ val=PAwaitFor(resl(1:3),timeout)
 try
     problem = PAwaitFor(resl(4),timeout)
 catch
+    disp('Error occured');
 end
 val2=PAwaitFor(resl(5),timeout)
 val($+1) = val2;
@@ -56,6 +57,7 @@ for i=1:5
         val(k) = vl;
         k=k+1;        
     catch
+        disp('Error occured');
     end
 end
 val=gsort(val,"g","i");
