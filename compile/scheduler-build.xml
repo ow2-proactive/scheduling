@@ -9,7 +9,10 @@
 		<mkdir dir="${cl.scheduler.tests.dir}" />
 
 		<copy toDir="${cl.scheduler.dir}">
-			<fileset dir="${src.scheduler.dir}" excludes="**/*.java" />
+			<fileset dir="${src.scheduler.dir}">
+              <exclude name="**/*.java" />
+              <exclude name="${src.scheduler.mapreduce.dir}" />
+            </fileset>
 		</copy>
 		<copy toDir="${cl.scheduler.tests.dir}">
 			<fileset dir="${src.scheduler.tests.dir}" excludes="**/*.java" />
@@ -21,7 +24,7 @@
 			<classpath refid="scheduler.libs" />
 			<classpath path="${cl.rm.dir}" />
 			<include name="**/*.java" />
-			<exclude name="**/ext/mapreduce/**/*.java" />
+			<exclude name="${src.scheduler.mapreduce.dir}" />
 		</javac>
 
 		<javac srcdir="${src.scheduler.tests.dir}" destdir="${cl.scheduler.tests.dir}" deprecation="on" source="${source}" debug="${debug}">
@@ -31,6 +34,7 @@
 			<classpath path="${cl.rm.tests.dir}" />
 			<classpath path="${cl.scheduler.dir}" />
 			<include name="**/*.java" />
+			<exclude name="${src.scheduler.mapreduce.tests.dir}" />
 		</javac>
 
 		<stubGenerator srcDir="${cl.scheduler.dir}" refclasspath="all.classpath">
@@ -62,11 +66,36 @@
 
 	<target name="compile.scheduler.mapreduce" depends="compile.scheduler" description="Compile Scheduler's MapReduce extension">
 
-		<javac srcdir="${src.scheduler.dir}" destdir="${cl.scheduler.dir}" deprecation="on" source="${source}" debug="${debug}">
+		<mkdir dir="${cl.scheduler.mapreduce.dir}" />
+
+        <copy toDir="${cl.scheduler.mapreduce.dir}">
+            <fileset dir="${base.dir}/samples/jobs_descriptors/Workflow/mapreduce/" includes="replicateMapperPATask.js" />
+            <fileset dir="${base.dir}/samples/jobs_descriptors/Workflow/mapreduce/" includes="replicateReducerPATask.js" />
+            <fileset dir="${base.dir}/samples/jobs_descriptors/Workflow/mapreduce/" includes="reducerPATaskOutputFileTransfer.js" />
+            <fileset dir="${base.dir}/extensions/mapreduce/" includes="proactive.mapreduce.framework.configuration" />
+        </copy>
+
+		<javac srcdir="${src.scheduler.dir}" destdir="${cl.scheduler.mapreduce.dir}" deprecation="on" source="${source}" debug="${debug}">
 
 			<classpath refid="scheduler.libs" />
 			<classpath path="${cl.rm.dir}" />
-			<include name="**/ext/mapreduce/**/*.java" />
+			<classpath path="${cl.scheduler.dir}" />
+			<include name="${src.scheduler.mapreduce.dir}" />
+		</javac>
+
+		<javac
+			srcdir="${src.scheduler.tests.dir}"
+			destdir="${cl.scheduler.tests.dir}"
+			deprecation="on"
+			source="${source}"
+			debug="${debug}"  >
+
+			<classpath refid="scheduler.libs"/>
+			<classpath path="${cl.rm.dir}"/>
+			<classpath path="${cl.rm.tests.dir}"/>
+			<classpath path="${cl.scheduler.dir}"/>
+			<classpath path="${cl.scheduler.mapreduce.dir}"/>
+			<include name="${src.scheduler.mapreduce.tests.dir}" />
 		</javac>
 
 	</target>
@@ -115,11 +144,7 @@
 	<!-- start of the ant target to create the ProActive_Scheduler-mapreduce.jar -->
 	<target name="deploy.scheduler.mapreduce" depends="-deployCopy, compile.scheduler.mapreduce, deploy.common.client" description="Creates scheduler mapreduce jar">
 		<jar destfile="${deploy.lib.dir}/${scheduler.mapreduce.jar}" manifest="${basedir}/scheduler-Manifest-base.mf" index="true">
-			<fileset dir="${cl.scheduler.dir}" includes="**/org/ow2/proactive/scheduler/ext/mapreduce/**" excludes="org/ow2/proactive/scheduler/ext/mapreduce/examples/**" />
-			<fileset dir="${base.dir}/samples/jobs_descriptors/Workflow/mapreduce/" includes="replicateMapperPATask.js" />
-			<fileset dir="${base.dir}/samples/jobs_descriptors/Workflow/mapreduce/" includes="replicateReducerPATask.js" />
-			<fileset dir="${base.dir}/samples/jobs_descriptors/Workflow/mapreduce/" includes="reducerPATaskOutputFileTransfer.js" />
-			<fileset dir="${base.dir}/extensions/mapreduce/" includes="proactive.mapreduce.framework.configuration" />
+			<fileset dir="${cl.scheduler.mapreduce.dir}" includes="**" />
 			<indexjars>
 				<fileset refid="jar.index.fileset" />
 			</indexjars>
@@ -144,6 +169,11 @@
 
 	<target name="junit.scheduler" depends="deploy.scheduler, deploy.scheduler.worker" description="Run scheduler's tests">
 		<junitMacro testsuite="scheduler.testsuite" testclasspath="scheduler.test.classpath" log4jconfig="-Dlog4j.configuration=file:${base.dir}/compile/scheduler-log4j" />
+
+	</target>
+
+	<target name="junit.scheduler.mapreduce" depends="deploy.scheduler, deploy.scheduler.mapreduce" description="Run MapReduce tests">
+		<junitMacro testsuite="scheduler.mapreduce.testsuite" testclasspath="scheduler.mapreduce.test.classpath" log4jconfig="-Dlog4j.configuration=file:${base.dir}/compile/scheduler-log4j" />
 
 	</target>
 

@@ -30,6 +30,7 @@
 					<pathElement base="proactive" relpath="/dist/lib/ProActive_SRM-common.jar"/>
 					<pathElement base="proactive" relpath="/dist/lib/ProActive_ResourceManager.jar" />
 					<pathElement base="proactive" relpath="/dist/lib/ProActive_Scheduler-core.jar" />
+					<pathElement base="proactive" relpath="/dist/lib/ProActive_Scheduler-mapreduce.jar" />
 
 					<!-- <pathElement base="proactive" relpath="lib/common/relaxngDatatype.jar" />
 					<pathElement base="proactive" relpath="lib/common/jsr173_1.0_api.jar" />
