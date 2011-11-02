@@ -65,7 +65,7 @@ public class PAMapReduceJobConfiguration {
      * loaded properties
      */
     public PAMapReduceJobConfiguration() {
-        properties = new Properties();
+        init();
     }
 
     /**
@@ -207,16 +207,19 @@ public class PAMapReduceJobConfiguration {
      */
     protected void init() {
         properties = new Properties();
-        try {
-            InputStream is = new FileInputStream(propertyFile);
-            fileLoaded = propertyFile.exists();
-            properties.load(is);
-        } catch (FileNotFoundException e) {
-            // thrown by "InputStream is = new FileInputStream(propertyFile);"
-            e.printStackTrace();
-        } catch (IOException e) {
-            // thrown by "properties.load(is);"
-            e.printStackTrace();
+        if (propertyFile != null) {
+            try {
+                InputStream is = new FileInputStream(propertyFile);
+                fileLoaded = propertyFile.exists();
+                properties.load(is);
+            } catch (FileNotFoundException e) {
+                // thrown by
+                // "InputStream is = new FileInputStream(propertyFile);"
+                e.printStackTrace();
+            } catch (IOException e) {
+                // thrown by "properties.load(is);"
+                e.printStackTrace();
+            }
         }
 
         /*
