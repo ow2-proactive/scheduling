@@ -54,6 +54,7 @@ import org.apache.hadoop.mapreduce.lib.input.SequenceFileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
 
+
 /**********************************************************
  * MapredLoadTest generates a bunch of work that exercises a Hadoop Map-Reduce
  * system (and DFS, too). It goes through the following steps:
@@ -113,8 +114,7 @@ public class TestMapReduce3Jobs extends FunctionalTest {
      * in random order, but where each number appears as many times as we were
      * instructed.
      */
-    public static class RandomGenMapper extends
-            Mapper<IntWritable, IntWritable, IntWritable, IntWritable> {
+    public static class RandomGenMapper extends Mapper<IntWritable, IntWritable, IntWritable, IntWritable> {
 
         private static Random r = new Random();
 
@@ -131,13 +131,12 @@ public class TestMapReduce3Jobs extends FunctionalTest {
     }
 
     /**
-   */
-    public static class RandomGenReducer extends
-            Reducer<IntWritable, IntWritable, IntWritable, IntWritable> {
+    */
+    public static class RandomGenReducer extends Reducer<IntWritable, IntWritable, IntWritable, IntWritable> {
 
         @Override
-        public void reduce(IntWritable key, Iterable<IntWritable> it, Context context)
-                throws IOException, InterruptedException {
+        public void reduce(IntWritable key, Iterable<IntWritable> it, Context context) throws IOException,
+                InterruptedException {
             for (IntWritable iw : it) {
                 context.write(iw, null);
             }
@@ -164,18 +163,17 @@ public class TestMapReduce3Jobs extends FunctionalTest {
         @Override
         public void map(WritableComparable<?> key, Text val, Context context) throws IOException,
                 InterruptedException {
-            context.write(new IntWritable(Integer.parseInt(val.toString().trim())),
-                    new IntWritable(1));
+            context.write(new IntWritable(Integer.parseInt(val.toString().trim())), new IntWritable(1));
         }
     }
 
     /**
-   */
+    */
     public static class RandomCheckReducer extends
             Reducer<IntWritable, IntWritable, IntWritable, IntWritable> {
         @Override
-        public void reduce(IntWritable key, Iterable<IntWritable> it, Context context)
-                throws IOException, InterruptedException {
+        public void reduce(IntWritable key, Iterable<IntWritable> it, Context context) throws IOException,
+                InterruptedException {
             int keyint = key.get();
             int count = 0;
             for (IntWritable iw : it) {
@@ -193,8 +191,7 @@ public class TestMapReduce3Jobs extends FunctionalTest {
      * Thus, the map() function is just the identity function and reduce() just
      * sums. Nothing to see here!
      */
-    public static class MergeMapper extends
-            Mapper<IntWritable, IntWritable, IntWritable, IntWritable> {
+    public static class MergeMapper extends Mapper<IntWritable, IntWritable, IntWritable, IntWritable> {
 
         @Override
         public void map(IntWritable key, IntWritable val, Context context) throws IOException,
@@ -205,10 +202,9 @@ public class TestMapReduce3Jobs extends FunctionalTest {
         }
     }
 
-    public static class MergeReducer extends
-            Reducer<IntWritable, IntWritable, IntWritable, IntWritable> {
-        public void reduce(IntWritable key, Iterator<IntWritable> it, Context context)
-                throws IOException, InterruptedException {
+    public static class MergeReducer extends Reducer<IntWritable, IntWritable, IntWritable, IntWritable> {
+        public void reduce(IntWritable key, Iterator<IntWritable> it, Context context) throws IOException,
+                InterruptedException {
             int keyint = key.get();
             int total = 0;
             while (it.hasNext()) {
@@ -225,9 +221,9 @@ public class TestMapReduce3Jobs extends FunctionalTest {
     @org.junit.Test
     public void run() throws Exception {
 
-        Path TEST_ROOT_DIR = new Path(System.getProperty("java.io.tmpdir") + File.separator
-                + "TestMapReduce3Jobs");
-        
+        Path TEST_ROOT_DIR = new Path(System.getProperty("java.io.tmpdir") + File.separator +
+            "TestMapReduce3Jobs");
+
         fs.delete(TEST_ROOT_DIR, true);
 
         //
@@ -238,8 +234,7 @@ public class TestMapReduce3Jobs extends FunctionalTest {
         int dist[] = new int[range];
         for (int i = 0; i < range; i++) {
             double avgInts = (1.0 * countsToGo) / (range - i);
-            dist[i] = (int) Math.max(0,
-                    Math.round(avgInts + (Math.sqrt(avgInts) * r.nextGaussian())));
+            dist[i] = (int) Math.max(0, Math.round(avgInts + (Math.sqrt(avgInts) * r.nextGaussian())));
             countsToGo -= dist[i];
         }
         if (countsToGo > 0) {
@@ -317,7 +312,7 @@ public class TestMapReduce3Jobs extends FunctionalTest {
         pamrjc.setOutputSpace("file://" + TEST_ROOT_DIR);
 
         MapReduceTHelper.submit(genJob, pamrjc);
-        
+
         printFiles(randomOuts, conf);
 
         //
@@ -371,7 +366,7 @@ public class TestMapReduce3Jobs extends FunctionalTest {
         pamrjc.setOutputSpace("file://" + TEST_ROOT_DIR);
 
         MapReduceTHelper.submit(checkJob, pamrjc);
-        
+
         printFiles(intermediateOuts, conf);
 
         //
@@ -401,7 +396,7 @@ public class TestMapReduce3Jobs extends FunctionalTest {
         pamrjc.setOutputSpace("file://" + TEST_ROOT_DIR);
 
         MapReduceTHelper.submit(mergeJob, pamrjc);
-        
+
         printFiles(finalOuts, conf);
 
         //
@@ -432,8 +427,8 @@ public class TestMapReduce3Jobs extends FunctionalTest {
                         break;
                     } else {
                         if (!((key.get() == i) && (val.get() == dist[i]))) {
-                            System.err.println("Mismatch!  Pos=" + key.get() + ", i=" + i
-                                    + ", val=" + val.get() + ", dist[i]=" + dist[i]);
+                            System.err.println("Mismatch!  Pos=" + key.get() + ", i=" + i + ", val=" +
+                                val.get() + ", dist[i]=" + dist[i]);
                             success = false;
                         }
                         totalseen += val.get();
@@ -483,8 +478,7 @@ public class TestMapReduce3Jobs extends FunctionalTest {
         in.close();
     }
 
-    private static void printSequenceFile(FileSystem fs, Path p, Configuration conf)
-            throws IOException {
+    private static void printSequenceFile(FileSystem fs, Path p, Configuration conf) throws IOException {
         SequenceFile.Reader r = new SequenceFile.Reader(fs, p, conf);
         Object key = null;
         Object value = null;
@@ -522,5 +516,5 @@ public class TestMapReduce3Jobs extends FunctionalTest {
             }
         }
     }
-    
+
 }

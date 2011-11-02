@@ -46,6 +46,7 @@ import org.ow2.proactive.scheduler.ext.mapreduce.ReadMode;
 import org.ow2.proactive.scheduler.ext.mapreduce.WriteMode;
 import org.ow2.tests.FunctionalTest;
 
+
 /**
  * MapReduce test using word count example. Test basic functionality, various
  * read modes, setting the number of reducers and input split size, using
@@ -62,8 +63,7 @@ public class TestMapReduce extends FunctionalTest {
         private Text word = new Text();
 
         @Override
-        public void map(Object key, Text value, Context context) throws IOException,
-                InterruptedException {
+        public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
             StringTokenizer itr = new StringTokenizer(value.toString());
             while (itr.hasMoreTokens()) {
                 word.set(itr.nextToken());
@@ -79,8 +79,8 @@ public class TestMapReduce extends FunctionalTest {
         private IntWritable result = new IntWritable();
 
         @Override
-        public void reduce(Text key, Iterable<IntWritable> values, Context context)
-                throws IOException, InterruptedException {
+        public void reduce(Text key, Iterable<IntWritable> values, Context context) throws IOException,
+                InterruptedException {
             int sum = 0;
             for (IntWritable val : values) {
                 sum += val.get();
@@ -95,7 +95,7 @@ public class TestMapReduce extends FunctionalTest {
     private static final String INPUT1 = "this is a test\nof a word count test\nword\nword\n";
     private static final String INPUT2 = "more test";
     private static final String EXPECTED_OUTPUT = "a\t2\ncount\t1\nis\t1\nmore\t1\nof\t1\ntest\t3\nthis\t1\nword\t3\n";
-    
+
     @org.junit.Test
     public void run() throws Throwable {
 
@@ -107,7 +107,7 @@ public class TestMapReduce extends FunctionalTest {
         // Splitter, 2*Mapper (1 per input file), MapperJoin, Reducer,
         // ReducerJoin -- 6 tasks overall
         Assert.assertEquals(6, jobInfo.getTotalNumberOfTasks());
-        
+
         // fullLocalRead + remoteWrite
         job = prepareHadoopJob(false);
         pamrjc = MapReduceTHelper.getConfiguration();
@@ -137,7 +137,7 @@ public class TestMapReduce extends FunctionalTest {
         // Splitter, 2*Mapper (1 per input file), MapperJoin, 3*Reducer,
         // ReducerJoin -- 8 tasks overall
         Assert.assertEquals(8, jobInfo.getTotalNumberOfTasks());
-    
+
         // inputSplitSize = 10
         job = prepareHadoopJob(false);
         pamrjc = MapReduceTHelper.getConfiguration();
@@ -149,7 +149,7 @@ public class TestMapReduce extends FunctionalTest {
         Assert.assertEquals(10, jobInfo.getTotalNumberOfTasks());
 
         helper.cleanup();
-        
+
     }
 
     private Job prepareHadoopJob(boolean combiner) throws Throwable {
@@ -174,10 +174,10 @@ public class TestMapReduce extends FunctionalTest {
         FileInputFormat.addInputPath(job, new Path("part1"));
         FileInputFormat.addInputPath(job, new Path("part2"));
         FileOutputFormat.setOutputPath(job, new Path("output"));
-        
+
         return job;
     }
-    
+
     /**
      * Submit the job, wait for completion, check that the result is correct. Do
      * not sort the output before checking.
@@ -190,11 +190,12 @@ public class TestMapReduce extends FunctionalTest {
      * Submit the job, wait for completion, check that the result is correct.
      * Optionally sort the output before checking.
      */
-    private JobResult submitAndCheck(Job job, PAMapReduceJobConfiguration pamrjc, boolean sort) throws Throwable {
+    private JobResult submitAndCheck(Job job, PAMapReduceJobConfiguration pamrjc, boolean sort)
+            throws Throwable {
 
         pamrjc.setInputSpace("file://" + helper.getRootDir() + "/in");
         pamrjc.setOutputSpace("file://" + helper.getRootDir() + "/out");
-        
+
         // submit PAMapReduceJob and wait for completion
         JobResult result = MapReduceTHelper.submit(job, pamrjc);
 
@@ -204,5 +205,5 @@ public class TestMapReduce extends FunctionalTest {
         Assert.assertEquals("Output of the job", EXPECTED_OUTPUT, out);
         return result;
     }
-    
+
 }
