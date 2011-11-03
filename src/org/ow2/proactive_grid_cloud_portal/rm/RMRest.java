@@ -116,8 +116,6 @@ public class RMRest {
         RMCachingProxyUserInterface s = RMSessionMapper.getInstance().getSessionsMap().get(sessionId);
 
         if (s == null) {
-            //throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_UNAUTHORIZED)
-                    //.entity("you are not connected, try to log in first").build());
             throw new NotConnectedException("you are not connected to the scheduler, you should log on first");
         }
 
