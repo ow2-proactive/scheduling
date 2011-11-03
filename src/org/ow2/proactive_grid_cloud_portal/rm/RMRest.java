@@ -40,7 +40,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.net.HttpURLConnection;
 import java.security.KeyException;
 import java.text.DecimalFormat;
 import java.util.Collection;
@@ -64,9 +63,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 
 import org.jboss.resteasy.annotations.GZIP;
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
@@ -87,6 +84,7 @@ import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.frontend.topology.Topology;
 import org.ow2.proactive.resourcemanager.nodesource.common.ConfigurableField;
 import org.ow2.proactive.resourcemanager.nodesource.common.PluginDescriptor;
+import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
 import org.ow2.proactive.utils.NodeSet;
@@ -114,12 +112,13 @@ public class RMRest {
 	};
 	
 	
-    public RMCachingProxyUserInterface checkAccess(String sessionId) throws WebApplicationException {
+    public RMCachingProxyUserInterface checkAccess(String sessionId) throws NotConnectedException {
         RMCachingProxyUserInterface s = RMSessionMapper.getInstance().getSessionsMap().get(sessionId);
 
         if (s == null) {
-            throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_UNAUTHORIZED)
-                    .entity("you are not connected, try to log in first").build());
+            //throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_UNAUTHORIZED)
+                    //.entity("you are not connected, try to log in first").build());
+            throw new NotConnectedException("you are not connected to the scheduler, you should log on first");
         }
 
         RMSessionMapper.getInstance().getSessionsLastAccessToClient().put(sessionId, new Long(System.currentTimeMillis()));
@@ -160,7 +159,7 @@ public class RMRest {
     @POST
     @Path("disconnect")
     @Produces("application/json")
-    public void rmDisconnect(@HeaderParam("sessionid") String sessionId) {
+    public void rmDisconnect(@HeaderParam("sessionid") String sessionId) throws NotConnectedException {
         RMCachingProxyUserInterface rm = checkAccess(sessionId);
         rm.disconnect();
         PAActiveObject.terminateActiveObject(rm,true);
@@ -207,11 +206,12 @@ public class RMRest {
      * Returns the state of the Resource Manager
      * @param sessionId a valid session id
      * @return Returns the state of the scheduler
+     * @throws NotConnectedException 
      */
     @GET
     @Path("state")
     @Produces("application/json")
-    public RMState getState(@HeaderParam("sessionid") String sessionId) {
+    public RMState getState(@HeaderParam("sessionid") String sessionId) throws NotConnectedException {
         ResourceManager rm = checkAccess(sessionId);
         return PAFuture.getFutureValue(rm.getState());
     }
@@ -220,13 +220,14 @@ public class RMRest {
      * Returns the initial state of the resource manager
      * @param sessionId
      * @return the initial state of the resource manager 
+     * @throws NotConnectedException 
      */
     @GET
 	@GZIP
 	@Path("monitoring")
 	@Produces("application/json")
 	public RMInitialState getInitialState(
-			@HeaderParam("sessionid") String sessionId) {
+			@HeaderParam("sessionid") String sessionId) throws NotConnectedException {
 		RMCachingProxyUserInterface rm = checkAccess(sessionId);
 		return PAFuture.getFutureValue(rm.getRMInitialState());
 	}
@@ -237,11 +238,12 @@ public class RMRest {
 	 * @param sessionId
 	 *            a valid session id
 	 * @return true if the resource manager is operational.
+	 * @throws NotConnectedException 
 	 */
 	@GET
 	@Path("isactive")
 	@Produces("application/json")
-	public boolean isActive(@HeaderParam("sessionid") String sessionId) {
+	public boolean isActive(@HeaderParam("sessionid") String sessionId) throws NotConnectedException {
 		ResourceManager rm = checkAccess(sessionId);
 		return rm.isActive().getBooleanValue();
 	}
@@ -253,12 +255,13 @@ public class RMRest {
 	 * @param nodeUrl
 	 *            the url of the node
 	 * @return true if new node is added successfully
+	 * @throws NotConnectedException 
 	 */
 	@POST
 	@Produces("application/json")
 	@Path("node")
 	public boolean addNode(@HeaderParam("sessionid") String sessionId,
-			@FormParam("nodeurl") String nodeUrl) {
+			@FormParam("nodeurl") String nodeUrl) throws NotConnectedException {
 		ResourceManager rm = checkAccess(sessionId);
 		return rm.addNode(nodeUrl).getBooleanValue();
 	}
@@ -274,13 +277,14 @@ public class RMRest {
 	 *            the node source
 	 * @return true if new node is added successfully, runtime exception
 	 *         otherwise
+	 * @throws NotConnectedException 
 	 */
 	@POST
 	@Path("node")
 	@Produces("application/json")
 	public boolean addNode(@HeaderParam("sessionid") String sessionId,
 			@FormParam("nodeurl") String url,
-			@FormParam("nodesource") String nodesource) {
+			@FormParam("nodesource") String nodesource) throws NotConnectedException {
 		ResourceManager rm = checkAccess(sessionId);
 		return rm.addNode(url, nodesource).getBooleanValue();
 	}
@@ -294,12 +298,13 @@ public class RMRest {
 	 * @param url
 	 *            the url of the node
 	 * @return true if the node nodeUrl is registered and not down
+	 * @throws NotConnectedException 
 	 */
 	@GET
 	@Path("node/isavailable")
 	@Produces("application/json")
 	public boolean nodeIsAvailable(@HeaderParam("sessionid") String sessionId,
-			@FormParam("nodeurl") String url) {
+			@FormParam("nodeurl") String url) throws NotConnectedException {
 		ResourceManager rm = checkAccess(sessionId);
 		return rm.nodeIsAvailable(url).getBooleanValue();
 	}
@@ -311,11 +316,12 @@ public class RMRest {
 	 * @param sessionId
 	 *            a valid session id
 	 * @return true if successfully disconnected
+	 * @throws NotConnectedException 
 	 */
 	@POST
 	@Path("disconnect")
 	@Produces("application/json")
-	public boolean disconnect(@HeaderParam("sessionid") String sessionId) {
+	public boolean disconnect(@HeaderParam("sessionid") String sessionId) throws NotConnectedException {
 		ResourceManager rm = checkAccess(sessionId);
 		RMSessionMapper.getInstance().getSessionsMap().remove(rm);
 		return rm.disconnect().getBooleanValue();
@@ -345,6 +351,7 @@ public class RMRest {
 	 * @param policyFileParameters
 	 *            File or credential parameters
 	 * @return true if a node source has been created
+	 * @throws NotConnectedException 
 	 */
 	@POST
 	@Path("nodesource/create")
@@ -357,7 +364,7 @@ public class RMRest {
 			@FormParam("infrastructureFileParameters") String[] infrastructureFileParameters,
 			@FormParam("policyType") String policyType,
 			@FormParam("policyParameters") String[] policyParameters,
-			@FormParam("policyFileParameters") String[] policyFileParameters) {
+			@FormParam("policyFileParameters") String[] policyFileParameters) throws NotConnectedException {
 		ResourceManager rm = checkAccess(sessionId);
 		Object[] infraParams = new Object[infrastructureParameters.length
 				+ infrastructureFileParameters.length];
@@ -419,6 +426,7 @@ public class RMRest {
 	 * @param sessionId
 	 * @param sourceName
 	 * @return the ping frequency
+	 * @throws NotConnectedException 
 	 */
 
 	@POST
@@ -426,7 +434,7 @@ public class RMRest {
 	@Produces("application/json")
 	public int getNodeSourcePingFrequency(
 			@HeaderParam("sessionid") String sessionId,
-			@FormParam("sourcename") String sourceName) {
+			@FormParam("sourcename") String sourceName) throws NotConnectedException {
 		ResourceManager rm = checkAccess(sessionId);
 		return rm.getNodeSourcePingFrequency(sourceName).getIntValue();
 	}
@@ -438,12 +446,13 @@ public class RMRest {
 	 * @param url
 	 * @return true of the node has been released
 	 * @throws NodeException
+	 * @throws NotConnectedException 
 	 */
 	@POST
 	@Path("node/release")
 	@Produces("application/json")
 	public boolean releaseNode(@HeaderParam("sessionid") String sessionId,
-			@FormParam("url") String url) throws NodeException {
+			@FormParam("url") String url) throws NodeException, NotConnectedException {
 		ResourceManager rm = checkAccess(sessionId);
 		Node n;
 		n = NodeFactory.getNode(url);
@@ -457,13 +466,14 @@ public class RMRest {
 	 * @param nodeUrl
 	 * @param preempt
 	 * @return
+	 * @throws NotConnectedException 
 	 */
 	@POST
 	@Path("node/remove")
 	@Produces("application/json")
 	public boolean removeNode(@HeaderParam("sessionid") String sessionId,
 			@FormParam("url") String nodeUrl,
-			@FormParam("preempt") boolean preempt) {
+			@FormParam("preempt") boolean preempt) throws NotConnectedException {
 		ResourceManager rm = checkAccess(sessionId);
 		return rm.removeNode(nodeUrl, preempt).getBooleanValue();
 	}
@@ -475,13 +485,14 @@ public class RMRest {
 	 * @param sourceName
 	 * @param preempt
 	 * @return
+	 * @throws NotConnectedException 
 	 */
 	@POST
 	@Path("nodesource/remove")
 	@Produces("application/json")
 	public boolean removeNodeSource(@HeaderParam("sessionid") String sessionId,
 			@FormParam("name") String sourceName,
-			@FormParam("preempt") boolean preempt) {
+			@FormParam("preempt") boolean preempt) throws NotConnectedException {
 		ResourceManager rm = checkAccess(sessionId);
 		return rm.removeNodeSource(sourceName, preempt).getBooleanValue();
 	}
@@ -494,12 +505,13 @@ public class RMRest {
 	 * @param nodeUrls
 	 *            set of node urls to lock
 	 * @return true when all nodes were free and have been locked
+	 * @throws NotConnectedException 
 	 */
 	@POST
 	@Path("node/lock")
 	@Produces("application/json")
 	public boolean lockNodes(@HeaderParam("sessionid") String sessionId,
-			@FormParam("nodeurls") Set<String> nodeUrls) {
+			@FormParam("nodeurls") Set<String> nodeUrls) throws NotConnectedException {
 		ResourceManager rm = checkAccess(sessionId);
 		return rm.lockNodes(nodeUrls).getBooleanValue();
 	}
@@ -512,12 +524,13 @@ public class RMRest {
 	 * @param nodeUrls
 	 *            set of node urls to unlock
 	 * @return true when all nodes were locked and have been unlocked
+	 * @throws NotConnectedException 
 	 */
 	@POST
 	@Path("node/unlock")
 	@Produces("application/json")
 	public boolean unlockNodes(@HeaderParam("sessionid") String sessionId,
-			@FormParam("nodeurls") Set<String> nodeUrls) {
+			@FormParam("nodeurls") Set<String> nodeUrls) throws NotConnectedException {
 		ResourceManager rm = checkAccess(sessionId);
 		return rm.unlockNodes(nodeUrls).getBooleanValue();
 	}
@@ -529,10 +542,11 @@ public class RMRest {
 	 * @param arg0
 	 * @param arg1
 	 * @return
+	 * @throws NotConnectedException 
 	 */
 	public boolean setNodeSourcePingFrequency(
 			@HeaderParam("sessionid") String sessionId, int frequency,
-			String sourcename) {
+			String sourcename) throws NotConnectedException {
 		ResourceManager rm = checkAccess(sessionId);
 		return rm.setNodeSourcePingFrequency(frequency, sourcename)
 				.getBooleanValue();
@@ -546,43 +560,44 @@ public class RMRest {
 	 * @param sessionId
 	 * @param arg0
 	 * @return
+	 * @throws NotConnectedException 
 	 */
 	@GET
 	@Path("shutdown")
 	@Produces("application/json")
 	public boolean shutdown(@HeaderParam("sessionid") String sessionId,
-			boolean preempt) {
+			boolean preempt) throws NotConnectedException {
 		ResourceManager rm = checkAccess(sessionId);
 		return rm.shutdown(preempt).getBooleanValue();
 	}
 
 	public NodeSet getAtMostNodes(@HeaderParam("sessionid") String sessionId,
 			int number, TopologyDescriptor descriptor,
-			List<SelectionScript> selectionScriptsList, NodeSet exclusion) {
+			List<SelectionScript> selectionScriptsList, NodeSet exclusion) throws NotConnectedException {
 		ResourceManager rm = checkAccess(sessionId);
 		return rm.getAtMostNodes(number, descriptor, selectionScriptsList,
 				exclusion);
 	}
 
-	public Topology getTopology(@HeaderParam("sessionid") String sessionId) {
+	public Topology getTopology(@HeaderParam("sessionid") String sessionId) throws NotConnectedException {
 		ResourceManager rm = checkAccess(sessionId);
 		return rm.getTopology();
 	}
 
 	public NodeSet getAtMostNodes(@HeaderParam("sessionid") String sessionId,
-			int arg0, SelectionScript arg1) {
+			int arg0, SelectionScript arg1) throws NotConnectedException {
 		ResourceManager rm = checkAccess(sessionId);
 		return rm.getAtMostNodes(arg0, arg1);
 	}
 
 	public NodeSet getAtMostNodes(@HeaderParam("sessionid") String sessionId,
-			int arg0, SelectionScript arg1, NodeSet arg2) {
+			int arg0, SelectionScript arg1, NodeSet arg2) throws NotConnectedException {
 		ResourceManager rm = checkAccess(sessionId);
 		return rm.getAtMostNodes(arg0, arg1, arg2);
 	}
 
 	public NodeSet getAtMostNodes(@HeaderParam("sessionid") String sessionId,
-			int arg0, List<SelectionScript> arg1, NodeSet arg2) {
+			int arg0, List<SelectionScript> arg1, NodeSet arg2) throws NotConnectedException {
 		ResourceManager rm = checkAccess(sessionId);
 		return rm.getAtMostNodes(arg0, arg1, arg2);
 	}
@@ -592,13 +607,14 @@ public class RMRest {
 	 *
 	 * @param sessionId
 	 * @return the list of supported node source infrastructures descriptors
+	 * @throws NotConnectedException 
 	 */
 	@GET
 	@GZIP
 	@Path("infrastructures")
 	@Produces("application/json")
 	public Collection<PluginDescriptor> getSupportedNodeSourceInfrastructures(
-			@HeaderParam("sessionid") String sessionId) {
+			@HeaderParam("sessionid") String sessionId) throws NotConnectedException {
 		ResourceManager rm = checkAccess(sessionId);
 		return rm.getSupportedNodeSourceInfrastructures();
 	}
@@ -608,13 +624,14 @@ public class RMRest {
 	 *
 	 * @param sessionId
 	 * @return the list of supported node source policies descriptors
+	 * @throws NotConnectedException 
 	 */
 	@GET
 	@GZIP
     @Path("policies")
     @Produces("application/json")
     public Collection<PluginDescriptor> getSupportedNodeSourcePolicies(
-            @HeaderParam("sessionid") String sessionId) {
+            @HeaderParam("sessionid") String sessionId) throws NotConnectedException {
         ResourceManager rm = checkAccess(sessionId);
         return rm.getSupportedNodeSourcePolicies();
     }
@@ -630,6 +647,7 @@ public class RMRest {
      * @throws IntrospectionException
      * @throws ReflectionException
      * @throws IOException
+     * @throws NotConnectedException 
      */
     @GET
     @GZIP
@@ -637,7 +655,7 @@ public class RMRest {
     @Produces("application/json")
     public Object getMBeanInfo(@HeaderParam("sessionid") String sessionId,
             @PathParam("name") ObjectName name, @QueryParam("attr") List<String> attrs)
-            throws InstanceNotFoundException, IntrospectionException, ReflectionException, IOException {
+            throws InstanceNotFoundException, IntrospectionException, ReflectionException, IOException, NotConnectedException {
         RMCachingProxyUserInterface rm = checkAccess(sessionId);
 
         if ((attrs == null) || (attrs.size() == 0)) {
@@ -681,6 +699,7 @@ public class RMRest {
      * @throws MalformedObjectNameException
      * @throws NullPointerException
      * @throws InterruptedException
+     * @throws NotConnectedException 
      */
     @GET
     @GZIP
@@ -689,7 +708,7 @@ public class RMRest {
 	public String getStatHistory(@HeaderParam("sessionid") String sessionId, @QueryParam("range") String range)
 			throws InstanceNotFoundException, IntrospectionException,
 			ReflectionException, IOException, MalformedObjectNameException,
-			NullPointerException, InterruptedException {
+			NullPointerException, InterruptedException, NotConnectedException {
 
     	RMCachingProxyUserInterface rm = checkAccess(sessionId);
 
