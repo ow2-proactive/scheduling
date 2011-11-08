@@ -21,7 +21,7 @@
 	<!-- ************
 		Junit tests
 	-->
-	<target name="junit.all" depends="junit.rm, junit.scheduler" description="Run all tests"/>
+	<target name="junit.all" depends="junit.rm, junit.scheduler, junit.scheduler.mapreduce" description="Run all tests"/>
 
 	<target name="with.clover">
 		<taskdef resource="cloverlib.xml" classpath="${base.dir}/compile/lib/clover.jar" />

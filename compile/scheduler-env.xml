@@ -9,12 +9,17 @@
 
 	<property name="src.scheduler.dir"   	 value="${src.dir}/scheduler/src" />
 	<property name="src.scheduler.tests.dir" value="${src.dir}/scheduler/tests" />
+
+	<!-- Relative paths to MapReduce sources and tests -->
+	<property name="src.scheduler.mapreduce.dir" value="org/ow2/proactive/scheduler/ext/mapreduce/" />
+	<property name="src.scheduler.mapreduce.tests.dir" value="functionaltests/ext/mapreduce/" />
 	
 	<!-- ================================================================ -->
 	<!--                   		Class  paths                              -->
 	<!--  =============================================================== -->
 
 	<property name="cl.scheduler.dir"    value="${classes.dir}/scheduler" />
+	<property name="cl.scheduler.mapreduce.dir"    value="${classes.dir}/schedulerMapReduce" />
 	<property name="cl.scheduler.worker.dir"    value="${cl.scheduler.dir}/worker" />
 	<property name="cl.scheduler.tests.dir"    value="${classes.dir}/schedulerTests" />
 
@@ -78,6 +83,12 @@
 		<pathelement location="${base.dir}/compile/lib/junit-4.3.jar"/>
 	</path>
 
+	<path id="scheduler.mapreduce.test.classpath">
+		<path refid="scheduler.test.classpath"/>
+		<!-- Add mapreduce jar to classpath for mapreduce tests -->
+		<pathelement location="${deploy.lib.dir}/${scheduler.mapreduce.jar}"/>
+	</path>
+
     <if name="test">
             <fileset dir="${cl.scheduler.tests.dir}" id="scheduler.testsuite">
                     <include name="${test}" />
@@ -90,5 +101,20 @@
                     </fileset>
             </else>
     </if>
+
+    <!-- Define fileset for mapreduce tests -->
+    <if name="test">
+            <fileset dir="${cl.scheduler.tests.dir}" id="scheduler.mapreduce.testsuite">
+                    <include name="${test}" />
+                    <exclude name="**/*$*.class" />
+            </fileset>
+            <else>
+                    <fileset dir="${cl.scheduler.tests.dir}" id="scheduler.mapreduce.testsuite">
+                            <include name="**/ext/mapreduce/*Test*.class" />
+                            <exclude name="**/*$*.class"/>
+                    </fileset>
+            </else>
+    </if>
+
 
 </project>
