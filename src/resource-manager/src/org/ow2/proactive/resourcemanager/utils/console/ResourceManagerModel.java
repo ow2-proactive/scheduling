@@ -127,7 +127,7 @@ public class ResourceManagerModel extends ConsoleModel {
                 + " nodeSource is removed immediately if second parameter is true)"));
         commands.add(new Command("locknode(nodeURL)", "Locks the node"));
         commands.add(new Command("unlocknode(nodeURL)", "Unlocks the node"));
-        commands.add(new Command("listnodes()", "List every handled nodes"));
+        commands.add(new Command("listnodes(nodeSourceName)", "List nodes for a particular or all node sources"));
         commands.add(new Command("listns()", "List every handled node sources"));
         commands.add(new Command("nodeinfo(nodeURL)", "Displays node informations"));
         commands.add(new Command("listinfrastructures()", "List supported infrastructures"));
@@ -292,8 +292,9 @@ public class ResourceManagerModel extends ConsoleModel {
         }
     }
 
-    public List<RMNodeEvent> listnodes_() {
+    public List<RMNodeEvent> listnodes_(String nodeSourceName) {
         try {
+            boolean listAllNodes = nodeSourceName == null || nodeSourceName.length() == 0;
             List<RMNodeEvent> listne = rm.getMonitoring().getState().getNodesEvents();
             if (listne.size() == 0) {
                 print("No nodes handled by Resource Manager");
@@ -316,15 +317,18 @@ public class ResourceManagerModel extends ConsoleModel {
                 //separator
                 oaf.addEmptyLine();
                 for (RMNodeEvent evt : listne) {
-                    list = new ArrayList<String>();
-                    list.add(evt.getNodeSource());
-                    list.add(evt.getHostName());
-                    list.add(evt.getNodeState().toString());
-                    list.add(evt.getTimeStampFormatted());
-                    list.add(evt.getNodeUrl());
-                    list.add(evt.getNodeProvider() == null ? "" : evt.getNodeProvider());
-                    list.add(evt.getNodeOwner() == null ? "" : evt.getNodeOwner());
-                    oaf.addLine(list);
+
+                    if (listAllNodes || evt.getNodeSource().equals(nodeSourceName)) {
+                        list = new ArrayList<String>();
+                        list.add(evt.getNodeSource());
+                        list.add(evt.getHostName());
+                        list.add(evt.getNodeState().toString());
+                        list.add(evt.getTimeStampFormatted());
+                        list.add(evt.getNodeUrl());
+                        list.add(evt.getNodeProvider() == null ? "" : evt.getNodeProvider());
+                        list.add(evt.getNodeOwner() == null ? "" : evt.getNodeOwner());
+                        oaf.addLine(list);
+                    }
                 }
                 print(Tools.getStringAsArray(oaf));
             }

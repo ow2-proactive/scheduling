@@ -371,9 +371,11 @@ public class ResourceManagerController {
         policyOpt.setArgs(Option.UNLIMITED_VALUES);
         options.addOption(policyOpt);
 
-        Option listNodesOpt = new Option("ln", "listnodes", false, control +
+        Option listNodesOpt = new Option("ln", "listnodes", true, control +
             "List nodes handled by Resource Manager. Display is : NODESOURCE HOSTNAME STATE NODE_URL");
         listNodesOpt.setRequired(false);
+        listNodesOpt.setOptionalArg(true);
+        listNodesOpt.setArgName("nodeSourceName");
         actionGroup.addOption(listNodesOpt);
 
         Option listNSOpt = new Option("lns", "listns", false, control +
@@ -535,7 +537,7 @@ public class ResourceManagerController {
                 }
             }
         } else if (cmd.hasOption("listnodes")) {
-            model.listnodes_();
+            model.listnodes_(cmd.getOptionValue("listnodes"));
         } else if (cmd.hasOption("topology")) {
             model.topology_();
         } else if (cmd.hasOption("listns")) {
