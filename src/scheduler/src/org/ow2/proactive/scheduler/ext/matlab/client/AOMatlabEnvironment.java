@@ -336,7 +336,8 @@ public class AOMatlabEnvironment extends AOMatSciEnvironment<Boolean, MatlabResu
                         //System.out.println(config.getVersionPref());
                         sscript = new SelectionScript(url1, new String[] { "versionPref",
                                 config.getVersionPref(), "versionRej", config.getVersionRejAsString(),
-                                "versionMin", config.getVersionMin(), "versionMax", config.getVersionMax() });
+                                "versionMin", config.getVersionMin(), "versionMax", config.getVersionMax() },
+                            false);
                     } catch (InvalidScriptException e1) {
                         throw new RuntimeException(e1);
                     }
