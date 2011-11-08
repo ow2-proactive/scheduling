@@ -56,13 +56,14 @@ import org.ow2.proactive.scheduler.ext.mapreduce.PAMapReduceFramework;
 import org.ow2.proactive.scheduler.ext.mapreduce.PAMapReduceJobConfiguration;
 import org.ow2.tests.FunctionalTest;
 
+
 /**
  * Test that the sort MapReduce job produces correct result even if first
  * iterations of mapper and reducer fail, given that maxNumberOfExecutions is
  * greater than 1.
  */
 public class TestFaultTolerance extends FunctionalTest {
-    
+
     /**
      * This Mapper will fail the first time it is run, but will work on
      * consecutive runs. Relies on a file created in tmpdir and thus requires
@@ -72,12 +73,11 @@ public class TestFaultTolerance extends FunctionalTest {
 
         private Text word = new Text();
 
-        public static final File MAPPER_MARKER = new File(System.getProperty("java.io.tmpdir")
-                + File.separator + TestFaultTolerance.class.getName() + ".mapper.marker");
+        public static final File MAPPER_MARKER = new File(System.getProperty("java.io.tmpdir") +
+            File.separator + TestFaultTolerance.class.getName() + ".mapper.marker");
 
         @Override
-        public void map(Object key, Text value, Context context) throws IOException,
-                InterruptedException {
+        public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
             if (MAPPER_MARKER.createNewFile()) {
                 throw new RuntimeException("First iteration of the mapper fails");
             }
@@ -96,12 +96,12 @@ public class TestFaultTolerance extends FunctionalTest {
      */
     public static class FailingReducer extends Reducer<Text, Text, Text, NullWritable> {
 
-        public static final File REDUCER_MARKER = new File(System.getProperty("java.io.tmpdir")
-                + File.separator + TestFaultTolerance.class.getName() + ".reducer.marker");
-        
+        public static final File REDUCER_MARKER = new File(System.getProperty("java.io.tmpdir") +
+            File.separator + TestFaultTolerance.class.getName() + ".reducer.marker");
+
         @Override
-        public void reduce(Text key, Iterable<Text> values, Context context)
-                throws IOException, InterruptedException {
+        public void reduce(Text key, Iterable<Text> values, Context context) throws IOException,
+                InterruptedException {
             if (REDUCER_MARKER.createNewFile()) {
                 throw new RuntimeException("First iteration of the reducer fails");
             }
@@ -123,12 +123,12 @@ public class TestFaultTolerance extends FunctionalTest {
         FailingReducer.REDUCER_MARKER.delete();
 
     }
-    
+
     @org.junit.Test
     public void run() throws Throwable {
 
         cleanup();
-        
+
         // generate input
         helper.writeFile("in/input", INPUT);
 
@@ -144,26 +144,28 @@ public class TestFaultTolerance extends FunctionalTest {
         FileOutputFormat.setOutputPath(job, new Path("output"));
 
         PAMapReduceJobConfiguration pamrjc = MapReduceTHelper.getConfiguration();
-     
+
         pamrjc.setInputSpace("file://" + helper.getRootDir() + "/in");
         pamrjc.setOutputSpace("file://" + helper.getRootDir() + "/out");
         pamrjc.setInputSplitSize(20);
         //pamrjc.setMaxNumberOfExecutions(2);
         pamrjc.setMaxNumberOfExecutions(PAMapReduceFramework.MAPPER_PA_TASK, 2);
         pamrjc.setMaxNumberOfExecutions(PAMapReduceFramework.REDUCER_PA_TASK, 2);
-        
+
         // submit PAMapReduceJob and wait for completion
         MapReduceTHelper.submit(job, pamrjc);
-        
+
         // check output
         String out = helper.readFiles("out/output", false);
         System.out.println(out);
         Assert.assertEquals("Output of the sort job", EXPECTED_OUTPUT, out);
-        Assert.assertTrue("File should be created by 1st iteration of mapper", FailingMapper.MAPPER_MARKER.exists());
-        Assert.assertTrue("File should be created by 1st iteration of reducer", FailingReducer.REDUCER_MARKER.exists());
-        
-        cleanup();        
-        
+        Assert.assertTrue("File should be created by 1st iteration of mapper", FailingMapper.MAPPER_MARKER
+                .exists());
+        Assert.assertTrue("File should be created by 1st iteration of reducer", FailingReducer.REDUCER_MARKER
+                .exists());
+
+        cleanup();
+
     }
-    
+
 }

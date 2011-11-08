@@ -62,9 +62,10 @@ import org.ow2.proactive.scheduler.ext.mapreduce.exception.PAJobConfigurationExc
 
 import functionaltests.SchedulerTHelper;
 
+
 public class MapReduceTHelper {
 
-    private static FileSystem localFs; 
+    private static FileSystem localFs;
 
     static {
         try {
@@ -72,7 +73,7 @@ public class MapReduceTHelper {
         } catch (IOException io) {
             throw new RuntimeException("Problem getting local fs", io);
         }
-    } 
+    }
 
     public static PAMapReduceJobConfiguration getConfiguration() {
         PAMapReduceJobConfiguration pamrjc = new PAMapReduceJobConfiguration();
@@ -90,7 +91,7 @@ public class MapReduceTHelper {
         JobResult result = waitForCompletion(taskflow);
         return result;
     }
-    
+
     public static JobResult waitForCompletion(TaskFlowJob taskflow) throws Exception {
         JobId id;
         JobResult result;
@@ -109,11 +110,11 @@ public class MapReduceTHelper {
         System.out.println("-------------Job finished------------------------");
         return result;
     }
-    
+
     private String testRootDir;
 
     public MapReduceTHelper(String name) {
-        testRootDir = System.getProperty("java.io.tmpdir")+ File.separator + name;
+        testRootDir = System.getProperty("java.io.tmpdir") + File.separator + name;
     }
 
     /**
@@ -137,7 +138,7 @@ public class MapReduceTHelper {
     public boolean cleanup() throws IOException {
         return localFs.delete(new Path(testRootDir), true);
     }
-    
+
     public String getRootDir() {
         return testRootDir;
     }
@@ -171,7 +172,7 @@ public class MapReduceTHelper {
             Collections.sort(lines);
         }
         StringBuilder result = new StringBuilder();
-        for (String line: lines) {
+        for (String line : lines) {
             result.append(line);
             result.append('\n');
         }
@@ -194,5 +195,5 @@ public class MapReduceTHelper {
         f.write(data.getBytes());
         f.close();
     }
-    
+
 }
