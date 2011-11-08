@@ -42,7 +42,7 @@ import org.scilab.modules.types.ScilabType;
 
 
 /**
- * ResultsAndLogs wrapper of scilab tasks results
+ * ResultsAndLogs an object encapsulating PAsolve Scilab results plus logs and exceptions
  *
  * @author The ProActive Team
  */

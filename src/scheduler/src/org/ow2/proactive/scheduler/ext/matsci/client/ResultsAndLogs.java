@@ -40,7 +40,7 @@ import java.io.Serializable;
 
 
 /**
- * ResultsAndLogs
+ * ResultsAndLogs an object encapsulating PAsolve Matlab or Scilab results plus logs and exceptions
  *
  * @author The ProActive Team
  */

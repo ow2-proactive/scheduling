@@ -65,7 +65,7 @@ import java.util.TreeSet;
 
 
 /**
- * This active object handles the connection between Matlab and the Scheduler directly from the Matlab environment
+ * AOMatlabEnvironment This active object handles the connection between Matlab and the Scheduler directly from the Matlab environment
  *
  * @author The ProActive Team
  */

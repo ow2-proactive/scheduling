@@ -67,7 +67,7 @@ import java.util.TreeSet;
 
 
 /**
- * This active object handles the interaction between Scilab and the Scheduler it creates Scheduler jobs and receives results
+ * AOScilabEnvironment This active object handles the interaction between Scilab and the Scheduler it creates Scheduler jobs and receives results
  *
  * @author The ProActive Team
  */

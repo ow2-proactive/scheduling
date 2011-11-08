@@ -37,7 +37,7 @@
 package org.ow2.proactive.scheduler.ext.matlab.client;
 
 /**
- * MatlabResultsAndLogs
+ * MatlabResultsAndLogs an object encapsulating PAsolve Matlab results plus logs and exceptions
  *
  * @author The ProActive Team
  */

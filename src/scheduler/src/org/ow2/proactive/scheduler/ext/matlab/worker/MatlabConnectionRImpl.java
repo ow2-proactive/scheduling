@@ -36,16 +36,7 @@
  */
 package org.ow2.proactive.scheduler.ext.matlab.worker;
 
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Map;
-
+import com.activeeon.proactive.license_saver.client.LicenseSaverClient;
 import org.objectweb.proactive.core.ProActiveException;
 import org.ow2.proactive.scheduler.ext.common.util.IOTools;
 import org.ow2.proactive.scheduler.ext.matlab.common.PASolveMatlabGlobalConfig;
@@ -55,11 +46,14 @@ import org.ow2.proactive.scheduler.ext.matlab.common.exception.MatlabTaskExcepti
 import org.ow2.proactive.scheduler.ext.matlab.common.exception.UnreachableLicenseProxyException;
 import org.ow2.proactive.scheduler.ext.matlab.common.exception.UnsufficientLicencesException;
 
-import com.activeeon.proactive.license_saver.client.LicenseSaverClient;
+import java.io.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Map;
 
 
 /**
- * MatlabConnectionRImpl
+ * MatlabConnectionRImpl this class
  *
  * @author The ProActive Team
  */

@@ -36,24 +36,24 @@
  */
 package org.ow2.proactive.scheduler.ext.matlab.worker;
 
-import java.io.File;
-
 import org.ow2.proactive.scheduler.ext.matlab.common.PASolveMatlabGlobalConfig;
 import org.ow2.proactive.scheduler.ext.matlab.common.PASolveMatlabTaskConfig;
 import org.ow2.proactive.scheduler.ext.matlab.common.exception.MatlabInitException;
 import org.ow2.proactive.scheduler.ext.matlab.common.exception.MatlabTaskException;
 
+import java.io.File;
+
 
 /**
- * This class uses the matlabcontrol API to establish a connection with MATLAB for
- * MATLAB tasks executions. There can be only one instance at a time.
- * Be careful this class is not thread safe.
+ * This interface defines the connection to the matlab engine. This connection can either be via Matlab Control (live connection)
+ * or via Matlab batch mode. In the first case, commands sent are executed interactively by the matlab engine, in the latter case,
+ * they are scheduled and run as one in a generated matlab script.
  */
 public interface MatlabConnection {
 
     /**
      * Each time this method is called creates a new MATLAB process using
-     * the matlabcontrol API.
+     * either the matlabcontrol API or matlab batch mode.
      *
      * @param matlabExecutablePath The full path to the MATLAB executable
      * @param workingDir the directory where to start MATLAB

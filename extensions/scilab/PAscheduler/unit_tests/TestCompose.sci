@@ -23,6 +23,7 @@ t(3,1:5) = t(2,1:5);
  disp('..........................1 PAwaitFor');
  resl = PAsolve(t);
  val=PAwaitFor(resl,timeout)
+ PAclearResults(resl);
  disp(val);
  [ok,msg]=checkValuesSq(val);
 if ~ok error(msg),return; end
@@ -34,6 +35,7 @@ resl = PAsolve(t);
 for i=1:5
     val(i)=PAwaitAny(resl,timeout)
 end
+PAclearResults(resl);
 disp(val);
 val=gsort(val,"g","i");
 [ok,msg]=checkValuesSq(val);
@@ -55,7 +57,7 @@ t(1,3).Params = list('a');
      disp('Error occured');
      ok=%t;
  end
- 
+ PAclearResults(resl);
  
 if ~ok error(msg),return; end
  disp('..........................1 ......OK');
@@ -73,6 +75,7 @@ for i=1:5
          ok=%t;
     end
 end
+PAclearResults(resl);
 
 if ~ok error(msg),return; end
 disp('..........................2 ......OK');

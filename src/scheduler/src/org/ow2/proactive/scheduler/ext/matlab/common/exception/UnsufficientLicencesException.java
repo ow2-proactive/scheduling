@@ -37,7 +37,7 @@
 package org.ow2.proactive.scheduler.ext.matlab.common.exception;
 
 /**
- * UnsufficientLicencesException
+ * UnsufficientLicencesException when trying to run the tasks, not enough licences were found
  *
  * @author The ProActive Team
  */

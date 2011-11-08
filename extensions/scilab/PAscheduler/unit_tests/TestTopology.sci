@@ -20,6 +20,7 @@ t
 
 r=PAsolve(t);
 val=PAwaitFor(r,timeout);
+PAclearResults(r);
 ok = %t;
 for e=val
     ok = ok & e;

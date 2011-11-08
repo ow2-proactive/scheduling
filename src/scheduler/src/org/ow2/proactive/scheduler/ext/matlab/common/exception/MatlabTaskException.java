@@ -37,7 +37,7 @@
 package org.ow2.proactive.scheduler.ext.matlab.common.exception;
 
 /**
- * This exception represents errors which occur in Matlab scripts when executed
+ * MatlabTaskException This exception represents errors which occur in Matlab scripts when executed
  * @author The ProActive Team
  *
  */

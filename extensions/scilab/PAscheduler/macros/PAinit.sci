@@ -2,7 +2,7 @@ function [] = PAinit()
 
     global ('PA_initialized', 'PA_scheduler_dir')
 
-    jautoUnwrap(%t);
+    jautoUnwrap(%t);    
 
     version = ver();
     if strtod(part(version(1,2),1)) < 5
@@ -40,7 +40,8 @@ function [] = PAinit()
 
     // Policy
     system_setproperty('java.security.policy',strcat([PA_scheduler_dir, filesep(), 'config', filesep(), 'security.java.policy-client']));
-    jremove(log4jFile, log4jFileUri, urlLog4jFile, finalstring, File);
+    jremove(log4jFile, log4jFileUri, urlLog4jFile, finalstring);
+    //jremove(File);
 
     sep=pathsep();
 

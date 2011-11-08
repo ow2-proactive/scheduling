@@ -37,7 +37,7 @@
 package org.ow2.proactive.scheduler.ext.matlab.common.exception;
 
 /**
- * UnreachableLicenseProxyException
+ * UnreachableLicenseProxyException the license proxy server could not be contacted
  *
  * @author The ProActive Team
  */

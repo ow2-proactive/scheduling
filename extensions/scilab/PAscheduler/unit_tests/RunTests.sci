@@ -36,5 +36,8 @@ for i=1:nbiter
         [ok,msg] = TestTopology();
     end
     if ~ok disp(msg),return; end
+    jremove();
 end
+
+
 endfunction

@@ -56,6 +56,7 @@ function [ok, msg]=TestPATask(timeout)
         b_bias($+1) = res(1);
         b_variance($+1) = res(2);
     end
+    PAclearResults(resl);
 
     printf("\n Time: %f\n", toc());
 

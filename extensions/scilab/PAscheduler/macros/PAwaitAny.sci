@@ -30,7 +30,8 @@ function val=PAwaitAny(l,timeout)
         else
             ind = PAFuture.waitForAny(arrayList);
         end
-        jremove(arrayList,ArrayList,PAFuture);
+        jremove(arrayList);
+        //jremove(ArrayList,PAFuture);
         j=indList(ind+1);
         pares=l.matrix(j).entries;
         jinvoke(pares.waited,'set',%t);

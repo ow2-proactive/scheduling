@@ -3,7 +3,7 @@ function PAclearResults(l)
         m = size(l.matrix,2);
         //disp(m)
         R=l.matrix(1).entries;
-        PAjobRemove(R.jobid);
+        //PAjobRemove(R.jobid);
         for i=1:m
             R=l.matrix(i).entries;
             PAResult_clean(R);
