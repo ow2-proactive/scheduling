@@ -25,7 +25,11 @@ val2=PAwaitFor(resl2,timeout)
 val3=PAwaitFor(resl3,timeout)
 val4=PAwaitFor(resl4,timeout)
 val5=PAwaitFor(resl5,timeout)
-
+disp(val1);
+disp(val2);
+disp(val3);
+disp(val4);
+disp(val5);
 [ok,msg]=checkValuesFact(val1);
 if ~ok error(msg),return; end
 [ok,msg]=checkValuesFact(val2);
@@ -36,6 +40,9 @@ if ~ok error(msg),return; end
 if ~ok error(msg),return; end
 [ok,msg]=checkValuesFact(val5);
 if ~ok error(msg),return; end
+if ok then
+    disp('................................OK');
+end
 endfunction
 
 

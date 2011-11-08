@@ -87,20 +87,14 @@ for i=1:s(1)
                 load(R.outFile);
                 A{i,j} = out;
                 R.resultAcc(out);
-                R.resultSet.set(true);    
-                sched = PAScheduler;
-                sched.PATaskRepository(R.jobid, R.taskid, 'received');
-                clean(R);
+                resultSet(R);
             end             
 
         elseif RaL.isMatSciError();
             printLogs(RaL,R,true);  
             if ~R.resultSet.get()  
                 R.iserror.set(true);      
-                R.resultSet.set(true); 
-                sched = PAScheduler;
-                sched.PATaskRepository(R.jobid, R.taskid, 'received'); 
-                clean(R);
+                resultSet(R);
             end
             exception = MException('PAResult:PAwaitFor','Error during remote script execution');
         else
@@ -110,10 +104,7 @@ for i=1:s(1)
             e.printStackTrace(err);
             if ~R.resultSet.get()                
                 R.iserror.set(true);
-                R.resultSet.set(true); 
-                sched = PAScheduler;
-                sched.PATaskRepository(R.jobid, R.taskid, 'received');
-                clean(R);
+                resultSet(R);
             end
             exception = MException('PAResult:PAwaitFor','Internal Error');
         end                       
@@ -135,6 +126,13 @@ else
         end
     end
 end
+end
+
+function resultSet(R)
+R.resultSet.set(true);
+sched = PAScheduler;
+sched.PATaskRepository(R.jobid, R.taskid, 'received');
+clean(R);
 end
 
 function printLogs(RaL,R,err)

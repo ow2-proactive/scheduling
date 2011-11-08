@@ -20,7 +20,10 @@ function b=%PAResult_e(i1, R)
         end
     case 'jobid'
         b = R.jobid;
-         
+    case 'sid'
+        b = R.sid;
+    case 'dbrid'
+        b = R.dbrid;
     else
         error('PAResult::Unknown attribute : '''+i1+'''');    
     end

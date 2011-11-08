@@ -57,6 +57,9 @@
 %   */
 function PAstate()
     sched = PAScheduler;
+    if ~PAisConnected()
+        error('A connection to the ProActive scheduler is not established, see PAconnect');
+    end
     solver = sched.PAgetsolver();    
     if nargout == 1        
         varargout{1} = evalc('solver.schedulerState();');

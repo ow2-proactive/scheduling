@@ -18,15 +18,15 @@ function val=PAResult_PAwaitFor(R,timeout)
 
         if jinvoke(R.resultSet,'get')
             //disp('PAResult_PAwaitFor : Result get')
-            val=PAResult_DB(R.rid);
+            val=PAResult_DB(R.dbrid);
             //disp(val)
         else
             //disp('PAResult_PAwaitFor : Result set')
             load(R.outFile);
             val = out;
-            PAResult_DB(R.rid) = out;
+            PAResult_DB(R.dbrid) = out;
             //disp(val)
-            jinvoke(R.resultSet,'set',%t);
+            resultSet(R);
         end
 
     elseif jinvoke(RaL,'isMatSciError');
@@ -34,6 +34,7 @@ function val=PAResult_PAwaitFor(R,timeout)
         
         printLogs(R,RaL);
         jinvoke(R.iserror,'set',%t);
+        resultSet(R);
         errormessage = 'PAResult:PAwaitFor Error during remote script execution';
     else
         //disp('PAResult_PAwaitFor : internalError')
@@ -48,6 +49,7 @@ function val=PAResult_PAwaitFor(R,timeout)
         catch 
         end        
         jinvoke(R.iserror,'set',%t);
+        resultSet(R);
         errormessage = 'PAResult:PAwaitFor Internal Error';
     end
     jremove(RaL,PAFuture);
@@ -56,6 +58,28 @@ function val=PAResult_PAwaitFor(R,timeout)
     if errormessage ~= [] then
         val = [];
         error(errormessage)
+    end
+endfunction
+
+function resultSet(R)
+    global('PAResult_TasksDB')
+    jinvoke(R.resultSet,'set',%t);
+    remainingTasks = PAResult_TasksDB(R.sid);
+    ind = -1;
+    for i=1:length(remainingTasks)
+        if remainingTasks(i) == R.taskid then
+            ind = i;
+            
+        end
+    end    
+    if ind > 0 then
+        remainingTasks(ind) = null();
+    end
+    
+    PAResult_TasksDB(R.sid) = remainingTasks;
+    opt = PAoptions();
+    if opt.RemoveJobAfterRetrieve & length(remainingTasks) == 0 then
+        PAjobRemove(R.jobid);
     end
 endfunction
 

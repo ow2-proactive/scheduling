@@ -1,4 +1,4 @@
-function PAtaskResult(jobid,taskname)
+function PAjobRemove(jobid)
     global ('PA_connected');
     if ~PAisConnected()
         error('A connection to the ProActive scheduler is not established, see PAconnect');
@@ -9,6 +9,6 @@ function PAtaskResult(jobid,taskname)
     jimport org.ow2.proactive.scheduler.ext.scilab.client.ScilabSolver;
     solver = jnewInstance(ScilabSolver);            
     env = jinvoke(solver,'getEnvironment');
-    jinvoke(env,'taskResult',jobid,taskname);
+    jinvoke(env,'jobRemove',jobid);
     jremove(solver,env,ScilabSolver);
 endfunction

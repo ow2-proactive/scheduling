@@ -11,6 +11,7 @@ disp('...... Testing PAsolve with factorial');
 disp('..........................1 PAwaitFor');
 resl = PAsolve('factorial',1,2,3,4,5);
 val=PAwaitFor(resl,timeout)
+disp(val);
 [ok,msg]=checkValuesFact(val);
 if ~ok error(msg); end
 disp('..........................1 ......OK');
@@ -21,6 +22,7 @@ resl = PAsolve('factorial',1,2,3,4,5);
 for i=1:5
     val(i)=PAwaitAny(resl,timeout)
 end
+disp(val);
 val=gsort(val,"g","i");
 [ok,msg]=checkValuesFact(val);
 if ~ok error(msg); end

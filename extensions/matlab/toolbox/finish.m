@@ -37,10 +37,17 @@
 opt = PAoptions();
 try
     sched = PAScheduler;
-    tmpsolver = sched.PAgetsolver();
-    if strcmp(class(tmpsolver), 'double')
+    
+
+    solver = sched.PAgetsolver();
+    if strcmp(class(solver),'double')
         return;
     end
+    if ~PAisConnected()
+        warning('The matlab session is not connected to the scheduler, complete cleaning cannot be done');
+        pause(1);
+        return;
+    end    
     jobs = sched.PATaskRepository('uncomplete');
 
     if length(jobs) > 0

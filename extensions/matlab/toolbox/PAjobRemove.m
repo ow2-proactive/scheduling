@@ -1,30 +1,23 @@
-% PAjobResult returns or prints the textual representation of the result of the given
-% Scheduler job 
+% PAjobRemove removes the given job from the scheduler
 %
 % Syntax
 %
-%       >> PAjobResult(jobid);
-%       >> out = PAjobResult(jobid)
+%       >> PAjobRemove(jobid);       
 %
 % Inputs
 %       
 %       jobid - the id of the job (string or numeric)
 %
-% Outputs
-%
-%       out - a string containing the result
-%
 % Description
 %
-%       PAjobResult returns or prints the textual representation of the result of the given
-%       Scheduler job. This function is for convenient-use only, it is mainly 
-%       used to look at results of jobs handled by the scheduler which are not 
-%       Matlab jobs as PAjobResult won't return the actual Matlab object
-%       result. To get the actual Matlab object result, use PAgetResults.
-%       To get the output log of the given job, use PAjobOutput.
+%       PAjobRemove removes the given job from the scheduler. By default,
+%       the job is automatically removed from the scheduler when all
+%       results have been read. The option RemoveJobAfterRetrieve can be
+%       set to false to manually remove the job with the PAjobRemove
+%       function.
 %
 % See also
-%       PAgetResults, PAjobOutput, PAtaskResult, PAtaskOutput
+%       PAjobResult, PAtaskResult, PAtaskOutput
 
 %
 % /*
@@ -63,7 +56,7 @@
 %   * ################################################################
 %   * $$PROACTIVE_INITIAL_DEV$$
 %   */
-function varargout = PAjobResult(jobid)
+function PAjobRemove(jobid)
     if isnumeric(jobid)
         jobid = num2str(jobid);
     end
@@ -72,9 +65,7 @@ function varargout = PAjobResult(jobid)
     end
     sched = PAScheduler;
     solver = sched.PAgetsolver();
-    if nargout == 1        
-        varargout{1} = evalc('solver.jobResult(jobid);');
-    else             
-        solver.jobResult(jobid);
-    end
+                
+    solver.jobRemove(jobid);
+    
 end

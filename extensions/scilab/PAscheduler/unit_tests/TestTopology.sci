@@ -24,6 +24,9 @@ ok = %t;
 for e=val
     ok = ok & e;
 end
+if ok then
+    disp('................................OK');
+end
 msg=[];
 endfunction
 
