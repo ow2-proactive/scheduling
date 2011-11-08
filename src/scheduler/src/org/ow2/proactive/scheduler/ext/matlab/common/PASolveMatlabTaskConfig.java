@@ -40,7 +40,7 @@ import org.ow2.proactive.scheduler.ext.matsci.common.PASolveMatSciTaskConfig;
 
 
 /**
- * PASolveMatlabTaskConfig
+ * PASolveMatlabTaskConfig configuration of a Matlab Task
  *
  * @author The ProActive Team
  */
@@ -49,8 +49,14 @@ public class PASolveMatlabTaskConfig extends PASolveMatSciTaskConfig {
     /**  */
     private static final long serialVersionUID = 31L;
 
+    /**
+     * Toolboxes used by this task
+     */
     private String[] toolboxesUsed;
 
+    /**
+     * ID provided to the licence server when checking out a token, this id is then reused to give the token back.
+     */
     private String rid;
 
     public PASolveMatlabTaskConfig() {

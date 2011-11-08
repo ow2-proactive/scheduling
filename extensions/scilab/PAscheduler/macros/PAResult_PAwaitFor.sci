@@ -44,15 +44,17 @@ function val=PAResult_PAwaitFor(R,timeout)
         exstr = ScilabSolver.getStackTrace(e);
         printf('%s',exstr);
         try
-            jremove(e,ScilabSolver);
+            jremove(e);
             jremove(exstr);
+            //jremove(ScilabSolver);
         catch 
         end        
         jinvoke(R.iserror,'set',%t);
         resultSet(R);
         errormessage = 'PAResult:PAwaitFor Internal Error';
     end
-    jremove(RaL,PAFuture);
+    jremove(RaL);
+    //jremove(PAFuture);
 
     PAResult_clean(R);
     if errormessage ~= [] then
@@ -68,8 +70,7 @@ function resultSet(R)
     ind = -1;
     for i=1:length(remainingTasks)
         if remainingTasks(i) == R.taskid then
-            ind = i;
-            
+            ind = i;            
         end
     end    
     if ind > 0 then

@@ -16,7 +16,7 @@ function [] = PAconnect(uri,credpath)
            jinvoke(ScilabPrintStream,'setRedirect',[]);
            jremove(inst);
         end   
-        jremove(ScilabPrintStream, System);     
+        //jremove(ScilabPrintStream, System);
         if argn(2) == 2
             ex = jinvoke(solver, 'createConnection',uri, credpath);
         else       
@@ -24,7 +24,8 @@ function [] = PAconnect(uri,credpath)
         end        
         if type(ex) == 10 then            
             disp(ex); 
-            jremove(solver, ex, ScilabSolver);
+            jremove(solver, ex);
+            //jremove(ScilabSolver);
             error('PAconnect::Error while connecting');
         else            
             PA_connected = 1;
@@ -33,5 +34,6 @@ function [] = PAconnect(uri,credpath)
     else
         disp('Already connected');
     end
-    jremove(solver,ScilabSolver);
+    jremove(solver);
+    //jremove(ScilabSolver);
 endfunction

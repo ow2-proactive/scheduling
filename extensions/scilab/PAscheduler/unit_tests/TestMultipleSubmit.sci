@@ -30,6 +30,11 @@ disp(val2);
 disp(val3);
 disp(val4);
 disp(val5);
+PAclearResults(resl1);
+PAclearResults(resl2);
+PAclearResults(resl3);
+PAclearResults(resl4);
+PAclearResults(resl5);
 [ok,msg]=checkValuesFact(val1);
 if ~ok error(msg),return; end
 [ok,msg]=checkValuesFact(val2);

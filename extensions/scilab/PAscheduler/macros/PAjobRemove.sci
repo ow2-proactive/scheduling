@@ -1,7 +1,7 @@
 function PAjobRemove(jobid)
     global ('PA_connected');
-    if ~PAisConnected()
-        error('A connection to the ProActive scheduler is not established, see PAconnect');
+    if ~exists('PA_connected') | PA_connected ~= 1
+        error('A connection to the ProActive scheduler must be established in order to use PAsolve, see PAconnect');
     end
     if or(type(jobid)==[1 5 8]) then
         jobid = string(jobid);
@@ -10,5 +10,6 @@ function PAjobRemove(jobid)
     solver = jnewInstance(ScilabSolver);            
     env = jinvoke(solver,'getEnvironment');
     jinvoke(env,'jobRemove',jobid);
-    jremove(solver,env,ScilabSolver);
+    jremove(solver,env);
+    //jremove(ScilabSolver);
 endfunction

@@ -40,7 +40,7 @@ import org.ow2.proactive.scheduler.ext.matsci.common.PASolveMatSciGlobalConfig;
 
 
 /**
- * PASolveMatlabGlobalConfig
+ * PASolveMatlabGlobalConfig configuration of a Matlab PAsolve Job (a job represents a call to PAsolve)
  *
  * @author The ProActive Team
  */
@@ -48,17 +48,34 @@ public class PASolveMatlabGlobalConfig extends PASolveMatSciGlobalConfig {
 
     /**  */
     private static final long serialVersionUID = 31L;
-
+    /**
+     * URL of the script used to check licenses
+     */
     private String checkLicenceScriptUrl = null;
 
+    /**
+     * Options used when writing MAT files (binary Matlab files)
+     */
     private String matFileOptions = null;
 
+    /**
+     * URL of the license server proxy
+     */
     private String licenseServerUrl = null;
 
+    /**
+     * Name of the matlab function used to keep checked out tokens alive. This function is executed periodically by matlab.
+     */
     private String keepaliveCallbackFunctionName = null;
 
+    /**
+     * Name of the matlab function used to check out toolboxes tokens right after matlab starts.
+     */
     private String checktoolboxesFunctionName = null;
 
+    /**
+     * Do we use Matlab Control or standard matlab batch mode
+     */
     private boolean useMatlabControl = false;
 
     public PASolveMatlabGlobalConfig() {

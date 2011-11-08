@@ -12,6 +12,7 @@ disp('..........................1 PAwaitFor');
 resl = PAsolve('factorial',1,2,3,4,5);
 val=PAwaitFor(resl,timeout)
 disp(val);
+PAclearResults(resl);
 [ok,msg]=checkValuesFact(val);
 if ~ok error(msg); end
 disp('..........................1 ......OK');
@@ -22,6 +23,7 @@ resl = PAsolve('factorial',1,2,3,4,5);
 for i=1:5
     val(i)=PAwaitAny(resl,timeout)
 end
+PAclearResults(resl);
 disp(val);
 val=gsort(val,"g","i");
 [ok,msg]=checkValuesFact(val);
@@ -40,6 +42,7 @@ catch
     disp('Error occured');
 end
 val2=PAwaitFor(resl(5),timeout)
+PAclearResults(resl);
 val($+1) = val2;
 [ok,msg]=checkValuesSquare2(val);
 if ~ok error(msg); end
@@ -60,6 +63,7 @@ for i=1:5
         disp('Error occured');
     end
 end
+PAclearResults(resl);
 val=gsort(val,"g","i");
 [ok,msg]=checkValuesSquare2(val);
 if ~ok error(msg); end

@@ -61,9 +61,9 @@ import java.util.Map;
  * This class represents the executable of a MATLAB task. It's configuration is
  * composed of :
  * <ul>
- * <li>An instance of {@link PASolveMatlabGlobalConfig}: The global configuration.
- * <li>An instance of {@link PASolveMatlabTaskConfig}: The task configuration.
- * <li>An instance of {@link MatlabEngineConfig}: The task configuration.
+ * <li>An instance of {@link PASolveMatlabGlobalConfig}: The global PAsolve job configuration.
+ * <li>An instance of {@link PASolveMatlabTaskConfig}: The PAsolve task configuration.
+ * <li>An instance of {@link MatlabEngineConfig}: The local matlab engine configuration.
  * </ul>
  * The incoming calls order are: the {@link MatlabExecutable#MatlabExecutable()},
  * the {@link MatlabExecutable#init(Map)} method is called, then the {@link MatlabExecutable#execute(TaskResult...)} method.
@@ -80,11 +80,8 @@ public class MatlabExecutable extends JavaExecutable {
     /** The name of the property that defines MATLAB preferences directory */
     public static final String MATLAB_PREFDIR = "matlab.prefdir";
 
-    /** The ISO8601 for debug format of the date that precedes the log message */
-    private static final SimpleDateFormat ISO8601FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:sss");
-
-    private static String HOSTNAME;
-    private static String NODENAME;
+    protected static String HOSTNAME;
+    protected static String NODENAME;
 
     static {
         try {
@@ -93,6 +90,9 @@ public class MatlabExecutable extends JavaExecutable {
         } catch (Exception e) {
         }
     }
+
+    /** The ISO8601 for debug format of the date that precedes the log message */
+    protected static final SimpleDateFormat ISO8601FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:sss");
 
     /** For debug purpose see {@link MatlabExecutable#createLogFileOnDebug()} */
     private FileOutputStream debugfos;
@@ -262,6 +262,11 @@ public class MatlabExecutable extends JavaExecutable {
 
     /*********** PRIVATE METHODS ***********/
 
+    /**
+     * Initialize the Matlab Engine configuration
+     * @return the found configuration
+     * @throws Exception if no valid configuration could be found.
+     */
     protected MatSciEngineConfig initMatlabConfig() throws Exception {
         MatlabEngineConfig conf = (MatlabEngineConfig) MatlabEngineConfig.getCurrentConfiguration();
         if (conf == null) {
@@ -276,6 +281,10 @@ public class MatlabExecutable extends JavaExecutable {
         return matlabEngineConfig;
     }
 
+    /**
+     * Initialize the local DataSpace
+     * @throws Exception
+     */
     private void initLocalSpace() throws Exception {
         final DataSpacesFileObject dsLocalSpace = this.getLocalSpace();
         final String dsURI = dsLocalSpace.getRealURI();
@@ -309,6 +318,10 @@ public class MatlabExecutable extends JavaExecutable {
         this.paconfig.setLocalSpace(new URI(dsURI));
     }
 
+    /**
+     * Check that source files have been transferred and unzip them locally
+     * @throws Exception
+     */
     private void initTransferSource() throws Exception {
         // The sources are ALWAYS transfered and zipped
         String sourceZipFileName = taskconfig.getSourceZipFileName();
@@ -340,6 +353,10 @@ public class MatlabExecutable extends JavaExecutable {
         }
     }
 
+    /**
+     * Checks that the remote Matlab environnment has been transferred
+     * @throws Exception
+     */
     private void initTransferEnv() throws Exception {
         if (!paconfig.isTransferEnv()) {
             return;
@@ -350,6 +367,10 @@ public class MatlabExecutable extends JavaExecutable {
 
     }
 
+    /**
+     * Checks that the input files have been transferred, unzip them if asked
+     * @throws Exception
+     */
     private void initTransferInputFiles() throws Exception {
         if (taskconfig.isInputFilesThere() && paconfig.isZipInputFiles()) {
             int n = taskconfig.getInputFilesZipNames().length;
@@ -378,6 +399,10 @@ public class MatlabExecutable extends JavaExecutable {
         }
     }
 
+    /**
+     * Checks that input variables have been transferred
+     * @throws Exception
+     */
     private void initTransferVariables() throws Exception {
 
         taskconfig.setInputVariablesFileURI(new URI(getLocalFile(

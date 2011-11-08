@@ -36,6 +36,11 @@
  */
 package org.ow2.proactive.scheduler.ext.matlab.common.exception;
 
+/**
+ * MatlabInitException an exception occurred during Matlab initialization
+ *
+ * @author The ProActive Team
+ */
 public class MatlabInitException extends RuntimeException {
     /**  */
     private static final long serialVersionUID = 31L;

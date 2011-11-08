@@ -143,9 +143,10 @@ end
 [globalFilesToClean,taskFilesToClean,pa_dir,curr_dir,fs,subdir] = initDirectories(opt,solve_config,NN,solveid);
 
 % Initializing data spaces
-[keepaliveFunctionName,checktoolboxesFunctionName] = initDS(opt,solve_config,curr_dir);
+initDS(opt,solve_config,curr_dir);
 
-
+% Initialize Remote functions
+[keepaliveFunctionName,checktoolboxesFunctionName]= initRemoteFunctions(solve_config);
 
 % Transfering source files
 [funcDatabase,taskFilesToClean] = initTransferSource(opt,fs,solveid,funcDatabase,sched,allfuncs,...
@@ -213,6 +214,7 @@ end
 
 end
 
+% Parse command line parameters
 function [Tasks, NN, MM]=parseParams(varargin)
 if isa(varargin{1}, 'function_handle')
     Func = varargin{1};
@@ -260,7 +262,7 @@ end
 
 end
 
-
+% Initalize used functions (check dependencies)
 function [funcDatabase,allfuncs] = initFunctions(Tasks,task_config, NN, MM,sched)
 v=version;
 [vmaj rem] = strtok(v, '.');
@@ -325,37 +327,9 @@ for i=1:NN
 end
 end
 
-function initOtherTCAttributes(NN,MM, task_config, Tasks)
-for i=1:NN
-    for j=1:MM
-        task_config(i,j).setDescription(Tasks(j,i).Description);
-        if ischar(Tasks(j,i).SelectionScript)
-            select = Tasks(j,i).SelectionScript;
-            try
-                java.net.URL(select);
-                ok = true;
-            catch ME
-                ok = false;
-            end
-            
-            if ~ok
-                task_config(i,j).setCustomScriptUrl(['file:' select]);
-            else
-                task_config(i,j).setCustomScriptUrl(select);
-            end
-        end
-        if Tasks(j,i).NbNodes > 1
-            if ~ischar(Tasks(j,i).Topology)
-                error(['PAsolve::Topology is not defined in Task ' num2str(j) ',' num2str(i) ' with NbNodes > 1.']);
-            end
-            task_config(i,j).setNbNodes(Tasks(j,i).NbNodes);
-            task_config(i,j).setTopology(Tasks(j,i).Topology);
-            task_config(i,j).setThresholdProximity(Tasks(j,i).ThresholdProximity);
-        end
-    end
-end
-end
 
+
+% Initilize directories used
 function [globalFilesToClean,taskFilesToClean,pa_dir,curr_dir,fs,subdir] = initDirectories(opt,solve_config,NN,solveid)
 
 fs = filesep;
@@ -404,7 +378,8 @@ end
 subdir = [subdir '/' num2str(solveid)];
 end
 
-function [keepaliveFunctionName,checktoolboxesFunctionName]= initDS(opt,solve_config,curr_dir)
+% Initialize Data Spaces
+function initDS(opt,solve_config,curr_dir)
 
 if isnumeric(opt.CustomDataspaceURL) && isempty(opt.CustomDataspaceURL)
     helper = org.ow2.proactive.scheduler.ext.matsci.client.DataspaceHelper.getInstance();
@@ -417,12 +392,65 @@ else
     solve_config.setInputSpaceURL(opt.CustomDataspaceURL);
 end
 
+
+end
+
+% Initialize Remote Functions
+function [keepaliveFunctionName,checktoolboxesFunctionName] = initRemoteFunctions(solve_config)
 keepaliveFunctionName = 'keepalive_callback_fcn';
 solve_config.setKeepaliveCallbackFunctionName(keepaliveFunctionName);
 checktoolboxesFunctionName = 'checktoolboxes_start_and_hide_desktop';
 solve_config.setChecktoolboxesFunctionName(checktoolboxesFunctionName);
 end
 
+% Initialize Global PASolve Config
+function initSolveConfig(solve_config,opt,sched)
+solve_config.setDebug(opt.Debug);
+lgin = sched.PAgetlogin();
+solve_config.setLogin(lgin);
+solve_config.setTimeStamp(opt.TimeStamp);
+solve_config.setPriority(opt.Priority);
+solve_config.setTransferEnv(opt.TransferEnv);
+solve_config.setMatFileOptions(opt.TransferMatFileOptions);
+solve_config.setLicenseServerUrl(opt.LicenseServerURL);
+solve_config.setFork(opt.Fork);
+solve_config.setRunAsMe(opt.RunAsMe);
+solve_config.setWindowsStartupOptionsAsString(opt.WindowsStartupOptions);
+solve_config.setLinuxStartupOptionsAsString(opt.LinuxStartupOptions);
+
+solve_config.setInputSpaceName('MatlabInputSpace');
+solve_config.setOutputSpaceName('MatlabOutputSpace');
+
+solve_config.setVersionPref(opt.VersionPref);
+solve_config.setVersionRejAsString(opt.VersionRej);
+solve_config.setVersionMin(opt.VersionMin);
+solve_config.setVersionMax(opt.VersionMax);
+solve_config.setCheckMatSciUrl(opt.FindMatlabScript);
+solve_config.setCheckLicenceScriptUrl(opt.MatlabReservationScript);
+if ischar(opt.CustomScript)
+    select = opt.CustomScript
+    try
+        java.net.URL(select);
+        ok = true;
+    catch ME
+        ok = false;
+    end
+
+    if ~ok
+        solve_config.setCustomScriptUrl(['file:' select]);
+    else
+        solve_config.setCustomScriptUrl(select);
+    end
+end
+solve_config.setZipInputFiles(opt.ZipInputFiles);
+solve_config.setZipOutputFiles(opt.ZipOutputFiles);
+solve_config.setZipSourceFiles(true);
+solve_config.setUseMatlabControl(opt.UseMatlabControl);
+end
+
+
+
+% Initialize task config for Tansfer source (zip function used)
 function [funcDatabase,taskFilesToClean] = initTransferSource(opt, fs, solveid,funcDatabase,sched,allfuncs, NN, MM,Tasks,keepaliveFunctionName,checktoolboxesFunctionName,taskFilesToClean,task_config,pa_dir)
 sourceZipBaseName = ['MatlabPAsolveSrc_' num2str(solveid)];
 
@@ -524,6 +552,7 @@ for i=1:NN
 end
 end
 
+% Initialize Task Config Input Files
 function [taskFilesToClean] = initInputFiles(NN,MM,Tasks,opt,fs,taskFilesToClean,task_config,subdir,pa_dir)
 for i=1:NN
     for j=1:MM
@@ -567,6 +596,7 @@ for i=1:NN
 end
 end
 
+% Initialize Task Config Output Files
 function [taskFilesToClean] = initOutputFiles(NN,MM,Tasks,opt,subdir,pa_dir,taskFilesToClean,task_config)
 outputFilesLists = [];
 outputFiles = [];
@@ -614,6 +644,7 @@ for i=1:NN
 end
 end
 
+% Initialize Task Config Input Parameters
 function [input,main,taskFilesToClean,outVarFiles]=initParameters(solveid,NN,MM,Tasks,opt,taskFilesToClean,task_config,allfuncs,pa_dir,fs)
 
 input = 'i=0;';
@@ -665,8 +696,8 @@ for i=1:NN
             end
 
 
-        % Creating the rest of the command (evaluation of the user function)
-
+        % Creating the rest of the command (evaluation of the user
+        % function)
         main = [main 'out = ' allfuncs(i,j).s(2:end) '('];
 
         if j > 1 && length(argi) > 0 && Tasks(j,i).Compose
@@ -688,48 +719,36 @@ for i=1:NN
 end
 end
 
-function initSolveConfig(solve_config,opt,sched)
-solve_config.setDebug(opt.Debug);
-lgin = sched.PAgetlogin();
-solve_config.setLogin(lgin);
-solve_config.setTimeStamp(opt.TimeStamp);
-solve_config.setPriority(opt.Priority);
-solve_config.setTransferEnv(opt.TransferEnv);
-solve_config.setMatFileOptions(opt.TransferMatFileOptions);
-solve_config.setLicenseServerUrl(opt.LicenseServerURL);
-solve_config.setFork(opt.Fork);
-solve_config.setRunAsMe(opt.RunAsMe);
-solve_config.setWindowsStartupOptionsAsString(opt.WindowsStartupOptions);
-solve_config.setLinuxStartupOptionsAsString(opt.LinuxStartupOptions);
-
-solve_config.setInputSpaceName('MatlabInputSpace');
-solve_config.setOutputSpaceName('MatlabOutputSpace');
-
-solve_config.setVersionPref(opt.VersionPref);
-solve_config.setVersionRejAsString(opt.VersionRej);
-solve_config.setVersionMin(opt.VersionMin);
-solve_config.setVersionMax(opt.VersionMax);
-solve_config.setCheckMatSciUrl(opt.FindMatlabScript);
-solve_config.setCheckLicenceScriptUrl(opt.MatlabReservationScript);
-if ischar(opt.CustomScript)
-    select = opt.CustomScript
-    try
-        java.net.URL(select);
-        ok = true;
-    catch ME
-        ok = false;
-    end
-
-    if ~ok
-        solve_config.setCustomScriptUrl(['file:' select]);
-    else
-        solve_config.setCustomScriptUrl(select);
+% Initialize other task config attributes
+function initOtherTCAttributes(NN,MM, task_config, Tasks)
+for i=1:NN
+    for j=1:MM
+        task_config(i,j).setDescription(Tasks(j,i).Description);
+        if ischar(Tasks(j,i).SelectionScript)
+            select = Tasks(j,i).SelectionScript;
+            try
+                java.net.URL(select);
+                ok = true;
+            catch ME
+                ok = false;
+            end
+            
+            if ~ok
+                task_config(i,j).setCustomScriptUrl(['file:' select]);
+            else
+                task_config(i,j).setCustomScriptUrl(select);
+            end
+        end
+        if Tasks(j,i).NbNodes > 1
+            if ~ischar(Tasks(j,i).Topology)
+                error(['PAsolve::Topology is not defined in Task ' num2str(j) ',' num2str(i) ' with NbNodes > 1.']);
+            end
+            task_config(i,j).setNbNodes(Tasks(j,i).NbNodes);
+            task_config(i,j).setTopology(Tasks(j,i).Topology);
+            task_config(i,j).setThresholdProximity(Tasks(j,i).ThresholdProximity);
+        end
     end
 end
-solve_config.setZipInputFiles(opt.ZipInputFiles);
-solve_config.setZipOutputFiles(opt.ZipOutputFiles);
-solve_config.setZipSourceFiles(true);
-solve_config.setUseMatlabControl(opt.UseMatlabControl);
 end
 
 

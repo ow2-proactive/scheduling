@@ -14,375 +14,64 @@ function outputs = PAsolve(varargin)
     if typeof(PAResult_TasksDB) ~= 'list'
         PAResult_TasksDB = list();
     end
-
+    
     opt=PAoptions();
-
+    
     deff ("y=ischar(x)","y=type(x)==10","n");
-    if ischar(varargin(1)) then
-        Func = varargin(1);
-        NN=length(varargin)-1; 
-        Tasks = PATask(1,NN);       
-        Tasks(1,1:NN).Func = Func;
-        for i=1:NN      
-            if typeof(varargin(i+1)) == 'list'      
-                Tasks(1,i).Params =varargin(i+1);
-            else
-                Tasks(1,i).Params =list(varargin(i+1));
-            end
-        end
-        MM = 1;
-    elseif typeof(varargin(1)) == 'PATask'
-        if length(varargin) == 1
-            Tasks = varargin(1);
-            NN = size(Tasks,2);
-            MM = size(Tasks,1);
-        else
-            NN=argn(2);
-            MM = -1;
-            for i=1:NN
-                if typeof(varargin(i)) == 'PATask'
-                    if (size(varargin(i),2) ~= 1)
-                        error(strcat(['parameter ', string(i), ' should be a column vector.']));
-                    end
-                    sz = size(varargin(i),1);
-                    if MM == -1
-                        MM = sz;
-                        Tasks=PATask(MM,NN);
-                    elseif MM ~= sz
-                        error(strcat(['parameter ', string(i), ' should be a column vector of the same length than other parameters.']));
-                    end
-                    Tasks(1:sz,i) = varargin(i);
-                else
-                    error(strcat(['parameter ', num2str(i), ' is a ', typeof(varargin(i)), ', expected PATask instead.']));
-                end
-            end
 
-        end
-    end
+    [Tasks, NN, MM]=parseParams(varargin(:));
+
+    
+
+    initJavaStack();
 
     jimport org.ow2.proactive.scheduler.ext.scilab.common.PASolveScilabGlobalConfig;
     jimport org.ow2.proactive.scheduler.ext.scilab.common.PASolveScilabTaskConfig;
-    jimport org.ow2.proactive.scheduler.ext.common.util.FileUtils;
-    jimport org.ow2.proactive.scheduler.ext.matsci.client.AODataspaceRegistry;
-    jimport java.lang.String;
-    jimport java.net.URL;
-    jimport java.io.File;
-    
-    initJavaStack();
-    addJavaObj(PASolveScilabGlobalConfig);
-    addJavaObj(PASolveScilabTaskConfig); 
-    addJavaObj(FileUtils);
-    addJavaObj(AODataspaceRegistry);
-    addJavaObj(String);
-    addJavaObj(URL);
-    addJavaObj(File);
+    jimport org.ow2.proactive.scheduler.ext.common.util.FileUtils;       
+        
+    //addJavaObj(PASolveScilabGlobalConfig);
+    //addJavaObj(PASolveScilabTaskConfig); 
+    //addJavaObj(FileUtils);
+            
 
     solve_config = jnewInstance(PASolveScilabGlobalConfig);
     addJavaObj(solve_config);
-
-    solve_config.setDebug(opt.Debug);
-    solve_config.setTimeStamp(opt.TimeStamp);
-    solve_config.setFork(opt.Fork);
-    solve_config.setRunAsMe(opt.RunAsMe);
-    solve_config.setPriority(opt.Priority);
-    solve_config.setTransferSource(opt.TransferSource);
-    //solve_config.setTransferEnv(opt.TransferEnv);
-    solve_config.setTransferVariables(opt.TransferVariables);
-    solve_config.setKeepEngine(opt.KeepEngine);
-    jinvoke(solve_config,'setWindowsStartupOptionsAsString',opt.WindowsStartupOptions);
-    jinvoke(solve_config,'setLinuxStartupOptionsAsString',opt.LinuxStartupOptions);
-
-    solve_config.setInputSpaceName('ScilabInputSpace');
-    solve_config.setOutputSpaceName('ScilabOutputSpace');
-
-    solve_config.setVersionPref(opt.VersionPref);
-    solve_config.setVersionRejAsString(opt.VersionRej);
-    solve_config.setVersionMin(opt.VersionMin);
-    solve_config.setVersionMax(opt.VersionMax);
-    solve_config.setCheckMatSciUrl(opt.FindScilabScript);
-    if ischar(opt.CustomScript)
-        selects = opt.CustomScript
-        try
-            url=URL.new(selects);            
-            ok = true;
-        catch 
-            ok = false;
-        end
-        jremove(url);
-
-        if ~ok            
-            solve_config.setCustomScriptUrl(strcat(['file:', selects]));
-        else
-            solve_config.setCustomScriptUrl(selects);
-        end
-    end
-
-    solve_config.setZipSourceFiles(%f);
-
-    curr_dir = pwd();
-    fs=filesep();
-    curr_dir_java = File.new(curr_dir);
-    addJavaObj(curr_dir_java);
-    if ~jinvoke(curr_dir_java,'canWrite')
-        clearJavaStack();       
-        error('Current Directory should have write access rights');
-    end    
-    // PAScheduler sub directory init
-
-    subdir = '.PAScheduler';
-    solve_config.setTempSubDirName(subdir);
-
-    if isempty(opt.CustomDataspaceURL)
-        if ~isdir(strcat([curr_dir, fs, subdir]))
-            mkdir(curr_dir,subdir);
-        end
-        pa_dir = strcat([curr_dir, fs, subdir]);
-    else
-        if isempty(opt.CustomDataspacePath)
-            clearJavaStack();    
-            error('if CustomDataspaceURL is specified, CustomDataspacePath must be specified also');
-        end
-        if ~isdir(strcat([opt.CustomDataspacePath, fs, subdir]))
-            mkdir(opt.CustomDataspacePath,subdir);
-        end
-        pa_dir = strcat([opt.CustomDataspacePath, fs, subdir]);
-    end
-
-    if isempty(opt.CustomDataspaceURL)                
-        if ~exists('DataRegistryInit') | DataRegistryInit ~= 1
-            DataRegistry = AODataspaceRegistry.new('ScilabInputSpace','ScilabOutputSpace','ScilabSession',opt.Debug);
-            DataRegistryInit = 1;
-        end
-        pair = DataRegistry.createDataSpace(curr_dir);
-        addJavaObj(pair);
-        px=jinvoke(pair,'getX');
-        py=jinvoke(pair,'getY');
-        addJavaObj(px);
-        addJavaObj(py);
-        pxs = jcast(px,'java.lang.String');
-        pys = jcast(py,'java.lang.String');
-        addJavaObj(pxs);
-        addJavaObj(pys);
-        solve_config.setInputSpaceURL(pxs);
-        solve_config.setOutputSpaceURL(pys);
-        if opt.Debug then
-            disp('using Dataspace:')
-            disp(pxs)
-        end
-
-    else
-        solve_config.setOutputSpaceURL(opt.CustomDataspaceURL);
-        solve_config.setInputSpaceURL(opt.CustomDataspaceURL);
-    end
     
-
-    variableInFileBaseName = ['ScilabPAsolveVarIn_' string(SOLVEid)];
-    variableOutFileBaseName = ['ScilabPAsolveVarOut_' string(SOLVEid)];
-    outVarFiles = list(NN);
-    //tmpFiles = list();
-    taskFilesToClean = list();
-
     task_configs = jarray('org.ow2.proactive.scheduler.ext.scilab.common.PASolveScilabTaskConfig', NN,MM);
     addJavaObj(task_configs);
-    for i=1:NN
-        taskFilesToClean($+1)=list();
+    for i=1:NN       
         for j=1:MM
             t_conf = jnewInstance(PASolveScilabTaskConfig);
             addJavaObj(t_conf);
             task_configs(i-1,j-1) = t_conf;
-            if ~isempty(Tasks(j,i).Description) then
-                t_conf.setDescription(Tasks(j,i).Description);
-            end
-
-
-            // Input Files
-            if ~isempty(Tasks(j,i).InputFiles) then
-                ilen = length(Tasks(j,i).InputFiles);
-                if ilen > 0 then
-                    inputFiles = jarray('java.lang.String', ilen);
-                    addJavaObj(inputFiles);
-                    filelist = Tasks(j,i).InputFiles;
-                    for k=1:ilen
-                        filename = filelist(k);
-                        ifstr = String.new(strsubst(filename,'\','/'));
-                        addJavaObj(ifstr);
-                        inputFiles(k-1)=ifstr;
-                    end
-
-                    t_conf.setInputFiles(inputFiles);
-                    t_conf.setInputFilesThere(%t);
-                end                
-            end
-
-            // Output Files
-            if ~isempty(Tasks(j,i).OutputFiles) then
-                filelist = Tasks(j,i).OutputFiles;
-                ilen = length(filelist);
-                if ilen > 0 then
-                    outputFiles = jarray('java.lang.String', ilen);
-                    addJavaObj(outputFiles);
-                    for k=1:ilen
-                        filename = filelist(k);
-                        ofstr = String.new(strsubst(filename,'\','/'));
-                        addJavaObj(ofstr);
-                        outputFiles(k-1)=ofstr;
-                    end
-
-                    t_conf.setOutputFiles(outputFiles);
-                    t_conf.setOutputFilesThere(%t);
-                end
-            end
-
-            // Custom Script
-            if ~isempty(Tasks(j,i).SelectionScript) then
-                selects = Tasks(j,i).SelectionScript;                
-                try
-                    url = URL.new(selects);
-                    ok = %t;
-                catch 
-                    ok = %f;
-                end
-                jremove(url);
-
-                if ~ok
-                    t_conf.setCustomScriptUrl(strcat(['file:', selects ]));
-                else
-                    t_conf.setCustomScriptUrl(selects);
-                end
-            end   
-            
-            // Topology
-            if Tasks(j,i).NbNodes > 1 then
-                if ~(type(Tasks(j,i).Topology) == 10)
-                    error('PAsolve::Topology is not defined in Task '+string(j)+','+string(i)+' with NbNodes > 1.');
-                end
-                t_conf.setNbNodes(Tasks(j,i).NbNodes);
-                t_conf.setTopology(Tasks(j,i).Topology);
-                t_conf.setThresholdProximity(Tasks(j,i).ThresholdProximity);
-            end   
-
-
-            // Function
-            Func = Tasks(j,i).Func;
-            execstr(strcat(['functype = type(';Func;');']));
-            if (functype <> 13) & (functype <> 11)  then
-                clearJavaStack();
-                error('invalid function type for function ""' + Func + '"". Consider calling this function with a macro instead.');
-            end
-
-            // Source Files
-
-            if ~isempty(Tasks(j,i).Sources) then
-                srcs = Tasks(j,i).Sources;                                
-                for k=1:length(srcs)
-                    srcPath = srcs(k);
-                    if isfile(srcPath) then
-                        [ppath,fname,extension]=fileparts(srcPath);
-                        srcName = strcat(strcat([fname,extension]));
-                        
-                        if opt.Debug then
-                            disp(strcat(['Copying file ', srcPath, ' to ',pa_dir]));
-                        end
-                        copyfile(srcPath,pa_dir);
-                        // TODO find a cleaning mechanisme
-                        //taskFilesToClean(i)=lstcat(taskFilesToClean(i), list(pa_dir+fs+fname+extension));
-                        //tmpFiles($+1)=strcat([pa_dir,fs,fname,extension]);
-                        
-                        strName = String.new(srcName);
-                        addJavaObj(strName);
-                        t_conf.addSourceFile(strName);
-                    else
-                        clearJavaStack();
-                        error(strcat(['Source file ', srcPath, ' cannot be found']));
-                    end
-
-                end
-
-
-            end
-
-            // Saving main function name (with or without Sources attribute)
-            sourceNames = jarray('java.lang.String', 1);
-            addJavaObj(sourceNames);
-            sFN = 'ScilabPAsolve_src'+string(SOLVEid)+indToFile([i j])+'.bin';
-            execstr('save(pa_dir+fs+sFN,'+Func+');');
-            strName = String.new(sFN);
-            addJavaObj(strName);
-            sourceNames(0) = strName;
-            t_conf.setFunctionVarFiles(sourceNames);                
-            code=[];
-            taskFilesToClean(i)=lstcat(taskFilesToClean(i), list(pa_dir+fs+sFN));
-
-
-            t_conf.setFunctionName(Func);
-            t_conf.addSourceFile(sFN);
-
-            // Params
-            argi = Tasks(j,i).Params;
-            if opt.TransferVariables
-                inVarFN = strcat([variableInFileBaseName, indToFile([i j]), '.dat']);
-                outVarFN = strcat([variableOutFileBaseName, indToFile([i j]), '.dat']);
-                inVarFP = strcat([pa_dir, fs, inVarFN]);
-                outVarFP = strcat([pa_dir, fs, outVarFN]);
-                // Creating input parameters mat files
-                fd=mopen(inVarFP,'wb'); 
-                inl = argi;
-                if length(inl) == 0
-                    inl=list(%t);
-                end
-                for k=1:length(inl)
-                    execstr('in'+string(k)+'=inl(k);');
-                    execstr('save(fd,in'+string(k)+')');
-                end
-                mclose(fd);
-
-                jinvoke(t_conf,'setInputVariablesFileName',inVarFN);
-                jinvoke(t_conf,'setOutputVariablesFileName',outVarFN);
-                if j > 1 & Tasks(j,i).Compose
-                    cinVarFN = strcat([variableOutFileBaseName,indToFile([i j-1]),'.dat']);
-                    cinVarFP = pa_dir+fs+cinVarFN;                    
-                    jinvoke(t_conf,'setComposedInputVariablesFileName',cinVarFN);                    
-                end
-                outVarFiles(i) = outVarFP;
-                taskFilesToClean(i)=lstcat(taskFilesToClean(i), list(inVarFP));
-                //if j < MM
-                // because of disconnected mode, the final out is handled
-                //differently
-                taskFilesToClean(i)=lstcat(taskFilesToClean(i), list(outVarFP));
-                //end
-
-                inputscript = 'i=0';
-            else
-                inputscript = createInputScript(argi);
-            end            
-
-            t_conf.setInputScript(inputscript);
-
-            //mainScript = createMainScript(Func, opt);
-            mainScript = 'out = '+Tasks(j,i).Func+'(';
-            if j > 1 & Tasks(j,i).Compose
-                mainScript = mainScript + 'in';
-                if length(argi) > 0 then
-                    mainScript = mainScript + ',';
-                end
-            end
-            if length(argi) > 0
-                for k=1:length(argi)-1
-                    mainScript = mainScript + 'in'+string(k)+',';
-                end
-                mainScript = mainScript + ('in'+string(length(argi)));
-            end
-            mainScript = mainScript + ');';
-            t_conf.setMainScript(mainScript);
-
-            t_conf.setOutputs('out');
-
         end
     end
+    
+    
+    
+    
+
+    initSolveConfig(solve_config, opt);
+
+    [taskFilesToClean,pa_dir,curr_dir,fs,subdir] = initDirectories(opt,solve_config,NN,SOLVEid);
+
+    initDS(solve_config,opt);              
+    
+    
+    taskFilesToClean = initTransferSource(task_configs,solve_config,opt,Tasks, SOLVEid,taskFilesToClean, pa_dir,fs,NN,MM);
+    
+    initInputFiles(task_configs,solve_config,opt,Tasks,NN,MM);
+    
+    initOutputFiles(task_configs,solve_config,opt,Tasks,NN,MM);
+    
+    [outVarFiles, inputscript, mainScript,taskFilesToClean] = initParameters(task_configs,solve_config,opt,Tasks,pa_dir,fs,NN,MM,taskFilesToClean);
+    
+    initOtherTCAttributes(NN,MM, task_configs, Tasks);
+        
     jimport org.ow2.proactive.scheduler.ext.scilab.client.ScilabSolver;
     jimport org.objectweb.proactive.api.PAFuture;
-    addJavaObj(ScilabSolver);
-    addJavaObj(PAFuture);
+    //addJavaObj(ScilabSolver);
+    //addJavaObj(PAFuture);
     
     solver = jnewInstance(ScilabSolver);
     addJavaObj(solver);
@@ -423,6 +112,401 @@ function outputs = PAsolve(varargin)
     outputs = PAResL(results);
     clearJavaStack();
 
+endfunction
+
+// Parse command line parameters
+function [Tasks, NN, MM]=parseParams(varargin)
+    
+    if ischar(varargin(1)) then
+        Func = varargin(1);
+        NN=length(varargin)-1; 
+        Tasks = PATask(1,NN);       
+        Tasks(1,1:NN).Func = Func;
+        for i=1:NN      
+            if typeof(varargin(i+1)) == 'list'      
+                Tasks(1,i).Params =varargin(i+1);
+            else
+                Tasks(1,i).Params =list(varargin(i+1));
+            end
+        end
+        MM = 1;
+    elseif typeof(varargin(1)) == 'PATask'
+        if length(varargin) == 1
+            Tasks = varargin(1);
+            NN = size(Tasks,2);
+            MM = size(Tasks,1);
+        else
+            NN=argn(2);
+            MM = -1;
+            for i=1:NN
+                if typeof(varargin(i)) == 'PATask'
+                    if (size(varargin(i),2) ~= 1)
+                        error(strcat(['parameter ', string(i), ' should be a column vector.']));
+                    end
+                    sz = size(varargin(i),1);
+                    if MM == -1
+                        MM = sz;
+                        Tasks=PATask(MM,NN);
+                    elseif MM ~= sz
+                        error(strcat(['parameter ', string(i), ' should be a column vector of the same length than other parameters.']));
+                    end
+                    Tasks(1:sz,i) = varargin(i);
+                else
+                    error(strcat(['parameter ', string(i), ' is a ', typeof(varargin(i)), ', expected PATask instead.']));
+                end
+            end
+
+        end
+    end
+endfunction
+
+// Initialize used directories
+function [taskFilesToClean,pa_dir,curr_dir,fs,subdir] = initDirectories(opt,solve_config,NN,solveid)
+    jimport java.io.File;
+    //addJavaObj(File);   
+    curr_dir = pwd();
+    fs=filesep();
+    curr_dir_java = jnewInstance(File,curr_dir);
+    addJavaObj(curr_dir_java);
+    if ~jinvoke(curr_dir_java,'canWrite')
+        clearJavaStack();       
+        error('Current Directory should have write access rights');
+    end    
+    // PAScheduler sub directory init
+
+    subdir = '.PAScheduler';
+    solve_config.setTempSubDirName(subdir);
+
+    if isempty(opt.CustomDataspaceURL)
+        if ~isdir(strcat([curr_dir, fs, subdir]))
+            mkdir(curr_dir,subdir);
+        end
+        pa_dir = strcat([curr_dir, fs, subdir]);
+    else
+        if isempty(opt.CustomDataspacePath)
+            clearJavaStack();    
+            error('if CustomDataspaceURL is specified, CustomDataspacePath must be specified also');
+        end
+        if ~isdir(strcat([opt.CustomDataspacePath, fs, subdir]))
+            mkdir(opt.CustomDataspacePath,subdir);
+        end
+        pa_dir = strcat([opt.CustomDataspacePath, fs, subdir]);
+    end
+    
+    taskFilesToClean=list();
+    for i=1:NN
+        taskFilesToClean($+1)=list();
+    end
+endfunction
+
+// Initialize Data Spaces
+function initDS(solve_config,opt)
+    global('DataRegistryInit', 'DataRegistry')
+    jimport org.ow2.proactive.scheduler.ext.matsci.client.AODataspaceRegistry;
+    //addJavaObj(AODataspaceRegistry); 
+    if isempty(opt.CustomDataspaceURL)                
+        if ~exists('DataRegistry') | typeof(DataRegistry) ~= '_JObj' | ~jexists(DataRegistry)
+            DataRegistry = jnewInstance(AODataspaceRegistry,'ScilabInputSpace','ScilabOutputSpace','ScilabSession',opt.Debug);
+            DataRegistryInit = 1;
+        end
+        pair = DataRegistry.createDataSpace(curr_dir);
+        addJavaObj(pair);
+        px=jinvoke(pair,'getX');
+        py=jinvoke(pair,'getY');
+        addJavaObj(px);
+        addJavaObj(py);
+        pxs = jcast(px,'java.lang.String');
+        pys = jcast(py,'java.lang.String');
+        addJavaObj(pxs);
+        addJavaObj(pys);
+        solve_config.setInputSpaceURL(pxs);
+        solve_config.setOutputSpaceURL(pys);
+        if opt.Debug then
+            disp('using Dataspace:')
+            disp(pxs)
+        end
+
+    else
+        solve_config.setOutputSpaceURL(opt.CustomDataspaceURL);
+        solve_config.setInputSpaceURL(opt.CustomDataspaceURL);
+    end
+endfunction
+
+// Setting PAsolveConfig properties
+function initSolveConfig(solve_config,opt)
+    jimport java.net.URL;
+    //addJavaObj(URL);
+    solve_config.setDebug(opt.Debug);
+    solve_config.setTimeStamp(opt.TimeStamp);
+    solve_config.setFork(opt.Fork);
+    solve_config.setRunAsMe(opt.RunAsMe);
+    solve_config.setPriority(opt.Priority);
+    solve_config.setTransferSource(opt.TransferSource);
+    //solve_config.setTransferEnv(opt.TransferEnv);
+    solve_config.setTransferVariables(opt.TransferVariables);
+    solve_config.setKeepEngine(opt.KeepEngine);
+    jinvoke(solve_config,'setWindowsStartupOptionsAsString',opt.WindowsStartupOptions);
+    jinvoke(solve_config,'setLinuxStartupOptionsAsString',opt.LinuxStartupOptions);
+
+    solve_config.setInputSpaceName('ScilabInputSpace');
+    solve_config.setOutputSpaceName('ScilabOutputSpace');
+
+    solve_config.setVersionPref(opt.VersionPref);
+    solve_config.setVersionRejAsString(opt.VersionRej);
+    solve_config.setVersionMin(opt.VersionMin);
+    solve_config.setVersionMax(opt.VersionMax);
+    solve_config.setCheckMatSciUrl(opt.FindScilabScript);
+    if ischar(opt.CustomScript)
+        selects = opt.CustomScript
+        try
+            url=jnewInstance(URL,selects);            
+            ok = true;
+        catch 
+            ok = false;
+        end
+        jremove(url);
+
+        if ~ok            
+            solve_config.setCustomScriptUrl(strcat(['file:', selects]));
+        else
+            solve_config.setCustomScriptUrl(selects);
+        end
+    end
+
+    solve_config.setZipSourceFiles(%f);
+endfunction
+
+// Initialize Task Config source files to be transferred
+function taskFilesToClean = initTransferSource(task_configs,solve_config,opt,Tasks, solveid,taskFilesToClean, pa_dir,fs,NN,MM)    
+    jimport java.lang.String;
+    //addJavaObj(String);
+    for i=1:NN       
+        for j=1:MM
+            t_conf = task_configs(i-1,j-1);
+            // Function
+            Func = Tasks(j,i).Func;
+            execstr(strcat(['functype = type(';Func;');']));
+            if (functype <> 13) & (functype <> 11)  then
+                clearJavaStack();
+                error('invalid function type for function ""' + Func + '"". Consider calling this function with a macro instead.');
+            end
+
+            // Source Files
+            if ~isempty(Tasks(j,i).Sources) then
+                srcs = Tasks(j,i).Sources;                                
+                for k=1:length(srcs)
+                    srcPath = srcs(k);
+                    if isfile(srcPath) then
+                        [ppath,fname,extension]=fileparts(srcPath);
+                        srcName = strcat(strcat([fname,extension]));
+
+                        if opt.Debug then
+                            disp(strcat(['Copying file ', srcPath, ' to ',pa_dir]));
+                        end
+                        copyfile(srcPath,pa_dir);
+                        // TODO find a cleaning mechanisme
+                        //taskFilesToClean(i)=lstcat(taskFilesToClean(i), list(pa_dir+fs+fname+extension));
+                        //tmpFiles($+1)=strcat([pa_dir,fs,fname,extension]);
+
+                        strName = jnewInstance(String,srcName);
+                        addJavaObj(strName);
+                        t_conf.addSourceFile(strName);
+                    else
+                        clearJavaStack();
+                        error(strcat(['Source file ', srcPath, ' cannot be found']));
+                    end
+
+                end
+            end
+            
+            // Saving main function name (with or without Sources attribute)
+            sourceNames = jarray('java.lang.String', 1);
+            addJavaObj(sourceNames);
+            sFN = 'ScilabPAsolve_src'+string(solveid)+indToFile([i j])+'.bin';
+            execstr('save(pa_dir+fs+sFN,'+Func+');');
+            strName = jnewInstance(String,sFN);
+            addJavaObj(strName);
+            sourceNames(0) = strName;
+            t_conf.setFunctionVarFiles(sourceNames);                
+            code=[];
+            taskFilesToClean(i)=lstcat(taskFilesToClean(i), list(pa_dir+fs+sFN));
+
+
+            t_conf.setFunctionName(Func);
+            t_conf.addSourceFile(sFN);
+        end
+    end
+endfunction
+
+// Initialize Task Config Input Files
+function initInputFiles(task_configs,solve_config,opt,Tasks,NN,MM) 
+    jimport java.lang.String;
+    //addJavaObj(String);
+    for i=1:NN       
+        for j=1:MM
+            t_conf = task_configs(i-1,j-1);
+            // Input Files
+            if ~isempty(Tasks(j,i).InputFiles) then
+                ilen = length(Tasks(j,i).InputFiles);
+                if ilen > 0 then
+                    inputFiles = jarray('java.lang.String', ilen);
+                    addJavaObj(inputFiles);
+                    filelist = Tasks(j,i).InputFiles;
+                    for k=1:ilen
+                        filename = filelist(k);
+                        ifstr = jnewInstance(String,strsubst(filename,'\','/'));
+                        addJavaObj(ifstr);
+                        inputFiles(k-1)=ifstr;
+                    end
+
+                    t_conf.setInputFiles(inputFiles);
+                    t_conf.setInputFilesThere(%t);
+                end                
+            end
+        end
+    end
+endfunction
+
+// Initialize Task Config Ouput Files
+function initOutputFiles(task_configs,solve_config,opt,Tasks,NN,MM) 
+    jimport java.lang.String;
+    //addJavaObj(String);
+    for i=1:NN       
+        for j=1:MM
+            t_conf = task_configs(i-1,j-1);
+            if ~isempty(Tasks(j,i).OutputFiles) then
+                filelist = Tasks(j,i).OutputFiles;
+                ilen = length(filelist);
+                if ilen > 0 then
+                    outputFiles = jarray('java.lang.String', ilen);
+                    addJavaObj(outputFiles);
+                    for k=1:ilen
+                        filename = filelist(k);
+                        ofstr = jnewInstance(String,strsubst(filename,'\','/'));
+                        addJavaObj(ofstr);
+                        outputFiles(k-1)=ofstr;
+                    end
+
+                    t_conf.setOutputFiles(outputFiles);
+                    t_conf.setOutputFilesThere(%t);
+                end
+            end
+        end
+    end
+endfunction
+
+// Initialize Task Config Input Parameters
+function [outVarFiles, inputscript, mainScript,taskFilesToClean] = initParameters(task_configs,solve_config,opt,Tasks,pa_dir,fs,NN,MM,taskFilesToClean) 
+    
+    variableInFileBaseName = ['ScilabPAsolveVarIn_' string(SOLVEid)];
+    variableOutFileBaseName = ['ScilabPAsolveVarOut_' string(SOLVEid)];
+    outVarFiles = list(NN);  
+    
+    for i=1:NN       
+        for j=1:MM
+            t_conf = task_configs(i-1,j-1);
+            // Params
+            argi = Tasks(j,i).Params;
+            if opt.TransferVariables
+                inVarFN = strcat([variableInFileBaseName, indToFile([i j]), '.dat']);
+                outVarFN = strcat([variableOutFileBaseName, indToFile([i j]), '.dat']);
+                inVarFP = strcat([pa_dir, fs, inVarFN]);
+                outVarFP = strcat([pa_dir, fs, outVarFN]);
+                // Creating input parameters mat files
+                fd=mopen(inVarFP,'wb'); 
+                inl = argi;
+                if length(inl) == 0
+                    inl=list(%t);
+                end
+                for k=1:length(inl)
+                    execstr('in'+string(k)+'=inl(k);');
+                    execstr('save(fd,in'+string(k)+')');
+                end
+                mclose(fd);
+
+                jinvoke(t_conf,'setInputVariablesFileName',inVarFN);
+                jinvoke(t_conf,'setOutputVariablesFileName',outVarFN);
+                if j > 1 & Tasks(j,i).Compose
+                    cinVarFN = strcat([variableOutFileBaseName,indToFile([i j-1]),'.dat']);
+                    cinVarFP = pa_dir+fs+cinVarFN;                    
+                    jinvoke(t_conf,'setComposedInputVariablesFileName',cinVarFN);                    
+                end
+                outVarFiles(i) = outVarFP;
+                taskFilesToClean(i)=lstcat(taskFilesToClean(i), list(inVarFP));
+                //if j < MM
+                // because of disconnected mode, the final out is handled
+                //differently
+                taskFilesToClean(i)=lstcat(taskFilesToClean(i), list(outVarFP));
+                //end
+
+                inputscript = 'i=0';
+            else
+                inputscript = createInputScript(argi);
+            end 
+            
+            t_conf.setInputScript(inputscript);
+
+            //mainScript = createMainScript(Func, opt);
+            mainScript = 'out = '+Tasks(j,i).Func+'(';
+            if j > 1 & Tasks(j,i).Compose
+                mainScript = mainScript + 'in';
+                if length(argi) > 0 then
+                    mainScript = mainScript + ',';
+                end
+            end
+            if length(argi) > 0
+                for k=1:length(argi)-1
+                    mainScript = mainScript + 'in'+string(k)+',';
+                end
+                mainScript = mainScript + ('in'+string(length(argi)));
+            end
+            mainScript = mainScript + ');';
+            t_conf.setMainScript(mainScript);
+
+            t_conf.setOutputs('out');
+        end
+    end
+endfunction
+
+function initOtherTCAttributes(NN,MM, task_configs, Tasks)
+    jimport java.net.URL;
+    //addJavaObj(URL);
+    for i=1:NN       
+        for j=1:MM
+            t_conf = task_configs(i-1,j-1);
+            if ~isempty(Tasks(j,i).Description) then
+                t_conf.setDescription(Tasks(j,i).Description);
+            end                        
+
+            // Custom Script
+            if ~isempty(Tasks(j,i).SelectionScript) then
+                selects = Tasks(j,i).SelectionScript;                
+                try
+                    url = jnewInstance(URL,selects);
+                    ok = %t;
+                catch 
+                    ok = %f;
+                end
+                jremove(url);
+
+                if ~ok
+                    t_conf.setCustomScriptUrl(strcat(['file:', selects ]));
+                else
+                    t_conf.setCustomScriptUrl(selects);
+                end
+            end   
+            
+            // Topology
+            if Tasks(j,i).NbNodes > 1 then
+                if ~(type(Tasks(j,i).Topology) == 10)
+                    error('PAsolve::Topology is not defined in Task '+string(j)+','+string(i)+' with NbNodes > 1.');
+                end
+                t_conf.setNbNodes(Tasks(j,i).NbNodes);
+                t_conf.setTopology(Tasks(j,i).Topology);
+                t_conf.setThresholdProximity(Tasks(j,i).ThresholdProximity);
+            end  
+        end
+    end
 endfunction
 
 function nm=indToFile(ind)
@@ -466,26 +550,22 @@ function mainScript = createMainScript(funcName, opt)
 endfunction
 
 function initJavaStack()
-    js=list();
-    JAVA_STACK=resume(js);
+    global('JAVA_STACK')
+    JAVA_STACK=list();    
 endfunction
 
 function addJavaObj(obj)
-    js=JAVA_STACK;
-    js($+1)=obj;
-    JAVA_STACK=resume(js); 
+    global('JAVA_STACK')
+    JAVA_STACK($+1)=obj;    
 endfunction
 
 function clearJavaStack()
-    js=JAVA_STACK;
-    for i=length(js):-1:1
+    global('JAVA_STACK')
+    for i=length(JAVA_STACK):-1:1
         try
-            jremove(js(i));
+            jremove(JAVA_STACK(i));
         catch
         end
     end
-    JAVA_STACK=resume(js); 
+    clearglobal('JAVA_STACK');
 endfunction
-
-
-

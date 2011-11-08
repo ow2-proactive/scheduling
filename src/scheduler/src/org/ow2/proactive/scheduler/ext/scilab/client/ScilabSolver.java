@@ -58,7 +58,7 @@ import java.util.ArrayList;
 
 
 /**
- * This class is a Java object handling the interaction between Scilab c/jni code and the ActiveObject AOScilabEnvironment
+ * This class is a Java object handling the interaction between Scilab code and the ActiveObject AOScilabEnvironment
  *
  * @author The ProActive Team
  */
