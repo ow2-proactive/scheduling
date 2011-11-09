@@ -96,7 +96,7 @@
 			</fileset>
 		</copy>
 
-		<war destfile="proactive_grid_cloud_portal.war" webxml="${webinf}/web.xml" basedir="${war.root}">
+		<war destfile="SchedulingRest-${rest_api.version}.war" webxml="${webinf}/web.xml" basedir="${war.root}">
 			<manifest>
 				<!-- Who is building this jar? -->
 				<attribute name="Built-By" value="${user.name}" />
