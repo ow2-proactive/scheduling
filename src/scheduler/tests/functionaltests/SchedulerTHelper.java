@@ -332,7 +332,13 @@ public class SchedulerTHelper {
      */
     public static Scheduler getSchedulerInterface() throws Exception {
         if (adminSchedInterface == null) {
-            connect();
+            if ((System.getProperty("proactive.test.username") != null) &&
+                (System.getProperty("proactive.test.password") != null)) {
+                connect(System.getProperty("proactive.test.username"), System
+                        .getProperty("proactive.test.password"));
+            } else {
+                connect();
+            }
         }
         return adminSchedInterface;
     }
@@ -916,6 +922,17 @@ public class SchedulerTHelper {
         SchedulerAuthenticationInterface authInt = getSchedulerAuth();
         Credentials cred = Credentials.createCredentials(new CredData(username, password), authInt
                 .getPublicKey());
+        adminSchedInterface = authInt.login(cred);
+        initEventReceiver(adminSchedInterface);
+    }
+
+    /**
+     * Init connection as user
+     * @throws Exception
+     */
+    private static void connect(String user, String pwd) throws Exception {
+        SchedulerAuthenticationInterface authInt = getSchedulerAuth();
+        Credentials cred = Credentials.createCredentials(new CredData(user, pwd), authInt.getPublicKey());
         adminSchedInterface = authInt.login(cred);
         initEventReceiver(adminSchedInterface);
     }

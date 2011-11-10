@@ -189,6 +189,20 @@
 		</else>
 	</if>
 	
+	<if name="proactive.test.username">
+		<property name="username" value="-Dproactive.test.username=${proactive.test.username}"/>
+		<else>
+			<property name="username" value="-Dproactive.test.noUsernameSpecified"/>
+		</else>
+	</if>
+	
+	<if name="proactive.test.password">
+		<property name="password" value="-Dproactive.test.password=${proactive.test.password}"/>
+		<else>
+			<property name="password" value="-Dproactive.test.noPasswordSpecified"/>
+		</else>
+	</if>
+	
 	<macrodef name="junitMacro">
 		<attribute name="testsuite"/>
 		<attribute name="testclasspath"/>
@@ -205,6 +219,9 @@
 				<jvmarg value="-Dpa.rm.home=${base.dir}" />
 				<jvmarg value="-Dproactive.test.timeout=1800000" /> 
 				<jvmarg value="${fork_mode}" />
+				<jvmarg value="${username}" />
+				<jvmarg value="${password}" />
+
 				<classpath>
 					<additionalClasspath />
 					<path refid="@{testclasspath}" />
