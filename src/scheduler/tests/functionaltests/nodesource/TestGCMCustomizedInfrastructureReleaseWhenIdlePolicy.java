@@ -91,8 +91,16 @@ public class TestGCMCustomizedInfrastructureReleaseWhenIdlePolicy extends
         RMFactory.setOsJavaProperty();
         GCMDeploymentData = FileToBytesConverter.convertFileToByteArray((new File(getDescriptor())));
         //we override the gcm application file
-        SchedulerTHelper.startSchedulerWithEmptyResourceManager(new File(SchedulerTHelper.class.getResource(
-                "config/functionalTRMPropertiesForCustomisedIM.ini").toURI()).getAbsolutePath());
+        if ((System.getProperty("proactive.test.runAsMe") != null) &&
+            (System.getProperty("pas.launcher.forkas.method").equals("pwd"))) {
+            SchedulerTHelper.startSchedulerWithEmptyResourceManager(new File(SchedulerTHelper.class
+                    .getResource("config/functionalTRMPropertiesForRunAsMe.ini").toURI()).getAbsolutePath());
+        } else {
+            SchedulerTHelper.startSchedulerWithEmptyResourceManager(new File(SchedulerTHelper.class
+                    .getResource("config/functionalTRMPropertiesForCustomisedIM.ini").toURI())
+                    .getAbsolutePath());
+        }
+
         RMTHelper.connectToExistingRM();
     }
 }
