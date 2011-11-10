@@ -117,6 +117,9 @@ public class MyAO implements Serializable {
             if (System.getProperty("pas.launcher.forkas.method") != null) {
                 params.put("pas.launcher.forkas.method", System.getProperty("pas.launcher.forkas.method"));
             }
+            if (System.getProperty("proactive.test.runAsMe") != null) {
+                params.put("proactive.test.runAsMe", "true");
+            }
             Node[] nodes = new Node[RMTHelper.defaultNodesNumber];
             for (int i = 0; i < RMTHelper.defaultNodesNumber; i++) {
                 String nodeName = "default_nodemyao_" + System.currentTimeMillis();

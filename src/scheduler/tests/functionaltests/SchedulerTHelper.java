@@ -1087,6 +1087,9 @@ public class SchedulerTHelper {
             properties.append(" -Dpas.launcher.forkas.method=" +
                 System.getProperty("pas.launcher.forkas.method"));
         }
+        if (System.getProperty("proactive.test.runAsMe") != null) {
+            properties.append(" -Dproactive.test.runAsMe=true");
+        }
         vContract.setVariableFromProgram("jvmargDefinedByTest", properties.toString(),
                 VariableContractType.DescriptorDefaultVariable);
         gcmad = PAGCMDeployment.loadApplicationDescriptor(startForkedSchedulerApplication, vContract);
