@@ -133,7 +133,9 @@ public class TestLoggers extends FunctionalTest {
         @Override
         protected void append(LoggingEvent loggingevent) {
             //System.out.println(">> AppenderTester.append() : " + loggingevent.getMessage());
-            if (!Logging.MSG.equals(loggingevent.getMessage())) {
+            if (loggingevent.getLevel().equals(Log4JTaskLogs.STDERR_LEVEL)) {
+                return;
+            } else if (!Logging.MSG.equals(loggingevent.getMessage())) {
                 this.allLogsAwaited = false;
             }
             numberOfAppendedLogs++;
