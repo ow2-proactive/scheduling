@@ -89,7 +89,8 @@ public class TestPreemptRestartKillTask extends FunctionalTest {
     public void run() throws Throwable {
 
         SchedulerTHelper.log("Submitting job");
-        JobId id = SchedulerTHelper.submitJob(new File(jobDescriptor.toURI()).getAbsolutePath());
+        JobId id = SchedulerTHelper.submitJob(new File(jobDescriptor.toURI()).getAbsolutePath(),
+                UserType.ADMIN);
         SchedulerTHelper.log("Wait for event job submitted");
         SchedulerTHelper.waitForEventJobSubmitted(id);
         SchedulerTHelper.log("Wait for event t1 running");
