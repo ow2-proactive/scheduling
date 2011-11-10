@@ -46,6 +46,9 @@ import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
+import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
+import org.ow2.proactive.scheduler.common.job.factories.JobFactory_stax;
+import org.ow2.proactive.scheduler.common.task.NativeTask;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 
@@ -102,7 +105,25 @@ public class TestMultipleHostsRequest extends FunctionalTest {
         //System.setProperty(executablePathPropertyName, new File(executablePath.toURI()).getAbsolutePath());
 
         //test submission and event reception
-        JobId id = SchedulerTHelper.submitJob(new File(jobDescriptor.toURI()).getAbsolutePath());
+        TaskFlowJob job = (TaskFlowJob) JobFactory_stax.getFactory().createJob(
+                new File(jobDescriptor.toURI()).getAbsolutePath());
+
+        //must add /bin/sh at beginning of task1 command line on Linux OS in runAsMe mode
+        //and add property NODESNUMBER and NODESFILE at the end
+        if (OperatingSystem.getOperatingSystem().equals(OperatingSystem.unix) &&
+            System.getProperty("proactive.test.runAsMe") != null) {
+            String[] commandLine = ((NativeTask) job.getTask(task1Name)).getCommandLine();
+            String[] newCommandLine = new String[commandLine.length + 3];
+            newCommandLine[0] = "/bin/sh";
+            for (int i = 0; i < commandLine.length; i++) {
+                newCommandLine[i + 1] = commandLine[i];
+            }
+            newCommandLine[newCommandLine.length - 2] = "$NODESNUMBER";
+            newCommandLine[newCommandLine.length - 1] = "$NODESFILE";
+            ((NativeTask) job.getTask(task1Name)).setCommandLine(newCommandLine);
+        }
+
+        JobId id = SchedulerTHelper.submitJob(job);
 
         SchedulerTHelper.log("Job submitted, id " + id.toString());
 

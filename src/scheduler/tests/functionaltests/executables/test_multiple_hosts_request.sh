@@ -17,6 +17,14 @@ done
 return 0
 }
 
+#if we are on Linux in runAsMe mode, $# must be equals 3
+# $2 and $3 replaced environment variables
+if [ "$#" = "3" ]
+then
+    PAS_CORE_NB=$2
+    PAS_NODEFILE=$3
+fi
+
 TEST_RES=0
 
 if [ -z "$PAS_CORE_NB" ]
