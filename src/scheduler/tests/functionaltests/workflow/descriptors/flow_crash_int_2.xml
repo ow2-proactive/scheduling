@@ -50,7 +50,7 @@ runs = 3;
 importPackage(java.io);
 var ID   = 2;
 var RUNS = 3;
-var f = new File("test_flow_lock_crash_" + ID);
+var f = new File(java.lang.System.getProperty("java.io.tmpdir"), "test_flow_lock_crash_" + ID);
 var it = 0;
 if (f.exists()) {
 var input = new BufferedReader(new FileReader(f));
