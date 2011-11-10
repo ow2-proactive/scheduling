@@ -75,6 +75,7 @@ import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.job.factories.JobFactory;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
+import org.ow2.proactive.scheduler.common.task.NativeTask;
 import org.ow2.proactive.scheduler.common.task.Task;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
@@ -363,9 +364,9 @@ public class SchedulerTHelper {
      * @return JobId the job's identifier corresponding to submission.
      * @throws Exception if an error occurs at job creation/submission.
      */
-    public static JobId submitJob(String jobDescPath, boolean forkedMode) throws Exception {
+    public static JobId submitJob(String jobDescPath, executionMode mode) throws Exception {
         Job jobToSubmit = JobFactory.getFactory().createJob(jobDescPath);
-        return submitJob(jobToSubmit, forkedMode);
+        return submitJob(jobToSubmit, mode);
     }
 
     /**
@@ -376,8 +377,8 @@ public class SchedulerTHelper {
      * @throws Exception if an error occurs at job submission.
      */
     public static JobId submitJob(Job jobToSubmit) throws Exception {
-        boolean forked = isForkedModeSet();
-        return submitJob(jobToSubmit, forked);
+        executionMode mode = checkModeSet();
+        return submitJob(jobToSubmit, mode);
     }
 
     /**
@@ -388,10 +389,12 @@ public class SchedulerTHelper {
      * @return JobId the job's identifier corresponding to submission.
      * @throws Exception if an error occurs at job submission.
      */
-    public static JobId submitJob(Job jobToSubmit, boolean forkedMode) throws Exception {
+    public static JobId submitJob(Job jobToSubmit, executionMode mode) throws Exception {
         Scheduler userInt = getSchedulerInterface();
-        if (forkedMode == true) {
+        if (mode == executionMode.fork) {
             setForked(jobToSubmit);
+        } else if (mode == executionMode.runAsMe) {
+            setRunAsMe(jobToSubmit);
         }
         return userInt.submit(jobToSubmit);
     }
@@ -451,9 +454,9 @@ public class SchedulerTHelper {
      * @throws Exception if an error occurs at job creation/submission, or during
      * verification of events sequence.
      */
-    public static JobId testJobSubmission(String jobDescPath, boolean forkedMode) throws Exception {
+    public static JobId testJobSubmission(String jobDescPath, executionMode mode) throws Exception {
         Job jobToTest = JobFactory.getFactory().createJob(jobDescPath);
-        return testJobSubmission(jobToTest, forkedMode);
+        return testJobSubmission(jobToTest, mode);
     }
 
     /**
@@ -476,8 +479,8 @@ public class SchedulerTHelper {
      * verification of events sequence.
      */
     public static JobId testJobSubmission(Job jobToSubmit) throws Exception {
-        boolean forked = isForkedModeSet();
-        return testJobSubmission(jobToSubmit, forked);
+        executionMode mode = checkModeSet();
+        return testJobSubmission(jobToSubmit, mode);
     }
 
     /**
@@ -500,11 +503,13 @@ public class SchedulerTHelper {
      * @throws Exception if an error occurs at job submission, or during
      * verification of events sequence.
      */
-    public static JobId testJobSubmission(Job jobToSubmit, boolean forkedMode) throws Exception {
+    public static JobId testJobSubmission(Job jobToSubmit, executionMode mode) throws Exception {
         Scheduler userInt = getSchedulerInterface();
 
-        if (forkedMode == true) {
+        if (mode == executionMode.fork) {
             setForked(jobToSubmit);
+        } else if (mode == executionMode.runAsMe) {
+            setRunAsMe(jobToSubmit);
         }
 
         JobId id = userInt.submit(jobToSubmit);
@@ -966,11 +971,29 @@ public class SchedulerTHelper {
         }
     }
 
-    public static boolean isForkedModeSet() {
-        if (System.getProperty("proactive.test.fork") != null) {
-            return true;
+    public static void setRunAsMe(Job job) {
+        if (TaskFlowJob.class.isAssignableFrom(job.getClass())) {
+            for (Task task : ((TaskFlowJob) job).getTasks()) {
+                if (JavaTask.class.isAssignableFrom(task.getClass())) {
+                    if (!((JavaTask) task).isRunAsMe()) {
+                        ((JavaTask) task).setRunAsMe(true);
+                    }
+                } else if (NativeTask.class.isAssignableFrom(task.getClass())) {
+                    if (!((NativeTask) task).isRunAsMe()) {
+                        ((NativeTask) task).setRunAsMe(true);
+                    }
+                }
+            }
+        }
+    }
+
+    private static executionMode checkModeSet() {
+        if (System.getProperty("proactive.test.runAsMe") != null) {
+            return executionMode.runAsMe;
+        } else if (System.getProperty("proactive.test.fork") != null) {
+            return executionMode.fork;
         } else {
-            return false;
+            return executionMode.normal;
         }
     }
 

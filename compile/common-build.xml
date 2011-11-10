@@ -189,6 +189,13 @@
 		</else>
 	</if>
 	
+	<if name="proactive.test.runAsMe">
+		<property name="runAsMe_mode" value="-Dproactive.test.runAsMe"/>
+		<else>
+			<property name="runAsMe_mode" value="-Dproactive.test.notRunAsMe"/>
+		</else>
+	</if>
+	
 	<if name="proactive.test.username">
 		<property name="username" value="-Dproactive.test.username=${proactive.test.username}"/>
 		<else>
@@ -204,12 +211,11 @@
 	</if>
 	
 	<if name="pas.launcher.forkas.method">
-		<property name="runAsMe" value="-Dpas.launcher.forkas.method=${pas.launcher.forkas.method}"/>
+		<property name="forkas_method" value="-Dpas.launcher.forkas.method=${pas.launcher.forkas.method}"/>
 		<else>
-			<property name="runAsMe" value="-Dproactive.test.notRunAsMe"/>
+			<property name="forkas_method" value="-Dproactive.test.noForkasMethod"/>
 		</else>
 	</if>
-	
 	
 	<macrodef name="junitMacro">
 		<attribute name="testsuite"/>
@@ -227,9 +233,10 @@
 				<jvmarg value="-Dpa.rm.home=${base.dir}" />
 				<jvmarg value="-Dproactive.test.timeout=1800000" /> 
 				<jvmarg value="${fork_mode}" />
+				<jvmarg value="${runAsMe_mode}" />
 				<jvmarg value="${username}" />
 				<jvmarg value="${password}" />
-				<jvmarg value="${runAsMe}" />
+				<jvmarg value="${forkas_method}" />
 
 				<classpath>
 					<additionalClasspath />
