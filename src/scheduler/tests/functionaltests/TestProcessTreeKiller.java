@@ -71,12 +71,14 @@ public class TestProcessTreeKiller extends FunctionalTest {
 
     private static String unixPTKProcessName = "PTK_process.sh";
 
+    private static String unixSleepName = "sleep";
+
     private static URL nativeLinuxDetachedProcess = TestProcessTreeKiller.class
             .getResource("/functionaltests/executables/" + unixPTKProcessName);
 
     private static int detachedProcNumber = 4;
 
-    private final static int wait_time = 6000;
+    private final static int wait_time = 12000;
 
     /**
      * Tests start here.
@@ -94,7 +96,7 @@ public class TestProcessTreeKiller extends FunctionalTest {
             System.out.println("Skipping test...");
         } else {
 
-            killAll(unixPTKProcessName);
+            killAll(unixSleepName);
             String[] nativeExecLauncher;
 
             switch (OperatingSystem.getOperatingSystem()) {
@@ -103,8 +105,13 @@ public class TestProcessTreeKiller extends FunctionalTest {
                             "\"" + new File(nativeWindowsExecLauncher.toURI()).getAbsolutePath() + "\"" };
                     break;
                 case unix:
-                    nativeExecLauncher = new String[] { new File(nativeLinuxExecLauncher.toURI())
-                            .getAbsolutePath() };
+                    String executable = new File(nativeLinuxExecLauncher.toURI()).getAbsolutePath();
+                    if (System.getProperty("proactive.test.runAsMe") != null) {
+                        nativeExecLauncher = new String[] { "/bin/sh", executable };
+                    } else {
+                        nativeExecLauncher = new String[] { executable };
+                    }
+                    SchedulerTHelper.setExecutable(executable);
                     break;
                 default:
                     throw new IllegalStateException("Unsupported operating system");
@@ -133,15 +140,6 @@ public class TestProcessTreeKiller extends FunctionalTest {
             task2.setCommandLine(nativeExecLauncher);
             job2.addTask(task2);
 
-            if (OperatingSystem.getOperatingSystem() == OperatingSystem.unix) {
-                String list = "";
-                for (String str : nativeExecLauncher) {
-                    list += str + " ";
-                }
-                list += new File(nativeLinuxDetachedProcess.toURI()).getAbsolutePath();
-                SchedulerTHelper.setExecutable(list);
-            }
-
             //submit two jobs
             JobId id1 = SchedulerTHelper.submitJob(job1);
             SchedulerTHelper.waitForEventTaskRunning(id1, task1Name);
@@ -155,7 +153,7 @@ public class TestProcessTreeKiller extends FunctionalTest {
                     runningDetachedProcNumber = getProcessNumberWindows("TestSleep.exe");
                     break;
                 case unix:
-                    runningDetachedProcNumber = getProcessNumber(unixPTKProcessName);
+                    runningDetachedProcNumber = getProcessNumber(unixSleepName);
                     break;
                 default:
                     throw new IllegalStateException("Unsupported operating system");
@@ -175,7 +173,7 @@ public class TestProcessTreeKiller extends FunctionalTest {
                     runningDetachedProcNumber = getProcessNumberWindows("TestSleep.exe");
                     break;
                 case unix:
-                    runningDetachedProcNumber = getProcessNumber(unixPTKProcessName);
+                    runningDetachedProcNumber = getProcessNumber(unixSleepName);
                     break;
                 default:
                     throw new IllegalStateException("Unsupported operating system");
@@ -193,7 +191,7 @@ public class TestProcessTreeKiller extends FunctionalTest {
                     runningDetachedProcNumber = getProcessNumberWindows("TestSleep.exe");
                     break;
                 case unix:
-                    runningDetachedProcNumber = getProcessNumber(unixPTKProcessName);
+                    runningDetachedProcNumber = getProcessNumber(unixSleepName);
                     break;
                 default:
                     throw new IllegalStateException("Unsupported operating system");
@@ -238,7 +236,7 @@ public class TestProcessTreeKiller extends FunctionalTest {
     private int getProcessNumber(String executableName) throws IOException {
         int toReturn = 0;
         String line;
-        Process p = Runtime.getRuntime().exec("ps -e");
+        Process p = Runtime.getRuntime().exec("ps -N -U root -u root u");
         BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream()));
         while ((line = input.readLine()) != null) {
             if (line.contains(executableName)) {
