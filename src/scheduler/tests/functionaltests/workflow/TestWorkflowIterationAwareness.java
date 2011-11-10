@@ -44,6 +44,7 @@ import java.io.FileWriter;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import org.junit.Assert;
@@ -76,6 +77,8 @@ import functionaltests.SchedulerTHelper;
  */
 public class TestWorkflowIterationAwareness extends FunctionalTest {
 
+    private static final String tmp_dir_Windows = "C:\\tmp\\";
+
     private static final URL java_job = TestWorkflowIterationAwareness.class
             .getResource("/functionaltests/workflow/descriptors/flow_it_1.xml");
 
@@ -93,9 +96,8 @@ public class TestWorkflowIterationAwareness extends FunctionalTest {
     private static final String preScriptWindows = //
     "importPackage(java.io); \n" //
         +
-        "var f = new File(\"" +
-        PASchedulerProperties.SCHEDULER_HOME.getValueAsString().replace("\\", "\\\\") +
-        "\\\\PRE_$IT_$REP\"); \n" + //
+        "var f = new File(\"" + tmp_dir_Windows.replace("\\", "\\\\") + "PRE_$IT_$REP\"); \n" + //
+
         "f.createNewFile(); \n";
 
     private static final String postScript = //
@@ -109,9 +111,7 @@ public class TestWorkflowIterationAwareness extends FunctionalTest {
     "importPackage(java.io); \n" //
         +
         "var f = new File(\"" //
-        +
-        PASchedulerProperties.SCHEDULER_HOME.getValueAsString().replace("\\", "\\\\") +
-        "\\\\POST_$IT_$REP\"); \n" //
+        + tmp_dir_Windows.replace("\\", "\\\\") + "POST_$IT_$REP\"); \n" //
         + "f.createNewFile(); \n";
 
     private static final String dupScript = "enabled = true; \n" + "runs = 2; \n";
@@ -120,7 +120,7 @@ public class TestWorkflowIterationAwareness extends FunctionalTest {
     "importPackage(java.io); \n" //
         + "var ID   = 3; \n" //
         + "var RUNS = 2; \n" //
-        + "var f = new File(\"test_flow_lock_\" + ID); \n" //
+        + "var f = new File(java.lang.System.getProperty(\"java.io.tmpdir\"), \"test_flow_lock_\" + ID); \n" //
         + "var it = 0; \n" //
         + "if (f.exists()) { \n" //
         + "var input = new BufferedReader(new FileReader(f)); \n" //
@@ -207,7 +207,8 @@ public class TestWorkflowIterationAwareness extends FunctionalTest {
                 ((NativeTask) job.getTask("T1")).setPreScript(new SimpleScript(preScriptWindows, "js"));
                 ((NativeTask) job.getTask("T1")).setPostScript(new SimpleScript(postScriptWindows, "js"));
                 String[] tab = ((NativeTask) job.getTask("T1")).getCommandLine();
-                tab[0] = tab[0].replace("it.sh", "it.bat");
+                tab[0] = "\"" + tab[0].replace("it.sh", "it.bat") + "\"";
+                tab[1] = tmp_dir_Windows;
                 ((NativeTask) job.getTask("T1")).setCommandLine(tab);
                 break;
             case unix:
@@ -219,13 +220,25 @@ public class TestWorkflowIterationAwareness extends FunctionalTest {
         }
 
         JobId id = TWorkflowJobs.testJobSubmission(job, null);
-
         JobResult res = SchedulerTHelper.getJobResult(id);
         Assert.assertFalse(SchedulerTHelper.getJobResult(id).hadException());
 
         int n = 4;
         for (Entry<String, TaskResult> result : res.getAllResults().entrySet()) {
-            String path = PASchedulerProperties.SCHEDULER_HOME.getValueAsString() + "/native_result_";
+            String path = "";
+            switch (OperatingSystem.getOperatingSystem()) {
+                case windows:
+                    File tmpdir = new File(tmp_dir_Windows, "native_result_");
+                    path = tmpdir.getAbsolutePath();
+                    break;
+
+                case unix:
+                    path = System.getProperty("java.io.tmpdir") + "/native_result_";
+                    break;
+                default:
+                    throw new IllegalStateException("Operating system not supported");
+            }
+
             if (result.getKey().equals("T1")) {
                 n--;
                 File f = new File(path + "0_0");
@@ -257,6 +270,7 @@ public class TestWorkflowIterationAwareness extends FunctionalTest {
             }
         }
         Assert.assertTrue("Expected 4 tasks, misses " + n, n == 0);
+
         SchedulerTHelper.removeJob(id);
         SchedulerTHelper.waitForEventJobRemoved(id);
     }
@@ -280,10 +294,21 @@ public class TestWorkflowIterationAwareness extends FunctionalTest {
             }
         }
 
-        File pre = new File(PASchedulerProperties.SCHEDULER_HOME.getValueAsString() + "/PRE_" + it + "_" +
-            dup);
-        File post = new File(PASchedulerProperties.SCHEDULER_HOME.getValueAsString() + "/POST_" + it + "_" +
-            dup);
+        File pre = null;
+        File post = null;
+        switch (OperatingSystem.getOperatingSystem()) {
+            case windows:
+                pre = new File(tmp_dir_Windows, "PRE_" + it + "_" + dup);
+                post = new File(tmp_dir_Windows, "POST_" + it + "_" + dup);
+                break;
+            case unix:
+                pre = new File(System.getProperty("java.io.tmpdir"), "PRE_" + it + "_" + dup);
+                post = new File(System.getProperty("java.io.tmpdir"), "POST_" + it + "_" + dup);
+                break;
+            default:
+                throw new IllegalStateException("Operating system not supported");
+        }
+
         Assert.assertTrue("Could not find PRE file: " + pre.getAbsolutePath(), pre.exists());
         Assert.assertTrue("Could not find POST file: " + post.getAbsolutePath(), post.exists());
         pre.delete();
