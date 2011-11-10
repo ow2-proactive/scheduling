@@ -81,7 +81,7 @@ public class TestJobKilled extends FunctionalTest {
         //task 3 is never executed so no event can received
         //regarding this task.
         JobId id = SchedulerTHelper.submitJob(new File(jobDescriptor.toURI()).getAbsolutePath(),
-                executionMode.normal);
+                ExecutionMode.normal);
         //check events reception
         SchedulerTHelper.log("Job submitted, id " + id.toString());
         SchedulerTHelper.log("Waiting for jobSubmitted");

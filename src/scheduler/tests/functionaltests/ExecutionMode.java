@@ -1,5 +1,5 @@
 package functionaltests;
 
-public enum executionMode {
+public enum ExecutionMode {
     normal, fork, runAsMe
 }

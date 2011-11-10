@@ -397,7 +397,7 @@ public class SchedulerTHelper {
      * @return JobId the job's identifier corresponding to submission.
      * @throws Exception if an error occurs at job creation/submission.
      */
-    public static JobId submitJob(String jobDescPath, executionMode mode) throws Exception {
+    public static JobId submitJob(String jobDescPath, ExecutionMode mode) throws Exception {
         return submitJob(jobDescPath, mode, UserType.USER);
     }
 
@@ -410,7 +410,7 @@ public class SchedulerTHelper {
      * @return JobId the job's identifier corresponding to submission.
      * @throws Exception if an error occurs at job creation/submission.
      */
-    public static JobId submitJob(String jobDescPath, executionMode mode, UserType user) throws Exception {
+    public static JobId submitJob(String jobDescPath, ExecutionMode mode, UserType user) throws Exception {
         Job jobToSubmit = JobFactory.getFactory().createJob(jobDescPath);
         return submitJob(jobToSubmit, mode, user);
     }
@@ -435,7 +435,7 @@ public class SchedulerTHelper {
      * @throws Exception if an error occurs at job submission.
      */
     public static JobId submitJob(Job jobToSubmit, UserType user) throws Exception {
-        executionMode mode = checkModeSet();
+        ExecutionMode mode = checkModeSet();
         return submitJob(jobToSubmit, mode, user);
     }
 
@@ -447,7 +447,7 @@ public class SchedulerTHelper {
      * @return JobId the job's identifier corresponding to submission.
      * @throws Exception if an error occurs at job submission.
      */
-    public static JobId submitJob(Job jobToSubmit, executionMode mode) throws Exception {
+    public static JobId submitJob(Job jobToSubmit, ExecutionMode mode) throws Exception {
         return submitJob(jobToSubmit, mode, UserType.USER);
     }
 
@@ -460,11 +460,11 @@ public class SchedulerTHelper {
      * @return JobId the job's identifier corresponding to submission.
      * @throws Exception if an error occurs at job submission.
      */
-    public static JobId submitJob(Job jobToSubmit, executionMode mode, UserType user) throws Exception {
+    public static JobId submitJob(Job jobToSubmit, ExecutionMode mode, UserType user) throws Exception {
         Scheduler userInt = getSchedulerInterface(user);
-        if (mode == executionMode.fork) {
+        if (mode == ExecutionMode.fork) {
             setForked(jobToSubmit);
-        } else if (mode == executionMode.runAsMe) {
+        } else if (mode == ExecutionMode.runAsMe) {
             setRunAsMe(jobToSubmit);
         }
         return userInt.submit(jobToSubmit);
@@ -549,7 +549,7 @@ public class SchedulerTHelper {
      * @throws Exception if an error occurs at job creation/submission, or during
      * verification of events sequence.
      */
-    public static JobId testJobSubmission(String jobDescPath, executionMode mode) throws Exception {
+    public static JobId testJobSubmission(String jobDescPath, ExecutionMode mode) throws Exception {
         return testJobSubmission(jobDescPath, mode, UserType.USER);
     }
 
@@ -574,7 +574,7 @@ public class SchedulerTHelper {
      * @throws Exception if an error occurs at job creation/submission, or during
      * verification of events sequence.
      */
-    public static JobId testJobSubmission(String jobDescPath, executionMode mode, UserType user)
+    public static JobId testJobSubmission(String jobDescPath, ExecutionMode mode, UserType user)
             throws Exception {
         Job jobToTest = JobFactory.getFactory().createJob(jobDescPath);
         return testJobSubmission(jobToTest, mode, user);
@@ -624,7 +624,7 @@ public class SchedulerTHelper {
      * verification of events sequence.
      */
     public static JobId testJobSubmission(Job jobToSubmit, UserType user) throws Exception {
-        executionMode mode = checkModeSet();
+        ExecutionMode mode = checkModeSet();
         return testJobSubmission(jobToSubmit, mode, user);
     }
 
@@ -648,7 +648,7 @@ public class SchedulerTHelper {
      * @throws Exception if an error occurs at job submission, or during
      * verification of events sequence.
      */
-    public static JobId testJobSubmission(Job jobToSubmit, executionMode mode) throws Exception {
+    public static JobId testJobSubmission(Job jobToSubmit, ExecutionMode mode) throws Exception {
         return testJobSubmission(jobToSubmit, mode, UserType.USER);
     }
 
@@ -672,13 +672,13 @@ public class SchedulerTHelper {
      * @throws Exception if an error occurs at job submission, or during
      * verification of events sequence.
      */
-    public static JobId testJobSubmission(Job jobToSubmit, executionMode mode, UserType user)
+    public static JobId testJobSubmission(Job jobToSubmit, ExecutionMode mode, UserType user)
             throws Exception {
         Scheduler userInt = getSchedulerInterface(user);
 
-        if (mode == executionMode.fork) {
+        if (mode == ExecutionMode.fork) {
             setForked(jobToSubmit);
-        } else if (mode == executionMode.runAsMe) {
+        } else if (mode == ExecutionMode.runAsMe) {
             setRunAsMe(jobToSubmit);
         }
 
@@ -1167,13 +1167,13 @@ public class SchedulerTHelper {
         }
     }
 
-    private static executionMode checkModeSet() {
+    private static ExecutionMode checkModeSet() {
         if (System.getProperty("proactive.test.runAsMe") != null) {
-            return executionMode.runAsMe;
+            return ExecutionMode.runAsMe;
         } else if (System.getProperty("proactive.test.fork") != null) {
-            return executionMode.fork;
+            return ExecutionMode.fork;
         } else {
-            return executionMode.normal;
+            return ExecutionMode.normal;
         }
     }
 
