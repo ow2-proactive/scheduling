@@ -114,6 +114,9 @@ public class MyAO implements Serializable {
             ResourceManager rmAdmin = rmAuth.login(Credentials.getCredentials(PAResourceManagerProperties
                     .getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString())));
             Map<String, String> params = new HashMap<String, String>();
+            if (System.getProperty("pas.launcher.forkas.method") != null) {
+                params.put("pas.launcher.forkas.method", System.getProperty("pas.launcher.forkas.method"));
+            }
             Node[] nodes = new Node[RMTHelper.defaultNodesNumber];
             for (int i = 0; i < RMTHelper.defaultNodesNumber; i++) {
                 String nodeName = "default_nodemyao_" + System.currentTimeMillis();

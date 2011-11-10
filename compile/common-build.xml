@@ -203,6 +203,14 @@
 		</else>
 	</if>
 	
+	<if name="pas.launcher.forkas.method">
+		<property name="runAsMe" value="-Dpas.launcher.forkas.method=${pas.launcher.forkas.method}"/>
+		<else>
+			<property name="runAsMe" value="-Dproactive.test.notRunAsMe"/>
+		</else>
+	</if>
+	
+	
 	<macrodef name="junitMacro">
 		<attribute name="testsuite"/>
 		<attribute name="testclasspath"/>
@@ -221,6 +229,7 @@
 				<jvmarg value="${fork_mode}" />
 				<jvmarg value="${username}" />
 				<jvmarg value="${password}" />
+				<jvmarg value="${runAsMe}" />
 
 				<classpath>
 					<additionalClasspath />

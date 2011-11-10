@@ -908,6 +908,10 @@ public class SchedulerTHelper {
             PASchedulerProperties.SCHEDULER_HOME.getValueAsString() + "\"");
         properties.append(" " + PAResourceManagerProperties.RM_HOME.getCmdLine() + "\"" +
             PAResourceManagerProperties.RM_HOME.getValueAsString() + "\"");
+        if (System.getProperty("pas.launcher.forkas.method") != null) {
+            properties.append(" -Dpas.launcher.forkas.method=" +
+                System.getProperty("pas.launcher.forkas.method"));
+        }
         vContract.setVariableFromProgram("jvmargDefinedByTest", properties.toString(),
                 VariableContractType.DescriptorDefaultVariable);
         gcmad = PAGCMDeployment.loadApplicationDescriptor(startForkedSchedulerApplication, vContract);
