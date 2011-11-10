@@ -64,7 +64,7 @@ public class TestSchedulerMiscEvents extends FunctionalTest {
     @org.junit.Test
     public void run() throws Throwable {
 
-        Scheduler schedAdminInterface = SchedulerTHelper.getSchedulerInterface();
+        Scheduler schedAdminInterface = SchedulerTHelper.getSchedulerInterface(UserType.ADMIN);
 
         SchedulerTHelper.log("Try many tests about scheduler state");
 
