@@ -333,10 +333,31 @@ public class SchedulerTHelper {
      */
     public static Scheduler getSchedulerInterface() throws Exception {
         if (adminSchedInterface == null) {
-            if ((System.getProperty("proactive.test.username") != null) &&
-                (System.getProperty("proactive.test.password") != null)) {
-                connect(System.getProperty("proactive.test.username"), System
-                        .getProperty("proactive.test.password"));
+            if (System.getProperty("proactive.test.runAsMe") != null) {
+                connect(UserType.USER);
+            } else {
+                connect();
+            }
+        }
+        return adminSchedInterface;
+    }
+
+    /**
+     * Return Scheduler's interface. Start Scheduler if needed,
+     * connect as administrator if needed (if not yet connected as user).
+     *
+     * WARNING : if there was a previous connection as User, this connection is shut down.
+     * And so some event can be missed by event receiver, between disconnection and reconnection
+     * (only one connection to Scheduler per body is possible).
+     *
+     * @param user Type of user
+     * @return scheduler interface
+     * @throws Exception if an error occurs.
+     */
+    public static Scheduler getSchedulerInterface(UserType user) throws Exception {
+        if (adminSchedInterface == null) {
+            if (System.getProperty("proactive.test.runAsMe") != null) {
+                connect(user);
             } else {
                 connect();
             }
@@ -352,8 +373,20 @@ public class SchedulerTHelper {
      * @throws Exception if an error occurs at job creation/submission.
      */
     public static JobId submitJob(String jobDescPath) throws Exception {
+        return submitJob(jobDescPath, UserType.USER);
+    }
+
+    /**
+     * Creates a job from an XML job descriptor, submit it, and return immediately.
+     * connect as user if needed (if not yet connected as user).
+     * @param jobDescPath
+     * @param user Type of user
+     * @return JobId the job's identifier corresponding to submission.
+     * @throws Exception if an error occurs at job creation/submission.
+     */
+    public static JobId submitJob(String jobDescPath, UserType user) throws Exception {
         Job jobToSubmit = JobFactory.getFactory().createJob(jobDescPath);
-        return submitJob(jobToSubmit);
+        return submitJob(jobToSubmit, user);
     }
 
     /**
@@ -365,8 +398,21 @@ public class SchedulerTHelper {
      * @throws Exception if an error occurs at job creation/submission.
      */
     public static JobId submitJob(String jobDescPath, executionMode mode) throws Exception {
+        return submitJob(jobDescPath, mode, UserType.USER);
+    }
+
+    /**
+     * Creates a job from an XML job descriptor, submit it, and return immediately.
+     * connect as user if needed (if not yet connected as user).
+     * @param jobDescPath
+     * @param forkedMode true if forked mode 
+     * @param user Type of user
+     * @return JobId the job's identifier corresponding to submission.
+     * @throws Exception if an error occurs at job creation/submission.
+     */
+    public static JobId submitJob(String jobDescPath, executionMode mode, UserType user) throws Exception {
         Job jobToSubmit = JobFactory.getFactory().createJob(jobDescPath);
-        return submitJob(jobToSubmit, mode);
+        return submitJob(jobToSubmit, mode, user);
     }
 
     /**
@@ -377,8 +423,20 @@ public class SchedulerTHelper {
      * @throws Exception if an error occurs at job submission.
      */
     public static JobId submitJob(Job jobToSubmit) throws Exception {
+        return submitJob(jobToSubmit, UserType.USER);
+    }
+
+    /**
+     * Submit a job, and return immediately.
+     * Connect as user if needed (if not yet connected as user).
+     * @param jobToSubmit job object to schedule.
+     * @param user Type of user
+     * @return JobId the job's identifier corresponding to submission.
+     * @throws Exception if an error occurs at job submission.
+     */
+    public static JobId submitJob(Job jobToSubmit, UserType user) throws Exception {
         executionMode mode = checkModeSet();
-        return submitJob(jobToSubmit, mode);
+        return submitJob(jobToSubmit, mode, user);
     }
 
     /**
@@ -390,7 +448,20 @@ public class SchedulerTHelper {
      * @throws Exception if an error occurs at job submission.
      */
     public static JobId submitJob(Job jobToSubmit, executionMode mode) throws Exception {
-        Scheduler userInt = getSchedulerInterface();
+        return submitJob(jobToSubmit, mode, UserType.USER);
+    }
+
+    /**
+     * Submit a job, and return immediately.
+     * Connect as user if needed (if not yet connected as user).
+     * @param jobToSubmit job object to schedule.
+     * @param forkedMode true if the mode is forked, false if normal mode
+     * @param user Type of user
+     * @return JobId the job's identifier corresponding to submission.
+     * @throws Exception if an error occurs at job submission.
+     */
+    public static JobId submitJob(Job jobToSubmit, executionMode mode, UserType user) throws Exception {
+        Scheduler userInt = getSchedulerInterface(user);
         if (mode == executionMode.fork) {
             setForked(jobToSubmit);
         } else if (mode == executionMode.runAsMe) {
@@ -430,8 +501,32 @@ public class SchedulerTHelper {
      * verification of events sequence.
      */
     public static JobId testJobSubmission(String jobDescPath) throws Exception {
+        return testJobSubmission(jobDescPath, UserType.USER);
+    }
+
+    /**
+     * Creates and submit a job from an XML job descriptor, and check
+     * event related to this job submission :
+     * 1/ job submitted event
+     * 2/ job passing from pending to running (with state set to running).
+     * 3/ every task passing from pending to running (with state set to running).
+     * 4/ every task passing from running to finished (with state set to finished).
+     * 5/ and finally job passing from running to finished (with state set to finished).
+     * Then returns.
+     *
+     * This is the simplest events sequence of a job submission. If you need to test
+     * specific event or task states (failure, rescheduling etc, you must not use this
+     * helper and check events sequence with waitForEvent**() functions.
+     *
+     * @param jobDescPath path to an XML job descriptor to submit
+     * @param user Type of user
+     * @return JobId, the job's identifier.
+     * @throws Exception if an error occurs at job creation/submission, or during
+     * verification of events sequence.
+     */
+    public static JobId testJobSubmission(String jobDescPath, UserType user) throws Exception {
         Job jobToTest = JobFactory.getFactory().createJob(jobDescPath);
-        return testJobSubmission(jobToTest);
+        return testJobSubmission(jobToTest, user);
     }
 
     /**
@@ -455,8 +550,34 @@ public class SchedulerTHelper {
      * verification of events sequence.
      */
     public static JobId testJobSubmission(String jobDescPath, executionMode mode) throws Exception {
+        return testJobSubmission(jobDescPath, mode, UserType.USER);
+    }
+
+    /**
+     * Creates and submit a job from an XML job descriptor, and check
+     * event related to this job submission :
+     * 1/ job submitted event
+     * 2/ job passing from pending to running (with state set to running).
+     * 3/ every task passing from pending to running (with state set to running).
+     * 4/ every task passing from running to finished (with state set to finished).
+     * 5/ and finally job passing from running to finished (with state set to finished).
+     * Then returns.
+     *
+     * This is the simplest events sequence of a job submission. If you need to test
+     * specific event or task states (failure, rescheduling etc, you must not use this
+     * helper and check events sequence with waitForEvent**() functions.
+     *
+     * @param jobDescPath path to an XML job descriptor to submit
+     * @param forkedMode true if forked mode 
+     * @param user Type of user
+     * @return JobId, the job's identifier.
+     * @throws Exception if an error occurs at job creation/submission, or during
+     * verification of events sequence.
+     */
+    public static JobId testJobSubmission(String jobDescPath, executionMode mode, UserType user)
+            throws Exception {
         Job jobToTest = JobFactory.getFactory().createJob(jobDescPath);
-        return testJobSubmission(jobToTest, mode);
+        return testJobSubmission(jobToTest, mode, user);
     }
 
     /**
@@ -479,8 +600,32 @@ public class SchedulerTHelper {
      * verification of events sequence.
      */
     public static JobId testJobSubmission(Job jobToSubmit) throws Exception {
+        return testJobSubmission(jobToSubmit, UserType.USER);
+    }
+
+    /**
+     * Creates and submit a job from an XML job descriptor, and check, with assertions,
+     * event related to this job submission :
+     * 1/ job submitted event
+     * 2/ job passing from pending to running (with state set to running).
+     * 3/ every task passing from pending to running (with state set to running).
+     * 4/ every task finish without error ; passing from running to finished (with state set to finished).
+     * 5/ and finally job passing from running to finished (with state set to finished).
+     * Then returns.
+     *
+     * This is the simplest events sequence of a job submission. If you need to test
+     * specific events or task states (failures, rescheduling etc, you must not use this
+     * helper and check events sequence with waitForEvent**() functions.
+     *
+     * @param jobToSubmit job object to schedule.
+     * @param user Type of user
+     * @return JobId, the job's identifier.
+     * @throws Exception if an error occurs at job submission, or during
+     * verification of events sequence.
+     */
+    public static JobId testJobSubmission(Job jobToSubmit, UserType user) throws Exception {
         executionMode mode = checkModeSet();
-        return testJobSubmission(jobToSubmit, mode);
+        return testJobSubmission(jobToSubmit, mode, user);
     }
 
     /**
@@ -504,7 +649,32 @@ public class SchedulerTHelper {
      * verification of events sequence.
      */
     public static JobId testJobSubmission(Job jobToSubmit, executionMode mode) throws Exception {
-        Scheduler userInt = getSchedulerInterface();
+        return testJobSubmission(jobToSubmit, mode, UserType.USER);
+    }
+
+    /**
+     * Creates and submit a job from an XML job descriptor, and check, with assertions,
+     * event related to this job submission :
+     * 1/ job submitted event
+     * 2/ job passing from pending to running (with state set to running).
+     * 3/ every task passing from pending to running (with state set to running).
+     * 4/ every task finish without error ; passing from running to finished (with state set to finished).
+     * 5/ and finally job passing from running to finished (with state set to finished).
+     * Then returns.
+     *
+     * This is the simplest events sequence of a job submission. If you need to test
+     * specific events or task states (failures, rescheduling etc, you must not use this
+     * helper and check events sequence with waitForEvent**() functions.
+     *
+     * @param jobToSubmit job object to schedule.
+     * @param forkedMode true if the mode is forked, false if normal mode
+     * @return JobId, the job's identifier.
+     * @throws Exception if an error occurs at job submission, or during
+     * verification of events sequence.
+     */
+    public static JobId testJobSubmission(Job jobToSubmit, executionMode mode, UserType user)
+            throws Exception {
+        Scheduler userInt = getSchedulerInterface(user);
 
         if (mode == executionMode.fork) {
             setForked(jobToSubmit);
@@ -939,9 +1109,16 @@ public class SchedulerTHelper {
      * Init connection as user
      * @throws Exception
      */
-    private static void connect(String user, String pwd) throws Exception {
+    private static void connect(UserType user) throws Exception {
+        if ((System.getProperty("proactive.test.login." + user) == null) ||
+            (System.getProperty("proactive.test.password." + user) == null)) {
+            throw new IllegalStateException(
+                "Property proactive.test.login or proactive.test.password are not correctly set");
+        }
+        String login = System.getProperty("proactive.test.login." + user);
+        String pwd = System.getProperty("proactive.test.password." + user);
         SchedulerAuthenticationInterface authInt = getSchedulerAuth();
-        Credentials cred = Credentials.createCredentials(new CredData(user, pwd), authInt.getPublicKey());
+        Credentials cred = Credentials.createCredentials(new CredData(login, pwd), authInt.getPublicKey());
         adminSchedInterface = authInt.login(cred);
         initEventReceiver(adminSchedInterface);
     }

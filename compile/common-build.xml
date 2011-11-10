@@ -196,19 +196,33 @@
 		</else>
 	</if>
 	
-	<if name="proactive.test.username">
-		<property name="username" value="-Dproactive.test.username=${proactive.test.username}"/>
+	<if name="proactive.test.login.user">
+		<property name="userlogin" value="-Dproactive.test.login.user=${proactive.test.login.user}"/>
 		<else>
-			<property name="username" value="-Dproactive.test.noUsernameSpecified"/>
+			<property name="userlogin" value="-Dproactive.test.noLoginSpecified.user"/>
 		</else>
 	</if>
 	
-	<if name="proactive.test.password">
-		<property name="password" value="-Dproactive.test.password=${proactive.test.password}"/>
+	<if name="proactive.test.password.user">
+		<property name="userpassword" value="-Dproactive.test.password.user=${proactive.test.password.user}"/>
 		<else>
-			<property name="password" value="-Dproactive.test.noPasswordSpecified"/>
+			<property name="userpassword" value="-Dproactive.test.noPasswordSpecified.user"/>
 		</else>
 	</if>
+	
+	<if name="proactive.test.login.admin">
+			<property name="adminlogin" value="-Dproactive.test.login.admin=${proactive.test.login.admin}"/>
+			<else>
+				<property name="adminlogin" value="-Dproactive.test.noLoginSpecified.admin"/>
+			</else>
+		</if>
+		
+		<if name="proactive.test.password.admin">
+			<property name="adminpassword" value="-Dproactive.test.password.admin=${proactive.test.password.admin}"/>
+			<else>
+				<property name="adminpassword" value="-Dproactive.test.noPasswordSpecified.admin"/>
+			</else>
+		</if>
 	
 	<if name="pas.launcher.forkas.method">
 		<property name="forkas_method" value="-Dpas.launcher.forkas.method=${pas.launcher.forkas.method}"/>
@@ -234,8 +248,10 @@
 				<jvmarg value="-Dproactive.test.timeout=1800000" /> 
 				<jvmarg value="${fork_mode}" />
 				<jvmarg value="${runAsMe_mode}" />
-				<jvmarg value="${username}" />
-				<jvmarg value="${password}" />
+				<jvmarg value="${userlogin}" />
+				<jvmarg value="${userpassword}" />
+				<jvmarg value="${adminlogin}" />
+				<jvmarg value="${adminpassword}" />
 				<jvmarg value="${forkas_method}" />
 
 				<classpath>
