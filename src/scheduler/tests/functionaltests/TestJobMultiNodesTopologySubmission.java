@@ -80,7 +80,8 @@ public class TestJobMultiNodesTopologySubmission extends FunctionalTest {
      */
     @org.junit.Test
     public void run() throws Throwable {
-        JobId id = SchedulerTHelper.testJobSubmission(new File(jobDescriptor.toURI()).getAbsolutePath());
+        JobId id = SchedulerTHelper.testJobSubmission(new File(jobDescriptor.toURI()).getAbsolutePath(),
+                UserType.ADMIN);
 
         // check result are not null
         JobResult res = SchedulerTHelper.getJobResult(id);
