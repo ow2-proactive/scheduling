@@ -149,7 +149,6 @@ public class TestWorkflowIterationAwareness extends FunctionalTest {
     public void run() throws Throwable {
         testJavaJob();
         testNativeJob();
-        testForkedJob();
     }
 
     /**
@@ -255,84 +254,6 @@ public class TestWorkflowIterationAwareness extends FunctionalTest {
                 checkResult(in.readLine(), "T1#1*1", "1", "1");
                 in.close();
                 f.delete();
-            }
-        }
-        Assert.assertTrue("Expected 4 tasks, misses " + n, n == 0);
-        SchedulerTHelper.removeJob(id);
-        SchedulerTHelper.waitForEventJobRemoved(id);
-    }
-
-    /**
-     * forked java task through API
-     */
-    private static void testForkedJob() throws Throwable {
-        TaskFlowJob job = new TaskFlowJob();
-        job.setName("Test flow");
-
-        JavaTask t = new JavaTask();
-        t.setName("T");
-        t.setExecutableClassName("org.ow2.proactive.scheduler.examples.EmptyTask");
-        t.setForkEnvironment(new ForkEnvironment());
-        t.setMaxNumberOfExecution(4);
-        t.setFlowBlock(FlowBlock.START);
-        FlowScript dup = FlowScript.createReplicateFlowScript(dupScript);
-        t.setFlowScript(dup);
-        job.addTask(t);
-
-        JavaTask t1 = new JavaTask();
-        t1.setName("T1");
-        t1.setExecutableClassName("org.ow2.proactive.scheduler.examples.IterationAwareJob");
-        t1.addArgument("it", "$IT");
-        t1.addArgument("dup", "$REP");
-        t1.setForkEnvironment(new ForkEnvironment());
-        t1.setMaxNumberOfExecution(4);
-        t1.addDependence(t);
-        switch (OperatingSystem.getOperatingSystem()) {
-            case windows:
-                t1.setPreScript(new SimpleScript(preScriptWindows, "javascript"));
-                t1.setPostScript(new SimpleScript(postScriptWindows, "javascript"));
-                break;
-            case unix:
-                t1.setPreScript(new SimpleScript(preScript, "javascript"));
-                t1.setPostScript(new SimpleScript(postScript, "javascript"));
-                break;
-            default:
-                throw new IllegalStateException("Unsupported operating system");
-        }
-
-        job.addTask(t1);
-
-        JavaTask t2 = new JavaTask();
-        t2.setName("T2");
-        t2.addDependence(t1);
-        t2.setExecutableClassName("org.ow2.proactive.scheduler.examples.EmptyTask");
-        t2.setForkEnvironment(new ForkEnvironment());
-        t2.setMaxNumberOfExecution(4);
-        t2.setFlowBlock(FlowBlock.END);
-        FlowScript loop = FlowScript.createLoopFlowScript(loopScript, t.getName());
-        loop.setActionType(FlowActionType.LOOP);
-        loop.setActionTarget(t);
-        t2.setFlowScript(loop);
-        job.addTask(t2);
-
-        JobId id = TWorkflowJobs.testJobSubmission(job, null);
-        JobResult res = SchedulerTHelper.getJobResult(id);
-        Assert.assertFalse(SchedulerTHelper.getJobResult(id).hadException());
-
-        int n = 4;
-        for (Entry<String, TaskResult> result : res.getAllResults().entrySet()) {
-            if (result.getKey().equals("T1")) {
-                n--;
-                checkResult(result.getValue().toString(), "T1", "0", "0");
-            } else if (result.getKey().equals("T1*1")) {
-                n--;
-                checkResult(result.getValue().toString(), "T1*1", "0", "1");
-            } else if (result.getKey().equals("T1#1")) {
-                n--;
-                checkResult(result.getValue().toString(), "T1#1", "1", "0");
-            } else if (result.getKey().equals("T1#1*1")) {
-                n--;
-                checkResult(result.getValue().toString(), "T1#1*1", "1", "1");
             }
         }
         Assert.assertTrue("Expected 4 tasks, misses " + n, n == 0);
