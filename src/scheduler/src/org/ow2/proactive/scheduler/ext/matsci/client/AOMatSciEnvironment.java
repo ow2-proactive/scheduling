@@ -194,7 +194,7 @@ public abstract class AOMatSciEnvironment<R, RL> implements Serializable, Schedu
                 SchedulerEvent.JOB_PENDING_TO_FINISHED, SchedulerEvent.KILLED, SchedulerEvent.SHUTDOWN,
                 SchedulerEvent.SHUTTING_DOWN, SchedulerEvent.STOPPED, SchedulerEvent.RESUMED,
                 SchedulerEvent.TASK_RUNNING_TO_FINISHED);
-        SchedulerStatus status = scheduler.getState().getStatus();
+        SchedulerStatus status = scheduler.getStatus();
         schedulerStopped = (status == SchedulerStatus.STOPPED);
         schedulerKilled = (status == SchedulerStatus.KILLED);
 
