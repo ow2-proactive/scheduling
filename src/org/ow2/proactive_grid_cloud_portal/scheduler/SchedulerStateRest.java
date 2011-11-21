@@ -109,6 +109,7 @@ import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.JobState;
+import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.job.UserIdentification;
 import org.ow2.proactive.scheduler.common.job.factories.JobFactory;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
@@ -262,52 +263,52 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             @QueryParam("finished") @DefaultValue("true") boolean finished) throws PermissionException,
             NotConnectedException {
         Scheduler s = checkAccess(sessionId, "revisionjobsinfo?index=" + index + "&range=" + range);
-        List<JobState> jobs = new ArrayList<JobState>();
+        List<UserJobInfo> jobs = new ArrayList<UserJobInfo>();
         renewLeaseForClient(s);
-        Map<AtomicLong, SchedulerState> stateAndrevision = SchedulerStateCaching
-                .getRevisionAndSchedulerState();
+        
+         Map<AtomicLong, List<UserJobInfo>> stateAndLightRevision = SchedulerStateCaching
+                .getRevisionAndLightSchedulerState();
 
-        Entry<AtomicLong, SchedulerState> entry = stateAndrevision.entrySet().iterator().next();
+        Entry<AtomicLong, List<UserJobInfo>> entry = stateAndLightRevision.entrySet().iterator().next();
 
-        SchedulerState state = entry.getValue();
+        List<UserJobInfo> lightState = entry.getValue();
 
         String user = SchedulerSessionMapper.getInstance().getSchedulerSession(sessionId).getUserName();
+        
         if (myJobs && user != null && user.trim().length() > 0) {
             if (pending) {
-                for (JobState j : state.getPendingJobs()) {
-                    if (j.getOwner().equals(user))
+                for (UserJobInfo j : lightState) {
+                    if ((j.getJobOwner().equals(user)) && 
+                    	(j.getJobinfo().getStatus().equals(JobStatus.PENDING)))
                         jobs.add(j);
                 }
             }
             if (running) {
-                for (JobState j : state.getRunningJobs()) {
-                    if (j.getOwner().equals(user))
+                for (UserJobInfo j : lightState) {
+                    if ((j.getJobOwner().equals(user)) && 
+                        	(j.getJobinfo().getStatus().equals(JobStatus.RUNNING)))
                         jobs.add(j);
                 }
             }
             if (finished) {
-                for (JobState j : state.getFinishedJobs()) {
-                    if (j.getOwner().equals(user))
+                for (UserJobInfo j : lightState) {
+                    if ((j.getJobOwner().equals(user)) && 
+                        	(j.getJobinfo().getStatus().equals(JobStatus.FINISHED)))
                         jobs.add(j);
                 }
             }
-        } else {
-            if (pending)
-                jobs.addAll(state.getPendingJobs());
-            if (running)
-                jobs.addAll(state.getRunningJobs());
-            if (finished)
-                jobs.addAll(state.getFinishedJobs());
+        } else {          
+                jobs.addAll(lightState);
         }
 
         if (range != -1 && index != -1) {
             JobState.setSortingOrder(JobState.DESC_ORDER);
-            Collections.sort(jobs, new Comparator<JobState>() {
-                public int compare(JobState o1, JobState o2) {
+            Collections.sort(jobs, new Comparator<UserJobInfo>() {
+                public int compare(UserJobInfo o1, UserJobInfo o2) {
                     // create 3 sub groups : pending, running, finished, in order
                     // each subgroup is sorted by id
                     int o1i = -1;
-                    switch (o1.getStatus()) {
+                    switch (o1.getJobinfo().getStatus()) {
                         case PENDING:
                             o1i = 0;
                             break;
@@ -321,7 +322,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
                     }
 
                     int o2i = -1;
-                    switch (o2.getStatus()) {
+                    switch (o2.getJobinfo().getStatus()) {
                         case PENDING:
                             o2i = 0;
                             break;
@@ -339,7 +340,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
                     else if (o2i > o1i)
                         return 1;
 
-                    return o1.compareTo(o2);
+                    return 0;
                 }
             });
         }
@@ -347,13 +348,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         //filter the result if needed
         jobs = subList(jobs, index, range);
 
-        List<UserJobInfo> jobInfoList = new ArrayList<UserJobInfo>();
-        for (JobState j : jobs) {
-            jobInfoList.add(new UserJobInfo(j.getId().value(), j.getOwner(), j.getJobInfo()));
-        }
-
         HashMap<AtomicLong, List<UserJobInfo>> map = new HashMap<AtomicLong, List<UserJobInfo>>();
-        map.put(entry.getKey(), jobInfoList);
+        map.put(entry.getKey(), jobs);
         return map;
 
     }

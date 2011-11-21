@@ -37,7 +37,9 @@
 package org.ow2.proactive_grid_cloud_portal.scheduler;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicLong;
@@ -49,9 +51,10 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.utils.Sleeper;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.common.SchedulerState;
+import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
+import org.ow2.proactive.scheduler.common.exception.PermissionException;
 import org.ow2.proactive.scheduler.common.util.CachingSchedulerProxyUserInterface;
 import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
-import org.ow2.proactive.scheduler.core.SchedulerStateImpl;
 import org.ow2.proactive_grid_cloud_portal.webapp.PortalConfiguration;
 
 
@@ -66,8 +69,9 @@ import org.ow2.proactive_grid_cloud_portal.webapp.PortalConfiguration;
 public class SchedulerStateCaching {
     private static Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.PREFIX + ".rest.caching");
 
-    private static CachingSchedulerProxyUserInterface scheduler;
+    private static MyCachingSchedulerProxyUserInterface scheduler;
     private static SchedulerState localState;
+    private static List<UserJobInfo> lightLocalState;
     private static long schedulerRevision;
     private static int refreshInterval;
     private static volatile boolean kill = false;
@@ -83,7 +87,7 @@ public class SchedulerStateCaching {
      */
     private static Thread leaseRenewerThreadUpdater;
 
-    protected static Map<AtomicLong, SchedulerState> revisionAndSchedulerState;
+    protected static HashMap<AtomicLong, List<UserJobInfo>> revisionAndLightSchedulerState;
 
     private static int leaseRenewRate;
 
@@ -91,7 +95,7 @@ public class SchedulerStateCaching {
         return scheduler;
     }
 
-    public static void setScheduler(CachingSchedulerProxyUserInterface scheduler) {
+    public static void setScheduler(MyCachingSchedulerProxyUserInterface scheduler) {
         SchedulerStateCaching.scheduler = scheduler;
     }
 
@@ -101,8 +105,8 @@ public class SchedulerStateCaching {
 
         new Thread(new Runnable() {
             public void run() {
-                revisionAndSchedulerState = new HashMap<AtomicLong, SchedulerState>();
-                revisionAndSchedulerState.put(new AtomicLong(-1), new SchedulerStateImpl());
+                revisionAndLightSchedulerState =  new HashMap<AtomicLong,  List<UserJobInfo>>();
+                revisionAndLightSchedulerState.put(new AtomicLong(-1), new ArrayList<UserJobInfo>());
 
                 init_();
                 start_();
@@ -124,7 +128,7 @@ public class SchedulerStateCaching {
 
                 if (scheduler == null) {
 
-                    scheduler = PAActiveObject.newActive(CachingSchedulerProxyUserInterface.class,
+                    scheduler = PAActiveObject.newActive(MyCachingSchedulerProxyUserInterface.class,
                             new Object[] {});
 
                     // check is we use a credential file 
@@ -162,14 +166,16 @@ public class SchedulerStateCaching {
                     long currentSchedulerStateRevision = scheduler.getSchedulerStateRevision();
                     try {
                         if (currentSchedulerStateRevision != schedulerRevision) {
-                            Map<AtomicLong, SchedulerState> schedStateTmp = scheduler.getRevisionVersionAndSchedulerState();
+                        	long begin = System.currentTimeMillis();
+                             HashMap<AtomicLong, List<UserJobInfo>> schedStateTmp = scheduler.getLightSchedulerStateAsUserInfoList();
                             PAFuture.waitFor(schedStateTmp);
-                            revisionAndSchedulerState = schedStateTmp;
-                            Entry<AtomicLong, SchedulerState> tmp = revisionAndSchedulerState.entrySet()
+                            long end = System.currentTimeMillis();                            
+                            revisionAndLightSchedulerState = schedStateTmp;
+                            Entry<AtomicLong, List<UserJobInfo>> tmp = revisionAndLightSchedulerState.entrySet()
                                     .iterator().next();
-                            localState = tmp.getValue();
+                            lightLocalState = tmp.getValue();
                             schedulerRevision = tmp.getKey().longValue();
-                            logger.debug("updated scheduler state revision at " + schedulerRevision);
+                            logger.debug("updated scheduler state revision at " + schedulerRevision + " ,took " + (end- begin) + " msecs for " + lightLocalState.size() + " jobs");
                         }
                     } catch (Throwable t) {
                         logger.info(
@@ -204,12 +210,8 @@ public class SchedulerStateCaching {
 
     }
 
-    public static SchedulerState getLocalState() {
-        return localState;
-    }
-
-    public static void setLocalState(SchedulerState localState) {
-        SchedulerStateCaching.localState = localState;
+    public static SchedulerState getLocalState() throws NotConnectedException, PermissionException {
+        return scheduler.getState();
     }
 
     public static long getSchedulerRevision() {
@@ -236,7 +238,11 @@ public class SchedulerStateCaching {
         SchedulerStateCaching.kill = kill;
     }
 
-    public static Map<AtomicLong, SchedulerState> getRevisionAndSchedulerState() {
-        return revisionAndSchedulerState;
+    public static Map<AtomicLong, List<UserJobInfo>> getRevisionAndLightSchedulerState() {
+        return revisionAndLightSchedulerState;
     }
+
+	public static Map<AtomicLong, SchedulerState> getRevisionAndSchedulerState() {
+		return scheduler.getRevisionVersionAndSchedulerState();
+	}
 }

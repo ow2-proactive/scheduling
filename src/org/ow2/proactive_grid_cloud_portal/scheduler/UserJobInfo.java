@@ -36,6 +36,8 @@
  */
 package org.ow2.proactive_grid_cloud_portal.scheduler;
 
+import java.io.Serializable;
+
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.ow2.proactive.scheduler.common.job.JobInfo;
@@ -50,7 +52,7 @@ import org.ow2.proactive.scheduler.common.job.JobInfo;
  *
  */
 @XmlRootElement
-public class UserJobInfo {
+public class UserJobInfo implements Serializable{
     /*
      * the id of the job
      */

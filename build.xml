@@ -53,6 +53,9 @@
 			<include name="**/*.jar" />
 		</fileset>
 		<pathelement location="${classes.dir}" />
+		<fileset dir="${ant.library.dir}">
+			<include name="**/*.jar" />
+	 	</fileset>
 	</path>
 
 	<!-- NB: all the source files are the project source files -->
@@ -62,6 +65,14 @@
 		<javac srcdir="${src.dir}" destdir="${classes.dir}" deprecation="false" failonerror="true" debug="true">
 			<classpath refid="src.classpath" />
 		</javac>
+		
+		<taskdef name="stubGenerator" classname="ant.AntStubGenerator" classpathref="src.classpath" />
+		<typedef name="class" classname="ant.AntStubGeneratorClass" classpathref="src.classpath" />
+		
+		<stubGenerator srcDir="${classes.dir}" refclasspath="src.classpath">
+				<class name="org.ow2.proactive_grid_cloud_portal.scheduler.MyCachingSchedulerProxyUserInterface" />
+		</stubGenerator>
+		
 	</target>
 
 
@@ -178,6 +189,7 @@
 		<jar jarfile="${webinf.lib.dir}/schedulingrest-scheduler-${rest_api.version}.jar">
 			<fileset dir="${classes.dir}">
 				<include name="org/ow2/proactive_grid_cloud_portal/scheduler/**" />
+				<include name="pa/stub/org/ow2/proactive_grid_cloud_portal/scheduler/**" />
 			</fileset>
 			<manifest>
 				<!-- Who is building this jar? -->
