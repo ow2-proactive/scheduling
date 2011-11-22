@@ -127,7 +127,8 @@ public class ResourceManagerModel extends ConsoleModel {
                 + " nodeSource is removed immediately if second parameter is true)"));
         commands.add(new Command("locknode(nodeURL)", "Locks the node"));
         commands.add(new Command("unlocknode(nodeURL)", "Unlocks the node"));
-        commands.add(new Command("listnodes(nodeSourceName)", "List nodes for a particular or all node sources"));
+        commands.add(new Command("listnodes(nodeSourceName)",
+            "List nodes for a particular or all node sources"));
         commands.add(new Command("listns()", "List every handled node sources"));
         commands.add(new Command("nodeinfo(nodeURL)", "Displays node informations"));
         commands.add(new Command("listinfrastructures()", "List supported infrastructures"));

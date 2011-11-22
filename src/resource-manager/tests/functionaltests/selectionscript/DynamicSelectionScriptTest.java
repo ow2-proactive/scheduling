@@ -47,6 +47,7 @@ import org.objectweb.proactive.api.PAFuture;
 import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
+import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.scripting.SelectionScript;
@@ -86,6 +87,8 @@ public class DynamicSelectionScriptTest extends FunctionalTest {
     private URL badSelectionScriptpath = this.getClass().getResource("badSelectionScript.js");
 
     private URL withoutSelectedSelectionScriptpath = this.getClass().getResource("withoutSelectedSScript.js");
+
+    private URL fileCheckScriptPath = this.getClass().getResource("fileCheck.js");
 
     private String vmPropKey = "myProperty";
     private String vmPropValue = "myValue";
@@ -253,5 +256,42 @@ public class DynamicSelectionScriptTest extends FunctionalTest {
         } catch (RuntimeException e) {
         }
         assertTrue(resourceManager.getState().getFreeNodesNumber() == RMTHelper.defaultNodesNumber);
+
+        RMTHelper.log("Test 7");
+
+        // Checking the dynamicity of the node (period during which the dynamic characteristics do not change).
+        // It sets to 10 secs for testing configuration.
+        // So first run the synamic script that fails checking if the file exist
+        // Then create a file and call getNodes again. It must return 0 nodes.
+        // Wait for 10 secs and call getNodes again. The script must be executed now
+        // and we should get some nodes.
+
+        final String FILE_NAME = System.getProperty("java.io.tmpdir") + "/dynamicity.selection";
+        if (new File(FILE_NAME).exists()) {
+            new File(FILE_NAME).delete();
+        }
+        SelectionScript fileCheck = new SelectionScript(new File(fileCheckScriptPath.toURI()),
+            new String[] { FILE_NAME }, true);
+        System.out.println("The dynamic script checking is file exists must fail " + FILE_NAME);
+        nodes = resourceManager.getAtMostNodes(1, fileCheck);
+        Assert.assertEquals(0, nodes.size());
+        System.out.println("Correct");
+
+        System.out.println("Creating the file " + FILE_NAME);
+        new File(FILE_NAME).createNewFile();
+
+        System.out.println("The dynamic script checking is file exists must not be executed " + FILE_NAME);
+        nodes = resourceManager.getAtMostNodes(1, fileCheck);
+        Assert.assertEquals(0, nodes.size());
+        System.out.println("Correct");
+
+        Thread.sleep(PAResourceManagerProperties.RM_SELECT_SCRIPT_NODE_DYNAMICITY.getValueAsInt());
+
+        System.out.println("The dynamic script checking is file exists must pass " + FILE_NAME);
+        nodes = resourceManager.getAtMostNodes(1, fileCheck);
+        Assert.assertEquals(1, nodes.size());
+        System.out.println("Correct");
+
+        new File(FILE_NAME).delete();
     }
 }

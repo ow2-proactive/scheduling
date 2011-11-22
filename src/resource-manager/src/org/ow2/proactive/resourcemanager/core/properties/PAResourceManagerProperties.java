@@ -76,11 +76,12 @@ public enum PAResourceManagerProperties {
     /**  The number of selection script digests stored in the cache to predict the execution results */
     RM_SELECT_SCRIPT_CACHE_SIZE("pa.rm.select.script.cache", PropertyType.INTEGER),
 
-    /** The minimal probability for dynamic scripts. If the probability of being successful reach this value
-     *	it won't be executed anymore (in percents) Default is 1% out of 100% which corresponds approximately
-     *  to 30 times consecutive scripts failure of on a host.
+    /**
+     *  The time period when a node has the same dynamic characteristics (in ms).
+     *  Default is 5 mins, which means that if any dynamic selection scripts returns
+     *  false on a node it won't be executed there at least for this time.
      */
-    RM_SELECT_SCRIPT_MINPROBABILIYT("pa.rm.select.script.minprobability", PropertyType.INTEGER),
+    RM_SELECT_SCRIPT_NODE_DYNAMICITY("pa.rm.select.node.dynamicity", PropertyType.INTEGER),
 
     /**  Timeout in ms for node lookup */
     RM_NODELOOKUP_TIMEOUT("pa.rm.nodelookup.timeout", PropertyType.INTEGER),
