@@ -306,42 +306,38 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
 	for (UserJobInfo j : lightState) {
 
-	    if (pending
-		    && (j.getJobinfo().getStatus().equals(JobStatus.PENDING))) {
-
-		if (onlyUserJobs) {
-		    if (j.getJobOwner().equals(user)) {
-			jobs.add(j);
-		    }
-		} else {
-		    jobs.add(j);
-		}
-
+	    if (onlyUserJobs && !j.getJobOwner().equals(user)) {
+		continue;
 	    }
 
-	    if (running
-		    && (j.getJobinfo().getStatus().equals(JobStatus.RUNNING))) {
+	    JobStatus jobStatus = j.getJobinfo().getStatus();
 
-		if (onlyUserJobs) {
-		    if (j.getJobOwner().equals(user)) {
-			jobs.add(j);
-		    }
-		} else {
+	    switch (jobStatus) {
+	    case PENDING:
+		if (pending) {
 		    jobs.add(j);
 		}
-
-	    }
-
-	    if (finished
-		    && j.getJobinfo().getStatus().equals(JobStatus.FINISHED)) {
-
-		if (onlyUserJobs) {
-		    if ((j.getJobOwner().equals(user))) {
-			jobs.add(j);
-		    }
-		} else {
+		break;
+	    case RUNNING:
+	    case STALLED:
+	    case PAUSED:
+		if (running) {
 		    jobs.add(j);
 		}
+		break;
+	    case FINISHED:
+	    case CANCELED:
+	    case FAILED:
+	    case KILLED:
+		if (finished) {
+		    jobs.add(j);
+		}
+		break;
+	    default:
+		// unknown status so far
+		// but we display it anyway
+		jobs.add(j);
+		break;
 	    }
 	}
 
@@ -359,6 +355,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 			break;
 		    case RUNNING:
 		    case STALLED:
+		    case PAUSED:
 			o1i = 1;
 			break;
 		    default:
@@ -373,6 +370,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 			break;
 		    case RUNNING:
 		    case STALLED:
+		    case PAUSED:
 			o2i = 1;
 			break;
 		    default:
