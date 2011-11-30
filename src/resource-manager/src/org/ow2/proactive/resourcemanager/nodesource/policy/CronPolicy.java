@@ -47,7 +47,6 @@ import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
-import org.ow2.proactive.resourcemanager.nodesource.utils.NamesConvertor;
 import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 
 
@@ -173,8 +172,8 @@ public class CronPolicy extends NodeSourcePolicy implements InitActive {
      */
     @Override
     public String toString() {
-        return NamesConvertor.beautifyName(this.getClass().getSimpleName()) + " acquisiotion at [" +
-            nodeAcquision + "]" + ", removal at [" + nodeRemoval + "], preemptive: " + preemptive;
+        return super.toString() + " acquisiotion at [" + nodeAcquision + "]" + ", removal at [" +
+            nodeRemoval + "], preemptive: " + preemptive;
 
     }
 }

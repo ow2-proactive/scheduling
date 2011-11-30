@@ -53,7 +53,6 @@ import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
-import org.ow2.proactive.resourcemanager.nodesource.utils.NamesConvertor;
 
 
 /**
@@ -234,7 +233,7 @@ public class TimeSlotPolicy extends NodeSourcePolicy implements InitActive {
      */
     @Override
     public String toString() {
-        return NamesConvertor.beautifyName(this.getClass().getSimpleName()) + " [Acquire Time: " +
-            acquireTime + " Release Time: " + releaseTime + " Period: " + period + " ms]";
+        return super.toString() + " [Acquire Time: " + acquireTime + " Release Time: " + releaseTime +
+            " Period: " + period + " ms]";
     }
 }

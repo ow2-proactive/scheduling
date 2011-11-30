@@ -46,6 +46,7 @@ import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
+import org.ow2.proactive.resourcemanager.nodesource.utils.NamesConvertor;
 import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 
 
@@ -72,15 +73,13 @@ public abstract class NodeSourcePolicy implements Serializable {
     /** Node source of the policy */
     protected NodeSource nodeSource;
 
-    public enum AccessType {
-        ME, MY_GROUPS, PROVIDER, PROVIDER_GROUPS, ALL
-    };
+    // Users who can get nodes for computations from this node source
+    @Configurable(description = "ME|users=name1,name2,groups=group1,group2|ALL")
+    private AccessType userAccessType = AccessType.ALL;
 
-    @Configurable(description = "ME|MY_GROUPS|PROVIDER|PROVIDER_GROUPS|ALL")
-    private AccessType nodeUsers = AccessType.ALL;
-
-    @Configurable(description = "ME|MY_GROUPS|ALL")
-    private AccessType nodeProviders = AccessType.ME;
+    // Users who can add/remove nodes to/from this node source
+    @Configurable(description = "ME|users=name1,name2,groups=group1,group2|ALL")
+    private AccessType provideerAccessType = AccessType.ME;
 
     /**
      * Configure a policy with given parameters.
@@ -90,16 +89,12 @@ public abstract class NodeSourcePolicy implements Serializable {
     public BooleanWrapper configure(Object... policyParameters) {
         if (policyParameters != null && policyParameters.length >= 2) {
             try {
-                nodeUsers = AccessType.valueOf(policyParameters[0].toString());
+                userAccessType = AccessType.valueOf(policyParameters[0].toString());
             } catch (IllegalArgumentException e) {
                 throw new IllegalArgumentException("Incorrect parameter value " + policyParameters[0]);
             }
             try {
-                nodeProviders = AccessType.valueOf(policyParameters[1].toString());
-                if (nodeProviders == AccessType.PROVIDER || nodeProviders == AccessType.PROVIDER_GROUPS) {
-                    // these values are not allowed for admin access
-                    throw new IllegalArgumentException("Incorrect parameter value " + policyParameters[1]);
-                }
+                provideerAccessType = AccessType.valueOf(policyParameters[1].toString());
             } catch (IllegalArgumentException e) {
                 throw new IllegalArgumentException("Incorrect parameter value " + policyParameters[1]);
             }
@@ -221,7 +216,7 @@ public abstract class NodeSourcePolicy implements Serializable {
      * @return a node source administration type
      */
     public AccessType getProviderAccessType() {
-        return nodeProviders;
+        return provideerAccessType;
     }
 
     /**
@@ -231,6 +226,15 @@ public abstract class NodeSourcePolicy implements Serializable {
      * @return a nodes access type
      */
     public AccessType getUserAccessType() {
-        return nodeUsers;
+        return userAccessType;
+    }
+
+    /**
+     * Policy string representation.
+     */
+    @Override
+    public String toString() {
+        return NamesConvertor.beautifyName(this.getClass().getSimpleName()) + " user access type [" +
+            userAccessType + "]" + ", provider access type [" + provideerAccessType + "]";
     }
 }
