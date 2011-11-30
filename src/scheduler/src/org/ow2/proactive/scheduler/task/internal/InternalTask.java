@@ -230,7 +230,7 @@ public abstract class InternalTask extends TaskState {
      * {@link TransientInSerialization} annotation
      **/
     private static final List<Field> fieldsToSerialize = getFieldsToSerialize();
-    
+
     /**
      * {@inheritDoc}
      */
@@ -1324,12 +1324,12 @@ public abstract class InternalTask extends TaskState {
         List<Field> fieldsToSerialize = new ArrayList<Field>();
         Field[] fields = InternalTask.class.getDeclaredFields();
         for (Field f : fields) {
-            if (!f.isAnnotationPresent(TransientInSerialization.class)
-                    && !Modifier.isStatic(f.getModifiers())) {
+            if (!f.isAnnotationPresent(TransientInSerialization.class) &&
+                !Modifier.isStatic(f.getModifiers())) {
                 fieldsToSerialize.add(f);
             }
         }
         return fieldsToSerialize;
     }
-    
+
 }

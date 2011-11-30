@@ -115,18 +115,20 @@ public class ConnectAction extends SchedulerGUIAction {
                         JobsController.getActiveView().init();
 
                         switch (res) {
-                        case 0: // init val
-				return Status.OK_STATUS;
+                            case 0: // init val
+                                return Status.OK_STATUS;
 
-                        case SchedulerProxy.LOGIN_OR_PASSWORD_WRONG:
-                           errorConnect(new Exception("Authentication failed: invalid username or password "), dialogResult.getUrl());
-                            return Status.OK_STATUS;
+                            case SchedulerProxy.LOGIN_OR_PASSWORD_WRONG:
+                                errorConnect(new Exception(
+                                    "Authentication failed: invalid username or password "), dialogResult
+                                        .getUrl());
+                                return Status.OK_STATUS;
 
-                        case SchedulerProxy.CONNECTED:
-				postConnect(dialogResult.getUrl());
-				default:
-					return Status.OK_STATUS;
-				}
+                            case SchedulerProxy.CONNECTED:
+                                postConnect(dialogResult.getUrl());
+                            default:
+                                return Status.OK_STATUS;
+                        }
                     } catch (Throwable t) {
                         errorConnect(t, dialogResult.getUrl());
                         // Status.WARNING used (instead of Status.ERROR) to avoid the appearance of an eclipse's error dialog
@@ -156,9 +158,9 @@ public class ConnectAction extends SchedulerGUIAction {
      */
     private void postConnect(final String schedulerURL) {
 
-	UIJob uiJob = new UIJob(getParent().getDisplay(), "Scheduler post connect job") {
-			@Override
-			public IStatus runInUIThread(IProgressMonitor monitor) {
+        UIJob uiJob = new UIJob(getParent().getDisplay(), "Scheduler post connect job") {
+            @Override
+            public IStatus runInUIThread(IProgressMonitor monitor) {
                 SeparatedJobView.getPendingJobComposite().initTable();
                 SeparatedJobView.getRunningJobComposite().initTable();
                 SeparatedJobView.getFinishedJobComposite().initTable();
