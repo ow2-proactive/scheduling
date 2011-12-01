@@ -344,7 +344,6 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 	}
 
 	if (range != -1 && index != -1) {
-	    JobState.setSortingOrder(JobState.DESC_ORDER);
 	    Collections.sort(jobs, new Comparator<UserJobInfo>() {
 		public int compare(UserJobInfo o1, UserJobInfo o2) {
 		    // create 3 sub groups : pending, running, finished, in
@@ -385,8 +384,10 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 		    else if (o2i > o1i)
 			return 1;
 
-		    return 0;
-		}
+			Integer id1 = Integer.valueOf(o1.getJobid());
+			Integer id2 = Integer.valueOf(o2.getJobid());
+			return id2.compareTo(id1);
+			}
 	    });
 	}
 
