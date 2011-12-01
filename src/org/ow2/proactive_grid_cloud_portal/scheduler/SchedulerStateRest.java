@@ -44,6 +44,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.io.Serializable;
 import java.security.KeyException;
 import java.security.PublicKey;
@@ -111,6 +112,7 @@ import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.job.UserIdentification;
+import org.ow2.proactive.scheduler.common.job.factories.FlatJobFactory;
 import org.ow2.proactive.scheduler.common.job.factories.JobFactory;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskState;
@@ -1294,6 +1296,69 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
     }
 
+	/**
+	 * Submit job using flat command file
+	 * @param sessionId valid session id
+	 * @param commandFileContent content of a command file: endline separated native commands
+	 * @param jobName name of the job to create
+	 * @param selectionScriptContent content of a selection script, or null
+	 * @param selectionScriptExtension extension of the selectionscript to determine script engine ("js", "py", "rb")
+	 * @return Id of the submitted job
+	 * @throws NotConnectedException
+	 * @throws IOException
+	 * @throws JobCreationException
+	 * @throws PermissionException
+	 * @throws SubmissionClosedException
+	 */
+	@POST
+	@Path("submitflat")
+	@Produces("application/json")
+	public JobId submitFlat(@HeaderParam("sessionid") String sessionId,
+			@FormParam("commandFileContent") String commandFileContent,
+			@FormParam("jobName") String jobName,
+			@FormParam("selectionScriptContent") String selectionScriptContent,
+			@FormParam("selectionScriptExtension") String selectionScriptExtension)
+			throws NotConnectedException, IOException, JobCreationException,
+			PermissionException, SubmissionClosedException {
+		Scheduler s = checkAccess(sessionId, "submitflat");
+		
+		try {
+			File command = File.createTempFile("flatsubmit_commands_", ".txt");
+			command.deleteOnExit();
+			
+			String selectionPath = null;
+			File selection = null;
+
+			if (selectionScriptContent != null
+					&& selectionScriptContent.trim().length() > 0) {
+				selection = File.createTempFile("flatsubmit_selection_", "."
+						+ selectionScriptExtension);
+				selection.deleteOnExit();
+				PrintWriter pw = new PrintWriter(
+						new FileOutputStream(selection));
+				pw.print(selectionScriptContent);
+				pw.close();
+				selectionPath = selection.getAbsolutePath();
+			}
+
+			PrintWriter pw = new PrintWriter(new FileOutputStream(command));
+			pw.print(commandFileContent);
+			pw.close();
+
+			Job j = FlatJobFactory.getFactory()
+					.createNativeJobFromCommandsFile(command.getAbsolutePath(),
+							jobName, selectionPath, null);
+			JobId id = s.submit(j);
+			
+			command.delete();
+			if (selection != null)
+				selection.delete();
+			return id;
+		} catch (IOException e) {
+			throw new IOException("I/O Error: " + e.getMessage(), e);
+		}
+	}
+	
     /**
      * Submits a job to the scheduler
      * 

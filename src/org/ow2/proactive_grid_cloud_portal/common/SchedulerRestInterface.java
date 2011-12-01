@@ -463,6 +463,32 @@ public interface SchedulerRestInterface {
             @PathParam("jobid") final String jobId) throws NotConnectedException, UnknownJobException,
             PermissionException;
 
+	/**
+	 * Submit job using flat command file
+	 * @param sessionId valid session id
+	 * @param commandFileContent content of a command file: line separated native commands
+	 * @param jobName name of the job to create
+	 * @param selectionScriptContent content of a selection script, or null
+	 * @param selectionScriptExtension extension of the selectionscript to determine script engine ("js", "py", "rb")
+	 * @return Id of the submitted job
+	 * @throws NotConnectedException
+	 * @throws IOException
+	 * @throws JobCreationException
+	 * @throws PermissionException
+	 * @throws SubmissionClosedException
+	 */
+	@POST
+	@Path("submitflat")
+	@Produces("application/json")
+	public abstract JobId submitFlat(
+			@HeaderParam("sessionid") String sessionId,
+			@FormParam("commandFileContent") String commandFileContent,
+			@FormParam("jobName") String jobName,
+			@FormParam("selectionScriptContent") String selectionScriptContent,
+			@FormParam("selectionScriptExtension") String selectionScriptExtension)
+			throws NotConnectedException, IOException, JobCreationException,
+			PermissionException, SubmissionClosedException;
+    
     /**
      * Submits a job to the scheduler 
      * @param sessionId a valid session id
