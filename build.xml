@@ -97,6 +97,9 @@
 			<fileset dir="${lib.dir}/resteasy">
 				<include name="**/*.jar" />
 			</fileset>
+			<fileset dir="${lib.dir}/misc">
+				<include name="**/*.jar" />
+			</fileset>
 		</copy>
 
 		<!-- copy doc content -->
