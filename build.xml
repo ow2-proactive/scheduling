@@ -46,6 +46,10 @@
 		<delete dir="${webinf.classes.dir}" />
 		<delete dir="${webinf.lib.dir}" />
 		<delete dir="${war.root}/doc" />
+		<delete dir="${build.dir}" />
+		<delete>
+		  <fileset dir="." includes="SchedulingRest-*.war" />
+		</delete>
 	</target>
 
 	<path id="src.classpath">
