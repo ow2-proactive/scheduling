@@ -461,7 +461,7 @@
                   id="org.ow2.proactive.scheduler.showruntimedataToolbarItem"
                   label="Show Runtime Monitoring"
                   style="push"
-                  tooltip="Show Runtime Monitoring View">
+                  tooltip="Show Runtime Monitoring and History">
                <visibleWhen
                      checkEnabled="false">
                   <with
@@ -707,7 +707,7 @@
                   id="org.ow2.proactive.scheduler.showruntimedataToolbarItem"
                   label="Show Runtime Monitoring"
                   style="push"
-                  tooltip="Show Runtime Monitoring View">
+                  tooltip="Show Runtime Monitoring and History">
                <visibleWhen
                      checkEnabled="false">
                   <with

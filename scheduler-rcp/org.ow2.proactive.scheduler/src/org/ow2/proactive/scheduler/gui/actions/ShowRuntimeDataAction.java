@@ -61,7 +61,7 @@ import org.ow2.proactive.scheduler.Activator;
  */
 public final class ShowRuntimeDataAction extends JMXAbstractAction {
 
-    public static final String NAME = "Runtime Monitoring";
+    public static final String NAME = "Runtime Monitoring and History";
 
     /** The URL of the configuration file */
     private final URL configFileURL;

@@ -104,7 +104,7 @@ public class ConnectHandler extends AbstractHandler implements IHandler {
             });
         } else if (!dialogResult.isCanceled()) {
             //perform connection in a new thread, non graphic
-            Job job = new Job("Downloading the Resource Manager Server state, this might take a few moments.") {
+            Job job = new Job("Downloading the Cloud & Grid state, this might take several minutes.") {
 
                 @Override
                 protected IStatus run(IProgressMonitor monitor) {

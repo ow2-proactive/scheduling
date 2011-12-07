@@ -158,6 +158,12 @@ public class RMModel implements Serializable {
 
         TreeParentElement source = (TreeParentElement) find(root, nodeEvent.getNodeSource());
 
+        if (source==null)
+        {
+		System.out.println("WARNING: could not find node source "+ nodeEvent.getNodeSource() + " fore node "+ nodeEvent.getNodeUrl()+". Node will not be represented. ");
+		return;
+        }
+
         // the source cannot be null
         TreeParentElement host = (TreeParentElement) find(source, nodeEvent.getHostName());
         if (host == null) { // if the host is null, then add it
@@ -448,7 +454,12 @@ public class RMModel implements Serializable {
     /****************************************************/
 
     private TreeLeafElement find(TreeParentElement parent, String name) {
-        for (TreeLeafElement child : parent.getChildren())
+//        if ((parent==null) || parent.getChildren()==null)
+//        {
+//        	return null;
+//        }
+
+	for (TreeLeafElement child : parent.getChildren())
             if (child.getName().equals(name))
                 return child;
         return null;
