@@ -293,20 +293,20 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 	List<UserJobInfo> jobs = new ArrayList<UserJobInfo>();
 	renewLeaseForClient(s);
 
-	Map<AtomicLong, List<UserJobInfo>> stateAndLightRevision = SchedulerStateCaching
+	Map<AtomicLong, LightSchedulerState> stateAndLightRevision = SchedulerStateCaching
 		.getRevisionAndLightSchedulerState();
 
-	Entry<AtomicLong, List<UserJobInfo>> entry = stateAndLightRevision
+	Entry<AtomicLong, LightSchedulerState> entry = stateAndLightRevision
 		.entrySet().iterator().next();
 
-	List<UserJobInfo> lightState = entry.getValue();
+	LightSchedulerState lightState = entry.getValue();
 
 	String user = SchedulerSessionMapper.getInstance()
 		.getSchedulerSession(sessionId).getUserName();
 
 	boolean onlyUserJobs = (myJobs && user != null && user.trim().length() > 0);
 
-	for (UserJobInfo j : lightState) {
+	for (UserJobInfo j : lightState.getJobs()) {
 
 	    if (onlyUserJobs && !j.getJobOwner().equals(user)) {
 		continue;
@@ -1669,8 +1669,15 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 	    @HeaderParam("sessionid") final String sessionId)
 	    throws NotConnectedException, PermissionException {
 	final Scheduler s = checkAccess(sessionId, "status");
-	return PAFuture.getFutureValue(s.getStatus());
+	renewLeaseForClient(s);
+	Map<AtomicLong, LightSchedulerState> stateAndLightRevision = SchedulerStateCaching
+			.getRevisionAndLightSchedulerState();
 
+	Entry<AtomicLong, LightSchedulerState> entry = stateAndLightRevision
+			.entrySet().iterator().next();
+
+	LightSchedulerState lightState = entry.getValue();
+	return lightState.getStatus();
     }
 
     /**
@@ -1936,19 +1943,14 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
 	Scheduler s = checkAccess(sessionId, "users");
 	renewLeaseForClient(s);
-	Map<AtomicLong, SchedulerState> stateAndrevision = SchedulerStateCaching
-		.getRevisionAndSchedulerState();
+	Map<AtomicLong, LightSchedulerState> stateAndLightRevision = SchedulerStateCaching
+			.getRevisionAndLightSchedulerState();
 
-	Entry<AtomicLong, SchedulerState> entry = stateAndrevision.entrySet()
-		.iterator().next();
-	SchedulerState state = entry.getValue();
+	Entry<AtomicLong, LightSchedulerState> entry = stateAndLightRevision
+			.entrySet().iterator().next();
 
-	ArrayList<UserIdentification> userIds = new ArrayList<UserIdentification>();
-	for (UserIdentification user : state.getUsers().getUsers()) {
-	    userIds.add(user);
-	}
-
-	return userIds;
+	LightSchedulerState lightState = entry.getValue();
+	return lightState.getUsers();
     }
 
     /*

@@ -61,6 +61,7 @@ import org.ow2.proactive.scheduler.common.SchedulerState;
 import org.ow2.proactive.scheduler.common.exception.InternalSchedulerException;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.job.JobState;
+import org.ow2.proactive.scheduler.common.job.UserIdentification;
 import org.ow2.proactive.scheduler.common.util.CachingSchedulerProxyUserInterface;
 import org.ow2.proactive.utils.console.MBeanInfoViewer;
 
@@ -157,7 +158,7 @@ public class MyCachingSchedulerProxyUserInterface extends CachingSchedulerProxyU
         schedulerState = PAFuture.getFutureValue(schedulerState);
     }
 
-    public  HashMap<AtomicLong, List<UserJobInfo>> getLightSchedulerStateAsUserInfoList() {
+    public  HashMap<AtomicLong, LightSchedulerState> getLightSchedulerState() {
     	Map<AtomicLong, SchedulerState> _schedStateAndRevision = getRevisionVersionAndSchedulerState();
     	
     	Entry<AtomicLong, SchedulerState> entry = _schedStateAndRevision.entrySet().iterator().next();
@@ -173,9 +174,14 @@ public class MyCachingSchedulerProxyUserInterface extends CachingSchedulerProxyU
         for (JobState j : jobs) {
             jobInfoList.add(new UserJobInfo(j.getId().value(), j.getOwner(), j.getJobInfo()));
         }
+        List<UserIdentification> users = new ArrayList<UserIdentification>();
+        users.addAll(state.getUsers().getUsers());
         
-        HashMap<AtomicLong, List<UserJobInfo>> result = new HashMap<AtomicLong, List<UserJobInfo>>();
-        result.put(entry.getKey(), jobInfoList);
+		LightSchedulerState lightState = new LightSchedulerState(jobInfoList,
+				users, state.getStatus());
+        
+        HashMap<AtomicLong, LightSchedulerState> result = new HashMap<AtomicLong, LightSchedulerState>();
+        result.put(entry.getKey(), lightState);
         return  result;
     }
 }

@@ -37,7 +37,6 @@
 package org.ow2.proactive_grid_cloud_portal.scheduler;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -71,7 +70,7 @@ public class SchedulerStateCaching {
 
     private static MyCachingSchedulerProxyUserInterface scheduler;
     private static SchedulerState localState;
-    private static List<UserJobInfo> lightLocalState;
+    private static LightSchedulerState lightLocalState;
     private static long schedulerRevision;
     private static int refreshInterval;
     private static volatile boolean kill = false;
@@ -87,7 +86,7 @@ public class SchedulerStateCaching {
      */
     private static Thread leaseRenewerThreadUpdater;
 
-    protected static HashMap<AtomicLong, List<UserJobInfo>> revisionAndLightSchedulerState;
+    protected static HashMap<AtomicLong, LightSchedulerState> revisionAndLightSchedulerState;
 
     private static int leaseRenewRate;
 
@@ -105,8 +104,8 @@ public class SchedulerStateCaching {
 
         new Thread(new Runnable() {
             public void run() {
-                revisionAndLightSchedulerState =  new HashMap<AtomicLong,  List<UserJobInfo>>();
-                revisionAndLightSchedulerState.put(new AtomicLong(-1), new ArrayList<UserJobInfo>());
+                revisionAndLightSchedulerState =  new HashMap<AtomicLong,  LightSchedulerState>();
+                revisionAndLightSchedulerState.put(new AtomicLong(-1), new LightSchedulerState());
 
                 init_();
                 start_();
@@ -167,15 +166,15 @@ public class SchedulerStateCaching {
                     try {
                         if (currentSchedulerStateRevision != schedulerRevision) {
                         	long begin = System.currentTimeMillis();
-                             HashMap<AtomicLong, List<UserJobInfo>> schedStateTmp = scheduler.getLightSchedulerStateAsUserInfoList();
+                             HashMap<AtomicLong, LightSchedulerState> schedStateTmp = scheduler.getLightSchedulerState();
                             PAFuture.waitFor(schedStateTmp);
                             long end = System.currentTimeMillis();                            
                             revisionAndLightSchedulerState = schedStateTmp;
-                            Entry<AtomicLong, List<UserJobInfo>> tmp = revisionAndLightSchedulerState.entrySet()
+                            Entry<AtomicLong, LightSchedulerState> tmp = revisionAndLightSchedulerState.entrySet()
                                     .iterator().next();
                             lightLocalState = tmp.getValue();
                             schedulerRevision = tmp.getKey().longValue();
-                            logger.debug("updated scheduler state revision at " + schedulerRevision + " ,took " + (end- begin) + " msecs for " + lightLocalState.size() + " jobs");
+                            logger.debug("updated scheduler state revision at " + schedulerRevision + " ,took " + (end- begin) + " msecs for " + lightLocalState.getJobs().size() + " jobs");
                         }
                     } catch (Throwable t) {
                         logger.info(
@@ -238,7 +237,7 @@ public class SchedulerStateCaching {
         SchedulerStateCaching.kill = kill;
     }
 
-    public static Map<AtomicLong, List<UserJobInfo>> getRevisionAndLightSchedulerState() {
+    public static Map<AtomicLong, LightSchedulerState> getRevisionAndLightSchedulerState() {
         return revisionAndLightSchedulerState;
     }
 
