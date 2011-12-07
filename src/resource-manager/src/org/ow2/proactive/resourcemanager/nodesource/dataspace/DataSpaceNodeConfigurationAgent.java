@@ -41,6 +41,7 @@ import java.io.Serializable;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.extensions.dataspaces.core.BaseScratchSpaceConfiguration;
 import org.objectweb.proactive.extensions.dataspaces.core.DataSpacesNodes;
 import org.ow2.proactive.resourcemanager.utils.RMLoggers;
@@ -61,6 +62,8 @@ public class DataSpaceNodeConfigurationAgent implements Serializable {
      * It is also defined in TaskLauncher.
      */
     protected static final String NODE_DATASPACE_SCRATCHDIR = "node.dataspace.scratchdir";
+
+    public static final long DATASPACE_CLOSE_TIMEOUT = 21 * 1000; // seconds (Christian's last wish)
 
     /**
      * Create a new instance of DataSpaceNodeConfigurationAgent
@@ -92,16 +95,16 @@ public class DataSpaceNodeConfigurationAgent implements Serializable {
         return true;
     }
 
-    public boolean closeNodeConfiguration() {
+    public BooleanWrapper closeNodeConfiguration() {
         try {
             DataSpacesNodes.closeNodeConfig(PAActiveObject
                     .getActiveObjectNode(PAActiveObject.getStubOnThis()));
         } catch (Throwable t) {
             logger.error("Cannot close dataSpace configuration !", t);
-            return false;
+            throw new RuntimeException(t);
         }
         PAActiveObject.terminateActiveObject(false);
-        return true;
+        return new BooleanWrapper(true);
     }
 
 }

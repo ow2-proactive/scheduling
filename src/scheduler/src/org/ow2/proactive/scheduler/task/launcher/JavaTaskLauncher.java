@@ -40,14 +40,21 @@ import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.annotation.ImmediateService;
 import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.objectweb.proactive.extensions.dataspaces.core.BaseScratchSpaceConfiguration;
 import org.objectweb.proactive.extensions.dataspaces.core.DataSpacesNodes;
+import org.ow2.proactive.resourcemanager.nodesource.dataspace.DataSpaceNodeConfigurationAgent;
 import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
 import org.ow2.proactive.scheduler.common.task.ExecutableInitializer;
 import org.ow2.proactive.scheduler.common.task.JavaExecutableInitializer;
@@ -266,13 +273,27 @@ public class JavaTaskLauncher extends TaskLauncher {
      */
     @ImmediateService
     public boolean closeNodeConfiguration() {
+
+        // using an executor service to timeout the data spaces deactivation
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        final StubObject stub = PAActiveObject.getStubOnThis();
+        Callable<Boolean> task = new Callable<Boolean>() {
+            public Boolean call() throws Exception {
+                DataSpacesNodes.closeNodeConfig(PAActiveObject.getActiveObjectNode(stub));
+                return true;
+            }
+        };
+        Future<Boolean> future = executor.submit(task);
         try {
-            DataSpacesNodes.closeNodeConfig(PAActiveObject
-                    .getActiveObjectNode(PAActiveObject.getStubOnThis()));
+            future.get(DataSpaceNodeConfigurationAgent.DATASPACE_CLOSE_TIMEOUT, TimeUnit.MILLISECONDS);
         } catch (Throwable t) {
             logger_dev.error("Cannot close properly DataSpaces.", t);
             return false;
+        } finally {
+            future.cancel(true);
+            executor.shutdown();
         }
+
         return true;
     }
 }
