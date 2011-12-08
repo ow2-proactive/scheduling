@@ -102,7 +102,8 @@ public class ConnectAction extends SchedulerGUIAction {
             });
         } else if (!dialogResult.isCanceled()) {
 
-            Job job = new Job("Downloading the Orchestration & Scheduling State, this might take a several minutes.") {
+            Job job = new Job(
+                    "Downloading the Orchestration & Scheduling State, this might take a several minutes.") {
                 @Override
                 public IStatus run(IProgressMonitor monitor) {
                     try {
