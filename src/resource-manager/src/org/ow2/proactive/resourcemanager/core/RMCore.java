@@ -977,6 +977,9 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             nodes.addAll(nodes.getExtraNodes());
         }
 
+        // exception to throw in case of problems
+        RuntimeException exception = null;
+
         for (Node node : nodes) {
             String nodeURL = null;
             try {
@@ -985,7 +988,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                 logger.debug("A Runtime exception occured while obtaining information on the node,"
                     + "the node must be down (it will be detected later)", e);
                 // node is down, will be detected by pinger
-                throw new IllegalStateException(e.getMessage(), e);
+                exception = new IllegalStateException(e.getMessage(), e);
             }
 
             // verify whether the node has not been removed from the RM
@@ -1003,13 +1006,17 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                                 .getPrincipals(UserNamePrincipal.class);
                         Permission ownerPermission = new PrincipalPermission(rmnode.getOwner().getName(),
                             userPrincipal);
-                        caller.checkPermission(ownerPermission, caller + " is not authorized to free node " +
-                            node.getNodeInformation().getURL());
+                        try {
+                            caller.checkPermission(ownerPermission, caller +
+                                " is not authorized to free node " + node.getNodeInformation().getURL());
 
-                        if (rmnode.isToRemove()) {
-                            removeNodeFromCoreAndSource(rmnode, caller);
-                        } else {
-                            internalSetFree(rmnode);
+                            if (rmnode.isToRemove()) {
+                                removeNodeFromCoreAndSource(rmnode, caller);
+                            } else {
+                                internalSetFree(rmnode);
+                            }
+                        } catch (SecurityException ex) {
+                            exception = ex;
                         }
                     } else {
                         // down node, just ignore
@@ -1018,8 +1025,13 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                 }
             } else {
                 logger.warn("Cannot release unknown node " + nodeURL);
-                throw new IllegalArgumentException("Cannot release unknown node " + nodeURL);
+                exception = new IllegalArgumentException("Cannot release unknown node " + nodeURL);
             }
+        }
+
+        if (exception != null) {
+            // throwing the latest exception we had
+            throw exception;
         }
 
         return new BooleanWrapper(true);
