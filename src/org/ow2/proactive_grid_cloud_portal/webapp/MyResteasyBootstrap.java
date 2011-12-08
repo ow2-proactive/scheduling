@@ -58,15 +58,14 @@ import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.exception.PermissionException;
 import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
-import org.ow2.proactive_grid_cloud_portal.common.exceptionmapper.NotConnectedExceptionMapper;
 import org.ow2.proactive_grid_cloud_portal.rm.RMSessionMapper;
 import org.ow2.proactive_grid_cloud_portal.rm.RMSessionsCleaner;
+import org.ow2.proactive_grid_cloud_portal.rm.RMStateCaching;
 import org.ow2.proactive_grid_cloud_portal.scheduler.IntWrapperConverter;
 import org.ow2.proactive_grid_cloud_portal.scheduler.RestartModeConverter;
 import org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerSessionMapper;
 import org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerSessionsCleaner;
 import org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateCaching;
-import org.ow2.proactive_grid_cloud_portal.scheduler.UpdatablePropertiesConverter;
 
 
 public class MyResteasyBootstrap extends ResteasyBootstrap {
@@ -133,6 +132,7 @@ public class MyResteasyBootstrap extends ResteasyBootstrap {
 
         // initialize the scheduler's state cache
         SchedulerStateCaching.init();
+        RMStateCaching.init();
 
         // start the scheduler session cleaner
         schedulerSessionCleaner = new SchedulerSessionsCleaner(SchedulerSessionMapper.getInstance());
@@ -193,6 +193,7 @@ public class MyResteasyBootstrap extends ResteasyBootstrap {
         rmSessionCleaner.stop();
 
         SchedulerStateCaching.setKill(true);
+        RMStateCaching.kill();
 
         // force the shutdown of the runtime
         ProActiveRuntimeImpl.getProActiveRuntime().cleanJvmFromPA();

@@ -226,8 +226,8 @@ public class RMRest {
 	@Produces("application/json")
 	public RMInitialState getInitialState(
 			@HeaderParam("sessionid") String sessionId) throws NotConnectedException {
-		RMCachingProxyUserInterface rm = checkAccess(sessionId);
-		return PAFuture.getFutureValue(rm.getRMInitialState());
+		checkAccess(sessionId);
+		return RMStateCaching.getRMInitialState();
 	}
 
 	/**

@@ -38,7 +38,6 @@ package org.ow2.proactive_grid_cloud_portal.scheduler;
 
 import java.io.File;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicLong;
