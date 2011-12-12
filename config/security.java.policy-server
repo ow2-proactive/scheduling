@@ -174,13 +174,14 @@ grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "
     permission org.ow2.proactive.permissions.AllPermission;
 };
 
-// Members of "watchers" group have only a read access to the scheduler state
+// Members of "watchers" group have only a read access to the scheduler and RM state
 // and the authorization to register a listener in order to receive updates of the scheduler state
 grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "watchers" {
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.scheduler.core.SchedulerFrontend.getState";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.scheduler.core.SchedulerFrontend.addEventListener";
     permission org.ow2.proactive.scheduler.permissions.GetOwnStateOnlyPermission "false";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.scheduler.core.SchedulerFrontend.getStatus";
+	permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.getMonitoring";
 };
 //
 // OTHER PERMISSIONS
