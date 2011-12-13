@@ -194,15 +194,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      */
     private void renewLeaseForClient(Scheduler scheduler)
 	    throws NotConnectedException, PermissionException {
-	/*
-	 * final Scheduler sched = scheduler; new Thread(new Runnable() {
-	 * 
-	 * public void run() { try { sched.getStatus();
-	 * PAActiveObject.getBodyOnThis().terminate(); } catch
-	 * (NotConnectedException e) { // TODO Auto-generated catch block
-	 * e.printStackTrace(); } catch (PermissionException e) { // TODO
-	 * Auto-generated catch block e.printStackTrace(); } } }).start();
-	 */
+    	scheduler.renewSession();
     }
 
     /**
