@@ -64,25 +64,32 @@ public final class ResourceManagerPerspective implements IPerspectiveFactory {
      * @see org.eclipse.ui.IPerspectiveFactory#createInitialLayout(org.eclipse.ui.IPageLayout)
      */
     public void createInitialLayout(final IPageLayout layout) {
-        // Get identifier of the editor area of the page layout
-        final String editorArea = layout.getEditorArea();
+        /*
+         * Use following default layout:
+         * <Tab And Tree Views>  <Compact View>
+         * <Node Info Views>     <editor area used to show Runtime Monitoring>     
+         */
+    	final String editorArea = layout.getEditorArea();
         layout.setEditorAreaVisible(false);
 
-        // The top folder will contain the table explorer view and the tree explorer view  
-        final IFolderLayout topFolder = layout.createFolder("topLeft", IPageLayout.TOP, 0.3f, editorArea);
-        topFolder.addView(ResourcesTabView.ID);
-        topFolder.addView(ResourceExplorerView.ID);
+        final IFolderLayout topLeftFolder = layout.createFolder("topLeft", 
+        		IPageLayout.LEFT, 
+        		0.3f, 
+        		editorArea);
+        topLeftFolder.addView(ResourcesTabView.ID);
+        topLeftFolder.addView(ResourceExplorerView.ID);
 
-        // The bottom left folder contains the statistics view
-        final IFolderLayout bottomLeftFolder = layout.createFolder("bottomLeft", IPageLayout.BOTTOM, 0.7f,
-                editorArea);
+        final IFolderLayout topRightFolder = layout.createFolder("topRight", 
+        		IPageLayout.TOP, 
+        		0.5f, 
+        		editorArea);
+        topRightFolder.addView(ResourcesCompactView.ID);
+
+        final IFolderLayout bottomLeftFolder = layout.createFolder("bottomLeft", 
+        		IPageLayout.BOTTOM, 
+        		0.5f, 
+        		"topLeft");
         bottomLeftFolder.addView(StatisticsView.ID);
         bottomLeftFolder.addView(NodeInfoView.ID);
-
-        // The bottom left folder contains the compact view
-        final IFolderLayout bottomRightFolder = layout.createFolder("bottomRight", IPageLayout.BOTTOM, 0.3f,
-                editorArea);
-        bottomRightFolder.addView(ResourcesCompactView.ID);
-
     }
 }
