@@ -70,8 +70,8 @@ public class TableSelectionListener implements ISelectionChangedListener {
                     RemoveNodesHandler.getInstance().setSelectedNodes(list);
                 if (LockNodesHandler.getInstance() != null)
                     LockNodesHandler.getInstance().setSelectedNodes(list);
-                if (RemoveNodesHandler.getInstance() != null)
-                    RemoveNodesHandler.getInstance().setSelectedNodes(list);
+                if (UnlockNodesHandler.getInstance() != null)
+                	UnlockNodesHandler.getInstance().setSelectedNodes(list);
             }
 
             if (list.size() > 0) {
