@@ -90,7 +90,7 @@ public class ExitAction extends SchedulerGUIAction {
 
         try {
             if (ActionsManager.getInstance().isConnected()) {
-                DisconnectAction.disconnection();
+                DisconnectAction.disconnection(false);
             }
         } catch (Throwable t) {
             // we're closing anyway, some graphical components may have been disposed

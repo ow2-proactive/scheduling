@@ -613,7 +613,7 @@ public class SubmitJobAction extends SchedulerGUIAction {
                         String filePath = fileName;
                         try {
                             Job job = JobFactory.getFactory().createJob(filePath);
-                            JobId id = SchedulerProxy.getInstance().submit(job);
+                            JobId id = SchedulerProxy.getInstance().syncJobSubmit(job);
                             submittedJobs.put(id, fileName);
                         } catch (JobCreationException e) {
                             failedJobs.put(fileName, "Job creation error : " + e.getMessage());

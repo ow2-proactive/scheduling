@@ -61,9 +61,7 @@ public class ShutdownSchedulerAction extends SchedulerGUIAction {
     public void run() {
         if (MessageDialog.openConfirm(getParent(), "Confirm please",
                 "Are you sure you want to shutdown the scheduler ?")) {
-            if (SchedulerProxy.getInstance().shutdown()) {
-                DisconnectAction.disconnection();
-            }
+            SchedulerProxy.getInstance().shutdown();
         }
     }
 

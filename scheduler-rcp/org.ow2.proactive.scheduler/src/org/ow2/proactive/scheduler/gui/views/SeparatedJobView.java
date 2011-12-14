@@ -409,9 +409,8 @@ public class SeparatedJobView extends ViewPart {
         }
 
         JobsOutputController.clearInstance();
-        PAActiveObject.terminateActiveObject(JobsController.getActiveView(), false);
-        SchedulerProxy.getInstance().disconnect();
-        PAActiveObject.terminateActiveObject(SchedulerProxy.getInstance(), false);
+        JobsController.terminateActiveView();
+        SchedulerProxy.getInstance().disconnect(false);
         JobsController.clearInstances();
         SchedulerProxy.clearInstance();
         super.dispose();

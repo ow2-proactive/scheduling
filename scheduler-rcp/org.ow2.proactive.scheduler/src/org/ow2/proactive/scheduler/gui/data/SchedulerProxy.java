@@ -36,21 +36,20 @@
  */
 package org.ow2.proactive.scheduler.gui.data;
 
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Observer;
 
-import javax.security.auth.login.LoginException;
-
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
-import org.objectweb.proactive.api.PAActiveObject;
-import org.objectweb.proactive.api.PAFuture;
-import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
+import org.ow2.proactive.gui.common.ActiveObjectCallResultHandler;
+import org.ow2.proactive.gui.common.ActiveObjectPingerThread;
+import org.ow2.proactive.gui.common.ActiveObjectProxy;
 import org.ow2.proactive.scheduler.Activator;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
@@ -58,23 +57,14 @@ import org.ow2.proactive.scheduler.common.SchedulerConnection;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SchedulerEventListener;
 import org.ow2.proactive.scheduler.common.SchedulerState;
-import org.ow2.proactive.scheduler.common.SchedulerStatus;
-import org.ow2.proactive.scheduler.common.exception.JobAlreadyFinishedException;
-import org.ow2.proactive.scheduler.common.exception.JobCreationException;
-import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.exception.PermissionException;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
-import org.ow2.proactive.scheduler.common.exception.SubmissionClosedException;
-import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
-import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
-import org.ow2.proactive.scheduler.common.job.JobResult;
-import org.ow2.proactive.scheduler.common.job.JobState;
+import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
-import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingException;
 import org.ow2.proactive.scheduler.gui.actions.DisconnectAction;
 import org.ow2.proactive.scheduler.gui.actions.JMXActionsManager;
 import org.ow2.proactive.scheduler.gui.composite.StatusLabel;
@@ -89,460 +79,40 @@ import org.ow2.proactive.scheduler.gui.views.SeparatedJobView;
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9
  */
-public class SchedulerProxy implements Scheduler {
+public class SchedulerProxy extends ActiveObjectProxy<Scheduler> implements ActiveObjectPingerThread.PingListener {
 
-    private static final long SCHEDULER_SERVER_PING_FREQUENCY = 5000;
-    private static final long SCHEDULER_CONNECTION_TIMEOUT = 600000; // 600 secs
-    public static final int CONNECTED = 1;
-    public static final int LOGIN_OR_PASSWORD_WRONG = 2;
-    private static SchedulerProxy instance = null;
+    private static SchedulerProxy instance;
     private SchedulerAuthenticationInterface sai;
-    private Scheduler scheduler = null;
-    private String userName = null;
-    private Thread pinger;
+    private String userName;
+    private transient ActiveObjectPingerThread pinger;
     private String schedulerURL;
-    private boolean connected = false;
+    private boolean connected;
 
-    private static String disconnectionReason = "Unknown reason.";
+    private static final Hashtable<TaskId, TaskResult> cachedTaskResult = new Hashtable<TaskId, TaskResult>();
 
-    List<SchedulerConnectionListener> observers;
+    private List<SchedulerConnectionListener> observers;
 
-    // -------------------------------------------------------------------- //
-    // --------------------------- constructor ---------------------------- //
-    // -------------------------------------------------------------------- //
-    /**
-     * Create a new instance of SchedulerProxy.
-     *
-     */
     public SchedulerProxy() {
         observers = new LinkedList<SchedulerConnectionListener>();
     }
 
-    private void displayError(final String message) {
-        Display.getDefault().asyncExec(new Runnable() {
-            public void run() {
-                MessageDialog.openError(Display.getDefault().getActiveShell(), "Error !", message);
-            }
-        });
-    }
+	private Credentials credentials;
 
-    // -------------------------------------------------------------------- //
-    // ---------------- implements AdminSchedulerInterface ---------------- //
-    // -------------------------------------------------------------------- //
+	@Override
+	protected Scheduler doCreateActiveObject() throws Exception {
+		return sai.login(credentials);
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    public void addEventListener(SchedulerEventListener sel, boolean myEventsOnly, SchedulerEvent... events) {
-        // Do nothing (unused)
-    }
+    @Override
+	protected boolean doPingActiveObject(Scheduler activeObject) {
+		return activeObject.isConnected();
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    public SchedulerState addEventListener(SchedulerEventListener listener, boolean myEventsOnly,
-            boolean getSchedulerState, SchedulerEvent... events) {
-        SchedulerState schedState = null;
-        try {
-
-            schedState = (SchedulerState) scheduler.addEventListener(listener, myEventsOnly,
-                    getSchedulerState, events);
-
-        } catch (PermissionException pe) {
-            Activator.log(IStatus.ERROR, "Error getting full state : " + pe.getMessage(), pe);
-            try {
-                schedState = (SchedulerState) scheduler.addEventListener(listener, true, getSchedulerState,
-                        events);
-            } catch (SchedulerException e) {
-                Activator.log(IStatus.ERROR, "Error in Scheduler Proxy ", e);
-                displayError(e.getMessage());
-            }
-        } catch (SchedulerException e) {
-            Activator.log(IStatus.ERROR, "Error in Scheduler Proxy ", e);
-            displayError(e.getMessage());
-        }
-
-        if (schedState != null) {
-            //SCHEDULING-1434 -
-            //Note: the pinger will only be started once, see condition in startPinger()
-            startPinger();
-        }
-        return schedState;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void removeEventListener() {
-        //not used for the GUI
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void disconnect() {
-        if (scheduler != null) {
-            try {
-                //disconnect scheduler if it is not dead
-                //protect disconnection with a try catch
-                scheduler.disconnect();
-                if (pinger != null) {
-                    pinger.interrupt();
-                }
-                connected = false;
-            } catch (Exception e) {
-                // Nothing to do
-                Activator.log(IStatus.ERROR, "- Scheduler Proxy: Error in  disconnect action", e);
-                displayError(e.getMessage());
-            }
-            sendConnectionLostEvent();
-        }
-    }
-
-    public void serverDown() {
-        pinger.interrupt();
-
-        Display.getDefault().asyncExec(new Runnable() {
-            public void run() {
-                MessageDialog.openInformation(SeparatedJobView.getSchedulerShell(), "Disconnection",
-                        disconnectionReason);
-                StatusLabel.getInstance().disconnect();
-                // stop log server
-                try {
-                    Activator.terminateLoggerServer();
-                } catch (LogForwardingException e) {
-                    Activator.log(IStatus.ERROR,
-                            "- Scheduler Proxy: Error while terminating the logger server", e);
-                    e.printStackTrace();
-                }
-                DisconnectAction.disconnection();
-                connected = false;
-            }
-        });
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public JobResult getJobResult(JobId jobId) {
-        try {
-            return scheduler.getJobResult(jobId);
-        } catch (SchedulerException e) {
-            Activator.log(IStatus.ERROR, "- Scheduler Proxy: Error when getting job result", e);
-            displayError(e.getMessage());
-        }
-        return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public TaskResult getTaskResult(JobId jobId, String taskName) {
-        try {
-            return scheduler.getTaskResult(jobId, taskName);
-        } catch (SchedulerException e) {
-            Activator.log(IStatus.ERROR, "- Scheduler Proxy: Error when getting task result", e);
-            displayError(e.getMessage());
-        }
-        return null;
-    }
-
-    public TaskResult getTaskResultFromIncarnation(JobId jobId, String taskName, int inc)
-            throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
-        try {
-            return scheduler.getTaskResultFromIncarnation(jobId, taskName, inc);
-        } catch (SchedulerException e) {
-            Activator.log(IStatus.ERROR, "- Scheduler Proxy: Error when getting task result", e);
-            displayError(e.getMessage());
-        }
-        return null;
-    }
-
-    public boolean killTask(JobId jobId, String taskName) {
-        return killTask(jobId.value(), taskName);
-    }
-
-    public boolean preemptTask(JobId jobId, String taskName, int restartDelay) {
-        return preemptTask(jobId.value(), taskName, restartDelay);
-    }
-
-    public boolean restartTask(JobId jobId, String taskName, int restartDelay) {
-        return restartTask(jobId.value(), taskName, restartDelay);
-    }
-
-    public boolean killTask(String jobId, String taskName) {
-        boolean res = false;
-        try {
-            res = scheduler.killTask(jobId, taskName);
-        } catch (Exception e) {
-            Activator.log(IStatus.ERROR, "- Scheduler Proxy: Failed to kill task", e);
-            displayError(e.getMessage());
-        }
-        return res;
-    }
-
-    public boolean preemptTask(String jobId, String taskName, int restartDelay) {
-        boolean res = false;
-        try {
-            res = scheduler.preemptTask(jobId, taskName, restartDelay);
-        } catch (Exception e) {
-            Activator.log(IStatus.ERROR, "- Scheduler Proxy: Failed to preempt task", e);
-            displayError(e.getMessage());
-        }
-        return res;
-    }
-
-    public boolean restartTask(String jobId, String taskName, int restartDelay) {
-        boolean res = false;
-        try {
-            res = scheduler.restartTask(jobId, taskName, restartDelay);
-        } catch (Exception e) {
-            Activator.log(IStatus.ERROR, "- Scheduler Proxy: Failed to restart task", e);
-            displayError(e.getMessage());
-        }
-        return res;
-    }
-
-    public boolean reloadPolicyConfiguration() throws NotConnectedException, PermissionException {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public boolean killJob(JobId jobId) {
-        try {
-            return scheduler.killJob(jobId);
-        } catch (SchedulerException e) {
-            Activator.log(IStatus.ERROR, "- Scheduler Proxy: Error on kill job ", e);
-            displayError(e.getMessage());
-        }
-        return false;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void listenJobLogs(JobId jobId, AppenderProvider appenderProvider) {
-        try {
-            scheduler.listenJobLogs(jobId, appenderProvider);
-        } catch (SchedulerException e) {
-            Activator.log(IStatus.ERROR, "- Scheduler Proxy: Error on listen log", e);
-            displayError(e.getMessage());
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public boolean pauseJob(JobId jobId) {
-        try {
-            return scheduler.pauseJob(jobId);
-        } catch (SchedulerException e) {
-            Activator.log(IStatus.ERROR, "- Scheduler Proxy: Error on pause", e);
-            displayError(e.getMessage());
-        }
-        return false;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public boolean resumeJob(JobId jobId) {
-        try {
-            return scheduler.resumeJob(jobId);
-        } catch (SchedulerException e) {
-            Activator.log(IStatus.ERROR, "- Scheduler Proxy: Error on resume action", e);
-            displayError(e.getMessage());
-        }
-        return false;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public JobId submit(Job job) throws NotConnectedException, PermissionException,
-            SubmissionClosedException, JobCreationException {
-        return scheduler.submit(job);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public boolean removeJob(JobId jobId) {
-        try {
-            return scheduler.removeJob(jobId);
-        } catch (SchedulerException e) {
-            Activator.log(IStatus.ERROR, "- Scheduler Proxy: Error on remove job action ", e);
-            displayError(e.getMessage());
-            return false;
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public boolean kill() {
-        try {
-            boolean b = scheduler.kill();
-            if (pinger != null) {
-                pinger.interrupt();
-            }
-            return b;
-        } catch (SchedulerException e) {
-            Activator.log(IStatus.ERROR, "- Scheduler Proxy: Error on kill action ", e);
-            displayError(e.getMessage());
-        }
-        return false;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public boolean pause() {
-        try {
-            return scheduler.pause();
-        } catch (SchedulerException e) {
-            Activator.log(IStatus.ERROR, "- Scheduler Proxy: Error on pause action ", e);
-            displayError(e.getMessage());
-        }
-        return false;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public boolean freeze() {
-        try {
-            return scheduler.freeze();
-        } catch (SchedulerException e) {
-            Activator.log(IStatus.ERROR, "- Scheduler Proxy: Error on freeze action ", e);
-            displayError(e.getMessage());
-        }
-        return false;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public boolean resume() {
-        try {
-            return scheduler.resume();
-        } catch (SchedulerException e) {
-            Activator.log(IStatus.ERROR, "- Scheduler Proxy: Error on resume action ", e);
-            displayError(e.getMessage());
-        }
-        return false;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public boolean shutdown() {
-        try {
-            boolean b = scheduler.shutdown();
-            if (pinger != null) {
-                pinger.interrupt();
-            }
-            return b;
-        } catch (SchedulerException e) {
-            Activator.log(IStatus.ERROR, "- Scheduler Proxy: Error on shut down action ", e);
-            displayError(e.getMessage());
-        }
-        return false;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public boolean start() {
-        try {
-            return scheduler.start();
-        } catch (SchedulerException e) {
-            Activator.log(IStatus.ERROR, "- Scheduler Proxy: Error on start action", e);
-            displayError(e.getMessage());
-        }
-        return false;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public boolean stop() {
-        try {
-            return scheduler.stop();
-        } catch (SchedulerException e) {
-            Activator.log(IStatus.ERROR, "- Scheduler Proxy: Error on stop action ", e);
-            displayError(e.getMessage());
-        }
-        return false;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void changeJobPriority(JobId jobId, JobPriority priority) {
-        try {
-            scheduler.changeJobPriority(jobId, priority);
-        } catch (SchedulerException e) {
-            Activator.log(IStatus.ERROR, "- Scheduler Proxy: Error on change priority action ", e);
-            displayError(e.getMessage());
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public boolean changePolicy(String newPolicyClassName) {
-        try {
-            return scheduler.changePolicy(newPolicyClassName);
-        } catch (SchedulerException e) {
-            Activator.log(IStatus.ERROR, "- Scheduler Proxy: Error on change Policy action", e);
-            displayError(e.getMessage());
-        }
-        return false;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public boolean linkResourceManager(String rmURL) {
-        try {
-            return scheduler.linkResourceManager(rmURL);
-        } catch (SchedulerException e) {
-            Activator.log(IStatus.ERROR, "- Scheduler Proxy: Error on link Resource Manager action", e);
-            displayError(e.getMessage());
-        }
-        return false;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public boolean isConnected() {
-        if (scheduler == null)
-            return false;
-        return scheduler.isConnected();
-    }
-
-    /**
-     * Asynchronous method to check if the client can reach the scheduler
-     */
-    public BooleanWrapper isAlive() {
-        return new BooleanWrapper(scheduler.isConnected());
-    }
-
-    // -------------------------------------------------------------------- //
-    // ------------------------------ public ------------------------------ //
-    // -------------------------------------------------------------------- //
-
-    public int connectToScheduler(SelectSchedulerDialogResult dialogResult) throws Throwable {
+    public boolean connectToScheduler(SelectSchedulerDialogResult dialogResult) throws Throwable {
         try {
             userName = dialogResult.getLogin();
             byte[] cred = dialogResult.getCred();
             schedulerURL = dialogResult.getUrl();
-            Credentials credentials = null;
             sai = SchedulerConnection.join(schedulerURL);
 
             if (cred == null) {
@@ -559,23 +129,29 @@ public class SchedulerProxy implements Scheduler {
                 credentials = Credentials.getCredentialsBase64(cred);
             }
 
-            if (scheduler == null || !scheduler.isConnected()) {
-                scheduler = sai.login(credentials);
-            }
-
+			if (!isActiveObjectCreated() || !syncPingActiveObject()) {
+				createActiveObject();
+			}
+			Display.getDefault().asyncExec(new Runnable() {
+                public void run() {
+            		initActiveObjectHolderForCurrentThread();
+                }
+            });
+			
             sendConnectionCreatedEvent(dialogResult.getUrl(), userName, dialogResult.getPassword());
             // SCHEDULING-1434 - should start the pinger after the first call to addEventListener
             //startPinger();
             connected = true;
 
+            
             JMXActionsManager.getInstance().initJMXClient(schedulerURL, sai,
                     new Object[] { dialogResult.getLogin(), credentials });
-            return CONNECTED;
-        } catch (LoginException e) {
+            return true;
+        } catch (Exception e) {
             e.printStackTrace();
             // exception is handled by the GUI
             userName = null;
-            return LOGIN_OR_PASSWORD_WRONG;
+            return false;
         } catch (Throwable t) {
             Activator.log(IStatus.ERROR, "- Error when connecting to the scheduler ", t);
             userName = null;
@@ -583,79 +159,408 @@ public class SchedulerProxy implements Scheduler {
         }
     }
 
+    public SchedulerState syncAddEventListener(final SchedulerEventListener listener, final boolean myEventsOnly,
+            final boolean getSchedulerState, final SchedulerEvent... events) {
+    	try {
+    		SchedulerState result = syncCallActiveObject(new ActiveObjectSyncAccess<Scheduler>() {
+    			@Override
+    			public SchedulerState accessActiveObject(Scheduler scheduler) {
+    		    	SchedulerState schedState = null;
+    		        try {
+    		            schedState = (SchedulerState) scheduler.addEventListener(listener, myEventsOnly,
+    		                    getSchedulerState, events);
+    		        } catch (PermissionException pe) {
+    		            Activator.log(IStatus.ERROR, "Error getting full state : " + pe.getMessage(), pe);
+    		            try {
+    		                schedState = (SchedulerState) scheduler.addEventListener(listener, true, getSchedulerState,
+    		                        events);
+    		            } catch (SchedulerException e) {
+    			        	logAndDisplayError(e, "Error in Scheduler Proxy ");
+    		            }
+    		        } catch (SchedulerException e) {
+    		        	logAndDisplayError(e, "Error in Scheduler Proxy ");
+    		        }
+    		        return schedState;
+    			}
+            });
+	        
+    		if (result != null) {
+	            //SCHEDULING-1434 -
+	            //Note: the pinger will only be started once, see condition in startPinger()
+	            startPinger();
+	        }
+	        
+	        return result;
+    	} catch (Exception e) {
+    		Activator.log(IStatus.ERROR, "Error adding scheduler event listener", e);
+    		return null;
+    	}
+    }
+
+    public void disconnect(boolean serverIsDown) {
+    	if (isActiveObjectCreated()) {
+			if (pinger != null) {
+				pinger.stopPinger();
+			}
+			if (!serverIsDown) {
+				asyncCallActiveObject(new ActiveObjectAccess<Scheduler>() {
+					@Override
+					public void accessActiveObject(Scheduler scheduler) {
+		                try {
+		                	scheduler.disconnect();
+		                } catch (Exception e) {
+		    				logAndDisplayError(e, "- Scheduler Proxy: Error in  disconnect action");
+		                }
+					}
+				});
+			}
+	        connected = false;
+	        sendConnectionLostEvent();
+			
+			terminateActiveObjectHolder();
+    	}
+    }
+
+    private void serverDown(final String disconnectionReason) {
+        Display.getDefault().asyncExec(new Runnable() {
+            public void run() {
+                MessageDialog.openInformation(SeparatedJobView.getSchedulerShell(), "Disconnection",
+                        disconnectionReason);
+                StatusLabel.getInstance().disconnect();
+                DisconnectAction.disconnection(true);
+                connected = false;
+            }
+        });
+    }
+
+    public static void deleteTaskResultCache() {
+        cachedTaskResult.clear();
+    }
+
+    public void getTaskResult(final JobId jobId, 
+    		final TaskId tid, 
+    		final ActiveObjectCallResultHandler<TaskResult> resultHadler) {
+        TaskResult taskResult = cachedTaskResult.get(tid);
+        if (taskResult != null) {
+        	resultHadler.handleResult(taskResult);
+        } else {
+        	asyncCallActiveObject(new ActiveObjectAccess<Scheduler>() {
+    			@Override
+    			public void accessActiveObject(Scheduler scheduler) {
+    		    	try {
+    		    		TaskResult taskResult = scheduler.getTaskResult(jobId, tid.getReadableName());
+    		    		if (taskResult != null) {
+    		    			cachedTaskResult.put(tid, taskResult);
+    		    			resultHadler.handleResult(taskResult);
+    		    		}
+    		        } catch (SchedulerException e) {
+    		            logAndDisplayError(e, "- Scheduler Proxy: Error when getting task result");
+    		        }
+    			}
+            	
+    		});
+        }
+    }
+
+    public void killTask(JobId jobId, String taskName) {
+        killTask(jobId.value(), taskName);
+    }
+
+    public void preemptTask(JobId jobId, String taskName, int restartDelay) {
+        preemptTask(jobId.value(), taskName, restartDelay);
+    }
+
+    public void restartTask(JobId jobId, String taskName, int restartDelay) {
+        restartTask(jobId.value(), taskName, restartDelay);
+    }
+
+    public void killTask(final String jobId, final String taskName) {
+        asyncCallActiveObject(new ActiveObjectAccess<Scheduler>() {
+			@Override
+			public void accessActiveObject(Scheduler scheduler) {
+		        try {
+		            scheduler.killTask(jobId, taskName);
+		        } catch (Exception e) {
+		        	logAndDisplayError(e, "- Scheduler Proxy: Failed to kill task");
+		        }
+			}
+        	
+		});
+    }
+
+    public void preemptTask(final String jobId, final String taskName, final int restartDelay) {
+        asyncCallActiveObject(new ActiveObjectAccess<Scheduler>() {
+			@Override
+			public void accessActiveObject(Scheduler scheduler) {
+		        try {
+		            scheduler.preemptTask(jobId, taskName, restartDelay);
+		        } catch (Exception e) {
+		        	logAndDisplayError(e, "- Scheduler Proxy: Failed to preempt task");
+		        }
+			}
+        	
+		});
+    }
+
+    public void restartTask(final String jobId, final String taskName, final int restartDelay) {
+        asyncCallActiveObject(new ActiveObjectAccess<Scheduler>() {
+			@Override
+			public void accessActiveObject(Scheduler scheduler) {
+		        try {
+		            scheduler.restartTask(jobId, taskName, restartDelay);
+		        } catch (Exception e) {
+		        	logAndDisplayError(e, "- Scheduler Proxy: Failed to restart task");
+		        }
+			}
+        	
+		});
+    }
+
+    public void killJob(final JobId jobId) {
+        asyncCallActiveObject(new ActiveObjectAccess<Scheduler>() {
+			@Override
+			public void accessActiveObject(Scheduler scheduler) {
+		    	try {
+		            scheduler.killJob(jobId);
+		        } catch (SchedulerException e) {
+		            logAndDisplayError(e, "- Scheduler Proxy: Error on kill job ");
+		        }
+			}
+        	
+        });
+    }
+
+    public void listenJobLogs(final JobId jobId, final AppenderProvider appenderProvider) {
+        asyncCallActiveObject(new ActiveObjectAccess<Scheduler>() {
+			@Override
+			public void accessActiveObject(Scheduler scheduler) {
+		        try {
+        		    scheduler.listenJobLogs(jobId, appenderProvider);
+        		} catch (SchedulerException e) {
+        			logAndDisplayError(e, "- Scheduler Proxy: Error on listen log");
+        		}
+			}
+		});
+    }
+
+    public void pauseJob(final JobId jobId) {
+        asyncCallActiveObject(new ActiveObjectAccess<Scheduler>() {
+			@Override
+			public void accessActiveObject(Scheduler scheduler) {
+		    	try {
+		            scheduler.pauseJob(jobId);
+		        } catch (SchedulerException e) {
+		            logAndDisplayError(e, "- Scheduler Proxy: Error on pause");
+		        }
+			}
+		
+        });
+    }
+
+    public void resumeJob(final JobId jobId) {
+        asyncCallActiveObject(new ActiveObjectAccess<Scheduler>() {
+			@Override
+			public void accessActiveObject(Scheduler scheduler) {
+		    	try {
+		            scheduler.resumeJob(jobId);
+		        } catch (SchedulerException e) {
+		            logAndDisplayError(e, "- Scheduler Proxy: Error on resume action");
+		        }
+			}
+		
+        });
+    }
+
+    public void jobSubmit(final Job job) {
+    	asyncCallActiveObject(new ActiveObjectAccess<Scheduler>() {
+			@Override
+			public void accessActiveObject(Scheduler scheduler) {
+	    	    try {
+	    	    	scheduler.submit(job);
+	    	    } catch (Exception e) {
+	    	    	logAndDisplayError(e, "Couldn't submit job");
+	    	    }
+			}
+		});
+    	
+    }
+    
+    // NOTE: method is synchronous, so it shouldn't be called from GUI thread   
+    public JobId syncJobSubmit(final Job job) throws Exception {
+    	return syncCallActiveObject(new ActiveObjectSyncAccess<Scheduler>() {
+			@Override
+			public JobId accessActiveObject(Scheduler scheduler) throws Exception {
+	    	    return scheduler.submit(job);
+			}
+		});
+    }
+
+    public void removeJob(final JobId jobId) {
+        asyncCallActiveObject(new ActiveObjectAccess<Scheduler>() {
+			@Override
+			public void accessActiveObject(Scheduler scheduler) {
+		    	try {
+		            scheduler.removeJob(jobId);
+		        } catch (SchedulerException e) {
+		            logAndDisplayError(e, "- Scheduler Proxy: Error on remove job action ");
+		        }
+			}
+        	
+		});
+    }
+
+    public void kill() {
+        asyncCallActiveObject(new ActiveObjectAccess<Scheduler>() {
+			@Override
+			public void accessActiveObject(Scheduler scheduler) {
+		    	try {
+		            scheduler.kill();
+		            Display.getDefault().asyncExec(new Runnable() {
+		                public void run() {
+		                    DisconnectAction.disconnection(true);
+		                }
+		            });
+		        } catch (SchedulerException e) {
+		            logAndDisplayError(e, "- Scheduler Proxy: Error on kill action ");
+		        }
+			}
+		
+        });
+    }
+
+    public void pause() {
+        asyncCallActiveObject(new ActiveObjectAccess<Scheduler>() {
+			@Override
+			public void accessActiveObject(Scheduler scheduler) {
+		        try {
+		            scheduler.pause();
+		        } catch (SchedulerException e) {
+		            logAndDisplayError(e, "- Scheduler Proxy: Error on pause action ");
+		        }
+			}
+        	
+		});
+    }
+
+    public void freeze() {
+        asyncCallActiveObject(new ActiveObjectAccess<Scheduler>() {
+			@Override
+			public void accessActiveObject(Scheduler scheduler) {
+		    	try {
+		            scheduler.freeze();
+		        } catch (SchedulerException e) {
+		            logAndDisplayError(e, "- Scheduler Proxy: Error on freeze action ");
+		        }
+			}
+        	
+		});
+    }
+
+    public void resume() {
+        asyncCallActiveObject(new ActiveObjectAccess<Scheduler>() {
+			@Override
+			public void accessActiveObject(Scheduler scheduler) {
+        		try {
+            		scheduler.resume();
+        		} catch (SchedulerException e) {
+            		logAndDisplayError(e, "- Scheduler Proxy: Error on resume action ");
+        		}
+			}
+		});
+    }
+
+	public void shutdown() {
+		asyncCallActiveObject(new ActiveObjectAccess<Scheduler>() {
+			@Override
+			public void accessActiveObject(Scheduler scheduler) {
+				try {
+					scheduler.shutdown();
+		            Display.getDefault().asyncExec(new Runnable() {
+		                public void run() {
+		                    DisconnectAction.disconnection(true);
+		                }
+		            });
+				} catch (SchedulerException e) {
+					logAndDisplayError(e, "- Scheduler Proxy: Error on shut down action ");
+				}
+			}
+		});
+	}
+
+    public void start() {
+		asyncCallActiveObject(new ActiveObjectAccess<Scheduler>() {
+			@Override
+			public void accessActiveObject(Scheduler scheduler) {
+		        try {
+        		    scheduler.start();
+        		} catch (SchedulerException e) {
+        			logAndDisplayError(e, "- Scheduler Proxy: Error on start action");
+        		}
+			}
+		});
+    }
+
+    public void stop() {
+		asyncCallActiveObject(new ActiveObjectAccess<Scheduler>() {
+			@Override
+			public void accessActiveObject(Scheduler scheduler) {
+		        try {
+		            scheduler.stop();
+        		} catch (SchedulerException e) {
+		            logAndDisplayError(e, "- Scheduler Proxy: Error on stop action ");
+        		}
+			}
+		});
+    }
+
+    public void changeJobPriority(final JobId jobId, final JobPriority priority) {
+    	asyncCallActiveObject(new ActiveObjectAccess<Scheduler>() {
+			@Override
+			public void accessActiveObject(Scheduler scheduler) {
+		    	try {
+		            scheduler.changeJobPriority(jobId, priority);
+		        } catch (SchedulerException e) {
+		        	logAndDisplayError(e, "- Scheduler Proxy: Error on change priority action ");
+		        }
+			}
+    	});
+    }
     private void startPinger() {
-        if ((pinger != null) && (!pinger.isInterrupted()))
+        if ((pinger != null) && (!pinger.isStopped()))
             return;
         System.out.println("SchedulerProxy.startPinger() - starting pinger .... ");
-        class Pinger extends Thread {
-            private SchedulerProxy stubOnSchedulerProxy;
-
-            public Pinger(SchedulerProxy stubOnSchedulerProxy) {
-                this.stubOnSchedulerProxy = stubOnSchedulerProxy;
-            }
-
-            @Override
-            public void run() {
-                boolean ping = true;
-                while (!isInterrupted()) {
-                    try {
-                        Thread.sleep(SCHEDULER_SERVER_PING_FREQUENCY);
-                        ping = false;
-                        //try to ping Scheduler server
-                        try {
-                            // isAlive is an asynchronous call, so we have a control over
-                            // the timeout
-                            BooleanWrapper alive = this.stubOnSchedulerProxy.isAlive();
-                            PAFuture.waitFor(alive, SCHEDULER_CONNECTION_TIMEOUT);
-                            ping = alive.getBooleanValue();
-                        } catch (Throwable t) {
-                            SchedulerProxy.disconnectionReason = "Scheduler  '" + schedulerURL +
-                                "'  seems to be down. Now disconnecting.";
-                            break;
-                        }
-                        if (!ping) {
-                            SchedulerProxy.disconnectionReason = "Your connection to the Scheduler '" +
-                                schedulerURL + "' has expired. Now disconnecting.";
-                            break;
-                        }
-                    } catch (InterruptedException e) {
-                        break;
-                    }
-                }
-                if (!ping) {
-                    serverDown();
-                }
-            }
-        }
-        pinger = new Pinger((SchedulerProxy) PAActiveObject.getStubOnThis());
+        pinger = new ActiveObjectPingerThread(this, this);
         pinger.start();
     }
 
-    public Boolean isItHisJob(String userName) {
+    @Override
+	public void onPingError() {
+        String disconnectionReason = "Scheduler  '" + schedulerURL + 
+        		"'  seems to be down. Now disconnecting.";
+    	serverDown(disconnectionReason);
+    }
+
+	@Override
+	public void onPingTimeout() {
+		onPingError();
+	}
+
+    @Override
+	public void onPingFalse() {
+        String disconnectionReason = "Your connection to the Scheduler '" + schedulerURL + 
+        		"' has expired. Now disconnecting.";
+    	serverDown(disconnectionReason);
+    }
+    
+	public Boolean isItHisJob(String userName) {
         if ((this.userName == null) || (userName == null)) {
             return false;
         }
         return this.userName.equals(userName);
     }
-
-    // -------------------------------------------------------------------- //
-    // ------------------------------ Static ------------------------------ //
-    // -------------------------------------------------------------------- //
-    public static SchedulerProxy getInstanceWithException() throws Throwable {
-        if (instance == null) {
-            instance = (SchedulerProxy) PAActiveObject.newActive(SchedulerProxy.class.getName(), null);
-        }
-        return instance;
-    }
-
     public static SchedulerProxy getInstance() {
         if (instance == null) {
-            try {
-                instance = getInstanceWithException();
-            } catch (Throwable t) {
-                Activator.log(IStatus.ERROR, "- Scheduler Proxy: Error on get instance ", t);
-                //t.printStackTrace();
-            }
+        	instance = new SchedulerProxy();
         }
         return instance;
     }
@@ -666,10 +571,6 @@ public class SchedulerProxy implements Scheduler {
 
     public boolean isProxyConnected() {
         return connected;
-    }
-
-    public Scheduler getScheduler() {
-        return scheduler;
     }
 
     public static void clearInstance() {
@@ -700,121 +601,15 @@ public class SchedulerProxy implements Scheduler {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public JobResult getJobResult(String jobId) throws NotConnectedException, PermissionException,
-            UnknownJobException {
-        return scheduler.getJobResult(jobId);
-    }
+    private void logAndDisplayError(final Exception e, final String message) {
+		Activator.log(IStatus.ERROR, message, e);
 
-    /**
-     * {@inheritDoc}
-     */
-    public TaskResult getTaskResult(String jobId, String taskName) throws NotConnectedException,
-            UnknownJobException, UnknownTaskException, PermissionException {
-        return scheduler.getTaskResult(jobId, taskName);
-    }
+		Display.getDefault().asyncExec(new Runnable() {
+            public void run() {
+                MessageDialog.openError(Display.getDefault().getActiveShell(), "Error !", e.getMessage());
+            }
+        });
+	}
 
-    public TaskResult getTaskResultFromIncarnation(String jobId, String taskName, int inc)
-            throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
-        return scheduler.getTaskResultFromIncarnation(jobId, taskName, inc);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void changeJobPriority(String jobId, JobPriority priority) throws NotConnectedException,
-            UnknownJobException, PermissionException, JobAlreadyFinishedException {
-        scheduler.changeJobPriority(jobId, priority);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public boolean killJob(String jobId) throws NotConnectedException, UnknownJobException,
-            PermissionException {
-        return scheduler.killJob(jobId);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public boolean pauseJob(String jobId) throws NotConnectedException, UnknownJobException,
-            PermissionException {
-        return scheduler.pauseJob(jobId);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public boolean removeJob(String jobId) throws NotConnectedException, UnknownJobException,
-            PermissionException {
-        return scheduler.removeJob(jobId);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public boolean resumeJob(String jobId) throws NotConnectedException, UnknownJobException,
-            PermissionException {
-        return scheduler.resumeJob(jobId);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void listenJobLogs(String jobId, AppenderProvider appender) throws NotConnectedException,
-            UnknownJobException, PermissionException {
-        scheduler.listenJobLogs(jobId, appender);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public SchedulerStatus getStatus() throws NotConnectedException, PermissionException {
-        try {
-            return scheduler.getStatus();
-        } catch (SchedulerException e) {
-            Activator.log(IStatus.ERROR, "- Scheduler Proxy: Error while getting status", e);
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public JobState getJobState(String jobId) throws NotConnectedException, UnknownJobException,
-            PermissionException {
-        return scheduler.getJobState(jobId);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public JobState getJobState(JobId jobId) throws NotConnectedException, UnknownJobException,
-            PermissionException {
-        return scheduler.getJobState(jobId);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public SchedulerState getState() throws NotConnectedException, PermissionException {
-        return scheduler.getState();
-    }
-
-    public SchedulerState getState(boolean arg0) throws NotConnectedException, PermissionException {
-        return scheduler.getState(arg0);
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see org.ow2.proactive.scheduler.common.Scheduler#renewSession()
-     */
-    public void renewSession() throws NotConnectedException {
-        scheduler.renewSession();
-    }
 
 }

@@ -39,10 +39,10 @@ package org.ow2.proactive.scheduler.gui.actions;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.dialogs.ProgressMonitorDialog;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
@@ -60,17 +60,13 @@ import org.ow2.proactive.scheduler.gui.views.SeparatedJobView;
 
 
 public class ConnectAction extends SchedulerGUIAction {
-    private int res = 0;
-    private static boolean connDialogUp = false;
+    private static boolean connDialogUp;
 
     public ConnectAction() {
-
         this.setText("&Connect");
         this.setToolTipText("Connect the started ProActive Scheduler by its url");
-        this
-                .setImageDescriptor(Activator.getDefault().getImageRegistry().getDescriptor(
+        this.setImageDescriptor(Activator.getDefault().getImageRegistry().getDescriptor(
                         Internal.IMG_CONNECT));
-
     }
 
     @Override
@@ -107,29 +103,20 @@ public class ConnectAction extends SchedulerGUIAction {
                 @Override
                 public IStatus run(IProgressMonitor monitor) {
                     try {
-                        // Connection to the scheduler
-                        JobsController.turnActive();
-                        res = 0;
-                        res = SchedulerProxy.getInstance().connectToScheduler(dialogResult);
                         setName("Downloading the Orchestration & Scheduling State, this might take a several minutes.");
-                        //getting the scheduler state here, in this job (non UI).
-                        JobsController.getActiveView().init();
 
-                        switch (res) {
-                            case 0: // init val
-                                return Status.OK_STATUS;
-
-                            case SchedulerProxy.LOGIN_OR_PASSWORD_WRONG:
-                                errorConnect(new Exception(
+                        boolean connected  = SchedulerProxy.getInstance().connectToScheduler(dialogResult);
+                        if (connected) {
+                            //getting the scheduler state here, in this job (non UI).
+                            JobsController.getActiveView().init();
+                            postConnect(dialogResult.getUrl());
+                        } else {
+                            errorConnect(new Exception(
                                     "Authentication failed: invalid username or password "), dialogResult
                                         .getUrl());
-                                return Status.OK_STATUS;
-
-                            case SchedulerProxy.CONNECTED:
-                                postConnect(dialogResult.getUrl());
-                            default:
-                                return Status.OK_STATUS;
                         }
+
+                        return Status.OK_STATUS;
                     } catch (Throwable t) {
                         errorConnect(t, dialogResult.getUrl());
                         // Status.WARNING used (instead of Status.ERROR) to avoid the appearance of an eclipse's error dialog
@@ -138,12 +125,6 @@ public class ConnectAction extends SchedulerGUIAction {
                     }
                 }
 
-                @Override
-                protected void canceling() {
-                    if (res == SchedulerProxy.CONNECTED) {
-                        //SchedulerProxy.getInstance().disconnect();                                    
-                    }
-                }
             };
 
             job.setUser(true);

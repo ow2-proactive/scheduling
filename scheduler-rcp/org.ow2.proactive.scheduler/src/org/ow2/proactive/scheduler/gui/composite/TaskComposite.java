@@ -40,11 +40,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Map.Entry;
-
-import javax.swing.JPanel;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.action.Action;
@@ -73,12 +70,10 @@ import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
-import org.objectweb.proactive.api.PAFuture;
 import org.ow2.proactive.scheduler.Activator;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.task.TaskId;
-import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.common.task.util.ResultPreviewTool.SimpleTextPanel;
@@ -522,90 +517,15 @@ public class TaskComposite extends Composite implements Comparator<TaskState> {
             // update its tasks informations if task is finished
             if (task.getStatus() == TaskStatus.FINISHED || task.getStatus() == TaskStatus.FAULTY ||
                 task.getStatus() == TaskStatus.WAITING_ON_ERROR) {
-                TaskResult tr = getTaskResult(job.getId(), taskId);
-                if (tr != null) {
-                    if (grapchicalPreview) {
-                        displayGraphicalPreview(resultPreview, tr);
-                        resultPreview.putOnTop();
-                    } else {
-                        displayTextualPreview(resultPreview, tr);
-                        resultPreview.putOnTop();
-                    }
-                } else {
-                    throw new RuntimeException("Cannot get the result of Task " + taskId + ".");
-                }
+                SchedulerProxy.getInstance().getTaskResult(job.getId(), 
+                		taskId, 
+                		new GetTaskResultHandler(grapchicalPreview)); 
             } else { //Not available
                 resultPreview.update(new SimpleTextPanel("No preview is available because the task is " +
                     task.getStatus() + "..."));
             }
         }
     }
-
-    /**
-     * Display in Result Preview view graphical description of a task result if
-     * any graphical description is available for this task
-     * @param resultPreview Result preview SWT view object
-     * @param result TaskResult that has eventually a graphical description
-     */
-    private void displayGraphicalPreview(ResultPreview resultPreview, TaskResult result) {
-        JPanel previewPanel;
-        try {
-            previewPanel = result.getGraphicalDescription();
-            resultPreview.update(previewPanel);
-        } catch (Throwable t) {
-            // root exception can be wrapped into ProActive level exception
-            // try to display also cause exception.
-            // TODO cdelbe : recursive display ?
-            String cause = t.getCause() != null ? System.getProperty("line.separator") + "caused by " +
-                t.getCause() : "";
-            resultPreview.update(new SimpleTextPanel("[ERROR] Cannot create graphical previewer: " +
-                System.getProperty("line.separator") + t + cause));
-        }
-    }
-
-    /**
-     * Display in Result Preview view textual description of a task result.
-     * @param resultPreview Result preview SWT view object
-     * @param result TaskResult for which a textual description is to display
-     */
-    private void displayTextualPreview(ResultPreview resultPreview, TaskResult result) {
-        JPanel previewPanel;
-        try {
-            previewPanel = new SimpleTextPanel(result.getTextualDescription());
-            resultPreview.update(previewPanel);
-        } catch (Throwable t) {
-            // root exception can be wrapped into ProActive level exception
-            // try to display also cause exception.
-            String cause = t.getCause() != null ? System.getProperty("line.separator") + "caused by " +
-                t.getCause() : "";
-            resultPreview.update(new SimpleTextPanel("[ERROR] Cannot create textual previewer: " +
-                System.getProperty("line.separator") + t + cause));
-        }
-    }
-
-    // TODO TMP MKRIS
-    private static final Hashtable<TaskId, TaskResult> cachedTaskResult = new Hashtable<TaskId, TaskResult>();
-
-    public static TaskResult getTaskResult(JobId jid, TaskId tid) {
-        // TODO : NO ACCESS TO SCHED HERE ...
-        // get result from scheduler
-        // I just did a copy/past of that code form jobsController
-        TaskResult tr = cachedTaskResult.get(tid);
-        if (tr == null) {
-            tr = SchedulerProxy.getInstance().getTaskResult(jid, tid.getReadableName());
-            tr = PAFuture.getFutureValue(tr);
-            if (tr != null) {
-                cachedTaskResult.put(tid, tr);
-            }
-        }
-        return tr;
-    }
-
-    public static void deleteTaskResultCache() {
-        cachedTaskResult.clear();
-    }
-
-    // END TMP MKRIS
 
     private void sort(final SelectionEvent event, final int field) {
         if (this.tasks != null) {

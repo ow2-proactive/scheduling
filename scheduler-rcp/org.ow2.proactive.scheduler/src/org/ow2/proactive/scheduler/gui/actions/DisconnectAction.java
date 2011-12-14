@@ -37,7 +37,6 @@
 package org.ow2.proactive.scheduler.gui.actions;
 
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.objectweb.proactive.api.PAActiveObject;
 import org.ow2.proactive.scheduler.Activator;
 import org.ow2.proactive.scheduler.common.SchedulerStatus;
 import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingException;
@@ -61,11 +60,11 @@ public class DisconnectAction extends SchedulerGUIAction {
     public void run() {
         if (MessageDialog.openConfirm(getParent().getShell(), "Confirm disconnection",
                 "Are you sure you want to disconnect from the ProActive Scheduler ?")) {
-            disconnection();
+            disconnection(false);
         }
     }
 
-    public static void disconnection() {
+    public static void disconnection(boolean serverIsDown) {
         StatusLabel.getInstance().disconnect();
         // stop log server
         try {
@@ -77,10 +76,13 @@ public class DisconnectAction extends SchedulerGUIAction {
         try {
             // Disconnect the JMX client of ChartIt
             JMXActionsManager.getInstance().disconnectJMXClient();
-            SchedulerProxy.getInstance().disconnect();
-            PAActiveObject.terminateActiveObject(SchedulerProxy.getInstance(), false);
         } catch (Throwable th) {
             th.printStackTrace();
+        }
+        try {
+            SchedulerProxy.getInstance().disconnect(serverIsDown);
+        } catch (Throwable th) {
+        	th.printStackTrace();
         }
         SchedulerProxy.clearInstance();
 

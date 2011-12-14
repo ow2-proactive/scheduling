@@ -72,6 +72,7 @@ import org.ow2.proactive.scheduler.common.task.util.ResultPreviewTool.SimpleText
 import org.ow2.proactive.scheduler.gui.Colors;
 import org.ow2.proactive.scheduler.gui.data.ActionsManager;
 import org.ow2.proactive.scheduler.gui.data.JobsController;
+import org.ow2.proactive.scheduler.gui.data.SchedulerProxy;
 import org.ow2.proactive.scheduler.gui.data.TableManager;
 import org.ow2.proactive.scheduler.gui.views.JobInfo;
 import org.ow2.proactive.scheduler.gui.views.ResultPreview;
@@ -350,7 +351,7 @@ public abstract class AbstractJobComposite extends Composite {
                             }
                             if (lastSelected == null || !jobId.equals(lastSelected)) {
                                 lastSelected = jobId;
-                                TaskComposite.deleteTaskResultCache();
+                                SchedulerProxy.deleteTaskResultCache();
                             }
                         }
 

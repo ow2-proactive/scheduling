@@ -60,9 +60,7 @@ public class KillSchedulerAction extends SchedulerGUIAction {
     public void run() {
         if (MessageDialog.openConfirm(getParent(), "Confirm please",
                 "Are you sure you want to Kill the scheduler ?")) {
-            if (SchedulerProxy.getInstance().kill()) {
-                DisconnectAction.disconnection();
-            }
+            SchedulerProxy.getInstance().kill();
         }
     }
 

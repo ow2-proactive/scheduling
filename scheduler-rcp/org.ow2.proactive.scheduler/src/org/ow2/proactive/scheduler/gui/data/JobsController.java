@@ -49,6 +49,7 @@ import org.eclipse.swt.widgets.Display;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.NodeException;
+import org.ow2.proactive.gui.common.SWTGuiThreadResultHandler;
 import org.ow2.proactive.scheduler.Activator;
 import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
@@ -67,7 +68,6 @@ import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.util.ResultPreviewTool.SimpleTextPanel;
 import org.ow2.proactive.scheduler.gui.actions.DisconnectAction;
 import org.ow2.proactive.scheduler.gui.composite.AbstractJobComposite;
-import org.ow2.proactive.scheduler.gui.composite.TaskComposite;
 import org.ow2.proactive.scheduler.gui.listeners.EventJobsListener;
 import org.ow2.proactive.scheduler.gui.listeners.EventSchedulerListener;
 import org.ow2.proactive.scheduler.gui.listeners.EventTasksListener;
@@ -621,6 +621,17 @@ public class JobsController implements SchedulerEventListener {
         }
     }
 
+    static class GetTaskResultHandler extends SWTGuiThreadResultHandler<TaskResult> {
+
+		@Override
+		protected void handleResultInGuiThread(TaskResult result) {
+            ResultPreview resultPreview = ResultPreview.getInstance();
+            if (resultPreview != null) {
+                resultPreview.update(new SimpleTextPanel(result.getTextualDescription()));
+            }
+		}
+    }
+    
     private void taskRunningToFinishedEvent(TaskInfo info) {
         JobId jobId = info.getJobId();
         getJobById(jobId).update(info);
@@ -652,13 +663,9 @@ public class JobsController implements SchedulerEventListener {
                         taskView.lineUpdate(getTaskStateById(job, taskId));
 
                         if (taskId.equals(taskView.getIdOfSelectedTask())) {
-                            TaskResult tr = TaskComposite.getTaskResult(job.getId(), taskId);
-                            if (tr != null) {
-                                ResultPreview resultPreview = ResultPreview.getInstance();
-                                if (resultPreview != null) {
-                                    resultPreview.update(new SimpleTextPanel(tr.getTextualDescription()));
-                                }
-                            }
+                            SchedulerProxy.getInstance().getTaskResult(job.getId(), 
+                            		taskId, 
+                            		new GetTaskResultHandler()); 
                         }
                     }
                 }
@@ -694,7 +701,7 @@ public class JobsController implements SchedulerEventListener {
         ActionsManager.getInstance().setSchedulerStatus(SchedulerStatus.KILLED);
         Display.getDefault().syncExec(new Runnable() {
             public void run() {
-                DisconnectAction.disconnection();
+                DisconnectAction.disconnection(true);
             }
         });
 
@@ -730,7 +737,7 @@ public class JobsController implements SchedulerEventListener {
         ActionsManager.getInstance().setSchedulerStatus(SchedulerStatus.KILLED);
         Display.getDefault().syncExec(new Runnable() {
             public void run() {
-                DisconnectAction.disconnection();
+                DisconnectAction.disconnection(true);
             }
         });
 
@@ -1108,7 +1115,7 @@ public class JobsController implements SchedulerEventListener {
      */
     public boolean init() {
         SchedulerState state = null;
-        state = SchedulerProxy.getInstance().addEventListener(
+        state = SchedulerProxy.getInstance().syncAddEventListener(
                 ((SchedulerEventListener) PAActiveObject.getStubOnThis()), false, true);
 
         if (state == null) { // addEventListener failed
@@ -1182,9 +1189,14 @@ public class JobsController implements SchedulerEventListener {
         return activeView;
     }
 
+    public static void terminateActiveView() {
+    	if (activeView != null) {
+    		PAActiveObject.terminateActiveObject(activeView, false);
+    	}
+    }
+    
     public static JobsController turnActive() {
         //if it has already been turned active, we return the active reference
-
         if (activeView != null)
             return activeView;
         try {

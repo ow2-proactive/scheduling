@@ -36,13 +36,10 @@
  */
 package org.ow2.proactive.scheduler.gui.wizards.flatJobWizard;
 
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchWizard;
-import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.gui.data.SchedulerProxy;
 
@@ -51,9 +48,9 @@ public class FlatFileJobWizard extends Wizard implements IWorkbenchWizard {
 
     private MainPage mainPage;
     private SummaryPage summaryPage;
-    private Job createdJob = null;
+    private Job createdJob;
 
-    private boolean canFinish = false;
+    private boolean canFinish;
 
     public FlatFileJobWizard() {
         super();
@@ -66,15 +63,8 @@ public class FlatFileJobWizard extends Wizard implements IWorkbenchWizard {
     @Override
     public boolean performFinish() {
         if (createdJob != null) {
-            try {
-                // SUBMIT JOB
-                SchedulerProxy.getInstance().submit(createdJob);
-                return true;
-            } catch (SchedulerException e) {
-                MessageDialog.openError(Display.getCurrent().getActiveShell(), "Couldn't submit job",
-                        "Couldn't submit job due to : " + e.getCause());
-                return false;
-            }
+            SchedulerProxy.getInstance().jobSubmit(createdJob);
+            return true;
         } else {
             return false;
         }
