@@ -894,6 +894,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
     /**
      * {@inheritDoc}
      */
+    @ImmediateService
     public boolean isConnected() {
         try {
             checkAccess();
