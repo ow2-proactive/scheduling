@@ -38,8 +38,6 @@ package org.ow2.proactive.resourcemanager.gui.data;
 
 import org.eclipse.swt.widgets.Display;
 import org.objectweb.proactive.api.PAActiveObject;
-import org.objectweb.proactive.api.PAFuture;
-import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.resourcemanager.common.event.RMEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMInitialState;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
@@ -57,11 +55,8 @@ import org.ow2.proactive.resourcemanager.gui.views.StatisticsView;
 
 public class EventsReceiver implements RMEventListener {
 
-    private static final long RM_SERVER_PING_FREQUENCY = 5000;
-    private static final long RM_CONNECTION_TIMEOUT = 300000;
-    private RMModel model = null;
-    private RMMonitoring monitor = null;
-    private Thread pinger;
+    private RMModel model;
+    private RMMonitoring monitor;
 
     public EventsReceiver() {
     }
@@ -109,50 +104,15 @@ public class EventsReceiver implements RMEventListener {
                     }
                 }
             });
-            startPinger();
         } catch (Throwable t) {
             throw new RMException(t);
         }
     }
 
-    private void startPinger() {
-        pinger = new Thread() {
-            @Override
-            public void run() {
-                while (!pinger.isInterrupted()) {
-                    try {
-                        try {
-                            if (!RMStore.isConnected()) {
-                                break;
-                            }
-                            //try to ping RM server
-                            BooleanWrapper alive = RMStore.getInstance().getResourceManager().isActive();
-                            PAFuture.waitFor(alive, RM_CONNECTION_TIMEOUT);
-                            if (!pinger.isInterrupted() && !alive.getBooleanValue()) {
-                                throw new RMException("RM seems to be down");
-                            }
-                        } catch (Exception e) {
-                            //if exception, considered RM as down
-                            rmShutDownEvent(true);
-                            break;
-                        }
-                        Thread.sleep(RM_SERVER_PING_FREQUENCY);
-                    } catch (InterruptedException e) {
-                        break;
-                    }
-                }
-            }
-        };
-        pinger.setName("Pinger");
-        pinger.start();
-    }
-
-    // ----------------------------------------------------------------------
-    // methods implemented from RMEvent listener
-    // ----------------------------------------------------------------------
     /**
      * @see org.ow2.proactive.resourcemanager.frontend.RMEventListener#nodeEvent(org.ow2.proactive.resourcemanager.common.event.RMNodeEvent)
      */
+    @Override
     public void nodeEvent(RMNodeEvent event) {
         switch (event.getEventType()) {
             case NODE_ADDED:
@@ -182,6 +142,7 @@ public class EventsReceiver implements RMEventListener {
     /**
      * @see org.ow2.proactive.resourcemanager.frontend.RMEventListener#nodeSourceEvent(org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent)
      */
+    @Override
     public void nodeSourceEvent(RMNodeSourceEvent event) {
         switch (event.getEventType()) {
             case NODESOURCE_CREATED:
@@ -196,6 +157,7 @@ public class EventsReceiver implements RMEventListener {
     /**
      * @see org.ow2.proactive.resourcemanager.frontend.RMEventListener#rmEvent(org.ow2.proactive.resourcemanager.common.event.RMEvent)
      */
+    @Override
     public void rmEvent(RMEvent event) {
         switch (event.getEventType()) {
             case STARTED:
@@ -208,15 +170,9 @@ public class EventsReceiver implements RMEventListener {
                 });
                 break;
             case SHUTDOWN:
-                rmShutDownEvent(false);
+                RMStore.getInstance().shutDownActions(false);
                 break;
         }
     }
-
-    public synchronized void rmShutDownEvent(boolean failed) {
-        if (RMStore.getInstance().getModel() != null) {
-            pinger.interrupt();
-            RMStore.getInstance().shutDownActions(failed);
-        }
-    }
+    
 }

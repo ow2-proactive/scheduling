@@ -81,15 +81,6 @@ public class DeployingNode extends Node {
         if (removeDownNodes && this.state == NodeState.DEPLOYING) {
             return;
         }
-        try {
-            RMStore.getInstance().getResourceManager().removeNode(this.getName(), true);
-        } catch (RuntimeException e) {
-            e.printStackTrace();
-            String message = e.getMessage();
-            if (e.getCause() != null) {
-                message = e.getCause().getMessage();
-            }
-            MessageDialog.openError(Display.getDefault().getActiveShell(), "Cannot remove node", message);
-        }
+        RMStore.getInstance().getResourceManager().removeNode(this.getName(), true);
     }
 }

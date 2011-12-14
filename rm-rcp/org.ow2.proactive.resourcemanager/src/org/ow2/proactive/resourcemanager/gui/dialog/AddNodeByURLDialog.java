@@ -36,7 +36,6 @@
  */
 package org.ow2.proactive.resourcemanager.gui.dialog;
 
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FormAttachment;
@@ -52,9 +51,8 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
-import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
-import org.ow2.proactive.resourcemanager.Activator;
 import org.ow2.proactive.resourcemanager.gui.data.RMStore;
+import org.ow2.proactive.resourcemanager.gui.data.ResourceManagerProxy;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 
 
@@ -145,26 +143,16 @@ public class AddNodeByURLDialog extends Dialog {
                 if (urlText.getText().equals(""))
                     MessageDialog.openError(shell, "Error", "You didn't enter an url");
                 else {
-                    try {
-                        BooleanWrapper result = RMStore.getInstance().getResourceManager().addNode(
-                                urlText.getText(), sourceNameCombo.getText());
-                        if (result.booleanValue()) {
-                            shell.close();
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        String message = e.getMessage();
-
-                        if (e.getCause() != null) {
-                            message = e.getCause().getMessage();
-                        }
-
-                        Activator.log(IStatus.ERROR, "Resource manager is unable to add the node: " +
-                            urlText.getText(), e);
-                        MessageDialog.openError(shell, "Adding Node Error",
-                                "Resource manager is unable to add the node. \n\n" + message);
-                        shell.close();
-                    }
+                	ResourceManagerProxy proxy = RMStore.getInstance().getResourceManager();
+    				try { 
+    					if (!proxy.syncAddNode(urlText.getText(), sourceNameCombo.getText())) {
+    						proxy.displayError("Unknown reason", "Adding Node Error");
+    					} else {
+    	                	shell.close();
+    					}
+    				} catch (Exception e) {
+    					proxy.logAndDisplayError(e, "Adding Node Error");
+    				}
                 }
             }
         });

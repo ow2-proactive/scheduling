@@ -36,8 +36,6 @@
  */
 package org.ow2.proactive.resourcemanager.gui.data.model;
 
-import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.swt.widgets.Display;
 import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.gui.data.RMStore;
@@ -47,7 +45,7 @@ import org.ow2.proactive.resourcemanager.gui.data.RMStore;
  * @author The ProActive Team
  */
 public class Node extends TreeLeafElement implements Removable, Describable {
-    protected NodeState state = null;
+    protected NodeState state;
     protected String stateChangeTime;
     protected String provider;
     protected String owner;
@@ -121,16 +119,6 @@ public class Node extends TreeLeafElement implements Removable, Describable {
         if (removeDownNodes && this.getState() != NodeState.DOWN) {
             return;
         }
-        try {
-            RMStore.getInstance().getResourceManager().removeNode(this.getName(), preemptive)
-                    .getBooleanValue();
-        } catch (RuntimeException e) {
-            e.printStackTrace();
-            String message = e.getMessage();
-            if (e.getCause() != null) {
-                message = e.getCause().getMessage();
-            }
-            MessageDialog.openError(Display.getDefault().getActiveShell(), "Cannot remove node", message);
-        }
+        RMStore.getInstance().getResourceManager().removeNode(this.getName(), preemptive);
     }
 }

@@ -146,8 +146,6 @@ public class JMXActionsManager {
      * Disconnects the JMX client and disables this action and closes the associated editor
      */
     public void disconnectJMXClient() {
-        // Disconnect the jmx Client
-        this.jmxClient.disconnect();
         // Disable all actions of this manager
         for (final IAction a : this.actions) {
             a.setEnabled(false);
@@ -160,6 +158,16 @@ public class JMXActionsManager {
                 t.printStackTrace();
             }
         }
+        /*
+         * disconnect action requires network access and 
+         * potentially it can hang, run it from separate thread 
+         * to don't freeze GUI thread
+         */
+        new Thread() {
+        	public void run() {
+        		jmxClient.disconnect();
+        	}
+        }.start();
     }
 
     public JMXClientHelper getJMXClientHelper() {

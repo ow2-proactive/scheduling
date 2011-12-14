@@ -49,13 +49,13 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.NodeException;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
+import org.ow2.proactive.gui.common.ActiveObjectPingerThread;
 import org.ow2.proactive.resourcemanager.Activator;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.common.RMConstants;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.frontend.RMConnection;
 import org.ow2.proactive.resourcemanager.frontend.RMMonitoring;
-import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.gui.actions.JMXActionsManager;
 import org.ow2.proactive.resourcemanager.gui.data.model.RMModel;
 import org.ow2.proactive.resourcemanager.gui.dialog.SelectResourceManagerDialog;
@@ -70,24 +70,23 @@ import org.ow2.proactive.resourcemanager.gui.views.StatisticsView;
  * @author The ProActive Team
  *
  */
-public class RMStore {
+public class RMStore implements ActiveObjectPingerThread.PingListener {
 
-    private static RMStore instance = null;
-    private static boolean isConnected = false;
+    private static RMStore instance;
+    private static boolean isConnected;
 
-    /*    public static StatusLineContributionItem statusItem =
-     new StatusLineContributionItem("LoggedInStatus");*/
-    private ResourceManagerProxy resourceManagerAO = null;
+    private ResourceManagerProxy resourceManagerAO;
 
-    private RMMonitoring rmMonitoring = null;
-    private EventsReceiver receiver = null;
-    private RMModel model = null;
+    private RMMonitoring rmMonitoring;
+    private EventsReceiver receiver;
+    private RMModel model;
     private String baseURL;
 
+    private ActiveObjectPingerThread pinger;
+    
     private RMStore(String url, String login, String password, byte[] cred) throws RMException {
         try {
-            //resourceManagerAO = PAActiveObject.newActive(ResourceManagerProxy.class, new Object[] {});
-            resourceManagerAO = ResourceManagerProxy.getActiveInstance();
+            resourceManagerAO = ResourceManagerProxy.getProxyInstance();
             baseURL = url;
 
             if (url != null && !url.endsWith("/")) {
@@ -122,19 +121,19 @@ public class RMStore {
                 }
                 resourceManagerAO.connect(rmAuthentication, credentials);
                 //resourceManager = auth.login(creds);
-            } catch (LoginException e) {
+            } catch (Exception e) {
                 Activator.log(IStatus.INFO, "Login exception for user " + login, e);
                 throw new RMException(e.getMessage());
             }
 
-            rmMonitoring = resourceManagerAO.getMonitoring();
-            // checking if there were no exception
-            rmMonitoring.toString();
+            rmMonitoring = resourceManagerAO.syncGetMonitoring();
 
             instance = this;
             receiver = PAActiveObject.newActive(EventsReceiver.class, new Object[] {});
             receiver.init(rmMonitoring);
             SelectResourceManagerDialog.saveInformations();
+
+            startPinger(resourceManagerAO);
             isConnected = true;
             //ControllerView.getInstance().connectedEvent(isAdmin);
 
@@ -150,9 +149,34 @@ public class RMStore {
             Activator.log(IStatus.ERROR, "Node exeption", e);
             e.printStackTrace();
             throw new RMException(e.getMessage(), e);
+        } catch (Exception e) {
+            Activator.log(IStatus.ERROR, "Connection exeption", e);
+            e.printStackTrace();
+            throw new RMException(e.getMessage(), e);
         }
     }
 
+	@Override
+	public void onPingError() {
+		RMStore.getInstance().shutDownActions(true);
+	}
+
+    @Override
+	public void onPingFalse() {
+    	onPingError();
+	}
+
+	@Override
+	public void onPingTimeout() {
+		onPingError();
+	}
+
+	private void startPinger(ResourceManagerProxy proxy) {
+    	pinger = new ActiveObjectPingerThread(proxy, this);
+    	pinger.setName("Pinger");
+    	pinger.start();
+    }
+    
     public static void newInstance(String url, String login, String password, byte[] cred)
             throws RMException, SecurityException {
         instance = new RMStore(url, login, password, cred);
@@ -183,7 +207,7 @@ public class RMStore {
      * @return the rmAdmin
      * @throws RMException
      */
-    public ResourceManager getResourceManager() {
+    public ResourceManagerProxy getResourceManager() {
         return resourceManagerAO;
     }
 
@@ -200,21 +224,28 @@ public class RMStore {
         return this.baseURL;
     }
 
-    public void shutDownActions(final boolean failed) {
-        Display.getDefault().asyncExec(new Runnable() {
-            public void run() {
-                String msg;
-                if (failed) {
-                    msg = "seems to be down";
-                } else {
-                    msg = "has been shutdown";
+    /*
+     * method is synchronized since it can be concurrently called by the RMEventListener
+     * and pinger thread
+     */
+    public synchronized void shutDownActions(final boolean failed) {
+        if (isConnected) {
+        	isConnected = false;
+            Display.getDefault().asyncExec(new Runnable() {
+                public void run() {
+                    String msg;
+                    if (failed) {
+                        msg = "seems to be down";
+                    } else {
+                        msg = "has been shutdown";
+                    }
+                    MessageDialog.openInformation(Display.getDefault().getActiveShell(), "shutdown",
+                            "Resource manager  '" + RMStore.getInstance().getURL() + "'  " + msg +
+                                ", now disconnect.");
+                    disconnectionActions();
                 }
-                MessageDialog.openInformation(Display.getDefault().getActiveShell(), "shutdown",
-                        "Resource manager  '" + RMStore.getInstance().getURL() + "'  " + msg +
-                            ", now disconnect.");
-                disconnectionActions();
-            }
-        });
+            });
+        }
     }
 
     /**
@@ -223,7 +254,9 @@ public class RMStore {
      *
      */
     public void disconnectionActions() {
-        // remove empty editor if it exists
+    	pinger.stopPinger();
+
+    	// remove empty editor if it exists
         try {
             PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().setEditorAreaVisible(false);
         } catch (Throwable t) {
@@ -253,20 +286,15 @@ public class RMStore {
 
         // Disconnect JMX ChartIt action
         JMXActionsManager.getInstance().disconnectJMXClient();
-        try {
-            //disconnect user if user has not failed
-            //protect it by a try catch
-            resourceManagerAO.disconnect();
-        } catch (Exception e) {
-        }
+        resourceManagerAO.disconnect();
         resourceManagerAO = null;
         rmMonitoring = null;
         model = null;
         baseURL = null;
         isConnected = false;
-        PAActiveObject.terminateActiveObject(receiver, true);
+        // termination is asynchronous since it is called from GUI thread
+        PAActiveObject.terminateActiveObject(receiver, false);
         RMStatusBarItem.getInstance().setText("disconnected");
-        //ControllerView.clearInstance();
     }
 
 }

@@ -414,6 +414,7 @@
 		<path refid="common.classpath"/>
 		<pathelement path="${rcp.scheduler.dir}/org.ow2.proactive.scheduler/bin" />
 		<pathelement path="${rcp.rm.dir}/org.ow2.proactive.resourcemanager/bin" />
+        <pathelement path="${rcp.scheduler.dir}/org.ow2.proactive.scheduling.common.lib/bin" />
 		<pathelement path="${classes.dir}/scheduler"/>
 		<pathelement path="${classes.dir}/scheduler"/>
 		<pathelement path="${classes.dir}/resource-manager"/>
@@ -422,17 +423,16 @@
 	<target name="rcp.generateStubs" description="Generate Stubs for the RCP products, for better performance">
 		<taskdef name="stubGenerator" classname="ant.AntStubGenerator" classpath="${proactive.utils.jar}" />
 		<typedef name="class" classname="ant.AntStubGeneratorClass" classpath="${proactive.utils.jar}" />
+        <stubGenerator srcDir="${rcp.scheduler.dir}/org.ow2.proactive.scheduling.common.lib/bin" refclasspath="rcps.classpath">
+        	<class name="org.ow2.proactive.gui.common.ActiveObjectProxy$ActiveObjectHolder" />
+        </stubGenerator>
 		<stubGenerator srcDir="${rcp.scheduler.dir}/org.ow2.proactive.scheduler/bin" refclasspath="rcps.classpath">
-			<class name="org.ow2.proactive.scheduler.gui.data.SchedulerProxy" />
 			<class name="org.ow2.proactive.scheduler.gui.data.JobsController" />
 		</stubGenerator>
-
 		<stubGenerator srcDir="${rcp.rm.dir}/org.ow2.proactive.resourcemanager/bin" refclasspath="rcps.classpath">
-			<class name="org.ow2.proactive.resourcemanager.gui.data.ResourceManagerProxy" />
 			<class name="org.ow2.proactive.resourcemanager.gui.data.EventsReceiver"/>
 		</stubGenerator>
 	</target>
-	
 
 	<target name="rcp.libClean.scheduling.common">
 		<delete failonerror="false" includeemptydirs="true">

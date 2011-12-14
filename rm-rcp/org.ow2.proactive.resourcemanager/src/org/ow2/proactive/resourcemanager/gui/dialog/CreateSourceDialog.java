@@ -38,11 +38,12 @@ package org.ow2.proactive.resourcemanager.gui.dialog;
 
 import java.util.Collection;
 
-import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
-import org.eclipse.swt.events.ControlEvent;
-import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -55,9 +56,9 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
-import org.ow2.proactive.resourcemanager.exception.RMException;
-import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.gui.data.RMStore;
+import org.ow2.proactive.resourcemanager.gui.data.ResourceManagerProxy;
+import org.ow2.proactive.resourcemanager.gui.data.SupportedPluginDescriptors;
 import org.ow2.proactive.resourcemanager.gui.dialog.nodesources.ConfigurablePanel;
 import org.ow2.proactive.resourcemanager.gui.dialog.nodesources.NodeSourceName;
 import org.ow2.proactive.resourcemanager.nodesource.common.PluginDescriptor;
@@ -77,7 +78,8 @@ public class CreateSourceDialog {
     private ScrolledComposite scroll = null;
     private Composite view = null;
 
-    private CreateSourceDialog(Shell parent) throws RMException {
+    private CreateSourceDialog(Shell parent, 
+    		SupportedPluginDescriptors infrastructuresAndPolicies) {
 
         ProActiveConfiguration.load();
 
@@ -113,10 +115,8 @@ public class CreateSourceDialog {
         policy = new ConfigurablePanel(view, "Node source policy", this);
         policy.setLayoutData(new GridData(GridData.BEGINNING | GridData.FILL_BOTH));
 
-        ResourceManager rm = RMStore.getInstance().getResourceManager();
-        Collection<PluginDescriptor> infrastructures = rm.getSupportedNodeSourceInfrastructures();
 
-        for (PluginDescriptor descriptor : infrastructures) {
+        for (PluginDescriptor descriptor : infrastructuresAndPolicies.getSupportedNodeSourceInfrastructures()) {
             try {
                 infrastructure.addComboValue(descriptor);
             } catch (Throwable e) {
@@ -124,7 +124,7 @@ public class CreateSourceDialog {
             }
         }
 
-        Collection<PluginDescriptor> policies = rm.getSupportedNodeSourcePolicies();
+        Collection<PluginDescriptor> policies = infrastructuresAndPolicies.getSupportedNodeSourcePolicies();
 
         for (PluginDescriptor descriptor : policies) {
             policy.addComboValue(descriptor);
@@ -155,24 +155,21 @@ public class CreateSourceDialog {
         okButton.setText("     OK     ");
         okButton.addListener(SWT.Selection, new Listener() {
             public void handleEvent(Event event) {
+            	validateForm();
+                ResourceManagerProxy rm = RMStore.getInstance().getResourceManager();
                 try {
-                    validateForm();
-                    ResourceManager rm = RMStore.getInstance().getResourceManager();
                     Object[] policyParams = policy.getParameters();
-                    rm.createNodeSource(name.getNodeSourceName(),
+                    boolean result = rm.syncCreateNodeSource(name.getNodeSourceName(),
                             infrastructure.getSelectedPlugin().getPluginName(),
                             infrastructure.getParameters(), policy.getSelectedPlugin().getPluginName(),
-                            policyParams).getBooleanValue();
-
-                    dialog.close();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    String message = e.getMessage();
-                    if (e.getCause() != null) {
-                        message = e.getCause().getMessage();
+                            policyParams);
+                    if (result) {
+                        dialog.close();
+                    } else {
+                    	rm.displayError("Unknown reason", "Cannot create nodesource");
                     }
-                    MessageDialog.openError(Display.getDefault().getActiveShell(),
-                            "Cannot create nodesource", message);
+                } catch (Exception e) {
+                	rm.logAndDisplayError(e, "Cannot create nodesource");
                 }
             }
         });
@@ -204,18 +201,27 @@ public class CreateSourceDialog {
      *
      * @param parent the parent
      */
-    public static void showDialog(Shell parent) {
-        try {
-            new CreateSourceDialog(parent);
-        } catch (Exception e) {
-            e.printStackTrace();
-            String message = e.getMessage();
-            if (e.getCause() != null) {
-                message = e.getCause().getMessage();
-            }
-            MessageDialog.openError(Display.getDefault().getActiveShell(), "Cannot create nodesource",
-                    message);
-        }
+    public static void showDialog(final Shell parent) {
+        Job job = new Job("Initializing dialog.") {
+			@Override
+			protected IStatus run(IProgressMonitor monitor) {
+		        ResourceManagerProxy rm = RMStore.getInstance().getResourceManager();
+		        try {
+		            final SupportedPluginDescriptors infrastructuresAndPolicies = rm.syncGetSupportedPluginDescriptors(); 
+		        	parent.getDisplay().asyncExec(new Runnable() {
+		        		public void run() {
+			            	new CreateSourceDialog(parent, infrastructuresAndPolicies);
+		        		}
+		        	});
+					return Status.OK_STATUS;
+		        } catch (Exception e) {
+		            rm.logAndDisplayError(e, "Cannot create nodesource");
+		            return Status.OK_STATUS;
+		        }
+			}
+        };
+        job.setUser(true);
+        job.schedule();
     }
 
     private void validateForm() {

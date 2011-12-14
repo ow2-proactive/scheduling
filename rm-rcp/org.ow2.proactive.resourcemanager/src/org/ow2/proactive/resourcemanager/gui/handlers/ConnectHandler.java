@@ -44,9 +44,7 @@ import org.eclipse.core.commands.IHandler;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
@@ -112,7 +110,11 @@ public class ConnectHandler extends AbstractHandler implements IHandler {
                         RMStore.newInstance(dialogResult.getUrl(), dialogResult.getLogin(), dialogResult
                                 .getPassword(), dialogResult.getCredentials());
 
-                        RMStatusBarItem.getInstance().setText("connected");
+                        parent.getDisplay().syncExec(new Runnable() {
+                            public void run() {
+                                RMStatusBarItem.getInstance().setText("connected");
+                            }
+                        });
 
                         return Status.OK_STATUS;
 
@@ -151,11 +153,8 @@ public class ConnectHandler extends AbstractHandler implements IHandler {
                     Activator.log(IStatus.ERROR, "Could not connect to the Resource Manager ", t);
                     t.printStackTrace();
                 }
-                try {
-                    // trying to disconnect in any case
-                    RMStore.getInstance().getResourceManager().disconnect();
-                } catch (Throwable thr) {
-                }
+                // trying to disconnect in any case
+                RMStore.getInstance().getResourceManager().disconnect();
                 return Status.OK_STATUS;
             }
         };

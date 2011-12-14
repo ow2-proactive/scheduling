@@ -226,7 +226,7 @@ public class TopologyViewer {
 
     public void loadMatrix() {
         if (RMStore.isConnected()) {
-            topology = RMStore.getInstance().getResourceManager().getTopology();
+            topology = RMStore.getInstance().getResourceManager().syncGetTopology();
             loadMatrix(topology);
         }
     }
@@ -254,7 +254,7 @@ public class TopologyViewer {
                     lock.lock();
                     synchronized (visualization) {
                         try {
-                            topology = RMStore.getInstance().getResourceManager().getTopology();
+                            topology = RMStore.getInstance().getResourceManager().syncGetTopology();
                             String host = node.getParent().getParent().getName();
                             // Topology topology =
                             // RMStore.getInstance().getResourceManager().getTopology();

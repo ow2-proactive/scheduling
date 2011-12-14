@@ -45,11 +45,8 @@ import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.HandlerEvent;
 import org.eclipse.core.commands.IHandler;
-import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.swt.widgets.Display;
-import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
-import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.gui.data.RMStore;
+import org.ow2.proactive.resourcemanager.gui.data.ResourceManagerProxy;
 import org.ow2.proactive.resourcemanager.gui.data.model.Selectable;
 
 
@@ -58,7 +55,7 @@ public class LockNodesHandler extends AbstractHandler implements IHandler {
     private static LockNodesHandler instance;
 
     private boolean previousState = true;
-    private Set<String> selectedNodes = null;
+    private Set<String> selectedNodes;
 
     public LockNodesHandler() {
         super();
@@ -90,22 +87,8 @@ public class LockNodesHandler extends AbstractHandler implements IHandler {
     }
 
     public Object execute(ExecutionEvent event) throws ExecutionException {
-
-        ResourceManager resourceManager = RMStore.getInstance().getResourceManager();
-        try {
-            BooleanWrapper status = resourceManager.lockNodes(selectedNodes);
-            if (status.getBooleanValue()) {
-                // success
-            } else {
-                MessageDialog.openError(Display.getDefault().getActiveShell(), "Cannot lock nodes",
-                        "Unknown reason");
-            }
-        } catch (Exception e) {
-            MessageDialog.openError(Display.getDefault().getActiveShell(), "Cannot lock nodes", e
-                    .getMessage());
-            e.printStackTrace();
-        }
-
+        ResourceManagerProxy resourceManager = RMStore.getInstance().getResourceManager();
+        resourceManager.lockNodes(selectedNodes);
         return null;
     }
 

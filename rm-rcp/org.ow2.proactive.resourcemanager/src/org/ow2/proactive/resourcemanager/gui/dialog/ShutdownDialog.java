@@ -36,8 +36,6 @@
  */
 package org.ow2.proactive.resourcemanager.gui.dialog;
 
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
@@ -49,7 +47,6 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
-import org.ow2.proactive.resourcemanager.Activator;
 import org.ow2.proactive.resourcemanager.gui.data.RMStore;
 
 
@@ -93,15 +90,8 @@ public class ShutdownDialog extends Dialog {
         okButton.setText("OK");
         okButton.addListener(SWT.Selection, new Listener() {
             public void handleEvent(Event event) {
-                try {
-                    RMStore.getInstance().getResourceManager().shutdown(!preemptCheck.getSelection())
-                            .booleanValue();
-                } catch (RuntimeException e) {
-                    MessageDialog.openError(parent, "Cannot shutdown the resource manager", e.getMessage());
-                    Activator.log(IStatus.ERROR, "Error when shutting down. ", e);
-                    e.printStackTrace();
-                }
-                shell.close();
+            	RMStore.getInstance().getResourceManager().shutdown(!preemptCheck.getSelection());
+            	shell.close();
             }
         });
 
