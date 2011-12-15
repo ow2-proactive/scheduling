@@ -36,6 +36,9 @@
  */
 package org.ow2.proactive.resourcemanager.selection.statistics;
 
+import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
+
+
 /**
  *
  * This class represents probability entity, provides means for
@@ -85,6 +88,9 @@ public class Probability {
      */
     public void decrease() {
         probability = calcProbability(--step);
+        if (probability * 100 < PAResourceManagerProperties.RM_SELECT_SCRIPT_MINPROBABILIYT.getValueAsInt()) {
+            probability = 0;
+        }
     }
 
     /**
