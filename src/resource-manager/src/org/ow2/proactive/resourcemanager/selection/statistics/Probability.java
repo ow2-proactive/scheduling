@@ -36,6 +36,9 @@
  */
 package org.ow2.proactive.resourcemanager.selection.statistics;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 
 
@@ -53,13 +56,27 @@ import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProper
  */
 public class Probability {
 
+    public static final Probability ZERO = new Probability(0);
+    public static final Probability ONE = new Probability(1);
+
+    private static Timer timer = new Timer(true);
     private int step = 0;
     private double probability = calcProbability(step);
 
-    /**
-     * Default constructor
-     */
-    public Probability() {
+    private class RestoreProbabilityTask extends TimerTask {
+
+        private final double probability;
+
+        private RestoreProbabilityTask(double probability) {
+            this.probability = probability;
+        }
+
+        @Override
+        public void run() {
+            synchronized (Probability.this) {
+                Probability.this.probability = probability;
+            }
+        }
     }
 
     /**
@@ -72,7 +89,7 @@ public class Probability {
     /**
      * Returns the probability value
      */
-    public double value() {
+    public synchronized double value() {
         return probability;
     }
 
@@ -84,19 +101,26 @@ public class Probability {
     }
 
     /**
-     * Decreases the probability
+     * Sets the probability to zero until the timer restores it.
+     * It's done to pause the permanent execution of dynamic selection scripts
      */
-    public void decrease() {
-        probability = calcProbability(--step);
-        if (probability * 100 < PAResourceManagerProperties.RM_SELECT_SCRIPT_MINPROBABILIYT.getValueAsInt()) {
-            probability = 0;
+    public synchronized void decrease() {
+
+        if (probability > 0 && probability < 1) {
+            // setting the probability to 0 to timeout the script execution on this node
+            // and scheduling the timer
+            probability = calcProbability(--step);
+            timer.schedule(new RestoreProbabilityTask(probability),
+                    PAResourceManagerProperties.RM_SELECT_SCRIPT_NODE_DYNAMICITY.getValueAsInt());
         }
+
+        probability = 0;
     }
 
     /**
      * Increases the probability
      */
-    public void increase() {
+    public synchronized void increase() {
         probability = calcProbability(++step);
     }
 
@@ -104,7 +128,7 @@ public class Probability {
      * Returns string probability representation
      */
     @Override
-    public String toString() {
+    public synchronized String toString() {
         return String.valueOf(probability);
     }
 

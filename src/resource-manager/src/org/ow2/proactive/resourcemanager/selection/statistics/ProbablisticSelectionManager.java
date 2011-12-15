@@ -42,6 +42,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -238,7 +240,7 @@ public class ProbablisticSelectionManager extends SelectionManager {
                 if (script.isDynamic()) {
                     probability.decrease();
                 } else {
-                    probability = new Probability(0);
+                    probability = Probability.ZERO;
                 }
             } else {
                 // script passed
@@ -246,7 +248,7 @@ public class ProbablisticSelectionManager extends SelectionManager {
                 if (script.isDynamic()) {
                     probability.increase();
                 } else {
-                    probability = new Probability(1);
+                    probability = Probability.ONE;
                 }
             }
 
