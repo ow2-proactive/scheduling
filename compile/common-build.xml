@@ -427,7 +427,7 @@
         	<class name="org.ow2.proactive.gui.common.ActiveObjectProxy$ActiveObjectHolder" />
         </stubGenerator>
 		<stubGenerator srcDir="${rcp.scheduler.dir}/org.ow2.proactive.scheduler/bin" refclasspath="rcps.classpath">
-			<class name="org.ow2.proactive.scheduler.gui.data.JobsController" />
+			<class name="org.ow2.proactive.scheduler.gui.data.SchedulerEventListenerImpl" />
 		</stubGenerator>
 		<stubGenerator srcDir="${rcp.rm.dir}/org.ow2.proactive.resourcemanager/bin" refclasspath="rcps.classpath">
 			<class name="org.ow2.proactive.resourcemanager.gui.data.EventsReceiver"/>

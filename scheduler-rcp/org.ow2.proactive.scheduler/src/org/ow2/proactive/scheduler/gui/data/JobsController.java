@@ -46,14 +46,11 @@ import java.util.Vector;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
-import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
-import org.objectweb.proactive.core.node.NodeException;
 import org.ow2.proactive.gui.common.SWTGuiThreadResultHandler;
 import org.ow2.proactive.scheduler.Activator;
 import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
-import org.ow2.proactive.scheduler.common.SchedulerEventListener;
 import org.ow2.proactive.scheduler.common.SchedulerState;
 import org.ow2.proactive.scheduler.common.SchedulerStatus;
 import org.ow2.proactive.scheduler.common.SchedulerUsers;
@@ -86,20 +83,20 @@ import org.ow2.proactive.scheduler.gui.views.TaskView;
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9
  */
-public class JobsController implements SchedulerEventListener {
-    // The shared instance view as a direct reference
-    private static JobsController localView = null;
+public class JobsController {
 
-    // The shared instance view as an active object
-    private static JobsController activeView = null;
+    // The shared instance view as a direct reference
+    private static JobsController instance;
+
+    private SchedulerEventListenerImpl eventListener;
 
     // jobs
-    private Map<JobId, JobState> jobs = null;
+    private Map<JobId, JobState> jobs;
 
     // jobs id
-    private Vector<JobId> pendingJobsIds = null;
-    private Vector<JobId> runningJobsIds = null;
-    private Vector<JobId> finishedJobsIds = null;
+    private Vector<JobId> pendingJobsIds;
+    private Vector<JobId> runningJobsIds;
+    private Vector<JobId> finishedJobsIds;
 
     //Scheduler users
     private SchedulerUsers users = null;
@@ -271,10 +268,6 @@ public class JobsController implements SchedulerEventListener {
         for (SchedulerUsersListener listener : schedulerUsersListeners)
             listener.update(users.getUsers());
     }
-
-    // -------------------------------------------------------------------- //
-    // ---------------- implements SchedulerEventListener ----------------- //
-    // -------------------------------------------------------------------- //
 
     /**
      * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#schedulerStateUpdatedEvent(org.ow2.proactive.scheduler.common.SchedulerEvent)
@@ -623,15 +616,15 @@ public class JobsController implements SchedulerEventListener {
 
     static class GetTaskResultHandler extends SWTGuiThreadResultHandler<TaskResult> {
 
-		@Override
-		protected void handleResultInGuiThread(TaskResult result) {
+        @Override
+        protected void handleResultInGuiThread(TaskResult result) {
             ResultPreview resultPreview = ResultPreview.getInstance();
             if (resultPreview != null) {
                 resultPreview.update(new SimpleTextPanel(result.getTextualDescription()));
             }
-		}
+        }
     }
-    
+
     private void taskRunningToFinishedEvent(TaskInfo info) {
         JobId jobId = info.getJobId();
         getJobById(jobId).update(info);
@@ -663,9 +656,8 @@ public class JobsController implements SchedulerEventListener {
                         taskView.lineUpdate(getTaskStateById(job, taskId));
 
                         if (taskId.equals(taskView.getIdOfSelectedTask())) {
-                            SchedulerProxy.getInstance().getTaskResult(job.getId(), 
-                            		taskId, 
-                            		new GetTaskResultHandler()); 
+                            SchedulerProxy.getInstance().getTaskResult(job.getId(), taskId,
+                                    new GetTaskResultHandler());
                         }
                     }
                 }
@@ -1109,14 +1101,21 @@ public class JobsController implements SchedulerEventListener {
     }
 
     /**
-     * Initiate the controller. Warning, this method must be synchronous.
+     * Initiate the controller
      *
      * @return true only if no error caught, for synchronous call.
      */
-    public boolean init() {
+    public boolean init(SchedulerProxy schedulerProxy) {
         SchedulerState state = null;
-        state = SchedulerProxy.getInstance().syncAddEventListener(
-                ((SchedulerEventListener) PAActiveObject.getStubOnThis()), false, true);
+
+        try {
+            eventListener = SchedulerEventListenerImpl.createActiveObjectListener(this);
+        } catch (Exception e) {
+            e.printStackTrace();
+            Activator.log(IStatus.ERROR, "Error in jobs controller ", e);
+            return false;
+        }
+        state = schedulerProxy.syncAddEventListener(eventListener, false, true);
 
         if (state == null) { // addEventListener failed
             return false;
@@ -1171,50 +1170,29 @@ public class JobsController implements SchedulerEventListener {
         users = state.getUsers();
         usersUpdateInternal();
 
-        // for synchronous call
         return true;
     }
 
     public static JobsController getLocalView() {
-        if (localView == null) {
-            localView = new JobsController();
+        if (instance == null) {
+            instance = new JobsController();
         }
-        return localView;
+        return instance;
     }
 
-    public static JobsController getActiveView() {
-        if (activeView == null) {
-            turnActive();
+    public void terminateEventListener() {
+        if (eventListener != null) {
+            eventListener.stopListenEvents();
+            PAActiveObject.terminateActiveObject(eventListener, false);
+            eventListener = null;
         }
-        return activeView;
     }
 
-    public static void terminateActiveView() {
-    	if (activeView != null) {
-    		PAActiveObject.terminateActiveObject(activeView, false);
-    	}
-    }
-    
-    public static JobsController turnActive() {
-        //if it has already been turned active, we return the active reference
-        if (activeView != null)
-            return activeView;
-        try {
-            activeView = (JobsController) PAActiveObject.turnActive(getLocalView());
-            return activeView;
-        } catch (NodeException e) {
-            e.printStackTrace();
-            Activator.log(IStatus.ERROR, "Error in jobs controller ", e);
-        } catch (ActiveObjectCreationException e) {
-            Activator.log(IStatus.ERROR, "Error in jobs controller ", e);
-            e.printStackTrace();
+    public static void clearInstance() {
+        if (instance != null) {
+            instance.terminateEventListener();
+            instance = null;
         }
-        return null;
-    }
-
-    public static void clearInstances() {
-        localView = null;
-        activeView = null;
     }
 
 }

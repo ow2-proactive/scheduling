@@ -108,7 +108,7 @@ public class ConnectAction extends SchedulerGUIAction {
                         boolean connected  = SchedulerProxy.getInstance().connectToScheduler(dialogResult);
                         if (connected) {
                             //getting the scheduler state here, in this job (non UI).
-                            JobsController.getActiveView().init();
+                            JobsController.getLocalView().init(SchedulerProxy.getInstance());
                             postConnect(dialogResult.getUrl());
                         } else {
                             errorConnect(new Exception(

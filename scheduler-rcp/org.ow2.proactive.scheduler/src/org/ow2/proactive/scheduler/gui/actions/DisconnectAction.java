@@ -43,6 +43,7 @@ import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingExcepti
 import org.ow2.proactive.scheduler.gui.Internal;
 import org.ow2.proactive.scheduler.gui.composite.StatusLabel;
 import org.ow2.proactive.scheduler.gui.data.ActionsManager;
+import org.ow2.proactive.scheduler.gui.data.JobsController;
 import org.ow2.proactive.scheduler.gui.data.SchedulerProxy;
 import org.ow2.proactive.scheduler.gui.views.SeparatedJobView;
 
@@ -73,6 +74,9 @@ public class DisconnectAction extends SchedulerGUIAction {
             e.printStackTrace();
         }
 
+        // stop listen for Scheduler events
+        JobsController.getLocalView().terminateEventListener();
+        
         try {
             // Disconnect the JMX client of ChartIt
             JMXActionsManager.getInstance().disconnectJMXClient();
