@@ -78,11 +78,11 @@
 			the path to the java executable, the Resource Manager home directory, the protocol and the port that will be used to access created nodes,
 			the list of Java options and finally, the list of hosts. For the static policy, 2 parameters has to be provided:
 			the permission for node utilization and the permission for providing nodes. The provider permission specifies users who can add nodes to this node
-			source and is one of the followings: "ME", "MY_GROUPS", "ALL". The utilization permission defines who can obtain nodes for
+			source and is one of the followings: "ME", "users=user1,user2;groups=group1,group2", "ALL". The utilization permission defines who can obtain nodes for
 			computations from this node source and must be one
-			of the followings: "ME" (node source creator), "MY_GROUPS", "PROVIDER", "PROVIDER_GROUPS", "ALL".
+			of the followings: "ME" (node source creator), "users=user1,user2;groups=group1,group2", "ALL".
 			In the previous example, only the user who has
-			created the node source, that is "admin", can add nodes to it but every user belonging to his groups can use them.
+			created the node source, that is "admin", can add nodes to it but all users can use them.
 		</para>
 
 		<note>

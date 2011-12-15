@@ -77,8 +77,8 @@ import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.frontend.RMMonitoringImpl;
 import org.ow2.proactive.resourcemanager.nodesource.dataspace.DataSpaceNodeConfigurationAgent;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.InfrastructureManager;
+import org.ow2.proactive.resourcemanager.nodesource.policy.AccessType;
 import org.ow2.proactive.resourcemanager.nodesource.policy.NodeSourcePolicy;
-import org.ow2.proactive.resourcemanager.nodesource.policy.NodeSourcePolicy.AccessType;
 import org.ow2.proactive.resourcemanager.rmnode.RMDeployingNode;
 import org.ow2.proactive.resourcemanager.rmnode.RMNode;
 import org.ow2.proactive.resourcemanager.rmnode.RMNodeImpl;
@@ -142,7 +142,7 @@ public class NodeSource implements InitActive, RunActive {
     private final Permission providerPermission;
     // user can get nodes for running computations
     // level is configured by ns admin at the moment of ns creation
-    private NodeSourcePolicy.AccessType nodeUserAccessType;
+    private AccessType nodeUserAccessType;
 
     /**
      * Creates a new instance of NodeSource.
@@ -191,8 +191,8 @@ public class NodeSource implements InitActive, RunActive {
         // creating node source provider permission
         // could be one of the following: PrincipalPermission (NS creator) or PrincipalPermission (NS creator groups)
         // or PrincipalPermission (anyone)
-        this.providerPermission = new PrincipalPermission(provider.getName(), provider.getSubject()
-                .getPrincipals(getPrincipalType(nodeSourcePolicy.getProviderAccessType())));
+        this.providerPermission = new PrincipalPermission(provider.getName(), nodeSourcePolicy
+                .getProviderAccessType().getIdentityPrincipals(provider));
         this.nodeUserAccessType = nodeSourcePolicy.getUserAccessType();
     }
 
@@ -363,13 +363,13 @@ public class NodeSource implements InitActive, RunActive {
         // ME/MY_GROUPS (ns creator/ns creator groups) and in this case
         // creator's principals will be used
         Client permissionOwner = administrator;
-        if (nodeUserAccessType == AccessType.PROVIDER || nodeUserAccessType == AccessType.PROVIDER_GROUPS) {
+        if (nodeUserAccessType.equals(AccessType.PROVIDER) ||
+            nodeUserAccessType.equals(AccessType.PROVIDER_GROUPS)) {
             permissionOwner = provider;
         }
         // now selecting the type (user or group) and construct the permission
         PrincipalPermission nodeAccessPermission = new PrincipalPermission(
-            node.getNodeInformation().getURL(), permissionOwner.getSubject().getPrincipals(
-                    getPrincipalType(nodeUserAccessType)));
+            node.getNodeInformation().getURL(), nodeUserAccessType.getIdentityPrincipals(permissionOwner));
 
         return new RMNodeImpl(node, stub, provider, nodeAccessPermission);
     }
@@ -751,31 +751,6 @@ public class NodeSource implements InitActive, RunActive {
     @ImmediateService
     public Permission getProviderPermission() {
         return providerPermission;
-    }
-
-    /**
-     * Returns the type of principal of the node source administrator.
-     * Based on this type the appropriate PrincipalPermission is created
-     * in the node source which will control the administrator access to it.
-     * <p>
-     * The PrincipalPermission which will be created could be represented by
-     * the following pseudo code: PrincipalPermission(nodeSourceOwner.getPrincipals(type))
-     */
-    private Class<? extends IdentityPrincipal> getPrincipalType(NodeSourcePolicy.AccessType accessLevel) {
-        if (accessLevel == AccessType.ME || accessLevel == AccessType.PROVIDER) {
-            // USER
-            return UserNamePrincipal.class;
-        } else if (accessLevel == AccessType.MY_GROUPS || accessLevel == AccessType.PROVIDER_GROUPS) {
-            // GROP
-            return GroupNamePrincipal.class;
-        }
-        // creating fake anonymous class to filter out all meaningful principals
-        // in node source and create permission like PrincipalPermission(empty)
-        return new IdentityPrincipal("") {
-
-            /**  */
-            private static final long serialVersionUID = 31L;
-        }.getClass();
     }
 
     /**

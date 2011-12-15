@@ -45,7 +45,6 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
-import org.ow2.proactive.resourcemanager.nodesource.utils.NamesConvertor;
 import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SchedulerEventListener;
@@ -120,8 +119,7 @@ public class ReleaseResourcesWhenSchedulerIdle extends SchedulerAwarePolicy impl
 
     @Override
     public String toString() {
-        return NamesConvertor.beautifyName(this.getClass().getSimpleName()) + " [idle time: " + idleTime +
-            " ms]";
+        return super.toString() + " [idle time: " + idleTime + " ms]";
     }
 
     @Override

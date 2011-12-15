@@ -57,7 +57,6 @@ import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.frontend.RMEventListener;
 import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
-import org.ow2.proactive.resourcemanager.nodesource.utils.NamesConvertor;
 import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
@@ -275,9 +274,8 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
 
     @Override
     public String toString() {
-        return NamesConvertor.beautifyName(this.getClass().getSimpleName()) + " [Max Nodes: " + maxNodes +
-            " Min Nodes: " + minNodes + " Job Per Node: " + loadFactor + " Refresh period " + refreshTime +
-            "]";
+        return super.toString() + " [Max Nodes: " + maxNodes + " Min Nodes: " + minNodes + " Job Per Node: " +
+            loadFactor + " Refresh period " + refreshTime + "]";
     }
 
     /**

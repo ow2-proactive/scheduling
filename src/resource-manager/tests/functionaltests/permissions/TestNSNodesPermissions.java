@@ -64,6 +64,8 @@ import functionaltests.RMTHelper;
  *     can use nodes of this provider.
  *
  *  5. If set to ALL no restriction on the nodes utilization.
+ *  
+ *  6. If set to a specific user/group only those users can add/remove (can remove only their nodes)
  *
  *  We suppose that the resource manager is configured in the way that
  *  3 users exist: admin, nsadmin, user
@@ -311,6 +313,162 @@ public class TestNSNodesPermissions extends FunctionalTest {
         // removing the node source
         admin = RMTHelper.join("admin", "admin");
         admin.removeNodeSource(nsName, true).getBooleanValue();
+        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
+        RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, nsName);
+        admin.disconnect();
+
+        RMTHelper.log("Test6.1 - specific users");
+        admin = RMTHelper.join("admin", "admin");
+        admin.createNodeSource(nsName, DefaultInfrastructureManager.class.getName(), null,
+                StaticPolicy.class.getName(), new Object[] { "users=nsadmin", "ALL" }).getBooleanValue();
+
+        node = RMTHelper.createNode("node1");
+        node2 = RMTHelper.createNode("node2");
+        admin.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
+        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
+        //we eat the configuring to free nodeevent
+        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        admin.disconnect();
+
+        user = RMTHelper.join("radmin", "pwd");
+        nodes = user.getAtMostNodes(1, null);
+        Assert.assertEquals("User cannot get foreign node", 0, nodes.size());
+
+        user.addNode(node2.getNodeInformation().getURL(), nsName).getBooleanValue();
+        RMTHelper.waitForNodeEvent(RMEventType.NODE_ADDED, node2.getNodeInformation().getURL());
+        //we eat the configuring to free nodeevent
+        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        nodes = user.getAtMostNodes(1, null);
+        Assert.assertEquals("User cannot even your own node", 0, nodes.size());
+        user.disconnect();
+
+        nsadmin = RMTHelper.join("nsadmin", "pwd");
+        nodes = nsadmin.getAtMostNodes(2, null);
+        Assert.assertEquals(2, nodes.size());
+        //we eat free -> busy * 2
+        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        nsadmin.releaseNodes(nodes);
+        //busy -> free * 2
+        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        nsadmin.disconnect();
+
+        // removing the node source
+        admin = RMTHelper.join("admin", "admin");
+        admin.removeNodeSource(nsName, true).getBooleanValue();
+        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
+        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
+        RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, nsName);
+        admin.disconnect();
+
+        RMTHelper.log("Test6.2 - specific groups");
+        admin = RMTHelper.join("admin", "admin");
+        admin.createNodeSource(nsName, DefaultInfrastructureManager.class.getName(), null,
+                StaticPolicy.class.getName(), new Object[] { "groups=nsadmins", "ALL" }).getBooleanValue();
+
+        node = RMTHelper.createNode("node1");
+        node2 = RMTHelper.createNode("node2");
+        admin.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
+        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
+        //we eat the configuring to free nodeevent
+        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        admin.disconnect();
+
+        user = RMTHelper.join("radmin", "pwd");
+        nodes = user.getAtMostNodes(1, null);
+        Assert.assertEquals("User cannot get foreign node", 0, nodes.size());
+
+        user.addNode(node2.getNodeInformation().getURL(), nsName).getBooleanValue();
+        RMTHelper.waitForNodeEvent(RMEventType.NODE_ADDED, node2.getNodeInformation().getURL());
+        //we eat the configuring to free nodeevent
+        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        nodes = user.getAtMostNodes(1, null);
+        Assert.assertEquals("User cannot even your own node", 0, nodes.size());
+        user.disconnect();
+
+        nsadmin = RMTHelper.join("nsadmin", "pwd");
+        nodes = nsadmin.getAtMostNodes(2, null);
+        Assert.assertEquals(2, nodes.size());
+        //we eat free -> busy * 2
+        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        nsadmin.releaseNodes(nodes);
+        //busy -> free * 2
+        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        nsadmin.disconnect();
+
+        // removing the node source
+        admin = RMTHelper.join("admin", "admin");
+        nodes = admin.getAtMostNodes(2, null);
+        Assert.assertEquals(2, nodes.size());
+        //we eat free -> busy * 2
+        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        admin.releaseNodes(nodes);
+        //busy -> free * 2
+        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+
+        admin.removeNodeSource(nsName, true).getBooleanValue();
+        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
+        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
+        RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, nsName);
+        admin.disconnect();
+
+        RMTHelper.log("Test6.3 - specific users and groups");
+        admin = RMTHelper.join("admin", "admin");
+        admin.createNodeSource(nsName, DefaultInfrastructureManager.class.getName(), null,
+                StaticPolicy.class.getName(), new Object[] { "users=radmin;groups=nsadmins", "ALL" })
+                .getBooleanValue();
+
+        node = RMTHelper.createNode("node1");
+        node2 = RMTHelper.createNode("node2");
+        admin.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
+        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
+        //we eat the configuring to free nodeevent
+        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        admin.disconnect();
+
+        user = RMTHelper.join("radmin", "pwd");
+        nodes = user.getAtMostNodes(1, null);
+        Assert.assertEquals("User did not get a node but had a right to get it", 1, nodes.size());
+        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        nsadmin.releaseNodes(nodes);
+        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+
+        user.addNode(node2.getNodeInformation().getURL(), nsName).getBooleanValue();
+        RMTHelper.waitForNodeEvent(RMEventType.NODE_ADDED, node2.getNodeInformation().getURL());
+        //we eat the configuring to free nodeevent
+        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        nodes = user.getAtMostNodes(2, null);
+        Assert.assertEquals("User did not get nodes but had a right to get them", 2, nodes.size());
+        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        nsadmin.releaseNodes(nodes);
+        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        user.disconnect();
+
+        nsadmin = RMTHelper.join("nsadmin", "pwd");
+        nodes = nsadmin.getAtMostNodes(2, null);
+        Assert.assertEquals(2, nodes.size());
+        //we eat free -> busy * 2
+        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        nsadmin.releaseNodes(nodes);
+        //busy -> free * 2
+        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        nsadmin.disconnect();
+
+        // removing the node source
+        admin = RMTHelper.join("admin", "admin");
+        admin.removeNodeSource(nsName, true).getBooleanValue();
+        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
+        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
+        RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, nsName);
         admin.disconnect();
 
         System.out.println("Success");

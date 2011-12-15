@@ -94,13 +94,7 @@ rmURL maxNodes serviceUrl userName password trustStore trustStorePassword javaPa
 										<para><emphasis role="bold">"ME"</emphasis> - Only the node source creator </para>
 									</listitem>
 									<listitem>
-										<para><emphasis role="bold">"MY_GROUPS"</emphasis> - Only groups in which the node source creator belongs to</para>
-									</listitem>
-									<listitem>
-										<para><emphasis role="bold">"PROVIDER"</emphasis> - Only the node provider who added the node. Provider can use only its nodes</para>
-									</listitem>
-									<listitem>
-										<para><emphasis role="bold">"PROVIDER_GROUPS"</emphasis> - Only groups in which the node provider belongs to. Users from this groups can user only nodes of this provider</para>
+										<para><emphasis role="bold">"users=user1,user2;groups=group1,group2"</emphasis> - Only specific users or groups (for our example user1, user2, group1 and group2). It is possible to specify only groups or only users.</para>
 									</listitem>
 									<listitem>
 										<para><emphasis role="bold">"ALL"</emphasis> - Everybody</para>
@@ -116,7 +110,7 @@ rmURL maxNodes serviceUrl userName password trustStore trustStorePassword javaPa
 										<para><emphasis role="bold">"ME"</emphasis> - Only the node source creator </para>
 									</listitem>
 									<listitem>
-										<para><emphasis role="bold">"MY_GROUPS"</emphasis> - Only the group in which the node source creator belongs to</para>
+										<para><emphasis role="bold">"users=user1,user2;groups=group1,group2"</emphasis> - Only specific users or groups (for our example user1, user2, group1 and group2). It is possible to specify only groups or only users.</para>
 									</listitem>
 									<listitem>
 										<para><emphasis role="bold">"ALL"</emphasis> - Everybody</para>
@@ -560,15 +554,9 @@ test.example.net 5
 								<listitem>
 									<para><emphasis role="bold">"ME"</emphasis> - Only the node source creator </para>
 								</listitem>
-								<listitem>
-									<para><emphasis role="bold">"MY_GROUPS"</emphasis> - Only groups in which the node source creator belongs to</para>
-								</listitem>
-								<listitem>
-									<para><emphasis role="bold">"PROVIDER"</emphasis> - Only the node provider who added the node. Provider can use only its nodes</para>
-								</listitem>
-								<listitem>
-									<para><emphasis role="bold">"PROVIDER_GROUPS"</emphasis> - Only groups in which the node provider belongs to. Users from this groups can user only nodes of this provider</para>
-								</listitem>
+									<listitem>
+										<para><emphasis role="bold">"users=user1,user2;groups=group1,group2"</emphasis> - Only specific users or groups (for our example user1, user2, group1 and group2). It is possible to specify only groups or only users.</para>
+									</listitem>
 								<listitem>
 									<para><emphasis role="bold">"ALL"</emphasis> - Everybody</para>
 								</listitem>
@@ -582,9 +570,9 @@ test.example.net 5
 								<listitem>
 									<para><emphasis role="bold">"ME"</emphasis> - Only the node source creator </para>
 								</listitem>
-								<listitem>
-									<para><emphasis role="bold">"MY_GROUPS"</emphasis> - Only the group in which the node source creator belongs to</para>
-								</listitem>
+									<listitem>
+										<para><emphasis role="bold">"users=user1,user2;groups=group1,group2"</emphasis> - Only specific users or groups (for our example user1, user2, group1 and group2). It is possible to specify only groups or only users.</para>
+									</listitem>
 								<listitem>
 									<para><emphasis role="bold">"ALL"</emphasis> - Everybody</para>
 								</listitem>
@@ -607,13 +595,7 @@ test.example.net 5
 									<para><emphasis role="bold">"ME"</emphasis> - Only the node source creator </para>
 								</listitem>
 								<listitem>
-									<para><emphasis role="bold">"MY_GROUPS"</emphasis> - Only groups in which the node source creator belongs to</para>
-								</listitem>
-								<listitem>
-									<para><emphasis role="bold">"PROVIDER"</emphasis> - Only the node provider who added the node. Provider can use only its nodes</para>
-								</listitem>
-								<listitem>
-									<para><emphasis role="bold">"PROVIDER_GROUPS"</emphasis> - Only groups in which the node provider belongs to. Users from this groups can user only nodes of this provider</para>
+									<para><emphasis role="bold">"users=user1,user2;groups=group1,group2"</emphasis> - Only specific users or groups (for our example user1, user2, group1 and group2). It is possible to specify only groups or only users.</para>
 								</listitem>
 								<listitem>
 									<para><emphasis role="bold">"ALL"</emphasis> - Everybody</para>
@@ -629,7 +611,7 @@ test.example.net 5
 									<para><emphasis role="bold">"ME"</emphasis> - Only the node source creator </para>
 								</listitem>
 								<listitem>
-									<para><emphasis role="bold">"MY_GROUPS"</emphasis> - Only the group in which the node source creator belongs to</para>
+									<para><emphasis role="bold">"users=user1,user2;groups=group1,group2"</emphasis> - Only specific users or groups (for our example user1, user2, group1 and group2). It is possible to specify only groups or only users.</para>
 								</listitem>
 								<listitem>
 									<para><emphasis role="bold">"ALL"</emphasis> - Everybody</para>
@@ -667,13 +649,7 @@ test.example.net 5
 									<para><emphasis role="bold">"ME"</emphasis> - Only the node source creator </para>
 								</listitem>
 								<listitem>
-									<para><emphasis role="bold">"MY_GROUPS"</emphasis> - Only groups in which the node source creator belongs to</para>
-								</listitem>
-								<listitem>
-									<para><emphasis role="bold">"PROVIDER"</emphasis> - Only the node provider who added the node. Provider can use only its nodes</para>
-								</listitem>
-								<listitem>
-									<para><emphasis role="bold">"PROVIDER_GROUPS"</emphasis> - Only groups in which the node provider belongs to. Users from this groups can user only nodes of this provider</para>
+									<para><emphasis role="bold">"users=user1,user2;groups=group1,group2"</emphasis> - Only specific users or groups (for our example user1, user2, group1 and group2). It is possible to specify only groups or only users.</para>
 								</listitem>
 								<listitem>
 									<para><emphasis role="bold">"ALL"</emphasis> - Everybody</para>
@@ -689,7 +665,7 @@ test.example.net 5
 									<para><emphasis role="bold">"ME"</emphasis> - Only the node source creator </para>
 								</listitem>
 								<listitem>
-									<para><emphasis role="bold">"MY_GROUPS"</emphasis> - Only the group in which the node source creator belongs to</para>
+									<para><emphasis role="bold">"users=user1,user2;groups=group1,group2"</emphasis> - Only specific users or groups (for our example user1, user2, group1 and group2). It is possible to specify only groups or only users.</para>
 								</listitem>
 								<listitem>
 									<para><emphasis role="bold">"ALL"</emphasis> - Everybody</para>
@@ -730,13 +706,7 @@ test.example.net 5
 									<para><emphasis role="bold">"ME"</emphasis> - Only the node source creator </para>
 								</listitem>
 								<listitem>
-									<para><emphasis role="bold">"MY_GROUPS"</emphasis> - Only groups in which the node source creator belongs to</para>
-								</listitem>
-								<listitem>
-									<para><emphasis role="bold">"PROVIDER"</emphasis> - Only the node provider who added the node. Provider can use only its nodes</para>
-								</listitem>
-								<listitem>
-									<para><emphasis role="bold">"PROVIDER_GROUPS"</emphasis> - Only groups in which the node provider belongs to. Users from this groups can user only nodes of this provider</para>
+									<para><emphasis role="bold">"users=user1,user2;groups=group1,group2"</emphasis> - Only specific users or groups (for our example user1, user2, group1 and group2). It is possible to specify only groups or only users.</para>
 								</listitem>
 								<listitem>
 									<para><emphasis role="bold">"ALL"</emphasis> - Everybody</para>
@@ -752,7 +722,7 @@ test.example.net 5
 									<para><emphasis role="bold">"ME"</emphasis> - Only the node source creator </para>
 								</listitem>
 								<listitem>
-									<para><emphasis role="bold">"MY_GROUPS"</emphasis> - Only the group in which the node source creator belongs to</para>
+									<para><emphasis role="bold">"users=user1,user2;groups=group1,group2"</emphasis> - Only specific users or groups (for our example user1, user2, group1 and group2). It is possible to specify only groups or only users.</para>
 								</listitem>
 								<listitem>
 									<para><emphasis role="bold">"ALL"</emphasis> - Everybody</para>
@@ -798,13 +768,7 @@ test.example.net 5
 									<para><emphasis role="bold">"ME"</emphasis> - Only the node source creator </para>
 								</listitem>
 								<listitem>
-									<para><emphasis role="bold">"MY_GROUPS"</emphasis> - Only groups in which the node source creator belongs to</para>
-								</listitem>
-								<listitem>
-									<para><emphasis role="bold">"PROVIDER"</emphasis> - Only the node provider who added the node. Provider can use only its nodes</para>
-								</listitem>
-								<listitem>
-									<para><emphasis role="bold">"PROVIDER_GROUPS"</emphasis> - Only groups in which the node provider belongs to. Users from this groups can user only nodes of this provider</para>
+									<para><emphasis role="bold">"users=user1,user2;groups=group1,group2"</emphasis> - Only specific users or groups (for our example user1, user2, group1 and group2). It is possible to specify only groups or only users.</para>
 								</listitem>
 								<listitem>
 									<para><emphasis role="bold">"ALL"</emphasis> - Everybody</para>
@@ -820,7 +784,7 @@ test.example.net 5
 									<para><emphasis role="bold">"ME"</emphasis> - Only the node source creator </para>
 								</listitem>
 								<listitem>
-									<para><emphasis role="bold">"MY_GROUPS"</emphasis> - Only the group in which the node source creator belongs to</para>
+									<para><emphasis role="bold">"users=user1,user2;groups=group1,group2"</emphasis> - Only specific users or groups (for our example user1, user2, group1 and group2). It is possible to specify only groups or only users.</para>
 								</listitem>
 								<listitem>
 									<para><emphasis role="bold">"ALL"</emphasis> - Everybody</para>
@@ -876,13 +840,7 @@ test.example.net 5
 									<para><emphasis role="bold">"ME"</emphasis> - Only the node source creator </para>
 								</listitem>
 								<listitem>
-									<para><emphasis role="bold">"MY_GROUPS"</emphasis> - Only groups in which the node source creator belongs to</para>
-								</listitem>
-								<listitem>
-									<para><emphasis role="bold">"PROVIDER"</emphasis> - Only the node provider who added the node. Provider can use only its nodes</para>
-								</listitem>
-								<listitem>
-									<para><emphasis role="bold">"PROVIDER_GROUPS"</emphasis> - Only groups in which the node provider belongs to. Users from this groups can user only nodes of this provider</para>
+									<para><emphasis role="bold">"users=user1,user2;groups=group1,group2"</emphasis> - Only specific users or groups (for our example user1, user2, group1 and group2). It is possible to specify only groups or only users.</para>
 								</listitem>
 								<listitem>
 									<para><emphasis role="bold">"ALL"</emphasis> - Everybody</para>
@@ -898,7 +856,7 @@ test.example.net 5
 									<para><emphasis role="bold">"ME"</emphasis> - Only the node source creator </para>
 								</listitem>
 								<listitem>
-									<para><emphasis role="bold">"MY_GROUPS"</emphasis> - Only the group in which the node source creator belongs to</para>
+									<para><emphasis role="bold">"users=user1,user2;groups=group1,group2"</emphasis> - Only specific users or groups (for our example user1, user2, group1 and group2). It is possible to specify only groups or only users.</para>
 								</listitem>
 								<listitem>
 									<para><emphasis role="bold">"ALL"</emphasis> - Everybody</para>
@@ -967,13 +925,7 @@ test.example.net 5
 									<para><emphasis role="bold">"ME"</emphasis> - Only the node source creator </para>
 								</listitem>
 								<listitem>
-									<para><emphasis role="bold">"MY_GROUPS"</emphasis> - Only groups in which the node source creator belongs to</para>
-								</listitem>
-								<listitem>
-									<para><emphasis role="bold">"PROVIDER"</emphasis> - Only the node provider who added the node. Provider can use only its nodes</para>
-								</listitem>
-								<listitem>
-									<para><emphasis role="bold">"PROVIDER_GROUPS"</emphasis> - Only groups in which the node provider belongs to. Users from this groups can user only nodes of this provider</para>
+									<para><emphasis role="bold">"users=user1,user2;groups=group1,group2"</emphasis> - Only specific users or groups (for our example user1, user2, group1 and group2). It is possible to specify only groups or only users.</para>
 								</listitem>
 								<listitem>
 									<para><emphasis role="bold">"ALL"</emphasis> - Everybody</para>
@@ -989,7 +941,7 @@ test.example.net 5
 									<para><emphasis role="bold">"ME"</emphasis> - Only the node source creator </para>
 								</listitem>
 								<listitem>
-									<para><emphasis role="bold">"MY_GROUPS"</emphasis> - Only the group in which the node source creator belongs to</para>
+									<para><emphasis role="bold">"users=user1,user2;groups=group1,group2"</emphasis> - Only specific users or groups (for our example user1, user2, group1 and group2). It is possible to specify only groups or only users.</para>
 								</listitem>
 								<listitem>
 									<para><emphasis role="bold">"ALL"</emphasis> - Everybody</para>
@@ -1058,13 +1010,7 @@ test.example.net 5
 									<para><emphasis role="bold">"ME"</emphasis> - Only the node source creator </para>
 								</listitem>
 								<listitem>
-									<para><emphasis role="bold">"MY_GROUPS"</emphasis> - Only groups in which the node source creator belongs to</para>
-								</listitem>
-								<listitem>
-									<para><emphasis role="bold">"PROVIDER"</emphasis> - Only the node provider who added the node. Provider can use only its nodes</para>
-								</listitem>
-								<listitem>
-									<para><emphasis role="bold">"PROVIDER_GROUPS"</emphasis> - Only groups in which the node provider belongs to. Users from this groups can user only nodes of this provider</para>
+									<para><emphasis role="bold">"users=user1,user2;groups=group1,group2"</emphasis> - Only specific users or groups (for our example user1, user2, group1 and group2). It is possible to specify only groups or only users.</para>
 								</listitem>
 								<listitem>
 									<para><emphasis role="bold">"ALL"</emphasis> - Everybody</para>
@@ -1080,7 +1026,7 @@ test.example.net 5
 									<para><emphasis role="bold">"ME"</emphasis> - Only the node source creator </para>
 								</listitem>
 								<listitem>
-									<para><emphasis role="bold">"MY_GROUPS"</emphasis> - Only the group in which the node source creator belongs to</para>
+									<para><emphasis role="bold">"users=user1,user2;groups=group1,group2"</emphasis> - Only specific users or groups (for our example user1, user2, group1 and group2). It is possible to specify only groups or only users.</para>
 								</listitem>
 								<listitem>
 									<para><emphasis role="bold">"ALL"</emphasis> - Everybody</para>
