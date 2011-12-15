@@ -142,16 +142,17 @@ public class SchedulerProxy implements Scheduler {
      */
     public SchedulerState addEventListener(SchedulerEventListener listener, boolean myEventsOnly,
             boolean getSchedulerState, SchedulerEvent... events) {
-	SchedulerState schedState=null;
-	try {
+        SchedulerState schedState = null;
+        try {
 
-		 schedState = (SchedulerState) scheduler.addEventListener(listener, myEventsOnly, getSchedulerState,
-                    events);
+            schedState = (SchedulerState) scheduler.addEventListener(listener, myEventsOnly,
+                    getSchedulerState, events);
 
         } catch (PermissionException pe) {
             Activator.log(IStatus.ERROR, "Error getting full state : " + pe.getMessage(), pe);
             try {
-		schedState= (SchedulerState) scheduler.addEventListener(listener, true, getSchedulerState, events);
+                schedState = (SchedulerState) scheduler.addEventListener(listener, true, getSchedulerState,
+                        events);
             } catch (SchedulerException e) {
                 Activator.log(IStatus.ERROR, "Error in Scheduler Proxy ", e);
                 displayError(e.getMessage());
@@ -161,13 +162,12 @@ public class SchedulerProxy implements Scheduler {
             displayError(e.getMessage());
         }
 
-	if (schedState!=null)
-	{
-		//SCHEDULING-1434 -
-		//Note: the pinger will only be started once, see condition in startPinger()
-		startPinger();
-	}
-	return schedState;
+        if (schedState != null) {
+            //SCHEDULING-1434 -
+            //Note: the pinger will only be started once, see condition in startPinger()
+            startPinger();
+        }
+        return schedState;
     }
 
     /**
@@ -584,9 +584,9 @@ public class SchedulerProxy implements Scheduler {
     }
 
     private void startPinger() {
-	if ((pinger!=null) && (!pinger.isInterrupted()))
-			return;
-	System.out.println("SchedulerProxy.startPinger() - starting pinger .... ");
+        if ((pinger != null) && (!pinger.isInterrupted()))
+            return;
+        System.out.println("SchedulerProxy.startPinger() - starting pinger .... ");
         class Pinger extends Thread {
             private SchedulerProxy stubOnSchedulerProxy;
 
