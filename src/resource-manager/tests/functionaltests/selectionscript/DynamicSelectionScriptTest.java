@@ -261,7 +261,7 @@ public class DynamicSelectionScriptTest extends FunctionalTest {
 
         // Checking the dynamicity of the node (period during which the dynamic characteristics do not change).
         // It sets to 10 secs for testing configuration.
-        // So first run the synamic script that fails checking if the file exist
+        // So first run the dynamic script that fails checking if the file exist
         // Then create a file and call getNodes again. It must return 0 nodes.
         // Wait for 10 secs and call getNodes again. The script must be executed now
         // and we should get some nodes.
