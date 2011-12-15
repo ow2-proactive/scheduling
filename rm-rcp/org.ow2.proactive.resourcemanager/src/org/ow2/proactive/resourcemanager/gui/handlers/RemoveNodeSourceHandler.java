@@ -48,8 +48,10 @@ import org.ow2.proactive.resourcemanager.gui.dialog.RemoveSourceDialog;
 
 public class RemoveNodeSourceHandler extends AbstractHandler implements IHandler {
 
+    public static final String COMMAND_ID = "org.ow2.proactive.resourcemanager.plugin.removeNodesource";
+
     private static RemoveNodeSourceHandler instance;
-    boolean previousState = true;
+    private boolean previousState = true;
 
     public RemoveNodeSourceHandler() {
         super();

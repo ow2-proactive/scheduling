@@ -48,7 +48,9 @@ import org.ow2.proactive.resourcemanager.gui.dialog.ShutdownDialog;
 
 public class ShutdownHandler extends AbstractHandler implements IHandler {
 
-    boolean previousState = true;
+    public static final String COMMAND_ID = "org.ow2.proactive.resourcemanager.plugin.shutdown";
+
+    private boolean previousState = true;
 
     @Override
     public boolean isEnabled() {

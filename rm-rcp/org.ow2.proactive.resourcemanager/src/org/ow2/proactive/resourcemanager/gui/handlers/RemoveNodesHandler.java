@@ -53,6 +53,8 @@ import org.ow2.proactive.resourcemanager.gui.dialog.RemoveNodeDialog;
 
 public class RemoveNodesHandler extends AbstractHandler implements IHandler {
 
+    public static final String COMMAND_ID = "org.ow2.proactive.resourcemanager.plugin.removeNodes";
+
     private static RemoveNodesHandler instance;
 
     private boolean previousState = true;

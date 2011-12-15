@@ -48,7 +48,9 @@ import org.ow2.proactive.resourcemanager.gui.data.RMStore;
 
 public class DisconnectHandler extends AbstractHandler implements IHandler {
 
-    boolean previousState = true;
+    public static final String COMMAND_ID = "org.ow2.proactive.resourcemanager.plugin.gui.disconnectCommand";
+
+    private boolean previousState = true;
 
     @Override
     public boolean isEnabled() {

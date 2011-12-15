@@ -48,6 +48,9 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.commands.ICommandService;
 import org.eclipse.ui.handlers.HandlerUtil;
 import org.eclipse.ui.progress.UIJob;
 import org.ow2.proactive.resourcemanager.Activator;
@@ -58,6 +61,8 @@ import org.ow2.proactive.resourcemanager.gui.dialog.SelectResourceManagerDialogR
 
 
 public class ConnectHandler extends AbstractHandler implements IHandler {
+
+    public static final String COMMAND_ID = "org.ow2.proactive.resourcemanager.plugin.gui.connectCommand";
 
     private boolean previousState = true;
     /** A boolean value to know if the dialog box is already open */
@@ -107,12 +112,13 @@ public class ConnectHandler extends AbstractHandler implements IHandler {
                 @Override
                 protected IStatus run(IProgressMonitor monitor) {
                     try {
-                        RMStore.newInstance(dialogResult.getUrl(), dialogResult.getLogin(), dialogResult
-                                .getPassword(), dialogResult.getCredentials());
+                        RMStore.newInstance(dialogResult.getUrl(), dialogResult.getLogin(),
+                                dialogResult.getPassword(), dialogResult.getCredentials());
 
                         parent.getDisplay().syncExec(new Runnable() {
                             public void run() {
                                 RMStatusBarItem.getInstance().setText("connected");
+                                updateToolbarCommands();
                             }
                         });
 
@@ -140,6 +146,18 @@ public class ConnectHandler extends AbstractHandler implements IHandler {
         fireHandlerChanged(new HandlerEvent(this, true, false));
         this.isDialogOpen = false;
         return null;
+    }
+
+    private void updateToolbarCommands() {
+        IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+        ICommandService commandService = (ICommandService) window.getService(ICommandService.class);
+        String commandIds[] = { AddNodesHandler.COMMAND_ID, ConnectHandler.COMMAND_ID,
+                CreateNodeSourceHandler.COMMAND_ID, DisconnectHandler.COMMAND_ID,
+                RemoveNodesHandler.COMMAND_ID, RemoveNodeSourceHandler.COMMAND_ID,
+                ShowAccountHandler.COMMAND_ID, ShowRuntimeDataHandler.COMMAND_ID, ShutdownHandler.COMMAND_ID };
+        for (String commandId : commandIds) {
+            commandService.getCommand(commandId).getHandler().isEnabled();
+        }
     }
 
     private void errorConnect(final Throwable t, final String rmUrl) {

@@ -48,7 +48,9 @@ import org.ow2.proactive.resourcemanager.gui.dialog.AddNodeByURLDialog;
 
 public class AddNodesHandler extends AbstractHandler implements IHandler {
 
-    boolean previousState = true;
+    public static final String COMMAND_ID = "org.ow2.proactive.resourcemanager.plugin.addNodes";
+
+    private boolean previousState = true;
 
     @Override
     public boolean isEnabled() {

@@ -39,6 +39,7 @@ package org.ow2.proactive.resourcemanager.gui.handlers;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.commands.HandlerEvent;
 import org.eclipse.core.commands.IHandler;
 import org.eclipse.core.runtime.IStatus;
 import org.ow2.proactive.resourcemanager.Activator;
@@ -48,7 +49,11 @@ import org.ow2.proactive.resourcemanager.gui.data.RMStore;
 
 public class ShowAccountHandler extends AbstractHandler implements IHandler {
 
+    public static final String COMMAND_ID = "org.ow2.proactive.resourcemanager.command.ShowAccount";
+
     private ShowMyAccountActionDelegate delegate;
+
+    private boolean previousState = true;
 
     public ShowAccountHandler() {
         try {
@@ -60,7 +65,12 @@ public class ShowAccountHandler extends AbstractHandler implements IHandler {
 
     @Override
     public boolean isEnabled() {
-        return RMStore.isConnected();
+        boolean newState = RMStore.isConnected();
+        if (newState != previousState) {
+            previousState = newState;
+            fireHandlerChanged(new HandlerEvent(this, true, false));
+        }
+        return newState;
     }
 
     public Object execute(ExecutionEvent event) throws ExecutionException {
