@@ -229,6 +229,12 @@ public abstract class InternalTask extends TaskState {
     private boolean skipIdepsInSerialization = false;
 
     /**
+     * List of non-static fields that don't have the
+     * {@link TransientInSerialization} annotation
+     **/
+    private static final List<Field> fieldsToSerialize = getFieldsToSerialize();
+    
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -1268,29 +1274,19 @@ public abstract class InternalTask extends TaskState {
     //********************************************************************
 
     /**
-     * <b>IMPORTANT : </b><br />
-     * Using hibernate does not allow to have java transient fields that is inserted in database anyway.<br />
-     * Hibernate defined @Transient annotation meaning the field won't be inserted in database.
-     * If the java transient modifier is set for a field, so the hibernate @Transient annotation becomes
-     * useless and the field won't be inserted in DB anyway.<br />
-     * For performance reason, some field must be java transient but not hibernate transient.
-     * These fields are annotated with @TransientInSerialization.
-     * The @TransientInSerialization describe the fields that won't be serialized by java since the two following
-     * methods describe the serialization process.
-     * <p>
-     * If {@link #skipIdepsInSerialization} is true when this method is called, {@link #ideps} will
-     * not be included in the serialized object.
+     * Serialize this instance. Include only the fields contained in the
+     * {@link #fieldsToSerialize}. <br/>
+     * 
+     * If {@link #skipIdepsInSerialization} is true when this method is called,
+     * {@link #ideps} will not be included in the serialized object.
      */
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         try {
             Map<String, Object> toSerialize = new HashMap<String, Object>();
-            Field[] fields = InternalTask.class.getDeclaredFields();
-            for (Field f : fields) {
-                boolean excludeIdeps = this.skipIdepsInSerialization &&
-                    f.equals(InternalTask.class.getDeclaredField("ideps"));
-                if (!f.isAnnotationPresent(TransientInSerialization.class) &&
-                    !Modifier.isStatic(f.getModifiers()) && !excludeIdeps) {
+            for (Field f : fieldsToSerialize) {
+                // skip the "ideps" field if the skipIdepsInSerialization flag is set
+                if (!(this.skipIdepsInSerialization && (f.getName() == "ideps"))) {
                     toSerialize.put(f.getName(), f.get(this));
                 }
             }
@@ -1312,4 +1308,31 @@ public abstract class InternalTask extends TaskState {
         }
     }
 
+    /**
+     * Create a list of non-static fields without
+     * {@link TransientInSerialization} annotation for later use by the
+     * {@link #writeObject} method. <br/>
+     * 
+     * Note that {@link TransientInSerialization} is used to annotate the fields
+     * of this class that should not be serialized by Java serialization. <br/>
+     * 
+     * Also note that <b>transient</b> modifier cannot be used instead of
+     * {@link TransientInSerialization} because, for performance reasons, some
+     * fields must be Java-transient but not Hibernate-transient; such fields
+     * can have neither the {@link Transient} annotation nor the
+     * <b>transient</b> modifier.
+     * 
+     */
+    private static List<Field> getFieldsToSerialize() {
+        List<Field> fieldsToSerialize = new ArrayList<Field>();
+        Field[] fields = InternalTask.class.getDeclaredFields();
+        for (Field f : fields) {
+            if (!f.isAnnotationPresent(TransientInSerialization.class)
+                    && !Modifier.isStatic(f.getModifiers())) {
+                fieldsToSerialize.add(f);
+            }
+        }
+        return fieldsToSerialize;
+    }
+    
 }
