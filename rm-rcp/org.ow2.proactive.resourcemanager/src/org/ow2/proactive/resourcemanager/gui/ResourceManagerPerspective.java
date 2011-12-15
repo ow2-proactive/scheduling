@@ -75,13 +75,14 @@ public final class ResourceManagerPerspective implements IPerspectiveFactory {
 
         // The bottom left folder contains the statistics view
         final IFolderLayout bottomLeftFolder = layout.createFolder("bottomLeft", IPageLayout.BOTTOM, 0.7f,
-                "topLeft");
+                editorArea);
         bottomLeftFolder.addView(StatisticsView.ID);
         bottomLeftFolder.addView(NodeInfoView.ID);
 
         // The bottom left folder contains the compact view
-        final IFolderLayout bottomRightFolder = layout.createFolder("bottomRight", IPageLayout.RIGHT, 0.5f,
-                "bottomLeft");
+        final IFolderLayout bottomRightFolder = layout.createFolder("bottomRight", IPageLayout.BOTTOM, 0.3f,
+			editorArea);
         bottomRightFolder.addView(ResourcesCompactView.ID);
+
     }
 }

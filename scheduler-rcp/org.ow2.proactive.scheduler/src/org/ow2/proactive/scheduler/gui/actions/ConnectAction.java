@@ -102,7 +102,7 @@ public class ConnectAction extends SchedulerGUIAction {
             });
         } else if (!dialogResult.isCanceled()) {
 
-            Job job = new Job("Downloading the Scheduler Server state, this might take a few moments.") {
+            Job job = new Job("Downloading the Orchestration & Scheduling State, this might take a several minutes.") {
                 @Override
                 public IStatus run(IProgressMonitor monitor) {
                     try {
@@ -110,7 +110,7 @@ public class ConnectAction extends SchedulerGUIAction {
                         JobsController.turnActive();
                         res = 0;
                         res = SchedulerProxy.getInstance().connectToScheduler(dialogResult);
-                        setName("Downloading the Scheduler Server state, this might take a few moments.");
+                        setName("Downloading the Orchestration & Scheduling State, this might take a several minutes.");
                         //getting the scheduler state here, in this job (non UI).
                         JobsController.getActiveView().init();
 
