@@ -78,8 +78,7 @@ public class CreateSourceDialog {
     private ScrolledComposite scroll = null;
     private Composite view = null;
 
-    private CreateSourceDialog(Shell parent, 
-    		SupportedPluginDescriptors infrastructuresAndPolicies) {
+    private CreateSourceDialog(Shell parent, SupportedPluginDescriptors infrastructuresAndPolicies) {
 
         ProActiveConfiguration.load();
 
@@ -114,7 +113,6 @@ public class CreateSourceDialog {
 
         policy = new ConfigurablePanel(view, "Node source policy", this);
         policy.setLayoutData(new GridData(GridData.BEGINNING | GridData.FILL_BOTH));
-
 
         for (PluginDescriptor descriptor : infrastructuresAndPolicies.getSupportedNodeSourceInfrastructures()) {
             try {
@@ -155,21 +153,20 @@ public class CreateSourceDialog {
         okButton.setText("     OK     ");
         okButton.addListener(SWT.Selection, new Listener() {
             public void handleEvent(Event event) {
-            	validateForm();
+                validateForm();
                 ResourceManagerProxy rm = RMStore.getInstance().getResourceManager();
                 try {
                     Object[] policyParams = policy.getParameters();
-                    boolean result = rm.syncCreateNodeSource(name.getNodeSourceName(),
-                            infrastructure.getSelectedPlugin().getPluginName(),
-                            infrastructure.getParameters(), policy.getSelectedPlugin().getPluginName(),
-                            policyParams);
+                    boolean result = rm.syncCreateNodeSource(name.getNodeSourceName(), infrastructure
+                            .getSelectedPlugin().getPluginName(), infrastructure.getParameters(), policy
+                            .getSelectedPlugin().getPluginName(), policyParams);
                     if (result) {
                         dialog.close();
                     } else {
-                    	rm.displayError("Unknown reason", "Cannot create nodesource");
+                        rm.displayError("Unknown reason", "Cannot create nodesource");
                     }
                 } catch (Exception e) {
-                	rm.logAndDisplayError(e, "Cannot create nodesource");
+                    rm.logAndDisplayError(e, "Cannot create nodesource");
                 }
             }
         });
@@ -203,22 +200,23 @@ public class CreateSourceDialog {
      */
     public static void showDialog(final Shell parent) {
         Job job = new Job("Initializing dialog.") {
-			@Override
-			protected IStatus run(IProgressMonitor monitor) {
-		        ResourceManagerProxy rm = RMStore.getInstance().getResourceManager();
-		        try {
-		            final SupportedPluginDescriptors infrastructuresAndPolicies = rm.syncGetSupportedPluginDescriptors(); 
-		        	parent.getDisplay().asyncExec(new Runnable() {
-		        		public void run() {
-			            	new CreateSourceDialog(parent, infrastructuresAndPolicies);
-		        		}
-		        	});
-					return Status.OK_STATUS;
-		        } catch (Exception e) {
-		            rm.logAndDisplayError(e, "Cannot create nodesource");
-		            return Status.OK_STATUS;
-		        }
-			}
+            @Override
+            protected IStatus run(IProgressMonitor monitor) {
+                ResourceManagerProxy rm = RMStore.getInstance().getResourceManager();
+                try {
+                    final SupportedPluginDescriptors infrastructuresAndPolicies = rm
+                            .syncGetSupportedPluginDescriptors();
+                    parent.getDisplay().asyncExec(new Runnable() {
+                        public void run() {
+                            new CreateSourceDialog(parent, infrastructuresAndPolicies);
+                        }
+                    });
+                    return Status.OK_STATUS;
+                } catch (Exception e) {
+                    rm.logAndDisplayError(e, "Cannot create nodesource");
+                    return Status.OK_STATUS;
+                }
+            }
         };
         job.setUser(true);
         job.schedule();

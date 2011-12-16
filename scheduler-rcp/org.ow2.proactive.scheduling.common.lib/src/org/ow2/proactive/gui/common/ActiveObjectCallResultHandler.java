@@ -38,6 +38,7 @@ package org.ow2.proactive.gui.common;
 
 import java.io.Serializable;
 
+
 /**
  * Callback which is called to handle result of asynchronous call.  
  * 
@@ -46,6 +47,6 @@ import java.io.Serializable;
  */
 public interface ActiveObjectCallResultHandler<T> extends Serializable {
 
-	void handleResult(T result);
-	
+    void handleResult(T result);
+
 }

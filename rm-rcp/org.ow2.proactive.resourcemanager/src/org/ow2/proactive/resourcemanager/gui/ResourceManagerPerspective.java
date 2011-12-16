@@ -69,26 +69,20 @@ public final class ResourceManagerPerspective implements IPerspectiveFactory {
          * <Tab And Tree Views>  <Compact View>
          * <Node Info Views>     <editor area used to show Runtime Monitoring>     
          */
-    	final String editorArea = layout.getEditorArea();
+        final String editorArea = layout.getEditorArea();
         layout.setEditorAreaVisible(false);
 
-        final IFolderLayout topLeftFolder = layout.createFolder("topLeft", 
-        		IPageLayout.LEFT, 
-        		0.3f, 
-        		editorArea);
+        final IFolderLayout topLeftFolder = layout
+                .createFolder("topLeft", IPageLayout.LEFT, 0.3f, editorArea);
         topLeftFolder.addView(ResourcesTabView.ID);
         topLeftFolder.addView(ResourceExplorerView.ID);
 
-        final IFolderLayout topRightFolder = layout.createFolder("topRight", 
-        		IPageLayout.TOP, 
-        		0.5f, 
-        		editorArea);
+        final IFolderLayout topRightFolder = layout.createFolder("topRight", IPageLayout.TOP, 0.5f,
+                editorArea);
         topRightFolder.addView(ResourcesCompactView.ID);
 
-        final IFolderLayout bottomLeftFolder = layout.createFolder("bottomLeft", 
-        		IPageLayout.BOTTOM, 
-        		0.5f, 
-        		"topLeft");
+        final IFolderLayout bottomLeftFolder = layout.createFolder("bottomLeft", IPageLayout.BOTTOM, 0.5f,
+                "topLeft");
         bottomLeftFolder.addView(StatisticsView.ID);
         bottomLeftFolder.addView(NodeInfoView.ID);
     }

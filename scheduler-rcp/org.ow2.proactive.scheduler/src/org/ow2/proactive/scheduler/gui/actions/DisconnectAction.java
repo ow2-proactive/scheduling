@@ -76,7 +76,7 @@ public class DisconnectAction extends SchedulerGUIAction {
 
         // stop listen for Scheduler events
         JobsController.getLocalView().terminateEventListener();
-        
+
         try {
             // Disconnect the JMX client of ChartIt
             JMXActionsManager.getInstance().disconnectJMXClient();
@@ -86,7 +86,7 @@ public class DisconnectAction extends SchedulerGUIAction {
         try {
             SchedulerProxy.getInstance().disconnect(serverIsDown);
         } catch (Throwable th) {
-        	th.printStackTrace();
+            th.printStackTrace();
         }
         SchedulerProxy.clearInstance();
 

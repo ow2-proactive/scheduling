@@ -41,6 +41,7 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+
 /**
  * Special thread which is used to detect failure of active object instance.
  * <p/>  
@@ -59,130 +60,127 @@ import java.util.concurrent.TimeUnit;
  */
 public class ActiveObjectPingerThread extends Thread implements Serializable {
 
-	public static final long DEFAULT_PING_FREQUENCY = 5000;
+    public static final long DEFAULT_PING_FREQUENCY = 5000;
 
-	public static final long DEFAULT_PING_TIMEOUT = 5000;
-	
-	public static interface PingListener {
-		
-		void onPingFalse();
-		
-		void onPingError();
-		
-		void onPingTimeout();
-	}
+    public static final long DEFAULT_PING_TIMEOUT = 5000;
 
-	private class PingTimeoutHandler implements Runnable {
-		@Override
-		@SuppressWarnings("deprecation")
-		public void run() {
-			pingTimeout();
-			/*
-			 * it is safe to use 'stop' here since pinger thread
-			 * doesn't have any state which can be corrupted after 
-			 * thread stopping 
-			 */
-			stop();
-		}
-	}
-	
-	private final ScheduledThreadPoolExecutor pingTimeoutWatchdogTimer;
-	
-	private final ActiveObjectProxy<?> activeObjectProxy; 
-	
-	private final long pingFrequency;
-	
-	private final long pingTimeout;
-	
-	private final PingListener pingListener;
-	
-	private volatile boolean stopPing;
-	
-	public ActiveObjectPingerThread(ActiveObjectProxy<?> activeObjectProxy, 
-			long pingFrequency,
-			long pingTimeout,
-			PingListener pingListener) {
-		this.activeObjectProxy = activeObjectProxy;
-		this.pingFrequency = pingFrequency;
-		this.pingTimeout = pingTimeout;
-		this.pingListener = pingListener;
-		this.pingTimeoutWatchdogTimer = new ScheduledThreadPoolExecutor(1);
-	}
+    public static interface PingListener {
 
-	public ActiveObjectPingerThread(ActiveObjectProxy<?> activeObjectProxy, 
-			PingListener pingListener) {
-		this(activeObjectProxy, DEFAULT_PING_FREQUENCY, DEFAULT_PING_TIMEOUT, pingListener);
-	}
-	
-	public void stopPinger() {
-		stopPing = true;
-		interrupt();
-	}
-	
-	public boolean isStopped() {
-		return stopPing;
-	}
-	
-	public void run() {
-		PingTimeoutHandler pingTimeoutHandler = new PingTimeoutHandler();
+        void onPingFalse();
+
+        void onPingError();
+
+        void onPingTimeout();
+    }
+
+    private class PingTimeoutHandler implements Runnable {
+        @Override
+        @SuppressWarnings("deprecation")
+        public void run() {
+            pingTimeout();
+            /*
+             * it is safe to use 'stop' here since pinger thread
+             * doesn't have any state which can be corrupted after 
+             * thread stopping 
+             */
+            stop();
+        }
+    }
+
+    private final ScheduledThreadPoolExecutor pingTimeoutWatchdogTimer;
+
+    private final ActiveObjectProxy<?> activeObjectProxy;
+
+    private final long pingFrequency;
+
+    private final long pingTimeout;
+
+    private final PingListener pingListener;
+
+    private volatile boolean stopPing;
+
+    public ActiveObjectPingerThread(ActiveObjectProxy<?> activeObjectProxy, long pingFrequency,
+            long pingTimeout, PingListener pingListener) {
+        this.activeObjectProxy = activeObjectProxy;
+        this.pingFrequency = pingFrequency;
+        this.pingTimeout = pingTimeout;
+        this.pingListener = pingListener;
+        this.pingTimeoutWatchdogTimer = new ScheduledThreadPoolExecutor(1);
+    }
+
+    public ActiveObjectPingerThread(ActiveObjectProxy<?> activeObjectProxy, PingListener pingListener) {
+        this(activeObjectProxy, DEFAULT_PING_FREQUENCY, DEFAULT_PING_TIMEOUT, pingListener);
+    }
+
+    public void stopPinger() {
+        stopPing = true;
+        interrupt();
+    }
+
+    public boolean isStopped() {
+        return stopPing;
+    }
+
+    public void run() {
+        PingTimeoutHandler pingTimeoutHandler = new PingTimeoutHandler();
         try {
-    		while (!stopPing) {
+            while (!stopPing) {
                 try {
                     Thread.sleep(pingFrequency);
                 } catch (InterruptedException e) {
                     break;
                 }
-                
+
                 // ping call is synchronous, need to use special time to detect ping timeout
-                ScheduledFuture<?> future = pingTimeoutWatchdogTimer.schedule(pingTimeoutHandler, 
-                		pingTimeout, 
-                		TimeUnit.MILLISECONDS);
+                ScheduledFuture<?> future = pingTimeoutWatchdogTimer.schedule(pingTimeoutHandler,
+                        pingTimeout, TimeUnit.MILLISECONDS);
 
                 boolean pingResult;
                 try {
-                	pingResult = activeObjectProxy.syncPingActiveObject(); 
+                    pingResult = activeObjectProxy.syncPingActiveObject();
                 } catch (Throwable t) {
-                	pingError(t);
-                	break;
+                    pingError(t);
+                    break;
                 } finally {
                     if (!future.cancel(false)) {
-                    	// timeout handler already was executed
-                    	break;
+                        // timeout handler already was executed
+                        break;
                     }
                 }
 
                 if (!pingResult) {
-                	pingFalse();
-                	break;
+                    pingFalse();
+                    break;
                 }
             }
         } finally {
             pingTimeoutWatchdogTimer.shutdown();
         }
         // System.out.println("Pinger is finishing");
-	}
+    }
 
-	private synchronized void pingError(Throwable t) {
-		if (!stopPing) {
-			stopPing = true;
-			System.out.println("Ping error: " + t);
-			pingListener.onPingError();
-		}
-	}
-	private synchronized void pingFalse() {
-		if (!stopPing) {
-			stopPing = true;
-			System.out.println("Ping false");
-			pingListener.onPingFalse();
-		}
-	}
+    private synchronized void pingError(Throwable t) {
+        if (!stopPing) {
+            stopPing = true;
+            System.out.println("Ping error: " + t);
+            pingListener.onPingError();
+        }
+    }
 
-	private synchronized void pingTimeout() {
-		if (!stopPing) {
-			stopPing = true;
-			System.out.println("Ping timeout");
-			pingListener.onPingTimeout();
-		}
-	}
-	
+    private synchronized void pingFalse() {
+        if (!stopPing) {
+            stopPing = true;
+            System.out.println("Ping false");
+            pingListener.onPingFalse();
+        }
+    }
+
+    private synchronized void pingTimeout() {
+        if (!stopPing) {
+            stopPing = true;
+            System.out.println("Ping timeout");
+            pingListener.onPingTimeout();
+        }
+    }
+
 }

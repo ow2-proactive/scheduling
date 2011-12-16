@@ -46,6 +46,7 @@ import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.UserIdentification;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 
+
 /**
  * Active object listening for Scheduler events.
  *  
@@ -57,16 +58,17 @@ public class SchedulerEventListenerImpl implements SchedulerEventListener {
     private volatile boolean stopListenEvents;
 
     private JobsController jobController;
-    
-    public static SchedulerEventListenerImpl createActiveObjectListener(JobsController jobController) throws Exception {
+
+    public static SchedulerEventListenerImpl createActiveObjectListener(JobsController jobController)
+            throws Exception {
         SchedulerEventListenerImpl listener = new SchedulerEventListenerImpl();
         listener.jobController = jobController;
         return PAActiveObject.turnActive(listener);
     }
-    
+
     public SchedulerEventListenerImpl() {
     }
-    
+
     @Override
     public void schedulerStateUpdatedEvent(SchedulerEvent eventType) {
         if (stopListenEvents) {
@@ -111,5 +113,5 @@ public class SchedulerEventListenerImpl implements SchedulerEventListener {
     public void stopListenEvents() {
         stopListenEvents = true;
     }
-    
+
 }

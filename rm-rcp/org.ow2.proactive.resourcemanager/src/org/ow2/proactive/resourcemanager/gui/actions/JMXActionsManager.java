@@ -164,9 +164,9 @@ public class JMXActionsManager {
          * to don't freeze GUI thread
          */
         new Thread() {
-        	public void run() {
-        		jmxClient.disconnect();
-        	}
+            public void run() {
+                jmxClient.disconnect();
+            }
         }.start();
     }
 

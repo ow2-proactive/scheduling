@@ -43,6 +43,7 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.util.ResultPreviewTool.SimpleTextPanel;
 import org.ow2.proactive.scheduler.gui.views.ResultPreview;
 
+
 /**
  * GUI callback action which is called after completion of the asynchronous
  * action 'Scheduler.getTaskResult'.
@@ -52,17 +53,17 @@ import org.ow2.proactive.scheduler.gui.views.ResultPreview;
  */
 class GetTaskResultHandler extends SWTGuiThreadResultHandler<TaskResult> {
 
-	private final boolean grapchicalPreview;
-	
-	GetTaskResultHandler(boolean grapchicalPreview) {
-		this.grapchicalPreview = grapchicalPreview;
-	}
-	
-	@Override
-	protected void handleResultInGuiThread(TaskResult result) {
-		ResultPreview resultPreview = ResultPreview.getInstance();
+    private final boolean grapchicalPreview;
+
+    GetTaskResultHandler(boolean grapchicalPreview) {
+        this.grapchicalPreview = grapchicalPreview;
+    }
+
+    @Override
+    protected void handleResultInGuiThread(TaskResult result) {
+        ResultPreview resultPreview = ResultPreview.getInstance();
         if (resultPreview != null) {
-			if (grapchicalPreview) {
+            if (grapchicalPreview) {
                 displayGraphicalPreview(resultPreview, result);
                 resultPreview.putOnTop();
             } else {
@@ -70,9 +71,9 @@ class GetTaskResultHandler extends SWTGuiThreadResultHandler<TaskResult> {
                 resultPreview.putOnTop();
             }
         }
-	}
+    }
 
-	/**
+    /**
      * Display in Result Preview view graphical description of a task result if
      * any graphical description is available for this task
      * @param resultPreview Result preview SWT view object

@@ -83,7 +83,7 @@ public class RMStore implements ActiveObjectPingerThread.PingListener {
     private String baseURL;
 
     private ActiveObjectPingerThread pinger;
-    
+
     private RMStore(String url, String login, String password, byte[] cred) throws RMException {
         try {
             resourceManagerAO = ResourceManagerProxy.getProxyInstance();
@@ -156,27 +156,27 @@ public class RMStore implements ActiveObjectPingerThread.PingListener {
         }
     }
 
-	@Override
-	public void onPingError() {
-		RMStore.getInstance().shutDownActions(true);
-	}
+    @Override
+    public void onPingError() {
+        RMStore.getInstance().shutDownActions(true);
+    }
 
     @Override
-	public void onPingFalse() {
-    	onPingError();
-	}
-
-	@Override
-	public void onPingTimeout() {
-		onPingError();
-	}
-
-	private void startPinger(ResourceManagerProxy proxy) {
-    	pinger = new ActiveObjectPingerThread(proxy, this);
-    	pinger.setName("Pinger");
-    	pinger.start();
+    public void onPingFalse() {
+        onPingError();
     }
-    
+
+    @Override
+    public void onPingTimeout() {
+        onPingError();
+    }
+
+    private void startPinger(ResourceManagerProxy proxy) {
+        pinger = new ActiveObjectPingerThread(proxy, this);
+        pinger.setName("Pinger");
+        pinger.start();
+    }
+
     public static void newInstance(String url, String login, String password, byte[] cred)
             throws RMException, SecurityException {
         instance = new RMStore(url, login, password, cred);
@@ -230,7 +230,7 @@ public class RMStore implements ActiveObjectPingerThread.PingListener {
      */
     public synchronized void shutDownActions(final boolean failed) {
         if (isConnected) {
-        	isConnected = false;
+            isConnected = false;
             Display.getDefault().asyncExec(new Runnable() {
                 public void run() {
                     String msg;
@@ -254,9 +254,9 @@ public class RMStore implements ActiveObjectPingerThread.PingListener {
      *
      */
     public void disconnectionActions() {
-    	pinger.stopPinger();
+        pinger.stopPinger();
 
-    	// remove empty editor if it exists
+        // remove empty editor if it exists
         try {
             PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().setEditorAreaVisible(false);
         } catch (Throwable t) {

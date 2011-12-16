@@ -143,16 +143,16 @@ public class AddNodeByURLDialog extends Dialog {
                 if (urlText.getText().equals(""))
                     MessageDialog.openError(shell, "Error", "You didn't enter an url");
                 else {
-                	ResourceManagerProxy proxy = RMStore.getInstance().getResourceManager();
-    				try { 
-    					if (!proxy.syncAddNode(urlText.getText(), sourceNameCombo.getText())) {
-    						proxy.displayError("Unknown reason", "Adding Node Error");
-    					} else {
-    	                	shell.close();
-    					}
-    				} catch (Exception e) {
-    					proxy.logAndDisplayError(e, "Adding Node Error");
-    				}
+                    ResourceManagerProxy proxy = RMStore.getInstance().getResourceManager();
+                    try {
+                        if (!proxy.syncAddNode(urlText.getText(), sourceNameCombo.getText())) {
+                            proxy.displayError("Unknown reason", "Adding Node Error");
+                        } else {
+                            shell.close();
+                        }
+                    } catch (Exception e) {
+                        proxy.logAndDisplayError(e, "Adding Node Error");
+                    }
                 }
             }
         });

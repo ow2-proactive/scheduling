@@ -517,9 +517,8 @@ public class TaskComposite extends Composite implements Comparator<TaskState> {
             // update its tasks informations if task is finished
             if (task.getStatus() == TaskStatus.FINISHED || task.getStatus() == TaskStatus.FAULTY ||
                 task.getStatus() == TaskStatus.WAITING_ON_ERROR) {
-                SchedulerProxy.getInstance().getTaskResult(job.getId(), 
-                		taskId, 
-                		new GetTaskResultHandler(grapchicalPreview)); 
+                SchedulerProxy.getInstance().getTaskResult(job.getId(), taskId,
+                        new GetTaskResultHandler(grapchicalPreview));
             } else { //Not available
                 resultPreview.update(new SimpleTextPanel("No preview is available because the task is " +
                     task.getStatus() + "..."));

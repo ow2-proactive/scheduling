@@ -41,6 +41,7 @@ import java.io.Serializable;
 import org.objectweb.proactive.annotation.ImmediateService;
 import org.objectweb.proactive.api.PAActiveObject;
 
+
 /**
  * With current implementation of active object security creation of active
  * object and all methods calls on this object should be executed from the same
@@ -59,145 +60,142 @@ import org.objectweb.proactive.api.PAActiveObject;
  */
 public abstract class ActiveObjectProxy<T> implements Serializable {
 
-	/*
-	 * Active object class creating secured active object and 
-	 * providing access to this object. 
-	 * <p/>
-	 * Note: this class shouldn't be used outside of ActiveObjectProxy class.
-	 */
-	public static class ActiveObjectHolder<T> {
+    /*
+     * Active object class creating secured active object and 
+     * providing access to this object. 
+     * <p/>
+     * Note: this class shouldn't be used outside of ActiveObjectProxy class.
+     */
+    public static class ActiveObjectHolder<T> {
 
-		protected T activeObject;
+        protected T activeObject;
 
-		public ActiveObjectHolder() {
-		}
+        public ActiveObjectHolder() {
+        }
 
-		public void createActiveObject(ActiveObjectProxy<T> proxy)
-				throws Exception {
-			// System.out.println("Creating active - " + Thread.currentThread());
-			activeObject = proxy.doCreateActiveObject();
-		}
+        public void createActiveObject(ActiveObjectProxy<T> proxy) throws Exception {
+            // System.out.println("Creating active - " + Thread.currentThread());
+            activeObject = proxy.doCreateActiveObject();
+        }
 
-		/*
-		 * Method synchronously executes given callback in the active object's
-		 * thread
-		 */
-		public void asyncCallActiveObject(ActiveObjectAccess<T> access) {
-			// System.out.println("Start async call active - " + Thread.currentThread());
-			access.accessActiveObject(activeObject);
-			// System.out.println("End async call active");
-		}
+        /*
+         * Method synchronously executes given callback in the active object's
+         * thread
+         */
+        public void asyncCallActiveObject(ActiveObjectAccess<T> access) {
+            // System.out.println("Start async call active - " + Thread.currentThread());
+            access.accessActiveObject(activeObject);
+            // System.out.println("End async call active");
+        }
 
-		/*
-		 * Method which is supposed to be called from separate thread to check
-		 * that active object is alive. <p/> Note: this method and method
-		 * 'asyncCallActiveObject' executing business logic shouldn't be handled
-		 * by the same thread, to achieve this effect pinging method is
-		 * annotated as ImmediateService.
-		 */
-		@ImmediateService
-		public boolean syncPingActiveObject(ActiveObjectProxy<T> proxy) {
-			// System.out.println("Start ping active - " + Thread.currentThread());
-			if (activeObject == null) {
-				return false;
-			}
-			return proxy.doPingActiveObject(activeObject);
-		}
+        /*
+         * Method which is supposed to be called from separate thread to check
+         * that active object is alive. <p/> Note: this method and method
+         * 'asyncCallActiveObject' executing business logic shouldn't be handled
+         * by the same thread, to achieve this effect pinging method is
+         * annotated as ImmediateService.
+         */
+        @ImmediateService
+        public boolean syncPingActiveObject(ActiveObjectProxy<T> proxy) {
+            // System.out.println("Start ping active - " + Thread.currentThread());
+            if (activeObject == null) {
+                return false;
+            }
+            return proxy.doPingActiveObject(activeObject);
+        }
 
-		/*
-		 * Method synchronously executes given callback in the calling thread
-		 */
-		@ImmediateService
-		public <V> V syncCallActiveObject(ActiveObjectSyncAccess<T> access)
-				throws Exception {
-			// System.out.println("Start sync call active - " + Thread.currentThread());
-			V result = access.accessActiveObject(activeObject);
-			// System.out.println("End sync call active");
-			return result;
-		}
+        /*
+         * Method synchronously executes given callback in the calling thread
+         */
+        @ImmediateService
+        public <V> V syncCallActiveObject(ActiveObjectSyncAccess<T> access) throws Exception {
+            // System.out.println("Start sync call active - " + Thread.currentThread());
+            V result = access.accessActiveObject(activeObject);
+            // System.out.println("End sync call active");
+            return result;
+        }
 
-	}
+    }
 
-	public static interface ActiveObjectAccess<T> extends Serializable {
+    public static interface ActiveObjectAccess<T> extends Serializable {
 
-		void accessActiveObject(T activeObject);
+        void accessActiveObject(T activeObject);
 
-	}
+    }
 
-	public static interface ActiveObjectSyncAccess<T> extends Serializable {
+    public static interface ActiveObjectSyncAccess<T> extends Serializable {
 
-		<V> V accessActiveObject(T activeObject) throws Exception;
+        <V> V accessActiveObject(T activeObject) throws Exception;
 
-	}
+    }
 
-	private ActiveObjectHolder<T> activeObjectHolder;
+    private ActiveObjectHolder<T> activeObjectHolder;
 
-	public ActiveObjectProxy() {
-	}
+    public ActiveObjectProxy() {
+    }
 
-	@SuppressWarnings("unchecked")
-	public void createActiveObject() throws Exception {
-		activeObjectHolder = (ActiveObjectHolder<T>) PAActiveObject.newActive(
-				ActiveObjectHolder.class, new Object[] {});
-		activeObjectHolder.createActiveObject(this);
-	}
+    @SuppressWarnings("unchecked")
+    public void createActiveObject() throws Exception {
+        activeObjectHolder = (ActiveObjectHolder<T>) PAActiveObject.newActive(ActiveObjectHolder.class,
+                new Object[] {});
+        activeObjectHolder.createActiveObject(this);
+    }
 
-	/**
-	 * Synchronous method supposed to be called from the special thread to check
-	 * that active object is alive.
-	 */
-	public boolean syncPingActiveObject() {
-		return activeObjectHolder.syncPingActiveObject(this);
-	}
+    /**
+     * Synchronous method supposed to be called from the special thread to check
+     * that active object is alive.
+     */
+    public boolean syncPingActiveObject() {
+        return activeObjectHolder.syncPingActiveObject(this);
+    }
 
-	public void terminateActiveObjectHolder() {
-		if (activeObjectHolder != null) {
-			PAActiveObject.terminateActiveObject(activeObjectHolder, false);
-		}
-	}
+    public void terminateActiveObjectHolder() {
+        if (activeObjectHolder != null) {
+            PAActiveObject.terminateActiveObject(activeObjectHolder, false);
+        }
+    }
 
-	/**
-	 * At the time of this writing first method call on active object instance
-	 * triggers body initialization and this may require network connection so
-	 * potentially it can hang.
-	 * <p/>
-	 * To avoid this problem this method can be called right after
-	 * ActiveObjectHolder creation to trigger its initialization.
-	 */
-	public void initActiveObjectHolderForCurrentThread() {
-		asyncCallActiveObject(new ActiveObjectAccess<T>() {
-			@Override
-			public void accessActiveObject(T activeObject) {
-				// do nothing, just trigger initialization of activeObjectHolder
-			}
-		});
-	}
+    /**
+     * At the time of this writing first method call on active object instance
+     * triggers body initialization and this may require network connection so
+     * potentially it can hang.
+     * <p/>
+     * To avoid this problem this method can be called right after
+     * ActiveObjectHolder creation to trigger its initialization.
+     */
+    public void initActiveObjectHolderForCurrentThread() {
+        asyncCallActiveObject(new ActiveObjectAccess<T>() {
+            @Override
+            public void accessActiveObject(T activeObject) {
+                // do nothing, just trigger initialization of activeObjectHolder
+            }
+        });
+    }
 
-	public boolean isActiveObjectCreated() {
-		return activeObjectHolder != null;
-	}
+    public boolean isActiveObjectCreated() {
+        return activeObjectHolder != null;
+    }
 
-	protected void asyncCallActiveObject(ActiveObjectAccess<T> access) {
-		activeObjectHolder.asyncCallActiveObject(access);
-	}
+    protected void asyncCallActiveObject(ActiveObjectAccess<T> access) {
+        activeObjectHolder.asyncCallActiveObject(access);
+    }
 
-	protected <V> V syncCallActiveObject(ActiveObjectSyncAccess<T> access)
-			throws Exception {
-		return activeObjectHolder.syncCallActiveObject(access);
-	}
+    protected <V> V syncCallActiveObject(ActiveObjectSyncAccess<T> access) throws Exception {
+        return activeObjectHolder.syncCallActiveObject(access);
+    }
 
-	/**
-	 * 
-	 * @param activeObject
-	 * @return
-	 */
-	protected abstract boolean doPingActiveObject(T activeObject);
+    /**
+     * 
+     * @param activeObject
+     * @return
+     */
+    protected abstract boolean doPingActiveObject(T activeObject);
 
-	/**
-	 * 
-	 * @return
-	 * @throws Exception
-	 */
-	protected abstract T doCreateActiveObject() throws Exception;
+    /**
+     * 
+     * @return
+     * @throws Exception
+     */
+    protected abstract T doCreateActiveObject() throws Exception;
 
 }

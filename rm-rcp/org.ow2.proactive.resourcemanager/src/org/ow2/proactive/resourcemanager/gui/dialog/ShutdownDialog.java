@@ -90,8 +90,8 @@ public class ShutdownDialog extends Dialog {
         okButton.setText("OK");
         okButton.addListener(SWT.Selection, new Listener() {
             public void handleEvent(Event event) {
-            	RMStore.getInstance().getResourceManager().shutdown(!preemptCheck.getSelection());
-            	shell.close();
+                RMStore.getInstance().getResourceManager().shutdown(!preemptCheck.getSelection());
+                shell.close();
             }
         });
 

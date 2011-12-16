@@ -112,8 +112,8 @@ public class ConnectHandler extends AbstractHandler implements IHandler {
                 @Override
                 protected IStatus run(IProgressMonitor monitor) {
                     try {
-                        RMStore.newInstance(dialogResult.getUrl(), dialogResult.getLogin(),
-                                dialogResult.getPassword(), dialogResult.getCredentials());
+                        RMStore.newInstance(dialogResult.getUrl(), dialogResult.getLogin(), dialogResult
+                                .getPassword(), dialogResult.getCredentials());
 
                         parent.getDisplay().syncExec(new Runnable() {
                             public void run() {

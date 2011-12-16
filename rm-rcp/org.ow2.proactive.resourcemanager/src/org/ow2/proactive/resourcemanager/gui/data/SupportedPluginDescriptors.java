@@ -40,6 +40,7 @@ import java.util.Collection;
 
 import org.ow2.proactive.resourcemanager.nodesource.common.PluginDescriptor;
 
+
 /**
  * Contains data needed to initialize 'Create Node Source' dialog:
  * <ul>
@@ -52,24 +53,22 @@ import org.ow2.proactive.resourcemanager.nodesource.common.PluginDescriptor;
  */
 public class SupportedPluginDescriptors {
 
-	private final Collection<PluginDescriptor> supportedNodeSourceInfrastructures;
-	
-	private final Collection<PluginDescriptor> supportedNodeSourcePolicies;
+    private final Collection<PluginDescriptor> supportedNodeSourceInfrastructures;
 
-	public SupportedPluginDescriptors(
-			Collection<PluginDescriptor> supportedNodeSourceInfrastructures,
-			Collection<PluginDescriptor> supportedNodeSourcePolicies) {
-		this.supportedNodeSourceInfrastructures = supportedNodeSourceInfrastructures;
-		this.supportedNodeSourcePolicies = supportedNodeSourcePolicies;
-	}
+    private final Collection<PluginDescriptor> supportedNodeSourcePolicies;
 
-	public Collection<PluginDescriptor> getSupportedNodeSourceInfrastructures() {
-		return supportedNodeSourceInfrastructures;
-	}
+    public SupportedPluginDescriptors(Collection<PluginDescriptor> supportedNodeSourceInfrastructures,
+            Collection<PluginDescriptor> supportedNodeSourcePolicies) {
+        this.supportedNodeSourceInfrastructures = supportedNodeSourceInfrastructures;
+        this.supportedNodeSourcePolicies = supportedNodeSourcePolicies;
+    }
 
-	public Collection<PluginDescriptor> getSupportedNodeSourcePolicies() {
-		return supportedNodeSourcePolicies;
-	}
-	
-	
+    public Collection<PluginDescriptor> getSupportedNodeSourceInfrastructures() {
+        return supportedNodeSourceInfrastructures;
+    }
+
+    public Collection<PluginDescriptor> getSupportedNodeSourcePolicies() {
+        return supportedNodeSourcePolicies;
+    }
+
 }

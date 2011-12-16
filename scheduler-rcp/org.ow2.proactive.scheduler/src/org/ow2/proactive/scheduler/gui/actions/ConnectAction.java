@@ -65,7 +65,8 @@ public class ConnectAction extends SchedulerGUIAction {
     public ConnectAction() {
         this.setText("&Connect");
         this.setToolTipText("Connect the started ProActive Scheduler by its url");
-        this.setImageDescriptor(Activator.getDefault().getImageRegistry().getDescriptor(
+        this
+                .setImageDescriptor(Activator.getDefault().getImageRegistry().getDescriptor(
                         Internal.IMG_CONNECT));
     }
 
@@ -105,15 +106,15 @@ public class ConnectAction extends SchedulerGUIAction {
                     try {
                         setName("Downloading the Orchestration & Scheduling State, this might take a several minutes.");
 
-                        boolean connected  = SchedulerProxy.getInstance().connectToScheduler(dialogResult);
+                        boolean connected = SchedulerProxy.getInstance().connectToScheduler(dialogResult);
                         if (connected) {
                             //getting the scheduler state here, in this job (non UI).
                             JobsController.getLocalView().init(SchedulerProxy.getInstance());
                             postConnect(dialogResult.getUrl());
                         } else {
-                            errorConnect(new Exception(
-                                    "Authentication failed: invalid username or password "), dialogResult
-                                        .getUrl());
+                            errorConnect(
+                                    new Exception("Authentication failed: invalid username or password "),
+                                    dialogResult.getUrl());
                         }
 
                         return Status.OK_STATUS;

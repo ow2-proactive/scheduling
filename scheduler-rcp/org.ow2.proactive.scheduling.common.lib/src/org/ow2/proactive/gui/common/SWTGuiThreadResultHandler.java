@@ -38,6 +38,7 @@ package org.ow2.proactive.gui.common;
 
 import org.eclipse.swt.widgets.Display;
 
+
 /**
  * Callback which is called to handle result of asynchronous call.
  * <p/>
@@ -48,15 +49,15 @@ import org.eclipse.swt.widgets.Display;
  */
 public abstract class SWTGuiThreadResultHandler<T> implements ActiveObjectCallResultHandler<T> {
 
-	@Override
-	public final void handleResult(final T result) {
-		Display.getDefault().asyncExec(new Runnable() {
-			public void run() {
-				handleResultInGuiThread(result);
-			}
-		});
-	}
+    @Override
+    public final void handleResult(final T result) {
+        Display.getDefault().asyncExec(new Runnable() {
+            public void run() {
+                handleResultInGuiThread(result);
+            }
+        });
+    }
 
-	protected abstract void handleResultInGuiThread(T result);
-	
+    protected abstract void handleResultInGuiThread(T result);
+
 }

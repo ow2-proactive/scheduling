@@ -79,7 +79,8 @@ import org.ow2.proactive.scheduler.gui.views.SeparatedJobView;
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9
  */
-public class SchedulerProxy extends ActiveObjectProxy<Scheduler> implements ActiveObjectPingerThread.PingListener {
+public class SchedulerProxy extends ActiveObjectProxy<Scheduler> implements
+        ActiveObjectPingerThread.PingListener {
 
     private static SchedulerProxy instance;
     private SchedulerAuthenticationInterface sai;
@@ -96,17 +97,17 @@ public class SchedulerProxy extends ActiveObjectProxy<Scheduler> implements Acti
         observers = new LinkedList<SchedulerConnectionListener>();
     }
 
-	private Credentials credentials;
-
-	@Override
-	protected Scheduler doCreateActiveObject() throws Exception {
-		return sai.login(credentials);
-	}
+    private Credentials credentials;
 
     @Override
-	protected boolean doPingActiveObject(Scheduler activeObject) {
-		return activeObject.isConnected();
-	}
+    protected Scheduler doCreateActiveObject() throws Exception {
+        return sai.login(credentials);
+    }
+
+    @Override
+    protected boolean doPingActiveObject(Scheduler activeObject) {
+        return activeObject.isConnected();
+    }
 
     public boolean connectToScheduler(SelectSchedulerDialogResult dialogResult) throws Throwable {
         try {
@@ -129,21 +130,20 @@ public class SchedulerProxy extends ActiveObjectProxy<Scheduler> implements Acti
                 credentials = Credentials.getCredentialsBase64(cred);
             }
 
-			if (!isActiveObjectCreated() || !syncPingActiveObject()) {
-				createActiveObject();
-			}
-			Display.getDefault().asyncExec(new Runnable() {
+            if (!isActiveObjectCreated() || !syncPingActiveObject()) {
+                createActiveObject();
+            }
+            Display.getDefault().asyncExec(new Runnable() {
                 public void run() {
-            		initActiveObjectHolderForCurrentThread();
+                    initActiveObjectHolderForCurrentThread();
                 }
             });
-			
+
             sendConnectionCreatedEvent(dialogResult.getUrl(), userName, dialogResult.getPassword());
             // SCHEDULING-1434 - should start the pinger after the first call to addEventListener
             //startPinger();
             connected = true;
 
-            
             JMXActionsManager.getInstance().initJMXClient(schedulerURL, sai,
                     new Object[] { dialogResult.getLogin(), credentials });
             return true;
@@ -159,66 +159,66 @@ public class SchedulerProxy extends ActiveObjectProxy<Scheduler> implements Acti
         }
     }
 
-    public SchedulerState syncAddEventListener(final SchedulerEventListener listener, final boolean myEventsOnly,
-            final boolean getSchedulerState, final SchedulerEvent... events) {
-    	try {
-    		SchedulerState result = syncCallActiveObject(new ActiveObjectSyncAccess<Scheduler>() {
-    			@Override
-    			public SchedulerState accessActiveObject(Scheduler scheduler) {
-    		    	SchedulerState schedState = null;
-    		        try {
-    		            schedState = (SchedulerState) scheduler.addEventListener(listener, myEventsOnly,
-    		                    getSchedulerState, events);
-    		        } catch (PermissionException pe) {
-    		            Activator.log(IStatus.ERROR, "Error getting full state : " + pe.getMessage(), pe);
-    		            try {
-    		                schedState = (SchedulerState) scheduler.addEventListener(listener, true, getSchedulerState,
-    		                        events);
-    		            } catch (SchedulerException e) {
-    			        	logAndDisplayError(e, "Error in Scheduler Proxy ");
-    		            }
-    		        } catch (SchedulerException e) {
-    		        	logAndDisplayError(e, "Error in Scheduler Proxy ");
-    		        }
-    		        return schedState;
-    			}
+    public SchedulerState syncAddEventListener(final SchedulerEventListener listener,
+            final boolean myEventsOnly, final boolean getSchedulerState, final SchedulerEvent... events) {
+        try {
+            SchedulerState result = syncCallActiveObject(new ActiveObjectSyncAccess<Scheduler>() {
+                @Override
+                public SchedulerState accessActiveObject(Scheduler scheduler) {
+                    SchedulerState schedState = null;
+                    try {
+                        schedState = (SchedulerState) scheduler.addEventListener(listener, myEventsOnly,
+                                getSchedulerState, events);
+                    } catch (PermissionException pe) {
+                        Activator.log(IStatus.ERROR, "Error getting full state : " + pe.getMessage(), pe);
+                        try {
+                            schedState = (SchedulerState) scheduler.addEventListener(listener, true,
+                                    getSchedulerState, events);
+                        } catch (SchedulerException e) {
+                            logAndDisplayError(e, "Error in Scheduler Proxy ");
+                        }
+                    } catch (SchedulerException e) {
+                        logAndDisplayError(e, "Error in Scheduler Proxy ");
+                    }
+                    return schedState;
+                }
             });
-	        
-    		if (result != null) {
-	            //SCHEDULING-1434 -
-	            //Note: the pinger will only be started once, see condition in startPinger()
-	            startPinger();
-	        }
-	        
-	        return result;
-    	} catch (Exception e) {
-    		Activator.log(IStatus.ERROR, "Error adding scheduler event listener", e);
-    		return null;
-    	}
+
+            if (result != null) {
+                //SCHEDULING-1434 -
+                //Note: the pinger will only be started once, see condition in startPinger()
+                startPinger();
+            }
+
+            return result;
+        } catch (Exception e) {
+            Activator.log(IStatus.ERROR, "Error adding scheduler event listener", e);
+            return null;
+        }
     }
 
     public void disconnect(boolean serverIsDown) {
-    	if (isActiveObjectCreated()) {
-			if (pinger != null) {
-				pinger.stopPinger();
-			}
-			if (!serverIsDown) {
-				asyncCallActiveObject(new ActiveObjectAccess<Scheduler>() {
-					@Override
-					public void accessActiveObject(Scheduler scheduler) {
-		                try {
-		                	scheduler.disconnect();
-		                } catch (Exception e) {
-		    				logAndDisplayError(e, "- Scheduler Proxy: Error in  disconnect action");
-		                }
-					}
-				});
-			}
-	        connected = false;
-	        sendConnectionLostEvent();
-			
-			terminateActiveObjectHolder();
-    	}
+        if (isActiveObjectCreated()) {
+            if (pinger != null) {
+                pinger.stopPinger();
+            }
+            if (!serverIsDown) {
+                asyncCallActiveObject(new ActiveObjectAccess<Scheduler>() {
+                    @Override
+                    public void accessActiveObject(Scheduler scheduler) {
+                        try {
+                            scheduler.disconnect();
+                        } catch (Exception e) {
+                            logAndDisplayError(e, "- Scheduler Proxy: Error in  disconnect action");
+                        }
+                    }
+                });
+            }
+            connected = false;
+            sendConnectionLostEvent();
+
+            terminateActiveObjectHolder();
+        }
     }
 
     private void serverDown(final String disconnectionReason) {
@@ -237,28 +237,27 @@ public class SchedulerProxy extends ActiveObjectProxy<Scheduler> implements Acti
         cachedTaskResult.clear();
     }
 
-    public void getTaskResult(final JobId jobId, 
-    		final TaskId tid, 
-    		final ActiveObjectCallResultHandler<TaskResult> resultHadler) {
+    public void getTaskResult(final JobId jobId, final TaskId tid,
+            final ActiveObjectCallResultHandler<TaskResult> resultHadler) {
         TaskResult taskResult = cachedTaskResult.get(tid);
         if (taskResult != null) {
-        	resultHadler.handleResult(taskResult);
+            resultHadler.handleResult(taskResult);
         } else {
-        	asyncCallActiveObject(new ActiveObjectAccess<Scheduler>() {
-    			@Override
-    			public void accessActiveObject(Scheduler scheduler) {
-    		    	try {
-    		    		TaskResult taskResult = scheduler.getTaskResult(jobId, tid.getReadableName());
-    		    		if (taskResult != null) {
-    		    			cachedTaskResult.put(tid, taskResult);
-    		    			resultHadler.handleResult(taskResult);
-    		    		}
-    		        } catch (SchedulerException e) {
-    		            logAndDisplayError(e, "- Scheduler Proxy: Error when getting task result");
-    		        }
-    			}
-            	
-    		});
+            asyncCallActiveObject(new ActiveObjectAccess<Scheduler>() {
+                @Override
+                public void accessActiveObject(Scheduler scheduler) {
+                    try {
+                        TaskResult taskResult = scheduler.getTaskResult(jobId, tid.getReadableName());
+                        if (taskResult != null) {
+                            cachedTaskResult.put(tid, taskResult);
+                            resultHadler.handleResult(taskResult);
+                        }
+                    } catch (SchedulerException e) {
+                        logAndDisplayError(e, "- Scheduler Proxy: Error when getting task result");
+                    }
+                }
+
+            });
         }
     }
 
@@ -276,255 +275,256 @@ public class SchedulerProxy extends ActiveObjectProxy<Scheduler> implements Acti
 
     public void killTask(final String jobId, final String taskName) {
         asyncCallActiveObject(new ActiveObjectAccess<Scheduler>() {
-			@Override
-			public void accessActiveObject(Scheduler scheduler) {
-		        try {
-		            scheduler.killTask(jobId, taskName);
-		        } catch (Exception e) {
-		        	logAndDisplayError(e, "- Scheduler Proxy: Failed to kill task");
-		        }
-			}
-        	
-		});
+            @Override
+            public void accessActiveObject(Scheduler scheduler) {
+                try {
+                    scheduler.killTask(jobId, taskName);
+                } catch (Exception e) {
+                    logAndDisplayError(e, "- Scheduler Proxy: Failed to kill task");
+                }
+            }
+
+        });
     }
 
     public void preemptTask(final String jobId, final String taskName, final int restartDelay) {
         asyncCallActiveObject(new ActiveObjectAccess<Scheduler>() {
-			@Override
-			public void accessActiveObject(Scheduler scheduler) {
-		        try {
-		            scheduler.preemptTask(jobId, taskName, restartDelay);
-		        } catch (Exception e) {
-		        	logAndDisplayError(e, "- Scheduler Proxy: Failed to preempt task");
-		        }
-			}
-        	
-		});
+            @Override
+            public void accessActiveObject(Scheduler scheduler) {
+                try {
+                    scheduler.preemptTask(jobId, taskName, restartDelay);
+                } catch (Exception e) {
+                    logAndDisplayError(e, "- Scheduler Proxy: Failed to preempt task");
+                }
+            }
+
+        });
     }
 
     public void restartTask(final String jobId, final String taskName, final int restartDelay) {
         asyncCallActiveObject(new ActiveObjectAccess<Scheduler>() {
-			@Override
-			public void accessActiveObject(Scheduler scheduler) {
-		        try {
-		            scheduler.restartTask(jobId, taskName, restartDelay);
-		        } catch (Exception e) {
-		        	logAndDisplayError(e, "- Scheduler Proxy: Failed to restart task");
-		        }
-			}
-        	
-		});
+            @Override
+            public void accessActiveObject(Scheduler scheduler) {
+                try {
+                    scheduler.restartTask(jobId, taskName, restartDelay);
+                } catch (Exception e) {
+                    logAndDisplayError(e, "- Scheduler Proxy: Failed to restart task");
+                }
+            }
+
+        });
     }
 
     public void killJob(final JobId jobId) {
         asyncCallActiveObject(new ActiveObjectAccess<Scheduler>() {
-			@Override
-			public void accessActiveObject(Scheduler scheduler) {
-		    	try {
-		            scheduler.killJob(jobId);
-		        } catch (SchedulerException e) {
-		            logAndDisplayError(e, "- Scheduler Proxy: Error on kill job ");
-		        }
-			}
-        	
+            @Override
+            public void accessActiveObject(Scheduler scheduler) {
+                try {
+                    scheduler.killJob(jobId);
+                } catch (SchedulerException e) {
+                    logAndDisplayError(e, "- Scheduler Proxy: Error on kill job ");
+                }
+            }
+
         });
     }
 
     public void listenJobLogs(final JobId jobId, final AppenderProvider appenderProvider) {
         asyncCallActiveObject(new ActiveObjectAccess<Scheduler>() {
-			@Override
-			public void accessActiveObject(Scheduler scheduler) {
-		        try {
-        		    scheduler.listenJobLogs(jobId, appenderProvider);
-        		} catch (SchedulerException e) {
-        			logAndDisplayError(e, "- Scheduler Proxy: Error on listen log");
-        		}
-			}
-		});
+            @Override
+            public void accessActiveObject(Scheduler scheduler) {
+                try {
+                    scheduler.listenJobLogs(jobId, appenderProvider);
+                } catch (SchedulerException e) {
+                    logAndDisplayError(e, "- Scheduler Proxy: Error on listen log");
+                }
+            }
+        });
     }
 
     public void pauseJob(final JobId jobId) {
         asyncCallActiveObject(new ActiveObjectAccess<Scheduler>() {
-			@Override
-			public void accessActiveObject(Scheduler scheduler) {
-		    	try {
-		            scheduler.pauseJob(jobId);
-		        } catch (SchedulerException e) {
-		            logAndDisplayError(e, "- Scheduler Proxy: Error on pause");
-		        }
-			}
-		
+            @Override
+            public void accessActiveObject(Scheduler scheduler) {
+                try {
+                    scheduler.pauseJob(jobId);
+                } catch (SchedulerException e) {
+                    logAndDisplayError(e, "- Scheduler Proxy: Error on pause");
+                }
+            }
+
         });
     }
 
     public void resumeJob(final JobId jobId) {
         asyncCallActiveObject(new ActiveObjectAccess<Scheduler>() {
-			@Override
-			public void accessActiveObject(Scheduler scheduler) {
-		    	try {
-		            scheduler.resumeJob(jobId);
-		        } catch (SchedulerException e) {
-		            logAndDisplayError(e, "- Scheduler Proxy: Error on resume action");
-		        }
-			}
-		
+            @Override
+            public void accessActiveObject(Scheduler scheduler) {
+                try {
+                    scheduler.resumeJob(jobId);
+                } catch (SchedulerException e) {
+                    logAndDisplayError(e, "- Scheduler Proxy: Error on resume action");
+                }
+            }
+
         });
     }
 
     public void jobSubmit(final Job job) {
-    	asyncCallActiveObject(new ActiveObjectAccess<Scheduler>() {
-			@Override
-			public void accessActiveObject(Scheduler scheduler) {
-	    	    try {
-	    	    	scheduler.submit(job);
-	    	    } catch (Exception e) {
-	    	    	logAndDisplayError(e, "Couldn't submit job");
-	    	    }
-			}
-		});
-    	
+        asyncCallActiveObject(new ActiveObjectAccess<Scheduler>() {
+            @Override
+            public void accessActiveObject(Scheduler scheduler) {
+                try {
+                    scheduler.submit(job);
+                } catch (Exception e) {
+                    logAndDisplayError(e, "Couldn't submit job");
+                }
+            }
+        });
+
     }
-    
+
     // NOTE: method is synchronous, so it shouldn't be called from GUI thread   
     public JobId syncJobSubmit(final Job job) throws Exception {
-    	return syncCallActiveObject(new ActiveObjectSyncAccess<Scheduler>() {
-			@Override
-			public JobId accessActiveObject(Scheduler scheduler) throws Exception {
-	    	    return scheduler.submit(job);
-			}
-		});
+        return syncCallActiveObject(new ActiveObjectSyncAccess<Scheduler>() {
+            @Override
+            public JobId accessActiveObject(Scheduler scheduler) throws Exception {
+                return scheduler.submit(job);
+            }
+        });
     }
 
     public void removeJob(final JobId jobId) {
         asyncCallActiveObject(new ActiveObjectAccess<Scheduler>() {
-			@Override
-			public void accessActiveObject(Scheduler scheduler) {
-		    	try {
-		            scheduler.removeJob(jobId);
-		        } catch (SchedulerException e) {
-		            logAndDisplayError(e, "- Scheduler Proxy: Error on remove job action ");
-		        }
-			}
-        	
-		});
+            @Override
+            public void accessActiveObject(Scheduler scheduler) {
+                try {
+                    scheduler.removeJob(jobId);
+                } catch (SchedulerException e) {
+                    logAndDisplayError(e, "- Scheduler Proxy: Error on remove job action ");
+                }
+            }
+
+        });
     }
 
     public void kill() {
         asyncCallActiveObject(new ActiveObjectAccess<Scheduler>() {
-			@Override
-			public void accessActiveObject(Scheduler scheduler) {
-		    	try {
-		            scheduler.kill();
-		            Display.getDefault().asyncExec(new Runnable() {
-		                public void run() {
-		                    DisconnectAction.disconnection(true);
-		                }
-		            });
-		        } catch (SchedulerException e) {
-		            logAndDisplayError(e, "- Scheduler Proxy: Error on kill action ");
-		        }
-			}
-		
+            @Override
+            public void accessActiveObject(Scheduler scheduler) {
+                try {
+                    scheduler.kill();
+                    Display.getDefault().asyncExec(new Runnable() {
+                        public void run() {
+                            DisconnectAction.disconnection(true);
+                        }
+                    });
+                } catch (SchedulerException e) {
+                    logAndDisplayError(e, "- Scheduler Proxy: Error on kill action ");
+                }
+            }
+
         });
     }
 
     public void pause() {
         asyncCallActiveObject(new ActiveObjectAccess<Scheduler>() {
-			@Override
-			public void accessActiveObject(Scheduler scheduler) {
-		        try {
-		            scheduler.pause();
-		        } catch (SchedulerException e) {
-		            logAndDisplayError(e, "- Scheduler Proxy: Error on pause action ");
-		        }
-			}
-        	
-		});
+            @Override
+            public void accessActiveObject(Scheduler scheduler) {
+                try {
+                    scheduler.pause();
+                } catch (SchedulerException e) {
+                    logAndDisplayError(e, "- Scheduler Proxy: Error on pause action ");
+                }
+            }
+
+        });
     }
 
     public void freeze() {
         asyncCallActiveObject(new ActiveObjectAccess<Scheduler>() {
-			@Override
-			public void accessActiveObject(Scheduler scheduler) {
-		    	try {
-		            scheduler.freeze();
-		        } catch (SchedulerException e) {
-		            logAndDisplayError(e, "- Scheduler Proxy: Error on freeze action ");
-		        }
-			}
-        	
-		});
+            @Override
+            public void accessActiveObject(Scheduler scheduler) {
+                try {
+                    scheduler.freeze();
+                } catch (SchedulerException e) {
+                    logAndDisplayError(e, "- Scheduler Proxy: Error on freeze action ");
+                }
+            }
+
+        });
     }
 
     public void resume() {
         asyncCallActiveObject(new ActiveObjectAccess<Scheduler>() {
-			@Override
-			public void accessActiveObject(Scheduler scheduler) {
-        		try {
-            		scheduler.resume();
-        		} catch (SchedulerException e) {
-            		logAndDisplayError(e, "- Scheduler Proxy: Error on resume action ");
-        		}
-			}
-		});
+            @Override
+            public void accessActiveObject(Scheduler scheduler) {
+                try {
+                    scheduler.resume();
+                } catch (SchedulerException e) {
+                    logAndDisplayError(e, "- Scheduler Proxy: Error on resume action ");
+                }
+            }
+        });
     }
 
-	public void shutdown() {
-		asyncCallActiveObject(new ActiveObjectAccess<Scheduler>() {
-			@Override
-			public void accessActiveObject(Scheduler scheduler) {
-				try {
-					scheduler.shutdown();
-		            Display.getDefault().asyncExec(new Runnable() {
-		                public void run() {
-		                    DisconnectAction.disconnection(true);
-		                }
-		            });
-				} catch (SchedulerException e) {
-					logAndDisplayError(e, "- Scheduler Proxy: Error on shut down action ");
-				}
-			}
-		});
-	}
+    public void shutdown() {
+        asyncCallActiveObject(new ActiveObjectAccess<Scheduler>() {
+            @Override
+            public void accessActiveObject(Scheduler scheduler) {
+                try {
+                    scheduler.shutdown();
+                    Display.getDefault().asyncExec(new Runnable() {
+                        public void run() {
+                            DisconnectAction.disconnection(true);
+                        }
+                    });
+                } catch (SchedulerException e) {
+                    logAndDisplayError(e, "- Scheduler Proxy: Error on shut down action ");
+                }
+            }
+        });
+    }
 
     public void start() {
-		asyncCallActiveObject(new ActiveObjectAccess<Scheduler>() {
-			@Override
-			public void accessActiveObject(Scheduler scheduler) {
-		        try {
-        		    scheduler.start();
-        		} catch (SchedulerException e) {
-        			logAndDisplayError(e, "- Scheduler Proxy: Error on start action");
-        		}
-			}
-		});
+        asyncCallActiveObject(new ActiveObjectAccess<Scheduler>() {
+            @Override
+            public void accessActiveObject(Scheduler scheduler) {
+                try {
+                    scheduler.start();
+                } catch (SchedulerException e) {
+                    logAndDisplayError(e, "- Scheduler Proxy: Error on start action");
+                }
+            }
+        });
     }
 
     public void stop() {
-		asyncCallActiveObject(new ActiveObjectAccess<Scheduler>() {
-			@Override
-			public void accessActiveObject(Scheduler scheduler) {
-		        try {
-		            scheduler.stop();
-        		} catch (SchedulerException e) {
-		            logAndDisplayError(e, "- Scheduler Proxy: Error on stop action ");
-        		}
-			}
-		});
+        asyncCallActiveObject(new ActiveObjectAccess<Scheduler>() {
+            @Override
+            public void accessActiveObject(Scheduler scheduler) {
+                try {
+                    scheduler.stop();
+                } catch (SchedulerException e) {
+                    logAndDisplayError(e, "- Scheduler Proxy: Error on stop action ");
+                }
+            }
+        });
     }
 
     public void changeJobPriority(final JobId jobId, final JobPriority priority) {
-    	asyncCallActiveObject(new ActiveObjectAccess<Scheduler>() {
-			@Override
-			public void accessActiveObject(Scheduler scheduler) {
-		    	try {
-		            scheduler.changeJobPriority(jobId, priority);
-		        } catch (SchedulerException e) {
-		        	logAndDisplayError(e, "- Scheduler Proxy: Error on change priority action ");
-		        }
-			}
-    	});
+        asyncCallActiveObject(new ActiveObjectAccess<Scheduler>() {
+            @Override
+            public void accessActiveObject(Scheduler scheduler) {
+                try {
+                    scheduler.changeJobPriority(jobId, priority);
+                } catch (SchedulerException e) {
+                    logAndDisplayError(e, "- Scheduler Proxy: Error on change priority action ");
+                }
+            }
+        });
     }
+
     private void startPinger() {
         if ((pinger != null) && (!pinger.isStopped()))
             return;
@@ -534,33 +534,34 @@ public class SchedulerProxy extends ActiveObjectProxy<Scheduler> implements Acti
     }
 
     @Override
-	public void onPingError() {
-        String disconnectionReason = "Scheduler  '" + schedulerURL + 
-        		"'  seems to be down. Now disconnecting.";
-    	serverDown(disconnectionReason);
+    public void onPingError() {
+        String disconnectionReason = "Scheduler  '" + schedulerURL +
+            "'  seems to be down. Now disconnecting.";
+        serverDown(disconnectionReason);
     }
-
-	@Override
-	public void onPingTimeout() {
-		onPingError();
-	}
 
     @Override
-	public void onPingFalse() {
-        String disconnectionReason = "Your connection to the Scheduler '" + schedulerURL + 
-        		"' has expired. Now disconnecting.";
-    	serverDown(disconnectionReason);
+    public void onPingTimeout() {
+        onPingError();
     }
-    
-	public Boolean isItHisJob(String userName) {
+
+    @Override
+    public void onPingFalse() {
+        String disconnectionReason = "Your connection to the Scheduler '" + schedulerURL +
+            "' has expired. Now disconnecting.";
+        serverDown(disconnectionReason);
+    }
+
+    public Boolean isItHisJob(String userName) {
         if ((this.userName == null) || (userName == null)) {
             return false;
         }
         return this.userName.equals(userName);
     }
+
     public static SchedulerProxy getInstance() {
         if (instance == null) {
-        	instance = new SchedulerProxy();
+            instance = new SchedulerProxy();
         }
         return instance;
     }
@@ -602,14 +603,13 @@ public class SchedulerProxy extends ActiveObjectProxy<Scheduler> implements Acti
     }
 
     private void logAndDisplayError(final Exception e, final String message) {
-		Activator.log(IStatus.ERROR, message, e);
+        Activator.log(IStatus.ERROR, message, e);
 
-		Display.getDefault().asyncExec(new Runnable() {
+        Display.getDefault().asyncExec(new Runnable() {
             public void run() {
                 MessageDialog.openError(Display.getDefault().getActiveShell(), "Error !", e.getMessage());
             }
         });
-	}
-
+    }
 
 }

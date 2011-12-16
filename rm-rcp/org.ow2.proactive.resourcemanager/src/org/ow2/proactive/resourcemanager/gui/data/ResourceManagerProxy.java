@@ -64,221 +64,216 @@ import org.ow2.proactive.resourcemanager.nodesource.common.PluginDescriptor;
 public class ResourceManagerProxy extends ActiveObjectProxy<ResourceManager> {
 
     private static ResourceManagerProxy proxyInstance;
-    
-    private RMAuthentication auth;
-    
-    private Credentials creds;
-    
-    @Override
-	protected boolean doPingActiveObject(ResourceManager resourceManager) {
-		return resourceManager.isActive().getBooleanValue();
-	}
 
-	@Override
-	protected ResourceManager doCreateActiveObject() throws Exception {
-		return auth.login(creds);
-	}
-    
-	public static ResourceManagerProxy getProxyInstance() {
-		if (proxyInstance == null) {
-			proxyInstance = new ResourceManagerProxy();
-		}
-		return proxyInstance;
-	}
+    private RMAuthentication auth;
+
+    private Credentials creds;
+
+    @Override
+    protected boolean doPingActiveObject(ResourceManager resourceManager) {
+        return resourceManager.isActive().getBooleanValue();
+    }
+
+    @Override
+    protected ResourceManager doCreateActiveObject() throws Exception {
+        return auth.login(creds);
+    }
+
+    public static ResourceManagerProxy getProxyInstance() {
+        if (proxyInstance == null) {
+            proxyInstance = new ResourceManagerProxy();
+        }
+        return proxyInstance;
+    }
 
     public void connect(RMAuthentication auth, Credentials creds) throws Exception {
         this.auth = auth;
         this.creds = creds;
         createActiveObject();
-		Display.getDefault().asyncExec(new Runnable() {
+        Display.getDefault().asyncExec(new Runnable() {
             public void run() {
-        		initActiveObjectHolderForCurrentThread();
+                initActiveObjectHolderForCurrentThread();
             }
         });
     }
 
     public boolean syncAddNode(final String nodeUrl, final String sourceName) throws Exception {
         return syncCallActiveObject(new ActiveObjectSyncAccess<ResourceManager>() {
-			@Override
-			public Boolean accessActiveObject(ResourceManager resourceManager) throws Exception {
-				return resourceManager.addNode(nodeUrl, sourceName).getBooleanValue();
-			}
-		});
+            @Override
+            public Boolean accessActiveObject(ResourceManager resourceManager) throws Exception {
+                return resourceManager.addNode(nodeUrl, sourceName).getBooleanValue();
+            }
+        });
     }
 
     public boolean syncCreateNodeSource(final String nodeSourceName, final String infrastructureType,
-            final Object[] infrastructureParameters, final String policyType, final Object[] policyParameters) throws Exception {
+            final Object[] infrastructureParameters, final String policyType, final Object[] policyParameters)
+            throws Exception {
         return syncCallActiveObject(new ActiveObjectSyncAccess<ResourceManager>() {
-			@Override
-			public Boolean accessActiveObject(ResourceManager resourceManager)
-					throws Exception {
-		    	return resourceManager.createNodeSource(nodeSourceName, 
-						infrastructureType, 
-						infrastructureParameters, 
-						policyType, 
-						policyParameters).getBooleanValue();
-			}
+            @Override
+            public Boolean accessActiveObject(ResourceManager resourceManager) throws Exception {
+                return resourceManager.createNodeSource(nodeSourceName, infrastructureType,
+                        infrastructureParameters, policyType, policyParameters).getBooleanValue();
+            }
         });
     }
 
     public void disconnect() {
         asyncCallActiveObject(new ActiveObjectAccess<ResourceManager>() {
-			@Override
-			public void accessActiveObject(ResourceManager resourceManager) {
-		    	try {
-		    		BooleanWrapper result = resourceManager.disconnect();
-		    		if (!result.getBooleanValue()) {
-		    			Activator.log(IStatus.INFO, "Resource Manager Proxy: Failed to disconnect", null);
-		    		}
-		    	} catch (Throwable t) {
-		    		Activator.log(IStatus.INFO, "Resource Manager Proxy: Error on get disconnect", t);
-		    	}
-			}
-		
+            @Override
+            public void accessActiveObject(ResourceManager resourceManager) {
+                try {
+                    BooleanWrapper result = resourceManager.disconnect();
+                    if (!result.getBooleanValue()) {
+                        Activator.log(IStatus.INFO, "Resource Manager Proxy: Failed to disconnect", null);
+                    }
+                } catch (Throwable t) {
+                    Activator.log(IStatus.INFO, "Resource Manager Proxy: Error on get disconnect", t);
+                }
+            }
+
         });
     }
 
     public RMMonitoring syncGetMonitoring() throws Exception {
-    	RMMonitoring result = syncCallActiveObject(new ActiveObjectSyncAccess<ResourceManager>() {
-			@Override
-			public RMMonitoring accessActiveObject(ResourceManager resourceManager)
-					throws Exception {
-		    	return resourceManager.getMonitoring();
-			}
+        RMMonitoring result = syncCallActiveObject(new ActiveObjectSyncAccess<ResourceManager>() {
+            @Override
+            public RMMonitoring accessActiveObject(ResourceManager resourceManager) throws Exception {
+                return resourceManager.getMonitoring();
+            }
         });
-    	PAFuture.waitFor(result);
-    	return result;
+        PAFuture.waitFor(result);
+        return result;
     }
 
     public SupportedPluginDescriptors syncGetSupportedPluginDescriptors() throws Exception {
-    	Collection<PluginDescriptor> infrastructures = syncCallActiveObject(new ActiveObjectSyncAccess<ResourceManager>() {
-			@Override
-			public Collection<PluginDescriptor> accessActiveObject(ResourceManager resourceManager)
-					throws Exception {
-		    	return resourceManager.getSupportedNodeSourceInfrastructures();
-			}
+        Collection<PluginDescriptor> infrastructures = syncCallActiveObject(new ActiveObjectSyncAccess<ResourceManager>() {
+            @Override
+            public Collection<PluginDescriptor> accessActiveObject(ResourceManager resourceManager)
+                    throws Exception {
+                return resourceManager.getSupportedNodeSourceInfrastructures();
+            }
         });
-    	PAFuture.waitFor(infrastructures);
-    	Collection<PluginDescriptor> policies = syncCallActiveObject(new ActiveObjectSyncAccess<ResourceManager>() {
-			@Override
-			public Collection<PluginDescriptor> accessActiveObject(ResourceManager resourceManager)
-					throws Exception {
-		        return resourceManager.getSupportedNodeSourcePolicies();
-			}
+        PAFuture.waitFor(infrastructures);
+        Collection<PluginDescriptor> policies = syncCallActiveObject(new ActiveObjectSyncAccess<ResourceManager>() {
+            @Override
+            public Collection<PluginDescriptor> accessActiveObject(ResourceManager resourceManager)
+                    throws Exception {
+                return resourceManager.getSupportedNodeSourcePolicies();
+            }
         });
-    	PAFuture.waitFor(policies);
-    	return new SupportedPluginDescriptors(infrastructures, policies);
+        PAFuture.waitFor(policies);
+        return new SupportedPluginDescriptors(infrastructures, policies);
     }
 
     public void removeNode(final String nodeUrl, final boolean preempt) {
         asyncCallActiveObject(new ActiveObjectAccess<ResourceManager>() {
-			@Override
-			public void accessActiveObject(ResourceManager resourceManager) {
-				try { 
-					BooleanWrapper result = resourceManager.removeNode(nodeUrl, preempt);
-					if (!result.getBooleanValue()) {
-						displayError("Unknown reason", "Cannot remove node");
-					}
-				} catch (Exception e) {
-					logAndDisplayError(e, "Cannot remove node");
-				}
-				
-			}
-		});
+            @Override
+            public void accessActiveObject(ResourceManager resourceManager) {
+                try {
+                    BooleanWrapper result = resourceManager.removeNode(nodeUrl, preempt);
+                    if (!result.getBooleanValue()) {
+                        displayError("Unknown reason", "Cannot remove node");
+                    }
+                } catch (Exception e) {
+                    logAndDisplayError(e, "Cannot remove node");
+                }
+
+            }
+        });
     }
 
     public boolean syncRemoveNodeSource(final String sourceName, final boolean preempt) throws Exception {
         return syncCallActiveObject(new ActiveObjectSyncAccess<ResourceManager>() {
-			@Override
-			public Boolean accessActiveObject(ResourceManager resourceManager) throws Exception {
-				return resourceManager.removeNodeSource(sourceName, preempt).getBooleanValue();
-			}
-		});
+            @Override
+            public Boolean accessActiveObject(ResourceManager resourceManager) throws Exception {
+                return resourceManager.removeNodeSource(sourceName, preempt).getBooleanValue();
+            }
+        });
     }
 
     public void shutdown(final boolean preempt) {
         asyncCallActiveObject(new ActiveObjectAccess<ResourceManager>() {
-			@Override
-			public void accessActiveObject(ResourceManager resourceManager) {
-				try { 
-					BooleanWrapper result = resourceManager.shutdown(preempt);
-					if (!result.getBooleanValue()) {
-						displayError("Unknown reason", "Cannot shutdown the resource manager");
-					}
-				} catch (Exception e) {
-					logAndDisplayError(e, "Cannot shutdown the resource manager");
-				}
-				
-			}
-		});
+            @Override
+            public void accessActiveObject(ResourceManager resourceManager) {
+                try {
+                    BooleanWrapper result = resourceManager.shutdown(preempt);
+                    if (!result.getBooleanValue()) {
+                        displayError("Unknown reason", "Cannot shutdown the resource manager");
+                    }
+                } catch (Exception e) {
+                    logAndDisplayError(e, "Cannot shutdown the resource manager");
+                }
+
+            }
+        });
     }
 
     public Topology syncGetTopology() {
-    	try {
-        	Topology result = syncCallActiveObject(new ActiveObjectSyncAccess<ResourceManager>() {
-    			@Override
-    			public Topology accessActiveObject(ResourceManager resourceManager)
-    					throws Exception {
-    				return resourceManager.getTopology();
-    			}
+        try {
+            Topology result = syncCallActiveObject(new ActiveObjectSyncAccess<ResourceManager>() {
+                @Override
+                public Topology accessActiveObject(ResourceManager resourceManager) throws Exception {
+                    return resourceManager.getTopology();
+                }
             });
-        	PAFuture.waitFor(result);
-        	return result;
-    	} catch (Exception e) {
-			logAndDisplayError(e, "Failed to get nodes topology");
-			throw new RuntimeException(e);
-    	}
+            PAFuture.waitFor(result);
+            return result;
+        } catch (Exception e) {
+            logAndDisplayError(e, "Failed to get nodes topology");
+            throw new RuntimeException(e);
+        }
     }
 
     public void lockNodes(final Set<String> nodesUrls) {
         asyncCallActiveObject(new ActiveObjectAccess<ResourceManager>() {
-			@Override
-			public void accessActiveObject(ResourceManager resourceManager) {
-				try { 
-					BooleanWrapper result = resourceManager.lockNodes(nodesUrls);
-					if (!result.getBooleanValue()) {
-						displayError("Unknown reason", "Cannot lock nodes");
-					}
-				} catch (Exception e) {
-					logAndDisplayError(e, "Cannot lock nodes");
-				}
-			}
-		});
+            @Override
+            public void accessActiveObject(ResourceManager resourceManager) {
+                try {
+                    BooleanWrapper result = resourceManager.lockNodes(nodesUrls);
+                    if (!result.getBooleanValue()) {
+                        displayError("Unknown reason", "Cannot lock nodes");
+                    }
+                } catch (Exception e) {
+                    logAndDisplayError(e, "Cannot lock nodes");
+                }
+            }
+        });
     }
 
     public void unlockNodes(final Set<String> nodesUrls) {
         asyncCallActiveObject(new ActiveObjectAccess<ResourceManager>() {
-			@Override
-			public void accessActiveObject(ResourceManager resourceManager) {
-				try { 
-					BooleanWrapper result = resourceManager.unlockNodes(nodesUrls);
-					if (!result.getBooleanValue()) {
-						displayError("Unknown reason", "Cannot unlock nodes");
-					}
-				} catch (Exception e) {
-					logAndDisplayError(e, "Cannot unlock nodes");
-				}
-			}
-		});
+            @Override
+            public void accessActiveObject(ResourceManager resourceManager) {
+                try {
+                    BooleanWrapper result = resourceManager.unlockNodes(nodesUrls);
+                    if (!result.getBooleanValue()) {
+                        displayError("Unknown reason", "Cannot unlock nodes");
+                    }
+                } catch (Exception e) {
+                    logAndDisplayError(e, "Cannot unlock nodes");
+                }
+            }
+        });
     }
 
     public void logAndDisplayError(Exception e, final String title) {
-    	Activator.log(IStatus.ERROR, title, e);
-    	
+        Activator.log(IStatus.ERROR, title, e);
+
         String message = e.getMessage();
         if (e.getCause() != null) {
             message = e.getCause().getMessage();
         }
-        
+
         displayError(message, title);
     }
-    
+
     public void displayError(final String message, final String title) {
-		Display.getDefault().asyncExec(new Runnable() {
+        Display.getDefault().asyncExec(new Runnable() {
             public void run() {
                 MessageDialog.openError(Display.getDefault().getActiveShell(), title, message);
             }
         });
     }
-    
+
 }

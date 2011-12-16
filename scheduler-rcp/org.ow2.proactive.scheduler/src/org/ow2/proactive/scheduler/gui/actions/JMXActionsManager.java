@@ -169,16 +169,16 @@ public class JMXActionsManager {
         for (final AbstractHandler h : this.handlers) {
             h.setEnabled(new Boolean(false));
         }
-        
+
         /*
          * disconnect action requires network access and 
          * potentially it can hang, run it from separate thread 
          * to don't freeze GUI thread
          */
         new Thread() {
-        	public void run() {
-        		jmxClient.disconnect();
-        	}
+            public void run() {
+                jmxClient.disconnect();
+            }
         }.start();
     }
 

@@ -129,16 +129,16 @@ public class RemoveSourceDialog extends Dialog {
                 if (src.equals(""))
                     MessageDialog.openError(shell, "Error", "You didn't choose a source to remove");
                 else {
-                	ResourceManagerProxy proxy = RMStore.getInstance().getResourceManager();
-                	try { 
-    					if (!proxy.syncRemoveNodeSource(src, !preemptCheck.getSelection())) {
-    						proxy.displayError("Unknown reason", "Error in node source removal");
-    					} else {
-    	                    shell.close();
-    					}
-    				} catch (Exception e) {
-    					proxy.logAndDisplayError(e, "Error in node source removal");
-    				}
+                    ResourceManagerProxy proxy = RMStore.getInstance().getResourceManager();
+                    try {
+                        if (!proxy.syncRemoveNodeSource(src, !preemptCheck.getSelection())) {
+                            proxy.displayError("Unknown reason", "Error in node source removal");
+                        } else {
+                            shell.close();
+                        }
+                    } catch (Exception e) {
+                        proxy.logAndDisplayError(e, "Error in node source removal");
+                    }
                 }
             }
         });
