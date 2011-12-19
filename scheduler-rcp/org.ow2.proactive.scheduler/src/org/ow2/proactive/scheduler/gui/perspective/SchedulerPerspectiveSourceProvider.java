@@ -64,7 +64,7 @@ public class SchedulerPerspectiveSourceProvider extends AbstractSourceProvider {
     /**
      * true if the current perspective is the Resource Manager Perspective
      */
-    private boolean isSchedulerPerspective = true;
+    private boolean isSchedulerPerspective;
 
     @Override
     public void dispose() {

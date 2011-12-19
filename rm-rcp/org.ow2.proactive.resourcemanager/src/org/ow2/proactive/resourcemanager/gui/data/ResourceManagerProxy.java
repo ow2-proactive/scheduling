@@ -45,7 +45,7 @@ import org.eclipse.swt.widgets.Display;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.authentication.crypto.Credentials;
-import org.ow2.proactive.gui.common.ActiveObjectProxy;
+import org.ow2.proactive.gui.common.DefaultActiveObjectProxy;
 import org.ow2.proactive.resourcemanager.Activator;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.frontend.RMMonitoring;
@@ -61,7 +61,7 @@ import org.ow2.proactive.resourcemanager.nodesource.common.PluginDescriptor;
  * @author The ProActive Team
  * @since ProActive Scheduling 2.0
  */
-public class ResourceManagerProxy extends ActiveObjectProxy<ResourceManager> {
+public class ResourceManagerProxy extends DefaultActiveObjectProxy<ResourceManager> {
 
     private static ResourceManagerProxy proxyInstance;
 
@@ -133,6 +133,8 @@ public class ResourceManagerProxy extends ActiveObjectProxy<ResourceManager> {
             }
 
         });
+
+        terminateActiveObjectHolder();
     }
 
     public RMMonitoring syncGetMonitoring() throws Exception {

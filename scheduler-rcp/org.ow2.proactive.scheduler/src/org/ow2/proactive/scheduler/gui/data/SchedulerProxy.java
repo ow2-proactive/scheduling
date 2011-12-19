@@ -49,7 +49,7 @@ import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.gui.common.ActiveObjectCallResultHandler;
 import org.ow2.proactive.gui.common.ActiveObjectPingerThread;
-import org.ow2.proactive.gui.common.ActiveObjectProxy;
+import org.ow2.proactive.gui.common.DefaultActiveObjectProxy;
 import org.ow2.proactive.scheduler.Activator;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
@@ -79,7 +79,7 @@ import org.ow2.proactive.scheduler.gui.views.SeparatedJobView;
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9
  */
-public class SchedulerProxy extends ActiveObjectProxy<Scheduler> implements
+public class SchedulerProxy extends DefaultActiveObjectProxy<Scheduler> implements
         ActiveObjectPingerThread.PingListener {
 
     private static SchedulerProxy instance;

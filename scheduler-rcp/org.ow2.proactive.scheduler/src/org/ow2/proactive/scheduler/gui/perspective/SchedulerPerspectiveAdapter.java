@@ -78,6 +78,7 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PerspectiveAdapter;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.services.ISourceProviderService;
+import org.ow2.proactive.scheduler.gui.data.SchedulerProxy;
 import org.ow2.proactive.scheduler.gui.handlers.SchedulerStatusSourceProvider;
 
 
@@ -91,32 +92,37 @@ public class SchedulerPerspectiveAdapter extends PerspectiveAdapter {
     @Override
     public void perspectiveActivated(IWorkbenchPage page, IPerspectiveDescriptor perspectiveDescriptor) {
         super.perspectiveActivated(page, perspectiveDescriptor);
-        boolean schedPerspective = false;
-        if (perspectiveDescriptor.getId().equals(
-                "org.ow2.proactive.scheduler.gui.perspective.SchedulerPerspective")) {
-            schedPerspective = true;
+        if (isSchedulerPerspective(perspectiveDescriptor)) {
+            updatePerspectiveState(true);
         }
+    }
 
+    @Override
+    public void perspectiveDeactivated(IWorkbenchPage page, IPerspectiveDescriptor perspectiveDescriptor) {
+        if (isSchedulerPerspective(perspectiveDescriptor)) {
+            updatePerspectiveState(false);
+        }
+    }
+
+    private void updatePerspectiveState(boolean isActive) {
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         ISourceProviderService service = (ISourceProviderService) window
                 .getService(ISourceProviderService.class);
+
         SchedulerPerspectiveSourceProvider sourceProvider = (SchedulerPerspectiveSourceProvider) service
                 .getSourceProvider(SchedulerPerspectiveSourceProvider.schedulerPerspectiveKey);
-        if (schedPerspective)
-            sourceProvider.perspectiveChanged(true);
-        else
-            sourceProvider.perspectiveChanged(false);
+        sourceProvider.perspectiveChanged(isActive);
 
         SchedulerStatusSourceProvider sourceProvider1 = (SchedulerStatusSourceProvider) service
                 .getSourceProvider(SchedulerStatusSourceProvider.CAN_START_SCHEDULER);
-        if (schedPerspective)
-            sourceProvider1.perspectiveChanged(true);
-        else
-            sourceProvider1.perspectiveChanged(false);
+        sourceProvider1.perspectiveChanged(isActive);
 
+        SchedulerProxy.getInstance().setActivityIndicatorState(isActive);
     }
 
-    public void perspectiveDeactivated(IWorkbenchPage page, IPerspectiveDescriptor perspective) {
+    private boolean isSchedulerPerspective(IPerspectiveDescriptor perspectiveDescriptor) {
+        return perspectiveDescriptor.getId().equals(
+                "org.ow2.proactive.scheduler.gui.perspective.SchedulerPerspective");
     }
 
 }

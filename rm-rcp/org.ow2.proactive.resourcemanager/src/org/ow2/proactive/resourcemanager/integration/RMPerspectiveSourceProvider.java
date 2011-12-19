@@ -41,7 +41,6 @@ import java.util.Map;
 
 import org.eclipse.ui.AbstractSourceProvider;
 import org.eclipse.ui.ISources;
-import org.eclipse.ui.PlatformUI;
 
 
 /**
@@ -65,7 +64,7 @@ public class RMPerspectiveSourceProvider extends AbstractSourceProvider {
     /**
      * true if the current perspective is the Resource Manager Perspective
      */
-    private boolean isRmPerspective = true;
+    private boolean isRmPerspective;
 
     @Override
     public void dispose() {

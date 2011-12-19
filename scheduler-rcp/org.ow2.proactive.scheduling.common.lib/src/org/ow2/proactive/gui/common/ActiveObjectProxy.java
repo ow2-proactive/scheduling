@@ -61,14 +61,16 @@ import org.objectweb.proactive.api.PAActiveObject;
 public abstract class ActiveObjectProxy<T> implements Serializable {
 
     /*
-     * Active object class creating secured active object and 
-     * providing access to this object. 
-     * <p/>
+     * Active object class creating secured active object and providing access to this object. <p/>
      * Note: this class shouldn't be used outside of ActiveObjectProxy class.
      */
     public static class ActiveObjectHolder<T> {
 
-        protected T activeObject;
+        private T activeObject;
+
+        private ActiveObjectActivityListener activityListener;
+
+        private long activeCallsCounter;
 
         public ActiveObjectHolder() {
         }
@@ -79,20 +81,23 @@ public abstract class ActiveObjectProxy<T> implements Serializable {
         }
 
         /*
-         * Method synchronously executes given callback in the active object's
-         * thread
+         * Method synchronously executes given callback in the active object's thread
          */
         public void asyncCallActiveObject(ActiveObjectAccess<T> access) {
             // System.out.println("Start async call active - " + Thread.currentThread());
-            access.accessActiveObject(activeObject);
-            // System.out.println("End async call active");
+            activityStarted();
+            try {
+                access.accessActiveObject(activeObject);
+            } finally {
+                // System.out.println("End async call active - " + Thread.currentThread());
+                activityFinished();
+            }
         }
 
         /*
-         * Method which is supposed to be called from separate thread to check
-         * that active object is alive. <p/> Note: this method and method
-         * 'asyncCallActiveObject' executing business logic shouldn't be handled
-         * by the same thread, to achieve this effect pinging method is
+         * Method which is supposed to be called from separate thread to check that active object is
+         * alive. <p/> Note: this method and method 'asyncCallActiveObject' executing business logic
+         * shouldn't be handled by the same thread, to achieve this effect pinging method is
          * annotated as ImmediateService.
          */
         @ImmediateService
@@ -110,9 +115,31 @@ public abstract class ActiveObjectProxy<T> implements Serializable {
         @ImmediateService
         public <V> V syncCallActiveObject(ActiveObjectSyncAccess<T> access) throws Exception {
             // System.out.println("Start sync call active - " + Thread.currentThread());
-            V result = access.accessActiveObject(activeObject);
-            // System.out.println("End sync call active");
-            return result;
+            activityStarted();
+            try {
+                V result = access.accessActiveObject(activeObject);
+                return result;
+            } finally {
+                // System.out.println("End sync call active - " + Thread.currentThread());
+                activityFinished();
+            }
+        }
+
+        private synchronized void activityFinished() {
+            if (activeCallsCounter <= 0) {
+                throw new IllegalStateException("Activity didn't start");
+            }
+            activeCallsCounter--;
+            if (activeCallsCounter == 0 && activityListener != null) {
+                activityListener.activityFinished();
+            }
+        }
+
+        private synchronized void activityStarted() {
+            if (activeCallsCounter == 0 && activityListener != null) {
+                activityListener.activityStarted();
+            }
+            activeCallsCounter++;
         }
 
     }
@@ -129,15 +156,84 @@ public abstract class ActiveObjectProxy<T> implements Serializable {
 
     }
 
+    /**
+     * Listens for active object events, there are following events:
+     * <ul>
+     * <li>activityStarted is called when method call on active object
+     * is started 
+     * <li>activityFinished is called  when method call on active object
+     * finished
+     * 
+     * (note: if one asynchronous call is in progress and another active
+     * object's method is called then 'activityStarted' event isn't fired,
+     * and activityFinished event will be fired only once when both methods
+     * finish) 
+     * 
+     * @author sboikov
+     *
+     */
+    public static abstract class ActiveObjectActivityListener {
+
+        private boolean stop;
+
+        private boolean activityInProgress;
+
+        public synchronized final void activityStarted() {
+            if (stop) {
+                return;
+            } else {
+                if (!activityInProgress) {
+                    activityInProgress = true;
+                    onActivityStarted();
+                }
+            }
+        }
+
+        public synchronized final void activityFinished() {
+            if (stop) {
+                return;
+            } else {
+                if (activityInProgress) {
+                    activityInProgress = false;
+                    onActivityFinished();
+                }
+            }
+        }
+
+        private synchronized final void stop() {
+            if (stop) {
+                return;
+            } else {
+                stop = true;
+                if (activityInProgress) {
+                    activityInProgress = false;
+                    onActivityFinished();
+                }
+            }
+        }
+
+        public boolean isActivityInProgress() {
+            return activityInProgress;
+        }
+
+        protected abstract void onActivityStarted();
+
+        protected abstract void onActivityFinished();
+
+    }
+
     private ActiveObjectHolder<T> activeObjectHolder;
+
+    private transient ActiveObjectActivityListener activityListener;
 
     public ActiveObjectProxy() {
     }
 
-    @SuppressWarnings("unchecked")
     public void createActiveObject() throws Exception {
-        activeObjectHolder = (ActiveObjectHolder<T>) PAActiveObject.newActive(ActiveObjectHolder.class,
-                new Object[] {});
+        activeObjectHolder = new ActiveObjectHolder<T>();
+        activityListener = doCreateActivityListener();
+        activeObjectHolder.activityListener = activityListener;
+        activeObjectHolder = PAActiveObject.turnActive(activeObjectHolder);
         activeObjectHolder.createActiveObject(this);
     }
 
@@ -151,6 +247,9 @@ public abstract class ActiveObjectProxy<T> implements Serializable {
 
     public void terminateActiveObjectHolder() {
         if (activeObjectHolder != null) {
+            if (activityListener != null) {
+                activityListener.stop();
+            }
             PAActiveObject.terminateActiveObject(activeObjectHolder, false);
         }
     }
@@ -197,5 +296,13 @@ public abstract class ActiveObjectProxy<T> implements Serializable {
      * @throws Exception
      */
     protected abstract T doCreateActiveObject() throws Exception;
+
+    protected ActiveObjectActivityListener doCreateActivityListener() {
+        return null;
+    }
+
+    protected ActiveObjectActivityListener getActivityListener() {
+        return activityListener;
+    }
 
 }

@@ -62,7 +62,7 @@ public class ActiveObjectPingerThread extends Thread implements Serializable {
 
     public static final long DEFAULT_PING_FREQUENCY = 5000;
 
-    public static final long DEFAULT_PING_TIMEOUT = 5000;
+    public static final long DEFAULT_PING_TIMEOUT = 30000;
 
     public static interface PingListener {
 

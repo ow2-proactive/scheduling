@@ -42,6 +42,7 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PerspectiveAdapter;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.services.ISourceProviderService;
+import org.ow2.proactive.resourcemanager.gui.data.ResourceManagerProxy;
 
 
 /**
@@ -54,24 +55,31 @@ public class ResourceManagerPerspectiveAdapter extends PerspectiveAdapter {
     @Override
     public void perspectiveActivated(IWorkbenchPage page, IPerspectiveDescriptor perspectiveDescriptor) {
         super.perspectiveActivated(page, perspectiveDescriptor);
-        boolean rmPerspective = false;
-        if (perspectiveDescriptor.getId().equals(
-                "org.ow2.proactive.resourcemanager.gui.ResourceManagerPerspective")) {
-            rmPerspective = true;
+        if (isRMPerspective(perspectiveDescriptor)) {
+            updatePerspectiveState(true);
         }
+    }
 
+    @Override
+    public void perspectiveDeactivated(IWorkbenchPage page, IPerspectiveDescriptor perspectiveDescriptor) {
+        if (isRMPerspective(perspectiveDescriptor)) {
+            updatePerspectiveState(false);
+        }
+    }
+
+    private void updatePerspectiveState(boolean isActive) {
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         ISourceProviderService service = (ISourceProviderService) window
                 .getService(ISourceProviderService.class);
         RMPerspectiveSourceProvider sourceProvider = (RMPerspectiveSourceProvider) service
                 .getSourceProvider(RMPerspectiveSourceProvider.rmPerspectiveKey);
-        if (rmPerspective)
-            sourceProvider.perspectiveChanged(true);
-        else
-            sourceProvider.perspectiveChanged(false);
+        sourceProvider.perspectiveChanged(isActive);
+        ResourceManagerProxy.getProxyInstance().setActivityIndicatorState(isActive);
     }
 
-    public void perspectiveDeactivated(IWorkbenchPage page, IPerspectiveDescriptor perspective) {
+    private boolean isRMPerspective(IPerspectiveDescriptor perspectiveDescriptor) {
+        return perspectiveDescriptor.getId().equals(
+                "org.ow2.proactive.resourcemanager.gui.ResourceManagerPerspective");
     }
 
 }
