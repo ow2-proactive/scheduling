@@ -48,12 +48,9 @@ import java.util.TimerTask;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
-import org.objectweb.proactive.RunActive;
-import org.objectweb.proactive.Service;
 import org.objectweb.proactive.annotation.ImmediateService;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.UniqueID;
-import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.mop.MOP;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
@@ -122,7 +119,7 @@ import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
  * @since ProActive Scheduling 0.9
  */
 @ActiveObject
-public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Scheduler, RunActive {
+public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Scheduler {
 
     /** Scheduler logger */
     public static final Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.FRONTEND);
@@ -1461,24 +1458,6 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
             default:
                 logger_dev.warn("**WARNING** - Unconsistent update type received from Scheduler Core : " +
                     notification.getEventType());
-        }
-    }
-
-    /**
-     * Method controls the execution of every request.
-     * Tries to keep this active object alive in case of any exception.
-     */
-    public void runActivity(Body body) {
-        Service service = new Service(body);
-        while (body.isActive()) {
-            Request request = service.blockingRemoveOldest();
-            if (request != null) {
-                try {
-                    service.serve(request);
-                } catch (Throwable e) {
-                    logger.error("Cannot serve request: " + request, e);
-                }
-            }
         }
     }
 
