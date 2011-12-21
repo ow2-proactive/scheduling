@@ -88,9 +88,7 @@ public class TestWorkflowIterationAwareness extends FunctionalTest {
     private static final String preScript = //
     "importPackage(java.io); \n" //
         +
-        "var f = new File(\"" +
-        PASchedulerProperties.SCHEDULER_HOME.getValueAsString() +
-        "/PRE_$IT_$REP\"); \n" + //
+        "var f = new File(\"" + System.getProperty("java.io.tmpdir") + "/PRE_$IT_$REP\"); \n" + //
         "f.createNewFile(); \n";
 
     private static final String preScriptWindows = //
@@ -104,7 +102,7 @@ public class TestWorkflowIterationAwareness extends FunctionalTest {
     "importPackage(java.io); \n" //
         +
         "var f = new File(\"" //
-        + PASchedulerProperties.SCHEDULER_HOME.getValueAsString() + "/POST_$IT_$REP\"); \n" //
+        + System.getProperty("java.io.tmpdir") + "/POST_$IT_$REP\"); \n" //
         + "f.createNewFile(); \n";
 
     private static final String postScriptWindows = //
