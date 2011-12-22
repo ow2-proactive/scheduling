@@ -1,0 +1,30 @@
+# Path of the eclipse installation
+eclipse.baseLocation=
+
+# Os/Ws/Arch of the eclipse specified by eclipse.baseLocation
+baseos=linux
+basews=gtk
+basearch=x86
+
+# Path to the deltapack installation (it should be path to the directory containing 'plugins' and 'features' directories)
+deltapack=
+
+#
+# Path to the sources of all plugins, make sure specified directories contain all following plugins:
+# org.ow2.proactive.scheduler*
+# org.ow2.proactive.resourcemanager*
+# com.activeon.workfloweditor*
+# com.activeon.proactive.studio
+# org.objectweb.proactive.ic2d.chartit
+# org.objectweb.proactive.ic2d.lib
+rcp.pluginPath=<your_eclipse_ws>${path.separator}<your_eclipse_ws>/Scheduler/scheduler-rcp${path.separator}<your_eclipse_ws>/Scheduler/rm-rcp
+
+#
+# The list of {os, ws, arch} configurations to build
+#
+#configs=linux, gtk, x86
+configs=win32, win32, x86 & \
+    win32, win32, x86_64 & \
+    linux, gtk, x86 & \
+    linux, gtk, x86_64 & \
+    macosx, cocoa, x86_64

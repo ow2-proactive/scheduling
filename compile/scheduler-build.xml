@@ -3,6 +3,7 @@
 	<import file="common-build.xml" />
 	<import file="scheduler-env.xml" />
 	<import file="rm-build.xml" />
+    <import file="common-rcp-build.xml" />
 
 	<target name="compile.scheduler" depends="compile.rm" description="Compile all Scheduler's stuffs">
 		<mkdir dir="${cl.scheduler.dir}" />
@@ -418,22 +419,18 @@
 		</copy>
 	</target>
 
-	<target name="rcp.build.scheduler" depends="rcp.libCopy.scheduler" description="build the scheduler's rcp product using the eclipse's headless build mechanism">
-		<available type="file" file="${equinoxjar}" property="equinoxjar.exists" />
-		<fail message="Could not find the org.eclipse.equinox.launcher jar. Please set the variable 'equinoxjar' with the path of your current equinox eclipse installation i.e. .../eclipse/plugins/org.eclipse.equinox.launcher_x.x.x.jar" unless="equinoxjar.exists" />
-
-		<available type="dir" file="${eclipse.baseLocation}" property="eclipse.baseLocation.exists" />
-		<fail message="Could not find the installation directory of eclipse. Please set the variable 'eclipse.baseLocation' with the path of your eclipse installation" unless="eclipse.baseLocation.exists" />
-
-		<java jar="${equinoxjar}" fork="true">
-			<arg value="-application" />
-			<arg value="org.eclipse.ant.core.antRunner" />
-			<arg value="-buildfile" />
-			<arg value="../scheduler-rcp/org.ow2.proactive.scheduler.script/build.xml" />
-			<jvmarg value="-Dbasews=${ws}" />
-			<jvmarg value="-Dbaseos=${os}" />
-			<jvmarg value="-Dbasearch=${arch}" />
-			<jvmarg value="-DbaseLocation=${eclipse.baseLocation}" />
-		</java>
+	<target name="rcp.build.scheduler" depends="rcp.libCopy.scheduler,rcp.generateStubs" description="build the scheduler's rcp product using the eclipse's headless build mechanism">
+        <run-rcp-build productfile="/org.ow2.proactive.scheduler/scheduler.product"  distDir="../dist/scheduler-rcp"/>
 	</target>
+
+	<!--
+	FIXME: 
+	   target for studio building is temporarily added here just 
+	   for the testing purpose, to be moved to more appropriate place
+	   after svn structure refactoring  
+	-->
+	<target name="rcp.build.studio" description="build the studio's rcp product using the eclipse's headless build mechanism">
+        <run-rcp-build productfile="/com.activeeon.proactive.studio/studio.product"  distDir="../dist/studio-rcp"/>
+    </target>
+	
 </project>
