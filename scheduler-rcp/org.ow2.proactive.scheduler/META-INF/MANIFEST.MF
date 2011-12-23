@@ -8,7 +8,8 @@ Bundle-Vendor: ProActive Team
 Bundle-Localization: plugin
 Bundle-ActivationPolicy: lazy
 Eclipse-RegisterBuddy: org.ow2.proactive.scheduler,org.ow2.proactive.scheduler.lib, org.ow2.proactive.scheduling.common.lib, org.objectweb.proactive.ic2d.lib
-Bundle-ClassPath: bin/
+Bundle-ClassPath: .,
+ bin/
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Require-Bundle: org.eclipse.ui;visibility:=reexport,
  org.eclipse.ui.console;visibility:=reexport,

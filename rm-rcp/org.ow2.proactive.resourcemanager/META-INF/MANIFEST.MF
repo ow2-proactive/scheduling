@@ -14,7 +14,8 @@ Require-Bundle: org.eclipse.ui,
  org.objectweb.proactive.ic2d.lib
 Bundle-ActivationPolicy: lazy
 Eclipse-RegisterBuddy: org.ow2.proactive.resourcemanager.lib, org.objectweb.proactive.ic2d.lib, org.ow2.proactive.scheduling.common.lib
-Bundle-ClassPath: bin/,
+Bundle-ClassPath: .,
+ bin/,
  lib/
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Export-Package: org.ow2.proactive.resourcemanager;

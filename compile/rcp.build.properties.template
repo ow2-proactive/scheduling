@@ -1,7 +1,7 @@
 # Path of the eclipse installation
-eclipse.baseLocation=
+eclipseLocation=
 
-# Os/Ws/Arch of the eclipse specified by eclipse.baseLocation
+# Os/Ws/Arch of the eclipse specified by eclipseLocation
 baseos=linux
 basews=gtk
 basearch=x86
@@ -10,14 +10,18 @@ basearch=x86
 deltapack=
 
 #
-# Path to the sources of all plugins, make sure specified directories contain all following plugins:
-# org.ow2.proactive.scheduler*
-# org.ow2.proactive.resourcemanager*
-# com.activeon.workfloweditor*
-# com.activeon.proactive.studio
-# org.objectweb.proactive.ic2d.chartit
-# org.objectweb.proactive.ic2d.lib
-rcp.pluginPath=<your_eclipse_ws>${path.separator}<your_eclipse_ws>/Scheduler/scheduler-rcp${path.separator}<your_eclipse_ws>/Scheduler/rm-rcp
+# Paths to the sources of all plugins you are going to complie,
+# if you are going to compile workflow studio then make sure specified 
+# directories contain all following plugins:
+# - org.ow2.proactive.scheduler*
+# - org.ow2.proactive.resourcemanager*
+# - com.activeon.workfloweditor*
+# - com.activeon.proactive.studio
+# - org.objectweb.proactive.ic2d.chartit
+# - org.objectweb.proactive.ic2d.lib
+# Expression ${path.separator} can be used as path separator, for example: 
+# /tmp/Scheduler/rm-rcp${path.separator}/tmp/Scheduler/scheduler-rcp${path.separator}/tmp/optimizing/trunk/src
+rcp.pluginPath=
 
 #
 # The list of {os, ws, arch} configurations to build

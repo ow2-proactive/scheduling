@@ -136,7 +136,7 @@
 		</copy>
 	</target>
 
-	<target name="rcp.build.rm" depends="rcp.libCopy.rm,rcp.generateStubs" description="build the rm's rcp products using the eclipse's headless build mechanism">
+	<target name="rcp.build.rm" depends="rcp.libCopy.rm" description="build the rm's rcp products using the eclipse's headless build mechanism">
         <run-rcp-build productfile="/org.ow2.proactive.resourcemanager/resource_manager.product"  distDir="../dist/rm-rcp"/>
 	</target>
 

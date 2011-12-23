@@ -419,7 +419,7 @@
 		</copy>
 	</target>
 
-	<target name="rcp.build.scheduler" depends="rcp.libCopy.scheduler,rcp.generateStubs" description="build the scheduler's rcp product using the eclipse's headless build mechanism">
+	<target name="rcp.build.scheduler" depends="rcp.libCopy.scheduler" description="build the scheduler's rcp product using the eclipse's headless build mechanism">
         <run-rcp-build productfile="/org.ow2.proactive.scheduler/scheduler.product"  distDir="../dist/scheduler-rcp"/>
 	</target>
 
@@ -429,7 +429,7 @@
 	   for the testing purpose, to be moved to more appropriate place
 	   after svn structure refactoring  
 	-->
-	<target name="rcp.build.studio" description="build the studio's rcp product using the eclipse's headless build mechanism">
+	<target name="rcp.build.studio" depends="rcp.libCopy.all" description="build the studio's rcp product using the eclipse's headless build mechanism">
         <run-rcp-build productfile="/com.activeeon.proactive.studio/studio.product"  distDir="../dist/studio-rcp"/>
     </target>
 	
