@@ -61,14 +61,14 @@ public class TestWorkflowRecoveryInterrupted extends FunctionalTest {
 
     private static final String job_prefix = "/functionaltests/workflow/descriptors/flow_crash_int_";
 
-    private static final String[] job_1 = { "T 0", "T1 1", "T5 2", "T6 2", "T2 2", "T3 7", "T1#1 8",
-            "T5#1 9", "T6#1 9", "T2#1 9", "T3#1 28", "T1#2 29", "T5#2 30", "T6#2 30", "T2#2 30", "T3#2 91",
-            "T4 92" };
+    private static final String[] job_1 = { "T 0 ()", "T1 1 (T)", "T5 2 (T1)", "T6 2 (T1)", "T2 2 (T1)", "T3 7 (T2 T5 T6)", "T1#1 8 (T3)",
+            "T5#1 9 (T1#1)", "T6#1 9 (T1#1)", "T2#1 9 (T1#1)", "T3#1 28 (T2#1 T5#1 T6#1)", "T1#2 29 (T3#1)", "T5#2 30 (T1#2)", "T6#2 30 (T1#2)", "T2#2 30 (T1#2)", "T3#2 91 (T2#2 T5#2 T6#2)",
+            "T4 92 (T3#2)" };
 
-    private static final String[] job_2 = { "T 0", "T1 1", "T2 2", "T1*1 1", "T2*1 2", "T1*2 1", "T2*2 2",
-            "T3 7", "T#1 8", "T1#1 9", "T2#1 10", "T1#1*1 9", "T2#1*1 10", "T1#1*2 9", "T2#1*2 10",
-            "T3#1 31", "T#2 32", "T1#2 33", "T2#2 34", "T1#2*1 33", "T2#2*1 34", "T1#2*2 33", "T2#2*2 34",
-            "T3#2 103" };
+    private static final String[] job_2 = { "T 0 ()", "T1 1 (T)", "T2 2 (T1)", "T1*1 1 (T)", "T2*1 2 (T1*1)", "T1*2 1 (T)", "T2*2 2 (T1*2)",
+            "T3 7 (T2 T2*1 T2*2)", "T#1 8 (T3)", "T1#1 9 (T#1)", "T2#1 10 (T1#1)", "T1#1*1 9 (T#1)", "T2#1*1 10 (T1#1*1)", "T1#1*2 9 (T#1)", "T2#1*2 10 (T1#1*2)",
+            "T3#1 31 (T2#1 T2#1*1 T2#1*2)", "T#2 32 (T3#1)", "T1#2 33 (T#2)", "T2#2 34 (T1#2)", "T1#2*1 33 (T#2)", "T2#2*1 34 (T1#2*1)", "T1#2*2 33 (T#2)", "T2#2*2 34 (T1#2*2)",
+            "T3#2 103 (T2#2 T2#2*1 T2#2*2)" };
 
     @org.junit.Test
     public void run() throws Throwable {
