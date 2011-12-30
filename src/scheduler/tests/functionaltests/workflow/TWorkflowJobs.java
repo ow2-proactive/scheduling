@@ -38,9 +38,12 @@ package functionaltests.workflow;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Map.Entry;
 
 import org.junit.Assert;
@@ -56,10 +59,12 @@ import org.ow2.proactive.scheduler.common.job.factories.JobFactory;
 import org.ow2.proactive.scheduler.common.task.Task;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.common.task.flow.FlowActionType;
 
 import org.ow2.tests.FunctionalTest;
+
 import functionaltests.SchedulerTHelper;
 
 
@@ -102,6 +107,22 @@ public abstract class TWorkflowJobs extends FunctionalTest {
     protected void internalRun() throws Throwable {
         String[][] jobs = getJobs();
 
+        /*
+         * Parse job data. The format of an entry is the following (square
+         * brackets designate optional content):
+         * 
+         * <task name> <result>[ ([<dependency1>[ <dependency2>[ ...]]])]
+         * 
+         * i.e. there should be space-separated task name and expected result
+         * and optionally a list of space-separated list of dependencies in
+         * parentheses. The order of dependencies is arbitrary. Dependencies
+         * will be checked only if the list is present.
+         *
+         * Examples of valid entries:
+         * 
+         * "T1 1", "T1 1 ()", "T1 1 ()", "T1 1 (T)", "T2 1 (T0 T1)"
+         * 
+         */
         for (int i = 0; i < jobs.length; i++) {
             Map<String, Long> tasks = new HashMap<String, Long>();
             for (int j = 0; j < jobs[i].length; j++) {
@@ -113,10 +134,25 @@ public abstract class TWorkflowJobs extends FunctionalTest {
                     t.printStackTrace();
                 }
             }
+
+            // parse dependences info, if present
+            Map<String, Set<String>> dependences = new HashMap<String, Set<String>>();
+            for (int j = 0; j < jobs[i].length; j++) {
+                String[] val = jobs[i][j].split(" ", 3);
+                if (val.length == 3) {
+                    try {
+                        String deps = val[2].substring(1, val[2].length() - 1);
+                        dependences.put(val[0], new HashSet<String>(Arrays.asList(deps.split(" "))));
+                    } catch (Throwable t) {
+                        throw new RuntimeException("Error parsing dependences for entry: " + jobs[i][j], t);
+                    }
+                }
+            }
+
             String path = new File(TWorkflowJobs.class.getResource(getJobPrefix() + (i + 1) + jobSuffix)
                     .toURI()).getAbsolutePath();
             SchedulerTHelper.log("Testing job: " + path);
-            testJob(path, tasks);
+            testJob(path, tasks, dependences);
         }
     }
 
@@ -183,9 +219,11 @@ public abstract class TWorkflowJobs extends FunctionalTest {
      * 
      * @param jobPath
      * @param expectedResults
+     * @param expectedDependences 
      * @throws Throwable
      */
-    public static void testJob(String jobPath, Map<String, Long> expectedResults) throws Throwable {
+    public static void testJob(String jobPath, Map<String, Long> expectedResults,
+            Map<String, Set<String>> expectedDependences) throws Throwable {
         List<String> skip = new ArrayList<String>();
         for (Entry<String, Long> er : expectedResults.entrySet()) {
             if (er.getValue() < 0) {
@@ -197,19 +235,30 @@ public abstract class TWorkflowJobs extends FunctionalTest {
         JobResult res = SchedulerTHelper.getJobResult(id);
         Assert.assertFalse(SchedulerTHelper.getJobResult(id).hadException());
 
-        for (Entry<String, TaskResult> result : res.getAllResults().entrySet()) {
+        compareResults(jobPath, expectedResults, res);
+
+        JobState js = SchedulerTHelper.getSchedulerInterface().getJobState(id);
+        compareDependences(js, expectedDependences);
+
+        SchedulerTHelper.removeJob(id);
+        SchedulerTHelper.waitForEventJobRemoved(id);
+    }
+
+    public static void compareResults(String prefix, Map<String, Long> expectedResults, JobResult jobResult)
+            throws Throwable {
+        for (Entry<String, TaskResult> result : jobResult.getAllResults().entrySet()) {
             Long expected = expectedResults.get(result.getKey());
 
-            Assert.assertNotNull(jobPath + ": Not expecting result for task '" + result.getKey() + "'",
+            Assert.assertNotNull(prefix + ": Not expecting result for task '" + result.getKey() + "'",
                     expected);
             Assert.assertTrue("Task " + result.getKey() + " should be skipped, but returned a result",
                     expected >= 0);
             if (!(result.getValue().value() instanceof Long)) {
                 System.out.println(result.getValue().value() + " " + result.getValue().value().getClass());
             }
-            Assert.assertTrue(jobPath + ": Result for task '" + result.getKey() + "' is not an Long", result
+            Assert.assertTrue(prefix + ": Result for task '" + result.getKey() + "' is not an Long", result
                     .getValue().value() instanceof Long);
-            Assert.assertEquals(jobPath + ": Invalid result for task '" + result.getKey() + "'", expected,
+            Assert.assertEquals(prefix + ": Invalid result for task '" + result.getKey() + "'", expected,
                     (Long) result.getValue().value());
         }
 
@@ -219,16 +268,35 @@ public abstract class TWorkflowJobs extends FunctionalTest {
         for (Entry<String, Long> expected : expectedResults.entrySet()) {
             if (expected.getValue() < 0) {
                 Assert.assertFalse("Task " + expected.getKey() + " should be skipped, but returned a result",
-                        res.getAllResults().containsKey(expected.getKey()));
+                        jobResult.getAllResults().containsKey(expected.getKey()));
                 skipped++;
             }
         }
 
-        Assert.assertEquals("Expected and actual result sets are not identical in " + jobPath + " (skipped " +
-            skipped + "): ", expectedResults.size(), res.getAllResults().size() + skipped);
+        Assert.assertEquals("Expected and actual result sets are not identical in " + prefix + " (skipped " +
+            skipped + "): ", expectedResults.size(), jobResult.getAllResults().size() + skipped);
+    }
 
-        SchedulerTHelper.removeJob(id);
-        SchedulerTHelper.waitForEventJobRemoved(id);
+    public static void compareDependences(JobState js, Map<String, Set<String>> expectedDependences) {
+        for (TaskState ts : js.getTasks()) {
+            String taskName = ts.getId().getReadableName();
+            if (expectedDependences.containsKey(taskName)) {
+                // expected dependences for this task
+                Set<String> expected = expectedDependences.get(taskName);
+                // actual dependences of this task
+                List<TaskState> actualDepTasks = ts.getDependences();
+                Set<String> actual = new HashSet<String>();
+                if (actualDepTasks != null && actualDepTasks.size() != 0) {
+                    for (TaskState d : actualDepTasks) {
+                        actual.add(d.getId().getReadableName());
+                    }
+                } else {
+                    actual.add("");
+                }
+                // compare expected to actual
+                Assert.assertEquals("Dependence mismatch for task " + taskName, expected, actual);
+            }
+        }
     }
 
     public static JobId testJobSubmission(String jobDescPath, List<String> skip) throws Exception {
