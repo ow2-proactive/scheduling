@@ -64,7 +64,9 @@ import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.task.TaskId;
+import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
+import org.ow2.proactive.scheduler.task.ClientTaskState;
 
 
 /**
@@ -189,6 +191,9 @@ public class JobInfoImpl implements JobInfo {
     /** Tasks skipped by a Control Flow Action */
     @Transient
     private List<TaskId> tasksSkipped = null;
+
+    @Transient
+    private List<ClientTaskState> modifiedTasks;
 
     /** Hibernate default constructor */
     public JobInfoImpl() {
@@ -486,6 +491,14 @@ public class JobInfoImpl implements JobInfo {
     @Override
     public String toString() {
         return getClass().getSimpleName() + "[" + jobId + "]";
+    }
+    
+    public void setModifiedTasks(List<ClientTaskState> tasks) {
+        this.modifiedTasks = tasks;
+    }
+    
+    public List<ClientTaskState> getModifiedTasks() {
+        return this.modifiedTasks;
     }
 
 }

@@ -126,6 +126,7 @@ import org.ow2.proactive.scheduler.descriptor.TaskDescriptor;
 import org.ow2.proactive.scheduler.exception.ProgressPingerException;
 import org.ow2.proactive.scheduler.exception.RunningProcessException;
 import org.ow2.proactive.scheduler.exception.StartProcessException;
+import org.ow2.proactive.scheduler.job.ClientJobState;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.job.InternalJobWrapper;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
@@ -918,7 +919,8 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
             DatabaseManager.getInstance().unload(it);
         }
         logger_dev.info("JobEnvironment and internalTask unloaded for job '" + job.getId() + "'");
-        frontend.jobSubmitted(job);
+        // convert InternalJob to ClientJobState and send it to frontend
+        frontend.jobSubmitted(new ClientJobState(job));
         return true;
     }
 
@@ -2334,7 +2336,8 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
     private Vector<JobState> convert(Vector<InternalJob> jobs) {
         Vector<JobState> jobs2 = new Vector<JobState>();
         for (InternalJob j : jobs) {
-            jobs2.add(j);
+            // convert InternalJob to ClientJobState before sending it to frontend
+            jobs2.add(new ClientJobState(j));
         }
         return jobs2;
     }

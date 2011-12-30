@@ -100,6 +100,7 @@ import org.ow2.proactive.scheduler.descriptor.JobDescriptor;
 import org.ow2.proactive.scheduler.descriptor.JobDescriptorImpl;
 import org.ow2.proactive.scheduler.descriptor.TaskDescriptor;
 import org.ow2.proactive.scheduler.job.JobInfoImpl.ReplicatedTask;
+import org.ow2.proactive.scheduler.task.ClientTaskState;
 import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalForkedJavaTask;
@@ -569,6 +570,8 @@ public abstract class InternalJob extends JobState {
         if (action != null) {
             InternalTask initiator = tasks.get(taskId);
 
+            List<InternalTask> modifiedTasks = new ArrayList<InternalTask>();
+            
             switch (action.getType()) {
                 /*
                  * LOOP action
@@ -636,9 +639,11 @@ public abstract class InternalJob extends JobState {
                             //add entry to job result
                             ((JobResultImpl) this.getJobResult()).addToAllResults(nt.getName());
                         }
+                        modifiedTasks.addAll(dup.values());
 
                         // connect replicated tree
                         newTarget.addDependence(initiator);
+                        modifiedTasks.add(newTarget);
 
                         // connect mergers
                         List<InternalTask> mergers = new ArrayList<InternalTask>();
@@ -658,26 +663,16 @@ public abstract class InternalJob extends JobState {
                             t.getIDependences().remove(initiator);
                             t.addDependence(newInit);
                         }
+                        modifiedTasks.addAll(mergers);
 
                         // propagate the changes in the job descriptor
                         getJobDescriptor().doLoop(taskId, dup, newTarget, newInit);
 
-                        List<ReplicatedTask> tev = new ArrayList<ReplicatedTask>();
-                        for (Entry<TaskId, InternalTask> it : dup.entrySet()) {
-                            ReplicatedTask tid = new ReplicatedTask(it.getKey(), it.getValue().getId());
-                            if (it.getValue().hasDependences()) {
-                                for (InternalTask dep : it.getValue().getIDependences()) {
-                                    tid.deps.add(dep.getId());
-                                }
-                            }
-                            tev.add(tid);
-                        }
-
-                        this.jobInfo.setTasksLooped(tev);
-                        // notify listeners that tasks were added to the job
+                        this.jobInfo.setModifiedTasks(createClientTaskStates(modifiedTasks));
+                        // notify frontend that tasks were added and modified
                         frontend.jobStateUpdated(this.getOwner(), new NotificationData<JobInfo>(
                             SchedulerEvent.TASK_REPLICATED, this.getJobInfo()));
-                        this.jobInfo.setTasksLooped(null);
+                        this.jobInfo.setModifiedTasks(null);
 
                         didAction = true;
                         break;
@@ -785,8 +780,10 @@ public abstract class InternalJob extends JobState {
 
                     // plug the branch
                     branchStart.addDependence(initiator);
+                    modifiedTasks.add(branchStart);
                     if (targetJoin != null) {
                         targetJoin.addDependence(branchEnd);
+                        modifiedTasks.add(targetJoin);
                     }
 
                     // the other branch will not be executed
@@ -799,6 +796,12 @@ public abstract class InternalJob extends JobState {
                         }
                     }
 
+                    // even though the targetElse is not going to be executed, a
+                    // dependency on initiator still makes sense and would help
+                    // reconstruct the job graph on the client
+                    targetElse.addDependence(initiator);
+                    modifiedTasks.add(targetElse);
+                    
                     List<TaskId> tev = new ArrayList<TaskId>(elseTasks.size());
                     for (InternalTask it : elseTasks) {
                         it.setFinishedTime(System.currentTimeMillis());
@@ -820,10 +823,12 @@ public abstract class InternalJob extends JobState {
                             joinId, targetElse.getId(), elseTasks);
 
                     this.jobInfo.setTasksSkipped(tev);
-                    // notify listeners that tasks were skipped
+                    this.jobInfo.setModifiedTasks(createClientTaskStates(modifiedTasks));
+                    // notify frontend that tasks were modified
                     frontend.jobStateUpdated(this.getOwner(), new NotificationData<JobInfo>(
                         SchedulerEvent.TASK_SKIPPED, this.getJobInfo()));
                     this.jobInfo.setTasksSkipped(null);
+                    this.jobInfo.setModifiedTasks(null);
 
                     // no jump is performed ; now that the tasks have been plugged
                     // the flow can continue its normal operation
@@ -861,8 +866,6 @@ public abstract class InternalJob extends JobState {
                             }
                         }
                     }
-
-                    List<ReplicatedTask> tasksEvent = new ArrayList<ReplicatedTask>();
 
                     // for each initial task to replicate
                     for (InternalTask todup : toReplicate) {
@@ -925,6 +928,7 @@ public abstract class InternalJob extends JobState {
                                 //add entry to job result
                                 ((JobResultImpl) this.getJobResult()).addToAllResults(nt.getName());
                             }
+                            modifiedTasks.addAll(dup.values());
 
                             // find the beginning and the ending of the replicated block
                             for (Entry<TaskId, InternalTask> it : dup.entrySet()) {
@@ -934,6 +938,9 @@ public abstract class InternalJob extends JobState {
                                 if (todup.getId().equals(it.getKey())) {
                                     newTarget = nt;
                                     newTarget.addDependence(initiator);
+                                    // no need to add newTarget to modifiedTasks
+                                    // because newTarget is among dup.values(), and we
+                                    // have added them all
                                 }
                                 // connect the last task of the block with the merge task(s)
                                 if (target.getId().equals(it.getKey())) {
@@ -954,6 +961,7 @@ public abstract class InternalJob extends JobState {
                                     // connect the merge tasks
                                     for (InternalTask t : toAdd) {
                                         t.addDependence(newEnd);
+                                        modifiedTasks.add(t);
                                     }
                                 }
                             }
@@ -962,24 +970,15 @@ public abstract class InternalJob extends JobState {
                             getJobDescriptor().doReplicate(taskId, dup, newTarget, target.getId(),
                                     newEnd.getId());
 
-                            // used by the event dispatcher
-                            for (Entry<TaskId, InternalTask> it : dup.entrySet()) {
-                                ReplicatedTask tid = new ReplicatedTask(it.getKey(), it.getValue().getId());
-                                if (it.getValue().hasDependences()) {
-                                    for (InternalTask dep : it.getValue().getIDependences()) {
-                                        tid.deps.add(dep.getId());
-                                    }
-                                }
-                                tasksEvent.add(tid);
-                            }
                         }
                     }
-                    // notify listeners that tasks were added to the job
-                    this.jobInfo.setTasksReplicated(tasksEvent);
+
+                    // notify frontend that tasks were added to the job
+                    this.jobInfo.setModifiedTasks(createClientTaskStates(modifiedTasks));
                     frontend.jobStateUpdated(this.getOwner(), new NotificationData<JobInfo>(
                         SchedulerEvent.TASK_REPLICATED, this.getJobInfo()));
-                    this.jobInfo.setTasksReplicated(null);
-
+                    this.jobInfo.setModifiedTasks(null);
+                    
                     // no jump is performed ; now that the tasks have been replicated and
                     // configured, the flow can continue its normal operation
                     getJobDescriptor().terminate(taskId);
@@ -1052,6 +1051,14 @@ public abstract class InternalJob extends JobState {
         return descriptor;
     }
 
+    private static List<ClientTaskState> createClientTaskStates(List<InternalTask> tasks) {
+        List<ClientTaskState> newTasks = new ArrayList<ClientTaskState>();
+        for (InternalTask task : tasks) {
+            newTasks.add(new ClientTaskState(task));
+        }
+        return newTasks;
+    }
+    
     /**
      * Walk up <code>down</code>'s dependences until
      * a task <code>name</code> is met
