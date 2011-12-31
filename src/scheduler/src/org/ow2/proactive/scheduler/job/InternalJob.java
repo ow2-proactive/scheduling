@@ -571,7 +571,7 @@ public abstract class InternalJob extends JobState {
             InternalTask initiator = tasks.get(taskId);
 
             List<InternalTask> modifiedTasks = new ArrayList<InternalTask>();
-            
+
             switch (action.getType()) {
                 /*
                  * LOOP action
@@ -801,7 +801,7 @@ public abstract class InternalJob extends JobState {
                     // reconstruct the job graph on the client
                     targetElse.addDependence(initiator);
                     modifiedTasks.add(targetElse);
-                    
+
                     List<TaskId> tev = new ArrayList<TaskId>(elseTasks.size());
                     for (InternalTask it : elseTasks) {
                         it.setFinishedTime(System.currentTimeMillis());
@@ -978,7 +978,7 @@ public abstract class InternalJob extends JobState {
                     frontend.jobStateUpdated(this.getOwner(), new NotificationData<JobInfo>(
                         SchedulerEvent.TASK_REPLICATED, this.getJobInfo()));
                     this.jobInfo.setModifiedTasks(null);
-                    
+
                     // no jump is performed ; now that the tasks have been replicated and
                     // configured, the flow can continue its normal operation
                     getJobDescriptor().terminate(taskId);
@@ -1058,7 +1058,7 @@ public abstract class InternalJob extends JobState {
         }
         return newTasks;
     }
-    
+
     /**
      * Walk up <code>down</code>'s dependences until
      * a task <code>name</code> is met

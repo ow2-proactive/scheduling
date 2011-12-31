@@ -16,6 +16,7 @@ import org.ow2.proactive.scheduler.task.ClientTaskState;
 import org.ow2.proactive.scheduler.task.TaskInfoImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 
+
 public class ClientJobState extends JobState {
 
     private JobInfoImpl jobInfo;
@@ -47,13 +48,11 @@ public class ClientJobState extends JobState {
         try {
             tasks.get(taskInfo.getTaskId()).update(taskInfo);
         } catch (NullPointerException e) {
-            throw new IllegalArgumentException(
-                "This task info is not applicable in this job. (task id '" + taskInfo.getTaskId() +
-                    "' not found)");
+            throw new IllegalArgumentException("This task info is not applicable in this job. (task id '" +
+                taskInfo.getTaskId() + "' not found)");
         }
     }
 
-   
     @Override
     public void update(JobInfo info) {
         if (!getId().equals(info.getJobId())) {
@@ -120,7 +119,7 @@ public class ClientJobState extends JobState {
     public JobType getType() {
         return type;
     }
-    
+
     private void addTasks(List<ClientTaskState> newTasks) {
         for (ClientTaskState ts : newTasks) {
             tasks.put(ts.getId(), ts);

@@ -8,6 +8,7 @@ import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 
+
 public class ClientTaskState extends TaskState {
 
     private TaskInfo info;
@@ -16,7 +17,7 @@ public class ClientTaskState extends TaskState {
     private int replicationIndex;
     private List<TaskId> dependenceIds = new ArrayList<TaskId>();
     private List<TaskState> dependences = new ArrayList<TaskState>();
-    
+
     public ClientTaskState(TaskState taskState) {
         //copy information from the TaskStae passed as an argument
         info = taskState.getTaskInfo();
@@ -69,7 +70,7 @@ public class ClientTaskState extends TaskState {
     public int getReplicationIndex() {
         return replicationIndex;
     }
-    
+
     public void restoreDependences(Map<TaskId, TaskState> tasksMap) {
         dependences.clear();
         for (TaskId id : dependenceIds) {

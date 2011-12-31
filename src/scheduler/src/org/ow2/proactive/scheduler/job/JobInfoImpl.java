@@ -492,11 +492,11 @@ public class JobInfoImpl implements JobInfo {
     public String toString() {
         return getClass().getSimpleName() + "[" + jobId + "]";
     }
-    
+
     public void setModifiedTasks(List<ClientTaskState> tasks) {
         this.modifiedTasks = tasks;
     }
-    
+
     public List<ClientTaskState> getModifiedTasks() {
         return this.modifiedTasks;
     }
