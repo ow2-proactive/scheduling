@@ -67,7 +67,8 @@ public class TestWorkflowRecoveryFinished extends FunctionalTest {
             // 2: loop a simple block
             { "T 0 ()", "T1 1 (T)", "T2 2 (T1)", "T1#1 3 (T2)", "T2#1 4 (T1#1)", "T3 5 (T2#1)" },
             // 3: loop on a simple block / replicate a single task
-            { "T 0 ()", "T1 1 (T)", "T2 2 (T1)", "T2*1 2 (T1)", "T3 5 (T2 T2*1)", "T1#1 6 (T3)", "T2#1 7 (T1#1)", "T2#1*1 7 (T1#1)", "T3#1 15 (T2#1 T2#1*1)", "T4 16 (T3#1)" },
+            { "T 0 ()", "T1 1 (T)", "T2 2 (T1)", "T2*1 2 (T1)", "T3 5 (T2 T2*1)", "T1#1 6 (T3)",
+                    "T2#1 7 (T1#1)", "T2#1*1 7 (T1#1)", "T3#1 15 (T2#1 T2#1*1)", "T4 16 (T3#1)" },
 
     };
 
