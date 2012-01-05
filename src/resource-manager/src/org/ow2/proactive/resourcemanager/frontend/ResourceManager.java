@@ -173,7 +173,7 @@ public interface ResourceManager {
      * Only free nodes can be locked.
      *
      * @param urls is a set of free nodes
-     * @return true if all the nodes become locked, runtime exception with error otherwise
+     * @return true if all the nodes become locked, false otherwise
      *
      */
     public BooleanWrapper lockNodes(Set<String> urls);
@@ -187,7 +187,7 @@ public interface ResourceManager {
      *
      * @param urls is a set of nodes to be unlocked
      *
-     * @return true if all the nodes become free, runtime exception otherwise
+     * @return true if all the nodes become free, false otherwise
      */
     public BooleanWrapper unlockNodes(Set<String> urls);
 

@@ -1533,45 +1533,73 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      * {@inheritDoc}
      */
     public BooleanWrapper lockNodes(Set<String> urls) {
+        boolean result = true;
         for (String url : urls) {
             RMNode rmnode = getNodebyUrl(url);
+
+            if (rmnode == null) {
+                logger.warn("Cannot lock unknown node with the following url " + url);
+                result = false;
+                continue;
+            }
+
             if (rmnode.isFree()) {
-                // throws a security exception if caller is not an admin
-                checkNodeAdminPermission(rmnode, caller);
+                try {
+                    // throws a security exception if caller is not an admin
+                    checkNodeAdminPermission(rmnode, caller);
+                } catch (SecurityException ex) {
+                    logger.warn("", ex);
+                    result = false;
+                    continue;
+                }
                 rmnode.lock(caller);
                 freeNodes.remove(rmnode);
                 this.registerAndEmitNodeEvent(new RMNodeEvent(rmnode, RMEventType.NODE_STATE_CHANGED,
                     NodeState.FREE, caller.getName()));
             } else {
-                throw new IllegalArgumentException("Cannot lock the node " + rmnode.getNodeURL() +
-                    " which is not free [ state is " + rmnode.getState() + " ]");
+                logger.warn("Cannot lock the node " + rmnode.getNodeURL() + " which is not free [ state is " +
+                    rmnode.getState() + " ]");
+                result = false;
+                continue;
             }
         }
-        return new BooleanWrapper(true);
+        return new BooleanWrapper(result);
     }
 
     /**
      * {@inheritDoc}
      */
     public BooleanWrapper unlockNodes(Set<String> urls) {
+        boolean result = true;
         for (String url : urls) {
             RMNode rmnode = getNodebyUrl(url);
+
+            if (rmnode == null) {
+                logger.warn("Cannot lock unknown node with the following url " + url);
+                result = false;
+                continue;
+            }
+
             if (rmnode.isLocked()) {
-                // throws a security exception if caller is not an admin
-                checkNodeAdminPermission(rmnode, caller);
                 try {
+                    // throws a security exception if caller is not an admin
+                    checkNodeAdminPermission(rmnode, caller);
                     rmnode.setFree();
                     freeNodes.add(rmnode);
-                } catch (NodeException e) {
-                    throw new RuntimeException(e);
+                } catch (Exception e) {
+                    logger.warn("", e);
+                    result = false;
+                    continue;
                 }
                 this.registerAndEmitNodeEvent(new RMNodeEvent(rmnode, RMEventType.NODE_STATE_CHANGED,
                     NodeState.LOCKED, caller.getName()));
             } else {
-                throw new IllegalArgumentException("Cannot unlock the node " + rmnode.getNodeURL() +
+                logger.warn("Cannot unlock the node " + rmnode.getNodeURL() +
                     " which is not locked [ state is " + rmnode.getState() + " ]");
+                result = false;
+                continue;
             }
         }
-        return new BooleanWrapper(true);
+        return new BooleanWrapper(result);
     }
 }

@@ -128,21 +128,19 @@ public class TestLockNodes extends FunctionalTest {
             Assert.assertEquals(evt.getNodeState(), NodeState.BUSY);
         }
 
-        try {
-            resourceManager.lockNodes(nodesUrls).getBooleanValue();
+        BooleanWrapper res = resourceManager.lockNodes(nodesUrls);
+        if (res.getBooleanValue()) {
             Assert.assertTrue("Successfully locked non-free nodes", false);
-        } catch (RuntimeException e) {
-            RMTHelper.log(e.getMessage());
+        } else {
             RMTHelper.log("Test 3 - success");
         }
 
         RMTHelper.log("Test 4 - unlocking nodes which are not locked");
 
-        try {
-            resourceManager.unlockNodes(nodesUrls).getBooleanValue();
+        res = resourceManager.lockNodes(nodesUrls);
+        if (res.getBooleanValue()) {
             Assert.assertTrue("Successfully unlocked busy nodes", false);
-        } catch (RuntimeException e) {
-            RMTHelper.log(e.getMessage());
+        } else {
             RMTHelper.log("Test 4 - success");
         }
         RMTHelper.log("End of test");
