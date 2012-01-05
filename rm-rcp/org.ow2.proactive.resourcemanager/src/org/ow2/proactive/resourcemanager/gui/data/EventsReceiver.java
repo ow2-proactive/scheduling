@@ -37,14 +37,12 @@
 package org.ow2.proactive.resourcemanager.gui.data;
 
 import org.eclipse.swt.widgets.Display;
-import org.objectweb.proactive.api.PAActiveObject;
 import org.ow2.proactive.resourcemanager.common.event.RMEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMInitialState;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.exception.RMException;
-import org.ow2.proactive.resourcemanager.frontend.RMEventListener;
-import org.ow2.proactive.resourcemanager.frontend.RMMonitoring;
+import org.ow2.proactive.resourcemanager.frontend.RMGroupEventListener;
 import org.ow2.proactive.resourcemanager.gui.data.model.RMModel;
 import org.ow2.proactive.resourcemanager.gui.views.ResourceExplorerView;
 import org.ow2.proactive.resourcemanager.gui.views.ResourcesCompactView;
@@ -53,22 +51,16 @@ import org.ow2.proactive.resourcemanager.gui.views.ResourcesTopologyView;
 import org.ow2.proactive.resourcemanager.gui.views.StatisticsView;
 
 
-public class EventsReceiver implements RMEventListener {
+public class EventsReceiver extends RMGroupEventListener {
 
     private RMModel model;
-    private RMMonitoring monitor;
 
     public EventsReceiver() {
     }
 
-    public void init(RMMonitoring monitorStub) throws RMException {
-        this.monitor = monitorStub;
+    public void init(RMInitialState initialState) throws RMException {
         try {
             model = RMStore.getInstance().getModel();
-            RMInitialState initialState = monitor.addRMEventListener((RMEventListener) PAActiveObject
-                    .getStubOnThis());
-
-            RMStore.setConnected(true);
 
             for (RMNodeSourceEvent nodeSourceEvent : initialState.getNodeSource()) {
                 model.addNodeSource(nodeSourceEvent);

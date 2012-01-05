@@ -48,6 +48,8 @@ import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.gui.common.DefaultActiveObjectProxy;
 import org.ow2.proactive.resourcemanager.Activator;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
+import org.ow2.proactive.resourcemanager.common.event.RMInitialState;
+import org.ow2.proactive.resourcemanager.frontend.RMEventListener;
 import org.ow2.proactive.resourcemanager.frontend.RMMonitoring;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.frontend.topology.Topology;
@@ -142,6 +144,17 @@ public class ResourceManagerProxy extends DefaultActiveObjectProxy<ResourceManag
             @Override
             public RMMonitoring accessActiveObject(ResourceManager resourceManager) throws Exception {
                 return resourceManager.getMonitoring();
+            }
+        });
+        PAFuture.waitFor(result);
+        return result;
+    }
+
+    public RMInitialState syncAddRMEventListener(final RMEventListener receiver) throws Exception {
+        RMInitialState result = syncCallActiveObject(new ActiveObjectSyncAccess<ResourceManager>() {
+            @Override
+            public RMInitialState accessActiveObject(ResourceManager resourceManager) throws Exception {
+                return resourceManager.getMonitoring().addRMEventListener(receiver);
             }
         });
         PAFuture.waitFor(result);

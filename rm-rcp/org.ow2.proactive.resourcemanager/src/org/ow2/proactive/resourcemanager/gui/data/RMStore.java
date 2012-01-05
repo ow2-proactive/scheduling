@@ -53,8 +53,10 @@ import org.ow2.proactive.gui.common.ActiveObjectPingerThread;
 import org.ow2.proactive.resourcemanager.Activator;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.common.RMConstants;
+import org.ow2.proactive.resourcemanager.common.event.RMInitialState;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.frontend.RMConnection;
+import org.ow2.proactive.resourcemanager.frontend.RMEventListener;
 import org.ow2.proactive.resourcemanager.frontend.RMMonitoring;
 import org.ow2.proactive.resourcemanager.gui.actions.JMXActionsManager;
 import org.ow2.proactive.resourcemanager.gui.data.model.RMModel;
@@ -130,7 +132,11 @@ public class RMStore implements ActiveObjectPingerThread.PingListener {
 
             instance = this;
             receiver = PAActiveObject.newActive(EventsReceiver.class, new Object[] {});
-            receiver.init(rmMonitoring);
+            RMInitialState initialState = resourceManagerAO
+                    .syncAddRMEventListener((RMEventListener) receiver);
+            RMStore.setConnected(true);
+
+            receiver.init(initialState);
             SelectResourceManagerDialog.saveInformations();
 
             startPinger(resourceManagerAO);

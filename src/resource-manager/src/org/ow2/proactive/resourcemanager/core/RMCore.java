@@ -1375,9 +1375,9 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             if (client.getHistory() != null) {
                 client.getHistory().update();
             }
-            logger.info(client + " disconnected");
+            logger.info(client + " disconnected from " + client.getId().shortString());
         } else {
-            logger.warn("Trying to disconnect unknown client with id " + clientId);
+            logger.warn("Trying to disconnect unknown client with id " + clientId.shortString());
         }
     }
 

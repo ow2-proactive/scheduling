@@ -104,7 +104,7 @@ public class RMAuthenticationImpl extends AuthenticationImpl implements RMAuthen
 
         client.setHistory(history);
 
-        logger.info(client + " connected");
+        logger.info(client + " connected from " + client.getId().shortString());
         return rmcore;
     }
 

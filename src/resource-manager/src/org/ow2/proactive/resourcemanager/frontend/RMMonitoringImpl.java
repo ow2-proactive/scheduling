@@ -43,7 +43,7 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
@@ -54,6 +54,7 @@ import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
+import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.common.RMConstants;
 import org.ow2.proactive.resourcemanager.common.event.RMEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
@@ -87,8 +88,7 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
 
     // Attributes
     private RMCore rmcore;
-    private Map<UniqueID, RMEventListener> listeners;
-    private HashMap<EventDispatcher, LinkedList<RMEvent>> pendingEvents;
+    private Map<UniqueID, EventDispatcher> dispatchers;
     private transient ExecutorService eventDispatcherThreadPool;
 
     /** Resource Manager's statistics */
@@ -106,9 +106,8 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
      * @param rmcore Stub of the RMCore active object.
      */
     public RMMonitoringImpl(RMCore rmcore) {
-        this.listeners = new HashMap<UniqueID, RMEventListener>();
+        this.dispatchers = new HashMap<UniqueID, EventDispatcher>();
         this.rmcore = rmcore;
-        this.pendingEvents = new HashMap<EventDispatcher, LinkedList<RMEvent>>();
     }
 
     /**
@@ -130,42 +129,38 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
 
     private class EventDispatcher implements Runnable {
 
-        private UniqueID listenerId;
-        private ReentrantLock lock = new ReentrantLock();
+        protected Client client;
 
-        public EventDispatcher(UniqueID listenerId) {
-            this.listenerId = listenerId;
+        protected RMEventListener listener;
+        protected LinkedList<RMEvent> events;
+
+        protected AtomicBoolean inProcess = new AtomicBoolean(false);
+
+        public EventDispatcher(Client client, RMEventListener listener) {
+            this.client = client;
+            this.listener = listener;
+            this.events = new LinkedList<RMEvent>();
         }
 
         public void run() {
-            if (lock.isLocked()) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("Communication to the client " + listenerId.shortString() +
-                        " is in progress in one thread of the thread pool. " +
-                        "Either events come too quick or the client is slow. " +
-                        "Do not initiate connection from another thread.");
-                }
-                return;
-            }
-            lock.lock();
 
             int numberOfEventDelivered = 0;
             long timeStamp = System.currentTimeMillis();
             if (logger.isDebugEnabled()) {
                 logger.debug("Initializing " + Thread.currentThread() + " for events delivery to client '" +
-                    listenerId.shortString() + "'");
+                    client + "'");
             }
 
-            LinkedList<RMEvent> events = pendingEvents.get(this);
             while (true) {
                 RMEvent event = null;
                 synchronized (events) {
                     if (logger.isDebugEnabled()) {
-                        logger.debug(events.size() + " pending events for the client '" +
-                            listenerId.shortString() + "'");
+                        logger.debug(events.size() + " pending events for the client '" + client + "'");
                     }
                     if (events.size() > 0) {
                         event = events.removeFirst();
+                    } else {
+                        inProcess.set(false);
                     }
                 }
 
@@ -173,36 +168,24 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
                     deliverEvent(event);
                     numberOfEventDelivered++;
                 } else {
-                    lock.unlock();
                     break;
                 }
             }
 
             if (logger.isDebugEnabled()) {
-                logger.debug("Finnishing delivery in " + Thread.currentThread() + " to client '" +
-                    listenerId.shortString() + "'. " + numberOfEventDelivered + " events were delivered in " +
+                logger.debug("Finnishing delivery in " + Thread.currentThread() + " to client '" + client +
+                    "'. " + numberOfEventDelivered + " events were delivered in " +
                     (System.currentTimeMillis() - timeStamp) + " ms");
             }
         }
 
         private void deliverEvent(RMEvent event) {
 
-            RMEventListener listener = null;
-
-            synchronized (listeners) {
-                listener = listeners.get(listenerId);
-            }
-
-            if (listener == null) {
-                return;
-            }
-
             //dispatch event
             long timeStamp = System.currentTimeMillis();
 
             if (logger.isDebugEnabled()) {
-                logger.debug("Dispatching event '" + event.toString() + "' to client " +
-                    listenerId.shortString());
+                logger.debug("Dispatching event '" + event.toString() + "' to client " + client);
             }
             try {
                 if (event instanceof RMNodeEvent) {
@@ -217,28 +200,118 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
 
                 long time = System.currentTimeMillis() - timeStamp;
                 if (logger.isDebugEnabled()) {
-                    logger.debug("Event '" + event.toString() + "' has been delivered to client " +
-                        listenerId.shortString() + " in " + time + " ms");
+                    logger.debug("Event '" + event.toString() + "' has been delivered to client " + client +
+                        " in " + time + " ms");
                 }
 
             } catch (Exception e) {
-                // probably listener was removed or became down
-                RMEventListener l = null;
-                synchronized (listeners) {
-                    l = listeners.remove(listenerId);
-                    pendingEvents.remove(this);
-                }
-                if (l != null) {
-                    logger.debug("", e);
-                    logger.info("User known as '" + listenerId.shortString() +
-                        "' has been removed from listeners");
+                // probably listener was removed or disconnected
+                logger.warn("Cannot send events to " + client, e);
+                synchronized (dispatchers) {
+                    dispatchers.remove(client.getId());
+                    logger.warn(client + " was removed from listeners");
                 }
             }
         }
 
-        public boolean equals(Object obj) {
-            EventDispatcher other = (EventDispatcher) obj;
-            return listenerId.equals(other.listenerId);
+        public void queueEvent(RMEvent event) {
+            synchronized (events) {
+                events.add(event);
+
+                if (inProcess.get()) {
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("Communication to the client " + client +
+                            " is in progress in one thread of the thread pool. " +
+                            "Either events come too quick or the client is slow. " +
+                            "Do not initiate connection from another thread.");
+                    }
+                } else {
+                    inProcess.set(true);
+                    eventDispatcherThreadPool.submit(this);
+                }
+            }
+        }
+    }
+
+    private class GroupEventDispatcher extends EventDispatcher {
+
+        public GroupEventDispatcher(Client client, RMEventListener stub) {
+            super(client, stub);
+        }
+
+        public void run() {
+
+            long timeStamp = System.currentTimeMillis();
+            if (logger.isDebugEnabled()) {
+                logger.debug("Initializing " + Thread.currentThread() + " for events delivery to client '" +
+                    client + "'");
+            }
+
+            LinkedList<RMEvent> toDeliver = new LinkedList<RMEvent>();
+            while (true) {
+                synchronized (events) {
+                    if (logger.isDebugEnabled()) {
+                        logger.debug(events.size() + " pending events for the client '" + client + "'");
+                    }
+
+                    if (events.size() > 0) {
+                        toDeliver.clear();
+                        toDeliver.addAll(events);
+                        events.clear();
+                    } else {
+                        inProcess.set(false);
+                        break;
+                    }
+                }
+
+                if (toDeliver.size() > 0) {
+                    if (deliverEvents(toDeliver)) {
+                        if (logger.isDebugEnabled()) {
+                            logger.debug("Finnishing delivery in " + Thread.currentThread() + " to client '" +
+                                client + "'. " + toDeliver.size() + " events were delivered in " +
+                                (System.currentTimeMillis() - timeStamp) + " ms");
+                        }
+                    }
+                    try {
+                        // do not send group events often than half a second 
+                        Thread.sleep(500);
+                    } catch (InterruptedException e) {
+                        logger.error("", e);
+                    }
+
+                } else {
+                    logger.debug("No events to deliver to client " + client);
+                }
+            }
+        }
+
+        private boolean deliverEvents(Collection<RMEvent> events) {
+            //dispatch event
+            long timeStamp = System.currentTimeMillis();
+
+            if (logger.isDebugEnabled()) {
+                for (RMEvent event : events) {
+                    logger.debug("Dispatching events '" + event.toString() + "' to client " + client);
+                }
+            }
+            try {
+                ((RMGroupEventListener) listener).notify(events);
+
+                long time = System.currentTimeMillis() - timeStamp;
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Events has been delivered to client " + client + " in " + time + " ms");
+                }
+
+            } catch (Exception e) {
+                // probably listener was removed or disconnected
+                logger.warn("Cannot send events to " + client, e);
+                synchronized (dispatchers) {
+                    dispatchers.remove(client.getId());
+                    logger.warn(client + " was removed from listeners");
+                }
+                return false;
+            }
+            return true;
         }
     }
 
@@ -250,12 +323,24 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
      * @param events list of wanted events that must be received.
      * @return RMInitialState snapshot of RM's current state : nodes and node sources.
      *  */
-    public RMInitialState addRMEventListener(RMEventListener listener, RMEventType... events) {
+    public RMInitialState addRMEventListener(RMEventListener stub, RMEventType... events) {
         UniqueID id = PAActiveObject.getContext().getCurrentRequest().getSourceBodyID();
 
-        synchronized (listeners) {
-            this.listeners.put(id, listener);
-            this.pendingEvents.put(new EventDispatcher(id), new LinkedList<RMEvent>());
+        logger.debug("Adding the RM listner for " + id.shortString());
+        synchronized (dispatchers) {
+            Client client = null;
+            synchronized (RMCore.clients) {
+                client = RMCore.clients.get(id);
+            }
+            if (client == null) {
+                throw new IllegalArgumentException("Unknown client " + id.shortString());
+            }
+
+            if (stub instanceof RMGroupEventListener) {
+                this.dispatchers.put(id, new GroupEventDispatcher(client, stub));
+            } else {
+                this.dispatchers.put(id, new EventDispatcher(client, stub));
+            }
         }
         return rmcore.getRMInitialState();
     }
@@ -265,10 +350,10 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
      */
     public void removeRMEventListener() throws RMException {
         UniqueID id = PAActiveObject.getContext().getCurrentRequest().getSourceBodyID();
-        synchronized (listeners) {
-            if (listeners.containsKey(id)) {
-                listeners.remove(id);
-                pendingEvents.remove(new EventDispatcher(id));
+        synchronized (dispatchers) {
+            if (dispatchers.containsKey(id)) {
+                logger.debug("Removing the RM listner for " + id.shortString());
+                dispatchers.remove(id);
             } else {
                 throw new RMException("Listener is unknown");
             }
@@ -286,14 +371,9 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
             logger.debug("Queueing event '" + event.toString() + "'");
         }
 
-        synchronized (listeners) {
-            for (Collection<RMEvent> events : pendingEvents.values()) {
-                synchronized (events) {
-                    events.add(event);
-                }
-            }
-            for (Runnable eventDispatcher : pendingEvents.keySet()) {
-                eventDispatcherThreadPool.submit(eventDispatcher);
+        synchronized (dispatchers) {
+            for (EventDispatcher dispatcher : dispatchers.values()) {
+                dispatcher.queueEvent(event);
             }
         }
     }
