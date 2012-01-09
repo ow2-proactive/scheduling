@@ -5,7 +5,6 @@
 
 	<import file="rm-env.xml" />
 	<import file="common-build.xml" />
-    <import file="common-rcp-build.xml" />
 
 	<!-- ************
 		Compilation
@@ -112,32 +111,6 @@
 				<jvmarg value="-DdistantHost=${distantHost}" />
 			</jvmargs>
 		</junitMacro>
-	</target>
-
-	<!-- ************
-			RCP
-		-->
-
-	<target name="rcp.libClean.rm" description="Clean all required libraries for rm RCP">
-		<delete includeemptydirs="true">
-			<fileset dir="${rcp.rm.dir}/${rcp.rm.lib}/lib" includes="**/*" />
-		</delete>
-	</target>
-
-	<target name="rcp.libCopy.rm" depends="rcp.libCopy.scheduling.common, deploy.rm, deploy.rm.client" description="Copy all required libraries to RM plugins">
-		<copy todir="${rcp.rm.dir}/${rcp.rm.lib}/lib" includeemptydirs="no">
-			<fileset dir="${deploy.lib.dir}" includes="${rm.jar}, ${rm.client.jar}" />
-		</copy>
-		<copy todir="${rcp.rm.dir}/${rcp.rm.lib}/lib" flatten="true" includeemptydirs="yes">
-			<fileset dir="${lib.dir}/" includes="nodesource/**" />
-		</copy>
-		<copy todir="${rcp.rm.dir}/${rcp.rm.lib}/lib" flatten="true" includeemptydirs="no">
-			<fileset dir="${rcp.rm.dir}/${rcp.rm.lib}/local/lib" />
-		</copy>
-	</target>
-
-	<target name="rcp.build.rm" depends="rcp.libCopy.rm" description="build the rm's rcp products using the eclipse's headless build mechanism">
-        <run-rcp-build productfile="/org.ow2.proactive.resourcemanager/resource_manager.product"  distDir="../dist/rm-rcp"/>
 	</target>
 
 </project>

@@ -23,10 +23,7 @@
 	<property name="cl.scheduler.worker.dir"    value="${cl.scheduler.dir}/worker" />
 	<property name="cl.scheduler.tests.dir"    value="${classes.dir}/schedulerTests" />
 
-	<property name="scheduler.plugin.lib"	value="org.ow2.proactive.scheduler.lib" />
 	<property name="scheduler.path"    value="${proactive.path}/scheduler"/>
-
-	<property name="scheduler-plugin.dir" value="${base.dir}/scheduler-plugins-src" />
 
 	<!-- ================================================================ -->
     <!--                    		jar  names                            -->

@@ -36,11 +36,6 @@
 
 	<property name="cl.common.dir" value="${classes.dir}/common" />
 
-	<property name="rcp.scheduler.dir" value="${base.dir}/scheduler-rcp/" />
-	<property name="rcp.scheduler.lib" value="org.ow2.proactive.scheduler.lib" />
-	<property name="rcp.rm.dir" value="${base.dir}/rm-rcp/" />
-	<property name="rcp.rm.lib" value="org.ow2.proactive.resourcemanager.lib" />
-
 	<property name="proactive.path" value="org/ow2/proactive" />
 
 	<property name="proactive.core.path" value="${proactive.path}/core" />
@@ -63,13 +58,6 @@
 
 	<property name="srm.common.jar" value="ProActive_SRM-common.jar" />
 	<property name="srm.common.client.jar" value="ProActive_SRM-common-client.jar" />
-
-	<!-- ================================================================ -->
-	<!--                    	common rcp names                          -->
-	<!--  =============================================================== -->
-
-	<property name="scheduling.plugin.common.lib" value="org.ow2.proactive.scheduling.common.lib" />
-
 
 	<!-- ================================================================ -->
 	<!--                   define the different classpaths                -->

@@ -14,9 +14,6 @@
 
 	<property name="rm.path"    		value="${proactive.path}/resourcemanager"/>
 
-	<property name="resourcemanager-plugin.dir" value="${base.dir}/resource-manager-plugin-src" />
-
-
 	<!-- ================================================================ -->
     <!--                    		jar  names                            -->
 	<!--  =============================================================== -->
