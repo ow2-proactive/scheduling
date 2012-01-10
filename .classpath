@@ -242,5 +242,6 @@
 	<classpathentry kind="lib" path="lib/scheduling/org.scilab.modules.types.jar"/>
 	<classpathentry kind="lib" path="lib/scheduling/ProActive_Scheduler-matsci.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="lib/scheduling/rrd4j-2.0.6.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

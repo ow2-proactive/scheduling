@@ -4,8 +4,8 @@
 
 	<property name="project-name" value="ProActive Grid Cloud Portal" />
 
-
-	<property file="./build.properties" />
+    <property file="${user.home}/.proactive/build.properties" />
+	<property file="${basedir}/build.properties" />
 
 	<!-- to generate a release uncomment the variable rest_api.version -->
 	<!-- in the build.properties file, then launch the generation of the war file -->
@@ -14,24 +14,31 @@
 		<format property="rest_api.version" pattern="yyyyMMddHHmm" locale="en,UK" />
 	</tstamp>
 
-
-	<property name="build.dir" value="build" />
+    <property name="projectRoot" value="${basedir}/.." />
+    <property name="build.dir" value="${projectRoot}/build" />
+    <property name="dist.dir" value="${projectRoot}/dist" />
 	<property name="classes.dir" value="${build.dir}/classes" />
-	<property name="lib.dir" value="lib" />
-	<property name="war.root" value="WebContent" />
+	<property name="lib.dir" value="${projectRoot}/lib" />
+	<property name="war.root" value="${projectRoot}/WebContent" />
 	<property name="webinf" value="${war.root}/WEB-INF" />
 	<property name="webinf.lib.dir" value="${war.root}/WEB-INF/lib" />
 	<property name="webinf.classes.dir" value="${war.root}/WEB-INF/classes" />
 	<property name="webinf.lib.doc" value="${war.root}/WEB-INF/doc" />
-	<property name="src.dir" value="src" />
-
+	<property name="src.dir" value="${projectRoot}/src" />
 
 	<!-- 
 		 Compile all
 	-->
 
-	<target name="prepare" description="Create dir for class files">
+    <target name="copy.dependencies" description="Copy dependencies from the compiled Scheduling project">
+        <copy todir="${lib.dir}/scheduling">
+            <fileset dir="${scheduling.project.dir}/dist/lib" includes="*/**" />
+        </copy>
+    </target>
+
+    <target name="prepare" description="Create dir for class files">
 		<mkdir dir="${classes.dir}" />
+        <mkdir dir="${dist.dir}" />
 		<mkdir dir="${webinf.lib.dir}" />
 		<mkdir dir="${war.root}/doc" />
 		<copy todir="${webinf.classes.dir}">
@@ -47,6 +54,7 @@
 		<delete dir="${webinf.lib.dir}" />
 		<delete dir="${war.root}/doc" />
 		<delete dir="${build.dir}" />
+        <delete dir="${dist.dir}" />
 		<delete>
 		  <fileset dir="." includes="SchedulingRest-*.war" />
 		</delete>
@@ -114,7 +122,7 @@
 			</fileset>
 		</copy>
 
-		<war destfile="SchedulingRest-${rest_api.version}.war" webxml="${webinf}/web.xml" basedir="${war.root}">
+		<war destfile="${dist.dir}/SchedulingRest-${rest_api.version}.war" webxml="${webinf}/web.xml" basedir="${war.root}">
 			<manifest>
 				<!-- Who is building this jar? -->
 				<attribute name="Built-By" value="${user.name}" />
