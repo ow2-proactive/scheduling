@@ -11,8 +11,8 @@ import org.ow2.proactive.scheduler.common.task.TaskState;
 
 public class ClientTaskState extends TaskState {
 
-    private TaskInfo info;
-    private int maxExecutionFailure;
+    private TaskInfo taskInfo;
+    private int maxNumberOfExecutionOnFailure;
     private int iterationIndex;
     private int replicationIndex;
     private List<TaskId> dependenceIds = new ArrayList<TaskId>();
@@ -20,10 +20,11 @@ public class ClientTaskState extends TaskState {
 
     public ClientTaskState(TaskState taskState) {
         //copy information from the TaskStae passed as an argument
-        info = taskState.getTaskInfo();
-        maxExecutionFailure = taskState.getMaxNumberOfExecutionOnFailure();
+        taskInfo = taskState.getTaskInfo();
+        maxNumberOfExecutionOnFailure = taskState.getMaxNumberOfExecutionOnFailure();
         iterationIndex = taskState.getIterationIndex();
         replicationIndex = taskState.getReplicationIndex();
+        this.setName(taskState.getName());
 
         // Store only task IDs here; #restoreDependences is later called by
         // ClientJobState in order for this instance to store references to the
@@ -38,7 +39,7 @@ public class ClientTaskState extends TaskState {
 
     @Override
     public void update(TaskInfo taskInfo) {
-        info = taskInfo;
+        taskInfo = taskInfo;
     }
 
     @Override
@@ -48,12 +49,12 @@ public class ClientTaskState extends TaskState {
 
     @Override
     public TaskInfo getTaskInfo() {
-        return info;
+        return taskInfo;
     }
 
     @Override
     public int getMaxNumberOfExecutionOnFailure() {
-        return maxExecutionFailure;
+        return maxNumberOfExecutionOnFailure;
     }
 
     @Override
