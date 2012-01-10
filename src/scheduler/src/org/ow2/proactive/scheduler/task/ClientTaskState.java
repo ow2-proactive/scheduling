@@ -39,7 +39,7 @@ public class ClientTaskState extends TaskState {
 
     @Override
     public void update(TaskInfo taskInfo) {
-        taskInfo = taskInfo;
+        this.taskInfo = taskInfo;
     }
 
     @Override
