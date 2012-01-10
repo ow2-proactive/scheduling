@@ -1,11 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project default="deploy.all" basedir=".">
 
+    <property file="${basedir}/build.properties" />
 	<property file="${user.home}/.proactive/build.properties" />
 	<import file="scheduler-build.xml" />
 	<import file="rm-build.xml" />
 	<import file="../doc/src/build.xml" optional="true"/>
 	
+    <target name="copy.dependencies" description="Copy dependencies from the compiled Programming project">
+        <copy todir="${lib.dir}/ProActive" overwrite="true">
+            <fileset dir="${programming.project.dir}/dist/lib">
+                <include name="ProActive.jar"/>
+                <include name="ProActive_utils.jar"/>
+            </fileset>
+        </copy>
+    </target>
+    
 	<!-- ************
 		Compilation		
 	-->
