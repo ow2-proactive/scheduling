@@ -42,8 +42,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -108,7 +106,7 @@ public class ProbablisticSelectionManager extends SelectionManager {
      * @return candidates node list for script execution
      */
     @Override
-    public List<RMNode> arrangeNodes(final List<RMNode> nodes, List<SelectionScript> scripts) {
+    public List<RMNode> arrangeNodesForScriptExecution(final List<RMNode> nodes, List<SelectionScript> scripts) {
 
         long startTime = System.currentTimeMillis();
         logger.debug("Arranging nodes");
@@ -118,7 +116,6 @@ public class ProbablisticSelectionManager extends SelectionManager {
         // if no scripts are specified return filtered free nodes
         if (!scriptSpecified) {
             logger.debug("Selection script was not specified");
-            Collections.shuffle(nodes);
             return nodes;
         }
 

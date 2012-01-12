@@ -60,6 +60,7 @@ import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.core.RMCore;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.rmnode.RMNode;
+import org.ow2.proactive.resourcemanager.selection.policies.ShufflePolicy;
 import org.ow2.proactive.resourcemanager.selection.topology.TopologyHandler;
 import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 import org.ow2.proactive.scripting.ScriptException;
@@ -87,6 +88,9 @@ public abstract class SelectionManager {
 
     private Set<String> inProgress;
 
+    // the policy for arranging nodes
+    private SelectionPolicy selectionPolicy;
+
     public SelectionManager() {
     }
 
@@ -95,6 +99,16 @@ public abstract class SelectionManager {
         this.scriptExecutorThreadPool = Executors.newFixedThreadPool(SELECTION_THEADS_NUMBER,
                 new NamedThreadFactory("Selection manager threadpool"));
         this.inProgress = Collections.synchronizedSet(new HashSet<String>());
+
+        String policyClassName = PAResourceManagerProperties.RM_SELECTION_POLICY.getValueAsString();
+        try {
+            Class<?> policyClass = Class.forName(policyClassName);
+            selectionPolicy = (SelectionPolicy) policyClass.newInstance();
+        } catch (Exception e) {
+            logger.error("Cannot use the specified policy class: " + e.getMessage());
+            logger.warn("Using the default class: " + ShufflePolicy.class.getName());
+            selectionPolicy = new ShufflePolicy();
+        }
     }
 
     /**
@@ -105,7 +119,8 @@ public abstract class SelectionManager {
      * @param scripts - set of selection scripts
      * @return collection of arranged nodes
      */
-    public abstract List<RMNode> arrangeNodes(final List<RMNode> nodes, List<SelectionScript> scripts);
+    public abstract List<RMNode> arrangeNodesForScriptExecution(final List<RMNode> nodes,
+            List<SelectionScript> scripts);
 
     /**
      * Predicts script execution result. Allows to avoid duplicate script execution 
@@ -144,8 +159,12 @@ public abstract class SelectionManager {
             return new NodeSet();
         }
 
+        // arranging nodes according to the selection policy
+        // if could be shuffling or node source priorities
+        List<RMNode> afterPolicyNodes = selectionPolicy.arrangeNodes(number, filteredNodes, client);
+
         // arranging nodes for script execution
-        List<RMNode> arrangedNodes = arrangeNodes(filteredNodes, scripts);
+        List<RMNode> arrangedNodes = arrangeNodesForScriptExecution(afterPolicyNodes, scripts);
 
         List<Node> matchedNodes = null;
         if (topologyDescriptor.isTopologyBased()) {

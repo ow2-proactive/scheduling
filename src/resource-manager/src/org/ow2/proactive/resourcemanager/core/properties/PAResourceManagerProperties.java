@@ -150,6 +150,9 @@ public enum PAResourceManagerProperties {
     /** Max number of threads in node source for parallel task execution */
     RM_NODESOURCE_MAX_THREAD_NUMBER("pa.rm.nodesource.maxthreadnumber", PropertyType.INTEGER),
 
+    /** The full class name of the policy selected nodes */
+    RM_SELECTION_POLICY("pa.rm.selection.policy", PropertyType.STRING),
+
     /** Max number of threads in node source for parallel task execution */
     RM_SELECTION_MAX_THREAD_NUMBER("pa.rm.selection.maxthreadnumber", PropertyType.INTEGER),
 
