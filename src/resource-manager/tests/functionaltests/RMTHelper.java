@@ -39,6 +39,8 @@ package functionaltests;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -54,12 +56,6 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.process.JVMProcessImpl;
 import org.objectweb.proactive.core.util.ProActiveInet;
-import org.objectweb.proactive.core.xml.VariableContractImpl;
-import org.objectweb.proactive.core.xml.VariableContractType;
-import org.objectweb.proactive.extensions.gcmdeployment.PAGCMDeployment;
-import org.objectweb.proactive.gcmdeployment.GCMApplication;
-import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
-import org.objectweb.proactive.utils.OperatingSystem;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.RMFactory;
@@ -74,9 +70,9 @@ import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.LocalInfrastructure;
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.ow2.proactive.utils.FileToBytesConverter;
-
-import org.ow2.tests.FunctionalTest;
 import org.ow2.tests.ProActiveSetup;
+
+import functionaltests.common.InputStreamReaderThread;
 import functionaltests.monitor.RMMonitorEventReceiver;
 import functionaltests.monitor.RMMonitorsHandler;
 
@@ -93,18 +89,6 @@ public class RMTHelper {
 
     protected static final String VAR_OS = "os";
 
-    protected static URL startForkedRMApplication = RMTHelper.class
-            .getResource("/functionaltests/config/StartForkedRMApplication.xml");
-
-    protected static VariableContractImpl vContract;
-    protected static GCMApplication gcmad;
-
-    /**
-     * A default deployment descriptor
-     */
-    public static URL defaultDescriptor = RMTHelper.class
-            .getResource("/functionaltests/config/GCMNodeSourceDeployment.xml");
-
     /**
      * Number of nodes deployed with default deployment descriptor
      */
@@ -112,7 +96,7 @@ public class RMTHelper {
     /**
      * Timeout for local infrastructure
      */
-    public static int defaultNodesTimeout = 20 * 1000;//20s
+    public static int defaultNodesTimeout = 20 * 1000; //20s
 
     private static URL functionalTestRMProperties = RMTHelper.class
             .getResource("/functionaltests/config/functionalTRMProperties.ini");
@@ -184,7 +168,9 @@ public class RMTHelper {
         //first emtpy im parameter is default rm url
         byte[] creds = FileToBytesConverter.convertFileToByteArray(new File(PAResourceManagerProperties
                 .getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString())));
-        rm.createNodeSource(NodeSource.LOCAL_INFRASTRUCTURE_NAME, LocalInfrastructure.class.getName(),
+        rm.createNodeSource(
+                NodeSource.LOCAL_INFRASTRUCTURE_NAME,
+                LocalInfrastructure.class.getName(),
                 new Object[] { "", creds, RMTHelper.defaultNodesNumber, RMTHelper.defaultNodesTimeout,
                         setup.getJvmParameters() }, StaticPolicy.class.getName(), null);
     }
@@ -264,6 +250,8 @@ public class RMTHelper {
         initEventReceiver(auth);
     }
 
+    private static Process rmProcess;
+
     /**
      * Start the RM using a forked JVM and
      * deploys, with its associated Resource manager, 5 local ProActive nodes.
@@ -277,12 +265,65 @@ public class RMTHelper {
             configurationFile = new File(functionalTestRMProperties.toURI()).getAbsolutePath();
         }
         PAResourceManagerProperties.updateProperties(configurationFile);
-        deployRMGCMA();
-        GCMVirtualNode vn = gcmad.getVirtualNode("VN");
-        Node node = vn.getANode();
-        RMLauncherAO launcherAO = (RMLauncherAO) PAActiveObject.newActive(RMLauncherAO.class.getName(), null,
-                node);
-        auth = launcherAO.createAndJoinForkedRM(configurationFile);
+
+        List<String> commandLine = new ArrayList<String>();
+        commandLine.add(System.getProperty("java.home") + File.separator + "bin" + File.separator + "java");
+        commandLine.add("-Djava.security.manager");
+        commandLine.add(CentralPAPropertyRepository.PA_HOME.getCmdLine() +
+            CentralPAPropertyRepository.PA_HOME.getValue());
+        commandLine.add(CentralPAPropertyRepository.JAVA_SECURITY_POLICY.getCmdLine() +
+            CentralPAPropertyRepository.JAVA_SECURITY_POLICY.getValue());
+        commandLine.add(CentralPAPropertyRepository.LOG4J.getCmdLine() +
+            CentralPAPropertyRepository.LOG4J.getValue());
+        commandLine.add(PAResourceManagerProperties.RM_HOME.getCmdLine() +
+            PAResourceManagerProperties.RM_HOME.getValueAsString());
+
+        String home = PAResourceManagerProperties.RM_HOME.getValueAsString();
+        StringBuilder classpath = new StringBuilder();
+        classpath.append(home + File.separator + "dist" + File.separator + "lib" + File.separator +
+            "ProActive_tests.jar");
+        classpath.append(File.pathSeparator);
+        classpath.append(home + File.separator + "dist" + File.separator + "lib" + File.separator +
+            "ProActive_SRM-common.jar");
+        classpath.append(File.pathSeparator);
+        classpath.append(home + File.separator + "dist" + File.separator + "lib" + File.separator +
+            "ProActive_ResourceManager.jar");
+        classpath.append(File.pathSeparator);
+        classpath.append(home + File.separator + "dist" + File.separator + "lib" + File.separator +
+            "ProActive.jar");
+        classpath.append(File.pathSeparator);
+        classpath.append(home + File.separator + "dist" + File.separator + "lib" + File.separator +
+            "script-js.jar");
+        classpath.append(File.pathSeparator);
+        classpath.append(home + File.separator + "dist" + File.separator + "lib" + File.separator +
+            "jruby-engine.jar");
+        classpath.append(File.pathSeparator);
+        classpath.append(home + File.separator + "dist" + File.separator + "lib" + File.separator +
+            "jython-engine.jar");
+        classpath.append(File.pathSeparator);
+        classpath.append(home + File.separator + "classes" + File.separator + "schedulerTests");
+        classpath.append(File.pathSeparator);
+        classpath.append(home + File.separator + "classes" + File.separator + "resource-managerTests");
+        commandLine.add("-cp");
+        commandLine.add(classpath.toString());
+        commandLine.add(CentralPAPropertyRepository.PA_TEST.getCmdLine() + "true");
+        commandLine.add(RMTStarter.class.getName());
+        commandLine.add(configurationFile);
+                
+        System.out.println("Starting RM process: " + commandLine);
+
+        ProcessBuilder processBuilder = new ProcessBuilder(commandLine);
+        processBuilder.redirectErrorStream(true);
+        rmProcess = processBuilder.start();
+        
+        InputStreamReaderThread outputReader = new InputStreamReaderThread(rmProcess.getInputStream(), "[RM VM output]: ");
+        outputReader.start();
+        
+        String url = "//" + ProActiveInet.getInstance().getHostname();
+        
+        System.out.println("Waiting for the RM using URL: " + url);
+        auth = RMConnection.waitAndJoin(url);
+
         initEventReceiver(auth);
     }
 
@@ -315,8 +356,10 @@ public class RMTHelper {
      * @throws ProActiveException
      */
     public static void killRM() throws Exception {
-        if (gcmad != null) {
-            gcmad.kill();
+        if (rmProcess != null) {
+            rmProcess.destroy();
+            rmProcess.waitFor();
+            rmProcess = null;
         }
         auth = null;
         monitor = null;
@@ -462,27 +505,6 @@ public class RMTHelper {
     //private methods
     //-------------------------------------------------------------//
 
-    private static void deployRMGCMA() throws ProActiveException {
-
-        vContract = new VariableContractImpl();
-        vContract.setVariableFromProgram(VAR_OS, OperatingSystem.getOperatingSystem().name(),
-                VariableContractType.DescriptorDefaultVariable);
-        StringBuilder properties = new StringBuilder("-Djava.security.manager");
-        properties.append(" " + CentralPAPropertyRepository.PA_HOME.getCmdLine() + "\"" +
-            CentralPAPropertyRepository.PA_HOME.getValue() + "\"");
-        properties.append(" " + CentralPAPropertyRepository.JAVA_SECURITY_POLICY.getCmdLine() + "\"" +
-            CentralPAPropertyRepository.JAVA_SECURITY_POLICY.getValue() + "\"");
-        properties.append(" " + CentralPAPropertyRepository.LOG4J.getCmdLine() + "\"" +
-            CentralPAPropertyRepository.LOG4J.getValue() + "\"");
-
-        properties.append(" " + PAResourceManagerProperties.RM_HOME.getCmdLine() + "\"" +
-            PAResourceManagerProperties.RM_HOME.getValueAsString() + "\"");
-        vContract.setVariableFromProgram("jvmargDefinedByTest", properties.toString(),
-                VariableContractType.DescriptorDefaultVariable);
-        gcmad = PAGCMDeployment.loadApplicationDescriptor(startForkedRMApplication, vContract);
-        gcmad.startDeployment();
-    }
-
     private static void initEventReceiver(RMAuthentication auth) throws Exception {
         RMMonitorsHandler mHandler = getMonitorsHandler();
         if (eventReceiver == null) {
@@ -509,8 +531,9 @@ public class RMTHelper {
      */
     public static ResourceManager connect(String name, String pass, String propertyFile) throws Exception {
         RMAuthentication authInt = getRMAuth(propertyFile);
-        Credentials cred = Credentials.createCredentials(new CredData(CredData.parseLogin(name), CredData
-                .parseDomain(name), pass), authInt.getPublicKey());
+        Credentials cred = Credentials.createCredentials(
+                new CredData(CredData.parseLogin(name), CredData.parseDomain(name), pass),
+                authInt.getPublicKey());
 
         return authInt.login(cred);
     }
@@ -520,8 +543,9 @@ public class RMTHelper {
      */
     public static ResourceManager join(String name, String pass) throws Exception {
         RMAuthentication authInt = getRMAuth();
-        Credentials cred = Credentials.createCredentials(new CredData(CredData.parseLogin(name), CredData
-                .parseDomain(name), pass), authInt.getPublicKey());
+        Credentials cred = Credentials.createCredentials(
+                new CredData(CredData.parseLogin(name), CredData.parseDomain(name), pass),
+                authInt.getPublicKey());
 
         while (true) {
             try {

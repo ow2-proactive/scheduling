@@ -36,50 +36,40 @@
  */
 package functionaltests;
 
-import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.ow2.proactive.resourcemanager.RMFactory;
-import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.RMConnection;
 
 
 /**
- * Active object that launches Resource Manager on a forked JVM.
+ * Locally launches Resource Manager. 
  *
  * @author ProActive team
  *
  */
-@ActiveObject
-public class RMLauncherAO {
+public class RMTStarter {
 
     /**
-     * ProActive empty constructor
+     * Start a Resource Manager.
+     * <p/>
+     * Must be called with one parameter: path to a RM Properties file.
      */
-    public RMLauncherAO() {
-    }
-
-    /**
-     * Start a Resource Manager in Active's Object's JVM
-     * @param RMPropPath  path to a RM Properties file, or null if not needed
-     * @return SchedulerAuthenticationInteface of created Scheduler
-     * @throws Exception if any error occurs.
-     */
-    public RMAuthentication createAndJoinForkedRM(String RMPropPath) throws Exception {
-
-        RMAuthentication auth = null;
-
-        if (RMPropPath != null) {
-            PAResourceManagerProperties.updateProperties(RMPropPath);
+    public static void main(String[] args) throws Exception {
+        if (args.length < 1) {
+            throw new IllegalArgumentException(
+                "RMTStarter must be started with one parameter: path to a RM Properties file");
         }
+
+        String RMPropPath = args[0];
+        PAResourceManagerProperties.updateProperties(RMPropPath);
 
         //Starting a local RM
         RMFactory.setOsJavaProperty();
         RMFactory.startLocal();
 
         // waiting the initialization
-        auth = RMConnection.waitAndJoin(null);
+        RMConnection.waitAndJoin(null);
 
         System.out.println("Resource Manager successfully created !");
-        return auth;
     }
 }

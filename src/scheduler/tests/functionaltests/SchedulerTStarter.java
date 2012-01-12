@@ -36,7 +36,6 @@
  */
 package functionaltests;
 
-import java.io.File;
 import java.io.Serializable;
 import java.net.URI;
 import java.util.HashMap;
@@ -51,19 +50,17 @@ import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProper
 import org.ow2.proactive.resourcemanager.frontend.RMConnection;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.scheduler.SchedulerFactory;
-import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.common.SchedulerConnection;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 
 
 /**
- * MyAO is an active object that will start a new scheduler.
- * It is used to start A scheduler in a separate JVM than the Test itself.
+ * Starts Scheduler and Resource Manager.
+ * It is used to start scheduler in a separate JVM than the Test itself.
  *
  * @author The ProActive Team
- * @since ProActive Scheduling 1.0
  */
-public class MyAO implements Serializable {
+public class SchedulerTStarter implements Serializable {
 
     protected String rmUsername = "demo";
     protected String rmPassword = "demo";
@@ -71,32 +68,24 @@ public class MyAO implements Serializable {
     protected static String schedulerDefaultURL = "//Localhost/";
 
     /**
-     * ProActive empty constructor
+     * Start a Scheduler and Resource Manager. Must be called with following
+     * arguments: 
+     * <ul>
+     * <li>first argument: true if the RM started with the scheduler has to start some nodes
+     * <li>second argument: path to a scheduler Properties file
+     * <li>third argument: path to a RM Properties file
+     * </ul>
      */
-    public MyAO() {
-    }
-
-    /**
-     * Start a Scheduler and Resource Manager in Active's Object's JVM
-     *
-     * @param localnodes true if the RM started with the scheduler has to start some nodes
-     * @param schedPropPath path to a scheduler Properties file, or null if not needed
-     * @param RMPropPath  path to a RM Properties file, or null if not needed
-     * @return SchedulerAuthenticationInteface of created Scheduler
-     * @throws Exception if any error occurs.
-     */
-    public SchedulerAuthenticationInterface createAndJoinForkedScheduler(boolean localnodes,
-            String schedPropPath, String RMPropPath) throws Exception {
-
-        SchedulerAuthenticationInterface schedulerAuth = null;
-
-        if (RMPropPath != null) {
-            PAResourceManagerProperties.updateProperties(RMPropPath);
+    public static void main(String[] args) throws Exception {
+        if (args.length < 3) {
+            throw new IllegalArgumentException("SchedulerTStarter must be started with 3 parameters: localhodes schedPropPath rmPropPath");
         }
-
-        if (schedPropPath != null) {
-            PASchedulerProperties.updateProperties(schedPropPath);
-        }
+        boolean localnodes = Boolean.valueOf(args[0]);
+        String schedPropPath = args[1];
+        String RMPropPath = args[2];
+        
+        PAResourceManagerProperties.updateProperties(RMPropPath);
+        PASchedulerProperties.updateProperties(schedPropPath);
 
         //Starting a local RM
         RMFactory.setOsJavaProperty();
@@ -109,7 +98,7 @@ public class MyAO implements Serializable {
             CentralPAPropertyRepository.PA_RMI_PORT.getValue() + "/"),
                 PASchedulerProperties.SCHEDULER_DEFAULT_POLICY.getValueAsString());
 
-        schedulerAuth = SchedulerConnection.waitAndJoin(schedulerDefaultURL);
+        SchedulerConnection.waitAndJoin(schedulerDefaultURL);
         if (localnodes) {
             ResourceManager rmAdmin = rmAuth.login(Credentials.getCredentials(PAResourceManagerProperties
                     .getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString())));
@@ -131,6 +120,5 @@ public class MyAO implements Serializable {
             }
         }
         System.out.println("Scheduler successfully created !");
-        return schedulerAuth;
     }
 }

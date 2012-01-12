@@ -40,26 +40,22 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.Assert;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
-import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveTimeoutException;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
-import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.core.xml.VariableContractImpl;
-import org.objectweb.proactive.core.xml.VariableContractType;
-import org.objectweb.proactive.extensions.gcmdeployment.PAGCMDeployment;
-import org.objectweb.proactive.gcmdeployment.GCMApplication;
-import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
-import org.objectweb.proactive.utils.OperatingSystem;
+import org.objectweb.proactive.core.util.ProActiveInet;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
+import org.ow2.proactive.scheduler.common.SchedulerConnection;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SchedulerEventListener;
@@ -81,6 +77,7 @@ import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 
+import functionaltests.common.InputStreamReaderThread;
 import functionaltests.monitor.MonitorEventReceiver;
 import functionaltests.monitor.SchedulerMonitorsHandler;
 
@@ -129,9 +126,6 @@ import functionaltests.monitor.SchedulerMonitorsHandler;
  */
 public class SchedulerTHelper {
 
-    protected static URL startForkedSchedulerApplication = SchedulerTHelper.class
-            .getResource("/functionaltests/config/StartForkedSchedulerApplication.xml");
-
     protected static URL functionalTestRMProperties = SchedulerTHelper.class
             .getResource("config/functionalTRMProperties.ini");
 
@@ -140,10 +134,9 @@ public class SchedulerTHelper {
 
     public static String schedulerDefaultURL = "//Localhost/" + SchedulerConstants.SCHEDULER_DEFAULT_NAME;
 
+    private static Process schedulerProcess;
+    
     protected static final String VAR_OS = "os";
-
-    protected static VariableContractImpl vContract;
-    protected static GCMApplication gcmad;
 
     protected static SchedulerAuthenticationInterface schedulerAuth;
 
@@ -201,7 +194,7 @@ public class SchedulerTHelper {
     }
 
     /**
-     * Starts Scheduler with a specific GCM deployment descriptor and scheduler properties file,
+     * Starts Scheduler with scheduler properties file,
      * @param localnodes true if the RM has to start some nodes
      * @param configuration the Scheduler configuration file to use (default is functionalTSchedulerProperties.ini)
      * 			null to use the default one.
@@ -226,12 +219,80 @@ public class SchedulerTHelper {
             rmPropertiesFilePath = new File(functionalTestRMProperties.toURI()).getAbsolutePath();
         }
         cleanTMP();
-        deploySchedulerGCMA();
-        GCMVirtualNode vn = gcmad.getVirtualNode("VN");
-        Node node = vn.getANode();
-        MyAO myAO = (MyAO) PAActiveObject.newActive(MyAO.class.getName(), null, node);
-        schedulerAuth = myAO.createAndJoinForkedScheduler(localnodes, schedPropertiesFilePath,
-                rmPropertiesFilePath);
+        
+        List<String> commandLine = new ArrayList<String>();
+        commandLine.add(System.getProperty("java.home") + File.separator + "bin" + File.separator + "java");
+        commandLine.add("-Djava.security.manager");
+        commandLine.add(CentralPAPropertyRepository.PA_HOME.getCmdLine() +
+            CentralPAPropertyRepository.PA_HOME.getValue());
+        commandLine.add(CentralPAPropertyRepository.JAVA_SECURITY_POLICY.getCmdLine() +
+            CentralPAPropertyRepository.JAVA_SECURITY_POLICY.getValue());
+        commandLine.add(CentralPAPropertyRepository.LOG4J.getCmdLine() +
+            CentralPAPropertyRepository.LOG4J.getValue());
+        commandLine.add(PASchedulerProperties.SCHEDULER_HOME.getCmdLine() +
+                PASchedulerProperties.SCHEDULER_HOME.getValueAsString());
+        commandLine.add(PAResourceManagerProperties.RM_HOME.getCmdLine() +
+            PAResourceManagerProperties.RM_HOME.getValueAsString());
+        if (System.getProperty("pas.launcher.forkas.method") != null) {
+            commandLine.add("-Dpas.launcher.forkas.method=" + System.getProperty("pas.launcher.forkas.method"));
+        }
+        if (System.getProperty("proactive.test.runAsMe") != null) {
+            commandLine.add("-Dproactive.test.runAsMe=true");
+        }
+
+        String home = PAResourceManagerProperties.RM_HOME.getValueAsString();
+        StringBuilder classpath = new StringBuilder();
+        classpath.append(home + File.separator + "dist" + File.separator + "lib" + File.separator +
+            "ProActive_tests.jar");
+        classpath.append(File.pathSeparator);
+        classpath.append(home + File.separator + "dist" + File.separator + "lib" + File.separator +
+            "ProActive_SRM-common.jar");
+        classpath.append(File.pathSeparator);
+        classpath.append(home + File.separator + "dist" + File.separator + "lib" + File.separator +
+                "ProActive_Scheduler-core.jar");
+        classpath.append(File.pathSeparator);
+        classpath.append(home + File.separator + "dist" + File.separator + "lib" + File.separator +
+                "ProActive_Scheduler-mapreduce.jar");
+        classpath.append(File.pathSeparator);
+        classpath.append(home + File.separator + "dist" + File.separator + "lib" + File.separator +
+            "ProActive_ResourceManager.jar");
+        classpath.append(File.pathSeparator);
+        classpath.append(home + File.separator + "dist" + File.separator + "lib" + File.separator +
+            "ProActive.jar");
+        classpath.append(File.pathSeparator);
+        classpath.append(home + File.separator + "dist" + File.separator + "lib" + File.separator +
+            "script-js.jar");
+        classpath.append(File.pathSeparator);
+        classpath.append(home + File.separator + "dist" + File.separator + "lib" + File.separator +
+            "jruby-engine.jar");
+        classpath.append(File.pathSeparator);
+        classpath.append(home + File.separator + "dist" + File.separator + "lib" + File.separator +
+            "jython-engine.jar");
+        classpath.append(File.pathSeparator);
+        classpath.append(home + File.separator + "classes" + File.separator + "schedulerTests");
+        classpath.append(File.pathSeparator);
+        classpath.append(home + File.separator + "classes" + File.separator + "resource-managerTests");
+        commandLine.add("-cp");
+        commandLine.add(classpath.toString());
+        commandLine.add(CentralPAPropertyRepository.PA_TEST.getCmdLine() + "true");
+        commandLine.add(SchedulerTStarter.class.getName());
+        commandLine.add(String.valueOf(localnodes));
+        commandLine.add(schedPropertiesFilePath);
+        commandLine.add(rmPropertiesFilePath);
+        
+        System.out.println("Starting Scheduler process: " + commandLine);
+
+        ProcessBuilder processBuilder = new ProcessBuilder(commandLine);
+        processBuilder.redirectErrorStream(true);
+        schedulerProcess = processBuilder.start();
+        
+        InputStreamReaderThread outputReader = new InputStreamReaderThread(schedulerProcess.getInputStream(), "[Scheduler VM output]: ");
+        outputReader.start();
+        
+        String url = "//" + ProActiveInet.getInstance().getHostname();
+        
+        System.out.println("Waiting for the Scheduler using URL: " + url);
+        schedulerAuth = SchedulerConnection.waitAndJoin(url);
     }
 
     /* convenience method to clean TMP from dataspace when executing test */
@@ -262,9 +323,11 @@ public class SchedulerTHelper {
     /**
      * Kill the forked Scheduler if exists.
      */
-    public static void killScheduler() {
-        if (gcmad != null) {
-            gcmad.kill();
+    public static void killScheduler() throws Exception {
+        if (schedulerProcess != null) {
+            schedulerProcess.destroy();
+            schedulerProcess.waitFor();
+            schedulerProcess = null;
         }
         schedulerAuth = null;
         adminSchedInterface = null;
@@ -284,8 +347,7 @@ public class SchedulerTHelper {
     }
 
     /**
-     * Restart the scheduler using a forked JVM,
-     * with default GCM deployment descriptor.
+     * Restart the scheduler using a forked JVM.
      * User or administrator interface is not reconnected automatically.
      *
      * @param configuration the Scheduler configuration file to use (default is functionalTSchedulerProperties.ini)
@@ -294,8 +356,6 @@ public class SchedulerTHelper {
      */
     public static void killAndRestartScheduler(String configuration) throws Exception {
         killScheduler();
-        deploySchedulerGCMA();
-        //let everything be destroyed
         startScheduler(configuration);
     }
 
@@ -1066,34 +1126,6 @@ public class SchedulerTHelper {
         }
         SchedulerState state = schedInt.addEventListener((SchedulerEventListener) eventReceiver, true, true);
         mHandler.init(state);
-    }
-
-    private static void deploySchedulerGCMA() throws ProActiveException {
-        vContract = new VariableContractImpl();
-        vContract.setVariableFromProgram(VAR_OS, OperatingSystem.getOperatingSystem().name(),
-                VariableContractType.DescriptorDefaultVariable);
-        StringBuilder properties = new StringBuilder("-Djava.security.manager");
-        properties.append(" " + CentralPAPropertyRepository.PA_HOME.getCmdLine() + "\"" +
-            CentralPAPropertyRepository.PA_HOME.getValue() + "\"");
-        properties.append(" " + CentralPAPropertyRepository.JAVA_SECURITY_POLICY.getCmdLine() + "\"" +
-            CentralPAPropertyRepository.JAVA_SECURITY_POLICY.getValue() + "\"");
-        properties.append(" " + CentralPAPropertyRepository.LOG4J.getCmdLine() + "\"" +
-            CentralPAPropertyRepository.LOG4J.getValue() + "\"");
-        properties.append(" " + PASchedulerProperties.SCHEDULER_HOME.getCmdLine() + "\"" +
-            PASchedulerProperties.SCHEDULER_HOME.getValueAsString() + "\"");
-        properties.append(" " + PAResourceManagerProperties.RM_HOME.getCmdLine() + "\"" +
-            PAResourceManagerProperties.RM_HOME.getValueAsString() + "\"");
-        if (System.getProperty("pas.launcher.forkas.method") != null) {
-            properties.append(" -Dpas.launcher.forkas.method=" +
-                System.getProperty("pas.launcher.forkas.method"));
-        }
-        if (System.getProperty("proactive.test.runAsMe") != null) {
-            properties.append(" -Dproactive.test.runAsMe=true");
-        }
-        vContract.setVariableFromProgram("jvmargDefinedByTest", properties.toString(),
-                VariableContractType.DescriptorDefaultVariable);
-        gcmad = PAGCMDeployment.loadApplicationDescriptor(startForkedSchedulerApplication, vContract);
-        gcmad.startDeployment();
     }
 
     /**
