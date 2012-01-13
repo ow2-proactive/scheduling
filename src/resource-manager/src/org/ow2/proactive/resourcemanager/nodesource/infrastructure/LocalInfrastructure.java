@@ -96,41 +96,42 @@ public class LocalInfrastructure extends InfrastructureManager {
         if (rmHome.contains(" ")) {
             containsSpace = true;
         }
-        if (!this.paProperties.contains(CentralPAPropertyRepository.JAVA_SECURITY_POLICY.getName())) {
-            this.paProperties += " " + CentralPAPropertyRepository.JAVA_SECURITY_POLICY.getCmdLine();
+        String paProperties = this.paProperties;
+        if (!paProperties.contains(CentralPAPropertyRepository.JAVA_SECURITY_POLICY.getName())) {
+            paProperties += " " + CentralPAPropertyRepository.JAVA_SECURITY_POLICY.getCmdLine();
             if (containsSpace) {
-                this.paProperties += "\"";
+                paProperties += "\"";
             }
-            this.paProperties += rmHome + "config" + osObj.fs + "security.java.policy-client";
+            paProperties += rmHome + "config" + osObj.fs + "security.java.policy-client";
             if (containsSpace) {
-                this.paProperties += "\"";
+                paProperties += "\"";
             }
         }
-        if (!this.paProperties.contains(CentralPAPropertyRepository.LOG4J.getName())) {
-            this.paProperties += " " + CentralPAPropertyRepository.LOG4J.getCmdLine();
+        if (!paProperties.contains(CentralPAPropertyRepository.LOG4J.getName())) {
+            paProperties += " " + CentralPAPropertyRepository.LOG4J.getCmdLine();
             if (containsSpace) {
-                this.paProperties += "\"";
+                paProperties += "\"";
             }
             //often needs this specific log4j config on windows... because of tty problems??
-            this.paProperties += rmHome + "config" + osObj.fs + "log4j" + osObj.fs + "rm-log4j-server";
+            paProperties += rmHome + "config" + osObj.fs + "log4j" + osObj.fs + "rm-log4j-server";
             if (containsSpace) {
-                this.paProperties += "\"";
+                paProperties += "\"";
             }
         }
-        if (!this.paProperties.contains(PAResourceManagerProperties.RM_HOME.getKey())) {
-            this.paProperties += " " + PAResourceManagerProperties.RM_HOME.getCmdLine();
+        if (!paProperties.contains(PAResourceManagerProperties.RM_HOME.getKey())) {
+            paProperties += " " + PAResourceManagerProperties.RM_HOME.getCmdLine();
             if (containsSpace) {
-                this.paProperties += "\"";
+                paProperties += "\"";
             }
-            this.paProperties += rmHome;
+            paProperties += rmHome;
             if (containsSpace) {
                 if (rmHome.endsWith("\\")) {
-                    this.paProperties += "\\";
+                    paProperties += "\\";
                 }
-                this.paProperties += "\"";
+                paProperties += "\"";
             }
         }
-        clb.setPaProperties(this.paProperties);
+        clb.setPaProperties(paProperties);
         clb.setNodeName(nodeName);
         try {
             clb.setCredentialsValueAndNullOthers(new String(this.credentials.getBase64()));
