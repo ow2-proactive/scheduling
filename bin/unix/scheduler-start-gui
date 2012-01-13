@@ -1,0 +1,189 @@
+#!/usr/bin/env bash
+
+CLASSPATH=.
+workingDir=$(dirname $0)
+. $workingDir/env scheduler-log4j-server
+
+SCHED_JVM_X_OPTS="-Xms128m -Xmx2048m"
+SCHED_JVM_D_OPTS=""
+DROP_DB=""
+SCHED_PARAMS=""
+
+SCHED_WAR=$PA_SCHEDULER/dist/war/scheduler.war
+RM_WAR=$PA_SCHEDULER/dist/war/rm.war
+REST_WAR=$PA_SCHEDULER/dist/war/rest.war
+PORT=8080
+VERBOSE=false
+
+DO_RM=true
+DO_REST=true
+DO_SCHED=true
+
+print_help () {
+	echo -e "$0 [options]"
+	echo -e ""
+	echo -e "If no option is specified, starts a new Resource Manager, starts a new Scheduler,"
+	echo -e "starts the REST API Server and the Web Interface."
+	echo -e ""
+	echo -e "-u,--rmURL URL              Connect to an existing RM instead of starting a new one"
+	echo -e "-p,--policy POLICY          Complete name of the Scheduling policy to use"
+	echo -e "-c,--clean                  Start the Scheduler server with a clean Database"
+	echo -e "-s,--sched-only             Start only the Scheduler Web App, not the RM's"
+	echo -e "-r,--rm-only                Start only the RM Web App, not the Scheduler's"
+	echo -e "-a,--api-only               Start the REST API Server only, not the GUI Web Apps"
+	echo -e "-S,--sched-war PATH         Path to the Scheduler Web Application folder or .war file"
+	echo -e "                            default: $SCHED_WAR"
+	echo -e "-R,--rm-war PATH            Path to the RM Web Application folder or .war file"
+	echo -e "                            default: $RM_WAR"
+	echo -e "-A,--api-war PATH           Path to the REST Server API Web Application folder or .war file"
+	echo -e "                            default: $REST_WAR"
+	echo -e "-P,--port PORT              HTTP server port for the Web UI. default: $PORT"
+	echo -e "-v,--verbose                Verbose output"
+	echo -e "-h,--help                   Print this message and exit"
+	echo -e "-Dxxx                       JVM option for the RM, Scheduler and HTTP servers."
+	echo -e "                            ie -Dproactive.communication.protocol=pnp"
+	echo -e ""
+}
+
+stop () {
+	echo "Error: $1";
+	echo "Use -h to print help";
+	exit 1;
+}
+
+
+cleanup () {
+	# do not use the bash builtin, which does not know the negative-pid syntax
+	/bin/kill -- -$$
+}
+
+trap cleanup 2
+
+
+
+while [ $# -gt 0 ]; do
+	case $1 in
+		-h | --help)
+			print_help
+			exit 0;;
+		-v | --verbose)
+			VERBOSE=true
+			shift 1;;
+		-u | --rmURL)
+			[ $# -eq 1 ] && stop "$1 requires an argument"
+			SCHED_PARAMS=$SCHED_PARAMS" $1 $2"
+			RM_URL=$2
+			shift 2;;
+		-p | --policy)
+			[ $# -eq 1 ] && stop "$1 requires an argument"
+			SCHED_PARAMS=$SCHED_PARAMS" $1 $2"
+			shift 2;;
+		-c | --clean)
+			DROP_DB="-Dpa.scheduler.db.hibernate.dropdb=true -Dpa.rm.db.hibernate.dropdb=true"
+			shift 1;;
+		-s | --sched-only)
+			DO_SCHED=true
+			DO_RM=false
+			DO_REST=true
+			shift;;
+		-r | --rm-only)
+			DO_SCHED=false
+			DO_RM=true
+			DO_REST=true
+			shift;;
+		-a | --api-only)
+			DO_SCHED=false
+			DO_RM=false
+			DO_REST=true
+			shift;;
+		-S | --sched-war)
+			[ $# -eq 1 ] && stop "$1 requires an argument"
+			SCHED_WAR=$2
+			shift 2;;
+		-R | --rm-war)
+			[ $# -eq 1 ] && stop "$1 requires an argument"
+			RM_WAR=$2
+			shift 2;;
+		-A | --api-war)
+			[ $# -eq 1 ] && stop "$1 requires an argument"
+			REST_WAR=$2
+			shift 2;;
+		-P | --port)
+			[ $# -eq 1 ] && stop "$1 requires an argument"
+			PORT=$2
+			shift 2;;
+		*)
+			if [ $(echo $1 | grep '^-D.*$') ]; then
+				SCHED_JVM_D_OPTS="$SCHED_JVM_D_OPTS $1"
+			else
+				stop "Unknown option: $1"
+			fi
+			shift;;
+
+	esac
+done
+
+
+SCHED_OUT=$(mktemp scheduler.XXXXXX.out --tmpdir)
+
+eval $JAVACMD \
+	-Dderby.stream.error.file=\"$PA_SCHEDULER/.logs/derby.log\" \
+	$DROP_DB \
+	$SCHED_JVM_X_OPTS \
+	org.ow2.proactive.scheduler.util.SchedulerStarter \
+	$SCHED_JVM_D_OPTS \
+	$SCHED_PARAMS \
+	| tee $SCHED_OUT 2>&1 &
+
+SCHED_PID=$!
+
+SCHED_LINE="Scheduler successfully created on "
+RM_LINE="Resource Manager created on "
+
+while true; do
+	if [ "$(grep "$SCHED_LINE" $SCHED_OUT)" ]; then
+		SCHED_URL=$(grep "$SCHED_LINE" $SCHED_OUT| sed -e "s/^${SCHED_LINE}\(.*\)/\1/g")
+		break;
+	fi
+
+	if [ "$(grep "$RM_LINE" $SCHED_OUT)" ]; then
+		RM_URL=$(grep "$RM_LINE" $SCHED_OUT| sed -e "s/^${RM_LINE}\(.*\)/\1/g")
+	fi
+
+	if [ ! "$(ps | grep $SCHED_PID)" ]; then
+		# I don't see a way to return the exit code from the forked process
+		exit 1;
+	fi
+	sleep 1s
+done
+
+CMD="-A $REST_WAR -p $PORT"
+NOJETTY=false
+
+nojetty () {
+	echo "Not deploying Web Interface: $1"
+	NOJETTY=true
+}
+
+[ ! -f $REST_WAR ] && nojetty "Missing file $REST_WAR"
+
+if [ $DO_SCHED = true ]; then
+	[ ! -f $SCHED_WAR ] && nojetty "Missing file $SCHED_WAR"
+	[ ! $SCHED_URL ] && nojetty "Could not determine Scheduler URL"
+	CMD=$CMD" -S $SCHED_WAR -s $SCHED_URL"
+fi
+if [ $DO_RM = true ]; then
+	[ ! -f $RM_WAR ] && nojetty "Missing file $RM_WAR"
+	[ ! $RM_URL ] && nojetty "Could not determine RM URL"
+	CMD=$CMD" -R $RM_WAR -r $RM_URL"
+fi
+if [ $VERBOSE = false ]; then
+	CMD=$CMD" -q"
+fi
+
+if [ $NOJETTY = false ]; then
+	. $(dirname $0)/jetty-launcher $CMD $SCHED_JVM_D_OPTS &
+fi
+
+
+wait
