@@ -29,8 +29,6 @@
 	<classpathentry kind="lib" path="lib/ProActive/cog-jglobus-1.2.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/cog-ogce.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/colobus-0.1.jar"/>
-	<classpathentry kind="lib" path="lib/ProActive/colt.jar"/>
-	<classpathentry kind="lib" path="lib/ProActive/concurrent.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/cryptix.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/cryptix32.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/cryptix-asn1.jar"/>
@@ -43,7 +41,6 @@
 	<classpathentry kind="lib" path="lib/ProActive/jcommon-1.0.6.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/jdom.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/jfreechart-1.0.2.jar"/>
-	<classpathentry kind="lib" path="lib/ProActive/jung-1.7.4.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/log4j.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/mail.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/moduleloader.jar"/>

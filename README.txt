@@ -39,6 +39,32 @@ administration guide will help you to tune the scheduler, and the user guide
 will explain how to build and submit jobs.
 
 
+*** Prepare project for compilation
+
+Scheduling project depends on the ProActive Programming project. To build Scheduling
+it is necessary to copy there all binaries produced as result of Programming 
+compilation: content of the 'Programming/dist/lib' into the 'Scheduler/lib/ProActive'.
+This can be done using special ant target (this target assumes that special build property 
+'programming.project.dir' contains path to the compiled ProActive Programming project):
+    o Under Linux:
+      cd compile
+      ./build copy.dependencies  (check that the build script has executable permission)
+
+    o Under Windows:
+      cd compile
+      build.bat copy.dependencies
+
+Also special ant script was created for quick start with Scheduling project:
+- check out 'build' project (svn://scm.gforge.inria.fr/svn/proactive/build)
+- go to the build project
+- execute 'ant prepare-scheduling' 
+This ant target will check out ProActive Programming and Scheduling projects, 
+compile Programming and will copy all required dependencies into the Scheduling, 
+after this Scheduling project is completely ready for compilation (note: before executing 
+ant script it is possible to modify some script parameters like svn url to use, 
+see build/build.properties for all available options).
+  
+
 *** Compilation :
 
 If you want to recompile all sources and generate all jar files:

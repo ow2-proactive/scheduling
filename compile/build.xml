@@ -10,10 +10,7 @@
 	
     <target name="copy.dependencies" description="Copy dependencies from the compiled Programming project">
         <copy todir="${lib.dir}/ProActive" overwrite="true">
-            <fileset dir="${programming.project.dir}/dist/lib">
-                <include name="ProActive.jar"/>
-                <include name="ProActive_utils.jar"/>
-            </fileset>
+            <fileset dir="${programming.project.dir}/dist/lib" includes="*/**" />
         </copy>
     </target>
     
