@@ -112,9 +112,19 @@ public class NodeSourcePriorityPolicy implements SelectionPolicy {
     /**
      * Sort by node source priorities.
      * 
-     * @return the same list but shuffled (allowed by interface specification).
+     * @return the list arranged according to the node source priorities
      */
     public List<RMNode> arrangeNodes(int number, List<RMNode> nodes, Client client) {
+
+        if (nodeSources == null) {
+            logger.error("The policy config was not loaded");
+            return nodes;
+        }
+        if (nodeSources.size() == 0) {
+            logger.debug("The policy config is empty");
+            return nodes;
+        }
+
         logger.debug("Arranging nodes according to node sources priorities");
 
         HashMap<String, List<RMNode>> nodesMap = new HashMap<String, List<RMNode>>();
@@ -132,14 +142,10 @@ public class NodeSourcePriorityPolicy implements SelectionPolicy {
                 arranged.addAll(nodesMap.get(ns));
                 nodesMap.remove(ns);
 
-                if (arranged.size() > number) {
+                if (arranged.size() >= number) {
                     break;
                 }
             }
-        }
-
-        if (arranged.size() > number) {
-            return arranged.subList(0, number);
         }
 
         for (String ns : nodesMap.keySet()) {
