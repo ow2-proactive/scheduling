@@ -176,7 +176,7 @@ CLASS=org.ow2.proactive.utils.JettyLauncher
 
 
 if [ $VERBOSE_JETTY = false ]; then
-	LOGFILE=$(mktemp XXXXXX.log --tmpdir)
+	LOGFILE=$(mktemp --tmpdir)
 	[ $VERBOSE = true ] && echo "Jetty Launcher logs to $LOGFILE"
 	LOG="-l $LOGFILE"
 fi

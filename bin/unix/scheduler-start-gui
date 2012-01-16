@@ -124,7 +124,7 @@ while [ $# -gt 0 ]; do
 done
 
 
-SCHED_OUT=$(mktemp scheduler.XXXXXX.out --tmpdir)
+SCHED_OUT=$(mktemp --tmpdir)
 
 eval $JAVACMD \
 	-Dderby.stream.error.file=\"$PA_SCHEDULER/.logs/derby.log\" \
