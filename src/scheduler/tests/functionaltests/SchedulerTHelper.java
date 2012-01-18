@@ -78,6 +78,7 @@ import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 
 import functionaltests.common.InputStreamReaderThread;
+import functionaltests.common.CommonTUtils;
 import functionaltests.monitor.MonitorEventReceiver;
 import functionaltests.monitor.SchedulerMonitorsHandler;
 
@@ -135,7 +136,7 @@ public class SchedulerTHelper {
     public static String schedulerDefaultURL = "//Localhost/" + SchedulerConstants.SCHEDULER_DEFAULT_NAME;
 
     private static Process schedulerProcess;
-    
+
     protected static final String VAR_OS = "os";
 
     protected static SchedulerAuthenticationInterface schedulerAuth;
@@ -219,7 +220,7 @@ public class SchedulerTHelper {
             rmPropertiesFilePath = new File(functionalTestRMProperties.toURI()).getAbsolutePath();
         }
         cleanTMP();
-        
+
         List<String> commandLine = new ArrayList<String>();
         commandLine.add(System.getProperty("java.home") + File.separator + "bin" + File.separator + "java");
         commandLine.add("-Djava.security.manager");
@@ -230,11 +231,12 @@ public class SchedulerTHelper {
         commandLine.add(CentralPAPropertyRepository.LOG4J.getCmdLine() +
             CentralPAPropertyRepository.LOG4J.getValue());
         commandLine.add(PASchedulerProperties.SCHEDULER_HOME.getCmdLine() +
-                PASchedulerProperties.SCHEDULER_HOME.getValueAsString());
+            PASchedulerProperties.SCHEDULER_HOME.getValueAsString());
         commandLine.add(PAResourceManagerProperties.RM_HOME.getCmdLine() +
             PAResourceManagerProperties.RM_HOME.getValueAsString());
         if (System.getProperty("pas.launcher.forkas.method") != null) {
-            commandLine.add("-Dpas.launcher.forkas.method=" + System.getProperty("pas.launcher.forkas.method"));
+            commandLine.add("-Dpas.launcher.forkas.method=" +
+                System.getProperty("pas.launcher.forkas.method"));
         }
         if (System.getProperty("proactive.test.runAsMe") != null) {
             commandLine.add("-Dproactive.test.runAsMe=true");
@@ -249,10 +251,10 @@ public class SchedulerTHelper {
             "ProActive_SRM-common.jar");
         classpath.append(File.pathSeparator);
         classpath.append(home + File.separator + "dist" + File.separator + "lib" + File.separator +
-                "ProActive_Scheduler-core.jar");
+            "ProActive_Scheduler-core.jar");
         classpath.append(File.pathSeparator);
         classpath.append(home + File.separator + "dist" + File.separator + "lib" + File.separator +
-                "ProActive_Scheduler-mapreduce.jar");
+            "ProActive_Scheduler-mapreduce.jar");
         classpath.append(File.pathSeparator);
         classpath.append(home + File.separator + "dist" + File.separator + "lib" + File.separator +
             "ProActive_ResourceManager.jar");
@@ -279,18 +281,19 @@ public class SchedulerTHelper {
         commandLine.add(String.valueOf(localnodes));
         commandLine.add(schedPropertiesFilePath);
         commandLine.add(rmPropertiesFilePath);
-        
+
         System.out.println("Starting Scheduler process: " + commandLine);
 
         ProcessBuilder processBuilder = new ProcessBuilder(commandLine);
         processBuilder.redirectErrorStream(true);
         schedulerProcess = processBuilder.start();
-        
-        InputStreamReaderThread outputReader = new InputStreamReaderThread(schedulerProcess.getInputStream(), "[Scheduler VM output]: ");
+
+        InputStreamReaderThread outputReader = new InputStreamReaderThread(schedulerProcess.getInputStream(),
+            "[Scheduler VM output]: ");
         outputReader.start();
-        
+
         String url = "//" + ProActiveInet.getInstance().getHostname();
-        
+
         System.out.println("Waiting for the Scheduler using URL: " + url);
         schedulerAuth = SchedulerConnection.waitAndJoin(url);
     }
@@ -328,6 +331,10 @@ public class SchedulerTHelper {
             schedulerProcess.destroy();
             schedulerProcess.waitFor();
             schedulerProcess = null;
+
+            // sometimes RM_NODE object isn't removed from the RMI registry after JVM with RM is killed (SCHEDULING-1498)
+            String rmNodeName = PAResourceManagerProperties.RM_NODE_NAME.getValueAsString();
+            CommonTUtils.cleanupActiveObjectRegistry(rmNodeName);
         }
         schedulerAuth = null;
         adminSchedInterface = null;
@@ -1134,8 +1141,8 @@ public class SchedulerTHelper {
      */
     private static void connect() throws Exception {
         SchedulerAuthenticationInterface authInt = getSchedulerAuth();
-        Credentials cred = Credentials.createCredentials(new CredData(username, password), authInt
-                .getPublicKey());
+        Credentials cred = Credentials.createCredentials(new CredData(username, password),
+                authInt.getPublicKey());
         adminSchedInterface = authInt.login(cred);
         initEventReceiver(adminSchedInterface);
     }

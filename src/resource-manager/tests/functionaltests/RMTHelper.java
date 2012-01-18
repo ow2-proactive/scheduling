@@ -72,6 +72,7 @@ import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.ow2.proactive.utils.FileToBytesConverter;
 import org.ow2.tests.ProActiveSetup;
 
+import functionaltests.common.CommonTUtils;
 import functionaltests.common.InputStreamReaderThread;
 import functionaltests.monitor.RMMonitorEventReceiver;
 import functionaltests.monitor.RMMonitorsHandler;
@@ -309,18 +310,19 @@ public class RMTHelper {
         commandLine.add(CentralPAPropertyRepository.PA_TEST.getCmdLine() + "true");
         commandLine.add(RMTStarter.class.getName());
         commandLine.add(configurationFile);
-                
+
         System.out.println("Starting RM process: " + commandLine);
 
         ProcessBuilder processBuilder = new ProcessBuilder(commandLine);
         processBuilder.redirectErrorStream(true);
         rmProcess = processBuilder.start();
-        
-        InputStreamReaderThread outputReader = new InputStreamReaderThread(rmProcess.getInputStream(), "[RM VM output]: ");
+
+        InputStreamReaderThread outputReader = new InputStreamReaderThread(rmProcess.getInputStream(),
+            "[RM VM output]: ");
         outputReader.start();
-        
+
         String url = "//" + ProActiveInet.getInstance().getHostname();
-        
+
         System.out.println("Waiting for the RM using URL: " + url);
         auth = RMConnection.waitAndJoin(url);
 
@@ -360,6 +362,10 @@ public class RMTHelper {
             rmProcess.destroy();
             rmProcess.waitFor();
             rmProcess = null;
+
+            // sometimes RM_NODE object isn't removed from the RMI registry after JVM with RM is killed (SCHEDULING-1498)
+            String rmNodeName = PAResourceManagerProperties.RM_NODE_NAME.getValueAsString();
+            CommonTUtils.cleanupActiveObjectRegistry(rmNodeName);
         }
         auth = null;
         monitor = null;
