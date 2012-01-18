@@ -69,11 +69,12 @@ public class NodeSourcePriorityPolicy implements SelectionPolicy {
     // when the file was modified
     private long lastModified = 0;
     private List<String> nodeSources;
+    private final String configFileName;
 
     public NodeSourcePriorityPolicy() {
-        String configFileName = System.getProperty(CONFIG_NAME_PROPERTY);
+        configFileName = System.getProperty(CONFIG_NAME_PROPERTY);
         if (configFileName != null) {
-            reloadFile(configFileName);
+            reloadConfig();
         } else {
             throw new IllegalArgumentException("Config file is not specified");
         }
@@ -83,7 +84,7 @@ public class NodeSourcePriorityPolicy implements SelectionPolicy {
      * Reload config if it has been changed.
      * @param configFileName
      */
-    private void reloadFile(String configFileName) {
+    private void reloadConfig() {
         File config = new File(configFileName);
         if (config.exists()) {
             if (lastModified < config.lastModified()) {
@@ -124,6 +125,8 @@ public class NodeSourcePriorityPolicy implements SelectionPolicy {
             logger.debug("The policy config is empty");
             return nodes;
         }
+
+        reloadConfig();
 
         logger.debug("Arranging nodes according to node sources priorities");
 
