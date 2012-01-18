@@ -1253,7 +1253,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      *            the id of the job
      * @return true if success, false if not
      */
-    @POST
+    @PUT
     @Path("jobs/{jobid}/pause")
     @Produces("application/json")
     public boolean pauseJob(@HeaderParam("sessionid") final String sessionId,
@@ -1276,7 +1276,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      *            the id of the job
      * @return true if success, false if not
      */
-    @POST
+    @PUT
     @Path("jobs/{jobid}/resume")
     @Produces("application/json")
     public boolean resumeJob(@HeaderParam("sessionid") final String sessionId,

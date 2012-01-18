@@ -443,7 +443,7 @@ public interface SchedulerRestInterface {
      * @param jobId the id of the job
      * @return true if success, false if not
      */
-    @POST
+    @PUT
     @Path("jobs/{jobid}/pause")
     @Produces("application/json")
     public abstract boolean pauseJob(@HeaderParam("sessionid") final String sessionId,
@@ -456,7 +456,7 @@ public interface SchedulerRestInterface {
      * @param jobId the id of the job
      * @return true if success, false if not
      */
-    @POST
+    @PUT
     @Path("jobs/{jobid}/resume")
     @Produces("application/json")
     public abstract boolean resumeJob(@HeaderParam("sessionid") final String sessionId,
