@@ -108,6 +108,8 @@ public class NodeSource implements InitActive, RunActive {
     /** Default name */
     public static final String LOCAL_INFRASTRUCTURE_NAME = "LocalNodes";
     public static final String DEFAULT = "Default";
+    public static final int INTERNAL_POOL = 0;
+    public static final int EXTERNAL_POOL = 1;
 
     /** unique name of the source */
     private final String name;
@@ -125,8 +127,7 @@ public class NodeSource implements InitActive, RunActive {
     private Map<String, Node> downNodes;
 
     private static int instanceCount = 0;
-    private static ExecutorService internalThreadPool;
-    private static ExecutorService externalThreadPool;
+    private static ThreadPoolHolder threadPoolHolder;
     private NodeSource stub;
     private final Client administrator;
 
@@ -209,12 +210,21 @@ public class NodeSource implements InitActive, RunActive {
 
         Thread.currentThread().setName("Node Source \"" + name + "\"");
 
-        try {
-            // executor service initialization
-            initExecutorService();
-        } catch (Exception e) {
-            e.printStackTrace();
+        if (instanceCount == 0) {
+            try {
+                int maxThreads = PAResourceManagerProperties.RM_NODESOURCE_MAX_THREAD_NUMBER.getValueAsInt();
+                if (maxThreads < 2) {
+                    maxThreads = 2;
+                }
+
+                // executor service initialization
+                NodeSource.threadPoolHolder = new ThreadPoolHolder(
+                    new int[] { maxThreads / 2, maxThreads / 2 });
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
+        instanceCount++;
     }
 
     public void runActivity(Body body) {
@@ -420,7 +430,7 @@ public class NodeSource implements InitActive, RunActive {
      * @throws Exception if node was not looked up
      */
     private Node lookupNode(String nodeUrl, long timeout) throws Exception {
-        Future<Node> futureNode = internalThreadPool.submit(new NodeLocator(nodeUrl));
+        Future<Node> futureNode = threadPoolHolder.submit(INTERNAL_POOL, new NodeLocator(nodeUrl));
         return futureNode.get(timeout, TimeUnit.MILLISECONDS);
     }
 
@@ -582,22 +592,13 @@ public class NodeSource implements InitActive, RunActive {
 
         PAActiveObject.terminateActiveObject(false);
 
-        synchronized (NodeSource.class) {
-            instanceCount--;
+        instanceCount--;
 
-            if (instanceCount == 0) {
-                // terminating thread pool
-                internalThreadPool.shutdown();
-                externalThreadPool.shutdown();
-                try {
-                    // waiting until all nodes will be removed
-                    internalThreadPool.awaitTermination(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
-                    externalThreadPool.awaitTermination(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
-                } catch (InterruptedException e) {
-                    logger.warn("", e);
-                }
-                internalThreadPool = null;
-                externalThreadPool = null;
+        if (instanceCount == 0) {
+            try {
+                NodeSource.threadPoolHolder.shutdown();
+            } catch (InterruptedException e) {
+                logger.warn("", e);
             }
         }
     }
@@ -683,26 +684,8 @@ public class NodeSource implements InitActive, RunActive {
      * @param command to execute
      */
     @ImmediateService
-    public void executeInParallel(Runnable command) {
-        externalThreadPool.execute(command);
-    }
-
-    /**
-     * Instantiates the thread pool if it is null.
-     */
-    private synchronized static void initExecutorService() {
-        instanceCount++;
-
-        if (internalThreadPool == null) {
-            int maxThreads = PAResourceManagerProperties.RM_NODESOURCE_MAX_THREAD_NUMBER.getValueAsInt();
-            if (maxThreads < 2) {
-                maxThreads = 2;
-            }
-            internalThreadPool = Executors.newFixedThreadPool(maxThreads / 2, new NamedThreadFactory(
-                "Node Source internal threadpool"));
-            externalThreadPool = Executors.newFixedThreadPool(maxThreads / 2, new NamedThreadFactory(
-                "Node Source external threadpool"));
-        }
+    public void executeInParallel(Runnable task) {
+        NodeSource.threadPoolHolder.execute(EXTERNAL_POOL, task);
     }
 
     /**
