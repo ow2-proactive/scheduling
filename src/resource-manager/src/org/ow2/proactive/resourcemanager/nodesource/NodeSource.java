@@ -124,6 +124,7 @@ public class NodeSource implements InitActive, RunActive {
 
     private static AtomicInteger instanceCount = new AtomicInteger(0);
     private static ThreadPoolHolder threadPoolHolder;
+
     private NodeSource stub;
     private final Client administrator;
 
@@ -140,6 +141,20 @@ public class NodeSource implements InitActive, RunActive {
     // user can get nodes for running computations
     // level is configured by ns admin at the moment of ns creation
     private AccessType nodeUserAccessType;
+
+    static {
+        try {
+            int maxThreads = PAResourceManagerProperties.RM_NODESOURCE_MAX_THREAD_NUMBER.getValueAsInt();
+            if (maxThreads < 2) {
+                maxThreads = 2;
+            }
+
+            // executor service initialization
+            NodeSource.threadPoolHolder = new ThreadPoolHolder(new int[] { maxThreads / 2, maxThreads / 2 });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     /**
      * Creates a new instance of NodeSource.
@@ -205,21 +220,7 @@ public class NodeSource implements InitActive, RunActive {
         nodeSourcePolicy.setNodeSource((NodeSource) PAActiveObject.getStubOnThis());
 
         Thread.currentThread().setName("Node Source \"" + name + "\"");
-
-        if (instanceCount.incrementAndGet() == 1) {
-            try {
-                int maxThreads = PAResourceManagerProperties.RM_NODESOURCE_MAX_THREAD_NUMBER.getValueAsInt();
-                if (maxThreads < 2) {
-                    maxThreads = 2;
-                }
-
-                // executor service initialization
-                NodeSource.threadPoolHolder = new ThreadPoolHolder(
-                    new int[] { maxThreads / 2, maxThreads / 2 });
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
+        instanceCount.incrementAndGet();
     }
 
     public void runActivity(Body body) {
