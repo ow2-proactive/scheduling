@@ -1140,8 +1140,8 @@ public class SchedulerTHelper {
      */
     private static void connect() throws Exception {
         SchedulerAuthenticationInterface authInt = getSchedulerAuth();
-        Credentials cred = Credentials.createCredentials(new CredData(username, password),
-                authInt.getPublicKey());
+        Credentials cred = Credentials.createCredentials(new CredData(username, password), authInt
+                .getPublicKey());
         adminSchedInterface = authInt.login(cred);
         initEventReceiver(adminSchedInterface);
     }

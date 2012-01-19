@@ -169,9 +169,7 @@ public class RMTHelper {
         //first emtpy im parameter is default rm url
         byte[] creds = FileToBytesConverter.convertFileToByteArray(new File(PAResourceManagerProperties
                 .getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString())));
-        rm.createNodeSource(
-                NodeSource.LOCAL_INFRASTRUCTURE_NAME,
-                LocalInfrastructure.class.getName(),
+        rm.createNodeSource(NodeSource.LOCAL_INFRASTRUCTURE_NAME, LocalInfrastructure.class.getName(),
                 new Object[] { "", creds, RMTHelper.defaultNodesNumber, RMTHelper.defaultNodesTimeout,
                         setup.getJvmParameters() }, StaticPolicy.class.getName(), null);
     }
@@ -536,9 +534,8 @@ public class RMTHelper {
      */
     public static ResourceManager connect(String name, String pass, String propertyFile) throws Exception {
         RMAuthentication authInt = getRMAuth(propertyFile);
-        Credentials cred = Credentials.createCredentials(
-                new CredData(CredData.parseLogin(name), CredData.parseDomain(name), pass),
-                authInt.getPublicKey());
+        Credentials cred = Credentials.createCredentials(new CredData(CredData.parseLogin(name), CredData
+                .parseDomain(name), pass), authInt.getPublicKey());
 
         return authInt.login(cred);
     }
@@ -548,9 +545,8 @@ public class RMTHelper {
      */
     public static ResourceManager join(String name, String pass) throws Exception {
         RMAuthentication authInt = getRMAuth();
-        Credentials cred = Credentials.createCredentials(
-                new CredData(CredData.parseLogin(name), CredData.parseDomain(name), pass),
-                authInt.getPublicKey());
+        Credentials cred = Credentials.createCredentials(new CredData(CredData.parseLogin(name), CredData
+                .parseDomain(name), pass), authInt.getPublicKey());
 
         while (true) {
             try {

@@ -78,12 +78,13 @@ public class SchedulerTStarter implements Serializable {
      */
     public static void main(String[] args) throws Exception {
         if (args.length < 3) {
-            throw new IllegalArgumentException("SchedulerTStarter must be started with 3 parameters: localhodes schedPropPath rmPropPath");
+            throw new IllegalArgumentException(
+                "SchedulerTStarter must be started with 3 parameters: localhodes schedPropPath rmPropPath");
         }
         boolean localnodes = Boolean.valueOf(args[0]);
         String schedPropPath = args[1];
         String RMPropPath = args[2];
-        
+
         PAResourceManagerProperties.updateProperties(RMPropPath);
         PASchedulerProperties.updateProperties(schedPropPath);
 
