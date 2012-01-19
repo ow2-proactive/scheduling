@@ -42,10 +42,9 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
@@ -61,9 +60,6 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
-import org.objectweb.proactive.utils.NamedThreadFactory;
-import org.ow2.proactive.authentication.principals.GroupNamePrincipal;
-import org.ow2.proactive.authentication.principals.IdentityPrincipal;
 import org.ow2.proactive.authentication.principals.UserNamePrincipal;
 import org.ow2.proactive.permissions.PrincipalPermission;
 import org.ow2.proactive.resourcemanager.authentication.Client;
@@ -126,7 +122,7 @@ public class NodeSource implements InitActive, RunActive {
     private Map<String, Node> nodes;
     private Map<String, Node> downNodes;
 
-    private static int instanceCount = 0;
+    private static AtomicInteger instanceCount = new AtomicInteger(0);
     private static ThreadPoolHolder threadPoolHolder;
     private NodeSource stub;
     private final Client administrator;
@@ -210,7 +206,7 @@ public class NodeSource implements InitActive, RunActive {
 
         Thread.currentThread().setName("Node Source \"" + name + "\"");
 
-        if (instanceCount == 0) {
+        if (instanceCount.incrementAndGet() == 1) {
             try {
                 int maxThreads = PAResourceManagerProperties.RM_NODESOURCE_MAX_THREAD_NUMBER.getValueAsInt();
                 if (maxThreads < 2) {
@@ -224,7 +220,6 @@ public class NodeSource implements InitActive, RunActive {
                 e.printStackTrace();
             }
         }
-        instanceCount++;
     }
 
     public void runActivity(Body body) {
@@ -592,9 +587,7 @@ public class NodeSource implements InitActive, RunActive {
 
         PAActiveObject.terminateActiveObject(false);
 
-        instanceCount--;
-
-        if (instanceCount == 0) {
+        if (instanceCount.decrementAndGet() == 0) {
             try {
                 NodeSource.threadPoolHolder.shutdown();
             } catch (InterruptedException e) {
