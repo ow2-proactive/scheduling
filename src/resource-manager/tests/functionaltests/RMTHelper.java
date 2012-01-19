@@ -364,8 +364,7 @@ public class RMTHelper {
             rmProcess = null;
 
             // sometimes RM_NODE object isn't removed from the RMI registry after JVM with RM is killed (SCHEDULING-1498)
-            String rmNodeName = PAResourceManagerProperties.RM_NODE_NAME.getValueAsString();
-            CommonTUtils.cleanupActiveObjectRegistry(rmNodeName);
+            CommonTUtils.cleanupRMActiveObjectRegistry();
         }
         auth = null;
         monitor = null;

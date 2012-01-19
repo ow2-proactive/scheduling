@@ -41,21 +41,32 @@ import java.net.URI;
 import org.objectweb.proactive.core.remoteobject.AbstractRemoteObjectFactory;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectFactory;
 import org.objectweb.proactive.core.util.ProActiveInet;
+import org.ow2.proactive.resourcemanager.common.RMConstants;
+import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
+
 
 public class CommonTUtils {
+
+    public static void cleanupRMActiveObjectRegistry() throws Exception {
+        cleanupActiveObjectRegistry(PAResourceManagerProperties.RM_NODE_NAME.getValueAsString(),
+                RMConstants.NAME_ACTIVE_OBJECT_RMCORE, RMConstants.NAME_ACTIVE_OBJECT_RMADMIN,
+                RMConstants.NAME_ACTIVE_OBJECT_RMAUTHENTICATION, RMConstants.NAME_ACTIVE_OBJECT_RMUSER,
+                RMConstants.NAME_ACTIVE_OBJECT_RMMONITORING);
+    }
 
     public static void cleanupActiveObjectRegistry(String... namesToRemove) throws Exception {
         String url = "//" + ProActiveInet.getInstance().getHostname();
 
-        RemoteObjectFactory factory = AbstractRemoteObjectFactory.getDefaultRemoteObjectFactory(); 
+        RemoteObjectFactory factory = AbstractRemoteObjectFactory.getDefaultRemoteObjectFactory();
         for (URI uri : factory.list(new URI(url))) {
             for (String name : namesToRemove) {
                 if (uri.getPath().endsWith(name)) {
                     System.out.println("Unregistering object with URI: " + uri);
                     factory.unregister(uri);
+                    break;
                 }
             }
         }
     }
-    
+
 }
