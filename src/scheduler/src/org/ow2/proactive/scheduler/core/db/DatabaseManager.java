@@ -55,7 +55,7 @@ public class DatabaseManager {
      *
      * @return the scheduler database manager instance
      */
-    public static SchedulerDatabaseManager getInstance() {
+    public synchronized static SchedulerDatabaseManager getInstance() {
         if (dbManager == null) {
             if (System.getProperty(JAVA_PROPERTYNAME_NODB) != null) {
                 dbManager = new SchedulerDatabaseManagerSelector(new SchedulerEmptyDatabaseManager());
