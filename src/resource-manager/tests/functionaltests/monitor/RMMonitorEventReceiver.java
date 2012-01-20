@@ -46,13 +46,14 @@ import org.ow2.proactive.resourcemanager.common.event.RMInitialState;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.frontend.RMEventListener;
+import org.ow2.proactive.resourcemanager.frontend.RMGroupEventListener;
 import org.ow2.proactive.resourcemanager.frontend.RMMonitoring;
 
 import functionaltests.RMTHelper;
 
 
 @ActiveObject
-public class RMMonitorEventReceiver implements RMEventListener {
+public class RMMonitorEventReceiver extends RMGroupEventListener {
 
     private RMMonitorsHandler monitorsHandler;
 

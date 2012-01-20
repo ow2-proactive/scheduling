@@ -248,40 +248,30 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
             }
 
             LinkedList<RMEvent> toDeliver = new LinkedList<RMEvent>();
-            while (true) {
-                synchronized (events) {
+            synchronized (events) {
+                if (logger.isDebugEnabled()) {
+                    logger.debug(events.size() + " pending events for the client '" + client + "'");
+                }
+
+                if (events.size() > 0) {
+                    toDeliver.clear();
+                    toDeliver.addAll(events);
+                    events.clear();
+                }
+                inProcess.set(false);
+            }
+
+            if (toDeliver.size() > 0) {
+                if (deliverEvents(toDeliver)) {
                     if (logger.isDebugEnabled()) {
-                        logger.debug(events.size() + " pending events for the client '" + client + "'");
-                    }
-
-                    if (events.size() > 0) {
-                        toDeliver.clear();
-                        toDeliver.addAll(events);
-                        events.clear();
-                    } else {
-                        inProcess.set(false);
-                        break;
+                        logger.debug("Finnishing delivery in " + Thread.currentThread() + " to client '" +
+                            client + "'. " + toDeliver.size() + " events were delivered in " +
+                            (System.currentTimeMillis() - timeStamp) + " ms");
                     }
                 }
 
-                if (toDeliver.size() > 0) {
-                    if (deliverEvents(toDeliver)) {
-                        if (logger.isDebugEnabled()) {
-                            logger.debug("Finnishing delivery in " + Thread.currentThread() + " to client '" +
-                                client + "'. " + toDeliver.size() + " events were delivered in " +
-                                (System.currentTimeMillis() - timeStamp) + " ms");
-                        }
-                    }
-                    try {
-                        // do not send group events often than half a second 
-                        Thread.sleep(500);
-                    } catch (InterruptedException e) {
-                        logger.error("", e);
-                    }
-
-                } else {
-                    logger.debug("No events to deliver to client " + client);
-                }
+            } else {
+                logger.debug("No events to deliver to client " + client);
             }
         }
 
