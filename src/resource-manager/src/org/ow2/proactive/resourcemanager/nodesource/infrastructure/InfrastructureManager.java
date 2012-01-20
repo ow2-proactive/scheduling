@@ -286,6 +286,10 @@ public abstract class InfrastructureManager implements Serializable {
         this.deployingNodes.clear();
         //delegating the call to the implementation
         this.shutDown();
+
+        if (timeouter != null) {
+            timeouter.cancel();
+        }
     }
 
     //**********************************************************************************************\\
@@ -559,7 +563,7 @@ public abstract class InfrastructureManager implements Serializable {
 
     private synchronized void sched(TimerTask task, long delay) {
         if (this.timeouter == null) {
-            this.timeouter = new Timer();
+            this.timeouter = new Timer("InfrastructureManager Timer");
         }
         this.timeouter.schedule(task, delay);
     }

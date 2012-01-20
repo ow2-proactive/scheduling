@@ -75,7 +75,7 @@ public class ReleaseResourcesWhenSchedulerIdle extends SchedulerAwarePolicy impl
     public BooleanWrapper configure(Object... policyParameters) {
         super.configure(policyParameters);
         try {
-            timer = new Timer(true);
+            timer = new Timer("ReleaseResourcesWhenSchedulerIdle Timer(1)", true);
             idleTime = Long.parseLong(policyParameters[4].toString());
         } catch (RuntimeException e) {
             throw new IllegalArgumentException(e);
@@ -142,7 +142,7 @@ public class ReleaseResourcesWhenSchedulerIdle extends SchedulerAwarePolicy impl
                 debug("Job is finished. Total number of jobs is " + activeJobs);
                 if (activeJobs == 0 && !resourcesReleased) {
                     debug("Schedule task to release resources in " + idleTime);
-                    timer = new Timer(true);
+                    timer = new Timer("ReleaseResourcesWhenSchedulerIdle Timer(2)", true);
                     timer.schedule(new TimerTask() {
                         @Override
                         public void run() {

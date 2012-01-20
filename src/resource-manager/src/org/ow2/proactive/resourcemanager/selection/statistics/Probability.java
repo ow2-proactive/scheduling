@@ -59,7 +59,7 @@ public class Probability {
     public static final Probability ZERO = new Probability(0);
     public static final Probability ONE = new Probability(1);
 
-    private static Timer timer = new Timer(true);
+    private static Timer timer = new Timer("resourcemanager.selection.statistics.Probability timer", true);
     private int step = 0;
     private double probability = calcProbability(step);
 

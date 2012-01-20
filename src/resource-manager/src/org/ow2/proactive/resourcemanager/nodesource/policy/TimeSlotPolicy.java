@@ -97,7 +97,7 @@ public class TimeSlotPolicy extends NodeSourcePolicy implements InitActive {
     public static transient DateFormat dateFormat = SimpleDateFormat.getDateTimeInstance(
             SimpleDateFormat.SHORT, SimpleDateFormat.FULL, new Locale("en"));
     /** Timer used for tasks scheduling */
-    private transient Timer timer = new Timer(true);
+    private transient Timer timer = new Timer("TimeSlotPolicy Timer", true);
 
     /**
      * Initial time for nodes acquisition
