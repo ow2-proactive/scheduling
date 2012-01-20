@@ -84,7 +84,6 @@
 	<classpathentry kind="lib" path="lib/scheduling/cog-jglobus-1.2.jar"/>
 	<classpathentry kind="lib" path="lib/scheduling/cog-ogce.jar"/>
 	<classpathentry kind="lib" path="lib/scheduling/colobus-0.1.jar"/>
-	<classpathentry kind="lib" path="lib/scheduling/colt.jar"/>
 	<classpathentry kind="lib" path="lib/scheduling/commons-cli-1.1.jar"/>
 	<classpathentry kind="lib" path="lib/scheduling/commons-codec-1.3.jar"/>
 	<classpathentry kind="lib" path="lib/scheduling/commons-collections-3.2.jar"/>
@@ -93,7 +92,6 @@
 	<classpathentry kind="lib" path="lib/scheduling/commons-httpclient-3.1.jar"/>
 	<classpathentry kind="lib" path="lib/scheduling/commons-logging-1.1.1.jar"/>
 	<classpathentry kind="lib" path="lib/scheduling/commons-net-1.4.1.jar"/>
-	<classpathentry kind="lib" path="lib/scheduling/concurrent.jar"/>
 	<classpathentry kind="lib" path="lib/scheduling/configadmin-1.2.4.jar"/>
 	<classpathentry kind="lib" path="lib/scheduling/cryptix-asn1.jar"/>
 	<classpathentry kind="lib" path="lib/scheduling/cryptix.jar"/>
@@ -150,7 +148,6 @@
 	<classpathentry kind="lib" path="lib/scheduling/julia-asm-2.5.3-SNAPSHOT.jar"/>
 	<classpathentry kind="lib" path="lib/scheduling/julia-mixins-2.5.3-SNAPSHOT.jar"/>
 	<classpathentry kind="lib" path="lib/scheduling/julia-runtime-2.5.3-SNAPSHOT.jar"/>
-	<classpathentry kind="lib" path="lib/scheduling/jung-1.7.4.jar"/>
 	<classpathentry kind="lib" path="lib/scheduling/jython-engine.jar"/>
 	<classpathentry kind="lib" path="lib/scheduling/jython.jar"/>
 	<classpathentry kind="lib" path="lib/scheduling/log4j.jar"/>
