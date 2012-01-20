@@ -238,6 +238,9 @@ public final class SchedulerStateImpl implements SchedulerState {
             case STARTED:
                 status = SchedulerStatus.STARTED;
                 break;
+            case RESUMED:
+                status = SchedulerStatus.STARTED;
+                break;
             case STOPPED:
                 status = SchedulerStatus.STOPPED;
                 break;
