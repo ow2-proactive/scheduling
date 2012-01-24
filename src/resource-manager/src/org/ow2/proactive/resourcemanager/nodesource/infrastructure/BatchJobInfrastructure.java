@@ -86,9 +86,11 @@ public abstract class BatchJobInfrastructure extends InfrastructureManager {
      */
     {
         String jhome = System.getenv("JAVA_HOME");
-        File f = new File(jhome);
-        if (f.exists() && f.isDirectory()) {
-            javaPath = jhome + ((jhome.endsWith("/")) ? "" : "/") + "bin/java";
+        if (jhome != null) {
+            File f = new File(jhome);
+            if (f.exists() && f.isDirectory()) {
+                javaPath = jhome + ((jhome.endsWith("/")) ? "" : "/") + "bin/java";
+            }
         }
     }
 
