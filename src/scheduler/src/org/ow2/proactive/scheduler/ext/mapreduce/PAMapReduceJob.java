@@ -785,7 +785,7 @@ public class PAMapReduceJob {
                 String outputFilesSelectionString = paHadoopJobConfiguration
                         .get(PAMapReduceFrameworkProperties
                                 .getPropertyAsString(PAMapReduceFrameworkProperties.HADOOP_OUTPUT_DIRECTORY_PROPERTY_NAME.key)) +
-                    File.separator + PAMapReduceFramework.getTemporaryOutputDirectoryRegex();
+                    "/" + PAMapReduceFramework.getTemporaryOutputDirectoryRegex();
                 logger
                         .debug("The value of the outputFileSelectionString of the ProActive MapReduce ReducerPATask is '" +
                             outputFilesSelectionString + "'");

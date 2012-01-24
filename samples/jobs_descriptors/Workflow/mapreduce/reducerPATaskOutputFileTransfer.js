@@ -4,15 +4,15 @@
  * specifies "output" as the name of the folder, in the output space of the job,
  * in which he wants to store the output files of the ReducerPATask tasks then
  * those files will be stored in a folder whose name will follow the format:
- * "output" + File.separator + "_temporary" + File.separator + "_attempt_*" +
- * File.separator + "part-r-*". This is do to the fact that we cannot change the
+ * "output/_temporary/_attempt_* /part-r-*".
+ * This is do to the fact that we cannot change the
  * Hadoop code to force Hadoop to write the reducer output in the folder defined
  * by the user. Hence in this script we must select all the files whose names
  * match the "part-r-*" and we must rename them in something more simple (e.g.,
  * reducer_&lt;reducerId&gt;.out), put those file in the directory "output" and
  * remove all the other sub-folders of the folder "output" (i.e., remove the
- * sub-folders whose names match the string "_temporary" + File.separator +
- * "_attempt_*") To do this we must notice that the Script Environment has some
+ * sub-folders whose names match the string "_temporary/_attempt_*")
+ * To do this we must notice that the Script Environment has some
  * DataSpacesFileObjects bound to itself. Those DataSpacesFileObject are
  * accessible through the variables: - input: bound the INPUT data space of the
  * job - output: bound to the OUTPUT data space of the job - globalspace: bound
@@ -20,8 +20,8 @@
  * space of the task As a consequence of all the previous explanation the
  * argument this script needs to execute are three: - the debug level - the
  * string to use to select the output files (using the Hadoop OutputFormat, this
- * means the script need in input a string like "output" + File.separator +
- * "_temporary" + File.separator + "_attempt_*" + File.separator + "part-r-*") -
+ * means the script need in input a string like
+ * "output/_temporary/_attempt_* /part-r-*") -
  * the string that represents the prefix to use to build the name of the moved
  * files (i.e., something like "reducer_" that will substitute "part-r-" in the
  * original file name) We must notice that to retrieve the various strings to
@@ -70,7 +70,7 @@ debug(
 				+ movedFilePrefix, debugLogLevel);
 
 // String[] parts = ... of a string as "$OUTPUT/_temporary/_attempt_*/part-r-*"
-var parts = outputFileSelectionString.split(File.separator);
+var parts = outputFileSelectionString.split("/");
 var userDefinedOutputFolder = parts[0]; // the user defined name of the output
 										// directory
 var temporaryFolderToDelete = parts[1]; // the "_temporary" string
@@ -134,7 +134,7 @@ if (selectedDataSpacesFileObjectListSize > 0) {
 				currentDataSpacesFileObjectName.length());
 		debug("The currentReducerId at iteration '" + i + "' is "
 				+ currentReducerId, debugLogLevel);
-		currentName = userDefinedOutputFolder + File.separator
+		currentName = userDefinedOutputFolder + "/"
 				+ movedFilePrefix + currentReducerId;
 		debug(
 				"The name of the file in which the originary one must be moved at iteration '"
@@ -154,7 +154,7 @@ if (selectedDataSpacesFileObjectListSize > 0) {
 	 *  delete)
 	 */
 	var temporayFolder = output.resolveFile(userDefinedOutputFolder
-			+ File.separator + temporaryFolderToDelete);
+			+ "/" + temporaryFolderToDelete);
 	temporayFolder["delete"](FileSelector.SELECT_ALL);
 	debug("The virtual URI of the temporary folder to delete is "
 			+ temporayFolder.getVirtualURI(), debugLogLevel);

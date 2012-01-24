@@ -203,7 +203,7 @@ public class PADataSpacesFileSystem extends FileSystem {
              */
             DataSpacesFileObject parentDataSpacesFileObject = null;
             boolean foundNotExistingAncestorDirectory = false;
-            String[] elements = fString.split(File.separator);
+            String[] elements = fString.split("/");
             int existingAncestorDirectories = 0;
             if (elements.length > 0) {
                 String currentDirectory = null;
@@ -211,7 +211,7 @@ public class PADataSpacesFileSystem extends FileSystem {
                     if (i == 0) {
                         currentDirectory = elements[i];
                     } else {
-                        currentDirectory += File.separator + elements[i];
+                        currentDirectory += "/" + elements[i];
                     }
 
                     if ((dataSpacesFileObject.resolveFile(currentDirectory).exists())) {
@@ -235,7 +235,7 @@ public class PADataSpacesFileSystem extends FileSystem {
             } else {
                 String toCreate = elements[existingAncestorDirectories];
                 for (int i = existingAncestorDirectories + 1; i < elements.length; i++) {
-                    toCreate += File.separator + elements[i];
+                    toCreate += "/" + elements[i];
                 }
 
                 /*
@@ -1006,7 +1006,7 @@ public class PADataSpacesFileSystem extends FileSystem {
              * character
              */
             pathUriPath = pathUri.getPath();
-            if (pathUriPath.startsWith(File.separator)) {
+            if (pathUriPath.startsWith("/")) {
                 pathUriPath = pathUriPath.substring(1);
             }
         }

@@ -317,7 +317,7 @@ public class PAMapReduceFramework {
      * @return
      */
     public static String getTemporaryOutputDirectoryRegex() {
-        return "_temporary" + File.separator + "_attempt_*" + File.separator + "part-r-*";
+        return "_temporary/_attempt_*/part-r-*";
     }
 
     /**
