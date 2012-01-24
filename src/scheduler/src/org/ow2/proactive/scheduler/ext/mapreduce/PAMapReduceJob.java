@@ -1157,7 +1157,6 @@ public class PAMapReduceJob {
             throws PAJobConfigurationException {
         if (configuration != null) {
             changeHadoopInputPathList(configuration);
-            changeHadoopOutputPath(configuration);
 
             PAHadoopJobConfiguration pahjc = new PAHadoopJobConfiguration(configuration);
 
@@ -1334,176 +1333,78 @@ public class PAMapReduceJob {
     /**
      * Modify each {@link Path} in the list of input path of the Hadoop job
      * using the method {@link PAMapReduceJob#changeHadoopPath(String)}.
-     *
-     * This method build a new comma separated list of input paths and set it in
-     * the {@link Configuration} received as parameter, substituting the
-     * original comma separated list of input paths. Each path in the new comma
-     * separated list of input paths is modified according to the
-     * {@link PAMapReduceJob#changeHadoopPath(String)} method.
-     *
-     * We must notice that this method contains some code coped and pasted from
-     * the
+     * 
+     * This method contains some code copied from
+     * 
      * {@link FileInputFormat#getInputPaths(org.apache.hadoop.mapreduce.JobContext)}
      * and {@link FileInputFormat#addInputPaths(Job, String)}.
-     *
+     * 
      * @param configuration
      *            the configuration to use to retrieve the list of the job input
-     *            {@link Path}
-     *
-     *            We must notice that this method contains some code copied and
-     *            pasted from the code of the methods getInputPaths(JobContext
-     *            jobContext) addInputPath(Job job, Path path) of the class
-     *            org.apache.hadoop.mapreduce.lib.input.FileInputFormat
+     *            {@link Path}s
      */
     protected void changeHadoopInputPathList(Configuration configuration) {
-        String inputPathStringList = configuration
-                .get(PAMapReduceFrameworkProperties
-                        .getPropertyAsString(PAMapReduceFrameworkProperties.HADOOP_INPUT_DIRECTORY_PROPERTY_NAME.key));
+        String inputDirPropertyName = PAMapReduceFrameworkProperties
+                .getPropertyAsString(PAMapReduceFrameworkProperties.HADOOP_INPUT_DIRECTORY_PROPERTY_NAME.key);
+        String inputPathStringList = configuration.get(inputDirPropertyName);
         if ((inputPathStringList != null) && (!inputPathStringList.trim().equalsIgnoreCase(""))) {
             String newInputPathStringList = "";
             String[] list = StringUtils.split(inputPathStringList);
             for (int i = 0; i < list.length; i++) {
                 if (i == 0) {
-                    newInputPathStringList += changeHadoopPath(StringUtils.escapeString(list[i]));
+                    newInputPathStringList += changeHadoopPath(StringUtils.escapeString(list[i]),
+                            configuration);
                 } else {
                     newInputPathStringList += StringUtils.COMMA_STR +
-                        changeHadoopPath(StringUtils.escapeString(list[i]));
+                        changeHadoopPath(StringUtils.escapeString(list[i]), configuration);
                 }
             }
-            configuration
-                    .set(
-                            PAMapReduceFrameworkProperties
-                                    .getPropertyAsString(PAMapReduceFrameworkProperties.HADOOP_INPUT_DIRECTORY_PROPERTY_NAME.key),
-                            newInputPathStringList);
+            configuration.set(inputDirPropertyName, newInputPathStringList);
         }
     }
 
     /**
-     * Modify each {@link Path} in the list of output path of the Hadoop job
-     * according to the method {@link PAMapReduceJob#changeHadoopPath(String)}
-     *
-     * @param configuration
-     *            the configuration to use to retrieve the job output
-     *            {@link Path}
-     */
-    protected void changeHadoopOutputPath(Configuration configuration) {
-        String outputPathString = configuration
-                .get(PAMapReduceFrameworkProperties
-                        .getPropertyAsString(PAMapReduceFrameworkProperties.HADOOP_OUTPUT_DIRECTORY_PROPERTY_NAME.key));
-        if ((outputPathString != null) && (!outputPathString.trim().equalsIgnoreCase(""))) {
-            outputPathString = changeHadoopPath(StringUtils.escapeString(outputPathString));
-            configuration
-                    .set(
-                            PAMapReduceFrameworkProperties
-                                    .getPropertyAsString(PAMapReduceFrameworkProperties.HADOOP_OUTPUT_DIRECTORY_PROPERTY_NAME.key),
-                            outputPathString);
-        }
-    }
-
-    /**
-     * Modify the string representation of an Hadoop path in the way the new
-     * path will be relative (i.e., no initial "/" under unix). In such a way
-     * when we instantiate an Hadoop {@link Path} no scheme will be added and
-     * the Hadoop classes that need the {@link FileSystem} implementation to
-     * which that path belongs to will be forced to retrieve that information
-     * from the configuration. This means that in the case of the ProActive
-     * MapReduce configuration the returned FileSystem implementation will be
-     * {@link PADataSpacesFileSystem} (whose configuration properties is
-     * {@link PAMapReduceFrameworkProperties#WORKFLOW_FILE_SYSTEM_DEFAULT_NAME}
-     * ). We must look at {@link Path#getFileSystem(Configuration)} (and
-     * following the invocation chain at
-     * {@link FileSystem#getDefaultUri(Configuration)}) to get more details. In
-     * the case of the ProActive MapReduce framework the name of the file system
-     * is "pads:///" and this tells to the Hadoop FileSystem to instantiate via
-     * reflection the class referred by the property "fs.pads.impl" that in the
-     * case of ProActive MapReduce framework is
-     * "org.ow2.proactive.scheduler.ext.hadoopmapreduce.fs.PADataSpacesFileSystem"
-     * . This class corresponds to the {@link FileSystem} implementation based
-     * on DataSpacesFileObject
-     *
+     * Undo the effect of {@link FileInputFormat#addInputPath()}.
+     * 
+     * {@link FileInputFormat#addInputPath()} makes relative {@link Path}s
+     * absolute by resolving them relative to the current working directory (see
+     * {@link Path.makeQalified()}. We need the paths to remain relative, so we
+     * reverse the effect of {@link FileInputFormat#addInputPath()} by stripping
+     * the working directory from the path.
+     * 
+     * Note: we need the paths to remain relative because:
+     * 
+     * - it makes no sense to resolve them using workdir (they are relative to
+     * the input dataspace)
+     * 
+     * - this way the correct filesystem implementation is chosen by Hadoop
+     * (relative paths contain no schema, thus the default is used, the
+     * default is determined by
+     * {@link PAMapReduceFrameworkProperties#WORKFLOW_FILE_SYSTEM_DEFAULT_NAME},
+     * which points to "pads://", which corresponds to
+     * {@link PADataSpacesFileSystem}, which is what we need).
+     * 
      * @param pathString
-     *            the String representation of the Hadoop {@link Path}. The
-     *            string will identify a relative path (i.e., no initial "/"
-     *            under unix)
-     *
-     *            We have to notice that the code of this method is a copied and
-     *            pasted from the constructor Path(String pathString) of the
-     *            Hadoop class org.apache.hadoop.fs.Path
+     *            the String representation of the Hadoop {@link Path}
+     * 
+     * @param configuration
+     *            Hadoop configuration object
      */
-    protected String changeHadoopPath(String pathString) {
-        String modifiedPath = pathString;
+    protected String changeHadoopPath(String pathString, Configuration configuration) {
+        String workDir;
 
-        // add a slash in front of paths with Windows drive letters
-        if (hasWindowsDrive(pathString, false))
-            pathString = "/" + pathString;
-
-        // parse uri components
-        String scheme = null;
-        String authority = null;
-
-        int start = 0;
-
-        // parse uri scheme, if any
-        int colon = pathString.indexOf(':');
-        int slash = pathString.indexOf('/');
-        if ((colon != -1) && ((slash == -1) || (colon < slash))) { // has a
-            // scheme
-            scheme = pathString.substring(0, colon);
-            start = colon + 1;
-
-            /*
-             * We must substitute the existing scheme with our "pads" scheme
-             * preserving the colon and the slash. Then remembering that Hadoop
-             * MapReduce resolve relative paths using the Java System Property
-             * "user.dir" we have to delete the occurrence of the value of that
-             * string with the path part of the user configured input dataspace.
-             * E.g., if the Hadoop created path is something like
-             * "file:/home/theproactiveteam/workspace/proactive_mapreduce_client/current_input"
-             * and and the value of the "user.dir" Java System property is
-             * "/home/theproactiveteam/workspace/proactive_mapreduce_client/"
-             * then the non scheme string part will be:
-             * ":/home/theproactiveteam/workspace/proactive_mapreduce_client/current_input"
-             * and the "user.dir" will begin at index 1 in the no scheme string
-             * part. The string after the "user.dir" string in the no scheme
-             * part string will be "/current_input" and to obtain the relative
-             * path we must left out the initial "/" (this is the reason of the
-             * "substring(1)")
-             *
-             * Lastly after all is executed we must obtain "current_input".
-             */
-            String noSchemeStringPart = pathString.substring(colon);
-            String userDirString = System.getProperty(PAMapReduceFramework.USER_DIR);
-            int startOfUserDirString = pathString.indexOf(userDirString);
-            if (startOfUserDirString > 0) {
-                /*
-                 * startOfUserDirString is greater than 0 because the character
-                 * whose index is zero is the colon (because the scheme part is
-                 * defined, in the Java URI, as the string that comes before the
-                 * colon)
-                 */
-
-                /*
-                 * delete the "user.dir" string from the no scheme string part
-                 */
-                String afterUserDirString = pathString.substring(startOfUserDirString +
-                    userDirString.length());
-                /*
-                 * we left out the initial "/" (or "\") character TODO test if
-                 * with windows it will work because maybe Java under windows
-                 * can use "\\" so that we must do "substring(2)"
-                 */
-                modifiedPath = afterUserDirString.substring(1);
-            } else {
-                /*
-                 * the "user.dir" string is not contained in the no scheme
-                 * string part so we only we left out the first two characters
-                 * ":/" of the no scheme string
-                 */
-                modifiedPath = noSchemeStringPart.substring(2);
-            }
+        try {
+            workDir = FileSystem.get(configuration).getWorkingDirectory().toString();
+        } catch (IOException e) {
+            throw new RuntimeException("Cannot determine working directory!", e);
         }
 
-        return modifiedPath;
+        if (!pathString.startsWith(workDir)) {
+            throw new RuntimeException("Path does not start with working directory: " + pathString);
+        }
+        // we rely on the fact that workDir has no trailing slash
+        // thus + 1
+        return pathString.substring(workDir.length() + 1);
     }
 
     /**
