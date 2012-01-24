@@ -329,4 +329,19 @@ public interface ResourceManager {
      * @return nodes topology
      */
     public Topology getTopology();
+
+    /**
+     * Sets node info in JSON format
+     * @param nodeUrl is an url of the node
+     * @param nodeInfo is a json string
+     */
+    public void setNodeInfo(String nodeUrl, String nodeInfo);
+
+    /**
+     * Gets node info in JSON format
+     * 
+     * @param nodeUrl is an url of the node
+     */
+    public String getNodeInfo(String nodeUrl);
+
 }

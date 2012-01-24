@@ -205,6 +205,13 @@ public class TestNodeSourcePolicy extends FunctionalTest {
         public void setLastEvent(RMNodeEvent lastEvent) {
         }
 
+        public void setInfo(String nodeProperties) {
+        }
+
+        public String getInfo() {
+            return null;
+        }
+
     }
 
     /** Actions to be Perform by this test.

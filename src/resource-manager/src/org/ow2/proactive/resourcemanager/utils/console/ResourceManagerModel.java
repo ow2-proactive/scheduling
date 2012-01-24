@@ -71,6 +71,11 @@ import org.ow2.proactive.utils.console.Command;
 import org.ow2.proactive.utils.console.ConsoleModel;
 import org.ow2.proactive.utils.console.MBeanInfoViewer;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
+
 
 /**
  * Class represents underlying model of the resource manager when accessing from
@@ -570,20 +575,26 @@ public class ResourceManagerModel extends ConsoleModel {
 
     public void nodeinfo_(final String nodeURL) {
         try {
-            List<RMNodeEvent> allnodes = this.rm.getMonitoring().getState().getNodesEvents();
-            boolean found = false;
-            for (RMNodeEvent node : allnodes) {
-                if (node.getNodeUrl().equals(nodeURL)) {
-                    print(node.getNodeInfo());
-                    found = true;
-                    break;
-                }
-            }
-            if (!found) {
-                throw new IllegalArgumentException("Node with URL " + nodeURL + " has not been found.");
-            }
+            printJson(this.rm.getNodeInfo(nodeURL));
+        } catch (IllegalArgumentException e) {
+            throw e;
         } catch (Exception e) {
             handleExceptionDisplay("Error while retrieving node informations", e);
+        }
+    }
+
+    private void printJson(String msg) {
+        try {
+            JsonParser parser = new JsonParser();
+            JsonElement elem = parser.parse(msg);
+            Gson gson = new GsonBuilder().setPrettyPrinting().create();
+            String jsonOutput = gson.toJson(elem);
+
+            print(jsonOutput);
+        } catch (RuntimeException e) {
+            print("Invalid JSON:\n");
+            print(msg);
+            e.printStackTrace();
         }
     }
 

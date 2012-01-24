@@ -148,6 +148,24 @@ public class RMNodeStarter {
     /** Name of the java property to set the node source name */
     protected final static String NODESOURCE_PROP_NAME = "proactive.node.nodesource";
 
+    /** Default dynamic scripts execution period */
+    public final static int DYNAMIC_SCRIPTS_DEFAULT_PERIOD = 60 * 1000; // 1 min
+    /** Period can be changed using this property */
+    public final static String DYNAMIC_SCRIPTS_PERIOD_PROPERTY = "proactive.node.script.period";
+    /** Default scripts execution mode */
+    public final static boolean SCRIPT_EXCUTION_ENABLED = true;
+    /** Disables or enables the scripts execution */
+    public final static String SCRIPT_EXCUTION_ENABLED_PROPERTY = "proactive.node.script.enabled";
+    /** Default scripts execution timeout */
+    public final static int SCRIPT_EXCUTION_DEFAULT_TIMEOUT = 10000;// 10 secs
+    /** Property defining the scripts execution */
+    public final static String SCRIPT_EXCUTION_TIMEOUT_PROPERTY = "proactive.node.script.timout";
+
+    /** jvm, proactive, host information */
+    private RMNodeInformation nodeInfo;
+    /** Visible node thread to notify when new node info is available*/
+    protected static Thread nodeThread = null;
+
     // The url of the created node
     protected String nodeURL = "Not defined";
     // the rank of this node
@@ -272,6 +290,7 @@ public class RMNodeStarter {
      * @param args The arguments needed to join the Resource Manager
      */
     public static void main(String[] args) {
+        nodeThread = Thread.currentThread();
         //this call takes JVM properties into account
         args = JVMPropertiesPreloader.overrideJVMProperties(args);
         checkLog4jConfiguration();
@@ -280,6 +299,7 @@ public class RMNodeStarter {
     }
 
     protected void doMain(final String args[]) {
+
         this.parseCommandLine(args);
         this.readAndSetTheRank();
         Node node = this.createLocalNode(nodeName);
@@ -292,8 +312,12 @@ public class RMNodeStarter {
             System.setProperty(NODESOURCE_PROP_NAME, nodeSourceName);
         }
 
+        // start script execution here if required
+        this.nodeInfo = new RMNodeInformation(node);
+
         if (rmURL != null) {
             ResourceManager rm = this.registerInRM(credentials, rmURL, nodeName, nodeSourceName);
+            rm.setNodeInfo(this.getNodeURL(), nodeInfo.getNodeInfo());
 
             if (rm != null) {
                 System.out.println("Connected to the Resource Manager at " + rmURL +
@@ -307,7 +331,13 @@ public class RMNodeStarter {
                 // infrastructure manager
                 if (PING_DELAY_IN_MS > 0) {
                     try {
-                        while (rm.nodeIsAvailable(this.getNodeURL()).getBooleanValue()) {
+                        while (true) {
+                            if (nodeInfo.isUpdated()) {
+                                rm.setNodeInfo(this.getNodeURL(), nodeInfo.getNodeInfo());
+                            } else if (!rm.nodeIsAvailable(this.getNodeURL()).getBooleanValue()) {
+                                break;
+                            }
+
                             try {
                                 Thread.sleep(PING_DELAY_IN_MS);
                             } catch (InterruptedException e) {
@@ -867,7 +897,7 @@ public class RMNodeStarter {
         private Properties paPropProperties;
         private String paPropString;
         private int addAttempts = -1, addAttemptsDelay = -1;
-        private final String[] requiredJARs = { "script-js.jar",
+        private final String[] requiredJARs = { "script-js.jar", "gson-2.1.jar",
                 "jruby-engine.jar",
                 "jython-engine.jar",
                 "commons-logging-1.1.1.jar",

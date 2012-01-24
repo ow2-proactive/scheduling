@@ -1602,4 +1602,41 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         }
         return new BooleanWrapper(result);
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setNodeInfo(String nodeUrl, String nodeInfo) {
+        RMNode node = allNodes.get(nodeUrl);
+        if (node == null) {
+            throw new IllegalArgumentException("Unknown node " + nodeUrl);
+        }
+
+        node.setInfo(nodeInfo);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getNodeInfo(String nodeUrl) {
+        RMNode node = allNodes.get(nodeUrl);
+        if (node == null) {
+            // might be deploying node
+            for (NodeSource s : this.nodeSources.values()) {
+                for (RMDeployingNode dNode : s.getDeployingNodes()) {
+                    if (dNode.getNodeURL().equals(nodeUrl)) {
+                        node = dNode;
+                        break;
+                    }
+                }
+            }
+
+            if (node != null) {
+                return node.getInfo();
+            }
+            throw new IllegalArgumentException("Unknown node " + nodeUrl);
+        }
+
+        return node.getInfo();
+    }
 }

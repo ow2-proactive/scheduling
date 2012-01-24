@@ -248,7 +248,7 @@ public interface RMNode extends Comparable<RMNode> {
     public void setBusy(Client owner) throws NodeException;
 
     /**
-     *  * change the node's status to 'to release'.
+     * change the node's status to 'to release'.
      * @throws NodeException if the node is down
      */
     public void setToRemove() throws NodeException;
@@ -278,5 +278,18 @@ public interface RMNode extends Comparable<RMNode> {
     public void setAddEvent(final RMNodeEvent addEvent);
 
     public void setLastEvent(final RMNodeEvent lastEvent);
+
+    /**
+     * Sets node info in JSON format
+     * 
+     * @param nodeInfo is a json string
+     */
+    public void setInfo(String nodeProperties);
+
+    /**
+     * Gets node info in JSON format
+     * 
+     */
+    public String getInfo();
 
 }

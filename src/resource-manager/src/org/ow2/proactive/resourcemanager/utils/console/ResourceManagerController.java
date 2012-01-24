@@ -548,6 +548,11 @@ public class ResourceManagerController {
             for (String nsName : nsNames) {
                 model.removens_(nsName, preempt);
             }
+        } else if (cmd.hasOption("ni")) {
+            String[] nodesURls = cmd.getOptionValues("ni");
+            for (String nUrl : nodesURls) {
+                model.nodeinfo_(nUrl);
+            }
         } else if (cmd.hasOption("shutdown")) {
             model.shutdown_(cmd.hasOption("f"));
         } else if (cmd.hasOption("stats")) {

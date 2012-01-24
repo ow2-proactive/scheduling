@@ -1,0 +1,12 @@
+# Script execution configuration file
+# Format: "script relative path" "top level property name" "script type"
+#
+# "script relative path" - is the path relative to $RM_HOME/scripts/nodeproperties/unix directory
+# "top level property name" - the name of the top level property in json like {"processes": {...}}
+# "script type" - static or dynamic. Dynamic scripts executed periodically.
+
+arch.sh arch static
+cpu.sh cpu static
+network.sh network static
+memory.sh memory dynamic
+processes.sh processes dynamic

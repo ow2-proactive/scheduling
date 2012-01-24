@@ -437,4 +437,18 @@ public class UserRMProxy implements ResourceManager, RunActive {
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public void setNodeInfo(String nodeUrl, String nodeInfo) {
+        rm.setNodeInfo(nodeUrl, nodeInfo);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getNodeInfo(String nodeUrl) {
+        return rm.getNodeInfo(nodeUrl);
+    }
+
 }
