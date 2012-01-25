@@ -171,7 +171,7 @@
 		<chmod file="${cl.scheduler.tests.dir}/functionaltests/executables/test_multiple_hosts_request.sh" perm="ugo+rx" />
 		<chmod file="${cl.scheduler.tests.dir}/functionaltests/executables/*.sh" perm="ugo+rx" />
 		<junitMacro testsuite="scheduler.testsuite" testclasspath="scheduler.test.classpath" log4jconfig="-Dlog4j.configuration=file:${base.dir}/compile/scheduler-log4j" />
-
+		<antcall target="junit.summary" />
 	</target>
 
 	<target name="junit.scheduler.mapreduce" depends="deploy.scheduler, deploy.scheduler.mapreduce" description="Run MapReduce tests">
