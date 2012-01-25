@@ -163,8 +163,6 @@ public class RMNodeStarter {
 
     /** jvm, proactive, host information */
     private RMNodeInformation nodeInfo;
-    /** Visible node thread to notify when new node info is available*/
-    protected static Thread nodeThread = null;
 
     // The url of the created node
     protected String nodeURL = "Not defined";
@@ -290,7 +288,6 @@ public class RMNodeStarter {
      * @param args The arguments needed to join the Resource Manager
      */
     public static void main(String[] args) {
-        nodeThread = Thread.currentThread();
         //this call takes JVM properties into account
         args = JVMPropertiesPreloader.overrideJVMProperties(args);
         checkLog4jConfiguration();

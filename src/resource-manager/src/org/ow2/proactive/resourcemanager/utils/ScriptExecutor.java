@@ -247,7 +247,6 @@ public class ScriptExecutor {
         if (newResults) {
             // notifying the node
             newResultsAwailable.set(true);
-            RMNodeStarter.nodeThread.interrupt();
         }
     }
 
