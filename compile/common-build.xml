@@ -283,6 +283,16 @@
 		</sequential>
 	</macrodef>
 
+	<target name="junit.summary">
+		<junitreport todir="${junit.dir}">
+		  <fileset dir="${junit.dir}">
+		    <include name="TEST-*.xml"/>
+		  </fileset>
+		  <report format="frames" todir="${junit.dir}/html"/>
+		</junitreport>
+		<echo message="JUnit report: ${junit.dir}/html/index.html" />
+	</target>
+
 	<target name="with.clover">
 		<taskdef resource="cloverlib.xml" classpath="${base.dir}/compile/lib/clover.jar" />
 		<clover-setup initString="${compile.dir}/ProActiveCoverage.db" />

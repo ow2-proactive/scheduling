@@ -176,7 +176,7 @@
 
 	<target name="junit.scheduler.mapreduce" depends="deploy.scheduler, deploy.scheduler.mapreduce" description="Run MapReduce tests">
 		<junitMacro testsuite="scheduler.mapreduce.testsuite" testclasspath="scheduler.mapreduce.test.classpath" log4jconfig="-Dlog4j.configuration=file:${base.dir}/compile/scheduler-log4j" />
-
+		<antcall target="junit.summary" />
 	</target>
 
 	<!-- ================================================================ -->

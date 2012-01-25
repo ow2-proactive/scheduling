@@ -111,6 +111,7 @@
 				<jvmarg value="-DdistantHost=${distantHost}" />
 			</jvmargs>
 		</junitMacro>
+		<antcall target="junit.summary" />
 	</target>
 
 </project>
