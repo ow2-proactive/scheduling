@@ -331,6 +331,7 @@
 				<fileset dir="${src.scheduler.tests.dir}" includes="**/*.java" />
 				<fileset dir="${src.rm.dir}" includes="**/*.java" />
 				<fileset dir="${src.rm.tests.dir}" includes="**/*.java" />
+                <fileset dir="${src.performance}" includes="**/*.java" />
 			</sourcefileset>
 		</eclipse_format_m>
 	</target>

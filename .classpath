@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" output="classes/resource-managerTests" path="src/resource-manager/tests"/>
+	<classpathentry kind="src" path="performance/src" output="classes/performance"/>
 	<classpathentry kind="src" output="classes/common" path="src/common"/>
 	<classpathentry kind="src" output="classes/resource-manager" path="src/resource-manager/src"/>
 	<classpathentry kind="src" output="classes/scheduler" path="src/scheduler/src"/>
@@ -173,5 +174,7 @@
 	<classpathentry kind="lib" path="lib/mapreduce/hadoop-0.20.2-core.jar"/>
 	<classpathentry kind="lib" path="lib/matsci/ProActive_LicenseSaver-1.0.0-api.jar"/>
 	<classpathentry kind="lib" path="lib/resource-manager/gson-2.1.jar"/>
-	<classpathentry kind="output" path="classes"/>
+	<classpathentry kind="lib" path="performance/lib/ApacheJMeter_core.jar"/>
+	<classpathentry kind="lib" path="performance/lib/ApacheJMeter_java.jar"/>
+    <classpathentry kind="output" path="classes"/> 
 </classpath>

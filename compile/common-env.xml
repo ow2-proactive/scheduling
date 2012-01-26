@@ -29,6 +29,7 @@
 
 	<property name="src.dir" value="${base.dir}/src" />
 	<property name="src.common" value="${src.dir}/common" />
+    <property name="src.performance" value="${base.dir}/performance/src" />
 
 	<!-- ================================================================ -->
 	<!--                   		Class  paths                              -->
