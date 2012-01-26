@@ -450,13 +450,13 @@ public final class RMDeployingNode implements RMNode, Serializable {
     public String getInfo() {
         StringBuilder sb = new StringBuilder();
         sb.append("{");
-        sb.append("'name': '" + this.getNodeName() + "',");
-        sb.append("'url': '" + this.getNodeURL() + "',");
-        sb.append("'node_source': '" + this.getNodeSourceName() + "',");
-        sb.append("'provider': '" + this.getProvider().getName() + "',");
-        sb.append("'state': '" + this.getState() + "',");
-        sb.append("'description': '" + this.getDescription() + "',");
-        sb.append("'command': '" + this.getCommandLine() + "'");
+        sb.append("\"name\": \"" + this.getNodeName() + "\",");
+        sb.append("\"url\": \"" + this.getNodeURL() + "\",");
+        sb.append("\"node_source\": \"" + this.getNodeSourceName() + "\",");
+        sb.append("\"provider\": \"" + this.getProvider().getName() + "\",");
+        sb.append("\"state\": \"" + this.getState() + "\",");
+        sb.append("\"description\": \"" + this.getDescription() + "\",");
+        sb.append("\"command\": \"" + this.getCommandLine() + "\"");
         sb.append("}");
 
         return sb.toString();

@@ -522,18 +522,18 @@ public class RMNodeImpl implements RMNode, Serializable {
      * {@inheritDoc}
      */
     public String getInfo() {
-        return "{'server': " + rmNodeInfo() + ", 'node':" + nodeInfo + "}";
+        return "{\"server\": " + rmNodeInfo() + ", \"node\":" + nodeInfo + "}";
     }
 
     public String rmNodeInfo() {
         StringBuilder sb = new StringBuilder();
         sb.append("{");
-        sb.append("'name': '" + this.getNodeName() + "',");
-        sb.append("'url': '" + this.getNodeURL() + "',");
-        sb.append("'node_source': '" + this.getNodeSourceName() + "',");
-        sb.append("'provider': '" + this.getProvider().getName() + "',");
-        sb.append("'user': '" + (owner == null ? "nobody" : owner.getName()) + "',");
-        sb.append("'state': '" + this.getState() + "'");
+        sb.append("\"name\": \"" + this.getNodeName() + "\",");
+        sb.append("\"url\": \"" + this.getNodeURL() + "\",");
+        sb.append("\"node_source\": \"" + this.getNodeSourceName() + "\",");
+        sb.append("\"provider\": \"" + this.getProvider().getName() + "\",");
+        sb.append("\"user\": \"" + (owner == null ? "nobody" : owner.getName()) + "\",");
+        sb.append("\"state\": \"" + this.getState() + "\"");
         sb.append("}");
 
         return sb.toString();

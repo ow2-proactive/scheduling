@@ -204,7 +204,7 @@ public class ScriptExecutor {
                 } else {
                     first = false;
                 }
-                hInfo.append("'" + scriptProperty + "': " + hostInfo.get(scriptProperty));
+                hInfo.append("\"" + scriptProperty + "\": " + hostInfo.get(scriptProperty));
             }
             newResultsAwailable.set(false);
         }
@@ -229,9 +229,9 @@ public class ScriptExecutor {
         for (Script script : scripts) {
             String output = executeScript(script.getFileName());
             try {
-                parser.parse("{ 'must_be_valid_json' : " + output + "}");
+                parser.parse("{ \"must_be_valid_json\" : " + output + "}");
             } catch (RuntimeException e) {
-                logger.error(e.getMessage() + ":\n{ 'must_be_valid_json' : " + output + "}");
+                logger.error(e.getMessage() + ":\n{ \"must_be_valid_json\" : " + output + "}");
                 continue;
             }
 

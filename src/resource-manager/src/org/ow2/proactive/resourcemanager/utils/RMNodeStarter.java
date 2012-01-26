@@ -153,7 +153,7 @@ public class RMNodeStarter {
     /** Period can be changed using this property */
     public final static String DYNAMIC_SCRIPTS_PERIOD_PROPERTY = "proactive.node.script.period";
     /** Default scripts execution mode */
-    public final static boolean SCRIPT_EXCUTION_ENABLED = true;
+    public final static boolean SCRIPT_EXCUTION_ENABLED = false;
     /** Disables or enables the scripts execution */
     public final static String SCRIPT_EXCUTION_ENABLED_PROPERTY = "proactive.node.script.enabled";
     /** Default scripts execution timeout */
@@ -309,12 +309,17 @@ public class RMNodeStarter {
             System.setProperty(NODESOURCE_PROP_NAME, nodeSourceName);
         }
 
-        // start script execution here if required
-        this.nodeInfo = new RMNodeInformation(node);
-
         if (rmURL != null) {
             ResourceManager rm = this.registerInRM(credentials, rmURL, nodeName, nodeSourceName);
-            rm.setNodeInfo(this.getNodeURL(), nodeInfo.getNodeInfo());
+
+            try {
+                // start script execution here if required
+                this.nodeInfo = new RMNodeInformation(node);
+                rm.setNodeInfo(this.getNodeURL(), nodeInfo.getNodeInfo());
+            } catch (RuntimeException e) {
+                logger.error("Cannot initialize node properties", e);
+                System.exit(ExitStatus.RMNODE_EXIT_FORCED.exitCode);
+            }
 
             if (rm != null) {
                 System.out.println("Connected to the Resource Manager at " + rmURL +

@@ -90,7 +90,7 @@ public class RMNodeInformation {
                 first = false;
             }
             String value = System.getProperty(propertyName);
-            jInfo += "'" + propertyName + "': '" + value + "'";
+            jInfo += "\"" + propertyName + "\": \"" + value + "\"";
         }
 
         return jInfo;
@@ -102,18 +102,18 @@ public class RMNodeInformation {
     private String getProactiveInfo() {
         ProActiveRuntime runtime = node.getProActiveRuntime();
 
-        String runtimeInfo = "'runtime': {";
-        runtimeInfo += "'url': '" + runtime.getURL() + "',";
-        runtimeInfo += "'name': '" + runtime.getVMInformation().getName() + "',";
-        runtimeInfo += "'hostname': '" + runtime.getVMInformation().getHostName() + "',";
-        runtimeInfo += "'inetaddress': '" + runtime.getVMInformation().getInetAddress() + "'";
+        String runtimeInfo = "\"runtime\": {";
+        runtimeInfo += "\"url\": \"" + runtime.getURL() + "\",";
+        runtimeInfo += "\"name\": \"" + runtime.getVMInformation().getName() + "\",";
+        runtimeInfo += "\"hostname\": \"" + runtime.getVMInformation().getHostName() + "\",";
+        runtimeInfo += "\"inetaddress\": \"" + runtime.getVMInformation().getInetAddress() + "\"";
         runtimeInfo += "}";
 
-        String nodeInfo = "'node': {";
-        nodeInfo += "'url': '" + node.getNodeInformation().getURL() + "',";
-        nodeInfo += "'name': '" + node.getNodeInformation().getName() + "',";
+        String nodeInfo = "\"node\": {";
+        nodeInfo += "\"url\": \"" + node.getNodeInformation().getURL() + "\",";
+        nodeInfo += "\"name\": \"" + node.getNodeInformation().getName() + "\",";
         try {
-            nodeInfo += "'activeobjects': '" + node.getNumberOfActiveObjects() + "'";
+            nodeInfo += "\"activeobjects\": \"" + node.getNumberOfActiveObjects() + "\"";
         } catch (NodeException e) {
         }
         nodeInfo += "}";
@@ -134,8 +134,8 @@ public class RMNodeInformation {
             proactiveInfo = getProactiveInfo();
         }
 
-        String info = "{ 'date': '" + new Date() + "', 'proactive': {" + proactiveInfo + "}, 'jvm': {" +
-            jvmInfo + "}, 'host': {" + scriptExecutor.getScriptsResults() + "} }";
+        String info = "{ \"date\": \"" + new Date() + "\", \"proactive\": {" + proactiveInfo +
+            "}, \"jvm\": {" + jvmInfo + "}, \"host\": {" + scriptExecutor.getScriptsResults() + "} }";
 
         logger.debug("Node Info " + info);
         return info;
