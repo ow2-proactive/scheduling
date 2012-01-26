@@ -338,6 +338,10 @@ public class TaskResultImpl implements TaskResult {
         return id;
     }
 
+    public void setTaskId(TaskId id) {
+        this.id = id;
+    }
+
     /**
      * @see org.ow2.proactive.scheduler.common.task.TaskResult#value()
      */

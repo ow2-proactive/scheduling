@@ -1738,6 +1738,20 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
             if (jobLog != null) {
                 jobLog.close();
             }
+
+            // SCHEDULING-1508
+            // must reload all fields tagged @Unloadable before attempting removal, else when calling session.delete(job):
+            // - hibernate sees a null field, decides without checking that it must also be null in DB
+            // - the field is tagged @Unloadable and we nulled it manually, meaning it exists in DB
+            // - job is removed, but orphan data persists in DB forever for each @Unloadable field
+            // At the time of this fix, only InternalTask and TaskResultImpl contain @Unloadable fields
+            for (InternalTask it : job.getITasks()) {
+                DatabaseManager.getInstance().load(it);
+            }
+            for (TaskResult res : job.getJobResult().getAllResults().values()) {
+                DatabaseManager.getInstance().load(res);
+            }
+
             //remove from DataBase
             boolean rfdb = PASchedulerProperties.JOB_REMOVE_FROM_DB.getValueAsBoolean();
             logger_dev.info("Remove job '" + jobId + "' also from  dataBase : " + rfdb);
