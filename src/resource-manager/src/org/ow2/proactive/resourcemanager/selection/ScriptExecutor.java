@@ -133,26 +133,34 @@ public class ScriptExecutor implements Callable<Node> {
             }
         }
 
+        manager.scriptExecutionFinished(rmnode.getNodeURL());
+        if (logger.isDebugEnabled()) {
+            logger.debug("Node " + rmnode.getNodeURL() + " matched: " + nodeMatch);
+        }
+
         // cleaning the node
         try {
             rmnode.clean();
         } catch (Throwable t) {
             logger.warn("Exception while cleaning the node " + rmnode.getNodeURL() + ": " + t.getMessage());
             logger.warn("Checking if the node " + rmnode.getNodeURL() + " is alive");
-            rmnode.getNodeSource().pingNode(rmnode.getNode());
+            try {
+                // 'pingNode' call can fail with exception if NodeSource was destroyed
+                rmnode.getNodeSource().pingNode(rmnode.getNode());
+            } catch (Throwable pingError) {
+                logger.warn("NodeSource seems to be removed: " + rmnode.getNodeSourceName(), pingError);
+            }
+            return null;
         }
-
-        manager.scriptExecutionFinished(rmnode.getNodeURL());
-        if (logger.isDebugEnabled())
-            logger.debug("Node " + rmnode.getNodeURL() + " matched: " + nodeMatch);
 
         if (exception != null) {
             throw exception;
         }
         if (nodeMatch) {
             return rmnode.getNode();
+        } else {
+            return null;
         }
-        return null;
     }
 
     public String toString() {
