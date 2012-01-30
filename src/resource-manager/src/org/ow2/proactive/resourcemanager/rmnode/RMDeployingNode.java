@@ -455,7 +455,17 @@ public final class RMDeployingNode implements RMNode, Serializable {
         sb.append("\"node_source\": \"" + this.getNodeSourceName() + "\",");
         sb.append("\"provider\": \"" + this.getProvider().getName() + "\",");
         sb.append("\"state\": \"" + this.getState() + "\",");
-        sb.append("\"description\": \"" + this.getDescription() + "\",");
+        sb.append("\"description\": [");
+        boolean first = true;
+        for (String line : this.getDescription().split("\\r?\\n")) {
+            if (first) {
+                first = false;
+            } else {
+                sb.append(",");
+            }
+            sb.append("\"" + line + "\"");
+        }
+        sb.append("],");
         sb.append("\"command\": \"" + this.getCommandLine() + "\"");
         sb.append("}");
 

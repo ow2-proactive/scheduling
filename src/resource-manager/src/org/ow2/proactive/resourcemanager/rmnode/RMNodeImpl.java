@@ -522,7 +522,8 @@ public class RMNodeImpl implements RMNode, Serializable {
      * {@inheritDoc}
      */
     public String getInfo() {
-        return "{\"server\": " + rmNodeInfo() + ", \"node\":" + nodeInfo + "}";
+        return "{\"Resource Manager Node Info\": " + rmNodeInfo() + ", \"Detailed Node Info\":" + nodeInfo +
+            "}";
     }
 
     public String rmNodeInfo() {

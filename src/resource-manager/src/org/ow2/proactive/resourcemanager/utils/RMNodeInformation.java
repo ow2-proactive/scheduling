@@ -134,7 +134,7 @@ public class RMNodeInformation {
             proactiveInfo = getProactiveInfo();
         }
 
-        String info = "{ \"date\": \"" + new Date() + "\", \"proactive\": {" + proactiveInfo +
+        String info = "{ \"updated at\": \"" + new Date() + "\", \"proactive\": {" + proactiveInfo +
             "}, \"jvm\": {" + jvmInfo + "}, \"host\": {" + scriptExecutor.getScriptsResults() + "} }";
 
         logger.debug("Node Info " + info);
