@@ -52,6 +52,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
@@ -116,8 +117,13 @@ public class TaskResultImpl implements TaskResult {
 
     /** The task identification of the result */
     @Cascade(CascadeType.ALL)
-    @OneToOne(fetch = FetchType.EAGER, targetEntity = TaskIdImpl.class)
+    @ManyToOne(fetch = FetchType.EAGER, targetEntity = TaskIdImpl.class)
     private TaskId id = null;
+
+    /** reference to a previous result of a failed execution of the same task, or null */
+    @Cascade(CascadeType.ALL)
+    @OneToOne(fetch = FetchType.EAGER, targetEntity = TaskResultImpl.class)
+    private TaskResultImpl previousResult = null;
 
     /** The value of the result if no exception occurred as a byte array */
     @Unloadable
@@ -336,10 +342,6 @@ public class TaskResultImpl implements TaskResult {
      */
     public TaskId getTaskId() {
         return id;
-    }
-
-    public void setTaskId(TaskId id) {
-        this.id = id;
     }
 
     /**
@@ -606,6 +608,21 @@ public class TaskResultImpl implements TaskResult {
      */
     public long getTaskDuration() {
         return taskDuration;
+    }
+
+    /**
+     * When a Task fails, use this method to link the failed TaskResultImpl to the new one 
+     * @param prev previous failed TaskResultIMpl
+     */
+    public void setPreviousResult(TaskResultImpl prev) {
+        previousResult = prev;
+    }
+
+    /**
+     * @return previous task result impl, most probably containing the trace of a previously failed task, or null
+     */
+    public TaskResultImpl getPreviousResult() {
+        return previousResult;
     }
 
     /**

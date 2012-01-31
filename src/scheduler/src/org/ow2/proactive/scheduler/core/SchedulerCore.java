@@ -1030,26 +1030,11 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
             //if not killed
             job.failed(task.getId(), jobStatus);
 
-            TaskResult oldRes = null;
+            TaskResultImpl oldRes = null;
             try {
-                oldRes = job.getJobResult().getAllResults().get(task.getName());
-                if (oldRes != null) {
-                    // SCHEDULING-1507
-                    // this task has already failed once and stored a TaskResultImpl
-                    // containing an exception. If we don't remove this TaskResultImpl from
-                    // DB before adding the one from the next execution, two TaskResultImpl
-                    // will exist in DB for the same task, which will cause problems when
-                    // trying to delete everything.
-                    job.getJobResult().removeResult(task.getName());
-                    // we have to null the TaskId before deleting the TaskResult,
-                    // else hibernate will attempt to delete the TaskId that is still used by another Task
-                    // playing with the @Cascade tag in TaskResultImpl#id could be neater
-                    // if we can be sure there is no side effect
-                    ((TaskResultImpl) oldRes).setTaskId(null);
-                    DatabaseManager.getInstance().delete(oldRes);
-                }
+                oldRes = (TaskResultImpl) job.getJobResult().getAllResults().get(task.getName());
             } catch (Throwable t) {
-                logger.error("Failed to clear previous TaskResult", t);
+            	logger.error("Failed to fetch previous TaskResult", t);
             }
 
             //store the exception into jobResult / To prevent from empty task result (when job canceled), create one
@@ -1059,10 +1044,12 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
                     errorMsg), -1, null);
                 ((JobResultImpl) job.getJobResult()).addTaskResult(task.getName(), taskResult, task
                         .isPreciousResult());
+                ((TaskResultImpl) taskResult).setPreviousResult(oldRes);
             } else if (jobStatus == JobStatus.CANCELED) {
                 taskResult = (TaskResult) PAFuture.getFutureValue(taskResult);
                 ((JobResultImpl) job.getJobResult()).addTaskResult(task.getName(), taskResult, task
                         .isPreciousResult());
+                ((TaskResultImpl) taskResult).setPreviousResult(oldRes);
             }
 
             //add the result in database
