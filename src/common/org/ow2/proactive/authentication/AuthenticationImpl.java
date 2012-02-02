@@ -46,7 +46,11 @@ import javax.security.auth.Subject;
 import javax.security.auth.login.LoginContext;
 import javax.security.auth.login.LoginException;
 
+import org.objectweb.proactive.Body;
+import org.objectweb.proactive.RunActive;
+import org.objectweb.proactive.Service;
 import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.core.body.request.Request;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 
@@ -57,7 +61,7 @@ import org.ow2.proactive.authentication.crypto.Credentials;
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9.1
  */
-public abstract class AuthenticationImpl implements Authentication {
+public abstract class AuthenticationImpl implements Authentication, RunActive {
 
     /** Activation is used to control authentication during scheduling initialization */
     private boolean activated = false;
@@ -223,4 +227,23 @@ public abstract class AuthenticationImpl implements Authentication {
         getLogger().info("Authentication service is now shutdown!");
         return true;
     }
+
+    /**
+     * Method controls the execution of every request.
+     * Tries to keep this active object alive in case of any exception.
+     */
+    public void runActivity(Body body) {
+        Service service = new Service(body);
+        while (body.isActive()) {
+            Request request = service.blockingRemoveOldest();
+            if (request != null) {
+                try {
+                    service.serve(request);
+                } catch (Throwable e) {
+                    getLogger().error("Cannot serve request: " + request, e);
+                }
+            }
+        }
+    }
+
 }
