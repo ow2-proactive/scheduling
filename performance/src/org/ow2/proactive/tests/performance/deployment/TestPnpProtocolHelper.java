@@ -34,37 +34,43 @@
  * ################################################################
  * $ACTIVEEON_INITIAL_DEV$
  */
-package org.ow2.proactive.tests.performance.deployment.rm;
+package org.ow2.proactive.tests.performance.deployment;
 
 import java.net.InetAddress;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.extensions.pnp.PNPConfig;
-import org.ow2.proactive.tests.performance.deployment.DeploymentTestUtils;
-import org.ow2.proactive.tests.performance.deployment.SchedulingFolder;
 
 
-public class TestPnpRMDeployHelper extends TestRMDeployHelper {
+public class TestPnpProtocolHelper extends TestProtocolHelper {
 
     private Integer pnpPort;
 
-    public TestPnpRMDeployHelper(SchedulingFolder schedulingFolder, InetAddress rmHost, String javaPath) {
-        super(schedulingFolder, rmHost, javaPath);
+    public TestPnpProtocolHelper(String javaPath, SchedulingFolder schedulingFolder, InetAddress serverHost) {
+        super(javaPath, schedulingFolder, serverHost);
     }
 
     @Override
     public String prepareForDeployment() throws Exception {
-        pnpPort = DeploymentTestUtils.findFreePort(rmHost, javaPath, schedulingFolder
+        pnpPort = DeploymentTestUtils.findFreePort(serverHost, javaPath, schedulingFolder
                 .getPerformanceClassesDir().getAbsolutePath());
-        String url = String.format("pnp://%s:%d/", rmHost.getHostName(), pnpPort.intValue());
+        String url = String.format("pnp://%s:%d/", serverHost.getHostName(), pnpPort.intValue());
         return url;
     }
 
     @Override
-    protected List<String> getAdditionalRMJavaOptions() {
+    public Map<String, String> getClientProActiveProperties() {
+        Map<String, String> properties = new HashMap<String, String>();
+        properties.put(CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL.getName(), "pnp");
+        return properties;
+    }
+
+    @Override
+    public List<String> getAdditionalServerJavaOptions() {
         if (pnpPort == null) {
             throw new IllegalStateException("TestPnpRMDeployHelper didn't prepare deployment");
         }
@@ -72,13 +78,6 @@ public class TestPnpRMDeployHelper extends TestRMDeployHelper {
         options.add(PNPConfig.PA_PNP_PORT.getCmdLine() + String.valueOf(pnpPort.intValue()));
         options.add(CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL.getCmdLine() + "pnp");
         return options;
-    }
-
-    @Override
-    public Map<String, String> getClientProActiveProperties() {
-        Map<String, String> properties = super.getClientProActiveProperties();
-        properties.put(CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL.getName(), "pnp");
-        return properties;
     }
 
 }

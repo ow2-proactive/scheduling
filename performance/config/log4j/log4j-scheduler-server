@@ -6,7 +6,7 @@ log4j.appender.stdout.layout=org.apache.log4j.PatternLayout
 log4j.appender.stdout.layout.ConversionPattern=%d [%t] %-5p %c - %m%n
 
 log4j.appender.R=org.apache.log4j.RollingFileAppender
-log4j.appender.R.File=${pa.rm.home}/.logs/PERFORMANCE_server.log
+log4j.appender.R.File=${pa.scheduler.home}/.logs/PERFORMANCE_scheduler_server.log
 log4j.appender.R.MaxFileSize=10MB
 log4j.appender.R.MaxBackupIndex=5
 

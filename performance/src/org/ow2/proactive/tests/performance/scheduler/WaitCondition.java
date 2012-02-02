@@ -34,37 +34,42 @@
  * ################################################################
  * $ACTIVEEON_INITIAL_DEV$
  */
-package org.ow2.proactive.tests.performance.deployment;
+package org.ow2.proactive.tests.performance.scheduler;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
+import org.ow2.proactive.scheduler.common.NotificationData;
+import org.ow2.proactive.scheduler.common.SchedulerEvent;
+import org.ow2.proactive.scheduler.common.job.JobInfo;
+import org.ow2.proactive.scheduler.common.job.JobState;
+import org.ow2.proactive.scheduler.common.job.UserIdentification;
+import org.ow2.proactive.scheduler.common.task.TaskInfo;
 
-import org.ow2.proactive.tests.performance.deployment.rm.TestRMDeployHelper;
 
+public abstract class WaitCondition {
 
-public class KillTestProcesses {
+    private final StringBuilder eventsLog = new StringBuilder();
 
-    public static void killProcesses(String hostsNamesString) {
-        String hosts[] = {};
-        if (!hostsNamesString.isEmpty()) {
-            hosts = hostsNamesString.split(",");
-        }
-        Set<String> hostsList = new LinkedHashSet<String>();
-        for (String hostName : hosts) {
-            if (hostName != null && !hostName.isEmpty()) {
-                hostsList.add(hostName);
-            }
-        }
-        System.out.println("Killing test processes on the hosts: " + hostsList);
-        DeploymentTestUtils.killTestProcesses(hostsList, TestRMDeployHelper.TEST_JVM_OPTION);
+    protected void addEventLog(String logMessage) {
+        eventsLog.append(logMessage).append('\n');
     }
 
-    public static void main(String[] args) {
-        String hostsNamesString = System.getProperty("testHosts");
-        if (hostsNamesString == null) {
-            throw new IllegalArgumentException("Property 'testHosts' isn't set");
-        }
-        killProcesses(hostsNamesString);
+    public StringBuilder getEventsLog() {
+        return eventsLog;
     }
 
+    public abstract boolean stopWait() throws WaitFailedException;
+
+    public void schedulerStateUpdatedEvent(SchedulerEvent eventType) {
+    }
+
+    public void jobSubmittedEvent(JobState job) {
+    }
+
+    public void jobStateUpdatedEvent(NotificationData<JobInfo> notification) {
+    }
+
+    public void taskStateUpdatedEvent(NotificationData<TaskInfo> notification) {
+    }
+
+    public void usersUpdatedEvent(NotificationData<UserIdentification> notification) {
+    }
 }

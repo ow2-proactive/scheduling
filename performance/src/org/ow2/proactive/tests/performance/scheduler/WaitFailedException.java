@@ -34,37 +34,12 @@
  * ################################################################
  * $ACTIVEEON_INITIAL_DEV$
  */
-package org.ow2.proactive.tests.performance.deployment;
+package org.ow2.proactive.tests.performance.scheduler;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
+public class WaitFailedException extends Exception {
 
-import org.ow2.proactive.tests.performance.deployment.rm.TestRMDeployHelper;
-
-
-public class KillTestProcesses {
-
-    public static void killProcesses(String hostsNamesString) {
-        String hosts[] = {};
-        if (!hostsNamesString.isEmpty()) {
-            hosts = hostsNamesString.split(",");
-        }
-        Set<String> hostsList = new LinkedHashSet<String>();
-        for (String hostName : hosts) {
-            if (hostName != null && !hostName.isEmpty()) {
-                hostsList.add(hostName);
-            }
-        }
-        System.out.println("Killing test processes on the hosts: " + hostsList);
-        DeploymentTestUtils.killTestProcesses(hostsList, TestRMDeployHelper.TEST_JVM_OPTION);
-    }
-
-    public static void main(String[] args) {
-        String hostsNamesString = System.getProperty("testHosts");
-        if (hostsNamesString == null) {
-            throw new IllegalArgumentException("Property 'testHosts' isn't set");
-        }
-        killProcesses(hostsNamesString);
+    public WaitFailedException(String message) {
+        super(message);
     }
 
 }

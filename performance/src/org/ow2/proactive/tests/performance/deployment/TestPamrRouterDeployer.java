@@ -34,57 +34,85 @@
  * ################################################################
  * $ACTIVEEON_INITIAL_DEV$
  */
-package org.ow2.proactive.tests.performance.deployment.rm;
+package org.ow2.proactive.tests.performance.deployment;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
-import org.objectweb.proactive.extensions.pamr.PAMRConfig;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
-import org.ow2.proactive.tests.performance.deployment.DeploymentTestUtils;
-import org.ow2.proactive.tests.performance.deployment.SchedulingFolder;
-import org.ow2.proactive.tests.performance.deployment.TestExecutionException;
 import org.ow2.proactive.tests.performance.deployment.process.SSHProcessExecutor;
+import org.ow2.proactive.tests.performance.utils.TestUtils;
 
 
-public class TestPamrRMDeployHelper extends TestRMDeployHelper {
+public class TestPamrRouterDeployer {
 
-    public static final String RM_PAMR_ID = "0";
+    private final String javaPath;
 
-    public static final String RM_PAMR_COOKIE = "test_resource_manager";
-
-    private Integer pamrPort;
+    private final SchedulingFolder schedulingFolder;
 
     private final InetAddress pamrHost;
 
-    public TestPamrRMDeployHelper(SchedulingFolder schedulingFolder, InetAddress rmHost,
-            InetAddress pamrHost, String javaPath) {
-        super(schedulingFolder, rmHost, javaPath);
-        this.pamrHost = pamrHost;
+    private final Integer pamrPort;
+
+    private final List<PamrReservedId> reservedPamrIds;
+
+    public static TestPamrRouterDeployer createPamrRouterDeployerUsingSystemProperties() throws Exception {
+        String javaPath = TestUtils.getRequiredProperty("test.javaPath");
+        String schedulingPath = TestUtils.getRequiredProperty("test.schedulingPath");
+        String hostName = TestUtils.getRequiredProperty("test.deploy.pamr.startNewRouter.host");
+        String reservedIds = TestUtils.getRequiredProperty("test.deploy.pamr.startNewRouter.reservedIds");
+        return new TestPamrRouterDeployer(javaPath, schedulingPath, hostName, reservedIds);
     }
 
-    @Override
-    public String prepareForDeployment() throws Exception {
-        Map<String, String> properties = new HashMap<String, String>();
-        properties.put(RM_PAMR_ID, RM_PAMR_COOKIE);
-        String pamrConfigPath = createPamrConfig(schedulingFolder, properties);
+    public TestPamrRouterDeployer(String javaPath, String schedulingPath, String hostName, String reservedIds)
+            throws Exception {
+        this.javaPath = javaPath;
+        schedulingFolder = new SchedulingFolder(schedulingPath);
+        Collection<String> hosts = Collections.singleton(hostName);
+
+        reservedPamrIds = new ArrayList<PamrReservedId>();
+        if (!reservedIds.isEmpty()) {
+            String[] ids = reservedIds.split(",");
+            for (String id : ids) {
+                String splitted[] = id.split(":");
+                if (splitted.length != 2 || splitted[0].isEmpty() || splitted[1].isEmpty()) {
+                    throw new TestExecutionException("Invalid format of reservedIds: " + reservedIds);
+                }
+                reservedPamrIds.add(new PamrReservedId(splitted[0], splitted[1]));
+            }
+        } else {
+            throw new TestExecutionException("Pamr reservedIds are not specified");
+        }
+
+        pamrHost = TestDeployer.prepareHostsForTest(hosts, javaPath, schedulingFolder.getRootDirPath())
+                .get(0);
 
         pamrPort = DeploymentTestUtils.findFreePort(pamrHost, javaPath, schedulingFolder
                 .getPerformanceClassesDir().getAbsolutePath());
+    }
+
+    public void startRouter() throws Exception {
+        Map<String, String> properties = new LinkedHashMap<String, String>();
+        for (PamrReservedId id : reservedPamrIds) {
+            properties.put(id.getId(), id.getCookie());
+        }
+        String pamrConfigPath = createPamrConfig(schedulingFolder, properties);
 
         List<String> command = new ArrayList<String>();
         command.add(javaPath);
-        command.add("-D" + TEST_JVM_OPTION);
+        command.add("-D" + TestDeployHelper.TEST_JVM_OPTION);
         command.add(PAResourceManagerProperties.RM_HOME.getCmdLine() + schedulingFolder.getRootDirPath());
         command.add(CentralPAPropertyRepository.LOG4J.getCmdLine() + "file:" +
-            getFileName(schedulingFolder.getTestConfigDir(), "/log4j/log4j-pamr-router"));
+            TestDeployer.getFileName(schedulingFolder.getTestConfigDir(), "/log4j/log4j-pamr-router"));
         command.add("-cp");
         command.add(schedulingFolder.getRootDirPath() + "/dist/lib/ProActive.jar" + File.pathSeparator +
             schedulingFolder.getRootDirPath() + "/dist/lib/ProActive_utils.jar");
@@ -95,48 +123,23 @@ public class TestPamrRMDeployHelper extends TestRMDeployHelper {
         command.add(pamrConfigPath);
         command.add("--verbose");
 
-        System.out.println("Starting PAMR on the " + pamrHost + ", command: " + command);
+        System.out.println("Starting PAMR router on the " + pamrHost + ", command: " + command);
         SSHProcessExecutor pamrProcess = SSHProcessExecutor.createExecutorPrintOutput("PAMR Router",
                 pamrHost, command.toArray(new String[command.size()]));
         pamrProcess.start();
 
         Thread.sleep(5000);
         if (pamrProcess.isProcessFinished()) {
-            throw new TestExecutionException("Failed to start PAMR ROUTER");
+            throw new TestExecutionException("Failed to start PAMR router");
         }
-        pamrProcess.killProcess();
-
-        return String.format("pamr://%s/", RM_PAMR_ID);
     }
 
-    @Override
-    public Map<String, String> getClientProActiveProperties() {
-        if (pamrPort == null) {
-            throw new IllegalStateException("TestPamrRMDeployHelper didn't prepare deployment");
-        }
-        Map<String, String> properties = super.getClientProActiveProperties();
-        properties.put(CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL.getName(), "pamr");
-        properties.put(PAMRConfig.PA_NET_ROUTER_ADDRESS.getName(), pamrHost.getHostName());
-        properties.put(PAMRConfig.PA_NET_ROUTER_PORT.getName(), String.valueOf(pamrPort));
-        return properties;
+    public InetAddress getPamrHost() {
+        return pamrHost;
     }
 
-    @Override
-    protected List<String> getAdditionalRMJavaOptions() {
-        if (pamrPort == null) {
-            throw new IllegalStateException("TestPamrRMDeployHelper didn't prepare deployment");
-        }
-
-        List<String> options = new ArrayList<String>();
-
-        options.add(CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL.getCmdLine() + "pamr");
-        options.add(PAMRConfig.PA_NET_ROUTER_ADDRESS.getCmdLine() + pamrHost.getHostName());
-        options.add(PAMRConfig.PA_NET_ROUTER_PORT.getCmdLine() + String.valueOf(pamrPort));
-
-        options.add(PAMRConfig.PA_PAMR_AGENT_ID.getCmdLine() + RM_PAMR_ID);
-        options.add(PAMRConfig.PA_PAMR_AGENT_MAGIC_COOKIE.getCmdLine() + RM_PAMR_COOKIE);
-
-        return options;
+    public Integer getPamrPort() {
+        return pamrPort;
     }
 
     private String createPamrConfig(SchedulingFolder schedulingFolder, Map<String, String> properties)

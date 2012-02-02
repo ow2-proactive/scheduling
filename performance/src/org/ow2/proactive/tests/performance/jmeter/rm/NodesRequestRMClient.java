@@ -47,6 +47,7 @@ import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.scripting.SelectionScript;
+import org.ow2.proactive.tests.performance.utils.TestUtils;
 import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
 import org.ow2.proactive.utils.NodeSet;
 
@@ -64,8 +65,6 @@ public class NodesRequestRMClient extends BaseJMeterRMClient {
     public static final String PARAM_SELECTION_SCRIPT_TYPE_DYNAMIC = "selectionScriptTypeDynamic";
 
     public static final String PARAM_NODE_REQUEST_TOPOLOGY = "nodeRequestTopology";
-
-    private Random random = new Random();
 
     @Override
     public Arguments getDefaultParameters() {
@@ -126,21 +125,10 @@ public class NodesRequestRMClient extends BaseJMeterRMClient {
             boolean dynamicContent = getBooleanParameter(context, PARAM_SELECTION_SCRIPT_DYNAMIC_CONTENT);
             boolean dynamicScriptType = getBooleanParameter(context, PARAM_SELECTION_SCRIPT_TYPE_DYNAMIC);
 
-            return createScript(returnValue, dynamicContent, dynamicScriptType);
+            return TestUtils.createSimpleSelectionScript(returnValue, dynamicContent, dynamicScriptType);
         } else {
             return null;
         }
-    }
-
-    private SelectionScript createScript(boolean returnValue, boolean dynamicContent, boolean dynamicScript)
-            throws Exception {
-        StringBuilder scriptText = new StringBuilder();
-        if (dynamicContent) {
-            scriptText.append(String.format("// dummy comment %d, %d\n", System.currentTimeMillis(), random
-                    .nextLong()));
-        }
-        scriptText.append(String.format("selected = %s;", String.valueOf(returnValue)));
-        return new SelectionScript(scriptText.toString(), "JavaScript", dynamicScript);
     }
 
     private TopologyDescriptor getTopologyDescriptor(JavaSamplerContext context) {
@@ -148,25 +136,7 @@ public class NodesRequestRMClient extends BaseJMeterRMClient {
             return TopologyDescriptor.ARBITRARY;
         }
         String topology = context.getParameter(PARAM_NODE_REQUEST_TOPOLOGY);
-        if (topology == null || topology.isEmpty()) {
-            return TopologyDescriptor.ARBITRARY;
-        }
-
-        if (topology.equals("ARBITRARY")) {
-            return TopologyDescriptor.ARBITRARY;
-        } else if (topology.equals("BEST_PROXIMITY")) {
-            return TopologyDescriptor.BEST_PROXIMITY;
-        } else if (topology.equals("DIFFERENT_HOSTS_EXCLUSIVE")) {
-            return TopologyDescriptor.DIFFERENT_HOSTS_EXCLUSIVE;
-        } else if (topology.equals("MULTIPLE_HOSTS_EXCLUSIVE")) {
-            return TopologyDescriptor.MULTIPLE_HOSTS_EXCLUSIVE;
-        } else if (topology.equals("SINGLE_HOST")) {
-            return TopologyDescriptor.SINGLE_HOST;
-        } else if (topology.equals("SINGLE_HOST_EXCLUSIVE")) {
-            return TopologyDescriptor.SINGLE_HOST_EXCLUSIVE;
-        } else {
-            throw new IllegalArgumentException("Invalid topology parameter: " + topology);
-        }
+        return TestUtils.getTopologyDescriptor(topology);
     }
 
 }

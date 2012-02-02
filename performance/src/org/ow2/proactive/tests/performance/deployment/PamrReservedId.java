@@ -36,35 +36,23 @@
  */
 package org.ow2.proactive.tests.performance.deployment;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
+public class PamrReservedId {
 
-import org.ow2.proactive.tests.performance.deployment.rm.TestRMDeployHelper;
+    private final String id;
 
+    private final String cookie;
 
-public class KillTestProcesses {
-
-    public static void killProcesses(String hostsNamesString) {
-        String hosts[] = {};
-        if (!hostsNamesString.isEmpty()) {
-            hosts = hostsNamesString.split(",");
-        }
-        Set<String> hostsList = new LinkedHashSet<String>();
-        for (String hostName : hosts) {
-            if (hostName != null && !hostName.isEmpty()) {
-                hostsList.add(hostName);
-            }
-        }
-        System.out.println("Killing test processes on the hosts: " + hostsList);
-        DeploymentTestUtils.killTestProcesses(hostsList, TestRMDeployHelper.TEST_JVM_OPTION);
+    public PamrReservedId(String id, String cookie) {
+        this.id = id;
+        this.cookie = cookie;
     }
 
-    public static void main(String[] args) {
-        String hostsNamesString = System.getProperty("testHosts");
-        if (hostsNamesString == null) {
-            throw new IllegalArgumentException("Property 'testHosts' isn't set");
-        }
-        killProcesses(hostsNamesString);
+    public String getId() {
+        return id;
+    }
+
+    public String getCookie() {
+        return cookie;
     }
 
 }

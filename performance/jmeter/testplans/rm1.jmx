@@ -62,9 +62,9 @@
             <stringProp name="Argument.value">${__P(sshNodeSourceUsers,0)}</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
-          <elementProp name="rmTestTime" elementType="Argument">
-            <stringProp name="Argument.name">rmTestTime</stringProp>
-            <stringProp name="Argument.value">${__P(rmTestTime,10)}</stringProp>
+          <elementProp name="testTime" elementType="Argument">
+            <stringProp name="Argument.name">testTime</stringProp>
+            <stringProp name="Argument.value">${__P(testTime,10)}</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
           <elementProp name="createNodeSourceHosts" elementType="Argument">
@@ -177,7 +177,7 @@
         <longProp name="ThreadGroup.start_time">1326895728000</longProp>
         <longProp name="ThreadGroup.end_time">1326895766000</longProp>
         <boolProp name="ThreadGroup.scheduler">true</boolProp>
-        <stringProp name="ThreadGroup.duration">${rmTestTime}</stringProp>
+        <stringProp name="ThreadGroup.duration">${testTime}</stringProp>
         <stringProp name="ThreadGroup.delay"></stringProp>
       </ThreadGroup>
       <hashTree>
@@ -246,7 +246,7 @@
         <longProp name="ThreadGroup.start_time">1326967157000</longProp>
         <longProp name="ThreadGroup.end_time">1326967157000</longProp>
         <boolProp name="ThreadGroup.scheduler">true</boolProp>
-        <stringProp name="ThreadGroup.duration">${rmTestTime}</stringProp>
+        <stringProp name="ThreadGroup.duration">${testTime}</stringProp>
         <stringProp name="ThreadGroup.delay"></stringProp>
       </ThreadGroup>
       <hashTree>
@@ -293,11 +293,6 @@
                 <stringProp name="Argument.value">${nodeJavaOptions}</stringProp>
                 <stringProp name="Argument.metadata">=</stringProp>
               </elementProp>
-              <elementProp name="nodeProActiveConfig" elementType="Argument">
-                <stringProp name="Argument.name">nodeProActiveConfig</stringProp>
-                <stringProp name="Argument.value">${nodeProActiveConfig}</stringProp>
-                <stringProp name="Argument.metadata">=</stringProp>
-              </elementProp>
               <elementProp name="cliNodeDeploymentScript" elementType="Argument">
                 <stringProp name="Argument.name">cliNodeDeploymentScript</stringProp>
                 <stringProp name="Argument.value">${cliNodeDeploymentScript}</stringProp>
@@ -330,7 +325,7 @@
         <longProp name="ThreadGroup.start_time">1326968131000</longProp>
         <longProp name="ThreadGroup.end_time">1326968131000</longProp>
         <boolProp name="ThreadGroup.scheduler">true</boolProp>
-        <stringProp name="ThreadGroup.duration">${rmTestTime}</stringProp>
+        <stringProp name="ThreadGroup.duration">${testTime}</stringProp>
         <stringProp name="ThreadGroup.delay"></stringProp>
       </ThreadGroup>
       <hashTree>
@@ -375,11 +370,6 @@
               <elementProp name="nodeJavaOptions" elementType="Argument">
                 <stringProp name="Argument.name">nodeJavaOptions</stringProp>
                 <stringProp name="Argument.value">${nodeJavaOptions}</stringProp>
-                <stringProp name="Argument.metadata">=</stringProp>
-              </elementProp>
-              <elementProp name="nodeProActiveConfig" elementType="Argument">
-                <stringProp name="Argument.name">nodeProActiveConfig</stringProp>
-                <stringProp name="Argument.value">${nodeProActiveConfig}</stringProp>
                 <stringProp name="Argument.metadata">=</stringProp>
               </elementProp>
             </collectionProp>

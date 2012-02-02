@@ -34,37 +34,34 @@
  * ################################################################
  * $ACTIVEEON_INITIAL_DEV$
  */
-package org.ow2.proactive.tests.performance.deployment;
+package org.ow2.proactive.tests.performance.jmeter.scheduler;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
+import org.ow2.proactive.scheduler.common.job.JobPriority;
+import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
+import org.ow2.proactive.scheduler.common.task.NativeTask;
 
-import org.ow2.proactive.tests.performance.deployment.rm.TestRMDeployHelper;
 
+public class SimpleNativeJobSubmitClient extends BaseJobSubmitClient {
 
-public class KillTestProcesses {
+    @Override
+    protected TaskFlowJob createJob(String jobName) throws Exception {
+        TaskFlowJob job = new TaskFlowJob();
+        job.setName(jobName);
+        job.setPriority(JobPriority.NORMAL);
+        job.setCancelJobOnError(true);
+        job.setDescription("Job with one native task (task exits immediately)");
 
-    public static void killProcesses(String hostsNamesString) {
-        String hosts[] = {};
-        if (!hostsNamesString.isEmpty()) {
-            hosts = hostsNamesString.split(",");
-        }
-        Set<String> hostsList = new LinkedHashSet<String>();
-        for (String hostName : hosts) {
-            if (hostName != null && !hostName.isEmpty()) {
-                hostsList.add(hostName);
-            }
-        }
-        System.out.println("Killing test processes on the hosts: " + hostsList);
-        DeploymentTestUtils.killTestProcesses(hostsList, TestRMDeployHelper.TEST_JVM_OPTION);
-    }
+        NativeTask task = new NativeTask();
+        task.setCommandLine(new String[] { testsSourcePath +
+            "/org/ow2/proactive/tests/performance/jmeter/scheduler/nativeTask.sh" });
+        task.setName("Test native task");
+        task.setDescription("Test native task, exits immediately");
+        task.setMaxNumberOfExecution(1);
+        task.setCancelJobOnError(true);
 
-    public static void main(String[] args) {
-        String hostsNamesString = System.getProperty("testHosts");
-        if (hostsNamesString == null) {
-            throw new IllegalArgumentException("Property 'testHosts' isn't set");
-        }
-        killProcesses(hostsNamesString);
+        job.addTask(task);
+
+        return job;
     }
 
 }

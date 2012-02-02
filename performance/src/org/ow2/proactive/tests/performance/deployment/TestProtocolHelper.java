@@ -36,35 +36,29 @@
  */
 package org.ow2.proactive.tests.performance.deployment;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.net.InetAddress;
+import java.util.List;
+import java.util.Map;
 
-import org.ow2.proactive.tests.performance.deployment.rm.TestRMDeployHelper;
 
+public abstract class TestProtocolHelper {
 
-public class KillTestProcesses {
+    protected final String javaPath;
 
-    public static void killProcesses(String hostsNamesString) {
-        String hosts[] = {};
-        if (!hostsNamesString.isEmpty()) {
-            hosts = hostsNamesString.split(",");
-        }
-        Set<String> hostsList = new LinkedHashSet<String>();
-        for (String hostName : hosts) {
-            if (hostName != null && !hostName.isEmpty()) {
-                hostsList.add(hostName);
-            }
-        }
-        System.out.println("Killing test processes on the hosts: " + hostsList);
-        DeploymentTestUtils.killTestProcesses(hostsList, TestRMDeployHelper.TEST_JVM_OPTION);
+    protected final SchedulingFolder schedulingFolder;
+
+    protected final InetAddress serverHost;
+
+    public TestProtocolHelper(String javaPath, SchedulingFolder schedulingFolder, InetAddress serverHost) {
+        this.javaPath = javaPath;
+        this.schedulingFolder = schedulingFolder;
+        this.serverHost = serverHost;
     }
 
-    public static void main(String[] args) {
-        String hostsNamesString = System.getProperty("testHosts");
-        if (hostsNamesString == null) {
-            throw new IllegalArgumentException("Property 'testHosts' isn't set");
-        }
-        killProcesses(hostsNamesString);
-    }
+    public abstract String prepareForDeployment() throws Exception;
+
+    public abstract Map<String, String> getClientProActiveProperties();
+
+    public abstract List<String> getAdditionalServerJavaOptions();
 
 }

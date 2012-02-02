@@ -1,0 +1,377 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jmeterTestPlan version="1.2" properties="2.1">
+  <hashTree>
+    <TestPlan guiclass="TestPlanGui" testclass="TestPlan" testname="Scheduler Test 1" enabled="true">
+      <stringProp name="TestPlan.comments"></stringProp>
+      <boolProp name="TestPlan.functional_mode">false</boolProp>
+      <boolProp name="TestPlan.serialize_threadgroups">false</boolProp>
+      <elementProp name="TestPlan.user_defined_variables" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
+        <collectionProp name="Arguments.arguments">
+          <elementProp name="schedulerLogin" elementType="Argument">
+            <stringProp name="Argument.name">schedulerLogin</stringProp>
+            <stringProp name="Argument.value">${__P(schedulerLogin,admin)}</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="schedulerPassword" elementType="Argument">
+            <stringProp name="Argument.name">schedulerPassword</stringProp>
+            <stringProp name="Argument.value">${__P(schedulerPassword,admin)}</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="schedulerUrl" elementType="Argument">
+            <stringProp name="Argument.name">schedulerUrl</stringProp>
+            <stringProp name="Argument.value">${__P(schedulerUrl,rmi://localhost:1099/)}</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="schedulingPath" elementType="Argument">
+            <stringProp name="Argument.name">schedulingPath</stringProp>
+            <stringProp name="Argument.value">${__P(schedulingPath,)}</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="schedulerListenersNumber" elementType="Argument">
+            <stringProp name="Argument.name">schedulerListenersNumber</stringProp>
+            <stringProp name="Argument.value">${__P(schedulerListenersNumber,0)}</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="simpleJavaTaskUsersNumber" elementType="Argument">
+            <stringProp name="Argument.name">simpleJavaTaskUsersNumber</stringProp>
+            <stringProp name="Argument.value">${__P(simpleJavaTaskUsersNumber,1)}</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="testTime" elementType="Argument">
+            <stringProp name="Argument.name">testTime</stringProp>
+            <stringProp name="Argument.value">${__P(testTime,1)}</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="simpleNativeTaskUsersNumber" elementType="Argument">
+            <stringProp name="Argument.name">simpleNativeTaskUsersNumber</stringProp>
+            <stringProp name="Argument.value">${__P(simpleNativeTaskUsersNumber,0)}</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="multiNodeSubmitUsersNumber" elementType="Argument">
+            <stringProp name="Argument.name">multiNodeSubmitUsersNumber</stringProp>
+            <stringProp name="Argument.value">${__P(multiNodeSubmitUsersNumber,0)}</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="multiNodeSubmitTaskType" elementType="Argument">
+            <stringProp name="Argument.name">multiNodeSubmitTaskType</stringProp>
+            <stringProp name="Argument.value">${__P(multiNodeSubmitTaskType,1)}</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="multiNodeSubmitNodesNumber" elementType="Argument">
+            <stringProp name="Argument.name">multiNodeSubmitNodesNumber</stringProp>
+            <stringProp name="Argument.value">${__P(multiNodeSubmitNodesNumber,1)}</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="multiNodeSubmitTopology" elementType="Argument">
+            <stringProp name="Argument.name">multiNodeSubmitTopology</stringProp>
+            <stringProp name="Argument.value">${__P(multiNodeSubmitTopology,)}</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="submitUseSelectionScript" elementType="Argument">
+            <stringProp name="Argument.name">submitUseSelectionScript</stringProp>
+            <stringProp name="Argument.value">${__P(submitUseSelectionScript,false)}</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="submitSelectionScriptDynamicContent" elementType="Argument">
+            <stringProp name="Argument.name">submitSelectionScriptDynamicContent</stringProp>
+            <stringProp name="Argument.value">${__P(submitSelectionScriptDynamicContent,false)}</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="submitSelectionScriptTypeDynamic" elementType="Argument">
+            <stringProp name="Argument.name">submitSelectionScriptTypeDynamic</stringProp>
+            <stringProp name="Argument.value">${__P(submitSelectionScriptTypeDynamic,false)}</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="submitAndKillUsersNumber" elementType="Argument">
+            <stringProp name="Argument.name">submitAndKillUsersNumber</stringProp>
+            <stringProp name="Argument.value">${__P(submitAndKillUsersNumber,0)}</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+        </collectionProp>
+      </elementProp>
+      <stringProp name="TestPlan.user_define_classpath"></stringProp>
+    </TestPlan>
+    <hashTree>
+      <SetupThreadGroup guiclass="SetupThreadGroupGui" testclass="SetupThreadGroup" testname="setUp" enabled="true">
+        <stringProp name="ThreadGroup.on_sample_error">stoptest</stringProp>
+        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
+          <boolProp name="LoopController.continue_forever">false</boolProp>
+          <stringProp name="LoopController.loops">1</stringProp>
+        </elementProp>
+        <stringProp name="ThreadGroup.num_threads">1</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">1</stringProp>
+        <longProp name="ThreadGroup.start_time">1326736302000</longProp>
+        <longProp name="ThreadGroup.end_time">1326736302000</longProp>
+        <boolProp name="ThreadGroup.scheduler">false</boolProp>
+        <stringProp name="ThreadGroup.duration"></stringProp>
+        <stringProp name="ThreadGroup.delay"></stringProp>
+      </SetupThreadGroup>
+      <hashTree>
+        <JavaSampler guiclass="JavaTestSamplerGui" testclass="JavaSampler" testname="Register listeners" enabled="true">
+          <elementProp name="arguments" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" enabled="true">
+            <collectionProp name="Arguments.arguments">
+              <elementProp name="schedulerUrl" elementType="Argument">
+                <stringProp name="Argument.name">schedulerUrl</stringProp>
+                <stringProp name="Argument.value">${schedulerUrl}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="schedulerLogin" elementType="Argument">
+                <stringProp name="Argument.name">schedulerLogin</stringProp>
+                <stringProp name="Argument.value">${schedulerLogin}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="schedulerPassword" elementType="Argument">
+                <stringProp name="Argument.name">schedulerPassword</stringProp>
+                <stringProp name="Argument.value">${schedulerPassword}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="schedulerListenersNumber" elementType="Argument">
+                <stringProp name="Argument.name">schedulerListenersNumber</stringProp>
+                <stringProp name="Argument.value">${schedulerListenersNumber}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+            </collectionProp>
+          </elementProp>
+          <stringProp name="classname">org.ow2.proactive.tests.performance.jmeter.scheduler.SchedulerScenarioSetupClient</stringProp>
+        </JavaSampler>
+        <hashTree/>
+      </hashTree>
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Submit simple java task" enabled="true">
+        <stringProp name="ThreadGroup.on_sample_error">stoptest</stringProp>
+        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
+          <boolProp name="LoopController.continue_forever">false</boolProp>
+          <intProp name="LoopController.loops">-1</intProp>
+        </elementProp>
+        <stringProp name="ThreadGroup.num_threads">${simpleJavaTaskUsersNumber}</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">1</stringProp>
+        <longProp name="ThreadGroup.start_time">1326895728000</longProp>
+        <longProp name="ThreadGroup.end_time">1326895766000</longProp>
+        <boolProp name="ThreadGroup.scheduler">true</boolProp>
+        <stringProp name="ThreadGroup.duration">${testTime}</stringProp>
+        <stringProp name="ThreadGroup.delay"></stringProp>
+      </ThreadGroup>
+      <hashTree>
+        <JavaSampler guiclass="JavaTestSamplerGui" testclass="JavaSampler" testname="Submit simple java task" enabled="true">
+          <elementProp name="arguments" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" enabled="true">
+            <collectionProp name="Arguments.arguments">
+              <elementProp name="schedulerUrl" elementType="Argument">
+                <stringProp name="Argument.name">schedulerUrl</stringProp>
+                <stringProp name="Argument.value">${schedulerUrl}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="schedulerLogin" elementType="Argument">
+                <stringProp name="Argument.name">schedulerLogin</stringProp>
+                <stringProp name="Argument.value">${schedulerLogin}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="schedulerPassword" elementType="Argument">
+                <stringProp name="Argument.name">schedulerPassword</stringProp>
+                <stringProp name="Argument.value">${schedulerPassword}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="schedulingPath" elementType="Argument">
+                <stringProp name="Argument.name">schedulingPath</stringProp>
+                <stringProp name="Argument.value">${schedulingPath}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="submitUseSelectionScript" elementType="Argument">
+                <stringProp name="Argument.name">submitUseSelectionScript</stringProp>
+                <stringProp name="Argument.value">${submitUseSelectionScript}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="submitSelectionScriptDynamicContent" elementType="Argument">
+                <stringProp name="Argument.name">submitSelectionScriptDynamicContent</stringProp>
+                <stringProp name="Argument.value">${submitSelectionScriptDynamicContent}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="submitSelectionScriptTypeDynamic" elementType="Argument">
+                <stringProp name="Argument.name">submitSelectionScriptTypeDynamic</stringProp>
+                <stringProp name="Argument.value">${submitSelectionScriptTypeDynamic}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+            </collectionProp>
+          </elementProp>
+          <stringProp name="classname">org.ow2.proactive.tests.performance.jmeter.scheduler.SimpleJavaJobSubmitClient</stringProp>
+        </JavaSampler>
+        <hashTree/>
+      </hashTree>
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Submit simple native task" enabled="true">
+        <stringProp name="ThreadGroup.on_sample_error">stoptest</stringProp>
+        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
+          <boolProp name="LoopController.continue_forever">false</boolProp>
+          <intProp name="LoopController.loops">-1</intProp>
+        </elementProp>
+        <stringProp name="ThreadGroup.num_threads">${simpleNativeTaskUsersNumber}</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">1</stringProp>
+        <longProp name="ThreadGroup.start_time">1328027215000</longProp>
+        <longProp name="ThreadGroup.end_time">1328027215000</longProp>
+        <boolProp name="ThreadGroup.scheduler">true</boolProp>
+        <stringProp name="ThreadGroup.duration">${testTime}</stringProp>
+        <stringProp name="ThreadGroup.delay"></stringProp>
+      </ThreadGroup>
+      <hashTree>
+        <JavaSampler guiclass="JavaTestSamplerGui" testclass="JavaSampler" testname="Submit simple native task" enabled="true">
+          <elementProp name="arguments" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" enabled="true">
+            <collectionProp name="Arguments.arguments">
+              <elementProp name="schedulerUrl" elementType="Argument">
+                <stringProp name="Argument.name">schedulerUrl</stringProp>
+                <stringProp name="Argument.value">${schedulerUrl}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="schedulerLogin" elementType="Argument">
+                <stringProp name="Argument.name">schedulerLogin</stringProp>
+                <stringProp name="Argument.value">${schedulerLogin}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="schedulerPassword" elementType="Argument">
+                <stringProp name="Argument.name">schedulerPassword</stringProp>
+                <stringProp name="Argument.value">${schedulerPassword}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="schedulingPath" elementType="Argument">
+                <stringProp name="Argument.name">schedulingPath</stringProp>
+                <stringProp name="Argument.value">${schedulingPath}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="submitUseSelectionScript" elementType="Argument">
+                <stringProp name="Argument.name">submitUseSelectionScript</stringProp>
+                <stringProp name="Argument.value">${submitUseSelectionScript}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="submitSelectionScriptDynamicContent" elementType="Argument">
+                <stringProp name="Argument.name">submitSelectionScriptDynamicContent</stringProp>
+                <stringProp name="Argument.value">${submitSelectionScriptDynamicContent}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="submitSelectionScriptTypeDynamic" elementType="Argument">
+                <stringProp name="Argument.name">submitSelectionScriptTypeDynamic</stringProp>
+                <stringProp name="Argument.value">${submitSelectionScriptTypeDynamic}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+            </collectionProp>
+          </elementProp>
+          <stringProp name="classname">org.ow2.proactive.tests.performance.jmeter.scheduler.SimpleNativeJobSubmitClient</stringProp>
+        </JavaSampler>
+        <hashTree/>
+      </hashTree>
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Submit simple multinode task" enabled="true">
+        <stringProp name="ThreadGroup.on_sample_error">stoptest</stringProp>
+        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
+          <boolProp name="LoopController.continue_forever">false</boolProp>
+          <intProp name="LoopController.loops">-1</intProp>
+        </elementProp>
+        <stringProp name="ThreadGroup.num_threads">${multiNodeSubmitUsersNumber}</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">1</stringProp>
+        <longProp name="ThreadGroup.start_time">1328027215000</longProp>
+        <longProp name="ThreadGroup.end_time">1328027215000</longProp>
+        <boolProp name="ThreadGroup.scheduler">true</boolProp>
+        <stringProp name="ThreadGroup.duration">${testTime}</stringProp>
+        <stringProp name="ThreadGroup.delay"></stringProp>
+      </ThreadGroup>
+      <hashTree>
+        <JavaSampler guiclass="JavaTestSamplerGui" testclass="JavaSampler" testname="Submit simple multinode task" enabled="true">
+          <elementProp name="arguments" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" enabled="true">
+            <collectionProp name="Arguments.arguments">
+              <elementProp name="schedulerUrl" elementType="Argument">
+                <stringProp name="Argument.name">schedulerUrl</stringProp>
+                <stringProp name="Argument.value">${schedulerUrl}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="schedulerLogin" elementType="Argument">
+                <stringProp name="Argument.name">schedulerLogin</stringProp>
+                <stringProp name="Argument.value">${schedulerLogin}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="schedulerPassword" elementType="Argument">
+                <stringProp name="Argument.name">schedulerPassword</stringProp>
+                <stringProp name="Argument.value">${schedulerPassword}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="schedulingPath" elementType="Argument">
+                <stringProp name="Argument.name">schedulingPath</stringProp>
+                <stringProp name="Argument.value">${schedulingPath}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="submitUseSelectionScript" elementType="Argument">
+                <stringProp name="Argument.name">submitUseSelectionScript</stringProp>
+                <stringProp name="Argument.value">${submitUseSelectionScript}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="submitSelectionScriptDynamicContent" elementType="Argument">
+                <stringProp name="Argument.name">submitSelectionScriptDynamicContent</stringProp>
+                <stringProp name="Argument.value">${submitSelectionScriptDynamicContent}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="submitSelectionScriptTypeDynamic" elementType="Argument">
+                <stringProp name="Argument.name">submitSelectionScriptTypeDynamic</stringProp>
+                <stringProp name="Argument.value">${submitSelectionScriptTypeDynamic}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="multiNodeSubmitTaskType" elementType="Argument">
+                <stringProp name="Argument.name">multiNodeSubmitTaskType</stringProp>
+                <stringProp name="Argument.value">${multiNodeSubmitTaskType}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="multiNodeSubmitNodesNumber" elementType="Argument">
+                <stringProp name="Argument.name">multiNodeSubmitNodesNumber</stringProp>
+                <stringProp name="Argument.value">${multiNodeSubmitNodesNumber}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="multiNodeSubmitTopology" elementType="Argument">
+                <stringProp name="Argument.name">multiNodeSubmitTopology</stringProp>
+                <stringProp name="Argument.value">${multiNodeSubmitTopology}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+            </collectionProp>
+          </elementProp>
+          <stringProp name="classname">org.ow2.proactive.tests.performance.jmeter.scheduler.MultiNodeJobSubmitClient</stringProp>
+        </JavaSampler>
+        <hashTree/>
+      </hashTree>
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Submit and kill simple job" enabled="true">
+        <stringProp name="ThreadGroup.on_sample_error">stoptest</stringProp>
+        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
+          <boolProp name="LoopController.continue_forever">false</boolProp>
+          <intProp name="LoopController.loops">-1</intProp>
+        </elementProp>
+        <stringProp name="ThreadGroup.num_threads">${submitAndKillUsersNumber}</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">1</stringProp>
+        <longProp name="ThreadGroup.start_time">1328027215000</longProp>
+        <longProp name="ThreadGroup.end_time">1328027215000</longProp>
+        <boolProp name="ThreadGroup.scheduler">true</boolProp>
+        <stringProp name="ThreadGroup.duration">${testTime}</stringProp>
+        <stringProp name="ThreadGroup.delay"></stringProp>
+      </ThreadGroup>
+      <hashTree>
+        <JavaSampler guiclass="JavaTestSamplerGui" testclass="JavaSampler" testname="Submit and kill simple job" enabled="true">
+          <elementProp name="arguments" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" enabled="true">
+            <collectionProp name="Arguments.arguments">
+              <elementProp name="schedulerUrl" elementType="Argument">
+                <stringProp name="Argument.name">schedulerUrl</stringProp>
+                <stringProp name="Argument.value">${schedulerUrl}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="schedulerLogin" elementType="Argument">
+                <stringProp name="Argument.name">schedulerLogin</stringProp>
+                <stringProp name="Argument.value">${schedulerLogin}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="schedulerPassword" elementType="Argument">
+                <stringProp name="Argument.name">schedulerPassword</stringProp>
+                <stringProp name="Argument.value">${schedulerPassword}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="schedulingPath" elementType="Argument">
+                <stringProp name="Argument.name">schedulingPath</stringProp>
+                <stringProp name="Argument.value">${schedulingPath}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+            </collectionProp>
+          </elementProp>
+          <stringProp name="classname">org.ow2.proactive.tests.performance.jmeter.scheduler.SubmitAndKillSchedulerClient</stringProp>
+        </JavaSampler>
+        <hashTree/>
+      </hashTree>
+    </hashTree>
+  </hashTree>
+</jmeterTestPlan>
