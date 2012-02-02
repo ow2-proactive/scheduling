@@ -36,46 +36,21 @@
  */
 package org.ow2.proactive.tests.performance.rm;
 
-import java.io.Serializable;
-
-import org.objectweb.proactive.api.PAActiveObject;
 import org.ow2.proactive.resourcemanager.common.event.RMEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
-import org.ow2.proactive.resourcemanager.frontend.RMEventListener;
-import org.ow2.proactive.resourcemanager.frontend.RMGroupEventListener;
+import org.ow2.proactive.tests.performance.utils.AbstractWaitCondition;
 
 
-public class RMTestListener extends RMGroupEventListener implements Serializable {
+public abstract class RMWaitCondition extends AbstractWaitCondition {
 
-    private RMEventListener eventsMonitor;
-
-    public RMTestListener() {
-    }
-
-    public RMTestListener(RMEventListener eventsMonitor) {
-        this.eventsMonitor = eventsMonitor;
-    }
-
-    public static RMTestListener createRMTestListener(RMEventListener eventsMonitor) throws Exception {
-        RMTestListener listener = new RMTestListener(eventsMonitor);
-        listener = PAActiveObject.turnActive(listener);
-        return listener;
-    }
-
-    @Override
     public void rmEvent(RMEvent event) {
-        eventsMonitor.rmEvent(event);
     }
 
-    @Override
     public void nodeSourceEvent(RMNodeSourceEvent event) {
-        eventsMonitor.nodeSourceEvent(event);
     }
 
-    @Override
     public void nodeEvent(RMNodeEvent event) {
-        eventsMonitor.nodeEvent(event);
     }
 
 }

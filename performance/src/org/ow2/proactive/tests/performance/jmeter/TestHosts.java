@@ -38,7 +38,9 @@ package org.ow2.proactive.tests.performance.jmeter;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import junit.framework.Assert;
 
@@ -91,6 +93,14 @@ public class TestHosts {
         if (hosts.isEmpty()) {
             throw new IllegalArgumentException("Invalid hosts list: " + hostsList);
         }
+    }
+
+    public synchronized Set<String> getAllHostsNames() {
+        Set<String> result = new LinkedHashSet<String>();
+        for (Host host : hosts) {
+            result.add(host.getHostName());
+        }
+        return result;
     }
 
     public synchronized Host getHost() {

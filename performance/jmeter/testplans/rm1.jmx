@@ -117,6 +117,11 @@
             <stringProp name="Argument.value">${__P(nodeJavaOptions,)}</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
+          <elementProp name="createNodeSourceUseAllHosts" elementType="Argument">
+            <stringProp name="Argument.name">createNodeSourceUseAllHosts</stringProp>
+            <stringProp name="Argument.value">${__P(createNodeSourceUseAllHosts,false)}</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
         </collectionProp>
       </elementProp>
       <stringProp name="TestPlan.user_define_classpath"></stringProp>
@@ -273,6 +278,11 @@
                 <stringProp name="Argument.value">${createNodeSourceHosts}</stringProp>
                 <stringProp name="Argument.metadata">=</stringProp>
               </elementProp>
+              <elementProp name="createNodeSourceUseAllHosts" elementType="Argument">
+                <stringProp name="Argument.name">createNodeSourceUseAllHosts</stringProp>
+                <stringProp name="Argument.value">${createNodeSourceUseAllHosts}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
               <elementProp name="createNodeSourceNodesPerHost" elementType="Argument">
                 <stringProp name="Argument.name">createNodeSourceNodesPerHost</stringProp>
                 <stringProp name="Argument.value">${createNodeSourceNodesPerHost}</stringProp>
@@ -350,6 +360,11 @@
               <elementProp name="createNodeSourceHosts" elementType="Argument">
                 <stringProp name="Argument.name">createNodeSourceHosts</stringProp>
                 <stringProp name="Argument.value">${createNodeSourceHosts}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="createNodeSourceUseAllHosts" elementType="Argument">
+                <stringProp name="Argument.name">createNodeSourceUseAllHosts</stringProp>
+                <stringProp name="Argument.value">${createNodeSourceUseAllHosts}</stringProp>
                 <stringProp name="Argument.metadata">=</stringProp>
               </elementProp>
               <elementProp name="createNodeSourceNodesPerHost" elementType="Argument">

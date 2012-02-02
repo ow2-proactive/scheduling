@@ -158,13 +158,18 @@ public class SchedulerAndRMTestDeployer {
     private static Map<String, String> deploy(TestDeployer deployer, String propertiesPrefix) {
         try {
             Map<String, String> deployResultProperties = deployer.startServer();
-            Map<String, String> propertiesWithPrefix = new LinkedHashMap<String, String>();
             if (deployResultProperties != null) {
-                for (Map.Entry<String, String> property : deployResultProperties.entrySet()) {
-                    propertiesWithPrefix.put(propertiesPrefix + "." + property.getKey(), property.getValue());
+                Map<String, String> propertiesWithPrefix = new LinkedHashMap<String, String>();
+                if (deployResultProperties != null) {
+                    for (Map.Entry<String, String> property : deployResultProperties.entrySet()) {
+                        propertiesWithPrefix.put(propertiesPrefix + "." + property.getKey(), property
+                                .getValue());
+                    }
                 }
+                return propertiesWithPrefix;
+            } else {
+                return null;
             }
-            return propertiesWithPrefix;
         } catch (Throwable t) {
             t.printStackTrace(System.out);
             return null;

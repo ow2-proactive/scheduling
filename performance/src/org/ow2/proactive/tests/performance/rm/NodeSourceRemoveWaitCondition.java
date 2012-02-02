@@ -34,12 +34,38 @@
  * ################################################################
  * $ACTIVEEON_INITIAL_DEV$
  */
-package org.ow2.proactive.tests.performance.scheduler;
+package org.ow2.proactive.tests.performance.rm;
 
-public class WaitFailedException extends Exception {
+import org.ow2.proactive.resourcemanager.common.event.RMEventType;
+import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
+import org.ow2.proactive.tests.performance.utils.WaitFailedException;
 
-    public WaitFailedException(String message) {
-        super(message);
+
+public class NodeSourceRemoveWaitCondition extends RMWaitCondition {
+
+    private final String sourceName;
+
+    private boolean nodeSourceRemoved;
+
+    public NodeSourceRemoveWaitCondition(String sourceName) {
+        this.sourceName = sourceName;
+    }
+
+    @Override
+    public synchronized void nodeSourceEvent(RMNodeSourceEvent event) {
+        if (!sourceName.equals(event.getSourceName())) {
+            return;
+        }
+        addEventLog("Event " + event.getEventType());
+        if (event.getEventType() == RMEventType.NODESOURCE_REMOVED) {
+            nodeSourceRemoved = true;
+            notifyAll();
+        }
+    }
+
+    @Override
+    public boolean stopWait() throws WaitFailedException {
+        return nodeSourceRemoved;
     }
 
 }

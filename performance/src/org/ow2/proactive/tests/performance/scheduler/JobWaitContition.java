@@ -41,9 +41,10 @@ import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
+import org.ow2.proactive.tests.performance.utils.WaitFailedException;
 
 
-public class JobWaitContition extends WaitCondition {
+public class JobWaitContition extends SchedulerWaitCondition {
 
     private final String jobName;
 
@@ -61,7 +62,7 @@ public class JobWaitContition extends WaitCondition {
     }
 
     @Override
-    public synchronized boolean stopWait() throws WaitFailedException {
+    public boolean stopWait() throws WaitFailedException {
         if (completedJobInfo == null) {
             return false;
         }

@@ -39,6 +39,7 @@ package org.ow2.proactive.tests.performance.jmeter.rm;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.util.Set;
 
 import org.apache.jmeter.config.Arguments;
 import org.apache.jmeter.protocol.java.sampler.JavaSamplerContext;
@@ -91,11 +92,16 @@ public class CLIInfrastructureNodeSourceCreateClient extends BaseNodeSourceCreat
     }
 
     @Override
-    protected boolean createNodeSource(String nodeSourceName, String hostName, int nodesNumber,
+    protected boolean createNodeSource(String nodeSourceName, Set<String> hostNames, int nodesNumber,
             String javaPath, String schedulingPath, JavaSamplerContext context) throws Exception {
 
         String rmUrl = context.getParameter(RMConnectionParameters.PARAM_RM_URL);
-        String hostsList = String.format("%s %d", hostName, nodesNumber);
+        StringBuilder hostsListBuilder = new StringBuilder();
+        for (String hostName : hostNames) {
+            hostsListBuilder.append(String.format("%s %d\n", hostName, nodesNumber));
+        }
+
+        String hostsList = hostsListBuilder.toString();
         int timeout = NODE_DEPLOY_TIMEOUT;
         int attempt = 1;
         String interpreter = DEFAULT_INTERPRETER;

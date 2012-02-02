@@ -42,21 +42,10 @@ import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.UserIdentification;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
+import org.ow2.proactive.tests.performance.utils.AbstractWaitCondition;
 
 
-public abstract class WaitCondition {
-
-    private final StringBuilder eventsLog = new StringBuilder();
-
-    protected void addEventLog(String logMessage) {
-        eventsLog.append(logMessage).append('\n');
-    }
-
-    public StringBuilder getEventsLog() {
-        return eventsLog;
-    }
-
-    public abstract boolean stopWait() throws WaitFailedException;
+public abstract class SchedulerWaitCondition extends AbstractWaitCondition {
 
     public void schedulerStateUpdatedEvent(SchedulerEvent eventType) {
     }

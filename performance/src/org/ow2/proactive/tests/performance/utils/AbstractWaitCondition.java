@@ -34,22 +34,20 @@
  * ################################################################
  * $ACTIVEEON_INITIAL_DEV$
  */
-package org.ow2.proactive.tests.performance.jmeter.rm;
+package org.ow2.proactive.tests.performance.utils;
 
-import org.ow2.proactive.resourcemanager.common.event.RMEvent;
-import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
-import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
+public abstract class AbstractWaitCondition {
 
+    private final StringBuilder eventsLog = new StringBuilder();
 
-public class RMEventsMonitor {
-
-    public void rmEvent(RMEvent event) {
+    protected void addEventLog(String logMessage) {
+        eventsLog.append(logMessage).append('\n');
     }
 
-    public void nodeSourceEvent(RMNodeSourceEvent event) {
+    public StringBuilder getEventsLog() {
+        return eventsLog;
     }
 
-    public void nodeEvent(RMNodeEvent event) {
-    }
+    public abstract boolean stopWait() throws WaitFailedException;
 
 }

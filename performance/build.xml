@@ -48,6 +48,9 @@
 
     <target name="clean">
         <delete dir="${classes.dir}" />
+        <delete dir="${tmp}/RM_DB" />
+        <delete dir="${tmp}/SCHEDULER_DB" />
+        <delete dir="${project.root}/.logs"/>
     </target>
 
     <target name="compile.tests">
@@ -186,6 +189,7 @@
                 <property name="selectionScriptDynamicContent" value="${selectionScriptDynamicContent}" />
 
                 <property name="createNodeSourceHosts" value="${createNodeSourceHosts}" />
+                <property name="createNodeSourceUseAllHosts" value="${createNodeSourceUseAllHosts}" />
                 <property name="createNodeSourceNodesPerHost" value="${createNodeSourceNodesPerHost}" />
                 <property name="createNodeSourceJavaPath" value="${createNodeSourceJavaPath}" />
                 <property name="createNodeSourceSchedulingPath" value="${project.root}" />

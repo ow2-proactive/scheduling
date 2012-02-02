@@ -49,7 +49,7 @@ import org.ow2.proactive.tests.performance.scheduler.JobWaitContition;
 import org.ow2.proactive.tests.performance.scheduler.SchedulerEventsMonitor;
 import org.ow2.proactive.tests.performance.scheduler.SchedulerTestListener;
 import org.ow2.proactive.tests.performance.scheduler.TestSchedulerProxy;
-import org.ow2.proactive.tests.performance.scheduler.WaitCondition;
+import org.ow2.proactive.tests.performance.scheduler.SchedulerWaitCondition;
 import org.ow2.proactive.tests.performance.utils.TestUtils;
 
 
@@ -112,7 +112,7 @@ public abstract class BaseJobSubmitClient extends BaseJMeterSchedulerClient {
             }
         }
 
-        WaitCondition waitCondition = eventsMonitor.addWaitCondition(new JobWaitContition(jobName));
+        SchedulerWaitCondition waitCondition = eventsMonitor.addWaitCondition(new JobWaitContition(jobName));
 
         System.out.println(String.format("Submitting job: %s, selectionScript: %s (%s)",
                 job.getDescription(), String.valueOf(useSelectionScript), Thread.currentThread().toString()));

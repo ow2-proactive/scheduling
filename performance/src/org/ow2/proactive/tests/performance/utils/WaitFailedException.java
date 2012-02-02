@@ -34,48 +34,12 @@
  * ################################################################
  * $ACTIVEEON_INITIAL_DEV$
  */
-package org.ow2.proactive.tests.performance.rm;
+package org.ow2.proactive.tests.performance.utils;
 
-import java.io.Serializable;
+public class WaitFailedException extends Exception {
 
-import org.objectweb.proactive.api.PAActiveObject;
-import org.ow2.proactive.resourcemanager.common.event.RMEvent;
-import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
-import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
-import org.ow2.proactive.resourcemanager.frontend.RMEventListener;
-import org.ow2.proactive.resourcemanager.frontend.RMGroupEventListener;
-
-
-public class RMTestListener extends RMGroupEventListener implements Serializable {
-
-    private RMEventListener eventsMonitor;
-
-    public RMTestListener() {
-    }
-
-    public RMTestListener(RMEventListener eventsMonitor) {
-        this.eventsMonitor = eventsMonitor;
-    }
-
-    public static RMTestListener createRMTestListener(RMEventListener eventsMonitor) throws Exception {
-        RMTestListener listener = new RMTestListener(eventsMonitor);
-        listener = PAActiveObject.turnActive(listener);
-        return listener;
-    }
-
-    @Override
-    public void rmEvent(RMEvent event) {
-        eventsMonitor.rmEvent(event);
-    }
-
-    @Override
-    public void nodeSourceEvent(RMNodeSourceEvent event) {
-        eventsMonitor.nodeSourceEvent(event);
-    }
-
-    @Override
-    public void nodeEvent(RMNodeEvent event) {
-        eventsMonitor.nodeEvent(event);
+    public WaitFailedException(String message) {
+        super(message);
     }
 
 }

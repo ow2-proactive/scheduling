@@ -55,7 +55,7 @@ import org.ow2.proactive.tests.performance.scheduler.JobWaitContition;
 import org.ow2.proactive.tests.performance.scheduler.SchedulerEventsMonitor;
 import org.ow2.proactive.tests.performance.scheduler.SchedulerTestListener;
 import org.ow2.proactive.tests.performance.scheduler.StartTaskWaitContition;
-import org.ow2.proactive.tests.performance.scheduler.WaitCondition;
+import org.ow2.proactive.tests.performance.scheduler.SchedulerWaitCondition;
 
 
 public class SubmitAndKillSchedulerClient extends BaseJMeterSchedulerClient {
@@ -95,10 +95,10 @@ public class SubmitAndKillSchedulerClient extends BaseJMeterSchedulerClient {
         String jobName = generateUniqueJobName();
         String taskName = "Task-SubmitAndKillSchedulerClient";
 
-        WaitCondition taskStartCondition = eventsMonitor.addWaitCondition(new StartTaskWaitContition(jobName,
-            taskName));
-        WaitCondition jobCompleteCondition = eventsMonitor.addWaitCondition(new JobWaitContition(jobName,
-            JobStatus.KILLED));
+        SchedulerWaitCondition taskStartCondition = eventsMonitor
+                .addWaitCondition(new StartTaskWaitContition(jobName, taskName));
+        SchedulerWaitCondition jobCompleteCondition = eventsMonitor.addWaitCondition(new JobWaitContition(
+            jobName, JobStatus.KILLED));
 
         TaskFlowJob job = createJob(jobName, taskName);
         Scheduler scheduler = getScheduler();

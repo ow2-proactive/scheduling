@@ -54,8 +54,10 @@ import org.ow2.proactive.resourcemanager.nodesource.policy.AccessType;
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.ow2.proactive.tests.performance.deployment.TestDeployer;
 import org.ow2.proactive.tests.performance.deployment.TestExecutionException;
-import org.ow2.proactive.tests.performance.rm.NodeSourceEventsMonitor;
+import org.ow2.proactive.tests.performance.rm.NodesDeployWaitCondition;
+import org.ow2.proactive.tests.performance.rm.RMEventsMonitor;
 import org.ow2.proactive.tests.performance.rm.RMTestListener;
+import org.ow2.proactive.tests.performance.rm.RMWaitCondition;
 import org.ow2.proactive.tests.performance.utils.TestUtils;
 
 
@@ -135,22 +137,24 @@ public class TestRMDeployer extends TestDeployer {
         RMAuthentication auth = RMConnection.waitAndJoin(expectedUrl, RM_START_TIMEOUT);
         ResourceManager rm = auth.login(credentials);
 
-        NodeSourceEventsMonitor eventsMonitor = new NodeSourceEventsMonitor(NODE_SOURCE_NAME);
+        RMEventsMonitor eventsMonitor = new RMEventsMonitor();
         RMTestListener listener = RMTestListener.createRMTestListener(eventsMonitor);
         RMInitialState state = rm.getMonitoring().addRMEventListener(listener);
         PAFuture.waitFor(state);
         state.getNodeSource().size();
 
         if (!rmNodesHosts.isEmpty()) {
+            int expectedNodesNumber = rmNodesHosts.size() * rmNodesPerHost;
+
+            RMWaitCondition waitCondition = eventsMonitor.addWaitCondition(new NodesDeployWaitCondition(
+                NODE_SOURCE_NAME, expectedNodesNumber));
             if (!createNodeSource(rm, expectedUrl, clientJavaOptions, clientProActiveConfig)) {
                 throw new TestExecutionException("Failed to create node source");
             }
 
-            int expectedNodesNumber = rmNodesHosts.size() * rmNodesPerHost;
             System.out.println("Waiting for nodes deployment (nodes: " + expectedNodesNumber + ", timeout: " +
                 RM_NODE_DEPLOY_TIMEOUT + ")");
-            boolean nodesStarted = eventsMonitor.waitForNodesInitialization(expectedNodesNumber,
-                    RM_NODE_DEPLOY_TIMEOUT);
+            boolean nodesStarted = eventsMonitor.waitFor(waitCondition, RM_NODE_DEPLOY_TIMEOUT);
             if (!nodesStarted) {
                 throw new TestExecutionException("Failed to deploy nodes");
             }

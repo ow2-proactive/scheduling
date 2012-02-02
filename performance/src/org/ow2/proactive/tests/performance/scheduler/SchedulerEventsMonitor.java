@@ -36,9 +36,7 @@
  */
 package org.ow2.proactive.tests.performance.scheduler;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.ow2.proactive.scheduler.common.NotificationData;
@@ -49,9 +47,11 @@ import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.job.UserIdentification;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
+import org.ow2.proactive.tests.performance.utils.AbstractEventsMonitor;
 
 
-public class SchedulerEventsMonitor implements SchedulerEventListener {
+public class SchedulerEventsMonitor extends AbstractEventsMonitor<SchedulerWaitCondition> implements
+        SchedulerEventListener {
 
     public static Set<JobStatus> completedJobStatus;
 
@@ -63,11 +63,9 @@ public class SchedulerEventsMonitor implements SchedulerEventListener {
         completedJobStatus.add(JobStatus.KILLED);
     }
 
-    private List<WaitCondition> waitConditions = new ArrayList<WaitCondition>();
-
     public void schedulerStateUpdatedEvent(SchedulerEvent eventType) {
         synchronized (waitConditions) {
-            for (WaitCondition waitCondition : waitConditions) {
+            for (SchedulerWaitCondition waitCondition : waitConditions) {
                 waitCondition.schedulerStateUpdatedEvent(eventType);
             }
         }
@@ -75,7 +73,7 @@ public class SchedulerEventsMonitor implements SchedulerEventListener {
 
     public void jobSubmittedEvent(JobState job) {
         synchronized (waitConditions) {
-            for (WaitCondition waitCondition : waitConditions) {
+            for (SchedulerWaitCondition waitCondition : waitConditions) {
                 waitCondition.jobSubmittedEvent(job);
             }
         }
@@ -83,7 +81,7 @@ public class SchedulerEventsMonitor implements SchedulerEventListener {
 
     public void jobStateUpdatedEvent(NotificationData<JobInfo> notification) {
         synchronized (waitConditions) {
-            for (WaitCondition waitCondition : waitConditions) {
+            for (SchedulerWaitCondition waitCondition : waitConditions) {
                 waitCondition.jobStateUpdatedEvent(notification);
             }
         }
@@ -91,7 +89,7 @@ public class SchedulerEventsMonitor implements SchedulerEventListener {
 
     public void taskStateUpdatedEvent(NotificationData<TaskInfo> notification) {
         synchronized (waitConditions) {
-            for (WaitCondition waitCondition : waitConditions) {
+            for (SchedulerWaitCondition waitCondition : waitConditions) {
                 waitCondition.taskStateUpdatedEvent(notification);
             }
         }
@@ -99,57 +97,8 @@ public class SchedulerEventsMonitor implements SchedulerEventListener {
 
     public void usersUpdatedEvent(NotificationData<UserIdentification> notification) {
         synchronized (waitConditions) {
-            for (WaitCondition waitCondition : waitConditions) {
+            for (SchedulerWaitCondition waitCondition : waitConditions) {
                 waitCondition.usersUpdatedEvent(notification);
-            }
-        }
-    }
-
-    public WaitCondition addWaitCondition(WaitCondition waitCondition) {
-        synchronized (waitConditions) {
-            waitConditions.add(waitCondition);
-        }
-        return waitCondition;
-    }
-
-    public final boolean waitFor(WaitCondition waitCondition, long timeout) throws InterruptedException {
-        synchronized (waitConditions) {
-            if (!waitConditions.contains(waitCondition)) {
-                throw new IllegalArgumentException("Condition isn't related to this monitor");
-            }
-        }
-        try {
-            long endTime = System.currentTimeMillis() + timeout;
-            try {
-                boolean stopWait;
-                while (!(stopWait = waitCondition.stopWait())) {
-                    long waitTime = endTime - System.currentTimeMillis();
-                    if (waitTime > 0) {
-                        synchronized (waitCondition) {
-                            waitCondition.wait(waitTime);
-                        }
-                    } else {
-                        break;
-                    }
-                }
-
-                // System.out.println("All events:\n" + waitCondition.getEventsLog());
-
-                if (stopWait) {
-                    return true;
-                } else {
-                    System.out.println("Waiting failed with timeout, all events:\n" +
-                        waitCondition.getEventsLog());
-                    return false;
-                }
-            } catch (WaitFailedException e) {
-                System.out.println("Waiting failed with error: " + e.getMessage() + ", all events:\n" +
-                    waitCondition.getEventsLog());
-                return false;
-            }
-        } finally {
-            synchronized (waitConditions) {
-                waitConditions.remove(waitCondition);
             }
         }
     }

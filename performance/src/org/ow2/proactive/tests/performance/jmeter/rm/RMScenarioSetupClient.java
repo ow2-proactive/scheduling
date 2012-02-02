@@ -48,6 +48,7 @@ import org.ow2.proactive.resourcemanager.common.event.RMEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.exception.RMException;
+import org.ow2.proactive.resourcemanager.frontend.RMEventListener;
 import org.ow2.proactive.tests.performance.jmeter.BaseJMeterClient;
 import org.ow2.proactive.tests.performance.jmeter.JVMKillerThread;
 import org.ow2.proactive.tests.performance.rm.RMTestListener;
@@ -58,7 +59,7 @@ public class RMScenarioSetupClient extends BaseJMeterClient {
 
     public static final String PARAM_LISTENERS_NUMBER = "rmListenersNumber";
 
-    private static class DummyEventsMonitor extends RMEventsMonitor {
+    private static class DummyEventsMonitor implements RMEventListener {
 
         private int nodeEventCounter;
 
