@@ -104,7 +104,7 @@ public class SubmitAndKillSchedulerClient extends BaseJMeterSchedulerClient {
         Scheduler scheduler = getScheduler();
         JobId jobId = scheduler.submit(job);
 
-        if (!eventsMonitor.waitFor(taskStartCondition, 60000)) {
+        if (!eventsMonitor.waitFor(taskStartCondition, 60000, getLogger())) {
             logJobResult(jobId);
             SampleResult result = new SampleResult();
             result.setSuccessful(false);
@@ -112,7 +112,7 @@ public class SubmitAndKillSchedulerClient extends BaseJMeterSchedulerClient {
             return result;
         }
 
-        System.out.println("Killing job " + jobId + "(" + Thread.currentThread() + ")");
+        logInfo("Killing job " + jobId + "(" + Thread.currentThread() + ")");
 
         SampleResult result = new SampleResult();
         result.sampleStart();
@@ -122,7 +122,7 @@ public class SubmitAndKillSchedulerClient extends BaseJMeterSchedulerClient {
             result.setSuccessful(false);
             result.setResponseMessage("Failed to kill job");
         } else {
-            if (!eventsMonitor.waitFor(jobCompleteCondition, 60000)) {
+            if (!eventsMonitor.waitFor(jobCompleteCondition, 60000, getLogger())) {
                 result.setSuccessful(false);
                 result.setResponseMessage("Killed job didn't finish as expected");
             } else {

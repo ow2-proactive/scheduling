@@ -80,7 +80,7 @@ public class SSHInfrastructureNodeSourceCreateClient extends BaseNodeSourceCreat
         String message = String.format(
                 "Creating node source, SSH infrastructure, hostsList=%s javaOpts=%s (%s)", hostsList,
                 javaOptions, Thread.currentThread().toString());
-        System.out.println(message);
+        logInfo(message);
 
         BooleanWrapper result = rm.createNodeSource(nodeSourceName, SSHInfrastructure.class.getName(),
                 infrastructureParameters, StaticPolicy.class.getName(), policyParameters);

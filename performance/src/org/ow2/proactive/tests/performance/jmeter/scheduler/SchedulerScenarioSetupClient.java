@@ -59,7 +59,7 @@ public class SchedulerScenarioSetupClient extends BaseJMeterClient {
 
     public static final String PARAM_LISTENERS_NUMBER = "schedulerListenersNumber";
 
-    static class DummyEventsMonitor implements SchedulerEventListener {
+    class DummyEventsMonitor implements SchedulerEventListener {
 
         private int schedulerState;
 
@@ -97,22 +97,22 @@ public class SchedulerScenarioSetupClient extends BaseJMeterClient {
         }
 
         public void printEventsNumber() {
-            System.out
-                    .println(String
-                            .format(
-                                    "Events: scheduler state=%d, job submitted=%d, job state updated=%d, task state updated %d, user updated %d",
-                                    schedulerState, jobSubmitted, jobStateUpdated, taskStateUpdated,
-                                    userUpdated));
+            logInfo(String
+                    .format("Events: scheduler state=%d, job submitted=%d, job state updated=%d, task state updated %d, user updated %d",
+                            schedulerState, jobSubmitted, jobStateUpdated, taskStateUpdated, userUpdated));
         }
     }
 
-    static class SchedulerListenerClient {
+    class SchedulerListenerClient {
 
         private final TestSchedulerProxy proxy;
 
         private final DummyEventsMonitor eventsMonitor;
 
         SchedulerListenerClient(SchedulerConnectionParameters parameters) throws Exception {
+            logInfo(String.format("Connecting to the Scheduler (%s, %s, %s, %s)",
+                    parameters.getSchedulerUrl(), parameters.getSchedulerLogin(),
+                    parameters.getSchedulerPassword(), Thread.currentThread()));
             proxy = parameters.connectWithProxy(60000);
             eventsMonitor = new DummyEventsMonitor();
             SchedulerTestListener listener = SchedulerTestListener.createListener(eventsMonitor);
@@ -139,19 +139,18 @@ public class SchedulerScenarioSetupClient extends BaseJMeterClient {
     @Override
     public void teardownTest(JavaSamplerContext context) {
         if (listenerClients.size() > 0) {
-            System.out.println("Disconnecting " + listenerClients.size() + " listeners clients");
+            logInfo("Disconnecting " + listenerClients.size() + " listeners clients");
             for (SchedulerListenerClient client : listenerClients) {
                 try {
                     client.printEventsAndDisconnect();
                 } catch (Exception e) {
-                    System.out.println("Failed to disconnect listener: " + e);
-                    e.printStackTrace(System.out);
+                    logError("Failed to disconnect listener: " + e, e);
                 }
             }
-            System.out.println("All listeners clients are disconnected");
+            logInfo("All listeners clients are disconnected");
         }
 
-        JVMKillerThread.startKillerThreadIfNonGUIMode(10000);
+        JVMKillerThread.startKillerThreadIfNonGUIMode(10000, getLogger());
     }
 
     @Override
@@ -164,13 +163,13 @@ public class SchedulerScenarioSetupClient extends BaseJMeterClient {
         int listenersNumber = context.getIntParameter(PARAM_LISTENERS_NUMBER);
         if (listenersNumber > 0) {
             SchedulerConnectionParameters parameters = new SchedulerConnectionParameters(context);
-            System.out.println("Registering " + listenersNumber + " scheduler listeners");
+            logInfo("Registering " + listenersNumber + " scheduler listeners");
 
             for (int i = 0; i < listenersNumber; i++) {
                 listenerClients.add(new SchedulerListenerClient(parameters));
             }
 
-            System.out.println("All listeners are registered");
+            logInfo("All listeners are registered");
         }
     }
 

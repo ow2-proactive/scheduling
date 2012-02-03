@@ -39,6 +39,8 @@ package org.ow2.proactive.tests.performance.utils;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log.Logger;
+
 
 public class AbstractEventsMonitor<T extends AbstractWaitCondition> {
 
@@ -51,7 +53,7 @@ public class AbstractEventsMonitor<T extends AbstractWaitCondition> {
         return waitCondition;
     }
 
-    public final boolean waitFor(T waitCondition, long timeout) throws InterruptedException {
+    public final boolean waitFor(T waitCondition, long timeout, Logger logger) throws InterruptedException {
         synchronized (waitConditions) {
             if (!waitConditions.contains(waitCondition)) {
                 throw new IllegalArgumentException("Condition isn't related to this monitor");
@@ -77,13 +79,23 @@ public class AbstractEventsMonitor<T extends AbstractWaitCondition> {
                 if (stopWait) {
                     return true;
                 } else {
-                    System.out.println("Waiting failed with timeout, all events:\n" +
-                        waitCondition.getEventsLog());
+                    String message = "Waiting failed with timeout, all events:\n" +
+                        waitCondition.getEventsLog();
+                    if (logger != null) {
+                        logger.error(message);
+                    } else {
+                        System.out.println(message);
+                    }
                     return false;
                 }
             } catch (WaitFailedException e) {
-                System.out.println("Waiting failed with error: " + e.getMessage() + ", all events:\n" +
-                    waitCondition.getEventsLog());
+                String message = "Waiting failed with error: " + e.getMessage() + ", all events:\n" +
+                    waitCondition.getEventsLog();
+                if (logger != null) {
+                    logger.error(message);
+                } else {
+                    System.out.println(message);
+                }
                 return false;
             }
         } finally {

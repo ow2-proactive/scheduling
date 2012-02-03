@@ -201,7 +201,9 @@
 
                 <property name="sshNodeSourceUsers" value="${sshNodeSourceUsers}" />
 
-                <jmeterarg value="-j ${basedir}/results/jmeter.log" />
+                <jmeterarg value="-j"/>
+                <jmeterarg value="${basedir}/results/jmeter.log" />
+                
             </jmeter>
 
             <xslt classpathref="xslt.classpath" in="${basedir}/results/@{testplan}.jtl" out="${basedir}/results/@{testplan}.html" style="${basedir}/jmeter/config/jmeter-results-report_21.xsl" />
@@ -246,7 +248,8 @@
 
                 <property name="submitAndKillUsersNumber" value="${submitAndKillUsersNumber}" />
 
-                <jmeterarg value="-j ${basedir}/results/jmeter.log" />
+                <jmeterarg value="-j"/>
+                <jmeterarg value="${basedir}/results/jmeter.log" />
             </jmeter>
 
             <xslt classpathref="xslt.classpath" in="${basedir}/results/@{testplan}.jtl" out="${basedir}/results/@{testplan}.html" style="${basedir}/jmeter/config/jmeter-results-report_21.xsl" />

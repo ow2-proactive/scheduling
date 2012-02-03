@@ -91,6 +91,9 @@ public abstract class BaseJMeterSchedulerClient extends BaseJMeterClient {
         testsSourcePath = testsSrcDir.getAbsolutePath();
 
         SchedulerConnectionParameters parameters = new SchedulerConnectionParameters(context);
+        logInfo(String.format("Connecting to the Scheduler (%s, %s, %s, %s)", parameters.getSchedulerUrl(), 
+                parameters.getSchedulerLogin(),
+                parameters.getSchedulerPassword(), Thread.currentThread()));
         schedulerProxy = parameters.connectWithProxy(10000);
     }
 
@@ -106,8 +109,7 @@ public abstract class BaseJMeterSchedulerClient extends BaseJMeterClient {
                 schedulerProxy.disconnect();
             }
         } catch (Exception e) {
-            System.out.println("Teardown failed: " + e);
-            e.printStackTrace(System.out);
+            logError("Teardown failed: " + e, e);
         }
     }
 
@@ -119,21 +121,21 @@ public abstract class BaseJMeterSchedulerClient extends BaseJMeterClient {
     }
 
     protected void logJobResult(JobId jobId) throws Exception {
-        System.out.println("Trying to get result for job " + jobId);
+        logError("Trying to get result for job " + jobId);
         JobResult result = getScheduler().getJobResult(jobId);
         if (result != null) {
             logJobResult(result);
         } else {
-            System.out.println("No result for job " + jobId);
+            logError("No result for job " + jobId);
         }
     }
 
     protected void logJobResult(JobResult result) throws Exception {
         for (TaskResult r : result.getAllResults().values()) {
-            System.out.println("Task: " + r.getTaskId());
-            System.out.println("Exception: " + r.getException());
-            System.out.println("SO:\n" + r.getOutput().getStdoutLogs(true));
-            System.out.println("SERR:\n" + r.getOutput().getStderrLogs(true));
+            logError("Task: " + r.getTaskId());
+            logError("Exception: " + r.getException());
+            logError("SO:\n" + r.getOutput().getStdoutLogs(true));
+            logError("SERR:\n" + r.getOutput().getStderrLogs(true));
         }
     }
 

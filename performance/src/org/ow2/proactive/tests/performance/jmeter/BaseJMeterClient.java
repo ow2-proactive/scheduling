@@ -37,12 +37,12 @@
 package org.ow2.proactive.tests.performance.jmeter;
 
 import org.apache.jmeter.config.Arguments;
-import org.apache.jmeter.protocol.java.sampler.JavaSamplerClient;
+import org.apache.jmeter.protocol.java.sampler.AbstractJavaSamplerClient;
 import org.apache.jmeter.protocol.java.sampler.JavaSamplerContext;
 import org.apache.jmeter.samplers.SampleResult;
 
 
-public abstract class BaseJMeterClient implements JavaSamplerClient {
+public abstract class BaseJMeterClient extends AbstractJavaSamplerClient {
 
     private String setupError;
 
@@ -59,8 +59,8 @@ public abstract class BaseJMeterClient implements JavaSamplerClient {
             } catch (Throwable t) {
                 SampleResult errorResult = new SampleResult();
                 errorResult.setSuccessful(false);
-                errorResult.setResponseMessage("Unexpected exception: " + t);
-                t.printStackTrace();
+                errorResult.setResponseMessage("Unexpected exception during test execution: " + t);
+                logError("Unexpected exception during test execution: " + t, t);
                 return errorResult;
             }
         }
@@ -74,12 +74,24 @@ public abstract class BaseJMeterClient implements JavaSamplerClient {
             printParameters(context);
 
             doSetupTest(context);
-        } catch (Throwable e) {
-            setupError = "Failed to setup execution: " + e;
-            e.printStackTrace(System.out);
+        } catch (Throwable t) {
+            setupError = "Failed to setup execution: " + t;
+            logError(setupError, t);
         }
     }
 
+    protected void logError(String message, Throwable t) {
+        getLogger().error(message, t);
+    }
+
+    protected void logError(String message) {
+        getLogger().error(message);
+    }
+    
+    protected void logInfo(String message) {
+        getLogger().info(message);
+    }
+    
     protected abstract void doSetupTest(JavaSamplerContext context) throws Throwable;
 
     public static boolean getBooleanParameter(JavaSamplerContext context, String name) {
@@ -99,9 +111,9 @@ public abstract class BaseJMeterClient implements JavaSamplerClient {
 
     protected void printParameters(JavaSamplerContext context) {
         Arguments args = getDefaultParameters();
-        System.out.println("Parameters for sampler " + getClass().getName() + ":");
+        logInfo("Parameters for sampler " + getClass().getName() + ":");
         for (String name : args.getArgumentsAsMap().keySet()) {
-            System.out.println(name + " = " + context.getParameter(name));
+            logInfo(name + " = " + context.getParameter(name));
         }
     }
 

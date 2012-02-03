@@ -37,6 +37,7 @@
 package org.ow2.proactive.tests.performance.jmeter;
 
 import org.apache.jmeter.JMeter;
+import org.apache.log.Logger;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
 
 
@@ -44,15 +45,18 @@ public class JVMKillerThread extends Thread {
 
     private final long killDelay;
 
-    public JVMKillerThread(long killDelay) {
+    private final Logger logger;
+    
+    public JVMKillerThread(long killDelay, Logger logger) {
         this.killDelay = killDelay;
+        this.logger = logger;
     }
 
     public void run() {
         try {
-            System.out.println(String.format("JVMKillerThread: sleeping for %d millis", killDelay));
+            logger.info(String.format("JVMKillerThread: sleeping for %d millis", killDelay));
             Thread.sleep(killDelay);
-            System.out.println("JVMKillerThread: killing JVM");
+            logger.info("JVMKillerThread: killing JVM");
             try {
                 RuntimeFactory.getDefaultRuntime().killRT(false);
             } finally {
@@ -63,9 +67,9 @@ public class JVMKillerThread extends Thread {
         }
     }
 
-    public static void startKillerThreadIfNonGUIMode(long killDelay) {
+    public static void startKillerThreadIfNonGUIMode(long killDelay, Logger logger) {
         if (JMeter.isNonGUI()) {
-            new JVMKillerThread(killDelay).start();
+            new JVMKillerThread(killDelay, logger).start();
         }
     }
 }

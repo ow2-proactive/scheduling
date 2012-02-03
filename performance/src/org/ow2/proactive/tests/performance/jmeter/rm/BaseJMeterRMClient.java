@@ -61,7 +61,7 @@ public abstract class BaseJMeterRMClient extends BaseJMeterClient {
         String password = parameters.getRmPassword();
 
         try {
-            System.out.println("Connecting to the RM (" + url + ", " + login + ", " + password + ")");
+            logInfo("Connecting to the RM (" + url + ", " + login + ", " + password + ")");
             rmProxy = PAActiveObject.newActive(TestRMProxy.class, new Object[] {});
             rmProxy
                     .init(url,

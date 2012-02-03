@@ -42,6 +42,9 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.log.Hierarchy;
+import org.apache.log.Logger;
+
 import junit.framework.Assert;
 
 
@@ -80,14 +83,17 @@ public class TestHosts {
 
     private List<Host> hosts = new ArrayList<TestHosts.Host>(0);
 
-    public TestHosts() {
+    private final Logger logger;
+    
+    public TestHosts(Logger logger) {
+        this.logger = logger;
     }
 
     private void initHosts(String hostsList) {
         this.hostsList = hostsList;
         this.hosts = new ArrayList<TestHosts.Host>();
         for (String host : hostsList.split(",")) {
-            System.out.println("Adding host in the free hosts list: " + host);
+            logger.info("Adding host in the free hosts list: " + host);
             hosts.add(new Host(host));
         }
         if (hosts.isEmpty()) {
@@ -121,7 +127,7 @@ public class TestHosts {
         host.threads.add(thread);
 
         if (host.threads.size() > 1) {
-            System.out.println("Warning: more than 1 thread use host " + host.toString() + " (threads: " +
+            logger.warn("Warning: more than 1 thread use host " + host.toString() + " (threads: " +
                 host.threads.size() + ")");
         }
         return host;
@@ -147,13 +153,13 @@ public class TestHosts {
             if (hostsList == null) {
                 throw new IllegalArgumentException("Hosts list is null");
             }
-            System.out.println("Hosts list changed, creating new hostslist (" + hostsList + ")");
+            logger.info("Hosts list changed, creating new hostslist (" + hostsList + ")");
             initHosts(hostsList);
         }
     }
 
     private static void sanityTest() {
-        TestHosts hosts = new TestHosts();
+        TestHosts hosts = new TestHosts(Hierarchy.getDefaultHierarchy().getRootLogger());
 
         hosts.initializeHostsIfChanged("host1,host2");
 

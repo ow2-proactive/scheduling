@@ -80,8 +80,6 @@ public class SchedulerConnectionParameters {
         String url = getSchedulerUrl();
         String login = getSchedulerLogin();
         String password = getSchedulerPassword();
-        System.out.println(String.format("Connecting to the Scheduler (%s, %s, %s, %s)", url, login,
-                password, Thread.currentThread()));
 
         TestSchedulerProxy proxy = TestSchedulerProxy.connectWithProxy(url, new CredData(CredData
                 .parseLogin(login), CredData.parseDomain(login), password), timeout);

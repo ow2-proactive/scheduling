@@ -154,7 +154,7 @@ public class TestRMDeployer extends TestDeployer {
 
             System.out.println("Waiting for nodes deployment (nodes: " + expectedNodesNumber + ", timeout: " +
                 RM_NODE_DEPLOY_TIMEOUT + ")");
-            boolean nodesStarted = eventsMonitor.waitFor(waitCondition, RM_NODE_DEPLOY_TIMEOUT);
+            boolean nodesStarted = eventsMonitor.waitFor(waitCondition, RM_NODE_DEPLOY_TIMEOUT, null);
             if (!nodesStarted) {
                 throw new TestExecutionException("Failed to deploy nodes");
             }

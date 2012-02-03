@@ -81,8 +81,6 @@ public class RMConnectionParameters {
         String url = getRmUrl();
         String login = getRmLogin();
         String password = getRmPassword();
-        System.out.println(String.format("Connecting to the RM (%s, %s, %s, %s)", url, login, password,
-                Thread.currentThread()));
 
         TestRMProxy rmProxy = PAActiveObject.newActive(TestRMProxy.class, new Object[] {});
         rmProxy.init(url, new CredData(CredData.parseLogin(login), CredData.parseDomain(login), password));

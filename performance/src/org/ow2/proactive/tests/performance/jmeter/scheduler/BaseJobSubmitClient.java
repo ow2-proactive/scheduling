@@ -114,7 +114,7 @@ public abstract class BaseJobSubmitClient extends BaseJMeterSchedulerClient {
 
         SchedulerWaitCondition waitCondition = eventsMonitor.addWaitCondition(new JobWaitContition(jobName));
 
-        System.out.println(String.format("Submitting job: %s, selectionScript: %s (%s)",
+        logInfo(String.format("Submitting job: %s, selectionScript: %s (%s)",
                 job.getDescription(), String.valueOf(useSelectionScript), Thread.currentThread().toString()));
 
         SampleResult result = new SampleResult();
@@ -122,7 +122,7 @@ public abstract class BaseJobSubmitClient extends BaseJMeterSchedulerClient {
         JobId jobId = scheduler.submit(job);
         result.sampleEnd();
 
-        boolean waitOK = eventsMonitor.waitFor(waitCondition, 60000);
+        boolean waitOK = eventsMonitor.waitFor(waitCondition, 60000, getLogger());
 
         JobResult jobResult = scheduler.getJobResult(jobId);
         if (waitOK) {
@@ -142,15 +142,10 @@ public abstract class BaseJobSubmitClient extends BaseJMeterSchedulerClient {
 
         if (!result.isSuccessful()) {
             if (jobResult != null) {
-                System.out.println("Job execution failed, job result:");
-                for (TaskResult taskResult : jobResult.getAllResults().values()) {
-                    System.out.println("Task " + taskResult.getTaskId());
-                    System.out.println("Exception: " + taskResult.getException());
-                    System.out.println("Stdout:\n" + taskResult.getOutput().getStdoutLogs(true));
-                    System.out.println("Stderr:\n" + taskResult.getOutput().getStderrLogs(true));
-                }
+                logError("Job execution failed, job result:");
+                logJobResult(jobResult);
             } else {
-                System.out.println("Job execution failed and job result isn't available");
+                logError("Job execution failed and job result isn't available");
             }
         }
 

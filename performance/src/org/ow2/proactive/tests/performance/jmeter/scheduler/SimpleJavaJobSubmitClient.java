@@ -53,6 +53,7 @@ public class SimpleJavaJobSubmitClient extends BaseJobSubmitClient {
 
         @Override
         public Serializable execute(TaskResult... results) throws Throwable {
+            System.out.println("Task is executed");
             return "OK";
         }
 

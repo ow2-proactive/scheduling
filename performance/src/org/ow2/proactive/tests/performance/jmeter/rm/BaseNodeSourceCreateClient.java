@@ -71,7 +71,7 @@ public abstract class BaseNodeSourceCreateClient extends BaseJMeterRMClient {
 
     public static final int NODE_SOURCE_REMOVE_TIMEOUT = 60000;
 
-    private static final TestHosts testHosts = new TestHosts();
+    private static TestHosts testHosts;
 
     private RMEventsMonitor eventsMonitor;
 
@@ -92,7 +92,12 @@ public abstract class BaseNodeSourceCreateClient extends BaseJMeterRMClient {
     @Override
     protected void doSetupTest(JavaSamplerContext context) throws Throwable {
         super.doSetupTest(context);
-        testHosts.initializeHostsIfChanged(context.getParameter(PARAM_HOSTS_LIST));
+        synchronized (BaseNodeSourceCreateClient.class) {
+            if (testHosts == null) {
+                testHosts = new TestHosts(getLogger());
+            }
+            testHosts.initializeHostsIfChanged(context.getParameter(PARAM_HOSTS_LIST));
+        }
 
         eventsMonitor = new RMEventsMonitor();
         listener = RMTestListener.createRMTestListener(eventsMonitor);
@@ -104,7 +109,7 @@ public abstract class BaseNodeSourceCreateClient extends BaseJMeterRMClient {
         if (listener != null) {
             try {
                 getResourceManager().removeEventListener();
-                System.out.println("Removed listener");
+                logInfo("Removed listener");
             } catch (RMException e) {
                 throw new RuntimeException("Failed to remove listener: " + e, e);
             }
@@ -154,7 +159,7 @@ public abstract class BaseNodeSourceCreateClient extends BaseJMeterRMClient {
                 return result;
             }
             try {
-                boolean nodesDeployed = eventsMonitor.waitFor(nodesDeployWaitCondition, NODE_DEPLOY_TIMEOUT);
+                boolean nodesDeployed = eventsMonitor.waitFor(nodesDeployWaitCondition, NODE_DEPLOY_TIMEOUT, getLogger());
                 result.sampleEnd();
                 if (!nodesDeployed) {
                     result.setSuccessful(false);
@@ -172,7 +177,7 @@ public abstract class BaseNodeSourceCreateClient extends BaseJMeterRMClient {
                     result.setResponseMessage("Failed to removed node source");
                 } else {
                     boolean removedEvent = eventsMonitor.waitFor(nodeSourceRemoveCondtion,
-                            NODE_SOURCE_REMOVE_TIMEOUT);
+                            NODE_SOURCE_REMOVE_TIMEOUT, getLogger());
                     if (!removedEvent) {
                         result.setSuccessful(false);
                         result.setResponseMessage("Failed to get NODESOURCE_REMOVED event");

@@ -59,7 +59,7 @@ public class RMScenarioSetupClient extends BaseJMeterClient {
 
     public static final String PARAM_LISTENERS_NUMBER = "rmListenersNumber";
 
-    private static class DummyEventsMonitor implements RMEventListener {
+    private class DummyEventsMonitor implements RMEventListener {
 
         private int nodeEventCounter;
 
@@ -74,27 +74,23 @@ public class RMScenarioSetupClient extends BaseJMeterClient {
 
         @Override
         public void nodeSourceEvent(RMNodeSourceEvent event) {
-            // System.out.println("------- Event " + event.getEventType() + " " + event.getSourceName());
-
             nodeSourceEventCounter++;
         }
 
         @Override
         public void nodeEvent(RMNodeEvent event) {
-            // System.out.println("--------- Event " + event.getEventType() + " " + event.getNodeState() + " " + event.getNodeSource());
-
             nodeEventCounter++;
         }
 
         public void printEventsInfo() {
-            System.out.println(String.format(
+            logInfo(String.format(
                     "Received events: rm events %d, node events %d,  node source events %d", rmEventCounter,
                     nodeEventCounter, nodeSourceEventCounter));
         }
 
     }
 
-    private static class RMListenerClient {
+    private class RMListenerClient {
 
         private final TestRMProxy rm;
 
@@ -103,6 +99,9 @@ public class RMScenarioSetupClient extends BaseJMeterClient {
         private final DummyEventsMonitor eventsMonitor;
 
         public RMListenerClient(RMConnectionParameters parameters) throws Exception {
+            logInfo(String.format("Connecting to the RM (%s, %s, %s, %s)", parameters.getRmUrl(), 
+                    parameters.getRmLogin(), parameters.getRmPassword(),
+                    Thread.currentThread()));
             rm = parameters.connectWithProxyUserInterface();
             eventsMonitor = new DummyEventsMonitor();
             listener = RMTestListener.createRMTestListener(eventsMonitor);
@@ -134,14 +133,14 @@ public class RMScenarioSetupClient extends BaseJMeterClient {
     @Override
     public void teardownTest(JavaSamplerContext context) {
         if (rmClients.size() > 0) {
-            System.out.println("Disconnecting " + rmClients.size() + " listeners clients");
+            logInfo("Disconnecting " + rmClients.size() + " listeners clients");
             for (RMListenerClient rmClient : rmClients) {
                 rmClient.disconnect();
             }
-            System.out.println("All listeners clients are disconnected");
+            logInfo("All listeners clients are disconnected");
         }
 
-        JVMKillerThread.startKillerThreadIfNonGUIMode(5000);
+        JVMKillerThread.startKillerThreadIfNonGUIMode(10000, getLogger());
     }
 
     @Override
@@ -150,13 +149,13 @@ public class RMScenarioSetupClient extends BaseJMeterClient {
 
         int listenersNumber = context.getIntParameter(PARAM_LISTENERS_NUMBER);
         if (listenersNumber > 0) {
-            System.out.println("Registering " + listenersNumber + " listeners");
+            logInfo("Registering " + listenersNumber + " listeners");
 
             for (int i = 0; i < listenersNumber; i++) {
                 rmClients.add(new RMListenerClient(parameters));
             }
 
-            System.out.println("All listeners are registered");
+            logInfo("All listeners are registered");
         }
     }
 

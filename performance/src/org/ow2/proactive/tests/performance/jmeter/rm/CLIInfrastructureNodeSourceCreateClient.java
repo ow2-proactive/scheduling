@@ -132,7 +132,7 @@ public class CLIInfrastructureNodeSourceCreateClient extends BaseNodeSourceCreat
         String message = String.format(
                 "Creating node source, CLI infrastructure, hostsList=%s javaOpts=%s (%s)", hostsList,
                 nodeJavaOptions, Thread.currentThread().toString());
-        System.out.println(message);
+        logInfo(message);
 
         BooleanWrapper result = rm.createNodeSource(nodeSourceName, CLIInfrastructure.class.getName(),
                 infrastructureParameters, StaticPolicy.class.getName(), policyParameters);

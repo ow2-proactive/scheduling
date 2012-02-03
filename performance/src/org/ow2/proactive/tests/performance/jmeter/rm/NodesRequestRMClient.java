@@ -38,7 +38,6 @@ package org.ow2.proactive.tests.performance.jmeter.rm;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import org.apache.jmeter.config.Arguments;
 import org.apache.jmeter.protocol.java.sampler.JavaSamplerContext;
@@ -86,7 +85,7 @@ public class NodesRequestRMClient extends BaseJMeterRMClient {
 
         TopologyDescriptor topologyDescriptor = getTopologyDescriptor(context);
 
-        System.out.println("Requesting " + nodesToRequest + " nodes, topology: " +
+        logInfo("Requesting " + nodesToRequest + " nodes, topology: " +
             topologyDescriptor.getClass().getSimpleName() + ", script: " + (selectionScript != null) + " (" +
             Thread.currentThread() + ")");
 
