@@ -160,7 +160,7 @@
 	<classpathentry kind="lib" path="lib/nodesource/cron/cron4j-rv2.2.3-mod.jar"/>
 	<classpathentry kind="lib" path="lib/common/hibernate/core/dom4j-1.6.1.jar"/>
 	<classpathentry kind="lib" path="lib/common/hibernate/core/geronimo-spec-jta-1.0.1B-rc4.jar"/>
-	<classpathentry kind="lib" path="lib/common/hibernate/core/hibernate-core.jar"/>
+	<classpathentry kind="lib" path="lib/common/hibernate/core/hibernate3.jar"/>
 	<classpathentry kind="lib" path="lib/common/hibernate/core/slf4j-api-1.5.6.jar"/>
 	<classpathentry kind="lib" path="lib/common/hibernate/annotation/ejb3-persistence.jar"/>
 	<classpathentry kind="lib" path="lib/common/hibernate/annotation/hibernate-annotations.jar"/>
