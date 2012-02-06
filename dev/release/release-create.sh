@@ -63,7 +63,7 @@ function del_client(){
 	rm -rf config/rm config/scheduler
 	rm config/security.java.policy-server
 	rm dist/lib/*ResourceManager* dist/lib/ProActive_Scheduler-fsm.jar
-	rm dist/lib/derby* dist/lib/hibernate-core.jar dist/lib/mysql-connector-java-5.1.16-bin.jar dist/lib/virtual* dist/lib/j-interop*.jar dist/lib/xenserver-5.0.0-3.jar
+	rm dist/lib/derby* dist/lib/hibernate3.jar dist/lib/mysql-connector-java-5.1.16-bin.jar dist/lib/virtual* dist/lib/j-interop*.jar dist/lib/xenserver-5.0.0-3.jar
 }
 
 function del_matsci() {
