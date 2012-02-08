@@ -31,8 +31,7 @@
 
         <!-- JDBC connection pool (use c3p0) -->
         <property name="connection.provider_class">org.hibernate.connection.C3P0ConnectionProvider</property>
-        <property name="c3p0.idle_test_period">30</property> <!-- seconds -->
-        <property name="c3p0.max_size">20</property>
+        <property name="c3p0.max_size">10</property>
         <property name="c3p0.min_size">10</property>
         <property name="c3p0.timeout">60</property> <!-- seconds -->
 
