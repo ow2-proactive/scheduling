@@ -37,6 +37,7 @@
 package org.ow2.proactive.resourcemanager.selection.topology;
 
 import java.net.InetAddress;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -68,9 +69,6 @@ import org.ow2.proactive.topology.descriptor.SingleHostExclusiveDescriptor;
 import org.ow2.proactive.topology.descriptor.ThresholdProximityDescriptor;
 import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
 import org.ow2.proactive.utils.NodeSet;
-
-import edu.emory.mathcs.backport.java.util.Collections;
-
 
 /**
  * Class is responsible for collecting the topology information, keeping it up to date and taking it into
