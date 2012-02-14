@@ -50,7 +50,6 @@ import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
-import org.ow2.proactive.tests.performance.jmeter.scheduler.SimpleJavaJobSubmitClient.SimpleJavaTask;
 import org.ow2.proactive.tests.performance.scheduler.JobWaitContition;
 import org.ow2.proactive.tests.performance.scheduler.SchedulerEventsMonitor;
 import org.ow2.proactive.tests.performance.scheduler.SchedulerTestListener;
@@ -150,7 +149,7 @@ public class SubmitAndKillSchedulerClient extends BaseJMeterSchedulerClient {
         job.setEnvironment(jobEnv);
 
         JavaTask task = new JavaTask();
-        task.setExecutableClassName(SimpleJavaTask.class.getName());
+        task.setExecutableClassName(SleepForeverJavaTask.class.getName());
         task.setName(taskName);
         task.setDescription("Test java task, sleeps forever");
         task.setMaxNumberOfExecution(1);

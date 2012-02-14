@@ -48,12 +48,22 @@ public class SSHProcessExecutor extends ProcessExecutor {
 
     public static SSHProcessExecutor createExecutorSaveOutput(String commandName, InetAddress host,
             String... command) {
-        return createExecutor(commandName, host, false, true, Arrays.asList(command));
+        return createExecutorSaveOutput(commandName, host, Arrays.asList(command));
+    }
+
+    public static SSHProcessExecutor createExecutorSaveOutput(String commandName, InetAddress host,
+            List<String> command) {
+        return createExecutor(commandName, host, false, true, command);
     }
 
     public static SSHProcessExecutor createExecutorPrintOutput(String commandName, InetAddress host,
             String... command) {
-        return createExecutor(commandName, host, true, false, Arrays.asList(command));
+        return createExecutorPrintOutput(commandName, host, Arrays.asList(command));
+    }
+
+    public static SSHProcessExecutor createExecutorPrintOutput(String commandName, InetAddress host,
+            List<String> command) {
+        return createExecutor(commandName, host, true, false, command);
     }
 
     private static SSHProcessExecutor createExecutor(String commandName, InetAddress host,

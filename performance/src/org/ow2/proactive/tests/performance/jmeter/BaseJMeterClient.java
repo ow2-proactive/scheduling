@@ -87,11 +87,11 @@ public abstract class BaseJMeterClient extends AbstractJavaSamplerClient {
     protected void logError(String message) {
         getLogger().error(message);
     }
-    
+
     protected void logInfo(String message) {
         getLogger().info(message);
     }
-    
+
     protected abstract void doSetupTest(JavaSamplerContext context) throws Throwable;
 
     public static boolean getBooleanParameter(JavaSamplerContext context, String name) {

@@ -99,6 +99,7 @@ public class JobWaitContition extends SchedulerWaitCondition {
         if (!jobName.equals(notification.getData().getJobId().getReadableName())) {
             return;
         }
-        addEventLog("Task state for job '" + jobName + "' updated " + notification.getEventType());
+        addEventLog("Task state for task '" + jobName + "/" +
+            notification.getData().getTaskId().getReadableName() + "' updated " + notification.getEventType());
     }
 }

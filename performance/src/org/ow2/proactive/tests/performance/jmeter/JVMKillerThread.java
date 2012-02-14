@@ -46,7 +46,7 @@ public class JVMKillerThread extends Thread {
     private final long killDelay;
 
     private final Logger logger;
-    
+
     public JVMKillerThread(long killDelay, Logger logger) {
         this.killDelay = killDelay;
         this.logger = logger;

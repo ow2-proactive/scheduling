@@ -45,6 +45,7 @@ import org.apache.jmeter.samplers.SampleResult;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.resourcemanager.exception.RMException;
+import org.ow2.proactive.tests.performance.deployment.TestEnv;
 import org.ow2.proactive.tests.performance.jmeter.TestHosts;
 import org.ow2.proactive.tests.performance.rm.NodeSourceRemoveWaitCondition;
 import org.ow2.proactive.tests.performance.rm.NodesDeployWaitCondition;
@@ -61,15 +62,13 @@ public abstract class BaseNodeSourceCreateClient extends BaseJMeterRMClient {
 
     public static final String PARAM_NODES_PER_HOST = "createNodeSourceNodesPerHost";
 
-    public static final String PARAM_JAVA_PATH = "createNodeSourceJavaPath";
-
-    public static final String PARAM_SCHEDULING_PATH = "createNodeSourceSchedulingPath";
+    public static final String PARAM_ENV = "createNodeSourceEnv";
 
     public static final String PARAM_NODE_JAVA_OPTIONS = "nodeJavaOptions";
 
-    public static final int NODE_DEPLOY_TIMEOUT = 60000;
+    public static final int NODE_DEPLOY_TIMEOUT = 5 * 60000;
 
-    public static final int NODE_SOURCE_REMOVE_TIMEOUT = 60000;
+    public static final int NODE_SOURCE_REMOVE_TIMEOUT = 5 * 60000;
 
     private static TestHosts testHosts;
 
@@ -77,14 +76,15 @@ public abstract class BaseNodeSourceCreateClient extends BaseJMeterRMClient {
 
     private RMTestListener listener;
 
+    protected TestEnv env;
+
     @Override
     public Arguments getDefaultParameters() {
         Arguments args = super.getDefaultParameters();
         args.addArgument(PARAM_HOSTS_LIST, "${createNodeSourceHosts}");
         args.addArgument(PARAM_USE_ALL_HOSTS, "${createNodeSourceUseAllHosts}");
         args.addArgument(PARAM_NODES_PER_HOST, "${createNodeSourceNodesPerHost}");
-        args.addArgument(PARAM_JAVA_PATH, "${createNodeSourceJavaPath}");
-        args.addArgument(PARAM_SCHEDULING_PATH, "${createNodeSourceSchedulingPath}");
+        args.addArgument(PARAM_ENV, "${createNodeSourceEnv}");
         args.addArgument(PARAM_NODE_JAVA_OPTIONS, "${nodeJavaOptions}");
         return args;
     }
@@ -92,6 +92,9 @@ public abstract class BaseNodeSourceCreateClient extends BaseJMeterRMClient {
     @Override
     protected void doSetupTest(JavaSamplerContext context) throws Throwable {
         super.doSetupTest(context);
+
+        env = TestEnv.getEnv(context.getParameter(PARAM_ENV));
+
         synchronized (BaseNodeSourceCreateClient.class) {
             if (testHosts == null) {
                 testHosts = new TestHosts(getLogger());
@@ -142,8 +145,9 @@ public abstract class BaseNodeSourceCreateClient extends BaseJMeterRMClient {
 
         try {
             int nodesNumber = context.getIntParameter(PARAM_NODES_PER_HOST);
-            String javaPath = context.getParameter(PARAM_JAVA_PATH);
-            String schedulingPath = context.getParameter(PARAM_SCHEDULING_PATH);
+
+            String javaPath = env.getJavaPath();
+            String schedulingPath = env.getSchedulingFolder().getRootDirPath();
 
             String nodeSourceName = "TestNodeSource-" + new UniqueID().getCanonString();
             int totalNodesNumber = hostNames.size() * nodesNumber;
@@ -159,7 +163,8 @@ public abstract class BaseNodeSourceCreateClient extends BaseJMeterRMClient {
                 return result;
             }
             try {
-                boolean nodesDeployed = eventsMonitor.waitFor(nodesDeployWaitCondition, NODE_DEPLOY_TIMEOUT, getLogger());
+                boolean nodesDeployed = eventsMonitor.waitFor(nodesDeployWaitCondition, NODE_DEPLOY_TIMEOUT,
+                        getLogger());
                 result.sampleEnd();
                 if (!nodesDeployed) {
                     result.setSuccessful(false);

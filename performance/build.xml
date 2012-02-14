@@ -30,9 +30,6 @@
         <fileset dir="${basedir}/lib">
             <include name="*.jar" />
         </fileset>
-        <fileset dir="${project.root}/compile/lib">
-            <include name="*.jar" />
-        </fileset>
     </path>
 
     <!-- setup stub generator task -->
@@ -43,19 +40,20 @@
         </fileset>
         <path location="${classes.dir}" />
     </path>
-    <taskdef name="stubGenerator" classname="ant.AntStubGenerator" classpathref="compile.classpath" />
-    <typedef name="class" classname="ant.AntStubGeneratorClass" classpathref="compile.classpath" />
 
     <target name="clean">
         <delete dir="${classes.dir}" />
         <delete dir="${tmp}/RM_DB" />
         <delete dir="${tmp}/SCHEDULER_DB" />
-        <delete dir="${project.root}/.logs"/>
+        <delete dir="${project.root}/.logs" />
     </target>
 
-    <target name="compile.tests">
+    <target name="compile.tests" unless="compile.tests.disable">
+        <taskdef name="stubGenerator" classname="ant.AntStubGenerator" classpathref="compile.classpath" />
+        <typedef name="class" classname="ant.AntStubGeneratorClass" classpathref="compile.classpath" />
+        
         <mkdir dir="${classes.dir}" />
-        <javac srcdir="${basedir}/src" destdir="${classes.dir}" includeAntRuntime="false">
+        <javac srcdir="${basedir}/src" destdir="${classes.dir}" debug="true" includeAntRuntime="false">
             <classpath refid="compile.classpath" />
         </javac>
         <stubGenerator dstDir="${classes.dir}" srcDir="${basedir}/src" refclasspath="stub.generation.classpath">
@@ -76,7 +74,6 @@
     </path>
 
     <property name="allTestHosts" value="${scheduler.deploy.schedulerHost},${rm.deploy.rmHost},${rm.deploy.rmNodesHosts},${createNodeSourceHosts},${test.deploy.pamr.startNewRouter.host}" />
-
 
     <target name="kill-test-processes" depends="compile.tests" description="Kill test processes">
         <java classname="org.ow2.proactive.tests.performance.deployment.KillTestProcesses" fork="true" failonerror="false" maxmemory="512m">
@@ -106,28 +103,38 @@
                 <!-- hosts where test processes are killed in case if deployment fails -->
                 <jvmarg value="-DtestHosts=${allTestHosts}" />
 
-                <jvmarg value="-Dtest.javaPath=${test.javaPath}" />
-                <jvmarg value="-Dtest.schedulingPath=${test.schedulingPath}" />
+                <jvmarg value="-Dtest.deploy.env.pamr=${test.deploy.env.pamr}" />
+                <jvmarg value="-Dtest.deploy.env.rm=${test.deploy.env.rm}" />
+                <jvmarg value="-Dtest.deploy.env.rmNodes=${test.deploy.env.rmNodes}" />
+                <jvmarg value="-Dtest.deploy.env.scheduler=${test.deploy.env.scheduler}" />
+
+                <jvmarg value="-Dtest.deploy.env.local.javaPath=${test.deploy.env.local.javaPath}" />
+                <jvmarg value="-Dtest.deploy.env.local.schedulingPath=${test.deploy.env.local.schedulingPath}" />
+                
                 <jvmarg value="-Dtest.deploy.protocol=${test.deploy.protocol}" />
 
-                <!-- needed if tests are run already running PAMR router -->
+                <!-- needed if tests should use already running PAMR router -->
                 <jvmarg value="-Dtest.deploy.pamr.existingRouterHost=${test.deploy.pamr.existingRouterHost}" />
                 <jvmarg value="-Dtest.deploy.pamr.existingRouterPort=${test.deploy.pamr.existingRouterPort}" />
 
                 <!-- properties used to start PAMR router -->
                 <jvmarg value="-Dtest.deploy.pamr.startNewRouter.host=${test.deploy.pamr.startNewRouter.host}" />
+                <jvmarg value="-Dtest.deploy.pamr.startNewRouter.port=${test.deploy.pamr.startNewRouter.port}" />
                 <jvmarg value="-Dtest.deploy.pamr.startNewRouter.reservedIds=0:resource_manager,1:scheduler" />
                 <jvmarg value="-Drm.deploy.pamr.serverReservedId=0:resource_manager" />
                 <jvmarg value="-Dscheduler.deploy.pamr.serverReservedId=1:scheduler" />
 
-
                 <jvmarg value="-Drm.deploy.rmHost=${rm.deploy.rmHost}" />
+                <jvmarg value="-Drm.deploy.dropDB=${rm.deploy.dropDB}" />
+                <jvmarg value="-Drm.deploy.javaOpts=${rm.deploy.javaOpts}" />
                 <jvmarg value="-Drm.deploy.rmNodesHosts=${rm.deploy.rmNodesHosts}" />
                 <jvmarg value="-Drm.deploy.rmNodesPerHosts=${rm.deploy.rmNodesPerHosts}" />
                 <jvmarg value="-Drm.deploy.testNodes=${createNodeSourceHosts}" />
 
                 <jvmarg value="-Dscheduler.deploy.schedulerHost=${scheduler.deploy.schedulerHost}" />
+                <jvmarg value="-Dscheduler.deploy.dropDB=${scheduler.deploy.dropDB}" />
                 <jvmarg value="-Dscheduler.deploy.rmUrl=${scheduler.deploy.rmUrl}" />
+                <jvmarg value="-Dscheduler.deploy.javaOpts=${scheduler.deploy.javaOpts}" />
 
                 <jvmarg value="-Djava.security.policy=${basedir}/config/grant.all.java.policy" />
             </java>
@@ -143,12 +150,12 @@
         <test-deployer-macro startpamrifneeded="false" startrm="false" startscheduler="true" />
     </target>
 
-    <target name="deploy-rm-and-scheduler" description="Deploy RM and Scheduler">
+    <target name="deploy-rm-and-scheduler" depends="compile.tests" description="Deploy RM and Scheduler">
         <test-deployer-macro startpamrifneeded="true" startrm="true" startscheduler="true" />
     </target>
 
     <target name="deploy-rm-and-execute-test" depends="copy.libs.to.jmeter, deploy-rm" description="Deploy RM, execute JMeter RM test and kill all test processes">
-        <run-rm-jmeter-test testplan="rm1" targetRmUrl="${rm.deploy.result.serverUrl}" clientjavaoptions="${rm.deploy.result.clientJavaOptions}" clientproactiveconfig="${basedir}/tmp/RMClientProActiveConfiguration.xml" />
+        <run-rm-jmeter-test testplan="rm1" targetRmUrl="${rm.deploy.result.serverUrl}" clientjavaoptions="${rm.deploy.result.clientJavaOptions}" clientproactiveconfig="${basedir}/tmp/RMClientProActiveConfiguration.xml"/>
         <antcall target="kill-test-processes" />
         <fail if="rm-rm1-failed" message="JMeter test failed" />
     </target>
@@ -156,21 +163,21 @@
     <target name="deploy-rm-and-scheduler-and-execute-test" depends="copy.libs.to.jmeter, deploy-rm-and-scheduler" description="Deploy RM, Scheduler, execute JMeter Scheduler test and kill all test processes">
         <run-scheduler-jmeter-test testplan="scheduler1" targetschedulerurl="${scheduler.deploy.result.serverUrl}" clientproactiveconfig="${basedir}/tmp/SchedulerClientProActiveConfiguration.xml" />
         <antcall target="kill-test-processes" />
-        <fail if="rm-rm1-failed" message="JMeter test failed" />
+        <fail if="scheduler-scheduler1-failed" message="JMeter test failed" />
     </target>
 
     <macrodef name="run-rm-jmeter-test">
         <attribute name="testplan" />
         <attribute name="targetRmUrl" />
         <attribute name="clientJavaOptions" />
-        <attribute name="clientProactiveConfig" />
+        <attribute name="clientProActiveConfig" />
         <sequential>
             <delete file="${basedir}/results/@{testplan}.jtl" />
             <delete file="${basedir}/results/@{testplan}.html" />
 
             <jmeter failureProperty="rm-@{testplan}-failed" jmeterhome="${jmeterhome}" testplan="${basedir}/jmeter/testplans/@{testplan}.jmx" resultlog="${basedir}/results/@{testplan}.jtl">
                 <jvmarg value="-Djava.security.policy=${basedir}/config/grant.all.java.policy" />
-                <jvmarg value="-Dproactive.configuration=@{clientProactiveConfig}" />
+                <jvmarg value="-Dproactive.configuration=@{clientProActiveConfig}" />
 
                 <property name="search_paths" value="${classes.dir}" />
 
@@ -178,6 +185,9 @@
 
                 <property name="rmUrl" value="@{targetRmUrl}" />
                 <property name="testTime" value="${testTime}" />
+
+                <jvmarg value="-Dtest.deploy.env.local.javaPath=${test.deploy.env.local.javaPath}" />
+                <jvmarg value="-Dtest.deploy.env.local.schedulingPath=${test.deploy.env.local.schedulingPath}" />
 
                 <property name="rmListenersNumber" value="${rmListenersNumber}" />
 
@@ -191,8 +201,8 @@
                 <property name="createNodeSourceHosts" value="${createNodeSourceHosts}" />
                 <property name="createNodeSourceUseAllHosts" value="${createNodeSourceUseAllHosts}" />
                 <property name="createNodeSourceNodesPerHost" value="${createNodeSourceNodesPerHost}" />
-                <property name="createNodeSourceJavaPath" value="${createNodeSourceJavaPath}" />
-                <property name="createNodeSourceSchedulingPath" value="${project.root}" />
+                
+                <property name="createNodeSourceEnv" value="${test.deploy.env.rmNodes}" />
 
                 <property name="cliNodeSourceUsers" value="${cliNodeSourceUsers}" />
                 <property name="cliUseDefaultScripts" value="${cliUseDefaultScripts}" />
@@ -201,9 +211,9 @@
 
                 <property name="sshNodeSourceUsers" value="${sshNodeSourceUsers}" />
 
-                <jmeterarg value="-j"/>
+                <jmeterarg value="-j" />
                 <jmeterarg value="${basedir}/results/jmeter.log" />
-                
+
             </jmeter>
 
             <xslt classpathref="xslt.classpath" in="${basedir}/results/@{testplan}.jtl" out="${basedir}/results/@{testplan}.html" style="${basedir}/jmeter/config/jmeter-results-report_21.xsl" />
@@ -229,7 +239,7 @@
                 <property name="jmeter.save.saveservice.output_format" value="xml" />
 
                 <property name="schedulerUrl" value="@{targetSchedulerUrl}" />
-                <property name="schedulingPath" value="${project.root}" />
+                <property name="schedulingPath" value="${test.deploy.env.local.schedulingPath}" />
                 <property name="testTime" value="${testTime}" />
 
                 <property name="schedulerListenersNumber" value="${schedulerListenersNumber}" />
@@ -246,9 +256,23 @@
                 <property name="multiNodeSubmitNodesNumber" value="${multiNodeSubmitNodesNumber}" />
                 <property name="multiNodeSubmitTopology" value="${multiNodeSubmitTopology}" />
 
+                <property name="submitDependentTasksUsersNumber" value="${submitDependentTasksUsersNumber}" />
+                <property name="dependentTasksSubmitTaskType" value="${dependentTasksSubmitTaskType}" />
+                <property name="dependentTasksSubmitTasksNumber" value="${dependentTasksSubmitTasksNumber}" />
+
+                <property name="replicateTasksUsersNumber" value="${replicateTasksUsersNumber}" />
+                <property name="replicateTasksSubmitChildrenNumber" value="${replicateTasksSubmitChildrenNumber}" />
+                <property name="replicateTasksSubmitTaskType" value="${replicateTasksSubmitTaskType}" />
+
+                <property name="loopTasksUsersNumber" value="${loopTasksUsersNumber}" />
+                <property name="loopTasksSubmitIterationsNumber" value="${loopTasksSubmitIterationsNumber}" />
+                <property name="loopTasksSubmitTaskType" value="${loopTasksSubmitTaskType}" />
+
+                <property name="sampleJobUsersNumber" value="${sampleJobUsersNumber}" />
+
                 <property name="submitAndKillUsersNumber" value="${submitAndKillUsersNumber}" />
 
-                <jmeterarg value="-j"/>
+                <jmeterarg value="-j" />
                 <jmeterarg value="${basedir}/results/jmeter.log" />
             </jmeter>
 
@@ -259,13 +283,102 @@
     </macrodef>
 
     <target name="run-scheduler-test" depends="compile.tests, copy.libs.to.jmeter" description="Run JMeter Scheduler test (Scheduler should be already deployed)">
-        <run-scheduler-jmeter-test testplan="scheduler1" targetSchedulerUrl="${scheduler.deploy.rmUrl}" clientproactiveconfig="${basedir}/config/DefaultClientProActiveConfiguration.xml" />
+        <run-scheduler-jmeter-test testplan="scheduler1" targetSchedulerUrl="${targetSchedulerUrl}" clientproactiveconfig="${basedir}/config/DefaultClientProActiveConfiguration.xml" />
         <fail if="scheduler-scheduler1-failed" message="JMeter test failed" />
     </target>
 
     <target name="run-rm-test" depends="compile.tests, copy.libs.to.jmeter" description="Run JMeter RM (RM should be already deployed)">
         <run-rm-jmeter-test testplan="rm1" targetRmUrl="${rmUrl}" clientproactiveconfig="${basedir}/config/DefaultClientProActiveConfiguration.xml" clientjavaoptions="-Dpa.rm.home=${project.root} -Dproactive.configuration=${basedir}/config/DefaultClientProActiveConfiguration.xml -Dorg.ow2.proactive.tests.performance=true" />
         <fail if="rm-rm1-failed" message="JMeter test failed" />
+    </target>
+
+    <macrodef name="rsync">
+        <attribute name="src" />
+        <attribute name="host" />
+        <attribute name="dest" />
+        <element name="rsync-args" optional="yes"/>
+        <sequential>
+            <echo message="rsync @{src} @{host}:@{dest}" />
+            <exec executable="rsync" failonerror="true">
+                <arg value="--verbose" />
+                <arg value="--progress" />
+                <arg value="--stats" />
+                <arg value="--recursive" />
+                <arg value="--times" />
+                <arg value="--perms" />
+                <arg value="--group" />
+                <arg value="--links" />
+                <arg value="--delete" />
+                <arg value="--exclude" />
+                <arg value=".svn" />
+                <rsync-args/>
+                <arg value="@{src}" />
+                <arg value="@{host}:@{dest}" />
+            </exec>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="rsyncSchedulingMacro">
+        <attribute name="host" />
+        <attribute name="dest" />
+        <sequential>
+            <rsync src="${project.root}/dist/" host="@{host}" dest="@{dest}/dist" />
+            <rsync src="${project.root}/addons/" host="@{host}" dest="@{dest}/addons" />
+            <rsync src="${project.root}/config/" host="@{host}" dest="@{dest}/config" />
+            <rsync src="${project.root}/samples/" host="@{host}" dest="@{dest}/samples" />
+            <rsync src="${project.root}/classes/performance" host="@{host}" dest="@{dest}/classes/" />
+            <rsync src="${project.root}/performance/" host="@{host}" dest="@{dest}/performance">
+                <rsync-args>
+                    <arg value="--exclude" />
+                    <arg value="tmp" />
+                    <arg value="--exclude" />
+                    <arg value="results" />
+                </rsync-args>
+            </rsync>
+        </sequential>
+    </macrodef>
+
+    <target name="test-with-get-nodes-from-scheduler" depends="compile.tests" description="Run tests using hosts provided by the existing Scheduler">
+        <rsyncSchedulingMacro host="${get.hosts.from.scheduler.copySchedulingHost}" dest="${get.hosts.from.scheduler.copySchedulingPath}"/>
+        
+        <path id="run.with.scheduler.classpath">
+            <fileset dir="${get.hosts.from.scheduler.clientSchedulingPath}/dist/lib">
+                <include name="*.jar" />
+            </fileset>
+            <pathelement location="${classes.dir}" />
+        </path>
+
+        <java classname="org.ow2.proactive.tests.performance.deployment.gethostsfromscheduler.GetHostsFromSchedulerTestExecutor" fork="true" failonerror="false" maxmemory="512m">
+            <classpath>
+                <path refid="run.with.scheduler.classpath" />
+            </classpath>
+            <jvmarg value="-Djava.security.policy=${basedir}/config/grant.all.java.policy" />
+            <jvmarg value="-Dproactive.configuration=${get.hosts.from.scheduler.clientProActiveConfig}" />
+
+            <jvmarg value="-Dget.hosts.from.scheduler.targetToRun=${get.hosts.from.scheduler.targetToRun}" />
+    
+            <jvmarg value="-Dtest.deploy.env.local.javaPath=${test.deploy.env.local.javaPath}" />
+            <jvmarg value="-Dtest.deploy.env.local.schedulingPath=${test.deploy.env.local.schedulingPath}" />
+            <jvmarg value="-Dtest.deploy.env.rmNodes=${test.deploy.env.rmNodes}" />
+            
+            <jvmarg value="-Dget.hosts.from.scheduler.copySchedulingPath=${get.hosts.from.scheduler.copySchedulingPath}" />
+            <jvmarg value="-Dget.hosts.from.scheduler.schedulerUrl=${get.hosts.from.scheduler.schedulerUrl}" />
+            <jvmarg value="-Dget.hosts.from.scheduler.schedulerLogin=${get.hosts.from.scheduler.schedulerLogin}" />
+            <jvmarg value="-Dget.hosts.from.scheduler.schedulerPassword=${get.hosts.from.scheduler.schedulerPassword}" />
+            <jvmarg value="-Dget.hosts.from.scheduler.rmHostsNumber=${get.hosts.from.scheduler.rmHostsNumber}" />
+            <jvmarg value="-Dget.hosts.from.scheduler.jmeterhome=${get.hosts.from.scheduler.jmeterhome}" />
+            <jvmarg value="-Dget.hosts.from.scheduler.rmAdditionalHostsNumber=${get.hosts.from.scheduler.rmAdditionalHostsNumber}" />
+        </java>
+        
+        <mkdir dir="${project.root}/performance/results/remoteResults"/>
+        <exec executable="scp" failonerror="true">
+            <arg value="${get.hosts.from.scheduler.copySchedulingHost}:${get.hosts.from.scheduler.copySchedulingPath}/performance/results/*" />
+            <arg value="${project.root}/performance/results/remoteResults" />
+        </exec>
+        <exec executable="scp" failonerror="true">
+            <arg value="${get.hosts.from.scheduler.copySchedulingHost}:${get.hosts.from.scheduler.copySchedulingPath}/.logs/*" />
+            <arg value="${project.root}/performance/results/remoteResults" />
+        </exec>
     </target>
 
 </project>

@@ -36,13 +36,46 @@
  */
 package org.ow2.proactive.tests.performance.jmeter.scheduler;
 
+import org.apache.jmeter.config.Arguments;
+import org.apache.jmeter.protocol.java.sampler.JavaSamplerContext;
 import org.ow2.proactive.scheduler.common.job.JobEnvironment;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
-import org.ow2.proactive.scheduler.common.task.JavaTask;
+import org.ow2.proactive.scheduler.common.task.Task;
+import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
 
 
-public class SimpleJavaJobSubmitClient extends BaseJobSubmitClient {
+/**
+ * Scenario submit job with task executed in loop.
+ * 
+ */
+public class LoopTaskSubmitClient extends BaseJobSubmitClient {
+
+    public static final String LOOP_TASK_SUBMIT_ITERATIONS_NUMBER = "loopTasksSubmitIterationsNumber";
+
+    public static final String LOOP_TASK_SUBMIT_TASK_TYPE = "loopTasksSubmitTaskType";
+
+    private TaskType taskType;
+
+    private int iterationsNumber;
+
+    @Override
+    public Arguments getDefaultParameters() {
+        Arguments args = super.getDefaultParameters();
+        args.addArgument(LOOP_TASK_SUBMIT_ITERATIONS_NUMBER, "${loopTasksSubmitIterationsNumber}");
+        args.addArgument(LOOP_TASK_SUBMIT_TASK_TYPE, "${loopTasksSubmitTaskType}");
+        return args;
+    }
+
+    @Override
+    protected void doSetupTest(JavaSamplerContext context) throws Throwable {
+        super.doSetupTest(context);
+
+        String taskTypeParam = getRequiredParameter(context, LOOP_TASK_SUBMIT_TASK_TYPE);
+        taskType = TaskType.valueOf(taskTypeParam);
+
+        iterationsNumber = context.getIntParameter(LOOP_TASK_SUBMIT_ITERATIONS_NUMBER);
+    }
 
     @Override
     protected TaskFlowJob createJob(String jobName) throws Exception {
@@ -50,18 +83,23 @@ public class SimpleJavaJobSubmitClient extends BaseJobSubmitClient {
         job.setName(jobName);
         job.setPriority(JobPriority.NORMAL);
         job.setCancelJobOnError(true);
-        job.setDescription("Job with one java task (task exits immediately)");
+        job.setDescription("Job executes tasks in the loop, iterations: " + iterationsNumber +
+            "  (tasks exit immediately)");
         job.setMaxNumberOfExecution(1);
 
         JobEnvironment jobEnv = new JobEnvironment();
         jobEnv.setJobClasspath(new String[] { testsClasspath });
         job.setEnvironment(jobEnv);
 
-        JavaTask task = createSimpleJavaTask(true);
-        task.setName("Simple java task");
-        task.setDescription("Test java task, exits immediately");
+        Task mainTask = createSimpleTask(taskType, "Loop main task");
+        job.addTask(mainTask);
 
-        job.addTask(task);
+        String loopScript = String.format("if ($IT < %d) { loop = true; } else { loop = false; }",
+                iterationsNumber);
+        Task loopTask = createSimpleTask(taskType, "Loop task");
+        loopTask.addDependence(mainTask);
+        loopTask.setFlowScript(FlowScript.createLoopFlowScript(loopScript, loopTask.getName()));
+        job.addTask(loopTask);
 
         return job;
     }

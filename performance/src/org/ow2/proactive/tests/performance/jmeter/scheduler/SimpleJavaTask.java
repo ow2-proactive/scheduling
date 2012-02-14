@@ -36,32 +36,19 @@
  */
 package org.ow2.proactive.tests.performance.jmeter.scheduler;
 
-import org.ow2.proactive.scheduler.common.job.JobPriority;
-import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
-import org.ow2.proactive.scheduler.common.task.NativeTask;
+import java.io.Serializable;
+
+import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 
 
-public class SimpleNativeJobSubmitClient extends BaseJobSubmitClient {
+public class SimpleJavaTask extends JavaExecutable {
 
     @Override
-    protected TaskFlowJob createJob(String jobName) throws Exception {
-        TaskFlowJob job = new TaskFlowJob();
-        job.setName(jobName);
-        job.setPriority(JobPriority.NORMAL);
-        job.setCancelJobOnError(true);
-        job.setDescription("Job with one native task (task exits immediately)");
-
-        NativeTask task = new NativeTask();
-        task.setCommandLine(new String[] { testsSourcePath +
-            "/org/ow2/proactive/tests/performance/jmeter/scheduler/nativeTask.sh" });
-        task.setName("Simple native task");
-        task.setDescription("Test native task, exits immediately");
-        task.setMaxNumberOfExecution(1);
-        task.setCancelJobOnError(true);
-
-        job.addTask(task);
-
-        return job;
+    public Serializable execute(TaskResult... results) throws Throwable {
+        Thread.sleep(5000);
+        System.out.println("Task is executed");
+        return "OK";
     }
 
 }

@@ -38,52 +38,34 @@ package org.ow2.proactive.tests.performance.deployment;
 
 import java.io.File;
 import java.net.InetAddress;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
-import org.ow2.proactive.tests.performance.deployment.process.SSHProcessExecutor;
+import org.ow2.proactive.tests.performance.deployment.process.ProcessExecutor;
 import org.ow2.proactive.tests.performance.deployment.rm.TestRMDeployHelper;
 import org.ow2.proactive.tests.performance.utils.TestFileUtils;
 
 
 public abstract class TestDeployer {
 
-    protected final String javaPath;
-
-    protected final SchedulingFolder schedulingFolder;
-
-    protected final InetAddress serverHost;
+    protected final HostTestEnv serverHostEnv;
 
     protected final String clientConfigFileName;
+
+    protected final TestEnv localEnv = TestEnv.getLocalEnvUsingSystemProperties();
 
     protected TestDeployHelper deployHelper;
 
     private String serverUrl;
 
-    public TestDeployer(String javaPath, String schedulingPath, String clientConfigFileName,
-            String serverHostName) throws InterruptedException {
-        this.javaPath = javaPath;
-        this.schedulingFolder = new SchedulingFolder(schedulingPath);
+    public TestDeployer(HostTestEnv serverHostEnv, String clientConfigFileName) throws InterruptedException {
+        this.serverHostEnv = serverHostEnv;
         this.clientConfigFileName = clientConfigFileName;
-        this.serverHost = prepareHostsForTest(Collections.singleton(serverHostName), javaPath, schedulingPath)
-                .get(0);
     }
 
-    public String getJavaPath() {
-        return javaPath;
-    }
-
-    public SchedulingFolder getSchedulingFolder() {
-        return schedulingFolder;
-    }
-
-    public InetAddress getServerHost() {
-        return serverHost;
+    public HostTestEnv getServerHostEnv() {
+        return serverHostEnv;
     }
 
     public String getClientConfigFileName() {
@@ -94,37 +76,48 @@ public abstract class TestDeployer {
         this.deployHelper = deployHelper;
     }
 
-    protected SSHProcessExecutor startServer(InetAddress host) throws Exception {
+    protected ProcessExecutor runStartServerCommand() throws Exception {
         List<String> startCommand = deployHelper.createServerStartCommand();
-        System.out.println("Starting server process on the " + host + ": " + startCommand);
-        SSHProcessExecutor executor = SSHProcessExecutor.createExecutorPrintOutput("Server", host,
-                startCommand.toArray(new String[startCommand.size()]));
+        System.out.println("Starting server process on the " + serverHostEnv.getHost().getHostName() + ": " +
+            startCommand);
+        ProcessExecutor executor = serverHostEnv.runCommandPrintOutput("Server", startCommand);
         executor.start();
 
         return executor;
     }
 
-    protected abstract void waitForServerStartup(String expectedUrl, String clientJavaOptions,
-            File clientProActiveConfig) throws Exception;
+    protected abstract void waitForServerStartup(String expectedUrl) throws Exception;
+
+    protected String javaPropertiesAsSingleString(Map<String, String> map) {
+        StringBuilder stringBuilder = new StringBuilder();
+        for (Map.Entry<String, String> prop : map.entrySet()) {
+            stringBuilder.append("-D").append(prop.getKey()).append("=").append(prop.getValue()).append(" ");
+        }
+        return stringBuilder.toString();
+    }
 
     public final Map<String, String> startServer() {
-        SSHProcessExecutor executor;
-        File clientProActiveConfig;
+        ProcessExecutor executor;
+        Map<String, String> clientProperties;
 
         try {
             serverUrl = deployHelper.prepareForDeployment();
 
-            Map<String, String> clientJavaOptionsMap = deployHelper.getClientProActiveProperties();
-            String xmlConfiguration = DeploymentTestUtils.createProActiveConfiguration(clientJavaOptionsMap);
-            clientProActiveConfig = new File(schedulingFolder.getTestTmpDir(), clientConfigFileName);
+            System.out.println("Setting java properties:");
+            clientProperties = deployHelper.getClientJavaProperties(localEnv);
+            for (Map.Entry<String, String> prop : clientProperties.entrySet()) {
+                System.out.println(String.format("%s=%s", prop.getKey(), prop.getValue()));
+                System.setProperty(prop.getKey(), prop.getValue());
+            }
+
+            File clientProActiveConfig = new File(localEnv.getSchedulingFolder().getTestTmpDir(),
+                clientConfigFileName);
+            String xmlConfiguration = DeploymentTestUtils.createProActiveConfiguration(clientProperties);
             TestFileUtils.writeStringToFile(clientProActiveConfig, xmlConfiguration);
             System.out.println("Created client configuration: " + clientProActiveConfig.getAbsolutePath());
             System.out.println(xmlConfiguration);
 
-            System.setProperty(CentralPAPropertyRepository.PA_CONFIGURATION_FILE.getName(),
-                    clientProActiveConfig.getAbsolutePath());
-
-            executor = startServer(serverHost);
+            executor = runStartServerCommand();
         } catch (TestExecutionException e) {
             throw e;
         } catch (Exception e) {
@@ -133,21 +126,13 @@ public abstract class TestDeployer {
 
         Throwable error = null;
         try {
-            StringBuilder javaOptionsBuilder = new StringBuilder();
-            javaOptionsBuilder.append(CentralPAPropertyRepository.PA_CONFIGURATION_FILE.getCmdLine() +
-                clientProActiveConfig.getAbsolutePath());
-            for (String option : deployHelper.getClientJavaOptions()) {
-                javaOptionsBuilder.append(" " + option);
-            }
-            String clientJavaOptions = javaOptionsBuilder.toString();
-
-            waitForServerStartup(serverUrl, clientJavaOptions, clientProActiveConfig);
+            waitForServerStartup(serverUrl);
 
             System.out.println("Server started, url: " + serverUrl);
 
             Map<String, String> result = new HashMap<String, String>();
             result.put("deploy.result.serverUrl", serverUrl);
-            result.put("deploy.result.clientJavaOptions", clientJavaOptions);
+            result.put("deploy.result.clientJavaOptions", javaPropertiesAsSingleString(clientProperties));
             return result;
         } catch (Throwable t) {
             error = t;
@@ -160,7 +145,7 @@ public abstract class TestDeployer {
                 error.printStackTrace(System.out);
 
                 System.out.println("Trying to kill server processes");
-                killTestProcesses(serverHost);
+                killTestProcesses(serverHostEnv.getHost());
             }
         }
 
@@ -168,22 +153,6 @@ public abstract class TestDeployer {
 
     public String getServerUrl() {
         return serverUrl;
-    }
-
-    public static List<InetAddress> prepareHostsForTest(Collection<String> hostNames, String javaPath,
-            String rmPath) throws InterruptedException {
-        List<InetAddress> addresses = new ArrayList<InetAddress>();
-        for (String hostName : hostNames) {
-            System.out.println("Before-execution checks for " + hostName);
-            InetAddress hostAddr = prepareHostForTest(hostName, javaPath, rmPath);
-            if (hostAddr == null) {
-                throw new TestExecutionException("Before-execution checks failed for " + hostName +
-                    ", see log for more details");
-            } else {
-                addresses.add(hostAddr);
-            }
-        }
-        return addresses;
     }
 
     protected static boolean killTestProcesses(InetAddress hostAddr) {
@@ -194,42 +163,8 @@ public abstract class TestDeployer {
         }
     }
 
-    protected static InetAddress prepareHostForTest(String hostName, String javaPath, String schedulerPath)
-            throws InterruptedException {
-        InetAddress hostAddr = DeploymentTestUtils.checkHostIsAvailable(hostName);
-        if (hostAddr == null) {
-            return null;
-        }
-
-        // System.out.println("Checking scheduler path is available for the host " + hostAddr);
-        if (!DeploymentTestUtils.checkPathIsAvailable(hostAddr, schedulerPath)) {
-            return null;
-        }
-
-        // System.out.println("Checking java for host " + hostAddr);
-        if (!DeploymentTestUtils.checkJavaIsAvailable(hostAddr, javaPath)) {
-            return null;
-        }
-
-        // System.out.println("Trying to find and kill existing test processes on the host " + hostAddr);
-        // killTestProcesses(hostAddr);
-
-        List<String> javaProcesses = DeploymentTestUtils.listProcesses(hostAddr, "java");
-        if (!javaProcesses.isEmpty()) {
-            System.out.println("WARNING: there are java processes on the host " + hostAddr + ":");
-            for (String process : javaProcesses) {
-                System.out.println(process);
-            }
-        }
-
-        return hostAddr;
-    }
-
     public static String getFileName(File parent, String path) {
         File file = new File(parent, path);
-        if (!file.exists()) {
-            throw new TestExecutionException("Failed to find file: " + file.getAbsolutePath());
-        }
         return file.getAbsolutePath();
     }
 

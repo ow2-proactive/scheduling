@@ -54,6 +54,12 @@ public class TestFileUtils {
     public static File getWritableFile(String fileName) throws IOException {
         File file = new File(fileName);
         if (!file.exists()) {
+            if (!file.getParentFile().exists()) {
+                if (!file.getParentFile().mkdirs()) {
+                    throw new IllegalArgumentException("Failed to create directory " +
+                        file.getParentFile().getAbsolutePath());
+                }
+            }
             if (!file.createNewFile()) {
                 throw new IllegalArgumentException("Failed to create file " + file.getAbsolutePath());
             }

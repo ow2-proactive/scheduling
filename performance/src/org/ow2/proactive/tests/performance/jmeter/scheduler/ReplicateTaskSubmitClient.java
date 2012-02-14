@@ -41,32 +41,38 @@ import org.apache.jmeter.protocol.java.sampler.JavaSamplerContext;
 import org.ow2.proactive.scheduler.common.job.JobEnvironment;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
-import org.ow2.proactive.scheduler.common.task.ParallelEnvironment;
 import org.ow2.proactive.scheduler.common.task.Task;
-import org.ow2.proactive.tests.performance.utils.TestUtils;
-import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
+import org.ow2.proactive.scheduler.common.task.flow.FlowBlock;
+import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
 
 
-public class MultiNodeJobSubmitClient extends BaseJobSubmitClient {
+/**
+ * Scenario submit job with replicated tasks:
+ *         A
+ *         |
+ * ------------------
+ * |    |     |      |
+ * B    B     B      B
+ * ------------------
+ *          |
+ *          C
+ * 
+ */
+public class ReplicateTaskSubmitClient extends BaseJobSubmitClient {
 
-    public static final String PARAM_MULTI_NODE_SUBMIT_TASK_TYPE = "multiNodeSubmitTaskType";
+    public static final String REPLICATE_TASK_SUBMIT_CHILDREN_NUMBER = "replicateTasksSubmitChildrenNumber";
 
-    public static final String PARAM_MULTI_NODE_SUBMIT_NODES_NUMBER = "multiNodeSubmitNodesNumber";
-
-    public static final String PARAM_MULTI_NODE_SUBMIT_TOPOLOGY = "multiNodeSubmitTopology";
+    public static final String REPLICATE_TASK_SUBMIT_TASK_TYPE = "replicateTasksSubmitTaskType";
 
     private TaskType taskType;
 
-    private int nodesNumber;
-
-    private TopologyDescriptor topology;
+    private int replicatedChildrenNumber;
 
     @Override
     public Arguments getDefaultParameters() {
         Arguments args = super.getDefaultParameters();
-        args.addArgument(PARAM_MULTI_NODE_SUBMIT_TASK_TYPE, "${multiNodeSubmitTaskType}");
-        args.addArgument(PARAM_MULTI_NODE_SUBMIT_NODES_NUMBER, "${multiNodeSubmitNodesNumber}");
-        args.addArgument(PARAM_MULTI_NODE_SUBMIT_TOPOLOGY, "${multiNodeSubmitTopology}");
+        args.addArgument(REPLICATE_TASK_SUBMIT_CHILDREN_NUMBER, "${replicateTasksSubmitChildrenNumber}");
+        args.addArgument(REPLICATE_TASK_SUBMIT_TASK_TYPE, "${replicateTasksSubmitTaskType}");
         return args;
     }
 
@@ -74,12 +80,10 @@ public class MultiNodeJobSubmitClient extends BaseJobSubmitClient {
     protected void doSetupTest(JavaSamplerContext context) throws Throwable {
         super.doSetupTest(context);
 
-        String taskTypeParam = getRequiredParameter(context, PARAM_MULTI_NODE_SUBMIT_TASK_TYPE);
+        String taskTypeParam = getRequiredParameter(context, REPLICATE_TASK_SUBMIT_TASK_TYPE);
         taskType = TaskType.valueOf(taskTypeParam);
 
-        nodesNumber = context.getIntParameter(PARAM_MULTI_NODE_SUBMIT_NODES_NUMBER);
-
-        topology = TestUtils.getTopologyDescriptor(context.getParameter(PARAM_MULTI_NODE_SUBMIT_TOPOLOGY));
+        replicatedChildrenNumber = context.getIntParameter(REPLICATE_TASK_SUBMIT_CHILDREN_NUMBER);
     }
 
     @Override
@@ -88,23 +92,31 @@ public class MultiNodeJobSubmitClient extends BaseJobSubmitClient {
         job.setName(jobName);
         job.setPriority(JobPriority.NORMAL);
         job.setCancelJobOnError(true);
-        job.setDescription("Multinode job with one task, task exits immediately (" + taskType + ", nodes: " +
-            nodesNumber + ", topology: " + topology.getClass().getSimpleName() + ")");
+        job.setDescription("Job with " + replicatedChildrenNumber +
+            " replicated children (tasks exit immediately)");
         job.setMaxNumberOfExecution(1);
-        if (taskType.equals(TaskType.java_task)) {
-            JobEnvironment jobEnv = new JobEnvironment();
-            jobEnv.setJobClasspath(new String[] { testsClasspath });
-            job.setEnvironment(jobEnv);
-        }
 
-        Task task = createSimpleTask(taskType, "Test multinode task");
-        task.setDescription("Test multinode task, exits immediately");
+        JobEnvironment jobEnv = new JobEnvironment();
+        jobEnv.setJobClasspath(new String[] { testsClasspath });
+        job.setEnvironment(jobEnv);
 
-        ParallelEnvironment parallelEnv = new ParallelEnvironment(nodesNumber, topology);
-        task.setParallelEnvironment(parallelEnv);
+        Task mainTask = createSimpleTask(taskType, "Replication main task");
+        mainTask.setFlowBlock(FlowBlock.START);
+        String replicateScript = String.format("runs = %d", replicatedChildrenNumber);
+        mainTask.setFlowScript(FlowScript.createReplicateFlowScript(replicateScript));
+        job.addTask(mainTask);
 
-        job.addTask(task);
+        Task replicatedTask = createSimpleTask(taskType, "Replicated task");
+        replicatedTask.addDependence(mainTask);
+        job.addTask(replicatedTask);
+
+        Task lastTask = createSimpleTask(taskType, "Replication last task");
+        lastTask.setFlowBlock(FlowBlock.END);
+        lastTask.addDependence(replicatedTask);
+
+        job.addTask(lastTask);
 
         return job;
     }
+
 }

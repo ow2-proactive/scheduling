@@ -42,6 +42,9 @@ import org.apache.jmeter.samplers.SampleResult;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
+import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
+import org.ow2.proactive.scheduler.common.task.JavaTask;
+import org.ow2.proactive.scheduler.common.task.NativeTask;
 import org.ow2.proactive.scheduler.common.task.Task;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scripting.SelectionScript;
@@ -60,6 +63,8 @@ public abstract class BaseJobSubmitClient extends BaseJMeterSchedulerClient {
     public static final String PARAM_SUBMIT_SELECTION_SCRIPT_DYNAMIC_CONTENT = "submitSelectionScriptDynamicContent";
 
     public static final String PARAM_SUBMIT_SELECTION_SCRIPT_TYPE_DYNAMIC = "submitSelectionScriptTypeDynamic";
+
+    public static final long JOB_COMPLETE_TIMEOUT = 5 * 60000;
 
     private SchedulerEventsMonitor eventsMonitor;
 
@@ -114,15 +119,15 @@ public abstract class BaseJobSubmitClient extends BaseJMeterSchedulerClient {
 
         SchedulerWaitCondition waitCondition = eventsMonitor.addWaitCondition(new JobWaitContition(jobName));
 
-        logInfo(String.format("Submitting job: %s, selectionScript: %s (%s)",
-                job.getDescription(), String.valueOf(useSelectionScript), Thread.currentThread().toString()));
+        logInfo(String.format("Submitting job: %s, selectionScript: %s (%s)", job.getDescription(), String
+                .valueOf(useSelectionScript), Thread.currentThread().toString()));
 
         SampleResult result = new SampleResult();
         result.sampleStart();
         JobId jobId = scheduler.submit(job);
         result.sampleEnd();
 
-        boolean waitOK = eventsMonitor.waitFor(waitCondition, 60000, getLogger());
+        boolean waitOK = eventsMonitor.waitFor(waitCondition, JOB_COMPLETE_TIMEOUT, getLogger());
 
         JobResult jobResult = scheduler.getJobResult(jobId);
         if (waitOK) {
@@ -150,6 +155,46 @@ public abstract class BaseJobSubmitClient extends BaseJMeterSchedulerClient {
         }
 
         return result;
+    }
+
+    protected final JavaTask createSimpleJavaTask(boolean fork) {
+        JavaTask task = new JavaTask();
+        task.setExecutableClassName(SimpleJavaTask.class.getName());
+        task.setMaxNumberOfExecution(1);
+        task.setCancelJobOnError(true);
+
+        if (fork) {
+            ForkEnvironment forkEnv = new ForkEnvironment();
+            task.setForkEnvironment(forkEnv);
+        }
+
+        return task;
+    }
+
+    protected final NativeTask createSimpleNativeTask() {
+        NativeTask task = new NativeTask();
+        task.setCommandLine(new String[] { testsSourcePath +
+            "/org/ow2/proactive/tests/performance/jmeter/scheduler/nativeTask.sh" });
+        task.setMaxNumberOfExecution(1);
+        task.setCancelJobOnError(true);
+        return task;
+    }
+
+    protected Task createSimpleTask(TaskType taskType, String name) {
+        Task task;
+        switch (taskType) {
+            case java_task:
+                task = createSimpleJavaTask(true);
+                break;
+            case native_task:
+                task = createSimpleNativeTask();
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid task type: " + taskType);
+        }
+        task.setName(name);
+
+        return task;
     }
 
     protected abstract TaskFlowJob createJob(String jobName) throws Exception;

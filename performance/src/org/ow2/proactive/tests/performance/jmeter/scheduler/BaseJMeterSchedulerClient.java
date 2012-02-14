@@ -91,9 +91,8 @@ public abstract class BaseJMeterSchedulerClient extends BaseJMeterClient {
         testsSourcePath = testsSrcDir.getAbsolutePath();
 
         SchedulerConnectionParameters parameters = new SchedulerConnectionParameters(context);
-        logInfo(String.format("Connecting to the Scheduler (%s, %s, %s, %s)", parameters.getSchedulerUrl(), 
-                parameters.getSchedulerLogin(),
-                parameters.getSchedulerPassword(), Thread.currentThread()));
+        logInfo(String.format("Connecting to the Scheduler (%s, %s, %s, %s)", parameters.getSchedulerUrl(),
+                parameters.getSchedulerLogin(), parameters.getSchedulerPassword(), Thread.currentThread()));
         schedulerProxy = parameters.connectWithProxy(10000);
     }
 

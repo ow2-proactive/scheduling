@@ -44,6 +44,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import org.ow2.proactive.tests.performance.deployment.process.ProcessExecutor;
 import org.ow2.proactive.tests.performance.deployment.process.SSHProcessExecutor;
 import org.ow2.proactive.tests.performance.utils.FindFreePort;
 
@@ -61,10 +62,12 @@ public class DeploymentTestUtils {
     public static InetAddress checkHostIsAvailable(String hostName) {
         try {
             InetAddress hostAddr = InetAddress.getByName(hostName);
-            if (!hostAddr.isReachable(10000)) {
+            /*
+            if (!hostAddr.isReachable(30000)) {
                 System.out.println("ERROR: InetAddress.isReachable is false for " + hostName);
                 return null;
             }
+             */
             return hostAddr;
         } catch (UnknownHostException e) {
             System.out.println("Unknow host error for host " + hostName + ": " + e);
@@ -75,10 +78,13 @@ public class DeploymentTestUtils {
         }
     }
 
-    public static Integer findFreePort(InetAddress hostAddr, String javaPath, String classpath)
-            throws InterruptedException {
-        SSHProcessExecutor executor = SSHProcessExecutor.createExecutorSaveOutput("findPort", hostAddr,
-                javaPath, "-cp", classpath, FindFreePort.class.getName());
+    public static Integer findFreePort(HostTestEnv env) throws InterruptedException {
+        List<String> command = new ArrayList<String>();
+        command.add(env.getEnv().getJavaPath());
+        command.add("-cp");
+        command.add(env.getEnv().getSchedulingFolder().getPerformanceClassesDir().getAbsolutePath());
+        command.add(FindFreePort.class.getName());
+        ProcessExecutor executor = env.runCommandSaveOutput("findPort", command);
         if (!executor.executeAndWaitCompletion(10000, true)) {
             throw new TestExecutionException("Failed to execute command to find free port");
         }
@@ -93,17 +99,41 @@ public class DeploymentTestUtils {
         }
     }
 
-    public static boolean checkJavaIsAvailable(InetAddress hostAddr, String javaPath)
+    public static boolean isJavaIsAvailable(InetAddress hostAddr, String javaPath)
             throws InterruptedException {
         SSHProcessExecutor executor = SSHProcessExecutor.createExecutorSaveOutput("java -version", hostAddr,
                 javaPath, "-version");
         return executor.executeAndWaitCompletion(10000, true);
     }
 
-    public static boolean checkPathIsAvailable(InetAddress hostAddr, String path) throws InterruptedException {
+    public static void checkJavaIsAvailable(InetAddress hostAddr, String javaPath) {
+        try {
+            if (!isJavaIsAvailable(hostAddr, javaPath)) {
+                throw new TestExecutionException("Java '" + javaPath + "' isn't available at " + hostAddr);
+            }
+        } catch (TestExecutionException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new TestExecutionException("Unexpected exception: " + e, e);
+        }
+    }
+
+    public static boolean isPathIsAvailable(InetAddress hostAddr, String path) throws InterruptedException {
         SSHProcessExecutor executor = SSHProcessExecutor.createExecutorSaveOutput(DIR_TEST_COMMAND, hostAddr,
                 DIR_TEST_COMMAND, path);
         return executor.executeAndWaitCompletion(10000, true);
+    }
+
+    public static void checkPathIsAvailable(InetAddress hostAddr, String path) {
+        try {
+            if (!isPathIsAvailable(hostAddr, path)) {
+                throw new TestExecutionException("Path '" + path + "' isn't available at " + hostAddr);
+            }
+        } catch (TestExecutionException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new TestExecutionException("Unexpected exception: " + e, e);
+        }
     }
 
     public static void killTestProcesses(Collection<String> hosts, String stringToFind) {

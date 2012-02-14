@@ -36,23 +36,16 @@
  */
 package org.ow2.proactive.tests.performance.deployment;
 
-import java.net.InetAddress;
 import java.util.List;
 import java.util.Map;
 
 
 public abstract class TestProtocolHelper {
 
-    protected final String javaPath;
+    protected final HostTestEnv serverHostEnv;
 
-    protected final SchedulingFolder schedulingFolder;
-
-    protected final InetAddress serverHost;
-
-    public TestProtocolHelper(String javaPath, SchedulingFolder schedulingFolder, InetAddress serverHost) {
-        this.javaPath = javaPath;
-        this.schedulingFolder = schedulingFolder;
-        this.serverHost = serverHost;
+    public TestProtocolHelper(HostTestEnv serverHostEnv) {
+        this.serverHostEnv = serverHostEnv;
     }
 
     public abstract String prepareForDeployment() throws Exception;

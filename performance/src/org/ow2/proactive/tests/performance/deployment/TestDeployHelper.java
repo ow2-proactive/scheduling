@@ -37,7 +37,6 @@
 package org.ow2.proactive.tests.performance.deployment;
 
 import java.io.File;
-import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -49,28 +48,31 @@ import org.ow2.proactive.tests.performance.utils.TestFileUtils;
 
 public abstract class TestDeployHelper {
 
-    public static final String TEST_JVM_OPTION = "org.ow2.proactive.tests.performance=true";
+    public static final String TEST_JVM_OPTION_NAME = "org.ow2.proactive.tests.performance";
 
-    protected final SchedulingFolder schedulingFolder;
+    public static final String TEST_JVM_OPTION = TEST_JVM_OPTION_NAME + "=true";
 
-    protected final String javaPath;
+    protected final HostTestEnv serverHostEnv;
 
     protected final TestProtocolHelper protocolHelper;
 
-    public TestDeployHelper(String javaPath, SchedulingFolder schedulingFolder, InetAddress serverHost,
-            String protocol) throws InterruptedException {
-        this.javaPath = javaPath;
-        this.schedulingFolder = schedulingFolder;
-        this.protocolHelper = createProtocolHelper(protocol, schedulingFolder, serverHost, javaPath);
+    static final String[] requiredJARs = { "script-js.jar", "gson-2.1.jar", "jruby-engine.jar",
+            "jython-engine.jar", "commons-logging-1.1.1.jar", "ProActive_Scheduler-core.jar",
+            "ProActive_SRM-common.jar", "ProActive_ResourceManager.jar", "ProActive_Scheduler-worker.jar",
+            "ProActive_Scheduler-matsci.jar", "ProActive_Scheduler-mapreduce.jar",
+            "commons-httpclient-3.1.jar", "commons-codec-1.3.jar", "ProActive.jar" };
+
+    public TestDeployHelper(HostTestEnv serverHostEnv, String protocol) throws InterruptedException {
+        this.serverHostEnv = serverHostEnv;
+        this.protocolHelper = createProtocolHelper(protocol, serverHostEnv);
     }
 
-    private TestProtocolHelper createProtocolHelper(String protocol, SchedulingFolder schedulingFolder,
-            InetAddress serverHost, String javaPath) throws InterruptedException {
+    private TestProtocolHelper createProtocolHelper(String protocol, HostTestEnv serverHostEnv)
+            throws InterruptedException {
         if (protocol.equalsIgnoreCase("pnp")) {
-            return new TestPnpProtocolHelper(javaPath, schedulingFolder, serverHost);
+            return new TestPnpProtocolHelper(serverHostEnv);
         } else if (protocol.equalsIgnoreCase("pamr")) {
-            return new TestPamrProtocolHelper(javaPath, schedulingFolder, serverHost,
-                getPamrServedReservedId());
+            return new TestPamrProtocolHelper(serverHostEnv, getPamrServedReservedId());
         } else {
             throw new IllegalArgumentException("Test doesn't support protocol " + protocol);
         }
@@ -84,35 +86,37 @@ public abstract class TestDeployHelper {
         return protocolHelper.prepareForDeployment();
     }
 
-    public Map<String, String> getClientProActiveProperties() {
+    public Map<String, String> getClientJavaProperties(TestEnv env) {
         Map<String, String> properties = new LinkedHashMap<String, String>();
 
-        properties.put(CentralPAPropertyRepository.PA_HOME.getName(), schedulingFolder.getRootDirPath());
+        properties.put(CentralPAPropertyRepository.PA_HOME.getName(), env.getSchedulingFolder()
+                .getRootDirPath());
         properties.put(CentralPAPropertyRepository.LOG4J.getName(), "file:" +
-            TestDeployer.getFileName(schedulingFolder.getTestConfigDir(), "/log4j/log4j-client"));
+            new File(env.getSchedulingFolder().getTestConfigDir(), "/log4j/log4j-client").getAbsolutePath());
 
         Map<String, String> protocolSpecificOptions = protocolHelper.getClientProActiveProperties();
         properties.putAll(protocolSpecificOptions);
 
+        properties.put(TEST_JVM_OPTION_NAME, "true");
+
         return properties;
     }
 
-    public List<String> getClientJavaOptions() {
-        List<String> result = new ArrayList<String>();
-        result.add("-D" + TEST_JVM_OPTION);
-        return result;
-    }
-
     protected String buildSchedulingClasspath() {
-        List<String> distLibJars = TestFileUtils.listDirectoryJars(new File(schedulingFolder.getRootDir(),
-            "/dist/lib").getAbsolutePath());
-        List<String> addonsJars = TestFileUtils.listDirectoryJars(new File(schedulingFolder.getRootDir(),
-            "/addons").getAbsolutePath());
+        TestEnv localEnv = TestEnv.getLocalEnvUsingSystemProperties();
+
+        List<String> distLibJars = new ArrayList<String>();
+        for (String jar : requiredJARs) {
+            distLibJars.add(localEnv.getSchedulingFolder().getRootDir() + "/dist/lib/" + jar);
+        }
+        List<String> addonsJars = TestFileUtils.listDirectoryJars(new File(localEnv.getSchedulingFolder()
+                .getRootDir(), "/addons").getAbsolutePath());
 
         List<String> allJars = new ArrayList<String>(distLibJars);
         allJars.addAll(addonsJars);
         StringBuilder result = new StringBuilder();
         for (String jar : allJars) {
+            jar = localEnv.convertFileNameForEnv(jar, serverHostEnv.getEnv());
             result.append(jar).append(File.pathSeparatorChar);
         }
 

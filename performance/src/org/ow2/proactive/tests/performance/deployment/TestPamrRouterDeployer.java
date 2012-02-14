@@ -37,47 +37,42 @@
 package org.ow2.proactive.tests.performance.deployment;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
-import org.ow2.proactive.tests.performance.deployment.process.SSHProcessExecutor;
+import org.ow2.proactive.tests.performance.deployment.process.ProcessExecutor;
 import org.ow2.proactive.tests.performance.utils.TestUtils;
 
 
 public class TestPamrRouterDeployer {
 
-    private final String javaPath;
-
-    private final SchedulingFolder schedulingFolder;
-
-    private final InetAddress pamrHost;
+    private final HostTestEnv env;
 
     private final Integer pamrPort;
 
     private final List<PamrReservedId> reservedPamrIds;
 
     public static TestPamrRouterDeployer createPamrRouterDeployerUsingSystemProperties() throws Exception {
-        String javaPath = TestUtils.getRequiredProperty("test.javaPath");
-        String schedulingPath = TestUtils.getRequiredProperty("test.schedulingPath");
+        TestEnv env = TestEnv.getEnvUsingSystemProperties("pamr");
         String hostName = TestUtils.getRequiredProperty("test.deploy.pamr.startNewRouter.host");
         String reservedIds = TestUtils.getRequiredProperty("test.deploy.pamr.startNewRouter.reservedIds");
-        return new TestPamrRouterDeployer(javaPath, schedulingPath, hostName, reservedIds);
+        Integer port = null;
+        String portProperty = System.getProperty("test.deploy.pamr.startNewRouter.port");
+        if (portProperty != null && !portProperty.trim().isEmpty()) {
+            port = Integer.valueOf(portProperty);
+        }
+        return new TestPamrRouterDeployer(env, hostName, port, reservedIds);
     }
 
-    public TestPamrRouterDeployer(String javaPath, String schedulingPath, String hostName, String reservedIds)
+    public TestPamrRouterDeployer(TestEnv env, String hostName, Integer port, String reservedIds)
             throws Exception {
-        this.javaPath = javaPath;
-        schedulingFolder = new SchedulingFolder(schedulingPath);
-        Collection<String> hosts = Collections.singleton(hostName);
+        this.env = new HostTestEnv(hostName, env);
 
         reservedPamrIds = new ArrayList<PamrReservedId>();
         if (!reservedIds.isEmpty()) {
@@ -93,11 +88,11 @@ public class TestPamrRouterDeployer {
             throw new TestExecutionException("Pamr reservedIds are not specified");
         }
 
-        pamrHost = TestDeployer.prepareHostsForTest(hosts, javaPath, schedulingFolder.getRootDirPath())
-                .get(0);
-
-        pamrPort = DeploymentTestUtils.findFreePort(pamrHost, javaPath, schedulingFolder
-                .getPerformanceClassesDir().getAbsolutePath());
+        if (port == null) {
+            pamrPort = DeploymentTestUtils.findFreePort(this.env);
+        } else {
+            pamrPort = port;
+        }
     }
 
     public void startRouter() throws Exception {
@@ -105,17 +100,21 @@ public class TestPamrRouterDeployer {
         for (PamrReservedId id : reservedPamrIds) {
             properties.put(id.getId(), id.getCookie());
         }
-        String pamrConfigPath = createPamrConfig(schedulingFolder, properties);
+        String pamrConfigPath = createPamrConfig(properties);
 
         List<String> command = new ArrayList<String>();
-        command.add(javaPath);
+        command.add(env.getEnv().getJavaPath());
         command.add("-D" + TestDeployHelper.TEST_JVM_OPTION);
-        command.add(PAResourceManagerProperties.RM_HOME.getCmdLine() + schedulingFolder.getRootDirPath());
-        command.add(CentralPAPropertyRepository.LOG4J.getCmdLine() + "file:" +
-            TestDeployer.getFileName(schedulingFolder.getTestConfigDir(), "/log4j/log4j-pamr-router"));
+        command.add(PAResourceManagerProperties.RM_HOME.getCmdLine() +
+            env.getEnv().getSchedulingFolder().getRootDirPath());
+        command.add(CentralPAPropertyRepository.LOG4J.getCmdLine() +
+            "file:" +
+            TestDeployer.getFileName(env.getEnv().getSchedulingFolder().getTestConfigDir(),
+                    "/log4j/log4j-pamr-router"));
         command.add("-cp");
-        command.add(schedulingFolder.getRootDirPath() + "/dist/lib/ProActive.jar" + File.pathSeparator +
-            schedulingFolder.getRootDirPath() + "/dist/lib/ProActive_utils.jar");
+        command.add(env.getEnv().getSchedulingFolder().getRootDirPath() + "/dist/lib/ProActive.jar" +
+            File.pathSeparator + env.getEnv().getSchedulingFolder().getRootDirPath() +
+            "/dist/lib/ProActive_utils.jar");
         command.add("org.objectweb.proactive.extensions.pamr.router.Main");
         command.add("--port");
         command.add(String.valueOf(pamrPort));
@@ -123,9 +122,9 @@ public class TestPamrRouterDeployer {
         command.add(pamrConfigPath);
         command.add("--verbose");
 
-        System.out.println("Starting PAMR router on the " + pamrHost + ", command: " + command);
-        SSHProcessExecutor pamrProcess = SSHProcessExecutor.createExecutorPrintOutput("PAMR Router",
-                pamrHost, command.toArray(new String[command.size()]));
+        System.out.println("Starting PAMR router on the " + env.getHost() + ", command: " + command);
+
+        ProcessExecutor pamrProcess = env.runCommandPrintOutput("PAMR router", command);
         pamrProcess.start();
 
         Thread.sleep(5000);
@@ -135,17 +134,18 @@ public class TestPamrRouterDeployer {
     }
 
     public InetAddress getPamrHost() {
-        return pamrHost;
+        return env.getHost();
     }
 
     public Integer getPamrPort() {
         return pamrPort;
     }
 
-    private String createPamrConfig(SchedulingFolder schedulingFolder, Map<String, String> properties)
-            throws IOException {
-        File file = new File(schedulingFolder.getTestTmpDir(), "/pamr.router.config");
-        PrintWriter writer = new PrintWriter(file);
+    private String createPamrConfig(Map<String, String> properties) throws Exception {
+        TestEnv localEnv = TestEnv.getLocalEnvUsingSystemProperties();
+
+        File localConfigFile = new File(localEnv.getSchedulingFolder().getTestTmpDir(), "/pamr.router.config");
+        PrintWriter writer = new PrintWriter(localConfigFile);
         try {
             writer.println("configuration=performance_test");
             for (Map.Entry<String, String> entry : properties.entrySet()) {
@@ -154,7 +154,8 @@ public class TestPamrRouterDeployer {
         } finally {
             writer.close();
         }
-        return file.getAbsolutePath();
+
+        return env.copyFileFromLocalEnv(localEnv, localConfigFile);
     }
 
 }

@@ -36,22 +36,22 @@
  */
 package org.ow2.proactive.tests.performance.deployment.scheduler;
 
-import java.io.File;
-
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.common.SchedulerConnection;
 import org.ow2.proactive.scheduler.common.SchedulerStatus;
+import org.ow2.proactive.tests.performance.deployment.HostTestEnv;
 import org.ow2.proactive.tests.performance.deployment.TestDeployHelper;
 import org.ow2.proactive.tests.performance.deployment.TestDeployer;
+import org.ow2.proactive.tests.performance.deployment.TestEnv;
 import org.ow2.proactive.tests.performance.deployment.TestExecutionException;
 import org.ow2.proactive.tests.performance.utils.TestUtils;
 
 
 public class TestSchedulerDeployer extends TestDeployer {
 
-    static final long SCHEDULER_START_TIMEOUT = 60000;
+    static final long SCHEDULER_START_TIMEOUT = 5 * 60000;
 
     static final String CLIENT_CONFIG_FILE_NAME = "SchedulerClientProActiveConfiguration.xml";
 
@@ -61,35 +61,32 @@ public class TestSchedulerDeployer extends TestDeployer {
         if (rmUrl == null) {
             rmUrl = TestUtils.getRequiredProperty("scheduler.deploy.rmUrl");
         }
-        String protocol = TestUtils.getRequiredProperty("test.deploy.protocol");
-        String javaPath = TestUtils.getRequiredProperty("test.javaPath");
-        String schedulingPath = TestUtils.getRequiredProperty("test.schedulingPath");
+        HostTestEnv serverHostEnv = new HostTestEnv(schedulerHostName, TestEnv
+                .getEnvUsingSystemProperties("scheduler"));
 
-        TestSchedulerDeployer deployer = TestSchedulerDeployer.createSchedulerDeployer(javaPath,
-                schedulingPath, schedulerHostName, protocol, rmUrl);
+        String protocol = TestUtils.getRequiredProperty("test.deploy.protocol");
+
+        TestSchedulerDeployer deployer = TestSchedulerDeployer.createSchedulerDeployer(serverHostEnv,
+                protocol, rmUrl);
 
         return deployer;
     }
 
-    public static TestSchedulerDeployer createSchedulerDeployer(String javaPath, String schedulingPath,
-            String schedulerHostName, String protocol, String rmUrl) throws InterruptedException {
-        TestSchedulerDeployer deployer = new TestSchedulerDeployer(javaPath, schedulingPath,
-            schedulerHostName, protocol);
-        TestDeployHelper deployHelper = new TestSchedulerDeployHelper(javaPath, deployer
-                .getSchedulingFolder(), deployer.getServerHost(), protocol, rmUrl);
+    public static TestSchedulerDeployer createSchedulerDeployer(HostTestEnv serverHostEnv, String protocol,
+            String rmUrl) throws Exception {
+        TestSchedulerDeployer deployer = new TestSchedulerDeployer(serverHostEnv, protocol);
+        TestDeployHelper deployHelper = new TestSchedulerDeployHelper(serverHostEnv, protocol, rmUrl);
         deployer.setDeployHelper(deployHelper);
         return deployer;
     }
 
-    private TestSchedulerDeployer(String javaPath, String schedulingPath, String schedulerHostName,
-            String protocol) throws InterruptedException {
-        super(javaPath, schedulingPath, CLIENT_CONFIG_FILE_NAME, schedulerHostName);
+    private TestSchedulerDeployer(HostTestEnv serverHostEnv, String protocol) throws InterruptedException {
+        super(serverHostEnv, CLIENT_CONFIG_FILE_NAME);
     }
 
     @Override
-    protected void waitForServerStartup(String expectedUrl, String clientJavaOptions,
-            File clientProActiveConfig) throws Exception {
-        Credentials credentials = schedulingFolder.getSchedulingCredentials();
+    protected void waitForServerStartup(String expectedUrl) throws Exception {
+        Credentials credentials = serverHostEnv.getEnv().getSchedulingFolder().getSchedulingCredentials();
 
         System.out.println(String.format("Waiting for scheduler, url: %s, timeout: %d", expectedUrl,
                 SCHEDULER_START_TIMEOUT));

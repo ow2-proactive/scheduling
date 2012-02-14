@@ -84,7 +84,7 @@ public class TestHosts {
     private List<Host> hosts = new ArrayList<TestHosts.Host>(0);
 
     private final Logger logger;
-    
+
     public TestHosts(Logger logger) {
         this.logger = logger;
     }

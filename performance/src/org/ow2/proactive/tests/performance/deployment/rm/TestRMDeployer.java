@@ -36,7 +36,6 @@
  */
 package org.ow2.proactive.tests.performance.deployment.rm;
 
-import java.io.File;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -52,7 +51,9 @@ import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.SSHInfrastructure;
 import org.ow2.proactive.resourcemanager.nodesource.policy.AccessType;
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
+import org.ow2.proactive.tests.performance.deployment.HostTestEnv;
 import org.ow2.proactive.tests.performance.deployment.TestDeployer;
+import org.ow2.proactive.tests.performance.deployment.TestEnv;
 import org.ow2.proactive.tests.performance.deployment.TestExecutionException;
 import org.ow2.proactive.tests.performance.rm.NodesDeployWaitCondition;
 import org.ow2.proactive.tests.performance.rm.RMEventsMonitor;
@@ -67,7 +68,7 @@ public class TestRMDeployer extends TestDeployer {
 
     public static final String CLIENT_CONFIG_FILE_NAME = "RMClientProActiveConfiguration.xml";
 
-    public static final long RM_START_TIMEOUT = 60000;
+    public static final long RM_START_TIMEOUT = 5 * 60000;
 
     public static final long RM_NODE_DEPLOY_TIMEOUT = 2 * 60000;
 
@@ -75,11 +76,13 @@ public class TestRMDeployer extends TestDeployer {
 
     private final int rmNodesPerHost;
 
+    private final TestEnv nodesTestEnv;
+
     public static TestRMDeployer createRMDeployerUsingSystemProperties() throws Exception {
         String rmHostName = TestUtils.getRequiredProperty("rm.deploy.rmHost");
+        HostTestEnv serverHostEnv = new HostTestEnv(rmHostName, TestEnv.getEnvUsingSystemProperties("rm"));
+
         String protocol = TestUtils.getRequiredProperty("test.deploy.protocol");
-        String javaPath = TestUtils.getRequiredProperty("test.javaPath");
-        String rmPath = TestUtils.getRequiredProperty("test.schedulingPath");
 
         String[] rmNodesHosts = {};
         String rmNodesHostsString = TestUtils.getRequiredProperty("rm.deploy.rmNodesHosts");
@@ -94,25 +97,27 @@ public class TestRMDeployer extends TestDeployer {
             testNodes = testNodesString.split(",");
         }
 
-        return TestRMDeployer.createRMDeployer(javaPath, rmPath, rmHostName, protocol, Arrays
+        TestEnv nodesTestEnv = TestEnv.getEnvUsingSystemProperties("rmNodes");
+
+        return TestRMDeployer.createRMDeployer(serverHostEnv, protocol, nodesTestEnv, Arrays
                 .asList(rmNodesHosts), nodesPerHost, Arrays.asList(testNodes));
     }
 
-    public static TestRMDeployer createRMDeployer(String javaPath, String rmPath, String rmHostName,
-            String protocol, List<String> rmNodesHosts, int rmNodesPerHost, List<String> testNodes)
-            throws InterruptedException {
-        TestRMDeployer deployer = new TestRMDeployer(javaPath, rmPath, rmHostName, protocol, rmNodesHosts,
+    public static TestRMDeployer createRMDeployer(HostTestEnv serverHostEnv, String protocol,
+            TestEnv nodesTestEnv, List<String> rmNodesHosts, int rmNodesPerHost, List<String> testNodes)
+            throws Exception {
+        TestRMDeployer deployer = new TestRMDeployer(serverHostEnv, protocol, nodesTestEnv, rmNodesHosts,
             rmNodesPerHost, testNodes);
-        TestRMDeployHelper deployHelper = new TestRMDeployHelper(javaPath, deployer.getSchedulingFolder(),
-            deployer.getServerHost(), protocol);
+        TestRMDeployHelper deployHelper = new TestRMDeployHelper(serverHostEnv, protocol);
         deployer.setDeployHelper(deployHelper);
         return deployer;
     }
 
-    private TestRMDeployer(String javaPath, String schedulingPath, String serverHostName, String protocol,
-            List<String> rmNodesHosts, int rmNodesPerHost, List<String> testNodes)
-            throws InterruptedException {
-        super(javaPath, schedulingPath, CLIENT_CONFIG_FILE_NAME, serverHostName);
+    private TestRMDeployer(HostTestEnv serverHostEnv, String protocol, TestEnv nodesTestEnv,
+            List<String> rmNodesHosts, int rmNodesPerHost, List<String> testNodes) throws Exception {
+        super(serverHostEnv, CLIENT_CONFIG_FILE_NAME);
+
+        this.nodesTestEnv = nodesTestEnv;
 
         this.rmNodesHosts = rmNodesHosts;
         if (rmNodesPerHost <= 0) {
@@ -123,13 +128,14 @@ public class TestRMDeployer extends TestDeployer {
         Set<String> allHosts = new LinkedHashSet<String>();
         allHosts.addAll(rmNodesHosts);
         allHosts.addAll(testNodes);
-        prepareHostsForTest(allHosts, javaPath, schedulingPath);
+        for (String nodeHost : testNodes) {
+            nodesTestEnv.validateEnv(nodeHost);
+        }
     }
 
     @Override
-    protected void waitForServerStartup(String expectedUrl, String clientJavaOptions,
-            File clientProActiveConfig) throws Exception {
-        Credentials credentials = schedulingFolder.getRMCredentials();
+    protected void waitForServerStartup(String expectedUrl) throws Exception {
+        Credentials credentials = localEnv.getSchedulingFolder().getRMCredentials();
 
         System.out
                 .println("Waiting for the RM on the URL: " + expectedUrl + ", timeout: " + RM_START_TIMEOUT);
@@ -148,7 +154,11 @@ public class TestRMDeployer extends TestDeployer {
 
             RMWaitCondition waitCondition = eventsMonitor.addWaitCondition(new NodesDeployWaitCondition(
                 NODE_SOURCE_NAME, expectedNodesNumber));
-            if (!createNodeSource(rm, expectedUrl, clientJavaOptions, clientProActiveConfig)) {
+
+            String clientJavaOptions = javaPropertiesAsSingleString(deployHelper
+                    .getClientJavaProperties(nodesTestEnv));
+
+            if (!createNodeSource(rm, expectedUrl, clientJavaOptions)) {
                 throw new TestExecutionException("Failed to create node source");
             }
 
@@ -182,8 +192,7 @@ public class TestRMDeployer extends TestDeployer {
         }
     }
 
-    private boolean createNodeSource(ResourceManager rm, String rmUrl, String javaOptions,
-            File clientProActiveConfig) throws Exception {
+    private boolean createNodeSource(ResourceManager rm, String rmUrl, String javaOptions) throws Exception {
         StringBuilder hostsListString = new StringBuilder();
         for (String hostName : rmNodesHosts) {
             hostsListString.append(String.format("%s %d\n", hostName, rmNodesPerHost));
@@ -194,11 +203,11 @@ public class TestRMDeployer extends TestDeployer {
         String sshOptions = "";
         String targetOs = "UNIX";
 
-        byte[] creds = schedulingFolder.getRMCredentialsBytes();
+        byte[] creds = serverHostEnv.getEnv().getSchedulingFolder().getRMCredentialsBytes();
 
         Object[] infrastructureParameters = new Object[] { rmUrl, hostsListString.toString().getBytes(),
-                timeout, attempt, sshOptions, javaPath, schedulingFolder.getRootDirPath(), targetOs,
-                javaOptions.toString(), creds };
+                timeout, attempt, sshOptions, nodesTestEnv.getJavaPath(),
+                nodesTestEnv.getSchedulingFolder().getRootDirPath(), targetOs, javaOptions.toString(), creds };
 
         Object[] policyParameters = new Object[] { AccessType.ALL.toString(), AccessType.ALL.toString() };
 

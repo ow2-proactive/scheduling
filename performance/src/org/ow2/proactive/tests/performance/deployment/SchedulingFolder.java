@@ -57,11 +57,11 @@ public class SchedulingFolder {
     private final File testTmpDir;
 
     public SchedulingFolder(String path) {
-        rootDir = checkIsDirectory(path);
-        performanceDir = checkIsDirectory(rootDir, "performance");
-        performanceClassesDir = checkIsDirectory(rootDir, "classes/performance");
-        testConfigDir = checkIsDirectory(performanceDir, "config");
-        testTmpDir = checkIsDirectory(performanceDir, "tmp");
+        rootDir = new File(path);
+        performanceDir = new File(rootDir, "performance");
+        performanceClassesDir = new File(rootDir, "classes/performance");
+        testConfigDir = new File(performanceDir, "config");
+        testTmpDir = new File(performanceDir, "tmp");
     }
 
     public String getRootDirPath() {
@@ -126,21 +126,4 @@ public class SchedulingFolder {
         }
     }
 
-    private File checkIsDirectory(File parent, String path) {
-        File file = new File(parent, path);
-        checkIsDirectory(file);
-        return file;
-    }
-
-    private File checkIsDirectory(String path) {
-        File file = new File(path);
-        checkIsDirectory(file);
-        return file;
-    }
-
-    private void checkIsDirectory(File file) {
-        if (!file.isDirectory()) {
-            throw new TestExecutionException("Failed to find directory: " + file.getAbsolutePath());
-        }
-    }
 }

@@ -36,7 +36,6 @@
  */
 package org.ow2.proactive.tests.performance.deployment;
 
-import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -50,15 +49,14 @@ public class TestPnpProtocolHelper extends TestProtocolHelper {
 
     private Integer pnpPort;
 
-    public TestPnpProtocolHelper(String javaPath, SchedulingFolder schedulingFolder, InetAddress serverHost) {
-        super(javaPath, schedulingFolder, serverHost);
+    public TestPnpProtocolHelper(HostTestEnv serverHostEnv) {
+        super(serverHostEnv);
     }
 
     @Override
     public String prepareForDeployment() throws Exception {
-        pnpPort = DeploymentTestUtils.findFreePort(serverHost, javaPath, schedulingFolder
-                .getPerformanceClassesDir().getAbsolutePath());
-        String url = String.format("pnp://%s:%d/", serverHost.getHostName(), pnpPort.intValue());
+        pnpPort = DeploymentTestUtils.findFreePort(serverHostEnv);
+        String url = String.format("pnp://%s:%d/", serverHostEnv.getHost().getHostName(), pnpPort.intValue());
         return url;
     }
 

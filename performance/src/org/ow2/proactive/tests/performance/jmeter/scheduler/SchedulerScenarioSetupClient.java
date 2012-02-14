@@ -98,7 +98,8 @@ public class SchedulerScenarioSetupClient extends BaseJMeterClient {
 
         public void printEventsNumber() {
             logInfo(String
-                    .format("Events: scheduler state=%d, job submitted=%d, job state updated=%d, task state updated %d, user updated %d",
+                    .format(
+                            "Events: scheduler state=%d, job submitted=%d, job state updated=%d, task state updated %d, user updated %d",
                             schedulerState, jobSubmitted, jobStateUpdated, taskStateUpdated, userUpdated));
         }
     }
@@ -110,9 +111,9 @@ public class SchedulerScenarioSetupClient extends BaseJMeterClient {
         private final DummyEventsMonitor eventsMonitor;
 
         SchedulerListenerClient(SchedulerConnectionParameters parameters) throws Exception {
-            logInfo(String.format("Connecting to the Scheduler (%s, %s, %s, %s)",
-                    parameters.getSchedulerUrl(), parameters.getSchedulerLogin(),
-                    parameters.getSchedulerPassword(), Thread.currentThread()));
+            logInfo(String.format("Connecting to the Scheduler (%s, %s, %s, %s)", parameters
+                    .getSchedulerUrl(), parameters.getSchedulerLogin(), parameters.getSchedulerPassword(),
+                    Thread.currentThread()));
             proxy = parameters.connectWithProxy(60000);
             eventsMonitor = new DummyEventsMonitor();
             SchedulerTestListener listener = SchedulerTestListener.createListener(eventsMonitor);

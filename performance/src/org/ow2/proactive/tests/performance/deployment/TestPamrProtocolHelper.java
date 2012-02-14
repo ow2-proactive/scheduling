@@ -58,9 +58,8 @@ public class TestPamrProtocolHelper extends TestProtocolHelper {
 
     private final Integer pamrPort;
 
-    protected TestPamrProtocolHelper(String javaPath, SchedulingFolder schedulingFolder,
-            InetAddress serverHost, String serverReservedId) {
-        super(javaPath, schedulingFolder, serverHost);
+    protected TestPamrProtocolHelper(HostTestEnv serverHostEnv, String serverReservedId) {
+        super(serverHostEnv);
         if (serverReservedId == null) {
             throw new TestExecutionException(
                 "serverReservedId required for execution with pamr not specified");

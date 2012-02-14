@@ -38,17 +38,18 @@ package org.ow2.proactive.tests.performance.deployment.rm;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
-import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.utils.RMStarter;
+import org.ow2.proactive.tests.performance.deployment.HostTestEnv;
 import org.ow2.proactive.tests.performance.deployment.SchedulingFolder;
 import org.ow2.proactive.tests.performance.deployment.TestDeployHelper;
 import org.ow2.proactive.tests.performance.deployment.TestDeployer;
+import org.ow2.proactive.tests.performance.deployment.TestEnv;
 import org.ow2.proactive.tests.performance.deployment.TestExecutionException;
 import org.ow2.proactive.tests.performance.utils.TestFileUtils;
 import org.ow2.proactive.tests.performance.utils.TestUtils;
@@ -56,13 +57,11 @@ import org.ow2.proactive.tests.performance.utils.TestUtils;
 
 public class TestRMDeployHelper extends TestDeployHelper {
 
-    private final File rmHibernateConfig;
+    private final String rmHibernateConfig;
 
-    public TestRMDeployHelper(String javaPath, SchedulingFolder schedulingFolder, InetAddress serverHost,
-            String protocol) throws InterruptedException {
-        super(javaPath, schedulingFolder, serverHost, protocol);
-        rmHibernateConfig = createTestHibernateConfig(schedulingFolder.getTestConfigDir(), schedulingFolder
-                .getTestTmpDir());
+    public TestRMDeployHelper(HostTestEnv serverHostEnv, String protocol) throws InterruptedException {
+        super(serverHostEnv, protocol);
+        rmHibernateConfig = createTestHibernateConfig();
     }
 
     @Override
@@ -72,21 +71,30 @@ public class TestRMDeployHelper extends TestDeployHelper {
 
     @Override
     public List<String> createServerStartCommand() {
+        SchedulingFolder schedulingFolder = serverHostEnv.getEnv().getSchedulingFolder();
+
         List<String> result = new ArrayList<String>();
-        result.add(javaPath);
+        result.add(serverHostEnv.getEnv().getJavaPath());
 
         List<String> javaOpts = protocolHelper.getAdditionalServerJavaOptions();
         if (javaOpts != null) {
             result.addAll(javaOpts);
         }
 
+        String rmJavaOpts = System.getProperty("rm.deploy.javaOpts");
+        if (rmJavaOpts != null && !rmJavaOpts.isEmpty()) {
+            for (String opt : rmJavaOpts.split(" ")) {
+                result.add(opt);
+            }
+        }
+
         result.add("-D" + TEST_JVM_OPTION);
 
         result.add("-Djava.security.manager");
 
-        result.add(PAResourceManagerProperties.RM_DB_HIBERNATE_DROPDB.getCmdLine() + "true");
-        result.add(PAResourceManagerProperties.RM_DB_HIBERNATE_CONFIG.getCmdLine() +
-            rmHibernateConfig.getAbsolutePath());
+        String dropDB = System.getProperty("rm.deploy.dropDB", "false");
+        result.add(PAResourceManagerProperties.RM_DB_HIBERNATE_DROPDB.getCmdLine() + dropDB);
+        result.add(PAResourceManagerProperties.RM_DB_HIBERNATE_CONFIG.getCmdLine() + rmHibernateConfig);
 
         File rootDir = schedulingFolder.getRootDir();
         result.add(CentralPAPropertyRepository.JAVA_SECURITY_POLICY.getCmdLine() +
@@ -108,24 +116,27 @@ public class TestRMDeployHelper extends TestDeployHelper {
         return result;
     }
 
-    public List<String> getClientJavaOptions() {
-        List<String> result = super.getClientJavaOptions();
-        result.add("-D" + PAResourceManagerProperties.RM_HOME.getKey() + "=" +
-            schedulingFolder.getRootDirPath());
+    @Override
+    public Map<String, String> getClientJavaProperties(TestEnv env) {
+        Map<String, String> result = super.getClientJavaProperties(env);
+        result.put(PAResourceManagerProperties.RM_HOME.getKey(), env.getSchedulingFolder().getRootDirPath());
         return result;
     }
 
-    private File createTestHibernateConfig(File testConfigDir, File testTmpDir) {
+    private String createTestHibernateConfig() {
         try {
-            String hibernateCfg = TestFileUtils.readStreamToString(new FileInputStream(new File(
-                testConfigDir, "rm/rm.hibernate.cfg.xml")));
-            hibernateCfg = hibernateCfg.replace("@RM_DB_DIR", testTmpDir.getAbsolutePath() + "/RM_DB");
+            TestEnv localEnv = TestEnv.getLocalEnvUsingSystemProperties();
+            File localFile = new File(localEnv.getSchedulingFolder().getTestTmpDir(), "rm.hibernate.cfg.xml");
 
-            File tmpConfigFile = new File(testTmpDir, "rm.hibernate.cfg.xml");
-            TestFileUtils.writeStringToFile(tmpConfigFile, hibernateCfg);
+            String hibernateCfg = TestFileUtils.readStreamToString(new FileInputStream(new File(localEnv
+                    .getSchedulingFolder().getTestConfigDir(), "rm/rm.hibernate.cfg.xml")));
+            hibernateCfg = hibernateCfg.replace("@RM_DB_DIR", serverHostEnv.getEnv().getSchedulingFolder()
+                    .getTestTmpDir() +
+                "/RM_DB");
+            TestFileUtils.writeStringToFile(localFile, hibernateCfg);
 
-            return tmpConfigFile;
-        } catch (IOException e) {
+            return serverHostEnv.copyFileFromLocalEnv(localEnv, localFile);
+        } catch (Exception e) {
             throw new TestExecutionException("Failed to prepare test configuration", e);
         }
     }

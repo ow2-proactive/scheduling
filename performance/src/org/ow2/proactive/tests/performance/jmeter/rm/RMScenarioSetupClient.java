@@ -83,9 +83,8 @@ public class RMScenarioSetupClient extends BaseJMeterClient {
         }
 
         public void printEventsInfo() {
-            logInfo(String.format(
-                    "Received events: rm events %d, node events %d,  node source events %d", rmEventCounter,
-                    nodeEventCounter, nodeSourceEventCounter));
+            logInfo(String.format("Received events: rm events %d, node events %d,  node source events %d",
+                    rmEventCounter, nodeEventCounter, nodeSourceEventCounter));
         }
 
     }
@@ -99,9 +98,8 @@ public class RMScenarioSetupClient extends BaseJMeterClient {
         private final DummyEventsMonitor eventsMonitor;
 
         public RMListenerClient(RMConnectionParameters parameters) throws Exception {
-            logInfo(String.format("Connecting to the RM (%s, %s, %s, %s)", parameters.getRmUrl(), 
-                    parameters.getRmLogin(), parameters.getRmPassword(),
-                    Thread.currentThread()));
+            logInfo(String.format("Connecting to the RM (%s, %s, %s, %s)", parameters.getRmUrl(), parameters
+                    .getRmLogin(), parameters.getRmPassword(), Thread.currentThread()));
             rm = parameters.connectWithProxyUserInterface();
             eventsMonitor = new DummyEventsMonitor();
             listener = RMTestListener.createRMTestListener(eventsMonitor);

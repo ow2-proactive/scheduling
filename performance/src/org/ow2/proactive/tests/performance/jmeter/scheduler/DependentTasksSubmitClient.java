@@ -36,13 +36,41 @@
  */
 package org.ow2.proactive.tests.performance.jmeter.scheduler;
 
+import org.apache.jmeter.config.Arguments;
+import org.apache.jmeter.protocol.java.sampler.JavaSamplerContext;
 import org.ow2.proactive.scheduler.common.job.JobEnvironment;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
-import org.ow2.proactive.scheduler.common.task.JavaTask;
+import org.ow2.proactive.scheduler.common.task.Task;
 
 
-public class SimpleJavaJobSubmitClient extends BaseJobSubmitClient {
+public class DependentTasksSubmitClient extends BaseJobSubmitClient {
+
+    public static final String PARAM_DEPENDENT_TASK_SUBMIT_TASKS_NUMBER = "dependentTasksSubmitTasksNumber";
+
+    public static final String PARAM_DEPENDENT_TASK_SUBMIT_TASK_TYPE = "dependentTasksSubmitTaskType";
+
+    private TaskType taskType;
+
+    private int dependentTasksNumber;
+
+    @Override
+    public Arguments getDefaultParameters() {
+        Arguments args = super.getDefaultParameters();
+        args.addArgument(PARAM_DEPENDENT_TASK_SUBMIT_TASKS_NUMBER, "${dependentTasksSubmitTasksNumber}");
+        args.addArgument(PARAM_DEPENDENT_TASK_SUBMIT_TASK_TYPE, "${dependentTasksSubmitTaskType}");
+        return args;
+    }
+
+    @Override
+    protected void doSetupTest(JavaSamplerContext context) throws Throwable {
+        super.doSetupTest(context);
+
+        String taskTypeParam = getRequiredParameter(context, PARAM_DEPENDENT_TASK_SUBMIT_TASK_TYPE);
+        taskType = TaskType.valueOf(taskTypeParam);
+
+        dependentTasksNumber = context.getIntParameter(PARAM_DEPENDENT_TASK_SUBMIT_TASKS_NUMBER);
+    }
 
     @Override
     protected TaskFlowJob createJob(String jobName) throws Exception {
@@ -50,18 +78,26 @@ public class SimpleJavaJobSubmitClient extends BaseJobSubmitClient {
         job.setName(jobName);
         job.setPriority(JobPriority.NORMAL);
         job.setCancelJobOnError(true);
-        job.setDescription("Job with one java task (task exits immediately)");
+        job.setDescription("Job with " + dependentTasksNumber + " dependent tasks (tasks exit immediately)");
         job.setMaxNumberOfExecution(1);
 
         JobEnvironment jobEnv = new JobEnvironment();
         jobEnv.setJobClasspath(new String[] { testsClasspath });
         job.setEnvironment(jobEnv);
 
-        JavaTask task = createSimpleJavaTask(true);
-        task.setName("Simple java task");
-        task.setDescription("Test java task, exits immediately");
+        Task mainTask = createSimpleTask(taskType, "Dependent tasks: main task");
+        Task lastTask = createSimpleTask(taskType, "Dependent tasks: last task");
 
-        job.addTask(task);
+        for (int i = 0; i < dependentTasksNumber; i++) {
+            Task task = createSimpleTask(taskType, "Dependent task-" + i);
+            task.addDependence(mainTask);
+            job.addTask(task);
+
+            lastTask.addDependence(task);
+        }
+
+        job.addTask(mainTask);
+        job.addTask(lastTask);
 
         return job;
     }

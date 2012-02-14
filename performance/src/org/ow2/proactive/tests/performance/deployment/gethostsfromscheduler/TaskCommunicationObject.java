@@ -34,34 +34,21 @@
  * ################################################################
  * $ACTIVEEON_INITIAL_DEV$
  */
-package org.ow2.proactive.tests.performance.jmeter.scheduler;
+package org.ow2.proactive.tests.performance.deployment.gethostsfromscheduler;
 
-import org.ow2.proactive.scheduler.common.job.JobPriority;
-import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
-import org.ow2.proactive.scheduler.common.task.NativeTask;
+public class TaskCommunicationObject {
 
+    private boolean canRunTest;
 
-public class SimpleNativeJobSubmitClient extends BaseJobSubmitClient {
+    public TaskCommunicationObject() {
+    }
 
-    @Override
-    protected TaskFlowJob createJob(String jobName) throws Exception {
-        TaskFlowJob job = new TaskFlowJob();
-        job.setName(jobName);
-        job.setPriority(JobPriority.NORMAL);
-        job.setCancelJobOnError(true);
-        job.setDescription("Job with one native task (task exits immediately)");
+    public boolean canRunTest() {
+        return canRunTest;
+    }
 
-        NativeTask task = new NativeTask();
-        task.setCommandLine(new String[] { testsSourcePath +
-            "/org/ow2/proactive/tests/performance/jmeter/scheduler/nativeTask.sh" });
-        task.setName("Simple native task");
-        task.setDescription("Test native task, exits immediately");
-        task.setMaxNumberOfExecution(1);
-        task.setCancelJobOnError(true);
-
-        job.addTask(task);
-
-        return job;
+    public void setCanRunTest() {
+        canRunTest = true;
     }
 
 }

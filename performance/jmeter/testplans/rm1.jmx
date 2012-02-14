@@ -77,16 +77,6 @@
             <stringProp name="Argument.value">${__P(createNodeSourceNodesPerHost,1)}</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
-          <elementProp name="createNodeSourceJavaPath" elementType="Argument">
-            <stringProp name="Argument.name">createNodeSourceJavaPath</stringProp>
-            <stringProp name="Argument.value">${__P(createNodeSourceJavaPath,)}</stringProp>
-            <stringProp name="Argument.metadata">=</stringProp>
-          </elementProp>
-          <elementProp name="createNodeSourceSchedulingPath" elementType="Argument">
-            <stringProp name="Argument.name">createNodeSourceSchedulingPath</stringProp>
-            <stringProp name="Argument.value">${__P(createNodeSourceSchedulingPath,)}</stringProp>
-            <stringProp name="Argument.metadata">=</stringProp>
-          </elementProp>
           <elementProp name="cliNodeSourceUsers" elementType="Argument">
             <stringProp name="Argument.name">cliNodeSourceUsers</stringProp>
             <stringProp name="Argument.value">${__P(cliNodeSourceUsers,0)}</stringProp>
@@ -120,6 +110,11 @@
           <elementProp name="createNodeSourceUseAllHosts" elementType="Argument">
             <stringProp name="Argument.name">createNodeSourceUseAllHosts</stringProp>
             <stringProp name="Argument.value">${__P(createNodeSourceUseAllHosts,false)}</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="createNodeSourceEnv" elementType="Argument">
+            <stringProp name="Argument.name">createNodeSourceEnv</stringProp>
+            <stringProp name="Argument.value">${__P(createNodeSourceEnv,local)}</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
         </collectionProp>
@@ -288,14 +283,9 @@
                 <stringProp name="Argument.value">${createNodeSourceNodesPerHost}</stringProp>
                 <stringProp name="Argument.metadata">=</stringProp>
               </elementProp>
-              <elementProp name="createNodeSourceJavaPath" elementType="Argument">
-                <stringProp name="Argument.name">createNodeSourceJavaPath</stringProp>
-                <stringProp name="Argument.value">${createNodeSourceJavaPath}</stringProp>
-                <stringProp name="Argument.metadata">=</stringProp>
-              </elementProp>
-              <elementProp name="createNodeSourceSchedulingPath" elementType="Argument">
-                <stringProp name="Argument.name">createNodeSourceSchedulingPath</stringProp>
-                <stringProp name="Argument.value">${createNodeSourceSchedulingPath}</stringProp>
+              <elementProp name="createNodeSourceEnv" elementType="Argument">
+                <stringProp name="Argument.name">createNodeSourceEnv</stringProp>
+                <stringProp name="Argument.value">${createNodeSourceEnv}</stringProp>
                 <stringProp name="Argument.metadata">=</stringProp>
               </elementProp>
               <elementProp name="nodeJavaOptions" elementType="Argument">
@@ -372,14 +362,9 @@
                 <stringProp name="Argument.value">${createNodeSourceNodesPerHost}</stringProp>
                 <stringProp name="Argument.metadata">=</stringProp>
               </elementProp>
-              <elementProp name="createNodeSourceJavaPath" elementType="Argument">
-                <stringProp name="Argument.name">createNodeSourceJavaPath</stringProp>
-                <stringProp name="Argument.value">${createNodeSourceJavaPath}</stringProp>
-                <stringProp name="Argument.metadata">=</stringProp>
-              </elementProp>
-              <elementProp name="createNodeSourceSchedulingPath" elementType="Argument">
-                <stringProp name="Argument.name">createNodeSourceSchedulingPath</stringProp>
-                <stringProp name="Argument.value">${createNodeSourceSchedulingPath}</stringProp>
+              <elementProp name="createNodeSourceEnv" elementType="Argument">
+                <stringProp name="Argument.name">createNodeSourceEnv</stringProp>
+                <stringProp name="Argument.value">${createNodeSourceEnv}</stringProp>
                 <stringProp name="Argument.metadata">=</stringProp>
               </elementProp>
               <elementProp name="nodeJavaOptions" elementType="Argument">

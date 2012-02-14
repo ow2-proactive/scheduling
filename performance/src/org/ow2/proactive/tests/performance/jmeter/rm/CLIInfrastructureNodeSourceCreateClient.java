@@ -83,8 +83,8 @@ public class CLIInfrastructureNodeSourceCreateClient extends BaseNodeSourceCreat
 
         useDefaultScripts = getBooleanParameter(context, PARAM_CLI_USE_DEFAULT_SCRIPTS);
         if (useDefaultScripts) {
-            String javaPath = getRequiredParameter(context, PARAM_JAVA_PATH);
-            String schedulingPath = getRequiredParameter(context, PARAM_SCHEDULING_PATH);
+            String javaPath = env.getJavaPath();
+            String schedulingPath = env.getSchedulingFolder().getRootDirPath();
             String nodeJavaOptions = getNodeJavaOptions(context);
             defaultDeploymentScript = createDefaultDeploymentScript(javaPath, nodeJavaOptions, schedulingPath);
             defaultRemovalScript = "#!/bin/bash\n".getBytes();
