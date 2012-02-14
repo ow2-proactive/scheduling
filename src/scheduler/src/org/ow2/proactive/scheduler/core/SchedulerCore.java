@@ -82,6 +82,7 @@ import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.objectweb.proactive.utils.NamedThreadFactory;
 import org.ow2.proactive.db.Condition;
 import org.ow2.proactive.db.ConditionComparator;
+import org.ow2.proactive.db.DatabaseCallback;
 import org.ow2.proactive.db.DatabaseManager.FilteredExceptionCallback;
 import org.ow2.proactive.db.DatabaseManagerException;
 import org.ow2.proactive.resourcemanager.exception.RMException;
@@ -155,6 +156,31 @@ import org.ow2.proactive.utils.NodeSet;
 @ActiveObject
 public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotification, RunActive,
         FilteredExceptionCallback {
+
+    static class UpdateJobDatabaseCallback implements DatabaseCallback {
+
+        final InternalJob job;
+
+        final InternalTask descriptor;
+
+        final boolean updateResult;
+
+        public UpdateJobDatabaseCallback(InternalJob job, InternalTask descriptor, boolean updateResult) {
+            this.job = job;
+            this.descriptor = descriptor;
+            this.updateResult = updateResult;
+        }
+
+        @Override
+        public void workWithDatabase(org.ow2.proactive.db.DatabaseManager dbManager) {
+            dbManager.synchronize(job.getJobInfo());
+            dbManager.synchronize(descriptor.getTaskInfo());
+            if (updateResult) {
+                dbManager.update(job.getJobResult());
+            }
+        }
+
+    }
 
     /** Scheduler logger */
     public static final Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.CORE);
@@ -1034,7 +1060,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
             try {
                 oldRes = (TaskResultImpl) job.getJobResult().getAllResults().get(task.getName());
             } catch (Throwable t) {
-            	logger.error("Failed to fetch previous TaskResult", t);
+                logger.error("Failed to fetch previous TaskResult", t);
             }
 
             //store the exception into jobResult / To prevent from empty task result (when job canceled), create one
@@ -1196,10 +1222,8 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
                         SchedulerEvent.TASK_WAITING_FOR_RESTART, descriptor.getTaskInfo()));
                     job.reStartTask(descriptor);
                     //update job and task info
-                    DatabaseManager.getInstance().startTransaction();
-                    DatabaseManager.getInstance().synchronize(job.getJobInfo());
-                    DatabaseManager.getInstance().synchronize(descriptor.getTaskInfo());
-                    DatabaseManager.getInstance().commitTransaction();
+                    DatabaseManager.getInstance().runAsSingleTransaction(
+                            new UpdateJobDatabaseCallback(job, descriptor, false));
                     //free execution node even if it is dead
                     try {
                         rmProxiesManager.getUserRMProxy(job).releaseNodes(
@@ -1233,10 +1257,8 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
                         SchedulerEvent.TASK_WAITING_FOR_RESTART, descriptor.getTaskInfo()));
                     job.reStartTask(descriptor);
                     //update job and task info
-                    DatabaseManager.getInstance().startTransaction();
-                    DatabaseManager.getInstance().synchronize(job.getJobInfo());
-                    DatabaseManager.getInstance().synchronize(descriptor.getTaskInfo());
-                    DatabaseManager.getInstance().commitTransaction();
+                    DatabaseManager.getInstance().runAsSingleTransaction(
+                            new UpdateJobDatabaseCallback(job, descriptor, false));
                     //free execution node even if it is dead
                     try {
                         ((UserRMProxy) rmProxiesManager.getUserRMProxy(job)).releaseNodes(descriptor
@@ -1315,11 +1337,8 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
                             .isPreciousResult());
                     //and update database
                     //update job and task info
-                    DatabaseManager.getInstance().startTransaction();
-                    DatabaseManager.getInstance().synchronize(job.getJobInfo());
-                    DatabaseManager.getInstance().synchronize(descriptor.getTaskInfo());
-                    DatabaseManager.getInstance().update(job.getJobResult());
-                    DatabaseManager.getInstance().commitTransaction();
+                    DatabaseManager.getInstance().runAsSingleTransaction(
+                            new UpdateJobDatabaseCallback(job, descriptor, true));
                     //send event to user
                     frontend.taskStateUpdated(job.getOwner(), new NotificationData<TaskInfo>(
                         SchedulerEvent.TASK_WAITING_FOR_RESTART, descriptor.getTaskInfo()));
@@ -1359,11 +1378,8 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
             }
 
             //Update database
-            DatabaseManager.getInstance().startTransaction();
-            DatabaseManager.getInstance().synchronize(job.getJobInfo());
-            DatabaseManager.getInstance().synchronize(descriptor.getTaskInfo());
-            DatabaseManager.getInstance().update(job.getJobResult());
-            DatabaseManager.getInstance().commitTransaction();
+            DatabaseManager.getInstance().runAsSingleTransaction(
+                    new UpdateJobDatabaseCallback(job, descriptor, true));
 
             //clean the current result to improve memory usage
             if (!job.getJobDescriptor().hasChildren(descriptor.getId())) {

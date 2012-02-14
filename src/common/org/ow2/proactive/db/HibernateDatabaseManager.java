@@ -189,6 +189,18 @@ public abstract class HibernateDatabaseManager implements DatabaseManager, Filte
         }
     }
 
+    @Override
+    public void runAsSingleTransaction(DatabaseCallback callback) {
+        startTransaction();
+        try {
+            callback.workWithDatabase(this);
+            commitTransaction();
+        } catch (Throwable t) {
+            getDevLogger().error("", t);
+            rollbackTransaction();
+        }
+    }
+
     /**
      * Force a transaction to be started. This method has to be used only when multiple calls
      * to methods of this class have to be performed.<br />
@@ -339,7 +351,7 @@ public abstract class HibernateDatabaseManager implements DatabaseManager, Filte
             getDevLogger().debug("Registering new Object : " + o.getClass().getName());
             session.save(o);
             commitTransaction(session);
-        } catch (Exception e) {
+        } catch (Throwable e) {
             getDevLogger().error("", e);
             rollbackTransaction(session);
             this.exceptionHandler.handle("Unable to store the given object !", e);
@@ -359,7 +371,7 @@ public abstract class HibernateDatabaseManager implements DatabaseManager, Filte
             getDevLogger().info("Deleting Object : " + o.getClass().getName());
             session.delete(o);
             commitTransaction(session);
-        } catch (Exception e) {
+        } catch (Throwable e) {
             getDevLogger().error("", e);
             rollbackTransaction(session);
             this.exceptionHandler.handle("Unable to delete the given object !", e);
@@ -380,7 +392,7 @@ public abstract class HibernateDatabaseManager implements DatabaseManager, Filte
             getDevLogger().debug("Updating Object : " + o.getClass().getName());
             session.update(o);
             commitTransaction(session);
-        } catch (Exception e) {
+        } catch (Throwable e) {
             getDevLogger().error("", e);
             rollbackTransaction(session);
             this.exceptionHandler.handle("Unable to update the given object !", e);
@@ -500,7 +512,7 @@ public abstract class HibernateDatabaseManager implements DatabaseManager, Filte
             //commit
             commitTransaction(session);
             getDevLogger().debug("Transaction committed");
-        } catch (Exception e) {
+        } catch (Throwable e) {
             getDevLogger().error("", e);
             rollbackTransaction(session);
             this.exceptionHandler.handle("Unable to synchronize this object !", e);

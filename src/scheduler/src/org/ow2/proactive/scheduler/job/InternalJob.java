@@ -74,6 +74,7 @@ import org.hibernate.annotations.Proxy;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.dataspaces.core.naming.NamingService;
 import org.ow2.proactive.authentication.crypto.Credentials;
+import org.ow2.proactive.db.DatabaseCallback;
 import org.ow2.proactive.db.annotation.Alterable;
 import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
@@ -549,7 +550,7 @@ public abstract class InternalJob extends JobState {
     public InternalTask terminateTask(boolean errorOccurred, TaskId taskId, SchedulerFrontend frontend,
             FlowAction action) {
         logger_dev.debug(" ");
-        InternalTask descriptor = tasks.get(taskId);
+        final InternalTask descriptor = tasks.get(taskId);
         descriptor.setFinishedTime(System.currentTimeMillis());
         descriptor.setStatus(errorOccurred ? TaskStatus.FAULTY : TaskStatus.FINISHED);
         try {
@@ -1031,11 +1032,14 @@ public abstract class InternalJob extends JobState {
         if (!didAction) {
             getJobDescriptor().terminate(taskId);
         } else {
-            DatabaseManager.getInstance().startTransaction();
-            DatabaseManager.getInstance().synchronize(this.getJobInfo());
-            DatabaseManager.getInstance().synchronize(descriptor.getTaskInfo());
-            DatabaseManager.getInstance().update(this);
-            DatabaseManager.getInstance().commitTransaction();
+            DatabaseManager.getInstance().runAsSingleTransaction(new DatabaseCallback() {
+                @Override
+                public void workWithDatabase(org.ow2.proactive.db.DatabaseManager dbManager) {
+                    dbManager.synchronize(getJobInfo());
+                    dbManager.synchronize(descriptor.getTaskInfo());
+                    dbManager.update(InternalJob.this);
+                }
+            });
         }
 
         //creating list of status for the jobDescriptor

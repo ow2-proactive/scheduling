@@ -98,6 +98,14 @@ public interface DatabaseManager {
     public void rollbackTransaction();
 
     /**
+     * Execute database access code represented by the given DatabaseCallback
+     * as single transaction. This method starts transaction before executing
+     * callback and commits transaction when callback finishes. If any exception is thrown
+     * by callback or commit then it tries to rollbacks transaction.
+     */
+    public void runAsSingleTransaction(DatabaseCallback callback);
+
+    /**
      * Register an object.
      * This method will persist the given object and store it in the database.
      *

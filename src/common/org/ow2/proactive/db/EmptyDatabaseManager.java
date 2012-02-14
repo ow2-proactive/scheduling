@@ -89,6 +89,12 @@ public class EmptyDatabaseManager implements DatabaseManager {
     /**
      * Do nothing
      */
+    public void runAsSingleTransaction(DatabaseCallback callback) {
+    }
+
+    /**
+     * Do nothing
+     */
     public void rollbackTransaction() {
     }
 

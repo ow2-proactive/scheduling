@@ -39,6 +39,7 @@ package org.ow2.proactive.scheduler.core.db;
 import java.util.List;
 
 import org.ow2.proactive.db.Condition;
+import org.ow2.proactive.db.DatabaseCallback;
 import org.ow2.proactive.db.DatabaseManager.FilteredExceptionCallback;
 import org.ow2.proactive.db.DatabaseManagerException;
 import org.ow2.proactive.scheduler.core.RecoverCallback;
@@ -119,6 +120,13 @@ public class SchedulerDatabaseManagerSelector implements SchedulerDatabaseManage
      */
     public void rollbackTransaction() {
         strategy.rollbackTransaction();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void runAsSingleTransaction(DatabaseCallback callback) {
+        strategy.runAsSingleTransaction(callback);
     }
 
     /**
