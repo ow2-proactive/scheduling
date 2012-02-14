@@ -54,7 +54,7 @@ public class InternalJobWrapper implements Serializable {
      * 
      * @return the internal job.
      */
-    public InternalJob getJob() {
+    public synchronized InternalJob getJob() {
         return job;
     }
 
@@ -63,7 +63,7 @@ public class InternalJobWrapper implements Serializable {
      * 
      * @param job the internal job to set.
      */
-    public void setJob(InternalJob job) {
+    public synchronized void setJob(InternalJob job) {
         this.job = job;
     }
 
