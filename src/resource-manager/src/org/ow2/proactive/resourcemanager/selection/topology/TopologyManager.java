@@ -70,6 +70,7 @@ import org.ow2.proactive.topology.descriptor.ThresholdProximityDescriptor;
 import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
 import org.ow2.proactive.utils.NodeSet;
 
+
 /**
  * Class is responsible for collecting the topology information, keeping it up to date and taking it into
  * account for nodes selection.

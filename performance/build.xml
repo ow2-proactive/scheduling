@@ -58,6 +58,7 @@
         </javac>
         <stubGenerator dstDir="${classes.dir}" srcDir="${basedir}/src" refclasspath="stub.generation.classpath">
             <class name="org.ow2.proactive.tests.performance.rm.RMTestListener" />
+            <class name="org.ow2.proactive.tests.performance.scheduler.SchedulerTestListener" />
         </stubGenerator>
         <copy file="${basedir}/src/org/ow2/proactive/tests/performance/jmeter/rm/defaultSSHDeployment" todir="${classes.dir}/org/ow2/proactive/tests/performance/jmeter/rm" />
     </target>
@@ -230,6 +231,7 @@
             <delete file="${basedir}/results/@{testplan}.jtl" />
             <delete file="${basedir}/results/@{testplan}.html" />
             <chmod file="${basedir}/src/org/ow2/proactive/tests/performance/jmeter/scheduler/nativeTask.sh" perm="ugo+rx" />
+            <chmod file="${basedir}/src/org/ow2/proactive/tests/performance/jmeter/scheduler/sleep_forever_nativeTask.sh" perm="ugo+rx" />
 
             <jmeter failureProperty="scheduler-@{testplan}-failed" jmeterhome="${jmeterhome}" testplan="${basedir}/jmeter/testplans/@{testplan}.jmx" resultlog="${basedir}/results/@{testplan}.jtl">
                 <jvmarg value="-Djava.security.policy=${basedir}/config/grant.all.java.policy" />
@@ -338,9 +340,21 @@
         </sequential>
     </macrodef>
 
-    <target name="test-with-get-nodes-from-scheduler" depends="compile.tests" description="Run tests using hosts provided by the existing Scheduler">
+    <target name="test-with-get-nodes-from-scheduler-remote" depends="compile.tests">
         <rsyncSchedulingMacro host="${get.hosts.from.scheduler.copySchedulingHost}" dest="${get.hosts.from.scheduler.copySchedulingPath}"/>
-        
+        <antcall target="test-with-get-nodes-from-scheduler"/>
+        <mkdir dir="${project.root}/performance/results/remoteResults"/>
+        <exec executable="scp" failonerror="true">
+            <arg value="${get.hosts.from.scheduler.copySchedulingHost}:${get.hosts.from.scheduler.copySchedulingPath}/performance/results/*" />
+            <arg value="${project.root}/performance/results/remoteResults" />
+        </exec>
+        <exec executable="scp" failonerror="true">
+            <arg value="${get.hosts.from.scheduler.copySchedulingHost}:${get.hosts.from.scheduler.copySchedulingPath}/.logs/*" />
+            <arg value="${project.root}/performance/results/remoteResults" />
+        </exec>
+    </target>
+
+    <target name="test-with-get-nodes-from-scheduler" depends="compile.tests" description="Run tests using hosts provided by the existing Scheduler">
         <path id="run.with.scheduler.classpath">
             <fileset dir="${get.hosts.from.scheduler.clientSchedulingPath}/dist/lib">
                 <include name="*.jar" />
@@ -369,16 +383,6 @@
             <jvmarg value="-Dget.hosts.from.scheduler.jmeterhome=${get.hosts.from.scheduler.jmeterhome}" />
             <jvmarg value="-Dget.hosts.from.scheduler.rmAdditionalHostsNumber=${get.hosts.from.scheduler.rmAdditionalHostsNumber}" />
         </java>
-        
-        <mkdir dir="${project.root}/performance/results/remoteResults"/>
-        <exec executable="scp" failonerror="true">
-            <arg value="${get.hosts.from.scheduler.copySchedulingHost}:${get.hosts.from.scheduler.copySchedulingPath}/performance/results/*" />
-            <arg value="${project.root}/performance/results/remoteResults" />
-        </exec>
-        <exec executable="scp" failonerror="true">
-            <arg value="${get.hosts.from.scheduler.copySchedulingHost}:${get.hosts.from.scheduler.copySchedulingPath}/.logs/*" />
-            <arg value="${project.root}/performance/results/remoteResults" />
-        </exec>
     </target>
 
 </project>

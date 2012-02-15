@@ -120,7 +120,7 @@ public class TestPamrRouterDeployer {
         command.add(String.valueOf(pamrPort));
         command.add("--configFile");
         command.add(pamrConfigPath);
-        command.add("--verbose");
+        // command.add("--verbose");
 
         System.out.println("Starting PAMR router on the " + env.getHost() + ", command: " + command);
 

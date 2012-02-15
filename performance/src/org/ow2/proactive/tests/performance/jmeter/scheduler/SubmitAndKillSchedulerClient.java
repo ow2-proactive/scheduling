@@ -48,6 +48,8 @@ import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
+import org.ow2.proactive.scheduler.common.task.NativeTask;
+import org.ow2.proactive.scheduler.common.task.Task;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import org.ow2.proactive.tests.performance.scheduler.JobWaitContition;
@@ -58,6 +60,10 @@ import org.ow2.proactive.tests.performance.scheduler.SchedulerWaitCondition;
 
 
 public class SubmitAndKillSchedulerClient extends BaseJMeterSchedulerClient {
+
+    static final long EXECUTION_START_TIMEOUT = 60000;
+
+    static final long FINISH_TIMEOUT = 60000;
 
     public static class SleepForeverJavaTask extends JavaExecutable {
 
@@ -70,6 +76,8 @@ public class SubmitAndKillSchedulerClient extends BaseJMeterSchedulerClient {
         }
 
     }
+
+    private TaskType taskType = TaskType.native_task;
 
     private SchedulerEventsMonitor eventsMonitor;
 
@@ -103,7 +111,7 @@ public class SubmitAndKillSchedulerClient extends BaseJMeterSchedulerClient {
         Scheduler scheduler = getScheduler();
         JobId jobId = scheduler.submit(job);
 
-        if (!eventsMonitor.waitFor(taskStartCondition, 60000, getLogger())) {
+        if (!eventsMonitor.waitFor(taskStartCondition, EXECUTION_START_TIMEOUT, getLogger())) {
             logJobResult(jobId);
             SampleResult result = new SampleResult();
             result.setSuccessful(false);
@@ -121,11 +129,16 @@ public class SubmitAndKillSchedulerClient extends BaseJMeterSchedulerClient {
             result.setSuccessful(false);
             result.setResponseMessage("Failed to kill job");
         } else {
-            if (!eventsMonitor.waitFor(jobCompleteCondition, 60000, getLogger())) {
+            if (!eventsMonitor.waitFor(jobCompleteCondition, FINISH_TIMEOUT, getLogger())) {
                 result.setSuccessful(false);
                 result.setResponseMessage("Killed job didn't finish as expected");
             } else {
-                result.setSuccessful(true);
+                if (!scheduler.removeJob(jobId)) {
+                    result.setSuccessful(false);
+                    result.setResponseMessage("Failed to remove killed job");
+                } else {
+                    result.setSuccessful(true);
+                }
             }
         }
 
@@ -144,19 +157,34 @@ public class SubmitAndKillSchedulerClient extends BaseJMeterSchedulerClient {
         job.setDescription("Job with one java task (task sleeps forever)");
         job.setMaxNumberOfExecution(1);
 
-        JobEnvironment jobEnv = new JobEnvironment();
-        jobEnv.setJobClasspath(new String[] { testsClasspath });
-        job.setEnvironment(jobEnv);
+        Task task;
 
-        JavaTask task = new JavaTask();
-        task.setExecutableClassName(SleepForeverJavaTask.class.getName());
+        switch (taskType) {
+            case java_task:
+                JobEnvironment jobEnv = new JobEnvironment();
+                jobEnv.setJobClasspath(new String[] { testsClasspath });
+                job.setEnvironment(jobEnv);
+
+                task = new JavaTask();
+                ((JavaTask) task).setExecutableClassName(SleepForeverJavaTask.class.getName());
+                task.setDescription("Test java task, sleeps forever");
+
+                ForkEnvironment forkEnv = new ForkEnvironment();
+                ((JavaTask) task).setForkEnvironment(forkEnv);
+                break;
+            case native_task:
+                task = new NativeTask();
+                ((NativeTask) task).setCommandLine(new String[] { testsSourcePath +
+                    "/org/ow2/proactive/tests/performance/jmeter/scheduler/sleep_forever_nativeTask.sh" });
+                task.setDescription("Test native task, sleeps forever");
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid task type: " + taskType);
+        }
+
         task.setName(taskName);
-        task.setDescription("Test java task, sleeps forever");
         task.setMaxNumberOfExecution(1);
         task.setCancelJobOnError(true);
-
-        ForkEnvironment forkEnv = new ForkEnvironment();
-        task.setForkEnvironment(forkEnv);
 
         job.addTask(task);
 
