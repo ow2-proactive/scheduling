@@ -46,7 +46,6 @@ import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.jinterop.dcom.test.SysInfoEvents;
 import org.objectweb.proactive.utils.OperatingSystem;
 
 
@@ -87,7 +86,7 @@ public class ProcessCleaner {
         // JPS is only available on some JDK
         // We need a fall back in case jps does not exist.
         try {
-            File jpsFile = getJps();
+            getJps();
             return getAliveWithJps();
         } catch (FileNotFoundException e) {
             return getAliveWithNative();
