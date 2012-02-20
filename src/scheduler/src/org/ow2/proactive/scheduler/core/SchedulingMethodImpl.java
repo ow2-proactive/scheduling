@@ -612,7 +612,8 @@ final class SchedulingMethodImpl implements SchedulingMethod {
      */
     void finalizeStarting(InternalJob job, InternalTask task, Node node, TaskLauncher launcher) {
         logger.info("Task '" + task.getId() + "' started on " +
-            node.getNodeInformation().getVMInformation().getHostName());
+            node.getNodeInformation().getVMInformation().getHostName() + "(node: " +
+            node.getNodeInformation().getName() + ")");
         // set the different informations on job
         if (job.getStartTime() < 0) {
             // if it is the first task of this job

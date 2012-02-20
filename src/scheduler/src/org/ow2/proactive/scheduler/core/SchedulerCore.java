@@ -846,6 +846,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
                                             td.getExecuterInformations().getNodes());
                                 } catch (Exception e) {
                                     //just save the rest of the method execution
+                                    logger_dev.debug("", e);
                                 }
 
                                 //re-init progress as it is failed
@@ -1007,6 +1008,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
                     logger_dev.info("Force terminating task '" + td.getId() + "'");
                     td.getExecuterInformations().getLauncher().terminate(false);
                 } catch (Exception e) { /* (nothing to do) */
+                    logger_dev.debug("", e);
                 }
 
                 try {
@@ -1274,9 +1276,11 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
                     //ie:command not found
                     //just note that an error occurred.
                     errorOccurred = true;
+                    logger_dev.error("error occured '" + taskId + "'", spe);
                 } catch (Throwable e) {
                     //in any other case, note that an error occurred but the user must be informed.
                     errorOccurred = true;
+                    logger_dev.error("error occured '" + taskId + "'", e);
                 }
             } else {
                 logger_dev.debug("Terminated task '" + taskId + "' is a java task");

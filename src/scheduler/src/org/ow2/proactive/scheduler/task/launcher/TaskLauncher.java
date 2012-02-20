@@ -292,15 +292,21 @@ public abstract class TaskLauncher {
      * @param core reference to the scheduler.
      */
     protected void finalizeTask(TaskTerminateNotification core) {
-        // unset env
-        this.unsetEnv();
-        // reset stdout/err
-        try {
-            this.finalizeLoggers();
-        } catch (RuntimeException e) {
-            // exception should not be thrown to the scheduler core
-            // the result has been computed and must be returned !
-            logger_dev.warn("Loggers are not shutdown !", e);
+        /*
+         * if task was killed then unsetEnv and finalizeLoggers were already called, 
+         * don't call it again, otherwise it can affect others tasks (SCHEDULING-1526)
+         */
+        if (!hasBeenKilled) {
+            // unset env
+            this.unsetEnv();
+            // reset stdout/err
+            try {
+                this.finalizeLoggers();
+            } catch (RuntimeException e) {
+                // exception should not be thrown to the scheduler core
+                // the result has been computed and must be returned !
+                logger_dev.warn("Loggers are not shutdown !", e);
+            }
         }
 
         //terminate the task

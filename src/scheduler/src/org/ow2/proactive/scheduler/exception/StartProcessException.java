@@ -54,4 +54,8 @@ public class StartProcessException extends ProcessException {
     public StartProcessException(String msg) {
         super(msg);
     }
+
+    public StartProcessException(String msg, Throwable cause) {
+        super(msg, cause);
+    }
 }

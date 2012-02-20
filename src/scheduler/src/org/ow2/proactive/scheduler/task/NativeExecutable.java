@@ -310,7 +310,7 @@ public class NativeExecutable extends Executable {
                 //we have to inform him about the cause.
                 logger_dev.info("", e);
                 System.err.println(e);
-                throw new StartProcessException(e.getMessage());
+                throw new StartProcessException(e.getMessage(), e);
             }
 
             try {
