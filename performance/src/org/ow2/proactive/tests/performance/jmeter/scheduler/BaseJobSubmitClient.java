@@ -119,13 +119,13 @@ public abstract class BaseJobSubmitClient extends BaseJMeterSchedulerClient {
 
         SchedulerWaitCondition waitCondition = eventsMonitor.addWaitCondition(new JobWaitContition(jobName));
 
-        logInfo(String.format("Submitting job: %s, selectionScript: %s (%s)", job.getDescription(), String
-                .valueOf(useSelectionScript), Thread.currentThread().toString()));
-
         SampleResult result = new SampleResult();
         result.sampleStart();
         JobId jobId = scheduler.submit(job);
         result.sampleEnd();
+
+        logInfo(String.format("Submitted job (id: %s): %s, selectionScript: %s (%s)", job.getDescription(),
+                jobId.toString(), String.valueOf(useSelectionScript), Thread.currentThread().toString()));
 
         boolean waitOK = eventsMonitor.waitFor(waitCondition, JOB_COMPLETE_TIMEOUT, getLogger());
 
@@ -139,7 +139,7 @@ public abstract class BaseJobSubmitClient extends BaseJMeterSchedulerClient {
                 }
             }
             result.setSuccessful(!hasErrors);
-            result.setResponseMessage("Some job tasks has exceptions");
+            result.setResponseMessage("Some job tasks had exceptions");
         } else {
             result.setSuccessful(false);
             result.setResponseMessage("Job was submitted, but didn't finish as expected");

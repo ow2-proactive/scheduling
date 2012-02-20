@@ -41,7 +41,6 @@ import java.io.Serializable;
 import org.apache.jmeter.protocol.java.sampler.JavaSamplerContext;
 import org.apache.jmeter.samplers.SampleResult;
 import org.ow2.proactive.scheduler.common.Scheduler;
-import org.ow2.proactive.scheduler.common.job.JobEnvironment;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
@@ -149,6 +148,23 @@ public class SubmitAndKillSchedulerClient extends BaseJMeterSchedulerClient {
         return result;
     }
 
+    static Task createJavaSleepingTask() {
+        JavaTask task = new JavaTask();
+        task.setExecutableClassName(SleepForeverJavaTask.class.getName());
+        task.setDescription("Test java task, sleeps forever");
+        ForkEnvironment forkEnv = new ForkEnvironment();
+        task.setForkEnvironment(forkEnv);
+        return task;
+    }
+
+    static Task createNativeSleepingTask(String testsSourcePath) {
+        NativeTask task = new NativeTask();
+        task.setCommandLine(new String[] { testsSourcePath +
+            "/org/ow2/proactive/tests/performance/jmeter/scheduler/sleep_forever_nativeTask.sh" });
+        task.setDescription("Test native task, sleeps forever");
+        return task;
+    }
+
     private TaskFlowJob createJob(String jobName, String taskName) throws Exception {
         TaskFlowJob job = new TaskFlowJob();
         job.setName(jobName);
@@ -161,22 +177,10 @@ public class SubmitAndKillSchedulerClient extends BaseJMeterSchedulerClient {
 
         switch (taskType) {
             case java_task:
-                JobEnvironment jobEnv = new JobEnvironment();
-                jobEnv.setJobClasspath(new String[] { testsClasspath });
-                job.setEnvironment(jobEnv);
-
-                task = new JavaTask();
-                ((JavaTask) task).setExecutableClassName(SleepForeverJavaTask.class.getName());
-                task.setDescription("Test java task, sleeps forever");
-
-                ForkEnvironment forkEnv = new ForkEnvironment();
-                ((JavaTask) task).setForkEnvironment(forkEnv);
+                task = createJavaSleepingTask();
                 break;
             case native_task:
-                task = new NativeTask();
-                ((NativeTask) task).setCommandLine(new String[] { testsSourcePath +
-                    "/org/ow2/proactive/tests/performance/jmeter/scheduler/sleep_forever_nativeTask.sh" });
-                task.setDescription("Test native task, sleeps forever");
+                task = createNativeSleepingTask(testsSourcePath);
                 break;
             default:
                 throw new IllegalArgumentException("Invalid task type: " + taskType);

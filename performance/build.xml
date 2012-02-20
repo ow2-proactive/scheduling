@@ -273,7 +273,8 @@
                 <property name="sampleJobUsersNumber" value="${sampleJobUsersNumber}" />
 
                 <property name="submitAndKillUsersNumber" value="${submitAndKillUsersNumber}" />
-
+                <property name="submitAndKillTasksUsersNumber" value="${submitAndKillTasksUsersNumber}" />
+                
                 <jmeterarg value="-j" />
                 <jmeterarg value="${basedir}/results/jmeter.log" />
             </jmeter>
