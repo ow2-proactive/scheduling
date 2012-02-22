@@ -253,21 +253,7 @@ public class SchedulerStarter {
     }
 
     private static String getLocalAdress() throws ProActiveException, UnknownProtocolException {
-        RemoteObjectFactory rof = null;
-        try {
-            rof = AbstractRemoteObjectFactory.getDefaultRemoteObjectFactory();
-            return rof.getBaseURI().toString();
-        } catch (NullPointerException e) {
-            // PROACTIVE-1179
-            // #getBaseURI() should throw a ProActiveException but does not,
-            // leaving us with NPE when PAMR is misconfigured.
-            // If PAMR, using #unregister with an unknown URI forces the 
-            // exception to be thrown without any other side effect
-            // this workaround can be removed when getBaseURI() will throw a ProActiveException
-            if (rof.getProtocolId().equals("pamr")) {
-                rof.unregister(URI.create("unknown://not-bound"));
-            }
-            throw e;
-        }
+        RemoteObjectFactory rof = AbstractRemoteObjectFactory.getDefaultRemoteObjectFactory();
+        return rof.getBaseURI().toString();
     }
 }
