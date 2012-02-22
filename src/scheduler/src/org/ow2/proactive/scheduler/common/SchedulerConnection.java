@@ -99,7 +99,7 @@ public class SchedulerConnection extends Connection<SchedulerAuthenticationInter
         try {
             return getInstance().connect(normalizeScheduler(url));
         } catch (Exception e) {
-            throw new ConnectionException(e);
+            throw new ConnectionException("Failed to connect to " + url, e);
         }
     }
 

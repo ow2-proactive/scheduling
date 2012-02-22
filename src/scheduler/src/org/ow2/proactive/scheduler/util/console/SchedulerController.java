@@ -285,16 +285,15 @@ public class SchedulerController {
         } catch (ParseException e) {
             displayHelp = true;
         } catch (LoginException e) {
-            logger.error(e.getMessage() + newline + "Shutdown the controller." + newline);
+            logger.error(getMessages(e) + "Shutdown the controller." + newline);
             logger.debug("", e);
             System.exit(3);
         } catch (SchedulerException e) {
-            logger.error(e.getMessage() + newline + "Shutdown the controller." + newline);
+            logger.error(getMessages(e) + "Shutdown the controller." + newline);
             logger.debug("", e);
             System.exit(4);
         } catch (Exception e) {
-            logger.error("An error has occurred : " + e.getMessage() + newline + "Shutdown the controller." +
-                newline, e);
+            logger.error(getMessages(e) + "Shutdown the controller." + newline, e);
             logger.debug("", e);
             System.exit(5);
         }
@@ -311,6 +310,22 @@ public class SchedulerController {
 
         // if execution reaches this point this means it must exit
         System.exit(0);
+    }
+
+    private String getMessages(Throwable t) {
+        StringBuilder ret = new StringBuilder();
+        String prefix = "";
+        while (t != null) {
+            ret.append(prefix + t.getClass().getSimpleName() + ": ");
+            prefix = " caused by ";
+            String msg = t.getMessage();
+            if (msg != null && !msg.isEmpty()) {
+                ret.append(msg);
+            }
+            t = t.getCause();
+            ret.append(newline);
+        }
+        return ret.toString();
     }
 
     protected void connect() throws LoginException, AlreadyConnectedException {
