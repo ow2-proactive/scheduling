@@ -73,6 +73,8 @@ public abstract class TestDeployHelper {
             return new TestPnpProtocolHelper(serverHostEnv);
         } else if (protocol.equalsIgnoreCase("pamr")) {
             return new TestPamrProtocolHelper(serverHostEnv, getPamrServedReservedId());
+        } else if (protocol.equalsIgnoreCase("rmi")) {
+            return new TestRMIProtocolHelper(serverHostEnv);
         } else {
             throw new IllegalArgumentException("Test doesn't support protocol " + protocol);
         }
