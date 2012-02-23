@@ -41,6 +41,7 @@ import java.io.Serializable;
 import org.apache.jmeter.protocol.java.sampler.JavaSamplerContext;
 import org.apache.jmeter.samplers.SampleResult;
 import org.ow2.proactive.scheduler.common.Scheduler;
+import org.ow2.proactive.scheduler.common.job.JobEnvironment;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
@@ -107,6 +108,7 @@ public class SubmitAndKillSchedulerClient extends BaseJMeterSchedulerClient {
             jobName, JobStatus.KILLED));
 
         TaskFlowJob job = createJob(jobName, taskName);
+
         Scheduler scheduler = getScheduler();
         JobId jobId = scheduler.submit(job);
 
@@ -178,6 +180,9 @@ public class SubmitAndKillSchedulerClient extends BaseJMeterSchedulerClient {
         switch (taskType) {
             case java_task:
                 task = createJavaSleepingTask();
+                JobEnvironment jobEnv = new JobEnvironment();
+                jobEnv.setJobClasspath(new String[] { testsClasspath });
+                job.setEnvironment(jobEnv);
                 break;
             case native_task:
                 task = createNativeSleepingTask(testsSourcePath);

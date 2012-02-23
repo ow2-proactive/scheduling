@@ -42,6 +42,7 @@ import java.util.List;
 import org.apache.jmeter.protocol.java.sampler.JavaSamplerContext;
 import org.apache.jmeter.samplers.SampleResult;
 import org.ow2.proactive.scheduler.common.Scheduler;
+import org.ow2.proactive.scheduler.common.job.JobEnvironment;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobResult;
@@ -93,6 +94,9 @@ public class SubmitAndKillTaskSchedulerClient extends BaseJMeterSchedulerClient 
         job.setCancelJobOnError(false);
         job.setDescription("Job with java and native task (tasks sleep forever)");
         job.setMaxNumberOfExecution(1);
+        JobEnvironment jobEnv = new JobEnvironment();
+        jobEnv.setJobClasspath(new String[] { testsClasspath });
+        job.setEnvironment(jobEnv);
 
         Task javaTask = SubmitAndKillSchedulerClient.createJavaSleepingTask();
         javaTask.setName("Sleeping java task");
