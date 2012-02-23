@@ -160,9 +160,6 @@ public class InternalJobFactory {
             }
         }
 
-        //reinit taskId count
-        TaskIdImpl.initialize();
-
         for (Entry<Task, InternalTask> entry : tasksList.entrySet()) {
             if (entry.getKey().getDependencesList() != null) {
                 for (Task t : entry.getKey().getDependencesList()) {

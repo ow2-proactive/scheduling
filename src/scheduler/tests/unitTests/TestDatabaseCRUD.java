@@ -129,8 +129,9 @@ public class TestDatabaseCRUD {
         itfJob.setJobDescriptor(new JobDescriptorImpl(itfJob));
         //add a taskResult
         itfJob.setJobResult(new JobResultImpl(itfJob));
-        ((JobResultImpl) itfJob.getJobResult()).addTaskResult("task2", new TaskResultImpl(TaskIdImpl
-                .nextId(itfJob.getJobInfo().getJobId()), "salut", null, 1, null), true);
+        ((JobResultImpl) itfJob.getJobResult()).addTaskResult("task2",
+                new TaskResultImpl(TaskIdImpl.createTaskId(itfJob.getJobInfo().getJobId(), "111111111",
+                        111111111), "salut", null, 1, null), true);
         //register the job
         DatabaseManager.getInstance().register(itfJob);
         //list of internal job to recover
@@ -393,7 +394,7 @@ public class TestDatabaseCRUD {
         infoMem.setExecutionHostName("toto");
         infoMem.setStartTime(1142564);
         infoMem.setStatus(TaskStatus.RUNNING);
-        infoMem.setTaskId(TaskIdImpl.nextId(id.getJobId()));
+        infoMem.setTaskId(TaskIdImpl.createTaskId(id.getJobId(), "222222222", 222222222));
         //synchronize update with database
         DatabaseManager.getInstance().synchronize(infoMem);
         //re-check MEM vs DB instance

@@ -455,10 +455,8 @@ public abstract class InternalJob extends JobState {
     public boolean addTask(InternalTask task) {
         task.setJobId(getId());
 
-        if (TaskIdImpl.getCurrentValue() < this.tasks.size()) {
-            TaskIdImpl.initialize(tasks.size());
-        }
-        task.setId(TaskIdImpl.nextId(getId(), task.getName()));
+        int taskId = tasks.size();
+        task.setId(TaskIdImpl.createTaskId(getId(), task.getName(), taskId));
 
         boolean result = (tasks.put(task.getId(), task) == null);
 
@@ -1189,13 +1187,13 @@ public abstract class InternalJob extends JobState {
         logger_dev.debug(" ");
         //get tasks
         ArrayList<InternalTask> sorted = getITasks();
-        //re-init taskId count
-        TaskIdImpl.initialize();
         //sort task according to the ID
         Collections.sort(sorted);
         tasks.clear();
+        //re-init taskId
+        int id = 0;
         for (InternalTask td : sorted) {
-            TaskId newId = TaskIdImpl.nextId(getId(), td.getName());
+            TaskId newId = TaskIdImpl.createTaskId(getId(), td.getName(), id++);
             td.setId(newId);
             td.setJobInfo(getJobInfo());
             tasks.put(newId, td);

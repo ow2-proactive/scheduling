@@ -83,10 +83,6 @@ public final class TaskIdImpl implements TaskId {
      */
     public static final int JOB_FACTOR = PASchedulerProperties.JOB_FACTOR.getValueAsInt();
 
-    /** the global id count */
-    @XmlTransient
-    private static int currentId = 0;
-
     /** task id */
     @Column(name = "ID")
     private long id;
@@ -110,9 +106,9 @@ public final class TaskIdImpl implements TaskId {
      *
      * @param jobId the task id to set.
      */
-    private TaskIdImpl(JobId jobId) {
+    private TaskIdImpl(JobId jobId, int id) {
         this.jobId = jobId;
-        this.id = (jobId.hashCode() * JOB_FACTOR) + (++currentId);
+        this.id = (jobId.hashCode() * JOB_FACTOR) + id;
     }
 
     /**
@@ -121,53 +117,20 @@ public final class TaskIdImpl implements TaskId {
      * @param jobId the task id to set.
      * @param name the human readable task name.
      */
-    private TaskIdImpl(JobId jobId, String name) {
-        this(jobId);
+    private TaskIdImpl(JobId jobId, String name, int id) {
+        this(jobId, id);
         this.readableName = name;
     }
 
     /**
-     * To reinitialize the initial id value
-     */
-    public static void initialize() {
-        currentId = 0;
-    }
-
-    /**
-     * To reinitialize the initial id value
-     * 
-     * @param init the initial value to set
-     */
-    public static void initialize(int init) {
-        currentId = Math.max(0, init);
-    }
-
-    /**
-     * @return the current value of the id
-     */
-    public static int getCurrentValue() {
-        return currentId;
-    }
-
-    /**
-     * Get the next id.
-     *
-     * @param jobId the id of the enclosing job. Permit a generation of a task id based on the jobId.
-     * @return the next available id.
-     */
-    public static synchronized TaskId nextId(JobId jobId) {
-        return new TaskIdImpl(jobId);
-    }
-
-    /**
-     * Get the next id, and set task name.
+     * Create task id, and set task name.
      *
      * @param jobId the id of the enclosing job. Permit a generation of a task id based on the jobId.
      * @param readableName Set the task name in the returned task id as well.
-     * @return the next available id with task name set.
+     * @return new task id with task name set.
      */
-    public static synchronized TaskId nextId(JobId jobId, String readableName) {
-        return new TaskIdImpl(jobId, readableName);
+    public static TaskId createTaskId(JobId jobId, String readableName, int id) {
+        return new TaskIdImpl(jobId, readableName, id);
     }
 
     /**
