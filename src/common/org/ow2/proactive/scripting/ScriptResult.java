@@ -51,17 +51,37 @@ import org.objectweb.proactive.annotation.PublicAPI;
  * @param <E> template class for the result.
  */
 @PublicAPI
-public class ScriptResult<E> implements Serializable {
+public final class ScriptResult<E> implements Serializable {
 
     /** Result of the script */
-    private E result = null;
+    private final E result;
     /** Exception in the result if so */
-    private Throwable exception = null;
+    private final Throwable exception;
+    /** Output of the script */
+    private String output;
 
     /**
      * ProActive empty constructor
      */
     public ScriptResult() {
+        this.result = null;
+        this.exception = null;
+    }
+
+    /**
+     * Create a new instance of ScriptResult.
+     * @param result result to store
+     */
+    public ScriptResult(E result) {
+        this(result, null);
+    }
+
+    /**
+     * Create a new instance of ScriptResult.
+     * @param exception script exception
+     */
+    public ScriptResult(Throwable exception) {
+        this(null, exception);
     }
 
     /** Constructor
@@ -71,22 +91,6 @@ public class ScriptResult<E> implements Serializable {
     public ScriptResult(E result, Throwable exception) {
         this.result = result;
         this.exception = exception;
-    }
-
-    /**
-     * Create a new instance of ScriptResult
-     * 
-     * @param result result to store
-     */
-    public ScriptResult(E result) {
-        this(result, null);
-    }
-
-    /** Constructor
-     * @param exception to store as a script result
-     */
-    public ScriptResult(Throwable exception) {
-        this(null, exception);
     }
 
     /** tell if an exception has been raised during
@@ -106,14 +110,6 @@ public class ScriptResult<E> implements Serializable {
     }
 
     /**
-     * Set an exception qs result.
-     * @param exception exception to set.
-     */
-    public void setException(Throwable exception) {
-        this.exception = exception;
-    }
-
-    /**
      * Return the result's object
      * @return result object.
      */
@@ -122,10 +118,18 @@ public class ScriptResult<E> implements Serializable {
     }
 
     /**
-     * Set the result
-     * @param result result to set
+     * Return the script's output.
+     * @return output string
      */
-    public void setResult(E result) {
-        this.result = result;
+    public String getOutput() {
+        return output;
+    }
+
+    /** 
+     * Sets the output of the script
+     * @param output the script's output
+     */
+    public void setOutput(String output) {
+        this.output = output;
     }
 }

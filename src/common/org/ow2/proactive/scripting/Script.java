@@ -41,6 +41,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.Serializable;
 import java.net.URL;
@@ -63,6 +64,7 @@ import org.hibernate.annotations.Proxy;
 import org.hibernate.annotations.Type;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.ow2.proactive.utils.BoundedStringWriter;
 import org.ow2.proactive.utils.SchedulerLoggers;
 
 
@@ -81,6 +83,9 @@ import org.ow2.proactive.utils.SchedulerLoggers;
 @AccessType("field")
 @Proxy(lazy = false)
 public abstract class Script<E> implements Serializable {
+
+    // default output size in chars based on the notorious JL's statistics :)
+    public static final int DEFAULT_OUTPUT_MAX_SIZE = 125;
 
     /** Loggers */
     public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerLoggers.SCRIPT);
@@ -260,6 +265,12 @@ public abstract class Script<E> implements Serializable {
             return new ScriptResult<E>(new Exception("No Script Engine Found"));
         }
 
+        // SCHEDULING-1532: redirect script output to a buffer (keep the latest DEFAULT_OUTPUT_MAX_SIZE)
+        // the output is still printed to stdout
+        BoundedStringWriter sw = new BoundedStringWriter(DEFAULT_OUTPUT_MAX_SIZE);
+        PrintWriter pw = new PrintWriter(sw);
+        engine.getContext().setWriter(pw);
+
         try {
             Bindings bindings = engine.getBindings(ScriptContext.ENGINE_SCOPE);
             //add additional bindings
@@ -271,7 +282,11 @@ public abstract class Script<E> implements Serializable {
             prepareBindings(bindings);
             engine.eval(getReader());
 
-            return getResult(bindings);
+            // Add output to the script result
+            ScriptResult<E> result = this.getResult(bindings);
+            result.setOutput(sw.toString());
+
+            return result;
         } catch (Throwable e) {
             logger_dev.error("", e);
             return new ScriptResult<E>(new Exception("An exception occured while executing the script ", e));
@@ -364,5 +379,4 @@ public abstract class Script<E> implements Serializable {
 
         return false;
     }
-
 }

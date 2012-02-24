@@ -69,7 +69,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
 @AccessType("field")
 @Proxy(lazy = false)
 @XmlAccessorType(XmlAccessType.FIELD)
-public class SimpleScript extends Script {
+public class SimpleScript extends Script<Object> {
     @Id
     @GeneratedValue
     @SuppressWarnings("unused")
