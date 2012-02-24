@@ -52,6 +52,7 @@ import org.ow2.proactive.scheduler.common.task.NativeTask;
 import org.ow2.proactive.scheduler.common.task.Task;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
+import org.ow2.proactive.tests.performance.deployment.TestDeployHelper;
 import org.ow2.proactive.tests.performance.scheduler.JobWaitContition;
 import org.ow2.proactive.tests.performance.scheduler.SchedulerEventsMonitor;
 import org.ow2.proactive.tests.performance.scheduler.SchedulerTestListener;
@@ -61,7 +62,7 @@ import org.ow2.proactive.tests.performance.scheduler.SchedulerWaitCondition;
 
 public class SubmitAndKillSchedulerClient extends BaseJMeterSchedulerClient {
 
-    static final long EXECUTION_START_TIMEOUT = 60000;
+    static final long EXECUTION_START_TIMEOUT = 5 * 60000;
 
     static final long FINISH_TIMEOUT = 60000;
 
@@ -112,6 +113,8 @@ public class SubmitAndKillSchedulerClient extends BaseJMeterSchedulerClient {
         Scheduler scheduler = getScheduler();
         JobId jobId = scheduler.submit(job);
 
+        logInfo("Killing job " + jobId + "(" + Thread.currentThread() + ")");
+
         if (!eventsMonitor.waitFor(taskStartCondition, EXECUTION_START_TIMEOUT, getLogger())) {
             logJobResult(jobId);
             SampleResult result = new SampleResult();
@@ -119,8 +122,6 @@ public class SubmitAndKillSchedulerClient extends BaseJMeterSchedulerClient {
             result.setResponseMessage("Failed to wait for start of task execition");
             return result;
         }
-
-        logInfo("Killing job " + jobId + "(" + Thread.currentThread() + ")");
 
         SampleResult result = new SampleResult();
         result.sampleStart();
@@ -155,6 +156,7 @@ public class SubmitAndKillSchedulerClient extends BaseJMeterSchedulerClient {
         task.setExecutableClassName(SleepForeverJavaTask.class.getName());
         task.setDescription("Test java task, sleeps forever");
         ForkEnvironment forkEnv = new ForkEnvironment();
+        forkEnv.addJVMArgument("-D" + TestDeployHelper.TEST_JVM_OPTION);
         task.setForkEnvironment(forkEnv);
         return task;
     }

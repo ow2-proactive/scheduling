@@ -72,7 +72,9 @@ public class TestRMIProtocolHelper extends TestProtocolHelper {
             throw new IllegalStateException("TestRMIProtocolHelper didn't prepare deployment");
         }
         List<String> options = new ArrayList<String>();
-        options.add(CentralPAPropertyRepository.PA_RMI_PORT.getCmdLine() + String.valueOf(rmiPort.intValue()));
+        options
+                .add(CentralPAPropertyRepository.PA_RMI_PORT.getCmdLine() +
+                    String.valueOf(rmiPort.intValue()));
         options.add(CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL.getCmdLine() + "rmi");
         return options;
     }

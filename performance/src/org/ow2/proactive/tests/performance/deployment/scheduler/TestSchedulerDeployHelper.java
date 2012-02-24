@@ -113,6 +113,9 @@ public class TestSchedulerDeployHelper extends TestDeployHelper {
         result.add(CentralPAPropertyRepository.LOG4J.getCmdLine() + "file:" +
             TestDeployer.getFileName(schedulingFolder.getTestConfigDir(), "/log4j/log4j-scheduler-server"));
 
+        result.add(PASchedulerProperties.SCHEDULER_DEFAULT_FJT_LOG4J.getCmdLine() +
+            TestDeployer.getFileName(schedulingFolder.getTestConfigDir(), "/log4j/log4j-forkedTask"));
+
         result.add("-cp");
         result.add(buildSchedulingClasspath());
         result.add(SchedulerStarter.class.getName());
