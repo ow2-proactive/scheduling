@@ -43,6 +43,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.InetAddress;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -65,6 +66,9 @@ import org.ow2.proactive.resourcemanager.frontend.topology.Topology;
 import org.ow2.proactive.resourcemanager.nodesource.common.PluginDescriptor;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.DefaultInfrastructureManager;
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
+import org.ow2.proactive.resourcemanager.utils.TargetType;
+import org.ow2.proactive.scripting.ScriptResult;
+import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.utils.ObjectArrayFormatter;
 import org.ow2.proactive.utils.Tools;
 import org.ow2.proactive.utils.console.Command;
@@ -150,6 +154,9 @@ public class ResourceManagerModel extends ConsoleModel {
         commands
                 .add(new Command("exec(scriptFilePath)",
                     "Execute the content of the given script file (parameter is a string representing a script-file path)"));
+        commands.add(new Command("execRemote(scriptFilePath, targetType, targets)",
+            "Execute the content of the given script file on specified targets, targetType can be on of " +
+                Arrays.toString(TargetType.values())));
         commands.add(new Command("cnslhelp() or ?c", "Displays help about the console functions itself"));
         if (allowExitCommand) {
             commands.add(new Command("exit()", "Exits RM controller"));
@@ -639,6 +646,37 @@ public class ResourceManagerModel extends ConsoleModel {
             eval(readFileContent(br), mArgs);
             br.close();
         } catch (Exception e) {
+            handleExceptionDisplay("*ERROR*", e);
+        }
+    }
+
+    public void execRemote_(final String commandFilePath, final String targetType,
+            final HashSet<String> targets) {
+        try {
+            // Read the script from the file   
+            File scriptFile = new File(commandFilePath.trim());
+            print("Script " + scriptFile.getName() + " targets: " + targets);
+            SelectionScript ss = new SelectionScript(scriptFile, /*no params*/new String[0]);
+            // Execute the script on the given targets
+            List<ScriptResult<Boolean>> results = this.rm.executeScript(ss, targetType, targets);
+            if (results.size() == 0) {
+                print("No scripts were executed, maybe no targets found or no registered nodes at all");
+            }
+            for (ScriptResult<Boolean> sr : results) {
+                Throwable exception = sr.getException();
+                if (exception != null) {
+                    handleExceptionDisplay("An exception occured when running script:", exception);
+                }
+                StringBuilder bld = new StringBuilder();
+                bld.append("Script result: ").append(sr.getResult());
+                String output = sr.getOutput();
+                if (output != null) {
+                    bld.append(", output: ").append(newline);
+                    bld.append(output);
+                }
+                print(bld.toString());
+            }
+        } catch (Throwable e) {
             handleExceptionDisplay("*ERROR*", e);
         }
     }

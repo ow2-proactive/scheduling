@@ -46,8 +46,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Random;
+import java.util.Map.Entry;
 
 import org.apache.log4j.Appender;
 import org.apache.log4j.AppenderSkeleton;
@@ -83,6 +83,7 @@ import org.ow2.proactive.scheduler.task.launcher.TaskLauncherInitializer;
 import org.ow2.proactive.scheduler.task.launcher.utils.ForkerUtils;
 import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 import org.ow2.proactive.scheduler.util.process.ThreadReader;
+import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.ScriptHandler;
 import org.ow2.proactive.scripting.ScriptLoader;
 import org.ow2.proactive.scripting.ScriptResult;
@@ -340,7 +341,7 @@ public class ForkedJavaExecutable extends JavaExecutable implements ForkerStarte
             handler.addBinding(TaskLauncher.DS_OUTPUT_BINDING_NAME, this.execInitializer.getOutput());
             handler.addBinding(TaskLauncher.DS_GLOBAL_BINDING_NAME, this.execInitializer.getGlobal());
 
-            ScriptResult<String> res = handler.handle(fe.getEnvScript());
+            ScriptResult<String> res = handler.handle((Script<String>) fe.getEnvScript());
             //result
             if (res.errorOccured()) {
                 res.getException().printStackTrace();

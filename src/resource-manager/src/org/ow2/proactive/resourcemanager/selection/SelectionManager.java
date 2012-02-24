@@ -44,6 +44,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -63,6 +64,7 @@ import org.ow2.proactive.resourcemanager.rmnode.RMNode;
 import org.ow2.proactive.resourcemanager.selection.policies.ShufflePolicy;
 import org.ow2.proactive.resourcemanager.selection.topology.TopologyHandler;
 import org.ow2.proactive.resourcemanager.utils.RMLoggers;
+import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.ScriptException;
 import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive.scripting.SelectionScript;
@@ -340,6 +342,62 @@ public abstract class SelectionManager {
             }
         }
         return filteredList;
+    }
+
+    public <T> List<ScriptResult<T>> executeScript(final Script<T> script, Set<RMNode> nodes) {
+
+        // Create as many Callables as there a scripts to execute
+        final ArrayList<Callable<ScriptResult<T>>> scriptExecutors = new ArrayList<Callable<ScriptResult<T>>>(
+            nodes.size());
+        for (final RMNode rmnode : nodes) {
+            scriptExecutors.add(new Callable<ScriptResult<T>>() {
+                @Override
+                public ScriptResult<T> call() throws Exception {
+                    // Later think about handling proactive timeout here
+                    return rmnode.executeScript(script);
+                }
+
+                @Override
+                public String toString() {
+                    return "executing script on " + rmnode.getNodeURL();
+                }
+            });
+        }
+
+        // launching
+        List<Future<ScriptResult<T>>> futures = null;
+        try {
+            futures = this.scriptExecutorThreadPool.invokeAll(scriptExecutors,
+                    PAResourceManagerProperties.RM_SELECT_SCRIPT_TIMEOUT.getValueAsInt(),
+                    TimeUnit.MILLISECONDS);
+        } catch (InterruptedException e) {
+            logger.warn("Interrupted while waiting, unable to execute all scripts", e);
+            Thread.currentThread().interrupt();
+        }
+
+        final List<ScriptResult<T>> results = new LinkedList<ScriptResult<T>>();
+
+        int index = 0;
+        // waiting for the results
+        for (final Future<ScriptResult<T>> future : futures) {
+            final String description = scriptExecutors.get(index++).toString();
+            ScriptResult<T> result = null;
+            try {
+                result = future.get();
+            } catch (CancellationException e) {
+                result = new ScriptResult<T>(new ScriptException("Cancelled due to timeout expiration for " +
+                    description, e));
+            } catch (InterruptedException e) {
+                result = new ScriptResult<T>(new ScriptException(
+                    "Cancelled due to interruption while waiting for " + description));
+            } catch (ExecutionException e) {
+                result = new ScriptResult<T>(new ScriptException("Exception occured in script call", e
+                        .getCause()));
+            }
+            results.add(result);
+        }
+
+        return results;
     }
 
     /**

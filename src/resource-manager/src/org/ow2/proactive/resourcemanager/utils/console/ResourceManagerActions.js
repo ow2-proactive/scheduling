@@ -145,6 +145,14 @@ function exec(commandFilePath){
 	return rm_.exec_(commandFilePath);
 }
 
+function execRemote(commandFilePath, targetType, targets){
+	var targetSet = new java.util.HashSet(arguments.length-2);	
+	for (var i = 2; i<arguments.length; i++) {	   
+	   targetSet.add(arguments[i]);
+	}
+	return rm_.execRemote_(commandFilePath, targetType, targetSet);
+}
+
 function exit(){
 	return rm_.exit_();
 }

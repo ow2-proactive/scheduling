@@ -48,6 +48,7 @@ import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.InfrastructureManager;
+import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive.scripting.SelectionScript;
 
@@ -156,7 +157,7 @@ public final class RMDeployingNode implements RMNode, Serializable {
     /**
      * {@inheritDoc}
      */
-    public ScriptResult<Boolean> executeScript(SelectionScript script) {
+    public <T> ScriptResult<T> executeScript(Script<T> script) {
         throw new UnsupportedOperationException();
     }
 

@@ -44,11 +44,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
+import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -116,6 +117,9 @@ import org.ow2.proactive.resourcemanager.selection.statistics.ProbablisticSelect
 import org.ow2.proactive.resourcemanager.selection.topology.TopologyManager;
 import org.ow2.proactive.resourcemanager.utils.ClientPinger;
 import org.ow2.proactive.resourcemanager.utils.RMLoggers;
+import org.ow2.proactive.resourcemanager.utils.TargetType;
+import org.ow2.proactive.scripting.Script;
+import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
 import org.ow2.proactive.utils.NodeSet;
@@ -1542,28 +1546,29 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                 result = false;
                 continue;
             }
-
-            if (rmnode.isFree()) {
-                try {
-                    // throws a security exception if caller is not an admin
-                    checkNodeAdminPermission(rmnode, caller);
-                } catch (SecurityException ex) {
-                    logger.warn("", ex);
-                    result = false;
-                    continue;
-                }
-                rmnode.lock(caller);
-                freeNodes.remove(rmnode);
-                this.registerAndEmitNodeEvent(new RMNodeEvent(rmnode, RMEventType.NODE_STATE_CHANGED,
-                    NodeState.FREE, caller.getName()));
-            } else {
-                logger.warn("Cannot lock the node " + rmnode.getNodeURL() + " which is not free [ state is " +
-                    rmnode.getState() + " ]");
-                result = false;
-                continue;
-            }
+            result = this.lockNode(rmnode);
         }
         return new BooleanWrapper(result);
+    }
+
+    private boolean lockNode(RMNode rmnode) {
+        if (!rmnode.isFree()) {
+            logger.warn("Cannot lock the node " + rmnode.getNodeURL() + " which is not free [ state is " +
+                rmnode.getState() + " ]");
+            return false;
+        }
+        try {
+            // can throws a security exception if caller is not an admin
+            this.checkNodeAdminPermission(rmnode, this.caller);
+            rmnode.lock(this.caller);
+            this.freeNodes.remove(rmnode);
+        } catch (SecurityException ex) {
+            logger.warn("", ex);
+            return false;
+        }
+        this.registerAndEmitNodeEvent(new RMNodeEvent(rmnode, RMEventType.NODE_STATE_CHANGED, NodeState.FREE,
+            this.caller.getName()));
+        return true;
     }
 
     /**
@@ -1580,27 +1585,29 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                 continue;
             }
 
-            if (rmnode.isLocked()) {
-                try {
-                    // throws a security exception if caller is not an admin
-                    checkNodeAdminPermission(rmnode, caller);
-                    rmnode.setFree();
-                    freeNodes.add(rmnode);
-                } catch (Exception e) {
-                    logger.warn("", e);
-                    result = false;
-                    continue;
-                }
-                this.registerAndEmitNodeEvent(new RMNodeEvent(rmnode, RMEventType.NODE_STATE_CHANGED,
-                    NodeState.LOCKED, caller.getName()));
-            } else {
-                logger.warn("Cannot unlock the node " + rmnode.getNodeURL() +
-                    " which is not locked [ state is " + rmnode.getState() + " ]");
-                result = false;
-                continue;
-            }
+            result = this.unlockNode(rmnode);
         }
         return new BooleanWrapper(result);
+    }
+
+    private boolean unlockNode(RMNode rmnode) {
+        if (!rmnode.isLocked()) {
+            logger.warn("Cannot unlock the node " + rmnode.getNodeURL() + " which is not locked [ state is " +
+                rmnode.getState() + " ]");
+            return false;
+        }
+        try {
+            // can throws a security exception if caller is not an admin
+            this.checkNodeAdminPermission(rmnode, this.caller);
+            rmnode.setFree();
+            freeNodes.add(rmnode);
+        } catch (Exception ex) {
+            logger.warn("", ex);
+            return false;
+        }
+        this.registerAndEmitNodeEvent(new RMNodeEvent(rmnode, RMEventType.NODE_STATE_CHANGED,
+            NodeState.LOCKED, caller.getName()));
+        return true;
     }
 
     /**
@@ -1638,5 +1645,71 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         }
 
         return node.getInfo();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public <T> List<ScriptResult<T>> executeScript(Script<T> script, String targetType, Set<String> targets) {
+
+        // Check target type
+        final TargetType tType = TargetType.valueOf(targetType);
+        final HashSet<RMNode> selectedNodes = new HashSet<RMNode>();
+        try {
+            switch (tType) {
+                case NODESOURCE_NAME:
+                    // If target is a nodesource name select all its nodes
+                    for (String target : targets) {
+                        NodeSource nodeSource = this.nodeSources.get(target);
+                        if (nodeSource != null) {
+                            for (RMNode candidateNode : this.allNodes.values()) {
+                                if (candidateNode.getNodeSource().equals(nodeSource)) {
+                                    this.selectCandidateNode(selectedNodes, candidateNode);
+                                }
+                            }
+                        }
+                    }
+                    break;
+                case NODE_URL:
+                    // If target is node url select the node
+                    for (String target : targets) {
+                        RMNode candidateNode = this.allNodes.get(target);
+                        if (candidateNode != null) {
+                            this.selectCandidateNode(selectedNodes, candidateNode);
+                        }
+                    }
+                    break;
+                case HOSTNAME:
+                    // If target is hostname select first node from that host
+                    for (String target : targets) {
+                        for (RMNode node : this.allNodes.values()) {
+                            if (node.getHostName().equals(target)) {
+                                this.selectCandidateNode(selectedNodes, node);
+                                break;
+                            }
+                        }
+                    }
+                    break;
+                default:
+                    throw new IllegalArgumentException("Unable to execute script, unknown target type: " +
+                        targetType);
+            }
+
+            return this.selectionManager.executeScript(script, selectedNodes);
+        } finally {
+            // Ask osmirnov to replace this by a non-blocking callback
+            for (RMNode rmnode : selectedNodes) {
+                this.unlockNode(rmnode);
+            }
+        }
+    }
+
+    private void selectCandidateNode(HashSet<RMNode> selectedNodes, RMNode candidateNode) {
+        if (this.lockNode(candidateNode)) {
+            selectedNodes.add(candidateNode);
+        } else {
+            throw new IllegalStateException("Unable to execute script atomically, the " +
+                candidateNode.getNodeURL() + " is note free.");
+        }
     }
 }

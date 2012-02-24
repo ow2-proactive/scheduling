@@ -636,7 +636,7 @@ public abstract class TaskLauncher {
         logger_dev.info("Executing pre-script");
         ScriptHandler handler = ScriptLoader.createLocalHandler();
         this.addDataspaceBinding(handler);
-        ScriptResult<String> res = handler.handle(pre);
+        ScriptResult<String> res = handler.handle((Script<String>) pre);
 
         if (res.errorOccured()) {
             res.getException().printStackTrace();
@@ -663,7 +663,7 @@ public abstract class TaskLauncher {
         ScriptHandler handler = ScriptLoader.createLocalHandler();
         this.addDataspaceBinding(handler);
         handler.addBinding(EXECUTION_SUCCEED_BINDING_NAME, executionSucceed);
-        ScriptResult<String> res = handler.handle(post);
+        ScriptResult<String> res = handler.handle((Script<String>) post);
 
         if (res.errorOccured()) {
             res.getException().printStackTrace();

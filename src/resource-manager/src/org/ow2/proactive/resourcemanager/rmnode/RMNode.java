@@ -45,6 +45,7 @@ import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
+import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive.scripting.SelectionScript;
 
@@ -73,11 +74,12 @@ import org.ow2.proactive.scripting.SelectionScript;
 public interface RMNode extends Comparable<RMNode> {
 
     /**
-     * Execute a {@link SelectionScript} on this {@link RMNode}
+     * Execute a {@link Script} on this {@link RMNode}
+     * @param <T> The parameterized result type of the script 
      * @param script a selection script to execute.
      * @return the {@link ScriptResult} corresponding to the script execution.
      */
-    public ScriptResult<Boolean> executeScript(SelectionScript script);
+    public <T> ScriptResult<T> executeScript(Script<T> script);
 
     /**
      * Get a map of all selection scripts already tested on this node,

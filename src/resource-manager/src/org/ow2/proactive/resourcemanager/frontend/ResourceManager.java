@@ -49,6 +49,8 @@ import org.ow2.proactive.resourcemanager.common.event.RMEvent;
 import org.ow2.proactive.resourcemanager.frontend.topology.Topology;
 import org.ow2.proactive.resourcemanager.nodesource.common.PluginDescriptor;
 import org.ow2.proactive.resourcemanager.nodesource.policy.NodeSourcePolicyFactory;
+import org.ow2.proactive.scripting.Script;
+import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
 import org.ow2.proactive.utils.NodeSet;
@@ -344,4 +346,13 @@ public interface ResourceManager {
      */
     public String getNodeInfo(String nodeUrl);
 
+    /**
+     * Executes the script on the specified targets depending on the target type {@link TargetType}.
+     * 
+     * 
+     * @param <T> The parameterized result type of the script 
+     * @param script a selection script to execute.
+     * @return the {@link ScriptResult} corresponding to the script execution.
+     */
+    public <T> List<ScriptResult<T>> executeScript(Script<T> script, String targetType, Set<String> targets);
 }

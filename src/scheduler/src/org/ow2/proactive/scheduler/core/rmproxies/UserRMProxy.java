@@ -42,8 +42,8 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
+import java.util.Map.Entry;
 import java.util.concurrent.Future;
 
 import javax.security.auth.login.LoginException;
@@ -451,4 +451,11 @@ public class UserRMProxy implements ResourceManager, RunActive {
         return rm.getNodeInfo(nodeUrl);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <T> List<ScriptResult<T>> executeScript(Script<T> script, String targetType, Set<String> targets) {
+        return rm.executeScript(script, targetType, targets);
+    }
 }

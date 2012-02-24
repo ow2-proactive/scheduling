@@ -53,6 +53,7 @@ import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.resourcemanager.rmnode.RMNode;
 import org.ow2.proactive.resourcemanager.selection.policies.NodeSourcePriorityPolicy;
+import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.tests.FunctionalTest;
@@ -209,6 +210,11 @@ public class TestNodeSourcePolicy extends FunctionalTest {
         }
 
         public String getInfo() {
+            return null;
+        }
+
+        @Override
+        public <T> ScriptResult<T> executeScript(Script<T> script) {
             return null;
         }
 

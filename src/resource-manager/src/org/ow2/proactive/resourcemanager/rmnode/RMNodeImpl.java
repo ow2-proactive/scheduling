@@ -50,6 +50,7 @@ import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
+import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.ScriptHandler;
 import org.ow2.proactive.scripting.ScriptLoader;
 import org.ow2.proactive.scripting.ScriptResult;
@@ -345,18 +346,16 @@ public class RMNodeImpl implements RMNode, Serializable {
      * @return Result of the test.
      *
      */
-    @SuppressWarnings("unchecked")
-    public ScriptResult<Boolean> executeScript(SelectionScript script) {
-        if (handler == null) {
+    public <T> ScriptResult<T> executeScript(Script<T> script) {
+        if (this.handler == null) {
             try {
-                handler = ScriptLoader.createHandler(this.node);
+                this.handler = ScriptLoader.createHandler(this.node);
             } catch (Exception e) {
-                return new ScriptResult<Boolean>(new NodeException(
-                    "Unable to create Script Handler on node ", e));
+                return new ScriptResult<T>(new NodeException("Unable to create Script Handler on node ", e));
             }
         }
 
-        return handler.handle(script);
+        return this.handler.handle(script);
     }
 
     /**

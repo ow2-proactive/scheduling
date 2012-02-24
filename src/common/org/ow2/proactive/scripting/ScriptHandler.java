@@ -67,11 +67,11 @@ public class ScriptHandler implements Serializable {
      * @param script a script to execute
      * @return a ScriptResult object containing the result.
      */
-    public ScriptResult handle(Script script) {
+    public <T> ScriptResult<T> handle(Script<T> script) {
         try {
             return script.execute(additionalBindings);
         } catch (Throwable t) {
-            return new ScriptResult(t);
+            return new ScriptResult<T>(t);
         }
     }
 
