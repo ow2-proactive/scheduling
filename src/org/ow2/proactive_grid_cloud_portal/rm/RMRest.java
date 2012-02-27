@@ -302,7 +302,7 @@ public class RMRest {
 	@Path("node/isavailable")
 	@Produces("application/json")
 	public boolean nodeIsAvailable(@HeaderParam("sessionid") String sessionId,
-			@FormParam("nodeurl") String url) throws NotConnectedException {
+			@QueryParam("nodeurl") String url) throws NotConnectedException {
 		ResourceManager rm = checkAccess(sessionId);
 		return rm.nodeIsAvailable(url).getBooleanValue();
 	}
@@ -533,6 +533,54 @@ public class RMRest {
 		return rm.unlockNodes(nodeUrls).getBooleanValue();
 	}
 
+	/**
+     * Retrieves attributes of the specified mbean.
+	 * 
+	 * @param sessionId current session
+	 * @param name of mbean
+	 * @param nodeJmxUrl mbean server url
+	 * @param attrs set of mbean attributes
+	 * 
+	 * @return mbean attributes values
+	 */
+	@GET
+	@GZIP
+	@Produces("application/json")
+	@Path("node/mbean")
+    public Object getNodeMBeanInfo(@HeaderParam("sessionid") String sessionId,
+    		@QueryParam("nodejmxurl") String nodeJmxUrl, @QueryParam("objectname") String objectName,  
+    		@QueryParam("attrs") List<String> attrs)
+            throws InstanceNotFoundException, IntrospectionException, ReflectionException, IOException, NotConnectedException, MalformedObjectNameException, NullPointerException {
+		
+		// checking that still connected to the RM
+		RMCachingProxyUserInterface rmProxy = checkAccess(sessionId);
+		return rmProxy.getNodeMBeanInfo(nodeJmxUrl, objectName, attrs);
+    }
+
+	/**
+     * Retrieves attributes of the specified mbeans.
+	 * 
+	 * @param sessionId current session
+	 * @param objectNames mbean names (@see ObjectName format)
+	 * @param nodeJmxUrl mbean server url
+	 * @param attrs set of mbean attributes
+	 * 
+	 * @return mbean attributes values
+	 */
+	@GET
+	@GZIP
+	@Produces("application/json")
+	@Path("node/mbeans")
+    public Object getNodeMBeansInfo(@HeaderParam("sessionid") String sessionId,
+    		@QueryParam("nodejmxurl") String nodeJmxUrl, @QueryParam("objectname") String objectNames,  
+    		@QueryParam("attrs") List<String> attrs)
+            throws InstanceNotFoundException, IntrospectionException, ReflectionException, IOException, NotConnectedException, MalformedObjectNameException, NullPointerException {
+		
+		// checking that still connected to the RM
+		RMCachingProxyUserInterface rmProxy = checkAccess(sessionId);
+		return rmProxy.getNodeMBeansInfo(nodeJmxUrl, objectNames, attrs);
+    }
+	
 	/**
 	 * Each node source scan its nodes periodically to check their states. This
 	 * method changes the period of nodes scanning.

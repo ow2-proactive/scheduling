@@ -116,7 +116,6 @@
 	<classpathentry kind="lib" path="lib/scheduling/glite-wms-jdlj.jar"/>
 	<classpathentry kind="lib" path="lib/scheduling/hibernate-annotations.jar"/>
 	<classpathentry kind="lib" path="lib/scheduling/hibernate-commons-annotations.jar"/>
-	<classpathentry kind="lib" path="lib/scheduling/hibernate-core.jar"/>
 	<classpathentry kind="lib" path="lib/scheduling/http-2.0.4.jar"/>
 	<classpathentry kind="lib" path="lib/scheduling/ibis-1.4.jar"/>
 	<classpathentry kind="lib" path="lib/scheduling/ibis-connect-1.0.jar"/>
@@ -240,5 +239,6 @@
 	<classpathentry kind="lib" path="lib/scheduling/ProActive_Scheduler-matsci.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="lib/scheduling/rrd4j-2.0.6.jar"/>
+	<classpathentry kind="lib" path="lib/scheduling/hibernate3.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
