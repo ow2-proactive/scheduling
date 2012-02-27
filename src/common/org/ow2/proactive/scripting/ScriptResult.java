@@ -51,7 +51,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
  * @param <E> template class for the result.
  */
 @PublicAPI
-public final class ScriptResult<E> implements Serializable {
+public class ScriptResult<E> implements Serializable {
 
     /** Result of the script */
     private final E result;
