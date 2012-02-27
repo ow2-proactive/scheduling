@@ -139,19 +139,21 @@ public class SchedulerScenarioSetupClient extends BaseJMeterClient {
 
     @Override
     public void teardownTest(JavaSamplerContext context) {
-        if (listenerClients.size() > 0) {
-            logInfo("Disconnecting " + listenerClients.size() + " listeners clients");
-            for (SchedulerListenerClient client : listenerClients) {
-                try {
-                    client.printEventsAndDisconnect();
-                } catch (Exception e) {
-                    logError("Failed to disconnect listener: " + e, e);
+        try {
+            if (listenerClients.size() > 0) {
+                logInfo("Disconnecting " + listenerClients.size() + " listeners clients");
+                for (SchedulerListenerClient client : listenerClients) {
+                    try {
+                        client.printEventsAndDisconnect();
+                    } catch (Exception e) {
+                        logError("Failed to disconnect listener: " + e, e);
+                    }
                 }
+                logInfo("All listeners clients are disconnected");
             }
-            logInfo("All listeners clients are disconnected");
+        } finally {
+            JVMKillerThread.startKillerThreadIfNonGUIMode(10000, getLogger());
         }
-
-        JVMKillerThread.startKillerThreadIfNonGUIMode(10000, getLogger());
     }
 
     @Override

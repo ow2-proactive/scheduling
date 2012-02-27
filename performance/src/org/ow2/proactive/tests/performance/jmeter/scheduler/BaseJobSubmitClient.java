@@ -132,15 +132,7 @@ public abstract class BaseJobSubmitClient extends BaseJMeterSchedulerClient {
 
         JobResult jobResult = scheduler.getJobResult(jobId);
         if (waitOK) {
-            boolean hasErrors = false;
-            for (TaskResult taskResult : jobResult.getAllResults().values()) {
-                if (taskResult.hadException()) {
-                    hasErrors = true;
-                    break;
-                }
-            }
-            result.setSuccessful(!hasErrors);
-            result.setResponseMessage("Some job tasks had exceptions");
+            checkJobResult(jobResult, result);
         } else {
             result.setSuccessful(false);
             result.setResponseMessage("Job was submitted, but didn't finish as expected");
@@ -156,6 +148,18 @@ public abstract class BaseJobSubmitClient extends BaseJMeterSchedulerClient {
         }
 
         return result;
+    }
+
+    protected void checkJobResult(JobResult jobResult, SampleResult result) throws Exception {
+        boolean hasErrors = false;
+        for (TaskResult taskResult : jobResult.getAllResults().values()) {
+            if (taskResult.hadException()) {
+                hasErrors = true;
+                break;
+            }
+        }
+        result.setSuccessful(!hasErrors);
+        result.setResponseMessage("Some job tasks had exceptions");
     }
 
     protected final JavaTask createSimpleJavaTask(boolean fork) {

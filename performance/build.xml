@@ -232,6 +232,7 @@
             <delete file="${basedir}/results/@{testplan}.html" />
             <chmod file="${basedir}/src/org/ow2/proactive/tests/performance/jmeter/scheduler/nativeTask.sh" perm="ugo+rx" />
             <chmod file="${basedir}/src/org/ow2/proactive/tests/performance/jmeter/scheduler/sleep_forever_nativeTask.sh" perm="ugo+rx" />
+            <chmod file="${basedir}/src/org/ow2/proactive/tests/performance/jmeter/scheduler/failing_nativeTask.sh" perm="ugo+rx" />
 
             <jmeter failureProperty="scheduler-@{testplan}-failed" jmeterhome="${jmeterhome}" testplan="${basedir}/jmeter/testplans/@{testplan}.jmx" resultlog="${basedir}/results/@{testplan}.jtl">
                 <jvmarg value="-Djava.security.policy=${basedir}/config/grant.all.java.policy" />
@@ -271,6 +272,10 @@
                 <property name="loopTasksSubmitTaskType" value="${loopTasksSubmitTaskType}" />
 
                 <property name="sampleJobUsersNumber" value="${sampleJobUsersNumber}" />
+
+                <property name="failingTasksUsersNumber" value="${failingTasksUsersNumber}" />
+                <property name="failingTaskSubmitTaskType" value="${failingTaskSubmitTaskType}" />
+                <property name="failingTaskSubmitRestartMode" value="${failingTaskSubmitRestartMode}" />
 
                 <property name="submitAndKillUsersNumber" value="${submitAndKillUsersNumber}" />
                 <property name="submitAndKillTasksUsersNumber" value="${submitAndKillTasksUsersNumber}" />
