@@ -40,7 +40,7 @@ import javax.management.remote.JMXAuthenticator;
 import javax.security.auth.Subject;
 import javax.security.auth.login.LoginException;
 
-import org.ow2.proactive.authentication.AuthenticationImpl;
+import org.ow2.proactive.authentication.Authentication;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 
@@ -54,15 +54,20 @@ import org.ow2.proactive.authentication.crypto.Credentials;
 public final class JMXAuthenticatorImpl implements JMXAuthenticator {
 
     /** reference to the authentication Object */
-    private final AuthenticationImpl authentication;
+    private final Authentication authentication;
+
+    /** extra permission checker */
+    private final PermissionChecker permissionChecker;
 
     /**
      * Constructor to assign the values to the global variables 
      *
      * @param authentication the authentication object that is actually used 
+     * @param permissionChecker 
      */
-    public JMXAuthenticatorImpl(final AuthenticationImpl authentication) {
+    public JMXAuthenticatorImpl(final Authentication authentication, PermissionChecker permissionChecker) {
         this.authentication = authentication;
+        this.permissionChecker = permissionChecker;
     }
 
     /**
@@ -103,7 +108,14 @@ public final class JMXAuthenticatorImpl implements JMXAuthenticator {
             throw new SecurityException("Invalid credentials");
         }
         try {
-            return this.authentication.authenticate(internalCredentials);
+            Subject s = this.authentication.authenticate(internalCredentials);
+            if (permissionChecker != null) {
+                boolean allowed = permissionChecker.checkPermission(internalCredentials);
+                if (!allowed) {
+                    throw new SecurityException("Permission denied");
+                }
+            }
+            return s;
         } catch (LoginException e) {
             throw new SecurityException("Unable to authenticate " + username);
         }

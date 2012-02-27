@@ -440,15 +440,15 @@ public class UserRMProxy implements ResourceManager, RunActive {
     /**
      * {@inheritDoc}
      */
-    public void setNodeInfo(String nodeUrl, String nodeInfo) {
-        rm.setNodeInfo(nodeUrl, nodeInfo);
+    public BooleanWrapper isNodeAdmin(String nodeUrl) {
+        return rm.isNodeAdmin(nodeUrl);
     }
 
     /**
      * {@inheritDoc}
      */
-    public String getNodeInfo(String nodeUrl) {
-        return rm.getNodeInfo(nodeUrl);
+    public BooleanWrapper isNodeUser(String nodeUrl) {
+        return rm.isNodeUser(nodeUrl);
     }
 
     /**

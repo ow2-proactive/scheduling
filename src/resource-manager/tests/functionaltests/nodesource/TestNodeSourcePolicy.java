@@ -47,6 +47,7 @@ import java.util.List;
 
 import org.junit.Assert;
 import org.objectweb.proactive.core.node.NodeException;
+import org.ow2.proactive.jmx.naming.JMXTransportProtocol;
 import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
@@ -206,10 +207,10 @@ public class TestNodeSourcePolicy extends FunctionalTest {
         public void setLastEvent(RMNodeEvent lastEvent) {
         }
 
-        public void setInfo(String nodeProperties) {
+        public void setJMXUrl(JMXTransportProtocol protocol, String address) {
         }
 
-        public String getInfo() {
+        public String getJMXUrl(JMXTransportProtocol protocol) {
             return null;
         }
 

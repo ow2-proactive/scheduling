@@ -597,7 +597,8 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      * 
      * @param nodeURL the node's url of the node that is going to be added
      */
-    public void internalAddNodeToCore(String nodeURL) {
+    public void internalAddNodeToCore(RMNode configuredNode) {
+        String nodeURL = configuredNode.getNodeURL();
         if (!this.allNodes.containsKey(nodeURL)) {
             //does nothing, the node has been removed preemptively
             //during its configuration
@@ -606,7 +607,8 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             return;
         }
         //was added during internalRegisterConfiguringNode
-        RMNode rmnode = this.allNodes.get(nodeURL);
+        RMNode rmnode = this.allNodes.remove(nodeURL);
+        this.allNodes.put(nodeURL, configuredNode);
 
         if (toShutDown) {
             logger.warn("Node " + rmnode.getNodeURL() +
@@ -629,7 +631,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             return;
         }
 
-        internalSetFree(rmnode);
+        internalSetFree(configuredNode);
     }
 
     /**
@@ -1613,38 +1615,45 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     /**
      * {@inheritDoc}
      */
-    public void setNodeInfo(String nodeUrl, String nodeInfo) {
-        RMNode node = allNodes.get(nodeUrl);
-        if (node == null) {
+    public BooleanWrapper isNodeAdmin(String nodeUrl) {
+        RMNode rmnode = getNodebyUrl(nodeUrl);
+
+        if (rmnode == null) {
             throw new IllegalArgumentException("Unknown node " + nodeUrl);
         }
 
-        node.setInfo(nodeInfo);
+        try {
+            caller.checkPermission(rmnode.getAdminPermission(), caller +
+                " is not authorized to administrate the node " + rmnode.getNodeURL() + " from " +
+                rmnode.getNodeSource().getName());
+        } catch (SecurityException e) {
+            // client does not have an access to this node
+            logger.debug(e.getMessage());
+            return new BooleanWrapper(false);
+        }
+        return new BooleanWrapper(true);
     }
 
     /**
      * {@inheritDoc}
      */
-    public String getNodeInfo(String nodeUrl) {
-        RMNode node = allNodes.get(nodeUrl);
-        if (node == null) {
-            // might be deploying node
-            for (NodeSource s : this.nodeSources.values()) {
-                for (RMDeployingNode dNode : s.getDeployingNodes()) {
-                    if (dNode.getNodeURL().equals(nodeUrl)) {
-                        node = dNode;
-                        break;
-                    }
-                }
-            }
+    public BooleanWrapper isNodeUser(String nodeUrl) {
+        RMNode rmnode = getNodebyUrl(nodeUrl);
 
-            if (node != null) {
-                return node.getInfo();
-            }
+        if (rmnode == null) {
             throw new IllegalArgumentException("Unknown node " + nodeUrl);
         }
 
-        return node.getInfo();
+        try {
+            caller.checkPermission(rmnode.getUserPermission(), caller +
+                " is not authorized to run computations on the node " + rmnode.getNodeURL() + " from " +
+                rmnode.getNodeSource().getName());
+        } catch (SecurityException e) {
+            // client does not have an access to this node
+            logger.debug(e.getMessage());
+            return new BooleanWrapper(false);
+        }
+        return new BooleanWrapper(true);
     }
 
     /**

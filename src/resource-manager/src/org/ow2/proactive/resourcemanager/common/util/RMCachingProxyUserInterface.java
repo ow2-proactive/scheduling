@@ -36,14 +36,31 @@
  */
 package org.ow2.proactive.resourcemanager.common.util;
 
+import java.io.IOException;
 import java.security.KeyException;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 
+import javax.management.Attribute;
+import javax.management.AttributeList;
+import javax.management.InstanceNotFoundException;
+import javax.management.IntrospectionException;
+import javax.management.MalformedObjectNameException;
+import javax.management.ObjectName;
+import javax.management.ReflectionException;
+import javax.management.openmbean.CompositeData;
+import javax.management.remote.JMXConnector;
+import javax.management.remote.JMXConnectorFactory;
+import javax.management.remote.JMXServiceURL;
 import javax.security.auth.login.LoginException;
 
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.jmx.JMXClientHelper;
+import org.ow2.proactive.jmx.provider.JMXProviderUtils;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.common.event.RMEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
@@ -67,13 +84,19 @@ import org.ow2.proactive.resourcemanager.frontend.RMMonitoringImpl;
 @ActiveObject
 public class RMCachingProxyUserInterface extends RMProxyUserInterface implements RMEventListener {
 
+    protected RMAuthentication rmAuth;
     protected RMMonitoringImpl rmMonitoring;
     protected RMInitialState rmInitialState;
     protected RMEventType RMstate;
+    protected Credentials credentials;
+
+    protected JMXConnector nodeConnector;
+    protected String nodeConnectorUrl;
 
     public boolean init(String url, Credentials credentials) throws RMException, KeyException, LoginException {
 
-        RMAuthentication rmAuth = RMConnection.join(url);
+        this.credentials = credentials;
+        this.rmAuth = RMConnection.join(url);
         this.target = rmAuth.login(credentials);
 
         rmInitialState = this.target.getMonitoring().addRMEventListener(
@@ -158,4 +181,139 @@ public class RMCachingProxyUserInterface extends RMProxyUserInterface implements
         return rmInitialState;
     }
 
+    /**
+     * Retrieves attributes of the specified mbean.
+     * 
+     * @param sessionId current session
+     * @param name of mbean
+     * @param nodeJmxUrl mbean server url
+     * @param attrs set of mbean attributes
+     * 
+     * @return mbean attributes values
+     */
+    public Object getNodeMBeanInfo(String nodeJmxUrl, String objectName, List<String> attrs)
+            throws IOException, InstanceNotFoundException, IntrospectionException,
+            MalformedObjectNameException, ReflectionException, NullPointerException {
+
+        initNodeConnector(nodeJmxUrl);
+
+        if ((attrs == null) || (attrs.size() == 0)) {
+            // no attribute is requested, we return
+            // the description of the mbean
+            return nodeConnector.getMBeanServerConnection().getMBeanInfo(new ObjectName(objectName));
+        } else {
+
+            List<Object> result = new LinkedList<Object>();
+            AttributeList attributes = nodeConnector.getMBeanServerConnection().getAttributes(
+                    new ObjectName(objectName), attrs.toArray(new String[] {}));
+
+            for (Object attrObj : attributes) {
+                if (attrObj instanceof Attribute) {
+                    // when data from MXBean is requested
+                    // convert the composite data (see MXBean spec) into
+                    // readable values
+                    Attribute attr = (Attribute) attrObj;
+                    Object value = attr.getValue();
+                    if (value instanceof CompositeData[]) {
+                        CompositeData[] valueArr = (CompositeData[]) value;
+                        Object[] converted = new Object[valueArr.length];
+                        for (int i = 0; i < valueArr.length; i++) {
+                            converted[i] = convertCompositeData(valueArr[i]);
+                        }
+                        attr = new Attribute(attr.getName(), converted);
+                    }
+                    if (value instanceof CompositeData) {
+                        CompositeData compositeData = (CompositeData) value;
+                        attr = new Attribute(attr.getName(), convertCompositeData(compositeData));
+                    }
+
+                    result.add(attr);
+                }
+            }
+
+            return result;
+        }
+    }
+
+    /**
+     * Converts MXBean composite data to json serializable values 
+     */
+    private Object convertCompositeData(CompositeData compositeData) {
+        HashMap<String, Object> vals = new HashMap<String, Object>();
+        for (Object key : compositeData.getCompositeType().keySet()) {
+            vals.put(key.toString(), compositeData.get(key.toString()));
+        }
+        return vals;
+    }
+
+    /**
+     * Retrieves attributes of the specified mbeans.
+     * 
+     * @param sessionId current session
+     * @param objectNames mbean names (@see ObjectName format)
+     * @param nodeJmxUrl mbean server url
+     * @param attrs set of mbean attributes
+     * 
+     * @return mbean attributes values
+     */
+    public Object getNodeMBeansInfo(String nodeJmxUrl, String objectNames, List<String> attrs)
+            throws IOException, InstanceNotFoundException, IntrospectionException,
+            MalformedObjectNameException, ReflectionException, NullPointerException {
+
+        initNodeConnector(nodeJmxUrl);
+
+        Set<ObjectName> beans = nodeConnector.getMBeanServerConnection().queryNames(
+                new ObjectName(objectNames), null);
+
+        HashMap<String, Object> results = new HashMap<String, Object>();
+        for (ObjectName bean : beans) {
+            results
+                    .put(bean.getCanonicalName(),
+                            getNodeMBeanInfo(nodeJmxUrl, bean.getCanonicalName(), attrs));
+        }
+
+        return results;
+    }
+
+    /**
+     * Initializes mbean server connection to specified url.
+     * If the connection is already established returns existing
+     * connection. 
+     * 
+     * @param url mbean server url
+     * @return mbean server connection
+     * @throws IOException 
+     */
+    private void initNodeConnector(String url) throws IOException {
+
+        if (url == null) {
+            throw new NullPointerException("nodeJmxUrl cannot be null");
+        }
+
+        if (url.equals(nodeConnectorUrl) && nodeConnector != null) {
+            // already connected
+            return;
+        }
+
+        if (nodeConnector != null) {
+            nodeConnector.close();
+            nodeConnector = null;
+        }
+
+        final HashMap<String, Object> env = new HashMap<String, Object>(2);
+        env.put(JMXConnector.CREDENTIALS, new Object[] { "", credentials });
+        if (url.startsWith("service:jmx:ro")) {
+            env.put(JMXConnectorFactory.PROTOCOL_PROVIDER_PACKAGES, JMXProviderUtils.RO_PROVIDER_PKGS);
+        }
+        try {
+            nodeConnector = JMXConnectorFactory.connect(new JMXServiceURL(url), env);
+            nodeConnectorUrl = url;
+        } catch (IOException ex) {
+            if (ex.getCause() != null && ex.getCause() instanceof RuntimeException) {
+                throw (RuntimeException) ex.getCause();
+            } else {
+                throw ex;
+            }
+        }
+    }
 }

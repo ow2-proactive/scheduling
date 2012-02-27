@@ -46,6 +46,7 @@ else
     # Script engines must be added to classpath to be found
     # it must also placed before jars containing jar-index
     CLASSPATH=$CLASSPATH:"$PA_SCHEDULER/dist/lib/script-js.jar"
+    CLASSPATH=$CLASSPATH:"$PA_SCHEDULER/dist/lib/sigar/sigar.jar"
     CLASSPATH=$CLASSPATH:"$PA_SCHEDULER/dist/lib/jruby-engine.jar"
     CLASSPATH=$CLASSPATH:"$PA_SCHEDULER/dist/lib/jython-engine.jar"
     #  Needed explicitly by VFS (file transfer in pre/post script

@@ -320,18 +320,12 @@ public class RMProxyUserInterface implements ResourceManager {
         return this.jmxClient.getConnector().getMBeanServerConnection().getAttributes(name, attributes);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public void setNodeInfo(String nodeUrl, String nodeInfo) {
-        this.target.setNodeInfo(nodeUrl, nodeInfo);
+    public BooleanWrapper isNodeAdmin(String nodeUrl) {
+        return this.target.isNodeAdmin(nodeUrl);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public String getNodeInfo(String nodeUrl) {
-        return this.target.getNodeInfo(nodeUrl);
+    public BooleanWrapper isNodeUser(String nodeUrl) {
+        return this.target.isNodeUser(nodeUrl);
     }
 
     @Override

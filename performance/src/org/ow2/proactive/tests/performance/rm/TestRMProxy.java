@@ -61,6 +61,8 @@ import org.ow2.proactive.resourcemanager.frontend.RMMonitoring;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.frontend.topology.Topology;
 import org.ow2.proactive.resourcemanager.nodesource.common.PluginDescriptor;
+import org.ow2.proactive.scripting.Script;
+import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
 import org.ow2.proactive.utils.NodeSet;
@@ -188,14 +190,15 @@ public class TestRMProxy implements ResourceManager {
         return this.target.unlockNodes(urls);
     }
 
-    @Override
-    public void setNodeInfo(String nodeUrl, String nodeInfo) {
-        this.target.setNodeInfo(nodeUrl, nodeInfo);
+    public BooleanWrapper isNodeAdmin(String nodeUrl) {
+        return target.isNodeAdmin(nodeUrl);
     }
 
-    @Override
-    public String getNodeInfo(String nodeUrl) {
-        return this.target.getNodeInfo(nodeUrl);
+    public BooleanWrapper isNodeUser(String nodeUrl) {
+        return target.isNodeUser(nodeUrl);
     }
 
+    public <T> List<ScriptResult<T>> executeScript(Script<T> script, String targetType, Set<String> targets) {
+        return target.executeScript(script, targetType, targets);
+    }
 }

@@ -333,18 +333,16 @@ public interface ResourceManager {
     public Topology getTopology();
 
     /**
-     * Sets node info in JSON format
-     * @param nodeUrl is an url of the node
-     * @param nodeInfo is a json string
+     * Checks if the currently connected user is the node administrator
+     * @return true if yes, false otherwise
      */
-    public void setNodeInfo(String nodeUrl, String nodeInfo);
+    public BooleanWrapper isNodeAdmin(String nodeUrl);
 
     /**
-     * Gets node info in JSON format
-     * 
-     * @param nodeUrl is an url of the node
+     * Checks if the currently connected user can use node for computations
+     * @return true if yes, false otherwise
      */
-    public String getNodeInfo(String nodeUrl);
+    public BooleanWrapper isNodeUser(String nodeUrl);
 
     /**
      * Executes the script on the specified targets depending on the target type {@link TargetType}.

@@ -45,6 +45,7 @@ import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.ow2.proactive.authentication.principals.UserNamePrincipal;
+import org.ow2.proactive.jmx.naming.JMXTransportProtocol;
 import org.ow2.proactive.permissions.PrincipalPermission;
 import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.common.NodeState;
@@ -131,7 +132,7 @@ public class RMNodeImpl implements RMNode, Serializable {
     /** The last event */
     private RMNodeEvent lastEvent;
 
-    private String nodeInfo;
+    private String[] jmxUrls;
 
     /** Create an RMNode Object.
      * A Created node begins to be free.
@@ -154,6 +155,7 @@ public class RMNodeImpl implements RMNode, Serializable {
         this.stateChangeTime = System.currentTimeMillis();
         this.addEvent = null;
         this.lastEvent = null;
+        this.jmxUrls = new String[JMXTransportProtocol.values().length];
     }
 
     /**
@@ -336,6 +338,10 @@ public class RMNodeImpl implements RMNode, Serializable {
         sb.append("Used by : " + (owner == null ? "nobody" : owner.getName()));
         sb.append(lf);
         sb.append("State : " + state);
+        sb.append(lf);
+        sb.append("JMX RMI: " + getJMXUrl(JMXTransportProtocol.RMI));
+        sb.append(lf);
+        sb.append("JMX RO: " + getJMXUrl(JMXTransportProtocol.RO));
         return sb.toString();
     }
 
@@ -513,30 +519,11 @@ public class RMNodeImpl implements RMNode, Serializable {
     /**
      * {@inheritDoc}
      */
-    public void setInfo(String nodeInfo) {
-        this.nodeInfo = nodeInfo;
+    public void setJMXUrl(JMXTransportProtocol protocol, String address) {
+        jmxUrls[protocol.ordinal()] = address;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public String getInfo() {
-        return "{\"Resource Manager Node Info\": " + rmNodeInfo() + ", \"Detailed Node Info\":" + nodeInfo +
-            "}";
+    public String getJMXUrl(JMXTransportProtocol protocol) {
+        return jmxUrls[protocol.ordinal()];
     }
-
-    public String rmNodeInfo() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("{");
-        sb.append("\"name\": \"" + this.getNodeName() + "\",");
-        sb.append("\"url\": \"" + this.getNodeURL() + "\",");
-        sb.append("\"node_source\": \"" + this.getNodeSourceName() + "\",");
-        sb.append("\"provider\": \"" + this.getProvider().getName() + "\",");
-        sb.append("\"user\": \"" + (owner == null ? "nobody" : owner.getName()) + "\",");
-        sb.append("\"state\": \"" + this.getState() + "\"");
-        sb.append("}");
-
-        return sb.toString();
-    }
-
 }

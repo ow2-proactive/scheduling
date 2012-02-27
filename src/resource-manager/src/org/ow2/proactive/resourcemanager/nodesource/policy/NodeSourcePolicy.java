@@ -79,7 +79,7 @@ public abstract class NodeSourcePolicy implements Serializable {
 
     // Users who can add/remove nodes to/from this node source
     @Configurable(description = "ME|users=name1,name2,groups=group1,group2|ALL")
-    private AccessType provideerAccessType = AccessType.ME;
+    private AccessType providerAccessType = AccessType.ME;
 
     /**
      * Configure a policy with given parameters.
@@ -94,7 +94,7 @@ public abstract class NodeSourcePolicy implements Serializable {
                 throw new IllegalArgumentException("Incorrect parameter value " + policyParameters[0]);
             }
             try {
-                provideerAccessType = AccessType.valueOf(policyParameters[1].toString());
+                providerAccessType = AccessType.valueOf(policyParameters[1].toString());
             } catch (IllegalArgumentException e) {
                 throw new IllegalArgumentException("Incorrect parameter value " + policyParameters[1]);
             }
@@ -216,7 +216,7 @@ public abstract class NodeSourcePolicy implements Serializable {
      * @return a node source administration type
      */
     public AccessType getProviderAccessType() {
-        return provideerAccessType;
+        return providerAccessType;
     }
 
     /**
@@ -235,6 +235,6 @@ public abstract class NodeSourcePolicy implements Serializable {
     @Override
     public String toString() {
         return NamesConvertor.beautifyName(this.getClass().getSimpleName()) + " user access type [" +
-            userAccessType + "]" + ", provider access type [" + provideerAccessType + "]";
+            userAccessType + "]" + ", provider access type [" + providerAccessType + "]";
     }
 }

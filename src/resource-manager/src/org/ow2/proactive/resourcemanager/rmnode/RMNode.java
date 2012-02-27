@@ -41,6 +41,7 @@ import java.util.HashMap;
 
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
+import org.ow2.proactive.jmx.naming.JMXTransportProtocol;
 import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
@@ -250,7 +251,7 @@ public interface RMNode extends Comparable<RMNode> {
     public void setBusy(Client owner) throws NodeException;
 
     /**
-     * change the node's status to 'to release'.
+     *  * change the node's status to 'to release'.
      * @throws NodeException if the node is down
      */
     public void setToRemove() throws NodeException;
@@ -282,16 +283,20 @@ public interface RMNode extends Comparable<RMNode> {
     public void setLastEvent(final RMNodeEvent lastEvent);
 
     /**
-     * Sets node info in JSON format
+     * Sets the jmx url of the node.
      * 
-     * @param nodeInfo is a json string
+     * @param jmx protocol to be used for accessing the node
+     * @param address url of the jmx server
+     * 
      */
-    public void setInfo(String nodeProperties);
+    public void setJMXUrl(JMXTransportProtocol protocol, String address);
 
     /**
-     * Gets node info in JSON format
+     * Gets the JMX url of the node.
      * 
+     * @param jmx protocol to be used for accessing the node
+     * 
+     * @return a jmx url 
      */
-    public String getInfo();
-
+    public String getJMXUrl(JMXTransportProtocol protocol);
 }

@@ -43,6 +43,7 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
+import org.ow2.proactive.jmx.naming.JMXTransportProtocol;
 import org.ow2.proactive.resourcemanager.core.RMCore;
 import org.ow2.proactive.resourcemanager.nodesource.dataspace.DataSpaceNodeConfigurationAgent;
 import org.ow2.proactive.resourcemanager.rmnode.RMNode;
@@ -91,9 +92,16 @@ public class RMNodeConfigurator {
                 logger.debug("Data spaces is already configured for node " +
                     nodeToAdd.getNodeInformation().getURL());
             }
+
+            // setting node JMX connector urls
+            rmnodeToAdd.setJMXUrl(JMXTransportProtocol.RMI, nodeToAdd.getProperty(RMNodeStarter.JMX_URL +
+                JMXTransportProtocol.RMI));
+            rmnodeToAdd.setJMXUrl(JMXTransportProtocol.RO, nodeToAdd.getProperty(RMNodeStarter.JMX_URL +
+                JMXTransportProtocol.RO));
+
             // blocking call involving running ping process on the node
             RMCore.topologyManager.addNode(nodeToAdd);
-            rmcore.internalAddNodeToCore(nodeURL);
+            rmcore.internalAddNodeToCore(rmnodeToAdd);
         } catch (Exception e) {
             logger.warn("Cannot properly configure the node " + nodeURL +
                 " because of an error during configuration phase", e);

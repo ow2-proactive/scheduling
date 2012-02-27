@@ -51,6 +51,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+import javax.security.auth.login.LoginException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
@@ -70,12 +71,15 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.authentication.crypto.Credentials;
+import org.ow2.proactive.jmx.PermissionChecker;
+import org.ow2.proactive.jmx.naming.JMXTransportProtocol;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.common.RMConstants;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.exception.AddingNodesException;
 import org.ow2.proactive.resourcemanager.frontend.RMConnection;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
+import org.ow2.proactive.resourcemanager.node.jmx.SigarExposer;
 import org.ow2.proactive.resourcemanager.nodesource.dataspace.DataSpaceNodeConfigurationAgent;
 import org.ow2.proactive.utils.console.JVMPropertiesPreloader;
 import org.w3c.dom.Document;
@@ -95,6 +99,7 @@ public class RMNodeStarter {
     protected String rmURL = null;
     protected String nodeName = RMNodeStarter.PAAGENT_DEFAULT_NODE_NAME;
     protected String nodeSourceName = null;
+    protected Node node;
 
     /** Class' logger */
     protected static final Logger logger = ProActiveLogger.getLogger(RMLoggers.RMNODE);
@@ -148,21 +153,8 @@ public class RMNodeStarter {
     /** Name of the java property to set the node source name */
     protected final static String NODESOURCE_PROP_NAME = "proactive.node.nodesource";
 
-    /** Default dynamic scripts execution period */
-    public final static int DYNAMIC_SCRIPTS_DEFAULT_PERIOD = 60 * 1000; // 1 min
-    /** Period can be changed using this property */
-    public final static String DYNAMIC_SCRIPTS_PERIOD_PROPERTY = "proactive.node.script.period";
-    /** Default scripts execution mode */
-    public final static boolean SCRIPT_EXCUTION_ENABLED = false;
-    /** Disables or enables the scripts execution */
-    public final static String SCRIPT_EXCUTION_ENABLED_PROPERTY = "proactive.node.script.enabled";
-    /** Default scripts execution timeout */
-    public final static int SCRIPT_EXCUTION_DEFAULT_TIMEOUT = 10000;// 10 secs
-    /** Property defining the scripts execution */
-    public final static String SCRIPT_EXCUTION_TIMEOUT_PROPERTY = "proactive.node.script.timout";
-
-    /** jvm, proactive, host information */
-    private RMNodeInformation nodeInfo;
+    /** Name of the node property that stores the Sigar JMX connection URL*/
+    public static final String JMX_URL = "proactive.node.jmx.sigar.";
 
     // The url of the created node
     protected String nodeURL = "Not defined";
@@ -170,6 +162,9 @@ public class RMNodeStarter {
     protected int rank;
     // if true, previous nodes with different URLs are removed from the RM
     protected boolean removePrevious;
+
+    // Sigar JMX beans
+    protected SigarExposer sigarExposer;
 
     public static final char OPTION_CREDENTIAL_FILE = 'f';
     public static final char OPTION_CREDENTIAL_ENV = 'e';
@@ -296,10 +291,9 @@ public class RMNodeStarter {
     }
 
     protected void doMain(final String args[]) {
-
         this.parseCommandLine(args);
         this.readAndSetTheRank();
-        Node node = this.createLocalNode(nodeName);
+        this.node = this.createLocalNode(nodeName);
         this.nodeURL = node.getNodeInformation().getURL();
         System.out.println(this.nodeURL);
 
@@ -311,15 +305,6 @@ public class RMNodeStarter {
 
         if (rmURL != null) {
             ResourceManager rm = this.registerInRM(credentials, rmURL, nodeName, nodeSourceName);
-
-            try {
-                // start script execution here if required
-                this.nodeInfo = new RMNodeInformation(node);
-                rm.setNodeInfo(this.getNodeURL(), nodeInfo.getNodeInfo());
-            } catch (RuntimeException e) {
-                logger.error("Cannot initialize node properties", e);
-                System.exit(ExitStatus.RMNODE_EXIT_FORCED.exitCode);
-            }
 
             if (rm != null) {
                 System.out.println("Connected to the Resource Manager at " + rmURL +
@@ -333,13 +318,7 @@ public class RMNodeStarter {
                 // infrastructure manager
                 if (PING_DELAY_IN_MS > 0) {
                     try {
-                        while (true) {
-                            if (nodeInfo.isUpdated()) {
-                                rm.setNodeInfo(this.getNodeURL(), nodeInfo.getNodeInfo());
-                            } else if (!rm.nodeIsAvailable(this.getNodeURL()).getBooleanValue()) {
-                                break;
-                            }
-
+                        while (rm.nodeIsAvailable(this.getNodeURL()).getBooleanValue()) {
                             try {
                                 Thread.sleep(PING_DELAY_IN_MS);
                             } catch (InterruptedException e) {
@@ -698,6 +677,37 @@ public class RMNodeStarter {
             System.exit(ExitStatus.RMNODE_ADD_ERROR.exitCode);
         }
 
+        // initializing JMX server with Sigar beans
+        sigarExposer = new SigarExposer();
+        final RMAuthentication rmAuth = auth;
+        sigarExposer.boot(auth, false, new PermissionChecker() {
+            public boolean checkPermission(Credentials cred) {
+                ResourceManager rm = null;
+                try {
+                    rm = rmAuth.login(cred);
+                    boolean isAdmin = rm.isNodeAdmin(node.getNodeInformation().getURL()).getBooleanValue();
+                    if (!isAdmin) {
+                        throw new SecurityException("Permission denied");
+                    }
+                    return isAdmin;
+                } catch (LoginException e) {
+                    throw new SecurityException(e);
+                } finally {
+                    if (rm != null) {
+                        rm.disconnect();
+                    }
+                }
+            }
+        });
+        try {
+            node.setProperty(JMX_URL + JMXTransportProtocol.RMI, sigarExposer.getAddress(
+                    JMXTransportProtocol.RMI).toString());
+            node.setProperty(JMX_URL + JMXTransportProtocol.RO, sigarExposer.getAddress(
+                    JMXTransportProtocol.RO).toString());
+        } catch (Exception e) {
+            logger.error("", e);
+        }
+
         // 4 - Add the created node to the Resource Manager with a specified
         // number of attempts and a timeout between each attempt
         boolean isNodeAdded = false;
@@ -743,12 +753,12 @@ public class RMNodeStarter {
         }// while
 
         if (!isNodeAdded) {
+            // if not registered
             System.out.println("The Resource Manager was unable to add the local node " + this.nodeURL +
                 " after " + NB_OF_ADD_NODE_ATTEMPTS + " attempts. The application will exit.");
             System.err.println(ExitStatus.RMNODE_ADD_ERROR.description);
             System.exit(ExitStatus.RMNODE_ADD_ERROR.exitCode);
-        }// if not registered
-
+        }
         return rm;
     }
 
@@ -899,8 +909,8 @@ public class RMNodeStarter {
         private Properties paPropProperties;
         private String paPropString;
         private int addAttempts = -1, addAttemptsDelay = -1;
-        private final String[] requiredJARs = { "script-js.jar", "gson-2.1.jar",
-                "jruby-engine.jar",
+        private final String[] requiredJARs = { "script-js.jar", "jruby-engine.jar",
+                "sigar/sigar.jar",
                 "jython-engine.jar",
                 "commons-logging-1.1.1.jar",
                 "ProActive_Scheduler-core.jar",// SCHEDULING-1338 and SCHEDULING-1307 : core required for forked java task

@@ -32,6 +32,7 @@
 			<include name="common/**/*.jar"/>
 			<include name="nodesource/**/*.jar"/>
 			<include name="resource-manager/**/*.jar"/>
+			<include name="node/**/*.jar"/>
 		</fileset>
 		<pathelement location="${cl.common.dir}" />
 		<pathelement location="${base.dir}/compile/lib/junit-4.3.jar"/>

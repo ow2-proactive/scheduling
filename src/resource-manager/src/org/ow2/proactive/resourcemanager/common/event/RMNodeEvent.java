@@ -39,6 +39,7 @@ package org.ow2.proactive.resourcemanager.common.event;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
+import org.ow2.proactive.jmx.naming.JMXTransportProtocol;
 import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.frontend.RMMonitoring;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
@@ -98,6 +99,12 @@ public final class RMNodeEvent extends RMEvent {
     /** The description of the node */
     private String description;
 
+    /** The node's default JMX url */
+    private String defaultJMXUrl;
+
+    /** The node's proactive JMX url */
+    private String proactiveJMXUrl;
+
     /**
      * ProActive empty constructor
      */
@@ -113,6 +120,8 @@ public final class RMNodeEvent extends RMEvent {
         this.nodeProvider = null;
         this.nodeOwner = null;
         this.description = null;
+        this.defaultJMXUrl = null;
+        this.proactiveJMXUrl = null;
     }
 
     /**
@@ -144,6 +153,8 @@ public final class RMNodeEvent extends RMEvent {
         this.VMName = rmNode.getDescriptorVMName();
         this.nodeState = rmNode.getState();
         this.description = rmNode.toString();
+        this.defaultJMXUrl = rmNode.getJMXUrl(JMXTransportProtocol.RMI);
+        this.proactiveJMXUrl = rmNode.getJMXUrl(JMXTransportProtocol.RO);
 
         // when node is requested to be removed
         // there is no state change in the node itself
@@ -281,6 +292,22 @@ public final class RMNodeEvent extends RMEvent {
      */
     public String getNodeInfo() {
         return this.description;
+    }
+
+    /**
+     * Gets the node default JMX url.
+     * @return the node default JMX url
+     */
+    public String getDefaultJMXUrl() {
+        return defaultJMXUrl;
+    }
+
+    /**
+     * Gets the node proactive JMX url.
+     * @return the node proactive JMX url
+     */
+    public String getProactiveJMXUrl() {
+        return proactiveJMXUrl;
     }
 
 }

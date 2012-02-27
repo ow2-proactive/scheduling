@@ -40,8 +40,10 @@ import java.io.Serializable;
 import java.security.PublicKey;
 
 import javax.management.JMException;
+import javax.security.auth.Subject;
 import javax.security.auth.login.LoginException;
 
+import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.jmx.naming.JMXTransportProtocol;
 
 
@@ -93,5 +95,16 @@ public interface Authentication extends Loggable, Serializable {
      * @return the URL of this Instance.
      */
     public String getHostURL();
+
+    /**
+     * Performs login
+     * 
+     * @param role the role of the user to connect, can be admin or user
+     * @param groups the group in which the user is
+     * @param cred encrypted username and password
+     * @return the name of the user logged
+     * @throws LoginException if username or password is incorrect.
+     */
+    public Subject authenticate(Credentials cred) throws LoginException;
 
 }

@@ -36,6 +36,7 @@
  */
 package org.ow2.proactive.jmx;
 
+import java.lang.management.ManagementFactory;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.rmi.RemoteException;
@@ -54,6 +55,7 @@ import javax.management.remote.JMXServiceURL;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.ProActiveInet;
+import org.ow2.proactive.authentication.Authentication;
 import org.ow2.proactive.authentication.AuthenticationImpl;
 import org.ow2.proactive.jmx.naming.JMXTransportProtocol;
 import org.ow2.proactive.jmx.provider.JMXProviderUtils;
@@ -107,7 +109,7 @@ public abstract class AbstractJMXHelper {
     }
 
     /**
-     * Starts the boot sequence of of the JMX monitoring infrastructure.
+     * Starts the boot sequence of of the JMX monitoring infrastructure with a new JMX server.
      * <p>
      * <ul>
      * <li>Creates a new RMI registry or reuses an existing one needed for the JMX RMI connector server.
@@ -119,18 +121,42 @@ public abstract class AbstractJMXHelper {
      * @param auth the object responsible for authentication
      * @return <code>true</code> if the boot sequence was successful (at least one of two connector servers were started), otherwise returns <code>false</code>
      */
-    public final boolean boot(final AuthenticationImpl auth) {
+    public final boolean boot(final Authentication auth) {
+        return boot(auth, true, null);
+    }
+
+    /**
+     * Starts the boot sequence of of the JMX monitoring infrastructure.
+     * <p>
+     * <ul>
+     * <li>Creates a new RMI registry or reuses an existing one needed for the JMX RMI connector server.
+     * <li>Create a a single MBean server for both administrator users and for anonymous users.
+     * <li>Registers the MBeans into the MBean server.
+     * <li>Creates and starts the connector servers, one over RMI and one over RO.
+     * </ul>
+     *
+     * @param auth the object responsible for authentication
+     * @param createNewServer defined is new JMX server will be created or default will be used. 
+     * @param permissionChecker additional permission checker
+     * @return <code>true</code> if the boot sequence was successful (at least one of two connector servers were started), otherwise returns <code>false</code>
+     */
+    public final boolean boot(final Authentication auth, boolean createNewServer,
+            PermissionChecker permissionChecker) {
         // Create a single MBean server
         MBeanServer mbs = null;
         try {
-            mbs = MBeanServerFactory.createMBeanServer();
+            if (createNewServer) {
+                mbs = MBeanServerFactory.createMBeanServer();
+            } else {
+                mbs = ManagementFactory.getPlatformMBeanServer();
+            }
         } catch (Exception e) {
             logger.error(jmxRmiFailureReason = jmxRoFailureReason = "Unable to create the JMX MBean server",
                     e);
             return false;
         }
         // Create an authenticator that will be used by the connectors
-        final JMXAuthenticator authenticator = new JMXAuthenticatorImpl(auth);
+        final JMXAuthenticator authenticator = new JMXAuthenticatorImpl(auth, permissionChecker);
 
         // Let sub-classes create a the MBean server forwarder
         this.registerMBeans(mbs);

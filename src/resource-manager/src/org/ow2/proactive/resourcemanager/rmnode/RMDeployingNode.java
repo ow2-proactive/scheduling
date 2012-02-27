@@ -43,6 +43,7 @@ import java.util.HashMap;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeInformation;
+import org.ow2.proactive.jmx.naming.JMXTransportProtocol;
 import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
@@ -438,39 +439,13 @@ public final class RMDeployingNode implements RMNode, Serializable {
         return sb.toString();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public void setInfo(String nodeProperties) {
-        throw new UnsupportedOperationException();
+    @Override
+    public void setJMXUrl(JMXTransportProtocol protocol, String address) {
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public String getInfo() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("{");
-        sb.append("\"name\": \"" + this.getNodeName() + "\",");
-        sb.append("\"url\": \"" + this.getNodeURL() + "\",");
-        sb.append("\"node_source\": \"" + this.getNodeSourceName() + "\",");
-        sb.append("\"provider\": \"" + this.getProvider().getName() + "\",");
-        sb.append("\"state\": \"" + this.getState() + "\",");
-        sb.append("\"description\": [");
-        boolean first = true;
-        for (String line : this.getDescription().split("\\r?\\n")) {
-            if (first) {
-                first = false;
-            } else {
-                sb.append(",");
-            }
-            sb.append("\"" + line + "\"");
-        }
-        sb.append("],");
-        sb.append("\"command\": \"" + this.getCommandLine() + "\"");
-        sb.append("}");
-
-        return sb.toString();
+    @Override
+    public String getJMXUrl(JMXTransportProtocol protocol) {
+        return null;
     }
 
 }
