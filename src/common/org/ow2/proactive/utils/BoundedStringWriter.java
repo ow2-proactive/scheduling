@@ -67,13 +67,19 @@ public class BoundedStringWriter extends Writer {
     /** {@inheritDoc} */
     @Override
     public void write(char[] c, int off, int len) {
-        char[] toPrint = new char[len];
-        System.arraycopy(c, off, toPrint, 0, len);
-        this.bld.append(toPrint);
-        if (this.bld.length() > this.maxSize) {
-            this.bld.delete(0, Math.abs(len - this.maxSize));
+        int nextLen = this.bld.length() + len;
+        if (nextLen <= this.maxSize) {
+            this.bld.append(c, off, len);
+        } else { // nextLen > this.maxSize    		
+            if (len <= this.maxSize) {
+                this.bld.delete(0, nextLen - this.maxSize);
+                this.bld.append(c, off, len);
+            } else {
+                this.bld.delete(0, this.maxSize);
+                this.bld.append(c, len - this.maxSize, this.maxSize);
+            }
         }
-        System.out.print(toPrint);
+        System.out.print(new String(c, off, len));
     }
 
     /**
@@ -105,5 +111,42 @@ public class BoundedStringWriter extends Writer {
      */
     @Override
     public void flush() throws IOException {
+    }
+
+    public static void main(String[] args) throws IOException {
+        { // test 0
+            BoundedStringWriter wr = new BoundedStringWriter(5);
+            wr.append("");
+            System.out.println("--> " + wr.toString() + " " + wr.toString().length());
+        }
+        { // test ==
+            BoundedStringWriter wr = new BoundedStringWriter(5);
+            wr.append("213");
+            System.out.println("--> " + wr.toString() + " " + wr.toString().length());
+            wr.append("22");
+            System.out.println("--> " + wr.toString() + " " + wr.toString().length());
+        }
+        { // test < 
+            BoundedStringWriter wr = new BoundedStringWriter(5);
+            wr.append("213");
+            System.out.println("--> " + wr.toString() + " " + wr.toString().length());
+            wr.append("2");
+            System.out.println("--> " + wr.toString() + " " + wr.toString().length());
+        }
+
+        { // test >
+            BoundedStringWriter wr = new BoundedStringWriter(5);
+            wr.append("213");
+            System.out.println("--> " + wr.toString() + " " + wr.toString().length());
+            wr.append("22222");
+            System.out.println("--> " + wr.toString() + " " + wr.toString().length());
+        }
+        { // test >>
+            BoundedStringWriter wr = new BoundedStringWriter(5);
+            wr.append("");
+            System.out.println("--> " + wr.toString() + " " + wr.toString().length());
+            wr.append("321321313213212222222222222222132");
+            System.out.println("--> " + wr.toString() + " " + wr.toString().length());
+        }
     }
 }
