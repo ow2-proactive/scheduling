@@ -27,6 +27,7 @@ CLASSPATH=$CLASSPATH:$RM_HOME_NODE/dist/lib/jruby-engine.jar
 CLASSPATH=$CLASSPATH:$RM_HOME_NODE/dist/lib/jython-engine.jar
 CLASSPATH=$CLASSPATH:$RM_HOME_NODE/dist/lib/commons-logging-1.1.1.jar
 CLASSPATH=$CLASSPATH:$RM_HOME_NODE/dist/lib/gson-2.1.jar
+CLASSPATH=$CLASSPATH:$RM_HOME_NODE/dist/lib/sigar/sigar.jar
 CLASSPATH=$CLASSPATH:$RM_HOME_NODE/dist/lib/ProActive_SRM-common.jar
 CLASSPATH=$CLASSPATH:$RM_HOME_NODE/dist/lib/ProActive_ResourceManager.jar
 CLASSPATH=$CLASSPATH:$RM_HOME_NODE/dist/lib/ProActive_Scheduler-worker.jar

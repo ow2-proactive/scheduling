@@ -186,6 +186,9 @@
 
                 <property name="rmUrl" value="@{targetRmUrl}" />
                 <property name="testTime" value="${testTime}" />
+                <property name="stopOnError" value="${stopOnError}" />
+                <property name="rmLogin" value="nsadmin" />
+                <property name="rmPassword" value="pwd" />
 
                 <jvmarg value="-Dtest.deploy.env.local.javaPath=${test.deploy.env.local.javaPath}" />
                 <jvmarg value="-Dtest.deploy.env.local.schedulingPath=${test.deploy.env.local.schedulingPath}" />
@@ -214,7 +217,7 @@
 
                 <jmeterarg value="-j" />
                 <jmeterarg value="${basedir}/results/jmeter.log" />
-
+                
             </jmeter>
 
             <xslt classpathref="xslt.classpath" in="${basedir}/results/@{testplan}.jtl" out="${basedir}/results/@{testplan}.html" style="${basedir}/jmeter/config/jmeter-results-report_21.xsl" />
@@ -244,6 +247,7 @@
                 <property name="schedulerUrl" value="@{targetSchedulerUrl}" />
                 <property name="schedulingPath" value="${test.deploy.env.local.schedulingPath}" />
                 <property name="testTime" value="${testTime}" />
+                <property name="stopOnError" value="${stopOnError}" />
 
                 <property name="schedulerListenersNumber" value="${schedulerListenersNumber}" />
 

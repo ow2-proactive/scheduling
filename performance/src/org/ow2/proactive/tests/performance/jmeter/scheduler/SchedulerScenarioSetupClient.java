@@ -132,7 +132,8 @@ public class SchedulerScenarioSetupClient extends BaseJMeterClient {
 
     @Override
     public Arguments getDefaultParameters() {
-        Arguments args = SchedulerConnectionParameters.getDefaultParameters();
+        Arguments args = super.getDefaultParameters();
+        SchedulerConnectionParameters.getDefaultParameters(args);
         args.addArgument(PARAM_LISTENERS_NUMBER, "${schedulerListenersNumber}");
         return args;
     }

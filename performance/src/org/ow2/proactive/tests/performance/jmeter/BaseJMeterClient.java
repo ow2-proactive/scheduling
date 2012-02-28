@@ -44,7 +44,18 @@ import org.apache.jmeter.samplers.SampleResult;
 
 public abstract class BaseJMeterClient extends AbstractJavaSamplerClient {
 
+    public static final String PARAM_STOP_ON_ERROR = "stopOnError";
+
     private String setupError;
+
+    private boolean stopOnError;
+
+    @Override
+    public Arguments getDefaultParameters() {
+        Arguments args = new Arguments();
+        args.addArgument(PARAM_STOP_ON_ERROR, "${stopOnError}");
+        return args;
+    }
 
     @Override
     public final SampleResult runTest(JavaSamplerContext context) {
@@ -52,13 +63,19 @@ public abstract class BaseJMeterClient extends AbstractJavaSamplerClient {
             SampleResult errorResult = new SampleResult();
             errorResult.setSuccessful(false);
             errorResult.setResponseMessage(setupError);
+            errorResult.setStopTest(true);
             return errorResult;
         } else {
             try {
-                return doRunTest(context);
+                SampleResult result = doRunTest(context);
+                if (result != null && !result.isSuccessful() && stopOnError) {
+                    result.setStopTest(true);
+                }
+                return result;
             } catch (Throwable t) {
                 SampleResult errorResult = new SampleResult();
                 errorResult.setSuccessful(false);
+                errorResult.setStopTest(stopOnError);
                 errorResult.setResponseMessage("Unexpected exception during test execution: " + t);
                 logError("Unexpected exception during test execution: " + t, t);
                 return errorResult;
@@ -72,6 +89,8 @@ public abstract class BaseJMeterClient extends AbstractJavaSamplerClient {
     public final void setupTest(JavaSamplerContext context) {
         try {
             printParameters(context);
+
+            stopOnError = getBooleanParameter(context, PARAM_STOP_ON_ERROR);
 
             doSetupTest(context);
         } catch (Throwable t) {

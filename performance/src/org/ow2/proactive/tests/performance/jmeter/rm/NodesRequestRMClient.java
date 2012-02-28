@@ -105,11 +105,16 @@ public class NodesRequestRMClient extends BaseJMeterRMClient {
 
         BooleanWrapper released = rm.releaseNodes(nodes);
         PAFuture.waitFor(released);
-
-        result.setSuccessful(true);
-        result.setResponseMessage(String.format("Requested %d nodes, received %d nodes", nodesToRequest,
-                nodesReceived));
         result.sampleEnd();
+
+        if (nodesToRequest != nodesReceived) {
+            result.setSuccessful(false);
+            result.setResponseMessage(String.format(
+                    "Didn't receive expected nodes, requested %d nodes, received %d nodes", nodesToRequest,
+                    nodesReceived));
+        } else {
+            result.setSuccessful(true);
+        }
 
         return result;
     }

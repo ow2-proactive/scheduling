@@ -51,8 +51,7 @@ public class RMConnectionParameters {
 
     public static final String PARAM_RM_PASSWORD = "rmPassword";
 
-    public static Arguments getDefaultParameters() {
-        Arguments args = new Arguments();
+    public static Arguments getDefaultParameters(Arguments args) {
         args.addArgument(PARAM_RM_URL, "${rmUrl}");
         args.addArgument(PARAM_RM_LOGIN, "${rmLogin}");
         args.addArgument(PARAM_RM_PASSWORD, "${rmPassword}");

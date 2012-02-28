@@ -157,6 +157,11 @@
             <stringProp name="Argument.value">${__P(failingTaskSubmitRestartMode,ANYWHERE)}</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
+          <elementProp name="stopOnError" elementType="Argument">
+            <stringProp name="Argument.name">stopOnError</stringProp>
+            <stringProp name="Argument.value">${__P(stopOnError,true)}</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
         </collectionProp>
       </elementProp>
       <stringProp name="TestPlan.user_define_classpath"></stringProp>
@@ -180,6 +185,11 @@
         <JavaSampler guiclass="JavaTestSamplerGui" testclass="JavaSampler" testname="Register listeners" enabled="true">
           <elementProp name="arguments" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" enabled="true">
             <collectionProp name="Arguments.arguments">
+              <elementProp name="stopOnError" elementType="Argument">
+                <stringProp name="Argument.name">stopOnError</stringProp>
+                <stringProp name="Argument.value">${stopOnError}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
               <elementProp name="schedulerUrl" elementType="Argument">
                 <stringProp name="Argument.name">schedulerUrl</stringProp>
                 <stringProp name="Argument.value">${schedulerUrl}</stringProp>
@@ -207,7 +217,7 @@
         <hashTree/>
       </hashTree>
       <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Submit simple java task" enabled="true">
-        <stringProp name="ThreadGroup.on_sample_error">stoptest</stringProp>
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
         <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
           <boolProp name="LoopController.continue_forever">false</boolProp>
           <intProp name="LoopController.loops">-1</intProp>
@@ -224,6 +234,11 @@
         <JavaSampler guiclass="JavaTestSamplerGui" testclass="JavaSampler" testname="Submit simple java task" enabled="true">
           <elementProp name="arguments" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" enabled="true">
             <collectionProp name="Arguments.arguments">
+              <elementProp name="stopOnError" elementType="Argument">
+                <stringProp name="Argument.name">stopOnError</stringProp>
+                <stringProp name="Argument.value">${stopOnError}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
               <elementProp name="schedulerUrl" elementType="Argument">
                 <stringProp name="Argument.name">schedulerUrl</stringProp>
                 <stringProp name="Argument.value">${schedulerUrl}</stringProp>
@@ -266,7 +281,7 @@
         <hashTree/>
       </hashTree>
       <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Submit simple native task" enabled="true">
-        <stringProp name="ThreadGroup.on_sample_error">stoptest</stringProp>
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
         <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
           <boolProp name="LoopController.continue_forever">false</boolProp>
           <intProp name="LoopController.loops">-1</intProp>
@@ -283,6 +298,11 @@
         <JavaSampler guiclass="JavaTestSamplerGui" testclass="JavaSampler" testname="Submit simple native task" enabled="true">
           <elementProp name="arguments" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" enabled="true">
             <collectionProp name="Arguments.arguments">
+              <elementProp name="stopOnError" elementType="Argument">
+                <stringProp name="Argument.name">stopOnError</stringProp>
+                <stringProp name="Argument.value">${stopOnError}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
               <elementProp name="schedulerUrl" elementType="Argument">
                 <stringProp name="Argument.name">schedulerUrl</stringProp>
                 <stringProp name="Argument.value">${schedulerUrl}</stringProp>
@@ -325,7 +345,7 @@
         <hashTree/>
       </hashTree>
       <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Submit simple multinode task" enabled="true">
-        <stringProp name="ThreadGroup.on_sample_error">stoptest</stringProp>
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
         <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
           <boolProp name="LoopController.continue_forever">false</boolProp>
           <intProp name="LoopController.loops">-1</intProp>
@@ -342,6 +362,11 @@
         <JavaSampler guiclass="JavaTestSamplerGui" testclass="JavaSampler" testname="Submit simple multinode task" enabled="true">
           <elementProp name="arguments" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" enabled="true">
             <collectionProp name="Arguments.arguments">
+              <elementProp name="stopOnError" elementType="Argument">
+                <stringProp name="Argument.name">stopOnError</stringProp>
+                <stringProp name="Argument.value">${stopOnError}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
               <elementProp name="schedulerUrl" elementType="Argument">
                 <stringProp name="Argument.name">schedulerUrl</stringProp>
                 <stringProp name="Argument.value">${schedulerUrl}</stringProp>
@@ -399,7 +424,7 @@
         <hashTree/>
       </hashTree>
       <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Submit and kill simple job" enabled="true">
-        <stringProp name="ThreadGroup.on_sample_error">stoptest</stringProp>
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
         <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
           <boolProp name="LoopController.continue_forever">false</boolProp>
           <intProp name="LoopController.loops">-1</intProp>
@@ -416,6 +441,11 @@
         <JavaSampler guiclass="JavaTestSamplerGui" testclass="JavaSampler" testname="Submit and kill simple job" enabled="true">
           <elementProp name="arguments" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" enabled="true">
             <collectionProp name="Arguments.arguments">
+              <elementProp name="stopOnError" elementType="Argument">
+                <stringProp name="Argument.name">stopOnError</stringProp>
+                <stringProp name="Argument.value">${stopOnError}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
               <elementProp name="schedulerUrl" elementType="Argument">
                 <stringProp name="Argument.name">schedulerUrl</stringProp>
                 <stringProp name="Argument.value">${schedulerUrl}</stringProp>
@@ -443,7 +473,7 @@
         <hashTree/>
       </hashTree>
       <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Submit task with dependencies" enabled="true">
-        <stringProp name="ThreadGroup.on_sample_error">stoptest</stringProp>
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
         <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
           <boolProp name="LoopController.continue_forever">false</boolProp>
           <intProp name="LoopController.loops">-1</intProp>
@@ -460,6 +490,11 @@
         <JavaSampler guiclass="JavaTestSamplerGui" testclass="JavaSampler" testname="Submit task with dependencies" enabled="true">
           <elementProp name="arguments" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" enabled="true">
             <collectionProp name="Arguments.arguments">
+              <elementProp name="stopOnError" elementType="Argument">
+                <stringProp name="Argument.name">stopOnError</stringProp>
+                <stringProp name="Argument.value">${stopOnError}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
               <elementProp name="schedulerUrl" elementType="Argument">
                 <stringProp name="Argument.name">schedulerUrl</stringProp>
                 <stringProp name="Argument.value">${schedulerUrl}</stringProp>
@@ -512,7 +547,7 @@
         <hashTree/>
       </hashTree>
       <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Submit replicated tasks" enabled="true">
-        <stringProp name="ThreadGroup.on_sample_error">stoptest</stringProp>
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
         <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
           <boolProp name="LoopController.continue_forever">false</boolProp>
           <intProp name="LoopController.loops">-1</intProp>
@@ -529,6 +564,11 @@
         <JavaSampler guiclass="JavaTestSamplerGui" testclass="JavaSampler" testname="Submit replicated tasks" enabled="true">
           <elementProp name="arguments" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" enabled="true">
             <collectionProp name="Arguments.arguments">
+              <elementProp name="stopOnError" elementType="Argument">
+                <stringProp name="Argument.name">stopOnError</stringProp>
+                <stringProp name="Argument.value">${stopOnError}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
               <elementProp name="schedulerUrl" elementType="Argument">
                 <stringProp name="Argument.name">schedulerUrl</stringProp>
                 <stringProp name="Argument.value">${schedulerUrl}</stringProp>
@@ -581,7 +621,7 @@
         <hashTree/>
       </hashTree>
       <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Submit loop tasks" enabled="true">
-        <stringProp name="ThreadGroup.on_sample_error">stoptest</stringProp>
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
         <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
           <boolProp name="LoopController.continue_forever">false</boolProp>
           <intProp name="LoopController.loops">-1</intProp>
@@ -598,6 +638,11 @@
         <JavaSampler guiclass="JavaTestSamplerGui" testclass="JavaSampler" testname="Submit loop tasks" enabled="true">
           <elementProp name="arguments" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" enabled="true">
             <collectionProp name="Arguments.arguments">
+              <elementProp name="stopOnError" elementType="Argument">
+                <stringProp name="Argument.name">stopOnError</stringProp>
+                <stringProp name="Argument.value">${stopOnError}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
               <elementProp name="schedulerUrl" elementType="Argument">
                 <stringProp name="Argument.name">schedulerUrl</stringProp>
                 <stringProp name="Argument.value">${schedulerUrl}</stringProp>
@@ -650,7 +695,7 @@
         <hashTree/>
       </hashTree>
       <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Submit sample jobs" enabled="true">
-        <stringProp name="ThreadGroup.on_sample_error">stoptest</stringProp>
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
         <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
           <boolProp name="LoopController.continue_forever">false</boolProp>
           <intProp name="LoopController.loops">-1</intProp>
@@ -667,6 +712,11 @@
         <JavaSampler guiclass="JavaTestSamplerGui" testclass="JavaSampler" testname="Submit sample jobs" enabled="true">
           <elementProp name="arguments" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" enabled="true">
             <collectionProp name="Arguments.arguments">
+              <elementProp name="stopOnError" elementType="Argument">
+                <stringProp name="Argument.name">stopOnError</stringProp>
+                <stringProp name="Argument.value">${stopOnError}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
               <elementProp name="schedulerUrl" elementType="Argument">
                 <stringProp name="Argument.name">schedulerUrl</stringProp>
                 <stringProp name="Argument.value">${schedulerUrl}</stringProp>
@@ -694,7 +744,7 @@
         <hashTree/>
       </hashTree>
       <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Submit and kill tasks" enabled="true">
-        <stringProp name="ThreadGroup.on_sample_error">stoptest</stringProp>
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
         <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
           <boolProp name="LoopController.continue_forever">false</boolProp>
           <intProp name="LoopController.loops">-1</intProp>
@@ -711,6 +761,11 @@
         <JavaSampler guiclass="JavaTestSamplerGui" testclass="JavaSampler" testname="Submit and kill tasks" enabled="true">
           <elementProp name="arguments" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" enabled="true">
             <collectionProp name="Arguments.arguments">
+              <elementProp name="stopOnError" elementType="Argument">
+                <stringProp name="Argument.name">stopOnError</stringProp>
+                <stringProp name="Argument.value">${stopOnError}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
               <elementProp name="schedulerUrl" elementType="Argument">
                 <stringProp name="Argument.name">schedulerUrl</stringProp>
                 <stringProp name="Argument.value">${schedulerUrl}</stringProp>
@@ -738,7 +793,7 @@
         <hashTree/>
       </hashTree>
       <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Submit failing tasks" enabled="true">
-        <stringProp name="ThreadGroup.on_sample_error">stoptest</stringProp>
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
         <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
           <boolProp name="LoopController.continue_forever">false</boolProp>
           <intProp name="LoopController.loops">-1</intProp>
@@ -755,6 +810,11 @@
         <JavaSampler guiclass="JavaTestSamplerGui" testclass="JavaSampler" testname="Submit failing tasks" enabled="true">
           <elementProp name="arguments" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" enabled="true">
             <collectionProp name="Arguments.arguments">
+              <elementProp name="stopOnError" elementType="Argument">
+                <stringProp name="Argument.name">stopOnError</stringProp>
+                <stringProp name="Argument.value">${stopOnError}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
               <elementProp name="schedulerUrl" elementType="Argument">
                 <stringProp name="Argument.name">schedulerUrl</stringProp>
                 <stringProp name="Argument.value">${schedulerUrl}</stringProp>

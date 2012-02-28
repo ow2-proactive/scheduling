@@ -123,7 +123,8 @@ public class RMScenarioSetupClient extends BaseJMeterClient {
 
     @Override
     public Arguments getDefaultParameters() {
-        Arguments args = RMConnectionParameters.getDefaultParameters();
+        Arguments args = super.getDefaultParameters();
+        RMConnectionParameters.getDefaultParameters(args);
         args.addArgument(PARAM_LISTENERS_NUMBER, "${rmListenersNumber}");
         return args;
     }

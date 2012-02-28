@@ -50,7 +50,9 @@ public abstract class BaseJMeterRMClient extends BaseJMeterClient {
 
     @Override
     public Arguments getDefaultParameters() {
-        return RMConnectionParameters.getDefaultParameters();
+        Arguments args = super.getDefaultParameters();
+        RMConnectionParameters.getDefaultParameters(args);
+        return args;
     }
 
     @Override

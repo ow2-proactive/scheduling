@@ -62,7 +62,8 @@ public abstract class BaseJMeterSchedulerClient extends BaseJMeterClient {
 
     @Override
     public Arguments getDefaultParameters() {
-        Arguments args = SchedulerConnectionParameters.getDefaultParameters();
+        Arguments args = super.getDefaultParameters();
+        SchedulerConnectionParameters.getDefaultParameters(args);
         args.addArgument(PARAM_SCHEDULING_PATH, "${schedulingPath}");
         return args;
     }

@@ -50,8 +50,7 @@ public class SchedulerConnectionParameters {
 
     public static final String PARAM_SCHEDULER_PASSWORD = "schedulerPassword";
 
-    public static Arguments getDefaultParameters() {
-        Arguments args = new Arguments();
+    public static Arguments getDefaultParameters(Arguments args) {
         args.addArgument(PARAM_SCHEDULER_URL, "${schedulerUrl}");
         args.addArgument(PARAM_SCHEDULER_LOGIN, "${schedulerLogin}");
         args.addArgument(PARAM_SCHEDULER_PASSWORD, "${schedulerPassword}");
