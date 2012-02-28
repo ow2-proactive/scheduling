@@ -16,6 +16,7 @@ var cmd = Arrays.copyOfRange(args, 1, args.length);
 
 var localNode = null;
 var process = null;
+
 try {
 	var localSpaceDir = null;
 	// Init dataspaces    
@@ -72,7 +73,7 @@ try {
 	
 	// Close dataspaces
 	try {
-		DataSpacesNodes.tryCloseNodeApplicationConfig(node);
+		DataSpacesNodes.tryCloseNodeApplicationConfig(localNode);
 	} catch (e) {
 		println("Unable to close dataspaces: " + e.javaException);
 	}
