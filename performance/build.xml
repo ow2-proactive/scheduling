@@ -162,9 +162,9 @@
     </target>
 
     <target name="deploy-rm-and-scheduler-and-execute-test" depends="copy.libs.to.jmeter, deploy-rm-and-scheduler" description="Deploy RM, Scheduler, execute JMeter Scheduler test and kill all test processes">
-        <run-scheduler-jmeter-test testplan="scheduler1" targetschedulerurl="${scheduler.deploy.result.serverUrl}" clientproactiveconfig="${basedir}/tmp/SchedulerClientProActiveConfiguration.xml" />
+        <run-scheduler-jmeter-test testplan="${schedulerScenario}" targetschedulerurl="${scheduler.deploy.result.serverUrl}" clientproactiveconfig="${basedir}/tmp/SchedulerClientProActiveConfiguration.xml" />
         <antcall target="kill-test-processes" />
-        <fail if="scheduler-scheduler1-failed" message="JMeter test failed" />
+        <fail if="scheduler-${schedulerScenario}-failed" message="JMeter test failed" />
     </target>
 
     <macrodef name="run-rm-jmeter-test">
@@ -284,8 +284,14 @@
                 <property name="submitAndKillUsersNumber" value="${submitAndKillUsersNumber}" />
                 <property name="submitAndKillTasksUsersNumber" value="${submitAndKillTasksUsersNumber}" />
                 
+                <property name="schedulerConnectUsersNumber" value="${schedulerConnectUsersNumber}" />
+                
+                <property name="hugeJobTasksNumber" value="${hugeJobTasksNumber}" />
+                <property name="hugeJobCompleteTimeout" value="${hugeJobCompleteTimeout}" />
+                
                 <jmeterarg value="-j" />
                 <jmeterarg value="${basedir}/results/jmeter.log" />
+
             </jmeter>
 
             <xslt classpathref="xslt.classpath" in="${basedir}/results/@{testplan}.jtl" out="${basedir}/results/@{testplan}.html" style="${basedir}/jmeter/config/jmeter-results-report_21.xsl" />

@@ -65,7 +65,7 @@ public abstract class BaseJobSubmitClient extends BaseJMeterSchedulerClient {
 
     public static final String PARAM_SUBMIT_SELECTION_SCRIPT_TYPE_DYNAMIC = "submitSelectionScriptTypeDynamic";
 
-    public static final long JOB_COMPLETE_TIMEOUT = 5 * 60000;
+    public static final long DEFAULT_JOB_COMPLETE_TIMEOUT = 5 * 60000;
 
     private SchedulerEventsMonitor eventsMonitor;
 
@@ -128,7 +128,7 @@ public abstract class BaseJobSubmitClient extends BaseJMeterSchedulerClient {
         logInfo(String.format("Submitted job (id: %s): %s, selectionScript: %s (%s)", job.getDescription(),
                 jobId.toString(), String.valueOf(useSelectionScript), Thread.currentThread().toString()));
 
-        boolean waitOK = eventsMonitor.waitFor(waitCondition, JOB_COMPLETE_TIMEOUT, getLogger());
+        boolean waitOK = eventsMonitor.waitFor(waitCondition, getJobCompleteTimeout(), getLogger());
 
         JobResult jobResult = scheduler.getJobResult(jobId);
         if (waitOK) {
@@ -162,6 +162,10 @@ public abstract class BaseJobSubmitClient extends BaseJMeterSchedulerClient {
         result.setResponseMessage("Some job tasks had exceptions");
     }
 
+    protected long getJobCompleteTimeout() {
+        return DEFAULT_JOB_COMPLETE_TIMEOUT;
+    }   
+    
     protected final JavaTask createSimpleJavaTask(boolean fork) {
         JavaTask task = new JavaTask();
         task.setExecutableClassName(SimpleJavaTask.class.getName());
