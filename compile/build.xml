@@ -142,7 +142,7 @@
 
 
 	<target name="doc-jaxrs" depends="doc-jaxb" description="Generate JAX-RS documentation">
-		<javadoc classpathref="src.classpath" sourcepath="${src.dir}" destdir="${build.dir}/jaxrsdocs/" extdirs="${lib.dir}" doclet="com.lunatech.doclets.jax.jaxrs.JAXRSDoclet" docletpathref="src.classpath" footer="Copyright 2007-2011 Activeeon All Rights Reserved. ">
+		<javadoc useexternalfile="true" classpathref="src.classpath" sourcepath="${src.dir}" destdir="${build.dir}/jaxrsdocs/" extdirs="${lib.dir}" doclet="com.lunatech.doclets.jax.jaxrs.JAXRSDoclet" docletpathref="src.classpath" footer="Copyright 2007-2011 Activeeon All Rights Reserved. ">
 			<package name="org.ow2.proactive_grid_cloud_portal.*" />
 			<link href="jaxbdocs/" />
 		</javadoc>
@@ -150,7 +150,7 @@
 
 
 	<target name="doc-jaxb" description="Generate JAXB documentation">
-		<javadoc classpathref="src.classpath" sourcepath="${src.dir}" destdir="${build.dir}/jaxbdocs/" extdirs="${lib.dir}" doclet="com.lunatech.doclets.jax.jaxb.JAXBDoclet" docletpathref="src.classpath" footer="Copyright 2007-2011 Activeeon All Rights Reserved. ">
+		<javadoc useexternalfile="true" classpathref="src.classpath" sourcepath="${src.dir}" destdir="${build.dir}/jaxbdocs/" extdirs="${lib.dir}" doclet="com.lunatech.doclets.jax.jaxb.JAXBDoclet" docletpathref="src.classpath" footer="Copyright 2007-2011 Activeeon All Rights Reserved. ">
 			<package name="org.ow2.proactive_grid_cloud_portal.*" />
 		</javadoc>
 	</target>
