@@ -1,5 +1,17 @@
-log4j.rootLogger=info, stdout
+log4j.rootLogger=debug, R
 
 log4j.appender.stdout=org.apache.log4j.ConsoleAppender
 log4j.appender.stdout.layout=org.apache.log4j.PatternLayout
+
 log4j.appender.stdout.layout.ConversionPattern=%d [%t] %-5p %c - %m%n
+
+log4j.appender.R=org.apache.log4j.RollingFileAppender
+log4j.appender.R.File=/tmp/PERFORMANCE_tests_nodes.log
+log4j.appender.R.MaxFileSize=10MB
+log4j.appender.R.MaxBackupIndex=5
+
+log4j.appender.R.layout=org.apache.log4j.PatternLayout
+log4j.appender.R.layout.ConversionPattern=%d [%t] %-5p %c - %m%n
+
+log4j.logger.proactive.pamr=error
+log4j.logger.proactive.mop=error

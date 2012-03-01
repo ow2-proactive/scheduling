@@ -13,5 +13,6 @@ log4j.appender.R.MaxBackupIndex=5
 log4j.appender.R.layout=org.apache.log4j.PatternLayout
 log4j.appender.R.layout.ConversionPattern=%d [%t] %-5p %c - %m%n
 
-log4j.logger.proactive.resourceManager=debug
-log4j.logger.proactive.resourceManager.database=error
+log4j.logger.proactive.scheduler=debug
+log4j.logger.proactive.scheduler.dev.database=info
+
