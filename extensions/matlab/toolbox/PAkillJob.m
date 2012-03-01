@@ -62,5 +62,6 @@ function PAkillJob(jobid)
     end
     sched = PAScheduler;
     solver = sched.PAgetsolver();
-    solver.killJob(jobid);
+    output = solver.killJob(jobid);
+    disp(output);   
 end

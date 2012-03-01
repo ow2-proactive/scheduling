@@ -1,26 +1,10 @@
-<html>
-   <head>
-      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-   
-      <link rel="stylesheet" href="file:////usr/local/matlab2009b/toolbox/matlab/helptools/private/helpwin.css">
-      <title>M-File Help: PAoptions</title>
-   </head>
-   <body>
-      <!--Single-page help-->
-      <table border="0" cellspacing="0" width="100%">
-         <tr class="subheader">
-            <td class="headertitle">M-File Help: PAoptions</td>
-            <td class="subheader-left"><a href="matlab:open PAoptions">View code for PAoptions</a></td>
-            <td class="subheader-right"><a href="matlab:helpwin">Default Topics</a></td>
-         </tr>
-      </table>
-      <div class="title">PAoptions</div>
-      <div class="helptext"><pre><!--helptext -->  <span class="helptopic">PAoptions</span> sets or returns the current options for the PAsolve execution
+<html><title>M-File Help: PAoptions</title><body><table width="100%" border=0 cellspacing=0 bgcolor=d0d0f0><tr><td>&nbsp;<a href="matlab:open 'PAoptions.m'"><b>View code for PAoptions</b></a></td><td valign="left"></td><td align=right><a href="matlab:helpwin"><b>Default Topics</b></a>&nbsp;</td></tr></table><br> <br>
+<code><pre>  <b>PAoptions</b> sets or returns the current options for the PAsolve execution
  
   Syntax
  
-        &gt;&gt; options = <span class="helptopic">PAoptions</span>();
-        &gt;&gt; <span class="helptopic">PAoptions</span>(param,value, ...);
+        &gt;&gt; options = <b>PAoptions</b>();
+        &gt;&gt; <b>PAoptions</b>(param,value, ...);
  
   Inputs
  
@@ -34,13 +18,13 @@
  
   Description
         
-        <span class="helptopic">PAoptions</span> sets options used by the next PAsolve call. A structure
+        <b>PAoptions</b> sets options used by the next PAsolve call. A structure
         containing the current options can be retrieved by calling
-        <span class="helptopic">PAoptions</span> with no parameter.
+        <b>PAoptions</b> with no parameter.
  
   Example
  
-        &gt;&gt; <span class="helptopic">PAoptions</span>('Debug', true);
+        &gt;&gt; <b>PAoptions</b>('Debug', true);
         &gt;&gt; r = PAsolve(@factorial, 1, 2, 3, 4)  % Runs PAsolve in "Debug"
         mode.
  
@@ -58,10 +42,17 @@
     TransferEnv       true | false | 'on' | 'off'
  
                 Transfers the environment in which the PAsolve/PAeval function is called
-                to every remote calls. If variables from this "caller"
-                environment need to be accessed inside the batch function,
-                they should be done using the evalin('caller', ...) syntax
+                to every remote tasks. Variables transferred this way need to be accessed inside the submitted function
+                via the evalin('caller', ...) syntax. Global variables are also transferred and can be accessed normally via the "global" keyword
                 default to 'off'
+    EnvExcludeList       
+                Comma separated list of variables which should be
+                excluded from the workspace when transferring the
+                environment (TransferEnv)
+    EnvExcludeTypeList
+                Comma separated list of object types which should be
+                excluded from the workspace when transferring the
+                environment (TransferEnv)
     AutomaticDump     true | false | 'on' | 'off'
                 If this option is set to true, the current state of the
                 PAsolve job database will be systematically saved at each
@@ -76,11 +67,11 @@
                 you don't want to rely on ProActive's automatic transfer
                 protocol. The dataspace server must of course be started
                 and configure manually in that case. e.g
-                <a href="ftp://myserver/rootpath">ftp://myserver/rootpath</a>
+                ftp://myserver/rootpath
  
     CustomDataspacePath       char
                 Path to the root of the Custom Dataspace provided by
-                CustomDataspaceURL. For example if <a href="ftp://myserver/rootpath">ftp://myserver/rootpath</a>
+                CustomDataspaceURL. For example if ftp://myserver/rootpath
                 is the URL of the Dataspace and the rootpath directory
                 corresponds on the file system to /user/myserver/.../root
                 then this path must be specified in CustomDataspacePath.
@@ -99,7 +90,7 @@
  
     RemoveJobAfterRetrieve     true | false | 'on' | 'off'
                 Removes the job automatically after all results have been
-                retrieved. If not the job is removed at the end of the
+                retrieved. If the options is "off", the job is removed at the end of the
                 matlab session, or manually via PAjobRemove. default to
                 'on'
  
@@ -134,12 +125,24 @@
                 url or path of selection script used to reserve matlab
                 tokens (internal)
  
-    ProActiveJars
+    ProActiveJars and EmbeddedJars
                 Comma separated list of jar files used by ProActive
                 (internal)
  
     ProActiveConfiguration
                 path to ProActive configuration file (internal)
+ 
+    Log4JConfiguration
+                path to log4j configuration file (internal)
+ 
+    SecurityFile
+                path to java security configuration file (internal)
+ 
+    RmiPort
+                default RMI port used when deploying the middleman JVM (internal)
+ 
+    JvmTimeout
+                default timeout used when deploying the middleman JVM (internal)
  
     DisconnectedModeFile
                 path to disconnected mode temporary file (internal)
@@ -150,6 +153,8 @@
     CleanAllTempFilesDirectly
                 do we clean the temporary files after all results of a PAsolve 
                 call are received (default), or do we wait until Matlab terminates 
-                to allow PAgetResults calls for this job. (internal)</pre></div><!--after help -->
-   </body>
-</html>
+                to allow PAgetResults calls for this job. (internal)
+ 
+</pre>
+
+</code></body></html>

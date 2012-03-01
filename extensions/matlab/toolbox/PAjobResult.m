@@ -72,9 +72,9 @@ function varargout = PAjobResult(jobid)
     end
     sched = PAScheduler;
     solver = sched.PAgetsolver();
+    output = solver.jobResult(jobid);
+    disp(output);
     if nargout == 1        
-        varargout{1} = evalc('solver.jobResult(jobid);');
-    else             
-        solver.jobResult(jobid);
+        varargout{1} = output;                        
     end
 end

@@ -36,7 +36,7 @@
  */
 package org.ow2.proactive.scheduler.ext.scilab.common;
 
-import org.ow2.proactive.scheduler.ext.matsci.common.PASolveMatSciTaskConfig;
+import org.ow2.proactive.scheduler.ext.matsci.common.data.PASolveMatSciTaskConfig;
 
 
 /**
@@ -46,11 +46,29 @@ import org.ow2.proactive.scheduler.ext.matsci.common.PASolveMatSciTaskConfig;
  */
 public class PASolveScilabTaskConfig extends PASolveMatSciTaskConfig {
 
+    /**
+     * name of the scilab function used
+     */
     private String functionName;
 
+    /**
+     * definition of the function (obsolete)
+     */
     private String functionDefinition;
 
+    /**
+     * list of files used to store the definition of the function
+     */
     private String[] functionVarFiles;
+
+    /**
+     * name of the output variables used (obsolete)
+     */
+    private String outputs;
+
+    public PASolveScilabTaskConfig() {
+
+    }
 
     public String getOutputs() {
         return outputs;
@@ -59,8 +77,6 @@ public class PASolveScilabTaskConfig extends PASolveMatSciTaskConfig {
     public void setOutputs(String outputs) {
         this.outputs = outputs;
     }
-
-    private String outputs;
 
     public String getFunctionName() {
         return functionName;
@@ -86,7 +102,4 @@ public class PASolveScilabTaskConfig extends PASolveMatSciTaskConfig {
         this.functionVarFiles = functionVarFiles;
     }
 
-    public PASolveScilabTaskConfig() {
-
-    }
 }

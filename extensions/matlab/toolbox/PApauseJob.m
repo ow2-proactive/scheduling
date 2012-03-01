@@ -63,5 +63,6 @@ function PApauseJob(jobid)
     end
     sched = PAScheduler;
     solver = sched.PAgetsolver();
-    solver.pauseJob(jobid);
+    output = solver.pauseJob(jobid);
+    disp(output);
 end

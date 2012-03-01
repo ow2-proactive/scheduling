@@ -59,9 +59,9 @@ t(3,1:5).Compose = true;
 t
 
  disp('...... Testing PAsolve with sqrt(sqrt(sqrt(x)))');
- disp('..........................1 PAwaitAll');
+ disp('..........................1 PAwaitFor (all)');
  resl = PAsolve(t);
- val=PAwaitAll(resl,timeout)
+ val=PAwaitFor(resl,timeout)
  [ok,msg]=checkValues(val);
 if ~ok disp(msg),return; end
  disp('..........................1 ......OK');

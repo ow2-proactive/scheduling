@@ -33,6 +33,7 @@
 	<property name="scheduler.client.jar"        value="ProActive_Scheduler-client.jar" />
 	<property name="scheduler.worker.jar"        value="ProActive_Scheduler-worker.jar" />
 	<property name="scheduler.matsci.jar"        value="ProActive_Scheduler-matsci.jar" />
+    <property name="scheduler.matsci.embedded.jar"        value="ProActive_Scheduler-matsciemb.jar" />
 	<property name="scheduler.mapreduce.jar"     value="ProActive_Scheduler-mapreduce.jar" />
 	<property name="scheduler.fsm.jar"    		 value="ProActive_Scheduler-fsm.jar" />
 

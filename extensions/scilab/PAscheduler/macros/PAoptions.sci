@@ -16,8 +16,9 @@ function opts = PAoptions(varargin)
     deff ("y=versioncheck(x)","if isnumeric(x), y=isempty(x), elseif ischar(x), y=~isempty(regexp(x, ''/^[1-9][0-9]*(\.[0-9]+)*$/'')), else y=%f, end","n");
     deff ("y=versionlistcheck(x)","if isnumeric(x), y=isempty(x), elseif ischar(x), y=~isempty(regexp(x, ''/^([1-9][0-9]*(\.[0-9]+)*[ ;,]+)*[1-9][0-9]*(\.[0-9]+)*$/'')), else y=%f, end","n");
     deff ("y=jarlistcheck(x)","if ischar(x), y=~isempty(regexp(x, ''/^([\w\-]+\.jar[ ;,]+)*[\w\-]+\.jar$/'')), else y=%f ,end","n");
+    deff ("y=listcheck(x)","if ischar(x), y=~isempty(regexp(x, ''/^([^ ;,]+[ ;,]+)*[^ ;,]+$/'')), else y=%f ,end","n");
 
-    jarlisttrans = jarlisttocell;
+    listtrans = stringtolist;
 
     deff ("y=urlcheck(x)","if isnumeric(x), y=isempty(x), else y=ischar(x), end","n");
     deff ("y=charornull(x)","if isnumeric(x), y=isempty(x), else y=ischar(x), end","n");    
@@ -41,6 +42,8 @@ function opts = PAoptions(varargin)
     deff ("y=conftrans(x)","y=strsubst(variabletrans(x),''/'',filesep())","n");
 
     deff ("y=ischarornull(x)","if isnumeric(x), y=isempty(x), else y=ischar(x), end","n");
+    deff ("y=charornum(x)","y=or(type(x)==[1,5,8,10])","n");
+    deff ("y=charornumtrans(x)","if isnumeric(x), y=x, else y=evstr(x), end","n");
 
     deff ("y=prioritycheck(x)","if ischar(x), y=ismember(x,{''Idle'', ''Lowest'', ''Low'', ''Normal'', ''High'', ''Highest''}), else y=%f, end","n")
 
@@ -56,17 +59,7 @@ function opts = PAoptions(varargin)
     inputs(j).default = %f;
     inputs(j).check = 'logcheck';
     inputs(j).trans = 'logtrans';
-    j=j+1;
-    inputs(j).name = 'TransferSource';
-    inputs(j).default = %t;
-    inputs(j).check = 'logcheck';
-    inputs(j).trans = 'logtrans';
-    j=j+1;
-    inputs(j).name = 'KeepEngine';
-    inputs(j).default = %f;
-    inputs(j).check = 'logcheck';
-    inputs(j).trans = 'logtrans';
-    j=j+1;
+    j=j+1;    
     inputs(j).name = 'Fork';
     inputs(j).default = %f;
     inputs(j).check = 'logcheck';
@@ -82,11 +75,21 @@ function opts = PAoptions(varargin)
     inputs(j).check = 'logcheck';
     inputs(j).trans = 'logtrans';
     j=j+1;
-    //    inputs(j).name = 'TransferEnv';
-    //    inputs(j).default = %f;
-    //    inputs(j).check = 'logcheck';
-    //    inputs(j).trans = 'logtrans';
-    //    j=j+1;
+    inputs(j).name = 'TransferEnv';
+    inputs(j).default = %f;
+    inputs(j).check = 'logcheck';
+    inputs(j).trans = 'logtrans';    
+    j=j+1;
+    inputs(j).name = 'EnvExcludeList';
+    inputs(j).default = 'demolist;scicos_pal;%scicos_menu;version;compiled;profilable;ans;called;%scicos_short;%helps;%helps_modules;MSDOS;who_user;%scicos_display_mode;%scicos_help';
+    inputs(j).check = 'listcheck';
+    inputs(j).trans = 'stringtocell';
+    j=j+1;
+    inputs(j).name = 'EnvExcludeTypeList';
+    inputs(j).default = 'library;_Jobj;function';
+    inputs(j).check = 'listcheck';
+    inputs(j).trans = 'stringtocell';
+    j=j+1;
     inputs(j).name = 'TransferVariables';
     inputs(j).default = %t;
     inputs(j).check = 'logcheck';
@@ -157,15 +160,40 @@ function opts = PAoptions(varargin)
     //    inputs(j).check = 'logcheck';
     //    inputs(j).trans = 'logtrans';
     //    j=j+1;
+    inputs(j).name = 'EmbeddedJars';
+    inputs(j).default = 'ProActive_Scheduler-matsciemb.jar';
+    inputs(j).check = 'jarlistcheck';
+    inputs(j).trans = 'stringtocell';
+    j=j+1;
     inputs(j).name = 'ProActiveJars';
     inputs(j).default = 'jruby.jar,jruby-engine.jar,jython.jar,jython-engine.jar,ProActive.jar,ProActive_Scheduler-client.jar,ProActive_SRM-common-client.jar,ProActive_Scheduler-matsci.jar';
     inputs(j).check = 'jarlistcheck';
-    inputs(j).trans = 'jarlisttrans';
+    inputs(j).trans = 'stringtocell';
     j=j+1;
     inputs(j).name = 'ProActiveConfiguration';
     inputs(j).default = strcat(['$SCHEDULER$', fs, 'config', fs, 'proactive', fs, 'ProActiveConfiguration.xml']);
     inputs(j).check = 'ischar';
+    inputs(j).trans = 'conftrans'
+    j=j+1;
+    inputs(j).name = 'Log4JConfiguration';
+    inputs(j).default = strcat(['$SCHEDULER$', fs, 'config', fs, 'log4j', fs, 'log4j-client']);
+    inputs(j).check = 'ischar';
     inputs(j).trans = 'conftrans';
+    j=j+1;
+    inputs(j).name = 'SecurityFile';
+    inputs(j).default = strcat(['$SCHEDULER$', fs, 'config', fs, 'security.java.policy-client']);
+    inputs(j).check = 'ischar';
+    inputs(j).trans = 'conftrans';
+    j=j+1;
+    inputs(j).name = 'RmiPort';
+    inputs(j).default = 1111;
+    inputs(j).check = 'charornum';
+    inputs(j).trans = 'charornumtrans';
+    j=j+1;
+    inputs(j).name = 'JvmTimeout';
+    inputs(j).default = 1200;
+    inputs(j).check = 'charornum';
+    inputs(j).trans = 'charornumtrans';
     //    j=j+1;
     //    inputs(j).name = 'DisconnectedModeFile';
     //    inputs(j).default = strcat(['$HOME$', fs, '.PAsolveTmp.dat']);
@@ -177,7 +205,7 @@ function opts = PAoptions(varargin)
     // Parsing option file
     if isempty(proactive_pa_options) then 
         userdir = home_dir;
-        optionpath = strcat([userdir, fs, '.scilab', fs, 'PAoptions.ini']); 
+        optionpath = userdir + fs + '.scilab' + fs + 'PAoptions.ini'; 
         if isfile(optionpath) then
             [fid, ferr] = mopen(optionpath, 'r'); 
         else
@@ -199,7 +227,8 @@ function opts = PAoptions(varargin)
                         chk = inputs(j).check; 
                         tf = evstr(strcat([chk, '(value)']));                               
                         if ~tf then
-                            error(strcat(['Parse error when loading option file ', optionpath, ', option ', deblanked, ' doesn''t satisfy check ', chk ]));
+                            disp(value)
+                            error('Parse error when loading option file ' + optionpath + ', option ' + deblanked + ' doesn''t satisfy check '+ chk );
                         end
                         transfunc = inputs(j).trans;
                         def = evstr(strcat([transfunc, '(value)']))
@@ -228,7 +257,8 @@ function opts = PAoptions(varargin)
                 chk = inputs(i).check;
                 tf = evstr(strcat([chk, '(value)']));
                 if ~tf then
-                    error(strcat(['Argument ', optionName, ' doesn''t satisfy check ', chk ]));
+                    disp(value)
+                    error('Argument '+ optionName+ ' doesn''t satisfy check '+ chk );
                 end
                 default = %f;                    
                 Parameter = evstr(strcat([transfunc, '(value)']));                                       
@@ -253,7 +283,7 @@ function [n,key,value]=getline(fid)
     [n,key, value] = mfscanf(fid, '%s = %[^\n]')
 endfunction
 
-function cl=jarlisttocell(x)
+function cl=stringtocell(x)
     cl=cell();
     i=1;
     remain=x;
@@ -268,6 +298,26 @@ function cl=jarlisttocell(x)
             goon=%f;
         else            
             cl(i).entries=str;
+            i=i+1;
+        end
+        str = strtok(',; ');
+    end
+endfunction
+function cl=stringtolist(x)
+    cl=list();
+    i=1;
+    remain=x;
+    if iscell(x) then
+        cl = x;
+        return
+    end
+    goon=%t;
+    str = strtok(remain, ',; ');
+    while goon                          
+        if isempty(str) | length(str) == 0 then
+            goon=%f;
+        else            
+            cl($+1)=str;
             i=i+1;
         end
         str = strtok(',; ');

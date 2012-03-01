@@ -59,7 +59,7 @@
 %   * ################################################################
 %   * $$PROACTIVE_INITIAL_DEV$$
 %   */
-function PAtaskOutput(jobid, tname)
+function varargout = PAtaskOutput(jobid, tname)
     if isnumeric(jobid)
         jobid = num2str(jobid);
     end
@@ -68,5 +68,9 @@ function PAtaskOutput(jobid, tname)
     end
     sched = PAScheduler;
     solver = sched.PAgetsolver();
-    solver.taskOutput(jobid, tname);
+    output = solver.taskOutput(jobid, tname);
+    disp(output);
+    if nargout == 1        
+        varargout{1} = output;                        
+    end
 end

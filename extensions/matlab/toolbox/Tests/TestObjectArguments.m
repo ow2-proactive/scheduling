@@ -43,10 +43,10 @@ if ~exist('timeout', 'var')
     end
 end
 disp('...... Testing PAsolve with Object arguments');
- disp('..........................1 PAwaitAll');
+ disp('..........................1 PAwaitFor');
 d=dummy(55);
 resl = PAsolve(@dummyfunc,{d});
-val=PAwaitAll(resl,timeout)
+val=PAwaitFor(resl,timeout)
 
 if val.field2 == 22
     disp('..........................1 ......OK');

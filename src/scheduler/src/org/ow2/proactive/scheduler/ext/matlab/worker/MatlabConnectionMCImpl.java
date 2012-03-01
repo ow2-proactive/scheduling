@@ -36,27 +36,21 @@
  */
 package org.ow2.proactive.scheduler.ext.matlab.worker;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-
-import matlabcontrol.MatlabConnectionException;
-import matlabcontrol.MatlabInvocationException;
-import matlabcontrol.MatlabProcessCreator;
-import matlabcontrol.RemoteMatlabProxy;
-import matlabcontrol.RemoteMatlabProxyFactory;
-
+import com.activeeon.proactive.license_saver.client.LicenseSaverClient;
+import matlabcontrol.*;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.utils.OperatingSystem;
-import org.ow2.proactive.scheduler.ext.matlab.common.PASolveMatlabGlobalConfig;
-import org.ow2.proactive.scheduler.ext.matlab.common.PASolveMatlabTaskConfig;
+import org.ow2.proactive.scheduler.ext.matlab.common.data.PASolveMatlabGlobalConfig;
+import org.ow2.proactive.scheduler.ext.matlab.common.data.PASolveMatlabTaskConfig;
 import org.ow2.proactive.scheduler.ext.matlab.common.exception.MatlabInitException;
 import org.ow2.proactive.scheduler.ext.matlab.common.exception.MatlabTaskException;
 import org.ow2.proactive.scheduler.ext.matlab.common.exception.UnreachableLicenseProxyException;
 import org.ow2.proactive.scheduler.ext.matlab.common.exception.UnsufficientLicencesException;
 import org.ow2.proactive.scheduler.ext.matsci.worker.util.MatSciEngineConfigBase;
 
-import com.activeeon.proactive.license_saver.client.LicenseSaverClient;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 
 /**

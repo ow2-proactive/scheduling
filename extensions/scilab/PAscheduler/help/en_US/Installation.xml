@@ -88,9 +88,6 @@
     <installation>
         <version>5.3.0</version> <!-- Scilab version (must be at least 5.3.0) -->
         <home>c:\Program Files\scilab-5.3.0</home> <!-- Scilab installation directory -->
-        <libdir>bin</libdir>  <!-- Relative path to scilab libraries (generally bin on windows) -->
-        <!-- <tpdir>lib/thirdparty</tpdir>-->  <!-- Relative path to scilab third party libraries (empty on windows) -->
-        <!-- <scidir>share/scilab</scidir>-->  <!-- Relative path to scilab SCI directory (empty on windows) -->
         <bindir>bin</bindir>
         <command>Scilex.exe</command>
     </installation>
@@ -106,10 +103,6 @@
                 </para>
             </listitem>
             <listitem>
-                <para><emphasis>libdir:</emphasis> relative path (from homedir) to scilab dlls or so files.
-                </para>
-            </listitem>
-            <listitem>
                 <para><emphasis>bindir:</emphasis> relative path (from homedir) to scilab executable.
                 </para>
             </listitem>
@@ -118,42 +111,6 @@
                 </para>
             </listitem>
         </itemizedlist>
-    </refsection>
-    <refsection>
-        <title>Setting up the java.policy file</title>
-        <para>On each client host that will connect to the Scheduler to submit tasks, it is mandatory to add a specific configuration file for Java called the Java Policy file. This file is meant to define the security settings of a given Java Virtual Machine. This configuration can either be:</para>
-        <itemizedlist>
-            <listitem>
-                <para>Specific to a given <emphasis>scilab installation</emphasis> (but common for all users on this machine).
-                </para>
-            </listitem>
-            <listitem>
-                <para>Specific to a given <emphasis>user</emphasis>, but common to every scilab installations of this machine (and also all other Java programs).
-                </para>
-            </listitem>
-        </itemizedlist>
-        <refsection><title>Scilab specific configuration</title>
-            <para>In order to do the first type of configuration, one needs to have write access to Scilab's installation directory (requires administrator privilege). First a file called scilab.java.policy must be created in any directory (for example DIRPOLICY).</para>
-            <para>The scilab.java.policy file must contain the following:</para>
-            <programlisting><![CDATA[grant {
-  permission java.security.AllPermission;
-};]]></programlisting>
-            <para>Finally, the file SCILAB/share/scilab/etc/jvm_options.xml needs to be edited and the following lines added between the main tags "jvm_options":</para>
-            <programlisting><![CDATA[<option value="-Djava.security.manager"/>
-<option value="-Djava.security.policy=/path/to/DIRPOLICY/scilab.java.policy"/>
-]]></programlisting>
-            <para>If the configuration has not been done properly, a call to PAconnect will result in displaying an error message containing the following Exception:
-java.security.AccessControlException: access denied (java.util.PropertyPermission org.mortbay.io.nio.JVMBUG_THRESHHOLD read)
-
-Recheck your configuration if this message appear.</para>
-            </refsection>
-            <refsection><title>User specific configuration</title>
-            <para>The second type of java policy configuration is simpler to do than the first one, but it will apply to every Java program started by this user on your machine, including Java applets. Accordingly, this set up should be done with care.
-In order to do the second configuration, go to the <emphasis>HOME</emphasis> directory of the user that will use the toolbox.</para>
-             <para>In this HOME directory, create a file called .java.policy (notice the first dot in the file name), which will contain the same text as the scilab.java.policy file from the first method. That's it! Again, if the configuration is not done properly the same exception will appear when trying to connect to the Scheduler.</para>
-
-            </refsection>
-
     </refsection>
 
     <refsection>

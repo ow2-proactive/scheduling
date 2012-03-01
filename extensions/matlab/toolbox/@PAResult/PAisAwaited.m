@@ -58,11 +58,24 @@
 %   * $$PROACTIVE_INITIAL_DEV$$
 %   */
 function A = PAisAwaited(this)
+sched = PAScheduler;
+% Get the solver from memory
+solver = sched.PAgetsolver();
 s=size(this);
+R=this(1,1);
+jobid = R.jobid;
+taskids = java.util.ArrayList(s(1)*s(2));
 for i=1:s(1)
-    for j=1:s(2)
+    for j=1:s(2)        
         R=this(i,j);
-        f = R.future;
-        A(i,j) = org.objectweb.proactive.api.PAFuture.isAwaited(f);
+        taskids.add(R.taskid);                
     end
 end
+unrei = solver.areAwaited(jobid, taskids);
+answers = unrei.get();
+for i=1:s(1)
+    for j=1:s(2)        
+        A(i,j)=answers.get((i-1)*s(2)+(j-1));        
+    end
+end
+

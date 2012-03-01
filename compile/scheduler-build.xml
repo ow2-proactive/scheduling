@@ -46,10 +46,10 @@
 			<class name="org.ow2.proactive.scheduler.authentication.SchedulerAuthentication" />
 			<class name="org.ow2.proactive.scheduler.examples.Worker" />
 			<class name="org.ow2.proactive.scheduler.ext.masterworker.AOSchedulerWorker" />
-			<class name="org.ow2.proactive.scheduler.ext.matlab.client.AOMatlabEnvironment" />
-			<class name="org.ow2.proactive.scheduler.ext.scilab.client.AOScilabEnvironment" />
-			<class name="org.ow2.proactive.scheduler.ext.scilab.worker.AOScilabWorker" />
-			<class name="org.ow2.proactive.scheduler.ext.matsci.client.AODataspaceRegistry" />
+			<class name="org.ow2.proactive.scheduler.ext.matlab.middleman.AOMatlabEnvironment" />
+			<class name="org.ow2.proactive.scheduler.ext.scilab.middleman.AOScilabEnvironment" />
+            <class name="org.ow2.proactive.scheduler.ext.matsci.middleman.AOMatSciEnvironment" />
+			<class name="org.ow2.proactive.scheduler.ext.matsci.middleman.AODataspaceRegistry" />
 			<class name="org.ow2.proactive.scheduler.core.rmproxies.SchedulerRMProxy" />
 			<class name="org.ow2.proactive.scheduler.core.rmproxies.UserRMProxy" />
 			<class name="org.ow2.proactive.scheduler.task.launcher.ForkedJavaTaskLauncher" />
@@ -126,6 +126,9 @@
 	</target>
 
 	<target name="deploy.scheduler.matsci" depends="-deployCopy, compile.scheduler, deploy.common.client" description="Creates scheduler matlab/scilab jar">
+        <rmic base="${cl.scheduler.dir}" classpathref="scheduler.libs" includes="**/org/ow2/proactive/scheduler/ext/matsci/middleman/AOMatSciEnvironment.class" />
+        <rmic base="${cl.scheduler.dir}" classpathref="scheduler.libs" includes="**/org/ow2/proactive/scheduler/ext/matsci/middleman/AODataspaceRegistry.class" />
+        <rmic base="${cl.scheduler.dir}" classpathref="scheduler.libs" includes="**/org/ow2/proactive/scheduler/ext/matsci/middleman/MatSciJVMProcessInterfaceImpl.class" />
 		<jar destfile="${deploy.lib.dir}/${scheduler.matsci.jar}" manifest="${basedir}/scheduler-Manifest-base.mf" index="true">
 			<fileset dir="${cl.scheduler.dir}" includes="org/ow2/proactive/scheduler/common/Main.class" />
 			<fileset dir="${cl.scheduler.dir}" includes="**/org/ow2/proactive/scheduler/ext/common/**" />
@@ -135,6 +138,16 @@
 			<indexjars>
 				<fileset refid="jar.index.fileset" />
 			</indexjars>
+		</jar>
+        <jar destfile="${deploy.lib.dir}/${scheduler.matsci.embedded.jar}" manifest="${basedir}/scheduler-Manifest-base.mf" index="true">
+			<fileset dir="${cl.scheduler.dir}" includes="**/org/ow2/proactive/scheduler/ext/common/util/**" />
+			<fileset dir="${cl.scheduler.dir}" includes="**/org/ow2/proactive/scheduler/ext/matsci/client/**" />
+            <fileset dir="${cl.scheduler.dir}" includes="**/org/ow2/proactive/scheduler/ext/matsci/common/**" />
+			<fileset dir="${cl.scheduler.dir}" includes="**/org/ow2/proactive/scheduler/ext/matlab/client/**" />
+            <fileset dir="${cl.scheduler.dir}" includes="**/org/ow2/proactive/scheduler/ext/matlab/common/**" />
+            <fileset dir="${cl.scheduler.dir}" includes="**/org/ow2/proactive/scheduler/ext/scilab/client/**" />
+            <fileset dir="${cl.scheduler.dir}" includes="**/org/ow2/proactive/scheduler/ext/scilab/common/**" />
+            <fileset dir="${cl.scheduler.dir}" includes="**/org/ow2/proactive/scheduler/ext/matsci/middleman/*_Stub.class" />
 		</jar>
 	</target>
 

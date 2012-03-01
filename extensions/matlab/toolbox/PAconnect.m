@@ -80,12 +80,13 @@ function jobs = PAconnect(url, credpath)
 %   */
 
 sched = PAScheduler;
+opt = PAoptions();
 
 % Verify that proactive is already on the path or not
 p = javaclasspath('-all');
 cptoadd = 1;
 for i = 1:length(p)
-    if (strfind(p{i}, 'ProActive.jar'))
+    if (strfind(p{i}, 'ProActive_Scheduler-matlabemb.jar'))
         cptoadd = 0;
     end
 end
@@ -97,51 +98,102 @@ reconnected = false;
 % Test that the session is not already connected to a Scheduler, or that
 % the connection to it is failing
 tmpsolver = sched.PAgetsolver();
-if ~strcmp(class(tmpsolver), 'double')
-    tst = false;
-    try
-        tst = tmpsolver.isConnected();
-    catch ME
-        % Renewing a broken connection
-        tmpsolver.terminate();
-        pause(1);
-        node=sched.PAgetNode();
-        nodei = node.getNodeInformation();
-        nodeurl = nodei.getURL();
-        try
-            org.objectweb.proactive.core.node.NodeFactory.killNode(nodeurl);
-        catch
-        end
-        node=org.objectweb.proactive.core.node.NodeFactory.createLocalNode('MatlabNode', true, [], []);
-        sched.PAgetNode(node);
-        tmpsolver = org.objectweb.proactive.api.PAActiveObject.newActive('org.ow2.proactive.scheduler.ext.matlab.client.AOMatlabEnvironment',[],node );
-        
-        sched.PAgetsolver(tmpsolver);
+if ~strcmp(class(tmpsolver), 'double')            
+    
+    if ~tmpsolver.isConnected()
+         % Renewing a broken connection
         ok = tmpsolver.join(url);
         if ~ok
             error('PAconnect::Error while connecting');
         end
-    end
-    if tst && tmpsolver.isLoggedIn()
+        tst = true;
+    end    
+    
+    if tmpsolver.isLoggedIn()
         error('This session is already connected to a scheduler.');
     end
     solver = tmpsolver;
 else
     % Creating a new connection
-    node=org.objectweb.proactive.core.node.NodeFactory.createLocalNode('MatlabNode', true, [], []);
-    sched.PAgetNode(node);
-    solver = org.objectweb.proactive.api.PAActiveObject.newActive('org.ow2.proactive.scheduler.ext.matlab.client.AOMatlabEnvironment',[], node );
-    
+    deployJVM(sched,opt);
+    %     node=org.objectweb.proactive.core.node.NodeFactory.createLocalNode('MatlabNode', true, [], []);
+    %     sched.PAgetNode(node);
+    %     solver = org.objectweb.proactive.api.PAActiveObject.newActive('org.ow2.proactive.scheduler.ext.matlab.middleman.AOMatlabEnvironment',[], node );
+    %
+    solver = sched.PAgetsolver();
     ok = solver.join(url);
     if ~ok
         error('PAconnect::Error while connecting');
     end
+    dataspaces(sched, opt);
     % Recording the solver inside the session, each further call to PAgetsolver
     % will retrieve it
-    sched.PAgetsolver(solver);
+    %sched.PAgetsolver(solver);
+end
+
+if exist('credpath', 'var')
+    login(solver,sched, credpath);
+else
+    login(solver, sched);
 end
 
 
+
+end
+
+function deployJVM(sched,opt)
+deployer = org.ow2.proactive.scheduler.ext.matsci.client.embedded.util.StandardJVMSpawnHelper.getInstance();
+home = getenv('JAVA_HOME');
+fs=filesep();
+if length(home) > 0
+    deployer.setJavaPath([home fs 'bin' fs 'java']);
+end
+[pathstr, name, ext] = fileparts(mfilename('fullpath'));
+javafile = java.io.File(pathstr);
+scheduling_dir = char(javafile.getParentFile().getParentFile().getParent().toString());
+
+dist_lib_dir = [scheduling_dir fs 'dist' fs 'lib'];
+if ~exist(dist_lib_dir,'dir')
+    plugins_dir = [scheduling_dir fs 'plugins'];
+    dirdir=dir([plugins_dir fs 'org.ow2.proactive.scheduler.lib_*']);
+    dd=dirdir.name;
+    dist_lib_dir = [plugins_dir fs dd fs 'lib'];
+    if ~exist(dist_lib_dir,'dir')
+        error(['PAconnect::cannot find directory ' dist_lib_dir]);
+    end
+end
+jars = opt.ProActiveJars;
+jarsjava = javaArray('java.lang.String', length(jars));
+for i=1:length(jars)
+    jarsjava(i) = java.lang.String([dist_lib_dir filesep jars{i}]);
+end
+deployer.setDebug(opt.Debug);
+deployer.setClasspathEntries(jarsjava);
+deployer.setProActiveConfiguration(opt.ProActiveConfiguration);
+deployer.setLog4JFile(opt.Log4JConfiguration);
+deployer.setPolicyFile(opt.SecurityFile);
+deployer.setClassName('org.ow2.proactive.scheduler.ext.matsci.middleman.MiddlemanDeployer');
+
+if exist(opt.DisconnectedModeFile,'file')
+    load(opt.DisconnectedModeFile, 'rmiport');
+else
+    rmiport = opt.RmiPort;
+end
+deployer.setRmiPort(rmiport);
+
+pair = deployer.deployOrLookup();
+itfs = pair.getX();
+PAoptions('RmiPort',pair.getY());
+solver = deployer.getMatlabEnvironment();
+sched.PAgetsolver(solver);
+registry = deployer.getRegistry();
+sched.PAgetDataspaceRegistry(registry);
+jvmint = deployer.getJvmInterface();
+sched.PAgetJVMInterface(jvmint);
+
+end
+
+function login(solver, sched, credpath)
 % Logging in
 if exist('credpath', 'var')
     try
@@ -170,31 +222,17 @@ else
         error('PAconnect::Authentication error');
     end
     sched.PAgetlogin(login);
-    
+
 end
 disp('Login succesful');
 
+end
+
+function dataspaces(sched,opt)
 % Dataspace Handler
-opt = PAoptions();
-dsconnected = org.ow2.proactive.scheduler.ext.matsci.client.DataspaceHelper.isConnected();
-if ~dsconnected && isnumeric(opt.CustomDataspaceURL) && isempty(opt.CustomDataspaceURL) && exist(opt.DisconnectedModeFile,'file')
-    errorreconnecting = false;
-    if isnumeric(opt.CustomDataspaceURL) && isempty(opt.CustomDataspaceURL)
-        try
-            load(opt.DisconnectedModeFile, 'registryurl');
-            disp('Reconnecting to existing dataspace handler, please wait...');
-            org.ow2.proactive.scheduler.ext.matsci.client.DataspaceHelper.init(registryurl,'MatlabInputSpace', 'MatlabOutputSpace', opt.Debug);
-        catch ME
-            disp('There was a problem reconnecting to previous dataspace handler.');
-            if isa(ME,'MException')
-                disp(getReport(ME));
-            elseif isa(ME, 'java.lang.Throwable')
-                ME.printStackTrace();
-            end
-            errorreconnecting = true;
-        end
-    end
-    
+registry = sched.PAgetDataspaceRegistry();
+registry.init('MatlabInputSpace', 'MatlabOutputSpace', opt.Debug);
+if exist(opt.DisconnectedModeFile,'file')
     % We load the job database, wether there was a problem with
     % reconnecting to the Dataspace handler or not
     try
@@ -215,18 +253,7 @@ if ~dsconnected && isnumeric(opt.CustomDataspaceURL) && isempty(opt.CustomDatasp
             delete(opt.DisconnectedModeFile);
         end
     end
-    
-    if errorreconnecting
-        dsconnected = false;
-    else
-        dsconnected = true;
-    end
-    
 end
-if ~dsconnected && isnumeric(opt.CustomDataspaceURL) && isempty(opt.CustomDataspaceURL)
-    disp('Creating dataspace handler, please wait...');
-    org.ow2.proactive.scheduler.ext.matsci.client.DataspaceHelper.init([],'MatlabInputSpace', 'MatlabOutputSpace', opt.Debug);
-    disp('Dataspace handler created');
 end
 
 

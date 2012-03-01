@@ -1,29 +1,29 @@
-function val=PAResult_PAwaitFor(R,timeout)
+function [val_k,err]=PAResult_PAwaitFor(R,RaL)
     global ('PAResult_DB');
+    val_k = [];
     //disp('PAResult_PAwaitFor : init')    
     errormessage=[];
-    if ~jexists(R.future) then
-        error('PAResult::object cleared');        
-    end
-    jimport org.objectweb.proactive.api.PAFuture;
-    ff = R.future;    
+    //if ~jexists(R.future) then
+    //    error('PAResult::object cleared');        
+    //end
+       
     if argn(2) == 2
-        RaL = PAFuture.getFutureValue(ff,timeout);
+        jinvoke(R.RaL,'set',RaL);        
     else
-        RaL = PAFuture.getFutureValue(ff);
+        RaL = jinvoke(R.RaL,'get');                
     end
     if jinvoke(RaL,'isOK')
         //disp('PAResult_PAwaitFor : isOK')        
-        printLogs(R,RaL);
+        printLogs(R,RaL, %f);
 
         if jinvoke(R.resultSet,'get')
             //disp('PAResult_PAwaitFor : Result get')
-            val=PAResult_DB(R.dbrid);
+            val_k=PAResult_DB(R.dbrid);
             //disp(val)
         else
             //disp('PAResult_PAwaitFor : Result set')
             load(R.outFile);
-            val = out;
+            val_k = out;
             PAResult_DB(R.dbrid) = out;
             //disp(val)
             resultSet(R);
@@ -32,16 +32,16 @@ function val=PAResult_PAwaitFor(R,timeout)
     elseif jinvoke(RaL,'isMatSciError');
         //disp('PAResult_PAwaitFor : isMatSciError')
         
-        printLogs(R,RaL);
+        printLogs(R,RaL,%t);
         jinvoke(R.iserror,'set',%t);
         resultSet(R);
         errormessage = 'PAResult:PAwaitFor Error during remote script execution';
     else
         //disp('PAResult_PAwaitFor : internalError')
-        printLogs(R,RaL);
+        printLogs(R,RaL,%t);
         e = jinvoke(RaL,'getException');
-        jimport org.ow2.proactive.scheduler.ext.scilab.client.ScilabSolver;
-        exstr = ScilabSolver.getStackTrace(e);
+        jimport org.ow2.proactive.scheduler.ext.common.util.StackTraceUtil;        
+        exstr = jinvoke(StackTraceUtil,'getStackTrace',e);
         printf('%s',exstr);
         try
             jremove(e);
@@ -52,15 +52,10 @@ function val=PAResult_PAwaitFor(R,timeout)
         jinvoke(R.iserror,'set',%t);
         resultSet(R);
         errormessage = 'PAResult:PAwaitFor Internal Error';
-    end
-    jremove(RaL);
-    //jremove(PAFuture);
+    end    
 
     PAResult_clean(R);
-    if errormessage ~= [] then
-        val = [];
-        error(errormessage)
-    end
+    err = errormessage;
 endfunction
 
 function resultSet(R)
@@ -84,11 +79,11 @@ function resultSet(R)
     end
 endfunction
 
-function printLogs(R,RaL)
+function printLogs(R,RaL,err)
     if ~jexists(R.logsPrinted) then
             error('PAResult::object cleared');
         end
-    if ~jinvoke(R.logsPrinted,'get')
+    if ~jinvoke(R.logsPrinted,'get') | err
         logs = jinvoke(RaL,'getLogs');
         dummy = jinvoke(R.logs,'append',logs);
         jremove(dummy); // append returns a StringBuilder object that must be freed

@@ -51,7 +51,7 @@
 
     <refsection>
         <title>Examples</title>
-        <programlisting role="example"><![CDATA[
+        <programlisting role="example"><![CDATA[<![CDATA[<![CDATA[<![CDATA[<![CDATA[<![CDATA[<![CDATA[<![CDATA[<![CDATA[<![CDATA[
 function out=mysleep(in)
     sleep(in)
     out=%t
@@ -82,9 +82,8 @@ Task 0_0 has been killed.
  r  =
 
 (1):
-Aborted by userorg.ow2.proactive.scheduler.ext.matsci.client.PASolveException: org.ow2.proactive.scheduler.common.exception.TaskAbortedException: Aborted by user
-	at org.ow2.proactive.scheduler.ext.scilab.client.AOScilabEnvironment.waitResultOfTask(AOScilabEnvironment.java:115)
-	at org.ow2.proactive.scheduler.ext.scilab.client.AOScilabEnvironment.waitResult(AOScilabEnvironment.java:395)
+Aborted by userorg.ow2.proactive.scheduler.ext.matsci.client.PASolveException: org.ow2.proactive.scheduler.common.exception.TaskAbortedException: Aborg.ow2.proactive.scheduler.ext.scilab.middlemanmiddleman.AOScilabEnvironmentvironment.waitResultOfTask(AOScilabEnvironment.java:115)
+	at org.ow2.proactive.scheduler.ext.scilab.middleman.AOScilabEnvironment.waitResult(AOScilabEnvironment.java:395)
 	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
 	at sun.reflect.NativeMethodAccessorImpl.invoke(Unknown Source)
 	at sun.reflect.DelegatingMethodAccessorImpl.invoke(Unknown Source)
@@ -95,10 +94,8 @@ Aborted by userorg.ow2.proactive.scheduler.ext.matsci.client.PASolveException: o
 	at org.objectweb.proactive.core.body.BodyImpl$ActiveLocalBodyStrategy.serveInternal(BodyImpl.java:626)
 	at org.objectweb.proactive.core.body.BodyImpl$ActiveLocalBodyStrategy.serve(BodyImpl.java:587)
 	at org.objectweb.proactive.core.body.AbstractBody.serve(AbstractBody.java:949)
-	at org.objectweb.proactive.Service.serve(Service.java:121)
-	at org.ow2.proactive.scheduler.ext.matsci.client.AOMatSciEnvironment.servePending(AOMatSciEnvironment.java:830)
-	at org.ow2.proactive.scheduler.ext.matsci.client.AOMatSciEnvironment.maybeServePending(AOMatSciEnvironment.java:794)
-	at org.ow2.proactive.scheduler.ext.matsci.client.AOMatSciEnvironment.runActivity(AOMatSciEnvironment.java:760)
+	at org.objectweb.proactive.Service.serve(Service.java:org.ow2.proactive.scheduler.ext.matsci.middleman.AOMatSciEnvironmentvironment.servePending(AOMatSciEnvironment.java:830)
+	aorg.ow2.proactive.scheduler.ext.matsci.middlemanan.AOMatSciEnvironment.maybeServePendorg.ow2.proactive.scheduler.ext.matsci.client.middleman.AOMatSciEnvironment.ext.matsci.client.AOMatSciEnvironment.runActivity(AOMatSciEnvironment.java:760)
 	at org.objectweb.proactive.core.body.ActiveBody.run(ActiveBody.java:203)
 	at java.lang.Thread.run(Unknown Source)
 Caused by: org.ow2.proactive.scheduler.common.exception.TaskAbortedException: Aborted by user
@@ -127,7 +124,7 @@ at line       8 of function %PAResult_p called by :
 at line       9 of function %PAResL_p called by :
 r
 
- ]]></programlisting>
+]]></programlisting>
     </refsection>
 
     <refsection>

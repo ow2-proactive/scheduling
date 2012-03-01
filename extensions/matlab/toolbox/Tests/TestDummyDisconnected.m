@@ -85,8 +85,8 @@ for j=1:length(alltasks1)
 end
 
 disp('..................................then wait for results');
-val1=PAwaitAll(resl1,timeout)
-val2=PAwaitAll(resl2,timeout)
+val1=PAwaitFor(resl1,timeout)
+val2=PAwaitFor(resl2,timeout)
 
 [ok,msg]=checkValuesFact(val1);
 if ~ok disp(msg),return; end
@@ -97,22 +97,22 @@ disp('........... retrieve the same results from the scheduler');
 
 solver = sched.PAgetsolver();
 
-resfutureList1 = solver.retrieve(jinfo1);
+solver.retrieve(jinfo1);
 
-for i=1:resfutureList1.size()
-    syncres1(i)=PAResult(resfutureList1.get(i-1), taskinfolist1{i});
+for i=1:length(taskinfolist1)
+    syncres1(i)=PAResult(taskinfolist1{i});
     sched.PAaddDirToClean(jobs{1}, taskinfolist1{i}.cleanDirSet);
 end
 
-resfutureList2 = solver.retrieve(jinfo2);
+solver.retrieve(jinfo2);
 
-for i=1:resfutureList2.size()
-    syncres2(i)=PAResult(resfutureList2.get(i-1), taskinfolist2{i});
+for i=1:length(taskinfolist2)
+    syncres2(i)=PAResult(taskinfolist2{i});
     sched.PAaddDirToClean(jobs{2}, taskinfolist1{i}.cleanDirSet);
 end
 
-val1=PAwaitAll(syncres1,timeout)
-val2=PAwaitAll(syncres2,timeout)
+val1=PAwaitFor(syncres1,timeout)
+val2=PAwaitFor(syncres2,timeout)
 
 [ok,msg]=checkValuesFact(val1);
 if ~ok disp(msg),return; end
@@ -122,8 +122,8 @@ if ~ok disp(msg),return; end
 if old1
     PAoptions('CleanAllTempFilesDirectly', true);
     % re-clean the jobs to clear temp files
-    val1=PAwaitAll(syncres1,timeout);
-    val2=PAwaitAll(syncres2,timeout);
+    val1=PAwaitFor(syncres1,timeout);
+    val2=PAwaitFor(syncres2,timeout);
 end
 
 if old2

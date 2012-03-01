@@ -42,8 +42,8 @@ import org.objectweb.proactive.extensions.dataspaces.api.DataSpacesFileObject;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import org.ow2.proactive.scheduler.ext.common.util.FileUtils;
-import org.ow2.proactive.scheduler.ext.matlab.common.PASolveMatlabGlobalConfig;
-import org.ow2.proactive.scheduler.ext.matlab.common.PASolveMatlabTaskConfig;
+import org.ow2.proactive.scheduler.ext.matlab.common.data.PASolveMatlabGlobalConfig;
+import org.ow2.proactive.scheduler.ext.matlab.common.data.PASolveMatlabTaskConfig;
 import org.ow2.proactive.scheduler.ext.matlab.common.exception.MatlabTaskException;
 import org.ow2.proactive.scheduler.ext.matlab.worker.util.MatlabEngineConfig;
 import org.ow2.proactive.scheduler.ext.matlab.worker.util.MatlabFinder;
@@ -372,31 +372,7 @@ public class MatlabExecutable extends JavaExecutable {
      * @throws Exception
      */
     private void initTransferInputFiles() throws Exception {
-        if (taskconfig.isInputFilesThere() && paconfig.isZipInputFiles()) {
-            int n = taskconfig.getInputFilesZipNames().length;
-            URI[] uris = new URI[n];
-            for (int i = 0; i < n; i++) {
-                uris[i] = new URI(getLocalFile(tempSubDirRel + taskconfig.getInputFilesZipNames()[i])
-                        .getRealURI());
-            }
-            taskconfig.setInputZipFilesURI(uris);
-
-            printLog("Unzipping input files...");
-
-            for (URI uri : taskconfig.getInputZipFilesURI()) {
-                File inputZip = new File(uri);
-                if (!inputZip.exists()) {
-                    System.err.println("Error, input zip file cannot be accessed at : " + inputZip);
-                    throw new IllegalStateException("Error, input zip file cannot be accessed at : " +
-                        inputZip);
-                }
-                // Uncompress the input file
-                if (!FileUtils.unzip(inputZip, localSpaceRootDir)) {
-                    System.err.println("Unable to unzip the input file " + inputZip);
-                    throw new IllegalStateException("Unable to the input file " + inputZip);
-                }
-            }
-        }
+        // do nothing
     }
 
     /**
@@ -464,6 +440,14 @@ public class MatlabExecutable extends JavaExecutable {
             File envMat = new File(taskconfig.getEnvMatFileURI());
             printLog("Loading workspace from " + envMat);
             // Load workspace using MATLAB command
+            String[] globals = paconfig.getEnvGlobalNames();
+            if (globals != null && globals.length > 0) {
+                String globalstr = "";
+                for (String name : globals) {
+                    globalstr += " " + name;
+                }
+                matlabConnection.evalString("global" + globalstr);
+            }
             matlabConnection.evalString("load('" + envMat + "');");
         }
     }
@@ -515,23 +499,7 @@ public class MatlabExecutable extends JavaExecutable {
     }
 
     private void transferOutputFiles() throws Exception {
-        if (taskconfig.isOutputFilesThere() && paconfig.isZipOutputFiles()) {
-
-            printLog("Zipping output files...");
-
-            String[] outputFiles = taskconfig.getOutputFiles();
-            String[] names = taskconfig.getOutputFilesZipNames();
-
-            for (int i = 0; i < names.length; i++) {
-                File outputZip = new File(tempSubDir, names[i]);
-                //conn.evalString("ProActiveOutputFiles=cell(1,"+outputFiles.length+");");
-                //for (int i=0; i < outputFiles.length; i++) {
-                String updatedFile = outputFiles[i].replaceAll("/", File.separator);
-                //conn.evalString("ProActiveOutputFiles{"+(i+1)+"}='"+updatedFile+"';");
-                //}
-                matlabConnection.evalString("zip('" + outputZip + "',{'" + updatedFile + "'});");
-            }
-        }
+        // do nothing
     }
 
     private void testOutput() throws Exception {

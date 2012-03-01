@@ -21,18 +21,18 @@
 %       patask_k - a vector of PATask objects
 %
 %       patask - a matrix of PATask objects
-%       
+%
 %
 % Description
 %
-%       The call to PAsolve is synchronous until the scheduler has received the 
+%       The call to PAsolve is synchronous until the scheduler has received the
 %       information necessary to run the tasks. PAsolve returns right
 %       afterwards and doesn't block matlab until the tasks have been scheduled
 %       and completed.
 %
-%       PAsolve returns an array of objects of type PAResult. Its size matches 
-%       the number of argk or pataskk given or the number of columns in the 
-%       patask matrix. 
+%       PAsolve returns an array of objects of type PAResult. Its size matches
+%       the number of argk or pataskk given or the number of columns in the
+%       patask matrix.
 %
 %       Blocking wait functions can be called on this PAResult array or on
 %       a portion of this array (see PAwaitFor, PAwaitAny). Non-blocking
@@ -40,7 +40,7 @@
 %       (PAisAwaited)
 %
 %       PAsolve is based on the principle of parametric sweep, i.e. one
-%       task/many parameters (see Basic syntax). 
+%       task/many parameters (see Basic syntax).
 %
 %       PAsolve can either be called by giving a function handle and a list
 %       of parameters (Basic Syntax), or by providing arrays of PATask objects which
@@ -52,7 +52,7 @@
 %       the previous line.
 %
 %       PAsolve behaviour can be configured using the PAoptions function.
-%   
+%
 %
 % See also
 %       PAconnect, PAoptions, PAgetResults, PATask, PAResult, PAResult/PAwaitFor,
@@ -98,6 +98,26 @@
 %   */
 function results = PAsolve(varargin)
 
+    function [names,types] = filternames(names, types)
+        names_ex = opt.EnvExcludeList;
+        types_ex = opt.EnvExcludeTypeList;
+        j=1;
+        for i=1:length(names)
+            tf1 = ismember(names{j}, names_ex);
+            tf2 = ismember(types{j}, types_ex);
+            if tf1
+                names(j)=[];
+                types(j)=[];
+            elseif tf2
+                names(j)=[];
+                types(j)=[];
+            else
+                j=j+1;
+            end
+        end
+    end
+
+
 %mlock
 persistent solveid
 if exist('solveid','var') == 1 && isa(solveid,'int32')
@@ -117,7 +137,7 @@ solver = sched.PAgetsolver();
 if strcmp(class(solver),'double')
     error('This Matlab session is not connected to a Scheduler.');
 end
-try 
+try
     tst = solver.isConnected();
 catch ME
     error('This Matlab session is not connected to a Scheduler.');
@@ -127,11 +147,11 @@ if ~tst
 end
 
 opt = PAoptions;
-solve_config = org.ow2.proactive.scheduler.ext.matlab.common.PASolveMatlabGlobalConfig();
-task_config = javaArray('org.ow2.proactive.scheduler.ext.matlab.common.PASolveMatlabTaskConfig', NN,MM);
+solve_config = org.ow2.proactive.scheduler.ext.matlab.common.data.PASolveMatlabGlobalConfig();
+task_config = javaArray('org.ow2.proactive.scheduler.ext.matlab.common.data.PASolveMatlabTaskConfig', NN,MM);
 for i=1:NN
     for j=1:MM
-        task_config(i,j)= org.ow2.proactive.scheduler.ext.matlab.common.PASolveMatlabTaskConfig();
+        task_config(i,j)= org.ow2.proactive.scheduler.ext.matlab.common.data.PASolveMatlabTaskConfig();
     end
 end
 
@@ -143,28 +163,91 @@ end
 [globalFilesToClean,taskFilesToClean,pa_dir,curr_dir,fs,subdir] = initDirectories(opt,solve_config,NN,solveid);
 
 % Initializing data spaces
-initDS(opt,solve_config,curr_dir);
+initDS(opt,sched,solve_config,curr_dir);
 
 % Initialize Remote functions
 [keepaliveFunctionName,checktoolboxesFunctionName]= initRemoteFunctions(solve_config);
 
+% Transfering the environment
+if opt.TransferEnv
+    envMatName = ['MatlabEnv_' num2str(solveid) '.mat'];
+    envFilePath = [pa_dir fs envMatName];
+
+    % saving caller workspace and global variables
+    local_varlist = evalin('caller', 'whos();');
+
+    local_names = {local_varlist.name};
+    local_types = {local_varlist.class};
+
+    [local_names,local_types] = filternames(local_names, local_types);
+    
+    % additional processing for specific types
+    for i=1:length(local_names)
+        if evalin('caller', ['iscom(' local_names{i} ');'])
+            local_types{i} = 'com';
+        elseif evalin('caller', ['isjava(' local_names{i} ');'])
+            local_types{i} = 'java';
+        elseif evalin('caller', ['isinterface(' local_names{i} ');'])
+            local_types{i} = 'interface';
+        end
+    end
+
+    global_varlist = whos('global');
+    global_names = {global_varlist.name};
+    global_types = {global_varlist.class};
+
+    [global_names,global_types] = filternames(global_names, global_types);
+
+    local_names_mod = cellfun(@(x) ['''' x ''','] ,local_names,'UniformOutput',false);
+    local_names_str = cell2mat(local_names_mod);
+    if opt.Debug
+        disp(['Saving caller vars :' local_names_str ' in ' envFilePath]);
+    end
+    evalin('caller', ['save(''' envFilePath  ''',' local_names_str '''' opt.TransferMatFileOptions ''')']);
+
+    global_names_mod = cellfun(@(x) [' ' x] ,global_names,'UniformOutput',false);
+    global_names_str = cell2mat(global_names_mod);
+
+    global_names_mod2 = cellfun(@(x) ['''' x ''','] ,global_names,'UniformOutput',false);
+    global_names_str2 = cell2mat(global_names_mod2);
+
+    eval(['global' global_names_str]);
+    
+    for i=1:length(global_names)
+        if eval(['iscom(' global_names{i} ');'])
+            global_types{i} = 'com';
+        elseif eval(['isjava(' global_names{i} ');'])
+            global_types{i} = 'java';
+        elseif eval(['isinterface(' global_names{i} ');'])
+            global_types{i} = 'interface';
+        end
+    end
+    
+    if opt.Debug
+        disp(['Saving global vars :' global_names_str ' in ' envFilePath]);
+    end
+    eval(['save(''' envFilePath  ''',' global_names_str2 ' ''-append'',''' opt.TransferMatFileOptions ''')']);
+
+    solve_config.setEnvMatFileName(envMatName);
+
+    globalNames = javaArray('java.lang.String', length(global_names));
+    for i=1:length(global_names)
+        globalNames(i) = java.lang.String(global_names{i});
+    end
+
+    solve_config.setEnvGlobalNames(globalNames);
+
+    globalFilesToClean=[globalFilesToClean {envFilePath}];
+else
+    local_names = {};
+    local_types = {};
+    global_names = {};
+    global_types = {};
+end
+
 % Transfering source files
 [funcDatabase,taskFilesToClean] = initTransferSource(opt,fs,solveid,funcDatabase,sched,allfuncs,...
-    NN,MM,Tasks,keepaliveFunctionName,checktoolboxesFunctionName,taskFilesToClean,task_config,pa_dir);
-
-
-% Transfering the environment
-envZipName = ['MatlabPAsolveEnv_' num2str(solveid) '.zip'];
-envMatName = ['MatlabEnv_' num2str(solveid) '.mat'];
-if opt.TransferEnv
-    envFilePath = [pa_dir fs envMatName];
-    envZipFilePath = [pa_dir fs envZipName];
-    evalin('caller', ['save(''' envFilePath  ''',''' opt.TransferMatFileOptions ''')']);
-        
-    solve_config.setEnvMatFileName(envMatName);
-    
-    globalFilesToClean=[globalFilesToClean {envFilePath}];
-end
+    NN,MM,Tasks,keepaliveFunctionName,checktoolboxesFunctionName,taskFilesToClean,task_config,pa_dir, local_names,local_types, global_names, global_types);
 
 % Init Input Files
 [taskFilesToClean] = initInputFiles(NN,MM,Tasks,opt,fs,taskFilesToClean,task_config,subdir,pa_dir);
@@ -183,10 +266,8 @@ initSolveConfig(solve_config,opt,sched);
 
 % Send the task list to the scheduler
 
-pairinfolist = solver.solve(solve_config, task_config);
+jobinfo = solver.solve(solve_config, task_config);
 
-jobinfo = pairinfolist.getX();
-resfutureList = pairinfolist.getY();
 jid = char(jobinfo.getJobId());
 disp(['Job submitted : ' jid]);
 
@@ -202,7 +283,7 @@ for i=1:NN
     taskinfo.jobid = jid;
     taskinfo.taskid = char(tnit.next());
     sched.PATaskRepository(jid, taskinfo.taskid, taskinfo);
-    results(i)=PAResult(resfutureList.get(i-1), taskinfo);
+    results(i)=PAResult(taskinfo);
     for j=1:length(taskFilesToClean{i})
         sched.PAaddFileToClean(jid, taskFilesToClean{i}{j});
     end
@@ -322,7 +403,7 @@ for i=1:NN
         else
             error(['Parameter ' num2str(i) ',' num2str(j)  ' has no function definition.']);
         end
-        
+
     end
 end
 end
@@ -379,11 +460,12 @@ subdir = [subdir '/' num2str(solveid)];
 end
 
 % Initialize Data Spaces
-function initDS(opt,solve_config,curr_dir)
+function initDS(opt,sched, solve_config,curr_dir)
 
 if isnumeric(opt.CustomDataspaceURL) && isempty(opt.CustomDataspaceURL)
-    helper = org.ow2.proactive.scheduler.ext.matsci.client.DataspaceHelper.getInstance();
-    pair = helper.createDataSpace(curr_dir);
+    registry = sched.PAgetDataspaceRegistry();
+    unreifiable = registry.createDataSpace(curr_dir);
+    pair = unreifiable.get();
     solve_config.setInputSpaceURL(pair.getX());
     solve_config.setOutputSpaceURL(pair.getY());
 
@@ -442,16 +524,14 @@ if ischar(opt.CustomScript)
         solve_config.setCustomScriptUrl(select);
     end
 end
-solve_config.setZipInputFiles(opt.ZipInputFiles);
-solve_config.setZipOutputFiles(opt.ZipOutputFiles);
 solve_config.setZipSourceFiles(true);
 solve_config.setUseMatlabControl(opt.UseMatlabControl);
 end
 
 
 
-% Initialize task config for Tansfer source (zip function used)
-function [funcDatabase,taskFilesToClean] = initTransferSource(opt, fs, solveid,funcDatabase,sched,allfuncs, NN, MM,Tasks,keepaliveFunctionName,checktoolboxesFunctionName,taskFilesToClean,task_config,pa_dir)
+% Initialize task config for Transfer source (zip function used)
+function [funcDatabase,taskFilesToClean] = initTransferSource(opt, fs, solveid,funcDatabase,sched,allfuncs, NN, MM,Tasks,keepaliveFunctionName,checktoolboxesFunctionName,taskFilesToClean,task_config,pa_dir, local_names,local_types, global_names, global_types)
 sourceZipBaseName = ['MatlabPAsolveSrc_' num2str(solveid)];
 
 
@@ -482,28 +562,36 @@ sourceZipBaseName = ['MatlabPAsolveSrc_' num2str(solveid)];
         zFN = [sourceZipBaseName '_' hashsource '.zip'];
         zFP = [pa_dir fs zFN];
         if ~exist(zFP, 'file')
-            zip(zFP, z);                    
+            zip(zFP, z);
         end
-%         if length(z) > 0
-                        
-%         else
-%             % Dummy code in case there is no file to zip
-%             zFP = [pa_dir fs zFN];
-%             zip(zFP, {[mfilename('fullpath') '.m']});
-%             h = char(org.ow2.proactive.scheduler.ext.common.util.IOTools.generateHash(zFP));
-%         end
+        %         if length(z) > 0
+
+        %         else
+        %             % Dummy code in case there is no file to zip
+        %             zFP = [pa_dir fs zFN];
+        %             zip(zFP, {[mfilename('fullpath') '.m']});
+        %             h = char(org.ow2.proactive.scheduler.ext.common.util.IOTools.generateHash(zFP));
+        %         end
     end
 
 
 
-stdclasses = {'logical','char','int8','uint8','int16','uint16','int32','uint32','int64','uint64','single','double','cell','struct','function_handle'};
+stdclasses = {'logical','char','int8','uint8','int16','uint16','int32','uint32','int64','uint64','single','double','cell','struct','function_handle','com','java','interface'};
 envziplist={};
 if opt.TransferEnv
-    sp=evalin('caller', 'whos');
+    global_names_mod = cellfun(@(x) [' ' x] ,global_names,'UniformOutput',false);
+    global_names_str = cell2mat(global_names_mod);
+    eval(['global' global_names_str]);
 
-    for i=1:length(sp)
-        c=sp(i).class;
-        if ismember(c, stdclasses) || evalin('caller', ['iscom(' sp(i).name ')']) || evalin('caller', ['isjava(' sp(i).name ')']) || evalin('caller', ['isinterface(' sp(i).name ')'])
+    for i=1:(length(local_names)+length(global_names))
+        if i <= length(local_names)
+            c = local_types{i};
+            ok = ismember(c, stdclasses);
+        else
+            c = global_types{i-length(local_names)};
+            ok = ismember(c, stdclasses);
+        end
+        if ok
         else
             if ~isfield(funcDatabase, c) || ~isfield(funcDatabase.(c),'dep')
                 [envmfiles envclassdirs] = sched.findDependency(c);
@@ -551,6 +639,7 @@ for i=1:NN
     end
 end
 end
+
 
 % Initialize Task Config Input Files
 function [taskFilesToClean] = initInputFiles(NN,MM,Tasks,opt,fs,taskFilesToClean,task_config,subdir,pa_dir)
@@ -661,39 +750,39 @@ for i=1:NN
         argi = Tasks(j,i).Params;
         main ='';
 
-            inVarFN = [variableInFileBaseName indToFile([i j]) '.mat'];
-            outVarFN = [variableOutFileBaseName indToFile([i j]) '.mat'];
-            inVarFP = [pa_dir fs inVarFN];
-            outVarFP = [pa_dir fs outVarFN];
-            % Creating input parameters mat files
-            if length(argi) == 0
-                in.in1=true;
-            else
-                for k=1:length(argi)
-                    in.(['in' num2str(k)]) = argi{k};
-                end
+        inVarFN = [variableInFileBaseName indToFile([i j]) '.mat'];
+        outVarFN = [variableOutFileBaseName indToFile([i j]) '.mat'];
+        inVarFP = [pa_dir fs inVarFN];
+        outVarFP = [pa_dir fs outVarFN];
+        % Creating input parameters mat files
+        if length(argi) == 0
+            in.in1=true;
+        else
+            for k=1:length(argi)
+                in.(['in' num2str(k)]) = argi{k};
             end
-            if (ischar(opt.TransferMatFileOptions) && length(opt.TransferMatFileOptions) > 0)
-                save(inVarFP,'-struct','in',opt.TransferMatFileOptions);
-            else
-                save(inVarFP,'-struct','in');
-            end
-            taskFilesToClean{i}=union(taskFilesToClean{i}, {inVarFP});
-            % because of disconnected mode, the final out is handled
-            % differently
-            if j < MM
-                taskFilesToClean{i}=union(taskFilesToClean{i}, {outVarFP});
-            end
-            task_config(i,j).setInputVariablesFileName(inVarFN);
-            task_config(i,j).setOutputVariablesFileName(outVarFN);
-            if j > 1 && Tasks(j,i).Compose
-                task_config(i,j).setComposedInputVariablesFileName([variableOutFileBaseName indToFile([i j-1]) '.mat']);
-            end
+        end
+        if (ischar(opt.TransferMatFileOptions) && length(opt.TransferMatFileOptions) > 0)
+            save(inVarFP,'-struct','in',opt.TransferMatFileOptions);
+        else
+            save(inVarFP,'-struct','in');
+        end
+        taskFilesToClean{i}=union(taskFilesToClean{i}, {inVarFP});
+        % because of disconnected mode, the final out is handled
+        % differently
+        if j < MM
+            taskFilesToClean{i}=union(taskFilesToClean{i}, {outVarFP});
+        end
+        task_config(i,j).setInputVariablesFileName(inVarFN);
+        task_config(i,j).setOutputVariablesFileName(outVarFN);
+        if j > 1 && Tasks(j,i).Compose
+            task_config(i,j).setComposedInputVariablesFileName([variableOutFileBaseName indToFile([i j-1]) '.mat']);
+        end
 
-            % The last task in the chain contains the final output
-            if j == MM
-                outVarFiles{i} = outVarFP;
-            end
+        % The last task in the chain contains the final output
+        if j == MM
+            outVarFiles{i} = outVarFP;
+        end
 
 
         % Creating the rest of the command (evaluation of the user
@@ -714,7 +803,7 @@ for i=1:NN
         main = [main ');'];
         task_config(i,j).setInputScript(input);
         task_config(i,j).setMainScript(main);
-        
+
     end
 end
 end
@@ -732,7 +821,7 @@ for i=1:NN
             catch ME
                 ok = false;
             end
-            
+
             if ~ok
                 task_config(i,j).setCustomScriptUrl(['file:' select]);
             else

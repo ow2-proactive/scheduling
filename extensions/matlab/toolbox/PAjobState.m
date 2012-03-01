@@ -68,9 +68,9 @@ function PAjobState(jobid)
     end
     sched = PAScheduler;
     solver = sched.PAgetsolver();
+    output = solver.jobState(jobid);
+    disp(output);
     if nargout == 1        
-        varargout{1} = evalc('solver.jobState(jobid);');
-    else             
-        solver.jobState(jobid);
+        varargout{1} = output;                        
     end
 end

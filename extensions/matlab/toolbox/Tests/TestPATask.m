@@ -71,7 +71,7 @@ T
 
 disp('...... Testing PAsolve with image processing, input/output files, and custom selection script');
 resl = PAsolve(T);
-val=PAwaitAll(resl,timeout)
+val=PAwaitFor(resl,timeout)
 
 for i=1:length(val)
     if val{i} ~= 1

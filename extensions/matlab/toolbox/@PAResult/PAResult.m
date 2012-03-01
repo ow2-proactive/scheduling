@@ -67,9 +67,8 @@
 %   * $$PROACTIVE_INITIAL_DEV$$
 %   */
 function varargout = PAResult(varargin)
-if nargin > 0    
-    this.future = varargin{1};
-    taskinfo = varargin{2};
+if nargin > 0       
+    taskinfo = varargin{1};
     this.cleanFileSet = taskinfo.cleanFileSet;
     this.cleanDirSet = taskinfo.cleanDirSet;
     this.outFile = taskinfo.outFile;
@@ -81,11 +80,11 @@ if nargin > 0
         this.logs = java.lang.StringBuilder();
         this.waited = java.util.concurrent.atomic.AtomicBoolean(false);
         this.iserror = java.util.concurrent.atomic.AtomicBoolean(false);                       
-        this.resultSet = java.util.concurrent.atomic.AtomicBoolean(false);        
+        this.resultSet = java.util.concurrent.atomic.AtomicBoolean(false);    
+        this.RaL =  org.ow2.proactive.scheduler.ext.matsci.client.common.data.UnReifiable();
     
     
-else
-    this.future = [];    
+else      
     this.cleanFileSet = [];
     this.cleanDirSet = [];
     this.outFile = [];
@@ -97,6 +96,7 @@ else
     this.waited = java.util.concurrent.atomic.AtomicBoolean(true);
     this.iserror = java.util.concurrent.atomic.AtomicBoolean(false);            
     this.resultSet = java.util.concurrent.atomic.AtomicBoolean(true);
+    this.RaL =  org.ow2.proactive.scheduler.ext.matsci.client.common.data.UnReifiable();
 end
 
 result = [];

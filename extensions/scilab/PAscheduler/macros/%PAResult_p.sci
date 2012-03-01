@@ -5,7 +5,7 @@ function %PAResult_p(R)
             printf('Result Cleared\n');
             return;
         end
-        if PAResult_PAisAwaited(R)
+        if %t
             printf('Awaited (J:'+ string(R.jobid)+ ')\n')
         else
             //try

@@ -46,7 +46,7 @@ end
 
 disp('...... Testing PAsolve with signal toolbox');
 resl = PAsolve(@signalfunc,{1},{1},{1},{1},{1},{1});
-val=PAwaitAll(resl,timeout)
+val=PAwaitFor(resl,timeout)
 for j=1:length(val)
     if val{j} ~= 1
         ok=false;

@@ -41,10 +41,17 @@
 %   TransferEnv       true | false | 'on' | 'off'
 %
 %               Transfers the environment in which the PAsolve/PAeval function is called
-%               to every remote calls. If variables from this "caller"
-%               environment need to be accessed inside the batch function,
-%               they should be done using the evalin('caller', ...) syntax
+%               to every remote tasks. Variables transferred this way need to be accessed inside the submitted function
+%               via the evalin('caller', ...) syntax. Global variables are also transferred and can be accessed normally via the "global" keyword
 %               default to 'off'
+%   EnvExcludeList       
+%               Comma separated list of variables which should be
+%               excluded from the workspace when transferring the
+%               environment (TransferEnv)
+%   EnvExcludeTypeList
+%               Comma separated list of object types which should be
+%               excluded from the workspace when transferring the
+%               environment (TransferEnv)
 %   AutomaticDump     true | false | 'on' | 'off'
 %               If this option is set to true, the current state of the
 %               PAsolve job database will be systematically saved at each
@@ -82,7 +89,7 @@
 %
 %   RemoveJobAfterRetrieve     true | false | 'on' | 'off'
 %               Removes the job automatically after all results have been
-%               retrieved. If not the job is removed at the end of the
+%               retrieved. If the options is "off", the job is removed at the end of the
 %               matlab session, or manually via PAjobRemove. default to
 %               'on'
 %
@@ -117,12 +124,24 @@
 %               url or path of selection script used to reserve matlab
 %               tokens (internal)
 %
-%   ProActiveJars
+%   ProActiveJars and EmbeddedJars
 %               Comma separated list of jar files used by ProActive
 %               (internal)
 %
 %   ProActiveConfiguration
 %               path to ProActive configuration file (internal)
+%
+%   Log4JConfiguration
+%               path to log4j configuration file (internal)
+%
+%   SecurityFile
+%               path to java security configuration file (internal)
+%
+%   RmiPort
+%               default RMI port used when deploying the middleman JVM (internal)
+%
+%   JvmTimeout
+%               default timeout used when deploying the middleman JVM (internal)
 %
 %   DisconnectedModeFile
 %               path to disconnected mode temporary file (internal)
@@ -190,11 +209,14 @@ versioncheck = @(x)((isnumeric(x)&&isempty(x)) || (ischar(x) && ~isempty(regexp(
 versionlistcheck = @(x)((isnumeric(x)&&isempty(x)) || (ischar(x) &&  ~isempty(regexp(x, '^([1-9][\d]*\.[\d]+[ ;,]+)*[1-9][\d]*\.[\d]+$'))));
 
 jarlistcheck = @(x)(ischar(x) &&  ~isempty(regexp(x, '^([\w\-]+\.jar[ ;,]+)*[\w\-]+\.jar$')));
-jarlisttrans = @jarlisttocell;
+listcheck = @(x)(ischar(x) && (isempty(x) || ~isempty(regexp(x, '^([^ ;,]+[ ;,]+)*[^ ;,]+$'))));
+listtrans = @listtocell;
 
 urlcheck=@(x)((isnumeric(x)&&isempty(x)) || ischar(x));
 
 charornull = @(x)((isnumeric(x)&&isempty(x)) || ischar(x));
+
+charornum = @(x)(isnumeric(x) || ischar(x));
 
 
 v = version;
@@ -253,6 +275,16 @@ inputs(j).name = 'TransferEnv';
 inputs(j).default = false;
 inputs(j).check = logcheck;
 inputs(j).trans = logtrans;
+j=j+1;
+inputs(j).name = 'EnvExcludeList';
+inputs(j).default = '';
+inputs(j).check = listcheck;
+inputs(j).trans = listtrans;
+j=j+1;
+inputs(j).name = 'EnvExcludeTypeList';
+inputs(j).default = '';
+inputs(j).check = listcheck;
+inputs(j).trans = listtrans;
 j=j+1;
 inputs(j).name = 'AutomaticDump';
 inputs(j).default = false;
@@ -337,10 +369,25 @@ j=j+1;
 inputs(j).name = 'ProActiveJars';
 inputs(j).default = 'jruby.jar,jruby-engine.jar,jython.jar,jython-engine.jar,ProActive.jar,ProActive_Scheduler-client.jar,ProActive_SRM-common-client.jar,ProActive_Scheduler-matsci.jar';
 inputs(j).check = jarlistcheck;
-inputs(j).trans = jarlisttrans;
+inputs(j).trans = listtrans;
+j=j+1;
+inputs(j).name = 'EmbeddedJars';
+inputs(j).default = 'ProActive_Scheduler-matsciemb.jar';
+inputs(j).check = jarlistcheck;
+inputs(j).trans = listtrans;
 j=j+1;
 inputs(j).name = 'ProActiveConfiguration';
 inputs(j).default = ['$SCHEDULER$' filesep 'config' filesep 'proactive' filesep 'ProActiveConfiguration.xml'];
+inputs(j).check = @ischar;
+inputs(j).trans = conftrans;
+j=j+1;
+inputs(j).name = 'Log4JConfiguration';
+inputs(j).default = ['$SCHEDULER$' filesep 'config' filesep 'log4j' filesep 'log4j-client'];
+inputs(j).check = @ischar;
+inputs(j).trans = conftrans;
+j=j+1;
+inputs(j).name = 'SecurityFile';
+inputs(j).default = ['$SCHEDULER$' filesep 'config' filesep 'security.java.policy-client'];
 inputs(j).check = @ischar;
 inputs(j).trans = conftrans;
 j=j+1;
@@ -358,6 +405,23 @@ inputs(j).name = 'CleanAllTempFilesDirectly';
 inputs(j).default = true;
 inputs(j).check = logcheck;
 inputs(j).trans = logtrans;
+j=j+1;
+inputs(j).name = 'SchedulingDir';
+inputs(j).default = scheduling_dir;
+inputs(j).check = @ischar;
+inputs(j).trans = id;
+j=j+1;
+inputs(j).name = 'RmiPort';
+inputs(j).default = 1111;
+inputs(j).check = charornum;
+inputs(j).trans = @charornumtrans;
+j=j+1;
+inputs(j).name = 'JvmTimeout';
+inputs(j).default = 1200;
+inputs(j).check = charornum;
+inputs(j).trans = @charornumtrans;
+
+
 
 
 % Parsing option file
@@ -420,7 +484,15 @@ opts = pa_options;
 
 end
 
-function cl=jarlisttocell(x)
+function num = charornumtrans(x)
+if ischar(x)
+    num = str2num(x);
+else
+    num = x;
+end
+end
+
+function cl=listtocell(x)
 cl={};
 i=1;
 remain=x;

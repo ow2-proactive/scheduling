@@ -72,7 +72,7 @@ proactiveset = 0;
 jcp = javaclasspath();
 for i=1:length(jcp)
     line = jcp{i};
-    if findstr(line,'ProActive.jar')
+    if findstr(line,'ProActive_Scheduler-matsciemb.jar')
         proactiveset = 1;
     end
 end
@@ -81,55 +81,17 @@ end
 
 if ~proactiveset
     % script engines must be at the beginning to avoid jar index problems    
-    jars = opt.ProActiveJars;
+    jars = opt.EmbeddedJars;
     for i=1:length(jars)
         jarsFullPath{i} = [dist_lib_dir filesep jars{i}];
     end   
     
-    % ensure that the correct class loader is used inside proactive
-    
-    th = java.lang.Thread.currentThread();
-    cl = th.getContextClassLoader();
-
-    ucz = cl.getClass().getSuperclass();
-    ucpf = ucz.getDeclaredField('ucp');
-    ucpf.setAccessible(true);
-    ucp = ucpf.get(cl);
-    urls = ucp.getURLs();
-    stack1 = java.util.Stack();    
-    % We put proactive classes in the bottom, so they won't interfere with
-    % matlab's jars
-    for i=1:length(jars)
-        url = java.net.URL(['file:' jarsFullPath{i}]);
-        stack1.push(url);         
-    end
-    for i=1:urls.length
-        %if any(strfind(char(urls(i).toString()), 'jini'))
-        %else
-        stack1.push(urls(i));
-        %end
-    end
-    
-    
-    %% handling the classpath variable    ;
-    cp = char(java.lang.System.getProperty('java.class.path'));    
-    for i=length(jarsFullPath):-1:1
-        cp = [jarsFullPath{i} pathsep cp];
-    end
     warning('off')
-    java.lang.System.setProperty('java.class.path', cp);
-    
-    
-    urls = javaArray('java.net.URL',1);    
-    ucp2=sun.misc.URLClassPath(stack1.toArray(urls));
-    
-    ucpf.set(cl, ucp2);
     
     for i=1:length(jars)
         javaaddpath(jarsFullPath{i},'-END');
     end
-    
-    java.lang.System.setProperty('java.rmi.server.RMIClassLoaderSpi','default');
+        
     warning('on')
     
 end

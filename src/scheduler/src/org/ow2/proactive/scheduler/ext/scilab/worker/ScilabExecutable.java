@@ -65,6 +65,7 @@ public class ScilabExecutable extends JavaExecutable {
 
     /** The root of the local space and a temporary dir inside */
     private File localSpaceRootDir, tempSubDir;
+    private String tempSubDirRel;
 
     /** The connection to SCILAB from scilabcontrol API */
     private ScilabConnection scilabConnection;
@@ -236,7 +237,16 @@ public class ScilabExecutable extends JavaExecutable {
 
         // Create a temp dir in the root dir of the local space
         this.localSpaceRootDir = new File(new URI(dsURI));
-        this.tempSubDir = new File(this.localSpaceRootDir, this.paconfig.getTempSubDirName());
+        String[] subDirs = this.paconfig.getTempSubDirNames();
+        this.tempSubDir = this.localSpaceRootDir;
+
+        this.tempSubDirRel = "";
+        int i = 0;
+        while (i < subDirs.length) {
+            this.tempSubDir = new File(this.tempSubDir, subDirs[i]);
+            tempSubDirRel += subDirs[i] + "/";
+            i++;
+        }
 
         // Set the local space of the global configuration
         this.paconfig.setLocalSpace(new URI(dsURI));
@@ -248,8 +258,8 @@ public class ScilabExecutable extends JavaExecutable {
             if (sourceZipFileName == null) {
                 sourceZipFileName = paconfig.getSourceZipFileName();
             }
-            taskconfig.setSourceZipFileURI(new URI(getLocalFile(
-                    paconfig.getTempSubDirName() + "/" + sourceZipFileName).getRealURI()));
+            taskconfig.setSourceZipFileURI(new URI(getLocalFile(tempSubDirRel + sourceZipFileName)
+                    .getRealURI()));
 
             File sourceZip = new File(taskconfig.getSourceZipFileURI());
 
@@ -280,49 +290,23 @@ public class ScilabExecutable extends JavaExecutable {
             return;
         }
 
-        taskconfig.setEnvMatFileURI(new URI(getLocalFile(
-                paconfig.getTempSubDirName() + "/" + paconfig.getEnvMatFileName()).getRealURI()));
+        taskconfig.setEnvMatFileURI(new URI(getLocalFile(tempSubDirRel + paconfig.getEnvMatFileName())
+                .getRealURI()));
 
     }
 
     private void initTransferInputFiles() throws Exception {
-        if (taskconfig.isInputFilesThere() && paconfig.isZipInputFiles()) {
-            int n = taskconfig.getInputFilesZipNames().length;
-            URI[] uris = new URI[n];
-            for (int i = 0; i < n; i++) {
-                uris[i] = new URI(getLocalFile(
-                        paconfig.getTempSubDirName() + "/" + taskconfig.getInputFilesZipNames()[i])
-                        .getRealURI());
-            }
-            taskconfig.setInputZipFilesURI(uris);
-
-            printLog("Unzipping input files...");
-
-            for (URI uri : taskconfig.getInputZipFilesURI()) {
-                File inputZip = new File(uri);
-                if (!inputZip.exists()) {
-                    System.err.println("Error, input zip file cannot be accessed at : " + inputZip);
-                    throw new IllegalStateException("Error, input zip file cannot be accessed at : " +
-                        inputZip);
-                }
-                // Uncompress the input file
-                if (!FileUtils.unzip(inputZip, localSpaceRootDir)) {
-                    System.err.println("Unable to unzip the input file " + inputZip);
-                    throw new IllegalStateException("Unable to the input file " + inputZip);
-                }
-            }
-        }
+        // do nothing
     }
 
     private void initTransferVariables() throws Exception {
 
         taskconfig.setInputVariablesFileURI(new URI(getLocalFile(
-                paconfig.getTempSubDirName() + "/" + taskconfig.getInputVariablesFileName()).getRealURI()));
+                tempSubDirRel + taskconfig.getInputVariablesFileName()).getRealURI()));
 
         if (taskconfig.getComposedInputVariablesFileName() != null) {
             taskconfig.setComposedInputVariablesFileURI(new URI(getLocalFile(
-                    paconfig.getTempSubDirName() + "/" + taskconfig.getComposedInputVariablesFileName())
-                    .getRealURI()));
+                    tempSubDirRel + taskconfig.getComposedInputVariablesFileName()).getRealURI()));
         }
 
     }
@@ -345,6 +329,15 @@ public class ScilabExecutable extends JavaExecutable {
             File envMat = new File(taskconfig.getEnvMatFileURI());
             printLog("Loading workspace from " + envMat);
             // Load workspace using SCILAB command
+            String[] globals = paconfig.getEnvGlobalNames();
+            if (globals != null && globals.length > 0) {
+                String globalstr = "";
+                for (String name : globals) {
+                    globalstr += "'" + name + "'" + ",";
+                }
+                globalstr = globalstr.substring(0, globalstr.length() - 1);
+                scilabConnection.evalString("global(" + globalstr + ")");
+            }
             scilabConnection.evalString("load('" + envMat + "');");
         }
     }
@@ -393,24 +386,7 @@ public class ScilabExecutable extends JavaExecutable {
     }
 
     private void transferOutputFiles() throws Exception {
-        if (taskconfig.isOutputFilesThere() && paconfig.isZipOutputFiles()) {
-
-            printLog("Zipping output files...");
-
-            String[] outputFiles = taskconfig.getOutputFiles();
-            String[] names = taskconfig.getOutputFilesZipNames();
-
-            for (int i = 0; i < names.length; i++) {
-                File outputZip = new File(tempSubDir, names[i]);
-                //conn.evalString("ProActiveOutputFiles=cell(1,"+outputFiles.length+");");
-                //for (int i=0; i < outputFiles.length; i++) {
-                String updatedFile = outputFiles[i].replaceAll("/", File.separator);
-                //conn.evalString("ProActiveOutputFiles{"+(i+1)+"}='"+updatedFile+"';");
-                //}
-                FileUtils.zip(outputZip, new File[] { new File(updatedFile) });
-            }
-
-        }
+        // do nothing
     }
 
     private void testOutput() throws Exception {

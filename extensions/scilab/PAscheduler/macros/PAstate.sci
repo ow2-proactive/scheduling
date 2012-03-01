@@ -1,11 +1,9 @@
 function [] = PAstate()
-    global ('PA_connected');
+    global ('PA_connected','PA_solver');
     if ~PAisConnected()
         error('A connection to the ProActive scheduler is not established, see PAconnect');
     end
-    jimport org.ow2.proactive.scheduler.ext.scilab.client.ScilabSolver;
-    solver = jnewInstance(ScilabSolver);        
-    env = jinvoke(solver,'getEnvironment');
-    jinvoke(env, 'schedulerState');    
-    jremove(solver,env,ScilabSolver);
+    
+    txt = jinvoke(PA_solver, 'schedulerState');    
+    printf('%s\n',txt);   
 endfunction

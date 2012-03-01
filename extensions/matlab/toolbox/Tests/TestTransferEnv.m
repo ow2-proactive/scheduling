@@ -43,13 +43,17 @@ if ~exist('timeout', 'var')
     end
 end
 disp('...... Testing PAsolve with Transfer Env');
-disp('..........................1 PAwaitAll');
+disp('..........................1 PAwaitFor');
 opt=PAoptions();
 old = opt.TransferEnv;
 PAoptions('TransferEnv', true);
-mytransferenvvar = 'toto';
-resl = PAsolve(@transferenvfunc,'titi');
-val=PAwaitAll(resl,timeout)
+% declaring toto as a local variable that will be transfered
+toto = dummy('toto');
+% declaring totoGlobal in a subfunction as a global variable (and thus not
+% as a local variable)
+declareGlobal();
+resl = PAsolve(@transferenvfunc,'ok');
+val=PAwaitFor(resl,timeout)
 if val
     disp('..........................1 ......OK');
     ok=true;
@@ -60,3 +64,10 @@ else
     msg = 'TestTransferEnv::wrong value for val, error occured remotely';
 end
 PAoptions('TransferEnv', old);
+end
+
+function out=declareGlobal()
+    global totoGlobal
+    totoGlobal = dummy('totoGlobal');
+    out='ok';
+end

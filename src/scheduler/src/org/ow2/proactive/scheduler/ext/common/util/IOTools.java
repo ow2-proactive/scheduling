@@ -44,6 +44,11 @@ import java.nio.charset.Charset;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.concurrent.ExecutorService;
+
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 
 /**
@@ -53,7 +58,7 @@ import java.util.ArrayList;
  */
 public class IOTools {
 
-    private static String nl = System.getProperty("line.separator");
+    private static final String nl = System.getProperty("line.separator");
 
     public static ProcessResult blockingGetProcessResult(Process process) {
 
@@ -192,6 +197,62 @@ public class IOTools {
         }
 
         return lines;
+    }
+
+    /**
+     * Return the content of the given File as a String
+     *
+     * @param in input stream to read
+     * @return content as a string
+     */
+    public static String readFileAsString(final File in, long timeout) throws InterruptedException,
+            TimeoutException {
+
+        ExecutorService service = Executors.newSingleThreadExecutor();
+
+        final StringBuffer answer = new StringBuffer();
+
+        service.submit(new Runnable() {
+            public void run() {
+                final ArrayList<String> lines = new ArrayList<String>();
+                BufferedInputStream bis = null;
+                try {
+                    bis = new BufferedInputStream(new FileInputStream(in));
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
+                final BufferedReader d = new BufferedReader(new InputStreamReader(
+                    new BufferedInputStream(bis)));
+                String line = null;
+
+                try {
+                    line = d.readLine();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    line = null;
+                }
+
+                while (line != null) {
+                    answer.append(line + nl);
+
+                    try {
+                        line = d.readLine();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        line = null;
+                    }
+                }
+
+                try {
+                    bis.close();
+                } catch (IOException e) {
+                }
+            }
+        });
+
+        boolean ok = service.awaitTermination(timeout, TimeUnit.MILLISECONDS);
+
+        return answer.toString();
     }
 
     public static class RedirectionThread implements Runnable, Serializable {

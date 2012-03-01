@@ -56,11 +56,11 @@ resl4 = PAsolve(@factorial,{1},{2},{3},{4},{5});
 disp('..........................submit 5');
 resl5 = PAsolve(@factorial,{1},{2},{3},{4},{5});  
 
-val1=PAwaitAll(resl1,timeout)
-val2=PAwaitAll(resl2,timeout)
-val3=PAwaitAll(resl3,timeout)
-val4=PAwaitAll(resl4,timeout)
-val5=PAwaitAll(resl5,timeout)
+val1=PAwaitFor(resl1,timeout)
+val2=PAwaitFor(resl2,timeout)
+val3=PAwaitFor(resl3,timeout)
+val4=PAwaitFor(resl4,timeout)
+val5=PAwaitFor(resl5,timeout)
 
 [ok,msg]=checkValuesFact(val1);
 if ~ok disp(msg),return; end

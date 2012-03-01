@@ -76,10 +76,8 @@ try
     for i = 1:length(alljobs)
         sched.PAaddFileToClean(alljobs{i});
     end
-    if isnumeric(opt.CustomDataspaceURL) && isempty(opt.CustomDataspaceURL)
-        helper = org.ow2.proactive.scheduler.ext.matsci.client.DataspaceHelper.getInstance();
-        helper.shutdown();
-    end
+    jvm = sched.PAgetJVMInterface();
+    jvm.shutdown();    
 
     if exist(opt.DisconnectedModeFile,'file')
         delete(opt.DisconnectedModeFile);

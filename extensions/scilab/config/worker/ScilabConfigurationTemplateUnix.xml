@@ -3,9 +3,6 @@
     <installation>
         <version>5.3.0</version> <!-- Scilab version (must be at least 5.3.0) -->
         <home>/user/fviale/desktop/home/bin/scilab-5.3.0</home> <!-- Scilab installation directory -->
-        <libdir>lib/scilab</libdir>  <!-- Relative path to scilab libraries (generally lib/scilab on linux) -->
-        <tpdir>lib/thirdparty</tpdir>  <!-- Relative path to scilab third party libraries (generally lib/thirdparty on linux) -->
-        <scidir>share/scilab</scidir>  <!-- Relative path to scilab SCI directory (generally share/scilab on linux) -->
         <bindir>bin</bindir>
         <command>scilab</command>
     </installation>   

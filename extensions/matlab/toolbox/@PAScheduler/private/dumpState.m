@@ -2,13 +2,9 @@
 % file
 function dumpState()
     opt = PAoptions();
-    sched = PAScheduler;
-    if isnumeric(opt.CustomDataspaceURL) && isempty(opt.CustomDataspaceURL)
-        helper = org.ow2.proactive.scheduler.ext.matsci.client.DataspaceHelper.getInstance();
-        registryurl = helper.getUrl();
-    else
-        registryurl = [];
-    end
-    sched.PATaskRepository('save');
-    save(opt.DisconnectedModeFile, 'registryurl', '-append');
+    sched = PAScheduler;    
+    sched.PATaskRepository('save'); 
+    rmiport = opt.RmiPort;
+    save(opt.DisconnectedModeFile, 'rmiport', '-append');
+    
 end

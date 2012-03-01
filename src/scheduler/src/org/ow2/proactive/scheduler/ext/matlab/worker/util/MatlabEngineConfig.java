@@ -64,6 +64,16 @@ public class MatlabEngineConfig extends MatSciEngineConfigBase {
      */
     private String matlabCommandName = null;
 
+    /**
+     * Current Matlab configuration
+     */
+    protected static MatlabEngineConfig currentConf = null;
+
+    /**
+     * last Matlab configuration
+     */
+    protected static MatlabEngineConfig lastConf = null;
+
     private static final String nl = System.getProperty("line.separator");
 
     public MatlabEngineConfig(String matlabHome, String matlabVersion, String matlabBinDir,

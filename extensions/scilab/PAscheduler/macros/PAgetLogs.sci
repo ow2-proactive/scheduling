@@ -1,16 +1,16 @@
-function val=PAgetLogs(l)
+function val_k=PAgetLogs(l)
     if typeof(l) == 'PAResL' then
         tf = PAisAwaited(l);
         if and(~tf) then
             m = size(l.matrix,2);
         if m == 1
             pares=l.matrix.entries;
-            val=jinvoke(pares.logs,'toString');
+            val_k=jinvoke(pares.logs,'toString');
         else
-            val=list();
+            val_k=list();
             for i=1:m
                 pares=l.matrix(i).entries;
-                val($+1)=jinvoke(pares.logs,'toString');
+                val_k($+1)=jinvoke(pares.logs,'toString');
             end
         end
         else

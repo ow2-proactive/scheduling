@@ -91,9 +91,9 @@ if opt.CleanAllTempFilesDirectly
 end
 alltasks = sched.PATaskRepository(jobid, 'alltasks');
 solver = sched.PAgetsolver();
-resfutureList = solver.retrieve(jinfo);
+solver.retrieve(jinfo);
 for j=1:length(alltasks)
     taskinfo = sched.PATaskRepository(jobid, alltasks{j}, 'taskinfo');
-    res(j)=PAResult(resfutureList.get(j-1), taskinfo);
+    res(j)=PAResult(taskinfo);
     sched.PAaddDirToClean(jobid, taskinfo.cleanDirSet);
 end

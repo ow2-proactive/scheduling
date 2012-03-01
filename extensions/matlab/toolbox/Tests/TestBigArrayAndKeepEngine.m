@@ -49,7 +49,7 @@ disp('.................................. Testing PAsolve with big array and Keep
 disp('............................First create a out of memory error on distant engines');
 resl = PAsolve(@makeBigArray,{100000},{100000},{100000},{100000});
 try 
-val=PAwaitAll(resl,timeout)
+val=PAwaitFor(resl,timeout)
 catch err
 end
 
@@ -57,7 +57,7 @@ disp('....Then create more big matrixes on the same engines (we verify that they
 for i=1:8
     disp(['..........................Iteration ' num2str(i)]);
     resl = PAsolve(@makeBigArray,{i*1000},{i*1000},{i*1000},{i*1000});
-    val=PAwaitAll(resl,timeout)
+    val=PAwaitFor(resl,timeout)
     for j=1:length(val)
         if val{j} ~= 1
             ok=false;

@@ -66,10 +66,10 @@ function varargout = PAjobOutput(jobid)
         error('A connection to the ProActive scheduler is not established, see PAconnect');
     end
     sched = PAScheduler;
-    solver = sched.PAgetsolver();
+    solver = sched.PAgetsolver();    
+    output = solver.jobOutput(jobid);
+    disp(output);
     if nargout == 1        
-        varargout{1} = evalc('solver.jobOutput(jobid);');
-    else             
-        solver.jobOutput(jobid);
+        varargout{1} = output;                        
     end
 end

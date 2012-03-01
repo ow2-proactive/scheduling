@@ -47,7 +47,7 @@ else
 end
 
 if nargin == 2
-    if ischar(varargin{1}) && isa(varargin{2},'org.ow2.proactive.scheduler.ext.matsci.client.MatSciJobPermanentInfo')
+    if ischar(varargin{1}) && isa(varargin{2},'org.ow2.proactive.scheduler.ext.matsci.client.common.data.MatSciJobPermanentInfo')
         %% registering job
         key = char(varargin{1});
         jkey = ['j' char(varargin{1})];

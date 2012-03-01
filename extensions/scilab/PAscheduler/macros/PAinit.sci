@@ -22,26 +22,14 @@ function [] = PAinit()
     else
         dist_lib_dir = fullfile(PA_scheduler_dir,'dist','lib');        
     end   
-    schedjar=fullfile(dist_lib_dir,'ProActive.jar'); 
+    schedjar=fullfile(dist_lib_dir,'ProActive_Scheduler-matsciemb.jar'); 
     if length(fileinfo(schedjar)) == 0 
         error(strcat(['Can''t locate the scheduler jar at ""';schedjar;'"" , please make sure that SCHEDULER_HOME refers to the correct directory.']));
     end    
     opt=PAoptions();
 
     jimport java.io.File;
-        
-    // Log4J file
-    log4jFile = File.new(strcat([PA_scheduler_dir, filesep(), 'config', filesep(), 'log4j', filesep(), 'log4j-client']));
-    log4jFileUri = jinvoke(log4jFile,'toURI');
-    urlLog4jFile = jinvoke(log4jFileUri,'toURL');
-    finalstring = jinvoke(urlLog4jFile,'toExternalForm');
-    system_setproperty('log4j.configuration',finalstring);
-    system_setproperty('proactive.configuration', opt.ProActiveConfiguration);
-
-    // Policy
-    system_setproperty('java.security.policy',strcat([PA_scheduler_dir, filesep(), 'config', filesep(), 'security.java.policy-client']));
-    jremove(log4jFile, log4jFileUri, urlLog4jFile, finalstring);
-    //jremove(File);
+            
 
     sep=pathsep();
 
@@ -53,7 +41,7 @@ function [] = PAinit()
         end
     end
 
-    listjars = opt.ProActiveJars;
+    listjars = opt.EmbeddedJars;
 
     cp = initcp;
     

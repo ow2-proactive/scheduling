@@ -5,8 +5,9 @@ try
         frames = java.awt.Frame.getFrames;
         awtinvoke(frames(1),'setVisible',0);
     end
-catch
+catch    
 end
+
 
 all_toolboxes = {'simulink', 'control', 'curvefit', 'images', 'compiler', 'nnet', 'optim', 'pde', 'robust', 'signal', 'slcontrol', 'spline', 'stats', 'symbolic', 'ident','toto'};
 toolboxes_code = {'simulink', 'control_toolbox','curve_fitting_toolbox', 'image_toolbox','compiler', 'neural_network_toolbox', 'optimization_toolbox', 'pde_toolbox', 'robust_toolbox', 'signal_toolbox', 'simulink_control_design','spline_toolbox', 'statistics_toolbox', 'symbolic_toolbox', 'identification_toolbox','toto'};
@@ -29,3 +30,4 @@ fclose(fid);
 if ~ok
     exit();
 end
+

@@ -51,5 +51,7 @@ this.PAJobInfo = @PAJobInfo;
 this.PATaskRepository = @PATaskRepository;
 this.logindlg=@logindlg;
 this.dumpState=@dumpState;
+this.PAgetDataspaceRegistry = @PAgetDataspaceRegistry;
+this.PAgetJVMInterface = @PAgetJVMInterface;
 
 this = class(this, 'PAScheduler');

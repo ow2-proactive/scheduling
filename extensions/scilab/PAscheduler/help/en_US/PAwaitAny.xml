@@ -20,7 +20,9 @@
     <title>Calling Sequence</title>
 
     <synopsis>PAwaitAny(resl)</synopsis>
-     <synopsis>PAwaitAny(resl,timeout)</synopsis>
+    <synopsis>PAwaitAny(resl,timeout)</synopsis>
+      <synopsis>[val,index]=PAwaitAny(resl)</synopsis>
+      <synopsis>[val,index]=PAwaitAny(resl,timeout)</synopsis>
   </refsynopsisdiv>
 
   <refsection>
@@ -31,7 +33,7 @@
   </refsection>
 
   <refsection>
-        <title>Parameters</title>
+        <title>Parameters and Output</title>
         <variablelist>
             <varlistentry>
                 <term>resl</term>
@@ -46,6 +48,22 @@
                 <listitem>
                     <para>
                         an optional timeout (in ms), the PAwaitFor call will block until the results are available or the timeout expires.
+                    </para>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>val</term>
+                <listitem>
+                    <para>
+                        the return value of the task.
+                    </para>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>index</term>
+                <listitem>
+                    <para>
+                        the index of the task in the result list resl.
                     </para>
                 </listitem>
             </varlistentry>

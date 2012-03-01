@@ -44,9 +44,9 @@ if ~exist('timeout', 'var')
 end
 
 disp('...... Testing PAsolve with factorial');
-disp('..........................1 PAwaitAll');
+disp('..........................1 PAwaitFor (all)');
 resl = PAsolve(@factorial,{1},{2},{3},{4},{5});
-val=PAwaitAll(resl,timeout)
+val=PAwaitFor(resl,timeout)
 [ok,msg]=checkValuesFact(val);
 if ~ok disp(msg),return; end
 disp('..........................1 ......OK');
@@ -63,7 +63,7 @@ if ~ok disp(msg),return; end
 disp('..........................2 ......OK');
 clear val;
 
-disp('..........................3 PAwaitFor');
+disp('..........................3 PAwaitFor (each)');
 resl = PAsolve(@factorial,{1},{2},{3},{4},{5});
 for i=1:5
     val(i)=PAwaitFor(resl(i),timeout)
@@ -94,9 +94,15 @@ clear val;
 clear logs;
 
 disp('...... Testing PAsolve with funcSquare and an error');
-disp('..........................6 PAwaitAll');
+disp('..........................6 PAwaitFor (all)');
 resl = PAsolve(@funcSquare,{1},{2},{3},{'a'},{5});
-val=PAwaitAll(resl,timeout)
+val1=PAwaitFor(resl(1:3),timeout);
+val2=PAwaitFor(resl(5),timeout);
+try
+val3=PAwaitFor(resl(4),timeout);
+catch 
+end
+val=[val1 {[]} val2];
 [ok,msg]=checkValuesSquare(val);
 if ~ok disp(msg),return; end
 disp('..........................6 ......OK');
@@ -118,7 +124,7 @@ if ~ok disp(msg),return; end
 disp('..........................7 ......OK');
 clear val;
 
-disp('..........................8 PAwaitFor');
+disp('..........................8 PAwaitFor (each)');
 resl = PAsolve(@funcSquare,{1},{2},{3},{'a'},{5});
 j=1;
 for i=1:5

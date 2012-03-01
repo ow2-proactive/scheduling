@@ -66,6 +66,30 @@
                  </para>
             </listitem>
             <listitem>
+                <para><emphasis>TransferEnv</emphasis>: enables transferring the local environment (local and global variables).
+                 </para>
+            </listitem>
+            <listitem>
+                <para><emphasis>EnvExcludeList</emphasis>: controls witch variables should not be copied when using TransferEnv, by listing their names (Comma separated list).
+                 </para>
+            </listitem>
+            <listitem>
+                <para><emphasis>EnvExcludeTypeList</emphasis>: controls witch variable types should not be copied when using TransferEnv (Comma separated list).
+                 </para>
+            </listitem>
+            <listitem>
+                <para><emphasis>Fork</emphasis>: enables running the Scilab task in a separate JVM from the Scheduler Node.
+                 </para>
+            </listitem>
+            <listitem>
+                <para><emphasis>RunAsMe</emphasis>: enables running the Scilab task as the user provided when connecting to the scheduler (implies Fork mode).
+                 </para>
+            </listitem>
+            <listitem>
+                <para><emphasis>RemoveJobAfterRetrieve</emphasis>: when set to "on", every PAsolve job will be removed from the scheduler after results have been retrieved. If set to "off", the job can be removed using the PAjobRemove function. Defaults to "on".
+                 </para>
+            </listitem>
+            <listitem>
                 <para><emphasis>CustomDataspaceURL</emphasis> and <emphasis>CustomDataspacePath</emphasis>: by default these options are not set. Dataspaces are a ProActive internal mechanism allowing a shared file system between hosts. The mechanism allows the automatic transfer of files between the local scilab session and the remote engines. ProActive Toolbox has an internal automatic Dataspace creation. But sometimes, one would like to rely on an external Dataspace such as a ftp server. This Dataspace MUST be accessible from the local file system in order to work with ProActive Scheduler Toolbox.The CustomDataspaceURL option gives the Universally accessible URL of this dataspace and the CustomDataspacePath gives the path to access this dataspace from the local file system.
                  </para>
             </listitem>
@@ -86,10 +110,6 @@
                  </para>
             </listitem>
             <listitem>
-                <para><emphasis>KeepEngine</emphasis>: tells if the remote scilab engine should be kept between Tasks execution (This is a beta feature). Default to false.
-                 </para>
-            </listitem>
-            <listitem>
                 <para><emphasis>Priority</emphasis>: this option is the priority of jobs created inside the ProActive Scheduler by PAsolve calls. Default to "Normal".
                  </para>
             </listitem>
@@ -102,11 +122,31 @@
                  </para>
             </listitem>
             <listitem>
-                <para><emphasis>ProActiveJars</emphasis>:  libraries used by ProActive Scheduler Toolbox (internal use only)
+                <para><emphasis>CustomScript</emphasis>: with this option, a custom selection script can be provided for every jobs launched via PAsolve.
+                 </para>
+            </listitem>
+            <listitem>
+                <para><emphasis>EmbeddedJars</emphasis> and <emphasis>ProActiveJars</emphasis>:  libraries used by ProActive Scheduler Toolbox (internal use only)
                  </para>
             </listitem>
             <listitem>
                 <para><emphasis>ProActiveConfiguration</emphasis>:  path to ProActive Configuration file (modifying this option requires knowledge of ProActive internals).
+                 </para>
+            </listitem>
+            <listitem>
+                <para><emphasis>Log4JConfiguration</emphasis>:  path to log4j configuration file (internal).
+                 </para>
+            </listitem>
+            <listitem>
+                <para><emphasis>SecurityFile</emphasis>:  path to java security configuration file (internal).
+                 </para>
+            </listitem>
+            <listitem>
+                <para><emphasis>RmiPort</emphasis>:  default RMI port used to deploy the middleman JVM (internal).
+                 </para>
+            </listitem>
+            <listitem>
+                <para><emphasis>JvmTimeout</emphasis>:  default timeout used when deploying the middleman JVM (internal).
                  </para>
             </listitem>
         </itemizedlist>

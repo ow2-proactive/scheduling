@@ -96,31 +96,39 @@
 %   */
 function varargout = PAwaitAny(this,timeout)
 s=size(this);
-arrayList = java.util.ArrayList();
+sched = PAScheduler;
+% Get the solver from memory
+solver = sched.PAgetsolver();
+R=this(1,1);
+jobid = R.jobid;
+taskids = java.util.ArrayList(s(1)*s(2));
 indList={};
 k=1;
 for i=1:s(1)
     for j=1:s(2)
-        R=this(i,j);
+        R=this(i,j);  
         if ~R.waited.get()
-            arrayList.add(R.future);
+            taskids.add(R.taskid); 
             indList{k}=[i j];
             k=k+1;
         end
     end
 end
-
 if isempty(indList)
     error('All results have already been accessed');
 end
 
 if exist('timeout','var') == 1
-    ind = org.objectweb.proactive.api.PAFuture.waitForAny(arrayList,int64(timeout));
+    unrei = solver.waitAny(jobid,taskids,java.lang.Integer(timeout));
 else
-    ind = org.objectweb.proactive.api.PAFuture.waitForAny(arrayList);
+    unrei = solver.waitAny(jobid,taskids,java.lang.Integer(-1));
 end
+pair = unrei.get();
+ind=pair.getY();
+
 l=indList{ind+1};
 R=this(l(1),l(2));
+R.RaL.set(pair.getX());
 R.waited.set(true);
 A = PAwaitFor(R);
 varargout{1} = A;

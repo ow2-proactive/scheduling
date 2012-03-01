@@ -36,13 +36,6 @@
  */
 package org.ow2.proactive.scheduler.ext.scilab.worker.util;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.regex.Matcher;
-
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.input.SAXBuilder;
@@ -51,6 +44,13 @@ import org.objectweb.proactive.utils.OperatingSystem;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.ext.matsci.worker.util.MatSciConfigurationParser;
 import org.ow2.proactive.scheduler.ext.matsci.worker.util.MatSciEngineConfig;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.regex.Matcher;
 
 
 /**
@@ -124,32 +124,6 @@ public class ScilabConfigurationParser extends MatSciConfigurationParser {
             File filehome = new File(home);
             checkDir(filehome, configFile);
 
-            String libdir = courant.getChild("libdir").getText();
-            if ((libdir == null) || (libdir.trim().length() == 0)) {
-                throw new IllegalArgumentException("In " + configFile + ", libdir element must not be empty");
-            }
-            libdir = libdir.trim().replaceAll("/", Matcher.quoteReplacement("" + os.fileSeparator()));
-            File filelib = new File(filehome, libdir);
-            checkDir(filelib, configFile);
-
-            Element sciel = courant.getChild("scidir");
-            String scidir = null;
-            if (sciel != null) {
-                scidir = sciel.getText();
-                if (scidir.length() > 0) {
-                    scidir = scidir.trim().replaceAll("/", Matcher.quoteReplacement("" + os.fileSeparator()));
-                    File filesci = new File(filehome, scidir);
-                    checkDir(filesci, configFile);
-                }
-            }
-
-            // extdir can be null
-            String tpdir = null;
-            Element extel = courant.getChild("tpdir");
-            if (extel != null) {
-                tpdir = extel.getText();
-            }
-
             String bindir = courant.getChild("bindir").getText();
             if ((bindir == null) || (bindir.trim().length() == 0)) {
                 throw new IllegalArgumentException("In " + configFile + ", bindir element must not be empty");
@@ -166,7 +140,7 @@ public class ScilabConfigurationParser extends MatSciConfigurationParser {
             File filecommand = new File(filebin, command);
             checkFile(filecommand, configFile, true);
 
-            configs.add(new ScilabEngineConfig(home, version, libdir, scidir, tpdir, bindir, command, false));
+            configs.add(new ScilabEngineConfig(home, version, bindir, command, false));
         }
 
         return configs;

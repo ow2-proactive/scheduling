@@ -9,12 +9,16 @@ function PAclearResults(l)
             PAResult_clean(R);
             jremove(R.cleaned, R.logsPrinted, R.logs,R.waited, R.iserror, R.resultSet);
             try
-                jremove(R.future)
+                jremove(R.RaL)
             catch
             end            
         end
     elseif typeof(l) == 'PAResult' then
         PAResult_clean(l);
-        jremove(l.cleaned, l.logsPrinted, l.logs,l.waited, l.iserror, l.resultSet);        
+        jremove(l.cleaned, l.logsPrinted, l.logs,l.waited, l.iserror, l.resultSet);       
+        try
+            jremove(l.RaL)
+        catch
+        end     
     end
 endfunction

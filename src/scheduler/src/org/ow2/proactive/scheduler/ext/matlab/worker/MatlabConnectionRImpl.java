@@ -39,8 +39,8 @@ package org.ow2.proactive.scheduler.ext.matlab.worker;
 import com.activeeon.proactive.license_saver.client.LicenseSaverClient;
 import org.objectweb.proactive.core.ProActiveException;
 import org.ow2.proactive.scheduler.ext.common.util.IOTools;
-import org.ow2.proactive.scheduler.ext.matlab.common.PASolveMatlabGlobalConfig;
-import org.ow2.proactive.scheduler.ext.matlab.common.PASolveMatlabTaskConfig;
+import org.ow2.proactive.scheduler.ext.matlab.common.data.PASolveMatlabGlobalConfig;
+import org.ow2.proactive.scheduler.ext.matlab.common.data.PASolveMatlabTaskConfig;
 import org.ow2.proactive.scheduler.ext.matlab.common.exception.MatlabInitException;
 import org.ow2.proactive.scheduler.ext.matlab.common.exception.MatlabTaskException;
 import org.ow2.proactive.scheduler.ext.matlab.common.exception.UnreachableLicenseProxyException;
@@ -262,7 +262,9 @@ public class MatlabConnectionRImpl implements MatlabConnection {
             process = null;
             lt1.goon = false;
             sendAck(false);
-            throw new MatlabInitException("Timeout occured while starting Matlab");
+            String output = IOTools.readFileAsString(this.logFile, 20000);
+            throw new MatlabInitException("Timeout occured while starting Matlab, with following output (" +
+                this.logFile + "):" + nl + output);
         }
         if (!running) {
             lt1.goon = false;
@@ -273,8 +275,9 @@ public class MatlabConnectionRImpl implements MatlabConnection {
 
         int exitValue = process.waitFor();
         if (exitValue != 0) {
+            String output = IOTools.readFileAsString(this.logFile, 20000);
             throw new MatlabInitException("Matlab process exited with code : " + exitValue +
-                " after task started.");
+                " after task started. With following output (" + this.logFile + "):" + nl + output);
         }
 
     }

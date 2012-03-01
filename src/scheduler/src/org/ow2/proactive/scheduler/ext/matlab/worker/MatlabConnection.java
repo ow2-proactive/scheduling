@@ -36,8 +36,8 @@
  */
 package org.ow2.proactive.scheduler.ext.matlab.worker;
 
-import org.ow2.proactive.scheduler.ext.matlab.common.PASolveMatlabGlobalConfig;
-import org.ow2.proactive.scheduler.ext.matlab.common.PASolveMatlabTaskConfig;
+import org.ow2.proactive.scheduler.ext.matlab.common.data.PASolveMatlabGlobalConfig;
+import org.ow2.proactive.scheduler.ext.matlab.common.data.PASolveMatlabTaskConfig;
 import org.ow2.proactive.scheduler.ext.matlab.common.exception.MatlabInitException;
 import org.ow2.proactive.scheduler.ext.matlab.common.exception.MatlabTaskException;
 

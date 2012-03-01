@@ -63,5 +63,6 @@ function PAresumeJob(jobid)
     end
     sched = PAScheduler;
     solver = sched.PAgetsolver();
-    solver.resumeJob(jobid);
+    output = solver.resumeJob(jobid);
+    disp(output);
 end

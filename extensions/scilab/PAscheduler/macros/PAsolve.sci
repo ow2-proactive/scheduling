@@ -1,5 +1,8 @@
 function outputs = PAsolve(varargin)
-    global ('PA_connected','DataRegistry', 'DataRegistryInit', 'SOLVEid', 'PAResult_TasksDB')
+    [locals,globals] = who_user1();
+    ke=grep(locals,['varargin']);
+    locals(ke)=[];
+    global ('PA_connected','PA_solver', 'SOLVEid', 'PAResult_TasksDB')
 
     if ~exists('PA_connected') | PA_connected ~= 1
         error('A connection to the ProActive scheduler must be established in order to use PAsolve, see PAconnect');
@@ -46,10 +49,7 @@ function outputs = PAsolve(varargin)
             task_configs(i-1,j-1) = t_conf;
         end
     end
-    
-    
-    
-    
+                
 
     initSolveConfig(solve_config, opt);
 
@@ -60,6 +60,8 @@ function outputs = PAsolve(varargin)
     
     taskFilesToClean = initTransferSource(task_configs,solve_config,opt,Tasks, SOLVEid,taskFilesToClean, pa_dir,fs,NN,MM);
     
+    initTransferEnv(locals,globals,solve_config,opt,SOLVEid,taskFilesToClean, pa_dir,fs);
+    
     initInputFiles(task_configs,solve_config,opt,Tasks,NN,MM);
     
     initOutputFiles(task_configs,solve_config,opt,Tasks,NN,MM);
@@ -68,20 +70,12 @@ function outputs = PAsolve(varargin)
     
     initOtherTCAttributes(NN,MM, task_configs, Tasks);
         
-    jimport org.ow2.proactive.scheduler.ext.scilab.client.ScilabSolver;
-    jimport org.objectweb.proactive.api.PAFuture;
+       
     //addJavaObj(ScilabSolver);
     //addJavaObj(PAFuture);
-    
-    solver = jnewInstance(ScilabSolver);
-    addJavaObj(solver);
-
-    pairinfolist = solver.solve(solve_config, task_configs);
-    addJavaObj(pairinfolist);
-    jobinfo = jinvoke(pairinfolist,'getX');
-    addJavaObj(jobinfo);
-    resfutureList =  jinvoke(pairinfolist,'getY');
-    addJavaObj(resfutureList);
+        
+    jobinfo = PA_solver.solve(solve_config, task_configs);    
+    addJavaObj(jobinfo);    
     jidjava = jinvoke(jobinfo,'getJobId');
     addJavaObj(jidjava);
     jid = string(jidjava);
@@ -103,10 +97,9 @@ function outputs = PAsolve(varargin)
         taskinfo.jobid = jid;
         
         taskinfo.taskid = ftn(i);
-        taskinfo.sid = SOLVEid;
-        future = jinvoke(resfutureList,'get',i-1);
+        taskinfo.sid = SOLVEid;        
 
-        results(i)=PAResult(future, taskinfo);
+        results(i)=PAResult(taskinfo);
     end    
     PAResult_TasksDB(SOLVEid) = ftn;
     outputs = PAResL(results);
@@ -163,6 +156,7 @@ endfunction
 // Initialize used directories
 function [taskFilesToClean,pa_dir,curr_dir,fs,subdir] = initDirectories(opt,solve_config,NN,solveid)
     jimport java.io.File;
+    jimport java.lang.String;
     //addJavaObj(File);   
     curr_dir = pwd();
     fs=filesep();
@@ -174,42 +168,57 @@ function [taskFilesToClean,pa_dir,curr_dir,fs,subdir] = initDirectories(opt,solv
     end    
     // PAScheduler sub directory init
 
-    subdir = '.PAScheduler';
-    solve_config.setTempSubDirName(subdir);
+    subdir = '.PAScheduler';    
 
     if isempty(opt.CustomDataspaceURL)
-        if ~isdir(strcat([curr_dir, fs, subdir]))
+        if ~isdir(curr_dir + fs + subdir)
             mkdir(curr_dir,subdir);
         end
-        pa_dir = strcat([curr_dir, fs, subdir]);
+        if ~isdir(curr_dir + fs + subdir + fs + string(solveid))
+            mkdir(curr_dir + fs + subdir,string(solveid));
+        end
+        pa_dir = curr_dir + fs + subdir + fs + string(solveid);
     else
         if isempty(opt.CustomDataspacePath)
             clearJavaStack();    
             error('if CustomDataspaceURL is specified, CustomDataspacePath must be specified also');
         end
-        if ~isdir(strcat([opt.CustomDataspacePath, fs, subdir]))
+        if ~isdir(opt.CustomDataspacePath + fs + subdir)
             mkdir(opt.CustomDataspacePath,subdir);
         end
-        pa_dir = strcat([opt.CustomDataspacePath, fs, subdir]);
+        if ~isdir(opt.CustomDataspacePath + fs + subdir + fs + string(solveid))
+            mkdir(opt.CustomDataspacePath + fs + subdir , string(solveid));
+        end
+        pa_dir = opt.CustomDataspacePath + fs + subdir + fs + string(solveid);
     end
+       
     
     taskFilesToClean=list();
     for i=1:NN
         taskFilesToClean($+1)=list();
     end
+    
+    subDirNames = jarray('java.lang.String', 2);
+    addJavaObj(subDirNames);
+    strName1 = jnewInstance(String,subdir);
+    addJavaObj(strName1);
+    subDirNames(0) = strName1;
+    strName2 = jnewInstance(String,string(solveid));
+    addJavaObj(strName2);
+    subDirNames(1) = strName2;
+    jinvoke(solve_config,'setTempSubDirNames',subDirNames);
+    
+    subdir = subdir + '/' + string(solveid); 
 endfunction
 
 // Initialize Data Spaces
 function initDS(solve_config,opt)
-    global('DataRegistryInit', 'DataRegistry')
-    jimport org.ow2.proactive.scheduler.ext.matsci.client.AODataspaceRegistry;
+    global('PA_dsregistry')    
     //addJavaObj(AODataspaceRegistry); 
-    if isempty(opt.CustomDataspaceURL)                
-        if ~exists('DataRegistry') | typeof(DataRegistry) ~= '_JObj' | ~jexists(DataRegistry)
-            DataRegistry = jnewInstance(AODataspaceRegistry,'ScilabInputSpace','ScilabOutputSpace','ScilabSession',opt.Debug);
-            DataRegistryInit = 1;
-        end
-        pair = DataRegistry.createDataSpace(curr_dir);
+    if isempty(opt.CustomDataspaceURL)                        
+        unreifiable = jinvoke(PA_dsregistry,'createDataSpace',curr_dir);
+        addJavaObj(unreifiable);
+        pair = jinvoke(unreifiable,'get');
         addJavaObj(pair);
         px=jinvoke(pair,'getX');
         py=jinvoke(pair,'getY');
@@ -238,13 +247,11 @@ function initSolveConfig(solve_config,opt)
     //addJavaObj(URL);
     solve_config.setDebug(opt.Debug);
     solve_config.setTimeStamp(opt.TimeStamp);
+    solve_config.setTransferEnv(opt.TransferEnv);
     solve_config.setFork(opt.Fork);
-    solve_config.setRunAsMe(opt.RunAsMe);
-    solve_config.setPriority(opt.Priority);
-    solve_config.setTransferSource(opt.TransferSource);
-    //solve_config.setTransferEnv(opt.TransferEnv);
-    solve_config.setTransferVariables(opt.TransferVariables);
-    solve_config.setKeepEngine(opt.KeepEngine);
+    solve_config.setRunAsMe(opt.RunAsMe);    
+    solve_config.setPriority(opt.Priority);    
+    //solve_config.setTransferEnv(opt.TransferEnv);       
     jinvoke(solve_config,'setWindowsStartupOptionsAsString',opt.WindowsStartupOptions);
     jinvoke(solve_config,'setLinuxStartupOptionsAsString',opt.LinuxStartupOptions);
 
@@ -323,6 +330,9 @@ function taskFilesToClean = initTransferSource(task_configs,solve_config,opt,Tas
             sourceNames = jarray('java.lang.String', 1);
             addJavaObj(sourceNames);
             sFN = 'ScilabPAsolve_src'+string(solveid)+indToFile([i j])+'.bin';
+            if opt.Debug then
+                disp('Saving function '+Func+' into file ' +pa_dir+fs+sFN);
+            end
             execstr('save(pa_dir+fs+sFN,'+Func+');');
             strName = jnewInstance(String,sFN);
             addJavaObj(strName);
@@ -335,6 +345,40 @@ function taskFilesToClean = initTransferSource(task_configs,solve_config,opt,Tas
             t_conf.setFunctionName(Func);
             t_conf.addSourceFile(sFN);
         end
+    end
+endfunction
+
+function initTransferEnv(locals,globals,solve_config,opt,solveid,taskFilesToClean, pa_dir,fs)
+    // Transfering the environment    
+    
+    if opt.TransferEnv
+        jimport java.lang.String;
+        envMatName = 'ScilabPAsolveEnv_'+ string(solveid)+ '.mat';
+        envFilePath = pa_dir + fs  + envMatName;
+        bigstr='';
+        for i=1:size(locals,1)
+            bigstr=bigstr+','+locals(i);
+        end 
+        for i=1:size(globals,1)
+            bigstr=bigstr+','+globals(i);
+        end               
+        execstr('save('''+envFilePath+''''+bigstr+')');
+        if opt.Debug then
+            disp('Saving Environment vars '+bigstr+' in '+envFilePath);
+        end        
+        if size(globals,1) > 0 then
+            globalNames = jarray('java.lang.String', size(globals,1));
+            addJavaObj(globalNames);
+        else 
+            globalNames = [];
+        end
+                
+        for i=1:size(globals,1)
+            name = jnewInstance(String,globals(i));
+            addJavaObj(name);
+        end
+        jinvoke(solve_config,'setEnvMatFileName',envMatName);     
+        jinvoke(solve_config,'setEnvGlobalNames',globalNames);         
     end
 endfunction
 
@@ -475,7 +519,7 @@ function initOtherTCAttributes(NN,MM, task_configs, Tasks)
         for j=1:MM
             t_conf = task_configs(i-1,j-1);
             if ~isempty(Tasks(j,i).Description) then
-                t_conf.setDescription(Tasks(j,i).Description);
+                jinvoke(t_conf,'setDescription',Tasks(j,i).Description);
             end                        
 
             // Custom Script
@@ -490,9 +534,9 @@ function initOtherTCAttributes(NN,MM, task_configs, Tasks)
                 jremove(url);
 
                 if ~ok
-                    t_conf.setCustomScriptUrl(strcat(['file:', selects ]));
+                    jinvoke(t_conf,'setCustomScriptUrl','file:'+selects);
                 else
-                    t_conf.setCustomScriptUrl(selects);
+                    jinvoke(t_conf,'setCustomScriptUrl',selects);
                 end
             end   
             
@@ -501,9 +545,9 @@ function initOtherTCAttributes(NN,MM, task_configs, Tasks)
                 if ~(type(Tasks(j,i).Topology) == 10)
                     error('PAsolve::Topology is not defined in Task '+string(j)+','+string(i)+' with NbNodes > 1.');
                 end
-                t_conf.setNbNodes(Tasks(j,i).NbNodes);
-                t_conf.setTopology(Tasks(j,i).Topology);
-                t_conf.setThresholdProximity(Tasks(j,i).ThresholdProximity);
+                jinvoke(t_conf,'setNbNodes',Tasks(j,i).NbNodes);
+                jinvoke(t_conf,'setTopology',Tasks(j,i).Topology);
+                jinvoke(t_conf,'setThresholdProximity',Tasks(j,i).ThresholdProximity);
             end  
         end
     end

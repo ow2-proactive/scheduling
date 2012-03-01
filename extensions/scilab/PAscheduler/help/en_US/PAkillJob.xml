@@ -45,7 +45,7 @@
 
     <refsection>
         <title>Examples</title>
-        <programlisting role="example"><![CDATA[
+        <programlisting role="example"><![CDATA[<![CDATA[<![CDATA[<![CDATA[<![CDATA[<![CDATA[<![CDATA[<![CDATA[
 function out=mysleep(in)
     sleep(in)
     out=%t
@@ -66,9 +66,8 @@ Job 7 killed.
  r  =
 
 (1):
-org.ow2.proactive.scheduler.ext.matsci.client.PASolveException: [AOScilabEnvironment] The job has been killed
-	at org.ow2.proactive.scheduler.ext.scilab.client.AOScilabEnvironment.waitResultOfTask(AOScilabEnvironment.java:106)
-	at org.ow2.proactive.scheduler.ext.scilab.client.AOScilabEnvironment.waitResult(AOScilabEnvironment.java:395)
+org.ow2.proactive.scheduler.ext.matsci.client.PASolveException: [AOScilabEnvironment] The job has been kiorg.ow2.proactive.scheduler.ext.scilab.client.middleman.AOScilabEnvironmentvironment.waitResultOfTask(AOScilabEnvironment.java:106)
+	at org.ow2.proactive.scheduler.ext.scilab.middleman.AOScilabEnvironment.waitResult(AOScilabEnvironment.java:395)
 	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
 	at sun.reflect.NativeMethodAccessorImpl.invoke(Unknown Source)
 	at sun.reflect.DelegatingMethodAccessorImpl.invoke(Unknown Source)
@@ -80,9 +79,7 @@ org.ow2.proactive.scheduler.ext.matsci.client.PASolveException: [AOScilabEnviron
 	at org.objectweb.proactive.core.body.BodyImpl$ActiveLocalBodyStrategy.serve(BodyImpl.java:587)
 	at org.objectweb.proactive.core.body.AbstractBody.serve(AbstractBody.java:949)
 	at org.objectweb.proactive.Service.serve(Service.java:121)
-	at org.ow2.proactive.scheduler.ext.matsci.client.AOMatSciEnvironment.servePending(AOMatSciEnvironment.java:830)
-	at org.ow2.proactive.scheduler.ext.matsci.client.AOMatSciEnvironment.maybeServePending(AOMatSciEnvironment.java:794)
-	at org.ow2.proactive.scheduler.ext.matsci.client.AOMatSciEnvironment.runActivity(AOMatSciEnvironment.java:760)
+	at org.ow2.proactive.scheduler.ext.matsci.middleman.AOMatSciEnvironment.servePending(AOMatSciEnvironorg.ow2.proactive.scheduler.ext.matsci.client.middleman.AOMatSciEnvironmentAOMatSciEnvironment.maybeServePendorg.ow2.proactive.scheduler.ext.matsci.client.middleman.AOMatSciEnvironment.ext.matsci.client.AOMatSciEnvironment.runActivity(AOMatSciEnvironment.java:760)
 	at org.objectweb.proactive.core.body.ActiveBody.run(ActiveBody.java:203)
 	at java.lang.Thread.run(Unknown Source)
  !--error 10000

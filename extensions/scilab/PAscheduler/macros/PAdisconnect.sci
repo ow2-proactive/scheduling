@@ -1,20 +1,17 @@
 function PAdisconnect()
     
-    global ('PA_initialized', 'PA_connected')
+    global ('PA_initialized', 'PA_connected', 'PA_solver')
 
     if ~exists('PA_initialized') | PA_initialized ~= 1
         PAinit();
-    end
-    jimport org.ow2.proactive.scheduler.ext.scilab.client.ScilabSolver;
-    solver = jnewInstance(ScilabSolver);
-    if ~exists('PA_connected') | PA_connected ~= 1 | ~jinvoke(solver,'isLoggedIn') 
-        jremove(solver,ScilabSolver);
+    end    
+    if ~exists('PA_connected') | PA_connected ~= 1 | ~jinvoke(PA_solver,'isLoggedIn')         
         error('This Matlab session is not connected to a Scheduler');
     end
     try
-       jinvoke(solver ,'disconnect'); 
+       jinvoke(PA_solver ,'disconnect'); 
        PA_connected = %f;
     catch                 
-    end        
-    jremove(solver,ScilabSolver);
+    end     
+    disp("Disconnected")       
 endfunction

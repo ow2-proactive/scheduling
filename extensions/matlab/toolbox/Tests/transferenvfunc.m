@@ -1,7 +1,10 @@
 function ok=transferenvfunc(in)
-    mytransferenvvar = evalin('caller', 'mytransferenvvar')
+    global totoGlobal
+    mytransferenvvar = evalin('caller', 'toto');
     try
-        disp(['Hello ' in ' and ' mytransferenvvar]);
+        disp(['Hello ' mytransferenvvar.field2]);
+        
+        disp(['Hello ' totoGlobal.field2]);
         ok = true;
     catch
         disp(getReport(ME));

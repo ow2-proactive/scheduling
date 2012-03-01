@@ -63,5 +63,6 @@ function PAkillTask(jobid, tname)
     end
     sched = PAScheduler;
     solver = sched.PAgetsolver();
-    solver.killTask(jobid, tname);
+    output = solver.killTask(jobid, tname);
+    disp(output);
 end

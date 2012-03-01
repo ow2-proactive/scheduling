@@ -67,17 +67,38 @@
 %   */
 function varargout = PAwaitFor(this,timeout)
 s=size(this);
+sched = PAScheduler;
+% Get the solver from memory
+solver = sched.PAgetsolver();
 exception = [];
+R=this(1,1);
+jobid = R.jobid;
+taskids = java.util.ArrayList(s(1)*s(2));
+allRes = true;
 for i=1:s(1)
     for j=1:s(2)
-        R=this(i,j);
-        f = R.future;
-        if exist('timeout','var') == 1
-
-            RaL = org.objectweb.proactive.api.PAFuture.getFutureValue(f,timeout);
+        R=this(i,j);   
+        allRes = allRes && (R.resultSet.get() || R.waited.get());
+        taskids.add(R.taskid); 
+    end
+end
+if ~allRes
+    if exist('timeout','var') == 1
+        unrei = solver.waitAll(jobid,taskids,java.lang.Integer(timeout));    
+    else
+        unrei = solver.waitAll(jobid,taskids,java.lang.Integer(-1));
+    end
+    answers = unrei.get();
+end
+for i=1:s(1)
+    for j=1:s(2)
+        R=this(i,j);   
+        if ~allRes
+            RaL = answers.get((i-1)*s(2)+(j-1)); 
+            R.RaL.set(RaL);
         else
-            RaL = org.objectweb.proactive.api.PAFuture.getFutureValue(f);
-        end
+            RaL = R.RaL.get();
+        end    
         if RaL.isOK()
             printLogs(RaL,R,false);           
 
@@ -136,7 +157,7 @@ clean(R);
 end
 
 function printLogs(RaL,R,err)
-if ~R.logsPrinted.get()
+if ~R.logsPrinted.get() || err
     logs = RaL.getLogs();
     if isjava(logs)
         R.logs.append(logs);
