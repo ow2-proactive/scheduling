@@ -464,7 +464,11 @@ function initDS(opt,sched, solve_config,curr_dir)
 
 if isnumeric(opt.CustomDataspaceURL) && isempty(opt.CustomDataspaceURL)
     registry = sched.PAgetDataspaceRegistry();
-    unreifiable = registry.createDataSpace(curr_dir);
+    try 
+        unreifiable = registry.createDataSpace(curr_dir);
+    catch
+        error('There was a problem contacting the middleman Java Virtual Machine, please reconnect using PAconnect');
+    end
     pair = unreifiable.get();
     solve_config.setInputSpaceURL(pair.getX());
     solve_config.setOutputSpaceURL(pair.getY());

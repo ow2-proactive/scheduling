@@ -205,8 +205,8 @@ elseif mod(nargin,2) ~= 0
 end
 
 logcheck = @(x)(ischar(x) && ismember(x, {'on','off', 'true', 'false'})) || islogical(x) || (isnumeric(x) && ((x == 0)||(x == 1)));
-versioncheck = @(x)((isnumeric(x)&&isempty(x)) || (ischar(x) && ~isempty(regexp(x, '^[1-9][\d]*\.[\d]+$'))));
-versionlistcheck = @(x)((isnumeric(x)&&isempty(x)) || (ischar(x) &&  ~isempty(regexp(x, '^([1-9][\d]*\.[\d]+[ ;,]+)*[1-9][\d]*\.[\d]+$'))));
+versioncheck = @(x)((isnumeric(x)&&isempty(x)) || (ischar(x) && isempty(x)) || (ischar(x) && ~isempty(regexp(x, '^[1-9][\d]*\.[\d]+$'))));
+versionlistcheck = @(x)((isnumeric(x)&&isempty(x)) || (ischar(x) && isempty(x)) || (ischar(x) &&  ~isempty(regexp(x, '^([1-9][\d]*\.[\d]+[ ;,]+)*[1-9][\d]*\.[\d]+$'))));
 
 jarlistcheck = @(x)(ischar(x) &&  ~isempty(regexp(x, '^([\w\-]+\.jar[ ;,]+)*[\w\-]+\.jar$')));
 listcheck = @(x)(ischar(x) && (isempty(x) || ~isempty(regexp(x, '^([^ ;,]+[ ;,]+)*[^ ;,]+$'))));
@@ -309,7 +309,7 @@ j=j+1;
 inputs(j).name = 'VersionPref';
 inputs(j).default = [maj '.' min];
 inputs(j).check = versioncheck;
-inputs(j).trans = id;
+inputs(j).trans = @versiontrans;
 j=j+1;
 inputs(j).name = 'VersionRej';
 inputs(j).default = [];
@@ -319,12 +319,12 @@ j=j+1;
 inputs(j).name = 'VersionMin';
 inputs(j).default = [];
 inputs(j).check = versioncheck;
-inputs(j).trans = id;
+inputs(j).trans = @versiontrans;
 j=j+1;
 inputs(j).name = 'VersionMax';
 inputs(j).default = [];
 inputs(j).check = versioncheck;
-inputs(j).trans = id;
+inputs(j).trans = @versiontrans;
 j=j+1;
 inputs(j).name = 'MatlabReservationScript';
 inputs(j).default = ['$SCHEDULER$' filesep 'extensions' filesep 'matlab' filesep 'script' filesep 'reserve_matlab.rb' ];
@@ -489,6 +489,14 @@ if ischar(x)
     num = str2num(x);
 else
     num = x;
+end
+end
+
+function v = versiontrans(x)
+if ischar(x) && isempty(x)
+    v = [];
+else
+    v = x;
 end
 end
 

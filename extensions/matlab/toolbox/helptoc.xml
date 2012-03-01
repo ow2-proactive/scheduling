@@ -57,7 +57,11 @@
                 <tocitem target="proactive_simulink.html#simulink-6">Using Disconnected Mode</tocitem>
             </tocitem>
 
+
+
         </tocitem>
+        <tocitem target="PAScheduler_function_list.html" image="$toolbox/matlab/icons/reficon.gif">Functions - By Category</tocitem>
+
         <tocreference target="helpfuncbycat.xml"></tocreference>
 
 

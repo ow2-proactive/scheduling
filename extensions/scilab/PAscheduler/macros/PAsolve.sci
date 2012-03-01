@@ -215,8 +215,12 @@ endfunction
 function initDS(solve_config,opt)
     global('PA_dsregistry')    
     //addJavaObj(AODataspaceRegistry); 
-    if isempty(opt.CustomDataspaceURL)                        
-        unreifiable = jinvoke(PA_dsregistry,'createDataSpace',curr_dir);
+    if isempty(opt.CustomDataspaceURL)   
+        try                     
+            unreifiable = jinvoke(PA_dsregistry,'createDataSpace',curr_dir);
+        catch 
+            error('There was a problem contacting the middleman Java Virtual Machine, please reconnect using PAconnect');
+        end
         addJavaObj(unreifiable);
         pair = jinvoke(unreifiable,'get');
         addJavaObj(pair);

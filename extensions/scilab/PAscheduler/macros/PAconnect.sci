@@ -17,27 +17,37 @@ function [] = PAconnect(uri,credpath)
     
 
     if type(PA_solver) ~= 1 then
-        PA_connected = jinvoke(PA_solver,'isConnected');
+        isJVMdeployed = 1;
+        isConnected = 0;        
+        try
+            isConnected = jinvoke(PA_solver,'isConnected');
+        catch 
+            isJVMdeployed = 0;
+        end
+    else
+        isJVMdeployed = 0;
+        isConnected = 0;
     end
         
-    if ~exists('PA_connected') | PA_connected ~= 1 
-        deployJVM(opt);   
+    if ~isJVMdeployed 
+        deployJVM(opt);  
+    end 
+    if ~isConnected then
         ok = jinvoke(PA_solver,'join', uri);
         if ~ok then
             error('PAConnect::Error wile connecting');
         end
         dataspaces(opt);
-        PA_connected = 1;
         disp(strcat(['Connection successful to ', uri]));
-           
-    end    
+    end
+                                                   
     if ~jinvoke(PA_solver,'isLoggedIn')  
         if argn(2) == 2 then
             login(credpath); 
         else
             login(); 
         end
-                             
+        PA_connected = 1;                             
     else
         disp('Already connected');
     end    

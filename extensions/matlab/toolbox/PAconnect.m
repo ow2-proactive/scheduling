@@ -98,38 +98,39 @@ reconnected = false;
 % Test that the session is not already connected to a Scheduler, or that
 % the connection to it is failing
 tmpsolver = sched.PAgetsolver();
-if ~strcmp(class(tmpsolver), 'double')            
-    
-    if ~tmpsolver.isConnected()
-         % Renewing a broken connection
-        ok = tmpsolver.join(url);
-        if ~ok
-            error('PAconnect::Error while connecting');
-        end
-        tst = true;
-    end    
-    
-    if tmpsolver.isLoggedIn()
-        error('This session is already connected to a scheduler.');
+if ~strcmp(class(tmpsolver), 'double') 
+    isJVMdeployed = 1;
+    isConnected = 0;
+    try
+        isConnected = tmpsolver.isConnected();
+    catch
+        isJVMdeployed = 0;
     end
-    solver = tmpsolver;
-else
+else 
+    isJVMdeployed = 0;
+    isConnected = 0;
+end
+
+
+if ~isJVMdeployed
     % Creating a new connection
     deployJVM(sched,opt);
-    %     node=org.objectweb.proactive.core.node.NodeFactory.createLocalNode('MatlabNode', true, [], []);
-    %     sched.PAgetNode(node);
-    %     solver = org.objectweb.proactive.api.PAActiveObject.newActive('org.ow2.proactive.scheduler.ext.matlab.middleman.AOMatlabEnvironment',[], node );
-    %
+end
+if ~isConnected
+    % joining the scheduler
     solver = sched.PAgetsolver();
     ok = solver.join(url);
     if ~ok
         error('PAconnect::Error while connecting');
     end
     dataspaces(sched, opt);
-    % Recording the solver inside the session, each further call to PAgetsolver
-    % will retrieve it
-    %sched.PAgetsolver(solver);
+else
+    solver = tmpsolver;
 end
+
+if solver.isLoggedIn()
+    error('This session is already connected to a scheduler.');
+end    
 
 if exist('credpath', 'var')
     login(solver,sched, credpath);
