@@ -1139,10 +1139,19 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
      * Clear every dirty listeners that are no more responding
      */
     private void clearListeners() {
-        for (UniqueID uId : dirtyList) {
+        Set<UniqueID> toRemove;
+        
+        synchronized (dirtyList) {
+            if (dirtyList.isEmpty()) {
+                return;
+            }
+            toRemove = new HashSet<UniqueID>(dirtyList);
+            dirtyList.clear();
+        }
+
+        for (UniqueID uId : toRemove) {
             disconnect(uId);
         }
-        dirtyList.clear();
     }
 
     /**
@@ -1151,7 +1160,9 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
      * @param id the id of the user to be removed.
      */
     void markAsDirty(UniqueID id) {
-        dirtyList.add(id);
+        synchronized (dirtyList) {
+            dirtyList.add(id);
+        }
     }
 
     /**
