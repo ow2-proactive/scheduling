@@ -164,8 +164,8 @@ public abstract class BaseJobSubmitClient extends BaseJMeterSchedulerClient {
 
     protected long getJobCompleteTimeout() {
         return DEFAULT_JOB_COMPLETE_TIMEOUT;
-    }   
-    
+    }
+
     protected final JavaTask createSimpleJavaTask(boolean fork) {
         JavaTask task = new JavaTask();
         task.setExecutableClassName(SimpleJavaTask.class.getName());

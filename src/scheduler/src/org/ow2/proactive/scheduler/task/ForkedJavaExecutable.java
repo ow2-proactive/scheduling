@@ -108,8 +108,9 @@ public class ForkedJavaExecutable extends JavaExecutable implements ForkerStarte
 
     /** Check start timeout : timeout to check if the process has failed */
     private static final long CHECKSTART_TIMEOUT = 2000;
-    /** Number of times we check the start (total timeout will be RETRY_ACQUIRE*CHECKSTART_TIMEOUT) */
-    private static final int NB_RETRY_CHECKSTART = 10;
+
+    /** Total times we wait for the start */
+    private static final long START_TIMEOUT = 60 * 1000;
 
     /** Size of the log buffer on forked side ; logs are buffered on forker side */
     private static final int FORKED_LOG_BUFFER_SIZE = 0;
@@ -540,7 +541,10 @@ public class ForkedJavaExecutable extends JavaExecutable implements ForkerStarte
     private synchronized void waitForRegistration(OSProcessBuilder ospb) throws SchedulerException,
             InterruptedException {
         int numberOfTrials = 0;
-        for (; numberOfTrials < NB_RETRY_CHECKSTART; numberOfTrials++) {
+
+        long waitEndTime = System.currentTimeMillis() + START_TIMEOUT;
+
+        while (System.currentTimeMillis() < waitEndTime) {
             this.wait(CHECKSTART_TIMEOUT);
 
             if (processStarted) {
@@ -559,8 +563,8 @@ public class ForkedJavaExecutable extends JavaExecutable implements ForkerStarte
                     numberOfTrials + ")");
             }
         }
-        throw new StartForkedProcessException("Unable to create a separate java process after " +
-            NB_RETRY_CHECKSTART + " tries", ospb.command());
+        throw new StartForkedProcessException("Separate java process didn't start after " + START_TIMEOUT +
+            "ms", ospb.command());
     }
 
     /**

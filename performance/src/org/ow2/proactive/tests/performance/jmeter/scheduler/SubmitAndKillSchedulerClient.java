@@ -64,7 +64,7 @@ public class SubmitAndKillSchedulerClient extends BaseJMeterSchedulerClient {
 
     static final long EXECUTION_START_TIMEOUT = 5 * 60000;
 
-    static final long FINISH_TIMEOUT = 60000;
+    static final long FINISH_TIMEOUT = 5 * 60000;
 
     public static class SleepForeverJavaTask extends JavaExecutable {
 

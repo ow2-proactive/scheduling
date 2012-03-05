@@ -1140,7 +1140,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
      */
     private void clearListeners() {
         Set<UniqueID> toRemove;
-        
+
         synchronized (dirtyList) {
             if (dirtyList.isEmpty()) {
                 return;
@@ -1199,7 +1199,8 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
     private void dispatchJobSubmitted(JobState job) {
         try {
             if (logger_dev.isDebugEnabled()) {
-                logger_dev.debug("Dispatch event '" + SchedulerEvent.JOB_SUBMITTED + "'");
+                logger_dev.debug("Dispatch event '" + SchedulerEvent.JOB_SUBMITTED + "', job: " +
+                    job.getJobInfo().getJobId());
             }
             for (UserIdentificationImpl userId : identifications.values()) {
                 //if this user has a listener
@@ -1235,7 +1236,8 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
     private void dispatchJobStateUpdated(String owner, NotificationData<JobInfo> notification) {
         try {
             if (logger_dev.isDebugEnabled()) {
-                logger_dev.debug("Dispatch event '" + notification.getEventType() + "'");
+                logger_dev.debug("Dispatch event '" + notification.getEventType() + "', job: " +
+                    notification.getData().getJobId());
             }
             for (UserIdentificationImpl userId : identifications.values()) {
                 //if this user has a listener
@@ -1267,7 +1269,8 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
     private void dispatchTaskStateUpdated(String owner, NotificationData<TaskInfo> notification) {
         try {
             if (logger_dev.isDebugEnabled()) {
-                logger_dev.debug("Dispatch event '" + notification.getEventType() + "'");
+                logger_dev.debug("Dispatch event '" + notification.getEventType() + "', task: " +
+                    notification.getData().getTaskId());
             }
             for (UserIdentificationImpl userId : identifications.values()) {
                 //if this user has a listener

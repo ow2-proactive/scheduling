@@ -49,7 +49,7 @@ import org.ow2.proactive.tests.performance.jmeter.scheduler.SchedulerConnectionP
 
 public class SchedulerConnectClient extends BaseJMeterSchedulerClient {
 
-    private static final long LOGIN_TIMEOUT = 60000;
+    private static final long LOGIN_TIMEOUT = 5 * 60000;
 
     @Override
     protected SampleResult doRunTest(JavaSamplerContext context) throws Throwable {
@@ -59,9 +59,8 @@ public class SchedulerConnectClient extends BaseJMeterSchedulerClient {
         String password = parameters.getSchedulerPassword();
 
         SchedulerAuthenticationInterface auth = SchedulerConnection.waitAndJoin(url, LOGIN_TIMEOUT);
-        Credentials cred = Credentials.createCredentials(
-                new CredData(CredData.parseLogin(login), CredData.parseDomain(login), password),
-                auth.getPublicKey());
+        Credentials cred = Credentials.createCredentials(new CredData(CredData.parseLogin(login), CredData
+                .parseDomain(login), password), auth.getPublicKey());
 
         SampleResult result = new SampleResult();
         result.sampleStart();

@@ -44,9 +44,13 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.UniqueID;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.utils.NamedThreadFactory;
 import org.ow2.proactive.scheduler.common.SchedulerEventListener;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
+import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 import org.ow2.proactive.threading.ReifiedMethodCall;
 
 
@@ -59,12 +63,14 @@ import org.ow2.proactive.threading.ReifiedMethodCall;
  */
 public class ClientRequestHandler {
 
+    public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.FRONTEND);
+
     /** Number of threads used by the thread pool for clients events sending */
     private static final int THREAD_NUMBER = PASchedulerProperties.SCHEDULER_LISTENERS_THREADNUMBER
             .getValueAsInt();
     /** thread pool */
-    private static final ExecutorService threadPoolForNetworkCalls = Executors
-            .newFixedThreadPool(THREAD_NUMBER);
+    private static final ExecutorService threadPoolForNetworkCalls = Executors.newFixedThreadPool(
+            THREAD_NUMBER, new NamedThreadFactory("ClientRequestHandlerPool"));
 
     private static final AtomicInteger requestLeft = new AtomicInteger();
 
@@ -185,6 +191,9 @@ public class ClientRequestHandler {
                 //try to empty the events list if no event comes from the core
                 tryStartTask();
             } catch (Throwable t) {
+                if (logger_dev.isDebugEnabled()) {
+                    logger_dev.debug("Error during sending event to the cleint " + clientId, t);
+                }
                 //remove this client from Frontend (client dead or timed out)
                 frontend.markAsDirty(clientId);
                 //do not set busy here, we don't want to wait N times for the network timeout
