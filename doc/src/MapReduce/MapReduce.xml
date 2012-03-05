@@ -310,7 +310,7 @@ FileOutputFormat.setOutputPath(job, new Path("output_dir"));</programlisting>
                             <literal>$SCHEDULER_HOME/src/scheduler/src/org/ow2/proactive/scheduler/ext/mapreduce/examples/paMapReduceConfigurationProperties.property</literal>. Here
                             we'll use a minimal configuration file sufficient to run the example:
 
-                            <programlisting language="sh"># filename: $MAPREDUCE_EXAMPLE/paMapReduceConfigurationProperties.property
+                            <programlisting language="sh"># filename: $EXAMPLE_DIR/paMapReduceConfigurationProperties.property
 
 # scheduler URL
 org.ow2.proactive.scheduler.ext.mapreduce.schedulerUrl=rmi://localhost:55855/
@@ -395,7 +395,7 @@ else
             <para>
                 Here is the full result of the modifications described above:
 
-                <programlisting language="java">// filename: $MAPREDUCE_EXAMPLE/WordCount.java
+                <programlisting language="java">// filename: $EXAMPLE_DIR/WordCount.java
 
 import java.io.*;
 import java.util.*;
@@ -510,7 +510,7 @@ public class WordCount {
                         Compile:
                     </para>
                     <programlisting language="sh"># for compilation, we need 3 jars: Hadoop core, ProActive core and ProActive MapReduce addon
-$ COMPILE_CLASSPATH=$SCHEDULER_HOME/dist/lib/mapreduce/hadoop-0.20.2-core.jar:$SCHEDULER_HOME/dist/lib/ProActive_Scheduler-core.jar:$SCHEDULER_HOME/dist/lib/ProActive_Scheduler-mapreduce.jar
+$ COMPILE_CLASSPATH=$SCHEDULER_HOME/dist/lib/hadoop-0.20.2-core.jar:$SCHEDULER_HOME/dist/lib/ProActive_Scheduler-core.jar:$SCHEDULER_HOME/dist/lib/ProActive_Scheduler-mapreduce.jar
 
 $ mkdir $EXAMPLE_DIR/classes
 $ javac -cp $COMPILE_CLASSPATH -d $EXAMPLE_DIR/classes $EXAMPLE_DIR/WordCount.java</programlisting>
@@ -548,7 +548,7 @@ Scheduler successfully created on rmi://deepthought.inria.fr:55855/</programlist
                 </listitem>
                 <listitem>
                     <para>Run:</para>
-                    <programlisting language="sh">java -cp $SCHEDULER_HOME/dist/lib/*:$EXAMPLE_DIR/classes WordCount</programlisting>
+                    <programlisting language="sh">java -Djava.security.policy=$SCHEDULER_HOME/config/security.java.policy-client -cp $SCHEDULER_HOME/dist/lib/*:$EXAMPLE_DIR/classes WordCount</programlisting>
                 </listitem>
                 <listitem>
                     <para>
