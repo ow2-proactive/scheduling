@@ -142,6 +142,8 @@ public class SubmitFailingTaskSchedulerClient extends BaseJobSubmitClient {
     @Override
     protected void checkJobResult(JobResult jobResult, SampleResult result) throws Exception {
         if (jobResult.getAllResults().size() != 1) {
+            logError("One task result is expected instead of " + jobResult.getAllResults().size() +
+                " for job with failing tasks " + jobResult.getJobId());
             result.setResponseMessage("One task result is expected instead of " +
                 jobResult.getAllResults().size());
             return;
@@ -155,6 +157,7 @@ public class SubmitFailingTaskSchedulerClient extends BaseJobSubmitClient {
             if (taskType == TaskType.java_task) {
                 if (taskResult.getException() == null) {
                     error = true;
+                    logError("Exception was expected in the result for job " + jobResult.getJobId());
                     result.setResponseMessage("Exception is expected in task result");
                     break;
                 }

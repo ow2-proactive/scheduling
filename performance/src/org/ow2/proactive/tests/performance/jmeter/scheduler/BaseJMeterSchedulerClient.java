@@ -131,6 +131,7 @@ public abstract class BaseJMeterSchedulerClient extends BaseJMeterClient {
     }
 
     protected void logJobResult(JobResult result) throws Exception {
+        logError("Job result(" + result.getJobId() + "):");
         for (TaskResult r : result.getAllResults().values()) {
             logError("Task: " + r.getTaskId());
             logError("Exception: " + r.getException());

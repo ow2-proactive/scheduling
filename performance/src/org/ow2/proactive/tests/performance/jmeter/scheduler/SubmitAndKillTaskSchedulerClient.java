@@ -135,6 +135,7 @@ public class SubmitAndKillTaskSchedulerClient extends BaseJMeterSchedulerClient 
             boolean killed = scheduler.killTask(jobId, task.getName());
             if (!killed && result.isSuccessful()) {
                 result.setSuccessful(false);
+                logError("Failed to kill task for job " + jobId + ", task: " + task.getName());
                 result.setResponseMessage("Failed to kill task " + task.getName());
             }
         }
@@ -144,6 +145,7 @@ public class SubmitAndKillTaskSchedulerClient extends BaseJMeterSchedulerClient 
         if (!eventsMonitor.waitFor(jobCompleteCondition, FINISH_TIMEOUT, getLogger())) {
             if (result.isSuccessful()) {
                 result.setSuccessful(false);
+                logError("Job " + jobId + " with killed tasks didn't finish as expected");
                 result.setResponseMessage("Job with killed tasks didn't finish as expected");
             }
         }
@@ -153,6 +155,7 @@ public class SubmitAndKillTaskSchedulerClient extends BaseJMeterSchedulerClient 
             for (TaskResult taskResult : jobResult.getAllResults().values()) {
                 if (!taskResult.hadException()) {
                     result.setSuccessful(false);
+                    logError("Exception was expected for task " + taskResult.getTaskId() + ", job: " + jobId);
                     result.setResponseMessage("Exception is expected for task " +
                         taskResult.getTaskId().getReadableName() + "");
                 }
@@ -162,6 +165,8 @@ public class SubmitAndKillTaskSchedulerClient extends BaseJMeterSchedulerClient 
         if (!result.isSuccessful()) {
             if (jobResult != null) {
                 logJobResult(jobResult);
+            } else {
+                logError("Job result was not available for job with killed tasks " + jobId);
             }
         }
 

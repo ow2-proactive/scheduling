@@ -135,15 +135,16 @@ public abstract class BaseJobSubmitClient extends BaseJMeterSchedulerClient {
             checkJobResult(jobResult, result);
         } else {
             result.setSuccessful(false);
+            logError("Job " + jobId + " was submitted, but didn't finish as expected");
             result.setResponseMessage("Job was submitted, but didn't finish as expected");
         }
 
         if (!result.isSuccessful()) {
             if (jobResult != null) {
-                logError("Job execution failed, job result:");
+                logError("Job execution failed (" + jobId + "), job result:");
                 logJobResult(jobResult);
             } else {
-                logError("Job execution failed and job result isn't available");
+                logError("Job execution failed and job result isn't available, job: " + jobId);
             }
         }
 
@@ -154,6 +155,7 @@ public abstract class BaseJobSubmitClient extends BaseJMeterSchedulerClient {
         boolean hasErrors = false;
         for (TaskResult taskResult : jobResult.getAllResults().values()) {
             if (taskResult.hadException()) {
+                logError("Task " + taskResult.getTaskId() + " had exception, job: " + jobResult.getJobId());
                 hasErrors = true;
                 break;
             }

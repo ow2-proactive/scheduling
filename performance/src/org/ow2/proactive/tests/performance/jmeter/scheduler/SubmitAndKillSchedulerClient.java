@@ -119,6 +119,7 @@ public class SubmitAndKillSchedulerClient extends BaseJMeterSchedulerClient {
             logJobResult(jobId);
             SampleResult result = new SampleResult();
             result.setSuccessful(false);
+            logError("Failed to wait for start of task execition, job: " + jobId);
             result.setResponseMessage("Failed to wait for start of task execition");
             return result;
         }
@@ -129,14 +130,17 @@ public class SubmitAndKillSchedulerClient extends BaseJMeterSchedulerClient {
         result.sampleEnd();
         if (!killed) {
             result.setSuccessful(false);
+            logError("Failed to kill job " + jobId);
             result.setResponseMessage("Failed to kill job");
         } else {
             if (!eventsMonitor.waitFor(jobCompleteCondition, FINISH_TIMEOUT, getLogger())) {
                 result.setSuccessful(false);
+                logError("Killed job " + jobId + " didn't finish as expected");
                 result.setResponseMessage("Killed job didn't finish as expected");
             } else {
                 if (!scheduler.removeJob(jobId)) {
                     result.setSuccessful(false);
+                    logError("Failed to removed killed job " + jobId);
                     result.setResponseMessage("Failed to remove killed job");
                 } else {
                     result.setSuccessful(true);
