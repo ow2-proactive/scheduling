@@ -122,6 +122,7 @@
                 <jvmarg value="-Dtest.deploy.pamr.startNewRouter.host=${test.deploy.pamr.startNewRouter.host}" />
                 <jvmarg value="-Dtest.deploy.pamr.startNewRouter.port=${test.deploy.pamr.startNewRouter.port}" />
                 <jvmarg value="-Dtest.deploy.pamr.startNewRouter.reservedIds=0:resource_manager,1:scheduler" />
+                <jvmarg value="-Dtest.deploy.pamr.startNewRouter.args=${test.deploy.pamr.startNewRouter.args}" />
                 <jvmarg value="-Drm.deploy.pamr.serverReservedId=0:resource_manager" />
                 <jvmarg value="-Dscheduler.deploy.pamr.serverReservedId=1:scheduler" />
 

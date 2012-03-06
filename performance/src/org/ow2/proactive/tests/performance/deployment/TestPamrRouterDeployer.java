@@ -58,6 +58,8 @@ public class TestPamrRouterDeployer {
 
     private final List<PamrReservedId> reservedPamrIds;
 
+    private final String[] pamrArgs;
+
     public static TestPamrRouterDeployer createPamrRouterDeployerUsingSystemProperties() throws Exception {
         TestEnv env = TestEnv.getEnvUsingSystemProperties("pamr");
         String hostName = TestUtils.getRequiredProperty("test.deploy.pamr.startNewRouter.host");
@@ -67,11 +69,18 @@ public class TestPamrRouterDeployer {
         if (portProperty != null && !portProperty.trim().isEmpty()) {
             port = Integer.valueOf(portProperty);
         }
-        return new TestPamrRouterDeployer(env, hostName, port, reservedIds);
+        String pamrArgsValues = System.getProperty("test.deploy.pamr.startNewRouter.args");
+        String[] pamrArgs;
+        if (pamrArgsValues != null) {
+            pamrArgs = pamrArgsValues.split(" ");
+        } else {
+            pamrArgs = new String[0];
+        }
+        return new TestPamrRouterDeployer(env, hostName, port, reservedIds, pamrArgs);
     }
 
-    public TestPamrRouterDeployer(TestEnv env, String hostName, Integer port, String reservedIds)
-            throws Exception {
+    public TestPamrRouterDeployer(TestEnv env, String hostName, Integer port, String reservedIds,
+            String[] pamrArgs) throws Exception {
         this.env = new HostTestEnv(hostName, env);
 
         reservedPamrIds = new ArrayList<PamrReservedId>();
@@ -93,6 +102,8 @@ public class TestPamrRouterDeployer {
         } else {
             pamrPort = port;
         }
+
+        this.pamrArgs = pamrArgs;
     }
 
     public void startRouter() throws Exception {
@@ -120,7 +131,9 @@ public class TestPamrRouterDeployer {
         command.add(String.valueOf(pamrPort));
         command.add("--configFile");
         command.add(pamrConfigPath);
-        // command.add("--verbose");
+        for (String pamrArg : pamrArgs) {
+            command.add(pamrArg);
+        }
 
         System.out.println("Starting PAMR router on the " + env.getHost() + ", command: " + command);
 
