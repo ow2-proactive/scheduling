@@ -48,8 +48,8 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -64,6 +64,7 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
+import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
@@ -200,6 +201,9 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     private boolean shutedDown = false;
 
     private Client caller = null;
+
+    /** Any local active object (including a half body) will act as the same single client */
+    private static final Client localClient = new Client(null, false);
 
     /**
      * Map of connected clients and internal services that have an access to the core.
@@ -377,7 +381,6 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                 @Override
                 public void run() {
                     if (!toShutDown) {
-                        RMCore.clients.put(PAActiveObject.getBodyOnThis().getID(), new Client(null, false));
                         rmcoreStub.shutdown(true);
                     }
 
@@ -396,14 +399,6 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
             // Creating RM started event
             this.monitoring.rmEvent(new RMEvent(RMEventType.STARTED));
-
-            // registering internal clients of the core
-            clients.put(Client.getId(nodeConfigurator), new Client(null, false));
-            clients.put(Client.getId(nodesCleaner), new Client(null, false));
-            clients.put(Client.getId(authentication), new Client(null, false));
-            clients.put(Client.getId(monitoring), new Client(null, false));
-            clients.put(Client.getId(selectionManager), new Client(null, false));
-            clients.put(Client.getId(clientPinger), new Client(null, false));
 
             authentication.setActivated(true);
             clientPinger.ping();
@@ -1419,6 +1414,12 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         Client client = RMCore.clients.get(clientId);
 
         if (client == null) {
+            // Check if the client id is a local body or half body
+            LocalBodyStore lbs = LocalBodyStore.getInstance();
+            if (lbs.getLocalBody(clientId) != null || lbs.getLocalHalfBody(clientId) != null) {
+                return RMCore.localClient;
+            }
+
             throw new NotConnectedException("Client " + clientId +
                 " is not connected to the resource manager");
         }
