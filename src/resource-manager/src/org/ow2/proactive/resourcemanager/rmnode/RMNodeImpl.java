@@ -345,6 +345,25 @@ public class RMNodeImpl implements RMNode, Serializable {
         return sb.toString();
     }
 
+    private void initHandler() throws NodeException {
+        if (this.handler == null) {
+            try {
+                this.handler = ScriptLoader.createHandler(this.node);
+            } catch (Exception e) {
+                throw new NodeException("Unable to create Script Handler on node ", e);
+            }
+        }
+    }
+
+    /**
+     * Returns the ProActive stub on the remote script handler.
+     * @return the ProActive stub on the script handler.
+     */
+    public ScriptHandler getHandler() throws NodeException {
+        this.initHandler();
+        return this.handler;
+    }
+
     /**
      * Execute a selection Script in order to test the Node.
      * If no script handler is defined, create one, and execute the script.
@@ -353,14 +372,11 @@ public class RMNodeImpl implements RMNode, Serializable {
      *
      */
     public <T> ScriptResult<T> executeScript(Script<T> script) {
-        if (this.handler == null) {
-            try {
-                this.handler = ScriptLoader.createHandler(this.node);
-            } catch (Exception e) {
-                return new ScriptResult<T>(new NodeException("Unable to create Script Handler on node ", e));
-            }
+        try {
+            this.initHandler();
+        } catch (NodeException e) {
+            return new ScriptResult<T>(e);
         }
-
         return this.handler.handle(script);
     }
 

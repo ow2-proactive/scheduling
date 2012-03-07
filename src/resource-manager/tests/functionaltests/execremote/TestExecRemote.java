@@ -126,7 +126,7 @@ public final class TestExecRemote extends FunctionalTest {
         }
         {
             File sFile = new File(miscDir + "processBuilder.js");
-            RMTHelper.log("Test 4 - Test " + sFile + " as OutputableScript");
+            RMTHelper.log("Test 4 - Test " + sFile);
 
             String[] cmd = (isLinux) ? new String[] { "/bin/sh", "-c", "echo " + valueToEcho }
                     : new String[] { "cmd.exe", "/c", "@(echo " + valueToEcho + ")" };
@@ -143,7 +143,7 @@ public final class TestExecRemote extends FunctionalTest {
         }
         {
             File sFile = new File(miscDir + "processBuilderWithDS.js");
-            RMTHelper.log("Test 5 - Test " + sFile + " as OutputableScript");
+            RMTHelper.log("Test 5 - Test " + sFile);
             // Create test temporary file
             String testFilename = "test.txt";
             File tempDir = new File("testExecRemote");
@@ -204,7 +204,7 @@ public final class TestExecRemote extends FunctionalTest {
             }
         }
         {
-            RMTHelper.log("Test 7 - Execute script on a specified hostname");
+            RMTHelper.log("Test 7 - Execute script with hostname as target");
             SimpleScript script = new SimpleScript(TestExecRemote.simpleScriptContent, "javascript");
             HashSet<String> targets = new HashSet<String>(1);
             targets.add(hostname);
@@ -224,7 +224,6 @@ public final class TestExecRemote extends FunctionalTest {
                 Assert.assertNull("No exception must occur", exception);
             }
         }
-
     }
 
     private class DSHelper {
@@ -232,7 +231,6 @@ public final class TestExecRemote extends FunctionalTest {
         private FileSystemServerDeployer inputDataserverDeployer;
 
         public String startDS(final String rootDir) throws Exception {
-
             // Start Naming Service
             this.namingServiceDeployer = new NamingServiceDeployer();
             NamingService localNamingService = this.namingServiceDeployer.getLocalNamingService();
@@ -261,7 +259,6 @@ public final class TestExecRemote extends FunctionalTest {
                     if (this.inputDataserverDeployer != null) {
                         this.inputDataserverDeployer.terminate();
                     }
-
                 }
             }
         }

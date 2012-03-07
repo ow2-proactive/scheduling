@@ -113,6 +113,7 @@ import org.ow2.proactive.resourcemanager.nodesource.policy.NodeSourcePolicyFacto
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.ow2.proactive.resourcemanager.rmnode.RMDeployingNode;
 import org.ow2.proactive.resourcemanager.rmnode.RMNode;
+import org.ow2.proactive.resourcemanager.rmnode.RMNodeImpl;
 import org.ow2.proactive.resourcemanager.selection.SelectionManager;
 import org.ow2.proactive.resourcemanager.selection.statistics.ProbablisticSelectionManager;
 import org.ow2.proactive.resourcemanager.selection.topology.TopologyManager;
@@ -120,6 +121,7 @@ import org.ow2.proactive.resourcemanager.utils.ClientPinger;
 import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 import org.ow2.proactive.resourcemanager.utils.TargetType;
 import org.ow2.proactive.scripting.Script;
+import org.ow2.proactive.scripting.ScriptHandler;
 import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
@@ -1549,12 +1551,12 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                 result = false;
                 continue;
             }
-            result = this.lockNode(rmnode);
+            result = this.internalLockNode(rmnode);
         }
         return new BooleanWrapper(result);
     }
 
-    private boolean lockNode(RMNode rmnode) {
+    private boolean internalLockNode(RMNode rmnode) {
         if (!rmnode.isFree()) {
             logger.warn("Cannot lock the node " + rmnode.getNodeURL() + " which is not free [ state is " +
                 rmnode.getState() + " ]");
@@ -1588,12 +1590,12 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                 continue;
             }
 
-            result = this.unlockNode(rmnode);
+            result = this.internalUnlockNode(rmnode);
         }
         return new BooleanWrapper(result);
     }
 
-    private boolean unlockNode(RMNode rmnode) {
+    private boolean internalUnlockNode(RMNode rmnode) {
         if (!rmnode.isLocked()) {
             logger.warn("Cannot unlock the node " + rmnode.getNodeURL() + " which is not locked [ state is " +
                 rmnode.getState() + " ]");
@@ -1661,65 +1663,84 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      * {@inheritDoc}
      */
     public <T> List<ScriptResult<T>> executeScript(Script<T> script, String targetType, Set<String> targets) {
-
-        // Check target type
+        // Depending on the target type, select nodes for script execution
         final TargetType tType = TargetType.valueOf(targetType);
-        final HashSet<RMNode> selectedNodes = new HashSet<RMNode>();
-        try {
-            switch (tType) {
-                case NODESOURCE_NAME:
-                    // If target is a nodesource name select all its nodes
-                    for (String target : targets) {
-                        NodeSource nodeSource = this.nodeSources.get(target);
-                        if (nodeSource != null) {
-                            for (RMNode candidateNode : this.allNodes.values()) {
-                                if (candidateNode.getNodeSource().equals(nodeSource)) {
-                                    this.selectCandidateNode(selectedNodes, candidateNode);
-                                }
+        final HashSet<RMNode> selectedRMNodes = new HashSet<RMNode>();
+        switch (tType) {
+            case NODESOURCE_NAME:
+                // If target is a nodesource name select all its nodes
+                for (String target : targets) {
+                    NodeSource nodeSource = this.nodeSources.get(target);
+                    if (nodeSource != null) {
+                        for (RMNode candidateNode : this.allNodes.values()) {
+                            if (candidateNode.getNodeSource().equals(nodeSource)) {
+                                this.selectCandidateNode(selectedRMNodes, candidateNode);
                             }
                         }
                     }
-                    break;
-                case NODE_URL:
-                    // If target is node url select the node
-                    for (String target : targets) {
-                        RMNode candidateNode = this.allNodes.get(target);
-                        if (candidateNode != null) {
-                            this.selectCandidateNode(selectedNodes, candidateNode);
+                }
+                break;
+            case NODE_URL:
+                // If target is node url select the node
+                for (String target : targets) {
+                    RMNode candidateNode = this.allNodes.get(target);
+                    if (candidateNode != null) {
+                        this.selectCandidateNode(selectedRMNodes, candidateNode);
+                    }
+                }
+                break;
+            case HOSTNAME:
+                // If target is hostname select first node from that host
+                for (String target : targets) {
+                    for (RMNode node : this.allNodes.values()) {
+                        if (node.getHostName().equals(target)) {
+                            this.selectCandidateNode(selectedRMNodes, node);
+                            break;
                         }
                     }
-                    break;
-                case HOSTNAME:
-                    // If target is hostname select first node from that host
-                    for (String target : targets) {
-                        for (RMNode node : this.allNodes.values()) {
-                            if (node.getHostName().equals(target)) {
-                                this.selectCandidateNode(selectedNodes, node);
-                                break;
-                            }
-                        }
-                    }
-                    break;
-                default:
-                    throw new IllegalArgumentException("Unable to execute script, unknown target type: " +
-                        targetType);
-            }
+                }
+                break;
+            default:
+                throw new IllegalArgumentException("Unable to execute script, unknown target type: " +
+                    targetType);
+        }
 
-            return this.selectionManager.executeScript(script, selectedNodes);
-        } finally {
-            // Ask osmirnov to replace this by a non-blocking callback
-            for (RMNode rmnode : selectedNodes) {
-                this.unlockNode(rmnode);
+        // Only nodeURL and script handlers are needed
+        final HashMap<String, ScriptHandler> us = new HashMap<String, ScriptHandler>(selectedRMNodes.size());
+        for (RMNode node : selectedRMNodes) {
+            String nodeURL = node.getNodeURL();
+            try {
+                us.put(nodeURL, ((RMNodeImpl) node).getHandler());
+            } catch (Exception e) {
+                this.unselectNodes(selectedRMNodes);
+                throw new IllegalStateException(
+                    "Unable to execute script atomically, a problem occured on node " + nodeURL, e);
             }
+        }
+
+        // Return a ProActive future on the list of results
+        return this.selectionManager.executeScript(script, us);
+
+        // To avoid blocking rmcore ao the call is delegated to the selection
+        // manager ao and each node is unlocked as soon as the script has
+        // finished it's execution.
+    }
+
+    private void selectCandidateNode(HashSet<RMNode> selectedRMNodes, RMNode candidateNode) {
+        if (this.internalLockNode(candidateNode)) {
+            selectedRMNodes.add(candidateNode);
+        } else {
+            // Unlock all previously locked nodes
+            this.unselectNodes(selectedRMNodes);
+            throw new IllegalStateException("Unable to execute script atomically, the " +
+                candidateNode.getNodeURL() + " is not free.");
         }
     }
 
-    private void selectCandidateNode(HashSet<RMNode> selectedNodes, RMNode candidateNode) {
-        if (this.lockNode(candidateNode)) {
-            selectedNodes.add(candidateNode);
-        } else {
-            throw new IllegalStateException("Unable to execute script atomically, the " +
-                candidateNode.getNodeURL() + " is note free.");
+    private void unselectNodes(final HashSet<RMNode> selectedRMNodes) {
+        // Unlock all previously locked nodes
+        for (RMNode rmnode : selectedRMNodes) {
+            this.internalUnlockNode(rmnode);
         }
     }
 }
