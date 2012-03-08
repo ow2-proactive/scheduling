@@ -145,12 +145,21 @@ function exec(commandFilePath){
 	return rm_.exec_(commandFilePath);
 }
 
-function execRemote(commandFilePath, targetType, targets){
-	var targetSet = new java.util.HashSet(arguments.length-2);	
-	for (var i = 2; i<arguments.length; i++) {	   
-	   targetSet.add(arguments[i]);
-	}
-	return rm_.execRemote_(commandFilePath, targetType, targetSet);
+function execr(path,type,targets){   
+	var targetSet = new java.util.HashSet(targets.length);	
+	for (var i = 0; i<targets.length; i++) {
+	   targetSet.add(targets[i]);
+	}	
+	if (arguments.length > 3) {
+		var scriptArgs = java.lang.reflect.Array.newInstance(java.lang.String, arguments.length - 3);	
+		for (var i = 0; i<scriptArgs.length; i++) {
+			scriptArgs[i] = arguments[i+3];
+		}
+		return rm_.execr_(path, type, targetSet, scriptArgs);
+	} else {
+		var scriptArgs = java.lang.reflect.Array.newInstance(java.lang.String, 0);
+		return rm_.execr_(path, type, targetSet, scriptArgs);
+	}	
 }
 
 function exit(){

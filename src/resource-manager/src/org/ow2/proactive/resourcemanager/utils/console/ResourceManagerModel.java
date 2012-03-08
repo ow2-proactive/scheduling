@@ -57,6 +57,7 @@ import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
+import org.ow2.proactive.resourcemanager.common.RMConstants;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.exception.RMException;
@@ -149,9 +150,12 @@ public class ResourceManagerModel extends ConsoleModel {
         commands
                 .add(new Command("exec(scriptFilePath)",
                     "Execute the content of the given script file (parameter is a string representing a script-file path)"));
-        commands.add(new Command("execRemote(scriptFilePath, targetType, targets)",
-            "Execute the content of the given script file on specified targets, targetType can be on of " +
-                Arrays.toString(TargetType.values())));
+        commands.add(new Command("execr(path,type,[targets],args)",
+            "Execute remotely the specified script at 'path' on specified ['targets'] of 'type' " +
+                Arrays.toString(TargetType.values()) +
+                " with optional 'args'. For example execr('../../samples/scripts/misc/processBuilder.js','" +
+                TargetType.NODESOURCE_NAME + "',['" + RMConstants.DEFAULT_STATIC_SOURCE_NAME +
+                "'],'hostname');"));
         commands.add(new Command("cnslhelp() or ?c", "Displays help about the console functions itself"));
         if (allowExitCommand) {
             commands.add(new Command("exit()", "Exits RM controller"));
@@ -639,31 +643,35 @@ public class ResourceManagerModel extends ConsoleModel {
         }
     }
 
-    public void execRemote_(final String commandFilePath, final String targetType,
-            final HashSet<String> targets) {
+    public void execr_(String commandFilePath, String targetType, HashSet<String> targets, String[] args) {
         try {
             // Read the script from the file   
             File scriptFile = new File(commandFilePath.trim());
             print("Script " + scriptFile.getName() + " targets: " + targets);
-            SelectionScript ss = new SelectionScript(scriptFile, /*no params*/new String[0]);
+            SelectionScript ss = new SelectionScript(scriptFile, args);
             // Execute the script on the given targets
             List<ScriptResult<Boolean>> results = this.rm.executeScript(ss, targetType, targets);
             if (results.size() == 0) {
-                print("No scripts were executed, maybe no targets found or no registered nodes at all");
+                print("No scripts were executed, maybe no targets found or the Resource Manager has no nodes");
             }
             for (ScriptResult<Boolean> sr : results) {
-                Throwable exception = sr.getException();
-                if (exception != null) {
-                    handleExceptionDisplay("An exception occured when running script:", exception);
+                StringBuilder bld = new StringBuilder("Script");
+                Object result = sr.getResult();
+                if (result != null) {
+                    bld.append(" result: ").append(sr.getResult());
                 }
-                StringBuilder bld = new StringBuilder();
-                bld.append("Script result: ").append(sr.getResult());
                 String output = sr.getOutput();
                 if (output != null) {
-                    bld.append(", output: ").append(newline);
+                    bld.append(" output: ").append(newline);
                     bld.append(output);
                 }
-                print(bld.toString());
+                Throwable exception = sr.getException();
+                if (exception != null) {
+                    bld.append(" had an exception:");
+                    handleExceptionDisplay(bld.toString(), exception);
+                } else {
+                    print(bld.toString());
+                }
             }
         } catch (Throwable e) {
             handleExceptionDisplay("*ERROR*", e);
