@@ -43,8 +43,8 @@ package org.ow2.proactive.utils.console;
  * @since ProActive Scheduling 1.0
  */
 public class Command {
-    private String name;
-    private String description;
+    private final String name;
+    private final String description;
 
     /**
      * Create a new instance of Command
@@ -67,15 +67,6 @@ public class Command {
     }
 
     /**
-     * Set the name value to the given name value
-     *
-     * @param name the name to set
-     */
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    /**
      * Get the description
      *
      * @return the description
@@ -83,14 +74,4 @@ public class Command {
     public String getDescription() {
         return description;
     }
-
-    /**
-     * Set the description value to the given description value
-     *
-     * @param description the description to set
-     */
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
 }

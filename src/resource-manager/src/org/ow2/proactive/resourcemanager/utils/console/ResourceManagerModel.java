@@ -68,8 +68,10 @@ import org.ow2.proactive.resourcemanager.nodesource.common.PluginDescriptor;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.DefaultInfrastructureManager;
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.ow2.proactive.resourcemanager.utils.TargetType;
+import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive.scripting.SelectionScript;
+import org.ow2.proactive.scripting.SimpleScript;
 import org.ow2.proactive.utils.ObjectArrayFormatter;
 import org.ow2.proactive.utils.Tools;
 import org.ow2.proactive.utils.console.Command;
@@ -645,16 +647,32 @@ public class ResourceManagerModel extends ConsoleModel {
 
     public void execr_(String commandFilePath, String targetType, HashSet<String> targets, String[] args) {
         try {
-            // Read the script from the file   
+            // Read the script from the file and check is selection script
             File scriptFile = new File(commandFilePath.trim());
+            String scriptContent = null;
+            BufferedReader br = null;
+            try {
+                br = new BufferedReader(new FileReader(scriptFile));
+                scriptContent = readFileContent(br);
+            } finally {
+                br.close();
+            }
+            Script<?> script = null;
+            if (scriptContent.contains(SelectionScript.RESULT_VARIABLE)) {
+                script = new SelectionScript(scriptFile, args);
+            } else {
+                script = new SimpleScript(scriptFile, args);
+            }
             print("Script " + scriptFile.getName() + " targets: " + targets);
-            SelectionScript ss = new SelectionScript(scriptFile, args);
-            // Execute the script on the given targets
-            List<ScriptResult<Boolean>> results = this.rm.executeScript(ss, targetType, targets);
+
+            // Execute the script on the specified targets (don't know how to avoid cast warning)
+            @SuppressWarnings("unchecked")
+            List<ScriptResult<Object>> results = this.rm.executeScript((Script<Object>) script, targetType,
+                    targets);
             if (results.size() == 0) {
                 print("No scripts were executed, maybe no targets found or the Resource Manager has no nodes");
             }
-            for (ScriptResult<Boolean> sr : results) {
+            for (ScriptResult<Object> sr : results) {
                 StringBuilder bld = new StringBuilder("Script");
                 Object result = sr.getResult();
                 if (result != null) {
