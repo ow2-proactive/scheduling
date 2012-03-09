@@ -1,6 +1,5 @@
 package org.ow2.proactive.scheduler.ext.matsci.client.embedded.util;
 
-import org.objectweb.proactive.utils.OperatingSystem;
 import org.ow2.proactive.scheduler.ext.common.util.IOTools;
 import org.ow2.proactive.scheduler.ext.matsci.client.common.DataspaceRegistry;
 import org.ow2.proactive.scheduler.ext.matsci.client.common.MatSciEnvironment;
@@ -21,6 +20,7 @@ import java.util.Map;
 
 /**
  * StandardJVMSpawnHelper class used to start a Java Virtual Machine on the local host and deploy RMI interfaces on it.
+ * This class MUST NOT contain any reference other than matsci or common extension, as it is run within Matlab/Scilab without access to Scheduler or ProActive jars
  *
  * @author The ProActive Team
  */
@@ -49,7 +49,7 @@ public class StandardJVMSpawnHelper {
     private static String DEFAULT_JAVAPATH;
 
     static {
-        if (OperatingSystem.getOperatingSystem() == OperatingSystem.windows) {
+        if (System.getProperty("os.name").startsWith("Windows")) {
             DEFAULT_JAVAPATH = System.getProperty("java.home") + File.separator + "bin" + File.separator +
                 "java.exe";
         } else {
