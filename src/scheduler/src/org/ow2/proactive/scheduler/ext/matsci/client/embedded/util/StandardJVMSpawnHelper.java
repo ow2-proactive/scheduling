@@ -1,5 +1,6 @@
 package org.ow2.proactive.scheduler.ext.matsci.client.embedded.util;
 
+import org.objectweb.proactive.utils.OperatingSystem;
 import org.ow2.proactive.scheduler.ext.common.util.IOTools;
 import org.ow2.proactive.scheduler.ext.matsci.client.common.DataspaceRegistry;
 import org.ow2.proactive.scheduler.ext.matsci.client.common.MatSciEnvironment;
@@ -45,8 +46,17 @@ public class StandardJVMSpawnHelper {
     /**
      * Default Java executable path (java path of the current JVM)
      */
-    private final static String DEFAULT_JAVAPATH = System.getProperty("java.home") + File.separator + "bin" +
-        File.separator + "java";
+    private static String DEFAULT_JAVAPATH;
+
+    static {
+        if (OperatingSystem.getOperatingSystem() == OperatingSystem.windows) {
+            DEFAULT_JAVAPATH = System.getProperty("java.home") + File.separator + "bin" + File.separator +
+                "java.exe";
+        } else {
+            DEFAULT_JAVAPATH = System.getProperty("java.home") + File.separator + "bin" + File.separator +
+                "java";
+        }
+    }
 
     /**
      * Options for the JVM

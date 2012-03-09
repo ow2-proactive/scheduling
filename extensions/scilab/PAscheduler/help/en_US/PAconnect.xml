@@ -20,6 +20,7 @@
     <title>Calling Sequence</title>
 
     <synopsis>PAconnect(url)</synopsis>
+    <synopsis>PAconnect(url,cred)</synopsis>
   </refsynopsisdiv>
 
   <refsection>
@@ -42,7 +43,7 @@
                 </listitem>
             </varlistentry>
             <varlistentry>
-                <term>uri</term>
+                <term>cred</term>
                 <listitem>
                     <para>
                         credpath path to the login credential file (optional)

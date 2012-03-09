@@ -64,7 +64,12 @@ function deployJVM(opt)
     home = getenv('JAVA_HOME');
     fs=filesep();
     if length(home) > 0
-        deployer.setJavaPath(home + fs + 'bin'+ fs +'java');
+        if (getos() == "Windows") then
+            deployer.setJavaPath(home + fs + 'bin'+ fs +'java.exe');
+        else
+            deployer.setJavaPath(home + fs + 'bin'+ fs +'java');
+        end
+        
     end
 
     scheduling_dir = PA_scheduler_dir;

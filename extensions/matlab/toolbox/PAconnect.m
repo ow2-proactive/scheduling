@@ -147,7 +147,12 @@ deployer = org.ow2.proactive.scheduler.ext.matsci.client.embedded.util.StandardJ
 home = getenv('JAVA_HOME');
 fs=filesep();
 if length(home) > 0
-    deployer.setJavaPath([home fs 'bin' fs 'java']);
+    if ispc()
+        deployer.setJavaPath([home fs 'bin' fs 'java.exe']);
+    else
+        deployer.setJavaPath([home fs 'bin' fs 'java']);
+    end
+    
 end
 [pathstr, name, ext] = fileparts(mfilename('fullpath'));
 javafile = java.io.File(pathstr);
