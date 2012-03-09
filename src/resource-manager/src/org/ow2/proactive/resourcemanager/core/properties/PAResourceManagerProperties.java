@@ -42,6 +42,7 @@ import java.io.IOException;
 import java.util.Properties;
 
 import org.objectweb.proactive.annotation.PublicAPI;
+import org.ow2.proactive.resourcemanager.selection.SelectionManager;
 
 
 /**
@@ -61,29 +62,33 @@ public enum PAResourceManagerProperties {
     /* ********************** RMCORE PROPERTIES ********************* */
     /* ***************************************************************** */
 
-    /** name of the ProActive Node containing RM's active objects */
+    /** Name of the ProActive Node containing RM's active objects */
     RM_NODE_NAME("pa.rm.node.name", PropertyType.STRING),
 
-    /** ping frequency in ms used by node source for keeping a watch on handled nodes */
+    /** Ping frequency in ms used by node source for keeping a watch on handled nodes */
     RM_NODE_SOURCE_PING_FREQUENCY("pa.rm.node.source.ping.frequency", PropertyType.INTEGER),
 
-    /** ping frequency used by resource manager to ping connected clients (in ms) */
+    /** Ping frequency used by resource manager to ping connected clients (in ms) */
     RM_CLIENT_PING_FREQUENCY("pa.rm.client.ping.frequency", PropertyType.INTEGER),
 
-    /**  Timeout in ms for selection script execution */
+    /** Timeout in ms for selection script execution */
     RM_SELECT_SCRIPT_TIMEOUT("pa.rm.select.script.timeout", PropertyType.INTEGER),
 
-    /**  The number of selection script digests stored in the cache to predict the execution results */
+    /** The number of selection script digests stored in the cache to predict the execution results */
     RM_SELECT_SCRIPT_CACHE_SIZE("pa.rm.select.script.cache", PropertyType.INTEGER),
 
     /**
-     *  The time period when a node has the same dynamic characteristics (in ms).
-     *  Default is 5 mins, which means that if any dynamic selection scripts returns
-     *  false on a node it won't be executed there at least for this time.
+     * The time period when a node has the same dynamic characteristics (in ms).
+     * Default is 5 mins, which means that if any dynamic selection scripts returns
+     * false on a node it won't be executed there at least for this time.
      */
     RM_SELECT_SCRIPT_NODE_DYNAMICITY("pa.rm.select.node.dynamicity", PropertyType.INTEGER),
 
-    /**  Timeout in ms for node lookup */
+    /** Timeout in ms for remote script execution using
+     *  {@link SelectionManager#executeScript(org.ow2.proactive.scripting.Script, java.util.HashMap)}*/
+    RM_EXECUTE_SCRIPT_TIMEOUT("pa.rm.execute.script.timeout", PropertyType.INTEGER),
+
+    /** Timeout in ms for node lookup */
     RM_NODELOOKUP_TIMEOUT("pa.rm.nodelookup.timeout", PropertyType.INTEGER),
 
     /** GCM application template file path, used to perform GCM deployments */
@@ -91,27 +96,27 @@ public enum PAResourceManagerProperties {
     RM_GCM_TEMPLATE_APPLICATION_FILE("pa.rm.gcm.template.application.file", PropertyType.STRING),
 
     /**
-     * name of a string contained in in the GCM Application (GCMA) XML file, that must mandatory appear
+     * Name of a string contained in in the GCM Application (GCMA) XML file, that must mandatory appear
      * as a place of a GCM deployment file.
      */
     @Deprecated
     RM_GCMD_PATH_PROPERTY_NAME("pa.rm.gcmd.path.property.name", PropertyType.STRING),
 
-    /** path to the Amazon EC2 account credentials properties file,
+    /** Path to the Amazon EC2 account credentials properties file,
      *  mandatory when using the EC2 Infrastructure */
     RM_EC2_PATH_PROPERTY_NAME("pa.rm.ec2.properties", PropertyType.STRING),
 
     /** Resource Manager home directory */
     RM_HOME("pa.rm.home", PropertyType.STRING),
 
-    /** path to the Jaas configuration file which defines what modules are available for
+    /** Path to the Jaas configuration file which defines what modules are available for
      * internal authentication */
     RM_AUTH_JAAS_PATH("pa.rm.auth.jaas.path", PropertyType.STRING),
 
-    /** path to the private key file which is used to decrypt credentials passed to the jaas module */
+    /** Path to the private key file which is used to decrypt credentials passed to the jaas module */
     RM_AUTH_PRIVKEY_PATH("pa.rm.auth.privkey.path", PropertyType.STRING),
 
-    /** path to the public key file which is used to encrypt credentials for authentication */
+    /** Path to the public key file which is used to encrypt credentials for authentication */
     RM_AUTH_PUBKEY_PATH("pa.rm.auth.pubkey.path", PropertyType.STRING),
 
     /** Resource Manager authentication method */

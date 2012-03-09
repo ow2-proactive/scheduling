@@ -351,7 +351,7 @@ public abstract class SelectionManager {
     public <T> List<ScriptResult<T>> executeScript(final Script<T> script,
             final HashMap<String, ScriptHandler> us) {
         // TODO: add a specific timeout for script execution
-        final int timeout = PAResourceManagerProperties.RM_SELECT_SCRIPT_TIMEOUT.getValueAsInt();
+        final int timeout = PAResourceManagerProperties.RM_EXECUTE_SCRIPT_TIMEOUT.getValueAsInt();
         // Create as many Callables as there are target nodes
         final Set<Entry<String, ScriptHandler>> entries = us.entrySet();
         final ArrayList<Callable<ScriptResult<T>>> scriptExecutors = new ArrayList<Callable<ScriptResult<T>>>(

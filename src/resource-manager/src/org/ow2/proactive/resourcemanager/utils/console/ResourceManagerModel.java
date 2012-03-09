@@ -655,7 +655,9 @@ public class ResourceManagerModel extends ConsoleModel {
                 br = new BufferedReader(new FileReader(scriptFile));
                 scriptContent = readFileContent(br);
             } finally {
-                br.close();
+                if (br != null) {
+                    br.close();
+                }
             }
             Script<?> script = null;
             if (scriptContent.contains(SelectionScript.RESULT_VARIABLE)) {
