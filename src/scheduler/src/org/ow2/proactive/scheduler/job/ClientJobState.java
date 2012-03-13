@@ -14,7 +14,6 @@ import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.task.ClientTaskState;
 import org.ow2.proactive.scheduler.task.TaskInfoImpl;
-import org.ow2.proactive.scheduler.task.internal.InternalTask;
 
 
 public class ClientJobState extends JobState {

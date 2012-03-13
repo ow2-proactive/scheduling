@@ -98,6 +98,7 @@ import org.ow2.proactive.scheduler.core.account.SchedulerAccountsManager;
 import org.ow2.proactive.scheduler.core.jmx.SchedulerJMXHelper;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.descriptor.JobDescriptorImpl;
+import org.ow2.proactive.scheduler.job.ClientJobState;
 import org.ow2.proactive.scheduler.job.IdentifiedJob;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.job.InternalJobFactory;
@@ -1382,8 +1383,9 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
      * {@inheritDoc}
      */
     public void jobSubmitted(JobState job) {
-        jobsMap.put(job.getId(), job);
-        sState.getPendingJobs().add(job);
+        JobState storedJobState = new ClientJobState(job); 
+        jobsMap.put(job.getId(), storedJobState);
+        sState.getPendingJobs().add(storedJobState);
         dispatchJobSubmitted(job);
         this.jmxHelper.getSchedulerRuntimeMBean().jobSubmittedEvent(job);
     }
