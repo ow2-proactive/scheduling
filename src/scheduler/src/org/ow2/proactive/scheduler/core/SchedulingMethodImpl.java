@@ -39,6 +39,7 @@ package org.ow2.proactive.scheduler.core;
 import java.security.KeyException;
 import java.security.PrivateKey;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -85,7 +86,7 @@ import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
 import org.ow2.proactive.utils.Formatter;
 import org.ow2.proactive.utils.NodeSet;
 
-import edu.emory.mathcs.backport.java.util.Collections;
+
 
 
 /**

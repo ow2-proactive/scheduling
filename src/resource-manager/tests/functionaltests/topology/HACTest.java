@@ -37,6 +37,7 @@
 package functionaltests.topology;
 
 import java.net.InetAddress;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -51,7 +52,6 @@ import org.ow2.proactive.resourcemanager.frontend.topology.clustering.HAC;
 import org.ow2.proactive.topology.descriptor.BestProximityDescriptor;
 import org.ow2.proactive.topology.descriptor.DistanceFunction;
 
-import edu.emory.mathcs.backport.java.util.Collections;
 import org.ow2.tests.FunctionalTest;
 import functionaltests.RMTHelper;
 
