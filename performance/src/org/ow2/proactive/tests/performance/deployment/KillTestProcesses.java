@@ -52,7 +52,7 @@ public class KillTestProcesses {
         Set<String> hostsList = new LinkedHashSet<String>();
         for (String hostName : hosts) {
             if (hostName != null && !hostName.isEmpty()) {
-                hostsList.add(hostName);
+                hostsList.add(hostName.trim());
             }
         }
         System.out.println("Killing test processes on the hosts: " + hostsList);

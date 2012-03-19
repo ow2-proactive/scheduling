@@ -46,7 +46,7 @@ import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
 
 
 /**
- * Scenario submit job with task executed in loop.
+ * Scenario submits job with task executed in loop.
  * 
  */
 public class LoopTaskSubmitClient extends BaseJobSubmitClient {

@@ -43,6 +43,7 @@ import org.apache.jmeter.protocol.java.sampler.JavaSamplerContext;
 import org.apache.jmeter.samplers.SampleResult;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.job.factories.JobFactory;
 import org.ow2.proactive.tests.performance.scheduler.JobWaitContition;
@@ -105,18 +106,35 @@ public class SampleJobsSubmitClient extends BaseJMeterSchedulerClient {
             jobCompleteConditions.add(jobCompleteCondition);
         }
 
+        List<JobId> jobsIds = new ArrayList<JobId>();
+
         SampleResult result = new SampleResult();
         result.sampleStart();
         for (Job job : jobs) {
             JobId jobId = getScheduler().submit(job);
             logInfo("Submitted job " + jobId + " " + job.getName() + "(" + Thread.currentThread() + ")");
+
+            jobsIds.add(jobId);
         }
         result.sampleEnd();
 
         boolean ok = true;
-        for (SchedulerWaitCondition jobCompleteCondition : jobCompleteConditions) {
+
+        for (int i = 0; i < jobCompleteConditions.size(); i++) {
+            SchedulerWaitCondition jobCompleteCondition = jobCompleteConditions.get(i);
+
             if (!eventsMonitor.waitFor(jobCompleteCondition, JOB_WAIT_TIMEOUT, getLogger())) {
                 ok = false;
+
+                JobId jobId = jobsIds.get(i);
+                logError("Job execution failed (" + jobId + "), trying to get job result:");
+                JobResult jobResult = getScheduler().getJobResult(jobId);
+                if (jobResult != null) {
+                    logError("Job execution failed (" + jobId + "), job result:");
+                    logJobResult(jobResult);
+                } else {
+                    logError("Job execution failed and job result isn't available, job: " + jobId);
+                }
             }
         }
         result.setSuccessful(ok);

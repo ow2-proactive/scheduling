@@ -61,7 +61,7 @@ public class DeploymentTestUtils {
 
     public static InetAddress checkHostIsAvailable(String hostName) {
         try {
-            InetAddress hostAddr = InetAddress.getByName(hostName);
+            InetAddress hostAddr = InetAddress.getByName(hostName.trim());
             /*
             if (!hostAddr.isReachable(30000)) {
                 System.out.println("ERROR: InetAddress.isReachable is false for " + hostName);

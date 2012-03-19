@@ -91,6 +91,7 @@ public class TestHosts {
         this.hostsList = hostsList;
         this.hosts = new ArrayList<TestHosts.Host>();
         for (String host : hostsList.split(",")) {
+            host = host.trim();
             logger.info("Adding host in the free hosts list: " + host);
             hosts.add(new Host(host));
         }

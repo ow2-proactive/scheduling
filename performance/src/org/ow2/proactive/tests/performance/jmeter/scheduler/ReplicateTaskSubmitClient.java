@@ -47,7 +47,7 @@ import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
 
 
 /**
- * Scenario submit job with replicated tasks:
+ * Scenario submits job with replicated tasks:
  *         A
  *         |
  * ------------------

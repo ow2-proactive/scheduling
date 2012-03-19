@@ -79,7 +79,7 @@ public class TestRMDeployer extends TestDeployer {
     private final TestEnv nodesTestEnv;
 
     public static TestRMDeployer createRMDeployerUsingSystemProperties() throws Exception {
-        String rmHostName = TestUtils.getRequiredProperty("rm.deploy.rmHost");
+        String rmHostName = TestUtils.getRequiredProperty("rm.deploy.rmHost").trim();
         HostTestEnv serverHostEnv = new HostTestEnv(rmHostName, TestEnv.getEnvUsingSystemProperties("rm"));
 
         String protocol = TestUtils.getRequiredProperty("test.deploy.protocol");
@@ -88,6 +88,9 @@ public class TestRMDeployer extends TestDeployer {
         String rmNodesHostsString = TestUtils.getRequiredProperty("rm.deploy.rmNodesHosts");
         if (!rmNodesHostsString.trim().isEmpty()) {
             rmNodesHosts = rmNodesHostsString.split(",");
+            for (int i = 0; i < rmNodesHosts.length; i++) {
+                rmNodesHosts[i] = rmNodesHosts[i].trim();
+            }
         }
 
         int nodesPerHost = Integer.valueOf(TestUtils.getRequiredProperty("rm.deploy.rmNodesPerHosts"));
@@ -95,6 +98,9 @@ public class TestRMDeployer extends TestDeployer {
         String testNodesString = TestUtils.getRequiredProperty("rm.deploy.testNodes");
         if (!testNodesString.trim().isEmpty()) {
             testNodes = testNodesString.split(",");
+            for (int i = 0; i < testNodes.length; i++) {
+                testNodes[i] = testNodes[i].trim();
+            }
         }
 
         TestEnv nodesTestEnv = TestEnv.getEnvUsingSystemProperties("rmNodes");

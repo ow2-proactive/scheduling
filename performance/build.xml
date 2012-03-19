@@ -11,6 +11,14 @@
 
     <property name="classes.dir" value="${project.root}/classes/performance" />
 
+    <property name="test.deploy.env.local.javaPath" value="${javaPath}" />
+    <property name="test.deploy.env.local.schedulingPath" value="${schedulingPath}" />
+    <property name="test.deploy.env.pamr" value="local" />
+    <property name="test.deploy.env.rm" value="local" />
+    <property name="test.deploy.env.rmNodes" value="local" />
+    <property name="test.deploy.env.scheduler" value="local" />
+    <property name="schedulerScenario" value="scheduler1" />
+
     <!-- setup jmeter ant task -->
     <property name="ant_jmeter_regexp" value="extras/ant-jmeter-*.jar" />
     <path id="ant-jmeter-path">
@@ -45,7 +53,6 @@
         <delete dir="${classes.dir}" />
         <delete dir="${tmp}/RM_DB" />
         <delete dir="${tmp}/SCHEDULER_DB" />
-        <delete dir="${project.root}/.logs" />
     </target>
 
     <target name="compile.tests" unless="compile.tests.disable">
