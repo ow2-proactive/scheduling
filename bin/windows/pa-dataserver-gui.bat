@@ -16,14 +16,14 @@ IF DEFINED CLASSPATHEXT (
 
 SET CLASSPATH=%CLASSPATH%;%PROACTIVE%\dist\lib\ProActive.jar;%PROACTIVE%\dist\lib\ProActive_examples.jar;%PROACTIVE%\dist\lib\ProActive_utils.jar
 
-set JAVA_CMD="%JAVA_HOME%\bin\java.exe" -Dproactive.home="%PROACTIVE%"  -Djava.security.manager -Djava.security.policy="%PROACTIVE%\config\security.java.policy-client"
+set JAVA_CMD="%JAVA_HOME%\bin\java.exe" -Dproactive.home="%PROACTIVE%" -Dproactive.configuration="file:%PROACTIVE%\config\proactive\ProActiveConfiguration.xml" -Djava.security.manager -Djava.security.policy="%PROACTIVE%\config\security.java.policy-client"
 %JAVA_CMD% org.objectweb.proactive.extensions.vfsprovider.gui.ServerBrowser
 
 goto end
 
 :javahome
 echo.
-echo The enviroment variable JAVA_HOME must be set the current jdk distribution
+echo The environment variable JAVA_HOME must be set the current jdk distribution
 echo installed on your computer.
 echo Use
 echo    set JAVA_HOME=<the directory where is the JDK>
