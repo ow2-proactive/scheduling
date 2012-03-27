@@ -14,7 +14,7 @@ set SCHED_URL=
 :ParamParseLoop
 IF [%1]==[] goto :ParamParseEndLoop
     IF %1 == -q (
-        set VERBOSE=false 
+        set VERBOSE=false
         goto :ParamParseShift
     ) 
     IF %1 == -v (
