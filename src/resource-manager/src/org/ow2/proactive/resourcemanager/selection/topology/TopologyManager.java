@@ -309,7 +309,7 @@ public class TopologyManager {
     private class SingleHostHandler extends TopologyHandler {
         @Override
         public NodeSet select(int number, List<Node> matchedNodes) {
-            if (number == 0) {
+            if (number <= 0 || matchedNodes.size() == 0) {
                 return new NodeSet();
             }
             if (number > matchedNodes.size()) {
@@ -353,7 +353,7 @@ public class TopologyManager {
     private class SingleHostExclusiveHandler extends TopologyHandler {
         @Override
         public NodeSet select(int number, List<Node> matchedNodes) {
-            if (number == 0) {
+            if (number <= 0 || matchedNodes.size() == 0) {
                 return new NodeSet();
             }
 
@@ -371,7 +371,7 @@ public class TopologyManager {
         private NodeSet selectRecursively(int number, List<InetAddress> hostsSortedByNodesNumber,
                 List<Node> matchedNodes) {
 
-            if (number == 0) {
+            if (number <= 0 || matchedNodes.size() == 0) {
                 return new NodeSet();
             }
             if (number > matchedNodes.size()) {
@@ -469,7 +469,7 @@ public class TopologyManager {
 
         @Override
         public NodeSet select(int number, List<Node> matchedNodes) {
-            if (number == 0) {
+            if (number <= 0 || matchedNodes.size() == 0) {
                 return new NodeSet();
             }
 
@@ -553,7 +553,7 @@ public class TopologyManager {
     private class DifferentHostsExclusiveHandler extends TopologyHandler {
         @Override
         public NodeSet select(int number, List<Node> matchedNodes) {
-            if (number == 0) {
+            if (number <= 0 || matchedNodes.size() == 0) {
                 return new NodeSet();
             }
 
