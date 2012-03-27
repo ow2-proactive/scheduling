@@ -46,9 +46,9 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import org.ow2.proactive.tests.performance.deployment.DeploymentTestUtils;
+import org.ow2.proactive.tests.performance.deployment.TestDeployer;
 import org.ow2.proactive.tests.performance.deployment.TestExecutionException;
 import org.ow2.proactive.tests.performance.deployment.process.ProcessExecutor;
-import org.ow2.proactive.tests.performance.deployment.rm.TestRMDeployHelper;
 import org.ow2.proactive.utils.NodeSet;
 
 
@@ -114,7 +114,7 @@ public class TestExecutionTask extends JavaExecutable {
         }
 
         System.out.println("Killing test processes on the hosts: " + hosts);
-        DeploymentTestUtils.killTestProcesses(hosts, TestRMDeployHelper.TEST_JVM_OPTION);
+        DeploymentTestUtils.killTestProcesses(hosts, TestDeployer.TEST_JVM_OPTION);
     }
 
     private void runTest(Set<String> hosts) throws Exception {

@@ -38,16 +38,22 @@ package org.ow2.proactive.tests.performance.deployment;
 
 import java.io.File;
 import java.net.InetAddress;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.ow2.proactive.tests.performance.deployment.process.ProcessExecutor;
-import org.ow2.proactive.tests.performance.deployment.rm.TestRMDeployHelper;
 import org.ow2.proactive.tests.performance.utils.TestFileUtils;
 
 
 public abstract class TestDeployer {
+
+    public static final String TEST_JVM_OPTION_NAME = "org.ow2.proactive.tests.performance";
+
+    public static final String TEST_JVM_OPTION = TEST_JVM_OPTION_NAME + "=true";
 
     protected final HostTestEnv serverHostEnv;
 
@@ -55,13 +61,21 @@ public abstract class TestDeployer {
 
     protected final TestEnv localEnv = TestEnv.getLocalEnvUsingSystemProperties();
 
-    protected TestDeployHelper deployHelper;
-
     private String serverUrl;
 
-    public TestDeployer(HostTestEnv serverHostEnv, String clientConfigFileName) throws InterruptedException {
+    protected final TestProtocolHelper protocolHelper;
+
+    static final String[] requiredJARs = { "script-js.jar", "gson-2.1.jar", "jruby-engine.jar",
+            "jython-engine.jar", "commons-logging-1.1.1.jar", "ProActive_Scheduler-core.jar",
+            "ProActive_SRM-common.jar", "ProActive_ResourceManager.jar", "ProActive_Scheduler-worker.jar",
+            "ProActive_Scheduler-matsci.jar", "ProActive_Scheduler-mapreduce.jar",
+            "commons-httpclient-3.1.jar", "commons-codec-1.3.jar", "ProActive.jar" };
+
+    public TestDeployer(HostTestEnv serverHostEnv, String clientConfigFileName, String protocol)
+            throws InterruptedException {
         this.serverHostEnv = serverHostEnv;
         this.clientConfigFileName = clientConfigFileName;
+        this.protocolHelper = createProtocolHelper(protocol, serverHostEnv);
     }
 
     public HostTestEnv getServerHostEnv() {
@@ -72,12 +86,8 @@ public abstract class TestDeployer {
         return clientConfigFileName;
     }
 
-    public void setDeployHelper(TestDeployHelper deployHelper) {
-        this.deployHelper = deployHelper;
-    }
-
     protected ProcessExecutor runStartServerCommand() throws Exception {
-        List<String> startCommand = deployHelper.createServerStartCommand();
+        List<String> startCommand = createServerStartCommand();
         System.out.println("Starting server process on the " + serverHostEnv.getHost().getHostName() + ": " +
             startCommand);
         ProcessExecutor executor = serverHostEnv.runCommandPrintOutput("Server", startCommand);
@@ -101,10 +111,10 @@ public abstract class TestDeployer {
         Map<String, String> clientProperties;
 
         try {
-            serverUrl = deployHelper.prepareForDeployment();
+            serverUrl = prepareForDeployment();
 
             System.out.println("Setting java properties:");
-            clientProperties = deployHelper.getClientJavaProperties(localEnv);
+            clientProperties = getClientJavaProperties(localEnv);
             for (Map.Entry<String, String> prop : clientProperties.entrySet()) {
                 System.out.println(String.format("%s=%s", prop.getKey(), prop.getValue()));
                 System.setProperty(prop.getKey(), prop.getValue());
@@ -157,7 +167,7 @@ public abstract class TestDeployer {
 
     protected static boolean killTestProcesses(InetAddress hostAddr) {
         try {
-            return DeploymentTestUtils.killProcessesUsingPgrep(hostAddr, TestRMDeployHelper.TEST_JVM_OPTION);
+            return DeploymentTestUtils.killProcessesUsingPgrep(hostAddr, TEST_JVM_OPTION);
         } catch (InterruptedException e) {
             throw new TestExecutionException("Main test execution thread was interrupted", e);
         }
@@ -166,6 +176,64 @@ public abstract class TestDeployer {
     public static String getFileName(File parent, String path) {
         File file = new File(parent, path);
         return file.getAbsolutePath();
+    }
+
+    private TestProtocolHelper createProtocolHelper(String protocol, HostTestEnv serverHostEnv)
+            throws InterruptedException {
+        if (protocol.equalsIgnoreCase("pnp")) {
+            return new TestPnpProtocolHelper(serverHostEnv);
+        } else if (protocol.equalsIgnoreCase("pamr")) {
+            return new TestPamrProtocolHelper(serverHostEnv, getPamrServedReservedId());
+        } else if (protocol.equalsIgnoreCase("rmi")) {
+            return new TestRMIProtocolHelper(serverHostEnv);
+        } else {
+            throw new IllegalArgumentException("Test doesn't support protocol " + protocol);
+        }
+    }
+
+    protected abstract String getPamrServedReservedId();
+
+    public abstract List<String> createServerStartCommand();
+
+    public String prepareForDeployment() throws Exception {
+        return protocolHelper.prepareForDeployment();
+    }
+
+    public Map<String, String> getClientJavaProperties(TestEnv env) {
+        Map<String, String> properties = new LinkedHashMap<String, String>();
+
+        properties.put(CentralPAPropertyRepository.PA_HOME.getName(), env.getSchedulingFolder()
+                .getRootDirPath());
+        properties.put(CentralPAPropertyRepository.LOG4J.getName(), "file:" +
+            new File(env.getSchedulingFolder().getTestConfigDir(), "/log4j/log4j-client").getAbsolutePath());
+
+        Map<String, String> protocolSpecificOptions = protocolHelper.getClientProActiveProperties();
+        properties.putAll(protocolSpecificOptions);
+
+        properties.put(TEST_JVM_OPTION_NAME, "true");
+
+        return properties;
+    }
+
+    protected String buildSchedulingClasspath() {
+        TestEnv localEnv = TestEnv.getLocalEnvUsingSystemProperties();
+
+        List<String> distLibJars = new ArrayList<String>();
+        for (String jar : requiredJARs) {
+            distLibJars.add(localEnv.getSchedulingFolder().getRootDir() + "/dist/lib/" + jar);
+        }
+        List<String> addonsJars = TestFileUtils.listDirectoryJars(new File(localEnv.getSchedulingFolder()
+                .getRootDir(), "/addons").getAbsolutePath());
+
+        List<String> allJars = new ArrayList<String>(distLibJars);
+        allJars.addAll(addonsJars);
+        StringBuilder result = new StringBuilder();
+        for (String jar : allJars) {
+            jar = localEnv.convertFileNameForEnv(jar, serverHostEnv.getEnv());
+            result.append(jar).append(File.pathSeparatorChar);
+        }
+
+        return result.toString();
     }
 
 }

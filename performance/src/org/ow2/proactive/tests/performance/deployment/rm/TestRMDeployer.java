@@ -36,22 +36,30 @@
  */
 package org.ow2.proactive.tests.performance.deployment.rm;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.objectweb.proactive.api.PAFuture;
+import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.common.event.RMInitialState;
+import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.RMConnection;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.SSHInfrastructure;
 import org.ow2.proactive.resourcemanager.nodesource.policy.AccessType;
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
+import org.ow2.proactive.resourcemanager.utils.RMStarter;
 import org.ow2.proactive.tests.performance.deployment.HostTestEnv;
+import org.ow2.proactive.tests.performance.deployment.SchedulingFolder;
 import org.ow2.proactive.tests.performance.deployment.TestDeployer;
 import org.ow2.proactive.tests.performance.deployment.TestEnv;
 import org.ow2.proactive.tests.performance.deployment.TestExecutionException;
@@ -59,6 +67,7 @@ import org.ow2.proactive.tests.performance.rm.NodesDeployWaitCondition;
 import org.ow2.proactive.tests.performance.rm.RMEventsMonitor;
 import org.ow2.proactive.tests.performance.rm.RMTestListener;
 import org.ow2.proactive.tests.performance.rm.RMWaitCondition;
+import org.ow2.proactive.tests.performance.utils.TestFileUtils;
 import org.ow2.proactive.tests.performance.utils.TestUtils;
 
 
@@ -114,14 +123,12 @@ public class TestRMDeployer extends TestDeployer {
             throws Exception {
         TestRMDeployer deployer = new TestRMDeployer(serverHostEnv, protocol, nodesTestEnv, rmNodesHosts,
             rmNodesPerHost, testNodes);
-        TestRMDeployHelper deployHelper = new TestRMDeployHelper(serverHostEnv, protocol);
-        deployer.setDeployHelper(deployHelper);
         return deployer;
     }
 
     private TestRMDeployer(HostTestEnv serverHostEnv, String protocol, TestEnv nodesTestEnv,
             List<String> rmNodesHosts, int rmNodesPerHost, List<String> testNodes) throws Exception {
-        super(serverHostEnv, CLIENT_CONFIG_FILE_NAME);
+        super(serverHostEnv, CLIENT_CONFIG_FILE_NAME, protocol);
 
         this.nodesTestEnv = nodesTestEnv;
 
@@ -161,8 +168,7 @@ public class TestRMDeployer extends TestDeployer {
             RMWaitCondition waitCondition = eventsMonitor.addWaitCondition(new NodesDeployWaitCondition(
                 NODE_SOURCE_NAME, expectedNodesNumber));
 
-            String clientJavaOptions = javaPropertiesAsSingleString(deployHelper
-                    .getClientJavaProperties(nodesTestEnv));
+            String clientJavaOptions = javaPropertiesAsSingleString(getClientJavaProperties(nodesTestEnv));
 
             if (!createNodeSource(rm, expectedUrl, clientJavaOptions)) {
                 throw new TestExecutionException("Failed to create node source");
@@ -224,6 +230,85 @@ public class TestRMDeployer extends TestDeployer {
         BooleanWrapper result = rm.createNodeSource(NODE_SOURCE_NAME, SSHInfrastructure.class.getName(),
                 infrastructureParameters, StaticPolicy.class.getName(), policyParameters);
         return result.getBooleanValue();
+    }
+
+    @Override
+    protected String getPamrServedReservedId() {
+        return TestUtils.getRequiredProperty("rm.deploy.pamr.serverReservedId");
+    }
+
+    @Override
+    public List<String> createServerStartCommand() {
+        String rmHibernateConfig = createTestHibernateConfig();
+
+        SchedulingFolder schedulingFolder = serverHostEnv.getEnv().getSchedulingFolder();
+
+        List<String> result = new ArrayList<String>();
+        result.add(serverHostEnv.getEnv().getJavaPath());
+
+        List<String> javaOpts = protocolHelper.getAdditionalServerJavaOptions();
+        if (javaOpts != null) {
+            result.addAll(javaOpts);
+        }
+
+        String rmJavaOpts = System.getProperty("rm.deploy.javaOpts");
+        if (rmJavaOpts != null && !rmJavaOpts.isEmpty()) {
+            for (String opt : rmJavaOpts.split(" ")) {
+                result.add(opt);
+            }
+        }
+
+        result.add("-D" + TEST_JVM_OPTION);
+
+        result.add("-Djava.security.manager");
+
+        String dropDB = System.getProperty("rm.deploy.dropDB", "false");
+        result.add(PAResourceManagerProperties.RM_DB_HIBERNATE_DROPDB.getCmdLine() + dropDB);
+        result.add(PAResourceManagerProperties.RM_DB_HIBERNATE_CONFIG.getCmdLine() + rmHibernateConfig);
+
+        File rootDir = schedulingFolder.getRootDir();
+        result.add(CentralPAPropertyRepository.JAVA_SECURITY_POLICY.getCmdLine() +
+            TestDeployer.getFileName(rootDir, "/config/security.java.policy-server"));
+
+        result.add(CentralPAPropertyRepository.PA_HOME.getCmdLine() + schedulingFolder.getRootDirPath());
+        result.add(PAResourceManagerProperties.RM_HOME.getCmdLine() + schedulingFolder.getRootDirPath());
+
+        result.add(CentralPAPropertyRepository.PA_CONFIGURATION_FILE.getCmdLine() +
+            TestDeployer.getFileName(schedulingFolder.getTestConfigDir(), "EmptyProActiveConfiguration.xml"));
+
+        result.add(CentralPAPropertyRepository.LOG4J.getCmdLine() + "file:" +
+            TestDeployer.getFileName(schedulingFolder.getTestConfigDir(), "/log4j/log4j-rm-server"));
+
+        result.add("-cp");
+        result.add(buildSchedulingClasspath());
+        result.add(RMStarter.class.getName());
+
+        return result;
+    }
+
+    @Override
+    public Map<String, String> getClientJavaProperties(TestEnv env) {
+        Map<String, String> result = super.getClientJavaProperties(env);
+        result.put(PAResourceManagerProperties.RM_HOME.getKey(), env.getSchedulingFolder().getRootDirPath());
+        return result;
+    }
+
+    private String createTestHibernateConfig() {
+        try {
+            TestEnv localEnv = TestEnv.getLocalEnvUsingSystemProperties();
+            File localFile = new File(localEnv.getSchedulingFolder().getTestTmpDir(), "rm.hibernate.cfg.xml");
+
+            String hibernateCfg = TestFileUtils.readStreamToString(new FileInputStream(new File(localEnv
+                    .getSchedulingFolder().getTestConfigDir(), "rm/rm.hibernate.cfg.xml")));
+            hibernateCfg = hibernateCfg.replace("@RM_DB_DIR", serverHostEnv.getEnv().getSchedulingFolder()
+                    .getTestTmpDir() +
+                "/RM_DB");
+            TestFileUtils.writeStringToFile(localFile, hibernateCfg);
+
+            return serverHostEnv.copyFileFromLocalEnv(localEnv, localFile);
+        } catch (Exception e) {
+            throw new TestExecutionException("Failed to prepare test configuration", e);
+        }
     }
 
 }

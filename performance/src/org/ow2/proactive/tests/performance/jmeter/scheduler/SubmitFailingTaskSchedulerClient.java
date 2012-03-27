@@ -52,7 +52,7 @@ import org.ow2.proactive.scheduler.common.task.RestartMode;
 import org.ow2.proactive.scheduler.common.task.Task;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
-import org.ow2.proactive.tests.performance.deployment.TestDeployHelper;
+import org.ow2.proactive.tests.performance.deployment.TestDeployer;
 
 
 public class SubmitFailingTaskSchedulerClient extends BaseJobSubmitClient {
@@ -172,7 +172,7 @@ public class SubmitFailingTaskSchedulerClient extends BaseJobSubmitClient {
         task.setExecutableClassName(FailingJavaTask.class.getName());
         task.setDescription("Test java task, throws exception");
         ForkEnvironment forkEnv = new ForkEnvironment();
-        forkEnv.addJVMArgument("-D" + TestDeployHelper.TEST_JVM_OPTION);
+        forkEnv.addJVMArgument("-D" + TestDeployer.TEST_JVM_OPTION);
         task.setForkEnvironment(forkEnv);
         return task;
     }

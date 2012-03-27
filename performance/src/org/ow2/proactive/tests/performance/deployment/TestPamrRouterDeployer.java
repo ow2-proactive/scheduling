@@ -115,7 +115,7 @@ public class TestPamrRouterDeployer {
 
         List<String> command = new ArrayList<String>();
         command.add(env.getEnv().getJavaPath());
-        command.add("-D" + TestDeployHelper.TEST_JVM_OPTION);
+        command.add("-D" + TestDeployer.TEST_JVM_OPTION);
         command.add(PAResourceManagerProperties.RM_HOME.getCmdLine() +
             env.getEnv().getSchedulingFolder().getRootDirPath());
         command.add(CentralPAPropertyRepository.LOG4J.getCmdLine() +

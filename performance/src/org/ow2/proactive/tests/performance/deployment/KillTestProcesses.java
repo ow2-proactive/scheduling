@@ -39,9 +39,15 @@ package org.ow2.proactive.tests.performance.deployment;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import org.ow2.proactive.tests.performance.deployment.rm.TestRMDeployHelper;
 
-
+/**
+ * Program killing all java processes started by the test.
+ * It tries to kill all java processes started with JVM option -Dorg.ow2.proactive.tests.performance=true 
+ * on the given hosts.   
+ *  
+ * @author ProActive team
+ *
+ */
 public class KillTestProcesses {
 
     public static void killProcesses(String hostsNamesString) {
@@ -56,7 +62,7 @@ public class KillTestProcesses {
             }
         }
         System.out.println("Killing test processes on the hosts: " + hostsList);
-        DeploymentTestUtils.killTestProcesses(hostsList, TestRMDeployHelper.TEST_JVM_OPTION);
+        DeploymentTestUtils.killTestProcesses(hostsList, TestDeployer.TEST_JVM_OPTION);
     }
 
     public static void main(String[] args) {

@@ -48,12 +48,12 @@ import org.ow2.proactive.scheduler.common.task.NativeTask;
 import org.ow2.proactive.scheduler.common.task.Task;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scripting.SelectionScript;
-import org.ow2.proactive.tests.performance.deployment.TestDeployHelper;
+import org.ow2.proactive.tests.performance.deployment.TestDeployer;
 import org.ow2.proactive.tests.performance.scheduler.JobWaitContition;
 import org.ow2.proactive.tests.performance.scheduler.SchedulerEventsMonitor;
 import org.ow2.proactive.tests.performance.scheduler.SchedulerTestListener;
-import org.ow2.proactive.tests.performance.scheduler.TestSchedulerProxy;
 import org.ow2.proactive.tests.performance.scheduler.SchedulerWaitCondition;
+import org.ow2.proactive.tests.performance.scheduler.TestSchedulerProxy;
 import org.ow2.proactive.tests.performance.utils.TestUtils;
 
 
@@ -177,7 +177,7 @@ public abstract class BaseJobSubmitClient extends BaseJMeterSchedulerClient {
         if (fork) {
             ForkEnvironment forkEnv = new ForkEnvironment();
             task.setForkEnvironment(forkEnv);
-            forkEnv.addJVMArgument("-D" + TestDeployHelper.TEST_JVM_OPTION);
+            forkEnv.addJVMArgument("-D" + TestDeployer.TEST_JVM_OPTION);
         }
 
         return task;

@@ -52,12 +52,12 @@ import org.ow2.proactive.scheduler.common.task.NativeTask;
 import org.ow2.proactive.scheduler.common.task.Task;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
-import org.ow2.proactive.tests.performance.deployment.TestDeployHelper;
+import org.ow2.proactive.tests.performance.deployment.TestDeployer;
 import org.ow2.proactive.tests.performance.scheduler.JobWaitContition;
 import org.ow2.proactive.tests.performance.scheduler.SchedulerEventsMonitor;
 import org.ow2.proactive.tests.performance.scheduler.SchedulerTestListener;
-import org.ow2.proactive.tests.performance.scheduler.StartTaskWaitContition;
 import org.ow2.proactive.tests.performance.scheduler.SchedulerWaitCondition;
+import org.ow2.proactive.tests.performance.scheduler.StartTaskWaitContition;
 
 
 public class SubmitAndKillSchedulerClient extends BaseJMeterSchedulerClient {
@@ -160,7 +160,7 @@ public class SubmitAndKillSchedulerClient extends BaseJMeterSchedulerClient {
         task.setExecutableClassName(SleepForeverJavaTask.class.getName());
         task.setDescription("Test java task, sleeps forever");
         ForkEnvironment forkEnv = new ForkEnvironment();
-        forkEnv.addJVMArgument("-D" + TestDeployHelper.TEST_JVM_OPTION);
+        forkEnv.addJVMArgument("-D" + TestDeployer.TEST_JVM_OPTION);
         task.setForkEnvironment(forkEnv);
         return task;
     }
