@@ -80,9 +80,9 @@ IF [%1]==[] goto :ParamParseEndLoop
         goto :ParamParseShift
     ) 
 
-    set TMP_VAR=%1
+    set TMP_VAR=%~1
     IF %TMP_VAR:~0,2% == -D (
-        set JAVA_OPTS=%1 %JAVA_OPTS%    
+        set JAVA_OPTS=%TMP_VAR% %JAVA_OPTS%    
         goto :ParamParseShift
     )
 
@@ -94,15 +94,6 @@ IF [%1]==[] goto :ParamParseEndLoop
 goto :ParamParseLoop
 :ParamParseEndLoop
 
-echo Verbose %VERBOSE%
-echo Rest %REST%
-echo Rm %RM%
-echo Scheduler %SCHED%
-echo Rm url %RM_URL%
-echo Sched url %SCHED_URL%
-echo Port %PORT%
-echo JAVA_OPTS %JAVA_OPTS%
-
 IF [%REST%]==[] (
     echo REST Server argument is mandatory
     goto :eof
@@ -112,7 +103,7 @@ set REST_URL=http://localhost:%PORT%/rest/rest
 
 call :createTempDir scheduler_start_gui
 set BASE_TEMP_DIR=%_result%
-set REST_DIR=%BASE_TEMP_DIR%\rest
+set REST_DIR="%BASE_TEMP_DIR%\rest"
 set RM_DIR="%BASE_TEMP_DIR%\rm"
 set LOGFILE="%BASE_TEMP_DIR%\jetty.log"
 set POL="%BASE_TEMP_DIR%\java.security.policy"
@@ -180,7 +171,6 @@ set CP=%CP%;%LIB_DIR%\ProActive\servlet-api-2.5-6.1.11.jar
 set CP=%CP%;%CD%\..\..\dist\lib\ProActive_SRM-common.jar
 
 set CLASS=org.ow2.proactive.utils.JettyLauncher
-
 
 set LOG=
 IF %VERBOSE_JETTY% == false (
