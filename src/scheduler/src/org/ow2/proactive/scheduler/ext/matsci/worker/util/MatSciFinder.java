@@ -36,12 +36,12 @@
  */
 package org.ow2.proactive.scheduler.ext.matsci.worker.util;
 
+import org.objectweb.proactive.utils.OperatingSystem;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import org.objectweb.proactive.utils.OperatingSystem;
 
 
 /**
@@ -57,33 +57,47 @@ public abstract class MatSciFinder {
     private static MatSciFinder instance = null;
 
     public abstract MatSciEngineConfig findMatSci(String version_pref, HashSet<String> versionsRej,
-            String versionMin, String versionMax) throws Exception;
+            String versionMin, String versionMax, boolean debug) throws Exception;
 
     protected MatSciEngineConfig chooseMatSciConfig(ArrayList<MatSciEngineConfig> configs,
-            String version_pref, Set<String> versionsRej, String versionMin, String versionMax) {
+            String version_pref, Set<String> versionsRej, String versionMin, String versionMax, boolean debug) {
         List<MatSciEngineConfig> selected = new ArrayList<MatSciEngineConfig>();
-        System.out.println("Choosing config with version_pref=" + version_pref + ", versionRej=" +
-            versionsRej + ", versionMin=" + versionMin + ", versionMax=" + versionMax);
+        if (debug) {
+            System.out.println("Choosing config with version_pref=" + version_pref + ", versionRej=" +
+                versionsRej + ", versionMin=" + versionMin + ", versionMax=" + versionMax);
+        }
         for (MatSciEngineConfig conf : configs) {
             String version = conf.getVersion();
-            System.out.println("Version : " + version);
+            if (debug) {
+                System.out.println("Version : " + version);
+            }
             if (versionsRej != null && !versionsRej.isEmpty() && versionsRej.contains(version)) {
-                System.out.println("... rejected");
+                if (debug) {
+                    System.out.println("... rejected");
+                }
                 continue;
             }
             if (versionMin != null && MatSciEngineConfigBase.infStrictVersion(version, versionMin)) {
-                System.out.println("... too low");
+                if (debug) {
+                    System.out.println("... too low");
+                }
                 continue;
             }
             if (versionMax != null && MatSciEngineConfigBase.infStrictVersion(versionMax, version)) {
-                System.out.println("... too high");
+                if (debug) {
+                    System.out.println("... too high");
+                }
                 continue;
             }
             if (version_pref != null && version_pref.equals(version)) {
-                System.out.println("... preferred");
+                if (debug) {
+                    System.out.println("... preferred");
+                }
                 return conf;
             }
-            System.out.println("... accepted");
+            if (debug) {
+                System.out.println("... accepted");
+            }
             selected.add(conf);
         }
         if (selected.size() > 0) {

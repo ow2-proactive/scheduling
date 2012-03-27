@@ -36,13 +36,6 @@
  */
 package org.ow2.proactive.scheduler.ext.matlab.worker.util;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.regex.Matcher;
-
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.input.SAXBuilder;
@@ -50,6 +43,13 @@ import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.ext.matsci.worker.util.MatSciConfigurationParser;
 import org.ow2.proactive.scheduler.ext.matsci.worker.util.MatSciEngineConfig;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.regex.Matcher;
 
 
 /**
@@ -64,7 +64,7 @@ public class MatlabConfigurationParser extends MatSciConfigurationParser {
     static Document document;
     static Element racine;
 
-    public static ArrayList<MatSciEngineConfig> getConfigs() throws Exception {
+    public static ArrayList<MatSciEngineConfig> getConfigs(boolean debug) throws Exception {
         String homestr = null;
 
         try {
@@ -122,7 +122,9 @@ public class MatlabConfigurationParser extends MatSciConfigurationParser {
             throw new FileNotFoundException(configFile + " not found, aborting...");
         }
 
-        System.out.println("Parsing configuration file: " + configFile);
+        if (debug) {
+            System.out.println("Parsing configuration file: " + configFile);
+        }
 
         SAXBuilder sxb = new SAXBuilder();
         Document document = sxb.build(configFile);
@@ -181,6 +183,6 @@ public class MatlabConfigurationParser extends MatSciConfigurationParser {
     }
 
     public static void main(String[] args) throws Exception {
-        System.out.println(getConfigs());
+        System.out.println(getConfigs(true));
     }
 }

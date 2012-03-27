@@ -70,30 +70,29 @@ public class MatSciConfigurationParser {
         return home;
     }
 
-    protected static void checkDir(File dir, File conf) throws Exception {
+    protected static void checkDir(File dir, File conf) {
         if (!dir.exists()) {
-            throw new IOException("In " + conf + ", " + dir + " doesn't exist");
+            System.out.println("In " + conf + ", " + dir + " doesn't exist");
         }
         if (!dir.isDirectory()) {
-            throw new IOException("In " + conf + ", " + dir + " is not a directory");
+            System.out.println("In " + conf + ", " + dir + " is not a directory");
         }
         if (!dir.canRead()) {
-            throw new IOException("In " + conf + ", " + dir + " is not readable");
+            // When using RunAsMe, we cannot be sure the current user has the right permissions
+            System.out.println("In " + conf + ", " + dir + " is not readable");
         }
     }
 
     protected static void checkFile(File file, File conf, boolean executable) throws Exception {
         if (!file.exists()) {
-            throw new IOException("In " + conf + ", " + file + " doesn't exist");
+            System.out.println("In " + conf + ", " + file + " doesn't exist");
         }
         if (!file.isFile()) {
-            throw new IOException("In " + conf + ", " + file + " is not a file");
+            System.out.println("In " + conf + ", " + file + " is not a file");
         }
         if (!file.canRead()) {
-            throw new IOException("In " + conf + ", " + file + " is not readable");
-        }
-        if (executable && !file.canRead()) {
-            throw new IOException("In " + conf + ", " + file + " is not executable");
+            // When using RunAsMe, we cannot be sure the current user has the right permissions
+            System.out.println("In " + conf + ", " + file + " is not readable");
         }
     }
 }

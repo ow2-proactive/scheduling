@@ -73,19 +73,9 @@ public class AODataspaceRegistry implements DataspaceRegistry {
     private String outbasename;
 
     /**
-     * file storing logs coming from this class
-     */
-    private File logFile;
-
-    /**
      * debug mode
      */
     private boolean debug;
-
-    /**
-     * print stream to the log file
-     */
-    private PrintStream outDebug;
 
     public AODataspaceRegistry() {
 
@@ -97,34 +87,19 @@ public class AODataspaceRegistry implements DataspaceRegistry {
         this.outbasename = outbasename;
         this.debug = debug;
 
-        if (debug) {
-            String tmpPath = System.getProperty("java.io.tmpdir");
-            logFile = new File(tmpPath, "" + this.getClass().getSimpleName() + ".log");
-            if (!logFile.exists()) {
+    }
 
-                try {
-                    logFile.createNewFile();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
+    protected void printLog(final String message) {
+        if (!debug) {
+            return;
         }
+        MatSciJVMProcessInterfaceImpl.printLog(this, message);
     }
 
     /** {@inheritDoc} */
     public UnReifiable<Pair<String, String>> createDataSpace(String path) {
-        if (debug) {
-            try {
-                outDebug = new PrintStream(new BufferedOutputStream(new FileOutputStream(logFile, true)));
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            }
-        }
 
-        if (debug) {
-            System.out.println("Looking up or creating dataspaces for :" + path);
-            outDebug.println("Looking up or creating dataspaces for :" + path);
-        }
+        printLog("Looking up or creating dataspaces for :" + path);
 
         File jcurr = new File(path);
         String jpath = null;
@@ -138,46 +113,27 @@ public class AODataspaceRegistry implements DataspaceRegistry {
         FileSystemServerDeployer indepl = null;
         FileSystemServerDeployer outdepl = null;
         if (dataspacesin.containsKey(dirhash)) {
-            if (debug) {
-                System.out.println("Reusing existing dataspaces");
-                outDebug.println("Reusing existing dataspaces");
-            }
+            printLog("Reusing existing dataspaces");
 
             indepl = dataspacesin.get(dirhash);
             outdepl = dataspacesout.get(dirhash);
 
         } else {
             try {
-                if (debug) {
-                    System.out.println("Creating new dataspaces");
-                    outDebug.println("Creating new dataspaces");
-                }
+                printLog("Creating new dataspaces");
 
                 indepl = new FileSystemServerDeployer(this.inbasename + "_" + dirhash, jpath, false, true);
                 outdepl = new FileSystemServerDeployer(this.outbasename + "_" + dirhash, jpath, false, true);
                 dataspacesin.put(dirhash, indepl);
                 dataspacesout.put(dirhash, outdepl);
-                if (debug) {
-                    System.out.println("Input dataspace created at url : " + indepl.getVFSRootURL());
-                    System.out.println("Output dataspace created at url : " + outdepl.getVFSRootURL());
-                    outDebug.println("Input dataspace created at url : " + indepl.getVFSRootURL());
-                    outDebug.println("Output dataspace created at url : " + outdepl.getVFSRootURL());
-                }
+                printLog("Input dataspace created at url : " + indepl.getVFSRootURL());
+                printLog("Output dataspace created at url : " + outdepl.getVFSRootURL());
+
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
-        if (debug) {
-            try {
-                outDebug.flush();
-                outDebug.close();
-            } catch (Exception e) {
 
-            }
-        }
-        if (debug) {
-            System.out.flush();
-        }
         return new UnReifiable<Pair<String, String>>(new Pair<String, String>(indepl.getVFSRootURL(), outdepl
                 .getVFSRootURL()));
     }

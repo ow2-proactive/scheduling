@@ -93,6 +93,7 @@ public class ScilabConnectionRImpl implements ScilabConnection {
         fullcommand.append("disp('" + startPattern + "');" + nl);
         fullcommand.append("try" + nl);
         fullcommand.append("lines(0);" + nl);
+        fullcommand.append("funcprot(0);" + nl);
     }
 
     public void release() {
@@ -137,8 +138,8 @@ public class ScilabConnectionRImpl implements ScilabConnection {
 
         IOTools.LoggingThread lt1;
         if (debug) {
-            lt1 = new IOTools.LoggingThread(process, "[SCILAB]", System.out, System.err, outDebug, null,
-                null, null);
+            lt1 = new IOTools.LoggingThread(process, "[SCILAB Engine]", System.out, System.err, outDebug,
+                null, null, null);
 
         } else {
             lt1 = new IOTools.LoggingThread(process, "[SCILAB]", System.out, System.err, startPattern, null,

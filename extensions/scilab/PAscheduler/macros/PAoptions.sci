@@ -50,16 +50,21 @@ function opts = PAoptions(varargin)
     deff ("y=id(x)","y=x","n");
 
     j=1;
+    inputs(j).name = 'JobName';
+    inputs(j).default = 'Scilab';
+    inputs(j).check = 'ischar';
+    inputs(j).trans = 'id';
+    j=j+1;
+    inputs(j).name = 'JobDescription';
+    inputs(j).default = 'Set of parallel Scilab tasks';
+    inputs(j).check = 'ischar';
+    inputs(j).trans = 'id';
+    j=j+1;
     inputs(j).name = 'Debug';
     inputs(j).default = %f;
     inputs(j).check = 'logcheck';
     inputs(j).trans = 'logtrans';
     j=j+1;
-    inputs(j).name = 'TimeStamp';
-    inputs(j).default = %f;
-    inputs(j).check = 'logcheck';
-    inputs(j).trans = 'logtrans';
-    j=j+1;    
     inputs(j).name = 'Fork';
     inputs(j).default = %f;
     inputs(j).check = 'logcheck';

@@ -67,7 +67,7 @@ public class ScilabConfigurationParser extends MatSciConfigurationParser {
     static Document document;
     static Element racine;
 
-    public static ArrayList<MatSciEngineConfig> getConfigs() throws Exception {
+    public static ArrayList<MatSciEngineConfig> getConfigs(boolean debug) throws Exception {
         File configFile = null;
         ArrayList<MatSciEngineConfig> configs = new ArrayList<MatSciEngineConfig>();
 
@@ -91,7 +91,9 @@ public class ScilabConfigurationParser extends MatSciConfigurationParser {
             throw new FileNotFoundException(configFile + " not found, aborting...");
         }
 
-        System.out.println("Parsing configuration file :" + configFile);
+        if (debug) {
+            System.out.println("Parsing configuration file :" + configFile);
+        }
 
         SAXBuilder sxb = new SAXBuilder();
         Document document = sxb.build(configFile);
@@ -148,6 +150,6 @@ public class ScilabConfigurationParser extends MatSciConfigurationParser {
     }
 
     public static void main(String[] args) throws Exception {
-        System.out.println(getConfigs());
+        System.out.println(getConfigs(true));
     }
 }

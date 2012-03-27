@@ -186,7 +186,7 @@ public class MatlabExecutable extends JavaExecutable {
 
         // Acquire a connection to MATLAB
         if (paconfig.isUseMatlabControl()) {
-            this.matlabConnection = new MatlabConnectionMCImpl();
+            this.matlabConnection = new MatlabConnectionMCImpl(this.tmpDir, this.outDebug, NODENAME);
         } else {
             this.matlabConnection = new MatlabConnectionRImpl(this.tmpDir, this.outDebug, NODENAME);
         }
@@ -271,7 +271,8 @@ public class MatlabExecutable extends JavaExecutable {
         MatlabEngineConfig conf = (MatlabEngineConfig) MatlabEngineConfig.getCurrentConfiguration();
         if (conf == null) {
             conf = (MatlabEngineConfig) MatlabFinder.getInstance().findMatSci(paconfig.getVersionPref(),
-                    paconfig.getVersionRej(), paconfig.getVersionMin(), paconfig.getVersionMax());
+                    paconfig.getVersionRej(), paconfig.getVersionMin(), paconfig.getVersionMax(),
+                    paconfig.isDebug());
             if (conf == null) {
                 throw new IllegalStateException("No valid Matlab configuration found, aborting...");
             }
@@ -439,6 +440,10 @@ public class MatlabExecutable extends JavaExecutable {
         if (paconfig.isTransferEnv()) {
             File envMat = new File(taskconfig.getEnvMatFileURI());
             printLog("Loading workspace from " + envMat);
+            if (paconfig.isDebug()) {
+                matlabConnection.evalString("disp('Contents of " + envMat + "');");
+                matlabConnection.evalString("whos('-file','" + envMat + "')");
+            }
             // Load workspace using MATLAB command
             String[] globals = paconfig.getEnvGlobalNames();
             if (globals != null && globals.length > 0) {
@@ -518,7 +523,8 @@ public class MatlabExecutable extends JavaExecutable {
             return;
         }
         final Date d = new Date();
-        final String log = "[" + ISO8601FORMAT.format(d) + " " + HOSTNAME + "] " + message;
+        final String log = "[" + ISO8601FORMAT.format(d) + " " + HOSTNAME + "][" +
+            this.getClass().getSimpleName() + "] " + message;
         System.out.println(log);
         System.out.flush();
         if (this.outDebug != null) {

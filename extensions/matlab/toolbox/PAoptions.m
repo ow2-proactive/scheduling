@@ -29,13 +29,15 @@
 %
 % Parameters
 %
+%   JobName
+%               Name of the job that will be submitted to the Scheduler
+%
+%   JobDescription
+%               Description of the job that will be submitted to the scheduler
+%
 %   Debug               true | false | 'on' | 'off'
 %
 %               Debug mode, default to 'off'
-%
-%   TimeStamp           true | false | 'on' | 'off'
-%
-%               TimeStamp mode in outputs, default to 'off'
 %
 %
 %   TransferEnv       true | false | 'on' | 'off'
@@ -241,6 +243,16 @@ id = @(x)x;
 
 
 j=1;
+inputs(j).name = 'JobName';
+inputs(j).default = 'Matlab';
+inputs(j).check = @ischar;
+inputs(j).trans = id;
+j=j+1;
+inputs(j).name = 'JobDescription';
+inputs(j).default = 'Set of parallel Matlab tasks';
+inputs(j).check = @ischar;
+inputs(j).trans = id;
+j=j+1;
 inputs(j).name = 'Debug';
 inputs(j).default = false;
 inputs(j).check = logcheck;

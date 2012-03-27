@@ -42,25 +42,27 @@ package org.ow2.proactive.scheduler.ext.common.util;
  *
  */
 public class ProcessResult {
-    private int returnValue;
-    private String[] output;
-    private String[] error;
 
-    public ProcessResult(int returnValue, String[] output, String[] error) {
+    private boolean finished;
+    private int returnValue;
+    private String output;
+
+    public ProcessResult(int returnValue, String output, boolean finished) {
         this.returnValue = returnValue;
-        this.output = (output != null) ? output : new String[0];
-        this.error = (error != null) ? error : new String[0];
+        this.output = output;
+        this.finished = finished;
     }
 
     public int getReturnValue() {
         return returnValue;
     }
 
-    public String[] getOutput() {
+    public String getOutput() {
         return output;
     }
 
-    public String[] getError() {
-        return error;
+    public boolean isFinished() {
+        return finished;
     }
+
 }

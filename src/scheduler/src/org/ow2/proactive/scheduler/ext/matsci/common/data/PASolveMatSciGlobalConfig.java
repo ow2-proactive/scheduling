@@ -49,6 +49,16 @@ import java.util.HashSet;
 public class PASolveMatSciGlobalConfig implements Serializable {
 
     /**
+     * Name of the Scheduler job
+     */
+    protected String jobName = null;
+
+    /**
+     * Description of the Scheduler job
+     */
+    protected String jobDescription = null;
+
+    /**
      * Debug Mode
      **/
     protected boolean debug = false;
@@ -159,11 +169,6 @@ public class PASolveMatSciGlobalConfig implements Serializable {
     protected String priority = null;
 
     /**
-     * do we add a timestamp to each remote log line ?
-     */
-    protected boolean timeStamp = false;
-
-    /**
      * directory structure of the matsci temp directory (each element of the array is a subdirectory of the previous one)
      */
     protected String[] tempSubDirNames;
@@ -182,12 +187,20 @@ public class PASolveMatSciGlobalConfig implements Serializable {
 
     }
 
-    public boolean isTimeStamp() {
-        return timeStamp;
+    public String getJobName() {
+        return jobName;
     }
 
-    public void setTimeStamp(boolean timeStamp) {
-        this.timeStamp = timeStamp;
+    public void setJobName(String jobName) {
+        this.jobName = jobName;
+    }
+
+    public String getJobDescription() {
+        return jobDescription;
+    }
+
+    public void setJobDescription(String jobDescription) {
+        this.jobDescription = jobDescription;
     }
 
     public String getPriority() {

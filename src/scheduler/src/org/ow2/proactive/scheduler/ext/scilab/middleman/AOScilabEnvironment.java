@@ -95,23 +95,24 @@ public class AOScilabEnvironment extends AOMatSciEnvironment<ScilabType, ScilabR
      */
     protected ScilabResultsAndLogs getResultOfTask(String jid, String tname) {
         ScilabResultsAndLogs answer = new ScilabResultsAndLogs();
+        answer.setJobId(jid);
+        answer.setTaskName(tname);
         MatSciJobVolatileInfo<ScilabType> jinfo = currentJobs.get(jid);
 
-        if (jinfo.isDebugCurrentJob()) {
+        if (debug) {
 
-            System.out.println("[AOScilabEnvironment] Sending the results of task " + tname + " of job " +
-                jid + " back...");
+            printLog("Sending the results of task " + tname + " of job " + jid + " back...");
 
         }
 
         Throwable t = null;
         if (schedulerStopped || schedulerKilled) {
             answer.setStatus(MatSciTaskStatus.GLOBAL_ERROR);
-            answer.setException(new PASolveException("[AOScilabEnvironment] The scheduler has been stopped"));
+            answer.setException(new PASolveException("The scheduler has been stopped"));
         } else if (jinfo.getStatus() == JobStatus.KILLED) {
             // Job killed
             answer.setStatus(MatSciTaskStatus.GLOBAL_ERROR);
-            answer.setException(new PASolveException("[AOScilabEnvironment] The job has been killed"));
+            answer.setException(new PASolveException("The job has been killed"));
         } else if ((t = jinfo.getException(tname)) != null) {
             // Error inside job
             if (t instanceof ScilabTaskException) {
@@ -152,15 +153,15 @@ public class AOScilabEnvironment extends AOMatSciEnvironment<ScilabType, ScilabR
         PASolveScilabTaskConfig[][] taskConfigs = (PASolveScilabTaskConfig[][]) tconf;
 
         if (schedulerStopped || schedulerKilled) {
-            throw new PASchedulerException("[AOScilabEnvironment] the Scheduler is stopped");
+            throw new PASchedulerException("the Scheduler is stopped");
         }
         ensureConnection();
 
         // We store the script selecting the nodes to use it later at termination.
         debug = config.isDebug();
 
-        if (config.isDebug()) {
-            System.out.println("[AOScilabEnvironment] Submitting job of " + taskConfigs.length + " tasks...");
+        if (debug) {
+            printLog("Submitting job of " + taskConfigs.length + " tasks...");
         }
         //Thread t = java.lang.Thread.currentThread();
         //t.setContextClassLoader(this.getClass().getClassLoader());
@@ -168,10 +169,10 @@ public class AOScilabEnvironment extends AOMatSciEnvironment<ScilabType, ScilabR
 
         // Creating a task flow job
         TaskFlowJob job = new TaskFlowJob();
-        job.setName("Scilab Environment Job " + lastGenJobId++);
+        job.setName(gconf.getJobName() + " " + lastGenJobId++);
         job.setPriority(JobPriority.findPriority(config.getPriority()));
         job.setCancelJobOnError(false);
-        job.setDescription("Set of parallel Scilab tasks");
+        job.setDescription(gconf.getJobDescription());
 
         job.setInputSpace(config.getInputSpaceURL());
         job.setOutputSpace(config.getOutputSpaceURL());
@@ -390,8 +391,8 @@ public class AOScilabEnvironment extends AOMatSciEnvironment<ScilabType, ScilabR
         String jid = null;
         try {
             jid = scheduler.submit(job).value();
-            if (config.isDebug()) {
-                System.out.println("[AOScilabEnvironment] Job " + jid + " submitted.");
+            if (debug) {
+                printLog("Job " + jid + " submitted.");
             }
             jpinfo = new MatSciJobPermanentInfo(jid, nbResults, depth, config, tnames, finaltnames);
             currentJobs.put(jid, new MatSciJobVolatileInfo(jpinfo));

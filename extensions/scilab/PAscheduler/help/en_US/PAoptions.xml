@@ -58,11 +58,15 @@
 
     <itemizedlist>
             <listitem>
-                <para><emphasis>Debug</emphasis>: enables debug mode in PAsolve calls (very verbose).
+                <para><emphasis>JobName</emphasis>: Name of the job that will be submitted to the scheduler.
                  </para>
             </listitem>
             <listitem>
-                <para><emphasis>Timestamp</emphasis>: enables timestamp printing in remote output.
+                <para><emphasis>JobDescription</emphasis>: Description of the job that will be submitted to the scheduler.
+                 </para>
+            </listitem>
+            <listitem>
+                <para><emphasis>Debug</emphasis>: enables debug mode in PAsolve calls (very verbose).
                  </para>
             </listitem>
             <listitem>

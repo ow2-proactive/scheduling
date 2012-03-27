@@ -115,7 +115,7 @@ public interface MatSciEnvironment extends Remote {
      * @throws TimeoutException if a timeout occurred
      */
     public UnReifiable<Pair<ResultsAndLogs, Integer>> waitAny(String jid, ArrayList<String> tnames,
-            Integer timeout) throws RemoteException, TimeoutException;
+            Integer timeout) throws RemoteException, Exception;
 
     /**
      * waits for all computed task among a given list, with an optonal timeout
@@ -127,7 +127,7 @@ public interface MatSciEnvironment extends Remote {
      * @throws TimeoutException if a timeout occurred
      */
     public UnReifiable<ArrayList<ResultsAndLogs>> waitAll(String jid, ArrayList<String> tnames,
-            Integer timeout) throws RemoteException, TimeoutException;
+            Integer timeout) throws RemoteException, Exception;
 
     /**
      * tells if results among the given list are available or not

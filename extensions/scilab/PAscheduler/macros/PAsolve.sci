@@ -249,8 +249,9 @@ endfunction
 function initSolveConfig(solve_config,opt)
     jimport java.net.URL;
     //addJavaObj(URL);
+    solve_config.setJobName(opt.JobName);
+    solve_config.setJobDescription(opt.JobDescription);
     solve_config.setDebug(opt.Debug);
-    solve_config.setTimeStamp(opt.TimeStamp);
     solve_config.setTransferEnv(opt.TransferEnv);
     solve_config.setFork(opt.Fork);
     solve_config.setRunAsMe(opt.RunAsMe);    

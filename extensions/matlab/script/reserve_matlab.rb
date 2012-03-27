@@ -1,8 +1,6 @@
 include Java
 
 import org.ow2.proactive.scheduler.ext.matlab.worker.util.MatlabEngineConfig
-import org.ow2.proactive.scheduler.ext.matlab.worker.util.MatlabFinder
-
 
 import java.lang.System
 
@@ -11,13 +9,9 @@ module JavaIO
 end
 import java.net.InetAddress
 import java.util.Date
-import java.lang.Runtime
-import java.lang.ProcessBuilder
 import java.util.HashSet
 
 class ReserveMatlab
-
-  require 'rbconfig'
 
   def initialize
     @toolboxmap = {
@@ -46,7 +40,7 @@ class ReserveMatlab
         # Simulink Control Design
         "slcontrol" => %q!Simulink_Control_Design!,
         # Spline
-        "spline" => %q!Spline_Toolbox')!,
+        "spline" => %q!Spline_Toolbox!,
         # Statistics
         "stats" => %q!Statistics_Toolbox!,
         # Symbolic Maths
@@ -69,10 +63,6 @@ class ReserveMatlab
     $stdout.sync=true
     $stderr.reopen $stdout
 
-    @nodeDir = JavaIO::File.new(@tmpPath, @nodeName);
-    if not @nodeDir.exists()
-      @nodeDir.mkdir();
-    end
 
     @host = InetAddress.getLocalHost().getHostName();
 
@@ -90,79 +80,21 @@ class ReserveMatlab
   end
 
 
-  def os
-    @os ||= begin
-      case RbConfig::CONFIG['host_os']
-        when /mswin|msys|mingw32|Windows/
-          :windows
-        when /darwin|mac os/
-          :macosx
-        when /linux/
-          :linux
-        when /solaris|bsd/
-          :unix
-        else
-          # unlikely
-          raise "unknown os #{RbConfig::CONFIG['host_os']}"
-      end
-    end
-  end
-
 
   def toolbox_code(tb)
     return @toolboxmap[tb]
   end
 
-  # Executes the selection script
-  def findConf!
-    @conf = MatlabEngineConfig.getCurrentConfiguration()
-    if @conf == nil
-      return false
-    end
-
-    return true
-  end
-
-  def conf
-    return @conf
-  end
-
-  def flock(file, mode)
-    success = file.flock(mode)
-    if success
-      begin
-        yield file
-      ensure
-        file.flock(File::LOCK_UN)
-      end
-    end
-    return success
-  end
-
-  def open_lock(filename, openmode="r", lockmode=nil)
-    if openmode == 'r' || openmode == 'rb'
-      lockmode ||= File::LOCK_SH
-    else
-      lockmode ||= File::LOCK_EX
-    end
-    value = nil
-    open(filename, openmode) do |f|
-      flock(f, lockmode) do
-        begin
-          value = yield f
-        ensure
-          f.flock(File::LOCK_UN) # Comment this line out on Windows.
-        end
-      end
-      return value
-    end
-  end
 
   def checkFeature(client, rid, login, feature)
     if client.areLicensed(feature)
       # TODO login with runAsMe
+      begin
       request = LicenseRequest.new(rid, login, feature)
       tf = client.hasLicense(request);
+      rescue
+          return false
+        end
       log(tf)
       return tf;
     else
@@ -211,6 +143,7 @@ class ReserveMatlab
           feat_set.add(tcode)
 
         end
+
         tf = checkFeature(client, rid, login, feat_set)
 
         # use the code and login to contact the proxy server for each Matlab feature
@@ -229,10 +162,8 @@ $selected = false
 begin
   cm = ReserveMatlab.new
 
-  if cm.findConf!
-    #$selected = true
-    $selected = cm.checkMatlab
-  end
+  #$selected = true
+  $selected = cm.checkMatlab
 
 rescue Exception => e
   puts e.message + "\n" + e.backtrace.join("\n")

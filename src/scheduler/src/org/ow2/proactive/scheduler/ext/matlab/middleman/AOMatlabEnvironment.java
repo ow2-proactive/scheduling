@@ -86,6 +86,10 @@ public class AOMatlabEnvironment extends AOMatSciEnvironment<Boolean, MatlabResu
 
     }
 
+    public AOMatlabEnvironment(boolean debug) {
+        super(debug);
+    }
+
     /**
      * gets the result and logs of a given task
      * @param jid id of the job
@@ -94,23 +98,22 @@ public class AOMatlabEnvironment extends AOMatSciEnvironment<Boolean, MatlabResu
      */
     protected MatlabResultsAndLogs getResultOfTask(String jid, String tname) {
         MatlabResultsAndLogs answer = new MatlabResultsAndLogs();
+        answer.setJobId(jid);
+        answer.setTaskName(tname);
         MatSciJobVolatileInfo<Boolean> jinfo = currentJobs.get(jid);
 
-        if (jinfo.isDebugCurrentJob()) {
-
-            System.out.println("[AOMatlabEnvironment] Sending the results of task " + tname + " of job " +
-                jid + " back...");
-
+        if (debug) {
+            printLog("Sending the results of task " + tname + " of job " + jid + " back...");
         }
 
         Throwable t = null;
         if (schedulerStopped || schedulerKilled) {
             answer.setStatus(MatSciTaskStatus.GLOBAL_ERROR);
-            answer.setException(new PASolveException("[AOMatlabEnvironment] The scheduler has been stopped"));
+            answer.setException(new PASolveException("The scheduler has been stopped"));
         } else if (jinfo.getStatus() == JobStatus.KILLED) {
             // Job killed
             answer.setStatus(MatSciTaskStatus.GLOBAL_ERROR);
-            answer.setException(new PASolveException("[AOMatlabEnvironment] The job has been killed"));
+            answer.setException(new PASolveException("The job has been killed"));
         } else if ((t = jinfo.getException(tname)) != null) {
             // Error inside job
             if (t instanceof MatlabTaskException) {
@@ -151,15 +154,15 @@ public class AOMatlabEnvironment extends AOMatSciEnvironment<Boolean, MatlabResu
         PASolveMatlabTaskConfig[][] taskConfigs = (PASolveMatlabTaskConfig[][]) tconf;
 
         if (schedulerStopped || schedulerKilled) {
-            throw new PASchedulerException("[AOMatlabEnvironment] the Scheduler is stopped");
+            throw new PASchedulerException("the Scheduler is stopped");
         }
         ensureConnection();
 
         // We store the script selecting the nodes to use it later at termination.
         debug = config.isDebug();
 
-        if (config.isDebug()) {
-            System.out.println("[AOMatlabEnvironment] Submitting job of " + taskConfigs.length + " tasks...");
+        if (debug) {
+            printLog("Submitting job of " + taskConfigs.length + " tasks...");
         }
         //Thread t = java.lang.Thread.currentThread();
         //t.setContextClassLoader(this.getClass().getClassLoader());
@@ -167,10 +170,10 @@ public class AOMatlabEnvironment extends AOMatSciEnvironment<Boolean, MatlabResu
 
         // Creating a task flow job
         TaskFlowJob job = new TaskFlowJob();
-        job.setName("Matlab Environment Job " + lastGenJobId++);
+        job.setName(gconf.getJobName() + " " + lastGenJobId++);
         job.setPriority(JobPriority.findPriority(config.getPriority()));
         job.setCancelJobOnError(false);
-        job.setDescription("Set of parallel Matlab tasks");
+        job.setDescription(gconf.getJobDescription());
 
         job.setInputSpace(config.getInputSpaceURL());
         job.setOutputSpace(config.getOutputSpaceURL());
@@ -375,7 +378,7 @@ public class AOMatlabEnvironment extends AOMatSciEnvironment<Boolean, MatlabResu
                 SelectionScript sscript = null;
                 try {
                     //System.out.println(config.getVersionPref());
-                    sscript = new SelectionScript(url1, new String[] { "versionPref",
+                    sscript = new SelectionScript(url1, new String[] { "" + config.isDebug(), "versionPref",
                             config.getVersionPref(), "versionRej", config.getVersionRejAsString(),
                             "versionMin", config.getVersionMin(), "versionMax", config.getVersionMax() },
                         false);
@@ -427,8 +430,8 @@ public class AOMatlabEnvironment extends AOMatSciEnvironment<Boolean, MatlabResu
         String jid = null;
         try {
             jid = scheduler.submit(job).value();
-            if (config.isDebug()) {
-                System.out.println("[AOMatlabEnvironment] Job " + jid + " submitted.");
+            if (debug) {
+                printLog("Job " + jid + " submitted.");
             }
             jpinfo = new MatSciJobPermanentInfo(jid, nbResults, depth, config, tnames, finaltnames);
             currentJobs.put(jid, new MatSciJobVolatileInfo(jpinfo));

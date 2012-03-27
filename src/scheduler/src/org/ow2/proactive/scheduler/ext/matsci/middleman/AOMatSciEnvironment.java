@@ -36,16 +36,11 @@
  */
 package org.ow2.proactive.scheduler.ext.matsci.middleman;
 
-import org.apache.log4j.Logger;
-import org.objectweb.proactive.Body;
-import org.objectweb.proactive.InitActive;
-import org.objectweb.proactive.RunActive;
-import org.objectweb.proactive.Service;
+import org.objectweb.proactive.*;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.body.request.BlockingRequestQueue;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.body.request.RequestFilter;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.common.*;
@@ -54,7 +49,6 @@ import org.ow2.proactive.scheduler.common.job.*;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
-import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 import org.ow2.proactive.scheduler.ext.matsci.client.common.MatSciEnvironment;
 import org.ow2.proactive.scheduler.ext.matsci.client.common.data.*;
 import org.ow2.proactive.scheduler.ext.matsci.client.common.exception.PASchedulerException;
@@ -63,7 +57,6 @@ import org.ow2.proactive.utils.console.StdOutConsole;
 
 import javax.security.auth.login.LoginException;
 import java.io.*;
-import java.net.UnknownHostException;
 import java.security.KeyException;
 import java.util.*;
 import java.util.concurrent.TimeoutException;
@@ -75,7 +68,7 @@ import java.util.concurrent.TimeoutException;
  * @author The ProActive Team
  */
 public abstract class AOMatSciEnvironment<R, RL> implements MatSciEnvironment, Serializable,
-        SchedulerEventListener, InitActive, RunActive {
+        SchedulerEventListener, InitActive, RunActive, EndActive {
 
     /**
      * Connection to the scheduler
@@ -133,29 +126,9 @@ public abstract class AOMatSciEnvironment<R, RL> implements MatSciEnvironment, S
     protected HashMap<String, Boolean> timeoutOccured = new HashMap<String, Boolean>();
 
     /**
-     * log4J logger
-     */
-    protected static Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.MATSCI);
-
-    /**
      * Debug mode
      */
-    protected static boolean debug = logger.isDebugEnabled();
-
-    /**
-     * host name
-     */
-    protected static String host = null;
-
-    static {
-        if (host == null) {
-            try {
-                host = java.net.InetAddress.getLocalHost().getHostName();
-            } catch (UnknownHostException e) {
-                e.printStackTrace();
-            }
-        }
-    }
+    protected boolean debug;
 
     /**
      * Proactive stub on this AO
@@ -194,6 +167,14 @@ public abstract class AOMatSciEnvironment<R, RL> implements MatSciEnvironment, S
 
     /**********************************************************************************************************
      ************************************** LOGIN AND CONNECTION *********************************************/
+
+    public AOMatSciEnvironment() {
+
+    }
+
+    public AOMatSciEnvironment(boolean debug) {
+        this.debug = debug;
+    }
 
     /** {@inheritDoc} */
     public void login(String user, String passwd) throws PASchedulerException {
@@ -345,6 +326,16 @@ public abstract class AOMatSciEnvironment<R, RL> implements MatSciEnvironment, S
         aoid = PAActiveObject.getBodyOnThis().getID().getVMID().toString();
     }
 
+    public void endActivity(org.objectweb.proactive.Body body) {
+        try {
+            scheduler.disconnect();
+        } catch (NotConnectedException e) {
+            e.printStackTrace();
+        } catch (PermissionException e) {
+            e.printStackTrace();
+        }
+    }
+
     /** {@inheritDoc} */
     public boolean join(String url) throws PASchedulerException {
         try {
@@ -366,6 +357,28 @@ public abstract class AOMatSciEnvironment<R, RL> implements MatSciEnvironment, S
     public boolean terminate() {
         this.terminated = true;
         return true;
+    }
+
+    protected void printLog(final String message) {
+        printLog(message, false);
+    }
+
+    protected void printLog(final String message, boolean force) {
+        if (!debug && !force) {
+            return;
+        }
+        MatSciJVMProcessInterfaceImpl.printLog(this, message);
+    }
+
+    protected void printLog(final Throwable ex) {
+        printLog(ex, false);
+    }
+
+    protected void printLog(final Throwable ex, boolean force) {
+        if (!debug && !force) {
+            return;
+        }
+        MatSciJVMProcessInterfaceImpl.printLog(this, ex);
     }
 
     /**********************************************************************************************************
@@ -542,9 +555,8 @@ public abstract class AOMatSciEnvironment<R, RL> implements MatSciEnvironment, S
     protected void updateJobResult(String jid, JobResult jResult, JobStatus status) {
         // Getting the Job result from the Scheduler
         MatSciJobVolatileInfo jinfo = currentJobs.get(jid);
-        if (jinfo.isDebugCurrentJob()) {
-            System.out.println("[AOMatlabEnvironment] Updating results of job: " + jid + "(" + jid + ") : " +
-                status);
+        if (debug) {
+            printLog("Updating results of job: " + jid + "(" + jid + ") : " + status);
         }
         jinfo.setStatus(org.ow2.proactive.scheduler.ext.matsci.client.common.data.JobStatus
                 .getJobStatus(status.toString()));
@@ -567,17 +579,16 @@ public abstract class AOMatSciEnvironment<R, RL> implements MatSciEnvironment, S
                 task_results = new TreeMap<String, TaskResult>(new TaskNameComparator());
                 task_results.putAll(jResult.getAllResults());
 
-                if (jinfo.isDebugCurrentJob()) {
-                    System.out.println("[AOMatSciEnvironment] Updating job " + jResult.getName() + "(" + jid +
-                        ") tasks ");
+                if (debug) {
+                    printLog("Updating job " + jResult.getName() + "(" + jid + ") tasks ");
                 }
 
                 // Iterating over the task results
                 for (String tname : task_results.keySet()) {
                     if (!jinfo.isReceivedResult(tname)) {
                         TaskResult res = task_results.get(tname);
-                        if (jinfo.isDebugCurrentJob()) {
-                            System.out.println("[AOMatSciEnvironment] Looking for result of task: " + tname);
+                        if (debug) {
+                            printLog("Looking for result of task: " + tname);
                         }
 
                         updateTaskResult(mainException, res, jid, tname);
@@ -604,22 +615,17 @@ public abstract class AOMatSciEnvironment<R, RL> implements MatSciEnvironment, S
         MatSciJobVolatileInfo jinfo = currentJobs.get(jid);
 
         boolean intermediate = !jinfo.getFinalTasksNames().contains(tname);
-        if (jinfo.isDebugCurrentJob()) {
+        if (debug) {
             if (intermediate) {
-                System.out.println("[AOMatSciEnvironment] Looking for result of intermediate task " + tname +
-                    " for job " + jid);
+                printLog("Looking for result of intermediate task " + tname + " for job " + jid);
             } else {
-                System.out.println("[AOMatSciEnvironment] Looking for result of task " + tname + " for job " +
-                    jid);
+                printLog("Looking for result of task " + tname + " for job " + jid);
             }
         }
         String logs = null;
         if (res != null) {
-            if (!jinfo.isTimeStamp()) {
-                logs = res.getOutput().getAllLogs(false);
-            } else {
-                logs = res.getOutput().getAllLogs(true);
-            }
+
+            logs = res.getOutput().getAllLogs(false);
 
             jinfo.addLogs(tname, logs);
         }
@@ -630,13 +636,13 @@ public abstract class AOMatSciEnvironment<R, RL> implements MatSciEnvironment, S
             ex = res.getException();
         }
         if (ex != null) {
-            if (jinfo.isDebugCurrentJob()) {
+            if (debug) {
                 if (intermediate) {
-                    System.out.println("[AOMatSciEnvironment] Intermediate task " + tname + " for job " +
-                        jid + " threw an exception : " + ex.getClass() + " " + ex.getMessage());
+                    printLog("Intermediate task " + tname + " for job " + jid + " threw an exception : " +
+                        ex.getClass() + " " + ex.getMessage());
                 } else {
-                    System.out.println("[AOMatSciEnvironment] Task " + tname + " for job " + jid +
-                        " threw an exception : " + ex.getClass() + " " + ex.getMessage());
+                    printLog("Task " + tname + " for job " + jid + " threw an exception : " + ex.getClass() +
+                        " " + ex.getMessage());
                 }
             }
             jinfo.setException(tname, ex);
@@ -677,39 +683,54 @@ public abstract class AOMatSciEnvironment<R, RL> implements MatSciEnvironment, S
 
     /** {@inheritDoc} */
     public UnReifiable<Pair<ResultsAndLogs, Integer>> waitAny(String jid, ArrayList<String> tnames,
-            Integer timeout) throws TimeoutException {
-        Boolean tout = timeoutOccured.get(jid);
-        if (tout != null && tout) {
-            timeoutOccured.put(jid, false);
-            throw new TimeoutException("Timeout occured while executing PAwaitAny for job " + jid);
+            Integer timeout) throws Exception {
+        try {
+            Boolean tout = timeoutOccured.get(jid);
+            if (tout != null && tout) {
+                timeoutOccured.put(jid, false);
+                throw new TimeoutException("Timeout occured while executing PAwaitAny for job " + jid);
+            }
+            return new UnReifiable<Pair<ResultsAndLogs, Integer>>(new Pair<ResultsAndLogs, Integer>(
+                getResultOfTask(jid, tnames.get(lastPAWaitAnyIndex)), lastPAWaitAnyIndex));
+        } catch (Exception e) {
+            printLog(e);
+            throw e;
         }
-        return new UnReifiable<Pair<ResultsAndLogs, Integer>>(new Pair<ResultsAndLogs, Integer>(
-            getResultOfTask(jid, tnames.get(lastPAWaitAnyIndex)), lastPAWaitAnyIndex));
     }
 
     /** {@inheritDoc} */
     public UnReifiable<ArrayList<ResultsAndLogs>> waitAll(String jid, ArrayList<String> tnames,
-            Integer timeout) throws TimeoutException {
-        Boolean tout = timeoutOccured.get(jid);
-        if (tout != null && tout) {
-            timeoutOccured.put(jid, false);
-            throw new TimeoutException("Timeout occured while executing PAwaitAll for job " + jid);
+            Integer timeout) throws Exception {
+        try {
+            Boolean tout = timeoutOccured.get(jid);
+            if (tout != null && tout) {
+                timeoutOccured.put(jid, false);
+                throw new TimeoutException("Timeout occured while executing PAwaitAll for job " + jid);
+            }
+            ArrayList<ResultsAndLogs> answers = new ArrayList<ResultsAndLogs>();
+            for (String tname : tnames) {
+                answers.add(getResultOfTask(jid, tname));
+            }
+            return new UnReifiable<ArrayList<ResultsAndLogs>>(answers);
+        } catch (Exception e) {
+            printLog(e);
+            throw e;
         }
-        ArrayList<ResultsAndLogs> answers = new ArrayList<ResultsAndLogs>();
-        for (String tname : tnames) {
-            answers.add(getResultOfTask(jid, tname));
-        }
-        return new UnReifiable<ArrayList<ResultsAndLogs>>(answers);
     }
 
     /** {@inheritDoc} */
     public UnReifiable<ArrayList<Boolean>> areAwaited(String jid, ArrayList<String> tnames) {
-        if (currentJobs.containsKey(jid)) {
-            return new UnReifiable<ArrayList<Boolean>>(currentJobs.get(jid).areAwaited(tnames));
-        } else if (finishedJobs.containsKey(jid)) {
-            return new UnReifiable<ArrayList<Boolean>>(finishedJobs.get(jid).areAwaited(tnames));
-        } else {
-            throw new IllegalArgumentException("Unknown job " + jid);
+        try {
+            if (currentJobs.containsKey(jid)) {
+                return new UnReifiable<ArrayList<Boolean>>(currentJobs.get(jid).areAwaited(tnames));
+            } else if (finishedJobs.containsKey(jid)) {
+                return new UnReifiable<ArrayList<Boolean>>(finishedJobs.get(jid).areAwaited(tnames));
+            } else {
+                throw new IllegalArgumentException("Unknown job " + jid);
+            }
+        } catch (RuntimeException e) {
+            printLog(e);
+            throw e;
         }
     }
 
@@ -725,7 +746,7 @@ public abstract class AOMatSciEnvironment<R, RL> implements MatSciEnvironment, S
             case SHUTDOWN:
             case SHUTTING_DOWN:
                 if (debug) {
-                    logger.debug("[AOMatSciEnvironment] Received " + eventType.toString() + " event");
+                    printLog("Received " + eventType.toString() + " event");
                 }
                 schedulerKilled = true;
                 for (String jid : currentJobs.keySet()) {
@@ -734,7 +755,7 @@ public abstract class AOMatSciEnvironment<R, RL> implements MatSciEnvironment, S
                 break;
             case STOPPED:
                 if (debug) {
-                    logger.debug("[AOMatSciEnvironment] Received " + eventType.toString() + " event");
+                    printLog("Received " + eventType.toString() + " event");
                 }
                 for (String jid : currentJobs.keySet()) {
                     updateJobResult(jid, null, JobStatus.KILLED);
@@ -743,7 +764,7 @@ public abstract class AOMatSciEnvironment<R, RL> implements MatSciEnvironment, S
                 break;
             case RESUMED:
                 if (debug) {
-                    logger.debug("[AOMatSciEnvironment] Received " + eventType.toString() + " event");
+                    printLog("Received " + eventType.toString() + " event");
                 }
                 schedulerStopped = false;
                 break;
@@ -762,7 +783,7 @@ public abstract class AOMatSciEnvironment<R, RL> implements MatSciEnvironment, S
             case JOB_PENDING_TO_FINISHED:
                 if (info.getStatus() == JobStatus.KILLED) {
                     if (debug) {
-                        System.out.println("[AOMatSciEnvironment] Received job " + jid + " killed event...");
+                        printLog("Received job " + jid + " killed event...");
                     }
 
                     // Filtering the right job
@@ -777,7 +798,7 @@ public abstract class AOMatSciEnvironment<R, RL> implements MatSciEnvironment, S
 
                 if (info.getStatus() == JobStatus.KILLED) {
                     if (debug) {
-                        System.out.println("[AOMatSciEnvironment] Received job " + jid + " killed event...");
+                        printLog("Received job " + jid + " killed event...");
                     }
 
                     // Filtering the right job
@@ -794,8 +815,7 @@ public abstract class AOMatSciEnvironment<R, RL> implements MatSciEnvironment, S
                     updateJobResult(jid, jResult, JobStatus.KILLED);
                 } else {
                     if (debug) {
-                        System.out
-                                .println("[AOMatSciEnvironment] Received job " + jid + " finished event...");
+                        printLog("Received job " + jid + " finished event...");
                     }
 
                     if (info == null) {
@@ -836,8 +856,7 @@ public abstract class AOMatSciEnvironment<R, RL> implements MatSciEnvironment, S
                 String tnm = info.getName();
                 String jid = info.getJobId().value();
                 if (debug) {
-                    System.out.println("[AOMatSciEnvironment] Received task " + tnm + " of Job " + jid +
-                        " finished event...");
+                    printLog("Received task " + tnm + " of Job " + jid + " finished event...");
                 }
                 // Filtering the right job
                 if (!currentJobs.containsKey(jid)) {
@@ -883,14 +902,13 @@ public abstract class AOMatSciEnvironment<R, RL> implements MatSciEnvironment, S
 
                 if (tout == Integer.MAX_VALUE) {
                     if (debug) {
-                        System.out.println("[AOMatSciEnvironment] waiting for request with no timeout");
+                        printLog("waiting for request with no timeout");
 
                     }
                     service.waitForRequest();
                 } else {
                     if (debug) {
-                        System.out
-                                .println("[AOMatSciEnvironment] waiting for request with timeout = " + tout);
+                        printLog("waiting for request with timeout = " + tout);
 
                     }
                     BlockingRequestQueue queue = body.getRequestQueue();
@@ -900,10 +918,11 @@ public abstract class AOMatSciEnvironment<R, RL> implements MatSciEnvironment, S
                 substractTimeout(time);
 
                 if (service.hasRequestToServe()) {
-                    if (debug) {
-                        System.out.println("[AOMatSciEnvironment] Request received");
-                    }
+
                     Request randomRequest = service.getOldest();
+                    if (debug) {
+                        printLog("Request received : " + randomRequest.getMethodName());
+                    }
                     if (randomRequest.getMethodName().equals("waitAll")) {
                         String jid = (String) randomRequest.getParameter(0);
                         tout = (Integer) randomRequest.getParameter(2);
@@ -916,10 +935,8 @@ public abstract class AOMatSciEnvironment<R, RL> implements MatSciEnvironment, S
 
                         pendingRequests.put(jid, randomRequest);
                         if (debug) {
-                            System.out
-                                    .println("[AOMatSciEnvironment] Removed " +
-                                        randomRequest.getMethodName() + " for job=" + jid +
-                                        " request from the queue");
+                            printLog("Removed " + randomRequest.getMethodName() + " for job=" + jid +
+                                " request from the queue");
                         }
                         service.blockingRemoveOldest("waitAll");
                     } else if (randomRequest.getMethodName().equals("waitAny")) {
@@ -933,10 +950,8 @@ public abstract class AOMatSciEnvironment<R, RL> implements MatSciEnvironment, S
                         }
                         pendingRequests.put(jid, randomRequest);
                         if (debug) {
-                            System.out
-                                    .println("[AOMatSciEnvironment] Removed " +
-                                        randomRequest.getMethodName() + " for job=" + jid +
-                                        " request from the queue");
+                            printLog("Removed " + randomRequest.getMethodName() + " for job=" + jid +
+                                " request from the queue");
                         }
                         service.blockingRemoveOldest("waitAny");
                     }
@@ -948,7 +963,7 @@ public abstract class AOMatSciEnvironment<R, RL> implements MatSciEnvironment, S
                 // we maybe serve the pending waitXXX method if there is one and if the necessary results are collected
                 maybeServePending(service);
             } catch (Throwable ex) {
-                ex.printStackTrace();
+                printLog(ex);
             }
         }
 
@@ -1015,8 +1030,7 @@ public abstract class AOMatSciEnvironment<R, RL> implements MatSciEnvironment, S
                             timeoutOccured.put(jid, to);
                             pendingRequests.put(jid, null);
                             if (debug) {
-                                System.out.println("[AOMatSciEnvironment] serving " + req.getMethodName() +
-                                    " for job " + jid);
+                                printLog("serving " + req.getMethodName() + " for job " + jid);
                             }
                             service.serve(req);
                         }
@@ -1032,8 +1046,7 @@ public abstract class AOMatSciEnvironment<R, RL> implements MatSciEnvironment, S
                             timeoutOccured.put(jid, to);
                             pendingRequests.put(jid, null);
                             if (debug) {
-                                System.out.println("[AOMatSciEnvironment] serving " + req.getMethodName() +
-                                    " for job " + jid);
+                                printLog("serving " + req.getMethodName() + " for job " + jid);
                             }
                             lastPAWaitAnyIndex = any;
                             service.serve(req);

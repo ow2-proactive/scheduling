@@ -98,10 +98,6 @@ public class MatSciJobVolatileInfo<R> implements Serializable {
         return info.getConf().isDebug();
     }
 
-    public boolean isTimeStamp() {
-        return info.getConf().isTimeStamp();
-    }
-
     public boolean isJobFinished() {
         return jobFinished;
     }

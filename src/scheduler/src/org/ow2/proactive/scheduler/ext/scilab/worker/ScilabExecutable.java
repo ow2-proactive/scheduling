@@ -208,7 +208,8 @@ public class ScilabExecutable extends JavaExecutable {
         ScilabEngineConfig conf = (ScilabEngineConfig) ScilabEngineConfig.getCurrentConfiguration();
         if (conf == null) {
             conf = (ScilabEngineConfig) ScilabFinder.getInstance().findMatSci(paconfig.getVersionPref(),
-                    paconfig.getVersionRej(), paconfig.getVersionMin(), paconfig.getVersionMax());
+                    paconfig.getVersionRej(), paconfig.getVersionMin(), paconfig.getVersionMax(),
+                    paconfig.isDebug());
             if (conf == null) {
                 throw new IllegalStateException("No valid Scilab configuration found, aborting...");
             }
@@ -328,6 +329,10 @@ public class ScilabExecutable extends JavaExecutable {
         if (paconfig.isTransferEnv()) {
             File envMat = new File(taskconfig.getEnvMatFileURI());
             printLog("Loading workspace from " + envMat);
+            if (paconfig.isDebug()) {
+                scilabConnection.evalString("disp('Contents of " + envMat + "');");
+                scilabConnection.evalString("listvarinfile('" + envMat + "')");
+            }
             // Load workspace using SCILAB command
             String[] globals = paconfig.getEnvGlobalNames();
             if (globals != null && globals.length > 0) {
@@ -405,7 +410,8 @@ public class ScilabExecutable extends JavaExecutable {
             return;
         }
         final Date d = new Date();
-        final String log = "[" + ISO8601FORMAT.format(d) + " " + HOSTNAME + "] " + message;
+        final String log = "[" + ISO8601FORMAT.format(d) + " " + HOSTNAME + "][" +
+            this.getClass().getSimpleName() + "] " + message;
         System.out.println(log);
         System.out.flush();
         if (this.outDebugWriter != null) {

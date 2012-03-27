@@ -44,8 +44,8 @@ function [val_k,err]=PAResult_PAwaitFor(R,RaL)
         exstr = jinvoke(StackTraceUtil,'getStackTrace',e);
         printf('%s',exstr);
         try
-            jremove(e);
-            jremove(exstr);
+            //jremove(e);
+            //jremove(exstr);
             //jremove(ScilabSolver);
         catch 
         end        
@@ -92,7 +92,7 @@ function printLogs(R,RaL,err)
             printf('%s',logstr);
         end
         jinvoke(R.logsPrinted,'set',%t);
-        jremove(logs,logstr);
+        //jremove(logs,logstr);
 
     end    
 endfunction

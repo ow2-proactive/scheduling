@@ -56,9 +56,26 @@ public class ResultsAndLogs<R> implements Serializable {
     protected String logs;
 
     /**
+     * jobId associated with this result
+     */
+    protected String jobId;
+
+    /**
+     * Task name associated with this result
+     */
+    protected String taskName;
+
+    /**
      * Exception thrown if any
      */
     protected Throwable exception;
+
+    /**
+     * Status of the execution
+     */
+    protected MatSciTaskStatus status;
+
+    private static final String nl = System.getProperty("line.separator");
 
     public ResultsAndLogs() {
     }
@@ -69,7 +86,11 @@ public class ResultsAndLogs<R> implements Serializable {
     }
 
     public void setLogs(String logs) {
-        this.logs = logs;
+        if (logs == null) {
+            this.logs = this.jobId + ": " + this.taskName;
+        } else {
+            this.logs = this.jobId + ": " + this.taskName + nl + logs;
+        }
         compressLogs();
     }
 
@@ -77,7 +98,21 @@ public class ResultsAndLogs<R> implements Serializable {
         this.exception = exception;
     }
 
-    protected MatSciTaskStatus status;
+    public String getTaskName() {
+        return taskName;
+    }
+
+    public void setTaskName(String taskName) {
+        this.taskName = taskName;
+    }
+
+    public String getJobId() {
+        return jobId;
+    }
+
+    public void setJobId(String jobId) {
+        this.jobId = jobId;
+    }
 
     public boolean isGlobalError() {
         return status == MatSciTaskStatus.GLOBAL_ERROR;

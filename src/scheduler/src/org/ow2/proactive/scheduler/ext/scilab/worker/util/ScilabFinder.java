@@ -36,11 +36,11 @@
  */
 package org.ow2.proactive.scheduler.ext.scilab.worker.util;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-
 import org.ow2.proactive.scheduler.ext.matsci.worker.util.MatSciEngineConfig;
 import org.ow2.proactive.scheduler.ext.matsci.worker.util.MatSciFinder;
+
+import java.util.ArrayList;
+import java.util.HashSet;
 
 
 public class ScilabFinder extends MatSciFinder {
@@ -62,13 +62,13 @@ public class ScilabFinder extends MatSciFinder {
      * Utility function to find Matlab
      */
     public MatSciEngineConfig findMatSci(String version_pref, String versionsRej, String versionMin,
-            String versionMax) throws Exception {
-        return findMatSci(version_pref, parseVersionRej(versionsRej), versionMin, versionMax);
+            String versionMax, boolean debug) throws Exception {
+        return findMatSci(version_pref, parseVersionRej(versionsRej), versionMin, versionMax, debug);
     }
 
     public MatSciEngineConfig findMatSci(String version_pref, HashSet<String> versionsRej, String versionMin,
-            String versionMax) throws Exception {
-        ArrayList<MatSciEngineConfig> confs = ScilabConfigurationParser.getConfigs();
+            String versionMax, boolean debug) throws Exception {
+        ArrayList<MatSciEngineConfig> confs = ScilabConfigurationParser.getConfigs(debug);
 
         if (confs == null) {
             System.out.println("No configuration found");
@@ -78,7 +78,7 @@ public class ScilabFinder extends MatSciFinder {
             System.out.println("Found " + conf.getVersion());
         }
         MatSciEngineConfig answer = chooseMatSciConfig(confs, version_pref, versionsRej, versionMin,
-                versionMax);
+                versionMax, debug);
         if (answer == null) {
             System.out.println("No configuration accepted");
         }

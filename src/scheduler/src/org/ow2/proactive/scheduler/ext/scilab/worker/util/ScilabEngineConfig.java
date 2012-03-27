@@ -113,7 +113,6 @@ public class ScilabEngineConfig extends MatSciEngineConfigBase {
         return false;
     }
 
-
     public String toString() {
         return "Scilab Home : " + scilabHome + nl + "Scilab Version : " + version + nl + "Scilab binDir : " +
             scilabBinDir + nl + "Scilab command : " + scilabCommandName;

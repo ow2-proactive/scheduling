@@ -36,7 +36,8 @@ begin
     System.setOut(logout);
     System.setErr(logout);
 
-    cpt = 0
+    debug = ($args[0] == "true")
+    cpt = 1
     versionPref = nil
     versionMin = nil
     versionMax = nil
@@ -58,8 +59,7 @@ begin
 
     begin
 
-
-      cf = ScilabFinder.getInstance().findMatSci(versionPref, versionRej, versionMin, versionMax);
+      cf = ScilabFinder.getInstance().findMatSci(versionPref, versionRej, versionMin, versionMax,debug)
     rescue JavaIO::FileNotFoundException => fnfe
       puts fnfe.message
     rescue Exception => e
@@ -81,7 +81,11 @@ rescue Exception => e
 ensure
   $stdout = orig_stdout
   $stderr = orig_stderr
-  System.setOut(orig_jstdout);
-  System.setErr(orig_jstderr);
-  logout.close();
+  System.setOut(orig_jstdout)
+  System.setErr(orig_jstderr)
+  begin
+    logout.close()
+    fos.close()
+  rescue
+  end
 end

@@ -214,8 +214,8 @@ public class MatlabConnectionRImpl implements MatlabConnection {
             lt1 = new IOTools.LoggingThread(process, "[MATLAB]", System.out, System.err, outDebug, null,
                 null, "License checkout failed");
         } else {
-            lt1 = new IOTools.LoggingThread(process, "[MATLAB OUT]", System.out, System.err, startPattern,
-                null, "License checkout failed");
+            lt1 = new IOTools.LoggingThread(process, "[MATLAB]", System.out, System.err, startPattern, null,
+                "License checkout failed");
 
         }
         Thread t1 = new Thread(lt1, "OUT MATLAB");

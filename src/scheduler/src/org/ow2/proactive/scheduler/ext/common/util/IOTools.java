@@ -43,9 +43,10 @@ import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.concurrent.ExecutorService;
-
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -60,41 +61,50 @@ public class IOTools {
 
     private static final String nl = System.getProperty("line.separator");
 
-    public static ProcessResult blockingGetProcessResult(Process process) {
+    protected static final SimpleDateFormat ISO8601FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:sss");
 
-        final InputStream is = process.getInputStream();
-        final InputStream es = process.getErrorStream();
-        final ArrayList<String> out_lines = new ArrayList<String>();
-        final ArrayList<String> err_lines = new ArrayList<String>();
-        Thread t1 = new Thread(new Runnable() {
+    public static ProcessResult blockingGetProcessResult(final Process process, long timeout)
+            throws InterruptedException, IOException {
+
+        ExecutorService service = Executors.newSingleThreadExecutor();
+
+        final ByteArrayOutputStream buf = new ByteArrayOutputStream();
+
+        service.submit(new Runnable() {
             public void run() {
-                ArrayList<String> linesTemp = getContentAsList(is);
-                out_lines.addAll(linesTemp);
+                InputStream is = process.getInputStream();
+                try {
+                    int result = 0;
+
+                    result = is.read();
+
+                    while (result != -1) {
+                        byte b = (byte) result;
+                        buf.write(b);
+                        result = is.read();
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
             }
         });
-        Thread t2 = new Thread(new Runnable() {
-            public void run() {
-                ArrayList<String> linesTemp = getContentAsList(es);
-                err_lines.addAll(linesTemp);
+
+        boolean ok = service.awaitTermination(timeout, TimeUnit.MILLISECONDS);
+        if (!ok) {
+            process.destroy();
+            Thread.sleep(1000);
+        }
+        int retValue = -1;
+        if (ok) {
+
+            try {
+                retValue = process.waitFor();
+            } catch (InterruptedException e) {
+                e.printStackTrace(); //To change body of catch statement use File | Settings | File Templates.
             }
-        });
-        t1.start();
-        t2.start();
-        try {
-            t1.join();
-            t2.join();
-
-        } catch (InterruptedException e) {
-            e.printStackTrace(); //To change body of catch statement use File | Settings | File Templates.
         }
-
-        int retValue = 0;
-        try {
-            retValue = process.waitFor();
-        } catch (InterruptedException e) {
-            e.printStackTrace(); //To change body of catch statement use File | Settings | File Templates.
-        }
-        return new ProcessResult(retValue, out_lines.toArray(new String[0]), err_lines.toArray(new String[0]));
+        return new ProcessResult(retValue, buf.toString(), ok);
     }
 
     public static String generateHash(File file) throws NoSuchAlgorithmException, FileNotFoundException,
@@ -215,14 +225,13 @@ public class IOTools {
         service.submit(new Runnable() {
             public void run() {
                 final ArrayList<String> lines = new ArrayList<String>();
-                BufferedInputStream bis = null;
+                InputStream is = null;
                 try {
-                    bis = new BufferedInputStream(new FileInputStream(in));
+                    is = new FileInputStream(in);
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
                 }
-                final BufferedReader d = new BufferedReader(new InputStreamReader(
-                    new BufferedInputStream(bis)));
+                final BufferedReader d = new BufferedReader(new InputStreamReader(is));
                 String line = null;
 
                 try {
@@ -244,7 +253,7 @@ public class IOTools {
                 }
 
                 try {
-                    bis.close();
+                    is.close();
                 } catch (IOException e) {
                 }
             }
@@ -492,21 +501,26 @@ public class IOTools {
         private void printLine(String line) {
             if (debugStream == null) {
                 if (lastline_err) {
-                    err.println("[ " + HOSTNAME + " ] " + line);
+                    err.println("[" + ISO8601FORMAT.format(new Date()) + " " + HOSTNAME + "]" +
+                        appendMessage + line);
                     err.flush();
                 } else {
-                    out.println("[ " + HOSTNAME + " ] " + line);
+                    out.println("[" + ISO8601FORMAT.format(new Date()) + " " + HOSTNAME + "]" +
+                        appendMessage + line);
                     out.flush();
                 }
             } else {
                 if (lastline_err) {
-                    err.println("[ " + HOSTNAME + " " + new java.util.Date() + " ]" + appendMessage + line);
+                    err.println("[" + ISO8601FORMAT.format(new Date()) + " " + HOSTNAME + "]" +
+                        appendMessage + line);
                     err.flush();
                 } else {
-                    out.println("[ " + HOSTNAME + " " + new java.util.Date() + " ]" + appendMessage + line);
+                    out.println("[" + ISO8601FORMAT.format(new Date()) + " " + HOSTNAME + "]" +
+                        appendMessage + line);
                     out.flush();
                 }
-                debugStream.println("[ " + new java.util.Date() + " ]" + appendMessage + line);
+                debugStream.println("[" + ISO8601FORMAT.format(new Date()) + " " + HOSTNAME + "]" +
+                    appendMessage + line);
                 debugStream.flush();
             }
         }

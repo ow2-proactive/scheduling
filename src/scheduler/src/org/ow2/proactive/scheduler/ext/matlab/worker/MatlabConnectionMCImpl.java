@@ -40,6 +40,7 @@ import com.activeeon.proactive.license_saver.client.LicenseSaverClient;
 import matlabcontrol.*;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.utils.OperatingSystem;
+import org.ow2.proactive.scheduler.ext.common.util.IOTools;
 import org.ow2.proactive.scheduler.ext.matlab.common.data.PASolveMatlabGlobalConfig;
 import org.ow2.proactive.scheduler.ext.matlab.common.data.PASolveMatlabTaskConfig;
 import org.ow2.proactive.scheduler.ext.matlab.common.exception.MatlabInitException;
@@ -49,6 +50,7 @@ import org.ow2.proactive.scheduler.ext.matlab.common.exception.UnsufficientLicen
 import org.ow2.proactive.scheduler.ext.matsci.worker.util.MatSciEngineConfigBase;
 
 import java.io.File;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -81,7 +83,22 @@ public class MatlabConnectionMCImpl implements MatlabConnection {
 
     protected String[] startUpOptions;
 
-    public MatlabConnectionMCImpl() {
+    /** Stream used for debug output */
+    private static PrintStream outDebug;
+
+    /** Pattern used to remove Matlab startup message from logs */
+    private static final String startPattern = "---- MATLAB START ----";
+
+    /** The temp directory */
+    private static String tmpDir;
+
+    /** The ProActive node name */
+    private static String nodeName;
+
+    public MatlabConnectionMCImpl(final String tmpDir, final PrintStream outDebug, final String nodeName) {
+        this.tmpDir = tmpDir;
+        this.outDebug = outDebug;
+        this.nodeName = nodeName;
     }
 
     /**
@@ -364,6 +381,21 @@ public class MatlabConnectionMCImpl implements MatlabConnection {
             b.command(command);
 
             process = b.start();
+
+            IOTools.LoggingThread lt1;
+
+            if (debug) {
+                lt1 = new IOTools.LoggingThread(process, "[MATLAB]", System.out, System.err, outDebug, null,
+                    null, "License checkout failed");
+            } else {
+                lt1 = new IOTools.LoggingThread(process, "[MATLAB]", System.out, System.err, startPattern,
+                    null, "License checkout failed");
+
+            }
+
+            Thread t1 = new Thread(lt1, "OUT MATLAB");
+            t1.setDaemon(true);
+            t1.start();
 
             return process;
 
