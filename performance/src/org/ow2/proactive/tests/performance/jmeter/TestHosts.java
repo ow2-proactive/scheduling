@@ -42,7 +42,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.log.Hierarchy;
 import org.apache.log.Logger;
 
 

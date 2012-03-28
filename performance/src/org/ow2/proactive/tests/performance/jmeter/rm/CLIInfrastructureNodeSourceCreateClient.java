@@ -51,7 +51,17 @@ import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.ow2.proactive.tests.performance.utils.TestFileUtils;
 import org.ow2.proactive.utils.FileToBytesConverter;
 
-
+/**
+ * Test scenario 'Create Node Source with CLIInfrastructure'.
+ * <p/>
+ * Scenario creates new node source using call 'ResourceManager.createNodeSource'
+ * (CLIInfrastructure is used), waits when deployment of all nodes in the created 
+ * node source completes and then removes node source using 'ResourceManager.removeNodeSource'. 
+ * Scenario measures total time required to create node source and deploy all nodes.
+ *   
+ * @author ProActive team
+ *
+ */
 public class CLIInfrastructureNodeSourceCreateClient extends BaseNodeSourceCreateClient {
 
     public static final String PARAM_CLI_DEPLOYMENT_SCRIPT = "cliNodeDeploymentScript";

@@ -53,7 +53,20 @@ import org.ow2.proactive.tests.performance.rm.RMEventsMonitor;
 import org.ow2.proactive.tests.performance.rm.RMTestListener;
 import org.ow2.proactive.tests.performance.rm.RMWaitCondition;
 
-
+/**
+ * Base abstract class for 'Create Node Source' scenarios.
+ * <p/>
+ * Scenario creates new node source using call 'ResourceManager.createNodeSource', 
+ * waits when deployment of all nodes in the created node source completes and then removes 
+ * node source using 'ResourceManager.removeNodeSource'. 
+ * Scenario measures total time required to create node source and deploy all nodes.
+ * <p/>
+ * Subclasses implementing concrete scenarios should just implement abstract method 
+ * creating scenario-specific node source ('createNodeSource').  
+ * 
+ * @author ProActive team
+ *
+ */
 public abstract class BaseNodeSourceCreateClient extends BaseJMeterRMClient {
 
     public static final String PARAM_HOSTS_LIST = "createNodeSourceHosts";
@@ -158,6 +171,7 @@ public abstract class BaseNodeSourceCreateClient extends BaseJMeterRMClient {
             SampleResult result = new SampleResult();
             result.sampleStart();
             if (!createNodeSource(nodeSourceName, hostNames, nodesNumber, javaPath, schedulingPath, context)) {
+                logError("Failed to create node source " + nodeSourceName);
                 result.setResponseMessage("Failed to create node source");
                 result.setSuccessful(false);
                 return result;
@@ -167,6 +181,7 @@ public abstract class BaseNodeSourceCreateClient extends BaseJMeterRMClient {
                         getLogger());
                 result.sampleEnd();
                 if (!nodesDeployed) {
+                    logError("Failed to deploy nodes for the node source " + nodeSourceName);
                     result.setSuccessful(false);
                     result.setResponseMessage("Failed to deploy nodes");
                 } else {
@@ -178,12 +193,15 @@ public abstract class BaseNodeSourceCreateClient extends BaseJMeterRMClient {
 
                 BooleanWrapper removedRequest = getResourceManager().removeNodeSource(nodeSourceName, true);
                 if (!removedRequest.getBooleanValue()) {
+                    logError("Failed to remove node source " + nodeSourceName);
                     result.setSuccessful(false);
                     result.setResponseMessage("Failed to removed node source");
                 } else {
                     boolean removedEvent = eventsMonitor.waitFor(nodeSourceRemoveCondtion,
                             NODE_SOURCE_REMOVE_TIMEOUT, getLogger());
                     if (!removedEvent) {
+                        logError("Failed to get NODESOURCE_REMOVED event for the node source " +
+                            nodeSourceName);
                         result.setSuccessful(false);
                         result.setResponseMessage("Failed to get NODESOURCE_REMOVED event");
                     }

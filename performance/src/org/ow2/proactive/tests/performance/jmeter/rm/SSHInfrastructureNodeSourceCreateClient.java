@@ -48,6 +48,17 @@ import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.ow2.proactive.utils.FileToBytesConverter;
 
 
+/**
+ * Test scenario 'Create Node Source with SSHInfrastructure'.
+ * <p/>
+ * Scenario creates new node source using call 'ResourceManager.createNodeSource'
+ * (SSHInfrastructure is used), waits when deployment of all nodes in the created 
+ * node source completes and then removes node source using 'ResourceManager.removeNodeSource'. 
+ * Scenario measures total time required to create node source and deploy all nodes.
+ *   
+ * @author ProActive team
+ *
+ */
 public class SSHInfrastructureNodeSourceCreateClient extends BaseNodeSourceCreateClient {
 
     @Override

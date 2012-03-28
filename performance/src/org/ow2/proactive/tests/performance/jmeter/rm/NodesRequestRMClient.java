@@ -51,6 +51,16 @@ import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
 import org.ow2.proactive.utils.NodeSet;
 
 
+/**
+ * Test scenario 'Request Nodes'. 
+ * <p/>
+ * Scenario requests nodes from RM using call 'ResourceManager.getAtMostNodes()' 
+ * and immediately releases received nodes using call 'ResourceManager.releaseNodes()'. 
+ * It measures total time required to complete these two RM calls.
+ * 
+ * @author ProActive team
+ *
+ */
 public class NodesRequestRMClient extends BaseJMeterRMClient {
 
     public static final String PARAM_REQUESTED_NODES_NUMBER = "requestedNodesNumber";
@@ -109,9 +119,11 @@ public class NodesRequestRMClient extends BaseJMeterRMClient {
 
         if (nodesToRequest != nodesReceived) {
             result.setSuccessful(false);
-            result.setResponseMessage(String.format(
+            String message = String.format(
                     "Didn't receive expected nodes, requested %d nodes, received %d nodes", nodesToRequest,
-                    nodesReceived));
+                    nodesReceived);
+            logError(message);
+            result.setResponseMessage(message);
         } else {
             result.setSuccessful(true);
         }
