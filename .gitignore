@@ -1,0 +1,41 @@
+
+# /
+/.classpath
+/.project
+/.settings
+/classes
+/dist
+/docs
+/doc-files
+/junitReports
+/log
+/.machinefile_*
+/output
+/timitOutputDirectory
+/.classpath*
+/generated
+
+# /bin/unix/
+/bin/unix/.machinefile*
+/bin/unix/SCHEDULER_DB
+/bin/unix/startP2PService.sh
+
+# /compile/
+/compile/eclipse_formatter_config.properties
+/compile/Manifest.mf
+
+# /dev/lib/
+
+# /lib/
+/lib/script-js.jar
+/lib/script-api.jar
+/lib/js.jar
+
+# /lib/ProActive/
+/lib/ProActive/*
+
+# /performance/results/
+/performance/results/*
+
+# /performance/tmp/
+/performance/tmp/*
