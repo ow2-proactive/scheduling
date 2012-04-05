@@ -66,9 +66,7 @@ public class ThreadReader implements Runnable {
      * @see java.lang.Runnable#run()
      */
     public void run() {
-        final boolean[] stop = new boolean[] { false };
-
-        new Thread() {
+        Thread readerThread = new Thread() {
             @Override
             public void run() {
                 String str = null;
@@ -76,18 +74,18 @@ public class ThreadReader implements Runnable {
                     while ((str = in.readLine()) != null) {
                         out.println(str);
                     }
-                    stop[0] = true;
-
                 } catch (IOException e) {
                     //nothing to do, socket is dead
                 }
             }
-        }.start();
+        };
+        readerThread.start();
 
-        while (!stop[0] && !executable.isKilled()) {
+        while (readerThread.isAlive() && !executable.isKilled()) {
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
+                break;
             }
         }
 

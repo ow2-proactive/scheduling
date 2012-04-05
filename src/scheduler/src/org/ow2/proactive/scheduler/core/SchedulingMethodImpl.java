@@ -87,8 +87,6 @@ import org.ow2.proactive.utils.Formatter;
 import org.ow2.proactive.utils.NodeSet;
 
 
-
-
 /**
  * SchedulingMethodImpl is the default implementation for the scheduling process
  *

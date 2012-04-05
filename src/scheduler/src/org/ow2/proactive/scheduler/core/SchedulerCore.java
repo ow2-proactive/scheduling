@@ -528,7 +528,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
                     } catch (InterruptedException e) {
                         //miam -> shutdown scheduler
                     } catch (Exception e) {
-                        logger_dev.info("", e);
+                        logger_dev.info("Nodes pingining failed", e);
                     }
                 }
             }
@@ -822,22 +822,34 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
                             } catch (NullPointerException e) {
                                 //should not happened, but avoid restart if execInfo or launcher is null
                                 //nothing to do
-                            } catch (IllegalArgumentException iae) {
+                                if (logger_dev.isDebugEnabled()) {
+                                    logger_dev.debug("getProgress failed on job '" + job.getId() +
+                                        "', task '" + td.getId() + "'", e);
+                                }
+                            } catch (IllegalArgumentException e) {
                                 //thrown by (1)
                                 //avoid setting bad value, no event if bad
-                            } catch (ProgressPingerException ppe) {
+                                if (logger_dev.isDebugEnabled()) {
+                                    logger_dev.debug("getProgress failed on job '" + job.getId() +
+                                        "', task '" + td.getId() + "'", e);
+                                }
+                            } catch (ProgressPingerException e) {
                                 //thrown by (2) in one of this two cases :
                                 // * when user has overridden getProgress method and the method throws an exception
                                 // * if forked JVM process is dead
                                 //nothing to do in any case
+                                if (logger_dev.isDebugEnabled()) {
+                                    logger_dev.debug("getProgress failed on job '" + job.getId() +
+                                        "', task '" + td.getId() + "'", e);
+                                }
                             } catch (Throwable t) {
+                                logger_dev.info("Node failed on job '" + job.getId() + "', task '" +
+                                    td.getId() + "'", t);
+
                                 //check if the task has not been terminated while pinging
                                 if (currentlyRunningTasks.get(job.getId()).remove(td.getId()) == null) {
                                     continue;
                                 }
-
-                                logger_dev.info("Node failed on job '" + job.getId() + "', task '" +
-                                    td.getId() + "'");
 
                                 try {
                                     logger_dev.info("Try to free failed node set");
@@ -846,7 +858,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
                                             td.getExecuterInformations().getNodes());
                                 } catch (Exception e) {
                                     //just save the rest of the method execution
-                                    logger_dev.debug("", e);
+                                    logger_dev.debug("Failed to free failed node set", e);
                                 }
 
                                 //re-init progress as it is failed

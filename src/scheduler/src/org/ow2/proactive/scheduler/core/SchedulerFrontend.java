@@ -1383,7 +1383,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
      * {@inheritDoc}
      */
     public void jobSubmitted(JobState job) {
-        JobState storedJobState = new ClientJobState(job); 
+        JobState storedJobState = new ClientJobState(job);
         jobsMap.put(job.getId(), storedJobState);
         sState.getPendingJobs().add(storedJobState);
         dispatchJobSubmitted(job);

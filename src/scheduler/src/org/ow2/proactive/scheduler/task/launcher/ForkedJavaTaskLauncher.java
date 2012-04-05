@@ -231,7 +231,7 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher implements ForkerSt
                 throw ipe;
             } catch (Throwable t) {
                 //communication error with the forked JVM (probably dead VM)
-                throw new ForkedJVMProcessException("Forded JVM seems to be dead", t);
+                throw new ForkedJVMProcessException("Forked JVM seems to be dead", t);
             }
         }
     }

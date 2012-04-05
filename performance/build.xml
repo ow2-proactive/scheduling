@@ -138,6 +138,8 @@
                 <jvmarg value="-Drm.deploy.javaOpts=${rm.deploy.javaOpts}" />
                 <jvmarg value="-Drm.deploy.rmNodesHosts=${rm.deploy.rmNodesHosts}" />
                 <jvmarg value="-Drm.deploy.rmNodesPerHosts=${rm.deploy.rmNodesPerHosts}" />
+                <jvmarg value="-Drm.deploy.rmNodesSourcesNumber=${rm.deploy.rmNodesSourcesNumber}" />
+            	
                 <jvmarg value="-Drm.deploy.testNodes=${createNodeSourceHosts}" />
 
                 <jvmarg value="-Dscheduler.deploy.schedulerHost=${scheduler.deploy.schedulerHost}" />
@@ -408,5 +410,5 @@
             <jvmarg value="-Dget.hosts.from.scheduler.rmAdditionalHostsNumber=${get.hosts.from.scheduler.rmAdditionalHostsNumber}" />
         </java>
     </target>
-
+	
 </project>
