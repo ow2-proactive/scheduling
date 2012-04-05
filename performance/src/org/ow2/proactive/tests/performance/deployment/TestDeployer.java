@@ -222,11 +222,15 @@ public abstract class TestDeployer {
         for (String jar : requiredJARs) {
             distLibJars.add(localEnv.getSchedulingFolder().getRootDir() + "/dist/lib/" + jar);
         }
-        List<String> addonsJars = TestFileUtils.listDirectoryJars(new File(localEnv.getSchedulingFolder()
-                .getRootDir(), "/addons").getAbsolutePath());
-
         List<String> allJars = new ArrayList<String>(distLibJars);
-        allJars.addAll(addonsJars);
+
+        File addons = new File(localEnv.getSchedulingFolder().getRootDir(), "/addons");
+
+        if (addons.isDirectory()) {
+            List<String> addonsJars = TestFileUtils.listDirectoryJars(addons.getAbsolutePath());
+            allJars.addAll(addonsJars);
+        }
+
         StringBuilder result = new StringBuilder();
         for (String jar : allJars) {
             jar = localEnv.convertFileNameForEnv(jar, serverHostEnv.getEnv());
