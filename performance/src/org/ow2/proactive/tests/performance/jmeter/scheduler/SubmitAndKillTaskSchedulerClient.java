@@ -56,121 +56,143 @@ import org.ow2.proactive.tests.performance.scheduler.SchedulerTestListener;
 import org.ow2.proactive.tests.performance.scheduler.SchedulerWaitCondition;
 import org.ow2.proactive.tests.performance.scheduler.StartTaskWaitContition;
 
-
+/**
+ * Test scenario 'Submit and kill tasks'.
+ * <p/>
+ * Scenario submits job with two tasks (native and java tasks which sleep
+ * forever), waits when both tasks start execution and kills both tasks
+ * (Scheduler.killTask). It measures total time required to kill two tasks.
+ * 
+ * @author ProActive team
+ * 
+ */
 public class SubmitAndKillTaskSchedulerClient extends BaseJMeterSchedulerClient {
 
-    static final long EXECUTION_START_TIMEOUT = 5 * 60000;
+	static final long EXECUTION_START_TIMEOUT = 5 * 60000;
 
-    static final long FINISH_TIMEOUT = 5 * 60000;
+	static final long FINISH_TIMEOUT = 5 * 60000;
 
-    private SchedulerEventsMonitor eventsMonitor;
+	private SchedulerEventsMonitor eventsMonitor;
 
-    @Override
-    protected void doSetupTest(JavaSamplerContext context) throws Throwable {
-        super.doSetupTest(context);
+	@Override
+	protected void doSetupTest(JavaSamplerContext context) throws Throwable {
+		super.doSetupTest(context);
 
-        eventsMonitor = new SchedulerEventsMonitor();
-        SchedulerTestListener listener = SchedulerTestListener.createListener(eventsMonitor);
-        getScheduler().addEventListener(listener, true);
-    }
+		eventsMonitor = new SchedulerEventsMonitor();
+		SchedulerTestListener listener = SchedulerTestListener
+				.createListener(eventsMonitor);
+		getScheduler().addEventListener(listener, true);
+	}
 
-    @Override
-    protected void doTeardownTest(JavaSamplerContext context) throws Exception {
-        getScheduler().removeEventListener();
+	@Override
+	protected void doTeardownTest(JavaSamplerContext context) throws Exception {
+		getScheduler().removeEventListener();
 
-        super.doTeardownTest(context);
-    }
+		super.doTeardownTest(context);
+	}
 
-    @Override
-    protected SampleResult doRunTest(JavaSamplerContext context) throws Throwable {
-        String jobName = generateUniqueJobName();
+	@Override
+	protected SampleResult doRunTest(JavaSamplerContext context)
+			throws Throwable {
+		String jobName = generateUniqueJobName();
 
-        SchedulerWaitCondition jobCompleteCondition = eventsMonitor.addWaitCondition(new JobWaitContition(
-            jobName, JobStatus.FINISHED));
+		SchedulerWaitCondition jobCompleteCondition = eventsMonitor
+				.addWaitCondition(new JobWaitContition(jobName,
+						JobStatus.FINISHED));
 
-        TaskFlowJob job = new TaskFlowJob();
-        job.setName(jobName);
-        job.setPriority(JobPriority.NORMAL);
-        job.setCancelJobOnError(false);
-        job.setDescription("Job with java and native task (tasks sleep forever)");
-        job.setMaxNumberOfExecution(1);
-        JobEnvironment jobEnv = new JobEnvironment();
-        jobEnv.setJobClasspath(new String[] { testsClasspath });
-        job.setEnvironment(jobEnv);
+		TaskFlowJob job = new TaskFlowJob();
+		job.setName(jobName);
+		job.setPriority(JobPriority.NORMAL);
+		job.setCancelJobOnError(false);
+		job.setDescription("Job with java and native task (tasks sleep forever)");
+		job.setMaxNumberOfExecution(1);
+		JobEnvironment jobEnv = new JobEnvironment();
+		jobEnv.setJobClasspath(new String[] { testsClasspath });
+		job.setEnvironment(jobEnv);
 
-        Task javaTask = SubmitAndKillSchedulerClient.createJavaSleepingTask();
-        javaTask.setName("Sleeping java task");
-        job.addTask(javaTask);
+		Task javaTask = SubmitAndKillSchedulerClient.createJavaSleepingTask();
+		javaTask.setName("Sleeping java task");
+		job.addTask(javaTask);
 
-        Task nativeTask = SubmitAndKillSchedulerClient.createNativeSleepingTask(testsSourcePath);
-        nativeTask.setName("Sleeping native task");
-        job.addTask(nativeTask);
+		Task nativeTask = SubmitAndKillSchedulerClient
+				.createNativeSleepingTask(testsSourcePath);
+		nativeTask.setName("Sleeping native task");
+		job.addTask(nativeTask);
 
-        List<SchedulerWaitCondition> taskStartConditions = new ArrayList<SchedulerWaitCondition>();
-        for (Task task : job.getTasks()) {
-            taskStartConditions.add(eventsMonitor.addWaitCondition(new StartTaskWaitContition(jobName, task
-                    .getName())));
-        }
+		List<SchedulerWaitCondition> taskStartConditions = new ArrayList<SchedulerWaitCondition>();
+		for (Task task : job.getTasks()) {
+			taskStartConditions.add(eventsMonitor
+					.addWaitCondition(new StartTaskWaitContition(jobName, task
+							.getName())));
+		}
 
-        Scheduler scheduler = getScheduler();
-        JobId jobId = scheduler.submit(job);
+		Scheduler scheduler = getScheduler();
+		JobId jobId = scheduler.submit(job);
 
-        logInfo("Killing tasks for job " + jobId + "(" + Thread.currentThread() + ")");
+		logInfo("Killing tasks for job " + jobId + "(" + Thread.currentThread()
+				+ ")");
 
-        for (SchedulerWaitCondition taskStartCondition : taskStartConditions) {
-            if (!eventsMonitor.waitFor(taskStartCondition, EXECUTION_START_TIMEOUT, getLogger())) {
-                logJobResult(jobId);
-                SampleResult result = new SampleResult();
-                result.setSuccessful(false);
-                result.setResponseMessage("Failed to wait for start of task execition");
-                return result;
-            }
-        }
+		for (SchedulerWaitCondition taskStartCondition : taskStartConditions) {
+			if (!eventsMonitor.waitFor(taskStartCondition,
+					EXECUTION_START_TIMEOUT, getLogger())) {
+				logJobResult(jobId);
+				SampleResult result = new SampleResult();
+				result.setSuccessful(false);
+				result.setResponseMessage("Failed to wait for start of task execition");
+				return result;
+			}
+		}
 
-        SampleResult result = new SampleResult();
-        result.setSuccessful(true);
-        result.sampleStart();
+		SampleResult result = new SampleResult();
+		result.setSuccessful(true);
+		result.sampleStart();
 
-        for (Task task : job.getTasks()) {
-            boolean killed = scheduler.killTask(jobId, task.getName());
-            if (!killed && result.isSuccessful()) {
-                result.setSuccessful(false);
-                logError("Failed to kill task for job " + jobId + ", task: " + task.getName());
-                result.setResponseMessage("Failed to kill task " + task.getName());
-            }
-        }
+		for (Task task : job.getTasks()) {
+			boolean killed = scheduler.killTask(jobId, task.getName());
+			if (!killed && result.isSuccessful()) {
+				result.setSuccessful(false);
+				logError("Failed to kill task for job " + jobId + ", task: "
+						+ task.getName());
+				result.setResponseMessage("Failed to kill task "
+						+ task.getName());
+			}
+		}
 
-        result.sampleEnd();
+		result.sampleEnd();
 
-        if (!eventsMonitor.waitFor(jobCompleteCondition, FINISH_TIMEOUT, getLogger())) {
-            if (result.isSuccessful()) {
-                result.setSuccessful(false);
-                logError("Job " + jobId + " with killed tasks didn't finish as expected");
-                result.setResponseMessage("Job with killed tasks didn't finish as expected");
-            }
-        }
+		if (!eventsMonitor.waitFor(jobCompleteCondition, FINISH_TIMEOUT,
+				getLogger())) {
+			if (result.isSuccessful()) {
+				result.setSuccessful(false);
+				logError("Job " + jobId
+						+ " with killed tasks didn't finish as expected");
+				result.setResponseMessage("Job with killed tasks didn't finish as expected");
+			}
+		}
 
-        JobResult jobResult = scheduler.getJobResult(jobId);
-        if (result.isSuccessful()) {
-            for (TaskResult taskResult : jobResult.getAllResults().values()) {
-                if (!taskResult.hadException()) {
-                    result.setSuccessful(false);
-                    logError("Exception was expected for task " + taskResult.getTaskId() + ", job: " + jobId);
-                    result.setResponseMessage("Exception is expected for task " +
-                        taskResult.getTaskId().getReadableName() + "");
-                }
-            }
-        }
+		JobResult jobResult = scheduler.getJobResult(jobId);
+		if (result.isSuccessful()) {
+			for (TaskResult taskResult : jobResult.getAllResults().values()) {
+				if (!taskResult.hadException()) {
+					result.setSuccessful(false);
+					logError("Exception was expected for task "
+							+ taskResult.getTaskId() + ", job: " + jobId);
+					result.setResponseMessage("Exception is expected for task "
+							+ taskResult.getTaskId().getReadableName() + "");
+				}
+			}
+		}
 
-        if (!result.isSuccessful()) {
-            if (jobResult != null) {
-                logJobResult(jobResult);
-            } else {
-                logError("Job result was not available for job with killed tasks " + jobId);
-            }
-        }
+		if (!result.isSuccessful()) {
+			if (jobResult != null) {
+				logJobResult(jobResult);
+			} else {
+				logError("Job result was not available for job with killed tasks "
+						+ jobId);
+			}
+		}
 
-        return result;
-    }
+		return result;
+	}
 
 }

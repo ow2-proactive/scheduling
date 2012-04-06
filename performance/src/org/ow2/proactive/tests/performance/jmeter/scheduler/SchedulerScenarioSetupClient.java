@@ -55,6 +55,17 @@ import org.ow2.proactive.tests.performance.scheduler.SchedulerTestListener;
 import org.ow2.proactive.tests.performance.scheduler.TestSchedulerProxy;
 
 
+/**
+ * JavaSampler executed by the setUp ThreadGroup of the Scheduler test.
+ * <p/>
+ * To stress Scheduler event handling system it creates dummy Scheduler event listeners which
+ * are registered when test execution starts and removed when test finishes
+ * (number of these listeners is controlled by the property
+ * 'schedulerListenersNumber').
+ * 
+ * @author ProActive team
+ * 
+ */
 public class SchedulerScenarioSetupClient extends BaseJMeterClient {
 
     public static final String PARAM_LISTENERS_NUMBER = "schedulerListenersNumber";

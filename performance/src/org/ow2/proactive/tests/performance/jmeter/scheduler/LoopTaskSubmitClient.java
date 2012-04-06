@@ -46,7 +46,14 @@ import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
 
 
 /**
- * Scenario submits job with task executed in loop.
+ * Test scenario 'Submit loop workflow tasks' (it executes basic 'submit job'
+ * scenario, see BaseJobSubmitClient for details).
+ * <p/>
+ * Scenario submits job with task executed in the loop, job has two tasks,
+ * second task depends on the first and second task is executed in the loop N
+ * times (parameter N is configurable).
+ * 
+ * @author ProActive team
  * 
  */
 public class LoopTaskSubmitClient extends BaseJobSubmitClient {

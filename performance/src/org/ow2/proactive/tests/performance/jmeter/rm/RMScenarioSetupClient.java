@@ -55,6 +55,17 @@ import org.ow2.proactive.tests.performance.rm.RMTestListener;
 import org.ow2.proactive.tests.performance.rm.TestRMProxy;
 
 
+/**
+ * JavaSampler executed by the setUp ThreadGroup of the RM test.
+ * <p/>
+ * To stress RM event handling system it creates dummy RM event listeners which
+ * are registered when test execution starts and removed when test finishes
+ * (number of these listeners is controlled by the property
+ * 'rmListenersNumber').
+ * 
+ * @author ProActive team
+ * 
+ */
 public class RMScenarioSetupClient extends BaseJMeterClient {
 
     public static final String PARAM_LISTENERS_NUMBER = "rmListenersNumber";

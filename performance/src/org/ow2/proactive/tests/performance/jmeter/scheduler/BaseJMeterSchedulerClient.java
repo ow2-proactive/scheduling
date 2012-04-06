@@ -48,6 +48,13 @@ import org.ow2.proactive.tests.performance.jmeter.BaseJMeterClient;
 import org.ow2.proactive.tests.performance.scheduler.TestSchedulerProxy;
 
 
+/**
+ * Base JavaSampler for all samplers working with Scheduler (it handles
+ * connection to the Scheduler and provides some common utility methods).
+ * 
+ * @author ProActive team
+ * 
+ */
 public abstract class BaseJMeterSchedulerClient extends BaseJMeterClient {
 
     private TestSchedulerProxy schedulerProxy;

@@ -54,135 +54,155 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import org.ow2.proactive.tests.performance.deployment.TestDeployer;
 
-
+/**
+ * Test scenario 'Submit failing task' (it executes basic 'submit job' scenario,
+ * see BaseJobSubmitClient for details).
+ * <p/>
+ * Scenario submits job with two tasks which always fail: java task (throws
+ * exception) and native task (exits with code 1). Tasks are created with
+ * parameter maxNumberOfExecution=3 so scheduler tries to execute each task 3
+ * times.
+ * 
+ * @author ProActive team
+ * 
+ */
 public class SubmitFailingTaskSchedulerClient extends BaseJobSubmitClient {
 
-    public static class FailingJavaTask extends JavaExecutable {
+	public static class FailingJavaTask extends JavaExecutable {
 
-        @Override
-        public Serializable execute(TaskResult... results) throws Throwable {
-            System.out.println("Task throws exception");
-            throw new Exception("Test exception");
-        }
+		@Override
+		public Serializable execute(TaskResult... results) throws Throwable {
+			System.out.println("Task throws exception");
+			throw new Exception("Test exception");
+		}
 
-    }
+	}
 
-    public static final String PARAM_FAILING_TASK_SUBMIT_TASK_TYPE = "failingTaskSubmitTaskType";
+	public static final String PARAM_FAILING_TASK_SUBMIT_TASK_TYPE = "failingTaskSubmitTaskType";
 
-    public static final String PARAM_FAILING_TASK_SUBMIT_RESTART_MODE = "failingTaskSubmitRestartMode";
+	public static final String PARAM_FAILING_TASK_SUBMIT_RESTART_MODE = "failingTaskSubmitRestartMode";
 
-    public static final int NUMBER_OF_EXECUTION = 3;
+	public static final int NUMBER_OF_EXECUTION = 3;
 
-    private static final String taskName = "Task-SubmitFailingTaskSchedulerClient";
+	private static final String taskName = "Task-SubmitFailingTaskSchedulerClient";
 
-    private TaskType taskType;
+	private TaskType taskType;
 
-    private RestartMode restartMode;
+	private RestartMode restartMode;
 
-    @Override
-    public Arguments getDefaultParameters() {
-        Arguments args = super.getDefaultParameters();
-        args.addArgument(PARAM_FAILING_TASK_SUBMIT_TASK_TYPE, "${failingTaskSubmitTaskType}");
-        args.addArgument(PARAM_FAILING_TASK_SUBMIT_RESTART_MODE, "${failingTaskSubmitRestartMode}");
-        return args;
-    }
+	@Override
+	public Arguments getDefaultParameters() {
+		Arguments args = super.getDefaultParameters();
+		args.addArgument(PARAM_FAILING_TASK_SUBMIT_TASK_TYPE,
+				"${failingTaskSubmitTaskType}");
+		args.addArgument(PARAM_FAILING_TASK_SUBMIT_RESTART_MODE,
+				"${failingTaskSubmitRestartMode}");
+		return args;
+	}
 
-    @Override
-    protected void doSetupTest(JavaSamplerContext context) throws Throwable {
-        super.doSetupTest(context);
+	@Override
+	protected void doSetupTest(JavaSamplerContext context) throws Throwable {
+		super.doSetupTest(context);
 
-        String taskTypeParam = getRequiredParameter(context, PARAM_FAILING_TASK_SUBMIT_TASK_TYPE);
-        taskType = TaskType.valueOf(taskTypeParam);
+		String taskTypeParam = getRequiredParameter(context,
+				PARAM_FAILING_TASK_SUBMIT_TASK_TYPE);
+		taskType = TaskType.valueOf(taskTypeParam);
 
-        String restartMode = getRequiredParameter(context, PARAM_FAILING_TASK_SUBMIT_RESTART_MODE);
-        if (restartMode.equals("ANYWHERE")) {
-            this.restartMode = RestartMode.ANYWHERE;
-        } else if (restartMode.equals("ELSEWHERE")) {
-            this.restartMode = RestartMode.ELSEWHERE;
-        } else {
-            throw new IllegalArgumentException("Invalid restart mode: " + restartMode);
-        }
-    }
+		String restartMode = getRequiredParameter(context,
+				PARAM_FAILING_TASK_SUBMIT_RESTART_MODE);
+		if (restartMode.equals("ANYWHERE")) {
+			this.restartMode = RestartMode.ANYWHERE;
+		} else if (restartMode.equals("ELSEWHERE")) {
+			this.restartMode = RestartMode.ELSEWHERE;
+		} else {
+			throw new IllegalArgumentException("Invalid restart mode: "
+					+ restartMode);
+		}
+	}
 
-    @Override
-    protected TaskFlowJob createJob(String jobName) throws Exception {
-        TaskFlowJob job = new TaskFlowJob();
-        job.setName(jobName);
-        job.setPriority(JobPriority.NORMAL);
-        job.setCancelJobOnError(false);
-        job.setDescription("Job with one task (task always fails), type: " + taskType + ", restart: " +
-            restartMode);
+	@Override
+	protected TaskFlowJob createJob(String jobName) throws Exception {
+		TaskFlowJob job = new TaskFlowJob();
+		job.setName(jobName);
+		job.setPriority(JobPriority.NORMAL);
+		job.setCancelJobOnError(false);
+		job.setDescription("Job with one task (task always fails), type: "
+				+ taskType + ", restart: " + restartMode);
 
-        Task task;
+		Task task;
 
-        switch (taskType) {
-            case java_task:
-                task = createJavaTask();
-                JobEnvironment jobEnv = new JobEnvironment();
-                jobEnv.setJobClasspath(new String[] { testsClasspath });
-                job.setEnvironment(jobEnv);
-                break;
-            case native_task:
-                task = createNativeTask(testsSourcePath);
-                break;
-            default:
-                throw new IllegalArgumentException("Invalid task type: " + taskType);
-        }
+		switch (taskType) {
+		case java_task:
+			task = createJavaTask();
+			JobEnvironment jobEnv = new JobEnvironment();
+			jobEnv.setJobClasspath(new String[] { testsClasspath });
+			job.setEnvironment(jobEnv);
+			break;
+		case native_task:
+			task = createNativeTask(testsSourcePath);
+			break;
+		default:
+			throw new IllegalArgumentException("Invalid task type: " + taskType);
+		}
 
-        task.setName(taskName);
-        task.setMaxNumberOfExecution(NUMBER_OF_EXECUTION);
-        task.setCancelJobOnError(false);
-        task.setRestartTaskOnError(restartMode);
+		task.setName(taskName);
+		task.setMaxNumberOfExecution(NUMBER_OF_EXECUTION);
+		task.setCancelJobOnError(false);
+		task.setRestartTaskOnError(restartMode);
 
-        job.addTask(task);
+		job.addTask(task);
 
-        return job;
-    }
+		return job;
+	}
 
-    @Override
-    protected void checkJobResult(JobResult jobResult, SampleResult result) throws Exception {
-        if (jobResult.getAllResults().size() != 1) {
-            logError("One task result is expected instead of " + jobResult.getAllResults().size() +
-                " for job with failing tasks " + jobResult.getJobId());
-            result.setResponseMessage("One task result is expected instead of " +
-                jobResult.getAllResults().size());
-            return;
-        }
+	@Override
+	protected void checkJobResult(JobResult jobResult, SampleResult result)
+			throws Exception {
+		if (jobResult.getAllResults().size() != 1) {
+			logError("One task result is expected instead of "
+					+ jobResult.getAllResults().size()
+					+ " for job with failing tasks " + jobResult.getJobId());
+			result.setResponseMessage("One task result is expected instead of "
+					+ jobResult.getAllResults().size());
+			return;
+		}
 
-        boolean error = false;
+		boolean error = false;
 
-        for (int i = 0; i < NUMBER_OF_EXECUTION; i++) {
-            TaskResult taskResult = getScheduler().getTaskResultFromIncarnation(jobResult.getJobId(),
-                    taskName, i);
-            if (taskType == TaskType.java_task) {
-                if (taskResult.getException() == null) {
-                    error = true;
-                    logError("Exception was expected in the result for job " + jobResult.getJobId());
-                    result.setResponseMessage("Exception is expected in task result");
-                    break;
-                }
-            }
-        }
+		for (int i = 0; i < NUMBER_OF_EXECUTION; i++) {
+			TaskResult taskResult = getScheduler()
+					.getTaskResultFromIncarnation(jobResult.getJobId(),
+							taskName, i);
+			if (taskType == TaskType.java_task) {
+				if (taskResult.getException() == null) {
+					error = true;
+					logError("Exception was expected in the result for job "
+							+ jobResult.getJobId());
+					result.setResponseMessage("Exception is expected in task result");
+					break;
+				}
+			}
+		}
 
-        result.setSuccessful(!error);
-    }
+		result.setSuccessful(!error);
+	}
 
-    static Task createJavaTask() {
-        JavaTask task = new JavaTask();
-        task.setExecutableClassName(FailingJavaTask.class.getName());
-        task.setDescription("Test java task, throws exception");
-        ForkEnvironment forkEnv = new ForkEnvironment();
-        forkEnv.addJVMArgument("-D" + TestDeployer.TEST_JVM_OPTION);
-        task.setForkEnvironment(forkEnv);
-        return task;
-    }
+	static Task createJavaTask() {
+		JavaTask task = new JavaTask();
+		task.setExecutableClassName(FailingJavaTask.class.getName());
+		task.setDescription("Test java task, throws exception");
+		ForkEnvironment forkEnv = new ForkEnvironment();
+		forkEnv.addJVMArgument("-D" + TestDeployer.TEST_JVM_OPTION);
+		task.setForkEnvironment(forkEnv);
+		return task;
+	}
 
-    static Task createNativeTask(String testsSourcePath) {
-        NativeTask task = new NativeTask();
-        task.setCommandLine(new String[] { testsSourcePath +
-            "/org/ow2/proactive/tests/performance/jmeter/scheduler/failing_nativeTask.sh" });
-        task.setDescription("Test native task, exits with code 1");
-        return task;
-    }
+	static Task createNativeTask(String testsSourcePath) {
+		NativeTask task = new NativeTask();
+		task.setCommandLine(new String[] { testsSourcePath
+				+ "/org/ow2/proactive/tests/performance/jmeter/scheduler/failing_nativeTask.sh" });
+		task.setDescription("Test native task, exits with code 1");
+		return task;
+	}
 
 }

@@ -41,6 +41,19 @@ import org.apache.log.Logger;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
 
 
+/**
+ * Test JavaSamplers work with ProActive which internally starts some non-daemon
+ * threads and JMeter process can finish when test execution completes because
+ * of this threads. This class is used as workaround for this ProActive issue:
+ * special JavaSampler executed by the setUp ThreadGroup from its 'teardownTest'
+ * method starts JVMKillerThread which after some delay calls System.exit (delay
+ * is needed because JMeter has do some work after 'teardownTest' is called).
+ * This hack with JVMKillerThread isn't reliable but I didn't find another
+ * simple solution.
+ * 
+ * @author ProActive team
+ * 
+ */
 public class JVMKillerThread extends Thread {
 
     private final long killDelay;
