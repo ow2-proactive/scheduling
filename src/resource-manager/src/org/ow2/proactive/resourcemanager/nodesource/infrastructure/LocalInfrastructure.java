@@ -118,6 +118,17 @@ public class LocalInfrastructure extends InfrastructureManager {
                 paProperties += "\"";
             }
         }
+        if (!paProperties.contains(CentralPAPropertyRepository.PA_CONFIGURATION_FILE.getName())) {
+            paProperties += " " + CentralPAPropertyRepository.PA_CONFIGURATION_FILE.getCmdLine();
+            if (containsSpace) {
+                paProperties += "\"";
+            }
+            paProperties += rmHome + "config" + osObj.fs + "proactive" + osObj.fs +
+                "ProActiveConfiguration.xml";
+            if (containsSpace) {
+                paProperties += "\"";
+            }
+        }
         if (!paProperties.contains(PAResourceManagerProperties.RM_HOME.getKey())) {
             paProperties += " " + PAResourceManagerProperties.RM_HOME.getCmdLine();
             if (containsSpace) {
