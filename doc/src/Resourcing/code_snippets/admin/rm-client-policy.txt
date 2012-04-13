@@ -5,41 +5,43 @@ Name: Release Resources When Scheduler Idle
 Description: Releases all resources when scheduler is idle for specified
 time. Acquires them back on job submission.
 Class name: org.ow2.proactive.scheduler.resourcemanager.nodesource.policy.ReleaseResourcesWhenSchedulerIdle
-Parameters: <class name> nodeUsers[ALL] nodeProviders[ME] schedulerUrl schedulerCredentialsPath idleTime[60000]
+Parameters: <class name> userAccessType[ALL] providerAccessType[ME] schedulerUrl schedulerCredentialsPath idleTime[60000] 
 
 Name: Cron Load Based Policy
 Description: Triggers new nodes acquisition when scheduler is overloaded within a time slot defined in crontab syntax.
 Class name: org.ow2.proactive.scheduler.resourcemanager.nodesource.policy.CronLoadBasedPolicy
-Parameters: <class name> nodeUsers[ALL] nodeProviders[ME] schedulerUrl schedulerCredentialsPath refreshTime[1000] minNodes[0] maxNodes[10] loadFactor[10] nodeDeploymentTimeout[10000] acquisionAllowed[* * * * *] acquisionForbidden[* * * * *] preemptive[false] allowed[false]
+Parameters: <class name> userAccessType[ALL] providerAccessType[ME] schedulerUrl schedulerCredentialsPath refreshTime[1000] minNodes[0] maxNodes[10] loadFactor[10] nodeDeploymentTimeout[10000] acquisionAllowed[* * * * *] acquisionForbidden[* * * * *] preemptive[false] allowed[false] 
 
 Name: EC2 Policy
 Description: Allocates as many resources as scheduler required according
 to loading factor. Releases resources smoothly.
 Class name: org.ow2.proactive.scheduler.resourcemanager.nodesource.policy.EC2Policy
-Parameters: <class name> nodeUsers[ALL] nodeProviders[ME] schedulerUrl schedulerCredentialsPath refreshTime[1000] minNodes[0] maxNodes[10] loadFactor[10] nodeDeploymentTimeout[2400000]
+Parameters: <class name> userAccessType[ALL] providerAccessType[ME] schedulerUrl schedulerCredentialsPath refreshTime[1000] minNodes[0] maxNodes[10] loadFactor[10] nodeDeploymentTimeout[2400000] 
 
 Name: Time Slot Policy
 Description: Acquires and releases nodes at specified time.
 Class name: org.ow2.proactive.resourcemanager.nodesource.policy.TimeSlotPolicy
-Parameters: <class name> nodeUsers[ALL] nodeProviders[ME] acquireTime[7/18/11 10:31:13 AM CEST] releaseTime[7/18/11 11:31:13 AM CEST] period[86400000] preemptive[true]
+Parameters: <class name> userAccessType[ALL] providerAccessType[ME] acquireTime[4/12/12 5:06:37 AM PDT] releaseTime[4/12/12 6:06:37 AM PDT] period[86400000] preemptive[true] 
 
 Name: Cron Slot Load Based Policy
 Description: Keeps all nodes up and running within specified time slot and acquires node on demand when scheduler is overloaded at another time.
 Class name: org.ow2.proactive.scheduler.resourcemanager.nodesource.policy.CronSlotLoadBasedPolicy
-Parameters: <class name> nodeUsers[ALL] nodeProviders[ME] schedulerUrl schedulerCredentialsPath refreshTime[1000] minNodes[0] maxNodes[10] loadFactor[10] nodeDeploymentTimeout[10000] deployAllAt[* * * * *] undeployAllAt[* * * * *] preemptive[false] acquireNow[false]
+Parameters: <class name> userAccessType[ALL] providerAccessType[ME] schedulerUrl schedulerCredentialsPath refreshTime[1000] minNodes[0] maxNodes[10] loadFactor[10] nodeDeploymentTimeout[10000] deployAllAt[* * * * *] undeployAllAt[* * * * *] preemptive[false] acquireNow[false] 
 
 Name: Scheduler Loading Policy
 Description: Allocates as many resources as scheduler required according
 to loading factor. Releases resources smoothly.
 Class name: org.ow2.proactive.scheduler.resourcemanager.nodesource.policy.SchedulerLoadingPolicy
-Parameters: <class name> nodeUsers[ALL] nodeProviders[ME] schedulerUrl schedulerCredentialsPath refreshTime[1000] minNodes[0] maxNodes[10] loadFactor[10] nodeDeploymentTimeout[10000]
+Parameters: <class name> userAccessType[ALL] providerAccessType[ME] schedulerUrl schedulerCredentialsPath refreshTime[1000] minNodes[0] maxNodes[10] loadFactor[10] nodeDeploymentTimeout[10000] 
 
 Name: Static Policy
 Description: Static nodes acquisition.
 Class name: org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy
-Parameters: <class name> nodeUsers[ALL] nodeProviders[ME]
+Parameters: <class name> userAccessType[ALL] providerAccessType[ME] 
 
 Name: Cron Policy
 Description: Acquires and releases nodes at specified time.
 Class name: org.ow2.proactive.resourcemanager.nodesource.policy.CronPolicy
-Parameters: <class name> nodeUsers[ALL] nodeProviders[ME] nodeAcquision[* * * * *] nodeRemoval[* * * * *] preemptive[false] forceDeployment[false]
+Parameters: <class name> userAccessType[ALL] providerAccessType[ME] nodeAcquision[* * * * *] nodeRemoval[* * * * *] preemptive[false] forceDeployment[false] 
+
+

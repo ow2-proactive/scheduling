@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="Resource_Manager_wui">
+<info><title>Resource Manager Web Interface</title></info>
+<!--  <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V5.0//EN" "../docbook.dtd">  -->
+	<para>
+		<emphasis role="bold">
+		Resource Manager Web Interface</emphasis> allows you to manage and monitor the server part
+		through your web browser. It looks similar to the RM GUI, so please refer to the <xref linkend="Resource_Manager_plugin" />
+		to understand the meaning of all actions, views and icons.
+	</para>
+	<para>
+		In this section we will describe a node/host monitoring feature that is available only with
+		web interface.
+	</para>
+
+	<section xml:id="RM_NODE_SIGAR"><info><title>Sigar</title></info>
+		<para>
+			Every node in the resource manager is capable to monitor underneath system. 
+			We have selected the 
+			<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://support.hyperic.com/display/SIGAR/Home">
+			Hyperic's System Information Gatherer
+			</link> (SIGAR) as a cross
+			-platform API for collecting software inventory data. SIGAR includes support 
+			for the majority of modern operating systems (Linux, Windows, Mac OSX and others) 
+			across a variety of versions and architectures. SIGAR API offers a portable access 
+			to the OS-level monitoring data including:
+			<itemizedlist>
+				<listitem><para>
+					System memory, swap, cpu, load average, uptime, logins.
+					</para>
+				</listitem>
+				<listitem>
+				<para>
+					Per-process memory, cpu, credential info, state, arguments, environment, open files.
+					</para>
+				</listitem>
+				<listitem>
+				<para>
+					File system detection and metrics.
+					</para>
+				</listitem>
+				<listitem>
+				<para>
+					Network interface detection, configuration information and metrics.
+					</para>
+				</listitem>
+				<listitem>
+				<para>
+					Network route and connection tables.
+					</para>
+				</listitem>
+			</itemizedlist>			
+			SIGAR integration into the ProActive Scheduling framework is done at multiple levels, 
+			the SIGAR monitoring data is exposed using JMX components on the node level to the REST 
+			Server accessed by the Web Portal. The JMX technology (see 
+			<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://jcp.org/en/jsr/detail?id=160">
+			JSR 160: JavaTM Management Extensions Remote API
+			</link> ) offers a modular and dynamic way to expose monitored data that can 
+			be aggregated using any JMX Clients (JConsole, JManage, MC4J, etc.). 
+		</para>
+		<para>
+			More precisely using JMX terminology, a ProActive Node contains an MBeanServer that 
+			contains MBeans for each aspect of monitoring (CPU, Memory, Network and Processes), 
+			they are exposed to the external applications through:
+			<itemizedlist>
+				<listitem><para>
+					RMI Connector url offers optimal performance but is limited to local networks only, for example: service:jmx:rmi:///jndi/rmi://optimus.activeeon.com:39437/rmnode
+					</para>
+				</listitem>
+				<listitem>
+				<para>
+					ProActive RemoteObjects Connector can be used within routed protocols (see pamr), for example: service:jmx:ro:///jndi/rmi://optimus.activeeon.com:1102/rmnode
+					</para>
+				</listitem>
+			</itemizedlist>
+			The REST Server acts as a JMX client application that aggregates the collected monitoring data and exposes it to any kind of HTTP clients, this offers maximal 
+			flexibility and portability and can be requested by native applications.		
+		</para>
+		
+		<figure xml:id="sigar_arch"><info><title>Sigar data transfer</title></info>
+				<mediaobject>
+					<imageobject>
+						<imagedata scalefit="1" width="80%" contentdepth="80%"  fileref="images/png/sigar_jmx_rest.png" format="PNG"/>
+					</imageobject>
+				</mediaobject>
+		</figure>
+		
+		</section>
+		<section xml:id="rm_node_monitoring"><info><title>Node and Host Monitoring</title></info>
+		<para>
+			To start the resource manager with web interface, run the <emphasis>scheduler-start-gui</emphasis>
+			script in <literal>bin/unix/</literal> directory. It will launch both RM and Scheduler and their 
+			web interfaces. Then go to <emphasis role="bold">http://localhost:8080/rm</emphasis> and login.
+			The gathered monitoring data can be host specific or node specific. The following screenshots shows different available views in the WEB Portals taken from some unix hosts.			
+		</para>
+
+		<figure xml:id="monitor_1"><info><title>Host Overview</title></info>
+				<mediaobject>
+					<imageobject>
+						<imagedata width="80%"  fileref="images/png/monitor/s1.png" format="PNG"/>
+					</imageobject>
+				</mediaobject>
+		</figure>
+		<figure xml:id="monitor_2"><info><title>Cpu and Cores Utilization</title></info>
+				<mediaobject>
+					<imageobject>
+						<imagedata width="80%" fileref="images/png/monitor/s2.png" format="PNG"/>
+					</imageobject>
+				</mediaobject>
+		</figure>
+		<figure xml:id="monitor_3"><info><title>Memory Consumption</title></info>
+				<mediaobject>
+					<imageobject>
+						<imagedata width="80%" fileref="images/png/monitor/s3.png" format="PNG"/>
+					</imageobject>
+				</mediaobject>
+		</figure>
+		<figure xml:id="monitor_4"><info><title>File System Usage</title></info>
+				<mediaobject>
+					<imageobject>
+						<imagedata width="80%" fileref="images/png/monitor/s4.png" format="PNG"/>
+					</imageobject>
+				</mediaobject>
+		</figure>		
+		<figure xml:id="monitor_5"><info><title>Network Interfaces</title></info>
+				<mediaobject>
+					<imageobject>
+						<imagedata width="80%" fileref="images/png/monitor/s5.png" format="PNG"/>
+					</imageobject>
+				</mediaobject>
+		</figure>
+		<figure xml:id="monitor_6"><info><title>Proactive Node Overview</title></info>
+				<mediaobject>
+					<imageobject>
+						<imagedata width="80%" fileref="images/png/monitor/s6.png" format="PNG"/>
+					</imageobject>
+				</mediaobject>
+		</figure>
+		<figure xml:id="monitor_7"><info><title>Proactive Node Summary</title></info>
+				<mediaobject>
+					<imageobject>
+						<imagedata width="80%" fileref="images/png/monitor/s7.png" format="PNG"/>
+					</imageobject>
+				</mediaobject>
+		</figure>
+		</section>
+</section>

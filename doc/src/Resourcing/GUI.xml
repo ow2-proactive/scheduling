@@ -212,6 +212,16 @@
 					</para>
 				</listitem>
 				<listitem>
+				<mediaobject>
+				<imageobject>
+						<imagedata scalefit="1" fileref="images/png/plugin/locked.png" format="PNG"/>
+				</imageobject>
+				</mediaobject>
+				<para>
+					Node is <emphasis role="bold">locked</emphasis> by its administrator. It is under maintenance and cannot be used for computations.
+					</para>
+				</listitem>
+				<listitem>
 					<mediaobject>
 						<imageobject>
 							<imagedata scalefit="1" fileref="images/png/plugin/down.png" format="PNG"/>
