@@ -51,6 +51,7 @@ import org.ow2.proactive.tests.performance.scheduler.SchedulerEventsMonitor;
 import org.ow2.proactive.tests.performance.scheduler.SchedulerTestListener;
 import org.ow2.proactive.tests.performance.scheduler.SchedulerWaitCondition;
 
+
 /**
  * Test scenario 'Submit sample jobs'.
  * <p/>

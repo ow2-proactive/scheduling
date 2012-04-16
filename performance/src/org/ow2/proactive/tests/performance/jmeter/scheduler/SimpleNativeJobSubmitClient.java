@@ -40,6 +40,7 @@ import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.NativeTask;
 
+
 /**
  * Test scenario 'Submit simple native task' (it executes basic 'submit job'
  * scenario, see BaseJobSubmitClient for details).
@@ -52,25 +53,25 @@ import org.ow2.proactive.scheduler.common.task.NativeTask;
  */
 public class SimpleNativeJobSubmitClient extends BaseJobSubmitClient {
 
-	@Override
-	protected TaskFlowJob createJob(String jobName) throws Exception {
-		TaskFlowJob job = new TaskFlowJob();
-		job.setName(jobName);
-		job.setPriority(JobPriority.NORMAL);
-		job.setCancelJobOnError(true);
-		job.setDescription("Job with one native task (task exits immediately)");
+    @Override
+    protected TaskFlowJob createJob(String jobName) throws Exception {
+        TaskFlowJob job = new TaskFlowJob();
+        job.setName(jobName);
+        job.setPriority(JobPriority.NORMAL);
+        job.setCancelJobOnError(true);
+        job.setDescription("Job with one native task (task exits immediately)");
 
-		NativeTask task = new NativeTask();
-		task.setCommandLine(new String[] { testsSourcePath
-				+ "/org/ow2/proactive/tests/performance/jmeter/scheduler/nativeTask.sh" });
-		task.setName("Simple native task");
-		task.setDescription("Test native task, exits immediately");
-		task.setMaxNumberOfExecution(1);
-		task.setCancelJobOnError(true);
+        NativeTask task = new NativeTask();
+        task.setCommandLine(new String[] { testsSourcePath +
+            "/org/ow2/proactive/tests/performance/jmeter/scheduler/nativeTask.sh" });
+        task.setName("Simple native task");
+        task.setDescription("Test native task, exits immediately");
+        task.setMaxNumberOfExecution(1);
+        task.setCancelJobOnError(true);
 
-		job.addTask(task);
+        job.addTask(task);
 
-		return job;
-	}
+        return job;
+    }
 
 }
