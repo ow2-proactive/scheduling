@@ -47,6 +47,7 @@ import java.util.Map;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.ow2.proactive.tests.performance.deployment.process.ProcessExecutor;
 import org.ow2.proactive.tests.performance.utils.TestFileUtils;
+import org.ow2.proactive.tests.performance.utils.TestUtils;
 
 
 public abstract class TestDeployer {
@@ -180,6 +181,41 @@ public abstract class TestDeployer {
 
     private TestProtocolHelper createProtocolHelper(String protocol, HostTestEnv serverHostEnv)
             throws InterruptedException {
+        if (protocol.equalsIgnoreCase("multi")) {
+
+            String baseProtocolProperty = TestUtils.getRequiredProperty("test.deploy.multiprotocol.protocol");
+            String additionalProtocolsProperty = TestUtils
+                    .getRequiredProperty("test.deploy.multiprotocol.additional_protocols");
+            String protocolsOrderProperty = TestUtils
+                    .getRequiredProperty("test.deploy.multiprotocol.protocols_order");
+
+            for (String protocolValue : protocolsOrderProperty.split(",")) {
+                String trimmed = protocolValue.trim();
+                if (!trimmed.equals("rmi") && !trimmed.equals("pnp") && !trimmed.equals("pamr")) {
+                    throw new IllegalArgumentException(
+                        "Invalid protocol in the test.deploy.multiprotocol.protocols_order: " + protocolValue);
+                }
+            }
+
+            TestProtocolHelper baseProtocol = createBasicProtocolHelper(baseProtocolProperty, serverHostEnv);
+
+            List<TestProtocolHelper> additionalProtocols = new ArrayList<TestProtocolHelper>();
+            for (String additionalProtocol : additionalProtocolsProperty.split(",")) {
+                additionalProtocols.add(createBasicProtocolHelper(additionalProtocol.trim(), serverHostEnv));
+            }
+            if (additionalProtocols.isEmpty()) {
+                throw new IllegalArgumentException(
+                    "Additional protocols are not specified for multi-protocol");
+            }
+
+            return new TestMultiprotocolHelper(serverHostEnv, baseProtocol, additionalProtocols,
+                protocolsOrderProperty);
+        } else {
+            return createBasicProtocolHelper(protocol, serverHostEnv);
+        }
+    }
+
+    private TestProtocolHelper createBasicProtocolHelper(String protocol, HostTestEnv serverHostEnv) {
         if (protocol.equalsIgnoreCase("pnp")) {
             return new TestPnpProtocolHelper(serverHostEnv);
         } else if (protocol.equalsIgnoreCase("pamr")) {

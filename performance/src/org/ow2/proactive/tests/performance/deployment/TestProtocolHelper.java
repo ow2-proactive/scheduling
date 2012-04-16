@@ -44,8 +44,15 @@ public abstract class TestProtocolHelper {
 
     protected final HostTestEnv serverHostEnv;
 
-    public TestProtocolHelper(HostTestEnv serverHostEnv) {
+    protected final String protocolName;
+
+    public TestProtocolHelper(HostTestEnv serverHostEnv, String protocolName) {
         this.serverHostEnv = serverHostEnv;
+        this.protocolName = protocolName;
+    }
+
+    public String getProtocolName() {
+        return protocolName;
     }
 
     public abstract String prepareForDeployment() throws Exception;

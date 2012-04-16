@@ -50,7 +50,7 @@ public class TestPnpProtocolHelper extends TestProtocolHelper {
     private Integer pnpPort;
 
     public TestPnpProtocolHelper(HostTestEnv serverHostEnv) {
-        super(serverHostEnv);
+        super(serverHostEnv, "pnp");
     }
 
     @Override
@@ -63,7 +63,7 @@ public class TestPnpProtocolHelper extends TestProtocolHelper {
     @Override
     public Map<String, String> getClientProActiveProperties() {
         Map<String, String> properties = new HashMap<String, String>();
-        properties.put(CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL.getName(), "pnp");
+        properties.put(CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL.getName(), protocolName);
         return properties;
     }
 
@@ -74,7 +74,7 @@ public class TestPnpProtocolHelper extends TestProtocolHelper {
         }
         List<String> options = new ArrayList<String>();
         options.add(PNPConfig.PA_PNP_PORT.getCmdLine() + String.valueOf(pnpPort.intValue()));
-        options.add(CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL.getCmdLine() + "pnp");
+        options.add(CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL.getCmdLine() + protocolName);
         return options;
     }
 
