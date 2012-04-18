@@ -396,8 +396,10 @@ final class SchedulingMethodImpl implements SchedulingMethod {
 
         try {
             TopologyDescriptor descriptor = null;
+            boolean bestEffort = true;
             if (internalTask.isParallel()) {
                 descriptor = internalTask.getParallelEnvironment().getTopologyDescriptor();
+                bestEffort = false;
                 if (descriptor == null) {
                     logger.debug("Topology is not defined for the task " + internalTask.getName());
                 }
@@ -408,9 +410,9 @@ final class SchedulingMethodImpl implements SchedulingMethod {
             }
 
             try {
-                nodeSet = core.rmProxiesManager.getUserRMProxy(currentJob).getAtMostNodes(
-                        neededResourcesNumber, descriptor, internalTask.getSelectionScripts(),
-                        internalTask.getNodeExclusion());
+                nodeSet = core.rmProxiesManager.getUserRMProxy(currentJob).getNodes(neededResourcesNumber,
+                        descriptor, internalTask.getSelectionScripts(), internalTask.getNodeExclusion(),
+                        bestEffort);
             } catch (TopologyDisabledException tde) {
                 logger_dev.info("Cancel job " + currentJob.getName() + " as the topology is disabled");
                 simulateJobStartAndCancelIt(tasksToSchedule, "Topology is disabled");

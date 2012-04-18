@@ -295,6 +295,15 @@ public class UserRMProxy implements ResourceManager, RunActive {
      * {@inheritDoc}
      */
     @ImmediateService
+    public NodeSet getNodes(int number, TopologyDescriptor descriptor,
+            List<SelectionScript> selectionScriptsList, NodeSet exclusion, boolean bestEffort) {
+        return rm.getNodes(number, descriptor, selectionScriptsList, exclusion, bestEffort);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @ImmediateService
     public BooleanWrapper disconnect() {
         return rm.disconnect();
     }
@@ -458,4 +467,5 @@ public class UserRMProxy implements ResourceManager, RunActive {
     public <T> List<ScriptResult<T>> executeScript(Script<T> script, String targetType, Set<String> targets) {
         return rm.executeScript(script, targetType, targets);
     }
+
 }

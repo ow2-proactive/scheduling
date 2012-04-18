@@ -151,7 +151,7 @@ public abstract class SelectionManager {
             RMNode rmnode);
 
     public NodeSet selectNodes(int number, TopologyDescriptor topologyDescriptor,
-            List<SelectionScript> scripts, NodeSet exclusion, Client client) {
+            List<SelectionScript> scripts, NodeSet exclusion, Client client, boolean bestEffort) {
 
         // can throw Exception if topology is disabled
         TopologyHandler handler = RMCore.topologyManager.getHandler(topologyDescriptor);
@@ -213,6 +213,13 @@ public abstract class SelectionManager {
         // TopologyHandler handler = RMCore.topologyManager.getHandler(topologyDescriptor);
         logger.info("Looking for nodes using " + topologyDescriptor);
         NodeSet selectedNodes = handler.select(number, matchedNodes);
+
+        if (selectedNodes.size() < number && !bestEffort) {
+            selectedNodes.clear();
+            if (selectedNodes.getExtraNodes() != null) {
+                selectedNodes.getExtraNodes().clear();
+            }
+        }
 
         // the nodes are selected, now mark them as busy.
         for (Node node : new LinkedList<Node>(selectedNodes)) {
