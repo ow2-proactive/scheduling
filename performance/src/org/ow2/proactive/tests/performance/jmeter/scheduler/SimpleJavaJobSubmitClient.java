@@ -41,6 +41,7 @@ import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 
+
 /**
  * Test scenario 'Submit simple java task' (it executes basic 'submit job'
  * scenario, see BaseJobSubmitClient for details).
@@ -53,26 +54,26 @@ import org.ow2.proactive.scheduler.common.task.JavaTask;
  */
 public class SimpleJavaJobSubmitClient extends BaseJobSubmitClient {
 
-	@Override
-	protected TaskFlowJob createJob(String jobName) throws Exception {
-		TaskFlowJob job = new TaskFlowJob();
-		job.setName(jobName);
-		job.setPriority(JobPriority.NORMAL);
-		job.setCancelJobOnError(true);
-		job.setDescription("Job with one java task (task exits immediately)");
-		job.setMaxNumberOfExecution(1);
+    @Override
+    protected TaskFlowJob createJob(String jobName) throws Exception {
+        TaskFlowJob job = new TaskFlowJob();
+        job.setName(jobName);
+        job.setPriority(JobPriority.NORMAL);
+        job.setCancelJobOnError(true);
+        job.setDescription("Job with one java task (task exits immediately)");
+        job.setMaxNumberOfExecution(1);
 
-		JobEnvironment jobEnv = new JobEnvironment();
-		jobEnv.setJobClasspath(new String[] { testsClasspath });
-		job.setEnvironment(jobEnv);
+        JobEnvironment jobEnv = new JobEnvironment();
+        jobEnv.setJobClasspath(new String[] { testsClasspath });
+        job.setEnvironment(jobEnv);
 
-		JavaTask task = createSimpleJavaTask(true);
-		task.setName("Simple java task");
-		task.setDescription("Test java task, exits immediately");
+        JavaTask task = createSimpleJavaTask(true);
+        task.setName("Simple java task");
+        task.setDescription("Test java task, exits immediately");
 
-		job.addTask(task);
+        job.addTask(task);
 
-		return job;
-	}
+        return job;
+    }
 
 }

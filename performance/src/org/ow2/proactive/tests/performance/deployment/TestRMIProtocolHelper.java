@@ -49,7 +49,7 @@ public class TestRMIProtocolHelper extends TestProtocolHelper {
     private Integer rmiPort;
 
     public TestRMIProtocolHelper(HostTestEnv serverHostEnv) {
-        super(serverHostEnv);
+        super(serverHostEnv, "rmi");
     }
 
     @Override
@@ -62,7 +62,7 @@ public class TestRMIProtocolHelper extends TestProtocolHelper {
     @Override
     public Map<String, String> getClientProActiveProperties() {
         Map<String, String> properties = new HashMap<String, String>();
-        properties.put(CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL.getName(), "rmi");
+        properties.put(CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL.getName(), protocolName);
         return properties;
     }
 
@@ -75,7 +75,7 @@ public class TestRMIProtocolHelper extends TestProtocolHelper {
         options
                 .add(CentralPAPropertyRepository.PA_RMI_PORT.getCmdLine() +
                     String.valueOf(rmiPort.intValue()));
-        options.add(CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL.getCmdLine() + "rmi");
+        options.add(CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL.getCmdLine() + protocolName);
         return options;
     }
 

@@ -46,6 +46,7 @@ import org.ow2.proactive.scheduler.common.SchedulerConnection;
 import org.ow2.proactive.tests.performance.jmeter.scheduler.BaseJMeterSchedulerClient;
 import org.ow2.proactive.tests.performance.jmeter.scheduler.SchedulerConnectionParameters;
 
+
 /**
  * Test scenario 'Connect to the Scheduler'.
  * <p/>

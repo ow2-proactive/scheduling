@@ -120,6 +120,9 @@
                 <jvmarg value="-Dtest.deploy.env.local.schedulingPath=${test.deploy.env.local.schedulingPath}" />
                 
                 <jvmarg value="-Dtest.deploy.protocol=${test.deploy.protocol}" />
+                <jvmarg value="-Dtest.deploy.multiprotocol.protocol=${test.deploy.multiprotocol.protocol}" />
+                <jvmarg value="-Dtest.deploy.multiprotocol.additional_protocols=${test.deploy.multiprotocol.additional_protocols}" />
+				<jvmarg value="-Dtest.deploy.multiprotocol.protocols_order=${test.deploy.multiprotocol.protocols_order}" />
 
                 <!-- needed if tests should use already running PAMR router -->
                 <jvmarg value="-Dtest.deploy.pamr.existingRouterHost=${test.deploy.pamr.existingRouterHost}" />
