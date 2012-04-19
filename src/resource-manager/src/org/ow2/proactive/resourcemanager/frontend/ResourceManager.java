@@ -288,6 +288,30 @@ public interface ResourceManager {
             List<SelectionScript> selectionScriptsList, NodeSet exclusion);
 
     /**
+     * Finds "number" nodes for computations according to the selection scripts
+     * (node must be complaint to all scripts).
+     * All nodes which are returned to the client as marked internally as busy and cannot
+     * be used by others until the client frees them.
+     * <p>
+     * If the resource manager does not have enough nodes the result depends on the bestEffort
+     * mode. If set to true, the method returns as many node as it has, 
+     * but only those which correspond the to selection criteria. If bestEffort set to false
+     * the method returns either 0 or all required nodes.
+     * 
+     *
+     * @param number the number of nodes
+     * @param descriptor the topology descriptor of nodes 
+     * @see {@link TopologyDescriptor}
+     * @param selectionScriptList criteria to be verified by the returned nodes
+     * @param exclusion a list of node which should not be in the result set
+     * @param bestEffort the mode of node aggregation
+     * 
+     * @return a list of nodes
+     */
+    public NodeSet getNodes(int number, TopologyDescriptor descriptor,
+            List<SelectionScript> selectionScriptsList, NodeSet exclusion, boolean bestEffort);
+
+    /**
      * Releases the node after computations. The specified node is marked as free and become
      * available to other users.
      *
