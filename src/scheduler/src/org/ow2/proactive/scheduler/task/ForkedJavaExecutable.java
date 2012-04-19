@@ -356,7 +356,11 @@ public class ForkedJavaExecutable extends JavaExecutable implements ForkerStarte
      * Return the progress value of the executable that runs in the forked JVM.
      */
     public int getProgress() {
-        return this.newJavaTaskLauncher.getProgress();
+        if (this.newJavaTaskLauncher == null) {
+            return 0;
+        } else {
+            return this.newJavaTaskLauncher.getProgress();
+        }
     }
 
     /**
