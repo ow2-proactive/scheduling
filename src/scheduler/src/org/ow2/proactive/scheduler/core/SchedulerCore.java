@@ -700,7 +700,8 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
                         }
                     } catch (Error e) {
                         //this point is reached in case of big problem, sometimes unknown
-                        logger.error("\nSchedulerCore.runActivity(MAIN_LOOP) caught an ERROR !", e);
+                        logger.error("SchedulerCore.runActivity(MAIN_LOOP) caught an ERROR !");
+                        logger_dev.error("\nSchedulerCore.runActivity(MAIN_LOOP) caught an ERROR !", e);
                         //Terminate proxy and disconnecting RM
                         logger_dev.error("Resource Manager will be disconnected");
                         rmProxiesManager.terminateSchedulerRMProxy();
