@@ -75,9 +75,12 @@ public class SchedulerConnectClient extends BaseJMeterSchedulerClient {
         SampleResult result = new SampleResult();
         result.sampleStart();
         Scheduler scheduler = auth.login(cred);
-        result.sampleEnd();
-        result.setSuccessful(true);
-        scheduler.disconnect();
+        try {
+            result.sampleEnd();
+            result.setSuccessful(true);
+        } finally {
+            scheduler.disconnect();
+        }
 
         return result;
     }

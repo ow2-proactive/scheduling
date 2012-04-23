@@ -102,7 +102,7 @@ public class GetHostsFromSchedulerTestExecutor extends Thread {
         Credentials cred = Credentials.createCredentials(credData, auth.getPublicKey());
         Scheduler scheduler = auth.login(cred);
 
-        System.out.println("Connected to scheduller, status: " + scheduler.getStatus());
+        System.out.println("Connected to the scheduler, status: " + scheduler.getStatus());
 
         return scheduler;
     }

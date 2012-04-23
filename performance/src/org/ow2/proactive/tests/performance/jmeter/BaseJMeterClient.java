@@ -90,8 +90,9 @@ public abstract class BaseJMeterClient extends AbstractJavaSamplerClient {
                 SampleResult errorResult = new SampleResult();
                 errorResult.setSuccessful(false);
                 errorResult.setStopTest(stopOnError);
-                errorResult.setResponseMessage("Unexpected exception during test execution: " + t);
-                logError("Unexpected exception during test execution: " + t, t);
+                String message = "Unexpected exception during test execution: " + t + " (sampler " + getClass().getSimpleName() + ")";
+                errorResult.setResponseMessage(message);
+                logError(message, t);
                 return errorResult;
             }
         }
