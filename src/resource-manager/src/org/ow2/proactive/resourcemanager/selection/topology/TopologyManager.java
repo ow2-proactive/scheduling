@@ -225,6 +225,12 @@ public class TopologyManager {
                 }
             }
 
+            try {
+                PAActiveObject.terminateActiveObject(pinger, true);
+            } catch (RuntimeException e) {
+                logger.error("Cannot kill the pinger active object", e);
+            }
+
             return result;
         } catch (ActiveObjectCreationException e) {
             logger.warn(e.getMessage(), e);
