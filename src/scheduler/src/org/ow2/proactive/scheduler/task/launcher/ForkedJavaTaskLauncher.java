@@ -119,8 +119,13 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher implements ForkerSt
                 fjei.setDecrypter(decrypter);
             }
 
-            // dataspaces can be used in envScript...
-            // but no automatic transfer is requiered
+            /*
+             * Initialize dataspaces since it can be used in envScript.
+             * 
+             * Log of the JavaTaskLauncher starts after envScript was executed, so it doesn't
+             * contain envScript output, to have complete log file it is specially handled by the
+             * ForkedJavaTaskLauncher.
+             */
             this.initDataSpaces();
             fjei.setDataspaces(SCRATCH, INPUT, OUTPUT, GLOBAL);
 
@@ -150,6 +155,11 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher implements ForkerSt
             } finally {
                 //compute duration in any cases (exception or not)
                 duration = System.currentTimeMillis() - duration;
+            }
+
+            if (storeLogs) {
+                // copy only task output, others files are copied by the forked JavaTaskLauncher
+                copyScratchDataToOutput(getTaskOutputSelectors());
             }
 
             if (userResult instanceof TaskResult) {

@@ -158,19 +158,20 @@ public class JavaTaskLauncher extends TaskLauncher {
             }
 
             //for the next two steps, task could be killed anywhere
+            
+            if (!hasBeenKilled && post != null) {
+                sample = System.currentTimeMillis();
+                //launch post script
+                this.executePostScript(exception == null);
+                duration += System.currentTimeMillis() - sample;
+            }
+
             if (!hasBeenKilled) {
                 sample = System.currentTimeMillis();
                 //copy output file
                 copyScratchDataToOutput();
                 sample = System.currentTimeMillis() - sample;
                 logger_dev.info("Time spent copying SCRATCH datas to OUTPUT : " + sample + " ms");
-            }
-
-            if (!hasBeenKilled && post != null) {
-                sample = System.currentTimeMillis();
-                //launch post script
-                this.executePostScript(exception == null);
-                duration += System.currentTimeMillis() - sample;
             }
         } catch (Throwable ex) {
             logger_dev.debug("Exception occured while running task " + this.taskId + ": ", ex);

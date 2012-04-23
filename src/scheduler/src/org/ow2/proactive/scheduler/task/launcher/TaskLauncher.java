@@ -293,8 +293,8 @@ public abstract class TaskLauncher {
      */
     protected void finalizeTask(TaskTerminateNotification core) {
         /*
-         * if task was killed then unsetEnv and finalizeLoggers were already called, 
-         * don't call it again, otherwise it can affect others tasks (SCHEDULING-1526)
+         * if task was killed then unsetEnv and finalizeLoggers were already called, don't call it
+         * again, otherwise it can affect others tasks (SCHEDULING-1526)
          */
         if (!hasBeenKilled) {
             // unset env
@@ -785,8 +785,9 @@ public abstract class TaskLauncher {
             try {
                 // configure node for application
                 long id = taskId.getJobId().hashCode();
-                DataSpacesNodes.configureApplication(PAActiveObject.getActiveObjectNode(PAActiveObject
-                        .getStubOnThis()), id, namingServiceUrl);
+                DataSpacesNodes.configureApplication(
+                        PAActiveObject.getActiveObjectNode(PAActiveObject.getStubOnThis()), id,
+                        namingServiceUrl);
                 //prepare scratch, input, output
                 SCRATCH = PADataSpaces.resolveScratchForAO();
                 INPUT = PADataSpaces.resolveDefaultInput();
@@ -973,24 +974,14 @@ public abstract class TaskLauncher {
         }
     }
 
-    protected void copyScratchDataToOutput() throws FileSystemException {
+    protected void copyScratchDataToOutput(List<OutputSelector> outputFiles) throws FileSystemException {
         if (isDataspaceAware()) {
             try {
-                // if logs are precisous, they are treated like output files
-                if (this.storeLogs) {
-                    // add log files as output
-                    OutputSelector logFiles = new OutputSelector(new FileSelector(
-                        TaskLauncher.LOG_FILE_PREFIX + "*"), OutputAccessMode.TransferToOutputSpace);
-                    if (this.outputFiles == null) {
-                        this.outputFiles = new ArrayList<OutputSelector>();
-                    }
-                    this.outputFiles.add(logFiles);
-                }
-
                 if (outputFiles == null) {
                     logger_dev_dataspace.debug("Output selector is empty, no file to copy");
                     return;
                 }
+
                 //check first the OUTPUT and then the INPUT, take care if not set
                 if (OUTPUT == null) {
                     logger_dev_dataspace.debug("Job OUTPUT space is not defined, cannot copy file.");
@@ -1065,6 +1056,26 @@ public abstract class TaskLauncher {
                 this.displayDataspacesStatus();
             }
         }
+    }
+
+    protected void copyScratchDataToOutput() throws FileSystemException {
+        if (isDataspaceAware()) {
+            if (this.storeLogs) {
+                if (this.outputFiles == null) {
+                    this.outputFiles = new ArrayList<OutputSelector>();
+                }
+                this.outputFiles.addAll(getTaskOutputSelectors());
+            }
+            copyScratchDataToOutput(outputFiles);
+        }
+    }
+
+    protected List<OutputSelector> getTaskOutputSelectors() {
+        List<OutputSelector> result = new ArrayList<OutputSelector>(1);
+        OutputSelector logFiles = new OutputSelector(new FileSelector(TaskLauncher.LOG_FILE_PREFIX + "*"),
+            OutputAccessMode.TransferToOutputSpace);
+        result.add(logFiles);
+        return result;
     }
 
     private void handleOutput(DataSpacesFileObject out, FastFileSelector fast,

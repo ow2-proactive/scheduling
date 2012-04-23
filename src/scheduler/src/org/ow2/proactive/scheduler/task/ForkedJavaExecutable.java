@@ -167,7 +167,7 @@ public class ForkedJavaExecutable extends JavaExecutable implements ForkerStarte
             //create task launcher on new JVM node
             logger_dev.debug("Create remote task launcher");
             newJavaTaskLauncher = createForkedTaskLauncher();
-
+            
             // redirect tasks logs to local stdout/err
             newJavaTaskLauncher.activateLogs(new StdAppenderProvider());
 
@@ -674,6 +674,8 @@ public class ForkedJavaExecutable extends JavaExecutable implements ForkerStarte
         /* JavaTaskLauncher will be an active object created on a newly created ProActive node */
         logger_dev.info("Create java task launcher");
         TaskLauncherInitializer tli = execInitializer.getJavaTaskLauncherInitializer();
+        // for the forked java task precious log is is handled by the ForkedJavaTaskLauncher
+        tli.setPreciousLogs(false);
         JavaTaskLauncher newLauncher = (JavaTaskLauncher) PAActiveObject.newActive(JavaTaskLauncher.class
                 .getName(), new Object[] { tli }, forkedNode);
         return newLauncher;

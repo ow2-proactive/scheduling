@@ -180,6 +180,7 @@
 
 	<target name="junit.scheduler" depends="deploy.scheduler, deploy.scheduler.worker" description="Run scheduler's tests">
 		<chmod file="${cl.scheduler.tests.dir}/functionaltests/executables/exportedVars.sh" perm="ugo+rx" />
+        <chmod file="${cl.scheduler.tests.dir}/functionaltests/executables/test_echo_task.sh" perm="ugo+rx" />
 		<chmod file="${cl.scheduler.tests.dir}/functionaltests/workflow/it.sh" perm="ugo+rx" />
 		<chmod file="${cl.scheduler.tests.dir}/functionaltests/executables/test_multiple_hosts_request.sh" perm="ugo+rx" />
 		<chmod file="${cl.scheduler.tests.dir}/functionaltests/executables/*.sh" perm="ugo+rx" />
