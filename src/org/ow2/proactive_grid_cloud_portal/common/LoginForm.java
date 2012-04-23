@@ -42,7 +42,6 @@ import java.io.InputStream;
 import javax.ws.rs.FormParam;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import org.apache.axis.utils.IOUtils;
 import org.jboss.resteasy.annotations.providers.multipart.PartType;
 import org.objectweb.proactive.core.mop.PAObjectInputStream;
 
