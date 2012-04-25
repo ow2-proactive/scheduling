@@ -158,7 +158,7 @@ public class JavaTaskLauncher extends TaskLauncher {
             }
 
             //for the next two steps, task could be killed anywhere
-            
+
             if (!hasBeenKilled && post != null) {
                 sample = System.currentTimeMillis();
                 //launch post script

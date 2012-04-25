@@ -36,9 +36,6 @@
  */
 package org.ow2.proactive.scheduler.exception;
 
-import java.util.List;
-
-
 /**
  * Used when starting forked java process.
  * If the process cannot be started or cannot be reached, this exception is raised. 
@@ -48,42 +45,13 @@ import java.util.List;
  */
 public class StartForkedProcessException extends StartProcessException {
 
-    private List<String> command;
-
     /**
      * Create a new instance of StartForkedProcessException
      * 
      * @param msg the message describing the exception
-     * @param command the forked java command that causes the exception
      */
-    public StartForkedProcessException(String msg, List<String> command) {
+    public StartForkedProcessException(String msg) {
         super(msg);
-        if (command == null || command.size() < 1) {
-            throw new IllegalArgumentException("Argument command must contain at least one element");
-        }
-        this.command = command;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getLocalizedMessage() {
-        StringBuilder sb = new StringBuilder(command.get(0));
-        for (int i = 1; i < command.size(); i++) {
-            sb.append(" " + command.get(i));
-        }
-        return super.getLocalizedMessage() + System.getProperty("line.separator") + "Command was : <" +
-            sb.toString() + ">";
-    }
-
-    /**
-     * Get the forked java command associated to this exception
-     * 
-     * @return the forked java command associated to this exception
-     */
-    public List<String> getCommand() {
-        return this.command;
     }
 
 }
