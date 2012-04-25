@@ -2,6 +2,7 @@ package functionaltests;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.log4j.AppenderSkeleton;
@@ -25,8 +26,6 @@ import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingService;
 import org.ow2.proactive.scheduler.common.util.logforwarder.providers.SocketBasedForwardingProvider;
 import org.ow2.tests.FunctionalTest;
-
-import edu.emory.mathcs.backport.java.util.Arrays;
 
 
 /**
