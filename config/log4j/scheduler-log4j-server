@@ -41,7 +41,6 @@ log4j.logger.proactive.scheduler.dev.admin.consol=INFO,CONSOLE
 #log4j.logger.proactive.scheduler.dev.policy=DEBUG
 #log4j.logger.proactive.scheduler.dev.admin.policy=DEBUG
 
-
 # avoid displaying additivity of the inherit loggers
 #log4j.additivity.proactive.resourceManager=false
 # define RESOURCE MANAGER loggers
@@ -67,6 +66,10 @@ log4j.logger.proactive.pamr.client=WARN,CONSOLE
 # Hibernate logger
 log4j.additivity.org.hibernate=false
 log4j.logger.org.hibernate=INFO,SchedulerDevHibFileAppender
+
+log4j.logger.com.mchange=WARN,SchedulerDevFileAppender
+log4j.logger.com.mchange.v2.c3p0=WARN,SchedulerDevFileAppender
+log4j.logger.com.mchange.v2.c3p0.SQLWarnings=WARN,SchedulerDevFileAppender
 
 # File appender for Administrator logging level (FILE1)
 log4j.appender.SchedulerFileAppender=org.apache.log4j.RollingFileAppender
