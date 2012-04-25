@@ -438,9 +438,9 @@ final class SchedulingMethodImpl implements SchedulingMethod {
                         // set of tasks to scheduler changed, so release all the nodes
                         logger_dev.debug("Set of tasks to scheduler changed. Releasing nodes.");
                         core.rmProxiesManager.getUserRMProxy(currentJob).releaseNodes(nodes);
+                        rmPendingRequest = null;
+                        return null;
                     }
-                    rmPendingRequest = null;
-                    // continue with a new request
                 } else {
                     // waiting further
                     logger_dev.debug("Pending node search request to the resource manager.");
@@ -448,7 +448,6 @@ final class SchedulingMethodImpl implements SchedulingMethod {
                 }
             }
 
-            rmPendingRequest = null;
             // ask nodes from the rm as there are no pending request
             TopologyDescriptor descriptor = null;
             boolean bestEffort = true;
