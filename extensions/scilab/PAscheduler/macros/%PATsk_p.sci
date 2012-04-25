@@ -24,6 +24,11 @@ function %PATsk_p(l)
     if ~isempty(l.SelectionScript) then
         printf('SelectionScript: '+l.SelectionScript+'\n');
     end
+    if l.Static then
+        printf('Static: true\n');
+    else
+        printf('Static: false\n');
+    end
     if ~isempty(l.Sources) then
         printf('Sources: ');
         for i=1:length(l.Sources)

@@ -272,9 +272,9 @@ function initSolveConfig(solve_config,opt)
         selects = opt.CustomScript
         try
             url=jnewInstance(URL,selects);            
-            ok = true;
+            ok = %t;
         catch 
-            ok = false;
+            ok = %f;
         end
         jremove(url);
 
@@ -283,6 +283,8 @@ function initSolveConfig(solve_config,opt)
         else
             solve_config.setCustomScriptUrl(selects);
         end
+        solve_config.setCustomScriptStatic(opt.CustomScriptStatic);
+        solve_config.setCustomScriptParams(opt.CustomScriptParams);
     end
 
     solve_config.setZipSourceFiles(%f);
@@ -533,16 +535,18 @@ function initOtherTCAttributes(NN,MM, task_configs, Tasks)
                 try
                     url = jnewInstance(URL,selects);
                     ok = %t;
+                    jremove(url);
                 catch 
                     ok = %f;
-                end
-                jremove(url);
+                end                
 
                 if ~ok
                     jinvoke(t_conf,'setCustomScriptUrl','file:'+selects);
                 else
                     jinvoke(t_conf,'setCustomScriptUrl',selects);
                 end
+                jinvoke(t_conf,'setStaticScript',Tasks(j,i).Static);
+                jinvoke(t_conf,'setCustomScriptParams',Tasks(j,i).ScriptParams);
             end   
             
             // Topology

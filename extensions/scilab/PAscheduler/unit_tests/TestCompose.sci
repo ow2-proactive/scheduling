@@ -12,8 +12,7 @@ function [ok, msg]=TestCompose(timeout)
         //disp(out)
     endfunction
 
-    function [ok,msg]=checkValuesSq(val)
-        right=sqrt(sqrt(sqrt(1:5)))
+    function [ok,msg]=checkValuesSq(val,right)        
         if length(right) ~= length(val)
             ok = %f;
             msg = 'Wrong number of outputs';
@@ -60,7 +59,7 @@ function [ok, msg]=TestCompose(timeout)
     val=PAwaitFor(resl,timeout)
     PAclearResults(resl);
     disp(val);
-    [ok,msg]=checkValuesSq(val);
+    [ok,msg]=checkValuesSq(val,sqrt(sqrt(sqrt(1:5))));
     if ~ok error(msg),return; end
     disp('..........................1 ......OK');
     clear val;
@@ -73,7 +72,7 @@ function [ok, msg]=TestCompose(timeout)
     PAclearResults(resl);
     disp(val);
     val=gsort(val,"g","i");
-    [ok,msg]=checkValuesSq(val);
+    [ok,msg]=checkValuesSq(val,sqrt(sqrt(sqrt(1:5))));
     if ~ok error(msg),return; end
     disp('..........................2 ......OK');
     clear val;
@@ -82,17 +81,8 @@ function [ok, msg]=TestCompose(timeout)
     t(1,3).Params = list('a');
     disp('..........................1 PAwaitFor');
     resl = PAsolve(t);
-    val1=PAwaitFor(resl(1:2),timeout);
-    val2=PAwaitFor(resl(4:5),timeout);
-    ok=%f;
-    msg = 'Error not received';
-    try 
-        problem = PAwaitFor(resl(3),timeout);
-    catch
-        disp(lasterror());
-        disp('Expected Error occured');
-        ok=%t;
-    end
+    val=PAwaitFor(resl(1:5),timeout);    
+    [ok,msg]=checkValuesSq(val,list(sqrt(sqrt(sqrt(1))),sqrt(sqrt(sqrt(2))), [], sqrt(sqrt(sqrt(4))),sqrt(sqrt(sqrt(5)))));
     PAclearResults(resl);
 
     if ~ok error(msg),return; end
@@ -101,18 +91,20 @@ function [ok, msg]=TestCompose(timeout)
 
     disp('..........................2 PAwaitAny');
     resl = PAsolve(t);
-    ok=%f;
+    
     msg = 'Error not received';
+     k=1;
+    val=[];
     for i=1:5
-        try
-            vl=PAwaitAny(resl,timeout)
-        catch
-            disp(lasterror());
-            disp('Expected Error occured');
-            ok=%t;
-        end
+        
+        vl=PAwaitAny(resl,timeout)
+        val(k) = vl;
+        k=k+1;             
     end
     PAclearResults(resl);
+    val=gsort(val,"g","i");
+    [ok,msg]=checkValuesSq(val,list([],sqrt(sqrt(sqrt(1))),sqrt(sqrt(sqrt(2))), sqrt(sqrt(sqrt(4))),sqrt(sqrt(sqrt(5)))));
+    
 
     if ~ok error(msg),return; end
     disp('..........................2 ......OK');

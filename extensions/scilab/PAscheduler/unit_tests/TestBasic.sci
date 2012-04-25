@@ -25,7 +25,7 @@ function [ok, msg]=TestBasic(timeout)
     endfunction
 
     function [ok,msg]=checkValuesSquare2(val)
-        [ok,msg]=checkValues(val,list(1,4,9,25), 'funcSquare');
+        [ok,msg]=checkValues(val,list([],1,4,9,25), 'funcSquare');
     endfunction
 
     function [ok,msg]=checkValuesSquare3(val)
@@ -93,36 +93,26 @@ function [ok, msg]=TestBasic(timeout)
     disp('...... Testing PAsolve with funcSquare and an error');
     disp('..........................3 PAwaitFor');
     resl = PAsolve('funcSquare',1,2,3,'a',5);
-    val=PAwaitFor(resl(1:3),timeout)
-    val2=PAwaitFor(resl(5),timeout)
-    try    
-        problem = PAwaitFor(resl(4),timeout)
-    catch
-        disp(lasterror());
-        disp('Expected Error occured');
-    end
-    val($+1) = val2(1);
+    val=PAwaitFor(resl(1:5),timeout)
+        
     PAclearResults(resl);
     disp(val)
-    [ok,msg]=checkValuesSquare2(val);
+    [ok,msg]=checkValuesSquare(val);
     if ~ok error(msg); end
     disp('..........................3 ......OK');
-    clear val,val2;
+    clear val;
 
     disp('..........................4 PAwaitAny');
     resl = PAsolve('funcSquare',1,2,3,'a',5);
     k=1;
+    val=[];
     for i=1:5
-        try
-            //printf('k=%d\n',k)
-            vl=PAwaitAny(resl,timeout);
+        
+        //printf('k=%d\n',k)
+        vl=PAwaitAny(resl,timeout);
             //disp(vl)
-            val(k) = vl;
-            k=k+1;        
-        catch
-            disp(lasterror());
-            disp('Expected Error occured');
-        end
+        val(k) = vl;
+        k=k+1;                
     end
     PAclearResults(resl);
     val=gsort(val,"g","i");

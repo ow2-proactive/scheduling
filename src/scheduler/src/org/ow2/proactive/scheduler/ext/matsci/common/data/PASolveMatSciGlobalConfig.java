@@ -114,6 +114,16 @@ public class PASolveMatSciGlobalConfig implements Serializable {
     protected String customScriptUrl = null;
 
     /**
+     * url of a custom selection script, if any
+     */
+    protected boolean customScriptStatic = false;
+
+    /**
+     * Parameters of the custom script
+     */
+    private String customScriptParams = null;
+
+    /**
      * uri of the local dataspace (available when executing the task)
      */
     protected URI localSpace;
@@ -257,6 +267,22 @@ public class PASolveMatSciGlobalConfig implements Serializable {
 
     public void setCustomScriptUrl(String customScriptUrl) {
         this.customScriptUrl = customScriptUrl;
+    }
+
+    public boolean isCustomScriptStatic() {
+        return customScriptStatic;
+    }
+
+    public void setCustomScriptStatic(boolean customScriptStatic) {
+        this.customScriptStatic = customScriptStatic;
+    }
+
+    public String getCustomScriptParams() {
+        return customScriptParams;
+    }
+
+    public void setCustomScriptParams(String customScriptParams) {
+        this.customScriptParams = customScriptParams;
     }
 
     public String getVersionPref() {

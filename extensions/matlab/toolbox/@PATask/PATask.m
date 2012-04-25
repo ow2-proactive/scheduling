@@ -31,6 +31,13 @@
 %       defined selection script (in languages such as Javascript, Ruby,
 %       Python), see ProActive Scheduler documentation for more information.
 %
+%       Static - a boolean, true if the SelectionScript is a static one
+%       (executed only once on a given machine), otherwise the
+%       SelectionScript will be dynamic (default)
+%
+%       ScriptParams - a string containing the parameters of the custom script
+%       delimited by spaces.
+%
 %       Compose - a boolean which defines if this task depends on the
 %       result of the previous task(previous line) inside this PATask
 %       column. If Compose is set to true, then the FIRST parameter of the
@@ -143,6 +150,8 @@ else
     this.OutputFiles = [];
     this.Compose=false;
     this.SelectionScript = [];
+    this.Static = false;
+    this.ScriptParams = [];
     this.NbNodes = 1;
     this.Topology = [];
     this.ThresholdProximity = 0;

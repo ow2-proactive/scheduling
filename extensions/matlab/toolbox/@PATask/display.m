@@ -57,6 +57,7 @@ if isequal(get(0,'FormatSpacing'),'compact')
     dp2(X.OutputFiles,'OuputFiles')
     dp2(X.Compose,'Compose')
     dp2(X.SelectionScript,'SelectionScript')
+    dp2(X.Static,'Static')
 else
     disp(' ')
     if length(name) > 0
@@ -70,6 +71,7 @@ else
     dp2(X.OutputFiles,'OuputFiles')
     dp2(X.Compose,'Compose')
     dp2(X.SelectionScript,'SelectionScript')
+    dp2(X.Static,'Static')
 end
 end
 

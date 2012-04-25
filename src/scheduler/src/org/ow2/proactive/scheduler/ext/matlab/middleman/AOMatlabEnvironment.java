@@ -348,28 +348,58 @@ public class AOMatlabEnvironment extends AOMatSciEnvironment<Boolean, MatlabResu
                     URL url = new URL(taskConfigs[i][j].getCustomScriptUrl());
 
                     SelectionScript sscript = null;
+
+                    String[] params;
+                    if (taskConfigs[i][j].getCustomScriptParams() != null &&
+                        taskConfigs[i][j].getCustomScriptParams().trim().length() > 0) {
+
+                        params = taskConfigs[i][j].getCustomScriptParams().split("\\s");
+
+                    } else {
+                        params = new String[0];
+                    }
+
                     try {
 
-                        sscript = new SelectionScript(url, new String[0]);
+                        sscript = new SelectionScript(url, params, !taskConfigs[i][j].isStaticScript());
 
                     } catch (InvalidScriptException e1) {
                         throw new PASchedulerException(e1);
                     }
                     schedulerTask.addSelectionScript(sscript);
+
+                    printLog("Task " + i + "_" + j + ":" + " using task custom script (" +
+                        (taskConfigs[i][j].isStaticScript() ? "static" : "dynamic") + ") " + url +
+                        " with params : " + params);
                 }
 
                 if (config.getCustomScriptUrl() != null) {
                     URL url = new URL(config.getCustomScriptUrl());
 
                     SelectionScript sscript = null;
+
+                    String[] params;
+                    if (config.getCustomScriptParams() != null &&
+                        config.getCustomScriptParams().trim().length() > 0) {
+
+                        params = config.getCustomScriptParams().split("\\s");
+
+                    } else {
+                        params = new String[0];
+                    }
+
                     try {
 
-                        sscript = new SelectionScript(url, new String[0]);
+                        sscript = new SelectionScript(url, params, !config.isCustomScriptStatic());
 
                     } catch (InvalidScriptException e1) {
                         throw new PASchedulerException(e1);
                     }
                     schedulerTask.addSelectionScript(sscript);
+
+                    printLog("Task " + i + "_" + j + ":" + " using global custom script (" +
+                        (taskConfigs[i][j].isStaticScript() ? "static" : "dynamic") + ") " + url +
+                        " with params : " + params);
 
                 }
 

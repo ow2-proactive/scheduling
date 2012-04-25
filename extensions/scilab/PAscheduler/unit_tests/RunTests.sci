@@ -1,4 +1,5 @@
 function [ok, msg]=RunTests(nbiter,timeout)
+    
 
 for i=1:nbiter
     disp(['Iteration ' string(i)]);
@@ -41,6 +42,13 @@ for i=1:nbiter
         [ok,msg] = TestTransferEnv(timeout);
     else
         [ok,msg] = TestTransferEnv();
+    end
+    if ~ok disp(msg),return; end
+    
+    if exists('timeout')
+        [ok,msg] = TestSelectionScripts(timeout);
+    else
+        [ok,msg] = TestSelectionScripts();
     end
     if ~ok disp(msg),return; end
     
