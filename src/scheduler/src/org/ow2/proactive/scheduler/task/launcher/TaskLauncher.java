@@ -500,6 +500,18 @@ public abstract class TaskLauncher {
         }
     }
 
+    @ImmediateService
+    public void getStoredLogs(AppenderProvider logSink) {
+        Appender appender;
+        try {
+            appender = logSink.getAppender();
+        } catch (LogForwardingException e) {
+            logger_dev.error("Cannot create log appender.", e);
+            return;
+        }
+        this.logAppender.appendStoredEvents(appender);
+    }
+
     /**
      * Activate the logs on this host and port.
      * @param logSink the provider for the appender to write in.
@@ -523,23 +535,23 @@ public abstract class TaskLauncher {
                 MDC.getContext().put(Log4JTaskLogs.MDC_HOST, "Unknown host");
             }
             // create appender
-            Appender a = null;
+            Appender appender = null;
             try {
-                a = logSink.getAppender();
+                appender = logSink.getAppender();
             } catch (LogForwardingException e) {
                 logger_dev.error("Cannot create log appender.", e);
                 return;
             }
             // fill appender
             if (!this.loggersFinalized.get()) {
-                this.logAppender.addAppender(a);
+                this.logAppender.addAppender(appender);
             } else {
                 logger_dev.info("Logs for task " + this.taskId + " are closed. Flushing buffer...");
                 // Everything is closed: reopen and close...
                 for (LoggingEvent e : this.logAppender.getStorage()) {
-                    a.doAppend(e);
+                    appender.doAppend(e);
                 }
-                a.close();
+                appender.close();
                 this.loggersActivated.set(false);
                 return;
             }
@@ -681,7 +693,6 @@ public abstract class TaskLauncher {
      * @throws Throwable if an exception occurred in the flow script. 
      *      TaskResult#setAction(FlowAction) will NOT be called on res 
      */
-    @SuppressWarnings("unchecked")
     protected void executeFlowScript(TaskResult res) throws Throwable {
         replaceTagsInScript(flow);
         logger_dev.info("Executing flow-script");
@@ -785,9 +796,8 @@ public abstract class TaskLauncher {
             try {
                 // configure node for application
                 long id = taskId.getJobId().hashCode();
-                DataSpacesNodes.configureApplication(
-                        PAActiveObject.getActiveObjectNode(PAActiveObject.getStubOnThis()), id,
-                        namingServiceUrl);
+                DataSpacesNodes.configureApplication(PAActiveObject.getActiveObjectNode(PAActiveObject
+                        .getStubOnThis()), id, namingServiceUrl);
                 //prepare scratch, input, output
                 SCRATCH = PADataSpaces.resolveScratchForAO();
                 INPUT = PADataSpaces.resolveDefaultInput();

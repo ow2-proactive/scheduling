@@ -1518,16 +1518,16 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
     @RunActivityFiltered(id = "external")
     public void listenJobLogs(JobId jobId, AppenderProvider appenderProvider) throws UnknownJobException {
         logger_dev.info("listen logs of job '" + jobId + "'");
-        Logger l = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX + jobId);
+        Logger jobLogger = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX + jobId);
 
         // create the appender to the remote listener
-        Appender appender = null;
+        Appender clientAppender = null;
         try {
-            appender = appenderProvider.getAppender();
-        } catch (LogForwardingException e1) {
-            logger.error("Cannot create an appender for job " + jobId, e1);
-            logger_dev.error("", e1);
-            throw new InternalException("Cannot create an appender for job " + jobId, e1);
+            clientAppender = appenderProvider.getAppender();
+        } catch (LogForwardingException e) {
+            logger.error("Cannot create an appender for job " + jobId, e);
+            logger_dev.error("", e);
+            throw new InternalException("Cannot create an appender for job " + jobId, e);
         }
 
         // targeted job
@@ -1537,29 +1537,36 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
             throw new UnknownJobException(jobId);
         }
 
+        boolean logIsAlreadyInitialized;
+
         // get or create appender for the targeted job
         AsyncAppender jobAppender = this.jobsToBeLogged.get(jobId);
         if (jobAppender == null) {
+            logIsAlreadyInitialized = false;
             jobAppender = new AsyncAppender();
             jobAppender.setName(Log4JTaskLogs.JOB_APPENDER_NAME);
             this.jobsToBeLogged.put(jobId, jobAppender);
-            l.setAdditivity(false);
-            l.addAppender(jobAppender);
+            jobLogger.setAdditivity(false);
+            jobLogger.addAppender(jobAppender);
+        } else {
+            logIsAlreadyInitialized = true;
         }
+
         // should add the appender before activating logs on running tasks !
-        jobAppender.addAppender(appender);
+        jobAppender.addAppender(clientAppender);
 
         // handle finished jobs
         if (this.finishedJobs.contains(target)) {
             logger_dev.info("listen logs of job '" + jobId + "' : job is already finished");
             // for finished tasks, add logs events "manually"
             Collection<TaskResult> allRes = target.getJobResult().getAllResults().values();
+
             for (TaskResult tr : allRes) {
-                this.flushTaskLogs(tr, l, appender);
+                this.flushTaskLogs(tr, jobLogger, clientAppender);
             }
             // as the job is finished, close appenders
             logger_dev.info("Cleaning loggers for already finished job '" + jobId + "'");
-            l.removeAllAppenders(); // close appenders...
+            jobLogger.removeAllAppenders(); // close appenders...
             this.jobsToBeLogged.remove(jobId);
 
             // job is not finished, tasks are running
@@ -1569,7 +1576,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
             // for finished tasks, add logs events "manually"
             Collection<TaskResult> allRes = target.getJobResult().getAllResults().values();
             for (TaskResult tr : allRes) {
-                this.flushTaskLogs(tr, l, appender);
+                this.flushTaskLogs(tr, jobLogger, clientAppender);
             }
 
             // for running tasks, activate loggers on taskLauncher side
@@ -1578,8 +1585,12 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
             if (curRunning != null) {
                 for (TaskId tid : curRunning.keySet()) {
                     try {
-                        TaskLauncher tl = curRunning.get(tid);
-                        tl.activateLogs(this.lfs.getAppenderProvider());
+                        TaskLauncher taskLauncher = curRunning.get(tid);
+                        if (logIsAlreadyInitialized) {
+                            taskLauncher.getStoredLogs(appenderProvider);
+                        } else {
+                            taskLauncher.activateLogs(this.lfs.getAppenderProvider());
+                        }
                     } catch (LogForwardingException e) {
                         logger.error("Cannot create an appender provider for task " + tid, e);
                         logger_dev.error("", e);

@@ -144,8 +144,8 @@ public class TestPreciousLogs extends FunctionalTest {
             System.out.println(output);
 
             for (String expectedLine : expectedOutput.get(taskName)) {
-                Assert.assertTrue("Output doesn't contain line " + expectedLine,
-                        output.contains(expectedLine));
+                Assert.assertTrue("Output doesn't contain line " + expectedLine, output
+                        .contains(expectedLine));
             }
         }
     }
