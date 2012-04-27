@@ -900,6 +900,11 @@ public class SchedulerTHelper {
         return getMonitorsHandler().waitForEventJob(SchedulerEvent.JOB_RUNNING_TO_FINISHED, id, timeout);
     }
 
+    public static JobInfo waitForEventPendingJobFinished(JobId id, long timeout)
+            throws ProActiveTimeoutException {
+        return getMonitorsHandler().waitForEventJob(SchedulerEvent.JOB_PENDING_TO_FINISHED, id, timeout);
+    }
+
     /**
      * Wait for a job removed from Scheduler's database.
      * If corresponding event has been already thrown by scheduler, returns immediately
