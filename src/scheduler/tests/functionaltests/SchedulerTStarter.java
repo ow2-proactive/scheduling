@@ -81,6 +81,16 @@ public class SchedulerTStarter implements Serializable {
             throw new IllegalArgumentException(
                 "SchedulerTStarter must be started with 3 parameters: localhodes schedPropPath rmPropPath");
         }
+
+        if (args.length == 4) {
+            createWithExistingRM(args);
+        } else {
+            createRMAndScheduler(args);
+        }
+        System.out.println("Scheduler successfully created !");
+    }
+
+    private static void createRMAndScheduler(String[] args) throws Exception {
         boolean localnodes = Boolean.valueOf(args[0]);
         String schedPropPath = args[1];
         String RMPropPath = args[2];
@@ -120,6 +130,20 @@ public class SchedulerTStarter implements Serializable {
                 rmAdmin.addNode(nodes[i].getNodeInformation().getURL());
             }
         }
-        System.out.println("Scheduler successfully created !");
+    }
+
+    private static void createWithExistingRM(String[] args) throws Exception {
+        String schedPropPath = args[1];
+        String rmUrl = args[3];
+
+        System.out.println("Creating with existing " + rmUrl);
+
+        PASchedulerProperties.updateProperties(schedPropPath);
+
+        SchedulerFactory.createScheduler(new URI(rmUrl), PASchedulerProperties.SCHEDULER_DEFAULT_POLICY
+                .getValueAsString());
+
+        SchedulerConnection.waitAndJoin(schedulerDefaultURL);
+
     }
 }
