@@ -146,7 +146,7 @@ public enum SchedulerStatus implements java.io.Serializable {
      * @return true if the scheduler is NOT usable in its current state
      */
     public boolean isUnusable() {
-        return this == UNLINKED || isKilled();
+        return isKilled();
     }
 
     /**
@@ -210,7 +210,7 @@ public enum SchedulerStatus implements java.io.Serializable {
      * @return true if a job can be submitted to scheduler
      */
     public boolean isSubmittable() {
-        return !isDown() && this != STOPPED;
+        return !isShuttingDown() && this != STOPPED;
     }
 
 }

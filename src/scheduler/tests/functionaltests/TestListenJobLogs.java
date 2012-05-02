@@ -29,9 +29,14 @@ import org.ow2.tests.FunctionalTest;
 
 
 /**
- * - get logs for task which is running
- * - get log for task which finished but job is still running
- * - get log for task after job has finished
+ * Test against method Scheduler.listenJobLogs.
+ * Test calls Scheduler.listenJobLogs several times for the same job and check 
+ * that it works properly in different conditions:
+ * <ul>
+ * <li>can get logs for task which is running
+ * <li>can get log for task which finished but job is still running
+ * <li>can get log for task after job has finished
+ * </ul>
  * 
  * @author ProActive team
  *
