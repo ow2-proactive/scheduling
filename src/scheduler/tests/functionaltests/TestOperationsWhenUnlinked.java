@@ -112,7 +112,7 @@ public class TestOperationsWhenUnlinked extends FunctionalTest {
         if (!scheduler.resumeJob(jobId2)) {
             Assert.fail("Failed to resume job " + jobId2);
         }
-        
+
         System.out.println("Creating new RM");
         RMTHelper.getResourceManager();
         RMTHelper.createDefaultNodeSource(2);
