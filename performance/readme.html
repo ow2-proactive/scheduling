@@ -132,6 +132,9 @@ should be accessible by the SSH from the host where tests are executed.
 <li><b>rm.deploy.dropDB</b> (rm.test.properties) if RM should cleanup its database during start-up</li>
 <li><b>rm.deploy.rmNodesHosts</b> (rm.test.properties) host where RM should deploy nodes</li>
 <li><b>rm.deploy.rmNodesPerHosts</b> (rm.test.properties) how many nodes RM should start on each host after start-up</li>
+<li><b>optional rm.deploy.rmNodesSourcesNumber</b> (rm.test.properties) how many NodeSources should use RM to deploy
+nodes (1 by default), this value can't be bigger then number of available hosts. 
+It it more than one then RM equally divides available hosts between all NodeSources </li>
 </ul>
 
 <h4><a id="deploy_pamr">PAMR router parameters:</a></h4>

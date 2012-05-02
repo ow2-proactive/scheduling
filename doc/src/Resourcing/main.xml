@@ -17,6 +17,7 @@
 	  <!ENTITY AdminJavaAPI SYSTEM "AdminJavaAPI.xml">
 	  <!ENTITY EC2 SYSTEM "EC2.xml">
 	  <!ENTITY GUI SYSTEM "GUI.xml">
+	  <!ENTITY WUI SYSTEM "WUI.xml">
 	  <!ENTITY CLI SYSTEM "CLI.xml">
 	  <!ENTITY JMX SYSTEM "JMX.xml">
 	  <!ENTITY Accounting SYSTEM "Accounting.xml">

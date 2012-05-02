@@ -44,6 +44,13 @@ import org.ow2.proactive.tests.performance.jmeter.BaseJMeterClient;
 import org.ow2.proactive.tests.performance.rm.TestRMProxy;
 
 
+/**
+ * Base JavaSampler for all samplers working with Resource Manager
+ * (it handles connection to the RM). 
+ * 
+ * @author ProActive team
+ *
+ */
 public abstract class BaseJMeterRMClient extends BaseJMeterClient {
 
     private TestRMProxy rmProxy;

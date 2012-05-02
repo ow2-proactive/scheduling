@@ -45,6 +45,13 @@ import java.util.Set;
 import org.apache.log.Logger;
 
 
+/**
+ * Utility class used to equally divide set of available hosts
+ * between multiple threads. 
+ * 
+ * @author ProActive team
+ *
+ */
 public class TestHosts {
 
     public static class Host implements Comparable<Host> {

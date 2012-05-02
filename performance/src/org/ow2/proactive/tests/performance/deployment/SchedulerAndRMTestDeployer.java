@@ -71,7 +71,7 @@ public class SchedulerAndRMTestDeployer {
                 startPamrIfNeeded, startRM, startScheduler));
 
         String protocol = TestUtils.getRequiredProperty("test.deploy.protocol");
-        if (protocol.equalsIgnoreCase("pamr") && startPamrIfNeeded) {
+        if ((protocol.equalsIgnoreCase("pamr") || protocol.equalsIgnoreCase("multi")) && startPamrIfNeeded) {
             try {
                 TestPamrRouterDeployer deployer = TestPamrRouterDeployer
                         .createPamrRouterDeployerUsingSystemProperties();

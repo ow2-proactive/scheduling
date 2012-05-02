@@ -44,6 +44,19 @@ import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.Task;
 
 
+/**
+ * Test scenario 'Submit dependent tasks' (it executes basic 'submit job'
+ * scenario, see BaseJobSubmitClient for details).
+ * <p/>
+ * Scenario submits job which contains tasks with dependencies (tasks don't do
+ * anything just sleep some time and finish). Job contains following tasks: one
+ * 'first task', N 'dependent tasks' depending on the 'first task' and one 'last
+ * task' depending on the all 'dependent tasks' (number of 'dependent tasks' is
+ * configurable).
+ * 
+ * @author ProActive team
+ * 
+ */
 public class DependentTasksSubmitClient extends BaseJobSubmitClient {
 
     public static final String PARAM_DEPENDENT_TASK_SUBMIT_TASKS_NUMBER = "dependentTasksSubmitTasksNumber";

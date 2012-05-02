@@ -70,22 +70,29 @@
 		To start it in this mode, just launch the <emphasis role="bold">bin/[os]/rm-client[.bat]</emphasis> command without any parameter.
 		Once connected, type ? or help() to get the list of provided functions:
 	</para>
-		<screen> exMode(display,onDemand)        Change the way exceptions are displayed (if display is true, stacks are displayed - if onDemand is true, prompt before displaying stacks)
- addnode(nodeURL, nsName)        Add node to the given node source (parameters is a string representing the node URL to add and an optional string representing the node source in which to add the node)
- removenode(nodeURL,preempt)     Remove the given node (parameter is a string representing the node URL, node is removed immediately if second parameter is true)
- createns(nsName,infr,pol)       Create a new node source with specified name, infrastructure and policy (e.g. createns('myname', ['infrastrucure', 'param1', ...], ['policy', 'param1', ...]))
- removens(nsName,preempt)        Remove the given node source (parameter is a string representing the node source name to remove, node source is removed immediately if second parameter is true)
- listnodes()                     List every handled nodes
- listns()                        List every handled node sources
- listInfrastructures()           List supported infrastructures
- listPolicies()                  List available node sources policies
- shutdown(preempt)               Shutdown the Resource Manager (RM shutdown immediately if parameter is true)
- jmxinfo()                       Display some statistics provided by MBean
- exec(scriptFilePath)            Execute the content of the given script file (parameter is a string representing a script-file path)
- setLogsDir(logsDir)             Set the directory where the log are located, (default is RM_HOME/.logs
- viewlogs(nbLines)               View the last nbLines lines of the logs file, (default nbLines is 20)
- refreshPermissions()            Reload permissions policy file
- exit()                          Exits RM controller</screen>
+		<screen> addnode(nodeURL, nsName)         Add node to the given node source (parameters is a string representing the node URL to add and an optional string representing the node source in which to add the node)
+ removenode(nodeURL,preempt)      Remove the given node (parameter is a string representing the node URL, node is removed immediately if second parameter is true)
+ createns(nsName,infr,pol)        Create a new node source with specified name, infrastructure and policy (e.g. createns('myname', ['infrastrucure', 'param1', ...], ['policy', 'param1', ...]))
+ removens(nsName,preempt)         Remove the given node source (parameter is a string representing the node source name to remove, nodeSource is removed immediately if second parameter is true)
+ locknode(nodeURL)                Locks the node
+ unlocknode(nodeURL)              Unlocks the node
+ listnodes(nodeSourceName)        List nodes for a particular or all node sources
+ listns()                         List every handled node sources
+ nodeinfo(nodeURL)                Displays node informations
+ listinfrastructures()            List supported infrastructures
+ listpolicies()                   List available node sources policies
+ topology()                       Displays nodes topology
+ shutdown(preempt)                Shutdown the Resource Manager (RM shutdown immediately if parameter is true)
+ stats()                          Display some statistics about the Resource Manager
+ myaccount()                      Display current user account information
+ account(username)                Display account information by username
+ reloadconfig()                   Reload the resource manager config, including permissions and log4j
+ reconnect()                      Try to reconnect this console to the server
+ exec(scriptFilePath)             Execute the content of the given script file (parameter is a string representing a script-file path)
+ execr(path,type,[targets],args)     Execute remotely the specified script at 'path' on specified ['targets'] of 'type' [NODESOURCE_NAME, NODE_URL, HOSTNAME] with optional 'args'. For example execr('../../samples/scripts/misc/processBuilder.js','NODESOURCE_NAME',['Default'],'hostname');
+ cnslhelp() or ?c                 Displays help about the console functions itself
+ exit()                           Exits RM controller
+</screen>
 
 	<section xml:id="rm_admin_js_console_script"><info><title>execute actions in a Java script file</title></info>
 		<para>

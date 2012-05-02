@@ -42,6 +42,16 @@ import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 
 
+/**
+ * Test scenario 'Submit simple java task' (it executes basic 'submit job'
+ * scenario, see BaseJobSubmitClient for details).
+ * <p/>
+ * Scenario submits job which contains single forked java task, task just sleeps
+ * for 5 seconds and finishes.
+ * 
+ * @author ProActive team
+ * 
+ */
 public class SimpleJavaJobSubmitClient extends BaseJobSubmitClient {
 
     @Override

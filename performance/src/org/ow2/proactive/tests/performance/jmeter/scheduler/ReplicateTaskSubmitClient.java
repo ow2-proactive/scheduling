@@ -47,15 +47,21 @@ import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
 
 
 /**
- * Scenario submits job with replicated tasks:
+ * Test scenario 'Submit replicate workflow tasks' (it executes basic 'submit job'
+ * scenario, see BaseJobSubmitClient for details).
+ * <p/>
+ * Scenario submits job with replicated tasks. Workflow schema is following 
+ * (task B is replicated N times, parameter N is configurable):
  *         A
  *         |
+ * --------------------
+ * |    |     |  |    |
+ * B_1  B_2   ....   B_N
  * ------------------
- * |    |     |      |
- * B    B     B      B
- * ------------------
- *          |
- *          C
+ *         |
+ *         C
+ * 
+ * @author ProActive team
  * 
  */
 public class ReplicateTaskSubmitClient extends BaseJobSubmitClient {

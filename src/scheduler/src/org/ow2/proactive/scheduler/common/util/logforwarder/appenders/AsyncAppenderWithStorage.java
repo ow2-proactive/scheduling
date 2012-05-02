@@ -124,8 +124,15 @@ public class AsyncAppenderWithStorage extends AsyncAppender {
     public synchronized void addAppender(final Appender newAppender) {
         super.addAppender(newAppender);
         // flush the buffer into the sink
+        appendStoredEvents(newAppender);
+    }
+
+    /**
+     * Append stored events to the given appender.
+     */
+    public synchronized void appendStoredEvents(Appender appender) {
         for (LoggingEvent e : this.storage) {
-            newAppender.doAppend(e);
+            appender.doAppend(e);
         }
     }
 

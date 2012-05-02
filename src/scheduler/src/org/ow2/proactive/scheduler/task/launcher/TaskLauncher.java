@@ -293,8 +293,8 @@ public abstract class TaskLauncher {
      */
     protected void finalizeTask(TaskTerminateNotification core) {
         /*
-         * if task was killed then unsetEnv and finalizeLoggers were already called, 
-         * don't call it again, otherwise it can affect others tasks (SCHEDULING-1526)
+         * if task was killed then unsetEnv and finalizeLoggers were already called, don't call it
+         * again, otherwise it can affect others tasks (SCHEDULING-1526)
          */
         if (!hasBeenKilled) {
             // unset env
@@ -500,6 +500,18 @@ public abstract class TaskLauncher {
         }
     }
 
+    @ImmediateService
+    public void getStoredLogs(AppenderProvider logSink) {
+        Appender appender;
+        try {
+            appender = logSink.getAppender();
+        } catch (LogForwardingException e) {
+            logger_dev.error("Cannot create log appender.", e);
+            return;
+        }
+        this.logAppender.appendStoredEvents(appender);
+    }
+
     /**
      * Activate the logs on this host and port.
      * @param logSink the provider for the appender to write in.
@@ -523,23 +535,23 @@ public abstract class TaskLauncher {
                 MDC.getContext().put(Log4JTaskLogs.MDC_HOST, "Unknown host");
             }
             // create appender
-            Appender a = null;
+            Appender appender = null;
             try {
-                a = logSink.getAppender();
+                appender = logSink.getAppender();
             } catch (LogForwardingException e) {
                 logger_dev.error("Cannot create log appender.", e);
                 return;
             }
             // fill appender
             if (!this.loggersFinalized.get()) {
-                this.logAppender.addAppender(a);
+                this.logAppender.addAppender(appender);
             } else {
                 logger_dev.info("Logs for task " + this.taskId + " are closed. Flushing buffer...");
                 // Everything is closed: reopen and close...
                 for (LoggingEvent e : this.logAppender.getStorage()) {
-                    a.doAppend(e);
+                    appender.doAppend(e);
                 }
-                a.close();
+                appender.close();
                 this.loggersActivated.set(false);
                 return;
             }
@@ -681,7 +693,6 @@ public abstract class TaskLauncher {
      * @throws Throwable if an exception occurred in the flow script. 
      *      TaskResult#setAction(FlowAction) will NOT be called on res 
      */
-    @SuppressWarnings("unchecked")
     protected void executeFlowScript(TaskResult res) throws Throwable {
         replaceTagsInScript(flow);
         logger_dev.info("Executing flow-script");
@@ -973,24 +984,14 @@ public abstract class TaskLauncher {
         }
     }
 
-    protected void copyScratchDataToOutput() throws FileSystemException {
+    protected void copyScratchDataToOutput(List<OutputSelector> outputFiles) throws FileSystemException {
         if (isDataspaceAware()) {
             try {
-                // if logs are precisous, they are treated like output files
-                if (this.storeLogs) {
-                    // add log files as output
-                    OutputSelector logFiles = new OutputSelector(new FileSelector(
-                        TaskLauncher.LOG_FILE_PREFIX + "*"), OutputAccessMode.TransferToOutputSpace);
-                    if (this.outputFiles == null) {
-                        this.outputFiles = new ArrayList<OutputSelector>();
-                    }
-                    this.outputFiles.add(logFiles);
-                }
-
                 if (outputFiles == null) {
                     logger_dev_dataspace.debug("Output selector is empty, no file to copy");
                     return;
                 }
+
                 //check first the OUTPUT and then the INPUT, take care if not set
                 if (OUTPUT == null) {
                     logger_dev_dataspace.debug("Job OUTPUT space is not defined, cannot copy file.");
@@ -1065,6 +1066,26 @@ public abstract class TaskLauncher {
                 this.displayDataspacesStatus();
             }
         }
+    }
+
+    protected void copyScratchDataToOutput() throws FileSystemException {
+        if (isDataspaceAware()) {
+            if (this.storeLogs) {
+                if (this.outputFiles == null) {
+                    this.outputFiles = new ArrayList<OutputSelector>();
+                }
+                this.outputFiles.addAll(getTaskOutputSelectors());
+            }
+            copyScratchDataToOutput(outputFiles);
+        }
+    }
+
+    protected List<OutputSelector> getTaskOutputSelectors() {
+        List<OutputSelector> result = new ArrayList<OutputSelector>(1);
+        OutputSelector logFiles = new OutputSelector(new FileSelector(TaskLauncher.LOG_FILE_PREFIX + "*"),
+            OutputAccessMode.TransferToOutputSpace);
+        result.add(logFiles);
+        return result;
     }
 
     private void handleOutput(DataSpacesFileObject out, FastFileSelector fast,

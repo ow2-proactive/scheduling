@@ -55,6 +55,18 @@ import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import org.ow2.proactive.tests.performance.deployment.TestDeployer;
 
 
+/**
+ * Test scenario 'Submit failing task' (it executes basic 'submit job' scenario,
+ * see BaseJobSubmitClient for details).
+ * <p/>
+ * Scenario submits job with two tasks which always fail: java task (throws
+ * exception) and native task (exits with code 1). Tasks are created with
+ * parameter maxNumberOfExecution=3 so scheduler tries to execute each task 3
+ * times.
+ * 
+ * @author ProActive team
+ * 
+ */
 public class SubmitFailingTaskSchedulerClient extends BaseJobSubmitClient {
 
     public static class FailingJavaTask extends JavaExecutable {

@@ -41,6 +41,16 @@ import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.NativeTask;
 
 
+/**
+ * Test scenario 'Submit simple native task' (it executes basic 'submit job'
+ * scenario, see BaseJobSubmitClient for details).
+ * <p/>
+ * Scenario submits job which contains single native task, native task's script
+ * just sleep 5 seconds and finishes.
+ * 
+ * @author ProActive team
+ * 
+ */
 public class SimpleNativeJobSubmitClient extends BaseJobSubmitClient {
 
     @Override

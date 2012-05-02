@@ -528,7 +528,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
                     } catch (InterruptedException e) {
                         //miam -> shutdown scheduler
                     } catch (Exception e) {
-                        logger_dev.info("", e);
+                        logger_dev.info("Nodes pingining failed", e);
                     }
                 }
             }
@@ -700,7 +700,8 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
                         }
                     } catch (Error e) {
                         //this point is reached in case of big problem, sometimes unknown
-                        logger.error("\nSchedulerCore.runActivity(MAIN_LOOP) caught an ERROR !", e);
+                        logger.error("SchedulerCore.runActivity(MAIN_LOOP) caught an ERROR !");
+                        logger_dev.error("\nSchedulerCore.runActivity(MAIN_LOOP) caught an ERROR !", e);
                         //Terminate proxy and disconnecting RM
                         logger_dev.error("Resource Manager will be disconnected");
                         rmProxiesManager.terminateSchedulerRMProxy();
@@ -822,22 +823,34 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
                             } catch (NullPointerException e) {
                                 //should not happened, but avoid restart if execInfo or launcher is null
                                 //nothing to do
-                            } catch (IllegalArgumentException iae) {
+                                if (logger_dev.isDebugEnabled()) {
+                                    logger_dev.debug("getProgress failed on job '" + job.getId() +
+                                        "', task '" + td.getId() + "'", e);
+                                }
+                            } catch (IllegalArgumentException e) {
                                 //thrown by (1)
                                 //avoid setting bad value, no event if bad
-                            } catch (ProgressPingerException ppe) {
+                                if (logger_dev.isDebugEnabled()) {
+                                    logger_dev.debug("getProgress failed on job '" + job.getId() +
+                                        "', task '" + td.getId() + "'", e);
+                                }
+                            } catch (ProgressPingerException e) {
                                 //thrown by (2) in one of this two cases :
                                 // * when user has overridden getProgress method and the method throws an exception
                                 // * if forked JVM process is dead
                                 //nothing to do in any case
+                                if (logger_dev.isDebugEnabled()) {
+                                    logger_dev.debug("getProgress failed on job '" + job.getId() +
+                                        "', task '" + td.getId() + "'", e);
+                                }
                             } catch (Throwable t) {
+                                logger_dev.info("Node failed on job '" + job.getId() + "', task '" +
+                                    td.getId() + "'", t);
+
                                 //check if the task has not been terminated while pinging
                                 if (currentlyRunningTasks.get(job.getId()).remove(td.getId()) == null) {
                                     continue;
                                 }
-
-                                logger_dev.info("Node failed on job '" + job.getId() + "', task '" +
-                                    td.getId() + "'");
 
                                 try {
                                     logger_dev.info("Try to free failed node set");
@@ -846,7 +859,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
                                             td.getExecuterInformations().getNodes());
                                 } catch (Exception e) {
                                     //just save the rest of the method execution
-                                    logger_dev.debug("", e);
+                                    logger_dev.debug("Failed to free failed node set", e);
                                 }
 
                                 //re-init progress as it is failed
@@ -1505,16 +1518,16 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
     @RunActivityFiltered(id = "external")
     public void listenJobLogs(JobId jobId, AppenderProvider appenderProvider) throws UnknownJobException {
         logger_dev.info("listen logs of job '" + jobId + "'");
-        Logger l = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX + jobId);
+        Logger jobLogger = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX + jobId);
 
         // create the appender to the remote listener
-        Appender appender = null;
+        Appender clientAppender = null;
         try {
-            appender = appenderProvider.getAppender();
-        } catch (LogForwardingException e1) {
-            logger.error("Cannot create an appender for job " + jobId, e1);
-            logger_dev.error("", e1);
-            throw new InternalException("Cannot create an appender for job " + jobId, e1);
+            clientAppender = appenderProvider.getAppender();
+        } catch (LogForwardingException e) {
+            logger.error("Cannot create an appender for job " + jobId, e);
+            logger_dev.error("", e);
+            throw new InternalException("Cannot create an appender for job " + jobId, e);
         }
 
         // targeted job
@@ -1524,29 +1537,36 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
             throw new UnknownJobException(jobId);
         }
 
+        boolean logIsAlreadyInitialized;
+
         // get or create appender for the targeted job
         AsyncAppender jobAppender = this.jobsToBeLogged.get(jobId);
         if (jobAppender == null) {
+            logIsAlreadyInitialized = false;
             jobAppender = new AsyncAppender();
             jobAppender.setName(Log4JTaskLogs.JOB_APPENDER_NAME);
             this.jobsToBeLogged.put(jobId, jobAppender);
-            l.setAdditivity(false);
-            l.addAppender(jobAppender);
+            jobLogger.setAdditivity(false);
+            jobLogger.addAppender(jobAppender);
+        } else {
+            logIsAlreadyInitialized = true;
         }
+
         // should add the appender before activating logs on running tasks !
-        jobAppender.addAppender(appender);
+        jobAppender.addAppender(clientAppender);
 
         // handle finished jobs
         if (this.finishedJobs.contains(target)) {
             logger_dev.info("listen logs of job '" + jobId + "' : job is already finished");
             // for finished tasks, add logs events "manually"
             Collection<TaskResult> allRes = target.getJobResult().getAllResults().values();
+
             for (TaskResult tr : allRes) {
-                this.flushTaskLogs(tr, l, appender);
+                this.flushTaskLogs(tr, jobLogger, clientAppender);
             }
             // as the job is finished, close appenders
             logger_dev.info("Cleaning loggers for already finished job '" + jobId + "'");
-            l.removeAllAppenders(); // close appenders...
+            jobLogger.removeAllAppenders(); // close appenders...
             this.jobsToBeLogged.remove(jobId);
 
             // job is not finished, tasks are running
@@ -1556,7 +1576,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
             // for finished tasks, add logs events "manually"
             Collection<TaskResult> allRes = target.getJobResult().getAllResults().values();
             for (TaskResult tr : allRes) {
-                this.flushTaskLogs(tr, l, appender);
+                this.flushTaskLogs(tr, jobLogger, clientAppender);
             }
 
             // for running tasks, activate loggers on taskLauncher side
@@ -1565,8 +1585,12 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
             if (curRunning != null) {
                 for (TaskId tid : curRunning.keySet()) {
                     try {
-                        TaskLauncher tl = curRunning.get(tid);
-                        tl.activateLogs(this.lfs.getAppenderProvider());
+                        TaskLauncher taskLauncher = curRunning.get(tid);
+                        if (logIsAlreadyInitialized) {
+                            taskLauncher.getStoredLogs(appenderProvider);
+                        } else {
+                            taskLauncher.activateLogs(this.lfs.getAppenderProvider());
+                        }
                     } catch (LogForwardingException e) {
                         logger.error("Cannot create an appender provider for task " + tid, e);
                         logger_dev.error("", e);
@@ -1942,7 +1966,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
      * {@inheritDoc}
      */
     public boolean pauseJob(JobId jobId) {
-        if (status.isDown()) {
+        if (status.isShuttingDown()) {
             return false;
         }
 
@@ -1968,7 +1992,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
      * {@inheritDoc}
      */
     public boolean resumeJob(JobId jobId) {
-        if (status.isDown()) {
+        if (status.isShuttingDown()) {
             return false;
         }
 

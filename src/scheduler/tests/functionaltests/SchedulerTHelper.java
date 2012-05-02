@@ -191,7 +191,7 @@ public class SchedulerTHelper {
      * @throws Exception if an error occurs.
      */
     public static void startSchedulerWithEmptyResourceManager(String rmPropertyFilePath) throws Exception {
-        startScheduler(false, null, rmPropertyFilePath);
+        startScheduler(false, null, rmPropertyFilePath, null);
     }
 
     /**
@@ -202,7 +202,7 @@ public class SchedulerTHelper {
      * @throws Exception
      */
     public static void startScheduler(boolean localnodes, String schedPropertiesFilePath) throws Exception {
-        startScheduler(localnodes, schedPropertiesFilePath, null);
+        startScheduler(localnodes, schedPropertiesFilePath, null, null);
     }
 
     /**
@@ -212,7 +212,7 @@ public class SchedulerTHelper {
      * @throws Exception
      */
     public static void startScheduler(boolean localnodes, String schedPropertiesFilePath,
-            String rmPropertiesFilePath) throws Exception {
+            String rmPropertiesFilePath, String rmUrl) throws Exception {
         if (schedPropertiesFilePath == null) {
             schedPropertiesFilePath = new File(functionalTestSchedulerProperties.toURI()).getAbsolutePath();
         }
@@ -281,6 +281,9 @@ public class SchedulerTHelper {
         commandLine.add(String.valueOf(localnodes));
         commandLine.add(schedPropertiesFilePath);
         commandLine.add(rmPropertiesFilePath);
+        if (rmUrl != null) {
+            commandLine.add(rmUrl);
+        }
 
         System.out.println("Starting Scheduler process: " + commandLine);
 
@@ -898,6 +901,11 @@ public class SchedulerTHelper {
      */
     public static JobInfo waitForEventJobFinished(JobId id, long timeout) throws ProActiveTimeoutException {
         return getMonitorsHandler().waitForEventJob(SchedulerEvent.JOB_RUNNING_TO_FINISHED, id, timeout);
+    }
+
+    public static JobInfo waitForEventPendingJobFinished(JobId id, long timeout)
+            throws ProActiveTimeoutException {
+        return getMonitorsHandler().waitForEventJob(SchedulerEvent.JOB_PENDING_TO_FINISHED, id, timeout);
     }
 
     /**

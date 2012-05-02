@@ -59,7 +59,7 @@ public class TestPamrProtocolHelper extends TestProtocolHelper {
     private final Integer pamrPort;
 
     protected TestPamrProtocolHelper(HostTestEnv serverHostEnv, String serverReservedId) {
-        super(serverHostEnv);
+        super(serverHostEnv, "pamr");
         if (serverReservedId == null) {
             throw new TestExecutionException(
                 "serverReservedId required for execution with pamr not specified");
@@ -91,7 +91,7 @@ public class TestPamrProtocolHelper extends TestProtocolHelper {
     @Override
     public Map<String, String> getClientProActiveProperties() {
         Map<String, String> properties = new HashMap<String, String>();
-        properties.put(CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL.getName(), "pamr");
+        properties.put(CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL.getName(), protocolName);
         properties.put(PAMRConfig.PA_NET_ROUTER_ADDRESS.getName(), pamrHostName);
         properties.put(PAMRConfig.PA_NET_ROUTER_PORT.getName(), String.valueOf(pamrPort.intValue()));
         return properties;
@@ -101,7 +101,7 @@ public class TestPamrProtocolHelper extends TestProtocolHelper {
     public List<String> getAdditionalServerJavaOptions() {
         List<String> options = new ArrayList<String>();
 
-        options.add(CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL.getCmdLine() + "pamr");
+        options.add(CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL.getCmdLine() + protocolName);
         options.add(PAMRConfig.PA_NET_ROUTER_ADDRESS.getCmdLine() + pamrHostName);
         options.add(PAMRConfig.PA_NET_ROUTER_PORT.getCmdLine() + String.valueOf(pamrPort.intValue()));
 

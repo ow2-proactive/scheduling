@@ -239,7 +239,7 @@ public class WaitAndPrint extends JavaExecutable {
 				}
 			}
 
-			message = URIBuilder.getLocalAddress().toString();
+			message = ProActiveInet.getInstance().getHostname();
 			Thread.sleep(10000);
 
 		} catch (Exception e) {

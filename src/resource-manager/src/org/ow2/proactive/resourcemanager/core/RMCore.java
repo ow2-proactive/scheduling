@@ -1068,6 +1068,14 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
     public NodeSet getAtMostNodes(int number, TopologyDescriptor descriptor,
             List<SelectionScript> selectionScrips, NodeSet exclusion) {
+        return getNodes(number, descriptor, selectionScrips, exclusion, true);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public NodeSet getNodes(int number, TopologyDescriptor descriptor, List<SelectionScript> selectionScrips,
+            NodeSet exclusion, boolean bestEffort) {
 
         if (number <= 0) {
             throw new IllegalArgumentException("Illegal node number " + number);
@@ -1079,7 +1087,8 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             if (descriptor == null) {
                 descriptor = TopologyDescriptor.ARBITRARY;
             }
-            return selectionManager.selectNodes(number, descriptor, selectionScrips, exclusion, caller);
+            return selectionManager.selectNodes(number, descriptor, selectionScrips, exclusion, caller,
+                    bestEffort);
         }
     }
 

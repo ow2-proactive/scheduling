@@ -48,6 +48,13 @@ import org.ow2.proactive.tests.performance.jmeter.BaseJMeterClient;
 import org.ow2.proactive.tests.performance.scheduler.TestSchedulerProxy;
 
 
+/**
+ * Base JavaSampler for all samplers working with Scheduler (it handles
+ * connection to the Scheduler and provides some common utility methods).
+ * 
+ * @author ProActive team
+ * 
+ */
 public abstract class BaseJMeterSchedulerClient extends BaseJMeterClient {
 
     private TestSchedulerProxy schedulerProxy;
@@ -134,7 +141,9 @@ public abstract class BaseJMeterSchedulerClient extends BaseJMeterClient {
         logError("Job result(" + result.getJobId() + "):");
         for (TaskResult r : result.getAllResults().values()) {
             logError("Task: " + r.getTaskId());
-            logError("Exception: " + r.getException());
+            if (r.getException() != null) {
+                logError("Task exception: " + r.getException(), r.getException());
+            }
             logError("SO:\n" + r.getOutput().getStdoutLogs(true));
             logError("SERR:\n" + r.getOutput().getStderrLogs(true));
         }

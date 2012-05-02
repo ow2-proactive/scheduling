@@ -201,4 +201,10 @@ public class TestRMProxy implements ResourceManager {
     public <T> List<ScriptResult<T>> executeScript(Script<T> script, String targetType, Set<String> targets) {
         return target.executeScript(script, targetType, targets);
     }
+
+    @Override
+    public NodeSet getNodes(int number, TopologyDescriptor descriptor,
+            List<SelectionScript> selectionScriptsList, NodeSet exclusion, boolean bestEffort) {
+        return this.getNodes(number, descriptor, selectionScriptsList, exclusion, bestEffort);
+    }
 }

@@ -53,6 +53,7 @@ import org.ow2.proactive.tests.performance.rm.RMEventsMonitor;
 import org.ow2.proactive.tests.performance.rm.RMTestListener;
 import org.ow2.proactive.tests.performance.rm.RMWaitCondition;
 
+
 /**
  * Base abstract class for 'Create Node Source' scenarios.
  * <p/>

@@ -57,6 +57,16 @@ import org.ow2.proactive.tests.performance.scheduler.TestSchedulerProxy;
 import org.ow2.proactive.tests.performance.utils.TestUtils;
 
 
+/**
+ * Base abstract class for the group of JavaSamplers executing the same
+ * scenario: submit some job to the Scheduler and wait when job execution
+ * completes (tests measure time required to execute Scheduler.submit). All
+ * these scenarios differ only in the type of the submitted job, and subclasses
+ * should implement method 'createJob' which creates scenario-specific job.
+ * 
+ * @author ProActive team
+ * 
+ */
 public abstract class BaseJobSubmitClient extends BaseJMeterSchedulerClient {
 
     public static final String PARAM_SUBMIT_USE_SELECTION_SCRIPT = "submitUseSelectionScript";

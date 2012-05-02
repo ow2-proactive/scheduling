@@ -47,6 +47,16 @@ import org.ow2.proactive.tests.performance.jmeter.scheduler.BaseJMeterSchedulerC
 import org.ow2.proactive.tests.performance.jmeter.scheduler.SchedulerConnectionParameters;
 
 
+/**
+ * Test scenario 'Connect to the Scheduler'.
+ * <p/>
+ * Scenario just establishes connection with Scheduler (SchedulerConnection.waitAndJoin), 
+ * logins (SchedulerAuthenticationInterface.login) and immediately 
+ * disconnects (Scheduler.disconnect).
+ * 
+ * @author ProActive team
+ *
+ */
 public class SchedulerConnectClient extends BaseJMeterSchedulerClient {
 
     private static final long LOGIN_TIMEOUT = 5 * 60000;
@@ -65,9 +75,12 @@ public class SchedulerConnectClient extends BaseJMeterSchedulerClient {
         SampleResult result = new SampleResult();
         result.sampleStart();
         Scheduler scheduler = auth.login(cred);
-        result.sampleEnd();
-        result.setSuccessful(true);
-        scheduler.disconnect();
+        try {
+            result.sampleEnd();
+            result.setSuccessful(true);
+        } finally {
+            scheduler.disconnect();
+        }
 
         return result;
     }

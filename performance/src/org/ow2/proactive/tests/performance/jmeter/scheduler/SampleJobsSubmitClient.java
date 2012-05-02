@@ -52,6 +52,17 @@ import org.ow2.proactive.tests.performance.scheduler.SchedulerTestListener;
 import org.ow2.proactive.tests.performance.scheduler.SchedulerWaitCondition;
 
 
+/**
+ * Test scenario 'Submit sample jobs'.
+ * <p/>
+ * This scenario submits multiple jobs using jobs descriptors from the scheduler 
+ * samples and waits when jobs finish. It measures total time required to submit all jobs. 
+ * Submitted jobs are Job_8_tasks.xml, Job_Aborted.xml, Job_fork.xml, _nativ.xml, 
+ * Job_PI.xml, Job_pre_post.xml, Job_with_dep.xml, Job_with_select_script.xml
+ * 
+ * @author ProActive team
+ *
+ */
 public class SampleJobsSubmitClient extends BaseJMeterSchedulerClient {
 
     static final long JOB_WAIT_TIMEOUT = 5 * 60000;

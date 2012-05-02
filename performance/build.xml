@@ -120,6 +120,9 @@
                 <jvmarg value="-Dtest.deploy.env.local.schedulingPath=${test.deploy.env.local.schedulingPath}" />
                 
                 <jvmarg value="-Dtest.deploy.protocol=${test.deploy.protocol}" />
+                <jvmarg value="-Dtest.deploy.multiprotocol.protocol=${test.deploy.multiprotocol.protocol}" />
+                <jvmarg value="-Dtest.deploy.multiprotocol.additional_protocols=${test.deploy.multiprotocol.additional_protocols}" />
+				<jvmarg value="-Dtest.deploy.multiprotocol.protocols_order=${test.deploy.multiprotocol.protocols_order}" />
 
                 <!-- needed if tests should use already running PAMR router -->
                 <jvmarg value="-Dtest.deploy.pamr.existingRouterHost=${test.deploy.pamr.existingRouterHost}" />
@@ -138,6 +141,8 @@
                 <jvmarg value="-Drm.deploy.javaOpts=${rm.deploy.javaOpts}" />
                 <jvmarg value="-Drm.deploy.rmNodesHosts=${rm.deploy.rmNodesHosts}" />
                 <jvmarg value="-Drm.deploy.rmNodesPerHosts=${rm.deploy.rmNodesPerHosts}" />
+                <jvmarg value="-Drm.deploy.rmNodesSourcesNumber=${rm.deploy.rmNodesSourcesNumber}" />
+            	
                 <jvmarg value="-Drm.deploy.testNodes=${createNodeSourceHosts}" />
 
                 <jvmarg value="-Dscheduler.deploy.schedulerHost=${scheduler.deploy.schedulerHost}" />
@@ -408,5 +413,5 @@
             <jvmarg value="-Dget.hosts.from.scheduler.rmAdditionalHostsNumber=${get.hosts.from.scheduler.rmAdditionalHostsNumber}" />
         </java>
     </target>
-
+	
 </project>

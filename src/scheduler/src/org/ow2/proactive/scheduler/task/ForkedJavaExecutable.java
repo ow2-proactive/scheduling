@@ -87,6 +87,7 @@ import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.ScriptHandler;
 import org.ow2.proactive.scripting.ScriptLoader;
 import org.ow2.proactive.scripting.ScriptResult;
+import org.ow2.proactive.utils.FileToBytesConverter;
 
 
 /**
@@ -356,7 +357,11 @@ public class ForkedJavaExecutable extends JavaExecutable implements ForkerStarte
      * Return the progress value of the executable that runs in the forked JVM.
      */
     public int getProgress() {
-        return this.newJavaTaskLauncher.getProgress();
+        if (this.newJavaTaskLauncher == null) {
+            return 0;
+        } else {
+            return this.newJavaTaskLauncher.getProgress();
+        }
     }
 
     /**
@@ -466,7 +471,7 @@ public class ForkedJavaExecutable extends JavaExecutable implements ForkerStarte
         }
 
         //TODO SCHEDULING-1302 : WORK AROUND
-        //automaticaly propagate PAMR props to the forked JVM if defined on the forker.
+        //automatically propagate PAMR props to the forked JVM if defined on the forker.
         if (PAMRConfig.PA_NET_ROUTER_ADDRESS.isSet()) {
             command.add(PAMRConfig.PA_NET_ROUTER_ADDRESS.getCmdLine() +
                 PAMRConfig.PA_NET_ROUTER_ADDRESS.getValue());
@@ -554,17 +559,51 @@ public class ForkedJavaExecutable extends JavaExecutable implements ForkerStarte
 
             try {
                 int ec = process.exitValue();
-                // process terminated abnormally:
-                throw new StartForkedProcessException(
-                    "Unable to create a separate java process. Exit code : " + ec, ospb.command());
+                throw startProcessException(String.format(
+                        "Unable to create a separate java process. Exit code: %d.", ec), ospb);
             } catch (IllegalThreadStateException e) {
                 //thrown by process.exitValue() if process is not finished
                 logger_dev.debug("Process not terminated, continue launching Forked VM (try number " +
                     numberOfTrials + ")");
             }
         }
-        throw new StartForkedProcessException("Separate java process didn't start after " + START_TIMEOUT +
-            "ms", ospb.command());
+        throw startProcessException(String.format("Separate java process didn't start after %dms.",
+                START_TIMEOUT), ospb);
+    }
+
+    private StartForkedProcessException startProcessException(String message, OSProcessBuilder ospb) {
+        String processInfo = getProcessCommandInformation(ospb.command(), fpolicy, flog4j, fpaconfig);
+        throw new StartForkedProcessException(message + "\nProcess information:\n" + processInfo);
+    }
+
+    String getProcessCommandInformation(List<String> command, File... tempFiles) {
+        if (command.size() < 1) {
+            throw new IllegalArgumentException();
+        }
+
+        StringBuilder result = new StringBuilder();
+        result.append("Command:\n");
+        result.append(command.get(0));
+        for (int i = 1; i < command.size(); i++) {
+            result.append(' ').append(command.get(i));
+        }
+        if (tempFiles.length > 0) {
+            result.append("\nTemporary files:\n");
+            for (File file : tempFiles) {
+                if (file != null) {
+                    String content;
+                    try {
+                        content = new String(FileToBytesConverter.convertFileToByteArray(file));
+                    } catch (IOException e) {
+                        content = "Failed to get file content: " + e.getMessage();
+                    }
+                    result.append("Temporary file '" + file.getName() + "' ").append(
+                            "(" + file.getAbsolutePath() + "). ");
+                    result.append("Content of the temporary file:\n").append(content).append('\n');
+                }
+            }
+        }
+        return result.toString();
     }
 
     /**
@@ -670,6 +709,8 @@ public class ForkedJavaExecutable extends JavaExecutable implements ForkerStarte
         /* JavaTaskLauncher will be an active object created on a newly created ProActive node */
         logger_dev.info("Create java task launcher");
         TaskLauncherInitializer tli = execInitializer.getJavaTaskLauncherInitializer();
+        // for the forked java task precious log is is handled by the ForkedJavaTaskLauncher
+        tli.setPreciousLogs(false);
         JavaTaskLauncher newLauncher = (JavaTaskLauncher) PAActiveObject.newActive(JavaTaskLauncher.class
                 .getName(), new Object[] { tli }, forkedNode);
         return newLauncher;

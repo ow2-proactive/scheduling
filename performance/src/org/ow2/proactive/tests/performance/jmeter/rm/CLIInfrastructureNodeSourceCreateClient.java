@@ -51,6 +51,7 @@ import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.ow2.proactive.tests.performance.utils.TestFileUtils;
 import org.ow2.proactive.utils.FileToBytesConverter;
 
+
 /**
  * Test scenario 'Create Node Source with CLIInfrastructure'.
  * <p/>

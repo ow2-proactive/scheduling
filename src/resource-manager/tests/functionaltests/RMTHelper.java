@@ -145,14 +145,18 @@ public class RMTHelper {
         return createNode(nodeName, null);
     }
 
+    public static void createDefaultNodeSource() throws Exception {
+        createDefaultNodeSource(RMTHelper.defaultNodesNumber);
+    }
+
     /**
      * Creates a Default Infrastructure Manager with defaultNodesNumber nodes
      * @throws Exception
      */
-    public static void createDefaultNodeSource() throws Exception {
+    public static void createDefaultNodeSource(int nodesNumber) throws Exception {
         RMFactory.setOsJavaProperty();
         ResourceManager rm = getResourceManager();
-        for (int i = 0; i < RMTHelper.defaultNodesNumber; i++) {
+        for (int i = 0; i < nodesNumber; i++) {
             String nodeName = "default_nodermt_" + System.currentTimeMillis();
             Node node = createNode(nodeName);
             rm.addNode(node.getNodeInformation().getURL());

@@ -60,6 +60,16 @@ import org.ow2.proactive.tests.performance.scheduler.SchedulerWaitCondition;
 import org.ow2.proactive.tests.performance.scheduler.StartTaskWaitContition;
 
 
+/**
+ * Test scenario 'Submit and kill job'.
+ * <p/>
+ * Scenario submits job with one native task (task sleeps forever), waits when
+ * task starts execution, kills job (Scheduler.killJob) and removes killed job
+ * (Scheduler.removedJob). It measures time required to call Scheduler.killJob.
+ * 
+ * @author ProActive team
+ * 
+ */
 public class SubmitAndKillSchedulerClient extends BaseJMeterSchedulerClient {
 
     static final long EXECUTION_START_TIMEOUT = 5 * 60000;

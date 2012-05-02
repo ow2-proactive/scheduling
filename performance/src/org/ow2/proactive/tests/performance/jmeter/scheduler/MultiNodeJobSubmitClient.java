@@ -47,6 +47,17 @@ import org.ow2.proactive.tests.performance.utils.TestUtils;
 import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
 
 
+/**
+ * Test scenario 'Submit multi-node task' (it executes basic 'submit job'
+ * scenario, see BaseJobSubmitClient for details).
+ * <p/>
+ * Scenario submits job which contains single multi-node task (task doesn't do
+ * anything just sleeps some time and finishes). Number of nodes requested by
+ * the task and ToplogyDescriptor used for the nodes request are configurable.
+ * 
+ * @author ProActive team
+ * 
+ */
 public class MultiNodeJobSubmitClient extends BaseJobSubmitClient {
 
     public static final String PARAM_MULTI_NODE_SUBMIT_TASK_TYPE = "multiNodeSubmitTaskType";

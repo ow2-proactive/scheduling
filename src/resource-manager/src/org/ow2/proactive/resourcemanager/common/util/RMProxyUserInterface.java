@@ -333,4 +333,9 @@ public class RMProxyUserInterface implements ResourceManager {
         return this.target.executeScript(script, targetType, targets);
     }
 
+    @Override
+    public NodeSet getNodes(int number, TopologyDescriptor descriptor,
+            List<SelectionScript> selectionScriptsList, NodeSet exclusion, boolean bestEffort) {
+        return this.getNodes(number, descriptor, selectionScriptsList, exclusion, bestEffort);
+    }
 }

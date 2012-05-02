@@ -85,6 +85,8 @@ public class TestRMDeployer extends TestDeployer {
 
     private final int rmNodesPerHost;
 
+    private final int nodeSourcesNumber;
+
     private final TestEnv nodesTestEnv;
 
     public static TestRMDeployer createRMDeployerUsingSystemProperties() throws Exception {
@@ -112,22 +114,25 @@ public class TestRMDeployer extends TestDeployer {
             }
         }
 
+        int nodeSourcesNumber = Integer.parseInt(System.getProperty("rm.deploy.rmNodesSourcesNumber", "1"));
+
         TestEnv nodesTestEnv = TestEnv.getEnvUsingSystemProperties("rmNodes");
 
         return TestRMDeployer.createRMDeployer(serverHostEnv, protocol, nodesTestEnv, Arrays
-                .asList(rmNodesHosts), nodesPerHost, Arrays.asList(testNodes));
+                .asList(rmNodesHosts), nodesPerHost, nodeSourcesNumber, Arrays.asList(testNodes));
     }
 
     public static TestRMDeployer createRMDeployer(HostTestEnv serverHostEnv, String protocol,
-            TestEnv nodesTestEnv, List<String> rmNodesHosts, int rmNodesPerHost, List<String> testNodes)
-            throws Exception {
+            TestEnv nodesTestEnv, List<String> rmNodesHosts, int rmNodesPerHost, int nodeSourcesNumber,
+            List<String> testNodes) throws Exception {
         TestRMDeployer deployer = new TestRMDeployer(serverHostEnv, protocol, nodesTestEnv, rmNodesHosts,
-            rmNodesPerHost, testNodes);
+            rmNodesPerHost, nodeSourcesNumber, testNodes);
         return deployer;
     }
 
     private TestRMDeployer(HostTestEnv serverHostEnv, String protocol, TestEnv nodesTestEnv,
-            List<String> rmNodesHosts, int rmNodesPerHost, List<String> testNodes) throws Exception {
+            List<String> rmNodesHosts, int rmNodesPerHost, int nodeSourcesNumber, List<String> testNodes)
+            throws Exception {
         super(serverHostEnv, CLIENT_CONFIG_FILE_NAME, protocol);
 
         this.nodesTestEnv = nodesTestEnv;
@@ -137,6 +142,17 @@ public class TestRMDeployer extends TestDeployer {
             throw new IllegalArgumentException("Invalid rmNodesPerHost: " + rmNodesPerHost);
         }
         this.rmNodesPerHost = rmNodesPerHost;
+
+        if (nodeSourcesNumber > rmNodesHosts.size()) {
+            System.out
+                    .println(String
+                            .format(
+                                    "WARNING: requested number of node sources(%d) is bigger than number of available hosts(%d)",
+                                    nodeSourcesNumber, rmNodesHosts.size()));
+            this.nodeSourcesNumber = rmNodesHosts.size();
+        } else {
+            this.nodeSourcesNumber = nodeSourcesNumber;
+        }
 
         Set<String> allHosts = new LinkedHashSet<String>();
         allHosts.addAll(rmNodesHosts);
@@ -165,20 +181,10 @@ public class TestRMDeployer extends TestDeployer {
         if (!rmNodesHosts.isEmpty()) {
             int expectedNodesNumber = rmNodesHosts.size() * rmNodesPerHost;
 
-            RMWaitCondition waitCondition = eventsMonitor.addWaitCondition(new NodesDeployWaitCondition(
-                NODE_SOURCE_NAME, expectedNodesNumber));
-
             String clientJavaOptions = javaPropertiesAsSingleString(getClientJavaProperties(nodesTestEnv));
 
-            if (!createNodeSource(rm, expectedUrl, clientJavaOptions)) {
+            if (!createNodeSource(rm, eventsMonitor, expectedUrl, clientJavaOptions)) {
                 throw new TestExecutionException("Failed to create node source");
-            }
-
-            System.out.println("Waiting for nodes deployment (nodes: " + expectedNodesNumber + ", timeout: " +
-                RM_NODE_DEPLOY_TIMEOUT + ")");
-            boolean nodesStarted = eventsMonitor.waitFor(waitCondition, RM_NODE_DEPLOY_TIMEOUT, null);
-            if (!nodesStarted) {
-                throw new TestExecutionException("Failed to deploy nodes");
             }
 
             int nodesNumber = rm.getState().getFreeNodesNumber();
@@ -204,9 +210,46 @@ public class TestRMDeployer extends TestDeployer {
         }
     }
 
-    private boolean createNodeSource(ResourceManager rm, String rmUrl, String javaOptions) throws Exception {
+    private boolean createNodeSource(ResourceManager rm, RMEventsMonitor eventsMonitor, String rmUrl,
+            String javaOptions) throws Exception {
+
+        int hostsPerNodeSource = rmNodesHosts.size() / nodeSourcesNumber;
+
+        for (int i = 0; i < nodeSourcesNumber; i++) {
+            int start = i * hostsPerNodeSource;
+            int end = start + hostsPerNodeSource;
+            if (i == nodeSourcesNumber - 1) {
+                end = rmNodesHosts.size();
+            }
+            List<String> nodeSourceHosts = rmNodesHosts.subList(start, end);
+
+            String nodeSourceName = NODE_SOURCE_NAME + "-" + i;
+
+            int expectedNodesNumber = nodeSourceHosts.size() * rmNodesPerHost;
+            RMWaitCondition waitCondition = eventsMonitor.addWaitCondition(new NodesDeployWaitCondition(
+                nodeSourceName, expectedNodesNumber));
+
+            System.out.println("Creating node source '" + nodeSourceName + "' using " +
+                nodeSourceHosts.size() + " hosts (" + nodeSourceHosts + ")");
+            if (!createNodeSource(rm, rmUrl, javaOptions, nodeSourceHosts, nodeSourceName)) {
+                return false;
+            }
+
+            System.out.println("Waiting for nodes deployment (nodes: " + expectedNodesNumber + ", timeout: " +
+                RM_NODE_DEPLOY_TIMEOUT + ")");
+            boolean nodesStarted = eventsMonitor.waitFor(waitCondition, RM_NODE_DEPLOY_TIMEOUT, null);
+            if (!nodesStarted) {
+                throw new TestExecutionException("Failed to deploy nodes");
+            }
+        }
+
+        return true;
+    }
+
+    private boolean createNodeSource(ResourceManager rm, String rmUrl, String javaOptions,
+            List<String> hosts, String nodeSourceName) throws Exception {
         StringBuilder hostsListString = new StringBuilder();
-        for (String hostName : rmNodesHosts) {
+        for (String hostName : hosts) {
             hostsListString.append(String.format("%s %d\n", hostName, rmNodesPerHost));
         }
 
@@ -227,7 +270,7 @@ public class TestRMDeployer extends TestDeployer {
                 "Creating node source, ssh infrastructure, rmUrl=%s, hostsList=%s, javaOptions: %s", rmUrl,
                 hostsListString, javaOptions.toString()));
 
-        BooleanWrapper result = rm.createNodeSource(NODE_SOURCE_NAME, SSHInfrastructure.class.getName(),
+        BooleanWrapper result = rm.createNodeSource(nodeSourceName, SSHInfrastructure.class.getName(),
                 infrastructureParameters, StaticPolicy.class.getName(), policyParameters);
         return result.getBooleanValue();
     }

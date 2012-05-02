@@ -188,6 +188,12 @@
 							</listitem>
 							<listitem>
 								<para>
+									<emphasis>Locked</emphasis> -
+									Node is under maintenance and cannot be used for computations.
+								</para>
+							</listitem>
+							<listitem>
+								<para>
 									<emphasis>To be removed</emphasis> -
 									Node is busy but requested to be removed. So it
 									will be removed once the client will release it.

@@ -177,14 +177,6 @@ public class NativeTaskLauncher extends TaskLauncher {
             }
 
             //for the next two steps, task could be killed anywhere
-            if (!hasBeenKilled) {
-                sample = System.currentTimeMillis();
-                //copy output file
-                copyScratchDataToOutput();
-                sample = System.currentTimeMillis() - sample;
-                logger_dev.info("Time spent copying SCRATCH datas to OUTPUT : " + sample + " ms");
-            }
-
             if (!hasBeenKilled && post != null) {
                 sample = System.currentTimeMillis();
                 int retCode = -1;//< 0 means exception in the command itself (ie. command not found)
@@ -194,6 +186,14 @@ public class NativeTaskLauncher extends TaskLauncher {
                 //launch post script
                 this.executePostScript(retCode == 0 && exception == null);
                 duration += System.currentTimeMillis() - sample;
+            }
+
+            if (!hasBeenKilled) {
+                sample = System.currentTimeMillis();
+                //copy output file
+                copyScratchDataToOutput();
+                sample = System.currentTimeMillis() - sample;
+                logger_dev.info("Time spent copying SCRATCH datas to OUTPUT : " + sample + " ms");
             }
         } catch (Throwable ex) {
             logger_dev.debug("Exception occured while running task " + this.taskId + ": ", ex);

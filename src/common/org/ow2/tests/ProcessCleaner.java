@@ -120,11 +120,26 @@ public class ProcessCleaner {
     }
 
     private int[] getAliveWithNative() throws IOException {
-        switch (OperatingSystem.getOperatingSystem()) {
+        OperatingSystem os = OperatingSystem.getOperatingSystem();
+        switch (os) {
             case unix:
-                ProcessBuilder pb = new ProcessBuilder("/bin/sh", "-c",
-                    "for PID in $(pidof java) ; do grep -q -- '" + this.pattern.toString() +
-                        "' /proc/$PID/cmdline && echo $PID ; done");
+
+                ProcessBuilder pb = null;
+
+                // Mac Os
+                String osName = System.getProperty("os.name").toLowerCase();
+
+                if (osName.indexOf("mac") >= 0) {
+                    // Mac OS / Mac Os X
+                    pb = new ProcessBuilder("/bin/sh", "-c",
+                        "for PID in $(pidof java) ; do ps $PID | grep -q -- '" + this.pattern.toString() +
+                            "' && echo $PID ; done");
+                } else {
+                    // Linux / Unix
+                    pb = new ProcessBuilder("/bin/sh", "-c", "for PID in $(pidof java) ; do grep -q -- '" +
+                        this.pattern.toString() + "' /proc/$PID/cmdline && echo $PID ; done");
+                }
+
                 pb.redirectErrorStream(true);
                 Process p = pb.start();
 

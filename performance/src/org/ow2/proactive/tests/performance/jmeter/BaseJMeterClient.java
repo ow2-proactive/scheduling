@@ -42,6 +42,20 @@ import org.apache.jmeter.protocol.java.sampler.JavaSamplerContext;
 import org.apache.jmeter.samplers.SampleResult;
 
 
+/**
+ * Abstract JavaSampler class extending standard JMeter class AbstractJavaSamplerClient .
+ * BaseJMeterClient should be used as base class for all JavaSamplers used in tests.
+ * <p/>
+ * Main purpose of this class is to properly handle error during sampler initialization 
+ * (it stop test if initialization fails) and to handle 'stopOnError' property.
+ * This property controls tests behavior in case if during execution some of the 
+ * tests gets an error. If stopOnError=true then tests execution is interrupted in case 
+ * of any error. If stopOnError=false then even if an error occurs tests continue 
+ * execution until test end time is reached
+ * 
+ * @author ProActive team
+ *
+ */
 public abstract class BaseJMeterClient extends AbstractJavaSamplerClient {
 
     public static final String PARAM_STOP_ON_ERROR = "stopOnError";
@@ -76,8 +90,10 @@ public abstract class BaseJMeterClient extends AbstractJavaSamplerClient {
                 SampleResult errorResult = new SampleResult();
                 errorResult.setSuccessful(false);
                 errorResult.setStopTest(stopOnError);
-                errorResult.setResponseMessage("Unexpected exception during test execution: " + t);
-                logError("Unexpected exception during test execution: " + t, t);
+                String message = "Unexpected exception during test execution: " + t + " (sampler " +
+                    getClass().getSimpleName() + ")";
+                errorResult.setResponseMessage(message);
+                logError(message, t);
                 return errorResult;
             }
         }

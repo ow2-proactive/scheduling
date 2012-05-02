@@ -21,6 +21,10 @@ log4j.logger.proactive.resourceManager.consol=INFO,CONSOLE
 #log4j.logger.proactive.resourceManager.policy=INFO
 log4j.logger.proactive.resourceManager.statistics=INFO
 
+log4j.logger.com.mchange=WARN,RMDevFileAppender
+log4j.logger.com.mchange.v2.c3p0=WARN,RMDevFileAppender
+log4j.logger.com.mchange.v2.c3p0.SQLWarnings=WARN,RMDevFileAppender
+
 # File appender for verbose developer logging level (FILE3)
 log4j.appender.RMDevFileAppender=org.apache.log4j.RollingFileAppender
 log4j.appender.RMDevFileAppender.File=${pa.rm.home}/.logs/RM.log
@@ -38,3 +42,5 @@ log4j.appender.CONSOLE.layout.ConversionPattern=%m%n
 log4j.appender.resourceManagerAppender=org.apache.log4j.ConsoleAppender
 log4j.appender.resourceManagerAppender.layout=org.apache.log4j.PatternLayout
 log4j.appender.resourceManagerAppender.layout.ConversionPattern=[%-5p] [RESOURCE_MANAGER.%C{1}] %m%n
+
+
