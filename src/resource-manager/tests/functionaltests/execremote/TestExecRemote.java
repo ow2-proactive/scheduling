@@ -67,7 +67,7 @@ public final class TestExecRemote extends FunctionalTest {
     private static final String erroneousSimpleScriptContent = "var a = null; a.toString();";
     private static final String selectionScriptContent = "selected = true; print(selected);";
 
-    @org.junit.Ignore("SCHEDULING-1587")
+    //@org.junit.Ignore("SCHEDULING-1587")
     @org.junit.Test
     public void action() throws Exception {
         try {
@@ -85,7 +85,7 @@ public final class TestExecRemote extends FunctionalTest {
             System.getProperty("os.name").toLowerCase().startsWith("mac");
         final String valueToEcho = "111";
 
-        RMTHelper.defaultNodesNumber = 1;
+//        RMTHelper.defaultNodesNumber = 1;
         RMTHelper.createLocalNodeSource();
         RMTHelper
                 .waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, NodeSource.LOCAL_INFRASTRUCTURE_NAME);
@@ -130,7 +130,7 @@ public final class TestExecRemote extends FunctionalTest {
             File sFile = new File(miscDir + "processBuilder.js");
             RMTHelper.log("Test 4 - Test " + sFile);
 
-            String[] cmd = (isLinux) ? new String[] { "/bin/sh", "-c", "echo " + valueToEcho }
+            String[] cmd = (isLinux) ? new String[] { "/bin/bash", "-c", "echo " + valueToEcho }
                     : new String[] { "cmd.exe", "/c", "@(echo " + valueToEcho + ")" };
             SimpleScript script = new SimpleScript(sFile, cmd);
             List<ScriptResult<Object>> results = RMTHelper.getResourceManager().executeScript(script,
@@ -163,7 +163,7 @@ public final class TestExecRemote extends FunctionalTest {
             try {
                 // Start DS				
                 String dsurl = dsHelper.startDS(tempDir.getAbsolutePath());
-                String[] cmd = (isLinux) ? new String[] { dsurl, "/bin/sh", "-c", "more " + testFilename }
+                String[] cmd = (isLinux) ? new String[] { dsurl, "/bin/bash", "-c", "more " + testFilename }
                         : new String[] { dsurl, "cmd.exe", "/c", "more", testFilename };
                 // Execute the script
                 SimpleScript script = new SimpleScript(sFile, cmd);
