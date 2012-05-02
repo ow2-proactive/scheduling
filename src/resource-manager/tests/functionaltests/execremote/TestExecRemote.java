@@ -67,7 +67,6 @@ public final class TestExecRemote extends FunctionalTest {
     private static final String erroneousSimpleScriptContent = "var a = null; a.toString();";
     private static final String selectionScriptContent = "selected = true; print(selected);";
 
-    
     @org.junit.Test
     public void action() throws Exception {
         try {
