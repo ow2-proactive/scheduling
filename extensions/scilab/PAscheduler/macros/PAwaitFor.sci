@@ -37,7 +37,7 @@ function val_k=PAwaitFor(l,timeout)
                 [tmpval,err] = PAResult_PAwaitFor(R,jinvoke(answers,'get',i-1));
                 val_k($+1)=tmpval;
                 if ~isempty(err) then
-                    disp(err);
+                    warning(err);
                     anyerror = %t;
                 end
                 
@@ -46,14 +46,14 @@ function val_k=PAwaitFor(l,timeout)
                 [tmpval,err] = PAResult_PAwaitFor(R);
                 val_k($+1)=tmpval;
                 if ~isempty(err) then
-                    disp(err);
+                    warning(err);
                     anyerror = %t;
                 end
                 
             end
         end
         if anyerror then
-             error('PAWaitFor:Error occured');
+             warning('PAWaitFor:Error occured');
         end
 
     else        

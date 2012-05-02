@@ -46,8 +46,8 @@ function [val_k,index]=PAwaitAny(l,timeout)
         jinvoke(pares.waited,'set',%t);
         [val_k,err] = PAResult_PAwaitFor(pares);
         if ~isempty(err) then
-            disp(err);
-            error('PAwaitAny:Error occured')
+            warning(err);
+            warning('PAwaitAny:Error occured')
         end
     else        
         error('Expected argument of type PAResL, received '+typeof(l))

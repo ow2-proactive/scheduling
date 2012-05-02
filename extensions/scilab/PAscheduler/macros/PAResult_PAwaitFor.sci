@@ -35,7 +35,7 @@ function [val_k,err]=PAResult_PAwaitFor(R,RaL)
         printLogs(R,RaL,%t);
         jinvoke(R.iserror,'set',%t);
         resultSet(R);
-        errormessage = 'PAResult:PAwaitFor Error during remote script execution';
+        errormessage = 'PAResult:PAwaitFor Error during execution of task '+R.taskid;
     else
         //disp('PAResult_PAwaitFor : internalError')
         printLogs(R,RaL,%t);
@@ -51,7 +51,7 @@ function [val_k,err]=PAResult_PAwaitFor(R,RaL)
         end        
         jinvoke(R.iserror,'set',%t);
         resultSet(R);
-        errormessage = 'PAResult:PAwaitFor Internal Error';
+        errormessage = 'PAResult:PAwaitFor Internal Error while executing '+R.taskid;
     end    
 
     PAResult_clean(R);
@@ -83,7 +83,7 @@ function printLogs(R,RaL,err)
     if ~jexists(R.logsPrinted) then
             error('PAResult::object cleared');
         end
-    if ~jinvoke(R.logsPrinted,'get') | err
+    if ~jinvoke(R.logsPrinted,'get')
         logs = jinvoke(RaL,'getLogs');
         dummy = jinvoke(R.logs,'append',logs);
         jremove(dummy); // append returns a StringBuilder object that must be freed
@@ -93,6 +93,10 @@ function printLogs(R,RaL,err)
         end
         jinvoke(R.logsPrinted,'set',%t);
         //jremove(logs,logstr);
-
+    elseif err
+        logstr = jinvoke(R.logs,'toString');
+        if ~isempty(logstr) then
+            printf('%s',logstr);
+        end
     end    
 endfunction
