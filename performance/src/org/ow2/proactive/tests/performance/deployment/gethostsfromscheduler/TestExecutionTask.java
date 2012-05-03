@@ -66,6 +66,8 @@ public class TestExecutionTask extends JavaExecutable {
 
     private String communicationObjectUrl;
 
+    private String antPath;
+
     private String jmeterhome;
 
     @Override
@@ -134,7 +136,11 @@ public class TestExecutionTask extends JavaExecutable {
         }
 
         List<String> command = new ArrayList<String>();
-        command.add("ant");
+        if (antPath == null) {
+            command.add("ant");
+        } else {
+            command.add(antPath);
+        }
         command.add("-buildfile");
         command.add(antScriptPath);
         command.add("-Dcompile.tests.disable=true");

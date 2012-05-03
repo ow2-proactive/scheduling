@@ -410,6 +410,7 @@
             <jvmarg value="-Dget.hosts.from.scheduler.schedulerPassword=${get.hosts.from.scheduler.schedulerPassword}" />
             <jvmarg value="-Dget.hosts.from.scheduler.rmHostsNumber=${get.hosts.from.scheduler.rmHostsNumber}" />
             <jvmarg value="-Dget.hosts.from.scheduler.jmeterhome=${get.hosts.from.scheduler.jmeterhome}" />
+            <jvmarg value="-Dget.hosts.from.scheduler.antPath=${get.hosts.from.scheduler.antPath}" />
             <jvmarg value="-Dget.hosts.from.scheduler.rmAdditionalHostsNumber=${get.hosts.from.scheduler.rmAdditionalHostsNumber}" />
         </java>
     </target>
