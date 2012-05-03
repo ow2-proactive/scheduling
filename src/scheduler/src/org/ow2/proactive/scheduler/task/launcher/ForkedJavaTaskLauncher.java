@@ -144,7 +144,7 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher implements ForkerSt
             //schedule timer at any time
             scheduleTimer();
 
-            duration = System.currentTimeMillis();
+            duration = System.nanoTime();
             //launch task : here, result is a taskLauncher if everything terminated without error,
             //result is an integer if forkedJVM has exited abnormally (integer contains the error code)
             Serializable userResult;
@@ -154,7 +154,7 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher implements ForkerSt
                 throw t;
             } finally {
                 //compute duration in any cases (exception or not)
-                duration = System.currentTimeMillis() - duration;
+                duration = System.nanoTime() - duration;
             }
 
             if (storeLogs) {
@@ -170,19 +170,20 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher implements ForkerSt
             } else {
                 Integer ec = (Integer) userResult;
                 if (ec == 0) {
-                    return new TaskResultImpl(taskId, ec, getLogs(), duration);
+                    return new TaskResultImpl(taskId, ec, getLogs(), duration / 1000000);
                 } else {
                     Throwable t = new ForkedJavaTaskException(
                         "Forked JVM process has been terminated with exit code " + ec, ec);
-                    return new TaskResultImpl(taskId, t, getLogs(), duration);
+                    return new TaskResultImpl(taskId, t, getLogs(), duration / 1000000);
                 }
             }
         } catch (Throwable ex) {
             logger_dev.info("", ex);
             if (this.getLogs() == null) {
-                return new TaskResultImpl(taskId, ex, new SimpleTaskLogs("", ex.toString()), duration, null);
+                return new TaskResultImpl(taskId, ex, new SimpleTaskLogs("", ex.toString()),
+                    duration / 1000000, null);
             } else {
-                return new TaskResultImpl(taskId, ex, this.getLogs(), duration, null);
+                return new TaskResultImpl(taskId, ex, this.getLogs(), duration / 1000000, null);
             }
         } finally {
             // finalize doTask

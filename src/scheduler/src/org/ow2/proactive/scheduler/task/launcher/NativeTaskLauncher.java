@@ -115,10 +115,10 @@ public class NativeTaskLauncher extends TaskLauncher {
             initDataSpaces();
             replaceTagsInDataspaces();
 
-            sample = System.currentTimeMillis();
+            sample = System.nanoTime();
             //copy datas from OUTPUT or INPUT to local scratch
             copyInputDataToScratch();
-            sample = System.currentTimeMillis() - sample;
+            sample = System.nanoTime() - sample;
             logger_dev.info("Time spent copying INPUT datas to SCRATCH : " + sample + " ms");
 
             if (!hasBeenKilled) {
@@ -135,9 +135,9 @@ public class NativeTaskLauncher extends TaskLauncher {
 
             //execute pre-script
             if (!hasBeenKilled && pre != null) {
-                sample = System.currentTimeMillis();
+                sample = System.nanoTime();
                 this.executePreScript();
-                duration = System.currentTimeMillis() - sample;
+                duration = System.nanoTime() - sample;
             }
 
             if (!hasBeenKilled) {
@@ -164,7 +164,7 @@ public class NativeTaskLauncher extends TaskLauncher {
                 // pass the nodesfile as parameter if needed...
                 replaceCommandNodesInfosTags();
 
-                sample = System.currentTimeMillis();
+                sample = System.nanoTime();
                 try {
                     //launch task
                     logger_dev.debug("Starting execution of task '" + taskId + "'");
@@ -172,27 +172,27 @@ public class NativeTaskLauncher extends TaskLauncher {
                 } catch (Throwable t) {
                     exception = t;
                 }
-                duration += System.currentTimeMillis() - sample;
+                duration += System.nanoTime() - sample;
 
             }
 
             //for the next two steps, task could be killed anywhere
             if (!hasBeenKilled && post != null) {
-                sample = System.currentTimeMillis();
+                sample = System.nanoTime();
                 int retCode = -1;//< 0 means exception in the command itself (ie. command not found)
                 if (userResult != null) {
                     retCode = Integer.parseInt(userResult.toString());
                 }
                 //launch post script
                 this.executePostScript(retCode == 0 && exception == null);
-                duration += System.currentTimeMillis() - sample;
+                duration += System.nanoTime() - sample;
             }
 
             if (!hasBeenKilled) {
-                sample = System.currentTimeMillis();
+                sample = System.nanoTime();
                 //copy output file
                 copyScratchDataToOutput();
-                sample = System.currentTimeMillis() - sample;
+                sample = System.nanoTime() - sample;
                 logger_dev.info("Time spent copying SCRATCH datas to OUTPUT : " + sample + " ms");
             }
         } catch (Throwable ex) {
@@ -203,9 +203,9 @@ public class NativeTaskLauncher extends TaskLauncher {
             if (!hasBeenKilled) {
                 // set the result
                 if (exception != null) {
-                    res = new TaskResultImpl(taskId, exception, null, duration, null);
+                    res = new TaskResultImpl(taskId, exception, null, duration / 1000000, null);
                 } else {
-                    res = new TaskResultImpl(taskId, userResult, null, duration, null);
+                    res = new TaskResultImpl(taskId, userResult, null, duration / 1000000, null);
                 }
                 try {
                     // logs have to be retrieved after flowscript exec if any
@@ -217,7 +217,7 @@ public class NativeTaskLauncher extends TaskLauncher {
                 } catch (Throwable e) {
                     // task result is now the exception thrown by flowscript
                     // flowaction is set to default
-                    res = new TaskResultImpl(taskId, e, null, duration, null);
+                    res = new TaskResultImpl(taskId, e, null, duration / 1000000, null);
                     // action is set to default as the script was not evaluated
                     res.setAction(FlowAction.getDefaultAction(this.flow));
                 }

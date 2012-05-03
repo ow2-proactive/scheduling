@@ -115,10 +115,10 @@ public class JavaTaskLauncher extends TaskLauncher {
             initDataSpaces();
             replaceTagsInDataspaces();
 
-            sample = System.currentTimeMillis();
+            sample = System.nanoTime();
             //copy datas from OUTPUT or INPUT to local scratch
             copyInputDataToScratch();
-            sample = System.currentTimeMillis() - sample;
+            sample = System.nanoTime() - sample;
             logger_dev.info("Time spent copying INPUT datas to SCRATCH : " + sample + " ms");
 
             if (!hasBeenKilled) {
@@ -131,9 +131,9 @@ public class JavaTaskLauncher extends TaskLauncher {
 
             //launch pre script
             if (!hasBeenKilled && pre != null) {
-                sample = System.currentTimeMillis();
+                sample = System.nanoTime();
                 this.executePreScript();
-                duration += System.currentTimeMillis() - sample;
+                duration += System.nanoTime() - sample;
             }
 
             if (!hasBeenKilled) {
@@ -147,30 +147,30 @@ public class JavaTaskLauncher extends TaskLauncher {
                 } catch (InvocationTargetException e) {
                     throw e.getCause() != null ? e.getCause() : e;
                 }
-                sample = System.currentTimeMillis();
+                sample = System.nanoTime();
                 try {
                     //launch task
                     userResult = currentExecutable.execute(results);
                 } catch (Throwable t) {
                     exception = t;
                 }
-                duration += System.currentTimeMillis() - sample;
+                duration += System.nanoTime() - sample;
             }
 
             //for the next two steps, task could be killed anywhere
 
             if (!hasBeenKilled && post != null) {
-                sample = System.currentTimeMillis();
+                sample = System.nanoTime();
                 //launch post script
                 this.executePostScript(exception == null);
-                duration += System.currentTimeMillis() - sample;
+                duration += System.nanoTime() - sample;
             }
 
             if (!hasBeenKilled) {
-                sample = System.currentTimeMillis();
+                sample = System.nanoTime();
                 //copy output file
                 copyScratchDataToOutput();
-                sample = System.currentTimeMillis() - sample;
+                sample = System.nanoTime() - sample;
                 logger_dev.info("Time spent copying SCRATCH datas to OUTPUT : " + sample + " ms");
             }
         } catch (Throwable ex) {
@@ -181,9 +181,9 @@ public class JavaTaskLauncher extends TaskLauncher {
             if (!hasBeenKilled) {
                 // set the result
                 if (exception != null) {
-                    res = new TaskResultImpl(taskId, exception, null, duration, null);
+                    res = new TaskResultImpl(taskId, exception, null, duration / 1000000, null);
                 } else {
-                    res = new TaskResultImpl(taskId, userResult, null, duration, null);
+                    res = new TaskResultImpl(taskId, userResult, null, duration / 1000000, null);
                 }
                 try {
                     // logs have to be retrieved after flowscript exec if any
@@ -195,7 +195,7 @@ public class JavaTaskLauncher extends TaskLauncher {
                 } catch (Throwable e) {
                     // task result is now the exception thrown by flowscript
                     // flowaction is set to default
-                    res = new TaskResultImpl(taskId, e, null, duration, null);
+                    res = new TaskResultImpl(taskId, e, null, duration / 1000000, null);
                     // action is set to default as the script was not evaluated
                     res.setAction(FlowAction.getDefaultAction(this.flow));
                 }
