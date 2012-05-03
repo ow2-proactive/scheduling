@@ -16,6 +16,7 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import org.ow2.tests.FunctionalTest;
 
+
 /**
  * Test checks that it is possible to submit job when
  * scheduler isn't linked to RM.
