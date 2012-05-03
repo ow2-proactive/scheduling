@@ -85,7 +85,7 @@ public final class TestExecRemote extends FunctionalTest {
             System.getProperty("os.name").toLowerCase().startsWith("mac");
         final String valueToEcho = "111";
 
-//        RMTHelper.defaultNodesNumber = 1;
+        //        RMTHelper.defaultNodesNumber = 1;
         RMTHelper.createLocalNodeSource();
         RMTHelper
                 .waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, NodeSource.LOCAL_INFRASTRUCTURE_NAME);
@@ -163,13 +163,12 @@ public final class TestExecRemote extends FunctionalTest {
             try {
                 // Start DS				
                 String dsurl = dsHelper.startDS(tempDir.getAbsolutePath());
-                String[] cmd = (isLinux) ? new String[] { dsurl, "/bin/bash", "-c", "more " + testFilename }
-                        : new String[] { dsurl, "cmd.exe", "/c", "more", testFilename };
+                String[] cmd = (isLinux) ? new String[] { dsurl, "/bin/cat", testFilename } : new String[] {
+                        dsurl, "cmd.exe", "/c", "more", testFilename };
                 // Execute the script
                 SimpleScript script = new SimpleScript(sFile, cmd);
                 List<ScriptResult<Object>> results = RMTHelper.getResourceManager().executeScript(script,
                         TargetType.NODE_URL.toString(), nodesUrls);
-                Assert.assertNotNull("The list of results must not be null", results);
                 Assert.assertFalse("The results must not be empty", results.size() == 0);
                 for (ScriptResult<Object> res : results) {
                     Throwable exception = res.getException();
@@ -196,7 +195,6 @@ public final class TestExecRemote extends FunctionalTest {
             targets.add(NodeSource.LOCAL_INFRASTRUCTURE_NAME);
             List<ScriptResult<Object>> results = RMTHelper.getResourceManager().executeScript(script,
                     TargetType.NODESOURCE_NAME.toString(), targets);
-            Assert.assertNotNull("The list of results must not be null", results);
             Assert.assertEquals("The size of result list must equal to size of nodesource", results.size(),
                     RMTHelper.defaultNodesNumber);
             for (ScriptResult<Object> res : results) {

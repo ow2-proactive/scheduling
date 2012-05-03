@@ -18,6 +18,7 @@ var localNode = null;
 var process = null;
 
 try {
+
 	var localSpaceDir = null;
 	// Init dataspaces
 	try {
@@ -38,13 +39,11 @@ try {
 	pb.directory(new File(localSpaceDir));
 
 	try {
-		println("Executing native command in dir: " + localSpaceDir);
 		process = pb.start();
 	} catch (e) {
 		throw "Unable to start native process: " + e.javaException;
 	}
 
-	println("Reading process input stream (" + cmd + ")");
 	var isr = new InputStreamReader(process.getInputStream());
 	var br = new BufferedReader(isr);
 
@@ -68,8 +67,7 @@ try {
 			throw "Unable to wait for the end of native process: " +  e;
 		}
 	}
-	println("Script sucessful");
-
+	
 } finally {
 	if (process != null) {
 		process.destroy();
