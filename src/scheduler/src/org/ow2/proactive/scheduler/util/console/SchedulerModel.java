@@ -159,7 +159,7 @@ public class SchedulerModel extends ConsoleModel {
                 .add(new Command(
                     "taskresult(id,taskName[,inc])",
                     "Get the result of the given task (parameter is an int or a string representing the jobId, and the task name)"));
-        commands.add(new Command("joboutput(id)",
+        commands.add(new Command("joboutput(id[,taskSort])",
             "Get the output of the given job (parameter is an int or a string representing the jobId)"));
         commands
                 .add(new Command(
@@ -176,7 +176,7 @@ public class SchedulerModel extends ConsoleModel {
                     "Terminate the given task execution and re-schedules it after the given delay (parameter delay is in second)"));
         commands.add(new Command("killtask(id,taskName)", "kill the given task"));
         commands
-                .add(new Command("jobstate(id)",
+                .add(new Command("jobstate(id[,taskSort])",
                     "Get the current state of the given job (parameter is an int or a string representing the jobId)"));
         commands.add(new Command("listjobs()", "Display the list of jobs managed by the scheduler"));
         commands.add(new Command("stats()", "Display some statistics about the Scheduler"));
@@ -527,17 +527,32 @@ public class SchedulerModel extends ConsoleModel {
     }
 
     public void output_(String jobId) {
+        output_(jobId, "" + TaskState.SORT_BY_ID);
+    }
+
+    public void output_(String jobId, String tSort) {
+        int sort = TaskState.SORT_BY_ID;
+        try {
+            sort = Integer.parseInt(tSort);
+        } catch (NumberFormatException nfe) {
+            handleExceptionDisplay("Bad value for 2rd argument : 'sort' ", nfe);
+        }
+
         try {
             JobResult result = scheduler.getJobResult(jobId);
 
             if (result != null) {
-                print("Job " + jobId + " output => " + newline);
+                print("Job " + jobId + " output => '" + tSort + "' " + newline);
 
-                for (Entry<String, TaskResult> e : result.getAllResults().entrySet()) {
-                    TaskResult tRes = e.getValue();
+                JobState js = scheduler.getJobState(jobId);
+                List<TaskState> tasks = js.getTasks();
+                TaskState.setSortingBy(sort);
+                Collections.sort(tasks);
 
+                for (TaskState ts : tasks) {
+                    TaskResult tRes = result.getResult(ts.getName());
                     try {
-                        print(e.getKey() + " : " + newline + tRes.getOutput().getAllLogs(false));
+                        print(ts.getName() + " : " + newline + tRes.getOutput().getAllLogs(false));
                     } catch (Throwable e1) {
                         error(tRes.getException().toString());
                     }
@@ -580,6 +595,17 @@ public class SchedulerModel extends ConsoleModel {
     }
 
     public JobState jobState_(String jobId) {
+        return jobState_(jobId, "" + TaskState.SORT_BY_ID);
+    }
+
+    public JobState jobState_(String jobId, String tSort) {
+        int sort = TaskState.SORT_BY_ID;
+        try {
+            sort = Integer.parseInt(tSort);
+        } catch (NumberFormatException nfe) {
+            handleExceptionDisplay("Bad value for 2rd argument : 'sort' ", nfe);
+        }
+
         List<String> list;
         try {
             JobState js = scheduler.getJobState(jobId);
@@ -613,6 +639,7 @@ public class SchedulerModel extends ConsoleModel {
             oaf.addEmptyLine();
             //add each lines
             List<TaskState> tasks = js.getTasks();
+            TaskState.setSortingBy(sort);
             Collections.sort(tasks);
             for (TaskState ts : tasks) {
                 list = new ArrayList<String>();
@@ -1031,6 +1058,23 @@ public class SchedulerModel extends ConsoleModel {
             out.append(String.format(" %1$-" + cmdHelpMaxCharLength + "s %2$s" + newline, commands.get(i)
                     .getName(), commands.get(i).getDescription()));
         }
+
+        out.append(newline);
+        out.append("Task sorting by ");
+        out.append("id:");
+        out.append(TaskState.SORT_BY_ID);
+        out.append(", name:");
+        out.append(TaskState.SORT_BY_NAME);
+        out.append(", status:");
+        out.append(TaskState.SORT_BY_STATUS);
+        out.append(", start time:");
+        out.append(TaskState.SORT_BY_STARTED_TIME);
+        out.append(", finish time:");
+        out.append(TaskState.SORT_BY_FINISHED_TIME);
+        out.append(", host:");
+        out.append(TaskState.SORT_BY_HOST_NAME);
+        out.append(", duration:");
+        out.append(TaskState.SORT_BY_EXEC_DURATION);
 
         return out.toString();
     }

@@ -70,6 +70,7 @@ import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.factories.FlatJobFactory;
+import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 import org.ow2.proactive.utils.FileToBytesConverter;
 import org.ow2.proactive.utils.Tools;
@@ -440,7 +441,7 @@ public class SchedulerController {
         opt = new Option("jo", "joboutput", true, control + "Get the output of the given job");
         opt.setArgName("jobId");
         opt.setRequired(false);
-        opt.setArgs(1);
+        opt.setArgs(2);
         actionGroup.addOption(opt);
 
         opt = new Option("to", "taskoutput", true, control + "Get the output of the given task");
@@ -460,7 +461,7 @@ public class SchedulerController {
             "Get the current state of the given job (Also tasks description)");
         opt.setArgName("jobId");
         opt.setRequired(false);
-        opt.setArgs(1);
+        opt.setArgs(2);
         actionGroup.addOption(opt);
 
         opt = new Option("lj", "listjobs", false, control +
@@ -612,7 +613,15 @@ public class SchedulerController {
             }
             model.tresult_(optionValues[0], optionValues[1], incarnation);
         } else if (cmd.hasOption("joboutput")) {
-            model.output_(cmd.getOptionValue("joboutput"));
+            String[] optionValues = cmd.getOptionValues("joboutput");
+            if (optionValues == null || optionValues.length > 2) {
+                model.error("joboutput takes 1 or 2 arguments. Use --help for more");
+            }
+            String sort = "" + TaskState.SORT_BY_ID;
+            if (optionValues.length == 2) {
+                sort = optionValues[1];
+            }
+            model.output_(optionValues[0], sort);
         } else if (cmd.hasOption("taskoutput")) {
             String[] optionValues = cmd.getOptionValues("taskoutput");
             if (optionValues == null || optionValues.length != 2) {
@@ -627,7 +636,15 @@ public class SchedulerController {
                     newline + "\t" + "where priorities are Idle, Lowest, Low, Normal, High, Highest");
             }
         } else if (cmd.hasOption("jobstate")) {
-            model.jobState_(cmd.getOptionValue("jobstate"));
+            String[] optionValues = cmd.getOptionValues("jobstate");
+            if (optionValues == null || optionValues.length > 2) {
+                model.error("jobstate takes 1 or 2 arguments. Use --help for more");
+            }
+            String sort = "" + TaskState.SORT_BY_ID;
+            if (optionValues.length == 2) {
+                sort = optionValues[1];
+            }
+            model.jobState_(optionValues[0], sort);
         } else if (cmd.hasOption("listjobs")) {
             model.schedulerState_();
         } else if (cmd.hasOption("stats")) {

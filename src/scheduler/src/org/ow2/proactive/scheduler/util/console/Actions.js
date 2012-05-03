@@ -117,8 +117,11 @@ function preempttask(jobId,taskName,delay){
     return s_.preemptt_(""+jobId,""+taskName,""+delay);
 }
 
-function joboutput(jobId){
-	s_.output_(""+jobId);
+function joboutput(jobId,taskSort){
+	if (taskSort)
+		s_.output_(""+jobId,""+taskSort);
+	else
+		s_.output_(""+jobId);
 }
 
 function taskoutput(jobId,taskName){
@@ -129,8 +132,11 @@ function priority(jobId, priority){
 	s_.priority_(""+jobId,""+priority);
 }
 
-function jobstate(jobId){
-	return s_.jobState_(""+jobId);
+function jobstate(jobId,taskSort){
+	if (taskSort)
+		return s_.jobState_(""+jobId,""+taskSort);
+	else
+		return s_.jobState_(""+jobId);
 }
 
 function exec(commandFilePath){
