@@ -38,7 +38,11 @@ package org.ow2.proactive.resourcemanager.nodesource;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
+import org.objectweb.proactive.Body;
+import org.objectweb.proactive.RunActive;
+import org.objectweb.proactive.Service;
 import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -55,7 +59,7 @@ import org.ow2.proactive.resourcemanager.utils.RMNodeStarter;
  * This class is responsible for the node configuration
  */
 @ActiveObject
-public class RMNodeConfigurator {
+public class RMNodeConfigurator implements RunActive {
     /** class' logger */
     private static final Logger logger = ProActiveLogger.getLogger(RMLoggers.NODESOURCE);
     /** rmcore reference to be able to add the node to the core after the configuration went well */
@@ -122,5 +126,23 @@ public class RMNodeConfigurator {
         DataSpaceNodeConfigurationAgent conf = (DataSpaceNodeConfigurationAgent) PAActiveObject.newActive(
                 DataSpaceNodeConfigurationAgent.class.getName(), null, node);
         conf.configureNode();
+    }
+
+    /**
+     * Method controls the execution of every request.
+     * Tries to keep this active object alive in case of any exception.
+     */
+    public void runActivity(Body body) {
+        Service service = new Service(body);
+        while (body.isActive()) {
+            Request request = service.blockingRemoveOldest();
+            if (request != null) {
+                try {
+                    service.serve(request);
+                } catch (Throwable e) {
+                    logger.error("Cannot serve request: " + request, e);
+                }
+            }
+        }
     }
 }

@@ -211,7 +211,11 @@ public class GetHostsFromSchedulerTestExecutor extends Thread {
                     "/build.xml");
         task.addArgument("communicationObjectUrl", communicationObjectUrl);
         task.addArgument("jmeterhome", TestUtils.getRequiredProperty("get.hosts.from.scheduler.jmeterhome"));
-
+        String antPath = System.getProperty("get.hosts.from.scheduler.antPath");
+        if (antPath != null && !antPath.trim().isEmpty()) {
+            task.addArgument("antPath", antPath);
+        }
+        
         System.out.println("Task arguments:");
         for (Map.Entry<String, Serializable> arg : task.getArguments().entrySet()) {
             System.out.println(arg.getKey() + "=" + arg.getValue());

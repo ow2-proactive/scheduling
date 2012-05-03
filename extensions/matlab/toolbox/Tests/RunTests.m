@@ -108,4 +108,10 @@ for i=1:nbiter
         [ok,msg] = TestTopology();
     end
     if ~ok disp(msg),return; end
+    if exist('timeout', 'var')
+        [ok,msg] = TestSelectionScripts(timeout);
+    else
+        [ok,msg] = TestSelectionScripts();
+    end
+    if ~ok disp(msg),return; end
 end

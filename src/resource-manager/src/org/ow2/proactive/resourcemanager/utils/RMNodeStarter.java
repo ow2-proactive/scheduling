@@ -283,11 +283,24 @@ public class RMNodeStarter {
      * @param args The arguments needed to join the Resource Manager
      */
     public static void main(String[] args) {
-        //this call takes JVM properties into account
-        args = JVMPropertiesPreloader.overrideJVMProperties(args);
-        checkLog4jConfiguration();
-        RMNodeStarter starter = new RMNodeStarter();
-        starter.doMain(args);
+        try {
+            //this call takes JVM properties into account
+            args = JVMPropertiesPreloader.overrideJVMProperties(args);
+            checkLog4jConfiguration();
+            RMNodeStarter starter = new RMNodeStarter();
+            starter.doMain(args);
+        } catch (Throwable t) {
+            System.out
+                    .println("A major problem occured when trying to start a node and register it into the Resource Manager, see the stacktrace below");
+            // Fix for SCHEDULING-1588            	
+            if (t instanceof java.lang.NoClassDefFoundError) {
+                System.out
+                        .println("Unable to load a class definition, maybe the classpath is not accessible");
+            }
+            t.printStackTrace();
+            // Do not load extra class definitions
+            System.exit(/*ExitStatus.UNKNOWN.exitCode*/-2);
+        }
     }
 
     protected void doMain(final String args[]) {

@@ -46,6 +46,10 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.Body;
+import org.objectweb.proactive.RunActive;
+import org.objectweb.proactive.Service;
+import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
@@ -60,7 +64,7 @@ import org.ow2.proactive.resourcemanager.utils.RMLoggers;
  * It does it in parallel in a dedicated thread pool.
  */
 @ActiveObject
-public class NodesCleaner {
+public class NodesCleaner implements RunActive {
     /** class' logger */
     private static final Logger logger = ProActiveLogger.getLogger(RMLoggers.CLEANER);
 
@@ -128,5 +132,23 @@ public class NodesCleaner {
         }
 
         return new BooleanWrapper(false);
+    }
+
+    /**
+     * Method controls the execution of every request.
+     * Tries to keep this active object alive in case of any exception.
+     */
+    public void runActivity(Body body) {
+        Service service = new Service(body);
+        while (body.isActive()) {
+            Request request = service.blockingRemoveOldest();
+            if (request != null) {
+                try {
+                    service.serve(request);
+                } catch (Throwable e) {
+                    logger.error("Cannot serve request: " + request, e);
+                }
+            }
+        }
     }
 }

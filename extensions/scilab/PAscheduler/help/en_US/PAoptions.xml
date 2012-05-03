@@ -130,6 +130,14 @@
                  </para>
             </listitem>
             <listitem>
+                <para><emphasis>CustomScriptStatic</emphasis>: a boolean, true if the CustomScript is a static one (executed only once on a given machine), otherwise the CustomScript will be dynamic (default).
+                 </para>
+            </listitem>
+            <listitem>
+                <para><emphasis>CustomScriptParams</emphasis>: a string containing the parameters of the custom script, delimited by spaces.
+                 </para>
+            </listitem>
+            <listitem>
                 <para><emphasis>EmbeddedJars</emphasis> and <emphasis>ProActiveJars</emphasis>:  libraries used by ProActive Scheduler Toolbox (internal use only)
                  </para>
             </listitem>

@@ -359,6 +359,10 @@ public class IOTools {
             this(p, appendMessage, out, err, null, startpattern, stoppattern, patternToFind);
         }
 
+        public LoggingThread(Process p, String appendMessage, PrintStream out, PrintStream err) {
+            this(p, appendMessage, out, err, null, null, null, null);
+        }
+
         public LoggingThread(Process p, String appendMessage, PrintStream out, PrintStream err,
                 PrintStream ds, String startpattern, String stoppattern, String patternToFind) {
             this.brout = new BufferedReader(new InputStreamReader(p.getInputStream()));

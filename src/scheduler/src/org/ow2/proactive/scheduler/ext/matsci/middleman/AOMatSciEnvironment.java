@@ -1012,8 +1012,9 @@ public abstract class AOMatSciEnvironment<R, RL> implements MatSciEnvironment, S
     protected void maybeServePending(Service service) {
         if (!currentJobs.isEmpty()) {
             Map<String, MatSciJobVolatileInfo<R>> clonedJobIds = new HashMap<String, MatSciJobVolatileInfo<R>>(
-                currentJobs);
-            clonedJobIds.putAll(finishedJobs);
+                finishedJobs);
+            // for the rare case that the scheduler is restarted with a clean database, we must make sure that the current jobs are not overwritten by old finished jobs ids, so we construct the hashmap this way
+            clonedJobIds.putAll(currentJobs);
             for (Map.Entry<String, MatSciJobVolatileInfo<R>> entry : clonedJobIds.entrySet()) {
                 MatSciJobVolatileInfo<R> jinfo = entry.getValue();
                 String jid = entry.getKey();

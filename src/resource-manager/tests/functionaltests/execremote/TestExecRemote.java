@@ -64,10 +64,10 @@ import functionaltests.RMTHelper;
 
 public final class TestExecRemote extends FunctionalTest {
     private static final String simpleScriptContent = "";
-    private static final String erroneousSimpleScriptContent = "var a = null; a.toString()";
+    private static final String erroneousSimpleScriptContent = "var a = null; a.toString();";
     private static final String selectionScriptContent = "selected = true; print(selected);";
 
-    @org.junit.Ignore("SCHEDULING-1587")
+    //@org.junit.Ignore("SCHEDULING-1587")
     @org.junit.Test
     public void action() throws Exception {
         try {
@@ -81,10 +81,11 @@ public final class TestExecRemote extends FunctionalTest {
     private void internalAction() throws Exception {
         final String miscDir = System.getProperty("pa.rm.home") + File.separator + "samples" +
             File.separator + "scripts" + File.separator + "misc" + File.separator;
-        boolean isLinux = System.getProperty("os.name").toLowerCase().startsWith("linux");
+        boolean isLinux = System.getProperty("os.name").toLowerCase().startsWith("linux") ||
+            System.getProperty("os.name").toLowerCase().startsWith("mac");
         final String valueToEcho = "111";
 
-        //RMTHelper.defaultNodesNumber=1;
+        //        RMTHelper.defaultNodesNumber = 1;
         RMTHelper.createLocalNodeSource();
         RMTHelper
                 .waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, NodeSource.LOCAL_INFRASTRUCTURE_NAME);
@@ -129,7 +130,7 @@ public final class TestExecRemote extends FunctionalTest {
             File sFile = new File(miscDir + "processBuilder.js");
             RMTHelper.log("Test 4 - Test " + sFile);
 
-            String[] cmd = (isLinux) ? new String[] { "/bin/sh", "-c", "echo " + valueToEcho }
+            String[] cmd = (isLinux) ? new String[] { "/bin/bash", "-c", "echo " + valueToEcho }
                     : new String[] { "cmd.exe", "/c", "@(echo " + valueToEcho + ")" };
             SimpleScript script = new SimpleScript(sFile, cmd);
             List<ScriptResult<Object>> results = RMTHelper.getResourceManager().executeScript(script,
@@ -162,13 +163,12 @@ public final class TestExecRemote extends FunctionalTest {
             try {
                 // Start DS				
                 String dsurl = dsHelper.startDS(tempDir.getAbsolutePath());
-                String[] cmd = (isLinux) ? new String[] { dsurl, "/bin/sh", "-c", "more", testFilename }
-                        : new String[] { dsurl, "cmd.exe", "/c", "more", testFilename };
+                String[] cmd = (isLinux) ? new String[] { dsurl, "/bin/cat", testFilename } : new String[] {
+                        dsurl, "cmd.exe", "/c", "more", testFilename };
                 // Execute the script
                 SimpleScript script = new SimpleScript(sFile, cmd);
                 List<ScriptResult<Object>> results = RMTHelper.getResourceManager().executeScript(script,
                         TargetType.NODE_URL.toString(), nodesUrls);
-                Assert.assertNotNull("The list of results must not be null", results);
                 Assert.assertFalse("The results must not be empty", results.size() == 0);
                 for (ScriptResult<Object> res : results) {
                     Throwable exception = res.getException();
@@ -176,7 +176,10 @@ public final class TestExecRemote extends FunctionalTest {
                         RMTHelper.log("An exception occured while executing the script remotely:");
                         exception.printStackTrace(System.out);
                     }
+
                     String output = res.getOutput();
+
+                    Assert.assertNotNull("Output must not be null", output);
                     Assert.assertTrue("The script output must contains " + valueToEcho, output
                             .contains(valueToEcho));
                 }
@@ -192,7 +195,6 @@ public final class TestExecRemote extends FunctionalTest {
             targets.add(NodeSource.LOCAL_INFRASTRUCTURE_NAME);
             List<ScriptResult<Object>> results = RMTHelper.getResourceManager().executeScript(script,
                     TargetType.NODESOURCE_NAME.toString(), targets);
-            Assert.assertNotNull("The list of results must not be null", results);
             Assert.assertEquals("The size of result list must equal to size of nodesource", results.size(),
                     RMTHelper.defaultNodesNumber);
             for (ScriptResult<Object> res : results) {

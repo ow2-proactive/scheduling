@@ -5,7 +5,7 @@ function opts = PAoptions(varargin)
         opts = proactive_pa_options; 
         return;
     elseif pmodulo(argn(2),2) ~= 0
-        error(strcat(['Wrong number of arguments : ' string(nargin)]));
+        error(strcat(['Wrong number of arguments : ' string(argn(2))]));
     end
 
     deff ("y=isnumeric(x)","y=or(type(x)==[1,5,8])","n");
@@ -38,7 +38,7 @@ function opts = PAoptions(varargin)
     home_dir = system_getproperty('user.home');
     deff ("y=logtrans(x)","if islogical(x), y=x, elseif ischar(x), y=( x == ''on'' | x == ''true''), elseif isnumeric(x), y=(x==1), end","n");
     deff ("y=variabletrans(x)","y=strsubst(strsubst(strsubst(x, ''$SCHEDULER$'', PA_scheduler_dir),''$TMP$'',tmp_dir), ''$HOME$'', home_dir)","n");
-    deff ("y=scripttrans(x)","y=strcat([''file:'', strsubst(variabletrans(x), ''\'', ''/'')])","n");
+    deff ("y=scripttrans(x)","if ischar(x), y=strcat([''file:'', strsubst(variabletrans(x), ''\'', ''/'')]),else y=x, end","n");
     deff ("y=conftrans(x)","y=strsubst(variabletrans(x),''/'',filesep())","n");
 
     deff ("y=ischarornull(x)","if isnumeric(x), y=isempty(x), else y=ischar(x), end","n");
@@ -140,6 +140,16 @@ function opts = PAoptions(varargin)
     inputs(j).check = 'ischarornull';
     inputs(j).trans = 'scripttrans';
     j=j+1;
+    inputs(j).name = 'CustomScriptStatic';
+    inputs(j).default = %f;
+    inputs(j).check = 'logcheck';
+    inputs(j).trans = 'logtrans';
+    j=j+1;
+    inputs(j).name = 'CustomScriptParams';
+    inputs(j).default = [];
+    inputs(j).check = 'ischarornull';
+    inputs(j).trans = 'id';
+    j=j+1;
     inputs(j).name = 'Priority';
     inputs(j).default = 'Normal';
     inputs(j).check = 'prioritycheck';
@@ -189,6 +199,11 @@ function opts = PAoptions(varargin)
     inputs(j).default = strcat(['$SCHEDULER$', fs, 'config', fs, 'security.java.policy-client']);
     inputs(j).check = 'ischar';
     inputs(j).trans = 'conftrans';
+    j=j+1;
+    inputs(j).name = 'SchedulingDir';
+    inputs(j).default = PA_scheduler_dir;
+    inputs(j).check = 'ischar';
+    inputs(j).trans = 'id';
     j=j+1;
     inputs(j).name = 'RmiPort';
     inputs(j).default = 1111;

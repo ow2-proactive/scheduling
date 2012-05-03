@@ -9,6 +9,8 @@ function a=%c_i_PATsk(i1,b,a)
         a.OutputFiles = list(b);
     elseif i1 == 'SelectionScript' then
         a.SelectionScript = b;
+    elseif i1 == 'ScriptParams' then
+        a.ScriptParams = b;
     elseif i1 == 'Sources' then
         a.Sources = list(b);
     elseif i1 == 'Topology' then

@@ -2,13 +2,13 @@
 %
 % Syntax
 %       >> val=PAwaitFor(r)
-% 
+%
 % Inputs
 %
 %   r - an array of PAResult objects received by a call to PAsolve
 %
 % Outputs
-%   
+%
 %   val - if r is a scalar, val contains the real result of the
 %       computation. If r is a vector, then val will contain a cell array containing the real results.
 %
@@ -77,30 +77,31 @@ taskids = java.util.ArrayList(s(1)*s(2));
 allRes = true;
 for i=1:s(1)
     for j=1:s(2)
-        R=this(i,j);   
+        R=this(i,j);
         allRes = allRes && (R.resultSet.get() || R.waited.get());
-        taskids.add(R.taskid); 
+        taskids.add(R.taskid);
     end
 end
 if ~allRes
     if exist('timeout','var') == 1
-        unrei = solver.waitAll(jobid,taskids,java.lang.Integer(timeout));    
+        unrei = solver.waitAll(jobid,taskids,java.lang.Integer(timeout));
     else
         unrei = solver.waitAll(jobid,taskids,java.lang.Integer(-1));
     end
     answers = unrei.get();
 end
+A = cell(i,j);
 for i=1:s(1)
     for j=1:s(2)
-        R=this(i,j);   
+        R=this(i,j);
         if ~allRes
-            RaL = answers.get((i-1)*s(2)+(j-1)); 
+            RaL = answers.get((i-1)*s(2)+(j-1));
             R.RaL.set(RaL);
         else
             RaL = R.RaL.get();
-        end    
+        end
         if RaL.isOK()
-            printLogs(RaL,R,false);           
+            printLogs(RaL,R,false);
 
             if R.resultSet.get()
                 A{i,j} = R.resultAcc();
@@ -109,35 +110,38 @@ for i=1:s(1)
                 A{i,j} = out;
                 R.resultAcc(out);
                 resultSet(R);
-            end             
+            end
+            
+            exception = [];
 
         elseif RaL.isMatSciError();
-            printLogs(RaL,R,true);  
-            if ~R.resultSet.get()  
-                R.iserror.set(true);      
-                resultSet(R);
-            end
-            exception = MException('PAResult:PAwaitFor','Error during remote script execution');
-        else
-            printLogs(RaL,R,true); 
-            e = RaL.getException();
-            err = java.lang.System.err;
-            e.printStackTrace(err);
-            if ~R.resultSet.get()                
+            printLogs(RaL,R,true);
+            if ~R.resultSet.get()
                 R.iserror.set(true);
                 resultSet(R);
             end
-            exception = MException('PAResult:PAwaitFor','Internal Error');
-        end                       
+            exception = 'PAResult:PAwaitFor Error during remote script execution';
+        else
+            printLogs(RaL,R,true);
+            e = RaL.getException();
+            err = java.lang.System.err;
+            e.printStackTrace(err);
+            if ~R.resultSet.get()
+                R.iserror.set(true);
+                resultSet(R);
+            end
+            exception = 'PAResult:PAwaitFor Internal Error';
+        end
     end
 end
 
-if isa(exception,'MException')
-    throw(exception);
+if ischar(exception)
+    warning(exception);       
 end
 if isscalar(A)
     A=A{1};
-end
+end 
+
 if nargout <= 1
     varargout{1}=A;
 else
@@ -170,7 +174,13 @@ if ~R.logsPrinted.get() || err
             end
         end
     end
+elseif err
+    logs = RaL.getLogs();
+    if logs.length() > 0
+        java.lang.System.err.println(logs);
+    end
 end
+
 end
 
 

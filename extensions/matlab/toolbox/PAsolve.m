@@ -515,7 +515,7 @@ solve_config.setVersionMax(opt.VersionMax);
 solve_config.setCheckMatSciUrl(opt.FindMatlabScript);
 solve_config.setCheckLicenceScriptUrl(opt.MatlabReservationScript);
 if ischar(opt.CustomScript)
-    select = opt.CustomScript
+    select = opt.CustomScript;
     try
         java.net.URL(select);
         ok = true;
@@ -528,6 +528,8 @@ if ischar(opt.CustomScript)
     else
         solve_config.setCustomScriptUrl(select);
     end
+    solve_config.setCustomScriptStatic(opt.CustomScriptStatic);
+    solve_config.setCustomScriptParams(opt.CustomScriptParams);
 end
 solve_config.setZipSourceFiles(true);
 solve_config.setUseMatlabControl(opt.UseMatlabControl);
@@ -832,6 +834,8 @@ for i=1:NN
             else
                 task_config(i,j).setCustomScriptUrl(select);
             end
+            task_config(i,j).setStaticScript(Tasks(j,i).Static);
+            task_config(i,j).setCustomScriptParams(Tasks(j,i).ScriptParams);
         end
         if Tasks(j,i).NbNodes > 1
             if ~ischar(Tasks(j,i).Topology)

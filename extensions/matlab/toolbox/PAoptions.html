@@ -29,18 +29,18 @@
         mode.
  
   Parameters
-
+ 
     JobName
                 Name of the job that will be submitted to the Scheduler
-
+ 
     JobDescription
-
                 Description of the job that will be submitted to the scheduler
-
+ 
     Debug               true | false | 'on' | 'off'
  
                 Debug mode, default to 'off'
-
+ 
+ 
     TransferEnv       true | false | 'on' | 'off'
  
                 Transfers the environment in which the PAsolve/PAeval function is called
@@ -118,6 +118,15 @@
     CustomScript
                 url or path of a user-defined selection script used in
                 addition to (before) FindMatlabScript and MatlabReservationScript
+ 
+    CustomScriptStatic
+                a boolean, true if the CustomScript is a static one
+                (executed only once on a given machine), otherwise the
+                CustomScript will be dynamic (default)
+ 
+    CustomScriptParams
+                a string containing the parameters of the custom script
+                delimited by spaces.
  
     FindMatlabScript
                 url or path of selection script used to find matlab

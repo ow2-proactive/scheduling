@@ -67,7 +67,7 @@ public class MatSciJVMProcessInterfaceImpl implements InitActive, EndActive, Mat
     /** Creates a log file in the java.io.tmpdir if debug is enabled */
     protected void createLogFileOnDebug() throws Exception {
 
-        final File logFile = new File(this.TMPDIR, this.getClass().getSimpleName() + ".log");
+        final File logFile = new File(this.TMPDIR, "MatSci_Middleman_JVM.log");
         if (!logFile.exists()) {
             logFile.createNewFile();
         }
@@ -87,22 +87,26 @@ public class MatSciJVMProcessInterfaceImpl implements InitActive, EndActive, Mat
 
     public static void printLog(Object origin, final Throwable ex) {
         final Date d = new Date();
-        final String log = "[" + origin.getClass().getSimpleName() + "] " + StackTraceUtil.getStackTrace(ex);
-        System.out.println(log);
+        final String log1 = "[" + origin.getClass().getSimpleName() + "] " + StackTraceUtil.getStackTrace(ex);
+        final String log2 = "[" + ISO8601FORMAT.format(d) + " " + host + "][" +
+            origin.getClass().getSimpleName() + "] " + StackTraceUtil.getStackTrace(ex);
+        System.out.println(log1);
         System.out.flush();
         if (outDebugWriter != null) {
-            outDebugWriter.println(log);
+            outDebugWriter.println(log2);
             outDebugWriter.flush();
         }
     }
 
     public static void printLog(Object origin, final String message) {
         final Date d = new Date();
-        final String log = "[" + origin.getClass().getSimpleName() + "] " + message;
-        System.out.println(log);
+        final String log1 = "[" + origin.getClass().getSimpleName() + "] " + message;
+        final String log2 = "[" + ISO8601FORMAT.format(d) + " " + host + "][" +
+            origin.getClass().getSimpleName() + "] " + message;
+        System.out.println(log1);
         System.out.flush();
         if (outDebugWriter != null) {
-            outDebugWriter.println(log);
+            outDebugWriter.println(log2);
             outDebugWriter.flush();
         }
     }

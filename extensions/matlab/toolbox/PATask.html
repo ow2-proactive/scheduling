@@ -1,33 +1,17 @@
-<html>
-   <head>
-      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-   
-      <link rel="stylesheet" href="file:////usr/local/matlab2009b/toolbox/matlab/helptools/private/helpwin.css">
-      <title>M-File Help: PATask</title>
-   </head>
-   <body>
-      <!--Single-page help-->
-      <table border="0" cellspacing="0" width="100%">
-         <tr class="subheader">
-            <td class="headertitle">M-File Help: PATask</td>
-            <td class="subheader-left"><a href="matlab:open @PATask/PATask.m">View code for PATask</a></td>
-            <td class="subheader-right"><a href="matlab:helpwin">Default Topics</a></td>
-         </tr>
-      </table>
-      <div class="title">PATask</div>
-      <div class="helptext"><pre><!--helptext -->  <span class="helptopic">PATask</span> constructor of <span class="helptopic">PATask</span> objects
+<html><title>M-File Help: PATask</title><body><table width="100%" border=0 cellspacing=0 bgcolor=d0d0f0><tr><td>&nbsp;<a href="matlab:open '@PATask/PATask.m'"><b>View code for PATask</b></a></td><td valign="left"></td><td align=right><a href="matlab:helpwin"><b>Default Topics</b></a>&nbsp;</td></tr></table><br> <br>
+<code><pre>  <b>PATask</b> constructor of <b>PATask</b> objects
  
   Syntax
-        t = <span class="helptopic">PATask</span>(lin, col);
+        t = <b>PATask</b>(lin, col);
  
   Inputs
         
-        lin - the number of lines of the <span class="helptopic">PATask</span> matrix to create
-        col - the number of columns of the <span class="helptopic">PATask</span> matrix to create
+        lin - the number of lines of the <b>PATask</b> matrix to create
+        col - the number of columns of the <b>PATask</b> matrix to create
  
   Outputs
         
-        t - a <span class="helptopic">PATask</span> matrix
+        t - a <b>PATask</b> matrix
  
   Properties 
  
@@ -48,8 +32,15 @@
         defined selection script (in languages such as Javascript, Ruby,
         Python), see ProActive Scheduler documentation for more information.
  
+        Static - a boolean, true if the SelectionScript is a static one
+        (executed only once on a given machine), otherwise the
+        SelectionScript will be dynamic (default)
+ 
+        ScriptParams - a string containing the parameters of the custom script
+        delimited by spaces.
+ 
         Compose - a boolean which defines if this task depends on the
-        result of the previous task(previous line) inside this <span class="helptopic">PATask</span>
+        result of the previous task(previous line) inside this <b>PATask</b>
         column. If Compose is set to true, then the FIRST parameter of the
         Func function will be taken from the result of the previous task,
         subsequent parameters will be taken from the "Params" list.
@@ -81,23 +72,26 @@
         calling the Func function. So, in order to retrieve this list,
         you'll need to add the following code to your Matlab function:
         nl = evalin('caller','NODE_LIST'); 
-        "nl" will be affected a cell array of strings. The first element of this list is always the Node where the
-        function Func is executed.
+         "nl" will be affected a cell array of strings. The first element of 
+        this list is always the Node where the function Func is executed.
         The TestTopology function in the Tests folder provides an example
         of topology usage.           
  
         
   Examples
  
-        &gt;&gt; t = <span class="helptopic">PATask</span>(2,1);
+        &gt;&gt; t = <b>PATask</b>(2,1);
         &gt;&gt; t.Func = @factorial;
         &gt;&gt; t(1,1).Params = {3};
         &gt;&gt; t(2,1).Compose = true;
         &gt;&gt; r = PAsolve(t);
         &gt;&gt; val = PAwaitFor(r)
         val =
-            720   % Result of factorial(factorial(3))</pre></div><!--after help --><!--seeAlso--><div class="footerlinktitle">See also</div><div class="footerlink">
-        <a href="matlab:doc PAsolve">PAsolve</a>
-</div>
-   </body>
-</html>
+            720   % Result of factorial(factorial(3))
+ 
+ 
+  See also
+        <a href="matlab:helpwin PAsolve">PAsolve</a>
+</pre>
+
+</code></body></html>

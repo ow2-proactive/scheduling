@@ -66,6 +66,10 @@ for i=1:length(fn)
             else
                 this.SelectionScript = value;
             end
+        case 'Static'
+            this.Static = value;
+        case 'ScriptParams'
+            this.ScriptParams = value;
         case 'Description'
             this.Description = value;
         case 'Compose'

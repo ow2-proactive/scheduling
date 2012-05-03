@@ -118,6 +118,15 @@
 %               url or path of a user-defined selection script used in
 %               addition to (before) FindMatlabScript and MatlabReservationScript
 %
+%   CustomScriptStatic
+%               a boolean, true if the CustomScript is a static one
+%               (executed only once on a given machine), otherwise the
+%               CustomScript will be dynamic (default)
+%
+%   CustomScriptParams
+%               a string containing the parameters of the custom script
+%               delimited by spaces.
+%
 %   FindMatlabScript
 %               url or path of selection script used to find matlab
 %               (internal)
@@ -233,8 +242,6 @@ scheduling_dir = char(javafile.getParentFile().getParentFile().getParent().toStr
 tmp_dir = char(java.lang.System.getProperty('java.io.tmpdir'));
 home_dir = char(java.lang.System.getProperty('user.home'));
 logtrans = @(x)((islogical(x) && x) || (ischar(x) && (strcmp(x,'on') || strcmp(x,'true'))) || (isnumeric(x)&&(x==1)));
-variabletrans = @(x)(strrep(strrep(strrep(x, '$SCHEDULER$', scheduling_dir),'$TMP$',tmp_dir), '$HOME$', home_dir));
-scripttrans = @(x)(['file:' strrep(variabletrans(x), '\', '/')]);
 conftrans = @(x)(strrep(variabletrans(x),'/',filesep));
 
 ischarornull = @(x)(ischar(x) || isnumeric(x)&&isempty(x));
@@ -341,17 +348,27 @@ j=j+1;
 inputs(j).name = 'MatlabReservationScript';
 inputs(j).default = ['$SCHEDULER$' filesep 'extensions' filesep 'matlab' filesep 'script' filesep 'reserve_matlab.rb' ];
 inputs(j).check = @ischar;
-inputs(j).trans = scripttrans;
+inputs(j).trans = @scripttrans;
 j=j+1;
 inputs(j).name = 'FindMatlabScript';
 inputs(j).default = ['$SCHEDULER$' filesep 'extensions' filesep 'matlab' filesep 'script' filesep 'file_matlab_finder.rb' ];
 inputs(j).check = @ischar;
-inputs(j).trans = scripttrans;
+inputs(j).trans = @scripttrans;
 j=j+1;
 inputs(j).name = 'CustomScript';
 inputs(j).default = [];
 inputs(j).check = ischarornull;
-inputs(j).trans = scripttrans;
+inputs(j).trans = @scripttrans;
+j=j+1;
+inputs(j).name = 'CustomScriptStatic';
+inputs(j).default = false;
+inputs(j).check = logcheck;
+inputs(j).trans = logtrans;
+j=j+1;
+inputs(j).name = 'CustomScriptParams';
+inputs(j).default = [];
+inputs(j).check = ischarornull;
+inputs(j).trans = id;
 j=j+1;
 inputs(j).name = 'Priority';
 inputs(j).default = 'Normal';
@@ -433,6 +450,58 @@ inputs(j).default = 1200;
 inputs(j).check = charornum;
 inputs(j).trans = @charornumtrans;
 
+function s = variabletrans(x)
+if ~ischar(x)
+    s = x;
+else
+s  = strrep(strrep(strrep(x, '$SCHEDULER$', scheduling_dir),'$TMP$',tmp_dir), '$HOME$', home_dir);
+end
+end
+
+function s = scripttrans(x)
+if ~ischar(x)
+    s = x;
+else
+    s = ['file:' strrep(variabletrans(x), '\', '/')];
+end
+end
+
+function num = charornumtrans(x)
+if ischar(x)
+    num = str2num(x);
+else
+    num = x;
+end
+end
+
+function v = versiontrans(x)
+if ischar(x) && isempty(x)
+    v = [];
+else
+    v = x;
+end
+end
+
+function cl=listtocell(x)
+cl={};
+i=1;
+remain=x;
+if iscell(x)
+    cl = x;
+    return;
+end
+goon=true;
+while goon
+    [str, remain] = strtok(remain, ',; ');
+    if isempty(str) || length(str) == 0
+        goon=false;
+    else
+        cl{i}=str;
+        i=i+1;
+    end
+end
+end
+
 
 
 
@@ -496,39 +565,5 @@ opts = pa_options;
 
 end
 
-function num = charornumtrans(x)
-if ischar(x)
-    num = str2num(x);
-else
-    num = x;
-end
-end
 
-function v = versiontrans(x)
-if ischar(x) && isempty(x)
-    v = [];
-else
-    v = x;
-end
-end
-
-function cl=listtocell(x)
-cl={};
-i=1;
-remain=x;
-if iscell(x)
-    cl = x;
-    return;
-end
-goon=true;
-while goon
-    [str, remain] = strtok(remain, ',; ');
-    if isempty(str) || length(str) == 0
-        goon=false;
-    else
-        cl{i}=str;
-        i=i+1;
-    end
-end
-end
 

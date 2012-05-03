@@ -412,7 +412,7 @@ public class StandardJVMSpawnHelper {
                 lt1 = new IOTools.LoggingThread(process, "[MIDDLEMAN]", System.out, System.err, outDebug);
 
             } else {
-                lt1 = new IOTools.LoggingThread(process);
+                lt1 = new IOTools.LoggingThread(process, "[MIDDLEMAN]", System.out, System.err);
             }
             Thread t1 = new Thread(lt1, "MIDDLEMAN");
             t1.setDaemon(true);

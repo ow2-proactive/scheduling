@@ -43,7 +43,10 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
+import org.objectweb.proactive.RunActive;
+import org.objectweb.proactive.Service;
 import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.ow2.proactive.resourcemanager.authentication.Client;
@@ -55,7 +58,7 @@ import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProper
  * Periodically pings connected clients of the resource manager
  */
 @ActiveObject
-public class ClientPinger implements InitActive {
+public class ClientPinger implements InitActive, RunActive {
 
     private static final Logger logger = ProActiveLogger.getLogger(RMLoggers.PINGER);
 
@@ -113,6 +116,24 @@ public class ClientPinger implements InitActive {
                 logger.debug("Number of pinged clients " + numberOfPingedClients);
             }
 
+        }
+    }
+
+    /**
+     * Method controls the execution of every request.
+     * Tries to keep this active object alive in case of any exception.
+     */
+    public void runActivity(Body body) {
+        Service service = new Service(body);
+        while (body.isActive()) {
+            Request request = service.blockingRemoveOldest();
+            if (request != null) {
+                try {
+                    service.serve(request);
+                } catch (Throwable e) {
+                    logger.error("Cannot serve request: " + request, e);
+                }
+            }
         }
     }
 

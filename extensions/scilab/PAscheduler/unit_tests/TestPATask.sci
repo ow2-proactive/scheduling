@@ -1,5 +1,13 @@
 function [ok, msg]=TestPATask(timeout)
-    mode(-1);    
+    
+    
+    opt = PAoptions();
+    
+    testdir = fullfile(opt.SchedulingDir,'extensions', 'scilab', 'PAscheduler','unit_tests');
+    
+    if pwd() ~= testdir then
+        error('TestPATask must be run in directory '+testdir);
+    end
 
     function [ok,msg]=checkValuesEst(b_bias,b_variance)
         ok_bias = [0.0045490 0.0126257 0.0200381 0.0269282 0.0333926 0.0612466 0.1042142 0.1381027 0.1666017 0.1914026 0.2134579 0.2333707 0.2515521 0.2682983 0.2838306 0.6953426 0.8033789 0.8537557 0.8833246 0.9028600 0.9167554 0.9271556 0.9352365 0.9416984 0.9469846 0.9469846 0.9721750 0.9811320 0.9857258 0.9885205 0.9903999 0.9917505 0.9927679 0.9935619 0.9941988];

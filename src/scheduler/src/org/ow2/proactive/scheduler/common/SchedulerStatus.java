@@ -146,7 +146,7 @@ public enum SchedulerStatus implements java.io.Serializable {
      * @return true if the scheduler is NOT usable in its current state
      */
     public boolean isUnusable() {
-        return this == UNLINKED || isKilled();
+        return isKilled();
     }
 
     /**

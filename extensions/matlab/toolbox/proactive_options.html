@@ -75,26 +75,37 @@
 <pre>SCHEDULING/extensions/matlab/config/toolbox/PAoptions.ini</pre>
 <p>It contains the following options:</p>
 <ul type="disc">
+    <li><p><b>JobName</b>: Name of the job that will be submitted to the Scheduler</p></li>
+    <li><p><b>JobDescription</b>: Description of the job that will be submitted to the scheduler</p></li>
     <li><p><b>Debug</b>: activate this option if any problem occurs and you want ProActive Scheduler Toolbox to run in debug mode (with verbose output)</p></li>
-    <li><p><b>TimeStamp</b>: activate this option in addition to Debug if you want that every debug line contains as well a Timestamp indicating the current system time.</p></li>
-    <li><p><b>TransferEnv</b>: this option is by default set to off. It allows the workspace where the PAsolve call is done to be automatically transfered to the remote matlab engines. Global variables or variables existing in workspaces higher than the current one will not be transferred though.</p></li>
+    <li><p><b>TransferEnv</b>: this option is by default set to off. It allows the workspace where the PAsolve call is done to be automatically transfered to the remote matlab engines. Global variables are transferred but not local variables existing in workspaces higher than the current one. The options <b>EnvExcludeList</b> and <b>EnvExcludeTypeList</b> control the name and type of variables that should be excluded from the transfer.</p></li>
     <li><p><b>LicenseServerURL</b>: this very important option is the address of the proxy server which, if installed, acts as a proxy to the FlexNET server. The proxy server ensures that Matlab or toolboxes license tokens are available before any remote Matlab tasks starts. The scheduling of the task will be delayed until the tokens are available. The License Saver Proxy is not distributed with ProActive Toolbox and must be downloaded separately. See <a href="http://www.activeeon.com">http://www.activeeon.com</a> for availablity and download. </p></li>
     <li><p><b>CustomDataspaceURL</b> and <b>CustomDataspacePath</b>: by default these options are not set. Dataspaces are a ProActive internal mechanism allowing a shared file system between hosts. The mechanism allows the automatic transfer of files between the local matlab session and the remote engines. <b>ProActive Scheduler Toolbox</b> has an internal automatic Dataspace creation. But sometimes, one would like to rely on an external Dataspace such as a ftp server. This Dataspace MUST be accessible from the local file system in order to work with <b>ProActive Scheduler Toolbox</b>.The <b>CustomDataspaceURL</b> option gives the Universally accessible URL of this dataspace and the <b>CustomDataspacePath</b> gives the path to access this dataspace from the local file system. </p></li>
     <li><p><b>VersionPref</b>, <b>VersionMin</b>, <b>VersionMax</b> and <b>VersionRej</b>: these options allow the user to define which version of Matlab should/should not be used. In an heterogeneous environment, several versions of matlab can be available simultaneously on the network. These options ensures that the submitted matlab code will meet the correct matlab version. It is the responsibility of the user to find which versions are/are not compatible with the code.</p></li>
     <li><p><b>VersionPref</b>: is the preferred version to use. It won't prevent another version to be used if the preferred version is not available.It is set automatically to the version of the local matlab session, but can be as well user defined via this option.</p></li>
     <li><p><b>VersionMin</b> and <b>VersionMax</b>: is the minimum/maximum version to use. It is set by default to the minimum/maximum version supported.</p></li>
     <li><p><b>VersionRej</b>: is a list of versions to be rejected. It is set by default to the versions for which the ptolemy java2matlab interface has not been compiled (and thus are not supported). These versions are all "a" releases matlab2007a, matlab2008a, etc...</p></li>
-    <li><p><b>TransferMatFileOptions</b>: this is the options used by the toolbox when generating mat files (in TransferEnv or TransferVariables). By default, it is set to '-v7'</p></li>
-    <li><p><b>Fork</b>: this option is set by default to off. It means the tasks will be executed (on remote hosts) in a separate JVM process.</p></li>
+    <li><p><b>TransferMatFileOptions</b>: this is the options used by the toolbox when generating mat files (in TransferEnv). By default, it is set to '-v7'</p></li>
+    <li><p><b>Fork</b>: this option is set by default to off. It means the tasks will be executed (on remote hosts) in a separate Java Virtual Machine process.</p></li>
     <li><p><b>RunAsMe</b>: this option is set by default to off. It means the tasks will be executed (on remote hosts) under the account of the currently logged user.</p></li>
     <li><p><b>Priority</b>: this option is the priority of jobs created inside the ProActive Scheduler by PAsolve calls. Default to "Normal"</p></li>
-    <li><p><b>ZipInputFiles</b> and <b>ZipOutputFiles</b>: this option tells if PATasks InputFiles/OutputFiles should be zipped before being sent. It is set by default to off. Turning the options on is not recommended due to some instability observed in maltab zip command.</p></li>
+    <li><p><b>AutomaticDump</b>:  the current state of the PAsolve job database will be systematically saved at each PAsolve call. At a price of a slight slowing down of PAsolve calls, it allows to keep the database information in case
+                the local Matlab session crashes. Thus, after restarting Matlab, all the previous session jobs results can be retrieved via PAgetResults.</p></li>
+    <li><p><b>RemoveJobAfterRetrieve</b>: automatically removes the job from the scheduler after all results of the job have been retrieved.</p></li>
     <li><p><b>FindMatlabScript</b>: this option sets the script used to find matlab on the remote host. Changing the script means modifying the toolbox internal behavior and is therefore not recommended.</p></li>
     <li><p><b>MatlabReservationScript</b>: this option sets the script used to reserve a matlab token (and eventually toolboxes tokens) prior to run matlab code on the remote engine. Again, changing the script means modifying the toolbox internal behavior and is therefore not recommended. Eventually the script itself could be edited to add checks for toolboxes that are not supported by ProActive Scheduler Toolbox : simulink, control system, fixedpoint, images, neural networks, optimization, pde, robust, signal, spline, stats, symbolic, system identification, virtual reality, simulink control design, simulink stateflow, compiler.</p></li>
-    <li><p><b>CustomScript</b>: In addition to FindMatlabScript and MatlabReservationScript a custom selection script can be added to select only specific resources, such as matlab engine running only on Windows, or from a specific set of machines.</p></li>
-    <li><p><b>ProActiveJars</b>: libraries used by ProActive Scheduler Toolbox (internal use only).</p></li>
-    <li><p><b>ProActiveConfiguration</b>: path to ProActive Configuration file (modifying this option requires knowledge of ProActive internals).</p></li>
+    <li><p><b>CustomScript</b>: In addition to FindMatlabScript and MatlabReservationScript a custom selection script can be added to select only specific resources, such as matlab engine running only on Windows, or from a specific set of machines. The options <b>CustomScriptStatic</b> and <b>CustomScriptParams</b> control, respectively, if the script is static and the script parameters.</p></li>
+    <li><p><b>ProActiveJars</b> and <b>EmbeddedJars</b>: libraries used by ProActive Scheduler Toolbox (internal use only).</p></li>
+    <li><p><b>ProActiveConfiguration</b>: path to ProActive Configuration file (internal).</p></li>
+    <li><p><b>Log4JConfiguration</b>: path to log4j configuration file (internal).</p></li>
+    <li><p><b>SecurityFile</b>: path to java security configuration file (internal).</p></li>
+    <li><p><b>RmiPort</b>: default RMI port used when deploying the middleman JVM (internal).</p></li>
+    <li><p><b>JvmTimeout</b>: default timeout used when deploying the middleman JVM (internal).</p></li>
     <li><p><b>DisconnectedModeFile</b>: path to a file used by ProActive Scheduler Toolbox disconnected mode.</p></li>
+    <li><p><b>UseMatlabControl</b>: do we use the MatlabControl framework (internal).</p></li>
+    <li><p><b>CleanAllTempFilesDirectly</b>: do we clean the temporary files after all results of a PAsolve
+                call are received (default), or do we wait until Matlab terminates
+                to allow PAgetResults calls for this job. (internal).</p></li>
 </ul>
 
 
@@ -215,11 +226,11 @@ Error in ==> PAResult.subsref at 47
 <ul type="disc">
     <li><p>The <b>Debug</b> option.</p></li>
     <li><p>The <b>CheckMatlabXXX.log</b> and <b>ReserveMatlabXXX.log</b> files.</p></li>
-    <li><p>The <b>MatlabTaskXXX.log</b> files.</p></li>
-    <li><p>The <b>AODataspaceRegistry.log</b> file.</p></li>
+    <li><p>The <b>MatlabExecutableXXX.log</b> and <b>MatlabStartXXX.log</b>files.</p></li>
+    <li><p>The <b>MatSci_Middleman_JVM.log</b> file.</p></li>
 </ul>
 <p>Files with XXX in the above list are created with a complex ID replacing the XXX pattern.</p>
-<p>The <b>CheckMatlab</b>, <b>ReserveMatlab</b> and <b>MatlabTask</b> log files are produced on the <b>worker hosts</b> <i>TEMP</i> directory. The TEMP directory is always <i>/tmp</i> on linux systems. On Windows it can be known by opening a command line (cmd.exe) and typing echo %TEMP%:</p>
+<p>The <b>CheckMatlab</b>, <b>ReserveMatlab</b>, <b>MatlabExecutable</b> and <b>MatlabStart</b> log files are produced on the <b>worker hosts</b> <i>TEMP</i> directory. The TEMP directory is always <i>/tmp</i> on linux systems. On Windows it can be known by opening a command line (cmd.exe) and typing echo %TEMP%:</p>
 <pre>C:\Users\Administrator>echo %TEMP%
 C:\Users\Administrator\AppData\Local\Temp\2
 </pre>
@@ -255,97 +266,93 @@ Matlab command name : matlab
     command executed
     OK
 </pre>
-<p>The <b>MatlabTask</b> log files are not created by default. They are the verbose output of the tasks submitted via PAsolve and are activated only if the PAoption Debug is set to on. Here is an example of those files:</p>
-<pre>MatlabTask0a3e377deae6f182_2396e9a2_12d7b483856__8000.log:
-    [Thu Jan 13 01:56:33 CET 2011 pendule MatlabTask] Checking Processes...
-    [Thu Jan 13 01:56:33 CET 2011 pendule MatlabTask] Executing the task, try 1
-    [Thu Jan 13 01:56:33 CET 2011 pendule MatlabTask] Initializing : 2396e9a2-12d7b483856--7651--0a3e377deae6f182-2396e9a2-12d7b483856--8000
-    [Thu Jan 13 01:56:33 CET 2011 pendule MatlabTask] Executing
-    [ Thu Jan 13 01:56:33 CET 2011 ][pendule OUT]matlabEngine.put(test, 1)
-    [ Thu Jan 13 01:56:33 CET 2011 ][pendule OUT]ptmatlabCreateDoubleMatrix(test) 1 x 1
-    [ Thu Jan 13 01:56:33 CET 2011 ][pendule OUT]ptmatlabEngPutArray(test) 1 x 1
-    [ Thu Jan 13 01:56:33 CET 2011 ][pendule OUT]ptmatlabDestroy(test)
-    [ Thu Jan 13 01:56:33 CET 2011 ][pendule OUT]ptmatlabEngGetArray(test) 1 x 1
-    [ Thu Jan 13 01:56:33 CET 2011 ][pendule OUT]ptmatlabGetClassName() = double
-    [ Thu Jan 13 01:56:33 CET 2011 ][pendule OUT]ptmatlabGetDimensions() = 1 x 1
-    [ Thu Jan 13 01:56:33 CET 2011 ][pendule OUT]ptmatlabIsComplex() = 0
-    [ Thu Jan 13 01:56:33 CET 2011 ][pendule OUT]ptmatlabGetDoubleMatrix() 1 x 1
-    [ Thu Jan 13 01:56:33 CET 2011 ][pendule OUT]ptmatlabDestroy(test)
-    [ Thu Jan 13 01:56:33 CET 2011 ][pendule OUT]matlabEngine.get(test) = 1
-    [ Thu Jan 13 01:56:33 CET 2011 ][pendule OUT]matlabEngine.evalString("clear test")
-    [ Thu Jan 13 01:56:33 CET 2011 ][pendule OUT]
-    [ Thu Jan 13 01:56:33 CET 2011 ][pendule OUT]matlabEngine.evalString("clear all;")
-    [ Thu Jan 13 01:56:33 CET 2011 ][pendule OUT]matlabEngine.evalString("cd('/tmp/PA_JVM1485855611/PA_JVM1485855611_GCMNode-0/13/2396e9a2-12d7b483856--7651--0a3e377deae6f182-2396e9a2-12d7b483856--8000');")
-    [ Thu Jan 13 01:56:33 CET 2011 ][pendule OUT]
-    [ Thu Jan 13 01:56:33 CET 2011 ][pendule OUT]Unzipping source files
-    [ Thu Jan 13 01:56:33 CET 2011 ][pendule OUT]matlabEngine.evalString("restoredefaultpath;")
-    [ Thu Jan 13 01:56:33 CET 2011 ][pendule OUT]
-    [ Thu Jan 13 01:56:33 CET 2011 ][pendule OUT]matlabEngine.evalString("addpath('/tmp/PA_JVM1485855611/PA_JVM1485855611_GCMNode-0/13/2396e9a2-12d7b483856--7651--0a3e377deae6f182-2396e9a2-12d7b483856--8000/.PAScheduler');")
-    [ Thu Jan 13 01:56:33 CET 2011 ][pendule OUT]
-    [ Thu Jan 13 01:56:33 CET 2011 ][pendule OUT]matlabEngine.evalString("unzip('/tmp/PA_JVM1485855611/PA_JVM1485855611_GCMNode-0/13/2396e9a2-12d7b483856--7651--0a3e377deae6f182-2396e9a2-12d7b483856--8000/.PAScheduler/MatlabPAsolveSrc_3_1_1.zip','/tmp/PA_JVM1485855611/PA_JVM1485855611_GCMNode-0/13/2396e9a2-12d7b483856--7651--0a3e377deae6f182-2396e9a2-12d7b483856--8000/.PAScheduler');")
-    [ Thu Jan 13 01:56:33 CET 2011 ][pendule OUT]
-    [ Thu Jan 13 01:56:33 CET 2011 ][pendule OUT]Contents of /tmp/PA_JVM1485855611/PA_JVM1485855611_GCMNode-0/13/2396e9a2-12d7b483856--7651--0a3e377deae6f182-2396e9a2-12d7b483856--8000/.PAScheduler
-    [ Thu Jan 13 01:56:33 CET 2011 ][pendule OUT]/tmp/PA_JVM1485855611/PA_JVM1485855611_GCMNode-0/13/2396e9a2-12d7b483856--7651--0a3e377deae6f182-2396e9a2-12d7b483856--8000/.PAScheduler/MatlabPAsolveVarIn_3_1_1.mat
-    [ Thu Jan 13 01:56:33 CET 2011 ][pendule OUT]/tmp/PA_JVM1485855611/PA_JVM1485855611_GCMNode-0/13/2396e9a2-12d7b483856--7651--0a3e377deae6f182-2396e9a2-12d7b483856--8000/.PAScheduler/PAsolve.m
-    [ Thu Jan 13 01:56:33 CET 2011 ][pendule OUT]/tmp/PA_JVM1485855611/PA_JVM1485855611_GCMNode-0/13/2396e9a2-12d7b483856--7651--0a3e377deae6f182-2396e9a2-12d7b483856--8000/.PAScheduler/MatlabPAsolveSrc_3_1_1.zip
-    [ Thu Jan 13 01:56:33 CET 2011 ][pendule OUT]Loading Input Variable file /tmp/PA_JVM1485855611/PA_JVM1485855611_GCMNode-0/13/2396e9a2-12d7b483856--7651--0a3e377deae6f182-2396e9a2-12d7b483856--8000/.PAScheduler/MatlabPAsolveVarIn_3_1_1.mat
-    [ Thu Jan 13 01:56:33 CET 2011 ][pendule OUT]matlabEngine.evalString("load('/tmp/PA_JVM1485855611/PA_JVM1485855611_GCMNode-0/13/2396e9a2-12d7b483856--7651--0a3e377deae6f182-2396e9a2-12d7b483856--8000/.PAScheduler/MatlabPAsolveVarIn_3_1_1.mat');")
-    [ Thu Jan 13 01:56:33 CET 2011 ][pendule OUT]
-    [ Thu Jan 13 01:56:33 CET 2011 ][pendule OUT]matlabEngine.evalString("who")
-    [ Thu Jan 13 01:56:33 CET 2011 ][pendule OUT]>>
-    [ Thu Jan 13 01:56:33 CET 2011 ][pendule OUT]Your variables are:
-    [ Thu Jan 13 01:56:33 CET 2011 ][pendule OUT]
-    [ Thu Jan 13 01:56:33 CET 2011 ][pendule OUT]RESTOREDEFAULTPATH_EXECUTED
-    [ Thu Jan 13 01:56:33 CET 2011 ][pendule OUT]in1
-    [ Thu Jan 13 01:56:33 CET 2011 ][pendule OUT]
-    [ Thu Jan 13 01:56:33 CET 2011 ][pendule OUT]
-    [ Thu Jan 13 01:56:33 CET 2011 ][pendule OUT]Feeding input:
-    [ Thu Jan 13 01:56:33 CET 2011 ][pendule OUT]i=0;
-    [ Thu Jan 13 01:56:33 CET 2011 ][pendule OUT]matlabEngine.evalString("i=0;")
-    [ Thu Jan 13 01:56:33 CET 2011 ][pendule OUT]
-    [ Thu Jan 13 01:56:33 CET 2011 ][pendule OUT]Executing Matlab command:
-    [ Thu Jan 13 01:56:33 CET 2011 ][pendule OUT]out = factorial(in1);
-    [ Thu Jan 13 01:56:33 CET 2011 ][pendule OUT]
-    [ Thu Jan 13 01:56:33 CET 2011 ][pendule OUT]matlabEngine.evalString("out = factorial(in1);
-    [ Thu Jan 13 01:56:33 CET 2011 ][pendule OUT]")
-    [ Thu Jan 13 01:56:33 CET 2011 ][pendule OUT]
-    [ Thu Jan 13 01:56:33 CET 2011 ][pendule OUT]Matlab command completed successfully
-    [ Thu Jan 13 01:56:33 CET 2011 ][pendule OUT]Receiving output:
-    [ Thu Jan 13 01:56:33 CET 2011 ][pendule OUT]Saving Output Variable file /tmp/PA_JVM1485855611/PA_JVM1485855611_GCMNode-0/13/2396e9a2-12d7b483856--7651--0a3e377deae6f182-2396e9a2-12d7b483856--8000/.PAScheduler/MatlabPAsolveVarOut_3_1_1.mat
-    [ Thu Jan 13 01:56:33 CET 2011 ][pendule OUT]matlabEngine.evalString("save('/tmp/PA_JVM1485855611/PA_JVM1485855611_GCMNode-0/13/2396e9a2-12d7b483856--7651--0a3e377deae6f182-2396e9a2-12d7b483856--8000/.PAScheduler/MatlabPAsolveVarOut_3_1_1.mat','out','-v7');")
-    [ Thu Jan 13 01:56:33 CET 2011 ][pendule OUT]
-    [ Thu Jan 13 01:56:33 CET 2011 ][pendule OUT]true
-    [Thu Jan 13 01:56:33 CET 2011 pendule MatlabTask] Received result
-    [Thu Jan 13 01:56:33 CET 2011 pendule MatlabTask] Packing memory in Matlabengine
-    [ Thu Jan 13 01:56:33 CET 2011 ][pendule OUT]matlabEngine.evalString("rmpath('/tmp/PA_JVM1485855611/PA_JVM1485855611_GCMNode-0/13/2396e9a2-12d7b483856--7651--0a3e377deae6f182-2396e9a2-12d7b483856--8000/.PAScheduler');")
-    [ Thu Jan 13 01:56:33 CET 2011 ][pendule OUT]
-    [ Thu Jan 13 01:56:33 CET 2011 ][pendule OUT]matlabEngine.evalString("v=fopen('all');for i=1:length(v),fclose(v(i)), end")
-    [ Thu Jan 13 01:56:33 CET 2011 ][pendule OUT]
-    [ Thu Jan 13 01:56:33 CET 2011 ][pendule OUT]matlabEngine.evalString("cd('/tmp');")
-    [ Thu Jan 13 01:56:33 CET 2011 ][pendule OUT]
-    [ Thu Jan 13 01:56:33 CET 2011 ][pendule OUT]matlabEngine.evalString("clear all;")
-    [ Thu Jan 13 01:56:33 CET 2011 ][pendule OUT]
-    [ Thu Jan 13 01:56:33 CET 2011 ][pendule OUT]matlabEngine.evalString("pack;")
-    [Thu Jan 13 01:56:34 CET 2011 pendule MatlabTask] Task completed successfully
-    [ Thu Jan 13 01:56:34 CET 2011 ][pendule OUT]
-    [Thu Jan 13 01:56:34 CET 2011 pendule MatlabTask] Performing after task actions
-    [Thu Jan 13 01:56:34 CET 2011 pendule MatlabTask] Closing output
+<p>The <b>MatlabExecutable</b> log files are not created by default. They are the verbose output of the tasks submitted via PAsolve and are activated only if the PAoption Debug is set to on. Here is an example of those files:</p>
+<pre>MatlabExecutable0a3e377deae6f182_2396e9a2_12d7b483856__8000.log:
+    [2012-04-25 19:29:020 pendule][MatlabExecutable] Unzipping source files from /tmp/PA_JVM554543033/local-LocalNodes-3/1/-721112986/.PAScheduler/0/MatlabPAsolveSrc_0_6b1bd1617af47a4630456822b146673dfd8dd37a.zip
+[2012-04-25 19:29:020 pendule][MatlabExecutable] Contents of /tmp/PA_JVM554543033/local-LocalNodes-3/1/-721112986/.PAScheduler/0
+[2012-04-25 19:29:020 pendule][MatlabExecutable] MatlabPAsolveSrc_0_6b1bd1617af47a4630456822b146673dfd8dd37a.zip
+[2012-04-25 19:29:020 pendule][MatlabExecutable] checktoolboxes_start_and_hide_desktop.m
+[2012-04-25 19:29:020 pendule][MatlabExecutable] MatlabPAsolveVarIn_0_1_1.mat
+[2012-04-25 19:29:020 pendule][MatlabExecutable] keepalive_callback_fcn.m
+[2012-04-25 19:29:020 pendule][MatlabExecutable] Acquiring MATLAB connection using /usr/local/matlab2010b/bin/matlab
+[2012-04-25 19:29:020 pendule][MatlabExecutable] Adding to matlabpath sources from /tmp/PA_JVM554543033/local-LocalNodes-3/1/-721112986/.PAScheduler/0
+[2012-04-25 19:29:020 pendule][MatlabExecutable] checktoolboxes_start_and_hide_desktop( {'matlab'},'/tmp/PA_JVM554543033/local-LocalNodes-3/1/-721112986');
+[2012-04-25 19:29:020 pendule][MatlabExecutable] Executing Keep-Alive timer
+[2012-04-25 19:29:020 pendule][MatlabExecutable] t = timer('Period', 300,'ExecutionMode','fixedRate');t.TimerFcn = { @keepalive_callback_fcn, {'matlab'}};start(t);
+[2012-04-25 19:29:020 pendule][MatlabExecutable] Loading input variables from /tmp/PA_JVM554543033/local-LocalNodes-3/1/-721112986/.PAScheduler/0/MatlabPAsolveVarIn_0_1_1.mat
+[2012-04-25 19:29:020 pendule][MatlabExecutable] Running MATLAB command: out = factorial(in1);
+[2012-04-25 19:29:020 pendule][MatlabExecutable] MATLAB command completed successfully, receiving output...
+[2012-04-25 19:29:020 pendule][MatlabExecutable] Storing 'out' variable into /tmp/PA_JVM554543033/local-LocalNodes-3/1/-721112986/.PAScheduler/0/MatlabPAsolveVarOut_0_1_1.mat
+[2012-04-25 19:29:021 pendule][MATLAB]Warning: No window system found.  Java option 'MWT' ignored
+[2012-04-25 19:29:021 pendule][MATLAB]
+[2012-04-25 19:29:021 pendule][MATLAB]                            < M A T L A B (R) >
+[2012-04-25 19:29:021 pendule][MATLAB]                  Copyright 1984-2010 The MathWorks, Inc.
+[2012-04-25 19:29:021 pendule][MATLAB]                Version 7.11.0.584 (R2010b) 64-bit (glnxa64)
+[2012-04-25 19:29:021 pendule][MATLAB]                              August 16, 2010
+[2012-04-25 19:29:021 pendule][MATLAB]
+[2012-04-25 19:29:021 pendule][MATLAB]
+[2012-04-25 19:29:021 pendule][MATLAB]  To get started, type one of these: helpwin, helpdesk, or demo.
+[2012-04-25 19:29:021 pendule][MATLAB]  For product information, visit www.mathworks.com.
+[2012-04-25 19:29:021 pendule][MATLAB]
+[2012-04-25 19:29:022 pendule][MATLAB]---- MATLAB START ----
+[2012-04-25 19:29:022 pendule][MATLAB]
+[2012-04-25 19:29:022 pendule][MATLAB]Your variables are:
+[2012-04-25 19:29:022 pendule][MATLAB]
+[2012-04-25 19:29:022 pendule][MATLAB]NODE_LIST      NODE_URL_LIST  in1            t
+[2012-04-25 19:29:022 pendule][MATLAB]
+[2012-04-25 19:29:022 pendule][MatlabExecutable] Receiving and testing output...
+[2012-04-25 19:29:022 pendule][MatlabExecutable] Closing MATLAB...
+[2012-04-25 19:29:022 pendule][MatlabExecutable] Task completed successfully
 </pre>
-<p>Finally the <b>AODataspaceRegistry.log</b> file is created on the <b>client host</b> and is logging everything concerning ProActive DataSpaces. Here is an example of those files:</p>
-<pre>Looking up or creating dataspaces for :/home/fviale/matlab/Model_22_06_2009
-Creating new dataspaces
-Input dataspace created at url : paprmi://pendule.inria.fr:1099/MatlabInputSpace_e930b2ec?proactive_vfs_provider_path=/
-Output dataspace created at url : paprmi://pendule.inria.fr:1099/MatlabOutputSpace_e930b2ec?proactive_vfs_provider_path=/
-Looking up or creating dataspaces for :/home/fviale/matlab/Model_22_06_2009
-Creating new dataspaces
-Input dataspace created at url : paprmi://pendule.inria.fr:1099/MatlabInputSpace_e930b2ec?proactive_vfs_provider_path=/
-Output dataspace created at url : paprmi://pendule.inria.fr:1099/MatlabOutputSpace_e930b2ec?proactive_vfs_provider_path=/
-Looking up or creating dataspaces for :/home/fviale/matlab/Model_22_06_2009
-Reusing existing dataspaces
-Looking up or creating dataspaces for :/home/fviale/matlab/Model_22_06_2009
-Creating new dataspaces
-Input dataspace created at url : paprmi://pendule.inria.fr:1099/MatlabInputSpace_e930b2ec?proactive_vfs_provider_path=/
-Output dataspace created at url : paprmi://pendule.inria.fr:1099/MatlabOutputSpace_e930b2ec?proactive_vfs_provider_path=/
+<p>The <b>MatlabStart</b> log file is the direct output of the Matlab process created on the worker. Unlike the <b>MatlabExecutable</b> log file, it is created each time.</p>
+<pre>/tmp/MatlabStart0a3e377deae6f182_2d177818_136ea6d1f1f__8000.log:
+                                < M A T L A B (R) >
+                  Copyright 1984-2010 The MathWorks, Inc.
+                Version 7.11.0.584 (R2010b) 64-bit (glnxa64)
+                              August 16, 2010
+
+
+  To get started, type one of these: helpwin, helpdesk, or demo.
+  For product information, visit www.mathworks.com.
+
+---- MATLAB START ----
+
+Your variables are:
+
+NODE_LIST      NODE_URL_LIST  in1            t
+</pre>
+<p>Finally the <b>MatSci_Middleman_JVM.log</b> file is created inside the temp directory of the <b>client host</b> and is logging everything concerning ProActive MiddleMan JVM. Here is an example:</p>
+<pre>/tmp/MatSci_Middleman_JVM.log:
+    [2012-04-25 19:29:016 pendule][AOMatlabEnvironment] Submitting job of 1 tasks...
+    [2012-04-25 19:29:016 pendule][AOMatlabEnvironment] Job 1 submitted.
+    [2012-04-25 19:29:016 pendule][AOMatlabEnvironment] waiting for request with no timeout
+    [2012-04-25 19:29:016 pendule][AOMatlabEnvironment] Request received : areAwaited
+    [2012-04-25 19:29:016 pendule][AOMatlabEnvironment] waiting for request with no timeout
+    [2012-04-25 19:29:022 pendule][AOMatlabEnvironment] Request received : taskStateUpdatedEvent
+    [2012-04-25 19:29:022 pendule][AOMatlabEnvironment] Received task 0_0 of Job 1 finished event...
+    [2012-04-25 19:29:022 pendule][AOMatlabEnvironment] Looking for result of task 0_0 for job 1
+    [2012-04-25 19:29:022 pendule][AOMatlabEnvironment] waiting for request with no timeout
+    [2012-04-25 19:29:022 pendule][AOMatlabEnvironment] Request received : jobStateUpdatedEvent
+    [2012-04-25 19:29:022 pendule][AOMatlabEnvironment] Received job 1 finished event...
+    [2012-04-25 19:29:023 pendule][AOMatlabEnvironment] Updating results of job: 1(1) : Finished
+    [2012-04-25 19:29:023 pendule][AOMatlabEnvironment] waiting for request with no timeout
+    [2012-04-25 19:29:024 pendule][AOMatlabEnvironment] Request received : areAwaited
+    [2012-04-25 19:29:024 pendule][AOMatlabEnvironment] waiting for request with no timeout
+    [2012-04-25 19:29:024 pendule][AOMatlabEnvironment] Request received : waitAll
+    [2012-04-25 19:29:024 pendule][AOMatlabEnvironment] Removed waitAll for job=1 request from the queue
+    [2012-04-25 19:29:024 pendule][AOMatlabEnvironment] serving waitAll for job 1
+    [2012-04-25 19:29:024 pendule][AOMatlabEnvironment] Sending the results of task 0_0 of job 1 back...
+    [2012-04-25 19:29:024 pendule][AOMatlabEnvironment] waiting for request with no timeout
+    [2012-04-25 19:29:024 pendule][AOMatlabEnvironment] Request received : isConnected
+    [2012-04-25 19:29:024 pendule][AOMatlabEnvironment] waiting for request with no timeout
+    [2012-04-25 19:29:024 pendule][AOMatlabEnvironment] Request received : isLoggedIn
+    [2012-04-25 19:29:024 pendule][AOMatlabEnvironment] waiting for request with no timeout
+    [2012-04-25 19:29:024 pendule][AOMatlabEnvironment] Request received : jobRemove
+    [2012-04-25 19:29:024 pendule][AOMatlabEnvironment] waiting for request with no timeout
+    [2012-04-25 19:29:046 pendule][AOMatlabEnvironment] Request received : isConnected
+    [2012-04-25 19:29:046 pendule][AOMatlabEnvironment] waiting for request with no timeout
+    [2012-04-25 19:29:047 pendule][AOMatlabEnvironment] Request received : solve
+
 </pre>
 
 <a name="bottom_of_page"></a>

@@ -20,7 +20,6 @@
 	<classpathentry kind="lib" path="lib/common/msv.jar"/>
 	<classpathentry kind="lib" path="lib/common/relaxngDatatype.jar"/>
 	<classpathentry kind="lib" path="lib/common/xsdlib.jar"/>
-	<classpathentry kind="lib" path="lib/ProActive/axis.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/batik-awt-util.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/batik-dom.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/batik-svggen.jar"/>
@@ -67,36 +66,14 @@
 	<classpathentry kind="lib" path="lib/ProActive/ProActive_utils.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/servlet-api-2.5-6.1.11.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/ssj.jar"/>
-	<classpathentry kind="lib" path="lib/ProActive/annogen-0.1.0.jar"/>
-	<classpathentry kind="lib" path="lib/ProActive/axiom-api-1.2.7.jar"/>
-	<classpathentry kind="lib" path="lib/ProActive/axiom-impl-1.2.7.jar"/>
-	<classpathentry kind="lib" path="lib/ProActive/axis2-adb-1.4.1.jar"/>
-	<classpathentry kind="lib" path="lib/ProActive/axis2-kernel-1.4.1.jar"/>
-	<classpathentry kind="lib" path="lib/ProActive/backport-util-concurrent-3.1.jar"/>
-	<classpathentry kind="lib" path="lib/ProActive/commons-fileupload-1.2.jar"/>
-	<classpathentry kind="lib" path="lib/ProActive/commons-httpclient-3.1.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/commons-logging-1.1.1.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/commons-net-1.4.1.jar"/>
-	<classpathentry kind="lib" path="lib/ProActive/cxf-2.2.2.jar"/>
-	<classpathentry kind="lib" path="lib/ProActive/FastInfoset-1.2.3.jar"/>
-	<classpathentry kind="lib" path="lib/ProActive/geronimo-activation_1.1_spec-1.0.2.jar"/>
-	<classpathentry kind="lib" path="lib/ProActive/geronimo-annotation_1.0_spec-1.1.1.jar"/>
-	<classpathentry kind="lib" path="lib/ProActive/geronimo-javamail_1.4_spec-1.6.jar"/>
-	<classpathentry kind="lib" path="lib/ProActive/geronimo-jaxws_2.1_spec-1.0.jar"/>
-	<classpathentry kind="lib" path="lib/ProActive/geronimo-stax-api_1.0_spec-1.0.1.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/jackrabbit-jcr-commons-1.5.2.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/jackrabbit-webdav-1.5.2.jar"/>
-	<classpathentry kind="lib" path="lib/ProActive/jaxb-api-2.1.jar"/>
-	<classpathentry kind="lib" path="lib/ProActive/jaxb-impl-2.1.9.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/jetty-6.1.18.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/jetty-util-6.1.18.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/jna.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/jsch-0.1.31.jar"/>
-	<classpathentry kind="lib" path="lib/ProActive/neethi-2.0.4.jar"/>
-	<classpathentry kind="lib" path="lib/ProActive/saaj-api-1.3.jar"/>
-	<classpathentry kind="lib" path="lib/ProActive/spring-beans-2.5.5.jar"/>
-	<classpathentry kind="lib" path="lib/ProActive/spring-context-2.5.5.jar"/>
-	<classpathentry kind="lib" path="lib/ProActive/spring-core-2.5.5.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/vi-java.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/vim.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/vim25.jar"/>
@@ -107,18 +84,14 @@
 	<classpathentry kind="lib" path="lib/ProActive/virtualization-vmware-vi.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/virtualization-vmware-vix.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/virtualization-xenserver.jar"/>
-	<classpathentry kind="lib" path="lib/ProActive/woden-api-1.0M8.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/ws-commons-util-1.0.2.jar"/>
-	<classpathentry kind="lib" path="lib/ProActive/wstx-asl-3.2.8.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/xenserver-5.0.0-3.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/xercesImpl-2.8.1.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/xmlrpc-client-3.1.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/xmlrpc-common-3.1.jar"/>
-	<classpathentry kind="lib" path="lib/ProActive/XmlSchema-1.4.5.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/bcel-5.2.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/commons-discovery-0.4.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/ProActive.jar"/>
-	<classpathentry kind="lib" path="lib/ProActive/commons-codec-1.3.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/fractal-api-2.0.3-SNAPSHOT.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/fractal-gcm-api-1.1.1.jar"/>
 	<classpathentry kind="lib" path="lib/common/commons-collections-3.2.jar"/>
@@ -135,14 +108,12 @@
 	<classpathentry kind="lib" path="lib/ProActive/j-interop.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/j-interopdeps.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/jakarta-oro-2.0.8.jar"/>
-	<classpathentry kind="lib" path="lib/ProActive/jaxb-xjc-2.1.9.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/jcifs-1.2.19.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/julia-asm-2.5.3-SNAPSHOT.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/julia-mixins-2.5.3-SNAPSHOT.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/julia-runtime-2.5.3-SNAPSHOT.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/mofcomp.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/netty-3.2.0.ALPHA2.jar"/>
-	<classpathentry kind="lib" path="lib/ProActive/org.apache.servicemix.bundles.wsdl4j-1.6.1_1.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/saaj-impl.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/servicebinder-0.9.0.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/shell-1.4.2.jar"/>
@@ -176,5 +147,16 @@
 	<classpathentry kind="lib" path="performance/lib/ApacheJMeter_java.jar"/>
 	<classpathentry kind="lib" path="performance/lib/logkit-2.0.jar"/>
 	<classpathentry kind="lib" path="lib/node/sigar/sigar.jar"/>
+	<classpathentry kind="lib" path="lib/nodesource/winhpc/axis2-1.4/lib/axiom-api-1.2.7.jar"/>
+	<classpathentry kind="lib" path="lib/nodesource/winhpc/axis2-1.4/lib/axiom-dom-1.2.7.jar"/>
+	<classpathentry kind="lib" path="lib/nodesource/winhpc/axis2-1.4/lib/axis2-codegen-1.4.jar"/>
+	<classpathentry kind="lib" path="lib/nodesource/winhpc/axis2-1.4/lib/axis2-kernel-1.4.1.jar"/>
+	<classpathentry kind="lib" path="lib/nodesource/winhpc/rampart-1.3/lib/opensaml-1.1.jar"/>
+	<classpathentry kind="lib" path="lib/nodesource/winhpc/rampart-1.3/lib/rampart-core-1.3.jar"/>
+	<classpathentry kind="lib" path="lib/nodesource/winhpc/rampart-1.3/lib/rampart-policy-1.3.jar"/>
+	<classpathentry kind="lib" path="lib/nodesource/winhpc/rampart-1.3/lib/rampart-trust-1.3.jar"/>
+	<classpathentry kind="lib" path="lib/nodesource/winhpc/rampart-1.3/lib/wss4j-1.5.3.jar"/>
+	<classpathentry kind="lib" path="lib/nodesource/winhpc/rampart-1.3/lib/xmlsec-1.4.0.jar"/>
+	<classpathentry kind="lib" path="lib/nodesource/ec2/commons-httpclient-3.1.jar"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>

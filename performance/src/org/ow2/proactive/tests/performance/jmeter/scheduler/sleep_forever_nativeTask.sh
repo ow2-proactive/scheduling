@@ -2,5 +2,5 @@
 echo "Task is going to sleep forever"
 while :
 do
-    sleep 1h
+    sleep 3600
 done

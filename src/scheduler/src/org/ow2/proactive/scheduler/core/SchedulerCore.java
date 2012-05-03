@@ -1966,7 +1966,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
      * {@inheritDoc}
      */
     public boolean pauseJob(JobId jobId) {
-        if (status.isDown()) {
+        if (status.isShuttingDown()) {
             return false;
         }
 
@@ -1992,7 +1992,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
      * {@inheritDoc}
      */
     public boolean resumeJob(JobId jobId) {
-        if (status.isDown()) {
+        if (status.isShuttingDown()) {
             return false;
         }
 
