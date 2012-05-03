@@ -215,7 +215,7 @@ public class GetHostsFromSchedulerTestExecutor extends Thread {
         if (antPath != null && !antPath.trim().isEmpty()) {
             task.addArgument("antPath", antPath);
         }
-        
+
         System.out.println("Task arguments:");
         for (Map.Entry<String, Serializable> arg : task.getArguments().entrySet()) {
             System.out.println(arg.getKey() + "=" + arg.getValue());
