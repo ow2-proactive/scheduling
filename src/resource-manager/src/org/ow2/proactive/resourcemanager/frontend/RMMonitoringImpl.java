@@ -48,9 +48,12 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
+import org.objectweb.proactive.RunActive;
+import org.objectweb.proactive.Service;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
+import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
@@ -83,7 +86,7 @@ import org.ow2.proactive.resourcemanager.utils.RMLoggers;
  * @since ProActive Scheduling 0.9
  */
 @ActiveObject
-public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActive {
+public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActive, RunActive {
     private static final Logger logger = ProActiveLogger.getLogger(RMLoggers.MONITORING);
 
     // Attributes
@@ -124,6 +127,24 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
         } catch (ProActiveException e) {
             logger.debug("Cannot register RMMonitoring. Aborting...", e);
             PAActiveObject.terminateActiveObject(true);
+        }
+    }
+
+    /**
+     * Method controls the execution of every request.
+     * Tries to keep this active object alive in case of any exception.
+     */
+    public void runActivity(Body body) {
+        Service service = new Service(body);
+        while (body.isActive()) {
+            Request request = service.blockingRemoveOldest();
+            if (request != null) {
+                try {
+                    service.serve(request);
+                } catch (Throwable e) {
+                    logger.error("Cannot serve request: " + request, e);
+                }
+            }
         }
     }
 
