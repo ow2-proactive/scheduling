@@ -132,12 +132,28 @@
                 </listitem>
             </varlistentry>
             <varlistentry>
+                <term>InputSource</term>
+                <listitem>
+                    <para>
+                        this string attribute determines which DataSpace will be used as an input DataSpace, it can either be "input" or "global", to use respectively the job Input Space or the Scheduler Global Space.
+                    </para>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
                 <term>OutputFiles</term>
                 <listitem>
                     <para>
                         A list containing the relative path (relative to each distant Scilab session working directory)
                         of any output file that will be created by the function Func. After the task is complete, the
                         files will be transferred to the current directory accordingly to its relative path.
+                    </para>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>OutputSource</term>
+                <listitem>
+                    <para>
+                        this string attribute determines which DataSpace will be used as an output DataSpace, it can either be "ouput" or "global", to use respectively the job Output Space or the Scheduler Global Space.
                     </para>
                 </listitem>
             </varlistentry>
@@ -149,6 +165,22 @@
                         addition to the internal selection script which only selects machines which have been configured
                         for Scilab use (see<link linkend="Installation">Installation</link>). Refer to the Scheduler
                         manual for a detailed explanation on how to write selection scripts.
+                    </para>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>Static</term>
+                <listitem>
+                    <para>
+                        A boolean value which tells if the task SelectionScript is a static script (%t) or a dynamic one (%f)
+                    </para>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>ScriptParams</term>
+                <listitem>
+                    <para>
+                        a string containing the arguments of the SelectionScript, arguments should be separated by spaces.
                     </para>
                 </listitem>
             </varlistentry>

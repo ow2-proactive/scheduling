@@ -38,7 +38,9 @@ function depmodules = findUsedToolboxes(functionName)
 global alreadyFoundFunctions
 
 functionName = lower(functionName);
+
 [list,builtins,classes] = depfun(functionName,'-quiet','-toponly');
+
 root = matlabroot;
 alreadyFoundFunctions = {functionName};
 depmodules = {};

@@ -654,38 +654,21 @@ for i=1:NN
     for j=1:MM
         ilen = length(Tasks(j,i).InputFiles);
         if ilen > 0
-            inputFiles = javaArray('java.lang.String', ilen);
-            if opt.ZipInputFiles
-                inputZipNames = javaArray('java.lang.String', ilen);
-            end
+            inputFiles = javaArray('java.lang.String', ilen);            
 
             filelist = Tasks(j,i).InputFiles;
             for k=1:ilen
-                if opt.ZipInputFiles
-                    filename = filelist{k};
-                    [pathstr, name, ext] = fileparts(filename);
-                    inputZipName = [name ext '.zip'];
-                    inputZipPath = [pa_dir fs inputZipName];
-                    if exist(filename)
-                        ziplist = {filename};
-                        zip(inputZipPath, ziplist);
-                    end
-                    inputZipNames(k)=java.lang.String(inputZipName);
-                    inputFiles(k)=java.lang.String([subdir '/' inputZipName]);
-                    taskFilesToClean{i}=union(taskFilesToClean{i}, {inputZipPath});
-                else
-                    if isAbsolute(filelist{k})
-                        error([filelist{k} ' is an absolute pathname, use the option "ZipInputFiles" if you want to use it.']);
-                    end
-                    inputFiles(k)=java.lang.String(strrep(filelist{k},'\','/'));
+
+                if isAbsolute(filelist{k})
+                    error([filelist{k} ' is an absolute pathname, please use a relative pathname that is a decendant of the current directory.']);
                 end
-            end
-            if opt.ZipInputFiles
-                task_config(i,j).setInputFilesZipNames(inputZipNames);
-            end
+                inputFiles(k)=java.lang.String(strrep(filelist{k},'\','/'));
+
+            end            
 
             task_config(i,j).setInputFiles(inputFiles);
             task_config(i,j).setInputFilesThere(true);
+            task_config(i,j).setInputSource(org.ow2.proactive.scheduler.ext.matsci.common.data.DSSource.getSource(Tasks(j,i).InputSource));
         end
     end
 
@@ -702,11 +685,7 @@ for i=1:NN
         filelist = Tasks(j,i).OutputFiles;
         noutput = length(filelist);
         if noutput > 0
-            outputFiles = javaArray('java.lang.String', noutput);
-            if opt.ZipOutputFiles
-                outputFilesLists = javaArray('java.lang.String', noutput);
-                outputZipNames= javaArray('java.lang.String', noutput);
-            end
+            outputFiles = javaArray('java.lang.String', noutput);            
 
             %outputZipName = [outputZipBaseName indTofile([i j]) '.zip'];
             %outputZipPath = [subdir '/' outputZipName];
@@ -717,24 +696,13 @@ for i=1:NN
                     error([filename ' is an absolute pathname, invalid for output files.']);
                 end
 
-                if opt.ZipOutputFiles
-                    [pathstr, name, ext] = fileparts(filename);
-                    outputZipName = [name ext '.zip'];
-                    outputZipNames(k)=java.lang.String(outputZipName);
-                    outputZipPath = [subdir '/' outputZipName];
-                    outputFilesLists(k)=java.lang.String(strrep(filename,'\','/'));
-                    outputFiles(k)=java.lang.String(outputZipPath);
-                    taskFilesToClean{i}=union(taskFilesToClean{i}, {[pa_dir fs outputZipName]});
-                else
-                    outputFiles(k)=java.lang.String(strrep(filename,'\','/'));
-                end
-            end
-            if opt.ZipOutputFiles
-                task_config(i,j).setOutputFilesZipNames(outputZipNames);
-                task_config(i,j).setOutputFilesZipList(outputFilesLists);
-            end
+                
+                outputFiles(k)=java.lang.String(strrep(filename,'\','/'));
+                
+            end            
             task_config(i,j).setOutputFiles(outputFiles);
             task_config(i,j).setOutputFilesThere(true);
+            task_config(i,j).setOutputSource(org.ow2.proactive.scheduler.ext.matsci.common.data.DSSource.getSource(Tasks(j,i).OutputSource));
         end
     end
 end

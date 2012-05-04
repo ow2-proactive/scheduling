@@ -392,6 +392,7 @@ endfunction
 // Initialize Task Config Input Files
 function initInputFiles(task_configs,solve_config,opt,Tasks,NN,MM) 
     jimport java.lang.String;
+    jimport org.ow2.proactive.scheduler.ext.matsci.common.data.DSSource;
     //addJavaObj(String);
     for i=1:NN       
         for j=1:MM
@@ -412,6 +413,8 @@ function initInputFiles(task_configs,solve_config,opt,Tasks,NN,MM)
 
                     t_conf.setInputFiles(inputFiles);
                     t_conf.setInputFilesThere(%t);
+                    
+                    t_conf.setInputSource(jinvoke(DSSource,'getSource',Tasks(j,i).InputSource));
                 end                
             end
         end
@@ -421,6 +424,7 @@ endfunction
 // Initialize Task Config Ouput Files
 function initOutputFiles(task_configs,solve_config,opt,Tasks,NN,MM) 
     jimport java.lang.String;
+    jimport org.ow2.proactive.scheduler.ext.matsci.common.data.DSSource;
     //addJavaObj(String);
     for i=1:NN       
         for j=1:MM
@@ -440,6 +444,8 @@ function initOutputFiles(task_configs,solve_config,opt,Tasks,NN,MM)
 
                     t_conf.setOutputFiles(outputFiles);
                     t_conf.setOutputFilesThere(%t);
+                    
+                    t_conf.setOutputSource(jinvoke(DSSource,'getSource',Tasks(j,i).OutputSource));
                 end
             end
         end

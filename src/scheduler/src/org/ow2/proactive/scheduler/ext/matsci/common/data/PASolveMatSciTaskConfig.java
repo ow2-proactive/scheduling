@@ -123,6 +123,10 @@ public class PASolveMatSciTaskConfig implements Serializable {
      */
     private String[] inputFiles;
 
+    private DSSource inputSource = DSSource.INPUT;
+
+    private DSSource outputSource = DSSource.OUTPUT;
+
     /**
      * URI of environment zipped file
      */
@@ -182,6 +186,22 @@ public class PASolveMatSciTaskConfig implements Serializable {
 
     public URI getEnvZipFileURI() {
         return envZipFileURI;
+    }
+
+    public DSSource getInputSource() {
+        return inputSource;
+    }
+
+    public void setInputSource(DSSource inputSource) {
+        this.inputSource = inputSource;
+    }
+
+    public DSSource getOutputSource() {
+        return outputSource;
+    }
+
+    public void setOutputSource(DSSource outputSource) {
+        this.outputSource = outputSource;
     }
 
     public String getCustomScriptUrl() {

@@ -54,10 +54,16 @@ if isequal(get(0,'FormatSpacing'),'compact')
     dp2(X.Params,'Params')
     dp2(X.Description,'Description')
     dp2(X.InputFiles,'InputFiles')
+    dp2(X.InputSource,'InputSource')
     dp2(X.OutputFiles,'OuputFiles')
+    dp2(X.OutputSource,'OutputSource')
     dp2(X.Compose,'Compose')
     dp2(X.SelectionScript,'SelectionScript')
     dp2(X.Static,'Static')
+    dp2(X.ScriptParams,'ScriptParams')
+    dp2(X.NbNodes,'NbNodes')
+    dp2(X.Topology,'Topology')
+    dp2(X.ThresholdProximity,'ThresholdProximity')    
 else
     disp(' ')
     if length(name) > 0
@@ -68,10 +74,16 @@ else
     dp2(X.Params,'Params')
     dp2(X.Description,'Description')
     dp2(X.InputFiles,'InputFiles')
+    dp2(X.InputSource,'InputSource')
     dp2(X.OutputFiles,'OuputFiles')
+    dp2(X.OutputSource,'OutputSource')
     dp2(X.Compose,'Compose')
     dp2(X.SelectionScript,'SelectionScript')
     dp2(X.Static,'Static')
+    dp2(X.ScriptParams,'ScriptParams')
+    dp2(X.NbNodes,'NbNodes')
+    dp2(X.Topology,'Topology')
+    dp2(X.ThresholdProximity,'ThresholdProximity')
 end
 end
 
@@ -92,6 +104,8 @@ elseif islogical(Y)
     else
         disp(['    ' name ':       false']);
     end
+elseif isnumeric(Y) && ~isempty(Y)
+    disp(['    ' name ': ' num2str(Y)]);
 else
     try 
     disp(['    ' name ': ' char(Y)]);

@@ -645,7 +645,7 @@ public abstract class AOMatSciEnvironment<R, RL> implements MatSciEnvironment, S
                         " " + ex.getMessage());
                 }
             }
-            jinfo.setException(tname, ex);
+            jinfo.setException(tname, new PASchedulerException(ex));
 
         } else {
             if (!intermediate) {

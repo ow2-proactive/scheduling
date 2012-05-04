@@ -34,7 +34,7 @@
 %   * ################################################################
 %   * $$PROACTIVE_INITIAL_DEV$$
 %   */
-function [ok, msg]=TestPATask(timeout)
+function [ok, msg]=TestPATaskWithGS(timeout)
 if ~exist('timeout', 'var')
     if ispc()
         timeout = 400000;
@@ -42,6 +42,7 @@ if ~exist('timeout', 'var')
         timeout = 200000;
     end
 end
+   
 oldpwd = pwd;
 % Create an array of filenames that make up the image sequence
 [pathstr, name, ext] = fileparts(mfilename('fullpath'));
@@ -52,7 +53,9 @@ fileNames = {dirOutput.name}';
 numFrames = numel(fileNames);
 delete([fileFolder '/' 'New*.pgm']);
 
-T = PATask(1,numFrames);
+[pathstr, name, ext] = fileparts(mfilename('fullpath'));
+
+T = PATask(2,numFrames);
 for p = 1:numFrames
 
     T(1,p).Compose = false;
@@ -61,8 +64,18 @@ for p = 1:numFrames
     T(1,p).InputFiles = {['images_low' '/' fileNames{p}]};
     [pathstr, name, ext] = fileparts(fileNames{p});
     T(1,p).OutputFiles = {['images_low' '/' 'New_' name '.pgm']};
+    T(1,p).OutputSource = 'global';
     T(1,p).Description = ['Image recogition' num2str(p)];
-    [pathstr, name, ext] = fileparts(mfilename('fullpath'));    
+    T(2,p).Compose = false;
+    T(2,p).Params = 1;
+    T(2,p).Func = @factorial;
+    T(2,p).InputFiles = {['images_low' '/' 'New_' name '.pgm']};
+    [pathstr, name, ext] = fileparts(fileNames{p});
+    T(2,p).InputSource = 'global';
+    T(2,p).OutputFiles = {['images_low' '/' 'New_' name '.pgm']};
+    T(2,p).OutputSource = 'output';
+    T(2,p).Description = ['Id'];
+
 end
 % Prepare
 
@@ -97,4 +110,8 @@ close(h);
 cd(oldpwd);
 ok=true;
 msg=[];
+end
 
+ function b=id(a)
+        b=a;
+    end

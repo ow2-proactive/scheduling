@@ -54,12 +54,16 @@ for i=1:length(fn)
             else
                 this.InputFiles = {value};
             end
+        case 'InputSource'
+            this.InputSource = lower(value);
         case 'OutputFiles'
             if iscell(value) || (isnumeric(value) && isempty(value))
                 this.OutputFiles = value;
             else
                 this.OutputFiles = {value};
             end
+        case 'OutputSource'
+            this.OutputSource = lower(value);
         case 'SelectionScript'
             if ischar(value)
                 this.SelectionScript = ['file:' strrep(value, '\', '/')];

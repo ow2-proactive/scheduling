@@ -285,10 +285,34 @@ public class AOMatlabEnvironment extends AOMatSciEnvironment<Boolean, MatlabResu
                 schedulerTask.addOutputFiles(subDir + taskConfigs[i][j].getOutputVariablesFileName(),
                         OutputAccessMode.TransferToOutputSpace);
 
+                InputAccessMode iam = null;
+                switch (taskConfigs[i][j].getInputSource()) {
+                    case INPUT:
+                        iam = InputAccessMode.TransferFromInputSpace;
+                        break;
+                    case OUTPUT:
+                        iam = InputAccessMode.TransferFromOutputSpace;
+                        break;
+                    case GLOBAL:
+                        iam = InputAccessMode.TransferFromGlobalSpace;
+                        break;
+                }
+
+                OutputAccessMode oam = null;
+
+                switch (taskConfigs[i][j].getOutputSource()) {
+                    case OUTPUT:
+                        oam = OutputAccessMode.TransferToOutputSpace;
+                        break;
+                    case GLOBAL:
+                        oam = OutputAccessMode.TransferToGlobalSpace;
+                        break;
+                }
+
                 String[] inputFiles = taskConfigs[i][j].getInputFiles();
                 if (inputFiles != null && inputFiles.length > 0) {
                     for (String inputFile : inputFiles) {
-                        schedulerTask.addInputFiles(inputFile, InputAccessMode.TransferFromInputSpace);
+                        schedulerTask.addInputFiles(inputFile, iam);
                     }
                 }
 
@@ -296,7 +320,7 @@ public class AOMatlabEnvironment extends AOMatSciEnvironment<Boolean, MatlabResu
                 if (outputFiles != null && outputFiles.length > 0) {
 
                     for (String outputFile : outputFiles) {
-                        schedulerTask.addOutputFiles(outputFile, OutputAccessMode.TransferToOutputSpace);
+                        schedulerTask.addOutputFiles(outputFile, oam);
                     }
                 }
 

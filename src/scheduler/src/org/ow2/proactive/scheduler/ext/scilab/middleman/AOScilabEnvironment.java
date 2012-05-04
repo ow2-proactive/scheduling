@@ -68,7 +68,6 @@ import org.scilab.modules.types.ScilabType;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.StringTokenizer;
 import java.util.TreeSet;
 
 
@@ -277,10 +276,34 @@ public class AOScilabEnvironment extends AOMatSciEnvironment<ScilabType, ScilabR
                 schedulerTask.addOutputFiles(subDir + taskConfigs[i][j].getOutputVariablesFileName(),
                         OutputAccessMode.TransferToOutputSpace);
 
+                InputAccessMode iam = null;
+                switch (taskConfigs[i][j].getInputSource()) {
+                    case INPUT:
+                        iam = InputAccessMode.TransferFromInputSpace;
+                        break;
+                    case OUTPUT:
+                        iam = InputAccessMode.TransferFromOutputSpace;
+                        break;
+                    case GLOBAL:
+                        iam = InputAccessMode.TransferFromGlobalSpace;
+                        break;
+                }
+
+                OutputAccessMode oam = null;
+
+                switch (taskConfigs[i][j].getOutputSource()) {
+                    case OUTPUT:
+                        oam = OutputAccessMode.TransferToOutputSpace;
+                        break;
+                    case GLOBAL:
+                        oam = OutputAccessMode.TransferToGlobalSpace;
+                        break;
+                }
+
                 String[] inputFiles = taskConfigs[i][j].getInputFiles();
                 if (inputFiles != null && inputFiles.length > 0) {
                     for (String inputFile : inputFiles) {
-                        schedulerTask.addInputFiles(inputFile, InputAccessMode.TransferFromInputSpace);
+                        schedulerTask.addInputFiles(inputFile, iam);
                     }
                 }
 
@@ -288,7 +311,7 @@ public class AOScilabEnvironment extends AOMatSciEnvironment<ScilabType, ScilabR
                 if (outputFiles != null && outputFiles.length > 0) {
 
                     for (String outputFile : outputFiles) {
-                        schedulerTask.addOutputFiles(outputFile, OutputAccessMode.TransferToOutputSpace);
+                        schedulerTask.addOutputFiles(outputFile, oam);
                     }
                 }
 

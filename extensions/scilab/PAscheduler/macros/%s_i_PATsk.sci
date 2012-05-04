@@ -10,7 +10,7 @@ function a=%s_i_PATsk(i1,b,a)
             a.InputFiles = list();
         else
             error('InputFiles must be a list, a string or null');
-        end    
+        end      
      elseif i1 == 'OutputFiles' then
         if isempty(b) then
             a.OutputFiles = list();
