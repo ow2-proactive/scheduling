@@ -76,17 +76,18 @@ public class SelectionScriptTimeOutTest extends FunctionalTest {
      */
     @org.junit.Test
     public void action() throws Exception {
+        RMTHelper helper = RMTHelper.getDefaultInstance();
 
         RMTHelper.log("Deployment");
 
-        ResourceManager resourceManager = RMTHelper.getResourceManager();
-        RMTHelper.createDefaultNodeSource();
-        RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, NodeSource.DEFAULT);
+        ResourceManager resourceManager = helper.getResourceManager();
+        helper.createDefaultNodeSource();
+        helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, NodeSource.DEFAULT);
 
         for (int i = 0; i < RMTHelper.defaultNodesNumber; i++) {
-            RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
+            helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
             //wait for the nodes to be in free state
-            RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+            helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
         }
 
         int scriptSleepingTime = PAResourceManagerProperties.RM_SELECT_SCRIPT_TIMEOUT.getValueAsInt() * 2;
@@ -116,11 +117,11 @@ public class SelectionScriptTimeOutTest extends FunctionalTest {
         HashMap<String, String> vmProperties = new HashMap<String, String>();
         vmProperties.put(nodeName, "dummy");
 
-        String nodeURL = RMTHelper.createNode(nodeName, vmProperties).getNodeInformation().getURL();
+        String nodeURL = helper.createNode(nodeName, vmProperties).getNodeInformation().getURL();
         resourceManager.addNode(nodeURL);
-        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
+        helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
         //wait for the nodes to be in free state
-        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
 
         // now we have RMTHelper.defaultNodesNumber + 1 nodes
         script = new SelectionScript(new File(selectionScriptWithtimeOutPath.toURI()), new String[] {

@@ -99,17 +99,18 @@ public class SelectionWithNodesExclusionTest extends FunctionalTest {
     */
     @org.junit.Test
     public void action() throws Exception {
+        RMTHelper helper = RMTHelper.getDefaultInstance();
 
         RMTHelper.log("Deployment");
 
-        ResourceManager resourceManager = RMTHelper.getResourceManager();
-        RMTHelper.createDefaultNodeSource();
-        RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, NodeSource.DEFAULT);
+        ResourceManager resourceManager = helper.getResourceManager();
+        helper.createDefaultNodeSource();
+        helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, NodeSource.DEFAULT);
 
         for (int i = 0; i < RMTHelper.defaultNodesNumber; i++) {
-            RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
+            helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
             //wait for the nodes to be in free state
-            RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+            helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
         }
 
         RMTHelper.log("Test 1");
@@ -123,13 +124,13 @@ public class SelectionWithNodesExclusionTest extends FunctionalTest {
         assertTrue(resourceManager.getState().getFreeNodesNumber() == RMTHelper.defaultNodesNumber - 1);
 
         //wait for node busy event
-        RMNodeEvent evt = RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        RMNodeEvent evt = helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
         Assert.assertEquals(evt.getNodeState(), NodeState.BUSY);
 
         resourceManager.releaseNodes(nodeSetWithNodeToExclude);
 
         //wait for node free event
-        evt = RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        evt = helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
         Assert.assertEquals(evt.getNodeState(), NodeState.FREE);
 
         assertTrue(resourceManager.getState().getFreeNodesNumber() == RMTHelper.defaultNodesNumber);
@@ -142,7 +143,7 @@ public class SelectionWithNodesExclusionTest extends FunctionalTest {
         PAFuture.waitFor(nodes);
 
         for (int i = 0; i < RMTHelper.defaultNodesNumber - 1; i++) {
-            evt = RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+            evt = helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
             Assert.assertEquals(evt.getNodeState(), NodeState.BUSY);
         }
 
@@ -155,7 +156,7 @@ public class SelectionWithNodesExclusionTest extends FunctionalTest {
 
         //wait for nodes freed event
         for (int i = 0; i < RMTHelper.defaultNodesNumber - 1; i++) {
-            evt = RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+            evt = helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
             Assert.assertEquals(evt.getNodeState(), NodeState.FREE);
         }
 
@@ -176,7 +177,7 @@ public class SelectionWithNodesExclusionTest extends FunctionalTest {
 
         //wait for nodes busy event
         for (int i = 0; i < RMTHelper.defaultNodesNumber - 1; i++) {
-            evt = RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+            evt = helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
             Assert.assertEquals(evt.getNodeState(), NodeState.BUSY);
         }
 
@@ -189,7 +190,7 @@ public class SelectionWithNodesExclusionTest extends FunctionalTest {
 
         //wait for nodes freed event
         for (int i = 0; i < RMTHelper.defaultNodesNumber - 1; i++) {
-            evt = RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+            evt = helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
             Assert.assertEquals(evt.getNodeState(), NodeState.FREE);
         }
 
@@ -210,7 +211,7 @@ public class SelectionWithNodesExclusionTest extends FunctionalTest {
 
         //wait for nodes busy event
         for (int i = 0; i < RMTHelper.defaultNodesNumber - 1; i++) {
-            evt = RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+            evt = helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
             Assert.assertEquals(evt.getNodeState(), NodeState.BUSY);
         }
 
@@ -223,7 +224,7 @@ public class SelectionWithNodesExclusionTest extends FunctionalTest {
 
         //wait for node free event
         for (int i = 0; i < RMTHelper.defaultNodesNumber - 1; i++) {
-            evt = RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+            evt = helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
             Assert.assertEquals(evt.getNodeState(), NodeState.FREE);
         }
 
@@ -237,18 +238,18 @@ public class SelectionWithNodesExclusionTest extends FunctionalTest {
         HashMap<String, String> vmProperties = new HashMap<String, String>();
         vmProperties.put(this.vmPropKey, this.vmPropValue);
 
-        String node1URL = RMTHelper.createNode(node1Name, vmProperties).getNodeInformation().getURL();
+        String node1URL = helper.createNode(node1Name, vmProperties).getNodeInformation().getURL();
         resourceManager.addNode(node1URL);
 
-        String node2URL = RMTHelper.createNode(node2Name, vmProperties).getNodeInformation().getURL();
+        String node2URL = helper.createNode(node2Name, vmProperties).getNodeInformation().getURL();
         resourceManager.addNode(node2URL);
 
         Thread.sleep(5000);
-        RMTHelper.waitForNodeEvent(RMEventType.NODE_ADDED, node1URL);
-        RMTHelper.waitForNodeEvent(RMEventType.NODE_ADDED, node2URL);
+        helper.waitForNodeEvent(RMEventType.NODE_ADDED, node1URL);
+        helper.waitForNodeEvent(RMEventType.NODE_ADDED, node2URL);
         //wait for the nodes to be in free state
-        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
 
         //wait for nodes added events
         assertTrue(resourceManager.getState().getFreeNodesNumber() == RMTHelper.defaultNodesNumber + 2);
@@ -269,7 +270,7 @@ public class SelectionWithNodesExclusionTest extends FunctionalTest {
         PAFuture.waitFor(nodes);
 
         //wait for nodes busy event
-        evt = RMTHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node2URL);
+        evt = helper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node2URL);
         Assert.assertEquals(evt.getNodeState(), NodeState.BUSY);
 
         // booked all nodes minus the node to exclude
@@ -282,7 +283,7 @@ public class SelectionWithNodesExclusionTest extends FunctionalTest {
 
         resourceManager.releaseNodes(nodes);
         //wait for node free event
-        evt = RMTHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node2URL);
+        evt = helper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node2URL);
         Assert.assertEquals(evt.getNodeState(), NodeState.FREE);
 
         assertTrue(resourceManager.getState().getFreeNodesNumber() == RMTHelper.defaultNodesNumber + 2);
@@ -306,7 +307,7 @@ public class SelectionWithNodesExclusionTest extends FunctionalTest {
         PAFuture.waitFor(nodes);
 
         //wait for nodes busy event
-        evt = RMTHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node1URL);
+        evt = helper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node1URL);
         Assert.assertEquals(evt.getNodeState(), NodeState.BUSY);
 
         // booked all nodes minus the node to exclude
@@ -320,7 +321,7 @@ public class SelectionWithNodesExclusionTest extends FunctionalTest {
         resourceManager.releaseNodes(nodes);
 
         //wait for node free event
-        evt = RMTHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node1URL);
+        evt = helper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node1URL);
         Assert.assertEquals(evt.getNodeState(), NodeState.FREE);
 
         assertTrue(resourceManager.getState().getFreeNodesNumber() == RMTHelper.defaultNodesNumber + 2);

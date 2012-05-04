@@ -73,22 +73,23 @@ public class TestConcurrentUsers extends FunctionalTest {
      */
     @org.junit.Test
     public void action() throws Exception {
+        final RMTHelper helper = RMTHelper.getDefaultInstance();
 
-        ResourceManager resourceManager = RMTHelper.connect(RMTHelper.username, RMTHelper.username);
+        ResourceManager resourceManager = helper.connect(RMTHelper.username, RMTHelper.username);
 
         String hostName = ProActiveInet.getInstance().getHostname();
         String node1Name = "node1";
         String node1URL = "//" + hostName + "/" + node1Name;
-        RMTHelper.createNode(node1Name);
+        helper.createNode(node1Name);
         resourceManager.createNodeSource(NodeSource.DEFAULT, DefaultInfrastructureManager.class.getName(),
                 null, StaticPolicy.class.getName(), null);
-        RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, NodeSource.DEFAULT);
+        helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, NodeSource.DEFAULT);
         resourceManager.addNode(node1URL, NodeSource.DEFAULT);
 
         // waiting for node adding event
-        RMTHelper.waitForNodeEvent(RMEventType.NODE_ADDED, node1URL);
+        helper.waitForNodeEvent(RMEventType.NODE_ADDED, node1URL);
         // waiting for the node to be free
-        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
 
         assertTrue(resourceManager.getState().getTotalNodesNumber() == 1);
         assertTrue(resourceManager.getState().getFreeNodesNumber() == 1);
@@ -98,7 +99,7 @@ public class TestConcurrentUsers extends FunctionalTest {
         final NodeSet ns = resourceManager.getAtMostNodes(1, null);
 
         // waiting for node busy event
-        RMNodeEvent evt = RMTHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node1URL);
+        RMNodeEvent evt = helper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node1URL);
         Assert.assertEquals(evt.getNodeState(), NodeState.BUSY);
         assertTrue(ns.size() == 1);
         assertTrue(resourceManager.getState().getTotalNodesNumber() == 1);
@@ -108,7 +109,7 @@ public class TestConcurrentUsers extends FunctionalTest {
             @Override
             public void run() {
                 try {
-                    ResourceManager rm2 = RMTHelper.connect("user", "pwd");
+                    ResourceManager rm2 = helper.connect("user", "pwd");
                     rm2.releaseNode(ns.get(0)).getBooleanValue();
                 } catch (Exception e) {
                     System.out.println(e.getMessage());
@@ -122,7 +123,7 @@ public class TestConcurrentUsers extends FunctionalTest {
         Assert.assertEquals(0, resourceManager.getState().getFreeNodesNumber());
 
         resourceManager.releaseNodes(ns);
-        evt = RMTHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node1URL);
+        evt = helper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node1URL);
         Assert.assertEquals(evt.getNodeState(), NodeState.FREE);
 
         assertTrue(resourceManager.getState().getTotalNodesNumber() == 1);
@@ -143,7 +144,7 @@ public class TestConcurrentUsers extends FunctionalTest {
         nodeProcess.startProcess();
 
         // node busy event
-        evt = RMTHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node1URL);
+        evt = helper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node1URL);
         Assert.assertEquals(evt.getNodeState(), NodeState.BUSY);
         assertTrue(resourceManager.getState().getTotalNodesNumber() == 1);
         assertTrue(resourceManager.getState().getFreeNodesNumber() == 0);
@@ -152,7 +153,7 @@ public class TestConcurrentUsers extends FunctionalTest {
         RMTHelper.log("Client does not exist anymore. Waiting for client crash detection.");
         // it should be detected by RM
         // waiting for node free event
-        evt = RMTHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node1URL);
+        evt = helper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node1URL);
         Assert.assertEquals(evt.getNodeState(), NodeState.FREE);
         assertTrue(resourceManager.getState().getTotalNodesNumber() == 1);
         assertTrue(resourceManager.getState().getFreeNodesNumber() == 1);
@@ -160,7 +161,7 @@ public class TestConcurrentUsers extends FunctionalTest {
         RMTHelper.log("Test 4 - disconnecting");
 
         NodeSet ns2 = resourceManager.getAtMostNodes(1, null);
-        RMNodeEvent event = RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED, 10000);
+        RMNodeEvent event = helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED, 10000);
         Assert.assertTrue(event.getNodeState() == NodeState.BUSY);
         try {
             PAFuture.waitFor(ns2);
@@ -187,7 +188,7 @@ public class TestConcurrentUsers extends FunctionalTest {
         t.join();
 
         try {
-            event = RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED, 10000);
+            event = helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED, 10000);
             Assert.assertTrue(event.toString(), false);
         } catch (ProActiveTimeoutException e) {
         }

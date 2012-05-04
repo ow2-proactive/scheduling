@@ -82,18 +82,19 @@ public class NonBlockingCoreTest extends FunctionalTest {
      */
     @org.junit.Test
     public void action() throws Exception {
+        RMTHelper helper = RMTHelper.getDefaultInstance();
 
-        ResourceManager resourceManager = RMTHelper.getResourceManager();
+        ResourceManager resourceManager = helper.getResourceManager();
 
         RMTHelper.log("Deployment");
 
-        RMTHelper.createDefaultNodeSource();
-        RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, NodeSource.DEFAULT);
+        helper.createDefaultNodeSource();
+        helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, NodeSource.DEFAULT);
 
         for (int i = 0; i < RMTHelper.defaultNodesNumber; i++) {
-            RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
+            helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
             //waiting for node to be in free state
-            RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+            helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
         }
 
         int coreScriptExecutionTimeout = PAResourceManagerProperties.RM_SELECT_SCRIPT_TIMEOUT.getValueAsInt();
@@ -128,14 +129,14 @@ public class NonBlockingCoreTest extends FunctionalTest {
         String hostName = ProActiveInet.getInstance().getHostname();
         String node1Name = "node1";
         String node1URL = "//" + hostName + "/" + node1Name;
-        RMTHelper.createNode(node1Name);
+        helper.createNode(node1Name);
 
         RMTHelper.log("Adding node " + node1URL);
         resourceManager.addNode(node1URL);
 
-        RMTHelper.waitForNodeEvent(RMEventType.NODE_ADDED, node1URL);
+        helper.waitForNodeEvent(RMEventType.NODE_ADDED, node1URL);
         //waiting for node to be in free state, it is in configuring state when added...
-        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
 
         assertTrue(resourceManager.getState().getTotalNodesNumber() == RMTHelper.defaultNodesNumber + 1);
         assertTrue(resourceManager.getState().getFreeNodesNumber() == RMTHelper.defaultNodesNumber + 1);
@@ -144,23 +145,22 @@ public class NonBlockingCoreTest extends FunctionalTest {
         RMTHelper.log("Removing node " + node1URL);
         resourceManager.removeNode(node1URL, false);
 
-        RMTHelper.waitForNodeEvent(RMEventType.NODE_REMOVED, node1URL);
+        helper.waitForNodeEvent(RMEventType.NODE_REMOVED, node1URL);
 
         assertTrue(resourceManager.getState().getTotalNodesNumber() == RMTHelper.defaultNodesNumber);
         assertTrue(resourceManager.getState().getFreeNodesNumber() == RMTHelper.defaultNodesNumber);
 
         RMTHelper.log("Creating Local node source " + NodeSource.LOCAL_INFRASTRUCTURE_NAME);
-        RMTHelper.createLocalNodeSource();
+        helper.createLocalNodeSource();
 
         //wait for creation of GCM Node Source event, and deployment of its nodes
-        RMTHelper
-                .waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, NodeSource.LOCAL_INFRASTRUCTURE_NAME);
+        helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, NodeSource.LOCAL_INFRASTRUCTURE_NAME);
         for (int i = 0; i < RMTHelper.defaultNodesNumber; i++) {
-            RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
-            RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
+            helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
+            helper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
             //waiting for the node to be in free state
-            RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
-            RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+            helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
+            helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
         }
 
         assertTrue(resourceManager.getState().getTotalNodesNumber() == RMTHelper.defaultNodesNumber * 2);

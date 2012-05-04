@@ -72,27 +72,28 @@ public class TestNSProviderPermissions extends FunctionalTest {
 
     @org.junit.Test
     public void action() throws Exception {
+        RMTHelper helper = RMTHelper.getDefaultInstance();
 
         String nsName = "ns";
         RMTHelper.log("Test1 - node providers = ME");
 
-        ResourceManager nsadmin = RMTHelper.join("nsadmin", "pwd");
+        ResourceManager nsadmin = helper.join("nsadmin", "pwd");
         nsadmin.createNodeSource(nsName, DefaultInfrastructureManager.class.getName(), null,
                 StaticPolicy.class.getName(), new Object[] { "ALL", "ME" });
-        RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, nsName);
+        helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, nsName);
 
-        Node node = RMTHelper.createNode("node1");
-        Node node2 = RMTHelper.createNode("node2");
+        Node node = helper.createNode("node1");
+        Node node2 = helper.createNode("node2");
         try {
             nsadmin.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
         } catch (Exception e) {
             Assert.assertTrue(false);
         }
 
-        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
+        helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
         nsadmin.disconnect();
 
-        ResourceManager user = RMTHelper.join("radmin", "pwd");
+        ResourceManager user = helper.join("radmin", "pwd");
         try {
             // user does not allow to add nodes
             user.addNode(node2.getNodeInformation().getURL(), nsName).getBooleanValue();
@@ -111,11 +112,11 @@ public class TestNSProviderPermissions extends FunctionalTest {
         user.disconnect();
 
         // AllPermission user
-        ResourceManager admin = RMTHelper.join("admin", "admin");
+        ResourceManager admin = helper.join("admin", "admin");
         try {
             // user does not allow to add nodes
             admin.addNode(node2.getNodeInformation().getURL(), nsName).getBooleanValue();
-            RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
+            helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
         } catch (Exception e) {
             Assert.assertTrue(false);
         }
@@ -123,7 +124,7 @@ public class TestNSProviderPermissions extends FunctionalTest {
         try {
             // user does not allow to remove nodes
             admin.removeNode(node.getNodeInformation().getURL(), true).getBooleanValue();
-            RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
+            helper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
         } catch (Exception e) {
             Assert.assertTrue(false);
         }
@@ -131,8 +132,8 @@ public class TestNSProviderPermissions extends FunctionalTest {
         try {
             // user does not allow to remove nodes
             admin.removeNodeSource(nsName, true).getBooleanValue();
-            RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
-            RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, nsName);
+            helper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
+            helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, nsName);
         } catch (Exception e) {
             Assert.assertTrue(false);
         }
@@ -140,30 +141,30 @@ public class TestNSProviderPermissions extends FunctionalTest {
         RMTHelper.log("Test2 - node providers = MY_GROUPS");
         admin.createNodeSource(nsName, DefaultInfrastructureManager.class.getName(), null, StaticPolicy.class
                 .getName(), new Object[] { "ALL", "MY_GROUPS" });
-        RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, nsName);
+        helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, nsName);
 
-        node = RMTHelper.createNode("node1");
-        node2 = RMTHelper.createNode("node2");
-        Node node3 = RMTHelper.createNode("node3");
+        node = helper.createNode("node1");
+        node2 = helper.createNode("node2");
+        Node node3 = helper.createNode("node3");
         try {
             admin.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
-            RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
+            helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
         } catch (Exception e) {
             Assert.assertTrue(false);
         }
         admin.disconnect();
 
-        nsadmin = RMTHelper.join("nsadmin", "pwd");
+        nsadmin = helper.join("nsadmin", "pwd");
         try {
             // nsadmin is in the same group as admin
             nsadmin.addNode(node2.getNodeInformation().getURL(), nsName).getBooleanValue();
-            RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
+            helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
         } catch (Exception e) {
             Assert.assertTrue(false);
         }
         nsadmin.disconnect();
 
-        user = RMTHelper.join("radmin", "pwd");
+        user = helper.join("radmin", "pwd");
         try {
             // user does not allow to add nodes
             user.addNode(node3.getNodeInformation().getURL(), nsName).getBooleanValue();
@@ -181,7 +182,7 @@ public class TestNSProviderPermissions extends FunctionalTest {
         }
         user.disconnect();
 
-        nsadmin = RMTHelper.join("nsadmin", "pwd");
+        nsadmin = helper.join("nsadmin", "pwd");
         try {
             // nsadmin cannot remove foreign node
             nsadmin.removeNode(node.getNodeInformation().getURL(), true).getBooleanValue();
@@ -192,48 +193,48 @@ public class TestNSProviderPermissions extends FunctionalTest {
         try {
             // but it can remove its own
             nsadmin.removeNode(node2.getNodeInformation().getURL(), true).getBooleanValue();
-            RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
+            helper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
             nsadmin.addNode(node3.getNodeInformation().getURL(), nsName).getBooleanValue();
-            RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
+            helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
         } catch (Exception e) {
             Assert.assertTrue(false);
         }
         nsadmin.disconnect();
 
-        admin = RMTHelper.join("admin", "admin");
+        admin = helper.join("admin", "admin");
         try {
             // admin can remove foreign node
             admin.removeNode(node3.getNodeInformation().getURL(), true).getBooleanValue();
-            RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
+            helper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
             admin.removeNodeSource(nsName, true).getBooleanValue();
-            RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, nsName);
+            helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, nsName);
         } catch (Exception e) {
             Assert.assertTrue(false);
         }
         admin.disconnect();
 
         RMTHelper.log("Test3 - node providers = ALL");
-        nsadmin = RMTHelper.join("nsadmin", "pwd");
+        nsadmin = helper.join("nsadmin", "pwd");
         nsadmin.createNodeSource(nsName, DefaultInfrastructureManager.class.getName(), null,
                 StaticPolicy.class.getName(), new Object[] { "ALL", "ALL" });
-        RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, nsName);
+        helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, nsName);
 
-        node = RMTHelper.createNode("node1");
-        node2 = RMTHelper.createNode("node2");
-        node3 = RMTHelper.createNode("node3");
+        node = helper.createNode("node1");
+        node2 = helper.createNode("node2");
+        node3 = helper.createNode("node3");
         try {
             nsadmin.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
-            RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
+            helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
         } catch (Exception e) {
             Assert.assertTrue(false);
         }
         nsadmin.disconnect();
 
-        user = RMTHelper.join("radmin", "pwd");
+        user = helper.join("radmin", "pwd");
         try {
             // user can add new nodes
             user.addNode(node2.getNodeInformation().getURL(), nsName).getBooleanValue();
-            RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
+            helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
         } catch (Exception e) {
             Assert.assertTrue(false);
         }
@@ -253,28 +254,28 @@ public class TestNSProviderPermissions extends FunctionalTest {
         try {
             // adding node3
             user.addNode(node3.getNodeInformation().getURL(), nsName).getBooleanValue();
-            RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
+            helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
         } catch (Exception e) {
             Assert.assertTrue(false);
         }
         user.disconnect();
-        nsadmin = RMTHelper.join("nsadmin", "pwd");
+        nsadmin = helper.join("nsadmin", "pwd");
         try {
             // nsadmin can remove node3 as ns admin
             nsadmin.removeNode(node3.getNodeInformation().getURL(), true).getBooleanValue();
-            RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
+            helper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
         } catch (Exception e) {
             Assert.assertTrue(false);
         }
         nsadmin.disconnect();
         RMTHelper.log("Test4 - admin priveleges");
-        admin = RMTHelper.join("admin", "admin");
+        admin = helper.join("admin", "admin");
         try {
             // admin can remove anything
             admin.removeNode(node.getNodeInformation().getURL(), true).getBooleanValue();
-            RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
+            helper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
             admin.removeNodeSource(nsName, false);
-            RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, nsName);
+            helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, nsName);
         } catch (Exception e) {
             Assert.assertTrue(false);
         }
@@ -282,19 +283,19 @@ public class TestNSProviderPermissions extends FunctionalTest {
         RMTHelper.log("Test5.1 - specific users");
         admin.createNodeSource(nsName, DefaultInfrastructureManager.class.getName(), null, StaticPolicy.class
                 .getName(), new Object[] { "ALL", "users=nsadmin" });
-        RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, nsName);
+        helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, nsName);
 
-        node = RMTHelper.createNode("node1");
-        node2 = RMTHelper.createNode("node2");
-        node3 = RMTHelper.createNode("node3");
+        node = helper.createNode("node1");
+        node2 = helper.createNode("node2");
+        node3 = helper.createNode("node3");
         try {
             admin.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
-            RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
+            helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
         } catch (Exception e) {
             Assert.assertTrue(false);
         }
         admin.disconnect();
-        nsadmin = RMTHelper.join("nsadmin", "pwd");
+        nsadmin = helper.join("nsadmin", "pwd");
         try {
             // nsadmin cannot remove node as he is not a node owner
             nsadmin.removeNode(node.getNodeInformation().getURL(), true).getBooleanValue();
@@ -304,12 +305,12 @@ public class TestNSProviderPermissions extends FunctionalTest {
         }
         try {
             nsadmin.addNode(node2.getNodeInformation().getURL(), nsName).getBooleanValue();
-            RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
+            helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
         } catch (Exception e) {
             Assert.assertTrue(false);
         }
         nsadmin.disconnect();
-        user = RMTHelper.join("radmin", "pwd");
+        user = helper.join("radmin", "pwd");
         try {
             // user cannot add new nodes
             user.addNode(node3.getNodeInformation().getURL(), nsName).getBooleanValue();
@@ -326,33 +327,33 @@ public class TestNSProviderPermissions extends FunctionalTest {
         }
         user.disconnect();
 
-        admin = RMTHelper.join("admin", "admin");
+        admin = helper.join("admin", "admin");
         try {
             // user does not allow to remove nodes
             admin.removeNodeSource(nsName, true).getBooleanValue();
-            RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
-            RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
-            RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, nsName);
+            helper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
+            helper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
+            helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, nsName);
         } catch (Exception e) {
             Assert.assertTrue(false);
         }
 
         RMTHelper.log("Test5.2 - specific groups");
         admin.createNodeSource(nsName, DefaultInfrastructureManager.class.getName(), null,
-                StaticPolicy.class.getName(), new Object[] { "ALL", "groups=nsadmins" }).booleanValue();
-        RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, nsName);
+                StaticPolicy.class.getName(), new Object[] { "ALL", "groups=nsadmins" }).getBooleanValue();
+        helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, nsName);
 
-        node = RMTHelper.createNode("node1");
-        node2 = RMTHelper.createNode("node2");
-        node3 = RMTHelper.createNode("node3");
+        node = helper.createNode("node1");
+        node2 = helper.createNode("node2");
+        node3 = helper.createNode("node3");
         try {
             admin.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
-            RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
+            helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
         } catch (Exception e) {
             Assert.assertTrue(e.getMessage(), false);
         }
         admin.disconnect();
-        nsadmin = RMTHelper.join("nsadmin", "pwd");
+        nsadmin = helper.join("nsadmin", "pwd");
         try {
             // nsadmin cannot remove node as he is not a node owner
             nsadmin.removeNode(node.getNodeInformation().getURL(), true).getBooleanValue();
@@ -362,12 +363,12 @@ public class TestNSProviderPermissions extends FunctionalTest {
         }
         try {
             nsadmin.addNode(node2.getNodeInformation().getURL(), nsName).getBooleanValue();
-            RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
+            helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
         } catch (Exception e) {
             Assert.assertTrue(e.getMessage(), false);
         }
         nsadmin.disconnect();
-        user = RMTHelper.join("radmin", "pwd");
+        user = helper.join("radmin", "pwd");
         try {
             // user cannot add new nodes
             user.addNode(node3.getNodeInformation().getURL(), nsName).getBooleanValue();
@@ -384,13 +385,13 @@ public class TestNSProviderPermissions extends FunctionalTest {
         }
         user.disconnect();
 
-        admin = RMTHelper.join("admin", "admin");
+        admin = helper.join("admin", "admin");
         try {
             // user does not allow to remove nodes
             admin.removeNodeSource(nsName, true).getBooleanValue();
-            RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
-            RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
-            RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, nsName);
+            helper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
+            helper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
+            helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, nsName);
         } catch (Exception e) {
             Assert.assertTrue(e.getMessage(), false);
         }
@@ -398,19 +399,19 @@ public class TestNSProviderPermissions extends FunctionalTest {
         RMTHelper.log("Test5.3 - specific users/groups");
         admin.createNodeSource(nsName, DefaultInfrastructureManager.class.getName(), null, StaticPolicy.class
                 .getName(), new Object[] { "ALL", "users=radmin;groups=nsadmins" });
-        RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, nsName);
+        helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, nsName);
 
-        node = RMTHelper.createNode("node1");
-        node2 = RMTHelper.createNode("node2");
-        node3 = RMTHelper.createNode("node3");
+        node = helper.createNode("node1");
+        node2 = helper.createNode("node2");
+        node3 = helper.createNode("node3");
         try {
             admin.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
-            RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
+            helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
         } catch (Exception e) {
             Assert.assertTrue(e.getMessage(), false);
         }
         admin.disconnect();
-        nsadmin = RMTHelper.join("nsadmin", "pwd");
+        nsadmin = helper.join("nsadmin", "pwd");
         try {
             // nsadmin cannot remove node as he is not a node owner
             nsadmin.removeNode(node.getNodeInformation().getURL(), true).getBooleanValue();
@@ -420,16 +421,16 @@ public class TestNSProviderPermissions extends FunctionalTest {
         }
         try {
             nsadmin.addNode(node2.getNodeInformation().getURL(), nsName).getBooleanValue();
-            RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
+            helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
         } catch (Exception e) {
             Assert.assertTrue(e.getMessage(), false);
         }
         nsadmin.disconnect();
-        user = RMTHelper.join("radmin", "pwd");
+        user = helper.join("radmin", "pwd");
         try {
             // user can add new nodes
             user.addNode(node3.getNodeInformation().getURL(), nsName).getBooleanValue();
-            RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
+            helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
         } catch (Exception e) {
             Assert.assertTrue(e.getMessage(), false);
         }
@@ -442,14 +443,14 @@ public class TestNSProviderPermissions extends FunctionalTest {
         }
         user.disconnect();
 
-        admin = RMTHelper.join("admin", "admin");
+        admin = helper.join("admin", "admin");
         try {
             // user does not allow to remove nodes
             admin.removeNodeSource(nsName, true).getBooleanValue();
-            RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
-            RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
-            RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
-            RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, nsName);
+            helper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
+            helper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
+            helper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
+            helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, nsName);
         } catch (Exception e) {
             Assert.assertTrue(e.getMessage(), false);
         }

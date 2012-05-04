@@ -65,6 +65,8 @@ public class TestGCMCustomizedInfrastructureReleaseWhenIdlePolicy extends
     /** timeout for node acquisition */
     protected static final int TIMEOUT = 60 * 1000;
 
+    private RMTHelper helper = RMTHelper.getDefaultInstance();
+
     @Override
     protected String getDescriptor() throws URISyntaxException {
         return new File(TestGCMInfrastructureReleaseWhenIdlePolicy.class.getResource(
@@ -77,12 +79,11 @@ public class TestGCMCustomizedInfrastructureReleaseWhenIdlePolicy extends
         byte[] hosts = "localhost1 localhost2 localhost3 localhost4 localhost5".getBytes();
         // creating node source
         // first parameter of im is empty rm url
-        RMTHelper.getResourceManager().createNodeSource(sourceName,
-                GCMCustomisedInfrastructure.class.getName(),
+        helper.getResourceManager().createNodeSource(sourceName, GCMCustomisedInfrastructure.class.getName(),
                 new Object[] { "", GCMDeploymentData, hosts, TIMEOUT },
                 ReleaseResourcesWhenSchedulerIdle.class.getName(), getPolicyParams());
 
-        RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, sourceName);
+        helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, sourceName);
 
     }
 
@@ -101,6 +102,6 @@ public class TestGCMCustomizedInfrastructureReleaseWhenIdlePolicy extends
                     .getAbsolutePath());
         }
 
-        RMTHelper.connectToExistingRM();
+        helper.connectToExistingRM();
     }
 }

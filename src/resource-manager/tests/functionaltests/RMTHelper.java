@@ -93,23 +93,26 @@ public class RMTHelper {
     /**
      * Number of nodes deployed with default deployment descriptor
      */
-    public static int defaultNodesNumber = 5;
+    public static final int defaultNodesNumber = 5;
     /**
      * Timeout for local infrastructure
      */
-    public static int defaultNodesTimeout = 20 * 1000; //20s
+    public static final int defaultNodesTimeout = 20 * 1000; //20s
 
-    private static URL functionalTestRMProperties = RMTHelper.class
+    public static final URL functionalTestRMProperties = RMTHelper.class
             .getResource("/functionaltests/config/functionalTRMProperties.ini");
 
-    protected static RMMonitorsHandler monitorsHandler;
+    protected RMMonitorsHandler monitorsHandler;
 
-    protected static RMMonitorEventReceiver eventReceiver;
+    protected RMMonitorEventReceiver eventReceiver;
 
-    protected static ResourceManager resourceManager;
+    protected ResourceManager resourceManager;
 
-    protected static RMMonitoring monitor;
-    protected static RMAuthentication auth;
+    protected RMMonitoring monitor;
+
+    protected RMAuthentication auth;
+
+    private Process rmProcess;
 
     final protected static ProActiveSetup setup = new ProActiveSetup();
 
@@ -122,6 +125,12 @@ public class RMTHelper {
      * Default password for RM's connection
      */
     public static String password = "demo";
+
+    private static RMTHelper defaultInstance = new RMTHelper();
+
+    public static RMTHelper getDefaultInstance() {
+        return defaultInstance;
+    }
 
     /**
      * Log a String for tests.
@@ -141,11 +150,11 @@ public class RMTHelper {
      * @throws IOException if the external JVM cannot be created
      * @throws NodeException if lookup of the new node fails.
      */
-    public static Node createNode(String nodeName) throws IOException, NodeException {
+    public Node createNode(String nodeName) throws IOException, NodeException {
         return createNode(nodeName, null);
     }
 
-    public static void createDefaultNodeSource() throws Exception {
+    public void createDefaultNodeSource() throws Exception {
         createDefaultNodeSource(RMTHelper.defaultNodesNumber);
     }
 
@@ -153,7 +162,7 @@ public class RMTHelper {
      * Creates a Default Infrastructure Manager with defaultNodesNumber nodes
      * @throws Exception
      */
-    public static void createDefaultNodeSource(int nodesNumber) throws Exception {
+    public void createDefaultNodeSource(int nodesNumber) throws Exception {
         RMFactory.setOsJavaProperty();
         ResourceManager rm = getResourceManager();
         for (int i = 0; i < nodesNumber; i++) {
@@ -167,7 +176,7 @@ public class RMTHelper {
      * Creates a Local Infrastructure Manager with defaultNodesNumber nodes
      * @throws Exception
      */
-    public static void createLocalNodeSource() throws Exception {
+    public void createLocalNodeSource() throws Exception {
         RMFactory.setOsJavaProperty();
         ResourceManager rm = getResourceManager();
         //first emtpy im parameter is default rm url
@@ -190,7 +199,7 @@ public class RMTHelper {
      * @throws IOException if the external JVM cannot be created
      * @throws NodeException if lookup of the new node fails.
      */
-    public static Node createNode(String nodeName, Map<String, String> vmParameters) throws IOException,
+    public Node createNode(String nodeName, Map<String, String> vmParameters) throws IOException,
             NodeException {
 
         JVMProcessImpl nodeProcess = new JVMProcessImpl(
@@ -239,7 +248,7 @@ public class RMTHelper {
      * Used by Scheduler's tests
      * @throws Exception
      */
-    public static void connectToExistingRM() throws Exception {
+    public void connectToExistingRM() throws Exception {
         connectToExistingRM(null);
     }
 
@@ -248,22 +257,23 @@ public class RMTHelper {
      * @param URL existing Resource Manager's URL
      * @throws Exception
      */
-    public static void connectToExistingRM(String URL) throws Exception {
+    public void connectToExistingRM(String URL) throws Exception {
         auth = RMConnection.waitAndJoin(URL);
         initEventReceiver(auth);
     }
 
-    private static Process rmProcess;
+    public void startRM(String configurationFile) throws Exception {
+        startRM(configurationFile, CentralPAPropertyRepository.PA_RMI_PORT.getValue());
+    }
 
     /**
-     * Start the RM using a forked JVM and
-     * deploys, with its associated Resource manager, 5 local ProActive nodes.
+     * Start the RM using a forked JVM
      *
      * @param configurationFile the RM's configuration file to use (default is functionalTSchedulerProperties.ini)
      * 			null to use the default one.
      * @throws Exception if an error occurs.
      */
-    public static void startRM(String configurationFile) throws Exception {
+    public String startRM(String configurationFile, int rmiPort, String... jvmArgs) throws Exception {
         if (configurationFile == null) {
             configurationFile = new File(functionalTestRMProperties.toURI()).getAbsolutePath();
         }
@@ -310,9 +320,12 @@ public class RMTHelper {
         commandLine.add("-cp");
         commandLine.add(classpath.toString());
         commandLine.add(CentralPAPropertyRepository.PA_TEST.getCmdLine() + "true");
+        commandLine.add(CentralPAPropertyRepository.PA_RMI_PORT.getCmdLine() + rmiPort);
+        for (String jvmArg : jvmArgs) {
+            commandLine.add(jvmArg);
+        }
         commandLine.add(RMTStarter.class.getName());
         commandLine.add(configurationFile);
-
         System.out.println("Starting RM process: " + commandLine);
 
         ProcessBuilder processBuilder = new ProcessBuilder(commandLine);
@@ -323,12 +336,14 @@ public class RMTHelper {
             "[RM VM output]: ");
         outputReader.start();
 
-        String url = "//" + ProActiveInet.getInstance().getHostname();
+        String url = "rmi://localhost:" + rmiPort + "/";
 
         System.out.println("Waiting for the RM using URL: " + url);
         auth = RMConnection.waitAndJoin(url);
 
         initEventReceiver(auth);
+
+        return url;
     }
 
     /**
@@ -337,7 +352,7 @@ public class RMTHelper {
      * @return RMauthentication interface
      * @throws Exception
      */
-    public static RMAuthentication getRMAuth() throws Exception {
+    public RMAuthentication getRMAuth() throws Exception {
         return getRMAuth(null);
     }
 
@@ -347,7 +362,7 @@ public class RMTHelper {
      * @return
      * @throws Exception
      */
-    public static RMAuthentication getRMAuth(String propertyFile) throws Exception {
+    public RMAuthentication getRMAuth(String propertyFile) throws Exception {
         if (auth == null) {
             startRM(propertyFile);
         }
@@ -359,7 +374,7 @@ public class RMTHelper {
      * @throws Exception
      * @throws ProActiveException
      */
-    public static void killRM() throws Exception {
+    public void killRM() throws Exception {
         if (rmProcess != null) {
             rmProcess.destroy();
             rmProcess.waitFor();
@@ -379,7 +394,7 @@ public class RMTHelper {
      * otherwise wait for reception of the corresponding event.
      * @param event awaited event.
      */
-    public static void waitForRMStateEvent(RMEventType event) {
+    public void waitForRMStateEvent(RMEventType event) {
         try {
             waitForRMStateEvent(event, 0);
         } catch (ProActiveTimeoutException e) {
@@ -396,8 +411,7 @@ public class RMTHelper {
      * @param timeout in milliseconds
      * @throws ProActiveTimeoutException if timeout is reached
      */
-    public static void waitForRMStateEvent(RMEventType eventType, long timeout)
-            throws ProActiveTimeoutException {
+    public void waitForRMStateEvent(RMEventType eventType, long timeout) throws ProActiveTimeoutException {
         getMonitorsHandler().waitForRMStateEvent(eventType, timeout);
     }
 
@@ -408,7 +422,7 @@ public class RMTHelper {
      * @param nodeSourceEvent awaited event.
      * @param nodeSourceName corresponding node source name for which an event is awaited.
      */
-    public static void waitForNodeSourceEvent(RMEventType nodeSourceEvent, String nodeSourceName) {
+    public void waitForNodeSourceEvent(RMEventType nodeSourceEvent, String nodeSourceName) {
         try {
             waitForNodeSourceEvent(nodeSourceEvent, nodeSourceName, 0);
         } catch (ProActiveTimeoutException e) {
@@ -426,7 +440,7 @@ public class RMTHelper {
      * @param timeout in milliseconds
      * @throws ProActiveTimeoutException if timeout is reached
      */
-    public static void waitForNodeSourceEvent(RMEventType eventType, String nodeSourceName, long timeout)
+    public void waitForNodeSourceEvent(RMEventType eventType, String nodeSourceName, long timeout)
             throws ProActiveTimeoutException {
         getMonitorsHandler().waitForNodesourceEvent(eventType, nodeSourceName, timeout);
     }
@@ -439,12 +453,12 @@ public class RMTHelper {
      * @param nodeUrl Url's of the node for which a new state is awaited.
      * @return RMNodeEvent object received by event receiver.
      */
-    public static RMNodeEvent waitForNodeEvent(RMEventType nodeEvent, String nodeUrl) {
+    public RMNodeEvent waitForNodeEvent(RMEventType nodeEvent, String nodeUrl) {
         try {
             return waitForNodeEvent(nodeEvent, nodeUrl, 0);
         } catch (ProActiveTimeoutException e) {
             //unreachable block, 0 means infinite, no timeout
-            //log sthing ?
+            //log string ?
             return null;
         }
     }
@@ -459,7 +473,7 @@ public class RMTHelper {
      * @return RMNodeEvent object received by event receiver.
      * @throws ProActiveTimeoutException if timeout is reached
      */
-    public static RMNodeEvent waitForNodeEvent(RMEventType eventType, String nodeUrl, long timeout)
+    public RMNodeEvent waitForNodeEvent(RMEventType eventType, String nodeUrl, long timeout)
             throws ProActiveTimeoutException {
         return getMonitorsHandler().waitForNodeEvent(eventType, nodeUrl, timeout);
     }
@@ -471,7 +485,7 @@ public class RMTHelper {
      * @param eventType awaited event.
      * @return RMNodeEvent object received by event receiver.
      */
-    public static RMNodeEvent waitForAnyNodeEvent(RMEventType eventType) {
+    public RMNodeEvent waitForAnyNodeEvent(RMEventType eventType) {
         try {
             return waitForAnyNodeEvent(eventType, 0);
         } catch (ProActiveTimeoutException e) {
@@ -486,7 +500,7 @@ public class RMTHelper {
      * @param url of the node
      * @throws NodeException if node cannot be looked up
      */
-    public static void killNode(String url) throws NodeException {
+    public void killNode(String url) throws NodeException {
         Node node = NodeFactory.getNode(url);
         try {
             node.getProActiveRuntime().killRT(false);
@@ -503,7 +517,7 @@ public class RMTHelper {
      * @return RMNodeEvent object received by event receiver.
      * @throws ProActiveTimeoutException if timeout is reached
      */
-    public static RMNodeEvent waitForAnyNodeEvent(RMEventType eventType, long timeout)
+    public RMNodeEvent waitForAnyNodeEvent(RMEventType eventType, long timeout)
             throws ProActiveTimeoutException {
         return getMonitorsHandler().waitForAnyNodeEvent(eventType, timeout);
     }
@@ -512,7 +526,7 @@ public class RMTHelper {
     //private methods
     //-------------------------------------------------------------//
 
-    private static void initEventReceiver(RMAuthentication auth) throws Exception {
+    private void initEventReceiver(RMAuthentication auth) throws Exception {
         RMMonitorsHandler mHandler = getMonitorsHandler();
         if (eventReceiver == null) {
             /** create event receiver then turnActive to avoid deepCopy of MonitorsHandler object
@@ -529,14 +543,14 @@ public class RMTHelper {
     /**
      * Connects to the resource manager
      */
-    public static ResourceManager connect(String name, String pass) throws Exception {
+    public ResourceManager connect(String name, String pass) throws Exception {
         return connect(name, pass, null);
     }
 
     /**
      * Idem than connect but allows to specify a propertyFile used to start the RM
      */
-    public static ResourceManager connect(String name, String pass, String propertyFile) throws Exception {
+    public ResourceManager connect(String name, String pass, String propertyFile) throws Exception {
         RMAuthentication authInt = getRMAuth(propertyFile);
         Credentials cred = Credentials.createCredentials(new CredData(CredData.parseLogin(name), CredData
                 .parseDomain(name), pass), authInt.getPublicKey());
@@ -547,7 +561,7 @@ public class RMTHelper {
     /**
      * Joins to the resource manager.
      */
-    public static ResourceManager join(String name, String pass) throws Exception {
+    public ResourceManager join(String name, String pass) throws Exception {
         RMAuthentication authInt = getRMAuth();
         Credentials cred = Credentials.createCredentials(new CredData(CredData.parseLogin(name), CredData
                 .parseDomain(name), pass), authInt.getPublicKey());
@@ -564,7 +578,7 @@ public class RMTHelper {
     /**
      * Gets the connected ResourceManager interface.
      */
-    public static ResourceManager getResourceManager() throws Exception {
+    public ResourceManager getResourceManager() throws Exception {
         if (resourceManager == null) {
             resourceManager = connect(username, password);
         }
@@ -576,14 +590,14 @@ public class RMTHelper {
      * @return the resource manager
      * @throws Exception
      */
-    public static ResourceManager getResourceManager(String propertyFile) throws Exception {
+    public ResourceManager getResourceManager(String propertyFile) throws Exception {
         if (resourceManager == null) {
             resourceManager = connect(username, password, propertyFile);
         }
         return resourceManager;
     }
 
-    private static RMMonitorsHandler getMonitorsHandler() {
+    private RMMonitorsHandler getMonitorsHandler() {
         if (monitorsHandler == null) {
             monitorsHandler = new RMMonitorsHandler();
         }

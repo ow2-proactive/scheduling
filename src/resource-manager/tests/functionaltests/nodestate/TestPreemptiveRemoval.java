@@ -82,19 +82,19 @@ public class TestPreemptiveRemoval extends FunctionalTest {
 
         RMTHelper.log("Deployment");
 
-        ResourceManager resourceManager = RMTHelper.getResourceManager();
+        RMTHelper helper = RMTHelper.getDefaultInstance();
+        ResourceManager resourceManager = helper.getResourceManager();
 
-        RMTHelper.createLocalNodeSource();
-        RMTHelper
-                .waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, NodeSource.LOCAL_INFRASTRUCTURE_NAME);
+        helper.createLocalNodeSource();
+        helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, NodeSource.LOCAL_INFRASTRUCTURE_NAME);
 
         for (int i = 0; i < RMTHelper.defaultNodesNumber; i++) {
             //for deploying nodes
-            RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
-            RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
+            helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
+            helper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
             //wait for nodes to be in free state
-            RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
-            RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+            helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
+            helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
         }
 
         //----------------------------------------------------------
@@ -110,7 +110,7 @@ public class TestPreemptiveRemoval extends FunctionalTest {
         assertTrue(resourceManager.getState().getFreeNodesNumber() == 0);
 
         for (int i = 0; i < RMTHelper.defaultNodesNumber; i++) {
-            RMNodeEvent evt = RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+            RMNodeEvent evt = helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
             Assert.assertEquals(evt.getNodeState(), NodeState.BUSY);
         }
 
@@ -122,8 +122,7 @@ public class TestPreemptiveRemoval extends FunctionalTest {
         //remove n, which is busy
         resourceManager.removeNode(n1.getNodeInformation().getURL(), true);
 
-        RMNodeEvent evt = RMTHelper.waitForNodeEvent(RMEventType.NODE_REMOVED, n1.getNodeInformation()
-                .getURL());
+        RMNodeEvent evt = helper.waitForNodeEvent(RMEventType.NODE_REMOVED, n1.getNodeInformation().getURL());
 
         assertTrue(resourceManager.getState().getTotalNodesNumber() == RMTHelper.defaultNodesNumber - 1);
 
@@ -136,8 +135,7 @@ public class TestPreemptiveRemoval extends FunctionalTest {
 
         boolean timeouted = false;
         try {
-            RMTHelper
-                    .waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, n1.getNodeInformation().getURL(), 4000);
+            helper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, n1.getNodeInformation().getURL(), 4000);
         } catch (ProActiveTimeoutException e) {
             // TODO Auto-generated catch block
             timeouted = true;
@@ -150,7 +148,7 @@ public class TestPreemptiveRemoval extends FunctionalTest {
         resourceManager.releaseNodes(nodes);
 
         for (int i = 0; i < RMTHelper.defaultNodesNumber - 1; i++) {
-            evt = RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+            evt = helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
             Assert.assertEquals(evt.getNodeState(), NodeState.FREE);
         }
 
@@ -163,7 +161,7 @@ public class TestPreemptiveRemoval extends FunctionalTest {
 
         resourceManager.removeNode(n2.getNodeInformation().getURL(), true);
 
-        evt = RMTHelper.waitForNodeEvent(RMEventType.NODE_REMOVED, n2.getNodeInformation().getURL());
+        evt = helper.waitForNodeEvent(RMEventType.NODE_REMOVED, n2.getNodeInformation().getURL());
 
         assertTrue(resourceManager.getState().getTotalNodesNumber() == RMTHelper.defaultNodesNumber - 2);
         assertTrue(resourceManager.getState().getFreeNodesNumber() == RMTHelper.defaultNodesNumber - 2);
@@ -178,7 +176,7 @@ public class TestPreemptiveRemoval extends FunctionalTest {
         assertTrue(nodes.size() == 2);
 
         for (int i = 0; i < 2; i++) {
-            evt = RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+            evt = helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
             Assert.assertEquals(evt.getNodeState(), NodeState.BUSY);
         }
 
@@ -190,7 +188,7 @@ public class TestPreemptiveRemoval extends FunctionalTest {
         //place node in toRelease state (by a non preemptive removal)
         resourceManager.removeNode(n3.getNodeInformation().getURL(), false);
 
-        evt = RMTHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, n3.getNodeInformation().getURL());
+        evt = helper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, n3.getNodeInformation().getURL());
         Assert.assertEquals(evt.getNodeState(), NodeState.TO_BE_REMOVED);
 
         assertTrue(resourceManager.getState().getTotalNodesNumber() == RMTHelper.defaultNodesNumber - 2);
@@ -198,14 +196,14 @@ public class TestPreemptiveRemoval extends FunctionalTest {
         //finally remove preemptively the node
         resourceManager.removeNode(n3.getNodeInformation().getURL(), true);
 
-        RMTHelper.waitForNodeEvent(RMEventType.NODE_REMOVED, n3.getNodeInformation().getURL());
+        helper.waitForNodeEvent(RMEventType.NODE_REMOVED, n3.getNodeInformation().getURL());
 
         assertTrue(resourceManager.getState().getTotalNodesNumber() == RMTHelper.defaultNodesNumber - 3);
 
         nodes.remove(n3);
         resourceManager.releaseNodes(nodes);
 
-        evt = RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        evt = helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
         Assert.assertEquals(evt.getNodeState(), NodeState.FREE);
 
         //----------------------------------------------------------
@@ -218,7 +216,7 @@ public class TestPreemptiveRemoval extends FunctionalTest {
             e.printStackTrace();
         }
 
-        evt = RMTHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, n4.getNodeInformation().getURL());
+        evt = helper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, n4.getNodeInformation().getURL());
         Assert.assertEquals(evt.getNodeState(), NodeState.DOWN);
 
         //check that node down event has been thrown
@@ -226,7 +224,7 @@ public class TestPreemptiveRemoval extends FunctionalTest {
 
         resourceManager.removeNode(n4.getNodeInformation().getURL(), true);
 
-        RMTHelper.waitForNodeEvent(RMEventType.NODE_REMOVED, n4.getNodeInformation().getURL());
+        helper.waitForNodeEvent(RMEventType.NODE_REMOVED, n4.getNodeInformation().getURL());
 
         assertTrue(resourceManager.getState().getTotalNodesNumber() == RMTHelper.defaultNodesNumber - 4);
         assertTrue(resourceManager.getState().getFreeNodesNumber() == RMTHelper.defaultNodesNumber - 4);
@@ -241,7 +239,7 @@ public class TestPreemptiveRemoval extends FunctionalTest {
 
         timeouted = false;
         try {
-            RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED, 4000);
+            helper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED, 4000);
         } catch (ProActiveTimeoutException e) {
             // TODO Auto-generated catch block
             timeouted = true;

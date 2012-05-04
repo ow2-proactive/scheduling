@@ -61,7 +61,7 @@ public class ConnectionTest extends FunctionalTest {
     @org.junit.Test
     public void action() throws Exception {
 
-        RMAuthentication auth = RMTHelper.getRMAuth();
+        RMAuthentication auth = RMTHelper.getDefaultInstance().getRMAuth();
 
         RMTHelper.log("Test 1");
         RMTHelper.log("Connecting to existing resource manager");

@@ -65,47 +65,51 @@ public class TestLocalInfrastructureStaticPolicy extends FunctionalTest {
 
     protected int defaultDescriptorNodesNb = 3;
 
+    private RMTHelper helper = RMTHelper.getDefaultInstance();
+
     protected void createEmptyNodeSource(String sourceName) throws Exception {
         //first parameter of im is empty default rm url
         byte[] creds = FileToBytesConverter.convertFileToByteArray(new File(PAResourceManagerProperties
                 .getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString())));
-        RMTHelper.getResourceManager().createNodeSource(sourceName, LocalInfrastructure.class.getName(),
+        helper.getResourceManager().createNodeSource(sourceName, LocalInfrastructure.class.getName(),
                 new Object[] { "", creds, 0, RMTHelper.defaultNodesTimeout, "" },
                 StaticPolicy.class.getName(), null);
 
-        RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, sourceName);
+        helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, sourceName);
     }
 
     protected void createNodeSourceWithNodes(String sourceName) throws Exception {
+        RMTHelper helper = RMTHelper.getDefaultInstance();
+
         // creating node source
         // first parameter of im is empty default rm url
         byte[] creds = FileToBytesConverter.convertFileToByteArray(new File(PAResourceManagerProperties
                 .getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString())));
-        RMTHelper.getResourceManager().createNodeSource(sourceName, LocalInfrastructure.class.getName(),
+        helper.getResourceManager().createNodeSource(sourceName, LocalInfrastructure.class.getName(),
                 new Object[] { "", creds, defaultDescriptorNodesNb, RMTHelper.defaultNodesTimeout, "" },
                 StaticPolicy.class.getName(), null);
 
-        RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, sourceName);
+        helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, sourceName);
         for (int i = 0; i < defaultDescriptorNodesNb; i++) {
-            RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
+            helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
         }
         // once added, wait for nodes to be configured
         for (int i = 0; i < defaultDescriptorNodesNb; i++) {
-            RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+            helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
         }
     }
 
     protected void removeNodeSource(String sourceName) throws Exception {
         // removing node source
-        RMTHelper.getResourceManager().removeNodeSource(sourceName, true);
+        helper.getResourceManager().removeNodeSource(sourceName, true);
 
         //wait the n events of the n nodes removals of the node source
         for (int i = 0; i < defaultDescriptorNodesNb; i++) {
-            RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
+            helper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
         }
 
         //wait for the event of the node source removal
-        RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, sourceName);
+        helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, sourceName);
     }
 
     protected void init() throws Exception {
@@ -122,7 +126,9 @@ public class TestLocalInfrastructureStaticPolicy extends FunctionalTest {
         String source1 = "Node_source_1";
         String source2 = "Node_source_2";
 
-        ResourceManager resourceManager = RMTHelper.getResourceManager();
+        RMTHelper helper = RMTHelper.getDefaultInstance();
+
+        ResourceManager resourceManager = helper.getResourceManager();
 
         RMTHelper.log("Test 1 - creation/removal of empty node source");
 
@@ -131,7 +137,7 @@ public class TestLocalInfrastructureStaticPolicy extends FunctionalTest {
         RMTHelper.log("removal");
         resourceManager.removeNodeSource(source1, true);
 
-        RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, source1);
+        helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, source1);
 
         RMTHelper.log("Test 2 - creation/removal of the node source with nodes");
         createNodeSourceWithNodes(source1);
@@ -144,15 +150,15 @@ public class TestLocalInfrastructureStaticPolicy extends FunctionalTest {
 
         for (Node n : ns) {
             // eat the freeToBusy event
-            RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+            helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
             resourceManager.removeNode(n.getNodeInformation().getURL(), true);
-            RMTHelper.waitForNodeEvent(RMEventType.NODE_REMOVED, n.getNodeInformation().getURL());
+            helper.waitForNodeEvent(RMEventType.NODE_REMOVED, n.getNodeInformation().getURL());
         }
 
         assertTrue(resourceManager.getState().getTotalNodesNumber() == 0);
         assertTrue(resourceManager.getState().getFreeNodesNumber() == 0);
         resourceManager.removeNodeSource(source1, true);
-        RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, source1);
+        helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, source1);
 
         RMTHelper.log("Test 3 - several node sources");
         createNodeSourceWithNodes(source1);
@@ -164,19 +170,19 @@ public class TestLocalInfrastructureStaticPolicy extends FunctionalTest {
         resourceManager.removeNodeSource(source1, true);
         //wait the n events of the n nodes removals of the node source
         for (int i = 0; i < defaultDescriptorNodesNb; i++) {
-            RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
+            helper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
         }
 
         //wait for the event of the node source removal
-        RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, source1);
+        helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, source1);
 
         resourceManager.removeNodeSource(source2, true);
         for (int i = 0; i < defaultDescriptorNodesNb; i++) {
-            RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
+            helper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
         }
 
         //wait for the event of the node source removal
-        RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, source2);
+        helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, source2);
 
     }
 }

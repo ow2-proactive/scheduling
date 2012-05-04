@@ -93,6 +93,7 @@ public class SelectionTest extends FunctionalTest {
     */
     @org.junit.Test
     public void action() throws Exception {
+        RMTHelper helper = RMTHelper.getDefaultInstance();
 
         String currentHost = System.getenv("HOSTNAME");
         String rmUrl = URIBuilder.buildURI(currentHost, "", "rmi").toString();
@@ -109,7 +110,7 @@ public class SelectionTest extends FunctionalTest {
             String javaExec = System.getenv("JAVA_HOME") + "/bin/java";
 
             // properties are defined, trying to deploy nodes to these hosts
-            BooleanWrapper result = RMTHelper.getResourceManager().createNodeSource("remote",
+            BooleanWrapper result = helper.getResourceManager().createNodeSource("remote",
                     SSHInfrastructure.class.getName(), new Object[] { rmUrl, // rm url
                             "", // ssh options
                             javaExec, // java executable path
@@ -123,13 +124,13 @@ public class SelectionTest extends FunctionalTest {
                     null);
 
             if (result.getBooleanValue()) {
-                RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
-                RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
-                RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
+                helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
+                helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
+                helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
                 //wait for the nodes to be in free state
-                RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-                RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-                RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+                helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+                helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+                helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
             }
 
             // we are good - all remote nodes registered
@@ -140,8 +141,8 @@ public class SelectionTest extends FunctionalTest {
         }
 
         // adding default nodes
-        RMTHelper.createDefaultNodeSource();
-        RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, NodeSource.DEFAULT);
+        helper.createDefaultNodeSource();
+        helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, NodeSource.DEFAULT);
 
         // creating the selection script object
         SelectionScript script = new SelectionScript(new File(vmPropSelectionScriptpath), new String[] {
@@ -149,12 +150,12 @@ public class SelectionTest extends FunctionalTest {
         List<SelectionScript> scriptList = new LinkedList<SelectionScript>();
         scriptList.add(script);
 
-        ResourceManager resourceManager = RMTHelper.getResourceManager();
+        ResourceManager resourceManager = helper.getResourceManager();
 
         for (int i = 0; i < RMTHelper.defaultNodesNumber; i++) {
-            RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
+            helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
             //wait for the nodes to be in free state
-            RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+            helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
         }
 
         String node1 = "node1";
@@ -163,13 +164,13 @@ public class SelectionTest extends FunctionalTest {
         HashMap<String, String> vmProperties = new HashMap<String, String>();
         vmProperties.put(this.vmPropKey1, this.vmPropValue1);
 
-        String node1URL = RMTHelper.createNode(node1, vmProperties).getNodeInformation().getURL();
+        String node1URL = helper.createNode(node1, vmProperties).getNodeInformation().getURL();
         resourceManager.addNode(node1URL, NodeSource.DEFAULT);
 
         //wait node adding event
-        RMTHelper.waitForNodeEvent(RMEventType.NODE_ADDED, node1URL);
+        helper.waitForNodeEvent(RMEventType.NODE_ADDED, node1URL);
         //wait for the nodes to be in free state
-        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
 
         // so now we have 9 node in total
         // 6 local nodes (5 default, 1 marked with property)

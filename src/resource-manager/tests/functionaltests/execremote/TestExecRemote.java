@@ -86,24 +86,25 @@ public final class TestExecRemote extends FunctionalTest {
         final String valueToEcho = "111";
 
         //        RMTHelper.defaultNodesNumber = 1;
-        RMTHelper.createLocalNodeSource();
-        RMTHelper
-                .waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, NodeSource.LOCAL_INFRASTRUCTURE_NAME);
+        RMTHelper.getDefaultInstance().createLocalNodeSource();
+        RMTHelper.getDefaultInstance().waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED,
+                NodeSource.LOCAL_INFRASTRUCTURE_NAME);
 
         // Wait until all nodes are added and free
         HashSet<String> nodesUrls = new HashSet<String>();
         String hostname = null;
         for (int i = 0; i < RMTHelper.defaultNodesNumber; i++) {
-            RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
-            RMNodeEvent nodeEvent = RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+            RMTHelper.getDefaultInstance().waitForAnyNodeEvent(RMEventType.NODE_ADDED);
+            RMNodeEvent nodeEvent = RMTHelper.getDefaultInstance().waitForAnyNodeEvent(
+                    RMEventType.NODE_STATE_CHANGED);
             nodesUrls.add(nodeEvent.getNodeUrl());
             hostname = nodeEvent.getHostName();
         }
         {
             RMTHelper.log("Test 1 - Execute SimpleScript");
             SimpleScript script = new SimpleScript(TestExecRemote.erroneousSimpleScriptContent, "javascript");
-            List<ScriptResult<Object>> results = RMTHelper.getResourceManager().executeScript(script,
-                    TargetType.NODE_URL.toString(), nodesUrls);
+            List<ScriptResult<Object>> results = RMTHelper.getDefaultInstance().getResourceManager()
+                    .executeScript(script, TargetType.NODE_URL.toString(), nodesUrls);
             Assert.assertNotNull("The list of results must not be null", results);
             Assert.assertFalse("The results must not be empty", results.size() == 0);
             for (ScriptResult<Object> res : results) {
@@ -115,8 +116,8 @@ public final class TestExecRemote extends FunctionalTest {
         {
             RMTHelper.log("Test 2 - Execute SelectionScript");
             SelectionScript script = new SelectionScript(TestExecRemote.selectionScriptContent, "javascript");
-            List<ScriptResult<Boolean>> results = RMTHelper.getResourceManager().executeScript(script,
-                    TargetType.NODE_URL.toString(), nodesUrls);
+            List<ScriptResult<Boolean>> results = RMTHelper.getDefaultInstance().getResourceManager()
+                    .executeScript(script, TargetType.NODE_URL.toString(), nodesUrls);
             Assert.assertNotNull("The list of results must not be null", results);
             Assert.assertFalse("The results must not be empty", results.size() == 0);
             for (ScriptResult<Boolean> res : results) {
@@ -133,8 +134,8 @@ public final class TestExecRemote extends FunctionalTest {
             String[] cmd = (isLinux) ? new String[] { "/bin/bash", "-c", "echo " + valueToEcho }
                     : new String[] { "cmd.exe", "/c", "@(echo " + valueToEcho + ")" };
             SimpleScript script = new SimpleScript(sFile, cmd);
-            List<ScriptResult<Object>> results = RMTHelper.getResourceManager().executeScript(script,
-                    TargetType.NODE_URL.toString(), nodesUrls);
+            List<ScriptResult<Object>> results = RMTHelper.getDefaultInstance().getResourceManager()
+                    .executeScript(script, TargetType.NODE_URL.toString(), nodesUrls);
             Assert.assertNotNull("The list of results must not be null", results);
             Assert.assertFalse("The results must not be empty", results.size() == 0);
             for (ScriptResult<Object> res : results) {
@@ -167,8 +168,8 @@ public final class TestExecRemote extends FunctionalTest {
                         dsurl, "cmd.exe", "/c", "more", testFilename };
                 // Execute the script
                 SimpleScript script = new SimpleScript(sFile, cmd);
-                List<ScriptResult<Object>> results = RMTHelper.getResourceManager().executeScript(script,
-                        TargetType.NODE_URL.toString(), nodesUrls);
+                List<ScriptResult<Object>> results = RMTHelper.getDefaultInstance().getResourceManager()
+                        .executeScript(script, TargetType.NODE_URL.toString(), nodesUrls);
                 Assert.assertFalse("The results must not be empty", results.size() == 0);
                 for (ScriptResult<Object> res : results) {
                     Throwable exception = res.getException();
@@ -193,8 +194,8 @@ public final class TestExecRemote extends FunctionalTest {
             SimpleScript script = new SimpleScript(TestExecRemote.simpleScriptContent, "javascript");
             HashSet<String> targets = new HashSet<String>(1);
             targets.add(NodeSource.LOCAL_INFRASTRUCTURE_NAME);
-            List<ScriptResult<Object>> results = RMTHelper.getResourceManager().executeScript(script,
-                    TargetType.NODESOURCE_NAME.toString(), targets);
+            List<ScriptResult<Object>> results = RMTHelper.getDefaultInstance().getResourceManager()
+                    .executeScript(script, TargetType.NODESOURCE_NAME.toString(), targets);
             Assert.assertEquals("The size of result list must equal to size of nodesource", results.size(),
                     RMTHelper.defaultNodesNumber);
             for (ScriptResult<Object> res : results) {
@@ -211,8 +212,8 @@ public final class TestExecRemote extends FunctionalTest {
             SimpleScript script = new SimpleScript(TestExecRemote.simpleScriptContent, "javascript");
             HashSet<String> targets = new HashSet<String>(1);
             targets.add(hostname);
-            List<ScriptResult<Object>> results = RMTHelper.getResourceManager().executeScript(script,
-                    TargetType.HOSTNAME.toString(), targets);
+            List<ScriptResult<Object>> results = RMTHelper.getDefaultInstance().getResourceManager()
+                    .executeScript(script, TargetType.HOSTNAME.toString(), targets);
             Assert.assertNotNull("The list of results must not be null", results);
             Assert
                     .assertEquals(

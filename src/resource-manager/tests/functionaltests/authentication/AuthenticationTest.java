@@ -69,8 +69,7 @@ public class AuthenticationTest extends FunctionalTest {
      */
     @org.junit.Test
     public void action() throws Exception {
-
-        RMAuthentication auth = RMTHelper.getRMAuth();
+        RMAuthentication auth = RMTHelper.getDefaultInstance().getRMAuth();
 
         RMTHelper.log("Test 1");
         RMTHelper.log("Trying to authorized with correct admin name and password");

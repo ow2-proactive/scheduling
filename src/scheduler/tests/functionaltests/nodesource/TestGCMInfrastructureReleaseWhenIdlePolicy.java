@@ -74,6 +74,8 @@ public class TestGCMInfrastructureReleaseWhenIdlePolicy extends FunctionalTest {
     protected static URL jobDescriptor = TestGCMInfrastructureReleaseWhenIdlePolicy.class
             .getResource("/functionaltests/descriptors/Job_PI.xml");
 
+    private RMTHelper helper = RMTHelper.getDefaultInstance();
+
     protected Object[] getPolicyParams() throws Exception {
         SchedulerAuthenticationInterface auth = SchedulerConnection
                 .join(SchedulerTHelper.schedulerDefaultURL);
@@ -91,26 +93,26 @@ public class TestGCMInfrastructureReleaseWhenIdlePolicy extends FunctionalTest {
         // creating node source
         byte[] creds = FileToBytesConverter.convertFileToByteArray(new File(PAResourceManagerProperties
                 .getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString())));
-        RMTHelper.getResourceManager().createNodeSource(sourceName, LocalInfrastructure.class.getName(),
+        helper.getResourceManager().createNodeSource(sourceName, LocalInfrastructure.class.getName(),
                 new Object[] { "", creds, defaultDescriptorNodesNb, RMTHelper.defaultNodesTimeout, "" },
                 ReleaseResourcesWhenSchedulerIdle.class.getName(), getPolicyParams());
 
-        RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, sourceName);
+        helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, sourceName);
     }
 
     protected void removeNodeSource(String sourceName) throws Exception {
         // removing node source
-        RMTHelper.getResourceManager().removeNodeSource(sourceName, true);
+        helper.getResourceManager().removeNodeSource(sourceName, true);
 
         //wait for the event of the node source removal
-        RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, sourceName);
+        helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, sourceName);
     }
 
     protected void init() throws Exception {
         RMFactory.setOsJavaProperty();
         GCMDeploymentData = FileToBytesConverter.convertFileToByteArray((new File(getDescriptor())));
         SchedulerTHelper.startSchedulerWithEmptyResourceManager();
-        RMTHelper.connectToExistingRM();
+        helper.connectToExistingRM();
     }
 
     /** Actions to be Perform by this test.
@@ -125,7 +127,7 @@ public class TestGCMInfrastructureReleaseWhenIdlePolicy extends FunctionalTest {
         String source1 = "Node_source_1";
         SchedulerTHelper.log("Test 1");
 
-        ResourceManager resourceManager = RMTHelper.getResourceManager();
+        ResourceManager resourceManager = helper.getResourceManager();
 
         createDefaultNodeSource(source1);
         assertTrue(resourceManager.getState().getTotalNodesNumber() == 0);
@@ -140,12 +142,12 @@ public class TestGCMInfrastructureReleaseWhenIdlePolicy extends FunctionalTest {
 
         // waiting for acquiring nodes
         for (int i = 0; i < defaultDescriptorNodesNb; i++) {
-            RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
+            helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
         }
 
         // nodes should be removed in 30 secs after job completion
         for (int i = 0; i < defaultDescriptorNodesNb; i++) {
-            RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
+            helper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
         }
 
         SchedulerTHelper.waitForFinishedJob(jobId);

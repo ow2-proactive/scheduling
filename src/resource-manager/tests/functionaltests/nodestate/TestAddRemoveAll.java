@@ -59,12 +59,14 @@ public class TestAddRemoveAll extends FunctionalTest {
 
     @org.junit.Test
     public void action() throws Exception {
-        ResourceManager resourceManager = RMTHelper.getResourceManager();
+        RMTHelper helper = RMTHelper.getDefaultInstance();
+
+        ResourceManager resourceManager = helper.getResourceManager();
         RMTHelper.log("Add/RemoveAll");
         resourceManager.createNodeSource(NodeSource.DEFAULT, DefaultInfrastructureManager.class.getName(),
                 null, StaticPolicy.class.getName(), null);
-        RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, NodeSource.DEFAULT);
-        Node nodeToAdd = RMTHelper.createNode(nodeName);
+        helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, NodeSource.DEFAULT);
+        Node nodeToAdd = helper.createNode(nodeName);
         resourceManager.addNode(nodeToAdd.getNodeInformation().getURL(), NodeSource.DEFAULT)
                 .getBooleanValue();
         //at this time, nodes maybe fully added in the nodesource but not in the core

@@ -64,10 +64,12 @@ public class TestGCMCustomizedInfrastructureStaticPolicy extends TestLocalInfras
     /** timeout for node acquisition */
     private static final int TIMEOUT = 60 * 1000;
 
+    private RMTHelper helper = RMTHelper.getDefaultInstance();
+
     @Override
     protected void init() throws Exception {
         // overriding gcma file
-        RMTHelper.getResourceManager(new File(RMTHelper.class.getResource(
+        helper.getResourceManager(new File(RMTHelper.class.getResource(
                 "/functionaltests/config/functionalTRMPropertiesForCustomisedIM.ini").toURI())
                 .getAbsolutePath());
         // using localhost deployment for customized infrastructure
@@ -89,12 +91,11 @@ public class TestGCMCustomizedInfrastructureStaticPolicy extends TestLocalInfras
     @Override
     protected void createEmptyNodeSource(String sourceName) throws Exception {
         // first empty parameter of im is default rm url
-        RMTHelper.getResourceManager().createNodeSource(sourceName,
-                GCMCustomisedInfrastructure.class.getName(),
+        helper.getResourceManager().createNodeSource(sourceName, GCMCustomisedInfrastructure.class.getName(),
                 new Object[] { "", emptyGCMD, emptyhostsListData, TIMEOUT }, StaticPolicy.class.getName(),
                 null);
 
-        RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, sourceName);
+        helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, sourceName);
     }
 
     @Override
@@ -102,21 +103,20 @@ public class TestGCMCustomizedInfrastructureStaticPolicy extends TestLocalInfras
 
         // creating node source
         // first empty parameter of im is default rm url
-        RMTHelper.getResourceManager().createNodeSource(sourceName,
-                GCMCustomisedInfrastructure.class.getName(),
+        helper.getResourceManager().createNodeSource(sourceName, GCMCustomisedInfrastructure.class.getName(),
                 new Object[] { "", GCMDeploymentData, hostsListData, TIMEOUT }, StaticPolicy.class.getName(),
                 null);
 
-        RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, sourceName);
+        helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, sourceName);
         for (int i = 0; i < defaultDescriptorNodesNb; i++) {
             //rmdeploying node added
-            RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
+            helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
             //rmdeploying node removed
-            RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
+            helper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
             //node added
-            RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
+            helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
             //configuring to free
-            RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+            helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
         }
     }
 }

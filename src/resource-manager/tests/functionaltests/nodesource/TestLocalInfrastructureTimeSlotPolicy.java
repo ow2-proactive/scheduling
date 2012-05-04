@@ -60,6 +60,8 @@ public class TestLocalInfrastructureTimeSlotPolicy extends FunctionalTest {
 
     protected int descriptorNodeNumber = 1;
 
+    private RMTHelper helper = RMTHelper.getDefaultInstance();
+
     protected Object[] getPolicyParams() {
         return new Object[] { "ME", "ALL", TimeSlotPolicy.dateFormat.format(System.currentTimeMillis()),
                 TimeSlotPolicy.dateFormat.format(System.currentTimeMillis() + 15000), "0", "true" };
@@ -69,36 +71,36 @@ public class TestLocalInfrastructureTimeSlotPolicy extends FunctionalTest {
         byte[] creds = FileToBytesConverter.convertFileToByteArray(new File(PAResourceManagerProperties
                 .getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString())));
         //first null parameter is the rm url
-        RMTHelper.getResourceManager().createNodeSource(sourceName, LocalInfrastructure.class.getName(),
+        helper.getResourceManager().createNodeSource(sourceName, LocalInfrastructure.class.getName(),
                 new Object[] { "", creds, 0, RMTHelper.defaultNodesTimeout, "" },
                 TimeSlotPolicy.class.getName(), getPolicyParams());
 
-        RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, sourceName);
+        helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, sourceName);
     }
 
     protected void createDefaultNodeSource(String sourceName) throws Exception {
         // creating node source
         byte[] creds = FileToBytesConverter.convertFileToByteArray(new File(PAResourceManagerProperties
                 .getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString())));
-        RMTHelper.getResourceManager().createNodeSource(sourceName, LocalInfrastructure.class.getName(),
+        helper.getResourceManager().createNodeSource(sourceName, LocalInfrastructure.class.getName(),
                 new Object[] { "", creds, descriptorNodeNumber, RMTHelper.defaultNodesTimeout, "" },
                 //first parameter is empty rm url
                 TimeSlotPolicy.class.getName(), getPolicyParams());
-        RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, sourceName);
+        helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, sourceName);
 
         for (int i = 0; i < descriptorNodeNumber; i++) {
-            RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
+            helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
             //we eat the configuring to free event
-            RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+            helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
         }
     }
 
     protected void removeNodeSource(String sourceName) throws Exception {
         // removing node source
-        RMTHelper.getResourceManager().removeNodeSource(sourceName, true);
+        helper.getResourceManager().removeNodeSource(sourceName, true);
 
         //wait for the event of the node source removal
-        RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, sourceName);
+        helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, sourceName);
     }
 
     protected void init() throws Exception {
@@ -124,7 +126,7 @@ public class TestLocalInfrastructureTimeSlotPolicy extends FunctionalTest {
         RMTHelper.log("Test 2 - nodes will be removed in 15 secs");
         // wait for the nodes release
         for (int i = 0; i < descriptorNodeNumber; i++) {
-            RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
+            helper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
         }
         removeNodeSource(source1);
     }

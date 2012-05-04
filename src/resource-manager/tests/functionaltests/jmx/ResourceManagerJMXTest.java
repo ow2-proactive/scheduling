@@ -88,7 +88,7 @@ public final class ResourceManagerJMXTest extends FunctionalTest {
         final String adminLogin = RMTHelper.username;
         final String adminPassword = RMTHelper.password;
 
-        final RMAuthentication auth = (RMAuthentication) RMTHelper.getRMAuth();
+        final RMAuthentication auth = (RMAuthentication) RMTHelper.getDefaultInstance().getRMAuth();
         final PublicKey pubKey = auth.getPublicKey();
         // final Credentials userCreds =
         // Credentials.createCredentials(userLogin, userPassword, pubKey);
@@ -202,13 +202,13 @@ public final class ResourceManagerJMXTest extends FunctionalTest {
 
             RMTHelper.log("Test as user 4 - Check RuntimeDataMBean attributes are correct");
             // Start a new node and add it to the rm
-            final Node node = RMTHelper.createNode("test");
+            final Node node = RMTHelper.getDefaultInstance().createNode("test");
             final String nodeURL = node.getNodeInformation().getURL();
-            RMTHelper.getResourceManager().addNode(nodeURL).getBooleanValue(); // force sync, now the node is in configuring state
+            RMTHelper.getDefaultInstance().getResourceManager().addNode(nodeURL).getBooleanValue(); // force sync, now the node is in configuring state
 
-            RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
+            RMTHelper.getDefaultInstance().waitForAnyNodeEvent(RMEventType.NODE_ADDED);
             // We eat configuring to free events
-            RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+            RMTHelper.getDefaultInstance().waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
             // Get all attributes to test
             AttributeList list = conn.getAttributes(runtimeDataMBeanName, new String[] { "Status",
                     "AvailableNodesCount", "FreeNodesCount" });
@@ -225,9 +225,9 @@ public final class ResourceManagerJMXTest extends FunctionalTest {
             Assert.assertEquals("Incorrect value of " + attribute.getName() + " attribute", 1, attribute
                     .getValue());
 
-            RMTHelper.getResourceManager().removeNode(nodeURL, false);
+            RMTHelper.getDefaultInstance().getResourceManager().removeNode(nodeURL, false);
 
-            RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
+            RMTHelper.getDefaultInstance().waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
 
             // Get all attributes to test
             list = conn.getAttributes(runtimeDataMBeanName, new String[] { "AvailableNodesCount",

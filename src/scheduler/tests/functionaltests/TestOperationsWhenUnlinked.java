@@ -37,9 +37,11 @@ public class TestOperationsWhenUnlinked extends FunctionalTest {
 
     }
 
+    private RMTHelper helper = RMTHelper.getDefaultInstance();
+
     @Test
     public void test() throws Exception {
-        RMTHelper.getResourceManager();
+        helper.getResourceManager();
 
         String rmUrl = "rmi://localhost:" + CentralPAPropertyRepository.PA_RMI_PORT.getValue() + "/";
 
@@ -63,14 +65,14 @@ public class TestOperationsWhenUnlinked extends FunctionalTest {
         SchedulerTHelper.waitForEventTaskFinished(jobId1, TASK_NAME);
 
         System.out.println("Killing RM");
-        RMTHelper.killRM();
+        helper.killRM();
 
         System.out.println("Waiting RM_DOWN event");
         SchedulerTHelper.waitForEventSchedulerState(SchedulerEvent.RM_DOWN, 30000);
 
         System.out.println("Creating new RM");
-        RMTHelper.getResourceManager();
-        RMTHelper.createDefaultNodeSource(2);
+        helper.getResourceManager();
+        helper.createDefaultNodeSource(2);
 
         System.out.println("Linking new RM");
         scheduler.linkResourceManager(rmUrl);
@@ -98,7 +100,7 @@ public class TestOperationsWhenUnlinked extends FunctionalTest {
         JobId jobId1 = scheduler.submit(createJob());
 
         System.out.println("Killing RM");
-        RMTHelper.killRM();
+        helper.killRM();
 
         System.out.println("Waiting RM_DOWN event");
         SchedulerTHelper.waitForEventSchedulerState(SchedulerEvent.RM_DOWN, 30000);
@@ -114,8 +116,8 @@ public class TestOperationsWhenUnlinked extends FunctionalTest {
         }
 
         System.out.println("Creating new RM");
-        RMTHelper.getResourceManager();
-        RMTHelper.createDefaultNodeSource(2);
+        helper.getResourceManager();
+        helper.createDefaultNodeSource(2);
 
         System.out.println("Linking new RM");
         scheduler.linkResourceManager(rmUrl);

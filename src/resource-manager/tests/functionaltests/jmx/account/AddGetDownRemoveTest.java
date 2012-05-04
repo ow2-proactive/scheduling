@@ -85,14 +85,16 @@ public final class AddGetDownRemoveTest extends FunctionalTest {
      */
     @org.junit.Test
     public void action() throws Exception {
-        final ResourceManager r = RMTHelper.getResourceManager();
+        RMTHelper helper = RMTHelper.getDefaultInstance();
+
+        final ResourceManager r = helper.getResourceManager();
 
         // The username and thr password must be the same a used to connect to the RM
         final String adminLogin = RMTHelper.username;
         final String adminPassword = RMTHelper.password;
 
         // All accounting values are checked through JMX
-        final RMAuthentication auth = (RMAuthentication) RMTHelper.getRMAuth();
+        final RMAuthentication auth = (RMAuthentication) RMTHelper.getDefaultInstance().getRMAuth();
         final PublicKey pubKey = auth.getPublicKey();
         final Credentials adminCreds = Credentials.createCredentials(new CredData(adminLogin, adminPassword),
                 pubKey);
@@ -111,12 +113,12 @@ public final class AddGetDownRemoveTest extends FunctionalTest {
         // ADD, GET, DOWN, REMOVE
         // 1) ADD
         final String name = "test";
-        Node node = RMTHelper.createNode(name);
+        Node node = RMTHelper.getDefaultInstance().createNode(name);
         final String nodeURL = node.getNodeInformation().getURL();
         r.addNode(nodeURL).getBooleanValue();
 
         // wait for node from configuring to free
-        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        RMTHelper.getDefaultInstance().waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
 
         // 2) GET
         final long beforeGetTime = System.currentTimeMillis();

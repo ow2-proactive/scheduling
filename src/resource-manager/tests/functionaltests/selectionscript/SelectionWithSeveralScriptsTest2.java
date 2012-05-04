@@ -90,17 +90,18 @@ public class SelectionWithSeveralScriptsTest2 extends FunctionalTest {
     */
     @org.junit.Test
     public void action() throws Exception {
+        RMTHelper helper = RMTHelper.getDefaultInstance();
 
-        ResourceManager resourceManager = RMTHelper.getResourceManager();
+        ResourceManager resourceManager = helper.getResourceManager();
 
         RMTHelper.log("Deployment");
-        RMTHelper.createDefaultNodeSource();
-        RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, NodeSource.DEFAULT);
+        helper.createDefaultNodeSource();
+        helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, NodeSource.DEFAULT);
 
         for (int i = 0; i < RMTHelper.defaultNodesNumber; i++) {
-            RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
+            helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
             //wait for the nodes to be in free state
-            RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+            helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
         }
 
         String node1Name = "node1";
@@ -113,13 +114,13 @@ public class SelectionWithSeveralScriptsTest2 extends FunctionalTest {
         HashMap<String, String> vmProp1 = new HashMap<String, String>();
         vmProp1.put(this.vmPropKey1, this.vmPropValue1);
 
-        String node1URL = RMTHelper.createNode(node1Name, vmProp1).getNodeInformation().getURL();
+        String node1URL = helper.createNode(node1Name, vmProp1).getNodeInformation().getURL();
         resourceManager.addNode(node1URL);
 
         //wait node adding event
-        RMTHelper.waitForNodeEvent(RMEventType.NODE_ADDED, node1URL);
+        helper.waitForNodeEvent(RMEventType.NODE_ADDED, node1URL);
         //wait for the node to be in free state
-        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
 
         //--------------------------------------------------
         //create a second node with two VM properties
@@ -129,13 +130,13 @@ public class SelectionWithSeveralScriptsTest2 extends FunctionalTest {
         vmTwoProperties.put(this.vmPropKey1, this.vmPropValue1);
         vmTwoProperties.put(this.vmPropKey2, this.vmPropValue2);
 
-        String node2URL = RMTHelper.createNode(node2Name, vmTwoProperties).getNodeInformation().getURL();
+        String node2URL = helper.createNode(node2Name, vmTwoProperties).getNodeInformation().getURL();
         resourceManager.addNode(node2URL);
 
         //wait node adding event
-        RMTHelper.waitForNodeEvent(RMEventType.NODE_ADDED, node2URL);
+        helper.waitForNodeEvent(RMEventType.NODE_ADDED, node2URL);
         //wait for the node to be in free state
-        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
 
         //create the static selection script object that check vm prop1
         SelectionScript sScript1 = new SelectionScript(new File(vmPropSelectionScriptpath.toURI()),
@@ -161,13 +162,13 @@ public class SelectionWithSeveralScriptsTest2 extends FunctionalTest {
         assertTrue(nodes.get(0).getNodeInformation().getURL().equals(node2URL));
 
         //wait for node busy event
-        RMNodeEvent evt = RMTHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node2URL);
+        RMNodeEvent evt = helper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node2URL);
         Assert.assertEquals(evt.getNodeState(), NodeState.BUSY);
         assertTrue(resourceManager.getState().getFreeNodesNumber() == RMTHelper.defaultNodesNumber + 1);
 
         resourceManager.releaseNodes(nodes);
         //wait for node free event
-        evt = RMTHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node2URL);
+        evt = helper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node2URL);
         Assert.assertEquals(evt.getNodeState(), NodeState.FREE);
 
         assertTrue(resourceManager.getState().getFreeNodesNumber() == RMTHelper.defaultNodesNumber + 2);

@@ -89,14 +89,16 @@ public final class AddGetTest extends FunctionalTest {
      */
     @org.junit.Test
     public void action() throws Exception {
-        final ResourceManager r = RMTHelper.getResourceManager();
+        RMTHelper helper = RMTHelper.getDefaultInstance();
+
+        final ResourceManager r = helper.getResourceManager();
 
         // The username and thr password must be the same a used to connect to the RM
         final String adminLogin = RMTHelper.username;
         final String adminPassword = RMTHelper.password;
 
         // All accounting values are checked through JMX
-        final RMAuthentication auth = (RMAuthentication) RMTHelper.getRMAuth();
+        final RMAuthentication auth = (RMAuthentication) helper.getRMAuth();
         final PublicKey pubKey = auth.getPublicKey();
         final Credentials adminCreds = Credentials.createCredentials(new CredData(adminLogin, adminPassword),
                 pubKey);
@@ -133,12 +135,12 @@ public final class AddGetTest extends FunctionalTest {
         // ADD, GET
         // 1) ADD
         final long beforeAddTime = System.currentTimeMillis();
-        Node node = RMTHelper.createNode("test");
+        Node node = helper.createNode("test");
         final String nodeURL = node.getNodeInformation().getURL();
         r.addNode(nodeURL).getBooleanValue();
         //we eat the configuring to free
-        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
-        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
+        helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
 
         // 2) GET
         final long beforeGetTime = System.currentTimeMillis();

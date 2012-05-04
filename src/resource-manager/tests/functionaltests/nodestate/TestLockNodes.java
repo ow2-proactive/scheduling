@@ -72,20 +72,20 @@ public class TestLockNodes extends FunctionalTest {
      */
     @org.junit.Test
     public void action() throws Exception {
+        RMTHelper helper = RMTHelper.getDefaultInstance();
 
         RMTHelper.log("Deployment");
 
-        ResourceManager resourceManager = RMTHelper.getResourceManager();
+        ResourceManager resourceManager = helper.getResourceManager();
 
-        RMTHelper.createLocalNodeSource();
-        RMTHelper
-                .waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, NodeSource.LOCAL_INFRASTRUCTURE_NAME);
+        helper.createLocalNodeSource();
+        helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, NodeSource.LOCAL_INFRASTRUCTURE_NAME);
 
         Set<String> nodesUrls = new HashSet<String>();
         for (int i = 0; i < RMTHelper.defaultNodesNumber; i++) {
-            RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
+            helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
             //wait for the nodes to be in free state
-            RMNodeEvent nodeEvent = RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+            RMNodeEvent nodeEvent = helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
             nodesUrls.add(nodeEvent.getNodeUrl());
         }
 
@@ -95,7 +95,7 @@ public class TestLockNodes extends FunctionalTest {
         if (status.getBooleanValue()) {
 
             for (int i = 0; i < RMTHelper.defaultNodesNumber; i++) {
-                RMNodeEvent nodeEvent = RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+                RMNodeEvent nodeEvent = helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
                 Assert.assertEquals(nodeEvent.getNodeState(), NodeState.LOCKED);
             }
 
@@ -108,7 +108,7 @@ public class TestLockNodes extends FunctionalTest {
         if (status.getBooleanValue()) {
 
             for (int i = 0; i < RMTHelper.defaultNodesNumber; i++) {
-                RMNodeEvent nodeEvent = RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+                RMNodeEvent nodeEvent = helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
                 Assert.assertEquals(nodeEvent.getNodeState(), NodeState.FREE);
             }
 
@@ -124,7 +124,7 @@ public class TestLockNodes extends FunctionalTest {
         assertTrue(resourceManager.getState().getFreeNodesNumber() == 0);
 
         for (int i = 0; i < RMTHelper.defaultNodesNumber; i++) {
-            RMNodeEvent evt = RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+            RMNodeEvent evt = helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
             Assert.assertEquals(evt.getNodeState(), NodeState.BUSY);
         }
 

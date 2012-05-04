@@ -99,18 +99,19 @@ public class DynamicSelectionScriptTest extends FunctionalTest {
     */
     @org.junit.Test
     public void action() throws Exception {
+        RMTHelper helper = RMTHelper.getDefaultInstance();
 
         RMTHelper.log("Deployment");
-        RMTHelper.createDefaultNodeSource();
-        RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, NodeSource.DEFAULT);
+        helper.createDefaultNodeSource();
+        helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, NodeSource.DEFAULT);
 
         for (int i = 0; i < RMTHelper.defaultNodesNumber; i++) {
-            RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
+            helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
             //waiting for the nodes to be in free state
-            RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+            helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
         }
 
-        ResourceManager resourceManager = RMTHelper.getResourceManager();
+        ResourceManager resourceManager = helper.getResourceManager();
 
         //String hostName = ProActiveInet.getInstance().getHostname();
         String node1Name = "node1";
@@ -119,13 +120,13 @@ public class DynamicSelectionScriptTest extends FunctionalTest {
         HashMap<String, String> vmProperties = new HashMap<String, String>();
         vmProperties.put(this.vmPropKey, this.vmPropValue);
 
-        String node1URL = RMTHelper.createNode(node1Name, vmProperties).getNodeInformation().getURL();
+        String node1URL = helper.createNode(node1Name, vmProperties).getNodeInformation().getURL();
         resourceManager.addNode(node1URL);
 
         //wait node adding event
-        RMTHelper.waitForNodeEvent(RMEventType.NODE_ADDED, node1URL);
+        helper.waitForNodeEvent(RMEventType.NODE_ADDED, node1URL);
         //wait for the node to be in free state
-        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
 
         //create the dynamic selection script object
         SelectionScript sScript = new SelectionScript(new File(vmPropSelectionScriptpath.toURI()),
@@ -142,13 +143,13 @@ public class DynamicSelectionScriptTest extends FunctionalTest {
         assertTrue(resourceManager.getState().getFreeNodesNumber() == RMTHelper.defaultNodesNumber);
         assertTrue(nodes.get(0).getNodeInformation().getURL().equals(node1URL));
 
-        RMNodeEvent evt = RMTHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node1URL);
+        RMNodeEvent evt = helper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node1URL);
         Assert.assertEquals(evt.getNodeState(), NodeState.BUSY);
 
         resourceManager.releaseNode(nodes.get(0));
 
         //wait for node free event
-        evt = RMTHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node1URL);
+        evt = helper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node1URL);
         Assert.assertEquals(evt.getNodeState(), NodeState.FREE);
 
         RMTHelper.log("Test 2");
@@ -163,26 +164,26 @@ public class DynamicSelectionScriptTest extends FunctionalTest {
         assertTrue(nodes.get(0).getNodeInformation().getURL().equals(node1URL));
 
         //wait for node busy event
-        evt = RMTHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node1URL);
+        evt = helper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node1URL);
         Assert.assertEquals(evt.getNodeState(), NodeState.BUSY);
 
         resourceManager.releaseNode(nodes.get(0));
 
         //wait for node free event
-        evt = RMTHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node1URL);
+        evt = helper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node1URL);
         Assert.assertEquals(evt.getNodeState(), NodeState.FREE);
 
         RMTHelper.log("Test 3");
 
         //add a second with JVM env var
 
-        String node2URL = RMTHelper.createNode(node2Name, vmProperties).getNodeInformation().getURL();
+        String node2URL = helper.createNode(node2Name, vmProperties).getNodeInformation().getURL();
         resourceManager.addNode(node2URL);
 
         //wait node adding event
-        RMTHelper.waitForNodeEvent(RMEventType.NODE_ADDED, node2URL);
+        helper.waitForNodeEvent(RMEventType.NODE_ADDED, node2URL);
         //wait for the node to be in free state
-        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
 
         nodes = resourceManager.getAtMostNodes(3, sScript);
 
@@ -193,17 +194,17 @@ public class DynamicSelectionScriptTest extends FunctionalTest {
         assertTrue(resourceManager.getState().getFreeNodesNumber() == RMTHelper.defaultNodesNumber);
 
         //wait for nodes busy event
-        evt = RMTHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node1URL);
+        evt = helper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node1URL);
         Assert.assertEquals(evt.getNodeState(), NodeState.BUSY);
-        evt = RMTHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node2URL);
+        evt = helper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node2URL);
         Assert.assertEquals(evt.getNodeState(), NodeState.BUSY);
 
         resourceManager.releaseNodes(nodes);
 
         //wait for node free event
-        evt = RMTHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node1URL);
+        evt = helper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node1URL);
         Assert.assertEquals(evt.getNodeState(), NodeState.FREE);
-        evt = RMTHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node2URL);
+        evt = helper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node2URL);
         Assert.assertEquals(evt.getNodeState(), NodeState.FREE);
 
         RMTHelper.log("Test 4");
@@ -212,8 +213,8 @@ public class DynamicSelectionScriptTest extends FunctionalTest {
         resourceManager.removeNode(node2URL, true);
 
         //wait for node removed event
-        RMTHelper.waitForNodeEvent(RMEventType.NODE_REMOVED, node2URL);
-        RMTHelper.waitForNodeEvent(RMEventType.NODE_REMOVED, node1URL);
+        helper.waitForNodeEvent(RMEventType.NODE_REMOVED, node2URL);
+        helper.waitForNodeEvent(RMEventType.NODE_REMOVED, node1URL);
 
         nodes = resourceManager.getAtMostNodes(3, sScript);
 

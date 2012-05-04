@@ -68,6 +68,8 @@ import functionaltests.SchedulerTHelper;
 public class TestGCMCustomizedInfrastructureSchedulerLoadingPolicy extends
         TestGCMCustomizedInfrastructureReleaseWhenIdlePolicy {
 
+    private RMTHelper helper = RMTHelper.getDefaultInstance();
+
     @Override
     protected Object[] getPolicyParams() throws Exception {
         SchedulerAuthenticationInterface auth = SchedulerConnection
@@ -94,12 +96,11 @@ public class TestGCMCustomizedInfrastructureSchedulerLoadingPolicy extends
         byte[] hosts = InetAddress.getLocalHost().getHostName().getBytes();
         // creating node source
         // first parameter of im is default rm url
-        RMTHelper.getResourceManager().createNodeSource(sourceName,
-                GCMCustomisedInfrastructure.class.getName(),
+        helper.getResourceManager().createNodeSource(sourceName, GCMCustomisedInfrastructure.class.getName(),
                 new Object[] { "", GCMDeploymentData, hosts, TIMEOUT },
                 SchedulerLoadingPolicy.class.getName(), getPolicyParams());
 
-        RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, sourceName);
+        helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, sourceName);
     }
 
     @Override
@@ -108,7 +109,7 @@ public class TestGCMCustomizedInfrastructureSchedulerLoadingPolicy extends
 
         init();
 
-        ResourceManager resourceManager = RMTHelper.getResourceManager();
+        ResourceManager resourceManager = helper.getResourceManager();
 
         String source1 = "Node_source_1";
 
@@ -120,10 +121,10 @@ public class TestGCMCustomizedInfrastructureSchedulerLoadingPolicy extends
         JobId jobId = SchedulerTHelper.testJobSubmission(new File(jobDescriptor.toURI()).getAbsolutePath());
 
         // waiting for acquiring nodes
-        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
+        helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
 
         // nodes should be removed after scheduler becomes idle
-        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
+        helper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
 
         SchedulerTHelper.waitForFinishedJob(jobId);
 
