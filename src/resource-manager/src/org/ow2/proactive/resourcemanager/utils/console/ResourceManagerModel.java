@@ -337,7 +337,10 @@ public class ResourceManagerModel extends ConsoleModel {
                         list.add(evt.getNodeSource());
                         list.add(evt.getHostName());
                         list.add(evt.getNodeState().toString());
-                        list.add(evt.getTimeStampFormatted());
+                        String date = Tools.getFormattedDate(evt.getTimeStamp());
+                        if (evt.getTimeStamp() != -1)
+                            date += " (" + Tools.getElapsedTime(evt.getTimeStamp()) + ")";
+                        list.add(date);
                         list.add(evt.getNodeUrl());
                         list.add(evt.getNodeProvider() == null ? "" : evt.getNodeProvider());
                         list.add(evt.getNodeOwner() == null ? "" : evt.getNodeOwner());

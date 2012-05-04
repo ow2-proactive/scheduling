@@ -739,7 +739,10 @@ public class SchedulerModel extends ConsoleModel {
         list.add(js.getPriority().toString());
         list.add(js.getProjectName());
         list.add(js.getStatus().toString());
-        list.add(Tools.getFormattedDate(js.getStartTime()));
+        String date = Tools.getFormattedDate(js.getStartTime());
+        if (js.getStartTime() != -1)
+            date += " (" + Tools.getElapsedTime(js.getStartTime()) + ")";
+        list.add(date);
         list.add(Tools.getFormattedDuration(js.getStartTime(), js.getFinishedTime()));
         return list;
     }

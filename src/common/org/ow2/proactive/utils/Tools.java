@@ -37,8 +37,9 @@
 package org.ow2.proactive.utils;
 
 import java.net.URI;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
+import java.util.Date;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 
@@ -139,10 +140,37 @@ public class Tools {
             return "Not yet";
         }
 
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(time);
+        SimpleDateFormat sdf = new SimpleDateFormat();
+        return sdf.format(new Date(time));
+    }
 
-        return String.format("%1$tT  %1$tD", calendar);
+    public static String getElapsedTime(long time) {
+        long seconds = (System.currentTimeMillis() - time) / 1000;
+        long day, hou, min, sec;
+        StringBuilder ret = new StringBuilder();
+
+        day = seconds / (3600 * 24);
+        seconds -= day * (3600 * 24);
+        hou = seconds / 3600;
+        seconds -= hou * 3600;
+        min = seconds / 60;
+        sec = seconds % 60;
+
+        if (day > 0) {
+            ret.append(day + "d ");
+            ret.append(hou + "h ");
+        } else if (hou > 0) {
+            ret.append(hou + "h");
+            ret.append(min + "mn ");
+        } else if (min > 0) {
+            ret.append(min + "mn ");
+        } else {
+            ret.append(sec + "s ");
+        }
+
+        ret.append("ago");
+
+        return ret.toString();
     }
 
     /**
