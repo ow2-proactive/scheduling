@@ -43,6 +43,11 @@ import java.util.Map;
 
 import javax.security.auth.login.LoginException;
 
+import org.apache.log4j.Logger;
+import org.objectweb.proactive.ActiveObjectCreationException;
+import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
@@ -85,8 +90,40 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
     protected Scheduler uischeduler;
     protected MBeanInfoViewer mbeaninfoviewer;
 
+    public static final Logger logger_util = ProActiveLogger.getLogger(SchedulerLoggers.UTIL);
+
+    /*
+     * a reference to a stub on this active object
+     */
+    private static SchedulerProxyUserInterface activeInstance;
+
+    /**
+     * Default constructor demanded by ProActive.
+     * WARNING: Singleton pattern: Use getActiveInstance() instead of this constructor
+     * @deprecated
+     */
     public SchedulerProxyUserInterface() {
 
+    }
+
+    /**
+     * Singleton active object constructor.
+     * Creates the singleton
+     *
+     * Creates an active object on this and returns a reference to its stub.
+     * If the active object is already created, returns the reference
+     * @return
+     * @throws NodeException
+     * @throws ActiveObjectCreationException
+     */
+
+    public static SchedulerProxyUserInterface getActiveInstance() throws ActiveObjectCreationException,
+            NodeException {
+        if (activeInstance != null)
+            return activeInstance;
+
+        activeInstance = PAActiveObject.newActive(SchedulerProxyUserInterface.class, new Object[] {});
+        return activeInstance;
     }
 
     /**
@@ -147,7 +184,7 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
     /**
      * Subscribes a listener to the Scheduler
      */
-    //@Override
+    @Override
     public SchedulerState addEventListener(SchedulerEventListener sel, boolean myEventsOnly,
             boolean getCurrentState, SchedulerEvent... events) throws NotConnectedException,
             PermissionException {
@@ -159,7 +196,7 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
 
     }
 
-    //@Override
+    @Override
     public void disconnect() throws NotConnectedException, PermissionException {
         if (uischeduler == null)
             throw new NotConnectedException("Not connected to the scheduler.");
@@ -168,7 +205,7 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
 
     }
 
-    //@Override
+    @Override
     public boolean isConnected() {
         if (uischeduler == null) {
             return false;
@@ -184,7 +221,7 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
             }
     }
 
-    //@Override
+    @Override
     public void renewSession() throws NotConnectedException {
         if (uischeduler == null) {
             throw new NotConnectedException("Not connected to the scheduler.");
@@ -192,7 +229,7 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
         uischeduler.renewSession();
     }
 
-    //@Override
+    @Override
     public void removeEventListener() throws NotConnectedException, PermissionException {
         if (uischeduler == null) {
             throw new NotConnectedException("Not connected to the scheduler.");
@@ -202,7 +239,7 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
 
     }
 
-    //@Override
+    @Override
     public JobId submit(Job job) throws NotConnectedException, PermissionException,
             SubmissionClosedException, JobCreationException {
         if (uischeduler == null) {
@@ -212,7 +249,7 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
         return uischeduler.submit(job);
     }
 
-    //@Override
+    @Override
     public void changeJobPriority(JobId jobId, JobPriority priority) throws NotConnectedException,
             UnknownJobException, PermissionException, JobAlreadyFinishedException {
         if (uischeduler == null) {
@@ -223,7 +260,7 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
 
     }
 
-    //@Override
+    @Override
     public JobResult getJobResult(String jobId) throws NotConnectedException, PermissionException,
             UnknownJobException {
         if (uischeduler == null) {
@@ -233,7 +270,7 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
         return uischeduler.getJobResult(jobId);
     }
 
-    //@Override
+    @Override
     public JobResult getJobResult(JobId jobId) throws NotConnectedException, PermissionException,
             UnknownJobException {
         if (uischeduler == null) {
@@ -243,7 +280,7 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
         return uischeduler.getJobResult(jobId);
     }
 
-    //@Override
+    @Override
     public TaskResult getTaskResult(String jobId, String taskName) throws NotConnectedException,
             UnknownJobException, UnknownTaskException, PermissionException {
         if (uischeduler == null) {
@@ -253,7 +290,7 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
         return uischeduler.getTaskResult(jobId, taskName);
     }
 
-    //@Override
+    @Override
     public TaskResult getTaskResult(JobId jobId, String taskName) throws NotConnectedException,
             UnknownJobException, UnknownTaskException, PermissionException {
         if (uischeduler == null) {
@@ -263,13 +300,13 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
         return uischeduler.getTaskResult(jobId, taskName);
     }
 
-    //@Override
+    @Override
     public TaskResult getTaskResultFromIncarnation(JobId jobId, String taskName, int inc)
             throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
         return uischeduler.getTaskResultFromIncarnation(jobId, taskName, inc);
     }
 
-    //@Override
+    @Override
     public TaskResult getTaskResultFromIncarnation(String jobId, String taskName, int inc)
             throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
         return uischeduler.getTaskResultFromIncarnation(jobId, taskName, inc);
@@ -323,7 +360,7 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
         return uischeduler.preemptTask(jobId, taskName, restartDelay);
     }
 
-    //@Override
+    @Override
     public boolean killJob(JobId jobId) throws NotConnectedException, UnknownJobException,
             PermissionException {
         if (uischeduler == null) {
@@ -333,7 +370,7 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
         return uischeduler.killJob(jobId);
     }
 
-    //@Override
+    @Override
     public void listenJobLogs(JobId jobId, AppenderProvider appenderProvider) throws NotConnectedException,
             UnknownJobException, PermissionException {
         if (uischeduler == null) {
@@ -344,7 +381,7 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
 
     }
 
-    //@Override
+    @Override
     public boolean pauseJob(JobId jobId) throws NotConnectedException, UnknownJobException,
             PermissionException {
         if (uischeduler == null) {
@@ -355,7 +392,7 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
 
     }
 
-    //@Override
+    @Override
     public boolean removeJob(JobId jobId) throws NotConnectedException, UnknownJobException,
             PermissionException {
         if (uischeduler == null) {
@@ -366,7 +403,7 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
 
     }
 
-    //@Override
+    @Override
     public boolean resumeJob(JobId jobId) throws NotConnectedException, UnknownJobException,
             PermissionException {
         if (uischeduler == null) {
@@ -375,37 +412,37 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
         return uischeduler.resumeJob(jobId);
     }
 
-    //@Override
+    @Override
     public void changeJobPriority(String jobId, JobPriority priority) throws NotConnectedException,
             UnknownJobException, PermissionException, JobAlreadyFinishedException {
         uischeduler.changeJobPriority(jobId, priority);
 
     }
 
-    //@Override
+    @Override
     public SchedulerStatus getStatus() throws NotConnectedException, PermissionException {
         return uischeduler.getStatus();
     }
 
-    //@Override
+    @Override
     public boolean killJob(String jobId) throws NotConnectedException, UnknownJobException,
             PermissionException {
         return uischeduler.killJob(jobId);
     }
 
-    //@Override
+    @Override
     public boolean pauseJob(String jobId) throws NotConnectedException, UnknownJobException,
             PermissionException {
         return uischeduler.pauseJob(jobId);
     }
 
-    //@Override
+    @Override
     public boolean removeJob(String jobId) throws NotConnectedException, UnknownJobException,
             PermissionException {
         return uischeduler.removeJob(jobId);
     }
 
-    //@Override
+    @Override
     public boolean resumeJob(String jobId) throws NotConnectedException, UnknownJobException,
             PermissionException {
         return uischeduler.resumeJob(jobId);
