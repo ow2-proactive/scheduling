@@ -36,27 +36,24 @@
  */
 package org.ow2.proactive.scheduler.common.util;
 
-import java.security.KeyException;
-import java.security.PublicKey;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
 import javax.security.auth.login.LoginException;
 
+import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.annotation.ImmediateService;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
+import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.common.NotificationData;
-import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
-import org.ow2.proactive.scheduler.common.SchedulerConnection;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SchedulerEventListener;
 import org.ow2.proactive.scheduler.common.SchedulerState;
-import org.ow2.proactive.scheduler.common.exception.InternalSchedulerException;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.exception.PermissionException;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
@@ -93,6 +90,28 @@ public class CachingSchedulerProxyUserInterface extends SchedulerProxyUserInterf
         return schedulerState;
     }
 
+    private static CachingSchedulerProxyUserInterface activeInstance;
+
+    /**
+     * Singleton active object constructor.
+     * Creates the singleton
+     *
+     * Creates an active object on this and returns a reference to its stub.
+     * If the active object is already created, returns the reference
+     * @return
+     * @throws NodeException
+     * @throws ActiveObjectCreationException
+     */
+
+    public static CachingSchedulerProxyUserInterface getActiveInstance()
+            throws ActiveObjectCreationException, NodeException {
+        if (activeInstance != null)
+            return activeInstance;
+
+        activeInstance = PAActiveObject.newActive(CachingSchedulerProxyUserInterface.class, new Object[] {});
+        return activeInstance;
+    }
+
     /**
      * initialize the connection the scheduler. 
      * Must be called only once
@@ -102,12 +121,8 @@ public class CachingSchedulerProxyUserInterface extends SchedulerProxyUserInterf
      * @throws LoginException thrown if the credential is invalid
      */
     public void init(String url, Credentials credentials) throws SchedulerException, LoginException {
-        SchedulerAuthenticationInterface auth = SchedulerConnection.join(url);
-        this.uischeduler = auth.login(credentials);
-        CachingSchedulerProxyUserInterface ao = (CachingSchedulerProxyUserInterface) PAActiveObject
-                .getStubOnThis();
-        schedulerState = this.uischeduler.addEventListener(ao, false, true);
-        schedulerState = PAFuture.getFutureValue(schedulerState);
+        super.init(url, credentials);
+        subscribeListener();
     }
 
     /**
@@ -122,16 +137,16 @@ public class CachingSchedulerProxyUserInterface extends SchedulerProxyUserInterf
      * @throws LoginException if the couple username/password is invalid
      */
     public void init(String url, String user, String pwd) throws SchedulerException, LoginException {
-        SchedulerAuthenticationInterface auth = SchedulerConnection.join(url);
-        PublicKey pubKey = auth.getPublicKey();
+        super.init(url, user, pwd);
+        subscribeListener();
+    }
 
-        try {
-            Credentials cred = Credentials.createCredentials(new CredData(CredData.parseLogin(user), CredData
-                    .parseDomain(user), pwd), pubKey);
-            this.uischeduler = auth.login(cred);
-        } catch (KeyException e) {
-            throw new InternalSchedulerException(e);
-        }
+    public void init(String url, CredData credData) throws SchedulerException, LoginException {
+        super.init(url, credData);
+        subscribeListener();
+    }
+
+    private void subscribeListener() throws NotConnectedException, PermissionException {
         CachingSchedulerProxyUserInterface ao = (CachingSchedulerProxyUserInterface) PAActiveObject
                 .getStubOnThis();
         schedulerState = this.uischeduler.addEventListener(ao, false, true);
