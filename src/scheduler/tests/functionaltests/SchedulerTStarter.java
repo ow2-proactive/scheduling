@@ -123,7 +123,7 @@ public class SchedulerTStarter implements Serializable {
             Node[] nodes = new Node[RMTHelper.defaultNodesNumber];
             for (int i = 0; i < RMTHelper.defaultNodesNumber; i++) {
                 String nodeName = "default_nodemyao_" + System.currentTimeMillis();
-                Node node = RMTHelper.createNode(nodeName, params);
+                Node node = RMTHelper.getDefaultInstance().createNode(nodeName, params);
                 nodes[i] = node;
             }
             for (int i = 0; i < RMTHelper.defaultNodesNumber; i++) {
