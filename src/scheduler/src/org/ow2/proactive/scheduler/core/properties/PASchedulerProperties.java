@@ -79,6 +79,15 @@ public enum PASchedulerProperties {
     /** Scheduler main loop time out */
     SCHEDULER_TIME_OUT("pa.scheduler.core.timeout", PropertyType.INTEGER),
 
+    /** Scheduler auto reconnection to the RM when the connection is down */
+    SCHEDULER_RMCONNECTION_AUTO_CONNECT("pa.scheduler.core.rmconnection.autoconnect", PropertyType.BOOLEAN),
+
+    /** Scheduler time span between two reconnection attempts  */
+    SCHEDULER_RMCONNECTION_TIMESPAN("pa.scheduler.core.rmconnection.timespan", PropertyType.INTEGER),
+
+    /** Scheduler maximum number of reconnection attempts  */
+    SCHEDULER_RMCONNECTION_ATTEMPTS("pa.scheduler.core.rmconnection.attempts", PropertyType.INTEGER),
+
     /** Scheduler main loop time out */
     SCHEDULER_START_TERMINATE_RATIO("pa.scheduler.core.stratio", PropertyType.INTEGER),
 

@@ -41,6 +41,7 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.URI;
+import java.net.ConnectException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -71,6 +72,7 @@ import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.api.PALifeCycle;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
+import org.objectweb.proactive.core.body.exceptions.SendRequestCommunicationException;
 import org.objectweb.proactive.core.body.request.RequestFilter;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectAdapter;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectExposer;
@@ -183,6 +185,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
     }
 
     /** Scheduler logger */
+    private static final Logger loggerConsole = ProActiveLogger.getLogger(SchedulerLoggers.CONSOLE);
     public static final Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.CORE);
     public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.CORE);
 
@@ -259,6 +262,9 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
     private Timer removeJobTimer;
     /** Timer used for restarting tasks */
     private Timer restartTaskTimer;
+
+    /** Url used to store the last url of the RM (used to try to reconnect to the rm when it is down)*/
+    private URI lastRmUrl;
 
     /** Log forwarding service for nodes */
     LogForwardingService lfs;
@@ -445,7 +451,11 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
             //try connect to RM with Scheduler user
             this.rmProxiesManager = RMProxiesManager.createRMProxiesManager(rmURL);
             this.rmProxiesManager.getSchedulerRMProxy();//-> used to connect RM
-            //init
+
+            // Save RM Url
+            this.lastRmUrl = rmURL;
+
+            // init
             this.jobs = new HashMap<JobId, InternalJob>();
             this.pendingJobs = new Vector<InternalJob>();
             this.runningJobs = new Vector<InternalJob>();
@@ -669,8 +679,8 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
                             logger_dev.trace("[PROF] Terminate served = " + termServicesCounter + " in " +
                                 (System.currentTimeMillis() - startTerm));
                         }
-
                     } catch (Exception e) {
+
                         //this point is reached in case of unknown problems
                         logger
                                 .error(
@@ -678,36 +688,19 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
                                         e);
                         //trying to check if RM is alive
                         try {
-                            logger_dev.error("Check if Resource Manager is alive");
-                            //call isActive and wait recursively on the two futures (this -> proxy -> RM)
                             PAFuture.waitFor(rmProxiesManager.getSchedulerRMProxy().isActive(), true);
                         } catch (Exception rme) {
-                            logger_dev.error("Resource Manager seems to be dead", rme);
-                            //try to terminate every proxies
-                            rmProxiesManager.terminateAllProxies();
-                            //if failed
-                            freeze();
-                            //scheduler functionality are reduced until now
-                            status = SchedulerStatus.UNLINKED;
-                            logger
-                                    .fatal("\n*****************************************************************************************************************\n"
-                                        + "* Resource Manager is no more available, Scheduler has been paused waiting for a resource manager to be reconnect\n"
-                                        + "* Scheduler is in critical state and its functionalities are reduced : \n"
-                                        + "* \t-> use the linkResourceManager() method to reconnect a new one.\n"
-                                        + "*****************************************************************************************************************");
-                            frontend.schedulerStateUpdated(SchedulerEvent.RM_DOWN);
+
+                            // Check and tries to reconnect the RM proxies else Freeze the scheduler.
+                            checkAndReconnectRM();
+
                         }
                     } catch (Error e) {
                         //this point is reached in case of big problem, sometimes unknown
                         logger.error("SchedulerCore.runActivity(MAIN_LOOP) caught an ERROR !");
                         logger_dev.error("\nSchedulerCore.runActivity(MAIN_LOOP) caught an ERROR !", e);
-                        //Terminate proxy and disconnecting RM
-                        logger_dev.error("Resource Manager will be disconnected");
-                        rmProxiesManager.terminateAllProxies();
-                        //if failed
-                        freeze();
-                        //scheduler functionality are reduced until now
-                        status = SchedulerStatus.UNLINKED;
+
+                        clearProxiesAndFreeze();
                     }
                 }
 
@@ -2133,6 +2126,112 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
             logger_dev.error("", e);
             throw new InternalException("Exception occurs while loading the policy class !", e);
         }
+    }
+
+    /**
+     * Check the connection to the RM. If the connection is down and automatic reconnection is enabled, this method performs n reconnection attempts before returning the result.
+     * These parameters can be set in the configuration :
+     * - Enabling/Disabling automatic reconnection: pa.scheduler.core.rmconnection.autoconnect (default is true)
+     * - Delay in ms between 2 consecutive attempts: pa.scheduler.core.rmconnection.timespan (default is 5000 ms)
+     * - Maximum number of attempts: pa.scheduler.core.rmconnection.attempts (default is 10)
+     * @return true if the RM is alive, false otherwise.
+     */
+    private boolean checkAndReconnectRM() {
+
+        // Result of the method.
+        boolean alive = false;
+
+        // Checks if the option is enabled (true by default)
+        boolean autoReconnectRM = PASchedulerProperties.SCHEDULER_RMCONNECTION_AUTO_CONNECT.isSet() ? PASchedulerProperties.SCHEDULER_RMCONNECTION_AUTO_CONNECT
+                .getValueAsBoolean()
+                : true;
+
+        // Delay (in ms) between each connection attempts (5s by default)
+        int timespan = PASchedulerProperties.SCHEDULER_RMCONNECTION_TIMESPAN.isSet() ? PASchedulerProperties.SCHEDULER_RMCONNECTION_TIMESPAN
+                .getValueAsInt()
+                : 5000;
+
+        // Maximum number of attempts (10 by default)
+        int maxAttempts = PASchedulerProperties.SCHEDULER_RMCONNECTION_ATTEMPTS.isSet() ? PASchedulerProperties.SCHEDULER_RMCONNECTION_ATTEMPTS
+                .getValueAsInt()
+                : 10;
+
+        // If the options is disabled or the number of attempts is wrong, it is set to 1
+        if (!autoReconnectRM || maxAttempts <= 0)
+            maxAttempts = 1;
+
+        // Check the timespan option
+        if (timespan <= 0)
+            timespan = 5000;
+
+        // Save the url in a string of the last connected RM.
+        String rmURL = this.lastRmUrl.toString();
+        int nbAttempts = 1;
+
+        loggerConsole.info("Trying to retrieve RM connection at url " + rmURL + "...");
+
+        while (!alive && nbAttempts <= maxAttempts) {
+            try {
+
+                // Call isActive and wait recursively on the two futures (this -> proxy -> RM)
+                PAFuture.waitFor(rmProxiesManager.getSchedulerRMProxy().isActive(), true);
+
+                alive = true;
+                loggerConsole.info("Resource Manager successfully retrieved on " + rmURL);
+
+            } catch (Exception rme) {
+                alive = false;
+
+                if (nbAttempts != maxAttempts) {
+                    try {
+                        // Sleep before two attempts
+                        logger.info("Waiting " + timespan + " ms before the next attempt...");
+                        Thread.sleep(timespan);
+                    } catch (InterruptedException ex) {
+                        logger.error("An exception has occurred while waiting.");
+                    }
+                }
+            }
+            nbAttempts++;
+        }
+
+        // Display a message in the Console.
+        if (!alive) {
+
+            logger.info("Resource Manager seems to be dead.");
+
+            // Disconnect proxies and freeze the scheduler.
+            clearProxiesAndFreeze();
+
+            loggerConsole
+                    .fatal("\n*****************************************************************************************************************\n" +
+                        "* Resource Manager is no more available, Scheduler has been paused waiting for a resource manager to be reconnect\n" +
+                        "* Scheduler is in critical state and its functionalities are reduced : \n" +
+                        "* \t-> use the linkrm(\"" +
+                        rmURL +
+                        "\") command in scheduler-client to reconnect a new one.\n" +
+                        "*****************************************************************************************************************");
+
+            frontend.schedulerStateUpdated(SchedulerEvent.RM_DOWN);
+        }
+
+        return alive;
+    }
+
+    /**
+     * Terminate all proxies and freeze the scheduler.
+     */
+    private void clearProxiesAndFreeze() {
+
+        // Terminate proxy and disconnect RM
+        logger_dev.error("Resource Manager will be disconnected");
+        rmProxiesManager.terminateAllProxies();
+
+        //if failed
+        freeze();
+
+        //scheduler functionality are reduced until now
+        status = SchedulerStatus.UNLINKED;
     }
 
     /**
