@@ -38,6 +38,9 @@ package org.ow2.proactive.utils.console;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -46,6 +49,10 @@ import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
+
+import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 
 
 /**
@@ -74,6 +81,8 @@ public abstract class ConsoleModel {
     protected String initEnvFileName = null;
 
     protected ArrayList<Command> commands;
+
+    protected Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.CONSOLE);
 
     protected ConsoleModel() {
         commands = new ArrayList<Command>();
@@ -127,9 +136,21 @@ public abstract class ConsoleModel {
     //***************** DISPLAY HANDLING *******************
 
     /**
+     * @param msg the message to display
+     * @param the exception to manage
+     */
+    protected void logUserException(String msg, Throwable t) {
+        //log the exception independently on the configuration
+        final Writer result = new StringWriter();
+        final PrintWriter printWriter = new PrintWriter(result);
+        t.printStackTrace(printWriter);
+        logger.info("User exception occured. Msg:  " + msg + " stacktrace: " + result);
+    }
+
+    /**
      * Display the given message with the given exception according to the options set.
      * This will display the exception on demand or not at all.
-     *
+     * 
      * @param msg the message to display
      * @param t the exception to manage
      */

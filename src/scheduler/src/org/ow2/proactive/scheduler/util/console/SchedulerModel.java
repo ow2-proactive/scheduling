@@ -292,12 +292,15 @@ public class SchedulerModel extends ConsoleModel {
         if (t instanceof NotConnectedException) {
             String tmp = "Your session has expired, please try to reconnect server using reconnect() command !";
             console.error(tmp);
+            logUserException(tmp, t);
         } else if (t instanceof PermissionException) {
             String tmp = msg + " : " + (t.getMessage() == null ? t : t.getMessage());
             console.error(tmp);
+            logUserException(tmp, t);
         } else if (t instanceof ProActiveRuntimeException) {
             String tmp = msg + " : Scheduler server seems to be unreachable !";
             console.error(tmp);
+            logUserException(tmp, t);
         } else {
             super.handleExceptionDisplay(msg, t);
         }
