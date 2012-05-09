@@ -31,29 +31,29 @@ public class TestRMProxy extends FunctionalTest {
     static final int NODES_NUMBER = 5;
 
     private RMTHelper helper = RMTHelper.getDefaultInstance();
-    
+
     private Credentials user1Credentials;
 
     private Credentials user2Credentials;
-    
+
     @Before
     public void init() throws Exception {
-        user1Credentials = Credentials.createCredentials(new CredData("admin", "admin"), helper
-                .getRMAuth().getPublicKey());
+        user1Credentials = Credentials.createCredentials(new CredData("admin", "admin"), helper.getRMAuth()
+                .getPublicKey());
 
-        user2Credentials = Credentials.createCredentials(new CredData("demo", "demo"), helper
-                .getRMAuth().getPublicKey());
+        user2Credentials = Credentials.createCredentials(new CredData("demo", "demo"), helper.getRMAuth()
+                .getPublicKey());
     }
-    
+
     @Test
     public void testProxiesManager() throws Exception {
         createNodeSource();
-        
+
         System.out.println("\n Test with per-user connection \n");
         testRMProxies(false);
 
         System.out.println("\n Test with single connection \n");
-        
+
         testRMProxies(true);
     }
 
@@ -65,7 +65,7 @@ public class TestRMProxy extends FunctionalTest {
             helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
         }
     }
-    
+
     private void testRMProxies(boolean singleUserConnection) throws Exception {
         ResourceManager rm = helper.getResourceManager();
 
@@ -75,9 +75,8 @@ public class TestRMProxy extends FunctionalTest {
         Credentials schedulerProxyCredentials = Credentials.getCredentials(PASchedulerProperties
                 .getAbsolutePath(PASchedulerProperties.RESOURCE_MANAGER_CREDS.getValueAsString()));
 
-        
         RMProxiesManager proxiesManager;
-        
+
         if (singleUserConnection) {
             proxiesManager = new SingleConnectionRMProxiesManager(rmUri, schedulerProxyCredentials);
         } else {
@@ -113,7 +112,7 @@ public class TestRMProxy extends FunctionalTest {
         requestWithTwoUsers(user1RMProxy, user2RMProxy, rm);
 
         checkSchedulerProxy(proxiesManager);
-        
+
         System.out.println("Terminate user proxy1");
         proxiesManager.terminateUserRMProxy("admin");
         user1RMProxy = proxiesManager.getUserRMProxy("admin", user1Credentials);
@@ -123,15 +122,15 @@ public class TestRMProxy extends FunctionalTest {
         proxiesManager.terminateUserRMProxy("demo");
         user2RMProxy = proxiesManager.getUserRMProxy("demo", user2Credentials);
         requestReleaseAllNodes(user2RMProxy, rm);
-        
+
         System.out.println("Terminate all proxies");
         proxiesManager.terminateAllProxies();
     }
-    
+
     private void requestWithTwoUsers(UserRMProxy proxy1, UserRMProxy proxy2, ResourceManager rm)
             throws Exception {
         System.out.println("Request nodes for two users");
-        
+
         NodeSet nodeSet1 = proxy1.getNodes(1, null, null, null, false);
         NodeSet nodeSet2 = proxy2.getNodes(2, null, null, null, false);
         waitWhenNodeSetAcquired(nodeSet1, 1);
@@ -174,7 +173,7 @@ public class TestRMProxy extends FunctionalTest {
         Assert.assertNotNull("Extra nodes are expected", nodeSet.getExtraNodes());
         Assert.assertEquals(NODES_NUMBER - 1, nodeSet.getExtraNodes().size());
         Assert.assertEquals(0, rm.getState().getFreeNodesNumber());
-        
+
         proxy.releaseNodes(nodeSet);
         waitWhenNodesAreReleased(NODES_NUMBER);
         Assert.assertEquals(NODES_NUMBER, rm.getState().getFreeNodesNumber());

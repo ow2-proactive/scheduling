@@ -55,12 +55,13 @@ import org.ow2.proactive.utils.NodeSet;
 public class UserRMProxy {
 
     private static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.RMPROXY);
-    
+
     private final Credentials credentials;
 
     private final RMProxiesManager proxiesManager;
-    
-    private final Map<URI, RMProxyActiveObject> proxyActiveObjects = new LinkedHashMap<URI, RMProxyActiveObject>(2);
+
+    private final Map<URI, RMProxyActiveObject> proxyActiveObjects = new LinkedHashMap<URI, RMProxyActiveObject>(
+        2);
 
     public UserRMProxy(RMProxiesManager proxiesManager, Credentials credentials) {
         this.proxiesManager = proxiesManager;
@@ -72,16 +73,17 @@ public class UserRMProxy {
             throws RMProxyCreationException {
 
         RMProxiesManager.Connection rmConnection = proxiesManager.getCurrentRMConnection();
-        
+
         RMProxyActiveObject proxyActiveObject;
         synchronized (proxyActiveObjects) {
             proxyActiveObject = proxyActiveObjects.get(rmConnection.getRmURI());
             if (proxyActiveObject == null) {
-                proxyActiveObject = RMProxyActiveObject.createAOProxy(rmConnection.getRmAuthentication(), credentials);
+                proxyActiveObject = RMProxyActiveObject.createAOProxy(rmConnection.getRmAuthentication(),
+                        credentials);
                 proxyActiveObjects.put(rmConnection.getRmURI(), proxyActiveObject);
             }
         }
-        
+
         NodeSet nodeSet = proxyActiveObject.getNodes(number, descriptor, selectionScriptsList, exclusion,
                 bestEffort);
         return nodeSet;
@@ -90,21 +92,21 @@ public class UserRMProxy {
     public void releaseNodes(NodeSet nodeSet) {
         releaseNodes(nodeSet, null);
     }
-    
+
     public void releaseNodes(NodeSet nodeSet, Script<?> cleaningScript) {
         if (nodeSet.size() == 0) {
             if (nodeSet.getExtraNodes() == null || nodeSet.getExtraNodes().size() == 0) {
                 throw new IllegalArgumentException("Trying to release empty NodeSet");
             }
         }
-        
+
         RMProxyActiveObject tragetProxyActiveObject = null;
-        
+
         synchronized (proxyActiveObjects) {
             if (proxyActiveObjects.size() > 1) {
                 for (Iterator<RMProxyActiveObject> i = proxyActiveObjects.values().iterator(); i.hasNext();) {
                     RMProxyActiveObject proxyActiveObject = i.next();
-                    boolean useThisRM; 
+                    boolean useThisRM;
                     try {
                         useThisRM = proxyActiveObject.isNodeSetForThisRM(nodeSet);
                     } catch (Exception e) {
@@ -125,10 +127,10 @@ public class UserRMProxy {
             } else {
                 if (!proxyActiveObjects.isEmpty()) {
                     tragetProxyActiveObject = proxyActiveObjects.values().iterator().next();
-                } 
+                }
             }
         }
-        
+
         if (tragetProxyActiveObject != null) {
             tragetProxyActiveObject.releaseNodes(nodeSet, cleaningScript);
         } else {
@@ -144,5 +146,5 @@ public class UserRMProxy {
             proxyActiveObjects.clear();
         }
     }
-    
+
 }

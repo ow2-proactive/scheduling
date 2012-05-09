@@ -64,10 +64,11 @@ public class TestRMProxyRebind extends MultipleRMTBase {
         // RM1 was killed, restart it
         rmiPort1 = CentralPAPropertyRepository.PA_RMI_PORT.getValue() + 3;
         jmxPort1 = PAResourceManagerProperties.RM_JMX_PORT.getValueAsInt() + 3;
-        rmUrl1 = helper1.startRM(config1.getAbsolutePath(), rmiPort1,
-                PAResourceManagerProperties.RM_JMX_PORT.getCmdLine() + jmxPort1);
+        rmUrl1 = helper1.startRM(config1.getAbsolutePath(), rmiPort1, PAResourceManagerProperties.RM_JMX_PORT
+                .getCmdLine() +
+            jmxPort1);
         createNodeSource(helper1, rmiPort1, NODES_NUMBER);
-        
+
         checkFreeNodes(helper1.getResourceManager(), NODES_NUMBER);
         checkFreeNodes(helper2.getResourceManager(), NODES_NUMBER);
 
@@ -80,7 +81,7 @@ public class TestRMProxyRebind extends MultipleRMTBase {
         ResourceManager rm2 = helper2.getResourceManager();
 
         RMProxiesManager proxiesManager;
-        
+
         if (singleConnection) {
             proxiesManager = new SingleConnectionRMProxiesManager(rmUri1, schedulerProxyCredentials);
         } else {
@@ -97,7 +98,8 @@ public class TestRMProxyRebind extends MultipleRMTBase {
         checkFreeNodes(rm1, NODES_NUMBER - 1);
         checkFreeNodes(rm2, NODES_NUMBER);
 
-        Assert.assertEquals(NODES_NUMBER - 1, proxiesManager.getSchedulerRMProxy().getState().getFreeNodesNumber());
+        Assert.assertEquals(NODES_NUMBER - 1, proxiesManager.getSchedulerRMProxy().getState()
+                .getFreeNodesNumber());
 
         System.out.println("Get one node with RM1");
         NodeSet rm1NodeSet2 = proxy1.getNodes(1, null, null, null, false);
@@ -105,12 +107,14 @@ public class TestRMProxyRebind extends MultipleRMTBase {
         checkFreeNodes(rm1, NODES_NUMBER - 2);
         checkFreeNodes(rm2, NODES_NUMBER);
 
-        Assert.assertEquals(NODES_NUMBER - 2, proxiesManager.getSchedulerRMProxy().getState().getFreeNodesNumber());
+        Assert.assertEquals(NODES_NUMBER - 2, proxiesManager.getSchedulerRMProxy().getState()
+                .getFreeNodesNumber());
         Assert.assertTrue(proxiesManager.getSchedulerRMProxy().isActive().getBooleanValue());
-        
+
         proxiesManager.rebindRMProxiesManager(rmUri2);
 
-        Assert.assertEquals(NODES_NUMBER, proxiesManager.getSchedulerRMProxy().getState().getFreeNodesNumber());
+        Assert.assertEquals(NODES_NUMBER, proxiesManager.getSchedulerRMProxy().getState()
+                .getFreeNodesNumber());
         Assert.assertTrue(proxiesManager.getSchedulerRMProxy().isActive().getBooleanValue());
 
         System.out.println("Get one node with RM2");
@@ -119,7 +123,8 @@ public class TestRMProxyRebind extends MultipleRMTBase {
         checkFreeNodes(rm1, NODES_NUMBER - 2);
         checkFreeNodes(rm2, NODES_NUMBER - 1);
 
-        Assert.assertEquals(NODES_NUMBER - 1, proxiesManager.getSchedulerRMProxy().getState().getFreeNodesNumber());
+        Assert.assertEquals(NODES_NUMBER - 1, proxiesManager.getSchedulerRMProxy().getState()
+                .getFreeNodesNumber());
 
         System.out.println("Get two nodes with RM2");
         NodeSet rm2NodeSet2 = proxy1.getNodes(2, null, null, null, false);
@@ -127,7 +132,8 @@ public class TestRMProxyRebind extends MultipleRMTBase {
         checkFreeNodes(rm1, NODES_NUMBER - 2);
         checkFreeNodes(rm2, NODES_NUMBER - 3);
 
-        Assert.assertEquals(NODES_NUMBER - 3, proxiesManager.getSchedulerRMProxy().getState().getFreeNodesNumber());
+        Assert.assertEquals(NODES_NUMBER - 3, proxiesManager.getSchedulerRMProxy().getState()
+                .getFreeNodesNumber());
 
         System.out.println("Release one node with RM1");
         proxy1.releaseNodes(rm1NodeSet1);
@@ -135,7 +141,8 @@ public class TestRMProxyRebind extends MultipleRMTBase {
         checkFreeNodes(rm1, NODES_NUMBER - 1);
         checkFreeNodes(rm2, NODES_NUMBER - 3);
 
-        Assert.assertEquals(NODES_NUMBER - 3, proxiesManager.getSchedulerRMProxy().getState().getFreeNodesNumber());
+        Assert.assertEquals(NODES_NUMBER - 3, proxiesManager.getSchedulerRMProxy().getState()
+                .getFreeNodesNumber());
 
         System.out.println("Release one node with RM2");
         proxy1.releaseNodes(rm2NodeSet1);
@@ -143,20 +150,23 @@ public class TestRMProxyRebind extends MultipleRMTBase {
         checkFreeNodes(rm1, NODES_NUMBER - 1);
         checkFreeNodes(rm2, NODES_NUMBER - 2);
 
-        Assert.assertEquals(NODES_NUMBER - 2, proxiesManager.getSchedulerRMProxy().getState().getFreeNodesNumber());
+        Assert.assertEquals(NODES_NUMBER - 2, proxiesManager.getSchedulerRMProxy().getState()
+                .getFreeNodesNumber());
 
         System.out.println("Kill RM1");
         helper1.killRM();
 
-        Assert.assertEquals(NODES_NUMBER - 2, proxiesManager.getSchedulerRMProxy().getState().getFreeNodesNumber());
+        Assert.assertEquals(NODES_NUMBER - 2, proxiesManager.getSchedulerRMProxy().getState()
+                .getFreeNodesNumber());
         Assert.assertTrue(proxiesManager.getSchedulerRMProxy().isActive().getBooleanValue());
 
         System.out.println("Release two nodes with RM2");
         proxy1.releaseNodes(rm2NodeSet2);
         waitWhenNodeSetReleased(2, helper2);
         checkFreeNodes(rm2, NODES_NUMBER);
-        
-        Assert.assertEquals(NODES_NUMBER, proxiesManager.getSchedulerRMProxy().getState().getFreeNodesNumber());
+
+        Assert.assertEquals(NODES_NUMBER, proxiesManager.getSchedulerRMProxy().getState()
+                .getFreeNodesNumber());
         Assert.assertTrue(proxiesManager.getSchedulerRMProxy().isActive().getBooleanValue());
 
         System.out.println("Try to release node with terminated RM1");
@@ -165,9 +175,10 @@ public class TestRMProxyRebind extends MultipleRMTBase {
         System.out.println("Try to release node with terminated RM1 one more time");
         proxy1.releaseNodes(rm1NodeSet2);
 
-        Assert.assertEquals(NODES_NUMBER, proxiesManager.getSchedulerRMProxy().getState().getFreeNodesNumber());
+        Assert.assertEquals(NODES_NUMBER, proxiesManager.getSchedulerRMProxy().getState()
+                .getFreeNodesNumber());
         Assert.assertTrue(proxiesManager.getSchedulerRMProxy().isActive().getBooleanValue());
-        
+
         System.out.println("Terminate all proxies");
         proxiesManager.terminateAllProxies();
     }
