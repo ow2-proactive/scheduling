@@ -52,7 +52,7 @@ import javax.script.ScriptException;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
+//import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 
 
 /**
@@ -82,7 +82,7 @@ public abstract class ConsoleModel {
 
     protected ArrayList<Command> commands;
 
-    protected Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.CONSOLE);
+    //protected Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.CONSOLE);
 
     protected ConsoleModel() {
         commands = new ArrayList<Command>();
@@ -144,7 +144,7 @@ public abstract class ConsoleModel {
         final Writer result = new StringWriter();
         final PrintWriter printWriter = new PrintWriter(result);
         t.printStackTrace(printWriter);
-        logger.info("User exception occured. Msg:  " + msg + " stacktrace: " + result);
+        //logger.info("User exception occured. Msg:  " + msg + " stacktrace: " + result);
     }
 
     /**
