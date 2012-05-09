@@ -24,8 +24,8 @@ public final class PerUserConnectionRMProxiesManager extends RMProxiesManager {
 
     private final Object connectionStateLock = new Object();
 
-    public PerUserConnectionRMProxiesManager(URI rmURI, Credentials schedulerProxyCredentials) throws RMException,
-            RMProxyCreationException {
+    public PerUserConnectionRMProxiesManager(URI rmURI, Credentials schedulerProxyCredentials)
+            throws RMException, RMProxyCreationException {
         super(schedulerProxyCredentials);
         rebindRMProxiesManager(rmURI);
 

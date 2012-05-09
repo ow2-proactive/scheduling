@@ -67,9 +67,8 @@ public class TestLinkAnotherRM extends MultipleRMTBase {
         }
 
     }
-    
-    private TaskFlowJob createJob(String communicationObjectUrl)
-            throws Exception {
+
+    private TaskFlowJob createJob(String communicationObjectUrl) throws Exception {
         TaskFlowJob job = new TaskFlowJob();
         job.setName("Test job");
 
@@ -112,11 +111,11 @@ public class TestLinkAnotherRM extends MultipleRMTBase {
 
         checkFreeNodes(helper1.getResourceManager(), NODES_NUMBER);
         checkFreeNodes(helper2.getResourceManager(), NODES_NUMBER);
-        
+
         SchedulerTHelper.startScheduler(false, null, null, rmUrl1);
-        
+
         Scheduler scheduler = SchedulerTHelper.getSchedulerInterface();
-        
+
         CommunicationObject communicationObject1 = PAActiveObject.newActive(CommunicationObject.class,
                 new Object[] {});
         String communicationObjectUrl1 = PAActiveObject.getUrl(communicationObject1);
@@ -132,7 +131,7 @@ public class TestLinkAnotherRM extends MultipleRMTBase {
         System.out.println("Submit job2");
         JobId jobId2 = scheduler.submit(createJob(communicationObjectUrl2));
         SchedulerTHelper.waitForEventJobRunning(jobId2);
-        
+
         System.out.println("Wait when nodes are acquired");
         helper1.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
         helper1.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
@@ -142,7 +141,7 @@ public class TestLinkAnotherRM extends MultipleRMTBase {
         if (!scheduler.linkResourceManager(rmUrl2)) {
             Assert.fail("Failed to link another RM");
         }
-        
+
         System.out.println("Kill job1");
         scheduler.killJob(jobId1);
         SchedulerTHelper.waitForEventJobFinished(jobId1);
@@ -171,6 +170,5 @@ public class TestLinkAnotherRM extends MultipleRMTBase {
         Assert.assertEquals("Unexpected number of free nodes", expectedNumber, rm.getState()
                 .getFreeNodesNumber());
     }
-
 
 }

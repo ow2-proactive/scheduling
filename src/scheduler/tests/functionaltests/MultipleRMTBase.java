@@ -23,8 +23,9 @@ import org.ow2.proactive.scheduler.common.util.FileUtils;
 import org.ow2.proactive.utils.FileToBytesConverter;
 import org.ow2.tests.FunctionalTest;
 
+
 public class MultipleRMTBase extends FunctionalTest {
-    
+
     protected File config1;
 
     protected File config2;
@@ -74,22 +75,22 @@ public class MultipleRMTBase extends FunctionalTest {
             "dbconfig2.xml");
         tempFiles.add(hibernateConfig2);
 
-        writeStringToFile(hibernateConfig1,
-                hibernateConfig.replace(defaultDB, "jdbc:derby:RM_DB1;create=true"));
-        writeStringToFile(hibernateConfig2,
-                hibernateConfig.replace(defaultDB, "jdbc:derby:RM_DB2;create=true"));
+        writeStringToFile(hibernateConfig1, hibernateConfig.replace(defaultDB,
+                "jdbc:derby:RM_DB1;create=true"));
+        writeStringToFile(hibernateConfig2, hibernateConfig.replace(defaultDB,
+                "jdbc:derby:RM_DB2;create=true"));
 
         config1 = new File(System.getProperty("java.io.tmpdir") + File.separator + "rmconfig1.txt");
         tempFiles.add(config1);
         config2 = new File(System.getProperty("java.io.tmpdir") + File.separator + "rmconfig2.txt");
         tempFiles.add(config2);
 
-        config.put(PAResourceManagerProperties.RM_DB_HIBERNATE_CONFIG.getKey(),
-                hibernateConfig1.getAbsolutePath());
+        config.put(PAResourceManagerProperties.RM_DB_HIBERNATE_CONFIG.getKey(), hibernateConfig1
+                .getAbsolutePath());
         config.store(new FileOutputStream(config1), null);
 
-        config.put(PAResourceManagerProperties.RM_DB_HIBERNATE_CONFIG.getKey(),
-                hibernateConfig2.getAbsolutePath());
+        config.put(PAResourceManagerProperties.RM_DB_HIBERNATE_CONFIG.getKey(), hibernateConfig2
+                .getAbsolutePath());
         config.store(new FileOutputStream(config2), null);
     }
 
@@ -103,7 +104,7 @@ public class MultipleRMTBase extends FunctionalTest {
             }
         }
     }
-    
+
     protected void createNodeSource(RMTHelper helper, int rmiPort, int nodesNumber) throws Exception {
         Map<String, String> map = new HashMap<String, String>(1);
         map.put(CentralPAPropertyRepository.PA_RMI_PORT.getName(), String.valueOf(rmiPort));

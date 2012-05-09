@@ -18,8 +18,8 @@ public final class SingleConnectionRMProxiesManager extends RMProxiesManager {
 
     private RMProxyActiveObject currentRMProxy;
 
-    public SingleConnectionRMProxiesManager(URI rmURI, Credentials schedulerProxyCredentials) throws RMException,
-            RMProxyCreationException {
+    public SingleConnectionRMProxiesManager(URI rmURI, Credentials schedulerProxyCredentials)
+            throws RMException, RMProxyCreationException {
         super(schedulerProxyCredentials);
         rebindRMProxiesManager(rmURI);
 

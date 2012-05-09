@@ -45,7 +45,8 @@ public class RMProxyActiveObject {
     public RMProxyActiveObject() {
     }
 
-    static RMProxyActiveObject createAOProxy(RMAuthentication rmAuth, Credentials creds) throws RMProxyCreationException {
+    static RMProxyActiveObject createAOProxy(RMAuthentication rmAuth, Credentials creds)
+            throws RMProxyCreationException {
         try {
             RMProxyActiveObject proxy = PAActiveObject.newActive(RMProxyActiveObject.class, new Object[] {});
             proxy.connect(rmAuth, creds);
@@ -154,7 +155,8 @@ public class RMProxyActiveObject {
                 //TODO - linked to PROACTIVE-936 -> IllegalArgumentException is raised if method name is unknown
                 //should be replaced by checked exception
                 logger_dev
-                        .error("ERROR : Callback method won't be executed, node won't be released. This is a critical state, check the callback method name",
+                        .error(
+                                "ERROR : Callback method won't be executed, node won't be released. This is a critical state, check the callback method name",
                                 e);
             }
             this.nodes.put(node, future);

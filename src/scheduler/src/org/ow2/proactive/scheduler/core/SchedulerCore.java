@@ -852,8 +852,8 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
                                 try {
                                     logger_dev.info("Try to free failed node set");
                                     //free execution node even if it is dead
-                                    rmProxiesManager.getUserRMProxy(job.getOwner(), job.getCredentials()).releaseNodes(
-                                            td.getExecuterInformations().getNodes());
+                                    rmProxiesManager.getUserRMProxy(job.getOwner(), job.getCredentials())
+                                            .releaseNodes(td.getExecuterInformations().getNodes());
                                 } catch (Exception e) {
                                     //just save the rest of the method execution
                                     logger_dev.debug("Failed to free failed node set", e);
@@ -1023,8 +1023,8 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
 
                 try {
                     //free every execution nodes
-                    ((UserRMProxy) rmProxiesManager.getUserRMProxy(job.getOwner(), job.getCredentials())).releaseNodes(nodes, td
-                            .getCleaningScript());
+                    ((UserRMProxy) rmProxiesManager.getUserRMProxy(job.getOwner(), job.getCredentials()))
+                            .releaseNodes(nodes, td.getCleaningScript());
                 } catch (Throwable e) {
                     logger_dev.debug("", e);
                     //we did our best
@@ -1273,8 +1273,9 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
                             new UpdateJobDatabaseCallback(job, descriptor, false));
                     //free execution node even if it is dead
                     try {
-                        ((UserRMProxy) rmProxiesManager.getUserRMProxy(job.getOwner(), job.getCredentials())).releaseNodes(descriptor
-                                .getExecuterInformations().getNodes(), descriptor.getCleaningScript());
+                        ((UserRMProxy) rmProxiesManager.getUserRMProxy(job.getOwner(), job.getCredentials()))
+                                .releaseNodes(descriptor.getExecuterInformations().getNodes(), descriptor
+                                        .getCleaningScript());
                     } catch (RMProxyCreationException rmpce) {
                         logger_dev.debug("", rmpce);
                         //we did our best - should not be thrown here
@@ -1331,8 +1332,9 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
                         descriptor.setNodeExclusion(descriptor.getExecuterInformations().getNodes());
                     }
                     try {
-                        ((UserRMProxy) rmProxiesManager.getUserRMProxy(job.getOwner(), job.getCredentials())).releaseNodes(descriptor
-                                .getExecuterInformations().getNodes(), descriptor.getCleaningScript());
+                        ((UserRMProxy) rmProxiesManager.getUserRMProxy(job.getOwner(), job.getCredentials()))
+                                .releaseNodes(descriptor.getExecuterInformations().getNodes(), descriptor
+                                        .getCleaningScript());
                         hasBeenReleased = true;
                     } catch (Exception e) {
                         logger_dev.error("", e);
@@ -1444,8 +1446,9 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
             if (!hasBeenReleased) {
                 //free every execution nodes
                 try {
-                    ((UserRMProxy) rmProxiesManager.getUserRMProxy(job.getOwner(), job.getCredentials())).releaseNodes(descriptor
-                            .getExecuterInformations().getNodes(), descriptor.getCleaningScript());
+                    ((UserRMProxy) rmProxiesManager.getUserRMProxy(job.getOwner(), job.getCredentials()))
+                            .releaseNodes(descriptor.getExecuterInformations().getNodes(), descriptor
+                                    .getCleaningScript());
                 } catch (RMProxyCreationException e) {
                     logger_dev.debug("", e);
                     //we did our best > should not be thrown
@@ -1920,8 +1923,8 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
                         }
 
                         try {
-                            ((UserRMProxy) rmProxiesManager.getUserRMProxy(j.getOwner(), j.getCredentials())).releaseNodes(nodes, td
-                                    .getCleaningScript());
+                            ((UserRMProxy) rmProxiesManager.getUserRMProxy(j.getOwner(), j.getCredentials()))
+                                    .releaseNodes(nodes, td.getCleaningScript());
                         } catch (Throwable e) {
                             logger_dev.debug("", e);
                             //we did our best - should not be thrown here

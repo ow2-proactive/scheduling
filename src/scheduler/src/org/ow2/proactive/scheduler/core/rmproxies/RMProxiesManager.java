@@ -54,9 +54,9 @@ import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 public abstract class RMProxiesManager {
 
     static class Connection {
-        
+
         private final URI rmURI;
-        
+
         private final RMAuthentication rmAuthentication;
 
         public Connection(URI rmURI, RMAuthentication rmAuthentication) {
@@ -71,7 +71,7 @@ public abstract class RMProxiesManager {
         public RMAuthentication getRmAuthentication() {
             return rmAuthentication;
         }
-        
+
     }
 
     /**
@@ -80,17 +80,19 @@ public abstract class RMProxiesManager {
      * @param rmURI The URI of a started Resource Manager
      * @return an instance of RMProxiesManager joined to the Resource Manager at the given URI
      */
-    public static RMProxiesManager createRMProxiesManager(final URI rmURI) throws RMException, RMProxyCreationException {
+    public static RMProxiesManager createRMProxiesManager(final URI rmURI) throws RMException,
+            RMProxyCreationException {
         Credentials schedulerProxyCredentials;
         try {
             schedulerProxyCredentials = Credentials.getCredentials(PASchedulerProperties
                     .getAbsolutePath(PASchedulerProperties.RESOURCE_MANAGER_CREDS.getValueAsString()));
-            
+
         } catch (Exception e) {
             throw new RMProxyCreationException(e);
         }
 
-        boolean singleConnection = PASchedulerProperties.RESOURCE_MANAGER_SINGLE_CONNECTION.getValueAsBoolean();
+        boolean singleConnection = PASchedulerProperties.RESOURCE_MANAGER_SINGLE_CONNECTION
+                .getValueAsBoolean();
 
         if (singleConnection) {
             return new SingleConnectionRMProxiesManager(rmURI, schedulerProxyCredentials);
@@ -98,13 +100,14 @@ public abstract class RMProxiesManager {
             return new PerUserConnectionRMProxiesManager(rmURI, schedulerProxyCredentials);
         }
     }
-    
+
     protected final Credentials schedulerProxyCredentials;
-    
-    public RMProxiesManager(Credentials schedulerProxyCredentials) throws RMException, RMProxyCreationException {
+
+    public RMProxiesManager(Credentials schedulerProxyCredentials) throws RMException,
+            RMProxyCreationException {
         this.schedulerProxyCredentials = schedulerProxyCredentials;
     }
-    
+
     /**
      * Rebind a RMProxiesManager to another RM using its URI (example : "rmi://localhost:1099/" ).
      *
@@ -127,7 +130,8 @@ public abstract class RMProxiesManager {
      *
      * @return the user RM proxy associated with the given owner.
      */
-    public abstract UserRMProxy getUserRMProxy(String user, Credentials credentials) throws RMProxyCreationException;
+    public abstract UserRMProxy getUserRMProxy(String user, Credentials credentials)
+            throws RMProxyCreationException;
 
     /**
      * Terminate the user RM proxy associated with the given user
@@ -142,7 +146,7 @@ public abstract class RMProxiesManager {
     public abstract void terminateAllProxies();
 
     abstract RMProxyActiveObject getSchedulerProxyActiveObjectForCurrentRM();
-    
+
     abstract Connection getCurrentRMConnection();
 
 }
