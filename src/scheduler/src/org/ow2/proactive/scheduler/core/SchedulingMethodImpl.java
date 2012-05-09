@@ -178,13 +178,7 @@ final class SchedulingMethodImpl implements SchedulingMethod {
 
         while (!taskRetrivedFromPolicy.isEmpty()) {
             //get rmState and update it in scheduling policy
-            RMState rmState = null;
-            try {
-                rmState = core.rmProxiesManager.getSchedulerRMProxy().getState();
-            } catch (RMProxyCreationException rmpce) {
-                logger_dev.error("", rmpce);
-                break;
-            }
+            RMState rmState = core.rmProxiesManager.getSchedulerRMProxy().getState();
             core.policy.setRMState(rmState);
             internalPolicy.RMState = rmState;
             int availableNodesNumber = rmState.getFreeNodesNumber();
@@ -247,7 +241,7 @@ final class SchedulingMethodImpl implements SchedulingMethod {
                     if (tasksToSchedule.isEmpty()) {
                         //get back unused nodes to the RManager
                         if (!nodeSet.isEmpty()) {
-                            core.rmProxiesManager.getUserRMProxy(currentJob).releaseNodes(nodeSet);
+                            core.rmProxiesManager.getUserRMProxy(currentJob.getOwner(), currentJob.getCredentials()).releaseNodes(nodeSet);
                         }
                         //and leave the loop
                         break;
@@ -258,7 +252,7 @@ final class SchedulingMethodImpl implements SchedulingMethod {
                 logger.warn("An exception occured while creating the task launcher.", e1);
                 //so try to get back every remaining nodes to the resource manager
                 try {
-                    core.rmProxiesManager.getUserRMProxy(currentJob).releaseNodes(nodeSet);
+                    core.rmProxiesManager.getUserRMProxy(currentJob.getOwner(), currentJob.getCredentials()).releaseNodes(nodeSet);
                 } catch (Exception e2) {
                     logger_dev.info("Unable to get back the nodeSet to the RM", e2);
                 }
@@ -272,7 +266,7 @@ final class SchedulingMethodImpl implements SchedulingMethod {
                 logger.debug("Timeout while deploying task", e1);
                 //so try to get back every remaining nodes to the resource manager
                 try {
-                    core.rmProxiesManager.getUserRMProxy(currentJob).releaseNodes(nodeSet);
+                    core.rmProxiesManager.getUserRMProxy(currentJob.getOwner(), currentJob.getCredentials()).releaseNodes(nodeSet);
                 } catch (Exception e2) {
                     logger_dev.info("Unable to get back the nodeSet to the RM", e2);
                 }
@@ -281,7 +275,7 @@ final class SchedulingMethodImpl implements SchedulingMethod {
                 logger.warn("An exception occured while starting task.", e1);
                 //so try to get back every remaining nodes to the resource manager
                 try {
-                    core.rmProxiesManager.getUserRMProxy(currentJob).releaseNodes(nodeSet);
+                    core.rmProxiesManager.getUserRMProxy(currentJob.getOwner(), currentJob.getCredentials()).releaseNodes(nodeSet);
                 } catch (Exception e2) {
                     logger_dev.info("Unable to get back the nodeSet to the RM", e2);
                 }
@@ -437,7 +431,7 @@ final class SchedulingMethodImpl implements SchedulingMethod {
                     } else {
                         // set of tasks to scheduler changed, so release all the nodes
                         logger_dev.debug("Set of tasks to scheduler changed. Releasing nodes.");
-                        core.rmProxiesManager.getUserRMProxy(currentJob).releaseNodes(nodes);
+                        core.rmProxiesManager.getUserRMProxy(currentJob.getOwner(), currentJob.getCredentials()).releaseNodes(nodes);
                         rmPendingRequest = null;
                         return null;
                     }
@@ -465,7 +459,7 @@ final class SchedulingMethodImpl implements SchedulingMethod {
 
             NodeSet nodeSet = new NodeSet();
             try {
-                nodeSet = core.rmProxiesManager.getUserRMProxy(currentJob).getNodes(neededResourcesNumber,
+                nodeSet = core.rmProxiesManager.getUserRMProxy(currentJob.getOwner(), currentJob.getCredentials()).getNodes(neededResourcesNumber,
                         descriptor, internalTask.getSelectionScripts(), internalTask.getNodeExclusion(),
                         bestEffort);
             } catch (TopologyDisabledException tde) {
@@ -655,7 +649,7 @@ final class SchedulingMethodImpl implements SchedulingMethod {
                     //exception can come from future.get() -> cancellationException
                     //exception can also come from (1) or (2)
                     nodes.add(node);
-                    core.rmProxiesManager.getUserRMProxy(job).releaseNodes(nodes);
+                    core.rmProxiesManager.getUserRMProxy(job.getOwner(), job.getCredentials()).releaseNodes(nodes);
                 } catch (Throwable ni) {
                     //miam miam
                 }

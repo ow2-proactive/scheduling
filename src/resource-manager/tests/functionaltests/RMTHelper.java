@@ -187,6 +187,11 @@ public class RMTHelper {
                         setup.getJvmParameters() }, StaticPolicy.class.getName(), null);
     }
 
+    public Node createNode(String nodeName, Map<String, String> vmParameters) throws IOException, NodeException {
+        String expectedUrl = "//" + ProActiveInet.getInstance().getHostname() + "/" + nodeName;
+        return createNode(nodeName, expectedUrl, vmParameters);
+    }
+    
     /**
      * Create a ProActive Node in a new JVM on the local host
      * with specific java parameters.
@@ -199,7 +204,7 @@ public class RMTHelper {
      * @throws IOException if the external JVM cannot be created
      * @throws NodeException if lookup of the new node fails.
      */
-    public Node createNode(String nodeName, Map<String, String> vmParameters) throws IOException,
+    public Node createNode(String nodeName, String expectedUrl, Map<String, String> vmParameters) throws IOException,
             NodeException {
 
         JVMProcessImpl nodeProcess = new JVMProcessImpl(
@@ -225,8 +230,7 @@ public class RMTHelper {
             NodeException toThrow = null;
             for (int i = 0; i < 12; i++) {
                 try {
-                    newNode = NodeFactory.getNode("//" + ProActiveInet.getInstance().getHostname() + "/" +
-                        nodeName);
+                    newNode = NodeFactory.getNode(expectedUrl);
                 } catch (NodeException e) {
                     toThrow = e;
                     //nothing, wait another loop

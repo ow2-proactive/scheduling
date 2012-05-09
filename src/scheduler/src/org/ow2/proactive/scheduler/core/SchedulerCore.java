@@ -443,7 +443,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
             this.jobClasspathManager = new JobClasspathManager();
 
             //try connect to RM with Scheduler user
-            this.rmProxiesManager = RMProxiesManager.getRMProxiesManager(rmURL);
+            this.rmProxiesManager = RMProxiesManager.createRMProxiesManager(rmURL);
             this.rmProxiesManager.getSchedulerRMProxy();//-> used to connect RM
             //init
             this.jobs = new HashMap<JobId, InternalJob>();
@@ -684,8 +684,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
                         } catch (Exception rme) {
                             logger_dev.error("Resource Manager seems to be dead", rme);
                             //try to terminate every proxies
-                            rmProxiesManager.terminateSchedulerRMProxy();
-                            rmProxiesManager.terminateAllUsersRMProxies();
+                            rmProxiesManager.terminateAllProxies();
                             //if failed
                             freeze();
                             //scheduler functionality are reduced until now
@@ -704,8 +703,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
                         logger_dev.error("\nSchedulerCore.runActivity(MAIN_LOOP) caught an ERROR !", e);
                         //Terminate proxy and disconnecting RM
                         logger_dev.error("Resource Manager will be disconnected");
-                        rmProxiesManager.terminateSchedulerRMProxy();
-                        rmProxiesManager.terminateAllUsersRMProxies();
+                        rmProxiesManager.terminateAllProxies();
                         //if failed
                         freeze();
                         //scheduler functionality are reduced until now
@@ -766,8 +764,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
 
         logger.info("Terminating...");
         //try to disconnect every proxies
-        rmProxiesManager.terminateSchedulerRMProxy();
-        rmProxiesManager.terminateAllUsersRMProxies();
+        rmProxiesManager.terminateAllProxies();
         logger_dev.info("Resource Manager proxies shutdown");
 
         if (status == SchedulerStatus.SHUTTING_DOWN) {
@@ -855,7 +852,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
                                 try {
                                     logger_dev.info("Try to free failed node set");
                                     //free execution node even if it is dead
-                                    rmProxiesManager.getUserRMProxy(job).releaseNodes(
+                                    rmProxiesManager.getUserRMProxy(job.getOwner(), job.getCredentials()).releaseNodes(
                                             td.getExecuterInformations().getNodes());
                                 } catch (Exception e) {
                                     //just save the rest of the method execution
@@ -1026,7 +1023,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
 
                 try {
                     //free every execution nodes
-                    ((UserRMProxy) rmProxiesManager.getUserRMProxy(job)).releaseNodes(nodes, td
+                    ((UserRMProxy) rmProxiesManager.getUserRMProxy(job.getOwner(), job.getCredentials())).releaseNodes(nodes, td
                             .getCleaningScript());
                 } catch (Throwable e) {
                     logger_dev.debug("", e);
@@ -1241,7 +1238,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
                             new UpdateJobDatabaseCallback(job, descriptor, false));
                     //free execution node even if it is dead
                     try {
-                        rmProxiesManager.getUserRMProxy(job).releaseNodes(
+                        rmProxiesManager.getUserRMProxy(job.getOwner(), job.getCredentials()).releaseNodes(
                                 descriptor.getExecuterInformations().getNodes());
                         hasBeenReleased = true;
                     } catch (Exception e) {
@@ -1276,7 +1273,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
                             new UpdateJobDatabaseCallback(job, descriptor, false));
                     //free execution node even if it is dead
                     try {
-                        ((UserRMProxy) rmProxiesManager.getUserRMProxy(job)).releaseNodes(descriptor
+                        ((UserRMProxy) rmProxiesManager.getUserRMProxy(job.getOwner(), job.getCredentials())).releaseNodes(descriptor
                                 .getExecuterInformations().getNodes(), descriptor.getCleaningScript());
                     } catch (RMProxyCreationException rmpce) {
                         logger_dev.debug("", rmpce);
@@ -1334,7 +1331,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
                         descriptor.setNodeExclusion(descriptor.getExecuterInformations().getNodes());
                     }
                     try {
-                        ((UserRMProxy) rmProxiesManager.getUserRMProxy(job)).releaseNodes(descriptor
+                        ((UserRMProxy) rmProxiesManager.getUserRMProxy(job.getOwner(), job.getCredentials())).releaseNodes(descriptor
                                 .getExecuterInformations().getNodes(), descriptor.getCleaningScript());
                         hasBeenReleased = true;
                     } catch (Exception e) {
@@ -1447,7 +1444,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
             if (!hasBeenReleased) {
                 //free every execution nodes
                 try {
-                    ((UserRMProxy) rmProxiesManager.getUserRMProxy(job)).releaseNodes(descriptor
+                    ((UserRMProxy) rmProxiesManager.getUserRMProxy(job.getOwner(), job.getCredentials())).releaseNodes(descriptor
                             .getExecuterInformations().getNodes(), descriptor.getCleaningScript());
                 } catch (RMProxyCreationException e) {
                     logger_dev.debug("", e);
@@ -1482,7 +1479,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
             }
         }
         //if not found in pending and running, terminate proxy
-        rmProxiesManager.terminateUserRMProxy(job);
+        rmProxiesManager.terminateUserRMProxy(job.getOwner());
     }
 
     /**
@@ -1923,7 +1920,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
                         }
 
                         try {
-                            ((UserRMProxy) rmProxiesManager.getUserRMProxy(j)).releaseNodes(nodes, td
+                            ((UserRMProxy) rmProxiesManager.getUserRMProxy(j.getOwner(), j.getCredentials())).releaseNodes(nodes, td
                                     .getCleaningScript());
                         } catch (Throwable e) {
                             logger_dev.debug("", e);
@@ -2139,20 +2136,17 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
      * {@inheritDoc}
      */
     public boolean linkResourceManager(String rmURL) {
-        //only if unlink
-        if (status != SchedulerStatus.UNLINKED) {
-            return false;
-        }
         try {
             //re-link the RM
-            rmProxiesManager = RMProxiesManager.rebindRMProxiesManager(new URI(rmURL.trim()));
-            rmProxiesManager.getSchedulerRMProxy();
-            logger
-                    .info("New resource manager has been linked to the scheduler.\n\t-> Resume to continue the scheduling.");
-            frontend.schedulerStateUpdated(SchedulerEvent.RM_UP);
-            //restart the scheduler
-            status = SchedulerStatus.STARTED;
-            frontend.schedulerStateUpdated(SchedulerEvent.STARTED);
+            rmProxiesManager.rebindRMProxiesManager(new URI(rmURL.trim()));
+            logger.info("New resource manager has been linked to the scheduler");
+            if (status == SchedulerStatus.UNLINKED) {
+                logger.info("Resume to continue the scheduling.");
+                frontend.schedulerStateUpdated(SchedulerEvent.RM_UP);
+                //restart the scheduler
+                status = SchedulerStatus.STARTED;
+                frontend.schedulerStateUpdated(SchedulerEvent.STARTED);
+            }
             return true;
         } catch (Exception e) {
             throw new InternalException("Error while connecting the new Resource Manager !", e);

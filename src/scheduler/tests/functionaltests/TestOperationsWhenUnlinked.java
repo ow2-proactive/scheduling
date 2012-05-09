@@ -27,6 +27,8 @@ import org.ow2.tests.FunctionalTest;
  */
 public class TestOperationsWhenUnlinked extends FunctionalTest {
 
+    static final String TASK_NAME = "Test task";
+
     public static class TestJavaTask extends JavaExecutable {
 
         @Override
@@ -69,13 +71,6 @@ public class TestOperationsWhenUnlinked extends FunctionalTest {
 
         System.out.println("Waiting RM_DOWN event");
         SchedulerTHelper.waitForEventSchedulerState(SchedulerEvent.RM_DOWN, 30000);
-
-        System.out.println("Creating new RM");
-        helper.getResourceManager();
-        helper.createDefaultNodeSource(2);
-
-        System.out.println("Linking new RM");
-        scheduler.linkResourceManager(rmUrl);
 
         System.out.println("Killing job1");
         if (!scheduler.killJob(jobId1)) {
@@ -120,7 +115,9 @@ public class TestOperationsWhenUnlinked extends FunctionalTest {
         helper.createDefaultNodeSource(2);
 
         System.out.println("Linking new RM");
-        scheduler.linkResourceManager(rmUrl);
+        if (!scheduler.linkResourceManager(rmUrl)) {
+            Assert.fail("Failed to link another RM");
+        }
 
         System.out.println("Waiting when jobs finish");
         SchedulerTHelper.waitForEventJobFinished(jobId1);
@@ -143,8 +140,6 @@ public class TestOperationsWhenUnlinked extends FunctionalTest {
             Assert.assertTrue("Unxepected output", output.contains("OK"));
         }
     }
-
-    static final String TASK_NAME = "Test task";
 
     private TaskFlowJob createJob() throws Exception {
         TaskFlowJob job = new TaskFlowJob();

@@ -36,51 +36,23 @@
  */
 package org.ow2.proactive.scheduler.core.rmproxies;
 
-import java.util.Set;
-
-import org.objectweb.proactive.annotation.ImmediateService;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
-import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.ow2.proactive.resourcemanager.common.RMState;
 
 
-/**
- * SchedulerRMProxy is the ResourceManager proxy for Scheduler core.
- * It is currently implemented has an active Object that forwards call to Resource Manager.
- *
- * @author The ProActive Team
- * @since ProActive Scheduling 2.2
- */
-@ActiveObject
-public class SchedulerRMProxy extends UserRMProxy {
+public class SchedulerRMProxy {
 
-    /**
-     * ProActive constructor, DO NOT USE
-     */
-    public SchedulerRMProxy() {
+    private final RMProxiesManager proxiesManager;
+
+    SchedulerRMProxy(RMProxiesManager proxiesManager) {
+        this.proxiesManager = proxiesManager;
     }
 
-    public SchedulerRMProxy(Set<String> filters) {
-        super(filters);
-    }
-
-    /************************ INHERITED FROM RESOURCE-MANAGER **********************/
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @ImmediateService
-    public RMState getState() {
-        return rm.getState();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @ImmediateService
     public BooleanWrapper isActive() {
-        return rm.isActive();
+        return proxiesManager.getSchedulerProxyActiveObjectForCurrentRM().isActive();
+    }
+
+    public RMState getState() {
+        return proxiesManager.getSchedulerProxyActiveObjectForCurrentRM().getState();
     }
 }
