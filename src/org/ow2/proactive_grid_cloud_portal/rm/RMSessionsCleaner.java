@@ -50,6 +50,7 @@ import org.ow2.proactive.resourcemanager.common.util.RMCachingProxyUserInterface
 import org.ow2.proactive.resourcemanager.common.util.RMProxyUserInterface;
 import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 
+
 /**
  * The ressource manager does not disconnect clients by itself, there is no session timeout.
  * This class takes care of removing rm proxies that have been not used during a given
@@ -104,10 +105,10 @@ public class RMSessionsCleaner implements Runnable {
                                 // if not connected, removing it from the session map
                                 // to clean
                                 logger.info("RM session " + entry.getKey() +
-                                " is scheduled for deletion, timeout reached");
+                                    " is scheduled for deletion, timeout reached");
 
-                                rmproxy.disconnect(); 
-                                
+                                rmproxy.disconnect();
+
                                 scheduledforRemoval.add(entry);
                                 removedSession++;
                             }

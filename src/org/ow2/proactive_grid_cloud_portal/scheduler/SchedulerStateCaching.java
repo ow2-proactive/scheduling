@@ -103,7 +103,7 @@ public class SchedulerStateCaching {
 
         new Thread(new Runnable() {
             public void run() {
-                revisionAndLightSchedulerState =  new HashMap<AtomicLong,  LightSchedulerState>();
+                revisionAndLightSchedulerState = new HashMap<AtomicLong, LightSchedulerState>();
                 revisionAndLightSchedulerState.put(new AtomicLong(-1), new LightSchedulerState());
 
                 init_();
@@ -164,21 +164,25 @@ public class SchedulerStateCaching {
                     long currentSchedulerStateRevision = scheduler.getSchedulerStateRevision();
                     try {
                         if (currentSchedulerStateRevision != schedulerRevision) {
-                        	long begin = System.currentTimeMillis();
-                             HashMap<AtomicLong, LightSchedulerState> schedStateTmp = scheduler.getLightSchedulerState();
+                            long begin = System.currentTimeMillis();
+                            HashMap<AtomicLong, LightSchedulerState> schedStateTmp = scheduler
+                                    .getLightSchedulerState();
                             PAFuture.waitFor(schedStateTmp);
-                            long end = System.currentTimeMillis();                            
+                            long end = System.currentTimeMillis();
                             revisionAndLightSchedulerState = schedStateTmp;
-                            Entry<AtomicLong, LightSchedulerState> tmp = revisionAndLightSchedulerState.entrySet()
-                                    .iterator().next();
+                            Entry<AtomicLong, LightSchedulerState> tmp = revisionAndLightSchedulerState
+                                    .entrySet().iterator().next();
                             lightLocalState = tmp.getValue();
                             schedulerRevision = tmp.getKey().longValue();
-                            logger.debug("updated scheduler state revision at " + schedulerRevision + " ,took " + (end- begin) + " msecs for " + lightLocalState.getJobs().size() + " jobs");
+                            logger.debug("updated scheduler state revision at " + schedulerRevision +
+                                " ,took " + (end - begin) + " msecs for " + lightLocalState.getJobs().size() +
+                                " jobs");
                         }
                     } catch (Throwable t) {
-                        logger.info(
-                                "exception thrown when updating scheduler caching, cache not updated, connection resetted",
-                                t);
+                        logger
+                                .info(
+                                        "exception thrown when updating scheduler caching, cache not updated, connection resetted",
+                                        t);
                         init_();
                     }
                     new Sleeper(refreshInterval).sleep();
@@ -195,8 +199,9 @@ public class SchedulerStateCaching {
                     try {
                         scheduler.renewSession();
                     } catch (Exception e) {
-                        logger.info("leaseRenewerThread was not able to call the renewSession method, exception message is " +
-                            e.getMessage());
+                        logger
+                                .info("leaseRenewerThread was not able to call the renewSession method, exception message is " +
+                                    e.getMessage());
                         init_();
                     }
                 }
@@ -240,7 +245,7 @@ public class SchedulerStateCaching {
         return revisionAndLightSchedulerState;
     }
 
-	public static Map<AtomicLong, SchedulerState> getRevisionAndSchedulerState() {
-		return scheduler.getRevisionVersionAndSchedulerState();
-	}
+    public static Map<AtomicLong, SchedulerState> getRevisionAndSchedulerState() {
+        return scheduler.getRevisionVersionAndSchedulerState();
+    }
 }

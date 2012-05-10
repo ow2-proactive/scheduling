@@ -44,12 +44,12 @@ import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.frontend.RMEventListener;
 import org.ow2.proactive.resourcemanager.frontend.RMMonitoringImpl;
 
+
 public class CachingRMEventListener implements RMEventListener {
 
     protected RMMonitoringImpl rmMonitoring;
     protected RMInitialState rmInitialState;
     protected RMEventType RMstate;
-
 
     public void rmEvent(RMEvent event) {
         switch (event.getEventType()) {
@@ -64,19 +64,19 @@ public class CachingRMEventListener implements RMEventListener {
     }
 
     public void nodeSourceEvent(RMNodeSourceEvent event) {
-       switch (event.getEventType()) {
-           case NODESOURCE_CREATED:
-               rmInitialState.getNodeSource().add(event);
-               break;
-           case NODESOURCE_REMOVED:
-               for (int i = 0 ; i < rmInitialState.getNodeSource().size(); i++) {
-                   if (rmInitialState.getNodeSource().get(i).getSourceName().equals(event.getSourceName())) {
-                       rmInitialState.getNodeSource().remove(i);
-                       break;
-                   }
-               }
-               break;
-       }
+        switch (event.getEventType()) {
+            case NODESOURCE_CREATED:
+                rmInitialState.getNodeSource().add(event);
+                break;
+            case NODESOURCE_REMOVED:
+                for (int i = 0; i < rmInitialState.getNodeSource().size(); i++) {
+                    if (rmInitialState.getNodeSource().get(i).getSourceName().equals(event.getSourceName())) {
+                        rmInitialState.getNodeSource().remove(i);
+                        break;
+                    }
+                }
+                break;
+        }
 
     }
 
@@ -96,17 +96,14 @@ public class CachingRMEventListener implements RMEventListener {
             case NODE_STATE_CHANGED:
                 for (int i = 0; i < rmInitialState.getNodesEvents().size(); i++) {
                     if (event.getNodeUrl().equals(rmInitialState.getNodesEvents().get(i))) {
-                        rmInitialState.getNodesEvents().set(i,event);
+                        rmInitialState.getNodesEvents().set(i, event);
                         break;
                     }
                 }
                 break;
 
-
         }
 
-      }
-
-
+    }
 
 }

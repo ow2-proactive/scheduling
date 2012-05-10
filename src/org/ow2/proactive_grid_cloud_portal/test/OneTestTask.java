@@ -43,24 +43,21 @@ import java.util.Map;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 
+
 public class OneTestTask extends JavaExecutable {
 
-        String schedulerUrl; 
-    
-        @Override
-        public void init(Map<String, Serializable> args) throws Exception {
-            super.init(args);   
-            schedulerUrl = (String) args.get("rest_api_url");
-        }
-        
-        
-        @Override
-        public Serializable execute(TaskResult... results) throws Throwable {
-            
-            return new OneClient().test(URI.create(schedulerUrl));
-            
-            
-        }
-    }
-          
+    String schedulerUrl;
 
+    @Override
+    public void init(Map<String, Serializable> args) throws Exception {
+        super.init(args);
+        schedulerUrl = (String) args.get("rest_api_url");
+    }
+
+    @Override
+    public Serializable execute(TaskResult... results) throws Throwable {
+
+        return new OneClient().test(URI.create(schedulerUrl));
+
+    }
+}

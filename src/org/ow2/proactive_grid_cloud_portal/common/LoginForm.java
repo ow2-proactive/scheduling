@@ -73,7 +73,7 @@ public class LoginForm {
      * ssh key for runAsMe
      */
     private byte[] sshKey;
-    
+
     public LoginForm() {
     }
 
@@ -108,7 +108,7 @@ public class LoginForm {
     public byte[] getSshKey() {
         return sshKey;
     }
-    
+
     @FormParam("sshkey")
     public void setSshKey(String sshKeyStream) {
         this.sshKey = sshKeyStream.getBytes();

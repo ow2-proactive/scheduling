@@ -85,9 +85,9 @@ public class LoggingInterceptor implements PreProcessInterceptor, PostProcessInt
         if (logger.isDebugEnabled()) {
 
             String httpMethod = request.getHttpMethod();
-            
-            URI uri = ui.getRequestUri(); 
-            
+
+            URI uri = ui.getRequestUri();
+
             String uriPath = uri.getPath();
             if (uri.getQuery() != null) {
                 uriPath += "?" + uri.getQuery();
@@ -95,7 +95,7 @@ public class LoggingInterceptor implements PreProcessInterceptor, PostProcessInt
             if (uri.getFragment() != null) {
                 uriPath += "#" + uri.getFragment();
             }
-            
+
             String sessionid = null;
             List<String> headerSessionId = request.getHttpHeaders().getRequestHeader("sessionid");
             if (headerSessionId != null) {
@@ -130,7 +130,7 @@ public class LoggingInterceptor implements PreProcessInterceptor, PostProcessInt
         if (uri.getFragment() != null) {
             uriPath += "#" + uri.getFragment();
         }
-        
+
         if (logger.isDebugEnabled()) {
             // in debug mode log anything
             logger.info(sessionid + "|" + uriPath + "|" + response.getStatus() + "|" +

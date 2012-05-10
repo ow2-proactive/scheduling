@@ -44,6 +44,7 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.SerializationConfig;
 import org.codehaus.jackson.xc.JaxbAnnotationIntrospector;
 
+
 /**
  * Configuration class that allows to specialize the behaviour of
  * the JSon serialization made by the Jackson Provicer
@@ -61,6 +62,5 @@ public class JacksonProvider implements ContextResolver<ObjectMapper> {
         mapper.getSerializationConfig().disable(SerializationConfig.Feature.FAIL_ON_EMPTY_BEANS);
         return mapper;
     }
-    
-    
+
 }

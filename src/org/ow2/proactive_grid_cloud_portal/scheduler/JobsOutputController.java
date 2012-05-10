@@ -117,14 +117,14 @@ public class JobsOutputController {
      * @return the output of the specified job, or null
      * @see JobsOutputController#createJobOutput(JobId)
      */
-  /*  public JobOutput getJobOutput(String sessionId, String jobId) {
-        JobOutputAppender joa = appenders.get(generateAppendersKey(sessionId, jobId));
-        if (joa == null) {
-            return null;
-        } else {
-            return joa.getJobOutput();
-        }
-    }*/
+    /*  public JobOutput getJobOutput(String sessionId, String jobId) {
+          JobOutputAppender joa = appenders.get(generateAppendersKey(sessionId, jobId));
+          if (joa == null) {
+              return null;
+          } else {
+              return joa.getJobOutput();
+          }
+      }*/
 
     /**
      * Create an output for a job identified by the given jobId
@@ -142,13 +142,8 @@ public class JobsOutputController {
     public JobOutputAppender createJobOutput(SchedulerSession ss, String jobId) throws NotConnectedException,
             UnknownJobException, PermissionException, LogForwardingException, IOException {
 
-        
-        
-        return new JobOutputAppender(ss,
-                jobId,
-                lfs.getAppenderProvider(),
-                new JobOutput(PREFIX_JOB_OUTPUT_TITLE + jobId, new CircularArrayList<String>(50)));
-        
+        return new JobOutputAppender(ss, jobId, lfs.getAppenderProvider(), new JobOutput(
+            PREFIX_JOB_OUTPUT_TITLE + jobId, new CircularArrayList<String>(50)));
 
     }
 
@@ -158,16 +153,16 @@ public class JobsOutputController {
      * @param jobId
      *            the jobId
      */
-   /* public void removeJobOutput(String sessionId) {
-        JobOutputAppender joa = 
-        if (joa != null) {
-            joa.close();
-        }
-        Logger log = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX + jobId);
-        log.removeAppender(joa);
-        appenders.remove(generateAppendersKey(sessionId, jobId));
-    }
-*/
+    /* public void removeJobOutput(String sessionId) {
+         JobOutputAppender joa = 
+         if (joa != null) {
+             joa.close();
+         }
+         Logger log = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX + jobId);
+         log.removeAppender(joa);
+         appenders.remove(generateAppendersKey(sessionId, jobId));
+     }
+     */
     /**
      * Remove all output ! This method clear the console.
      */

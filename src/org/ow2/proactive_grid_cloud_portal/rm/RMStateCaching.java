@@ -51,6 +51,7 @@ import org.ow2.proactive.resourcemanager.core.RMCore;
 import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 import org.ow2.proactive_grid_cloud_portal.webapp.PortalConfiguration;
 
+
 /**
  * Periodically request {@link RMCore#getMonitoring()}, store it locally
  * <p>
@@ -67,114 +68,109 @@ import org.ow2.proactive_grid_cloud_portal.webapp.PortalConfiguration;
  */
 public class RMStateCaching {
 
-	private static Logger logger = ProActiveLogger
-			.getLogger(SchedulerLoggers.PREFIX + ".rest.rm.caching");
+    private static Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.PREFIX + ".rest.rm.caching");
 
-	private static RMCachingProxyUserInterface rm;
-	private static RMInitialState state;
+    private static RMCachingProxyUserInterface rm;
+    private static RMInitialState state;
 
-	private static Thread rmUpdater;
-	private static int refreshInterval;
+    private static Thread rmUpdater;
+    private static int refreshInterval;
 
-	private static boolean kill = false;
+    private static boolean kill = false;
 
-	/**
-	 * Start a thread that will periodically fetch {@link RMCore#getMonitoring()}
-	 * <p>
-	 * Thread frequency can be customized using {@link PortalConfiguration#rm_cache_refreshrate}
-	 * <p>
-	 * Cached object can be retreived using {@link #getRMInitialState()}
-	 * <p>
-	 * Stop this thread by calling {@link #kill()}
-	 */
-	public synchronized static void init() {
-		new Thread(new Runnable() {
-			@Override
-			public void run() {
-				state = new RMInitialState();
+    /**
+     * Start a thread that will periodically fetch {@link RMCore#getMonitoring()}
+     * <p>
+     * Thread frequency can be customized using {@link PortalConfiguration#rm_cache_refreshrate}
+     * <p>
+     * Cached object can be retreived using {@link #getRMInitialState()}
+     * <p>
+     * Stop this thread by calling {@link #kill()}
+     */
+    public synchronized static void init() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                state = new RMInitialState();
 
-				init_();
-				run_();
-			}
-		}).start();
-	}
+                init_();
+                run_();
+            }
+        }).start();
+    }
 
-	private static void init_() {
-		refreshInterval = Integer.parseInt(PortalConfiguration.getProperties()
-				.getProperty(PortalConfiguration.rm_cache_refreshrate));
+    private static void init_() {
+        refreshInterval = Integer.parseInt(PortalConfiguration.getProperties().getProperty(
+                PortalConfiguration.rm_cache_refreshrate));
 
-		while (rm == null) {
-			String url = PortalConfiguration.getProperties().getProperty(
-					PortalConfiguration.rm_url);
-			String cred_path = PortalConfiguration.getProperties().getProperty(
-					PortalConfiguration.rm_cache_credential);
+        while (rm == null) {
+            String url = PortalConfiguration.getProperties().getProperty(PortalConfiguration.rm_url);
+            String cred_path = PortalConfiguration.getProperties().getProperty(
+                    PortalConfiguration.rm_cache_credential);
 
-			try {
-				if (rm == null) {
-					rm = PAActiveObject.newActive(
-							RMCachingProxyUserInterface.class, new Object[] {});
-					File f = new File(cred_path);
-					if (f.exists()) {
-						Credentials cred = Credentials
-								.getCredentials(cred_path);
-						rm.init(url, cred);
-					} else {
-						String login = PortalConfiguration
-								.getProperties()
-								.getProperty(PortalConfiguration.rm_cache_login);
-						String password = PortalConfiguration.getProperties()
-								.getProperty(
-										PortalConfiguration.rm_cache_password);
-						rm.init(url, new CredData(login, password));
-					}
-				}
-			} catch (Exception e) {
-				PAActiveObject.terminateActiveObject(rm, true);
-				rm = null;
-				new Sleeper(8 * 1000).sleep();
-				continue;
-			}
-		}
-	}
+            try {
+                if (rm == null) {
+                    rm = PAActiveObject.newActive(RMCachingProxyUserInterface.class, new Object[] {});
+                    File f = new File(cred_path);
+                    if (f.exists()) {
+                        Credentials cred = Credentials.getCredentials(cred_path);
+                        rm.init(url, cred);
+                    } else {
+                        String login = PortalConfiguration.getProperties().getProperty(
+                                PortalConfiguration.rm_cache_login);
+                        String password = PortalConfiguration.getProperties().getProperty(
+                                PortalConfiguration.rm_cache_password);
+                        rm.init(url, new CredData(login, password));
+                    }
+                }
+            } catch (Exception e) {
+                PAActiveObject.terminateActiveObject(rm, true);
+                rm = null;
+                new Sleeper(8 * 1000).sleep();
+                continue;
+            }
+        }
+    }
 
-	private static void run_() {
-		rmUpdater = new Thread(new Runnable() {
-			@Override
-			public void run() {
-				while (!kill) {
+    private static void run_() {
+        rmUpdater = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (!kill) {
 
-					try {
-					long t1 = System.currentTimeMillis();
-					state = PAFuture.getFutureValue(rm.getRMInitialState());
-					long t2 = System.currentTimeMillis();
-					logger.debug("updated RM initial state in " + (t2 - t1)
-							+ "ms");
-					} catch (Throwable t) {
-						logger.error("Exception occurrend while updating RM state cache, connection reset", t);
-						init_();
-					}
+                    try {
+                        long t1 = System.currentTimeMillis();
+                        state = PAFuture.getFutureValue(rm.getRMInitialState());
+                        long t2 = System.currentTimeMillis();
+                        logger.debug("updated RM initial state in " + (t2 - t1) + "ms");
+                    } catch (Throwable t) {
+                        logger
+                                .error("Exception occurrend while updating RM state cache, connection reset",
+                                        t);
+                        init_();
+                    }
 
-					new Sleeper(refreshInterval).sleep();
-				}
-			}
-		});
-		rmUpdater.setName("RM Initial State Cache Updater");
-		rmUpdater.setDaemon(true);
-		rmUpdater.start();
-	}
+                    new Sleeper(refreshInterval).sleep();
+                }
+            }
+        });
+        rmUpdater.setName("RM Initial State Cache Updater");
+        rmUpdater.setDaemon(true);
+        rmUpdater.start();
+    }
 
-	/**
-	 * @return cached RM State as returned by {@link RMCore#getMonitoring()}
-	 */
-	public static RMInitialState getRMInitialState() {
-		return state;
-	}
+    /**
+     * @return cached RM State as returned by {@link RMCore#getMonitoring()}
+     */
+    public static RMInitialState getRMInitialState() {
+        return state;
+    }
 
-	/**
-	 * @return stop the RM State polling thread
-	 */
-	public static void kill() {
-		RMStateCaching.kill = true;
-	}
+    /**
+     * @return stop the RM State polling thread
+     */
+    public static void kill() {
+        RMStateCaching.kill = true;
+    }
 
 }

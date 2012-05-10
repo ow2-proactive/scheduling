@@ -43,6 +43,7 @@ import java.util.List;
 import org.ow2.proactive.scheduler.common.SchedulerStatus;
 import org.ow2.proactive.scheduler.common.job.UserIdentification;
 
+
 /**
  * Subset of org.ow2.proactive.scheduler.common.SchedulerState
  * that is small and fast to serialize
@@ -50,35 +51,34 @@ import org.ow2.proactive.scheduler.common.job.UserIdentification;
  */
 public class LightSchedulerState implements Serializable {
 
-	private List<UserJobInfo> jobs = null;
+    private List<UserJobInfo> jobs = null;
 
-	private List<UserIdentification> users = null;
+    private List<UserIdentification> users = null;
 
-	private SchedulerStatus status = null;
+    private SchedulerStatus status = null;
 
-	public LightSchedulerState() {
-		this.jobs = new ArrayList<UserJobInfo>();
-		this.users = new ArrayList<UserIdentification>();
-		this.status = SchedulerStatus.STOPPED;
-	}
-	
-	public LightSchedulerState(List<UserJobInfo> jobs,
-			List<UserIdentification> users, SchedulerStatus status) {
-		this.jobs = jobs;
-		this.users = users;
-		this.status = status;
-	}
+    public LightSchedulerState() {
+        this.jobs = new ArrayList<UserJobInfo>();
+        this.users = new ArrayList<UserIdentification>();
+        this.status = SchedulerStatus.STOPPED;
+    }
 
-	public List<UserJobInfo> getJobs() {
-		return jobs;
-	}
+    public LightSchedulerState(List<UserJobInfo> jobs, List<UserIdentification> users, SchedulerStatus status) {
+        this.jobs = jobs;
+        this.users = users;
+        this.status = status;
+    }
 
-	public List<UserIdentification> getUsers() {
-		return users;
-	}
+    public List<UserJobInfo> getJobs() {
+        return jobs;
+    }
 
-	public SchedulerStatus getStatus() {
-		return status;
-	}
+    public List<UserIdentification> getUsers() {
+        return users;
+    }
+
+    public SchedulerStatus getStatus() {
+        return status;
+    }
 
 }

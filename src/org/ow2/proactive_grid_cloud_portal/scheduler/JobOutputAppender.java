@@ -70,12 +70,13 @@ public class JobOutputAppender extends AppenderSkeleton {
      * @throws UnknownJobException 
      * @throws NotConnectedException 
      */
-    public JobOutputAppender(SchedulerSession ss, String jobId, AppenderProvider ap, JobOutput jobOutput) throws NotConnectedException, UnknownJobException, PermissionException {
+    public JobOutputAppender(SchedulerSession ss, String jobId, AppenderProvider ap, JobOutput jobOutput)
+            throws NotConnectedException, UnknownJobException, PermissionException {
         this.name = "Appender for job output";
         this.ss = ss;
         this.jobOutput = jobOutput;
-        this.jobId =  jobId;
-        
+        this.jobId = jobId;
+
         this.setLayout(Log4JTaskLogs.getTaskLogLayout());
         Logger log = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX + this.jobId);
         log.setAdditivity(false);
@@ -83,7 +84,7 @@ public class JobOutputAppender extends AppenderSkeleton {
         log.addAppender(this);
         ss.setJobOutputAppender(this);
         ss.getScheduler().listenJobLogs(jobId, ap);
-        
+
     }
 
     // -------------------------------------------------------------------- //
@@ -98,12 +99,12 @@ public class JobOutputAppender extends AppenderSkeleton {
         return jobOutput;
     }
 
-    public void terminate () {
+    public void terminate() {
         close();
         Logger log = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX + jobId);
         log.removeAppender(this);
     }
-    
+
     // -------------------------------------------------------------------- //
     // -------------------- extends AppenderSkeleton ---------------------- //
     // -------------------------------------------------------------------- //

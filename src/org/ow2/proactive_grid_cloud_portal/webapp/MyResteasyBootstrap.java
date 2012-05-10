@@ -82,9 +82,9 @@ public class MyResteasyBootstrap extends ResteasyBootstrap {
         //        RuntimeDelegate.setInstance(dispatcher);
         //        RegisterBuiltin.register(dispatcher);
 
-//        ResteasyProviderFactory dispatcher = new ResteasyProviderFactory();
-//        RuntimeDelegate.setInstance(dispatcher);
-//        RegisterBuiltin.register(dispatcher);
+        //        ResteasyProviderFactory dispatcher = new ResteasyProviderFactory();
+        //        RuntimeDelegate.setInstance(dispatcher);
+        //        RegisterBuiltin.register(dispatcher);
 
         dispatcher.addStringConverter(RestartModeConverter.class);
         dispatcher.addStringConverter(IntWrapperConverter.class);
@@ -127,7 +127,7 @@ public class MyResteasyBootstrap extends ResteasyBootstrap {
                         false);
             }
         }
-        
+
         System.setProperty("scheduler.database.nodb", "true");
 
         // initialize the scheduler's state cache
@@ -156,8 +156,8 @@ public class MyResteasyBootstrap extends ResteasyBootstrap {
 
         // happily terminate sessions
 
-        String[] sessionids = SchedulerSessionMapper.getInstance().getSessionsMap().keySet()
-                .toArray(new String[] {});
+        String[] sessionids = SchedulerSessionMapper.getInstance().getSessionsMap().keySet().toArray(
+                new String[] {});
         int i = 0;
         for (; i < sessionids.length; i++) {
             Scheduler s = SchedulerSessionMapper.getInstance().getSessionsMap().get(sessionids[i])

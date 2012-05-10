@@ -75,7 +75,9 @@ public class SchedulerSessionsCleaner implements Runnable {
     public void run() {
         while (!stop) {
             Map<String, SchedulerSession> sessionMap = ssm.getSessionsMap();
-            logger.info("Scheduler sessions cleaning started, " + sessionMap.size() + " existing session(s) ");
+            logger
+                    .info("Scheduler sessions cleaning started, " + sessionMap.size() +
+                        " existing session(s) ");
             int removedSession = 0;
             List<Entry<String, SchedulerSession>> scheduledforRemoval = new ArrayList<Entry<String, SchedulerSession>>();
             synchronized (sessionMap) {
@@ -93,12 +95,14 @@ public class SchedulerSessionsCleaner implements Runnable {
                         // if not connected, removing it from the session map
                         // to clean
                         if (!connected) {
-                            logger.info("Scheduler session " + entry.getKey() + " is scheduled for deletion, not connected");
+                            logger.info("Scheduler session " + entry.getKey() +
+                                " is scheduled for deletion, not connected");
                             scheduledforRemoval.add(entry);
                             removedSession++;
                         }
                     } catch (Throwable t) {
-                        logger.info("Scheduler session " + entry.getKey() + " is scheduled for deletion, connection issue");
+                        logger.info("Scheduler session " + entry.getKey() +
+                            " is scheduled for deletion, connection issue");
                         scheduledforRemoval.add(entry);
                         removedSession++;
                     }
@@ -112,7 +116,7 @@ public class SchedulerSessionsCleaner implements Runnable {
 
             }
             // clean every 5 minutes
-            logger.info("Scheduler sessions cleaning ended, " + removedSession+ " session(s) removed");
+            logger.info("Scheduler sessions cleaning ended, " + removedSession + " session(s) removed");
             new Sleeper(cleanPeriod).sleep();
         }
         logger.info(Thread.currentThread().getName() + " terminated");

@@ -50,6 +50,7 @@ import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
 import org.ow2.proactive.utils.console.MBeanInfoViewer;
 
+
 /**
  * Class that extends SchedulerProxyUserInterface as released in 3.0.x
  * can be removed when the api will be released with Scheduling 3.1.x 
@@ -58,7 +59,6 @@ import org.ow2.proactive.utils.console.MBeanInfoViewer;
  */
 public class MySchedulerProxyUserInterface extends SchedulerProxyUserInterface {
 
-    
     /**
      * initialize the connection the scheduler. 
      * Must be called only once.
@@ -82,5 +82,5 @@ public class MySchedulerProxyUserInterface extends SchedulerProxyUserInterface {
             throw new InternalSchedulerException(e);
         }
     }
-    
+
 }

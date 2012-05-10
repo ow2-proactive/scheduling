@@ -60,28 +60,23 @@ import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 @Provider
 @ServerInterceptor
 @DecoderPrecedence
-public class LoggingExecutionInterceptor implements MessageBodyReaderInterceptor, AcceptedByMethod,ClientExecutionInterceptor {
+public class LoggingExecutionInterceptor implements MessageBodyReaderInterceptor, AcceptedByMethod,
+        ClientExecutionInterceptor {
     private static Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.PREFIX + ".rest");
 
-       @SuppressWarnings("unchecked")
-       public ClientResponse execute(ClientExecutionContext ctx) throws Exception
-       {
-          String uri = ctx.getRequest().getUri();
-          logger.info(String.format("Reading url %s", uri));
-          StopWatch stopWatch = new StopWatch();
-          stopWatch.start();
-          ClientResponse response = ctx.proceed();
-          stopWatch.stop();
-          String contentLength = (String) response.getMetadata().getFirst(
-                  HttpHeaderNames.CONTENT_LENGTH);
-          logger.debug(String.format("Read url %s in %d ms size %s.", uri,
-                  stopWatch.getTime(), contentLength));
-          return response;
-       }
+    @SuppressWarnings("unchecked")
+    public ClientResponse execute(ClientExecutionContext ctx) throws Exception {
+        String uri = ctx.getRequest().getUri();
+        logger.info(String.format("Reading url %s", uri));
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
+        ClientResponse response = ctx.proceed();
+        stopWatch.stop();
+        String contentLength = (String) response.getMetadata().getFirst(HttpHeaderNames.CONTENT_LENGTH);
+        logger.debug(String.format("Read url %s in %d ms size %s.", uri, stopWatch.getTime(), contentLength));
+        return response;
+    }
 
-       
-       
-       
     public Object read(MessageBodyReaderContext ctx) throws IOException, WebApplicationException {
 
         StopWatch stopWatch = new StopWatch();
@@ -90,8 +85,8 @@ public class LoggingExecutionInterceptor implements MessageBodyReaderInterceptor
             return ctx.proceed();
         } finally {
             stopWatch.stop();
-            logger.debug(String.format("Read mediaType %s as %s in %d ms.", ctx.getMediaType().toString(), ctx
-                    .getType().getName(), stopWatch.getTime()));
+            logger.debug(String.format("Read mediaType %s as %s in %d ms.", ctx.getMediaType().toString(),
+                    ctx.getType().getName(), stopWatch.getTime()));
         }
     }
 

@@ -77,7 +77,7 @@ public class RMSessionMapper {
     public Map<String, Long> getSessionsLastAccessToClient() {
         return sessionsLastAccessToClient;
     }
-    
+
     /**
      * Remove the proxy associated to the session id <code>key</code>
      * This method also terminates the active object used as proxy 

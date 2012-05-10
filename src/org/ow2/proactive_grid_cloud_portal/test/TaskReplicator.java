@@ -41,17 +41,16 @@ import java.io.Serializable;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 
+
 /**
  * empty class whose goal is to replicate the following
  *
  */
-public class TaskReplicator  extends JavaExecutable {
+public class TaskReplicator extends JavaExecutable {
 
-    
     @Override
     public Serializable execute(TaskResult... results) throws Throwable {
         return null;
     }
-
 
 }

@@ -52,7 +52,7 @@ import org.ow2.proactive.scheduler.common.job.JobInfo;
  *
  */
 @XmlRootElement
-public class UserJobInfo implements Serializable{
+public class UserJobInfo implements Serializable {
     /*
      * the id of the job
      */

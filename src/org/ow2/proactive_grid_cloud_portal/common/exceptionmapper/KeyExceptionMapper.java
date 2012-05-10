@@ -46,16 +46,16 @@ import javax.ws.rs.ext.Provider;
 
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
+
 @Provider
 public class KeyExceptionMapper implements ExceptionMapper<KeyException> {
 
-	public Response toResponse(KeyException exception) {
-		ExceptionToJson js = new ExceptionToJson();
-		js.setErrorMessage(exception.getMessage());
-		js.setHttpErrorCode(HttpURLConnection.HTTP_NOT_FOUND);
-		js.setStackTrace(ProActiveLogger.getStackTraceAsString(exception));
-		return Response.status(HttpURLConnection.HTTP_NOT_FOUND).entity(js)
-				.build();
-	}
+    public Response toResponse(KeyException exception) {
+        ExceptionToJson js = new ExceptionToJson();
+        js.setErrorMessage(exception.getMessage());
+        js.setHttpErrorCode(HttpURLConnection.HTTP_NOT_FOUND);
+        js.setStackTrace(ProActiveLogger.getStackTraceAsString(exception));
+        return Response.status(HttpURLConnection.HTTP_NOT_FOUND).entity(js).build();
+    }
 
 }

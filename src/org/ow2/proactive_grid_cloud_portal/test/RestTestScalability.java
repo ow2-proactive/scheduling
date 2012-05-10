@@ -60,18 +60,18 @@ public class RestTestScalability {
     public static void main(String[] args) {
         try {
 
-//            String restApiUrl = "http://dalek:8080/proactive_grid_cloud_portal/scheduler";
+            //            String restApiUrl = "http://dalek:8080/proactive_grid_cloud_portal/scheduler";
             String restApiUrl = "https://node0.cloud.sophia.inria.fr:8080/proactive_grid_cloud_portal/scheduler";
-//            CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL.setValue("pamr");
+            //            CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL.setValue("pamr");
             PAMRConfig.PA_NET_ROUTER_ADDRESS.setValue("node0.cloud.sophia.inria.fr");
             PAMRConfig.PA_NET_ROUTER_PORT.setValue(8090);
-            
+
             PAMRConfig.PA_PAMR_SOCKET_FACTORY.setValue("ssh");
-            
+
             PAMRConfig.PA_PAMRSSH_KEY_DIR.setValue(System.getProperty("user.home") + "/.ssh/cloud");
             PAMRConfig.PA_PAMRSSH_REMOTE_USERNAME.setValue("ac");
-            
-//            String scheduler_url = "pamr://1/";
+
+            //            String scheduler_url = "pamr://1/";
             String scheduler_url = "rmi://tagada.activeeon.com:1099/";
             TaskFlowJob job = new TaskFlowJob();
             job.setName("sparkle deploy");
@@ -109,23 +109,23 @@ public class RestTestScalability {
             job.addTask(join);
 
             JobEnvironment je = new JobEnvironment();
-            je.setJobClasspath(new String[] { "/home/acontes/ws_git/proactive_grid_cloud_portal.git/build/classes" });
+            je
+                    .setJobClasspath(new String[] { "/home/acontes/ws_git/proactive_grid_cloud_portal.git/build/classes" });
             //                    "/home/acontes/ws_git/proactive_grid_cloud_portal.git/WebContent/WEB-INF/lib"});
             job.setEnvironment(je);
 
             System.out.println("the job is ready, we now contact the scheduler");
-            
+
             SchedulerProxyUserInterface s = PAActiveObject.newActive(SchedulerProxyUserInterface.class, null);
 
             s.init(scheduler_url, "demo", "demo");
 
             System.out.println("trying to submit the job");
-            
+
             s.submit(job);
 
-
             System.out.println("job submitted");
-            
+
         } catch (UserException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -143,7 +143,7 @@ public class RestTestScalability {
             e.printStackTrace();
         } catch (InvalidScriptException e) {
             // TODO Auto-generated catch block
-            e.printStackTrace(); 
+            e.printStackTrace();
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();

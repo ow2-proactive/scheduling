@@ -54,34 +54,32 @@ public class OneClient {
     public long test(URI uri) throws HttpException, IOException {
 
         long result;
-        
+
         // login
 
-        PostMethod methodLogin = new PostMethod(
-           uri.toString() + "/login");
+        PostMethod methodLogin = new PostMethod(uri.toString() + "/login");
         methodLogin.addParameter("username", "demo");
         methodLogin.addParameter("password", "demo");
-        
+
         HttpClient client = new HttpClient();
         String sessionId = "";
 
         client.executeMethod(methodLogin);
         sessionId = methodLogin.getResponseBodyAsString();
-//        System.out.println(sessionId);
+        //        System.out.println(sessionId);
 
-        GetMethod method = new GetMethod(uri.toString()+ "/state");
+        GetMethod method = new GetMethod(uri.toString() + "/state");
         method.addRequestHeader("sessionid", sessionId);
         client = new HttpClient();
         client.executeMethod(method);
         result = method.getResponseBodyAsString().length();
         System.out.println(method.getResponseBodyAsString());
 
-        PutMethod dismethod = new PutMethod(
-            uri.toString() + "/disconnect");
+        PutMethod dismethod = new PutMethod(uri.toString() + "/disconnect");
         dismethod.addRequestHeader("sessionid", sessionId);
         client = new HttpClient();
         client.executeMethod(dismethod);
-//        System.out.println(method.getResponseBodyAsString());
+        //        System.out.println(method.getResponseBodyAsString());
 
         return result;
         /*

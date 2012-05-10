@@ -49,7 +49,8 @@ public class SchedulerSessionMapper {
 
     private Map<String, SchedulerSession> sessions;
     private static SchedulerSessionMapper sessionMapper;
-//    private long currentSessionid = 0l;
+
+    //    private long currentSessionid = 0l;
 
     private SchedulerSessionMapper() {
         sessions = Collections.synchronizedMap(new HashMap<String, SchedulerSession>());
@@ -62,7 +63,7 @@ public class SchedulerSessionMapper {
         return sessionMapper;
     }
 
-    public String add(SchedulerProxyUserInterface s, String username) {        
+    public String add(SchedulerProxyUserInterface s, String username) {
         String id = SessionIdGenerator.newSessionId();
         SchedulerSession ss = new SchedulerSession();
         ss.setScheduler(s);

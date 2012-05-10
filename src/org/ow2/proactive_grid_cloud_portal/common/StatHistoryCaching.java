@@ -38,6 +38,7 @@ package org.ow2.proactive_grid_cloud_portal.common;
 
 import java.util.HashMap;
 
+
 /**
  * Simple cache for Statistic History
  * <p>
@@ -52,69 +53,69 @@ import java.util.HashMap;
  */
 public class StatHistoryCaching {
 
-	// invalidate entry after MAX_DURATION millis
-	private static final long MAX_DURATION = 5000;
-	
-	public class StatHistoryCacheEntry {
-		private long timeStamp;
-		private String value;
+    // invalidate entry after MAX_DURATION millis
+    private static final long MAX_DURATION = 5000;
 
-		public StatHistoryCacheEntry(String value, long timeStamp) {
-			this.timeStamp = timeStamp;
-			this.value = value;
-		}
+    public class StatHistoryCacheEntry {
+        private long timeStamp;
+        private String value;
 
-		public long getTimeStamp() {
-			return timeStamp;
-		}
+        public StatHistoryCacheEntry(String value, long timeStamp) {
+            this.timeStamp = timeStamp;
+            this.value = value;
+        }
 
-		public void setTimeStamp(long timeStamp) {
-			this.timeStamp = timeStamp;
-		}
+        public long getTimeStamp() {
+            return timeStamp;
+        }
 
-		public String getValue() {
-			return value;
-		}
+        public void setTimeStamp(long timeStamp) {
+            this.timeStamp = timeStamp;
+        }
 
-		public void setValue(String value) {
-			this.value = value;
-		}
-	}
+        public String getValue() {
+            return value;
+        }
 
-	private HashMap<String, StatHistoryCacheEntry> statHistoryCache = null;
+        public void setValue(String value) {
+            this.value = value;
+        }
+    }
 
-	private static StatHistoryCaching instance = null;
+    private HashMap<String, StatHistoryCacheEntry> statHistoryCache = null;
 
-	private StatHistoryCaching() {
-		this.statHistoryCache = new HashMap<String, StatHistoryCacheEntry>();
-	}
+    private static StatHistoryCaching instance = null;
 
-	public static synchronized StatHistoryCaching getInstance() {
-		if (instance == null)
-			instance = new StatHistoryCaching();
-		return instance;
-	}
+    private StatHistoryCaching() {
+        this.statHistoryCache = new HashMap<String, StatHistoryCacheEntry>();
+    }
 
-	/**
-	 * @param key key of the cache element to retrieve
-	 * @return the cache entry if it exists and has not expired, or null
-	 */
-	public synchronized StatHistoryCacheEntry getEntry (String key) {
-		StatHistoryCacheEntry entry = this.statHistoryCache.get(key);
-		if (entry == null)
-			return null;
-		
-		if (System.currentTimeMillis() - entry.timeStamp > MAX_DURATION) {
-			this.statHistoryCache.remove(key);
-			return null;
-		}
-		
-		return entry;
-	}
-	
-	public synchronized void addEntry (String key, long timeStamp, String value) {
-		StatHistoryCacheEntry entry = new StatHistoryCacheEntry(value, timeStamp);
-		this.statHistoryCache.put(key, entry);
-	}
-	
+    public static synchronized StatHistoryCaching getInstance() {
+        if (instance == null)
+            instance = new StatHistoryCaching();
+        return instance;
+    }
+
+    /**
+     * @param key key of the cache element to retrieve
+     * @return the cache entry if it exists and has not expired, or null
+     */
+    public synchronized StatHistoryCacheEntry getEntry(String key) {
+        StatHistoryCacheEntry entry = this.statHistoryCache.get(key);
+        if (entry == null)
+            return null;
+
+        if (System.currentTimeMillis() - entry.timeStamp > MAX_DURATION) {
+            this.statHistoryCache.remove(key);
+            return null;
+        }
+
+        return entry;
+    }
+
+    public synchronized void addEntry(String key, long timeStamp, String value) {
+        StatHistoryCacheEntry entry = new StatHistoryCacheEntry(value, timeStamp);
+        this.statHistoryCache.put(key, entry);
+    }
+
 }
