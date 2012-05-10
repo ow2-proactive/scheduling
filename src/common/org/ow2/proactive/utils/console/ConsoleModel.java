@@ -51,8 +51,6 @@ import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
-//import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 
 
 /**
@@ -82,9 +80,14 @@ public abstract class ConsoleModel {
 
     protected ArrayList<Command> commands;
 
-    //protected Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.CONSOLE);
+    protected Logger logger;
 
-    protected ConsoleModel() {
+    /**
+     * 
+     * @param _logger Logger to be provided by concrete implementation 
+     */
+    protected ConsoleModel(Logger _logger) {
+        this.logger = _logger;
         commands = new ArrayList<Command>();
         commands.add(new Command("filterspush(regexp)", "Add a new regexp to the list of filters"));
         commands.add(new Command("filterspop()", "Remove the last inserted regexp from the list of filters"));
@@ -144,7 +147,7 @@ public abstract class ConsoleModel {
         final Writer result = new StringWriter();
         final PrintWriter printWriter = new PrintWriter(result);
         t.printStackTrace(printWriter);
-        //logger.info("User exception occured. Msg:  " + msg + " stacktrace: " + result);
+        logger.info("User exception occured. Msg:  " + msg + " stacktrace: " + result);
     }
 
     /**

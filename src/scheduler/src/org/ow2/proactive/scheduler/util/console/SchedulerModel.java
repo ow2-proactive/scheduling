@@ -51,6 +51,7 @@ import java.util.Map.Entry;
 import javax.security.auth.login.LoginException;
 
 import org.objectweb.proactive.core.ProActiveRuntimeException;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
@@ -71,6 +72,7 @@ import org.ow2.proactive.scheduler.common.job.factories.FlatJobFactory;
 import org.ow2.proactive.scheduler.common.job.factories.JobFactory;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskState;
+import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 import org.ow2.proactive.utils.ObjectArrayFormatter;
 import org.ow2.proactive.utils.Tools;
 import org.ow2.proactive.utils.console.Command;
@@ -131,7 +133,7 @@ public class SchedulerModel extends ConsoleModel {
     }
 
     protected SchedulerModel(boolean allowExitCommand) {
-        super();
+        super(ProActiveLogger.getLogger(SchedulerLoggers.CONSOLE));
         this.allowExitCommand = allowExitCommand;
         commands.add(new Command("submit(XMLdescriptor)",
             "Submit a new job (parameter is a string representing the job XML descriptor URL)"));

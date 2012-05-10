@@ -54,6 +54,7 @@ import java.util.Map.Entry;
 import javax.security.auth.login.LoginException;
 
 import org.objectweb.proactive.core.ProActiveRuntimeException;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
@@ -67,6 +68,7 @@ import org.ow2.proactive.resourcemanager.frontend.topology.Topology;
 import org.ow2.proactive.resourcemanager.nodesource.common.PluginDescriptor;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.DefaultInfrastructureManager;
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
+import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 import org.ow2.proactive.resourcemanager.utils.TargetType;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.ScriptResult;
@@ -118,6 +120,7 @@ public class ResourceManagerModel extends ConsoleModel {
     }
 
     protected ResourceManagerModel(boolean allowExitCommand) {
+        super(ProActiveLogger.getLogger(RMLoggers.CONSOLE));
         this.allowExitCommand = allowExitCommand;
         commands.add(new Command("addnode(nodeURL, nsName)",
             "Add node to the given node source (parameters is a string representing the node URL to add &"
@@ -235,6 +238,7 @@ public class ResourceManagerModel extends ConsoleModel {
         if (t instanceof ProActiveRuntimeException) {
             String tmp = msg + " : ResourceManager server seems to be unreachable !";
             console.error(tmp);
+            logUserException(tmp, t);
         } else {
             super.handleExceptionDisplay(msg, t);
         }
