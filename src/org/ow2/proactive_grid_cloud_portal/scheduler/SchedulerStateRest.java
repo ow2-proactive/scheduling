@@ -752,7 +752,71 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     String jobId) throws NotConnectedException, UnknownJobException, PermissionException {
         Scheduler s = checkAccess(sessionId, "PUT jobs/" + jobId + "/kill");
         return s.killJob(jobId);
+    }
 
+    /**
+     * Kill a task within a job
+     * @param sessionId current session
+     * @param jobid id of the job containing the task to kill
+     * @param taskname name of the task to kill
+     * @throws NotConnectedException
+     * @throws UnknownJobException
+     * @throws UnknownTaskException
+     * @throws PermissionException
+     */
+    @PUT
+    @Path("jobs/{jobid}/tasks/{taskname}/kill")
+    public boolean killTask(@HeaderParam("sessionid")
+    String sessionId, @PathParam("jobid")
+    String jobid, @PathParam("taskname")
+    String taskname) throws NotConnectedException, UnknownJobException, UnknownTaskException,
+            PermissionException {
+        Scheduler s = checkAccess(sessionId, "PUT jobs/" + jobid + "/tasks/" + taskname + "/kill");
+        return s.killTask(jobid, taskname);
+    }
+
+    /**
+     * Preempt a task within a job
+     * <p>
+     * The task will be stopped and restarted later
+     * @param sessionId current session
+     * @param jobid id of the job containing the task to preempt
+     * @param taskname name of the task to preempt
+     * @throws NotConnectedException
+     * @throws UnknownJobException
+     * @throws UnknownTaskException
+     * @throws PermissionException
+     */
+    @PUT
+    @Path("jobs/{jobid}/tasks/{taskname}/preempt")
+    public boolean preemptTask(@HeaderParam("sessionid")
+    String sessionId, @PathParam("jobid")
+    String jobid, @PathParam("taskname")
+    String taskname) throws NotConnectedException, UnknownJobException, UnknownTaskException,
+            PermissionException {
+        Scheduler s = checkAccess(sessionId, "PUT jobs/" + jobid + "/tasks/" + taskname + "/preempt");
+        return s.preemptTask(jobid, taskname, 5);
+    }
+
+    /**
+     * Restart a task within a job
+     * @param sessionId current session
+     * @param jobid id of the job containing the task to kill
+     * @param taskname name of the task to kill
+     * @throws NotConnectedException
+     * @throws UnknownJobException
+     * @throws UnknownTaskException
+     * @throws PermissionException
+     */
+    @PUT
+    @Path("jobs/{jobid}/tasks/{taskname}/restart")
+    public boolean restartTask(@HeaderParam("sessionid")
+    String sessionId, @PathParam("jobid")
+    String jobid, @PathParam("taskname")
+    String taskname) throws NotConnectedException, UnknownJobException, UnknownTaskException,
+            PermissionException {
+        Scheduler s = checkAccess(sessionId, "PUT jobs/" + jobid + "/tasks/" + taskname + "/restart");
+        return s.restartTask(jobid, taskname, 5);
     }
 
     /**
