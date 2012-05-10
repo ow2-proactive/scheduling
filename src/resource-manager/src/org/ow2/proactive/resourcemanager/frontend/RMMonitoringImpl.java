@@ -36,9 +36,11 @@
  */
 package org.ow2.proactive.resourcemanager.frontend;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -154,12 +156,17 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
 
         protected RMEventListener listener;
         protected LinkedList<RMEvent> events;
+        protected List<RMEventType> eventTypes = null;
 
         protected AtomicBoolean inProcess = new AtomicBoolean(false);
 
-        public EventDispatcher(Client client, RMEventListener listener) {
+        public EventDispatcher(Client client, RMEventListener listener, RMEventType[] eventTypes) {
             this.client = client;
             this.listener = listener;
+            if (eventTypes != null && eventTypes.length > 0) {
+                this.eventTypes = Arrays.asList(eventTypes);
+            }
+
             this.events = new LinkedList<RMEvent>();
         }
 
@@ -237,18 +244,20 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
 
         public void queueEvent(RMEvent event) {
             synchronized (events) {
-                events.add(event);
+                if (eventTypes == null || eventTypes.contains(event.getEventType())) {
+                    events.add(event);
 
-                if (inProcess.get()) {
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("Communication to the client " + client +
-                            " is in progress in one thread of the thread pool. " +
-                            "Either events come too quick or the client is slow. " +
-                            "Do not initiate connection from another thread.");
+                    if (inProcess.get()) {
+                        if (logger.isDebugEnabled()) {
+                            logger.debug("Communication to the client " + client +
+                                " is in progress in one thread of the thread pool. " +
+                                "Either events come too quick or the client is slow. " +
+                                "Do not initiate connection from another thread.");
+                        }
+                    } else {
+                        inProcess.set(true);
+                        eventDispatcherThreadPool.submit(this);
                     }
-                } else {
-                    inProcess.set(true);
-                    eventDispatcherThreadPool.submit(this);
                 }
             }
         }
@@ -256,8 +265,8 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
 
     private class GroupEventDispatcher extends EventDispatcher {
 
-        public GroupEventDispatcher(Client client, RMEventListener stub) {
-            super(client, stub);
+        public GroupEventDispatcher(Client client, RMEventListener stub, RMEventType[] events) {
+            super(client, stub, events);
         }
 
         public void run() {
@@ -348,9 +357,9 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
             }
 
             if (stub instanceof RMGroupEventListener) {
-                this.dispatchers.put(id, new GroupEventDispatcher(client, stub));
+                this.dispatchers.put(id, new GroupEventDispatcher(client, stub, events));
             } else {
-                this.dispatchers.put(id, new EventDispatcher(client, stub));
+                this.dispatchers.put(id, new EventDispatcher(client, stub, events));
             }
         }
         return rmcore.getRMInitialState();
