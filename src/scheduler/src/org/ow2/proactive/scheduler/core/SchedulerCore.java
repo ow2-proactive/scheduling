@@ -185,7 +185,6 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
     }
 
     /** Scheduler logger */
-    private static final Logger loggerConsole = ProActiveLogger.getLogger(SchedulerLoggers.CONSOLE);
     public static final Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.CORE);
     public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.CORE);
 
@@ -2141,10 +2140,10 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
         // Result of the method.
         boolean alive = false;
 
-        // Checks if the option is enabled (true by default)
+        // Checks if the option is enabled (false by default)
         boolean autoReconnectRM = PASchedulerProperties.SCHEDULER_RMCONNECTION_AUTO_CONNECT.isSet() ? PASchedulerProperties.SCHEDULER_RMCONNECTION_AUTO_CONNECT
                 .getValueAsBoolean()
-                : true;
+                : false;
 
         // Delay (in ms) between each connection attempts (5s by default)
         int timespan = PASchedulerProperties.SCHEDULER_RMCONNECTION_TIMESPAN.isSet() ? PASchedulerProperties.SCHEDULER_RMCONNECTION_TIMESPAN
@@ -2168,16 +2167,15 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
         String rmURL = this.lastRmUrl.toString();
         int nbAttempts = 1;
 
-        loggerConsole.info("Trying to retrieve RM connection at url " + rmURL + "...");
+        logger.info("Trying to retrieve RM connection at url " + rmURL + "...");
 
         while (!alive && nbAttempts <= maxAttempts) {
             try {
 
                 // Call isActive and wait recursively on the two futures (this -> proxy -> RM)
                 PAFuture.waitFor(rmProxiesManager.getSchedulerRMProxy().isActive(), true);
-
                 alive = true;
-                loggerConsole.info("Resource Manager successfully retrieved on " + rmURL);
+                logger.info("Resource Manager successfully retrieved on " + rmURL);
 
             } catch (Exception rme) {
                 alive = false;
@@ -2195,7 +2193,6 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
             nbAttempts++;
         }
 
-        // Display a message in the Console.
         if (!alive) {
 
             logger.info("Resource Manager seems to be dead.");
@@ -2203,7 +2200,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
             // Disconnect proxies and freeze the scheduler.
             clearProxiesAndFreeze();
 
-            loggerConsole
+            logger
                     .fatal("\n*****************************************************************************************************************\n" +
                         "* Resource Manager is no more available, Scheduler has been paused waiting for a resource manager to be reconnect\n" +
                         "* Scheduler is in critical state and its functionalities are reduced : \n" +
