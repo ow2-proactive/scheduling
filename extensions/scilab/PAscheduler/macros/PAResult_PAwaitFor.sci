@@ -59,23 +59,26 @@ function [val_k,err]=PAResult_PAwaitFor(R,RaL)
 endfunction
 
 function resultSet(R)
-    global('PAResult_TasksDB')
-    jinvoke(R.resultSet,'set',%t);
-    remainingTasks = PAResult_TasksDB(R.sid);
-    ind = -1;
-    for i=1:length(remainingTasks)
-        if remainingTasks(i) == R.taskid then
-            ind = i;            
+    if ~jinvoke(R.resultSet,'get') then
+
+        global('PAResult_TasksDB')
+        jinvoke(R.resultSet,'set',%t);
+        remainingTasks = PAResult_TasksDB(R.sid);
+        ind = -1;
+        for i=1:length(remainingTasks)
+            if remainingTasks(i) == R.taskid then
+                ind = i;            
+            end
+        end    
+        if ind > 0 then
+            remainingTasks(ind) = null();
         end
-    end    
-    if ind > 0 then
-        remainingTasks(ind) = null();
-    end
-    
-    PAResult_TasksDB(R.sid) = remainingTasks;
-    opt = PAoptions();
-    if opt.RemoveJobAfterRetrieve & length(remainingTasks) == 0 then
-        PAjobRemove(R.jobid);
+
+        PAResult_TasksDB(R.sid) = remainingTasks;
+        opt = PAoptions();
+        if opt.RemoveJobAfterRetrieve & length(remainingTasks) == 0 then
+            PAjobRemove(R.jobid);
+        end
     end
 endfunction
 

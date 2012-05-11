@@ -53,6 +53,7 @@ import org.ow2.proactive.scheduler.ext.matsci.client.common.MatSciEnvironment;
 import org.ow2.proactive.scheduler.ext.matsci.client.common.data.*;
 import org.ow2.proactive.scheduler.ext.matsci.client.common.exception.PASchedulerException;
 import org.ow2.proactive.scheduler.util.console.SchedulerModel;
+import org.ow2.proactive.utils.FileToBytesConverter;
 import org.ow2.proactive.utils.console.StdOutConsole;
 
 import javax.security.auth.login.LoginException;
@@ -176,8 +177,12 @@ public abstract class AOMatSciEnvironment<R, RL> implements MatSciEnvironment, S
         this.debug = debug;
     }
 
-    /** {@inheritDoc} */
     public void login(String user, String passwd) throws PASchedulerException {
+        login(user, passwd, null);
+    }
+
+    /** {@inheritDoc} */
+    public void login(String user, String passwd, String keyfile) throws PASchedulerException {
 
         if (scheduler != null) {
             try {
@@ -191,8 +196,17 @@ public abstract class AOMatSciEnvironment<R, RL> implements MatSciEnvironment, S
         //System.out.println("Trying to connect with "+user+" " +passwd);
         Credentials creds = null;
         try {
-            creds = Credentials.createCredentials(new CredData(CredData.parseLogin(user), CredData
-                    .parseDomain(user), passwd), auth.getPublicKey());
+            if (keyfile != null && keyfile.length() > 0) {
+                byte[] keyfileContent = FileToBytesConverter.convertFileToByteArray(new File(keyfile));
+                CredData cd = new CredData(CredData.parseLogin(user), CredData.parseDomain(user), passwd,
+                    keyfileContent);
+                creds = Credentials.createCredentials(cd, auth.getPublicKey());
+            } else {
+                creds = Credentials.createCredentials(new CredData(CredData.parseLogin(user), CredData
+                        .parseDomain(user), passwd), auth.getPublicKey());
+            }
+        } catch (IOException e) {
+            throw new PASchedulerException(e);
         } catch (KeyException e) {
             throw new PASchedulerException(e, PASchedulerException.ExceptionType.KeyException);
         } catch (LoginException e) {
@@ -204,14 +218,17 @@ public abstract class AOMatSciEnvironment<R, RL> implements MatSciEnvironment, S
 
     }
 
+    /**
+     * Internal method for login
+     * @param creds
+     * @throws PASchedulerException
+     */
     protected void initLogin(Credentials creds) throws PASchedulerException {
         SchedulerStatus status = null;
         try {
             this.scheduler = auth.login(creds);
 
             loggedin = true;
-
-            // myEventsOnly doesn't work with the disconnected mode, so we disable it
 
             this.scheduler.addEventListener(stubOnThis, true, SchedulerEvent.JOB_RUNNING_TO_FINISHED,
                     SchedulerEvent.JOB_PENDING_TO_FINISHED, SchedulerEvent.KILLED, SchedulerEvent.SHUTDOWN,
@@ -341,7 +358,7 @@ public abstract class AOMatSciEnvironment<R, RL> implements MatSciEnvironment, S
         try {
             auth = SchedulerConnection.join(url);
         } catch (ConnectionException e) {
-            throw new PASchedulerException(e);
+            return false;
         }
         this.loggedin = false;
         joined = true;

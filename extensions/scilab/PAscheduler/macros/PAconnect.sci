@@ -35,7 +35,7 @@ function [] = PAconnect(uri,credpath)
     if ~isConnected then
         ok = jinvoke(PA_solver,'join', uri);
         if ~ok then
-            error('PAConnect::Error wile connecting');
+            error('PAConnect::Error wile connecting to ' + uri);
         end
         dataspaces(opt);
         disp(strcat(['Connection successful to ', uri]));

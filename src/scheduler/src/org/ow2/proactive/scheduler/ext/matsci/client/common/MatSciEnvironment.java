@@ -42,6 +42,18 @@ public interface MatSciEnvironment extends Remote {
     public void login(String user, String passwd) throws PASchedulerException, RemoteException;
 
     /**
+     * Tries to log into the scheduler, using the provided user and password, and an additional SSH key
+     *
+     * @param user   username
+     * @param passwd password
+     * @param keyFile path to SSH key File
+     * @throws PASchedulerException
+     *          if the login fails
+     */
+    public void login(String user, String passwd, String keyFile) throws PASchedulerException,
+            RemoteException;
+
+    /**
      * Tries to log into the scheduler, using the provided credential file
      *
      * @param credPath   path to the credentials file

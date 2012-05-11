@@ -20,7 +20,7 @@ function jobs = PAconnect(url, credpath)
 %
 %       PAconnect connects to a running ProActive Scheduler by specifying its
 %       url. If the scheduler could be reached a popup window will appear, asking
-%       for login and password. ProActive Scheduler features a full account
+%       for login and password. An additional SSH key can also be provided when the user needs to execute remote task under one's identity (RunAsMe option). ProActive Scheduler features a full account
 %       management facility along with the possibility to synchronize to existing
 %       Windows or Linux accounts via LDAP.
 %       More information can be found inside Scheduler's manual chapter "Configure
@@ -118,10 +118,10 @@ if ~isJVMdeployed
 end
 if ~isConnected
     % joining the scheduler
-    solver = sched.PAgetsolver();
+    solver = sched.PAgetsolver();    
     ok = solver.join(url);
     if ~ok
-        error('PAconnect::Error while connecting');
+        error(['PAconnect::Error ProActive Scheduler cannot be contacted at URL ' url ]);
     end
     dataspaces(sched, opt);
 else
@@ -200,6 +200,7 @@ sched.PAgetJVMInterface(jvmint);
 end
 
 function login(solver, sched, credpath)
+opt = PAoptions();
 % Logging in
 if exist('credpath', 'var')
     try
@@ -214,12 +215,14 @@ else
     msg = 'Connect to the Scheduler';
     attempts = 1;
     while ~loggedin && attempts <= 3
-        [login,pwd]=sched.logindlg('Title',msg);
-        try
-            solver.login(login,pwd);
+        [login,pwd,keyfile]=sched.logindlg('Title',msg);
+        try            
+            solver.login(login,pwd,keyfile);
             loggedin = true;
         catch ME
-            disp(getReport(ME));
+            if opt.Debug
+                disp(getReport(ME));
+            end
             attempts = attempts+1;
             msg = ['Incorrect Login/Password, try ' num2str(attempts)];
         end

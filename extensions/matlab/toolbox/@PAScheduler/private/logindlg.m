@@ -26,7 +26,7 @@
 %       for characters in an edit field to be replaced by asterisks
 %       (password security).
 %
-%       Note:  On very slow computers the first few password characters may 
+%       Note:  On very slow computers the first few password characters may
 %       have a delay before they are converted to asterisks.
 
 % Changelist:
@@ -101,7 +101,7 @@ else
 end
 
 % Output Error Check
-if nargout > 1 && Pass == 1 || nargout > 2
+if nargout > 1 && Pass == 1 || nargout > 3
     error('Too many output arguments.')
 end
 
@@ -110,13 +110,16 @@ Color = get(0,'DefaultUicontrolBackgroundcolor');
 
 % Determine the size and position of the login interface
 if Pass == 0
-    Height = 9.5;
+    Height = 13.5;
 else
-    Height = 5.5;
+    Height = 9.5;
 end
+
+Width = 35;
+
 set(0,'Units','characters')
 Screen = get(0,'screensize');
-Position = [Screen(3)/2-17.5 Screen(4)/2-4.75 35 Height];
+Position = [Screen(3)/2-(Width/2) Screen(4)/2-(Height/2) Width Height];
 set(0,'Units','pixels')
 
 % Create the GUI
@@ -138,17 +141,23 @@ end
 
 % Texts
 if Pass == 0
-    gui.login_text = uicontrol(gui.main,'Style','text','FontSize',8,'HorizontalAlign','left','Units','characters','String','Login','Position',[1 7.65 20 1]);
+    gui.login_text = uicontrol(gui.main,'Style','text','FontSize',8,'HorizontalAlign','left','Units','characters','String','Login','Position',[1 11.15 20 1]);
 end
-gui.password_text = uicontrol(gui.main,'Style','text','FontSize',8,'HorizontalAlign','left','Units','characters','String','Password','Position',[1 4.15 20 1]);
+gui.password_text = uicontrol(gui.main,'Style','text','FontSize',8,'HorizontalAlign','left','Units','characters','String','Password','Position',[1 7.65 20 1]);
+
+gui.key_text = uicontrol(gui.main,'Style','text','FontSize',8,'HorizontalAlign','left','Units','characters','String','KeyFile','Position',[1 4.15 20 1]);
 
 % Edits
 if Pass == 0
-    gui.edit1 = uicontrol(gui.main,'Style','edit','FontSize',8,'HorizontalAlign','left','BackgroundColor','white','Units','characters','String','','Position',[1 6.02 33 1.7],'KeyPressfcn',{@Escape});
+    gui.edit1 = uicontrol(gui.main,'Style','edit','FontSize',8,'HorizontalAlign','left','BackgroundColor','white','Units','characters','String','','Position',[1 9.52 Width-3 1.7],'KeyPressfcn',{@Escape});
 end
-gui.edit2 = uicontrol(gui.main,'Style','edit','FontSize',8,'HorizontalAlign','left','BackgroundColor','white','Units','characters','String','','Position',[1 2.52 33 1.7],'KeyPressfcn',{@KeyPress_Function,gui.main},'Userdata','');
+gui.edit2 = uicontrol(gui.main,'Style','edit','FontSize',8,'HorizontalAlign','left','BackgroundColor','white','Units','characters','String','','Position',[1 6.02 Width-3 1.7],'KeyPressfcn',{@KeyPress_Function,gui.main},'Userdata','');
+
+gui.edit3 = uicontrol(gui.main,'Style','edit','FontSize',8,'HorizontalAlign','left','BackgroundColor','white','Units','characters','String','','Position',[1 2.52 Width-5 1.7],'KeyPressfcn',{@Escape},'Callback',@KeyFileEditCallback);
 
 % Buttons
+gui.KeyFileButton =  uicontrol(gui.main,'Style','push','FontSize',8,'Units','characters','String','...','Position',[Width-7 2.52 5.8 1.77],'Callback',{@KeyFileButtonCallback,gui.main},'KeyPressfcn',{@Escape});
+
 gui.OK = uicontrol(gui.main,'Style','push','FontSize',8,'Units','characters','String','OK','Position',[12 .2 10 1.7],'Callback',{@OK,gui.main},'KeyPressfcn',{@Escape});
 gui.Cancel = uicontrol(gui.main,'Style','push','FontSize',8,'Units','characters','String','Cancel','Position',[23 .2 10 1.7],'Callback',{@Cancel,gui.main},'KeyPressfcn',{@Escape});
 
@@ -172,12 +181,18 @@ if Check == 1
         Login = get(gui.edit1,'String');
     end
     Password = get(gui.edit2,'Userdata');
-    
+
+    KeyFile = get(gui.edit3,'String');
+
     if nargout == 1 % If only one output specified output Password
         varargout(1) = {Password};
     elseif nargout == 2 % If two outputs specified output both Login and Password
         varargout(1) = {Login};
         varargout(2) = {Password};
+    elseif nargout == 3
+        varargout(1) = {Login};
+        varargout(2) = {Password};
+        varargout(3) = {KeyFile};
     end
 else % If OK wasn't pressed output nothing
     if nargout == 1
@@ -185,6 +200,10 @@ else % If OK wasn't pressed output nothing
     elseif nargout == 2
         varargout(1) = {[]};
         varargout(2) = {[]};
+    elseif nargout == 3
+        varargout(1) = {[]};
+        varargout(2) = {[]};
+        varargout(3) = {[]};
     end
 end
 
@@ -192,58 +211,87 @@ delete(gui.main) % Close the GUI
 setappdata(0,'logindlg',[]) % Erase handles from memory
 
 %% Hide Password
-function KeyPress_Function(h,eventdata,fig)
-% Function to replace all characters in the password edit box with
-% asterisks
-password = get(h,'Userdata');
-key = get(fig,'currentkey');
+    function KeyPress_Function(h,eventdata,fig)
+        % Function to replace all characters in the password edit box with
+        % asterisks
+        password = get(h,'Userdata');
+        key = get(fig,'currentkey');
 
-switch key
-    case 'backspace'
-        password = password(1:end-1); % Delete the last character in the password
-    case 'return'  % This cannot be done through callback without making tab to the same thing
-        gui = getappdata(0,'logindlg');
-        OK([],[],gui.main);
-    case 'tab'  % Avoid tab triggering the OK button
-        gui = getappdata(0,'logindlg');
-        uicontrol(gui.OK);
-    case 'escape'
-        % Close the login dialog
-        Escape(fig,[])
-    otherwise
-        password = [password get(fig,'currentcharacter')]; % Add the typed character to the password
-end
+        switch key
+            case 'backspace'
+                password = password(1:end-1); % Delete the last character in the password
+            case 'return'  % This cannot be done through callback without making tab to the same thing
+                gui = getappdata(0,'logindlg');
+                OK([],[],gui.main);
+            case 'tab'  % Avoid tab triggering the OK button
+                gui = getappdata(0,'logindlg');
+                uicontrol(gui.OK);
+            case 'escape'
+                % Close the login dialog
+                Escape(fig,[])
+            otherwise
+                password = [password get(fig,'currentcharacter')]; % Add the typed character to the password
+        end
 
-SizePass = size(password); % Find the number of asterisks
-if SizePass(2) > 0
-    asterisk(1,1:SizePass(2)) = '*'; % Create a string of asterisks the same size as the password
-    set(h,'String',asterisk) % Set the text in the password edit box to the asterisk string
-else
-    set(h,'String','')
-end
+        SizePass = size(password); % Find the number of asterisks
+        if SizePass(2) > 0
+            asterisk(1,1:SizePass(2)) = '*'; % Create a string of asterisks the same size as the password
+            set(h,'String',asterisk) % Set the text in the password edit box to the asterisk string
+        else
+            set(h,'String','')
+        end
 
-set(h,'Userdata',password) % Store the password in its current state
+        set(h,'Userdata',password) % Store the password in its current state
+    end
 
 %% Cancel
-function Cancel(h,eventdata,fig)
-uiresume(fig)
+    function Cancel(h,eventdata,fig)
+        uiresume(fig)
+    end
 
 %% OK
-function OK(h,eventdata,fig)
-% Set the check and resume
-setappdata(fig,'Check',1)
-uiresume(fig)
+    function OK(h,eventdata,fig)
+        % Set the check and resume
+        setappdata(fig,'Check',1)
+        uiresume(fig)
+    end
+
+%% KeyFile Edit
+    function KeyFileEditCallback(h,eventdata,fig)
+        file = get(h,'String');
+        if exist(file, 'file') ~= 2
+            errordlg(['The given key file cannot be found ' 10, file], ...
+                'Invalid Key File', 'modal');
+            set(hObject, 'String', []);
+        end
+    end
+
+%% KeyFile button
+    function KeyFileButtonCallback(h, eventdata, fig)
+        % Callback called when the key file selection button is pressed
+        filespec = { 'id_rsa',  'RSA key-files';...
+            '*.*',  'All Files (*.*)'};
+        [filename, pathname] = uigetfile(filespec,'Pick an SSH Private Key File',get(gui.edit3, 'String'));
+
+        if ~isequal(filename,0)
+            KeyFile =fullfile(pathname, filename);
+            set(gui.edit3, 'String', KeyFile);
+        end
+    end
+
 
 %% Escape
-function Escape(h,eventdata)
-% Close the login if the escape button is pushed and neither edit box is
-% active
-fig = h;
-while ~strcmp(get(fig,'Type'),'figure')
-    fig = get(fig,'Parent');
-end
-key = get(fig,'currentkey');
+    function Escape(h,eventdata)
+        % Close the login if the escape button is pushed and neither edit box is
+        % active
+        fig = h;
+        while ~strcmp(get(fig,'Type'),'figure')
+            fig = get(fig,'Parent');
+        end
+        key = get(fig,'currentkey');
 
-if isempty(strfind(key,'escape')) == 0
-    Cancel([],[],fig)
+        if isempty(strfind(key,'escape')) == 0
+            Cancel([],[],fig)
+        end
+    end
 end

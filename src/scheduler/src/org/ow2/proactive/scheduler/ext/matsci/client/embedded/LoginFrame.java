@@ -44,6 +44,7 @@ import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.rmi.RemoteException;
 
 
@@ -56,6 +57,11 @@ public class LoginFrame<E extends MatSciEnvironment> extends JDialog {
 
     private JTextField username;
     private JPasswordField password;
+    private JTextField key;
+    private JFileChooser fc;
+
+    private JButton fcb;
+
     private E aose;
     private JButton login;
     private boolean loginSuccessful = false;
@@ -102,6 +108,31 @@ public class LoginFrame<E extends MatSciEnvironment> extends JDialog {
         password = new JPasswordField(15);
         cp.add(password, getConstraints(1, 1, 1, 1));
 
+        JLabel keyLabel = new JLabel("Key:");
+        cp.add(keyLabel, getConstraints(0, 2, 1, 1));
+
+        key = new JTextField(15);
+        cp.add(key, getConstraints(1, 2, 1, 1));
+
+        fc = new JFileChooser();
+        fc.setFileHidingEnabled(false);
+
+        fcb = new JButton("...");
+        cp.add(fcb, getConstraints(2, 2, 1, 1));
+
+        fcb.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                if (e.getSource() == fcb) {
+                    int returnVal = fc.showOpenDialog(LoginFrame.this);
+                    if (returnVal == JFileChooser.APPROVE_OPTION) {
+                        File file = fc.getSelectedFile();
+                        key.setText(file.toString());
+                    }
+
+                }
+            }
+        });
+
         login = new JButton("Login");
         if (recordListener) {
             login.addActionListener(new ActionListener() {
@@ -112,7 +143,7 @@ public class LoginFrame<E extends MatSciEnvironment> extends JDialog {
             });
         }
 
-        cp.add(login, getConstraints(1, 2, 1, 1));
+        cp.add(login, getConstraints(1, 3, 1, 1));
 
         setContentPane(cp);
     }
@@ -129,10 +160,11 @@ public class LoginFrame<E extends MatSciEnvironment> extends JDialog {
         nb_attempts++;
         String name = username.getText();
         String pwd = new String(password.getPassword());
+        String kkey = key.getText();
 
         try {
 
-            aose.login(name, pwd);
+            aose.login(name, pwd, kkey);
 
             dispose();
             return true;
