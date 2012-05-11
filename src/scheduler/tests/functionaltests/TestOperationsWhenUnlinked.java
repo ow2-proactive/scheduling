@@ -1,9 +1,15 @@
 package functionaltests;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.Serializable;
+import java.util.Properties;
 
 import junit.framework.Assert;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.ow2.proactive.scheduler.common.Scheduler;
@@ -14,6 +20,7 @@ import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
+import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.tests.FunctionalTest;
 
@@ -40,6 +47,29 @@ public class TestOperationsWhenUnlinked extends FunctionalTest {
     }
 
     private RMTHelper helper = RMTHelper.getDefaultInstance();
+    
+    private File config;
+    
+    @Before
+    public void createConfig() throws Exception {
+        // set property SCHEDULER_RMCONNECTION_AUTO_CONNECT to false so that RM failure is detected more fast
+        File configurationFile = new File(SchedulerTHelper.functionalTestSchedulerProperties.toURI());
+
+        Properties properties = new Properties();
+        properties.load(new FileInputStream(configurationFile));
+        
+        config = new File(System.getProperty("java.io.tmpdir") + File.separator + "scheduler_config.ini");
+        properties.put(PASchedulerProperties.SCHEDULER_RMCONNECTION_AUTO_CONNECT.getKey(), "false");
+        properties.store(new FileOutputStream(config), null);
+    }
+    
+    @After
+    public void deleteConfig() {
+        if (config != null) {
+            config.delete();
+        }
+    }
+    
 
     @Test
     public void test() throws Exception {
@@ -47,7 +77,7 @@ public class TestOperationsWhenUnlinked extends FunctionalTest {
 
         String rmUrl = "rmi://localhost:" + CentralPAPropertyRepository.PA_RMI_PORT.getValue() + "/";
 
-        SchedulerTHelper.startScheduler(false, null, null, rmUrl);
+        SchedulerTHelper.startScheduler(false, config.getAbsolutePath(), null, rmUrl);
 
         testSubmitAndPause(rmUrl);
 
