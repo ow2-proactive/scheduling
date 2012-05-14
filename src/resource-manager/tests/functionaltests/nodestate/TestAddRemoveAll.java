@@ -66,7 +66,7 @@ public class TestAddRemoveAll extends FunctionalTest {
         resourceManager.createNodeSource(NodeSource.DEFAULT, DefaultInfrastructureManager.class.getName(),
                 null, StaticPolicy.class.getName(), null);
         helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, NodeSource.DEFAULT);
-        Node nodeToAdd = helper.createNode(nodeName);
+        Node nodeToAdd = helper.createNode(nodeName).getNode();
         resourceManager.addNode(nodeToAdd.getNodeInformation().getURL(), NodeSource.DEFAULT)
                 .getBooleanValue();
         //at this time, nodes maybe fully added in the nodesource but not in the core

@@ -202,7 +202,7 @@ public final class ResourceManagerJMXTest extends FunctionalTest {
 
             RMTHelper.log("Test as user 4 - Check RuntimeDataMBean attributes are correct");
             // Start a new node and add it to the rm
-            final Node node = RMTHelper.getDefaultInstance().createNode("test");
+            final Node node = RMTHelper.getDefaultInstance().createNode("test").getNode();
             final String nodeURL = node.getNodeInformation().getURL();
             RMTHelper.getDefaultInstance().getResourceManager().addNode(nodeURL).getBooleanValue(); // force sync, now the node is in configuring state
 

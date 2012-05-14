@@ -113,7 +113,7 @@ public final class AddGetDownRemoveTest extends FunctionalTest {
         // ADD, GET, DOWN, REMOVE
         // 1) ADD
         final String name = "test";
-        Node node = RMTHelper.getDefaultInstance().createNode(name);
+        Node node = RMTHelper.getDefaultInstance().createNode(name).getNode();
         final String nodeURL = node.getNodeInformation().getURL();
         r.addNode(nodeURL).getBooleanValue();
 

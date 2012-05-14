@@ -39,7 +39,6 @@ package org.ow2.proactive.scheduler.core;
 import java.security.KeyException;
 import java.security.PrivateKey;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;

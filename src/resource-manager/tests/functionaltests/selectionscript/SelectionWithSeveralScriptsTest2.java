@@ -114,7 +114,7 @@ public class SelectionWithSeveralScriptsTest2 extends FunctionalTest {
         HashMap<String, String> vmProp1 = new HashMap<String, String>();
         vmProp1.put(this.vmPropKey1, this.vmPropValue1);
 
-        String node1URL = helper.createNode(node1Name, vmProp1).getNodeInformation().getURL();
+        String node1URL = helper.createNode(node1Name, vmProp1).getNode().getNodeInformation().getURL();
         resourceManager.addNode(node1URL);
 
         //wait node adding event
@@ -130,7 +130,8 @@ public class SelectionWithSeveralScriptsTest2 extends FunctionalTest {
         vmTwoProperties.put(this.vmPropKey1, this.vmPropValue1);
         vmTwoProperties.put(this.vmPropKey2, this.vmPropValue2);
 
-        String node2URL = helper.createNode(node2Name, vmTwoProperties).getNodeInformation().getURL();
+        String node2URL = helper.createNode(node2Name, vmTwoProperties).getNode().getNodeInformation()
+                .getURL();
         resourceManager.addNode(node2URL);
 
         //wait node adding event

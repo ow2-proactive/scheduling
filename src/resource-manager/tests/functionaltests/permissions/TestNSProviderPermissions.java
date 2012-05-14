@@ -82,8 +82,8 @@ public class TestNSProviderPermissions extends FunctionalTest {
                 StaticPolicy.class.getName(), new Object[] { "ALL", "ME" });
         helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, nsName);
 
-        Node node = helper.createNode("node1");
-        Node node2 = helper.createNode("node2");
+        Node node = helper.createNode("node1").getNode();
+        Node node2 = helper.createNode("node2").getNode();
         try {
             nsadmin.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
         } catch (Exception e) {
@@ -143,9 +143,9 @@ public class TestNSProviderPermissions extends FunctionalTest {
                 .getName(), new Object[] { "ALL", "MY_GROUPS" });
         helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, nsName);
 
-        node = helper.createNode("node1");
-        node2 = helper.createNode("node2");
-        Node node3 = helper.createNode("node3");
+        node = helper.createNode("node1").getNode();
+        node2 = helper.createNode("node2").getNode();
+        Node node3 = helper.createNode("node3").getNode();
         try {
             admin.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
             helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
@@ -219,9 +219,9 @@ public class TestNSProviderPermissions extends FunctionalTest {
                 StaticPolicy.class.getName(), new Object[] { "ALL", "ALL" });
         helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, nsName);
 
-        node = helper.createNode("node1");
-        node2 = helper.createNode("node2");
-        node3 = helper.createNode("node3");
+        node = helper.createNode("node1").getNode();
+        node2 = helper.createNode("node2").getNode();
+        node3 = helper.createNode("node3").getNode();
         try {
             nsadmin.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
             helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
@@ -285,9 +285,9 @@ public class TestNSProviderPermissions extends FunctionalTest {
                 .getName(), new Object[] { "ALL", "users=nsadmin" });
         helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, nsName);
 
-        node = helper.createNode("node1");
-        node2 = helper.createNode("node2");
-        node3 = helper.createNode("node3");
+        node = helper.createNode("node1").getNode();
+        node2 = helper.createNode("node2").getNode();
+        node3 = helper.createNode("node3").getNode();
         try {
             admin.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
             helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
@@ -343,9 +343,9 @@ public class TestNSProviderPermissions extends FunctionalTest {
                 StaticPolicy.class.getName(), new Object[] { "ALL", "groups=nsadmins" }).getBooleanValue();
         helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, nsName);
 
-        node = helper.createNode("node1");
-        node2 = helper.createNode("node2");
-        node3 = helper.createNode("node3");
+        node = helper.createNode("node1").getNode();
+        node2 = helper.createNode("node2").getNode();
+        node3 = helper.createNode("node3").getNode();
         try {
             admin.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
             helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
@@ -401,9 +401,9 @@ public class TestNSProviderPermissions extends FunctionalTest {
                 .getName(), new Object[] { "ALL", "users=radmin;groups=nsadmins" });
         helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, nsName);
 
-        node = helper.createNode("node1");
-        node2 = helper.createNode("node2");
-        node3 = helper.createNode("node3");
+        node = helper.createNode("node1").getNode();
+        node2 = helper.createNode("node2").getNode();
+        node3 = helper.createNode("node3").getNode();
         try {
             admin.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
             helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);

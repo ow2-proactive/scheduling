@@ -86,8 +86,8 @@ public class TestNSNodesPermissions extends FunctionalTest {
         nsadmin.createNodeSource(nsName, DefaultInfrastructureManager.class.getName(), null,
                 StaticPolicy.class.getName(), new Object[] { "ME", "ALL" }).getBooleanValue();
 
-        Node node = helper.createNode("node1");
-        Node node2 = helper.createNode("node2");
+        Node node = helper.createNode("node1").getNode();
+        Node node2 = helper.createNode("node2").getNode();
         nsadmin.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
         helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
         //we eat the configuring to free nodeevent
@@ -134,8 +134,8 @@ public class TestNSNodesPermissions extends FunctionalTest {
         admin.createNodeSource(nsName, DefaultInfrastructureManager.class.getName(), null,
                 StaticPolicy.class.getName(), new Object[] { "MY_GROUPS", "ALL" }).getBooleanValue();
 
-        node = helper.createNode("node1");
-        node2 = helper.createNode("node2");
+        node = helper.createNode("node1").getNode();
+        node2 = helper.createNode("node2").getNode();
         admin.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
         helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
         //we eat the configuring to free nodeevent
@@ -177,8 +177,8 @@ public class TestNSNodesPermissions extends FunctionalTest {
         user.createNodeSource(nsName, DefaultInfrastructureManager.class.getName(), null,
                 StaticPolicy.class.getName(), new Object[] { "PROVIDER", "ALL" }).getBooleanValue();
 
-        node = helper.createNode("node1");
-        node2 = helper.createNode("node2");
+        node = helper.createNode("node1").getNode();
+        node2 = helper.createNode("node2").getNode();
 
         user.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
         helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
@@ -233,8 +233,8 @@ public class TestNSNodesPermissions extends FunctionalTest {
         user.createNodeSource(nsName, DefaultInfrastructureManager.class.getName(), null,
                 StaticPolicy.class.getName(), new Object[] { "PROVIDER_GROUPS", "ALL" }).getBooleanValue();
 
-        node = helper.createNode("node1");
-        node2 = helper.createNode("node2");
+        node = helper.createNode("node1").getNode();
+        node2 = helper.createNode("node2").getNode();
 
         user.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
         helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
@@ -295,7 +295,7 @@ public class TestNSNodesPermissions extends FunctionalTest {
         user.createNodeSource(nsName, DefaultInfrastructureManager.class.getName(), null,
                 StaticPolicy.class.getName(), new Object[] { "ALL", "ALL" }).getBooleanValue();
 
-        node = helper.createNode("node1");
+        node = helper.createNode("node1").getNode();
         user.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
         helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
         //we eat the configuring to free nodeevent
@@ -324,8 +324,8 @@ public class TestNSNodesPermissions extends FunctionalTest {
         admin.createNodeSource(nsName, DefaultInfrastructureManager.class.getName(), null,
                 StaticPolicy.class.getName(), new Object[] { "users=nsadmin", "ALL" }).getBooleanValue();
 
-        node = helper.createNode("node1");
-        node2 = helper.createNode("node2");
+        node = helper.createNode("node1").getNode();
+        node2 = helper.createNode("node2").getNode();
         admin.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
         helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
         //we eat the configuring to free nodeevent
@@ -369,8 +369,8 @@ public class TestNSNodesPermissions extends FunctionalTest {
         admin.createNodeSource(nsName, DefaultInfrastructureManager.class.getName(), null,
                 StaticPolicy.class.getName(), new Object[] { "groups=nsadmins", "ALL" }).getBooleanValue();
 
-        node = helper.createNode("node1");
-        node2 = helper.createNode("node2");
+        node = helper.createNode("node1").getNode();
+        node2 = helper.createNode("node2").getNode();
         admin.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
         helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
         //we eat the configuring to free nodeevent
@@ -425,8 +425,8 @@ public class TestNSNodesPermissions extends FunctionalTest {
                 StaticPolicy.class.getName(), new Object[] { "users=radmin;groups=nsadmins", "ALL" })
                 .getBooleanValue();
 
-        node = helper.createNode("node1");
-        node2 = helper.createNode("node2");
+        node = helper.createNode("node1").getNode();
+        node2 = helper.createNode("node2").getNode();
         admin.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
         helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
         //we eat the configuring to free nodeevent

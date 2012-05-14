@@ -117,7 +117,7 @@ public class SelectionScriptTimeOutTest extends FunctionalTest {
         HashMap<String, String> vmProperties = new HashMap<String, String>();
         vmProperties.put(nodeName, "dummy");
 
-        String nodeURL = helper.createNode(nodeName, vmProperties).getNodeInformation().getURL();
+        String nodeURL = helper.createNode(nodeName, vmProperties).getNode().getNodeInformation().getURL();
         resourceManager.addNode(nodeURL);
         helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
         //wait for the nodes to be in free state

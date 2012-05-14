@@ -47,9 +47,9 @@ public class TestOperationsWhenUnlinked extends FunctionalTest {
     }
 
     private RMTHelper helper = RMTHelper.getDefaultInstance();
-    
+
     private File config;
-    
+
     @Before
     public void createConfig() throws Exception {
         // set property SCHEDULER_RMCONNECTION_AUTO_CONNECT to false so that RM failure is detected more fast
@@ -57,19 +57,18 @@ public class TestOperationsWhenUnlinked extends FunctionalTest {
 
         Properties properties = new Properties();
         properties.load(new FileInputStream(configurationFile));
-        
+
         config = new File(System.getProperty("java.io.tmpdir") + File.separator + "scheduler_config.ini");
         properties.put(PASchedulerProperties.SCHEDULER_RMCONNECTION_AUTO_CONNECT.getKey(), "false");
         properties.store(new FileOutputStream(config), null);
     }
-    
+
     @After
     public void deleteConfig() {
         if (config != null) {
             config.delete();
         }
     }
-    
 
     @Test
     public void test() throws Exception {

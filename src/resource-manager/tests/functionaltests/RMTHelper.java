@@ -64,7 +64,6 @@ import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.RMConnection;
-import org.ow2.proactive.resourcemanager.frontend.RMEventListener;
 import org.ow2.proactive.resourcemanager.frontend.RMMonitoring;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
@@ -151,7 +150,7 @@ public class RMTHelper {
      * @throws IOException if the external JVM cannot be created
      * @throws NodeException if lookup of the new node fails.
      */
-    public Node createNode(String nodeName) throws IOException, NodeException {
+    public TNode createNode(String nodeName) throws IOException, NodeException {
         return createNode(nodeName, null);
     }
 
@@ -168,7 +167,7 @@ public class RMTHelper {
         ResourceManager rm = getResourceManager();
         for (int i = 0; i < nodesNumber; i++) {
             String nodeName = "default_nodermt_" + System.currentTimeMillis();
-            Node node = createNode(nodeName);
+            Node node = createNode(nodeName).getNode();
             rm.addNode(node.getNodeInformation().getURL());
         }
     }
@@ -188,7 +187,7 @@ public class RMTHelper {
                         setup.getJvmParameters() }, StaticPolicy.class.getName(), null);
     }
 
-    public Node createNode(String nodeName, Map<String, String> vmParameters) throws IOException,
+    public TNode createNode(String nodeName, Map<String, String> vmParameters) throws IOException,
             NodeException {
         String expectedUrl = "//" + ProActiveInet.getInstance().getHostname() + "/" + nodeName;
         return createNode(nodeName, expectedUrl, vmParameters);
@@ -206,7 +205,7 @@ public class RMTHelper {
      * @throws IOException if the external JVM cannot be created
      * @throws NodeException if lookup of the new node fails.
      */
-    public Node createNode(String nodeName, String expectedUrl, Map<String, String> vmParameters)
+    public TNode createNode(String nodeName, String expectedUrl, Map<String, String> vmParameters)
             throws IOException, NodeException {
 
         JVMProcessImpl nodeProcess = new JVMProcessImpl(
@@ -238,7 +237,7 @@ public class RMTHelper {
                     //nothing, wait another loop
                 }
                 if (newNode != null)
-                    return newNode;
+                    return new TNode(nodeProcess, newNode);
                 else
                     Thread.sleep(1000);
             }
