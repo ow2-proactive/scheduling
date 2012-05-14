@@ -189,8 +189,7 @@ public class RMTHelper {
 
     public TNode createNode(String nodeName, Map<String, String> vmParameters) throws IOException,
             NodeException {
-        String expectedUrl = "//" + ProActiveInet.getInstance().getHostname() + "/" + nodeName;
-        return createNode(nodeName, expectedUrl, vmParameters);
+        return createNode(nodeName, null, vmParameters, null);
     }
 
     /**
@@ -205,8 +204,12 @@ public class RMTHelper {
      * @throws IOException if the external JVM cannot be created
      * @throws NodeException if lookup of the new node fails.
      */
-    public TNode createNode(String nodeName, String expectedUrl, Map<String, String> vmParameters)
-            throws IOException, NodeException {
+    public TNode createNode(String nodeName, String expectedUrl, Map<String, String> vmParameters,
+            List<String> vmOptions) throws IOException, NodeException {
+
+        if (expectedUrl == null) {
+            expectedUrl = "//" + ProActiveInet.getInstance().getHostname() + "/" + nodeName;
+        }
 
         JVMProcessImpl nodeProcess = new JVMProcessImpl(
             new org.objectweb.proactive.core.process.AbstractExternalProcess.StandardOutputMessageLogger());
@@ -218,6 +221,11 @@ public class RMTHelper {
                 if (!entry.getKey().equals("") && !entry.getValue().equals("")) {
                     jvmParameters += " -D" + entry.getKey() + "=" + entry.getValue();
                 }
+            }
+        }
+        if (vmOptions != null) {
+            for (String option : vmOptions) {
+                jvmParameters += " " + option;
             }
         }
 
@@ -236,10 +244,11 @@ public class RMTHelper {
                     toThrow = e;
                     //nothing, wait another loop
                 }
-                if (newNode != null)
+                if (newNode != null) {
                     return new TNode(nodeProcess, newNode);
-                else
+                } else {
                     Thread.sleep(1000);
+                }
             }
             throw toThrow == null ? new NodeException("unable to create the node " + nodeName) : toThrow;
         } catch (InterruptedException e) {

@@ -113,7 +113,7 @@ public class MultipleRMTBase extends FunctionalTest {
         for (int i = 0; i < nodesNumber; i++) {
             String nodeName = "node-" + i;
             String nodeUrl = "rmi://localhost:" + rmiPort + "/" + nodeName;
-            helper.createNode(nodeName, nodeUrl, map);
+            helper.createNode(nodeName, nodeUrl, map, null);
             helper.getResourceManager().addNode(nodeUrl);
         }
         helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, NodeSource.DEFAULT);
