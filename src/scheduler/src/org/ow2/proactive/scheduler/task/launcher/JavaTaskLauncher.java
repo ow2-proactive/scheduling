@@ -101,15 +101,20 @@ public class JavaTaskLauncher extends TaskLauncher {
      * @return a task result representing the result of this task execution.
      */
     @Override
-    public TaskResult doTask(TaskTerminateNotification core, ExecutableContainer executableContainer,
+    public void doTask(TaskTerminateNotification core, ExecutableContainer executableContainer,
             TaskResult... results) {
+        doTaskAndGetResult(core, executableContainer, results);
+    }
+
+    public TaskResult doTaskAndGetResult(TaskTerminateNotification core,
+            ExecutableContainer executableContainer, TaskResult... results) {
         long duration = -1;
         long sample = 0;
         // Executable result (res or ex)
         Throwable exception = null;
         Serializable userResult = null;
         // TaskResult produced by doTask
-        TaskResultImpl res = null;
+        TaskResultImpl res;
         try {
             //init dataspace
             initDataSpaces();
@@ -201,6 +206,8 @@ public class JavaTaskLauncher extends TaskLauncher {
                 }
                 res.setPropagatedProperties(retreivePropagatedProperties());
                 res.setLogs(this.getLogs());
+            } else {
+                res = null;
             }
 
             // finalize doTask
@@ -208,7 +215,7 @@ public class JavaTaskLauncher extends TaskLauncher {
             // This call is conditioned by the isKilled ...
             // An example when we don't want to finalize task is when using
             // forked java task, then only finalizing loggers is enough.
-            this.finalizeTask(core);
+            this.finalizeTask(core, res);
         }
         return res;
     }

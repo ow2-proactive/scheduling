@@ -106,10 +106,11 @@ public class TestTaskRestartOnNodeFailure extends FunctionalTest {
 
     }
 
+    private RMTHelper rmHelper = RMTHelper.getDefaultInstance();
+
     @Test
     public void testRestart() throws Exception {
         System.out.println("Start RM");
-        RMTHelper rmHelper = RMTHelper.getDefaultInstance();
         rmHelper.getResourceManager();
 
         TNode node1 = startNode(rmHelper);
@@ -120,65 +121,76 @@ public class TestTaskRestartOnNodeFailure extends FunctionalTest {
 
         CommunicationObject communicationObject = PAActiveObject.newActive(CommunicationObject.class,
                 new Object[] {});
-        String communicationObjectUrl = PAActiveObject.getUrl(communicationObject);
 
-        for (int i = 0; i < 3; i++) {
-            communicationObject.setCanFinish(false);
-            TNode node2 = startNode(rmHelper);
+        node1 = testTaskKillNode(communicationObject, node1, false);
+        node1 = testTaskKillNode(communicationObject, node1, true);
+        node1 = testTaskKillNode(communicationObject, node1, false);
+        node1 = testTaskKillNode(communicationObject, node1, true);
+    }
 
-            System.out.println("Submit job");
-            final JobId jobId = SchedulerTHelper.submitJob(createJob(communicationObjectUrl));
+    private TNode testTaskKillNode(CommunicationObject communicationObject, TNode node1,
+            boolean waitBeforeKill) throws Exception {
+        communicationObject.setCanFinish(false);
+        TNode node2 = startNode(rmHelper);
 
-            System.out.println("Wait when node becomes busy");
-            RMNodeEvent event;
-            do {
-                event = rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED, TIMEOUT);
-            } while (!event.getNodeState().equals(NodeState.BUSY));
+        System.out.println("Submit job");
+        final JobId jobId = SchedulerTHelper.submitJob(createJob(PAActiveObject.getUrl(communicationObject)));
 
-            final String taskNodeUrl = event.getNodeUrl();
+        System.out.println("Wait when node becomes busy");
+        RMNodeEvent event;
+        do {
+            event = rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED, TIMEOUT);
+        } while (!event.getNodeState().equals(NodeState.BUSY));
 
-            TNode aliveNode;
-            TNode nodeToKill;
+        final String taskNodeUrl = event.getNodeUrl();
 
-            if (taskNodeUrl.equals(node1.getNode().getNodeInformation().getURL())) {
-                nodeToKill = node1;
-                aliveNode = node2;
-            } else if (taskNodeUrl.equals(node2.getNode().getNodeInformation().getURL())) {
-                nodeToKill = node2;
-                aliveNode = node1;
-            } else {
-                throw new Exception("Can't detect node by URL: " + event.getNodeUrl());
-            }
+        TNode aliveNode;
+        TNode nodeToKill;
 
-            System.out.println("Wait when task starts");
-            SchedulerTHelper.waitForEventTaskRunning(jobId, "Test task");
-
-            System.out.println("Wait some time");
-            Thread.sleep(5000);
-
-            System.out.println("Stop task node process (node " +
-                nodeToKill.getNode().getNodeInformation().getURL() + ")");
-            nodeToKill.getNodeProcess().stopProcess();
-
-            System.out.println("Let task finish");
-            communicationObject.setCanFinish(true);
-
-            System.out.println("Wait when job finish");
-            SchedulerTHelper.waitForEventJobFinished(jobId, TIMEOUT);
-
-            event = rmHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, aliveNode.getNode()
-                    .getNodeInformation().getURL(), TIMEOUT);
-            Assert.assertEquals(NodeState.BUSY, event.getNodeState());
-            event = rmHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, aliveNode.getNode()
-                    .getNodeInformation().getURL(), TIMEOUT);
-            Assert.assertEquals(NodeState.FREE, event.getNodeState());
-
-            System.out.println("Check job result");
-            checkJobResult(SchedulerTHelper.getSchedulerInterface(), jobId);
-
-            node1 = aliveNode;
+        if (taskNodeUrl.equals(node1.getNode().getNodeInformation().getURL())) {
+            nodeToKill = node1;
+            aliveNode = node2;
+        } else if (taskNodeUrl.equals(node2.getNode().getNodeInformation().getURL())) {
+            nodeToKill = node2;
+            aliveNode = node1;
+        } else {
+            throw new Exception("Can't detect node by URL: " + event.getNodeUrl());
         }
 
+        System.out.println("Wait when task starts");
+        SchedulerTHelper.waitForEventTaskRunning(jobId, "Test task");
+
+        /*
+         * Want to test two cases (existed at the time of this writing):
+         * - if wait some time before killing node then node failure is detected by the pinger thread
+         * - if kill node immediately then node failure is detected by the thread calling TaskLauncher.doTask 
+         */
+        if (waitBeforeKill) {
+            System.out.println("Wait some time");
+            Thread.sleep(5000);
+        }
+
+        System.out.println("Stop task node process (node " +
+            nodeToKill.getNode().getNodeInformation().getURL() + ")");
+        nodeToKill.getNodeProcess().stopProcess();
+
+        System.out.println("Let task finish");
+        communicationObject.setCanFinish(true);
+
+        System.out.println("Wait when job finish");
+        SchedulerTHelper.waitForEventJobFinished(jobId, TIMEOUT);
+
+        event = rmHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, aliveNode.getNode()
+                .getNodeInformation().getURL(), TIMEOUT);
+        Assert.assertEquals(NodeState.BUSY, event.getNodeState());
+        event = rmHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, aliveNode.getNode()
+                .getNodeInformation().getURL(), TIMEOUT);
+        Assert.assertEquals(NodeState.FREE, event.getNodeState());
+
+        System.out.println("Check job result");
+        checkJobResult(SchedulerTHelper.getSchedulerInterface(), jobId);
+
+        return aliveNode;
     }
 
     private static int startedNodesCounter;

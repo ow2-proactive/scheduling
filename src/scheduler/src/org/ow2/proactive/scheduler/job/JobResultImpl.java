@@ -59,7 +59,6 @@ import org.hibernate.annotations.CascadeType;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 import org.hibernate.annotations.Proxy;
-import org.objectweb.proactive.api.PAFuture;
 import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
@@ -94,10 +93,6 @@ public class JobResultImpl implements JobResult {
     @Cascade(CascadeType.ALL)
     @OneToOne(fetch = FetchType.EAGER, targetEntity = JobIdImpl.class)
     private JobId id = null;
-
-    /** Temporary used to store proActive future result. */
-    @Transient
-    private Map<String, TaskResult> futurResults = new HashMap<String, TaskResult>();
 
     /** List of every result */
     @OneToMany(cascade = javax.persistence.CascadeType.ALL, targetEntity = TaskResultImpl.class)
@@ -168,17 +163,6 @@ public class JobResultImpl implements JobResult {
     }
 
     /**
-     * Used to store the futur result.
-     * It must be temporary in a Hibernate transient map to avoid empty ID Object.
-     *
-     * @param taskName user define name (in XML) of the task.
-     * @param taskResult the corresponding result of the task.
-     */
-    public void storeFuturResult(String taskName, TaskResult taskResult) {
-        futurResults.put(taskName, taskResult);
-    }
-
-    /**
      * <font color="red">-- For internal use only --</font>
      * Add a new task result to this job result.<br>
      * Used by the scheduler to fill your job result.
@@ -188,8 +172,6 @@ public class JobResultImpl implements JobResult {
      * @param isPrecious true if this taskResult is a precious one. It will figure out in the precious result list.
      */
     public void addTaskResult(String taskName, TaskResult taskResult, boolean isPrecious) {
-        //remove futur Result
-        futurResults.remove(taskName);
         //add to all Results
         allResults.put(taskName, taskResult);
         //add to precious results if needed
@@ -257,31 +239,7 @@ public class JobResultImpl implements JobResult {
         if (!allResults.containsKey(taskName)) {
             throw new UnknownTaskException(taskName + " does not exist in this job (jobId=" + id + ")");
         }
-        TaskResult tr = futurResults.get(taskName);
-        if (tr == null) {
-            return allResults.get(taskName);
-        } else if (!PAFuture.isAwaited(tr)) {
-            return tr;
-        } else {
-            return null;
-        }
-    }
-
-    /**
-     * Return any result even if it is awaited futur.
-     * Null is returned only if the given taskName is unknown
-     * <u>For internal Use.</u>
-     *
-     * @param taskName the task name of the result to get.
-     * @return the result if it exists, null if not.
-     */
-    public TaskResult getAnyResult(String taskName) throws UnknownTaskException {
-        TaskResult tr = futurResults.get(taskName);
-        if (tr == null) {
-            return allResults.get(taskName);
-        } else {
-            return tr;
-        }
+        return allResults.get(taskName);
     }
 
     /**

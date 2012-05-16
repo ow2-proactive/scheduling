@@ -38,6 +38,7 @@ package org.ow2.proactive.scheduler.common;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.scheduler.common.task.TaskId;
+import org.ow2.proactive.scheduler.common.task.TaskResult;
 
 
 /**
@@ -55,6 +56,6 @@ public interface TaskTerminateNotification {
      *
      * @param taskId the identification of the executed task.
      */
-    public void terminate(TaskId taskId);
+    public void terminate(TaskId taskId, TaskResult taskResult);
 
 }
