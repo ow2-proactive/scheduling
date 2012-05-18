@@ -1,14 +1,10 @@
 package org.ow2.proactive.scheduler.job;
 
-import java.io.File;
-import java.io.FilenameFilter;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.ow2.proactive.db.types.BigString;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.job.JobEnvironment;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
@@ -25,37 +21,28 @@ import org.ow2.proactive.scheduler.task.TaskInfoImpl;
 
 /**
  * 
- * This class is a client view of a {@link JobState}. 
- * A client will receive an instance of this class when connecting to the scheduler front-end and ask for a JobState (for instance by using {@link Scheduler#getJobState(String)}).
- *    
- * The value of some attributes will not be available in this view of the JobState. Therefore, calling the respective getters will throw a RuntimeException:
+ * This class is a client view of a {@link JobState}. A client will receive an
+ * instance of this class when connecting to the scheduler front-end and ask for
+ * a JobState (for instance by using {@link Scheduler#getJobState(String)}).
  * 
- * <ul>
- *  <li>
- *  {@link #getEnvironment()}
- *  </li>
- *  <li>
- *  {@link #getEnvironment()}
- *  </li>
- * </ul> 
- *  
- *   
+ * The value of some attributes will not be available in this view of the
+ * JobState. Therefore, calling the respective getters will throw a
+ * RuntimeException. See the public method's javadoc for more details.
  * 
  * @author esalagea
- *
+ * 
  */
-public class ClientJobState extends JobState {
+public final class ClientJobState extends JobState {
 
     private JobInfoImpl jobInfo;
     private String owner;
     private JobType type;
-    protected Map<TaskId, TaskState> tasks = new HashMap<TaskId, TaskState>();
+    private Map<TaskId, TaskState> tasks = new HashMap<TaskId, TaskState>();
 
     private boolean cancelJobOnError;
     private int maxNumberOfExecution;
 
-    //replacing the super's genericInformations attribute
-    private HashMap<String, String> genericInformations_client;
+    private HashMap<String, String> genericInformations;
 
     public ClientJobState(JobState jobState) {
         // converting internal job into a light job descriptor
@@ -73,7 +60,7 @@ public class ClientJobState extends JobState {
         this.cancelJobOnError = jobState.isCancelJobOnError();
         this.maxNumberOfExecution = jobState.getMaxNumberOfExecution();
 
-        this.genericInformations_client = new HashMap<String, String>(jobState.getGenericInformations());
+        this.genericInformations = new HashMap<String, String>(jobState.getGenericInformations());
 
         List<ClientTaskState> taskStates = new ArrayList<ClientTaskState>();
         for (TaskState ts : jobState.getTasks()) {
@@ -96,7 +83,7 @@ public class ClientJobState extends JobState {
 
     @Override
     public Map<String, String> getGenericInformations() {
-        return this.genericInformations_client;
+        return this.genericInformations;
     }
 
     @Override
@@ -122,16 +109,16 @@ public class ClientJobState extends JobState {
                 "This job info is not applicable for this job. (expected id is '" + getId() + "' but was '" +
                     info.getJobId() + "'");
         }
-        //update job info
+        // update job info
         this.jobInfo = (JobInfoImpl) info;
-        //update task status if needed
+        // update task status if needed
         if (this.jobInfo.getTaskStatusModify() != null) {
             for (TaskId id : tasks.keySet()) {
                 TaskInfoImpl taskInfo = (TaskInfoImpl) tasks.get(id).getTaskInfo();
                 taskInfo.setStatus(this.jobInfo.getTaskStatusModify().get(id));
             }
         }
-        //update task finished time if needed
+        // update task finished time if needed
         if (this.jobInfo.getTaskFinishedTimeModify() != null) {
             for (TaskId id : tasks.keySet()) {
                 if (this.jobInfo.getTaskFinishedTimeModify().containsKey(id)) {
@@ -192,7 +179,8 @@ public class ClientJobState extends JobState {
     }
 
     /**
-     * This property is not available for this implementation. Calling this method will throw a RuntimeException
+     * This property is not available for this implementation. Calling this
+     * method will throw a RuntimeException
      */
     @Override
     public JobEnvironment getEnvironment() {
@@ -200,7 +188,8 @@ public class ClientJobState extends JobState {
     }
 
     /**
-     * This property is not available for this implementation. Calling this method will throw a RuntimeException
+     * This property is not available for this implementation. Calling this
+     * method will throw a RuntimeException
      */
     @Override
     public RestartMode getRestartTaskOnError() {

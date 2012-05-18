@@ -19,20 +19,18 @@ import org.ow2.proactive.scripting.SelectionScript;
 
 /**
  * 
- * This class is a client view of a {@link TaskState}. 
- * A client may access instances of this class when connecting to the scheduler front-end and ask for a JobState (for instance by using {@link Scheduler#getJobState(String)}).
- *    
- * The value of some attributes will not be available in this view of the TaskState. Therefore, calling the respective getters will throw a RuntimeException.
- * See the public method's  javadoc for more details. 
+ * This class is a client view of a {@link TaskState}. A client may access
+ * instances of this class when connecting to the scheduler front-end and ask
+ * for a JobState (for instance by using {@link Scheduler#getJobState(String)}).
  * 
- * 
- *  
- *   
+ * The value of some attributes will not be available in this view of the
+ * TaskState. Therefore, calling the respective getters will throw a
+ * RuntimeException. See the public method's javadoc for more details.
  * 
  * @author esalagea
- *
+ * 
  */
-public class ClientTaskState extends TaskState {
+public final class ClientTaskState extends TaskState {
 
     private TaskInfo taskInfo;
     private int maxNumberOfExecutionOnFailure;
@@ -45,7 +43,7 @@ public class ClientTaskState extends TaskState {
     private int maxNumberOfExecution;
 
     public ClientTaskState(TaskState taskState) {
-        //copy information from the TaskStae passed as an argument
+        // copy information from the TaskStae passed as an argument
         taskInfo = taskState.getTaskInfo();
         maxNumberOfExecutionOnFailure = taskState.getMaxNumberOfExecutionOnFailure();
         iterationIndex = taskState.getIterationIndex();
@@ -128,7 +126,8 @@ public class ClientTaskState extends TaskState {
     }
 
     /**
-     * This property is not available for this implementation. Calling this method will throw a RuntimeException
+     * This property is not available for this implementation. Calling this
+     * method will throw a RuntimeException
      */
     @Override
     public List<InputSelector> getInputFilesList() {
@@ -137,7 +136,8 @@ public class ClientTaskState extends TaskState {
     }
 
     /**
-     * This property is not available for this implementation. Calling this method will throw a RuntimeException
+     * This property is not available for this implementation. Calling this
+     * method will throw a RuntimeException
      */
     @Override
     public List<OutputSelector> getOutputFilesList() {
@@ -146,7 +146,8 @@ public class ClientTaskState extends TaskState {
     }
 
     /**
-     * This property is not available for this implementation. Calling this method will throw a RuntimeException
+     * This property is not available for this implementation. Calling this
+     * method will throw a RuntimeException
      */
     @Override
     public ParallelEnvironment getParallelEnvironment() {
@@ -155,7 +156,8 @@ public class ClientTaskState extends TaskState {
     }
 
     /**
-     * This property is not available for this implementation. Calling this method will throw a RuntimeException
+     * This property is not available for this implementation. Calling this
+     * method will throw a RuntimeException
      */
     @Override
     public Script<?> getPreScript() {
@@ -164,7 +166,8 @@ public class ClientTaskState extends TaskState {
     }
 
     /**
-     * This property is not available for this implementation. Calling this method will throw a RuntimeException
+     * This property is not available for this implementation. Calling this
+     * method will throw a RuntimeException
      */
     @Override
     public Script<?> getPostScript() {
@@ -173,7 +176,8 @@ public class ClientTaskState extends TaskState {
     }
 
     /**
-     * This property is not available for this implementation. Calling this method will throw a RuntimeException
+     * This property is not available for this implementation. Calling this
+     * method will throw a RuntimeException
      */
     @Override
     public List<SelectionScript> getSelectionScripts() {
@@ -182,7 +186,8 @@ public class ClientTaskState extends TaskState {
     }
 
     /**
-     * This property is not available for this implementation. Calling this method will throw a RuntimeException
+     * This property is not available for this implementation. Calling this
+     * method will throw a RuntimeException
      */
     @Override
     public FlowScript getFlowScript() {
@@ -191,7 +196,8 @@ public class ClientTaskState extends TaskState {
     }
 
     /**
-     * This property is not available for this implementation. Calling this method will throw a RuntimeException
+     * This property is not available for this implementation. Calling this
+     * method will throw a RuntimeException
      */
     @Override
     public RestartMode getRestartTaskOnError() {
