@@ -49,6 +49,8 @@ import org.objectweb.proactive.annotation.PublicAPI;
 @PublicAPI
 public class TaskAbortedException extends SchedulerException {
 
+    private static final long serialVersionUID = 32L;
+
     /**
      * Create a new instance of TaskAbortedException
      *

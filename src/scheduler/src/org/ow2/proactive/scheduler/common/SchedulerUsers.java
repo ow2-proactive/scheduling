@@ -60,6 +60,8 @@ import org.ow2.proactive.scheduler.common.job.UserIdentification;
 @PublicAPI
 public class SchedulerUsers implements Serializable {
 
+    private static final long serialVersionUID = 32L;
+
     /** 
      * List of connected user.
      * Will be sorted by default as defined in the {@link UserIdentification#compareTo(UserIdentification)} method !

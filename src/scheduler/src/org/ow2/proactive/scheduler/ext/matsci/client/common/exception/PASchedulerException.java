@@ -12,6 +12,8 @@ import org.ow2.proactive.scheduler.ext.common.util.StackTraceUtil;
  */
 public class PASchedulerException extends RuntimeException {
 
+    private static final long serialVersionUID = 32L;
+
     private ExceptionType type;
 
     public enum ExceptionType {

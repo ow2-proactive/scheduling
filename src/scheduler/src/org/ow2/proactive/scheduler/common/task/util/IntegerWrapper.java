@@ -67,6 +67,8 @@ import org.objectweb.proactive.annotation.PublicAPI;
 @Proxy(lazy = false)
 @XmlAccessorType(XmlAccessType.FIELD)
 public class IntegerWrapper implements Serializable {
+
+    private static final long serialVersionUID = 32L;
     @Id
     @GeneratedValue
     @Column(name = "ID")

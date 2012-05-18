@@ -66,6 +66,8 @@ import org.hibernate.annotations.Proxy;
 @XmlAccessorType(XmlAccessType.FIELD)
 public final class PropertyModifier implements Serializable {
 
+    private static final long serialVersionUID = 32L;
+
     @Id
     @GeneratedValue
     @XmlTransient

@@ -66,6 +66,8 @@ import org.ow2.proactive.resourcemanager.authentication.Client;
  */
 public class AccessType implements Serializable {
 
+    private static final long serialVersionUID = 32L;
+
     private static Set<String> types = new HashSet<String>();
 
     public static final AccessType ME = new AccessType("ME");

@@ -62,6 +62,8 @@ import org.ow2.proactive.resourcemanager.utils.RMLoggers;
  */
 @ActiveObject
 public class CronPolicy extends NodeSourcePolicy implements InitActive {
+
+    private static final long serialVersionUID = 32L;
     protected static Logger logger = ProActiveLogger.getLogger(RMLoggers.POLICY);
 
     /**

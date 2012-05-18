@@ -165,6 +165,8 @@ public class SchedulerFixture extends ActiveFixture {
 
     public class CannotRegisterListenerException extends Exception {
 
+    private static final long serialVersionUID = 32L;
+
         public CannotRegisterListenerException(String msg) {
             super(msg);
         }

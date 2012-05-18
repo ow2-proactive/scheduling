@@ -54,6 +54,8 @@ import org.ow2.proactive.scheduler.common.task.util.ResultPreviewTool.SimpleText
  *
  */
 public class JoinPreview extends ResultPreview {
+
+    private static final long serialVersionUID = 32L;
     private static final String MATCH_PATTERN = "Merged picture parts in ";
 
     /**

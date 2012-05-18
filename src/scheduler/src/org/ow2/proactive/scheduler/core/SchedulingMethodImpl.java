@@ -688,5 +688,7 @@ final class SchedulingMethodImpl implements SchedulingMethod {
     }
 
     private class PendingRequestException extends Exception {
+
+    private static final long serialVersionUID = 32L;
     }
 }

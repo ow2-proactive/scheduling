@@ -79,6 +79,8 @@ import java.util.TreeSet;
  */
 public class AOMatlabEnvironment extends AOMatSciEnvironment<Boolean, MatlabResultsAndLogs> {
 
+    private static final long serialVersionUID = 32L;
+
     /**
      * Constructs the environment AO
      */

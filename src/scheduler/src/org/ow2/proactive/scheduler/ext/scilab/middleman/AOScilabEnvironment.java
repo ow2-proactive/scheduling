@@ -78,6 +78,8 @@ import java.util.TreeSet;
  */
 public class AOScilabEnvironment extends AOMatSciEnvironment<ScilabType, ScilabResultsAndLogs> {
 
+    private static final long serialVersionUID = 32L;
+
     /**
      * log4j logger
      */

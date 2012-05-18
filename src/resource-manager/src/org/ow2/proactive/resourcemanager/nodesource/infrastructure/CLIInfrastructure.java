@@ -26,6 +26,8 @@ import org.ow2.proactive.utils.FileToBytesConverter;
  */
 public class CLIInfrastructure extends HostsFileBasedInfrastructureManager {
 
+    private static final long serialVersionUID = 32L;
+
     @Configurable(description = "An interpreter that executes the script")
     protected String interpreter = "bash";
 

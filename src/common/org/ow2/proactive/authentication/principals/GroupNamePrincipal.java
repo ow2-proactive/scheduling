@@ -38,6 +38,8 @@ package org.ow2.proactive.authentication.principals;
 
 public class GroupNamePrincipal extends IdentityPrincipal {
 
+    private static final long serialVersionUID = 32L;
+
     public GroupNamePrincipal(String name) {
         super(name);
     }

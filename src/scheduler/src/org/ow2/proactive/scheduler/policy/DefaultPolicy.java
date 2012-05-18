@@ -55,6 +55,8 @@ import org.ow2.proactive.scheduler.descriptor.JobDescriptor;
  */
 public class DefaultPolicy extends Policy {
 
+    private static final long serialVersionUID = 32L;
+
     /**
      * {@inheritDoc}
      * Override reload to avoid reading config file

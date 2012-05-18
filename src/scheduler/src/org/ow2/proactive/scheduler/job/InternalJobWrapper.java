@@ -47,6 +47,8 @@ import java.io.Serializable;
  */
 public class InternalJobWrapper implements Serializable {
 
+    private static final long serialVersionUID = 32L;
+
     private InternalJob job;
 
     /**

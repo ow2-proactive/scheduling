@@ -44,6 +44,8 @@ package org.ow2.proactive.scheduler.common.exception;
  */
 public class InternalException extends RuntimeException {
 
+    private static final long serialVersionUID = 32L;
+
     /**
      * Create a new instance of InternalException
      *

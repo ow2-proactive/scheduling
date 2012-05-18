@@ -44,6 +44,8 @@ package org.ow2.proactive.scheduler.exception;
  */
 public class AdminSchedulerException extends Exception {
 
+    private static final long serialVersionUID = 32L;
+
     /**  */
 
     /**

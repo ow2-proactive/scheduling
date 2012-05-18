@@ -43,6 +43,8 @@ package org.ow2.proactive.scheduler.ext.matsci.client.common.data;
  */
 public class Pair<X, Y> implements java.io.Serializable {
 
+    private static final long serialVersionUID = 32L;
+
     X x;
     Y y;
 

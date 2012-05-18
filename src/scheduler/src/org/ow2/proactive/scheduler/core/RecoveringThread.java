@@ -44,6 +44,8 @@ package org.ow2.proactive.scheduler.core;
  */
 public class RecoveringThread extends Thread implements RecoverCallback {
 
+    private static final long serialVersionUID = 32L;
+
     private int jobsToRecover = 1;
     private int jobsRecovered = 0;
 

@@ -46,6 +46,8 @@ import org.ow2.proactive.scheduler.ext.matsci.common.data.PASolveMatSciTaskConfi
  */
 public class PASolveScilabTaskConfig extends PASolveMatSciTaskConfig {
 
+    private static final long serialVersionUID = 32L;
+
     /**
      * name of the scilab function used
      */

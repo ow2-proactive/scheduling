@@ -68,6 +68,8 @@ import org.objectweb.proactive.annotation.PublicAPI;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class RestartMode implements java.io.Serializable {
 
+    private static final long serialVersionUID = 32L;
+
     // WARNING, DO NOT CHANGE index property in RestartMode construction,
     // 1="Anywhere", 2="Elsewhere" (Changing the index can create inconsistent state in DB)
 

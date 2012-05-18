@@ -80,6 +80,8 @@ import org.ow2.proactive.scheduler.common.task.TaskInfo;
 @ActiveObject
 public class CachingSchedulerProxyUserInterface extends SchedulerProxyUserInterface implements
         SchedulerEventListener {
+
+    private static final long serialVersionUID = 32L;
     protected boolean isCachingEnabled = false;
 
     /**

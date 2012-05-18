@@ -79,6 +79,8 @@ import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
  */
 public class PAHadoopJobConfiguration extends Configuration implements Serializable {
 
+    private static final long serialVersionUID = 32L;
+
     /**
      * Further configuration parameter that can be used to store the
      * DataSpacesFileObject a {@link JavaExecutable} or a {@link FileSystem}

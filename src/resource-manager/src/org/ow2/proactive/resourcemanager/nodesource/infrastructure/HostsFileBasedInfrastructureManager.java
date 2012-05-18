@@ -57,6 +57,8 @@ import org.ow2.proactive.utils.FileToBytesConverter;
 /** Abstract infrastructure Manager implementation based on hosts list file. */
 public abstract class HostsFileBasedInfrastructureManager extends InfrastructureManager {
 
+    private static final long serialVersionUID = 32L;
+
     public static final int DEFAULT_NODE_TIMEOUT = 60 * 1000;
     public static final int DEFAULT_NODE_DEPLOYMENT_FAILURE_THRESHOLD = 5;
 

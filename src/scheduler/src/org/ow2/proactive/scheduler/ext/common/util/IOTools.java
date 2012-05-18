@@ -266,6 +266,8 @@ public class IOTools {
 
     public static class RedirectionThread implements Runnable, Serializable {
 
+    private static final long serialVersionUID = 32L;
+
         private InputStream is;
         private OutputStream os;
 
@@ -307,6 +309,8 @@ public class IOTools {
      * @author The ProActive Team
      */
     public static class LoggingThread implements Runnable, Serializable {
+
+    private static final long serialVersionUID = 32L;
 
         private String appendMessage;
         /**  */

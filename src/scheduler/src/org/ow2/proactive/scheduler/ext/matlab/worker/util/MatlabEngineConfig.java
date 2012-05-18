@@ -42,6 +42,8 @@ import org.ow2.proactive.scheduler.ext.matsci.worker.util.MatSciEngineConfigBase
 
 public class MatlabEngineConfig extends MatSciEngineConfigBase {
 
+    private static final long serialVersionUID = 32L;
+
     private static OperatingSystem os = OperatingSystem.getOperatingSystem();
 
     /**

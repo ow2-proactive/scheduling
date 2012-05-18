@@ -50,6 +50,8 @@ import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 
 public final class DataSpaceServiceStarter implements Serializable {
 
+    private static final long serialVersionUID = 32L;
+
     private static final String DEFAULT_LOCAL = System.getProperty("java.io.tmpdir") + File.separator +
         "scheduling";
     private static final String DEFAULT_LOCAL_INPUT = DEFAULT_LOCAL + File.separator + "defaultinput";

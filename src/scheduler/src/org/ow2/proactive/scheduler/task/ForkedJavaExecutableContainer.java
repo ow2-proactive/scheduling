@@ -75,6 +75,8 @@ import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 @Proxy(lazy = true)
 public class ForkedJavaExecutableContainer extends JavaExecutableContainer {
 
+    private static final long serialVersionUID = 32L;
+
     public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.CORE);
 
     /** Environment of a new dedicated JVM */

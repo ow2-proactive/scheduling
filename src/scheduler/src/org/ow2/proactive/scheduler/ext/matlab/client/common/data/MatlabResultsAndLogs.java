@@ -48,6 +48,8 @@ import org.ow2.proactive.scheduler.ext.matsci.client.common.data.ResultsAndLogs;
 
 public class MatlabResultsAndLogs extends ResultsAndLogs<Boolean> {
 
+    private static final long serialVersionUID = 32L;
+
     public MatlabResultsAndLogs() {
         super();
     }

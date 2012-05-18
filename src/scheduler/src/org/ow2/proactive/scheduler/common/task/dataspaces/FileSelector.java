@@ -137,6 +137,8 @@ import org.objectweb.proactive.annotation.PublicAPI;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class FileSelector implements Serializable {
 
+    private static final long serialVersionUID = 32L;
+
     @Id
     @GeneratedValue
     @XmlTransient

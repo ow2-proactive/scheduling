@@ -54,6 +54,8 @@ import org.objectweb.proactive.annotation.PublicAPI;
 @Proxy(lazy = false)
 public class ArbitraryTopologyDescriptor extends TopologyDescriptor {
 
+    private static final long serialVersionUID = 32L;
+
     /**
      * Creates a new instance of the descriptor
      */

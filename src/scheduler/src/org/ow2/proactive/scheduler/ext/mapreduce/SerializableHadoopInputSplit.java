@@ -22,6 +22,8 @@ import org.apache.hadoop.util.ReflectionUtils;
  */
 public class SerializableHadoopInputSplit extends InputSplit implements Serializable {
 
+    private static final long serialVersionUID = 32L;
+
     /**
      * The name of the method the Hadoop framework use to deserialize the InputSplit
      * 	instance

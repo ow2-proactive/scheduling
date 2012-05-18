@@ -38,6 +38,8 @@ package org.ow2.proactive.scheduler.ext.filessplitmerge.exceptions;
 
 public class InvalidInputDataException extends Exception {
 
+    private static final long serialVersionUID = 32L;
+
     public InvalidInputDataException(String message) {
         super(message);
     }

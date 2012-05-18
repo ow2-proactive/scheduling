@@ -107,6 +107,8 @@ import org.ow2.proactive.utils.Formatter;
 @Proxy(lazy = false)
 @XmlAccessorType(XmlAccessType.FIELD)
 public class TaskResultImpl implements TaskResult {
+
+    private static final long serialVersionUID = 32L;
     public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.CORE);
 
     @Id

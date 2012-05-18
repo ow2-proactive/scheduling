@@ -48,6 +48,8 @@ import java.util.ArrayList;
  */
 public class PASolveMatSciTaskConfig implements Serializable {
 
+    private static final long serialVersionUID = 32L;
+
     /**
      * names of source files
      */

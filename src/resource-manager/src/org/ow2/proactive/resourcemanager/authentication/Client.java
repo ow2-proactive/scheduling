@@ -68,6 +68,8 @@ import org.ow2.proactive.resourcemanager.core.history.UserHistory;
  */
 public class Client implements Serializable {
 
+    private static final long serialVersionUID = 32L;
+
     private static final Heartbeat hb = new Heartbeat();
     /** client's name */
     private String name;

@@ -67,6 +67,8 @@ import org.objectweb.proactive.annotation.PublicAPI;
 @Proxy(lazy = false)
 @XmlAccessorType(XmlAccessType.FIELD)
 public final class BigString implements Serializable {
+
+    private static final long serialVersionUID = 32L;
     @Id
     @GeneratedValue
     @Column(name = "ID")

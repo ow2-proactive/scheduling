@@ -66,6 +66,8 @@ public class HACTest extends FunctionalTest {
     protected static HashMap<Node, HashMap<Node, Long>> distances = new HashMap<Node, HashMap<Node, Long>>();
 
     private class LocalTopology implements Topology {
+
+    private static final long serialVersionUID = 32L;
         public Long getDistance(Node node, Node node2) {
             Long distance = null;
             if (distances.get(node) != null && distances.get(node).get(node2) != null) {

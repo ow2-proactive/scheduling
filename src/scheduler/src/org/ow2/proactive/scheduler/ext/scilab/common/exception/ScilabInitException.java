@@ -37,6 +37,8 @@
 package org.ow2.proactive.scheduler.ext.scilab.common.exception;
 
 public class ScilabInitException extends Exception {
+
+    private static final long serialVersionUID = 32L;
     public ScilabInitException(String string) {
         super(string);
     }

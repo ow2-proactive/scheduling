@@ -62,6 +62,8 @@ import org.ow2.proactive.utils.FileToBytesConverter;
 
 public class WinHPCInfrastructure extends DefaultInfrastructureManager {
 
+    private static final long serialVersionUID = 32L;
+
     /**
      * maximum number of nodes this infrastructure can ask simultaneously to the WinHPC scheduler
      */

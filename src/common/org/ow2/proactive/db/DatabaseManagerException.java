@@ -44,6 +44,8 @@ package org.ow2.proactive.db;
  */
 public class DatabaseManagerException extends RuntimeException {
 
+    private static final long serialVersionUID = 32L;
+
     /**
      * Create a new instance of DatabaseManagerException.
      */

@@ -46,6 +46,8 @@ import org.ow2.proactive.scheduler.ext.matsci.common.data.PASolveMatSciGlobalCon
  */
 public class PASolveMatlabGlobalConfig extends PASolveMatSciGlobalConfig {
 
+    private static final long serialVersionUID = 32L;
+
     /**
      * URL of the script used to check licenses
      */

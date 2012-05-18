@@ -43,6 +43,8 @@ package org.ow2.proactive.scheduler.ext.matlab.common.exception;
  */
 public class MatlabTaskException extends RuntimeException {
 
+    private static final long serialVersionUID = 32L;
+
     public MatlabTaskException() {
 
     }

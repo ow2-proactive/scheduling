@@ -97,6 +97,8 @@ public class SchedulerHibernateDatabaseManager extends HibernateDatabaseManager 
     public List<InternalJob> recoverAllJobs(RecoverCallback callback) {
         if (callback == null) {
             callback = new RecoverCallback() {
+
+    private static final long serialVersionUID = 32L;
                 public void init(int nb) {
                 }
 

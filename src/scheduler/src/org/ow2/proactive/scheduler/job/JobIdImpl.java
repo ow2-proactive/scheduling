@@ -67,6 +67,8 @@ import org.ow2.proactive.scheduler.common.job.JobId;
 @XmlRootElement(name = "jobid")
 @XmlAccessorType(XmlAccessType.FIELD)
 public final class JobIdImpl implements JobId {
+
+    private static final long serialVersionUID = 32L;
     @Id
     @GeneratedValue
     @SuppressWarnings("unused")

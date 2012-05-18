@@ -56,6 +56,8 @@ import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
  * @since ProActive Scheduling 0.9
  */
 public class MainLoopRequestFilter implements RequestFilter {
+
+    private static final long serialVersionUID = 32L;
     public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.CORE);
     private ArrayList<String> methodNames = new ArrayList<String>();
 

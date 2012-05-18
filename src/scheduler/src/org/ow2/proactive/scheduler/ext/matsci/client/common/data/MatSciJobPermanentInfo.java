@@ -49,6 +49,8 @@ import java.util.TreeSet;
  */
 public class MatSciJobPermanentInfo implements java.io.Serializable, Cloneable {
 
+    private static final long serialVersionUID = 32L;
+
     /**
      * Id if the job
      */

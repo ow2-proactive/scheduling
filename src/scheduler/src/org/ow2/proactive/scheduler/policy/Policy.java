@@ -67,6 +67,8 @@ import org.ow2.proactive.scheduler.descriptor.JobDescriptor;
 @PublicAPI
 public abstract class Policy implements Serializable {
 
+    private static final long serialVersionUID = 32L;
+
     protected static final Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.POLICY);
 
     /**

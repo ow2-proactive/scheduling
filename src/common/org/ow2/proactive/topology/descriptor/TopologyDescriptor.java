@@ -67,6 +67,8 @@ import org.objectweb.proactive.annotation.PublicAPI;
 @Proxy(lazy = false)
 public class TopologyDescriptor implements Serializable {
 
+    private static final long serialVersionUID = 32L;
+
     /** no constraint on node location */
     public static final TopologyDescriptor ARBITRARY = new ArbitraryTopologyDescriptor();
     /** the set of closest nodes */

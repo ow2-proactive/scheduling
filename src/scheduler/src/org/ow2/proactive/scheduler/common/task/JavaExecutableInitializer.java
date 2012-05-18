@@ -56,6 +56,8 @@ import org.ow2.proactive.utils.NodeSet;
  */
 public class JavaExecutableInitializer implements ExecutableInitializer {
 
+    private static final long serialVersionUID = 32L;
+
     /** Demanded nodes */
     protected NodeSet nodes;
 
