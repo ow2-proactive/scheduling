@@ -908,15 +908,13 @@ public class RMNodeStarter {
         private Properties paPropProperties;
         private String paPropString;
         private int addAttempts = -1, addAttemptsDelay = -1;
-        private final String[] requiredJARs = { "script-js.jar", "jruby-engine.jar",
-                "sigar/sigar.jar",
+        private final String[] requiredJARs = { "script-js.jar", "jruby-engine.jar", "sigar/sigar.jar",
                 "jython-engine.jar",
                 "commons-logging-1.1.1.jar",
                 "ProActive_Scheduler-core.jar",// SCHEDULING-1338 and SCHEDULING-1307 : core required for forked java task
                 "ProActive_SRM-common.jar", "ProActive_ResourceManager.jar",
-                "ProActive_Scheduler-worker.jar", "ProActive_Scheduler-matsci.jar",
-                "ProActive_Scheduler-mapreduce.jar", "commons-httpclient-3.1.jar", "commons-codec-1.3.jar",
-                "ProActive.jar" };
+                "ProActive_Scheduler-worker.jar", "ProActive_Scheduler-mapreduce.jar",
+                "commons-httpclient-3.1.jar", "commons-codec-1.3.jar", "ProActive.jar" };
         private final String addonsDir = "addons";
 
         private OperatingSystem targetOS = OperatingSystem.UNIX;

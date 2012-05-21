@@ -129,10 +129,6 @@
 			<fileset dir="${lib.dir}" includes="**/*.jar" excludes="**/sigar.jar"/>
         </copy>
         <copy todir="${deploy.lib.dir}" flatten="no">
-            <fileset dir="${lib.dir}/matsci" includes="**/*.so"/>
-            <fileset dir="${lib.dir}/matsci" includes="**/*.dll"/>
-        </copy>
-        <copy todir="${deploy.lib.dir}" flatten="no">
             <fileset dir="${lib.dir}/node/"/>
         </copy>
 		<copy todir="${deploy.lib.dir}" flatten="no">

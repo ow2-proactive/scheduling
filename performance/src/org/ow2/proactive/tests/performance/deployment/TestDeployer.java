@@ -36,18 +36,14 @@
  */
 package org.ow2.proactive.tests.performance.deployment;
 
-import java.io.File;
-import java.net.InetAddress;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.ow2.proactive.tests.performance.deployment.process.ProcessExecutor;
 import org.ow2.proactive.tests.performance.utils.TestFileUtils;
 import org.ow2.proactive.tests.performance.utils.TestUtils;
+
+import java.io.File;
+import java.net.InetAddress;
+import java.util.*;
 
 
 public abstract class TestDeployer {
@@ -69,8 +65,8 @@ public abstract class TestDeployer {
     static final String[] requiredJARs = { "script-js.jar", "gson-2.1.jar", "jruby-engine.jar",
             "jython-engine.jar", "commons-logging-1.1.1.jar", "ProActive_Scheduler-core.jar",
             "ProActive_SRM-common.jar", "ProActive_ResourceManager.jar", "ProActive_Scheduler-worker.jar",
-            "ProActive_Scheduler-matsci.jar", "ProActive_Scheduler-mapreduce.jar",
-            "commons-httpclient-3.1.jar", "commons-codec-1.3.jar", "ProActive.jar" };
+            "ProActive_Scheduler-mapreduce.jar", "commons-httpclient-3.1.jar", "commons-codec-1.3.jar",
+            "ProActive.jar" };
 
     public TestDeployer(HostTestEnv serverHostEnv, String clientConfigFileName, String protocol)
             throws InterruptedException {

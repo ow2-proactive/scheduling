@@ -34,10 +34,6 @@ log4j.logger.proactive.scheduler.dev.admin.consol=INFO,CONSOLE
 #log4j.logger.proactive.scheduler.dev.admin.RMproxy=DEBUG
 #log4j.logger.proactive.scheduler.dev.launcher=DEBUG
 #log4j.logger.proactive.scheduler.dev.script=DEBUG
-#log4j.logger.proactive.scheduler.dev.matlab=DEBUG
-#log4j.logger.proactive.scheduler.dev.admin.matlab=DEBUG
-#log4j.logger.proactive.scheduler.dev.scilab=DEBUG
-#log4j.logger.proactive.scheduler.dev.admin.scilab=DEBUG
 #log4j.logger.proactive.scheduler.dev.policy=DEBUG
 #log4j.logger.proactive.scheduler.dev.admin.policy=DEBUG
 

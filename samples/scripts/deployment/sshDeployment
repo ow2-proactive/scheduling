@@ -25,7 +25,6 @@ CLASSPATH=$CLASSPATH:$RM_HOME_NODE/dist/lib/commons-logging-1.1.1.jar
 CLASSPATH=$CLASSPATH:$RM_HOME_NODE/dist/lib/ProActive_SRM-common.jar
 CLASSPATH=$CLASSPATH:$RM_HOME_NODE/dist/lib/ProActive_ResourceManager.jar
 CLASSPATH=$CLASSPATH:$RM_HOME_NODE/dist/lib/ProActive_Scheduler-worker.jar
-CLASSPATH=$CLASSPATH:$RM_HOME_NODE/dist/lib/ProActive_Scheduler-matsci.jar
 CLASSPATH=$CLASSPATH:$RM_HOME_NODE/dist/lib/commons-httpclient-3.1.jar
 CLASSPATH=$CLASSPATH:$RM_HOME_NODE/dist/lib/commons-codec-1.3.jar
 CLASSPATH=$CLASSPATH:$RM_HOME_NODE/dist/lib/ProActive.jar

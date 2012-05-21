@@ -125,8 +125,6 @@
 	<classpathentry kind="lib" path="lib/ProActive/virtualization-hyperv-wmi.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/wbem.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/wiseman-tools.jar"/>
-	<classpathentry kind="lib" path="lib/matsci/org.scilab.modules.javasci.jar"/>
-	<classpathentry kind="lib" path="lib/matsci/org.scilab.modules.types.jar"/>
 	<classpathentry kind="lib" path="lib/nodesource/cron/cron4j-rv2.2.3-mod.jar"/>
 	<classpathentry kind="lib" path="lib/common/hibernate/core/dom4j-1.6.1.jar"/>
 	<classpathentry kind="lib" path="lib/common/hibernate/core/geronimo-spec-jta-1.0.1B-rc4.jar"/>
@@ -139,10 +137,8 @@
 	<classpathentry kind="lib" path="lib/nodesource/winhpc/WinHPCWebserviceStubs.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/commons-vfs-patched-2.0-SNAPSHOTr19199-tests.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/commons-vfs-patched-2.0-SNAPSHOTr19199.jar"/>
-	<classpathentry kind="lib" path="lib/matsci/matlabcontrol-3.1.0.jar"/>
 	<classpathentry kind="lib" path="lib/common/rrd4j-2.0.6.jar"/>
 	<classpathentry kind="lib" path="lib/mapreduce/hadoop-0.20.2-core.jar"/>
-	<classpathentry kind="lib" path="lib/matsci/ProActive_LicenseSaver-1.0.0-api.jar"/>
 	<classpathentry kind="lib" path="performance/lib/ApacheJMeter_core.jar"/>
 	<classpathentry kind="lib" path="performance/lib/ApacheJMeter_java.jar"/>
 	<classpathentry kind="lib" path="performance/lib/logkit-2.0.jar"/>

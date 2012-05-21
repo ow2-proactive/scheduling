@@ -14,8 +14,6 @@
 	<!ENTITY Tutorial			SYSTEM "Tutorial.xml">
 	<!ENTITY Plugin				SYSTEM "Plugin.xml">
 
-	<!ENTITY Matlab				SYSTEM "Matlab.xml">
-	<!ENTITY Scilab				SYSTEM "Scilab.xml">
 	<!ENTITY Modelica			SYSTEM "Modelica.xml">
 
 	<!ENTITY FilesSplitMerge	SYSTEM "FilesSplitMerge.xml">
@@ -42,8 +40,6 @@
 		<info>
 			<title>ProActive Scheduler's Extensions</title>
 		</info>
-		&Matlab;
-		&Scilab;
 		&Modelica;
 		&FilesSplitMerge;
 	</part>
