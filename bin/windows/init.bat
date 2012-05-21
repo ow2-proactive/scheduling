@@ -35,7 +35,6 @@ IF EXIST "%PA_SCHEDULER%\classes\scheduler" (
 	rem hibernate libs
 	FOR %%j IN ("%PA_SCHEDULER%\lib\common\hibernate\annotation\*.jar") DO SET JARS=!JARS!;%%j
 	FOR %%j IN ("%PA_SCHEDULER%\lib\common\hibernate\core\*.jar") DO SET JARS=!JARS!;%%j
-	FOR %%j IN ("%PA_SCHEDULER%\lib\matsci\*.jar") DO SET JARS=!JARS!;%%j
 	FOR %%j IN ("%PA_SCHEDULER%\addons\*.jar") DO SET JARS=!JARS!;%%j
 ) ELSE (
 	rem Script engines must be added to classpath to be found
@@ -53,7 +52,6 @@ IF EXIST "%PA_SCHEDULER%\classes\scheduler" (
 	SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\ProActive_SRM-common.jar
 	SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\ProActive_ResourceManager.jar
 	SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\ProActive_Scheduler-core.jar
-	SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\ProActive_Scheduler-matsci.jar
 	SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\ProActive_Scheduler-mapreduce.jar
 	FOR %%j IN ("%PA_SCHEDULER%\addons\*.jar") DO SET JARS=!JARS!;%%j
 )

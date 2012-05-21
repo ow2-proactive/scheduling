@@ -22,7 +22,6 @@ set CLASSPATH=%CLASSPATH%;%RM_HOME_NODE%\dist\lib\commons-logging-1.1.1.jar
 set CLASSPATH=%CLASSPATH%;%RM_HOME_NODE%\dist\lib\ProActive_SRM-common.jar
 set CLASSPATH=%CLASSPATH%;%RM_HOME_NODE%\dist\lib\ProActive_ResourceManager.jar
 set CLASSPATH=%CLASSPATH%;%RM_HOME_NODE%\dist\lib\ProActive_Scheduler-worker.jar
-set CLASSPATH=%CLASSPATH%;%RM_HOME_NODE%\dist\lib\ProActive_Scheduler-matsci.jar
 set CLASSPATH=%CLASSPATH%;%RM_HOME_NODE%\dist\lib\commons-httpclient-3.1.jar
 set CLASSPATH=%CLASSPATH%;%RM_HOME_NODE%\dist\lib\commons-codec-1.3.jar
 set CLASSPATH=%CLASSPATH%;%RM_HOME_NODE%\dist\lib\ProActive.jar
