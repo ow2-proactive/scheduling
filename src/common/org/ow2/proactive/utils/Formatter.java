@@ -65,7 +65,9 @@ public final class Formatter {
         try {
             sw = new StringWriter();
             pw = new PrintWriter(sw);
-            e.printStackTrace(pw);
+            for (StackTraceElement el : e.getStackTrace()) {
+                pw.print(el.toString());
+            }
             retValue = sw.toString();
         } finally {
             try {
