@@ -38,8 +38,11 @@ package org.ow2.proactive.scheduler.common.util;
 
 import java.security.KeyException;
 import java.security.PublicKey;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicLong;
 
 import javax.security.auth.login.LoginException;
@@ -205,4 +208,28 @@ public class CachingSchedulerProxyUserInterface extends SchedulerProxyUserInterf
         return s;
     }
 
+    public HashMap<AtomicLong, LightSchedulerState> getLightSchedulerState() {
+        Map<AtomicLong, SchedulerState> _schedStateAndRevision = getRevisionVersionAndSchedulerState();
+
+        Entry<AtomicLong, SchedulerState> entry = _schedStateAndRevision.entrySet().iterator().next();
+        SchedulerState state = entry.getValue();
+        List<JobState> jobs = new ArrayList<JobState>();
+        List<UserJobInfo> jobInfoList = new ArrayList<UserJobInfo>();
+
+        jobs.addAll(state.getPendingJobs());
+        jobs.addAll(state.getRunningJobs());
+        jobs.addAll(state.getFinishedJobs());
+
+        for (JobState j : jobs) {
+            jobInfoList.add(new UserJobInfo(j.getId().value(), j.getOwner(), j.getJobInfo()));
+        }
+        List<UserIdentification> users = new ArrayList<UserIdentification>();
+        users.addAll(state.getUsers().getUsers());
+
+        LightSchedulerState lightState = new LightSchedulerState(jobInfoList, users, state.getStatus());
+
+        HashMap<AtomicLong, LightSchedulerState> result = new HashMap<AtomicLong, LightSchedulerState>();
+        result.put(entry.getKey(), lightState);
+        return result;
+    }
 }
