@@ -42,7 +42,7 @@ import org.objectweb.proactive.extensions.masterworker.interfaces.WorkerMemory;
 
 public class MemoryTask2 implements Task<String> {
 
-private static final long serialVersionUID = 32L;
+    private static final long serialVersionUID = 32L;
 
     public String run(WorkerMemory memory) throws Exception {
         String mes = (String) memory.load("message");

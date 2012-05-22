@@ -77,7 +77,8 @@ public class BestProximityDescriptor extends TopologyDescriptor {
      */
     public final static DistanceFunction AVG = new DistanceFunction() {
 
-    private static final long serialVersionUID = 32L;
+        private static final long serialVersionUID = 32L;
+
         public long distance(long d1, long d2) {
             // not connected
             if (d1 < 0 || d2 < 0)
@@ -95,7 +96,8 @@ public class BestProximityDescriptor extends TopologyDescriptor {
      */
     public final static DistanceFunction MAX = new DistanceFunction() {
 
-    private static final long serialVersionUID = 32L;
+        private static final long serialVersionUID = 32L;
+
         public long distance(long d1, long d2) {
             // not connected
             if (d1 < 0 || d2 < 0)
@@ -113,7 +115,8 @@ public class BestProximityDescriptor extends TopologyDescriptor {
      */
     public final static DistanceFunction MIN = new DistanceFunction() {
 
-    private static final long serialVersionUID = 32L;
+        private static final long serialVersionUID = 32L;
+
         public long distance(long d1, long d2) {
             return Math.min(d1, d2);
         }

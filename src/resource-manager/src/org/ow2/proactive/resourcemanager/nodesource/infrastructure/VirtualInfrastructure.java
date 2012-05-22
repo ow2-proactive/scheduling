@@ -684,7 +684,7 @@ public class VirtualInfrastructure extends InfrastructureManager {
 
     private class VMDeploymentMonitor implements Serializable, Runnable {
 
-    private static final long serialVersionUID = 32L;
+        private static final long serialVersionUID = 32L;
         private volatile boolean run = false;
         private static final String DEPLOYING_NODE_NAME_FRAGMENT = "_node_";
         private Hashtable<String, VMGuestStatus> status = new Hashtable<String, VMGuestStatus>();
@@ -870,7 +870,7 @@ public class VirtualInfrastructure extends InfrastructureManager {
      */
     private class VirtualMachineManagerHolder implements Serializable {
 
-    private static final long serialVersionUID = 32L;
+        private static final long serialVersionUID = 32L;
         /** The kind of infrastructure to manage */
         protected final InfrastructureType infrastructureType;
         /** The hypervisor's url and authentication credentials */
@@ -910,7 +910,7 @@ public class VirtualInfrastructure extends InfrastructureManager {
     /** This class allows to cache registered nodes. */
     private class VMNodeCache implements Serializable {
 
-    private static final long serialVersionUID = 32L;
+        private static final long serialVersionUID = 32L;
         private final HashMap<String, ArrayList<String>> vmNodeCache = new HashMap<String, ArrayList<String>>();
 
         private void addNode(String holdingVM, String node) {

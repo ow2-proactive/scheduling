@@ -53,6 +53,8 @@ import org.ow2.proactive.scheduler.common.job.JobInfo;
  */
 @XmlRootElement
 public class UserJobInfo implements Serializable {
+
+    private static final long serialVersionUID = 32L;
     /*
      * the id of the job
      */

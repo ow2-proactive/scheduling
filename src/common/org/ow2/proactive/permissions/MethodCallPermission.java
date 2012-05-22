@@ -42,6 +42,7 @@ package org.ow2.proactive.permissions;
 public class MethodCallPermission extends ClientPermission {
 
     private static final long serialVersionUID = 32L;
+
     public MethodCallPermission(String name) {
         super(name);
     }

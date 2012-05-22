@@ -172,7 +172,7 @@ public class JobInfoImpl implements JobInfo {
      */
     public static class ReplicatedTask implements Serializable {
 
-    private static final long serialVersionUID = 32L;
+        private static final long serialVersionUID = 32L;
         public TaskId originalId = null;
         public TaskId replicatedId = null;
         public List<TaskId> deps = null;

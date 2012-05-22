@@ -1083,7 +1083,7 @@ public abstract class AOMatSciEnvironment<R, RL> implements MatSciEnvironment, S
      */
     private class FindNotWaitFilter implements RequestFilter {
 
-    private static final long serialVersionUID = 32L;
+        private static final long serialVersionUID = 32L;
 
         /**
          * Creates the filter

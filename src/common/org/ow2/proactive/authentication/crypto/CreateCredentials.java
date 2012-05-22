@@ -228,7 +228,8 @@ public class CreateCredentials {
                 Connection<AuthenticationImpl> conn = new Connection<AuthenticationImpl>(
                         AuthenticationImpl.class) {
 
-    private static final long serialVersionUID = 32L;
+                    private static final long serialVersionUID = 32L;
+
                     public Logger getLogger() {
                         return ProActiveLogger.getLogger("pa.scheduler.credentials");
                     }

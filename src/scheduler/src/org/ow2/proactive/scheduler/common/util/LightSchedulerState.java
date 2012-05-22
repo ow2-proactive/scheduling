@@ -51,6 +51,8 @@ import org.ow2.proactive.scheduler.common.job.UserIdentification;
  */
 public class LightSchedulerState implements Serializable {
 
+    private static final long serialVersionUID = 32L;
+
     private List<UserJobInfo> jobs = null;
 
     private List<UserIdentification> users = null;
