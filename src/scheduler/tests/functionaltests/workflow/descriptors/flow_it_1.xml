@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<job xmlns="urn:proactive:jobdescriptor:dev" 
+<job xmlns="urn:proactive:jobdescriptor:3.1" 
      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-     xsi:schemaLocation="urn:proactive:jobdescriptor:dev ../../src/scheduler/src/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/dev/schedulerjob.xsd"
+     xsi:schemaLocation="urn:proactive:jobdescriptor:3.1 ../../src/scheduler/src/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/3.1/schedulerjob.xsd"
      name="Job" priority="low" projectName="myProject" cancelJobOnError="true">
 
   <taskFlow>
