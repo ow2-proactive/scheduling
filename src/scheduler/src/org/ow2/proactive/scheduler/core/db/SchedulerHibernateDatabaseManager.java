@@ -98,7 +98,8 @@ public class SchedulerHibernateDatabaseManager extends HibernateDatabaseManager 
         if (callback == null) {
             callback = new RecoverCallback() {
 
-    private static final long serialVersionUID = 32L;
+                private static final long serialVersionUID = 32L;
+
                 public void init(int nb) {
                 }
 

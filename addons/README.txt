@@ -5,4 +5,4 @@ the Scheduler server, in order to to define a new scheduling policy.
 It can be used, for a node JVM, in order to add user classes needed by
 the Java Tasks. For large user (job) classpath, it is recommanded to
 put the classpath here rather than to transer it using the job classpath
-attribute.  
+attribute.

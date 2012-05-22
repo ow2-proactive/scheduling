@@ -604,7 +604,7 @@ public abstract class InfrastructureManager implements Serializable {
      */
     public static abstract class RMDeployingNodeAccessor implements Serializable {
 
-    private static final long serialVersionUID = 32L;
+        private static final long serialVersionUID = 32L;
         private static volatile RMDeployingNodeAccessor DEFAULT;
 
         public static void setDefault(RMDeployingNodeAccessor d) {

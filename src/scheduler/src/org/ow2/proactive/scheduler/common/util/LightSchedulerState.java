@@ -34,16 +34,53 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.ow2.proactive.permissions;
+package org.ow2.proactive.scheduler.common.util;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.ow2.proactive.scheduler.common.SchedulerStatus;
+import org.ow2.proactive.scheduler.common.job.UserIdentification;
+
 
 /**
- * Allows to remotely call a method of the service.
+ * Subset of org.ow2.proactive.scheduler.common.SchedulerState
+ * that is small and fast to serialize
+ *
  */
-public class MethodCallPermission extends ClientPermission {
+public class LightSchedulerState implements Serializable {
 
     private static final long serialVersionUID = 32L;
 
-    public MethodCallPermission(String name) {
-        super(name);
+    private List<UserJobInfo> jobs = null;
+
+    private List<UserIdentification> users = null;
+
+    private SchedulerStatus status = null;
+
+    public LightSchedulerState() {
+        this.jobs = new ArrayList<UserJobInfo>();
+        this.users = new ArrayList<UserIdentification>();
+        this.status = SchedulerStatus.STOPPED;
     }
+
+    public LightSchedulerState(List<UserJobInfo> jobs, List<UserIdentification> users, SchedulerStatus status) {
+        this.jobs = jobs;
+        this.users = users;
+        this.status = status;
+    }
+
+    public List<UserJobInfo> getJobs() {
+        return jobs;
+    }
+
+    public List<UserIdentification> getUsers() {
+        return users;
+    }
+
+    public SchedulerStatus getStatus() {
+        return status;
+    }
+
 }

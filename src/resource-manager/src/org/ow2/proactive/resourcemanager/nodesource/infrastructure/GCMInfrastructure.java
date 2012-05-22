@@ -79,7 +79,7 @@ public class GCMInfrastructure extends DefaultInfrastructureManager {
      */
     protected class DeploymentData implements Serializable {
 
-    private static final long serialVersionUID = 32L;
+        private static final long serialVersionUID = 32L;
         byte[] data;
         boolean deployed = false;
     }

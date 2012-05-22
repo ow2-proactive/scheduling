@@ -34,49 +34,73 @@
  * ################################################################
  * $$ACTIVEEON_INITIAL_DEV$$
  */
-package functionaltests.executables;
+package org.ow2.proactive.scheduler.common.util;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
 
-import org.ow2.proactive.scheduler.common.task.TaskResult;
-import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
+import javax.xml.bind.annotation.XmlRootElement;
+
+import org.ow2.proactive.scheduler.common.job.JobInfo;
 
 
-public class ResultAsArray extends JavaExecutable {
+/**
+ * A class that contains a subset of the information available
+ * in a scheduler state.
+ * It is mostly used to provide a fast access to meaningful
+ * data within the scheduler state without having to manage the
+ * complete state
+ *
+ */
+@XmlRootElement
+public class UserJobInfo implements Serializable {
 
-    private int size = 10;
+    private static final long serialVersionUID = 32L;
+    /*
+     * the id of the job
+     */
+    private String jobId;
 
-    //	public ResultAsArray(){}
+    /*
+     * the job's owner
+     */
+    private String jobOwner;
 
-    @Override
-    public Serializable execute(TaskResult... results) throws Throwable {
-        final ArrayList<RenderedBucket> renderedBucketList = new ArrayList<RenderedBucket>(size);
-        for (int i = 0; i < size; i++) {
-            float[] tab = new float[3 * 32 * 32]; // 3072 color component test
-            Arrays.fill(tab, (float) Math.random());
-            renderedBucketList.add(new RenderedBucket(i * 1, i * 2, i * 3, i * 4, tab));
-        }
-        return renderedBucketList;
+    /*
+     * Jobinfo of the job
+     */
+    private JobInfo jobInfo;
+
+    public UserJobInfo() {
     }
 
-    static class RenderedBucket implements Serializable {
-        private static final long serialVersionUID = 32L;
-        private int x, y, w, h;
-        private float[] color;
-
-        public RenderedBucket(int x, int y, int w, int h, float[] color) {
-            this.x = x;
-            this.y = y;
-            this.w = w;
-            this.h = h;
-            this.color = color;
-        }
-
-        @Override
-        public String toString() {
-            return "" + x + y + w + h;
-        }
+    public UserJobInfo(String jobid, String jobOwner, JobInfo jobinfo) {
+        this.jobId = jobid;
+        this.jobOwner = jobOwner;
+        this.jobInfo = jobinfo;
     }
+
+    public String getJobid() {
+        return jobId;
+    }
+
+    public void setJobid(String jobid) {
+        this.jobId = jobid;
+    }
+
+    public String getJobOwner() {
+        return jobOwner;
+    }
+
+    public void setJobOwner(String jobOwner) {
+        this.jobOwner = jobOwner;
+    }
+
+    public JobInfo getJobinfo() {
+        return jobInfo;
+    }
+
+    public void setJobinfo(JobInfo jobinfo) {
+        this.jobInfo = jobinfo;
+    }
+
 }
