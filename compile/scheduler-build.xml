@@ -176,7 +176,7 @@
 			</classpath>
 		</taskdef>
 
-		<property name="schemas.dir" value="${src.scheduler.dir}/${scheduler.path}/common/xml/schemas/jobdescriptor/3.2" />
+		<property name="schemas.dir" value="${src.scheduler.dir}/${scheduler.path}/common/xml/schemas/jobdescriptor/dev" />
 		<property name="export.schema.name" value="schedulerjob" />
 
 		<!-- Convert Relax NG schema from compact syntax to xml syntax -->

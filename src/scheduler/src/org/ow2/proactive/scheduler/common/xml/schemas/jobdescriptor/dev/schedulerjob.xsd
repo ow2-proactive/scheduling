@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jd="urn:proactive:jobdescriptor:3.2" elementFormDefault="qualified" targetNamespace="urn:proactive:jobdescriptor:3.2">
+<?xml version="1.0" encoding="UTF-8"?><xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:jd="urn:proactive:jobdescriptor:dev" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" elementFormDefault="qualified" targetNamespace="urn:proactive:jobdescriptor:dev">
   
   <xs:element name="job">
     <xs:annotation>
@@ -290,7 +290,7 @@
           </xs:attribute>
           <xs:attribute name="preciousLogs">
             <xs:annotation>
-              <xs:documentation>Do we keep the logs as file on LOCALSPACE</xs:documentation>
+              <xs:documentation>Do we keep the logs as file on LOCALSPACE  </xs:documentation>
             </xs:annotation>
             <xs:simpleType>
               <xs:union memberTypes="xs:boolean jd:variableRefType"/>
@@ -384,7 +384,7 @@
   <xs:attributeGroup name="preciousLogs">
     <xs:attribute name="preciousLogs" use="required">
       <xs:annotation>
-        <xs:documentation>Do we keep the logs as file on LOCALSPACE</xs:documentation>
+        <xs:documentation>Do we keep the logs as file on LOCALSPACE  </xs:documentation>
       </xs:annotation>
       <xs:simpleType>
         <xs:union memberTypes="xs:boolean jd:variableRefType"/>
