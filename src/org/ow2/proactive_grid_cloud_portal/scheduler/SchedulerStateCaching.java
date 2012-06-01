@@ -70,7 +70,7 @@ public class SchedulerStateCaching {
     private static MyCachingSchedulerProxyUserInterface scheduler;
     private static SchedulerState localState;
     private static LightSchedulerState lightLocalState;
-    private static long schedulerRevision;
+    private static long schedulerRevision = -1;
     private static int refreshInterval;
     private static volatile boolean kill = false;
 
