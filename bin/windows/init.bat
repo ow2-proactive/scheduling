@@ -31,7 +31,7 @@ IF EXIST "%PA_SCHEDULER%\classes\scheduler" (
 	rem Scheduler libraries
 	FOR %%j IN ("%PA_SCHEDULER%\lib\common\*.jar") DO SET JARS=!JARS!;%%j
 	FOR %%j IN ("%PA_SCHEDULER%\lib\common\script\*.jar") DO SET JARS=!JARS!;%%j
-	FOR %%j IN ("%PA_SCHEDULER%\lib\common\node\sigar\*.jar") DO SET JARS=!JARS!;%%j
+	FOR %%j IN ("%PA_SCHEDULER%\lib\node\sigar\*.jar") DO SET JARS=!JARS!;%%j
 	rem hibernate libs
 	FOR %%j IN ("%PA_SCHEDULER%\lib\common\hibernate\annotation\*.jar") DO SET JARS=!JARS!;%%j
 	FOR %%j IN ("%PA_SCHEDULER%\lib\common\hibernate\core\*.jar") DO SET JARS=!JARS!;%%j
