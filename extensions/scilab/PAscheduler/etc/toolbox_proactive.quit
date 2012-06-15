@@ -1,5 +1,0 @@
-    global ('PA_jvminterface')
-    disp('quitting...');
-    if type(PA_jvminterface) ~= 1 then
-        jinvoke(PA_jvminterface,'shutdown');
-    end

@@ -178,8 +178,8 @@ public class ForkedJavaExecutable extends JavaExecutable implements ForkerStarte
             //the forked java task launcher will do that in place
             logger_dev.debug("Starting java task");
             newJavaTaskLauncher.configureNode();
-            TaskResult result = newJavaTaskLauncher.doTask(null,
-                    execInitializer.getJavaExecutableContainer(), results);
+            TaskResult result = newJavaTaskLauncher.doTaskAndGetResult(null, execInitializer
+                    .getJavaExecutableContainer(), results);
 
             //waiting for task result futur
             //as it is forked, wait until futur has arrive or someone kill the task (core OR tasktimer)

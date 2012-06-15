@@ -1,6 +1,7 @@
 package org.ow2.proactive.scheduler.core.rmproxies;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -40,7 +41,7 @@ public class RMProxyActiveObject {
     protected ResourceManager rm;
 
     /** list of nodes and clean script being executed */
-    private Map<Node, ScriptResult<?>> nodes;
+    private Map<Node, ScriptResult<?>> nodes = new HashMap<Node, ScriptResult<?>>();
 
     public RMProxyActiveObject() {
     }

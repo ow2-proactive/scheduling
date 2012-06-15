@@ -115,7 +115,7 @@ public final class AddGetRemoveTest extends FunctionalTest {
 
         // ADD, GET, RELEASE
         // 1) ADD
-        Node node = helper.createNode("test");
+        Node node = helper.createNode("test").getNode();
         final String nodeURL = node.getNodeInformation().getURL();
         r.addNode(nodeURL).getBooleanValue();
         //we eat the configuring to free

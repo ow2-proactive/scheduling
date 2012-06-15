@@ -39,16 +39,10 @@ package org.ow2.proactive.scheduler.core;
 import java.security.KeyException;
 import java.security.PrivateKey;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Set;
-import java.util.concurrent.CancellationException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
@@ -77,13 +71,12 @@ import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptorImpl;
 import org.ow2.proactive.scheduler.descriptor.JobDescriptor;
 import org.ow2.proactive.scheduler.descriptor.TaskDescriptor;
 import org.ow2.proactive.scheduler.job.InternalJob;
-import org.ow2.proactive.scheduler.job.JobResultImpl;
 import org.ow2.proactive.scheduler.task.ExecutableContainerInitializer;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.task.launcher.TaskLauncher;
 import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 import org.ow2.proactive.scripting.ScriptException;
-import org.ow2.proactive.threading.ExecutorServiceTasksInvocator;
+import org.ow2.proactive.threading.TimeoutThreadPoolExecutor;
 import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
 import org.ow2.proactive.utils.Formatter;
 import org.ow2.proactive.utils.NodeSet;
@@ -114,7 +107,7 @@ final class SchedulingMethodImpl implements SchedulingMethod {
 
     protected SchedulerCore core = null;
 
-    protected ExecutorService threadPool;
+    protected TimeoutThreadPoolExecutor threadPool;
 
     protected PrivateKey corePrivateKey;
 
@@ -126,8 +119,8 @@ final class SchedulingMethodImpl implements SchedulingMethod {
 
     SchedulingMethodImpl(SchedulerCore core) {
         this.core = core;
-        this.threadPool = Executors.newFixedThreadPool(DOTASK_ACTION_THREADNUMBER, new NamedThreadFactory(
-            "DoTask_Action"));
+        this.threadPool = TimeoutThreadPoolExecutor.newFixedThreadPool(DOTASK_ACTION_THREADNUMBER,
+                new NamedThreadFactory("DoTask_Action"));
         this.internalPolicy = new InternalPolicy();
         try {
             this.corePrivateKey = Credentials.getPrivateKey(PASchedulerProperties
@@ -260,18 +253,6 @@ final class SchedulingMethodImpl implements SchedulingMethod {
                 }
                 if (--activeObjectCreationRetryTimeNumber == 0) {
                     return numberOfTaskStarted;
-                }
-            } catch (CancellationException e1) {
-                // timeout occurs on doTask
-                logger.warn("A timeout occured while deploying a task, performances may suffer. "
-                    + "Value of pa.scheduler.core.starttask.timeout should be increased.");
-                logger.debug("Timeout while deploying task", e1);
-                //so try to get back every remaining nodes to the resource manager
-                try {
-                    core.rmProxiesManager.getUserRMProxy(currentJob.getOwner(), currentJob.getCredentials())
-                            .releaseNodes(nodeSet);
-                } catch (Exception e2) {
-                    logger_dev.info("Unable to get back the nodeSet to the RM", e2);
                 }
             } catch (Exception e1) {
                 //if we are here, it is that something append while launching the current task.
@@ -621,38 +602,14 @@ final class SchedulingMethodImpl implements SchedulingMethod {
                 logger_dev.info("Starting deployment of task '" + task.getName() + "' for job '" +
                     job.getId() + "'");
 
-                //enqueue next instruction, and execute whole process in the thread-pool controller
-                TimedDoTaskAction tdta = new TimedDoTaskAction(job, task, launcher,
-                    (SchedulerCore) PAActiveObject.getStubOnThis(), params, corePrivateKey);
-                List<Future<TaskResult>> futurResults = ExecutorServiceTasksInvocator
-                        .invokeAllWithTimeoutAction(threadPool, Collections.singletonList(tdta),
-                                DOTASK_ACTION_TIMEOUT);
+                finalizeStarting(job, task, node, launcher);
 
-                //wait for only one result
-                Future<TaskResult> future = futurResults.get(0);
-                if (future.isDone()) {
-                    //if task has finished
-                    if (future.get() != null) {
-                        //and result is not null
-                        ((JobResultImpl) job.getJobResult()).storeFuturResult(task.getName(), future.get());
-                        //mark the task and job (if needed) as started and send events
-                        finalizeStarting(job, task, node, launcher);
-                    } else {
-                        //if there was a problem, free nodeSet for multi-nodes task (1)
-                        throw new RuntimeException(
-                            "An exception occured while starting the task. See previous exceptions for details.");
-                    }
-                } else {
-                    //if there was a problem, free nodeSet for multi-nodes task (2)
-                    throw new RuntimeException(
-                        "This is an unexpected behavior : task start should be done at this point.");
-                }
-
+                threadPool.submitWithTimeout(new TimedDoTaskAction(job, task, launcher, core,
+                    (SchedulerCore) PAActiveObject.getStubOnThis(), params, corePrivateKey),
+                        DOTASK_ACTION_TIMEOUT, TimeUnit.MILLISECONDS);
             } catch (Exception t) {
                 try {
                     //if there was a problem, free nodeSet for multi-nodes task
-                    //exception can come from future.get() -> cancellationException
-                    //exception can also come from (1) or (2)
                     nodes.add(node);
                     core.rmProxiesManager.getUserRMProxy(job.getOwner(), job.getCredentials()).releaseNodes(
                             nodes);

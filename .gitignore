@@ -15,6 +15,13 @@
 /.classpath*
 /generated
 
+.logs/
+RM_DB/
+SCHEDULER_DB/
+rm_statistics.rrd
+scheduler_statistics.rrd
+
+
 # /bin/unix/
 /bin/unix/.machinefile*
 /bin/unix/SCHEDULER_DB

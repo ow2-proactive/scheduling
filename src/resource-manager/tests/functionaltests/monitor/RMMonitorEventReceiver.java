@@ -45,6 +45,7 @@ import org.ow2.proactive.resourcemanager.common.event.RMEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMInitialState;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
+import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.frontend.RMEventListener;
 import org.ow2.proactive.resourcemanager.frontend.RMGroupEventListener;
 import org.ow2.proactive.resourcemanager.frontend.RMMonitoring;
@@ -91,6 +92,10 @@ public class RMMonitorEventReceiver extends RMGroupEventListener {
                 new CredData(RMTHelper.username, RMTHelper.password), auth.getPublicKey());
         RMMonitoring monitor = auth.login(cred).getMonitoring();
         return monitor.addRMEventListener((RMEventListener) PAActiveObject.getStubOnThis());
+    }
+
+    public void removeListener(RMMonitoring monitor) throws RMException {
+        monitor.removeRMEventListener();
     }
 
 }

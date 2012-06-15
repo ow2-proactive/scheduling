@@ -36,12 +36,12 @@
  */
 package org.ow2.proactive.scheduler.core.properties;
 
+import org.objectweb.proactive.annotation.PublicAPI;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
-
-import org.objectweb.proactive.annotation.PublicAPI;
 
 
 /**
@@ -277,6 +277,7 @@ public enum PASchedulerProperties {
     /* ***************************************************************** */
     /* ********************** MATLAB/SCILAB PROPERTIES ***************** */
     /* ***************************************************************** */
+    /* SCHEDULING-1610 removed Matlab/Scilab from Scheduling, but there is still work for SCHEDULING-1612 , current configuration scheme needs those properties
     /** Tells where to find matlab worker configuration file */
     MATLAB_WORKER_CONFIGURATION_FILE("pa.scheduler.ext.matlab.config.worker", PropertyType.STRING),
     /** Tells where to find scilab worker configuration file */

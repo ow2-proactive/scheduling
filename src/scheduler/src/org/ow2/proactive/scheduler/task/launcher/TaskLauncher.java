@@ -291,7 +291,7 @@ public abstract class TaskLauncher {
      * Common final behavior for any type of task launcher.
      * @param core reference to the scheduler.
      */
-    protected void finalizeTask(TaskTerminateNotification core) {
+    protected void finalizeTask(TaskTerminateNotification core, TaskResult taskResult) {
         /*
          * if task was killed then unsetEnv and finalizeLoggers were already called, don't call it
          * again, otherwise it can affect others tasks (SCHEDULING-1526)
@@ -312,7 +312,7 @@ public abstract class TaskLauncher {
         //terminate the task
         // if currentExecutable has been killed, no call back
         if (!hasBeenKilled && core != null) {
-            core.terminate(taskId);
+            core.terminate(taskId, taskResult);
         }
         this.currentExecutable = null;
     }
@@ -360,7 +360,7 @@ public abstract class TaskLauncher {
      * @param results the possible results from parent tasks.(if task flow)
      * @return a task result representing the result of this task execution.
      */
-    public abstract TaskResult doTask(TaskTerminateNotification core, ExecutableContainer execContainer,
+    public abstract void doTask(TaskTerminateNotification core, ExecutableContainer execContainer,
             TaskResult... results);
 
     /**

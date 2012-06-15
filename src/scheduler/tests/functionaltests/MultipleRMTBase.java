@@ -20,6 +20,7 @@ import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.scheduler.common.util.FileUtils;
+import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.utils.FileToBytesConverter;
 import org.ow2.tests.FunctionalTest;
 
@@ -49,6 +50,7 @@ public class MultipleRMTBase extends FunctionalTest {
         if (hibernateConfigFile == null) {
             Assert.fail("Can't find hibernate config");
         }
+        hibernateConfigFile = PASchedulerProperties.getAbsolutePath(hibernateConfigFile);
 
         String hibernateConfig = new String(FileToBytesConverter.convertFileToByteArray(new File(
             hibernateConfigFile)));
@@ -111,7 +113,7 @@ public class MultipleRMTBase extends FunctionalTest {
         for (int i = 0; i < nodesNumber; i++) {
             String nodeName = "node-" + i;
             String nodeUrl = "rmi://localhost:" + rmiPort + "/" + nodeName;
-            helper.createNode(nodeName, nodeUrl, map);
+            helper.createNode(nodeName, nodeUrl, map, null);
             helper.getResourceManager().addNode(nodeUrl);
         }
         helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, NodeSource.DEFAULT);

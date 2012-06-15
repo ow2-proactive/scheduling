@@ -29,56 +29,59 @@
  *
  *  Initial developer(s):               The ProActive Team
  *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s): ActiveEon Team - http://www.activeeon.com
+ *  Contributor(s):
  *
  * ################################################################
- * $$ACTIVEEON_CONTRIBUTOR$$
+ * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.ow2.proactive.utils;
+package org.ow2.proactive.scheduler.examples;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
+import java.io.Serializable;
+import java.util.Map;
+import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 
 
 /**
- * Formatter is a class grouping tools for formatting
- *
+ * Throw RuntimeException if replicationId argument is 1, otherwise sleep for 30
+ * seconds and exit normally.
+ * 
  * @author The ProActive Team
- * @since ProActive Scheduling 2.2
+ * @since ProActive Scheduling 3.1
+ * 
+ *        $Id$
  */
-public final class Formatter {
+public class FailTaskConditionally extends JavaExecutable {
 
-    /**
-     * Return the stack trace of the given exception in a string.
-     *
-     * @param e an exception or throwable
-     * @return the stack trace of the given exception in a string.
-     */
-    public static String stackTraceToString(Throwable e) {
-        if (e == null) {
-            return null;
-        }
-        String retValue = null;
-        StringWriter sw = null;
-        PrintWriter pw = null;
-        try {
-            sw = new StringWriter();
-            pw = new PrintWriter(sw);
-            for (StackTraceElement el : e.getStackTrace()) {
-                pw.print(el.toString());
-            }
-            retValue = sw.toString();
-        } finally {
+    public static final String EXCEPTION_MESSAGE = "Faulty task exception";
+
+    private int replicationId = 0;
+
+    @Override
+    public void init(Map<String, Serializable> args) {
+        if (args.containsKey("replicationId")) {
             try {
-                if (pw != null)
-                    pw.close();
-                if (sw != null)
-                    sw.close();
-            } catch (IOException ignore) {
+                replicationId = Integer.parseInt(args.get("replicationId").toString());
+            } catch (NumberFormatException e) {
             }
         }
-        return retValue;
     }
 
+    @Override
+    public Serializable execute(TaskResult... results) throws Throwable {
+        if (replicationId == 1) {
+            try {
+                System.out.println("I will throw a runtime exception in 3 sec");
+                Thread.sleep(3000);
+            } catch (Exception e) {
+            }
+
+            throw new RuntimeException(EXCEPTION_MESSAGE);
+
+        } else {
+            System.out.println("I will sleep for 30 seconds");
+            Thread.sleep(30000);
+            return "Nothing";
+        }
+    }
 }

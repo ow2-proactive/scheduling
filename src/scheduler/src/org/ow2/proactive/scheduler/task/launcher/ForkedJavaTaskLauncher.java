@@ -100,9 +100,10 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher implements ForkerSt
      * @see org.ow2.proactive.scheduler.task.launcher.JavaTaskLauncher#doTask(org.ow2.proactive.scheduler.common.TaskTerminateNotification, org.ow2.proactive.scheduler.task.ExecutableContainer, org.ow2.proactive.scheduler.common.task.TaskResult[])
      */
     @Override
-    public TaskResult doTask(TaskTerminateNotification core, ExecutableContainer executableContainer,
+    public void doTask(TaskTerminateNotification core, ExecutableContainer executableContainer,
             TaskResult... results) {
         long duration = -1;
+        TaskResultImpl taskResult = null;
         try {
 
             // create the executable (will set the context class loader to the taskclassserver)
@@ -163,33 +164,32 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher implements ForkerSt
             }
 
             if (userResult instanceof TaskResult) {
-                TaskResultImpl r = (TaskResultImpl) PAFuture.getFutureValue(userResult);
+                taskResult = (TaskResultImpl) PAFuture.getFutureValue(userResult);
                 // Override the logs since they are stored on forker side
-                r.setLogs(getLogs());
-                return r;
+                taskResult.setLogs(getLogs());
             } else {
                 Integer ec = (Integer) userResult;
                 if (ec == 0) {
-                    return new TaskResultImpl(taskId, ec, getLogs(), duration / 1000000);
+                    taskResult = new TaskResultImpl(taskId, ec, getLogs(), duration / 1000000);
                 } else {
                     Throwable t = new ForkedJavaTaskException(
                         "Forked JVM process has been terminated with exit code " + ec, ec);
-                    return new TaskResultImpl(taskId, t, getLogs(), duration / 1000000);
+                    taskResult = new TaskResultImpl(taskId, t, getLogs(), duration / 1000000);
                 }
             }
         } catch (Throwable ex) {
             logger_dev.info("", ex);
             if (this.getLogs() == null) {
-                return new TaskResultImpl(taskId, ex, new SimpleTaskLogs("", ex.toString()),
+                taskResult = new TaskResultImpl(taskId, ex, new SimpleTaskLogs("", ex.toString()),
                     duration / 1000000, null);
             } else {
-                return new TaskResultImpl(taskId, ex, this.getLogs(), duration / 1000000, null);
+                taskResult = new TaskResultImpl(taskId, ex, this.getLogs(), duration / 1000000, null);
             }
         } finally {
             // finalize doTask
             terminateDataSpace();
             cancelTimer();
-            finalizeTask(core);
+            finalizeTask(core, taskResult);
         }
     }
 

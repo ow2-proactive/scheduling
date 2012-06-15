@@ -116,7 +116,7 @@ public class StaticSelectionScriptTest extends FunctionalTest {
         HashMap<String, String> vmProperties = new HashMap<String, String>();
         vmProperties.put(this.vmPropKey, this.vmPropValue);
 
-        String node1URL = helper.createNode(node1Name, vmProperties).getNodeInformation().getURL();
+        String node1URL = helper.createNode(node1Name, vmProperties).getNode().getNodeInformation().getURL();
         resourceManager.addNode(node1URL);
 
         //wait node adding event
@@ -173,7 +173,7 @@ public class StaticSelectionScriptTest extends FunctionalTest {
         RMTHelper.log("Test 3");
 
         //add a second with JVM env var
-        String node2URL = helper.createNode(node2Name, vmProperties).getNodeInformation().getURL();
+        String node2URL = helper.createNode(node2Name, vmProperties).getNode().getNodeInformation().getURL();
         resourceManager.addNode(node2URL);
 
         //wait node adding event

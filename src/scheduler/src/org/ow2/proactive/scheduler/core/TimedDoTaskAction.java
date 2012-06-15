@@ -40,7 +40,6 @@ import java.security.KeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -60,31 +59,41 @@ import org.ow2.proactive.threading.CallableWithTimeoutAction;
  * @author The ProActive Team
  * @since ProActive Scheduling 2.0
  */
-public class TimedDoTaskAction implements CallableWithTimeoutAction<TaskResult> {
+public class TimedDoTaskAction implements CallableWithTimeoutAction<Void> {
 
     private static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.SCHEDULE);
 
-    private AtomicBoolean timeoutCalled = new AtomicBoolean(false);
-    private InternalJob job;
-    private InternalTask task;
-    private TaskLauncher launcher;
-    private SchedulerCore coreStub;
-    private TaskResult[] parameters;
-    private PrivateKey corePk;
+    private final InternalJob job;
+
+    private final InternalTask task;
+
+    private final TaskLauncher launcher;
+
+    private final SchedulerCore core;
+
+    private final SchedulerCore coreStub;
+
+    private final TaskResult[] parameters;
+
+    private final PrivateKey corePk;
+
+    private boolean taskWasRestarted;
 
     /**
      * Create a new instance of TimedDoTaskAction
      *
      * @param task the internal task
      * @param launcher the launcher of the task
+     * @param core SchedulerCore
      * @param coreStub the stub on SchedulerCore
      * @param parameters the parameters to be given to the task
      */
-    public TimedDoTaskAction(InternalJob job, InternalTask task, TaskLauncher launcher,
+    public TimedDoTaskAction(InternalJob job, InternalTask task, TaskLauncher launcher, SchedulerCore core,
             SchedulerCore coreStub, TaskResult[] parameters, PrivateKey corePk) {
         this.job = job;
         this.task = task;
         this.launcher = launcher;
+        this.core = core;
         this.coreStub = coreStub;
         this.parameters = parameters;
         this.corePk = corePk;
@@ -93,33 +102,16 @@ public class TimedDoTaskAction implements CallableWithTimeoutAction<TaskResult> 
     /**
      * {@inheritDoc}
      */
-    public TaskResult call() throws Exception {
+    public Void call() throws Exception {
         try {
-            //if a task has been launched
-            if (launcher != null) {
-                FillContainerWithEncryption();
-                //try launch the task
-                TaskResult tr = launcher.doTask(coreStub, task.getExecutableContainer(), parameters);
-                //check if timeout occurs
-                if (timeoutCalled.get()) {
-                    //return null if timeout occurs (task may have to be restarted later)
-                    logger_dev.info("Task '" + task.getId() + "' has timed out");
-                    return null;
-                } else {
-                    //return task result if everything was OK : normal behavior
-                    return tr;
-                }
-            } else {
-                //return null if launcher was null (should never append)
-                logger_dev.warn("Launcher was null");
-                return null;
-            }
-        } catch (Exception e) {
-            //return null if something wrong occurs during task deployment
-            logger_dev.warn("DoTask had an exception : " + e.getMessage());
-            logger_dev.debug("StackTrace :", e);
-            return null;
+            fillContainerWithEncryption();
+            // try launch the task
+            launcher.doTask(coreStub, task.getExecutableContainer(), parameters);
+        } catch (Throwable e) {
+            logger_dev.warn("Failed to start task: " + e.getMessage(), e);
+            restartTask();
         }
+        return null;
     }
 
     /**
@@ -129,7 +121,7 @@ public class TimedDoTaskAction implements CallableWithTimeoutAction<TaskResult> 
      * @throws KeyException if there was a problem while moving credentials
      * @throws NoSuchAlgorithmException if RSA is unknown
      */
-    private void FillContainerWithEncryption() throws KeyException, NoSuchAlgorithmException {
+    private void fillContainerWithEncryption() throws KeyException, NoSuchAlgorithmException {
         //do nothing if runAsMe is false or not set
         if (task.isRunAsMe()) {
             PublicKey pubkey = launcher.generatePublicKey();
@@ -145,8 +137,21 @@ public class TimedDoTaskAction implements CallableWithTimeoutAction<TaskResult> 
      * {@inheritDoc}
      */
     public void timeoutAction() {
-        logger_dev.debug("Task '" + task.getId() + "' timeout action called");
-        timeoutCalled.set(true);
+        try {
+            logger_dev.warn("Task start timeout for task '" + task.getId() + "'");
+            core.terminateTaskLauncher(launcher, task.getId(), false);
+            restartTask();
+        } catch (Throwable e) {
+            logger_dev.warn("Exception during submit timeout handling: " + e.getMessage(), e);
+        }
     }
 
+    private synchronized void restartTask() {
+        if (taskWasRestarted) {
+            return;
+        }
+        logger_dev.info("Trying to restart task '" + task.getId() + "'");
+        core.restartTaskOnNodeFailure(job, task, coreStub);
+        taskWasRestarted = true;
+    }
 }

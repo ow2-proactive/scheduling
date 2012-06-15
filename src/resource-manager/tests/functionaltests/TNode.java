@@ -27,35 +27,36 @@
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
  *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
+ *  Initial developer(s):               The ActiveEon Team
+ *                        http://www.activeeon.com/
  *  Contributor(s):
  *
  * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
+ * $ACTIVEEON_INITIAL_DEV$
  */
-package org.ow2.proactive.scheduler.common;
+package functionaltests;
 
-import org.objectweb.proactive.annotation.PublicAPI;
-import org.ow2.proactive.scheduler.common.task.TaskId;
-import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.process.JVMProcess;
 
 
-/**
- *
- * Interface that can be notified of a task termination
- *
- * @author The ProActive Team
- * @since ProActive Scheduling 1
- */
-@PublicAPI
-public interface TaskTerminateNotification {
+public class TNode {
 
-    /**
-     * Invoke by a task when it is about to finish.
-     *
-     * @param taskId the identification of the executed task.
-     */
-    public void terminate(TaskId taskId, TaskResult taskResult);
+    private final JVMProcess nodeProcess;
+
+    private final Node node;
+
+    public TNode(JVMProcess nodeProcess, Node node) {
+        this.nodeProcess = nodeProcess;
+        this.node = node;
+    }
+
+    public JVMProcess getNodeProcess() {
+        return nodeProcess;
+    }
+
+    public Node getNode() {
+        return node;
+    }
 
 }

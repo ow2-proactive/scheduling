@@ -5,9 +5,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.ow2.proactive.scheduler.common.Scheduler;
+import org.ow2.proactive.scheduler.common.job.JobEnvironment;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.JobType;
+import org.ow2.proactive.scheduler.common.task.RestartMode;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskState;
@@ -16,12 +19,30 @@ import org.ow2.proactive.scheduler.task.ClientTaskState;
 import org.ow2.proactive.scheduler.task.TaskInfoImpl;
 
 
-public class ClientJobState extends JobState {
+/**
+ * 
+ * This class is a client view of a {@link JobState}. A client will receive an
+ * instance of this class when connecting to the scheduler front-end and ask for
+ * a JobState (for instance by using {@link Scheduler#getJobState(String)}).
+ * 
+ * The value of some attributes will not be available in this view of the
+ * JobState. Therefore, calling the respective getters will throw a
+ * RuntimeException. See the public method's javadoc for more details.
+ * 
+ * @author esalagea
+ * 
+ */
+public final class ClientJobState extends JobState {
 
     private JobInfoImpl jobInfo;
     private String owner;
     private JobType type;
-    protected Map<TaskId, TaskState> tasks = new HashMap<TaskId, TaskState>();
+    private Map<TaskId, TaskState> tasks = new HashMap<TaskId, TaskState>();
+
+    private boolean cancelJobOnError;
+    private int maxNumberOfExecution;
+
+    private HashMap<String, String> genericInformations;
 
     public ClientJobState(JobState jobState) {
         // converting internal job into a light job descriptor
@@ -29,11 +50,40 @@ public class ClientJobState extends JobState {
         owner = jobState.getOwner();
         type = jobState.getType();
 
+        this.name = jobState.getName();
+        this.description = jobState.getDescription();
+        this.projectName = jobState.getProjectName();
+        this.priority = jobState.getPriority();
+        this.inputSpace = jobState.getInputSpace();
+        this.outputSpace = jobState.getOutputSpace();
+
+        this.cancelJobOnError = jobState.isCancelJobOnError();
+        this.maxNumberOfExecution = jobState.getMaxNumberOfExecution();
+
+        this.genericInformations = new HashMap<String, String>(jobState.getGenericInformations());
+
         List<ClientTaskState> taskStates = new ArrayList<ClientTaskState>();
         for (TaskState ts : jobState.getTasks()) {
             taskStates.add(new ClientTaskState(ts));
         }
         addTasks(taskStates);
+
+    }
+
+    @Override
+    public int getMaxNumberOfExecution() {
+        return this.maxNumberOfExecution;
+
+    }
+
+    @Override
+    public boolean isCancelJobOnError() {
+        return cancelJobOnError;
+    }
+
+    @Override
+    public Map<String, String> getGenericInformations() {
+        return this.genericInformations;
     }
 
     @Override
@@ -59,16 +109,16 @@ public class ClientJobState extends JobState {
                 "This job info is not applicable for this job. (expected id is '" + getId() + "' but was '" +
                     info.getJobId() + "'");
         }
-        //update job info
+        // update job info
         this.jobInfo = (JobInfoImpl) info;
-        //update task status if needed
+        // update task status if needed
         if (this.jobInfo.getTaskStatusModify() != null) {
             for (TaskId id : tasks.keySet()) {
                 TaskInfoImpl taskInfo = (TaskInfoImpl) tasks.get(id).getTaskInfo();
                 taskInfo.setStatus(this.jobInfo.getTaskStatusModify().get(id));
             }
         }
-        //update task finished time if needed
+        // update task finished time if needed
         if (this.jobInfo.getTaskFinishedTimeModify() != null) {
             for (TaskId id : tasks.keySet()) {
                 if (this.jobInfo.getTaskFinishedTimeModify().containsKey(id)) {
@@ -126,6 +176,25 @@ public class ClientJobState extends JobState {
         for (ClientTaskState ts : newTasks) {
             ts.restoreDependences(tasks);
         }
+    }
+
+    /**
+     * This property is not available for this implementation. Calling this
+     * method will throw a RuntimeException
+     */
+    @Override
+    public JobEnvironment getEnvironment() {
+        throw new RuntimeException("Not implemented: the job environment is not available on client side.");
+    }
+
+    /**
+     * This property is not available for this implementation. Calling this
+     * method will throw a RuntimeException
+     */
+    @Override
+    public RestartMode getRestartTaskOnError() {
+        throw new RuntimeException(
+            "Not implemented: the restart task on error property is not available on client side.");
     }
 
 }

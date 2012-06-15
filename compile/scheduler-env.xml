@@ -32,8 +32,6 @@
 	<property name="scheduler.core.jar"          value="ProActive_Scheduler-core.jar" />
 	<property name="scheduler.client.jar"        value="ProActive_Scheduler-client.jar" />
 	<property name="scheduler.worker.jar"        value="ProActive_Scheduler-worker.jar" />
-	<property name="scheduler.matsci.jar"        value="ProActive_Scheduler-matsci.jar" />
-    <property name="scheduler.matsci.embedded.jar"        value="ProActive_Scheduler-matsciemb.jar" />
 	<property name="scheduler.mapreduce.jar"     value="ProActive_Scheduler-mapreduce.jar" />
 	<property name="scheduler.fsm.jar"    		 value="ProActive_Scheduler-fsm.jar" />
 
@@ -46,7 +44,6 @@
 		<fileset dir="${lib.dir}">
 			<include name="ProActive/**/*.jar"/>
 			<include name="common/**/*.jar"/>
-			<include name="matsci/**/*.jar"/>
 			<!-- Hibernate libs -->
 			<include name="nodesource/**/*.jar"/>
 			<include name="mapreduce/*.jar" />

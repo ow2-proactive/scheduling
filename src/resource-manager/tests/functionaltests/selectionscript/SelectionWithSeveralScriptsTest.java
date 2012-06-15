@@ -122,7 +122,8 @@ public class SelectionWithSeveralScriptsTest extends FunctionalTest {
         vmTwoProperties.put(this.vmPropKey1, this.vmPropValue1);
         vmTwoProperties.put(this.vmPropKey2, this.vmPropValue2);
 
-        String node1URL = helper.createNode(node1Name, vmTwoProperties).getNodeInformation().getURL();
+        String node1URL = helper.createNode(node1Name, vmTwoProperties).getNode().getNodeInformation()
+                .getURL();
         resourceManager.addNode(node1URL);
 
         //wait node adding event
@@ -137,7 +138,7 @@ public class SelectionWithSeveralScriptsTest extends FunctionalTest {
         HashMap<String, String> vmProp1 = new HashMap<String, String>();
         vmProp1.put(this.vmPropKey1, this.vmPropValue1);
 
-        String node2URL = helper.createNode(node2Name, vmProp1).getNodeInformation().getURL();
+        String node2URL = helper.createNode(node2Name, vmProp1).getNode().getNodeInformation().getURL();
         resourceManager.addNode(node2URL);
 
         //wait node adding event
@@ -152,7 +153,7 @@ public class SelectionWithSeveralScriptsTest extends FunctionalTest {
         HashMap<String, String> vmProp2 = new HashMap<String, String>();
         vmProp1.put(this.vmPropKey2, this.vmPropValue2);
 
-        String node3URL = helper.createNode(node3Name, vmProp2).getNodeInformation().getURL();
+        String node3URL = helper.createNode(node3Name, vmProp2).getNode().getNodeInformation().getURL();
         resourceManager.addNode(node3URL);
 
         //wait node adding event

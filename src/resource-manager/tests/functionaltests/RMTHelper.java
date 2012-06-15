@@ -150,7 +150,7 @@ public class RMTHelper {
      * @throws IOException if the external JVM cannot be created
      * @throws NodeException if lookup of the new node fails.
      */
-    public Node createNode(String nodeName) throws IOException, NodeException {
+    public TNode createNode(String nodeName) throws IOException, NodeException {
         return createNode(nodeName, null);
     }
 
@@ -167,7 +167,7 @@ public class RMTHelper {
         ResourceManager rm = getResourceManager();
         for (int i = 0; i < nodesNumber; i++) {
             String nodeName = "default_nodermt_" + System.currentTimeMillis();
-            Node node = createNode(nodeName);
+            Node node = createNode(nodeName).getNode();
             rm.addNode(node.getNodeInformation().getURL());
         }
     }
@@ -187,10 +187,9 @@ public class RMTHelper {
                         setup.getJvmParameters() }, StaticPolicy.class.getName(), null);
     }
 
-    public Node createNode(String nodeName, Map<String, String> vmParameters) throws IOException,
+    public TNode createNode(String nodeName, Map<String, String> vmParameters) throws IOException,
             NodeException {
-        String expectedUrl = "//" + ProActiveInet.getInstance().getHostname() + "/" + nodeName;
-        return createNode(nodeName, expectedUrl, vmParameters);
+        return createNode(nodeName, null, vmParameters, null);
     }
 
     /**
@@ -205,8 +204,12 @@ public class RMTHelper {
      * @throws IOException if the external JVM cannot be created
      * @throws NodeException if lookup of the new node fails.
      */
-    public Node createNode(String nodeName, String expectedUrl, Map<String, String> vmParameters)
-            throws IOException, NodeException {
+    public TNode createNode(String nodeName, String expectedUrl, Map<String, String> vmParameters,
+            List<String> vmOptions) throws IOException, NodeException {
+
+        if (expectedUrl == null) {
+            expectedUrl = "//" + ProActiveInet.getInstance().getHostname() + "/" + nodeName;
+        }
 
         JVMProcessImpl nodeProcess = new JVMProcessImpl(
             new org.objectweb.proactive.core.process.AbstractExternalProcess.StandardOutputMessageLogger());
@@ -218,6 +221,11 @@ public class RMTHelper {
                 if (!entry.getKey().equals("") && !entry.getValue().equals("")) {
                     jvmParameters += " -D" + entry.getKey() + "=" + entry.getValue();
                 }
+            }
+        }
+        if (vmOptions != null) {
+            for (String option : vmOptions) {
+                jvmParameters += " " + option;
             }
         }
 
@@ -236,10 +244,11 @@ public class RMTHelper {
                     toThrow = e;
                     //nothing, wait another loop
                 }
-                if (newNode != null)
-                    return newNode;
-                else
+                if (newNode != null) {
+                    return new TNode(nodeProcess, newNode);
+                } else {
                     Thread.sleep(1000);
+                }
             }
             throw toThrow == null ? new NodeException("unable to create the node " + nodeName) : toThrow;
         } catch (InterruptedException e) {
@@ -609,4 +618,7 @@ public class RMTHelper {
         return monitorsHandler;
     }
 
+    public RMMonitorEventReceiver getEventReceiver() {
+        return eventReceiver;
+    }
 }

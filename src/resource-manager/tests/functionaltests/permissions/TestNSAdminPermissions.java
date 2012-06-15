@@ -119,7 +119,7 @@ public class TestNSAdminPermissions extends FunctionalTest {
         userRMAccess.disconnect();
 
         providerRMAccess = helper.join("nsadmin", "pwd");
-        Node node = helper.createNode("node1");
+        Node node = helper.createNode("node1").getNode();
         try {
             // adding the node as provider
             providerRMAccess.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
@@ -141,7 +141,7 @@ public class TestNSAdminPermissions extends FunctionalTest {
 
         RMTHelper.log("Test3 - ns admin cannot get the foreign node");
         providerRMAccess = helper.join("nsadmin", "pwd");
-        Node node2 = helper.createNode("node2");
+        Node node2 = helper.createNode("node2").getNode();
         try {
             // adding the node as provider
             providerRMAccess.addNode(node2.getNodeInformation().getURL(), nsName).getBooleanValue();

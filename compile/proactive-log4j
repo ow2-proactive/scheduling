@@ -77,8 +77,6 @@ log4j.logger.testsuite = TRACE
 
 #log4j.logger.proactive.scheduler = DEBUG
 #log4j.logger.proactive.resourceManager = DEBUG
-#log4j.logger.proactive.scheduler.ext.matlab = DEBUG
-#log4j.logger.proactive.scheduler.ext.scilab = DEBUG
 
 #log4j.logger.proactive.configuration = DEBUG
 #log4j.logger.proactive.remoteobject = DEBUG,CONSOLE

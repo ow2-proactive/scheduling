@@ -30,7 +30,6 @@ SUFFIX_SERVER=_server
 SUFFIX_WORKER=_worker
 SUFFIX_CLIENT_API=_client-API
 SUFFIX_CLIENT_API_FULL=_client-API-full
-SUFFIX_CLIENT_API_MATSCI=_client-API-matlab-scilab
 SUFFIX_CLIENT_API_MAPREDUCE=_client-API-mapreduce
 
 SUFFIX_CLIENT_RCPs=_client-RCP-
@@ -66,14 +65,6 @@ function del_client(){
 	rm dist/lib/derby* dist/lib/hibernate3.jar dist/lib/mysql-connector-java-5.1.16-bin.jar dist/lib/virtual* dist/lib/j-interop*.jar dist/lib/xenserver-5.0.0-3.jar
 }
 
-function del_matsci() {
-	echo "Removing all file related to matci"
-	rm -rf extensions/matlab extensions/scilab
-	rm -rf samples/jobs_descriptors/job_scilab
-	rm samples/scripts/selection/*lab.*
-	rm dist/lib/*matlab* dist/lib/*scilab* dist/lib/ProActive_LicenseSaver*.jar
-	rm dist/lib/ProActive_Scheduler-matsci.jar
-}
 
 function del_mapreduce() {
 	echo "Removing all file related to map reduce"
@@ -95,11 +86,8 @@ function del_scheduler() {
 	rm -rf doc/built/MapReduce doc/built/Scheduling
 	#removing src and lib
 	del_src
-	del_matsci
 	del_mapreduce
 	find . -name "scheduler*" -exec rm -rf {} \;
-	find . -name "matlab*" -exec rm -rf {} \;
-	find . -name "scilab*" -exec rm -rf {} \;
 	find . -name "mapreduce*" -exec rm -rf {} \;
 	mv RM-README.txt README.txt
 }
@@ -190,7 +178,6 @@ rm -rf config/authentication/*.cfg config/authentication/jaas.config config/auth
 rm config/log4j/*server config/log4j/*client
 rm -rf config/rm config/scheduler
 rm config/security.java.policy-server
-del_matsci
 del_mapreduce
 create_archive ${ARCHIVE_NAME}
 
@@ -200,7 +187,6 @@ echo "---------------> Creating Scheduling client API..."
 ARCHIVE_NAME=${PREFIX_API_SC}${VERSION}${SUFFIX_CLIENT_API}
 cp_r_full ${ARCHIVE_NAME}
 del_client
-del_matsci
 del_mapreduce
 create_archive ${ARCHIVE_NAME}
 
@@ -213,21 +199,11 @@ del_client
 create_archive ${ARCHIVE_NAME}
 
 
-# Scheduling client API matsci ####################
-echo "---------------> Creating Scheduling client API matsci..."
-ARCHIVE_NAME=${PREFIX_API_SC}${VERSION}${SUFFIX_CLIENT_API_MATSCI}
-cp_r_full ${ARCHIVE_NAME}
-del_client
-del_mapreduce
-create_archive ${ARCHIVE_NAME}
-
-
 # Scheduling client API mapreduce ################
 echo "---------------> Creating Scheduling client API mapreduce..."
 ARCHIVE_NAME=${PREFIX_API_SC}${VERSION}${SUFFIX_CLIENT_API_MAPREDUCE}
 cp_r_full ${ARCHIVE_NAME}
 del_client
-del_matsci
 create_archive ${ARCHIVE_NAME}
 
 

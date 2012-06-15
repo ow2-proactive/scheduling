@@ -41,7 +41,6 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.URI;
-import java.net.ConnectException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -67,12 +66,10 @@ import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
 import org.objectweb.proactive.annotation.ImmediateService;
 import org.objectweb.proactive.api.PAActiveObject;
-import org.objectweb.proactive.api.PAException;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.api.PALifeCycle;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
-import org.objectweb.proactive.core.body.exceptions.SendRequestCommunicationException;
 import org.objectweb.proactive.core.body.request.RequestFilter;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectAdapter;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectExposer;
@@ -836,44 +833,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
                                 logger_dev.info("Node failed on job '" + job.getId() + "', task '" +
                                     td.getId() + "'", t);
 
-                                //check if the task has not been terminated while pinging
-                                if (currentlyRunningTasks.get(job.getId()).remove(td.getId()) == null) {
-                                    continue;
-                                }
-
-                                try {
-                                    logger_dev.info("Try to free failed node set");
-                                    //free execution node even if it is dead
-                                    rmProxiesManager.getUserRMProxy(job.getOwner(), job.getCredentials())
-                                            .releaseNodes(td.getExecuterInformations().getNodes());
-                                } catch (Exception e) {
-                                    //just save the rest of the method execution
-                                    logger_dev.debug("Failed to free failed node set", e);
-                                }
-
-                                //re-init progress as it is failed
-                                td.setProgress(0);
-                                //manage restart
-                                td.decreaseNumberOfExecutionOnFailureLeft();
-                                DatabaseManager.getInstance().synchronize(td.getTaskInfo());
-                                logger_dev.info("Number of retry on Failure left for the task '" +
-                                    td.getId() + "' : " + td.getNumberOfExecutionOnFailureLeft());
-                                if (td.getNumberOfExecutionOnFailureLeft() > 0) {
-                                    td.setStatus(TaskStatus.WAITING_ON_FAILURE);
-                                    job.newWaitingTask();
-                                    frontend.taskStateUpdated(job.getOwner(), new NotificationData<TaskInfo>(
-                                        SchedulerEvent.TASK_WAITING_FOR_RESTART, td.getTaskInfo()));
-                                    job.reStartTask(td);
-                                    logger_dev.info("Task '" + td.getId() + "' is waiting to restart");
-                                } else {
-                                    //this call must be sequential with the core active object to avoid
-                                    //schedule() method and endjob() method to be called at the same time
-                                    schedulerStub
-                                            .endJob(
-                                                    job.getId(),
-                                                    td.getId(),
-                                                    "An error has occurred due to a node failure and the maximum amout of retries property has been reached.",
-                                                    JobStatus.FAILED);
+                                if (restartTaskOnNodeFailure(job, td, schedulerStub)) {
                                     break;
                                 }
                             }
@@ -882,6 +842,51 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
                     }
                 }
             });
+        }
+    }
+
+    boolean restartTaskOnNodeFailure(InternalJob job, InternalTask td, SchedulerCore schedulerStub) {
+        //check if the task has not been terminated while pinging
+        if (currentlyRunningTasks.get(job.getId()).remove(td.getId()) == null) {
+            logger_dev.info("Try to restart not running task");
+            return false;
+        }
+
+        try {
+            logger_dev.info("Try to free failed node set");
+            //free execution node even if it is dead
+            rmProxiesManager.getUserRMProxy(job.getOwner(), job.getCredentials()).releaseNodes(
+                    td.getExecuterInformations().getNodes());
+        } catch (Exception e) {
+            //just save the rest of the method execution
+            logger_dev.debug("Failed to free failed node set", e);
+        }
+
+        //re-init progress as it is failed
+        td.setProgress(0);
+        //manage restart
+        td.decreaseNumberOfExecutionOnFailureLeft();
+        DatabaseManager.getInstance().synchronize(td.getTaskInfo());
+        logger_dev.info("Number of retry on Failure left for the task '" + td.getId() + "' : " +
+            td.getNumberOfExecutionOnFailureLeft());
+        if (td.getNumberOfExecutionOnFailureLeft() > 0) {
+            td.setStatus(TaskStatus.WAITING_ON_FAILURE);
+            job.newWaitingTask();
+            frontend.taskStateUpdated(job.getOwner(), new NotificationData<TaskInfo>(
+                SchedulerEvent.TASK_WAITING_FOR_RESTART, td.getTaskInfo()));
+            job.reStartTask(td);
+            logger_dev.info("Task '" + td.getId() + "' is waiting to restart");
+            return false;
+        } else {
+            //this call must be sequential with the core active object to avoid
+            //schedule() method and endjob() method to be called at the same time
+            schedulerStub
+                    .endJob(
+                            job.getId(),
+                            td.getId(),
+                            "An error has occurred due to a node failure and the maximum amout of retries property has been reached.",
+                            JobStatus.FAILED);
+            return true;
         }
     }
 
@@ -1118,8 +1123,8 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
      * @param taskId the identification of the executed task.
      */
     @RunActivityFiltered(id = "internal")
-    public void terminate(final TaskId taskId) {
-        terminate(taskId, new TerminateOptions());
+    public void terminate(final TaskId taskId, TaskResult taskResult) {
+        terminate(taskId, taskResult, new TerminateOptions());
     }
 
     /**
@@ -1132,7 +1137,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
      * @param taskId the identification of the executed task.
      * @param terminateOptions the way the task must be terminated
      */
-    private void terminate(final TaskId taskId, final TerminateOptions terminateOptions) {
+    private void terminate(TaskId taskId, TaskResult taskResult, TerminateOptions terminateOptions) {
         boolean hasBeenReleased = false;
         int nativeIntegerResult = 0;
         JobId jobId = taskId.getJobId();
@@ -1173,17 +1178,9 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
             DatabaseManager.getInstance().unload(descriptor);
             TaskResultImpl res;
             if (terminateOptions.isNormalTermination()) {
-                //The task is terminated but it's possible to have to
-                //wait for the future of the task result (TaskResult).
-                //accessing to the taskResult could block current execution but for a very little time.
-                //it is the time between the end of the task and the arrival of the future from the task.
-                //
-                //check if the task result future has an error due to node death.
-                //if the node has died, a runtimeException is sent instead of the result
-                TaskResult tmp = ((JobResultImpl) job.getJobResult()).getAnyResult(descriptor.getName());
-                //unwrap future
-                res = (TaskResultImpl) PAFuture.getFutureValue(tmp);
-                logger_dev.info("Task '" + taskId + "' futur result unwrapped");
+                ((JobResultImpl) job.getJobResult()).addTaskResult(descriptor.getName(), taskResult,
+                        descriptor.isPreciousResult());
+                res = (TaskResultImpl) taskResult;
             } else {
                 if (terminateOptions.isPreempt()) {
                     //create fake task result with preempt exception
@@ -1198,47 +1195,13 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
                 }
             }
             // at this point, the TaskLauncher can be terminated
-            threadPoolForTerminateTL.submit(new Runnable() {
-                public void run() {
-                    try {
-                        taskLauncher.terminate(terminateOptions.isNormalTermination());
-                    } catch (Throwable t) {
-                        logger_dev.info("Cannot terminate task launcher for task '" + taskId + "'", t);
-                    }
-                }
-            });
+            terminateTaskLauncher(taskLauncher, taskId, terminateOptions.isNormalTermination());
 
             updateTaskIdReferences(res, descriptor.getId());
 
-            if (res != null) {
-                // HANDLE DESCRIPTORS
-                res.setPreviewerClassName(descriptor.getResultPreview());
-                res.setJobClasspath(job.getEnvironment().getJobClasspath()); // can be null
-                if (PAException.isException(res)) {
-                    //in this case, it is a node error. (should never come)
-                    //this is not user exception or usage,
-                    //so we restart independently of user or admin execution property
-                    logger_dev.info("Node failed on job '" + jobId + "', task '" + taskId + "'");
-                    //change status and update GUI
-                    descriptor.setStatus(TaskStatus.WAITING_ON_FAILURE);
-                    job.newWaitingTask();
-                    frontend.taskStateUpdated(job.getOwner(), new NotificationData<TaskInfo>(
-                        SchedulerEvent.TASK_WAITING_FOR_RESTART, descriptor.getTaskInfo()));
-                    job.reStartTask(descriptor);
-                    //update job and task info
-                    DatabaseManager.getInstance().runAsSingleTransaction(
-                            new UpdateJobDatabaseCallback(job, descriptor, false));
-                    //free execution node even if it is dead
-                    try {
-                        rmProxiesManager.getUserRMProxy(job.getOwner(), job.getCredentials()).releaseNodes(
-                                descriptor.getExecuterInformations().getNodes());
-                        hasBeenReleased = true;
-                    } catch (Exception e) {
-                        //save the return
-                    }
-                    return;
-                }
-            }
+            // HANDLE DESCRIPTORS
+            res.setPreviewerClassName(descriptor.getResultPreview());
+            res.setJobClasspath(job.getEnvironment().getJobClasspath()); // can be null
 
             logger.info("Task '" + taskId + "' on job '" + jobId + "' terminated");
 
@@ -1454,6 +1417,19 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
                 terminateUserProxy(job);
             }
         }
+    }
+
+    void terminateTaskLauncher(final TaskLauncher taskLauncher, final TaskId taskId,
+            final boolean normalTermination) {
+        threadPoolForTerminateTL.submit(new Runnable() {
+            public void run() {
+                try {
+                    taskLauncher.terminate(normalTermination);
+                } catch (Throwable t) {
+                    logger_dev.info("Cannot terminate task launcher for task '" + taskId + "'", t);
+                }
+            }
+        });
     }
 
     /**
@@ -2075,7 +2051,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
         InternalTask task = job.getTask(taskName);
 
         if (task.getStatus() == TaskStatus.RUNNING) {
-            this.terminate(task.getId(), options);
+            this.terminate(task.getId(), null, options);
             return true;
         } else {
             return false;

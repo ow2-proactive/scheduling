@@ -135,7 +135,7 @@ public final class AddGetTest extends FunctionalTest {
         // ADD, GET
         // 1) ADD
         final long beforeAddTime = System.currentTimeMillis();
-        Node node = helper.createNode("test");
+        Node node = helper.createNode("test").getNode();
         final String nodeURL = node.getNodeInformation().getURL();
         r.addNode(nodeURL).getBooleanValue();
         //we eat the configuring to free

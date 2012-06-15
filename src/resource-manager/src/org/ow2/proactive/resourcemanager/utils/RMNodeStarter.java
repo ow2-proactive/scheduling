@@ -36,32 +36,7 @@
  */
 package org.ow2.proactive.resourcemanager.utils;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.security.KeyException;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
-
-import javax.security.auth.login.LoginException;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.GnuParser;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Option;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
-import org.apache.commons.cli.Parser;
+import org.apache.commons.cli.*;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.objectweb.proactive.api.PAActiveObject;
@@ -85,6 +60,17 @@ import org.ow2.proactive.resourcemanager.nodesource.dataspace.DataSpaceNodeConfi
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+
+import javax.security.auth.login.LoginException;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import java.io.*;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.security.KeyException;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
 
 
 /**
@@ -922,15 +908,13 @@ public class RMNodeStarter {
         private Properties paPropProperties;
         private String paPropString;
         private int addAttempts = -1, addAttemptsDelay = -1;
-        private final String[] requiredJARs = { "script-js.jar", "jruby-engine.jar",
-                "sigar/sigar.jar",
+        private final String[] requiredJARs = { "script-js.jar", "jruby-engine.jar", "sigar/sigar.jar",
                 "jython-engine.jar",
                 "commons-logging-1.1.1.jar",
                 "ProActive_Scheduler-core.jar",// SCHEDULING-1338 and SCHEDULING-1307 : core required for forked java task
                 "ProActive_SRM-common.jar", "ProActive_ResourceManager.jar",
-                "ProActive_Scheduler-worker.jar", "ProActive_Scheduler-matsci.jar",
-                "ProActive_Scheduler-mapreduce.jar", "commons-httpclient-3.1.jar", "commons-codec-1.3.jar",
-                "ProActive.jar" };
+                "ProActive_Scheduler-worker.jar", "ProActive_Scheduler-mapreduce.jar",
+                "commons-httpclient-3.1.jar", "commons-codec-1.3.jar", "ProActive.jar" };
         private final String addonsDir = "addons";
 
         private OperatingSystem targetOS = OperatingSystem.UNIX;
@@ -1343,6 +1327,21 @@ public class RMNodeStarter {
 
             // add the content of addons dir on the classpath
             sb.append(this.targetOS.ps + rmHome + addonsDir);
+
+            // add jars inside the addons directory
+
+            File addonsAbsolute = new File(rmHome + addonsDir);
+            File[] addonsJars = addonsAbsolute.listFiles(new FileFilter() {
+                public boolean accept(File pathname) {
+                    return pathname.getName().matches(".*[.]jar");
+                }
+            });
+
+            if (addonsJars != null) {
+                for (File addonJar : addonsJars) {
+                    sb.append(this.targetOS.ps + addonJar.getAbsolutePath());
+                }
+            }
 
             if (this.getTargetOS().equals(OperatingSystem.CYGWIN) ||
                 this.getTargetOS().equals(OperatingSystem.WINDOWS)) {

@@ -164,7 +164,7 @@ public class SelectionTest extends FunctionalTest {
         HashMap<String, String> vmProperties = new HashMap<String, String>();
         vmProperties.put(this.vmPropKey1, this.vmPropValue1);
 
-        String node1URL = helper.createNode(node1, vmProperties).getNodeInformation().getURL();
+        String node1URL = helper.createNode(node1, vmProperties).getNode().getNodeInformation().getURL();
         resourceManager.addNode(node1URL, NodeSource.DEFAULT);
 
         //wait node adding event

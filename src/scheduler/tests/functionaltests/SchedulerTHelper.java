@@ -315,14 +315,19 @@ public class SchedulerTHelper {
 
     /* remove directories recursively */
     private static void removeDir(File dir) {
-        if (dir.isDirectory()) {
-            for (File f : dir.listFiles()) {
-                removeDir(f);
+        if (dir != null) {
+            if (dir.isDirectory()) {
+                File[] files = dir.listFiles();
+                if (files != null) {
+                    for (File f : files) {
+                        removeDir(f);
+                    }
+                }
             }
-        }
-        try {
-            dir.delete();
-        } catch (Exception e) {
+            try {
+                dir.delete();
+            } catch (Exception e) {
+            }
         }
     }
 

@@ -101,7 +101,7 @@ public class NativeTaskLauncher extends TaskLauncher {
      * @return a task result representing the result of this task execution.
      */
     @Override
-    public TaskResult doTask(TaskTerminateNotification core, ExecutableContainer executableContainer,
+    public void doTask(TaskTerminateNotification core, ExecutableContainer executableContainer,
             TaskResult... results) {
         long duration = -1;
         long sample = 0;
@@ -109,7 +109,7 @@ public class NativeTaskLauncher extends TaskLauncher {
         Throwable exception = null;
         Serializable userResult = null;
         // TaskResult produced by doTask
-        TaskResultImpl res = null;
+        TaskResultImpl res;
         try {
             //init dataspace
             initDataSpaces();
@@ -223,15 +223,16 @@ public class NativeTaskLauncher extends TaskLauncher {
                 }
                 res.setPropagatedProperties(retreivePropagatedProperties());
                 res.setLogs(this.getLogs());
+            } else {
+                res = null;
             }
             // finalize task in any cases (killed or not)
             terminateDataSpace();
             if (isWallTime()) {
                 cancelTimer();
             }
-            this.finalizeTask(core);
+            this.finalizeTask(core, res);
         }
-        return res;
     }
 
     private void replaceWorkingDirDSTags(ExecutableInitializer execInit) throws Exception {

@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="ISO-8859-15"?>
-<ScilabInstallations>
-    <installation>
-        <version>5.3.0</version> <!-- Scilab version (must be at least 5.3.0) -->
-        <home>/user/fviale/desktop/home/bin/scilab-5.3.0</home> <!-- Scilab installation directory -->
-        <bindir>bin</bindir>
-        <command>scilab</command>
-    </installation>   
-</ScilabInstallations>
