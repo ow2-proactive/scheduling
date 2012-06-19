@@ -31,199 +31,190 @@ import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import org.ow2.proactive.scheduler.common.util.dsclient.SchedulerProxyUIWithDSupport;
 import org.ow2.tests.FunctionalTest;
 
+
 /**
  * @author esalagea
  * 
  */
 public class TestSchedulerProxyUIWithDSSupport extends FunctionalTest {
 
-	public static final String workFolderPath = System
-			.getProperty("java.io.tmpdir")
-			+ File.separator
-			+ "testDS_LocalFolder";
-	public static final String dataServerFolderPath = System
-			.getProperty("java.io.tmpdir")
-			+ File.separator
-			+ "testDS_remoteFolder";
+    public static final String workFolderPath = System.getProperty("java.io.tmpdir") + File.separator +
+        "testDS_LocalFolder";
+    public static final String dataServerFolderPath = System.getProperty("java.io.tmpdir") + File.separator +
+        "testDS_remoteFolder";
 
-	private File inputLocalFolder;
-	private File outputLocalFolder;
-	private File workLocalFolder;
-	private DataServerProvider dataProvider;
-	private String dataServerURI;
+    private File inputLocalFolder;
+    private File outputLocalFolder;
+    private File workLocalFolder;
+    private DataServerProvider dataProvider;
+    private String dataServerURI;
 
-	private final String inputFileName = "input.txt";
+    private String push_url = "file://" + dataServerFolderPath;
+    private String pull_url = "file://" + dataServerFolderPath;
 
-	@Before
-	public void init() throws Exception {
+    private final String inputFileName = "input.txt";
 
-		workLocalFolder = new File(workFolderPath);
-		inputLocalFolder = new File(workLocalFolder, "input");
-		outputLocalFolder = new File(workLocalFolder, "output");
+    @Before
+    public void init() throws Exception {
 
-		inputLocalFolder.mkdirs();
-		outputLocalFolder.mkdirs();
+        workLocalFolder = new File(workFolderPath);
+        inputLocalFolder = new File(workLocalFolder, "input");
+        outputLocalFolder = new File(workLocalFolder, "output");
 
-		// ------------- create an input File ------------
-		File f = new File(inputLocalFolder, inputFileName);
+        inputLocalFolder.mkdirs();
+        outputLocalFolder.mkdirs();
 
-		FileWriter fw = new FileWriter(f);
-		for (int i = 0; i <= 100; i++)
-			fw.write("Some random input");
-		fw.close();
+        // ------------- create an input File ------------
+        File f = new File(inputLocalFolder, inputFileName);
 
-		// ----------------- start Data Server -------------
-		// this simulates a remote data server
-		dataServerURI = dataProvider.deployProActiveDataServer(
-				dataServerFolderPath, "data");
+        FileWriter fw = new FileWriter(f);
+        for (int i = 0; i <= 100; i++)
+            fw.write("Some random input");
+        fw.close();
 
-		// start scheduler and nodes
-		SchedulerTHelper.startScheduler();
+        // ----------------- start Data Server -------------
+        // this simulates a remote data server
+        dataServerURI = dataProvider.deployProActiveDataServer(dataServerFolderPath, "data");
 
-	}
+        // start scheduler and nodes
+        SchedulerTHelper.startScheduler();
 
-	@After
-	public void terminate() throws ProActiveException {
-		dataProvider.stopServer();
-	}
+    }
 
-	@org.junit.Test
-	public void run() throws Throwable {
-		Job job = createTestJob();
-		try {
-			submitJobWithData(job, inputLocalFolder.getAbsolutePath(),
-					outputLocalFolder.getAbsolutePath());
-		} catch (LoginException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (FileSystemException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (SchedulerException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ActiveObjectCreationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (NodeException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+    @After
+    public void terminate() throws ProActiveException {
+        dataProvider.stopServer();
+    }
 
-	}
+    @org.junit.Test
+    public void run() throws Throwable {
+        Job job = createTestJob();
+        try {
+            submitJobWithData(job, inputLocalFolder.getAbsolutePath(), outputLocalFolder.getAbsolutePath());
+        } catch (LoginException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (FileSystemException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (SchedulerException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (ActiveObjectCreationException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (NodeException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
 
-	private Job createTestJob() {
-		TaskFlowJob job = new TaskFlowJob();
-		JavaTask testTask = new JavaTask();
-		testTask.setName("TestJavaTask");
-		testTask.setExecutableClassName(TestDataJavaExecutable.class.getName());
-		job.setInputSpace(dataServerURI);
-		job.setOutputSpace(dataServerURI);
+    }
 
-		// testTask.
-		testTask.addInputFiles("in.txt", InputAccessMode.TransferFromInputSpace);
-		testTask.addOutputFiles("*.out", OutputAccessMode.TransferToOutputSpace);
+    private Job createTestJob() {
+        TaskFlowJob job = new TaskFlowJob();
+        JavaTask testTask = new JavaTask();
+        testTask.setName("TestJavaTask");
+        testTask.setExecutableClassName(TestDataJavaExecutable.class.getName());
+        job.setInputSpace(dataServerURI);
+        job.setOutputSpace(dataServerURI);
 
-		try {
-			job.addTask(testTask);
-		} catch (UserException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		setJobClasPath(job);
-		return job;
+        // testTask.
+        testTask.addInputFiles("in.txt", InputAccessMode.TransferFromInputSpace);
+        testTask.addOutputFiles("*.out", OutputAccessMode.TransferToOutputSpace);
 
-	}
+        try {
+            job.addTask(testTask);
+        } catch (UserException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        setJobClasPath(job);
+        return job;
 
-	public void submitJobWithData(Job job, String localInputFolderPath,
-			String localOutputFolderPath) throws LoginException,
-			SchedulerException, FileSystemException,
-			ActiveObjectCreationException, NodeException {
-		SchedulerProxyUIWithDSupport schedProxy = SchedulerProxyUIWithDSupport
-				.getActiveInstance();
+    }
 
-		schedProxy.init(SchedulerTHelper.schedulerDefaultURL,
-				SchedulerTHelper.username, SchedulerTHelper.password);
-		schedProxy.submit(job, localInputFolderPath, localOutputFolderPath);
-	}
+    public void submitJobWithData(Job job, String localInputFolderPath, String localOutputFolderPath)
+            throws LoginException, SchedulerException, FileSystemException, ActiveObjectCreationException,
+            NodeException {
+        SchedulerProxyUIWithDSupport schedProxy = SchedulerProxyUIWithDSupport.getActiveInstance();
 
-	/**
-	 * This method adds to the job the classpath of the application
-	 * 
-	 * @param job
-	 */
-	public void setJobClasPath(Job job) {
-		String appClassPath = "";
-		try {
-			File appMainFolder = new File(this.getClass().getProtectionDomain()
-					.getCodeSource().getLocation().toURI());
-			appClassPath = appMainFolder.getAbsolutePath();
+        schedProxy.init(SchedulerTHelper.schedulerDefaultURL, SchedulerTHelper.username,
+                SchedulerTHelper.password);
+        schedProxy.submit(job, localInputFolderPath, push_url, localOutputFolderPath, pull_url);
+    }
 
-		} catch (URISyntaxException e1) {
-			System.out
-					.println("Preview of the partial results will not be possible as some ressources could not be found by the system. \nThis will not alterate your results in any way. ");
-			System.out
-					.println("JobCreator: The bin folder of the project is null. It is needed to set the job environment. ");
-			e1.printStackTrace();
-		}
+    /**
+     * This method adds to the job the classpath of the application
+     * 
+     * @param job
+     */
+    public void setJobClasPath(Job job) {
+        String appClassPath = "";
+        try {
+            File appMainFolder = new File(this.getClass().getProtectionDomain().getCodeSource().getLocation()
+                    .toURI());
+            appClassPath = appMainFolder.getAbsolutePath();
 
-		JobEnvironment je = new JobEnvironment();
-		try {
-			je.setJobClasspath(new String[] { appClassPath });
-		} catch (IOException e) {
-			System.out
-					.println("Preview of the partial results will not be possible as the job classpath could not be loaded. \nThis will not alterate your results in any way.");
-			System.out.println("Could not add classpath to the job. ");
-			e.printStackTrace();
-		}
-		job.setEnvironment(je);
-	}
+        } catch (URISyntaxException e1) {
+            System.out
+                    .println("Preview of the partial results will not be possible as some ressources could not be found by the system. \nThis will not alterate your results in any way. ");
+            System.out
+                    .println("JobCreator: The bin folder of the project is null. It is needed to set the job environment. ");
+            e1.printStackTrace();
+        }
+
+        JobEnvironment je = new JobEnvironment();
+        try {
+            je.setJobClasspath(new String[] { appClassPath });
+        } catch (IOException e) {
+            System.out
+                    .println("Preview of the partial results will not be possible as the job classpath could not be loaded. \nThis will not alterate your results in any way.");
+            System.out.println("Could not add classpath to the job. ");
+            e.printStackTrace();
+        }
+        job.setEnvironment(je);
+    }
 
 }
 
 class TestDataJavaExecutable extends JavaExecutable {
 
-	@Override
-	public Serializable execute(TaskResult... results) throws Throwable {
+    @Override
+    public Serializable execute(TaskResult... results) throws Throwable {
 
-		System.out.println("local space real uri: "
-				+ this.getLocalSpace().getRealURI());
-		System.out.println("local space virtual uri: "
-				+ this.getLocalSpace().getVirtualURI());
+        System.out.println("local space real uri: " + this.getLocalSpace().getRealURI());
+        System.out.println("local space virtual uri: " + this.getLocalSpace().getVirtualURI());
 
-		File localSpaceFolder = new File(URI.create(this.getLocalSpace()
-				.getRealURI()));
-		System.out.println("Using localspace folder "
-				+ localSpaceFolder.getAbsolutePath());
-		File[] files = localSpaceFolder.listFiles();
+        File localSpaceFolder = new File(URI.create(this.getLocalSpace().getRealURI()));
+        System.out.println("Using localspace folder " + localSpaceFolder.getAbsolutePath());
+        File[] files = localSpaceFolder.listFiles();
 
-		for (File file : files) {
+        for (File file : files) {
 
-			if (file.isFile()) {
-				System.out.println("Treating input file "
-						+ file.getAbsolutePath());
+            if (file.isFile()) {
+                System.out.println("Treating input file " + file.getAbsolutePath());
 
-			} else {
-				System.out.println(file.getAbsolutePath() + " is not a file. ");
-			}
+            } else {
+                System.out.println(file.getAbsolutePath() + " is not a file. ");
+            }
 
-			File fout = new File(file.getAbsolutePath().concat(".out"));
-			FileReader fr = new FileReader(file);
-			BufferedReader br = new BufferedReader(fr);
-			BufferedWriter bw = new BufferedWriter(new FileWriter(fout));
+            File fout = new File(file.getAbsolutePath().concat(".out"));
+            FileReader fr = new FileReader(file);
+            BufferedReader br = new BufferedReader(fr);
+            BufferedWriter bw = new BufferedWriter(new FileWriter(fout));
 
-			String line;
-			while ((line = br.readLine()) != null) {
-				bw.write(line);
-				bw.newLine();
-			}
-			bw.close();
-			br.close();
-			System.out.println("Written file " + fout.getAbsolutePath());
-		}// for
+            String line;
+            while ((line = br.readLine()) != null) {
+                bw.write(line);
+                bw.newLine();
+            }
+            bw.close();
+            br.close();
+            System.out.println("Written file " + fout.getAbsolutePath());
+        }// for
 
-		System.out.println("Task End");
-		return "OK";
-	}
+        System.out.println("Task End");
+        return "OK";
+    }
 
 }
