@@ -167,9 +167,9 @@ fi
 
 JAVA=$JAVA_HOME/bin/java
 
-CP=$DIR/../../lib/ProActive/jetty-6.1.18.jar
-CP=$CP:$DIR/../../lib/ProActive/jetty-util-6.1.18.jar
-CP=$CP:$DIR/../../lib/ProActive/servlet-api-2.5-6.1.11.jar
+CP=$DIR/../../dist/lib/jetty-6.1.18.jar
+CP=$CP:$DIR/../../dist/lib/jetty-util-6.1.18.jar
+CP=$CP:$DIR/../../dist/lib/servlet-api-2.5-6.1.11.jar
 CP=$CP:$DIR/../../dist/lib/ProActive_SRM-common.jar
 
 CLASS=org.ow2.proactive.utils.JettyLauncher
