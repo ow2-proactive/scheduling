@@ -632,10 +632,13 @@ public class RMRest {
         return rm.getAtMostNodes(number, descriptor, selectionScriptsList, exclusion);
     }
 
+    @GET
+    @Path("topology")
+    @Produces("application/json")
     public Topology getTopology(@HeaderParam("sessionid")
     String sessionId) throws NotConnectedException {
         ResourceManager rm = checkAccess(sessionId);
-        return rm.getTopology();
+        return PAFuture.getFutureValue(rm.getTopology());
     }
 
     public NodeSet getAtMostNodes(@HeaderParam("sessionid")
