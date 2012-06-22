@@ -42,6 +42,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
+
 import org.objectweb.proactive.core.node.Node;
 import org.ow2.proactive.resourcemanager.frontend.topology.clustering.Cluster;
 import org.ow2.proactive.resourcemanager.frontend.topology.clustering.HAC;
@@ -53,6 +57,8 @@ import org.ow2.proactive.topology.descriptor.DistanceFunction;
  * Class represents hosts topology handled by resource manager.
  *
  */
+@XmlRootElement()
+@XmlAccessorType(XmlAccessType.FIELD)
 public class TopologyImpl implements Topology, Cloneable {
 
     /**
