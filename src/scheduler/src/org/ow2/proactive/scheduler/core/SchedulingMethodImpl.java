@@ -48,7 +48,6 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
-import org.objectweb.proactive.core.ProActiveTimeoutException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.utils.NamedThreadFactory;
@@ -113,10 +112,6 @@ final class SchedulingMethodImpl implements SchedulingMethod {
 
     private InternalPolicy internalPolicy;
 
-    private RMPendingRequest rmPendingRequest = null;
-
-    private static final int SCHEDULER_TIME_OUT = PASchedulerProperties.SCHEDULER_TIME_OUT.getValueAsInt();
-
     SchedulingMethodImpl(SchedulerCore core) {
         this.core = core;
         this.threadPool = TimeoutThreadPoolExecutor.newFixedThreadPool(DOTASK_ACTION_THREADNUMBER,
@@ -174,44 +169,27 @@ final class SchedulingMethodImpl implements SchedulingMethod {
             RMState rmState = core.rmProxiesManager.getSchedulerRMProxy().getState();
             core.policy.setRMState(rmState);
             internalPolicy.RMState = rmState;
-            int availableNodesNumber = rmState.getFreeNodesNumber();
-            logger_dev.info("Number of free resources : " + availableNodesNumber);
-            if (availableNodesNumber == 0 && rmPendingRequest == null) {
-                // if there is no free resources, stop it right now
-                logger_dev.info("Breaking the scheduler loop as there are no resources");
+            int freeResourcesNb = rmState.getFreeNodesNumber();
+            logger_dev.info("Number of free resources : " + freeResourcesNb);
+            //if there is no free resources, stop it right now
+            if (freeResourcesNb == 0) {
                 break;
             }
 
             //get the next compatible tasks from the whole returned policy tasks
-            int neededResourcesNumber = 0;
             LinkedList<EligibleTaskDescriptor> tasksToSchedule = new LinkedList<EligibleTaskDescriptor>();
-            if (rmPendingRequest != null) {
-                // neededResourcesNumber is not important in this case as it's defined
-                // by pending request
-                //
-                // passing all the eligible tasks to getNodes to see if pending request
-                // is still valid
-                tasksToSchedule = taskRetrivedFromPolicy;
-            } else {
-                while (taskRetrivedFromPolicy.size() > 0 && neededResourcesNumber == 0) {
-                    //the loop will search for next compatible task until it find something
-                    neededResourcesNumber = getNextcompatibleTasks(taskRetrivedFromPolicy,
-                            availableNodesNumber, tasksToSchedule);
-                }
-                logger.debug("Number of nodes to ask for : " + neededResourcesNumber);
+            int neededResourcesNumber = 0;
+            while (taskRetrivedFromPolicy.size() > 0 && neededResourcesNumber == 0) {
+                //the loop will search for next compatible task until it find something
+                neededResourcesNumber = getNextcompatibleTasks(taskRetrivedFromPolicy, freeResourcesNb,
+                        tasksToSchedule);
             }
-            if (neededResourcesNumber == 0 && rmPendingRequest == null) {
-                logger_dev.info("Breaking the scheduler loop as there are nodes to be asked for");
+            logger.debug("Number of nodes to ask for : " + neededResourcesNumber);
+            if (neededResourcesNumber == 0) {
                 break;
             }
 
-            NodeSet nodeSet = null;
-            try {
-                nodeSet = getRMNodes(neededResourcesNumber, tasksToSchedule);
-            } catch (PendingRequestException e) {
-                logger_dev.info("Breaking the scheduler loop due to a pending request to the RM");
-                break;
-            }
+            NodeSet nodeSet = getRMNodes(neededResourcesNumber, tasksToSchedule);
 
             //start selected tasks
             Node node = null;
@@ -376,10 +354,10 @@ final class SchedulingMethodImpl implements SchedulingMethod {
      * 		   An empty nodeSet if no nodes could be found
      * 		   null if the their was an exception when asking for the nodes (ie : selection script has failed)
      */
-    protected NodeSet getRMNodes(int neededResourcesNumber, LinkedList<EligibleTaskDescriptor> tasksToSchedule)
-            throws PendingRequestException {
+    protected NodeSet getRMNodes(int neededResourcesNumber, LinkedList<EligibleTaskDescriptor> tasksToSchedule) {
+        NodeSet nodeSet = new NodeSet();
 
-        if (neededResourcesNumber <= 0 && rmPendingRequest == null) {
+        if (neededResourcesNumber <= 0) {
             throw new IllegalArgumentException("Args 'neededResourcesNumber' must be > 0");
         }
 
@@ -397,38 +375,6 @@ final class SchedulingMethodImpl implements SchedulingMethod {
         }
 
         try {
-            if (rmPendingRequest != null) {
-                // there is already a request sent to the rm
-                // checking if nodes are ready
-                if (rmPendingRequest.isReady()) {
-                    // ready, so check if the set of tasks to scheduler is the same
-                    NodeSet nodes = rmPendingRequest.getNodes();
-
-                    if (rmPendingRequest.isValid(tasksToSchedule)) {
-                        // found nodes
-                        // WARNING nodes.size() may throw ScriptExecution exception
-                        // so don't remove it
-                        logger_dev.debug("Got " + nodes.size() + " node(s) in " +
-                            rmPendingRequest.elapsedTime() + " ms");
-                        // resetting the pending request
-                        rmPendingRequest = null;
-                        return nodes;
-                    } else {
-                        // set of tasks to scheduler changed, so release all the nodes
-                        logger_dev.debug("Set of tasks to scheduler changed. Releasing nodes.");
-                        core.rmProxiesManager.getUserRMProxy(currentJob.getOwner(),
-                                currentJob.getCredentials()).releaseNodes(nodes);
-                        rmPendingRequest = null;
-                        return null;
-                    }
-                } else {
-                    // waiting further
-                    logger_dev.debug("Pending node search request to the resource manager.");
-                    throw new PendingRequestException();
-                }
-            }
-
-            // ask nodes from the rm as there are no pending request
             TopologyDescriptor descriptor = null;
             boolean bestEffort = true;
             if (internalTask.isParallel()) {
@@ -443,7 +389,6 @@ final class SchedulingMethodImpl implements SchedulingMethod {
                 descriptor = TopologyDescriptor.ARBITRARY;
             }
 
-            NodeSet nodeSet = new NodeSet();
             try {
                 nodeSet = core.rmProxiesManager.getUserRMProxy(currentJob.getOwner(),
                         currentJob.getCredentials()).getNodes(neededResourcesNumber, descriptor,
@@ -455,13 +400,7 @@ final class SchedulingMethodImpl implements SchedulingMethod {
             }
             //the following line is used to unwrap the future, warning when moving or removing
             //it may also throw a ScriptException which is a RuntimeException
-            try {
-                PAFuture.waitFor(nodeSet, SCHEDULER_TIME_OUT, true);
-            } catch (ProActiveTimeoutException e) {
-                logger_dev.debug("Did not get nodes within " + SCHEDULER_TIME_OUT + " ms");
-                rmPendingRequest = new RMPendingRequest(nodeSet, tasksToSchedule);
-                throw new PendingRequestException();
-            }
+            PAFuture.waitFor(nodeSet, true);
             logger.debug("Got " + nodeSet.size() + " node(s)");
             return nodeSet;
         } catch (ScriptException e) {
@@ -474,13 +413,11 @@ final class SchedulingMethodImpl implements SchedulingMethod {
             //simulate jobs starts and cancel it
             simulateJobStartAndCancelIt(tasksToSchedule, "Selection script has failed : " +
                 Formatter.stackTraceToString(t));
-            rmPendingRequest = null;
             //leave the method by ss failure
             return null;
         } catch (RMProxyCreationException e) {
             logger_dev.info("Failed to create User RM Proxy : " + e.getMessage());
             logger_dev.debug("", e);
-            rmPendingRequest = null;
             //simulate jobs starts and cancel it
             simulateJobStartAndCancelIt(tasksToSchedule,
                     "Failed to create User RM Proxy : Authentication Failed to Resource Manager for user '" +
@@ -655,40 +592,5 @@ final class SchedulingMethodImpl implements SchedulingMethod {
             SchedulerEvent.TASK_PENDING_TO_RUNNING, task.getTaskInfo()));
         //fill previous task progress with 0, means task has started
         task.setProgress(0);
-    }
-
-    private class RMPendingRequest {
-
-        private NodeSet nodes;
-        private LinkedList<EligibleTaskDescriptor> tasks;
-        private long creationTime = System.currentTimeMillis();
-
-        public RMPendingRequest(NodeSet nodeSet, LinkedList<EligibleTaskDescriptor> tasksToSchedule) {
-            this.nodes = nodeSet;
-            this.tasks = tasksToSchedule;
-        }
-
-        public long elapsedTime() {
-            return System.currentTimeMillis() - creationTime;
-        }
-
-        public boolean isValid(LinkedList<EligibleTaskDescriptor> tasksToSchedule) {
-            // the request is still valid when it was done for the subset of tasks
-            // ready to be scheduled
-            return tasksToSchedule.containsAll(tasks);
-        }
-
-        public NodeSet getNodes() {
-            return nodes;
-        }
-
-        public boolean isReady() {
-            return !PAFuture.isAwaited(nodes);
-        }
-    }
-
-    private class PendingRequestException extends Exception {
-
-        private static final long serialVersionUID = 32L;
     }
 }
