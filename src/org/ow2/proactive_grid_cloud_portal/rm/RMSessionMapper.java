@@ -36,9 +36,8 @@
  */
 package org.ow2.proactive_grid_cloud_portal.rm;
 
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.objectweb.proactive.api.PAActiveObject;
 import org.ow2.proactive.resourcemanager.common.util.RMCachingProxyUserInterface;
@@ -52,8 +51,8 @@ public class RMSessionMapper {
     private Map<String, Long> sessionsLastAccessToClient;
 
     private RMSessionMapper() {
-        sessions = Collections.synchronizedMap(new HashMap<String, RMCachingProxyUserInterface>());
-        sessionsLastAccessToClient = Collections.synchronizedMap(new HashMap<String, Long>());
+        sessions = new ConcurrentHashMap<String, RMCachingProxyUserInterface>();
+        sessionsLastAccessToClient = new ConcurrentHashMap<String, Long>();
     }
 
     public static synchronized RMSessionMapper getInstance() {

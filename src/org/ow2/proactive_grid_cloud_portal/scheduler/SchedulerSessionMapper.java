@@ -36,9 +36,8 @@
  */
 package org.ow2.proactive_grid_cloud_portal.scheduler;
 
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.objectweb.proactive.api.PAActiveObject;
 import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
@@ -53,7 +52,7 @@ public class SchedulerSessionMapper {
     //    private long currentSessionid = 0l;
 
     private SchedulerSessionMapper() {
-        sessions = Collections.synchronizedMap(new HashMap<String, SchedulerSession>());
+        sessions = new ConcurrentHashMap<String, SchedulerSession>();
     }
 
     public static synchronized SchedulerSessionMapper getInstance() {
