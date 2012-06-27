@@ -85,7 +85,7 @@ public class TestSchedulerProxyUIWithDSSupport extends FunctionalTest {
     }
 
     @org.junit.Test
-    @org.junit.Ignore("This implementation is not yet finihed") 
+    @org.junit.Ignore("This implementation is not yet finihed")
     public void run() throws Throwable {
         Job job = createTestJob();
         try {

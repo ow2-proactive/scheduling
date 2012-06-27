@@ -29,7 +29,7 @@ public class TestIfTaskRestore extends FunctionalTest {
         }
 
     }
-    
+
     public static class TaskB extends JavaExecutable {
 
         @Override
