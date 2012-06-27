@@ -34,8 +34,6 @@ public final class ClientTaskState extends TaskState {
 
     private TaskInfo taskInfo;
     private int maxNumberOfExecutionOnFailure;
-    private int iterationIndex;
-    private int replicationIndex;
     private List<TaskId> dependenceIds = new ArrayList<TaskId>();
     private List<TaskState> dependences = new ArrayList<TaskState>();
 
@@ -46,8 +44,6 @@ public final class ClientTaskState extends TaskState {
         // copy information from the TaskStae passed as an argument
         taskInfo = taskState.getTaskInfo();
         maxNumberOfExecutionOnFailure = taskState.getMaxNumberOfExecutionOnFailure();
-        iterationIndex = taskState.getIterationIndex();
-        replicationIndex = taskState.getReplicationIndex();
         this.setName(taskState.getName());
 
         this.setDescription(taskState.getDescription());
@@ -100,12 +96,12 @@ public final class ClientTaskState extends TaskState {
 
     @Override
     public int getIterationIndex() {
-        return iterationIndex;
+        return taskInfo.getTaskId().getIterationIndex();
     }
 
     @Override
     public int getReplicationIndex() {
-        return replicationIndex;
+        return taskInfo.getTaskId().getReplicationIndex();
     }
 
     public void restoreDependences(Map<TaskId, TaskState> tasksMap) {
