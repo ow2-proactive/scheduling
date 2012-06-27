@@ -48,10 +48,6 @@ import java.net.URL;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import javax.persistence.Column;
-import javax.persistence.Lob;
-import javax.persistence.MappedSuperclass;
-import javax.persistence.Table;
 import javax.script.Bindings;
 import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
@@ -59,9 +55,6 @@ import javax.script.ScriptEngineFactory;
 import javax.script.ScriptEngineManager;
 
 import org.apache.log4j.Logger;
-import org.hibernate.annotations.AccessType;
-import org.hibernate.annotations.Proxy;
-import org.hibernate.annotations.Type;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.utils.BoundedStringWriter;
@@ -78,10 +71,6 @@ import org.ow2.proactive.utils.SchedulerLoggers;
  * @param <E> Template class's type of the result.
  */
 @PublicAPI
-@MappedSuperclass
-@Table(name = "SCRIPT")
-@AccessType("field")
-@Proxy(lazy = false)
 public abstract class Script<E> implements Serializable {
 
     // default output size in chars based on the notorious JL's statistics :)
@@ -94,23 +83,18 @@ public abstract class Script<E> implements Serializable {
     public static final String ARGUMENTS_NAME = "args";
 
     /** Name of the script engine */
-    @Column(name = "SCRIPTENGINE")
-    protected String scriptEngine = null;
+    protected String scriptEngine;
 
     /** The script to evaluate */
-    @Column(name = "SCRIPT", length = Integer.MAX_VALUE)
-    @Lob
-    protected String script = null;
+    protected String script;
 
     /** Id of this script */
-    @Column(name = "SCRIPT_ID", length = Integer.MAX_VALUE)
-    @Lob
-    protected String id = null;
+    protected String id;
 
     /** The parameters of the script */
-    @Column(name = "PARAMETERS", columnDefinition = "BLOB")
-    @Type(type = "org.ow2.proactive.scheduler.core.db.schedulerType.CharacterLargeOBject")
-    protected String[] parameters = null;
+    protected String[] parameters;
+
+    private static final ScriptEngineManager scriptEngineManager = new ScriptEngineManager();
 
     /** ProActive needed constructor */
     public Script() {
@@ -123,13 +107,16 @@ public abstract class Script<E> implements Serializable {
      * @throws InvalidScriptException if the creation fails.
      */
     public Script(String script, String engineName, String[] parameters) throws InvalidScriptException {
-        ScriptEngineManager manager = new ScriptEngineManager();
-        ScriptEngine engine = manager.getEngineByName(engineName);
-
-        if (engine == null) {
+        for (ScriptEngineFactory factory : scriptEngineManager.getEngineFactories()) {
+            for (String name : factory.getNames()) {
+                if (name.equals(engineName)) {
+                    scriptEngine = engineName;
+                    break;
+                }
+            }
+        }
+        if (scriptEngine == null) {
             throw new InvalidScriptException("The engine '" + engineName + "' is not valid");
-        } else {
-            scriptEngine = engine.getFactory().getNames().get(0);
         }
 
         this.script = script;
@@ -346,6 +333,10 @@ public abstract class Script<E> implements Serializable {
         }
 
         script = builder.toString();
+    }
+
+    public String getEngineName() {
+        return scriptEngine;
     }
 
     /** Set the scriptEngine from filepath */

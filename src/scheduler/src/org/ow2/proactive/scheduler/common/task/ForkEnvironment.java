@@ -42,27 +42,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.Lob;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
-import javax.persistence.Transient;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlTransient;
 
-import org.hibernate.annotations.AccessType;
-import org.hibernate.annotations.Cascade;
-import org.hibernate.annotations.CascadeType;
-import org.hibernate.annotations.LazyCollection;
-import org.hibernate.annotations.LazyCollectionOption;
-import org.hibernate.annotations.Proxy;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.db.types.BigString;
 import org.ow2.proactive.scheduler.common.exception.ExecutableCreationException;
@@ -80,72 +62,44 @@ import org.ow2.proactive.scripting.SimpleScript;
  *
  */
 @PublicAPI
-@Entity
-@Table(name = "FORK_ENVIRONMENT")
-@AccessType("field")
-@Proxy(lazy = false)
 @XmlAccessorType(XmlAccessType.FIELD)
 public class ForkEnvironment implements Serializable {
-    @Id
-    @GeneratedValue
-    @SuppressWarnings("unused")
-    @XmlTransient
-    private long hId;
 
     /**
      * Path to directory with Java installed, to this path '/bin/java' will be added.
      * If the path is null only 'java' command will be called
      */
-    @Column(name = "JAVA_HOME", length = Integer.MAX_VALUE)
-    @Lob
     private String javaHome = null;
 
     /**
      * Path to the working directory
      */
-    @Column(name = "WORKING_DIR", length = Integer.MAX_VALUE)
-    @Lob
     private String workingDir = null;
 
     /**
      * Base environment : used by internal constructor to set up
      * a base environment on which to apply client env
      */
-    @Transient
     private transient Map<String, String> baseSystemEnvironment = null;
 
     /**
      * User custom system environment : can modify base env or create new variable
      */
-    @OneToMany(targetEntity = PropertyModifier.class)
-    @LazyCollection(value = LazyCollectionOption.FALSE)
-    @Cascade(CascadeType.ALL)
-    @JoinColumn(name = "SYSENV")
     private List<PropertyModifier> systemEnvironment = null;
 
     /**
      * Arguments passed to Java (not an application) (example: memory settings or properties)
      */
-    @OneToMany(targetEntity = BigString.class)
-    @Cascade(CascadeType.ALL)
-    @LazyCollection(value = LazyCollectionOption.FALSE)
-    @JoinColumn(name = "JVM_ARGUMENTS")
     private List<BigString> jvmArguments = null;
 
     /**
      * Additional classpath when new JVM will be started
      */
-    @OneToMany(targetEntity = BigString.class)
-    @Cascade(CascadeType.ALL)
-    @LazyCollection(value = LazyCollectionOption.FALSE)
-    @JoinColumn(name = "CLASSPATH")
     private List<BigString> additionalClasspath = null;
 
     /**
      * EnvScript : can be used to initialize environment just before JVM fork.
      */
-    @Cascade(CascadeType.ALL)
-    @OneToOne(fetch = FetchType.EAGER, targetEntity = SimpleScript.class)
     private Script<?> script = null;
 
     public ForkEnvironment() {
@@ -417,6 +371,10 @@ public class ForkEnvironment implements Serializable {
      */
     public void setEnvScript(Script<?> script) {
         this.script = script;
+    }
+
+    public List<PropertyModifier> getPropertyModifiers() {
+        return systemEnvironment;
     }
 
 }

@@ -104,7 +104,7 @@ public class TestExportVars extends FunctionalTest {
         taskid = "task5";
         r = res.getResult(taskid);
         // exception in post script evaluation
-        Assert.assertEquals(0, (Integer) r.value());
+        Assert.assertEquals((Integer) 0, (Integer) r.value());
 
     }
 

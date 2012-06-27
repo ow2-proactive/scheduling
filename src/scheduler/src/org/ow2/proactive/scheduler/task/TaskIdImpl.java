@@ -36,26 +36,14 @@
  */
 package org.ow2.proactive.scheduler.task;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlTransient;
 
-import org.hibernate.annotations.AccessType;
-import org.hibernate.annotations.Cascade;
-import org.hibernate.annotations.CascadeType;
-import org.hibernate.annotations.Proxy;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
-import org.ow2.proactive.scheduler.job.JobIdImpl;
 
 
 /**
@@ -65,17 +53,8 @@ import org.ow2.proactive.scheduler.job.JobIdImpl;
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9
  */
-@Entity
-@Table(name = "TASK_ID")
-@AccessType("field")
-@Proxy(lazy = false)
 @XmlAccessorType(XmlAccessType.FIELD)
 public final class TaskIdImpl implements TaskId {
-    @Id
-    @GeneratedValue
-    @SuppressWarnings("unused")
-    @XmlTransient
-    private long hId;
 
     /**
      * Multiplicative factor for job id (taskId will be :
@@ -84,31 +63,27 @@ public final class TaskIdImpl implements TaskId {
     public static final int JOB_FACTOR = PASchedulerProperties.JOB_FACTOR.getValueAsInt();
 
     /** task id */
-    @Column(name = "ID")
     private long id;
 
     /** Human readable name */
-    @Column(name = "READABLE_NAME")
     private String readableName = SchedulerConstants.TASK_DEFAULT_NAME;
 
     /** Job id */
-    @Cascade(CascadeType.ALL)
-    @OneToOne(fetch = FetchType.EAGER, targetEntity = JobIdImpl.class)
     @XmlTransient
     private JobId jobId = null;
-
-    /** Hibernate default constructor */
-    private TaskIdImpl() {
-    }
 
     /**
      * Default constructor. Just set the id of the task.
      *
      * @param jobId the task id to set.
      */
-    private TaskIdImpl(JobId jobId, int id) {
+    private TaskIdImpl(JobId jobId, long id, boolean applyJobFactor) {
         this.jobId = jobId;
-        this.id = (jobId.hashCode() * JOB_FACTOR) + id;
+        if (applyJobFactor) {
+            this.id = (jobId.hashCode() * JOB_FACTOR) + id;
+        } else {
+            this.id = id;
+        }
     }
 
     /**
@@ -117,8 +92,8 @@ public final class TaskIdImpl implements TaskId {
      * @param jobId the task id to set.
      * @param name the human readable task name.
      */
-    private TaskIdImpl(JobId jobId, String name, int id) {
-        this(jobId, id);
+    private TaskIdImpl(JobId jobId, String name, long id, boolean applyJobFactor) {
+        this(jobId, id, applyJobFactor);
         this.readableName = name;
     }
 
@@ -129,8 +104,8 @@ public final class TaskIdImpl implements TaskId {
      * @param readableName Set the task name in the returned task id as well.
      * @return new task id with task name set.
      */
-    public static TaskId createTaskId(JobId jobId, String readableName, int id) {
-        return new TaskIdImpl(jobId, readableName, id);
+    public static TaskId createTaskId(JobId jobId, String readableName, long id, boolean applyJobFactor) {
+        return new TaskIdImpl(jobId, readableName, id, applyJobFactor);
     }
 
     /**
@@ -140,6 +115,10 @@ public final class TaskIdImpl implements TaskId {
      */
     public JobId getJobId() {
         return jobId;
+    }
+
+    public void setJobId(JobId jobId) {
+        this.jobId = jobId;
     }
 
     /**

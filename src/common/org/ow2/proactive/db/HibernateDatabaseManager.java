@@ -52,13 +52,12 @@ import javax.persistence.Table;
 
 import org.apache.log4j.Logger;
 import org.hibernate.Query;
+import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.annotations.Any;
 import org.hibernate.annotations.AnyMetaDef;
 import org.hibernate.annotations.MetaValue;
-import org.hibernate.cfg.AnnotationConfiguration;
 import org.hibernate.cfg.Configuration;
-import org.hibernate.classic.Session;
 import org.ow2.proactive.db.DatabaseManager.FilteredExceptionCallback;
 import org.ow2.proactive.db.DatabaseManagerExceptionHandler.DBMEHandler;
 import org.ow2.proactive.db.annotation.Alterable;
@@ -106,7 +105,7 @@ public abstract class HibernateDatabaseManager implements DatabaseManager, Filte
         //Create configuration from hibernate.cfg.xml using XML file for mapping
         //configuration = new Configuration().configure(new File(configurationFile));
         //Create configuration from hibernate.cfg.xml using Hibernate annotation
-        this.configuration = new AnnotationConfiguration().configure(new File(getConfigFile()));
+        this.configuration = new Configuration().configure(new File(getConfigFile()));
         this.sessionlock = new Object();
         this.idFields = new HashMap<Class<?>, Field>();
         this.globalSession = new ThreadLocal<Session>();

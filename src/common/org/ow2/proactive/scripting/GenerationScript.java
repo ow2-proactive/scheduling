@@ -41,20 +41,13 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.net.URL;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
 import javax.script.Bindings;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlTransient;
 
 import org.apache.log4j.Logger;
-import org.hibernate.annotations.AccessType;
-import org.hibernate.annotations.Proxy;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.utils.SchedulerLoggers;
@@ -68,20 +61,10 @@ import org.ow2.proactive.utils.SchedulerLoggers;
  * @since 3.9
  */
 @PublicAPI
-@Entity
-@Table(name = "GENERATION_SCRIPT")
-@AccessType("field")
-@Proxy(lazy = false)
 @XmlAccessorType(XmlAccessType.FIELD)
 public class GenerationScript extends Script<String> {
     /** Loggers */
     public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerLoggers.SCRIPT);
-
-    @Id
-    @GeneratedValue
-    @SuppressWarnings("unused")
-    @XmlTransient
-    private long hId;
 
     /**
      * The variable name which must be set after the evaluation
@@ -104,6 +87,11 @@ public class GenerationScript extends Script<String> {
      */
     public GenerationScript(Script<?> script) throws InvalidScriptException {
         super(script);
+    }
+
+    public GenerationScript(String script, String engineName, String[] parameters)
+            throws InvalidScriptException {
+        super(script, engineName, parameters);
     }
 
     /** Constructor. Directly create a script with a string.

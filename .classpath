@@ -128,11 +128,7 @@
 	<classpathentry kind="lib" path="lib/nodesource/cron/cron4j-rv2.2.3-mod.jar"/>
 	<classpathentry kind="lib" path="lib/common/hibernate/core/dom4j-1.6.1.jar"/>
 	<classpathentry kind="lib" path="lib/common/hibernate/core/geronimo-spec-jta-1.0.1B-rc4.jar"/>
-	<classpathentry kind="lib" path="lib/common/hibernate/core/hibernate3.jar"/>
 	<classpathentry kind="lib" path="lib/common/hibernate/core/slf4j-api-1.5.6.jar"/>
-	<classpathentry kind="lib" path="lib/common/hibernate/annotation/ejb3-persistence.jar"/>
-	<classpathentry kind="lib" path="lib/common/hibernate/annotation/hibernate-annotations.jar"/>
-	<classpathentry kind="lib" path="lib/common/hibernate/annotation/hibernate-commons-annotations.jar"/>
 	<classpathentry kind="lib" path="lib/nodesource/ec2/typica.jar"/>
 	<classpathentry kind="lib" path="lib/nodesource/winhpc/WinHPCWebserviceStubs.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/commons-vfs-patched-2.0-SNAPSHOTr19199-tests.jar"/>
@@ -154,5 +150,16 @@
 	<classpathentry kind="lib" path="lib/nodesource/winhpc/rampart-1.3/lib/wss4j-1.5.3.jar"/>
 	<classpathentry kind="lib" path="lib/nodesource/winhpc/rampart-1.3/lib/xmlsec-1.4.0.jar"/>
 	<classpathentry kind="lib" path="lib/nodesource/ec2/commons-httpclient-3.1.jar"/>
+	<classpathentry kind="lib" path="lib/common/hibernate/core/hibernate-core-4.1.3.Final.jar"/>
+	<classpathentry kind="lib" path="lib/common/hibernate/core/hibernate-commons-annotations-4.0.1.Final.jar"/>
+	<classpathentry kind="lib" path="lib/common/hibernate/core/hibernate-jpa-2.0-api-1.0.1.Final.jar"/>
+	<classpathentry kind="lib" path="compile/lib/hamcrest-all-1.3.0RC2.jar"/>
+	<classpathentry kind="lib" path="lib/common/hibernate/core/hibernate-c3p0-4.1.3.Final.jar"/>
+	<classpathentry kind="lib" path="lib/common/hibernate/core/c3p0-0.9.1.jar"/>
+	<classpathentry kind="lib" path="lib/common/stax2-api-3.1.1.jar"/>
+	<classpathentry kind="lib" path="lib/common/woodstox-core-lgpl-4.1.2.jar"/>
+	<classpathentry kind="lib" path="lib/common/h2-1.3.167.jar"/>
+	<classpathentry kind="lib" path="lib/common/hibernate/core/antlr-2.7.7.jar"/>
+	<classpathentry kind="lib" path="lib/common/hibernate/core/jboss-logging-3.1.0.GA.jar"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>

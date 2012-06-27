@@ -39,23 +39,10 @@ package org.ow2.proactive.scheduler.task;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlTransient;
 
 import org.apache.log4j.Logger;
-import org.hibernate.annotations.AccessType;
-import org.hibernate.annotations.Cascade;
-import org.hibernate.annotations.CascadeType;
-import org.hibernate.annotations.Proxy;
-import org.hibernate.annotations.Type;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
@@ -71,32 +58,18 @@ import org.ow2.proactive.scripting.InvalidScriptException;
  * This class is a container for Native executable. The actual executable is instanciated on the worker node.
  * @author The ProActive Team
  */
-@Entity
-@Table(name = "NATIVE_EXEC_CONTAINER")
-@AccessType("field")
-@Proxy(lazy = true)
 @XmlAccessorType(XmlAccessType.FIELD)
 public class NativeExecutableContainer extends ExecutableContainer {
 
     public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.CORE);
 
-    @Id
-    @GeneratedValue
-    @XmlTransient
-    protected long hId;
-
     // actual executable data
-    @Column(name = "NATIVE_COMMAND", columnDefinition = "BLOB")
-    @Type(type = "org.ow2.proactive.scheduler.core.db.schedulerType.CharacterLargeOBject")
     private String[] command;
 
     // actual generation script
-    @Cascade(CascadeType.ALL)
-    @OneToOne(fetch = FetchType.EAGER, targetEntity = GenerationScript.class)
     private GenerationScript generated;
 
     /** working dir (launching dir, pwd... of the native executable) */
-    @Column(name = "WORKING_DIR")
     private String workingDir;
 
     /** Hibernate default constructor */
@@ -178,6 +151,18 @@ public class NativeExecutableContainer extends ExecutableContainer {
         }
         nei.setNodesHost(nodesHost);
         return nei;
+    }
+
+    public GenerationScript getGenerationScript() {
+        return generated;
+    }
+
+    public String getWorkingDir() {
+        return workingDir;
+    }
+
+    public String[] getCommand() {
+        return command;
     }
 
 }

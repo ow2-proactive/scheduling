@@ -60,43 +60,43 @@ public class TestBoundedLinkedList {
         Assert.assertEquals(0, list.size());
         list.add(10);
         Assert.assertEquals(1, list.size());
-        Assert.assertEquals(10, list.element());
-        Assert.assertEquals(10, list.getFirst());
-        Assert.assertEquals(10, list.peek());
+        Assert.assertEquals((Integer) 10, list.element());
+        Assert.assertEquals((Integer) 10, list.getFirst());
+        Assert.assertEquals((Integer) 10, list.peek());
         list.add(20);
         Assert.assertEquals(2, list.size());
-        Assert.assertEquals(20, list.element());
-        Assert.assertEquals(20, list.getFirst());
-        Assert.assertEquals(20, list.peek());
+        Assert.assertEquals((Integer) 20, list.element());
+        Assert.assertEquals((Integer) 20, list.getFirst());
+        Assert.assertEquals((Integer) 20, list.peek());
         list.add(30);
         list.add(40);
         list.add(50);
         Assert.assertEquals(5, list.size());
-        Assert.assertEquals(50, list.element());
-        Assert.assertEquals(50, list.getFirst());
-        Assert.assertEquals(50, list.peek());
+        Assert.assertEquals((Integer) 50, list.element());
+        Assert.assertEquals((Integer) 50, list.getFirst());
+        Assert.assertEquals((Integer) 50, list.peek());
         list.remove();
         Assert.assertEquals(4, list.size());
-        Assert.assertEquals(40, list.element());
-        Assert.assertEquals(40, list.getFirst());
-        Assert.assertEquals(40, list.peek());
-        Assert.assertEquals(40, list.poll());//also remove element
+        Assert.assertEquals((Integer) 40, list.element());
+        Assert.assertEquals((Integer) 40, list.getFirst());
+        Assert.assertEquals((Integer) 40, list.peek());
+        Assert.assertEquals((Integer) 40, list.poll());//also remove element
         list.remove();
         Assert.assertEquals(2, list.size());
-        Assert.assertEquals(20, list.element());
-        Assert.assertEquals(10, list.getLast());
+        Assert.assertEquals((Integer) 20, list.element());
+        Assert.assertEquals((Integer) 10, list.getLast());
         list.add(60);
         list.add(70);
         list.add(80);
         list.add(90);
         list.add(100);
         Assert.assertEquals(5, list.size());
-        Assert.assertEquals(100, list.element());
-        Assert.assertEquals(60, list.getLast());
+        Assert.assertEquals((Integer) 100, list.element());
+        Assert.assertEquals((Integer) 60, list.getLast());
         list.addAll(1, list.toCollection());
         Assert.assertEquals(5, list.size());
-        Assert.assertEquals(100, list.getFirst());
-        Assert.assertEquals(70, list.getLast());
+        Assert.assertEquals((Integer) 100, list.getFirst());
+        Assert.assertEquals((Integer) 70, list.getLast());
         try {
             list.add(5, 12);//must throw the exception
             Assert.assertTrue(false);
@@ -112,13 +112,13 @@ public class TestBoundedLinkedList {
         Assert.assertEquals(7, list.getBound());
         Assert.assertEquals(5, list.size());
         list.add(111);
-        Assert.assertEquals(111, list.element());
-        Assert.assertEquals(70, list.getLast());
+        Assert.assertEquals((Integer) 111, list.element());
+        Assert.assertEquals((Integer) 70, list.getLast());
         Assert.assertEquals(6, list.size());
         list.add(222);
         list.add(333);
-        Assert.assertEquals(333, list.element());
-        Assert.assertEquals(80, list.getLast());
+        Assert.assertEquals((Integer) 333, list.element());
+        Assert.assertEquals((Integer) 80, list.getLast());
         Assert.assertEquals(7, list.size());
     }
 

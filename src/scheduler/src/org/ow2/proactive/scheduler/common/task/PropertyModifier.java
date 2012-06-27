@@ -39,18 +39,8 @@ package org.ow2.proactive.scheduler.common.task;
 import java.io.Serializable;
 import java.util.Map;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Lob;
-import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlTransient;
-
-import org.hibernate.annotations.AccessType;
-import org.hibernate.annotations.Proxy;
 
 
 /**
@@ -59,33 +49,16 @@ import org.hibernate.annotations.Proxy;
  * @author The ProActive Team
  * @since ProActive Scheduling 2.2
  */
-@Entity
-@Table(name = "PROPERTY_MODIFIER")
-@AccessType("field")
-@Proxy(lazy = false)
 @XmlAccessorType(XmlAccessType.FIELD)
 public final class PropertyModifier implements Serializable {
 
-    @Id
-    @GeneratedValue
-    @XmlTransient
-    private long hId;
-
     private String name = null;
 
-    @Column(name = "VALUE", length = Integer.MAX_VALUE)
-    @Lob
     private String value = null;
 
     private boolean append = false;
 
     private char appendChar = 0;
-
-    /**
-     * Hibernate empty constructor
-     */
-    public PropertyModifier() {
-    }
 
     /**
      * Create a new instance of PropertyModifier

@@ -224,6 +224,7 @@ public class SchedulerTHelper {
         List<String> commandLine = new ArrayList<String>();
         commandLine.add(System.getProperty("java.home") + File.separator + "bin" + File.separator + "java");
         commandLine.add("-Djava.security.manager");
+        //commandLine.add("-agentlib:jdwp=transport=dt_socket,server=y,address=9009,suspend=y");
         commandLine.add(CentralPAPropertyRepository.PA_HOME.getCmdLine() +
             CentralPAPropertyRepository.PA_HOME.getValue());
         commandLine.add(CentralPAPropertyRepository.JAVA_SECURITY_POLICY.getCmdLine() +

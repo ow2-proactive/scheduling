@@ -238,7 +238,7 @@
 		<element name="additionalClasspath" optional="yes" />
 
 		<sequential>
-			<delete dir="${base.dir}/SCHEDULER_DB" />
+			<delete dir="${base.dir}/TEST_SCHEDULER_DB" />
 			<mkdir dir="${junit.dir}" />
 			<junit printsummary="yes" forkmode="perTest" showoutput="${junit.showoutput}" timeout="1920000">
 				<jvmarg value="-Dproactive.home=${base.dir}" />

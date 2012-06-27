@@ -38,17 +38,6 @@ package org.ow2.proactive.scheduler.common.job;
 
 import java.net.MalformedURLException;
 
-import javax.persistence.Column;
-import javax.persistence.FetchType;
-import javax.persistence.Lob;
-import javax.persistence.MappedSuperclass;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
-
-import org.hibernate.annotations.AccessType;
-import org.hibernate.annotations.Cascade;
-import org.hibernate.annotations.CascadeType;
-import org.hibernate.annotations.Proxy;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.task.CommonAttribute;
@@ -72,37 +61,24 @@ import org.ow2.proactive.scheduler.common.task.CommonAttribute;
  * @since ProActive Scheduling 0.9
  */
 @PublicAPI
-@MappedSuperclass
-@Table(name = "JOB")
-@AccessType("field")
-@Proxy(lazy = false)
 public abstract class Job extends CommonAttribute {
 
     /** Name of the job */
-    @Column(name = "NAME")
     protected String name = SchedulerConstants.JOB_DEFAULT_NAME;
 
     /** Execution environment for this job */
-    @Cascade(CascadeType.ALL)
-    @OneToOne(fetch = FetchType.EAGER, targetEntity = JobEnvironment.class)
     protected JobEnvironment environment = new JobEnvironment();
 
     /** Short description of this job */
-    @Column(name = "DESCRIPTION", length = Integer.MAX_VALUE)
-    @Lob
     protected String description = "No description";
 
     /** Project name for this job */
-    @Column(name = "PROJECT_NAME")
     protected String projectName = "Not Assigned";
 
     /** Job priority */
-    @Column(name = "PRIORITY", columnDefinition = "integer")
     protected JobPriority priority = JobPriority.NORMAL;
 
-    @Column(name = "INPUT_SPACE")
     protected String inputSpace = null;
-    @Column(name = "OUTPUT_SPACE")
     protected String outputSpace = null;
 
     /** ProActive Empty Constructor */

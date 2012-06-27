@@ -38,12 +38,6 @@ package org.ow2.proactive.scheduler.task;
 
 import java.io.Serializable;
 
-import javax.persistence.MappedSuperclass;
-import javax.persistence.Table;
-import javax.persistence.Transient;
-
-import org.hibernate.annotations.AccessType;
-import org.hibernate.annotations.Proxy;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.common.exception.ExecutableCreationException;
 import org.ow2.proactive.scheduler.common.task.ExecutableInitializer;
@@ -57,17 +51,11 @@ import org.ow2.proactive.utils.NodeSet;
  *
  * @author The ProActive Team
  */
-@Table(name = "EXECUTABLE_CONTAINER")
-@MappedSuperclass
-@AccessType("field")
-@Proxy(lazy = false)
 public abstract class ExecutableContainer implements Serializable {
 
     // node set : not DB managed
-    @Transient
     protected NodeSet nodes;
 
-    @Transient
     protected Credentials credentials;
 
     /**

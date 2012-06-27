@@ -41,30 +41,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
-import javax.persistence.Transient;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlTransient;
 
-import org.hibernate.annotations.AccessType;
-import org.hibernate.annotations.Cascade;
-import org.hibernate.annotations.CascadeType;
-import org.hibernate.annotations.Proxy;
-import org.ow2.proactive.db.annotation.Alterable;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.task.TaskId;
-import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.task.ClientTaskState;
 
@@ -79,89 +64,54 @@ import org.ow2.proactive.scheduler.task.ClientTaskState;
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9
  */
-@Entity
-@Table(name = "JOB_INFO")
-@AccessType("field")
-@Proxy(lazy = false)
 @XmlAccessorType(XmlAccessType.FIELD)
 public class JobInfoImpl implements JobInfo {
-    @Id
-    @GeneratedValue
-    @SuppressWarnings("unused")
-    @XmlTransient
-    private long hId;
 
     /** job id  : must be initialize to a value in order to create temp taskId */
-    @Cascade(CascadeType.ALL)
-    @OneToOne(fetch = FetchType.EAGER, targetEntity = JobIdImpl.class)
     private JobId jobId = JobIdImpl.makeJobId("0");
 
     /** job submitted time */
-    @Alterable
-    @Column(name = "SUBMIT_TIME")
     private long submittedTime = -1;
 
     /** job started time*/
     //DEFAULT MUST BE -1
-    @Alterable
-    @Column(name = "START_TIME")
     private long startTime = -1;
 
     /** job finished time*/
     //DEFAULT MUST BE -1
-    @Alterable
-    @Column(name = "FINISHED_TIME")
     private long finishedTime = -1;
 
     /** job removed time (it means the user got back the result of the job)*/
     //DEFAULT MUST BE -1
-    @Alterable
-    @Column(name = "REMOVED_TIME")
     private long removedTime = -1;
 
     /** total number of tasks */
-    @Column(name = "NB_TASKS")
-    @Alterable
     private int totalNumberOfTasks = 0;
 
     /** number of pending tasks */
-    @Column(name = "NB_PENDING_TASKS")
-    @Alterable
     private int numberOfPendingTasks = 0;
 
     /** number of running tasks */
-    @Column(name = "NB_RUNNING_TASKS")
-    @Alterable
     private int numberOfRunningTasks = 0;
 
     /** number of finished tasks */
-    @Column(name = "NB_FINISHED_TASKS")
-    @Alterable
     private int numberOfFinishedTasks = 0;
 
     /** job priority */
-    @Column(name = "PRIORITY")
-    @Alterable
     private JobPriority priority = JobPriority.NORMAL;
 
     /** status of the job */
-    @Column(name = "STATUS")
-    @Alterable
     private JobStatus status = JobStatus.PENDING;
 
     /** to know if the job has to be removed after the fixed admin delay or not */
-    @Column(name = "TO_REMOVE")
-    @Alterable
     private boolean toBeRemoved = false;
 
     /** If this status is not null, it means the tasks have to change their status */
     //not Hibernate informations
-    @Transient
     private Map<TaskId, TaskStatus> taskStatusModify = null;
 
     /** If this finished time is not null, it means the tasks have to change their finished time */
     //not Hibernate informations
-    @Transient
     private Map<TaskId, Long> taskFinishedTimeModify = null;
 
     /**
@@ -181,18 +131,14 @@ public class JobInfoImpl implements JobInfo {
     }
 
     /** Tasks replicated by a Control Flow Action */
-    @Transient
     private List<ReplicatedTask> tasksReplicated = null;
 
     /** Tasks loop by a Control Flow Action */
-    @Transient
     private List<ReplicatedTask> tasksLooped = null;
 
     /** Tasks skipped by a Control Flow Action */
-    @Transient
     private List<TaskId> tasksSkipped = null;
 
-    @Transient
     private List<ClientTaskState> modifiedTasks;
 
     /** Hibernate default constructor */

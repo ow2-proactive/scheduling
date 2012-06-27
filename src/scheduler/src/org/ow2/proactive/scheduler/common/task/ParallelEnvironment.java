@@ -38,20 +38,9 @@ package org.ow2.proactive.scheduler.common.task;
 
 import java.io.Serializable;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 
-import org.hibernate.annotations.AccessType;
-import org.hibernate.annotations.Cascade;
-import org.hibernate.annotations.CascadeType;
-import org.hibernate.annotations.Proxy;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
 
@@ -63,27 +52,15 @@ import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
  *
  */
 @PublicAPI
-@Entity
-@Table(name = "PARALLEL_ENV")
-@AccessType("field")
-@Proxy(lazy = false)
 @XmlAccessorType(XmlAccessType.FIELD)
 public class ParallelEnvironment implements Serializable {
 
-    @Id
-    @GeneratedValue
-    @SuppressWarnings("unused")
-    private long hId;
-
     /** Number of nodes asked by the user. */
-    @Column(name = "NODES_NUMBER")
     private int nodesNumber;
 
     /**
      * The topology descriptor of the task
      */
-    @Cascade(CascadeType.ALL)
-    @OneToOne(fetch = FetchType.EAGER)
     private TopologyDescriptor topologyDescriptor = null;
 
     /**
@@ -142,4 +119,9 @@ public class ParallelEnvironment implements Serializable {
     public TopologyDescriptor getTopologyDescriptor() {
         return topologyDescriptor;
     }
+
+    public void setTopologyDescriptor(TopologyDescriptor topologyDescriptor) {
+        this.topologyDescriptor = topologyDescriptor;
+    }
+
 }

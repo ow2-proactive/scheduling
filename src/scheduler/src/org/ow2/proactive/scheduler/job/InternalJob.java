@@ -42,6 +42,7 @@ import java.io.ObjectOutputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -49,32 +50,12 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
-import javax.persistence.Column;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.Lob;
-import javax.persistence.MappedSuperclass;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
-import javax.persistence.Transient;
 import javax.xml.bind.annotation.XmlTransient;
 
 import org.apache.log4j.Logger;
-import org.hibernate.annotations.AccessType;
-import org.hibernate.annotations.AnyMetaDef;
-import org.hibernate.annotations.Cascade;
-import org.hibernate.annotations.CascadeType;
-import org.hibernate.annotations.LazyCollection;
-import org.hibernate.annotations.LazyCollectionOption;
-import org.hibernate.annotations.ManyToAny;
-import org.hibernate.annotations.MapKeyManyToMany;
-import org.hibernate.annotations.MetaValue;
-import org.hibernate.annotations.Proxy;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.dataspaces.core.naming.NamingService;
 import org.ow2.proactive.authentication.crypto.Credentials;
-import org.ow2.proactive.db.DatabaseCallback;
 import org.ow2.proactive.db.annotation.Alterable;
 import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
@@ -83,7 +64,6 @@ import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
-import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.task.TaskId;
@@ -95,7 +75,6 @@ import org.ow2.proactive.scheduler.common.task.flow.FlowActionType;
 import org.ow2.proactive.scheduler.common.task.flow.FlowBlock;
 import org.ow2.proactive.scheduler.core.SchedulerFrontend;
 import org.ow2.proactive.scheduler.core.annotation.TransientInSerialization;
-import org.ow2.proactive.scheduler.core.db.DatabaseManager;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.descriptor.JobDescriptor;
 import org.ow2.proactive.scheduler.descriptor.JobDescriptorImpl;
@@ -104,9 +83,6 @@ import org.ow2.proactive.scheduler.job.JobInfoImpl.ReplicatedTask;
 import org.ow2.proactive.scheduler.task.ClientTaskState;
 import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
-import org.ow2.proactive.scheduler.task.internal.InternalForkedJavaTask;
-import org.ow2.proactive.scheduler.task.internal.InternalJavaTask;
-import org.ow2.proactive.scheduler.task.internal.InternalNativeTask;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.task.launcher.TaskLauncher;
 import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
@@ -121,63 +97,35 @@ import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9
  */
-@MappedSuperclass
-@Table(name = "INTERNAL_JOB")
-@AccessType("field")
-@Proxy(lazy = false)
 public abstract class InternalJob extends JobState {
     public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.CORE);
 
     /** Owner of the job */
-    @Column(name = "OWNER")
     private String owner = "";
 
     /** List of every tasks in this job. */
-    @ManyToAny(metaColumn = @Column(name = "ITASK_TYPE", length = 5))
-    @AnyMetaDef(idType = "long", metaType = "string", metaValues = {
-            @MetaValue(targetEntity = InternalJavaTask.class, value = "IJT"),
-            @MetaValue(targetEntity = InternalNativeTask.class, value = "INT"),
-            @MetaValue(targetEntity = InternalForkedJavaTask.class, value = "IFJT") })
-    @JoinTable(joinColumns = @JoinColumn(name = "ITASK_ID"), inverseJoinColumns = @JoinColumn(name = "DEPEND_ID"))
-    @LazyCollection(value = LazyCollectionOption.FALSE)
-    @Cascade(CascadeType.ALL)
-    @MapKeyManyToMany(targetEntity = TaskIdImpl.class)
     protected Map<TaskId, InternalTask> tasks = new HashMap<TaskId, InternalTask>();
 
     /** Informations (that can be modified) about job execution */
     @Alterable
-    @Cascade(CascadeType.ALL)
-    @OneToOne(fetch = FetchType.EAGER, targetEntity = JobInfoImpl.class)
     protected JobInfoImpl jobInfo = new JobInfoImpl();
 
     /** Job descriptor for dependences management */
-    //Not DB managed, created once needed.
-    @Transient
     @TransientInSerialization
     @XmlTransient
     private JobDescriptor jobDescriptor;
 
     /** DataSpace application manager for this job */
     //Not DB managed, created once needed.
-    @Transient
     @TransientInSerialization
     @XmlTransient
     private JobDataSpaceApplication jobDataSpaceApplication;
 
-    /** Job result */
-    @Cascade(CascadeType.ALL)
-    @OneToOne(fetch = FetchType.EAGER, targetEntity = JobResultImpl.class)
-    @TransientInSerialization
-    private JobResult jobResult;
-
     /** Initial waiting time for a task before restarting in millisecond */
-    @Column(name = "RESTART_TIMER")
     @TransientInSerialization
     private long restartWaitingTimer = PASchedulerProperties.REEXECUTION_INITIAL_WAITING_TIME.getValueAsInt();
 
     /** used credentials to fork as user id. Can be null, or contain user/pwd[/key] */
-    @Lob
-    @Column(name = "CREDENTIALS", updatable = false, length = 16384/* 16Ko max */)
     @XmlTransient
     @TransientInSerialization
     private Credentials credentials = null;
@@ -445,6 +393,10 @@ public abstract class InternalJob extends JobState {
         return jobInfo;
     }
 
+    public void setJobInfo(JobInfoImpl jobInfo) {
+        this.jobInfo = jobInfo;
+    }
+
     /**
      * Append a task to this job.
      *
@@ -456,7 +408,7 @@ public abstract class InternalJob extends JobState {
         task.setJobId(getId());
 
         int taskId = tasks.size();
-        task.setId(TaskIdImpl.createTaskId(getId(), task.getName(), taskId));
+        task.setId(TaskIdImpl.createTaskId(getId(), task.getName(), taskId, true));
 
         boolean result = (tasks.put(task.getId(), task) == null);
 
@@ -546,18 +498,13 @@ public abstract class InternalJob extends JobState {
      * @return the taskDescriptor that has just been terminated.
      */
     public InternalTask terminateTask(boolean errorOccurred, TaskId taskId, SchedulerFrontend frontend,
-            FlowAction action) {
+            FlowAction action, TaskResultImpl result) {
         logger_dev.debug(" ");
         final InternalTask descriptor = tasks.get(taskId);
         descriptor.setFinishedTime(System.currentTimeMillis());
         descriptor.setStatus(errorOccurred ? TaskStatus.FAULTY : TaskStatus.FINISHED);
-        try {
-            descriptor.setExecutionDuration(((TaskResultImpl) getJobResult().getResult(descriptor.getName()))
-                    .getTaskDuration());
-        } catch (UnknownTaskException ute) {
-            //should never happen : taskName is unknown
-            logger_dev.error("", ute);
-        }
+        descriptor.setExecutionDuration(result.getTaskDuration());
+
         setNumberOfRunningTasks(getNumberOfRunningTasks() - 1);
         setNumberOfFinishedTasks(getNumberOfFinishedTasks() + 1);
 
@@ -635,8 +582,6 @@ public abstract class InternalJob extends JobState {
                             }
                             nt.setJobInfo(getJobInfo());
                             this.addTask(nt);
-                            //add entry to job result
-                            ((JobResultImpl) this.getJobResult()).addToAllResults(nt.getName());
                         }
                         modifiedTasks.addAll(dup.values());
 
@@ -809,7 +754,6 @@ public abstract class InternalJob extends JobState {
                         setNumberOfPendingTasks(getNumberOfPendingTasks() - 1);
                         setNumberOfFinishedTasks(getNumberOfFinishedTasks() + 1);
                         tev.add(it.getId());
-                        DatabaseManager.getInstance().unload(it);
                         logger_dev.info("Task " + it.getId() + " will not be executed");
                     }
 
@@ -824,8 +768,10 @@ public abstract class InternalJob extends JobState {
                     this.jobInfo.setTasksSkipped(tev);
                     this.jobInfo.setModifiedTasks(createClientTaskStates(modifiedTasks));
                     // notify frontend that tasks were modified
-                    frontend.jobStateUpdated(this.getOwner(), new NotificationData<JobInfo>(
-                        SchedulerEvent.TASK_SKIPPED, this.getJobInfo()));
+                    if (frontend != null) {
+                        frontend.jobStateUpdated(this.getOwner(), new NotificationData<JobInfo>(
+                            SchedulerEvent.TASK_SKIPPED, this.getJobInfo()));
+                    }
                     this.jobInfo.setTasksSkipped(null);
                     this.jobInfo.setModifiedTasks(null);
 
@@ -924,8 +870,6 @@ public abstract class InternalJob extends JobState {
                                 this.addTask(nt);
                                 int dupIndex = initiator.getReplicationIndex() * runs + i;
                                 nt.setReplicationIndex(dupIndex);
-                                //add entry to job result
-                                ((JobResultImpl) this.getJobResult()).addToAllResults(nt.getName());
                             }
                             modifiedTasks.addAll(dup.values());
 
@@ -974,8 +918,10 @@ public abstract class InternalJob extends JobState {
 
                     // notify frontend that tasks were added to the job
                     this.jobInfo.setModifiedTasks(createClientTaskStates(modifiedTasks));
-                    frontend.jobStateUpdated(this.getOwner(), new NotificationData<JobInfo>(
-                        SchedulerEvent.TASK_REPLICATED, this.getJobInfo()));
+                    if (frontend != null) {
+                        frontend.jobStateUpdated(this.getOwner(), new NotificationData<JobInfo>(
+                            SchedulerEvent.TASK_REPLICATED, this.getJobInfo()));
+                    }
                     this.jobInfo.setModifiedTasks(null);
 
                     // no jump is performed ; now that the tasks have been replicated and
@@ -1029,15 +975,6 @@ public abstract class InternalJob extends JobState {
         //terminate this task
         if (!didAction) {
             getJobDescriptor().terminate(taskId);
-        } else {
-            DatabaseManager.getInstance().runAsSingleTransaction(new DatabaseCallback() {
-                @Override
-                public void workWithDatabase(org.ow2.proactive.db.DatabaseManager dbManager) {
-                    dbManager.synchronize(getJobInfo());
-                    dbManager.synchronize(descriptor.getTaskInfo());
-                    dbManager.update(InternalJob.this);
-                }
-            });
         }
 
         //creating list of status for the jobDescriptor
@@ -1193,7 +1130,7 @@ public abstract class InternalJob extends JobState {
         //re-init taskId
         int id = 0;
         for (InternalTask td : sorted) {
-            TaskId newId = TaskIdImpl.createTaskId(getId(), td.getName(), id++);
+            TaskId newId = TaskIdImpl.createTaskId(getId(), td.getName(), id++, true);
             td.setId(newId);
             td.setJobInfo(getJobInfo());
             tasks.put(newId, td);
@@ -1325,6 +1262,13 @@ public abstract class InternalJob extends JobState {
     @Override
     public ArrayList<TaskState> getTasks() {
         return new ArrayList<TaskState>(tasks.values());
+    }
+
+    public void setTasks(Collection<InternalTask> tasksList) {
+        tasks = new HashMap<TaskId, InternalTask>(tasksList.size());
+        for (InternalTask task : tasksList) {
+            tasks.put(task.getId(), task);
+        }
     }
 
     /**
@@ -1525,22 +1469,6 @@ public abstract class InternalJob extends JobState {
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.job.JobState#getJobResult()
-     */
-    public JobResult getJobResult() {
-        return jobResult;
-    }
-
-    /**
-     * Sets the jobResult to the given jobResult value.
-     *
-     * @param jobResult the jobResult to set.
-     */
-    public void setJobResult(JobResult jobResult) {
-        this.jobResult = jobResult;
-    }
-
-    /**
      * Get the credentials for this job
      *
      * @return the credentials for this job
@@ -1604,7 +1532,6 @@ public abstract class InternalJob extends JobState {
         return jobDataSpaceApplication;
     }
 
-    @Transient
     private transient Map<String, InternalTask> tasknameITaskMapping = null;
 
     /**

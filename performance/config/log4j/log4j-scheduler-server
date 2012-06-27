@@ -13,6 +13,10 @@ log4j.appender.R.MaxBackupIndex=10
 log4j.appender.R.layout=org.apache.log4j.PatternLayout
 log4j.appender.R.layout.ConversionPattern=%d [%t] %-5p %c - %m%n
 
+log4j.logger.com.mchange=WARN,R
+log4j.logger.com.mchange.v2.c3p0=WARN,R
+log4j.logger.com.mchange.v2.c3p0.SQLWarnings=WARN,R
+
 log4j.logger.proactive.scheduler=debug
 log4j.logger.proactive.scheduler.dev.database=info
 

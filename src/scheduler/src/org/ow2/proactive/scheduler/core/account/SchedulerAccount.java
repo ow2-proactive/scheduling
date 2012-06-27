@@ -47,11 +47,28 @@ import org.ow2.proactive.account.Account;
  * @since ProActive Scheduling 2.1
  */
 public final class SchedulerAccount implements Account {
-    String username;
-    int totalTaskCount;
-    long totalTaskDuration;
-    int totalJobCount;
-    long totalJobDuration;
+
+    private String username;
+
+    private int totalTaskCount;
+
+    private long totalTaskDuration;
+
+    private int totalJobCount;
+
+    private long totalJobDuration;
+
+    public SchedulerAccount() {
+    }
+
+    public SchedulerAccount(String username, int totalTaskCount, long totalTaskDuration, int totalJobCount,
+            long totalJobDuration) {
+        this.username = username;
+        this.totalTaskCount = totalTaskCount;
+        this.totalTaskDuration = totalTaskDuration;
+        this.totalJobCount = totalJobCount;
+        this.totalJobDuration = totalJobDuration;
+    }
 
     /**
      * The total count of tasks completed by the current user. 

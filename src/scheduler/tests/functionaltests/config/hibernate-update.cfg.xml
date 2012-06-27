@@ -1,104 +1,26 @@
 <?xml version='1.0' encoding='utf-8'?>
 <!DOCTYPE hibernate-configuration PUBLIC
         "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
-        "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
+        "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
 
 <hibernate-configuration>
 
     <session-factory>
-
-        <!-- Database connection settings.
-        INFO :  To change the database provider, change the driver (connection.driver_class)
-			the URL (connection.url), and don't forget the dialect (<property name="dialect">) -->
         <property name="connection.driver_class">org.apache.derby.jdbc.EmbeddedDriver</property>
-        <property name="connection.url">jdbc:derby:SCHEDULER_DB;create=true</property>
+        <property name="connection.url">jdbc:derby:TEST_SCHEDULER_DB;create=true</property>
+        <property name="dialect">org.hibernate.dialect.DerbyTenFiveDialect</property>
         <property name="connection.username">scheduler</property>
         <property name="connection.password"></property>
 
-        <!-- JDBC connection pool (use the built-in) -->
-        <property name="connection.pool_size">10</property>
+        <property name="connection.provider_class">org.hibernate.service.jdbc.connections.internal.C3P0ConnectionProvider</property>
+        <property name="c3p0.max_size">5</property>
+        <property name="c3p0.min_size">5</property>
+        <property name="c3p0.timeout">60</property> <!-- seconds -->
 
-        <!-- SQL dialect  -->
-        <property name="dialect">org.hibernate.dialect.DerbyDialect</property>
-
-        <!-- Enable Hibernate's automatic session context management -->
-        <property name="current_session_context_class">thread</property>
-
-        <!-- Disable the second-level cache  -->
-        <property name="cache.provider_class">org.hibernate.cache.NoCacheProvider</property>
-
-        <!-- Echo all executed SQL to stdout. -->
         <property name="show_sql">false</property>
+        <property name="format_sql">true</property>
 
-        <!-- Behavior of the database schema on startup : validate | update | create | create-drop -->
         <property name="hbm2ddl.auto">update</property>
-
-        <!--  use stream method for binary object : use to store bigger object -->
-        <property name="jdbc.use_streams_for_binary">true</property>
-
-
-        <!-- Here are every type describe by hibernate's annotations.
-        Each Hibernate entity class must be referenced here. -->
-
-        <!-- JOB -->
-        <mapping class="org.ow2.proactive.scheduler.common.job.JobEnvironment"/>
-        <mapping class="org.ow2.proactive.scheduler.common.job.Job"/>
-        <mapping class="org.ow2.proactive.scheduler.job.JobInfoImpl"/>
-        <mapping class="org.ow2.proactive.scheduler.job.JobIdImpl"/>
-        <!-- TASK -->
-        <mapping class="org.ow2.proactive.scheduler.common.task.UpdatableProperties"/>
-        <mapping class="org.ow2.proactive.scheduler.common.task.CommonAttribute"/>
-        <mapping class="org.ow2.proactive.scheduler.common.task.RestartMode"/>
-        <mapping class="org.ow2.proactive.scheduler.common.task.Task"/>
-        <mapping class="org.ow2.proactive.scheduler.common.task.ForkEnvironment"/>
-        <mapping class="org.ow2.proactive.scheduler.common.task.PropertyModifier"/>
-        <mapping class="org.ow2.proactive.scheduler.common.task.Log4JTaskLogs"/>
-        <mapping class="org.ow2.proactive.scheduler.common.task.SimpleTaskLogs"/>
-        <mapping class="org.ow2.proactive.scheduler.common.task.dataspaces.FileSelector"/>
-        <mapping class="org.ow2.proactive.scheduler.common.task.dataspaces.InputSelector"/>
-        <mapping class="org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector"/>
-        <mapping class="org.ow2.proactive.scheduler.task.TaskInfoImpl"/>
-        <mapping class="org.ow2.proactive.scheduler.task.TaskIdImpl"/>
-		<mapping class="org.ow2.proactive.scheduler.common.task.flow.FlowAction"/>
-		<mapping class="org.ow2.proactive.scheduler.common.task.flow.FlowScript"/>
-        <!-- UTIL -->
-        <mapping class="org.ow2.proactive.scheduler.common.task.util.BooleanWrapper"/>
-        <mapping class="org.ow2.proactive.scheduler.common.task.util.IntegerWrapper"/>
-        <mapping class="org.ow2.proactive.db.types.BigString"/>
-        <mapping class="org.ow2.proactive.scheduler.common.task.util.ByteArrayWrapper"/>
-        <!-- TOPOLOGY -->
-		<mapping class="org.ow2.proactive.scheduler.common.task.ParallelEnvironment"/>
-		<mapping class="org.ow2.proactive.topology.descriptor.TopologyDescriptor"/>
-		<mapping class="org.ow2.proactive.topology.descriptor.ArbitraryTopologyDescriptor"/>
-		<mapping class="org.ow2.proactive.topology.descriptor.BestProximityDescriptor"/>
-		<mapping class="org.ow2.proactive.topology.descriptor.ThresholdProximityDescriptor"/>
-		<mapping class="org.ow2.proactive.topology.descriptor.SingleHostDescriptor"/>
-		<mapping class="org.ow2.proactive.topology.descriptor.SingleHostExclusiveDescriptor"/>
-		<mapping class="org.ow2.proactive.topology.descriptor.MultipleHostsExclusiveDescriptor"/>
-		<mapping class="org.ow2.proactive.topology.descriptor.DifferentHostsExclusiveDescriptor"/>
-        <!-- SCRIPTING -->
-        <mapping class="org.ow2.proactive.scripting.Script"/>
-        <mapping class="org.ow2.proactive.scripting.GenerationScript"/>
-        <mapping class="org.ow2.proactive.scripting.SelectionScript"/>
-        <mapping class="org.ow2.proactive.scripting.SimpleScript"/>
-        <!-- INTERNAL TASK -->
-        <mapping class="org.ow2.proactive.scheduler.task.internal.InternalTask"/>
-        <mapping class="org.ow2.proactive.scheduler.task.internal.InternalJavaTask"/>
-        <mapping class="org.ow2.proactive.scheduler.task.internal.InternalForkedJavaTask"/>
-        <mapping class="org.ow2.proactive.scheduler.task.internal.InternalNativeTask"/>
-        <!-- INTERNAL JOB -->
-        <mapping class="org.ow2.proactive.scheduler.job.InternalJob"/>
-		<mapping class="org.ow2.proactive.scheduler.job.InternalTaskFlowJob"/>
-		<mapping class="org.ow2.proactive.scheduler.job.InternalParameterSweepingJob"/>
-		<!-- CONTAINER -->
-		<mapping class="org.ow2.proactive.scheduler.task.ExecutableContainer"/>
-		<mapping class="org.ow2.proactive.scheduler.task.NativeExecutableContainer"/>
-		<mapping class="org.ow2.proactive.scheduler.task.JavaExecutableContainer"/>
-		<mapping class="org.ow2.proactive.scheduler.task.ForkedJavaExecutableContainer"/>
-		<!-- RESULTS -->
-		<mapping class="org.ow2.proactive.scheduler.job.JobResultImpl"/>
-		<mapping class="org.ow2.proactive.scheduler.task.TaskResultImpl"/>
-
     </session-factory>
 
 </hibernate-configuration>

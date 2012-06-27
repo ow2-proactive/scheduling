@@ -40,30 +40,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import javax.persistence.Column;
-import javax.persistence.DiscriminatorColumn;
-import javax.persistence.DiscriminatorType;
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Inheritance;
-import javax.persistence.InheritanceType;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
-import javax.persistence.Transient;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlTransient;
 
-import org.hibernate.annotations.AccessType;
-import org.hibernate.annotations.Cascade;
-import org.hibernate.annotations.CascadeType;
-import org.hibernate.annotations.LazyCollection;
-import org.hibernate.annotations.LazyCollectionOption;
-import org.hibernate.annotations.Proxy;
 import org.ow2.proactive.scheduler.common.exception.ExecutableCreationException;
 import org.ow2.proactive.scheduler.common.task.JavaExecutableInitializer;
 import org.ow2.proactive.scheduler.common.task.executable.Executable;
@@ -80,42 +59,19 @@ import org.ow2.proactive.scheduler.util.classloading.TaskClassServer;
  * @see TaskClassServer
  * @author The ProActive Team
  */
-@Entity
-@Table(name = "JAVA_EXEC_CONTAINER")
-@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-@DiscriminatorColumn(name = "EXEC_CONTAINER_TYPE", discriminatorType = DiscriminatorType.STRING)
-@DiscriminatorValue("JEC")
-@AccessType("field")
-@Proxy(lazy = true)
 @XmlAccessorType(XmlAccessType.FIELD)
 public class JavaExecutableContainer extends ExecutableContainer {
 
-    @Id
-    @GeneratedValue
-    @XmlTransient
-    protected long hId;
-
-    @Column(name = "EXECUTABLE_CLASS")
     protected String userExecutableClassName;
 
     /** Arguments of the task as a map */
-    @OneToMany(cascade = javax.persistence.CascadeType.ALL)
-    @Cascade(CascadeType.ALL)
-    @LazyCollection(value = LazyCollectionOption.FALSE)
-    @JoinTable(name = "JAVA_EXECCONTAINER_ARGUMENTS", joinColumns = @JoinColumn(name = "J_EXEC_CONTAINER_ID"))
     protected final Map<String, ByteArrayWrapper> serializedArguments = new HashMap<String, ByteArrayWrapper>();
 
     // instanciated on demand : not DB managed
-    @Transient
     protected JavaExecutable userExecutable;
 
     // can be null : not DB managed
-    @Transient
     protected TaskClassServer classServer;
-
-    /** Hibernate default constructor */
-    public JavaExecutableContainer() {
-    }
 
     /**
      * Create a new container for JavaExecutable
@@ -204,6 +160,14 @@ public class JavaExecutableContainer extends ExecutableContainer {
         jei.setSerializedArguments(tmp);
         jei.setNodes(nodes);
         return jei;
+    }
+
+    public String getUserExecutableClassName() {
+        return userExecutableClassName;
+    }
+
+    public Map<String, ByteArrayWrapper> getSerializedArguments() {
+        return serializedArguments;
     }
 
 }

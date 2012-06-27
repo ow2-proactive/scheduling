@@ -38,27 +38,12 @@ package org.ow2.proactive.scheduler.common.task;
 
 import java.io.Serializable;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlValue;
 
-import org.hibernate.annotations.AccessType;
-import org.hibernate.annotations.Any;
-import org.hibernate.annotations.AnyMetaDef;
-import org.hibernate.annotations.Cascade;
-import org.hibernate.annotations.CascadeType;
-import org.hibernate.annotations.MetaValue;
-import org.hibernate.annotations.Proxy;
 import org.objectweb.proactive.annotation.PublicAPI;
-import org.ow2.proactive.scheduler.common.task.util.BooleanWrapper;
-import org.ow2.proactive.scheduler.common.task.util.IntegerWrapper;
 
 
 /**
@@ -70,32 +55,15 @@ import org.ow2.proactive.scheduler.common.task.util.IntegerWrapper;
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9.1
  */
-@Entity
-@Table(name = "UPDATABLE_PROPERTIES")
-@AccessType("field")
-@Proxy(lazy = false)
 @XmlAccessorType(XmlAccessType.FIELD)
 @PublicAPI
 public class UpdatableProperties<T> implements Serializable {
-    @Id
-    @GeneratedValue
-    @SuppressWarnings("unused")
-    @XmlTransient
-    private long hId;
 
     /** The value of this property. */
-    @Any(metaColumn = @Column(name = "VALUE_TYPE", length = 5))
-    @AnyMetaDef(idType = "long", metaType = "string", metaValues = {
-            @MetaValue(targetEntity = RestartMode.class, value = "RM"),
-            @MetaValue(targetEntity = BooleanWrapper.class, value = "BW"),
-            @MetaValue(targetEntity = IntegerWrapper.class, value = "IW") })
-    @JoinColumn(name = "VALUE_ID")
-    @Cascade(CascadeType.ALL)
     @XmlValue
     private T value = null;
 
     /** If the property has been set. */
-    @Column(name = "SET_")
     @XmlTransient
     private boolean set = false;
 

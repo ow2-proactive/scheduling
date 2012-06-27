@@ -39,30 +39,11 @@ package org.ow2.proactive.scheduler.common.task;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.Column;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.Lob;
-import javax.persistence.MappedSuperclass;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
-import javax.persistence.Transient;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
-import org.hibernate.annotations.AccessType;
-import org.hibernate.annotations.AnyMetaDef;
-import org.hibernate.annotations.Cascade;
-import org.hibernate.annotations.CascadeType;
-import org.hibernate.annotations.LazyCollection;
-import org.hibernate.annotations.LazyCollectionOption;
-import org.hibernate.annotations.ManyToAny;
-import org.hibernate.annotations.MetaValue;
-import org.hibernate.annotations.Proxy;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.task.dataspaces.FileSelector;
@@ -96,113 +77,77 @@ import org.ow2.proactive.scripting.SimpleScript;
  * @since ProActive Scheduling 0.9
  */
 @PublicAPI
-@MappedSuperclass
-@Table(name = "TASK")
-@AccessType("field")
-@Proxy(lazy = false)
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "task")
 public abstract class Task extends CommonAttribute {
 
     /** Name of the task. */
-    @Column(name = "NAME")
     protected String name = SchedulerConstants.TASK_DEFAULT_NAME;
 
     /** block declaration : syntactic scopes used for workflows
      * string representation of a FlowBlock enum */
-    @Column(name = "FLOW_BLOCK")
     protected String flowBlock = FlowBlock.NONE.toString();
 
     /** Description of the task. */
-    @Column(name = "DESCRIPTION", length = Integer.MAX_VALUE)
-    @Lob
     protected String description = null;
 
     /** Description of the result of the task */
-    @Column(name = "RESULTPREVIEW", length = Integer.MAX_VALUE)
-    @Lob
     protected String resultPreview;
 
     /** DataSpace inputFiles */
-    @OneToMany
-    @LazyCollection(value = LazyCollectionOption.FALSE)
-    @Cascade(CascadeType.ALL)
     protected List<InputSelector> inputFiles = null;
 
     /** DataSpace outputFiles */
-    @OneToMany
-    @LazyCollection(value = LazyCollectionOption.FALSE)
-    @Cascade(CascadeType.ALL)
     protected List<OutputSelector> outputFiles = null;
 
     /**
      * The parallel environment of the task included number of nodes and topology definition
      * required to execute this task.
      */
-    @Cascade(CascadeType.ALL)
-    @OneToOne(fetch = FetchType.EAGER, targetEntity = ParallelEnvironment.class)
     protected ParallelEnvironment parallelEnvironment = null;
 
     /**
      * selection script : can be launched before getting a node in order to
      * verify some computer specificity.
      */
-    @ManyToAny(metaColumn = @Column(name = "S_SCRIPT", length = 5))
-    @AnyMetaDef(idType = "long", metaType = "string", metaValues = { @MetaValue(targetEntity = SelectionScript.class, value = "SS") })
-    @JoinTable(joinColumns = @JoinColumn(name = "SS_ID"), inverseJoinColumns = @JoinColumn(name = "DEPEND_ID"))
-    @LazyCollection(value = LazyCollectionOption.FALSE)
-    @Cascade(CascadeType.ALL)
     protected List<SelectionScript> sScripts;
 
     /**
      * PreScript : can be used to launch script just before the task
      * execution.
      */
-    @Cascade(CascadeType.ALL)
-    @OneToOne(fetch = FetchType.EAGER, targetEntity = SimpleScript.class)
     protected Script<?> preScript;
 
     /**
      * PostScript : can be used to launch script just after the task
      */
-    @Cascade(CascadeType.ALL)
-    @OneToOne(fetch = FetchType.EAGER, targetEntity = SimpleScript.class)
     protected Script<?> postScript;
 
     /**
      * CleaningScript : can be used to launch script just after the task or the postScript (if set)
      * Started even if a problem occurs.
      */
-    @Cascade(CascadeType.ALL)
-    @OneToOne(fetch = FetchType.EAGER, targetEntity = SimpleScript.class)
     protected Script<?> cScript;
 
     /**
      * FlowScript: Control Flow Action Script executed after the task,
      * returns a {@link FlowAction} which will perform flow actions on the job
      */
-    @Cascade(CascadeType.ALL)
-    @OneToOne(fetch = FetchType.EAGER, targetEntity = FlowScript.class)
     protected FlowScript flowScript;
 
     /** Tell whether this task has a precious result or not. */
-    @Column(name = "PRECIOUS_RESULT")
     protected boolean preciousResult;
 
     /** If true, the stdout/err of this tasks are stored in a file in LOCALSPACE */
-    @Column(name = "PRECIOUS_LOGS")
     protected boolean preciousLogs;
 
-    @Column(name = "RUN_AS_ME")
     protected boolean runAsMe;
 
     /** List of dependences if necessary. */
-    @Transient
     @XmlTransient
     private List<Task> dependences = null;
 
     /** maximum execution time of the task (in milliseconds), the variable is only valid if isWallTime is true */
-    @Column(name = "WALLTIME")
     protected long wallTime = 0;
 
     /**

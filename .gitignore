@@ -46,3 +46,4 @@ scheduler_statistics.rrd
 
 # /performance/tmp/
 /performance/tmp/*
+/TEST_SCHEDULER_DB

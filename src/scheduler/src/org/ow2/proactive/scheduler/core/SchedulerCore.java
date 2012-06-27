@@ -48,7 +48,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -79,9 +78,6 @@ import org.objectweb.proactive.core.remoteobject.exception.UnknownProtocolExcept
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.objectweb.proactive.utils.NamedThreadFactory;
-import org.ow2.proactive.db.Condition;
-import org.ow2.proactive.db.ConditionComparator;
-import org.ow2.proactive.db.DatabaseCallback;
 import org.ow2.proactive.db.DatabaseManager.FilteredExceptionCallback;
 import org.ow2.proactive.db.DatabaseManagerException;
 import org.ow2.proactive.resourcemanager.exception.RMException;
@@ -100,7 +96,6 @@ import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobResult;
-import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.task.Log4JTaskLogs;
 import org.ow2.proactive.scheduler.common.task.RestartMode;
@@ -109,36 +104,32 @@ import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
-import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
 import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingException;
 import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingService;
 import org.ow2.proactive.scheduler.core.annotation.RunActivityFiltered;
-import org.ow2.proactive.scheduler.core.db.DatabaseManager;
+import org.ow2.proactive.scheduler.core.db.JobClasspathContent;
+import org.ow2.proactive.scheduler.core.db.SchedulerDBManager;
+import org.ow2.proactive.scheduler.core.db.SchedulerStateRecoverHelper;
 import org.ow2.proactive.scheduler.core.jmx.SchedulerJMXHelper;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.core.rmproxies.RMProxiesManager;
 import org.ow2.proactive.scheduler.core.rmproxies.RMProxyCreationException;
 import org.ow2.proactive.scheduler.core.rmproxies.UserRMProxy;
-import org.ow2.proactive.scheduler.descriptor.TaskDescriptor;
 import org.ow2.proactive.scheduler.exception.ProgressPingerException;
 import org.ow2.proactive.scheduler.exception.RunningProcessException;
 import org.ow2.proactive.scheduler.exception.StartProcessException;
 import org.ow2.proactive.scheduler.job.ClientJobState;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.job.InternalJobWrapper;
-import org.ow2.proactive.scheduler.job.JobIdImpl;
-import org.ow2.proactive.scheduler.job.JobResultImpl;
 import org.ow2.proactive.scheduler.policy.Policy;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalNativeTask;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.task.launcher.TaskLauncher;
 import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
-import org.ow2.proactive.scheduler.util.classloading.JobClasspathManager;
-import org.ow2.proactive.scheduler.util.classloading.JobClasspathManager.JobClasspathEntry;
 import org.ow2.proactive.scheduler.util.classloading.TaskClassServer;
 import org.ow2.proactive.utils.NodeSet;
 
@@ -155,31 +146,6 @@ import org.ow2.proactive.utils.NodeSet;
 @ActiveObject
 public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotification, RunActive,
         FilteredExceptionCallback {
-
-    static class UpdateJobDatabaseCallback implements DatabaseCallback {
-
-        final InternalJob job;
-
-        final InternalTask descriptor;
-
-        final boolean updateResult;
-
-        public UpdateJobDatabaseCallback(InternalJob job, InternalTask descriptor, boolean updateResult) {
-            this.job = job;
-            this.descriptor = descriptor;
-            this.updateResult = updateResult;
-        }
-
-        @Override
-        public void workWithDatabase(org.ow2.proactive.db.DatabaseManager dbManager) {
-            dbManager.synchronize(job.getJobInfo());
-            dbManager.synchronize(descriptor.getTaskInfo());
-            if (updateResult) {
-                dbManager.update(job.getJobResult());
-            }
-        }
-
-    }
 
     /** Scheduler logger */
     public static final Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.CORE);
@@ -222,6 +188,8 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
 
     /** Direct link to the current job to submit. */
     private InternalJobWrapper currentJobToSubmit;
+
+    private SchedulerDBManager dbManager;
 
     /** Implementation of Resource Manager proxies */
     RMProxiesManager rmProxiesManager;
@@ -275,8 +243,6 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
     // contains taskCLassServer for currently running jobs
     protected Hashtable<JobId, TaskClassServer> classServers;
     protected Hashtable<JobId, RemoteObjectExposer<TaskClassServer>> remoteClassServers;
-    // handle job classpathes in DB
-    protected JobClasspathManager jobClasspathManager;
 
     /** Dataspaces Naming service */
     DataSpaceServiceStarter dataSpaceNSStarter;
@@ -436,13 +402,13 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
      * @param frontend a reference to the frontend.
      * @param policyFullName the fully qualified name of the policy to be used.
      */
-    public SchedulerCore(URI rmURL, SchedulerFrontend frontend, String policyFullName,
-            InternalJobWrapper jobSubmitLink) {
+    public SchedulerCore(URI rmURL, SchedulerFrontend frontend, SchedulerDBManager dbManager,
+            String policyFullName, InternalJobWrapper jobSubmitLink) {
         try {
             // create classloading tools
             this.classServers = new Hashtable<JobId, TaskClassServer>();
             this.remoteClassServers = new Hashtable<JobId, RemoteObjectExposer<TaskClassServer>>();
-            this.jobClasspathManager = new JobClasspathManager();
+            this.dbManager = dbManager;
 
             //try connect to RM with Scheduler user
             this.rmProxiesManager = RMProxiesManager.createRMProxiesManager(rmURL);
@@ -571,11 +537,10 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
         currentJob.setReplicatedTasksModify(null);
         currentJob.setLoopedTasksModify(null);
         currentJob.setSkippedTasksModify(null);
-        // and to database
-        DatabaseManager.getInstance().synchronize(currentJob.getJobInfo());
-        for (TaskState task : currentJob.getTasks()) {
-            DatabaseManager.getInstance().synchronize(task.getTaskInfo());
-        }
+    }
+
+    SchedulerDBManager getDBManager() {
+        return dbManager;
     }
 
     /**
@@ -599,8 +564,10 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
         }
         //Start DB, connect callback and rebuild the scheduler if needed.
         try {
-            DatabaseManager.getInstance().setCallback(this);
-            recover(PASchedulerProperties.SCHEDULER_DB_HIBERNATE_DROPDB.getValueAsBoolean());
+            // DatabaseManager.getInstance().setCallback(this);
+            dbManager.setCallback(this);
+
+            recover();
         } catch (Throwable e) {
             ProActiveLogger.getLogger(SchedulerLoggers.CONSOLE).info("Cannot start Scheduler :", e);
             kill();
@@ -713,6 +680,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
                     //finished jobs cannot be paused, so loop on all jobs
                     if (job.getStatus() == JobStatus.PAUSED) {
                         job.setUnPause();
+                        dbManager.updateJobAndTasksState(job);
 
                         //update events list and send event to the frontend
                         updateTaskInfosList(job, SchedulerEvent.JOB_RESUMED);
@@ -763,8 +731,6 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
         //destroying scheduler active objects
         frontend.terminate();
         //closing data base
-        logger.debug("Closing Scheduler data base !");
-        DatabaseManager.getInstance().close();
         //stop dataspace
         dataSpaceNSStarter.terminateNamingService();
         threadPoolForTerminateTL.shutdownNow();
@@ -866,15 +832,20 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
         td.setProgress(0);
         //manage restart
         td.decreaseNumberOfExecutionOnFailureLeft();
-        DatabaseManager.getInstance().synchronize(td.getTaskInfo());
+
         logger_dev.info("Number of retry on Failure left for the task '" + td.getId() + "' : " +
             td.getNumberOfExecutionOnFailureLeft());
+
         if (td.getNumberOfExecutionOnFailureLeft() > 0) {
             td.setStatus(TaskStatus.WAITING_ON_FAILURE);
             job.newWaitingTask();
+
             frontend.taskStateUpdated(job.getOwner(), new NotificationData<TaskInfo>(
                 SchedulerEvent.TASK_WAITING_FOR_RESTART, td.getTaskInfo()));
             job.reStartTask(td);
+
+            dbManager.taskRestarted(job, td, null);
+
             logger_dev.info("Task '" + td.getId() + "' is waiting to restart");
             return false;
         } else {
@@ -884,6 +855,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
                     .endJob(
                             job.getId(),
                             td.getId(),
+                            null,
                             "An error has occurred due to a node failure and the maximum amout of retries property has been reached.",
                             JobStatus.FAILED);
             return true;
@@ -909,34 +881,18 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
     @RunActivityFiltered(id = "external")
     public boolean submit() {
         InternalJob job = currentJobToSubmit.getJob();
-        logger_dev.info("Trying to submit new Job '" + job.getId() + "'");
-
-        // store jobclasspath content if it is set and unknown
-        if (job.getEnvironment().getJobClasspath() != null) {
-            // store jobclasspath in db if unknown
-            final long crc = job.getEnvironment().getJobClasspathCRC();
-            if (!jobClasspathManager.contains(crc)) {
-                jobClasspathManager.put(crc, job.getEnvironment().clearJobClasspathContent(), job
-                        .getEnvironment().containsJarFile());
-            } else {
-                // clear classpath content anyway, it will be retreived through DB
-                job.getEnvironment().clearJobClasspathContent();
-            }
-        }
-
-        // TODO cdelbe : create classserver only when job is running ?
-        // create taskClassLoader for this job
-        createTaskClassServer(job);
+        logger_dev.info("Trying to submit new Job '" + job.getName() + "'");
 
         job.submitAction();
 
-        //create job result storage
-        JobResult jobResult = new JobResultImpl(job);
-        //store the job result until user get it  (MUST BE SET BEFORE DB STORAGE)
-        job.setJobResult(jobResult);
+        dbManager.newJobSubmitted(job);
 
-        //Add to data base
-        DatabaseManager.getInstance().register(job);
+        job.getEnvironment().clearJobClasspathContent();
+
+        // TODO cdelbe : create classserver only when job is running ?
+
+        // TODO: here can get classpath content directly from InternalJob
+        createTaskClassServer(job);
 
         //If register OK : add job to core
         jobs.put(job.getId(), job);
@@ -946,13 +902,6 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
         // create a running task table for this job
         this.currentlyRunningTasks.put(job.getId(), new Hashtable<TaskId, TaskLauncher>());
 
-        //unload job environment that potentially contains classpath as byte[]
-        DatabaseManager.getInstance().unload(job.getEnvironment());
-        //unload heavy object
-        for (InternalTask it : job.getITasks()) {
-            DatabaseManager.getInstance().unload(it);
-        }
-        logger_dev.info("JobEnvironment and internalTask unloaded for job '" + job.getId() + "'");
         // convert InternalJob to ClientJobState and send it to frontend
         frontend.jobSubmitted(new ClientJobState(job));
         return true;
@@ -968,10 +917,11 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
      * @param jobStatus the type of the end for this job. (failed/canceled/killed)
      *
      */
-    protected void endJob(JobId jobId, TaskId taskId, String errorMsg, JobStatus jobStatus) {
+    protected void endJob(JobId jobId, TaskId taskId, TaskResultImpl result, String errorMsg,
+            JobStatus jobStatus) {
         InternalJob job = jobs.get(jobId);
         InternalTask task = job.getIHMTasks().get(taskId);
-        endJob(job, task, errorMsg, jobStatus);
+        endJob(job, task, result, errorMsg, jobStatus);
     }
 
     /**
@@ -983,7 +933,8 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
      * @param errorMsg the error message to send in the task result.
      * @param jobStatus the type of the end for this job. (failed/canceled/killed)
      */
-    void endJob(InternalJob job, InternalTask task, String errorMsg, JobStatus jobStatus) {
+    void endJob(InternalJob job, InternalTask task, TaskResultImpl taskResult, String errorMsg,
+            JobStatus jobStatus) {
         // job can be already ended (SCHEDULING-700)
         JobStatus currentStatus = job.getStatus();
         if (currentStatus == JobStatus.CANCELED || currentStatus == JobStatus.FAILED ||
@@ -992,8 +943,6 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
             // job is already ended nothing to do
             return;
         }
-
-        TaskResult taskResult = null;
 
         if (task != null) {
             logger_dev.info("Job ending request for job '" + job.getId() + "' - cause by task '" +
@@ -1026,29 +975,6 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
                     logger_dev.debug("", e);
                     //we did our best
                 }
-
-                //If not killed
-                if (jobStatus != JobStatus.KILLED) {
-                    //deleting tasks results except the one that causes the error
-                    if (!td.getId().equals(task.getId())) {
-                        try {
-                            job.getJobResult().removeResult(td.getName());
-                        } catch (UnknownTaskException ute) {
-                            //should never happen
-                            logger_dev.error("", ute);
-                        }
-                    }
-                    //if canceled, get the result of the canceled task
-                    if ((jobStatus == JobStatus.CANCELED) && td.getId().equals(task.getId())) {
-                        try {
-                            taskResult = job.getJobResult().getResult(task.getName());
-                        } catch (UnknownTaskException ute) {
-                            //should never append
-                            logger_dev.error("", ute);
-                        }
-                    }
-                }
-
             }
         }
 
@@ -1061,36 +987,21 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
             if (runningJobs.remove(job) || (pj = pendingJobs.remove(job))) {
                 finishedJobs.add(job);
             }
+
+            dbManager.updateAfterJobKilled(job);
         } else {
             //if not killed
             job.failed(task.getId(), jobStatus);
-
-            TaskResultImpl oldRes = null;
-            try {
-                oldRes = (TaskResultImpl) job.getJobResult().getAllResults().get(task.getName());
-            } catch (Throwable t) {
-                logger.error("Failed to fetch previous TaskResult", t);
-            }
 
             //store the exception into jobResult / To prevent from empty task result (when job canceled), create one
             boolean noResult = (jobStatus == JobStatus.CANCELED && taskResult == null);
             if (jobStatus == JobStatus.FAILED || noResult) {
                 taskResult = new TaskResultImpl(task.getId(), new Exception(errorMsg), new SimpleTaskLogs("",
                     errorMsg), -1, null);
-                ((JobResultImpl) job.getJobResult()).addTaskResult(task.getName(), taskResult, task
-                        .isPreciousResult());
-                ((TaskResultImpl) taskResult).setPreviousResult(oldRes);
-            } else if (jobStatus == JobStatus.CANCELED) {
-                taskResult = (TaskResult) PAFuture.getFutureValue(taskResult);
-                ((JobResultImpl) job.getJobResult()).addTaskResult(task.getName(), taskResult, task
-                        .isPreciousResult());
-                ((TaskResultImpl) taskResult).setPreviousResult(oldRes);
             }
 
-            //add the result in database
-            DatabaseManager.getInstance().update(job.getJobResult());
-            //unload the result to improve memory usage
-            DatabaseManager.getInstance().unload(taskResult);
+            dbManager.updateAfterTaskFinished(job, task, taskResult);
+
             //move the job from running to finished
             runningJobs.remove(job);
             finishedJobs.add(job);
@@ -1174,12 +1085,8 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
         }
 
         try {
-            //first unload the executable container that we don't need until next execution (if re-execution)
-            DatabaseManager.getInstance().unload(descriptor);
             TaskResultImpl res;
             if (terminateOptions.isNormalTermination()) {
-                ((JobResultImpl) job.getJobResult()).addTaskResult(descriptor.getName(), taskResult,
-                        descriptor.isPreciousResult());
                 res = (TaskResultImpl) taskResult;
             } else {
                 if (terminateOptions.isPreempt()) {
@@ -1198,10 +1105,6 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
             terminateTaskLauncher(taskLauncher, taskId, terminateOptions.isNormalTermination());
 
             updateTaskIdReferences(res, descriptor.getId());
-
-            // HANDLE DESCRIPTORS
-            res.setPreviewerClassName(descriptor.getResultPreview());
-            res.setJobClasspath(job.getEnvironment().getJobClasspath()); // can be null
 
             logger.info("Task '" + taskId + "' on job '" + jobId + "' terminated");
 
@@ -1223,9 +1126,9 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
                     frontend.taskStateUpdated(job.getOwner(), new NotificationData<TaskInfo>(
                         SchedulerEvent.TASK_WAITING_FOR_RESTART, descriptor.getTaskInfo()));
                     job.reStartTask(descriptor);
-                    //update job and task info
-                    DatabaseManager.getInstance().runAsSingleTransaction(
-                            new UpdateJobDatabaseCallback(job, descriptor, false));
+
+                    dbManager.taskRestarted(job, descriptor, null);
+
                     //free execution node even if it is dead
                     try {
                         ((UserRMProxy) rmProxiesManager.getUserRMProxy(job.getOwner(), job.getCredentials()))
@@ -1267,14 +1170,14 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
                 if (descriptor.isCancelJobOnError()) {
                     if (descriptor.getNumberOfExecutionLeft() <= 0) {
                         //if no rerun left, failed the job
-                        endJob(job, descriptor,
+                        endJob(job, descriptor, res,
                                 "An error occurred in your task and the maximum number of executions has been reached. "
                                     + "You also ask to cancel the job in such a situation !",
                                 JobStatus.CANCELED);
                         return;
                     } else if (terminateOptions.isKilled()) {
                         //task is killed, so cancel the job
-                        endJob(job, descriptor, "The task has been manually killed. "
+                        endJob(job, descriptor, res, "The task has been manually killed. "
                             + "You also ask to cancel the job in such a situation !", JobStatus.CANCELED);
                         return;
                     }
@@ -1303,13 +1206,8 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
                     }
                     job.newWaitingTask();
 
-                    //store this task result in the job result.
-                    ((JobResultImpl) job.getJobResult()).addTaskResult(descriptor.getName(), res, descriptor
-                            .isPreciousResult());
-                    //and update database
-                    //update job and task info
-                    DatabaseManager.getInstance().runAsSingleTransaction(
-                            new UpdateJobDatabaseCallback(job, descriptor, true));
+                    dbManager.updateAfterTaskFinished(job, descriptor, res);
+
                     //send event to user
                     frontend.taskStateUpdated(job.getOwner(), new NotificationData<TaskInfo>(
                         SchedulerEvent.TASK_WAITING_FOR_RESTART, descriptor.getTaskInfo()));
@@ -1329,14 +1227,11 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
                 }
             }
 
-            //store this task result in the job result.
-            ((JobResultImpl) job.getJobResult()).addTaskResult(descriptor.getName(), res, descriptor
-                    .isPreciousResult());
             logger_dev.info("TaskResult added to job '" + job.getId() + "' - task name is '" +
                 descriptor.getName() + "'");
             //to be done before terminating the task, once terminated it is not running anymore..
-            TaskDescriptor currentTD = job.getRunningTaskDescriptor(taskId);
-            descriptor = job.terminateTask(errorOccurred, taskId, frontend, res.getAction());
+            job.getRunningTaskDescriptor(taskId);
+            descriptor = job.terminateTask(errorOccurred, taskId, frontend, res.getAction(), res);
 
             //update job info if it is terminated
             if (job.isFinished()) {
@@ -1349,32 +1244,10 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
             }
 
             //Update database
-            DatabaseManager.getInstance().runAsSingleTransaction(
-                    new UpdateJobDatabaseCallback(job, descriptor, true));
-
-            //clean the current result to improve memory usage
-            if (!job.getJobDescriptor().hasChildren(descriptor.getId())) {
-                DatabaseManager.getInstance().unload(res);
-            }
-            //clean results for task that do not have child
-            if (currentTD != null) {
-                for (TaskDescriptor td : currentTD.getParents()) {
-                    if (td.getChildrenCount() == 0) {
-                        try {
-                            DatabaseManager.getInstance().unload(
-                                    job.getJobResult().getResult(td.getTaskId().getReadableName()));
-                        } catch (RuntimeException e) {
-                            //should never append
-                            logger_dev.error("", e);
-                        }
-                    }
-                }
-            }
-            //clean every task result if job is finished
-            if (job.isFinished()) {
-                for (TaskResult tr : job.getJobResult().getAllResults().values()) {
-                    DatabaseManager.getInstance().unload(tr);
-                }
+            if (res.getAction() != null) {
+                dbManager.updateAfterWorkflowTaskFinished(job, descriptor, res);
+            } else {
+                dbManager.updateAfterTaskFinished(job, descriptor, res);
             }
 
             //send event
@@ -1382,16 +1255,13 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
                 SchedulerEvent.TASK_RUNNING_TO_FINISHED, descriptor.getTaskInfo()));
             //if this job is finished (every task have finished)
             logger_dev.info("Number of finished tasks : " + job.getNumberOfFinishedTasks() +
-                " - Number of tasks : " + job.getTotalNumberOfTasks());
+                " - Number of tasks : " + job.getTotalNumberOfTasks() + ", finished: " + job.isFinished());
             if (job.isFinished()) {
                 //send event to client
                 frontend.jobStateUpdated(job.getOwner(), new NotificationData<JobInfo>(
                     SchedulerEvent.JOB_RUNNING_TO_FINISHED, job.getJobInfo()));
             }
             //free every execution nodes in the finally
-        } catch (UnknownTaskException ute) {
-            //should never happen : taskName is unknown
-            logger_dev.error("", ute);
         } catch (NullPointerException eNull) {
             logger_dev.error("", eNull);
             //avoid race condition between kill and terminate task
@@ -1527,7 +1397,9 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
         if (this.finishedJobs.contains(target)) {
             logger_dev.info("listen logs of job '" + jobId + "' : job is already finished");
             // for finished tasks, add logs events "manually"
-            Collection<TaskResult> allRes = target.getJobResult().getAllResults().values();
+
+            JobResult result = dbManager.loadJobResult(jobId);
+            Collection<TaskResult> allRes = result.getAllResults().values();
 
             for (TaskResult tr : allRes) {
                 this.flushTaskLogs(tr, jobLogger, clientAppender);
@@ -1541,8 +1413,10 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
         } else if (!this.pendingJobs.contains(target)) {
             // this jobs contains running and finished tasks
 
+            JobResult result = dbManager.loadJobResult(jobId);
+
             // for finished tasks, add logs events "manually"
-            Collection<TaskResult> allRes = target.getJobResult().getAllResults().values();
+            Collection<TaskResult> allRes = result.getAllResults().values();
             for (TaskResult tr : allRes) {
                 this.flushTaskLogs(tr, jobLogger, clientAppender);
             }
@@ -1571,17 +1445,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
 
     private void flushTaskLogs(TaskResult tr, Logger l, Appender a) {
         // if taskResult is not awaited, task is terminated
-        TaskLogs logs = null;
-        // try to look in the DB
-        DatabaseManager.getInstance().load(tr);
-        logs = tr.getOutput();
-        // avoid race condition if any...
-        if (logs == null) {
-            // the logs has been deleted and stored in the DB during the previous getOutput
-            // should not be null now !
-            DatabaseManager.getInstance().load(tr);
-            logs = tr.getOutput();
-        }
+        TaskLogs logs = tr.getOutput();
         if (logs instanceof Log4JTaskLogs) {
             for (LoggingEvent le : ((Log4JTaskLogs) logs).getAllEvents()) {
                 // write into socket appender directly to avoid double lines on other listeners
@@ -1599,13 +1463,15 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
     private void createTaskClassServer(InternalJob job) {
         // restart classserver if needed
         try {
-            if (job.getEnvironment().getJobClasspath() != null) {
-                JobClasspathEntry jce = jobClasspathManager.get(job.getEnvironment().getJobClasspathCRC());
-                if (jce == null) {
+            String[] classpath = job.getEnvironment().getJobClasspath();
+            if (classpath != null && classpath.length > 0) {
+                JobClasspathContent cp = dbManager.loadJobClasspathContent(job.getEnvironment()
+                        .getJobClasspathCRC());
+                if (cp == null) {
                     throw new ClassServerException("No classpath content is available for job " +
                         job.getJobInfo().getJobId());
                 }
-                this.addTaskClassServer(job.getId(), jce.classpathContent, jce.containsJarFiles);
+                this.addTaskClassServer(job.getId(), cp.getClasspathContent(), cp.isContainsJarFiles());
             }
         } catch (ClassServerException e) {
             throw new IllegalStateException("Cannot create TaskClassServer for job " +
@@ -1626,21 +1492,14 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
         }
 
         logger_dev.info("Trying to get JobResult of job '" + jobId + "'");
-        //result = null if not in DB (ie: not yet available)
-        JobResult result = null;
-        try {
-            result = DatabaseManager.getInstance().recover(job.getJobResult().getClass(),
-                    new Condition("id", ConditionComparator.EQUALS_TO, job.getJobResult().getJobId())).get(0);
-        } catch (IndexOutOfBoundsException e) {
-            throw new InternalException("Cannot retrieve the result of job '" + jobId + "' !", e);
-        }
+        JobResult result = dbManager.loadJobResult(jobId);
 
         try {
             if (!job.getJobInfo().isToBeRemoved() && SCHEDULER_REMOVED_JOB_DELAY > 0) {
 
                 //remember that this job is to be removed
                 job.setToBeRemoved();
-                DatabaseManager.getInstance().synchronize(job.getJobInfo());
+                dbManager.jobSetToBeRemoved(jobId);
 
                 try {
                     //remove job after the given delay
@@ -1658,9 +1517,6 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
                 }
             }
 
-            if (result != null) {
-                ((JobResultImpl) result).setJobInfo(job.getJobInfo());
-            }
             return result;
         } catch (Throwable t) {
             logger.warn("Thrown to user", t);
@@ -1687,32 +1543,11 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
             throw new UnknownJobException(jobId);
         }
 
-        //extract taskResult reference from memory (weak instance)
-        //useful to get the task result with the task name
-        TaskResult result = ((JobResultImpl) job.getJobResult()).getResult(taskName);
+        TaskResult result = dbManager.loadTaskResult(jobId, taskName, inc);
+
         if (result == null) {
-            //the task is not finished : means not yet started or running
             logger_dev.info("Task " + taskName + " is not finished");
             return null;
-        }
-        //extract full taskResult from DB
-        //use the previous result to get the task Id matching the given name.
-        //extract full copy from DB to avoid load, unload operation
-        //Hibernate hold every taskResults even the faulty one, can be interesting to have history
-        //So get the result of the task is getting the last one.
-        List<? extends TaskResult> results = DatabaseManager.getInstance().recover(result.getClass(),
-                new Condition("id", ConditionComparator.EQUALS_TO, result.getTaskId()));
-
-        int expectedMax = results.size() - 1;
-        if (inc > expectedMax) {
-            throw new IllegalArgumentException("Incarnation " + inc + " does not exist for this task.");
-        }
-
-        //get the proper incarnation : 0 is the last result
-        result = results.get(expectedMax - inc);
-
-        if ((result != null)) {
-            logger_dev.info("Get '" + taskName + "' task result for job '" + jobId + "'");
         }
 
         return result;
@@ -1730,8 +1565,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
             jobs.remove(jobId);
             job.setRemovedTime(System.currentTimeMillis());
             finishedJobs.remove(job);
-            //and to data base
-            DatabaseManager.getInstance().synchronize(job.getJobInfo());
+
             // close log buffer
             AsyncAppender jobLog = this.jobsToBeLogged.remove(jobId);
             if (jobLog != null) {
@@ -1741,22 +1575,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
             //remove from DataBase
             boolean rfdb = PASchedulerProperties.JOB_REMOVE_FROM_DB.getValueAsBoolean();
             logger_dev.info("Remove job '" + jobId + "' also from  dataBase : " + rfdb);
-            if (rfdb) {
-                // SCHEDULING-1508
-                // must reload all fields tagged @Unloadable before attempting removal, else when calling session.delete(job):
-                // - hibernate sees a null field, decides without checking that it must also be null in DB
-                // - the field is tagged @Unloadable and we nulled it manually, meaning it exists in DB
-                // - job is removed, but orphan data persists in DB forever for each @Unloadable field
-                // At the time of this fix, only InternalTask and TaskResultImpl contain @Unloadable fields
-                for (InternalTask it : job.getITasks()) {
-                    DatabaseManager.getInstance().load(it);
-                }
-                for (TaskResult res : job.getJobResult().getAllResults().values()) {
-                    DatabaseManager.getInstance().load(res);
-                }
-
-                DatabaseManager.getInstance().delete(job);
-            }
+            dbManager.removeJob(jobId, job.getRemovedTime(), rfdb);
             logger.info("Job " + jobId + " removed !");
             //send event to front-end
             frontend.jobStateUpdated(job.getOwner(), new NotificationData<JobInfo>(
@@ -1948,6 +1767,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
 
         if (change) {
             logger.debug("Job " + jobId + " has just been paused !");
+            dbManager.updateJobAndTasksState(job);
         }
 
         //update tasks events list and send it to front-end
@@ -1974,6 +1794,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
 
         if (change) {
             logger.debug("Job " + jobId + " has just been resumed !");
+            dbManager.updateJobAndTasksState(job);
         }
 
         //update tasks events list and send it to front-end
@@ -1998,7 +1819,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
             return false;
         }
 
-        endJob(job, null, "", JobStatus.KILLED);
+        endJob(job, null, null, "", JobStatus.KILLED);
 
         return true;
     }
@@ -2066,7 +1887,9 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
                 .info("Request sent to change priority on job '" + jobId + "' - new priority : " + priority);
         InternalJob job = jobs.get(jobId);
         job.setPriority(priority);
-        DatabaseManager.getInstance().synchronize(job.getJobInfo());
+
+        dbManager.changeJobPriority(jobId, priority);
+
         frontend.jobStateUpdated(job.getOwner(), new NotificationData<JobInfo>(
             SchedulerEvent.JOB_CHANGE_PRIORITY, job.getJobInfo()));
     }
@@ -2245,69 +2068,30 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
      * Get data base instance, connect it and ask if a rebuild is needed.
      * The steps to recover the core are visible below.
      *
-     * @param drop true if the db should be clean, false otherwise.
      */
-    private void recover(boolean drop) {
-        //Start Hibernate
-        logger.info("Starting Hibernate...");
-        logger.info("Drop DB : " + drop);
-        if (drop) {
-            DatabaseManager.getInstance().setProperty("hibernate.hbm2ddl.auto", "create");
-        }
-        logger.info("Hibernate successfully started !");
+    private void recover() {
+        SchedulerStateRecoverHelper.RecoveredSchedulerState recoveredState = new SchedulerStateRecoverHelper(
+            dbManager).recover();
 
-        //create condition of recovering : recover only non-removed job
-        //Condition condition = new Condition("jobInfo.removedTime", ConditionComparator.LESS_EQUALS_THAN,(long) 0);
-        //list of internal job to recover
-        //List<InternalJob> recovering = DatabaseManager.recover(InternalJob.class, condition);
-        RecoveringThread rt = new RecoveringThread();
-        List<InternalJob> recovering = new ArrayList<InternalJob>();
-        try {
-            recovering = DatabaseManager.getInstance().recoverAllJobs(rt);
-        } finally {
-            rt.interrupt();
-        }
+        this.jobs = new HashMap<JobId, InternalJob>();
 
-        if (recovering.size() == 0) {
-            logger_dev.info("No Job to recover.");
-            frontend.recover(new SchedulerStateImpl());
-            return;
-        }
+        this.pendingJobs = recoveredState.getPendingJobs();
+        this.runningJobs = recoveredState.getRunningJobs();
+        this.finishedJobs = recoveredState.getFinishedJobs();
 
-        // Recover the scheduler core
-        //------------------------------------------------------------------------
-        //----------------------    Re-build jobs lists  -------------------------
-        //------------------------------------------------------------------------
-        logger.info("Re-build jobs lists");
-
-        JobId maxId = JobIdImpl.makeJobId("0");
-
-        for (InternalJob job : recovering) {
+        for (InternalJob job : pendingJobs) {
             jobs.put(job.getId(), job);
-
-            //search last JobId
-            if (job.getId().compareTo(maxId) > 0) {
-                maxId = job.getId();
-            }
         }
-
-        //------------------------------------------------------------------------
-        //--------------------    Initialize jobId count   ----------------------
-        //------------------------------------------------------------------------
-        logger_dev.info("Initialize jobId count");
-        JobIdImpl.setInitialValue((JobIdImpl) maxId);
-
-        //------------------------------------------------------------------------
-        //-----------    Re-build pending/running/finished lists  ----------------
-        //------------------------------------------------------------------------
-        logger_dev.info("Re-build jobs pending/running/finished lists");
+        for (InternalJob job : runningJobs) {
+            jobs.put(job.getId(), job);
+        }
+        for (InternalJob job : finishedJobs) {
+            jobs.put(job.getId(), job);
+        }
 
         for (InternalJob job : jobs.values()) {
-            //rebuild job descriptor if needed (needed because not stored in database)
-            job.getJobDescriptor();
             switch (job.getStatus()) {
                 case PENDING:
-                    pendingJobs.add(job);
                     currentlyRunningTasks.put(job.getId(), new Hashtable<TaskId, TaskLauncher>());
                     // restart classserver if needed
                     createTaskClassServer(job);
@@ -2317,92 +2101,21 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
                     //start dataspace app for this job
                     job.startDataSpaceApplication(dataSpaceNSStarter.getNamingService(), dataSpaceNSStarter
                             .getNamingServiceURL());
-
-                    runningJobs.add(job);
                     currentlyRunningTasks.put(job.getId(), new Hashtable<TaskId, TaskLauncher>());
-
-                    //reset the finished events in the order they have occurred
-                    ArrayList<InternalTask> tasksList = copyAndSort(job.getITasks(), true);
-
-                    for (InternalTask task : tasksList) {
-                        job.update(task.getTaskInfo());
-                        //if the task was in waiting for restart status, restart it
-                        if (task.getStatus() == TaskStatus.WAITING_ON_ERROR ||
-                            task.getStatus() == TaskStatus.WAITING_ON_FAILURE) {
-                            job.newWaitingTask();
-                            job.reStartTask(task);
-                        }
-                    }
                     // restart classServer if needed
                     createTaskClassServer(job);
-
                     break;
                 case FINISHED:
                 case CANCELED:
                 case FAILED:
                 case KILLED:
-                    finishedJobs.add(job);
                     break;
                 case PAUSED:
-                    if ((job.getNumberOfPendingTasks() + job.getNumberOfRunningTasks() + job
-                            .getNumberOfFinishedTasks()) == 0) {
-                        pendingJobs.add(job);
-                    } else {
-                        runningJobs.add(job);
-
-                        //reset the finished events in the order they have occurred
-                        ArrayList<InternalTask> tasksListP = copyAndSort(job.getITasks(), true);
-
-                        for (InternalTask task : tasksListP) {
-                            job.update(task.getTaskInfo());
-                        }
-                    }
                     // restart classserver if needed
                     createTaskClassServer(job);
             }
             //unload job environment once handled
-            DatabaseManager.getInstance().unload(job.getEnvironment());
-        }
-
-        //------------------------------------------------------------------------
-        //------------------    Re-create task dependences   ---------------------
-        //------------------------------------------------------------------------
-        logger_dev.info("Re-create task dependences");
-
-        for (InternalJob job : runningJobs) {
-            ArrayList<InternalTask> tasksList = copyAndSort(job.getITasks(), true);
-
-            //simulate the running execution to recreate the tree.
-            for (InternalTask task : tasksList) {
-                job.simulateStartAndTerminate(task.getId());
-            }
-
-            if ((job.getStatus() == JobStatus.RUNNING) || (job.getStatus() == JobStatus.PAUSED)) {
-                //set the status to stalled because the scheduler start in stopped mode.
-                if (job.getStatus() == JobStatus.RUNNING) {
-                    job.setStatus(JobStatus.STALLED);
-                }
-
-                //set the task to pause inside the job if it is paused.
-                if (job.getStatus() == JobStatus.PAUSED) {
-                    job.setStatus(JobStatus.STALLED);
-                    job.setPaused();
-                    job.setTaskStatusModify(null);
-                }
-
-                //update the count of pending and running task.
-                job.setNumberOfPendingTasks(job.getNumberOfPendingTasks() + job.getNumberOfRunningTasks());
-                job.setNumberOfRunningTasks(0);
-            }
-        }
-
-        for (InternalJob job : pendingJobs) {
-            //set the task to pause inside the job if it is paused.
-            if (job.getStatus() == JobStatus.PAUSED) {
-                job.setStatus(JobStatus.STALLED);
-                job.setPaused();
-                job.setTaskStatusModify(null);
-            }
+            // DatabaseManager.getInstance().unload(job.getEnvironment());
         }
 
         //------------------------------------------------------------------------
@@ -2443,39 +2156,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
             }
         }
 
-        //------------------------------------------------------------------------
-        //----------------------    Sort each list by id   -----------------------
-        //------------------------------------------------------------------------
-
-        Comparator<InternalJob> jobComparator = new Comparator<InternalJob>() {
-            public int compare(InternalJob o1, InternalJob o2) {
-                return o1.getId().compareTo(o2.getId());
-            }
-        };
-        Collections.sort(pendingJobs, jobComparator);
-        Collections.sort(runningJobs, jobComparator);
-        Collections.sort(finishedJobs, jobComparator);
-        //------------------------------------------------------------------------
-        //-----------------    Recover the scheduler front-end   -----------------
-        //------------------------------------------------------------------------
-        logger.debug("Recover the scheduler front-end");
-
-        SchedulerStateImpl sState = new SchedulerStateImpl();
-        sState.setPendingJobs(convert(pendingJobs));
-        sState.setRunningJobs(convert(runningJobs));
-        sState.setFinishedJobs(convert(finishedJobs));
-        //status is started by default
-        frontend.recover(sState);
-
-    }
-
-    private Vector<JobState> convert(Vector<InternalJob> jobs) {
-        Vector<JobState> jobs2 = new Vector<JobState>();
-        for (InternalJob j : jobs) {
-            // convert InternalJob to ClientJobState before sending it to frontend
-            jobs2.add(new ClientJobState(j));
-        }
-        return jobs2;
+        frontend.recover(recoveredState.getSchedulerState());
     }
 
     /**
@@ -2485,68 +2166,6 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
         logger.info("Scheduler has lost the connection to database, and will be killed");
         frontend.schedulerStateUpdated(SchedulerEvent.DB_DOWN);
         kill(SchedulerStatus.DB_DOWN);
-    }
-
-    /**
-     * Make a copy of the given argument with the restriction 'onlyFinished'.
-     * As no task could be running after recover, this method also move task from RUNNING status to PENDING one.
-     * Then sort the array according to finished time order.
-     *
-     * @param tasks the list of internal tasks to copy.
-     * @param onlyFinished true if the copy must contains only the finished task,
-     *                                                 false to contains every tasks.
-     * @return the sorted copy of the given argument.
-     */
-    private ArrayList<InternalTask> copyAndSort(ArrayList<InternalTask> tasks, boolean onlyFinished) {
-        ArrayList<InternalTask> tasksList = new ArrayList<InternalTask>();
-
-        //copy the list with only the finished task.
-        for (InternalTask task : tasks) {
-            if (onlyFinished) {
-                switch (task.getStatus()) {
-                    case ABORTED:
-                    case FAILED:
-                    case FINISHED:
-                    case FAULTY:
-                        // SKIPPED is not included :
-                        // such task should never be eligible because no dependency 
-                        // points to it and it will never be executed
-                        tasksList.add(task);
-                }
-            } else {
-                tasksList.add(task);
-            }
-            //if task was running, put it in pending status
-            if (task.getStatus() == TaskStatus.RUNNING) {
-                task.setStatus(TaskStatus.PENDING);
-            }
-        }
-        //sort the finished task according to their finish time.
-        //to be sure to be in the right tree browsing.
-        Collections.sort(tasksList, new FinishTimeComparator());
-
-        return tasksList;
-    }
-
-    /**
-     * FinishTimeComparator will compare the internal task on their finished time.
-     *
-     * @author The ProActive Team
-     * @date 25 oct. 07
-     *
-     */
-    private static class FinishTimeComparator implements Comparator<InternalTask> {
-        /**
-         * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
-         * @param o1 First InternalTask to be compared.
-         * @param o2 Second InternalTask to be compared with the first.
-         * @return a negative integer, zero, or a positive integer as the
-         * 	       first argument is less than, equal to, or greater than the
-         *	       second. 
-         */
-        public int compare(InternalTask o1, InternalTask o2) {
-            return (int) (o1.getFinishedTime() - o2.getFinishedTime());
-        }
     }
 
 }

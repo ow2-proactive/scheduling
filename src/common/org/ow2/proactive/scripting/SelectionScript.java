@@ -44,20 +44,11 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Lob;
-import javax.persistence.Table;
 import javax.script.Bindings;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 
 import org.apache.log4j.Logger;
-import org.hibernate.annotations.AccessType;
-import org.hibernate.annotations.Proxy;
-import org.hibernate.annotations.Type;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.utils.SchedulerLoggers;
@@ -81,18 +72,9 @@ import org.ow2.proactive.utils.SchedulerLoggers;
  * @since ProActive Scheduling 0.9
  */
 @PublicAPI
-@Entity
-@Table(name = "SELECTION_SCRIPT")
-@AccessType("field")
-@Proxy(lazy = false)
 public class SelectionScript extends Script<Boolean> {
     /** Loggers */
     public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerLoggers.SCRIPT);
-
-    @Id
-    @GeneratedValue
-    @SuppressWarnings("unused")
-    private long hibernateId;
 
     /**
      * The variable name which must be set after the evaluation
@@ -101,15 +83,11 @@ public class SelectionScript extends Script<Boolean> {
     public static final String RESULT_VARIABLE = "selected";
 
     /** If true, script result is not cached */
-    @Column(name = "DYNAMIC")
     private boolean dynamic = true;
 
     /**
      * Hash digest of the script
      */
-    @Column(name = "S_SCRIPT_ID", length = Integer.MAX_VALUE, columnDefinition = "BLOB")
-    @Type(type = "org.ow2.proactive.scheduler.core.db.schedulerType.BinaryLargeOBject")
-    @Lob
     protected byte[] id_;
 
     /** ProActive needed constructor */

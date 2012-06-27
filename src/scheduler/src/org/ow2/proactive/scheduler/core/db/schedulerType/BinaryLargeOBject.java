@@ -44,6 +44,7 @@ import java.sql.Types;
 
 import org.apache.log4j.Logger;
 import org.hibernate.HibernateException;
+import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.usertype.UserType;
 import org.objectweb.proactive.core.util.converter.ByteToObjectConverter;
 import org.objectweb.proactive.core.util.converter.ObjectToByteConverter;
@@ -87,8 +88,8 @@ public class BinaryLargeOBject implements UserType {
     /**
      * @see org.hibernate.usertype.UserType#nullSafeGet(java.sql.ResultSet, java.lang.String[], java.lang.Object)
      */
-    public Object nullSafeGet(ResultSet rs, String[] names, Object owner) throws HibernateException,
-            SQLException {
+    public Object nullSafeGet(ResultSet rs, String[] names, SessionImplementor s, Object owner)
+            throws HibernateException, SQLException {
         /*Blob blob = rs.getBlob(names[0]);
         return deserialize(blob);*/
         byte[] bytes = rs.getBytes(names[0]);
@@ -103,8 +104,8 @@ public class BinaryLargeOBject implements UserType {
     /**
      * @see org.hibernate.usertype.UserType#nullSafeSet(java.sql.PreparedStatement, java.lang.Object, int)
      */
-    public void nullSafeSet(PreparedStatement st, Object value, int index) throws HibernateException,
-            SQLException {
+    public void nullSafeSet(PreparedStatement st, Object value, int index, SessionImplementor s)
+            throws HibernateException, SQLException {
         try {
             st.setBytes(index, ObjectToByteConverter.ObjectStream.convert(value));
         } catch (Exception e) {

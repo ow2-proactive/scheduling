@@ -39,20 +39,12 @@ package org.ow2.proactive.scheduler.common.task.flow;
 import java.io.Reader;
 import java.io.StringReader;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
 import javax.script.Bindings;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlTransient;
 
-import org.hibernate.annotations.AccessType;
-import org.hibernate.annotations.Proxy;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.scheduler.common.task.Task;
 import org.ow2.proactive.scripting.InvalidScriptException;
@@ -82,22 +74,11 @@ import org.ow2.proactive.scripting.SimpleScript;
  * 
  */
 @PublicAPI
-@Entity
-@Table(name = "FLOW_SCRIPT")
-@AccessType("field")
-@Proxy(lazy = false)
 @XmlAccessorType(XmlAccessType.FIELD)
 public class FlowScript extends Script<FlowAction> {
 
-    @Id
-    @GeneratedValue
-    @SuppressWarnings("unused")
-    @XmlTransient
-    private long hId;
-
     /** String representation of a FlowActionType
      * see {@link FlowActionType#parse(String)} */
-    @Column(name = "ACTIONTYPE")
     private String actionType = null;
 
     // implementation note:
@@ -116,15 +97,12 @@ public class FlowScript extends Script<FlowAction> {
     // also, this is only internals never exposed to the user
 
     /** Name of the target task of this action if it requires one */
-    @Column(name = "TARGET")
     private String target = null;
 
     /** Name of the 'Else' target task if this action is an 'If' */
-    @Column(name = "TARGET_ELSE")
     private String targetElse = null;
 
     /** Name of the 'Continuation' target task if this action is an 'If' */
-    @Column(name = "TARGET_CONT")
     private String targetContinuation = null;
 
     /** Name of the variable that will be set in the script's environment

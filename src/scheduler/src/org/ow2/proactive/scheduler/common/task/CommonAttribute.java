@@ -41,20 +41,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import javax.persistence.FetchType;
-import javax.persistence.MappedSuperclass;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 
-import org.hibernate.annotations.AccessType;
-import org.hibernate.annotations.Cascade;
-import org.hibernate.annotations.CascadeType;
-import org.hibernate.annotations.LazyCollection;
-import org.hibernate.annotations.LazyCollectionOption;
-import org.hibernate.annotations.Proxy;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.db.types.BigString;
 import org.ow2.proactive.scheduler.common.task.util.BooleanWrapper;
@@ -68,18 +57,12 @@ import org.ow2.proactive.scheduler.common.task.util.IntegerWrapper;
  * @since ProActive Scheduling 0.9.1
  */
 @PublicAPI
-@MappedSuperclass
-@Table(name = "COMMON_ATTRIBUTE")
-@AccessType("field")
-@Proxy(lazy = false)
 @XmlAccessorType(XmlAccessType.FIELD)
 public abstract class CommonAttribute implements Serializable {
     /** 
      * Do the job has to cancel when an exception occurs in a task. (default is false) <br />
      * You can override this property inside each task.
      */
-    @OneToOne(fetch = FetchType.EAGER)
-    @Cascade(CascadeType.ALL)
     protected UpdatableProperties<BooleanWrapper> cancelJobOnError = new UpdatableProperties<BooleanWrapper>(
         new BooleanWrapper(false));
 
@@ -88,8 +71,6 @@ public abstract class CommonAttribute implements Serializable {
      * It will be restarted according to the number of execution remaining.<br />
      * You can override this property inside each task.
      */
-    @OneToOne(fetch = FetchType.EAGER)
-    @Cascade(CascadeType.ALL)
     protected UpdatableProperties<RestartMode> restartTaskOnError = new UpdatableProperties<RestartMode>(
         RestartMode.ANYWHERE);
 
@@ -97,15 +78,10 @@ public abstract class CommonAttribute implements Serializable {
      * The maximum number of execution for a task (default 1). <br />
      * You can override this property inside each task.
      */
-    @OneToOne(fetch = FetchType.EAGER)
-    @Cascade(CascadeType.ALL)
     protected UpdatableProperties<IntegerWrapper> maxNumberOfExecution = new UpdatableProperties<IntegerWrapper>(
         new IntegerWrapper(1));
 
     /** Common user informations */
-    @OneToMany(cascade = javax.persistence.CascadeType.ALL)
-    @Cascade(CascadeType.ALL)
-    @LazyCollection(value = LazyCollectionOption.FALSE)
     protected Map<String, BigString> genericInformations = new HashMap<String, BigString>();
 
     /**

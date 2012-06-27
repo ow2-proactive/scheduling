@@ -38,17 +38,10 @@ package org.ow2.proactive.scheduler.job;
 
 import java.util.ArrayList;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
 
-import org.hibernate.annotations.AccessType;
-import org.hibernate.annotations.Proxy;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobType;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
@@ -61,18 +54,9 @@ import org.ow2.proactive.scheduler.task.internal.InternalTask;
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9
  */
-@Entity
-@Table(name = "INTERNAL_TF_JOB")
-@AccessType("field")
-@Proxy(lazy = false)
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
 public class InternalTaskFlowJob extends InternalJob {
-    @Id
-    @GeneratedValue
-    @SuppressWarnings("unused")
-    @XmlTransient
-    private long hId;
 
     /**
      * ProActive empty constructor.

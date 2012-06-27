@@ -40,31 +40,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
-import javax.persistence.Transient;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlTransient;
 
-import org.hibernate.annotations.AccessType;
-import org.hibernate.annotations.Cascade;
-import org.hibernate.annotations.CascadeType;
-import org.hibernate.annotations.LazyCollection;
-import org.hibernate.annotations.LazyCollectionOption;
-import org.hibernate.annotations.Proxy;
 import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
-import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 
 
@@ -77,45 +60,24 @@ import org.ow2.proactive.scheduler.task.internal.InternalTask;
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9
  */
-@Entity
-@Table(name = "JOB_RESULT_IMPL")
-@AccessType("field")
-@Proxy(lazy = false)
 @XmlAccessorType(XmlAccessType.FIELD)
 public class JobResultImpl implements JobResult {
-    @Id
-    @GeneratedValue
-    @SuppressWarnings("unused")
-    @XmlTransient
-    private long hId;
-
-    /** Referenced JobId */
-    @Cascade(CascadeType.ALL)
-    @OneToOne(fetch = FetchType.EAGER, targetEntity = JobIdImpl.class)
-    private JobId id = null;
 
     /** List of every result */
-    @OneToMany(cascade = javax.persistence.CascadeType.ALL, targetEntity = TaskResultImpl.class)
-    @Cascade(CascadeType.ALL)
-    @LazyCollection(value = LazyCollectionOption.FALSE)
-    @JoinColumn(name = "ALL_RESULTS")
     private Map<String, TaskResult> allResults = null;
 
     /** List of precious results */
-    @OneToMany(cascade = javax.persistence.CascadeType.ALL, targetEntity = TaskResultImpl.class)
-    @Cascade(CascadeType.ALL)
-    @LazyCollection(value = LazyCollectionOption.FALSE)
-    @JoinColumn(name = "PRECIOUS_RESULTS")
     private Map<String, TaskResult> preciousResults = null;
 
     /** Info of the job at the end */
-    @Transient
     private JobInfo jobInfo;
 
     /**
      * ProActive empty constructor
      */
     public JobResultImpl() {
+        allResults = new HashMap<String, TaskResult>();
+        preciousResults = new HashMap<String, TaskResult>();
     }
 
     /**
@@ -124,7 +86,7 @@ public class JobResultImpl implements JobResult {
      * @param id the jobId associated with this result
      */
     public JobResultImpl(InternalJob job) {
-        this.id = job.getId();
+        this.jobInfo = job.getJobInfo();
         this.allResults = new HashMap<String, TaskResult>(job.getTasks().size());
         this.preciousResults = new HashMap<String, TaskResult>();
         for (InternalTask it : job.getIHMTasks().values()) {
@@ -136,7 +98,7 @@ public class JobResultImpl implements JobResult {
      * @see org.ow2.proactive.scheduler.common.job.JobResult#getJobId()
      */
     public JobId getJobId() {
-        return id;
+        return jobInfo.getJobId();
     }
 
     /**
@@ -237,7 +199,8 @@ public class JobResultImpl implements JobResult {
      */
     public TaskResult getResult(String taskName) throws UnknownTaskException {
         if (!allResults.containsKey(taskName)) {
-            throw new UnknownTaskException(taskName + " does not exist in this job (jobId=" + id + ")");
+            throw new UnknownTaskException(taskName + " does not exist in this job (jobId=" + getJobId() +
+                ")");
         }
         return allResults.get(taskName);
     }
@@ -254,7 +217,8 @@ public class JobResultImpl implements JobResult {
      */
     public void removeResult(String taskName) throws UnknownTaskException {
         if (!allResults.containsKey(taskName)) {
-            throw new UnknownTaskException(taskName + " does not exist in this job (jobId=" + id + ")");
+            throw new UnknownTaskException(taskName + " does not exist in this job (jobId=" + getJobId() +
+                ")");
         }
         allResults.put(taskName, null);
         preciousResults.remove(taskName);

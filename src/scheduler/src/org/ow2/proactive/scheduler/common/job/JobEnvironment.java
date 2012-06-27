@@ -40,20 +40,9 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.zip.CRC32;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Lob;
-import javax.persistence.Table;
-import javax.persistence.Transient;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlTransient;
 
-import org.hibernate.annotations.AccessType;
-import org.hibernate.annotations.Proxy;
-import org.hibernate.annotations.Type;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.scheduler.common.util.JarUtils;
 
@@ -64,37 +53,33 @@ import org.ow2.proactive.scheduler.common.util.JarUtils;
  * @author The ProActive team
  */
 @PublicAPI
-@Entity
-@Table(name = "JOB_ENVIRONMENT")
-@AccessType("field")
-@Proxy(lazy = false)
 @XmlAccessorType(XmlAccessType.FIELD)
 public class JobEnvironment implements Serializable {
-    @Id
-    @GeneratedValue
-    @SuppressWarnings("unused")
-    @XmlTransient
-    private long hId;
 
     // job classpath
     // used for resolving classes only on user side !
-    @Column(name = "CLASSPATH", length = Integer.MAX_VALUE)
-    @Type(type = "org.ow2.proactive.scheduler.core.db.schedulerType.CharacterLargeOBject")
-    @Lob
     private String[] jobClasspath;
 
     // jar file containing the job classpath
     // handle manually in the core
     // @see JobClasspathManager
-    @Transient
     private byte[] jobClasspathContent;
 
     // true if the classpath contains jar files
-    @Column(name = "CONTAINS_JAR")
     private boolean containsJarFile;
 
     // CRC32 of the classpath content
     private long crc;
+
+    public JobEnvironment() {
+    }
+
+    public JobEnvironment(String[] jobClasspath, byte[] jobClasspathContent, boolean containsJarFile, long crc) {
+        this.jobClasspath = jobClasspath;
+        this.jobClasspathContent = jobClasspathContent;
+        this.containsJarFile = containsJarFile;
+        this.crc = crc;
+    }
 
     /**
      * Return the byte[] representation of the jar file containing the job classpath.

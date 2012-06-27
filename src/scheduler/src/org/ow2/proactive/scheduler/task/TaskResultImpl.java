@@ -42,46 +42,23 @@ import java.io.NotSerializableException;
 import java.io.Serializable;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.Lob;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
-import javax.persistence.Transient;
 import javax.swing.JPanel;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlTransient;
 
 import org.apache.log4j.Logger;
-import org.hibernate.annotations.AccessType;
-import org.hibernate.annotations.Any;
-import org.hibernate.annotations.AnyMetaDef;
-import org.hibernate.annotations.Cascade;
-import org.hibernate.annotations.CascadeType;
-import org.hibernate.annotations.LazyCollection;
-import org.hibernate.annotations.LazyCollectionOption;
-import org.hibernate.annotations.MetaValue;
-import org.hibernate.annotations.Proxy;
-import org.hibernate.annotations.Type;
 import org.objectweb.proactive.core.util.converter.ByteToObjectConverter;
 import org.objectweb.proactive.core.util.converter.ObjectToByteConverter;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.db.annotation.Unloadable;
 import org.ow2.proactive.db.types.BigString;
 import org.ow2.proactive.scheduler.common.exception.InternalSchedulerException;
-import org.ow2.proactive.scheduler.common.task.Log4JTaskLogs;
 import org.ow2.proactive.scheduler.common.task.ResultPreview;
-import org.ow2.proactive.scheduler.common.task.SimpleTaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
@@ -101,93 +78,65 @@ import org.ow2.proactive.utils.Formatter;
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9
  */
-@Entity
-@Table(name = "TASK_RESULT_IMPL")
-@AccessType("field")
-@Proxy(lazy = false)
 @XmlAccessorType(XmlAccessType.FIELD)
 public class TaskResultImpl implements TaskResult {
     public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.CORE);
 
-    @Id
-    @GeneratedValue
-    @SuppressWarnings("unused")
-    @XmlTransient
-    private long hId;
-
     /** The task identification of the result */
-    @Cascade(CascadeType.ALL)
-    @ManyToOne(fetch = FetchType.EAGER, targetEntity = TaskIdImpl.class)
     private TaskId id = null;
 
     /** reference to a previous result of a failed execution of the same task, or null */
-    @Cascade(CascadeType.ALL)
-    @OneToOne(fetch = FetchType.EAGER, targetEntity = TaskResultImpl.class)
     private TaskResultImpl previousResult = null;
 
     /** The value of the result if no exception occurred as a byte array */
     @Unloadable
-    @Column(name = "SERIALIZED_VALUE", updatable = false, length = Integer.MAX_VALUE)
-    @Type(type = "org.ow2.proactive.scheduler.core.db.schedulerType.BinaryLargeOBject")
-    @Lob
     private byte[] serializedValue = null;
     /** The value of the result if no exception occurred */
-    @Transient
     private transient Serializable value = null;
 
     /** The exception thrown by the task as a byte array */
     @Unloadable
-    @Column(name = "SERIALIZED_EXCEPTION", updatable = false, length = Integer.MAX_VALUE)
-    @Type(type = "org.ow2.proactive.scheduler.core.db.schedulerType.BinaryLargeOBject")
-    @Lob
     private byte[] serializedException = null;
     /** The exception thrown by the task */
-    @Transient
     private transient Throwable exception = null;
 
     /** Task output */
     @Unloadable
-    @Any(fetch = FetchType.EAGER, metaColumn = @Column(name = "OUTPUT_TYPE", updatable = false, length = 5))
-    @AnyMetaDef(idType = "long", metaType = "string", metaValues = {
-            @MetaValue(targetEntity = Log4JTaskLogs.class, value = "LTL"),
-            @MetaValue(targetEntity = SimpleTaskLogs.class, value = "STL") })
-    @JoinColumn(name = "OUTPUT_ID", updatable = false)
-    @Cascade(CascadeType.ALL)
     private TaskLogs output = null;
 
     /** Description definition of this result */
     @Unloadable
-    @Column(name = "PREVIEWER_CLASSNAME", updatable = false)
     private String previewerClassName = null;
 
     /** An instance that describe how to display the result of this task. */
-    @Transient
     private transient ResultPreview descriptor = null;
 
     // this classpath is used on client side to instantiate the previewer (can be null)
     @Unloadable
-    @Column(name = "JOB_CLASSPATH", updatable = false, columnDefinition = "BLOB")
-    @Type(type = "org.ow2.proactive.scheduler.core.db.schedulerType.CharacterLargeOBject")
     private String[] jobClasspath;
 
     /** result of the FlowScript if there was one, or null */
-    @Cascade(CascadeType.ALL)
-    @OneToOne(fetch = FetchType.EAGER, targetEntity = FlowAction.class)
     private FlowAction flowAction = null;
 
     //Managed by taskInfo, this field is here only to bring taskDuration to core AO
-    @Transient
     private long taskDuration = -1;
 
     /** All the properties propagated through Exporter.propagateProperty() */
     // @Unloadable // BUG ? DON't WORK WITH UNLOADABLE
-    @OneToMany(cascade = javax.persistence.CascadeType.ALL)
-    @Cascade(CascadeType.ALL)
-    @LazyCollection(value = LazyCollectionOption.FALSE)
     private Map<String, BigString> propagatedProperties;
 
-    /** ProActive empty constructor. */
-    public TaskResultImpl() {
+    public TaskResultImpl(TaskId id, byte[] serializedValue, byte[] serializedException, TaskLogs output,
+            Map<String, String> propagatedProperties) {
+        this(id, output);
+        this.serializedValue = serializedValue;
+        this.serializedException = serializedException;
+        if (propagatedProperties != null) {
+            this.propagatedProperties = new HashMap<String, BigString>(propagatedProperties.size());
+            for (Map.Entry<String, String> prop : propagatedProperties.entrySet()) {
+                this.propagatedProperties.put(prop.getKey(), new BigString(prop.getValue()));
+            }
+        }
+        this.output = output;
     }
 
     private TaskResultImpl(TaskId id, TaskLogs output) {

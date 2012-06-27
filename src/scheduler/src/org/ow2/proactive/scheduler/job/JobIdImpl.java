@@ -36,21 +36,12 @@
  */
 package org.ow2.proactive.scheduler.job;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
 
-import org.hibernate.annotations.AccessType;
-import org.hibernate.annotations.Proxy;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
-import org.ow2.proactive.scheduler.common.exception.MaxJobIdReachedException;
 import org.ow2.proactive.scheduler.common.job.JobId;
 
 
@@ -60,44 +51,26 @@ import org.ow2.proactive.scheduler.common.job.JobId;
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9
  */
-@Entity
-@Table(name = "JOB_ID")
-@AccessType("field")
-@Proxy(lazy = false)
 @XmlRootElement(name = "jobid")
 @XmlAccessorType(XmlAccessType.FIELD)
 public final class JobIdImpl implements JobId {
-    @Id
-    @GeneratedValue
-    @SuppressWarnings("unused")
-    @XmlTransient
-    private long hId;
 
     /** Default job name */
     public static final String DEFAULT_JOB_NAME = SchedulerConstants.JOB_DEFAULT_NAME;
 
-    /** global id count */
-    private static int currentId = 0;
-
     /** current instance id */
-    @Column(name = "ID")
     @XmlElement(name = "id")
-    private int id;
+    private long id;
 
     /** Human readable name */
-    @Column(name = "READABLE_NAME")
     private String readableName = DEFAULT_JOB_NAME;
-
-    /** Hibernate default constructor */
-    private JobIdImpl() {
-    }
 
     /**
      * Default Job id constructor
      *
      * @param id the id to put in the jobId
      */
-    private JobIdImpl(int id) {
+    private JobIdImpl(long id) {
         this.id = id;
     }
 
@@ -107,34 +80,9 @@ public final class JobIdImpl implements JobId {
      * @param id the id to put in the jobId
      * @param readableName the human readable name associated with this jobid
      */
-    private JobIdImpl(int id, String readableName) {
+    public JobIdImpl(long id, String readableName) {
         this(id);
         this.readableName = readableName;
-    }
-
-    /**
-     * To set the initial id value
-     *
-     * @param jobId the initial value to set
-     */
-    public static void setInitialValue(JobIdImpl jobId) {
-        currentId = jobId.id;
-    }
-
-    /**
-     * Get the next available Job Id
-     *
-     * @param readableName the human readable name of the the created jobid
-     * @return the next available id.
-     * @throws MaxJobIdReachedException if the maximum id for a job has been reached.
-     */
-    public static JobId nextId(String readableName) throws MaxJobIdReachedException {
-        currentId++;
-        if (currentId == Integer.MAX_VALUE) {
-            currentId = 0;
-            throw new MaxJobIdReachedException("The max value for JobId has been reached !");
-        }
-        return new JobIdImpl(currentId, readableName);
     }
 
     /**
@@ -148,7 +96,7 @@ public final class JobIdImpl implements JobId {
      * @see org.ow2.proactive.scheduler.common.job.JobId#value()
      */
     public String value() {
-        return "" + this.id;
+        return String.valueOf(this.id);
     }
 
     /**
@@ -158,7 +106,7 @@ public final class JobIdImpl implements JobId {
      * @return the new jobId
      */
     public static JobId makeJobId(String str) {
-        return new JobIdImpl(Integer.parseInt(str.trim()));
+        return new JobIdImpl(Long.parseLong(str.trim()));
     }
 
     /**
@@ -168,7 +116,7 @@ public final class JobIdImpl implements JobId {
      *		is less than, equal to, or greater than the specified object.
      */
     public int compareTo(JobId jobId) {
-        return Integer.valueOf(id).compareTo(Integer.valueOf(((JobIdImpl) jobId).id));
+        return Long.valueOf(id).compareTo(Long.valueOf(((JobIdImpl) jobId).id));
     }
 
     /**
@@ -191,7 +139,7 @@ public final class JobIdImpl implements JobId {
      */
     @Override
     public int hashCode() {
-        return this.id;
+        return (int) this.id;
     }
 
     /**

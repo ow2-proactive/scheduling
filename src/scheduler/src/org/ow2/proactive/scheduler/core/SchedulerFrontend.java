@@ -72,7 +72,6 @@ import org.ow2.proactive.scheduler.common.SchedulerStatus;
 import org.ow2.proactive.scheduler.common.exception.AlreadyConnectedException;
 import org.ow2.proactive.scheduler.common.exception.JobAlreadyFinishedException;
 import org.ow2.proactive.scheduler.common.exception.JobCreationException;
-import org.ow2.proactive.scheduler.common.exception.MaxJobIdReachedException;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.exception.PermissionException;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
@@ -95,9 +94,9 @@ import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
 import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
 import org.ow2.proactive.scheduler.core.account.SchedulerAccountsManager;
+import org.ow2.proactive.scheduler.core.db.SchedulerDBManager;
 import org.ow2.proactive.scheduler.core.jmx.SchedulerJMXHelper;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
-import org.ow2.proactive.scheduler.descriptor.JobDescriptorImpl;
 import org.ow2.proactive.scheduler.job.ClientJobState;
 import org.ow2.proactive.scheduler.job.IdentifiedJob;
 import org.ow2.proactive.scheduler.job.InternalJob;
@@ -180,6 +179,8 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
     private SchedulerStateImpl sState;
     private Map<JobId, JobState> jobsMap;
 
+    private SchedulerDBManager dbManager;
+
     /* ########################################################################################### */
     /*                                                                                             */
     /* ################################## SCHEDULER CONSTRUCTION ################################# */
@@ -200,11 +201,13 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
      * @param policyFullClassName the full class name of the policy to use.
      */
     public SchedulerFrontend(URI rmURL, String policyFullClassName) {
+        this.dbManager = SchedulerDBManager.createUsingProperties();
+
         this.identifications = new HashMap<UniqueID, UserIdentificationImpl>();
         this.credentials = new HashMap<UniqueID, Credentials>();
         this.dirtyList = new HashSet<UniqueID>();
         this.currentJobToSubmit = new InternalJobWrapper();
-        this.accountsManager = new SchedulerAccountsManager();
+        this.accountsManager = new SchedulerAccountsManager(dbManager);
         this.jmxHelper = new SchedulerJMXHelper(this.accountsManager);
         this.jobsMap = new HashMap<JobId, JobState>();
 
@@ -244,7 +247,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
             //creating scheduler core
             logger_dev.info("Creating scheduler core...");
             SchedulerCore scheduler_local = new SchedulerCore(rmURL, (SchedulerFrontend) PAActiveObject
-                    .getStubOnThis(), policyFullName, currentJobToSubmit);
+                    .getStubOnThis(), dbManager, policyFullName, currentJobToSubmit);
             scheduler = (SchedulerCore) PAActiveObject.turnActive(scheduler_local);
 
             logger_dev.info("Registering scheduler...");
@@ -428,39 +431,15 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
         }
         logger_dev.info("Preparing and settings job submission");
         //setting the job properties
-        try {
-            job.setId(JobIdImpl.nextId(job.getName()));
-        } catch (MaxJobIdReachedException e) {
-            scheduler.stop();
-            logger
-                    .fatal("\n****************************************************************************************************\n"
-                        + "****************************************************************************************************\n"
-                        + "**                                                                                                **\n"
-                        + "**  The maximum number of jobs that can be submitted has been reached !                           **\n"
-                        + "**  To prevent from any problems, the Scheduler has been stopped,                                 **\n"
-                        + "**  all running jobs will be terminated, no submit will be possible until restart.                **\n"
-                        + "**  Database should be archived and clean before restarting the Scheduler                         **\n"
-                        + "**  /!\\ Restarting the Scheduler without cleaning the DataBase implies some id to be duplicate    **\n"
-                        + "**  This is not a critical problem but some finished jobs could be unreachable by the Scheduler.  **\n"
-                        + "**                                                                                                **\n"
-                        + "****************************************************************************************************\n"
-                        + "****************************************************************************************************");
-            throw new MaxJobIdReachedException(
-                "The maximum number of jobs that can be submitted has been reached !\n"
-                    + "To prevent from any problems, the Scheduler has been stopped, "
-                    + "all running jobs will be terminated, no submit will be possible until restart.\n"
-                    + "Please, contact your administrator !");
-        }
+
         job.setOwner(ident.getUsername());
         //prepare tasks in order to be send into the core
         job.prepareTasks();
-        //create job descriptor
-        job.setJobDescriptor(new JobDescriptorImpl(job));
-        //put the job inside the frontend management list
-        jobs.put(job.getId(), new IdentifiedJob(job.getId(), ident));
         //statically reference the job to submit
         currentJobToSubmit.setJob(job);
         scheduler.submit();
+        //put the job inside the frontend management list
+        jobs.put(job.getId(), new IdentifiedJob(job.getId(), ident));
         //increase number of submit for this user
         ident.addSubmit();
         //send update user event
@@ -1118,6 +1097,9 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
      * @return always true;
      */
     public boolean terminate() {
+        logger.debug("Closing Scheduler database");
+        dbManager.close();
+
         if (authentication != null) {
             authentication.terminate();
         }

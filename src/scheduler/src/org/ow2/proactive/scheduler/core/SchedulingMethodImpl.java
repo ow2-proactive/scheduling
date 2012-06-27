@@ -41,6 +41,8 @@ import java.security.PrivateKey;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -60,10 +62,10 @@ import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SchedulerStatus;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.job.JobType;
+import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
-import org.ow2.proactive.scheduler.core.db.DatabaseManager;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.core.rmproxies.RMProxyCreationException;
 import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptor;
@@ -71,6 +73,7 @@ import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptorImpl;
 import org.ow2.proactive.scheduler.descriptor.JobDescriptor;
 import org.ow2.proactive.scheduler.descriptor.TaskDescriptor;
 import org.ow2.proactive.scheduler.job.InternalJob;
+import org.ow2.proactive.scheduler.task.ExecutableContainer;
 import org.ow2.proactive.scheduler.task.ExecutableContainerInitializer;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.task.launcher.TaskLauncher;
@@ -149,7 +152,6 @@ final class SchedulingMethodImpl implements SchedulingMethod {
      * @return the number of tasks that have been started
      */
     public int schedule() {
-
         int numberOfTaskStarted = 0;
         //Number of time to retry an active object creation before leaving scheduling loop
         activeObjectCreationRetryTimeNumber = ACTIVEOBJECT_CREATION_RETRY_TIME_NUMBER;
@@ -514,7 +516,7 @@ final class SchedulingMethodImpl implements SchedulingMethod {
                 logger.info("Job '" + ij.getId() + "' started");
             }
             //selection script has failed : end the job
-            core.endJob(ij, it, errorMsg, JobStatus.CANCELED);
+            core.endJob(ij, it, null, errorMsg, JobStatus.CANCELED);
         }
     }
 
@@ -526,7 +528,9 @@ final class SchedulingMethodImpl implements SchedulingMethod {
      */
     protected void loadAndInit(InternalJob job, InternalTask task) {
         logger_dev.debug("Load and Initialize the executable container for task '" + task.getId() + "'");
-        DatabaseManager.getInstance().load(task);
+        ExecutableContainer container = core.getDBManager().loadExecutableContainer(task);
+        task.setExecutableContainer(container);
+
         ExecutableContainerInitializer eci = new ExecutableContainerInitializer();
         // TCS can be null for non-java task
         eci.setClassServer(core.getTaskClassServer(job.getId()));
@@ -543,7 +547,6 @@ final class SchedulingMethodImpl implements SchedulingMethod {
      * @param taskDescriptor the descriptor of the task to be started
      *
      */
-    @SuppressWarnings("unchecked")
     protected void createExecution(NodeSet nodeSet, Node node, InternalJob job, InternalTask task,
             TaskDescriptor taskDescriptor) throws Exception {
         TaskLauncher launcher = null;
@@ -582,17 +585,14 @@ final class SchedulingMethodImpl implements SchedulingMethod {
                 int resultSize = taskDescriptor.getParents().size();
                 if ((job.getType() == JobType.TASKSFLOW) && (resultSize > 0) && task.handleResultsArguments()) {
                     params = new TaskResult[resultSize];
+                    List<TaskId> parentIds = new ArrayList<TaskId>(resultSize);
                     for (int i = 0; i < resultSize; i++) {
-                        //get parent task number i
-                        InternalTask parentTask = job.getIHMTasks().get(
-                                taskDescriptor.getParents().get(i).getTaskId());
-                        //set the task result in the arguments array.
-                        params[i] = job.getJobResult().getResult(parentTask.getName());
-                        //if this result has been unloaded, (extremely rare but possible)
-                        if (params[i].getOutput() == null) {
-                            //get the result and load the content from database
-                            DatabaseManager.getInstance().load(params[i]);
-                        }
+                        parentIds.add(taskDescriptor.getParents().get(i).getTaskId());
+                    }
+                    Map<TaskId, TaskResult> taskResults = core.getDBManager().loadTasksResults(job.getId(),
+                            parentIds);
+                    for (int i = 0; i < resultSize; i++) {
+                        params[i] = taskResults.get(taskDescriptor.getParents().get(i).getTaskId());
                     }
                 }
 
@@ -636,6 +636,9 @@ final class SchedulingMethodImpl implements SchedulingMethod {
             node.getNodeInformation().getVMInformation().getHostName() + "(node: " +
             node.getNodeInformation().getName() + ")");
         // set the different informations on job
+
+        boolean firstTaskStarted;
+
         if (job.getStartTime() < 0) {
             // if it is the first task of this job
             job.start();
@@ -644,10 +647,17 @@ final class SchedulingMethodImpl implements SchedulingMethod {
             //update tasks events list and send it to front-end
             core.updateTaskInfosList(job, SchedulerEvent.JOB_PENDING_TO_RUNNING);
             logger.info("Job '" + job.getId() + "' started");
+
+            firstTaskStarted = true;
+        } else {
+            firstTaskStarted = false;
         }
 
         // set the different informations on task
         job.startTask(task);
+
+        core.getDBManager().jobTaskStarted(job, task, firstTaskStarted);
+
         //set this task as started
         core.currentlyRunningTasks.get(task.getJobId()).put(task.getId(), launcher);
         // send task event to front-end

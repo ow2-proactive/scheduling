@@ -40,16 +40,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.OneToOne;
-
 import org.apache.log4j.Logger;
-import org.hibernate.annotations.AccessType;
-import org.hibernate.annotations.Cascade;
-import org.hibernate.annotations.CascadeType;
-import org.hibernate.annotations.Proxy;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.scheduler.common.exception.ExecutableCreationException;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
@@ -68,25 +59,12 @@ import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
  * @author The ProActive Team
  * @since ProActive Scheduling 1.1
  */
-@Entity
-//@Table(name = "FORKED_EXEC_CONTAINER")
-@DiscriminatorValue("FJEC")
-@AccessType("field")
-@Proxy(lazy = true)
 public class ForkedJavaExecutableContainer extends JavaExecutableContainer {
 
     public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.CORE);
 
     /** Environment of a new dedicated JVM */
-    @Cascade(CascadeType.ALL)
-    @OneToOne(fetch = FetchType.EAGER, targetEntity = ForkEnvironment.class)
     protected ForkEnvironment forkEnvironment = null;
-
-    /**
-     * Hibernate default constructor
-     */
-    public ForkedJavaExecutableContainer() {
-    }
 
     /**
      * Create a new container for JavaExecutable

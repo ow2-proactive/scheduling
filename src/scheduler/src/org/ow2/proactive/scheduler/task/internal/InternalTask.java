@@ -39,49 +39,24 @@ package org.ow2.proactive.scheduler.task.internal;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.persistence.Column;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.MappedSuperclass;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
-import javax.persistence.Transient;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlTransient;
 
-import org.hibernate.annotations.AccessType;
-import org.hibernate.annotations.Any;
-import org.hibernate.annotations.AnyMetaDef;
-import org.hibernate.annotations.Cascade;
-import org.hibernate.annotations.CascadeType;
-import org.hibernate.annotations.LazyCollection;
-import org.hibernate.annotations.LazyCollectionOption;
-import org.hibernate.annotations.ManyToAny;
-import org.hibernate.annotations.MetaValue;
-import org.hibernate.annotations.Proxy;
-import org.hibernate.collection.AbstractPersistentCollection;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.converter.MakeDeepCopy;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.db.annotation.Unloadable;
 import org.ow2.proactive.scheduler.common.exception.ExecutableCreationException;
 import org.ow2.proactive.scheduler.common.job.JobId;
@@ -94,9 +69,7 @@ import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.common.task.flow.FlowAction;
 import org.ow2.proactive.scheduler.common.task.flow.FlowActionType;
 import org.ow2.proactive.scheduler.common.task.flow.FlowBlock;
-import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 import org.ow2.proactive.scheduler.core.annotation.TransientInSerialization;
-import org.ow2.proactive.scheduler.core.db.DatabaseManager;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.task.ExecutableContainer;
@@ -119,99 +92,56 @@ import org.ow2.proactive.utils.NodeSet;
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9
  */
-@MappedSuperclass
-@Table(name = "INTERNAL_TASK")
-@AccessType("field")
-@Proxy(lazy = false)
 @XmlAccessorType(XmlAccessType.FIELD)
 public abstract class InternalTask extends TaskState {
 
     /** Parents list : null if no dependences */
     // WARNING  #writeObject() refers to this field's name as a String 
-    @ManyToAny(metaColumn = @Column(name = "ITASK_TYPE", length = 5))
-    @AnyMetaDef(idType = "long", metaType = "string", metaValues = {
-            @MetaValue(targetEntity = InternalJavaTask.class, value = "IJT"),
-            @MetaValue(targetEntity = InternalNativeTask.class, value = "INT"),
-            @MetaValue(targetEntity = InternalForkedJavaTask.class, value = "IFJT") })
-    @JoinTable(joinColumns = @JoinColumn(name = "ITASK_ID"), inverseJoinColumns = @JoinColumn(name = "DEPEND_ID"))
-    @LazyCollection(value = LazyCollectionOption.FALSE)
-    @Cascade(CascadeType.ALL)
     @XmlTransient
     private List<InternalTask> ideps = null;
 
     /** Informations about the launcher and node */
     //These informations are not required during task process
-    @Transient
     @TransientInSerialization
     private ExecuterInformations executerInformations;
 
     /** Task information : this is the informations that can change during process. */
-    @Cascade(CascadeType.ALL)
-    @OneToOne(fetch = FetchType.EAGER, targetEntity = TaskInfoImpl.class)
     private TaskInfoImpl taskInfo = new TaskInfoImpl();
 
     /** Node exclusion for this task if desired */
-    @Transient
     @TransientInSerialization
     @XmlTransient
     private NodeSet nodeExclusion = null;
 
     /** Contains the user executable */
     @Unloadable
-    @Any(fetch = FetchType.LAZY, metaColumn = @Column(name = "EXEC_CONTAINER_TYPE", updatable = false, length = 5))
-    @AnyMetaDef(idType = "long", metaType = "string", metaValues = {
-            @MetaValue(targetEntity = JavaExecutableContainer.class, value = "JEC"),
-            @MetaValue(targetEntity = NativeExecutableContainer.class, value = "NEC"),
-            @MetaValue(targetEntity = ForkedJavaExecutableContainer.class, value = "FJEC") })
-    @JoinColumn(name = "EXEC_CONTAINER_ID", updatable = false)
-    @Cascade(CascadeType.ALL)
     @TransientInSerialization
     @XmlTransient
     protected ExecutableContainer executableContainer = null;
 
     /** Maximum number of execution for this task in case of failure (node down) */
-    @Column(name = "MAX_EXEC_ON_FAILURE")
     private int maxNumberOfExecutionOnFailure = PASchedulerProperties.NUMBER_OF_EXECUTION_ON_FAILURE
             .getValueAsInt();
 
     /** iteration number if the task was replicated by a IF control flow action */
-    @Column(name = "ITERATION")
     private int iteration = 0;
 
     /** replication number if the task was replicated by a REPLICATE control flow action */
-    @Column(name = "REPLICATION")
     private int replication = 0;
 
     /** If this{@link #getFlowBlock()} != {@link FlowBlock#NONE}, 
      * each start block has a matching end block and vice versa */
-    @Column(name = "MATCH_BLOCK")
     private String matchingBlock = null;
 
     /** if this task is the JOIN task of a {@link FlowActionType#IF} action,
      * this list contains the 2 end-points (tagged {@link FlowBlock#END}) of the
      * IF and ELSE branches */
-    @ManyToAny(metaColumn = @Column(name = "ITASK_TYPE", length = 5))
-    @AnyMetaDef(idType = "long", metaType = "string", metaValues = {
-            @MetaValue(targetEntity = InternalJavaTask.class, value = "IJT"),
-            @MetaValue(targetEntity = InternalNativeTask.class, value = "INT"),
-            @MetaValue(targetEntity = InternalForkedJavaTask.class, value = "IFJT") })
-    @JoinTable(joinColumns = @JoinColumn(name = "ITASK_ID"), inverseJoinColumns = @JoinColumn(name = "DEPEND_ID"))
-    @LazyCollection(value = LazyCollectionOption.FALSE)
-    @Cascade(CascadeType.ALL)
     @TransientInSerialization
     @XmlTransient
-    @Column(name = "JOIN_BRANCH")
     private List<InternalTask> joinedBranches = null;
 
     /** if this task is the IF or ELSE task of a {@link FlowActionType#IF} action,
      * this fields points to the task performing the corresponding IF action */
-    @Any(fetch = FetchType.LAZY, metaColumn = @Column(name = "ITASK_TYPE", updatable = false, length = 5))
-    @AnyMetaDef(idType = "long", metaType = "string", metaValues = {
-            @MetaValue(targetEntity = InternalJavaTask.class, value = "IJT"),
-            @MetaValue(targetEntity = InternalNativeTask.class, value = "INT"),
-            @MetaValue(targetEntity = InternalForkedJavaTask.class, value = "IFJT") })
-    @JoinColumn(name = "ITASK_ID", updatable = false)
-    @Cascade(CascadeType.ALL)
     @TransientInSerialization
     @XmlTransient
     private InternalTask ifBranch = null;
@@ -230,6 +160,17 @@ public abstract class InternalTask extends TaskState {
      * {@link TransientInSerialization} annotation
      **/
     private static final List<Field> fieldsToSerialize = getFieldsToSerialize();
+
+    @TransientInSerialization
+    private InternalTask replicatedFrom;
+
+    void setReplicatedFrom(InternalTask replicatedFrom) {
+        this.replicatedFrom = replicatedFrom;
+    }
+
+    public InternalTask getReplicatedFrom() {
+        return replicatedFrom;
+    }
 
     /**
      * {@inheritDoc}
@@ -258,39 +199,22 @@ public abstract class InternalTask extends TaskState {
          * reset too.
          */
 
-        try {
-            DatabaseManager.getInstance().load(this);
-        } catch (NoClassDefFoundError e) {
-            // only the scheduler core needs to persist InternalTask in DB
-            // clients may need to call this method nonetheless
-        } catch (Throwable t) {
-            // if this happens on the core, you might want to fix it.
-            // clients that do not use hibernate can ignore this,
-            ProActiveLogger.getLogger(SchedulerLoggers.DATABASE).debug("Failed to init DB", t);
-        }
-
         InternalTask replicatedTask = null;
         // SCHEDULING-1373 remains, but not replicating the container make the core hangs,
         // while replicating it "only" loses tasks args in db...
-        ExecutableContainer replicatedContainer = null;
+        //ExecutableContainer replicatedContainer = null;
         try {
             this.skipIdepsInSerialization = true;
             // Deep copy of the InternalTask using serialization
             replicatedTask = (InternalTask) MakeDeepCopy.WithProActiveObjectStream.makeDeepCopy(this);
-            replicatedContainer = (ExecutableContainer) MakeDeepCopy.WithProActiveObjectStream
-                    .makeDeepCopy(this.executableContainer);
         } catch (Throwable t) {
             throw new ExecutableCreationException("Failed to serialize task", t);
         } finally {
             this.skipIdepsInSerialization = false;
         }
 
-        // ExecutableContainer is transient and non serializable but only given once at construction
-        // it needs to be explicitely added
-        replicatedTask.setExecutableContainer(replicatedContainer);
-
         // ideps contain references to other InternalTasks, it needs to be removed.
-        // anyway, dependecies for the new task will not be the same as the original
+        // anyway, dependencies for the new task will not be the same as the original
         replicatedTask.ideps = null;
 
         // the taskinfo needs to be cleaned so that we don't tag this task as finished
@@ -300,15 +224,7 @@ public abstract class InternalTask extends TaskState {
         replicatedTask.taskInfo.setNumberOfExecutionLeft(getMaxNumberOfExecution());
         replicatedTask.taskInfo.setNumberOfExecutionOnFailureLeft(getMaxNumberOfExecutionOnFailure());
 
-        ArrayList<Object> acc = new ArrayList<Object>();
-        acc.add(replicatedTask);
-        try {
-            // serialization copied everything, including hibernate ids
-            // these ids need to be set to 0 before DB insertion
-            resetIds(replicatedTask, acc);
-        } catch (Throwable e1) {
-            throw new ExecutableCreationException("Failed to reset hibernate ids in replica", e1);
-        }
+        replicatedTask.setReplicatedFrom(this);
 
         /* uncomment this to have a close look at the serialized graph
          * you will need to add some jars (http://xstream.codehaus.org/) to the classpath
@@ -323,108 +239,6 @@ public abstract class InternalTask extends TaskState {
         // since it only makes sense to hibernate once it's added to the parent InternalJob
         // The next DB.update(InternalJob) will take care of it
         return replicatedTask;
-    }
-
-    /**
-     * Recursively walks the object graph of the parameter
-     * to reset any hibernate id encountered
-     * 
-     * @param obj the root object to walk, may be null
-     * @param acc the set of all objects walked during the recursive call, to avoid cycles
-     * @throws IllegalArgumentException
-     * @throws IllegalAccessException
-     */
-    void resetIds(Object obj, List<Object> acc) throws IllegalArgumentException, IllegalAccessException {
-
-        if (obj == null)
-            return;
-
-        Class<?> clazz = obj.getClass();
-
-        LinkedList<Field> fields = new LinkedList<Field>();
-
-        while (clazz != null) {
-            for (Field f : clazz.getDeclaredFields()) {
-                if (!Modifier.isStatic(f.getModifiers())) {
-                    fields.addLast(f);
-                }
-            }
-            clazz = clazz.getSuperclass();
-        }
-
-        fields: for (Field f : fields) {
-
-            boolean accessible = f.isAccessible();
-            f.setAccessible(true);
-
-            Object value = f.get(obj);
-
-            for (Annotation a : f.getAnnotations()) {
-                // reset unique Hibernate identifiers
-                if (Id.class.isAssignableFrom(a.annotationType()) ||
-                    GeneratedValue.class.isAssignableFrom(a.annotationType())) {
-                    f.set(obj, 0);
-                    continue fields;
-                }
-            }
-
-            // every persisted Java Collection is translated at runtime as an Hibernate AbstractPersistentCollection. 
-            // This collection references the parent @Id, so we have to zero it too
-            if (AbstractPersistentCollection.class.isAssignableFrom(obj.getClass())) {
-                if (f.getName().equals("key")) {
-                    // the id is a Long name 'key' declared as Serializable 
-                    try {
-                        f.set(obj, new Long(0));
-                    } catch (Throwable t) {
-                        ProActiveLogger.getLogger(SchedulerLoggers.DATABASE).debug(
-                                "Failed to reset AbstractPersistentCollection key", t);
-                    }
-                } else if (f.getName().equals("role")) {
-                    try {
-                        f.set(obj, null);
-                    } catch (Throwable t) {
-                        ProActiveLogger.getLogger(SchedulerLoggers.DATABASE).debug(
-                                "Failed to reset AbstractPersistentCollection role", t);
-                    }
-                }
-            }
-
-            //boolean contains = acc.contains(value);
-            boolean contains = false;
-            for (Object o : acc) {
-                if (o == value) {
-                    contains = true;
-                    break;
-                }
-            }
-
-            if (contains) {
-                continue;
-            } else {
-                // this hibernate PersistentMap is nuts: it contains itself twice as a Map 
-                // and Serializable field... this forces me to remove it from the cycle detection
-                if (!(value != null && AbstractPersistentCollection.class.isAssignableFrom(value.getClass())))
-                    acc.add(value);
-            }
-
-            // arrays do not have regular fields in the java reflect api
-            if (f.getType().isArray() && value != null && !f.getType().getComponentType().isPrimitive()) {
-                for (int i = 0; i < Array.getLength(value); i++) {
-                    resetIds(Array.get(value, i), acc);
-                }
-            }
-            // plain string cannot contain ids
-            else if (value instanceof java.lang.String) {
-                continue;
-            }
-            // go deeper if not string, array or primitive
-            if (!f.getType().isPrimitive()) {
-                resetIds(f.get(obj), acc);
-            }
-
-            f.setAccessible(accessible);
-
-        }
     }
 
     /**
@@ -686,10 +500,6 @@ public abstract class InternalTask extends TaskState {
 
     public void setExecutableContainer(ExecutableContainer e) {
         this.executableContainer = e;
-    }
-
-    /** Hibernate default constructor */
-    public InternalTask() {
     }
 
     /**
@@ -1047,6 +857,19 @@ public abstract class InternalTask extends TaskState {
         return getInitialName(this.getName());
     }
 
+    private static final Pattern[] namePatterns;
+
+    static {
+        String[] regexps = new String[] { "^(.*)[" + TaskId.iterationSeparator + "].*$",
+                "^(.*)[" + TaskId.replicationSeparator + "].*$", "^(.*)$" };
+
+        namePatterns = new Pattern[regexps.length];
+
+        for (int i = 0; i < regexps.length; i++) {
+            namePatterns[i] = Pattern.compile(regexps[i]);
+        }
+    }
+
     /**
      * Extracts the original task name if it was added a suffix to
      * make it unique among replicated tasks
@@ -1060,12 +883,8 @@ public abstract class InternalTask extends TaskState {
     public static String getInitialName(String fullTaskname) {
         String taskName = null;
 
-        String[] str = new String[] { "^(.*)[" + TaskId.iterationSeparator + "].*$",
-                "^(.*)[" + TaskId.replicationSeparator + "].*$", "^(.*)$" };
-
         Matcher matcher = null;
-        for (String regex : str) {
-            Pattern pat = Pattern.compile(regex);
+        for (Pattern pat : namePatterns) {
             matcher = pat.matcher(fullTaskname);
             if (matcher.find()) {
                 taskName = matcher.group(1);
