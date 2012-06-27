@@ -34,46 +34,29 @@
  * ################################################################
  * $$ACTIVEEON_CONTRIBUTOR$$
  */
-package functionaltests.authentication;
+package unittests.topology;
 
-import static junit.framework.Assert.assertTrue;
-
-import org.ow2.proactive.resourcemanager.frontend.RMConnection;
-
-import functionaltests.RMConsecutive;
-import functionaltests.RMTHelper;
+import org.objectweb.proactive.core.node.NodeImpl;
 
 
-/**
- *
- * Test RM's connection helpers
- *
- * @author ProActive team
- *
- */
-public class ConnectionTest extends RMConsecutive {
+public class DummyNode extends NodeImpl {
 
-    /**
-     * test function
-     * @throws Exception
-     */
-    @org.junit.Test
-    public void action() throws Exception {
+    private static final long serialVersionUID = 32L;
+    private String name;
 
-        RMTHelper.getDefaultInstance().getRMAuth();
-
-        RMTHelper.log("Test 1");
-        RMTHelper.log("Connecting to existing resource manager");
-        try {
-            RMConnection.join(null);
-            RMConnection.waitAndJoin(null);
-            RMConnection.waitAndJoin(null, 10);
-
-            RMTHelper.log("Passed");
-        } catch (Exception e) {
-            RMTHelper.log("Failed: unexpected error " + e.getMessage());
-            assertTrue(false);
-        }
+    public DummyNode(String name) {
+        this.name = name;
     }
 
+    public String toString() {
+        return name;
+    }
+
+    public boolean equals(Object obj) {
+        return name.equals(obj.toString());
+    }
+
+    public int hashCode() {
+        return name.hashCode();
+    }
 }

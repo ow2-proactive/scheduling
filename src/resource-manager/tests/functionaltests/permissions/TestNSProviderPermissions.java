@@ -44,7 +44,7 @@ import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.DefaultInfrastructureManager;
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 
-import org.ow2.tests.FunctionalTest;
+import functionaltests.RMConsecutive;
 import functionaltests.RMTHelper;
 
 
@@ -68,7 +68,7 @@ import functionaltests.RMTHelper;
  *  admin and nsadmin are in the same group ("nsadmins")
  *
  */
-public class TestNSProviderPermissions extends FunctionalTest {
+public class TestNSProviderPermissions extends RMConsecutive {
 
     @org.junit.Test
     public void action() throws Exception {
@@ -77,7 +77,7 @@ public class TestNSProviderPermissions extends FunctionalTest {
         String nsName = "ns";
         RMTHelper.log("Test1 - node providers = ME");
 
-        ResourceManager nsadmin = helper.join("nsadmin", "pwd");
+        ResourceManager nsadmin = helper.getResourceManager(null, "nsadmin", "pwd");
         nsadmin.createNodeSource(nsName, DefaultInfrastructureManager.class.getName(), null,
                 StaticPolicy.class.getName(), new Object[] { "ALL", "ME" });
         helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, nsName);
@@ -91,9 +91,8 @@ public class TestNSProviderPermissions extends FunctionalTest {
         }
 
         helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
-        nsadmin.disconnect();
 
-        ResourceManager user = helper.join("radmin", "pwd");
+        ResourceManager user = helper.getResourceManager(null, "radmin", "pwd");
         try {
             // user does not allow to add nodes
             user.addNode(node2.getNodeInformation().getURL(), nsName).getBooleanValue();
@@ -109,10 +108,9 @@ public class TestNSProviderPermissions extends FunctionalTest {
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
-        user.disconnect();
 
         // AllPermission user
-        ResourceManager admin = helper.join("admin", "admin");
+        ResourceManager admin = helper.getResourceManager(null, "admin", "admin");
         try {
             // user does not allow to add nodes
             admin.addNode(node2.getNodeInformation().getURL(), nsName).getBooleanValue();
@@ -152,9 +150,8 @@ public class TestNSProviderPermissions extends FunctionalTest {
         } catch (Exception e) {
             Assert.assertTrue(false);
         }
-        admin.disconnect();
 
-        nsadmin = helper.join("nsadmin", "pwd");
+        nsadmin = helper.getResourceManager(null, "nsadmin", "pwd");
         try {
             // nsadmin is in the same group as admin
             nsadmin.addNode(node2.getNodeInformation().getURL(), nsName).getBooleanValue();
@@ -162,9 +159,8 @@ public class TestNSProviderPermissions extends FunctionalTest {
         } catch (Exception e) {
             Assert.assertTrue(false);
         }
-        nsadmin.disconnect();
 
-        user = helper.join("radmin", "pwd");
+        user = helper.getResourceManager(null, "radmin", "pwd");
         try {
             // user does not allow to add nodes
             user.addNode(node3.getNodeInformation().getURL(), nsName).getBooleanValue();
@@ -180,9 +176,8 @@ public class TestNSProviderPermissions extends FunctionalTest {
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
-        user.disconnect();
 
-        nsadmin = helper.join("nsadmin", "pwd");
+        nsadmin = helper.getResourceManager(null, "nsadmin", "pwd");
         try {
             // nsadmin cannot remove foreign node
             nsadmin.removeNode(node.getNodeInformation().getURL(), true).getBooleanValue();
@@ -199,9 +194,8 @@ public class TestNSProviderPermissions extends FunctionalTest {
         } catch (Exception e) {
             Assert.assertTrue(false);
         }
-        nsadmin.disconnect();
 
-        admin = helper.join("admin", "admin");
+        admin = helper.getResourceManager(null, "admin", "admin");
         try {
             // admin can remove foreign node
             admin.removeNode(node3.getNodeInformation().getURL(), true).getBooleanValue();
@@ -211,10 +205,9 @@ public class TestNSProviderPermissions extends FunctionalTest {
         } catch (Exception e) {
             Assert.assertTrue(false);
         }
-        admin.disconnect();
 
         RMTHelper.log("Test3 - node providers = ALL");
-        nsadmin = helper.join("nsadmin", "pwd");
+        nsadmin = helper.getResourceManager(null, "nsadmin", "pwd");
         nsadmin.createNodeSource(nsName, DefaultInfrastructureManager.class.getName(), null,
                 StaticPolicy.class.getName(), new Object[] { "ALL", "ALL" });
         helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, nsName);
@@ -228,9 +221,8 @@ public class TestNSProviderPermissions extends FunctionalTest {
         } catch (Exception e) {
             Assert.assertTrue(false);
         }
-        nsadmin.disconnect();
 
-        user = helper.join("radmin", "pwd");
+        user = helper.getResourceManager(null, "radmin", "pwd");
         try {
             // user can add new nodes
             user.addNode(node2.getNodeInformation().getURL(), nsName).getBooleanValue();
@@ -258,8 +250,8 @@ public class TestNSProviderPermissions extends FunctionalTest {
         } catch (Exception e) {
             Assert.assertTrue(false);
         }
-        user.disconnect();
-        nsadmin = helper.join("nsadmin", "pwd");
+
+        nsadmin = helper.getResourceManager(null, "nsadmin", "pwd");
         try {
             // nsadmin can remove node3 as ns admin
             nsadmin.removeNode(node3.getNodeInformation().getURL(), true).getBooleanValue();
@@ -267,9 +259,9 @@ public class TestNSProviderPermissions extends FunctionalTest {
         } catch (Exception e) {
             Assert.assertTrue(false);
         }
-        nsadmin.disconnect();
+
         RMTHelper.log("Test4 - admin priveleges");
-        admin = helper.join("admin", "admin");
+        admin = helper.getResourceManager(null, "admin", "admin");
         try {
             // admin can remove anything
             admin.removeNode(node.getNodeInformation().getURL(), true).getBooleanValue();
@@ -294,8 +286,7 @@ public class TestNSProviderPermissions extends FunctionalTest {
         } catch (Exception e) {
             Assert.assertTrue(false);
         }
-        admin.disconnect();
-        nsadmin = helper.join("nsadmin", "pwd");
+        nsadmin = helper.getResourceManager(null, "nsadmin", "pwd");
         try {
             // nsadmin cannot remove node as he is not a node owner
             nsadmin.removeNode(node.getNodeInformation().getURL(), true).getBooleanValue();
@@ -309,8 +300,7 @@ public class TestNSProviderPermissions extends FunctionalTest {
         } catch (Exception e) {
             Assert.assertTrue(false);
         }
-        nsadmin.disconnect();
-        user = helper.join("radmin", "pwd");
+        user = helper.getResourceManager(null, "radmin", "pwd");
         try {
             // user cannot add new nodes
             user.addNode(node3.getNodeInformation().getURL(), nsName).getBooleanValue();
@@ -325,9 +315,8 @@ public class TestNSProviderPermissions extends FunctionalTest {
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
-        user.disconnect();
 
-        admin = helper.join("admin", "admin");
+        admin = helper.getResourceManager(null, "admin", "admin");
         try {
             // user does not allow to remove nodes
             admin.removeNodeSource(nsName, true).getBooleanValue();
@@ -352,8 +341,7 @@ public class TestNSProviderPermissions extends FunctionalTest {
         } catch (Exception e) {
             Assert.assertTrue(e.getMessage(), false);
         }
-        admin.disconnect();
-        nsadmin = helper.join("nsadmin", "pwd");
+        nsadmin = helper.getResourceManager(null, "nsadmin", "pwd");
         try {
             // nsadmin cannot remove node as he is not a node owner
             nsadmin.removeNode(node.getNodeInformation().getURL(), true).getBooleanValue();
@@ -367,8 +355,7 @@ public class TestNSProviderPermissions extends FunctionalTest {
         } catch (Exception e) {
             Assert.assertTrue(e.getMessage(), false);
         }
-        nsadmin.disconnect();
-        user = helper.join("radmin", "pwd");
+        user = helper.getResourceManager(null, "radmin", "pwd");
         try {
             // user cannot add new nodes
             user.addNode(node3.getNodeInformation().getURL(), nsName).getBooleanValue();
@@ -383,9 +370,8 @@ public class TestNSProviderPermissions extends FunctionalTest {
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
-        user.disconnect();
 
-        admin = helper.join("admin", "admin");
+        admin = helper.getResourceManager(null, "admin", "admin");
         try {
             // user does not allow to remove nodes
             admin.removeNodeSource(nsName, true).getBooleanValue();
@@ -410,8 +396,7 @@ public class TestNSProviderPermissions extends FunctionalTest {
         } catch (Exception e) {
             Assert.assertTrue(e.getMessage(), false);
         }
-        admin.disconnect();
-        nsadmin = helper.join("nsadmin", "pwd");
+        nsadmin = helper.getResourceManager(null, "nsadmin", "pwd");
         try {
             // nsadmin cannot remove node as he is not a node owner
             nsadmin.removeNode(node.getNodeInformation().getURL(), true).getBooleanValue();
@@ -425,8 +410,7 @@ public class TestNSProviderPermissions extends FunctionalTest {
         } catch (Exception e) {
             Assert.assertTrue(e.getMessage(), false);
         }
-        nsadmin.disconnect();
-        user = helper.join("radmin", "pwd");
+        user = helper.getResourceManager(null, "radmin", "pwd");
         try {
             // user can add new nodes
             user.addNode(node3.getNodeInformation().getURL(), nsName).getBooleanValue();
@@ -441,9 +425,8 @@ public class TestNSProviderPermissions extends FunctionalTest {
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
-        user.disconnect();
 
-        admin = helper.join("admin", "admin");
+        admin = helper.getResourceManager(null, "admin", "admin");
         try {
             // user does not allow to remove nodes
             admin.removeNodeSource(nsName, true).getBooleanValue();

@@ -48,11 +48,10 @@ import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
-import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.utils.NodeSet;
 
-import org.ow2.tests.FunctionalTest;
+import functionaltests.RMConsecutive;
 import functionaltests.RMTHelper;
 
 
@@ -79,7 +78,7 @@ import functionaltests.RMTHelper;
  * @author ProActive team
  *
  */
-public class StaticSelectionScriptTest extends FunctionalTest {
+public class StaticSelectionScriptTest extends RMConsecutive {
 
     private URL vmPropSelectionScriptpath = this.getClass().getResource("vmPropertySelectionScript.js");
 
@@ -97,18 +96,8 @@ public class StaticSelectionScriptTest extends FunctionalTest {
     @org.junit.Test
     public void action() throws Exception {
         RMTHelper helper = RMTHelper.getDefaultInstance();
-
         ResourceManager resourceManager = helper.getResourceManager();
-
-        RMTHelper.log("Deployment");
-        helper.createDefaultNodeSource();
-        helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, NodeSource.DEFAULT);
-
-        for (int i = 0; i < RMTHelper.defaultNodesNumber; i++) {
-            helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
-            //wait for the nodes to be in free state
-            helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-        }
+        int nodeNumber = helper.createNodeSource("StaticSelectionScriptTest");
 
         String node1Name = "node1";
         String node2Name = "node2";
@@ -136,7 +125,7 @@ public class StaticSelectionScriptTest extends FunctionalTest {
         PAFuture.waitFor(nodes);
 
         assertTrue(nodes.size() == 1);
-        assertTrue(resourceManager.getState().getFreeNodesNumber() == RMTHelper.defaultNodesNumber);
+        assertTrue(resourceManager.getState().getFreeNodesNumber() == nodeNumber);
         assertTrue(nodes.get(0).getNodeInformation().getURL().equals(node1URL));
 
         //wait for node busy event
@@ -157,7 +146,7 @@ public class StaticSelectionScriptTest extends FunctionalTest {
         PAFuture.waitFor(nodes);
 
         assertTrue(nodes.size() == 1);
-        assertTrue(resourceManager.getState().getFreeNodesNumber() == RMTHelper.defaultNodesNumber);
+        assertTrue(resourceManager.getState().getFreeNodesNumber() == nodeNumber);
         assertTrue(nodes.get(0).getNodeInformation().getURL().equals(node1URL));
 
         //wait for node busy event
@@ -187,7 +176,7 @@ public class StaticSelectionScriptTest extends FunctionalTest {
         PAFuture.waitFor(nodes);
 
         assertTrue(nodes.size() == 2);
-        assertTrue(resourceManager.getState().getFreeNodesNumber() == RMTHelper.defaultNodesNumber);
+        assertTrue(resourceManager.getState().getFreeNodesNumber() == nodeNumber);
 
         //wait for node busy event
         evt = helper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node1URL);
@@ -218,7 +207,7 @@ public class StaticSelectionScriptTest extends FunctionalTest {
         PAFuture.waitFor(nodes);
 
         assertTrue(nodes.size() == 0);
-        assertTrue(resourceManager.getState().getFreeNodesNumber() == RMTHelper.defaultNodesNumber);
+        assertTrue(resourceManager.getState().getFreeNodesNumber() == nodeNumber);
 
         RMTHelper.log("Test 5");
 
@@ -236,7 +225,7 @@ public class StaticSelectionScriptTest extends FunctionalTest {
         } catch (RuntimeException e) {
         }
 
-        assertTrue(resourceManager.getState().getFreeNodesNumber() == RMTHelper.defaultNodesNumber);
+        assertTrue(resourceManager.getState().getFreeNodesNumber() == nodeNumber);
 
         RMTHelper.log("Test 6");
 
@@ -253,6 +242,6 @@ public class StaticSelectionScriptTest extends FunctionalTest {
             Assert.assertTrue(false);
         } catch (RuntimeException e) {
         }
-        assertTrue(resourceManager.getState().getFreeNodesNumber() == RMTHelper.defaultNodesNumber);
+        assertTrue(resourceManager.getState().getFreeNodesNumber() == nodeNumber);
     }
 }

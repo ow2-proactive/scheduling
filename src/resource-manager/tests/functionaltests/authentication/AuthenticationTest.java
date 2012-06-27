@@ -43,7 +43,7 @@ import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 
-import org.ow2.tests.FunctionalTest;
+import functionaltests.RMConsecutive;
 import functionaltests.RMTHelper;
 
 
@@ -54,7 +54,7 @@ import functionaltests.RMTHelper;
  * @author ProActive team
  *
  */
-public class AuthenticationTest extends FunctionalTest {
+public class AuthenticationTest extends RMConsecutive {
 
     private String adminName = "demo";
     private String adminPwd = "demo";
@@ -70,6 +70,7 @@ public class AuthenticationTest extends FunctionalTest {
     @org.junit.Test
     public void action() throws Exception {
         RMAuthentication auth = RMTHelper.getDefaultInstance().getRMAuth();
+        RMTHelper.getDefaultInstance().getResourceManager().disconnect().getBooleanValue();
 
         RMTHelper.log("Test 1");
         RMTHelper.log("Trying to authorized with correct admin name and password");

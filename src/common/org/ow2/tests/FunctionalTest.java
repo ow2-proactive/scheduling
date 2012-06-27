@@ -41,8 +41,9 @@ import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.log4j.Logger;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
+import org.junit.After;
+import org.junit.Assume;
+import org.junit.Before;
 import org.junit.Ignore;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
@@ -67,6 +68,7 @@ public class FunctionalTest {
     /** ProActive related stuff */
     static volatile private ProActiveSetup paSetup;
     static final private ProcessCleaner cleaner = new ProcessCleaner(".*proactive.test=true.*");
+    protected static boolean consecutiveMode = false;
 
     protected VariableContractImpl getVariableContract() {
         return paSetup.getVariableContract();
@@ -76,12 +78,26 @@ public class FunctionalTest {
         return paSetup.getJvmParameters();
     }
 
-    @BeforeClass
-    final static public void prepareForTest() throws Exception {
+    @Before
+    public void prepareForTest() throws Exception {
         CentralPAPropertyRepository.PA_TEST.setValue(true);
 
-        // Ensure that the host is clean
-        cleaner.killAliveProcesses();
+        String urlProperty = System.getProperty("url");
+        consecutiveMode = urlProperty != null && !urlProperty.equals("${url}");
+        if (!consecutiveMode) {
+            // Ensure that the host is clean
+            System.err.println("Running test in 'clean environment' mode");
+            cleaner.killAliveProcesses();
+        } else {
+            if (canBeExecutedInConsecutiveMode(this.getClass())) {
+                System.err.println("Running test in 'consecutive' mode");
+            } else {
+                // skipping this test execution
+                System.err.println("Test does not support the 'consecutive' mode execution");
+                Assume.assumeTrue(false);
+                return;
+            }
+        }
 
         // Ensure that the host will eventually be cleaned
         System.err.println("Arming timer " + timeout);
@@ -100,20 +116,17 @@ public class FunctionalTest {
         paSetup.start();
     }
 
-    static private void threadDumpPoccesses() {
-        try {
-            int[] pids = cleaner.getAliveProcesses();
-            for (int pid : pids) {
-                System.err.println("Alive proccess: " + pid);
-                System.err.println(cleaner.getThreadDump(pid));
-            }
-        } catch (Exception e) {
-            logger.error("Failed to generate thread dump of remaining processes", e);
+    private boolean canBeExecutedInConsecutiveMode(Class<?> cls) {
+        if (cls.isAnnotationPresent(Consecutive.class)) {
+            return true;
+        } else if (cls.getSuperclass() != null) {
+            return canBeExecutedInConsecutiveMode(cls.getSuperclass());
         }
+        return false;
     }
 
-    @AfterClass
-    final static public void afterClass() throws Exception {
+    @After
+    public void afterClass() throws Exception {
         // Disable timer and shutdown hook
         TimerTask tt = timerTask.getAndSet(null);
         if (tt != null) {
@@ -122,10 +135,14 @@ public class FunctionalTest {
         Runtime.getRuntime().removeShutdownHook(shutdownHook);
 
         // Cleanup proactive
-        paSetup.shutdown();
+        if (paSetup != null) {
+            paSetup.shutdown();
+        }
 
-        // Kill everything
-        cleaner.killAliveProcesses();
+        if (!consecutiveMode) {
+            // Kill everything
+            cleaner.killAliveProcesses();
+        }
     }
 
     static private class MyShutdownHook extends Thread {
@@ -135,7 +152,9 @@ public class FunctionalTest {
             try {
                 timer.cancel();
                 paSetup.shutdown();
-                cleaner.killAliveProcesses();
+                if (!consecutiveMode) {
+                    cleaner.killAliveProcesses();
+                }
             } catch (Exception e) {
                 logger.error("Failed to kill remaining proccesses", e);
             }
@@ -146,10 +165,12 @@ public class FunctionalTest {
         @Override
         public void safeRun() {
             System.err.println("Timeout reached. Killing remaining processes");
-            try {
-                cleaner.killAliveProcesses();
-            } catch (Exception e) {
-                logger.error("Failed to kill remaining proccesses", e);
+            if (!consecutiveMode) {
+                try {
+                    cleaner.killAliveProcesses();
+                } catch (Exception e) {
+                    logger.error("Failed to kill remaining proccesses", e);
+                }
             }
         }
     }

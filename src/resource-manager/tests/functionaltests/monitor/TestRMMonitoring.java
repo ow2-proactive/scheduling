@@ -44,12 +44,12 @@ import junit.framework.Assert;
 import org.objectweb.proactive.core.ProActiveTimeoutException;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
+import org.ow2.proactive.resourcemanager.common.event.RMInitialState;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
-import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.utils.NodeSet;
-import org.ow2.tests.FunctionalTest;
 
+import functionaltests.RMConsecutive;
 import functionaltests.RMTHelper;
 
 
@@ -59,7 +59,7 @@ import functionaltests.RMTHelper;
  * only events of this type.
  *
  */
-public class TestRMMonitoring extends FunctionalTest {
+public class TestRMMonitoring extends RMConsecutive {
 
     @org.junit.Test
     public void action() throws Exception {
@@ -68,21 +68,17 @@ public class TestRMMonitoring extends FunctionalTest {
         RMTHelper.log("Deployment");
 
         ResourceManager resourceManager = helper.getResourceManager();
-
-        helper.createLocalNodeSource();
-        helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, NodeSource.LOCAL_INFRASTRUCTURE_NAME);
+        helper.createNodeSource("TestRMMonitoring");
 
         Set<String> nodesUrls = new HashSet<String>();
-        for (int i = 0; i < RMTHelper.defaultNodesNumber; i++) {
-            helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
-            //wait for the nodes to be in free state
-            RMNodeEvent nodeEvent = helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-            nodesUrls.add(nodeEvent.getNodeUrl());
+        RMInitialState state = RMTHelper.getDefaultInstance().getResourceManager().getMonitoring().getState();
+        for (RMNodeEvent ne : state.getNodesEvents()) {
+            nodesUrls.add(ne.getNodeUrl());
         }
 
         // we received all event as we are here
         RMTHelper.log("Test 1 - subscribing only to 'node remove' event");
-        helper.getEventReceiver().removeListener(resourceManager.getMonitoring());
+        resourceManager.getMonitoring().removeRMEventListener();
         resourceManager.getMonitoring().addRMEventListener(helper.getEventReceiver(),
                 RMEventType.NODE_REMOVED);
 
@@ -107,7 +103,10 @@ public class TestRMMonitoring extends FunctionalTest {
         } catch (ProActiveTimeoutException ex) {
             RMTHelper.log("Test 2 - success");
         }
+
+        resourceManager.releaseNodes(ns).getBooleanValue();
         RMTHelper.log("End of test");
+
     }
 
 }

@@ -177,7 +177,7 @@ public class TestOperationsWhenUnlinked extends FunctionalTest {
 
         System.out.println("Creating new RM");
         helper.getResourceManager();
-        helper.createDefaultNodeSource(2);
+        helper.createNodeSource();
 
         System.out.println("Linking new RM");
         if (!scheduler.linkResourceManager(rmUrl)) {
@@ -198,7 +198,11 @@ public class TestOperationsWhenUnlinked extends FunctionalTest {
                 .getAllResults().size());
         for (TaskResult taskResult : jobResult.getAllResults().values()) {
             System.out.println("Task " + taskResult.getTaskId());
-            Assert.assertNull("Unexpected task result exception", taskResult.getException());
+            if (taskResult.getException() != null) {
+                taskResult.getException().printStackTrace();
+                Assert.assertNull("Unexpected task result exception", taskResult.getException());
+            }
+
             String output = taskResult.getOutput().getAllLogs(false);
             System.out.println("Task output:");
             System.out.println(output);

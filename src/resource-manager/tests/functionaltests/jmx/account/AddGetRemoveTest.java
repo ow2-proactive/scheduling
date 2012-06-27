@@ -58,7 +58,7 @@ import org.ow2.proactive.resourcemanager.core.jmx.mbean.ManagementMBean;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 
-import org.ow2.tests.FunctionalTest;
+import functionaltests.RMConsecutive;
 import functionaltests.RMTHelper;
 
 
@@ -74,7 +74,7 @@ import functionaltests.RMTHelper;
  *  
  * @author The ProActive Team 
  */
-public final class AddGetRemoveTest extends FunctionalTest {
+public final class AddGetRemoveTest extends RMConsecutive {
 
     /** GET->RELEASE duration time in ms */
     public static long GR_DURATION = 1000;
@@ -88,10 +88,9 @@ public final class AddGetRemoveTest extends FunctionalTest {
         RMTHelper helper = RMTHelper.getDefaultInstance();
 
         final ResourceManager r = helper.getResourceManager();
-
         // The username and thr password must be the same a used to connect to the RM
-        final String adminLogin = RMTHelper.username;
-        final String adminPassword = RMTHelper.password;
+        final String adminLogin = RMTHelper.defaultUserName;
+        final String adminPassword = RMTHelper.defaultUserPassword;
 
         // All accounting values are checked through JMX
         final RMAuthentication auth = (RMAuthentication) helper.getRMAuth();
@@ -110,8 +109,7 @@ public final class AddGetRemoveTest extends FunctionalTest {
         final JMXConnector jmxConnector = JMXConnectorFactory.connect(jmxRmiServiceURL, env);
         final MBeanServerConnection conn = jmxConnector.getMBeanServerConnection();
 
-        // Tests on database
-        //(nodeprovider=demo)                      
+        long usedNodeTime = (Long) conn.getAttribute(myAccountMBeanName, "UsedNodeTime");
 
         // ADD, GET, RELEASE
         // 1) ADD
@@ -137,7 +135,7 @@ public final class AddGetRemoveTest extends FunctionalTest {
         conn.invoke(managementMBeanName, "clearAccoutingCache", null, null);
 
         // Check account values validity
-        long usedNodeTime = (Long) conn.getAttribute(myAccountMBeanName, "UsedNodeTime");
+        usedNodeTime = (Long) conn.getAttribute(myAccountMBeanName, "UsedNodeTime") - usedNodeTime;
         Assert.assertTrue("Invalid value of the usedNodeTime attribute", (usedNodeTime >= GR_DURATION) &&
             (usedNodeTime <= getRemoveMaxDuration));
     }

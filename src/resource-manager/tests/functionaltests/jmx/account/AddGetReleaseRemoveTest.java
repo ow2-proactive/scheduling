@@ -59,8 +59,9 @@ import org.ow2.proactive.resourcemanager.core.jmx.RMJMXHelper;
 import org.ow2.proactive.resourcemanager.core.jmx.mbean.ManagementMBean;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
-
 import org.ow2.tests.FunctionalTest;
+
+import functionaltests.RMConsecutive;
 import functionaltests.RMTHelper;
 
 
@@ -76,7 +77,7 @@ import functionaltests.RMTHelper;
  *  
  * @author The ProActive Team 
  */
-public final class AddGetReleaseRemoveTest extends FunctionalTest {
+public final class AddGetReleaseRemoveTest extends RMConsecutive {
 
     /** GET->RELEASE duration time in ms */
     public static long GR_DURATION = 1000;
@@ -90,10 +91,9 @@ public final class AddGetReleaseRemoveTest extends FunctionalTest {
         RMTHelper helper = RMTHelper.getDefaultInstance();
 
         final ResourceManager r = helper.getResourceManager();
-
         // The username and thr password must be the same a used to connect to the RM
-        final String adminLogin = RMTHelper.username;
-        final String adminPassword = RMTHelper.password;
+        final String adminLogin = RMTHelper.defaultUserName;
+        final String adminPassword = RMTHelper.defaultUserPassword;
 
         // All accounting values are checked through JMX
         final RMAuthentication auth = (RMAuthentication) helper.getRMAuth();
@@ -112,12 +112,14 @@ public final class AddGetReleaseRemoveTest extends FunctionalTest {
         final JMXConnector jmxConnector = JMXConnectorFactory.connect(jmxRmiServiceURL, env);
         final MBeanServerConnection conn = jmxConnector.getMBeanServerConnection();
 
-        // Tests on database
-        //(nodeprovider=demo)                      
-
         // Ensure that no refreshes was done and all account values are correctly initialized        
         AttributeList atts = conn.getAttributes(myAccountMBeanName, new String[] { "UsedNodeTime",
                 "ProvidedNodeTime", "ProvidedNodesCount" });
+
+        long usedNodeTime = (Long) ((Attribute) atts.get(0)).getValue();
+        long providedNodeTime = (Long) ((Attribute) atts.get(1)).getValue();
+        int providedNodesCount = (Integer) ((Attribute) atts.get(2)).getValue();
+
         // ADD, GET, RELEASE, REMOVE
         // 1) ADD
         final long beforeAddTime = System.currentTimeMillis();
@@ -149,14 +151,17 @@ public final class AddGetReleaseRemoveTest extends FunctionalTest {
         // Check account values validity                      
         atts = conn.getAttributes(myAccountMBeanName, new String[] { "UsedNodeTime", "ProvidedNodeTime",
                 "ProvidedNodesCount" });
-        long usedNodeTime = (Long) ((Attribute) atts.get(0)).getValue();
-        long providedNodeTime = (Long) ((Attribute) atts.get(1)).getValue();
-        int providedNodesCount = (Integer) ((Attribute) atts.get(2)).getValue();
+        usedNodeTime = (Long) ((Attribute) atts.get(0)).getValue() - usedNodeTime;
+        providedNodeTime = (Long) ((Attribute) atts.get(1)).getValue() - providedNodeTime;
+        providedNodesCount = (Integer) ((Attribute) atts.get(2)).getValue() - providedNodesCount;
 
         Assert.assertTrue("Invalid value of the usedNodeTime attribute", (usedNodeTime >= GR_DURATION) &&
             (usedNodeTime <= getReleaseMaxDuration));
         Assert.assertTrue("Invalid value of the providedNodeTime attribute",
                 (providedNodeTime >= usedNodeTime) && (providedNodeTime <= addRemoveMaxDuration));
-        Assert.assertTrue("Invalid value of the providedNodesCount attribute", (providedNodesCount == 1));
+        if (!FunctionalTest.consecutiveMode) {
+            // in consecutive mode if user already provided this node before this value does not change
+            Assert.assertEquals("Invalid value of the providedNodesCount attribute", 1, providedNodesCount);
+        }
     }
 }

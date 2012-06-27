@@ -1,0 +1,69 @@
+#!/bin/bash
+
+##################################################################################################################
+#
+# Particular test rerun example
+# ./compile/build -Durl="rmi://gollum.local:1099/" -Dtest="**functionaltests/**/**AddGetDownRemoveTest*" junit.rm
+#
+##################################################################################################################
+
+
+compileDir=$(cd `dirname $0` && /bin/pwd)
+workingDir=$compileDir/../bin/unix
+
+echo "Compiling the resource manager"
+$compileDir/build deploy.rm
+
+CLASSPATH=.
+. $workingDir/env rm-log4j-server
+
+opt="-Xms128m -Xmx2048m"
+RM_OUT=$(mktemp --tmpdir)
+
+cleanup () {
+		echo "Killing the forked processeses"
+		/bin/kill $RM_PID
+		pkill -9 -f Dproactive.test
+		pkill -9 -f RMStarter
+}
+
+trap cleanup TERM INT
+
+RM_CONFIG="-Dpa.rm.db.hibernate.dropdb=true"
+RM_CONFIG="$RM_CONFIG -Dpa.rm.select.node.dynamicity=10000"
+RM_CONFIG="$RM_CONFIG -Dpa.rm.node.source.ping.frequency=10000"
+RM_CONFIG="$RM_CONFIG -Dpa.rm.client.ping.frequency=10000"
+RM_CONFIG="$RM_CONFIG -Dpa.rm.select.script.timeout=10000"
+
+eval $JAVACMD $RM_CONFIG -Dderby.stream.error.file=\"$PA_SCHEDULER/.logs/derby.log\" $opt org.ow2.proactive.resourcemanager.utils.RMStarter | tee $RM_OUT 2>&1 &
+
+RM_PID=$!
+RM_LINE="Resource Manager successfully created on "
+while true; do
+        if [ "$(grep "$RM_LINE" $RM_OUT)" ]; then
+                RM_URL=$(grep "$RM_LINE" $RM_OUT| sed -e "s/^${RM_LINE}\(.*\)/\1/g")
+                break;
+        fi
+
+        if [ ! "$(ps | grep $RM_PID)" ]; then
+                # I don't see a way to return the exit code from the forked process
+                exit 1;
+        fi
+        sleep 1s
+done
+
+ITERATIONS=$1
+if [ -z "$ITERATIONS" ]; then
+	ITERATIONS=1
+fi 
+
+echo "Running RM fuctional tests"
+for (( c=1; c<=$ITERATIONS; c++ ))
+do
+	echo "Iteration $c"
+	$compileDir/build -Durl="$RM_URL" -Dtest="**functionaltests/**/**Test*" junit.rm
+done
+
+cleanup
+
+exit

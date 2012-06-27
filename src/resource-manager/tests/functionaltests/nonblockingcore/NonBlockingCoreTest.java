@@ -53,11 +53,10 @@ import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.RMConnection;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
-import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.utils.NodeSet;
 
-import org.ow2.tests.FunctionalTest;
+import functionaltests.RMConsecutive;
 import functionaltests.RMTHelper;
 import functionaltests.selectionscript.SelectionScriptTimeOutTest;
 
@@ -69,7 +68,7 @@ import functionaltests.selectionscript.SelectionScriptTimeOutTest;
  * @author ProActice team
  *
  */
-public class NonBlockingCoreTest extends FunctionalTest {
+public class NonBlockingCoreTest extends RMConsecutive {
 
     private URL selectionScriptWithtimeOutPath = SelectionScriptTimeOutTest.class
             .getResource("selectionScriptWithtimeOut.js");
@@ -85,18 +84,8 @@ public class NonBlockingCoreTest extends FunctionalTest {
         RMTHelper helper = RMTHelper.getDefaultInstance();
 
         ResourceManager resourceManager = helper.getResourceManager();
-
-        RMTHelper.log("Deployment");
-
-        helper.createDefaultNodeSource();
-        helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, NodeSource.DEFAULT);
-
-        for (int i = 0; i < RMTHelper.defaultNodesNumber; i++) {
-            helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
-            //waiting for node to be in free state
-            helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-        }
-
+        int initialNodeNumber = 2;
+        helper.createNodeSource("NonBlockingCoreTest1", initialNodeNumber);
         int coreScriptExecutionTimeout = PAResourceManagerProperties.RM_SELECT_SCRIPT_TIMEOUT.getValueAsInt();
         int scriptSleepingTime = coreScriptExecutionTimeout * 2;
 
@@ -109,8 +98,8 @@ public class NonBlockingCoreTest extends FunctionalTest {
         //mandatory to use RMUser AO, otherwise, getAtMostNode we be send in RMAdmin request queue
         final RMAuthentication auth = RMConnection.waitAndJoin(null);
 
-        final Credentials cred = Credentials.createCredentials(new CredData(RMTHelper.username,
-            RMTHelper.password), auth.getPublicKey());
+        final Credentials cred = Credentials.createCredentials(new CredData(RMTHelper.defaultUserName,
+            RMTHelper.defaultUserPassword), auth.getPublicKey());
 
         // cannot connect twice from the same active object
         // so creating another thread
@@ -138,8 +127,8 @@ public class NonBlockingCoreTest extends FunctionalTest {
         //waiting for node to be in free state, it is in configuring state when added...
         helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
 
-        assertTrue(resourceManager.getState().getTotalNodesNumber() == RMTHelper.defaultNodesNumber + 1);
-        assertTrue(resourceManager.getState().getFreeNodesNumber() == RMTHelper.defaultNodesNumber + 1);
+        assertTrue(resourceManager.getState().getTotalNodesNumber() == initialNodeNumber + 1);
+        assertTrue(resourceManager.getState().getFreeNodesNumber() == initialNodeNumber + 1);
 
         //preemptive removal is useless for this case, because node is free
         RMTHelper.log("Removing node " + node1URL);
@@ -147,34 +136,25 @@ public class NonBlockingCoreTest extends FunctionalTest {
 
         helper.waitForNodeEvent(RMEventType.NODE_REMOVED, node1URL);
 
-        assertTrue(resourceManager.getState().getTotalNodesNumber() == RMTHelper.defaultNodesNumber);
-        assertTrue(resourceManager.getState().getFreeNodesNumber() == RMTHelper.defaultNodesNumber);
+        assertTrue(resourceManager.getState().getTotalNodesNumber() == initialNodeNumber);
+        assertTrue(resourceManager.getState().getFreeNodesNumber() == initialNodeNumber);
 
-        RMTHelper.log("Creating Local node source " + NodeSource.LOCAL_INFRASTRUCTURE_NAME);
-        helper.createLocalNodeSource();
+        String nsName = "NonBlockingCoreTest";
+        RMTHelper.log("Creating a node source " + nsName);
+        int nsNodesNumber = helper.createNodeSource(nsName);
 
-        //wait for creation of GCM Node Source event, and deployment of its nodes
-        helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, NodeSource.LOCAL_INFRASTRUCTURE_NAME);
-        for (int i = 0; i < RMTHelper.defaultNodesNumber; i++) {
-            helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
-            helper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
-            //waiting for the node to be in free state
-            helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
-            helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-        }
+        assertTrue(resourceManager.getState().getTotalNodesNumber() == nsNodesNumber + initialNodeNumber);
+        assertTrue(resourceManager.getState().getFreeNodesNumber() == nsNodesNumber + initialNodeNumber);
 
-        assertTrue(resourceManager.getState().getTotalNodesNumber() == RMTHelper.defaultNodesNumber * 2);
-        assertTrue(resourceManager.getState().getFreeNodesNumber() == RMTHelper.defaultNodesNumber * 2);
-
-        RMTHelper.log("Removing node source " + NodeSource.LOCAL_INFRASTRUCTURE_NAME);
-        resourceManager.removeNodeSource(NodeSource.LOCAL_INFRASTRUCTURE_NAME, true);
+        RMTHelper.log("Removing node source " + nsName);
+        resourceManager.removeNodeSource(nsName, true);
 
         boolean selectionInProgress = PAFuture.isAwaited(nodes);
 
         if (!selectionInProgress) {
             // normally we are looking for 2 nodes with timeout script,
             // so the selection procedure has to finish not earlier than
-            // coreScriptExecutionTimeout * RMTHelper.defaultNodesNumber
+            // coreScriptExecutionTimeout * nodesNumber
             // it should be sufficient to perform all admin operations concurrently
             //
             // if the core is blocked admin operations will be performed after selection

@@ -18,6 +18,7 @@
         <property name="c3p0.max_size">10</property>
         <property name="c3p0.min_size">10</property>
         <property name="c3p0.timeout">60</property> <!-- seconds -->
+		<property name="c3p0.idle_test_periods">50</property> <!-- should not be higher than c3p0.timeout -->
 
         <!-- JDBC connection pool (use the built-in) -->
         <property name="connection.pool_size">10</property>

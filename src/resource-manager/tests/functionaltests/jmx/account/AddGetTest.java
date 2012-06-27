@@ -61,7 +61,7 @@ import org.ow2.proactive.resourcemanager.core.jmx.mbean.ManagementMBean;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 
-import org.ow2.tests.FunctionalTest;
+import functionaltests.RMConsecutive;
 import functionaltests.RMTHelper;
 
 
@@ -78,7 +78,7 @@ import functionaltests.RMTHelper;
  * @author The ProActive Team 
  */
 @Ignore
-public final class AddGetTest extends FunctionalTest {
+public final class AddGetTest extends RMConsecutive {
 
     /** GET->RELEASE duration time in ms */
     public static long GR_DURATION = 1000;
@@ -92,10 +92,9 @@ public final class AddGetTest extends FunctionalTest {
         RMTHelper helper = RMTHelper.getDefaultInstance();
 
         final ResourceManager r = helper.getResourceManager();
-
         // The username and thr password must be the same a used to connect to the RM
-        final String adminLogin = RMTHelper.username;
-        final String adminPassword = RMTHelper.password;
+        final String adminLogin = RMTHelper.defaultUserName;
+        final String adminPassword = RMTHelper.defaultUserPassword;
 
         // All accounting values are checked through JMX
         final RMAuthentication auth = (RMAuthentication) helper.getRMAuth();
@@ -125,9 +124,10 @@ public final class AddGetTest extends FunctionalTest {
         int providedNodesCount = (Integer) ((Attribute) atts.get(2)).getValue();
 
         Assert
-                .assertTrue(
+                .assertEquals(
                         "The accounts must not be refreshed automatically therefore the LastRefreshDurationInMilliseconds must be 0",
-                        (Long) conn.getAttribute(managementMBeanName, "LastRefreshDurationInMilliseconds") == 0l);
+                        (Long) 0l, (Long) conn.getAttribute(managementMBeanName,
+                                "LastRefreshDurationInMilliseconds"));
         Assert.assertTrue("The usedNodeTime attribute must be 0", usedNodeTime == 0);
         Assert.assertTrue("The providedNodeTime attribute must be 0", providedNodeTime == 0);
         Assert.assertTrue("The providedNodesCount attribute must be 0", providedNodesCount == 0);

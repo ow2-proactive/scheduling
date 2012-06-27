@@ -36,21 +36,11 @@
  */
 package functionaltests.monitor;
 
-import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
-import org.ow2.proactive.authentication.crypto.CredData;
-import org.ow2.proactive.authentication.crypto.Credentials;
-import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.common.event.RMEvent;
-import org.ow2.proactive.resourcemanager.common.event.RMInitialState;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
-import org.ow2.proactive.resourcemanager.exception.RMException;
-import org.ow2.proactive.resourcemanager.frontend.RMEventListener;
 import org.ow2.proactive.resourcemanager.frontend.RMGroupEventListener;
-import org.ow2.proactive.resourcemanager.frontend.RMMonitoring;
-
-import functionaltests.RMTHelper;
 
 
 @ActiveObject
@@ -86,16 +76,4 @@ public class RMMonitorEventReceiver extends RMGroupEventListener {
         System.out.println("Event: " + event);
         monitorsHandler.handleSchedulerStateEvent(event.getEventType());
     }
-
-    public RMInitialState init(RMAuthentication auth) throws Exception {
-        Credentials cred = Credentials.createCredentials(
-                new CredData(RMTHelper.username, RMTHelper.password), auth.getPublicKey());
-        RMMonitoring monitor = auth.login(cred).getMonitoring();
-        return monitor.addRMEventListener((RMEventListener) PAActiveObject.getStubOnThis());
-    }
-
-    public void removeListener(RMMonitoring monitor) throws RMException {
-        monitor.removeRMEventListener();
-    }
-
 }

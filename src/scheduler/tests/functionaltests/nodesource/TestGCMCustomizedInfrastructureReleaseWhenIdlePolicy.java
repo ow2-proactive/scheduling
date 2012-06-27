@@ -102,6 +102,6 @@ public class TestGCMCustomizedInfrastructureReleaseWhenIdlePolicy extends
                     .getAbsolutePath());
         }
 
-        helper.connectToExistingRM();
+        helper.getResourceManager(null, RMTHelper.defaultUserName, RMTHelper.defaultUserPassword);
     }
 }

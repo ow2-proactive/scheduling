@@ -71,7 +71,7 @@ public class TestGCMCustomizedInfrastructureStaticPolicy extends TestLocalInfras
         // overriding gcma file
         helper.getResourceManager(new File(RMTHelper.class.getResource(
                 "/functionaltests/config/functionalTRMPropertiesForCustomisedIM.ini").toURI())
-                .getAbsolutePath());
+                .getAbsolutePath(), RMTHelper.defaultUserName, RMTHelper.defaultUserPassword);
         // using localhost deployment for customized infrastructure
         String oneNodeescriptor = new File(RMTHelper.class.getResource(
                 "/functionaltests/nodesource/1node.xml").toURI()).getAbsolutePath();

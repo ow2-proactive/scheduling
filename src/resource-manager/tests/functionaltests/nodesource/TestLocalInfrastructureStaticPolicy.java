@@ -36,10 +36,9 @@
  */
 package functionaltests.nodesource;
 
-import static junit.framework.Assert.assertTrue;
-
 import java.io.File;
-import java.net.URL;
+
+import junit.framework.Assert;
 
 import org.objectweb.proactive.core.node.Node;
 import org.ow2.proactive.resourcemanager.common.RMState;
@@ -51,7 +50,7 @@ import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.ow2.proactive.utils.FileToBytesConverter;
 import org.ow2.proactive.utils.NodeSet;
 
-import org.ow2.tests.FunctionalTest;
+import functionaltests.RMConsecutive;
 import functionaltests.RMTHelper;
 
 
@@ -61,7 +60,7 @@ import functionaltests.RMTHelper;
  * and static acquisition policy.
  *
  */
-public class TestLocalInfrastructureStaticPolicy extends FunctionalTest {
+public class TestLocalInfrastructureStaticPolicy extends RMConsecutive {
 
     protected int defaultDescriptorNodesNb = 3;
 
@@ -127,9 +126,7 @@ public class TestLocalInfrastructureStaticPolicy extends FunctionalTest {
         String source2 = "Node_source_2";
 
         RMTHelper helper = RMTHelper.getDefaultInstance();
-
         ResourceManager resourceManager = helper.getResourceManager();
-
         RMTHelper.log("Test 1 - creation/removal of empty node source");
 
         RMTHelper.log("creation");
@@ -143,8 +140,8 @@ public class TestLocalInfrastructureStaticPolicy extends FunctionalTest {
         createNodeSourceWithNodes(source1);
 
         RMState s = resourceManager.getState();
-        assertTrue(s.getTotalNodesNumber() == defaultDescriptorNodesNb);
-        assertTrue(s.getFreeNodesNumber() == defaultDescriptorNodesNb);
+        Assert.assertEquals(defaultDescriptorNodesNb, s.getTotalNodesNumber());
+        Assert.assertEquals(defaultDescriptorNodesNb, s.getFreeNodesNumber());
         // releasing some nodes
         NodeSet ns = resourceManager.getAtMostNodes(defaultDescriptorNodesNb, null);
 
@@ -155,8 +152,8 @@ public class TestLocalInfrastructureStaticPolicy extends FunctionalTest {
             helper.waitForNodeEvent(RMEventType.NODE_REMOVED, n.getNodeInformation().getURL());
         }
 
-        assertTrue(resourceManager.getState().getTotalNodesNumber() == 0);
-        assertTrue(resourceManager.getState().getFreeNodesNumber() == 0);
+        Assert.assertEquals(0, resourceManager.getState().getTotalNodesNumber());
+        Assert.assertEquals(0, resourceManager.getState().getFreeNodesNumber());
         resourceManager.removeNodeSource(source1, true);
         helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, source1);
 
@@ -164,8 +161,8 @@ public class TestLocalInfrastructureStaticPolicy extends FunctionalTest {
         createNodeSourceWithNodes(source1);
         createNodeSourceWithNodes(source2);
 
-        assertTrue(resourceManager.getState().getTotalNodesNumber() == 2 * defaultDescriptorNodesNb);
-        assertTrue(resourceManager.getState().getFreeNodesNumber() == 2 * defaultDescriptorNodesNb);
+        Assert.assertEquals(2 * defaultDescriptorNodesNb, resourceManager.getState().getTotalNodesNumber());
+        Assert.assertEquals(2 * defaultDescriptorNodesNb, resourceManager.getState().getFreeNodesNumber());
 
         resourceManager.removeNodeSource(source1, true);
         //wait the n events of the n nodes removals of the node source

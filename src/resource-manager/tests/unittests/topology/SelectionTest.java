@@ -34,7 +34,7 @@
  * ################################################################
  * $$ACTIVEEON_CONTRIBUTOR$$
  */
-package functionaltests.topology;
+package unittests.topology;
 
 import java.io.File;
 import java.util.HashMap;
@@ -82,7 +82,7 @@ import functionaltests.RMTHelper;
 public class SelectionTest extends FunctionalTest {
 
     private String vmPropSelectionScriptpath = this.getClass().getResource(
-            "../selectionscript/vmPropertySelectionScript.js").getPath();
+            "../../functionaltests/selectionscript/vmPropertySelectionScript.js").getPath();
 
     private String vmPropKey1 = "myProperty1";
     private String vmPropValue1 = "myValue1";
@@ -140,10 +140,6 @@ public class SelectionTest extends FunctionalTest {
             return;
         }
 
-        // adding default nodes
-        helper.createDefaultNodeSource();
-        helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, NodeSource.DEFAULT);
-
         // creating the selection script object
         SelectionScript script = new SelectionScript(new File(vmPropSelectionScriptpath), new String[] {
                 this.vmPropKey1, this.vmPropValue1 }, true);
@@ -151,13 +147,6 @@ public class SelectionTest extends FunctionalTest {
         scriptList.add(script);
 
         ResourceManager resourceManager = helper.getResourceManager();
-
-        for (int i = 0; i < RMTHelper.defaultNodesNumber; i++) {
-            helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
-            //wait for the nodes to be in free state
-            helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-        }
-
         String node1 = "node1";
 
         //a node with the VM properties

@@ -50,7 +50,6 @@ import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
-import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.core.rmproxies.PerUserConnectionRMProxiesManager;
 import org.ow2.proactive.scheduler.core.rmproxies.RMProxiesManager;
@@ -83,7 +82,8 @@ public class TestRMProxy extends FunctionalTest {
 
     @Test
     public void testProxiesManager() throws Exception {
-        createNodeSource();
+        helper.getResourceManager();
+        helper.createNodeSource();
 
         System.out.println("\n Test with per-user connection \n");
         testRMProxies(false);
@@ -91,15 +91,6 @@ public class TestRMProxy extends FunctionalTest {
         System.out.println("\n Test with single connection \n");
 
         testRMProxies(true);
-    }
-
-    private void createNodeSource() throws Exception {
-        helper.createDefaultNodeSource(NODES_NUMBER);
-        helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, NodeSource.DEFAULT);
-        for (int i = 0; i < NODES_NUMBER; i++) {
-            helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
-            helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-        }
     }
 
     private void testRMProxies(boolean singleUserConnection) throws Exception {

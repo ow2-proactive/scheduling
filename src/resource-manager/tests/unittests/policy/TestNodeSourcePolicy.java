@@ -34,7 +34,7 @@
  * ################################################################
  * $$ACTIVEEON_CONTRIBUTOR$$
  */
-package functionaltests.nodesource;
+package unittests.policy;
 
 import java.io.BufferedWriter;
 import java.io.File;

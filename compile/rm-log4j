@@ -1,22 +1,28 @@
-# This file represents the log4j config file for Resource Manager. (FOR TEST purpose only)
-# It is given as property in the build.xml file
+# Default: INFO level, FILE appender
+log4j.rootLogger=WARN, CONSOLE
 
-# The default logging level is INFO
-# The root logger logs in CONSOLE
+log4j.logger.proactive.configuration=ERROR
 
-log4j.rootLogger=INFO,CONSOLE
+# everything from RM has level DEBUG...
+log4j.logger.proactive.resourceManager=DEBUG
 
-# avoid displaying additivity of the inherit loggers
-log4j.additivity.proactive.resourceManager=false
-# define RESOURCE MANAGER loggers
-log4j.logger.proactive.resourceManager=WARN,CONSOLE
+# ...except statistics and database
+log4j.logger.proactive.resourceManager.statistics=WARN
+log4j.logger.proactive.resourceManager.database=WARN
+log4j.logger.proactive.resourceManager.connection=WARN
 
-# CONSOLE uses PatternLayout
+# ... and rmlauncher and consol. These also go to CONSOLE appender
+log4j.logger.proactive.resourceManager.rmlauncher=INFO, CONSOLE
+log4j.logger.proactive.resourceManager.consol=INFO, CONSOLE
+
+log4j.additivity.org.hibernate=false
+log4j.logger.org.hibernate=WARN, CONSOLE
+
+log4j.logger.com.mchange=WARN, CONSOLE
+log4j.logger.com.mchange.v2.c3p0=WARN, CONSOLE
+log4j.logger.com.mchange.v2.c3p0.SQLWarnings=WARN, CONSOLE
+
+# CONSOLE appender
 log4j.appender.CONSOLE=org.apache.log4j.ConsoleAppender
 log4j.appender.CONSOLE.layout=org.apache.log4j.PatternLayout
-log4j.appender.CONSOLE.layout.ConversionPattern=%m%n
-
-# RM Appender configuration (CONSOLE)
-log4j.appender.resourceManagerAppender=org.apache.log4j.ConsoleAppender
-log4j.appender.resourceManagerAppender.layout=org.apache.log4j.PatternLayout
-log4j.appender.resourceManagerAppender.layout.ConversionPattern=[%-5p] [RESOURCE_MANAGER.%C{1}] %m%n
+log4j.appender.CONSOLE.layout.ConversionPattern=[%-5p %d{ISO8601}] [RM.%C{1}.%M] %m%n

@@ -47,13 +47,11 @@ import org.objectweb.proactive.api.PAFuture;
 import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
-import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
-import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.utils.NodeSet;
 
-import org.ow2.tests.FunctionalTest;
+import functionaltests.RMConsecutive;
 import functionaltests.RMTHelper;
 
 
@@ -80,7 +78,7 @@ import functionaltests.RMTHelper;
  * @author ProActive team
  *
  */
-public class DynamicSelectionScriptTest extends FunctionalTest {
+public class DynamicSelectionScriptTest extends RMConsecutive {
 
     private URL vmPropSelectionScriptpath = this.getClass().getResource("vmPropertySelectionScript.js");
 
@@ -100,18 +98,8 @@ public class DynamicSelectionScriptTest extends FunctionalTest {
     @org.junit.Test
     public void action() throws Exception {
         RMTHelper helper = RMTHelper.getDefaultInstance();
-
-        RMTHelper.log("Deployment");
-        helper.createDefaultNodeSource();
-        helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, NodeSource.DEFAULT);
-
-        for (int i = 0; i < RMTHelper.defaultNodesNumber; i++) {
-            helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
-            //waiting for the nodes to be in free state
-            helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-        }
-
         ResourceManager resourceManager = helper.getResourceManager();
+        int nsSize = helper.createNodeSource("DynamicSelectionScriptTest");
 
         //String hostName = ProActiveInet.getInstance().getHostname();
         String node1Name = "node1";
@@ -140,7 +128,7 @@ public class DynamicSelectionScriptTest extends FunctionalTest {
         PAFuture.waitFor(nodes);
 
         assertTrue(nodes.size() == 1);
-        assertTrue(resourceManager.getState().getFreeNodesNumber() == RMTHelper.defaultNodesNumber);
+        assertTrue(resourceManager.getState().getFreeNodesNumber() == nsSize);
         assertTrue(nodes.get(0).getNodeInformation().getURL().equals(node1URL));
 
         RMNodeEvent evt = helper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node1URL);
@@ -160,7 +148,7 @@ public class DynamicSelectionScriptTest extends FunctionalTest {
         PAFuture.waitFor(nodes);
 
         assertTrue(nodes.size() == 1);
-        assertTrue(resourceManager.getState().getFreeNodesNumber() == RMTHelper.defaultNodesNumber);
+        assertTrue(resourceManager.getState().getFreeNodesNumber() == nsSize);
         assertTrue(nodes.get(0).getNodeInformation().getURL().equals(node1URL));
 
         //wait for node busy event
@@ -191,7 +179,7 @@ public class DynamicSelectionScriptTest extends FunctionalTest {
         PAFuture.waitFor(nodes);
 
         assertTrue(nodes.size() == 2);
-        assertTrue(resourceManager.getState().getFreeNodesNumber() == RMTHelper.defaultNodesNumber);
+        assertTrue(resourceManager.getState().getFreeNodesNumber() == nsSize);
 
         //wait for nodes busy event
         evt = helper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node1URL);
@@ -222,7 +210,7 @@ public class DynamicSelectionScriptTest extends FunctionalTest {
         PAFuture.waitFor(nodes);
 
         assertTrue(nodes.size() == 0);
-        assertTrue(resourceManager.getState().getFreeNodesNumber() == RMTHelper.defaultNodesNumber);
+        assertTrue(resourceManager.getState().getFreeNodesNumber() == nsSize);
 
         RMTHelper.log("Test 5");
 
@@ -239,7 +227,7 @@ public class DynamicSelectionScriptTest extends FunctionalTest {
             Assert.assertTrue(false);
         } catch (RuntimeException e) {
         }
-        assertTrue(resourceManager.getState().getFreeNodesNumber() == RMTHelper.defaultNodesNumber);
+        assertTrue(resourceManager.getState().getFreeNodesNumber() == nsSize);
 
         RMTHelper.log("Test 6");
 
@@ -256,7 +244,7 @@ public class DynamicSelectionScriptTest extends FunctionalTest {
             Assert.assertTrue(false);
         } catch (RuntimeException e) {
         }
-        assertTrue(resourceManager.getState().getFreeNodesNumber() == RMTHelper.defaultNodesNumber);
+        assertTrue(resourceManager.getState().getFreeNodesNumber() == nsSize);
 
         RMTHelper.log("Test 7");
 
@@ -286,7 +274,7 @@ public class DynamicSelectionScriptTest extends FunctionalTest {
         Assert.assertEquals(0, nodes.size());
         System.out.println("Correct");
 
-        Thread.sleep(PAResourceManagerProperties.RM_SELECT_SCRIPT_NODE_DYNAMICITY.getValueAsInt());
+        Thread.sleep(10000);
 
         System.out.println("The dynamic script checking is file exists must pass " + FILE_NAME);
         nodes = resourceManager.getAtMostNodes(1, fileCheck);

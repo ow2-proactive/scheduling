@@ -112,7 +112,7 @@ public class TestGCMInfrastructureReleaseWhenIdlePolicy extends FunctionalTest {
         RMFactory.setOsJavaProperty();
         GCMDeploymentData = FileToBytesConverter.convertFileToByteArray((new File(getDescriptor())));
         SchedulerTHelper.startSchedulerWithEmptyResourceManager();
-        helper.connectToExistingRM();
+        helper.getResourceManager(null, RMTHelper.defaultUserName, RMTHelper.defaultUserPassword);
     }
 
     /** Actions to be Perform by this test.

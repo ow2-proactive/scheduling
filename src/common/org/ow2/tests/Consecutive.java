@@ -29,32 +29,22 @@
  *
  *  Initial developer(s):               The ProActive Team
  *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s): ActiveEon Team - http://www.activeeon.com
+ *  Contributor(s):
  *
  * ################################################################
- * $$ACTIVEEON_CONTRIBUTOR$$
+ * $$PROACTIVE_INITIAL_DEV$$
  */
-package functionaltests.topology;
+package org.ow2.tests;
 
-import org.objectweb.proactive.core.node.NodeImpl;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 
 
-public class DummyNode extends NodeImpl {
-    private String name;
-
-    public DummyNode(String name) {
-        this.name = name;
-    }
-
-    public String toString() {
-        return name;
-    }
-
-    public boolean equals(Object obj) {
-        return name.equals(obj.toString());
-    }
-
-    public int hashCode() {
-        return name.hashCode();
-    }
+/**
+ * 
+ * An annotation indicates that test consecutively after another test in the same JVM. 
+ *
+ */
+@Retention(RetentionPolicy.RUNTIME)
+public @interface Consecutive {
 }

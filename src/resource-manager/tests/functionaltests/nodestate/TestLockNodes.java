@@ -39,7 +39,6 @@ package functionaltests.nodestate;
 import static junit.framework.Assert.assertTrue;
 
 import java.util.HashSet;
-import java.util.Set;
 
 import junit.framework.Assert;
 
@@ -47,12 +46,12 @@ import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
+import org.ow2.proactive.resourcemanager.common.event.RMInitialState;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
-import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.utils.NodeSet;
 
-import org.ow2.tests.FunctionalTest;
+import functionaltests.RMConsecutive;
 import functionaltests.RMTHelper;
 
 
@@ -64,7 +63,7 @@ import functionaltests.RMTHelper;
  * Unlock changes node states to "free".
  *
  */
-public class TestLockNodes extends FunctionalTest {
+public class TestLockNodes extends RMConsecutive {
 
     /** Actions to be Perform by this test.
      * The method is called automatically by Junit framework.
@@ -77,16 +76,12 @@ public class TestLockNodes extends FunctionalTest {
         RMTHelper.log("Deployment");
 
         ResourceManager resourceManager = helper.getResourceManager();
+        int nodesNumber = helper.createNodeSource("TestLockNodes");
 
-        helper.createLocalNodeSource();
-        helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, NodeSource.LOCAL_INFRASTRUCTURE_NAME);
-
-        Set<String> nodesUrls = new HashSet<String>();
-        for (int i = 0; i < RMTHelper.defaultNodesNumber; i++) {
-            helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
-            //wait for the nodes to be in free state
-            RMNodeEvent nodeEvent = helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-            nodesUrls.add(nodeEvent.getNodeUrl());
+        HashSet<String> nodesUrls = new HashSet<String>();
+        RMInitialState state = RMTHelper.getDefaultInstance().getResourceManager().getMonitoring().getState();
+        for (RMNodeEvent ne : state.getNodesEvents()) {
+            nodesUrls.add(ne.getNodeUrl());
         }
 
         RMTHelper.log("Test 1 - locking");
@@ -94,7 +89,7 @@ public class TestLockNodes extends FunctionalTest {
         BooleanWrapper status = resourceManager.lockNodes(nodesUrls);
         if (status.getBooleanValue()) {
 
-            for (int i = 0; i < RMTHelper.defaultNodesNumber; i++) {
+            for (int i = 0; i < nodesNumber; i++) {
                 RMNodeEvent nodeEvent = helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
                 Assert.assertEquals(nodeEvent.getNodeState(), NodeState.LOCKED);
             }
@@ -107,7 +102,7 @@ public class TestLockNodes extends FunctionalTest {
         status = resourceManager.unlockNodes(nodesUrls);
         if (status.getBooleanValue()) {
 
-            for (int i = 0; i < RMTHelper.defaultNodesNumber; i++) {
+            for (int i = 0; i < nodesNumber; i++) {
                 RMNodeEvent nodeEvent = helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
                 Assert.assertEquals(nodeEvent.getNodeState(), NodeState.FREE);
             }
@@ -117,13 +112,13 @@ public class TestLockNodes extends FunctionalTest {
 
         RMTHelper.log("Test 3 - locking non-free nodes");
 
-        NodeSet nodes = resourceManager.getAtMostNodes(RMTHelper.defaultNodesNumber, null);
+        NodeSet nodes = resourceManager.getAtMostNodes(nodesNumber, null);
 
         PAFuture.waitFor(nodes);
-        assertTrue(nodes.size() == RMTHelper.defaultNodesNumber);
+        assertTrue(nodes.size() == nodesNumber);
         assertTrue(resourceManager.getState().getFreeNodesNumber() == 0);
 
-        for (int i = 0; i < RMTHelper.defaultNodesNumber; i++) {
+        for (int i = 0; i < nodesNumber; i++) {
             RMNodeEvent evt = helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
             Assert.assertEquals(evt.getNodeState(), NodeState.BUSY);
         }
@@ -137,7 +132,7 @@ public class TestLockNodes extends FunctionalTest {
 
         RMTHelper.log("Test 4 - unlocking nodes which are not locked");
 
-        res = resourceManager.lockNodes(nodesUrls);
+        res = resourceManager.unlockNodes(nodesUrls);
         if (res.getBooleanValue()) {
             Assert.assertTrue("Successfully unlocked busy nodes", false);
         } else {

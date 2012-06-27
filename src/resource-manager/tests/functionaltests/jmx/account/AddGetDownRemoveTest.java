@@ -57,8 +57,9 @@ import org.ow2.proactive.resourcemanager.core.jmx.RMJMXHelper;
 import org.ow2.proactive.resourcemanager.core.jmx.mbean.ManagementMBean;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
+import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 
-import org.ow2.tests.FunctionalTest;
+import functionaltests.RMConsecutive;
 import functionaltests.RMTHelper;
 
 
@@ -74,7 +75,7 @@ import functionaltests.RMTHelper;
  *  
  * @author The ProActive Team 
  */
-public final class AddGetDownRemoveTest extends FunctionalTest {
+public final class AddGetDownRemoveTest extends RMConsecutive {
 
     /** GET->RELEASE duration time in ms */
     public static long GR_DURATION = 1000;
@@ -87,22 +88,18 @@ public final class AddGetDownRemoveTest extends FunctionalTest {
     public void action() throws Exception {
         RMTHelper helper = RMTHelper.getDefaultInstance();
 
-        final ResourceManager r = helper.getResourceManager();
-
         // The username and thr password must be the same a used to connect to the RM
-        final String adminLogin = RMTHelper.username;
-        final String adminPassword = RMTHelper.password;
-
+        final ResourceManager r = helper.getResourceManager();
         // All accounting values are checked through JMX
         final RMAuthentication auth = (RMAuthentication) RMTHelper.getDefaultInstance().getRMAuth();
         final PublicKey pubKey = auth.getPublicKey();
-        final Credentials adminCreds = Credentials.createCredentials(new CredData(adminLogin, adminPassword),
-                pubKey);
+        final Credentials adminCreds = Credentials.createCredentials(new CredData(RMTHelper.defaultUserName,
+            RMTHelper.defaultUserPassword), pubKey);
 
         final JMXServiceURL jmxRmiServiceURL = new JMXServiceURL(auth
                 .getJMXConnectorURL(JMXTransportProtocol.RMI));
         final HashMap<String, Object> env = new HashMap<String, Object>(1);
-        env.put(JMXConnector.CREDENTIALS, new Object[] { adminLogin, adminCreds });
+        env.put(JMXConnector.CREDENTIALS, new Object[] { RMTHelper.defaultUserName, adminCreds });
 
         // Connect to the JMX RMI Connector Server
         final ObjectName myAccountMBeanName = new ObjectName(RMJMXHelper.MYACCOUNT_MBEAN_NAME);
@@ -110,17 +107,23 @@ public final class AddGetDownRemoveTest extends FunctionalTest {
         final JMXConnector jmxConnector = JMXConnectorFactory.connect(jmxRmiServiceURL, env);
         final MBeanServerConnection conn = jmxConnector.getMBeanServerConnection();
 
+        long usedNodeTime = (Long) conn.getAttribute(myAccountMBeanName, "UsedNodeTime");
+
         // ADD, GET, DOWN, REMOVE
         // 1) ADD
-        final String name = "test";
+        final String name = "AddGetDownRemoveTest";
         Node node = RMTHelper.getDefaultInstance().createNode(name).getNode();
         final String nodeURL = node.getNodeInformation().getURL();
         r.addNode(nodeURL).getBooleanValue();
 
-        // wait for node from configuring to free
-        RMTHelper.getDefaultInstance().waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, NodeSource.DEFAULT);
+        r.setNodeSourcePingFrequency(5000, NodeSource.DEFAULT);
 
-        // 2) GET
+        // wait for node from configuring to free
+        helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
+        helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+
+        // 2) GET the same node
         final long beforeGetTime = System.currentTimeMillis();
         node = r.getAtMostNodes(1, null).get(0);
 
@@ -128,7 +131,10 @@ public final class AddGetDownRemoveTest extends FunctionalTest {
         Thread.sleep(GR_DURATION);
 
         // 3) Kill the node to ensure that the RM considers it as being DOWN
-        node.getProActiveRuntime().killNode(name);
+        try {
+            node.getProActiveRuntime().killRT(false);
+        } catch (Exception e) {
+        }
         while (r.nodeIsAvailable(nodeURL).getBooleanValue()) {
             Thread.sleep(500);
         }
@@ -142,7 +148,7 @@ public final class AddGetDownRemoveTest extends FunctionalTest {
         conn.invoke(managementMBeanName, "clearAccoutingCache", null, null);
 
         // Check account values validity
-        long usedNodeTime = (Long) conn.getAttribute(myAccountMBeanName, "UsedNodeTime");
+        usedNodeTime = (Long) conn.getAttribute(myAccountMBeanName, "UsedNodeTime") - usedNodeTime;
         Assert.assertTrue("Invalid value of the usedNodeTime attribute : " + usedNodeTime +
             " while expected is " + GR_DURATION, (usedNodeTime >= GR_DURATION) &&
             (usedNodeTime <= getDownMaxDuration));

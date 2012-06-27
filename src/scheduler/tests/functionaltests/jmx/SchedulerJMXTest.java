@@ -85,8 +85,8 @@ public final class SchedulerJMXTest extends FunctionalTest {
         final String userLogin = "demo";
         final String userPassword = "demo";
 
-        final String adminLogin = RMTHelper.username;
-        final String adminPassword = RMTHelper.password;
+        final String adminLogin = RMTHelper.defaultUserName;
+        final String adminPassword = RMTHelper.defaultUserPassword;
 
         final SchedulerAuthenticationInterface auth = (SchedulerAuthenticationInterface) SchedulerTHelper
                 .getSchedulerAuth();

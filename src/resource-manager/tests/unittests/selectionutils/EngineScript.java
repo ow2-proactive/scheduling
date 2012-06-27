@@ -34,7 +34,7 @@
  * ################################################################
  * $$ACTIVEEON_CONTRIBUTOR$$
  */
-package selectionutils;
+package unittests.selectionutils;
 
 import java.io.BufferedInputStream;
 import java.io.File;

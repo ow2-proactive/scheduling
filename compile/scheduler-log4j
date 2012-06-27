@@ -6,6 +6,8 @@
 
 log4j.rootLogger=INFO,CONSOLE
 
+log4j.logger.proactive.configuration=ERROR
+
 # avoid displaying additivity of the inherit loggers
 log4j.additivity.proactive.scheduler=false
 log4j.additivity.proactive.scheduler.dev=false
@@ -23,6 +25,10 @@ log4j.logger.proactive.resourceManager=WARN,CONSOLE
 # Hibernate logger
 log4j.additivity.org.hibernate=false
 log4j.logger.org.hibernate=WARN,CONSOLE
+
+log4j.logger.com.mchange=WARN, CONSOLE
+log4j.logger.com.mchange.v2.c3p0=WARN, CONSOLE
+log4j.logger.com.mchange.v2.c3p0.SQLWarnings=WARN, CONSOLE
 
 # CONSOLE uses PatternLayout
 log4j.appender.CONSOLE=org.apache.log4j.ConsoleAppender

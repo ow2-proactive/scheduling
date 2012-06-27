@@ -50,11 +50,12 @@ import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
-import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
+import org.ow2.proactive.resourcemanager.nodesource.infrastructure.DefaultInfrastructureManager;
+import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.utils.NodeSet;
 
-import org.ow2.tests.FunctionalTest;
+import functionaltests.RMConsecutive;
 import functionaltests.RMTHelper;
 
 
@@ -74,7 +75,7 @@ import functionaltests.RMTHelper;
  * As a result second node should be selected.
  *
  */
-public class SelectionWithSeveralScriptsTest2 extends FunctionalTest {
+public class SelectionWithSeveralScriptsTest2 extends RMConsecutive {
 
     private URL vmPropSelectionScriptpath = this.getClass().getResource("vmPropertySelectionScript.js");
 
@@ -91,21 +92,15 @@ public class SelectionWithSeveralScriptsTest2 extends FunctionalTest {
     @org.junit.Test
     public void action() throws Exception {
         RMTHelper helper = RMTHelper.getDefaultInstance();
-
         ResourceManager resourceManager = helper.getResourceManager();
 
-        RMTHelper.log("Deployment");
-        helper.createDefaultNodeSource();
-        helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, NodeSource.DEFAULT);
+        String nodeSourceName = "SelectionWithSeveralScriptsTest2";
+        resourceManager.createNodeSource(nodeSourceName, DefaultInfrastructureManager.class.getName(), null,
+                StaticPolicy.class.getName(), new Object[] { "ALL", "ALL" }).getBooleanValue();
+        helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, nodeSourceName);
 
-        for (int i = 0; i < RMTHelper.defaultNodesNumber; i++) {
-            helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
-            //wait for the nodes to be in free state
-            helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-        }
-
-        String node1Name = "node1";
-        String node2Name = "node2";
+        String node1Name = "node-sel2-1";
+        String node2Name = "node-sel2-2";
 
         //---------------------------------------------------
         //create a first node with one VM property
@@ -115,7 +110,7 @@ public class SelectionWithSeveralScriptsTest2 extends FunctionalTest {
         vmProp1.put(this.vmPropKey1, this.vmPropValue1);
 
         String node1URL = helper.createNode(node1Name, vmProp1).getNode().getNodeInformation().getURL();
-        resourceManager.addNode(node1URL);
+        resourceManager.addNode(node1URL, nodeSourceName);
 
         //wait node adding event
         helper.waitForNodeEvent(RMEventType.NODE_ADDED, node1URL);
@@ -132,7 +127,7 @@ public class SelectionWithSeveralScriptsTest2 extends FunctionalTest {
 
         String node2URL = helper.createNode(node2Name, vmTwoProperties).getNode().getNodeInformation()
                 .getURL();
-        resourceManager.addNode(node2URL);
+        resourceManager.addNode(node2URL, nodeSourceName);
 
         //wait node adding event
         helper.waitForNodeEvent(RMEventType.NODE_ADDED, node2URL);
@@ -160,19 +155,18 @@ public class SelectionWithSeveralScriptsTest2 extends FunctionalTest {
         PAFuture.waitFor(nodes);
 
         assertTrue(nodes.size() == 1);
-        assertTrue(nodes.get(0).getNodeInformation().getURL().equals(node2URL));
+        Assert.assertEquals(node2URL, nodes.get(0).getNodeInformation().getURL());
 
         //wait for node busy event
         RMNodeEvent evt = helper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node2URL);
         Assert.assertEquals(evt.getNodeState(), NodeState.BUSY);
-        assertTrue(resourceManager.getState().getFreeNodesNumber() == RMTHelper.defaultNodesNumber + 1);
+        assertTrue(resourceManager.getState().getFreeNodesNumber() == 1);
 
         resourceManager.releaseNodes(nodes);
         //wait for node free event
         evt = helper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node2URL);
         Assert.assertEquals(evt.getNodeState(), NodeState.FREE);
 
-        assertTrue(resourceManager.getState().getFreeNodesNumber() == RMTHelper.defaultNodesNumber + 2);
-
+        assertTrue(resourceManager.getState().getFreeNodesNumber() == 2);
     }
 }

@@ -40,11 +40,10 @@ import org.objectweb.proactive.core.node.Node;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.core.RMCore;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
-import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.DefaultInfrastructureManager;
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 
-import org.ow2.tests.FunctionalTest;
+import functionaltests.RMConsecutive;
 import functionaltests.RMTHelper;
 
 
@@ -53,9 +52,10 @@ import functionaltests.RMTHelper;
  * exists and that lead to dead lock in the past.
  * Running this test ensure that at least the dead lock doesn't occur.
  */
-public class TestAddRemoveAll extends FunctionalTest {
+public class TestAddRemoveAll extends RMConsecutive {
 
-    String nodeName = "nodeDeadLock";
+    private String nodeName = "nodeDeadLock";
+    private String nsName = "TestAddRemoveAll";
 
     @org.junit.Test
     public void action() throws Exception {
@@ -63,16 +63,15 @@ public class TestAddRemoveAll extends FunctionalTest {
 
         ResourceManager resourceManager = helper.getResourceManager();
         RMTHelper.log("Add/RemoveAll");
-        resourceManager.createNodeSource(NodeSource.DEFAULT, DefaultInfrastructureManager.class.getName(),
-                null, StaticPolicy.class.getName(), null);
-        helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, NodeSource.DEFAULT);
+        resourceManager.createNodeSource(nsName, DefaultInfrastructureManager.class.getName(), null,
+                StaticPolicy.class.getName(), null);
+        helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, nsName);
         Node nodeToAdd = helper.createNode(nodeName).getNode();
-        resourceManager.addNode(nodeToAdd.getNodeInformation().getURL(), NodeSource.DEFAULT)
-                .getBooleanValue();
+        resourceManager.addNode(nodeToAdd.getNodeInformation().getURL(), nsName).getBooleanValue();
         //at this time, nodes maybe fully added in the nodesource but not in the core
         //the next removal may fail for some nodes that are not known by the core...
         RMCore resourceManagerIMPL = (RMCore) resourceManager;
-        resourceManagerIMPL.removeAllNodes(NodeSource.DEFAULT, true);
+        resourceManagerIMPL.removeAllNodes(nsName, true);
         if (resourceManager.getState().getTotalNodesNumber() != 0) {
             RMTHelper.log("The removeAll method in RMCore didn't removed all nodes");
         } else {

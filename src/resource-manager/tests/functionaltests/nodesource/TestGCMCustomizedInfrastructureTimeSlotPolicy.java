@@ -81,7 +81,7 @@ public class TestGCMCustomizedInfrastructureTimeSlotPolicy extends TestLocalInfr
         // overriding gcma file
         helper.getResourceManager(new File(RMTHelper.class.getResource(
                 "/functionaltests/config/functionalTRMPropertiesForCustomisedIM.ini").toURI())
-                .getAbsolutePath());
+                .getAbsolutePath(), RMTHelper.defaultUserName, RMTHelper.defaultUserPassword);
         hostsListData = InetAddress.getLocalHost().getHostName().getBytes();
     }
 

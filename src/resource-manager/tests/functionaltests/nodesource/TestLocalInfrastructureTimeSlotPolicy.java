@@ -44,7 +44,7 @@ import org.ow2.proactive.resourcemanager.nodesource.infrastructure.LocalInfrastr
 import org.ow2.proactive.resourcemanager.nodesource.policy.TimeSlotPolicy;
 import org.ow2.proactive.utils.FileToBytesConverter;
 
-import org.ow2.tests.FunctionalTest;
+import functionaltests.RMConsecutive;
 import functionaltests.RMTHelper;
 
 
@@ -56,7 +56,7 @@ import functionaltests.RMTHelper;
  * This test may failed by timeout if the machine is too slow, so gcm deployment takes more than 15 secs
  *
  */
-public class TestLocalInfrastructureTimeSlotPolicy extends FunctionalTest {
+public class TestLocalInfrastructureTimeSlotPolicy extends RMConsecutive {
 
     protected int descriptorNodeNumber = 1;
 

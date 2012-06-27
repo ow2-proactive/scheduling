@@ -64,6 +64,7 @@ public class SchedulerTStarter implements Serializable {
 
     protected String rmUsername = "demo";
     protected String rmPassword = "demo";
+    private static final int RM_NODE_NUMBER = 5;
 
     protected static String schedulerDefaultURL = "//Localhost/";
 
@@ -120,13 +121,13 @@ public class SchedulerTStarter implements Serializable {
             if (System.getProperty("proactive.test.runAsMe") != null) {
                 params.put("proactive.test.runAsMe", "true");
             }
-            Node[] nodes = new Node[RMTHelper.defaultNodesNumber];
-            for (int i = 0; i < RMTHelper.defaultNodesNumber; i++) {
+            Node[] nodes = new Node[RM_NODE_NUMBER];
+            for (int i = 0; i < RM_NODE_NUMBER; i++) {
                 String nodeName = "default_nodemyao_" + System.currentTimeMillis();
                 Node node = RMTHelper.getDefaultInstance().createNode(nodeName, params).getNode();
                 nodes[i] = node;
             }
-            for (int i = 0; i < RMTHelper.defaultNodesNumber; i++) {
+            for (int i = 0; i < RM_NODE_NUMBER; i++) {
                 rmAdmin.addNode(nodes[i].getNodeInformation().getURL());
             }
         }

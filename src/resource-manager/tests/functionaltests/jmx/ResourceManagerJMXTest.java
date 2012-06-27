@@ -61,7 +61,7 @@ import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.core.jmx.RMJMXHelper;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 
-import org.ow2.tests.FunctionalTest;
+import functionaltests.RMConsecutive;
 import functionaltests.RMTHelper;
 
 
@@ -72,7 +72,7 @@ import functionaltests.RMTHelper;
  * 
  * @author ProActive team
  */
-public final class ResourceManagerJMXTest extends FunctionalTest {
+public final class ResourceManagerJMXTest extends RMConsecutive {
 
     /**
      * test function
@@ -85,8 +85,10 @@ public final class ResourceManagerJMXTest extends FunctionalTest {
         final String userLogin = "demo";
         final String userPassword = "demo";
 
-        final String adminLogin = RMTHelper.username;
-        final String adminPassword = RMTHelper.password;
+        final String adminLogin = RMTHelper.defaultUserName;
+        final String adminPassword = RMTHelper.defaultUserPassword;
+
+        RMTHelper.getDefaultInstance().getResourceManager();
 
         final RMAuthentication auth = (RMAuthentication) RMTHelper.getDefaultInstance().getRMAuth();
         final PublicKey pubKey = auth.getPublicKey();

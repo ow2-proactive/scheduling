@@ -112,13 +112,13 @@ public class TestBoundedLinkedList {
         Assert.assertEquals(7, list.getBound());
         Assert.assertEquals(5, list.size());
         list.add(111);
-        Assert.assertEquals((Integer) 111, list.element());
-        Assert.assertEquals((Integer) 70, list.getLast());
+        Assert.assertEquals(111, list.element().intValue());
+        Assert.assertEquals(70, list.getLast().intValue());
         Assert.assertEquals(6, list.size());
         list.add(222);
         list.add(333);
-        Assert.assertEquals((Integer) 333, list.element());
-        Assert.assertEquals((Integer) 80, list.getLast());
+        Assert.assertEquals(333, list.element().intValue());
+        Assert.assertEquals(80, list.getLast().intValue());
         Assert.assertEquals(7, list.size());
     }
 

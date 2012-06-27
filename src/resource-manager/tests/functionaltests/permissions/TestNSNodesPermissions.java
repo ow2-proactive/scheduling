@@ -45,7 +45,7 @@ import org.ow2.proactive.resourcemanager.nodesource.infrastructure.DefaultInfras
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.ow2.proactive.utils.NodeSet;
 
-import org.ow2.tests.FunctionalTest;
+import functionaltests.RMConsecutive;
 import functionaltests.RMTHelper;
 
 
@@ -73,16 +73,17 @@ import functionaltests.RMTHelper;
  *
  *  Checking all possible combination of permissions.
  */
-public class TestNSNodesPermissions extends FunctionalTest {
+public class TestNSNodesPermissions extends RMConsecutive {
 
     @org.junit.Test
     public void action() throws Exception {
         RMTHelper helper = RMTHelper.getDefaultInstance();
+        helper.getResourceManager();
 
         String nsName = "ns";
         RMTHelper.log("Test1 - node users = ME");
 
-        ResourceManager nsadmin = helper.join("nsadmin", "pwd");
+        ResourceManager nsadmin = helper.getResourceManager(null, "nsadmin", "pwd");
         nsadmin.createNodeSource(nsName, DefaultInfrastructureManager.class.getName(), null,
                 StaticPolicy.class.getName(), new Object[] { "ME", "ALL" }).getBooleanValue();
 
@@ -100,9 +101,8 @@ public class TestNSNodesPermissions extends FunctionalTest {
         nsadmin.releaseNodes(nodes);
         //busy -> free
         helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-        nsadmin.disconnect();
 
-        ResourceManager user = helper.join("radmin", "pwd");
+        ResourceManager user = helper.getResourceManager(null, "radmin", "pwd");
         nodes = user.getAtMostNodes(1, null);
         Assert.assertEquals("User cannot get foreign node", 0, nodes.size());
 
@@ -110,9 +110,8 @@ public class TestNSNodesPermissions extends FunctionalTest {
         helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
         //we eat the configuring to free nodeevent
         helper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node2.getNodeInformation().getURL());
-        user.disconnect();
 
-        nsadmin = helper.join("nsadmin", "pwd");
+        nsadmin = helper.getResourceManager(null, "nsadmin", "pwd");
         nodes = nsadmin.getAtMostNodes(2, null);
         //we eat free -> busy * 2
         helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
@@ -127,10 +126,9 @@ public class TestNSNodesPermissions extends FunctionalTest {
         helper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
         helper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
         helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, nsName);
-        nsadmin.disconnect();
 
         RMTHelper.log("Test2 - node users = MY_GROUPS");
-        ResourceManager admin = helper.join("admin", "admin");
+        ResourceManager admin = helper.getResourceManager(null, "admin", "admin");
         admin.createNodeSource(nsName, DefaultInfrastructureManager.class.getName(), null,
                 StaticPolicy.class.getName(), new Object[] { "MY_GROUPS", "ALL" }).getBooleanValue();
 
@@ -140,9 +138,8 @@ public class TestNSNodesPermissions extends FunctionalTest {
         helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
         //we eat the configuring to free nodeevent
         helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-        admin.disconnect();
 
-        user = helper.join("radmin", "pwd");
+        user = helper.getResourceManager(null, "radmin", "pwd");
         nodes = user.getAtMostNodes(1, null);
         Assert.assertEquals("User cannot get foreign node", 0, nodes.size());
 
@@ -150,9 +147,8 @@ public class TestNSNodesPermissions extends FunctionalTest {
         helper.waitForNodeEvent(RMEventType.NODE_ADDED, node2.getNodeInformation().getURL());
         //we eat the configuring to free nodeevent
         helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-        user.disconnect();
 
-        nsadmin = helper.join("nsadmin", "pwd");
+        nsadmin = helper.getResourceManager(null, "nsadmin", "pwd");
         nodes = nsadmin.getAtMostNodes(2, null);
         Assert.assertEquals(2, nodes.size());
         //we eat free -> busy * 2
@@ -162,18 +158,16 @@ public class TestNSNodesPermissions extends FunctionalTest {
         //busy -> free * 2
         helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
         helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-        nsadmin.disconnect();
 
         // removing the node source
-        admin = helper.join("admin", "admin");
+        admin = helper.getResourceManager(null, "admin", "admin");
         admin.removeNodeSource(nsName, true).getBooleanValue();
         helper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
         helper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
         helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, nsName);
-        admin.disconnect();
 
         RMTHelper.log("Test3 - node users = PROVIDER");
-        user = helper.join("radmin", "pwd");
+        user = helper.getResourceManager(null, "radmin", "pwd");
         user.createNodeSource(nsName, DefaultInfrastructureManager.class.getName(), null,
                 StaticPolicy.class.getName(), new Object[] { "PROVIDER", "ALL" }).getBooleanValue();
 
@@ -184,9 +178,8 @@ public class TestNSNodesPermissions extends FunctionalTest {
         helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
         //we eat the configuring to free nodeevent
         helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-        user.disconnect();
 
-        admin = helper.join("admin", "admin");
+        admin = helper.getResourceManager(null, "admin", "admin");
         admin.addNode(node2.getNodeInformation().getURL(), nsName).getBooleanValue();
         helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
         //we eat the configuring to free nodeevent
@@ -202,9 +195,8 @@ public class TestNSNodesPermissions extends FunctionalTest {
         //busy -> free * 2
         helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
         helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-        admin.disconnect();
 
-        user = helper.join("radmin", "pwd");
+        user = helper.getResourceManager(null, "radmin", "pwd");
         nodes = admin.getAtMostNodes(2, null);
         Assert.assertEquals(1, nodes.size());
         //we eat free -> busy
@@ -212,24 +204,21 @@ public class TestNSNodesPermissions extends FunctionalTest {
         user.releaseNodes(nodes);
         //busy -> free
         helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-        user.disconnect();
 
-        nsadmin = helper.join("nsadmin", "pwd");
+        nsadmin = helper.getResourceManager(null, "nsadmin", "pwd");
         nodes = nsadmin.getAtMostNodes(2, null);
         Assert.assertEquals("Have got a foreign node", 0, nodes.size());
         nsadmin.releaseNodes(nodes);
-        nsadmin.disconnect();
 
         // removing the node source
-        admin = helper.join("admin", "admin");
+        admin = helper.getResourceManager(null, "admin", "admin");
         admin.removeNodeSource(nsName, true).getBooleanValue();
         helper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
         helper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
         helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, nsName);
-        admin.disconnect();
 
         RMTHelper.log("Test4 - node users = PROVIDER_GROUPS");
-        user = helper.join("radmin", "pwd");
+        user = helper.getResourceManager(null, "radmin", "pwd");
         user.createNodeSource(nsName, DefaultInfrastructureManager.class.getName(), null,
                 StaticPolicy.class.getName(), new Object[] { "PROVIDER_GROUPS", "ALL" }).getBooleanValue();
 
@@ -240,9 +229,8 @@ public class TestNSNodesPermissions extends FunctionalTest {
         helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
         //we eat the configuring to free nodeevent
         helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-        user.disconnect();
 
-        admin = helper.join("admin", "admin");
+        admin = helper.getResourceManager(null, "admin", "admin");
         admin.addNode(node2.getNodeInformation().getURL(), nsName).getBooleanValue();
         helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
         //we eat the configuring to free nodeevent
@@ -258,9 +246,8 @@ public class TestNSNodesPermissions extends FunctionalTest {
         //we eat busy -> free * 2
         helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
         helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-        admin.disconnect();
 
-        user = helper.join("radmin", "pwd");
+        user = helper.getResourceManager(null, "radmin", "pwd");
         nodes = admin.getAtMostNodes(2, null);
         Assert.assertEquals(1, nodes.size());
         Assert.assertTrue(nodes.get(0).getNodeInformation().getURL().contains("node1"));
@@ -269,9 +256,8 @@ public class TestNSNodesPermissions extends FunctionalTest {
         user.releaseNodes(nodes);
         //we eat busy -> free
         helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-        user.disconnect();
 
-        nsadmin = helper.join("nsadmin", "pwd");
+        nsadmin = helper.getResourceManager(null, "nsadmin", "pwd");
         nodes = nsadmin.getAtMostNodes(2, null);
         Assert.assertEquals("Have not get an admin node", 1, nodes.size());
         Assert.assertTrue(nodes.get(0).getNodeInformation().getURL().contains("node2"));
@@ -280,18 +266,16 @@ public class TestNSNodesPermissions extends FunctionalTest {
         nsadmin.releaseNodes(nodes);
         //we eat busy -> free
         helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-        nsadmin.disconnect();
 
         // removing the node source
-        admin = helper.join("admin", "admin");
+        admin = helper.getResourceManager(null, "admin", "admin");
         admin.removeNodeSource(nsName, true).getBooleanValue();
         helper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
         helper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
         helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, nsName);
-        admin.disconnect();
 
         RMTHelper.log("Test5 - node users = ALL");
-        user = helper.join("radmin", "pwd");
+        user = helper.getResourceManager(null, "radmin", "pwd");
         user.createNodeSource(nsName, DefaultInfrastructureManager.class.getName(), null,
                 StaticPolicy.class.getName(), new Object[] { "ALL", "ALL" }).getBooleanValue();
 
@@ -300,9 +284,8 @@ public class TestNSNodesPermissions extends FunctionalTest {
         helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
         //we eat the configuring to free nodeevent
         helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-        user.disconnect();
 
-        nsadmin = helper.join("nsadmin", "pwd");
+        nsadmin = helper.getResourceManager(null, "nsadmin", "pwd");
         nodes = nsadmin.getAtMostNodes(1, null);
         Assert.assertEquals("Have got a foreign node", 1, nodes.size());
         //we eat the free to busy
@@ -310,17 +293,15 @@ public class TestNSNodesPermissions extends FunctionalTest {
         nsadmin.releaseNodes(nodes);
         //we eat the busy to free
         helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-        nsadmin.disconnect();
 
         // removing the node source
-        admin = helper.join("admin", "admin");
+        admin = helper.getResourceManager(null, "admin", "admin");
         admin.removeNodeSource(nsName, true).getBooleanValue();
         helper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
         helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, nsName);
-        admin.disconnect();
 
         RMTHelper.log("Test6.1 - specific users");
-        admin = helper.join("admin", "admin");
+        admin = helper.getResourceManager(null, "admin", "admin");
         admin.createNodeSource(nsName, DefaultInfrastructureManager.class.getName(), null,
                 StaticPolicy.class.getName(), new Object[] { "users=nsadmin", "ALL" }).getBooleanValue();
 
@@ -330,9 +311,8 @@ public class TestNSNodesPermissions extends FunctionalTest {
         helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
         //we eat the configuring to free nodeevent
         helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-        admin.disconnect();
 
-        user = helper.join("radmin", "pwd");
+        user = helper.getResourceManager(null, "radmin", "pwd");
         nodes = user.getAtMostNodes(1, null);
         Assert.assertEquals("User cannot get foreign node", 0, nodes.size());
 
@@ -342,9 +322,8 @@ public class TestNSNodesPermissions extends FunctionalTest {
         helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
         nodes = user.getAtMostNodes(1, null);
         Assert.assertEquals("User cannot even your own node", 0, nodes.size());
-        user.disconnect();
 
-        nsadmin = helper.join("nsadmin", "pwd");
+        nsadmin = helper.getResourceManager(null, "nsadmin", "pwd");
         nodes = nsadmin.getAtMostNodes(2, null);
         Assert.assertEquals(2, nodes.size());
         //we eat free -> busy * 2
@@ -354,18 +333,16 @@ public class TestNSNodesPermissions extends FunctionalTest {
         //busy -> free * 2
         helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
         helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-        nsadmin.disconnect();
 
         // removing the node source
-        admin = helper.join("admin", "admin");
+        admin = helper.getResourceManager(null, "admin", "admin");
         admin.removeNodeSource(nsName, true).getBooleanValue();
         helper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
         helper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
         helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, nsName);
-        admin.disconnect();
 
         RMTHelper.log("Test6.2 - specific groups");
-        admin = helper.join("admin", "admin");
+        admin = helper.getResourceManager(null, "admin", "admin");
         admin.createNodeSource(nsName, DefaultInfrastructureManager.class.getName(), null,
                 StaticPolicy.class.getName(), new Object[] { "groups=nsadmins", "ALL" }).getBooleanValue();
 
@@ -375,9 +352,8 @@ public class TestNSNodesPermissions extends FunctionalTest {
         helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
         //we eat the configuring to free nodeevent
         helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-        admin.disconnect();
 
-        user = helper.join("radmin", "pwd");
+        user = helper.getResourceManager(null, "radmin", "pwd");
         nodes = user.getAtMostNodes(1, null);
         Assert.assertEquals("User cannot get foreign node", 0, nodes.size());
 
@@ -387,9 +363,8 @@ public class TestNSNodesPermissions extends FunctionalTest {
         helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
         nodes = user.getAtMostNodes(1, null);
         Assert.assertEquals("User cannot even your own node", 0, nodes.size());
-        user.disconnect();
 
-        nsadmin = helper.join("nsadmin", "pwd");
+        nsadmin = helper.getResourceManager(null, "nsadmin", "pwd");
         nodes = nsadmin.getAtMostNodes(2, null);
         Assert.assertEquals(2, nodes.size());
         //we eat free -> busy * 2
@@ -399,10 +374,9 @@ public class TestNSNodesPermissions extends FunctionalTest {
         //busy -> free * 2
         helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
         helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-        nsadmin.disconnect();
 
         // removing the node source
-        admin = helper.join("admin", "admin");
+        admin = helper.getResourceManager(null, "admin", "admin");
         nodes = admin.getAtMostNodes(2, null);
         Assert.assertEquals(2, nodes.size());
         //we eat free -> busy * 2
@@ -417,10 +391,9 @@ public class TestNSNodesPermissions extends FunctionalTest {
         helper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
         helper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
         helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, nsName);
-        admin.disconnect();
 
         RMTHelper.log("Test6.3 - specific users and groups");
-        admin = helper.join("admin", "admin");
+        admin = helper.getResourceManager(null, "admin", "admin");
         admin.createNodeSource(nsName, DefaultInfrastructureManager.class.getName(), null,
                 StaticPolicy.class.getName(), new Object[] { "users=radmin;groups=nsadmins", "ALL" })
                 .getBooleanValue();
@@ -431,9 +404,8 @@ public class TestNSNodesPermissions extends FunctionalTest {
         helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
         //we eat the configuring to free nodeevent
         helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-        admin.disconnect();
 
-        user = helper.join("radmin", "pwd");
+        user = helper.getResourceManager(null, "radmin", "pwd");
         nodes = user.getAtMostNodes(1, null);
         Assert.assertEquals("User did not get a node but had a right to get it", 1, nodes.size());
         helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
@@ -451,9 +423,8 @@ public class TestNSNodesPermissions extends FunctionalTest {
         nsadmin.releaseNodes(nodes);
         helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
         helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-        user.disconnect();
 
-        nsadmin = helper.join("nsadmin", "pwd");
+        nsadmin = helper.getResourceManager(null, "nsadmin", "pwd");
         nodes = nsadmin.getAtMostNodes(2, null);
         Assert.assertEquals(2, nodes.size());
         //we eat free -> busy * 2
@@ -463,15 +434,13 @@ public class TestNSNodesPermissions extends FunctionalTest {
         //busy -> free * 2
         helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
         helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-        nsadmin.disconnect();
 
         // removing the node source
-        admin = helper.join("admin", "admin");
+        admin = helper.getResourceManager(null, "admin", "admin");
         admin.removeNodeSource(nsName, true).getBooleanValue();
         helper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
         helper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
         helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, nsName);
-        admin.disconnect();
 
         System.out.println("Success");
     }

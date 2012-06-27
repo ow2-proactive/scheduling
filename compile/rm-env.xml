@@ -35,7 +35,7 @@
 			<include name="node/**/*.jar"/>
 		</fileset>
 		<pathelement location="${cl.common.dir}" />
-		<pathelement location="${base.dir}/compile/lib/junit-4.3.jar"/>
+		<pathelement location="${base.dir}/compile/lib/junit-4.11-SNAPSHOT-20120416-1530.jar"/>
 	</path>
 
 	<path id="rm.classpath">
@@ -49,7 +49,7 @@
 	<path id="rm.test.classpath">
 		<path refid="rm.classpath"/>
 		<pathelement location="${cl.rm.tests.dir}" />
-		<pathelement location="${base.dir}/compile/lib/junit-4.3.jar"/>
+		<pathelement location="${base.dir}/compile/lib/junit-4.11-SNAPSHOT-20120416-1530.jar"/>
 	</path>
 
     <if name="test">

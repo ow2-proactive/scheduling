@@ -36,7 +36,6 @@
  */
 package functionaltests.nodestate;
 
-import static junit.framework.Assert.assertTrue;
 import junit.framework.Assert;
 
 import org.objectweb.proactive.api.PAFuture;
@@ -46,10 +45,9 @@ import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
-import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.utils.NodeSet;
 
-import org.ow2.tests.FunctionalTest;
+import functionaltests.RMConsecutive;
 import functionaltests.RMTHelper;
 
 
@@ -68,7 +66,7 @@ import functionaltests.RMTHelper;
  *
  * It tests 'node added' event too, during deployment
  */
-public class TestNodesStates extends FunctionalTest {
+public class TestNodesStates extends RMConsecutive {
 
     /** Actions to be Perform by this test.
      * The method is called automatically by Junit framework.
@@ -77,44 +75,32 @@ public class TestNodesStates extends FunctionalTest {
     @org.junit.Test
     public void action() throws Exception {
 
-        RMTHelper.log("Deployment");
-
         RMTHelper helper = RMTHelper.getDefaultInstance();
 
         ResourceManager resourceManager = helper.getResourceManager();
-
-        helper.createLocalNodeSource();
-        helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, NodeSource.LOCAL_INFRASTRUCTURE_NAME);
-
-        for (int i = 0; i < RMTHelper.defaultNodesNumber; i++) {
-            helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
-            //wait for the nodes to be in free state
-            helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-        }
-
+        int totalNodeNumber = helper.createNodeSource("TestNodesStates");
         //----------------------------------------------------------
         // Book all nodes deployed by descriptor (user action)
         // verify that there are no free nodes left,
         // and give back to RM
         RMTHelper.log("Test 1");
 
-        NodeSet nodes = resourceManager.getAtMostNodes(RMTHelper.defaultNodesNumber, null);
+        NodeSet nodes = resourceManager.getAtMostNodes(totalNodeNumber, null);
 
         PAFuture.waitFor(nodes);
-        assertTrue(nodes.size() == RMTHelper.defaultNodesNumber);
-        assertTrue(resourceManager.getState().getFreeNodesNumber() == 0);
+        Assert.assertEquals(totalNodeNumber, nodes.size());
+        Assert.assertEquals(0, resourceManager.getState().getFreeNodesNumber());
 
-        for (int i = 0; i < RMTHelper.defaultNodesNumber; i++) {
+        for (int i = 0; i < totalNodeNumber; i++) {
             RMNodeEvent evt = helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
             Assert.assertEquals(evt.getNodeState(), NodeState.BUSY);
         }
 
         //for next test
         Node n = nodes.get(0);
-
         resourceManager.releaseNodes(nodes);
 
-        for (int i = 0; i < RMTHelper.defaultNodesNumber; i++) {
+        for (int i = 0; i < totalNodeNumber; i++) {
             RMNodeEvent evt = helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
             Assert.assertEquals(evt.getNodeState(), NodeState.FREE);
         }
@@ -133,8 +119,8 @@ public class TestNodesStates extends FunctionalTest {
             timeouted = true;
         }
 
-        assertTrue(timeouted);
-        assertTrue(resourceManager.getState().getFreeNodesNumber() == RMTHelper.defaultNodesNumber);
+        Assert.assertTrue(timeouted);
+        Assert.assertEquals(totalNodeNumber, resourceManager.getState().getFreeNodesNumber());
 
         //----------------------------------------------------------
         // Book all nodes deployed by descriptor
@@ -143,11 +129,11 @@ public class TestNodesStates extends FunctionalTest {
         // user give back to RM the "toRelease" node, node is now removed
         RMTHelper.log("Test 3");
 
-        nodes = resourceManager.getAtMostNodes(RMTHelper.defaultNodesNumber, null);
+        nodes = resourceManager.getAtMostNodes(totalNodeNumber, null);
 
         PAFuture.waitFor(nodes);
 
-        for (int i = 0; i < RMTHelper.defaultNodesNumber; i++) {
+        for (int i = 0; i < totalNodeNumber; i++) {
             RMNodeEvent evt = helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
             Assert.assertEquals(evt.getNodeState(), NodeState.BUSY);
         }
@@ -163,13 +149,13 @@ public class TestNodesStates extends FunctionalTest {
         Assert.assertEquals(evt.getNodeState(), NodeState.TO_BE_REMOVED);
 
         //node is in "ToRelease" state, so always handled by RM
-        assertTrue(resourceManager.getState().getTotalNodesNumber() == RMTHelper.defaultNodesNumber);
+        Assert.assertEquals(totalNodeNumber, resourceManager.getState().getTotalNodesNumber());
 
         //user give back the node, so node is now removed
         resourceManager.releaseNode(n);
 
-        assertTrue(resourceManager.getState().getTotalNodesNumber() == RMTHelper.defaultNodesNumber - 1);
-        assertTrue(resourceManager.getState().getFreeNodesNumber() == 0);
+        Assert.assertEquals(totalNodeNumber - 1, resourceManager.getState().getTotalNodesNumber());
+        Assert.assertEquals(0, resourceManager.getState().getFreeNodesNumber());
 
         evt = helper.waitForNodeEvent(RMEventType.NODE_REMOVED, n.getNodeInformation().getURL());
 
@@ -194,15 +180,15 @@ public class TestNodesStates extends FunctionalTest {
         resourceManager.releaseNodes(nodes);
 
         // check Nodes freed Event has been thrown
-        for (int i = 0; i < RMTHelper.defaultNodesNumber - 2; i++) {
+        for (int i = 0; i < totalNodeNumber - 2; i++) {
             evt = helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
             Assert.assertEquals(evt.getNodeState(), NodeState.FREE);
         }
 
         //two nodes killed, but the detected down is in RM down nodes list
         //( down nodes are in total nodes count)
-        assertTrue(resourceManager.getState().getTotalNodesNumber() == RMTHelper.defaultNodesNumber - 1);
-        assertTrue(resourceManager.getState().getFreeNodesNumber() == RMTHelper.defaultNodesNumber - 2);
+        Assert.assertEquals(totalNodeNumber - 1, resourceManager.getState().getTotalNodesNumber());
+        Assert.assertEquals(totalNodeNumber - 2, resourceManager.getState().getFreeNodesNumber());
 
         //----------------------------------------------------------
         // nodes left are in free state
@@ -218,8 +204,8 @@ public class TestNodesStates extends FunctionalTest {
         evt = helper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, n2.getNodeInformation().getURL());
         Assert.assertEquals(evt.getNodeState(), NodeState.DOWN);
 
-        assertTrue(resourceManager.getState().getTotalNodesNumber() == RMTHelper.defaultNodesNumber - 1);
-        assertTrue(resourceManager.getState().getFreeNodesNumber() == RMTHelper.defaultNodesNumber - 3);
+        Assert.assertEquals(totalNodeNumber - 1, resourceManager.getState().getTotalNodesNumber());
+        Assert.assertEquals(totalNodeNumber - 3, resourceManager.getState().getFreeNodesNumber());
 
         //----------------------------------------------------------
         // book nodes, put one node in "toRelease" state,
@@ -227,10 +213,10 @@ public class TestNodesStates extends FunctionalTest {
         // node must detected down by RM
         RMTHelper.log("Test 6");
 
-        nodes = resourceManager.getAtMostNodes(RMTHelper.defaultNodesNumber - 3, null);
+        nodes = resourceManager.getAtMostNodes(totalNodeNumber - 3, null);
         PAFuture.waitFor(nodes);
 
-        for (int i = 0; i < RMTHelper.defaultNodesNumber - 3; i++) {
+        for (int i = 0; i < totalNodeNumber - 3; i++) {
             evt = helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
             Assert.assertEquals(evt.getNodeState(), NodeState.BUSY);
         }
@@ -256,19 +242,26 @@ public class TestNodesStates extends FunctionalTest {
         evt = helper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, n.getNodeInformation().getURL());
         Assert.assertEquals(evt.getNodeState(), NodeState.DOWN);
 
-        assertTrue(resourceManager.getState().getTotalNodesNumber() == RMTHelper.defaultNodesNumber - 1);
-        assertTrue(resourceManager.getState().getFreeNodesNumber() == 0);
+        Assert.assertEquals(totalNodeNumber - 1, resourceManager.getState().getTotalNodesNumber());
+        Assert.assertEquals(0, resourceManager.getState().getFreeNodesNumber());
+        // at this phase we have
+        // initial nodes in free state
+        // in created ns:
+        //  1 node removed
+        //  1 to be removed
+        //  3 down
+        // 
 
         //user tries to give back a down node, no bad effect
         resourceManager.releaseNodes(nodes);
 
-        for (int i = 0; i < RMTHelper.defaultNodesNumber - 4; i++) {
+        for (int i = 0; i < totalNodeNumber - 1 /*tbr*/- 1 /*removed*/- 3/*down*/; i++) {
             evt = helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
             Assert.assertEquals(evt.getNodeState(), NodeState.FREE);
         }
 
-        assertTrue(resourceManager.getState().getTotalNodesNumber() == RMTHelper.defaultNodesNumber - 1);
-        assertTrue(resourceManager.getState().getFreeNodesNumber() == RMTHelper.defaultNodesNumber - 4);
+        Assert.assertEquals(totalNodeNumber - 1, resourceManager.getState().getTotalNodesNumber());
+        Assert.assertEquals(totalNodeNumber - 4, resourceManager.getState().getFreeNodesNumber());
 
         //admin removes again the node, ok he already asked this removal when node n was busy
         //choice here is advert admin that node has fallen (not hiding the down node event),
@@ -278,8 +271,8 @@ public class TestNodesStates extends FunctionalTest {
         //check that node removed event has been received
         evt = helper.waitForNodeEvent(RMEventType.NODE_REMOVED, n.getNodeInformation().getURL());
 
-        assertTrue(resourceManager.getState().getTotalNodesNumber() == RMTHelper.defaultNodesNumber - 2);
-        assertTrue(resourceManager.getState().getFreeNodesNumber() == RMTHelper.defaultNodesNumber - 4);
+        Assert.assertEquals(totalNodeNumber - 2, resourceManager.getState().getTotalNodesNumber());
+        Assert.assertEquals(totalNodeNumber - 4, resourceManager.getState().getFreeNodesNumber());
 
         //----------------------------------------------------------
         // Remove a free node,
@@ -291,10 +284,10 @@ public class TestNodesStates extends FunctionalTest {
         //check that node removed event has been received
         evt = helper.waitForNodeEvent(RMEventType.NODE_REMOVED, n2.getNodeInformation().getURL());
 
-        assertTrue(resourceManager.getState().getTotalNodesNumber() == RMTHelper.defaultNodesNumber - 3);
-        assertTrue(resourceManager.getState().getFreeNodesNumber() == RMTHelper.defaultNodesNumber - 5);
-
+        Assert.assertEquals(totalNodeNumber - 3, resourceManager.getState().getTotalNodesNumber());
+        Assert.assertEquals(totalNodeNumber - 5, resourceManager.getState().getFreeNodesNumber());
         RMTHelper.log("End of test");
+
     }
 
 }

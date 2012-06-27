@@ -44,8 +44,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import javax.security.auth.login.LoginException;
-
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.ProActiveException;
@@ -63,10 +61,9 @@ import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
+import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.frontend.RMConnection;
-import org.ow2.proactive.resourcemanager.frontend.RMMonitoring;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
-import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.LocalInfrastructure;
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.ow2.proactive.utils.FileToBytesConverter;
@@ -93,7 +90,7 @@ public class RMTHelper {
     /**
      * Number of nodes deployed with default deployment descriptor
      */
-    public static final int defaultNodesNumber = 5;
+    private static final int defaultNodesNumber = 5;
     /**
      * Timeout for local infrastructure
      */
@@ -108,8 +105,6 @@ public class RMTHelper {
 
     protected ResourceManager resourceManager;
 
-    protected RMMonitoring monitor;
-
     protected RMAuthentication auth;
 
     private Process rmProcess;
@@ -119,12 +114,24 @@ public class RMTHelper {
     /**
      * Default user name for RM's connection
      */
-    public static String username = "demo";
+    public static String defaultUserName = "test_executor";
 
     /**
      * Default password for RM's connection
      */
-    public static String password = "demo";
+    public static String defaultUserPassword = "pwd";
+
+    /**
+     * Currently connected user name for RM's connection
+     */
+    public static String connectedUserName = null;
+
+    /**
+     * Currently connected password for RM's connection
+     */
+    public static String connectedUserPassword = null;
+
+    public static Credentials connectedUserCreds = null;
 
     private static RMTHelper defaultInstance = new RMTHelper();
 
@@ -142,6 +149,51 @@ public class RMTHelper {
     }
 
     /**
+     * Creates a Local node source
+     * @throws Exception
+     */
+    public void createNodeSource() throws Exception {
+        createNodeSource(this.getClass().getSimpleName());
+    }
+
+    /**
+     * Creates a Local node source with specified name
+     * @throws Exception
+     * @returns expected number of nodes
+     */
+    public int createNodeSource(String name) throws Exception {
+        createNodeSource(name, RMTHelper.defaultNodesNumber);
+        return RMTHelper.defaultNodesNumber;
+    }
+
+    /**
+     * Creates a Local node source with specified name
+     * @throws Exception
+     * @returns expected number of nodes
+     */
+    public void createNodeSource(String name, int nodeNumber) throws Exception {
+        RMFactory.setOsJavaProperty();
+        ResourceManager rm = getResourceManager();
+        System.out.println("Creating a node source " + name);
+        //first emtpy im parameter is default rm url
+        byte[] creds = FileToBytesConverter.convertFileToByteArray(new File(PAResourceManagerProperties
+                .getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString())));
+        rm
+                .createNodeSource(name, LocalInfrastructure.class.getName(), new Object[] { "", creds,
+                        nodeNumber, RMTHelper.defaultNodesTimeout, setup.getJvmParameters() },
+                        StaticPolicy.class.getName(), null);
+        rm.setNodeSourcePingFrequency(5000, name);
+
+        waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, name);
+        for (int i = 0; i < nodeNumber; i++) {
+            waitForAnyNodeEvent(RMEventType.NODE_ADDED);
+            waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
+            waitForAnyNodeEvent(RMEventType.NODE_ADDED);
+            waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        }
+    }
+
+    /**
      * Create a ProActive Node in a new JVM on the local host
      * This method can be used to test adding nodes mechanism
      * with already deploy ProActive nodes.
@@ -152,39 +204,6 @@ public class RMTHelper {
      */
     public TNode createNode(String nodeName) throws IOException, NodeException {
         return createNode(nodeName, null);
-    }
-
-    public void createDefaultNodeSource() throws Exception {
-        createDefaultNodeSource(RMTHelper.defaultNodesNumber);
-    }
-
-    /**
-     * Creates a Default Infrastructure Manager with defaultNodesNumber nodes
-     * @throws Exception
-     */
-    public void createDefaultNodeSource(int nodesNumber) throws Exception {
-        RMFactory.setOsJavaProperty();
-        ResourceManager rm = getResourceManager();
-        for (int i = 0; i < nodesNumber; i++) {
-            String nodeName = "default_nodermt_" + System.currentTimeMillis();
-            Node node = createNode(nodeName).getNode();
-            rm.addNode(node.getNodeInformation().getURL());
-        }
-    }
-
-    /**
-     * Creates a Local Infrastructure Manager with defaultNodesNumber nodes
-     * @throws Exception
-     */
-    public void createLocalNodeSource() throws Exception {
-        RMFactory.setOsJavaProperty();
-        ResourceManager rm = getResourceManager();
-        //first emtpy im parameter is default rm url
-        byte[] creds = FileToBytesConverter.convertFileToByteArray(new File(PAResourceManagerProperties
-                .getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString())));
-        rm.createNodeSource(NodeSource.LOCAL_INFRASTRUCTURE_NAME, LocalInfrastructure.class.getName(),
-                new Object[] { "", creds, RMTHelper.defaultNodesNumber, RMTHelper.defaultNodesTimeout,
-                        setup.getJvmParameters() }, StaticPolicy.class.getName(), null);
     }
 
     public TNode createNode(String nodeName, Map<String, String> vmParameters) throws IOException,
@@ -235,7 +254,7 @@ public class RMTHelper {
         nodeProcess.startProcess();
         try {
             Node newNode = null;
-            Thread.sleep(5000);
+            Thread.sleep(2000);
             NodeException toThrow = null;
             for (int i = 0; i < 12; i++) {
                 try {
@@ -255,29 +274,6 @@ public class RMTHelper {
             e.printStackTrace();
             return null;
         }
-    }
-
-    /**
-     * Connect to an existing RM, without creating one, and init Monitor handler
-     * Used by Scheduler's tests
-     * @throws Exception
-     */
-    public void connectToExistingRM() throws Exception {
-        connectToExistingRM(null);
-    }
-
-    /**
-     * Connect to an existing RM, without creating one, and init Monitor handler
-     * @param URL existing Resource Manager's URL
-     * @throws Exception
-     */
-    public void connectToExistingRM(String URL) throws Exception {
-        auth = RMConnection.waitAndJoin(URL);
-        initEventReceiver(auth);
-    }
-
-    public void startRM(String configurationFile) throws Exception {
-        startRM(configurationFile, CentralPAPropertyRepository.PA_RMI_PORT.getValue());
     }
 
     /**
@@ -354,33 +350,7 @@ public class RMTHelper {
 
         System.out.println("Waiting for the RM using URL: " + url);
         auth = RMConnection.waitAndJoin(url);
-
-        initEventReceiver(auth);
-
         return url;
-    }
-
-    /**
-     * Return RM authentication interface. Start forked RM with default test
-     * configuration file, if not yet started.
-     * @return RMauthentication interface
-     * @throws Exception
-     */
-    public RMAuthentication getRMAuth() throws Exception {
-        return getRMAuth(null);
-    }
-
-    /**
-     * Same as getRMAuth but allows to specify a property file used to start the RM
-     * @param propertyFile
-     * @return
-     * @throws Exception
-     */
-    public RMAuthentication getRMAuth(String propertyFile) throws Exception {
-        if (auth == null) {
-            startRM(propertyFile);
-        }
-        return auth;
     }
 
     /**
@@ -398,8 +368,8 @@ public class RMTHelper {
             CommonTUtils.cleanupRMActiveObjectRegistry();
         }
         auth = null;
-        monitor = null;
         resourceManager = null;
+        eventReceiver = null;
     }
 
     /**
@@ -540,52 +510,16 @@ public class RMTHelper {
     //private methods
     //-------------------------------------------------------------//
 
-    private void initEventReceiver(RMAuthentication auth) throws Exception {
+    private void initEventReceiver() throws Exception {
         RMMonitorsHandler mHandler = getMonitorsHandler();
         if (eventReceiver == null) {
             /** create event receiver then turnActive to avoid deepCopy of MonitorsHandler object
              * 	(shared instance between event receiver and static helpers).
             */
+            System.out.println("Initializing new event receiver");
             RMMonitorEventReceiver passiveEventReceiver = new RMMonitorEventReceiver(mHandler);
             eventReceiver = (RMMonitorEventReceiver) PAActiveObject.turnActive(passiveEventReceiver);
-        }
-        PAFuture.waitFor(eventReceiver.init(auth));
-
-        System.out.println("RMTHelper is connected");
-    }
-
-    /**
-     * Connects to the resource manager
-     */
-    public ResourceManager connect(String name, String pass) throws Exception {
-        return connect(name, pass, null);
-    }
-
-    /**
-     * Idem than connect but allows to specify a propertyFile used to start the RM
-     */
-    public ResourceManager connect(String name, String pass, String propertyFile) throws Exception {
-        RMAuthentication authInt = getRMAuth(propertyFile);
-        Credentials cred = Credentials.createCredentials(new CredData(CredData.parseLogin(name), CredData
-                .parseDomain(name), pass), authInt.getPublicKey());
-
-        return authInt.login(cred);
-    }
-
-    /**
-     * Joins to the resource manager.
-     */
-    public ResourceManager join(String name, String pass) throws Exception {
-        RMAuthentication authInt = getRMAuth();
-        Credentials cred = Credentials.createCredentials(new CredData(CredData.parseLogin(name), CredData
-                .parseDomain(name), pass), authInt.getPublicKey());
-
-        while (true) {
-            try {
-                return authInt.login(cred);
-            } catch (LoginException e) {
-                Thread.sleep(100);
-            }
+            PAFuture.waitFor(resourceManager.getMonitoring().addRMEventListener(eventReceiver));
         }
     }
 
@@ -593,10 +527,7 @@ public class RMTHelper {
      * Gets the connected ResourceManager interface.
      */
     public ResourceManager getResourceManager() throws Exception {
-        if (resourceManager == null) {
-            resourceManager = connect(username, password);
-        }
-        return resourceManager;
+        return getResourceManager(null, defaultUserName, defaultUserPassword);
     }
 
     /**
@@ -604,11 +535,63 @@ public class RMTHelper {
      * @return the resource manager
      * @throws Exception
      */
-    public ResourceManager getResourceManager(String propertyFile) throws Exception {
-        if (resourceManager == null) {
-            resourceManager = connect(username, password, propertyFile);
+    public ResourceManager getResourceManager(String propertyFile, String user, String pass) throws Exception {
+
+        if (user == null)
+            user = defaultUserName;
+        if (pass == null)
+            pass = defaultUserPassword;
+
+        if (resourceManager == null || !user.equals(connectedUserName)) {
+
+            if (resourceManager != null) {
+                System.out.println("Disconnecting user " + connectedUserName + " from the resource manager");
+                try {
+                    resourceManager.getMonitoring().removeRMEventListener();
+                    resourceManager.disconnect().getBooleanValue();
+
+                    eventReceiver = null;
+                    resourceManager = null;
+                } catch (RuntimeException ex) {
+                    ex.printStackTrace();
+                }
+            }
+
+            String rmUrl = System.getProperty("url");
+
+            if (rmUrl != null && !rmUrl.equals("${url}")) {
+                // joining the existing RM
+                try {
+                    System.out.println("Checking if there is existing RM on " + rmUrl);
+                    auth = RMConnection.join(rmUrl);
+                    System.out.println("Connected to the existing RM on " + rmUrl);
+                    authentificate(user, pass);
+                    initEventReceiver();
+                } catch (RMException ex) {
+                    System.out.println("Cannot connect to the RM on " + rmUrl + ": " + ex.getMessage());
+                    throw ex;
+                }
+            } else {
+                if (auth == null) {
+                    // creating a new RM and default node source
+                    startRM(propertyFile, CentralPAPropertyRepository.PA_RMI_PORT.getValue());
+                }
+                authentificate(user, pass);
+                initEventReceiver();
+            }
+            System.out.println("RMTHelper is connected");
         }
         return resourceManager;
+    }
+
+    private void authentificate(String user, String pass) throws Exception {
+        connectedUserName = user;
+        connectedUserPassword = pass;
+        connectedUserCreds = Credentials.createCredentials(new CredData(CredData.parseLogin(user), CredData
+                .parseDomain(connectedUserName), pass), auth.getPublicKey());
+
+        System.out.println("Authentificating as user " + user);
+        resourceManager = auth.login(connectedUserCreds);
     }
 
     private RMMonitorsHandler getMonitorsHandler() {
@@ -620,5 +603,12 @@ public class RMTHelper {
 
     public RMMonitorEventReceiver getEventReceiver() {
         return eventReceiver;
+    }
+
+    public RMAuthentication getRMAuth() throws Exception {
+        if (auth == null) {
+            getResourceManager();
+        }
+        return auth;
     }
 }
