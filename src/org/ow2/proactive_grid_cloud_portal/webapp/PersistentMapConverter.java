@@ -42,7 +42,7 @@ import java.util.Map;
 import javax.ws.rs.ext.Provider;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
-import org.hibernate.collection.PersistentMap;
+import org.hibernate.collection.internal.PersistentMap;
 
 
 @Provider
