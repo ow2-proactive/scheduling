@@ -212,6 +212,7 @@ public class Credentials implements Serializable {
 
             bytes = new byte[(int) f.length() - tot];
             in.readFully(bytes);
+            in.close();
         } catch (Exception e) {
             throw new KeyException("Could not retrieve public key from " + pubPath, e);
         }
@@ -351,6 +352,7 @@ public class Credentials implements Serializable {
         try {
             fin = new FileInputStream(f);
             fin.read(bytes);
+            fin.close();
         } catch (Exception e) {
             throw new KeyException("Could not read credentials from " + path, e);
         }
