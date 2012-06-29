@@ -153,6 +153,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      *            optional, if a sublist has to be returned, the range of the
      *            sublist
      * @return a list of jobs' ids under the form of a list of string
+     * @throws CacheNotYetInitialized if the cache is not yet initialized
      */
     @GET
     @Path("jobs")
@@ -162,7 +163,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @DefaultValue("-1")
     int index, @QueryParam("range")
     @DefaultValue("-1")
-    int range) throws NotConnectedException, PermissionException {
+    int range) throws NotConnectedException, PermissionException, CacheNotYetInitialized {
         Scheduler s = null;
 
         s = checkAccess(sessionId, "/scheduler/jobs");
@@ -212,6 +213,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      * @param sessionId
      *            a valid session id
      * @return a list of UserJobInfo
+     * @throws CacheNotYetInitialized if the cache is not yet initialized
      */
     @GET
     @Path("jobsinfo")
@@ -221,7 +223,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @DefaultValue("-1")
     int index, @QueryParam("range")
     @DefaultValue("-1")
-    int range) throws PermissionException, NotConnectedException {
+    int range) throws PermissionException, NotConnectedException, CacheNotYetInitialized {
         Scheduler s = checkAccess(sessionId, "/scheduler/jobsinfo");
         renewLeaseForClient(s);
         List<JobState> jobs = new ArrayList<JobState>();
@@ -446,12 +448,13 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      * @param sessionId
      *            a valid session id.
      * @return the scheduler state
+     * @throws CacheNotYetInitialized if the cache is not yet initialized
      */
     @GET
     @Path("state")
     @Produces( { "application/json", "application/xml" })
     public SchedulerState schedulerState(@HeaderParam("sessionid")
-    String sessionId) throws PermissionException, NotConnectedException {
+    String sessionId) throws PermissionException, NotConnectedException, CacheNotYetInitialized {
         Scheduler s = checkAccess(sessionId, "/scheduler/state");
         renewLeaseForClient(s);
         return SchedulerStateCaching.getLocalState();
@@ -482,12 +485,13 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      *            a valid session id.
      * @return a map of one entry containing the revision and the corresponding
      *         scheduler state
+     * @throws CacheNotYetInitialized if the cache is not yet initialized
      */
     @GET
     @Path("revisionandstate")
     @Produces( { "application/json", "application/xml" })
     public Map<AtomicLong, SchedulerState> getSchedulerStateAndRevision(@HeaderParam("sessionid")
-    String sessionId) throws PermissionException, NotConnectedException {
+    String sessionId) throws PermissionException, NotConnectedException, CacheNotYetInitialized {
         Scheduler s = checkAccess(sessionId, "/scheduler/staterevision");
         renewLeaseForClient(s);
         return SchedulerStateCaching.getRevisionAndSchedulerState();

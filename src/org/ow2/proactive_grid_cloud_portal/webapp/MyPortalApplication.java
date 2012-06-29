@@ -41,6 +41,7 @@ import java.util.Set;
 
 import javax.ws.rs.core.Application;
 
+import org.ow2.proactive_grid_cloud_portal.common.exceptionmapper.CacheNotYetInitializedMapper;
 import org.ow2.proactive_grid_cloud_portal.common.exceptionmapper.ConnectionExceptionMapper;
 import org.ow2.proactive_grid_cloud_portal.common.exceptionmapper.IOExceptionMapper;
 import org.ow2.proactive_grid_cloud_portal.common.exceptionmapper.InternalSchedulerExceptionMapper;
@@ -91,6 +92,7 @@ public class MyPortalApplication extends Application {
         set.add(LoggingExecutionInterceptor.class);
         set.add(ThrowableMapper.class);
         set.add(LoggingInterceptor.class);
+        set.add(CacheNotYetInitializedMapper.class);
         return set;
     }
 

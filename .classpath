@@ -124,7 +124,7 @@
 	<classpathentry kind="lib" path="lib/scheduling/ProActive_ResourceManager-client.jar" sourcepath="/Scheduler"/>
 	<classpathentry kind="lib" path="lib/scheduling/ProActive_ResourceManager.jar"/>
 	<classpathentry kind="lib" path="lib/scheduling/ProActive_Scheduler-client.jar" sourcepath="/Scheduler"/>
-	<classpathentry kind="lib" path="lib/scheduling/ProActive_Scheduler-core.jar"/>
+	<classpathentry kind="lib" path="lib/scheduling/ProActive_Scheduler-core.jar" sourcepath="/scheduling.git"/>
 	<classpathentry kind="lib" path="lib/scheduling/ProActive_Scheduler-fsm.jar"/>
 	<classpathentry kind="lib" path="lib/scheduling/ProActive_Scheduler-worker.jar"/>
 	<classpathentry kind="lib" path="lib/scheduling/ProActive_SRM-common-client.jar" sourcepath="/Scheduler"/>

@@ -83,7 +83,8 @@ import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.UserIdentification;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskState;
-import org.ow2.proactive_grid_cloud_portal.scheduler.UserJobInfo;
+import org.ow2.proactive.scheduler.common.util.UserJobInfo;
+import org.ow2.proactive_grid_cloud_portal.scheduler.CacheNotYetInitialized;
 import org.ow2.proactive_grid_cloud_portal.webapp.PersistentMapConverter;
 
 
@@ -99,6 +100,7 @@ public interface SchedulerRestInterface {
      * @param index optional, if a sublist has to be returned the index of the sublist
      * @param range optional, if a sublist has to be returned, the range of the sublist
      * @return a list of jobs' ids under the form of a list of string
+     * @throws CacheNotYetInitialized if the cache is not yet initialized
     */
     @GET
     @Path("jobs")
@@ -108,7 +110,7 @@ public interface SchedulerRestInterface {
     @DefaultValue("-1")
     int index, @QueryParam("range")
     @DefaultValue("-1")
-    int range) throws NotConnectedException, PermissionException;
+    int range) throws NotConnectedException, PermissionException, CacheNotYetInitialized;
 
     /**
      * Returns a subset of the scheduler state, including pending, running, finished
@@ -121,6 +123,7 @@ public interface SchedulerRestInterface {
      * @param range optional, if a sublist has to be returned, the range of the sublist
      * @param sessionId a valid session id
      * @return a list of UserJobInfo
+     * @throws CacheNotYetInitialized if the cache is not yet initialized
      */
     @GET
     @Path("jobsinfo")
@@ -130,7 +133,7 @@ public interface SchedulerRestInterface {
     @DefaultValue("-1")
     int index, @QueryParam("range")
     @DefaultValue("-1")
-    int range) throws PermissionException, NotConnectedException;
+    int range) throws PermissionException, NotConnectedException, CacheNotYetInitialized;
 
     /**
      * Returns a map containing one entry with the revision id as key and the 
@@ -172,12 +175,13 @@ public interface SchedulerRestInterface {
      * Returns the state of the scheduler
      * @param sessionId a valid session id.
      * @return the scheduler state 
+     * @throws CacheNotYetInitialized
      */
     @GET
     @Path("state")
     @Produces( { "application/json", "application/xml" })
     public abstract SchedulerState schedulerState(@HeaderParam("sessionid")
-    String sessionId) throws PermissionException, NotConnectedException;
+    String sessionId) throws PermissionException, NotConnectedException, CacheNotYetInitialized;
 
     /**
      * Returns the revision number of the scheduler state
@@ -195,12 +199,13 @@ public interface SchedulerRestInterface {
      * the scheduler state
      * @param sessionId a valid session id.
      * @return a map of one entry containing the revision and the corresponding scheduler state 
+     * @throws CacheNotYetInitialized
      */
     @GET
     @Path("revisionandstate")
     @Produces( { "application/json", "application/xml" })
     public abstract Map<AtomicLong, SchedulerState> getSchedulerStateAndRevision(@HeaderParam("sessionid")
-    String sessionId) throws PermissionException, NotConnectedException;
+    String sessionId) throws PermissionException, NotConnectedException, CacheNotYetInitialized;
 
     /**
      * returns only the jobs of the current user

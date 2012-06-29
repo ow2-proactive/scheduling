@@ -97,15 +97,21 @@ public class SchedulerStateCaching {
         SchedulerStateCaching.scheduler = scheduler;
     }
 
+    /**
+     *
+     */
     public synchronized static void init() {
         // here we need a thread to free the calling thread
         // i.e. not locking it when the scheduler is unavailable
 
         new Thread(new Runnable() {
             public void run() {
+                /*
+                 * initialize an empty state, prevent NPE while accessing the scheduler state
+                 * if not yet downloaded from the scheduler
+                 */
                 revisionAndLightSchedulerState = new HashMap<AtomicLong, LightSchedulerState>();
                 revisionAndLightSchedulerState.put(new AtomicLong(-1), new LightSchedulerState());
-
                 init_();
                 start_();
             }
@@ -213,10 +219,27 @@ public class SchedulerStateCaching {
 
     }
 
-    public static SchedulerState getLocalState() throws NotConnectedException, PermissionException {
+    /**
+     *
+     * @return the SchedulerState  exceptions returned are from
+     * {@link CachingSchedulerProxyUserInterface#getState()}
+     * @throws NotConnectedException if the cache is initialized but the connection to the scheduler has failed
+     * @throws PermissionException
+     * @throws CacheNotYetInitialized if the cache is not yet initialized
+     */
+    public static SchedulerState getLocalState() throws NotConnectedException, PermissionException,
+            CacheNotYetInitialized {
+        if (scheduler == null) {
+            throw new CacheNotYetInitialized(
+                "The underlying cache system is not connected to the scheduler, please retry later");
+        }
         return scheduler.getState();
     }
 
+    /**
+     *
+     * @return the scheduler state revision associated to this cache. -1 means no scheduler cache yet.
+     */
     public static long getSchedulerRevision() {
         return schedulerRevision;
     }
@@ -241,11 +264,28 @@ public class SchedulerStateCaching {
         SchedulerStateCaching.kill = kill;
     }
 
+    /**
+     *
+     * @return returns an one element map containing the revision number as key and  the light version of the scheduler state as object
+     *
+     */
     public static Map<AtomicLong, LightSchedulerState> getRevisionAndLightSchedulerState() {
         return revisionAndLightSchedulerState;
     }
 
-    public static Map<AtomicLong, SchedulerState> getRevisionAndSchedulerState() {
+    /**
+     *
+     * @return an one element map containing as key the revision and the state as object
+     * or null if the cache is not yet initialized
+     * @throws CacheNotYetInitialized if the cache is not yet initialized
+     */
+    public static Map<AtomicLong, SchedulerState> getRevisionAndSchedulerState()
+            throws CacheNotYetInitialized {
+        if (scheduler == null) {
+            throw new CacheNotYetInitialized(
+                "The underlying cache system is not connected to the scheduler, please retry later");
+        }
+
         return scheduler.getRevisionVersionAndSchedulerState();
     }
 }
