@@ -41,10 +41,7 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -200,7 +197,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
     /** Scheduler current policy */
     Policy policy;
 
-    /** list of all jobs managed by the scheduler */
+    /** list of all running and pending jobs managed by the scheduler */
     Map<JobId, InternalJob> jobs;
 
     /** list of pending jobs among the managed jobs */
@@ -211,9 +208,6 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
 
     /** Scheduler current status */
     SchedulerStatus status;
-
-    /** list of finished jobs among the managed jobs */
-    private Vector<InternalJob> finishedJobs;
 
     private SchedulingMethod schedulingMethod;
 
@@ -421,7 +415,6 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
             this.jobs = new HashMap<JobId, InternalJob>();
             this.pendingJobs = new Vector<InternalJob>();
             this.runningJobs = new Vector<InternalJob>();
-            this.finishedJobs = new Vector<InternalJob>();
             this.removeJobTimer = new Timer("RemoveJobTimer");
             this.restartTaskTimer = new Timer("RestartTaskTimer");
             this.status = SchedulerStatus.STOPPED;
@@ -935,6 +928,8 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
      */
     void endJob(InternalJob job, InternalTask task, TaskResultImpl taskResult, String errorMsg,
             JobStatus jobStatus) {
+        jobs.remove(job);
+
         // job can be already ended (SCHEDULING-700)
         JobStatus currentStatus = job.getStatus();
         if (currentStatus == JobStatus.CANCELED || currentStatus == JobStatus.FAILED ||
@@ -978,14 +973,14 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
             }
         }
 
-        boolean pj = false;
+        boolean pendingJob = false;
         //if job has been killed
         if (jobStatus == JobStatus.KILLED) {
             job.failed(null, jobStatus);
             //the next line will try to remove job from each list.
             //once removed, it won't be removed from remaining list, but we ensure that the job is in only one of the list.
-            if (runningJobs.remove(job) || (pj = pendingJobs.remove(job))) {
-                finishedJobs.add(job);
+            if (!runningJobs.remove(job)) {
+                pendingJob = pendingJobs.remove(job);
             }
 
             dbManager.updateAfterJobKilled(job);
@@ -1002,9 +997,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
 
             dbManager.updateAfterTaskFinished(job, task, taskResult);
 
-            //move the job from running to finished
             runningJobs.remove(job);
-            finishedJobs.add(job);
 
             if (!noResult) {
                 //send task event if there was a result
@@ -1016,7 +1009,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
         terminateJobHandling(job.getId());
 
         //update job and tasks events list and send it to front-end
-        updateTaskInfosList(job, pj ? SchedulerEvent.JOB_PENDING_TO_FINISHED
+        updateTaskInfosList(job, pendingJob ? SchedulerEvent.JOB_PENDING_TO_FINISHED
                 : SchedulerEvent.JOB_RUNNING_TO_FINISHED);
 
         logger.info("Job '" + job.getId() + "' terminated (" + jobStatus + ")");
@@ -1238,7 +1231,6 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
                 //terminating job
                 job.terminate();
                 runningJobs.remove(job);
-                finishedJobs.add(job);
                 logger.info("Job '" + jobId + "' terminated");
                 terminateJobHandling(job.getId());
             }
@@ -1350,6 +1342,21 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
         }
     }
 
+    private void initJobLogging(JobId jobId, Logger jobLogger, Appender clientAppender) {
+        // get or create appender for the targeted job
+        AsyncAppender jobAppender = this.jobsToBeLogged.get(jobId);
+        if (jobAppender == null) {
+            jobAppender = new AsyncAppender();
+            jobAppender.setName(Log4JTaskLogs.JOB_APPENDER_NAME);
+            this.jobsToBeLogged.put(jobId, jobAppender);
+            jobLogger.setAdditivity(false);
+            jobLogger.addAppender(jobAppender);
+        }
+
+        // should add the appender before activating logs on running tasks !
+        jobAppender.addAppender(clientAppender);
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -1368,37 +1375,56 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
             throw new InternalException("Cannot create an appender for job " + jobId, e);
         }
 
-        // targeted job
-        InternalJob target = this.jobs.get(jobId);
+        if (jobs.containsKey(jobId)) {
+            // this is running or pending job
 
-        if (target == null) {
-            throw new UnknownJobException(jobId);
-        }
+            boolean logIsAlreadyInitialized = jobsToBeLogged.containsKey(jobId);
+            initJobLogging(jobId, jobLogger, clientAppender);
 
-        boolean logIsAlreadyInitialized;
+            InternalJob target = this.jobs.get(jobId);
+            if (!pendingJobs.contains(target)) {
+                // this jobs contains running and finished tasks
 
-        // get or create appender for the targeted job
-        AsyncAppender jobAppender = this.jobsToBeLogged.get(jobId);
-        if (jobAppender == null) {
-            logIsAlreadyInitialized = false;
-            jobAppender = new AsyncAppender();
-            jobAppender.setName(Log4JTaskLogs.JOB_APPENDER_NAME);
-            this.jobsToBeLogged.put(jobId, jobAppender);
-            jobLogger.setAdditivity(false);
-            jobLogger.addAppender(jobAppender);
+                JobResult result = dbManager.loadJobResult(jobId);
+
+                // for finished tasks, add logs events "manually"
+                Collection<TaskResult> allRes = result.getAllResults().values();
+                for (TaskResult tr : allRes) {
+                    this.flushTaskLogs(tr, jobLogger, clientAppender);
+                }
+
+                // for running tasks, activate loggers on taskLauncher side
+                Hashtable<TaskId, TaskLauncher> curRunning = this.currentlyRunningTasks.get(jobId);
+                // for running tasks
+                if (curRunning != null) {
+                    for (TaskId tid : curRunning.keySet()) {
+                        try {
+                            TaskLauncher taskLauncher = curRunning.get(tid);
+                            if (logIsAlreadyInitialized) {
+                                taskLauncher.getStoredLogs(appenderProvider);
+                            } else {
+                                taskLauncher.activateLogs(this.lfs.getAppenderProvider());
+                            }
+                        } catch (LogForwardingException e) {
+                            logger.error("Cannot create an appender provider for task " + tid, e);
+                            logger_dev.error("", e);
+                        }
+                    }
+                }
+            }
+            // nothing to do for pending jobs (bufferFoJobId is not null)
         } else {
-            logIsAlreadyInitialized = true;
-        }
+            JobResult result = dbManager.loadJobResult(jobId);
+            if (result == null) {
+                throw new UnknownJobException(jobId);
+            }
 
-        // should add the appender before activating logs on running tasks !
-        jobAppender.addAppender(clientAppender);
+            // handle finished jobs
+            initJobLogging(jobId, jobLogger, clientAppender);
 
-        // handle finished jobs
-        if (this.finishedJobs.contains(target)) {
             logger_dev.info("listen logs of job '" + jobId + "' : job is already finished");
             // for finished tasks, add logs events "manually"
 
-            JobResult result = dbManager.loadJobResult(jobId);
             Collection<TaskResult> allRes = result.getAllResults().values();
 
             for (TaskResult tr : allRes) {
@@ -1408,39 +1434,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
             logger_dev.info("Cleaning loggers for already finished job '" + jobId + "'");
             jobLogger.removeAllAppenders(); // close appenders...
             this.jobsToBeLogged.remove(jobId);
-
-            // job is not finished, tasks are running
-        } else if (!this.pendingJobs.contains(target)) {
-            // this jobs contains running and finished tasks
-
-            JobResult result = dbManager.loadJobResult(jobId);
-
-            // for finished tasks, add logs events "manually"
-            Collection<TaskResult> allRes = result.getAllResults().values();
-            for (TaskResult tr : allRes) {
-                this.flushTaskLogs(tr, jobLogger, clientAppender);
-            }
-
-            // for running tasks, activate loggers on taskLauncher side
-            Hashtable<TaskId, TaskLauncher> curRunning = this.currentlyRunningTasks.get(jobId);
-            // for running tasks
-            if (curRunning != null) {
-                for (TaskId tid : curRunning.keySet()) {
-                    try {
-                        TaskLauncher taskLauncher = curRunning.get(tid);
-                        if (logIsAlreadyInitialized) {
-                            taskLauncher.getStoredLogs(appenderProvider);
-                        } else {
-                            taskLauncher.activateLogs(this.lfs.getAppenderProvider());
-                        }
-                    } catch (LogForwardingException e) {
-                        logger.error("Cannot create an appender provider for task " + tid, e);
-                        logger_dev.error("", e);
-                    }
-                }
-            }
         }
-        // nothing to do for pending jobs (bufferFoJobId is not null)
     }
 
     private void flushTaskLogs(TaskResult tr, Logger l, Appender a) {
@@ -1483,22 +1477,18 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
      * {@inheritDoc}
      */
     @ImmediateService
-    public JobResult getJobResult(JobId jobId) throws UnknownJobException {
-        final InternalJob job = jobs.get(jobId);
-        final SchedulerCore schedulerStub = (SchedulerCore) PAActiveObject.getStubOnThis();
+    public JobResult getJobResult(final JobId jobId) throws UnknownJobException {
+        logger_dev.info("Trying to get JobResult of job '" + jobId + "'");
 
-        if (job == null) {
+        JobResult result = dbManager.loadJobResult(jobId);
+        if (result == null) {
             throw new UnknownJobException(jobId);
         }
 
-        logger_dev.info("Trying to get JobResult of job '" + jobId + "'");
-        JobResult result = dbManager.loadJobResult(jobId);
-
         try {
-            if (!job.getJobInfo().isToBeRemoved() && SCHEDULER_REMOVED_JOB_DELAY > 0) {
-
+            if (!result.getJobInfo().isToBeRemoved() && SCHEDULER_REMOVED_JOB_DELAY > 0) {
+                final SchedulerCore schedulerStub = (SchedulerCore) PAActiveObject.getStubOnThis();
                 //remember that this job is to be removed
-                job.setToBeRemoved();
                 dbManager.jobSetToBeRemoved(jobId);
 
                 try {
@@ -1506,7 +1496,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
                     TimerTask tt = new TimerTask() {
                         @Override
                         public void run() {
-                            schedulerStub.removeJob(job.getId());
+                            schedulerStub.removeJob(jobId);
                         }
                     };
                     removeJobTimer.schedule(tt, SCHEDULER_REMOVED_JOB_DELAY);
@@ -1536,35 +1526,32 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
             throw new IllegalArgumentException("Incarnation must be 0 or greater.");
         }
 
-        InternalJob job = jobs.get(jobId);
-
-        if (job == null) {
-            logger_dev.info("Job '" + jobId + "' does not exist");
-            throw new UnknownJobException(jobId);
+        try {
+            TaskResult result = dbManager.loadTaskResult(jobId, taskName, inc);
+            if (result == null) {
+                logger_dev.info("Task " + taskName + " is not finished");
+                return null;
+            } else {
+                return result;
+            }
+        } catch (DatabaseManagerException e) {
+            throw new UnknownTaskException("Unknown task " + taskName + ", job: " + jobId);
         }
-
-        TaskResult result = dbManager.loadTaskResult(jobId, taskName, inc);
-
-        if (result == null) {
-            logger_dev.info("Task " + taskName + " is not finished");
-            return null;
-        }
-
-        return result;
     }
 
     /**
      * {@inheritDoc}
      */
     public boolean removeJob(JobId jobId) {
-        InternalJob job = jobs.get(jobId);
-
         logger_dev.info("Request to remove job '" + jobId + "'");
+        InternalJob job = jobs.remove(jobId);
+        if (job == null) {
+            // load job data, JobInfo is needed to send event
+            job = dbManager.loadJobWithoutTasks(jobId);
+        }
 
-        if (job != null && finishedJobs.contains(job)) {
-            jobs.remove(jobId);
+        if (job != null) {
             job.setRemovedTime(System.currentTimeMillis());
-            finishedJobs.remove(job);
 
             // close log buffer
             AsyncAppender jobLog = this.jobsToBeLogged.remove(jobId);
@@ -1729,7 +1716,6 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
         jobs.clear();
         pendingJobs.clear();
         runningJobs.clear();
-        finishedJobs.clear();
         jobsToBeLogged.clear();
         currentlyRunningTasks.clear();
         logger_dev.info("Terminating logging service...");
@@ -1759,7 +1745,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
 
         InternalJob job = jobs.get(jobId);
 
-        if (finishedJobs.contains(job)) {
+        if (job == null) {
             return false;
         }
 
@@ -1785,8 +1771,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
         }
 
         InternalJob job = jobs.get(jobId);
-
-        if (finishedJobs.contains(job)) {
+        if (job == null) {
             return false;
         }
 
@@ -2077,15 +2062,11 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
 
         this.pendingJobs = recoveredState.getPendingJobs();
         this.runningJobs = recoveredState.getRunningJobs();
-        this.finishedJobs = recoveredState.getFinishedJobs();
 
         for (InternalJob job : pendingJobs) {
             jobs.put(job.getId(), job);
         }
         for (InternalJob job : runningJobs) {
-            jobs.put(job.getId(), job);
-        }
-        for (InternalJob job : finishedJobs) {
             jobs.put(job.getId(), job);
         }
 

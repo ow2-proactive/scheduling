@@ -85,9 +85,6 @@ public class TaskResultImpl implements TaskResult {
     /** The task identification of the result */
     private TaskId id = null;
 
-    /** reference to a previous result of a failed execution of the same task, or null */
-    private TaskResultImpl previousResult = null;
-
     /** The value of the result if no exception occurred as a byte array */
     @Unloadable
     private byte[] serializedValue = null;
@@ -557,21 +554,6 @@ public class TaskResultImpl implements TaskResult {
      */
     public long getTaskDuration() {
         return taskDuration;
-    }
-
-    /**
-     * When a Task fails, use this method to link the failed TaskResultImpl to the new one 
-     * @param prev previous failed TaskResultIMpl
-     */
-    public void setPreviousResult(TaskResultImpl prev) {
-        previousResult = prev;
-    }
-
-    /**
-     * @return previous task result impl, most probably containing the trace of a previously failed task, or null
-     */
-    public TaskResultImpl getPreviousResult() {
-        return previousResult;
     }
 
     /**

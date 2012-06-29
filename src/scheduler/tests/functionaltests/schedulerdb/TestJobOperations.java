@@ -5,14 +5,39 @@ import java.util.Collection;
 import junit.framework.Assert;
 
 import org.junit.Test;
+import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.core.db.SchedulerStateRecoverHelper;
 import org.ow2.proactive.scheduler.job.InternalJob;
+import org.ow2.proactive.scheduler.job.JobIdImpl;
 
 
 public class TestJobOperations extends BaseSchedulerDBTest {
+
+    @Test
+    public void testLoadJobWithoutTasks() throws Exception {
+        TaskFlowJob jobDef = new TaskFlowJob();
+        jobDef.addTask(createDefaultTask("task1"));
+        jobDef.addTask(createDefaultTask("task2"));
+        jobDef.addTask(createDefaultTask("task3"));
+        jobDef.setPriority(JobPriority.HIGHEST);
+
+        InternalJob job = defaultSubmitJob(jobDef, "user1");
+
+        job = dbManager.loadJobWithoutTasks(job.getId());
+        Assert.assertEquals(0, job.getTasks().size());
+        Assert.assertEquals("user1", job.getOwner());
+        Assert.assertEquals(3, job.getJobInfo().getTotalNumberOfTasks());
+        Assert.assertEquals(0, job.getJobInfo().getNumberOfFinishedTasks());
+        Assert.assertEquals(0, job.getJobInfo().getNumberOfRunningTasks());
+        Assert.assertEquals(0, job.getJobInfo().getNumberOfPendingTasks());
+        Assert.assertEquals(JobStatus.PENDING, job.getJobInfo().getStatus());
+        Assert.assertEquals(JobPriority.HIGHEST, job.getJobInfo().getPriority());
+
+        Assert.assertNull(dbManager.loadJobWithoutTasks(JobIdImpl.makeJobId("123456789")));
+    }
 
     @Test
     public void testPause() throws Exception {

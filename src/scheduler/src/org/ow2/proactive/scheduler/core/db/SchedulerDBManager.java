@@ -272,6 +272,21 @@ public class SchedulerDBManager implements FilteredExceptionCallback {
         });
     }
 
+    public InternalJob loadJobWithoutTasks(final JobId id) {
+        return runWithoutTransaction(new SessionWork<InternalJob>() {
+            @Override
+            InternalJob executeWork(Session session) {
+                JobData jobData = (JobData) session.get(JobData.class, jobId(id));
+                if (jobData == null) {
+                    return null;
+                } else {
+                    return jobData.toInternalJob();
+                }
+            }
+
+        });
+    }
+
     public List<InternalJob> loadJobs(final boolean fullState, final JobId... jobIds) {
         return runWithoutTransaction(new SessionWork<List<InternalJob>>() {
             @Override
@@ -308,8 +323,7 @@ public class SchedulerDBManager implements FilteredExceptionCallback {
     }
 
     private List<InternalJob> loadInternalJobs(boolean fullState, Session session, List<Long> ids) {
-        Query jobQuery = session.createQuery("from JobData as job where job.id in (:ids)")
-                .setResultTransformer(DistinctRootEntityResultTransformer.INSTANCE);
+        Query jobQuery = session.createQuery("from JobData as job where job.id in (:ids)");
 
         List<InternalJob> result = new ArrayList<InternalJob>(ids.size());
 
@@ -762,7 +776,7 @@ public class SchedulerDBManager implements FilteredExceptionCallback {
                 JobData job = (JobData) session.get(JobData.class, id);
 
                 if (job == null) {
-                    throw new DatabaseManagerException("Invalid job id: " + jobId);
+                    return null;
                 }
 
                 Query query = session

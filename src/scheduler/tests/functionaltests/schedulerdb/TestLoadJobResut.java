@@ -5,7 +5,6 @@ import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.ow2.proactive.db.DatabaseManagerException;
 import org.ow2.proactive.db.types.BigString;
 import org.ow2.proactive.scheduler.common.job.JobEnvironment;
 import org.ow2.proactive.scheduler.common.job.JobId;
@@ -156,12 +155,7 @@ public class TestLoadJobResut extends BaseSchedulerDBTest {
     public void testInvalidJobId() throws Exception {
         JobId jobId = new JobIdImpl(Long.MAX_VALUE, "dummy");
         System.out.println("Load result for invalid jobId");
-        try {
-            dbManager.loadJobResult(jobId);
-            Assert.fail("Exception was expected");
-        } catch (DatabaseManagerException e) {
-
-        }
+        Assert.assertNull(dbManager.loadJobResult(jobId));
     }
 
 }

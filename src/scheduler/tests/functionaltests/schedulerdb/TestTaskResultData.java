@@ -11,6 +11,7 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.spi.LoggingEvent;
 import org.junit.Assert;
 import org.junit.Test;
+import org.ow2.proactive.db.DatabaseManagerException;
 import org.ow2.proactive.db.types.BigString;
 import org.ow2.proactive.scheduler.common.job.JobEnvironment;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
@@ -22,11 +23,37 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.flow.FlowAction;
 import org.ow2.proactive.scheduler.common.task.flow.FlowActionType;
 import org.ow2.proactive.scheduler.job.InternalJob;
+import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 
 
 public class TestTaskResultData extends BaseSchedulerDBTest {
+
+    @Test
+    public void testInvalidTask() throws Throwable {
+        TaskFlowJob jobDef = new TaskFlowJob();
+        jobDef.addTask(createDefaultTask("testTask"));
+        InternalJob job = defaultSubmitJob(jobDef);
+
+        // try to call when task exists but there is no result
+        Assert.assertNull(dbManager.loadTaskResult(job.getId(), "testTask", 0));
+        Assert.assertNull(dbManager.loadTaskResult(job.getId(), "testTask", 1));
+
+        // try to call with invalid task name and invalid jobId
+        try {
+            dbManager.loadTaskResult(job.getId(), "testTask1", 1);
+            Assert.fail();
+        } catch (DatabaseManagerException e) {
+            // expected
+        }
+        try {
+            dbManager.loadTaskResult(JobIdImpl.makeJobId("12345789"), "testTask", 1);
+            Assert.fail();
+        } catch (DatabaseManagerException e) {
+            // expected
+        }
+    }
 
     @Test
     public void testMultipleResults() throws Throwable {
