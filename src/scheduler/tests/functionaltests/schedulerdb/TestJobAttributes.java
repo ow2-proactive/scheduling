@@ -14,6 +14,19 @@ import org.ow2.proactive.scheduler.job.InternalJob;
 public class TestJobAttributes extends BaseSchedulerDBTest {
 
     @Test
+    public void testJobIdGeneration() throws Exception {
+        // test job ids are sequential 
+        for (int i = 0; i < 5; i++) {
+            TaskFlowJob jobDef = new TaskFlowJob();
+            for (int j = 0; j < 10; j++) {
+                jobDef.addTask(createDefaultTask("task" + j));
+            }
+            InternalJob job = defaultSubmitJob(jobDef);
+            Assert.assertEquals(String.valueOf(i + 1), job.getId().value());
+        }
+    }
+
+    @Test
     public void testLargeStringValues() throws Exception {
         String description = createString(500);
 
