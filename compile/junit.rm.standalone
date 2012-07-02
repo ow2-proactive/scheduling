@@ -21,7 +21,7 @@ opt="-Xms128m -Xmx2048m"
 RM_OUT=$(mktemp --tmpdir)
 
 cleanup () {
-		echo "Killing the forked processeses"
+		echo "Killing the forked processes"
 		/bin/kill $RM_PID
 		pkill -9 -f Dproactive.test
 		pkill -9 -f RMStarter
@@ -57,7 +57,7 @@ if [ -z "$ITERATIONS" ]; then
 	ITERATIONS=1
 fi 
 
-echo "Running RM fuctional tests"
+echo "Running RM functional tests"
 for (( c=1; c<=$ITERATIONS; c++ ))
 do
 	echo "Iteration $c"

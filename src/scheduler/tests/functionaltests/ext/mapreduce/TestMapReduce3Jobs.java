@@ -34,10 +34,6 @@ import java.io.OutputStreamWriter;
 import java.util.Iterator;
 import java.util.Random;
 
-import org.junit.Assert;
-import org.ow2.proactive.scheduler.ext.mapreduce.PAMapReduceJobConfiguration;
-import org.ow2.tests.FunctionalTest;
-
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
@@ -53,6 +49,10 @@ import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.input.SequenceFileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
+import org.junit.Assert;
+import org.ow2.proactive.scheduler.ext.mapreduce.PAMapReduceJobConfiguration;
+
+import functionaltests.SchedulerConsecutive;
 
 
 /**********************************************************
@@ -81,7 +81,7 @@ import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
  * seen ints. 7) A mapred job integrates all the count files into a single one.
  * 
  **********************************************************/
-public class TestMapReduce3Jobs extends FunctionalTest {
+public class TestMapReduce3Jobs extends SchedulerConsecutive {
 
     private static FileSystem fs;
 

@@ -48,7 +48,6 @@ import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.examples.FailTaskConditionally;
-import org.ow2.tests.FunctionalTest;
 
 
 /**
@@ -65,7 +64,7 @@ import org.ow2.tests.FunctionalTest;
  * @date 18 08 2011
  * @since ProActive Scheduling 3.1
  */
-public class TestJobCanceledWithReplication extends FunctionalTest {
+public class TestJobCanceledWithReplication extends SchedulerConsecutive {
 
     private static URL jobDescriptor = TestJobCanceledWithReplication.class
             .getResource("/functionaltests/descriptors/Job_Aborted_With_Replication.xml");

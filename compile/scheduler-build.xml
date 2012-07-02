@@ -155,7 +155,11 @@
 		<chmod file="${cl.scheduler.tests.dir}/functionaltests/workflow/it.sh" perm="ugo+rx" />
 		<chmod file="${cl.scheduler.tests.dir}/functionaltests/executables/test_multiple_hosts_request.sh" perm="ugo+rx" />
 		<chmod file="${cl.scheduler.tests.dir}/functionaltests/executables/*.sh" perm="ugo+rx" />
-		<junitMacro testsuite="scheduler.testsuite" testclasspath="scheduler.test.classpath" log4jconfig="-Dlog4j.configuration=file:${base.dir}/compile/scheduler-log4j" />
+		<junitMacro testsuite="scheduler.testsuite" testclasspath="scheduler.test.classpath" log4jconfig="-Dlog4j.configuration=file:${base.dir}/compile/scheduler-log4j">
+			<jvmargs>
+				<jvmarg value="-Durl=${url}" />
+			</jvmargs>
+		</junitMacro>			
 		<antcall target="junit.summary" />
 	</target>
 

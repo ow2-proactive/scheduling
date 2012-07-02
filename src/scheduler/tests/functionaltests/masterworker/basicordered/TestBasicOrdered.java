@@ -46,7 +46,7 @@ import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.extensions.masterworker.ProActiveMaster;
 import org.objectweb.proactive.extensions.masterworker.interfaces.Master;
 
-import org.ow2.tests.FunctionalTest;
+import functionaltests.SchedulerConsecutive;
 import functionaltests.SchedulerTHelper;
 import functionaltests.masterworker.A;
 
@@ -54,7 +54,7 @@ import functionaltests.masterworker.A;
 /**
  * Test Master/Worker ordering
  */
-public class TestBasicOrdered extends FunctionalTest {
+public class TestBasicOrdered extends SchedulerConsecutive {
     private Master<A, Integer> master;
     private List<A> tasks;
     public static final int NB_TASKS = 30;
@@ -62,7 +62,7 @@ public class TestBasicOrdered extends FunctionalTest {
     @org.junit.Test
     public void run() throws Throwable {
 
-        SchedulerTHelper.startScheduler();
+        SchedulerTHelper.init();
 
         //before
         master = new ProActiveMaster<A, Integer>();

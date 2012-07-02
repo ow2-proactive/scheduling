@@ -54,7 +54,8 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.junit.Assert;
 import org.ow2.proactive.scheduler.ext.mapreduce.PAMapReduceFramework;
 import org.ow2.proactive.scheduler.ext.mapreduce.PAMapReduceJobConfiguration;
-import org.ow2.tests.FunctionalTest;
+
+import functionaltests.SchedulerConsecutive;
 
 
 /**
@@ -62,7 +63,7 @@ import org.ow2.tests.FunctionalTest;
  * iterations of mapper and reducer fail, given that maxNumberOfExecutions is
  * greater than 1.
  */
-public class TestFaultTolerance extends FunctionalTest {
+public class TestFaultTolerance extends SchedulerConsecutive {
 
     /**
      * This Mapper will fail the first time it is run, but will work on

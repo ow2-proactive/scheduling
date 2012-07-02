@@ -48,8 +48,6 @@ import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 
-import org.ow2.tests.FunctionalTest;
-
 
 /**
  * This class tests the behavior when giving an invalid selection script
@@ -62,7 +60,7 @@ import org.ow2.tests.FunctionalTest;
  * @date 2 jun 08
  * @since ProActive Scheduling 1.0
  */
-public class TestJobWithInvalidSelectionScript extends FunctionalTest {
+public class TestJobWithInvalidSelectionScript extends SchedulerConsecutive {
 
     private static URL jobDescriptor = TestJobWithInvalidSelectionScript.class
             .getResource("/functionaltests/descriptors/Job_invalidSS.xml");

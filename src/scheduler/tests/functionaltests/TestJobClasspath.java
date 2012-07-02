@@ -57,8 +57,6 @@ import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.common.task.executable.Executable;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 
-import org.ow2.tests.FunctionalTest;
-
 
 /**
  * This class tests the job classpath feature.
@@ -73,7 +71,7 @@ import org.ow2.tests.FunctionalTest;
  * @date 18 Feb. 09
  * @since ProActive Scheduling 1.0
  */
-public class TestJobClasspath extends FunctionalTest {
+public class TestJobClasspath extends SchedulerConsecutive {
 
     private static URL jobDescriptor = TestJobClasspath.class
             .getResource("/functionaltests/descriptors/Job_Test_CP.xml");

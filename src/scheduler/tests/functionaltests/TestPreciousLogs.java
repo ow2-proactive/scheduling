@@ -61,7 +61,6 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import org.ow2.proactive.scripting.SimpleScript;
 import org.ow2.proactive.utils.FileToBytesConverter;
-import org.ow2.tests.FunctionalTest;
 
 
 /**
@@ -75,7 +74,7 @@ import org.ow2.tests.FunctionalTest;
  * @author ProActive team
  *
  */
-public class TestPreciousLogs extends FunctionalTest {
+public class TestPreciousLogs extends SchedulerConsecutive {
 
     public static class TestJavaTask extends JavaExecutable {
 

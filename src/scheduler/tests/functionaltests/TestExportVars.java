@@ -42,7 +42,6 @@ import java.util.Map;
 
 import org.junit.Assert;
 import org.objectweb.proactive.utils.OperatingSystem;
-import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
@@ -50,10 +49,8 @@ import org.ow2.proactive.scheduler.common.job.factories.JobFactory_stax;
 import org.ow2.proactive.scheduler.common.task.NativeTask;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 
-import org.ow2.tests.FunctionalTest;
 
-
-public class TestExportVars extends FunctionalTest {
+public class TestExportVars extends SchedulerConsecutive {
 
     private static URL jobDescriptor = TestJobPrePostSubmission.class
             .getResource("/functionaltests/descriptors/Job_exportVars.xml");

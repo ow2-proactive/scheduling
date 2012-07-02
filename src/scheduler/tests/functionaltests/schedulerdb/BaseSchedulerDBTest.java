@@ -20,6 +20,7 @@ import org.hamcrest.Description;
 import org.hamcrest.TypeSafeMatcher;
 import org.hibernate.cfg.Configuration;
 import org.junit.After;
+import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.objectweb.proactive.core.node.NodeFactory;
@@ -343,6 +344,14 @@ public class BaseSchedulerDBTest {
 
     @Before
     public void initTest() throws Exception {
+        String urlProperty = System.getProperty("url");
+        boolean consecutiveMode = urlProperty != null && !urlProperty.equals("${url}");
+        if (consecutiveMode) {
+            System.err.println("Test does not support the 'consecutive' mode execution");
+            Assume.assumeTrue(false);
+            return;
+        }
+
         Configuration config = new Configuration().configure(new File(PASchedulerProperties
                 .getAbsolutePath("src/scheduler/tests/functionaltests/config/hibernate.cfg.xml")));
         dbManager = new SchedulerDBManager(config, true);

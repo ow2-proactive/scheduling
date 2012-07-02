@@ -54,8 +54,6 @@ import org.ow2.proactive.scheduler.common.task.NativeTask;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 
-import org.ow2.tests.FunctionalTest;
-
 
 /**
  * Test whether attribute 'workingDir' set in native task element in a job descriptor
@@ -64,7 +62,7 @@ import org.ow2.tests.FunctionalTest;
  * @author The ProActive Team
  * @date 2 jun 08
  */
-public class TestWorkingDirStaticCommand extends FunctionalTest {
+public class TestWorkingDirStaticCommand extends SchedulerConsecutive {
 
     private static URL jobDescriptor = TestWorkingDirStaticCommand.class
             .getResource("/functionaltests/descriptors/Job_test_workingDir_static_command.xml");

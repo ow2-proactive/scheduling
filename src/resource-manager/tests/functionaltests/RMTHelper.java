@@ -64,6 +64,7 @@ import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProper
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.frontend.RMConnection;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
+import org.ow2.proactive.resourcemanager.nodesource.infrastructure.DefaultInfrastructureManager;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.LocalInfrastructure;
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.ow2.proactive.utils.FileToBytesConverter;
@@ -188,6 +189,23 @@ public class RMTHelper {
         for (int i = 0; i < nodeNumber; i++) {
             waitForAnyNodeEvent(RMEventType.NODE_ADDED);
             waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
+            waitForAnyNodeEvent(RMEventType.NODE_ADDED);
+            waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        }
+    }
+
+    public void createNodeSourceWithTestClassPath(String name) throws Exception {
+        RMFactory.setOsJavaProperty();
+        ResourceManager rm = getResourceManager();
+        System.out.println("Creating a node source " + name);
+        rm.createNodeSource(name, DefaultInfrastructureManager.class.getName(), null, StaticPolicy.class
+                .getName(), null);
+        rm.setNodeSourcePingFrequency(5000, name);
+        waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, name);
+
+        for (int i = 0; i < RMTHelper.defaultNodesNumber; i++) {
+            String nodeUrl = createNode(name + "-" + i).getNode().getNodeInformation().getURL();
+            resourceManager.addNode(nodeUrl, name);
             waitForAnyNodeEvent(RMEventType.NODE_ADDED);
             waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
         }

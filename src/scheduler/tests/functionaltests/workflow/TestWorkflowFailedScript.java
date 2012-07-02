@@ -47,7 +47,7 @@ import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
 
-import org.ow2.tests.FunctionalTest;
+import functionaltests.SchedulerConsecutive;
 import functionaltests.SchedulerTHelper;
 
 
@@ -60,7 +60,7 @@ import functionaltests.SchedulerTHelper;
  * @author The ProActive Team
  * @since ProActive Scheduling 2.2
  */
-public class TestWorkflowFailedScript extends FunctionalTest {
+public class TestWorkflowFailedScript extends SchedulerConsecutive {
 
     private static final String ifScriptContent = "throw new java.lang.Exception(\"test exception\");";
 

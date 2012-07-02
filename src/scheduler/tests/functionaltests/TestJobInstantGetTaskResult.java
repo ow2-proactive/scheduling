@@ -45,7 +45,6 @@ import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 
-import org.ow2.tests.FunctionalTest;
 import functionaltests.executables.ResultAsArray;
 
 
@@ -59,7 +58,7 @@ import functionaltests.executables.ResultAsArray;
  * @date 12 jun 09
  * @since ProActive Scheduling 1.0
  */
-public class TestJobInstantGetTaskResult extends FunctionalTest {
+public class TestJobInstantGetTaskResult extends SchedulerConsecutive {
 
     /**
     * Tests start here.

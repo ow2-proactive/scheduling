@@ -46,12 +46,12 @@ import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.extensions.masterworker.ProActiveMaster;
 import org.objectweb.proactive.extensions.masterworker.interfaces.Master;
 
-import org.ow2.tests.FunctionalTest;
+import functionaltests.SchedulerConsecutive;
 import functionaltests.SchedulerTHelper;
 import functionaltests.masterworker.A;
 
 
-public class TestClear extends FunctionalTest {
+public class TestClear extends SchedulerConsecutive {
 
     private Master<A, Integer> master;
     private List<A> tasks1;
@@ -63,7 +63,7 @@ public class TestClear extends FunctionalTest {
     @org.junit.Test
     public void run() throws Throwable {
 
-        SchedulerTHelper.startScheduler();
+        SchedulerTHelper.init();
 
         //before
         tasks1 = new ArrayList<A>();

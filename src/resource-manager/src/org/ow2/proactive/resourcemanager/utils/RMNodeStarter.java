@@ -41,6 +41,7 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.config.xml.ProActiveConfigurationParser;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeFactory;

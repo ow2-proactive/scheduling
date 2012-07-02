@@ -41,17 +41,11 @@ import java.net.URL;
 import java.util.Map.Entry;
 
 import org.junit.Assert;
-import org.ow2.proactive.authentication.crypto.Credentials;
-import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.common.RMState;
-import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
-import org.ow2.proactive.resourcemanager.frontend.RMConnection;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
-
-import org.ow2.tests.FunctionalTest;
 
 
 /**
@@ -74,7 +68,7 @@ import org.ow2.tests.FunctionalTest;
  * @date 2 jun 08
  * @since ProActive Scheduling 1.0
  */
-public class TestJobMultiNodesSubmission extends FunctionalTest {
+public class TestJobMultiNodesSubmission extends SchedulerConsecutive {
 
     private static URL jobDescriptor = TestJobMultiNodesSubmission.class
             .getResource("/functionaltests/descriptors/Job_MultiNodes.xml");
@@ -89,18 +83,16 @@ public class TestJobMultiNodesSubmission extends FunctionalTest {
         //submit job
         JobId id = SchedulerTHelper.submitJob(new File(jobDescriptor.toURI()).getAbsolutePath());
         //connect to RM
-        RMAuthentication rmAuth = RMConnection.waitAndJoin(null);
-        ResourceManager rmAdmin = rmAuth.login(Credentials.getCredentials(PAResourceManagerProperties
-                .getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString())));
+        ResourceManager rmAdmin = RMTHelper.getDefaultInstance().getResourceManager();
 
         //wait job is running
         SchedulerTHelper.waitForEventJobRunning(id);
 
         Thread.sleep(500);
 
-        //check RM has 5 busy nodes
+        //check RM has 4 busy nodes
         RMState rms = rmAdmin.getState();
-        Assert.assertEquals(5, rms.getTotalNodesNumber() - rms.getFreeNodesNumber());
+        Assert.assertEquals(4, rms.getTotalNodesNumber() - rms.getFreeNodesNumber());
 
         //wait for job to be finished
         SchedulerTHelper.waitForEventJobFinished(id);

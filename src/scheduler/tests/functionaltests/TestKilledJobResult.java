@@ -16,14 +16,13 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
-import org.ow2.tests.FunctionalTest;
 
 
 /**
  * Sanity test against result for killed job.
  *
  */
-public class TestKilledJobResult extends FunctionalTest {
+public class TestKilledJobResult extends SchedulerConsecutive {
 
     public static class TestJavaTask1 extends JavaExecutable {
 

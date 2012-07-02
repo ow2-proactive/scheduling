@@ -57,7 +57,6 @@ import org.ow2.proactive.scheduler.common.task.dataspaces.FileSelector;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputAccessMode;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
 
-import org.ow2.tests.FunctionalTest;
 import functionaltests.executables.DSWorker;
 
 
@@ -81,7 +80,7 @@ import functionaltests.executables.DSWorker;
  * @date 2 jun 08
  * @since ProActive Scheduling 1.0
  */
-public class TestJobDataspaceSubmission extends FunctionalTest {
+public class TestJobDataspaceSubmission extends SchedulerConsecutive {
 
     private static String IOSPACE = System.getProperty("java.io.tmpdir") + File.separator + "scheduler_test" +
         File.separator;

@@ -37,14 +37,9 @@
 package functionaltests.workflow;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 
 import org.junit.Assert;
@@ -53,18 +48,12 @@ import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.job.factories.JobFactory_stax;
-import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.NativeTask;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
-import org.ow2.proactive.scheduler.common.task.flow.FlowActionType;
-import org.ow2.proactive.scheduler.common.task.flow.FlowBlock;
-import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
-import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
-import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.SimpleScript;
 
-import org.ow2.tests.FunctionalTest;
+import functionaltests.SchedulerConsecutive;
 import functionaltests.SchedulerTHelper;
 
 
@@ -75,7 +64,7 @@ import functionaltests.SchedulerTHelper;
  * @author The ProActive Team
  * @since ProActive Scheduling 2.2
  */
-public class TestWorkflowIterationAwareness extends FunctionalTest {
+public class TestWorkflowIterationAwareness extends SchedulerConsecutive {
 
     private static final String tmp_dir_Windows = "C:\\tmp\\";
 

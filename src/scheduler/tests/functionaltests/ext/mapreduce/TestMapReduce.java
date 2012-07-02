@@ -44,7 +44,8 @@ import org.ow2.proactive.scheduler.ext.mapreduce.PAMapReduceFramework;
 import org.ow2.proactive.scheduler.ext.mapreduce.PAMapReduceJobConfiguration;
 import org.ow2.proactive.scheduler.ext.mapreduce.ReadMode;
 import org.ow2.proactive.scheduler.ext.mapreduce.WriteMode;
-import org.ow2.tests.FunctionalTest;
+
+import functionaltests.SchedulerConsecutive;
 
 
 /**
@@ -52,7 +53,7 @@ import org.ow2.tests.FunctionalTest;
  * read modes, setting the number of reducers and input split size, using
  * combiner class.
  */
-public class TestMapReduce extends FunctionalTest {
+public class TestMapReduce extends SchedulerConsecutive {
 
     /** 
      * Together with {@link IntSumReducer} implements word count algorithm.

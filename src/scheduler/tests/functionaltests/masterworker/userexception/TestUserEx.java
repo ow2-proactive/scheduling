@@ -46,7 +46,7 @@ import org.objectweb.proactive.extensions.masterworker.ProActiveMaster;
 import org.objectweb.proactive.extensions.masterworker.TaskException;
 import org.objectweb.proactive.extensions.masterworker.interfaces.Master;
 
-import org.ow2.tests.FunctionalTest;
+import functionaltests.SchedulerConsecutive;
 import functionaltests.SchedulerTHelper;
 import functionaltests.masterworker.A;
 
@@ -54,7 +54,7 @@ import functionaltests.masterworker.A;
 /**
  * Test load balancing
  */
-public class TestUserEx extends FunctionalTest {
+public class TestUserEx extends SchedulerConsecutive {
 
     private Master<A, Integer> master;
     private List<A> tasks;
@@ -63,7 +63,7 @@ public class TestUserEx extends FunctionalTest {
     @org.junit.Test
     public void run() throws Throwable {
 
-        SchedulerTHelper.startScheduler();
+        SchedulerTHelper.init();
 
         //before
         tasks = new ArrayList<A>();

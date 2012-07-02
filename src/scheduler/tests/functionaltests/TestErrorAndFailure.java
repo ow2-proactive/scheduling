@@ -49,8 +49,6 @@ import org.ow2.proactive.scheduler.common.task.NativeTask;
 import org.ow2.proactive.scheduler.common.task.Task;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 
-import org.ow2.tests.FunctionalTest;
-
 
 /**
  * This class tests a basic actions of a job submission to ProActive scheduler :
@@ -68,7 +66,7 @@ import org.ow2.tests.FunctionalTest;
  * @date 2 jun 08
  * @since ProActive Scheduling 1.0
  */
-public class TestErrorAndFailure extends FunctionalTest {
+public class TestErrorAndFailure extends SchedulerConsecutive {
 
     /**
      * Tests start here.

@@ -45,8 +45,6 @@ import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
 
-import org.ow2.tests.FunctionalTest;
-
 
 /**
  * Test connection mechanisms :
@@ -64,7 +62,7 @@ import org.ow2.tests.FunctionalTest;
  * @since ProActive Scheduling 1.0
  *
  */
-public class AuthenticationTest extends FunctionalTest {
+public class AuthenticationTest extends SchedulerConsecutive {
 
     private String adminName = "demo";
     private String adminPwd = "demo";

@@ -43,11 +43,10 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.junit.Assert;
-import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
@@ -63,8 +62,7 @@ import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.common.task.flow.FlowActionType;
 
-import org.ow2.tests.FunctionalTest;
-
+import functionaltests.SchedulerConsecutive;
 import functionaltests.SchedulerTHelper;
 
 
@@ -74,7 +72,7 @@ import functionaltests.SchedulerTHelper;
  * @author The ProActive Team
  * @since ProActive Scheduling 2.2
  */
-public abstract class TWorkflowJobs extends FunctionalTest {
+public abstract class TWorkflowJobs extends SchedulerConsecutive {
 
     protected final String jobSuffix = ".xml";
 

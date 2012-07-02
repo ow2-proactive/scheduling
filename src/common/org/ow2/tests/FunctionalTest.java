@@ -134,12 +134,11 @@ public class FunctionalTest {
         }
         Runtime.getRuntime().removeShutdownHook(shutdownHook);
 
-        // Cleanup proactive
-        if (paSetup != null) {
-            paSetup.shutdown();
-        }
-
         if (!consecutiveMode) {
+            // Cleanup proactive
+            if (paSetup != null) {
+                paSetup.shutdown();
+            }
             // Kill everything
             cleaner.killAliveProcesses();
         }
@@ -151,8 +150,8 @@ public class FunctionalTest {
             System.err.println("Shutdown hook. Killing remaining processes");
             try {
                 timer.cancel();
-                paSetup.shutdown();
                 if (!consecutiveMode) {
+                    paSetup.shutdown();
                     cleaner.killAliveProcesses();
                 }
             } catch (Exception e) {
@@ -171,6 +170,8 @@ public class FunctionalTest {
                 } catch (Exception e) {
                     logger.error("Failed to kill remaining proccesses", e);
                 }
+            } else {
+                System.exit(0);
             }
         }
     }

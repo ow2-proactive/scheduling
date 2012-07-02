@@ -48,8 +48,6 @@ import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 
-import org.ow2.tests.FunctionalTest;
-
 
 /**
  * This class tests the cancelJobOnError feature of a task.
@@ -64,7 +62,7 @@ import org.ow2.tests.FunctionalTest;
  * @date 2 jun 08
  * @since ProActive Scheduling 1.0
  */
-public class TestJobAborted extends FunctionalTest {
+public class TestJobAborted extends SchedulerConsecutive {
 
     private static URL jobDescriptor = TestJobAborted.class
             .getResource("/functionaltests/descriptors/Job_Aborted.xml");

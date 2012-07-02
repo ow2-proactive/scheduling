@@ -46,8 +46,6 @@ import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.examples.WaitAndPrint;
 
-import org.ow2.tests.FunctionalTest;
-
 
 /**
  * This class tests a special behavior.
@@ -60,7 +58,7 @@ import org.ow2.tests.FunctionalTest;
  * @date 08 july 09
  * @since ProActive Scheduling 1.0
  */
-public class TestMultipleUsersMakingMassivGetResultRequest extends FunctionalTest {
+public class TestMultipleUsersMakingMassivGetResultRequest extends SchedulerConsecutive {
 
     private static int ThreadNumber = 8; //8 clients
     private static long jobSubmissionDuration = 60 * 1000; // 60 sec

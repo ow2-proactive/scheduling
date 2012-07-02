@@ -27,14 +27,13 @@ import org.ow2.proactive.scheduler.common.task.dataspaces.InputAccessMode;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import org.ow2.proactive.scheduler.common.util.dsclient.SchedulerProxyUIWithDSupport;
-import org.ow2.tests.FunctionalTest;
 
 
 /**
  * @author esalagea
  * 
  */
-public class TestSchedulerProxyUIWithDSSupport extends FunctionalTest {
+public class TestSchedulerProxyUIWithDSSupport extends SchedulerConsecutive {
 
     public static final String workFolderPath = System.getProperty("java.io.tmpdir") + File.separator +
         "testDS_LocalFolder";
@@ -75,7 +74,7 @@ public class TestSchedulerProxyUIWithDSSupport extends FunctionalTest {
         dataServerURI = dataProvider.deployProActiveDataServer(dataServerFolderPath, "data");
 
         // start scheduler and nodes
-        SchedulerTHelper.startScheduler();
+        SchedulerTHelper.init();
 
     }
 

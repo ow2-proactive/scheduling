@@ -44,7 +44,7 @@ import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.factories.JobFactory;
 
-import org.ow2.tests.FunctionalTest;
+import functionaltests.SchedulerConsecutive;
 import functionaltests.SchedulerTHelper;
 
 
@@ -55,7 +55,7 @@ import functionaltests.SchedulerTHelper;
  * @author The ProActive Team
  * @since ProActive Scheduling 2.2
  */
-public class TestWorkflowSubmission extends FunctionalTest {
+public class TestWorkflowSubmission extends SchedulerConsecutive {
 
     private static final URL jobs_path = TestWorkflowSubmission.class
             .getResource("/functionaltests/workflow/descriptors/");

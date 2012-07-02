@@ -51,8 +51,6 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 
-import org.ow2.tests.FunctionalTest;
-
 
 /**
  * This class tests the preempt task, restart task, and kill task features.
@@ -75,7 +73,7 @@ import org.ow2.tests.FunctionalTest;
  * @date 15 mar. 11
  * @since ProActive Scheduling 3.0
  */
-public class TestPreemptRestartKillTask extends FunctionalTest {
+public class TestPreemptRestartKillTask extends SchedulerConsecutive {
 
     private static URL jobDescriptor = TestPreemptRestartKillTask.class
             .getResource("/functionaltests/descriptors/Job_preempt_restart_kill.xml");

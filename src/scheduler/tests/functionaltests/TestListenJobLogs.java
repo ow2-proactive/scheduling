@@ -61,7 +61,6 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingService;
 import org.ow2.proactive.scheduler.common.util.logforwarder.providers.SocketBasedForwardingProvider;
-import org.ow2.tests.FunctionalTest;
 
 
 /**
@@ -77,7 +76,7 @@ import org.ow2.tests.FunctionalTest;
  * @author ProActive team
  *
  */
-public class TestListenJobLogs extends FunctionalTest {
+public class TestListenJobLogs extends SchedulerConsecutive {
 
     static final long LOG_EVENT_TIMEOUT = 10000;
 

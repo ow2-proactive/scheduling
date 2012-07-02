@@ -55,8 +55,6 @@ import org.ow2.proactive.scheduler.common.task.dataspaces.InputAccessMode;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
 import org.ow2.proactive.scripting.SimpleScript;
 
-import org.ow2.tests.FunctionalTest;
-
 
 /**
  * Enforce GLOBAL space validity
@@ -77,7 +75,7 @@ import org.ow2.tests.FunctionalTest;
  * @author The ProActive Team
  * @since ProActive Scheduling 2.2
  */
-public class TestGlobalSpace extends FunctionalTest {
+public class TestGlobalSpace extends SchedulerConsecutive {
 
     private static final String[][] inFiles = { { "A", "Content of A" }, { "B", "not much" },
             { "_1234", "!@#%$@%54vc54\b\t\\\\\nasd123!@#", "res1", "one of the output files" },
@@ -205,7 +203,13 @@ public class TestGlobalSpace extends FunctionalTest {
         /**
          * start scheduler, submit job
          */
-        SchedulerTHelper.startScheduler(tmpProps.getAbsolutePath());
+        if (consecutiveMode) {
+            // pa.scheduler.dataspace.globalurl is set in the launching script
+            SchedulerTHelper.init();
+        } else {
+            SchedulerTHelper.startScheduler(true, tmpProps.getAbsolutePath());
+        }
+
         JobId id = SchedulerTHelper.getSchedulerInterface().submit(job);
         while (true) {
             try {

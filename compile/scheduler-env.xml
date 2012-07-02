@@ -94,6 +94,7 @@
             <else>
                     <fileset dir="${cl.scheduler.tests.dir}" id="scheduler.testsuite">
                             <include name="**/*Test*.class" />
+	                        <exclude name="**/ext/mapreduce/*Test*.class" />
                             <exclude name="**/*$*.class"/>
                     </fileset>
             </else>

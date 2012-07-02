@@ -44,16 +44,13 @@ import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 
-import org.ow2.tests.FunctionalTest;
 import functionaltests.executables.ComplexParamsExecutable;
 
 
-public class ComplexTypeArgsTest extends FunctionalTest {
+public class ComplexTypeArgsTest extends SchedulerConsecutive {
 
     @org.junit.Test
     public void run() throws Throwable {
-
-        SchedulerTHelper.startScheduler();
 
         //creating job
         TaskFlowJob submittedJob = new TaskFlowJob();

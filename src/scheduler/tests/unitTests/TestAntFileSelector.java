@@ -34,7 +34,7 @@
  * ################################################################
  * $$ACTIVEEON_INITIAL_DEV$$
  */
-package functionaltests;
+package unitTests;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -66,7 +66,7 @@ import org.objectweb.proactive.extensions.vfsprovider.FileSystemServerDeployer;
 
 public class TestAntFileSelector {
 
-    private static URL DSroot = TestAntFileSelector.class.getResource("/functionaltests/" +
+    private static URL DSroot = TestAntFileSelector.class.getResource("/unitTests/" +
         TestAntFileSelector.class.getSimpleName() + ".class");
 
     private static String DSrootString;
@@ -74,7 +74,7 @@ public class TestAntFileSelector {
     @Test
     public void run() throws Throwable {
         File parent = new File(DSroot.toURI()).getParentFile();
-        DSrootString = parent.getAbsolutePath();
+        DSrootString = parent.getAbsolutePath() + "/../functionaltests/";
 
         log(DSrootString);
         //start DS server

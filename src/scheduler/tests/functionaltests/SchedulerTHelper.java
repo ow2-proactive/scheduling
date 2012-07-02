@@ -151,17 +151,6 @@ public class SchedulerTHelper {
     public static String password = "demo";
 
     /**
-     * Start the scheduler using a forked JVM.
-     * It uses Scheduler Properties file designed for tests
-     * (database is recovered without jobs).
-     *
-     * @throws Exception
-     */
-    public static void startScheduler() throws Exception {
-        startScheduler(null);
-    }
-
-    /**
      * Start the scheduler using a forked JVM and
      * deploys, with its associated Resource manager, 5 local ProActive nodes.
      *
@@ -390,9 +379,24 @@ public class SchedulerTHelper {
      */
     public static SchedulerAuthenticationInterface getSchedulerAuth() throws Exception {
         if (schedulerAuth == null) {
-            startScheduler();
+            String schedulerUrl = System.getProperty("url");
+            if (schedulerUrl != null && !schedulerUrl.equals("${url}")) {
+                // connecting to the existing scheduler
+                schedulerAuth = SchedulerConnection.waitAndJoin(schedulerUrl);
+            } else {
+                startScheduler(null);
+            }
         }
         return schedulerAuth;
+    }
+
+    /**
+     * Starts the scheduler or connected to existing one if in consecutive mode
+     * 
+     * @throws Exception
+     */
+    public static void init() throws Exception {
+        getSchedulerAuth();
     }
 
     /**
@@ -407,14 +411,7 @@ public class SchedulerTHelper {
      * @throws Exception if an error occurs.
      */
     public static Scheduler getSchedulerInterface() throws Exception {
-        if (adminSchedInterface == null) {
-            if (System.getProperty("proactive.test.runAsMe") != null) {
-                connect(UserType.USER);
-            } else {
-                connect();
-            }
-        }
-        return adminSchedInterface;
+        return getSchedulerInterface(UserType.USER);
     }
 
     /**

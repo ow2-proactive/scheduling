@@ -53,7 +53,7 @@ import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
 import org.ow2.proactive.scheduler.common.task.flow.FlowBlock;
 import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
 
-import org.ow2.tests.FunctionalTest;
+import functionaltests.SchedulerConsecutive;
 import functionaltests.SchedulerTHelper;
 
 
@@ -63,7 +63,7 @@ import functionaltests.SchedulerTHelper;
  * @author The ProActive Team
  * @since ProActive Scheduling 2.2
  */
-public class TestWorkflowDataspace extends FunctionalTest {
+public class TestWorkflowDataspace extends SchedulerConsecutive {
 
     @org.junit.Test
     public void run() throws Throwable {

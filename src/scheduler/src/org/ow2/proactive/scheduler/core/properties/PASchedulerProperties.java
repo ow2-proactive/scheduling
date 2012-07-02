@@ -334,10 +334,10 @@ public enum PASchedulerProperties {
      */
     private static void setUserJavaProperties() {
         if (prop != null) {
-            for (Object o : prop.keySet()) {
-                String s = System.getProperty((String) o);
+            for (PASchedulerProperties p : PASchedulerProperties.values()) {
+                String s = System.getProperty(p.getKey());
                 if (s != null) {
-                    prop.setProperty((String) o, s);
+                    prop.setProperty(p.getKey(), s);
                 }
             }
         }

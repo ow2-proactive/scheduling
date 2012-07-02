@@ -85,7 +85,6 @@ import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import org.ow2.proactive.scripting.SelectionScript;
-import org.ow2.tests.FunctionalTest;
 
 
 /**
@@ -95,7 +94,7 @@ import org.ow2.tests.FunctionalTest;
  * @author ProActive team
  *
  */
-public class TestKillWhenInStoppedState extends FunctionalTest {
+public class TestKillWhenInStoppedState extends SchedulerConsecutive {
 
     static final long FINISH_JOB_TIMEOUT = 30000;
 
@@ -130,6 +129,10 @@ public class TestKillWhenInStoppedState extends FunctionalTest {
         }
 
         test(SchedulerStatus.STOPPED);
+
+        if (!scheduler.start()) {
+            Assert.fail("Failed to start scheduler");
+        }
     }
 
     public void test(SchedulerStatus status) throws Exception {

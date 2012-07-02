@@ -45,7 +45,6 @@ import org.objectweb.proactive.core.ProActiveTimeoutException;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
-
 import org.ow2.tests.FunctionalTest;
 
 

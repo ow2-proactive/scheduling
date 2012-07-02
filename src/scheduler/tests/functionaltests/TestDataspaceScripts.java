@@ -53,8 +53,6 @@ import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
 import org.ow2.proactive.scheduler.task.launcher.TaskLauncher;
 import org.ow2.proactive.scripting.SimpleScript;
 
-import org.ow2.tests.FunctionalTest;
-
 
 /**
  * Tests that Dataspaces are available in pre/post/flow scripts
@@ -62,7 +60,7 @@ import org.ow2.tests.FunctionalTest;
  * @author The ProActive Team
  * @since ProActive Scheduling 2.2
  */
-public class TestDataspaceScripts extends FunctionalTest {
+public class TestDataspaceScripts extends SchedulerConsecutive {
 
     private static final String[] fileContent = new String[] { "This is", "the content", "of the",
             "file line", "by line." };

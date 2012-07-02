@@ -5,7 +5,7 @@
 	<description>A ProActive job that will find out the Nth first prime number where N is given as
 		argument.</description>
 	<taskFlow>
-		<task name="Controller"  numberOfNodes="5">
+		<task name="Controller"  numberOfNodes="4">
 			<description>Will control the workers in order to find the prime number</description>
 			<javaExecutable
 				class="org.ow2.proactive.scheduler.examples.MultiNodeExample">

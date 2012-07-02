@@ -41,7 +41,6 @@ import static junit.framework.Assert.assertTrue;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SchedulerStatus;
-
 import org.ow2.tests.FunctionalTest;
 
 

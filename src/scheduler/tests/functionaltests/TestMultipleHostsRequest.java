@@ -52,8 +52,6 @@ import org.ow2.proactive.scheduler.common.task.NativeTask;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 
-import org.ow2.tests.FunctionalTest;
-
 
 /**
  * Test whether attribute reservation of several nodes for a native task
@@ -62,7 +60,7 @@ import org.ow2.tests.FunctionalTest;
  *
  * @author The ProActive Team
  */
-public class TestMultipleHostsRequest extends FunctionalTest {
+public class TestMultipleHostsRequest extends SchedulerConsecutive {
 
     private static URL jobDescriptor = TestMultipleHostsRequest.class
             .getResource("/functionaltests/descriptors/Job_native_4_hosts.xml");

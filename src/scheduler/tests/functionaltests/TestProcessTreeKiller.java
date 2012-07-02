@@ -51,8 +51,6 @@ import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.NativeTask;
 
-import org.ow2.tests.FunctionalTest;
-
 
 /**
  * @author ProActive team
@@ -61,7 +59,7 @@ import org.ow2.tests.FunctionalTest;
  * by a native Task, and only processes launched by this native task.
  *
  */
-public class TestProcessTreeKiller extends FunctionalTest {
+public class TestProcessTreeKiller extends SchedulerConsecutive {
 
     private static URL nativeLinuxExecLauncher = TestProcessTreeKiller.class
             .getResource("/functionaltests/executables/PTK_launcher.sh");

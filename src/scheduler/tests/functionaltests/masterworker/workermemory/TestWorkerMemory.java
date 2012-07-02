@@ -48,14 +48,14 @@ import org.objectweb.proactive.extensions.masterworker.ConstantMemoryFactory;
 import org.objectweb.proactive.extensions.masterworker.ProActiveMaster;
 import org.objectweb.proactive.extensions.masterworker.interfaces.Master;
 
-import org.ow2.tests.FunctionalTest;
+import functionaltests.SchedulerConsecutive;
 import functionaltests.SchedulerTHelper;
 
 
 /**
  * Test load balancing
  */
-public class TestWorkerMemory extends FunctionalTest {
+public class TestWorkerMemory extends SchedulerConsecutive {
     //private URL descriptor = TestWorkerMemory.class
     //        .getResource("/functionalTests/masterworker/workermemory/TestWorkerMemory.xml");
     private Master<MemoryTask2, String> master;
@@ -65,7 +65,7 @@ public class TestWorkerMemory extends FunctionalTest {
     @org.junit.Test
     public void run() throws Throwable {
 
-        SchedulerTHelper.startScheduler();
+        SchedulerTHelper.init();
 
         //before
         tasks = new ArrayList<MemoryTask2>();

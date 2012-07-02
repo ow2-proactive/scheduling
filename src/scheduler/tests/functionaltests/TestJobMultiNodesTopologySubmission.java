@@ -45,8 +45,6 @@ import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 
-import org.ow2.tests.FunctionalTest;
-
 
 /**
  * This class tests a basic actions of a job submission to ProActive scheduler :
@@ -68,7 +66,7 @@ import org.ow2.tests.FunctionalTest;
  * @date 2 jun 08
  * @since ProActive Scheduling 1.0
  */
-public class TestJobMultiNodesTopologySubmission extends FunctionalTest {
+public class TestJobMultiNodesTopologySubmission extends SchedulerConsecutive {
 
     private static URL jobDescriptor = TestJobMultiNodesTopologySubmission.class
             .getResource("/functionaltests/descriptors/Job_MultiNodes_topology.xml");

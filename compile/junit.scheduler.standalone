@@ -1,0 +1,70 @@
+#!/bin/bash
+
+##################################################################################################################
+#
+# Particular test rerun example
+# ./compile/build -Durl="rmi://gollum.local:1099/" -Dtest="**functionaltests/**/**AddGetDownRemoveTest*" junit.rm
+#
+##################################################################################################################
+
+
+compileDir=$(cd `dirname $0` && /bin/pwd)
+workingDir=$compileDir/../bin/unix
+
+echo "Compiling the scheduler"
+$compileDir/build deploy.scheduler deploy.scheduler.worker
+
+CLASSPATH=.
+. $workingDir/env scheduler-log4j-server
+
+echo "Copying test classes to addons folder"
+rm -rf $compileDir/../addons/functionaltests
+cp -r $compileDir/../classes/schedulerTests/functionaltests/ $compileDir/../addons/
+
+opt="-Xms128m -Xmx2048m"
+SCHEDULER_OUT=$(mktemp --tmpdir)
+
+cleanup () {
+		echo "Killing the forked processes"
+		pkill -9 -f RMStarter
+		pkill -9 -f SchedulerStarter
+		pkill -9 -f proactive
+}
+
+trap cleanup TERM INT
+
+SCHEDULER_CONFIG="-Dpa.scheduler.db.hibernate.dropdb=true"
+SCHEDULER_CONFIG=$SCHEDULER_CONFIG" -Dpa.scheduler.dataspace.globalurl=\"/tmp/\""
+
+eval $JAVACMD $SCHEDULER_CONFIG -Dderby.stream.error.file=\"$PA_SCHEDULER/.logs/derby.log\" $opt org.ow2.proactive.scheduler.util.SchedulerStarter | tee $SCHEDULER_OUT 2>&1 &
+
+SCHEDULER_PID=$!
+SCHEDULER_LINE="Scheduler successfully created on "
+while true; do
+        if [ "$(grep "$SCHEDULER_LINE" $SCHEDULER_OUT)" ]; then
+                SCHEDULER_URL=$(grep "$SCHEDULER_LINE" $SCHEDULER_OUT| sed -e "s/^${SCHEDULER_LINE}\(.*\)/\1/g")
+                break;
+        fi
+
+        if [ ! "$(ps | grep $SCHEDULER_PID)" ]; then
+                # I don't see a way to return the exit code from the forked process
+                exit 1;
+        fi
+        sleep 1s
+done
+
+ITERATIONS=$1
+if [ -z "$ITERATIONS" ]; then
+	ITERATIONS=1
+fi 
+
+echo "Running SCHEDULER functional tests"
+for (( c=1; c<=$ITERATIONS; c++ ))
+do
+	echo "Iteration $c"
+	$compileDir/build -Durl="$SCHEDULER_URL" -Dtest="**functionaltests/**/**Test*" junit.scheduler
+done
+
+cleanup
+
+exit
