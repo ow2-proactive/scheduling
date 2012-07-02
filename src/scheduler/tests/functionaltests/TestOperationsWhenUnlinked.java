@@ -48,6 +48,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
+import org.ow2.proactive.resourcemanager.common.event.RMEventType;
+import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.job.JobId;
@@ -176,8 +178,10 @@ public class TestOperationsWhenUnlinked extends FunctionalTest {
         }
 
         System.out.println("Creating new RM");
-        helper.getResourceManager();
-        helper.createNodeSource();
+        ResourceManager rm = helper.getResourceManager();
+        String nodeUrl = helper.createNode("test-node").getNode().getNodeInformation().getURL();
+        rm.addNode(nodeUrl);
+        helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
 
         System.out.println("Linking new RM");
         if (!scheduler.linkResourceManager(rmUrl)) {
