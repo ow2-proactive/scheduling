@@ -116,6 +116,20 @@ public class SelectionScript extends Script<Boolean> {
         buildSelectionScriptId();
     }
 
+    /** Directly create a script with a string.
+     * @param script String representing a script code
+     * @param parameters script execution arguments.
+     * @param engineName String a script execution engine.
+     * @param dynamic tell if the script is dynamic or static
+     * @throws InvalidScriptException if the creation fails.
+     */
+    public SelectionScript(String script, String engineName, String[] parameters, boolean dynamic)
+            throws InvalidScriptException {
+        super(script, engineName, parameters);
+        this.dynamic = dynamic;
+        buildSelectionScriptId();
+    }
+
     /** Create a selection script from a file.
      * @param file a file containing the script
      * @param parameters script execution arguments.

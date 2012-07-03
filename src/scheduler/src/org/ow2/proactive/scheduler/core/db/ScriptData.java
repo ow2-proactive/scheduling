@@ -109,7 +109,7 @@ public class ScriptData {
     }
 
     SelectionScript createSelectionScript() throws InvalidScriptException {
-        return new SelectionScript(getScript(), getScriptEngine(), isSelectionScriptDynamic());
+        return new SelectionScript(getScript(), getScriptEngine(), parameters(), isSelectionScriptDynamic());
     }
 
     GenerationScript createGenerationScript() throws InvalidScriptException {

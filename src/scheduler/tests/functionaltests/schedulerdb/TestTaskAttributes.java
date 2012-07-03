@@ -6,8 +6,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import junit.framework.Assert;
-
+import org.junit.Assert;
 import org.junit.Test;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.job.factories.JobFactory;
@@ -53,13 +52,14 @@ public class TestTaskAttributes extends BaseSchedulerDBTest {
         TaskFlowJob jobDef = new TaskFlowJob();
         JavaTask task1 = createDefaultTask("task1");
 
-        task1.addSelectionScript(new SelectionScript("selection1", "js"));
-        task1.addSelectionScript(new SelectionScript("selection2", "js"));
+        task1.addSelectionScript(new SelectionScript("selection1", "js", new String[] { "param1", "param2" },
+            true));
+        task1.addSelectionScript(new SelectionScript("selection2", "js", new String[] { "param3" }, false));
         task1.addSelectionScript(new SelectionScript("selection3", "js"));
 
-        task1.setCleaningScript(new SimpleScript("cleanscript", "js"));
-        task1.setPreScript(new SimpleScript("prescript", "js"));
-        task1.setPostScript(new SimpleScript("postscript", "js"));
+        task1.setCleaningScript(new SimpleScript("cleanscript", "js", new String[] { "p1", "p2" }));
+        task1.setPreScript(new SimpleScript("prescript", "js", new String[] { "p1", "p2" }));
+        task1.setPostScript(new SimpleScript("postscript", "js", new String[] { "p1", "p2" }));
         task1.setFlowScript(FlowScript.createContinueFlowScript());
 
         jobDef.addTask(task1);
@@ -69,8 +69,14 @@ public class TestTaskAttributes extends BaseSchedulerDBTest {
         InternalTask task = job.getTask("task1");
 
         Assert.assertEquals("cleanscript", task.getCleaningScript().getScript());
+        Assert.assertArrayEquals(new String[] { "p1", "p2" }, task.getCleaningScript().getParameters());
+
         Assert.assertEquals("prescript", task.getPreScript().getScript());
+        Assert.assertArrayEquals(new String[] { "p1", "p2" }, task.getPreScript().getParameters());
+
         Assert.assertEquals("postscript", task.getPostScript().getScript());
+        Assert.assertArrayEquals(new String[] { "p1", "p2" }, task.getPostScript().getParameters());
+
         Assert.assertEquals(FlowActionType.CONTINUE.toString(), task.getFlowScript().getActionType());
 
         Assert.assertEquals(3, task.getSelectionScripts().size());
@@ -78,6 +84,15 @@ public class TestTaskAttributes extends BaseSchedulerDBTest {
         Set<String> scripts = new HashSet<String>();
         for (SelectionScript script : task.getSelectionScripts()) {
             scripts.add(script.getScript());
+            if (script.getScript().equals("selection1")) {
+                Assert.assertArrayEquals(new String[] { "param1", "param2" }, script.getParameters());
+            }
+            if (script.getScript().equals("selection2")) {
+                Assert.assertArrayEquals(new String[] { "param3" }, script.getParameters());
+            }
+            if (script.getScript().equals("selection3")) {
+                Assert.assertArrayEquals(new String[] {}, script.getParameters());
+            }
         }
         Set<String> expected = new HashSet<String>();
         expected.add("selection1");
