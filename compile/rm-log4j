@@ -1,5 +1,5 @@
 # Default: INFO level, FILE appender
-log4j.rootLogger=WARN, CONSOLE
+log4j.rootLogger=INFO, CONSOLE
 
 log4j.logger.proactive.configuration=ERROR
 

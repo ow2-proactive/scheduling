@@ -1,5 +1,7 @@
 package functionaltests.schedulerdb;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,6 +13,7 @@ import org.hibernate.metadata.ClassMetadata;
 import org.junit.Test;
 import org.ow2.proactive.db.types.BigString;
 import org.ow2.proactive.scheduler.common.job.JobEnvironment;
+import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
@@ -20,6 +23,9 @@ import org.ow2.proactive.scheduler.common.task.dataspaces.InputAccessMode;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
 import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
 import org.ow2.proactive.scheduler.core.db.JobClasspathContent;
+import org.ow2.proactive.scheduler.core.db.JobData;
+import org.ow2.proactive.scheduler.core.db.TaskData;
+import org.ow2.proactive.scheduler.core.db.TaskResultData;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scripting.GenerationScript;
@@ -28,6 +34,33 @@ import org.ow2.proactive.scripting.SimpleScript;
 
 
 public class TestJobRemove extends BaseSchedulerDBTest {
+
+    @Test
+    public void testRuntimeDataRemoveAfterFinish() throws Throwable {
+        TaskFlowJob jobDef = createJob(2);
+        InternalJob job = defaultSubmitJobAndLoadInternal(false, jobDef);
+
+        dbManager.updateAfterTaskFinished(job, job.getTask("javaTask-0"), new TaskResultImpl(null, "OK1",
+            null, 0, null));
+        dbManager.updateAfterTaskFinished(job, job.getTask("forkedJavaTask-0"), new TaskResultImpl(null,
+            "OK2", null, 0, null));
+        dbManager.updateAfterTaskFinished(job, job.getTask("nativeTask-0"), new TaskResultImpl(null, "OK3",
+            null, 0, null));
+
+        job.setStatus(JobStatus.FINISHED);
+
+        dbManager.updateAfterTaskFinished(job, null, null);
+
+        checkAllEntitiesDeleted(JobData.class.getName(), TaskData.class.getName(), TaskResultData.class
+                .getName());
+
+        // check can still load task results
+
+        Assert.assertEquals("OK1", dbManager.loadTaskResult(job.getTask("javaTask-0").getId(), 0).value());
+        Assert.assertEquals("OK2", dbManager.loadTaskResult(job.getTask("forkedJavaTask-0").getId(), 0)
+                .value());
+        Assert.assertEquals("OK3", dbManager.loadTaskResult(job.getTask("nativeTask-0").getId(), 0).value());
+    }
 
     @Test
     public void testSetRemovedTime() throws Exception {
@@ -68,7 +101,7 @@ public class TestJobRemove extends BaseSchedulerDBTest {
         removeScenario(100);
     }
 
-    private void removeScenario(int tasksNumber) throws Exception {
+    private TaskFlowJob createJob(int tasksNumber) throws Exception {
         JobEnvironment env = new JobEnvironment();
         env.setJobClasspath(new String[] { "lib/ProActive/ProActive.jar", "compile/lib/ant.jar" });
 
@@ -127,6 +160,11 @@ public class TestJobRemove extends BaseSchedulerDBTest {
             jobDef.addTask(task3);
         }
 
+        return jobDef;
+    }
+
+    private void removeScenario(int tasksNumber) throws Exception {
+        TaskFlowJob jobDef = createJob(tasksNumber);
         InternalJob job = defaultSubmitJobAndLoadInternal(false, jobDef);
 
         Map<String, BigString> resProperties = new HashMap<String, BigString>();
@@ -180,11 +218,14 @@ public class TestJobRemove extends BaseSchedulerDBTest {
         task.addOutputFiles("f2", OutputAccessMode.TransferToOutputSpace);
     }
 
-    private void checkAllEntitiesDeleted() {
+    private void checkAllEntitiesDeleted(String... skipClasses) {
+        List<String> skip = new ArrayList<String>(Arrays.asList(skipClasses));
+        skip.add(JobClasspathContent.class.getName());
+
         Session session = dbManager.getSessionFactory().openSession();
         try {
             for (ClassMetadata metadata : session.getSessionFactory().getAllClassMetadata().values()) {
-                if (!metadata.getEntityName().equals(JobClasspathContent.class.getName())) {
+                if (!skip.contains(metadata.getEntityName())) {
                     System.out.println("Check " + metadata.getEntityName());
                     List<Object> list = session.createCriteria(metadata.getEntityName()).list();
                     Assert.assertEquals("Unexpected " + metadata.getEntityName(), 0, list.size());

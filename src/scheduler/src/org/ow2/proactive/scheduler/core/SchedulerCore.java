@@ -805,12 +805,6 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
     }
 
     boolean restartTaskOnNodeFailure(InternalJob job, InternalTask td, SchedulerCore schedulerStub) {
-        //check if the task has not been terminated while pinging
-        if (currentlyRunningTasks.get(job.getId()).remove(td.getId()) == null) {
-            logger_dev.info("Try to restart not running task");
-            return false;
-        }
-
         try {
             logger_dev.info("Try to free failed node set");
             //free execution node even if it is dead
@@ -819,6 +813,17 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
         } catch (Exception e) {
             //just save the rest of the method execution
             logger_dev.debug("Failed to free failed node set", e);
+        }
+
+        //check if the task has not been terminated while pinging
+        if (currentlyRunningTasks.get(job.getId()).remove(td.getId()) == null) {
+            logger_dev.info("Try to restart not running task");
+            return false;
+        }
+        if (!jobs.containsKey(job.getId())) {
+            logger_dev.info("Try to restart task for not running job (job: " + job.getId() + ", task: " +
+                td.getId() + ")");
+            return false;
         }
 
         //re-init progress as it is failed
@@ -928,7 +933,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
      */
     void endJob(InternalJob job, InternalTask task, TaskResultImpl taskResult, String errorMsg,
             JobStatus jobStatus) {
-        jobs.remove(job);
+        jobs.remove(job.getId());
 
         // job can be already ended (SCHEDULING-700)
         JobStatus currentStatus = job.getStatus();

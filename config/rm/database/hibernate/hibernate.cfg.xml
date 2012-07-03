@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <!DOCTYPE hibernate-configuration PUBLIC
         "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
-        "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
+        "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
 
 <hibernate-configuration>
 
@@ -15,14 +15,14 @@
 
         <property name="connection.driver_class">org.apache.derby.jdbc.EmbeddedDriver</property>
         <property name="connection.url">jdbc:derby:../../RM_DB;create=true</property>
-        <property name="dialect">org.hibernate.dialect.DerbyDialect</property>
+        <property name="dialect">org.hibernate.dialect.DerbyTenFiveDialect</property>
 
 
         <!-- MYSQL -->
 		<!--
         <property name="connection.driver_class">org.gjt.mm.mysql.Driver</property>
         <property name="connection.url">jdbc:mysql://localhost:3306/RM_DB</property>
-        <property name="dialect">org.hibernate.dialect.MySQLDialect</property>
+        <property name="dialect">org.hibernate.dialect.MySQL5InnoDBDialect</property>
 		-->
 
         <!-- Username and password -->
@@ -30,7 +30,7 @@
         <property name="connection.password"></property>
 
         <!-- JDBC connection pool (use c3p0) -->
-        <property name="connection.provider_class">org.hibernate.connection.C3P0ConnectionProvider</property>
+        <property name="connection.provider_class">org.hibernate.service.jdbc.connections.internal.C3P0ConnectionProvider</property>
         <property name="c3p0.max_size">10</property>
         <property name="c3p0.min_size">10</property>
         <property name="c3p0.timeout">60</property> <!-- seconds -->

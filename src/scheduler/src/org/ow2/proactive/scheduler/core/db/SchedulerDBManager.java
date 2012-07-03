@@ -5,8 +5,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.hibernate.Query;
@@ -65,11 +67,25 @@ public class SchedulerDBManager implements FilteredExceptionCallback {
 
     private static final Logger debugLogger = ProActiveLogger.getLogger(SchedulerDevLoggers.DATABASE);
 
-    private static final JobStatus[] finishedJobStatuses = { JobStatus.CANCELED, JobStatus.FAILED,
-            JobStatus.KILLED, JobStatus.FINISHED };
+    private static final Set<JobStatus> finishedJobStatuses;
 
-    private static final JobStatus[] notFinishedJobStatuses = { JobStatus.PAUSED, JobStatus.PENDING,
-            JobStatus.STALLED, JobStatus.RUNNING };
+    static {
+        finishedJobStatuses = new HashSet<JobStatus>();
+        finishedJobStatuses.add(JobStatus.CANCELED);
+        finishedJobStatuses.add(JobStatus.FAILED);
+        finishedJobStatuses.add(JobStatus.KILLED);
+        finishedJobStatuses.add(JobStatus.FINISHED);
+    }
+
+    private static final Set<JobStatus> notFinishedJobStatuses;
+
+    static {
+        notFinishedJobStatuses = new HashSet<JobStatus>();
+        notFinishedJobStatuses.add(JobStatus.PAUSED);
+        notFinishedJobStatuses.add(JobStatus.PENDING);
+        notFinishedJobStatuses.add(JobStatus.STALLED);
+        notFinishedJobStatuses.add(JobStatus.RUNNING);
+    }
 
     private final SessionFactory sessionFactory;
 
@@ -208,6 +224,38 @@ public class SchedulerDBManager implements FilteredExceptionCallback {
         });
     }
 
+    private void removeJobScripts(Session session, long jobId) {
+        session
+                .createQuery(
+                        "delete from ScriptData where id in (select td.envScript from ForkedJavaTaskData td where td.taskData.id.jobId = :jobId)")
+                .setParameter("jobId", jobId).executeUpdate();
+        session
+                .createQuery(
+                        "delete from ScriptData where id in (select td.generationScript from NativeTaskData td where td.taskData.id.jobId = :jobId)")
+                .setParameter("jobId", jobId).executeUpdate();
+        session
+                .createQuery(
+                        "delete from ScriptData where id in (select preScript from TaskData where id.jobId = :jobId)"
+                            + "or id in (select postScript from TaskData where id.jobId = :jobId) or id in (select cleanScript from TaskData where id.jobId = :jobId) or id in (select flowScript from TaskData where id.jobId = :jobId)")
+                .setParameter("jobId", jobId).executeUpdate();
+    }
+
+    private void removeJobRuntimeData(Session session, long jobId) {
+        removeJobScripts(session, jobId);
+
+        session.createQuery("delete from ScriptData where taskData.id.jobId = :jobId").setParameter("jobId",
+                jobId).executeUpdate();
+        session.createQuery("delete from JavaTaskData where taskData.id.jobId = :jobId").setParameter(
+                "jobId", jobId).executeUpdate();
+        session.createQuery("delete from ForkedJavaTaskData where taskData.id.jobId = :jobId").setParameter(
+                "jobId", jobId).executeUpdate();
+        session.createQuery("delete from NativeTaskData where taskData.id.jobId = :jobId").setParameter(
+                "jobId", jobId).executeUpdate();
+
+        session.createQuery("delete from SelectorData where taskData.id.jobId = :jobId").setParameter(
+                "jobId", jobId).executeUpdate();
+    }
+
     public void removeJob(final JobId jobId, final long removedTime, final boolean removeData) {
         runWithTransaction(new SessionWork<Void>() {
             @Override
@@ -220,20 +268,7 @@ public class SchedulerDBManager implements FilteredExceptionCallback {
                     session.createSQLQuery("delete from TASK_DATA_JOINED_BRANCHES where JOB_ID = :jobId")
                             .setParameter("jobId", id).executeUpdate();
 
-                    session
-                            .createQuery(
-                                    "delete from ScriptData where id in (select td.envScript from ForkedJavaTaskData td where td.taskData.id.jobId = :jobId)")
-                            .setParameter("jobId", id).executeUpdate();
-                    session
-                            .createQuery(
-                                    "delete from ScriptData where id in (select td.generationScript from NativeTaskData td where td.taskData.id.jobId = :jobId)")
-                            .setParameter("jobId", id).executeUpdate();
-
-                    session
-                            .createQuery(
-                                    "delete from ScriptData where id in (select preScript from TaskData where id.jobId = :jobId)"
-                                        + "or id in (select postScript from TaskData where id.jobId = :jobId) or id in (select cleanScript from TaskData where id.jobId = :jobId) or id in (select flowScript from TaskData where id.jobId = :jobId)")
-                            .setParameter("jobId", id).executeUpdate();
+                    removeJobScripts(session, id);
 
                     session.createQuery("delete from JobData where id = :jobId").setParameter("jobId", id)
                             .executeUpdate();
@@ -257,7 +292,7 @@ public class SchedulerDBManager implements FilteredExceptionCallback {
         return loadJobs(fullState, finishedJobStatuses);
     }
 
-    private List<InternalJob> loadJobs(final boolean fullState, final JobStatus... status) {
+    private List<InternalJob> loadJobs(final boolean fullState, final Collection<JobStatus> status) {
         return runWithoutTransaction(new SessionWork<List<InternalJob>>() {
             @Override
             @SuppressWarnings("unchecked")
@@ -547,6 +582,8 @@ public class SchedulerDBManager implements FilteredExceptionCallback {
                     + "numberOfRunningTasks = :numberOfRunningTasks, "
                     + "totalNumberOfTasks =:totalNumberOfTasks where id = :jobId";
 
+                long jobId = jobId(job);
+
                 JobInfo jobInfo = job.getJobInfo();
 
                 session.createQuery(jobUpdate).setParameter("status", jobInfo.getStatus()).setParameter(
@@ -554,9 +591,9 @@ public class SchedulerDBManager implements FilteredExceptionCallback {
                         jobInfo.getNumberOfPendingTasks()).setParameter("numberOfFinishedTasks",
                         jobInfo.getNumberOfFinishedTasks()).setParameter("numberOfRunningTasks",
                         jobInfo.getNumberOfRunningTasks()).setParameter("totalNumberOfTasks",
-                        jobInfo.getTotalNumberOfTasks()).setParameter("jobId", jobId(job)).executeUpdate();
+                        jobInfo.getTotalNumberOfTasks()).setParameter("jobId", jobId).executeUpdate();
 
-                JobData jobRuntimeData = (JobData) session.load(JobData.class, jobId(job));
+                JobData jobRuntimeData = (JobData) session.load(JobData.class, jobId);
 
                 List<TaskData> taskRuntimeDataList = new ArrayList<TaskData>();
 
@@ -593,6 +630,10 @@ public class SchedulerDBManager implements FilteredExceptionCallback {
 
                 TaskData.DBTaskId taskId = taskId(finishedTask.getId());
                 saveTaskResult(taskId, result, session);
+
+                if (finishedJobStatuses.contains(job.getStatus())) {
+                    removeJobRuntimeData(session, jobId);
+                }
 
                 return null;
             }
@@ -669,6 +710,10 @@ public class SchedulerDBManager implements FilteredExceptionCallback {
                 if (result != null) {
                     TaskData.DBTaskId taskId = taskId(finishedTask.getId());
                     saveTaskResult(taskId, result, session);
+                }
+
+                if (finishedJobStatuses.contains(job.getStatus())) {
+                    removeJobRuntimeData(session, jobId);
                 }
 
                 return null;
