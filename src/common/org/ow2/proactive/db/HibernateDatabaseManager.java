@@ -54,6 +54,7 @@ import org.apache.log4j.Logger;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.StatelessSession;
 import org.hibernate.annotations.Any;
 import org.hibernate.annotations.AnyMetaDef;
 import org.hibernate.annotations.MetaValue;
@@ -275,6 +276,15 @@ public abstract class HibernateDatabaseManager implements DatabaseManager, Filte
      * @param session the session to be closed
      */
     protected void closeSession(Session session) {
+        try {
+            session.close();
+        } catch (Exception e) {
+            getDevLogger().error("Error while closing session", e);
+            this.exceptionHandler.handle("Error while closing session", e);
+        }
+    }
+
+    protected void closeSession(StatelessSession session) {
         try {
             session.close();
         } catch (Exception e) {
@@ -645,15 +655,18 @@ public abstract class HibernateDatabaseManager implements DatabaseManager, Filte
             throw new IllegalArgumentException(
                 "Native Query string must be a read request, ie:start with 'SELECT'");
         }
+        StatelessSession session = getSessionFactory().openStatelessSession();
         try {
             getDevLogger().debug("Executing query '" + nativeQuery + "'");
-            return getSessionFactory().openStatelessSession().createSQLQuery(nativeQuery).list();
+            return session.createSQLQuery(nativeQuery).list();
         } catch (Exception e) {
             getDevLogger().error("", e);
             //this exception will not be handled by exception manager as it is read only and not error prone
             //as it is in a separate thread
             //we let exceptionhandler handle only exception coming from core request
             throw new DatabaseManagerException("Unable to execute sqlQuery !", e);
+        } finally {
+            closeSession(session);
         }
     }
 
