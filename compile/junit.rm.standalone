@@ -17,6 +17,9 @@ $compileDir/build deploy.rm
 CLASSPATH=.
 . $workingDir/env rm-log4j-server
 
+echo "Erasing previous tests results"
+rm -rf $compileDir/../junitReports/
+
 opt="-Xms128m -Xmx2048m"
 RM_OUT=$(mktemp --tmpdir)
 
@@ -62,6 +65,12 @@ for (( c=1; c<=$ITERATIONS; c++ ))
 do
 	echo "Iteration $c"
 	$compileDir/build -Durl="$RM_URL" -Dtest="**functionaltests/**/**Test*" junit.rm
+	ERRORS=`grep -e failures $compileDir/../junitReports/TESTS-TestSuites.xml | grep -v "errors=\"0\" failures=\"0\""`
+	if [ -n "$ERRORS" ]; then
+		echo "Some tests failed:"
+		echo $ERRORS
+		break;
+	fi
 done
 
 cleanup
