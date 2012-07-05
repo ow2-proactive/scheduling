@@ -36,15 +36,15 @@
  */
 package org.ow2.proactive.scheduler.ext.masterworker;
 
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.objectweb.proactive.extensions.masterworker.interfaces.DivisibleTask;
 import org.objectweb.proactive.extensions.masterworker.interfaces.WorkerMemory;
 import org.objectweb.proactive.extensions.masterworker.interfaces.internal.TaskIntern;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
+
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 
 
 /**
@@ -70,13 +70,13 @@ public class SchedulerExecutableAdapter extends JavaExecutable implements Worker
         }
 
         Serializable mem = args.get("workerMem");
-        if (memory == null) {
-            if (mem == null) {
-                memory = new HashMap<String, Object>();
-            } else {
-                memory = (Map<String, Object>) mem;
-            }
+
+        if (mem == null) {
+            memory = new HashMap<String, Object>();
+        } else {
+            memory = (Map<String, Object>) mem;
         }
+
     }
 
     /*
