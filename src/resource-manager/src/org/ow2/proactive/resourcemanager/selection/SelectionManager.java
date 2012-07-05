@@ -39,11 +39,9 @@ package org.ow2.proactive.resourcemanager.selection;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CancellationException;
@@ -69,7 +67,6 @@ import org.ow2.proactive.resourcemanager.selection.topology.TopologyHandler;
 import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.ScriptException;
-import org.ow2.proactive.scripting.ScriptHandler;
 import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
@@ -355,33 +352,39 @@ public abstract class SelectionManager {
         return filteredList;
     }
 
-    public <T> List<ScriptResult<T>> executeScript(final Script<T> script,
-            final HashMap<String, ScriptHandler> us) {
+    public <T> List<ScriptResult<T>> executeScript(final Script<T> script, final Collection<RMNode> nodes) {
         // TODO: add a specific timeout for script execution
         final int timeout = PAResourceManagerProperties.RM_EXECUTE_SCRIPT_TIMEOUT.getValueAsInt();
-        // Create as many Callables as there are target nodes
-        final Set<Entry<String, ScriptHandler>> entries = us.entrySet();
         final ArrayList<Callable<ScriptResult<T>>> scriptExecutors = new ArrayList<Callable<ScriptResult<T>>>(
-            entries.size());
+            nodes.size());
 
         // Execute the script on each selected node
-        for (final Entry<String, ScriptHandler> entry : entries) {
+        for (final RMNode node : nodes) {
             scriptExecutors.add(new Callable<ScriptResult<T>>() {
                 @Override
                 public ScriptResult<T> call() throws Exception {
                     // Execute with a timeout the script by the remote handler 
                     // and always async-unlock the node, exceptions will be treated as ExecutionException
                     try {
-                        ScriptResult<T> res = entry.getValue().handle(script);
-                        return PAFuture.getFutureValue(res, timeout);
+                        ScriptResult<T> res = node.executeScript(script);
+                        PAFuture.waitFor(res, timeout);
+                        return res;
+                        //return PAFuture.getFutureValue(res, timeout);
                     } finally {
-                        SelectionManager.this.rmcore.unlockNodes(Collections.singleton(entry.getKey()));
+                        // cleaning the node
+                        try {
+                            node.clean();
+                        } catch (Throwable ex) {
+                            logger.error("Cannot clean the node " + node.getNodeURL(), ex);
+                        }
+
+                        SelectionManager.this.rmcore.unlockNodes(Collections.singleton(node.getNodeURL()));
                     }
                 }
 
                 @Override
                 public String toString() {
-                    return "executing script on " + entry.getKey();
+                    return "executing script on " + node.getNodeURL();
                 }
             });
         }
