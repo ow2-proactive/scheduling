@@ -1,17 +1,18 @@
-# This file represents the log4j config file for Scheduler and Resource Manager.
-# It is given as property in the env.sh or init.bat script
+# Default: INFO level, RM file appender
+log4j.rootLogger=INFO, RM
 
-# The default logging level is INFO
-# The root logger logs in the ${pa.rm.home}/.logs/RM.log file
+# Everything from RM has level DEBUG...
+log4j.logger.proactive.resourceManager=DEBUG
 
-log4j.rootLogger=INFO,RMDevFileAppender
+# ...except statistics and database
+log4j.logger.proactive.resourceManager.statistics=INFO
+log4j.logger.proactive.resourceManager.database=INFO
 
-# avoid displaying additivity of the inherit loggers
-log4j.additivity.proactive.resourceManager=false
-# define RESOURCE MANAGER loggers
-log4j.logger.proactive.resourceManager=WARN,RMDevFileAppender
-log4j.logger.proactive.resourceManager.rmlauncher=INFO,CONSOLE
-log4j.logger.proactive.resourceManager.consol=INFO,CONSOLE
+# ... and rmlauncher and consol. These additionaly go to the CONSOLE
+# appender
+log4j.logger.proactive.resourceManager.rmlauncher=INFO, CONSOLE
+log4j.logger.proactive.resourceManager.consol=INFO, CONSOLE
+
 #log4j.logger.proactive.resourceManager.core=INFO
 #log4j.logger.proactive.resourceManager.user=INFO
 #log4j.logger.proactive.resourceManager.monitoring=INFO
@@ -19,28 +20,19 @@ log4j.logger.proactive.resourceManager.consol=INFO,CONSOLE
 #log4j.logger.proactive.resourceManager.rmnode=INFO
 #log4j.logger.proactive.resourceManager.rmfactory=INFO
 #log4j.logger.proactive.resourceManager.policy=INFO
-log4j.logger.proactive.resourceManager.statistics=INFO
 
-log4j.logger.com.mchange=WARN,RMDevFileAppender
-log4j.logger.com.mchange.v2.c3p0=WARN,RMDevFileAppender
-log4j.logger.com.mchange.v2.c3p0.SQLWarnings=WARN,RMDevFileAppender
+# silence c3p0
+log4j.logger.com.mchange=WARN
 
-# File appender for verbose developer logging level (FILE3)
-log4j.appender.RMDevFileAppender=org.apache.log4j.RollingFileAppender
-log4j.appender.RMDevFileAppender.File=${pa.rm.home}/.logs/RM.log
-log4j.appender.RMDevFileAppender.MaxFileSize=10MB
-log4j.appender.RMDevFileAppender.MaxBackupIndex=5
-log4j.appender.RMDevFileAppender.layout=org.apache.log4j.PatternLayout
-log4j.appender.RMDevFileAppender.layout.ConversionPattern=[%-1p %d{ISO8601}] [RM.%C{1}.%M] %m%n
+# RM file appender
+log4j.appender.RM=org.apache.log4j.RollingFileAppender
+log4j.appender.RM.File=${pa.rm.home}/.logs/RM.log
+log4j.appender.RM.MaxFileSize=100MB
+log4j.appender.RM.MaxBackupIndex=10
+log4j.appender.RM.layout=org.apache.log4j.PatternLayout
+log4j.appender.RM.layout.ConversionPattern=[%d{ISO8601} %-5p] [RM.%C{1}.%M] %m%n
 
-# CONSOLE uses PatternLayout
+# CONSOLE appender
 log4j.appender.CONSOLE=org.apache.log4j.ConsoleAppender
 log4j.appender.CONSOLE.layout=org.apache.log4j.PatternLayout
-log4j.appender.CONSOLE.layout.ConversionPattern=%m%n
-
-# RM Appender configuration (CONSOLE)
-log4j.appender.resourceManagerAppender=org.apache.log4j.ConsoleAppender
-log4j.appender.resourceManagerAppender.layout=org.apache.log4j.PatternLayout
-log4j.appender.resourceManagerAppender.layout.ConversionPattern=[%-5p] [RESOURCE_MANAGER.%C{1}] %m%n
-
 
