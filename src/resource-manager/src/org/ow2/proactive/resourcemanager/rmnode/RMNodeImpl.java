@@ -41,9 +41,11 @@ import java.io.Serializable;
 import java.security.Permission;
 import java.util.HashMap;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.authentication.principals.UserNamePrincipal;
 import org.ow2.proactive.jmx.naming.JMXTransportProtocol;
 import org.ow2.proactive.permissions.PrincipalPermission;
@@ -51,6 +53,7 @@ import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
+import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.ScriptHandler;
 import org.ow2.proactive.scripting.ScriptLoader;
@@ -80,6 +83,8 @@ import org.ow2.proactive.scripting.SelectionScript;
  *
  */
 public class RMNodeImpl implements RMNode, Serializable {
+
+    private final static Logger logger = ProActiveLogger.getLogger(RMLoggers.CORE);
 
     /** HashMap associates a selection Script to its result on the node */
     private HashMap<SelectionScript, Integer> scriptStatus;
@@ -389,6 +394,7 @@ public class RMNodeImpl implements RMNode, Serializable {
     public synchronized void clean() throws NodeException {
         handler = null;
         try {
+            logger.debug("Cleaning the node " + nodeURL);
             node.killAllActiveObjects();
         } catch (IOException e) {
             throw new NodeException("Node is down");

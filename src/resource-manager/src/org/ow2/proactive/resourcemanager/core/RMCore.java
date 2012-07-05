@@ -1714,21 +1714,8 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                     targetType);
         }
 
-        // Only nodeURL and script handlers are needed
-        final HashMap<String, ScriptHandler> us = new HashMap<String, ScriptHandler>(selectedRMNodes.size());
-        for (RMNode node : selectedRMNodes) {
-            String nodeURL = node.getNodeURL();
-            try {
-                us.put(nodeURL, ((RMNodeImpl) node).getHandler());
-            } catch (Exception e) {
-                this.unselectNodes(selectedRMNodes);
-                throw new IllegalStateException(
-                    "Unable to execute script atomically, a problem occured on node " + nodeURL, e);
-            }
-        }
-
         // Return a ProActive future on the list of results
-        return this.selectionManager.executeScript(script, us);
+        return this.selectionManager.executeScript(script, selectedRMNodes);
 
         // To avoid blocking rmcore ao the call is delegated to the selection
         // manager ao and each node is unlocked as soon as the script has
