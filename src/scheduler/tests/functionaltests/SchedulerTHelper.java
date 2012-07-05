@@ -382,7 +382,7 @@ public class SchedulerTHelper {
             String schedulerUrl = System.getProperty("url");
             if (schedulerUrl != null && !schedulerUrl.equals("${url}")) {
                 // connecting to the existing scheduler
-                schedulerAuth = SchedulerConnection.waitAndJoin(schedulerUrl);
+                schedulerAuth = SchedulerConnection.join(schedulerUrl);
             } else {
                 startScheduler(null);
             }
