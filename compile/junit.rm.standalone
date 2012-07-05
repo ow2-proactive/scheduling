@@ -7,6 +7,14 @@
 #
 ##################################################################################################################
 
+cleanup () {
+		echo "Killing the forked processes"
+		/bin/kill $RM_PID
+		pkill -9 -f Dproactive.test
+		pkill -9 -f RMStarter
+}
+
+cleanup
 
 compileDir=$(cd `dirname $0` && /bin/pwd)
 workingDir=$compileDir/../bin/unix
@@ -22,13 +30,6 @@ rm -rf $compileDir/../junitReports/
 
 opt="-Xms128m -Xmx2048m"
 RM_OUT=$(mktemp --tmpdir)
-
-cleanup () {
-		echo "Killing the forked processes"
-		/bin/kill $RM_PID
-		pkill -9 -f Dproactive.test
-		pkill -9 -f RMStarter
-}
 
 trap cleanup TERM INT
 

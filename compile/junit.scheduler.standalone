@@ -7,6 +7,14 @@
 #
 ##################################################################################################################
 
+cleanup () {
+		echo "Killing the forked processes"
+		pkill -9 -f RMStarter
+		pkill -9 -f SchedulerStarter
+		pkill -9 -f proactive
+}
+
+cleanup
 
 compileDir=$(cd `dirname $0` && /bin/pwd)
 workingDir=$compileDir/../bin/unix
@@ -26,13 +34,6 @@ rm -rf $compileDir/../junitReports/
 
 opt="-Xms128m -Xmx2048m"
 SCHEDULER_OUT=$(mktemp --tmpdir)
-
-cleanup () {
-		echo "Killing the forked processes"
-		pkill -9 -f RMStarter
-		pkill -9 -f SchedulerStarter
-		pkill -9 -f proactive
-}
 
 trap cleanup TERM INT
 
