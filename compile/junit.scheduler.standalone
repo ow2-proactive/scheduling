@@ -8,10 +8,14 @@
 ##################################################################################################################
 
 cleanup () {
-		echo "Killing the forked processes"
+		echo "List of proactive processes"
+		ps -ef | grep proactive
+		echo "Killing existing proactive processes"
 		pkill -9 -f RMStarter
 		pkill -9 -f SchedulerStarter
 		pkill -9 -f proactive
+		echo "List of proactive processes after pkill"
+		ps -ef | grep proactive
 }
 
 cleanup
