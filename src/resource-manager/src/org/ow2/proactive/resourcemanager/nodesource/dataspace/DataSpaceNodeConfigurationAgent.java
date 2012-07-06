@@ -44,7 +44,6 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.extensions.dataspaces.core.BaseScratchSpaceConfiguration;
 import org.objectweb.proactive.extensions.dataspaces.core.DataSpacesNodes;
-import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 
 
 /**
@@ -55,7 +54,7 @@ import org.ow2.proactive.resourcemanager.utils.RMLoggers;
  */
 public class DataSpaceNodeConfigurationAgent implements Serializable {
 
-    private static Logger logger = ProActiveLogger.getLogger(RMLoggers.DATASPACE);
+    private static Logger logger = ProActiveLogger.getLogger(DataSpaceNodeConfigurationAgent.class);
 
     /** 
      * This property is used by scheduling when configuring node and must be renamed carefully.

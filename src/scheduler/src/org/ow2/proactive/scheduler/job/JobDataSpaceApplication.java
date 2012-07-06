@@ -54,12 +54,11 @@ import org.objectweb.proactive.extensions.dataspaces.core.naming.NamingService;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
-import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 
 
 public class JobDataSpaceApplication implements Serializable {
 
-    public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.DATASPACE);
+    public static final Logger logger_dev = ProActiveLogger.getLogger(JobDataSpaceApplication.class);
 
     private long applicationId;
     private String namingServiceURL;

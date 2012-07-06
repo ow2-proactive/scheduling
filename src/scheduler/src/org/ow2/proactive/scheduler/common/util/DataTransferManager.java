@@ -46,7 +46,7 @@ public class DataTransferManager {
      */
     protected Set<String> awaitedJobsIds = Collections.synchronizedSet(new HashSet<String>());
 
-    public static final Logger logger_util = ProActiveLogger.getLogger(SchedulerLoggers.UTIL);
+    public static final Logger logger_util = ProActiveLogger.getLogger(DataTransferManager.class);
 
     protected static String statusFilename = "dataTransfer.status";
     /**

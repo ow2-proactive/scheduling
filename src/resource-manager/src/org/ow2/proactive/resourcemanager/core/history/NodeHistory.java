@@ -54,7 +54,6 @@ import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.db.DatabaseManager;
-import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 
 
 /**
@@ -67,7 +66,7 @@ import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 @Table(name = "NodeHistory")
 public class NodeHistory {
 
-    public static final Logger logger = ProActiveLogger.getLogger(RMLoggers.DATABASE);
+    public static final Logger logger = ProActiveLogger.getLogger(NodeHistory.class);
 
     @Id
     @GeneratedValue

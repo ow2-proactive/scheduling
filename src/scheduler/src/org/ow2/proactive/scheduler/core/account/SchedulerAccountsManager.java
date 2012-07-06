@@ -40,7 +40,6 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.account.AbstractAccountsManager;
 import org.ow2.proactive.scheduler.core.db.SchedulerDBManager;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
-import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 
 
 /**
@@ -58,7 +57,8 @@ public final class SchedulerAccountsManager extends AbstractAccountsManager<Sche
      * Create a new instance of this class.
      */
     public SchedulerAccountsManager(SchedulerDBManager dbManager) {
-        super("Scheduler Accounts Manager Refresher", ProActiveLogger.getLogger(SchedulerDevLoggers.DATABASE));
+        super("Scheduler Accounts Manager Refresher", ProActiveLogger
+                .getLogger(SchedulerAccountsManager.class));
 
         this.dbManager = dbManager;
     }

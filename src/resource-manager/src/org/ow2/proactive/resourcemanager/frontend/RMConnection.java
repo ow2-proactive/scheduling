@@ -43,7 +43,6 @@ import org.ow2.proactive.authentication.Connection;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.common.RMConstants;
 import org.ow2.proactive.resourcemanager.exception.RMException;
-import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 
 
 /**
@@ -64,7 +63,7 @@ public class RMConnection extends Connection<RMAuthentication> {
     }
 
     public Logger getLogger() {
-        return ProActiveLogger.getLogger(RMLoggers.CONNECTION);
+        return ProActiveLogger.getLogger(RMConnection.class);
     }
 
     public static synchronized RMConnection getInstance() {

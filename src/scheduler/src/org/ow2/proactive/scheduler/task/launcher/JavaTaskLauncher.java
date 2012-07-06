@@ -63,7 +63,6 @@ import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import org.ow2.proactive.scheduler.common.task.flow.FlowAction;
 import org.ow2.proactive.scheduler.task.ExecutableContainer;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
-import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 
 
 /**
@@ -74,7 +73,7 @@ import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 @ActiveObject
 public class JavaTaskLauncher extends TaskLauncher {
 
-    public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.LAUNCHER);
+    public static final Logger logger_dev = ProActiveLogger.getLogger(JavaTaskLauncher.class);
 
     /**
      * ProActive Empty Constructor

@@ -69,7 +69,6 @@ import org.ow2.proactive.resourcemanager.nodesource.infrastructure.LocalInfrastr
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.ow2.proactive.scheduler.SchedulerFactory;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
-import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.exception.AdminSchedulerException;
 import org.ow2.proactive.utils.FileToBytesConverter;
@@ -88,8 +87,8 @@ import org.ow2.proactive.utils.Tools;
  */
 public class SchedulerStarter {
     //shows how to run the scheduler
-    private static Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.CONSOLE);
-    private static Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.SCHEDULER);
+    private static Logger logger = ProActiveLogger.getLogger(SchedulerStarter.class);
+    private static Logger logger_dev = ProActiveLogger.getLogger(SchedulerStarter.class);
 
     public static final String defaultPolicy = PASchedulerProperties.SCHEDULER_DEFAULT_POLICY
             .getValueAsString();

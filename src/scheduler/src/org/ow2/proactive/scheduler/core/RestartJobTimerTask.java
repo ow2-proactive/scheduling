@@ -42,7 +42,6 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
-import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 
 
 /**
@@ -56,7 +55,7 @@ import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
  */
 public class RestartJobTimerTask extends TimerTask {
 
-    private static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.SCHEDULE);
+    private static final Logger logger_dev = ProActiveLogger.getLogger(RestartJobTimerTask.class);
     /** The job on which to restart the task */
     private InternalJob job;
     /** The task that have to be restarted */

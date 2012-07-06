@@ -45,12 +45,11 @@ import org.apache.log4j.Logger;
 import org.hyperic.sigar.jmx.SigarRegistry;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.jmx.AbstractJMXHelper;
-import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 
 
 public class SigarExposer extends AbstractJMXHelper {
 
-    private static final Logger LOGGER = ProActiveLogger.getLogger(RMLoggers.RMNODE);
+    private static final Logger LOGGER = ProActiveLogger.getLogger(SigarExposer.class);
 
     public SigarExposer() {
         super(LOGGER);

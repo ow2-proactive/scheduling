@@ -64,7 +64,6 @@ import org.ow2.proactive.scheduler.common.job.JobType;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
-import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.core.rmproxies.RMProxyCreationException;
 import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptor;
@@ -76,7 +75,6 @@ import org.ow2.proactive.scheduler.task.ExecutableContainer;
 import org.ow2.proactive.scheduler.task.ExecutableContainerInitializer;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.task.launcher.TaskLauncher;
-import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 import org.ow2.proactive.scripting.ScriptException;
 import org.ow2.proactive.threading.TimeoutThreadPoolExecutor;
 import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
@@ -93,8 +91,8 @@ import org.ow2.proactive.utils.NodeSet;
 final class SchedulingMethodImpl implements SchedulingMethod {
 
     /** Scheduler logger */
-    protected static final Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.SCHEDULE);
-    protected static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.SCHEDULE);
+    protected static final Logger logger = ProActiveLogger.getLogger(SchedulingMethodImpl.class);
+    protected static final Logger logger_dev = ProActiveLogger.getLogger(SchedulingMethodImpl.class);
 
     /** Number of time to retry an active object creation if it fails to create */
     protected static final int ACTIVEOBJECT_CREATION_RETRY_TIME_NUMBER = 3;

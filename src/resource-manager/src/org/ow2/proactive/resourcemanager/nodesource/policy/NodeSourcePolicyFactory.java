@@ -47,7 +47,6 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.exception.RMException;
-import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 
 
 /**
@@ -137,7 +136,7 @@ public class NodeSourcePolicyFactory {
                 Class<?> cls = Class.forName(className.toString());
                 supportedPolicies.add(cls);
             } catch (ClassNotFoundException e) {
-                ProActiveLogger.getLogger(RMLoggers.NODESOURCE).warn(
+                ProActiveLogger.getLogger(NodeSourcePolicyFactory.class).warn(
                         "Cannot find class " + className.toString());
             }
         }

@@ -49,7 +49,6 @@ import org.apache.log4j.PatternLayout;
 import org.apache.log4j.spi.LoggingEvent;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 import org.ow2.proactive.utils.Formatter;
 import org.ow2.proactive.utils.ObjectByteConverter;
 
@@ -168,7 +167,7 @@ public class Log4JTaskLogs implements TaskLogs {
                 try {
                     this.serializedAllEvents = ObjectByteConverter.objectToByteArray(errorEvent, true);
                 } catch (IOException e1) {
-                    ProActiveLogger.getLogger(SchedulerLoggers.PREFIX).error(
+                    ProActiveLogger.getLogger(Log4JTaskLogs.class).error(
                             "Could not convert to serialized events", e1);
                 }
             }

@@ -49,7 +49,6 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.resourcemanager.frontend.topology.Topology;
 import org.ow2.proactive.resourcemanager.frontend.topology.TopologyException;
-import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 import org.ow2.proactive.topology.descriptor.DistanceFunction;
 
 
@@ -62,7 +61,7 @@ import org.ow2.proactive.topology.descriptor.DistanceFunction;
  */
 public class HAC {
 
-    private final static Logger logger = ProActiveLogger.getLogger(RMLoggers.TOPOLOGY);
+    private final static Logger logger = ProActiveLogger.getLogger(HAC.class);
     private Topology topology;
     private final List<Node> pivot;
     private DistanceFunction distanceFunction;

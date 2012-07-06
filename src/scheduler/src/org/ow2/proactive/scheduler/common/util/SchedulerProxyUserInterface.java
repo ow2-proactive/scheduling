@@ -88,7 +88,7 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
     protected Scheduler uischeduler;
     protected MBeanInfoViewer mbeaninfoviewer;
 
-    public static final Logger logger_util = ProActiveLogger.getLogger(SchedulerLoggers.UTIL);
+    public static final Logger logger_util = ProActiveLogger.getLogger(SchedulerProxyUserInterface.class);
 
     /*
      * a reference to a stub on this active object

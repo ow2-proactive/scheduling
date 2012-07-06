@@ -51,7 +51,6 @@ import org.ow2.proactive.jmx.naming.JMXTransportProtocol;
 import org.ow2.proactive.resourcemanager.core.RMCore;
 import org.ow2.proactive.resourcemanager.nodesource.dataspace.DataSpaceNodeConfigurationAgent;
 import org.ow2.proactive.resourcemanager.rmnode.RMNode;
-import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 import org.ow2.proactive.resourcemanager.utils.RMNodeStarter;
 
 
@@ -61,7 +60,7 @@ import org.ow2.proactive.resourcemanager.utils.RMNodeStarter;
 @ActiveObject
 public class RMNodeConfigurator implements RunActive {
     /** class' logger */
-    private static final Logger logger = ProActiveLogger.getLogger(RMLoggers.NODESOURCE);
+    private static final Logger logger = ProActiveLogger.getLogger(RMNodeConfigurator.class);
     /** rmcore reference to be able to add the node to the core after the configuration went well */
     private RMCore rmcore;
 

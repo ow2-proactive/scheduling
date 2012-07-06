@@ -59,7 +59,6 @@ import org.ow2.proactive.scheduler.task.NativeExecutableContainer;
 import org.ow2.proactive.scheduler.task.launcher.NativeTaskLauncher;
 import org.ow2.proactive.scheduler.task.launcher.TaskLauncher;
 import org.ow2.proactive.scheduler.task.launcher.TaskLauncherInitializer;
-import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 
 
 /**
@@ -78,7 +77,7 @@ import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 @XmlRootElement(name = "task")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class InternalNativeTask extends InternalTask {
-    public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.CORE);
+    public static final Logger logger_dev = ProActiveLogger.getLogger(InternalNativeTask.class);
 
     @Id
     @GeneratedValue

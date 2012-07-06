@@ -54,7 +54,6 @@ import org.ow2.proactive.scheduler.task.ExecutableContainer;
 import org.ow2.proactive.scheduler.task.NativeExecutable;
 import org.ow2.proactive.scheduler.task.NativeExecutableInitializer;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
-import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 
 
 /**
@@ -66,7 +65,7 @@ import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 @ActiveObject
 public class NativeTaskLauncher extends TaskLauncher {
 
-    public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.LAUNCHER);
+    public static final Logger logger_dev = ProActiveLogger.getLogger(NativeTaskLauncher.class);
 
     private static final String DATASPACE_TAG = "$LOCALSPACE";
 

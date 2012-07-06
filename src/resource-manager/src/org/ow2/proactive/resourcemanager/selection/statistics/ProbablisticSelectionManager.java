@@ -50,7 +50,6 @@ import org.ow2.proactive.resourcemanager.core.RMCore;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.rmnode.RMNode;
 import org.ow2.proactive.resourcemanager.selection.SelectionManager;
-import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive.scripting.SelectionScript;
 
@@ -73,7 +72,7 @@ import org.ow2.proactive.scripting.SelectionScript;
 @ActiveObject
 public class ProbablisticSelectionManager extends SelectionManager {
 
-    private final static Logger logger = ProActiveLogger.getLogger(RMLoggers.RMSELECTION);
+    private final static Logger logger = ProActiveLogger.getLogger(ProbablisticSelectionManager.class);
 
     // contains an information about already executed scripts
     // script digest => node => probability

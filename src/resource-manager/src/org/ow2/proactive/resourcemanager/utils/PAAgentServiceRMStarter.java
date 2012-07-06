@@ -86,7 +86,7 @@ public final class PAAgentServiceRMStarter {
     private final static String RANK_PROP_NAME = "proactive.agent.rank";
 
     /** class' logger */
-    private static final Logger logger = Logger.getLogger(RMLoggers.RMNODE);
+    private static final Logger logger = Logger.getLogger(PAAgentServiceRMStarter.class);
 
     /**
      * The starter will try to connect to the Resource Manager before killing

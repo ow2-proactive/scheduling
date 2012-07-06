@@ -57,7 +57,6 @@ import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.frontend.RMEventListener;
 import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
-import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SchedulerEventListener;
@@ -73,7 +72,7 @@ import org.ow2.proactive.scheduler.common.task.TaskStatus;
 public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements InitActive, RunActive,
         RMEventListener {
 
-    protected static Logger logger = ProActiveLogger.getLogger(RMLoggers.POLICY);
+    protected static Logger logger = ProActiveLogger.getLogger(SchedulerLoadingPolicy.class);
 
     private Map<JobId, Integer> activeTasks;
     private int activeTask = 0;

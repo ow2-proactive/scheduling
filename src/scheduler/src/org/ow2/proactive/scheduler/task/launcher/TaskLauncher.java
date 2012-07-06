@@ -100,7 +100,6 @@ import org.ow2.proactive.scheduler.exception.ProgressPingerException;
 import org.ow2.proactive.scheduler.task.ExecutableContainer;
 import org.ow2.proactive.scheduler.task.KillTask;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
-import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 import org.ow2.proactive.scripting.PropertyUtils;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.ScriptHandler;
@@ -121,9 +120,8 @@ import org.ow2.proactive.utils.Formatter;
  */
 public abstract class TaskLauncher {
 
-    public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.LAUNCHER);
-    public static final Logger logger_dev_dataspace = ProActiveLogger
-            .getLogger(SchedulerDevLoggers.DATASPACE);
+    public static final Logger logger_dev = ProActiveLogger.getLogger(TaskLauncher.class);
+    public static final Logger logger_dev_dataspace = ProActiveLogger.getLogger(TaskLauncher.class);
 
     //Scratch dir property : we cannot take the key property from DataSpaceNodeConfigurationAgent class in RM.
     //we should not depend from RM package in this class.

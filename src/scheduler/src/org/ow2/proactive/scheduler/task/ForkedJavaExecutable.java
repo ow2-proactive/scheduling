@@ -46,8 +46,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.Map.Entry;
+import java.util.Random;
 
 import org.apache.log4j.Appender;
 import org.apache.log4j.AppenderSkeleton;
@@ -81,7 +81,6 @@ import org.ow2.proactive.scheduler.task.launcher.JavaTaskLauncher;
 import org.ow2.proactive.scheduler.task.launcher.TaskLauncher;
 import org.ow2.proactive.scheduler.task.launcher.TaskLauncherInitializer;
 import org.ow2.proactive.scheduler.task.launcher.utils.ForkerUtils;
-import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 import org.ow2.proactive.scheduler.util.process.ThreadReader;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.ScriptHandler;
@@ -99,7 +98,7 @@ import org.ow2.proactive.utils.FileToBytesConverter;
  */
 public class ForkedJavaExecutable extends JavaExecutable implements ForkerStarterCallback {
 
-    public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.LAUNCHER);
+    public static final Logger logger_dev = ProActiveLogger.getLogger(ForkedJavaExecutable.class);
 
     /** Fork environment script binding name */
     public static final String FORKENV_BINDING_NAME = "forkEnvironment";

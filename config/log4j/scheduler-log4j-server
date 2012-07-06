@@ -2,40 +2,15 @@
 log4j.rootLogger=INFO, SCHEDULER
 
 # Everything from Scheduler has level DEBUG...
-log4j.logger.proactive.scheduler=DEBUG
+log4j.logger.org.ow2.proactive.scheduler=DEBUG
 
 # ...except statistics and database
-log4j.logger.proactive.scheduler.dev.database=INFO
-log4j.logger.proactive.scheduler.dev.admin.statistics=INFO
+log4j.logger.org.ow2.proactive.scheduler.db=INFO
+log4j.logger.org.ow2.proactive.scheduler.core.jmx=INFO
 
 # ... and consol. It additionaly goes to the CONSOLE appender
-log4j.logger.proactive.scheduler.dev.admin.consol=INFO, CONSOLE
-
-#log4j.logger.proactive.scheduler.dev.core=INFO
-#log4j.logger.proactive.scheduler.dev.admin.core=INFO
-#log4j.logger.proactive.scheduler.dev.core.schedule=INFO
-#log4j.logger.proactive.scheduler.dev.admin.core.schedule=INFO
-#log4j.logger.proactive.scheduler.dev.dataspace=INFO
-#log4j.logger.proactive.scheduler.dev.admin.dataspace=INFO
-#log4j.logger.proactive.scheduler.dev.admin.database=INFO
-#log4j.logger.proactive.scheduler.dev.util=INFO
-#log4j.logger.proactive.scheduler.dev.admin.util=INFO
-#log4j.logger.proactive.scheduler.dev.frontend=INFO
-#log4j.logger.proactive.scheduler.dev.admin.frontend=INFO
-#log4j.logger.proactive.scheduler.dev.connection=INFO
-#log4j.logger.proactive.scheduler.dev.admin.connection=INFO
-#log4j.logger.proactive.scheduler.dev.factory=INFO
-#log4j.logger.proactive.scheduler.dev.admin.factory=INFO
-#log4j.logger.proactive.scheduler.dev.RMproxy=INFO
-#log4j.logger.proactive.scheduler.dev.admin.RMproxy=INFO
-#log4j.logger.proactive.scheduler.dev.launcher=INFO
-#log4j.logger.proactive.scheduler.dev.script=INFO
-#log4j.logger.proactive.scheduler.dev.matlab=INFO
-#log4j.logger.proactive.scheduler.dev.admin.matlab=INFO
-#log4j.logger.proactive.scheduler.dev.scilab=INFO
-#log4j.logger.proactive.scheduler.dev.admin.scilab=INFO
-#log4j.logger.proactive.scheduler.dev.policy=INFO
-#log4j.logger.proactive.scheduler.dev.admin.policy=INFO
+log4j.logger.org.ow2.proactive.scheduler.util.console=INFO, CONSOLE
+log4j.logger.org.ow2.proactive.scheduler.util.SchedulerStarter=INFO, CONSOLE
 
 # silence c3p0
 log4j.logger.com.mchange=WARN

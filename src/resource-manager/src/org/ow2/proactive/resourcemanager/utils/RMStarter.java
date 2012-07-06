@@ -69,7 +69,7 @@ public class RMStarter {
     /**
      * Log4j logger name.
      */
-    private static Logger logger = ProActiveLogger.getLogger(RMLoggers.CONSOLE);
+    private static Logger logger = ProActiveLogger.getLogger(RMStarter.class);
 
     private static Options options = new Options();
 

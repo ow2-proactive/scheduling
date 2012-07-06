@@ -62,12 +62,10 @@ import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.task.ForkedJavaExecutableContainer;
 import org.ow2.proactive.scheduler.task.JavaExecutableContainer;
 import org.ow2.proactive.scheduler.task.NativeExecutableContainer;
-import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalForkedJavaTask;
 import org.ow2.proactive.scheduler.task.internal.InternalJavaTask;
 import org.ow2.proactive.scheduler.task.internal.InternalNativeTask;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
-import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 
 
 /**
@@ -80,7 +78,7 @@ import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
  */
 public class InternalJobFactory {
 
-    public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.FACTORY);
+    public static final Logger logger_dev = ProActiveLogger.getLogger(InternalJobFactory.class);
 
     /**
      * Create a new internal job with the given job (user).

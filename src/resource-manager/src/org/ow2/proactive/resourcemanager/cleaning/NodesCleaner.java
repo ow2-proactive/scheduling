@@ -56,7 +56,6 @@ import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.ow2.proactive.resourcemanager.core.RMCore;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.rmnode.RMNode;
-import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 
 
 /**
@@ -66,7 +65,7 @@ import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 @ActiveObject
 public class NodesCleaner implements RunActive {
     /** class' logger */
-    private static final Logger logger = ProActiveLogger.getLogger(RMLoggers.CLEANER);
+    private static final Logger logger = ProActiveLogger.getLogger(NodesCleaner.class);
 
     private ExecutorService scriptExecutorThreadPool;
 

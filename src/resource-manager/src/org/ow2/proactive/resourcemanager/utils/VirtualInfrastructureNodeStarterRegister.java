@@ -71,7 +71,7 @@ public final class VirtualInfrastructureNodeStarterRegister {
     private static final int RM_WAIT_ON_JOIN_TIMEOUT_IN_MS = 60000;
 
     /**	PALogger */
-    private static Logger logger = ProActiveLogger.getLogger(RMLoggers.RMNODE);
+    private static Logger logger = ProActiveLogger.getLogger(VirtualInfrastructureNodeStarterRegister.class);
 
     /**
      * Creates a new instance of this class and calls registersInRm method. The

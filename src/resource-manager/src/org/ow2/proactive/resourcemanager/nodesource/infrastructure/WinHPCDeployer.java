@@ -66,7 +66,6 @@ import org.ggf.schemas.bes._2006._08.bes_factory.NotAuthorizedFaultException1;
 import org.ggf.schemas.bes._2006._08.bes_factory.UnsupportedFeatureFaultException5;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ogf.hpcbp.Client;
-import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 
 
 /**
@@ -78,7 +77,7 @@ import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 public class WinHPCDeployer {
 
     /** logger */
-    protected static Logger logger = ProActiveLogger.getLogger(RMLoggers.NODESOURCE);
+    protected static Logger logger = ProActiveLogger.getLogger(WinHPCDeployer.class);
 
     private HPCBPServiceStub proxy;
 

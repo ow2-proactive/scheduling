@@ -59,7 +59,6 @@ import org.ow2.proactive.resourcemanager.frontend.topology.TopologyException;
 import org.ow2.proactive.resourcemanager.frontend.topology.TopologyImpl;
 import org.ow2.proactive.resourcemanager.frontend.topology.clustering.HAC;
 import org.ow2.proactive.resourcemanager.frontend.topology.pinging.Pinger;
-import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 import org.ow2.proactive.topology.descriptor.ArbitraryTopologyDescriptor;
 import org.ow2.proactive.topology.descriptor.BestProximityDescriptor;
 import org.ow2.proactive.topology.descriptor.DifferentHostsExclusiveDescriptor;
@@ -79,7 +78,7 @@ import org.ow2.proactive.utils.NodeSet;
 public class TopologyManager {
 
     // logger
-    private final static Logger logger = ProActiveLogger.getLogger(RMLoggers.TOPOLOGY);
+    private final static Logger logger = ProActiveLogger.getLogger(TopologyManager.class);
 
     // hosts distances
     private TopologyImpl topology = new TopologyImpl();

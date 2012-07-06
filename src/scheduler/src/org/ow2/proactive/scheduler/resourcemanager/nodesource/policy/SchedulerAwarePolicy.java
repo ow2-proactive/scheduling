@@ -46,7 +46,6 @@ import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
 import org.ow2.proactive.resourcemanager.nodesource.policy.NodeSourcePolicy;
-import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
@@ -63,7 +62,7 @@ import org.ow2.proactive.scheduler.common.task.TaskInfo;
 @ActiveObject
 public abstract class SchedulerAwarePolicy extends NodeSourcePolicy implements SchedulerEventListener {
 
-    protected static Logger logger = ProActiveLogger.getLogger(RMLoggers.POLICY);
+    protected static Logger logger = ProActiveLogger.getLogger(SchedulerAwarePolicy.class);
 
     @Configurable
     protected String schedulerUrl = "";

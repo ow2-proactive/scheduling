@@ -72,7 +72,6 @@ import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.factories.FlatJobFactory;
 import org.ow2.proactive.scheduler.common.task.TaskState;
-import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 import org.ow2.proactive.utils.FileToBytesConverter;
 import org.ow2.proactive.utils.Tools;
 import org.ow2.proactive.utils.console.Console;
@@ -94,7 +93,7 @@ public class SchedulerController {
 
     protected static final String control = "<ctl> ";
     protected static final String newline = System.getProperty("line.separator");
-    protected static Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.CONSOLE);
+    protected static Logger logger = ProActiveLogger.getLogger(SchedulerController.class);
     protected static SchedulerController shell;
 
     protected CommandLine cmd = null;

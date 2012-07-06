@@ -54,7 +54,6 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
-import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 
 
 /**
@@ -65,7 +64,7 @@ import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 @PublicAPI
 public class ResultPreviewTool {
 
-    public static Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.SCHEDULER);
+    public static Logger logger = ProActiveLogger.getLogger(ResultPreviewTool.class);
 
     /**
      * Name of the environment variable for windows home directory

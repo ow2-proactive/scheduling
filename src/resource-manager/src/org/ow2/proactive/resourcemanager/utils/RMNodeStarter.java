@@ -36,12 +36,37 @@
  */
 package org.ow2.proactive.resourcemanager.utils;
 
-import org.apache.commons.cli.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileFilter;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.security.KeyException;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+
+import javax.security.auth.login.LoginException;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.GnuParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
+import org.apache.commons.cli.Parser;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.config.xml.ProActiveConfigurationParser;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeFactory;
@@ -62,17 +87,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-import javax.security.auth.login.LoginException;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import java.io.*;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.security.KeyException;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
-
 
 /**
  * This class is responsible for creating a local node. You can define different settings to
@@ -89,7 +103,7 @@ public class RMNodeStarter {
     protected Node node;
 
     /** Class' logger */
-    protected static final Logger logger = ProActiveLogger.getLogger(RMLoggers.RMNODE);
+    protected static final Logger logger = ProActiveLogger.getLogger(RMNodeStarter.class);
 
     /** The default name of the node */
     protected static final String PAAGENT_DEFAULT_NODE_NAME = "PA-AGENT_NODE";

@@ -42,7 +42,6 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.authentication.FileLoginModule;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
-import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 
 
 /**
@@ -88,7 +87,7 @@ public class RMFileLoginModule extends FileLoginModule {
      * Returns logger used for authentication
      */
     public Logger getLogger() {
-        return ProActiveLogger.getLogger(RMLoggers.CONNECTION);
+        return ProActiveLogger.getLogger(RMFileLoginModule.class);
     }
 
 }

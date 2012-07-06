@@ -59,7 +59,6 @@ import org.ow2.proactive.scheduler.task.ForkedJavaExecutableContainer;
 import org.ow2.proactive.scheduler.task.ForkedJavaExecutableInitializer;
 import org.ow2.proactive.scheduler.task.ForkerStarterCallback;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
-import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 
 
 /**
@@ -72,7 +71,7 @@ import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 @ActiveObject
 public class ForkedJavaTaskLauncher extends JavaTaskLauncher implements ForkerStarterCallback {
 
-    public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.LAUNCHER);
+    public static final Logger logger_dev = ProActiveLogger.getLogger(ForkedJavaTaskLauncher.class);
 
     private TaskLauncherInitializer initializer;
 

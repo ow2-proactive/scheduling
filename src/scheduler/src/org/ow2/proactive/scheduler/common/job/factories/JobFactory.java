@@ -43,7 +43,6 @@ import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.scheduler.common.exception.JobCreationException;
 import org.ow2.proactive.scheduler.common.job.Job;
-import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 
 
 /**
@@ -58,7 +57,7 @@ import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 @PublicAPI
 public abstract class JobFactory {
 
-    public static Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.FACTORY);
+    public static Logger logger = ProActiveLogger.getLogger(JobFactory.class);
 
     /** Temp dir to store temporary archive content */
     public static final String JOBFACTORY_TMPDIR_PROPERTY = "pas.jobfactory.tmpdir";

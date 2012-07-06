@@ -64,7 +64,6 @@ import org.ow2.proactive.scheduler.common.task.TaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.flow.FlowAction;
 import org.ow2.proactive.scheduler.common.task.util.ResultPreviewTool.SimpleTextPanel;
-import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 import org.ow2.proactive.scheduler.util.classloading.TaskClassLoader;
 import org.ow2.proactive.utils.Formatter;
 
@@ -80,7 +79,7 @@ import org.ow2.proactive.utils.Formatter;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 public class TaskResultImpl implements TaskResult {
-    public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.CORE);
+    public static final Logger logger_dev = ProActiveLogger.getLogger(TaskResultImpl.class);
 
     /** The task identification of the result */
     private TaskId id = null;

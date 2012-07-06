@@ -46,7 +46,6 @@ import org.ow2.proactive.account.AbstractAccountsManager;
 import org.ow2.proactive.resourcemanager.core.history.NodeHistory;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.db.DatabaseManager;
-import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 
 
 /**
@@ -64,7 +63,7 @@ public final class RMAccountsManager extends AbstractAccountsManager<RMAccount> 
      * Create a new instance of this class.
      */
     public RMAccountsManager() {
-        super("Resource Manager Accounts Refresher", ProActiveLogger.getLogger(RMLoggers.MONITORING));
+        super("Resource Manager Accounts Refresher", ProActiveLogger.getLogger(RMAccountsManager.class));
         // Get the database manager
         this.dbmanager = DatabaseManager.getInstance();
     }

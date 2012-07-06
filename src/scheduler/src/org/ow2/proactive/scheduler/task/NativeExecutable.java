@@ -65,7 +65,6 @@ import org.ow2.proactive.scheduler.exception.StartProcessException;
 import org.ow2.proactive.scheduler.task.launcher.TaskLauncher.OneShotDecrypter;
 import org.ow2.proactive.scheduler.task.launcher.TaskLauncher.SchedulerVars;
 import org.ow2.proactive.scheduler.task.launcher.utils.ForkerUtils;
-import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 import org.ow2.proactive.scheduler.util.process.ProcessTreeKiller;
 import org.ow2.proactive.scheduler.util.process.ThreadReader;
 import org.ow2.proactive.scripting.GenerationScript;
@@ -86,7 +85,7 @@ import org.ow2.proactive.utils.Tools;
  */
 public class NativeExecutable extends Executable {
 
-    public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.LAUNCHER);
+    public static final Logger logger_dev = ProActiveLogger.getLogger(NativeExecutable.class);
 
     private static String GENERATION_SCRIPT_ERR = "\nNo command eligible was found by generation script.\n"
         + "A generation script must define a variable named 'command' which contains "

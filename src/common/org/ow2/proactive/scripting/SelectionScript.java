@@ -51,7 +51,6 @@ import javax.script.ScriptEngineManager;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.ow2.proactive.utils.SchedulerLoggers;
 
 
 /**
@@ -74,7 +73,7 @@ import org.ow2.proactive.utils.SchedulerLoggers;
 @PublicAPI
 public class SelectionScript extends Script<Boolean> {
     /** Loggers */
-    public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerLoggers.SCRIPT);
+    public static final Logger logger_dev = ProActiveLogger.getLogger(SelectionScript.class);
 
     /**
      * The variable name which must be set after the evaluation

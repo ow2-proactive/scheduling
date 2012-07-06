@@ -49,7 +49,6 @@ import org.ow2.proactive.scheduler.common.exception.JobCreationException;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.NativeTask;
-import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 import org.ow2.proactive.scripting.InvalidScriptException;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.scripting.SimpleScript;
@@ -84,7 +83,7 @@ public class FlatJobFactory {
     /**
      * Log4j logger name
      */
-    public static Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.FACTORY);
+    public static Logger logger = ProActiveLogger.getLogger(FlatJobFactory.class);
 
     /**
      * comment character used to ignore line in text file containing

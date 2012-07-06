@@ -45,7 +45,6 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.authentication.crypto.Credentials;
-import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
@@ -54,7 +53,7 @@ import org.ow2.proactive.utils.NodeSet;
 
 public class UserRMProxy {
 
-    private static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.RMPROXY);
+    private static final Logger logger_dev = ProActiveLogger.getLogger(UserRMProxy.class);
 
     private final Credentials credentials;
 

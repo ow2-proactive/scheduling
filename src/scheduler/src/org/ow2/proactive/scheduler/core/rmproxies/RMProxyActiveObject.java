@@ -23,7 +23,6 @@ import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.common.RMState;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
-import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.ScriptHandler;
 import org.ow2.proactive.scripting.ScriptLoader;
@@ -36,7 +35,7 @@ import org.ow2.proactive.utils.NodeSet;
 @ActiveObject
 public class RMProxyActiveObject {
 
-    protected static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.RMPROXY);
+    protected static final Logger logger_dev = ProActiveLogger.getLogger(RMProxyActiveObject.class);
 
     protected ResourceManager rm;
 

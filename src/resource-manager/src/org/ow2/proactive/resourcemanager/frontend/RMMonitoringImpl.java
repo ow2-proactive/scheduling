@@ -71,7 +71,6 @@ import org.ow2.proactive.resourcemanager.core.jmx.RMJMXHelper;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.utils.AtomicRMStatisticsHolder;
-import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 
 
 /**
@@ -89,7 +88,7 @@ import org.ow2.proactive.resourcemanager.utils.RMLoggers;
  */
 @ActiveObject
 public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActive, RunActive {
-    private static final Logger logger = ProActiveLogger.getLogger(RMLoggers.MONITORING);
+    private static final Logger logger = ProActiveLogger.getLogger(RMMonitoringImpl.class);
 
     // Attributes
     private RMCore rmcore;

@@ -62,7 +62,7 @@ public final class VirtualInfrastructureNodeStarter {
     public static final int message_length = 1000;
 
     /** PALogger */
-    private static Logger logger = ProActiveLogger.getLogger(RMLoggers.RMNODE);
+    private static Logger logger = ProActiveLogger.getLogger(VirtualInfrastructureNodeStarter.class);
 
     /**
      * Creates a new instance of this class and calls registersInRm method. The

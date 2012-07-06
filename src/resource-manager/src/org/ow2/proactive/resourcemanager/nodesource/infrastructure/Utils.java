@@ -50,14 +50,13 @@ import org.objectweb.proactive.core.ssh.SSHClient;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.utils.OperatingSystem;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
-import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 
 
 /**
  * A class where static utility methods are welcome
  */
 public class Utils {
-    private static final Logger logger = ProActiveLogger.getLogger(RMLoggers.NODESOURCE);
+    private static final Logger logger = ProActiveLogger.getLogger(Utils.class);
 
     /**
      * Execute a specific command on a remote host through SSH

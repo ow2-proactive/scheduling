@@ -50,7 +50,6 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.ow2.proactive.utils.SchedulerLoggers;
 
 
 /**
@@ -64,7 +63,7 @@ import org.ow2.proactive.utils.SchedulerLoggers;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class GenerationScript extends Script<String> {
     /** Loggers */
-    public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerLoggers.SCRIPT);
+    public static final Logger logger_dev = ProActiveLogger.getLogger(GenerationScript.class);
 
     /**
      * The variable name which must be set after the evaluation

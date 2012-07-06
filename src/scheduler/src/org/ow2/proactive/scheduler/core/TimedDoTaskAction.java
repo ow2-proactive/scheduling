@@ -49,7 +49,6 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.task.launcher.TaskLauncher;
-import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 import org.ow2.proactive.threading.CallableWithTimeoutAction;
 
 
@@ -61,7 +60,7 @@ import org.ow2.proactive.threading.CallableWithTimeoutAction;
  */
 public class TimedDoTaskAction implements CallableWithTimeoutAction<Void> {
 
-    private static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.SCHEDULE);
+    private static final Logger logger_dev = ProActiveLogger.getLogger(TimedDoTaskAction.class);
 
     private final InternalJob job;
 

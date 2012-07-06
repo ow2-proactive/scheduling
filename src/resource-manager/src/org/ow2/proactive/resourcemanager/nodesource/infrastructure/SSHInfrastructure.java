@@ -51,7 +51,6 @@ import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
-import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 import org.ow2.proactive.resourcemanager.utils.RMNodeStarter;
 import org.ow2.proactive.resourcemanager.utils.RMNodeStarter.CommandLineBuilder;
 import org.ow2.proactive.resourcemanager.utils.RMNodeStarter.OperatingSystem;
@@ -81,7 +80,7 @@ public class SSHInfrastructure extends HostsFileBasedInfrastructureManager {
     /**
      * class' logger
      */
-    private static final Logger logger = ProActiveLogger.getLogger(RMLoggers.NODESOURCE);
+    private static final Logger logger = ProActiveLogger.getLogger(SSHInfrastructure.class);
 
     /**
      * ShhClient options (@see {@link SSHClient})

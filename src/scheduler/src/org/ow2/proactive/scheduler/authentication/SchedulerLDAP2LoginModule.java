@@ -41,7 +41,6 @@ import java.io.File;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.authentication.LDAP2LoginModule;
-import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 
 
@@ -109,6 +108,6 @@ public class SchedulerLDAP2LoginModule extends LDAP2LoginModule {
      * @return logger for authentication
      */
     public Logger getLogger() {
-        return ProActiveLogger.getLogger(SchedulerLoggers.CONNECTION);
+        return ProActiveLogger.getLogger(SchedulerLDAP2LoginModule.class);
     }
 }

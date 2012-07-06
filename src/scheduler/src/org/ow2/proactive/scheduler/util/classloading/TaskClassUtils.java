@@ -45,13 +45,12 @@ import java.util.zip.ZipEntry;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 import org.ow2.proactive.utils.FileToBytesConverter;
 
 
 public class TaskClassUtils {
 
-    public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.CORE);
+    public static final Logger logger_dev = ProActiveLogger.getLogger(TaskClassUtils.class);
 
     /**
     * Look for a classfile into a directory.

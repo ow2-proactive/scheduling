@@ -64,7 +64,6 @@ import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProper
 import org.ow2.proactive.resourcemanager.rmnode.RMNode;
 import org.ow2.proactive.resourcemanager.selection.policies.ShufflePolicy;
 import org.ow2.proactive.resourcemanager.selection.topology.TopologyHandler;
-import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.ScriptException;
 import org.ow2.proactive.scripting.ScriptResult;
@@ -80,7 +79,7 @@ import org.ow2.proactive.utils.NodeSet;
  */
 public abstract class SelectionManager {
 
-    private final static Logger logger = ProActiveLogger.getLogger(RMLoggers.RMSELECTION);
+    private final static Logger logger = ProActiveLogger.getLogger(SelectionManager.class);
 
     private RMCore rmcore;
 

@@ -45,7 +45,6 @@ import org.objectweb.proactive.extensions.processbuilder.OSUser;
 import org.objectweb.proactive.extensions.processbuilder.PAOSProcessBuilderFactory;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.scheduler.task.launcher.TaskLauncher.OneShotDecrypter;
-import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 
 
 /**
@@ -57,7 +56,7 @@ import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
  */
 public final class ForkerUtils {
 
-    private static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.LAUNCHER);
+    private static final Logger logger_dev = ProActiveLogger.getLogger(ForkerUtils.class);
 
     /** System property Key of the fork method */
     private static final String FORK_METHOD_KEY = "pas.launcher.forkas.method";

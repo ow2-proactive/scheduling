@@ -49,7 +49,6 @@ import org.hibernate.usertype.UserType;
 import org.objectweb.proactive.core.util.converter.ByteToObjectConverter;
 import org.objectweb.proactive.core.util.converter.ObjectToByteConverter;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 
 
 /**
@@ -62,7 +61,7 @@ import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
  */
 public class BinaryLargeOBject implements UserType {
 
-    public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.CORE);
+    public static final Logger logger_dev = ProActiveLogger.getLogger(BinaryLargeOBject.class);
 
     /**
      * @see org.hibernate.usertype.UserType#sqlTypes()

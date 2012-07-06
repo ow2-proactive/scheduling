@@ -68,7 +68,6 @@ import org.ow2.proactive.resourcemanager.frontend.topology.Topology;
 import org.ow2.proactive.resourcemanager.nodesource.common.PluginDescriptor;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.DefaultInfrastructureManager;
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
-import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 import org.ow2.proactive.resourcemanager.utils.TargetType;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.ScriptResult;
@@ -120,7 +119,7 @@ public class ResourceManagerModel extends ConsoleModel {
     }
 
     protected ResourceManagerModel(boolean allowExitCommand) {
-        super(ProActiveLogger.getLogger(RMLoggers.CONSOLE));
+        super(ProActiveLogger.getLogger(ResourceManagerModel.class));
         this.allowExitCommand = allowExitCommand;
         commands.add(new Command("addnode(nodeURL, nsName)",
             "Add node to the given node source (parameters is a string representing the node URL to add &"

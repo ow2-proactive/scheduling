@@ -50,7 +50,6 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.resourcemanager.common.RMState;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.SchedulerCoreMethods;
-import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 import org.ow2.proactive.scheduler.core.SchedulerCore;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptor;
@@ -67,7 +66,7 @@ import org.ow2.proactive.scheduler.descriptor.JobDescriptor;
 @PublicAPI
 public abstract class Policy implements Serializable {
 
-    protected static final Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.POLICY);
+    protected static final Logger logger = ProActiveLogger.getLogger(Policy.class);
 
     /**
      * Resources manager state. Can be used in an inherit policy to be aware

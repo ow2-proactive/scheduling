@@ -60,7 +60,6 @@ import org.ow2.proactive.scheduler.task.ForkedJavaExecutableContainer;
 import org.ow2.proactive.scheduler.task.launcher.ForkedJavaTaskLauncher;
 import org.ow2.proactive.scheduler.task.launcher.TaskLauncher;
 import org.ow2.proactive.scheduler.task.launcher.TaskLauncherInitializer;
-import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 
 
 /**
@@ -77,7 +76,7 @@ import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class InternalForkedJavaTask extends InternalJavaTask {
 
-    public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.CORE);
+    public static final Logger logger_dev = ProActiveLogger.getLogger(InternalForkedJavaTask.class);
 
     /** Policy content for the forked VM (declared as static element to be cached) */
     @Transient

@@ -70,7 +70,6 @@ import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.frontend.RMConnection;
-import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 import org.ow2.proactive.utils.console.Console;
 import org.ow2.proactive.utils.console.JlineConsole;
 import org.ow2.proactive.utils.console.MBeanInfoViewer;
@@ -93,7 +92,7 @@ public class ResourceManagerController {
 
     protected static final String control = "<ctl> ";
     protected static final String newline = System.getProperty("line.separator");
-    protected static Logger logger = ProActiveLogger.getLogger(RMLoggers.RMLAUNCHER);
+    protected static Logger logger = ProActiveLogger.getLogger(ResourceManagerController.class);
     protected static ResourceManagerController shell;
 
     private String commandName = "rm-client";

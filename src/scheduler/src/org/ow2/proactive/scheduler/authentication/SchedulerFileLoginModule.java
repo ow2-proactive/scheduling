@@ -41,7 +41,6 @@ import java.io.File;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.authentication.FileLoginModule;
-import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 
 
@@ -93,7 +92,7 @@ public class SchedulerFileLoginModule extends FileLoginModule {
      * @return logger used for authentication
      */
     public Logger getLogger() {
-        return ProActiveLogger.getLogger(SchedulerLoggers.CONNECTION);
+        return ProActiveLogger.getLogger(SchedulerFileLoginModule.class);
     }
 
 }

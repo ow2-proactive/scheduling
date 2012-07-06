@@ -21,9 +21,9 @@ import org.hibernate.transform.DistinctRootEntityResultTransformer;
 import org.junit.Test;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.db.DatabaseManager.FilteredExceptionCallback;
-import org.ow2.proactive.db.DatabaseManagerExceptionHandler.DBMEHandler;
 import org.ow2.proactive.db.DatabaseManagerException;
 import org.ow2.proactive.db.DatabaseManagerExceptionHandler;
+import org.ow2.proactive.db.DatabaseManagerExceptionHandler.DBMEHandler;
 import org.ow2.proactive.scheduler.common.job.JobEnvironment;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
@@ -38,7 +38,6 @@ import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputSelector;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
-import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 import org.ow2.proactive.scheduler.core.account.SchedulerAccount;
 import org.ow2.proactive.scheduler.core.db.TaskData.DBTaskId;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
@@ -55,7 +54,6 @@ import org.ow2.proactive.scheduler.task.internal.InternalForkedJavaTask;
 import org.ow2.proactive.scheduler.task.internal.InternalJavaTask;
 import org.ow2.proactive.scheduler.task.internal.InternalNativeTask;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
-import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 import org.ow2.proactive.scripting.InvalidScriptException;
 
 
@@ -63,9 +61,9 @@ public class SchedulerDBManager implements FilteredExceptionCallback {
 
     private static final String JAVA_PROPERTYNAME_NODB = "scheduler.database.nodb";
 
-    private static final Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.DATABASE);
+    private static final Logger logger = ProActiveLogger.getLogger(SchedulerDBManager.class);
 
-    private static final Logger debugLogger = ProActiveLogger.getLogger(SchedulerDevLoggers.DATABASE);
+    private static final Logger debugLogger = ProActiveLogger.getLogger(SchedulerDBManager.class);
 
     private static final Set<JobStatus> finishedJobStatuses;
 

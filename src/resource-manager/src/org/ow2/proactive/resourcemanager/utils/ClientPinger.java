@@ -60,7 +60,7 @@ import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProper
 @ActiveObject
 public class ClientPinger implements InitActive, RunActive {
 
-    private static final Logger logger = ProActiveLogger.getLogger(RMLoggers.PINGER);
+    private static final Logger logger = ProActiveLogger.getLogger(ClientPinger.class);
 
     private AtomicBoolean active = new AtomicBoolean(true);
     private RMCore rmcore;

@@ -50,7 +50,6 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.utils.NamedThreadFactory;
 import org.ow2.proactive.scheduler.common.SchedulerEventListener;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
-import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 import org.ow2.proactive.threading.ReifiedMethodCall;
 
 
@@ -63,7 +62,7 @@ import org.ow2.proactive.threading.ReifiedMethodCall;
  */
 public class ClientRequestHandler {
 
-    public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.FRONTEND);
+    public static final Logger logger_dev = ProActiveLogger.getLogger(ClientRequestHandler.class);
 
     /** Number of threads used by the thread pool for clients events sending */
     private static final int THREAD_NUMBER = PASchedulerProperties.SCHEDULER_LISTENERS_THREADNUMBER

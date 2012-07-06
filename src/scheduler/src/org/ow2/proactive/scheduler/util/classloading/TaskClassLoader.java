@@ -41,7 +41,6 @@ import java.io.IOException;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 
 
 /**
@@ -55,7 +54,7 @@ import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
  */
 public class TaskClassLoader extends ClassLoader {
 
-    public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.CORE);
+    public static final Logger logger_dev = ProActiveLogger.getLogger(TaskClassLoader.class);
 
     /** The associated classserver on the scheduler core side */
     // Can be null if no classpath has been set for the job

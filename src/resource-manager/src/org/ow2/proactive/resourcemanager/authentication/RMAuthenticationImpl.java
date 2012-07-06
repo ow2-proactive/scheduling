@@ -57,7 +57,6 @@ import org.ow2.proactive.resourcemanager.core.history.UserHistory;
 import org.ow2.proactive.resourcemanager.core.jmx.RMJMXHelper;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
-import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 
 
 /**
@@ -70,7 +69,7 @@ import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 public class RMAuthenticationImpl extends AuthenticationImpl implements RMAuthentication, InitActive {
 
     private static final String ERROR_ALREADY_CONNECTED = "This active object is already connected to the resource manager. Disconnect first.";
-    private final static Logger logger = ProActiveLogger.getLogger(RMLoggers.CONNECTION);
+    private final static Logger logger = ProActiveLogger.getLogger(RMAuthenticationImpl.class);
     private RMCore rmcore;
 
     /**
@@ -122,7 +121,7 @@ public class RMAuthenticationImpl extends AuthenticationImpl implements RMAuthen
     }
 
     public Logger getLogger() {
-        return ProActiveLogger.getLogger(RMLoggers.CONNECTION);
+        return ProActiveLogger.getLogger(RMAuthenticationImpl.class);
     }
 
     @Override

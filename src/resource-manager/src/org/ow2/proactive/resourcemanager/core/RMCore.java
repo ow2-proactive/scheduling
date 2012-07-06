@@ -113,15 +113,12 @@ import org.ow2.proactive.resourcemanager.nodesource.policy.NodeSourcePolicyFacto
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.ow2.proactive.resourcemanager.rmnode.RMDeployingNode;
 import org.ow2.proactive.resourcemanager.rmnode.RMNode;
-import org.ow2.proactive.resourcemanager.rmnode.RMNodeImpl;
 import org.ow2.proactive.resourcemanager.selection.SelectionManager;
 import org.ow2.proactive.resourcemanager.selection.statistics.ProbablisticSelectionManager;
 import org.ow2.proactive.resourcemanager.selection.topology.TopologyManager;
 import org.ow2.proactive.resourcemanager.utils.ClientPinger;
-import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 import org.ow2.proactive.resourcemanager.utils.TargetType;
 import org.ow2.proactive.scripting.Script;
-import org.ow2.proactive.scripting.ScriptHandler;
 import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
@@ -172,7 +169,7 @@ import org.ow2.proactive.utils.NodeSet;
 public class RMCore implements ResourceManager, InitActive, RunActive {
 
     /** Log4J logger name for RMCore */
-    private final static Logger logger = ProActiveLogger.getLogger(RMLoggers.CORE);
+    private final static Logger logger = ProActiveLogger.getLogger(RMCore.class);
 
     /** If RMCore Active object */
     private String id;

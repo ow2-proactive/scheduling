@@ -53,7 +53,6 @@ import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
-import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.ScriptHandler;
 import org.ow2.proactive.scripting.ScriptLoader;
@@ -84,7 +83,7 @@ import org.ow2.proactive.scripting.SelectionScript;
  */
 public class RMNodeImpl implements RMNode, Serializable {
 
-    private final static Logger logger = ProActiveLogger.getLogger(RMLoggers.CORE);
+    private final static Logger logger = ProActiveLogger.getLogger(RMNodeImpl.class);
 
     /** HashMap associates a selection Script to its result on the node */
     private HashMap<SelectionScript, Integer> scriptStatus;

@@ -56,11 +56,9 @@ import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.common.SchedulerConnection;
 import org.ow2.proactive.scheduler.common.exception.InternalSchedulerException;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
-import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 import org.ow2.proactive.scheduler.core.SchedulerFrontend;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.exception.AdminSchedulerException;
-import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 
 
 /**
@@ -80,8 +78,8 @@ import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 public class SchedulerFactory {
 
     /** Logger to be used for all messages related to the scheduler */
-    public static final Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.SCHEDULER);
-    public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.SCHEDULER);
+    public static final Logger logger = ProActiveLogger.getLogger(SchedulerFactory.class);
+    public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerFactory.class);
 
     private static boolean allowNullInit = false;
     private static boolean schedulerStarted = false;

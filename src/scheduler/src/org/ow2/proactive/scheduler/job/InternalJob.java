@@ -85,7 +85,6 @@ import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.task.launcher.TaskLauncher;
-import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 
 
 /**
@@ -98,7 +97,7 @@ import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
  * @since ProActive Scheduling 0.9
  */
 public abstract class InternalJob extends JobState {
-    public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.CORE);
+    public static final Logger logger_dev = ProActiveLogger.getLogger(InternalJob.class);
 
     /** Owner of the job */
     private String owner = "";

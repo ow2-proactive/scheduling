@@ -47,7 +47,6 @@ import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.JavaExecutableInitializer;
 import org.ow2.proactive.scheduler.common.task.executable.Executable;
 import org.ow2.proactive.scheduler.common.task.util.ByteArrayWrapper;
-import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 
 
 /**
@@ -61,7 +60,7 @@ import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
  */
 public class ForkedJavaExecutableContainer extends JavaExecutableContainer {
 
-    public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.CORE);
+    public static final Logger logger_dev = ProActiveLogger.getLogger(ForkedJavaExecutableContainer.class);
 
     /** Environment of a new dedicated JVM */
     protected ForkEnvironment forkEnvironment = null;

@@ -91,7 +91,6 @@ import org.ow2.proactive.scheduler.common.task.dataspaces.InputAccessMode;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputSelector;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
-import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
 import org.ow2.proactive.scheduler.core.account.SchedulerAccountsManager;
 import org.ow2.proactive.scheduler.core.db.SchedulerDBManager;
@@ -109,7 +108,7 @@ import org.ow2.proactive.scheduler.permissions.ChangePriorityPermission;
 import org.ow2.proactive.scheduler.permissions.ConnectToResourceManagerPermission;
 import org.ow2.proactive.scheduler.permissions.GetOwnStateOnlyPermission;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
-import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
+import org.ow2.proactive.scheduler.util.console.SchedulerController;
 
 
 /**
@@ -125,9 +124,9 @@ import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Scheduler, RunActive {
 
     /** Scheduler logger */
-    public static final Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.FRONTEND);
-    public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.FRONTEND);
-    public static final Logger logger_console = ProActiveLogger.getLogger(SchedulerLoggers.CONSOLE);
+    public static final Logger logger = ProActiveLogger.getLogger(SchedulerFrontend.class);
+    public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerFrontend.class);
+    public static final Logger logger_console = ProActiveLogger.getLogger(SchedulerController.class);
 
     /** A repeated warning message */
     private static final String ACCESS_DENIED = "Access denied ! You are not connected or your session has expired !";

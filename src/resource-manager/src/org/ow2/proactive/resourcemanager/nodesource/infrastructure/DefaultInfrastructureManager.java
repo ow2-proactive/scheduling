@@ -44,7 +44,6 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.nodesource.utils.NamesConvertor;
-import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 
 
 /**
@@ -57,7 +56,7 @@ import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 public class DefaultInfrastructureManager extends InfrastructureManager {
 
     /** logger*/
-    protected static Logger logger = ProActiveLogger.getLogger(RMLoggers.NODESOURCE);
+    protected static Logger logger = ProActiveLogger.getLogger(DefaultInfrastructureManager.class);
     /** registered nodes number */
     protected int nodesCount = 0;
 

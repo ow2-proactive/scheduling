@@ -51,12 +51,10 @@ import org.ow2.proactive.jmx.naming.JMXTransportProtocol;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.common.exception.AlreadyConnectedException;
-import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 import org.ow2.proactive.scheduler.core.SchedulerFrontend;
 import org.ow2.proactive.scheduler.core.jmx.SchedulerJMXHelper;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.job.UserIdentificationImpl;
-import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 import org.ow2.proactive.utils.Tools;
 
 
@@ -74,7 +72,7 @@ import org.ow2.proactive.utils.Tools;
 public class SchedulerAuthentication extends AuthenticationImpl implements SchedulerAuthenticationInterface {
 
     /** Scheduler logger */
-    public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.CONNECTION);
+    public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerAuthentication.class);
 
     /** The scheduler front-end connected to this authentication interface */
     private SchedulerFrontend frontend;
@@ -135,7 +133,7 @@ public class SchedulerAuthentication extends AuthenticationImpl implements Sched
      * @see org.ow2.proactive.authentication.Loggable#getLogger()
      */
     public Logger getLogger() {
-        return ProActiveLogger.getLogger(SchedulerLoggers.CONNECTION);
+        return ProActiveLogger.getLogger(SchedulerAuthentication.class);
     }
 
     /**

@@ -45,7 +45,6 @@ import java.util.Properties;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.exception.RMException;
-import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 
 
 /**
@@ -120,7 +119,7 @@ public class InfrastructureManagerFactory {
                 Class<?> cls = Class.forName(className.toString());
                 supportedInfrastructures.add(cls);
             } catch (ClassNotFoundException e) {
-                ProActiveLogger.getLogger(RMLoggers.NODESOURCE).warn(
+                ProActiveLogger.getLogger(InfrastructureManagerFactory.class).warn(
                         "Cannot find class " + className.toString());
             }
         }

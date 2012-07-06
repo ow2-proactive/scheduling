@@ -44,7 +44,6 @@ import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.body.request.RequestFilter;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.scheduler.core.annotation.RunActivityFiltered;
-import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 
 
 /**
@@ -56,7 +55,7 @@ import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
  * @since ProActive Scheduling 0.9
  */
 public class MainLoopRequestFilter implements RequestFilter {
-    public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.CORE);
+    public static final Logger logger_dev = ProActiveLogger.getLogger(MainLoopRequestFilter.class);
     private ArrayList<String> methodNames = new ArrayList<String>();
 
     /**

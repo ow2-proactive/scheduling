@@ -48,7 +48,6 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.rmnode.RMNode;
 import org.ow2.proactive.resourcemanager.selection.SelectionPolicy;
-import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 
 
 /**
@@ -64,7 +63,7 @@ import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 public class NodeSourcePriorityPolicy implements SelectionPolicy {
 
     public final static String CONFIG_NAME_PROPERTY = "pa.rm.selection.policy.nodesources";
-    private final static Logger logger = ProActiveLogger.getLogger(RMLoggers.RMSELECTION);
+    private final static Logger logger = ProActiveLogger.getLogger(NodeSourcePriorityPolicy.class);
 
     // when the file was modified
     private long lastModified = 0;

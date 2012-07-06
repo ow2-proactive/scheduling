@@ -102,7 +102,6 @@ import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
-import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
 import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingException;
 import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingService;
@@ -126,8 +125,8 @@ import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalNativeTask;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.task.launcher.TaskLauncher;
-import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 import org.ow2.proactive.scheduler.util.classloading.TaskClassServer;
+import org.ow2.proactive.scheduler.util.console.SchedulerController;
 import org.ow2.proactive.utils.NodeSet;
 
 
@@ -145,8 +144,8 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
         FilteredExceptionCallback {
 
     /** Scheduler logger */
-    public static final Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.CORE);
-    public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.CORE);
+    public static final Logger logger = ProActiveLogger.getLogger(SchedulerCore.class);
+    public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerCore.class);
 
     /** Number of threads used to call TaskLauncher.terminate() */
     private static final int TERMINATE_THREAD_NUMBER = PASchedulerProperties.SCHEDULER_STARTTASK_THREADNUMBER
@@ -545,7 +544,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
             dataSpaceNSStarter = new DataSpaceServiceStarter();
             dataSpaceNSStarter.startNamingService();
         } catch (Throwable e) {
-            ProActiveLogger.getLogger(SchedulerLoggers.CONSOLE).info("Cannot start Scheduler :", e);
+            ProActiveLogger.getLogger(SchedulerController.class).info("Cannot start Scheduler :", e);
             //terminate this active object
             try {
                 PAActiveObject.terminateActiveObject(false);
@@ -562,7 +561,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
 
             recover();
         } catch (Throwable e) {
-            ProActiveLogger.getLogger(SchedulerLoggers.CONSOLE).info("Cannot start Scheduler :", e);
+            ProActiveLogger.getLogger(SchedulerController.class).info("Cannot start Scheduler :", e);
             kill();
         }
 

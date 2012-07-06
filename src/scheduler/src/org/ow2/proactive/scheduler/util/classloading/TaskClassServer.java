@@ -51,7 +51,6 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.util.JarUtils;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
-import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 
 
 /**
@@ -63,7 +62,7 @@ import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
  */
 public class TaskClassServer {
 
-    public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.CORE);
+    public static final Logger logger_dev = ProActiveLogger.getLogger(TaskClassServer.class);
 
     // temp directory for unjaring classpath : if not defined, java.io.tmpdir is used.
     private static final String tmpTmpJarFilesDir = PASchedulerProperties.SCHEDULER_CLASSSERVER_TMPDIR

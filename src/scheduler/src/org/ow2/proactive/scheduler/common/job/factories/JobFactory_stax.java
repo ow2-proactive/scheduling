@@ -84,7 +84,6 @@ import org.ow2.proactive.scheduler.common.task.flow.FlowActionType;
 import org.ow2.proactive.scheduler.common.task.flow.FlowBlock;
 import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
 import org.ow2.proactive.scheduler.common.util.RegexpMatcher;
-import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 import org.ow2.proactive.scheduler.common.util.ZipUtils;
 import org.ow2.proactive.scripting.GenerationScript;
 import org.ow2.proactive.scripting.Script;
@@ -108,7 +107,7 @@ import org.xml.sax.SAXParseException;
  */
 public class JobFactory_stax extends JobFactory {
 
-    public static Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.FACTORY);
+    public static Logger logger = ProActiveLogger.getLogger(JobFactory_stax.class);
     /** Location of the schema used to parse job descriptor. */
     public static final String SCHEMA_LOCATION = "/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/dev/schedulerjob.rng";
     /** Variables styleScheet location. */

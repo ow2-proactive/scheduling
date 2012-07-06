@@ -47,7 +47,6 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.rmnode.RMNode;
-import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 import org.ow2.proactive.scripting.ScriptException;
 import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive.scripting.SelectionScript;
@@ -55,7 +54,7 @@ import org.ow2.proactive.scripting.SelectionScript;
 
 public class ScriptExecutor implements Callable<Node> {
 
-    private final static Logger logger = ProActiveLogger.getLogger(RMLoggers.RMSELECTION);
+    private final static Logger logger = ProActiveLogger.getLogger(ScriptExecutor.class);
     private RMNode rmnode;
     private SelectionManager manager;
     private List<SelectionScript> selectionScriptList;

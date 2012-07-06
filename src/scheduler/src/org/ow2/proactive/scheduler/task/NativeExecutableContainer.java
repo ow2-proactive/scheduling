@@ -49,7 +49,6 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.scheduler.common.exception.ExecutableCreationException;
 import org.ow2.proactive.scheduler.common.task.executable.Executable;
-import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 import org.ow2.proactive.scripting.GenerationScript;
 import org.ow2.proactive.scripting.InvalidScriptException;
 
@@ -61,7 +60,7 @@ import org.ow2.proactive.scripting.InvalidScriptException;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class NativeExecutableContainer extends ExecutableContainer {
 
-    public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.CORE);
+    public static final Logger logger_dev = ProActiveLogger.getLogger(NativeExecutableContainer.class);
 
     // actual executable data
     private String[] command;

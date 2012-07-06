@@ -47,7 +47,6 @@ import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
 import org.ow2.proactive.resourcemanager.nodesource.utils.NamesConvertor;
-import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 
 
 /**
@@ -69,7 +68,7 @@ import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 public abstract class NodeSourcePolicy implements Serializable {
 
     /** logger */
-    private static Logger logger = ProActiveLogger.getLogger(RMLoggers.POLICY);
+    private static Logger logger = ProActiveLogger.getLogger(NodeSourcePolicy.class);
     /** Node source of the policy */
     protected NodeSource nodeSource;
 

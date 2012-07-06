@@ -78,7 +78,6 @@ import org.ow2.proactive.resourcemanager.nodesource.policy.NodeSourcePolicy;
 import org.ow2.proactive.resourcemanager.rmnode.RMDeployingNode;
 import org.ow2.proactive.resourcemanager.rmnode.RMNode;
 import org.ow2.proactive.resourcemanager.rmnode.RMNodeImpl;
-import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 
 
 /**
@@ -98,7 +97,7 @@ import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 @ActiveObject
 public class NodeSource implements InitActive, RunActive {
 
-    private static Logger logger = ProActiveLogger.getLogger(RMLoggers.NODESOURCE);
+    private static Logger logger = ProActiveLogger.getLogger(NodeSource.class);
     private int pingFrequency = PAResourceManagerProperties.RM_NODE_SOURCE_PING_FREQUENCY.getValueAsInt();
 
     /** Default name */

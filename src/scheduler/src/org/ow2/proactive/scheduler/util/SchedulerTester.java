@@ -61,7 +61,6 @@ import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.factories.JobFactory;
-import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 
 
 /**
@@ -75,7 +74,7 @@ public class SchedulerTester {
     /** directory containing jobs to be submitted */
     public static String JOBS_HOME;
     /** Scheduler loggers. */
-    public static Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.CONSOLE);
+    public static Logger logger = ProActiveLogger.getLogger(SchedulerTester.class);
 
     // scheduler connection
     private static final String DEFAULT_URL = "//localhost/";

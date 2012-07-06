@@ -55,7 +55,6 @@ import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProper
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.frontend.RMConnection;
 import org.ow2.proactive.resourcemanager.frontend.RMMonitoring;
-import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 
 
 /**
@@ -73,7 +72,7 @@ import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 public class RMFactory {
 
     /** Logger of the RMFactory */
-    private static final Logger logger = ProActiveLogger.getLogger(RMLoggers.RMFACTORY);
+    private static final Logger logger = ProActiveLogger.getLogger(RMFactory.class);
 
     /** RMCore interface of the created Resource manager */
     private static RMCore rmcore = null;

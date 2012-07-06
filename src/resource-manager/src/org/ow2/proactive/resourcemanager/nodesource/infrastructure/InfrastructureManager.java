@@ -61,7 +61,6 @@ import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
 import org.ow2.proactive.resourcemanager.rmnode.RMDeployingNode;
 import org.ow2.proactive.resourcemanager.rmnode.RMNode;
-import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 import org.ow2.proactive.resourcemanager.utils.RMNodeStarter;
 import org.ow2.proactive.resourcemanager.utils.RMNodeStarter.OperatingSystem;
 
@@ -84,7 +83,7 @@ import org.ow2.proactive.resourcemanager.utils.RMNodeStarter.OperatingSystem;
 public abstract class InfrastructureManager implements Serializable {
 
     /** class' logger */
-    protected static final Logger logger = ProActiveLogger.getLogger(RMLoggers.NODESOURCE);
+    protected static final Logger logger = ProActiveLogger.getLogger(InfrastructureManager.class);
 
     /** manager's node source */
     protected NodeSource nodeSource;

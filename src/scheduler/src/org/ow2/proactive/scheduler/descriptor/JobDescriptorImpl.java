@@ -62,7 +62,6 @@ import org.ow2.proactive.scheduler.common.task.flow.FlowActionType;
 import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
-import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 
 
 /**
@@ -75,7 +74,7 @@ import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
  */
 public class JobDescriptorImpl implements JobDescriptor {
 
-    public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.CORE);
+    public static final Logger logger_dev = ProActiveLogger.getLogger(JobDescriptorImpl.class);
 
     private InternalJob internalJob;
 
