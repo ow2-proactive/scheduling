@@ -120,8 +120,7 @@ import org.ow2.proactive.utils.Formatter;
  */
 public abstract class TaskLauncher {
 
-    public static final Logger logger_dev = ProActiveLogger.getLogger(TaskLauncher.class);
-    public static final Logger logger_dev_dataspace = ProActiveLogger.getLogger(TaskLauncher.class);
+    public static final Logger logger = ProActiveLogger.getLogger(TaskLauncher.class);
 
     //Scratch dir property : we cannot take the key property from DataSpaceNodeConfigurationAgent class in RM.
     //we should not depend from RM package in this class.
@@ -282,7 +281,7 @@ public abstract class TaskLauncher {
         this.initLoggers();
         // set scheduler defined env variables
         this.initEnv();
-        logger_dev.debug("TaskLauncher initialized");
+        logger.debug("TaskLauncher initialized");
     }
 
     /**
@@ -303,7 +302,7 @@ public abstract class TaskLauncher {
             } catch (RuntimeException e) {
                 // exception should not be thrown to the scheduler core
                 // the result has been computed and must be returned !
-                logger_dev.warn("Loggers are not shutdown !", e);
+                logger.warn("Loggers are not shutdown !", e);
             }
         }
 
@@ -366,7 +365,7 @@ public abstract class TaskLauncher {
      */
     @SuppressWarnings("unchecked")
     protected void initLoggers() {
-        logger_dev.debug("Init loggers");
+        logger.debug("Init loggers");
         // error about log should not be logged
         LogLog.setQuietMode(true);
         // create logger
@@ -386,9 +385,9 @@ public abstract class TaskLauncher {
             try {
                 int logMaxSize = Integer.parseInt(logMaxSizeProp);
                 this.logAppender = new AsyncAppenderWithStorage(logMaxSize);
-                logger_dev.info("Logs are limited to " + logMaxSize + " lines for task " + this.taskId);
+                logger.info("Logs are limited to " + logMaxSize + " lines for task " + this.taskId);
             } catch (NumberFormatException e) {
-                logger_dev.warn(MAX_LOG_SIZE_PROPERTY +
+                logger.warn(MAX_LOG_SIZE_PROPERTY +
                     " property is not correctly defined. Logs size is bounded to default value " +
                     TaskLauncher.DEFAULT_LOG_MAX_SIZE + " for task " + this.taskId, e);
                 this.logAppender = new AsyncAppenderWithStorage(TaskLauncher.DEFAULT_LOG_MAX_SIZE);
@@ -455,13 +454,13 @@ public abstract class TaskLauncher {
         for (int i = 0; i < incomingResults.length; i++) {
             Map<String, String> properties = incomingResults[i].getPropagatedProperties();
             if (properties != null) {
-                logger_dev.info("Incoming properties for task " + this.taskId + " are " + properties);
+                logger.info("Incoming properties for task " + this.taskId + " are " + properties);
                 for (String key : properties.keySet()) {
-                    logger_dev.debug("Value of Incoming property " + key + " is " + properties.get(key));
+                    logger.debug("Value of Incoming property " + key + " is " + properties.get(key));
                     System.setProperty(key, properties.get(key));
                 }
             } else {
-                logger_dev.info("No Incoming properties for task " + this.taskId);
+                logger.info("No Incoming properties for task " + this.taskId);
             }
         }
     }
@@ -476,24 +475,24 @@ public abstract class TaskLauncher {
         // get all names of propagated vars
         String allVars = System.getProperty(PropertyUtils.PROPAGATED_PROPERTIES_VAR_NAME);
         if (allVars != null) {
-            logger_dev.debug("Propagated properties for task " + this.taskId + " are : " + allVars);
+            logger.debug("Propagated properties for task " + this.taskId + " are : " + allVars);
             StringTokenizer parser = new StringTokenizer(allVars, PropertyUtils.VARS_VAR_SEPARATOR);
             Map<String, BigString> exportedVars = new Hashtable<String, BigString>();
             while (parser.hasMoreTokens()) {
                 String key = parser.nextToken();
                 String value = System.getProperty(key);
                 if (value != null) {
-                    logger_dev.debug("Value of Propagated property " + key + " is " + value);
+                    logger.debug("Value of Propagated property " + key + " is " + value);
                     exportedVars.put(key, new BigString(value));
                     System.clearProperty(key);
                 } else {
-                    logger_dev.warn("Propagated property " + key + " is not set !");
+                    logger.warn("Propagated property " + key + " is not set !");
                 }
             }
             System.clearProperty(PropertyUtils.PROPAGATED_PROPERTIES_VAR_NAME);
             return exportedVars;
         } else {
-            logger_dev.debug("No Propagated properties for task " + this.taskId);
+            logger.debug("No Propagated properties for task " + this.taskId);
             return null;
         }
     }
@@ -504,7 +503,7 @@ public abstract class TaskLauncher {
         try {
             appender = logSink.getAppender();
         } catch (LogForwardingException e) {
-            logger_dev.error("Cannot create log appender.", e);
+            logger.error("Cannot create log appender.", e);
             return;
         }
         this.logAppender.appendStoredEvents(appender);
@@ -518,9 +517,9 @@ public abstract class TaskLauncher {
     @ImmediateService
     public void activateLogs(AppenderProvider logSink) {
         synchronized (this.loggersFinalized) {
-            logger_dev.info("Activating logs for task " + this.taskId);
+            logger.info("Activating logs for task " + this.taskId);
             if (this.loggersActivated.get()) {
-                logger_dev.info("Logs for task " + this.taskId + " are already activated");
+                logger.info("Logs for task " + this.taskId + " are already activated");
                 return;
             }
             this.loggersActivated.set(true);
@@ -537,14 +536,14 @@ public abstract class TaskLauncher {
             try {
                 appender = logSink.getAppender();
             } catch (LogForwardingException e) {
-                logger_dev.error("Cannot create log appender.", e);
+                logger.error("Cannot create log appender.", e);
                 return;
             }
             // fill appender
             if (!this.loggersFinalized.get()) {
                 this.logAppender.addAppender(appender);
             } else {
-                logger_dev.info("Logs for task " + this.taskId + " are closed. Flushing buffer...");
+                logger.info("Logs for task " + this.taskId + " are closed. Flushing buffer...");
                 // Everything is closed: reopen and close...
                 for (LoggingEvent e : this.logAppender.getStorage()) {
                     appender.doAppend(e);
@@ -553,7 +552,7 @@ public abstract class TaskLauncher {
                 this.loggersActivated.set(false);
                 return;
             }
-            logger_dev.info("Activated logs for task " + this.taskId);
+            logger.info("Activated logs for task " + this.taskId);
         }
     }
 
@@ -562,7 +561,7 @@ public abstract class TaskLauncher {
      */
     protected void finalizeLoggers() {
         synchronized (this.loggersFinalized) {
-            logger_dev.debug("Terminating loggers for task " + this.taskId + "...");
+            logger.debug("Terminating loggers for task " + this.taskId + "...");
             this.loggersFinalized.set(true);
             this.loggersActivated.set(false);
             //Unhandle loggers
@@ -572,7 +571,7 @@ public abstract class TaskLauncher {
             }
             System.setOut(TaskLauncher.SYSTEM_OUT);
             System.setErr(TaskLauncher.SYSTEM_ERR);
-            logger_dev.debug("Terminated loggers for task " + this.taskId);
+            logger.debug("Terminated loggers for task " + this.taskId);
         }
     }
 
@@ -616,10 +615,10 @@ public abstract class TaskLauncher {
             try {
                 int progress = currentExecutable.getProgress();
                 if (progress < 0) {
-                    logger_dev.warn("Returned progress (" + progress + ") is negative, return 0 instead.");
+                    logger.warn("Returned progress (" + progress + ") is negative, return 0 instead.");
                     return 0;
                 } else if (progress > 100) {
-                    logger_dev.warn("Returned progress (" + progress +
+                    logger.warn("Returned progress (" + progress +
                         ") is greater than 100, return 100 instead.");
                     return 100;
                 } else {
@@ -643,14 +642,14 @@ public abstract class TaskLauncher {
     @SuppressWarnings("unchecked")
     protected void executePreScript() throws ActiveObjectCreationException, NodeException, UserException {
         replaceTagsInScript(pre);
-        logger_dev.info("Executing pre-script");
+        logger.info("Executing pre-script");
         ScriptHandler handler = ScriptLoader.createLocalHandler();
         this.addDataspaceBinding(handler);
         ScriptResult<String> res = handler.handle((Script<String>) pre);
 
         if (res.errorOccured()) {
             res.getException().printStackTrace();
-            logger_dev.error("Error on pre-script occured : ", res.getException());
+            logger.error("Error on pre-script occured : ", res.getException());
             throw new UserException("Pre-script has failed on the current node", res.getException());
         }
         // flush prescript output
@@ -669,7 +668,7 @@ public abstract class TaskLauncher {
     protected void executePostScript(boolean executionSucceed) throws ActiveObjectCreationException,
             NodeException, UserException {
         replaceTagsInScript(post);
-        logger_dev.info("Executing post-script");
+        logger.info("Executing post-script");
         ScriptHandler handler = ScriptLoader.createLocalHandler();
         this.addDataspaceBinding(handler);
         handler.addBinding(EXECUTION_SUCCEED_BINDING_NAME, executionSucceed);
@@ -677,7 +676,7 @@ public abstract class TaskLauncher {
 
         if (res.errorOccured()) {
             res.getException().printStackTrace();
-            logger_dev.error("Error on post-script occured : ", res.getException());
+            logger.error("Error on post-script occured : ", res.getException());
             throw new UserException("Post-script has failed on the current node", res.getException());
         }
         // flush postscript output
@@ -693,7 +692,7 @@ public abstract class TaskLauncher {
      */
     protected void executeFlowScript(TaskResult res) throws Throwable {
         replaceTagsInScript(flow);
-        logger_dev.info("Executing flow-script");
+        logger.info("Executing flow-script");
         ScriptHandler handler = ScriptLoader.createLocalHandler();
         this.addDataspaceBinding(handler);
         handler.addBinding(FlowScript.resultVariable, res.value());
@@ -705,7 +704,7 @@ public abstract class TaskLauncher {
             if (ee != null) {
                 // stacktraced on user logs
                 ee.printStackTrace();
-                logger_dev.error("Error on flow-script occured : ", ee);
+                logger.error("Error on flow-script occured : ", ee);
                 throw new UserException("Flow-script has failed on the current node", ee);
             }
         } else {
@@ -747,7 +746,7 @@ public abstract class TaskLauncher {
             } catch (RuntimeException e) {
                 // exception should not be thrown to the scheduler core
                 // the result has been computed and must be returned !
-                logger_dev.warn("Loggers are not shutdown !", e);
+                logger.warn("Loggers are not shutdown !", e);
             }
         }
         PAActiveObject.terminateActiveObject(normalTermination);
@@ -767,7 +766,7 @@ public abstract class TaskLauncher {
      */
     protected void scheduleTimer(Executable executable) {
         if (isWallTime()) {
-            logger_dev.info("Execute timer because task '" + taskId + "' is walltimed");
+            logger.info("Execute timer because task '" + taskId + "' is walltimed");
             killTaskTimer = new KillTask(executable, wallTime);
             killTaskTimer.schedule();
         }
@@ -803,18 +802,17 @@ public abstract class TaskLauncher {
                 try {
                     GLOBAL = PADataSpaces.resolveOutput(SchedulerConstants.GLOBALSPACE_NAME);
                 } catch (Throwable t) {
-                    logger_dev_dataspace.warn("GLOBALSPACE is disabled");
-                    logger_dev_dataspace.debug("", t);
+                    logger.warn("GLOBALSPACE is disabled");
+                    logger.debug("", t);
                 }
                 // create a log file in local space if the node is configured
                 if (this.storeLogs) {
-                    logger_dev.info("logfile is enabled for task " + taskId);
+                    logger.info("logfile is enabled for task " + taskId);
                     initLocalLogsFile();
                 }
 
             } catch (Throwable t) {
-                logger_dev_dataspace.warn(
-                        "There was a problem while initializing dataSpaces, they are not activated", t);
+                logger.warn("There was a problem while initializing dataSpaces, they are not activated", t);
                 this.logDataspacesStatus(
                         "There was a problem while initializing dataSpaces, they are not activated",
                         DataspacesStatusLevel.ERROR);
@@ -827,12 +825,12 @@ public abstract class TaskLauncher {
         if (isDataspaceAware()) {
             try {
                 //in dataspace debug mode, scratch directory are not cleaned after task execution
-                if (!logger_dev_dataspace.isDebugEnabled()) {
+                if (!logger.isDebugEnabled()) {
                     DataSpacesNodes.tryCloseNodeApplicationConfig(PAActiveObject
                             .getActiveObjectNode(PAActiveObject.getStubOnThis()));
                 }
             } catch (Exception e) {
-                logger_dev_dataspace
+                logger
                         .warn("There was a problem while terminating dataSpaces. Dataspaces on this node might not work anymore.");
                 // cannot add this message to dataspaces status as it is called in finally block
             }
@@ -842,12 +840,12 @@ public abstract class TaskLauncher {
     protected void copyInputDataToScratch() throws FileSystemException {
         if (isDataspaceAware()) {
             if (inputFiles == null) {
-                logger_dev_dataspace.debug("Input selector is empty, no file to copy");
+                logger.debug("Input selector is empty, no file to copy");
                 return;
             }
             //check first the OUTPUT and then the INPUT, take care if not set
             if (INPUT == null && OUTPUT == null) {
-                logger_dev_dataspace.debug("Job INPUT/OUTPUT spaces are not defined, cannot copy file.");
+                logger.debug("Job INPUT/OUTPUT spaces are not defined, cannot copy file.");
                 this.logDataspacesStatus("Job inputspace and outputspace are not defined or not properly"
                     + " configured while intput files are specified : ", DataspacesStatusLevel.ERROR);
                 for (InputSelector is : inputFiles) {
@@ -879,7 +877,7 @@ public abstract class TaskLauncher {
                                         DataspacesStatusLevel.WARNING);
                             }
                         } catch (FileSystemException fse) {
-                            logger_dev_dataspace.info("", fse);
+                            logger.info("", fse);
                             toBeThrown = new FileSystemException(
                                 "Could not contact INPUT space. Check that INPUT space is still reachable !");
                             this.logDataspacesStatus("An error occured while resolving selector " + is,
@@ -901,7 +899,7 @@ public abstract class TaskLauncher {
                                         DataspacesStatusLevel.WARNING);
                             }
                         } catch (FileSystemException fse) {
-                            logger_dev_dataspace.info("", fse);
+                            logger.info("", fse);
                             toBeThrown = new FileSystemException(
                                 "Could not contact OUTPUT space. Check that OUTPUT space is still reachable !");
                             this.logDataspacesStatus("An error occured while resolving selector " + is,
@@ -922,7 +920,7 @@ public abstract class TaskLauncher {
                                         DataspacesStatusLevel.WARNING);
                             }
                         } catch (FileSystemException fse) {
-                            logger_dev_dataspace.info("", fse);
+                            logger.info("", fse);
                             toBeThrown = new FileSystemException(
                                 "Could not contact GLOBAL space. Check that GLOBAL space is still reachable !");
                             this.logDataspacesStatus("An error occured while resolving selector " + is,
@@ -964,15 +962,15 @@ public abstract class TaskLauncher {
                     } else { // if (globResults.contains(dsfo)) {
                         relativePath = dsfo.getVirtualURI().replaceFirst(globuri + "/?", "");
                     }
-                    logger_dev_dataspace.debug("* " + relativePath);
+                    logger.debug("* " + relativePath);
                     if (!relPathes.contains(relativePath)) {
-                        logger_dev.info("------------ resolving " + relativePath);
+                        logger.info("------------ resolving " + relativePath);
                         SCRATCH.resolveFile(relativePath).copyFrom(dsfo,
                                 org.objectweb.proactive.extensions.dataspaces.api.FileSelector.SELECT_SELF);
                     }
                     relPathes.add(relativePath);
                 } catch (FileSystemException fse) {
-                    logger_dev.info("", fse);
+                    logger.info("", fse);
                     toBeThrown = fse;
                 }
             }
@@ -986,13 +984,13 @@ public abstract class TaskLauncher {
         if (isDataspaceAware()) {
             try {
                 if (outputFiles == null) {
-                    logger_dev_dataspace.debug("Output selector is empty, no file to copy");
+                    logger.debug("Output selector is empty, no file to copy");
                     return;
                 }
 
                 //check first the OUTPUT and then the INPUT, take care if not set
                 if (OUTPUT == null) {
-                    logger_dev_dataspace.debug("Job OUTPUT space is not defined, cannot copy file.");
+                    logger.debug("Job OUTPUT space is not defined, cannot copy file.");
                     this.logDataspacesStatus("Job outputspace is not defined or not properly"
                         + " configured while output files are specified : ", DataspacesStatusLevel.ERROR);
                     for (OutputSelector os : outputFiles) {
@@ -1021,7 +1019,7 @@ public abstract class TaskLauncher {
                                             DataspacesStatusLevel.WARNING);
                                 }
                             } catch (FileSystemException fse) {
-                                logger_dev_dataspace.warn("", fse);
+                                logger.warn("", fse);
                                 toBeThrown = fse;
                                 this.logDataspacesStatus(
                                         "Error while transferring to outputspace for selector " + os,
@@ -1040,7 +1038,7 @@ public abstract class TaskLauncher {
                                             DataspacesStatusLevel.WARNING);
                                 }
                             } catch (FileSystemException fse) {
-                                logger_dev_dataspace.warn("", fse);
+                                logger.warn("", fse);
                                 toBeThrown = fse;
                                 this.logDataspacesStatus(
                                         "Error while transferring to outputspace for selector " + os,
@@ -1089,22 +1087,22 @@ public abstract class TaskLauncher {
     private void handleOutput(DataSpacesFileObject out, FastFileSelector fast,
             ArrayList<DataSpacesFileObject> results) throws FileSystemException {
         FastSelector.findFiles(SCRATCH, fast, true, results);
-        if (!logger_dev_dataspace.isDebugEnabled()) {
+        if (!logger.isDebugEnabled()) {
             if (results == null || results.size() == 0) {
-                logger_dev_dataspace.debug("No file found to copy from LOCAL space to OUTPUT space");
+                logger.debug("No file found to copy from LOCAL space to OUTPUT space");
             } else {
-                logger_dev_dataspace.debug("Files that will be copied from LOCAL space to OUTPUT space :");
+                logger.debug("Files that will be copied from LOCAL space to OUTPUT space :");
             }
         }
         String buri = SCRATCH.getVirtualURI();
         for (DataSpacesFileObject dsfo : results) {
             try {
                 String relativePath = dsfo.getVirtualURI().replaceFirst(buri + "/?", "");
-                logger_dev_dataspace.debug("* " + relativePath);
+                logger.debug("* " + relativePath);
                 out.resolveFile(relativePath).copyFrom(dsfo,
                         org.objectweb.proactive.extensions.dataspaces.api.FileSelector.SELECT_SELF);
             } catch (FileSystemException fse) {
-                logger_dev_dataspace.warn("", fse);
+                logger.warn("", fse);
                 throw fse;
             }
         }

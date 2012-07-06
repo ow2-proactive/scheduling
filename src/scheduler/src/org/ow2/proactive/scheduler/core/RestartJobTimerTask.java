@@ -55,7 +55,7 @@ import org.ow2.proactive.scheduler.task.internal.InternalTask;
  */
 public class RestartJobTimerTask extends TimerTask {
 
-    private static final Logger logger_dev = ProActiveLogger.getLogger(RestartJobTimerTask.class);
+    private static final Logger logger = ProActiveLogger.getLogger(RestartJobTimerTask.class);
     /** The job on which to restart the task */
     private InternalJob job;
     /** The task that have to be restarted */
@@ -81,7 +81,7 @@ public class RestartJobTimerTask extends TimerTask {
         try {
             job.reStartTask(task);
         } catch (Throwable t) {
-            logger_dev.fatal("Error while restarting task ! Job '" + job.getId() +
+            logger.fatal("Error while restarting task ! Job '" + job.getId() +
                 "' should be killed manually !", t);
         }
     }

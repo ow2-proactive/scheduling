@@ -92,7 +92,6 @@ final class SchedulingMethodImpl implements SchedulingMethod {
 
     /** Scheduler logger */
     protected static final Logger logger = ProActiveLogger.getLogger(SchedulingMethodImpl.class);
-    protected static final Logger logger_dev = ProActiveLogger.getLogger(SchedulingMethodImpl.class);
 
     /** Number of time to retry an active object creation if it fails to create */
     protected static final int ACTIVEOBJECT_CREATION_RETRY_TIME_NUMBER = 3;
@@ -162,7 +161,7 @@ final class SchedulingMethodImpl implements SchedulingMethod {
             return numberOfTaskStarted;
         }
 
-        logger_dev.info("Number of tasks ready to be scheduled : " + taskRetrivedFromPolicy.size());
+        logger.info("Number of tasks ready to be scheduled : " + taskRetrivedFromPolicy.size());
 
         while (!taskRetrivedFromPolicy.isEmpty()) {
             //get rmState and update it in scheduling policy
@@ -170,7 +169,7 @@ final class SchedulingMethodImpl implements SchedulingMethod {
             core.policy.setRMState(rmState);
             internalPolicy.RMState = rmState;
             int freeResourcesNb = rmState.getFreeNodesNumber();
-            logger_dev.info("Number of free resources : " + freeResourcesNb);
+            logger.info("Number of free resources : " + freeResourcesNb);
             //if there is no free resources, stop it right now
             if (freeResourcesNb == 0) {
                 break;
@@ -227,7 +226,7 @@ final class SchedulingMethodImpl implements SchedulingMethod {
                     core.rmProxiesManager.getUserRMProxy(currentJob.getOwner(), currentJob.getCredentials())
                             .releaseNodes(nodeSet);
                 } catch (Exception e2) {
-                    logger_dev.info("Unable to get back the nodeSet to the RM", e2);
+                    logger.info("Unable to get back the nodeSet to the RM", e2);
                 }
                 if (--activeObjectCreationRetryTimeNumber == 0) {
                     return numberOfTaskStarted;
@@ -240,7 +239,7 @@ final class SchedulingMethodImpl implements SchedulingMethod {
                     core.rmProxiesManager.getUserRMProxy(currentJob.getOwner(), currentJob.getCredentials())
                             .releaseNodes(nodeSet);
                 } catch (Exception e2) {
-                    logger_dev.info("Unable to get back the nodeSet to the RM", e2);
+                    logger.info("Unable to get back the nodeSet to the RM", e2);
                 }
             }
         }
@@ -269,7 +268,7 @@ final class SchedulingMethodImpl implements SchedulingMethod {
         }
 
         if (list.size() > 0) {
-            logger_dev.info("Number of jobs containing tasks to be scheduled : " + list.size());
+            logger.info("Number of jobs containing tasks to be scheduled : " + list.size());
         }
 
         return list;
@@ -304,7 +303,7 @@ final class SchedulingMethodImpl implements SchedulingMethod {
             int neededNodes = internalTask.getNumberOfNodesNeeded();
             SchedulingTaskComparator referent = new SchedulingTaskComparator(internalTask, currentJob
                     .getOwner());
-            logger_dev.debug("Get the most nodes matching the current selection ");
+            logger.debug("Get the most nodes matching the current selection ");
             boolean firstLoop = true;
             do {
                 if (!firstLoop) {
@@ -394,7 +393,7 @@ final class SchedulingMethodImpl implements SchedulingMethod {
                         currentJob.getCredentials()).getNodes(neededResourcesNumber, descriptor,
                         internalTask.getSelectionScripts(), internalTask.getNodeExclusion(), bestEffort);
             } catch (TopologyDisabledException tde) {
-                logger_dev.info("Cancel job " + currentJob.getName() + " as the topology is disabled");
+                logger.info("Cancel job " + currentJob.getName() + " as the topology is disabled");
                 simulateJobStartAndCancelIt(tasksToSchedule, "Topology is disabled");
                 return null;
             }
@@ -408,16 +407,16 @@ final class SchedulingMethodImpl implements SchedulingMethod {
             while (t.getCause() != null) {
                 t = t.getCause();
             }
-            logger_dev.info("Selection script throws an exception : " + t);
-            logger_dev.debug("", t);
+            logger.info("Selection script throws an exception : " + t);
+            logger.debug("", t);
             //simulate jobs starts and cancel it
             simulateJobStartAndCancelIt(tasksToSchedule, "Selection script has failed : " +
                 Formatter.stackTraceToString(t));
             //leave the method by ss failure
             return null;
         } catch (RMProxyCreationException e) {
-            logger_dev.info("Failed to create User RM Proxy : " + e.getMessage());
-            logger_dev.debug("", e);
+            logger.info("Failed to create User RM Proxy : " + e.getMessage());
+            logger.debug("", e);
             //simulate jobs starts and cancel it
             simulateJobStartAndCancelIt(tasksToSchedule,
                     "Failed to create User RM Proxy : Authentication Failed to Resource Manager for user '" +
@@ -462,7 +461,7 @@ final class SchedulingMethodImpl implements SchedulingMethod {
      * @param task the task to be initialized
      */
     protected void loadAndInit(InternalJob job, InternalTask task) {
-        logger_dev.debug("Load and Initialize the executable container for task '" + task.getId() + "'");
+        logger.debug("Load and Initialize the executable container for task '" + task.getId() + "'");
         ExecutableContainer container = core.getDBManager().loadExecutableContainer(task);
         task.setExecutableContainer(container);
 
@@ -534,8 +533,8 @@ final class SchedulingMethodImpl implements SchedulingMethod {
                 //set nodes in the executable container
                 task.getExecutableContainer().setNodes(nodes);
 
-                logger_dev.info("Starting deployment of task '" + task.getName() + "' for job '" +
-                    job.getId() + "'");
+                logger.info("Starting deployment of task '" + task.getName() + "' for job '" + job.getId() +
+                    "'");
 
                 finalizeStarting(job, task, node, launcher);
 

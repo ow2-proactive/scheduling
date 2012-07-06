@@ -73,7 +73,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 @PublicAPI
 public class SelectionScript extends Script<Boolean> {
     /** Loggers */
-    public static final Logger logger_dev = ProActiveLogger.getLogger(SelectionScript.class);
+    public static final Logger logger = ProActiveLogger.getLogger(SelectionScript.class);
 
     /**
      * The variable name which must be set after the evaluation
@@ -206,7 +206,7 @@ public class SelectionScript extends Script<Boolean> {
         try {
             this.id_ = MessageDigest.getInstance("SHA-1").digest(stringId.getBytes());
         } catch (NoSuchAlgorithmException e) {
-            logger_dev.error("", e);
+            logger.error("", e);
             this.id_ = stringId.getBytes();
         }
     }
@@ -255,7 +255,7 @@ public class SelectionScript extends Script<Boolean> {
             String msg = "No binding for key : " + RESULT_VARIABLE +
                 "\na Selection script must define a variable named '" + RESULT_VARIABLE +
                 "' set to true or false";
-            logger_dev.error(msg);
+            logger.error(msg);
             return new ScriptResult<Boolean>(new Exception(msg));
         }
     }

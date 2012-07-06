@@ -85,7 +85,7 @@ import org.ow2.proactive.utils.Tools;
  */
 public class NativeExecutable extends Executable {
 
-    public static final Logger logger_dev = ProActiveLogger.getLogger(NativeExecutable.class);
+    public static final Logger logger = ProActiveLogger.getLogger(NativeExecutable.class);
 
     private static String GENERATION_SCRIPT_ERR = "\nNo command eligible was found by generation script.\n"
         + "A generation script must define a variable named 'command' which contains "
@@ -147,10 +147,10 @@ public class NativeExecutable extends Executable {
             File wDirFile = new File(wDir);
             if (wDirFile.exists() && wDirFile.isDirectory()) {
                 this.wDirFile = wDirFile;
-                logger_dev.debug("Working dir set to : " + wDirFile.getAbsolutePath());
+                logger.debug("Working dir set to : " + wDirFile.getAbsolutePath());
             }
         } else {
-            logger_dev.debug("Working dir not set !");
+            logger.debug("Working dir not set !");
         }
 
         //get command (launch generation Script if needed)
@@ -163,7 +163,7 @@ public class NativeExecutable extends Executable {
             if ((generationScriptDefinedCommand == null) ||
                 generationScriptDefinedCommand.equals(GenerationScript.DEFAULT_COMMAND_VALUE)) {
 
-                logger_dev.error(GENERATION_SCRIPT_ERR + gs.getId());
+                logger.error(GENERATION_SCRIPT_ERR + gs.getId());
 
                 throw new UserException(GENERATION_SCRIPT_ERR + gs.getId());
             } else {
@@ -202,7 +202,7 @@ public class NativeExecutable extends Executable {
 
         if (res.errorOccured()) {
             res.getException().printStackTrace();
-            logger_dev.error("", res.getException());
+            logger.error("", res.getException());
             throw new UserException("Command generation script execution has failed on the current node");
         }
 
@@ -255,10 +255,10 @@ public class NativeExecutable extends Executable {
                 String key = parser.nextToken();
                 String value = System.getProperty(key);
                 if (value != null) {
-                    logger_dev.debug("Value of exported property " + key + " is " + value);
+                    logger.debug("Value of exported property " + key + " is " + value);
                     taskExportedProperties.put(key, value);
                 } else {
-                    logger_dev.warn("Exported property " + key + " is not set !");
+                    logger.warn("Exported property " + key + " is not set !");
                 }
             }
             System.clearProperty(PropertyUtils.EXPORTED_PROPERTIES_VAR_NAME);
@@ -307,7 +307,7 @@ public class NativeExecutable extends Executable {
             } catch (Exception e) {
                 //in this case, the error is certainly due to the user (ie : command not found)
                 //we have to inform him about the cause.
-                logger_dev.info("", e);
+                logger.info("", e);
                 System.err.println(e);
                 throw new StartProcessException(e.getMessage(), e);
             }
@@ -329,7 +329,7 @@ public class NativeExecutable extends Executable {
                 //killTreeProcess(process);
                 return process.exitValue();
             } catch (Exception e) {
-                logger_dev.error("", e);
+                logger.error("", e);
                 //exception during process
                 //means that for most cases, user is not responsible
                 throw new RunningProcessException(e.getMessage());
@@ -401,7 +401,7 @@ public class NativeExecutable extends Executable {
                 // yet without it.
                 // processTreeKiller seems not to kill current process...
             } catch (Throwable e) {
-                logger_dev.info("Unable to kill " + command[0] + " process", e);
+                logger.info("Unable to kill " + command[0] + " process", e);
             } finally {
                 process.destroy();
             }

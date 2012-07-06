@@ -58,7 +58,7 @@ import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 
 public class JobDataSpaceApplication implements Serializable {
 
-    public static final Logger logger_dev = ProActiveLogger.getLogger(JobDataSpaceApplication.class);
+    public static final Logger logger = ProActiveLogger.getLogger(JobDataSpaceApplication.class);
 
     private long applicationId;
     private String namingServiceURL;
@@ -156,7 +156,7 @@ public class JobDataSpaceApplication implements Serializable {
                 namingService.registerApplication(applicationId, predefinedSpaces);
                 alreadyRegistered = true;
             } catch (Exception e) {
-                logger_dev.warn("", e);
+                logger.warn("", e);
             }
         }
     }
@@ -174,7 +174,7 @@ public class JobDataSpaceApplication implements Serializable {
                 global.delete(FileSelector.SELECT_ALL);
                 global.delete();
             } catch (Throwable e) {
-                logger_dev.warn("Could not clear GLOBAL subdir", e);
+                logger.warn("Could not clear GLOBAL subdir", e);
             } finally {
                 try {
                     DataSpacesNodes.tryCloseNodeApplicationConfig(PAActiveObject

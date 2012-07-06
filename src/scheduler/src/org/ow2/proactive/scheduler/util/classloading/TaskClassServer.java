@@ -62,7 +62,7 @@ import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
  */
 public class TaskClassServer {
 
-    public static final Logger logger_dev = ProActiveLogger.getLogger(TaskClassServer.class);
+    public static final Logger logger = ProActiveLogger.getLogger(TaskClassServer.class);
 
     // temp directory for unjaring classpath : if not defined, java.io.tmpdir is used.
     private static final String tmpTmpJarFilesDir = PASchedulerProperties.SCHEDULER_CLASSSERVER_TMPDIR
@@ -128,7 +128,7 @@ public class TaskClassServer {
                 reuseExistingFiles = true;
                 // check crc ...
                 if (crcFile.exists()) {
-                    logger_dev.debug("Classpath files for job " + servedJobId +
+                    logger.debug("Classpath files for job " + servedJobId +
                         " already exists... Checking files");
                     BufferedReader crcReader = new BufferedReader(new FileReader(crcFile));
                     String read = crcReader.readLine();
@@ -147,7 +147,7 @@ public class TaskClassServer {
                     reuseExistingFiles = false;
                 }
             } catch (Exception e) {
-                logger_dev.warn("", e);
+                logger.warn("", e);
                 // if any exception occurs, cancel 
                 reuseExistingFiles = false;
             }
@@ -155,7 +155,7 @@ public class TaskClassServer {
 
         // delete old classpath if it cannot be reused
         if (classpathAlreadyExists && !reuseExistingFiles) {
-            logger_dev.debug("Deleting classpath files for job " + servedJobId);
+            logger.debug("Deleting classpath files for job " + servedJobId);
             // delete classpath files
             jarFile.delete();
             TaskClassUtils.deleteDirectory(dirClasspath);
@@ -164,7 +164,7 @@ public class TaskClassServer {
 
         // if no files can be reused, create new ones.
         if (!reuseExistingFiles) {
-            logger_dev.debug("Creating classpath files for job " + servedJobId);
+            logger.debug("Creating classpath files for job " + servedJobId);
             // create jar file
             FileOutputStream fos = new FileOutputStream(jarFile);
             fos.write(userClasspathJarFile);
@@ -188,7 +188,7 @@ public class TaskClassServer {
 
         // set the actual classpath
         this.classpath = deflateJar ? dirClasspath : jarFile;
-        logger_dev.info("Activated TaskClassServer for " + (deflateJar ? "deflated" : "") + " classpath " +
+        logger.info("Activated TaskClassServer for " + (deflateJar ? "deflated" : "") + " classpath " +
             this.classpath.getAbsolutePath() + " for job " + this.servedJobId);
     }
 
@@ -197,7 +197,7 @@ public class TaskClassServer {
      * classfiles cache is cleared.
      */
     public void desactivate() {
-        logger_dev.info("Desactivated TaskClassServer for classpath " + this.classpath.getAbsolutePath() +
+        logger.info("Desactivated TaskClassServer for classpath " + this.classpath.getAbsolutePath() +
             " for job " + this.servedJobId);
         // delete classpath files
         File jarFile = new File(this.getPathToJarFile());
@@ -219,25 +219,25 @@ public class TaskClassServer {
      * @throws ClassNotFoundException if the class classname cannot be found
      */
     public byte[] getClassBytes(String classname) throws ClassNotFoundException {
-        logger_dev.debug("Looking for class " + classname);
+        logger.debug("Looking for class " + classname);
         byte[] cb = useCache ? this.cachedClasses.get(classname) : null;
         if (cb == null) {
-            logger_dev.debug("Class " + classname + " is not available in class cache");
+            logger.debug("Class " + classname + " is not available in class cache");
             try {
                 cb = this.classpath.isFile() ? TaskClassUtils.lookIntoJarFile(classname, new JarFile(
                     classpath)) : TaskClassUtils.lookIntoDirectory(classname, classpath);
                 if (useCache) {
-                    logger_dev.debug("Class " + classname + " is added in class cache");
+                    logger.debug("Class " + classname + " is added in class cache");
                     this.cachedClasses.put(classname, cb);
                 }
             } catch (IOException e) {
-                logger_dev.error("", e);
+                logger.error("", e);
                 throw new ClassNotFoundException("Class " + classname + " has not been found in " +
                     classpath.getAbsolutePath() + ". Caused by " + e);
             }
         }
         // TODO cdelbe : return null or throw an exception. Should return null only...
-        logger_dev.debug("Class " + classname + " has " + (cb == null ? "not" : "") + " been found in " +
+        logger.debug("Class " + classname + " has " + (cb == null ? "not" : "") + " been found in " +
             classpath.getAbsolutePath());
         return cb;
     }

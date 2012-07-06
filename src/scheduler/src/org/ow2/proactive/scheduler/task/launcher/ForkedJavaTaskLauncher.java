@@ -71,7 +71,7 @@ import org.ow2.proactive.scheduler.task.TaskResultImpl;
 @ActiveObject
 public class ForkedJavaTaskLauncher extends JavaTaskLauncher implements ForkerStarterCallback {
 
-    public static final Logger logger_dev = ProActiveLogger.getLogger(ForkedJavaTaskLauncher.class);
+    public static final Logger logger = ProActiveLogger.getLogger(ForkedJavaTaskLauncher.class);
 
     private TaskLauncherInitializer initializer;
 
@@ -177,7 +177,7 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher implements ForkerSt
                 }
             }
         } catch (Throwable ex) {
-            logger_dev.info("", ex);
+            logger.info("", ex);
             if (this.getLogs() == null) {
                 taskResult = new TaskResultImpl(taskId, ex, new SimpleTaskLogs("", ex.toString()),
                     duration / 1000000, null);
@@ -226,10 +226,10 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher implements ForkerSt
             try {
                 int progress = currentExecutable.getProgress();//(1)
                 if (progress < 0) {
-                    logger_dev.warn("Returned progress (" + progress + ") is negative, return 0 instead.");
+                    logger.warn("Returned progress (" + progress + ") is negative, return 0 instead.");
                     return 0;
                 } else if (progress > 100) {
-                    logger_dev.warn("Returned progress (" + progress +
+                    logger.warn("Returned progress (" + progress +
                         ") is greater than 100, return 100 instead.");
                     return 100;
                 } else {

@@ -73,7 +73,7 @@ import org.ow2.proactive.scheduler.task.TaskResultImpl;
 @ActiveObject
 public class JavaTaskLauncher extends TaskLauncher {
 
-    public static final Logger logger_dev = ProActiveLogger.getLogger(JavaTaskLauncher.class);
+    public static final Logger logger = ProActiveLogger.getLogger(JavaTaskLauncher.class);
 
     /**
      * ProActive Empty Constructor
@@ -123,7 +123,7 @@ public class JavaTaskLauncher extends TaskLauncher {
             //copy datas from OUTPUT or INPUT to local scratch
             copyInputDataToScratch();
             sample = System.nanoTime() - sample;
-            logger_dev.info("Time spent copying INPUT datas to SCRATCH : " + sample + " ms");
+            logger.info("Time spent copying INPUT datas to SCRATCH : " + sample + " ms");
 
             if (!hasBeenKilled) {
                 // set exported vars
@@ -175,10 +175,10 @@ public class JavaTaskLauncher extends TaskLauncher {
                 //copy output file
                 copyScratchDataToOutput();
                 sample = System.nanoTime() - sample;
-                logger_dev.info("Time spent copying SCRATCH datas to OUTPUT : " + sample + " ms");
+                logger.info("Time spent copying SCRATCH datas to OUTPUT : " + sample + " ms");
             }
         } catch (Throwable ex) {
-            logger_dev.debug("Exception occured while running task " + this.taskId + ": ", ex);
+            logger.debug("Exception occured while running task " + this.taskId + ": ", ex);
             exception = ex;
             userResult = null;
         } finally {
@@ -266,7 +266,7 @@ public class JavaTaskLauncher extends TaskLauncher {
             DataSpacesNodes.configureNode(PAActiveObject.getActiveObjectNode(PAActiveObject.getStubOnThis()),
                     scratchConf);
         } catch (Throwable t) {
-            logger_dev.error("Cannot configure dataSpace", t);
+            logger.error("Cannot configure dataSpace", t);
             return false;
         }
         return true;
@@ -294,7 +294,7 @@ public class JavaTaskLauncher extends TaskLauncher {
         try {
             future.get(DataSpaceNodeConfigurationAgent.DATASPACE_CLOSE_TIMEOUT, TimeUnit.MILLISECONDS);
         } catch (Throwable t) {
-            logger_dev.error("Cannot close properly DataSpaces.", t);
+            logger.error("Cannot close properly DataSpaces.", t);
             return false;
         } finally {
             future.cancel(true);

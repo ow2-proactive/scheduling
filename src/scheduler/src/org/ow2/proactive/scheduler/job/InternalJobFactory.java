@@ -78,7 +78,7 @@ import org.ow2.proactive.scheduler.task.internal.InternalTask;
  */
 public class InternalJobFactory {
 
-    public static final Logger logger_dev = ProActiveLogger.getLogger(InternalJobFactory.class);
+    public static final Logger logger = ProActiveLogger.getLogger(InternalJobFactory.class);
 
     /**
      * Create a new internal job with the given job (user).
@@ -90,17 +90,17 @@ public class InternalJobFactory {
     public static InternalJob createJob(Job job, Credentials cred) throws JobCreationException {
         InternalJob iJob = null;
 
-        logger_dev.info("Create job '" + job.getName() + "' - " + job.getClass().getName());
+        logger.info("Create job '" + job.getName() + "' - " + job.getClass().getName());
 
         switch (job.getType()) {
             case PARAMETER_SWEEPING:
-                logger_dev.error("The type of the given job is not yet implemented !");
+                logger.error("The type of the given job is not yet implemented !");
                 throw new JobCreationException("The type of the given job is not yet implemented !");
             case TASKSFLOW:
                 iJob = createJob((TaskFlowJob) job);
                 break;
             default:
-                logger_dev.error("The type of the given job is unknown !");
+                logger.error("The type of the given job is unknown !");
                 throw new JobCreationException("The type of the given job is unknown !");
         }
 
@@ -110,7 +110,7 @@ public class InternalJobFactory {
             setJobCommonProperties(job, iJob);
             return iJob;
         } catch (Exception e) {
-            logger_dev.error("", e);
+            logger.error("", e);
             throw new InternalException("Error while creating the internalJob !", e);
         }
     }
@@ -124,14 +124,13 @@ public class InternalJobFactory {
      */
     private static InternalJob createJob(TaskFlowJob userJob) throws JobCreationException {
         if (userJob.getTasks().size() == 0) {
-            logger_dev.info("Job '" + userJob.getName() + "' must contain tasks !");
+            logger.info("Job '" + userJob.getName() + "' must contain tasks !");
             throw new JobCreationException("This job must contains tasks !");
         }
 
         int maxTask = PASchedulerProperties.JOB_FACTOR.getValueAsInt();
         if (userJob.getTasks().size() > maxTask) {
-            logger_dev.info("Job '" + userJob.getName() + "' cannot contain more than " + maxTask +
-                " tasks !");
+            logger.info("Job '" + userJob.getName() + "' cannot contain more than " + maxTask + " tasks !");
             throw new JobCreationException("Job cannot contain more than " + maxTask + " tasks !");
         }
 
@@ -142,7 +141,7 @@ public class InternalJobFactory {
             String e = "";
 
             e += "Invalid taskflow: " + err.getMessage() + "; context: " + err.getTask();
-            logger_dev.error(e);
+            logger.error(e);
             throw new JobCreationException(e, err);
         }
 
@@ -253,7 +252,7 @@ public class InternalJobFactory {
             return createTask(userJob, (JavaTask) task);
         } else {
             String msg = "The task you intend to add is unknown ! (type : " + task.getClass().getName() + ")";
-            logger_dev.info(msg);
+            logger.info(msg);
             throw new JobCreationException(msg);
         }
     }
@@ -278,7 +277,7 @@ public class InternalJobFactory {
                 args = (Map<String, byte[]>) f.get(task);
             } catch (Exception e) {
                 // should not happen...
-                logger_dev.fatal("Internal error : cannot retreive arguments for task " + task.getName(), e);
+                logger.fatal("Internal error : cannot retreive arguments for task " + task.getName(), e);
                 throw new Error("Internal error : implementation must be revised.", e);
             }
 
@@ -293,7 +292,7 @@ public class InternalJobFactory {
             }
         } else {
             String msg = "You must specify your own executable task class to be launched (in every task) !";
-            logger_dev.info(msg);
+            logger.info(msg);
             throw new JobCreationException(msg);
         }
 
@@ -317,7 +316,7 @@ public class InternalJobFactory {
         if (((task.getCommandLine() == null) || (task.getCommandLine().length == 0)) &&
             (task.getGenerationScript() == null)) {
             String msg = "The command line is null or empty and not generated !";
-            logger_dev.info(msg);
+            logger.info(msg);
             throw new JobCreationException(msg);
         }
         InternalNativeTask nativeTask = new InternalNativeTask(new NativeExecutableContainer(task
@@ -341,7 +340,7 @@ public class InternalJobFactory {
      */
     private static void setJobCommonProperties(Job job, InternalJob jobToSet)
             throws IllegalArgumentException, IllegalAccessException {
-        logger_dev.info("Setting job common properties");
+        logger.info("Setting job common properties");
 
         autoCopyfields(CommonAttribute.class, job, jobToSet);
         autoCopyfields(Job.class, job, jobToSet);
@@ -359,7 +358,7 @@ public class InternalJobFactory {
      */
     private static void setTaskCommonProperties(Job userJob, Task task, InternalTask taskToSet)
             throws IllegalArgumentException, IllegalAccessException {
-        logger_dev.debug("Setting task common properties");
+        logger.debug("Setting task common properties");
 
         autoCopyfields(CommonAttribute.class, task, taskToSet);
         autoCopyfields(Task.class, task, taskToSet);

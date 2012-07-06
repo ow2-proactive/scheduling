@@ -98,7 +98,7 @@ import org.ow2.proactive.utils.FileToBytesConverter;
  */
 public class ForkedJavaExecutable extends JavaExecutable implements ForkerStarterCallback {
 
-    public static final Logger logger_dev = ProActiveLogger.getLogger(ForkedJavaExecutable.class);
+    public static final Logger logger = ProActiveLogger.getLogger(ForkedJavaExecutable.class);
 
     /** Fork environment script binding name */
     public static final String FORKENV_BINDING_NAME = "forkEnvironment";
@@ -165,7 +165,7 @@ public class ForkedJavaExecutable extends JavaExecutable implements ForkerStarte
             waitForRegistration(ospb);
 
             //create task launcher on new JVM node
-            logger_dev.debug("Create remote task launcher");
+            logger.debug("Create remote task launcher");
             newJavaTaskLauncher = createForkedTaskLauncher();
 
             // redirect tasks logs to local stdout/err
@@ -175,14 +175,14 @@ public class ForkedJavaExecutable extends JavaExecutable implements ForkerStarte
             //do task must not pass schedulerCore object,
             //the deployed java task must not notify the core from termination
             //the forked java task launcher will do that in place
-            logger_dev.debug("Starting java task");
+            logger.debug("Starting java task");
             newJavaTaskLauncher.configureNode();
             TaskResult result = newJavaTaskLauncher.doTaskAndGetResult(null, execInitializer
                     .getJavaExecutableContainer(), results);
 
             //waiting for task result futur
             //as it is forked, wait until futur has arrive or someone kill the task (core OR tasktimer)
-            logger_dev.debug("Java task started, waiting for result or kill...");
+            logger.debug("Java task started, waiting for result or kill...");
             while (!isKilled()) {
                 try {
                     /* the below method throws an exception if timeout expires */
@@ -205,10 +205,10 @@ public class ForkedJavaExecutable extends JavaExecutable implements ForkerStarte
                 try {
                     newJavaTaskLauncher.closeNodeConfiguration();
                 } catch (Throwable e) {
-                    logger_dev.warn("Unable to close dataspaces while terminating forked JVM.", e);
+                    logger.warn("Unable to close dataspaces while terminating forked JVM.", e);
                 }
             } else {
-                logger_dev.debug("Task has been killed");
+                logger.debug("Task has been killed");
                 FutureMonitoring.removeFuture(((FutureProxy) ((StubObject) result).getProxy()));
                 throw new WalltimeExceededException("Task killed or walltime exceeded");
             }
@@ -265,7 +265,7 @@ public class ForkedJavaExecutable extends JavaExecutable implements ForkerStarte
      * @throws Exception if a problem occurs while creating the process
      */
     private OSProcessBuilder createProcessAndPrepareCommand() throws Exception {
-        logger_dev.debug("Preparing new java process");
+        logger.debug("Preparing new java process");
         //create process builder
         OSProcessBuilder ospb = createProcess();
         //update fork env with forked system env
@@ -283,8 +283,8 @@ public class ForkedJavaExecutable extends JavaExecutable implements ForkerStarte
         setWorkingDir(ospb);
         //set system environment
         setSystemEnvironment(ospb);
-        if (logger_dev.isDebugEnabled()) {
-            logger_dev.debug("JVM process and command created with command : " + command);
+        if (logger.isDebugEnabled()) {
+            logger.debug("JVM process and command created with command : " + command);
         }
         return ospb;
     }
@@ -332,7 +332,7 @@ public class ForkedJavaExecutable extends JavaExecutable implements ForkerStarte
     private void executeEnvScript(OSProcessBuilder ospb) throws Exception {
         ForkEnvironment fe = this.execInitializer.getForkEnvironment();
         if (fe != null && fe.getEnvScript() != null) {
-            logger_dev.info("Executing env-script");
+            logger.info("Executing env-script");
             ScriptHandler handler = ScriptLoader.createLocalHandler();
             handler.addBinding(FORKENV_BINDING_NAME, fe);
 
@@ -346,7 +346,7 @@ public class ForkedJavaExecutable extends JavaExecutable implements ForkerStarte
             //result
             if (res.errorOccured()) {
                 res.getException().printStackTrace();
-                logger_dev.error("Error on env-script occured : ", res.getException());
+                logger.error("Error on env-script occured : ", res.getException());
                 throw new UserException("Env-script has failed on the current node", res.getException());
             }
         }
@@ -409,7 +409,7 @@ public class ForkedJavaExecutable extends JavaExecutable implements ForkerStarte
                 command.add("-Djava.security.policy=" + fpolicy.getAbsolutePath());
             } catch (Exception e) {
                 //java policy not set
-                logger_dev.debug("", e);
+                logger.debug("", e);
             }
         }
         //set logHome than can be used in log4j file
@@ -435,7 +435,7 @@ public class ForkedJavaExecutable extends JavaExecutable implements ForkerStarte
                 command.add("-Dlog4j.configuration=file:" + flog4j.getAbsolutePath());
             } catch (Exception e) {
                 //log4j not set
-                logger_dev.debug("", e);
+                logger.debug("", e);
             }
         }
         //set default PAConfiguration
@@ -449,7 +449,7 @@ public class ForkedJavaExecutable extends JavaExecutable implements ForkerStarte
                 command.add("-Dproactive.configuration=file:" + fpaconfig.getAbsolutePath());
             } catch (Exception e) {
                 //PAConfig not set
-                logger_dev.debug("", e);
+                logger.debug("", e);
             }
         }
         // set log size to minimum value as log are handled on forker side
@@ -562,7 +562,7 @@ public class ForkedJavaExecutable extends JavaExecutable implements ForkerStarte
                         "Unable to create a separate java process. Exit code: %d.", ec), ospb);
             } catch (IllegalThreadStateException e) {
                 //thrown by process.exitValue() if process is not finished
-                logger_dev.debug("Process not terminated, continue launching Forked VM (try number " +
+                logger.debug("Process not terminated, continue launching Forked VM (try number " +
                     numberOfTrials + ")");
             }
         }
@@ -673,7 +673,7 @@ public class ForkedJavaExecutable extends JavaExecutable implements ForkerStarte
             }
         } catch (NotImplementedException e) {
             //normal behavior if user has not set any sys property in fork env
-            logger_dev.info("OS ProcessBuilder environment could not be retreived : " + e.getMessage());
+            logger.info("OS ProcessBuilder environment could not be retreived : " + e.getMessage());
         }
     }
 
@@ -706,7 +706,7 @@ public class ForkedJavaExecutable extends JavaExecutable implements ForkerStarte
      */
     private JavaTaskLauncher createForkedTaskLauncher() throws Exception {
         /* JavaTaskLauncher will be an active object created on a newly created ProActive node */
-        logger_dev.info("Create java task launcher");
+        logger.info("Create java task launcher");
         TaskLauncherInitializer tli = execInitializer.getJavaTaskLauncherInitializer();
         // for the forked java task precious log is is handled by the ForkedJavaTaskLauncher
         tli.setPreciousLogs(false);
@@ -720,7 +720,7 @@ public class ForkedJavaExecutable extends JavaExecutable implements ForkerStarte
      */
     private void clean() {
         try {
-            logger_dev.info("Cleaning forked java executable");
+            logger.info("Cleaning forked java executable");
             //if tmp file have been set, destroy it.
             if (fpolicy != null) {
                 fpolicy.delete();
@@ -737,7 +737,7 @@ public class ForkedJavaExecutable extends JavaExecutable implements ForkerStarte
             }
             terminateStreamReaders();
         } catch (Exception e) {
-            logger_dev.error("", e);
+            logger.error("", e);
         }
     }
 
@@ -781,7 +781,7 @@ public class ForkedJavaExecutable extends JavaExecutable implements ForkerStarte
             try {
                 newJavaTaskLauncher.closeNodeConfiguration();
             } catch (Throwable e) {
-                logger_dev.warn("Unable to close dataspaces while killing forked JVM.", e);
+                logger.warn("Unable to close dataspaces while killing forked JVM.", e);
             }
         }
         // kill anyway !

@@ -61,7 +61,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  */
 public class BinaryLargeOBject implements UserType {
 
-    public static final Logger logger_dev = ProActiveLogger.getLogger(BinaryLargeOBject.class);
+    public static final Logger logger = ProActiveLogger.getLogger(BinaryLargeOBject.class);
 
     /**
      * @see org.hibernate.usertype.UserType#sqlTypes()
@@ -170,7 +170,7 @@ public class BinaryLargeOBject implements UserType {
         try {
             return new SerialBlob(ObjectToByteConverter.ObjectStream.convert(o));
         } catch (Exception e) {
-            logger_dev.error("", e);
+            logger.error("", e);
             return null;
         }
     }
@@ -182,7 +182,7 @@ public class BinaryLargeOBject implements UserType {
             Object o = ois.readObject();
             return o;
         } catch (Exception e) {
-            logger_dev.error("", e);
+            logger.error("", e);
             return null;
         } finally {
             if (ois != null) {

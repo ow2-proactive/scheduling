@@ -65,7 +65,7 @@ import org.ow2.proactive.scheduler.task.TaskResultImpl;
 @ActiveObject
 public class NativeTaskLauncher extends TaskLauncher {
 
-    public static final Logger logger_dev = ProActiveLogger.getLogger(NativeTaskLauncher.class);
+    public static final Logger logger = ProActiveLogger.getLogger(NativeTaskLauncher.class);
 
     private static final String DATASPACE_TAG = "$LOCALSPACE";
 
@@ -118,7 +118,7 @@ public class NativeTaskLauncher extends TaskLauncher {
             //copy datas from OUTPUT or INPUT to local scratch
             copyInputDataToScratch();
             sample = System.nanoTime() - sample;
-            logger_dev.info("Time spent copying INPUT datas to SCRATCH : " + sample + " ms");
+            logger.info("Time spent copying INPUT datas to SCRATCH : " + sample + " ms");
 
             if (!hasBeenKilled) {
                 // set exported vars
@@ -166,7 +166,7 @@ public class NativeTaskLauncher extends TaskLauncher {
                 sample = System.nanoTime();
                 try {
                     //launch task
-                    logger_dev.debug("Starting execution of task '" + taskId + "'");
+                    logger.debug("Starting execution of task '" + taskId + "'");
                     userResult = currentExecutable.execute(results);
                 } catch (Throwable t) {
                     exception = t;
@@ -192,10 +192,10 @@ public class NativeTaskLauncher extends TaskLauncher {
                 //copy output file
                 copyScratchDataToOutput();
                 sample = System.nanoTime() - sample;
-                logger_dev.info("Time spent copying SCRATCH datas to OUTPUT : " + sample + " ms");
+                logger.info("Time spent copying SCRATCH datas to OUTPUT : " + sample + " ms");
             }
         } catch (Throwable ex) {
-            logger_dev.debug("Exception occured while running task " + this.taskId + ": ", ex);
+            logger.debug("Exception occured while running task " + this.taskId + ": ", ex);
             exception = ex;
             userResult = null;
         } finally {

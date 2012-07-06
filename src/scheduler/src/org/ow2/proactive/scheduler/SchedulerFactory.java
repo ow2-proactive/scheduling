@@ -79,7 +79,6 @@ public class SchedulerFactory {
 
     /** Logger to be used for all messages related to the scheduler */
     public static final Logger logger = ProActiveLogger.getLogger(SchedulerFactory.class);
-    public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerFactory.class);
 
     private static boolean allowNullInit = false;
     private static boolean schedulerStarted = false;
@@ -208,7 +207,7 @@ public class SchedulerFactory {
         //check arguments...
         if (rmURL == null) {
             String msg = "The Resource Manager URL must not be null";
-            logger_dev.error(msg);
+            logger.error(msg);
             throw new AdminSchedulerException(msg);
         }
 
@@ -222,7 +221,7 @@ public class SchedulerFactory {
             //ready
             logger.info("Scheduler is now ready to be started !");
         } catch (Exception e) {
-            logger_dev.error(e);
+            logger.error(e);
             throw new AdminSchedulerException(e.getMessage());
         }
     }

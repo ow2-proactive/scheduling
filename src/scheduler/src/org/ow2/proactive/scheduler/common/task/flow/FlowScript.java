@@ -496,7 +496,7 @@ public class FlowScript extends Script<FlowAction> {
             else if (this.actionType.equals(FlowActionType.LOOP.toString())) {
                 if (this.target == null) {
                     String msg = "LOOP control flow action requires a target";
-                    logger_dev.error(msg);
+                    logger.error(msg);
                     return new ScriptResult<FlowAction>(new Exception(msg));
                 } else {
                     if (bindings.containsKey(loopVariable)) {
@@ -511,7 +511,7 @@ public class FlowScript extends Script<FlowAction> {
                     } else {
                         String msg = "Script environment for LOOP action needs to define variable " +
                             loopVariable;
-                        logger_dev.error(msg);
+                        logger.error(msg);
                         return new ScriptResult<FlowAction>(new Exception(msg));
                     }
                 }
@@ -532,21 +532,21 @@ public class FlowScript extends Script<FlowAction> {
                         } catch (Exception e2) {
                             String msg = "REPLICATE action: could not parse value for variable " +
                                 replicateRunsVariable;
-                            logger_dev.error(msg);
+                            logger.error(msg);
                             return new ScriptResult<FlowAction>(new Exception(msg, e2));
                         }
                     }
                     if (args < 1) {
                         String msg = "REPLICATE action: value of variable " + replicateRunsVariable +
                             " cannot be negative";
-                        logger_dev.error(msg);
+                        logger.error(msg);
                         return new ScriptResult<FlowAction>(new Exception(msg));
                     }
                     act.setDupNumber(args);
                 } else {
                     String msg = "Script environment for REPLICATE action needs to define variable " +
                         replicateRunsVariable;
-                    logger_dev.error(msg);
+                    logger.error(msg);
                     return new ScriptResult<FlowAction>(new Exception(msg));
                 }
             }
@@ -556,11 +556,11 @@ public class FlowScript extends Script<FlowAction> {
             else if (this.actionType.equals(FlowActionType.IF.toString())) {
                 if (this.target == null) {
                     String msg = "IF action requires a target ";
-                    logger_dev.error(msg);
+                    logger.error(msg);
                     return new ScriptResult<FlowAction>(new Exception(msg));
                 } else if (this.targetElse == null) {
                     String msg = "IF action requires an ELSE target ";
-                    logger_dev.error(msg);
+                    logger.error(msg);
                     return new ScriptResult<FlowAction>(new Exception(msg));
                 } else {
                     act.setType(FlowActionType.IF);
@@ -577,13 +577,13 @@ public class FlowScript extends Script<FlowAction> {
                             String msg = "IF action: value for " + branchSelectionVariable +
                                 " needs to be one of " + ifBranchSelectedVariable + " or " +
                                 elseBranchSelectedVariable;
-                            logger_dev.error(msg);
+                            logger.error(msg);
                             return new ScriptResult<FlowAction>(new Exception(msg));
                         }
                     } else {
                         String msg = "Environment for IF action needs to define variable " +
                             branchSelectionVariable;
-                        logger_dev.error(msg);
+                        logger.error(msg);
                         return new ScriptResult<FlowAction>(new Exception(msg));
                     }
 
@@ -597,7 +597,7 @@ public class FlowScript extends Script<FlowAction> {
              */
             else {
                 String msg = actionType + " action type unknown";
-                logger_dev.error(msg);
+                logger.error(msg);
                 return new ScriptResult<FlowAction>(new Exception(msg));
             }
 

@@ -60,7 +60,7 @@ import org.ow2.proactive.scheduler.common.task.util.ByteArrayWrapper;
  */
 public class ForkedJavaExecutableContainer extends JavaExecutableContainer {
 
-    public static final Logger logger_dev = ProActiveLogger.getLogger(ForkedJavaExecutableContainer.class);
+    public static final Logger logger = ProActiveLogger.getLogger(ForkedJavaExecutableContainer.class);
 
     /** Environment of a new dedicated JVM */
     protected ForkEnvironment forkEnvironment = null;

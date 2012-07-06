@@ -8,12 +8,9 @@ log4j.logger.org.ow2.proactive.resourcemanager=DEBUG
 log4j.logger.org.ow2.proactive.resourcemanager.core.jmx=INFO
 log4j.logger.org.ow2.proactive.resourcemanager.db=INFO
 
-# ... and launchers and console. These additionaly go to the CONSOLE appender
+# ... and launchers and console. These additionally go to the CONSOLE appender
 log4j.logger.org.ow2.proactive.resourcemanager.utils.console=INFO, CONSOLE
 log4j.logger.org.ow2.proactive.resourcemanager.utils.RMStarter=INFO, CONSOLE
-
-# ... and c3p0 connection pool
-log4j.logger.com.mchange=WARN
 
 # silence c3p0
 log4j.logger.com.mchange=WARN

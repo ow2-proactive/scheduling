@@ -53,7 +53,7 @@ import org.ow2.proactive.utils.NodeSet;
 
 public class UserRMProxy {
 
-    private static final Logger logger_dev = ProActiveLogger.getLogger(UserRMProxy.class);
+    private static final Logger logger = ProActiveLogger.getLogger(UserRMProxy.class);
 
     private final Credentials credentials;
 
@@ -109,11 +109,11 @@ public class UserRMProxy {
                     try {
                         useThisRM = proxyActiveObject.isNodeSetForThisRM(nodeSet);
                     } catch (Exception e) {
-                        logger_dev.warn("RM call failed with exception", e);
+                        logger.warn("RM call failed with exception", e);
                         try {
                             proxyActiveObject.isActive().getBooleanValue();
                         } catch (Exception activeCheckError) {
-                            logger_dev.warn("RM isn't active, remove it from the list", e);
+                            logger.warn("RM isn't active, remove it from the list", e);
                             i.remove();
                         }
                         continue;
@@ -133,7 +133,7 @@ public class UserRMProxy {
         if (tragetProxyActiveObject != null) {
             tragetProxyActiveObject.releaseNodes(nodeSet, cleaningScript);
         } else {
-            logger_dev.warn("Didn't find RM to release NodeSet (RM is down or all NodeSet's Nodes are down)");
+            logger.warn("Didn't find RM to release NodeSet (RM is down or all NodeSet's Nodes are down)");
         }
     }
 

@@ -50,7 +50,7 @@ import org.ow2.proactive.utils.FileToBytesConverter;
 
 public class TaskClassUtils {
 
-    public static final Logger logger_dev = ProActiveLogger.getLogger(TaskClassUtils.class);
+    public static final Logger logger = ProActiveLogger.getLogger(TaskClassUtils.class);
 
     /**
     * Look for a classfile into a directory.
@@ -109,7 +109,7 @@ public class TaskClassUtils {
             inStream.close();
             return result;
         } else {
-            logger_dev.debug("Entry " + path + " has not been found in jar " + file.getName());
+            logger.debug("Entry " + path + " has not been found in jar " + file.getName());
             return null;
         }
     }

@@ -88,7 +88,6 @@ import org.ow2.proactive.utils.Tools;
 public class SchedulerStarter {
     //shows how to run the scheduler
     private static Logger logger = ProActiveLogger.getLogger(SchedulerStarter.class);
-    private static Logger logger_dev = ProActiveLogger.getLogger(SchedulerStarter.class);
 
     public static final String defaultPolicy = PASchedulerProperties.SCHEDULER_DEFAULT_POLICY
             .getValueAsString();
@@ -142,12 +141,12 @@ public class SchedulerStarter {
             else {
                 if (cmd.hasOption("p")) {
                     policyFullName = cmd.getOptionValue("p");
-                    logger_dev.info("Used policy : " + policyFullName);
+                    logger.info("Used policy : " + policyFullName);
                 }
 
                 if (cmd.hasOption("u")) {
                     rm = cmd.getOptionValue("u");
-                    logger_dev.info("RM URL : " + rm);
+                    logger.info("RM URL : " + rm);
                 }
 
                 logger.info("Starting Scheduler, Please wait...");
@@ -155,7 +154,7 @@ public class SchedulerStarter {
 
                 if (rm != null) {
                     try {
-                        logger_dev.info("Trying to connect to Resource Manager on " + rm);
+                        logger.info("Trying to connect to Resource Manager on " + rm);
                         SchedulerFactory.tryJoinRM(new URI(rm));
                         onlySched = true;
                     } catch (Exception e) {
@@ -166,7 +165,7 @@ public class SchedulerStarter {
                     rm = getLocalAdress();
                     URI uri = new URI(rm);
                     //trying to connect to a started local RM
-                    logger_dev.info("Trying to connect to a started Resource Manager on " + uri);
+                    logger.info("Trying to connect to a started Resource Manager on " + uri);
                     try {
                         SchedulerFactory.tryJoinRM(uri);
                         logger
@@ -180,7 +179,7 @@ public class SchedulerStarter {
                             logger.info("Trying to start a local Resource Manager");
                             rmAuth = RMFactory.startLocal();
 
-                            logger_dev
+                            logger
                                     .info("Trying to connect the local Resource Manager using Scheduler identity");
 
                             //creating default node source
@@ -221,20 +220,20 @@ public class SchedulerStarter {
                 }
             }
         } catch (MissingArgumentException e) {
-            logger_dev.error("", e);
+            logger.error("", e);
             displayHelp = true;
         } catch (MissingOptionException e) {
-            logger_dev.error("", e);
+            logger.error("", e);
             displayHelp = true;
         } catch (UnrecognizedOptionException e) {
-            logger_dev.error("", e);
-            logger_dev.error("", e);
+            logger.error("", e);
+            logger.error("", e);
             displayHelp = true;
         } catch (AlreadySelectedException e) {
-            logger_dev.error("", e);
+            logger.error("", e);
             displayHelp = true;
         } catch (ParseException e) {
-            logger_dev.error("", e);
+            logger.error("", e);
             displayHelp = true;
         } catch (Exception e) {
             logger.error("", e);

@@ -55,7 +55,7 @@ import org.ow2.proactive.scheduler.core.annotation.RunActivityFiltered;
  * @since ProActive Scheduling 0.9
  */
 public class MainLoopRequestFilter implements RequestFilter {
-    public static final Logger logger_dev = ProActiveLogger.getLogger(MainLoopRequestFilter.class);
+    public static final Logger logger = ProActiveLogger.getLogger(MainLoopRequestFilter.class);
     private ArrayList<String> methodNames = new ArrayList<String>();
 
     /**
@@ -69,7 +69,7 @@ public class MainLoopRequestFilter implements RequestFilter {
         for (Method m : SchedulerCore.class.getDeclaredMethods()) {
             if (m.isAnnotationPresent(RunActivityFiltered.class) &&
                 id.equals(m.getAnnotation(RunActivityFiltered.class).id())) {
-                logger_dev.info(m.getName() + " is filtered with id = " + id);
+                logger.info(m.getName() + " is filtered with id = " + id);
                 methodNames.add(m.getName());
             }
         }

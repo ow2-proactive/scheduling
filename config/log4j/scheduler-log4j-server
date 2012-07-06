@@ -8,7 +8,7 @@ log4j.logger.org.ow2.proactive.scheduler=DEBUG
 log4j.logger.org.ow2.proactive.scheduler.db=INFO
 log4j.logger.org.ow2.proactive.scheduler.core.jmx=INFO
 
-# ... and consol. It additionaly goes to the CONSOLE appender
+# ... and console. It additionally goes to the CONSOLE appender
 log4j.logger.org.ow2.proactive.scheduler.util.console=INFO, CONSOLE
 log4j.logger.org.ow2.proactive.scheduler.util.SchedulerStarter=INFO, CONSOLE
 

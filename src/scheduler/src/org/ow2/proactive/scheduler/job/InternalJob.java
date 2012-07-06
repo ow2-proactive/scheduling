@@ -84,7 +84,6 @@ import org.ow2.proactive.scheduler.task.ClientTaskState;
 import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
-import org.ow2.proactive.scheduler.task.launcher.TaskLauncher;
 
 
 /**
@@ -97,7 +96,7 @@ import org.ow2.proactive.scheduler.task.launcher.TaskLauncher;
  * @since ProActive Scheduling 0.9
  */
 public abstract class InternalJob extends JobState {
-    public static final Logger logger_dev = ProActiveLogger.getLogger(InternalJob.class);
+    public static final Logger logger = ProActiveLogger.getLogger(InternalJob.class);
 
     /** Owner of the job */
     private String owner = "";
@@ -424,7 +423,7 @@ public abstract class InternalJob extends JobState {
      * @param td the task which has just been started.
      */
     public void startTask(InternalTask td) {
-        logger_dev.debug(" ");
+        logger.debug(" ");
         setNumberOfPendingTasks(getNumberOfPendingTasks() - 1);
         setNumberOfRunningTasks(getNumberOfRunningTasks() + 1);
 
@@ -456,7 +455,7 @@ public abstract class InternalJob extends JobState {
      * Updates count for running to pending event.
      */
     public void newWaitingTask() {
-        logger_dev.debug(" ");
+        logger.debug(" ");
         setNumberOfPendingTasks(getNumberOfPendingTasks() + 1);
         setNumberOfRunningTasks(getNumberOfRunningTasks() - 1);
         if (getNumberOfRunningTasks() == 0 && getStatus() != JobStatus.PAUSED) {
@@ -470,7 +469,7 @@ public abstract class InternalJob extends JobState {
      * @param task the task which has to be restarted.
      */
     public void reStartTask(InternalTask task) {
-        logger_dev.debug(" ");
+        logger.debug(" ");
         getJobDescriptor().reStart(task.getId());
         task.setProgress(0);
         if (getStatus() == JobStatus.PAUSED) {
@@ -498,7 +497,7 @@ public abstract class InternalJob extends JobState {
      */
     public InternalTask terminateTask(boolean errorOccurred, TaskId taskId, SchedulerFrontend frontend,
             FlowAction action, TaskResultImpl result) {
-        logger_dev.debug(" ");
+        logger.debug(" ");
         final InternalTask descriptor = tasks.get(taskId);
         descriptor.setFinishedTime(System.currentTimeMillis());
         descriptor.setStatus(errorOccurred ? TaskStatus.FAULTY : TaskStatus.FINISHED);
@@ -534,7 +533,7 @@ public abstract class InternalJob extends JobState {
                         }
                         TaskId targetId = target.getTaskInfo().getTaskId();
 
-                        logger_dev.info("Control Flow Action LOOP (init:" + initiator.getId() + ";target:" +
+                        logger.info("Control Flow Action LOOP (init:" + initiator.getId() + ";target:" +
                             target.getId() + ")");
 
                         // accumulates the tasks between the initiator and the target
@@ -545,7 +544,7 @@ public abstract class InternalJob extends JobState {
                             initiator.replicateTree(dup, targetId, true, initiator.getReplicationIndex(),
                                     initiator.getIterationIndex());
                         } catch (ExecutableCreationException e) {
-                            logger_dev.error("", e);
+                            logger.error("", e);
                             break;
                         }
 
@@ -699,7 +698,7 @@ public abstract class InternalJob extends JobState {
                         }
                     }
 
-                    logger_dev.info("Control Flow Action IF: " + targetIf.getId() + " join: " +
+                    logger.info("Control Flow Action IF: " + targetIf.getId() + " join: " +
                         ((targetJoin == null) ? "null" : targetJoin.getId()));
 
                     // these 2 tasks delimit the Task Block formed by the IF branch
@@ -753,7 +752,7 @@ public abstract class InternalJob extends JobState {
                         setNumberOfPendingTasks(getNumberOfPendingTasks() - 1);
                         setNumberOfFinishedTasks(getNumberOfFinishedTasks() + 1);
                         tev.add(it.getId());
-                        logger_dev.info("Task " + it.getId() + " will not be executed");
+                        logger.info("Task " + it.getId() + " will not be executed");
                     }
 
                     // plug the branch in the descriptor
@@ -795,7 +794,7 @@ public abstract class InternalJob extends JobState {
                         runs = 1;
                     }
 
-                    logger_dev.info("Control Flow Action REPLICATE (runs:" + runs + ")");
+                    logger.info("Control Flow Action REPLICATE (runs:" + runs + ")");
                     List<InternalTask> toReplicate = new ArrayList<InternalTask>();
 
                     // find the tasks that need to be replicated
@@ -829,7 +828,7 @@ public abstract class InternalJob extends JobState {
                                 }
                             }
                             if (target == null) {
-                                logger_dev.error("REPLICATE: could not find matching block '" + tg + "'");
+                                logger.error("REPLICATE: could not find matching block '" + tg + "'");
                                 continue;
                             }
                         }
@@ -849,7 +848,7 @@ public abstract class InternalJob extends JobState {
                                         .getReplicationIndex() *
                                     runs, 0);
                             } catch (Exception e) {
-                                logger_dev.error("REPLICATE: could not replicate tree", e);
+                                logger.error("REPLICATE: could not replicate tree", e);
                                 break;
                             }
 
@@ -937,8 +936,7 @@ public abstract class InternalJob extends JobState {
                      */
                 case CONTINUE:
 
-                    logger_dev.debug("Task flow Action CONTINUE on task " +
-                        initiator.getId().getReadableName());
+                    logger.debug("Task flow Action CONTINUE on task " + initiator.getId().getReadableName());
                     break;
             }
 
@@ -1037,7 +1035,7 @@ public abstract class InternalJob extends JobState {
      * @param id the id of the task to start and terminate.
      */
     public void simulateStartAndTerminate(TaskId id) {
-        logger_dev.debug(" ");
+        logger.debug(" ");
         getJobDescriptor().start(id);
         getJobDescriptor().terminate(id);
     }
@@ -1049,7 +1047,7 @@ public abstract class InternalJob extends JobState {
      * @param jobStatus type of the failure on this job. (failed/canceled/killed)
      */
     public void failed(TaskId taskId, JobStatus jobStatus) {
-        logger_dev.debug(" ");
+        logger.debug(" ");
         if (jobStatus != JobStatus.KILLED) {
             InternalTask descriptor = tasks.get(taskId);
             if (descriptor.getStartTime() > 0) {
@@ -1110,7 +1108,7 @@ public abstract class InternalJob extends JobState {
      * Set all properties following a job submitting.
      */
     public void submitAction() {
-        logger_dev.debug(" ");
+        logger.debug(" ");
         setSubmittedTime(System.currentTimeMillis());
         setStatus(JobStatus.PENDING);
     }
@@ -1120,7 +1118,7 @@ public abstract class InternalJob extends JobState {
      * The task may have a consistent id and job info.
      */
     public synchronized void prepareTasks() {
-        logger_dev.debug(" ");
+        logger.debug(" ");
         //get tasks
         ArrayList<InternalTask> sorted = getITasks();
         //sort task according to the ID
@@ -1142,7 +1140,7 @@ public abstract class InternalJob extends JobState {
      * set the taskStatusModify to "null" : setTaskStatusModify(null);
      */
     public void start() {
-        logger_dev.debug(" ");
+        logger.debug(" ");
         setStartTime(System.currentTimeMillis());
         setNumberOfPendingTasks(getTotalNumberOfTasks());
         setNumberOfRunningTasks(0);
@@ -1162,11 +1160,11 @@ public abstract class InternalJob extends JobState {
      * Set all properties in order to terminate the job.
      */
     public void terminate() {
-        logger_dev.debug(" ");
+        logger.debug(" ");
         setStatus(JobStatus.FINISHED);
         setFinishedTime(System.currentTimeMillis());
         if (jobDataSpaceApplication != null) {
-            if (!TaskLauncher.logger_dev_dataspace.isDebugEnabled()) {
+            if (!logger.isDebugEnabled()) {
                 jobDataSpaceApplication.terminateDataSpaceApplication();
             }
         }
@@ -1180,7 +1178,7 @@ public abstract class InternalJob extends JobState {
      * @return true if the job has correctly been paused, false if not.
      */
     public boolean setPaused() {
-        logger_dev.debug(" ");
+        logger.debug(" ");
         if (jobInfo.getStatus() == JobStatus.PAUSED) {
             return false;
         }
@@ -1212,7 +1210,7 @@ public abstract class InternalJob extends JobState {
      * @return true if the job has correctly been unpaused, false if not.
      */
     public boolean setUnPause() {
-        logger_dev.debug(" ");
+        logger.debug(" ");
         if (jobInfo.getStatus() != JobStatus.PAUSED) {
             return false;
         }

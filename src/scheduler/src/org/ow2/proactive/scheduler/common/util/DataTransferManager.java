@@ -46,7 +46,7 @@ public class DataTransferManager {
      */
     protected Set<String> awaitedJobsIds = Collections.synchronizedSet(new HashSet<String>());
 
-    public static final Logger logger_util = ProActiveLogger.getLogger(DataTransferManager.class);
+    public static final Logger logger = ProActiveLogger.getLogger(DataTransferManager.class);
 
     protected static String statusFilename = "dataTransfer.status";
     /**
@@ -76,12 +76,12 @@ public class DataTransferManager {
         try {
             loadAwaitedJobs();
         } catch (FileNotFoundException e) {
-            logger_util
+            logger
                     .error(
                             "Could not load the status file. No data will be retrieved for previousley submitted jobs.",
                             e);
         } catch (IOException e) {
-            logger_util
+            logger
                     .error(
                             "Could not load the status file. No data will be retrieved for previousley submitted jobs.",
                             e);
@@ -116,7 +116,7 @@ public class DataTransferManager {
         try {
             return true;
         } catch (Exception e) {
-            logger_util.error("Could not pull data for job " + jobId_srt);
+            logger.error("Could not pull data for job " + jobId_srt);
             return false;
         }
 
@@ -176,16 +176,16 @@ public class DataTransferManager {
         try {
             jobState = uiScheduler.getJobState(id);
         } catch (NotConnectedException e) {
-            logger_util.error("Could not retreive output data for job " + id, e);
+            logger.error("Could not retreive output data for job " + id, e);
         } catch (UnknownJobException e) {
-            logger_util.error("Could not retreive output data for job " + id, e);
+            logger.error("Could not retreive output data for job " + id, e);
         } catch (PermissionException e) {
-            logger_util.error("Could not retreive output data for job " + id +
+            logger.error("Could not retreive output data for job " + id +
                 ". Did you connect with a diffrent user ? ", e);
         }
 
         if (jobState == null) {
-            logger_util.warn("The job " + id +
+            logger.warn("The job " + id +
                 " is listed as awaited but is unknown bby the scheduler. It will be removed from local list");
             removeAwaitedJob(id.toString());
         }
@@ -193,19 +193,19 @@ public class DataTransferManager {
         JobStatus status = jobState.getStatus();
         switch (status) {
             case KILLED: {
-                logger_util.info("The job " + id + "has been killed. No data will be transfered");
+                logger.info("The job " + id + "has been killed. No data will be transfered");
                 break;
             }
             case FINISHED: {
-                logger_util.info("Transfering data for finished job " + id);
+                logger.info("Transfering data for finished job " + id);
                 transferData(id.toString());
             }
             case CANCELED: {
-                logger_util.info("Transfering data for canceled job " + id);
+                logger.info("Transfering data for canceled job " + id);
                 transferData(id.toString());
             }
             case FAILED: {
-                logger_util.info("Transfering data for failed job " + id);
+                logger.info("Transfering data for failed job " + id);
                 transferData(id.toString());
             }
         }
@@ -232,9 +232,9 @@ public class DataTransferManager {
         try {
             this.saveAwaitedJobsToFile();
         } catch (FileNotFoundException e) {
-            logger_util.error("Could not save status file after adding job on awaited jobs list " + id, e);
+            logger.error("Could not save status file after adding job on awaited jobs list " + id, e);
         } catch (IOException e) {
-            logger_util.error("Could not save status file after adding job on awaited jobs list " + id, e);
+            logger.error("Could not save status file after adding job on awaited jobs list " + id, e);
         }
 
     }
@@ -245,9 +245,9 @@ public class DataTransferManager {
         try {
             this.saveAwaitedJobsToFile();
         } catch (FileNotFoundException e) {
-            logger_util.error("Could not save status file after removing job " + id, e);
+            logger.error("Could not save status file after removing job " + id, e);
         } catch (IOException e) {
-            logger_util.error("Could not save status file after removing job " + id, e);
+            logger.error("Could not save status file after removing job " + id, e);
         }
     }
 

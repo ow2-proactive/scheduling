@@ -56,7 +56,7 @@ import org.ow2.proactive.scheduler.task.launcher.TaskLauncher.OneShotDecrypter;
  */
 public final class ForkerUtils {
 
-    private static final Logger logger_dev = ProActiveLogger.getLogger(ForkerUtils.class);
+    private static final Logger logger = ProActiveLogger.getLogger(ForkerUtils.class);
 
     /** System property Key of the fork method */
     private static final String FORK_METHOD_KEY = "pas.launcher.forkas.method";
@@ -70,7 +70,7 @@ public final class ForkerUtils {
         String forkMethod = System.getProperty(FORK_METHOD_KEY);
         if (forkMethod == null) {
             FORK_METHOD_VALUE = null;
-            logger_dev.info("Java Property " + FORK_METHOD_KEY + " is not set.");
+            logger.info("Java Property " + FORK_METHOD_KEY + " is not set.");
         } else if (ForkMethod.NONE.matches(forkMethod)) {
             FORK_METHOD_VALUE = ForkMethod.NONE;
         } else if (ForkMethod.PWD.matches(forkMethod)) {
@@ -79,10 +79,10 @@ public final class ForkerUtils {
             FORK_METHOD_VALUE = ForkMethod.KEY;
         } else {
             FORK_METHOD_VALUE = null;
-            logger_dev.warn("WARNING : Java Property " + FORK_METHOD_KEY + " is not configured properly :");
-            logger_dev.warn("\t Must be one of : [" + ForkMethod.NONE + ", " + ForkMethod.PWD + ", " +
+            logger.warn("WARNING : Java Property " + FORK_METHOD_KEY + " is not configured properly :");
+            logger.warn("\t Must be one of : [" + ForkMethod.NONE + ", " + ForkMethod.PWD + ", " +
                 ForkMethod.KEY + "]");
-            logger_dev.warn("\t Currently set  : [" + forkMethod + "]");
+            logger.warn("\t Currently set  : [" + forkMethod + "]");
         }
     }
 

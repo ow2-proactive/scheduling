@@ -73,7 +73,7 @@ import org.ow2.proactive.scheduler.task.launcher.TaskLauncher;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class InternalJavaTask extends InternalTask {
 
-    public static final Logger logger_dev = ProActiveLogger.getLogger(InternalJavaTask.class);
+    public static final Logger logger = ProActiveLogger.getLogger(InternalJavaTask.class);
 
     @Id
     @GeneratedValue
@@ -107,7 +107,7 @@ public class InternalJavaTask extends InternalTask {
     public TaskLauncher createLauncher(InternalJob job, Node node) throws ActiveObjectCreationException,
             NodeException {
 
-        logger_dev.info("Create java task launcher");
+        logger.info("Create java task launcher");
         TaskLauncher launcher = (TaskLauncher) PAActiveObject.newActive(JavaTaskLauncher.class.getName(),
                 new Object[] { getDefaultTaskLauncherInitializer(job) }, node);
         setExecuterInformations(new ExecuterInformations(launcher, node));

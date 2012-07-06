@@ -108,7 +108,6 @@ import org.ow2.proactive.scheduler.permissions.ChangePriorityPermission;
 import org.ow2.proactive.scheduler.permissions.ConnectToResourceManagerPermission;
 import org.ow2.proactive.scheduler.permissions.GetOwnStateOnlyPermission;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
-import org.ow2.proactive.scheduler.util.console.SchedulerController;
 
 
 /**
@@ -125,8 +124,6 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
 
     /** Scheduler logger */
     public static final Logger logger = ProActiveLogger.getLogger(SchedulerFrontend.class);
-    public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerFrontend.class);
-    public static final Logger logger_console = ProActiveLogger.getLogger(SchedulerController.class);
 
     /** A repeated warning message */
     private static final String ACCESS_DENIED = "Access denied ! You are not connected or your session has expired !";
@@ -210,10 +207,10 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
         this.jmxHelper = new SchedulerJMXHelper(this.accountsManager);
         this.jobsMap = new HashMap<JobId, JobState>();
 
-        logger_dev.info("Creating scheduler Front-end...");
+        logger.info("Creating scheduler Front-end...");
         this.rmURL = rmURL;
         this.policyFullName = policyFullClassName;
-        logger_dev.debug("Policy used is " + policyFullClassName);
+        logger.debug("Policy used is " + policyFullClassName);
         this.jobs = new HashMap<JobId, IdentifiedJob>();
         this.sessionTimer = new Timer("SessionTimer");
         this.makeEventMethodsList();
@@ -240,25 +237,26 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
 
             // creating the scheduler authentication interface.
             // if this fails then it will not continue.
-            logger_dev.info("Creating scheduler authentication interface...");
+            logger.info("Creating scheduler authentication interface...");
             authentication = PAActiveObject.newActive(SchedulerAuthentication.class,
                     new Object[] { PAActiveObject.getStubOnThis() });
             //creating scheduler core
-            logger_dev.info("Creating scheduler core...");
+            logger.info("Creating scheduler core...");
             SchedulerCore scheduler_local = new SchedulerCore(rmURL, (SchedulerFrontend) PAActiveObject
                     .getStubOnThis(), dbManager, policyFullName, currentJobToSubmit);
             scheduler = (SchedulerCore) PAActiveObject.turnActive(scheduler_local);
 
-            logger_dev.info("Registering scheduler...");
+            logger.info("Registering scheduler...");
             PAActiveObject.registerByName(authentication, SchedulerConstants.SCHEDULER_DEFAULT_NAME);
 
             // Boot the JMX helper
-            logger_dev.info("Booting jmx...");
+            logger.info("Booting jmx...");
             this.jmxHelper.boot(authentication);
 
             // run !!
         } catch (Exception e) {
-            logger_console.error("", e);
+            logger.error("", e);
+            e.printStackTrace();
             System.exit(1);
         }
     }
@@ -280,9 +278,9 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
         //default state = started
         this.sState = sState;
         Set<JobState> jobStates = new HashSet<JobState>();
-        logger_dev.info("#Pending jobs list : " + sState.getPendingJobs().size());
-        logger_dev.info("#Running jobs list : " + sState.getRunningJobs().size());
-        logger_dev.info("#Finished jobs list : " + sState.getFinishedJobs().size());
+        logger.info("#Pending jobs list : " + sState.getPendingJobs().size());
+        logger.info("#Running jobs list : " + sState.getRunningJobs().size());
+        logger.info("#Finished jobs list : " + sState.getFinishedJobs().size());
 
         for (JobState js : sState.getPendingJobs()) {
             prepare(jobStates, js, false);
@@ -374,7 +372,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
      */
     public JobId submit(Job userJob) throws NotConnectedException, PermissionException,
             SubmissionClosedException, JobCreationException {
-        logger_dev.info("New job submission requested : " + userJob.getName());
+        logger.info("New job submission requested : " + userJob.getName());
 
         UniqueID id = checkAccess();
         UserIdentificationImpl ident = checkPermission("submit",
@@ -383,7 +381,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
         //check if the scheduler is stopped
         if (!scheduler.isSubmitPossible()) {
             String msg = "Scheduler is stopped, cannot submit job";
-            logger_dev.info(msg);
+            logger.info(msg);
             throw new SubmissionClosedException(msg);
         }
         //get the internal job.
@@ -391,7 +389,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
         //setting job informations
         if (job.getTasks().size() == 0) {
             String msg = "This job does not contain Tasks !! Insert tasks before submitting job";
-            logger_dev.info(msg);
+            logger.info(msg);
             throw new JobCreationException(msg);
         }
 
@@ -425,10 +423,10 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
                     .getUsername() +
                 " does not have rights to set job priority " + job.getPriority());
         } catch (PermissionException ex) {
-            logger_dev.info(ex.getMessage());
+            logger.info(ex.getMessage());
             throw ex;
         }
-        logger_dev.info("Preparing and settings job submission");
+        logger.info("Preparing and settings job submission");
         //setting the job properties
 
         job.setOwner(ident.getUsername());
@@ -460,7 +458,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
                 "You do not have permission to get the result of this job !");
 
         if (!ij.isFinished()) {
-            logger_dev.info("Job '" + jobId + "' is not finished");
+            logger.info("Job '" + jobId + "' is not finished");
             return null;
         }
 
@@ -662,7 +660,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
             checkOwnStatePermission(myJobsOnly, ui);
             return myJobsOnly ? sState.filterOnUser(ui.getUsername()) : sState;
         } catch (PermissionException ex) {
-            logger_dev.info(ex.getMessage());
+            logger.info(ex.getMessage());
             throw ex;
         }
     }
@@ -688,13 +686,13 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
         // check if listener is not null
         if (sel == null) {
             String msg = "Scheduler listener must be not null";
-            logger_dev.info(msg);
+            logger.info(msg);
             throw new IllegalArgumentException(msg);
         }
         // check if the listener is a reified remote object
         if (!MOP.isReifiedObject(sel)) {
             String msg = "Scheduler listener must be a remote object";
-            logger_dev.info(msg);
+            logger.info(msg);
             throw new IllegalArgumentException(msg);
         }
 
@@ -742,7 +740,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
     private UniqueID checkAccess() throws NotConnectedException {
         UniqueID id = PAActiveObject.getContext().getCurrentRequest().getSourceBodyID();
         if (!identifications.containsKey(id)) {
-            logger_dev.info(ACCESS_DENIED);
+            logger.info(ACCESS_DENIED);
             throw new NotConnectedException(ACCESS_DENIED);
         }
         return id;
@@ -776,7 +774,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
         try {
             ident.checkPermission(methodCallPermission, permissionMsg);
         } catch (PermissionException ex) {
-            logger_dev.warn(permissionMsg);
+            logger.warn(permissionMsg);
             throw ex;
         }
         return ident;
@@ -864,7 +862,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
             ident.getSession().cancel();
             //log and send events
             String user = ident.getUsername();
-            logger_dev.info("User '" + user + "' has disconnect the scheduler !");
+            logger.info("User '" + user + "' has disconnect the scheduler !");
             dispatchUsersUpdated(
                     new NotificationData<UserIdentification>(SchedulerEvent.USERS_UPDATE, ident), false);
         }
@@ -913,12 +911,12 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
 
         if (ij == null) {
             String msg = "The job represented by this ID '" + jobId + "' is unknown !";
-            logger_dev.info(msg);
+            logger.info(msg);
             throw new UnknownJobException(msg);
         }
 
         if (!ij.hasRight(ident)) {
-            logger_dev.info(permissionMsg);
+            logger.info(permissionMsg);
             throw new PermissionException(permissionMsg);
         }
 
@@ -970,13 +968,13 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
             ui.checkPermission(new ChangePriorityPermission(priority.getPriority()), ui.getUsername() +
                 " does not have permissions to set job priority to " + priority);
         } catch (PermissionException ex) {
-            logger_dev.info(ex.getMessage());
+            logger.info(ex.getMessage());
             throw ex;
         }
 
         if (jobs.get(jobId).isFinished()) {
             String msg = "Job '" + jobId + "' is already finished";
-            logger_dev.info(msg);
+            logger.info(msg);
             throw new JobAlreadyFinishedException(msg);
         }
 
@@ -1054,7 +1052,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
             ident.checkPermission(new ChangePolicyPermission(), ident.getUsername() +
                 " does not have permissions to change the policy of the scheduler");
         } catch (PermissionException ex) {
-            logger_dev.info(ex.getMessage());
+            logger.info(ex.getMessage());
             throw ex;
         }
         policyFullName = newPolicyClassname;
@@ -1075,7 +1073,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
             ident.checkPermission(new ConnectToResourceManagerPermission(), ident.getUsername() +
                 " does not have permissions to change RM in the scheduler");
         } catch (PermissionException ex) {
-            logger_dev.info(ex.getMessage());
+            logger.info(ex.getMessage());
             throw ex;
         }
         return scheduler.linkResourceManager(rmURL);
@@ -1154,8 +1152,8 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
      */
     private void dispatchSchedulerStateUpdated(SchedulerEvent eventType) {
         try {
-            if (logger_dev.isDebugEnabled()) {
-                logger_dev.debug("Dispatch event '" + eventType.toString() + "'");
+            if (logger.isDebugEnabled()) {
+                logger.debug("Dispatch event '" + eventType.toString() + "'");
             }
             for (UserIdentificationImpl userId : identifications.values()) {
                 //if this user has a listener
@@ -1169,7 +1167,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
             }
             clearListeners();
         } catch (SecurityException e) {
-            logger_dev.error(e);
+            logger.error(e);
         }
     }
 
@@ -1180,8 +1178,8 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
      */
     private void dispatchJobSubmitted(JobState job) {
         try {
-            if (logger_dev.isDebugEnabled()) {
-                logger_dev.debug("Dispatch event '" + SchedulerEvent.JOB_SUBMITTED + "', job: " +
+            if (logger.isDebugEnabled()) {
+                logger.debug("Dispatch event '" + SchedulerEvent.JOB_SUBMITTED + "', job: " +
                     job.getJobInfo().getJobId());
             }
             for (UserIdentificationImpl userId : identifications.values()) {
@@ -1199,13 +1197,13 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
                         }
                     } catch (NullPointerException e) {
                         //can't do anything
-                        logger_dev.debug("", e);
+                        logger.debug("", e);
                     }
                 }
             }
             clearListeners();
         } catch (SecurityException e) {
-            logger_dev.error(e);
+            logger.error(e);
         }
     }
 
@@ -1217,8 +1215,8 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
      */
     private void dispatchJobStateUpdated(String owner, NotificationData<JobInfo> notification) {
         try {
-            if (logger_dev.isDebugEnabled()) {
-                logger_dev.debug("Dispatch event '" + notification.getEventType() + "', job: " +
+            if (logger.isDebugEnabled()) {
+                logger.debug("Dispatch event '" + notification.getEventType() + "', job: " +
                     notification.getData().getJobId());
             }
             for (UserIdentificationImpl userId : identifications.values()) {
@@ -1238,7 +1236,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
             }
             clearListeners();
         } catch (SecurityException e) {
-            logger_dev.error(e);
+            logger.error(e);
         }
     }
 
@@ -1250,8 +1248,8 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
      */
     private void dispatchTaskStateUpdated(String owner, NotificationData<TaskInfo> notification) {
         try {
-            if (logger_dev.isDebugEnabled()) {
-                logger_dev.debug("Dispatch event '" + notification.getEventType() + "', task: " +
+            if (logger.isDebugEnabled()) {
+                logger.debug("Dispatch event '" + notification.getEventType() + "', task: " +
                     notification.getData().getTaskId());
             }
             for (UserIdentificationImpl userId : identifications.values()) {
@@ -1271,7 +1269,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
             }
             clearListeners();
         } catch (SecurityException e) {
-            logger_dev.error(e);
+            logger.error(e);
         }
     }
 
@@ -1283,8 +1281,8 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
     private void dispatchUsersUpdated(NotificationData<UserIdentification> notification,
             boolean checkForDownUser) {
         try {
-            if (logger_dev.isDebugEnabled()) {
-                logger_dev.debug("Dispatch event '" + notification.getEventType() + "'");
+            if (logger.isDebugEnabled()) {
+                logger.debug("Dispatch event '" + notification.getEventType() + "'");
             }
             for (UserIdentificationImpl userId : identifications.values()) {
                 //if this user has a listener
@@ -1307,7 +1305,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
                 clearListeners();
             }
         } catch (SecurityException e) {
-            logger_dev.error(e);
+            logger.error(e);
         }
         this.jmxHelper.getSchedulerRuntimeMBean().usersUpdatedEvent(notification);
     }
@@ -1351,7 +1349,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
             case POLICY_CHANGED:
                 break;
             default:
-                logger_dev.warn("**WARNING** - Unconsistent update type received from Scheduler Core : " +
+                logger.warn("**WARNING** - Unconsistent update type received from Scheduler Core : " +
                     eventType);
                 return;
         }
@@ -1417,7 +1415,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
                 this.jmxHelper.getSchedulerRuntimeMBean().jobStateUpdatedEvent(notification);
                 break;
             default:
-                logger_dev.warn("**WARNING** - Unconsistent update type received from Scheduler Core : " +
+                logger.warn("**WARNING** - Unconsistent update type received from Scheduler Core : " +
                     notification.getEventType());
         }
     }
@@ -1443,7 +1441,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
                 }
                 break;
             default:
-                logger_dev.warn("**WARNING** - Unconsistent update type received from Scheduler Core : " +
+                logger.warn("**WARNING** - Unconsistent update type received from Scheduler Core : " +
                     notification.getEventType());
         }
     }
@@ -1457,7 +1455,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
                 dispatchUsersUpdated(notification, true);
                 break;
             default:
-                logger_dev.warn("**WARNING** - Unconsistent update type received from Scheduler Core : " +
+                logger.warn("**WARNING** - Unconsistent update type received from Scheduler Core : " +
                     notification.getEventType());
         }
     }

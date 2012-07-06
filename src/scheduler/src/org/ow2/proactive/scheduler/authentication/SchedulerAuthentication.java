@@ -72,7 +72,7 @@ import org.ow2.proactive.utils.Tools;
 public class SchedulerAuthentication extends AuthenticationImpl implements SchedulerAuthenticationInterface {
 
     /** Scheduler logger */
-    public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerAuthentication.class);
+    public static final Logger logger = ProActiveLogger.getLogger(SchedulerAuthentication.class);
 
     /** The scheduler front-end connected to this authentication interface */
     private SchedulerFrontend frontend;
@@ -107,7 +107,7 @@ public class SchedulerAuthentication extends AuthenticationImpl implements Sched
         UserNamePrincipal unPrincipal = subject.getPrincipals(UserNamePrincipal.class).iterator().next();
         String user = unPrincipal.getName();
 
-        logger_dev.info("user : " + user);
+        logger.info("user : " + user);
         // add this user to the scheduler front-end
         UserIdentificationImpl ident = new UserIdentificationImpl(user, subject);
         ident.setHostName(getSenderHostName());

@@ -35,7 +35,7 @@ import org.ow2.proactive.utils.NodeSet;
 @ActiveObject
 public class RMProxyActiveObject {
 
-    protected static final Logger logger_dev = ProActiveLogger.getLogger(RMProxyActiveObject.class);
+    protected static final Logger logger = ProActiveLogger.getLogger(RMProxyActiveObject.class);
 
     protected ResourceManager rm;
 
@@ -154,16 +154,16 @@ public class RMProxyActiveObject {
             } catch (IllegalArgumentException e) {
                 //TODO - linked to PROACTIVE-936 -> IllegalArgumentException is raised if method name is unknown
                 //should be replaced by checked exception
-                logger_dev
+                logger
                         .error(
                                 "ERROR : Callback method won't be executed, node won't be released. This is a critical state, check the callback method name",
                                 e);
             }
             this.nodes.put(node, future);
-            logger_dev.info("Cleaning Script handled on node" + node.getNodeInformation().getURL());
+            logger.info("Cleaning Script handled on node" + node.getNodeInformation().getURL());
         } catch (Exception e) {
             //if active object cannot be created or script has failed
-            logger_dev.error("", e);
+            logger.error("", e);
             releaseNode(node);
         }
     }
@@ -181,8 +181,8 @@ public class RMProxyActiveObject {
         while (iterator.hasNext()) {
             Entry<Node, ScriptResult<?>> entry = iterator.next();
             if (!PAFuture.isAwaited(entry.getValue())) { // !awaited = arrived
-                if (logger_dev.isInfoEnabled()) {
-                    logger_dev.info("Cleaning script successfull, node freed : " +
+                if (logger.isInfoEnabled()) {
+                    logger.info("Cleaning script successfull, node freed : " +
                         entry.getKey().getNodeInformation().getURL());
                 }
                 ns.add(entry.getKey());

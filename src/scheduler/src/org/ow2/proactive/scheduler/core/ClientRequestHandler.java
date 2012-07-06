@@ -62,7 +62,7 @@ import org.ow2.proactive.threading.ReifiedMethodCall;
  */
 public class ClientRequestHandler {
 
-    public static final Logger logger_dev = ProActiveLogger.getLogger(ClientRequestHandler.class);
+    public static final Logger logger = ProActiveLogger.getLogger(ClientRequestHandler.class);
 
     /** Number of threads used by the thread pool for clients events sending */
     private static final int THREAD_NUMBER = PASchedulerProperties.SCHEDULER_LISTENERS_THREADNUMBER
@@ -190,8 +190,8 @@ public class ClientRequestHandler {
                 //try to empty the events list if no event comes from the core
                 tryStartTask();
             } catch (Throwable t) {
-                if (logger_dev.isDebugEnabled()) {
-                    logger_dev.debug("Error during sending event to the cleint " + clientId, t);
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Error during sending event to the cleint " + clientId, t);
                 }
                 //remove this client from Frontend (client dead or timed out)
                 frontend.markAsDirty(clientId);

@@ -76,7 +76,7 @@ public abstract class Script<E> implements Serializable {
     public static final int DEFAULT_OUTPUT_MAX_SIZE = 125;
 
     /** Loggers */
-    public static final Logger logger_dev = ProActiveLogger.getLogger(Script.class);
+    public static final Logger logger = ProActiveLogger.getLogger(Script.class);
 
     /** Variable name for script arguments */
     public static final String ARGUMENTS_NAME = "args";
@@ -274,7 +274,7 @@ public abstract class Script<E> implements Serializable {
 
             return result;
         } catch (Throwable e) {
-            logger_dev.error("", e);
+            logger.error("", e);
             return new ScriptResult<E>(new Exception("An exception occured while executing the script ", e));
 
         }

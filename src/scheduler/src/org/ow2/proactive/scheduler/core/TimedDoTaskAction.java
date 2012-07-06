@@ -60,7 +60,7 @@ import org.ow2.proactive.threading.CallableWithTimeoutAction;
  */
 public class TimedDoTaskAction implements CallableWithTimeoutAction<Void> {
 
-    private static final Logger logger_dev = ProActiveLogger.getLogger(TimedDoTaskAction.class);
+    private static final Logger logger = ProActiveLogger.getLogger(TimedDoTaskAction.class);
 
     private final InternalJob job;
 
@@ -107,7 +107,7 @@ public class TimedDoTaskAction implements CallableWithTimeoutAction<Void> {
             // try launch the task
             launcher.doTask(coreStub, task.getExecutableContainer(), parameters);
         } catch (Throwable e) {
-            logger_dev.warn("Failed to start task: " + e.getMessage(), e);
+            logger.warn("Failed to start task: " + e.getMessage(), e);
             restartTask();
         }
         return null;
@@ -137,11 +137,11 @@ public class TimedDoTaskAction implements CallableWithTimeoutAction<Void> {
      */
     public void timeoutAction() {
         try {
-            logger_dev.warn("Task start timeout for task '" + task.getId() + "'");
+            logger.warn("Task start timeout for task '" + task.getId() + "'");
             core.terminateTaskLauncher(launcher, task.getId(), false);
             restartTask();
         } catch (Throwable e) {
-            logger_dev.warn("Exception during submit timeout handling: " + e.getMessage(), e);
+            logger.warn("Exception during submit timeout handling: " + e.getMessage(), e);
         }
     }
 
@@ -149,7 +149,7 @@ public class TimedDoTaskAction implements CallableWithTimeoutAction<Void> {
         if (taskWasRestarted) {
             return;
         }
-        logger_dev.info("Trying to restart task '" + task.getId() + "'");
+        logger.info("Trying to restart task '" + task.getId() + "'");
         core.restartTaskOnNodeFailure(job, task, coreStub);
         taskWasRestarted = true;
     }

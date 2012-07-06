@@ -74,7 +74,7 @@ import org.ow2.proactive.scheduler.task.internal.InternalTask;
  */
 public class JobDescriptorImpl implements JobDescriptor {
 
-    public static final Logger logger_dev = ProActiveLogger.getLogger(JobDescriptorImpl.class);
+    public static final Logger logger = ProActiveLogger.getLogger(JobDescriptorImpl.class);
 
     private InternalJob internalJob;
 
@@ -104,7 +104,7 @@ public class JobDescriptorImpl implements JobDescriptor {
      * @param job the internal job to be lighted.
      */
     public JobDescriptorImpl(InternalJob job) {
-        logger_dev.debug("job = " + job.getId());
+        logger.debug("job = " + job.getId());
         internalJob = job;
 
         if (job.getType() == JobType.TASKSFLOW) {
@@ -126,7 +126,7 @@ public class JobDescriptorImpl implements JobDescriptor {
      * This list represents the ordered TaskDescriptor list of its parent tasks.
      */
     private void makeTree(InternalJob job) {
-        logger_dev.debug("job = " + job.getId());
+        logger.debug("job = " + job.getId());
         Map<InternalTask, TaskDescriptor> mem = new HashMap<InternalTask, TaskDescriptor>();
 
         //create task descriptor list
@@ -524,7 +524,7 @@ public class JobDescriptorImpl implements JobDescriptor {
      * @param taskId the task to remove from running task.
      */
     public void terminate(TaskId taskId) {
-        logger_dev.debug("task = " + taskId);
+        logger.debug("task = " + taskId);
         if (getInternal().getType() == JobType.TASKSFLOW) {
             TaskDescriptor lt = runningTasks.get(taskId);
 
@@ -564,7 +564,7 @@ public class JobDescriptorImpl implements JobDescriptor {
      * @param taskStatus the taskId with their current status.
      */
     public void update(Map<TaskId, TaskStatus> taskStatus) {
-        logger_dev.debug(" ");
+        logger.debug(" ");
         for (Entry<TaskId, TaskStatus> tid : taskStatus.entrySet()) {
             if (tid.getValue() == TaskStatus.PAUSED) {
                 TaskDescriptor lt = eligibleTasks.get(tid.getKey());

@@ -209,7 +209,7 @@ public class SchedulerProxyUIWithDSupport extends CachingSchedulerProxyUserInter
         } catch (FileSystemException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
-            logger_util.error("Could nnot create Default FileSystem Manager", e);
+            logger.error("Could nnot create Default FileSystem Manager", e);
         }
     }
 
@@ -354,7 +354,7 @@ public class SchedulerProxyUIWithDSupport extends CachingSchedulerProxyUserInter
             JobCreationException, FileSystemException {
 
         if (((push_url == null) || (push_url.equals(""))) && ((pull_url == null) || (pull_url.equals("")))) {
-            logger_util
+            logger
                     .warn("For the job " + job.getId() +
                         " no push or pull urls are defined. No data will be transfered for this job from the local machine ");
             return super.submit(job);
@@ -378,7 +378,7 @@ public class SchedulerProxyUIWithDSupport extends CachingSchedulerProxyUserInter
         FileObject fo = fsManager.resolveFile(fUri);
         fo.createFolder();
 
-        logger_util.debug("Created remote folder: " + fUri);
+        logger.debug("Created remote folder: " + fUri);
     }
 
     /**
@@ -545,9 +545,9 @@ public class SchedulerProxyUIWithDSupport extends CachingSchedulerProxyUserInter
         // folder before throwing an exception
         FileObject remoteFolder = fsManager.resolveFile(push_URL);
         FileObject localfolder = fsManager.resolveFile(localInputFolderPath);
-        logger_util.debug("Pushing files from " + localfolder + " to " + remoteFolder);
+        logger.debug("Pushing files from " + localfolder + " to " + remoteFolder);
         remoteFolder.copyFrom(localfolder, Selectors.SELECT_ALL);
-        logger_util.debug("Finished push operation from " + localfolder + " to " + remoteFolder);
+        logger.debug("Finished push operation from " + localfolder + " to " + remoteFolder);
         return true;
     }
 
@@ -567,7 +567,7 @@ public class SchedulerProxyUIWithDSupport extends CachingSchedulerProxyUserInter
     protected void pullData(AwaitedJob awaitedjob) {
         String localOutFolderPath = awaitedjob.getLocalOutputFolder();
         if (localOutFolderPath == null) {
-            logger_util.warn("The job " + awaitedjob.getJobId() +
+            logger.warn("The job " + awaitedjob.getJobId() +
                 " does not define an output folder on local machine. No output data will be retrieved");
             return;
         }
@@ -587,8 +587,8 @@ public class SchedulerProxyUIWithDSupport extends CachingSchedulerProxyUserInter
             remotePushFolder = fsManager.resolveFile(pushUrl);
             localfolder = fsManager.resolveFile(localOutFolderPath);
         } catch (Exception e) {
-            logger_util.error("Could not retrieve data for job " + jobId, e);
-            logger_util
+            logger.error("Could not retrieve data for job " + jobId, e);
+            logger
                     .info("Job  " +
                         jobId +
                         " will be removed from the known job list. The system will not attempt again to retrieve data for this job. You couyld try to manually copy the data from the location  " +
@@ -602,7 +602,7 @@ public class SchedulerProxyUIWithDSupport extends CachingSchedulerProxyUserInter
             if (!remotePullFolder.getParent().equals(remotePushFolder.getParent()))
                 foldersToDelete.add(remotePushFolder.getParent());
         } catch (FileSystemException e) {
-            logger_util.warn("Data in folders " + pull_URL + " and " + pushUrl +
+            logger.warn("Data in folders " + pull_URL + " and " + pushUrl +
                 " cannot be deleted due to an unexpected error ", e);
             e.printStackTrace();
         }
@@ -627,7 +627,7 @@ public class SchedulerProxyUIWithDSupport extends CachingSchedulerProxyUserInter
         try {
             decoder = new java.beans.XMLDecoder(new FileInputStream(statusFile));
         } catch (FileNotFoundException e1) {
-            logger_util
+            logger
                     .error(
                             "Could not load the status file. No data will be retrieved for previousley submitted jobs.",
                             e1);
@@ -669,7 +669,7 @@ public class SchedulerProxyUIWithDSupport extends CachingSchedulerProxyUserInter
             encoder.flush();
             encoder.close();
         } catch (Throwable t) {
-            logger_util
+            logger
                     .error(
                             "Could not persist the list of awaited jobs. Some jobs output data might not be transfered after application restart ",
                             t);
@@ -701,16 +701,16 @@ public class SchedulerProxyUIWithDSupport extends CachingSchedulerProxyUserInter
         try {
             jobState = this.getJobState(id);
         } catch (NotConnectedException e) {
-            logger_util.error("Could not retreive output data for job " + id, e);
+            logger.error("Could not retreive output data for job " + id, e);
         } catch (UnknownJobException e) {
-            logger_util.error("Could not retreive output data for job " + id, e);
+            logger.error("Could not retreive output data for job " + id, e);
         } catch (PermissionException e) {
-            logger_util.error("Could not retreive output data for job " + id +
+            logger.error("Could not retreive output data for job " + id +
                 ". Did you connect with a diffrent user ? ", e);
         }
 
         if (jobState == null) {
-            logger_util.warn("The job " + id +
+            logger.warn("The job " + id +
                 " is listed as awaited but is unknown bby the scheduler. It will be removed from local list");
             removeAwaitedJob(id.toString());
         }
@@ -718,25 +718,25 @@ public class SchedulerProxyUIWithDSupport extends CachingSchedulerProxyUserInter
         JobStatus status = jobState.getStatus();
         switch (status) {
             case KILLED: {
-                logger_util.info("The job " + id + "has been killed. No data will be transfered");
+                logger.info("The job " + id + "has been killed. No data will be transfered");
                 break;
             }
             case FINISHED: {
-                logger_util.info("Transfering data for finished job " + id);
+                logger.info("Transfering data for finished job " + id);
                 pullData(aj);
                 this.removeAwaitedJob(id.toString());
-                logger_util.info("Data transfer finished for finished job " + id);
+                logger.info("Data transfer finished for finished job " + id);
 
                 break;
             }
             case CANCELED: {
-                logger_util.info("Transfering data for canceled job " + id);
+                logger.info("Transfering data for canceled job " + id);
                 pullData(aj);
                 this.removeAwaitedJob(id.toString());
                 break;
             }
             case FAILED: {
-                logger_util.info("Transfering data for failed job " + id);
+                logger.info("Transfering data for failed job " + id);
                 pullData(aj);
                 this.removeAwaitedJob(id.toString());
                 break;
@@ -865,11 +865,10 @@ public class SchedulerProxyUIWithDSupport extends CachingSchedulerProxyUserInter
         try {
             this.saveAwaitedJobsToFile();
         } catch (FileNotFoundException e) {
-            logger_util.error("Could not save status file after adding job on awaited jobs list " +
-                aj.getJobId());
+            logger.error("Could not save status file after adding job on awaited jobs list " + aj.getJobId());
         } catch (IOException e) {
-            logger_util.error("Could not save status file after adding job on awaited jobs list " +
-                aj.getJobId(), e);
+            logger.error("Could not save status file after adding job on awaited jobs list " + aj.getJobId(),
+                    e);
         }
     }
 
@@ -879,9 +878,9 @@ public class SchedulerProxyUIWithDSupport extends CachingSchedulerProxyUserInter
         try {
             this.saveAwaitedJobsToFile();
         } catch (FileNotFoundException e) {
-            logger_util.error("Could not save status file after removing job " + id, e);
+            logger.error("Could not save status file after removing job " + id, e);
         } catch (IOException e) {
-            logger_util.error("Could not save status file after removing job " + id, e);
+            logger.error("Could not save status file after removing job " + id, e);
         }
     }
 
@@ -918,14 +917,14 @@ public class SchedulerProxyUIWithDSupport extends CachingSchedulerProxyUserInter
                 sourceUrl = source.getURL().toString();
                 destUrl = dest.getURL().toString();
 
-                logger_util.debug("Copying files from " + source + " to " + dest);
+                logger.debug("Copying files from " + source + " to " + dest);
                 dest.copyFrom(source, Selectors.SELECT_ALL);
-                logger_util.debug("Finished copying files from " + source + " to " + dest);
+                logger.debug("Finished copying files from " + source + " to " + dest);
 
             } catch (FileSystemException e) {
-                logger_util.error("An error occured while copying files from " + source + " to " + dest, e);
+                logger.error("An error occured while copying files from " + source + " to " + dest, e);
                 if (jobId != null) {
-                    logger_util
+                    logger
                             .info("Job  " +
                                 jobId +
                                 " will be removed from the known job list. The system will not attempt again to retrieve data for this job. You couyld try to manually copy the data from the location  " +
@@ -948,7 +947,7 @@ public class SchedulerProxyUIWithDSupport extends CachingSchedulerProxyUserInter
                     fo.delete(Selectors.SELECT_ALL);
                     fo.delete();
                 } catch (FileSystemException e) {
-                    logger_util.warn("Could not delete temporary fioles at location " + url +
+                    logger.warn("Could not delete temporary fioles at location " + url +
                         " . although the copy of these files to " + destUrl +
                         " has been successffully performed.");
                 }

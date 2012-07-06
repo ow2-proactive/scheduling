@@ -63,7 +63,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class GenerationScript extends Script<String> {
     /** Loggers */
-    public static final Logger logger_dev = ProActiveLogger.getLogger(GenerationScript.class);
+    public static final Logger logger = ProActiveLogger.getLogger(GenerationScript.class);
 
     /**
      * The variable name which must be set after the evaluation
@@ -158,12 +158,12 @@ public class GenerationScript extends Script<String> {
                 return new ScriptResult<String>((String) result);
             } else {
                 String msg = "Bad result format : awaited String, found " + result.getClass().getName();
-                logger_dev.warn(msg);
+                logger.warn(msg);
                 return new ScriptResult<String>(new Exception(msg));
             }
         } else {
             String msg = "No binding for key " + RESULT_VARIABLE;
-            logger_dev.warn(msg);
+            logger.warn(msg);
             return new ScriptResult<String>(new Exception(msg));
         }
     }

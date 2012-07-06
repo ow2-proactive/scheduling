@@ -77,7 +77,7 @@ import org.ow2.proactive.scheduler.task.launcher.TaskLauncherInitializer;
 @XmlRootElement(name = "task")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class InternalNativeTask extends InternalTask {
-    public static final Logger logger_dev = ProActiveLogger.getLogger(InternalNativeTask.class);
+    public static final Logger logger = ProActiveLogger.getLogger(InternalNativeTask.class);
 
     @Id
     @GeneratedValue
@@ -107,7 +107,7 @@ public class InternalNativeTask extends InternalTask {
             NodeException {
         NativeTaskLauncher launcher;
 
-        logger_dev.info("Create native task launcher");
+        logger.info("Create native task launcher");
         TaskLauncherInitializer tli = getDefaultTaskLauncherInitializer(job);
         launcher = (NativeTaskLauncher) PAActiveObject.newActive(NativeTaskLauncher.class.getName(),
                 new Object[] { tli }, node);

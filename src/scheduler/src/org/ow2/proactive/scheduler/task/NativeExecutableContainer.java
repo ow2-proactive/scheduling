@@ -60,7 +60,7 @@ import org.ow2.proactive.scripting.InvalidScriptException;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class NativeExecutableContainer extends ExecutableContainer {
 
-    public static final Logger logger_dev = ProActiveLogger.getLogger(NativeExecutableContainer.class);
+    public static final Logger logger = ProActiveLogger.getLogger(NativeExecutableContainer.class);
 
     // actual executable data
     private String[] command;
@@ -146,7 +146,7 @@ public class NativeExecutableContainer extends ExecutableContainer {
         try {
             nodesHost.add(PAActiveObject.getNode().getNodeInformation().getVMInformation().getHostName());
         } catch (NodeException e) {
-            logger_dev.warn("Local node could not be added to the list of host !", e);
+            logger.warn("Local node could not be added to the list of host !", e);
         }
         nei.setNodesHost(nodesHost);
         return nei;

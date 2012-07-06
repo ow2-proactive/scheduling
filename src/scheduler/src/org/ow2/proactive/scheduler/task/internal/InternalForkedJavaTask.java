@@ -76,7 +76,7 @@ import org.ow2.proactive.scheduler.task.launcher.TaskLauncherInitializer;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class InternalForkedJavaTask extends InternalJavaTask {
 
-    public static final Logger logger_dev = ProActiveLogger.getLogger(InternalForkedJavaTask.class);
+    public static final Logger logger = ProActiveLogger.getLogger(InternalForkedJavaTask.class);
 
     /** Policy content for the forked VM (declared as static element to be cached) */
     @Transient
@@ -116,7 +116,7 @@ public class InternalForkedJavaTask extends InternalJavaTask {
         tli.setPolicyContent(getJavaPolicy());
         tli.setLog4JContent(getLog4J());
         tli.setPaConfigContent(getPAConfiguration());
-        logger_dev.info("Create forked java task launcher");
+        logger.info("Create forked java task launcher");
         TaskLauncher launcher = (TaskLauncher) PAActiveObject.newActive(ForkedJavaTaskLauncher.class
                 .getName(), new Object[] { tli }, node);
         setExecuterInformations(new ExecuterInformations(launcher, node));
@@ -136,7 +136,7 @@ public class InternalForkedJavaTask extends InternalJavaTask {
                         .getAbsolutePath(PASchedulerProperties.SCHEDULER_DEFAULT_FJT_SECURITY_POLICY
                                 .getValueAsString()));
             } catch (Exception e) {
-                logger_dev.error("Policy file not read, applying default basic permission", e);
+                logger.error("Policy file not read, applying default basic permission", e);
                 policyContent = new StringBuilder("grant {\npermission java.security.BasicPermission;\n};\n");
             }
         }
@@ -154,7 +154,7 @@ public class InternalForkedJavaTask extends InternalJavaTask {
                 log4JContent = getFileContent(PASchedulerProperties
                         .getAbsolutePath(PASchedulerProperties.SCHEDULER_DEFAULT_FJT_LOG4J.getValueAsString()));
             } catch (Exception e) {
-                logger_dev.error("Log4J file not read, applying default basic content", e);
+                logger.error("Log4J file not read, applying default basic content", e);
                 //default ProActive log4j file is not suitable because CONSOLE appender is not supported under windows
                 log4JContent = new StringBuilder("log4j.rootLogger=INFO,NULL\n");
             }
@@ -174,7 +174,7 @@ public class InternalForkedJavaTask extends InternalJavaTask {
                         .getAbsolutePath(PASchedulerProperties.SCHEDULER_DEFAULT_FJT_PAConfig
                                 .getValueAsString()));
             } catch (Exception e) {
-                logger_dev.error("PAConfiguration file not read, applying default basic content", e);
+                logger.error("PAConfiguration file not read, applying default basic content", e);
                 paConfigContent = new StringBuilder("<ProActiveUserProperties>\n" + "<properties>\n"
                     + "<prop key=\"proactive.communication.protocol\" value=\"http\"/>\n" + "</properties>\n"
                     + "</ProActiveUserProperties>\n");
