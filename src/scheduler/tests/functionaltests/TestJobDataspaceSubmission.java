@@ -109,7 +109,7 @@ public class TestJobDataspaceSubmission extends SchedulerConsecutive {
         setup();
 
         TaskFlowJob job = new TaskFlowJob();
-        FileSystemServerDeployer filesServer = new FileSystemServerDeployer(IN, IOSPACE + IN, true);
+        FileSystemServerDeployer filesServer = new FileSystemServerDeployer(IN, IOSPACE + IN, true, true);
         String url = filesServer.getVFSRootURL();
         job.setInputSpace(url);
         filesServer = new FileSystemServerDeployer(OUT, IOSPACE + OUT, true);
@@ -210,6 +210,7 @@ public class TestJobDataspaceSubmission extends SchedulerConsecutive {
         fout = new File(outputDir.getAbsolutePath() + File.separator + out4);
         Assert.assertEquals(in1 + in2, getContent(fout));
 
+        filesServer.terminate();
         //and clean tmp space
         clean();
     }
