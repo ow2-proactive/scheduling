@@ -54,7 +54,6 @@ import org.jboss.resteasy.spi.interception.MessageBodyReaderInterceptor;
 import org.jboss.resteasy.util.HttpHeaderNames;
 import org.jboss.util.StopWatch;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 
 
 @Provider
@@ -62,7 +61,7 @@ import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 @DecoderPrecedence
 public class LoggingExecutionInterceptor implements MessageBodyReaderInterceptor, AcceptedByMethod,
         ClientExecutionInterceptor {
-    private static Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.PREFIX + ".rest");
+    private static Logger logger = ProActiveLogger.getLogger(LoggingExecutionInterceptor.class);
 
     @SuppressWarnings("unchecked")
     public ClientResponse execute(ClientExecutionContext ctx) throws Exception {

@@ -48,7 +48,6 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.utils.Sleeper;
 import org.ow2.proactive.resourcemanager.common.util.RMCachingProxyUserInterface;
 import org.ow2.proactive.resourcemanager.common.util.RMProxyUserInterface;
-import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 
 
 /**
@@ -59,7 +58,7 @@ import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
  */
 public class RMSessionsCleaner implements Runnable {
 
-    private Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.PREFIX + ".rest.sessioncleaner");
+    private Logger logger = ProActiveLogger.getLogger(RMSessionsCleaner.class);
 
     private volatile boolean stop = false;
     private RMSessionMapper rmsm;

@@ -57,7 +57,6 @@ import org.ow2.proactive.resourcemanager.common.util.RMCachingProxyUserInterface
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.exception.PermissionException;
-import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 import org.ow2.proactive_grid_cloud_portal.rm.RMSessionMapper;
 import org.ow2.proactive_grid_cloud_portal.rm.RMSessionsCleaner;
 import org.ow2.proactive_grid_cloud_portal.rm.RMStateCaching;
@@ -70,7 +69,7 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateCaching;
 
 public class MyResteasyBootstrap extends ResteasyBootstrap {
 
-    private Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.PREFIX + ".rest.webapps");
+    private Logger logger = ProActiveLogger.getLogger(MyResteasyBootstrap.class);
     private SchedulerSessionsCleaner schedulerSessionCleaner;
     private RMSessionsCleaner rmSessionCleaner;
 

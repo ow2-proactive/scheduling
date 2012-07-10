@@ -116,7 +116,6 @@ import org.ow2.proactive.scheduler.common.job.factories.FlatJobFactory;
 import org.ow2.proactive.scheduler.common.job.factories.JobFactory;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskState;
-import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
 import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingException;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
@@ -139,7 +138,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
     public static final String UNKNOWN_VALUE_TYPE = "Unknown value type";
 
-    private Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.PREFIX + ".rest");
+    private Logger logger = ProActiveLogger.getLogger(SchedulerStateRest.class);
 
     /**
      * Returns the ids of the current jobs under a list of string.

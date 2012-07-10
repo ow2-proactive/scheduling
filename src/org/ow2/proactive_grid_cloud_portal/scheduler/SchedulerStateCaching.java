@@ -52,7 +52,6 @@ import org.ow2.proactive.scheduler.common.SchedulerState;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.exception.PermissionException;
 import org.ow2.proactive.scheduler.common.util.CachingSchedulerProxyUserInterface;
-import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 import org.ow2.proactive_grid_cloud_portal.webapp.PortalConfiguration;
 
 
@@ -65,7 +64,7 @@ import org.ow2.proactive_grid_cloud_portal.webapp.PortalConfiguration;
  *
  */
 public class SchedulerStateCaching {
-    private static Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.PREFIX + ".rest.caching");
+    private static Logger logger = ProActiveLogger.getLogger(SchedulerStateCaching.class);
 
     private static MyCachingSchedulerProxyUserInterface scheduler;
     private static SchedulerState localState;

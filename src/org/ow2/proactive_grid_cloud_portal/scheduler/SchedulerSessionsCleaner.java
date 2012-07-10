@@ -47,8 +47,6 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.utils.Sleeper;
 import org.ow2.proactive.scheduler.common.Scheduler;
-import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
-import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
 
 
 /**
@@ -60,7 +58,7 @@ import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
  */
 public class SchedulerSessionsCleaner implements Runnable {
 
-    private Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.PREFIX + ".rest.sessioncleaner");
+    private Logger logger = ProActiveLogger.getLogger(SchedulerSessionsCleaner.class);
 
     // run the cleaner every 10 minutes
     protected int cleanPeriod = 5 * 60 * 1000;

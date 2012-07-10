@@ -36,9 +36,7 @@
  */
 package org.ow2.proactive_grid_cloud_portal.webapp;
 
-import java.net.HttpURLConnection;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
@@ -58,7 +56,6 @@ import org.jboss.resteasy.spi.Failure;
 import org.jboss.resteasy.spi.HttpRequest;
 import org.jboss.resteasy.spi.interception.PostProcessInterceptor;
 import org.jboss.resteasy.spi.interception.PreProcessInterceptor;
-import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -78,7 +75,7 @@ public class LoggingInterceptor implements PreProcessInterceptor, PostProcessInt
     @Context
     UriInfo ui;
 
-    private static final Logger logger = LoggerFactory.getLogger(SchedulerLoggers.PREFIX + ".rest");
+    private static final Logger logger = LoggerFactory.getLogger(LoggingInterceptor.class);
 
     public ServerResponse preProcess(HttpRequest request, ResourceMethod method) throws Failure,
             WebApplicationException {

@@ -48,7 +48,6 @@ import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.common.event.RMInitialState;
 import org.ow2.proactive.resourcemanager.common.util.RMCachingProxyUserInterface;
 import org.ow2.proactive.resourcemanager.core.RMCore;
-import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 import org.ow2.proactive_grid_cloud_portal.webapp.PortalConfiguration;
 
 
@@ -68,7 +67,7 @@ import org.ow2.proactive_grid_cloud_portal.webapp.PortalConfiguration;
  */
 public class RMStateCaching {
 
-    private static Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.PREFIX + ".rest.rm.caching");
+    private static Logger logger = ProActiveLogger.getLogger(RMStateCaching.class);
 
     private static RMCachingProxyUserInterface rm;
     private static RMInitialState state;
