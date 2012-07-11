@@ -67,6 +67,7 @@ import org.ow2.proactive.resourcemanager.common.event.RMInitialState;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.core.RMCore;
+import org.ow2.proactive.resourcemanager.core.history.NodeHistory;
 import org.ow2.proactive.resourcemanager.core.jmx.RMJMXHelper;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.exception.RMException;
@@ -402,6 +403,7 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
      */
     public void nodeEvent(RMNodeEvent event) {
         RMMonitoringImpl.rmStatistics.nodeEvent(event);
+        new NodeHistory(event).save();
         queueEvent(event);
     }
 

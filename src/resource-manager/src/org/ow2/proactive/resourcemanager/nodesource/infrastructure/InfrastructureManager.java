@@ -551,7 +551,6 @@ public abstract class InfrastructureManager implements Serializable {
     private void emitEvent(final RMNodeEvent event) {
         NodeSource nsStub = this.nodeSource.getStub();
         nsStub.internalEmitDeployingNodeEvent(event);
-        new NodeHistory(event).save();
     }
 
     private void timeout(String pnURL, long timeout) {

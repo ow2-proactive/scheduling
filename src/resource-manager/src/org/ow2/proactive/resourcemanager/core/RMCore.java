@@ -1248,7 +1248,6 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     }
 
     private void registerAndEmitNodeEvent(final RMNodeEvent event) {
-        new NodeHistory(event).save();
         this.monitoring.nodeEvent(event);
     }
 
