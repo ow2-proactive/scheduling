@@ -7,10 +7,12 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
@@ -21,6 +23,7 @@ import java.util.concurrent.ThreadFactory;
 import javax.security.auth.login.LoginException;
 
 import org.apache.commons.vfs.FileObject;
+import org.apache.commons.vfs.FileSelector;
 import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.FileSystemManager;
 import org.apache.commons.vfs.Selectors;
@@ -45,8 +48,11 @@ import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
+import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.job.UserIdentification;
+import org.ow2.proactive.scheduler.common.task.Task;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
+import org.ow2.proactive.scheduler.common.task.dataspaces.InputSelector;
 import org.ow2.proactive.scheduler.common.util.CachingSchedulerProxyUserInterface;
 
 
@@ -521,8 +527,38 @@ public class SchedulerProxyUIWithDSupport extends CachingSchedulerProxyUserInter
         Iterator<AwaitedJob> it = awaitedJobsIdsCopy.iterator();
         while (it.hasNext()) {
             AwaitedJob awaitedJob = it.next();
-            // String id = awaitedJob.getJobId();
-            pullData(awaitedJob);
+            String id = awaitedJob.getJobId();
+
+            try {
+                JobState js = uischeduler.getJobState(id);
+                if (js.isFinished()) {
+                    pullData(awaitedJob);
+                }
+
+            } catch (NotConnectedException e) {
+                logger
+                        .error(
+                                "A connection error occured while trying to download output data of Job " +
+                                    id +
+                                    ". This job will remain in the list of awaited jobs. Another attempt to dowload the output data will be made next time the application is initialized. ",
+                                e);
+            } catch (UnknownJobException e) {
+                logger.error("Could not retrieve output data for job " + id +
+                    " because this job is not known by the Scheduler. \n ", e);
+                logger
+                        .warn("Job  " +
+                            id +
+                            " will be removed from the known job list. The system will not attempt again to retrieve data for this job. You could try to manually copy the data from the location  " +
+                            awaitedJob.getPullURL());
+                removeAwaitedJob(id);
+            } catch (PermissionException e) {
+                logger
+                        .error(
+                                "Could not retrieve output data for job " +
+                                    id +
+                                    " because you don't have permmission to access this job. You need to use the same connection credentials you used for submitting the job.  \n Another attempt to dowload the output data for this job will be made next time the application is initialized. ",
+                                e);
+            }
         }
     }
 
@@ -546,7 +582,37 @@ public class SchedulerProxyUIWithDSupport extends CachingSchedulerProxyUserInter
         FileObject remoteFolder = fsManager.resolveFile(push_URL);
         FileObject localfolder = fsManager.resolveFile(localInputFolderPath);
         logger.debug("Pushing files from " + localfolder + " to " + remoteFolder);
-        remoteFolder.copyFrom(localfolder, Selectors.SELECT_ALL);
+
+        //create the selector
+        DSFileSelector fileSelector = new DSFileSelector();
+
+        TaskFlowJob tfj = (TaskFlowJob) job;
+        for (Task t : tfj.getTasks()) {
+            List<InputSelector> inputFileSelectors = t.getInputFilesList();
+            for (InputSelector is : inputFileSelectors) {
+                org.ow2.proactive.scheduler.common.task.dataspaces.FileSelector fs = is.getInputFiles();
+                if (fs.getIncludes() != null)
+                    fileSelector.addIncludes(Arrays.asList(fs.getIncludes()));
+
+                if (fs.getExcludes() != null)
+                    fileSelector.addExcludes(Arrays.asList(fs.getExcludes()));
+            }
+        }
+
+        //We need to check if a pattern exist in both includes and excludes.
+        // This may happen if a task one defines, for instance "*.txt" as includes
+        //and a task two defines "*.txt" as excludes. In this case we should remove it from the fileSelector's excludes.
+
+        Set<String> includes = fileSelector.getIncludes();
+        Set<String> excludes = fileSelector.getExcludes();
+
+        Set<String> intersection = new HashSet<String>(includes);
+        intersection.retainAll(excludes);
+        excludes.removeAll(intersection);
+        fileSelector.setExcludes(excludes);
+
+        remoteFolder.copyFrom(localfolder, fileSelector);
+
         logger.debug("Finished push operation from " + localfolder + " to " + remoteFolder);
         return true;
     }
@@ -607,8 +673,33 @@ public class SchedulerProxyUIWithDSupport extends CachingSchedulerProxyUserInter
             e.printStackTrace();
         }
 
+        FileSelector fileSelector = Selectors.SELECT_ALL;
+        // The code bellow has been commented:
+        // We do not need to build a file selector because the files in the temporary folder
+        // have been copied by the data space layer which already used a FastFileSelector
+        // configured with includes and excludes patterns
+
+        //         DSFileSelector fileSelector  = new DSFileSelector();
+        //          try{
+        //            JobState jobstate = uischeduler.getJobState(jobId);
+        //            for (TaskState ts : jobstate.getTasks() )
+        //     	   {
+        //         	 List<OutputSelector> of =  ts.getOutputFilesList();
+        //         	 for (OutputSelector outputSelector : of) {
+        //         		 org.ow2.proactive.scheduler.common.task.dataspaces.FileSelector fs = outputSelector.getOutputFiles();
+        //
+        //         		fileSelector.addIncludes(fs.getIncludes());
+        //         		fileSelector.addExcludes(fs.getExcludes());
+        //     		}
+        //     	   }
+        //          }catch (Exception e)
+        //     	   {
+        //     		 logger_util.error("An exception occured while computing which output files to download for job "+ jobId+". All available files will be downloaded for this job");
+        //         	 e.printStackTrace();
+        //     	   }
+
         DataTransferProcessor dtp = new DataTransferProcessor(remotePullFolder, localfolder, jobId,
-            foldersToDelete);
+            foldersToDelete, fileSelector);
         tpe.submit(dtp);
     }
 
@@ -889,6 +980,7 @@ public class SchedulerProxyUIWithDSupport extends CachingSchedulerProxyUserInter
         private FileObject dest;
         private String jobId;
         private Set<FileObject> foldersToDelete;
+        private FileSelector fileSelector;
 
         /**
          * 
@@ -901,11 +993,12 @@ public class SchedulerProxyUIWithDSupport extends CachingSchedulerProxyUserInter
          *            jobId is null
          */
         public DataTransferProcessor(FileObject source, FileObject dest, String _jobId,
-                Set<FileObject> foldersToDelete) {
+                Set<FileObject> foldersToDelete, FileSelector fileSelector) {
             this.source = source;
             this.dest = dest;
             this.jobId = _jobId;
             this.foldersToDelete = foldersToDelete;
+            this.fileSelector = fileSelector;
         }
 
         @Override
@@ -918,7 +1011,7 @@ public class SchedulerProxyUIWithDSupport extends CachingSchedulerProxyUserInter
                 destUrl = dest.getURL().toString();
 
                 logger.debug("Copying files from " + source + " to " + dest);
-                dest.copyFrom(source, Selectors.SELECT_ALL);
+                dest.copyFrom(source, fileSelector);
                 logger.debug("Finished copying files from " + source + " to " + dest);
 
             } catch (FileSystemException e) {
