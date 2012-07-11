@@ -1,33 +1,37 @@
 package functionaltests;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.Serializable;
-import java.net.URI;
 import java.net.URISyntaxException;
 
 import javax.security.auth.login.LoginException;
 
 import org.apache.commons.vfs.FileSystemException;
+import org.apache.log4j.Level;
+import org.junit.Assert;
+import org.junit.Before;
 import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.core.ProActiveTimeoutException;
 import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.utils.TimeoutAccounter;
+import org.ow2.proactive.authentication.Connection;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.exception.UserException;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobEnvironment;
+import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
-import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputAccessMode;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
-import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
+import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
 import org.ow2.proactive.scheduler.common.util.dsclient.SchedulerProxyUIWithDSupport;
 import org.ow2.tests.FunctionalTest;
+
+import functionaltests.monitor.EventMonitor;
 
 
 /**
@@ -36,24 +40,43 @@ import org.ow2.tests.FunctionalTest;
  */
 public class TestSchedulerProxyUIWithDSSupport extends FunctionalTest {
 
+    /**
+     * Local folder on client side where the input data is located and where the
+     * output data is to be downloaded
+     */
     public static final String workFolderPath = System.getProperty("java.io.tmpdir") + File.separator +
         "testDS_LocalFolder";
+
+    /**
+     * Intermediary folder accessible (via file transfer protocol supported by
+     * VFS) both from client side and from computing node side
+     */
     public static final String dataServerFolderPath = System.getProperty("java.io.tmpdir") + File.separator +
         "testDS_remoteFolder";
+
+    public static long TIMEOUT = 10000;
 
     private File inputLocalFolder;
     private File outputLocalFolder;
     private File workLocalFolder;
-    private DataServerProvider dataProvider;
+    // private DataServerProvider dataProvider;
     private String dataServerURI;
 
     private String push_url = "file://" + dataServerFolderPath;
     private String pull_url = "file://" + dataServerFolderPath;
 
     private final String inputFileName = "input.txt";
+    private File inputFile;
 
-    //@Before
+    // the proxy to be tested
+    SchedulerProxyUIWithDSupport schedProxy;
+    MyEventListener eventListener;
+
+    @Before
     public void init() throws Exception {
+
+        // log all data transfer related events
+        ProActiveLogger.getLogger(SchedulerProxyUserInterface.class).setLevel(Level.DEBUG);
 
         workLocalFolder = new File(workFolderPath);
         inputLocalFolder = new File(workLocalFolder, "input");
@@ -63,83 +86,94 @@ public class TestSchedulerProxyUIWithDSSupport extends FunctionalTest {
         outputLocalFolder.mkdirs();
 
         // ------------- create an input File ------------
-        File f = new File(inputLocalFolder, inputFileName);
+        inputFile = new File(inputLocalFolder, inputFileName);
 
-        FileWriter fw = new FileWriter(f);
+        FileWriter fw = new FileWriter(inputFile);
         for (int i = 0; i <= 100; i++)
             fw.write("Some random input");
         fw.close();
 
         // ----------------- start Data Server -------------
         // this simulates a remote data server
-        dataServerURI = dataProvider.deployProActiveDataServer(dataServerFolderPath, "data");
+        // dataServerURI =
+        // dataProvider.deployProActiveDataServer(dataServerFolderPath, "data");
+        dataServerURI = "file://" + dataServerFolderPath;
 
         // start scheduler and nodes
         SchedulerTHelper.startScheduler();
 
-    }
+        schedProxy = SchedulerProxyUIWithDSupport.getActiveInstance();
 
-    //@After
-    public void terminate() throws ProActiveException {
-        dataProvider.stopServer();
+        String schedulerUrl = System.getProperty("url");
+        if (schedulerUrl == null || schedulerUrl.equals("${url}")) {
+            schedulerUrl = Connection.normalize(null);
+        }
+
+        schedProxy.init(schedulerUrl, SchedulerTHelper.username, SchedulerTHelper.password);
+
+        eventListener = new MyEventListener();
+        MyEventListener myListenerRemoteReference = PAActiveObject.turnActive(eventListener);
+        schedProxy.addEventListener(myListenerRemoteReference);
+
+        // delete files after the test is finihed
+        inputFile.deleteOnExit();
+        File outputFile = new File(outputLocalFolder, inputFileName + ".out");
+        outputFile.deleteOnExit();
+
+        File dataTransfer = new File("dataTransfer.status");
+        File dataTransferBak = new File("dataTransfer.status.BAK");
+        dataTransfer.deleteOnExit();
+        dataTransferBak.deleteOnExit();
+
     }
 
     @org.junit.Test
-    @org.junit.Ignore("This implementation is not yet finihed") 
     public void run() throws Throwable {
         Job job = createTestJob();
-        try {
-            submitJobWithData(job, inputLocalFolder.getAbsolutePath(), outputLocalFolder.getAbsolutePath());
-        } catch (LoginException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (FileSystemException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (SchedulerException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (ActiveObjectCreationException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (NodeException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+
+        submitJobWithDataAndWaitToFinish(job, inputLocalFolder.getAbsolutePath(), outputLocalFolder
+                .getAbsolutePath());
+
+        // check that outputLocalFolder contains a file named inputFileName.out
+
+        File f = new File(outputLocalFolder, inputFileName + ".out");
+        Assert.assertTrue(f.isFile());
+    }
+
+    public void clean() {
 
     }
 
-    private Job createTestJob() {
+    private Job createTestJob() throws UserException {
         TaskFlowJob job = new TaskFlowJob();
         JavaTask testTask = new JavaTask();
         testTask.setName("TestJavaTask");
-        testTask.setExecutableClassName(TreatDataJavaExecutable.class.getName());
+        testTask.setExecutableClassName(TestDataJavaExecutable.class.getName());
         job.setInputSpace(dataServerURI);
         job.setOutputSpace(dataServerURI);
 
         // testTask.
-        testTask.addInputFiles("in.txt", InputAccessMode.TransferFromInputSpace);
+        testTask.addInputFiles("*.txt", InputAccessMode.TransferFromInputSpace);
         testTask.addOutputFiles("*.out", OutputAccessMode.TransferToOutputSpace);
 
-        try {
-            job.addTask(testTask);
-        } catch (UserException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+        job.addTask(testTask);
         setJobClasPath(job);
         return job;
 
     }
 
-    public void submitJobWithData(Job job, String localInputFolderPath, String localOutputFolderPath)
-            throws LoginException, SchedulerException, FileSystemException, ActiveObjectCreationException,
-            NodeException {
-        SchedulerProxyUIWithDSupport schedProxy = SchedulerProxyUIWithDSupport.getActiveInstance();
+    public void submitJobWithDataAndWaitToFinish(Job job, String localInputFolderPath,
+            String localOutputFolderPath) throws LoginException, SchedulerException, FileSystemException,
+            ActiveObjectCreationException, NodeException {
 
-        schedProxy.init(SchedulerTHelper.schedulerDefaultURL, SchedulerTHelper.username,
-                SchedulerTHelper.password);
-        schedProxy.submit(job, localInputFolderPath, push_url, localOutputFolderPath, pull_url);
+        EventMonitor em = new EventMonitor(null);
+
+        JobId id = schedProxy.submit(job, localInputFolderPath, push_url, localOutputFolderPath, pull_url);
+
+        eventListener.setJobID(id);
+        eventListener.setMonitor(em);
+        waitWithMonitor(em, TIMEOUT);
+
     }
 
     /**
@@ -174,46 +208,29 @@ public class TestSchedulerProxyUIWithDSSupport extends FunctionalTest {
         job.setEnvironment(je);
     }
 
-}
-
-class TreatDataJavaExecutable extends JavaExecutable {
-
-    @Override
-    public Serializable execute(TaskResult... results) throws Throwable {
-
-        System.out.println("local space real uri: " + this.getLocalSpace().getRealURI());
-        System.out.println("local space virtual uri: " + this.getLocalSpace().getVirtualURI());
-
-        File localSpaceFolder = new File(URI.create(this.getLocalSpace().getRealURI()));
-        System.out.println("Using localspace folder " + localSpaceFolder.getAbsolutePath());
-        File[] files = localSpaceFolder.listFiles();
-
-        for (File file : files) {
-
-            if (file.isFile()) {
-                System.out.println("Treating input file " + file.getAbsolutePath());
-
-            } else {
-                System.out.println(file.getAbsolutePath() + " is not a file. ");
+    private void waitWithMonitor(EventMonitor monitor, long timeout) throws ProActiveTimeoutException {
+        TimeoutAccounter counter = TimeoutAccounter.getAccounter(timeout);
+        synchronized (monitor) {
+            monitor.setTimeouted(false);
+            while (!counter.isTimeoutElapsed()) {
+                if (monitor.eventOccured())
+                    return;
+                try {
+                    System.out.println("waiting for event monitor " + monitor);
+                    // System.out.println("I AM WAITING FOR EVENT : " +
+                    // monitor.getWaitedEvent() + " during " +
+                    // counter.getRemainingTimeout());
+                    monitor.wait(counter.getRemainingTimeout());
+                } catch (InterruptedException e) {
+                    // spurious wake-up, nothing to do
+                    e.printStackTrace();
+                }
             }
-
-            File fout = new File(file.getAbsolutePath().concat(".out"));
-            FileReader fr = new FileReader(file);
-            BufferedReader br = new BufferedReader(fr);
-            BufferedWriter bw = new BufferedWriter(new FileWriter(fout));
-
-            String line;
-            while ((line = br.readLine()) != null) {
-                bw.write(line);
-                bw.newLine();
-            }
-            bw.close();
-            br.close();
-            System.out.println("Written file " + fout.getAbsolutePath());
-        }// for
-
-        System.out.println("Task End");
-        return "OK";
+            if (monitor.eventOccured())
+                return;
+            monitor.setTimeouted(true);
+        }
+        throw new ProActiveTimeoutException("timeout elapsed");
     }
 
 }
