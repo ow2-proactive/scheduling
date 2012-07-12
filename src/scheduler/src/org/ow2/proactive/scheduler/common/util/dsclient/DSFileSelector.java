@@ -27,7 +27,7 @@ import org.objectweb.proactive.extensions.dataspaces.vfs.selector.fast.SelectorU
  */
 public class DSFileSelector implements FileSelector {
 
-    public static final Logger logger_util = ProActiveLogger.getLogger("proactive.scheduler.dev.admin.util");
+    public static final Logger logger_util = ProActiveLogger.getLogger(DSFileSelector.class);
 
     Set<String> includes = new HashSet<String>();
     Set<String> excludes = new HashSet<String>();
